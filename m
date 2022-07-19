@@ -2,122 +2,245 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECDBC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 15:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77686C43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 15:27:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239100AbiGSPPp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jul 2022 11:15:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
+        id S229818AbiGSP1V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Jul 2022 11:27:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238985AbiGSPPe (ORCPT
+        with ESMTP id S239517AbiGSP1I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jul 2022 11:15:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1AD9C550B3
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:15:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658243714;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DZfape1HvRcQDBJMjqCK8x7O2btj6Zg9uPaKpCKPLz4=;
-        b=A73vFLu8lP9Ui8AT3JEQEjnipDQnV3FShXbctl23TfDsy5O0Bg22o791JsAWIg2e6ltIPO
-        rVg4UmELRTG8Dcpnx+0NZYaEyO1DmIYKhpk1sZ1UbsIaFoPicDusXkS984Zt3edM9Usz9M
-        60TGJVf8IWUruGp7MbGioEda3nk0M6Y=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-478-RucEUlWNMECtRVqthets1Q-1; Tue, 19 Jul 2022 11:15:06 -0400
-X-MC-Unique: RucEUlWNMECtRVqthets1Q-1
-Received: by mail-wm1-f72.google.com with SMTP id bg6-20020a05600c3c8600b003a03d5d19e4so5548172wmb.1
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:15:06 -0700 (PDT)
+        Tue, 19 Jul 2022 11:27:08 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FAA50735
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:27:07 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so316835pjl.0
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:27:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=7BFIgUumD/kmYA1pmYkKFh/T9Z0odVvpxKmd7kFvmds=;
+        b=p0vbyaqg8b7QFy3eBMSaHlXf9z9XE0n+e14lNNj1gZpq49P69UF7JOMI2ROL/j+ujq
+         +gZHfIHFE/7zg/iPBZtLcSmvKojE1oqsL/+5TwruTQzkQpMGT4Ji8QHQCL6U1QA3U32i
+         ZyKfUMAC8QgAwtjeq2dRlUdhtfHbR1bApY1aozNezDNFEI10cO96GBdrKfd9J0fIYVTQ
+         6etqQKX03zuvAuv+SLJKW1+TfwfmR4q6ztMN94P2S7hH55RyVE1koH9xoCQAXzFObsmc
+         EMpacVkF3ldoF7xO5EeLIpSYY2LmUNjaTcuchwgfQkl7UvtF/EHIU05MVKDrFCYXPTNi
+         maWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=DZfape1HvRcQDBJMjqCK8x7O2btj6Zg9uPaKpCKPLz4=;
-        b=F2j6Zj2p6WDeuA9NdVXIAfZpRl0c8nzZXtWBPkAuGP6HzKERSPjdbFFc2C9v5VxfKR
-         mF8Bgz/KxW/sC5sxPFoWmdLjsUJJ8vBvq9tavmrRznHBN4ihlaZyK4VaPcoVjnvngZCe
-         VQb50/NMNfFaKrbDJxqFngzc9f9LWxfo8jhkDAA/9ravw4eLH1QFgxhAYb9iu6zSAQ1q
-         G2fUaMfOkVCxX+Q1KKMQpziQAuXAvp0h+AWfjkk7eao0D5jIGZlsliP9/XcQMFHZ+GU/
-         zYcQIPR1NLVAzndEhMF8ejcPzdG9N3b6fqqVF4knszSTZ0KK0MLkWwrdgFPBNCmM1QFD
-         bhZg==
-X-Gm-Message-State: AJIora8BgItRoTN8p2cAO4GioCXL7IwoA/jbxUm0LXQMlOX4+fRP5kPh
-        sLZU6i+hf/x6CQXj4pdugBVT0VGCjLAJRxJY7K18//a58XKMsUaLVrO6lugk80Nav7dmDBaoKz+
-        bZRr4zutdzVzyJhoqBX3BaeD4GxP/4ZuLP333oplgc4Z3q5DC3MAwSAgcgIlvHPashvgu5V692P
-        UN
-X-Received: by 2002:a1c:2b05:0:b0:3a0:2ae2:5277 with SMTP id r5-20020a1c2b05000000b003a02ae25277mr32016359wmr.30.1658243704654;
-        Tue, 19 Jul 2022 08:15:04 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1ufZw67mDO/HMSiR5dpo2mMh5Dr7OZ3O/vXfLgflU9RixvUu7uhgILPHQ/3jGFAFcB3ZuKGow==
-X-Received: by 2002:a1c:2b05:0:b0:3a0:2ae2:5277 with SMTP id r5-20020a1c2b05000000b003a02ae25277mr32016321wmr.30.1658243704438;
-        Tue, 19 Jul 2022 08:15:04 -0700 (PDT)
-Received: from vschneid.remote.csb ([185.11.37.247])
-        by smtp.gmail.com with ESMTPSA id bg10-20020a05600c3c8a00b003a0323463absm23061621wmb.45.2022.07.19.08.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 08:15:03 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Kalle Valo <kvalo@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        Gregory Erwin <gregerwin256@gmail.com>,
-        Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgense?= =?utf-8?Q?n?= 
-        <toke@redhat.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v8] ath9k: let sleep be interrupted when unregistering
- hwrng
-In-Reply-To: <CAHmME9q8-1vpV9zFsKkawk+XFm96S6fmug7v-NPJNpQmRoe6-Q@mail.gmail.com>
-References: <Yrw5f8GN2fh2orid@zx2c4.com>
- <20220629114240.946411-1-Jason@zx2c4.com> <87v8s8ubws.fsf@kernel.org>
- <xhsmho7xv512f.mognet@vschneid.remote.csb>
- <CAHmME9q8-1vpV9zFsKkawk+XFm96S6fmug7v-NPJNpQmRoe6-Q@mail.gmail.com>
-Date:   Tue, 19 Jul 2022 16:15:02 +0100
-Message-ID: <xhsmhcze16snd.mognet@vschneid.remote.csb>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=7BFIgUumD/kmYA1pmYkKFh/T9Z0odVvpxKmd7kFvmds=;
+        b=MIIGVYhkEitXrwAMlAx7I66UtPsxgRx/Ma5MeqiUaU0FQLX6QBMcAgR3W3Q2kxeRVe
+         VQggQLHb8mGnPXBQyvD6s92Xphg/IMqjNOI/nZEXpgI/7dFS+Qn0XeF4vmB+ySXqFYiY
+         dPJ/aGKxLHv0b6mdfYNMge15pLjYJOUG09dbj8mKj69nch2IsBGXrBR+oJdOr2nXBesL
+         fBtu2NSViTH6+9PNbhbxdaDcCeE7smdiPhVXhfbvDtw9NQdpz11m4xbqvrb2zTAmZNmG
+         cUXBuo5nHJ4dS+f1y0LqDc9aJBHaswrdjGQj2oYCglyDKbljfM9d3QaN86o5uPfFrTNV
+         crRw==
+X-Gm-Message-State: AJIora91rK9XYfJVJSVWyKqj3XnoxMRosUWdsrvfYPqwnfC49jMFmSbH
+        Gx0slS945PWHwZZ2vVeKs9lU/4Rbc4D2mg==
+X-Google-Smtp-Source: AGRyM1vPbVu018sIn9j876XrLkEuv9R90ykTUif3VyJk91roiLtg2J50PgHRbmglm8ZG4JQ3oBG3Cw==
+X-Received: by 2002:a17:902:e54b:b0:16c:38e5:a9b7 with SMTP id n11-20020a170902e54b00b0016c38e5a9b7mr33883192plf.66.1658244426810;
+        Tue, 19 Jul 2022 08:27:06 -0700 (PDT)
+Received: from [192.168.0.4] ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id a3-20020a170902ecc300b0016be4d78792sm11725651plh.257.2022.07.19.08.27.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Jul 2022 08:27:06 -0700 (PDT)
+Message-ID: <856b44ba-23fc-4661-9afb-6b0487133e34@gmail.com>
+Date:   Wed, 20 Jul 2022 00:27:03 +0900
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [bug report] crypto: aria - Implement ARIA symmetric cipher
+ algorithm
+Content-Language: en-US
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-crypto@vger.kernel.org
+References: <YtZn9YdHZDDBWzoC@kili>
+From:   Taehee Yoo <ap420073@gmail.com>
+In-Reply-To: <YtZn9YdHZDDBWzoC@kili>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/07/22 13:53, Jason A. Donenfeld wrote:
-> Hi Valentin,
->
-> On 7/11/22, Valentin Schneider <vschneid@redhat.com> wrote:
->> Thanks for the Cc.
->>
->> I'm not hot on the export of wake_up_state(), IMO any wakeup with
->> !(state & TASK_NORMAL) should be reserved to kernel internals. Now, here
->> IIUC the problem is that the patch uses an inline invoking
->>
->>   wake_up_state(p, TASK_INTERRUPTIBLE)
->>
->> so this isn't playing with any 'exotic' task state, thus it shouldn't
->> actually need the export.
->>
->> I've been trying to figure out if this could work with just a
->> wake_up_process(), but the sleeping pattern here is not very conforming
->> (cf. 'wait loop' pattern in sched/core.c), AFAICT the signal is used to
->> circumvent that :/
->
-> I don't intend to work on this patch more. If you'd like to ack the
-> trivial scheduler change (adding EXPORT_SYMBOL), that'd help, and then
-> this can move forward as planned. Otherwise, if you have particular
-> opinions about this patch that you want to happen, feel free to pick
-> up the patch and send your own revisions (though I don't intend to do
-> further review). Alternatively, I'll just send a patch to remove the
-> driver entirely. Hopefully you do find this ack-able, though.
->
+Hi Dan,
+Thank you so much for your report!
 
-I'm not for a blanket wake_up_state() export, however if we *really* need
-it then I suppose we could have a wake_up_process_interruptible() exported
-and used by __set_notify_signal().
+On 7/19/22 17:14, Dan Carpenter wrote:
+ > Hello Taehee Yoo,
+ >
+ > The patch e4e712bbbd6d: "crypto: aria - Implement ARIA symmetric
+ > cipher algorithm" from Jul 4, 2022, leads to the following Smatch
+ > static checker warning:
+ >
+ > crypto/aria.c:69 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 4
+ > crypto/aria.c:70 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 5
+ > crypto/aria.c:71 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 6
+ > crypto/aria.c:72 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 7
+ > crypto/aria.c:86 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 8
+ > crypto/aria.c:87 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 9
+ > crypto/aria.c:88 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 10
+ > crypto/aria.c:89 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
+<= 11
+ >
+ > crypto/aria.c
+ >      19 static void aria_set_encrypt_key(struct aria_ctx *ctx, const 
+u8 *in_key,
+ >      20                                  unsigned int key_len)
+ >      21 {
+ >      22         const __be32 *key = (const __be32 *)in_key;
+ >      23         u32 w0[4], w1[4], w2[4], w3[4];
+ >      24         u32 reg0, reg1, reg2, reg3;
+ >      25         const u32 *ck;
+ >      26         int rkidx = 0;
+ >      27
+ >      28         ck = &key_rc[(key_len - 16) / 8][0];
+ >
+ > key_rc is declared like this:
+ >
+ > static const u32 key_rc[5][4] = {
+ >
+ >      29
+ >      30         w0[0] = be32_to_cpu(key[0]);
+ >      31         w0[1] = be32_to_cpu(key[1]);
+ >      32         w0[2] = be32_to_cpu(key[2]);
+ >      33         w0[3] = be32_to_cpu(key[3]);
+ >      34
+ >      35         reg0 = w0[0] ^ ck[0];
+ >      36         reg1 = w0[1] ^ ck[1];
+ >      37         reg2 = w0[2] ^ ck[2];
+ >      38         reg3 = w0[3] ^ ck[3];
+ >      39
+ >      40         aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
+ >      41
+ >      42         if (key_len > 16) {
+ >      43                 w1[0] = be32_to_cpu(key[4]);
+ >      44                 w1[1] = be32_to_cpu(key[5]);
+ >      45                 if (key_len > 24) {
+ >      46                         w1[2] = be32_to_cpu(key[6]);
+ >      47                         w1[3] = be32_to_cpu(key[7]);
+ >      48                 } else {
+ >      49                         w1[2] = 0;
+ >      50                         w1[3] = 0;
+ >      51                 }
+ >      52         } else {
+ >      53                 w1[0] = 0;
+ >      54                 w1[1] = 0;
+ >      55                 w1[2] = 0;
+ >      56                 w1[3] = 0;
+ >      57         }
+ >      58
+ >      59         w1[0] ^= reg0;
+ >      60         w1[1] ^= reg1;
+ >      61         w1[2] ^= reg2;
+ >      62         w1[3] ^= reg3;
+ >      63
+ >      64         reg0 = w1[0];
+ >      65         reg1 = w1[1];
+ >      66         reg2 = w1[2];
+ >      67         reg3 = w1[3];
+ >      68
+ > --> 69         reg0 ^= ck[4];
+ >
+ > So 4 and above is out of bounds.
+ >
+ >      70         reg1 ^= ck[5];
+ >      71         reg2 ^= ck[6];
+ >      72         reg3 ^= ck[7];
+ >      73
+ >      74         aria_subst_diff_even(&reg0, &reg1, &reg2, &reg3);
+ >      75
+ >      76         reg0 ^= w0[0];
+ >      77         reg1 ^= w0[1];
+ >      78         reg2 ^= w0[2];
+ >      79         reg3 ^= w0[3];
+ >      80
+ >      81         w2[0] = reg0;
+ >      82         w2[1] = reg1;
+ >      83         w2[2] = reg2;
+ >      84         w2[3] = reg3;
+ >      85
+ >      86         reg0 ^= ck[8];
+ >      87         reg1 ^= ck[9];
+ >      88         reg2 ^= ck[10];
+ >      89         reg3 ^= ck[11];
+ >      90
+ >      91         aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
+ >      92
+ >      93         w3[0] = reg0 ^ w1[0];
+ >      94         w3[1] = reg1 ^ w1[1];
+ >      95         w3[2] = reg2 ^ w1[2];
+ >      96         w3[3] = reg3 ^ w1[3];
+ >      97
+ >      98         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 19);
+ >      99         rkidx++;
+ >      100         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 19);
+ >      101         rkidx++;
+ >      102         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 19);
+ >      103         rkidx++;
+ >      104         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 19);
+ >      105
+ >      106         rkidx++;
+ >      107         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 31);
+ >      108         rkidx++;
+ >      109         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 31);
+ >      110         rkidx++;
+ >      111         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 31);
+ >      112         rkidx++;
+ >      113         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 31);
+ >      114
+ >      115         rkidx++;
+ >      116         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 67);
+ >      117         rkidx++;
+ >      118         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 67);
+ >      119         rkidx++;
+ >      120         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 67);
+ >      121         rkidx++;
+ >      122         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 67);
+ >      123
+ >      124         rkidx++;
+ >      125         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 97);
+ >      126         if (key_len > 16) {
+ >      127                 rkidx++;
+ >      128                 aria_gsrk(ctx->enc_key[rkidx], w1, w2, 97);
+ >      129                 rkidx++;
+ >      130                 aria_gsrk(ctx->enc_key[rkidx], w2, w3, 97);
+ >      131
+ >      132                 if (key_len > 24) {
+ >      133                         rkidx++;
+ >      134                         aria_gsrk(ctx->enc_key[rkidx], w3, 
+w0, 97);
+ >      135
+ >      136                         rkidx++;
+ >      137                         aria_gsrk(ctx->enc_key[rkidx], w0, 
+w1, 109);
+ >      138                 }
+ >      139         }
+ >      140 }
+ >
+ > regards,
+ > dan carpenter
 
+I think this is a false positive of smatch.
+ck is a pointer and it points key_rc, which is a double array.
+But ck is used as a single array.
+So, I think smatch warns it although there are actually no out-of-bounds.
+
+I just tested changing key_rc to a single array.
+There are no smatch warnings.
+So, I will send a patch to avoid this smatch warning.
+
+Thank you so much,
+Taehee Yoo
