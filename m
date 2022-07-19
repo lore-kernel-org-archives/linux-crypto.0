@@ -2,245 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77686C43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 15:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FB7C43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 16:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiGSP1V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jul 2022 11:27:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
+        id S234043AbiGSQNl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Jul 2022 12:13:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239517AbiGSP1I (ORCPT
+        with ESMTP id S233791AbiGSQNk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jul 2022 11:27:08 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FAA50735
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:27:07 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so316835pjl.0
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 08:27:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=7BFIgUumD/kmYA1pmYkKFh/T9Z0odVvpxKmd7kFvmds=;
-        b=p0vbyaqg8b7QFy3eBMSaHlXf9z9XE0n+e14lNNj1gZpq49P69UF7JOMI2ROL/j+ujq
-         +gZHfIHFE/7zg/iPBZtLcSmvKojE1oqsL/+5TwruTQzkQpMGT4Ji8QHQCL6U1QA3U32i
-         ZyKfUMAC8QgAwtjeq2dRlUdhtfHbR1bApY1aozNezDNFEI10cO96GBdrKfd9J0fIYVTQ
-         6etqQKX03zuvAuv+SLJKW1+TfwfmR4q6ztMN94P2S7hH55RyVE1koH9xoCQAXzFObsmc
-         EMpacVkF3ldoF7xO5EeLIpSYY2LmUNjaTcuchwgfQkl7UvtF/EHIU05MVKDrFCYXPTNi
-         maWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7BFIgUumD/kmYA1pmYkKFh/T9Z0odVvpxKmd7kFvmds=;
-        b=MIIGVYhkEitXrwAMlAx7I66UtPsxgRx/Ma5MeqiUaU0FQLX6QBMcAgR3W3Q2kxeRVe
-         VQggQLHb8mGnPXBQyvD6s92Xphg/IMqjNOI/nZEXpgI/7dFS+Qn0XeF4vmB+ySXqFYiY
-         dPJ/aGKxLHv0b6mdfYNMge15pLjYJOUG09dbj8mKj69nch2IsBGXrBR+oJdOr2nXBesL
-         fBtu2NSViTH6+9PNbhbxdaDcCeE7smdiPhVXhfbvDtw9NQdpz11m4xbqvrb2zTAmZNmG
-         cUXBuo5nHJ4dS+f1y0LqDc9aJBHaswrdjGQj2oYCglyDKbljfM9d3QaN86o5uPfFrTNV
-         crRw==
-X-Gm-Message-State: AJIora91rK9XYfJVJSVWyKqj3XnoxMRosUWdsrvfYPqwnfC49jMFmSbH
-        Gx0slS945PWHwZZ2vVeKs9lU/4Rbc4D2mg==
-X-Google-Smtp-Source: AGRyM1vPbVu018sIn9j876XrLkEuv9R90ykTUif3VyJk91roiLtg2J50PgHRbmglm8ZG4JQ3oBG3Cw==
-X-Received: by 2002:a17:902:e54b:b0:16c:38e5:a9b7 with SMTP id n11-20020a170902e54b00b0016c38e5a9b7mr33883192plf.66.1658244426810;
-        Tue, 19 Jul 2022 08:27:06 -0700 (PDT)
-Received: from [192.168.0.4] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id a3-20020a170902ecc300b0016be4d78792sm11725651plh.257.2022.07.19.08.27.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Jul 2022 08:27:06 -0700 (PDT)
-Message-ID: <856b44ba-23fc-4661-9afb-6b0487133e34@gmail.com>
-Date:   Wed, 20 Jul 2022 00:27:03 +0900
+        Tue, 19 Jul 2022 12:13:40 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EB704C610;
+        Tue, 19 Jul 2022 09:13:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=brCS8OPby6GWIHonkGWN6YbGD4J/wQe/mI0NHcuzeciTGzirFQ7O2/xqWgc02ow8iOOrcHOvB1Q+0pKL7A8p5yCtZPw3RnuH0NGEqEkhNZeCVeK9nOgEU3YL5wF7pdy3QXgwDnZOrtt+imPN8CHQgChuVM6mqnGx0g10B1vzSWha73zaENGZKgvh/S61+jjrWIIJApR8QvCnAMG7yt3Bbdvv5q5kLfyxGtYxDTtcOxlx7bQlpMQcUKK3vxX2P0StOQ2TIS4EdV+61DSfPoNFag6ATrrzbzyOBXctTkEyz8A21FIM8zphxDsgKCMJew4pucw78CDbcWDr+/ZroU5ZzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ddtGx0KMFJdQFk6Y95cMIs/e1GlpeKvQRgip1ocXj3M=;
+ b=ju9yoC9ZkdrObU+1ur9SVleuFbj9RP+1oJK7fcFPClU547XF/MGX4vraD7AuXT1dbv1fqluggyDg//szIVo0yPsnXs4fNPst0psks4bCtxQ/ySR7zhD4u8y1Y9KC3+1m7KO/Mc/0WOZpRmqjzzRTfDkz7r5ZNbjMv8x73xPQ110z+60A9EVMmGC9V045TKjYtUaNRtIRPBdNdZLVnsYTWXu7nAVwT1ugVgeCEoJlTYivWC5s3h4NHYAv5f1X7b2Np621tJOc6FY065TRPBzHS0mmxDTKgiBN3rk7tHdHL40XId9wr7dlrTuvqQ9zbGOp0UlsKcJjnkSfXZc5hAMgdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ddtGx0KMFJdQFk6Y95cMIs/e1GlpeKvQRgip1ocXj3M=;
+ b=uCQ4/EQH4O9yzmImRmltrA10CWVYSSrezTC8DOR9UhnPBMtttoEOfQMgAcLgIETbYsvJyaIJMhxkT3pBa1RtMUiXnK6AuZNE9Q2YbVxcmmQlLt7KLGV2TUTCZBLyqNz68Oo9YB6+MY2EIqfuK7w6up+DTGNb5v6TuumbpgVEpJw=
+Received: from DM6PR05CA0056.namprd05.prod.outlook.com (2603:10b6:5:335::25)
+ by MW3PR12MB4555.namprd12.prod.outlook.com (2603:10b6:303:59::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.17; Tue, 19 Jul
+ 2022 16:13:36 +0000
+Received: from DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:335:cafe::71) by DM6PR05CA0056.outlook.office365.com
+ (2603:10b6:5:335::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.11 via Frontend
+ Transport; Tue, 19 Jul 2022 16:13:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT030.mail.protection.outlook.com (10.13.172.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5438.12 via Frontend Transport; Tue, 19 Jul 2022 16:13:35 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Tue, 19 Jul
+ 2022 11:13:34 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     <mario.limonciello@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "John Allen" <john.allen@amd.com>
+CC:     Rijo-john Thomas <Rijo-john.Thomas@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: ccp - Add support for new CCP/PSP device ID
+Date:   Tue, 19 Jul 2022 11:13:28 -0500
+Message-ID: <20220719161328.7907-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [bug report] crypto: aria - Implement ARIA symmetric cipher
- algorithm
-Content-Language: en-US
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     linux-crypto@vger.kernel.org
-References: <YtZn9YdHZDDBWzoC@kili>
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <YtZn9YdHZDDBWzoC@kili>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: aef96a68-2a7c-4b4a-6979-08da69a1a1cf
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4555:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3/8YWn+1y5JdYJGGAR8jSH7nx8PI5cZ5CfYJXClv0YAYJtjHYoVLFI1vQB9/TimSBaYDVisHpVKXYlfc0JpIbALcFRKqzuEtq8GPG5Kj66k9Azprxj60ECBIB9Rhi67slG2SZ6OIapDa8FV3CCEhjMYuk4DuBoF5Fx/a8OFLlzaQHW5L03XzN7vMoJuNDiiasH4NMVaneUnIiPsQhSLEUUvFaRFJDnCLcW6jcgGPP0uNslzX43s9rbdFcaC9IUO3QlQmiRmU1WuVzRcnv4syNqgY6O1wrlas/2YOooZA38o1IUmMpc3kuAg+UJoBR2K2l4fzHKptQdmKAVHaNZfgyK2Mve6OVJufrxerKH2L90oDaZD06xilBtyyKtxVOGzA46gqp5Ecl0gxEoR/ZQeX4DLgTJceVDlPaCuzMzzGdjPX2aFWBUHCgF/meLDuICPQG6MEH6Nj2XhcnAoK8zxvrbcuU4OXtpaKcbp5EHYQb7R8oY1H6zeMBU142y+EUE+AGC85aGZbZpd9CzvQwPeT1V6gRihtCGJiIU3/UJwVTifEfiHDHwEil6ZTH1em5IZN638f6K3l9zyGgzCxbpDMF9guf4jx0vGo1qtj7xpu7+fBWeY5F4aVnaPOYK6KMvqpn3HwH4EdE4Ug1pxXhGI1uPZRSY8xwNseqmRk9RTNA31RsIYUZskLpCsP/IxwUv7QJzVpk6MAYr0i8mZ708JAAvHCaz5D7znjr+QAB1g2ziBiXNdq/4DrTnG8vx/agq+TJLMawEdkleJqdAfkttV9pwMRhocaW44fUTHsPumkUnutJHsrixpNUh/g7Gdxff3ggevHVW1WUPWbzGkHbZHhMQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(396003)(136003)(376002)(46966006)(36840700001)(40470700004)(54906003)(186003)(16526019)(82310400005)(6666004)(86362001)(36756003)(316002)(6636002)(1076003)(110136005)(426003)(47076005)(2616005)(336012)(40460700003)(4326008)(70206006)(478600001)(82740400003)(70586007)(8676002)(26005)(41300700001)(7696005)(81166007)(2906002)(40480700001)(356005)(44832011)(8936002)(5660300002)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2022 16:13:35.0784
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aef96a68-2a7c-4b4a-6979-08da69a1a1cf
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT030.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4555
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dan,
-Thank you so much for your report!
+Add a new CCP/PSP PCI device ID.  This uses same register offsets
+as the previously supported structure.
 
-On 7/19/22 17:14, Dan Carpenter wrote:
- > Hello Taehee Yoo,
- >
- > The patch e4e712bbbd6d: "crypto: aria - Implement ARIA symmetric
- > cipher algorithm" from Jul 4, 2022, leads to the following Smatch
- > static checker warning:
- >
- > crypto/aria.c:69 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 4
- > crypto/aria.c:70 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 5
- > crypto/aria.c:71 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 6
- > crypto/aria.c:72 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 7
- > crypto/aria.c:86 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 8
- > crypto/aria.c:87 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 9
- > crypto/aria.c:88 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 10
- > crypto/aria.c:89 aria_set_encrypt_key() error: buffer overflow 'ck' 4 
-<= 11
- >
- > crypto/aria.c
- >      19 static void aria_set_encrypt_key(struct aria_ctx *ctx, const 
-u8 *in_key,
- >      20                                  unsigned int key_len)
- >      21 {
- >      22         const __be32 *key = (const __be32 *)in_key;
- >      23         u32 w0[4], w1[4], w2[4], w3[4];
- >      24         u32 reg0, reg1, reg2, reg3;
- >      25         const u32 *ck;
- >      26         int rkidx = 0;
- >      27
- >      28         ck = &key_rc[(key_len - 16) / 8][0];
- >
- > key_rc is declared like this:
- >
- > static const u32 key_rc[5][4] = {
- >
- >      29
- >      30         w0[0] = be32_to_cpu(key[0]);
- >      31         w0[1] = be32_to_cpu(key[1]);
- >      32         w0[2] = be32_to_cpu(key[2]);
- >      33         w0[3] = be32_to_cpu(key[3]);
- >      34
- >      35         reg0 = w0[0] ^ ck[0];
- >      36         reg1 = w0[1] ^ ck[1];
- >      37         reg2 = w0[2] ^ ck[2];
- >      38         reg3 = w0[3] ^ ck[3];
- >      39
- >      40         aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
- >      41
- >      42         if (key_len > 16) {
- >      43                 w1[0] = be32_to_cpu(key[4]);
- >      44                 w1[1] = be32_to_cpu(key[5]);
- >      45                 if (key_len > 24) {
- >      46                         w1[2] = be32_to_cpu(key[6]);
- >      47                         w1[3] = be32_to_cpu(key[7]);
- >      48                 } else {
- >      49                         w1[2] = 0;
- >      50                         w1[3] = 0;
- >      51                 }
- >      52         } else {
- >      53                 w1[0] = 0;
- >      54                 w1[1] = 0;
- >      55                 w1[2] = 0;
- >      56                 w1[3] = 0;
- >      57         }
- >      58
- >      59         w1[0] ^= reg0;
- >      60         w1[1] ^= reg1;
- >      61         w1[2] ^= reg2;
- >      62         w1[3] ^= reg3;
- >      63
- >      64         reg0 = w1[0];
- >      65         reg1 = w1[1];
- >      66         reg2 = w1[2];
- >      67         reg3 = w1[3];
- >      68
- > --> 69         reg0 ^= ck[4];
- >
- > So 4 and above is out of bounds.
- >
- >      70         reg1 ^= ck[5];
- >      71         reg2 ^= ck[6];
- >      72         reg3 ^= ck[7];
- >      73
- >      74         aria_subst_diff_even(&reg0, &reg1, &reg2, &reg3);
- >      75
- >      76         reg0 ^= w0[0];
- >      77         reg1 ^= w0[1];
- >      78         reg2 ^= w0[2];
- >      79         reg3 ^= w0[3];
- >      80
- >      81         w2[0] = reg0;
- >      82         w2[1] = reg1;
- >      83         w2[2] = reg2;
- >      84         w2[3] = reg3;
- >      85
- >      86         reg0 ^= ck[8];
- >      87         reg1 ^= ck[9];
- >      88         reg2 ^= ck[10];
- >      89         reg3 ^= ck[11];
- >      90
- >      91         aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
- >      92
- >      93         w3[0] = reg0 ^ w1[0];
- >      94         w3[1] = reg1 ^ w1[1];
- >      95         w3[2] = reg2 ^ w1[2];
- >      96         w3[3] = reg3 ^ w1[3];
- >      97
- >      98         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 19);
- >      99         rkidx++;
- >      100         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 19);
- >      101         rkidx++;
- >      102         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 19);
- >      103         rkidx++;
- >      104         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 19);
- >      105
- >      106         rkidx++;
- >      107         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 31);
- >      108         rkidx++;
- >      109         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 31);
- >      110         rkidx++;
- >      111         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 31);
- >      112         rkidx++;
- >      113         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 31);
- >      114
- >      115         rkidx++;
- >      116         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 67);
- >      117         rkidx++;
- >      118         aria_gsrk(ctx->enc_key[rkidx], w1, w2, 67);
- >      119         rkidx++;
- >      120         aria_gsrk(ctx->enc_key[rkidx], w2, w3, 67);
- >      121         rkidx++;
- >      122         aria_gsrk(ctx->enc_key[rkidx], w3, w0, 67);
- >      123
- >      124         rkidx++;
- >      125         aria_gsrk(ctx->enc_key[rkidx], w0, w1, 97);
- >      126         if (key_len > 16) {
- >      127                 rkidx++;
- >      128                 aria_gsrk(ctx->enc_key[rkidx], w1, w2, 97);
- >      129                 rkidx++;
- >      130                 aria_gsrk(ctx->enc_key[rkidx], w2, w3, 97);
- >      131
- >      132                 if (key_len > 24) {
- >      133                         rkidx++;
- >      134                         aria_gsrk(ctx->enc_key[rkidx], w3, 
-w0, 97);
- >      135
- >      136                         rkidx++;
- >      137                         aria_gsrk(ctx->enc_key[rkidx], w0, 
-w1, 109);
- >      138                 }
- >      139         }
- >      140 }
- >
- > regards,
- > dan carpenter
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+---
+ drivers/crypto/ccp/sp-pci.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-I think this is a false positive of smatch.
-ck is a pointer and it points key_rc, which is a double array.
-But ck is used as a single array.
-So, I think smatch warns it although there are actually no out-of-bounds.
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index b5970ae54d0e..792d6da7f0c0 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -427,6 +427,12 @@ static const struct sp_dev_vdata dev_vdata[] = {
+ 		.bar = 2,
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ 		.psp_vdata = &pspv2,
++#endif
++	},
++	{	/* 6 */
++		.bar = 2,
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++		.psp_vdata = &pspv3,
+ #endif
+ 	},
+ };
+@@ -438,6 +444,7 @@ static const struct pci_device_id sp_pci_table[] = {
+ 	{ PCI_VDEVICE(AMD, 0x15DF), (kernel_ulong_t)&dev_vdata[4] },
+ 	{ PCI_VDEVICE(AMD, 0x1649), (kernel_ulong_t)&dev_vdata[4] },
+ 	{ PCI_VDEVICE(AMD, 0x14CA), (kernel_ulong_t)&dev_vdata[5] },
++	{ PCI_VDEVICE(AMD, 0x15C7), (kernel_ulong_t)&dev_vdata[6] },
+ 	/* Last entry must be zero */
+ 	{ 0, }
+ };
+-- 
+2.34.1
 
-I just tested changing key_rc to a single array.
-There are no smatch warnings.
-So, I will send a patch to avoid this smatch warning.
-
-Thank you so much,
-Taehee Yoo
