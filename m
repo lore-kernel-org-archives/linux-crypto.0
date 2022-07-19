@@ -2,70 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4156BC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 18:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23EFAC43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 20:28:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237314AbiGSSEe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jul 2022 14:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
+        id S235972AbiGSU16 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Jul 2022 16:27:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234186AbiGSSEd (ORCPT
+        with ESMTP id S234186AbiGSU16 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jul 2022 14:04:33 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB2C52E40;
-        Tue, 19 Jul 2022 11:04:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1DF29B81CBF;
-        Tue, 19 Jul 2022 18:04:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E51C341C6;
-        Tue, 19 Jul 2022 18:04:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658253869;
-        bh=5OfFErLFBejt60+IIJPAQA9g/7Onr9MuvpCgu+Z3+Qs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Uo1QbMqhFjL82JpmX7pQ0sog/PjleOuEoUbfX4PM9/50KjxF2YgabgoT7W9iczHAj
-         oH2ii7Xd78yI+YwtYyBOGD1bcFXNifHCBZHQNe5RvxGJYEGr26NB374fGF+JXBaM4k
-         k+H8xSSfOAS9LpukoIkrU4PYUTJtA/IHp5eP4GRTG77mfzVZ44LkQHH3TfYWlfXyoQ
-         67pGwJFBfAgHixRfkVf0f5GSKp6liO0kVwVQRNbcDiWK/saCCKSWOSu7Ytp1rpT82c
-         YxqAqWoo3NZoGRLv9aQVDZ9obo16Ncv7StgncII+8C7QN/xtRBi069i/XxZyGwr/BB
-         588yAdTGX3DHw==
-Date:   Tue, 19 Jul 2022 11:04:27 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Sudip Mukherjee (Codethink)" <sudipm.mukherjee@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-next@vger.kernel.org
-Subject: Re: build failure of next-20220719 due to 'missing MODULE_LICENSE()
- in lib/crypto/libsha1.o'
-Message-ID: <YtbyK2/jLGqcp3Rc@sol.localdomain>
-References: <YtbBb3gCsKfpsaXP@debian>
+        Tue, 19 Jul 2022 16:27:58 -0400
+Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CBD04F691
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Jul 2022 13:27:56 -0700 (PDT)
+Received: from pop-os.home ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id DtotonZfqnnjODtotop12z; Tue, 19 Jul 2022 22:27:54 +0200
+X-ME-Helo: pop-os.home
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Tue, 19 Jul 2022 22:27:54 +0200
+X-ME-IP: 90.11.190.129
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ccree - Remove a useless dma_supported() call
+Date:   Tue, 19 Jul 2022 22:27:50 +0200
+Message-Id: <ef6f884ef144390f152c34d2f549b1f50303b7b1.1658262447.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtbBb3gCsKfpsaXP@debian>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 03:36:31PM +0100, Sudip Mukherjee (Codethink) wrote:
-> Hi All,
-> 
-> Not sure if it has been reported, builds of arm milbeaut_m10v_defconfig
-> have failed to build next-20220719 with the error:
-> 
-> ERROR: modpost: missing MODULE_LICENSE() in lib/crypto/libsha1.o
-> 
-> caused by ec8f7f4821d5 ("crypto: lib - make the sha1 library optional").
-> 
+There is no point in calling dma_supported() before calling
+dma_set_coherent_mask(). This function already calls dma_supported() and
+returns an error (-EIO) if it fails.
 
-I already sent out a fix for this:
-https://lore.kernel.org/linux-crypto/20220719030415.32113-1-ebiggers@kernel.org/
+So remove the superfluous dma_supported() call.
 
-- Eric
+While at it, fix the name of the function reported in a dev_err().
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+I guess that the whole while loop could be removed, but I don't remind the
+thread with the corresponding explanation, so leave it as-is :(
+---
+ drivers/crypto/ccree/cc_driver.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 7d1bee86d581..99f8bda718fe 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -373,16 +373,16 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 
+ 	dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
+ 	while (dma_mask > 0x7fffffffUL) {
+-		if (dma_supported(dev, dma_mask)) {
+-			rc = dma_set_coherent_mask(dev, dma_mask);
+-			if (!rc)
+-				break;
+-		}
++		rc = dma_set_coherent_mask(dev, dma_mask);
++		if (!rc)
++			break;
++
+ 		dma_mask >>= 1;
+ 	}
+ 
+ 	if (rc) {
+-		dev_err(dev, "Failed in dma_set_mask, mask=%llx\n", dma_mask);
++		dev_err(dev, "Failed in dma_set_coherent_mask, mask=%llx\n",
++			dma_mask);
+ 		return rc;
+ 	}
+ 
+-- 
+2.34.1
+
