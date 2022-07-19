@@ -2,150 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F43C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 02:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376BCC43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 02:16:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236475AbiGSCGh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Jul 2022 22:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
+        id S236876AbiGSCQf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Jul 2022 22:16:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235991AbiGSCGh (ORCPT
+        with ESMTP id S236875AbiGSCQa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Jul 2022 22:06:37 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7F73C17B;
-        Mon, 18 Jul 2022 19:06:35 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Ln2Gp1T5jzFqBD;
-        Tue, 19 Jul 2022 10:05:22 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 19 Jul
- 2022 10:06:23 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liulongfang@huawei.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-CC:     <xuzaibo@huawei.com>, <weiyongjun1@huawei.com>,
-        <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH] crypto: hisilicon/hpre - don't use GFP_KERNEL to alloc mem during softirq
-Date:   Tue, 19 Jul 2022 10:10:42 +0800
-Message-ID: <20220719021042.250882-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 18 Jul 2022 22:16:30 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2CF2528F;
+        Mon, 18 Jul 2022 19:16:28 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oDcme-001wgN-8q; Tue, 19 Jul 2022 12:16:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 19 Jul 2022 10:16:24 +0800
+Date:   Tue, 19 Jul 2022 10:16:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Zhengchao Shao <shaozhengchao@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liulongfang@huawei.com, davem@davemloft.net, xuzaibo@huawei.com,
+        weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH] crypto: hisilicon/hpre - don't use GFP_KERNEL to alloc
+ mem during softirq
+Message-ID: <YtYT+JeYj7vlz9Xp@gondor.apana.org.au>
+References: <20220719021042.250882-1-shaozhengchao@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220719021042.250882-1-shaozhengchao@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The hpre encryption driver may be used to encrypt and decrypt packets
-during the rx softirq, it is not allowed to use GFP_KERNEL.
+On Tue, Jul 19, 2022 at 10:10:42AM +0800, Zhengchao Shao wrote:
+>
+> @@ -252,7 +252,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
+>  	if (unlikely(shift < 0))
+>  		return -EINVAL;
+>  
+> -	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, GFP_KERNEL);
+> +	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, flags);
 
-Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+How about just using GFP_ATOMIC unconditinoally?
 
-This patch is not tested, compiled only.
----
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 28 +++++++++++++--------
- 1 file changed, 18 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 97d54c1465c2..cf098fa673f4 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -241,7 +241,7 @@ static int hpre_get_data_dma_addr(struct hpre_asym_request *hpre_req,
- 
- static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
- 				struct scatterlist *data, unsigned int len,
--				int is_src, dma_addr_t *tmp)
-+				int is_src, dma_addr_t *tmp, gfp_t flags)
- {
- 	struct hpre_ctx *ctx = hpre_req->ctx;
- 	struct device *dev = ctx->dev;
-@@ -252,7 +252,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
- 	if (unlikely(shift < 0))
- 		return -EINVAL;
- 
--	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, GFP_KERNEL);
-+	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, flags);
- 	if (unlikely(!ptr))
- 		return -ENOMEM;
- 
-@@ -268,7 +268,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
- 
- static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
- 			     struct scatterlist *data, unsigned int len,
--			     int is_src, int is_dh)
-+			     int is_src, int is_dh, u32 flags)
- {
- 	struct hpre_sqe *msg = &hpre_req->req;
- 	struct hpre_ctx *ctx = hpre_req->ctx;
-@@ -280,7 +280,9 @@ static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
- 	    ((is_dh && !is_src) || !is_dh))
- 		ret = hpre_get_data_dma_addr(hpre_req, data, len, is_src, &tmp);
- 	else
--		ret = hpre_prepare_dma_buf(hpre_req, data, len, is_src, &tmp);
-+		ret = hpre_prepare_dma_buf(hpre_req, data, len, is_src, &tmp,
-+					   (flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+					   GFP_KERNEL : GFP_ATOMIC);
- 
- 	if (unlikely(ret))
- 		return ret;
-@@ -585,14 +587,16 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 		return ret;
- 
- 	if (req->src) {
--		ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1);
-+		ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1,
-+					req->base.flags);
- 		if (unlikely(ret))
- 			goto clear_all;
- 	} else {
- 		msg->in = cpu_to_le64(ctx->dh.dma_g);
- 	}
- 
--	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 1);
-+	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 1,
-+				req->base.flags);
- 	if (unlikely(ret))
- 		goto clear_all;
- 
-@@ -800,11 +804,13 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 	msg->dw0 |= cpu_to_le32(HPRE_ALG_NC_NCRT);
- 	msg->key = cpu_to_le64(ctx->rsa.dma_pubkey);
- 
--	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
-+	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0,
-+				req->base.flags);
- 	if (unlikely(ret))
- 		goto clear_all;
- 
--	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
-+	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0,
-+				req->base.flags);
- 	if (unlikely(ret))
- 		goto clear_all;
- 
-@@ -855,11 +861,13 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 				       HPRE_ALG_NC_NCRT);
- 	}
- 
--	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
-+	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0,
-+				req->base.flags);
- 	if (unlikely(ret))
- 		goto clear_all;
- 
--	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
-+	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0,
-+				req->base.flags);
- 	if (unlikely(ret))
- 		goto clear_all;
- 
+Cheers,
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
