@@ -2,83 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D39C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jul 2022 17:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F43C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 02:06:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235890AbiGRRtQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Jul 2022 13:49:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34842 "EHLO
+        id S236475AbiGSCGh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Jul 2022 22:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235895AbiGRRtP (ORCPT
+        with ESMTP id S235991AbiGSCGh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Jul 2022 13:49:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F8C2B608;
-        Mon, 18 Jul 2022 10:49:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=SAGZqlv/8Ekeq7cG9+dcrh2VR2Q3Mh2/2a+2GmOEZ38=; b=led+XNtZy4DOs8zGSGMdVKgQCV
-        o+5rhsSbXAm1WD2ABinuR6B/vzR+DxKu1xY2yskOvMGlItwad7UQlrx8JsMSDoEIk0HxBoQ50tOP1
-        qKfDzBoyZw5BC6ybQrsPm1RR0XHex0ddNvhvIBgG22T0t0DPNqbA2iXyXe/2+/4mkFQMoSC2NRiQH
-        qzD527277g92Y+GLhDfAo/KrQb/iLwAeA4WcyHmLwvlOGN2RNpAGcd4dwWlre2/SiBpdv+VtsdndC
-        3wp1IUoMOezYiZ4u/0YrTtQBu1YMP8fIumHHg1fxZqpN7Te6S8beExSl/LfCjnNKR8a3QGdxy1Dfn
-        GaCkBJaQ==;
-Received: from [2601:1c0:6280:3f0::a6b3]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oDUrl-00HKCn-4Q; Mon, 18 Jul 2022 17:49:09 +0000
-Message-ID: <e90e0d6e-b4e5-b708-a431-cec27379bf51@infradead.org>
-Date:   Mon, 18 Jul 2022 10:49:07 -0700
+        Mon, 18 Jul 2022 22:06:37 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7F73C17B;
+        Mon, 18 Jul 2022 19:06:35 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Ln2Gp1T5jzFqBD;
+        Tue, 19 Jul 2022 10:05:22 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 19 Jul
+ 2022 10:06:23 +0800
+From:   Zhengchao Shao <shaozhengchao@huawei.com>
+To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <liulongfang@huawei.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <xuzaibo@huawei.com>, <weiyongjun1@huawei.com>,
+        <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH] crypto: hisilicon/hpre - don't use GFP_KERNEL to alloc mem during softirq
+Date:   Tue, 19 Jul 2022 10:10:42 +0800
+Message-ID: <20220719021042.250882-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 0/2] crypto: make the sha1 library optional
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Jason@zx2c4.com
-References: <YtEqWH2JzolCfLRA@gondor.apana.org.au>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <YtEqWH2JzolCfLRA@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The hpre encryption driver may be used to encrypt and decrypt packets
+during the rx softirq, it is not allowed to use GFP_KERNEL.
 
+Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 
-On 7/15/22 01:50, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
->> This series makes it possible to build the kernel without SHA-1 support,
->> although for now this is only possible in minimal configurations, due to
->> the uses of SHA-1 in the networking subsystem.
->>
->> Eric Biggers (2):
->>  crypto: move lib/sha1.c into lib/crypto/
->>  crypto: make the sha1 library optional
->>
->> crypto/Kconfig          | 1 +
->> init/Kconfig            | 1 +
->> lib/Makefile            | 2 +-
->> lib/crypto/Kconfig      | 3 +++
->> lib/crypto/Makefile     | 3 +++
->> lib/{ => crypto}/sha1.c | 0
->> net/ipv6/Kconfig        | 1 +
->> 7 files changed, 10 insertions(+), 1 deletion(-)
->> rename lib/{ => crypto}/sha1.c (100%)
->>
->>
->> base-commit: 79e6e2f3f3ff345947075341781e900e4f70db81
-> 
-> All applied.  Thanks.
+This patch is not tested, compiled only.
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 28 +++++++++++++--------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-Eric,
-linux-next-20220718 has a build error:
-
-ERROR: modpost: missing MODULE_LICENSE() in lib/crypto/libsha1.o
-
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 97d54c1465c2..cf098fa673f4 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -241,7 +241,7 @@ static int hpre_get_data_dma_addr(struct hpre_asym_request *hpre_req,
+ 
+ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
+ 				struct scatterlist *data, unsigned int len,
+-				int is_src, dma_addr_t *tmp)
++				int is_src, dma_addr_t *tmp, gfp_t flags)
+ {
+ 	struct hpre_ctx *ctx = hpre_req->ctx;
+ 	struct device *dev = ctx->dev;
+@@ -252,7 +252,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
+ 	if (unlikely(shift < 0))
+ 		return -EINVAL;
+ 
+-	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, GFP_KERNEL);
++	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, flags);
+ 	if (unlikely(!ptr))
+ 		return -ENOMEM;
+ 
+@@ -268,7 +268,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
+ 
+ static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
+ 			     struct scatterlist *data, unsigned int len,
+-			     int is_src, int is_dh)
++			     int is_src, int is_dh, u32 flags)
+ {
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	struct hpre_ctx *ctx = hpre_req->ctx;
+@@ -280,7 +280,9 @@ static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
+ 	    ((is_dh && !is_src) || !is_dh))
+ 		ret = hpre_get_data_dma_addr(hpre_req, data, len, is_src, &tmp);
+ 	else
+-		ret = hpre_prepare_dma_buf(hpre_req, data, len, is_src, &tmp);
++		ret = hpre_prepare_dma_buf(hpre_req, data, len, is_src, &tmp,
++					   (flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++					   GFP_KERNEL : GFP_ATOMIC);
+ 
+ 	if (unlikely(ret))
+ 		return ret;
+@@ -585,14 +587,16 @@ static int hpre_dh_compute_value(struct kpp_request *req)
+ 		return ret;
+ 
+ 	if (req->src) {
+-		ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1);
++		ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1,
++					req->base.flags);
+ 		if (unlikely(ret))
+ 			goto clear_all;
+ 	} else {
+ 		msg->in = cpu_to_le64(ctx->dh.dma_g);
+ 	}
+ 
+-	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 1);
++	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 1,
++				req->base.flags);
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+@@ -800,11 +804,13 @@ static int hpre_rsa_enc(struct akcipher_request *req)
+ 	msg->dw0 |= cpu_to_le32(HPRE_ALG_NC_NCRT);
+ 	msg->key = cpu_to_le64(ctx->rsa.dma_pubkey);
+ 
+-	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
++	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0,
++				req->base.flags);
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+-	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
++	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0,
++				req->base.flags);
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+@@ -855,11 +861,13 @@ static int hpre_rsa_dec(struct akcipher_request *req)
+ 				       HPRE_ALG_NC_NCRT);
+ 	}
+ 
+-	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
++	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0,
++				req->base.flags);
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+-	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
++	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0,
++				req->base.flags);
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
 -- 
-~Randy
+2.17.1
+
