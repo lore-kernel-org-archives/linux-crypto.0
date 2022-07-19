@@ -2,82 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA01C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 04:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1933C43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 06:00:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236704AbiGSEe3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jul 2022 00:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41156 "EHLO
+        id S236684AbiGSGAs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Jul 2022 02:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234905AbiGSEe2 (ORCPT
+        with ESMTP id S235951AbiGSGAr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jul 2022 00:34:28 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D698225292;
-        Mon, 18 Jul 2022 21:34:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7EDBDB8196E;
-        Tue, 19 Jul 2022 04:34:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222A9C341C6;
-        Tue, 19 Jul 2022 04:34:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658205265;
-        bh=lyI4/mHHLRca4HDvmJ2/d/xQZLB7kG482WO+gt5PO1U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lgLXcmygLsMRXrtNyRLPbQm8DuxwAqm6z9Ox8diyOI0kztyTFcr2JQDFtTcuCGCjf
-         5FZ4Tyjz9OrM622UWg/m8pSoIKYJrMXqdQy3TFD1nmfQOdtCxEuw6EIBg5aLSX18tF
-         I/0OATgg1m9o/e+5QOba/WGlP9TLsBR3PFi94HYoXd4nPljEOHn35+rFYGlDw9/LfO
-         Q+ae6AQ6izsn0H21QPd/hxnlkQDUSzOgyXmOZ9jLufsY+lpX8/UymNd5ucKuMnpdbw
-         ZI1fDyCL35POMmwqCn6wClOwmoY7Y59e4Z8B+paF/B/ArcihI4pmBDlIUBGkbrRpHB
-         QNGUtkWD6fz4A==
-Date:   Mon, 18 Jul 2022 21:34:23 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] crypto: lib - move crypto_simd_disabled_for_test
- into utils
-Message-ID: <YtY0T4qASnYOIjIW@sol.localdomain>
-References: <20220716062920.210381-1-ebiggers@kernel.org>
- <20220716062920.210381-4-ebiggers@kernel.org>
- <YtMEFyH8WyPS/vJB@zx2c4.com>
+        Tue, 19 Jul 2022 02:00:47 -0400
+Received: from smtp.smtpout.orange.fr (smtp01.smtpout.orange.fr [80.12.242.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F8F37FBD
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Jul 2022 23:00:46 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id DgHgoxPJ53kbdDgHgotvMM; Tue, 19 Jul 2022 08:00:45 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Tue, 19 Jul 2022 08:00:45 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <00da8a58-e4d0-40c9-0b4a-011ca0754c77@wanadoo.fr>
+Date:   Tue, 19 Jul 2022 08:00:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtMEFyH8WyPS/vJB@zx2c4.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH] crypto: hisilicon/zip: Use the bitmap API to allocate
+ bitmaps
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Yang Shen <shenyang39@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <49a1b5bf6e8f7c2ad06a0e2dbc35e00169d4ebe2.1657383385.git.christophe.jaillet@wanadoo.fr>
+ <YtEmS//eV3Ok08BD@gondor.apana.org.au>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <YtEmS//eV3Ok08BD@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 16, 2022 at 08:32:55PM +0200, Jason A. Donenfeld wrote:
-> Hi Eric,
+Le 15/07/2022 à 10:33, Herbert Xu a écrit :
+> On Sat, Jul 09, 2022 at 06:16:46PM +0200, Christophe JAILLET wrote:
+>> Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
+>>
+>> It is less verbose and it improves the semantic.
+>>
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>>   drivers/crypto/hisilicon/zip/zip_crypto.c | 9 ++++-----
+>>   1 file changed, 4 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+>> index 67869513e48c..7bf53877e508 100644
+>> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
+>> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+>> @@ -606,8 +606,7 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
+>>   		req_q = &ctx->qp_ctx[i].req_q;
+>>   		req_q->size = QM_Q_DEPTH;
+>>   
+>> -		req_q->req_bitmap = kcalloc(BITS_TO_LONGS(req_q->size),
+>> -					    sizeof(long), GFP_KERNEL);
+>> +		req_q->req_bitmap = bitmap_zalloc(req_q->size, GFP_KERNEL);
+>>   		if (!req_q->req_bitmap) {
+>>   			ret = -ENOMEM;
+>>   			if (i == 0)
 > 
-> On Fri, Jul 15, 2022 at 11:29:20PM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > Move the definition of crypto_simd_disabled_for_test into
-> > lib/crypto/utils.c so that it can be accessed by library code.
-> > 
-> > This is needed when code that is shared between a traditional crypto API
-> > implementation and a library implementation is built-in, but
-> > CRYPTO_ALGAPI=m.  The x86 blake2s previously was an example of this
-> > (https://lore.kernel.org/linux-crypto/20220517033630.1182-1-gaochao49@huawei.com/T/#u).
-> > Although that case was resolved by removing the blake2s shash support,
-> > this problem could easily come back in the future, so let's address it.
+> You should add an include for linux/bitmap.h instead of relying
+> on implicit inclusion through some random header file.
+
+Hi, most of the patches are accepted as-is, so I will not resend all of 
+them.
+I'll only add the #include if a v2 is needed or for new patches.
+
+Thanks for the review and comment.
+
+CJ
+
 > 
-> I'm not sure I see the reason in general for a utility library rather
-> than doing these piecemeal like the rest of lib functions. Why is crypto
-> special here? But in particular to this patch: nothing is actually using
-> crypto_simd_disabled_for_test in lib/crypto, right? So is this
-> necessary?
+> The same goes for all your other patches too.
+> 
+> Thanks,
 
-Well, this is what Herbert wanted:
-https://lore.kernel.org/r/YtEgzHuuMts0YBCz@gondor.apana.org.au.  It's
-subjective, but for now I think I prefer this approach too, since the utility
-functions are so small and are widely used.  A whole module is overkill for just
-a few lines of code.
-
-The commit message answers your second and third questions.
-
-- Eric
