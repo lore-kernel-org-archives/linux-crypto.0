@@ -2,112 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DACBC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 17:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4156BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 18:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiGSRVr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Jul 2022 13:21:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48130 "EHLO
+        id S237314AbiGSSEe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Jul 2022 14:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238936AbiGSRVl (ORCPT
+        with ESMTP id S234186AbiGSSEd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Jul 2022 13:21:41 -0400
+        Tue, 19 Jul 2022 14:04:33 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D817E46D8E;
-        Tue, 19 Jul 2022 10:21:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB2C52E40;
+        Tue, 19 Jul 2022 11:04:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 90B67B81C76;
-        Tue, 19 Jul 2022 17:21:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4080CC341C6;
-        Tue, 19 Jul 2022 17:21:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cK15E3aO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1658251289;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+DdIaGBIWAy9ehfPzceJ7R4AOuJB01GP/jeXzjkuNW0=;
-        b=cK15E3aOfaYau/qzxYk1kkloBH9BwEizkRXRjeOPTGsrd1mKfY82Kg1qZdllepCJQ2YA2k
-        fzNWjrS/HIE5R7Py/BIl5qdxvxCsI+Ux9KlI6kAV+efUUjUTirU5j++IWs+BmBjsFNOVnJ
-        v2OhDxkIxgbw1o/2PcJl+mMgqee/XUI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 27e8b8f4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 19 Jul 2022 17:21:29 +0000 (UTC)
-Date:   Tue, 19 Jul 2022 19:21:24 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     Kalle Valo <kvalo@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-        Gregory Erwin <gregerwin256@gmail.com>,
-        Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-        Rui Salvaterra <rsalvaterra@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v8] ath9k: let sleep be interrupted when unregistering
- hwrng
-Message-ID: <YtboFNL+YsHxTHrN@zx2c4.com>
-References: <Yrw5f8GN2fh2orid@zx2c4.com>
- <20220629114240.946411-1-Jason@zx2c4.com>
- <87v8s8ubws.fsf@kernel.org>
- <xhsmho7xv512f.mognet@vschneid.remote.csb>
- <CAHmME9q8-1vpV9zFsKkawk+XFm96S6fmug7v-NPJNpQmRoe6-Q@mail.gmail.com>
- <xhsmhcze16snd.mognet@vschneid.remote.csb>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1DF29B81CBF;
+        Tue, 19 Jul 2022 18:04:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E51C341C6;
+        Tue, 19 Jul 2022 18:04:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658253869;
+        bh=5OfFErLFBejt60+IIJPAQA9g/7Onr9MuvpCgu+Z3+Qs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Uo1QbMqhFjL82JpmX7pQ0sog/PjleOuEoUbfX4PM9/50KjxF2YgabgoT7W9iczHAj
+         oH2ii7Xd78yI+YwtYyBOGD1bcFXNifHCBZHQNe5RvxGJYEGr26NB374fGF+JXBaM4k
+         k+H8xSSfOAS9LpukoIkrU4PYUTJtA/IHp5eP4GRTG77mfzVZ44LkQHH3TfYWlfXyoQ
+         67pGwJFBfAgHixRfkVf0f5GSKp6liO0kVwVQRNbcDiWK/saCCKSWOSu7Ytp1rpT82c
+         YxqAqWoo3NZoGRLv9aQVDZ9obo16Ncv7StgncII+8C7QN/xtRBi069i/XxZyGwr/BB
+         588yAdTGX3DHw==
+Date:   Tue, 19 Jul 2022 11:04:27 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Sudip Mukherjee (Codethink)" <sudipm.mukherjee@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org
+Subject: Re: build failure of next-20220719 due to 'missing MODULE_LICENSE()
+ in lib/crypto/libsha1.o'
+Message-ID: <YtbyK2/jLGqcp3Rc@sol.localdomain>
+References: <YtbBb3gCsKfpsaXP@debian>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <xhsmhcze16snd.mognet@vschneid.remote.csb>
+In-Reply-To: <YtbBb3gCsKfpsaXP@debian>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Valentin,
-
-On Tue, Jul 19, 2022 at 04:15:02PM +0100, Valentin Schneider wrote:
-> On 11/07/22 13:53, Jason A. Donenfeld wrote:
-> > Hi Valentin,
-> >
-> > On 7/11/22, Valentin Schneider <vschneid@redhat.com> wrote:
-> >> Thanks for the Cc.
-> >>
-> >> I'm not hot on the export of wake_up_state(), IMO any wakeup with
-> >> !(state & TASK_NORMAL) should be reserved to kernel internals. Now, here
-> >> IIUC the problem is that the patch uses an inline invoking
-> >>
-> >>   wake_up_state(p, TASK_INTERRUPTIBLE)
-> >>
-> >> so this isn't playing with any 'exotic' task state, thus it shouldn't
-> >> actually need the export.
-> >>
-> >> I've been trying to figure out if this could work with just a
-> >> wake_up_process(), but the sleeping pattern here is not very conforming
-> >> (cf. 'wait loop' pattern in sched/core.c), AFAICT the signal is used to
-> >> circumvent that :/
-> >
-> > I don't intend to work on this patch more. If you'd like to ack the
-> > trivial scheduler change (adding EXPORT_SYMBOL), that'd help, and then
-> > this can move forward as planned. Otherwise, if you have particular
-> > opinions about this patch that you want to happen, feel free to pick
-> > up the patch and send your own revisions (though I don't intend to do
-> > further review). Alternatively, I'll just send a patch to remove the
-> > driver entirely. Hopefully you do find this ack-able, though.
-> >
+On Tue, Jul 19, 2022 at 03:36:31PM +0100, Sudip Mukherjee (Codethink) wrote:
+> Hi All,
 > 
-> I'm not for a blanket wake_up_state() export, however if we *really* need
-> it then I suppose we could have a wake_up_process_interruptible() exported
-> and used by __set_notify_signal().
+> Not sure if it has been reported, builds of arm milbeaut_m10v_defconfig
+> have failed to build next-20220719 with the error:
 > 
-Thanks for keeping this thread alive. I'll do what you suggest and send
-a v+1. I think I understand the idea. Let's see how it goes.
+> ERROR: modpost: missing MODULE_LICENSE() in lib/crypto/libsha1.o
+> 
+> caused by ec8f7f4821d5 ("crypto: lib - make the sha1 library optional").
+> 
 
-Jason
+I already sent out a fix for this:
+https://lore.kernel.org/linux-crypto/20220719030415.32113-1-ebiggers@kernel.org/
+
+- Eric
