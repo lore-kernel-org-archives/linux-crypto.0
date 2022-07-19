@@ -2,54 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 376BCC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 02:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DB5C43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Jul 2022 03:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236876AbiGSCQf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Jul 2022 22:16:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
+        id S233102AbiGSDEx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Jul 2022 23:04:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236875AbiGSCQa (ORCPT
+        with ESMTP id S231687AbiGSDEw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Jul 2022 22:16:30 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2CF2528F;
-        Mon, 18 Jul 2022 19:16:28 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oDcme-001wgN-8q; Tue, 19 Jul 2022 12:16:25 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 19 Jul 2022 10:16:24 +0800
-Date:   Tue, 19 Jul 2022 10:16:24 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhengchao Shao <shaozhengchao@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liulongfang@huawei.com, davem@davemloft.net, xuzaibo@huawei.com,
-        weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/hpre - don't use GFP_KERNEL to alloc
- mem during softirq
-Message-ID: <YtYT+JeYj7vlz9Xp@gondor.apana.org.au>
-References: <20220719021042.250882-1-shaozhengchao@huawei.com>
+        Mon, 18 Jul 2022 23:04:52 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 787183AB34;
+        Mon, 18 Jul 2022 20:04:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 08E01B8186C;
+        Tue, 19 Jul 2022 03:04:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8937EC341C0;
+        Tue, 19 Jul 2022 03:04:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658199888;
+        bh=EMcEye5HY7kEpDggDR5ZLX2uR9NgtH945FPI9JMyOHw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=eec7IRTjZwOGISMW8RhNu0tZKtNXJTl8dit29OBV0oNZoUuAvIi40jLHP4jb9tQjn
+         CjZFLRUa/yJBtzYnmPIE7lf3FMFYye7XmeDpcVHfWgMR+gXdgHrLYb5raG1Oa2mYDk
+         qm8EU1+AyiD/Pnd5kyuACZ/vE9NHNUfN/yWnMYsFmQGsBf1SMuAhB69VfFuBcwi4Yt
+         81ZE14ZrApPzXn9csKVOkpQBD6vhyOabT1V6lrcS1VgKV9LCC1fmOfqP40cHjSeIpg
+         2g5xxyQACUzRFF7Swz+XM/2eCV0aFKVbWhkImmJbnURGpEYW2PkOTDMteKdQEwA2fS
+         6sB+3vzF4n2Rw==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] crypto: lib - add module license to libsha1
+Date:   Mon, 18 Jul 2022 20:04:15 -0700
+Message-Id: <20220719030415.32113-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.37.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220719021042.250882-1-shaozhengchao@huawei.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 10:10:42AM +0800, Zhengchao Shao wrote:
->
-> @@ -252,7 +252,7 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
->  	if (unlikely(shift < 0))
->  		return -EINVAL;
->  
-> -	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, GFP_KERNEL);
-> +	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, flags);
+From: Eric Biggers <ebiggers@google.com>
 
-How about just using GFP_ATOMIC unconditinoally?
+libsha1 can be a module, so it needs a MODULE_LICENSE.
 
-Cheers,
+Fixes: ec8f7f4821d5 ("crypto: lib - make the sha1 library optional")
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ lib/crypto/sha1.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
+index 0494766fc574ec..1aebe7be9401bd 100644
+--- a/lib/crypto/sha1.c
++++ b/lib/crypto/sha1.c
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/export.h>
++#include <linux/module.h>
+ #include <linux/bitops.h>
+ #include <linux/string.h>
+ #include <crypto/sha1.h>
+@@ -135,3 +136,5 @@ void sha1_init(__u32 *buf)
+ 	buf[4] = 0xc3d2e1f0;
+ }
+ EXPORT_SYMBOL(sha1_init);
++
++MODULE_LICENSE("GPL");
+
+base-commit: ec8f7f4821d5e70d71601519bc2325b311324a96
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.37.0
+
