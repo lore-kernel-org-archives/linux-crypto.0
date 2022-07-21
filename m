@@ -2,102 +2,225 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCB9C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 20:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34890C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 21:15:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233588AbiGUU7C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 16:59:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S233715AbiGUVPy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Jul 2022 17:15:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233072AbiGUU7C (ORCPT
+        with ESMTP id S233728AbiGUVPu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 16:59:02 -0400
-Received: from smtp.smtpout.orange.fr (smtp08.smtpout.orange.fr [80.12.242.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114428FD7B
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 13:59:01 -0700 (PDT)
-Received: from pop-os.home ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id EdG2oNF3UGDTnEdG2ovb82; Thu, 21 Jul 2022 22:58:59 +0200
-X-ME-Helo: pop-os.home
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 21 Jul 2022 22:58:59 +0200
-X-ME-IP: 90.11.190.129
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Yang Shen <shenyang39@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2] crypto: hisilicon/zip: Use the bitmap API to allocate bitmaps
-Date:   Thu, 21 Jul 2022 22:58:53 +0200
-Message-Id: <456a8b00720d603221c8329c19e38b9f4d96d15a.1658437112.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+        Thu, 21 Jul 2022 17:15:50 -0400
+X-Greylist: delayed 1715 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Jul 2022 14:15:48 PDT
+Received: from luna (cpc152649-stkp13-2-0-cust121.10-2.cable.virginm.net [86.15.83.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE99968723
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 14:15:48 -0700 (PDT)
+Received: from ben by luna with local (Exim 4.96)
+        (envelope-from <ben@luna.fluff.org>)
+        id 1oEd4h-001rp7-00;
+        Thu, 21 Jul 2022 21:47:11 +0100
+From:   Ben Dooks <ben-linux@fluff.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Ben Dooks <ben-linux@fluff.org>
+Subject: [PATCH] crypto: fix warnings from missing .note.GNU-stack
+Date:   Thu, 21 Jul 2022 21:47:09 +0100
+Message-Id: <20220721204709.445216-1-ben-linux@fluff.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
-It is less verbose and it improves the semantic.
+A lot of the assembly code in arch/arm/crypto is missing
+a .note.GNU-stack section which is making a numbe of warnings
+about implicit executable stack. This code does not look like
+it does not need an executable stack, so silence the warnings
+by adding a .section .note.GNU-stack to all these.
 
-While at it, add an explicit include <linux/bitmap.h>.
+Since this is an empty section, it should be backwards compatible
+with older linkers.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Fixes the following warnings:
+
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-cipher-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-neonbs-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv4-large.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv7-neon.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha256-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha512-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/chacha-neon-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-ce-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-ce-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha2-ce-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/ghash-ce-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+arm-linux-gnueabihf-ld: warning: arch/arm/crypto/crc32-ce-core.o: missing .note.GNU-stack section implies executable stack
+arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+Signed-off-by: Ben Dooks <ben-linux@fluff.org>
 ---
-v1 -> v2
-- add the missing include <linux/bitmap.h>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch/arm/crypto/aes-ce-core.S        | 2 ++
+ arch/arm/crypto/aes-cipher-core.S    | 2 ++
+ arch/arm/crypto/aes-neonbs-core.S    | 3 +++
+ arch/arm/crypto/chacha-neon-core.S   | 2 ++
+ arch/arm/crypto/chacha-scalar-core.S | 2 ++
+ arch/arm/crypto/crc32-ce-core.S      | 2 ++
+ arch/arm/crypto/ghash-ce-core.S      | 2 ++
+ arch/arm/crypto/sha1-armv4-large.S   | 1 +
+ arch/arm/crypto/sha1-armv7-neon.S    | 2 ++
+ arch/arm/crypto/sha1-ce-core.S       | 2 ++
+ arch/arm/crypto/sha2-ce-core.S       | 2 ++
+ arch/arm/crypto/sha256-armv4.pl      | 1 +
+ arch/arm/crypto/sha512-armv4.pl      | 1 +
+ 13 files changed, 24 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 67869513e48c..ad35434a3fdb 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -2,6 +2,7 @@
- /* Copyright (c) 2019 HiSilicon Limited. */
- #include <crypto/internal/acompress.h>
- #include <linux/bitfield.h>
-+#include <linux/bitmap.h>
- #include <linux/dma-mapping.h>
- #include <linux/scatterlist.h>
- #include "zip.h"
-@@ -606,8 +607,7 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
- 		req_q = &ctx->qp_ctx[i].req_q;
- 		req_q->size = QM_Q_DEPTH;
+diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
+index 312428d83eed..4e570c6df9bb 100644
+--- a/arch/arm/crypto/aes-ce-core.S
++++ b/arch/arm/crypto/aes-ce-core.S
+@@ -711,3 +711,5 @@ ENDPROC(ce_aes_invert)
+ 	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
+ 	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+ 	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index 1da3f41359aa..11f10ee35487 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -199,3 +199,5 @@ ENDPROC(__aes_arm_encrypt)
+ ENTRY(__aes_arm_decrypt)
+ 	do_crypt	iround, crypto_it_tab, crypto_aes_inv_sbox, 0
+ ENDPROC(__aes_arm_decrypt)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
+index 7b61032f29fa..19197c0d635c 100644
+--- a/arch/arm/crypto/aes-neonbs-core.S
++++ b/arch/arm/crypto/aes-neonbs-core.S
+@@ -1041,3 +1041,6 @@ ENTRY(aesbs_xts_decrypt)
+ 	ldr		ip, [sp, #8]		// reorder final tweak?
+ 	__xts_crypt	aesbs_decrypt8, q0, q1, q6, q4, q2, q7, q3, q5
+ ENDPROC(aesbs_xts_decrypt)
++
++.section .note.GNU-stack,"",%progbits
++
+diff --git a/arch/arm/crypto/chacha-neon-core.S b/arch/arm/crypto/chacha-neon-core.S
+index 13d12f672656..a90690d32ad8 100644
+--- a/arch/arm/crypto/chacha-neon-core.S
++++ b/arch/arm/crypto/chacha-neon-core.S
+@@ -641,3 +641,5 @@ ENDPROC(chacha_4block_xor_neon)
+ 	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+ 	.byte		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
+ 	.byte		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/chacha-scalar-core.S b/arch/arm/crypto/chacha-scalar-core.S
+index 083fe1ab96d0..81f94876f418 100644
+--- a/arch/arm/crypto/chacha-scalar-core.S
++++ b/arch/arm/crypto/chacha-scalar-core.S
+@@ -441,3 +441,5 @@ ENTRY(hchacha_block_arm)
+ 1:	_chacha_permute	12
+ 	b		0b
+ ENDPROC(hchacha_block_arm)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
+index 3f13a76b9066..990c756c7487 100644
+--- a/arch/arm/crypto/crc32-ce-core.S
++++ b/arch/arm/crypto/crc32-ce-core.S
+@@ -304,3 +304,5 @@ ENDPROC(crc32_armv8_le)
+ ENTRY(crc32c_armv8_le)
+ 	__crc32		c
+ ENDPROC(crc32c_armv8_le)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
+index 9f51e3fa4526..2f712b9d8b2b 100644
+--- a/arch/arm/crypto/ghash-ce-core.S
++++ b/arch/arm/crypto/ghash-ce-core.S
+@@ -337,3 +337,5 @@ ENTRY(pmull_ghash_update_p8)
  
--		req_q->req_bitmap = kcalloc(BITS_TO_LONGS(req_q->size),
--					    sizeof(long), GFP_KERNEL);
-+		req_q->req_bitmap = bitmap_zalloc(req_q->size, GFP_KERNEL);
- 		if (!req_q->req_bitmap) {
- 			ret = -ENOMEM;
- 			if (i == 0)
-@@ -631,11 +631,11 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
- 	return 0;
+ 	ghash_update	p8
+ ENDPROC(pmull_ghash_update_p8)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
+index 1c8b685149f2..4e40132382b5 100644
+--- a/arch/arm/crypto/sha1-armv4-large.S
++++ b/arch/arm/crypto/sha1-armv4-large.S
+@@ -505,3 +505,4 @@ ENTRY(sha1_block_data_order)
+ ENDPROC(sha1_block_data_order)
+ .asciz	"SHA1 block transform for ARMv4, CRYPTOGAMS by <appro@openssl.org>"
+ .align	2
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1-armv7-neon.S
+index 28d816a6a530..a554b1bb4ceb 100644
+--- a/arch/arm/crypto/sha1-armv7-neon.S
++++ b/arch/arm/crypto/sha1-armv7-neon.S
+@@ -632,3 +632,5 @@ ENTRY(sha1_transform_neon)
+ .Ldo_nothing:
+   bx lr
+ ENDPROC(sha1_transform_neon)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/sha1-ce-core.S b/arch/arm/crypto/sha1-ce-core.S
+index 8a702e051738..73353804c33f 100644
+--- a/arch/arm/crypto/sha1-ce-core.S
++++ b/arch/arm/crypto/sha1-ce-core.S
+@@ -121,3 +121,5 @@ ENTRY(sha1_ce_transform)
+ 	vstr		dgbs, [r0, #16]
+ 	bx		lr
+ ENDPROC(sha1_ce_transform)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/sha2-ce-core.S b/arch/arm/crypto/sha2-ce-core.S
+index b6369d2440a1..b5f20ab96690 100644
+--- a/arch/arm/crypto/sha2-ce-core.S
++++ b/arch/arm/crypto/sha2-ce-core.S
+@@ -121,3 +121,5 @@ ENTRY(sha2_ce_transform)
+ 	vst1.32		{dga-dgb}, [r0]
+ 	bx		lr
+ ENDPROC(sha2_ce_transform)
++
++.section .note.GNU-stack,"",%progbits
+diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
+index f3a2b54efd4e..c12edbd99531 100644
+--- a/arch/arm/crypto/sha256-armv4.pl
++++ b/arch/arm/crypto/sha256-armv4.pl
+@@ -677,6 +677,7 @@ $code.=<<___;
+ #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+ .comm   OPENSSL_armcap_P,4,4
+ #endif
++.section .note.GNU-stack,"",%progbits
+ ___
  
- err_free_loop1:
--	kfree(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
-+	bitmap_free(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
- err_free_loop0:
- 	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.q);
- err_free_bitmap:
--	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
-+	bitmap_free(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
- 	return ret;
- }
+ open SELF,$0;
+diff --git a/arch/arm/crypto/sha512-armv4.pl b/arch/arm/crypto/sha512-armv4.pl
+index 2fc3516912fa..6411799b4d1d 100644
+--- a/arch/arm/crypto/sha512-armv4.pl
++++ b/arch/arm/crypto/sha512-armv4.pl
+@@ -639,6 +639,7 @@ $code.=<<___;
+ #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
+ .comm	OPENSSL_armcap_P,4,4
+ #endif
++.section .note.GNU-stack,"",%progbits
+ ___
  
-@@ -645,7 +645,7 @@ static void hisi_zip_release_req_q(struct hisi_zip_ctx *ctx)
- 
- 	for (i = 0; i < HZIP_CTX_Q_NUM; i++) {
- 		kfree(ctx->qp_ctx[i].req_q.q);
--		kfree(ctx->qp_ctx[i].req_q.req_bitmap);
-+		bitmap_free(ctx->qp_ctx[i].req_q.req_bitmap);
- 	}
- }
- 
+ $code =~ s/\`([^\`]*)\`/eval $1/gem;
 -- 
-2.34.1
+2.35.1
 
