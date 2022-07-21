@@ -2,218 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1A5C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 08:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDC5C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 09:29:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbiGUIO5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 04:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45544 "EHLO
+        id S232526AbiGUJ3O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Jul 2022 05:29:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiGUIO4 (ORCPT
+        with ESMTP id S232035AbiGUJ3K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 04:14:56 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197F2785BA;
-        Thu, 21 Jul 2022 01:14:55 -0700 (PDT)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LpQKT34S8zkWv3;
-        Thu, 21 Jul 2022 16:12:29 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 21 Jul 2022 16:14:53 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 21 Jul 2022 16:14:52 +0800
-Subject: Re: [PATCH v5 3/3] crypto: hisilicon/qm - defining the device
- isolation strategy
-To:     Greg KH <gregkh@linuxfoundation.org>
-References: <20220708070820.43958-1-yekai13@huawei.com>
- <20220708070820.43958-4-yekai13@huawei.com> <YsfeMgbP+bxstf+7@kroah.com>
-CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <7cd8e1f3-b4a2-8aae-7b6e-99c5ceb5f17f@huawei.com>
-Date:   Thu, 21 Jul 2022 16:14:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Thu, 21 Jul 2022 05:29:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7995A77A44
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 02:29:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2491A61F43
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 09:29:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09568C3411E;
+        Thu, 21 Jul 2022 09:29:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658395744;
+        bh=KEw8DJskb+PpDSC3YoCIg+9N695Dji/DNPBN8KYVkdc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eUaFp8AFW8YXdERoEetTOLC2u7uiXq+CUrIREd5VD4Nboma6aOESnnLdhd1VMD8+7
+         xEyfmrqCCHDadu+ZfzNwj5zT9BK6wGHkDm+/wymgvf1LTuBzJn6oXSWJSF/VQcax/z
+         rsSqQrVIYroUuzub1cDHflSRnc52TpbB4A10b+E6cWM0L10rftBYegVqgWQdaRdziB
+         tJKaJGX6Zepam4sCaU0lD+W4uKubmdkccYwnD8EumgdBbHg9qR/hxlYIhGmgGuSWQ+
+         9ZhUn3svn5MT635ySRz44gUe3XfyvA72NXYtYdYApAHki24Gi3N7NlzDFhsumrhaWX
+         1Ouy/OC8thbLw==
+Date:   Thu, 21 Jul 2022 10:28:58 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "Guozihua (Scott)" <guozihua@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        catalin.marinas@arm.com
+Subject: Re: [PATCH v2] arm64/crypto: poly1305 fix a read out-of-bound
+Message-ID: <20220721092858.GA17088@willie-the-truck>
+References: <20220712075031.29061-1-guozihua@huawei.com>
+ <20220720094116.GC15752@willie-the-truck>
+ <a29cb083-0305-3467-976c-e541daefc5e8@huawei.com>
+ <Yti73XyFb8l7n2gU@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <YsfeMgbP+bxstf+7@kroah.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yti73XyFb8l7n2gU@sol.localdomain>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Jul 20, 2022 at 07:37:17PM -0700, Eric Biggers wrote:
+> On Wed, Jul 20, 2022 at 05:57:30PM +0800, Guozihua (Scott) wrote:
+> > On 2022/7/20 17:41, Will Deacon wrote:
+> > > On Tue, Jul 12, 2022 at 03:50:31PM +0800, GUO Zihua wrote:
+> > > > A kasan error was reported during fuzzing:
+> > > 
+> > > [...]
+> > > 
+> > > > This patch fixes the issue by calling poly1305_init_arm64() instead of
+> > > > poly1305_init_arch(). This is also the implementation for the same
+> > > > algorithm on arm platform.
+> > > > 
+> > > > Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: GUO Zihua <guozihua@huawei.com>
+> > > > ---
+> > > >   arch/arm64/crypto/poly1305-glue.c | 2 +-
+> > > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > I'm not a crypto guy by any stretch of the imagination, but Ard is out
+> > > at the moment and this looks like an important fix so I had a crack at
+> > > reviewing it.
+> > > 
+> > > > diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
+> > > > index 9c3d86e397bf..1fae18ba11ed 100644
+> > > > --- a/arch/arm64/crypto/poly1305-glue.c
+> > > > +++ b/arch/arm64/crypto/poly1305-glue.c
+> > > > @@ -52,7 +52,7 @@ static void neon_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
+> > > >   {
+> > > >   	if (unlikely(!dctx->sset)) {
+> > > >   		if (!dctx->rset) {
+> > > > -			poly1305_init_arch(dctx, src);
+> > > > +			poly1305_init_arm64(&dctx->h, src);
+> > > >   			src += POLY1305_BLOCK_SIZE;
+> > > >   			len -= POLY1305_BLOCK_SIZE;
+> > > >   			dctx->rset = 1;
+> > > 
+> > > With this change, we no longer initialise dctx->buflen to 0 as part of the
+> > > initialisation. Looking at neon_poly1305_do_update(), I'm a bit worried
+> > > that we could land in the 'if (likely(len >= POLY1305_BLOCK_SIZE))' block,
+> > > end up with len == 0 and fail to set dctx->buflen. Is this a problem, or is
+> > > my ignorance showing?
+> > > 
+> > > Will
+> > > .
+> > 
+> > Thanks Will.
+> > 
+> > I noticed this as well, but I leaved it out so that the behavior is the same
+> > as the implementation for arm. The buflen here seems to be used for
+> > maintaining any excessive data after the last block, and is zeroed during
+> > init. I am not sure why it should be zeroed again during key initialization.
+> > Maybe the thought was that the very first block of the data is always used
+> > for initializing rset and that is also considered to be the "initialization"
+> > process for the algorithm, thus the zeroing of buflen. I could be completely
+> > wrong though.
+> > 
+> 
+> buflen is initialized by neon_poly1305_init(), so there's no issue here.
 
+Ah yes, thanks. I missed that. In which case, for the very little it's
+worth:
 
-On 2022/7/8 15:35, Greg KH wrote:
-> On Fri, Jul 08, 2022 at 03:08:20PM +0800, Kai Ye wrote:
->> Define the device isolation strategy by the device driver. The
->> user configures a frequency value by uacce interface. If the
->> slot reset frequency exceeds the value of setting for a certain
->> period of time, the device will not be available in user space.
->> The time window is one hour. The VF device use the PF device
->> isolation strategy. All the hardware errors are processed by PF
->> driver. This solution can be used for other drivers.
->>
->> Signed-off-by: Kai Ye <yekai13@huawei.com>
->> ---
->>  drivers/crypto/hisilicon/qm.c | 163 +++++++++++++++++++++++++++++++---
->>  include/linux/hisi_acc_qm.h   |   9 ++
->>  2 files changed, 160 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
->> index ad83c194d664..8eb3b790a655 100644
->> --- a/drivers/crypto/hisilicon/qm.c
->> +++ b/drivers/crypto/hisilicon/qm.c
->> @@ -417,6 +417,16 @@ struct hisi_qm_resource {
->>  	struct list_head list;
->>  };
->>
->> +/**
->> + * struct qm_hw_err - Structure describing the device errors
->> + * @list: hardware error list
->> + * @timestamp: timestamp when the error occurred
->> + */
->> +struct qm_hw_err {
->> +	struct list_head list;
->> +	unsigned long long timestamp;
->> +};
->> +
->>  struct hisi_qm_hw_ops {
->>  	int (*get_vft)(struct hisi_qm *qm, u32 *base, u32 *number);
->>  	void (*qm_db)(struct hisi_qm *qm, u16 qn,
->> @@ -3410,6 +3420,111 @@ static long hisi_qm_uacce_ioctl(struct uacce_queue *q, unsigned int cmd,
->>  	return 0;
->>  }
->>
->> +/**
->> + * qm_hw_err_isolate() - Try to isolate the uacce device with its VFs
->> + * according to user's configuration of isolation strategy. Warning: this
->> + * API should be called while there the users on this device are suspended
->> + * by slot resetting preparation of PCI AER.
->> + * @qm: the uacce device
->> + */
->> +static int qm_hw_err_isolate(struct hisi_qm *qm)
->> +{
->> +	struct qm_hw_err *err, *tmp, *hw_err;
->> +	struct qm_err_isolate *isolate;
->> +	u32 count = 0;
->> +
->> +	isolate = &qm->isolate_data;
->> +
->> +#define SECONDS_PER_HOUR	3600
->> +
->> +	/* All the hw errs are processed by PF driver */
->> +	if (qm->uacce->is_vf || isolate->is_isolate ||
->> +	    !isolate->hw_err_isolate_hz)
->> +		return 0;
->> +
->> +	hw_err = kzalloc(sizeof(*hw_err), GFP_ATOMIC);
->
-> Why atomic?  What lock is held here?
+Acked-by: Will Deacon <will@kernel.org>
 
-Atomic is not required. So use GFP_KERNEL.
->
->> +	if (!hw_err)
->> +		return -ENOMEM;
->> +
->> +	mutex_lock(&isolate->isolate_lock);
->> +	hw_err->timestamp = jiffies;
->> +	list_for_each_entry_safe(err, tmp, &isolate->uacce_hw_errs, list) {
->> +		if ((hw_err->timestamp - err->timestamp) / HZ >
->> +		    SECONDS_PER_HOUR) {
->
-> No possiblity of wrapping the timestamp?
-I do not understand this suggestion, Can you show more detail in this 
-suggestion?
+Herbert, please can you pick this up?
 
->
->> +			list_del(&err->list);
->> +			kfree(err);
->> +		} else {
->> +			count++;
->> +		}
->> +	}
->> +	list_add(&hw_err->list, &isolate->uacce_hw_errs);
->> +	mutex_unlock(&isolate->isolate_lock);
->> +
->> +	if (count >= isolate->hw_err_isolate_hz)
->> +		isolate->is_isolate = true;
->> +
->> +	return 0;
->> +}
->> +
->> +static void qm_hw_err_destroy(struct hisi_qm *qm)
->> +{
->> +	struct qm_hw_err *err, *tmp;
->> +
->> +	mutex_lock(&qm->isolate_data.isolate_lock);
->> +	list_for_each_entry_safe(err, tmp, &qm->isolate_data.uacce_hw_errs, list) {
->> +		list_del(&err->list);
->> +		kfree(err);
->> +	}
->> +	mutex_unlock(&qm->isolate_data.isolate_lock);
->> +}
->> +
->> +static enum uacce_dev_state hisi_qm_get_isolate_state(struct uacce_device *uacce)
->> +{
->> +	struct hisi_qm *qm = uacce->priv;
->> +	struct hisi_qm *pf_qm;
->> +
->> +	if (uacce->is_vf)
->> +		pf_qm = pci_get_drvdata(pci_physfn(qm->pdev));
->> +	else
->> +		pf_qm = qm;
->> +
->> +	return pf_qm->isolate_data.is_isolate ?
->> +			UACCE_DEV_ISOLATE : UACCE_DEV_NORMAL;
->> +}
->> +
->> +static int hisi_qm_isolate_strategy_write(struct uacce_device *uacce,
->> +					  u32 freq)
->> +{
->> +	struct hisi_qm *qm = uacce->priv;
->> +
->> +	/* Must be set by PF */
->> +	if (uacce->is_vf)
->> +		return -EINVAL;
->
-> But the value passed to you is not invalid, something else went wrong.
-> Are you sure this is the correct error?
-use EPERM instead of EINVAL.
->
->> +
->> +	if (qm->isolate_data.is_isolate)
->> +		return -EINVAL;
->
-> Same here, why is this correct?
-use EPERM instead of EINVAL.
->
->> +
->> +	qm->isolate_data.hw_err_isolate_hz = freq;
->
-> No validation of the value passed to you?  It can be anything?
->
->> +
->> +	/* After the policy is updated, need to reset the hardware err list */
->> +	qm_hw_err_destroy(qm);
->
-> No error checking?
-Due to the process is clean list. So no error checking is required.
->
-> thanks,
->
-> greg k-h
-> .
->
-
-Thanks
-
-Kai
+Will
