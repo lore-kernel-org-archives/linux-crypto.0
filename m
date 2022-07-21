@@ -2,112 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F310BC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 02:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CA6C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 03:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231724AbiGUCh0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Jul 2022 22:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48116 "EHLO
+        id S229927AbiGUDv0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Jul 2022 23:51:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231726AbiGUChV (ORCPT
+        with ESMTP id S231184AbiGUDvH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Jul 2022 22:37:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D714A77547
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Jul 2022 19:37:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 450E86006F
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 02:37:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66FF7C341C7;
-        Thu, 21 Jul 2022 02:37:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658371039;
-        bh=nio2uohUp0eR0gZ5g5Bj68K5/J7oe6DZYxXrqFzgJZg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MAWGi15WSQCw328cz1F6HitqqRXhgAEvgeVHA40gRrvwnjx/eFIimYwgjpjSj9guD
-         YOQychJedPvP4Y7hFaXZzR3XDhijeHzQ44KJ09veFsFWJB2h5kxCD1p13xQb5XxoT3
-         CTouDfREJ0tuhrli7SOcM3r7KMnlNhjcVAXjdkC+Cj3I6fKydtAxC6e3CDZxc6TILu
-         JnYw9Rg7FRUhEC9XGKaPNXQthOySWaOz2fiVRa5QIFcUF7jdb/y3AcXdb28LR9JsNv
-         qHPAwIN7zzS7vWtiTowKMGhCUh0Xyo316JnIPxy9yk7vd16QlnDNr1eJG9WKHA/ut9
-         2ZMrejdMWp3Fg==
-Date:   Wed, 20 Jul 2022 19:37:17 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Guozihua (Scott)" <guozihua@huawei.com>
-Cc:     Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, catalin.marinas@arm.com
-Subject: Re: [PATCH v2] arm64/crypto: poly1305 fix a read out-of-bound
-Message-ID: <Yti73XyFb8l7n2gU@sol.localdomain>
-References: <20220712075031.29061-1-guozihua@huawei.com>
- <20220720094116.GC15752@willie-the-truck>
- <a29cb083-0305-3467-976c-e541daefc5e8@huawei.com>
+        Wed, 20 Jul 2022 23:51:07 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC7425290
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Jul 2022 20:51:05 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LpJVb6N5GzFqQK;
+        Thu, 21 Jul 2022 11:49:59 +0800 (CST)
+Received: from [10.67.110.173] (10.67.110.173) by
+ dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 21 Jul 2022 11:50:38 +0800
+Message-ID: <b9cb514c-30ed-0b8b-5d54-75001e07bd36@huawei.com>
+Date:   Thu, 21 Jul 2022 11:50:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a29cb083-0305-3467-976c-e541daefc5e8@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Inquiry about the removal of flag O_NONBLOCK on /dev/random
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     <linux-crypto@vger.kernel.org>, <luto@kernel.org>, <tytso@mit.edu>,
+        <ebiggers@kernel.org>
+References: <13e1fa9d-4df8-1a99-ca22-d9d655f2d023@huawei.com>
+ <YtaPJPkewin5uWdn@zx2c4.com>
+From:   "Guozihua (Scott)" <guozihua@huawei.com>
+In-Reply-To: <YtaPJPkewin5uWdn@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.110.173]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500024.china.huawei.com (7.185.36.203)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 05:57:30PM +0800, Guozihua (Scott) wrote:
-> On 2022/7/20 17:41, Will Deacon wrote:
-> > On Tue, Jul 12, 2022 at 03:50:31PM +0800, GUO Zihua wrote:
-> > > A kasan error was reported during fuzzing:
-> > 
-> > [...]
-> > 
-> > > This patch fixes the issue by calling poly1305_init_arm64() instead of
-> > > poly1305_init_arch(). This is also the implementation for the same
-> > > algorithm on arm platform.
-> > > 
-> > > Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: GUO Zihua <guozihua@huawei.com>
-> > > ---
-> > >   arch/arm64/crypto/poly1305-glue.c | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > I'm not a crypto guy by any stretch of the imagination, but Ard is out
-> > at the moment and this looks like an important fix so I had a crack at
-> > reviewing it.
-> > 
-> > > diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
-> > > index 9c3d86e397bf..1fae18ba11ed 100644
-> > > --- a/arch/arm64/crypto/poly1305-glue.c
-> > > +++ b/arch/arm64/crypto/poly1305-glue.c
-> > > @@ -52,7 +52,7 @@ static void neon_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
-> > >   {
-> > >   	if (unlikely(!dctx->sset)) {
-> > >   		if (!dctx->rset) {
-> > > -			poly1305_init_arch(dctx, src);
-> > > +			poly1305_init_arm64(&dctx->h, src);
-> > >   			src += POLY1305_BLOCK_SIZE;
-> > >   			len -= POLY1305_BLOCK_SIZE;
-> > >   			dctx->rset = 1;
-> > 
-> > With this change, we no longer initialise dctx->buflen to 0 as part of the
-> > initialisation. Looking at neon_poly1305_do_update(), I'm a bit worried
-> > that we could land in the 'if (likely(len >= POLY1305_BLOCK_SIZE))' block,
-> > end up with len == 0 and fail to set dctx->buflen. Is this a problem, or is
-> > my ignorance showing?
-> > 
-> > Will
-> > .
+On 2022/7/19 19:01, Jason A. Donenfeld wrote:
+> Hi,
 > 
-> Thanks Will.
+> On Thu, Jul 14, 2022 at 03:33:47PM +0800, Guozihua (Scott) wrote:
+>> Recently we noticed the removal of flag O_NONBLOCK on /dev/random by
+>> commit 30c08efec888 ("random: make /dev/random be almost like
+>> /dev/urandom"), it seems that some of the open_source packages e.g.
+>> random_get_fd() of util-linux and __getrandom() of glibc. The man page
+>> for random() is not updated either.
+>>
+>> Would anyone please kindly provide some background knowledge of this
+>> flag and it's removal? Thanks!
 > 
-> I noticed this as well, but I leaved it out so that the behavior is the same
-> as the implementation for arm. The buflen here seems to be used for
-> maintaining any excessive data after the last block, and is zeroed during
-> init. I am not sure why it should be zeroed again during key initialization.
-> Maybe the thought was that the very first block of the data is always used
-> for initializing rset and that is also considered to be the "initialization"
-> process for the algorithm, thus the zeroing of buflen. I could be completely
-> wrong though.
+> I didn't write that code, but I assume it was done this way because it
+> doesn't really matter that much now, as /dev/random never blocks after
+> the RNG is seeded. And now a days, the RNG gets seeded with jitter
+> fairly quickly as a last resort, so almost nobody waits a long time.
 > 
+> Looking at the two examples you mentioned, the one in util-linux does
+> that if /dev/urandom fails, which means it's mostly unused code, and the
+> one in glibc is for GNU Hurd, not Linux. I did a global code search and
+> found a bunch of other instances pretty similar to the util-linux case,
+> where /dev/random in O_NONBLOCK mode is used as a fallback to
+> /dev/urandom, which means it's basically never used. (Amusingly one such
+> user of this pattern is Ted's pwgen code from way back at the turn of
+> the millennium.)
+> 
+> All together, I couldn't really find anywhere that the removal of
+> O_NONBLOCK semantics would actually pose a problem for, especially since
+> /dev/random doesn't block at all after being initialized. So I'm
+> slightly leaning toward the "doesn't matter, do nothing" course of
+> action.
+> 
+> But on the other hand, you did somehow notice this, so that's important
+> perhaps. How did you run into it? *Does* it actually pose a problem? Or
+> was this a mostly theoretical finding from perusing source code?
+> Something like the below diff would probably work and isn't too
+> invasive, but I think I'd prefer to leave it be unless this really did
+> break some userspace of yours. So please let me know.
+> 
+> Regards,
+> Jason
+> 
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index 70d8d1d7e2d7..6f232ac258bf 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -1347,6 +1347,10 @@ static ssize_t random_read_iter(struct kiocb *kiocb, struct iov_iter *iter)
+>   {
+>   	int ret;
+>   
+> +	if (!crng_ready() &&
+> +	    ((kiocb->ki_flags & IOCB_NOWAIT) || (kiocb->ki_filp->f_flags & O_NONBLOCK)))
+> +		return -EAGAIN;
+> +
+>   	ret = wait_for_random_bytes();
+>   	if (ret != 0)
+>   		return ret;
+> 
+> .
 
-buflen is initialized by neon_poly1305_init(), so there's no issue here.
+Hi Jason, Thanks for the respond.
 
-- Eric
+The reason this comes to me is that we have an environment that is super 
+clean with very limited random events and with very limited random 
+hardware access. It would take up to 80 minutes before /dev/random is 
+fully initialized. I think it would be great if we can restore the 
+O_NONBLOCK flag.
+
+Would you mind merge this change into mainstream or may I have the honor?
+
+-- 
+Best
+GUO Zihua
