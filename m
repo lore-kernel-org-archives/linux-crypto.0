@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE2FC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 13:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61074C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 13:45:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbiGUNpW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 09:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48818 "EHLO
+        id S230204AbiGUNpc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Jul 2022 09:45:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbiGUNns (ORCPT
+        with ESMTP id S229790AbiGUNoM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 09:43:48 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891D684EDE
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:11 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id y11so2858446lfs.6
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:11 -0700 (PDT)
+        Thu, 21 Jul 2022 09:44:12 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E73A185D69
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:14 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id z22so2851553lfu.7
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wnw+J8g0tiBhDzUiau+rb2PQi3V9NPBPTs3vvmSimvA=;
-        b=C/30z5ieecqUehs+DRtzuPB5/G+kSizttIIaABkDKMpSlvs4oOY1lTItvwUZitY155
-         JVT3fUHSfI/Sp4/5r8SP3STvPr3jM0AF6srfDc4GDa0ajcjgBlWvN90meerLs2EReuMp
-         jJr/c+jdMTCvFfzhRe03l6Ez8a0wKMmKzHu2N/PBChSQsSYva4SfJrwCEOPA6PrKVYTg
-         C2o/qoIacYS6dC/N3mfIgR3vi9J43lNccyIhOEUMGbJDlbXn3nksw0/HFrFB9ITYBILe
-         ReqRy9ETf9hZVxKkLG0dCX8DiDtzNJ6gb2TGygeeVIH7dApKtFFiBeL71vH5WoqKiyxf
-         HaDw==
+        bh=zYS++DqZZJZ4dvIqRTXxDhDnXHSI1cMkpUczRGNZhnA=;
+        b=wATY/y0gsIvlvzvPsDq1n4/lpqroSymoajpW4vR+wn2co0/W8I1suw9tXibwdimcuo
+         ca5z1C1DcPlusxluSCmtikMk/tSjPTICw+mJStRSqtZiszLq2jEbpD9ha/m5Q10VOrXi
+         2+8IVHI0u2Ns6Iynmev1bBXBEmGha22C9CA/seWpUuV1hy4p7kbCP32FSf0OMPmMH0ku
+         oVa4KdVmjzNdS4cRrIz5sfdWdXE1w9kL1XUKzbx+JeMUeIkNdJ1gXi2AtTSzPYQd+T4w
+         X0Y1j6WZZNuBQP2eyEqpc4mcScpa765ys8V6msDwNy6Ut8LOUoNwYFX49jR/W0jRGVyH
+         Va5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wnw+J8g0tiBhDzUiau+rb2PQi3V9NPBPTs3vvmSimvA=;
-        b=1hK7OazHykZOI870quKK7EKSJJng9WadTqnOolrwNSu/9WI3z5hZ9vR+hoazVZf3G6
-         oLzYTSTiu4EGf0MFFrtO/YsZLxY59a/w8sEskKJiWVsJf0c7H57JI1rtnMmX0pOyedT7
-         ECsV50RYou9waMfRC0FkTCGvjopAJjJ/2JiSfYOxjTtJYH62vUM81SA+N4+FwYhJ8XfQ
-         end4ZPAqFNrK/bU6at3VhBxUdorTVh6mwaXvELK1ZDolBL6qVnssDXkRUF/O9gwWskFK
-         GLQhX/itHj2wiZP8ybspQ4VGwb8q7B1uS/86T4DDclbEPtwtbJ6AnncXF/0q/Hj0HWCs
-         V+Wg==
-X-Gm-Message-State: AJIora+qWTTrD1JHY3OoIf0ISVKJrJRfsUdscF/pUqoJEZxVW28zK+jN
-        u+05eXqeGbwVesc5crlRYMIqY4UZlAWCGg==
-X-Google-Smtp-Source: AGRyM1up3uDJL+F6wFXlokobzv+BfbbhHSmmnKFXtK5/UNG931oQbQMPOjvf5vm/UJcpy9mbBjZG+A==
-X-Received: by 2002:a05:6512:3b27:b0:489:e87e:c1ef with SMTP id f39-20020a0565123b2700b00489e87ec1efmr22562535lfv.490.1658410990833;
-        Thu, 21 Jul 2022 06:43:10 -0700 (PDT)
+        bh=zYS++DqZZJZ4dvIqRTXxDhDnXHSI1cMkpUczRGNZhnA=;
+        b=RjLDcsGt2Pp5d5CjZzfBPay/iu80BWnAsqKeNg0b+f99f5+Gmgy19swCmPNB4SaZlV
+         3HVku1MjVChZmw6P9SSP9zHWlQTDkY5Ycfefx5RdqL59IRR32lmUlBJ7MrDvobftlNpG
+         K+LZezhbtbatriJcN3kCIBMOVdLiX0caaSPioHcoWzknUiCUStu4ky9PnBmUgYtTwGMQ
+         I+H6ht7UfE6a/lKPJN8ocwdrdvRyriq2vaEMWfw+JJ7uv24zlgiYMAYIWpfHIpngD6yf
+         wSXptQ+xgBwPf1iokTNlQ9T3MDGTqMagZleR2nhg4Yftv/cPdhYWKRR0mD5zBt+TNuu5
+         xezw==
+X-Gm-Message-State: AJIora/6KWNINJ13pbcn58xCtW2kxBXi5vRCFJxBGw73W9cGEzmEXIMJ
+        QIH5zgGUPEd5/Vewde5srwOluRy5en/Bdg==
+X-Google-Smtp-Source: AGRyM1ut2DRnSzjd5OOJ/DKEf9PjPiI2zOgsiVkU+gNjEy+OfjyoBRa+Y634aqVFaQcmUrojQWDOog==
+X-Received: by 2002:ac2:435a:0:b0:48a:73bf:7371 with SMTP id o26-20020ac2435a000000b0048a73bf7371mr424493lfl.96.1658410993483;
+        Thu, 21 Jul 2022 06:43:13 -0700 (PDT)
 Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id o23-20020ac24e97000000b004867a427026sm458568lfr.40.2022.07.21.06.43.10
+        by smtp.gmail.com with ESMTPSA id o23-20020ac24e97000000b004867a427026sm458568lfr.40.2022.07.21.06.43.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 06:43:10 -0700 (PDT)
+        Thu, 21 Jul 2022 06:43:13 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>
 Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
         Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 11/15] crypto: ux500/hash: Drop custom uint64 type
-Date:   Thu, 21 Jul 2022 15:40:46 +0200
-Message-Id: <20220721134050.1047866-12-linus.walleij@linaro.org>
+Subject: [PATCH 13/15] crypto: ux500/hash: Use AMBA core primecell IDs
+Date:   Thu, 21 Jul 2022 15:40:48 +0200
+Message-Id: <20220721134050.1047866-14-linus.walleij@linaro.org>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220721134050.1047866-1-linus.walleij@linaro.org>
 References: <20220721134050.1047866-1-linus.walleij@linaro.org>
@@ -66,126 +66,86 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Drop the homebrewn uint64 support, the kernel has a u64 type
-that works just fine so we use that instead.
+Use the AMBA (PrimeCell) bus core define and read 32bit
+CID and PID from the peripheral, then check those.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/crypto/ux500/hash/hash_alg.h  | 19 ++----------------
- drivers/crypto/ux500/hash/hash_core.c | 28 ++++-----------------------
- 2 files changed, 6 insertions(+), 41 deletions(-)
+ drivers/crypto/ux500/hash/hash_alg.h  | 11 ++---------
+ drivers/crypto/ux500/hash/hash_core.c | 27 +++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/crypto/ux500/hash/hash_alg.h b/drivers/crypto/ux500/hash/hash_alg.h
-index 05f0b0221a13..6a610c83e63d 100644
+index cc44d3cb21ac..96c614444fa2 100644
 --- a/drivers/crypto/ux500/hash/hash_alg.h
 +++ b/drivers/crypto/ux500/hash/hash_alg.h
-@@ -16,9 +16,6 @@
- #define HASH_DMA_PERFORMANCE_MIN_SIZE	1024
- #define HASH_BYTES_PER_WORD		4
+@@ -63,15 +63,8 @@
+ #define HASH_STR_NBLW_MASK	0x0000001FUL
+ #define HASH_NBLW_MAX_VAL	0x1F
  
--/* Maximum value of the length's high word */
--#define HASH_HIGH_WORD_MAX_VAL		0xFFFFFFFFUL
--
- /* Power on Reset values HASH registers */
- #define HASH_RESET_CR_VALUE		0x0
- #define HASH_RESET_STR_VALUE		0x0
-@@ -135,18 +132,6 @@ enum hash_mode {
- 	HASH_MODE_DMA
- };
+-/* PrimeCell IDs */
+-#define HASH_P_ID0		0xE0
+-#define HASH_P_ID1		0x05
+-#define HASH_P_ID2		0x38
+-#define HASH_P_ID3		0x00
+-#define HASH_CELL_ID0		0x0D
+-#define HASH_CELL_ID1		0xF0
+-#define HASH_CELL_ID2		0x05
+-#define HASH_CELL_ID3		0xB1
++/* PrimeCell ID */
++#define UX500_HASH_PID		0x003805E0U
  
--/**
-- * struct uint64 - Structure to handle 64 bits integers.
-- * @high_word:	Most significant bits.
-- * @low_word:	Least significant bits.
-- *
-- * Used to handle 64 bits integers.
-- */
--struct uint64 {
--	u32 high_word;
--	u32 low_word;
--};
--
- /**
-  * struct hash_register - Contains all registers in ux500 hash hardware.
-  * @cr:		HASH control register (0x000).
-@@ -227,7 +212,7 @@ struct hash_state {
- 	u32		csfull;
- 	u32		csdatain;
- 	u32		buffer[HASH_BLOCK_SIZE / sizeof(u32)];
--	struct uint64	length;
-+	u64		length;
- 	u8		index;
- 	bool		dma_mode;
- 	bool		hw_initialized;
-@@ -342,7 +327,7 @@ struct hash_ctx {
-  */
- struct hash_req_ctx {
- 	u32			buffer[HASH_BLOCK_SIZE / sizeof(u32)];
--	struct uint64		length;
-+	u64			length;
- 	u8			index;
- 	bool			dma_mode;
- 	bool			hw_initialized;
+ /* Hardware access method */
+ enum hash_mode {
 diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 1edb11812c7d..390e50b2b1d2 100644
+index 83833cbe595f..a64edfb1cd96 100644
 --- a/drivers/crypto/ux500/hash/hash_core.c
 +++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -449,8 +449,7 @@ static int ux500_hash_init(struct ahash_request *req)
- 		ctx->keylen = 0;
+@@ -13,6 +13,7 @@
  
- 	req_ctx->index = 0;
--	req_ctx->length.low_word = 0;
--	req_ctx->length.high_word = 0;
-+	req_ctx->length = 0;
- 	req_ctx->hw_initialized = false;
- 	if (hash_mode == HASH_MODE_DMA) {
- 		if (req->nbytes < HASH_DMA_ALIGN_SIZE) {
-@@ -545,23 +544,6 @@ static void hash_messagepad(struct hash_device_data *device_data,
- 		cpu_relax();
- }
+ #define pr_fmt(fmt) "hashX hashX: " fmt
  
--/**
-- * hash_incrementlength - Increments the length of the current message.
-- * @ctx: Hash context
-- * @incr: Length of message processed already
-- *
-- * Overflow cannot occur, because conditions for overflow are checked in
-- * hash_hw_update.
-- */
--static void hash_incrementlength(struct hash_req_ctx *ctx, u32 incr)
--{
--	ctx->length.low_word += incr;
--
--	/* Check for wrap-around */
--	if (ctx->length.low_word < incr)
--		ctx->length.high_word++;
--}
--
- /**
-  * hash_setconfiguration - Sets the required configuration for the hash
-  *                         hardware.
-@@ -709,7 +691,7 @@ static int hash_process_data(struct hash_device_data *device_data,
- 					  (const u32 *)buffer,
- 					  HASH_BLOCK_SIZE);
- 		}
--		hash_incrementlength(req_ctx, HASH_BLOCK_SIZE);
-+		req_ctx->length += HASH_BLOCK_SIZE;
- 		data_buffer += (HASH_BLOCK_SIZE - *index);
++#include <linux/amba/bus.h>
+ #include <linux/clk.h>
+ #include <linux/device.h>
+ #include <linux/dma-mapping.h>
+@@ -940,18 +941,28 @@ int hash_check_hw(struct hash_device_data *device_data)
+ 	unsigned int regs[] = { UX500_HASH_PERIPHID0, UX500_HASH_PERIPHID1,
+ 		UX500_HASH_PERIPHID2, UX500_HASH_PERIPHID3, UX500_HASH_CELLID0,
+ 		UX500_HASH_CELLID1, UX500_HASH_CELLID2, UX500_HASH_CELLID3 };
+-	unsigned int expected[] = { HASH_P_ID0, HASH_P_ID1, HASH_P_ID2, HASH_P_ID3,
+-		HASH_CELL_ID0, HASH_CELL_ID1, HASH_CELL_ID2, HASH_CELL_ID3 };
+ 	unsigned int val;
++	u32 pid;
++	u32 cid;
+ 	int i;
  
- 		msg_length -= (HASH_BLOCK_SIZE - *index);
-@@ -933,10 +915,8 @@ int hash_hw_update(struct ahash_request *req)
- 	if (msg_length == 0)
- 		return 0;
- 
--	/* Check if ctx->length + msg_length
--	   overflows */
--	if (msg_length > (req_ctx->length.low_word + msg_length) &&
--	    req_ctx->length.high_word == HASH_HIGH_WORD_VAL_MAX) {
-+	/* Check if ctx->length + msg_length overflows */
-+	if ((req_ctx->length + msg_length) < msg_length) {
- 		pr_err("%s: HASH_MSG_LENGTH_OVERFLOW!\n", __func__);
- 		return crypto_hash_walk_done(&walk, -EPERM);
+-	for (i = 0; i < ARRAY_SIZE(regs); i++) {
++	for (pid = 0, i = 0; i < 8; i++) {
+ 		regmap_read(device_data->map, regs[i], &val);
+-		if (val != expected[i]) {
+-			dev_err(device_data->dev, "ID word %d was %08x expected %08x\n",
+-				i, val, expected[i]);
+-			return -ENODEV;
+-		}
++		if (i < 4)
++			pid |= (val & 255) << (i * 8);
++		else
++			cid |= (val & 255) << ((i - 4) * 8);
++	}
++
++	if (cid != AMBA_CID) {
++		dev_err(device_data->dev, "AMBA CID was %08x expected %08x\n",
++			cid, AMBA_CID);
++		return -ENODEV;
++	}
++	if (pid != UX500_HASH_PID) {
++		dev_err(device_data->dev, "PID was %08x expected %08x\n",
++			pid, UX500_HASH_PID);
++		return -ENODEV;
  	}
+ 
+ 	return 0;
 -- 
 2.36.1
 
