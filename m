@@ -2,92 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A60C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 11:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA12C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 11:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232549AbiGULaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 07:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46312 "EHLO
+        id S232745AbiGULaW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Jul 2022 07:30:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbiGULaP (ORCPT
+        with ESMTP id S229866AbiGULaR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 07:30:15 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D92FD36
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 04:30:12 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4LpVfN3dtVz1M8JK;
-        Thu, 21 Jul 2022 19:27:24 +0800 (CST)
+        Thu, 21 Jul 2022 07:30:17 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64EE7FD36
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 04:30:15 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LpVgf2q4XzmV8F;
+        Thu, 21 Jul 2022 19:28:30 +0800 (CST)
 Received: from [10.67.110.173] (10.67.110.173) by
  dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 21 Jul 2022 19:30:09 +0800
-Message-ID: <cb2da51e-8935-2787-28de-caba41d6ec14@huawei.com>
-Date:   Thu, 21 Jul 2022 19:30:09 +0800
+ 15.1.2375.24; Thu, 21 Jul 2022 19:30:13 +0800
+Message-ID: <4f21d499-9080-e911-f393-8559ab8eecc6@huawei.com>
+Date:   Thu, 21 Jul 2022 19:30:13 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
 Subject: Re: Inquiry about the removal of flag O_NONBLOCK on /dev/random
 Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     <linux-crypto@vger.kernel.org>, <luto@kernel.org>, <tytso@mit.edu>
+To:     Theodore Ts'o <tytso@mit.edu>
+CC:     Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        <linux-crypto@vger.kernel.org>, <luto@kernel.org>
 References: <13e1fa9d-4df8-1a99-ca22-d9d655f2d023@huawei.com>
  <YtaPJPkewin5uWdn@zx2c4.com>
  <b9cb514c-30ed-0b8b-5d54-75001e07bd36@huawei.com>
  <YtjREZMzuppTJHeR@sol.localdomain>
- <a93995db-a738-8e4f-68f2-42d7efd3c77d@huawei.com>
- <Ytj3RnGtWqg18bxO@sol.localdomain> <YtksefZvcFiugeC1@zx2c4.com>
+ <a93995db-a738-8e4f-68f2-42d7efd3c77d@huawei.com> <Ytkz7DOfL6mFCxnI@mit.edu>
 From:   "Guozihua (Scott)" <guozihua@huawei.com>
-In-Reply-To: <YtksefZvcFiugeC1@zx2c4.com>
+In-Reply-To: <Ytkz7DOfL6mFCxnI@mit.edu>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.67.110.173]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  dggpemm500024.china.huawei.com (7.185.36.203)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/7/21 18:37, Jason A. Donenfeld wrote:
-> Hi Guozihua,
+On 2022/7/21 19:09, Theodore Ts'o wrote:
+> On Thu, Jul 21, 2022 at 02:44:54PM +0800, Guozihua (Scott) wrote:
+>   >
+>> We have a userspace program that starts pretty early in the boot process and
+>> it tries to fetch random bits from /dev/random with O_NONBLOCK, if that
+>> returns -EAGAIN, it turns to /dev/urandom. Is this a correct handling of
+>> -EAGAIN? Or this is not one of the intended use case of O_NONBLOCK?
 > 
-> On Wed, Jul 20, 2022 at 11:50:46PM -0700, Eric Biggers wrote:
->> On Thu, Jul 21, 2022 at 02:44:54PM +0800, Guozihua (Scott) wrote:
->>
->> That doesn't make any sense; you should just use /dev/urandom unconditionally.
+> In addition to the good points which Eric and Jason have raised, the
+> other thing I would ask you is ***why*** is your userspace program
+> trying to fetch random bits early in the boot process?  Is it, say,
+> trying to generate a cryptographic key which is security critical.  If
+> so, then DON'T DO THAT.
 > 
-> What Eric said: this flow doesn't really make sense. Why not use
-> /dev/urandom unconditionally or getrandom(GRND_INSECURE)?
+> There have been plenty of really embarrassing security problems caused
+> by consumer grade products who generate a public/private key pair
+> within seconds of the customer taking the product out of the box, and
+> plugging it into the wall for the first time.  At which point,
+> hilarity ensues, unless the box is life- or mission- critical, in
+> which case tragedy ensues....
 > 
-> But also I have to wonder: you wrote '-EAGAIN' but usually userspace
-> checks errno==EAGAIN, a positive value. That makes me wonder whether you
-> wrote your email with your code is open. So I just wanted to triple
-> check that what you've described is actually what the code is doing,
-> just in case there's some ambiguity.
+> Is it possible to move the userspace program so it's not being started
+> early in the boot process?  What is it doing, and why does it need
+> random data in the first place?
 > 
-> I'm just trying to find out what this code is and where it is to assess
-> whether we change the userspace behavior again, given that this has been
-> sitting for several years now.
-> 
-> Jason
+> 						- Ted
 > .
 
-Hi Jason and Eric.
+Hi Ted,
 
-To clarify, the code in question is not written by me and I did not see 
-the code myself, the code is from another team. We discovered this 
-change during the test when we try to run our userspace program on a 
-newer version kernel, and it blocks for a long time during the boot 
-process. It seems that the author use the -EAGAIN error code as an 
-indication that /dev/random is not ready and they implemented a "best 
-effort" mechanism in terms of getting random data.
-
-Honestly speaking I don't know what they are using those random data 
-for, and I am trying to get some background knowledge for this flag and 
-the change, maybe figure out whether that team is using the flag as 
-intended, and bring this up with them.
+Thanks for the comment. The code is not written by me, but I think you 
+made a good point here and I'll definitely bring this up to the author.
 
 -- 
 Best
