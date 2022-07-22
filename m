@@ -2,77 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878AAC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 11:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DE2C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 11:35:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234280AbiGVL0N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Jul 2022 07:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57434 "EHLO
+        id S230199AbiGVLfr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Jul 2022 07:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232299AbiGVL0M (ORCPT
+        with ESMTP id S230134AbiGVLfq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Jul 2022 07:26:12 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5559927FC2
-        for <linux-crypto@vger.kernel.org>; Fri, 22 Jul 2022 04:26:11 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id x91so5493026ede.1
-        for <linux-crypto@vger.kernel.org>; Fri, 22 Jul 2022 04:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P3M+aSErzHoSEG9jae2b5t7SFzCtNxYRjinEbHlaaEg=;
-        b=Uvb4oYhPua1I3p4dj1bHinNjeOlIIo7fZIEWfnftUo+keus43ARtwRTQC1w8GcrjJr
-         fA2Ozi3Vt5wqn8Y727iP8NH9X2lp4G3NU0+imLgLdrkXnHecxuMWg5A0HSk5kI7mW7IB
-         7iYtUolxs79Te9W9VDsRPihPGRnoZ+3zj6pO+h2h/XLcuNrRTvpSM2HxwboxOcMSt1Ee
-         wkSvhVYQpKQOtlCAyHPWjz8u4QHONY5s2C8JYLIm+dBvV0sX/gch3IF3lWYSaA6nUD+8
-         C3Sp1NdQBVrkumxaXFhrtzWPOe2NHGesYa4nEYLXR1Kz64Q5l2GJ0D9hS7wbqNUTZgwS
-         11tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P3M+aSErzHoSEG9jae2b5t7SFzCtNxYRjinEbHlaaEg=;
-        b=1dt5ngqhi3+lGIFrQ/MhpgA+em3yTcqfIefaftE2tkPwPdUS0+jHLppHKrl4I022wD
-         nOTxmucYk+dBVYfx/merGww8ZqUA0ZX2cNWG4QlzJRNAVBl6FKWZm/FAANznAI4DWhjX
-         clj46Go33hYf0e/TD9vMneiVZm1IL795BcC85HI4IHwYLEX0Yj2N6VHPONz71oC05Gps
-         Ikj1Ix/7nRp+IWldcpc7nrB3U68gqsWco2OJypIJIxbXoE/oVaODf8kzb0oRL2USrxXM
-         sIHfAPOa4qQNWIZNusln28/QCD4wU4vBVW/6WJbdYo0leHgeqUgvFR/x7h1xfTRAMun9
-         r+Lw==
-X-Gm-Message-State: AJIora+xC7lN4TRktTLjYduoFL5TAQXop6zyHxCmoY5fEH5DSAqo7slu
-        jy0iS01cFOQN8jhuSKOuZsqBMyzsevlHMmGyG8qhY+26uyA=
-X-Google-Smtp-Source: AGRyM1sV3vBgMApei403xftPsf5aD3seWxODgHl3TvETGIJW3PAXvNndZdtQbvYBFZTUwIBc5bTvt3y9E8D3rHn81JM=
-X-Received: by 2002:a05:6402:5384:b0:431:6d84:b451 with SMTP id
- ew4-20020a056402538400b004316d84b451mr154393edb.46.1658489169556; Fri, 22 Jul
- 2022 04:26:09 -0700 (PDT)
+        Fri, 22 Jul 2022 07:35:46 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8CA7AF868;
+        Fri, 22 Jul 2022 04:35:43 -0700 (PDT)
+Received: from zn.tnic (p200300ea97297665329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7665:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E5EF91EC04E4;
+        Fri, 22 Jul 2022 13:35:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1658489738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=iA4hF9kkPlWcq5B8sNQx2XUmWFJBZdfDGxazbgtSxSs=;
+        b=Gfc3qmAZEapfyhMcE8YqM23jtcCxb3f562sZrP/kg89pc7XVy8A0voe5xVEINVUjkO8ZaW
+        m4rhZaFIc53CaGiUZGsfxI0n7W63uo5tIJG6Ml78lhKPPuk10M76vzqvHbod4qaMEiPiSw
+        UGND80nYqOiUPTj4DE81rtyPQKffhqE=
+Date:   Fri, 22 Jul 2022 13:35:32 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YtqLhHughuh3KDzH@zn.tnic>
+References: <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
+ <BYAPR12MB27599BCEA9F692E173911C3B8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <681e4e45-eff1-600c-9b81-1fa9bdf24232@intel.com>
+ <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
+ <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <5db37cc2-4fb1-7a73-c39a-3531260414d0@intel.com>
+ <BYAPR12MB2759AA368C8B6A5F1C31642F8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <YrTq3WfOeA6ehsk6@google.com>
+ <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-References: <20220721134050.1047866-1-linus.walleij@linaro.org>
-In-Reply-To: <20220721134050.1047866-1-linus.walleij@linaro.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Fri, 22 Jul 2022 13:25:57 +0200
-Message-ID: <CACRpkdYi6BLwrJd9szk_vMEf_RL8E4pUQCi9i1iLk8E18DKJTQ@mail.gmail.com>
-Subject: Re: [PATCH 00/15] Ux500 hash cleanup
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB276743CBEAD5AFE9033AFE558EB59@SN6PR12MB2767.namprd12.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 3:42 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+On Thu, Jun 23, 2022 at 10:43:40PM +0000, Kalra, Ashish wrote:
+> Yes, that's a nice way to hide it from the rest of the kernel which
+> does not require access to this structure anyway, in essence, it
+> becomes a private structure.
 
-> This cleans up the Ux500 hash accelerator.
+So this whole discussion whether there should be a model check or not
+in case a new RMP format gets added in the future is moot - when a new
+model format comes along, *then* the distinction should be done and
+added in code - not earlier.
 
-There are still problems with the patch set, discovered after a few
-iterations of expensive tests (and logging to netconsole to not
-lose any debug messages).
+This is nothing else but normal CPU enablement work - it should be done
+when it is really needed.
 
-I am ironing out the problems or at least making sure is is not
-worse than before the patches, then I will submit v2.
+Because the opposite can happen: you can add a model check which
+excludes future model X, future model X comes along but does *not*
+change the RMP format and then you're going to have to relax that model
+check again to fix SNP on the new model X.
 
-Review comments are however most welcome!
+So pls add the model checks only when really needed.
 
-Yours,
-Linus Walleij
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
