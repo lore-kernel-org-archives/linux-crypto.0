@@ -2,36 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C02B2C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 19:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18553CCA489
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 22:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236467AbiGVTiP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Jul 2022 15:38:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
+        id S236007AbiGVWQO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Jul 2022 18:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiGVTiO (ORCPT
+        with ESMTP id S234255AbiGVWQN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Jul 2022 15:38:14 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E9B52889;
-        Fri, 22 Jul 2022 12:38:14 -0700 (PDT)
-Received: from zn.tnic (p200300ea97297665329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7665:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A74851EC0666;
-        Fri, 22 Jul 2022 21:38:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658518688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=oqMlhQ+9AS8F60PcU1q78Rrrk17ahXV0byauFO5z1UU=;
-        b=pfCUktwvWkG8U+aXBptEc75Naz9avVy8tj8mgVyoRbOzAP4tbeOUfcsyB1cEHRJQiRYHNN
-        OszJAzeSOi6AAD3WDUvaBlLpfBrkiXm9Br3wdsTCPfwl/qdjJMF6lwdg4DjjaBwlGllUqz
-        9n5XyBv4JtYXEaGzrdzUq78AGYDJkNM=
-Date:   Fri, 22 Jul 2022 21:38:04 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
+        Fri, 22 Jul 2022 18:16:13 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AD98B4B4
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Jul 2022 15:16:12 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id w185so5558081pfb.4
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Jul 2022 15:16:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DvsPToDBCg7LtgfTt0+32mRr4nwV5bDezHW9QGpUdCE=;
+        b=tNKubLYYtWNcTQODGehA0A/1OYnUmUt4THz1nqFtzCXg5NEC1cRRSaX5PgITuSDLU6
+         G06p3vx+0Zy/5ssCW97K9rUlLfZc5yFeacry9qdLA/ORmYtTsf+hvAjNC/xJhwylqGqF
+         GDCvsMr0WCfkILIrPPqjC2A917wnhXYY6gdaIIh24eyORjdpEc+eFQw4xlXwr0mFGOr8
+         t0qsu5NCtqCDFbFmwAmnJdfZpcKyrltXlmOvzMeAR2KO9zlFDgaPTuZOo1aTJBLWVqyE
+         ee6wGHg3FjgjATQas4NYJjEgWhWbsJ+6+ttSV6V751uW+K/OWJqRkxFO+p/brT9lNe06
+         X/yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DvsPToDBCg7LtgfTt0+32mRr4nwV5bDezHW9QGpUdCE=;
+        b=omf+dOz+LdAyEeQ3bF3G+gsRw60+jx8Hh8fLz/SPMMffp++hE6uP9xKy/VGdTgflDt
+         UqXedornCOxCmcSPXit3j9rtg7i82leDuMYW8HFsVFZ6lB4iDJaXart6myhrNkn/4dZW
+         DTzkm/gFX98ZiWN9r+APPn6E+ri6LUol7GC2nWq1pdQGHL4iyN+E/+RDh4Dxh96qf9e6
+         ZWu8pRKSypZoN7Z4vtNZIbkhgGPv5HFjadJDDawtxf0vPziP4lqlVZPHwWbN5YJtKXoV
+         WdSSyLcjefzET6y0LPuPBuKEJaxkJlrftoPQ933kG7LIzKKj+4SgctGCfFrAO1/u4JBa
+         3RKA==
+X-Gm-Message-State: AJIora96NwubXS1ubOsfPf+Vrlq6qSIM6mOyUdu0pzkRZk6O854uNAl/
+        WoOTUa3tDi0TTNEu9amhmnidqQ==
+X-Google-Smtp-Source: AGRyM1sIc+nLzUHc1jVYbsv19cRcOoKn0TQ6YwR2BWbngZ0ui0Jg+GMpAVTUImqkVk1IcWXRZVwkvQ==
+X-Received: by 2002:a63:1246:0:b0:41a:58f:9fee with SMTP id 6-20020a631246000000b0041a058f9feemr1538198pgs.413.1658528171605;
+        Fri, 22 Jul 2022 15:16:11 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com. [35.230.65.123])
+        by smtp.gmail.com with ESMTPSA id 30-20020a63185e000000b0041296bca2a8sm3769062pgy.12.2022.07.22.15.16.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 15:16:10 -0700 (PDT)
+Date:   Fri, 22 Jul 2022 22:16:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
 Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
         Dave Hansen <dave.hansen@intel.com>,
         "x86@kernel.org" <x86@kernel.org>,
@@ -71,7 +90,7 @@ Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
         "dgilbert@redhat.com" <dgilbert@redhat.com>,
         "jarkko@kernel.org" <jarkko@kernel.org>
 Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Message-ID: <Ytr8nCL6pa2Q1kWy@zn.tnic>
+Message-ID: <Ytshp+D+IT8eaevH@google.com>
 References: <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
  <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
  <BYAPR12MB275984F14B1E103935A103D98EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
@@ -83,26 +102,55 @@ References: <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.
  <Ytr0t119QrZ8PUBB@google.com>
  <Ytr5ndnlOQvqWdPP@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <Ytr5ndnlOQvqWdPP@zn.tnic>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Btw,
+On Fri, Jul 22, 2022, Borislav Petkov wrote:
+> On Fri, Jul 22, 2022 at 07:04:23PM +0000, Sean Christopherson wrote:
+> > I disagree.  Running an old kernel on new hardware with a different RMP layout
+> > should refuse to use SNP, not read/write garbage and likely corrupt the RMP and/or
+> > host memory.
+> 
+> See my example below.
+> 
+> > And IMO, hiding the non-architectural RMP format in SNP-specific code so that we
+> > don't have to churn a bunch of call sites that don't _need_ access to the raw RMP
+> > format is a good idea regardless of whether we want to be optimistic or pessimistic
+> > about future formats.
+> 
+> I don't think I ever objected to that.
 
-what could work is to spec only a *version* field somewhere in the HW or
-FW which says which version the RMP header has.
+Yar, just wanted to be make sure we're all on the same page, I wasn't entirely
+sure what was get nacked :-)
 
-Then, OS would check that field and if it doesn't support that certain
-version, it'll bail.
+> > > This is nothing else but normal CPU enablement work - it should be done
+> > > when it is really needed.
+> > > 
+> 
+> <--- this here.
+> 
+> > > Because the opposite can happen: you can add a model check which
+> > > excludes future model X, future model X comes along but does *not*
+> > > change the RMP format and then you're going to have to relax that model
+> > > check again to fix SNP on the new model X.
+> 
+> So constantly adding new models to a list which support a certain
+> version of the RMP format doesn't scale either.
 
-I'd need to talk to folks first, though, what the whole story is behind
-not spec-ing the RMP format...
+Yeah, but either we get AMD to give us an architectural layout or we'll have to
+eat that cost at some point in the future.
 
--- 
-Regards/Gruss,
-    Boris.
+> If you corrupt the RMP because your kernel is old, you'll crash and burn
+> very visibly so that you'll be forced to have to look for an updated
+> kernel regardless.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Heh, you're definitely more optimistic than me.  I can just see something truly
+ridiculous happening like moving the page size bit and then getting weird behavior
+only when KVM happens to need the page size for some edge case.
+
+Anyways, it's not a sticking point, and I certainly am not volunteering to
+maintain the FMS list...
