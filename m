@@ -2,130 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BDAC43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 03:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69787C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 06:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbiGVDO6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 23:14:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39754 "EHLO
+        id S231274AbiGVGej (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Jul 2022 02:34:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbiGVDO5 (ORCPT
+        with ESMTP id S229783AbiGVGei (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 23:14:57 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C41E23167
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 20:14:55 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Lpvcq75K3zkXQd;
-        Fri, 22 Jul 2022 11:12:27 +0800 (CST)
-Received: from [10.67.110.173] (10.67.110.173) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 22 Jul 2022 11:14:52 +0800
-Message-ID: <6eb023d2-ba6a-c033-9d16-e03d3e5fa286@huawei.com>
-Date:   Fri, 22 Jul 2022 11:14:52 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v2] arm64/crypto: poly1305 fix a read out-of-bound
-Content-Language: en-US
-To:     Will Deacon <will@kernel.org>, Eric Biggers <ebiggers@kernel.org>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
+        Fri, 22 Jul 2022 02:34:38 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556724D4E5
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 23:34:37 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Lq02r48XqzjXRt;
+        Fri, 22 Jul 2022 14:31:48 +0800 (CST)
+Received: from huawei.com (10.67.175.31) by dggpemm500024.china.huawei.com
+ (7.185.36.203) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 22 Jul
+ 2022 14:34:35 +0800
+From:   GUO Zihua <guozihua@huawei.com>
+To:     <linux-crypto@vger.kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <catalin.marinas@arm.com>
-References: <20220712075031.29061-1-guozihua@huawei.com>
- <20220720094116.GC15752@willie-the-truck>
- <a29cb083-0305-3467-976c-e541daefc5e8@huawei.com>
- <Yti73XyFb8l7n2gU@sol.localdomain> <20220721092858.GA17088@willie-the-truck>
-From:   "Guozihua (Scott)" <guozihua@huawei.com>
-In-Reply-To: <20220721092858.GA17088@willie-the-truck>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.173]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+        <catalin.marinas@arm.com>, <will@kernel.org>, <ebiggers@kernel.org>
+Subject: [PATCH v3] arm64/crypto: poly1305 fix a read out-of-bound
+Date:   Fri, 22 Jul 2022 14:31:57 +0800
+Message-ID: <20220722063157.7581-1-guozihua@huawei.com>
+X-Mailer: git-send-email 2.36.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.175.31]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  dggpemm500024.china.huawei.com (7.185.36.203)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/7/21 17:28, Will Deacon wrote:
-> On Wed, Jul 20, 2022 at 07:37:17PM -0700, Eric Biggers wrote:
->> On Wed, Jul 20, 2022 at 05:57:30PM +0800, Guozihua (Scott) wrote:
->>> On 2022/7/20 17:41, Will Deacon wrote:
->>>> On Tue, Jul 12, 2022 at 03:50:31PM +0800, GUO Zihua wrote:
->>>>> A kasan error was reported during fuzzing:
->>>>
->>>> [...]
->>>>
->>>>> This patch fixes the issue by calling poly1305_init_arm64() instead of
->>>>> poly1305_init_arch(). This is also the implementation for the same
->>>>> algorithm on arm platform.
->>>>>
->>>>> Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
->>>>> Cc: stable@vger.kernel.org
->>>>> Signed-off-by: GUO Zihua <guozihua@huawei.com>
->>>>> ---
->>>>>    arch/arm64/crypto/poly1305-glue.c | 2 +-
->>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> I'm not a crypto guy by any stretch of the imagination, but Ard is out
->>>> at the moment and this looks like an important fix so I had a crack at
->>>> reviewing it.
->>>>
->>>>> diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
->>>>> index 9c3d86e397bf..1fae18ba11ed 100644
->>>>> --- a/arch/arm64/crypto/poly1305-glue.c
->>>>> +++ b/arch/arm64/crypto/poly1305-glue.c
->>>>> @@ -52,7 +52,7 @@ static void neon_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
->>>>>    {
->>>>>    	if (unlikely(!dctx->sset)) {
->>>>>    		if (!dctx->rset) {
->>>>> -			poly1305_init_arch(dctx, src);
->>>>> +			poly1305_init_arm64(&dctx->h, src);
->>>>>    			src += POLY1305_BLOCK_SIZE;
->>>>>    			len -= POLY1305_BLOCK_SIZE;
->>>>>    			dctx->rset = 1;
->>>>
->>>> With this change, we no longer initialise dctx->buflen to 0 as part of the
->>>> initialisation. Looking at neon_poly1305_do_update(), I'm a bit worried
->>>> that we could land in the 'if (likely(len >= POLY1305_BLOCK_SIZE))' block,
->>>> end up with len == 0 and fail to set dctx->buflen. Is this a problem, or is
->>>> my ignorance showing?
->>>>
->>>> Will
->>>> .
->>>
->>> Thanks Will.
->>>
->>> I noticed this as well, but I leaved it out so that the behavior is the same
->>> as the implementation for arm. The buflen here seems to be used for
->>> maintaining any excessive data after the last block, and is zeroed during
->>> init. I am not sure why it should be zeroed again during key initialization.
->>> Maybe the thought was that the very first block of the data is always used
->>> for initializing rset and that is also considered to be the "initialization"
->>> process for the algorithm, thus the zeroing of buflen. I could be completely
->>> wrong though.
->>>
->>
->> buflen is initialized by neon_poly1305_init(), so there's no issue here.
-> 
-> Ah yes, thanks. I missed that. In which case, for the very little it's
-> worth:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
-> 
-> Herbert, please can you pick this up?
-> 
-> Will
-> .
+A kasan error was reported during fuzzing:
 
-Thanks Will.
+BUG: KASAN: slab-out-of-bounds in neon_poly1305_blocks.constprop.0+0x1b4/0x250 [poly1305_neon]
+Read of size 4 at addr ffff0010e293f010 by task syz-executor.5/1646715
+CPU: 4 PID: 1646715 Comm: syz-executor.5 Kdump: loaded Not tainted 5.10.0.aarch64 #1
+Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.59 01/31/2019
+Call trace:
+ dump_backtrace+0x0/0x394
+ show_stack+0x34/0x4c arch/arm64/kernel/stacktrace.c:196
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x158/0x1e4 lib/dump_stack.c:118
+ print_address_description.constprop.0+0x68/0x204 mm/kasan/report.c:387
+ __kasan_report+0xe0/0x140 mm/kasan/report.c:547
+ kasan_report+0x44/0xe0 mm/kasan/report.c:564
+ check_memory_region_inline mm/kasan/generic.c:187 [inline]
+ __asan_load4+0x94/0xd0 mm/kasan/generic.c:252
+ neon_poly1305_blocks.constprop.0+0x1b4/0x250 [poly1305_neon]
+ neon_poly1305_do_update+0x6c/0x15c [poly1305_neon]
+ neon_poly1305_update+0x9c/0x1c4 [poly1305_neon]
+ crypto_shash_update crypto/shash.c:131 [inline]
+ shash_finup_unaligned+0x84/0x15c crypto/shash.c:179
+ crypto_shash_finup+0x8c/0x140 crypto/shash.c:193
+ shash_digest_unaligned+0xb8/0xe4 crypto/shash.c:201
+ crypto_shash_digest+0xa4/0xfc crypto/shash.c:217
+ crypto_shash_tfm_digest+0xb4/0x150 crypto/shash.c:229
+ essiv_skcipher_setkey+0x164/0x200 [essiv]
+ crypto_skcipher_setkey+0xb0/0x160 crypto/skcipher.c:612
+ skcipher_setkey+0x3c/0x50 crypto/algif_skcipher.c:305
+ alg_setkey+0x114/0x2a0 crypto/af_alg.c:220
+ alg_setsockopt+0x19c/0x210 crypto/af_alg.c:253
+ __sys_setsockopt+0x190/0x2e0 net/socket.c:2123
+ __do_sys_setsockopt net/socket.c:2134 [inline]
+ __se_sys_setsockopt net/socket.c:2131 [inline]
+ __arm64_sys_setsockopt+0x78/0x94 net/socket.c:2131
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall+0x64/0x100 arch/arm64/kernel/syscall.c:48
+ el0_svc_common.constprop.0+0x220/0x230 arch/arm64/kernel/syscall.c:155
+ do_el0_svc+0xb4/0xd4 arch/arm64/kernel/syscall.c:217
+ el0_svc+0x24/0x3c arch/arm64/kernel/entry-common.c:353
+ el0_sync_handler+0x160/0x164 arch/arm64/kernel/entry-common.c:369
+ el0_sync+0x160/0x180 arch/arm64/kernel/entry.S:683
 
-Herbert, would you please wait for a v3 patch? I'll update the reproduce 
-example based on Eric's comment.
+This error can be reproduced by the following code compiled as ko on a
+system with kasan enabled:
 
+#include <linux/module.h>
+#include <linux/crypto.h>
+#include <crypto/hash.h>
+#include <crypto/poly1305.h>
+
+char test_data[] = "\x00\x01\x02\x03\x04\x05\x06\x07"
+                   "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                   "\x10\x11\x12\x13\x14\x15\x16\x17"
+                   "\x18\x19\x1a\x1b\x1c\x1d\x1e";
+
+int init(void)
+{
+        struct crypto_shash *tfm = NULL;
+        char *data = NULL, *out = NULL;
+
+        tfm = crypto_alloc_shash("poly1305", 0, 0);
+        data = kmalloc(POLY1305_KEY_SIZE - 1, GFP_KERNEL);
+        out = kmalloc(POLY1305_DIGEST_SIZE, GFP_KERNEL);
+        memcpy(data, test_data, POLY1305_KEY_SIZE - 1);
+        crypto_shash_tfm_digest(tfm, data, POLY1305_KEY_SIZE - 1, out);
+
+        kfree(data);
+        kfree(out);
+        return 0;
+}
+
+void deinit(void)
+{
+}
+
+module_init(init)
+module_exit(deinit)
+MODULE_LICENSE("GPL");
+
+The root cause of the bug sits in neon_poly1305_blocks. The logic
+neon_poly1305_blocks() performed is that if it was called with both s[]
+and r[] uninitialized, it will first try to initialize them with the
+data from the first "block" that it believed to be 32 bytes in length.
+First 16 bytes are used as the key and the next 16 bytes for s[]. This
+would lead to the aforementioned read out-of-bound. However, after
+calling poly1305_init_arch(), only 16 bytes were deducted from the input
+and s[] is initialized yet again with the following 16 bytes. The second
+initialization of s[] is certainly redundent which indicates that the
+first initialization should be for r[] only.
+
+This patch fixes the issue by calling poly1305_init_arm64() instead of
+poly1305_init_arch(). This is also the implementation for the same
+algorithm on arm platform.
+
+Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+Cc: stable@vger.kernel.org
+Signed-off-by: GUO Zihua <guozihua@huawei.com>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+Acked-by: Will Deacon <will@kernel.org>
+---
+
+v3:
+  Tested and updated reproduction code following Eric's comment.
+  Included reviewed-by and acked-by from Eric and Will.
+v2:
+  Added Fixes and Cc tag.
+
+---
+ arch/arm64/crypto/poly1305-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
+index 9c3d86e397bf..1fae18ba11ed 100644
+--- a/arch/arm64/crypto/poly1305-glue.c
++++ b/arch/arm64/crypto/poly1305-glue.c
+@@ -52,7 +52,7 @@ static void neon_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
+ {
+ 	if (unlikely(!dctx->sset)) {
+ 		if (!dctx->rset) {
+-			poly1305_init_arch(dctx, src);
++			poly1305_init_arm64(&dctx->h, src);
+ 			src += POLY1305_BLOCK_SIZE;
+ 			len -= POLY1305_BLOCK_SIZE;
+ 			dctx->rset = 1;
 -- 
-Best
-GUO Zihua
+2.36.0
+
