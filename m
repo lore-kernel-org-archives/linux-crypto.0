@@ -2,47 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AEFC43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 08:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3FEC43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 08:47:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234355AbiGVIrN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Jul 2022 04:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45542 "EHLO
+        id S234474AbiGVIr0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Jul 2022 04:47:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234942AbiGVIrE (ORCPT
+        with ESMTP id S234488AbiGVIrX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Jul 2022 04:47:04 -0400
+        Fri, 22 Jul 2022 04:47:23 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D049EC52;
-        Fri, 22 Jul 2022 01:47:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833435F7D;
+        Fri, 22 Jul 2022 01:47:22 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oEoJ7-003HU0-NZ; Fri, 22 Jul 2022 18:46:51 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jul 2022 16:46:50 +0800
-Date:   Fri, 22 Jul 2022 16:46:50 +0800
+        id 1oEoJa-003HWP-Fw; Fri, 22 Jul 2022 18:47:20 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jul 2022 16:47:18 +0800
+Date:   Fri, 22 Jul 2022 16:47:18 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     shaom Deng <dengshaomin@cdjrlc.com>
-Cc:     davem@davemloft.net, paulus@samba.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, dengshaomin@cdjrlc.com
-Subject: Re: [PATCH] cyrpto:delete the rebundant word "block" in comments
-Message-ID: <Ytpj+njJpkmHVXLK@gondor.apana.org.au>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@cloudflare.com, Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH] crypto: testmgr - some more fixes to RSA test vectors
+Message-ID: <YtpkFnJf2CAxFpg9@gondor.apana.org.au>
+References: <20220717133746.918-1-ignat@cloudflare.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220716165633.17822-1-dengshaomin@cdjrlc.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20220717133746.918-1-ignat@cloudflare.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-shaom Deng <dengshaomin@cdjrlc.com> wrote:
-> there is rebundant word "block" in comments, so remove it
+On Sun, Jul 17, 2022 at 02:37:46PM +0100, Ignat Korchagin wrote:
+> Two more fixes:
 > 
-> Signed-off-by: shaom Deng <dengshaomin@cdjrlc.com>
+>   * some test vectors in commit 79e6e2f3f3ff ("crypto: testmgr - populate
+>     RSA CRT parameters in RSA test vectors") had misplaced commas, which
+>     break the test and trigger KASAN warnings at least on x86-64
+> 
+>   * pkcs1pad test vector did not have its CRT parameters
+> 
+> Fixes: 79e6e2f3f3ff ("crypto: testmgr - populate RSA CRT parameters in RSA test vectors")
+> Reported-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 > ---
-> arch/powerpc/crypto/aes-spe-glue.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+>  crypto/testmgr.h | 102 +++++++++++++++++++++++++++++------------------
+>  1 file changed, 63 insertions(+), 39 deletions(-)
 
 Patch applied.  Thanks.
 -- 
