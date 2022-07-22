@@ -2,64 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 494EBC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 08:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A0ACCA47F
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Jul 2022 08:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230405AbiGVISD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Jul 2022 04:18:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42830 "EHLO
+        id S234481AbiGVIof (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Jul 2022 04:44:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbiGVISC (ORCPT
+        with ESMTP id S234462AbiGVIoc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Jul 2022 04:18:02 -0400
+        Fri, 22 Jul 2022 04:44:32 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A4D87C3B;
-        Fri, 22 Jul 2022 01:17:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FD49FE05
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Jul 2022 01:44:30 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oEnr6-003GmK-Il; Fri, 22 Jul 2022 18:17:54 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jul 2022 16:17:52 +0800
-Date:   Fri, 22 Jul 2022 16:17:52 +0800
+        id 1oEoGd-003HMD-01; Fri, 22 Jul 2022 18:44:16 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Jul 2022 16:44:15 +0800
+Date:   Fri, 22 Jul 2022 16:44:15 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhengchao Shao <shaozhengchao@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        davem@davemloft.net, javier.martin@vista-silicon.com,
-        weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH] crypto: sahara - don't sleep when in softirq
-Message-ID: <YtpdMKbmddCFcNhX@gondor.apana.org.au>
-References: <20220713033550.118409-1-shaozhengchao@huawei.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Prabhjot Khurana <prabhjot.khurana@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de
+Subject: Re: [PATCH] crypto: keembay-ocs-ecc: Drop if with an always false
+ condition
+Message-ID: <YtpjX9WoXgoq9ru+@gondor.apana.org.au>
+References: <20220714212820.59237-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220713033550.118409-1-shaozhengchao@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220714212820.59237-1-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 11:35:50AM +0800, Zhengchao Shao wrote:
-> Function of sahara_aes_crypt maybe could be called by function
-> of crypto_skcipher_encrypt during the rx softirq, so it is not
-> allowed to use mutex lock. This patch is not yet tested.
+On Thu, Jul 14, 2022 at 11:28:20PM +0200, Uwe Kleine-König wrote:
+> The remove callback is only called after probe completed successfully.
+> In this case platform_set_drvdata() was called with a non-NULL argument
+> and so ecc_dev is never NULL.
 > 
-> Fixes: c0c3c89ae347 ("crypto: sahara - replace tasklets with kthread")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> This is a preparation for making platform remove callbacks return void.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 > ---
->  drivers/crypto/sahara.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-> index 457084b344c1..867107b4ed30 100644
-> --- a/drivers/crypto/sahara.c
-> +++ b/drivers/crypto/sahara.c
-> @@ -26,7 +26,6 @@
->  #include <linux/kernel.h>
->  #include <linux/kthread.h>
->  #include <linux/module.h>
-> -#include <linux/mutex.h>
+>  drivers/crypto/keembay/keembay-ocs-ecc.c | 2 --
+>  1 file changed, 2 deletions(-)
 
-Shouldn't this be replaced with spinlock.h?
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
