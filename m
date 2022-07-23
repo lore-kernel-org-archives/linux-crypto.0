@@ -2,267 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92304C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Jul 2022 10:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE83C43334
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Jul 2022 16:22:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237258AbiGWKhT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Jul 2022 06:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50044 "EHLO
+        id S230092AbiGWQWx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Jul 2022 12:22:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237288AbiGWKhS (ORCPT
+        with ESMTP id S236274AbiGWQWu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Jul 2022 06:37:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73ED9A1A4;
-        Sat, 23 Jul 2022 03:37:16 -0700 (PDT)
+        Sat, 23 Jul 2022 12:22:50 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A26140EC
+        for <linux-crypto@vger.kernel.org>; Sat, 23 Jul 2022 09:22:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E613061435;
-        Sat, 23 Jul 2022 10:37:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48C08C341CB;
-        Sat, 23 Jul 2022 10:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658572635;
-        bh=WbCIKYVcxKuYbQgQfFPveeFIBTFwuN+x08magz5RjsI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Ztbp18ihkdzhzJ+xYH0dRGX6486GbnhgN7+k/R1QTcH5MQ2UFDdvWhBg4Hszwsqdu
-         wJwSKUOW8xpmgRP09LaNZ7U85ADqYetwaN1cwfkfLmS0do5HetjbrJS+WU4sNSaKin
-         lWTqkGU2vuB3R56cWbjW7fPaZYQcydoegbre7PkkmKMNeBFH/HHjtOF5QmtQdeIqCI
-         pv7tYo7slJQr8diVjdZtLWAF649q/irDStid5PhOAx9gdgZCX1YM7yHtHLxAkNxUfu
-         /7Q7RThgul0k/P4J2TXf5+Gl7rgtLOffdN2WFPpUWkhAi8P2xgpM+Vag2gvBE+Sh4V
-         GZWSHBa/CvZIA==
-Received: by mail-oi1-f181.google.com with SMTP id bb16so8119504oib.11;
-        Sat, 23 Jul 2022 03:37:15 -0700 (PDT)
-X-Gm-Message-State: AJIora9x5/hCw2ioGOsOlqDdv47L6rIvnzBEWFBqBJJQnJm89Gx65cg+
-        7jLGzDmtZx/zE8abou+g42oFV+sq2R2QGIzihQU=
-X-Google-Smtp-Source: AGRyM1v2Wox6QsJsB1NBCxAYD6gX86YcnC3X6G3MbG9Q0KmcGdNraUZx+KzLIzPK5hi7N8GGsbEe4sk847QNbkoqD1k=
-X-Received: by 2002:a05:6808:1489:b0:33a:861c:838e with SMTP id
- e9-20020a056808148900b0033a861c838emr8583145oiw.228.1658572634322; Sat, 23
- Jul 2022 03:37:14 -0700 (PDT)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 65D80B80B8F
+        for <linux-crypto@vger.kernel.org>; Sat, 23 Jul 2022 16:22:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F2CC341C0;
+        Sat, 23 Jul 2022 16:22:46 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gHmbLuyU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1658593363;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=seQzy75JrVdtoEI8fvcy884GFXRdPiCP5Hc5jYTFtuI=;
+        b=gHmbLuyUVCb9wJ95QS2XKCVpSB8fIVKBFTA4X9smqVFJpV2eWVlFuycoPRTw+I22vAlvFh
+        fOlarOHzITVHyQLQEpOSaUEMCXz0Lcde63tHT8q6UsPl7I8W4Xrv/SqJrDDnfl+bjCSIpW
+        nIuBCF/6Rwyl2LQb3Ede5uAAmRTvxYo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 55564dd9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 23 Jul 2022 16:22:42 +0000 (UTC)
+Date:   Sat, 23 Jul 2022 18:22:39 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     gibc-alpha@sourceware.org,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Yann Droneaud <ydroneaud@opteya.com>, jann@thejh.net,
+        Michael@phoronix.com
+Cc:     linux-crypto@vger.kernel.org
+Subject: arc4random - are you sure we want these?
+Message-ID: <YtwgTySJyky0OcgG@zx2c4.com>
 MIME-Version: 1.0
-References: <20220721204709.445216-1-ben-linux@fluff.org>
-In-Reply-To: <20220721204709.445216-1-ben-linux@fluff.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 23 Jul 2022 12:37:03 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHvf8vWTL=6HzQGcUMK3Qwd9-s5qKAhJzGuk_cEa=cZkQ@mail.gmail.com>
-Message-ID: <CAMj1kXHvf8vWTL=6HzQGcUMK3Qwd9-s5qKAhJzGuk_cEa=cZkQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: fix warnings from missing .note.GNU-stack
-To:     Ben Dooks <ben-linux@fluff.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 21 Jul 2022 at 22:48, Ben Dooks <ben-linux@fluff.org> wrote:
->
-> A lot of the assembly code in arch/arm/crypto is missing
-> a .note.GNU-stack section which is making a numbe of warnings
-> about implicit executable stack. This code does not look like
-> it does not need an executable stack, so silence the warnings
-> by adding a .section .note.GNU-stack to all these.
->
-> Since this is an empty section, it should be backwards compatible
-> with older linkers.
->
-> Fixes the following warnings:
->
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-cipher-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-neonbs-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv4-large.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv7-neon.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha256-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha512-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/chacha-neon-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-ce-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-ce-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha2-ce-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/ghash-ce-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/crc32-ce-core.o: missing .note.GNU-stack section implies executable stack
-> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->
-> Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+Hi glibc developers,
 
-Hello Ben,
+I learned about the addition of the arc4random functions in glibc this
+morning, thanks to Phoronix. I wish somebody would have CC'd me into
+those discussions before it got committed, but here we are.
 
-This annotation is pointless in the kernel, as we never load any code
-as ELF executables. We only load raw binaries or partially linked
-objects, which don't carry this annotation, and we never use an
-executable stack anyway.
+I really wonder whether this is a good idea, whether this is something
+that glibc wants, and whether it's a design worth committing to in the
+long term.
 
-So instead of adding these annotations, can we please just find a way
-to shut up the linker?
+Firstly, for what use cases does this actually help? As of recent
+changes to the Linux kernels -- now backported all the way to 4.9! --
+getrandom() and /dev/urandom are extremely fast and operate over per-cpu
+states locklessly. Sure you avoid a syscall by doing that in userspace,
+but does it really matter? Who exactly benefits from this?
 
+Seen that way, it seems like a lot of complexity for nothing, and
+complexity that will lead to bugs and various oversights eventually.
 
-> ---
->  arch/arm/crypto/aes-ce-core.S        | 2 ++
->  arch/arm/crypto/aes-cipher-core.S    | 2 ++
->  arch/arm/crypto/aes-neonbs-core.S    | 3 +++
->  arch/arm/crypto/chacha-neon-core.S   | 2 ++
->  arch/arm/crypto/chacha-scalar-core.S | 2 ++
->  arch/arm/crypto/crc32-ce-core.S      | 2 ++
->  arch/arm/crypto/ghash-ce-core.S      | 2 ++
->  arch/arm/crypto/sha1-armv4-large.S   | 1 +
->  arch/arm/crypto/sha1-armv7-neon.S    | 2 ++
->  arch/arm/crypto/sha1-ce-core.S       | 2 ++
->  arch/arm/crypto/sha2-ce-core.S       | 2 ++
->  arch/arm/crypto/sha256-armv4.pl      | 1 +
->  arch/arm/crypto/sha512-armv4.pl      | 1 +
->  13 files changed, 24 insertions(+)
->
-> diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
-> index 312428d83eed..4e570c6df9bb 100644
-> --- a/arch/arm/crypto/aes-ce-core.S
-> +++ b/arch/arm/crypto/aes-ce-core.S
-> @@ -711,3 +711,5 @@ ENDPROC(ce_aes_invert)
->         .byte            0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
->         .byte           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
->         .byte           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-> index 1da3f41359aa..11f10ee35487 100644
-> --- a/arch/arm/crypto/aes-cipher-core.S
-> +++ b/arch/arm/crypto/aes-cipher-core.S
-> @@ -199,3 +199,5 @@ ENDPROC(__aes_arm_encrypt)
->  ENTRY(__aes_arm_decrypt)
->         do_crypt        iround, crypto_it_tab, crypto_aes_inv_sbox, 0
->  ENDPROC(__aes_arm_decrypt)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
-> index 7b61032f29fa..19197c0d635c 100644
-> --- a/arch/arm/crypto/aes-neonbs-core.S
-> +++ b/arch/arm/crypto/aes-neonbs-core.S
-> @@ -1041,3 +1041,6 @@ ENTRY(aesbs_xts_decrypt)
->         ldr             ip, [sp, #8]            // reorder final tweak?
->         __xts_crypt     aesbs_decrypt8, q0, q1, q6, q4, q2, q7, q3, q5
->  ENDPROC(aesbs_xts_decrypt)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> +
-> diff --git a/arch/arm/crypto/chacha-neon-core.S b/arch/arm/crypto/chacha-neon-core.S
-> index 13d12f672656..a90690d32ad8 100644
-> --- a/arch/arm/crypto/chacha-neon-core.S
-> +++ b/arch/arm/crypto/chacha-neon-core.S
-> @@ -641,3 +641,5 @@ ENDPROC(chacha_4block_xor_neon)
->         .byte           0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
->         .byte           0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
->         .byte           0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/chacha-scalar-core.S b/arch/arm/crypto/chacha-scalar-core.S
-> index 083fe1ab96d0..81f94876f418 100644
-> --- a/arch/arm/crypto/chacha-scalar-core.S
-> +++ b/arch/arm/crypto/chacha-scalar-core.S
-> @@ -441,3 +441,5 @@ ENTRY(hchacha_block_arm)
->  1:     _chacha_permute 12
->         b               0b
->  ENDPROC(hchacha_block_arm)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
-> index 3f13a76b9066..990c756c7487 100644
-> --- a/arch/arm/crypto/crc32-ce-core.S
-> +++ b/arch/arm/crypto/crc32-ce-core.S
-> @@ -304,3 +304,5 @@ ENDPROC(crc32_armv8_le)
->  ENTRY(crc32c_armv8_le)
->         __crc32         c
->  ENDPROC(crc32c_armv8_le)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-> index 9f51e3fa4526..2f712b9d8b2b 100644
-> --- a/arch/arm/crypto/ghash-ce-core.S
-> +++ b/arch/arm/crypto/ghash-ce-core.S
-> @@ -337,3 +337,5 @@ ENTRY(pmull_ghash_update_p8)
->
->         ghash_update    p8
->  ENDPROC(pmull_ghash_update_p8)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
-> index 1c8b685149f2..4e40132382b5 100644
-> --- a/arch/arm/crypto/sha1-armv4-large.S
-> +++ b/arch/arm/crypto/sha1-armv4-large.S
-> @@ -505,3 +505,4 @@ ENTRY(sha1_block_data_order)
->  ENDPROC(sha1_block_data_order)
->  .asciz "SHA1 block transform for ARMv4, CRYPTOGAMS by <appro@openssl.org>"
->  .align 2
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1-armv7-neon.S
-> index 28d816a6a530..a554b1bb4ceb 100644
-> --- a/arch/arm/crypto/sha1-armv7-neon.S
-> +++ b/arch/arm/crypto/sha1-armv7-neon.S
-> @@ -632,3 +632,5 @@ ENTRY(sha1_transform_neon)
->  .Ldo_nothing:
->    bx lr
->  ENDPROC(sha1_transform_neon)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/sha1-ce-core.S b/arch/arm/crypto/sha1-ce-core.S
-> index 8a702e051738..73353804c33f 100644
-> --- a/arch/arm/crypto/sha1-ce-core.S
-> +++ b/arch/arm/crypto/sha1-ce-core.S
-> @@ -121,3 +121,5 @@ ENTRY(sha1_ce_transform)
->         vstr            dgbs, [r0, #16]
->         bx              lr
->  ENDPROC(sha1_ce_transform)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/sha2-ce-core.S b/arch/arm/crypto/sha2-ce-core.S
-> index b6369d2440a1..b5f20ab96690 100644
-> --- a/arch/arm/crypto/sha2-ce-core.S
-> +++ b/arch/arm/crypto/sha2-ce-core.S
-> @@ -121,3 +121,5 @@ ENTRY(sha2_ce_transform)
->         vst1.32         {dga-dgb}, [r0]
->         bx              lr
->  ENDPROC(sha2_ce_transform)
-> +
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
-> index f3a2b54efd4e..c12edbd99531 100644
-> --- a/arch/arm/crypto/sha256-armv4.pl
-> +++ b/arch/arm/crypto/sha256-armv4.pl
-> @@ -677,6 +677,7 @@ $code.=<<___;
->  #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
->  .comm   OPENSSL_armcap_P,4,4
->  #endif
-> +.section .note.GNU-stack,"",%progbits
->  ___
->
->  open SELF,$0;
-> diff --git a/arch/arm/crypto/sha512-armv4.pl b/arch/arm/crypto/sha512-armv4.pl
-> index 2fc3516912fa..6411799b4d1d 100644
-> --- a/arch/arm/crypto/sha512-armv4.pl
-> +++ b/arch/arm/crypto/sha512-armv4.pl
-> @@ -639,6 +639,7 @@ $code.=<<___;
->  #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
->  .comm  OPENSSL_armcap_P,4,4
->  #endif
-> +.section .note.GNU-stack,"",%progbits
->  ___
->
->  $code =~ s/\`([^\`]*)\`/eval $1/gem;
-> --
-> 2.35.1
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+For example, the kernel reseeds itself when virtual machines fork using
+an identifier passed to the kernel via ACPI. It also reseeds itself on
+system resume, both from ordinary S3 sleep but also, more importantly,
+from hibernation. And in general, being the arbiter of entropy, the
+kernel is much better poised to determine when it makes sense to reseed.
+
+Glibc, on the other hand, can employ some heuristics and make some
+decisions -- on fork, after 16 MiB, and the like -- but in general these
+are lacking, compared to the much wider array of information the kernel
+has.
+
+You miss out on this with arc4random, and if that information _is_ to be
+exported to userspace somehow in the future, it would be awfully nice to
+design the userspace interface alongside the kernel one.
+
+For that reason, past discussion of having some random number generation
+in userspace libcs has geared toward doing this in the vDSO, somehow,
+where the kernel can be part and parcel of that effort.
+
+Seen from this perspective, going with OpenBSD's older paradigm might be
+rather limiting. Why not work together, between the kernel and libc, to
+see if we can come up with something better, before settling on an
+interface with semantics that are hard to walk back later?
+
+As-is, it's hard to recommend that anybody really use these functions.
+Just keep using getrandom(2), which has mostly favorable semantics.
+
+Yes, I get it: it's fun to make a random number generator, and so lots
+of projects figure out some way to make yet another one somewhere
+somehow. But the tendency to do so feels like a weird computer tinkerer
+disease rather something that has ever helped the overall ecosystem.
+
+So I'm wondering: who actually needs this, and why? What's the
+performance requirement like, and why is getrandom(2) insufficient? And
+is this really the best approach to take? If this is something needed,
+how would you feel about working together on a vDSO approach instead? Or
+maybe nobody actually needs this in the first place?
+
+And secondly, is there anyway that glibc can *not* do this, or has that
+ship fully sailed, and I really missed out by not being part of that
+discussion whenever it was happening?
+
+Thanks,
+Jason
