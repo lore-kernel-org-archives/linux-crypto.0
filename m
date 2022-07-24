@@ -2,306 +2,269 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D87E6C43334
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Jul 2022 17:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22BAC43334
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Jul 2022 17:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229967AbiGXRAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Jul 2022 13:00:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48236 "EHLO
+        id S229509AbiGXRdF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 24 Jul 2022 13:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGXRAt (ORCPT
+        with ESMTP id S229774AbiGXRdE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Jul 2022 13:00:49 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DCCAEE3F
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Jul 2022 10:00:45 -0700 (PDT)
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com [209.85.208.200])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C9D9A3F12C
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Jul 2022 17:00:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1658682043;
-        bh=A2EBTwoVYX14a4fWbZ0vCjcrE9v4KPce0Km1BN1L64o=;
-        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-         In-Reply-To:Content-Type;
-        b=YBFKs6DViBnvsXi3Lrg3GTyzO9ksEgePL1bykhQtIv5aT0XVltYi3Twzu2n2G50rM
-         fqqrxO9NxzQ2iBgvJVMt9Ha16pJmQykBIrxyiylNfWUl0dy/eoXiF0VxJcMk0G+rRd
-         mbUYW1KgUzEUmTo8HFLq4++KMaOt6HWlgKv51Q4KBVwvC52mRVpYkjgQdsaukAFXYj
-         qfEQnRHwc87Ttp5UFUbs/GKZTJ2OMvd+iMush6PJLmKzKQ89UoyhITprwxuiAp3UqU
-         sz266xe4859RR7uwmMzNllMxiSrI7gWxj9/6vDofwK6Mf2TO0P9jZzeuFfygdicNAJ
-         41nhvpjkH+f0w==
-Received: by mail-lj1-f200.google.com with SMTP id b23-20020a2e8497000000b0025d4590922cso1682929ljh.7
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Jul 2022 10:00:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=A2EBTwoVYX14a4fWbZ0vCjcrE9v4KPce0Km1BN1L64o=;
-        b=8MaxOE/fcmeP2C/6pztZr5vN0tQ4NcZzz+SEGUZktr4CDsveyGV6L8PwgxBUS1VcBy
-         Ofm81wRTVCQ+lI0mrEHKXYF+9Vqn/2sIRn4aSBfdtCuv0o5laiJd+d/kEA09s1EZOer+
-         m4ScqutjgyYJr5kAxa1gDr7Y7F7txZnjY/dm3kpFgxX+LBzOo9DWFs5cM9BDZhm+NHMI
-         P1OXDUOS/QjjqxNwE/rePdO/MGT2SEw5e37YEcV76mj/7ZfSl0do9Rvxa9ixoSp2yv+z
-         iMJp5dk7mL/vssBAvQREkitTgcQxNCl0F2RuX9jEvmKQafclfEb/bsG07jhOtJZd4wS9
-         VQqQ==
-X-Gm-Message-State: AJIora9fY3bU6p4VISINVCVuYsWc5vUv/TKmsnDXM6J8wqdY4YOlJr65
-        R+rTjf+vLHnIc0TlbCUyGp98YR2827k+c7doc5bVqfRwdtuZ0KGZnHBVoRIrcO/SrghIT8dWrBn
-        Dizrg4/5iWf1w+iK6I5n9qxJi41Jr+RoDJ+kmJfh4yg==
-X-Received: by 2002:a2e:aa0b:0:b0:25e:8fa:3c22 with SMTP id bf11-20020a2eaa0b000000b0025e08fa3c22mr153215ljb.149.1658682042956;
-        Sun, 24 Jul 2022 10:00:42 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uLE7FYtkFXRRn9lB5ptQTIPDy2Dd7YigerXtjJDXWHgv3ONzaHYw2zgFn8N9LB7WKxCTQdmA==
-X-Received: by 2002:a2e:aa0b:0:b0:25e:8fa:3c22 with SMTP id bf11-20020a2eaa0b000000b0025e08fa3c22mr153205ljb.149.1658682042547;
-        Sun, 24 Jul 2022 10:00:42 -0700 (PDT)
-Received: from [192.168.8.186] (87-49-44-169-mobile.dk.customer.tdc.net. [87.49.44.169])
-        by smtp.gmail.com with ESMTPSA id a5-20020a056512390500b00477c5940bbasm693374lfu.265.2022.07.24.10.00.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jul 2022 10:00:41 -0700 (PDT)
-Message-ID: <d731c9b8-cef8-5916-ab79-7edf5a3ede1e@canonical.com>
-Date:   Sun, 24 Jul 2022 19:00:39 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH] crypto: fix warnings from missing .note.GNU-stack
+        Sun, 24 Jul 2022 13:33:04 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19FB4B1E0;
+        Sun, 24 Jul 2022 10:33:03 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26OHLhq2028818;
+        Sun, 24 Jul 2022 17:32:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=BugUo7+Rp/RwZIaEcq3DD0ZapE/5+gvowHMudMhvOZE=;
+ b=shlUDNpQkZgWJnBI1FkGkPVU+vFRJoIQzmB3D2PlJVqIrpqTMrf0j385IDtmeR68fqNl
+ KV9U/qmmqKZBcGYzcMU2nSKYc/Az5VHeErCHqlWOUKmzQFt0FdBE1PDd6jU0n8dDU1OP
+ 0w+42DnGrmzD5k4Y8TRqYaTyOC6fw3r8+MNM/05FDuOQE2LVceHQh0jRqbnXrlTE2qZW
+ S4FPcw4zq0VlNGI2i2bdM3hs0gGEz1BNOe4QVS2oeukGbHMvOzcb7tZJRQ+UPWkijUho
+ ALGw6+CPRdS8Lzdu1kGY4Xad+Q65GItlbmv7HDsvUoVjB614A0Fp1/6MjXmxU2ZbIxiG og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hhadr84bm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Jul 2022 17:32:08 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26OHLlQ5028909;
+        Sun, 24 Jul 2022 17:32:07 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hhadr84bf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Jul 2022 17:32:07 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26OHLFGZ028731;
+        Sun, 24 Jul 2022 17:32:06 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma04dal.us.ibm.com with ESMTP id 3hg9899xq8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Jul 2022 17:32:06 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26OHW46S40305132
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 24 Jul 2022 17:32:04 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E7F56E052;
+        Sun, 24 Jul 2022 17:32:04 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 567516E04E;
+        Sun, 24 Jul 2022 17:31:56 +0000 (GMT)
+Received: from [9.65.220.76] (unknown [9.65.220.76])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 24 Jul 2022 17:31:55 +0000 (GMT)
+Message-ID: <240cc182-4628-bef4-2b99-47331b0874f1@linux.ibm.com>
+Date:   Sun, 24 Jul 2022 20:31:53 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
 Content-Language: en-US
-To:     Ard Biesheuvel <ardb@kernel.org>, Ben Dooks <ben-linux@fluff.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <20220721204709.445216-1-ben-linux@fluff.org>
- <CAMj1kXHvf8vWTL=6HzQGcUMK3Qwd9-s5qKAhJzGuk_cEa=cZkQ@mail.gmail.com>
-From:   Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
-In-Reply-To: <CAMj1kXHvf8vWTL=6HzQGcUMK3Qwd9-s5qKAhJzGuk_cEa=cZkQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xdiTVv2ibwldcYKv5fB7fxmxRBBxQGv1
+X-Proofpoint-GUID: nsiIU9BuCIfho9vMX2pH8fcPIaN8VMQL
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-23_02,2022-07-21_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 spamscore=0 clxscore=1011 malwarescore=0
+ mlxlogscore=999 mlxscore=0 suspectscore=0 impostorscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207240077
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Ashish,
 
-
-On 7/23/22 12:37, Ard Biesheuvel wrote:
-> On Thu, 21 Jul 2022 at 22:48, Ben Dooks <ben-linux@fluff.org> wrote:
->>
->> A lot of the assembly code in arch/arm/crypto is missing
->> a .note.GNU-stack section which is making a numbe of warnings
->> about implicit executable stack. This code does not look like
->> it does not need an executable stack, so silence the warnings
->> by adding a .section .note.GNU-stack to all these.
->>
->> Since this is an empty section, it should be backwards compatible
->> with older linkers.
->>
->> Fixes the following warnings:
->>
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-cipher-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-neonbs-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv4-large.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-armv7-neon.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha256-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha512-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/chacha-neon-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/aes-ce-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha1-ce-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/sha2-ce-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/ghash-ce-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->> arm-linux-gnueabihf-ld: warning: arch/arm/crypto/crc32-ce-core.o: missing .note.GNU-stack section implies executable stack
->> arm-linux-gnueabihf-ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
->>
->> Signed-off-by: Ben Dooks <ben-linux@fluff.org>
+On 21/06/2022 2:02, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Hello Ben,
+> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
+> hypervisor will use the instruction to add pages to the RMP table. See
+> APM3 for details on the instruction operations.
 > 
-> This annotation is pointless in the kernel, as we never load any code
-> as ELF executables. We only load raw binaries or partially linked
-> objects, which don't carry this annotation, and we never use an
-> executable stack anyway.
+> The PSMASH instruction expands a 2MB RMP entry into a corresponding set of
+> contiguous 4KB-Page RMP entries. The hypervisor will use this instruction
+> to adjust the RMP entry without invalidating the previous RMP entry.
 > 
-> So instead of adding these annotations, can we please just find a way
-> to shut up the linker?
-
-Passing -zexecstack to gcc silences the warning.
-
-This is what we use in U-Boot for ELF files that are only used as 
-intermediaries to create EFI binaries.
-
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h | 11 ++++++
+>  arch/x86/kernel/sev.c      | 72 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 83 insertions(+)
 > 
-> 
->> ---
->>   arch/arm/crypto/aes-ce-core.S        | 2 ++
->>   arch/arm/crypto/aes-cipher-core.S    | 2 ++
->>   arch/arm/crypto/aes-neonbs-core.S    | 3 +++
->>   arch/arm/crypto/chacha-neon-core.S   | 2 ++
->>   arch/arm/crypto/chacha-scalar-core.S | 2 ++
->>   arch/arm/crypto/crc32-ce-core.S      | 2 ++
->>   arch/arm/crypto/ghash-ce-core.S      | 2 ++
->>   arch/arm/crypto/sha1-armv4-large.S   | 1 +
->>   arch/arm/crypto/sha1-armv7-neon.S    | 2 ++
->>   arch/arm/crypto/sha1-ce-core.S       | 2 ++
->>   arch/arm/crypto/sha2-ce-core.S       | 2 ++
->>   arch/arm/crypto/sha256-armv4.pl      | 1 +
->>   arch/arm/crypto/sha512-armv4.pl      | 1 +
->>   13 files changed, 24 insertions(+)
->>
->> diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
->> index 312428d83eed..4e570c6df9bb 100644
->> --- a/arch/arm/crypto/aes-ce-core.S
->> +++ b/arch/arm/crypto/aes-ce-core.S
->> @@ -711,3 +711,5 @@ ENDPROC(ce_aes_invert)
->>          .byte            0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
->>          .byte           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
->>          .byte           0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
->> index 1da3f41359aa..11f10ee35487 100644
->> --- a/arch/arm/crypto/aes-cipher-core.S
->> +++ b/arch/arm/crypto/aes-cipher-core.S
->> @@ -199,3 +199,5 @@ ENDPROC(__aes_arm_encrypt)
->>   ENTRY(__aes_arm_decrypt)
->>          do_crypt        iround, crypto_it_tab, crypto_aes_inv_sbox, 0
->>   ENDPROC(__aes_arm_decrypt)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/aes-neonbs-core.S b/arch/arm/crypto/aes-neonbs-core.S
->> index 7b61032f29fa..19197c0d635c 100644
->> --- a/arch/arm/crypto/aes-neonbs-core.S
->> +++ b/arch/arm/crypto/aes-neonbs-core.S
->> @@ -1041,3 +1041,6 @@ ENTRY(aesbs_xts_decrypt)
->>          ldr             ip, [sp, #8]            // reorder final tweak?
->>          __xts_crypt     aesbs_decrypt8, q0, q1, q6, q4, q2, q7, q3, q5
->>   ENDPROC(aesbs_xts_decrypt)
->> +
->> +.section .note.GNU-stack,"",%progbits
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index cb16f0e5b585..6ab872311544 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -85,7 +85,9 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>  
+>  /* RMP page size */
+>  #define RMP_PG_SIZE_4K			0
+> +#define RMP_PG_SIZE_2M			1
+>  #define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
+> +#define X86_TO_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
+>  
+>  /*
+>   * The RMP entry format is not architectural. The format is defined in PPR
+> @@ -126,6 +128,15 @@ struct snp_guest_platform_data {
+>  	u64 secrets_gpa;
+>  };
+>  
+> +struct rmpupdate {
+> +	u64 gpa;
+> +	u8 assigned;
+> +	u8 pagesize;
+> +	u8 immutable;
+> +	u8 rsvd;
+> +	u32 asid;
+> +} __packed;
+> +
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  extern struct static_key_false sev_es_enable_key;
+>  extern void __sev_es_ist_enter(struct pt_regs *regs);
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 59e7ec6b0326..f6c64a722e94 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2429,3 +2429,75 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
+>  	return !!rmpentry_assigned(e);
+>  }
+>  EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+> +
+> +int psmash(u64 pfn)
+> +{
+> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!pfn_valid(pfn))
+> +		return -EINVAL;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENXIO;
+> +
+> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
+> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
+> +		      : "=a"(ret)
+> +		      : "a"(paddr)
+> +		      : "memory", "cc");
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(psmash);
+> +
+> +static int rmpupdate(u64 pfn, struct rmpupdate *val)
+> +{
+> +	unsigned long paddr = pfn << PAGE_SHIFT;
+> +	int ret;
+> +
+> +	if (!pfn_valid(pfn))
+> +		return -EINVAL;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return -ENXIO;
+> +
+> +	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+> +	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> +		     : "=a"(ret)
+> +		     : "a"(paddr), "c"((unsigned long)val)
+> +		     : "memory", "cc");
+> +	return ret;
+> +}
+> +
+> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
+> +{
+> +	struct rmpupdate val;
+> +
+> +	if (!pfn_valid(pfn))
+> +		return -EINVAL;
+> +
 
-Would llvm-as understand this?
+Should we add more checks on the arguments?
 
-Best regards
+1. asid must be > 0
+2. gpa must be aligned according to 'level'
+3. gpa must be below the maximal address for the guest
 
-Heinrich
+"Note that the guest physical address space is limited according to
+CPUID Fn80000008_EAX and thus the GPAs used by the firmware in
+measurement calculation are equally limited. Hypervisors should not
+attempt to map pages outside of this limit."
+(-SNP ABI spec page 86, section 8.17 SNP_LAUNCH_UPDATE)
 
->> +
->> diff --git a/arch/arm/crypto/chacha-neon-core.S b/arch/arm/crypto/chacha-neon-core.S
->> index 13d12f672656..a90690d32ad8 100644
->> --- a/arch/arm/crypto/chacha-neon-core.S
->> +++ b/arch/arm/crypto/chacha-neon-core.S
->> @@ -641,3 +641,5 @@ ENDPROC(chacha_4block_xor_neon)
->>          .byte           0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
->>          .byte           0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
->>          .byte           0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/chacha-scalar-core.S b/arch/arm/crypto/chacha-scalar-core.S
->> index 083fe1ab96d0..81f94876f418 100644
->> --- a/arch/arm/crypto/chacha-scalar-core.S
->> +++ b/arch/arm/crypto/chacha-scalar-core.S
->> @@ -441,3 +441,5 @@ ENTRY(hchacha_block_arm)
->>   1:     _chacha_permute 12
->>          b               0b
->>   ENDPROC(hchacha_block_arm)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
->> index 3f13a76b9066..990c756c7487 100644
->> --- a/arch/arm/crypto/crc32-ce-core.S
->> +++ b/arch/arm/crypto/crc32-ce-core.S
->> @@ -304,3 +304,5 @@ ENDPROC(crc32_armv8_le)
->>   ENTRY(crc32c_armv8_le)
->>          __crc32         c
->>   ENDPROC(crc32c_armv8_le)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
->> index 9f51e3fa4526..2f712b9d8b2b 100644
->> --- a/arch/arm/crypto/ghash-ce-core.S
->> +++ b/arch/arm/crypto/ghash-ce-core.S
->> @@ -337,3 +337,5 @@ ENTRY(pmull_ghash_update_p8)
->>
->>          ghash_update    p8
->>   ENDPROC(pmull_ghash_update_p8)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/sha1-armv4-large.S b/arch/arm/crypto/sha1-armv4-large.S
->> index 1c8b685149f2..4e40132382b5 100644
->> --- a/arch/arm/crypto/sha1-armv4-large.S
->> +++ b/arch/arm/crypto/sha1-armv4-large.S
->> @@ -505,3 +505,4 @@ ENTRY(sha1_block_data_order)
->>   ENDPROC(sha1_block_data_order)
->>   .asciz "SHA1 block transform for ARMv4, CRYPTOGAMS by <appro@openssl.org>"
->>   .align 2
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1-armv7-neon.S
->> index 28d816a6a530..a554b1bb4ceb 100644
->> --- a/arch/arm/crypto/sha1-armv7-neon.S
->> +++ b/arch/arm/crypto/sha1-armv7-neon.S
->> @@ -632,3 +632,5 @@ ENTRY(sha1_transform_neon)
->>   .Ldo_nothing:
->>     bx lr
->>   ENDPROC(sha1_transform_neon)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/sha1-ce-core.S b/arch/arm/crypto/sha1-ce-core.S
->> index 8a702e051738..73353804c33f 100644
->> --- a/arch/arm/crypto/sha1-ce-core.S
->> +++ b/arch/arm/crypto/sha1-ce-core.S
->> @@ -121,3 +121,5 @@ ENTRY(sha1_ce_transform)
->>          vstr            dgbs, [r0, #16]
->>          bx              lr
->>   ENDPROC(sha1_ce_transform)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/sha2-ce-core.S b/arch/arm/crypto/sha2-ce-core.S
->> index b6369d2440a1..b5f20ab96690 100644
->> --- a/arch/arm/crypto/sha2-ce-core.S
->> +++ b/arch/arm/crypto/sha2-ce-core.S
->> @@ -121,3 +121,5 @@ ENTRY(sha2_ce_transform)
->>          vst1.32         {dga-dgb}, [r0]
->>          bx              lr
->>   ENDPROC(sha2_ce_transform)
->> +
->> +.section .note.GNU-stack,"",%progbits
->> diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
->> index f3a2b54efd4e..c12edbd99531 100644
->> --- a/arch/arm/crypto/sha256-armv4.pl
->> +++ b/arch/arm/crypto/sha256-armv4.pl
->> @@ -677,6 +677,7 @@ $code.=<<___;
->>   #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
->>   .comm   OPENSSL_armcap_P,4,4
->>   #endif
->> +.section .note.GNU-stack,"",%progbits
->>   ___
->>
->>   open SELF,$0;
->> diff --git a/arch/arm/crypto/sha512-armv4.pl b/arch/arm/crypto/sha512-armv4.pl
->> index 2fc3516912fa..6411799b4d1d 100644
->> --- a/arch/arm/crypto/sha512-armv4.pl
->> +++ b/arch/arm/crypto/sha512-armv4.pl
->> @@ -639,6 +639,7 @@ $code.=<<___;
->>   #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
->>   .comm  OPENSSL_armcap_P,4,4
->>   #endif
->> +.section .note.GNU-stack,"",%progbits
->>   ___
->>
->>   $code =~ s/\`([^\`]*)\`/eval $1/gem;
->> --
->> 2.35.1
->>
->>
->> _______________________________________________
->> linux-arm-kernel mailing list
->> linux-arm-kernel@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+
+But note that in patch 28 of this series we have:
+
++		/* Transition the VMSA page to a firmware state. */
++		ret = rmp_make_private(pfn, -1, PG_LEVEL_4K, sev->asid, true);
+
+That (u64)(-1) value for the gpa argument violates conditions 2 and 3
+from my list above.
+
+And indeed when calculating measurements we see that the GPA value
+for the VMSA pages is 0x0000FFFF_FFFFF000, and not (u64)(-1). [1] [2]
+
+Instead of checks, we can mask the gpa argument so that rmpupdate will
+get the correct value.  Not sure which approach is preferable.
+
+
+[1] https://github.com/IBM/sev-snp-measure/blob/90f6e59831d20e44d03d5ee19388f624fca87291/sevsnpmeasure/gctx.py#L40
+[2] https://github.com/slp/snp-digest-rs/blob/0e5a787e99069944467151101ae4db474793d657/src/main.rs#L86
+
+
+-Dov
+
+
+> +	memset(&val, 0, sizeof(val));
+> +	val.assigned = 1;
+> +	val.asid = asid;
+> +	val.immutable = immutable;
+> +	val.gpa = gpa;
+> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
+> +
+> +	return rmpupdate(pfn, &val);
+> +}
+> +EXPORT_SYMBOL_GPL(rmp_make_private);
+> +
+> +int rmp_make_shared(u64 pfn, enum pg_level level)
+> +{
+> +	struct rmpupdate val;
+> +
+> +	if (!pfn_valid(pfn))
+> +		return -EINVAL;
+> +
+> +	memset(&val, 0, sizeof(val));
+> +	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
+> +
+> +	return rmpupdate(pfn, &val);
+> +}
+> +EXPORT_SYMBOL_GPL(rmp_make_shared);
