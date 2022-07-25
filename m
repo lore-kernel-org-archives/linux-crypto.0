@@ -2,67 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA46C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 22:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88080CCA48A
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 22:42:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbiGYWK7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 18:10:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54216 "EHLO
+        id S237608AbiGYWl7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 18:41:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiGYWK7 (ORCPT
+        with ESMTP id S237658AbiGYWln (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 18:10:59 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B20FBE28;
-        Mon, 25 Jul 2022 15:10:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id E8F08CE13E0;
-        Mon, 25 Jul 2022 22:10:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC66FC341C6;
-        Mon, 25 Jul 2022 22:10:54 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fmRZRPpm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1658787053;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ck4Do4hW4KRXeZrl83P4IhLy7IseiDgWXPhc2XxmnOs=;
-        b=fmRZRPpm+TPXNsKfKJk/d+1ttkal9Vjxu1ov5NQfRP+mObp68iR+a3E/VUn9HL1SfMHIWE
-        411wL7S3EsepRsirTEVngc5PHHYTK1eAG1EjsDAsvJaSrKLFWPxPib4K2g61xR7h1RT0D4
-        7vItzfEYcn5SxAPobreVicBKpNKqPgA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ecf57058 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 25 Jul 2022 22:10:53 +0000 (UTC)
-Date:   Tue, 26 Jul 2022 00:10:51 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] crypto: lib - create utils module and move
- __crypto_memneq into it
-Message-ID: <Yt8U60p0istFehfU@zx2c4.com>
-References: <20220725183636.97326-1-ebiggers@kernel.org>
- <20220725183636.97326-2-ebiggers@kernel.org>
+        Mon, 25 Jul 2022 18:41:43 -0400
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2C8275EE;
+        Mon, 25 Jul 2022 15:39:01 -0700 (PDT)
+Received: by mail-oi1-f171.google.com with SMTP id n133so5050748oib.0;
+        Mon, 25 Jul 2022 15:39:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=w7FxtvFFf34t5r5MspsAdF6ejzut5rmIbeeWhBNszsk=;
+        b=7ofqdrd2DVgHYYm6V3N7ionoTAm83ee0ZGxLIw1cVy8XeloG4tylkOpnEDTamCUt0u
+         lZifD4LaoDtVzEdmew6vmOq4TWfHU8DN99vAR7yin5/JaMyGU+csK2prq7DMdF9YvGI4
+         T8Yr7nAT3Av8KhTWzdG3lIAxsyleozeFGBY0yddOnrmXBjhSzaXxBXSBTek1VSIJQwMG
+         eEd01XrE1xuNpgrDpFHyXgK3fy6tb4e67pKKso+4m+Qc574Qv41JRsECbPnUk95QZnXH
+         y3Xk+rE4djKT6LsyPH1aZH6lgLdEVduI+CbpTkOWT8aNxzWrfztU9YaOoLg+tfTP/H91
+         G+TA==
+X-Gm-Message-State: AJIora8cSSdwkGlmGc80mvQVv/ebjXtUWn3MSsZcDgKWPJtTU7pY4NyB
+        6gkzfWZJIo/UIXtYSH+WJA==
+X-Google-Smtp-Source: AGRyM1v6/ZFtxGEc5L9KVu1Lgd4C63p2v2JuY18JC+fh1GxnzBafN02CL3keRAK9CglDbihJ7VltAQ==
+X-Received: by 2002:a54:458b:0:b0:33a:74a7:4271 with SMTP id z11-20020a54458b000000b0033a74a74271mr6406409oib.287.1658788690861;
+        Mon, 25 Jul 2022 15:38:10 -0700 (PDT)
+Received: from robh.at.kernel.org ([64.188.179.248])
+        by smtp.gmail.com with ESMTPSA id c17-20020a056870b29100b000e686d1386dsm6847741oao.7.2022.07.25.15.38.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jul 2022 15:38:10 -0700 (PDT)
+Received: (nullmailer pid 2874904 invoked by uid 1000);
+        Mon, 25 Jul 2022 22:38:09 -0000
+Date:   Mon, 25 Jul 2022 16:38:09 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        phone-devel@vger.kernel.org, devicetree@vger.kernel.org,
+        Stefan Hansson <newbyte@disroot.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] dt-bindings: crypto: Add ST-Ericsson Ux500 CRYP
+Message-ID: <20220725223809.GA2874868-robh@kernel.org>
+References: <20220721163010.1060062-1-linus.walleij@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220725183636.97326-2-ebiggers@kernel.org>
+In-Reply-To: <20220721163010.1060062-1-linus.walleij@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 25, 2022 at 11:36:34AM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Thu, 21 Jul 2022 18:30:10 +0200, Linus Walleij wrote:
+> This adds device tree bindings for the Ux500 CRYP block.
 > 
-> As requested at
-> https://lore.kernel.org/r/YtEgzHuuMts0YBCz@gondor.apana.org.au, move
-> __crypto_memneq into lib/crypto/ and put it under a new tristate.  The
-> tristate is CRYPTO_LIB_UTILS, and it builds a module libcryptoutils.  As
-> more crypto library utilities are being added, this creates a single
-> place for them to go without cluttering up the main lib directory.
+> This has been used for ages in the kernel device tree for
+> Ux500 but was never documented, so fill in the gap.
 > 
-> The module's main file will be lib/crypto/utils.c.  However, leave
-> memneq.c as its own file because of its nonstandard license.
+> Cc: devicetree@vger.kernel.org
+> Cc: Lionel Debieve <lionel.debieve@foss.st.com>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> The relationship to the existing STM32 CRYP block is pretty
+> obvious when looking at the register map. If preferred, I
+> can just extend the STM32 bindings with these extra
+> (generic) properties and compatibles as well.
+> ---
+>  .../crypto/stericsson,ux500-cryp.yaml         | 67 +++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/stericsson,ux500-cryp.yaml
+> 
 
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
