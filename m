@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807ECCCA473
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 14:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7152DC43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 14:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235358AbiGYOIC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 10:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46058 "EHLO
+        id S235321AbiGYOIF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 10:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235311AbiGYOHl (ORCPT
+        with ESMTP id S232682AbiGYOH6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 10:07:41 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4040717054
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:36 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id by8so13234614ljb.13
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:36 -0700 (PDT)
+        Mon, 25 Jul 2022 10:07:58 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B1D17A94
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:38 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id u20so5466992ljk.0
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=f/vbPkNKKbkjJjRwGJUOoxcfcoJSh1/50auwny6lijM=;
-        b=ygR5yI4yLkEw91pK3Zuyntm9mWwzok7jYknAlg00Gb60IwA+HqI7ez7sn8KMEm2wbS
-         vo1sFTF/qSsSJeH0yCDjsXxqoKFSizsVGR4pwYLpwrSe1NC7hxxPtnyKEuA5v1iThfxo
-         t5/Aso14HYPsamjcem4xtmQGk/HsxVjGkb3LZM27s0Q+7B+3IFp92lwF51HgFzk3Y24v
-         N5Gc/bm0RKekHRmyQfLgKcSEVJOwBefBx+c9CDaO3qPuaTC35m8BIENmRB4F8Ry6pX4M
-         XknAT0PDVv/KaB/mg+E7uULlirB3qbh3fMo0v5g8q7KPkoqV84qTu8f6NVvWPPOuQQoG
-         TiHg==
+        bh=yi2lvCepVGwm5m2nCvkz5wHi60hhFaZd2WavgA33JOY=;
+        b=nV1yHgodszVgqTT0PRJYaE3rLNkXFMwuZc/Ahb8HqL0mY/KHLAcHSZ8JJlqt6YwnW0
+         QeLD5UJFti4ggBKJxaEV66nykmHrwfxFbhiHdSasBhRxHtbPHD5sVpp0x0S4LH1j6pkd
+         tzDovRmoAIJ1l+2QLHTEKCzMk8lBbsWcHJ/Dr6q18jLUtSbV4giipH0LCWaIkECDnlfz
+         fTpT8i+NWskM4ZebkuRxxjcMCmJA8a3t9FOWaDJpUZvH4sF1KQzQhKUzIYqPWA82+NPb
+         /725E390S3N9gWCDIJ+VFvIkV0YFmWSvxNAzBwAGdoNquUK3bGk5Igi6j/gggiADhRRz
+         1QnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=f/vbPkNKKbkjJjRwGJUOoxcfcoJSh1/50auwny6lijM=;
-        b=aJFlSDNSJJQtbnN5ZkjFErHp3SpNyAuojUqg8kCRHuUu6r7hNpjshPbhX7FzdUg+e6
-         5N+jUFePpdayxeuUk0U4MO+zBxlgCLJVwIF+zzPivUYnScgVne0pQia/pJTTpbquE00D
-         JGbsShsXiX4e79j6cg0RrVX07QdD6tOlZmpNJpZpm4/XmjQukioQNVXX+3TFkgzmzWXv
-         Sz30aaHMyOMChMYs+X1CAgk0bsax1OcdQER4AedxAoK7yIny6IpilfX/so7VhWbNzYWb
-         ZGYKQ5xcXIzFdUJeDrYYiDdrd9TVLlWoF/S7oSB7qmQvN9Y04GgmIPaA9iaZ9OE8nFRv
-         6JhA==
-X-Gm-Message-State: AJIora8zTr/tc2wEyP5RspgZpuHyEW2QQdXTbvx7g1NBz7lnUUQyRVeR
-        nIGH6jlFg+F5Kwod/Mja0mdUI6eTkaVdqg==
-X-Google-Smtp-Source: AGRyM1tlVocaOXGBmAUJjTtSoTV1/vY6C+4qoaq0mflIUvRWTwEBbDnxfqq2kPY13ZWsVUTxYCZypg==
-X-Received: by 2002:a05:651c:178f:b0:25d:ba24:2e98 with SMTP id bn15-20020a05651c178f00b0025dba242e98mr4288019ljb.197.1658758055508;
-        Mon, 25 Jul 2022 07:07:35 -0700 (PDT)
+        bh=yi2lvCepVGwm5m2nCvkz5wHi60hhFaZd2WavgA33JOY=;
+        b=YKttJfvfLu1KA9/Br860zEVRUgV13TycXa6Dw97VpD0e60w7CHPCXpG3doclYU/dfw
+         DE5CA1HexqT0Cp1h3qB8xY/67wPOPEr1aBVwJ504A7CSRYGuypZNMLLOaA2AJ82g/u7D
+         OWhF7mtiuBjZlQvG+xgF1XVtq6dAgSzONDcxEC2iWY6pw7eFsKVNHV/kfYvJMKrRkFf/
+         DxRDaKH6ZuGf7l3q9SysxVT+BI3R6G9KFIX+c82o2PD/ybOdia+c8BuVN+ulMXJyrsAv
+         bJsic6ddxEv4c26v9vbctEZ9IcyNtSgqhPm/TY6LeDD6auvFQ/G5bq8/nBcpbC87fVzp
+         u8VQ==
+X-Gm-Message-State: AJIora83bfW6Kc55BWVTyL1C//RP4L0dh04bgSrHfzoVzEuWbQq4fng1
+        fIad1EpBby93PmW1gpTq/Eq6CQWIEzWgKQ==
+X-Google-Smtp-Source: AGRyM1vqpWKxgUjA7sTYscL5OkgIL6QlfPeVDFZYgyIRf7MHZLt+8BRJyTOCKlQqWHRwv/7irOFx4Q==
+X-Received: by 2002:a2e:3109:0:b0:25a:8a0c:40e2 with SMTP id x9-20020a2e3109000000b0025a8a0c40e2mr4155142ljx.26.1658758056835;
+        Mon, 25 Jul 2022 07:07:36 -0700 (PDT)
 Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05651205c700b0047f7419de4asm901127lfo.180.2022.07.25.07.07.34
+        by smtp.gmail.com with ESMTPSA id o7-20020a05651205c700b0047f7419de4asm901127lfo.180.2022.07.25.07.07.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 07:07:35 -0700 (PDT)
+        Mon, 25 Jul 2022 07:07:36 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>
 Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
         Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 11/15 v2] crypto: ux500/hash: Drop custom uint64 type
-Date:   Mon, 25 Jul 2022 16:05:00 +0200
-Message-Id: <20220725140504.2398965-12-linus.walleij@linaro.org>
+Subject: [PATCH 12/15 v2] crypto: ux500/hash: Drop regulator handling
+Date:   Mon, 25 Jul 2022 16:05:01 +0200
+Message-Id: <20220725140504.2398965-13-linus.walleij@linaro.org>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220725140504.2398965-1-linus.walleij@linaro.org>
 References: <20220725140504.2398965-1-linus.walleij@linaro.org>
@@ -66,129 +66,131 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Drop the homebrewn uint64 support, the kernel has a u64 type
-that works just fine so we use that instead.
+This "APE" voltage is not handled by a regulator but by the
+power domain, drop it.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
 ChangeLog v1->v2:
-- No changes
+- New patch after noticing the power domain is handling this
+  voltage.
 ---
- drivers/crypto/ux500/hash/hash_alg.h  | 19 ++----------------
- drivers/crypto/ux500/hash/hash_core.c | 28 ++++-----------------------
- 2 files changed, 6 insertions(+), 41 deletions(-)
+ drivers/crypto/ux500/hash/hash_core.c | 38 +++------------------------
+ 1 file changed, 4 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/crypto/ux500/hash/hash_alg.h b/drivers/crypto/ux500/hash/hash_alg.h
-index 05f0b0221a13..6a610c83e63d 100644
---- a/drivers/crypto/ux500/hash/hash_alg.h
-+++ b/drivers/crypto/ux500/hash/hash_alg.h
-@@ -16,9 +16,6 @@
- #define HASH_DMA_PERFORMANCE_MIN_SIZE	1024
- #define HASH_BYTES_PER_WORD		4
- 
--/* Maximum value of the length's high word */
--#define HASH_HIGH_WORD_MAX_VAL		0xFFFFFFFFUL
--
- /* Power on Reset values HASH registers */
- #define HASH_RESET_CR_VALUE		0x0
- #define HASH_RESET_STR_VALUE		0x0
-@@ -135,18 +132,6 @@ enum hash_mode {
- 	HASH_MODE_DMA
- };
- 
--/**
-- * struct uint64 - Structure to handle 64 bits integers.
-- * @high_word:	Most significant bits.
-- * @low_word:	Least significant bits.
-- *
-- * Used to handle 64 bits integers.
-- */
--struct uint64 {
--	u32 high_word;
--	u32 low_word;
--};
--
- /**
-  * struct hash_register - Contains all registers in ux500 hash hardware.
-  * @cr:		HASH control register (0x000).
-@@ -227,7 +212,7 @@ struct hash_state {
- 	u32		csfull;
- 	u32		csdatain;
- 	u32		buffer[HASH_BLOCK_SIZE / sizeof(u32)];
--	struct uint64	length;
-+	u64		length;
- 	u8		index;
- 	bool		dma_mode;
- 	bool		hw_initialized;
-@@ -342,7 +327,7 @@ struct hash_ctx {
-  */
- struct hash_req_ctx {
- 	u32			buffer[HASH_BLOCK_SIZE / sizeof(u32)];
--	struct uint64		length;
-+	u64			length;
- 	u8			index;
- 	bool			dma_mode;
- 	bool			hw_initialized;
 diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 1edb11812c7d..390e50b2b1d2 100644
+index 390e50b2b1d2..3bd58b60aade 100644
 --- a/drivers/crypto/ux500/hash/hash_core.c
 +++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -449,8 +449,7 @@ static int ux500_hash_init(struct ahash_request *req)
- 		ctx->keylen = 0;
- 
- 	req_ctx->index = 0;
--	req_ctx->length.low_word = 0;
--	req_ctx->length.high_word = 0;
-+	req_ctx->length = 0;
- 	req_ctx->hw_initialized = false;
- 	if (hash_mode == HASH_MODE_DMA) {
- 		if (req->nbytes < HASH_DMA_ALIGN_SIZE) {
-@@ -545,23 +544,6 @@ static void hash_messagepad(struct hash_device_data *device_data,
- 		cpu_relax();
- }
- 
--/**
-- * hash_incrementlength - Increments the length of the current message.
-- * @ctx: Hash context
-- * @incr: Length of message processed already
-- *
-- * Overflow cannot occur, because conditions for overflow are checked in
-- * hash_hw_update.
-- */
--static void hash_incrementlength(struct hash_req_ctx *ctx, u32 incr)
--{
--	ctx->length.low_word += incr;
+@@ -24,8 +24,6 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+ #include <linux/crypto.h>
 -
--	/* Check for wrap-around */
--	if (ctx->length.low_word < incr)
--		ctx->length.high_word++;
--}
--
- /**
-  * hash_setconfiguration - Sets the required configuration for the hash
-  *                         hardware.
-@@ -709,7 +691,7 @@ static int hash_process_data(struct hash_device_data *device_data,
- 					  (const u32 *)buffer,
- 					  HASH_BLOCK_SIZE);
+-#include <linux/regulator/consumer.h>
+ #include <linux/dmaengine.h>
+ #include <linux/bitops.h>
+ 
+@@ -244,22 +242,17 @@ static int get_empty_message_digest(
+  * hash_disable_power - Request to disable power and clock.
+  * @device_data:	Structure for the hash device.
+  *
+- * This function request for disabling power (regulator) and clock,
+- * and could also save current hw state.
++ * This function request for disabling the clock.
+  */
+ static int hash_disable_power(struct hash_device_data *device_data)
+ {
+ 	int ret = 0;
+-	struct device *dev = device_data->dev;
+ 
+ 	spin_lock(&device_data->power_state_lock);
+ 	if (!device_data->power_state)
+ 		goto out;
+ 
+ 	clk_disable(device_data->clk);
+-	ret = regulator_disable(device_data->regulator);
+-	if (ret)
+-		dev_err(dev, "%s: regulator_disable() failed!\n", __func__);
+ 
+ 	device_data->power_state = false;
+ 
+@@ -273,8 +266,7 @@ static int hash_disable_power(struct hash_device_data *device_data)
+  * hash_enable_power - Request to enable power and clock.
+  * @device_data:		Structure for the hash device.
+  *
+- * This function request for enabling power (regulator) and clock,
+- * and could also restore a previously saved hw state.
++ * This function request for enabling the clock.
+  */
+ static int hash_enable_power(struct hash_device_data *device_data)
+ {
+@@ -283,17 +275,9 @@ static int hash_enable_power(struct hash_device_data *device_data)
+ 
+ 	spin_lock(&device_data->power_state_lock);
+ 	if (!device_data->power_state) {
+-		ret = regulator_enable(device_data->regulator);
+-		if (ret) {
+-			dev_err(dev, "%s: regulator_enable() failed!\n",
+-				__func__);
+-			goto out;
+-		}
+ 		ret = clk_enable(device_data->clk);
+ 		if (ret) {
+ 			dev_err(dev, "%s: clk_enable() failed!\n", __func__);
+-			ret = regulator_disable(
+-					device_data->regulator);
+ 			goto out;
  		}
--		hash_incrementlength(req_ctx, HASH_BLOCK_SIZE);
-+		req_ctx->length += HASH_BLOCK_SIZE;
- 		data_buffer += (HASH_BLOCK_SIZE - *index);
+ 		device_data->power_state = true;
+@@ -1487,27 +1471,17 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ 	spin_lock_init(&device_data->ctx_lock);
+ 	spin_lock_init(&device_data->power_state_lock);
  
- 		msg_length -= (HASH_BLOCK_SIZE - *index);
-@@ -933,10 +915,8 @@ int hash_hw_update(struct ahash_request *req)
- 	if (msg_length == 0)
- 		return 0;
- 
--	/* Check if ctx->length + msg_length
--	   overflows */
--	if (msg_length > (req_ctx->length.low_word + msg_length) &&
--	    req_ctx->length.high_word == HASH_HIGH_WORD_VAL_MAX) {
-+	/* Check if ctx->length + msg_length overflows */
-+	if ((req_ctx->length + msg_length) < msg_length) {
- 		pr_err("%s: HASH_MSG_LENGTH_OVERFLOW!\n", __func__);
- 		return crypto_hash_walk_done(&walk, -EPERM);
+-	/* Enable power for HASH1 hardware block */
+-	device_data->regulator = regulator_get(dev, "v-ape");
+-	if (IS_ERR(device_data->regulator)) {
+-		dev_err(dev, "%s: regulator_get() failed!\n", __func__);
+-		ret = PTR_ERR(device_data->regulator);
+-		device_data->regulator = NULL;
+-		goto out;
+-	}
+-
+-	/* Enable the clock for HASH1 hardware block */
+ 	device_data->clk = devm_clk_get(dev, NULL);
+ 	if (IS_ERR(device_data->clk)) {
+ 		dev_err(dev, "%s: clk_get() failed!\n", __func__);
+ 		ret = PTR_ERR(device_data->clk);
+-		goto out_regulator;
++		goto out;
  	}
+ 
+ 	ret = clk_prepare(device_data->clk);
+ 	if (ret) {
+ 		dev_err(dev, "%s: clk_prepare() failed!\n", __func__);
+-		goto out_regulator;
++		goto out;
+ 	}
+ 
+ 	/* Enable device power (and clock) */
+@@ -1544,9 +1518,6 @@ static int ux500_hash_probe(struct platform_device *pdev)
+ out_clk_unprepare:
+ 	clk_unprepare(device_data->clk);
+ 
+-out_regulator:
+-	regulator_put(device_data->regulator);
+-
+ out:
+ 	return ret;
+ }
+@@ -1585,7 +1556,6 @@ static int ux500_hash_remove(struct platform_device *pdev)
+ 			__func__);
+ 
+ 	clk_unprepare(device_data->clk);
+-	regulator_put(device_data->regulator);
+ 
+ 	return 0;
+ }
 -- 
 2.36.1
 
