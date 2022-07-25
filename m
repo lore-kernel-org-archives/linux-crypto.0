@@ -2,107 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E12BC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 13:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C797C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 13:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235186AbiGYNYo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 09:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48054 "EHLO
+        id S235503AbiGYN0M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 09:26:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232494AbiGYNYn (ORCPT
+        with ESMTP id S235507AbiGYN0L (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 09:24:43 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359A813CCE;
-        Mon, 25 Jul 2022 06:24:42 -0700 (PDT)
-Received: from zn.tnic (p200300ea972976f8329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:76f8:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B0B301EC067C;
-        Mon, 25 Jul 2022 15:24:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658755476;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=6AT8Zd6HwL3AiZs+hVZ03j4gMl4EdeI7g5LHD0WVY6c=;
-        b=reBNqb8TBfK88JijG2GZF3ExFDhuXvx6UCJ+L4ncIaQQMbNHAnw46ziQDqR027wg/Pf545
-        gHmETb4hT1AQSnH+5tSTjZoNfWdm1nfBkVX2XX488+Z84i2aM4CdrsUtaA7n4u1Rx/f9vc
-        KB+srz/jIG2tKwpZor+3FWqijTbmBTc=
-Date:   Mon, 25 Jul 2022 15:24:31 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <Yt6ZjzCSqPv6BKfH@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <YrH0ca3Sam7Ru11c@work-vm>
- <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <Yrrc/6x70wa14c5t@work-vm>
- <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
+        Mon, 25 Jul 2022 09:26:11 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA517614F
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 06:26:10 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id b10so10449754pjq.5
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 06:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=ub7Jm7xVeiVXdiE/MTDklMnRqIlrehUSb1rrC7mzHfo=;
+        b=RG2zPm2uLQgLXDwYaVDd//S7cD5Bjp73KEE5wHGg9ilTe7Z0Os5soDHzC957UhL2ux
+         /ZNfb9t/SLTRoEtvRs/W1QhQYsEVII53L8oGjO4tZvP2FOj2zoyElmU5YxbH+gaDvzPF
+         zVjdnblMgUU1EQBbuWrcjcyn+Hz66oNU4W4ydYw0HyKBlO1fDTwqARYZXGkTnnmoI/2i
+         u4t9T7GO4h9ZIUKgoV9BfMVV9rYhXltnQRzAtHsfrvhS0zkNaICJJRWewsIP5+L8XUAy
+         MGGbtUvQG1hMUns0AOBlW2BOgrLozP6R4hYDWKbQZ1SlTEsg4kD7WLKvM8aOyeO42oXs
+         m9YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=ub7Jm7xVeiVXdiE/MTDklMnRqIlrehUSb1rrC7mzHfo=;
+        b=Jvoo6bEWwSyFHnvVx+KYhHgGG8WHSWV2gUMUPCOgg7/9b7WRcQw9EeZ0qyQXDh+FAA
+         co3zu+sCFzugYiAfSctYar8GxUFpw81/jm0XVsGGyf6nF0Yo9Jvhud3CD4l3HL7UULb+
+         WRr9ZNzhPmoWrXP1X+yez0D64jUtLcXUCNAvmzND0rD6D9lC9psRq1EKPuAQggX3Ap60
+         TpAxHBXDiP2IhXn1ngGkF8mcmhu0x9Isfse4ayOTkVnqx8MufzQUEGkjLBiYPDpXFXPB
+         1Lg8VCnHWC+jJClZNBILJtWHP/iX5PYIAJTXfWUJe22s9qqRbfefBDN1j5qsXKANz531
+         awTA==
+X-Gm-Message-State: AJIora/yQH8lwk6vQlU+PfKTVG+WZUCGyiZpxxubeITIfg3LDYk8bJNP
+        JyB2bnS5eNxoCzp2PLcBrjBRmTlwH2gKHhWlzWJQfmel
+X-Google-Smtp-Source: AGRyM1tOEXouZdo6YTpIdz/RcZ+HgbGPOBjx0+Gtt9w84buNpYV72y/nZ25YTsi1QRMI1IZjwbH9mog8JbB4y4sLjx4=
+X-Received: by 2002:a17:90b:4aca:b0:1f0:3395:6432 with SMTP id
+ mh10-20020a17090b4aca00b001f033956432mr31308778pjb.19.1658755570298; Mon, 25
+ Jul 2022 06:26:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <YtwgTySJyky0OcgG@zx2c4.com> <Ytwg8YEJn+76h5g9@zx2c4.com>
+ <87bktdsdrk.fsf@oldenburg.str.redhat.com> <Yt54x7uWnsL3eZSx@zx2c4.com>
+In-Reply-To: <Yt54x7uWnsL3eZSx@zx2c4.com>
+Reply-To: noloader@gmail.com
+From:   Jeffrey Walton <noloader@gmail.com>
+Date:   Mon, 25 Jul 2022 09:25:58 -0400
+Message-ID: <CAH8yC8n2FM9uXimT71Ej0mUw8TsDR-2RRQaN_DJ2g=UG_TBKWA@mail.gmail.com>
+Subject: Re: arc4random - are you sure we want these?
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 05:57:41PM +0000, Kalra, Ashish wrote:
-> Yes, I will be adding a check for CPU family/model as following :
+On Mon, Jul 25, 2022 at 7:08 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>  ...
+> > The performance numbers suggest that we benefit from buffering in user
+> > space.
+>
+> The question is whether it's safe and advisable to buffer this way in
+> userspace. Does userspace have the right information now of when to
+> discard the buffer and get a new one? I suspect it does not.
 
-Why if the PPR is already kinda spelling the already architectural
-pieces of the RMP entry?
+I _think_ the sharp edge on userspace buffering is generator state.
+Most generator threat models I have seen assume the attacker does not
+know the generator's state. If buffering occurs in the application,
+then it may be easier for an attacker to learn of the generator's
+state. If buffering occurs in the kernel, then generator state should
+be private from an userspace application's view.
 
-"In order to assist software" it says.
-
-So you call the specified ones by their name and the rest is __rsvd.
-
-No need for model checks at all.
-
-Right?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jeff
