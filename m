@@ -2,101 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E39E3C19F2C
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 13:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 808E0C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 21:50:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238898AbiGZNqT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 09:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59004 "EHLO
+        id S237322AbiGYVuZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 17:50:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238987AbiGZNqR (ORCPT
+        with ESMTP id S237352AbiGYVuO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 09:46:17 -0400
+        Mon, 25 Jul 2022 17:50:14 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7901E3C8;
-        Tue, 26 Jul 2022 06:46:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7003DDF3
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 14:50:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7CC9461573;
-        Tue, 26 Jul 2022 13:46:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E12F2C433C1;
-        Tue, 26 Jul 2022 13:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658843174;
-        bh=Y7KLQG1Vne9qbaDpnyRbyXPgoHLls22Lqjyu78AiFds=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=mKAus1aMBcFKC1QfBsK9nYXKGl6o+XeGE084mU2hbR/my4L38CAUfBwTCdreg+fXW
-         n47lJQ765XNWbL4tWmaiRbhWxTJJUMKylpxu2VfKNGU6o/+QE3/d/+kf91hmPLkVMC
-         zCtRFQFlJluLh+6BlnI37aIyO/NFogK3zqtljdFvNA/DY2ktZlEK0ekea1aRM3wsXM
-         CbLMt8DkwhIF4luD4HkJVpbfM+1knZwfV4v/0UbHyb9+A3nlmQAixeojrzYWAVG16Y
-         qhq1iATYbL5S/dB4ayNiz1bsLR2Dn84DoFdRxCICbWfPxeZMKBKCrjALm/JhiFbVRX
-         r9l+zKX8dJ6oQ==
-Received: by mail-oi1-f177.google.com with SMTP id j70so17121162oih.10;
-        Tue, 26 Jul 2022 06:46:14 -0700 (PDT)
-X-Gm-Message-State: AJIora+1EVhEFoqKmrtXM3d89OG4FliYn1YpBCZLZER83g0GYORFYREO
-        /2gwPnIow7RZIQStIHtzCXkirA0eaz10IdYpllE=
-X-Google-Smtp-Source: AGRyM1s4JlvzcaEKbhVv3ydzTyV1gB2ZgcW9aOdi7nsPievmOmN9Hm+IOuIF6gLPYPCK/Z46Jbn56Y+DMgGAPywmwWE=
-X-Received: by 2002:a05:6808:300b:b0:337:b697:b077 with SMTP id
- ay11-20020a056808300b00b00337b697b077mr7822159oib.126.1658843174055; Tue, 26
- Jul 2022 06:46:14 -0700 (PDT)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ACC5861303
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 21:50:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C99D6C341C6
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 21:50:08 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=fail reason="key not found in DNS" (0-bit key) header.d=libc.org header.i=@libc.org header.b="Ylqdaavy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=libc.org; s=20210105;
+        t=1658785806;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cYfe2ZrAUJl0cv5K4oqcBrhs+2+NT2q9lAMJzQL8js0=;
+        b=YlqdaavytysFI+bS7wVSZcW9PboI2sfL2bXh/d9nCPGzs6FeiwUvYlcWOTOHmyJXhMfj5i
+        SqWeFx0wo7+J7KMUBgFD1uNI5X6ZoO3fPYSX6rQLW/6jCdKFRHlrc9dlW6ih7RL1I3bpUC
+        AJPr0fpJ2SrcEVWIngNuw3LMqbsKZIw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 64a2c416 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 25 Jul 2022 21:50:06 +0000 (UTC)
+Date:   Mon, 25 Jul 2022 14:49:30 -0400
+From:   Rich Felker <dalias@libc.org>
+To:     Cristian =?utf-8?Q?Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
+Cc:     Florian Weimer <fweimer@redhat.com>,
+        Yann Droneaud <ydroneaud@opteya.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org,
+        Michael@phoronix.com, jann@thejh.net, linux-crypto@vger.kernel
+Subject: Re: arc4random - are you sure we want these?
+Message-ID: <20220725184929.GJ7074@brightrain.aerifal.cx>
+References: <YtwgTySJyky0OcgG@zx2c4.com>
+ <Ytwg8YEJn+76h5g9@zx2c4.com>
+ <6bf352e9-1312-40de-4733-3219721b343c@linaro.org>
+ <20220725153303.GF7074@brightrain.aerifal.cx>
+ <878rohp2ll.fsf@oldenburg.str.redhat.com>
+ <20220725174430.GI7074@brightrain.aerifal.cx>
+ <CAPBLoAe89Pwt=F_jcZirVXQA7JtugV+5+BWHBt0RaZka1y0K=g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220725183636.97326-1-ebiggers@kernel.org> <20220725183636.97326-3-ebiggers@kernel.org>
- <Yt8UnWCvoe8dKihc@zx2c4.com>
-In-Reply-To: <Yt8UnWCvoe8dKihc@zx2c4.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 26 Jul 2022 06:46:02 -0700
-X-Gmail-Original-Message-ID: <CAMj1kXEHM7=6K08uFHpEdYt_35J83hOkAKrq0rcsW0zYgG1f5Q@mail.gmail.com>
-Message-ID: <CAMj1kXEHM7=6K08uFHpEdYt_35J83hOkAKrq0rcsW0zYgG1f5Q@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] crypto: lib - move __crypto_xor into utils
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPBLoAe89Pwt=F_jcZirVXQA7JtugV+5+BWHBt0RaZka1y0K=g@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
+Message-ID: <20220725184930.sfXJfINJNBAnd96EqDjabhV00VSHfiFBZeU93TxhJew@z>
 
-On Mon, 25 Jul 2022 at 15:09, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Mon, Jul 25, 2022 at 11:36:35AM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > CRYPTO_LIB_CHACHA depends on CRYPTO for __crypto_xor, defined in
-> > crypto/algapi.c.  This is a layering violation because the dependencies
-> > should only go in the other direction (crypto/ => lib/crypto/).  Also
-> > the correct dependency would be CRYPTO_ALGAPI, not CRYPTO.  Fix this by
-> > moving __crypto_xor into the utils module in lib/crypto/.
-> >
-> > Note that CRYPTO_LIB_CHACHA_GENERIC selected XOR_BLOCKS, which is
-> > unrelated and unnecessary.  It was perhaps thought that XOR_BLOCKS was
-> > needed for __crypto_xor, but that's not the case.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
->
-> Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
-> With one small question:
->
-> > --- /dev/null
-> > +++ b/lib/crypto/utils.c
-> > @@ -0,0 +1,88 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * Crypto library utility functions
-> > + *
-> > + * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
->
-> Didn't Ard basically write the crypto_xor function in its current form?
-> I seem to remember some pretty hardcore refactoring he did a while back.
->
+On Mon, Jul 25, 2022 at 02:33:05PM -0400, Cristian Rodríguez via Libc-alpha wrote:
+> On Mon, Jul 25, 2022 at 1:44 PM Rich Felker <dalias@libc.org> wrote:
+> 
+> > Then don't fallback to /dev/urandom.
+> 
+> Those are my thoughts as well.. but __libc_fatal() if there is no
+> usable getrandom syscall with the needed semantics, in short making
+> this interface usable only when the kernel is.
+> 
+> This is quite drastic, but probably the only sane way to go.
 
-Hi Jason,
+You can at least try the sysctl and possibly also /dev approaches and
+only treat this as fatal as a last resort. If you can inspect
+entropy_avail or poll /dev/random to determine that the pool is
+initialized this is very safe, I think. And some research on distro
+practices might uncover whether this should be believed to be
+complete.
 
-Thanks for pointing this out. When I made those changes, I don't think
-an authorship assertion for copyright purposes was appropriate for the
-entire .c file (the FSF have some guidelines for this IIRC). It would
-also be strange for me or Eric to suddenly introduce a (c) Linaro (or
-ARM, not sure who my employer was at the time) at this point, so I
-think we can just leave this as proposed by Eric.
+(Note: I know some folks have raised seccomp sandboxing as an issue
+too, but unlike kernel which is sometimes locked in by legacy
+hardware, bad seccomp filters are in principle always fixable and are
+a form of user/admin error since it's not valid to make assumptions
+about what syscalls libc needs.)
+
+Rich
