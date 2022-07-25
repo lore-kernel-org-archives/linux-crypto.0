@@ -2,72 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE21C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 13:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0036CCA473
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 14:07:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234594AbiGYN6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 09:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
+        id S231912AbiGYOHP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 10:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235191AbiGYN6h (ORCPT
+        with ESMTP id S231472AbiGYOHO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 09:58:37 -0400
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E57B12D32
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 06:58:36 -0700 (PDT)
-Received: by mail-wr1-f53.google.com with SMTP id z13so16080422wro.13
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 06:58:36 -0700 (PDT)
+        Mon, 25 Jul 2022 10:07:14 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF2413CC6
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:13 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id p10so10691701lfd.9
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 07:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=E+MqVWiTt4M07TAuz476g665X1OQ10c+s7nQjeZcXao=;
+        b=vXXTBYN9fy/KLckuzoHjRLsSAOG3iTFaJevAhWukskqkE6nFb2LrveWYIzZsRCSLJp
+         SqblcR7p7d66Qp8VvqWTCvhBjnGSdGJL2yB7mVczIHZB4c5VLhrQqDLAsVFJEyzhxC2/
+         MRd/wuxbxVa30dbhXLINSmNGl93P9zGeYuXrt6ErrzBI+Q9mliphMMXbMtDyA24A6m7K
+         3j9/76a2dSYklT1jHmYQbWjOt01YbsBVEVyAVEXHtWFvC4ExGd3yFhRQY63+MDvOi3ho
+         bhrH91ROhuIRpeCwZ3yP1hLyEr3OnKIOx5kfHid7BXL0Nzhy8WX7xaQUn14cXoEWBIcU
+         h8eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IhDDyub/tbS9mrMSZuLpshhTp0XVRGFWKnNd67pwL/o=;
-        b=UF9+FequPRT5n70z2FIrRIUNms6p7buRllGqZ0sUReaE0UTrtcLZ8HNIAbu3bvUrg1
-         G02K/BA+elvf1wqilGUkD4wDAgj5jmQsKV9MP/QAWM6gEvqF8+ux5IfTh5LSdb3HLFYE
-         HQH57FphuIRYccEGo/WVMrUVjJ9NafvE55WDcOd1HpsSgW85sAwjfXrE8KPnhrUit1NM
-         MfRqfdI1Lmbc7b2qWPR4WIMCAy9ZCPZg0XturswY9dovJp/2hYYSAncjlYsBfcukgXlB
-         ujnFWqjO0S0osGM1mNKCtkgIPSlK5JfEWhs3EGlJgn67xmcs2xrrl1/c7skZlOeklHF3
-         9koA==
-X-Gm-Message-State: AJIora9JcMbBbsGzAR+izcEyL6B1HKLUPeKXY5NS7DsGLBQTp79NmIof
-        BRKv9vYJp6ce93HlRwmTP7ZzKEz54/Ia8IX7DGk59KMPOhY=
-X-Google-Smtp-Source: AGRyM1ucmXzAnxrh6tkvSEspV4vKUv9/ISjmDueRVf+T4RN93DsK1LhXWy6HyDxUXFAUgPDNy6l+GNPpZ+Tk8p04R+8=
-X-Received: by 2002:adf:e411:0:b0:21e:6315:80b8 with SMTP id
- g17-20020adfe411000000b0021e631580b8mr7840376wrm.219.1658757514541; Mon, 25
- Jul 2022 06:58:34 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=E+MqVWiTt4M07TAuz476g665X1OQ10c+s7nQjeZcXao=;
+        b=O/L3b+GGW9cV9FOPLYLsbZQohFN56bybKrGGURP/wDnUKpX8Jyd2P59p8NLTRrTvht
+         wIN9Nl7qWgaiKd+Ul3eQkGHo8Ftco7q/42rwtaMbJu+diBym+GYJMVe31tPkpHOAfqIp
+         wv/cpQX+q84UX4psGndMNpX+sbsOhKu5gIoG78LGBqoEx9d+latCGHpaXiczoB/NI1Nu
+         zuQCZFPa82KPvIV4BY2Jx+em4VIzGBbJhaYwAUwYDYQL50eY+rRvc7hul/6ik8MoYOoQ
+         8c4u5wRb1DTpsy36NYZuscATTZiU5rm+sPck8LCa9r3UIWXZuue8jYp4TH6w8qE7Hvao
+         pJFg==
+X-Gm-Message-State: AJIora8+AARQv8c9LI5tTN3CRqOlNP8TahymMcCBxJ+BuBhAfpLpwQOV
+        m+QkPUbSHU/EFMKHN1ObBo/F78pSCLVg9A==
+X-Google-Smtp-Source: AGRyM1vwSJjCkc0eqa0IsWGr1A6On88LLH9HyLUYQ///G4y0axxOQQn7sz8ej2Tp45u7Ql+TeUieAg==
+X-Received: by 2002:a05:6512:c13:b0:48a:9341:68ad with SMTP id z19-20020a0565120c1300b0048a934168admr1079989lfu.333.1658758032054;
+        Mon, 25 Jul 2022 07:07:12 -0700 (PDT)
+Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
+        by smtp.gmail.com with ESMTPSA id o7-20020a05651205c700b0047f7419de4asm901127lfo.180.2022.07.25.07.07.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jul 2022 07:07:11 -0700 (PDT)
+From:   Linus Walleij <linus.walleij@linaro.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 00/15 v2] Ux500 hash cleanup
+Date:   Mon, 25 Jul 2022 16:04:49 +0200
+Message-Id: <20220725140504.2398965-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <YtwgTySJyky0OcgG@zx2c4.com> <Ytwg8YEJn+76h5g9@zx2c4.com>
- <87bktdsdrk.fsf@oldenburg.str.redhat.com> <Yt54x7uWnsL3eZSx@zx2c4.com>
- <87v8rlqscj.fsf@oldenburg.str.redhat.com> <Yt6eHfnlEN8ViWrA@zx2c4.com>
-In-Reply-To: <Yt6eHfnlEN8ViWrA@zx2c4.com>
-From:   =?UTF-8?Q?Cristian_Rodr=C3=ADguez?= <crrodriguez@opensuse.org>
-Date:   Mon, 25 Jul 2022 09:58:23 -0400
-Message-ID: <CAPBLoAcadZw=bqKRn1Wd+NU=Cp+M+4ASB1e4qZbi01vZsgSsNw@mail.gmail.com>
-Subject: Re: arc4random - are you sure we want these?
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Florian Weimer <fweimer@redhat.com>,
-        Yann Droneaud <ydroneaud@opteya.com>, jann@thejh.net,
-        "Jason A. Donenfeld via Libc-alpha" <libc-alpha@sourceware.org>,
-        linux-crypto@vger.kernel.org, Michael@phoronix.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 25, 2022 at 9:44 AM Jason A. Donenfeld via Libc-alpha
-<libc-alpha@sourceware.org> wrote:
+This cleans up the Ux500 hash accelerator.
 
-> Or, if you insist on providing these functions t o d a y, and won't heed
-> my warnings about designing the APIs alongside the implementations, then
-> just make them thin wrappers over getrandom(0) *without* doing fancy
-> buffering, and then optimizations later can improve it. That would be
-> the incremental approach, which wouldn't harm potential users. It also
-> wouldn't shut the door on doing the buffering: if the kernel
-> optimization improvements go nowhere, and you decide it's a lost cause,
-> you can always change the way it works later, and make that decision
-> then.
+This has been very sparingly maintained the last few years,
+but as it happens an active user appeared and sent me a
+bug report, so here is a series cleaning up the driver
+so we can maintain it going forward.
 
-My 2CLP here if that matters..I agree with this sentiment/approach.
-provide this functions for source compat which all juist call
-getrandom and abort on failure *for now*
-and then  a future iteration can have something done about the syscall
-overhead with kernel help.
+Most patches are modernizations, using new frameworks and
+helpers.
+
+The expensive self tests are passing fine after this series.
+
+I think it is a bit too big to backport to stable :/
+But please put it in as non-urgent fix.
+
+If this goes well the plan is to do the same for the crypto
+driver which has all the same problems.
+
+ChangeLog v1->v2:
+- Iron out some minor runtime bugs.
+- Fix a regmap initialization error.
+- Fix up to use runtime PM and drop custom power states.
+
+Linus Walleij (15):
+  crypto: ux500/hash: Pass ctx to hash_setconfiguration()
+  crypto: ux500/hash: Get rid of custom device list
+  crypto: ux500/hash: Pass context to zero message digest
+  crypto: ux500/hash: Drop custom state save/restore
+  crypto: ux500/hash: Drop bit index
+  crypto: ux500/hash: Break while/do instead of if/else
+  crypto: ux500/hash: Rename and switch type of member
+  crypto: ux500/hash: Stop saving/restoring compulsively
+  crypto: ux500/hash: Get rid of state from request context
+  crypto: ux500/hash: Implement .export and .import
+  crypto: ux500/hash: Drop custom uint64 type
+  crypto: ux500/hash: Drop regulator handling
+  crypto: ux500/hash: Convert to regmap MMIO
+  crypto: ux500/hash: Use AMBA core primecell IDs
+  crypto: ux500/hash: Implement runtime PM
+
+ drivers/crypto/ux500/Kconfig          |    1 +
+ drivers/crypto/ux500/hash/hash_alg.h  |  262 ++----
+ drivers/crypto/ux500/hash/hash_core.c | 1154 ++++++++++---------------
+ 3 files changed, 536 insertions(+), 881 deletions(-)
+
+-- 
+2.36.1
+
