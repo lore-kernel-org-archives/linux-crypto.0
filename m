@@ -2,174 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE84C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 18:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C900BCCA48D
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Jul 2022 20:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236105AbiGYSg6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 14:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48576 "EHLO
+        id S237076AbiGYUja (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 16:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236084AbiGYSgx (ORCPT
+        with ESMTP id S237214AbiGYUj3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 14:36:53 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CCF1275A;
-        Mon, 25 Jul 2022 11:36:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id D2785CE13B5;
-        Mon, 25 Jul 2022 18:36:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05C24C341C8;
-        Mon, 25 Jul 2022 18:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658774209;
-        bh=woYVIEWGYvf6j+v2IaoCj1jL+lqsBN5fv0iS4lSB0KU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=khGlJfutfJp8pfvEYcDLhlTXTvS5KYRX4sfXCDd2llmGB+Wv1fjUicwQPWac2Je5l
-         nN3gOQ2pU8h3pPOw2lgwf1PdGWQgS6R5ngkrF5C6/vlXH2CFP1SzFNdIc62NDnNolc
-         rRjmJvK0FbA/1OJpbjVTG4LAQGAlXVfuvmr46l6wzlNqUwBkp5X9RTHKJRNMix4EU7
-         AMHHn7t3iwF/jTlfl8iRQtK80/npJmGU3Yk/lz4ysKJxgriWZY3znI7Bv4YP7/64il
-         wMfUG8TIAGl09HWxG9RPIxt9z4+y0STSvmvSE90CpeWoeX8JufVm9e8rc1B09LI7CQ
-         9Vjwr8YsuJfVg==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        "Jason A . Donenfeld " <Jason@zx2c4.com>
-Subject: [PATCH v3 1/3] crypto: lib - create utils module and move __crypto_memneq into it
-Date:   Mon, 25 Jul 2022 11:36:34 -0700
-Message-Id: <20220725183636.97326-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.37.0
-In-Reply-To: <20220725183636.97326-1-ebiggers@kernel.org>
-References: <20220725183636.97326-1-ebiggers@kernel.org>
+        Mon, 25 Jul 2022 16:39:29 -0400
+X-Greylist: delayed 474 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Jul 2022 13:39:28 PDT
+Received: from zimbra.cs.ucla.edu (zimbra.cs.ucla.edu [131.179.128.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1116922BF0
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 13:39:28 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by zimbra.cs.ucla.edu (Postfix) with ESMTP id E276F160051;
+        Mon, 25 Jul 2022 13:31:33 -0700 (PDT)
+Received: from zimbra.cs.ucla.edu ([127.0.0.1])
+        by localhost (zimbra.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id hEt1VM_rxK-b; Mon, 25 Jul 2022 13:31:33 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by zimbra.cs.ucla.edu (Postfix) with ESMTP id 3C14C16005C;
+        Mon, 25 Jul 2022 13:31:33 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at zimbra.cs.ucla.edu
+Received: from zimbra.cs.ucla.edu ([127.0.0.1])
+        by localhost (zimbra.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 7Fvocodj1riJ; Mon, 25 Jul 2022 13:31:33 -0700 (PDT)
+Received: from [192.168.1.9] (cpe-172-91-119-151.socal.res.rr.com [172.91.119.151])
+        by zimbra.cs.ucla.edu (Postfix) with ESMTPSA id 0F202160051;
+        Mon, 25 Jul 2022 13:31:33 -0700 (PDT)
+Message-ID: <5c29df04-6283-9eee-6648-215b52cfa26b@cs.ucla.edu>
+Date:   Mon, 25 Jul 2022 13:31:32 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     libc-alpha@sourceware.org, linux-crypto@vger.kernel.org
+References: <Ytwg8YEJn+76h5g9@zx2c4.com>
+ <555f2208-6a04-8c3c-ea52-41ad02b33b0c@cs.ucla.edu>
+ <Yt3b/HOguK9NFgCd@zx2c4.com>
+From:   Paul Eggert <eggert@cs.ucla.edu>
+Organization: UCLA Computer Science Department
+Subject: Re: arc4random - are you sure we want these?
+In-Reply-To: <Yt3b/HOguK9NFgCd@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On 7/24/22 16:55, Jason A. Donenfeld wrote:
 
-As requested at
-https://lore.kernel.org/r/YtEgzHuuMts0YBCz@gondor.apana.org.au, move
-__crypto_memneq into lib/crypto/ and put it under a new tristate.  The
-tristate is CRYPTO_LIB_UTILS, and it builds a module libcryptoutils.  As
-more crypto library utilities are being added, this creates a single
-place for them to go without cluttering up the main lib directory.
+> Sorry I missed your reply earlier. I'm not a subscriber so I missed this
+> as I somehow fell out of the CC.
 
-The module's main file will be lib/crypto/utils.c.  However, leave
-memneq.c as its own file because of its nonstandard license.
+Your email provider (Google) rejected email from cs.ucla.edu on the 
+grounds that its IP address 131.179.128.68 has a "very low reputation". 
+Google provided no way to appeal or fix the problem.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/Kconfig            | 2 +-
- lib/Kconfig               | 3 ---
- lib/Makefile              | 1 -
- lib/crypto/Kconfig        | 5 ++++-
- lib/crypto/Makefile       | 3 +++
- lib/{ => crypto}/memneq.c | 5 ++++-
- 6 files changed, 12 insertions(+), 7 deletions(-)
- rename lib/{ => crypto}/memneq.c (99%)
+I am using "Reply All" for this message because Google likely won't 
+deliver it to you directly. Perhaps someone else can forward it to you 
+for me. (Sorry to bother the list.)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e72bf3fc298cc5..7a10441998209d 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -15,7 +15,7 @@ source "crypto/async_tx/Kconfig"
- #
- menuconfig CRYPTO
- 	tristate "Cryptographic API"
--	select LIB_MEMNEQ
-+	select CRYPTO_LIB_UTILS
- 	help
- 	  This option provides the core Cryptographic API.
- 
-diff --git a/lib/Kconfig b/lib/Kconfig
-index eaaad4d85bf24b..6a843639814fbf 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -120,9 +120,6 @@ config INDIRECT_IOMEM_FALLBACK
- 
- source "lib/crypto/Kconfig"
- 
--config LIB_MEMNEQ
--	bool
--
- config CRC_CCITT
- 	tristate "CRC-CCITT functions"
- 	help
-diff --git a/lib/Makefile b/lib/Makefile
-index 67482f5ec0e899..0557be76c2565f 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -251,7 +251,6 @@ obj-$(CONFIG_DIMLIB) += dim/
- obj-$(CONFIG_SIGNATURE) += digsig.o
- 
- lib-$(CONFIG_CLZ_TAB) += clz_tab.o
--lib-$(CONFIG_LIB_MEMNEQ) += memneq.o
- 
- obj-$(CONFIG_GENERIC_STRNCPY_FROM_USER) += strncpy_from_user.o
- obj-$(CONFIG_GENERIC_STRNLEN_USER) += strnlen_user.o
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 9ff549f63540fa..b09d9d6546cbc3 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -2,6 +2,9 @@
- 
- menu "Crypto library routines"
- 
-+config CRYPTO_LIB_UTILS
-+	tristate
-+
- config CRYPTO_LIB_AES
- 	tristate
- 
-@@ -71,7 +74,7 @@ config CRYPTO_LIB_CURVE25519
- 	tristate "Curve25519 scalar multiplication library"
- 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
--	select LIB_MEMNEQ
-+	select CRYPTO_LIB_UTILS
- 	help
- 	  Enable the Curve25519 library interface. This interface may be
- 	  fulfilled by either the generic implementation or an arch-specific
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 919cbb2c220d61..b956b3bae26aaf 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -1,5 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+obj-$(CONFIG_CRYPTO_LIB_UTILS)			+= libcryptoutils.o
-+libcryptoutils-y				:= memneq.o
-+
- # chacha is used by the /dev/random driver which is always builtin
- obj-y						+= chacha.o
- obj-$(CONFIG_CRYPTO_LIB_CHACHA_GENERIC)		+= libchacha.o
-diff --git a/lib/memneq.c b/lib/crypto/memneq.c
-similarity index 99%
-rename from lib/memneq.c
-rename to lib/crypto/memneq.c
-index fb11608b1ec1dd..f2098318428478 100644
---- a/lib/memneq.c
-+++ b/lib/crypto/memneq.c
-@@ -59,8 +59,9 @@
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  */
- 
--#include <crypto/algapi.h>
- #include <asm/unaligned.h>
-+#include <crypto/algapi.h>
-+#include <linux/module.h>
- 
- #ifndef __HAVE_ARCH_CRYPTO_MEMNEQ
- 
-@@ -174,3 +175,5 @@ noinline unsigned long __crypto_memneq(const void *a, const void *b,
- EXPORT_SYMBOL(__crypto_memneq);
- 
- #endif /* __HAVE_ARCH_CRYPTO_MEMNEQ */
-+
-+MODULE_LICENSE("GPL");
--- 
-2.37.0
-
+Perhaps this is a subtle way to encourage our department's faculty to 
+let Google manage our email. We've resisted so far, though.
