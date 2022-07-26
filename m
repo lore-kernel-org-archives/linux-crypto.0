@@ -2,237 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9916C00140
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 16:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED85C00140
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 16:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239254AbiGZQUT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 12:20:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35578 "EHLO
+        id S229879AbiGZQvQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 12:51:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239222AbiGZQUR (ORCPT
+        with ESMTP id S239220AbiGZQvQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 12:20:17 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE3E1117
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:20:15 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id g19-20020a9d1293000000b0061c7bfda5dfso11168821otg.1
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:20:15 -0700 (PDT)
+        Tue, 26 Jul 2022 12:51:16 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C2863C1
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:51:15 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id w204so17742704oie.7
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:51:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=Gsa9iXNQEVoECudxTAJrnmX98L+cYS5jNdNs8mm18OA=;
-        b=AYRk3KUJAUiui6L6IUdP1Y6uFT1x1lKlrikg9E8zJa3v3xEfJJvWUXz44IEXsTfsR9
-         G3yg8+0Lw9a1FOhhO0Tr4KNJzF1HeUs3+aVfArzNTqlMJesd79cfhTV0lhjmWkTnrGIO
-         Af7tw4mhY2sPb4PBDvpdcn76HvItnO2Rrc/KUquCtwf8WNAtSkrcrdv8TBEfS/L1PnZm
-         yTH9nxakXJDrMVmRGGE/bafg/r4/Wjarz6v3HOFiT+8zrqwW0zU1WgIV6LiPawzUMezw
-         zGKOaB3Lj503Zmt1jxxQmsaD0dqZRCYxRfr25WXc2PndNuNwfGMdKS6LpKzU6BGoor+c
-         X0rQ==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wxzv/E+UaR2pmMOlye+KVg27MhKJv4mjPxrciwoZWQs=;
+        b=llH6sggjdXZyQd02xSh5FKxh89JH9Z1dfE8gLo/c5Sihe4ItHLHGLKYc57+vjdgIae
+         bzxnS6MmEY4SF4zoud7o47vZaBeNUI/2bT1gsbmiecoJ/s7DWxWcCjETESZSwsthEVuD
+         K/dL0hGftznRZCWuV+piEsat5oCA2ussY9bWj+gVtAIxAzFee92a+EuwRouRtMRQkqoS
+         R0lWVVE+MsqXvScHe2jtzdR/o9vwP/db4LYLRdA5wqhlkcE9q4Wfog84zsmbH6W2bunF
+         l3hsgntQfOEBDrP4qgVV8L1lTMHLCcQwQspu9s4nuujrMGQgAWf2SQB2v8NH0v3lVWZb
+         X4xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=Gsa9iXNQEVoECudxTAJrnmX98L+cYS5jNdNs8mm18OA=;
-        b=Hu8oSdnnAlIQ0REB1qb8SeXh9auhvKHOo14UavxlAw6NenqKk1laKSTG4vsUmZMV7v
-         nGJcEI8+TzRGNSQjrNFMZHYwaSLa0d7Z4Hc7XvCUxoD21CL+xTrwcdpRRUJ1m/iztGvT
-         tzv7XhsL3urL1GQqNa4jOGyyxZoTH+JrpIo1049FPun4joQ6TAb5kFMBpOHbPdmPY4l0
-         /j3YGpK9CUbMfnb8QoSyeNdmsembXGmmslkfubP7h7WoL1DCdlIj6rc8rz7OHCXmYkt3
-         13mQOGimdLQ5Kox6o86etMiffITtWten7j9dccmQU2DzPiuasQBOnPJesINlAcwOYL8O
-         T3hw==
-X-Gm-Message-State: AJIora9NUB4PEu6YLgn3pzXwaiwY/hGdYmb1o827yNJNka0Qkj2Q1mRI
-        DSDQtO0TbgpL8Oja4TZw/Q0gA7IQNi0boQ==
-X-Google-Smtp-Source: AGRyM1uYQhRhrHg8dZ/sDmjpMAJvnRA3qlPOlSUxwMDXcQdQn0G+JlWqUlL1rl9qMJVjfedAWuYe8g==
-X-Received: by 2002:a05:6830:3689:b0:61c:ae52:e36b with SMTP id bk9-20020a056830368900b0061cae52e36bmr6977693otb.225.1658852415150;
-        Tue, 26 Jul 2022 09:20:15 -0700 (PDT)
-Received: from ?IPV6:2804:431:c7cb:8ded:8925:49f1:c550:ee7d? ([2804:431:c7cb:8ded:8925:49f1:c550:ee7d])
-        by smtp.gmail.com with ESMTPSA id k23-20020a056870959700b000f5f4ad194bsm8180132oao.25.2022.07.26.09.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jul 2022 09:20:14 -0700 (PDT)
-Message-ID: <45ef8ca0-12ca-4853-98a0-9f52dfca8c57@linaro.org>
-Date:   Tue, 26 Jul 2022 13:20:11 -0300
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wxzv/E+UaR2pmMOlye+KVg27MhKJv4mjPxrciwoZWQs=;
+        b=5iT0RvPZ0Mb2SkIS04xNPiYBIXC5CJViCzloJluo1A0iGFNZw729YZitmKMsuuFp53
+         A/GGSHPu5KX/rWTZ38sv8QLOOKCdR5gArkwb2IiLwkWuSdHlhEUqTES0ItjMebQsOs36
+         B5W75egE9QoZOcZ/tpQIaFjgIZ9aaRBGkXA9e4Vb3ZcB9kQSkpAkQGYJudMAqGzsQGHU
+         zl9SG8cyFP+jXuwEMR8qmSu17ZHe+kqWBM0+7HI116QdhoPYxX5FmYbmsWSDXdrFNceF
+         oG7MfRn2K5DQDLlAZVUKUJ2GKV08GZTV1c/UhH0XYbgVIxzoUstnFjlYOJ1TDyyK+DJa
+         cX1w==
+X-Gm-Message-State: AJIora+CT1JfvNcOUX2kRoGahdV5q9SJ8Hj/kAda+2ZGMwcZKwnxoN5S
+        B3eVqtESSHMLFA/PEw/dnKGmdeNHNGZTDSENRUI=
+X-Google-Smtp-Source: AGRyM1vsuJ1rPiAGi4kZGlsA7p5B2rHWEPTLlj2r4WK04VfTO9wTQfARPgny53bX/mPo/7HGlwQHqTHjh/lpBtQgHlU=
+X-Received: by 2002:aca:3946:0:b0:33a:7585:494b with SMTP id
+ g67-20020aca3946000000b0033a7585494bmr69073oia.164.1658854274546; Tue, 26 Jul
+ 2022 09:51:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.0.3
-Subject: Re: [PATCH v4] arc4random: simplify design for better safety
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org
-Cc:     Florian Weimer <fweimer@redhat.com>,
-        =?UTF-8?Q?Cristian_Rodr=c3=adguez?= <crrodriguez@opensuse.org>,
-        Paul Eggert <eggert@cs.ucla.edu>,
-        Mark Harris <mark.hsj@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
+References: <20220725225728.824128-1-Jason@zx2c4.com> <20220725232810.843433-1-Jason@zx2c4.com>
+ <CAMdZqKH=9mDhoW_gpL-pUEQAGuN=orc1doudyAuHdoPc7O53RQ@mail.gmail.com> <Yt/EySjdJjYW/EcB@zx2c4.com>
+In-Reply-To: <Yt/EySjdJjYW/EcB@zx2c4.com>
+From:   Mark Harris <mark.hsj@gmail.com>
+Date:   Tue, 26 Jul 2022 09:51:03 -0700
+Message-ID: <CAMdZqKGzhajnb5ejypnPFanJ2E=4Pk_96x8FAAShttvnrRenfQ@mail.gmail.com>
+Subject: Re: [PATCH v2] arc4random: simplify design for better safety
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     libc-alpha@sourceware.org, Florian Weimer <fweimer@redhat.com>,
         linux-crypto@vger.kernel.org
-References: <20220725225728.824128-1-Jason@zx2c4.com>
- <20220726133049.1145913-1-Jason@zx2c4.com>
-From:   Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
-Organization: Linaro
-In-Reply-To: <20220726133049.1145913-1-Jason@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Jason A. Donenfeld wrote:
+> On Mon, Jul 25, 2022 at 06:10:06PM -0700, Mark Harris wrote:
+> > Jason A. Donenfeld wrote:
+> > > +      l = __getrandom_nocancel (p, n, 0);
+> > > +      if (l > 0)
+> > > +       {
+> > > +         if ((size_t) l == n)
+> > > +           return; /* Done reading, success. */
+> > > +         p = (uint8_t *) p + l;
+> > > +         n -= l;
+> > > +         continue; /* Interrupted by a signal; keep going. */
+> > > +       }
+> > > +      else if (l == 0)
+> > > +       arc4random_getrandom_failure (); /* Weird, should never happen. */
+> > > +      else if (errno == ENOSYS)
+> > > +       {
+> > > +         have_getrandom = false;
+> > > +         break; /* No syscall, so fallback to /dev/urandom. */
+> > > +       }
+> > > +      arc4random_getrandom_failure (); /* Unknown error, should never happen. */
+> >
+> > Isn't EINTR also possible?  Aborting in that case does not seem reasonable.
+>
+> Not in current kernels, where it always returns at least PAGE_SIZE bytes
+> before checking for pending signals. In older kernels, if there was a
+> signal pending at the top, it would do no work and return -ERESTARTSYS,
+> which I believe should then get restarted by glibc's syscaller? I might
+> be wrong about how restarts work though, so if you know better, please
+> let me know. TEMP_FAILURE_RETRY relies on errno, so that's not what we
+> want. I guess I can just add a case for it.
+>
+> > Also the __getrandom_nocancel function does not set errno on Linux; it
+> > just returns INTERNAL_SYSCALL_CALL (getrandom, buf, buflen, flags).
+> > So unless that is changed, it doesn't look like this ENOSYS check will
+> > detect old Linux kernels.
+>
+> Thanks. It looks like INTERNAL_SYSCALL_CALL just returns the errno as-is
+> as a return value, right? I'll adjust the code to account for that.
+
+Yes INTERNAL_SYSCALL_CALL just returns the negated errno value that it
+gets from the Linux kernel, but only on Linux does
+__getrandom_nocancel use that.  The Hurd and generic implementations
+set errno on error.  Previously the only call to this function did not
+care about the specific error value so it didn't matter.  Since you
+are now using the error value in generic code, __getrandom_nocancel
+should be changed on Linux to set errno like most other _nocancel
+calls, and then it should go back to checking errno here.
+
+And as Adhemerval mentioned, you only added a Linux implementation of
+__ppoll_infinity_nocancel, but are calling it from generic code.
+
+Also, by the way your patches cc'd directly to me get quarantined
+because DKIM signature verification failed.  The non-patch messages
+pass DKIM and are fine.
 
 
-On 26/07/22 10:30, Jason A. Donenfeld wrote:
 
-> +      l = __getrandom_nocancel (p, n, 0);
-> +      if (l > 0)
-> +	{
-> +	  if ((size_t) l == n)
-> +	    return; /* Done reading, success.  */
-> +	  p = (uint8_t *) p + l;
-> +	  n -= l;
-> +	  continue; /* Interrupted by a signal; keep going.  */
-> +	}
-> +      else if (l == 0)
-> +	arc4random_getrandom_failure (); /* Weird, should never happen.  */
-> +      else if (l == -EINTR)
-> +	continue; /* Interrupted by a signal; keep going.  */
-> +      else if (!__ASSUME_GETRANDOM && l == -ENOSYS)
-> +	{
-> +	  atomic_store_relaxed (&have_getrandom, false);
-
-I still think there is no much gain in this optimization, the syscall will
-most likely be present and it is one less static data.  Also, we avoid to
-use __ASSUME_GETRANDOM on generic code (all __ASSUME usage within
-sysdeps and/or nptl).
-
-> diff --git a/sysdeps/unix/sysv/linux/Makefile b/sysdeps/unix/sysv/linux/Makefile
-> index 2ccc92b6b8..2f4f9784ee 100644
-> --- a/sysdeps/unix/sysv/linux/Makefile
-> +++ b/sysdeps/unix/sysv/linux/Makefile
-> @@ -380,7 +380,8 @@ sysdep_routines += xstatconv internal_statvfs \
->  		   open_nocancel open64_nocancel \
->  		   openat_nocancel openat64_nocancel \
->  		   read_nocancel pread64_nocancel \
-> -		   write_nocancel statx_cp stat_t64_cp
-> +		   write_nocancel statx_cp stat_t64_cp \
-> +		   ppoll_nocancel
->  
->  sysdep_headers += bits/fcntl-linux.h
->  
-> diff --git a/sysdeps/unix/sysv/linux/Versions b/sysdeps/unix/sysv/linux/Versions
-> index 65d2ceda2c..febe1ad421 100644
-> --- a/sysdeps/unix/sysv/linux/Versions
-> +++ b/sysdeps/unix/sysv/linux/Versions
-> @@ -320,6 +320,7 @@ libc {
->      __read_nocancel;
->      __pread64_nocancel;
->      __close_nocancel;
-> +    __ppoll_infinity_nocancel;
->      __sigtimedwait;
->      # functions used by nscd
->      __netlink_assert_response;
-
-There is no need to export on GLIBC_PRIVATE, since it is not currently usage
-libc.so.  Just define is a hidden (attribute_hidden).
-
-> diff --git a/sysdeps/unix/sysv/linux/kernel-features.h b/sysdeps/unix/sysv/linux/kernel-features.h
-> index 74adc3956b..75d5f953d4 100644
-> --- a/sysdeps/unix/sysv/linux/kernel-features.h
-> +++ b/sysdeps/unix/sysv/linux/kernel-features.h
-> @@ -236,4 +236,11 @@
->  # define __ASSUME_FUTEX_LOCK_PI2 0
->  #endif
->  
-> +/* The getrandom() syscall was added in 3.17.  */
-> +#if __LINUX_KERNEL_VERSION >= 0x031100
-> +# define __ASSUME_GETRANDOM 1
-> +#else
-> +# define __ASSUME_GETRANDOM 0
-> +#endif
-> +
->  #endif /* kernel-features.h */
-> diff --git a/sysdeps/unix/sysv/linux/not-cancel.h b/sysdeps/unix/sysv/linux/not-cancel.h
-> index 2c58d5ae2f..d3df8fa79e 100644
-> --- a/sysdeps/unix/sysv/linux/not-cancel.h
-> +++ b/sysdeps/unix/sysv/linux/not-cancel.h
-> @@ -23,6 +23,7 @@
->  #include <sysdep.h>
->  #include <errno.h>
->  #include <unistd.h>
-> +#include <sys/poll.h>
->  #include <sys/syscall.h>
->  #include <sys/wait.h>
->  #include <time.h>
-> @@ -77,6 +78,10 @@ __getrandom_nocancel (void *buf, size_t buflen, unsigned int flags)
->  /* Uncancelable fcntl.  */
->  __typeof (__fcntl) __fcntl64_nocancel;
->  
-> +/* Uncancelable ppoll.  */
-> +int
-> +__ppoll_infinity_nocancel (struct pollfd *fds, nfds_t nfds);
-
-Use attribute_hidden here and remove it from sysdeps/unix/sysv/linux/Versions.
-
-> +
->  #if IS_IN (libc) || IS_IN (rtld)
->  hidden_proto (__open_nocancel)
->  hidden_proto (__open64_nocancel)
-> @@ -87,6 +92,7 @@ hidden_proto (__pread64_nocancel)
->  hidden_proto (__write_nocancel)
->  hidden_proto (__close_nocancel)
->  hidden_proto (__fcntl64_nocancel)
-> +hidden_proto (__ppoll_infinity_nocancel)
->  #endif
->  
->  #endif /* NOT_CANCEL_H  */
-
-Also update the hurd sysdeps/mach/hurd/not-cancel.h with a wrapper to 
-__poll (since it does not really support pthread cancellation).
-
-
-> diff --git a/sysdeps/generic/chacha20_arch.h b/sysdeps/unix/sysv/linux/ppoll_nocancel.c
-> similarity index 62%
-> rename from sysdeps/generic/chacha20_arch.h
-> rename to sysdeps/unix/sysv/linux/ppoll_nocancel.c
-> index 1b4559ccbc..28c8761566 100644
-> --- a/sysdeps/generic/chacha20_arch.h
-> +++ b/sysdeps/unix/sysv/linux/ppoll_nocancel.c
-> @@ -1,5 +1,5 @@
-> -/* Chacha20 implementation, generic interface for encrypt.
-> -   Copyright (C) 2022 Free Software Foundation, Inc.
-> +/* Linux ppoll syscall implementation -- non-cancellable.
-> +   Copyright (C) 2018-2022 Free Software Foundation, Inc.
->     This file is part of the GNU C Library.
->  
->     The GNU C Library is free software; you can redistribute it and/or
-> @@ -16,9 +16,16 @@
->     License along with the GNU C Library; if not, see
->     <https://www.gnu.org/licenses/>.  */
->  
-> -static inline void
-> -chacha20_crypt (uint32_t *state, uint8_t *dst, const uint8_t *src,
-> -		size_t bytes)
-> +#include <unistd.h>
-> +#include <sysdep-cancel.h>
-> +#include <not-cancel.h>
-> +
-> +int
-> +__ppoll_infinity_nocancel (struct pollfd *fds, nfds_t nfds)
->  {
-> -  chacha20_crypt_generic (state, dst, src, bytes);
-> +#ifndef __NR_ppoll_time64
-> +# define __NR_ppoll_time64 __NR_ppoll
-> +#endif
-> +  return INLINE_SYSCALL_CALL (ppoll_time64, fds, nfds, NULL, NULL, 0);
->  }
-> +hidden_def (__ppoll_infinity_nocancel)
-
-Maybe just add an inline wrapper on sysdeps/unix/sysv/linux/not-cancel.h, 
-as for __getrandom_nocancel:
-
-  static inline int
-  __ppoll_infinity_nocancel (struct pollfd *fds, nfds_t nfds)
-  {
-  #ifndef __NR_ppoll_time64
-  # define __NR_ppoll_time64 __NR_ppoll
-  #endif
-    return INLINE_SYSCALL_CALL (ppoll_time64, fds, nfds, NULL, NULL, 0);
-  }
-
-It avoids a lot of boilerplate code to add the internal symbol.
+ - Mark
