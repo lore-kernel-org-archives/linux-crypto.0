@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CE7C00140
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 20:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C6AC00140
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 20:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239905AbiGZUQd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 16:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51994 "EHLO
+        id S239912AbiGZUQu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 16:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239858AbiGZUQV (ORCPT
+        with ESMTP id S239864AbiGZUQW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 16:16:21 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA3232470
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:11 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id b21-20020a05600c4e1500b003a32bc8612fso17317wmq.3
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:11 -0700 (PDT)
+        Tue, 26 Jul 2022 16:16:22 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147F1326FD
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:14 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id v17so2669502wrr.10
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=GWR8XbBS1oy+lmPSjXOdFIQ7ZMLcTchWH7fRG8D5Oe4=;
-        b=LyKNGMWZNujT6s9/QUWJ2JVBwtpyqqQwZJlDQaKuI+upIlpRhAy3Nj9WwePSSu8pUl
-         yA3q3wn8gtvE5mz8rffc9gM4xJMJrCu8GPLJvcn6Mn+O9ZZAgFc3GCzL64tC11ct6TmK
-         PtQjdgAMGzKrapZECA0xSYFxrtDcXAsfd/IzTcjArOvGuVkEP4LGMSY4fWdrEnyQW4fN
-         J2BOgLkTRSIKF+kKYCweRPV0ABuWIEOrUjWwqN3/Aaegd6rAWAOw6wGm0RtJdgPX/pJv
-         0RLBc24wp3AJaUS1Jd7q4puaPs4XkhODkccEz8DTMVRjj1HEvj3e5YP5EqWuR+eX339l
-         li5A==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=pmSO5o3Q44tqKwKFfKNMm0Ze8ef3CVpVV9CI9yXzviE=;
+        b=D5lUTewwVLHHGjzMcNus5GsYhY5VOyJ5EbsBDumqrRq9zpSv8LL+NILNY+idc7V+jy
+         gwssJlDW4770QDmmsH1d8Z2O7J/OOre7FLr4zdjpP6erd/N5/yx5S7DUdz/51yqjxP1F
+         XkQpdIlAPcuuU9EK2Hp55iUVvyctYxw5oBCKEMSQJ7N5BNayUJNb8F5yjlmA8z28kUVP
+         A/AzsOtOML497PIrxw9l3CfdJCNw9/gT3tP0R6Td5iUkT08C2NtmMEKETjiSeQZku+3s
+         IoRefq1rlqZP+SVAhReLcNqCIZfD07wbzR0r9SkPpyEzb0AaR/oVqFPa8A4oqfVyQGOU
+         pNtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GWR8XbBS1oy+lmPSjXOdFIQ7ZMLcTchWH7fRG8D5Oe4=;
-        b=zeZOHue1BULCBEtVHyl3Trdu8K7LO+lxqM7Hp/07MZ16J0eAki4jE/4ZQ20qS+7O5H
-         jlK96m+Ec681KycIjGFWMpu6Zgm2lWtEW9dRVhOieTnOiaTgKJjqQ2O94NLtSnbw8MP6
-         UgMCjsphtSOemIRIuUkeowb4g2eLd8ZalyDV1eI2f1lTDgH45gmj2pESO3WSXjf0o7+5
-         dErGRXlP6t0XYDBOuWXVEeQ+dWMhLfmmHm8DBpntJ7P//r/J7/XemESDuVV7g6Tv2Dnn
-         ZJyyxBgMqf/qwmTzl67WiBT+/7YJCy3UqrhqT1RKKlgNkgM31hPSGdNoD9IsvF4+iPrr
-         OE0A==
-X-Gm-Message-State: AJIora8QHDfd8A/la+atYaVLusiuWgYvBfIBuimz/Yg9n9byKRh0eiXc
-        S86v0flJU/mFrDe7Mwama7tBtA==
-X-Google-Smtp-Source: AGRyM1sTDJOnzvOn5GuKOaCCikjaJbFUgi0rTM+scygEVQdwUbMQzlcukhe0K/rXy0i8Vr8g6LcDsg==
-X-Received: by 2002:a7b:c7d1:0:b0:3a3:1890:3495 with SMTP id z17-20020a7bc7d1000000b003a318903495mr591785wmk.18.1658866569657;
-        Tue, 26 Jul 2022 13:16:09 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=pmSO5o3Q44tqKwKFfKNMm0Ze8ef3CVpVV9CI9yXzviE=;
+        b=weeZ+ZhaMTRrbQ/hfRiQdF4CPInQxHdOqTvSxw1vsavhwqmEytqomt9WYZn6fnyym5
+         eHWwh35B5N+pEHZ+Ziu4oj850bG2CVYHhjx6QbRQyvopinLfg84kYTRM0y4s76+eFrxN
+         vg5nktEHCUyas2de9D4SP45usKBHfp5sc/Lza3Iic58SowQyhm7fO3A7gLoZwJJfi7rP
+         2RDmbmtyLIq6zThnE1jxvOVto3nsuR/fqgLUSyKRzA1djbALrStBBI/p/V5anrXa88Vz
+         T7PtZWhtDq/Gb54CavFh9OxKxdi9fuIZleNVLsCRgfCJ7oA0pwRTNQA0JtaRwRAVm6rk
+         WCsw==
+X-Gm-Message-State: AJIora8LSOkhYYRlw7k6z7Ghp0/XMvjeCNHqEVjZmGzy4pn3W4esPN2P
+        7xGb0CLyyOIM6JLyt2phbICyuA==
+X-Google-Smtp-Source: AGRyM1uB79Y9Ri2seTNWcO7Gq0vlx1PC/AF/5zeWVVl++TFNfM6zhF2Jc/Q/fwlASGpGWU8eiPG99Q==
+X-Received: by 2002:a05:6000:986:b0:21e:939b:a71 with SMTP id by6-20020a056000098600b0021e939b0a71mr5780694wrb.256.1658866572371;
+        Tue, 26 Jul 2022 13:16:12 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id m6-20020a05600c3b0600b003a320e6f011sm28073wms.1.2022.07.26.13.16.08
+        by smtp.gmail.com with ESMTPSA id m6-20020a05600c3b0600b003a320e6f011sm28073wms.1.2022.07.26.13.16.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 13:16:09 -0700 (PDT)
+        Tue, 26 Jul 2022 13:16:11 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
         Paolo Abeni <pabeni@redhat.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 2/6] crypto_pool: Add crypto_pool_reserve_scratch()
-Date:   Tue, 26 Jul 2022 21:15:56 +0100
-Message-Id: <20220726201600.1715505-3-dima@arista.com>
+Subject: [PATCH 4/6] net/tcp: Disable TCP-MD5 static key on tcp_md5sig_info destruction
+Date:   Tue, 26 Jul 2022 21:15:58 +0100
+Message-Id: <20220726201600.1715505-5-dima@arista.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220726201600.1715505-1-dima@arista.com>
 References: <20220726201600.1715505-1-dima@arista.com>
@@ -78,161 +78,271 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of having build-time hardcoded constant, reallocate scratch
-area, if needed by user. Different algos, different users may need
-different size of temp per-CPU buffer. Only up-sizing supported for
-simplicity.
+To do that, separate two scenarios:
+- where it's the first MD5 key on the system, which means that enabling
+  of the static key may need to sleep;
+- copying of an existing key from a listening socket to the request
+  socket upon receiving a signed TCP segment, where static key was
+  already enabled (when the key was added to the listening socket).
+
+Now the life-time of the static branch for TCP-MD5 is until:
+- last tcp_md5sig_info is destroyed
+- last socket in time-wait state with MD5 key is closed.
+
+Which means that after all sockets with TCP-MD5 keys are gone, the
+system gets back the performance of disabled md5-key static branch.
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- crypto/Kconfig        |  6 ++++
- crypto/crypto_pool.c  | 65 +++++++++++++++++++++++++++++++------------
- include/crypto/pool.h |  3 +-
- 3 files changed, 54 insertions(+), 20 deletions(-)
+ include/net/tcp.h        | 10 ++++++---
+ net/ipv4/tcp.c           |  5 +----
+ net/ipv4/tcp_ipv4.c      | 45 +++++++++++++++++++++++++++++++---------
+ net/ipv4/tcp_minisocks.c |  9 +++++---
+ net/ipv4/tcp_output.c    |  4 ++--
+ net/ipv6/tcp_ipv6.c      | 10 ++++-----
+ 6 files changed, 55 insertions(+), 28 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index aeddaa3dcc77..e5865be483be 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -2134,6 +2134,12 @@ config CRYPTO_POOL
- 	help
- 	  Per-CPU pool of crypto requests ready for usage in atomic contexts.
- 
-+config CRYPTO_POOL_DEFAULT_SCRATCH_SIZE
-+	hex "Per-CPU default scratch area size"
-+	depends on CRYPTO_POOL
-+	default 0x100
-+	range 0x100 0x10000
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index f366626cbbba..aa735f963723 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1663,7 +1663,11 @@ int tcp_v4_md5_hash_skb(char *md5_hash, const struct tcp_md5sig_key *key,
+ 			const struct sock *sk, const struct sk_buff *skb);
+ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 		   int family, u8 prefixlen, int l3index, u8 flags,
+-		   const u8 *newkey, u8 newkeylen, gfp_t gfp);
++		   const u8 *newkey, u8 newkeylen);
++int tcp_md5_key_copy(struct sock *sk, const union tcp_md5_addr *addr,
++		     int family, u8 prefixlen, int l3index,
++		     struct tcp_md5sig_key *key);
 +
- source "drivers/crypto/Kconfig"
- source "crypto/asymmetric_keys/Kconfig"
- source "certs/Kconfig"
-diff --git a/crypto/crypto_pool.c b/crypto/crypto_pool.c
-index c668c02499b7..8ad6415fa817 100644
---- a/crypto/crypto_pool.c
-+++ b/crypto/crypto_pool.c
-@@ -1,13 +1,14 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
+ int tcp_md5_do_del(struct sock *sk, const union tcp_md5_addr *addr,
+ 		   int family, u8 prefixlen, int l3index, u8 flags);
+ struct tcp_md5sig_key *tcp_v4_md5_lookup(const struct sock *sk,
+@@ -1671,7 +1675,7 @@ struct tcp_md5sig_key *tcp_v4_md5_lookup(const struct sock *sk,
  
- #include <crypto/pool.h>
-+#include <linux/cpu.h>
- #include <linux/kref.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
- #include <linux/percpu.h>
- #include <linux/workqueue.h>
- 
--static unsigned long scratch_size = DEFAULT_CRYPTO_POOL_SCRATCH_SZ;
-+static unsigned long scratch_size = CONFIG_CRYPTO_POOL_DEFAULT_SCRATCH_SIZE;
- static DEFINE_PER_CPU(void *, crypto_pool_scratch);
- 
- struct crypto_pool_entry {
-@@ -19,28 +20,60 @@ struct crypto_pool_entry {
- 
- #define CPOOL_SIZE (PAGE_SIZE/sizeof(struct crypto_pool_entry))
- static struct crypto_pool_entry cpool[CPOOL_SIZE];
--static int last_allocated;
-+static unsigned int last_allocated;
- static DEFINE_MUTEX(cpool_mutex);
- 
--static int crypto_pool_scratch_alloc(void)
-+static void __set_scratch(void *scratch)
+ #ifdef CONFIG_TCP_MD5SIG
+ #include <linux/jump_label.h>
+-extern struct static_key_false tcp_md5_needed;
++extern struct static_key_false_deferred tcp_md5_needed;
+ struct tcp_md5sig_key *__tcp_md5_do_lookup(const struct sock *sk, int l3index,
+ 					   const union tcp_md5_addr *addr,
+ 					   int family);
+@@ -1679,7 +1683,7 @@ static inline struct tcp_md5sig_key *
+ tcp_md5_do_lookup(const struct sock *sk, int l3index,
+ 		  const union tcp_md5_addr *addr, int family)
  {
--	int cpu;
-+	kfree(this_cpu_read(crypto_pool_scratch));
-+	this_cpu_write(crypto_pool_scratch, scratch);
-+}
+-	if (!static_branch_unlikely(&tcp_md5_needed))
++	if (!static_branch_unlikely(&tcp_md5_needed.key))
+ 		return NULL;
+ 	return __tcp_md5_do_lookup(sk, l3index, addr, family);
+ }
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 635c6782cdbb..300056008e90 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4404,11 +4404,8 @@ bool tcp_alloc_md5sig_pool(void)
+ 	if (unlikely(!tcp_md5sig_pool_populated)) {
+ 		mutex_lock(&tcp_md5sig_mutex);
  
--	lockdep_assert_held(&cpool_mutex);
-+/* Slow-path */
-+/**
-+ * crypto_pool_reserve_scratch - re-allocates scratch buffer, slow-path
-+ * @size: request size for the scratch/temp buffer
-+ */
-+int crypto_pool_reserve_scratch(unsigned long size)
-+{
-+	int cpu, err = 0;
+-		if (!tcp_md5sig_pool_populated) {
++		if (!tcp_md5sig_pool_populated)
+ 			__tcp_alloc_md5sig_pool();
+-			if (tcp_md5sig_pool_populated)
+-				static_branch_inc(&tcp_md5_needed);
+-		}
  
-+	mutex_lock(&cpool_mutex);
-+	if (size <= scratch_size) {
-+		for_each_possible_cpu(cpu) {
-+			if (per_cpu(crypto_pool_scratch, cpu))
-+				continue;
-+			goto allocate_scratch;
-+		}
-+		mutex_unlock(&cpool_mutex);
-+		return 0;
-+	}
-+allocate_scratch:
-+	cpus_read_lock();
- 	for_each_possible_cpu(cpu) {
--		void *scratch = per_cpu(crypto_pool_scratch, cpu);
-+		void *scratch;
- 
--		if (scratch)
--			continue;
-+		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
-+		if (!scratch) {
-+			err = -ENOMEM;
-+			break;
-+		}
- 
--		scratch = kmalloc_node(scratch_size, GFP_KERNEL,
--				       cpu_to_node(cpu));
--		if (!scratch)
--			return -ENOMEM;
--		per_cpu(crypto_pool_scratch, cpu) = scratch;
-+		if (!cpu_online(cpu)) {
-+			kfree(per_cpu(crypto_pool_scratch, cpu));
-+			per_cpu(crypto_pool_scratch, cpu) = scratch;
-+			continue;
-+		}
-+		err = smp_call_function_single(cpu, __set_scratch, scratch, 1);
-+		if (err) {
-+			kfree(scratch);
-+			break;
-+		}
+ 		mutex_unlock(&tcp_md5sig_mutex);
  	}
--	return 0;
-+
-+	cpus_read_unlock();
-+	mutex_unlock(&cpool_mutex);
-+	return err;
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 55e4092209a5..5b0caaea5029 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1044,7 +1044,7 @@ static void tcp_v4_reqsk_destructor(struct request_sock *req)
+  * We need to maintain these in the sk structure.
+  */
+ 
+-DEFINE_STATIC_KEY_FALSE(tcp_md5_needed);
++DEFINE_STATIC_KEY_DEFERRED_FALSE(tcp_md5_needed, HZ);
+ EXPORT_SYMBOL(tcp_md5_needed);
+ 
+ static bool better_md5_match(struct tcp_md5sig_key *old, struct tcp_md5sig_key *new)
+@@ -1171,9 +1171,9 @@ static int tcp_md5sig_info_add(struct sock *sk, gfp_t gfp)
  }
  
- static void crypto_pool_scratch_free(void)
-@@ -139,10 +172,6 @@ int crypto_pool_alloc_ahash(const char *alg)
+ /* This can be called on a newly created socket, from other files */
+-int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+-		   int family, u8 prefixlen, int l3index, u8 flags,
+-		   const u8 *newkey, u8 newkeylen, gfp_t gfp)
++int __tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
++		     int family, u8 prefixlen, int l3index, u8 flags,
++		     const u8 *newkey, u8 newkeylen, gfp_t gfp)
+ {
+ 	/* Add Key to the list */
+ 	struct tcp_md5sig_key *key;
+@@ -1200,9 +1200,6 @@ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 		return 0;
+ 	}
  
- 	/* slow-path */
- 	mutex_lock(&cpool_mutex);
--	err = crypto_pool_scratch_alloc();
--	if (err)
--		goto out;
+-	if (tcp_md5sig_info_add(sk, gfp))
+-		return -ENOMEM;
 -
- 	for (i = 0; i < last_allocated; i++) {
- 		if (cpool[i].alg && !strcmp(cpool[i].alg, alg)) {
- 			kref_get(&cpool[i].kref);
-diff --git a/include/crypto/pool.h b/include/crypto/pool.h
-index 2c61aa45faff..c7d817860cc3 100644
---- a/include/crypto/pool.h
-+++ b/include/crypto/pool.h
-@@ -4,8 +4,6 @@
+ 	md5sig = rcu_dereference_protected(tp->md5sig_info,
+ 					   lockdep_sock_is_held(sk));
  
- #include <crypto/hash.h>
+@@ -1226,8 +1223,36 @@ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 	hlist_add_head_rcu(&key->node, &md5sig->head);
+ 	return 0;
+ }
++
++int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
++		   int family, u8 prefixlen, int l3index, u8 flags,
++		   const u8 *newkey, u8 newkeylen)
++{
++	if (tcp_md5sig_info_add(sk, GFP_KERNEL))
++		return -ENOMEM;
++
++	static_branch_inc(&tcp_md5_needed.key);
++
++	return __tcp_md5_do_add(sk, addr, family, prefixlen, l3index, flags,
++				newkey, newkeylen, GFP_KERNEL);
++}
+ EXPORT_SYMBOL(tcp_md5_do_add);
  
--#define DEFAULT_CRYPTO_POOL_SCRATCH_SZ	128
--
- struct crypto_pool {
- 	void *scratch;
- };
-@@ -20,6 +18,7 @@ struct crypto_pool_ahash {
- 	struct ahash_request *req;
- };
++int tcp_md5_key_copy(struct sock *sk, const union tcp_md5_addr *addr,
++		     int family, u8 prefixlen, int l3index,
++		     struct tcp_md5sig_key *key)
++{
++	if (tcp_md5sig_info_add(sk, sk_gfp_mask(sk, GFP_ATOMIC)))
++		return -ENOMEM;
++
++	atomic_inc(&tcp_md5_needed.key.key.enabled);
++
++	return __tcp_md5_do_add(sk, addr, family, prefixlen, l3index,
++				key->flags, key->key, key->keylen,
++				sk_gfp_mask(sk, GFP_ATOMIC));
++}
++EXPORT_SYMBOL(tcp_md5_key_copy);
++
+ int tcp_md5_do_del(struct sock *sk, const union tcp_md5_addr *addr, int family,
+ 		   u8 prefixlen, int l3index, u8 flags)
+ {
+@@ -1314,7 +1339,7 @@ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
+ 		return -EINVAL;
  
-+int crypto_pool_reserve_scratch(unsigned long size);
- int crypto_pool_alloc_ahash(const char *alg);
- void crypto_pool_add(unsigned int id);
- void crypto_pool_release(unsigned int id);
+ 	return tcp_md5_do_add(sk, addr, AF_INET, prefixlen, l3index, flags,
+-			      cmd.tcpm_key, cmd.tcpm_keylen, GFP_KERNEL);
++			      cmd.tcpm_key, cmd.tcpm_keylen);
+ }
+ 
+ static int tcp_v4_md5_hash_headers(struct tcp_md5sig_pool *hp,
+@@ -1571,8 +1596,7 @@ struct sock *tcp_v4_syn_recv_sock(const struct sock *sk, struct sk_buff *skb,
+ 		 * memory, then we end up not copying the key
+ 		 * across. Shucks.
+ 		 */
+-		tcp_md5_do_add(newsk, addr, AF_INET, 32, l3index, key->flags,
+-			       key->key, key->keylen, GFP_ATOMIC);
++		tcp_md5_key_copy(newsk, addr, AF_INET, 32, l3index, key);
+ 		sk_gso_disable(newsk);
+ 	}
+ #endif
+@@ -2260,6 +2284,7 @@ void tcp_v4_destroy_sock(struct sock *sk)
+ 		tcp_clear_md5_list(sk);
+ 		kfree_rcu(rcu_dereference_protected(tp->md5sig_info, 1), rcu);
+ 		tp->md5sig_info = NULL;
++		static_branch_slow_dec_deferred(&tcp_md5_needed);
+ 	}
+ #endif
+ 
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index cb95d88497ae..5d475a45a478 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -291,13 +291,14 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
+ 		 */
+ 		do {
+ 			tcptw->tw_md5_key = NULL;
+-			if (static_branch_unlikely(&tcp_md5_needed)) {
++			if (static_branch_unlikely(&tcp_md5_needed.key)) {
+ 				struct tcp_md5sig_key *key;
+ 
+ 				key = tp->af_specific->md5_lookup(sk, sk);
+ 				if (key) {
+ 					tcptw->tw_md5_key = kmemdup(key, sizeof(*key), GFP_ATOMIC);
+ 					BUG_ON(tcptw->tw_md5_key && !tcp_alloc_md5sig_pool());
++					atomic_inc(&tcp_md5_needed.key.key.enabled);
+ 				}
+ 			}
+ 		} while (0);
+@@ -337,11 +338,13 @@ EXPORT_SYMBOL(tcp_time_wait);
+ void tcp_twsk_destructor(struct sock *sk)
+ {
+ #ifdef CONFIG_TCP_MD5SIG
+-	if (static_branch_unlikely(&tcp_md5_needed)) {
++	if (static_branch_unlikely(&tcp_md5_needed.key)) {
+ 		struct tcp_timewait_sock *twsk = tcp_twsk(sk);
+ 
+-		if (twsk->tw_md5_key)
++		if (twsk->tw_md5_key) {
+ 			kfree_rcu(twsk->tw_md5_key, rcu);
++			static_branch_slow_dec_deferred(&tcp_md5_needed);
++		}
+ 	}
+ #endif
+ }
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 78b654ff421b..9e12845a8758 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -766,7 +766,7 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
+ 
+ 	*md5 = NULL;
+ #ifdef CONFIG_TCP_MD5SIG
+-	if (static_branch_unlikely(&tcp_md5_needed) &&
++	if (static_branch_unlikely(&tcp_md5_needed.key) &&
+ 	    rcu_access_pointer(tp->md5sig_info)) {
+ 		*md5 = tp->af_specific->md5_lookup(sk, sk);
+ 		if (*md5) {
+@@ -922,7 +922,7 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
+ 
+ 	*md5 = NULL;
+ #ifdef CONFIG_TCP_MD5SIG
+-	if (static_branch_unlikely(&tcp_md5_needed) &&
++	if (static_branch_unlikely(&tcp_md5_needed.key) &&
+ 	    rcu_access_pointer(tp->md5sig_info)) {
+ 		*md5 = tp->af_specific->md5_lookup(sk, sk);
+ 		if (*md5) {
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index e54eee80ce5f..cb891a71db0d 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -658,12 +658,11 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
+ 	if (ipv6_addr_v4mapped(&sin6->sin6_addr))
+ 		return tcp_md5_do_add(sk, (union tcp_md5_addr *)&sin6->sin6_addr.s6_addr32[3],
+ 				      AF_INET, prefixlen, l3index, flags,
+-				      cmd.tcpm_key, cmd.tcpm_keylen,
+-				      GFP_KERNEL);
++				      cmd.tcpm_key, cmd.tcpm_keylen);
+ 
+ 	return tcp_md5_do_add(sk, (union tcp_md5_addr *)&sin6->sin6_addr,
+ 			      AF_INET6, prefixlen, l3index, flags,
+-			      cmd.tcpm_key, cmd.tcpm_keylen, GFP_KERNEL);
++			      cmd.tcpm_key, cmd.tcpm_keylen);
+ }
+ 
+ static int tcp_v6_md5_hash_headers(struct tcp_md5sig_pool *hp,
+@@ -1359,9 +1358,8 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
+ 		 * memory, then we end up not copying the key
+ 		 * across. Shucks.
+ 		 */
+-		tcp_md5_do_add(newsk, (union tcp_md5_addr *)&newsk->sk_v6_daddr,
+-			       AF_INET6, 128, l3index, key->flags, key->key, key->keylen,
+-			       sk_gfp_mask(sk, GFP_ATOMIC));
++		tcp_md5_key_copy(newsk, (union tcp_md5_addr *)&newsk->sk_v6_daddr,
++			       AF_INET6, 128, l3index, key);
+ 	}
+ #endif
+ 
 -- 
 2.36.1
 
