@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD739C00140
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41A8C3F6B0
 	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 20:16:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239874AbiGZUQW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 16:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51794 "EHLO
+        id S239881AbiGZUQX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 16:16:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239842AbiGZUQQ (ORCPT
+        with ESMTP id S239853AbiGZUQV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 16:16:16 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E70E222AA
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:10 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id v67-20020a1cac46000000b003a1888b9d36so40344wme.0
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:09 -0700 (PDT)
+        Tue, 26 Jul 2022 16:16:21 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8F832B81
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:12 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id v13so13833754wru.12
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:16:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=pXanxk9kkSH5IzZhG+IrzCgXJT5SaMoTxGMdgKi88Ao=;
-        b=aOTdaJR7DRCHTIhcRrNUKxttpjYsSYzUN56FfDWDFzWSCG98auk7DNhiske4HaC3zG
-         cS6h+UesI+/EQl/sHZpkP7AsceKUhdlWOjCCO3rXGmOU7O6FegMwB4L8sFyYH9uL0KLU
-         UKsGcQMbRLxqcQ+tphoCYKCx6EqnRaRP9idnG+bIn08ahovsjwxGm6YMATBHXTlbjgiS
-         fWk6KsehukN3u1IN5gy6zWnI59fMaGzddwvFRpExwBo5b4rlTSqWtz8XwLEYXUS0WeZ/
-         kE0+yP1n5ukWYeqlSd0NDKImOFfrKY9RToA5QaWiBhAsjw6KRTL8ApD3o9t+OickTtBz
-         ysBw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=pdEmRQDkktxyj133IoEXqOneVb48tak5Ed7jC2tmPss=;
+        b=NoSqp+M8tdLz1sYdFPgF7sEQXLSNybM3qMMiMI+8XdUdNnT/1ziUDTfJOPtzM2pf7B
+         60eDbGh5QPE2+3VRM5/liw90GlJa4dRAWD35fnQU46tW6uTxxrgvQzAkvdyK7YDJ2BLL
+         S3yc9XpH15mLCEnOqP5tHgO4eztj0vRCO/Lc/AY/QTEDwvOWN66UwOj7wv9/l0cdHWwH
+         Z1elrL0lZEiHkoxXg3msEDCkqQxfTT0XD+8ar1CJzEgclE0dYP0wH9K0jeeflUXT27Ct
+         S51HGosABXnq1obGhEZfcrAIwK2QXaf24/I71b2B99nO+tCN3RNfD/A+47RYIDlq+xYO
+         I1fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pXanxk9kkSH5IzZhG+IrzCgXJT5SaMoTxGMdgKi88Ao=;
-        b=GJ3/Zo9MMmG8TlsH9jkCqbExDDUkYsU50cmmMaBxKlxQ12Y94VYkWDC5oN1NHP4+pS
-         U0oK4XE3W5pSw4BlyG5lWmmKF2iLnhuc41qLTLxD1EOkMxEGtuZhy5pFHF7+f2k+D5rS
-         BW52wrmsQurNmsy1bFOer6opkfSSLNcAesoOsWehPd47qzrRLVx5Hyo2kSm3iXjCuS9M
-         oIXH4Z6ZgCXZzOSOTzeasHmguCvBtqssrWGwcfnXMwzuyOtdfDGJssRQInWAXo1jIf2m
-         tRwhzrjFbRUHjZNoV9I93hqP3lvO7mET1pjPEXDqW7RmI3Z18tnzUtafc/jgRk1/DbDn
-         HG1Q==
-X-Gm-Message-State: AJIora8cp8r3DOixJhEBviiJPxG1g4u90vmROKz82ovXYqHc5n+LXCXQ
-        dL5TctFk0cHpsJF+4ENfsxCD4w==
-X-Google-Smtp-Source: AGRyM1vN2dLizczxw8G9+ojw1TT85gS1AkDW1LlK5/c4Vuq3soc//mjpjF9+MdBOjk0uYiaWbIipjg==
-X-Received: by 2002:a05:600c:2212:b0:3a3:328:5bd2 with SMTP id z18-20020a05600c221200b003a303285bd2mr568174wml.146.1658866568443;
-        Tue, 26 Jul 2022 13:16:08 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=pdEmRQDkktxyj133IoEXqOneVb48tak5Ed7jC2tmPss=;
+        b=VcPFGyfxKhsAcRNiAsY8Zom+KBdzinbrXYvY7ngB3EcPtzcKdupAD2KACYwZTvTQ3B
+         +IKGAK6lM/XmPkDkQymlAMZCKCpm1urE8ziuvCPDJ16D4IoSFS2tp1lB3VEawru8PeeC
+         wlB0WGqW+Jsb8Noo/6BLOHPva8kvos9KEAVkf8TDAJqkAHP/QPMxkXpP0LcsmKIO12Ih
+         yVKHwAqTfUsL+0Pi9B+EH7agjDbr06cVQfPofdUmqVLJL46b6+MK9z5IlqMUOD/XAU+h
+         YiGDgdPL3caUyh0mEYQRczjF36RqKqPUN3hLkZKixqZNrO4eVeFr/UzrQaB99Aib1hwL
+         5/7A==
+X-Gm-Message-State: AJIora821JFQ1Bc8n6RnS7f1s4TFKGX4nNmWaTqd2ledujR9JO/CpPgF
+        MrsM9dggDV9tFT98+OIomLVTcw==
+X-Google-Smtp-Source: AGRyM1uQRBcHLiZ1Y9LPpdW7z50O+MQLPM9/unZYKIWc040bRCMVRnpd/+MrBgLnu3o3KKE4D15qKg==
+X-Received: by 2002:a5d:5581:0:b0:20f:fc51:7754 with SMTP id i1-20020a5d5581000000b0020ffc517754mr12412279wrv.413.1658866571059;
+        Tue, 26 Jul 2022 13:16:11 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id m6-20020a05600c3b0600b003a320e6f011sm28073wms.1.2022.07.26.13.16.07
+        by smtp.gmail.com with ESMTPSA id m6-20020a05600c3b0600b003a320e6f011sm28073wms.1.2022.07.26.13.16.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 13:16:08 -0700 (PDT)
+        Tue, 26 Jul 2022 13:16:10 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
         Paolo Abeni <pabeni@redhat.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 1/6] crypto: Introduce crypto_pool
-Date:   Tue, 26 Jul 2022 21:15:55 +0100
-Message-Id: <20220726201600.1715505-2-dima@arista.com>
+Subject: [PATCH 3/6] net/tcp: Separate tcp_md5sig_info allocation into tcp_md5sig_info_add()
+Date:   Tue, 26 Jul 2022 21:15:57 +0100
+Message-Id: <20220726201600.1715505-4-dima@arista.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220726201600.1715505-1-dima@arista.com>
 References: <20220726201600.1715505-1-dima@arista.com>
@@ -78,384 +78,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Introduce a per-CPU pool of async crypto requests that can be used
-in bh-disabled contexts (designed with net RX/TX softirqs as users in
-mind). Allocation can sleep and is a slow-path.
-Initial implementation has only ahash as a backend and a fix-sized array
-of possible algorithms used in parallel.
+Add a helper to allocate tcp_md5sig_info, that will help later to
+do/allocate things when info allocated, once per socket.
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- crypto/Kconfig        |   6 +
- crypto/Makefile       |   1 +
- crypto/crypto_pool.c  | 287 ++++++++++++++++++++++++++++++++++++++++++
- include/crypto/pool.h |  34 +++++
- 4 files changed, 328 insertions(+)
- create mode 100644 crypto/crypto_pool.c
- create mode 100644 include/crypto/pool.h
+ net/ipv4/tcp_ipv4.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bb427a835e44..aeddaa3dcc77 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -2128,6 +2128,12 @@ config CRYPTO_STATS
- config CRYPTO_HASH_INFO
- 	bool
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 0c83780dc9bf..55e4092209a5 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1152,6 +1152,24 @@ struct tcp_md5sig_key *tcp_v4_md5_lookup(const struct sock *sk,
+ }
+ EXPORT_SYMBOL(tcp_v4_md5_lookup);
  
-+config CRYPTO_POOL
-+	tristate "Per-CPU crypto pool"
-+	default n
-+	help
-+	  Per-CPU pool of crypto requests ready for usage in atomic contexts.
-+
- source "drivers/crypto/Kconfig"
- source "crypto/asymmetric_keys/Kconfig"
- source "certs/Kconfig"
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 167c004dbf4f..6d1d9801b76b 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -63,6 +63,7 @@ obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
- cryptomgr-y := algboss.o testmgr.o
- 
- obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
-+obj-$(CONFIG_CRYPTO_POOL) += crypto_pool.o
- obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
- crypto_user-y := crypto_user_base.o
- crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
-diff --git a/crypto/crypto_pool.c b/crypto/crypto_pool.c
-new file mode 100644
-index 000000000000..c668c02499b7
---- /dev/null
-+++ b/crypto/crypto_pool.c
-@@ -0,0 +1,287 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include <crypto/pool.h>
-+#include <linux/kref.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/percpu.h>
-+#include <linux/workqueue.h>
-+
-+static unsigned long scratch_size = DEFAULT_CRYPTO_POOL_SCRATCH_SZ;
-+static DEFINE_PER_CPU(void *, crypto_pool_scratch);
-+
-+struct crypto_pool_entry {
-+	struct ahash_request * __percpu *req;
-+	const char			*alg;
-+	struct kref			kref;
-+	bool				needs_key;
-+};
-+
-+#define CPOOL_SIZE (PAGE_SIZE/sizeof(struct crypto_pool_entry))
-+static struct crypto_pool_entry cpool[CPOOL_SIZE];
-+static int last_allocated;
-+static DEFINE_MUTEX(cpool_mutex);
-+
-+static int crypto_pool_scratch_alloc(void)
++static int tcp_md5sig_info_add(struct sock *sk, gfp_t gfp)
 +{
-+	int cpu;
++	struct tcp_sock *tp = tcp_sk(sk);
++	struct tcp_md5sig_info *md5sig;
 +
-+	lockdep_assert_held(&cpool_mutex);
++	if (rcu_dereference_protected(tp->md5sig_info, lockdep_sock_is_held(sk)))
++		return 0;
 +
-+	for_each_possible_cpu(cpu) {
-+		void *scratch = per_cpu(crypto_pool_scratch, cpu);
-+
-+		if (scratch)
-+			continue;
-+
-+		scratch = kmalloc_node(scratch_size, GFP_KERNEL,
-+				       cpu_to_node(cpu));
-+		if (!scratch)
-+			return -ENOMEM;
-+		per_cpu(crypto_pool_scratch, cpu) = scratch;
-+	}
-+	return 0;
-+}
-+
-+static void crypto_pool_scratch_free(void)
-+{
-+	int cpu;
-+
-+	lockdep_assert_held(&cpool_mutex);
-+
-+	for_each_possible_cpu(cpu) {
-+		void *scratch = per_cpu(crypto_pool_scratch, cpu);
-+
-+		if (!scratch)
-+			continue;
-+		per_cpu(crypto_pool_scratch, cpu) = NULL;
-+		kfree(scratch);
-+	}
-+}
-+
-+static int __cpool_alloc_ahash(struct crypto_pool_entry *e, const char *alg)
-+{
-+	struct crypto_ahash *hash;
-+	int cpu, ret = -ENOMEM;
-+
-+	e->alg = kstrdup(alg, GFP_KERNEL);
-+	if (!e->alg)
++	md5sig = kmalloc(sizeof(*md5sig), gfp);
++	if (!md5sig)
 +		return -ENOMEM;
 +
-+	e->req = alloc_percpu(struct ahash_request *);
-+	if (!e->req)
-+		goto out_free_alg;
-+
-+	hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(hash)) {
-+		ret = PTR_ERR(hash);
-+		goto out_free_req;
-+	}
-+
-+	/* If hash has .setkey(), allocate ahash per-cpu, not only request */
-+	e->needs_key = crypto_ahash_get_flags(hash) & CRYPTO_TFM_NEED_KEY;
-+
-+	for_each_possible_cpu(cpu) {
-+		struct ahash_request *req;
-+
-+		if (!hash)
-+			hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
-+		if (IS_ERR(hash))
-+			goto out_free;
-+
-+		req = ahash_request_alloc(hash, GFP_KERNEL);
-+		if (!req)
-+			goto out_free;
-+
-+		ahash_request_set_callback(req, 0, NULL, NULL);
-+
-+		*per_cpu_ptr(e->req, cpu) = req;
-+
-+		if (e->needs_key)
-+			hash = NULL;
-+	}
-+	kref_init(&e->kref);
-+	return 0;
-+
-+out_free:
-+	if (!IS_ERR_OR_NULL(hash) && e->needs_key)
-+		crypto_free_ahash(hash);
-+
-+	for_each_possible_cpu(cpu) {
-+		if (*per_cpu_ptr(e->req, cpu) == NULL)
-+			break;
-+		hash = crypto_ahash_reqtfm(*per_cpu_ptr(e->req, cpu));
-+		ahash_request_free(*per_cpu_ptr(e->req, cpu));
-+		if (e->needs_key) {
-+			crypto_free_ahash(hash);
-+			hash = NULL;
-+		}
-+	}
-+
-+	if (hash)
-+		crypto_free_ahash(hash);
-+out_free_req:
-+	free_percpu(e->req);
-+out_free_alg:
-+	kfree(e->alg);
-+	e->alg = NULL;
-+	return ret;
-+}
-+
-+/**
-+ * crypto_pool_alloc_ahash - allocates pool for ahash requests
-+ * @alg: name of async hash algorithm
-+ */
-+int crypto_pool_alloc_ahash(const char *alg)
-+{
-+	unsigned int i;
-+	int err;
-+
-+	/* slow-path */
-+	mutex_lock(&cpool_mutex);
-+	err = crypto_pool_scratch_alloc();
-+	if (err)
-+		goto out;
-+
-+	for (i = 0; i < last_allocated; i++) {
-+		if (cpool[i].alg && !strcmp(cpool[i].alg, alg)) {
-+			kref_get(&cpool[i].kref);
-+			goto out;
-+		}
-+	}
-+
-+	for (i = 0; i < last_allocated; i++) {
-+		if (!cpool[i].alg)
-+			break;
-+	}
-+	if (i >= CPOOL_SIZE) {
-+		err = -ENOSPC;
-+		goto out;
-+	}
-+
-+	err = __cpool_alloc_ahash(&cpool[i], alg);
-+	if (!err && last_allocated <= i)
-+		last_allocated++;
-+out:
-+	mutex_unlock(&cpool_mutex);
-+	return err ?: (int)i;
-+}
-+EXPORT_SYMBOL_GPL(crypto_pool_alloc_ahash);
-+
-+static void __cpool_free_entry(struct crypto_pool_entry *e)
-+{
-+	struct crypto_ahash *hash = NULL;
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu) {
-+		if (*per_cpu_ptr(e->req, cpu) == NULL)
-+			continue;
-+
-+		hash = crypto_ahash_reqtfm(*per_cpu_ptr(e->req, cpu));
-+		ahash_request_free(*per_cpu_ptr(e->req, cpu));
-+		if (e->needs_key) {
-+			crypto_free_ahash(hash);
-+			hash = NULL;
-+		}
-+	}
-+	if (hash)
-+		crypto_free_ahash(hash);
-+	free_percpu(e->req);
-+	kfree(e->alg);
-+	memset(e, 0, sizeof(*e));
-+}
-+
-+static void cpool_cleanup_work_cb(struct work_struct *work)
-+{
-+	unsigned int i;
-+	bool free_scratch = true;
-+
-+	mutex_lock(&cpool_mutex);
-+	for (i = 0; i < last_allocated; i++) {
-+		if (kref_read(&cpool[i].kref) > 0) {
-+			free_scratch = false;
-+			continue;
-+		}
-+		if (!cpool[i].alg)
-+			continue;
-+		__cpool_free_entry(&cpool[i]);
-+	}
-+	if (free_scratch)
-+		crypto_pool_scratch_free();
-+	mutex_unlock(&cpool_mutex);
-+}
-+
-+static DECLARE_WORK(cpool_cleanup_work, cpool_cleanup_work_cb);
-+static void cpool_schedule_cleanup(struct kref *kref)
-+{
-+	schedule_work(&cpool_cleanup_work);
-+}
-+
-+/**
-+ * crypto_pool_release - decreases number of users for a pool. If it was
-+ * the last user of the pool, releases any memory that was consumed.
-+ * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
-+ */
-+void crypto_pool_release(unsigned int id)
-+{
-+	if (WARN_ON_ONCE(id > last_allocated || !cpool[id].alg))
-+		return;
-+
-+	/* slow-path */
-+	kref_put(&cpool[id].kref, cpool_schedule_cleanup);
-+}
-+EXPORT_SYMBOL_GPL(crypto_pool_release);
-+
-+/**
-+ * crypto_pool_add - increases number of users (refcounter) for a pool
-+ * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
-+ */
-+void crypto_pool_add(unsigned int id)
-+{
-+	if (WARN_ON_ONCE(id > last_allocated || !cpool[id].alg))
-+		return;
-+	kref_get(&cpool[id].kref);
-+}
-+EXPORT_SYMBOL_GPL(crypto_pool_add);
-+
-+/**
-+ * crypto_pool_get - disable bh and start using crypto_pool
-+ * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
-+ * @c: returned crypto_pool for usage (uninitialized on failure)
-+ */
-+int crypto_pool_get(unsigned int id, struct crypto_pool *c)
-+{
-+	struct crypto_pool_ahash *ret = (struct crypto_pool_ahash *)c;
-+
-+	local_bh_disable();
-+	if (WARN_ON_ONCE(id > last_allocated || !cpool[id].alg)) {
-+		local_bh_enable();
-+		return -EINVAL;
-+	}
-+	ret->req = *this_cpu_ptr(cpool[id].req);
-+	ret->base.scratch = this_cpu_read(crypto_pool_scratch);
++	sk_gso_disable(sk);
++	INIT_HLIST_HEAD(&md5sig->head);
++	rcu_assign_pointer(tp->md5sig_info, md5sig);
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_pool_get);
 +
-+/**
-+ * crypto_pool_algo - return algorithm of crypto_pool
-+ * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
-+ * @buf: buffer to return name of algorithm
-+ * @buf_len: size of @buf
-+ */
-+size_t crypto_pool_algo(unsigned int id, char *buf, size_t buf_len)
-+{
-+	size_t ret = 0;
+ /* This can be called on a newly created socket, from other files */
+ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 		   int family, u8 prefixlen, int l3index, u8 flags,
+@@ -1182,17 +1200,11 @@ int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
+ 		return 0;
+ 	}
+ 
++	if (tcp_md5sig_info_add(sk, gfp))
++		return -ENOMEM;
 +
-+	/* slow-path */
-+	mutex_lock(&cpool_mutex);
-+	if (cpool[id].alg)
-+		ret = strscpy(buf, cpool[id].alg, buf_len);
-+	mutex_unlock(&cpool_mutex);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_pool_algo);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Per-CPU pool of crypto requests");
-diff --git a/include/crypto/pool.h b/include/crypto/pool.h
-new file mode 100644
-index 000000000000..2c61aa45faff
---- /dev/null
-+++ b/include/crypto/pool.h
-@@ -0,0 +1,34 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#ifndef _CRYPTO_POOL_H
-+#define _CRYPTO_POOL_H
-+
-+#include <crypto/hash.h>
-+
-+#define DEFAULT_CRYPTO_POOL_SCRATCH_SZ	128
-+
-+struct crypto_pool {
-+	void *scratch;
-+};
-+
-+/*
-+ * struct crypto_pool_ahash - per-CPU pool of ahash_requests
-+ * @base: common members that can be used by any async crypto ops
-+ * @req: pre-allocated ahash request
-+ */
-+struct crypto_pool_ahash {
-+	struct crypto_pool base;
-+	struct ahash_request *req;
-+};
-+
-+int crypto_pool_alloc_ahash(const char *alg);
-+void crypto_pool_add(unsigned int id);
-+void crypto_pool_release(unsigned int id);
-+
-+int crypto_pool_get(unsigned int id, struct crypto_pool *c);
-+static inline void crypto_pool_put(void)
-+{
-+	local_bh_enable();
-+}
-+size_t crypto_pool_algo(unsigned int id, char *buf, size_t buf_len);
-+
-+#endif /* _CRYPTO_POOL_H */
+ 	md5sig = rcu_dereference_protected(tp->md5sig_info,
+ 					   lockdep_sock_is_held(sk));
+-	if (!md5sig) {
+-		md5sig = kmalloc(sizeof(*md5sig), gfp);
+-		if (!md5sig)
+-			return -ENOMEM;
+-
+-		sk_gso_disable(sk);
+-		INIT_HLIST_HEAD(&md5sig->head);
+-		rcu_assign_pointer(tp->md5sig_info, md5sig);
+-	}
+ 
+ 	key = sock_kmalloc(sk, sizeof(*key), gfp | __GFP_ZERO);
+ 	if (!key)
 -- 
 2.36.1
 
