@@ -2,89 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DACDC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 01:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6B5CCA48A
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 01:10:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230015AbiGZBAT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 21:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
+        id S231469AbiGZBKT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 21:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiGZBAT (ORCPT
+        with ESMTP id S229792AbiGZBKS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 21:00:19 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8C217A92;
-        Mon, 25 Jul 2022 18:00:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 01D95B810A4;
-        Tue, 26 Jul 2022 01:00:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CEFCC341C6;
-        Tue, 26 Jul 2022 01:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658797215;
-        bh=2xklpD9zOkDaPX/6lcoq8t9QAqRhI7D956EnkKkQcPk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PlT//DjOSIFZ94KFBmwxgN/i0oxKfabFQlFwF5CINBZ1C03OWg+ecfUA2FEjHfhPc
-         8ovGhrAq+bq2WU153Ku/jUKaqBDmrRjzsh1H2KsAgL9++JbXDLIuGmn9/RcZLts51q
-         3xQJKDiB1D3yafgHLJeQ+OR5DqE39ujJ8t/RlKk3Ovw2VY02oQnEjK480TpHOtBi2n
-         N4nEECKZN2YHSrInrClTa5HUiC5UnbNgLBUSa61mSee/b2DLB151/jxXMSCndxCIby
-         F1PRUbH1kpIgaGPNXUc5VaF3zyqUEj1YfGtUGPhHeuoPpKEudDb9VNdqEpRDuphWmf
-         x6PwiVroSD/cQ==
-Date:   Mon, 25 Jul 2022 18:00:13 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ardb@kernel.org
-Subject: Re: [PATCH v3 2/3] crypto: lib - move __crypto_xor into utils
-Message-ID: <Yt88nXvui0Q+5MQu@sol.localdomain>
-References: <20220725183636.97326-1-ebiggers@kernel.org>
- <20220725183636.97326-3-ebiggers@kernel.org>
- <Yt8UnWCvoe8dKihc@zx2c4.com>
+        Mon, 25 Jul 2022 21:10:18 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8112E63EF
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 18:10:17 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id l188so3845427oia.4
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 18:10:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=P//9YslxSg0bCM7OInCyxs68DQsmujiF20lhQqTd+fM=;
+        b=JTZedKGTrcWe/Ub4nKLqeliWPkRxdH6OPf5Z7jQiK5zuRFyxCyRmNEDhV9AMzjEtSe
+         OfGfrtNfSeDsNyhIYprFegPPxuANescRMesq46uNLSFbx132a5WN5QWVG9zAKV3chSwo
+         muuHWikeXyynoW2jBAfba10TMxAChvFEEbNJJsiRA7+B7YSSZUGWmDLaw64BRFKsmr+N
+         P7Z9pkkgf1x+eOLoKwlh2F0QA0AxCdo81ewgO3k8Ve1yzbC5bufa5aC2YjLga7H/2EsI
+         tzX9A8d2xMfSGwScneuCGB/z7dJY/+7FYD4ZBLnxyTIgI99lx3gSB93UbloKwWRL3pGe
+         rj0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=P//9YslxSg0bCM7OInCyxs68DQsmujiF20lhQqTd+fM=;
+        b=4uwQxWNvURcOdfP7OaNapA/b4qH2fQdAy1dna1qoOD5cH4SdNWXF1Lwy2DSiWrjMcR
+         xzgQbW7GUYpKKDecNHQj8+QBw0XJOFfc3uQTSzMs2wSao9Tq4BvHG1s0/nWKIi3zWYNH
+         zN0cz/7sJpWI0pPLqQ2IU7SwlPBnZ0FBsMKN3q7IofngGFgV5DLa1v3FiZBWU+NsP2vZ
+         8LnQj6Di/uJ52UMej4HJ9X19PgqLOBvQVRDT0/BDVH95JanoQQUOBXtYccrYdcz6lKIh
+         wGEoInUtDUaj7lrwy00+t5kTY64jJo30oc9rpgu9R+RzNC56CLgHdLkb3aTWtCs/cBdq
+         saGg==
+X-Gm-Message-State: AJIora8sJ7jMK30LTd8sVKQJ+dsd581q22QEYL6mebUEfqU7H3X0wxMX
+        +ePTywGaUi2k5ayAzCIKPmOU32CguqTkHIwdUic0mseY
+X-Google-Smtp-Source: AGRyM1sLAXqvTUzm/QUqgW1tI5ulvclyuwh658EK2d9nP+ocqw4QSNWkChDqNZXZLdFm3+Sa4ErBcN7cPJCSYZjEn8E=
+X-Received: by 2002:a05:6808:1313:b0:33a:b979:b2c6 with SMTP id
+ y19-20020a056808131300b0033ab979b2c6mr8346963oiv.37.1658797816867; Mon, 25
+ Jul 2022 18:10:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yt8UnWCvoe8dKihc@zx2c4.com>
+References: <20220725225728.824128-1-Jason@zx2c4.com> <20220725232810.843433-1-Jason@zx2c4.com>
+In-Reply-To: <20220725232810.843433-1-Jason@zx2c4.com>
+From:   Mark Harris <mark.hsj@gmail.com>
+Date:   Mon, 25 Jul 2022 18:10:06 -0700
+Message-ID: <CAMdZqKH=9mDhoW_gpL-pUEQAGuN=orc1doudyAuHdoPc7O53RQ@mail.gmail.com>
+Subject: Re: [PATCH v2] arc4random: simplify design for better safety
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     libc-alpha@sourceware.org, Florian Weimer <fweimer@redhat.com>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 12:09:33AM +0200, Jason A. Donenfeld wrote:
-> On Mon, Jul 25, 2022 at 11:36:35AM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > CRYPTO_LIB_CHACHA depends on CRYPTO for __crypto_xor, defined in
-> > crypto/algapi.c.  This is a layering violation because the dependencies
-> > should only go in the other direction (crypto/ => lib/crypto/).  Also
-> > the correct dependency would be CRYPTO_ALGAPI, not CRYPTO.  Fix this by
-> > moving __crypto_xor into the utils module in lib/crypto/.
-> > 
-> > Note that CRYPTO_LIB_CHACHA_GENERIC selected XOR_BLOCKS, which is
-> > unrelated and unnecessary.  It was perhaps thought that XOR_BLOCKS was
-> > needed for __crypto_xor, but that's not the case.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> 
-> Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> 
-> With one small question:
-> 
-> > --- /dev/null
-> > +++ b/lib/crypto/utils.c
-> > @@ -0,0 +1,88 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + * Crypto library utility functions
-> > + *
-> > + * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Didn't Ard basically write the crypto_xor function in its current form?
-> I seem to remember some pretty hardcore refactoring he did a while back.
-> 
-> Jason
+Jason A. Donenfeld wrote:
+> +      l = __getrandom_nocancel (p, n, 0);
+> +      if (l > 0)
+> +       {
+> +         if ((size_t) l == n)
+> +           return; /* Done reading, success. */
+> +         p = (uint8_t *) p + l;
+> +         n -= l;
+> +         continue; /* Interrupted by a signal; keep going. */
+> +       }
+> +      else if (l == 0)
+> +       arc4random_getrandom_failure (); /* Weird, should never happen. */
+> +      else if (errno == ENOSYS)
+> +       {
+> +         have_getrandom = false;
+> +         break; /* No syscall, so fallback to /dev/urandom. */
+> +       }
+> +      arc4random_getrandom_failure (); /* Unknown error, should never happen. */
 
-I think that's fair to say, based on git blame.  I just copied the copyright
-statement from the top of crypto/algapi.c.
+Isn't EINTR also possible?  Aborting in that case does not seem reasonable.
 
-- Eric
+Also the __getrandom_nocancel function does not set errno on Linux; it
+just returns INTERNAL_SYSCALL_CALL (getrandom, buf, buflen, flags).
+So unless that is changed, it doesn't look like this ENOSYS check will
+detect old Linux kernels.
+
+> +      struct pollfd pfd = { .events = POLLIN };
+> +      pfd.fd = TEMP_FAILURE_RETRY (
+> +         __open64_nocancel ("/dev/random", O_RDONLY | O_CLOEXEC | O_NOCTTY));
+> +      if (pfd.fd < 0)
+> +       arc4random_getrandom_failure ();
+> +      if (__poll (&pfd, 1, -1) < 0)
+> +       arc4random_getrandom_failure ();
+> +      if (__close_nocancel (pfd.fd) < 0)
+> +       arc4random_getrandom_failure ();
+
+The TEMP_FAILURE_RETRY handles EINTR on open, but __poll can also
+result in EINTR.
+
+
+ - Mark
