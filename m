@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C30DCC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 06:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC14CCA48C
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 06:20:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237956AbiGZGT4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 02:19:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
+        id S237861AbiGZGUi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 02:20:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237847AbiGZGS0 (ORCPT
+        with ESMTP id S234878AbiGZGSh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 02:18:26 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC14E2A97B;
-        Mon, 25 Jul 2022 23:16:23 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id c72so13619612edf.8;
-        Mon, 25 Jul 2022 23:16:23 -0700 (PDT)
+        Tue, 26 Jul 2022 02:18:37 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27B982AC4A;
+        Mon, 25 Jul 2022 23:16:29 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id oy13so24340015ejb.1;
+        Mon, 25 Jul 2022 23:16:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TgzYWrC/GzzcSOAmciB9ptuiuFME4j1XZrTyvjcnyJY=;
-        b=HQdPE3ByzMMswEAtgvo4aPcFTSMjHDrkxEw8zaDhH5I4qUeqv/RytWklRWd50uZJGh
-         y1Kakxvc3rhX4zi6Ni45fd1f254sAvupRDJuzm7STxsfoENPQLYgV43FAlvbQs9vGCPZ
-         b+4BF0beqTWuTjZoyDONTVwYzI/cszl/hGDuNXiE/6SRQ5BVE+zXjKau5sma3z8Mum+q
-         UD2SmNthsXGIJ6nsigDNx7zjMafkWykEIZKAskVf47mOW0wumdHUHMoswXbIuXPkLAro
-         Yc0P1zWKlcTU0ezY+swSov/ZLQ3nT4Ob5L0CJgIb7pSrdg5gsOYhVnmzr3fYX36iRr3b
-         ZJIA==
+        bh=RVPT2+h1JMxni3JUffui8/RQgc3zJLoReDrrKPMolQw=;
+        b=UJePVQYo65M9v2USs8EFHDIFAH1XYBPB10fkxQ9aTwpgidrBI+zvqyXofyn5kWFiGP
+         nQc0kakV0imfSUre859iZo/PHAXVXJyjPXdVs/+xVGdLEeDfVfcTkjKUaMBaAad6ckwO
+         ttm1uTyUl1EpBvyqDVljePaspqKtH2oDdi45DlpHSQevWSNhC1hAOXaLgxnmkYL5zAvT
+         gHZ6Ff2f80xs2Q2L9VIQEBSzXIA95jqj5hWKSR9jRBBBW+cy8VL3sRT0N0epHi16dBcM
+         G9bv/lSy2f26xB6CsRfdnKl1x0SRnDBOSEvFKUZNTC/a0whMYFUR7bdIX9BetQeIEHdJ
+         5PRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TgzYWrC/GzzcSOAmciB9ptuiuFME4j1XZrTyvjcnyJY=;
-        b=bb1m0NKJWqIqYrJTQdGWE4GW9DIFPY7LDRBYcv+j9hDht34YXF+LgXDmR4sxLnK2u/
-         jhS7jCEXru8PJqcj3g9kl0KzK3PW6e5RoDTDOuh7hldifZFlpK0mZGT/xbi4BKgkshcn
-         blL8FtJUe3ZQQBV8ArIKGpYxCSeue6KGqn+iFmKsd+mEsjhKzXdUvLrN9NqidUQYzakw
-         ipAawvKfrmDQOyqBbl1mr5Dn+4uRZrqzowVw5MghNCjI9zkZrYRyh3MkvHbx0HsDkWe8
-         yoyILXRBMoVjVmpiLN/ttc0mLG/X7xeWhD6eVURhldcDUfxAKxz/9l/6f/X5ozDdh7Tn
-         ThmA==
-X-Gm-Message-State: AJIora/ESXbV3LHhCBlfIwqNd34wpQHrH9xXsy9GIdBQjLJWbnMilIdl
-        WLiJmqnbsYMEIPBeb0iaECM=
-X-Google-Smtp-Source: AGRyM1tS3tW8ryMCQmJ8v6DOBxTFO7bMroJ1N/k2bQkD0oHy+6eEfaQ/a/CV188zUVxpCxVcHGgrJg==
-X-Received: by 2002:aa7:d150:0:b0:43c:864c:51fc with SMTP id r16-20020aa7d150000000b0043c864c51fcmr167417edo.138.1658816183608;
-        Mon, 25 Jul 2022 23:16:23 -0700 (PDT)
+        bh=RVPT2+h1JMxni3JUffui8/RQgc3zJLoReDrrKPMolQw=;
+        b=YNDSeYHO9HiOoxr8Yw7ex9DErRlHw3qFKNMJ9DCHLaMm6FUMMxv2TFoFnX7W47J+5T
+         4rl+PArM5CQm/3J9Ukexhg26dmSyvlNp7Js5gUzfuWwTj19GuMCp02zYiKAZirqFvvGN
+         0+qSd9pUDNrOKmQJejrI4RbiG3ey/bHwoNvBfjVsj9TrEkq83QKu3okaF9rpxgBeMdlR
+         +UM+8rF3iPJoFRZ9kyOayVQIuXCU8hV7uRGEKmcwTZu0LMjY2ClipFB+puFw+04OEX7q
+         Uwp4bNzbp6ejHUHLgQYsUloRt9ZX4ZarK11yyMZD0C8PBGE1IK+YIvsnxr725dr7wzDX
+         RhRw==
+X-Gm-Message-State: AJIora9BIS7XkRbImY0iB3oPuE3up5LNbXJygGlLF1KrRttcFIPblgwx
+        qkMX45L6y8ryeEr760agtFI=
+X-Google-Smtp-Source: AGRyM1udI1N3XZr7wRnMZyHTJFEQ1upWuDSWy4nGkfJ9oOIeeAUuG8UCEDdTH3syR5NF36A6gtA+nA==
+X-Received: by 2002:a17:907:628a:b0:72f:678d:6047 with SMTP id nd10-20020a170907628a00b0072f678d6047mr12994888ejc.456.1658816174389;
+        Mon, 25 Jul 2022 23:16:14 -0700 (PDT)
 Received: from localhost.localdomain ([2a04:241e:502:a080:2b68:36a:5a94:4ba1])
-        by smtp.gmail.com with ESMTPSA id l23-20020a056402345700b0043ba7df7a42sm8133067edc.26.2022.07.25.23.16.21
+        by smtp.gmail.com with ESMTPSA id l23-20020a056402345700b0043ba7df7a42sm8133067edc.26.2022.07.25.23.16.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 23:16:23 -0700 (PDT)
+        Mon, 25 Jul 2022 23:16:13 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -68,9 +68,9 @@ Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 24/26] tcp: authopt: Initial support for TCP_AUTHOPT_FLAG_ACTIVE
-Date:   Tue, 26 Jul 2022 09:15:26 +0300
-Message-Id: <fc5ec8892c41f91fe70eb3035268274d4382c680.1658815925.git.cdleonard@gmail.com>
+Subject: [PATCH v6 19/26] selftests: nettest: Rename md5_prefix to key_addr_prefix
+Date:   Tue, 26 Jul 2022 09:15:21 +0300
+Message-Id: <081a8ad6f656f8ae4ab78403391fb509978c971a.1658815925.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1658815925.git.cdleonard@gmail.com>
 References: <cover.1658815925.git.cdleonard@gmail.com>
@@ -80,124 +80,185 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This can be used to determine if tcp authentication option is actually
-active on the current connection.
+This is in preparation for reusing the same option for TCP-AO
 
-TCP Authentication can be enabled but inactive on a socket if keys are
-only configured for destinations other than the peer.
-
-A listen socket with authentication enabled will return other sockets
-with authentication enabled on accept(). If no key is configured for the
-peer of an accepted socket then authentication will be inactive.
-
+Reviewed-by: David Ahern <dsahern@kernel.org>
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- include/uapi/linux/tcp.h | 13 +++++++++++++
- net/ipv4/tcp_authopt.c   | 22 +++++++++++++++++++---
- 2 files changed, 32 insertions(+), 3 deletions(-)
+ tools/testing/selftests/net/nettest.c | 50 +++++++++++++--------------
+ 1 file changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index b1063e1e1b9f..5ca8aa9d5e43 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -367,10 +367,23 @@ enum tcp_authopt_flag {
- 	 *	Configure behavior of segments with TCP-AO coming from hosts for which no
- 	 *	key is configured. The default recommended by RFC is to silently accept
- 	 *	such connections.
- 	 */
- 	TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED = (1 << 2),
-+	/**
-+	 * @TCP_AUTHOPT_FLAG_ACTIVE: If authentication is active for a specific socket.
-+	 *
-+	 * TCP Authentication can be enabled but inactive on a socket if keys are
-+	 * only configured for destinations other than the peer.
-+	 *
-+	 * A listen socket with authentication enabled will return other sockets
-+	 * with authentication enabled on accept(). If no key is configured for the
-+	 * peer of an accepted socket then authentication will be inactive.
-+	 *
-+	 * This flag is readonly and the value is determined at connection establishment time.
-+	 */
-+	TCP_AUTHOPT_FLAG_ACTIVE = (1 << 3),
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index d9a6fd2cd9d3..3841e5fec7c7 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -94,17 +94,17 @@ struct sock_args {
+ 	const char *clientns;
+ 	const char *serverns;
+ 
+ 	const char *password;
+ 	const char *client_pw;
+-	/* prefix for MD5 password */
+-	const char *md5_prefix_str;
++	/* prefix for MD5/AO*/
++	const char *key_addr_prefix_str;
+ 	union {
+ 		struct sockaddr_in v4;
+ 		struct sockaddr_in6 v6;
+-	} md5_prefix;
+-	unsigned int prefix_len;
++	} key_addr;
++	unsigned int key_addr_prefix_len;
+ 	/* 0: default, -1: force off, +1: force on */
+ 	int bind_key_ifindex;
+ 
+ 	/* expected addresses and device index for connection */
+ 	const char *expected_dev;
+@@ -264,16 +264,16 @@ static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args
+ 	int rc;
+ 
+ 	md5sig.tcpm_keylen = keylen;
+ 	memcpy(md5sig.tcpm_key, args->password, keylen);
+ 
+-	if (args->prefix_len) {
++	if (args->key_addr_prefix_len) {
+ 		opt = TCP_MD5SIG_EXT;
+ 		md5sig.tcpm_flags |= TCP_MD5SIG_FLAG_PREFIX;
+ 
+-		md5sig.tcpm_prefixlen = args->prefix_len;
+-		addr = &args->md5_prefix;
++		md5sig.tcpm_prefixlen = args->key_addr_prefix_len;
++		addr = &args->key_addr;
+ 	}
+ 	memcpy(&md5sig.tcpm_addr, addr, alen);
+ 
+ 	if ((args->ifindex && args->bind_key_ifindex >= 0) || args->bind_key_ifindex >= 1) {
+ 		opt = TCP_MD5SIG_EXT;
+@@ -309,17 +309,17 @@ static int tcp_md5_remote(int sd, struct sock_args *args)
+ 	int alen;
+ 
+ 	switch (args->version) {
+ 	case AF_INET:
+ 		sin.sin_port = htons(args->port);
+-		sin.sin_addr = args->md5_prefix.v4.sin_addr;
++		sin.sin_addr = args->key_addr.v4.sin_addr;
+ 		addr = &sin;
+ 		alen = sizeof(sin);
+ 		break;
+ 	case AF_INET6:
+ 		sin6.sin6_port = htons(args->port);
+-		sin6.sin6_addr = args->md5_prefix.v6.sin6_addr;
++		sin6.sin6_addr = args->key_addr.v6.sin6_addr;
+ 		addr = &sin6;
+ 		alen = sizeof(sin6);
+ 		break;
+ 	default:
+ 		log_error("unknown address family\n");
+@@ -705,11 +705,11 @@ enum addr_type {
+ 	ADDR_TYPE_LOCAL,
+ 	ADDR_TYPE_REMOTE,
+ 	ADDR_TYPE_MCAST,
+ 	ADDR_TYPE_EXPECTED_LOCAL,
+ 	ADDR_TYPE_EXPECTED_REMOTE,
+-	ADDR_TYPE_MD5_PREFIX,
++	ADDR_TYPE_KEY_PREFIX,
  };
  
- /**
-  * struct tcp_authopt - Per-socket options related to TCP Authentication Option
-  */
-diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index 1fd665c43b5d..e162e5944ec5 100644
---- a/net/ipv4/tcp_authopt.c
-+++ b/net/ipv4/tcp_authopt.c
-@@ -545,15 +545,23 @@ static struct tcp_authopt_info *__tcp_authopt_info_get_or_create(struct sock *sk
- 	rcu_assign_pointer(tp->authopt_info, info);
- 
- 	return info;
- }
- 
--#define TCP_AUTHOPT_KNOWN_FLAGS ( \
-+/* Flags fully controlled by user: */
-+#define TCP_AUTHOPT_USER_FLAGS ( \
- 	TCP_AUTHOPT_FLAG_LOCK_KEYID | \
- 	TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID | \
- 	TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED)
- 
-+/* All known flags */
-+#define TCP_AUTHOPT_KNOWN_FLAGS ( \
-+	TCP_AUTHOPT_FLAG_LOCK_KEYID | \
-+	TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID | \
-+	TCP_AUTHOPT_FLAG_REJECT_UNEXPECTED | \
-+	TCP_AUTHOPT_FLAG_ACTIVE)
-+
- /* Like copy_from_sockptr except tolerate different optlen for compatibility reasons
-  *
-  * If the src is shorter then it's from an old userspace and the rest of dst is
-  * filled with zeros.
-  *
-@@ -618,11 +626,11 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 
- 	info = __tcp_authopt_info_get_or_create(sk);
- 	if (IS_ERR(info))
- 		return PTR_ERR(info);
- 
--	info->flags = opt.flags & TCP_AUTHOPT_KNOWN_FLAGS;
-+	info->flags = opt.flags & TCP_AUTHOPT_USER_FLAGS;
- 	if (opt.flags & TCP_AUTHOPT_FLAG_LOCK_KEYID)
- 		info->send_keyid = opt.send_keyid;
- 	if (opt.flags & TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID)
- 		info->send_rnextkeyid = opt.send_rnextkeyid;
- 
-@@ -632,10 +640,11 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
- int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ static int convert_addr(struct sock_args *args, const char *_str,
+ 			enum addr_type atype)
  {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct tcp_authopt_info *info;
- 	struct tcp_authopt_key_info *send_key;
-+	bool anykey = false;
- 	int err;
+@@ -745,32 +745,32 @@ static int convert_addr(struct sock_args *args, const char *_str,
+ 		break;
+ 	case ADDR_TYPE_EXPECTED_REMOTE:
+ 		desc = "expected remote";
+ 		addr = &args->expected_raddr;
+ 		break;
+-	case ADDR_TYPE_MD5_PREFIX:
+-		desc = "md5 prefix";
++	case ADDR_TYPE_KEY_PREFIX:
++		desc = "key addr prefix";
+ 		if (family == AF_INET) {
+-			args->md5_prefix.v4.sin_family = AF_INET;
+-			addr = &args->md5_prefix.v4.sin_addr;
++			args->key_addr.v4.sin_family = AF_INET;
++			addr = &args->key_addr.v4.sin_addr;
+ 		} else if (family == AF_INET6) {
+-			args->md5_prefix.v6.sin6_family = AF_INET6;
+-			addr = &args->md5_prefix.v6.sin6_addr;
++			args->key_addr.v6.sin6_family = AF_INET6;
++			addr = &args->key_addr.v6.sin6_addr;
+ 		} else
+ 			return 1;
  
- 	memset(opt, 0, sizeof(*opt));
- 	sock_owned_by_me(sk);
- 	err = check_sysctl_tcp_authopt();
-@@ -644,11 +653,18 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ 		sep = strchr(str, '/');
+ 		if (sep) {
+ 			*sep = '\0';
+ 			sep++;
+ 			if (str_to_uint(sep, 1, pfx_len_max,
+-					&args->prefix_len) != 0) {
+-				fprintf(stderr, "Invalid port\n");
++					&args->key_addr_prefix_len) != 0) {
++				fprintf(stderr, "Invalid prefix\n");
+ 				return 1;
+ 			}
+ 		} else {
+-			args->prefix_len = 0;
++			args->key_addr_prefix_len = 0;
+ 		}
+ 		break;
+ 	default:
+ 		log_error("unknown address type\n");
+ 		exit(1);
+@@ -835,13 +835,13 @@ static int validate_addresses(struct sock_args *args)
  
- 	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
- 	if (!info)
- 		return -ENOENT;
+ 	if (args->remote_addr_str &&
+ 	    convert_addr(args, args->remote_addr_str, ADDR_TYPE_REMOTE) < 0)
+ 		return 1;
  
--	opt->flags = info->flags & TCP_AUTHOPT_KNOWN_FLAGS;
-+	opt->flags = info->flags & TCP_AUTHOPT_USER_FLAGS;
-+
-+	rcu_read_lock();
-+	tcp_authopt_lookup_send(sock_net_tcp_authopt(sk), sk, -1, &anykey);
-+	if (anykey)
-+		opt->flags |= TCP_AUTHOPT_FLAG_ACTIVE;
-+	rcu_read_unlock();
-+
- 	/* These keyids might be undefined, for example before connect.
- 	 * Reporting zero is not strictly correct because there are no reserved
- 	 * values.
- 	 */
- 	send_key = rcu_dereference_check(info->send_key, lockdep_sock_is_held(sk));
+-	if (args->md5_prefix_str &&
+-	    convert_addr(args, args->md5_prefix_str,
+-			 ADDR_TYPE_MD5_PREFIX) < 0)
++	if (args->key_addr_prefix_str &&
++	    convert_addr(args, args->key_addr_prefix_str,
++			 ADDR_TYPE_KEY_PREFIX) < 0)
+ 		return 1;
+ 
+ 	if (args->expected_laddr_str &&
+ 	    convert_addr(args, args->expected_laddr_str,
+ 			 ADDR_TYPE_EXPECTED_LOCAL))
+@@ -2020,11 +2020,11 @@ int main(int argc, char *argv[])
+ 			break;
+ 		case 'X':
+ 			args.client_pw = optarg;
+ 			break;
+ 		case 'm':
+-			args.md5_prefix_str = optarg;
++			args.key_addr_prefix_str = optarg;
+ 			break;
+ 		case 'S':
+ 			args.use_setsockopt = 1;
+ 			break;
+ 		case 'f':
+@@ -2079,17 +2079,17 @@ int main(int argc, char *argv[])
+ 			return 1;
+ 		}
+ 	}
+ 
+ 	if (args.password &&
+-	    ((!args.has_remote_ip && !args.md5_prefix_str) ||
++	    ((!args.has_remote_ip && !args.key_addr_prefix_str) ||
+ 	      args.type != SOCK_STREAM)) {
+ 		log_error("MD5 passwords apply to TCP only and require a remote ip for the password\n");
+ 		return 1;
+ 	}
+ 
+-	if (args.md5_prefix_str && !args.password) {
++	if (args.key_addr_prefix_str && !args.password) {
+ 		log_error("Prefix range for MD5 protection specified without a password\n");
+ 		return 1;
+ 	}
+ 
+ 	if (iter == 0) {
 -- 
 2.25.1
 
