@@ -2,120 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED85C00140
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 16:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFC5C00140
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 18:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbiGZQvQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 12:51:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60280 "EHLO
+        id S230351AbiGZSg6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 14:36:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239220AbiGZQvQ (ORCPT
+        with ESMTP id S239601AbiGZSg4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 12:51:16 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C2863C1
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:51:15 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id w204so17742704oie.7
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 09:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wxzv/E+UaR2pmMOlye+KVg27MhKJv4mjPxrciwoZWQs=;
-        b=llH6sggjdXZyQd02xSh5FKxh89JH9Z1dfE8gLo/c5Sihe4ItHLHGLKYc57+vjdgIae
-         bzxnS6MmEY4SF4zoud7o47vZaBeNUI/2bT1gsbmiecoJ/s7DWxWcCjETESZSwsthEVuD
-         K/dL0hGftznRZCWuV+piEsat5oCA2ussY9bWj+gVtAIxAzFee92a+EuwRouRtMRQkqoS
-         R0lWVVE+MsqXvScHe2jtzdR/o9vwP/db4LYLRdA5wqhlkcE9q4Wfog84zsmbH6W2bunF
-         l3hsgntQfOEBDrP4qgVV8L1lTMHLCcQwQspu9s4nuujrMGQgAWf2SQB2v8NH0v3lVWZb
-         X4xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wxzv/E+UaR2pmMOlye+KVg27MhKJv4mjPxrciwoZWQs=;
-        b=5iT0RvPZ0Mb2SkIS04xNPiYBIXC5CJViCzloJluo1A0iGFNZw729YZitmKMsuuFp53
-         A/GGSHPu5KX/rWTZ38sv8QLOOKCdR5gArkwb2IiLwkWuSdHlhEUqTES0ItjMebQsOs36
-         B5W75egE9QoZOcZ/tpQIaFjgIZ9aaRBGkXA9e4Vb3ZcB9kQSkpAkQGYJudMAqGzsQGHU
-         zl9SG8cyFP+jXuwEMR8qmSu17ZHe+kqWBM0+7HI116QdhoPYxX5FmYbmsWSDXdrFNceF
-         oG7MfRn2K5DQDLlAZVUKUJ2GKV08GZTV1c/UhH0XYbgVIxzoUstnFjlYOJ1TDyyK+DJa
-         cX1w==
-X-Gm-Message-State: AJIora+CT1JfvNcOUX2kRoGahdV5q9SJ8Hj/kAda+2ZGMwcZKwnxoN5S
-        B3eVqtESSHMLFA/PEw/dnKGmdeNHNGZTDSENRUI=
-X-Google-Smtp-Source: AGRyM1vsuJ1rPiAGi4kZGlsA7p5B2rHWEPTLlj2r4WK04VfTO9wTQfARPgny53bX/mPo/7HGlwQHqTHjh/lpBtQgHlU=
-X-Received: by 2002:aca:3946:0:b0:33a:7585:494b with SMTP id
- g67-20020aca3946000000b0033a7585494bmr69073oia.164.1658854274546; Tue, 26 Jul
- 2022 09:51:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220725225728.824128-1-Jason@zx2c4.com> <20220725232810.843433-1-Jason@zx2c4.com>
- <CAMdZqKH=9mDhoW_gpL-pUEQAGuN=orc1doudyAuHdoPc7O53RQ@mail.gmail.com> <Yt/EySjdJjYW/EcB@zx2c4.com>
-In-Reply-To: <Yt/EySjdJjYW/EcB@zx2c4.com>
-From:   Mark Harris <mark.hsj@gmail.com>
-Date:   Tue, 26 Jul 2022 09:51:03 -0700
-Message-ID: <CAMdZqKGzhajnb5ejypnPFanJ2E=4Pk_96x8FAAShttvnrRenfQ@mail.gmail.com>
-Subject: Re: [PATCH v2] arc4random: simplify design for better safety
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Tue, 26 Jul 2022 14:36:56 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEFA32EFD
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 11:36:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 7DCC2CE1A92
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 18:36:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1792AC433D6;
+        Tue, 26 Jul 2022 18:36:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="f7jDlF7X"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1658860608;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KBtVCb+gs9V9oJDCZh/m2Gv64lXqzBv+HHF42prGwN8=;
+        b=f7jDlF7X5qjCbmjWAT0o4y1rAr0xR9hp82YFF/nFc/1+8t3ZhkbAehcm7kbQsoyZY0T1Hf
+        MJQHKAOn9V5F7HeZ7HRrVHR8HjTEhbsOCrrpkMMXuFhaCdvUTQTpHijr79MjbaUqirEkQ3
+        2JI+GTk2kSYKIc1fumPHC2Jv0J1CSyQ=
+X-Spam: yes
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d9be2f07 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 26 Jul 2022 18:36:47 +0000 (UTC)
+Date:   Tue, 26 Jul 2022 20:36:45 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
 Cc:     libc-alpha@sourceware.org, Florian Weimer <fweimer@redhat.com>,
+        Cristian =?utf-8?Q?Rodr=C3=ADguez?= <crrodriguez@opensuse.org>,
+        Paul Eggert <eggert@cs.ucla.edu>,
+        Mark Harris <mark.hsj@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
         linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4] arc4random: simplify design for better safety
+Message-ID: <YuA0PcpBdWU5MS9s@zx2c4.com>
+References: <20220725225728.824128-1-Jason@zx2c4.com>
+ <20220726133049.1145913-1-Jason@zx2c4.com>
+ <45ef8ca0-12ca-4853-98a0-9f52dfca8c57@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <45ef8ca0-12ca-4853-98a0-9f52dfca8c57@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason A. Donenfeld wrote:
-> On Mon, Jul 25, 2022 at 06:10:06PM -0700, Mark Harris wrote:
-> > Jason A. Donenfeld wrote:
-> > > +      l = __getrandom_nocancel (p, n, 0);
-> > > +      if (l > 0)
-> > > +       {
-> > > +         if ((size_t) l == n)
-> > > +           return; /* Done reading, success. */
-> > > +         p = (uint8_t *) p + l;
-> > > +         n -= l;
-> > > +         continue; /* Interrupted by a signal; keep going. */
-> > > +       }
-> > > +      else if (l == 0)
-> > > +       arc4random_getrandom_failure (); /* Weird, should never happen. */
-> > > +      else if (errno == ENOSYS)
-> > > +       {
-> > > +         have_getrandom = false;
-> > > +         break; /* No syscall, so fallback to /dev/urandom. */
-> > > +       }
-> > > +      arc4random_getrandom_failure (); /* Unknown error, should never happen. */
-> >
-> > Isn't EINTR also possible?  Aborting in that case does not seem reasonable.
->
-> Not in current kernels, where it always returns at least PAGE_SIZE bytes
-> before checking for pending signals. In older kernels, if there was a
-> signal pending at the top, it would do no work and return -ERESTARTSYS,
-> which I believe should then get restarted by glibc's syscaller? I might
-> be wrong about how restarts work though, so if you know better, please
-> let me know. TEMP_FAILURE_RETRY relies on errno, so that's not what we
-> want. I guess I can just add a case for it.
->
-> > Also the __getrandom_nocancel function does not set errno on Linux; it
-> > just returns INTERNAL_SYSCALL_CALL (getrandom, buf, buflen, flags).
-> > So unless that is changed, it doesn't look like this ENOSYS check will
-> > detect old Linux kernels.
->
-> Thanks. It looks like INTERNAL_SYSCALL_CALL just returns the errno as-is
-> as a return value, right? I'll adjust the code to account for that.
+Hi Adhemerval,
 
-Yes INTERNAL_SYSCALL_CALL just returns the negated errno value that it
-gets from the Linux kernel, but only on Linux does
-__getrandom_nocancel use that.  The Hurd and generic implementations
-set errno on error.  Previously the only call to this function did not
-care about the specific error value so it didn't matter.  Since you
-are now using the error value in generic code, __getrandom_nocancel
-should be changed on Linux to set errno like most other _nocancel
-calls, and then it should go back to checking errno here.
+On Tue, Jul 26, 2022 at 01:20:11PM -0300, Adhemerval Zanella Netto wrote:
+> > +	{
+> > +	  atomic_store_relaxed (&have_getrandom, false);
+> 
+> I still think there is no much gain in this optimization, the syscall will
+> most likely be present and it is one less static data.  Also, we avoid to
+> use __ASSUME_GETRANDOM on generic code (all __ASSUME usage within
+> sysdeps and/or nptl).
 
-And as Adhemerval mentioned, you only added a Linux implementation of
-__ppoll_infinity_nocancel, but are calling it from generic code.
+Oh! *That's* what you were talking about before. Sorry I didn't catch
+your meaning the first time through.
 
-Also, by the way your patches cc'd directly to me get quarantined
-because DKIM signature verification failed.  The non-patch messages
-pass DKIM and are fine.
+Okay so you're alright having +1 syscall overhead on old systems, so
+that new systems can have a byte less of static data. I don't hold any
+opinions either way there and will defer to your expertise, so I'll get
+rid of this part on v5.
 
+> > +    __ppoll_infinity_nocancel;
+> >      __sigtimedwait;
+> >      # functions used by nscd
+> >      __netlink_assert_response;
+> 
+> There is no need to export on GLIBC_PRIVATE, since it is not currently usage
+> libc.so.  Just define is a hidden (attribute_hidden).
+> Use attribute_hidden here and remove it from sysdeps/unix/sysv/linux/Versions.
+>> Maybe just add an inline wrapper on sysdeps/unix/sysv/linux/not-cancel.h, 
+> as for __getrandom_nocancel:
+> It avoids a lot of boilerplate code to add the internal symbol.
 
+Okay I'll skip all the symbol stuff and just do the static inline like
+getrandom has. Thanks for the suggestion; that's a lot simpler.
 
- - Mark
+> Also update the hurd sysdeps/mach/hurd/not-cancel.h with a wrapper to 
+> __poll (since it does not really support pthread cancellation).
+
+Ack.
+
+Thanks for the comments. v5 coming up shortly.
+
+Jason
