@@ -2,102 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6B5CCA48A
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 01:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E4BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 01:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231469AbiGZBKT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 21:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50694 "EHLO
+        id S229876AbiGZBp4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 21:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbiGZBKS (ORCPT
+        with ESMTP id S229853AbiGZBp4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 21:10:18 -0400
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8112E63EF
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 18:10:17 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id l188so3845427oia.4
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Jul 2022 18:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P//9YslxSg0bCM7OInCyxs68DQsmujiF20lhQqTd+fM=;
-        b=JTZedKGTrcWe/Ub4nKLqeliWPkRxdH6OPf5Z7jQiK5zuRFyxCyRmNEDhV9AMzjEtSe
-         OfGfrtNfSeDsNyhIYprFegPPxuANescRMesq46uNLSFbx132a5WN5QWVG9zAKV3chSwo
-         muuHWikeXyynoW2jBAfba10TMxAChvFEEbNJJsiRA7+B7YSSZUGWmDLaw64BRFKsmr+N
-         P7Z9pkkgf1x+eOLoKwlh2F0QA0AxCdo81ewgO3k8Ve1yzbC5bufa5aC2YjLga7H/2EsI
-         tzX9A8d2xMfSGwScneuCGB/z7dJY/+7FYD4ZBLnxyTIgI99lx3gSB93UbloKwWRL3pGe
-         rj0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P//9YslxSg0bCM7OInCyxs68DQsmujiF20lhQqTd+fM=;
-        b=4uwQxWNvURcOdfP7OaNapA/b4qH2fQdAy1dna1qoOD5cH4SdNWXF1Lwy2DSiWrjMcR
-         xzgQbW7GUYpKKDecNHQj8+QBw0XJOFfc3uQTSzMs2wSao9Tq4BvHG1s0/nWKIi3zWYNH
-         zN0cz/7sJpWI0pPLqQ2IU7SwlPBnZ0FBsMKN3q7IofngGFgV5DLa1v3FiZBWU+NsP2vZ
-         8LnQj6Di/uJ52UMej4HJ9X19PgqLOBvQVRDT0/BDVH95JanoQQUOBXtYccrYdcz6lKIh
-         wGEoInUtDUaj7lrwy00+t5kTY64jJo30oc9rpgu9R+RzNC56CLgHdLkb3aTWtCs/cBdq
-         saGg==
-X-Gm-Message-State: AJIora8sJ7jMK30LTd8sVKQJ+dsd581q22QEYL6mebUEfqU7H3X0wxMX
-        +ePTywGaUi2k5ayAzCIKPmOU32CguqTkHIwdUic0mseY
-X-Google-Smtp-Source: AGRyM1sLAXqvTUzm/QUqgW1tI5ulvclyuwh658EK2d9nP+ocqw4QSNWkChDqNZXZLdFm3+Sa4ErBcN7cPJCSYZjEn8E=
-X-Received: by 2002:a05:6808:1313:b0:33a:b979:b2c6 with SMTP id
- y19-20020a056808131300b0033ab979b2c6mr8346963oiv.37.1658797816867; Mon, 25
- Jul 2022 18:10:16 -0700 (PDT)
+        Mon, 25 Jul 2022 21:45:56 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00017DF9E;
+        Mon, 25 Jul 2022 18:45:54 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4LsKRp0RY0z1M8MN;
+        Tue, 26 Jul 2022 09:43:02 +0800 (CST)
+Received: from kwepemm600003.china.huawei.com (7.193.23.202) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 09:45:52 +0800
+Received: from ubuntu1804.huawei.com (10.67.174.149) by
+ kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 09:45:51 +0800
+From:   Ye Weihua <yeweihua4@huawei.com>
+To:     <wangzhou1@hisilicon.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <tanshukun1@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <zhangjinhao2@huawei.com>
+Subject: [PATCH] drivers: hisilicon: fix mismatch in get/set sgl_sge_nr
+Date:   Tue, 26 Jul 2022 09:43:10 +0800
+Message-ID: <20220726014310.234760-1-yeweihua4@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20220725225728.824128-1-Jason@zx2c4.com> <20220725232810.843433-1-Jason@zx2c4.com>
-In-Reply-To: <20220725232810.843433-1-Jason@zx2c4.com>
-From:   Mark Harris <mark.hsj@gmail.com>
-Date:   Mon, 25 Jul 2022 18:10:06 -0700
-Message-ID: <CAMdZqKH=9mDhoW_gpL-pUEQAGuN=orc1doudyAuHdoPc7O53RQ@mail.gmail.com>
-Subject: Re: [PATCH v2] arc4random: simplify design for better safety
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     libc-alpha@sourceware.org, Florian Weimer <fweimer@redhat.com>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.174.149]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600003.china.huawei.com (7.193.23.202)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason A. Donenfeld wrote:
-> +      l = __getrandom_nocancel (p, n, 0);
-> +      if (l > 0)
-> +       {
-> +         if ((size_t) l == n)
-> +           return; /* Done reading, success. */
-> +         p = (uint8_t *) p + l;
-> +         n -= l;
-> +         continue; /* Interrupted by a signal; keep going. */
-> +       }
-> +      else if (l == 0)
-> +       arc4random_getrandom_failure (); /* Weird, should never happen. */
-> +      else if (errno == ENOSYS)
-> +       {
-> +         have_getrandom = false;
-> +         break; /* No syscall, so fallback to /dev/urandom. */
-> +       }
-> +      arc4random_getrandom_failure (); /* Unknown error, should never happen. */
+KASAN reported this Bug:
 
-Isn't EINTR also possible?  Aborting in that case does not seem reasonable.
+	[17619.659757] BUG: KASAN: global-out-of-bounds in param_get_int+0x34/0x60
+	[17619.673193] Read of size 4 at addr fffff01332d7ed00 by task read_all/1507958
+	...
+	[17619.698934] The buggy address belongs to the variable:
+	[17619.708371]  sgl_sge_nr+0x0/0xffffffffffffa300 [hisi_zip]
 
-Also the __getrandom_nocancel function does not set errno on Linux; it
-just returns INTERNAL_SYSCALL_CALL (getrandom, buf, buflen, flags).
-So unless that is changed, it doesn't look like this ENOSYS check will
-detect old Linux kernels.
+There is a mismatch in hisi_zip when get/set the variable sgl_sge_nr.
+The type of sgl_sge_nr is u16, and get/set sgl_sge_nr by
+param_get/set_int.
 
-> +      struct pollfd pfd = { .events = POLLIN };
-> +      pfd.fd = TEMP_FAILURE_RETRY (
-> +         __open64_nocancel ("/dev/random", O_RDONLY | O_CLOEXEC | O_NOCTTY));
-> +      if (pfd.fd < 0)
-> +       arc4random_getrandom_failure ();
-> +      if (__poll (&pfd, 1, -1) < 0)
-> +       arc4random_getrandom_failure ();
-> +      if (__close_nocancel (pfd.fd) < 0)
-> +       arc4random_getrandom_failure ();
+Replacing param_get/set_int to param_get/set_ushort can fix this bug.
 
-The TEMP_FAILURE_RETRY handles EINTR on open, but __poll can also
-result in EINTR.
+Fixes: f081fda293ffb ("crypto: hisilicon - add sgl_sge_nr module param for zip")
+Signed-off-by: Ye Weihua <yeweihua4@huawei.com>
+---
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 9520a4113c81..a91e6e0e9c69 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -122,12 +122,12 @@ static int sgl_sge_nr_set(const char *val, const struct kernel_param *kp)
+ 	if (ret || n == 0 || n > HISI_ACC_SGL_SGE_NR_MAX)
+ 		return -EINVAL;
+ 
+-	return param_set_int(val, kp);
++	return param_set_ushort(val, kp);
+ }
+ 
+ static const struct kernel_param_ops sgl_sge_nr_ops = {
+ 	.set = sgl_sge_nr_set,
+-	.get = param_get_int,
++	.get = param_get_ushort,
+ };
+ 
+ static u16 sgl_sge_nr = HZIP_SGL_SGE_NR;
+-- 
+2.17.1
 
- - Mark
