@@ -2,276 +2,139 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72404C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 20:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227CBC00144
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 20:56:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231264AbiGZUlM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 16:41:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39258 "EHLO
+        id S239977AbiGZU42 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 16:56:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbiGZUlL (ORCPT
+        with ESMTP id S232306AbiGZU41 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 16:41:11 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 928A015FFF;
-        Tue, 26 Jul 2022 13:41:10 -0700 (PDT)
-Received: from [192.168.87.140] (unknown [50.47.106.71])
-        by linux.microsoft.com (Postfix) with ESMTPSA id AC6FC20FE2E6;
-        Tue, 26 Jul 2022 13:41:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AC6FC20FE2E6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1658868070;
-        bh=VgOwC09+vnjb9WQXMFtlpt3WfTGrLfx+SsoGsAU+cFc=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=r/POcPaqbQK+X7IamgPgQgrbXsaxjYAYFv5uzXMI/O6N0IYq5ntGykO/OjrytvU9w
-         4wlBlS1q4t03xVRC5TSX0xM41bFel0XM/VCMmyY/a3JzAGPwLyXb1Lz4HqAQhr+Htl
-         KvdZU/W85fSzOsCYFuK3wC7v7tEjgXmUIGoueDQM=
-Message-ID: <9d6beefe-9974-22f8-750c-68c9acb707ab@linux.microsoft.com>
-Date:   Tue, 26 Jul 2022 13:41:09 -0700
+        Tue, 26 Jul 2022 16:56:27 -0400
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C28437FBE
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:56:26 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1013ecaf7e0so20101247fac.13
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 13:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=Lu19QanZmMmFbeJDfXhCYRPTw4ZQh3LrAl/eaR1hZNU=;
+        b=UxncJtFCG/lVGHVoBUSLaMr6K0GhluD7rjVk3MrUipdt6R9d/RXB1aIM/CGVj/Ecmy
+         VyWO57rdM7Xyvp6rrUGIP8OeflT9vp/YSnRqLuSozrMYJK+YROD7iwg6zUNfzLYoDbZT
+         Ve/BJtRfmNC7dqtxAPKRqjTDO0uudD0vlCfbsVemgbIkph8vmVA7R7Lb12Rx/EbEtNX6
+         1b3I7kCLl1mHlc7WjHu9SpiP7yc2rPza+fne8U2rfpsJEODxnVsbvLddSSXgRQYfKEe2
+         baoXN2bdmD2/jrAlyRDwFToSs9V66IEi5AiCZ5FBdUokP6xUWSCqZ55SmFra0SWGZLXL
+         0dUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=Lu19QanZmMmFbeJDfXhCYRPTw4ZQh3LrAl/eaR1hZNU=;
+        b=EPEfKUNZLDs5TLMH1MgItzvrAfdRHJ6nWn8CtvGMi1CrtM1tw94GM2I3mI70HHrTWT
+         5LjI1nA08mi73VU19j0YVcNjMFlCKGowzuhEpVJkyVozVzefeIme9stcHE5JN6qtx8l8
+         N2NuRyFc3FcIW3zucWI6nBMYv+KHZK3RPteM5KUGiEsv/RNz35oeIyLi3mCztGXvA+1Y
+         K6HVX0Tw3gj6LquKjUtLsmihcVzQG66uI/kJZwngp5b8ul6qCtpcRtF4/MMIdC1P7ChT
+         0MTqoJpJ3VI2mAuwetIJR0wAhU722bhxpZfi58B1OsTC7w6M2fWsTSc5bVCR+VjIju7R
+         9voQ==
+X-Gm-Message-State: AJIora/7XD3In6vkToBcNRBjX+ao8+ZGwCIRFBdyQe7r/s3kWIcv7q3l
+        +1tthm02SscGjVqCE7LAPNr2CQ59aGDglw==
+X-Google-Smtp-Source: AGRyM1u4acPkgeL8YgfuE1QdRat/EQf1eEcOxzG5hnnGgiWAw8wmAmEAd56jBNwLmzHGD8gfB5iTSw==
+X-Received: by 2002:a05:6870:d204:b0:10e:1cbc:477e with SMTP id g4-20020a056870d20400b0010e1cbc477emr570418oac.298.1658868985328;
+        Tue, 26 Jul 2022 13:56:25 -0700 (PDT)
+Received: from ?IPV6:2804:431:c7cb:8ded:8925:49f1:c550:ee7d? ([2804:431:c7cb:8ded:8925:49f1:c550:ee7d])
+        by smtp.gmail.com with ESMTPSA id x1-20020a544001000000b0033a422b39b4sm6421692oie.49.2022.07.26.13.56.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jul 2022 13:56:24 -0700 (PDT)
+Message-ID: <9101f76a-c5d4-4101-0583-d942fb247b72@linaro.org>
+Date:   Tue, 26 Jul 2022 17:56:21 -0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v8 5/5] crypto: aspeed: add HACE crypto driver
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.0.3
+Subject: Re: [PATCH v6] arc4random: simplify design for better safety
 Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Dhananjay Phadke <dhphadke@microsoft.com>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, BMC-SW@aspeedtech.com
-References: <20220726113448.2964968-1-neal_liu@aspeedtech.com>
- <20220726113448.2964968-6-neal_liu@aspeedtech.com>
-From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
-In-Reply-To: <20220726113448.2964968-6-neal_liu@aspeedtech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org
+Cc:     Florian Weimer <fweimer@redhat.com>,
+        =?UTF-8?Q?Cristian_Rodr=c3=adguez?= <crrodriguez@opensuse.org>,
+        Paul Eggert <eggert@cs.ucla.edu>,
+        Mark Harris <mark.hsj@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org
+References: <20220726190830.1189339-1-Jason@zx2c4.com>
+ <20220726195822.1223048-1-Jason@zx2c4.com>
+ <bb9b0cad-5b7a-e215-a9d2-ca8bcf664318@linaro.org>
+Organization: Linaro
+In-Reply-To: <bb9b0cad-5b7a-e215-a9d2-ca8bcf664318@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Neal,
 
-Thanks for addressing v7 review comments, few more below.
 
-On 7/26/2022 4:34 AM, Neal Liu wrote:
-> Add HACE crypto driver to support symmetric-key
-> encryption and decryption with multiple modes of
-> operation.
+On 26/07/22 17:17, Adhemerval Zanella Netto wrote:
 > 
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
-> ---
->   drivers/crypto/aspeed/Kconfig              |   26 +
->   drivers/crypto/aspeed/Makefile             |    7 +-
->   drivers/crypto/aspeed/aspeed-hace-crypto.c | 1121 ++++++++++++++++++++
->   drivers/crypto/aspeed/aspeed-hace.c        |   91 +-
->   drivers/crypto/aspeed/aspeed-hace.h        |  112 ++
->   5 files changed, 1354 insertions(+), 3 deletions(-)
->   create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
 > 
-> diff --git a/drivers/crypto/aspeed/Kconfig b/drivers/crypto/aspeed/Kconfig
-> index 059e627efef8..f19994915a5e 100644
-> --- a/drivers/crypto/aspeed/Kconfig
-> +++ b/drivers/crypto/aspeed/Kconfig
-> @@ -30,3 +30,29 @@ config CRYPTO_DEV_ASPEED_HACE_HASH_DEBUG
->   	  to ask for those messages.
->   	  Avoid enabling this option for production build to
->   	  minimize driver timing.
-> +
-> +config CRYPTO_DEV_ASPEED_HACE_CRYPTO
-> +	bool "Enable Aspeed Hash & Crypto Engine (HACE) crypto"
-> +	depends on CRYPTO_DEV_ASPEED
-> +	select CRYPTO_ENGINE
-> +	select CRYPTO_AES
-> +	select CRYPTO_DES
-> +	select CRYPTO_ECB
-> +	select CRYPTO_CBC
-> +	select CRYPTO_CFB
-> +	select CRYPTO_OFB
-> +	select CRYPTO_CTR
-> +	help
-> +	  Select here to enable Aspeed Hash & Crypto Engine (HACE)
-> +	  crypto driver.
-> +	  Supports AES/DES symmetric-key encryption and decryption
-> +	  with ECB/CBC/CFB/OFB/CTR options.
-> +
-> +config CRYPTO_DEV_ASPEED_HACE_CRYPTO_DEBUG
-> +	bool "Enable HACE crypto debug messages"
-> +	depends on CRYPTO_DEV_ASPEED_HACE_CRYPTO
-> +	help
-> +	  Print HACE crypto debugging messages if you use this option
-> +	  to ask for those messages.
-> +	  Avoid enabling this option for production build to
-> +	  minimize driver timing.
+> On 26/07/22 16:58, Jason A. Donenfeld wrote:
+>> Rather than buffering 16 MiB of entropy in userspace (by way of
+>> chacha20), simply call getrandom() every time.
+>>
+>> This approach is doubtlessly slower, for now, but trying to prematurely
+>> optimize arc4random appears to be leading toward all sorts of nasty
+>> properties and gotchas. Instead, this patch takes a much more
+>> conservative approach. The interface is added as a basic loop wrapper
+>> around getrandom(), and then later, the kernel and libc together can
+>> work together on optimizing that.
+>>
+>> This prevents numerous issues in which userspace is unaware of when it
+>> really must throw away its buffer, since we avoid buffering all
+>> together. Future improvements may include userspace learning more from
+>> the kernel about when to do that, which might make these sorts of
+>> chacha20-based optimizations more possible. The current heuristic of 16
+>> MiB is meaningless garbage that doesn't correspond to anything the
+>> kernel might know about. So for now, let's just do something
+>> conservative that we know is correct and won't lead to cryptographic
+>> issues for users of this function.
+>>
+>> This patch might be considered along the lines of, "optimization is the
+>> root of all evil," in that the much more complex implementation it
+>> replaces moves too fast without considering security implications,
+>> whereas the incremental approach done here is a much safer way of going
+>> about things. Once this lands, we can take our time in optimizing this
+>> properly using new interplay between the kernel and userspace.
+>>
+>> getrandom(0) is used, since that's the one that ensures the bytes
+>> returned are cryptographically secure. But on systems without it, we
+>> fallback to using /dev/urandom. This is unfortunate because it means
+>> opening a file descriptor, but there's not much of a choice. Secondly,
+>> as part of the fallback, in order to get more or less the same
+>> properties of getrandom(0), we poll on /dev/random, and if the poll
+>> succeeds at least once, then we assume the RNG is initialized. This is a
+>> rough approximation, as the ancient "non-blocking pool" initialized
+>> after the "blocking pool", not before, and it may not port back to all
+>> ancient kernels, though it does to all kernels supported by glibc
+>> (≥3.2), so generally it's the best approximation we can do.
+>>
+>> The motivation for including arc4random, in the first place, is to have
+>> source-level compatibility with existing code. That means this patch
+>> doesn't attempt to litigate the interface itself. It does, however,
+>> choose a conservative approach for implementing it.
+> 
+> LGTM, I agree this is safe solution for 2.36, we can optimize it later
+> if is were the case.
+> 
+> I will run some tests and push it upstream.
+> 
+> Reviewed-by: Adhemerval Zanella  <adhemerval.zanella@linaro.org>
 
-Why are separate options required for hash and crypto algorithms, if
-hace is only hw crypto on the SoCs?
-
-Looks like that's requiring unnecessary __weak register / unregister
-functions [see below].
-
-Couldn't just two options CONFIG_CRYPTO_DEV_ASPEED and 
-CONFIG_CRYPTO_DEV_ASPEED_DEBUG be simpler to set for downstream defconfigs?
-
-> diff --git a/drivers/crypto/aspeed/Makefile b/drivers/crypto/aspeed/Makefile
-> index 8bc8d4fed5a9..421e2ca9c53e 100644
-> --- a/drivers/crypto/aspeed/Makefile
-> +++ b/drivers/crypto/aspeed/Makefile
-> @@ -1,6 +1,9 @@
->   obj-$(CONFIG_CRYPTO_DEV_ASPEED) += aspeed_crypto.o
-> -aspeed_crypto-objs := aspeed-hace.o \
-> -		      $(hace-hash-y)
-> +aspeed_crypto-objs := aspeed-hace.o	\
-> +		      $(hace-hash-y)	\
-> +		      $(hace-crypto-y)
->   
->   obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) += aspeed-hace-hash.o
->   hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) := aspeed-hace-hash.o
-> +obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) += aspeed-hace-crypto.o
-> +hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) := aspeed-hace-crypto.o
-> diff --git a/drivers/crypto/aspeed/aspeed-hace-crypto.c b/drivers/crypto/aspeed/aspeed-hace-crypto.c
-> new file mode 100644
-
-[...]
-
-> +
-> +void aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-> +{
-> +	int rc, i;
-> +
-> +	CIPHER_DBG(hace_dev, "\n");
-> +
-> +	for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs); i++) {
-> +		aspeed_crypto_algs[i].hace_dev = hace_dev;
-> +		rc = crypto_register_skcipher(&aspeed_crypto_algs[i].alg.skcipher);
-> +		if (rc) {
-> +			CIPHER_DBG(hace_dev, "Failed to register %s\n",
-> +				   aspeed_crypto_algs[i].alg.skcipher.base.cra_name);
-> +		}
-> +	}
-> +
-> +	if (hace_dev->version != AST2600_VERSION)
-> +		return;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs_g6); i++) {
-> +		aspeed_crypto_algs_g6[i].hace_dev = hace_dev;
-> +		rc = crypto_register_skcipher(&aspeed_crypto_algs_g6[i].alg.skcipher);
-> +		if (rc) {
-> +			CIPHER_DBG(hace_dev, "Failed to register %s\n",
-> +				   aspeed_crypto_algs_g6[i].alg.skcipher.base.cra_name);
-> +		}
-> +	}
-> +}
-> diff --git a/drivers/crypto/aspeed/aspeed-hace.c b/drivers/crypto/aspeed/aspeed-hace.c
-> index 89b1585d72e2..efc0725ebf98 100644
-> --- a/drivers/crypto/aspeed/aspeed-hace.c
-> +++ b/drivers/crypto/aspeed/aspeed-hace.c
-> @@ -32,10 +32,22 @@ void __weak aspeed_unregister_hace_hash_algs(struct aspeed_hace_dev *hace_dev)
->   	dev_warn(hace_dev->dev, "%s: Not supported yet\n", __func__);
->   }
->   
-> +/* Weak function for HACE crypto */
-> +void __weak aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-> +{
-> +	dev_warn(hace_dev->dev, "%s: Not supported yet\n", __func__);
-> +}
-> +
-> +void __weak aspeed_unregister_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-> +{
-> +	dev_warn(hace_dev->dev, "%s: Not supported yet\n", __func__);
-> +}
-> +
-
-aspeed_unregister_hace_crypto_algs() is not implemented in 
-aspeed-hace-crypto.c, so those algorithms are not unregistered during 
-unload.
-
-This was missed because of __weak function.
-
->   /* HACE interrupt service routine */
->   static irqreturn_t aspeed_hace_irq(int irq, void *dev)
->   {
->   	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)dev;
-> +	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
->   	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
->   	u32 sts;
->   
-> @@ -51,9 +63,24 @@ static irqreturn_t aspeed_hace_irq(int irq, void *dev)
->   			dev_warn(hace_dev->dev, "HASH no active requests.\n");
->   	}
->   
-> +	if (sts & HACE_CRYPTO_ISR) {
-> +		if (crypto_engine->flags & CRYPTO_FLAGS_BUSY)
-> +			tasklet_schedule(&crypto_engine->done_task);
-> +		else
-> +			dev_warn(hace_dev->dev, "CRYPTO no active requests.\n");
-> +	}
-> +
->   	return IRQ_HANDLED;
->   }
->   
-> +static void aspeed_hace_crypto_done_task(unsigned long data)
-> +{
-> +	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
-> +	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-> +
-> +	crypto_engine->resume(hace_dev);
-> +}
-> +
->   static void aspeed_hace_hash_done_task(unsigned long data)
->   {
->   	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
-> @@ -65,11 +92,13 @@ static void aspeed_hace_hash_done_task(unsigned long data)
->   static void aspeed_hace_register(struct aspeed_hace_dev *hace_dev)
->   {
->   	aspeed_register_hace_hash_algs(hace_dev);
-> +	aspeed_register_hace_crypto_algs(hace_dev);
->   }
->   
->   static void aspeed_hace_unregister(struct aspeed_hace_dev *hace_dev)
->   {
->   	aspeed_unregister_hace_hash_algs(hace_dev);
-> +	aspeed_unregister_hace_crypto_algs(hace_dev);
->   }
-
-Could just wrap these calls instead of weak functions.
-
-static void aspeed_hace_unregister(struct aspeed_hace_dev *hace_dev)
-{
-#ifdef CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH
-   	aspeed_unregister_hace_hash_algs(hace_dev);
-#endif
-#ifdef CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO
-	aspeed_unregister_hace_crypto_algs(hace_dev);
-#endif
-}
-
->   
->   static const struct of_device_id aspeed_hace_of_matches[] = {
-> @@ -80,6 +109,7 @@ static const struct of_device_id aspeed_hace_of_matches[] = {
->   
->   static int aspeed_hace_probe(struct platform_device *pdev)
->   {
-> +	struct aspeed_engine_crypto *crypto_engine;
->   	const struct of_device_id *hace_dev_id;
->   	struct aspeed_engine_hash *hash_engine;
->   	struct aspeed_hace_dev *hace_dev;
-> @@ -100,6 +130,7 @@ static int aspeed_hace_probe(struct platform_device *pdev)
->   	hace_dev->dev = &pdev->dev;
->   	hace_dev->version = (unsigned long)hace_dev_id->data;
->   	hash_engine = &hace_dev->hash_engine;
-> +	crypto_engine = &hace_dev->crypto_engine;
->   
->   	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-
-Thanks,
-Dhananjay
+And I think we will need to tune down stdlib/tst-arc4random-thread internal
+parameters because it now takes about 1 minute on my testing machine (which
+is somewhat recent processor).  I will send a patch to adjust the maximum
+number of threads depending of the configured system CPU (to avoid syscall
+contention).
