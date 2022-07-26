@@ -2,55 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5808FC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 07:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BACCCA489
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 07:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232180AbiGZHHL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 03:07:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44726 "EHLO
+        id S238445AbiGZHcd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 03:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231600AbiGZHHK (ORCPT
+        with ESMTP id S232008AbiGZHb6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 03:07:10 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0240A27B07
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 00:07:05 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 6so23906611ybc.8
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 00:07:04 -0700 (PDT)
+        Tue, 26 Jul 2022 03:31:58 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E626D31DEA
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 00:28:02 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id a82so18411871ybb.12
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Jul 2022 00:28:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rcgy86h3bKxOBeG//wWyMWAkfwgF/OHgbS5GdJlqF1Q=;
-        b=rP6hiQUSnsCrLEpGMJ284D5gsGAEYG/Np9YNYB6fl6LnUVCfwCvUxh4qD3C5tJTybh
-         XrZCfH6LhMs4TZkLWoBBPpiVAGUmIvCk8Qw3nT9Qu2AQAUNYU3nT4USafHn66aKeMlNJ
-         yCFbhZu+bvyH00Uvz46+xPIRCAbWBd1kLGKgbyH0uCwSeggs64o0leDgdEXUQereCBF6
-         D99PIPkqaJIU/zaeVVso3vdqGKZdN0BiBtol8ZP3c08H4YtCwdienRdabs2P5ikL3k6n
-         yy6nVtKG38EDVLJQE7YMdfQdunpwFQWoc77YXmbOWmbcGUsOEi9FI4mmB+MuGnjZlUtU
-         3AxA==
+        bh=VvOrjB34rm7PzOpcu5vN7H48T73Za5L36kUOrTOg6ZU=;
+        b=UYCAqLQdkCe++bxbvoqb8ja13KXFhIBaW0rC+YYqYq4gvHo+TFgKPF/GZuT91VmSB8
+         C1W+AZw4l9ok/cijI6EPFtIFecx9ElKI75nt3EZmXPMl0ME3rxCMtwt6FCqEcqAzlXgc
+         L7pKvLgAUNdI/gsvxXkfFlg5biXeIuPvgjq6OlZZ2cbEWC7jVJ6RmvIswJs0R1wPEInh
+         sNGMWt8YNJtmjzLBgsGVFMhf8MoqqCx0CeHLgs7fbxPF4hIut+LmlvHlIRh5UZesH3nX
+         o77xUb6eSknQa9/tZQ3BGK1QZOpg9ZmseIfEITeaJYNYQSmSvHlSqBbMN8jvoIXgWsY1
+         JjRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rcgy86h3bKxOBeG//wWyMWAkfwgF/OHgbS5GdJlqF1Q=;
-        b=Pi/lMKO67IQdqucHahGyAdMGhwcNvFhMNf9wBBrzal3yUhWvB9aLqXFhUp0RziWf/f
-         rEi6f6KWxaolgfzGSrKIhPUku8EgXe/JsKCCLgeiMh7IXBL10yEmoHu2fdf0vqzvIQY9
-         my65aBz6lBZBORSIvGCL6k4OURWxO03KVQIXmBGBRJ1m70d8iK/e79R1U8hxdYheQ5GK
-         to+l6eI7e8KLpw3TB2sRqKDbOV54ht0oe7z1HwIbOZQoelwnzubsRkx9OnuxVjluJDIG
-         k32rbcgj0lylUsr0awksdhiA2N4kwoLk4x5Ax1ywjLwNj/GriFt5/J0BBBhv3nGM7UIU
-         K9fA==
-X-Gm-Message-State: AJIora+K5mpg8gS7x2U5ClyWtXbRfuzf3en8QANFC8sCNHX2sKh5jJqh
-        /dVhAEmAPUNIoi3l2AthSGdEV2HP7f9Y7C5BeNgKhQ==
-X-Google-Smtp-Source: AGRyM1unbv3SV++lnD2fcV87IVw5AbZYyhPNYpke56HhITiX0I4EE/vVweiHu7FW6Bdks5azJOL6VZF4mZCvd2GLMQc=
-X-Received: by 2002:a25:ab84:0:b0:671:748b:ffab with SMTP id
- v4-20020a25ab84000000b00671748bffabmr792029ybi.427.1658819223983; Tue, 26 Jul
- 2022 00:07:03 -0700 (PDT)
+        bh=VvOrjB34rm7PzOpcu5vN7H48T73Za5L36kUOrTOg6ZU=;
+        b=jS7yiV1a3+hSrbKofRNofpD30xMuzU1zhanibyJCHi2sMkav+0k7PE5Q2oz3IBjhb9
+         SBucS4cw7wEvIMo1iVSZD7e+1LBzz/aWEDR7rPywmXCQZWtWGcH+rl/XutiND3vjAu7k
+         GAVCkPg2SO4uUHNXZFtxSV18pKC/ju6zGUH+5OYo66RByd/8ZYzABBijVCGtPQsrOzls
+         rESDeKvHZDrTwtOqJGLpgKtgkb9P4cZYMXNH0FkwZ0ZStSaiDT/Qc2BBkVLkxWNV2AZw
+         daNVTuefKYtCH/mTHS/KPKMgAF11jr1EKVwKOX2S5hGy3bB2pj7so5k+EHmMmCNS31dZ
+         gCCQ==
+X-Gm-Message-State: AJIora9PIgckw6CDXbX2/H4TBIhM305y0nZ/ZmIYA+acqdYKqVoqJdvF
+        K32P7vOKQptEjV+K036dPcZCRZIoODodAAofy+DApg==
+X-Google-Smtp-Source: AGRyM1uv33zE0Yb5is3EhxTK8li350eCyxt4TvCNmDbhnKmlwtoEaE5nifSRGC+74wymZu7Olm8dTCRPLhrYeL6/L+k=
+X-Received: by 2002:a25:13c8:0:b0:670:6a55:5fad with SMTP id
+ 191-20020a2513c8000000b006706a555fadmr12357687ybt.598.1658820477779; Tue, 26
+ Jul 2022 00:27:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1658815925.git.cdleonard@gmail.com> <ad19d5c8a24054d48e1c35bb0ec92075b9f0dc6a.1658815925.git.cdleonard@gmail.com>
-In-Reply-To: <ad19d5c8a24054d48e1c35bb0ec92075b9f0dc6a.1658815925.git.cdleonard@gmail.com>
+ <CANn89i+ByJsdKLXi982jq0H3irYg_ANSEdmL2zwZ_7G-E_g2eg@mail.gmail.com>
+In-Reply-To: <CANn89i+ByJsdKLXi982jq0H3irYg_ANSEdmL2zwZ_7G-E_g2eg@mail.gmail.com>
 From:   Eric Dumazet <edumazet@google.com>
-Date:   Tue, 26 Jul 2022 09:06:52 +0200
-Message-ID: <CANn89i+ByJsdKLXi982jq0H3irYg_ANSEdmL2zwZ_7G-E_g2eg@mail.gmail.com>
+Date:   Tue, 26 Jul 2022 09:27:46 +0200
+Message-ID: <CANn89i+=LVDFx_zjDy6uK+QorR+fosdkb8jqNMO6syqOsS7ZqQ@mail.gmail.com>
 Subject: Re: [PATCH v6 21/26] selftests: net/fcnal: Initial tcp_authopt support
 To:     Leonard Crestez <cdleonard@gmail.com>
 Cc:     David Ahern <dsahern@kernel.org>, Philip Paeps <philip@trouble.is>,
@@ -79,31 +80,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 8:16 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+On Tue, Jul 26, 2022 at 9:06 AM Eric Dumazet <edumazet@google.com> wrote:
 >
-> Tests are mostly copied from tcp_md5 with minor changes.
+> On Tue, Jul 26, 2022 at 8:16 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+> >
+> > Tests are mostly copied from tcp_md5 with minor changes.
+> >
+> > It covers VRF support but only based on binding multiple servers: not
+> > multiple keys bound to different interfaces.
+> >
+> > Also add a specific -t tcp_authopt to run only these tests specifically.
+> >
 >
-> It covers VRF support but only based on binding multiple servers: not
-> multiple keys bound to different interfaces.
+> Thanks for the test.
 >
-> Also add a specific -t tcp_authopt to run only these tests specifically.
+> Could you amend the existing TCP MD5 test to make sure dual sockets
+> mode is working ?
 >
-
-Thanks for the test.
-
-Could you amend the existing TCP MD5 test to make sure dual sockets
-mode is working ?
-
-Apparently, if we have a dual stack listener socket (AF_INET6),
-correct incoming IPV4 SYNs are dropped.
-
- If this is the case, fixing MD5 should happen first ;)
-
-I think that we are very late in the cycle (linux-5.19 should be
-released in 5 days), and your patch set should not be merged so late.
-
-Thanks.
-
-> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
-> ---
+> Apparently, if we have a dual stack listener socket (AF_INET6),
+> correct incoming IPV4 SYNs are dropped.
 >
+>  If this is the case, fixing MD5 should happen first ;)
+>
+> I think that we are very late in the cycle (linux-5.19 should be
+> released in 5 days), and your patch set should not be merged so late.
+
+I suspect bug was added in
+
+commit 7bbb765b73496699a165d505ecdce962f903b422
+Author: Dmitry Safonov <0x7f454c46@gmail.com>
+Date:   Wed Feb 23 17:57:40 2022 +0000
+
+    net/tcp: Merge TCP-MD5 inbound callbacks
+
+a possible fix (also removing an indirect call for IPV4) could be:
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index ba2bdc81137490bd1748cde95789f8d2bff3ab0f..66b883d1683ddf7de6a8959a2b4e025a74c830b1
+100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4534,8 +4534,14 @@ tcp_inbound_md5_hash(const struct sock *sk,
+const struct sk_buff *skb,
+        }
+
+        /* check the signature */
+-       genhash = tp->af_specific->calc_md5_hash(newhash, hash_expected,
+-                                                NULL, skb);
++       if (family == AF_INET)
++               genhash = tcp_v4_md5_hash_skb(newhash,
++                                             hash_expected,
++                                             NULL, skb);
++       else
++               genhash = tp->af_specific->calc_md5_hash(newhash,
++                                                        hash_expected,
++                                                        NULL, skb);
+
+        if (genhash || memcmp(hash_location, newhash, 16) != 0) {
+                NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
