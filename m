@@ -2,73 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A918C43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 00:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DACDC43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Jul 2022 01:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbiGZAvY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Jul 2022 20:51:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39876 "EHLO
+        id S230015AbiGZBAT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Jul 2022 21:00:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230247AbiGZAvY (ORCPT
+        with ESMTP id S229755AbiGZBAT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Jul 2022 20:51:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514F424976;
-        Mon, 25 Jul 2022 17:51:23 -0700 (PDT)
+        Mon, 25 Jul 2022 21:00:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8C217A92;
+        Mon, 25 Jul 2022 18:00:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DD2C061349;
-        Tue, 26 Jul 2022 00:51:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D5E7C341C6;
-        Tue, 26 Jul 2022 00:51:22 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 01D95B810A4;
+        Tue, 26 Jul 2022 01:00:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CEFCC341C6;
+        Tue, 26 Jul 2022 01:00:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658796682;
-        bh=NLFzRaZSFroN3x3eXTNUEZ8NB31bA3KC4PRbcNi93mg=;
+        s=k20201202; t=1658797215;
+        bh=2xklpD9zOkDaPX/6lcoq8t9QAqRhI7D956EnkKkQcPk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rD99RVPaAFYi2cHLkD6Ukf2YBXaHmJ7zF0lpfdoQd/6YMHgqIN3vP7YRn3KNFfIRs
-         JaKyTLLIKlEHPZfIUIhJqa0kcKDxKwDIvgjxImfplNC3iQnfL/EnqkbdX1KT2a4vSt
-         DF8Sh1qpvatH5KHOxrnSpeEaJOm0WOpHr98ttHeRSPumTfd/vpJli7SgP+2Br3EAMQ
-         5DNWzGGJAyomzQF+CpNG+cMUu/dWq4HzEcJvRmAcM2mxLijooFSuUqlcNyC8wAEBqb
-         dJTOVMFMoXgqc9nq0zUD/d3MkoCl5wtTLKmgMAnDSZXiNOPY19i2KTvC30g0QQrbTc
-         B6aTxKz3uDobQ==
-Date:   Mon, 25 Jul 2022 17:51:20 -0700
+        b=PlT//DjOSIFZ94KFBmwxgN/i0oxKfabFQlFwF5CINBZ1C03OWg+ecfUA2FEjHfhPc
+         8ovGhrAq+bq2WU153Ku/jUKaqBDmrRjzsh1H2KsAgL9++JbXDLIuGmn9/RcZLts51q
+         3xQJKDiB1D3yafgHLJeQ+OR5DqE39ujJ8t/RlKk3Ovw2VY02oQnEjK480TpHOtBi2n
+         N4nEECKZN2YHSrInrClTa5HUiC5UnbNgLBUSa61mSee/b2DLB151/jxXMSCndxCIby
+         F1PRUbH1kpIgaGPNXUc5VaF3zyqUEj1YfGtUGPhHeuoPpKEudDb9VNdqEpRDuphWmf
+         x6PwiVroSD/cQ==
+Date:   Mon, 25 Jul 2022 18:00:13 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] crypto: lib - remove __HAVE_ARCH_CRYPTO_MEMNEQ
-Message-ID: <Yt86iHqr8W96wL+8@sol.localdomain>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ardb@kernel.org
+Subject: Re: [PATCH v3 2/3] crypto: lib - move __crypto_xor into utils
+Message-ID: <Yt88nXvui0Q+5MQu@sol.localdomain>
 References: <20220725183636.97326-1-ebiggers@kernel.org>
- <20220725183636.97326-4-ebiggers@kernel.org>
- <Yt8UCsYkH3O6RnFd@zx2c4.com>
+ <20220725183636.97326-3-ebiggers@kernel.org>
+ <Yt8UnWCvoe8dKihc@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yt8UCsYkH3O6RnFd@zx2c4.com>
+In-Reply-To: <Yt8UnWCvoe8dKihc@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 12:07:06AM +0200, Jason A. Donenfeld wrote:
-> On Mon, Jul 25, 2022 at 11:36:36AM -0700, Eric Biggers wrote:
+On Tue, Jul 26, 2022 at 12:09:33AM +0200, Jason A. Donenfeld wrote:
+> On Mon, Jul 25, 2022 at 11:36:35AM -0700, Eric Biggers wrote:
 > > From: Eric Biggers <ebiggers@google.com>
 > > 
-> > No architecture actually defines this, so it's unneeded.
+> > CRYPTO_LIB_CHACHA depends on CRYPTO for __crypto_xor, defined in
+> > crypto/algapi.c.  This is a layering violation because the dependencies
+> > should only go in the other direction (crypto/ => lib/crypto/).  Also
+> > the correct dependency would be CRYPTO_ALGAPI, not CRYPTO.  Fix this by
+> > moving __crypto_xor into the utils module in lib/crypto/.
+> > 
+> > Note that CRYPTO_LIB_CHACHA_GENERIC selected XOR_BLOCKS, which is
+> > unrelated and unnecessary.  It was perhaps thought that XOR_BLOCKS was
+> > needed for __crypto_xor, but that's not the case.
 > > 
 > > Signed-off-by: Eric Biggers <ebiggers@google.com>
->  
+> 
 > Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > 
-> Aside: out of curiosity, I wonder what was originally intended with
-> this, which magic arch-specific instructions were thought to be
-> potentially of aid.
+> With one small question:
+> 
+> > --- /dev/null
+> > +++ b/lib/crypto/utils.c
+> > @@ -0,0 +1,88 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * Crypto library utility functions
+> > + *
+> > + * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> Didn't Ard basically write the crypto_xor function in its current form?
+> I seem to remember some pretty hardcore refactoring he did a while back.
+> 
+> Jason
 
-The original commit (6bf37e5aa90f) says:
-
-	Similarly to kernel library string functions, leave an option for future
-	even further optimized architecture specific assembler implementations.
-
-But so far no one has bothered.  It's already optimized to use 'long' accesses,
-so I wouldn't expect it to get much faster with assembly.
+I think that's fair to say, based on git blame.  I just copied the copyright
+statement from the top of crypto/algapi.c.
 
 - Eric
