@@ -2,83 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B4CC04A68
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 12:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F720C04A68
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 15:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232149AbiG0MuL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 08:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33670 "EHLO
+        id S234040AbiG0Pwd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jul 2022 11:52:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232127AbiG0MuK (ORCPT
+        with ESMTP id S232850AbiG0Pwc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:50:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9978ADF3
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 05:50:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658926208;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=u3tWNZoM0SHgJT357NmowYOc/14fIdjywuVCaJBZfBY=;
-        b=SGcFBqiw37SJEce3iXhMfe5g3motm1cZbiOL7OzA6OEY+Wk+rMKkwV7Vz83DE7KtF1c4+L
-        ZuI1UYXka1LGYjtSjplAmWP0xx668sg1rGLELkse8ewfTefuXsUpStLpODa12aOmDVpeym
-        GTTT+SE4PYmXWOibWOgGxa+J3wdwPl8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-oATUdNq-NaeacgLetjm8rA-1; Wed, 27 Jul 2022 08:50:01 -0400
-X-MC-Unique: oATUdNq-NaeacgLetjm8rA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0889B85A589;
-        Wed, 27 Jul 2022 12:50:01 +0000 (UTC)
-Received: from oldenburg.str.redhat.com (unknown [10.39.192.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11AE6492CA2;
-        Wed, 27 Jul 2022 12:49:58 +0000 (UTC)
-From:   Florian Weimer <fweimer@redhat.com>
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Rich Felker <dalias@libc.org>,
-        Yann Droneaud <ydroneaud@opteya.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org,
-        linux-crypto@vger.kernel.org, Michael@phoronix.com, jann@thejh.net
-Subject: Re: arc4random - are you sure we want these?
-In-Reply-To: <YuEwR0bJhOvRtmFe@mit.edu> (Theodore Ts'o's message of "Wed, 27
-        Jul 2022 08:32:07 -0400")
-References: <YtwgTySJyky0OcgG@zx2c4.com> <Ytwg8YEJn+76h5g9@zx2c4.com>
-        <6bf352e9-1312-40de-4733-3219721b343c@linaro.org>
-        <20220725153303.GF7074@brightrain.aerifal.cx>
-        <878rohp2ll.fsf@oldenburg.str.redhat.com>
-        <20220725174430.GI7074@brightrain.aerifal.cx>
-        <CAPBLoAe89Pwt=F_jcZirVXQA7JtugV+5+BWHBt0RaZka1y0K=g@mail.gmail.com>
-        <20220725184929.GJ7074@brightrain.aerifal.cx>
-        <YuCa1lDqoxdnZut/@mit.edu>
-        <a5b6307d-6811-61b6-c13d-febaa6ad1e48@linaro.org>
-        <YuEwR0bJhOvRtmFe@mit.edu>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
-Date:   Wed, 27 Jul 2022 14:49:57 +0200
-Message-ID: <87v8rid8ju.fsf@oldenburg.str.redhat.com>
+        Wed, 27 Jul 2022 11:52:32 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A7349B7C;
+        Wed, 27 Jul 2022 08:52:31 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id i13so12828466edj.11;
+        Wed, 27 Jul 2022 08:52:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=sCiIbne8ijwxYERRgWmKwN6VqmxC0psTKJdz1VQXbvI=;
+        b=CPyK0OvuJ25Cp/X56lhMJFw/HcqGnRwWjTnIEipGqnnhjaMCyRed/L43d82BCzlDOy
+         PP0dL0w6z0N6064je/4MjYzHVvrzOaZOpMAbOBSEaT5/LkZpKg05Z4wmcIrBU0N5XqZc
+         OvaqNnS+O/THezH2K3YV3+pdd6vNJ8RKo4W+nta/N/khWX3C/vEsQwrGkXmnSol1/8Qj
+         qeZa6hyP/zvcsnc/DSKgYe7Xd0cjIaP3rVnsnIM7K1xBahOGIb2mZvKvaszEgJI/OTT0
+         AEvZ23vcC/narjoLqyNJqQT3nLwpMs/mlbVhzW2D01rxQHZiljyUKNN7tELenJoWjGEN
+         pKjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sCiIbne8ijwxYERRgWmKwN6VqmxC0psTKJdz1VQXbvI=;
+        b=eytcIG1bDzCt0n+43QHGiYKIovsfFMTh9AZHVOedsR1RFrT8f58iw70IX0kxu+O3v1
+         at/HjoJ5Qtxg9Q3HbWNJ3LEcRZjKE8MuuzcRLvV2+SE3CWcYgnO+flW17P706injSZTj
+         FGuUxwgWsMUFB7DRqmGqKZU6G8vJE/41KhD9IL2Y2pQhkjL+WhgEPCvNqPGq9WAC1hqe
+         ulBnrEjCkrDuTo0MGvqbPsHPSjg1Atg1pLtTZo2z773skWsylF1640fg5TpYfy2HjRGd
+         3W01rEvSxKoPcdBFHA6e4ksdz8EDSBxn/86wqvwH2tTH1Uq++8+KVE0b1Lv36ulPXBWg
+         0whQ==
+X-Gm-Message-State: AJIora8bsUk6aj4bLCQsYcU/msJ1KyQsjT5SUz189BxAlq/iqitOicZi
+        H5j0ZzZ+VySfuUkfnhnj5e0=
+X-Google-Smtp-Source: AGRyM1vO98nO6kDOdEHUpaoV1DgveBsqp+R6esVhO9kfIWL8XEmB3Qxg/xn0FPdBMHzrRB4QH5ScWQ==
+X-Received: by 2002:a05:6402:f12:b0:43c:a70d:ee6 with SMTP id i18-20020a0564020f1200b0043ca70d0ee6mr4771269eda.316.1658937149598;
+        Wed, 27 Jul 2022 08:52:29 -0700 (PDT)
+Received: from ?IPV6:2a04:241e:502:a09c:994d:5eac:a62d:7a76? ([2a04:241e:502:a09c:994d:5eac:a62d:7a76])
+        by smtp.gmail.com with ESMTPSA id 18-20020a170906201200b0072fe6408526sm2914413ejo.9.2022.07.27.08.52.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jul 2022 08:52:29 -0700 (PDT)
+Message-ID: <5b88eea6-1d84-8c16-36f4-358053e247f2@gmail.com>
+Date:   Wed, 27 Jul 2022 18:52:27 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 0/6] net/crypto: Introduce crypto_pool
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        David Ahern <dsahern@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20220726201600.1715505-1-dima@arista.com>
+ <YuCEN7LKcVLL0zBn@gondor.apana.org.au>
+From:   Leonard Crestez <cdleonard@gmail.com>
+In-Reply-To: <YuCEN7LKcVLL0zBn@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Theodore Ts'o:
+On 7/27/22 03:17, Herbert Xu wrote:
+> On Tue, Jul 26, 2022 at 09:15:54PM +0100, Dmitry Safonov wrote:
+>> Add crypto_pool - an API for allocating per-CPU array of crypto requests
+>> on slow-path (in sleep'able context) and to use them on a fast-path,
+>> which is RX/TX for net/ users (or in any other bh-disabled users).
+>> The design is based on the current implementations of md5sig_pool.
+>>
+>> Previously, I've suggested to add such API on TCP-AO patch submission [1],
+>> where Herbert kindly suggested to help with introducing new crypto API.
+> 
+> What I was suggesting is modifying the actual ahash interface so
+> that the tfm can be shared between different key users by moving
+> the key into the request object.
 
-> But even if you didn't take the latest kernels, I think you will find
-> that if you actually benchmark how many queries per second a real-life
-> secure web server or VPN gateway, even the original 5.15.0 /dev/random
-> driver was plenty fast enough for real world cryptographic use cases.
+The fact that setkey is implemented at the crypto_ahash instead of the 
+ahash_request level is baked into all algorithm implementations 
+(including many hardware-specific ones). Changing this seems extremely 
+difficult.
 
-The idea is to that arc4random() is suitable in pretty much all places
-that have historically used random() (outside of deterministic
-simulations).  Straight calls to getrandom are much, much slower than
-random(), and it's not even the system call overhead.
+Supporting setkey at the tfm level could be achieved by making it an 
+optional capability on a per-algorithm basis, then something like 
+crypto_pool could detect this scenario and avoid allocating a per-cpu 
+tfm. This would also require a crypto_pool_setkey wrapper.
 
-Thanks,
-Florian
+As it stands right now multiple crypto-api users needs to duplicate 
+logic for allocating a percpu array of transforms so adding this "pool" 
+API is an useful step forward.
 
+As far as I remember the requirement for a per-cpu scratch buffer is 
+based on weird architectures having limitations on what kind of memory 
+can be passed to crypto api so this will have to remain.
+
+--
+Regards,
+Leonard
