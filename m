@@ -2,139 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51693C19F21
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 09:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B4CC04A68
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 12:50:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbiG0J2L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 05:28:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41036 "EHLO
+        id S232149AbiG0MuL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jul 2022 08:50:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbiG0J15 (ORCPT
+        with ESMTP id S232127AbiG0MuK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 05:27:57 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6C247BB7
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 02:27:55 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id c131so29280863ybf.9
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 02:27:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bBFDz2W5xcHE0ZM3OCmaQTYQarGqNZfYlbjkrHAkU7Y=;
-        b=GzP/fohU8r+nSa3pQEBIHnxBWxZwdz999gax3ajvKKV/3qdNXgkMNf+4icGDdVliom
-         bSnb1aJALnTPPwUJAbpGuWaJJZ9qjslqNlGZZAneOAIusIAWv1CUuTznA9SxSf6+mIh2
-         pqhUvsR4XeiSykRLGwKylGq9JxhtxOWhs99agWtcf4xdfPblA4Wo+3WABwYAmdva9L0J
-         WvKFgZo2Q/IJkcXb3a3GjoXn0WD+wzQDWCfiux1tarsXAr2hhDUGBq7rwGFG8tURaiPF
-         pK8/1x0OC8CDhcC+tZW4s05T4/N2tzLIO2a2LvZLqCsmQI478xmdYM+ibJPHWyDy5TvS
-         m9Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bBFDz2W5xcHE0ZM3OCmaQTYQarGqNZfYlbjkrHAkU7Y=;
-        b=bXpHn7K43AJZafYfd3wzWydjdiDVvW3fgfWniakP6Zb87SU5j1NXWM63Y+Av3ykTLi
-         PtCs2PsnvucLaqL0gzJuzqj5pqzXv3VvbeQVon65vsd3k/qK1lghXsNxWV91y8eI43+d
-         wIMRkFDFfgCb2QgFuIoVw0wQA8QsK0SNH6w2As+G1ToWDzS7ArUfFwV3UTcBkbNPaxC0
-         E7yVnDhoo5kC9wxQYbtlA+lvKN0UnMStnHQ4CKXCHRbLRcsk52kcolH4VfCE8tl8x2R7
-         rVlbyNob7de+91BNV2vFjGP/jiHkjERyTxKpuNnzoPzo1NLIRDHVFksKKv4MRU7zsekC
-         zV+g==
-X-Gm-Message-State: AJIora+cxy5ujAbnntQeUB/a4i9ltcEuk9lS2fMMxEEFEmMCStsO1ZpY
-        GQJamT8lxrWEqLMlT7/UqFEqgBS+Xgr4n2GxFLfsoA==
-X-Google-Smtp-Source: AGRyM1ug6YIa7Qapp9b4B5y5/JmJxQbX5IwK+4B6dyOrtwMDpXUoAPCGrqsdEXvxbtlSDQIZ8jY0SSTJaKISEH9GcuU=
-X-Received: by 2002:a25:ab84:0:b0:671:748b:ffab with SMTP id
- v4-20020a25ab84000000b00671748bffabmr5212697ybi.427.1658914074600; Wed, 27
- Jul 2022 02:27:54 -0700 (PDT)
+        Wed, 27 Jul 2022 08:50:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9978ADF3
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 05:50:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658926208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u3tWNZoM0SHgJT357NmowYOc/14fIdjywuVCaJBZfBY=;
+        b=SGcFBqiw37SJEce3iXhMfe5g3motm1cZbiOL7OzA6OEY+Wk+rMKkwV7Vz83DE7KtF1c4+L
+        ZuI1UYXka1LGYjtSjplAmWP0xx668sg1rGLELkse8ewfTefuXsUpStLpODa12aOmDVpeym
+        GTTT+SE4PYmXWOibWOgGxa+J3wdwPl8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-639-oATUdNq-NaeacgLetjm8rA-1; Wed, 27 Jul 2022 08:50:01 -0400
+X-MC-Unique: oATUdNq-NaeacgLetjm8rA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0889B85A589;
+        Wed, 27 Jul 2022 12:50:01 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.39.192.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11AE6492CA2;
+        Wed, 27 Jul 2022 12:49:58 +0000 (UTC)
+From:   Florian Weimer <fweimer@redhat.com>
+To:     "Theodore Ts'o" <tytso@mit.edu>
+Cc:     Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Rich Felker <dalias@libc.org>,
+        Yann Droneaud <ydroneaud@opteya.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org,
+        linux-crypto@vger.kernel.org, Michael@phoronix.com, jann@thejh.net
+Subject: Re: arc4random - are you sure we want these?
+In-Reply-To: <YuEwR0bJhOvRtmFe@mit.edu> (Theodore Ts'o's message of "Wed, 27
+        Jul 2022 08:32:07 -0400")
+References: <YtwgTySJyky0OcgG@zx2c4.com> <Ytwg8YEJn+76h5g9@zx2c4.com>
+        <6bf352e9-1312-40de-4733-3219721b343c@linaro.org>
+        <20220725153303.GF7074@brightrain.aerifal.cx>
+        <878rohp2ll.fsf@oldenburg.str.redhat.com>
+        <20220725174430.GI7074@brightrain.aerifal.cx>
+        <CAPBLoAe89Pwt=F_jcZirVXQA7JtugV+5+BWHBt0RaZka1y0K=g@mail.gmail.com>
+        <20220725184929.GJ7074@brightrain.aerifal.cx>
+        <YuCa1lDqoxdnZut/@mit.edu>
+        <a5b6307d-6811-61b6-c13d-febaa6ad1e48@linaro.org>
+        <YuEwR0bJhOvRtmFe@mit.edu>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+Date:   Wed, 27 Jul 2022 14:49:57 +0200
+Message-ID: <87v8rid8ju.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
-References: <cover.1658815925.git.cdleonard@gmail.com> <ad19d5c8a24054d48e1c35bb0ec92075b9f0dc6a.1658815925.git.cdleonard@gmail.com>
- <CANn89i+ByJsdKLXi982jq0H3irYg_ANSEdmL2zwZ_7G-E_g2eg@mail.gmail.com>
- <CANn89i+=LVDFx_zjDy6uK+QorR+fosdkb8jqNMO6syqOsS7ZqQ@mail.gmail.com> <dd2ca85e-ab29-2973-f129-9afafb405851@gmail.com>
-In-Reply-To: <dd2ca85e-ab29-2973-f129-9afafb405851@gmail.com>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Wed, 27 Jul 2022 11:27:43 +0200
-Message-ID: <CANn89iLUuSWFHbZnb9DSJfR58bCU=pq+uPmT6s45=nrDzMWYYg@mail.gmail.com>
-Subject: Re: [PATCH v6 21/26] selftests: net/fcnal: Initial tcp_authopt support
-To:     Leonard Crestez <cdleonard@gmail.com>
-Cc:     David Ahern <dsahern@kernel.org>, Philip Paeps <philip@trouble.is>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        netdev <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 27, 2022 at 10:29 AM Leonard Crestez <cdleonard@gmail.com> wrote:
->
->
-> On 7/26/22 10:27, Eric Dumazet wrote:
-> > On Tue, Jul 26, 2022 at 9:06 AM Eric Dumazet <edumazet@google.com> wrote:
-> >>
-> >> On Tue, Jul 26, 2022 at 8:16 AM Leonard Crestez <cdleonard@gmail.com> wrote:
-> >>>
-> >>> Tests are mostly copied from tcp_md5 with minor changes.
-> >>>
-> >>> It covers VRF support but only based on binding multiple servers: not
-> >>> multiple keys bound to different interfaces.
-> >>>
-> >>> Also add a specific -t tcp_authopt to run only these tests specifically.
-> >>>
-> >>
-> >> Thanks for the test.
-> >>
-> >> Could you amend the existing TCP MD5 test to make sure dual sockets
-> >> mode is working ?
-> >>
-> >> Apparently, if we have a dual stack listener socket (AF_INET6),
-> >> correct incoming IPV4 SYNs are dropped.
->
-> >>   If this is the case, fixing MD5 should happen first ;
->
-> I remember looking into this and my conclusion was that ipv4-mapped-ipv6
-> is not worth supporting for AO, at least not in the initial version.
->
-> Instead I just wrote a test to check that ipv4-mapped-ipv6 fails for AO:
-> https://github.com/cdleonard/tcp-authopt-test/blob/main/tcp_authopt_test/test_verify_capture.py#L191
->
-> On a closer look it does appear that support existed for
-> ipv4-mapped-ipv6 in TCP-MD5 but my test didn't actually exercise it
-> correctly so the test had to be fixed.
->
->
-> Do you think it makes sense to add support for ipv4-mapped-ipv6 for AO?
-> It's not particularly difficult to test, it was skipped due to a lack of
-> application use case and to keep the initial series smaller.
+* Theodore Ts'o:
 
-I think this makes sense. ipv4-mapped support is definitely used.
+> But even if you didn't take the latest kernels, I think you will find
+> that if you actually benchmark how many queries per second a real-life
+> secure web server or VPN gateway, even the original 5.15.0 /dev/random
+> driver was plenty fast enough for real world cryptographic use cases.
 
->
-> Adding support for this later as a separate commit should be fine. Since
-> ivp4-mapped-ipv6 addresses shouldn't appear on the wire giving them
-> special treatment "later" should raise no compatibility concerns.
->
->
-> >> I think that we are very late in the cycle (linux-5.19 should be
-> >> released in 5 days), and your patch set should not be merged so late.
->
-> This was posted in order to get code reviews, I'm not actually expecting
-> inclusion.
+The idea is to that arc4random() is suitable in pretty much all places
+that have historically used random() (outside of deterministic
+simulations).  Straight calls to getrandom are much, much slower than
+random(), and it's not even the system call overhead.
 
-To be clear, I am supporting this work and would like to see it being
-merged hopefully soon ;)
+Thanks,
+Florian
+
