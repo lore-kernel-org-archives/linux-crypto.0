@@ -2,95 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F44C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 01:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C1CC00144
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 02:52:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240126AbiG0BRf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 21:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
+        id S240067AbiG0Cwf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 22:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiG0BRf (ORCPT
+        with ESMTP id S229717AbiG0Cwe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 21:17:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88132A261;
-        Tue, 26 Jul 2022 18:17:33 -0700 (PDT)
+        Tue, 26 Jul 2022 22:52:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018963B96B;
+        Tue, 26 Jul 2022 19:52:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 85F5D616D4;
-        Wed, 27 Jul 2022 01:17:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C95DAC433D7;
-        Wed, 27 Jul 2022 01:17:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9463F61761;
+        Wed, 27 Jul 2022 02:52:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E95C433D6;
+        Wed, 27 Jul 2022 02:52:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658884653;
-        bh=yHdFI7UZExa1GxsmSAJPPFlPx1kKFocZoTBH3mG9NMo=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=mdshVMdvfzhti6LRuDN6H7FqRhIPEHgJQTuekQbRk/mzcXXE8ynF8tli3utiZLp5O
-         QxJiEvHmZWAdKm0SYEtppBgNd1fXBwwgNxA1xN/58n6z/5G0fZLq1uX8wd9Gu+Ny9s
-         3BZFdmz9bgUxy7tc8D9OXGQTNnxX+AolldBOTMuoHbo/jeOpa7QOB7GpQQczyvNU5w
-         Mb6G9CKihsYC/NAcfU+R9sFAv01z9O5gFdLey2i/K+Dz7mddR0bFAiv8OXIQMYhtc1
-         +saf5fv4mak89IDZ4Wam0A9XfwnyABJR6qN7sfsaT3/bqbqGI+zbkKoRM2ZPP2tLqf
-         rmhz8+MSk3NtQ==
-Message-ID: <40928cfc-150c-8714-bb83-21d325ce93e5@kernel.org>
-Date:   Tue, 26 Jul 2022 19:17:30 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH v6 02/26] tcp: authopt: Remove more unused noops
-Content-Language: en-US
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Philip Paeps <philip@trouble.is>
-Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
+        s=k20201202; t=1658890352;
+        bh=mOvAqtymjKTyNB33hg2ZKI/KGchB0ZSy5/mlAYTBUOA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=NiMqKvPl/nfHT0J/79eWG9MQcSvoCr/GfTZfPO5Y4E0dmORqA4TuvLHFCNFM9kop+
+         juo3Nj/x196GIHtKN7+tkp3imeXXdGaS8VP25mdKZaTO3GqR4UNBBknJlvbLEOG5s3
+         Gj3Os8kZJthXVknYUaY4zKJzOSgZbgnaYyFndF7AzyBi7MbWDRnumqsrD3ikIOxoO8
+         v6flBlepBQyWY1pfkUbJIoSKi1KbstGCaoBqxjeW3sx8UeTqYbP9r+14C/dQ9/j5oL
+         pSC96vJ0XqHL0kdFcWAT+93nswod7CfsP2OF2Kuvfx6SWUt1Im9g6LuHLuEMH6oTs1
+         15Gfk+jeTf+7w==
+Date:   Tue, 26 Jul 2022 19:52:30 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        David Ahern <dsahern@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1658815925.git.cdleonard@gmail.com>
- <2e9007e2f536ef2b8e3dfdaa1dd44dcc6bfc125f.1658815925.git.cdleonard@gmail.com>
-From:   David Ahern <dsahern@kernel.org>
-In-Reply-To: <2e9007e2f536ef2b8e3dfdaa1dd44dcc6bfc125f.1658815925.git.cdleonard@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 6/6] net/ipv6: sr: Switch to using crypto_pool
+Message-ID: <20220726195230.1ba174fb@kernel.org>
+In-Reply-To: <20220726201600.1715505-7-dima@arista.com>
+References: <20220726201600.1715505-1-dima@arista.com>
+        <20220726201600.1715505-7-dima@arista.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/26/22 12:15 AM, Leonard Crestez wrote:
-> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
-> ---
->  include/net/tcp_authopt.h | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-> index adf325c260d5..bc2cff82830d 100644
-> --- a/include/net/tcp_authopt.h
-> +++ b/include/net/tcp_authopt.h
-> @@ -60,14 +60,10 @@ DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
->  void tcp_authopt_clear(struct sock *sk);
->  int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
->  int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key);
->  int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen);
->  #else
-> -static inline int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key)
-> -{
-> -	return -ENOPROTOOPT;
-> -}
->  static inline void tcp_authopt_clear(struct sock *sk)
->  {
->  }
->  #endif
->  
-added in the previous patch, so this one should be folded into patch 1
+On Tue, 26 Jul 2022 21:16:00 +0100 Dmitry Safonov wrote:
+> The conversion to use crypto_pool has the following upsides:
+> - now SR uses asynchronous API which may potentially free CPU cycles and
+>   improve performance for of CPU crypto algorithm providers;
+> - hash descriptors now don't have to be allocated on boot, but only at
+>   the moment SR starts using HMAC and until the last HMAC secret is
+>   deleted;
+> - potentially reuse ahash_request(s) for different users
+> - allocate only one per-CPU scratch buffer rather than a new one for
+>   each user
+> - have a common API for net/ users that need ahash on RX/TX fast path
+
+Build problems on allmodconfig:
+
+ERROR: modpost: "crypto_pool_reserve_scratch" [net/ipv6/ipv6.ko] undefined!
