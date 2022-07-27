@@ -2,63 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A63C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 08:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51693C19F21
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 09:28:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229703AbiG0ItT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 04:49:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33876 "EHLO
+        id S231511AbiG0J2L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jul 2022 05:28:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiG0ItS (ORCPT
+        with ESMTP id S231624AbiG0J15 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 04:49:18 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3405220CD;
-        Wed, 27 Jul 2022 01:49:17 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id oy13so30310033ejb.1;
-        Wed, 27 Jul 2022 01:49:17 -0700 (PDT)
+        Wed, 27 Jul 2022 05:27:57 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6C247BB7
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 02:27:55 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id c131so29280863ybf.9
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 02:27:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=d1lY+SbefORY1alUO5Ruoz9a82JcM7Nf8lJvnE9N4/c=;
-        b=OsRc2rKX4EZLzYrOOOwTb9hpk8Nplbpn5nOxGy5pzMQ7lLi/uDWWL3/IN3NB7JVlco
-         g/31tT6WzBZ/zZx5r3wO+xvUzuoiQkJFzEh2aLPIFjPQ8P24dHTPrGhpiIwvMIviola2
-         ZRWfYY4tQtlc2rvmjFHknsn0lnznuRl74ZeJ28EX59ssAwg+1G3eJUSkyeHp8wuwrKUL
-         BQMleBAJfNn6HH4e6GaOOzHLn3FYyvS319+/aVqCYpmWOQRgX4VBk6mneFHw0/qAMUnp
-         NuINY19JKHnEJMAFEilsKWrAvRLSl7litgjIvPlpk1Nba/8APkdwjhdQ22GOjhwIRgxX
-         ojew==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bBFDz2W5xcHE0ZM3OCmaQTYQarGqNZfYlbjkrHAkU7Y=;
+        b=GzP/fohU8r+nSa3pQEBIHnxBWxZwdz999gax3ajvKKV/3qdNXgkMNf+4icGDdVliom
+         bSnb1aJALnTPPwUJAbpGuWaJJZ9qjslqNlGZZAneOAIusIAWv1CUuTznA9SxSf6+mIh2
+         pqhUvsR4XeiSykRLGwKylGq9JxhtxOWhs99agWtcf4xdfPblA4Wo+3WABwYAmdva9L0J
+         WvKFgZo2Q/IJkcXb3a3GjoXn0WD+wzQDWCfiux1tarsXAr2hhDUGBq7rwGFG8tURaiPF
+         pK8/1x0OC8CDhcC+tZW4s05T4/N2tzLIO2a2LvZLqCsmQI478xmdYM+ibJPHWyDy5TvS
+         m9Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=d1lY+SbefORY1alUO5Ruoz9a82JcM7Nf8lJvnE9N4/c=;
-        b=2JidxEgHiuejVl0nLBdhePtrH6zM7yh2d013Gmj4csAeqCbfSx86/UwOdYBoMXMLXb
-         qjL/reYMCKdGF0Ya90s0RVLbZP2FIoodi3ER2u+dVf1qFZp9cI4JZ+qtYZe28jnPZr7y
-         JnPkJIJF2WVzkgDJyEjGjLX/5g3v5TcauYQRvZKMHddcU9cz+f79KvzbHMGg8J1/aY20
-         vcI6LzVsdeyOQxGNHnOJYFL3/ytTMzPmeFPG09iuBy9kjhIZVu/HEeZsDFrq6lZTHXKu
-         NZOXghyIip+Ksl/JAwhFdh890i2+daPwnwuh5WJRuFDeIXnSj7ZipmNg6oDivhI0h3sH
-         bzPg==
-X-Gm-Message-State: AJIora8lX/efq4BUqQF9L5KgReSvQmUrpcsZ2llX/wBPSIIeEbOBPSIN
-        uAnFjGblLnzZz6Lse3o03N0=
-X-Google-Smtp-Source: AGRyM1uWpUx1FgjuBQNIMqcaqrzHL/wqJikJ3HOaiWwuoYUf1yR2fbDipYNhXfnD7h1UUVwuqv/XIw==
-X-Received: by 2002:a17:907:948e:b0:72f:b536:57 with SMTP id dm14-20020a170907948e00b0072fb5360057mr16005650ejc.491.1658911756389;
-        Wed, 27 Jul 2022 01:49:16 -0700 (PDT)
-Received: from ?IPV6:2a04:241e:502:a09c:994d:5eac:a62d:7a76? ([2a04:241e:502:a09c:994d:5eac:a62d:7a76])
-        by smtp.gmail.com with ESMTPSA id kz22-20020a17090777d600b0072b16a57cdcsm7327975ejc.118.2022.07.27.01.49.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jul 2022 01:49:15 -0700 (PDT)
-Message-ID: <4a8ddb5b-e7bf-5a7d-48dc-72f62771c79e@gmail.com>
-Date:   Wed, 27 Jul 2022 11:49:13 +0300
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bBFDz2W5xcHE0ZM3OCmaQTYQarGqNZfYlbjkrHAkU7Y=;
+        b=bXpHn7K43AJZafYfd3wzWydjdiDVvW3fgfWniakP6Zb87SU5j1NXWM63Y+Av3ykTLi
+         PtCs2PsnvucLaqL0gzJuzqj5pqzXv3VvbeQVon65vsd3k/qK1lghXsNxWV91y8eI43+d
+         wIMRkFDFfgCb2QgFuIoVw0wQA8QsK0SNH6w2As+G1ToWDzS7ArUfFwV3UTcBkbNPaxC0
+         E7yVnDhoo5kC9wxQYbtlA+lvKN0UnMStnHQ4CKXCHRbLRcsk52kcolH4VfCE8tl8x2R7
+         rVlbyNob7de+91BNV2vFjGP/jiHkjERyTxKpuNnzoPzo1NLIRDHVFksKKv4MRU7zsekC
+         zV+g==
+X-Gm-Message-State: AJIora+cxy5ujAbnntQeUB/a4i9ltcEuk9lS2fMMxEEFEmMCStsO1ZpY
+        GQJamT8lxrWEqLMlT7/UqFEqgBS+Xgr4n2GxFLfsoA==
+X-Google-Smtp-Source: AGRyM1ug6YIa7Qapp9b4B5y5/JmJxQbX5IwK+4B6dyOrtwMDpXUoAPCGrqsdEXvxbtlSDQIZ8jY0SSTJaKISEH9GcuU=
+X-Received: by 2002:a25:ab84:0:b0:671:748b:ffab with SMTP id
+ v4-20020a25ab84000000b00671748bffabmr5212697ybi.427.1658914074600; Wed, 27
+ Jul 2022 02:27:54 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v6 02/26] tcp: authopt: Remove more unused noops
-Content-Language: en-US
-To:     David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
+References: <cover.1658815925.git.cdleonard@gmail.com> <ad19d5c8a24054d48e1c35bb0ec92075b9f0dc6a.1658815925.git.cdleonard@gmail.com>
+ <CANn89i+ByJsdKLXi982jq0H3irYg_ANSEdmL2zwZ_7G-E_g2eg@mail.gmail.com>
+ <CANn89i+=LVDFx_zjDy6uK+QorR+fosdkb8jqNMO6syqOsS7ZqQ@mail.gmail.com> <dd2ca85e-ab29-2973-f129-9afafb405851@gmail.com>
+In-Reply-To: <dd2ca85e-ab29-2973-f129-9afafb405851@gmail.com>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Wed, 27 Jul 2022 11:27:43 +0200
+Message-ID: <CANn89iLUuSWFHbZnb9DSJfR58bCU=pq+uPmT6s45=nrDzMWYYg@mail.gmail.com>
+Subject: Re: [PATCH v6 21/26] selftests: net/fcnal: Initial tcp_authopt support
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     David Ahern <dsahern@kernel.org>, Philip Paeps <philip@trouble.is>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
         Shuah Khan <shuah@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -71,49 +69,72 @@ Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
         Christoph Paasch <cpaasch@apple.com>,
         Ivan Delalande <colona@arista.com>,
         Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Philip Paeps <philip@trouble.is>
-References: <cover.1658815925.git.cdleonard@gmail.com>
- <2e9007e2f536ef2b8e3dfdaa1dd44dcc6bfc125f.1658815925.git.cdleonard@gmail.com>
- <40928cfc-150c-8714-bb83-21d325ce93e5@kernel.org>
-From:   Leonard Crestez <cdleonard@gmail.com>
-In-Reply-To: <40928cfc-150c-8714-bb83-21d325ce93e5@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Priyaranjan Jha <priyarjha@google.com>,
+        netdev <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/27/22 04:17, David Ahern wrote:
-> On 7/26/22 12:15 AM, Leonard Crestez wrote:
->> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
->> ---
->>   include/net/tcp_authopt.h | 4 ----
->>   1 file changed, 4 deletions(-)
->>
->> diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
->> index adf325c260d5..bc2cff82830d 100644
->> --- a/include/net/tcp_authopt.h
->> +++ b/include/net/tcp_authopt.h
->> @@ -60,14 +60,10 @@ DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
->>   void tcp_authopt_clear(struct sock *sk);
->>   int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
->>   int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key);
->>   int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen);
->>   #else
->> -static inline int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key)
->> -{
->> -	return -ENOPROTOOPT;
->> -}
->>   static inline void tcp_authopt_clear(struct sock *sk)
->>   {
->>   }
->>   #endif
->>   
-> added in the previous patch, so this one should be folded into patch 1
-Yes this was intended for squashing but missed somehow; sorry!
+On Wed, Jul 27, 2022 at 10:29 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+>
+>
+> On 7/26/22 10:27, Eric Dumazet wrote:
+> > On Tue, Jul 26, 2022 at 9:06 AM Eric Dumazet <edumazet@google.com> wrote:
+> >>
+> >> On Tue, Jul 26, 2022 at 8:16 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+> >>>
+> >>> Tests are mostly copied from tcp_md5 with minor changes.
+> >>>
+> >>> It covers VRF support but only based on binding multiple servers: not
+> >>> multiple keys bound to different interfaces.
+> >>>
+> >>> Also add a specific -t tcp_authopt to run only these tests specifically.
+> >>>
+> >>
+> >> Thanks for the test.
+> >>
+> >> Could you amend the existing TCP MD5 test to make sure dual sockets
+> >> mode is working ?
+> >>
+> >> Apparently, if we have a dual stack listener socket (AF_INET6),
+> >> correct incoming IPV4 SYNs are dropped.
+>
+> >>   If this is the case, fixing MD5 should happen first ;
+>
+> I remember looking into this and my conclusion was that ipv4-mapped-ipv6
+> is not worth supporting for AO, at least not in the initial version.
+>
+> Instead I just wrote a test to check that ipv4-mapped-ipv6 fails for AO:
+> https://github.com/cdleonard/tcp-authopt-test/blob/main/tcp_authopt_test/test_verify_capture.py#L191
+>
+> On a closer look it does appear that support existed for
+> ipv4-mapped-ipv6 in TCP-MD5 but my test didn't actually exercise it
+> correctly so the test had to be fixed.
+>
+>
+> Do you think it makes sense to add support for ipv4-mapped-ipv6 for AO?
+> It's not particularly difficult to test, it was skipped due to a lack of
+> application use case and to keep the initial series smaller.
 
---
-Regards,
-Leonard
+I think this makes sense. ipv4-mapped support is definitely used.
+
+>
+> Adding support for this later as a separate commit should be fine. Since
+> ivp4-mapped-ipv6 addresses shouldn't appear on the wire giving them
+> special treatment "later" should raise no compatibility concerns.
+>
+>
+> >> I think that we are very late in the cycle (linux-5.19 should be
+> >> released in 5 days), and your patch set should not be merged so late.
+>
+> This was posted in order to get code reviews, I'm not actually expecting
+> inclusion.
+
+To be clear, I am supporting this work and would like to see it being
+merged hopefully soon ;)
