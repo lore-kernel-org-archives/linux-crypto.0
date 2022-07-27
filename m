@@ -2,67 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85DDC00144
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 00:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F44C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 01:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240009AbiG0ASY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Jul 2022 20:18:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35432 "EHLO
+        id S240126AbiG0BRf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Jul 2022 21:17:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233331AbiG0ASW (ORCPT
+        with ESMTP id S229484AbiG0BRf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Jul 2022 20:18:22 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B4632D9D;
-        Tue, 26 Jul 2022 17:18:18 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oGUkR-004pdo-2Y; Wed, 27 Jul 2022 10:18:00 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 27 Jul 2022 08:17:59 +0800
-Date:   Wed, 27 Jul 2022 08:17:59 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Dmitry Safonov <dima@arista.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
+        Tue, 26 Jul 2022 21:17:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88132A261;
+        Tue, 26 Jul 2022 18:17:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 85F5D616D4;
+        Wed, 27 Jul 2022 01:17:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C95DAC433D7;
+        Wed, 27 Jul 2022 01:17:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658884653;
+        bh=yHdFI7UZExa1GxsmSAJPPFlPx1kKFocZoTBH3mG9NMo=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=mdshVMdvfzhti6LRuDN6H7FqRhIPEHgJQTuekQbRk/mzcXXE8ynF8tli3utiZLp5O
+         QxJiEvHmZWAdKm0SYEtppBgNd1fXBwwgNxA1xN/58n6z/5G0fZLq1uX8wd9Gu+Ny9s
+         3BZFdmz9bgUxy7tc8D9OXGQTNnxX+AolldBOTMuoHbo/jeOpa7QOB7GpQQczyvNU5w
+         Mb6G9CKihsYC/NAcfU+R9sFAv01z9O5gFdLey2i/K+Dz7mddR0bFAiv8OXIQMYhtc1
+         +saf5fv4mak89IDZ4Wam0A9XfwnyABJR6qN7sfsaT3/bqbqGI+zbkKoRM2ZPP2tLqf
+         rmhz8+MSk3NtQ==
+Message-ID: <40928cfc-150c-8714-bb83-21d325ce93e5@kernel.org>
+Date:   Tue, 26 Jul 2022 19:17:30 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH v6 02/26] tcp: authopt: Remove more unused noops
+Content-Language: en-US
+To:     Leonard Crestez <cdleonard@gmail.com>,
         Eric Dumazet <edumazet@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
+        Philip Paeps <philip@trouble.is>
+Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Jakub Kicinski <kuba@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/6] net/crypto: Introduce crypto_pool
-Message-ID: <YuCEN7LKcVLL0zBn@gondor.apana.org.au>
-References: <20220726201600.1715505-1-dima@arista.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220726201600.1715505-1-dima@arista.com>
+        Yuchung Cheng <ycheng@google.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Caowangbao <caowangbao@huawei.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1658815925.git.cdleonard@gmail.com>
+ <2e9007e2f536ef2b8e3dfdaa1dd44dcc6bfc125f.1658815925.git.cdleonard@gmail.com>
+From:   David Ahern <dsahern@kernel.org>
+In-Reply-To: <2e9007e2f536ef2b8e3dfdaa1dd44dcc6bfc125f.1658815925.git.cdleonard@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 09:15:54PM +0100, Dmitry Safonov wrote:
-> Add crypto_pool - an API for allocating per-CPU array of crypto requests
-> on slow-path (in sleep'able context) and to use them on a fast-path,
-> which is RX/TX for net/ users (or in any other bh-disabled users).
-> The design is based on the current implementations of md5sig_pool.
+On 7/26/22 12:15 AM, Leonard Crestez wrote:
+> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
+> ---
+>  include/net/tcp_authopt.h | 4 ----
+>  1 file changed, 4 deletions(-)
 > 
-> Previously, I've suggested to add such API on TCP-AO patch submission [1], 
-> where Herbert kindly suggested to help with introducing new crypto API.
-
-What I was suggesting is modifying the actual ahash interface so
-that the tfm can be shared between different key users by moving
-the key into the request object.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
+> index adf325c260d5..bc2cff82830d 100644
+> --- a/include/net/tcp_authopt.h
+> +++ b/include/net/tcp_authopt.h
+> @@ -60,14 +60,10 @@ DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
+>  void tcp_authopt_clear(struct sock *sk);
+>  int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
+>  int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key);
+>  int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen);
+>  #else
+> -static inline int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key)
+> -{
+> -	return -ENOPROTOOPT;
+> -}
+>  static inline void tcp_authopt_clear(struct sock *sk)
+>  {
+>  }
+>  #endif
+>  
+added in the previous patch, so this one should be folded into patch 1
