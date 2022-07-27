@@ -2,142 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2154BC04A68
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 17:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE8AC04A68
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 20:15:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243039AbiG0R5o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 13:57:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35694 "EHLO
+        id S229914AbiG0UPz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jul 2022 16:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238698AbiG0R51 (ORCPT
+        with ESMTP id S229839AbiG0UPy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 13:57:27 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AAF6B247;
-        Wed, 27 Jul 2022 10:01:44 -0700 (PDT)
-Received: from zn.tnic (p200300ea970f4fe3329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:4fe3:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F050F1EC04DA;
-        Wed, 27 Jul 2022 19:01:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1658941298;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=RWJzFBq0WyV6tQ+ZqLZ1AEB5KdQiAYWTFZnp9js+IYk=;
-        b=E1jfg4k4GTyDy4tx4WSwNylGy++reaewl6nh/UZAIdvOu54O6BrtIP6SOogm1scyjOXkAm
-        8OhwlXGLsnG/RMNgmC8aGcjmXcdcrTMVKMEdygb4vDnz8FHsZzd0q5O65TP4M8EaAActq7
-        gUMbQ6dBJ9jj5WGbPtQGg33bagoOLwQ=
-Date:   Wed, 27 Jul 2022 19:01:34 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
- when adding it to RMP table
-Message-ID: <YuFvbm/Zck9Tr5pq@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+        Wed, 27 Jul 2022 16:15:54 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12CB5246D
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Jul 2022 13:15:53 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 26RKFOGv020117
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jul 2022 16:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1658952928; bh=GxWAfRdc2ziEHfuvaVSBjk+KH/YGCESIRjxmtlJYudk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=ojvFcyI/zBCfy88UvCqPwr/NDkthmvMJV4/gswmhsC1kS8t9zSOBKX99hc/NNnUb4
+         RIDPehRjM1VSZf1ckqmOUfcaqql8Q5LFS6y+JXZpeqLSOd5FEoqxtfsQQyYmhlJZJV
+         1yk5UrvgXKK1F1LC5KR49okskMlBMLp2HtYXSAJQF9UaQr+N5QX04xoAevzpQUEDCZ
+         tdTJj8MDKTFP1OMKyr7orSNcBKXPvdK9mcIL0vmn3+fK+ugBtt8/S+PR/sIDgpgUSA
+         CtfeNEJusIMOHBH5U2myS9PovZqhsNWc5qKVgVNlikBIMBm8QwYjk0DF9VqRRaCD5C
+         xa6YCzMgOvgYA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 1D10E15C3434; Wed, 27 Jul 2022 16:15:24 -0400 (EDT)
+Date:   Wed, 27 Jul 2022 16:15:24 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Rich Felker <dalias@libc.org>,
+        Yann Droneaud <ydroneaud@opteya.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, libc-alpha@sourceware.org,
+        linux-crypto@vger.kernel.org, Michael@phoronix.com, jann@thejh.net
+Subject: Re: arc4random - are you sure we want these?
+Message-ID: <YuGc3O88Zxb5HkxY@mit.edu>
+References: <6bf352e9-1312-40de-4733-3219721b343c@linaro.org>
+ <20220725153303.GF7074@brightrain.aerifal.cx>
+ <878rohp2ll.fsf@oldenburg.str.redhat.com>
+ <20220725174430.GI7074@brightrain.aerifal.cx>
+ <CAPBLoAe89Pwt=F_jcZirVXQA7JtugV+5+BWHBt0RaZka1y0K=g@mail.gmail.com>
+ <20220725184929.GJ7074@brightrain.aerifal.cx>
+ <YuCa1lDqoxdnZut/@mit.edu>
+ <a5b6307d-6811-61b6-c13d-febaa6ad1e48@linaro.org>
+ <YuEwR0bJhOvRtmFe@mit.edu>
+ <87v8rid8ju.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <87v8rid8ju.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:03:07PM +0000, Ashish Kalra wrote:
+On Wed, Jul 27, 2022 at 02:49:57PM +0200, Florian Weimer wrote:
+> * Theodore Ts'o:
+> 
+> > But even if you didn't take the latest kernels, I think you will find
+> > that if you actually benchmark how many queries per second a real-life
+> > secure web server or VPN gateway, even the original 5.15.0 /dev/random
+> > driver was plenty fast enough for real world cryptographic use cases.
+> 
+> The idea is to that arc4random() is suitable in pretty much all places
+> that have historically used random() (outside of deterministic
+> simulations).  Straight calls to getrandom are much, much slower than
+> random(), and it's not even the system call overhead.
 
-> Subject: x86/sev: Invalid pages from direct map when adding it to RMP table
+What are those places?  And what are their performance and security
+requirements?  I've heard some people claim that arc4random() is
+supposed to provide strong security guarantees.  I've heard others
+claim that it doesn't, or at least glibc was planning on disclaiming
+security guaranteees.  So there seems to be a lack of clarity about
+the security requirements.
 
-"...: Invalidate pages from the direct map when adding them to the RMP table"
+What about the performance requirements?  Designing an interface where
+the requirement "as fast as possible" is often not a great pathway to
+success, because the reality is that engineering is always about
+tradeoffs.
 
-> +static int restore_direct_map(u64 pfn, int npages)
-> +{
-> +	int i, ret = 0;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
+If there are no security requirements (given the claim that some
+people want to put in the documentation disclaiming that arc4random
+might not be secure), why not just have people continue to use
+random(3)?
 
-set_memory_p() ?
-
-> +		if (ret)
-> +			goto cleanup;
-> +	}
-> +
-> +cleanup:
-> +	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
-
-Warn for each pfn?!
-
-That'll flood dmesg mightily.
-
-> +	return ret;
-> +}
-> +
-> +static int invalid_direct_map(unsigned long pfn, int npages)
-> +{
-> +	int i, ret = 0;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
-
-As above, set_memory_np() doesn't work here instead of looping over each
-page?
-
-> @@ -2462,11 +2494,38 @@ static int rmpupdate(u64 pfn, struct rmpupdate *val)
->  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
->  		return -ENXIO;
->  
-> +	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
-> +	npages = page_level_size(level) / PAGE_SIZE;
-> +
-> +	/*
-> +	 * If page is getting assigned in the RMP table then unmap it from the
-> +	 * direct map.
-> +	 */
-> +	if (val->assigned) {
-> +		if (invalid_direct_map(pfn, npages)) {
-> +			pr_err("Failed to unmap pfn 0x%llx pages %d from direct_map\n",
-
-"Failed to unmap %d pages at pfn 0x... from the direct map\n"
-
-> +			       pfn, npages);
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
->  	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
->  	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
->  		     : "=a"(ret)
->  		     : "a"(paddr), "c"((unsigned long)val)
->  		     : "memory", "cc");
-> +
-> +	/*
-> +	 * Restore the direct map after the page is removed from the RMP table.
-> +	 */
-> +	if (!ret && !val->assigned) {
-> +		if (restore_direct_map(pfn, npages)) {
-> +			pr_err("Failed to map pfn 0x%llx pages %d in direct_map\n",
-
-"Failed to map %d pages at pfn 0x... into the direct map\n"
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+    	      	     	      	     - Ted
