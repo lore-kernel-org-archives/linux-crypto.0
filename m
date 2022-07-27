@@ -2,118 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F720C04A68
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 15:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2154BC04A68
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Jul 2022 17:57:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbiG0Pwd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 11:52:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54184 "EHLO
+        id S243039AbiG0R5o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Jul 2022 13:57:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232850AbiG0Pwc (ORCPT
+        with ESMTP id S238698AbiG0R51 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 11:52:32 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A7349B7C;
-        Wed, 27 Jul 2022 08:52:31 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id i13so12828466edj.11;
-        Wed, 27 Jul 2022 08:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=sCiIbne8ijwxYERRgWmKwN6VqmxC0psTKJdz1VQXbvI=;
-        b=CPyK0OvuJ25Cp/X56lhMJFw/HcqGnRwWjTnIEipGqnnhjaMCyRed/L43d82BCzlDOy
-         PP0dL0w6z0N6064je/4MjYzHVvrzOaZOpMAbOBSEaT5/LkZpKg05Z4wmcIrBU0N5XqZc
-         OvaqNnS+O/THezH2K3YV3+pdd6vNJ8RKo4W+nta/N/khWX3C/vEsQwrGkXmnSol1/8Qj
-         qeZa6hyP/zvcsnc/DSKgYe7Xd0cjIaP3rVnsnIM7K1xBahOGIb2mZvKvaszEgJI/OTT0
-         AEvZ23vcC/narjoLqyNJqQT3nLwpMs/mlbVhzW2D01rxQHZiljyUKNN7tELenJoWjGEN
-         pKjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=sCiIbne8ijwxYERRgWmKwN6VqmxC0psTKJdz1VQXbvI=;
-        b=eytcIG1bDzCt0n+43QHGiYKIovsfFMTh9AZHVOedsR1RFrT8f58iw70IX0kxu+O3v1
-         at/HjoJ5Qtxg9Q3HbWNJ3LEcRZjKE8MuuzcRLvV2+SE3CWcYgnO+flW17P706injSZTj
-         FGuUxwgWsMUFB7DRqmGqKZU6G8vJE/41KhD9IL2Y2pQhkjL+WhgEPCvNqPGq9WAC1hqe
-         ulBnrEjCkrDuTo0MGvqbPsHPSjg1Atg1pLtTZo2z773skWsylF1640fg5TpYfy2HjRGd
-         3W01rEvSxKoPcdBFHA6e4ksdz8EDSBxn/86wqvwH2tTH1Uq++8+KVE0b1Lv36ulPXBWg
-         0whQ==
-X-Gm-Message-State: AJIora8bsUk6aj4bLCQsYcU/msJ1KyQsjT5SUz189BxAlq/iqitOicZi
-        H5j0ZzZ+VySfuUkfnhnj5e0=
-X-Google-Smtp-Source: AGRyM1vO98nO6kDOdEHUpaoV1DgveBsqp+R6esVhO9kfIWL8XEmB3Qxg/xn0FPdBMHzrRB4QH5ScWQ==
-X-Received: by 2002:a05:6402:f12:b0:43c:a70d:ee6 with SMTP id i18-20020a0564020f1200b0043ca70d0ee6mr4771269eda.316.1658937149598;
-        Wed, 27 Jul 2022 08:52:29 -0700 (PDT)
-Received: from ?IPV6:2a04:241e:502:a09c:994d:5eac:a62d:7a76? ([2a04:241e:502:a09c:994d:5eac:a62d:7a76])
-        by smtp.gmail.com with ESMTPSA id 18-20020a170906201200b0072fe6408526sm2914413ejo.9.2022.07.27.08.52.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jul 2022 08:52:29 -0700 (PDT)
-Message-ID: <5b88eea6-1d84-8c16-36f4-358053e247f2@gmail.com>
-Date:   Wed, 27 Jul 2022 18:52:27 +0300
+        Wed, 27 Jul 2022 13:57:27 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AAF6B247;
+        Wed, 27 Jul 2022 10:01:44 -0700 (PDT)
+Received: from zn.tnic (p200300ea970f4fe3329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:4fe3:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F050F1EC04DA;
+        Wed, 27 Jul 2022 19:01:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1658941298;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=RWJzFBq0WyV6tQ+ZqLZ1AEB5KdQiAYWTFZnp9js+IYk=;
+        b=E1jfg4k4GTyDy4tx4WSwNylGy++reaewl6nh/UZAIdvOu54O6BrtIP6SOogm1scyjOXkAm
+        8OhwlXGLsnG/RMNgmC8aGcjmXcdcrTMVKMEdygb4vDnz8FHsZzd0q5O65TP4M8EaAActq7
+        gUMbQ6dBJ9jj5WGbPtQGg33bagoOLwQ=
+Date:   Wed, 27 Jul 2022 19:01:34 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Message-ID: <YuFvbm/Zck9Tr5pq@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 0/6] net/crypto: Introduce crypto_pool
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Safonov <dima@arista.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20220726201600.1715505-1-dima@arista.com>
- <YuCEN7LKcVLL0zBn@gondor.apana.org.au>
-From:   Leonard Crestez <cdleonard@gmail.com>
-In-Reply-To: <YuCEN7LKcVLL0zBn@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/27/22 03:17, Herbert Xu wrote:
-> On Tue, Jul 26, 2022 at 09:15:54PM +0100, Dmitry Safonov wrote:
->> Add crypto_pool - an API for allocating per-CPU array of crypto requests
->> on slow-path (in sleep'able context) and to use them on a fast-path,
->> which is RX/TX for net/ users (or in any other bh-disabled users).
->> The design is based on the current implementations of md5sig_pool.
->>
->> Previously, I've suggested to add such API on TCP-AO patch submission [1],
->> where Herbert kindly suggested to help with introducing new crypto API.
-> 
-> What I was suggesting is modifying the actual ahash interface so
-> that the tfm can be shared between different key users by moving
-> the key into the request object.
+On Mon, Jun 20, 2022 at 11:03:07PM +0000, Ashish Kalra wrote:
 
-The fact that setkey is implemented at the crypto_ahash instead of the 
-ahash_request level is baked into all algorithm implementations 
-(including many hardware-specific ones). Changing this seems extremely 
-difficult.
+> Subject: x86/sev: Invalid pages from direct map when adding it to RMP table
 
-Supporting setkey at the tfm level could be achieved by making it an 
-optional capability on a per-algorithm basis, then something like 
-crypto_pool could detect this scenario and avoid allocating a per-cpu 
-tfm. This would also require a crypto_pool_setkey wrapper.
+"...: Invalidate pages from the direct map when adding them to the RMP table"
 
-As it stands right now multiple crypto-api users needs to duplicate 
-logic for allocating a percpu array of transforms so adding this "pool" 
-API is an useful step forward.
+> +static int restore_direct_map(u64 pfn, int npages)
+> +{
+> +	int i, ret = 0;
+> +
+> +	for (i = 0; i < npages; i++) {
+> +		ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
 
-As far as I remember the requirement for a per-cpu scratch buffer is 
-based on weird architectures having limitations on what kind of memory 
-can be passed to crypto api so this will have to remain.
+set_memory_p() ?
 
---
-Regards,
-Leonard
+> +		if (ret)
+> +			goto cleanup;
+> +	}
+> +
+> +cleanup:
+> +	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
+
+Warn for each pfn?!
+
+That'll flood dmesg mightily.
+
+> +	return ret;
+> +}
+> +
+> +static int invalid_direct_map(unsigned long pfn, int npages)
+> +{
+> +	int i, ret = 0;
+> +
+> +	for (i = 0; i < npages; i++) {
+> +		ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
+
+As above, set_memory_np() doesn't work here instead of looping over each
+page?
+
+> @@ -2462,11 +2494,38 @@ static int rmpupdate(u64 pfn, struct rmpupdate *val)
+>  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>  		return -ENXIO;
+>  
+> +	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
+> +	npages = page_level_size(level) / PAGE_SIZE;
+> +
+> +	/*
+> +	 * If page is getting assigned in the RMP table then unmap it from the
+> +	 * direct map.
+> +	 */
+> +	if (val->assigned) {
+> +		if (invalid_direct_map(pfn, npages)) {
+> +			pr_err("Failed to unmap pfn 0x%llx pages %d from direct_map\n",
+
+"Failed to unmap %d pages at pfn 0x... from the direct map\n"
+
+> +			       pfn, npages);
+> +			return -EFAULT;
+> +		}
+> +	}
+> +
+>  	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+>  	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+>  		     : "=a"(ret)
+>  		     : "a"(paddr), "c"((unsigned long)val)
+>  		     : "memory", "cc");
+> +
+> +	/*
+> +	 * Restore the direct map after the page is removed from the RMP table.
+> +	 */
+> +	if (!ret && !val->assigned) {
+> +		if (restore_direct_map(pfn, npages)) {
+> +			pr_err("Failed to map pfn 0x%llx pages %d in direct_map\n",
+
+"Failed to map %d pages at pfn 0x... into the direct map\n"
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
