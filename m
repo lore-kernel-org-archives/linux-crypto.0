@@ -2,88 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A601EC04A68
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 02:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62904C19F2B
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 06:18:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233027AbiG1CKr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Jul 2022 22:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46820 "EHLO
+        id S233442AbiG1GSZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jul 2022 02:18:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234184AbiG1CKq (ORCPT
+        with ESMTP id S233781AbiG1GSY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Jul 2022 22:10:46 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4CA5A3CD;
-        Wed, 27 Jul 2022 19:10:44 -0700 (PDT)
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LtYxR15Nvz9sxn;
-        Thu, 28 Jul 2022 10:09:31 +0800 (CST)
-Received: from kwepemm600003.china.huawei.com (7.193.23.202) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 28 Jul 2022 10:10:42 +0800
-Received: from ubuntu1804.huawei.com (10.67.174.149) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 28 Jul 2022 10:10:41 +0800
-From:   Ye Weihua <yeweihua4@huawei.com>
-To:     <wangzhou1@hisilicon.com>, <shenyang39@huawei.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <tanshukun1@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yeweihua4@huawei.com>
-Subject: [PATCH v2] drivers: hisilicon: fix mismatch in get/set sgl_sge_nr
-Date:   Thu, 28 Jul 2022 10:07:58 +0800
-Message-ID: <20220728020758.255383-1-yeweihua4@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 28 Jul 2022 02:18:24 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCA115D0F2;
+        Wed, 27 Jul 2022 23:18:22 -0700 (PDT)
+Received: from [192.168.87.140] (unknown [50.47.106.71])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 18D4620FE86F;
+        Wed, 27 Jul 2022 23:18:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 18D4620FE86F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1658989102;
+        bh=dOWYO9Tc9My88lpKym2V9t4KyEwrpWAjOIRXvs4C5XQ=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Ak0uQ40xJOJRfAIrFUYHIr9TFMyUDjJbJTZm6CGUkKy+4qOq8U56I8c+XrKWgMQ8B
+         csdkyl9vpQCSv5JuJFTpnLAuSRIlKNFG4wOc1us79zruuwJNmDK1gCUlFhLZtlZyG7
+         wGUvBV/uHTBcB+UTdH5KjjtwmuxD2IG+4K95CEvI=
+Message-ID: <450dee2f-63bf-51a7-730e-b780b594c1c5@linux.microsoft.com>
+Date:   Wed, 27 Jul 2022 23:18:22 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.174.149]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v8 5/5] crypto: aspeed: add HACE crypto driver
+Content-Language: en-US
+To:     Neal Liu <neal_liu@aspeedtech.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Johnny Huang <johnny_huang@aspeedtech.com>
+Cc:     "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        BMC-SW <BMC-SW@aspeedtech.com>
+References: <20220726113448.2964968-1-neal_liu@aspeedtech.com>
+ <20220726113448.2964968-6-neal_liu@aspeedtech.com>
+ <9d6beefe-9974-22f8-750c-68c9acb707ab@linux.microsoft.com>
+ <TY2PR06MB32137A54B483D6D700BDE7EC80979@TY2PR06MB3213.apcprd06.prod.outlook.com>
+From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
+In-Reply-To: <TY2PR06MB32137A54B483D6D700BDE7EC80979@TY2PR06MB3213.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-KASAN reported this Bug:
+On 7/26/2022 10:31 PM, Neal Liu wrote:
+>> Why are separate options required for hash and crypto algorithms, if hace is
+>> only hw crypto on the SoCs?
+>>
+>> Looks like that's requiring unnecessary __weak register / unregister functions
+>> [see below].
+>>
+>> Couldn't just two options CONFIG_CRYPTO_DEV_ASPEED and
+>> CONFIG_CRYPTO_DEV_ASPEED_DEBUG be simpler to set for downstream
+>> defconfigs?
+> I would like to separate different algorithms by different options for more convenient for further use and debug.
+> We also have RSA engine named ACRY, and would upstream once hash & crypto being accepted.
+> So combined them into one option seems not a good choice for multiple hw crypto, do you agree?
 
-	[17619.659757] BUG: KASAN: global-out-of-bounds in param_get_int+0x34/0x60
-	[17619.673193] Read of size 4 at addr fffff01332d7ed00 by task read_all/1507958
-	...
-	[17619.698934] The buggy address belongs to the variable:
-	[17619.708371]  sgl_sge_nr+0x0/0xffffffffffffa300 [hisi_zip]
+Not sure what's the use case of just enabling crypto or hash separately
+out of same HW engine and esp. when there's no alternative accel 
+available, but that's fine.
 
-There is a mismatch in hisi_zip when get/set the variable sgl_sge_nr.
-The type of sgl_sge_nr is u16, and get/set sgl_sge_nr by
-param_get/set_int.
+If ARCY is different HW engine (interface) then having separate config
+sounds logical.
 
-Replacing param_get/set_int to param_get/set_ushort can fix this bug.
+Multiplying DEBUG configs seems unnecessary though. With dynamic debug
+any of the dev_dbg could be turned on. Suggest using single one for
+the module, if not drop it altogether. Following code is still not
+covered by Kconfig, it in common code.
 
-Fixes: f081fda293ffb ("crypto: hisilicon - add sgl_sge_nr module param for zip")
-Signed-off-by: Ye Weihua <yeweihua4@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ > +#ifdef ASPEED_HACE_DEBUG
+ > +#define HACE_DBG(d, fmt, ...)	\
+ > +	dev_info((d)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+ > +#else
+ > +#define HACE_DBG(d, fmt, ...)	\
+ > +	dev_dbg((d)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+ > +#endif
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 9520a4113c81..a91e6e0e9c69 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -122,12 +122,12 @@ static int sgl_sge_nr_set(const char *val, const struct kernel_param *kp)
- 	if (ret || n == 0 || n > HISI_ACC_SGL_SGE_NR_MAX)
- 		return -EINVAL;
- 
--	return param_set_int(val, kp);
-+	return param_set_ushort(val, kp);
- }
- 
- static const struct kernel_param_ops sgl_sge_nr_ops = {
- 	.set = sgl_sge_nr_set,
--	.get = param_get_int,
-+	.get = param_get_ushort,
- };
- 
- static u16 sgl_sge_nr = HZIP_SGL_SGE_NR;
--- 
-2.17.1
+Regards,
+Dhananjay
+
 
