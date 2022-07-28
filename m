@@ -2,102 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62904C19F2B
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 06:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B48B0C04A68
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 07:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233442AbiG1GSZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jul 2022 02:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58710 "EHLO
+        id S233830AbiG1Hat (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jul 2022 03:30:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233781AbiG1GSY (ORCPT
+        with ESMTP id S233308AbiG1Has (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jul 2022 02:18:24 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCA115D0F2;
-        Wed, 27 Jul 2022 23:18:22 -0700 (PDT)
-Received: from [192.168.87.140] (unknown [50.47.106.71])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 18D4620FE86F;
-        Wed, 27 Jul 2022 23:18:22 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 18D4620FE86F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1658989102;
-        bh=dOWYO9Tc9My88lpKym2V9t4KyEwrpWAjOIRXvs4C5XQ=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Ak0uQ40xJOJRfAIrFUYHIr9TFMyUDjJbJTZm6CGUkKy+4qOq8U56I8c+XrKWgMQ8B
-         csdkyl9vpQCSv5JuJFTpnLAuSRIlKNFG4wOc1us79zruuwJNmDK1gCUlFhLZtlZyG7
-         wGUvBV/uHTBcB+UTdH5KjjtwmuxD2IG+4K95CEvI=
-Message-ID: <450dee2f-63bf-51a7-730e-b780b594c1c5@linux.microsoft.com>
-Date:   Wed, 27 Jul 2022 23:18:22 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v8 5/5] crypto: aspeed: add HACE crypto driver
-Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
+        Thu, 28 Jul 2022 03:30:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B39B57234
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Jul 2022 00:30:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658993446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ux6VwMtMxHO2mepOlWLk/n9XMR06YLsuanCnSO2VUjI=;
+        b=Cy84uvf9mctnvBd8B0UFUPyf7I6OJLszYFUHlBEnzKNXYI0dQT3n9KPW24nU2ZTwt0etK4
+        6Ez0ThLbOKlsH1aMoBJEKWeFeOuN5wODuseJ/VXgaE9e/fipWEBc6FYeTXHwPbxr/PszS/
+        0m1ojePJ4X/4a8vRUSdu71HaH/mv++Q=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-204-fvFAbU1_PgCryZqHIMMp5w-1; Thu, 28 Jul 2022 03:30:42 -0400
+X-MC-Unique: fvFAbU1_PgCryZqHIMMp5w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC6E2185A79C;
+        Thu, 28 Jul 2022 07:30:41 +0000 (UTC)
+Received: from starship (unknown [10.40.192.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 332ED492C3B;
+        Thu, 28 Jul 2022 07:30:34 +0000 (UTC)
+Message-ID: <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
+ configurations
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Cc:     "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        BMC-SW <BMC-SW@aspeedtech.com>
-References: <20220726113448.2964968-1-neal_liu@aspeedtech.com>
- <20220726113448.2964968-6-neal_liu@aspeedtech.com>
- <9d6beefe-9974-22f8-750c-68c9acb707ab@linux.microsoft.com>
- <TY2PR06MB32137A54B483D6D700BDE7EC80979@TY2PR06MB3213.apcprd06.prod.outlook.com>
-From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
-In-Reply-To: <TY2PR06MB32137A54B483D6D700BDE7EC80979@TY2PR06MB3213.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Thu, 28 Jul 2022 10:30:33 +0300
+In-Reply-To: <20220718141123.136106-1-mlevitsk@redhat.com>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/26/2022 10:31 PM, Neal Liu wrote:
->> Why are separate options required for hash and crypto algorithms, if hace is
->> only hw crypto on the SoCs?
->>
->> Looks like that's requiring unnecessary __weak register / unregister functions
->> [see below].
->>
->> Couldn't just two options CONFIG_CRYPTO_DEV_ASPEED and
->> CONFIG_CRYPTO_DEV_ASPEED_DEBUG be simpler to set for downstream
->> defconfigs?
-> I would like to separate different algorithms by different options for more convenient for further use and debug.
-> We also have RSA engine named ACRY, and would upstream once hash & crypto being accepted.
-> So combined them into one option seems not a good choice for multiple hw crypto, do you agree?
+On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
+> This patch series aims to harden the cpuid code against the case when
+> the hypervisor exposes a broken CPUID configuration to the guest,
+> in the form of having a feature disabled but not features that depend on it.
+> 
+> This is the more generic way to fix kernel panic in aes-ni kernel driver,
+> which was triggered by CPUID configuration in which AVX is disabled but
+> not AVX2.
+> 
+> https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> 
+> This was tested by booting a guest with AVX disabled and not AVX2,
+> and observing that both a warning is now printed in dmesg, and
+> that avx2 is gone from /proc/cpuinfo.
+> 
+> V2:
+> 
+> I hopefully addressed all the (very good) review feedback.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (5):
+>   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
+>   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+>   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
+>   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
+>   x86/cpuid: check for dependencies violations in CPUID and attempt to
+>     fix them
+> 
+>  arch/x86/events/intel/lbr.c       |  2 +-
+>  arch/x86/include/asm/cpufeature.h |  1 +
+>  arch/x86/kernel/cpu/common.c      | 51 +-------------------
+>  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
+>  4 files changed, 74 insertions(+), 60 deletions(-)
+> 
+> -- 
+> 2.34.3
+> 
+> 
+A very kind ping on these patches.
 
-Not sure what's the use case of just enabling crypto or hash separately
-out of same HW engine and esp. when there's no alternative accel 
-available, but that's fine.
-
-If ARCY is different HW engine (interface) then having separate config
-sounds logical.
-
-Multiplying DEBUG configs seems unnecessary though. With dynamic debug
-any of the dev_dbg could be turned on. Suggest using single one for
-the module, if not drop it altogether. Following code is still not
-covered by Kconfig, it in common code.
-
- > +#ifdef ASPEED_HACE_DEBUG
- > +#define HACE_DBG(d, fmt, ...)	\
- > +	dev_info((d)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
- > +#else
- > +#define HACE_DBG(d, fmt, ...)	\
- > +	dev_dbg((d)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
- > +#endif
-
-Regards,
-Dhananjay
-
+Best regards,
+	Maxim Levitsky
 
