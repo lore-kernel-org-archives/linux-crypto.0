@@ -2,126 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B48B0C04A68
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 07:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBE7C04A68
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 08:24:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233830AbiG1Hat (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jul 2022 03:30:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
+        id S234557AbiG1IYk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jul 2022 04:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233308AbiG1Has (ORCPT
+        with ESMTP id S234504AbiG1IYj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jul 2022 03:30:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B39B57234
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Jul 2022 00:30:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658993446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ux6VwMtMxHO2mepOlWLk/n9XMR06YLsuanCnSO2VUjI=;
-        b=Cy84uvf9mctnvBd8B0UFUPyf7I6OJLszYFUHlBEnzKNXYI0dQT3n9KPW24nU2ZTwt0etK4
-        6Ez0ThLbOKlsH1aMoBJEKWeFeOuN5wODuseJ/VXgaE9e/fipWEBc6FYeTXHwPbxr/PszS/
-        0m1ojePJ4X/4a8vRUSdu71HaH/mv++Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-204-fvFAbU1_PgCryZqHIMMp5w-1; Thu, 28 Jul 2022 03:30:42 -0400
-X-MC-Unique: fvFAbU1_PgCryZqHIMMp5w-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC6E2185A79C;
-        Thu, 28 Jul 2022 07:30:41 +0000 (UTC)
-Received: from starship (unknown [10.40.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 332ED492C3B;
-        Thu, 28 Jul 2022 07:30:34 +0000 (UTC)
-Message-ID: <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
-Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
- configurations
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Date:   Thu, 28 Jul 2022 10:30:33 +0300
-In-Reply-To: <20220718141123.136106-1-mlevitsk@redhat.com>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Thu, 28 Jul 2022 04:24:39 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD5B6248D
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Jul 2022 01:24:38 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Ltk9j4PNWzWfmR;
+        Thu, 28 Jul 2022 16:20:41 +0800 (CST)
+Received: from [10.67.110.173] (10.67.110.173) by
+ dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 28 Jul 2022 16:24:36 +0800
+Message-ID: <761e849c-3b9d-418e-eb68-664f09b3c661@huawei.com>
+Date:   Thu, 28 Jul 2022 16:24:36 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Inquiry about the removal of flag O_NONBLOCK on /dev/random
+Content-Language: en-US
+From:   "Guozihua (Scott)" <guozihua@huawei.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     Eric Biggers <ebiggers@kernel.org>, <linux-crypto@vger.kernel.org>,
+        <luto@kernel.org>, <tytso@mit.edu>,
+        zhongguohua <zhongguohua1@huawei.com>
+References: <13e1fa9d-4df8-1a99-ca22-d9d655f2d023@huawei.com>
+ <YtaPJPkewin5uWdn@zx2c4.com>
+ <b9cb514c-30ed-0b8b-5d54-75001e07bd36@huawei.com>
+ <YtjREZMzuppTJHeR@sol.localdomain>
+ <a93995db-a738-8e4f-68f2-42d7efd3c77d@huawei.com>
+ <Ytj3RnGtWqg18bxO@sol.localdomain> <YtksefZvcFiugeC1@zx2c4.com>
+ <29c4a3ec-f23f-f17f-da49-7d79ad88e284@huawei.com>
+ <Yt/LPr0uJVheDuuW@zx2c4.com>
+ <4a794339-7aaa-8951-8d24-9bc8a79fa9f3@huawei.com>
+In-Reply-To: <4a794339-7aaa-8951-8d24-9bc8a79fa9f3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Originating-IP: [10.67.110.173]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500024.china.huawei.com (7.185.36.203)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
-> This patch series aims to harden the cpuid code against the case when
-> the hypervisor exposes a broken CPUID configuration to the guest,
-> in the form of having a feature disabled but not features that depend on it.
+On 2022/7/26 19:33, Guozihua (Scott) wrote:
+> On 2022/7/26 19:08, Jason A. Donenfeld wrote:
+>> Hi,
+>>
+>> On Tue, Jul 26, 2022 at 03:43:31PM +0800, Guozihua (Scott) wrote:
+>>> Thanks for all the comments on this inquiry. Does the community has any
+>>> channel to publishes changes like these? And will the man pages get
+>>> updated? If so, are there any time frame?
+>>
+>> I was under the impression you were ultimately okay with the status quo.
+>> Have I misunderstood you?
+>>
+>> Thanks,
+>> Jason
+>> .
 > 
-> This is the more generic way to fix kernel panic in aes-ni kernel driver,
-> which was triggered by CPUID configuration in which AVX is disabled but
-> not AVX2.
+> Hi Jason.
 > 
-> https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> To clarify, I does not have any issue with this change. I asked here 
+> only because I would like some background knowledge on this flag, to 
+> ensure I am on the same page as the community regarding this flag and 
+> the change. And it seems that I understands it correctly.
 > 
-> This was tested by booting a guest with AVX disabled and not AVX2,
-> and observing that both a warning is now printed in dmesg, and
-> that avx2 is gone from /proc/cpuinfo.
+> However I do think it's a good idea to update the document soon to avoid 
+> any misunderstanding in the future.
 > 
-> V2:
-> 
-> I hopefully addressed all the (very good) review feedback.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (5):
->   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
->   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
->   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
->   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
->   x86/cpuid: check for dependencies violations in CPUID and attempt to
->     fix them
-> 
->  arch/x86/events/intel/lbr.c       |  2 +-
->  arch/x86/include/asm/cpufeature.h |  1 +
->  arch/x86/kernel/cpu/common.c      | 51 +-------------------
->  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
->  4 files changed, 74 insertions(+), 60 deletions(-)
-> 
-> -- 
-> 2.34.3
-> 
-> 
-A very kind ping on these patches.
 
-Best regards,
-	Maxim Levitsky
+Our colleague suggests that we should inform users clearly about the 
+change on the flag by returning -EINVAL when /dev/random gets this flag 
+during boot process. Otherwise programs might silently block for a long 
+time, causing other issues. Do you think this is a good way to prevent 
+similar issues on this flag?
 
+-- 
+Best
+GUO Zihua
