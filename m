@@ -2,84 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A6AC19F21
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 12:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59722C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Jul 2022 13:01:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232087AbiG1MuE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Jul 2022 08:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58670 "EHLO
+        id S237735AbiG1NBk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Jul 2022 09:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236073AbiG1MuC (ORCPT
+        with ESMTP id S231272AbiG1NBh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Jul 2022 08:50:02 -0400
-X-Greylist: delayed 604 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 28 Jul 2022 05:49:58 PDT
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BB93ED64;
-        Thu, 28 Jul 2022 05:49:58 -0700 (PDT)
-Date:   Thu, 28 Jul 2022 14:39:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-        t=1659011990; bh=mHeeMB1nB/QsiX2H/TWc7rHRm36suebQLzWsa5KfVVM=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=Jm0y8vf64U+kIqrBzHfrWk+WWxPYIllrknoFGtmJOYWoIA5KWgMhnLaxITx1BhPCP
-         K4RyrM+iMpVz2REhzt2nNgTPfEsIn1jWvfhlv3+TTBWX/lPpTEMv19RT+/kHTSP5WW
-         c0PWd/7u8CEQiNFZ80Sm/xx8MyXGE/JfC0NdqSNwhUwl/QP3unNIJw4Gqg16Dt/K63
-         m08rpMovF3o/I/3P1Iu41/CjlXEAEatbW+y1G8n/RKX2dqNP1tPa5imC4+UIKApbBu
-         AsUESlQvds3I0SRu6LkxxJN99P/WiJh6YHlji/2Yp0Dc+en9tyf8o9fUMScLyFfy4M
-         hCtM1oljeOdig==
-From:   =?ISO-8859-1?Q?Toke_H=F8iland-J=F8rgensen?= <toke@toke.dk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     linux-wireless@vger.kernel.org, kvalo@kernel.org,
-        stable@vger.kernel.org, Gregory Erwin <gregerwin256@gmail.com>,
+        Thu, 28 Jul 2022 09:01:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4BF7120AD;
+        Thu, 28 Jul 2022 06:01:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7019761CED;
+        Thu, 28 Jul 2022 13:01:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC2FC433D6;
+        Thu, 28 Jul 2022 13:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659013295;
+        bh=E51/MNk2qxY6NPI0mcpHqIuA3fXm7V2GZ5k3k3ZJ0YE=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=iUaHHETyUcy1uQ4igxgOhyNGZ3EKoJgd9+BjFAdy7kAVl+yPNxZTwjk6V6NrzSSjS
+         jeGyJIZ7dpu2/0DCcjAV45JBNKWcv7ZuhYKWnkaYMUg/716eiZaTFswd760svKwgq9
+         QJYp0ON4Tz5UtETP1X/4LbVePITwsT03g88ADFIo2lpbZffWsz7vpqGGI0xAP+k4BE
+         i7QcM8QXa+zOHNLXv6oGrqcxXQWitlL9tl8vB5BuiCHDpKuJg6mS/PgQerURanCtAu
+         U8THRUaYcFCiTDtB+lJLjahfmSSYf0jPQz9odN5VrTA/ijM8Deauj9GKm/WkWCcJT0
+         mEhPWojk+Ginw==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-wireless@vger.kernel.org, stable@vger.kernel.org,
+        Gregory Erwin <gregerwin256@gmail.com>,
         "Eric W . Biederman" <ebiederm@xmission.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: =?US-ASCII?Q?Re=3A_=5Bv12_PATCH=5D_hwrng=3A_core_-_let_sleep?= =?US-ASCII?Q?_be_interrupted_when_unregistering_hwrng?=
-In-Reply-To: <YuJjXI+tuiCcixbd@gondor.apana.org.au>
-References: <20220725215536.767961-1-Jason@zx2c4.com> <Yt+3ic4YYpAsUHMF@gondor.apana.org.au> <YuJjXI+tuiCcixbd@gondor.apana.org.au>
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <89068ADD-805B-4036-8CF5-2612E2E8D3FF@toke.dk>
+Subject: Re: [v12 PATCH] hwrng: core - let sleep be interrupted when unregistering hwrng
+References: <20220725215536.767961-1-Jason@zx2c4.com>
+        <Yt+3ic4YYpAsUHMF@gondor.apana.org.au>
+        <YuJjXI+tuiCcixbd@gondor.apana.org.au>
+        <89068ADD-805B-4036-8CF5-2612E2E8D3FF@toke.dk>
+Date:   Thu, 28 Jul 2022 16:01:29 +0300
+In-Reply-To: <89068ADD-805B-4036-8CF5-2612E2E8D3FF@toke.dk> ("Toke
+        \=\?utf-8\?Q\?H\=C3\=B8iland-J\=C3\=B8rgensen\=22's\?\= message of "Thu, 28 Jul 2022
+ 14:39:47 +0200")
+Message-ID: <877d3xo0gm.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk> writes:
 
+> On 28 July 2022 12:22:20 CEST, Herbert Xu <herbert@gondor.apana.org.au> w=
+rote:
+>>From: Jason A. Donenfeld <Jason@zx2c4.com>
+>>
+>>There are two deadlock scenarios that need addressing, which cause
+>>problems when the computer goes to sleep, the interface is set down, and
+>>hwrng_unregister() is called. When the deadlock is hit, sleep is delayed
+>>for tens of seconds, causing it to fail. These scenarios are:
+>>
+>>1) The hwrng kthread can't be stopped while it's sleeping, because it
+>>   uses msleep_interruptible() which does not react to kthread_stop.
+>>
+>>2) A normal user thread can't be interrupted by hwrng_unregister() while
+>>   it's sleeping, because hwrng_unregister() is called from elsewhere.
+>>
+>>We solve both issues by add a completion object called dying that
+>>fulfils waiters once we have started the process in hwrng_unregister.
+>>
+>>At the same time, we should cleanup a common and useless dmesg splat
+>>in the same area.
+>>
+>>Cc: <stable@vger.kernel.org>
+>>Reported-by: Gregory Erwin <gregerwin256@gmail.com>
+>>Fixes: fcd09c90c3c5 ("ath9k: use hw_random API instead of directly
+>> dumping into random.c")
+>>Link:
+>> https://lore.kernel.org/all/CAO+Okf6ZJC5-nTE_EJUGQtd8JiCkiEHytGgDsFGTEjs=
+0c00giw@mail.gmail.com/
+>>Link:
+>> https://lore.kernel.org/lkml/CAO+Okf5k+C+SE6pMVfPf-d8MfVPVq4PO7EY8Hys_DV=
+Xtent3HA@mail.gmail.com/
+>>Link: https://bugs.archlinux.org/task/75138
+>>Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+>>Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
 
-On 28 July 2022 12:22:20 CEST, Herbert Xu <herbert@gondor=2Eapana=2Eorg=2E=
-au> wrote:
->From: Jason A=2E Donenfeld <Jason@zx2c4=2Ecom>
->
->There are two deadlock scenarios that need addressing, which cause
->problems when the computer goes to sleep, the interface is set down, and
->hwrng_unregister() is called=2E When the deadlock is hit, sleep is delaye=
-d
->for tens of seconds, causing it to fail=2E These scenarios are:
->
->1) The hwrng kthread can't be stopped while it's sleeping, because it
->   uses msleep_interruptible() which does not react to kthread_stop=2E
->
->2) A normal user thread can't be interrupted by hwrng_unregister() while
->   it's sleeping, because hwrng_unregister() is called from elsewhere=2E
->
->We solve both issues by add a completion object called dying that
->fulfils waiters once we have started the process in hwrng_unregister=2E
->
->At the same time, we should cleanup a common and useless dmesg splat
->in the same area=2E
->
->Cc: <stable@vger=2Ekernel=2Eorg>
->Reported-by: Gregory Erwin <gregerwin256@gmail=2Ecom>
->Fixes: fcd09c90c3c5 ("ath9k: use hw_random API instead of directly dumpin=
-g into random=2Ec")
->Link: https://lore=2Ekernel=2Eorg/all/CAO+Okf6ZJC5-nTE_EJUGQtd8JiCkiEHytG=
-gDsFGTEjs0c00giw@mail=2Egmail=2Ecom/
->Link: https://lore=2Ekernel=2Eorg/lkml/CAO+Okf5k+C+SE6pMVfPf-d8MfVPVq4PO7=
-EY8Hys_DVXtent3HA@mail=2Egmail=2Ecom/
->Link: https://bugs=2Earchlinux=2Eorg/task/75138
->Signed-off-by: Jason A=2E Donenfeld <Jason@zx2c4=2Ecom>
->Signed-off-by: Herbert Xu <herbert@gondor=2Eapana=2Eorg=2Eau>
+Acked-by: Kalle Valo <kvalo@kernel.org>
 
-Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke=2Edk>
+Herbert, feel free to take this via your tree. Thanks!
+
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
