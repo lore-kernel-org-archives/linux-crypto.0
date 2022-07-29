@@ -2,67 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0CCC19F2B
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Jul 2022 07:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A148C00144
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Jul 2022 09:36:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234552AbiG2HbM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Jul 2022 03:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43480 "EHLO
+        id S233549AbiG2JgC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Jul 2022 05:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234476AbiG2HbK (ORCPT
+        with ESMTP id S233564AbiG2JgA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Jul 2022 03:31:10 -0400
-Received: from mail.coredeal.pl (mail.coredeal.pl [51.75.73.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B857B34F
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Jul 2022 00:31:09 -0700 (PDT)
-Received: by mail.coredeal.pl (Postfix, from userid 1002)
-        id 89BFEA9FF9; Fri, 29 Jul 2022 07:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=coredeal.pl; s=mail;
-        t=1659079847; bh=9KGuIG62LgzC9aYmjKxzocuYLRCVghXg6v9Q1q2LHec=;
-        h=Date:From:To:Subject:From;
-        b=n5By5Fyh/cwFN2+vWVtVDZSjSzLUFNlQlx3vmQBzRg77jW0jy5xvcqEhiWh7lD/d8
-         WYLTLC7l/GXm1bgTKd7cii4eio0XOOdLBsgfANM/7qhMoGZvVoiTIohLJhBb1IWaUl
-         qftl2o77giSgIRGEdI4nuvu9KeK4WdLBGNsw0wjpApc6mAfdUYjGbhEqDUb+JVGTd2
-         fi8zSqmXKUBMrvpUb6MRKVQuO1+kxYTk9S+OVyqYxzy8mDjnyD/gT8KJLt5JD+I15I
-         XsyUr2VAtMWmWLZw+sM46Y1sCRr71crmluZOa3zg6kTh7Puwzlluxf0ow36vDKB7d6
-         QcKMS8+k7pd/A==
-Received: by mail.coredeal.pl for <linux-crypto@vger.kernel.org>; Fri, 29 Jul 2022 07:29:16 GMT
-Message-ID: <20220729063000-0.1.4l.180x6.0.7qgmh1uc9b@coredeal.pl>
-Date:   Fri, 29 Jul 2022 07:29:16 GMT
-From:   "Krzysztof Maj" <krzysztof.maj@coredeal.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Biznesowy angielski
-X-Mailer: mail.coredeal.pl
+        Fri, 29 Jul 2022 05:36:00 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17D558B6B;
+        Fri, 29 Jul 2022 02:35:56 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oHMP5-005nJz-LG; Fri, 29 Jul 2022 19:35:33 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Jul 2022 17:35:31 +0800
+Date:   Fri, 29 Jul 2022 17:35:31 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Vinod Koul <vkoul@kernel.org>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: qcom-rng - Fix qcom_rng_of_match unused warning
+Message-ID: <YuOp49dCARTVQ+c+@gondor.apana.org.au>
+References: <202207240830.NxaVYPVM-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202207240830.NxaVYPVM-lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+On Sun, Jul 24, 2022 at 08:12:39AM +0800, kernel test robot wrote:
+>
+> >> drivers/crypto/qcom-rng.c:190:34: warning: 'qcom_rng_of_match' defined but not used [-Wunused-const-variable=]
+>      190 | static const struct of_device_id qcom_rng_of_match[] = {
+>          |                                  ^~~~~~~~~~~~~~~~~
 
-czy rozwa=C5=BCali Pa=C5=84stwo rozw=C3=B3j kwalifikacji j=C4=99zykowych =
-swoich pracownik=C3=B3w?
+---8<---
+Module device tables need to be declared as maybe_unused because
+they will be unused when built-in and the corresponding option is
+also disabled.
 
-Opracowali=C5=9Bmy kursy j=C4=99zykowe dla r=C3=B3=C5=BCnych bran=C5=BC, =
-w kt=C3=B3rych koncentrujemy si=C4=99 na podniesieniu poziomu s=C5=82owni=
-ctwa i jako=C5=9Bci komunikacji wykorzystuj=C4=85c autorsk=C4=85 metod=C4=
-=99, stworzon=C4=85 specjalnie dla wymagaj=C4=85cego biznesu.=20
+This patch adds the maybe_unused attributes to OF and ACPI.  This
+also allows us to remove the ifdef around the ACPI data structure.
 
-Niestandardowy kurs on-line, dopasowany do profilu firmy i obszar=C3=B3w =
-=C5=9Bwiadczonych us=C5=82ug, w szybkim czasie przyniesie efekty, kt=C3=B3=
-re zwi=C4=99ksz=C4=85 komfort i jako=C5=9B=C4=87 pracy, rozwijaj=C4=85c m=
-o=C5=BCliwo=C5=9Bci biznesowe.=20
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Zdalne szkolenie j=C4=99zykowe to m.in. zaj=C4=99cia z native speakerami,=
- kt=C3=B3re w szybkim czasie naucz=C4=85 pracownik=C3=B3w rozmawia=C4=87 =
-za pomoc=C4=85 jasnego i zwi=C4=99z=C5=82ego j=C4=99zyka Business English=
-=2E
-
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 wi=C4=99cej szczeg=C3=B3=C5=82=C3=B3=
-w i opowiedzie=C4=87 jak dzia=C5=82amy?=20
-
-
-Pozdrawiam
-Krzysztof Maj
+diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
+index 031b5f701a0a..72dd1a4ebac4 100644
+--- a/drivers/crypto/qcom-rng.c
++++ b/drivers/crypto/qcom-rng.c
+@@ -9,6 +9,7 @@
+ #include <linux/crypto.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/platform_device.h>
+@@ -201,15 +202,13 @@ static int qcom_rng_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-#if IS_ENABLED(CONFIG_ACPI)
+-static const struct acpi_device_id qcom_rng_acpi_match[] = {
++static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
+ 	{ .id = "QCOM8160", .driver_data = 1 },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(acpi, qcom_rng_acpi_match);
+-#endif
+ 
+-static const struct of_device_id qcom_rng_of_match[] = {
++static const struct of_device_id __maybe_unused qcom_rng_of_match[] = {
+ 	{ .compatible = "qcom,prng", .data = (void *)0},
+ 	{ .compatible = "qcom,prng-ee", .data = (void *)1},
+ 	{}
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
