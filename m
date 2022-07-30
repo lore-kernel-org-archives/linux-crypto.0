@@ -2,111 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B10BC00144
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Jul 2022 22:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 892F2C19F2B
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Jul 2022 08:39:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233266AbiG2WGj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Jul 2022 18:06:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43626 "EHLO
+        id S232054AbiG3Iju (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Jul 2022 04:39:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231449AbiG2WGi (ORCPT
+        with ESMTP id S231314AbiG3Ijt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Jul 2022 18:06:38 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3493761D84;
-        Fri, 29 Jul 2022 15:06:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D1450B829BD;
-        Fri, 29 Jul 2022 22:06:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65646C433D6;
-        Fri, 29 Jul 2022 22:06:33 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=fail reason="signature verification failed" (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Dm3EdRpJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1659132391;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aK+gfCA4YdshP55tSpv431gnfgm7OADGPtVgLaLQpbo=;
-        b=Dm3EdRpJ2eK0VBWtv4UY/wRg7VhnfADEGldFSyYWXSbdqsyy1fXhdniCsaWF65BfIiZdcK
-        O9suhulJfzEMOeSyi5hwdnh7RmutX4o9AJwW+grGLdD38v8jW5Axji9TwyFW4DBrhOTwII
-        30P2zo89XD2NehbGFNpyDAWCBVGF34I=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9ce959eb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 29 Jul 2022 22:06:31 +0000 (UTC)
-Date:   Sat, 30 Jul 2022 00:06:26 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Florian Weimer <fweimer@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Thomas Ristenpart <ristenpart@cornell.edu>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
-Subject: Re: [PATCH RFC v1] random: implement getrandom() in vDSO
-Message-ID: <YuRZ4tC+GY+hymFd@zx2c4.com>
-References: <20220729145525.1729066-1-Jason@zx2c4.com>
- <87a68r4qpy.fsf@oldenburg.str.redhat.com>
+        Sat, 30 Jul 2022 04:39:49 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DDE28720;
+        Sat, 30 Jul 2022 01:39:47 -0700 (PDT)
+Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LvyTM6SXZz9stV;
+        Sat, 30 Jul 2022 16:38:31 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 30 Jul 2022 16:39:45 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 30 Jul
+ 2022 16:39:45 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
+        <yekai13@huawei.com>
+Subject: [PATCH v6 0/3] crypto: hisilicon - supports device isolation feature
+Date:   Sat, 30 Jul 2022 16:32:43 +0800
+Message-ID: <20220730083246.55646-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87a68r4qpy.fsf@oldenburg.str.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Florian,
+1、Add the uacce hardware error isolation interface. Supports
+   configures the hardware error isolation frequency.
+2、Defining the isolation strategy for ACC by uacce sysfs node. If the 
+   number of hardware errors in a per hour exceeds the configured value,
+   the device will not be available in user space. The VF device use the
+   PF device isolation strategy.
+   
+changes v1->v2:
+	- deleted dev_to_uacce api.
+	- add vfs node doc. 
+	- move uacce->ref to driver.
+changes v2->v3:
+	- deleted some redundant code.
+	- use qm state instead of reference count.
+	- add null pointer check.
+	- isolate_strategy_read() instead of a copy.
+changes v3->v4:
+	- modify a comment
+changes v4->v5:
+	- use bool instead of atomic.
+	- isolation frequency instead of isolation command.
+changes v5->v6:
+	- add is_visible in uacce.
+	- add the description of the isolation strategy file node.
 
-Thanks for the feedback.
+Kai Ye (3):
+  uacce: supports device isolation feature
+  Documentation: add a isolation strategy sysfs node for uacce
+  crypto: hisilicon/qm - define the device isolation strategy
 
-On Fri, Jul 29, 2022 at 10:19:05PM +0200, Florian Weimer wrote:
-> > +	if (getcpu(&start, NULL, NULL) == 0)
-> > +		start %= NUM_BUCKETS;
-> 
-> getcpu is not available everywhere.  Userspace/libc should probably
-> provide a CPU number hint as an additional argument during the vDSO
-> call.  We can load that easily enough from rseq.  That's going to be
-> faster on x86, too (the LSL instruction is quite slow).  The only
-> advantage of using getcpu like this is that it's compatible with a libc
-> that isn't rseq-enabled.
+ Documentation/ABI/testing/sysfs-driver-uacce |  17 ++
+ drivers/crypto/hisilicon/qm.c                | 163 +++++++++++++++++--
+ drivers/misc/uacce/uacce.c                   |  58 +++++++
+ include/linux/hisi_acc_qm.h                  |   9 +
+ include/linux/uacce.h                        |  11 ++
+ 5 files changed, 246 insertions(+), 12 deletions(-)
 
-Actually, the only requirement is that it's somewhat stable and somehow
-separates threads most of the time. So a per-thread ID or even a
-per-thread address would work fine too. Adhemerval suggested on IRC this
-afternoon that there's a thread pointer register value that would be
-usable for this purpose. I think what I'll do for v2 is abstract this
-out to a __arch_get_bucket_hint() function, or similar, which the
-different archs can fill in.
+-- 
+2.33.0
 
-> > +	for (i = start;;) {
-> > +		struct getrandom_state *state = &buckets[i];
-> > +
-> > +		if (cmpxchg(&state->in_use, false, true) == false)
-> > +			return state;
-> > +
-> > +		i = i == NUM_BUCKETS - 1 ? 0 : i + 1;
-> > +		if (i == start)
-> > +			break;
-> > +	}
-> 
-> Surely this scales very badly once the number of buckets is smaller than
-> the system processor count?
-
-Right, and there are a few ways that observation can go:
-
-1) It doesn't matter, because who has > 28 threads all churning at once
-   here? Is that something real?
-
-2) The state variable is controllable by userspace, so in theory
-   different ones could be passed. I don't like this idea though - hard
-   to manage and not enough information to do it well.
-
-3) Since we know when this kind of contention is hit, it should be
-   possible to just expand the map size. Seems a bit complicated.
-
-4) Simply allocate a number of pages relative to the number of CPUs, so
-   that this isn't actually a problem. This seems like the simplest
-   approach and seems fine.
-
-Jason 
