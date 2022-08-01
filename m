@@ -2,50 +2,47 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34292C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6ABC00144
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:41:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230503AbiHAQbS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Aug 2022 12:31:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
+        id S233815AbiHAQlr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Aug 2022 12:41:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231653AbiHAQbR (ORCPT
+        with ESMTP id S233945AbiHAQlo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Aug 2022 12:31:17 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE1033A04;
-        Mon,  1 Aug 2022 09:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659371476; x=1690907476;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=AaEA2TO46c+mpYxj0CEeD2Dypcs7suvTtQjaxxfR7kY=;
-  b=BInlCthmB3uTvUdXXFZ3kQlR37LFUehDkRAYrgKZ2kxp9RqoosMhlwFn
-   dOvgculNKJgAZuxStJcoQLoXWCWsTRxp05luDZTEwScCbPs5jYZ/rNG2z
-   Ec98zWftXGzCGvHqVDu4hHcJPhdxskpPCUQdgpoCXVD6hSA9bkOCyeSyB
-   4w/4EhDZzlw6oJtOoQRd6+k0IawRzqtS2mEzWNRyoImhF9S1u3Ba0AJ7Z
-   yVCdlBIuuTAebDTzbADE1NyfOYnkJLlxqYDICe/vpa7+kHLVZLVEbFM/0
-   oWD4xEh5RVuvQ4RvOX7+yFlCBPJ1dyR/NUbSzNbohxVzs7GILrXf4bm/f
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="287944811"
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="287944811"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 09:31:16 -0700
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="630309202"
-Received: from cdthomas-mobl2.amr.corp.intel.com (HELO [10.209.57.155]) ([10.209.57.155])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 09:31:15 -0700
-Message-ID: <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
-Date:   Mon, 1 Aug 2022 09:31:15 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
+        Mon, 1 Aug 2022 12:41:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37D211835C
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Aug 2022 09:41:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659372101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DhoXo/Y209peqbHa3vvcONnGjAEeyiXsA/tKUz+QGDY=;
+        b=VLaRGB+Mveot9kRe+rX0KvhbiQwzQHlcStPNHE6qU4R77m15WLcFTNj6SLOUYs1ny9z5bN
+        H6glAepcMisPCOlExqbqUYvRzwsmr5wnmagfw2m7sP3j7TpRps2NX09HYxTltBfJim846n
+        KyPSW0aEp1Xr02lE1FnOC8qhOraeMCc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-539-P3FGFkgGO8au2CMneF6HXQ-1; Mon, 01 Aug 2022 12:41:32 -0400
+X-MC-Unique: P3FGFkgGO8au2CMneF6HXQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 309443C0E20F;
+        Mon,  1 Aug 2022 16:41:31 +0000 (UTC)
+Received: from starship (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0951D492C3B;
+        Mon,  1 Aug 2022 16:41:24 +0000 (UTC)
+Message-ID: <acb29da31cf7a805d8e6e8419151c27f6b135c58.camel@redhat.com>
 Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
  configurations
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
@@ -72,25 +69,37 @@ Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Mon, 01 Aug 2022 19:41:23 +0300
+In-Reply-To: <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
- <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+         <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+         <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/1/22 09:05, Maxim Levitsky wrote:
->> A very kind ping on these patches.
-> Another kind ping on these patches.
+On Mon, 2022-08-01 at 09:31 -0700, Dave Hansen wrote:
+> On 8/1/22 09:05, Maxim Levitsky wrote:
+> > > A very kind ping on these patches.
+> > Another kind ping on these patches.
+> 
+> Maxim,
+> 
+> This series is not forgotten.  Its latest version was simply posted too
+> close to the merge window.  It'll get looked at in a week or two when
+> things calm down.
+> 
+> Please be patient.
+> 
 
-Maxim,
+Thanks!
 
-This series is not forgotten.  Its latest version was simply posted too
-close to the merge window.  It'll get looked at in a week or two when
-things calm down.
+Best regards,
+	Maxim Levitsky
 
-Please be patient.
