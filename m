@@ -2,112 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 710F2C19F29
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 09:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E10C00144
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 12:53:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbiHAJZL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Aug 2022 05:25:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
+        id S234931AbiHAMxq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Aug 2022 08:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbiHAJZK (ORCPT
+        with ESMTP id S234930AbiHAMx0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Aug 2022 05:25:10 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D472B264;
-        Mon,  1 Aug 2022 02:25:07 -0700 (PDT)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LxCLh4MZ4zjXfM;
-        Mon,  1 Aug 2022 17:22:04 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 1 Aug 2022 17:25:04 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 1 Aug 2022 17:25:04 +0800
-Subject: Re: [PATCH v6 2/3] Documentation: add a isolation strategy sysfs node
- for uacce
-To:     Greg KH <gregkh@linuxfoundation.org>
-References: <20220730083246.55646-1-yekai13@huawei.com>
- <20220730083246.55646-3-yekai13@huawei.com> <YuUQuNPIV6Xrfmwt@kroah.com>
- <901896fa-2acc-127c-a8ea-8143cda47b1b@huawei.com>
- <YudvGPbcegOZQlbE@kroah.com>
-CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>
-From:   "yekai (A)" <yekai13@huawei.com>
-Message-ID: <3d8542bd-42b3-e739-6d97-d1e75effdba8@huawei.com>
-Date:   Mon, 1 Aug 2022 17:25:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Mon, 1 Aug 2022 08:53:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0AECBC3A;
+        Mon,  1 Aug 2022 05:49:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 47AAD611D3;
+        Mon,  1 Aug 2022 12:49:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93F1FC433D6;
+        Mon,  1 Aug 2022 12:49:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="C8ZZyIw5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1659358161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8SOm4QQsrw/iOq/I1WLOyZevVrgDkQwsQfuNCOYHDI=;
+        b=C8ZZyIw5bIt3TkMDIIpAeJ4D1qAgBXv3WOGSdolnCRBZ3Vo3PWazMIAgbVnoVJoCDzzejW
+        +huenHAa6ymCmcEOAaEk3TYAfAAI2nWnWUVU6zDPKQvgHinPxXk4qfMAFevH2/4vOSe+Og
+        JNqr3cEkU3QziwnDOUBkf9ZLmS9p1Hg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0f839804 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 1 Aug 2022 12:49:20 +0000 (UTC)
+Date:   Mon, 1 Aug 2022 14:49:17 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        x86@kernel.org, Nadia Heninger <nadiah@cs.ucsd.edu>,
+        Thomas Ristenpart <ristenpart@cornell.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH RFC v2] random: implement getrandom() in vDSO
+Message-ID: <YufLzQkmaERnJMOs@zx2c4.com>
+References: <YuXLlUZ8EzvZB43U@zx2c4.com>
+ <20220731013125.2103601-1-Jason@zx2c4.com>
+ <871qu0qri6.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YudvGPbcegOZQlbE@kroah.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <871qu0qri6.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hey Florian,
 
+On Mon, Aug 01, 2022 at 10:48:01AM +0200, Florian Weimer wrote:
+> * Jason A. Donenfeld:
+> 
+> > API-wise, vDSO getrandom has a pair of functions:
+> >
+> >   ssize_t getrandom(void *state, void *buffer, size_t len, unsigned int flags);
+> >   void *getrandom_alloc([inout] size_t *num, [out] size_t *size_per_each);
+> >
+> > In the first function, the return value and the latter 3 arguments are
+> > the same as ordinary getrandom(), while the first argument is a pointer
+> > to some state allocated with getrandom_alloc(). getrandom_alloc() takes
+> > the desired number of states, and returns an array of states, the number
+> > actually allocated, and the size in bytes of each one, enabling a libc
+> > to use one per thread. We very intentionally do *not* leave state
+> > allocation up to the caller. There are too many weird things that can go
+> > wrong, and it's important that vDSO does not provide too generic of a
+> > mechanism. It's not going to store its state in just any old memory
+> > address. It'll do it only in ones it allocates.
+> 
+> I still don't see why this couldn't be per-thread state (if you handle
+> fork generations somehow).
 
-On 2022/8/1 14:13, Greg KH wrote:
-> On Mon, Aug 01, 2022 at 10:20:27AM +0800, yekai (A) wrote:
->>
->> On 2022/7/30 19:06, Greg KH wrote:
->>> On Sat, Jul 30, 2022 at 04:32:45PM +0800, Kai Ye wrote:
->>>> Update documentation describing sysfs node that could help to
->>>> configure isolation strategy for users in the user space. And
->>>> describing sysfs node that could read the device isolated state.
->>>>
->>>> Signed-off-by: Kai Ye <yekai13@huawei.com>
->>>> ---
->>>>  Documentation/ABI/testing/sysfs-driver-uacce | 17 +++++++++++++++++
->>>>  1 file changed, 17 insertions(+)
->>>>
->>>> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
->>>> index 08f2591138af..1601f9dac29c 100644
->>>> --- a/Documentation/ABI/testing/sysfs-driver-uacce
->>>> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
->>>> @@ -19,6 +19,23 @@ Contact:        linux-accelerators@lists.ozlabs.org
->>>>  Description:    Available instances left of the device
->>>>                  Return -ENODEV if uacce_ops get_available_instances is not provided
->>>>  
->>>> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
->>>> +Date:           Jul 2022
->>>> +KernelVersion:  5.20
->>>> +Contact:        linux-accelerators@lists.ozlabs.org
->>>> +Description:    (RW) Configure the frequency size for the hardware error
->>>> +                isolation strategy. This size is a configured integer value.
->>>> +                The default is 0. The maximum value is 65535. This value is a
->>>> +                threshold based on your driver handling strategy.
->>> what is a "driver handling strategy"?  What exactly is this units in?
->>> Any documentation for how to use this?
->>>
->>> thanks,
->>>
->>> greg k-h
->>> .
->> The unit is the number of times, also means frequency size.
->> e.g.
->> In the  hisilicon acc engine, First we will time-stamp every slot AER error. Then check the AER error log when the device
->> AER error occurred. if the device slot AER error count  exceeds the preset the number of times in one hour, the isolated state
->> will be set to true. So the device will be isolated.  And the AER error log that exceed one hour  will be cleared.  Of course,
->> different strategy can be defined in different drivers.
-> Ok, can you please explain this better here when you redo the patch
-> series?
->
-> thanks,
->
-> greg k-h
-> .
->
-OK, I will do this in the next v7 patch series.
+That actually *is* the intent of this v2. Specifically, you call
+getrandom_alloc and you get an *array* of states, which you can then
+pass off to various threads. Since we have to allocate in page sizes, we
+can't do this piecemeal, so this is a mechanism for giving out chunks of
+them (~28 at a time), which you'd then give to threads as they're
+created, making more as needed.
 
-thanks
+> I also think it makes sense to introduce batching for the system call
+> implementation first, and tie that to the vDSO acceleration.  I expect a
+> large part of the benefit comes from the batching, not the system call
+> avoidance.
 
-Kai
+What I understand you to mean is that *instead of* doing vDSO, we could
+just batch in the kernel, and reap most of the performance benefits. If
+that turns out to be true, and then we don't even need this vDSO stuff,
+I'd be really happy. So I'll give this a try.
+
+One question is where to store that batch. On the surface, per-cpu seems
+appealing, like what we do for get_random_u32() and such for kernel
+callers. But per-cpu means disabling preemption, which then becomes a
+problem when copying into userspace, where the copies can fault. So
+maybe something more sensible is, like above, just doing this per-task.
+I'll give it a stab and will let you know what it looks like.
+
+Jason
