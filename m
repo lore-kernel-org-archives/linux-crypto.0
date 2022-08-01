@@ -2,47 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA84C19F2B
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34292C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:31:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232095AbiHAQFp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Aug 2022 12:05:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
+        id S230503AbiHAQbS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Aug 2022 12:31:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232361AbiHAQFn (ORCPT
+        with ESMTP id S231653AbiHAQbR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Aug 2022 12:05:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 269FCA454
-        for <linux-crypto@vger.kernel.org>; Mon,  1 Aug 2022 09:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659369941;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YjwnPcemFdKzS6S36gsMhGgEGUlUL1WuNW85mhTQ5/s=;
-        b=NYXKTHhZI1rkJZDabEcxbL7llaCZq6vErcJbZM/7Iizn/1DcEGkR7StuD8n28qQDDVS4qw
-        1dXk3dN2QTloGVqXhptNwc7eJbwKCJ6BZO5UwoWa4VfR1w22CpDap72ZHAVZUeqBlpOMvo
-        bQqyYsfV3V8UNGcm081heiBXONxskNA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-573-XmrRqtr3MD6uq2OG3uJbAw-1; Mon, 01 Aug 2022 12:05:38 -0400
-X-MC-Unique: XmrRqtr3MD6uq2OG3uJbAw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63CCE101A58E;
-        Mon,  1 Aug 2022 16:05:36 +0000 (UTC)
-Received: from starship (unknown [10.40.194.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 391A32166B26;
-        Mon,  1 Aug 2022 16:05:30 +0000 (UTC)
-Message-ID: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+        Mon, 1 Aug 2022 12:31:17 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE1033A04;
+        Mon,  1 Aug 2022 09:31:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659371476; x=1690907476;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AaEA2TO46c+mpYxj0CEeD2Dypcs7suvTtQjaxxfR7kY=;
+  b=BInlCthmB3uTvUdXXFZ3kQlR37LFUehDkRAYrgKZ2kxp9RqoosMhlwFn
+   dOvgculNKJgAZuxStJcoQLoXWCWsTRxp05luDZTEwScCbPs5jYZ/rNG2z
+   Ec98zWftXGzCGvHqVDu4hHcJPhdxskpPCUQdgpoCXVD6hSA9bkOCyeSyB
+   4w/4EhDZzlw6oJtOoQRd6+k0IawRzqtS2mEzWNRyoImhF9S1u3Ba0AJ7Z
+   yVCdlBIuuTAebDTzbADE1NyfOYnkJLlxqYDICe/vpa7+kHLVZLVEbFM/0
+   oWD4xEh5RVuvQ4RvOX7+yFlCBPJ1dyR/NUbSzNbohxVzs7GILrXf4bm/f
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="287944811"
+X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
+   d="scan'208";a="287944811"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 09:31:16 -0700
+X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
+   d="scan'208";a="630309202"
+Received: from cdthomas-mobl2.amr.corp.intel.com (HELO [10.209.57.155]) ([10.209.57.155])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 09:31:15 -0700
+Message-ID: <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
+Date:   Mon, 1 Aug 2022 09:31:15 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
 Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
  configurations
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -68,69 +72,25 @@ Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Date:   Mon, 01 Aug 2022 19:05:29 +0300
-In-Reply-To: <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
-         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
+ <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+ <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2022-07-28 at 10:30 +0300, Maxim Levitsky wrote:
-> On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
-> > This patch series aims to harden the cpuid code against the case when
-> > the hypervisor exposes a broken CPUID configuration to the guest,
-> > in the form of having a feature disabled but not features that depend on it.
-> > 
-> > This is the more generic way to fix kernel panic in aes-ni kernel driver,
-> > which was triggered by CPUID configuration in which AVX is disabled but
-> > not AVX2.
-> > 
-> > https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
-> > 
-> > This was tested by booting a guest with AVX disabled and not AVX2,
-> > and observing that both a warning is now printed in dmesg, and
-> > that avx2 is gone from /proc/cpuinfo.
-> > 
-> > V2:
-> > 
-> > I hopefully addressed all the (very good) review feedback.
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > Maxim Levitsky (5):
-> >   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
-> >   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
-> >   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
-> >   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
-> >   x86/cpuid: check for dependencies violations in CPUID and attempt to
-> >     fix them
-> > 
-> >  arch/x86/events/intel/lbr.c       |  2 +-
-> >  arch/x86/include/asm/cpufeature.h |  1 +
-> >  arch/x86/kernel/cpu/common.c      | 51 +-------------------
-> >  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
-> >  4 files changed, 74 insertions(+), 60 deletions(-)
-> > 
-> > -- 
-> > 2.34.3
-> > 
-> > 
-> A very kind ping on these patches.
+On 8/1/22 09:05, Maxim Levitsky wrote:
+>> A very kind ping on these patches.
+> Another kind ping on these patches.
 
-Another kind ping on these patches.
+Maxim,
 
+This series is not forgotten.  Its latest version was simply posted too
+close to the merge window.  It'll get looked at in a week or two when
+things calm down.
 
-Best regards,
-	Maxim Levitsky
-> 
-> Best regards,
-> 	Maxim Levitsky
-
-
+Please be patient.
