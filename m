@@ -2,213 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9C2C00144
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 13:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA84C19F2B
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:05:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231276AbiHAN3W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Aug 2022 09:29:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59684 "EHLO
+        id S232095AbiHAQFp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Aug 2022 12:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231440AbiHAN3V (ORCPT
+        with ESMTP id S232361AbiHAQFn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Aug 2022 09:29:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95863C179;
-        Mon,  1 Aug 2022 06:29:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 85E6C612C6;
-        Mon,  1 Aug 2022 13:29:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3959C433D6;
-        Mon,  1 Aug 2022 13:29:18 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="S+kpgMnl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1659360556;
+        Mon, 1 Aug 2022 12:05:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 269FCA454
+        for <linux-crypto@vger.kernel.org>; Mon,  1 Aug 2022 09:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659369941;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aKJOoamZnuVeYfzjXQgjS2Ghoq/vg62eefbibY7cYCQ=;
-        b=S+kpgMnlJ3fPlcD1QucdzozIO/1dBK30GkPDxs1UJbUgoZSco6LkGuioxJQTbj7n+U4PPi
-        NgtZaQ0icPKfKxIt7m5yaUQQumNu72ZzFsoAgrCKmjkMLWEycDSjOogk+uPd6Mm+yUBD6c
-        tap8jPql2sblg0GOcnp0RT0swe2Eme0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bdcf6de2 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 1 Aug 2022 13:29:16 +0000 (UTC)
-Date:   Mon, 1 Aug 2022 15:29:11 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Florian Weimer <fweimer@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Thomas Ristenpart <ristenpart@cornell.edu>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH RFC v2] random: implement getrandom() in vDSO
-Message-ID: <YufVJ5wmYgkgRnpQ@zx2c4.com>
-References: <YuXLlUZ8EzvZB43U@zx2c4.com>
- <20220731013125.2103601-1-Jason@zx2c4.com>
- <871qu0qri6.fsf@oldenburg.str.redhat.com>
- <YufLzQkmaERnJMOs@zx2c4.com>
+        bh=YjwnPcemFdKzS6S36gsMhGgEGUlUL1WuNW85mhTQ5/s=;
+        b=NYXKTHhZI1rkJZDabEcxbL7llaCZq6vErcJbZM/7Iizn/1DcEGkR7StuD8n28qQDDVS4qw
+        1dXk3dN2QTloGVqXhptNwc7eJbwKCJ6BZO5UwoWa4VfR1w22CpDap72ZHAVZUeqBlpOMvo
+        bQqyYsfV3V8UNGcm081heiBXONxskNA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-573-XmrRqtr3MD6uq2OG3uJbAw-1; Mon, 01 Aug 2022 12:05:38 -0400
+X-MC-Unique: XmrRqtr3MD6uq2OG3uJbAw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63CCE101A58E;
+        Mon,  1 Aug 2022 16:05:36 +0000 (UTC)
+Received: from starship (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 391A32166B26;
+        Mon,  1 Aug 2022 16:05:30 +0000 (UTC)
+Message-ID: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
+ configurations
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Mon, 01 Aug 2022 19:05:29 +0300
+In-Reply-To: <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YufLzQkmaERnJMOs@zx2c4.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Florian,
+On Thu, 2022-07-28 at 10:30 +0300, Maxim Levitsky wrote:
+> On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
+> > This patch series aims to harden the cpuid code against the case when
+> > the hypervisor exposes a broken CPUID configuration to the guest,
+> > in the form of having a feature disabled but not features that depend on it.
+> > 
+> > This is the more generic way to fix kernel panic in aes-ni kernel driver,
+> > which was triggered by CPUID configuration in which AVX is disabled but
+> > not AVX2.
+> > 
+> > https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> > 
+> > This was tested by booting a guest with AVX disabled and not AVX2,
+> > and observing that both a warning is now printed in dmesg, and
+> > that avx2 is gone from /proc/cpuinfo.
+> > 
+> > V2:
+> > 
+> > I hopefully addressed all the (very good) review feedback.
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > Maxim Levitsky (5):
+> >   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
+> >   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+> >   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
+> >   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
+> >   x86/cpuid: check for dependencies violations in CPUID and attempt to
+> >     fix them
+> > 
+> >  arch/x86/events/intel/lbr.c       |  2 +-
+> >  arch/x86/include/asm/cpufeature.h |  1 +
+> >  arch/x86/kernel/cpu/common.c      | 51 +-------------------
+> >  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
+> >  4 files changed, 74 insertions(+), 60 deletions(-)
+> > 
+> > -- 
+> > 2.34.3
+> > 
+> > 
+> A very kind ping on these patches.
 
-On Mon, Aug 01, 2022 at 02:49:17PM +0200, Jason A. Donenfeld wrote:
-> What I understand you to mean is that *instead of* doing vDSO, we could
-> just batch in the kernel, and reap most of the performance benefits. If
-> that turns out to be true, and then we don't even need this vDSO stuff,
-> I'd be really happy. So I'll give this a try.
+Another kind ping on these patches.
+
+
+Best regards,
+	Maxim Levitsky
 > 
-> One question is where to store that batch. On the surface, per-cpu seems
-> appealing, like what we do for get_random_u32() and such for kernel
-> callers. But per-cpu means disabling preemption, which then becomes a
-> problem when copying into userspace, where the copies can fault. So
-> maybe something more sensible is, like above, just doing this per-task.
-> I'll give it a stab and will let you know what it looks like.
-
-So doing the batching in the kernel gives roughly a 2x performance boost
-for the u32 case. Below is a little hacky patch you can play with. This
-isn't the face melting 15x of the vDSO approach, but it is something, I
-guess.
-
-Jason
-
-From 99a314f603c9cd173e6db2e3776eb76477283e1a Mon Sep 17 00:00:00 2001
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 1 Aug 2022 15:19:33 +0200
-Subject: [PATCH] random: batch getrandom() output per-task
-
-bla bla just a test
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 68 +++++++++++++++++++++++++++----------------
- include/linux/sched.h |  6 ++++
- 2 files changed, 49 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index d44832e9e709..1be0fea81cea 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -400,49 +400,67 @@ EXPORT_SYMBOL(get_random_bytes);
- static ssize_t get_random_bytes_user(struct iov_iter *iter)
- {
- 	u32 chacha_state[CHACHA_STATE_WORDS];
--	u8 block[CHACHA_BLOCK_SIZE];
--	size_t ret = 0, copied;
-+	unsigned long next_gen;
-+	size_t ret, copied, batch_len;
-+	bool do_more = true;
-
- 	if (unlikely(!iov_iter_count(iter)))
- 		return 0;
-
--	/*
--	 * Immediately overwrite the ChaCha key at index 4 with random
--	 * bytes, in case userspace causes copy_to_iter() below to sleep
--	 * forever, so that we still retain forward secrecy in that case.
--	 */
--	crng_make_state(chacha_state, (u8 *)&chacha_state[4], CHACHA_KEY_SIZE);
--	/*
--	 * However, if we're doing a read of len <= 32, we don't need to
--	 * use chacha_state after, so we can simply return those bytes to
--	 * the user directly.
--	 */
--	if (iov_iter_count(iter) <= CHACHA_KEY_SIZE) {
--		ret = copy_to_iter(&chacha_state[4], CHACHA_KEY_SIZE, iter);
--		goto out_zero_chacha;
-+retry_generation:
-+	ret = 0;
-+	next_gen = READ_ONCE(base_crng.generation);
-+	if (unlikely(next_gen != current->rng_batch.generation || crng_has_old_seed())) {
-+		current->rng_batch.position = sizeof(current->rng_batch.buf);
-+		current->rng_batch.generation = next_gen;
- 	}
-
--	for (;;) {
--		chacha20_block(chacha_state, block);
-+more_batch:
-+	batch_len = min_t(size_t, iov_iter_count(iter),
-+			  sizeof(current->rng_batch.buf) - current->rng_batch.position);
-+	if (batch_len) {
-+		copied = copy_to_iter(current->rng_batch.buf + current->rng_batch.position,
-+				      batch_len, iter);
-+		ret += copied;
-+		memset(current->rng_batch.buf + current->rng_batch.position, 0, batch_len);
-+		current->rng_batch.position += batch_len;
-+		if (!iov_iter_count(iter) || copied != batch_len)
-+			goto out;
-+	}
-+
-+	crng_make_state(chacha_state, current->rng_batch.buf + CHACHA_BLOCK_SIZE, 32);
-+	while (iov_iter_count(iter) >= CHACHA_BLOCK_SIZE) {
-+		chacha20_block(chacha_state, current->rng_batch.buf);
- 		if (unlikely(chacha_state[12] == 0))
- 			++chacha_state[13];
-
--		copied = copy_to_iter(block, sizeof(block), iter);
-+		copied = copy_to_iter(current->rng_batch.buf, CHACHA_BLOCK_SIZE, iter);
- 		ret += copied;
--		if (!iov_iter_count(iter) || copied != sizeof(block))
-+		if (!iov_iter_count(iter) || copied != CHACHA_BLOCK_SIZE) {
-+			do_more = false;
- 			break;
-+		}
-
--		BUILD_BUG_ON(PAGE_SIZE % sizeof(block) != 0);
-+		BUILD_BUG_ON(PAGE_SIZE % CHACHA_BLOCK_SIZE != 0);
- 		if (ret % PAGE_SIZE == 0) {
--			if (signal_pending(current))
-+			if (signal_pending(current)) {
-+				do_more = false;
- 				break;
-+			}
- 			cond_resched();
- 		}
- 	}
--
--	memzero_explicit(block, sizeof(block));
--out_zero_chacha:
-+	chacha20_block(chacha_state, current->rng_batch.buf);
-+	current->rng_batch.position = 0;
- 	memzero_explicit(chacha_state, sizeof(chacha_state));
-+	if (do_more)
-+		goto more_batch;
-+
-+out:
-+	if (unlikely(ret && current->rng_batch.generation != READ_ONCE(base_crng.generation))) {
-+		iov_iter_revert(iter, ret);
-+		goto retry_generation;
-+	}
- 	return ret ? ret : -EFAULT;
- }
-
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index c46f3a63b758..6df125a43bb1 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -1500,6 +1500,12 @@ struct task_struct {
- 	struct callback_head		l1d_flush_kill;
- #endif
-
-+	struct {
-+		unsigned long generation;
-+		u8 buf[96];
-+		u8 position;
-+	} rng_batch;
-+
- 	/*
- 	 * New fields for task_struct should be added above here, so that
- 	 * they are included in the randomized portion of task_struct.
---
-2.35.1
+> Best regards,
+> 	Maxim Levitsky
 
 
