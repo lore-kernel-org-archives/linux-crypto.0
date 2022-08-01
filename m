@@ -2,104 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6ABC00144
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 16:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0948BC00144
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Aug 2022 19:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233815AbiHAQlr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Aug 2022 12:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36156 "EHLO
+        id S231364AbiHATbi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 Aug 2022 15:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233945AbiHAQlo (ORCPT
+        with ESMTP id S234725AbiHATaj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Aug 2022 12:41:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37D211835C
-        for <linux-crypto@vger.kernel.org>; Mon,  1 Aug 2022 09:41:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659372101;
+        Mon, 1 Aug 2022 15:30:39 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAD965FC;
+        Mon,  1 Aug 2022 12:30:24 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1659382221;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DhoXo/Y209peqbHa3vvcONnGjAEeyiXsA/tKUz+QGDY=;
-        b=VLaRGB+Mveot9kRe+rX0KvhbiQwzQHlcStPNHE6qU4R77m15WLcFTNj6SLOUYs1ny9z5bN
-        H6glAepcMisPCOlExqbqUYvRzwsmr5wnmagfw2m7sP3j7TpRps2NX09HYxTltBfJim846n
-        KyPSW0aEp1Xr02lE1FnOC8qhOraeMCc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-539-P3FGFkgGO8au2CMneF6HXQ-1; Mon, 01 Aug 2022 12:41:32 -0400
-X-MC-Unique: P3FGFkgGO8au2CMneF6HXQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 309443C0E20F;
-        Mon,  1 Aug 2022 16:41:31 +0000 (UTC)
-Received: from starship (unknown [10.40.194.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0951D492C3B;
-        Mon,  1 Aug 2022 16:41:24 +0000 (UTC)
-Message-ID: <acb29da31cf7a805d8e6e8419151c27f6b135c58.camel@redhat.com>
-Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
- configurations
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Date:   Mon, 01 Aug 2022 19:41:23 +0300
-In-Reply-To: <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
-         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
-         <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
-         <85aa20bb-09ca-d1a6-8671-947370765a02@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=YCVoqN35XPquvGhrCezKkn75+pkhWZjm/1Cnh7Cbjjk=;
+        b=RjzhuQx5633QszrkNIxKCT7aAaRPPXzemzaBIwOMjfX2YZabgHe/r7Lguz6d1Is3f44Ax3
+        LKd8mdnTv3nd8Aqvh4iJuabq6cmCskzkUuoemqTUyFXoA1TknueoyXvAir9PZRFCBb2HXY
+        bzcy+DznOEC+TxuOUcLQJBamQ0CAFNhawScxdqrSLfG2bdzyRRXNtNdaAns24oT6uSr2Vm
+        CAuavR5mlznGm/hWtDda4jaD07/0KaPavXRiU56zbrsmbkgfHCZj2m8svTPCtS4r7nH/Wz
+        rkwxVLRRY3MTB1j7GCNGoMezUw1fJFB95i9IaAR3nNA4bxwgvVY/9A3hYjewCA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1659382221;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YCVoqN35XPquvGhrCezKkn75+pkhWZjm/1Cnh7Cbjjk=;
+        b=k6boVoGAAXOxRdWveTovBjKjjH+yIoMo1MbINTIwy3XYuV1UdsYLRMTliJs4KGtWBR2jR+
+        mu8eRVGKS6DnspAQ==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        x86@kernel.org, Nadia Heninger <nadiah@cs.ucsd.edu>,
+        Thomas Ristenpart <ristenpart@cornell.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Florian Weimer <fweimer@redhat.com>
+Subject: Re: [PATCH RFC v1] random: implement getrandom() in vDSO
+In-Reply-To: <YuXCpyULk6jFgGV5@zx2c4.com>
+References: <20220729145525.1729066-1-Jason@zx2c4.com>
+ <CAHk-=wiLwz=9h9LD1-_yb1+T+u59a2EjTmMvCiGj4A-ZsPN1wA@mail.gmail.com>
+ <YuXCpyULk6jFgGV5@zx2c4.com>
+Date:   Mon, 01 Aug 2022 21:30:20 +0200
+Message-ID: <87zggnsqwj.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-08-01 at 09:31 -0700, Dave Hansen wrote:
-> On 8/1/22 09:05, Maxim Levitsky wrote:
-> > > A very kind ping on these patches.
-> > Another kind ping on these patches.
-> 
-> Maxim,
-> 
-> This series is not forgotten.  Its latest version was simply posted too
-> close to the merge window.  It'll get looked at in a week or two when
-> things calm down.
-> 
-> Please be patient.
-> 
+Jason!
 
-Thanks!
+On Sun, Jul 31 2022 at 01:45, Jason A. Donenfeld wrote:
+> Thanks a bunch for chiming in. Indeed this whole thing is kind of crazy,
+> so your input is particularly useful here.
+>
+> On Sat, Jul 30, 2022 at 08:48:42AM -0700, Linus Torvalds wrote:
+>> It's just too specialized, and the people who care about performance
+>> can - and do - do special things anyway.
+>
+> To be clear, I really would rather not do this. I'm not really looking
+> for more stuff to do, and I don't tend to write (public) code "just
+> 'cuz". My worry is that by /not/ doing it, footguns will proliferate.
+> The glibc thing was what finally motivated me to want to at least sketch
+> out a potential action to make this kind of (apparently common) urge of
+> writing a userspace RNG safer.
 
-Best regards,
-	Maxim Levitsky
+But the user space tinkering will continue no matter what. They might
+then just use the vdso to get access to the ready/generation bits. I've
+seen "better" VDSO implementations to access time. :)
 
+> So, anyway, if I do muster a v2 of this (perhaps just to see the idea
+> through), the API might split in two to something like:
+>
+>   void *getrandom_allocate_states([inout] size_t *number_of_states, [out] size_t *length_per_state);
+>   ssize_t getrandom(void *state, void *buffer, size_t len, unsigned long flags);
+
+I'm not seeing any reason to have those functions at all.
+
+The only thing which would be VDSO worthy here is the access to
+random_state->ready and random_state->generation as that's the
+information which is otherwise not available to userspace.
+
+So you can just have:
+
+   int random_check_and_update_generation(u64 *generation);
+
+Everything else is library material, really.
+
+Thanks,
+
+        tglx
