@@ -2,90 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E5DC00140
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 13:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13C3C00140
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 14:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237072AbiHBN7T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Aug 2022 09:59:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58552 "EHLO
+        id S237058AbiHBOPA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Aug 2022 10:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237037AbiHBN7O (ORCPT
+        with ESMTP id S236168AbiHBOO7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Aug 2022 09:59:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3740E6165;
-        Tue,  2 Aug 2022 06:59:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Tue, 2 Aug 2022 10:14:59 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48321B7A1;
+        Tue,  2 Aug 2022 07:14:56 -0700 (PDT)
+Received: from zn.tnic (p57969665.dip0.t-ipconnect.de [87.150.150.101])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D8914B81F29;
-        Tue,  2 Aug 2022 13:59:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBFFC433C1;
-        Tue,  2 Aug 2022 13:59:09 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HifavJp+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1659448747;
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C3AC51EC0426;
+        Tue,  2 Aug 2022 16:14:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1659449690;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rBo0+ydwkBuVutUpn2oqaBgFUKHYpcNRhAN0M0iP060=;
-        b=HifavJp+XiFjfeb3n91xWAP3qxfIeO+6x2Vx/xVuRbuTVaYtLNsFgTs8pJXvF+f5E1ZwEU
-        tEPcf5g16SFL30fdXQvQaNF8l/U4RzTW9EKJdfmOOHXDBoFlBlkFgAqIPDOB6+dOndD4I4
-        kvROA04F35thyAxHEsP7xuKTR1yU+ZA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0f4f02e8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 2 Aug 2022 13:59:07 +0000 (UTC)
-Date:   Tue, 2 Aug 2022 15:59:05 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Thomas Ristenpart <ristenpart@cornell.edu>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Florian Weimer <fweimer@redhat.com>
-Subject: Re: [PATCH RFC v1] random: implement getrandom() in vDSO
-Message-ID: <YuktqQS7Rb0IbJNh@zx2c4.com>
-References: <20220729145525.1729066-1-Jason@zx2c4.com>
- <CAHk-=wiLwz=9h9LD1-_yb1+T+u59a2EjTmMvCiGj4A-ZsPN1wA@mail.gmail.com>
- <YuXCpyULk6jFgGV5@zx2c4.com>
- <87zggnsqwj.ffs@tglx>
- <Yuhe6IIFXqNMZs5b@zx2c4.com>
- <87bkt2sqq4.ffs@tglx>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Z8jwOPcUdOFzx8T/2N02LE8NjUGzajYNLDv9kHr1wy4=;
+        b=IG0mK8KrzQhKoW9wNbACe1dk+XLWRIv0NS5AZcL0Y0Bzp8OxAhzA5yHTwyPGqkaTcQVWUb
+        2lAr6YhEGZvc2T2HLUq0Z553eO6RzeCJoDWoFdQ6TqRdBSDWouWaRJTjeZHO6wePdHw7c8
+        pnWfqeATNMAHkT9Xava/TNZYo2rOwOE=
+Date:   Tue, 2 Aug 2022 16:14:45 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Message-ID: <YukxVYPiiBo6xH9c@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+ <YrH0ca3Sam7Ru11c@work-vm>
+ <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+ <Yrrc/6x70wa14c5t@work-vm>
+ <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <Yt6ZjzCSqPv6BKfH@zn.tnic>
+ <SN6PR12MB2767FDC22657E683F7467F9A8E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87bkt2sqq4.ffs@tglx>
+In-Reply-To: <SN6PR12MB2767FDC22657E683F7467F9A8E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+On Mon, Aug 01, 2022 at 11:32:21PM +0000, Kalra, Ashish wrote:
+> But we can't use this struct on a core/platform which has a different
+> layout, so aren't the model checks required ?
 
-On Tue, Aug 02, 2022 at 03:46:27PM +0200, Thomas Gleixner wrote:
-> Right now the Linux VDSO functions are 1:1 replacements for system calls
-> and not adding a magic pile of functionality which is otherwise not
-> available.
-> 
-> What you are proposing is to have an implementation which is not
-> available via a regular syscall. Which means you are creating a VDSO
-> only syscall which still has the same problem as any other syscall in
-> terms of API design and functionality which needs to be supported
-> forever.
+That would be a problem only if the already specified fields move or get
+resized.
 
-Wait, what? That's not correct. The WHOLE point is that vdso getrandom()
-will generate bytes in the same way as the ordinary syscall, without
-differences. Same function name, same algorithm. But just faster,
-because vDSO. I explicitly don't want to dip into introducing something
-different. That's the big selling point: that vDSO getrandom() and
-syscall getrandom() are the same thing. If you trust one, you can trust
-the other. If you expect properties of one, you get that from the other.
-If you know the API of one, you can use the other.
+If their offset and size don't change, you're good.
 
-There might be other valid objections to this whole thing, but "this is
-different from the syscall" really isn't one of them. It's the same
-ideaspace that motivated gettimeofday() and such.
+-- 
+Regards/Gruss,
+    Boris.
 
-Jason
+https://people.kernel.org/tglx/notes-about-netiquette
