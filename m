@@ -2,57 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05976C00140
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 18:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7B3C19F29
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 18:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbiHBSz6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Aug 2022 14:55:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58470 "EHLO
+        id S230175AbiHBS4A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Aug 2022 14:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230269AbiHBSzv (ORCPT
+        with ESMTP id S230364AbiHBSzx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Aug 2022 14:55:51 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C37B140CB
-        for <linux-crypto@vger.kernel.org>; Tue,  2 Aug 2022 11:55:50 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id ix21-20020a170902f81500b0016ee5379fe5so4175968plb.18
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Aug 2022 11:55:50 -0700 (PDT)
+        Tue, 2 Aug 2022 14:55:53 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9C314D1C
+        for <linux-crypto@vger.kernel.org>; Tue,  2 Aug 2022 11:55:52 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id q5-20020a17090a7a8500b001f0253f5aa3so7767588pjf.4
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Aug 2022 11:55:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc;
-        bh=30XQYa5vrUU1iEUJfeVFtkHZOATBPFqy9Zstl/P+5z8=;
-        b=U/mM+hN/C9aAjBSxsdYTboDvUHBaLxpmZHMEt1gXXrEYG5YnjVUHfwWO9nmAq85hJz
-         UTR5zjqMgwVwaTR19xC5TJQgFnhfameFuoB+lfYBuuUy4D1niJ6wZ62eikVApZlFeFMR
-         aMkbolcOb6t6yrchlJNNedj2XApSOt6SyAvuW59QBWSHdtP+wZxcMH4hDFPeDtnsQqDp
-         26zMYgyhgUITcYf/alnF6RyWJUb+YfMkL6RplnfXRVix8/5Fc+C7qHKzmdKo5Y4gDOJ+
-         3coU4Y3V1OG2KybEjG/wLaR38gtHzJZU02zNzPgC4yTKLtWnyWb0lhzKO3Yty3Mfcvv0
-         lyYw==
+        bh=DaRQ2izucvqnfyvR2TmA8t9g6dOpwwmSS0DB8AAt990=;
+        b=Ly/T2amXaGhpFs2B6F33kLC4xhEqMWV/njDT98eEk+lNKHotckSXgbK21dcXaRSkEJ
+         xC4TY/pNLC0vKpjDH+hWyM/8Z5B509hJThDN0jNXjV1sIfFO1tIamw71iNskhvacGwXV
+         dNKqw6o07cOIHW3GzxTWOIPg3BuCP9Mqu7z7XruKYJrZ6z0gc5FVfJKTGkVGLORTfSfo
+         6hIaTTFDAMJtB/Upablei5j9czw7XRYowNd3SzztxYpfPdBQw5IDAM2Hb90NJx2QANVi
+         WAW5/rZm+PxZmTV2nYO6O88EaUfncGhGnRn55ABJKqvwFrgAmkS+14oZlQLEuNedYMbf
+         JCFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc;
-        bh=30XQYa5vrUU1iEUJfeVFtkHZOATBPFqy9Zstl/P+5z8=;
-        b=qQTm5i3CNcj7XQo6nJsYIDj7BbAHZkBS5GMY6jtAeWHAWW4ZG1DpzF4uNZUlsYIiSM
-         OXJ/rSWHhUT+fH5l6/7i5oTiALrcTq05oxKQuw8L+mCg0UyY93FvF9NrGXr58rJ4mdke
-         UkEZJIO+ExRsmY5yPQ+MImPM1aeLerisZKhiU7vUIGBmIhtym6hduC9BnsF4F00jMiNt
-         SV+XV01cU2AKeJzIrkjRfu7DQ3WRosIjZ9UfvAp8ivqPcAOxWdMO6THR5C3uy/R0gzcz
-         qRosCJm3HQjeBEw2JCKmu+P1kiXKiLhHclBpA/frwYjGHPbqenaE6kx11hBNXPSoeIV0
-         bGdg==
-X-Gm-Message-State: ACgBeo0QjSkusp6HH0tUsIM6+q7XbyroXoLUNhfZE8/Ka2R9Ngvx6wIG
-        KFOEtmNh4IaJdv2Y3+egEKvoIi4Ipvk=
-X-Google-Smtp-Source: AA6agR6yQ+fa8aAJU91nirXEpLdJfvOKRCf8sGouwqrIk3ZQl0y+7CwvEhHK1EqDROOKe3AB5MwuoE4CU6hr
+        bh=DaRQ2izucvqnfyvR2TmA8t9g6dOpwwmSS0DB8AAt990=;
+        b=wZysq1K0CKWbL73+f3Y3B8IGFDNPwTg1xMxK8ec7NFYYVCZfItgdWr3XKVIf3HSK1K
+         w4NUeLy1g1gf2qfeNh3pmCNY5TRnRLMO1UK3GSkXUWiFiBJrzrqLd8SP6PD5+fWdCsiY
+         gJDIrVl28MuTZipZPNLqY7Ys4jO6UHNLEKsHvfyjcHLDyJhtfP/pTm/Y/+Fy3iZvJSMf
+         F20GmEOj8AM9PsGGLp1PdUajMmUBWQNF0W51c29RMBSyyufXyL7obOCDMxWxSNA22W2F
+         tSEmoYH7Z8os8IHCcZOzYEWVEOXdQknmoT7gxtIT72PzyAf7RQsDhKoPRBobssZlq+QI
+         ImdA==
+X-Gm-Message-State: AJIora8WxJG8Zt2ZN+3UrpsC2SzTNaNKU5lv+Xxsv5thN0dzMM1vqlhA
+        yfJ7fhMWpgZ0H7Z3vU4ob7wjHc9BrJc=
+X-Google-Smtp-Source: AGRyM1sWB3iGMjsNkKLdcbRYMAQl1qXz8lJEvDNwsSlg1g42TIIMXnJD1yEZwFLFr4gUcVdMpKbsvK5T7XDO
 X-Received: from jackyli.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3b51])
- (user=jackyli job=sendgmr) by 2002:a17:90b:4b91:b0:1f4:e116:8f1 with SMTP id
- lr17-20020a17090b4b9100b001f4e11608f1mr870049pjb.121.1659466549678; Tue, 02
- Aug 2022 11:55:49 -0700 (PDT)
-Date:   Tue,  2 Aug 2022 18:55:33 +0000
+ (user=jackyli job=sendgmr) by 2002:a63:43c2:0:b0:41a:9dea:5dac with SMTP id
+ q185-20020a6343c2000000b0041a9dea5dacmr17694202pga.585.1659466552250; Tue, 02
+ Aug 2022 11:55:52 -0700 (PDT)
+Date:   Tue,  2 Aug 2022 18:55:34 +0000
 In-Reply-To: <20220802185534.735338-1-jackyli@google.com>
-Message-Id: <20220802185534.735338-2-jackyli@google.com>
+Message-Id: <20220802185534.735338-3-jackyli@google.com>
 Mime-Version: 1.0
 References: <20220802185534.735338-1-jackyli@google.com>
 X-Mailer: git-send-email 2.37.1.455.g008518b4e5-goog
-Subject: [PATCH 1/2] crypto: ccp - Initialize PSP when reading psp data file failed
+Subject: [PATCH 2/2] crypto: ccp - Fail the PSP initialization when writing
+ psp data file failed
 From:   Jacky Li <jackyli@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
@@ -67,111 +68,97 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the OS fails the PSP initialization when the file specified at
-'init_ex_path' does not exist or has invalid content. However the SEV
-spec just requires users to allocate 32KB of 0xFF in the file, which can
-be taken care of by the OS easily.
+Currently the OS continues the PSP initialization when there is a write
+failure to the init_ex_file. Therefore, the userspace would be told that
+SEV is properly INIT'd even though the psp data file is not updated.
+This is problematic because later when asked for the SEV data, the OS
+won't be able to provide it.
 
-To improve the robustness during the PSP init, leverage the retry
-mechanism and continue the init process:
-
-During the first INIT_EX call, if the content is invalid or missing,
-continue the process by feeding those contents into PSP instead of
-aborting. PSP will then override it with 32KB 0xFF and return
-SEV_RET_SECURE_DATA_INVALID status code. In the second INIT_EX call,
-this 32KB 0xFF content will then be fed and PSP will write the valid
-data to the file.
-
-In order to do this, it's also needed to skip the sev_read_init_ex_file
-in the second INIT_EX call to prevent the file content from being
-overwritten by the 32KB 0xFF data provided by PSP in the first INIT_EX
-call.
-
-Co-developed-by: Peter Gonda <pgonda@google.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
+Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
+Reported-by: Peter Gonda <pgonda@google.com>
 Signed-off-by: Jacky Li <jackyli@google.com>
-Reported-by: Alper Gun <alpergun@google.com>
 ---
- .../virt/kvm/x86/amd-memory-encryption.rst    |  5 ++--
- drivers/crypto/ccp/sev-dev.c                  | 29 +++++++++++++------
- 2 files changed, 22 insertions(+), 12 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 2d307811978c..935aaeb97fe6 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -89,9 +89,8 @@ context. In a typical workflow, this command should be the first command issued.
- 
- The firmware can be initialized either by using its own non-volatile storage or
- the OS can manage the NV storage for the firmware using the module parameter
--``init_ex_path``. The file specified by ``init_ex_path`` must exist. To create
--a new NV storage file allocate the file with 32KB bytes of 0xFF as required by
--the SEV spec.
-+``init_ex_path``. If the file specified by ``init_ex_path`` does not exist or
-+is invalid, the OS will create or override the file with output from PSP.
- 
- Returns: 0 on success, -negative on error
- 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 799b476fc3e8..5bb2ae250d38 100644
+index 5bb2ae250d38..fd6bb01eb198 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -75,6 +75,7 @@ static void *sev_es_tmr;
-  */
- #define NV_LENGTH (32 * 1024)
- static void *sev_init_ex_buffer;
-+static bool nv_file_loaded;
+@@ -233,7 +233,7 @@ static int sev_read_init_ex_file(void)
+ 	return 0;
+ }
  
- static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+-static void sev_write_init_ex_file(void)
++static int sev_write_init_ex_file(void)
  {
-@@ -211,18 +212,19 @@ static int sev_read_init_ex_file(void)
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct file *fp;
+@@ -243,14 +243,15 @@ static void sev_write_init_ex_file(void)
+ 	lockdep_assert_held(&sev_cmd_mutex);
+ 
+ 	if (!sev_init_ex_buffer)
+-		return;
++		return 0;
+ 
+ 	fp = open_file_as_root(init_ex_path, O_CREAT | O_WRONLY, 0600);
  	if (IS_ERR(fp)) {
- 		int ret = PTR_ERR(fp);
- 
--		dev_err(sev->dev,
--			"SEV: could not open %s for read, error %d\n",
--			init_ex_path, ret);
-+		if (ret != -ENOENT) {
-+			dev_err(sev->dev,
-+				"SEV: could not open %s for read, error %d\n",
-+				init_ex_path, ret);
-+		}
- 		return ret;
++		int ret = PTR_ERR(fp);
+ 		dev_err(sev->dev,
+ 			"SEV: could not open file for write, error %ld\n",
+-			PTR_ERR(fp));
+-		return;
++			ret);
++		return ret;
  	}
  
- 	nread = kernel_read(fp, sev_init_ex_buffer, NV_LENGTH, NULL);
- 	if (nread != NV_LENGTH) {
--		dev_err(sev->dev,
--			"SEV: failed to read %u bytes to non volatile memory area, ret %ld\n",
-+		dev_info(sev->dev,
-+			"SEV: could not read %u bytes to non volatile memory area, ret %ld\n",
- 			NV_LENGTH, nread);
--		return -EIO;
+ 	nwrite = kernel_write(fp, sev_init_ex_buffer, NV_LENGTH, &offset);
+@@ -261,18 +262,20 @@ static void sev_write_init_ex_file(void)
+ 		dev_err(sev->dev,
+ 			"SEV: failed to write %u bytes to non volatile memory area, ret %ld\n",
+ 			NV_LENGTH, nwrite);
+-		return;
++		return -EIO;
  	}
  
- 	dev_dbg(sev->dev, "SEV: read %ld bytes from NV file\n", nread);
-@@ -417,9 +419,18 @@ static int __sev_init_ex_locked(int *error)
- 	data.nv_address = __psp_pa(sev_init_ex_buffer);
- 	data.nv_len = NV_LENGTH;
+ 	dev_dbg(sev->dev, "SEV: write successful to NV file\n");
++
++	return 0;
+ }
  
--	ret = sev_read_init_ex_file();
--	if (ret)
--		return ret;
-+	/*
-+	 * The caller of INIT_EX will retry if it fails. Furthermore, if the
-+	 * failure is due to sev_init_ex_buffer being invalid, the PSP will have
-+	 * properly initialized the buffer already. Therefore, do not initialize
-+	 * it a second time.
-+	 */
-+	if (!nv_file_loaded) {
-+		ret = sev_read_init_ex_file();
-+		if (ret && ret != -ENOENT)
-+			return ret;
-+		nv_file_loaded = true;
-+	}
+-static void sev_write_init_ex_file_if_required(int cmd_id)
++static int sev_write_init_ex_file_if_required(int cmd_id)
+ {
+ 	lockdep_assert_held(&sev_cmd_mutex);
  
- 	if (sev_es_tmr) {
- 		/*
+ 	if (!sev_init_ex_buffer)
+-		return;
++		return 0;
+ 
+ 	/*
+ 	 * Only a few platform commands modify the SPI/NV area, but none of the
+@@ -287,10 +290,10 @@ static void sev_write_init_ex_file_if_required(int cmd_id)
+ 	case SEV_CMD_PEK_GEN:
+ 		break;
+ 	default:
+-		return;
++		return 0;
+ 	}
+ 
+-	sev_write_init_ex_file();
++	return sev_write_init_ex_file();
+ }
+ 
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+@@ -363,7 +366,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 			cmd, reg & PSP_CMDRESP_ERR_MASK);
+ 		ret = -EIO;
+ 	} else {
+-		sev_write_init_ex_file_if_required(cmd);
++		ret = sev_write_init_ex_file_if_required(cmd);
+ 	}
+ 
+ 	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
 -- 
 2.37.1.455.g008518b4e5-goog
 
