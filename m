@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E330C19F2C
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 12:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78941C00140
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 13:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236272AbiHBMug (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Aug 2022 08:50:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36238 "EHLO
+        id S231797AbiHBNT6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Aug 2022 09:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232569AbiHBMuf (ORCPT
+        with ESMTP id S232425AbiHBNT4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Aug 2022 08:50:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3550CCC;
-        Tue,  2 Aug 2022 05:50:33 -0700 (PDT)
+        Tue, 2 Aug 2022 09:19:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A70813E3D;
+        Tue,  2 Aug 2022 06:19:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 937F7B819A1;
-        Tue,  2 Aug 2022 12:50:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA1E1C433D6;
-        Tue,  2 Aug 2022 12:50:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C64946134F;
+        Tue,  2 Aug 2022 13:19:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4184C433D7;
+        Tue,  2 Aug 2022 13:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659444631;
-        bh=fKvVypfFH+JdjXExshpBu+/wwf6r289/dR4kaa6y89Y=;
+        s=k20201202; t=1659446393;
+        bh=QpcAUsewd/+KMI+EaDJ9tjM4TNeoV2RTu8Kl+bvpWxA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Oh/y9mS8nTihVUTuHoEk8BDmxcPGiO/d5C2TG66DpBrwOAVnzorFJUs308bSWbSwA
-         9I54AvkKySbc53ZxUkr/vioMZLaqCMfxDgxSfdNOAYMe0IOW3jvLth1i94Vipn4wYl
-         6skR1UbzEcl7Ebj8zmjkM4isySpAsiBt7flXgSSqK+6weRNwGGJHWwTSJfu6TXr8Ss
-         XtbsBzF6CN9AaqCTr2gHS8s49ex9rnpHAqjLYPRRPUc7DrHbSNf8I2n00FMaC+tYlT
-         VQnGAlz/xzRMhpYMAnM5++znp/m3Da4AdUfWay7+eaGrPuc+l4HOwyVGnVlSyUO/wM
-         3liCWBTOkWLCQ==
-Date:   Tue, 2 Aug 2022 15:50:28 +0300
+        b=IW6a0pBIbsC5aevWoSvnCQw/mnUVKyYeXk22PgTJrLMOVjWuVKvxYHoJNu+XaOHGT
+         KX/BQQ3WevV4ImfzdxOhGW2VvY68hI7gVN/iEIHt4jCIbkg9PPG8z1MmmB0XAkbvIx
+         KQj5HmrDrwJWCvn8lpneqdu+BnUuBHv4yyh2zAWwr6x4k3iPI0CUjrfehS0MDbVOHZ
+         qWdDrluYFRNt0jpoza17eCzqQ5KF410Es93UkKJfyJ02SOiyeUoYdtuG6ixRfnaTeU
+         yxaUdedITpu2h5PZVWrj3BGH71at0ojTMovVf9bB5drUTA7vDAfZRPzmjToDJTzB6R
+         kGakJmiL3h0Dw==
+Date:   Tue, 2 Aug 2022 16:19:49 +0300
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     Ashish Kalra <Ashish.Kalra@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -48,347 +48,292 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         alpergun@google.com, dgilbert@redhat.com
-Subject: Re: [PATCH Part2 v6 26/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE
+Subject: Re: [PATCH Part2 v6 24/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START
  command
-Message-ID: <YukdgY/XThzrClah@kernel.org>
+Message-ID: <YukkdQJS4K+V2Nkn@kernel.org>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
- <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+ <6d5c899030b113755e6c093e8bb9ad123280edc6.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <6d5c899030b113755e6c093e8bb9ad123280edc6.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:08:05PM +0000, Ashish Kalra wrote:
+On Mon, Jun 20, 2022 at 11:07:35PM +0000, Ashish Kalra wrote:
 > From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> The KVM_SEV_SNP_LAUNCH_UPDATE command can be used to insert data into the
-> guest's memory. The data is encrypted with the cryptographic context
-> created with the KVM_SEV_SNP_LAUNCH_START.
-> 
-> In addition to the inserting data, it can insert a two special pages
-> into the guests memory: the secrets page and the CPUID page.
-> 
-> While terminating the guest, reclaim the guest pages added in the RMP
-> table. If the reclaim fails, then the page is no longer safe to be
-> released back to the system and leak them.
-
-From this paragraph I get a picture that reclaimer is failing "all the
-time", and that is totally normal and legit behaviour. Is this the case?
-
-Stimuli/conditions/something is mandatory if failure is mentioned in any
-context.
-
+> KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
+> The command initializes a cryptographic digest context used to construct
+> the measurement of the guest. If the guest is expected to be migrated,
+> the command also binds a migration agent (MA) to the guest.
 > 
 > For more information see the SEV-SNP specification.
 > 
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  .../virt/kvm/x86/amd-memory-encryption.rst    |  29 +++
->  arch/x86/kvm/svm/sev.c                        | 187 ++++++++++++++++++
->  include/uapi/linux/kvm.h                      |  19 ++
->  3 files changed, 235 insertions(+)
+>  .../virt/kvm/x86/amd-memory-encryption.rst    |  24 ++++
+>  arch/x86/kvm/svm/sev.c                        | 115 +++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h                        |   1 +
+>  include/uapi/linux/kvm.h                      |  10 ++
+>  4 files changed, 147 insertions(+), 3 deletions(-)
 > 
 > diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-> index 878711f2dca6..62abd5c1f72b 100644
+> index 903023f524af..878711f2dca6 100644
 > --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
 > +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-> @@ -486,6 +486,35 @@ Returns: 0 on success, -negative on error
+> @@ -462,6 +462,30 @@ The flags bitmap is defined as::
+>  If the specified flags is not supported then return -EOPNOTSUPP, and the supported
+>  flags are returned.
 >  
->  See the SEV-SNP specification for further detail on the launch input.
->  
-> +20. KVM_SNP_LAUNCH_UPDATE
-> +-------------------------
+> +19. KVM_SNP_LAUNCH_START
+> +------------------------
 > +
-> +The KVM_SNP_LAUNCH_UPDATE is used for encrypting a memory region. It also
-> +calculates a measurement of the memory contents. The measurement is a signature
-> +of the memory contents that can be sent to the guest owner as an attestation
-> +that the memory was encrypted correctly by the firmware.
+> +The KVM_SNP_LAUNCH_START command is used for creating the memory encryption
+> +context for the SEV-SNP guest. To create the encryption context, user must
+> +provide a guest policy, migration agent (if any) and guest OS visible
+> +workarounds value as defined SEV-SNP specification.
 > +
-> +Parameters (in): struct  kvm_snp_launch_update
+> +Parameters (in): struct  kvm_snp_launch_start
 > +
 > +Returns: 0 on success, -negative on error
 > +
 > +::
 > +
-> +        struct kvm_sev_snp_launch_update {
-> +                __u64 start_gfn;        /* Guest page number to start from. */
-> +                __u64 uaddr;            /* userspace address need to be encrypted */
-> +                __u32 len;              /* length of memory region */
-> +                __u8 imi_page;          /* 1 if memory is part of the IMI */
-> +                __u8 page_type;         /* page type */
-> +                __u8 vmpl3_perms;       /* VMPL3 permission mask */
-> +                __u8 vmpl2_perms;       /* VMPL2 permission mask */
-> +                __u8 vmpl1_perms;       /* VMPL1 permission mask */
+> +        struct kvm_sev_snp_launch_start {
+> +                __u64 policy;           /* Guest policy to use. */
+> +                __u64 ma_uaddr;         /* userspace address of migration agent */
+> +                __u8 ma_en;             /* 1 if the migtation agent is enabled */
+> +                __u8 imi_en;            /* set IMI to 1. */
+> +                __u8 gosvw[16];         /* guest OS visible workarounds */
 > +        };
 > +
-> +See the SEV-SNP spec for further details on how to build the VMPL permission
-> +mask and page type.
-> +
+> +See the SEV-SNP specification for further detail on the launch input.
 > +
 >  References
 >  ==========
 >  
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 41b83aa6b5f4..b5f0707d7ed6 100644
+> index 813bda7f7b55..9e6fc7a94ed7 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -18,6 +18,7 @@
->  #include <linux/processor.h>
->  #include <linux/trace_events.h>
->  #include <linux/hugetlb.h>
-> +#include <linux/sev.h>
->  
+> @@ -21,6 +21,7 @@
 >  #include <asm/pkru.h>
 >  #include <asm/trapnr.h>
-> @@ -233,6 +234,49 @@ static void sev_decommission(unsigned int handle)
->  	sev_guest_decommission(&decommission, NULL);
+>  #include <asm/fpu/xcr.h>
+> +#include <asm/sev.h>
+>  
+>  #include "x86.h"
+>  #include "svm.h"
+> @@ -73,6 +74,8 @@ static unsigned int nr_asids;
+>  static unsigned long *sev_asid_bitmap;
+>  static unsigned long *sev_reclaim_asid_bitmap;
+>  
+> +static int snp_decommission_context(struct kvm *kvm);
+> +
+>  struct enc_region {
+>  	struct list_head list;
+>  	unsigned long npages;
+> @@ -98,12 +101,17 @@ static int sev_flush_asids(int min_asid, int max_asid)
+>  	down_write(&sev_deactivate_lock);
+>  
+>  	wbinvd_on_all_cpus();
+> -	ret = sev_guest_df_flush(&error);
+> +
+> +	if (sev_snp_enabled)
+> +		ret = snp_guest_df_flush(&error);
+> +	else
+> +		ret = sev_guest_df_flush(&error);
+>  
+>  	up_write(&sev_deactivate_lock);
+>  
+>  	if (ret)
+> -		pr_err("SEV: DF_FLUSH failed, ret=%d, error=%#x\n", ret, error);
+> +		pr_err("SEV%s: DF_FLUSH failed, ret=%d, error=%#x\n",
+> +			sev_snp_enabled ? "-SNP" : "", ret, error);
+>  
+>  	return ret;
+>  }
+> @@ -1825,6 +1833,74 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	return ret;
 >  }
 >  
-> +static inline void snp_leak_pages(u64 pfn, enum pg_level level)
+> +static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
 > +{
-> +	unsigned int npages = page_level_size(level) >> PAGE_SHIFT;
-> +
-> +	WARN(1, "psc failed pfn 0x%llx pages %d (leaking)\n", pfn, npages);
-> +
-> +	while (npages) {
-> +		memory_failure(pfn, 0);
-> +		dump_rmpentry(pfn);
-> +		npages--;
-> +		pfn++;
-> +	}
-> +}
-> +
-> +static int snp_page_reclaim(u64 pfn)
-> +{
-> +	struct sev_data_snp_page_reclaim data = {0};
-> +	int err, rc;
-> +
-> +	data.paddr = __sme_set(pfn << PAGE_SHIFT);
-> +	rc = snp_guest_page_reclaim(&data, &err);
-> +	if (rc) {
-> +		/*
-> +		 * If the reclaim failed, then page is no longer safe
-> +		 * to use.
-> +		 */
-> +		snp_leak_pages(pfn, PG_LEVEL_4K);
-> +	}
-> +
-> +	return rc;
-> +}
-> +
-> +static int host_rmp_make_shared(u64 pfn, enum pg_level level, bool leak)
-> +{
+> +	struct sev_data_snp_gctx_create data = {};
+> +	void *context;
 > +	int rc;
 > +
-> +	rc = rmp_make_shared(pfn, level);
-> +	if (rc && leak)
-> +		snp_leak_pages(pfn, level);
+> +	/* Allocate memory for context page */
+
+Nit: this comment has very little value, if any. It's just stating
+the obvious.
+
+Instead, I'd add a description for the function:
+
+/*
+ * Allocate and initialize a digest for the guest measurement.
+ */
+static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+
+This would be much more helpful to get a grasp on "what I'm looking at".
+
+> +	context = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
+> +	if (!context)
+> +		return NULL;
 > +
-> +	return rc;
-> +}
-> +
->  static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
->  {
->  	struct sev_data_deactivate deactivate;
-> @@ -1902,6 +1946,123 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  	return rc;
->  }
->  
-> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct list_head *head = &sev->regions_list;
-> +	struct enc_region *i;
-> +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	list_for_each_entry(i, head, list) {
-> +		u64 start = i->uaddr;
-> +		u64 end = start + i->size;
-> +
-> +		if (start <= hva && end >= (hva + len))
-> +			return true;
+> +	data.gctx_paddr = __psp_pa(context);
+> +	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
+> +	if (rc) {
+> +		snp_free_firmware_page(context);
+> +		return NULL;
 > +	}
 > +
-> +	return false;
+> +	return context;
 > +}
 > +
-> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +static int snp_bind_asid(struct kvm *kvm, int *error)
 > +{
 > +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct sev_data_snp_launch_update data = {0};
-> +	struct kvm_sev_snp_launch_update params;
-> +	unsigned long npages, pfn, n = 0;
-> +	int *error = &argp->error;
-> +	struct page **inpages;
-> +	int ret, i, level;
-> +	u64 gfn;
+> +	struct sev_data_snp_activate data = {0};
+> +
+> +	data.gctx_paddr = __psp_pa(sev->snp_context);
+> +	data.asid   = sev_get_asid(kvm);
+> +	return sev_issue_cmd(kvm, SEV_CMD_SNP_ACTIVATE, &data, error);
+> +}
+> +
+> +static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_snp_launch_start start = {0};
+> +	struct kvm_sev_snp_launch_start params;
+> +	int rc;
 > +
 > +	if (!sev_snp_guest(kvm))
 > +		return -ENOTTY;
 > +
-> +	if (!sev->snp_context)
-> +		return -EINVAL;
-> +
 > +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
 > +		return -EFAULT;
 > +
-> +	/* Verify that the specified address range is registered. */
-> +	if (!is_hva_registered(kvm, params.uaddr, params.len))
-> +		return -EINVAL;
+> +	sev->snp_context = snp_context_create(kvm, argp);
+> +	if (!sev->snp_context)
+> +		return -ENOTTY;
 > +
-> +	/*
-> +	 * The userspace memory is already locked so technically we don't
-> +	 * need to lock it again. Later part of the function needs to know
-> +	 * pfn so call the sev_pin_memory() so that we can get the list of
-> +	 * pages to iterate through.
-> +	 */
-> +	inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
-> +	if (!inpages)
-> +		return -ENOMEM;
+> +	start.gctx_paddr = __psp_pa(sev->snp_context);
+> +	start.policy = params.policy;
+> +	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
+> +	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
+> +	if (rc)
+> +		goto e_free_context;
 > +
-> +	/*
-> +	 * Verify that all the pages are marked shared in the RMP table before
-> +	 * going further. This is avoid the cases where the userspace may try
-> +	 * updating the same page twice.
-> +	 */
-> +	for (i = 0; i < npages; i++) {
-> +		if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
-> +			sev_unpin_memory(kvm, inpages, npages);
-> +			return -EFAULT;
-> +		}
-> +	}
+> +	sev->fd = argp->sev_fd;
+> +	rc = snp_bind_asid(kvm, &argp->error);
+> +	if (rc)
+> +		goto e_free_context;
 > +
-> +	gfn = params.start_gfn;
-> +	level = PG_LEVEL_4K;
-> +	data.gctx_paddr = __psp_pa(sev->snp_context);
+> +	return 0;
 > +
-> +	for (i = 0; i < npages; i++) {
-> +		pfn = page_to_pfn(inpages[i]);
+> +e_free_context:
+> +	snp_decommission_context(kvm);
 > +
-> +		ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
-> +		if (ret) {
-> +			ret = -EFAULT;
-> +			goto e_unpin;
-> +		}
-> +
-> +		n++;
-> +		data.address = __sme_page_pa(inpages[i]);
-> +		data.page_size = X86_TO_RMP_PG_LEVEL(level);
-> +		data.page_type = params.page_type;
-> +		data.vmpl3_perms = params.vmpl3_perms;
-> +		data.vmpl2_perms = params.vmpl2_perms;
-> +		data.vmpl1_perms = params.vmpl1_perms;
-> +		ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
-> +		if (ret) {
-> +			/*
-> +			 * If the command failed then need to reclaim the page.
-> +			 */
-> +			snp_page_reclaim(pfn);
-> +			goto e_unpin;
-> +		}
-> +
-> +		gfn++;
-> +	}
-> +
-> +e_unpin:
-> +	/* Content of memory is updated, mark pages dirty */
-> +	for (i = 0; i < n; i++) {
-> +		set_page_dirty_lock(inpages[i]);
-> +		mark_page_accessed(inpages[i]);
-> +
-> +		/*
-> +		 * If its an error, then update RMP entry to change page ownership
-> +		 * to the hypervisor.
-> +		 */
-> +		if (ret)
-> +			host_rmp_make_shared(pfn, level, true);
-> +	}
-> +
-> +	/* Unlock the user pages */
-> +	sev_unpin_memory(kvm, inpages, npages);
-> +
-> +	return ret;
+> +	return rc;
 > +}
 > +
 >  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
 >  {
 >  	struct kvm_sev_cmd sev_cmd;
-> @@ -1995,6 +2156,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  	case KVM_SEV_SNP_LAUNCH_START:
->  		r = snp_launch_start(kvm, &sev_cmd);
+> @@ -1915,6 +1991,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_RECEIVE_FINISH:
+>  		r = sev_receive_finish(kvm, &sev_cmd);
 >  		break;
-> +	case KVM_SEV_SNP_LAUNCH_UPDATE:
-> +		r = snp_launch_update(kvm, &sev_cmd);
+> +	case KVM_SEV_SNP_LAUNCH_START:
+> +		r = snp_launch_start(kvm, &sev_cmd);
 > +		break;
 >  	default:
 >  		r = -EINVAL;
 >  		goto out;
-> @@ -2113,6 +2277,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
->  static void __unregister_enc_region_locked(struct kvm *kvm,
->  					   struct enc_region *region)
+> @@ -2106,6 +2185,28 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	return ret;
+>  }
+>  
+> +static int snp_decommission_context(struct kvm *kvm)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_snp_decommission data = {};
+> +	int ret;
+> +
+> +	/* If context is not created then do nothing */
+> +	if (!sev->snp_context)
+> +		return 0;
+> +
+> +	data.gctx_paddr = __sme_pa(sev->snp_context);
+> +	ret = snp_guest_decommission(&data, NULL);
+> +	if (WARN_ONCE(ret, "failed to release guest context"))
+> +		return ret;
+> +
+> +	/* free the context page now */
+> +	snp_free_firmware_page(sev->snp_context);
+> +	sev->snp_context = NULL;
+> +
+> +	return 0;
+> +}
+> +
+>  void sev_vm_destroy(struct kvm *kvm)
 >  {
-> +	unsigned long i, pfn;
-> +	int level;
-> +
-> +	/*
-> +	 * The guest memory pages are assigned in the RMP table. Unassign it
-> +	 * before releasing the memory.
-> +	 */
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -2147,7 +2248,15 @@ void sev_vm_destroy(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> -	sev_unbind_asid(kvm, sev->handle);
 > +	if (sev_snp_guest(kvm)) {
-> +		for (i = 0; i < region->npages; i++) {
-> +			pfn = page_to_pfn(region->pages[i]);
-> +
-> +			if (!snp_lookup_rmpentry(pfn, &level))
-> +				continue;
-> +
-> +			cond_resched();
-> +
-> +			if (level > PG_LEVEL_4K)
-> +				pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
-> +
-> +			host_rmp_make_shared(pfn, level, true);
+> +		if (snp_decommission_context(kvm)) {
+> +			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
+> +			return;
 > +		}
+> +	} else {
+> +		sev_unbind_asid(kvm, sev->handle);
 > +	}
 > +
->  	sev_unpin_memory(kvm, region->pages, region->npages);
->  	list_del(&region->list);
->  	kfree(region);
+>  	sev_asid_free(sev);
+>  }
+>  
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 2f45589ee596..71c011af098e 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -91,6 +91,7 @@ struct kvm_sev_info {
+>  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+>  	atomic_t migration_in_progress;
+>  	u64 snp_init_flags;
+> +	void *snp_context;      /* SNP guest context page */
+>  };
+>  
+>  struct kvm_svm {
 > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 0cb119d66ae5..9b36b07414ea 100644
+> index 0f912cefc544..0cb119d66ae5 100644
 > --- a/include/uapi/linux/kvm.h
 > +++ b/include/uapi/linux/kvm.h
-> @@ -1813,6 +1813,7 @@ enum sev_cmd_id {
+> @@ -1812,6 +1812,7 @@ enum sev_cmd_id {
+>  
 >  	/* SNP specific commands */
 >  	KVM_SEV_SNP_INIT,
->  	KVM_SEV_SNP_LAUNCH_START,
-> +	KVM_SEV_SNP_LAUNCH_UPDATE,
+> +	KVM_SEV_SNP_LAUNCH_START,
 >  
 >  	KVM_SEV_NR_MAX,
 >  };
-> @@ -1929,6 +1930,24 @@ struct kvm_sev_snp_launch_start {
->  	__u8 pad[6];
+> @@ -1919,6 +1920,15 @@ struct kvm_snp_init {
+>  	__u64 flags;
 >  };
 >  
-> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL		0x1
-> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA		0x2
-> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO		0x3
-> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED	0x4
-> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS		0x5
-> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID		0x6
-> +
-> +struct kvm_sev_snp_launch_update {
-> +	__u64 start_gfn;
-> +	__u64 uaddr;
-> +	__u32 len;
-> +	__u8 imi_page;
-> +	__u8 page_type;
-> +	__u8 vmpl3_perms;
-> +	__u8 vmpl2_perms;
-> +	__u8 vmpl1_perms;
+> +struct kvm_sev_snp_launch_start {
+> +	__u64 policy;
+> +	__u64 ma_uaddr;
+> +	__u8 ma_en;
+> +	__u8 imi_en;
+> +	__u8 gosvw[16];
+> +	__u8 pad[6];
 > +};
 > +
 >  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
