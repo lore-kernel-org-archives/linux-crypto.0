@@ -2,117 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6C2C19F2C
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Aug 2022 20:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE05BC19F2B
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Aug 2022 20:48:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238566AbiHCU1H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Aug 2022 16:27:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37740 "EHLO
+        id S238428AbiHCUsB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Aug 2022 16:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236138AbiHCU1F (ORCPT
+        with ESMTP id S238558AbiHCUsA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Aug 2022 16:27:05 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8310519012;
-        Wed,  3 Aug 2022 13:27:03 -0700 (PDT)
-Received: from zn.tnic (p57969665.dip0.t-ipconnect.de [87.150.150.101])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 3 Aug 2022 16:48:00 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BE75C95D;
+        Wed,  3 Aug 2022 13:47:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 34EFF1EC00F8;
-        Wed,  3 Aug 2022 22:26:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1659558417;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=NGAAgwsFZOFiyuIqVIHwUIdtAY8mEvoIbdgSbGrefj4=;
-        b=saUgyTZ9As3E+I3dXZj9mDddkTvaiqPubF7iHBiDAUHv1uqUQRvBQQaJmioU9Y/eeK0SV+
-        Fx8ZdZfliRxroJcFhwQbrI/BCmhC1w2JRF2SVcalW/Ebwhe6z9BvgQ/IUOs8cALByhrxpk
-        oAoh7W7eorRu7ffIUUqRappMfT1v+d8=
-Date:   Wed, 3 Aug 2022 22:26:51 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Message-ID: <YuraC/P4k0FgHM17@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <Yt6qit4al5/eM7YO@zn.tnic>
- <SN6PR12MB2767A5C613388594D7EAD3528E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id DC72F205AE;
+        Wed,  3 Aug 2022 20:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1659559676; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vKzaXxOuodAWNmH75tEbExlIwhjF1u2srkFX6cUqy68=;
+        b=1N9xrFj3qsgIi07FRZeT3t2v17ay2mE/+y9hObqOxXtEZRK9BaVfbGIK0zbZTMvY7BqOdb
+        M736F8TLWcuN3f6+uxonNWXujE9Bnm+s5rXFIPbYDQ8K4+bHznI0Dqlx3KevV+EkGiv8I3
+        AcKeH+t2EsxqZnN2dBvJXzNvJCDTEps=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1659559676;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vKzaXxOuodAWNmH75tEbExlIwhjF1u2srkFX6cUqy68=;
+        b=uP6uiImSTFu9yAAlNQcJk5kVRF+mp7dHlSeJ8nLrZo59FuJ/Ob2qdmuAbTTDKl27qA780e
+        gBCD5X7pmiIli+Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8FAE113A94;
+        Wed,  3 Aug 2022 20:47:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KBlkIfze6mJbMwAAMHmgww
+        (envelope-from <jdelvare@suse.de>); Wed, 03 Aug 2022 20:47:56 +0000
+Date:   Wed, 3 Aug 2022 22:47:55 +0200
+From:   Jean Delvare <jdelvare@suse.de>
+To:     LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+Cc:     Declan Murphy <declan.murphy@intel.com>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Prabhjot Khurana <prabhjot.khurana@intel.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] crypto: keembay-ocs - Drop obsolete dependency on
+ COMPILE_TEST
+Message-ID: <20220803224755.177de90e@endymion.delvare>
+Organization: SUSE Linux
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767A5C613388594D7EAD3528E9A9@SN6PR12MB2767.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 01, 2022 at 10:31:26PM +0000, Kalra, Ashish wrote:
-> The struct rmpentry is the raw layout of the RMP table entry
-> while struct rmpupdate is the structure expected by the rmpupdate
-> instruction for programming the RMP table entries.
->
-> Arguably, we can program a struct rmpupdate internally from a struct
-> rmpentry.
->
-> But we will still need struct rmpupdate for issuing the rmpupdate
-> instruction, so it is probably cleaner to keep it this way, as it only
-> has two main callers - rmp_make_private() and rmp_make_shared().
+Since commit 0166dc11be91 ("of: make CONFIG_OF user selectable"), it
+is possible to test-build any driver which depends on OF on any
+architecture by explicitly selecting OF. Therefore depending on
+COMPILE_TEST as an alternative is no longer needed.
 
-Ok, but then call it struct rmp_state. The APM says in the RMPUPDATE
-blurb:
+It is actually better to always build such drivers with OF enabled,
+so that the test builds are closer to how each driver will actually be
+built on its intended target. Building them without OF may not test
+much as the compiler will optimize out potentially large parts of the
+code. In the worst case, this could even pop false positive warnings.
+Dropping COMPILE_TEST here improves the quality of our testing and
+avoids wasting time on non-existent issues.
 
-"The RCX register provides the effective address of a 16-byte data
-structure which contains the new RMP state."
+Signed-off-by: Jean Delvare <jdelvare@suse.de>
+Cc: Declan Murphy <declan.murphy@intel.com>
+Cc: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
+Cc: Mark Gross <mgross@linux.intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Prabhjot Khurana <prabhjot.khurana@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+---
+ drivers/crypto/keembay/Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-so the function signature should be:
+--- linux-5.18.orig/drivers/crypto/keembay/Kconfig	2022-05-22 21:52:31.000000000 +0200
++++ linux-5.18/drivers/crypto/keembay/Kconfig	2022-08-03 22:36:27.354500492 +0200
+@@ -42,7 +42,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_AES_SM4_CT
+ config CRYPTO_DEV_KEEMBAY_OCS_ECC
+ 	tristate "Support for Intel Keem Bay OCS ECC HW acceleration"
+ 	depends on ARCH_KEEMBAY || COMPILE_TEST
+-	depends on OF || COMPILE_TEST
++	depends on OF
+ 	depends on HAS_IOMEM
+ 	select CRYPTO_ECDH
+ 	select CRYPTO_ENGINE
+@@ -64,7 +64,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_HCU
+ 	select CRYPTO_ENGINE
+ 	depends on HAS_IOMEM
+ 	depends on ARCH_KEEMBAY || COMPILE_TEST
+-	depends on OF || COMPILE_TEST
++	depends on OF
+ 	help
+ 	  Support for Intel Keem Bay Offload and Crypto Subsystem (OCS) Hash
+ 	  Control Unit (HCU) hardware acceleration for use with Crypto API.
 
-static int rmpupdate(u64 pfn, struct rmp_state *new)
-
-and this is basically the description of that. It can't get any more
-user-friendly than this.
-
-Thx.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jean Delvare
+SUSE L3 Support
