@@ -2,144 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C13F7C00140
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Aug 2022 22:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8967EC00140
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Aug 2022 00:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbiHBW1u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Aug 2022 18:27:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56400 "EHLO
+        id S236875AbiHCA5q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 2 Aug 2022 20:57:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234010AbiHBW1t (ORCPT
+        with ESMTP id S235706AbiHCA5o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Aug 2022 18:27:49 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A1D84D4F0;
-        Tue,  2 Aug 2022 15:27:47 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1659479264;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2+8YQaqr4jvBS77GSdetrDQfbpLw2aOVtTCrGN8SWq0=;
-        b=f4Fsr/J/7fmIJ2tvX1It3tya28H7xrMMJIXEhiveaI8B56d8Y7ynh+50whCMatb9FWA23I
-        DP9ICXxCnxu1bqeqH0KeaObLIY3cJSda2SFuFH4heJVgDqRVbFnwmzZIB3ss+cSOwvo0Q3
-        e1dgusOuX7PpaSZhIRWU7HBvLsNpSnb/6Qh4IPMrBUEYhUzPg9Z3qKsEirKdKKpCjObmGf
-        T0V2Zuh6On3YOvGT5mXnbOmwEbTRBKdfChjVKtzvfny9zSZy6H+y5DxCN5UWasFGV1XhEW
-        afNKWS7pehSl2eNQJCzmBFxB/CnPByq2euTBPqiXgWAlQ/KUsB82/Bj3rx7xFQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1659479264;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2+8YQaqr4jvBS77GSdetrDQfbpLw2aOVtTCrGN8SWq0=;
-        b=J5odj7yQnMHKp1krceheGfiT050s2V9VWquVety53pBTRT3cFLrw3HOBTdbvUxNHxE124Q
-        P8Dvry2qh+yQwpCg==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Tue, 2 Aug 2022 20:57:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25FDB4D16B;
+        Tue,  2 Aug 2022 17:57:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B1474B82029;
+        Wed,  3 Aug 2022 00:57:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74D2AC433D6;
+        Wed,  3 Aug 2022 00:57:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659488260;
+        bh=7uos+e2oUNx7Mbbre5RHKEoAotCc4pHCrRF1RuUJgRg=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=TTlBKJZOpQ6eFx6vVB2vVcKlUbbpmcA3uKpe8sI/m/KKjNnAlQR4A7MywNYMu1aEJ
+         e/uKmE/gCCaxNvGDBHm/4pdbvATddEqKKPSe8+QN3BD49dPQHWeS/sQEmZHLRJ2Sen
+         GvRDskt0uPRFQotFdp7du3fuMYtOobnVovaHGhXUhUiLLL1vmxRkiWSEwVwNPev5yV
+         REI8G8DKz3BhE9MJQTvwLQDrEw+gUHrBsAfFm+dVIBgD5yMszsnvdTgIjJDrfbuxgm
+         5QeTjemcXrXgg0ZPqX5W2erGaIBMakcnvurEMGF3igHAVPy8LRC0NDeaiULWmodO39
+         Xtea2bKdnt/sg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6261BC43140;
+        Wed,  3 Aug 2022 00:57:40 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 5.20
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+References: <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au> <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.20-p1
+X-PR-Tracked-Commit-Id: af5d35b83f642399c719ea9a8599a13b8a0c4167
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c2a24a7a036b3bd3a2e6c66730dfc777cae6540a
+Message-Id: <165948826038.18250.7000517425956638332.pr-tracker-bot@kernel.org>
+Date:   Wed, 03 Aug 2022 00:57:40 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Thomas Ristenpart <ristenpart@cornell.edu>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Florian Weimer <fweimer@redhat.com>
-Subject: Re: [PATCH RFC v1] random: implement getrandom() in vDSO
-In-Reply-To: <CAHmME9pNN6Pc_1NaMDv+hqv_ULXiVUYFXM=Xigu_StvGS_-53A@mail.gmail.com>
-References: <20220729145525.1729066-1-Jason@zx2c4.com>
- <CAHk-=wiLwz=9h9LD1-_yb1+T+u59a2EjTmMvCiGj4A-ZsPN1wA@mail.gmail.com>
- <YuXCpyULk6jFgGV5@zx2c4.com> <87zggnsqwj.ffs@tglx>
- <Yuhe6IIFXqNMZs5b@zx2c4.com> <87bkt2sqq4.ffs@tglx>
- <YuktqQS7Rb0IbJNh@zx2c4.com> <878ro6smmm.ffs@tglx>
- <CAHmME9pNN6Pc_1NaMDv+hqv_ULXiVUYFXM=Xigu_StvGS_-53A@mail.gmail.com>
-Date:   Wed, 03 Aug 2022 00:27:43 +0200
-Message-ID: <87zggmqo0w.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason!
+The pull request you sent on Tue, 2 Aug 2022 14:05:04 +0800:
 
-On Tue, Aug 02 2022 at 17:26, Jason A. Donenfeld wrote:
-> On Tue, Aug 2, 2022 at 5:14 PM Thomas Gleixner <tglx@linutronix.de> wrote:
->> Seriously no.
->
-> Why so serious all at once? :-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.20-p1
 
-Because you triggered the 'now it gets serious' button with your "it's
-the same" sentiment.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c2a24a7a036b3bd3a2e6c66730dfc777cae6540a
 
->> All existing VDSO functions have exactly the same function
->> signature and semantics as their syscall counterparts. So they are drop
->> in equivalent.
->>
->> But:
->>
->>   ssize_t getrandom(void *, void *, size_t, unsigned int);
->>
->> is very much different than
->>
->>   ssize_t getrandom(void *, size_t, unsigned int);
->>
->> Different signature and different semantics.
->
-> Different signature, but basically the same semantics.
+Thank you!
 
-Not at all. The concept of 'basically same semantics' is a delusion. It
-does not exist. Either it's the same or it's not.
-
-I really want to see your reaction on a claim that some RNG
-implementation is basically the same as the existing one. I'm sure you
-buy that without complaints.
-
->> So you have to go through the whole process of a new ABI whether you
->> like it or not.
->
-> Ahh, in that sense. Yea, I'd rather not have to do that too, with the
-> additional opaque handle passed as the first argument. It'd be nice if
-> there were some private place where I could store the necessary state,
-> but I'm not really sure where that might be at the moment. If you have
-> any ideas, please let me know.
-
-That's exactly the problem. VDSO is a stateless syscall wrapper which
-has to be self contained for obvious reasons.
-
-My previous statement:
-
-    Everything else is library material, really.
-
-is based on that fact and not on the unwillingness to add magic muck to
-the VDSO.
-
-The unwillingness part is just the question:
-
-    Is there a sensible usecase?
-
-Assumed that there is a sensible usecase, there is a way out and that's
-exactly the library part. You can make that VDSO interface versioned and
-provide a library in tools/random/ which goes in lockstep with the VDSO
-changes.
-
-If the RNG tinkerers abuse that, then so be it. You can't do anything
-about it whatever you try. They can abuse your magic vdso functionality
-too.
-
-That's very much the same as we have with e.g. perf. The old perf binary
-still works, but it does not have access to the latest and greatest
-features.
-
-You can do very much the same in a kernel supplied helper library which
-either can cope with the version change or falls back to
-sys_getrandom().
-
-Vs. the storage problem. That yells TLS, but that makes your process
-wide sharing moot, which might not be the worst of all things IMO.
-
-Thanks,
-
-        tglx
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
