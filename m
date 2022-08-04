@@ -2,125 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D241C19F29
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Aug 2022 01:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B6BC19F2D
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Aug 2022 10:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236533AbiHDBCg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Aug 2022 21:02:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36092 "EHLO
+        id S238997AbiHDK4j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Aug 2022 06:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiHDBCf (ORCPT
+        with ESMTP id S239183AbiHDK40 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Aug 2022 21:02:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEEBF18E1C;
-        Wed,  3 Aug 2022 18:02:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 4 Aug 2022 06:56:26 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5ED13E33;
+        Thu,  4 Aug 2022 03:56:25 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A47F6172C;
-        Thu,  4 Aug 2022 01:02:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57664C433D6;
-        Thu,  4 Aug 2022 01:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659574953;
-        bh=ojOGwVmUtAwEibZBXIJloUOWkBRws1ynoRVHan4EmDQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=DPRfoCrv0r98FNMwDUmPEWXziQjIJmZQ9o76KB0ty0LVoBGVNvbyHPrcbLkROmGBk
-         hbVqhkkxw1MJaIU2MnB2XNR6e8JmgbFPDxkhZZEqq2RfyEuAmx3ypoHLDA4PIal0XD
-         hRkU8Rrdi6FqJBHmnSN7JOGIr9tg5fdVunDWSh5cBXLOgoE0qi8DbJVoYAplXeEGrU
-         Ri5fNC2b2J6v4GFTx34uwFFrbdTAWd/59Ww7+GpdU8529dcFs6/oydrGUz4NqUfLVz
-         F7a3lLY4Xx29fCP1iSTrvJYngmT0ojQne5fltnzraWkOKIHTheVoJIzvyipmfqYs4T
-         WRRaVs5+xsxCA==
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        Harald Hoyer <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER - SE...), linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: ccp: Load the firmware twice when SEV API version < 1.43
-Date:   Thu,  4 Aug 2022 04:02:23 +0300
-Message-Id: <20220804010223.3619-1-jarkko@kernel.org>
-X-Mailer: git-send-email 2.37.1
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 84CC520EDD;
+        Thu,  4 Aug 2022 10:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1659610583; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mlktYDm7Q9WWK6B+W/bogBPhH4hH8aSA3B4MxQAXBh8=;
+        b=TPP8b3t9rP/4eLEeZXO6gehvwrqcL7GwZPmNp1ThS0tbE/j1542zCGpq07mMbmExjzmwlX
+        lXfgzuJ0CY6iYJqXmo4ApAu9S70VWGRjriAiRy5aI4x0SlodVrU8dHzjD3ON/ppZumNNz6
+        +x3nxSFky7Yjy+JgErlSstlF1EA2l8I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1659610583;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mlktYDm7Q9WWK6B+W/bogBPhH4hH8aSA3B4MxQAXBh8=;
+        b=o817tBQaO2BN6keT74Cjjte1SJotvXncGsbi9oVX1SnL7Y2Brd2tIf1H/kzQQWeXDBGYly
+        BMVwf/IvHGGT+ZCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 06ED513A94;
+        Thu,  4 Aug 2022 10:56:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id YtDiANel62J/GwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 04 Aug 2022 10:56:23 +0000
+Message-ID: <5c6e8435-22bb-234a-87a1-96c9f4e93dc9@suse.cz>
+Date:   Thu, 4 Aug 2022 12:56:22 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.3
+Subject: Re: [PATCH Part2 v6 27/49] KVM: SVM: Mark the private vma unmerable
+ for SEV-SNP guests
+Content-Language: en-US
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <bb10f0a4c5eb13a5338f77ef34f08f1190d4ae30.1655761627.git.ashish.kalra@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <bb10f0a4c5eb13a5338f77ef34f08f1190d4ae30.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jarkko Sakkinen <jarkko@profian.com>
+On 6/21/22 01:08, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> When SEV-SNP is enabled, the guest private pages are added in the RMP
+> table; while adding the pages, the rmp_make_private() unmaps the pages
+> from the direct map. If KSM attempts to access those unmapped pages then
+> it will trigger #PF (page-not-present).
+> 
+> Encrypted guest pages cannot be shared between the process, so an
+> userspace should not mark the region mergeable but to be safe, mark the
+> process vma unmerable before adding the pages in the RMP table.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-SEV-SNP does not initialize to a legit state, unless the firmware is
-loaded twice, when SEP API version < 1.43, and the firmware is updated
-to a later version. Because of this user space needs to work around
-this with "rmmod && modprobe" combo. Fix this by implementing the
-workaround to the driver.
+Note this doesn't really mark the vma unmergeable, rather it unmarks it as
+mergeable, and unmerges any already merged pages.
+Which seems like a good idea. Is snp_launch_update() the only place that
+needs it or can private pages be added elsewhere too?
 
-Reported-by: Harald Hoyer <harald@profian.com>
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
- drivers/crypto/ccp/sev-dev.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+However, AFAICS nothing stops userspace to do another
+madvise(MADV_MERGEABLE) afterwards, so we should make somehow sure that ksm
+will still be prevented, as we should protect the kernel even from a buggy
+userspace. So either we stop it with a flag at vma level (see ksm_madvise()
+for which flags currently stop it), or page level - currently only
+PageAnon() pages are handled. The vma level is probably easier/cheaper.
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 799b476fc3e8..f2abb7439dde 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -76,6 +76,9 @@ static void *sev_es_tmr;
- #define NV_LENGTH (32 * 1024)
- static void *sev_init_ex_buffer;
- 
-+/*
-+ * SEV API version >= maj.min?
-+ */
- static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
- {
- 	struct sev_device *sev = psp_master->sev_data;
-@@ -89,6 +92,14 @@ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
- 	return false;
- }
- 
-+/*
-+ * SEV API version < maj.min?
-+ */
-+static inline bool sev_version_less(u8 maj, u8 min)
-+{
-+	return !sev_version_greater_or_equal(maj, min);
-+}
-+
- static void sev_irq_handler(int irq, void *data, unsigned int status)
- {
- 	struct sev_device *sev = data;
-@@ -1274,6 +1285,7 @@ void sev_pci_init(void)
- {
- 	struct sev_device *sev = psp_master->sev_data;
- 	int error, rc;
-+	int i;
- 
- 	if (!sev)
- 		return;
-@@ -1283,9 +1295,13 @@ void sev_pci_init(void)
- 	if (sev_get_api_version())
- 		goto err;
- 
--	if (sev_version_greater_or_equal(0, 15) &&
--	    sev_update_firmware(sev->dev) == 0)
--		sev_get_api_version();
-+	/*
-+	 * SEV-SNP does not work properly before loading the FW twice in the API
-+	 * versions older than SEV 1.43.
-+	 */
-+	for (i = 0; i < sev_version_greater_or_equal(0, 15) + sev_version_less(1, 43); i++)
-+		if (sev_update_firmware(sev->dev) == 0)
-+			sev_get_api_version();
- 
- 	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
- 	 * instead of INIT.
--- 
-2.37.1
+It's also possible that this will solve itself with the switch to UPM as
+those vma's or pages might be incompatible with ksm naturally (didn't check
+closely), and then this patch can be just dropped. But we should double-check.
 
