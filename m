@@ -2,208 +2,168 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61507C19F2A
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Aug 2022 13:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C19C19F2A
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Aug 2022 13:37:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239409AbiHDNNr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Aug 2022 09:13:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51418 "EHLO
+        id S239746AbiHDNhY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 Aug 2022 09:37:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbiHDNNq (ORCPT
+        with ESMTP id S239959AbiHDNhV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Aug 2022 09:13:46 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2070.outbound.protection.outlook.com [40.107.220.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7081FA;
-        Thu,  4 Aug 2022 06:13:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g0/8nIGA/uX/kL222i5TylBTubk2KtkwhP471doqoQMehgAlS6glCf3supm/xSve5c+qtYvBwrL2Fy2iANihFNWtW9HQn8A9HLU/W/6l5qc7tuIL2c/pwYKcXHsg102QrGQpZixJVxY8jNEot2zwdQkRH/ixNgonoDan9y01rSvcAh5F2puLThleLfQEuYD8rIyA1ox3PBndvLnhWx1i5v3SBJnue7bP0JGYSEKN7AtXsY6peLqHKXz7tlVFLawMl8MRxw5sfyGUdZLZJ8vVJ2iOEPblhBW4kOvF2WMA0ULoVooqsCEA4K7AnLQGoZ5SsZHs0VoIR5WUUxz1GQmbjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oDsQbQAMZGqB2XLaC8exUvdnQYYlQsv04tHyvYZYMWw=;
- b=hCPkLaQzLLU/iX4MO2hb5Zgdb7ngABTuWbpRshHer49ECY0YmSZY6qSB5T38Y8Asu1oG2WnsHWkElBS7QovF7TynN7oPIooXI1oxGitIGjYq2J0XE6ApEaYgmX2RuR/gPHFcSwAJCvfPOfXLT62T7OBeMTt2Ib63ZlPLWw3yzKOXYOx7reuQKJ/+sQXCNT9ULHFLg1VNVS6BiHqUog8ccV1aHfDEEJmtavuVCeAd5NrhZKCwOs+M/8Csmdc8RooopluKSiFZWQsiPCSKYKEqItQX/BceTIhd+fvkk9ajazhyJ8Da1W1P3AijQ+9SALnR5U78f9vN90aBQ6hyCQK2RQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oDsQbQAMZGqB2XLaC8exUvdnQYYlQsv04tHyvYZYMWw=;
- b=TsCN1jWZCM9idE4QCnhf5uHJw3nRxriaCMrrTPQRe0fJ0iCMoRDSAu8ZMAVLQpKk/G1mb7fgejC0m8/0zy5Hzu3rFa3IXQ/y5I7Oz3+nxh+ksl+y0s5EwDQG5bm3wKrjFdZMLQSFQCUGP4o334lSPJSB1pCiAf/GUcNLOKdXS1U=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by CH2PR12MB4264.namprd12.prod.outlook.com (2603:10b6:610:a4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.15; Thu, 4 Aug
- 2022 13:13:38 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1dac:1301:78a3:c0d0]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1dac:1301:78a3:c0d0%4]) with mapi id 15.20.5504.015; Thu, 4 Aug 2022
- 13:13:38 +0000
-Message-ID: <58e8f9dc-a8d3-a2a5-2dd7-0783355e2567@amd.com>
-Date:   Thu, 4 Aug 2022 08:13:35 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] crypto: ccp: Load the firmware twice when SEV API version
- < 1.43
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        Harald Hoyer <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
-        <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20220804010223.3619-1-jarkko@kernel.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20220804010223.3619-1-jarkko@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR13CA0019.namprd13.prod.outlook.com
- (2603:10b6:610:b1::24) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        Thu, 4 Aug 2022 09:37:21 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911203D5B5;
+        Thu,  4 Aug 2022 06:37:19 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 2896921068;
+        Thu,  4 Aug 2022 13:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1659620238; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4z4bB0wf9LcF9P6u2FPUyZHxaeD5A+EOAqqR1WSbcG4=;
+        b=BXgO1RCi6DXmG5yZlxDlMsnurvSrUNO/6LU+fwYMGsA2KiyInuHZy5B+Z+0xmwLjX9vvTg
+        TGwZgIzeXkTEwi9Wl7yuERuGSQRaLUK5aJj9VMY+ky1oVWsdMoEQrcCEWqAIGrWvhJXgS+
+        b3PLvVILPAybITOU257Nx/Dfo6dDTws=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1659620238;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4z4bB0wf9LcF9P6u2FPUyZHxaeD5A+EOAqqR1WSbcG4=;
+        b=z0C+PLAADumOtWMXMulg5tP5ulysMkSTVGsW6yee5rER0go9eeH1Ci+9u33zw6DI9k6HDD
+        TmakTx0UQv3ICaDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A4FA113434;
+        Thu,  4 Aug 2022 13:37:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Rje4J43L62K/YAAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 04 Aug 2022 13:37:17 +0000
+Message-ID: <5c806192-f62c-5ea3-820d-8d629e0b0eba@suse.cz>
+Date:   Thu, 4 Aug 2022 15:37:17 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 86972236-5445-4914-5762-08da761b24b4
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4264:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kKTpIjp0D4zmglBLWRL5uAQsci0uOs00CU1yDbnBHMqV+hyhG7g2CTYKmOpQXBuYhQoxTSLp+VRfUHwkTf0+LJSf0VfzbvTBRpZkQDpNYodqVRwEij6FTzS3v61IYEu6ozYsbprIKasNcnfEC/c0ukaAY2jZIllRrFTMNL453bsF8GMKUcV/yu8pFZ7glUAGxo2iXRptx89bEBaJ7h4bmVJApOFyGDTHHpHvZU7iXvTQIBzBmYLyH51z4cOQ84UhweStP/yDIueUmnrCF0FuHvWzaCIBrsmN2ESe4AObuG1IbzWeqaNBCeOliXI9FPY4PA57MhtPGpSqj/JHSq8EXs0tqKaifJl47H0xTV8xht2OkmjeMec3za+8T/S/HaRX7MwkXANqm/V2hkzIkqdgR1HdT1s+Jhb8cVDaN5NMTR8BPakFnufcU1ALHYMhHPEvCOSLuBjuhoIS9txSRqJfHXk/kW1eQ4XHyAZkZSAKDWi+HWU+fDNlA1ymRSAybNCWVYTjPKwgFzCVPJaRrfeMWyvZAmjhSHcb0PuAewwIYqlKh64j0G6kwlz0OCOJN8Ivf0LEbpoN5n8M0pvCr+2yHsTTmjnb3s3ULtS0mH6v8fNsCuKvixFOqbDEGN47X6YXOpq9lW4/j0/g6GrNkOeDhH30Ej2qp5aOvf7Dah4RIRc20xEneF5H9ViQKBn3jy/MZw1f9C7NcolbF94suhk1/RK7hCWzzCzwXZjMejRrZHLuEdBFxHOEvUyuNDQzjnMwPJLrVBRSd33RYMZMwccuCqZV2w1rP9Wnaft8DJgEGRDTsIqm3KilSmXGSu/MRo+9TT1L0gjh7C5g/8Sxki6nG8bAW0cKH9ks7V1HP2Ug3ee9kkrPvHg+d8+4BkWAzLmn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(366004)(396003)(136003)(39860400002)(346002)(966005)(6486002)(110136005)(54906003)(5660300002)(478600001)(8936002)(316002)(66556008)(66946007)(66476007)(31686004)(36756003)(8676002)(4326008)(41300700001)(6666004)(2906002)(2616005)(26005)(6512007)(186003)(53546011)(6506007)(83380400001)(38100700002)(31696002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eEloV3NmRnZkYU1YNkx3MHJHZEZKU21CRHF2MUFqL1IraUJkeThsdnNncnZv?=
- =?utf-8?B?all0TFU4ckd3T05FeXNoT20yVFFuN1diKytPckdWWTU5SThpTGo4Q0pLbGVZ?=
- =?utf-8?B?N3A0bS9EQkpxeW1zRXFjRWJMRVpkNE8wckZXaHFlSTAzSnp5ZnFXZGRQdmU5?=
- =?utf-8?B?YU1UY1BIUlluSGxwUGFLZmtNUEYwNXV3ZmVxS2RQQ1BKSElKUW9XVWJFMUhO?=
- =?utf-8?B?LzIwYU5GT3V6WU8yYXJocXVhRTJwR3FpYWZMajZhVnNCekpjN1hhelc4RFZV?=
- =?utf-8?B?RzRtZytDUW11Q0J3TEIra2d1S1RwQ0xibldhV1V5R2Y3enZQaEVoWk1XYk0w?=
- =?utf-8?B?SGpnNTd6dDQ0UVJTaVVTYWMxYmkrVW1BR1J6VGNFcFhNbktLSmwyYk1TaFFW?=
- =?utf-8?B?UUlhbk5rV20raHJnck5nandQZWdLcWFuWVBpdi9KdHRhZGthUVZDZ1VkVUJk?=
- =?utf-8?B?N011eVNXckIxRklTWDZpRmR1eFVBSEpFMFhZVWdYczNvSVhyUEdPbWFacUVH?=
- =?utf-8?B?a0VZcTQxWnBEU280VFBZS2lOcTJZVUJjZS9tWVFXVjRLYzZ3aUMzVUY0S1JW?=
- =?utf-8?B?NDArK0lWK0podmZtanNFczJRMjRKNW9JUSsxMitHYUNaWGZsazk0bEpNSmxZ?=
- =?utf-8?B?VGNZWmg1VDN3WDlpRDB2MmE1dnV2Q0FpNm5xZ0ZGTjdvdDVJQWxIeUZ0OWlK?=
- =?utf-8?B?U2tLR3doQ0h0OUYycSt1TzgrRkV1RUZoQlUvZTRPVlJWTVRnK09VZVFWVlpZ?=
- =?utf-8?B?ckpIeEYzb2tLOE9OMXVPYVR2MkNSb0JXeDA4b1VMdGcveWZBVVlKQkxuV1ZD?=
- =?utf-8?B?NU9YdnZoUFQ0bW9QV05XT1c2SDZYQ3N4ekN4b1U3bmw3NjUwOW4wc2VMTjJL?=
- =?utf-8?B?YzNSQjllNDFrRVk0TTFCOWtSaE9LZHQ2QkZGdHVYb1AzWjUxV241R01MNjV3?=
- =?utf-8?B?aWh0VER0UU0xQVBhbVE5RVpUNk43cmVPV2Z3b1dxSGw1OHVlVXEvaXdLVm1N?=
- =?utf-8?B?S3ZBRmlPMml2enJ3aTdDOVJXVEFtcDcwQ2JtOFVIWUt5aWhNQWJmTG10ZEtI?=
- =?utf-8?B?RGVybytJSlUzbUpNY28zVVQ2QXdPZ1F0UElZVjYrZTZXQU53cVJ5UG0xN0E1?=
- =?utf-8?B?U2NPdGxGbUw4aTNZcXU3T1V2bE12ejhWWjQ4QncxdFNGYlp1K2QyQW1pYTFj?=
- =?utf-8?B?MFRneVdtMURJYzZnSW5HTmNnNVY2ZStscjkxeEluajNyWVdGU1ZyNzZQTk5t?=
- =?utf-8?B?TW5jcDJwcS9jUUJsRDk3VWROODU2WmozRVJramRCcERnTkQ0bWd2VzJBU0tL?=
- =?utf-8?B?dzVVOEtCOWZ3eXI1TjZjRHpubUZpR2dNc1JyQThleGtoSy9mUnNpL2FlZDVX?=
- =?utf-8?B?Q3RSamlZczkwTTVjS3FoVUM4Ky9aOTlKZXJ0RG5VRlZQMGUwYmVEdS9sbU8x?=
- =?utf-8?B?UGFZMTQ4WHBsTm42MTJJNUM0NHcvdEZwQjFWMUdCNThQY0tSTEpmbUtwNDZT?=
- =?utf-8?B?NWd6UmtqcXl0MkZsaFdBR3RleTdXbGlWTi9EOG1xaUU3cmc0LzUyVHREeUtE?=
- =?utf-8?B?NzV1UlZlQndnMU96eGl2ay9DdDRRWnZocHpxNGNzMU9oTkJHSmhYSnZDYTIz?=
- =?utf-8?B?L3J1NnNQSWhPUm9OM1AyN09zbktSSllycEZSMGRSUVVtTmttckFxa1QyNm1x?=
- =?utf-8?B?UHVwVnVBRVgyelFDQjF1SFc3a1Zta0lhbmFEL3R4RjRUd2Mzd0VwdlppZ2ZG?=
- =?utf-8?B?SllYYnc5ZHFMVTMwVmJ6TkxWZzlWVGVUL1BiN2tEV2JoWS80VXQwMFpRamN0?=
- =?utf-8?B?Z3lEMzNxTUltamxEdnRGbGY0dHEvcmlnTEhEVFVpN1AvSHVpY0tvbWtjM092?=
- =?utf-8?B?NENIdElBbDUxTlJiWldiWHRUQzBxTzhPVitpUi9aOWIxTndaYVZOYkk2ZlpB?=
- =?utf-8?B?MlBwMFNjUEZ6MkJnQzVyT0JHS01acXNzVjlVZXd5Nm9ZUloxVlNtejV1WmRC?=
- =?utf-8?B?VUVRcXJhWDYzOUhqUWd5NFJlVVArWUVWa2gvMmZrbWJGc2VYWmtwdG1xTVRy?=
- =?utf-8?B?OVRQMytyUVRPeEZpMXBEaEVLcWNHQ3RpejJ1NGJ1cjczclNuV0l0Z2N0Q294?=
- =?utf-8?Q?d9P/cHqL1uXeZXIF+xKxNpjeW?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86972236-5445-4914-5762-08da761b24b4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2022 13:13:37.9589
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: caRv+4Ti+bS8kPSAKUJd/IpvPPfB+x4gXfnF+ilIWYiHlnh/oS6PSboN9lCM/a3MwLNrGVQwT4gjTeEZDHJwaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4264
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.3
+Subject: Re: [PATCH Part2 v6 25/49] KVM: SVM: Disallow registering memory
+ range from HugeTLB for SNP guest
+Content-Language: en-US
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <b32e0daab8af130a1bda76eb06ecd2546e8478bb.1655761627.git.ashish.kalra@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <b32e0daab8af130a1bda76eb06ecd2546e8478bb.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/3/22 20:02, Jarkko Sakkinen wrote:
-> From: Jarkko Sakkinen <jarkko@profian.com>
+On 6/21/22 01:07, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> SEV-SNP does not initialize to a legit state, unless the firmware is
-> loaded twice, when SEP API version < 1.43, and the firmware is updated
-> to a later version. Because of this user space needs to work around
-> this with "rmmod && modprobe" combo. Fix this by implementing the
-> workaround to the driver.
-
-The SNP hypervisor patches are placing a minimum supported version
-requirement for the SEV firmware that exceeds the specified version
-above [1] (for the reason above, as well as some others), so this patch
-is not needed, NAK.
-
-[1] https://lore.kernel.org/lkml/87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com/
-
-Thanks,
-Tom
-
+> While creating the VM, userspace call the KVM_MEMORY_ENCRYPT_REG_REGION
+> ioctl to register the memory regions for the guest. This registered
+> memory region is typically used as a guest RAM. Later, the guest may
+> issue the page state change (PSC) request that will require splitting
+> the large page into smaller page. If the memory is allocated from the
+> HugeTLB then hypervisor will not be able to split it.
 > 
-> Reported-by: Harald Hoyer <harald@profian.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+> Do not allow registering the memory range backed by the HugeTLB until
+> the hypervisor support is added to handle the case.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->   drivers/crypto/ccp/sev-dev.c | 22 +++++++++++++++++++---
->   1 file changed, 19 insertions(+), 3 deletions(-)
+>  arch/x86/kvm/svm/sev.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
 > 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 799b476fc3e8..f2abb7439dde 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -76,6 +76,9 @@ static void *sev_es_tmr;
->   #define NV_LENGTH (32 * 1024)
->   static void *sev_init_ex_buffer;
->   
-> +/*
-> + * SEV API version >= maj.min?
-> + */
->   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->   {
->   	struct sev_device *sev = psp_master->sev_data;
-> @@ -89,6 +92,14 @@ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->   	return false;
->   }
->   
-> +/*
-> + * SEV API version < maj.min?
-> + */
-> +static inline bool sev_version_less(u8 maj, u8 min)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 9e6fc7a94ed7..41b83aa6b5f4 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/misc_cgroup.h>
+>  #include <linux/processor.h>
+>  #include <linux/trace_events.h>
+> +#include <linux/hugetlb.h>
+>  
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+> @@ -2007,6 +2008,35 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	return r;
+>  }
+>  
+> +static bool is_range_hugetlb(struct kvm *kvm, struct kvm_enc_region *range)
 > +{
-> +	return !sev_version_greater_or_equal(maj, min);
+> +	struct vm_area_struct *vma;
+> +	u64 start, end;
+> +	bool ret = true;
+> +
+> +	start = range->addr;
+> +	end = start + range->size;
+> +
+> +	mmap_read_lock(kvm->mm);
+> +
+> +	do {
+> +		vma = find_vma_intersection(kvm->mm, start, end);
+> +		if (!vma)
+> +			goto unlock;
+> +
+> +		if (is_vm_hugetlb_page(vma))
+> +			goto unlock;
+> +
+> +		start = vma->vm_end;
+> +	} while (end > vma->vm_end);
+
+Note it's more efficient to only find the first vma and then iterate using
+vma->vm_next. But the details will change when maple tree is merged, and
+likely this patch won't exist after rebasing to UPM anyway...
+
+> +	ret = false;
+> +
+> +unlock:
+> +	mmap_read_unlock(kvm->mm);
+> +	return ret;
 > +}
 > +
->   static void sev_irq_handler(int irq, void *data, unsigned int status)
->   {
->   	struct sev_device *sev = data;
-> @@ -1274,6 +1285,7 @@ void sev_pci_init(void)
->   {
->   	struct sev_device *sev = psp_master->sev_data;
->   	int error, rc;
-> +	int i;
->   
->   	if (!sev)
->   		return;
-> @@ -1283,9 +1295,13 @@ void sev_pci_init(void)
->   	if (sev_get_api_version())
->   		goto err;
->   
-> -	if (sev_version_greater_or_equal(0, 15) &&
-> -	    sev_update_firmware(sev->dev) == 0)
-> -		sev_get_api_version();
+>  int sev_mem_enc_register_region(struct kvm *kvm,
+>  				struct kvm_enc_region *range)
+>  {
+> @@ -2024,6 +2054,13 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+>  	if (range->addr > ULONG_MAX || range->size > ULONG_MAX)
+>  		return -EINVAL;
+>  
 > +	/*
-> +	 * SEV-SNP does not work properly before loading the FW twice in the API
-> +	 * versions older than SEV 1.43.
+> +	 * SEV-SNP does not support the backing pages from the HugeTLB. Verify
+> +	 * that the registered memory range is not from the HugeTLB.
 > +	 */
-> +	for (i = 0; i < sev_version_greater_or_equal(0, 15) + sev_version_less(1, 43); i++)
-> +		if (sev_update_firmware(sev->dev) == 0)
-> +			sev_get_api_version();
->   
->   	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
->   	 * instead of INIT.
+> +	if (sev_snp_guest(kvm) && is_range_hugetlb(kvm, range))
+> +		return -EINVAL;
+> +
+>  	region = kzalloc(sizeof(*region), GFP_KERNEL_ACCOUNT);
+>  	if (!region)
+>  		return -ENOMEM;
+
