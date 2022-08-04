@@ -2,118 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE05BC19F2B
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Aug 2022 20:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D241C19F29
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Aug 2022 01:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238428AbiHCUsB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Aug 2022 16:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51964 "EHLO
+        id S236533AbiHDBCg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 Aug 2022 21:02:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238558AbiHCUsA (ORCPT
+        with ESMTP id S229986AbiHDBCf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Aug 2022 16:48:00 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BE75C95D;
-        Wed,  3 Aug 2022 13:47:59 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 3 Aug 2022 21:02:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEEBF18E1C;
+        Wed,  3 Aug 2022 18:02:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id DC72F205AE;
-        Wed,  3 Aug 2022 20:47:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1659559676; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=vKzaXxOuodAWNmH75tEbExlIwhjF1u2srkFX6cUqy68=;
-        b=1N9xrFj3qsgIi07FRZeT3t2v17ay2mE/+y9hObqOxXtEZRK9BaVfbGIK0zbZTMvY7BqOdb
-        M736F8TLWcuN3f6+uxonNWXujE9Bnm+s5rXFIPbYDQ8K4+bHznI0Dqlx3KevV+EkGiv8I3
-        AcKeH+t2EsxqZnN2dBvJXzNvJCDTEps=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1659559676;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=vKzaXxOuodAWNmH75tEbExlIwhjF1u2srkFX6cUqy68=;
-        b=uP6uiImSTFu9yAAlNQcJk5kVRF+mp7dHlSeJ8nLrZo59FuJ/Ob2qdmuAbTTDKl27qA780e
-        gBCD5X7pmiIli+Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8FAE113A94;
-        Wed,  3 Aug 2022 20:47:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id KBlkIfze6mJbMwAAMHmgww
-        (envelope-from <jdelvare@suse.de>); Wed, 03 Aug 2022 20:47:56 +0000
-Date:   Wed, 3 Aug 2022 22:47:55 +0200
-From:   Jean Delvare <jdelvare@suse.de>
-To:     LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-Cc:     Declan Murphy <declan.murphy@intel.com>,
-        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
-        Mark Gross <mgross@linux.intel.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A47F6172C;
+        Thu,  4 Aug 2022 01:02:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57664C433D6;
+        Thu,  4 Aug 2022 01:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659574953;
+        bh=ojOGwVmUtAwEibZBXIJloUOWkBRws1ynoRVHan4EmDQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DPRfoCrv0r98FNMwDUmPEWXziQjIJmZQ9o76KB0ty0LVoBGVNvbyHPrcbLkROmGBk
+         hbVqhkkxw1MJaIU2MnB2XNR6e8JmgbFPDxkhZZEqq2RfyEuAmx3ypoHLDA4PIal0XD
+         hRkU8Rrdi6FqJBHmnSN7JOGIr9tg5fdVunDWSh5cBXLOgoE0qi8DbJVoYAplXeEGrU
+         Ri5fNC2b2J6v4GFTx34uwFFrbdTAWd/59Ww7+GpdU8529dcFs6/oydrGUz4NqUfLVz
+         F7a3lLY4Xx29fCP1iSTrvJYngmT0ojQne5fltnzraWkOKIHTheVoJIzvyipmfqYs4T
+         WRRaVs5+xsxCA==
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jarkko Sakkinen <jarkko@profian.com>,
+        Harald Hoyer <harald@profian.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Prabhjot Khurana <prabhjot.khurana@intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH] crypto: keembay-ocs - Drop obsolete dependency on
- COMPILE_TEST
-Message-ID: <20220803224755.177de90e@endymion.delvare>
-Organization: SUSE Linux
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
+        (CCP) DRIVER - SE...), linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: ccp: Load the firmware twice when SEV API version < 1.43
+Date:   Thu,  4 Aug 2022 04:02:23 +0300
+Message-Id: <20220804010223.3619-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since commit 0166dc11be91 ("of: make CONFIG_OF user selectable"), it
-is possible to test-build any driver which depends on OF on any
-architecture by explicitly selecting OF. Therefore depending on
-COMPILE_TEST as an alternative is no longer needed.
+From: Jarkko Sakkinen <jarkko@profian.com>
 
-It is actually better to always build such drivers with OF enabled,
-so that the test builds are closer to how each driver will actually be
-built on its intended target. Building them without OF may not test
-much as the compiler will optimize out potentially large parts of the
-code. In the worst case, this could even pop false positive warnings.
-Dropping COMPILE_TEST here improves the quality of our testing and
-avoids wasting time on non-existent issues.
+SEV-SNP does not initialize to a legit state, unless the firmware is
+loaded twice, when SEP API version < 1.43, and the firmware is updated
+to a later version. Because of this user space needs to work around
+this with "rmmod && modprobe" combo. Fix this by implementing the
+workaround to the driver.
 
-Signed-off-by: Jean Delvare <jdelvare@suse.de>
-Cc: Declan Murphy <declan.murphy@intel.com>
-Cc: Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-Cc: Mark Gross <mgross@linux.intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Prabhjot Khurana <prabhjot.khurana@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>
+Reported-by: Harald Hoyer <harald@profian.com>
+Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
 ---
- drivers/crypto/keembay/Kconfig |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
---- linux-5.18.orig/drivers/crypto/keembay/Kconfig	2022-05-22 21:52:31.000000000 +0200
-+++ linux-5.18/drivers/crypto/keembay/Kconfig	2022-08-03 22:36:27.354500492 +0200
-@@ -42,7 +42,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_AES_SM4_CT
- config CRYPTO_DEV_KEEMBAY_OCS_ECC
- 	tristate "Support for Intel Keem Bay OCS ECC HW acceleration"
- 	depends on ARCH_KEEMBAY || COMPILE_TEST
--	depends on OF || COMPILE_TEST
-+	depends on OF
- 	depends on HAS_IOMEM
- 	select CRYPTO_ECDH
- 	select CRYPTO_ENGINE
-@@ -64,7 +64,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_HCU
- 	select CRYPTO_ENGINE
- 	depends on HAS_IOMEM
- 	depends on ARCH_KEEMBAY || COMPILE_TEST
--	depends on OF || COMPILE_TEST
-+	depends on OF
- 	help
- 	  Support for Intel Keem Bay Offload and Crypto Subsystem (OCS) Hash
- 	  Control Unit (HCU) hardware acceleration for use with Crypto API.
-
-
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 799b476fc3e8..f2abb7439dde 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -76,6 +76,9 @@ static void *sev_es_tmr;
+ #define NV_LENGTH (32 * 1024)
+ static void *sev_init_ex_buffer;
+ 
++/*
++ * SEV API version >= maj.min?
++ */
+ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+@@ -89,6 +92,14 @@ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+ 	return false;
+ }
+ 
++/*
++ * SEV API version < maj.min?
++ */
++static inline bool sev_version_less(u8 maj, u8 min)
++{
++	return !sev_version_greater_or_equal(maj, min);
++}
++
+ static void sev_irq_handler(int irq, void *data, unsigned int status)
+ {
+ 	struct sev_device *sev = data;
+@@ -1274,6 +1285,7 @@ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	int error, rc;
++	int i;
+ 
+ 	if (!sev)
+ 		return;
+@@ -1283,9 +1295,13 @@ void sev_pci_init(void)
+ 	if (sev_get_api_version())
+ 		goto err;
+ 
+-	if (sev_version_greater_or_equal(0, 15) &&
+-	    sev_update_firmware(sev->dev) == 0)
+-		sev_get_api_version();
++	/*
++	 * SEV-SNP does not work properly before loading the FW twice in the API
++	 * versions older than SEV 1.43.
++	 */
++	for (i = 0; i < sev_version_greater_or_equal(0, 15) + sev_version_less(1, 43); i++)
++		if (sev_update_firmware(sev->dev) == 0)
++			sev_get_api_version();
+ 
+ 	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
+ 	 * instead of INIT.
 -- 
-Jean Delvare
-SUSE L3 Support
+2.37.1
+
