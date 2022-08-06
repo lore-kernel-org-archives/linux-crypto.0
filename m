@@ -2,98 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F24C19F2D
-	for <linux-crypto@archiver.kernel.org>; Sat,  6 Aug 2022 15:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99185C19F2D
+	for <linux-crypto@archiver.kernel.org>; Sat,  6 Aug 2022 18:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231352AbiHFPpb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 6 Aug 2022 11:45:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56948 "EHLO
+        id S231131AbiHFSPZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 6 Aug 2022 14:15:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbiHFPpa (ORCPT
+        with ESMTP id S231272AbiHFSPV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 6 Aug 2022 11:45:30 -0400
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C972CE18
-        for <linux-crypto@vger.kernel.org>; Sat,  6 Aug 2022 08:45:27 -0700 (PDT)
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-        by localhost (Postfix) with ESMTP id 4M0Rck0MFHz9sl1;
-        Sat,  6 Aug 2022 17:45:26 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 2Kq1ANbQhRFG; Sat,  6 Aug 2022 17:45:25 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase2.c-s.fr (Postfix) with ESMTP id 4M0Rcj6VGMz9skJ;
-        Sat,  6 Aug 2022 17:45:25 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id C98A88B76C;
-        Sat,  6 Aug 2022 17:45:25 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id Ui3-ODUsv8Bd; Sat,  6 Aug 2022 17:45:25 +0200 (CEST)
-Received: from [192.168.234.210] (unknown [192.168.234.210])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 7E0F28B765;
-        Sat,  6 Aug 2022 17:45:25 +0200 (CEST)
-Message-ID: <de9d2ae5-e794-6e54-baf6-f83a16d710a3@csgroup.eu>
-Date:   Sat, 6 Aug 2022 17:45:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: talitos b0030000.crypto: length exceeds h/w max limit
-Content-Language: fr-FR
-To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        Sat, 6 Aug 2022 14:15:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 380935F63;
+        Sat,  6 Aug 2022 11:15:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BDF7D6120D;
+        Sat,  6 Aug 2022 18:15:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA87C433C1;
+        Sat,  6 Aug 2022 18:15:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659809719;
+        bh=BY4p8tvAesSfXHOIklqi1YqTC0LMDLSpqbPlDu6FZHw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gFgMuRn+fh47VY2tmn9To+ifXShkp4IqH6Nr90jbeljoYgvrAeWY5UraRRdkghz+e
+         xzm5L6LV2uQ0Zt6Tfstd436otgB9fsOpzavtO6V11LJPx8QZjr6yiIwvXe7IfDgPLO
+         Hm12d0O2aiv1wK1rCumewu8MU7C7xVVDFRvHFkSPKnYJ0ztW9ayobWb4ThngMMUsG/
+         FFmeO0/syPaUu4/1siEHvZuCfZgPvlXtCQIIEUEyD6Tcqf/s3lHkeu1PDZS+9H7KsS
+         rZn35vZ1g0y/ErJ7F4HA0CHSe42T168NrIai9tBMkxQZSLP6mUegUdi0WiK0UArnMj
+         qpovbcbGeADVw==
+Date:   Sat, 6 Aug 2022 21:15:16 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Harald Hoyer <harald@profian.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jarkko Sakkinen <jarkko@profian.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-References: <4d9e644d-3d2d-518a-3d05-2539c69d88c1@c-s.fr>
- <1955828.3d07pK88Qj@tauon.chronox.de>
- <326109a3-bb5c-eac4-1340-70c179a3ad2a@c-s.fr>
- <10231361.cnp4CI42qt@positron.chronox.de>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <10231361.cnp4CI42qt@positron.chronox.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
+        <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp: Load the firmware twice when SEV API
+ version < 1.43
+Message-ID: <Yu6vtDLOkwMOjb+v@kernel.org>
+References: <20220804010223.3619-1-jarkko@kernel.org>
+ <58e8f9dc-a8d3-a2a5-2dd7-0783355e2567@amd.com>
+ <de02389f-249d-f565-1136-4af3655fab2a@profian.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de02389f-249d-f565-1136-4af3655fab2a@profian.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-Le 31/07/2019 à 09:11, Stephan Müller a écrit :
->>>>> If I remember correctly, the implementation with vmsplice was slower by
->>>>> a
->>>>> factor of 10 compared to sendmsg on the ISO image on an x86 system.
->>>>
->>>> At the time being I have an issue with this fix, because the talitos
->>>> driver only accepts 32k bytes at a time. With vmsplice, data is handed
->>>> over to the driver by blocks of PAGE_SIZE (16k in my case). With
->>>> sendmsg(), data is handed over to the driver with a single block.
->>>
->>> Ok. But wouldn't your driver need to process the data in the chunk size
->>> your hardware requires?
->>
->> Sure it needs to process the data in the chunk size the HW requires, but
->> do you know if there is a way to tell the core than the driver doesn't
->> accepts chunks of more than 32kbytes, or shall the driver be able to
->> handle data of any size ?
+On Thu, Aug 04, 2022 at 03:37:20PM +0200, Harald Hoyer wrote:
+> Am 04.08.22 um 15:13 schrieb Tom Lendacky:
+> > On 8/3/22 20:02, Jarkko Sakkinen wrote:
+> > > From: Jarkko Sakkinen <jarkko@profian.com>
+> > > 
+> > > SEV-SNP does not initialize to a legit state, unless the firmware is
+> > > loaded twice, when SEP API version < 1.43, and the firmware is updated
+> > > to a later version. Because of this user space needs to work around
+> > > this with "rmmod && modprobe" combo. Fix this by implementing the
+> > > workaround to the driver.
+> > 
+> > The SNP hypervisor patches are placing a minimum supported version
+> > requirement for the SEV firmware that exceeds the specified version
+> > above [1] (for the reason above, as well as some others), so this patch
+> > is not needed, NAK.
 > 
-> Coming back to this: Were you able to find a fix?
+> As described in the "Milan Release Notes.txt" of the AMD firmware update package amd_sev_fam19h_model0xh_1.33.03.zip.
+> 
+> "If upgrading to 1.33.01 or later from something older (picking up
+> CSF-1201), it is required that two Download Firmware commands be run to fix
+> the "Committed Version" across the firmware. CSF-1201 fixed a bug where the
+> committed version in the attestation report was incorrect. Performing a
+> single Download Firmware will upgrade the firmware, but performing a second
+> one will correct the committed version. This is a one-time upgrade issue.
+> "
 
-As far as I know the problem still exists.
+Reference should be part of the commit message. I'll
+update for the next iteration. Thanks for the remark.
 
-We want to upgrade libkcapi on our target, but still facing the issue 
-with libkcapi newer than 1.1.3 : When a file is bigger than 32 Kb, 
-hashing operation (md5 or sha256) fails and the kernel prints the 
-following message:
-
-[ 2369.772999] talitos b0030000.crypto: length exceeds h/w max limit
-
-Is there a way to tell crypto kernel core that a given driver has a 
-fixed limit and that data shall be sent in chunks ? Or is it the 
-responsibility of the driver to cut off the data in acceptable chunks ? 
-I guess the Talitos driver is not the only driver with such a limit, so 
-something centralised must exist to handle it ?
-
-Thanks
-Christophe
+BR, Jarkko
