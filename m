@@ -2,59 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A4DC19F2D
-	for <linux-crypto@archiver.kernel.org>; Sun,  7 Aug 2022 00:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 230D1C19F2A
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 Aug 2022 11:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiHGAjL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 6 Aug 2022 20:39:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44078 "EHLO
+        id S232071AbiHGLRo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 7 Aug 2022 07:17:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbiHGAjK (ORCPT
+        with ESMTP id S231282AbiHGLRo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 6 Aug 2022 20:39:10 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285EB1057E
-        for <linux-crypto@vger.kernel.org>; Sat,  6 Aug 2022 17:39:08 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oKUJi-008UGG-VC; Sun, 07 Aug 2022 10:38:56 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sun, 07 Aug 2022 08:38:54 +0800
-Date:   Sun, 7 Aug 2022 08:38:54 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: talitos b0030000.crypto: length exceeds h/w max limit
-Message-ID: <Yu8JngER3t8UIP8f@gondor.apana.org.au>
-References: <4d9e644d-3d2d-518a-3d05-2539c69d88c1@c-s.fr>
- <1955828.3d07pK88Qj@tauon.chronox.de>
- <326109a3-bb5c-eac4-1340-70c179a3ad2a@c-s.fr>
- <10231361.cnp4CI42qt@positron.chronox.de>
- <de9d2ae5-e794-6e54-baf6-f83a16d710a3@csgroup.eu>
+        Sun, 7 Aug 2022 07:17:44 -0400
+X-Greylist: delayed 399 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 07 Aug 2022 04:17:42 PDT
+Received: from immobilier-du-maroc.eu (unknown [164.132.21.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEFCBC08
+        for <linux-crypto@vger.kernel.org>; Sun,  7 Aug 2022 04:17:42 -0700 (PDT)
+Received: by ns376096.ip-94-23-192.eu (Postfix, from userid 10335)
+        id CC1046E15C81; Sun,  7 Aug 2022 13:11:02 +0200 (CEST)
+To:     linux-crypto@vger.kernel.org
+Subject: Immobilier au Maroc "CRYPTOCURRENCY WILL MAKE YOU A MILLIONAIRE"
+X-PHP-Originating-Script: 10335:class-phpmailer.php
+Date:   Sun, 7 Aug 2022 11:11:01 +0000
+From:   Immobilier au Maroc <wordpress@immobilier-du-maroc.eu>
+Reply-To: developper.viaprestige@gmail.com
+Message-ID: <377d7a280e1863be33a153de607db67f@www.immobilier-du-maroc.eu>
+X-Mailer: PHPMailer 5.2.22 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de9d2ae5-e794-6e54-baf6-f83a16d710a3@csgroup.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Aug 06, 2022 at 05:45:25PM +0200, Christophe Leroy wrote:
->
-> Is there a way to tell crypto kernel core that a given driver has a fixed
-> limit and that data shall be sent in chunks ? Or is it the responsibility of
-> the driver to cut off the data in acceptable chunks ? I guess the Talitos
-> driver is not the only driver with such a limit, so something centralised
-> must exist to handle it ?
+De : Charleszok <linux-crypto@vger.kernel.org>
+Objet : CRYPTOCURRENCY WILL MAKE YOU A MILLIONAIRE
 
-There is no length limit on the interface between the Crypto API
-and the drivers.  If the hardware is unable to handle requests
-longer than a certain size, then the driver should handle it by
-splitting up the SG list or using a fallback.
+Corps du message :
+CRYPTOCURRENCY DROP WILL MAKE YOU A BILLIONAIRE https://telegra.ph/Cryptocurrency-makes-people-millionaires-at-15-people-per-hour---Page-723634-08-02
 
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Cet e-mail a été envoyé via le formulaire de contact de Immobilier au Maroc (https://www.immobilier-du-maroc.eu)
+
