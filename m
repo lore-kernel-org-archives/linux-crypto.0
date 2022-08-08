@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B8AC25B0F
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 19:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A14C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 19:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244307AbiHHTN4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S244310AbiHHTN4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 8 Aug 2022 15:13:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33838 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244297AbiHHTNy (ORCPT
+        with ESMTP id S244293AbiHHTNy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 8 Aug 2022 15:13:54 -0400
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5706A1706C;
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56E851704D;
         Mon,  8 Aug 2022 12:13:52 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 278JDbqa053362;
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 278JDbsN099708;
         Mon, 8 Aug 2022 14:13:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
         s=ti-com-17Q1; t=1659986017;
-        bh=VaYzGM0wSLKYt3hbuBD2/xE/BVQiPQJv7qVXQ0swYNo=;
-        h=From:To:CC:Subject:Date;
-        b=s7Qd7XUrsuoZOQKqmTsOf0cNX4bet7KhJcKfZNRFBVLuawceavJRA5Hof0qVVpNui
-         oCjweZuhnNZ9BSqeiIsyoUA16sFrsXUPA9/iXRO9xO6MetI92Vb3115EStTvwIFCa4
-         lqCDLyZpg1RqJznQcWzqJSvkdTY0dHwkNwhIBoIk=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 278JDbuh016515
+        bh=jscsQ/IoQZ26mYB0MEJPoCO2OWweuz3qaoA4kkyHKYQ=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=bOsC0HX7ZkhjHRo3Q5TAd7VYPUsnVVFye0o6fKfnrEkUmLRm4wOqGM9OalrHhCPDW
+         llwuFAIPhb/njVAzyj7WDA+WwDHtO+S7lycECm6nYhcvEw/TWFr/CRADJO2tnPgeWq
+         TXaSmUEyMtrjdTCXUsCHYSnl1qyxXdQE+Viqq3Mw=
+Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 278JDb5C018473
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
         Mon, 8 Aug 2022 14:13:37 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 8
- Aug 2022 14:13:36 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ Aug 2022 14:13:37 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
- Frontend Transport; Mon, 8 Aug 2022 14:13:36 -0500
+ Frontend Transport; Mon, 8 Aug 2022 14:13:37 -0500
 Received: from uda0500628.dal.design.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 278JDaYN054740;
-        Mon, 8 Aug 2022 14:13:36 -0500
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 278JDaYR054740;
+        Mon, 8 Aug 2022 14:13:37 -0500
 From:   Daniel Parks <danielrparks@ti.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -51,10 +51,12 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>
-Subject: [RFC PATCH 0/6] Add SA2UL Public Key Accelerator driver
-Date:   Mon, 8 Aug 2022 14:12:49 -0500
-Message-ID: <cover.1659985696.git.danielrparks@ti.com>
+Subject: [RFC PATCH 4/6] arm64: dts: ti: k3-j721e-main: add SA2UL public key accelerator subdevice
+Date:   Mon, 8 Aug 2022 14:12:53 -0500
+Message-ID: <33daf58739bc55bbcdc516a81e7d94f82dbdaa7f.1659985696.git.danielrparks@ti.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1659985696.git.danielrparks@ti.com>
+References: <cover.1659985696.git.danielrparks@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
@@ -62,62 +64,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The PKA is a subdevice of the SA2UL that provides hardware acceleration
-for asymmetric cryptography algorithms. RSA and Diffie-Hellman are
-enabled in this patch series.
+j721e contains two SA2ULs, and the PKA in the main domain is accessible,
+so add it as a subdevice alongside the RNG module.
 
-Tested using these configurations:
-- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
-- CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+Signed-off-by: Daniel Parks <danielrparks@ti.com>
+---
+ arch/arm64/boot/dts/ti/k3-j721e-main.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-These patches are RFC for now because we're waiting for legal to clear
-us to release the firmware.
-
-The dts patches depend on [1] and [2], respectively, to apply without
-fuzz.
-
-[1]: https://www.spinics.net/lists/devicetree/msg523234.html
-[2]: https://www.spinics.net/lists/devicetree/msg523233.html
-
-Daniel Parks (6):
-  dt-bindings: crypto: ti,sa2ul: add pka subdevice
-  dt-bindings: crypto: add binding for eip29t2 public key accelerator
-    (PKA)
-  arm64: dts: ti: k3-am64-main: add SA2UL public key accelerator
-    subdevice
-  arm64: dts: ti: k3-j721e-main: add SA2UL public key accelerator
-    subdevice
-  crypto: sa2ul: turn on PKA engine
-  crypto: sa2ul_pka: Add SA2UL PKA driver
-
- .../inside-secure,safexcel-eip29t2.yaml       |  49 ++
- .../devicetree/bindings/crypto/ti,sa2ul.yaml  |   6 +
- arch/arm64/boot/dts/ti/k3-am64-main.dtsi      |   8 +
- arch/arm64/boot/dts/ti/k3-j721e-main.dtsi     |   7 +
- drivers/crypto/Kconfig                        |   2 +
- drivers/crypto/Makefile                       |   1 +
- drivers/crypto/sa2ul.c                        |   2 +-
- drivers/crypto/sa2ul_pka/Kconfig              |  26 +
- drivers/crypto/sa2ul_pka/Makefile             |   3 +
- drivers/crypto/sa2ul_pka/sa2ul_pka.h          | 135 +++++
- drivers/crypto/sa2ul_pka/sa2ul_pka_base.c     | 564 ++++++++++++++++++
- drivers/crypto/sa2ul_pka/sa2ul_pka_dh.c       | 150 +++++
- drivers/crypto/sa2ul_pka/sa2ul_pka_op.c       | 205 +++++++
- drivers/crypto/sa2ul_pka/sa2ul_pka_op.h       |  28 +
- drivers/crypto/sa2ul_pka/sa2ul_pka_rsa.c      | 193 ++++++
- drivers/crypto/sa2ul_pka/sa2ul_pka_sg.c       | 316 ++++++++++
- 16 files changed, 1694 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip29t2.yaml
- create mode 100644 drivers/crypto/sa2ul_pka/Kconfig
- create mode 100644 drivers/crypto/sa2ul_pka/Makefile
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka.h
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_base.c
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_dh.c
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_op.c
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_op.h
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_rsa.c
- create mode 100644 drivers/crypto/sa2ul_pka/sa2ul_pka_sg.c
-
+diff --git a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
+index 917c9dc99efa..56e4ae0ab61f 100644
+--- a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
+@@ -344,8 +344,15 @@
+ 			reg = <0x0 0x4e10000 0x0 0x7d>;
+ 			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&k3_clks 264 2>;
+ 		};
++
++		pka: pka@4e20000 {
++			compatible = "inside-secure,safexcel-eip29t2";
++			reg = <0x00 0x4e20000 0x00 0x2000>,
++			      <0x00 0x4e24000 0x00 0x8000>;
++			interrupts = <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>;
++		};
+ 	};
+ 
+ 	main_pmx0: pinctrl@11c000 {
+ 		compatible = "pinctrl-single";
 -- 
 2.17.1
 
