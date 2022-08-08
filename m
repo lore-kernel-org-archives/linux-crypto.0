@@ -2,439 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 306ECC00140
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 03:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D25C00140
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 05:38:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232719AbiHHDkP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 7 Aug 2022 23:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39514 "EHLO
+        id S233759AbiHHFiE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Aug 2022 01:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbiHHDkO (ORCPT
+        with ESMTP id S230461AbiHHFiC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 7 Aug 2022 23:40:14 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BD8DE83;
-        Sun,  7 Aug 2022 20:40:10 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4M1MMf3BTPzlVl0;
-        Mon,  8 Aug 2022 11:37:18 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 8 Aug 2022 11:40:08 +0800
-Received: from [10.67.102.118] (10.67.102.118) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 8 Aug 2022 11:40:07 +0800
-Subject: Re: [PATCH 6/6] net/ipv6: sr: Switch to using crypto_pool
-To:     Dmitry Safonov <dima@arista.com>, <linux-kernel@vger.kernel.org>
-CC:     Dmitry Safonov <0x7f454c46@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Hideaki YOSHIFUJI" <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Salam Noureddine" <noureddine@arista.com>,
-        <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <20220726201600.1715505-1-dima@arista.com>
- <20220726201600.1715505-7-dima@arista.com>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <22bbcbf7-c51b-4933-af3d-feed77ffd352@huawei.com>
-Date:   Mon, 8 Aug 2022 11:40:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 8 Aug 2022 01:38:02 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B2BF2670
+        for <linux-crypto@vger.kernel.org>; Sun,  7 Aug 2022 22:38:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z2VC+E5m/skrNlzsPiiFcsgZzUbNILJYiz9M/7WyYKhhG+KujyxsQjZE34w7J4G9dx92Xa6ziYcey2v6RbsiUaJnbcr7gLdXwxhcVfW1loGeDGiX/aTTQWPhGAi1kjD2BdrSpYOXojfSAJvkqukvEcZKsWUo6nQLs1fCtEOIzfak4b0FBpEI2mgGgK/gD/oVFb+9h65z46oUjaAghJ6BLDVhgqyBFEw143Aomkxh3ZiChq05Zi1pGPyHNKbpY7AbxW9fjFoqIWoJkVU9MxUG2vWWQ4yVh+5TmwGC5IuugAl80QoSV/6uppaP1WAsG+6Tvc7pAQ57Tf1JOd4OzUevCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QxNfODTwBL+NeM3fhmYlqdunEYJrMOeyELSQsxt1bVA=;
+ b=eCrkwgjmztjApYUB4oMGb1RVlKAWXfJbxMO9yYu5yWDow3eEjUSVoQPq95k0EMxJWFvTM+pCzISRPLEhl1+JLCvIfoKmNolr9pcR4hXIdDCcZ6A66bQ8ucj/AofZ2rcWXQhJGaCYvRjdJxq0s4a5KhRWwtgpBQstP5bG4Fjs7g19AB0UDaH/Akz5FVXOzEKPBSdY0rhgcJ8zTGPe8OOzyKLoSjleiFvCNEa0l8hhovlPoEBCgSogvcFSLjmALPBD79UoYdR+75PezjpwxKlRHophXSH7j6Ko0QJVFlQBRk3E5rUwEwCvvkYNT14MJcQ55VgZLjwulvPJqg2yQ7w5hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 64.136.252.176) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=stryker.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=stryker.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stryker.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QxNfODTwBL+NeM3fhmYlqdunEYJrMOeyELSQsxt1bVA=;
+ b=eduJXFkVRcQke5BL31D64Bvp9nz5cxVl7qAbgLQSS/33qk2H9wXJNs5TfR7zK5xJf048ufhS3TaxwRYf+VXs1sRUFGseg0zdZDL0y6zQ0QPz0RFf2nuhh3BrI940/Uh1vVCLT9Y7jW3B+c31//p2YxhxAGVbx21G0S03XKgMkaJBO9ufgsOM47SVg8KteCPPepShMz+ZNwSyDav+D7gyqTI1mQeGqLy4pdS3iUkq9fPanC95xHvhr8KBXina8XRGFQdqBtlnz0uxRWimHom85STLKzxSVMnPsx3pRrUZmFQIRuC/XLLu/nD6k+GgeVDcLo9iuuOpdNK5PMZ6icIuXw==
+Received: from DS7PR06CA0033.namprd06.prod.outlook.com (2603:10b6:8:54::15) by
+ DM6PR01MB3753.prod.exchangelabs.com (2603:10b6:5:8e::17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5504.18; Mon, 8 Aug 2022 05:37:58 +0000
+Received: from DM6NAM11FT017.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:54:cafe::e2) by DS7PR06CA0033.outlook.office365.com
+ (2603:10b6:8:54::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.16 via Frontend
+ Transport; Mon, 8 Aug 2022 05:37:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 64.136.252.176)
+ smtp.mailfrom=stryker.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=stryker.com;
+Received-SPF: Pass (protection.outlook.com: domain of stryker.com designates
+ 64.136.252.176 as permitted sender) receiver=protection.outlook.com;
+ client-ip=64.136.252.176; helo=kzoex10b.strykercorp.com; pr=C
+Received: from kzoex10b.strykercorp.com (64.136.252.176) by
+ DM6NAM11FT017.mail.protection.outlook.com (10.13.172.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5504.14 via Frontend Transport; Mon, 8 Aug 2022 05:37:58 +0000
+Received: from bldsmtp01.strykercorp.com (10.50.110.114) by
+ kzoex10b.strykercorp.com (10.60.0.53) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 8 Aug 2022 01:37:57 -0400
+Received: from bldwoapp11 ([192.168.131.10]) by bldsmtp01.strykercorp.com with
+ Microsoft SMTPSVC(8.5.9600.16384);      Sun, 7 Aug 2022 23:37:53 -0600
 MIME-Version: 1.0
-In-Reply-To: <20220726201600.1715505-7-dima@arista.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.102.118]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-X-CFilter-Loop: Reflected
+From:   <noreply@stryker.com>
+To:     <wos@stryker.com>
+CC:     <linux-crypto@vger.kernel.org>
+Date:   Mon, 8 Aug 2022 13:37:53 +0800
+Subject: Der Ruckgang der Kryptowahrung macht Sie zum Milliardar
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Message-ID: <BLDSMTP01HL2bti2SbP00132163@bldsmtp01.strykercorp.com>
+X-OriginalArrivalTime: 08 Aug 2022 05:37:53.0552 (UTC) FILETIME=[016E0900:01D8AAE9]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a3c5fbfa-927e-4529-b8cb-08da79002711
+X-MS-TrafficTypeDiagnostic: DM6PR01MB3753:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZTxnSr8uhg9pshWKSYq1JdEte8tJaxxIjzDwLmFUUn1KIDpSa2VCPqYeDgJD8NVewBTiLuOYkuAjg31w3Gh6BF+1Nx/IBFEMp7bRTH958+OM63i93kKiRw1iuLWHWmMiWF+tCPJdWIBNgBl/cLtzsyRHpNDy2oXeGXBTSll7mYY4TuzLMLDqt8dwyvUyVxnLz1bntl+tZ3/lxl1OdTpo8W/uvkQzOkA3gvEC5bkT3qhHnliPsv90fwzmnBpSIY0Z6936WFqxsBVtbtRFVdnDhiVUuVDwxWq+/vDEfbHg155BZtT6d0FntKgL5viAo2GTvqRWgPSV9lVGitErGPpIHT++V+r9Ls2XgH1RNyR+Sit6JOitDNdBc88S2hdPmoDVNmChlZsWayoqgt8YatHMpZBpzP2J9VEZEKwJPF7ymXXVo4C+KFkkeka1ooF54lgCpHqn+nDrUqPuFeBf2e1ylcjxwi4715Rf9hxVRX1GpfSNlsikX/HdYcWcUwVXMU02pjVWSzJNV6KZfohNNPX8cnLYgb7ApawXG3lLUJLH9xffJoYpcPMXylp9XtAMoAafHXkQanA3ZhK44JXOceC4Z2ZADFtRiDHOH7WdZMN+62AyYk0Y5CrkLb+mhxFoSH0ZrurWKtRNZCdoW74rmUjyujlDNb/5qsqW8vErTJYkQAcUdPc/pydPZXjKhYQiWH4yfInFvS5i3OrV61GYp+OvXTBYnET6hIpsGv5p3uZhJdmDQgF9fEBcPCVGmofK4QJkYccEp11B4Oo4yFEBUKdr0ApcCBk7kWSyx11SG7PawbOZXuKDZvrs06f2UZ4VBKYvjuOKmRJ88MZTA8WZQoFwxQ==
+X-Forefront-Antispam-Report: CIP:64.136.252.176;CTRY:US;LANG:de;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:kzoex10b.strykercorp.com;PTR:ip176-252-136-64.static.ctstelecom.net;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(396003)(376002)(39860400002)(46966006)(40470700004)(36840700001)(70206006)(8676002)(4326008)(558084003)(40480700001)(2906002)(478600001)(6636002)(2876002)(316002)(966005)(5660300002)(40460700003)(8936002)(70586007)(6862004)(9686003)(36860700001)(41300700001)(356005)(26005)(186003)(336012)(47076005)(82310400005)(83380400001)(81166007)(86362001)(82740400003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: stryker.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2022 05:37:58.7217
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3c5fbfa-927e-4529-b8cb-08da79002711
+X-MS-Exchange-CrossTenant-Id: 4e9dbbfb-394a-4583-8810-53f81f819e3b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=4e9dbbfb-394a-4583-8810-53f81f819e3b;Ip=[64.136.252.176];Helo=[kzoex10b.strykercorp.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT017.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB3753
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/7/27 4:16, Dmitry Safonov Wrote:
-> The conversion to use crypto_pool has the following upsides:
-> - now SR uses asynchronous API which may potentially free CPU cycles and
->   improve performance for of CPU crypto algorithm providers;
-Is there any specific test data for this performance improvement?
-How much has the memory increased?
-How much has the performance improved?
-Thanks
-Longfang.
-> - hash descriptors now don't have to be allocated on boot, but only at
->   the moment SR starts using HMAC and until the last HMAC secret is
->   deleted;
-> - potentially reuse ahash_request(s) for different users
-> - allocate only one per-CPU scratch buffer rather than a new one for
->   each user
-> - have a common API for net/ users that need ahash on RX/TX fast path
-> 
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  include/net/seg6_hmac.h |   7 --
->  net/ipv6/Kconfig        |   2 +-
->  net/ipv6/seg6.c         |   3 -
->  net/ipv6/seg6_hmac.c    | 204 ++++++++++++++++------------------------
->  4 files changed, 80 insertions(+), 136 deletions(-)
-> 
-> diff --git a/include/net/seg6_hmac.h b/include/net/seg6_hmac.h
-> index 2b5d2ee5613e..d6b7820ecda2 100644
-> --- a/include/net/seg6_hmac.h
-> +++ b/include/net/seg6_hmac.h
-> @@ -32,13 +32,6 @@ struct seg6_hmac_info {
->  	u8 alg_id;
->  };
->  
-> -struct seg6_hmac_algo {
-> -	u8 alg_id;
-> -	char name[64];
-> -	struct crypto_shash * __percpu *tfms;
-> -	struct shash_desc * __percpu *shashs;
-> -};
-> -
->  extern int seg6_hmac_compute(struct seg6_hmac_info *hinfo,
->  			     struct ipv6_sr_hdr *hdr, struct in6_addr *saddr,
->  			     u8 *output);
-> diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-> index 658bfed1df8b..5be1dab0f178 100644
-> --- a/net/ipv6/Kconfig
-> +++ b/net/ipv6/Kconfig
-> @@ -304,7 +304,7 @@ config IPV6_SEG6_LWTUNNEL
->  config IPV6_SEG6_HMAC
->  	bool "IPv6: Segment Routing HMAC support"
->  	depends on IPV6
-> -	select CRYPTO
-> +	select CRYPTO_POOL
->  	select CRYPTO_HMAC
->  	select CRYPTO_SHA1
->  	select CRYPTO_SHA256
-> diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-> index 73aaabf0e966..96b80e1d04c1 100644
-> --- a/net/ipv6/seg6.c
-> +++ b/net/ipv6/seg6.c
-> @@ -552,9 +552,6 @@ int __init seg6_init(void)
->  
->  void seg6_exit(void)
->  {
-> -#ifdef CONFIG_IPV6_SEG6_HMAC
-> -	seg6_hmac_exit();
-> -#endif
->  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
->  	seg6_iptunnel_exit();
->  #endif
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index d43c50a7310d..3732dd993925 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -35,6 +35,7 @@
->  #include <net/xfrm.h>
->  
->  #include <crypto/hash.h>
-> +#include <crypto/pool.h>
->  #include <net/seg6.h>
->  #include <net/genetlink.h>
->  #include <net/seg6_hmac.h>
-> @@ -70,6 +71,12 @@ static const struct rhashtable_params rht_params = {
->  	.obj_cmpfn		= seg6_hmac_cmpfn,
->  };
->  
-> +struct seg6_hmac_algo {
-> +	u8 alg_id;
-> +	char name[64];
-> +	int crypto_pool_id;
-> +};
-> +
->  static struct seg6_hmac_algo hmac_algos[] = {
->  	{
->  		.alg_id = SEG6_HMAC_ALGO_SHA1,
-> @@ -115,55 +122,17 @@ static struct seg6_hmac_algo *__hmac_get_algo(u8 alg_id)
->  	return NULL;
->  }
->  
-> -static int __do_hmac(struct seg6_hmac_info *hinfo, const char *text, u8 psize,
-> -		     u8 *output, int outlen)
-> -{
-> -	struct seg6_hmac_algo *algo;
-> -	struct crypto_shash *tfm;
-> -	struct shash_desc *shash;
-> -	int ret, dgsize;
-> -
-> -	algo = __hmac_get_algo(hinfo->alg_id);
-> -	if (!algo)
-> -		return -ENOENT;
-> -
-> -	tfm = *this_cpu_ptr(algo->tfms);
-> -
-> -	dgsize = crypto_shash_digestsize(tfm);
-> -	if (dgsize > outlen) {
-> -		pr_debug("sr-ipv6: __do_hmac: digest size too big (%d / %d)\n",
-> -			 dgsize, outlen);
-> -		return -ENOMEM;
-> -	}
-> -
-> -	ret = crypto_shash_setkey(tfm, hinfo->secret, hinfo->slen);
-> -	if (ret < 0) {
-> -		pr_debug("sr-ipv6: crypto_shash_setkey failed: err %d\n", ret);
-> -		goto failed;
-> -	}
-> -
-> -	shash = *this_cpu_ptr(algo->shashs);
-> -	shash->tfm = tfm;
-> -
-> -	ret = crypto_shash_digest(shash, text, psize, output);
-> -	if (ret < 0) {
-> -		pr_debug("sr-ipv6: crypto_shash_digest failed: err %d\n", ret);
-> -		goto failed;
-> -	}
-> -
-> -	return dgsize;
-> -
-> -failed:
-> -	return ret;
-> -}
-> -
->  int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
->  		      struct in6_addr *saddr, u8 *output)
->  {
->  	__be32 hmackeyid = cpu_to_be32(hinfo->hmackeyid);
-> -	u8 tmp_out[SEG6_HMAC_MAX_DIGESTSIZE];
-> +	struct crypto_pool_ahash hp;
-> +	struct seg6_hmac_algo *algo;
->  	int plen, i, dgsize, wrsize;
-> +	struct crypto_ahash *tfm;
-> +	struct scatterlist sg;
->  	char *ring, *off;
-> +	int err;
->  
->  	/* a 160-byte buffer for digest output allows to store highest known
->  	 * hash function (RadioGatun) with up to 1216 bits
-> @@ -176,6 +145,10 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
->  	if (plen >= SEG6_HMAC_RING_SIZE)
->  		return -EMSGSIZE;
->  
-> +	algo = __hmac_get_algo(hinfo->alg_id);
-> +	if (!algo)
-> +		return -ENOENT;
-> +
->  	/* Let's build the HMAC text on the ring buffer. The text is composed
->  	 * as follows, in order:
->  	 *
-> @@ -186,8 +159,36 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
->  	 * 5. All segments in the segments list (n * 128 bits)
->  	 */
->  
-> -	local_bh_disable();
-> +	err = crypto_pool_get(algo->crypto_pool_id, (struct crypto_pool *)&hp);
-> +	if (err)
-> +		return err;
-> +
->  	ring = this_cpu_ptr(hmac_ring);
-> +
-> +	sg_init_one(&sg, ring, plen);
-> +
-> +	tfm = crypto_ahash_reqtfm(hp.req);
-> +	dgsize = crypto_ahash_digestsize(tfm);
-> +	if (dgsize > SEG6_HMAC_MAX_DIGESTSIZE) {
-> +		pr_debug("digest size too big (%d / %d)\n",
-> +			 dgsize, SEG6_HMAC_MAX_DIGESTSIZE);
-> +		err = -ENOMEM;
-> +		goto err_put_pool;
-> +	}
-> +
-> +	err = crypto_ahash_setkey(tfm, hinfo->secret, hinfo->slen);
-> +	if (err) {
-> +		pr_debug("crypto_ahash_setkey failed: err %d\n", err);
-> +		goto err_put_pool;
-> +	}
-> +
-> +	err = crypto_ahash_init(hp.req);
-> +	if (err)
-> +		goto err_put_pool;
-> +
-> +	ahash_request_set_crypt(hp.req, &sg,
-> +				hp.base.scratch, SEG6_HMAC_MAX_DIGESTSIZE);
-> +
->  	off = ring;
->  
->  	/* source address */
-> @@ -210,21 +211,25 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
->  		off += 16;
->  	}
->  
-> -	dgsize = __do_hmac(hinfo, ring, plen, tmp_out,
-> -			   SEG6_HMAC_MAX_DIGESTSIZE);
-> -	local_bh_enable();
-> +	err = crypto_ahash_update(hp.req);
-> +	if (err)
-> +		goto err_put_pool;
->  
-> -	if (dgsize < 0)
-> -		return dgsize;
-> +	err = crypto_ahash_final(hp.req);
-> +	if (err)
-> +		goto err_put_pool;
->  
->  	wrsize = SEG6_HMAC_FIELD_LEN;
->  	if (wrsize > dgsize)
->  		wrsize = dgsize;
->  
->  	memset(output, 0, SEG6_HMAC_FIELD_LEN);
-> -	memcpy(output, tmp_out, wrsize);
-> +	memcpy(output, hp.base.scratch, wrsize);
->  
-> -	return 0;
-> +err_put_pool:
-> +	crypto_pool_put();
-> +
-> +	return err;
->  }
->  EXPORT_SYMBOL(seg6_hmac_compute);
->  
-> @@ -291,12 +296,24 @@ EXPORT_SYMBOL(seg6_hmac_info_lookup);
->  int seg6_hmac_info_add(struct net *net, u32 key, struct seg6_hmac_info *hinfo)
->  {
->  	struct seg6_pernet_data *sdata = seg6_pernet(net);
-> -	int err;
-> +	struct seg6_hmac_algo *algo;
-> +	int ret;
->  
-> -	err = rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo->node,
-> +	algo = __hmac_get_algo(hinfo->alg_id);
-> +	if (!algo)
-> +		return -ENOENT;
-> +
-> +	ret = crypto_pool_alloc_ahash(algo->name);
-> +	if (ret < 0)
-> +		return ret;
-> +	algo->crypto_pool_id = ret;
-> +
-> +	ret = rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo->node,
->  					    rht_params);
-> +	if (ret)
-> +		crypto_pool_release(algo->crypto_pool_id);
->  
-> -	return err;
-> +	return ret;
->  }
->  EXPORT_SYMBOL(seg6_hmac_info_add);
->  
-> @@ -304,6 +321,7 @@ int seg6_hmac_info_del(struct net *net, u32 key)
->  {
->  	struct seg6_pernet_data *sdata = seg6_pernet(net);
->  	struct seg6_hmac_info *hinfo;
-> +	struct seg6_hmac_algo *algo;
->  	int err = -ENOENT;
->  
->  	hinfo = rhashtable_lookup_fast(&sdata->hmac_infos, &key, rht_params);
-> @@ -315,6 +333,12 @@ int seg6_hmac_info_del(struct net *net, u32 key)
->  	if (err)
->  		goto out;
->  
-> +	algo = __hmac_get_algo(hinfo->alg_id);
-> +	if (algo)
-> +		crypto_pool_release(algo->crypto_pool_id);
-> +	else
-> +		WARN_ON_ONCE(1);
-> +
->  	seg6_hinfo_release(hinfo);
->  
->  out:
-> @@ -348,56 +372,9 @@ int seg6_push_hmac(struct net *net, struct in6_addr *saddr,
->  }
->  EXPORT_SYMBOL(seg6_push_hmac);
->  
-> -static int seg6_hmac_init_algo(void)
-> -{
-> -	struct seg6_hmac_algo *algo;
-> -	struct crypto_shash *tfm;
-> -	struct shash_desc *shash;
-> -	int i, alg_count, cpu;
-> -
-> -	alg_count = ARRAY_SIZE(hmac_algos);
-> -
-> -	for (i = 0; i < alg_count; i++) {
-> -		struct crypto_shash **p_tfm;
-> -		int shsize;
-> -
-> -		algo = &hmac_algos[i];
-> -		algo->tfms = alloc_percpu(struct crypto_shash *);
-> -		if (!algo->tfms)
-> -			return -ENOMEM;
-> -
-> -		for_each_possible_cpu(cpu) {
-> -			tfm = crypto_alloc_shash(algo->name, 0, 0);
-> -			if (IS_ERR(tfm))
-> -				return PTR_ERR(tfm);
-> -			p_tfm = per_cpu_ptr(algo->tfms, cpu);
-> -			*p_tfm = tfm;
-> -		}
-> -
-> -		p_tfm = raw_cpu_ptr(algo->tfms);
-> -		tfm = *p_tfm;
-> -
-> -		shsize = sizeof(*shash) + crypto_shash_descsize(tfm);
-> -
-> -		algo->shashs = alloc_percpu(struct shash_desc *);
-> -		if (!algo->shashs)
-> -			return -ENOMEM;
-> -
-> -		for_each_possible_cpu(cpu) {
-> -			shash = kzalloc_node(shsize, GFP_KERNEL,
-> -					     cpu_to_node(cpu));
-> -			if (!shash)
-> -				return -ENOMEM;
-> -			*per_cpu_ptr(algo->shashs, cpu) = shash;
-> -		}
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->  int __init seg6_hmac_init(void)
->  {
-> -	return seg6_hmac_init_algo();
-> +	return crypto_pool_reserve_scratch(SEG6_HMAC_MAX_DIGESTSIZE);
->  }
->  
->  int __net_init seg6_hmac_net_init(struct net *net)
-> @@ -407,29 +384,6 @@ int __net_init seg6_hmac_net_init(struct net *net)
->  	return rhashtable_init(&sdata->hmac_infos, &rht_params);
->  }
->  
-> -void seg6_hmac_exit(void)
-> -{
-> -	struct seg6_hmac_algo *algo = NULL;
-> -	int i, alg_count, cpu;
-> -
-> -	alg_count = ARRAY_SIZE(hmac_algos);
-> -	for (i = 0; i < alg_count; i++) {
-> -		algo = &hmac_algos[i];
-> -		for_each_possible_cpu(cpu) {
-> -			struct crypto_shash *tfm;
-> -			struct shash_desc *shash;
-> -
-> -			shash = *per_cpu_ptr(algo->shashs, cpu);
-> -			kfree(shash);
-> -			tfm = *per_cpu_ptr(algo->tfms, cpu);
-> -			crypto_free_shash(tfm);
-> -		}
-> -		free_percpu(algo->tfms);
-> -		free_percpu(algo->shashs);
-> -	}
-> -}
-> -EXPORT_SYMBOL(seg6_hmac_exit);
-> -
->  void __net_exit seg6_hmac_net_exit(struct net *net)
->  {
->  	struct seg6_pernet_data *sdata = seg6_pernet(net);
-> 
+Der Ruckgang der Kryptowahrung macht Sie zum Millionar https://telegra.ph/D=
+eutschland-hat-eine-neue-Einnahmequelle-von-479049-Euro-pro-Woche-08-07
+
+Follow this link to read our Privacy Statement<https://www.stryker.com/cont=
+ent/stryker/gb/en/legal/global-policy-statement.html/>
