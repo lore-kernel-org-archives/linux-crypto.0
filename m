@@ -2,103 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9CCC25B0C
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 21:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEE9C00140
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 23:25:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244126AbiHHVwc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Aug 2022 17:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
+        id S229842AbiHHXZm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 Aug 2022 19:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238812AbiHHVwb (ORCPT
+        with ESMTP id S236078AbiHHXZh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Aug 2022 17:52:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AA11837D;
-        Mon,  8 Aug 2022 14:52:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=dvNfVeFM68NeDGpgWDR8lvpLIiBjBMnhp8o6sKAZx70=; b=yLmyMG0H9VbI3XPyB2a0F0I2UL
-        U4uDMErbfNWJneBM5manH5HbGJmUKlIPGlSAq9glYPJX7OU6D4NOeI97RwRBKLHXs+bfiHCczFvAi
-        89QGyZtfz33xlVskllnFS/3kPhH9Fhyuyg4nTLCg1vNAfN+shp3TLS6ogfa2ldpBTEN/d0EQDr983
-        uyL+rXpC5Iy+hZWsYv82w77Q4ojWY0UVKX5SvnyxAD1hV6WuJOYXWuE1vvCHmV9qAeUFVjRaqOCT2
-        PwcgMT7p+foybUyhbRlRxCp5kJC/SBlo9wzaZWAfhk5sRWzaiHliJy9oU3/NtSt7HoJprUi5qGvUz
-        KYX6nMOg==;
-Received: from [2601:1c0:6280:3f0::a6b3]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oLAfW-00GEjJ-04; Mon, 08 Aug 2022 21:52:14 +0000
-Message-ID: <a7a08d22-e04a-d3c2-f245-b676aac9e551@infradead.org>
-Date:   Mon, 8 Aug 2022 14:52:13 -0700
+        Mon, 8 Aug 2022 19:25:37 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7151611175
+        for <linux-crypto@vger.kernel.org>; Mon,  8 Aug 2022 16:25:35 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id j63so15922817ybb.13
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2022 16:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=73cKPFgN9gZ8ltMONiXdX091+tMrsz21e0W09IrrYVM=;
+        b=XD4epq/wDO2pmaef1oiInC2dvEJIqvjq3q43Jfyj+ci5MUe0R+m7gQ5gr1x+XrMC76
+         LwLhtdXIbgRaVYj9MQHPhkljoWaVUbOD+Rn2R/6VQJfsCEUnZFnf0jVXFjOKLFdW6lBI
+         AQd3NhDC5HNC3/vyl8bHZJAkJILyum23NniPcQLdokRSRh3BOH9Pvf+6pzNo9iHp97GO
+         k+JFH6u4VVeMcZD5etwHx3zffyFTqC6FwhBiOzN9Qi+PU0a55A/i9Qsq66IR5/bRPQl6
+         Wo8EHYyvtyS5q4HqsP0RoQyycONWLoK9J3yYPmOqKiFDyUUXf5a88zIoeXUvyeGRrLXP
+         U/6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=73cKPFgN9gZ8ltMONiXdX091+tMrsz21e0W09IrrYVM=;
+        b=erkHu2x75uZmwVXlTWB+RfkVhSaKDJeE5h4u3UTrNCwHyxa7QhgrxnlvK4GjQAl93J
+         bxnMXkJsFeQnn7ripS4AVy5OeaOax8cKrF1ZAgkVRs3A/w7MQPqoZgQXP8/jOc2G+4ys
+         4WPAZYbp2dB84wR1HqwzwvdE7YNM0VCwx/hXDqL97PGkYzgXlxiBOadnzggZN3/T9mSw
+         WxK2UsA10QNtxmA6YNU5eZoJqIPvPcf5xoAmG9WetHo4jiPfMD63hMJlZh+xG5aTFJIT
+         WJpkPUK9FgmREKobKmwPgt6YfX1KKgwufxWrriQMeIddIbIowaywuh0rKNqnysjyO9Go
+         jH5g==
+X-Gm-Message-State: ACgBeo13o+ecRnHvAS/P4JPCmv9NBo0CORtL4IShlXGivFVoZgD3EUiZ
+        TbtH4VGICxGL3vWS/sPjey4c82eFtq460hLRvijdag==
+X-Google-Smtp-Source: AA6agR7NkhA/E2JJDWORK66aLcG/g1ZA5bYxFqc7io395Oy9dAKo9LEzL/8YuEkKlHfrKtLYRxQ/RoMYCYQoZ3yVrLc=
+X-Received: by 2002:a05:6902:1021:b0:676:ed79:5733 with SMTP id
+ x1-20020a056902102100b00676ed795733mr18366577ybt.509.1660001134604; Mon, 08
+ Aug 2022 16:25:34 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [RFC PATCH 6/6] crypto: sa2ul_pka: Add SA2UL PKA driver
-Content-Language: en-US
-To:     Daniel Parks <danielrparks@ti.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <cover.1659985696.git.danielrparks@ti.com>
- <b16fdaee8bcaaaa25d01c2e981ddf782ccf726b4.1659985696.git.danielrparks@ti.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <b16fdaee8bcaaaa25d01c2e981ddf782ccf726b4.1659985696.git.danielrparks@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1655761627.git.ashish.kalra@amd.com> <d325cb5d7961f015400999dda7ee8e08e4ca2ec6.1655761627.git.ashish.kalra@amd.com>
+ <YukZFKpAO5o5MLA1@kernel.org> <CAAH4kHazh_S4zTLimL3Bch7yo3zL2wv86j=w3f2n74O-joWLQQ@mail.gmail.com>
+ <a4b82687-7143-35c5-ee90-003a9f2a088c@amd.com>
+In-Reply-To: <a4b82687-7143-35c5-ee90-003a9f2a088c@amd.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Mon, 8 Aug 2022 16:25:23 -0700
+Message-ID: <CAAH4kHYHu_FMJJiSNXbSZLn1y297FVq-LdZF7Tmq3t58nfLuLQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 17/49] crypto: ccp: Add the SNP_{SET,GET}_EXT_CONFIG
+ command
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
+        linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, vkuznets@redhat.com,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>, dave.hansen@linux.intel.com,
+        slp@redhat.com, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        srinivas.pandruvada@linux.intel.com,
+        David Rientjes <rientjes@google.com>, dovmurik@linux.ibm.com,
+        tobin@ibm.com, Borislav Petkov <bp@alien8.de>,
+        "Roth, Michael" <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>, dgilbert@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi--
+> Would it be burden to supply all the certificates, both system and per-VM,
+> in this KVM call? On the SNP Extended Guest Request, the hypervisor could
+> just check if there is a per-VM blob and return that or else return the
+> system-wide blob (if present).
+>
 
-On 8/8/22 12:12, Daniel Parks wrote:
-> diff --git a/drivers/crypto/sa2ul_pka/Kconfig b/drivers/crypto/sa2ul_pka/Kconfig
-> new file mode 100644
-> index 000000000000..c4f87b14878e
-> --- /dev/null
-> +++ b/drivers/crypto/sa2ul_pka/Kconfig
-> @@ -0,0 +1,26 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +config CRYPTO_DEV_SA2UL_PKA
-> +	tristate "Support for TI security accelerator public-key module"
-> +	depends on CRYPTO_DEV_SA2UL || COMPILE_TEST
-> +	select ARM64_CRYPTO
-> +	select CRYPTO_AKCIPHER
-> +	select CRYPTO_RSA
-> +	select PACKING
-> +	select CRYPTO_DH
-> +	help
-> +		The K3 security accelerator engine contains a public-key
-> +		cryptography module. Select this if you want to use hardware
-> +		acceleration for asymmetric cryptography on these devices. This
-> +		engine is not available to the Linux cores on most devices; check
-> +		your device tree if unsure.
-> +
-> +config CRYPTO_DEV_SA2UL_PKA_DEBUG
-> +	bool "Debugging options for TI security accelerator public-key module"
-> +	depends on CRYPTO_DEV_SA2UL_PKA
-> +	default n
-> +	help
-> +		Enables the module options 'snapshot' and 'poison_mem' to assist
-> +		in debugging the PKA driver. Choosing "y" will allow the root user
-> +		to extract cryptographic keys from the driver, so do not enable in
-> +		a production build.
-
-Too much help text indentation.
-
-from Documentation/process/coding-style.rst:
-
-For all of the Kconfig* configuration files throughout the source tree,
-the indentation is somewhat different.  Lines under a ``config`` definition
-are indented with one tab, while help text is indented an additional two
-spaces.
+I think that's fine by me. We can use SNP_GET_EXT_CONFIG, merge in
+user space, and create an instance override with a KVM ioctl without
+touching ccp.
 
 -- 
-~Randy
+-Dionna Glaze, PhD (she/her)
