@@ -2,212 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3AE9C19F2D
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 15:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E02D5C19F2D
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 16:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244834AbiHIP5e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Aug 2022 11:57:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53432 "EHLO
+        id S245140AbiHIQz5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Aug 2022 12:55:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244731AbiHIP50 (ORCPT
+        with ESMTP id S245147AbiHIQzy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Aug 2022 11:57:26 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2067.outbound.protection.outlook.com [40.107.93.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E98D15711;
-        Tue,  9 Aug 2022 08:57:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MzBVjSBJ8zpCkX68XwqmEpzrnmBPvCO6c+MuGWFu/E0YDOMSpNPvGC9ANtH+a4gM6cd0dBBq3xz6Pqd75N3w24UU9LBkKhEzuH23NF0p4c0pT6VvrmqSbf0jkFVdF7QwTX7R1XaABchFE0wxCAlDRgmu+CfEYT3bLG0wGQV2QSoT5B5bxfVudqHw5HvxJkGMu8F1aAouz7Gcfz9S6rRaI8eWgmwj2LV49GgvYPgSwkexe0Wl6fgx+CcPGpexOtjYmBzYb4qlzHv3dLAfubiFnkoTRI49nztj2DhFw4X6AYoi2+OTuB5M6MJqU7Vg4+tSgKWM8OLpulHy0GedLGW/Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4O/dJ1UGtzVdbF1zKryGS2+iI6gtBDP0RR0R5t5pOYI=;
- b=WfDZJtD5kOnbiOlX5xVkxoMGmEpNvyq2a/OQAhNqNd8vc5QUm8GMRPSJMgcfk6lihRgo3jrvx4Ow6DIIofSpiG73v34b6SJxivQ6fIPEM47Pjw6VHs9MI6p1YV/HOK8iPC8ZfDjeoGfl3SsVzJINqdPb8QhazU3ZMoVByh6Qoll9FJCuFVC51d97sB+oqJu8svX6k9matBBzejZ51IbSCdcDVfr7RL/34feCu5GizniSJmOctnpWv0FoXdakMfPRwmHKkvqols5kbn9ijgyiqn9eupbDQgALlXj/OlXgm6fq7I5McCQyMkmtGp4suxHwONcWfBQszxYRd184hxoDeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4O/dJ1UGtzVdbF1zKryGS2+iI6gtBDP0RR0R5t5pOYI=;
- b=whsfeErn95VkFuyJFxCI+3Vef2v9U4ZAjRUaU0zU+Tt/gbZxHJw/Dck8cW1C5ae0uU2KkvbqhBEfAV9nikFZr2vErrUbyXcQAnJoCEa13q5oOEhcvp37/YgLgVmPjihsyaoWbGFTRkl9V2T/tczviHgswxsOVcG+DmVuOsuPxZ4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by PH7PR12MB5686.namprd12.prod.outlook.com (2603:10b6:510:13d::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.21; Tue, 9 Aug
- 2022 15:57:18 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1dac:1301:78a3:c0d0]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1dac:1301:78a3:c0d0%4]) with mapi id 15.20.5504.020; Tue, 9 Aug 2022
- 15:57:18 +0000
-Message-ID: <0a3a790d-989f-2f76-f636-62fbd925a776@amd.com>
-Date:   Tue, 9 Aug 2022 10:57:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] crypto: ccp: Add a quirk to firmware update
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        Harald Hoyer <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
-        <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20220808001537.6479-1-jarkko@kernel.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20220808001537.6479-1-jarkko@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0006.namprd04.prod.outlook.com
- (2603:10b6:806:f2::11) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        Tue, 9 Aug 2022 12:55:54 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080F7219C;
+        Tue,  9 Aug 2022 09:55:52 -0700 (PDT)
+Received: from zn.tnic (p200300ea971b9800329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:9800:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 846E71EC04DA;
+        Tue,  9 Aug 2022 18:55:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1660064147;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=i7kJIpddtAemUYbgwpjR+4WVlcQgX2AjGxouk8jTwJY=;
+        b=blu9wbGO3QfuTP67zh1c5NXyUm2UZXKneyuQAV4DlBW+3FkBSt5IQS+Wsj9rXAky4XiOeq
+        PddJJlBMbTiPpLXr3YFUe18BbIi8o3W2ISdjJoFT1eyE/B449QmkPRcoLI2WIAsad/DRrv
+        igZVfxy8u8RHoHuNCxklMtQTvkICyCA=
+Date:   Tue, 9 Aug 2022 18:55:43 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <YvKRjxgipxLSNCLe@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 57e405a6-2616-45da-2324-08da7a1fd659
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5686:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7eqZ/MOwemkXQcX3vQPm2/zxsR6dM1IMNZUvtUwiGZRTsidvN9uXU7GImR+BTrtl3A5w/7Ec6BQsa8Wh05GtgX8dBH0YJyNS71HIsrRklVGwZppGI3fx7VdVy9MEjxmnVdPwvz9SnCKf0pR853AQmrGBCjXtJmyMWmfHln6nKQ1jYjfJCXdGqUAHHGnxcXYW5mj/2cin46RIXRNuIC3ql0uijq/cMCtHyeUfxSX4v9ImCGlxari9CSyyRThNwr5hcr5zMC/jQvHQcTDRYRsZVLJK90bW4K14SN9xsI2NBN6BnaswiRFeCbMTg399gbSwl2arqL8mhUGQwzLOQuSAyHAdf+c8nMboyPto2qRVrRDeziuhJNyCEUen659KbdDk2WwEtqTPKuY2WAhi4rl20wurVoAykDBwjZfq9mx6Xzv3//YPuO83tVTayI2cnXWKMpVrcjToDxBiG8p2iSGjo5DF1G8gUal0YzCluMMYcux9N874acEDcXy3mDEfpLEluNimlclX85A8y759nodIblaplvGP24BoVyQSEG/l4YqQXC/mTEr+Wjj/StBH5Bzt3CVBNPYRUz40o/0jxuAmkwchD+7PFEEcjBSLtlxfiCICSZfyO9nlZrqFY4pGbu9SBzGpmsYthQwa35/VyOx6hG3jzJqAhefqiRMLyxGJLyJaw1zcKfL/wtnW5bWFLH1WhlhPpTE3MOLCbImO+S3TrTAYcSXCnUo+L+nPUuqhsD6LipIoPXGq2XqFQ3FGjV1VcMD+1NgwqgN0SKl8gJefKd6JlenCvEoDGY/rNCVLkHTZutTDb/MaGn5gMgLzEaLyYv86GWCfslP5eUgf3QGtVhdFXQsv+EoGJNYdzzcNrQo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(366004)(136003)(396003)(376002)(966005)(6486002)(41300700001)(26005)(36756003)(478600001)(31696002)(6512007)(186003)(53546011)(83380400001)(31686004)(2616005)(54906003)(110136005)(6506007)(66476007)(66556008)(4326008)(8676002)(5660300002)(66946007)(316002)(38100700002)(86362001)(2906002)(8936002)(15650500001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S0tmMmR5S3VtREFZQmJVL3NDUHd1em1zRzdEMGh5TG54eDlCTE90NU1GWXdv?=
- =?utf-8?B?ZXZFMm5lM2p4cDdKZjJaTnQ2ajMxeVV4UndVQTJuUDEvUHIya3lGRUtZN1I1?=
- =?utf-8?B?UmNUOWN0S2dGUzJYSitkRXFxSlJFdG1QT0h3UWplbitiRkNuQ1JwV2tJelBm?=
- =?utf-8?B?eDYzeEZVcnF4LytXYm1VZzRmd1hXMlJ1ODJ5L2FyYXY0T2hrWXZQWERLd3la?=
- =?utf-8?B?Vis1UFhKQzBNU1NlNnZ2ZlpkOEdZRjBDTFIvN0NwaHZMSlF3d1VHZ282b2Vl?=
- =?utf-8?B?Zys4enlBQXh2bGVJSUJhQ2lzcHZQS0xZdlZMeUhOS2RqN3Z1dlJzSi9lT1pJ?=
- =?utf-8?B?WDUrN0h3bE9KMDZzUjFUZmVrRFNkajRwWnZrNFV1ZXVyaENOTkdzUFBBUUpH?=
- =?utf-8?B?NEVpcjZIc0VkZVlqa3JZZ284Yis5RTBvcmhTSzd1OVdDL1hKUks4cnU3YTdK?=
- =?utf-8?B?V0NTZkZTZFNRbE82ZDVoS1dNNjYwSjFkdTdIK1R4TEpFeklPR0RudnhXOEox?=
- =?utf-8?B?YlIrTWFxWkx0YXd4NUVqRTFGT1hIN1hCRTd2akw3L0NrN2tnZDJjOWtEYmxp?=
- =?utf-8?B?a2k1cjNvTEFLSHdXOUU5QUFFV3l6SGVFdmFyamVFRU9zdHU0UEVNOStpYXhB?=
- =?utf-8?B?SE80RGxaVHY2ZEJaQ1I5MGJCeXpJdjZOV2N5RzFRTjJxdFozOVhUR1owRTB5?=
- =?utf-8?B?MFlIa0xyYmF1WEkwSXZQVENJWFc1bk5QdU5ib1l6VnJ1U0RQNnJSRjJYdjQ2?=
- =?utf-8?B?allBWDlvczZnbFJ0YklBa3BaakdLNHhEV1NhTlZUUHYybTZOOHZkdnJMdC84?=
- =?utf-8?B?S05tK2dHanRBQ201cnZHOWc4eW1UYURwSUhQQnNYUXczOTM1RG4ybmJkSDN3?=
- =?utf-8?B?bTl2VHZKbjdJeEpldlJRUExLOXFoRktSS3V6d3RCTlV3MEd4UDZteWlIemxr?=
- =?utf-8?B?cmk5M3FjNU5BMUlmSGk2ZWVQQVcwY0FPL3pSNDJnUzNzOVhiSXRnQW1QaWZy?=
- =?utf-8?B?OTRCV1l4MHZLMUZwM3VUSEo4a3ZwZ2w5WitQNmJCS1M5MkJMdTczaU9zeXdG?=
- =?utf-8?B?L01tMDVrTTV0UktIVm5kU0xpMW91ZzBSNjBndzVJc2t6UzZYcHZvNUpvVitT?=
- =?utf-8?B?NmdIeTlpenlkRzN0QzlhTG5DMFJnN0JidDg3Sm9wcEpTczAzT1lFZ1AxVTF6?=
- =?utf-8?B?WFhFaHg5ZzhQNTFxbHh3dHlqMHdVSzZaSnVKZmJwbW01VWZhbzZUOEpqbDAz?=
- =?utf-8?B?R0ZxemZyOVNMb2Jwc2RkdmpkcldNN2hGR3lhdVlvNkY1aTdCTGZiVSs0L3dY?=
- =?utf-8?B?RnErdUttYVdJZFBXS1h6cndSTko0TGhjKzlNVVJjeFhNeDNYWlFVNDltREpV?=
- =?utf-8?B?eU1KZ0I3c1FvMkV5dEVBY2M1Sm1PRW9mbU5ScVZ2NkJHY2xOR3RraWovZXho?=
- =?utf-8?B?R25Oa1RGUG1xOUI2YzFnNEYwa0FNRGxZTG9oZFB6ZVp5dXhLc1NWU1lIeDVC?=
- =?utf-8?B?ajlVMVNxSzdNMnlhRnlBMVg2TjdzYTVrbGQvcTdBU05KZFNvMmoyYnlRUUVZ?=
- =?utf-8?B?Z3lEQzV5Ym1IdXRFWUdMaUR0aytEd3pxY3FwckNSa2t0K3FycEZlMTRqUU96?=
- =?utf-8?B?K2xXQ3Flc0JpT2Z0Nkpqcm81b1Qya2dpOHh2cUs0dFp6N0l2dllxdUdBM1Fq?=
- =?utf-8?B?VndsUkZRYUt0MWhBYXV1RU5ZTytpVVpETFV1bkJyTi9KcENvNDNGOFptTm1U?=
- =?utf-8?B?R0hqYlM4V1l2d3hZdmpBc0dvaFdNWXl2c21mUUZtNU1QN211MXFPMEZFYnll?=
- =?utf-8?B?VmVyNDBmcU0vKzNSMCtFK2x5Z0U4eW1FeHJzdEIzaW9QQnVjZ0NSS0Y2UzNj?=
- =?utf-8?B?RjVLeGQ4bXRhU2kxeml4Y0pzTEt2NENhU21NbnZmQldIWDlEUkRUZUxlcHBG?=
- =?utf-8?B?R3hNbUozSkNNdW10Um82QktVdkYwbE81dU54emVxV2JCNGVZQUlLR3h6OGZ6?=
- =?utf-8?B?L29qeTgyRzU2TkpNSFVROUJ1VFBqYmZWTXJkSDE5REYxUTBrYlA2KytLNU1s?=
- =?utf-8?B?djB3ZU9XOU1Qa2kzcHBxOW9xeThuNDdvSTVsUlg3d3orU08wcXdJZHFPR3Q1?=
- =?utf-8?Q?u3grwzFc0/joJBjPH8ITzvhtk?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57e405a6-2616-45da-2324-08da7a1fd659
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2022 15:57:18.6337
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Me16fdRlV8QvmYufGxapkdMDm0RI6nOgDtQFoH3KnT4aO2tSWt8gRvWPvRV6cMlzvrTTVyLkBl3FJGz9dJPRzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5686
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/7/22 19:15, Jarkko Sakkinen wrote:
-> From: Jarkko Sakkinen <jarkko@profian.com>
-
-Looks good, just some minor commit message and comment changes requested.
-
+On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> A quirk for fixing the committed TCB version, when upgrading from earlier
-> firmware version than 1.33.01. This is a known issue, and the documented
+> When SEV-SNP is enabled globally, a write from the host goes through the
 
-", when upgrading from earlier firmware version than 1.33.01" => "when 
-upgrading from a firmware version earlier than 1.50"
+globally?
 
-> workaround is to load the firmware twice.
-> 
-> The issue realizes in a machine where the upgrade is done from firmware
-> reporting having SEV API version 1.49, and requires the following
-> workaround:
+Can SNP be even enabled any other way?
 
-Replace the above paragraph with just: "Currently, this issue requires the 
-following workaround:"
+I see the APM talks about it being enabled globally, I guess this means
+the RMP represents *all* system memory?
 
-> 
-> sudo modprobe -r kvm_amd
-> sudo modprobe -r ccp
-> sudo modprobe ccp
-> sudo modprobe kvm_amd
-> 
-> Implement this workaround inside kernel by checking whether the API
-> version is less than 1.50, and if so, download the firmware twice.
-> This addresses the TCB version issue.
-> 
-> Link: https://lore.kernel.org/all/de02389f-249d-f565-1136-4af3655fab2a@profian.com/
-> Reported-by: Harald Hoyer <harald@profian.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> ---
->   drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 799b476fc3e8..8ae26c5c64f6 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -742,6 +742,11 @@ static int sev_update_firmware(struct device *dev)
->   	struct page *p;
->   	u64 data_size;
->   
-> +	if (!sev_version_greater_or_equal(0, 15)) {
-> +		dev_dbg(dev, "DOWNLOAD_FIRMWARE not supported\n");
-> +		return -1;
-> +	}
+> @@ -1209,6 +1210,60 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
+>  }
+>  NOKPROBE_SYMBOL(do_kern_addr_fault);
+>  
+> +static inline size_t pages_per_hpage(int level)
+> +{
+> +	return page_level_size(level) / PAGE_SIZE;
+> +}
 > +
->   	if (sev_get_firmware(dev, &firmware) == -ENOENT) {
->   		dev_dbg(dev, "No SEV firmware file present\n");
->   		return -1;
-> @@ -774,6 +779,14 @@ static int sev_update_firmware(struct device *dev)
->   	data->len = firmware->size;
->   
->   	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
+> +/*
+> + * Return 1 if the caller need to retry, 0 if it the address need to be split
+> + * in order to resolve the fault.
+> + */
+
+Magic numbers.
+
+Pls do instead:
+
+enum rmp_pf_ret {
+	RMP_PF_SPLIT	= 0,
+	RMP_PF_RETRY	= 1,
+};
+
+and use those instead.
+
+> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
+> +				      unsigned long address)
+> +{
+> +	int rmp_level, level;
+> +	pte_t *pte;
+> +	u64 pfn;
+> +
+> +	pte = lookup_address_in_mm(current->mm, address, &level);
 > +
 > +	/*
-> +	 * A quirk for fixing the committed TCB version, when upgrading from
-> +	 * earlier firmware version than 1.33.01.
-
-s/1.33.01/1.50/
-
-Thanks,
-Tom
-
+> +	 * It can happen if there was a race between an unmap event and
+> +	 * the RMP fault delivery.
 > +	 */
-> +	if (!ret && !sev_version_greater_or_equal(1, 50))
-> +		ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
+
+You need to elaborate more here: a RMP fault can happen and then the
+page can get unmapped? What is the exact scenario here?
+
+> +	if (!pte || !pte_present(*pte))
+> +		return 1;
 > +
->   	if (ret)
->   		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
->   	else
-> @@ -1283,8 +1296,7 @@ void sev_pci_init(void)
->   	if (sev_get_api_version())
->   		goto err;
->   
-> -	if (sev_version_greater_or_equal(0, 15) &&
-> -	    sev_update_firmware(sev->dev) == 0)
-> +	if (sev_update_firmware(sev->dev) == 0)
->   		sev_get_api_version();
->   
->   	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
+> +	pfn = pte_pfn(*pte);
+> +
+> +	/* If its large page then calculte the fault pfn */
+> +	if (level > PG_LEVEL_4K) {
+> +		unsigned long mask;
+> +
+> +		mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
+> +		pfn |= (address >> PAGE_SHIFT) & mask;
+
+Oh boy, this is unnecessarily complicated. Isn't this
+
+	pfn |= pud_index(address);
+
+or
+	pfn |= pmd_index(address);
+
+depending on the level?
+
+I think it is but it needs more explaining.
+
+In any case, those are two static masks exactly and they don't need to
+be computed for each #PF.
+
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 7274f2b52bca..c2187ffcbb8e 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -4945,6 +4945,15 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+>  	return 0;
+>  }
+>  
+> +static int handle_split_page_fault(struct vm_fault *vmf)
+> +{
+> +	if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
+> +		return VM_FAULT_SIGBUS;
+
+Yah, this looks weird: generic code implies that page splitting after a
+#PF makes sense only when SEV is present and none otherwise.
+
+Why?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
