@@ -2,125 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAB1C19F2D
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 22:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8541DC25B08
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 23:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229450AbiHIWtc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Aug 2022 18:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
+        id S229548AbiHIXWL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Aug 2022 19:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiHIWtb (ORCPT
+        with ESMTP id S229480AbiHIXWL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Aug 2022 18:49:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F49165828;
-        Tue,  9 Aug 2022 15:49:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B8053B81912;
-        Tue,  9 Aug 2022 22:49:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF84BC433D6;
-        Tue,  9 Aug 2022 22:49:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660085367;
-        bh=uPhKhKjz4nLP7Bfa+GXJs+PEOTPR67p/T4XukYbqA4o=;
-        h=From:To:Cc:Subject:Date:From;
-        b=QRl+7reUPLya7J6GhrTYQqv9fhHRfcuM4mzrpHvWuSEjiEx8Vxyhf+Wm/SbZvHnEt
-         ecFi76RZXfgX1U6ynNeWnba3i79KvWpVipkw/jCbLWE1bylTYIWdjLsfTQ2z/mrfpx
-         U/7e0y1QDSXaw4iW/VrAqbHduMDS3AEl9PnQoLCXH4rIhymotXajdcHUcTw+p7kbIv
-         JIYnj+M1wtDIzVcacCzj4SAo119Bu4bh0MvlI3cLPm8FK7QAEVJK07/h315LWd3GFG
-         kMPeQoDQWfFSROc5uoJEhbHr7PpfOJTlHL4GoKBsPIZxUa5o0OwO5+Rc0iC6TQqfJ7
-         V55gPksXkWaQQ==
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Jarkko Sakkinen <jarkko@profian.com>,
-        Harald Hoyer <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
+        Tue, 9 Aug 2022 19:22:11 -0400
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52DB06E89C;
+        Tue,  9 Aug 2022 16:22:10 -0700 (PDT)
+Received: by mail-io1-f52.google.com with SMTP id o2so10864200iof.8;
+        Tue, 09 Aug 2022 16:22:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:references:in-reply-to:cc:to:from
+         :x-gm-message-state:from:to:cc;
+        bh=WKgX6OwnJvslqRDDK7OwdRHlwGBrq/rnVAIRLno0eKk=;
+        b=rgHJxJmIuUW7b8nxO0USQv48D9yrBymKkBYeMvQhRDevk/YEcDYcJY2tfvnlBhPfoe
+         k83FJMxqS7redvl+uJQiM8Omwlzy7OFAtalgyT+BZpkuyx6Wl8ppELo1JGqJlmsZHIB6
+         8z3cKRvm1X7pr/mDFUvpMM7M+9cjR7Rbh/vUa+w/3xjh5HOpo4NE6lKm5TUehHzqKUhW
+         uARiP26eVvZTcUm9usx4Pc/3hJOESOBcr5wGfhP8Axhk9nbpwcR5b0H4t27oAEz+QE4f
+         wBBPSFRUQPatLgH/ZtpSNePiUb39JqqpONoIqRoRYod9uqMppE0Cedqt6bPRxlK49Tuc
+         ngxQ==
+X-Gm-Message-State: ACgBeo1IF9/sSqf11fP0Z+BOw+RfoFKnF+MNp+GIZZlTjzMlmEiDf8Sf
+        FnhNUqxwK976hU76JCS9dQ==
+X-Google-Smtp-Source: AA6agR5QFg4qxoRQtr79qrPZn1JaCwglNPErhIuT1Uu88akqQwP9BtBHPUYP4k7Bfn8OgjZ+21s6tA==
+X-Received: by 2002:a02:cc6d:0:b0:342:82b1:c73b with SMTP id j13-20020a02cc6d000000b0034282b1c73bmr11769610jaq.290.1660087329552;
+        Tue, 09 Aug 2022 16:22:09 -0700 (PDT)
+Received: from robh.at.kernel.org ([64.188.179.248])
+        by smtp.gmail.com with ESMTPSA id j16-20020a056e020ef000b002df7e3c40fbsm1557389ilk.6.2022.08.09.16.22.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Aug 2022 16:22:08 -0700 (PDT)
+Received: (nullmailer pid 2675463 invoked by uid 1000);
+        Tue, 09 Aug 2022 23:22:06 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Daniel Parks <danielrparks@ti.com>
+Cc:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Tero Kristo <kristo@kernel.org>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER - SE...), linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v2] crypto: ccp: Add a quirk to firmware update
-Date:   Wed, 10 Aug 2022 01:49:15 +0300
-Message-Id: <20220809224915.92111-1-jarkko@kernel.org>
-X-Mailer: git-send-email 2.37.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, Nishanth Menon <nm@ti.com>
+In-Reply-To: <42d04e9ec43d10f978cee1dd974bbfdccf121d85.1659985696.git.danielrparks@ti.com>
+References: <cover.1659985696.git.danielrparks@ti.com> <42d04e9ec43d10f978cee1dd974bbfdccf121d85.1659985696.git.danielrparks@ti.com>
+Subject: Re: [RFC PATCH 1/6] dt-bindings: crypto: ti,sa2ul: add pka subdevice
+Date:   Tue, 09 Aug 2022 17:22:06 -0600
+Message-Id: <1660087326.225301.2675458.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jarkko Sakkinen <jarkko@profian.com>
+On Mon, 08 Aug 2022 14:12:50 -0500, Daniel Parks wrote:
+> The PKA (aka eip29t2) is a subdevice of the SA2UL on k3.
+> 
+> Signed-off-by: Daniel Parks <danielrparks@ti.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
 
-A quirk for fixing the committed TCB version, when upgrading from a
-firmware version earlier than 1.50. This is a known issue, and the
-documented workaround is to load the firmware twice.
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-Currently, this issue requires the  following workaround:
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml:68:1: [error] duplication of key "patternProperties" in mapping (key-duplicates)
 
-sudo modprobe -r kvm_amd
-sudo modprobe -r ccp
-sudo modprobe ccp
-sudo modprobe kvm_amd
+dtschema/dtc warnings/errors:
+make[1]: *** Deleting file 'Documentation/devicetree/bindings/crypto/ti,sa2ul.example.dts'
+Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml:68:1: found duplicate key "patternProperties" with value "{}" (original value: "{}")
+make[1]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/crypto/ti,sa2ul.example.dts] Error 1
+make[1]: *** Waiting for unfinished jobs....
+./Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml:68:1: found duplicate key "patternProperties" with value "{}" (original value: "{}")
+/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml: ignoring, error parsing file
+make: *** [Makefile:1404: dt_binding_check] Error 2
 
-Implement this workaround inside kernel by checking whether the API
-version is less than 1.50, and if so, download the firmware twice.
-This addresses the TCB version issue.
+doc reference errors (make refcheckdocs):
 
-Link: https://lore.kernel.org/all/de02389f-249d-f565-1136-4af3655fab2a@profian.com/
-Reported-by: Harald Hoyer <harald@profian.com>
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
-v2:
-- Updated the commit message and comments.
-  https://lore.kernel.org/all/0a3a790d-989f-2f76-f636-62fbd925a776@amd.com/
- drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+See https://patchwork.ozlabs.org/patch/
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 799b476fc3e8..f27f8bc966b1 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -742,6 +742,11 @@ static int sev_update_firmware(struct device *dev)
- 	struct page *p;
- 	u64 data_size;
- 
-+	if (!sev_version_greater_or_equal(0, 15)) {
-+		dev_dbg(dev, "DOWNLOAD_FIRMWARE not supported\n");
-+		return -1;
-+	}
-+
- 	if (sev_get_firmware(dev, &firmware) == -ENOENT) {
- 		dev_dbg(dev, "No SEV firmware file present\n");
- 		return -1;
-@@ -774,6 +779,14 @@ static int sev_update_firmware(struct device *dev)
- 	data->len = firmware->size;
- 
- 	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+
-+	/*
-+	 * A quirk for fixing the committed TCB version, when upgrading from
-+	 * earlier firmware version than 1.50.
-+	 */
-+	if (!ret && !sev_version_greater_or_equal(1, 50))
-+		ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+
- 	if (ret)
- 		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
- 	else
-@@ -1283,8 +1296,7 @@ void sev_pci_init(void)
- 	if (sev_get_api_version())
- 		goto err;
- 
--	if (sev_version_greater_or_equal(0, 15) &&
--	    sev_update_firmware(sev->dev) == 0)
-+	if (sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
- 
- 	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization
--- 
-2.37.1
+This check can fail if there are any dependencies. The base for a patch
+series is generally the most recent rc1.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit.
 
