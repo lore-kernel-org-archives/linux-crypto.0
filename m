@@ -2,122 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAFDC25B06
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 19:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4EFC25B06
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 19:12:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345215AbiHITDd (ORCPT
+        id S1345539AbiHITMe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Aug 2022 15:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36660 "EHLO
+        Tue, 9 Aug 2022 15:12:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345377AbiHITCx (ORCPT
+        with ESMTP id S1346397AbiHITLI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Aug 2022 15:02:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A36C027B29
-        for <linux-crypto@vger.kernel.org>; Tue,  9 Aug 2022 11:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660070214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m/RDB/JS2A+rkcJXiycrT7nlqCdePEvztzO47vN60tc=;
-        b=OTkJLxugI4Q2ZVD685SUlA6NPwBdjnhlkdSfNOxBdbz1OJeXJWK9Ew2KlMw5duZAmMMRH5
-        TID/6hnn4mhIW7wcUNuAFMA2uykx02fz50QUZ1NN9FXI9Ouwl1hvyexmX5v8rtfP9bq6SA
-        LNzBesPsOLHzdjSPRkNE7jbtqZXDelw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-197-Konk8NQ8Pn6aCMVlRANAzA-1; Tue, 09 Aug 2022 14:36:49 -0400
-X-MC-Unique: Konk8NQ8Pn6aCMVlRANAzA-1
-Received: by mail-ed1-f72.google.com with SMTP id x20-20020a05640226d400b0043d50aadf3fso7811598edd.23
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Aug 2022 11:36:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=m/RDB/JS2A+rkcJXiycrT7nlqCdePEvztzO47vN60tc=;
-        b=Y4Qfvd2zSyucMwXAslfsGJqFnOyCmFj8u7InHtAQVrWgNGtiSX3zR3tDGY6RmprjoC
-         l2f8/dX7YOFTNUwIrwJM/SZJrlY3dDA4uYYZmDTI1T274F2W/PDYmTsZ0NMA1hJigHze
-         G9Sx2KVhzHOCicMn3109cIAYxNstzwSULLhWlri8A+haSUMTZ/ihhAXV8yv2KmCW1TAw
-         pidp3QMCoMnssMVYHYkh1dlpPNBsDq23HGSruSDFbz9BIq7CstDq4GjW7g1llSVMVTGz
-         z3lFcS6YyfB2VjlkCBxG5CC4/nXoQIOmDDa6W/KJZR3b4veozDui22S+SBlY4gKnZ5So
-         k38A==
-X-Gm-Message-State: ACgBeo1nq3cShojavjb+OwmMBIg3XFNDWADVXa7uRbbrfZbla66npRRa
-        kRlSCwyJorO5MX5qOWeehM0+Jo0DjZSopfe99qKoU5CeozbQU5xQNPGl5fXVmxs8Wuf9g5aZQBz
-        AFFKSGgLGMfdiLSits1BSTBP5
-X-Received: by 2002:a17:907:28c9:b0:731:e57:bf27 with SMTP id en9-20020a17090728c900b007310e57bf27mr12916953ejc.451.1660070204929;
-        Tue, 09 Aug 2022 11:36:44 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6EzlIwxo5M9CoAjttFlYSxF5sujZStl/jx93pHpz0KHh5xypEXt7HG7RqiC3AKRhj9Vee8qQ==
-X-Received: by 2002:a17:907:28c9:b0:731:e57:bf27 with SMTP id en9-20020a17090728c900b007310e57bf27mr12916940ejc.451.1660070204682;
-        Tue, 09 Aug 2022 11:36:44 -0700 (PDT)
-Received: from redhat.com ([2.52.152.113])
-        by smtp.gmail.com with ESMTPSA id o3-20020a170906768300b0072b2ef2757csm1366205ejm.180.2022.08.09.11.36.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Aug 2022 11:36:43 -0700 (PDT)
-Date:   Tue, 9 Aug 2022 14:36:40 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Lei He <helei.sig11@bytedance.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, berrange@redhat.com,
-        pizhenwei@bytedance.com
-Subject: Re: [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
-Message-ID: <20220809143555-mutt-send-email-mst@kernel.org>
-References: <20220623070550.82053-1-helei.sig11@bytedance.com>
+        Tue, 9 Aug 2022 15:11:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BD22186;
+        Tue,  9 Aug 2022 11:58:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2BC65B81662;
+        Tue,  9 Aug 2022 18:58:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 329C6C433D6;
+        Tue,  9 Aug 2022 18:58:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660071535;
+        bh=XTBFh7yoTFr2i4RUTPJqLED6xHogeLuIDMQ2VyzUQr0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YZDdgijPBsZ6QGE/PLz0GiaQ/epIcNz9hIhJZ4mkHKcJdpDggaCBPsnAcxUz5RKxy
+         gvYvOj7irKjorlSTcQNQw40Ljb8UZWx2kJmHL2WUv/aFjeiJvomtXAJCkW696KM9Ly
+         HrAcX3W6FcmBYOcavCbd+yAXCYA5SKNGAXm0SyyL9b8FuWmIkfGHKeyoxwCsiqedBu
+         3tQysPMu6ByYQDI+xJolWoUQn7N3ahSgzYhmPyJTikbbyj1oKELQ1aSvxe6p6vFiT+
+         iCmOws85RRmGML/SPAdXA6tPD9S/PzpjzmNganj95M3xQqeG5HBpqtb8uyRcfxZScJ
+         SOKapxedDSqKw==
+Date:   Tue, 9 Aug 2022 21:58:51 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jarkko Sakkinen <jarkko@profian.com>,
+        Harald Hoyer <harald@profian.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
+        <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp: Add a quirk to firmware update
+Message-ID: <YvKua80NyjOcGgTD@kernel.org>
+References: <20220808001537.6479-1-jarkko@kernel.org>
+ <0a3a790d-989f-2f76-f636-62fbd925a776@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220623070550.82053-1-helei.sig11@bytedance.com>
+In-Reply-To: <0a3a790d-989f-2f76-f636-62fbd925a776@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 03:05:46PM +0800, Lei He wrote:
-> From: lei he <helei.sig11@bytedance.com>
+On Tue, Aug 09, 2022 at 10:57:16AM -0500, Tom Lendacky wrote:
+> On 8/7/22 19:15, Jarkko Sakkinen wrote:
+> > From: Jarkko Sakkinen <jarkko@profian.com>
 > 
-> This patch supports the ECDSA algorithm for virtio-crypto.
+> Looks good, just some minor commit message and comment changes requested.
 > 
-> V1 -> V2:
-> - explicitly specified an appropriate base commit.
-> - fixed the link error reported by kernel test robot <lkp@intl.com>.
-> - removed irrelevant commits.
+> > 
+> > A quirk for fixing the committed TCB version, when upgrading from earlier
+> > firmware version than 1.33.01. This is a known issue, and the documented
 > 
-> V1:
-> - fixed the problem that the max_signature_size of ECDSA is
-> incorrectly calculated.
-> - make pkcs8_private_key_parser can identify ECDSA private keys.
-> - implement ECDSA algorithm for virtio-crypto device
+> ", when upgrading from earlier firmware version than 1.33.01" => "when
+> upgrading from a firmware version earlier than 1.50"
+> 
+> > workaround is to load the firmware twice.
+> > 
+> > The issue realizes in a machine where the upgrade is done from firmware
+> > reporting having SEV API version 1.49, and requires the following
+> > workaround:
+> 
+> Replace the above paragraph with just: "Currently, this issue requires the
+> following workaround:"
+> 
+> > 
+> > sudo modprobe -r kvm_amd
+> > sudo modprobe -r ccp
+> > sudo modprobe ccp
+> > sudo modprobe kvm_amd
+> > 
+> > Implement this workaround inside kernel by checking whether the API
+> > version is less than 1.50, and if so, download the firmware twice.
+> > This addresses the TCB version issue.
+> > 
+> > Link: https://lore.kernel.org/all/de02389f-249d-f565-1136-4af3655fab2a@profian.com/
+> > Reported-by: Harald Hoyer <harald@profian.com>
+> > Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+> > ---
+> >   drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
+> >   1 file changed, 14 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > index 799b476fc3e8..8ae26c5c64f6 100644
+> > --- a/drivers/crypto/ccp/sev-dev.c
+> > +++ b/drivers/crypto/ccp/sev-dev.c
+> > @@ -742,6 +742,11 @@ static int sev_update_firmware(struct device *dev)
+> >   	struct page *p;
+> >   	u64 data_size;
+> > +	if (!sev_version_greater_or_equal(0, 15)) {
+> > +		dev_dbg(dev, "DOWNLOAD_FIRMWARE not supported\n");
+> > +		return -1;
+> > +	}
+> > +
+> >   	if (sev_get_firmware(dev, &firmware) == -ENOENT) {
+> >   		dev_dbg(dev, "No SEV firmware file present\n");
+> >   		return -1;
+> > @@ -774,6 +779,14 @@ static int sev_update_firmware(struct device *dev)
+> >   	data->len = firmware->size;
+> >   	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
+> > +
+> > +	/*
+> > +	 * A quirk for fixing the committed TCB version, when upgrading from
+> > +	 * earlier firmware version than 1.33.01.
+> 
+> s/1.33.01/1.50/
+> 
+> Thanks,
+> Tom
 
+Thanks Tom, I'll address the issues and send a new version.
 
-So this depends on core crypto changes that need Herbert's ack.
-I'll drop this from my radar for now.
-
-> 
-> lei he (4):
->   crypto: fix the calculation of max_size for ECDSA
->   crypto: pkcs8 parser support ECDSA private keys
->   crypto: remove unused field in pkcs8_parse_context
->   virtio-crypto: support ECDSA algorithm
-> 
->  crypto/Kconfig                                |   1 +
->  crypto/Makefile                               |   2 +
->  crypto/akcipher.c                             |  10 +
->  crypto/asymmetric_keys/pkcs8.asn1             |   2 +-
->  crypto/asymmetric_keys/pkcs8_parser.c         |  46 +++-
->  crypto/ecdsa.c                                |   3 +-
->  crypto/ecdsa_helper.c                         |  45 +++
->  drivers/crypto/virtio/Kconfig                 |   1 +
->  .../virtio/virtio_crypto_akcipher_algs.c      | 259 ++++++++++++++++--
->  include/crypto/internal/ecdsa.h               |  15 +
->  include/linux/asn1_encoder.h                  |   2 +
->  lib/asn1_encoder.c                            |   3 +-
->  12 files changed, 361 insertions(+), 28 deletions(-)
->  create mode 100644 crypto/ecdsa_helper.c
->  create mode 100644 include/crypto/internal/ecdsa.h
-> 
-> 
-> base-commit: 018ab4fabddd94f1c96f3b59e180691b9e88d5d8
-> -- 
-> 2.20.1
-
+BR, Jarkko
