@@ -2,101 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEE9C00140
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Aug 2022 23:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 403CFC19F2D
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Aug 2022 05:44:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbiHHXZm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Aug 2022 19:25:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55002 "EHLO
+        id S235043AbiHIFoV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 Aug 2022 01:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236078AbiHHXZh (ORCPT
+        with ESMTP id S229674AbiHIFoT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Aug 2022 19:25:37 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7151611175
-        for <linux-crypto@vger.kernel.org>; Mon,  8 Aug 2022 16:25:35 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id j63so15922817ybb.13
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2022 16:25:35 -0700 (PDT)
+        Tue, 9 Aug 2022 01:44:19 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A823025DB
+        for <linux-crypto@vger.kernel.org>; Mon,  8 Aug 2022 22:44:18 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id by6so3544204ljb.11
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Aug 2022 22:44:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=73cKPFgN9gZ8ltMONiXdX091+tMrsz21e0W09IrrYVM=;
-        b=XD4epq/wDO2pmaef1oiInC2dvEJIqvjq3q43Jfyj+ci5MUe0R+m7gQ5gr1x+XrMC76
-         LwLhtdXIbgRaVYj9MQHPhkljoWaVUbOD+Rn2R/6VQJfsCEUnZFnf0jVXFjOKLFdW6lBI
-         AQd3NhDC5HNC3/vyl8bHZJAkJILyum23NniPcQLdokRSRh3BOH9Pvf+6pzNo9iHp97GO
-         k+JFH6u4VVeMcZD5etwHx3zffyFTqC6FwhBiOzN9Qi+PU0a55A/i9Qsq66IR5/bRPQl6
-         Wo8EHYyvtyS5q4HqsP0RoQyycONWLoK9J3yYPmOqKiFDyUUXf5a88zIoeXUvyeGRrLXP
-         U/6w==
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=FI4To5jHqN39miuQQ5GtcgN7QV66DDmgPD6y4XMVAQo=;
+        b=euJ2qWDssIx9t21bUsosyWW2rBWJfg1GZDgAuP3pH2TugwNXbTPZnC6kEzfPX8cpNG
+         3faVNP+EbRsgKelYIJSiK77ASPCFxEfvPdz7VJjYEPiJjJTjLc3aySFOjQ8R7A68hjTF
+         2bZUdSX48Y7QTGXi2a9Yw3AMCAKvYe8zfZJ03tb2UOopBlidLObIs1c4QAi9yhxMmQkO
+         Q+8qsAdc/G8QXntNLSqphuVp4XZjg91VZgSn0+mP9kKfgMkE9CyJDLG4JwQkSL/6bY/C
+         czaI9v4zznSy0QeM9ajDbBagnhgVvx6gAtbEdqf6zyS1dbyKH0wiSQKQDbp+fsKzFYoM
+         2IgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=73cKPFgN9gZ8ltMONiXdX091+tMrsz21e0W09IrrYVM=;
-        b=erkHu2x75uZmwVXlTWB+RfkVhSaKDJeE5h4u3UTrNCwHyxa7QhgrxnlvK4GjQAl93J
-         bxnMXkJsFeQnn7ripS4AVy5OeaOax8cKrF1ZAgkVRs3A/w7MQPqoZgQXP8/jOc2G+4ys
-         4WPAZYbp2dB84wR1HqwzwvdE7YNM0VCwx/hXDqL97PGkYzgXlxiBOadnzggZN3/T9mSw
-         WxK2UsA10QNtxmA6YNU5eZoJqIPvPcf5xoAmG9WetHo4jiPfMD63hMJlZh+xG5aTFJIT
-         WJpkPUK9FgmREKobKmwPgt6YfX1KKgwufxWrriQMeIddIbIowaywuh0rKNqnysjyO9Go
-         jH5g==
-X-Gm-Message-State: ACgBeo13o+ecRnHvAS/P4JPCmv9NBo0CORtL4IShlXGivFVoZgD3EUiZ
-        TbtH4VGICxGL3vWS/sPjey4c82eFtq460hLRvijdag==
-X-Google-Smtp-Source: AA6agR7NkhA/E2JJDWORK66aLcG/g1ZA5bYxFqc7io395Oy9dAKo9LEzL/8YuEkKlHfrKtLYRxQ/RoMYCYQoZ3yVrLc=
-X-Received: by 2002:a05:6902:1021:b0:676:ed79:5733 with SMTP id
- x1-20020a056902102100b00676ed795733mr18366577ybt.509.1660001134604; Mon, 08
- Aug 2022 16:25:34 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=FI4To5jHqN39miuQQ5GtcgN7QV66DDmgPD6y4XMVAQo=;
+        b=0dAJO5kbrBHHHM/2uKRcaIlwF4WC8ANlzwnu40jwP0q6FI5DspfdRYq3/CljK1aXlq
+         Wdo+MwpP+HwzXKI0wwsZtQS6go3tiARJfc+Uv9/zPHWD5aTjWT083PAEpDQsYidoC89m
+         aLXknDSOZ8dw/NuHNQa+C2JnjVpNZCBKvWdYZkefTufbqAfWyOJEf5HneI5Pn089hml3
+         dpIQ00tkf6RUYhtokeyj3cVcbDMI24lRgOB1jwXaM3VEeIkUGfH+izh7DmTCiVXrgZpD
+         H1HZnfShCixgqQjyzjMeBk0iI6xTyr3bu3oI2FIkuR7biQQ5SLnpKZ/eDfTBHzQAgBbh
+         Jksw==
+X-Gm-Message-State: ACgBeo0MznVaGS3Q1V6yDpi+sUnTHq25dcxGJuZY/AjWa6O2DySQ8uXC
+        Sta2qzYZSu34w8F2FLrtn3uoMg==
+X-Google-Smtp-Source: AA6agR4wDGK9Bd2zYgQEapxkPv3dwBhu40WO1DHuINBqElReoxpFMuyYkVUCq7NHklvH00Roa6cUPw==
+X-Received: by 2002:a2e:9884:0:b0:25e:4b41:75da with SMTP id b4-20020a2e9884000000b0025e4b4175damr6505032ljj.339.1660023857070;
+        Mon, 08 Aug 2022 22:44:17 -0700 (PDT)
+Received: from [192.168.1.39] ([83.146.140.105])
+        by smtp.gmail.com with ESMTPSA id d10-20020a196b0a000000b0048b003c4bf7sm1631645lfa.169.2022.08.08.22.44.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Aug 2022 22:44:16 -0700 (PDT)
+Message-ID: <c97e7080-9d93-ae09-9bb2-106539f9b1ae@linaro.org>
+Date:   Tue, 9 Aug 2022 08:44:15 +0300
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <d325cb5d7961f015400999dda7ee8e08e4ca2ec6.1655761627.git.ashish.kalra@amd.com>
- <YukZFKpAO5o5MLA1@kernel.org> <CAAH4kHazh_S4zTLimL3Bch7yo3zL2wv86j=w3f2n74O-joWLQQ@mail.gmail.com>
- <a4b82687-7143-35c5-ee90-003a9f2a088c@amd.com>
-In-Reply-To: <a4b82687-7143-35c5-ee90-003a9f2a088c@amd.com>
-From:   Dionna Amalie Glaze <dionnaglaze@google.com>
-Date:   Mon, 8 Aug 2022 16:25:23 -0700
-Message-ID: <CAAH4kHYHu_FMJJiSNXbSZLn1y297FVq-LdZF7Tmq3t58nfLuLQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 17/49] crypto: ccp: Add the SNP_{SET,GET}_EXT_CONFIG
- command
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
-        linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, vkuznets@redhat.com,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>, dave.hansen@linux.intel.com,
-        slp@redhat.com, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        srinivas.pandruvada@linux.intel.com,
-        David Rientjes <rientjes@google.com>, dovmurik@linux.ibm.com,
-        tobin@ibm.com, Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        Marc Orr <marcorr@google.com>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>, dgilbert@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [RFC PATCH 1/6] dt-bindings: crypto: ti,sa2ul: add pka subdevice
+Content-Language: en-US
+To:     Daniel Parks <danielrparks@ti.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <cover.1659985696.git.danielrparks@ti.com>
+ <42d04e9ec43d10f978cee1dd974bbfdccf121d85.1659985696.git.danielrparks@ti.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <42d04e9ec43d10f978cee1dd974bbfdccf121d85.1659985696.git.danielrparks@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> Would it be burden to supply all the certificates, both system and per-VM,
-> in this KVM call? On the SNP Extended Guest Request, the hypervisor could
-> just check if there is a per-VM blob and return that or else return the
-> system-wide blob (if present).
->
+On 08/08/2022 22:12, Daniel Parks wrote:
+> The PKA (aka eip29t2) is a subdevice of the SA2UL on k3.
+> 
+> Signed-off-by: Daniel Parks <danielrparks@ti.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> index 02f47c2e7998..e4adb8192608 100644
+> --- a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> @@ -64,8 +64,14 @@ patternProperties:
+>      type: object
+>      description:
+>        Child RNG node for SA2UL
+>  
+> +patternProperties:
+> +  "^pka@[a-f0-9]+$":
+> +    type: object
+> +    description:
+> +      Child PKA node for SA2UL
 
-I think that's fine by me. We can use SNP_GET_EXT_CONFIG, merge in
-user space, and create an instance override with a KVM ioctl without
-touching ccp.
+If PKA is from "Public Key Accelerator", could you include here full
+name of the abbreviation?
 
--- 
--Dionna Glaze, PhD (she/her)
+Anyway you need here reference to schema for your node or describe the
+contents.
+
+Best regards,
+Krzysztof
