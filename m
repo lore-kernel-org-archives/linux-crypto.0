@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C5AC00140
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Aug 2022 20:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E54C00140
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Aug 2022 20:37:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbiHJU2i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Aug 2022 16:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        id S233381AbiHJUhc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 Aug 2022 16:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233129AbiHJU2h (ORCPT
+        with ESMTP id S232579AbiHJUha (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Aug 2022 16:28:37 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B741D27165;
-        Wed, 10 Aug 2022 13:28:35 -0700 (PDT)
+        Wed, 10 Aug 2022 16:37:30 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E593E67151;
+        Wed, 10 Aug 2022 13:37:29 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aRWud7gHNUdz/W9Fj4Cl7YPA/c3yAYvrOQlA2Gne7CetXIPEmodD/Y4Zf0W6iMPjvCXgVRl6y6rao5INyCfT1bMkSEw+VLSNzHY2pXKx+o2l5l17nNR6rEmab1fM21Roe3rIvGyUplSx2XQKjsasQh5PQR6Y/K6wbObCOKgYyxJTiO4PmfuEdSNFFFbKi1ZvNisPpblHtugwsPXURf+g/URlf6UTWOIsIiBS9m6GZAABoJ0X+5Q72Ujn47S7uUyidEPiqkwZxFRe3ZeeRguroLwq3x6TSWUIr4DE4wVm8vOztfJOkzelAbGuXPjdpGFNFSB5KZfKjU4E8LAK0bG3RQ==
+ b=bpH85MzNV2pGL5T6v17YM+c105/kO25TEe3knqs/b0FlLwuJzOe9FSwH3QoAb5m5bunct66ZrU/kQRH/00HI8szOR0YRGTUXBS+goPRwUvPlavS+p+/jfsutXjJuKH4KasRXklomd8jktkK3kiUYA+dwotuCCc3BgKHCh96BYz63Y78VkeWWonMxExUILiEGB+I10hUdWSrnG4rUKGnUgtoGHsnnGpfn7AUQ3BmR7Yoezp5TBseGxAE8jnbZ0ygFoXCxcLly9cIBG6cU6OISr4BNLYFuAm6Yh+QaFIiqfgXmLiReeXocoImnf2Ltv18DnfZ4kqUXZY4JhTNHaYp8QQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XZZ/xch/FghvVoc6rMBI4Oc5CrD2FVEIEk5Ub3/Wkck=;
- b=ezQesZaiutrNzelMSrsv2wWXQQwAeVa4I4EPETq4kd/j6eX4dtq5lUgbf6gKp6vIsg7ewSvZQZU11RapsrQ3NsgVhG/VEHRxvENNpYoaTXW9bbZ2eeAXVdyfT35uUXicBxiBAPsZqIkw71ulpr+mcnjMsZ3ZrrTha7L+lgp9Hh/eyF/m3Wd6GnHbGGTytMg1HkpU8Jlgudnh50bx4vZEcJE1n38JkpRKyatxDMFrmWH8EWZ3nWbGD3FWKqpsjt1T0xNm2h9HmpKbjZYerwCKuUKMXDzZMYouSsky0OS4ON8/sEmI9hGCq0kQ2/ZVCzWu4tdvzwjnXlzvycSpJG3zKw==
+ bh=0luXxKcaKNYrBJ9Te7ktrAH7T5eK6RWJscfv/fgQdeM=;
+ b=dVoswaob2iNSxNR0/9bU1jxgOt6XV5QKIRBMLWiPmNYtcBRpGEx8Dm/sImzmuXUpKCzzaoSAef+IqJO5FFIBjgtkqANW0iWMwII4EcPcmRLDryJsAuD3i9bNhqtAVzcBVWoYyF5AYe+qqPlsE4bUuRNnzoQQLZ9iE5BadTsZLDBscNSB8PFVcI3ww4s3PRqvFmef7iPe1Yje7q/xEqNqwGMmpew4sXRAhIgppuh8q95GbXzWuUE0X7bw19nkClN4okGWNRvqzI2z22y/BZlGVn+ZjKC2OMfvFDP5uxy8kMEA7qpPRhIjqfMb5YTzqfqm1eKHUwupbm6bP/4N91Ceng==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XZZ/xch/FghvVoc6rMBI4Oc5CrD2FVEIEk5Ub3/Wkck=;
- b=ohboqFJa85RkSprqL40L3LQhDUqEjxNkdJm6p9qO6DzWuM4nQZ2xMCqyQNwPNctG40YBgtKur5U0+1MCGa5vVPBeYilH9bIKEW53UNkmYTsaWi0Hc6A0OEK04ZO55anGBAUJYMIhvUXSQ7eGscKvhvqOow0D7CubQwqN8kbXlZ0=
+ bh=0luXxKcaKNYrBJ9Te7ktrAH7T5eK6RWJscfv/fgQdeM=;
+ b=jtpbF7CefRK1DothAqhGSS7BRxqvxx8zp6VX6/F7mUFBPKihbuXvkBOgkH2y1suvwmfxwPVZU9REDRLru9azVBRqG5Z2h7aX3GXem6IKtzA/8EfseyO/4YS2FGbeWuz1HRKvI1MCTgbJUEhzPVjQ+3sdgIRvC023zwj+KoinTa8=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BL1PR12MB5221.namprd12.prod.outlook.com (2603:10b6:208:30b::9)
- by BYAPR12MB3096.namprd12.prod.outlook.com (2603:10b6:a03:ad::13) with
+ by CY4PR1201MB0006.namprd12.prod.outlook.com (2603:10b6:903:d3::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.10; Wed, 10 Aug
- 2022 20:28:31 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.16; Wed, 10 Aug
+ 2022 20:37:27 +0000
 Received: from BL1PR12MB5221.namprd12.prod.outlook.com
  ([fe80::219f:8080:9607:b847]) by BL1PR12MB5221.namprd12.prod.outlook.com
  ([fe80::219f:8080:9607:b847%7]) with mapi id 15.20.5525.010; Wed, 10 Aug 2022
- 20:28:31 +0000
-Message-ID: <8dd975d4-e9fc-00eb-d630-cd09410121dc@amd.com>
-Date:   Wed, 10 Aug 2022 15:28:28 -0500
+ 20:37:27 +0000
+Message-ID: <5f52ffe6-03a4-a5bf-9c57-2c3951922a35@amd.com>
+Date:   Wed, 10 Aug 2022 15:37:25 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 1/2] crypto: ccp - Initialize PSP when reading psp data
- file failed
+Subject: Re: [PATCH 2/2] crypto: ccp - Fail the PSP initialization when
+ writing psp data file failed
 Content-Language: en-US
 To:     Jacky Li <jackyli@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -56,201 +56,173 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Peter Gonda <pgonda@google.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20220802185534.735338-1-jackyli@google.com>
- <20220802185534.735338-2-jackyli@google.com>
+ <20220802185534.735338-3-jackyli@google.com>
 From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20220802185534.735338-2-jackyli@google.com>
+In-Reply-To: <20220802185534.735338-3-jackyli@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DS7PR03CA0103.namprd03.prod.outlook.com
- (2603:10b6:5:3b7::18) To BL1PR12MB5221.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM6PR07CA0108.namprd07.prod.outlook.com
+ (2603:10b6:5:330::14) To BL1PR12MB5221.namprd12.prod.outlook.com
  (2603:10b6:208:30b::9)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 02c09b71-3b4f-4f83-62dd-08da7b0ee3e3
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3096:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56de8714-7976-4a16-4772-08da7b1023a9
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB0006:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bhQTlX1Nmb8MaomXYYtf+7mnjpT/8Ga6URRYt4mXr2dQiOdJkmHY5+amRJdM9OzjqqoY6DS5fiPdovFpXkZjNIL8H2WfPkfD/pbwaRyuXgu4D72RJPt/dBkVvq0DhRULHxLXI4RwVAlNXX0TmW26UFdyA3k618ow2GtHj0P43HMgVE2jukkF6Dvq5sCLhHiB8akez2ca0xEnEy8Q1Onxk531egykXzKIxg8j/lpao4HhEMVuiiNfVOWMt1tHZxwWbcs8wcRLRqCpOGhAvugY7gWWFuwKcaAQVC+TiqyOaMYNk2l6Qm6QcpDVvYKaEXQiUecuky9G9jvDT6jS0ue3oMrWOyW2cmj+1Q6bobyyheh4FfDwK2Wc96x+39NQ2KhIW3mKf3H/EWOADqnREKm1GINzflQ6b/vHrkbJu3bpOYhIDsxL3RB9mOh4ckO04LxWt41FBXfC13tTUPTNB4URVIgNNbj6Br9+EzhgjURfo321o/TZnqKzd1TsMNxvOfbwjbe9xLDtlNbInzlKHGQlAcs0jSMdLYnlxN/UN68x5oAIZbBEswBQQOLPEbHHuaAU1BIfAVn0uCdmbIkdUPmeXpMPVu8Jsz0mEl9bz7mi2zfqDnz69j1wWezSSyk1efqGMp91OEhEOsAByiccVRyGk8s/q6XYbUvD2fSEBQn7lxrlDmclBGlLtKHnUnueuyGp0UzS3a1HrsbzAgSBsAh5Jd+ccJS2zWVtENOyM0yUsxtfateSKyt51ZfmjRIWxMy6p3ySPW2Zs280izMw4MQKvv7/XqWkF23MbgtqTD1tKOZA8n45V0aU4xZSpM+2ETQnfrwjoj7KjIYlsrsA0xAsqg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5221.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(39860400002)(346002)(376002)(366004)(83380400001)(2616005)(2906002)(6666004)(41300700001)(316002)(186003)(31686004)(36756003)(26005)(53546011)(5660300002)(6506007)(6512007)(86362001)(31696002)(6486002)(478600001)(8936002)(54906003)(6636002)(110136005)(38100700002)(66476007)(66946007)(4326008)(66556008)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: vVXRlb0SnS6sgxy8PNPrSjaPJUm4SDLcuQzwxIM/aQkprgZm0vGgDHzewV6olr8ae2fbZXP24xyp/r5eIg+hBcS6eTBJ0xGPcPZTgwD6KiH+Fm0V/r4+tRftJbB0aUGmeZ6/PU3S0fMRkK1WCVOKveKa7FrOsUeQyWR9XFSxD/rv6lj6jqqCckZ8YQjD9pCU0XkB1xegg5ZRO8LvrkLE19w3wzqhVR1D4BS6f7rbSLSIqe58xk6GTAURr/s5p0AVmcvMDP47d87WILs8pOKRlUPU0VzvfdsGLimRpbU7adzD8OsoyJ+xHaB2QqmiQNLHwa5mMgDn/SYZvzyXNbWYxFM1FDUl48e8inHTkFKBzAu0vGPkVwCc4ogAMTL4YSIEqEGJ0FTtfWvQ2jCF6HGNbfy+QgNT2EcGfzOVlgIoNSyEB38zMNUsgIGwV9MnKSfqYPkd3h02x5vKke8LWo/RHqZXVikRo0iX10Pv4QjymkZdsFvvONYdlgjeGPdC3Co0rgyobiqDrGuwD8M/VzcoDAk0RKqwSV0NKEWtk4iV/MmF0jwtTvIjrlqb/aN03SBRymXcqfwlfsSawczjvUtYTPOxIFLGfXjnNavOW7/vmWpNP5S26e+5SPUKD5tttFemNH+TCSG1cxCAnoBCBRzojnmLMa/FT3h/Ll5Bjk4MBgpLA5Cwx31druILb/nBe/lOhwZ1ZDWX5K80M6lbNUigyvw7uiOgecbGJQ5yAnX/G6zzn90yJl3MbigOLcYnxm4Wf6f8rIRi71TBHGH/pObVgIi0Old+kdPrioVuaxhxZLd1EVnX7mTkgVvomp89+ehwWWrhMV+H/+/1mNVcs5BpAg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5221.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(366004)(136003)(39860400002)(396003)(36756003)(26005)(83380400001)(31686004)(6512007)(4326008)(2616005)(186003)(6636002)(86362001)(53546011)(41300700001)(110136005)(2906002)(316002)(66556008)(66476007)(38100700002)(6486002)(6506007)(5660300002)(31696002)(66946007)(54906003)(8676002)(8936002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y24zZGVyUHNMUjFYU1hLbTdwVU5iWTNTa3ZVSjRzTTFUT3lmUFduRnZOcmcx?=
- =?utf-8?B?bk5FT3pJdDE1ZjJtWnBkN24vUFJ6UG5tLzhvRmd3Mk1KNVAzelBFRVpuQVdB?=
- =?utf-8?B?Y0F4cDdlVE5INWNxWWlodVNnMVpXb1VISkUzWXB2NmNhd3R1M204ZjBTZzFB?=
- =?utf-8?B?WGdSS3RBb0MyZkRHeWRnVzhocDZsM3Y3OTd4OU9FR0dyVHQxNW5aS0c2dStC?=
- =?utf-8?B?UFhueC9wVXpLUFhGUjZ0TGZPaW14Qnd6dW1xTDJlS0owN04wbnNPbFdJUmM5?=
- =?utf-8?B?ZE4ycWVxeEcrSlhpbXhJOXdSU3BrTkUwSFNITUovdnI4Y21ZWXpIQjFzWlly?=
- =?utf-8?B?bEhVb1kyQVE1VnRoZTMzVGtlT2NxYXFrbGIyc3FzSGpMdHRPeEF2RytJVVBv?=
- =?utf-8?B?U28yVlgxdng0clp4bVJobXRJMk5VUzVTWUhKdy9BY3JTTkNHUEVmYks5MjV3?=
- =?utf-8?B?U3htYTRkdk5XaUY4eTRIQ2FlbUVrckFCYjY1ZmtFMFpLQ3JQaDdHRDNQK1gy?=
- =?utf-8?B?UXdxaHNKdi83Vi92TkpSQUZtUE9kMWg0S0RHTTRBdzhSNmZoZ2RpOWI1cXgr?=
- =?utf-8?B?SGM2ZlNxTkM5aVB4SDg0cW8zcTNGMWkwREU0Zk90b3NURzRFdmxUTFpuREx6?=
- =?utf-8?B?ZDJWdWNvdmhkUXoyd3pGMUdhNjZLaWVlZ2FQRndpam5VeStoT2VIdUFzVjdV?=
- =?utf-8?B?LzVBUUJVUmYzS1orcUVkS040a3B3OEZmVVpORU8zQi9LS0ZrVFo0QXU1QmJt?=
- =?utf-8?B?TER0SDJsL1Y1STlaTUwyZHkrbVFaTUJpU1Vwb2pSaEM4cmVjN3VzeDhSNktC?=
- =?utf-8?B?MkFuenlQU3ZGRFJ0RWJueGFDY2w0TmRyQW5paWFmc3ZXb0RKQ2ZhVXRxczVL?=
- =?utf-8?B?R3NSZE5VQThIUEFtSE1RSS9kTmtoRVNFUTJ5SHd6YTRabG1Zc2VjdUhHU1Zk?=
- =?utf-8?B?K1VGbzJiTitSbkVRMTgxVWRWSzhGcE9jVGxzZGVRZDBkWWYzdWRxQnBnQUZG?=
- =?utf-8?B?UGRHdm45VWswcWl1dVB6T09WMFVWL3o1ZjJsZmovWkJmaWxUeUIwaWczRnZP?=
- =?utf-8?B?b3oxVHg1SGcwRTVMTFVVYngyTnBjMldOcXBCbTNXSUdvOW82NlZ3Q0x6TnNB?=
- =?utf-8?B?cDBIWU1wUDkwV3I5OE9kdVFRa2tyMXRTTmdVTUNLLzFRK1hnMHYzOHZFNThw?=
- =?utf-8?B?VUFmaFdPblg4TEJwd2tJUW9OYzY4VTBRTFlSL0RpREl2TzhJOE1hTnhMU2d4?=
- =?utf-8?B?ZzNaRHRiVitqTmJaR2hUV2JrVmphQzJONjRaOFpYUnBBMDM1MktHR3hMSm9l?=
- =?utf-8?B?RVpxMzhxUXJPcjVlU3NSOG9MQW1JMEpKSGg1Tmd2L1dadmNCcDVxNXl5T2Zs?=
- =?utf-8?B?NzIyaWtGd1dRRmVkMzJLZmZKTVdwYWJ0YkdaK1lUTDJqYlNYa3c2MVNDVktw?=
- =?utf-8?B?c0F6VU9tUmdKUVlKZkpvZEFFNVRicG1Wak9BYkZkaDZhbGRwNHgwMEhRTTlO?=
- =?utf-8?B?dFA3MHVVR1ZaTUxmbUpHc2ZIODlRSE5raGt3Rk1MSG1mdG5EVE1GZ3lZa0dF?=
- =?utf-8?B?Z0Y3Yk0xV3QrNFcvOWpyNUhqV0FzaGI0WnFnQTVwTHcyNCtSV3lMa2xtZkdQ?=
- =?utf-8?B?bGZ6bTdJU2NNNmN1SjhTQ1hHZkxwWDR5TXpNSjIvc1lZM0xTSWwrV0RrZlJV?=
- =?utf-8?B?elhGaTdlK3ZhNTNuL3VvU29zUms4dHVMd1JMc2tFdUlyRHArL3Jwa0wrb3dm?=
- =?utf-8?B?aW91eCtzWkRCMTJ2T0xNb2FROFJQQmF1Q0UzOGlJTjNzb2FmdFZSVUlMM3gy?=
- =?utf-8?B?UEsyNVFpclNkaFY4TlZOSjBQSzZ6YitJNjF3VHFHSDVPcVVOWmdnUmZvVkg0?=
- =?utf-8?B?NkFxTlZLaUxDZDdVN0FlVHg2K3hSZWF3UmdmbHFaMTZlYzZPWXFkTFJnd1lo?=
- =?utf-8?B?MDk3M21BemRqSUE5Ny9qSFRJaHBWY215cDhpSFZMcm9XcjZvMlc0NEVJbmpq?=
- =?utf-8?B?WjVxY3FjNmpRR3VPRWhlWXN1a2taeW5lUVVzOW0yL1l1cWdVNS9QT1FzSjVr?=
- =?utf-8?B?Vzg0QTV5c2dRT1dXV3NHaXRHQnJYN3M5dXBrUWZsV2lUMjlKSHBMN0tBOVg0?=
- =?utf-8?Q?JlRfb8oLmWhIDdd0KZssTL7cD?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cGFPSytic0JGNDU3VjRJN0dsN3hsMGt0dHBpb3RhcHlMZnVTSU9MZmNaYUJx?=
+ =?utf-8?B?Zi9IellMWkdkVGN6cXV3clpGUEd2eVg2SUl6YjgrTlVXaTFNN3ZNS2JHUHRE?=
+ =?utf-8?B?UVNwWlZMWm52bDg0Qk9panM0VWxWR1pqVmdYWDNQNVdhZFh1bi9RejlweGVO?=
+ =?utf-8?B?bStuUVBmejhYZFJYMXBDajMrd0lBSlVHaENwWk1NRUVUQkVBZnRmdXpXQnpk?=
+ =?utf-8?B?RUpFelFVWXhBSk1Nb29QaEZtUkU2RWpRWDNDNE5rYTl2bEtOQlAvYkhuSFRI?=
+ =?utf-8?B?MTVJc3NIZncyWXBwQnkzYUZjZUo5Z2VyeDYyUmRUR0VRTmZDNDJXSDl4bjVq?=
+ =?utf-8?B?OWowZ1FlUDFETW5kTWxxeU9zeXJaSWtra2NXOVJleFF2dW5IVURNTms0dVVQ?=
+ =?utf-8?B?cjAyZzBSOVpaYWViWXNuUS9xWnZVcEo5SE9ad1RwNnhiRVR2b3dnaFUzSnhs?=
+ =?utf-8?B?QnU4M1FaY21JS2RnNGpWSTRhc09JZlp1dTVjeVJybk5XMlNVZ3lrcFVHRno2?=
+ =?utf-8?B?VEZ4b2ZaZ0s0YTQ1QVdJZDBYaks2STBNclhsbE5vVnBqbThEQUFPUXNFRXNF?=
+ =?utf-8?B?dEplMk1WdHdyVjB0cUZ1Qk9lZlNyQkMxNHIwV1dyMllnVEk0NWV4NWIzSVl3?=
+ =?utf-8?B?N1ZrZFdmUXNUSkNwWTROQTdmd3BFNHZydlBPYlNnUWo3NFYrd0ZEOVRZdjRW?=
+ =?utf-8?B?RENwd3RXSmM2OVgyaGtiTDRVQXhYUkVsVkdvSm9EVVBldGR1ekljVHZFdVNP?=
+ =?utf-8?B?Q0ROYTJ3ZTQ2dE03WkdVaGpuQXR1ZGppdGFsQ2FxUjhETldFL3JBV1dTUlpY?=
+ =?utf-8?B?NW1aVHAxbU0zaTNYWll4VU1MV1RWcVNoZ0dpNDJlUmk2dURIbGtCbUVMenFY?=
+ =?utf-8?B?dXhseG5GZ2xMMVd5N2c0WXp0K1YxTXlyRmJRazEyblBlOUxvd3RuZDFBUWVx?=
+ =?utf-8?B?R0xYOFFvd3hqblFIME8rS1YySldPZCtGRWQydGFCdTRYbkFhQ281UDl1cG9F?=
+ =?utf-8?B?eFRHbE14NkxNVTVPSWRNWUsvVXE2UWtrVjVoelNxOUgvWGtBSk9Sa29WeXB1?=
+ =?utf-8?B?d3NESmU2QzB5TTJnMTF5S2Zkc1RJZi8xRWhUbmRLU09OYVl0S0d2a25XM3hI?=
+ =?utf-8?B?dmpsSjRXMWhaZXhjRlNCdFNrTWNYaG5TWTRSSmw4RnRCOU9PSnZESXZnOHp4?=
+ =?utf-8?B?NzJSZzU1SjdjV0ZqcU4wTnBiZHR0a0plS0RpRlAzckpCcHRzRFhCdVVvVFlI?=
+ =?utf-8?B?dmNiTTBYeHNSbDVldStXOEVqcW1pVGtnSkVXQmM5QjNqM0xRSVRya3lUaGdu?=
+ =?utf-8?B?RzJPMkdvd0ZySzlEQURSdnR4WWNoVlFvUmJQRGxqcVMrMThkaDAyZG1ZUGI5?=
+ =?utf-8?B?V3E1RHJ2MytHNTl4V0hFMllRQUliWVZyMStDblZ2V3RrV1A3bkUzTTF3Wnd0?=
+ =?utf-8?B?TWd0RUUzTWJDMEl3bm1RcEdTSHhyMk9DR3IvS25HK1N2bWRZcUJQRk5vNkZP?=
+ =?utf-8?B?SlcxTGdXYWhETWVweHgvdVN0a2EzbDdpT0YyalJaZjhJZXl0SEttYkcvZU9Z?=
+ =?utf-8?B?NGRFdjNCZ1hvV0lZVFZnSlNRRHc1TEJkN0RzaWlhbHRVRDZ4WkJKMlIyQkZa?=
+ =?utf-8?B?WlRieWxiQUd1UlU1Ti9SU1g4ellxYU55cFVlUmlaWGV2OUpIWG1RQTZRUlpO?=
+ =?utf-8?B?Z2hBODY1ZDlMbHZLeWgydzVXMGtWc1VUcGF4MmpjQTVTOTdhWnYwcHVGeGZx?=
+ =?utf-8?B?TmdUVVNWSFZuczY4dGVTWVJiMHgvZXBSU3pKUkMxSnZpV2t5NW1JMVNQMXZQ?=
+ =?utf-8?B?VkRSL21CTVBlTnNTY3pqMHdocXN4Z2VxRG5tSDl4SC9CWWdJN2h2c1hReUdz?=
+ =?utf-8?B?MEFDclh0ODFZRm9qUlZPOGhwTk03eXZEbm5JOWdYVHJkMndPam1zZmliYmVp?=
+ =?utf-8?B?blkxS1ZucEtXZUFPdFBwNFNIeHF4cWNxZ0UydXcwN0R0UDFyRi9qMzk2UTd1?=
+ =?utf-8?B?SnZtQkNWNEp1cGdZME11MTlIOFduKzY5b3pYRFZnWEs4T3BLUXErb0E5Szkv?=
+ =?utf-8?B?cXdINVE4bW45MjVYVzZ2aUE1UE1rdVYrZnc1TDI3bXZhYnF3Sm4rMkcrUnRx?=
+ =?utf-8?Q?vDSl2+Hkn+rBtDYSpAxMt8RnM?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02c09b71-3b4f-4f83-62dd-08da7b0ee3e3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56de8714-7976-4a16-4772-08da7b1023a9
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5221.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2022 20:28:31.0685
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2022 20:37:27.5911
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3zZQSCgZEHvKtZ63DY2G8oEzj22iDEVeec+SrZQ6rff+QoH0BfHmRTzGQP0Ss4EN6EeOYQiZyOennPrYVPNiKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3096
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4VeStcw3MfUx4QqiadC31zOxWR2jh+XWGiZLB4MFpcj7JVH668gc1k5mQnm6N7LSIe8JSt6mEIX+jVnebTGyJg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0006
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 8/2/22 13:55, Jacky Li wrote:
-> Currently the OS fails the PSP initialization when the file specified at
-> 'init_ex_path' does not exist or has invalid content. However the SEV
-> spec just requires users to allocate 32KB of 0xFF in the file, which can
-> be taken care of by the OS easily.
+> Currently the OS continues the PSP initialization when there is a write
+> failure to the init_ex_file. Therefore, the userspace would be told that
+> SEV is properly INIT'd even though the psp data file is not updated.
+> This is problematic because later when asked for the SEV data, the OS
+> won't be able to provide it.
 > 
-> To improve the robustness during the PSP init, leverage the retry
-> mechanism and continue the init process:
-> 
-> During the first INIT_EX call, if the content is invalid or missing,
-> continue the process by feeding those contents into PSP instead of
-> aborting. PSP will then override it with 32KB 0xFF and return
-> SEV_RET_SECURE_DATA_INVALID status code. In the second INIT_EX call,
-> this 32KB 0xFF content will then be fed and PSP will write the valid
-> data to the file.
-> 
-> In order to do this, it's also needed to skip the sev_read_init_ex_file
-> in the second INIT_EX call to prevent the file content from being
-> overwritten by the 32KB 0xFF data provided by PSP in the first INIT_EX
-> call.
-> 
-> Co-developed-by: Peter Gonda <pgonda@google.com>
-> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
+> Reported-by: Peter Gonda <pgonda@google.com>
 > Signed-off-by: Jacky Li <jackyli@google.com>
-> Reported-by: Alper Gun <alpergun@google.com>
 > ---
->   .../virt/kvm/x86/amd-memory-encryption.rst    |  5 ++--
->   drivers/crypto/ccp/sev-dev.c                  | 29 +++++++++++++------
->   2 files changed, 22 insertions(+), 12 deletions(-)
+>   drivers/crypto/ccp/sev-dev.c | 23 +++++++++++++----------
+>   1 file changed, 13 insertions(+), 10 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-> index 2d307811978c..935aaeb97fe6 100644
-> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-> @@ -89,9 +89,8 @@ context. In a typical workflow, this command should be the first command issued.
->   
->   The firmware can be initialized either by using its own non-volatile storage or
->   the OS can manage the NV storage for the firmware using the module parameter
-> -``init_ex_path``. The file specified by ``init_ex_path`` must exist. To create
-> -a new NV storage file allocate the file with 32KB bytes of 0xFF as required by
-> -the SEV spec.
-> +``init_ex_path``. If the file specified by ``init_ex_path`` does not exist or
-> +is invalid, the OS will create or override the file with output from PSP.
->   
->   Returns: 0 on success, -negative on error
->   
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 799b476fc3e8..5bb2ae250d38 100644
+> index 5bb2ae250d38..fd6bb01eb198 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -75,6 +75,7 @@ static void *sev_es_tmr;
->    */
->   #define NV_LENGTH (32 * 1024)
->   static void *sev_init_ex_buffer;
-> +static bool nv_file_loaded;
+> @@ -233,7 +233,7 @@ static int sev_read_init_ex_file(void)
+>   	return 0;
+>   }
 >   
->   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+> -static void sev_write_init_ex_file(void)
+> +static int sev_write_init_ex_file(void)
 >   {
-> @@ -211,18 +212,19 @@ static int sev_read_init_ex_file(void)
+>   	struct sev_device *sev = psp_master->sev_data;
+>   	struct file *fp;
+> @@ -243,14 +243,15 @@ static void sev_write_init_ex_file(void)
+>   	lockdep_assert_held(&sev_cmd_mutex);
+>   
+>   	if (!sev_init_ex_buffer)
+> -		return;
+> +		return 0;
+>   
+>   	fp = open_file_as_root(init_ex_path, O_CREAT | O_WRONLY, 0600);
 >   	if (IS_ERR(fp)) {
->   		int ret = PTR_ERR(fp);
->   
-> -		dev_err(sev->dev,
-> -			"SEV: could not open %s for read, error %d\n",
-> -			init_ex_path, ret);
-> +		if (ret != -ENOENT) {
-> +			dev_err(sev->dev,
-> +				"SEV: could not open %s for read, error %d\n",
-> +				init_ex_path, ret);
-> +		}
+> +		int ret = PTR_ERR(fp);
 
-Shouldn't there still be some kind of message if the file is missing? A 
-typo could result in a file being created that the user isn't expecting. 
-At least indicating that the file will now possibly be created might be 
-good. Maybe not here, since this is called multiple times, though.
+Please put a blank line after the variable declaration.
 
->   		return ret;
->   	}
->   
->   	nread = kernel_read(fp, sev_init_ex_buffer, NV_LENGTH, NULL);
->   	if (nread != NV_LENGTH) {
-> -		dev_err(sev->dev,
-> -			"SEV: failed to read %u bytes to non volatile memory area, ret %ld\n",
-> +		dev_info(sev->dev,
-> +			"SEV: could not read %u bytes to non volatile memory area, ret %ld\n",
->   			NV_LENGTH, nread);
-> -		return -EIO;
->   	}
->   
->   	dev_dbg(sev->dev, "SEV: read %ld bytes from NV file\n", nread);
-> @@ -417,9 +419,18 @@ static int __sev_init_ex_locked(int *error)
->   	data.nv_address = __psp_pa(sev_init_ex_buffer);
->   	data.nv_len = NV_LENGTH;
->   
-> -	ret = sev_read_init_ex_file();
-> -	if (ret)
-> -		return ret;
-> +	/*
-> +	 * The caller of INIT_EX will retry if it fails. Furthermore, if the
+>   		dev_err(sev->dev,
+>   			"SEV: could not open file for write, error %ld\n",
+> -			PTR_ERR(fp));
+> -		return;
+> +			ret);
 
-This is a little confusing since this function, __sev_init_ex_locked(), is 
-the caller of INIT_EX. Maybe say "The caller of __sev_init_ex_locked() 
-will retry..."
-
-> +	 * failure is due to sev_init_ex_buffer being invalid, the PSP will have
-> +	 * properly initialized the buffer already. Therefore, do not initialize
-> +	 * it a second time.
-> +	 */
-> +	if (!nv_file_loaded) {
-> +		ret = sev_read_init_ex_file();
-> +		if (ret && ret != -ENOENT)
-> +			return ret;
-> +		nv_file_loaded = true;
-
-This is really meant to show the INIT_EX has been called, right? Maybe 
-move this and part of the above comment to just before the call to 
-INIT_EX. That will make this a bit less confusing.
-
-But, going back to the changes in sev_read_init_ex_file(), couldn't you 
-just return 0 in the "if (IS_ERR(fp)) {" path if ret == -ENOENT? Then you 
-don't have to check for it here, too.
+You'll need to fix the kernel test robot report here.
 
 Thanks,
 Tom
 
-> +	}
+> +		return ret;
+>   	}
 >   
->   	if (sev_es_tmr) {
->   		/*
+>   	nwrite = kernel_write(fp, sev_init_ex_buffer, NV_LENGTH, &offset);
+> @@ -261,18 +262,20 @@ static void sev_write_init_ex_file(void)
+>   		dev_err(sev->dev,
+>   			"SEV: failed to write %u bytes to non volatile memory area, ret %ld\n",
+>   			NV_LENGTH, nwrite);
+> -		return;
+> +		return -EIO;
+>   	}
+>   
+>   	dev_dbg(sev->dev, "SEV: write successful to NV file\n");
+> +
+> +	return 0;
+>   }
+>   
+> -static void sev_write_init_ex_file_if_required(int cmd_id)
+> +static int sev_write_init_ex_file_if_required(int cmd_id)
+>   {
+>   	lockdep_assert_held(&sev_cmd_mutex);
+>   
+>   	if (!sev_init_ex_buffer)
+> -		return;
+> +		return 0;
+>   
+>   	/*
+>   	 * Only a few platform commands modify the SPI/NV area, but none of the
+> @@ -287,10 +290,10 @@ static void sev_write_init_ex_file_if_required(int cmd_id)
+>   	case SEV_CMD_PEK_GEN:
+>   		break;
+>   	default:
+> -		return;
+> +		return 0;
+>   	}
+>   
+> -	sev_write_init_ex_file();
+> +	return sev_write_init_ex_file();
+>   }
+>   
+>   static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> @@ -363,7 +366,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>   			cmd, reg & PSP_CMDRESP_ERR_MASK);
+>   		ret = -EIO;
+>   	} else {
+> -		sev_write_init_ex_file_if_required(cmd);
+> +		ret = sev_write_init_ex_file_if_required(cmd);
+>   	}
+>   
+>   	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
