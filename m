@@ -2,48 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39585C25B0D
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Aug 2022 15:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C66D9C19F2A
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Aug 2022 15:54:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235773AbiHKPq1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Aug 2022 11:46:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42928 "EHLO
+        id S236932AbiHKPyL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Aug 2022 11:54:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235141AbiHKPpR (ORCPT
+        with ESMTP id S236485AbiHKPxg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Aug 2022 11:45:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62D494EE1;
-        Thu, 11 Aug 2022 08:39:32 -0700 (PDT)
+        Thu, 11 Aug 2022 11:53:36 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E2C9F1A9;
+        Thu, 11 Aug 2022 08:45:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6650D6148F;
-        Thu, 11 Aug 2022 15:39:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D742FC43143;
-        Thu, 11 Aug 2022 15:39:30 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C8B89B82123;
+        Thu, 11 Aug 2022 15:45:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2EB8C433C1;
+        Thu, 11 Aug 2022 15:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660232371;
-        bh=XlGk8IX1wN1ZNzCe5TFWky6S5v+Ns8c93X8nxKeGupM=;
+        s=k20201202; t=1660232707;
+        bh=GLdBc2h5Tcvr10jZvvlTIeKGec1FDDwOLUf9VmUKEkA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tRMyaxnj1H2R2cNQx31pgxgV/yZXCfYzCJaQ1svzDmFkIdUN0lMvm84vNz3OD7nYP
-         MNd88g/PDSiejN3rNZDXUtG8cqM2JN1mZ/X1m3xcg4agCQ1TQm0GE+hDyPKD0Q2Dfx
-         wxhou3ORCsjbVOS0x0hxoACEu772ANu9AOiRavIXTyskx8I4XHG+wy88sLA5aANdGs
-         60pTWrpLOogzGhcA8zf9PUf2w0HWqkKsmvbG/aJzgROTtFw54JZVaMok6xgrJQjLNc
-         46gMh/7LHgsyn/h6YpaX0FX2oE/2XPOiJ12eAXMOeSsaUHvUEc9alUEbuzfwx9Lx3J
-         yPykjdbICWcDw==
+        b=daIud4bv9MBiXTC65KwyM4NyIlTjV5PJ9Q15YPGqF7kgwnXanZ8fmR0ZM8p1jnNTD
+         TkgOhQSxUxc8UsMrUVmr6S+unep/QSslc4jza/j+np38evI7guwGWQukQgu9SYU9VL
+         Oz2QyXpSOyBgg1EEXmywI7sw2NUfx3Douuyq9ziUwkaX4+wSAYBcZseb+CsFL/Jc16
+         dWVyBLYupJ5B+z/TVTnckBKC6XMKlREy4CGwb0leZsWhZdG4HArVeWGkJZP/mGVzjr
+         ano2hqiRm3v2b1fnm/byVRJMWcNH6GiuesKtAd97cOoej2PTigIUORG9nJMK6Yw+z2
+         twu05E5yIs1xQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yuan Can <yuancan@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+Cc:     Shijith Thotton <sthotton@marvell.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, gilad@benyossef.com,
-        davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 072/105] crypto: ccree - Add missing clk_disable_unprepare() in cc_pm_resume()
-Date:   Thu, 11 Aug 2022 11:27:56 -0400
-Message-Id: <20220811152851.1520029-72-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, bbrezillon@kernel.org,
+        arno@natisbad.org, schalla@marvell.com, davem@davemloft.net,
+        dan.carpenter@oracle.com, keescook@chromium.org,
+        jiapeng.chong@linux.alibaba.com, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.18 21/93] crypto: octeontx2 - fix potential null pointer access
+Date:   Thu, 11 Aug 2022 11:41:15 -0400
+Message-Id: <20220811154237.1531313-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220811152851.1520029-1-sashal@kernel.org>
-References: <20220811152851.1520029-1-sashal@kernel.org>
+In-Reply-To: <20220811154237.1531313-1-sashal@kernel.org>
+References: <20220811154237.1531313-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,40 +54,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Yuan Can <yuancan@huawei.com>
+From: Shijith Thotton <sthotton@marvell.com>
 
-[ Upstream commit 30fb034361ff1b9bfc569b2d8d66b544ea3eb18f ]
+[ Upstream commit b03c0dc0788abccc7a25ef7dff5818f4123bb992 ]
 
-Add clk_disable_unprepare() on error path in cc_pm_resume().
+Added missing checks to avoid null pointer dereference.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Yuan Can <yuancan@huawei.com>
+The patch fixes below issue reported by klocwork tool:
+. Pointer 'strsep( &val, ":" )' returned from call to function 'strsep'
+  at line 1608 may be NULL and will be dereferenced at line 1608. Also
+  there are 2 similar errors on lines 1620, 1632 in otx2_cptpf_ucode.c.
+
+Signed-off-by: Shijith Thotton <sthotton@marvell.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/ccree/cc_pm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c   | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
-index d5421b0c6831..6124fbbbed94 100644
---- a/drivers/crypto/ccree/cc_pm.c
-+++ b/drivers/crypto/ccree/cc_pm.c
-@@ -41,6 +41,7 @@ static int cc_pm_resume(struct device *dev)
- 	/* wait for Cryptocell reset completion */
- 	if (!cc_wait_for_reset_completion(drvdata)) {
- 		dev_err(dev, "Cryptocell reset not completed");
-+		clk_disable_unprepare(drvdata->clk);
- 		return -EBUSY;
- 	}
- 
-@@ -48,6 +49,7 @@ static int cc_pm_resume(struct device *dev)
- 	rc = init_cc_regs(drvdata);
- 	if (rc) {
- 		dev_err(dev, "init_cc_regs (%x)\n", rc);
-+		clk_disable_unprepare(drvdata->clk);
- 		return rc;
- 	}
- 	/* check if tee fips error occurred during power down */
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+index 9cba2f714c7e..080cbfa093ec 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+@@ -1605,7 +1605,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		if (!strncasecmp(val, "se", 2) && strchr(val, ':')) {
+ 			if (has_se || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (!tmp)
++				goto err_print;
++			tmp = strim(tmp);
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
+@@ -1617,7 +1620,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		} else if (!strncasecmp(val, "ae", 2) && strchr(val, ':')) {
+ 			if (has_ae || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (!tmp)
++				goto err_print;
++			tmp = strim(tmp);
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
+@@ -1629,7 +1635,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		} else if (!strncasecmp(val, "ie", 2) && strchr(val, ':')) {
+ 			if (has_ie || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (!tmp)
++				goto err_print;
++			tmp = strim(tmp);
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
 -- 
 2.35.1
 
