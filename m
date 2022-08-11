@@ -2,47 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778ECC25B06
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Aug 2022 15:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9D7C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Aug 2022 15:41:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235994AbiHKPdY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Aug 2022 11:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46892 "EHLO
+        id S236021AbiHKPlm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 Aug 2022 11:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235678AbiHKPci (ORCPT
+        with ESMTP id S236416AbiHKPkn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Aug 2022 11:32:38 -0400
+        Thu, 11 Aug 2022 11:40:43 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633C797D56;
-        Thu, 11 Aug 2022 08:31:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE74698A74;
+        Thu, 11 Aug 2022 08:36:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id ED753B82157;
-        Thu, 11 Aug 2022 15:31:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 718F3C433D6;
-        Thu, 11 Aug 2022 15:31:28 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 36584B82157;
+        Thu, 11 Aug 2022 15:36:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA78C433C1;
+        Thu, 11 Aug 2022 15:36:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660231889;
-        bh=GLdBc2h5Tcvr10jZvvlTIeKGec1FDDwOLUf9VmUKEkA=;
+        s=k20201202; t=1660232177;
+        bh=6sRasSLSlcwEFv1YfjylIL2Tv62U0qLVFef2gp8bkIk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=D6Q7RwVRFrek82dVJEazunrTRR4RS2x3b/u+SWKZ9jmrRKhwLWLZuYH8cjezdkix+
-         e0ThnPEOHwAnQcwNzbLiSjoSriSmj0JuQTcXszoIsPTtsg+l70I2QASS4iAxhwdVkS
-         v1Fc/hK7HO3+BWiOJlh7UyIzc3uLn3DrUIXOL0EPc8KKhgakcwyFnEt/lofLYGDCDN
-         A4pESMBPHf5D2VleXgAvJBxwnG4V1WR7f75z/5MrxVk9Lq8AKLbNg6n9AbEJhb57+I
-         i7s4UJpKaJygT7xaDFomq6NJSX51mm4WiRY3rgOep1GOo0lxxkHfxQKEW2Jz7N3QqQ
-         NqyzroFhNMRLQ==
+        b=uvmXfE3yzDQ2z8xa2isrxo6r4DxPTOj3152u8+zQTqxCwRM0fPwgzocJGpeFIodzX
+         O/ZziC2Ph1FI43IhU/YambZpzDp8IFkWh/JZbtuzrRoCWRxRCFfIiPh3DAg2rqMMmc
+         J2XUtC7R6LMFtyZlp0ryigONVyZC23D7+Zwchiw9yfBrHLHx/3jls5lWdWpwo2rmVQ
+         IaifRdqZV0RS9pcupmsCw8ay39HWHz4JCuRggSg4tyLzDIlFRq1Ta5YT2K7tNcN0RA
+         NCKOgB9T2W6BL3oHQ/TLppDPlUBkuMQBtVdRAIXEMQhFnILx5V4TM9IAUXKm3Es4Sl
+         RpfYH+LzEoBBQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Shijith Thotton <sthotton@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, bbrezillon@kernel.org,
-        arno@natisbad.org, schalla@marvell.com, davem@davemloft.net,
-        dan.carpenter@oracle.com, keescook@chromium.org,
-        jiapeng.chong@linux.alibaba.com, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 022/105] crypto: octeontx2 - fix potential null pointer access
-Date:   Thu, 11 Aug 2022 11:27:06 -0400
-Message-Id: <20220811152851.1520029-22-sashal@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Breno Leitao <leitao@debian.org>,
+        Sasha Levin <sashal@kernel.org>, nayna@linux.ibm.com,
+        pfsmorigo@gmail.com, mpe@ellerman.id.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 5.19 065/105] crypto: vmx - Fix warning on p8_ghash_alg
+Date:   Thu, 11 Aug 2022 11:27:49 -0400
+Message-Id: <20220811152851.1520029-65-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220811152851.1520029-1-sashal@kernel.org>
 References: <20220811152851.1520029-1-sashal@kernel.org>
@@ -54,64 +53,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Shijith Thotton <sthotton@marvell.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit b03c0dc0788abccc7a25ef7dff5818f4123bb992 ]
+[ Upstream commit cc8166bfc829043020b5cc3b7cdba02a17d03b6d ]
 
-Added missing checks to avoid null pointer dereference.
+The compiler complains that p8_ghash_alg isn't declared which is
+because the header file aesp8-ppc.h isn't included in ghash.c.
+This patch fixes the warning.
 
-The patch fixes below issue reported by klocwork tool:
-. Pointer 'strsep( &val, ":" )' returned from call to function 'strsep'
-  at line 1608 may be NULL and will be dereferenced at line 1608. Also
-  there are 2 similar errors on lines 1620, 1632 in otx2_cptpf_ucode.c.
-
-Signed-off-by: Shijith Thotton <sthotton@marvell.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c   | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ drivers/crypto/vmx/ghash.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index 9cba2f714c7e..080cbfa093ec 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -1605,7 +1605,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
- 		if (!strncasecmp(val, "se", 2) && strchr(val, ':')) {
- 			if (has_se || ucode_idx)
- 				goto err_print;
--			tmp = strim(strsep(&val, ":"));
-+			tmp = strsep(&val, ":");
-+			if (!tmp)
-+				goto err_print;
-+			tmp = strim(tmp);
- 			if (!val)
- 				goto err_print;
- 			if (strlen(tmp) != 2)
-@@ -1617,7 +1620,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
- 		} else if (!strncasecmp(val, "ae", 2) && strchr(val, ':')) {
- 			if (has_ae || ucode_idx)
- 				goto err_print;
--			tmp = strim(strsep(&val, ":"));
-+			tmp = strsep(&val, ":");
-+			if (!tmp)
-+				goto err_print;
-+			tmp = strim(tmp);
- 			if (!val)
- 				goto err_print;
- 			if (strlen(tmp) != 2)
-@@ -1629,7 +1635,10 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
- 		} else if (!strncasecmp(val, "ie", 2) && strchr(val, ':')) {
- 			if (has_ie || ucode_idx)
- 				goto err_print;
--			tmp = strim(strsep(&val, ":"));
-+			tmp = strsep(&val, ":");
-+			if (!tmp)
-+				goto err_print;
-+			tmp = strim(tmp);
- 			if (!val)
- 				goto err_print;
- 			if (strlen(tmp) != 2)
+diff --git a/drivers/crypto/vmx/ghash.c b/drivers/crypto/vmx/ghash.c
+index 5bc5710a6de0..77eca20bc7ac 100644
+--- a/drivers/crypto/vmx/ghash.c
++++ b/drivers/crypto/vmx/ghash.c
+@@ -23,6 +23,7 @@
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/b128ops.h>
++#include "aesp8-ppc.h"
+ 
+ void gcm_init_p8(u128 htable[16], const u64 Xi[2]);
+ void gcm_gmult_p8(u64 Xi[2], const u128 htable[16]);
 -- 
 2.35.1
 
