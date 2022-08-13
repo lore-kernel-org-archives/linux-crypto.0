@@ -2,141 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F210C2BB45
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 Aug 2022 22:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EACDC19F2D
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 Aug 2022 23:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240257AbiHMWAr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 13 Aug 2022 18:00:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35068 "EHLO
+        id S239646AbiHMXGv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 13 Aug 2022 19:06:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240250AbiHMWAp (ORCPT
+        with ESMTP id S238439AbiHMXGu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 13 Aug 2022 18:00:45 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2890BF70;
-        Sat, 13 Aug 2022 15:00:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660428043; x=1691964043;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=J2stkkYmPik2bQMds1PPTKQFWYY4K6w3/+pjsawBn4I=;
-  b=czriY2QSJtsHs+0YJIn5ie4MEylQAeO1kW/kS7jZoyutko3tg5lYKLsh
-   U8uwSotSnGfPl2vJQS7mXtH4oMFazwVlS/Xc7jXjm/W0R2M8xn4DxBnHw
-   kIWTBYyV1rhIi/CUgFr62xfLVN+CqYCowKo4VrUWdTiHHWU6njZrRlHxQ
-   kaTEKulZ63EuSu4qn9pNqf4xP0sdTWK/u2NAugMb9FbtEUSj30NAXgimh
-   5qPunzQISbEjtHhAHANiwq1Jl2HcUvhbN24qdPsixdN+lNMnl7ALLrf3m
-   ZKPstDNZJppuxJNs4K8cjvcKaPPyhu1ezSatsWfsJc/83jLR0F08xO9ot
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10437"; a="293049446"
-X-IronPort-AV: E=Sophos;i="5.93,236,1654585200"; 
-   d="scan'208";a="293049446"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2022 15:00:42 -0700
-X-IronPort-AV: E=Sophos;i="5.93,236,1654585200"; 
-   d="scan'208";a="635047705"
-Received: from tsaiyinl-mobl1.amr.corp.intel.com (HELO localhost) ([10.209.125.19])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2022 15:00:40 -0700
-From:   ira.weiny@intel.com
-To:     Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>
-Cc:     Ira Weiny <ira.weiny@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Fabio M . De Francesco" <fmdefrancesco@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, x86@kernel.org,
-        linux-xtensa@linux-xtensa.org, keyrings@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        dri-devel@lists.freedesktop.org, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net, iommu@lists.linux.dev,
-        bpf@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] checkpatch: Add kmap and kmap_atomic to the deprecated list
-Date:   Sat, 13 Aug 2022 15:00:34 -0700
-Message-Id: <20220813220034.806698-1-ira.weiny@intel.com>
-X-Mailer: git-send-email 2.35.3
+        Sat, 13 Aug 2022 19:06:50 -0400
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407A78284F
+        for <linux-crypto@vger.kernel.org>; Sat, 13 Aug 2022 16:06:49 -0700 (PDT)
+Received: from pps.filterd (m0134421.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27DMvvbM014112;
+        Sat, 13 Aug 2022 23:05:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pps0720;
+ bh=2y/+QjsbwZnDSI3U6kv+3YmFpybKucr3hBm4+M8u7aw=;
+ b=Na+K7Oq7hJ5zGFVg8xzw33lbYZZVXcnKf69/q8Y3KcxwlZsKdFd3zMljfJA3nCLuXfZy
+ KfvAI35VZgkXn4oal2yug3zwPO/XX96oMhu5510VxeLv8W0y68/jqlKlejI4g3fKcou9
+ NaMiJW9S3IgdSu0YahGrorvj2QK6NHU0FIAFB8bdmQ/6aY4WapqdW2Xgtb4Yx0IoUhcp
+ 9a5zhPjsnIpBFyRwwXTcdAH6Yn5vZ/kD2QFEvHm9Dbk6jzFJ0JUiS+UB1oBNRqiDqG7X
+ BKyZR7pjStkTup0uG3lHgqeTLjuDd0tWSSXnRSIYXnnXCARnXIewLH5uKTGBv/DlC1lI /w== 
+Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hx3vfmd9k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 13 Aug 2022 23:05:20 +0000
+Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id D31C9132DE;
+        Sat, 13 Aug 2022 23:05:19 +0000 (UTC)
+Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 1D6C38041D1;
+        Sat, 13 Aug 2022 23:05:17 +0000 (UTC)
+From:   Robert Elliott <elliott@hpe.com>
+To:     tim.c.chen@linux.intel.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, toshi.kani@hpe.com, rwright@hpe.com
+Cc:     Robert Elliott <elliott@hpe.com>
+Subject: [PATCH] crypto: x86/sha512 - load based on CPU features
+Date:   Sat, 13 Aug 2022 18:04:31 -0500
+Message-Id: <20220813230431.2666-1-elliott@hpe.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: phYctUuUBvkym5Ne6LbuRZoJbIH4t842
+X-Proofpoint-ORIG-GUID: phYctUuUBvkym5Ne6LbuRZoJbIH4t842
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-13_11,2022-08-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ spamscore=0 clxscore=1011 malwarescore=0 mlxscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208130095
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ira Weiny <ira.weiny@intel.com>
+x86 optimized crypto modules built as modules rather than built-in
+to the kernel end up as .ko files in the filesystem, e.g., in
+/usr/lib/modules. If the filesystem itself is a module, these might
+not be available when the crypto API is initialized, resulting in
+the generic implementation being used (e.g., sha512_transform rather
+than sha512_transform_avx2).
 
-kmap() and kmap_atomic() are being deprecated in favor of
-kmap_local_page().
+In one test case, CPU utilization in the sha512 function dropped
+from 15.34% to 7.18% after forcing loading of the optimized module.
 
-There are two main problems with kmap(): (1) It comes with an overhead
-as mapping space is restricted and protected by a global lock for
-synchronization and (2) it also requires global TLB invalidation when
-the kmap’s pool wraps and it might block when the mapping space is fully
-utilized until a slot becomes available.
+Add module aliases for this x86 optimized crypto module based on CPU
+feature bits so udev gets a chance to load them later in the boot
+process when the filesystems are all running.
 
-kmap_local_page() is safe from any context and is therefore redundant
-with kmap_atomic() with the exception of any pagefault or preemption
-disable requirements.  However, using kmap_atomic() for these side
-effects makes the code less clear.  So any requirement for pagefault or
-preemption disable should be made explicitly.
-
-With kmap_local_page() the mappings are per thread, CPU local, can take
-page faults, and can be called from any context (including interrupts).
-It is faster than kmap() in kernels with HIGHMEM enabled. Furthermore,
-the tasks can be preempted and, when they are scheduled to run again,
-the kernel virtual addresses are restored.
-
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Suggested-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
-Signed-off-by: Ira Weiny <ira.weiny@intel.com>
-
+Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
-Suggested by credits.
-	Thomas: Idea to keep from growing more kmap/kmap_atomic calls.
-	Fabio: Stole some of his boiler plate commit message.
+ arch/x86/crypto/sha512_ssse3_glue.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Notes on tree-wide conversions:
-
-I've cc'ed mailing lists for subsystems which currently contains either kmap()
-or kmap_atomic() calls.  As some of you already know Fabio and I have been
-working through converting kmap() calls to kmap_local_page().  But there is a
-lot more work to be done.  Help from the community is always welcome,
-especially with kmap_atomic() conversions.  To keep from stepping on each
-others toes I've created a spreadsheet of the current calls[1].  Please let me
-or Fabio know if you plan on tacking one of the conversions so we can mark it
-off the list.
-
-[1] https://docs.google.com/spreadsheets/d/1i_ckZ10p90bH_CkxD2bYNi05S2Qz84E2OFPv8zq__0w/edit#gid=1679714357
-
----
- scripts/checkpatch.pl | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 79e759aac543..9ff219e0a9d5 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -807,6 +807,8 @@ our %deprecated_apis = (
- 	"rcu_barrier_sched"			=> "rcu_barrier",
- 	"get_state_synchronize_sched"		=> "get_state_synchronize_rcu",
- 	"cond_synchronize_sched"		=> "cond_synchronize_rcu",
-+	"kmap"					=> "kmap_local_page",
-+	"kmap_atomic"				=> "kmap_local_page",
- );
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index 30e70f4fe2f7..6d3b85e53d0e 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -36,6 +36,7 @@
+ #include <linux/types.h>
+ #include <crypto/sha2.h>
+ #include <crypto/sha512_base.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
  
- #Create a search pattern for all these strings to speed up a loop below
-
-base-commit: 4a9350597aff50bbd0f4b80ccf49d2e02d1111f5
+ asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
+@@ -284,6 +285,13 @@ static int register_sha512_avx2(void)
+ 			ARRAY_SIZE(sha512_avx2_algs));
+ 	return 0;
+ }
++static const struct x86_cpu_id module_cpu_ids[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
+ 
+ static void unregister_sha512_avx2(void)
+ {
+@@ -294,6 +302,8 @@ static void unregister_sha512_avx2(void)
+ 
+ static int __init sha512_ssse3_mod_init(void)
+ {
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
+ 
+ 	if (register_sha512_ssse3())
+ 		goto fail;
 -- 
-2.35.3
+2.37.1
 
