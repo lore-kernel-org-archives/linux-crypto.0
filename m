@@ -2,104 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C89C25B06
-	for <linux-crypto@archiver.kernel.org>; Sun, 14 Aug 2022 10:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42251C25B06
+	for <linux-crypto@archiver.kernel.org>; Sun, 14 Aug 2022 13:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230344AbiHNKN5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 14 Aug 2022 06:13:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42850 "EHLO
+        id S238739AbiHNNCP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 14 Aug 2022 09:02:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbiHNKN4 (ORCPT
+        with ESMTP id S231613AbiHNNCK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 Aug 2022 06:13:56 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55570201B9;
-        Sun, 14 Aug 2022 03:13:55 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id z20so6330437edb.9;
-        Sun, 14 Aug 2022 03:13:55 -0700 (PDT)
+        Sun, 14 Aug 2022 09:02:10 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E362DB496;
+        Sun, 14 Aug 2022 06:02:09 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so4736337pjf.2;
+        Sun, 14 Aug 2022 06:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=s2xCRCS5m4i4+EfBqMdOEQInaq/ShuXp1FW8bVckG40=;
-        b=WAX9jpeTuNWjlK8hqNNxEsbMZ7M3aD+MgDj/BVKuUiGwTEAG17A1knJU8BBwA4hJLI
-         /HAobNHHkFzxsZDlBjIj+o+3o/+6iXtKmwc4xnaXjaDOY912JF8twRccony2QhKgvpfW
-         TcyGggtlXvNwPPIoSkb9Lt9CIi6oNAHS3KlNenppEF7SnhcoEnZBDDQhFLgLWXfvP3At
-         Yl4REhB2gt4ghQ67RDOKrPaGLyt+LOAcuXAsF+P+cbJo7vI3lVKl9iu7p857sQEhgSZn
-         PfRVlFm+SkktqecyYSYVmEej1B8TBwHPv0SHJjpB3R9xoBcQMFRfxWnOlbgMhqYakwnF
-         dnmg==
+        h=message-id:date:subject:cc:to:from:from:to:cc;
+        bh=ALtpbVvXUPxMNMedagoUCg7KNZgTd9ARYDAZ+N1wtts=;
+        b=SCTv+sEDkCe4SCFoxoGASblFTl84qe2+qDfQ9jX2m0/BI0XcFVw0kS5Rltf1jEH7SP
+         NZSgXHHOn8omzrWM8VN0HeQIxewrAUMM9asG0XWBXOb6lJHU3FvqelMteLO4DrFADWUU
+         ArvHQWq4mmMDhiFwpBkp9m6bT+hmI0HtkQx3H+vlcnxr92KapL/LIc41hZIHVEuicEj8
+         0LJS6Ujai7KxloRpE02cYubzFqEfKdY9sxp+d961namo7KAClxJUk4ZLwCXI+83Fy5SK
+         TfEv9qCJJk4PsQgEc3mJ02YcYYvimbqO/JyxK/qrkeZtMzqASAN0UG3/CbQxGb/ZyQmC
+         HSAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=s2xCRCS5m4i4+EfBqMdOEQInaq/ShuXp1FW8bVckG40=;
-        b=16NthCSxW38YvtEGA0uNUXkwGw7KtGPUco96D3YsHI27lEM8b+WdrEyyYTiS2ZnttH
-         Cak7uRChjEtu8oAalGGwICqh7SWGg0kkWaAraYuc7pMMzTGfImR3/NHHgfP+Bq6EBnjp
-         iT/2LuYcpyPr+JtQj8CXbtLw+NfbJiC7z0eZ4sW08IRelUd61a1QxFXiRxCD0xr3fe1Z
-         4+RgA8SkMh4ZBoPMkbeTvQOnYL+RvjIQ/a5uw4BTLmJb0L/lpMdO9RG+yDdb6x4AXaLA
-         U+KNNTFEk1HpFprcqeiKBpa7fe+UbB2Y7n3I5nM367tLUYAQoI0B0lnXN6QvMDKn6EUK
-         NEXQ==
-X-Gm-Message-State: ACgBeo0MYfCN2IF9EOcnRL4LifFLCwX6VlBT2HtW+POp15iA9n2a0iy3
-        c55yIGLg35H+lTyKGeSBdzzl3G6p854M6w==
-X-Google-Smtp-Source: AA6agR42k51Lq8Yp/MP5cdbyrsfugOi+nLPScpkpXy8R/epCeq6yMXoPKsS9t/LJLtkE6kyFkTmLCQ==
-X-Received: by 2002:a05:6402:331f:b0:43d:931c:6945 with SMTP id e31-20020a056402331f00b0043d931c6945mr10280751eda.199.1660472033733;
-        Sun, 14 Aug 2022 03:13:53 -0700 (PDT)
-Received: from jernej-laptop.localnet (89-212-118-115.static.t-2.net. [89.212.118.115])
-        by smtp.gmail.com with ESMTPSA id c18-20020a056402121200b0043cc2c9f5adsm4496602edw.40.2022.08.14.03.13.52
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=ALtpbVvXUPxMNMedagoUCg7KNZgTd9ARYDAZ+N1wtts=;
+        b=ltokvWvOBbUxhJTJGnXodz5nRhC7lr+XlE7YmDjrSBugn6NuDP4EzWDTLeDUFadbQP
+         n8wcxF445nqyN7GW+fng83oSO69ssz6L4Co9gaBoqZvcKjF6XpH1WX7Q2yfvQTdo5p4V
+         Tn4440QrhOd1k8ZkQxnqQ5r/gYOqk4TQR7Fp1R4KVlgFZ+j5G8nJZYJWrZSYXyF+G7FI
+         ZAlJZsG2BSDsFMvYjpxaEoiSTf4bAs4/M+l92bRLxDE7AFK6i3iBepLYEvE6RwcgXsDU
+         mtoRvBt0QbRZpUshA8jrF6v59WD3R512KdyPr7pbSfMZ1eRgaNIXFDX8kC776XHe24+U
+         RPlg==
+X-Gm-Message-State: ACgBeo3IqKlfBqf0OW0y6dfS+aDuiU/OqiM2cbQltqdDEvTU8Spkv90O
+        c7JJMLdRxBnFyl55x2ogOi4=
+X-Google-Smtp-Source: AA6agR63n8XDi0DcZnX/nrYDD9eWBT4WDBiK7bUOWMb5ovqe+0pTAjrhL9VqUPsONtbDEcgzaHJ4pA==
+X-Received: by 2002:a17:903:41c4:b0:16d:cb15:290f with SMTP id u4-20020a17090341c400b0016dcb15290fmr11975573ple.47.1660482129385;
+        Sun, 14 Aug 2022 06:02:09 -0700 (PDT)
+Received: from localhost.localdomain ([182.160.5.243])
+        by smtp.gmail.com with ESMTPSA id a5-20020a17090a70c500b001f23db09351sm3028152pjm.46.2022.08.14.06.02.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Aug 2022 03:13:53 -0700 (PDT)
-From:   Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To:     linux-kernel@vger.kernel.org, cgel.zte@gmail.com
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-sunxi@lists.linux.dev, ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: Re: [PATCH linux-next] crypto: sun8i-ce:using the pm_runtime_resume_and_get  to simplify the code
-Date:   Sun, 14 Aug 2022 12:13:52 +0200
-Message-ID: <8140378.NyiUUSuA9g@jernej-laptop>
-In-Reply-To: <20220802074820.1648786-1-ye.xingchen@zte.com.cn>
-References: <20220802074820.1648786-1-ye.xingchen@zte.com.cn>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+        Sun, 14 Aug 2022 06:02:09 -0700 (PDT)
+From:   Tuo Cao <91tuocao@gmail.com>
+To:     jesper.nilsson@axis.com, lars.persson@axis.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-arm-kernel@axis.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, 91tuocao@gmail.com
+Subject: [PATCH] crypto: axis: artpec6_crypto: move spin_lock_bh to spin_lock in tasklet
+Date:   Sun, 14 Aug 2022 21:00:54 +0800
+Message-Id: <20220814130054.6444-1-91tuocao@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dne torek, 02. avgust 2022 ob 09:48:20 CEST je cgel.zte@gmail.com napisal(a):
-> From: ye xingchen <ye.xingchen@zte.com.cn>
-> 
-> Using pm_runtime_resume_and_get() to instade of  pm_runtime_get_sync
-> and pm_runtime_put_noidle.
-> 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
-> ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c index
-> 19cd2e52f89d..ef9cfc61af32 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> @@ -54,9 +54,8 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void
-> *data, size_t max, bool wa goto err_dst;
->  	}
-> 
-> -	err = pm_runtime_get_sync(ce->dev);
-> +	err = pm_runtime_resume_and_get(ce->dev);
->  	if (err < 0) {
-> -		pm_runtime_put_noidle(ce->dev);
->  		goto err_pm;
->  	}
+it is unnecessary to call spin_lock_bh in a tasklet.
 
-You should also remove braces, since there is only one line left.
+Signed-off-by: Tuo Cao <91tuocao@gmail.com>
+---
+ drivers/crypto/axis/artpec6_crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-With that fixed:
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
-
-Best regards,
-Jernej
-
-
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index 9ad188cffd0d..b4820594ab80 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -2091,7 +2091,7 @@ static void artpec6_crypto_task(unsigned long data)
+ 		return;
+ 	}
+ 
+-	spin_lock_bh(&ac->queue_lock);
++	spin_lock(&ac->queue_lock);
+ 
+ 	list_for_each_entry_safe(req, n, &ac->pending, list) {
+ 		struct artpec6_crypto_dma_descriptors *dma = req->dma;
+@@ -2128,7 +2128,7 @@ static void artpec6_crypto_task(unsigned long data)
+ 
+ 	artpec6_crypto_process_queue(ac, &complete_in_progress);
+ 
+-	spin_unlock_bh(&ac->queue_lock);
++	spin_unlock(&ac->queue_lock);
+ 
+ 	/* Perform the completion callbacks without holding the queue lock
+ 	 * to allow new request submissions from the callbacks.
+-- 
+2.17.1
 
