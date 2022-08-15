@@ -2,56 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D64B9C25B0E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 20:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F7AC282E7
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 20:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232333AbiHOUhI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Aug 2022 16:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50208 "EHLO
+        id S1345250AbiHOUhJ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Aug 2022 16:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344432AbiHOUfS (ORCPT
+        with ESMTP id S1346074AbiHOUfX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Aug 2022 16:35:18 -0400
+        Mon, 15 Aug 2022 16:35:23 -0400
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3182A73A;
-        Mon, 15 Aug 2022 12:06:26 -0700 (PDT)
-Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27FIoMh9018977;
-        Mon, 15 Aug 2022 19:06:22 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4204E63C;
+        Mon, 15 Aug 2022 12:06:29 -0700 (PDT)
+Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27FHdIEC029923;
+        Mon, 15 Aug 2022 19:06:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
  : mime-version; s=pps0720;
- bh=Iuxo2ne31HiW7Rg0v8Ej/FidItYg8f+vFmxa8hRVvfE=;
- b=WfSLjPkI/Avdc59M4Ab1Wybh25WfuivLT3w/Kd/AiavmKbhISJIsSONAAImEQpJZqcAZ
- iGf1IUJuHDApT3t+AqaUePWvgfs30Il2gWRBMKpKrBP+IvXWMkU5F+Rk5GujuaCx/RL4
- hLb62A1PoO44jdRzssfCNWWJv3zI3PjFrhEpuQ8hdMj5V3YXq+OOG2KGCSBBEozp85qU
- eDtUeotthI6cIS/IxneLM3DaXScAMQeb7HbBpj7paJQGcw5gyN93oBydrcJ716RlEwcJ
- YhLzcyzxtKetxvGZqROgJeoi9wK3rwMFi61ZQRGXvln0tUE+WFUQEzSc3BX7KWijiSr+ bQ== 
+ bh=d/d9/0ddOCMUWXxWz5xMR0gFJpcAOm6VSQ7E3ZdRtY0=;
+ b=Oj5SYJQodAa6nQPbVjIbqYiPCCo+2BPJHF39ayBq1Vi6nIRiPt7crhKegzQ5XTV+jM7I
+ MRjqqlbRtUc1ansKyJRYT5xNzFbalxOMZY0GW5SIkqg5jbgUwdZnay1+7QOFYEuWmRck
+ EEzli7NbrVSUVFF11Yk65ziFntNytKcFcL6/BUgMcQzAPWps9F9ly3kGjqhlg8t8EvLL
+ 17g99lelRaW0GPekvaJADqhskAZZdLiQvVXj0p0OlLvOfWCl7qMkfFfc8GdPyC1xmqa3
+ 2QEPSn7cYfF0AdDwKWn55cszXDnRQZQB9fDZq7X68goGdbE+c0OzU/ZL6+YsTino/KIv JQ== 
 Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hyus1842s-1
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hyt4j12gq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Aug 2022 19:06:22 +0000
+        Mon, 15 Aug 2022 19:06:25 +0000
 Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 75477804CB9;
-        Mon, 15 Aug 2022 19:06:21 +0000 (UTC)
+        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 8FE25804CBF;
+        Mon, 15 Aug 2022 19:06:24 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 313DD803299;
-        Mon, 15 Aug 2022 19:06:21 +0000 (UTC)
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 451BF80940A;
+        Mon, 15 Aug 2022 19:06:24 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     toshi.kani@hpe.com, Robert Elliott <elliott@hpe.com>
-Subject: [PATCH 4/8] crypto: Kconfig - simplify AEAD and block mode entries
-Date:   Mon, 15 Aug 2022 14:06:04 -0500
-Message-Id: <20220815190608.47182-5-elliott@hpe.com>
+Subject: [PATCH 7/8] crypto: Kconfig - sort the digests
+Date:   Mon, 15 Aug 2022 14:06:07 -0500
+Message-Id: <20220815190608.47182-8-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220815190608.47182-1-elliott@hpe.com>
 References: <20220815190608.47182-1-elliott@hpe.com>
-X-Proofpoint-ORIG-GUID: iC-CXEQD6YDHaaxkV9PF2TRMe8NyW-Lu
-X-Proofpoint-GUID: iC-CXEQD6YDHaaxkV9PF2TRMe8NyW-Lu
+X-Proofpoint-GUID: BtJhCOfEhCs_Z919nYlXKSWZCTD6UxYO
+X-Proofpoint-ORIG-GUID: BtJhCOfEhCs_Z919nYlXKSWZCTD6UxYO
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -59,313 +60,408 @@ X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-15_08,2022-08-15_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0
- phishscore=0 impostorscore=0 mlxscore=0 spamscore=0 mlxlogscore=493
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2207270000 definitions=main-2208150072
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Shorten menu titles and help text and make them consistent:
-* acronym
-* name
-* architecture and architecture features in parenthesis
-* no suffixes like "<something> algorithm", "support", or
-"hardware acceleration", or "optimized"
-
-Clarify architecture restrictions (e.g., include x86 in the names of
-all the x86-optimized modules.
-
-Simplify descriptions, update references, and ensure that https
-references are still valid.
+Sort the entries in Digests by their displayed names.
+In particular, keep the optimized CPU implementations next to the
+generic implementations.
 
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- crypto/Kconfig | 133 +++++++++++++++++++++++++++----------------------
- 1 file changed, 74 insertions(+), 59 deletions(-)
+ crypto/Kconfig | 299 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 149 insertions(+), 150 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 045ef2a92449..703c91e8e7a0 100644
+index 0116729ea369..f5cfb73e2423 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -198,7 +198,8 @@ menu "Crypto core or helper"
- 	select CRYPTO_NULL
- 	help
- 	  Authenc: Combined mode wrapper for IPsec.
--	  This is required for IPSec.
-+
-+	  This is required for IPSec ESP (XFRM_ESP).
+@@ -632,6 +632,58 @@ menu "Hash modes"
  
- config CRYPTO_TEST
- 	tristate "Testing module"
-@@ -319,57 +320,65 @@ menu "Public-key cryptography"
- menu "AEAD (Authenticated Encryption with Associated Data) ciphers"
+ menu "Digests"
  
- config CRYPTO_CCM
--	tristate "CCM support"
-+	tristate "CCM (Counter with Cipher Block Chaining-Message Authentication Code)"
- 	select CRYPTO_CTR
- 	select CRYPTO_HASH
- 	select CRYPTO_AEAD
- 	select CRYPTO_MANAGER
- 	help
--	  Support for Counter with CBC MAC. Required for IPsec.
-+	  CCM (Counter with Cipher Block Chaining-Message Authentication Code)
-+	  authenticated encryption mode (NIST SP800-38C)
- 
- config CRYPTO_GCM
--	tristate "GCM/GMAC support"
-+	tristate "GCM (Galois/Counter Mode) and GMAC (GCM Message Authentication Code)"
- 	select CRYPTO_CTR
- 	select CRYPTO_AEAD
- 	select CRYPTO_GHASH
- 	select CRYPTO_NULL
- 	select CRYPTO_MANAGER
- 	help
--	  Support for Galois/Counter Mode (GCM) and Galois Message
--	  Authentication Code (GMAC). Required for IPSec.
-+	  GCM (Galois/Counter Mode) authenticated encryption mode and GMAC
-+	  (GCM Message Authentication Code) (NIST SP800-38D)
-+
-+	  This is required for IPSec ESP (XFRM_ESP).
- 
- config CRYPTO_CHACHA20POLY1305
--	tristate "ChaCha20-Poly1305 AEAD support"
-+	tristate "ChaCha20-Poly1305"
- 	select CRYPTO_CHACHA20
- 	select CRYPTO_POLY1305
- 	select CRYPTO_AEAD
- 	select CRYPTO_MANAGER
- 	help
--	  ChaCha20-Poly1305 AEAD support, RFC7539.
--
--	  Support for the AEAD wrapper using the ChaCha20 stream cipher combined
--	  with the Poly1305 authenticator. It is defined in RFC7539 for use in
--	  IETF protocols.
-+	  ChaCha20 stream cipher and Poly1305 authenticator combined
-+	  mode (RFC8439)
- 
- config CRYPTO_AEGIS128
--	tristate "AEGIS-128 AEAD algorithm"
-+	tristate "AEGIS-128"
- 	select CRYPTO_AEAD
- 	select CRYPTO_AES  # for AES S-box tables
- 	help
--	 Support for the AEGIS-128 dedicated AEAD algorithm.
-+	  AEGIS-128 AEAD algorithm
- 
- config CRYPTO_AEGIS128_SIMD
--	bool "Support SIMD acceleration for AEGIS-128"
-+	bool "AEGIS-128 (arm SIMD acceleration)"
- 	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
- 	default y
++config CRYPTO_BLAKE2B
++	tristate "BLAKE2b"
++	select CRYPTO_HASH
 +	help
-+	  AEGIS-128 AEAD algorithm
++	  BLAKE2b cryptographic hash function (RFC 7693)
 +
-+	  Architecture: arm using the Neon SIMD architecture extension
- 
- config CRYPTO_AEGIS128_AESNI_SSE2
--	tristate "AEGIS-128 AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
-+	tristate "AEGIS-128 (x86_64 with AES-NI/SSE2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_AEAD
- 	select CRYPTO_SIMD
- 	help
--	 AESNI+SSE2 implementation of the AEGIS-128 dedicated AEAD algorithm.
-+	  AEGIS-128 AEAD algorithm
++	  BLAKE2b is optimized for 64-bit platforms and can produce digests
++	  of any size between 1 and 64 bytes. The keyed hash is also implemented.
++
++	  This module provides the following algorithms:
++	  - blake2b-160
++	  - blake2b-256
++	  - blake2b-384
++	  - blake2b-512
++
++	  See https://blake2.net for further information.
++
++	  Used by the btrfs filesystem.
++
++config CRYPTO_BLAKE2S
++	tristate "BLAKE2s"
++	select CRYPTO_LIB_BLAKE2S_GENERIC
++	select CRYPTO_HASH
++	help
++	  BLAKE2s cryptographic hash function (RFC 7693)
++
++	  BLAKE2s is optimized for 8 to 32-bit platforms and can produce
++	  digests of any size between 1 and 32 bytes. The keyed hash is
++	  also implemented.
++
++	  This module provides the following algorithms:
++	  - blake2s-128
++	  - blake2s-160
++	  - blake2s-224
++	  - blake2s-256
++
++	  Used by Wireguard.
++
++	  See https://blake2.net for further information.
++
++config CRYPTO_BLAKE2S_X86
++	tristate "BLAKE2s (x86_64 with SSSE3/AVX-512)"
++	depends on X86 && 64BIT
++	select CRYPTO_LIB_BLAKE2S_GENERIC
++	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
++	help
++	  BLAKE2s cryptographic hash function (RFC 7693)
 +
 +	  Architecture: x86_64 using:
-+	  * AES-NI (AES New Instructions)
-+	  * SSE2 (Streaming SIMD Extensions 2)
- 
- config CRYPTO_SEQIV
- 	tristate "Sequence Number IV Generator"
-@@ -380,7 +389,9 @@ menu "AEAD (Authenticated Encryption with Associated Data) ciphers"
- 	select CRYPTO_MANAGER
- 	help
- 	  This IV generator generates an IV based on a sequence number by
--	  xoring it with a salt.  This algorithm is mainly useful for CTR
-+	  xoring it with a salt.  This algorithm is mainly useful for CTR.
++	  * SSSE3 (Supplemental SSE3)
++	  * AVX-512 (Advanced Vector Extensions-512)
 +
-+	  This is required for IPsec ESP (XFRM_ESP).
+ config CRYPTO_CRC32C
+ 	tristate "CRC32c"
+ 	select CRYPTO_HASH
+@@ -726,69 +778,6 @@ menu "Digests"
  
- config CRYPTO_ECHAINIV
- 	tristate "Encrypted Chain IV Generator"
-@@ -400,72 +411,69 @@ menu "AEAD (Authenticated Encryption with Associated Data) ciphers"
- menu "Block modes"
+ 	  It is available with IBM z13 or later.
  
- config CRYPTO_CBC
--	tristate "CBC support"
-+	tristate "CBC (Cipher Block Chaining)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  CBC: Cipher Block Chaining mode
--	  This block cipher algorithm is required for IPSec.
-+	  CBC (Cipher Block Chaining) mode (NIST SP800-38A)
-+
-+	  This block cipher mode is required for IPSec ESP (XFRM_ESP).
- 
- config CRYPTO_CFB
--	tristate "CFB support"
-+	tristate "CFB (Cipher Feedback)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  CFB: Cipher FeedBack mode
--	  This block cipher algorithm is required for TPM2 Cryptography.
-+	  CFB (Cipher Feedback) mode (NIST SP800-38A)
-+
-+	  This block cipher mode is required for TPM2 Cryptography.
- 
- config CRYPTO_CTR
--	tristate "CTR support"
-+	tristate "CTR (Counter)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  CTR: Counter mode
--	  This block cipher algorithm is required for IPSec.
-+	  CTR (Counter) mode (NIST SP800-38A)
- 
- config CRYPTO_CTS
--	tristate "CTS support"
-+	tristate "CTS (Cipher Text Stealing)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  CTS: Cipher Text Stealing
--	  This is the Cipher Text Stealing mode as described by
--	  Section 8 of rfc2040 and referenced by rfc3962
--	  (rfc3962 includes errata information in its Appendix A) or
--	  CBC-CS3 as defined by NIST in Sp800-38A addendum from Oct 2010.
-+	  CBC-CS3 variant of CTS (Cipher Text Stealing) (NIST
-+	  Addendum to SP800-38A (October 2010))
-+
- 	  This mode is required for Kerberos gss mechanism support
- 	  for AES encryption.
- 
--	  See: https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
+-config CRYPTO_XXHASH
+-	tristate "xxHash"
+-	select CRYPTO_HASH
+-	select XXHASH
+-	help
+-	  xxHash non-cryptographic hash algorithm
 -
- config CRYPTO_ECB
--	tristate "ECB support"
-+	tristate "ECB (Electronic Codebook)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  ECB: Electronic CodeBook mode
--	  This is the simplest block cipher algorithm.  It simply encrypts
--	  the input block by block.
-+	  ECB (Electronic Codebook) mode (NIST SP800-38A)
+-	  Extremely fast, working at speeds close to RAM limits.
+-
+-	  Used by the btrfs filesystem.
+-
+-config CRYPTO_BLAKE2B
+-	tristate "BLAKE2b"
+-	select CRYPTO_HASH
+-	help
+-	  BLAKE2b cryptographic hash function (RFC 7693)
+-
+-	  BLAKE2b is optimized for 64-bit platforms and can produce digests
+-	  of any size between 1 and 64 bytes. The keyed hash is also implemented.
+-
+-	  This module provides the following algorithms:
+-	  - blake2b-160
+-	  - blake2b-256
+-	  - blake2b-384
+-	  - blake2b-512
+-
+-	  See https://blake2.net for further information.
+-
+-	  Used by the btrfs filesystem.
+-
+-config CRYPTO_BLAKE2S
+-	tristate "BLAKE2s"
+-	select CRYPTO_LIB_BLAKE2S_GENERIC
+-	select CRYPTO_HASH
+-	help
+-	  BLAKE2s cryptographic hash function (RFC 7693)
+-
+-	  BLAKE2s is optimized for 8 to 32-bit platforms and can produce
+-	  digests of any size between 1 and 32 bytes. The keyed hash is
+-	  also implemented.
+-
+-	  This module provides the following algorithms:
+-	  - blake2s-128
+-	  - blake2s-160
+-	  - blake2s-224
+-	  - blake2s-256
+-
+-	  Used by Wireguard.
+-
+-	  See https://blake2.net for further information.
+-
+-config CRYPTO_BLAKE2S_X86
+-	tristate "BLAKE2s (x86_64 with SSSE3/AVX-512)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_LIB_BLAKE2S_GENERIC
+-	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+-	help
+-	  BLAKE2s cryptographic hash function (RFC 7693)
+-
+-	  Architecture: x86_64 using:
+-	  * SSSE3 (Supplemental SSE3)
+-	  * AVX-512 (Advanced Vector Extensions-512)
+-
+ config CRYPTO_CRCT10DIF
+ 	tristate "CRCT10DIF"
+ 	select CRYPTO_HASH
+@@ -819,6 +808,14 @@ menu "Digests"
+ 	  Architecture: powerpc64 using AltiVec extensions
+ 	  Enable on POWER8 and newer processors for improved performance.
  
- config CRYPTO_LRW
--	tristate "LRW support"
-+	tristate "LRW (Liskov Rivest Wagner)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
++config CRYPTO_VPMSUM_TESTER
++	tristate "CRC32C and CRC32T10DIF vpmsum hardware acceleration tester (powerpc64)"
++	depends on CRYPTO_CRCT10DIF_VPMSUM && CRYPTO_CRC32C_VPMSUM
++	help
++	  Stress test for CRC32c and CRCT10DIF algorithms implemented with
++	  powerpc64 AltiVec extensions (POWER8 vpmsum instructions).
++	  Unless you are testing these algorithms, you don't need this.
++
+ config CRYPTO_CRC64_ROCKSOFT
+ 	tristate "CRC64 based on the Rocksoft Model CRC Algorithm"
+ 	depends on CRC64
+@@ -830,14 +827,6 @@ menu "Digests"
+ 
+ 	  See https://zlib.net/crc_v3.txt
+ 
+-config CRYPTO_VPMSUM_TESTER
+-	tristate "CRC32C and CRC32T10DIF vpmsum hardware acceleration tester (powerpc64)"
+-	depends on CRYPTO_CRCT10DIF_VPMSUM && CRYPTO_CRC32C_VPMSUM
+-	help
+-	  Stress test for CRC32c and CRCT10DIF algorithms implemented with
+-	  powerpc64 AltiVec extensions (POWER8 vpmsum instructions).
+-	  Unless you are testing these algorithms, you don't need this.
+-
+ config CRYPTO_GHASH
+ 	tristate "GHASH"
  	select CRYPTO_GF128MUL
- 	select CRYPTO_ECB
+@@ -845,37 +834,26 @@ menu "Digests"
  	help
--	  LRW: Liskov Rivest Wagner, a tweakable, non malleable, non movable
-+	  LRW (Liskov Rivest Wagner) mode, a tweakable, non malleable, non movable
- 	  narrow block cipher mode for dm-crypt.  Use it with cipher
- 	  specification string aes-lrw-benbi, the key must be 256, 320 or 384.
- 	  The first 128, 192 or 256 bits in the key are used for AES and the
- 	  rest is used to tie each cipher block to its logical position.
+ 	  GCM GHASH function (NIST SP800-38D)
  
- config CRYPTO_OFB
--	tristate "OFB support"
-+	tristate "OFB (Output Feedback)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  OFB: the Output Feedback mode makes a block cipher into a synchronous
-+	  OFB (Output Feedback) mode (NIST SP800-38A)
-+
-+	  This mode makes a block cipher into a synchronous
- 	  stream cipher. It generates keystream blocks, which are then XORed
- 	  with the plaintext blocks to get the ciphertext. Flipping a bit in the
- 	  ciphertext produces a flipped bit in the plaintext at the same
-@@ -473,30 +481,33 @@ menu "Block modes"
- 	  normally even when applied before encryption.
- 
- config CRYPTO_PCBC
--	tristate "PCBC support"
-+	tristate "PCBC (Propagating Cipher Block Chaining)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  PCBC: Propagating Cipher Block Chaining mode
-+	  PCBC (Propagating Cipher Block Chaining) mode
- 	  This block cipher algorithm is required for RxRPC.
- 
- config CRYPTO_XTS
--	tristate "XTS support"
-+	tristate "XTS (XOR Encrypt XOR with ciphertext stealing)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	select CRYPTO_ECB
- 	help
--	  XTS: IEEE1619/D16 narrow block cipher use with aes-xts-plain,
--	  key size 256, 384 or 512 bits. This implementation currently
--	  can't handle a sectorsize which is not a multiple of 16 bytes.
-+	  XTS (XOR Encrypt XOR with ciphertext stealing) mode (NIST SP800-38E
-+	  and IEEE 1619)
-+
-+	  Use with aes-xts-plain, key size 256, 384 or 512 bits. This
-+	  implementation currently can't handle a sectorsize which is not a
-+	  multiple of 16 bytes.
- 
- config CRYPTO_KEYWRAP
--	tristate "Key wrapping support"
-+	tristate "KW (AES Key Wrap)"
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	help
--	  Support for key wrapping (NIST SP800-38F / RFC3394) without
--	  padding.
-+	  KW (AES Key Wrap) authenticated encryption mode (NIST SP800-38F
-+	  and RFC3394) without padding.
- 
- config CRYPTO_NHPOLY1305
- 	tristate
-@@ -504,23 +515,27 @@ menu "Block modes"
- 	select CRYPTO_LIB_POLY1305_GENERIC
- 
- config CRYPTO_NHPOLY1305_SSE2
--	tristate "NHPoly1305 hash function (x86_64 SSE2 implementation)"
-+	tristate "NHPoly1305 (x86_64 with SSE2)"
+-config CRYPTO_POLY1305
+-	tristate "Poly1305"
+-	select CRYPTO_HASH
+-	select CRYPTO_LIB_POLY1305_GENERIC
+-	help
+-	  Poly1305 authenticator algorithm (RFC7539)
+-
+-	  Poly1305 is an authenticator algorithm designed by Daniel J. Bernstein.
+-	  It is used for the ChaCha20-Poly1305 AEAD, specified in RFC7539 for use
+-	  in IETF protocols. This is the portable C implementation of Poly1305.
+-
+-config CRYPTO_POLY1305_X86_64
+-	tristate "Poly1305 (x86_64 with SSE2/AVX2)"
++config CRYPTO_GHASH_CLMUL_NI_INTEL
++	tristate "GHASH (x86_64 with CLMUL-NI)"
  	depends on X86 && 64BIT
- 	select CRYPTO_NHPOLY1305
+-	select CRYPTO_LIB_POLY1305_GENERIC
+-	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++	select CRYPTO_CRYPTD
  	help
--	  SSE2 optimized implementation of the hash function used by the
--	  Adiantum encryption mode.
-+	  NHPoly1305 hash function (Adiantum)
+-	  Poly1305 authenticator algorithm (RFC7539)
++	  GCM GHASH hash function (NIST SP800-38D)
+ 
+ 	  Architecture: x86_64 using:
+-	  * SSE2 (Streaming SIMD Extensions 2)
+-	  * AVX2 (Advanced Vector Extensions 2)
++	  * CLMUL-NI (carry-less multiplication new instructions)
+ 
+-config CRYPTO_POLY1305_MIPS
+-	tristate "Poly1305 (MIPS)"
+-	depends on MIPS
+-	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++config CRYPTO_GHASH_S390
++	tristate "GHASH (s390)"
++	depends on S390
++	select CRYPTO_HASH
+ 	help
+-	  Poly1305 authenticator algorithm (RFC7539)
++	  GCM GHASH hash function (NIST SP800-38D)
+ 
+-	  Architecture: mips
++	  Architecture: s390
++
++	  It is available as of z196.
+ 
+ config CRYPTO_MD4
+ 	tristate "MD4"
+@@ -930,6 +908,38 @@ menu "Digests"
+ 	  This algorithm is required for TKIP, but it should not be used for
+ 	  other purposes because of the weakness of the algorithm.
+ 
++config CRYPTO_POLY1305
++	tristate "Poly1305"
++	select CRYPTO_HASH
++	select CRYPTO_LIB_POLY1305_GENERIC
++	help
++	  Poly1305 authenticator algorithm (RFC7539)
++
++	  Poly1305 is an authenticator algorithm designed by Daniel J. Bernstein.
++	  It is used for the ChaCha20-Poly1305 AEAD, specified in RFC7539 for use
++	  in IETF protocols. This is the portable C implementation of Poly1305.
++
++config CRYPTO_POLY1305_X86_64
++	tristate "Poly1305 (x86_64 with SSE2/AVX2)"
++	depends on X86 && 64BIT
++	select CRYPTO_LIB_POLY1305_GENERIC
++	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++	help
++	  Poly1305 authenticator algorithm
 +
 +	  Architecture: x86_64 using:
 +	  * SSE2 (Streaming SIMD Extensions 2)
++	  * AVX2 (Advanced Vector Extensions 2)
++
++config CRYPTO_POLY1305_MIPS
++	tristate "Poly1305 (MIPS)"
++	depends on MIPS
++	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++	help
++	  Poly1305 authenticator algorithm
++
++	  Architecture: mips
++
+ config CRYPTO_RMD160
+ 	tristate "RIPEMD-160"
+ 	select CRYPTO_HASH
+@@ -968,44 +978,6 @@ menu "Digests"
+ 	  * AVX2 (Advanced Vector Extensions 2)
+ 	  * SHA-NI (SHA Extensions New Instructions)
  
- config CRYPTO_NHPOLY1305_AVX2
--	tristate "NHPoly1305 hash function (x86_64 AVX2 implementation)"
-+	tristate "NHPoly1305 (x86_64 with AVX2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_NHPOLY1305
- 	help
--	  AVX2 optimized implementation of the hash function used by the
--	  Adiantum encryption mode.
-+	  NHPoly1305 hash function (Adiantum)
+-config CRYPTO_SHA256_SSSE3
+-	tristate "SHA224 and SHA256 (x86_64 with SSSE3/AVX/AVX2/SHA-NI)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_SHA256
+-	select CRYPTO_HASH
+-	help
+-	  SHA-224 and SHA-256 secure hash algorithms (FIPS 180)
+-
+-	  Architecture: x86_64 using:
+-	  * SSSE3 (Supplemental SSE3)
+-	  * AVX (Advanced Vector Extensions)
+-	  * AVX2 (Advanced Vector Extensions 2)
+-	  * SHA-NI (SHA Extensions New Instructions)
+-
+-config CRYPTO_SHA512_SSSE3
+-	tristate "SHA384 and SHA512 (x86_64 with SSSE3/AVX/AVX2)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_SHA512
+-	select CRYPTO_HASH
+-	help
+-	  SHA-384 and SHA-512 secure hash algorithms (FIPS 180)
+-
+-	  Architecture: x86_64 using:
+-	  * SSSE3 (Supplemental SSE3)
+-	  * AVX (Advanced Vector Extensions)
+-	  * AVX2 (Advanced Vector Extensions 2)
+-
+-config CRYPTO_SHA512_S390
+-	tristate "SHA384 and SHA512 (s390)"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  SHA-384 and SHA-512 secure hash algorithms (FIPS 180)
+-
+-	  Architecture: s390
+-
+-	  It is available as of z10.
+-
+ config CRYPTO_SHA1_OCTEON
+ 	tristate "SHA1 (OCTEON)"
+ 	depends on CPU_CAVIUM_OCTEON
+@@ -1063,6 +1035,20 @@ menu "Digests"
+ 	  This is required for IPsec AH (XFRM_AH) and IPsec ESP (XFRM_ESP).
+ 	  Used by the btrfs filesystem, Ceph, NFS, and SMB.
+ 
++config CRYPTO_SHA256_SSSE3
++	tristate "SHA224 and SHA256 (x86_64 with SSSE3/AVX/AVX2/SHA-NI)"
++	depends on X86 && 64BIT
++	select CRYPTO_SHA256
++	select CRYPTO_HASH
++	help
++	  SHA-224 and SHA-256 secure hash algorithms (FIPS 180)
 +
 +	  Architecture: x86_64 using:
++	  * SSSE3 (Supplemental SSE3)
++	  * AVX (Advanced Vector Extensions)
 +	  * AVX2 (Advanced Vector Extensions 2)
++	  * SHA-NI (SHA Extensions New Instructions)
++
+ config CRYPTO_SHA256_PPC_SPE
+ 	tristate "SHA224 and SHA256 (PPC SPE)"
+ 	depends on PPC && SPE
+@@ -1110,6 +1096,30 @@ menu "Digests"
+ 	help
+ 	  SHA-384 and SHA-512 secure hash algorithms (FIPS 180)
  
- config CRYPTO_ADIANTUM
--	tristate "Adiantum support"
-+	tristate "Adiantum"
- 	select CRYPTO_CHACHA20
- 	select CRYPTO_LIB_POLY1305_GENERIC
- 	select CRYPTO_NHPOLY1305
++config CRYPTO_SHA512_SSSE3
++	tristate "SHA384 and SHA512 (x86_64 with SSSE3/AVX/AVX2)"
++	depends on X86 && 64BIT
++	select CRYPTO_SHA512
++	select CRYPTO_HASH
++	help
++	  SHA-384 and SHA-512 secure hash algorithms (FIPS 180)
++
++	  Architecture: x86_64 using:
++	  * SSSE3 (Supplemental SSE3)
++	  * AVX (Advanced Vector Extensions)
++	  * AVX2 (Advanced Vector Extensions 2)
++
++config CRYPTO_SHA512_S390
++	tristate "SHA384 and SHA512 (s390)"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  SHA-384 and SHA-512 secure hash algorithms (FIPS 180)
++
++	  Architecture: s390
++
++	  It is available as of z10.
++
+ config CRYPTO_SHA512_OCTEON
+ 	tristate "SHA384 and SHA512 (OCTEON)"
+ 	depends on CPU_CAVIUM_OCTEON
+@@ -1213,27 +1223,16 @@ menu "Digests"
+ 	  See https://web.archive.org/web/20171129084214/http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html
+ 	  for further information.
+ 
+-config CRYPTO_GHASH_CLMUL_NI_INTEL
+-	tristate "GHASH (x86_64 with CLMUL-NI)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_CRYPTD
+-	help
+-	  GCM GHASH hash function (NIST SP800-38D)
+-
+-	  Architecture: x86_64 using:
+-	  * CLMUL-NI (carry-less multiplication new instructions)
+-
+-config CRYPTO_GHASH_S390
+-	tristate "GHASH (s390)"
+-	depends on S390
++config CRYPTO_XXHASH
++	tristate "xxHash"
+ 	select CRYPTO_HASH
++	select XXHASH
+ 	help
+-	  GCM GHASH hash function (NIST SP800-38D)
+-
+-	  Architecture: s390
++	  xxHash non-cryptographic hash algorithm
+ 
+-	  It is available as of z196.
++	  Extremely fast, working at speeds close to RAM limits.
+ 
++	  Used by the btrfs filesystem.
+ endmenu
+ 
+ menu "Ciphers"
 -- 
 2.37.1
 
