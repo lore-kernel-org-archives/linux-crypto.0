@@ -2,75 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B12C19F2C
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 05:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE38C25B0D
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 05:17:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232689AbiHPFO5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Aug 2022 01:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54214 "EHLO
+        id S230149AbiHPFRn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Aug 2022 01:17:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbiHPFOi (ORCPT
+        with ESMTP id S230331AbiHPFRY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Aug 2022 01:14:38 -0400
+        Tue, 16 Aug 2022 01:17:24 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889421EB7DC
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Aug 2022 14:30:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CDFCE05;
+        Mon, 15 Aug 2022 14:36:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4C841B811F9
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Aug 2022 21:30:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B79E0C433C1;
-        Mon, 15 Aug 2022 21:30:14 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A795FB811BF;
+        Mon, 15 Aug 2022 21:36:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D745C433D6;
+        Mon, 15 Aug 2022 21:36:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660599014;
-        bh=feO2cxwFis6LOaZ6FmU3TAcTU6imAQByNOy/kl/1Ss0=;
+        s=k20201202; t=1660599388;
+        bh=4/HG9B1vNLBzy1icJatyjocTnH3m+9Qg+3ewK5Z5ZBw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ao+Fabt9/JBtI1L/NvKuJC1KAdr+9q2qZNH1Y6gbQI/uKbQDvFQbluCT+ZbMkLwHU
-         7Lj7AQaGuGbnukMBocd1aYhr9HPaz63Bo9lM219AvshUjjoi3E2M6UZIf48BtTiX3A
-         CI4+8wnTXSfpxkyjVAPH94tpay94PAqwLp8yonj5DuIWeclYXIpAqCZeSxKI7AqY3W
-         feJGmCdi1nZPZDXu0hHu321k/d3ob1XLDRWhcZeAhD+H+6xZIOWZPhkvXh5+7VFxvf
-         MaB8CZocsSnbyPNMQra/6URP4IsUBjrnBA1StKYFgbgz83nCa2wboiAV377Qlor21v
-         pKd02AJ5ajntQ==
-Date:   Mon, 15 Aug 2022 14:30:13 -0700
+        b=BxA09qoKSm98McIK2tJkQRwkPA3BvdnPutPlcPn+CBVsg1028OynKaSs2QkKQ2px7
+         gWOcY7If19tLPW1f0pe2G2sLhxmmpQFiu2CMXNjTYfhNd8TvJAH7APBXdHUJz029Ex
+         hc/isGNxr3dVuZbzs/dLq6F683CTfHU0T2qY+wyYvSdE45+6mDaXVBYOuCwgFcNSu1
+         16mXIf3ZhCJ12cCJwG5Q+aE8cP6DmnqYJanTyCtxjSE6nPHvwoZcXHLG3qSYMYcrzB
+         Qy9P48cTrzgiy8euo4hSzFSHpO8YyqVf4G51U0UDLQj21T1W4KtzoSuFYbzQYUr0jE
+         2VMDI3wKO8/Cw==
+Date:   Mon, 15 Aug 2022 14:36:26 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Robert Elliott <elliott@hpe.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     tim.c.chen@linux.intel.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, toshi.kani@hpe.com, rwright@hpe.com
-Subject: Re: [PATCH] crypto: testmgr - don't generate WARN for missing modules
-Message-ID: <Yvq65Xd6GjeLdmO5@sol.localdomain>
-References: <20220813231443.2706-1-elliott@hpe.com>
+To:     Robert Elliott <elliott@hpe.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        toshi.kani@hpe.com
+Subject: Re: [PATCH 8/8] crypto: Kconfig - sort the ciphers
+Message-ID: <Yvq8Whax+i2jmQZJ@sol.localdomain>
+References: <20220815190608.47182-1-elliott@hpe.com>
+ <20220815190608.47182-9-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220813231443.2706-1-elliott@hpe.com>
+In-Reply-To: <20220815190608.47182-9-elliott@hpe.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Aug 13, 2022 at 06:14:43PM -0500, Robert Elliott wrote:
-> This userspace command:
->     modprobe tcrypt
-> or
->     modprobe tcrypt mode=0
+On Mon, Aug 15, 2022 at 02:06:08PM -0500, Robert Elliott wrote:
+> Sort the entries in Ciphers by their displayed names.
+> In particular, keep the optimized CPU implementations next to the
+> generic implementations.
 > 
-> runs all the tcrypt test cases numbered <200 (i.e., all the
-> test cases calling tcrypt_test() and returning return values).
+> Signed-off-by: Robert Elliott <elliott@hpe.com>
+> ---
+>  crypto/Kconfig | 118 ++++++++++++++++++++++++-------------------------
+>  1 file changed, 59 insertions(+), 59 deletions(-)
 > 
-> Tests are sparsely numbered from 0 to 1000. For example:
->     modprobe tcrypt mode=12
-> tests sha512, and
->     modprobe tcrypt mode=152
-> tests rfc4543(gcm(aes))) - AES-GCM as GMAC
-> 
-> The test manager generates WARNING crashdumps every time it attempts
-> a test using an algorithm that is not available (not built-in to the
-> kernel or available as a module):
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index f5cfb73e2423..03f4e2d97ef9 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1500,6 +1500,65 @@ menu "Ciphers"
+>  
+>  	  Processes eight blocks in parallel.
+>  
+> +config CRYPTO_CHACHA20
+> +	tristate "ChaCha"
+> +	select CRYPTO_LIB_CHACHA_GENERIC
+> +	select CRYPTO_SKCIPHER
+> +	help
+> +	  The ChaCha20, XChaCha20, and XChaCha12 stream cipher algorithms
+> +
+> +	  ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
+> +	  Bernstein and further specified in RFC7539 for use in IETF protocols.
+> +	  This is the portable C implementation of ChaCha20.  See
+> +	  https://cr.yp.to/chacha/chacha-20080128.pdf for further information.
+> +
+> +	  XChaCha20 is the application of the XSalsa20 construction to ChaCha20
+> +	  rather than to Salsa20.  XChaCha20 extends ChaCha20's nonce length
+> +	  from 64 bits (or 96 bits using the RFC7539 convention) to 192 bits,
+> +	  while provably retaining ChaCha20's security.  See
+> +	  https://cr.yp.to/snuffle/xsalsa-20081128.pdf for further information.
+> +
+> +	  XChaCha12 is XChaCha20 reduced to 12 rounds, with correspondingly
+> +	  reduced security margin but increased performance.  It can be needed
+> +	  in some performance-sensitive scenarios.
+> +
+> +config CRYPTO_CHACHA20_X86_64
+> +	tristate "ChaCha (x86_64 with SSSE3/AVX2/AVX-512VL)"
+> +	depends on X86 && 64BIT
+> +	select CRYPTO_SKCIPHER
+> +	select CRYPTO_LIB_CHACHA_GENERIC
+> +	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+> +	help
+> +	  ChaCha stream cipher algorithms
+> +
+> +	  Architecture: x86_64 using:
+> +	  * SSSE3 (Supplemental SSE3)
+> +	  * AVX2 (Advanced Vector Extensions 2)
+> +	  * AVX-512VL (Advanced Vector Extensions-512VL)
+> +
+> +config CRYPTO_CHACHA_MIPS
+> +	tristate "ChaCha (MIPS32r2)"
+> +	depends on CPU_MIPS32_R2
+> +	select CRYPTO_SKCIPHER
+> +	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+> +	help
+> +	  ChaCha stream cipher algorithms
+> +
+> +	  Architecture: MIPS32r2
+> +
+> +config CRYPTO_CHACHA_S390
+> +	tristate "ChaCha20 (s390)"
+> +	depends on S390
+> +	select CRYPTO_SKCIPHER
+> +	select CRYPTO_LIB_CHACHA_GENERIC
+> +	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+> +	help
+> +	  ChaCha20 stream cipher (RFC 7539)
+> +
+> +	  Architecture: s390
+> +
+> +	  It is available as of z13.
 
-Note that this is only a problem because tcrypt calls alg_test() directly.  The
-normal way that alg_test() gets called is for the registration-time self-test.
-It's not clear to me why tcrypt calls alg_test() directly; the registration-time
-test should be enough.  Herbert, do you know?
+Do we want to keep the architecture-specific options in crypto/Kconfig?  arm and
+arm64 split them out into a separate file arch/$arch/crypto/Kconfig.  Perhaps
+the other architectures should adopt that?
 
 - Eric
