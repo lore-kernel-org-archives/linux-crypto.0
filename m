@@ -2,163 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F53FC00140
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 09:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AD4C282E7
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 20:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241775AbiHOJmX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Aug 2022 05:42:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34534 "EHLO
+        id S1344816AbiHOUhE (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 Aug 2022 16:37:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233186AbiHOJmW (ORCPT
+        with ESMTP id S1346023AbiHOUfE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Aug 2022 05:42:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1925D1CB34;
-        Mon, 15 Aug 2022 02:42:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 15 Aug 2022 16:35:04 -0400
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16B4ABD60;
+        Mon, 15 Aug 2022 12:06:23 -0700 (PDT)
+Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27FI23UL000684;
+        Mon, 15 Aug 2022 19:06:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pps0720;
+ bh=mufaP9+9c7b9pVorr0YTGCKgp71WgJtILQJnlfOl6W4=;
+ b=cRF4ZnhCubZ4tgBXSY4DpcQJjBNo5PLlNOe+4tN96tLqcfXHMYGSkBsq+fx135w9S4RP
+ G5fl2WkaVzcyyEDNgFjS3l0Jyf6BT4MXqmdDHfQ/BS6vBL15UULMsBvvlGn0wSKVZXYZ
+ FMq/FXlqZ9wOz0ONwUHa62EUHJ9bpOYmy/D5jpu6AXwfeYJIJYBGiWbAa+1q4Xpd5PLK
+ JyUUxeMr5k+000pKeeclL5SbIf1Vz/mP46ZhCT0zGIpfprobU2mjJ3nDfsV2z+IKpRvd
+ oQ3BKQcNM+fybuRsDABcrcFNFlMeyWKVW4EUruid2l0B7XA6PTCCxcR+uysZtGIUaYEP uA== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hyts4rp7h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Aug 2022 19:06:17 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AEAD960FF1;
-        Mon, 15 Aug 2022 09:42:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11076C433D6;
-        Mon, 15 Aug 2022 09:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660556541;
-        bh=mIIGTw4aMzZ/OGv8lX0rJKJzHZ9/juqllmTKoHRRuhE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=N0D3MH8E8sRUuyIISUB0yg0MTGKTs+svFi/lTl6j9NLut5T1CmxLRaV3NvrJE1/Ft
-         O2Kc6H6qirviHJVUbSUUx1rF0hOUFv2CGDrmfLsOIq8Tts7zQRWEPxoR37u5FkPIfK
-         S3orIWnDsO8P3SleGpSYQz3xgZXZP5I8PorJgCW7sf8QqtCUM8QHMtfKS5M3UmF9yf
-         kNdaxVwA298T3CHhbUxzcsOO3YR0opEdWzidz2H9v1wCEpEBOX5HULsslrC32I8lDn
-         HTQQwCcuIponvsZ2IFu4tQL4vRFFoMI9g13eNGaOlKbj8I6a+IZeRMmGCIt2wUE2Z/
-         coT04CdADqLIA==
-Received: by mail-wr1-f41.google.com with SMTP id j7so8453737wrh.3;
-        Mon, 15 Aug 2022 02:42:20 -0700 (PDT)
-X-Gm-Message-State: ACgBeo3cCKAHrmguHqqlALQ2ryq3VrgMu76OUy7/vajJlP+osofxkU/d
-        vFzNk6diQfoZU1ZMSheVGH7iSgNNmDAE6vdeDKY=
-X-Google-Smtp-Source: AA6agR4sVq1vePjI1vORqyjjgxd+/zzwKVWOL7SwNmNgiAKdmWT73zj5V2uLM0EH2VK1oXNXIBhbRYCzkz8x8zO+4Fg=
-X-Received: by 2002:a5d:64a6:0:b0:21f:b3b:5cc9 with SMTP id
- m6-20020a5d64a6000000b0021f0b3b5cc9mr7806696wrp.601.1660556539286; Mon, 15
- Aug 2022 02:42:19 -0700 (PDT)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 99183D2EB;
+        Mon, 15 Aug 2022 19:06:16 +0000 (UTC)
+Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 153A9802BAD;
+        Mon, 15 Aug 2022 19:06:15 +0000 (UTC)
+From:   Robert Elliott <elliott@hpe.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     toshi.kani@hpe.com, Robert Elliott <elliott@hpe.com>
+Subject: [PATCH 0/8] crypto: Kconfig - simplify menus and help text
+Date:   Mon, 15 Aug 2022 14:06:00 -0500
+Message-Id: <20220815190608.47182-1-elliott@hpe.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-References: <20220815042915.44547-1-elliott@hpe.com>
-In-Reply-To: <20220815042915.44547-1-elliott@hpe.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 15 Aug 2022 11:42:08 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXH1rU=HCd8bV4AP18JXhMKSs7wdJoiYQkPFsPRj=iuZPQ@mail.gmail.com>
-Message-ID: <CAMj1kXH1rU=HCd8bV4AP18JXhMKSs7wdJoiYQkPFsPRj=iuZPQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: tcrypt - remove mode=1000
-To:     Robert Elliott <elliott@hpe.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        toshi.kani@hpe.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: 6zWimYhHHpOz3MG_7T5hk9el344-e-uu
+X-Proofpoint-GUID: 6zWimYhHHpOz3MG_7T5hk9el344-e-uu
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-15_08,2022-08-15_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=758 mlxscore=0 spamscore=0
+ bulkscore=0 phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208150072
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 15 Aug 2022 at 06:30, Robert Elliott <elliott@hpe.com> wrote:
->
-> The lists of algothms checked for existence by
->     modprobe tcrypt mode=1000
-> generates three bogus errors:
->     modprobe tcrypt mode=1000
->
->     console log:
->     tcrypt: alg rot13 not found
->     tcrypt: alg cts not found
->     tcrypt: alg arc4 not found
->
-> rot13 is not an algorithm in the crypto API or tested.
->
-> cts is a wrapper, not a base algorithm.
->
-> arc4 is named ecb(arc4), not arc4.
->
-> Also, the list is missing numerous algorithms that are tested by
-> other test modes:
->     blake2b-512
->     blake2s-256
->     crct10dif
->     xxhash64
->     ghash
->     cast5
->     sm4
->     ansi_prng
->
-> Several of the algorithms are only available if
-> CONFIG_CRYPTO_USER_API_ENABLE_OBSOLETE is enabled:
->     arc4
->     khazad
->     seed
->     tea, xtea, xeta
->
-> Rather that fix that list, remove test mode=1000 entirely.
-> It seems to have limited utility, and a web search shows no
-> discussion of anybody using it.
->
-> Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Robert Elliott <elliott@hpe.com>
+Improve the "make menuconfig" experience under the 
+Cryptographic API page.
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Robert Elliott (8):
+  crypto: Kconfig - add submenus
+  crypto: Kconfig - simplify public-key entries
+  crypto: Kconfig - simplify user-space interface entries
+  crypto: Kconfig - simplify AEAD and block mode entries
+  crypto: Kconfig - simplify hash mode and digest entries
+  crypto: Kconfig - simplify cipher, compression, and RNG entries
+  crypto: Kconfig - sort the digests
+  crypto: Kconfig - sort the ciphers
 
-> ---
->  crypto/tcrypt.c | 28 ----------------------------
->  1 file changed, 28 deletions(-)
->
-> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> index 2bacf8384f59..35d70382ee54 100644
-> --- a/crypto/tcrypt.c
-> +++ b/crypto/tcrypt.c
-> @@ -65,18 +65,6 @@ static int mode;
->  static u32 num_mb = 8;
->  static unsigned int klen;
->  static char *tvmem[TVMEMSIZE];
-> -
-> -static const char *check[] = {
-> -       "des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256", "sm3",
-> -       "blowfish", "twofish", "serpent", "sha384", "sha512", "md4", "aes",
-> -       "cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
-> -       "khazad", "wp512", "wp384", "wp256", "xeta",  "fcrypt",
-> -       "camellia", "seed", "rmd160",
-> -       "lzo", "lzo-rle", "cts", "sha3-224", "sha3-256", "sha3-384",
-> -       "sha3-512", "streebog256", "streebog512",
-> -       NULL
-> -};
-> -
->  static const int block_sizes[] = { 16, 64, 128, 256, 1024, 1420, 4096, 0 };
->  static const int aead_sizes[] = { 16, 64, 256, 512, 1024, 1420, 4096, 8192, 0 };
->
-> @@ -1454,18 +1442,6 @@ static void test_cipher_speed(const char *algo, int enc, unsigned int secs,
->                                    false);
->  }
->
-> -static void test_available(void)
-> -{
-> -       const char **name = check;
-> -
-> -       while (*name) {
-> -               printk("alg %s ", *name);
-> -               printk(crypto_has_alg(*name, 0, 0) ?
-> -                      "found\n" : "not found\n");
-> -               name++;
-> -       }
-> -}
-> -
->  static inline int tcrypt_test(const char *alg)
->  {
->         int ret;
-> @@ -2825,10 +2801,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->                 test_mb_skcipher_speed("ctr(blowfish)", DECRYPT, sec, NULL, 0,
->                                        speed_template_8_32, num_mb);
->                 break;
-> -
-> -       case 1000:
-> -               test_available();
-> -               break;
->         }
->
->         return ret;
-> --
-> 2.37.1
->
+ crypto/Kconfig | 1511 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 780 insertions(+), 731 deletions(-)
+
+-- 
+2.37.1
+
