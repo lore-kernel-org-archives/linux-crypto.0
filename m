@@ -2,57 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF043C28B2B
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 20:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FCEC282E7
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Aug 2022 20:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344937AbiHOUhF (ORCPT
+        id S1344485AbiHOUhG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Aug 2022 16:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
+        Mon, 15 Aug 2022 16:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345016AbiHOUfE (ORCPT
+        with ESMTP id S1346069AbiHOUfM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Aug 2022 16:35:04 -0400
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E337AABD61;
-        Mon, 15 Aug 2022 12:06:23 -0700 (PDT)
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27FIDjeH009888;
-        Mon, 15 Aug 2022 19:06:19 GMT
+        Mon, 15 Aug 2022 16:35:12 -0400
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89849ABD6A;
+        Mon, 15 Aug 2022 12:06:24 -0700 (PDT)
+Received: from pps.filterd (m0134421.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27FIEgS6004375;
+        Mon, 15 Aug 2022 19:06:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
  : mime-version; s=pps0720;
- bh=OvGNgjyXdRVoprmq/MPuupJ6TYjVRr2YqHsIXBFGU8o=;
- b=nYYy1CKfQpwbMCsrCCSmy5Hk4onohxaszlZ1hQ68uwP1oldmm8+lImAb3yjvfyohFdNu
- bO/KrYi8zIu4NRmC0s+87xkPwBT5DzySp3i96HG47orFbE+9OvUzOOa/zHst9WCwPhQT
- T90k3Dyve3nPT8mXebx1gPVE/yFnSOVfAuEUakaDvlNo/Fpcol/NO+SW23KaS4foYmq9
- 2EhQhgRkWTKjSVOseWwfh/AnPi+h8UbG9KlsdVBtdzN/i4NOlDhKeqh+ZU1T+iGEbHvS
- e7OUWg4UkA93TiF+FyEjKMby50YqQDHoWMjhuc2jMTHjZ9DU/JzmFLEMT/dJOpvUGcuE Zg== 
-Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hyu7r8bpq-1
+ bh=7UZRl7S6CD59FxX0p50QXXowmOOF0KD87WiCrV0FFvc=;
+ b=WoTZfNGQ6W5T+ONutzqQsBHZsRydbTwo0MjYrWxKHQs63hahiBhSZMKKZMTdFFhfJL2s
+ 3/cj0T6wodN3xloXdTTK+HI62xipD0IXJCEy00CZBOAfSZ3eLuk6GQgLy2Nw31LjqVVL
+ LMqQdvXBZsDkjbOpVWP0fLrrvtW7Ixs3MBFqV37j4vXRwvrBb/V16zI8izJZ/T1JqADM
+ WK0nNJRnUqJMj+RLJYA70GI538ZvQjWlt9TbjkopOLsIURXHJ3BgqUPM7O2lnuUY95XD
+ A9lEu/KFAhU8jC/HOpWwOA2oQ2oe9Yy128d5J8BGWG9pTHsjNZBlnfufUG6paXERQ7qD 2A== 
+Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3hyu8d0bst-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Aug 2022 19:06:19 +0000
+        Mon, 15 Aug 2022 19:06:21 +0000
 Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 218A5D2CF;
-        Mon, 15 Aug 2022 19:06:18 +0000 (UTC)
+        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 709AD804CB5;
+        Mon, 15 Aug 2022 19:06:20 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id CCA3B802BAD;
-        Mon, 15 Aug 2022 19:06:17 +0000 (UTC)
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 25F73804CF8;
+        Mon, 15 Aug 2022 19:06:20 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     toshi.kani@hpe.com, Robert Elliott <elliott@hpe.com>
-Subject: [PATCH 1/8] crypto: Kconfig - add submenus
-Date:   Mon, 15 Aug 2022 14:06:01 -0500
-Message-Id: <20220815190608.47182-2-elliott@hpe.com>
+Subject: [PATCH 3/8] crypto: Kconfig - simplify user-space interface entries
+Date:   Mon, 15 Aug 2022 14:06:03 -0500
+Message-Id: <20220815190608.47182-4-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220815190608.47182-1-elliott@hpe.com>
 References: <20220815190608.47182-1-elliott@hpe.com>
-X-Proofpoint-GUID: MTwPZk1esdoIQHNY7bUQETSbs3wsir6g
-X-Proofpoint-ORIG-GUID: MTwPZk1esdoIQHNY7bUQETSbs3wsir6g
+X-Proofpoint-ORIG-GUID: qzScPmMadnJgI9WTV04XrqEjOjTzo2TL
+X-Proofpoint-GUID: qzScPmMadnJgI9WTV04XrqEjOjTzo2TL
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -60,173 +60,149 @@ X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-15_08,2022-08-15_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 suspectscore=0 mlxlogscore=428 spamscore=0 mlxscore=0
- impostorscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 spamscore=0 suspectscore=0 mlxlogscore=999
+ bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2207270000 definitions=main-2208150071
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert each comment section into a submenu:
-Cryptographic API
-    Crypto core or helper
-    Public-key cryptography
-    AEAD (Authenticated Encryption with Associated Data) ciphers
-    Block modes
-    Hash modes
-    Digests
-    Ciphers
-    Compression
-    Random Number Generation
-    User-space interface
+Shorten menu titles and help text and make them consistent:
+* acronym
+* name
+* architecture and architecture features in parenthesis
+* no suffixes like "<something> algorithm", "support", or
+"hardware acceleration", or "optimized"
 
-That helps find entries (e.g., searching for a name like SHA512 doesn't
-just report the location is Main menu -> Cryptography API, leaving you
-to wade through 153 entries; it points you to the Digests page).
+Clarify architecture restrictions (e.g., include x86 in the names of
+all the x86-optimized modules.
+
+Simplify descriptions, update references, and ensure that https
+references are still valid.
 
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- crypto/Kconfig | 42 ++++++++++++++++++++++++++++++++----------
- 1 file changed, 32 insertions(+), 10 deletions(-)
+ crypto/Kconfig | 63 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 40 insertions(+), 23 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 7b81685b5655..c2db970bc998 100644
+index a7679e8cf842..045ef2a92449 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -21,7 +21,7 @@ menuconfig CRYPTO
- 
- if CRYPTO
- 
--comment "Crypto core or helper"
-+menu "Crypto core or helper"
- 
- config CRYPTO_FIPS
- 	bool "FIPS 200 compliance"
-@@ -214,7 +214,9 @@ menuconfig CRYPTO
- config CRYPTO_ENGINE
+@@ -2032,55 +2032,67 @@ menuconfig CRYPTO_DRBG_MENU
  	tristate
  
--comment "Public-key cryptography"
-+endmenu
-+
-+menu "Public-key cryptography"
- 
- config CRYPTO_RSA
- 	tristate "RSA algorithm"
-@@ -301,7 +303,9 @@ menuconfig CRYPTO
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 
--comment "Authenticated Encryption with Associated Data"
-+endmenu
-+
-+menu "AEAD (Authenticated Encryption with Associated Data) ciphers"
- 
- config CRYPTO_CCM
- 	tristate "CCM support"
-@@ -378,7 +382,11 @@ menuconfig CRYPTO
- 	  a sequence number xored with a salt.  This is the default
- 	  algorithm for CBC.
- 
--comment "Block modes"
-+	  This is required for IPsec ESP (XFRM_ESP).
-+
-+endmenu
-+
-+menu "Block modes"
- 
- config CRYPTO_CBC
- 	tristate "CBC support"
-@@ -552,7 +560,9 @@ menuconfig CRYPTO
- 	  combined with ESSIV the only feasible mode for h/w accelerated
- 	  block encryption)
- 
--comment "Hash modes"
-+endmenu
-+
-+menu "Hash modes"
- 
- config CRYPTO_CMAC
- 	tristate "CMAC support"
-@@ -594,7 +604,9 @@ menuconfig CRYPTO
- 	  See also:
- 	  <https://fastcrypto.org/vmac>
- 
--comment "Digest"
-+endmenu
-+
-+menu "Digests"
- 
- config CRYPTO_CRC32C
- 	tristate "CRC32c CRC algorithm"
-@@ -627,7 +639,6 @@ menuconfig CRYPTO
- 	  (vpmsum) instructions, introduced in POWER8. Enable on POWER8
- 	  and newer processors for improved performance.
- 
--
- config CRYPTO_CRC32C_SPARC64
- 	tristate "CRC32c CRC algorithm (SPARC64)"
- 	depends on SPARC64
-@@ -1142,7 +1153,9 @@ menuconfig CRYPTO
- 
- 	  It is available as of z196.
- 
--comment "Ciphers"
-+endmenu
-+
-+menu "Ciphers"
- 
- config CRYPTO_AES
- 	tristate "AES cipher algorithms"
-@@ -1877,7 +1890,9 @@ menuconfig CRYPTO
- 	  See also:
- 	  <https://www.schneier.com/twofish.html>
- 
--comment "Compression"
-+endmenu
-+
-+menu "Compression"
- 
- config CRYPTO_DEFLATE
- 	tristate "Deflate compression algorithm"
-@@ -1936,7 +1951,9 @@ menuconfig CRYPTO
- 	help
- 	  This is the zstd algorithm.
- 
--comment "Random Number Generation"
-+endmenu
-+
-+menu "Random Number Generation"
- 
- config CRYPTO_ANSI_CPRNG
- 	tristate "Pseudo Random Number Generation for Cryptographic modules"
-@@ -1993,6 +2010,8 @@ menuconfig CRYPTO_DRBG_MENU
- 	  random numbers. This Jitterentropy RNG registers with
- 	  the kernel crypto API and can be used by any caller.
- 
-+endmenu
-+
- config CRYPTO_KDF800108_CTR
- 	tristate
- 	select CRYPTO_HMAC
-@@ -2001,6 +2020,7 @@ menuconfig CRYPTO_DRBG_MENU
- config CRYPTO_USER_API
- 	tristate
- 
-+menu "User-space interface"
+ menu "User-space interface"
++comment "Enable the user-space interface for ..."
  config CRYPTO_USER_API_HASH
- 	tristate "User-space interface for hash algorithms"
+-	tristate "User-space interface for hash algorithms"
++	tristate "Hash algorithms"
  	depends on NET
-@@ -2069,6 +2089,8 @@ menuconfig CRYPTO_DRBG_MENU
- 	  - encrypt/decrypt/sign/verify numbers for asymmetric operations
- 	  - generate/seed numbers for rng operations
- 
-+endmenu
+ 	select CRYPTO_HASH
+ 	select CRYPTO_USER_API
+ 	help
+-	  This option enables the user-spaces interface for hash
+-	  algorithms.
++	  Enable the user-space interface for hash algorithms.
 +
- config CRYPTO_HASH_INFO
- 	bool
++	  See Documentation/crypto/userspace-if.rst and
++	  https://www.chronox.de/libkcapi/html/index.html
+ 
+ config CRYPTO_USER_API_SKCIPHER
+-	tristate "User-space interface for symmetric key cipher algorithms"
++	tristate "Symmetric key cipher algorithms"
+ 	depends on NET
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_USER_API
+ 	help
+-	  This option enables the user-spaces interface for symmetric
+-	  key cipher algorithms.
++	  Enable the user-space interface for symmetric key cipher algorithms.
++
++	  See Documentation/crypto/userspace-if.rst and
++	  https://www.chronox.de/libkcapi/html/index.html
+ 
+ config CRYPTO_USER_API_RNG
+-	tristate "User-space interface for random number generator algorithms"
++	tristate "RNG (random number generator) algorithms"
+ 	depends on NET
+ 	select CRYPTO_RNG
+ 	select CRYPTO_USER_API
+ 	help
+-	  This option enables the user-spaces interface for random
+-	  number generator algorithms.
++	  Enable the user-space interface for RNG (random number generator)
++	  algorithms.
++
++	  See Documentation/crypto/userspace-if.rst and
++	  https://www.chronox.de/libkcapi/html/index.html
+ 
+ config CRYPTO_USER_API_RNG_CAVP
+ 	bool "Enable CAVP testing of DRBG"
+ 	depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
+ 	help
+-	  This option enables extra API for CAVP testing via the user-space
+-	  interface: resetting of DRBG entropy, and providing Additional Data.
++	  Enable extra APIs in the user-space interface for NIST CAVP
++	  (Cryptographic Algorithm Validation Program) testing:
++	  - resetting DRBG entropy
++	  - providing Additional Data
+ 	  This should only be enabled for CAVP testing. You should say
+ 	  no unless you know what this is.
+ 
+ config CRYPTO_USER_API_AEAD
+-	tristate "User-space interface for AEAD cipher algorithms"
++	tristate "AEAD cipher algorithms"
+ 	depends on NET
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_NULL
+ 	select CRYPTO_USER_API
+ 	help
+-	  This option enables the user-spaces interface for AEAD
+-	  cipher algorithms.
++	  Enable the user-space interface for AEAD cipher algorithms.
++
++	  See Documentation/crypto/userspace-if.rst and
++	  https://www.chronox.de/libkcapi/html/index.html
+ 
+ config CRYPTO_USER_API_ENABLE_OBSOLETE
+-	bool "Enable obsolete cryptographic algorithms for userspace"
++	bool "Obsolete cryptographic algorithms"
+ 	depends on CRYPTO_USER_API
+ 	default y
+ 	help
+@@ -2089,16 +2101,21 @@ menu "User-space interface"
+ 	  only useful for userspace clients that still rely on them.
+ 
+ config CRYPTO_STATS
+-	bool "Crypto usage statistics for User-space"
++	bool "Crypto usage statistics"
+ 	depends on CRYPTO_USER
+ 	help
+-	  This option enables the gathering of crypto stats.
+-	  This will collect:
+-	  - encrypt/decrypt size and numbers of symmeric operations
+-	  - compress/decompress size and numbers of compress operations
+-	  - size and numbers of hash operations
+-	  - encrypt/decrypt/sign/verify numbers for asymmetric operations
+-	  - generate/seed numbers for rng operations
++	  Enable the gathering of crypto stats.
++
++	  This collects data sizes, numbers of requests, and numbers
++	  of errors processed by:
++	  - AEAD ciphers (encrypt, decrypt)
++	  - asymmetric key ciphers (encrypt, decrypt, verify, sign)
++	  - symmetric key ciphers (encrypt, decrypt)
++	  - compression algorithms (compress, decompress)
++	  - hash algorithms (hash)
++	  - key-agreement protocol primitives (setsecret, generate
++	    public key, compute shared secret)
++	  - RNG (generate, seed)
+ 
+ endmenu
  
 -- 
 2.37.1
