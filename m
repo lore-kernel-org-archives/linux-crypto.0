@@ -2,81 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7808C25B0E
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 12:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3314C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 14:03:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235105AbiHPMS0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Aug 2022 08:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46892 "EHLO
+        id S235735AbiHPODA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Aug 2022 10:03:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235020AbiHPMSI (ORCPT
+        with ESMTP id S235689AbiHPOC7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Aug 2022 08:18:08 -0400
-Received: from bg5.exmail.qq.com (bg4.exmail.qq.com [43.154.54.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25832DDF;
-        Tue, 16 Aug 2022 05:15:45 -0700 (PDT)
-X-QQ-mid: bizesmtp88t1660652127tpwbmw4y
-Received: from localhost.localdomain ( [182.148.12.144])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Tue, 16 Aug 2022 20:15:26 +0800 (CST)
-X-QQ-SSF: 01000000002000B0D000B00A0000000
-X-QQ-FEAT: 7jw2iSiCazqtwYDcJ+Li+DJ0HCwyu976NBVI15SXSx7Z0guy6XmDoekTOuxkJ
-        TAvnZJfUWdaNsE4TtrzsAZD2/ixAPKRrlj4c0FqCxfo6nzb+KsF6gvGU0ych4MUPw4zJ1Qy
-        aDuJZ/dNfO3SpoFTpCFM1LZEcELB6fsJGC+TzC24MguFehtbOsD2Rd9WxpvUKxrOK9aNqBI
-        OtWMuKFAn2ER3vlcjEsypv1eJtT1H4Ah9tDg2IGE/IUIAlOpeKq1jYAHOmpTYVL99l+rXsJ
-        5Qo2crIaycaAB9gHXqiGXh4Ekk6kuqvvnVw+/zLqW42Hw6nBEVlUaxwLWHBBMtWTBDKLmMe
-        tpku9OR35WzGk8g/JeK8YbfH69K+wAcli9fflQowS63Sf3B6lL4puD2YeiCfP2tLeNBF3LC
-X-QQ-GoodBg: 0
-From:   Jilin Yuan <yuanjilin@cdjrlc.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jilin Yuan <yuanjilin@cdjrlc.com>
-Subject: [PATCH] crypto: fix repeated words in comments
-Date:   Tue, 16 Aug 2022 20:15:19 +0800
-Message-Id: <20220816121519.60351-1-yuanjilin@cdjrlc.com>
-X-Mailer: git-send-email 2.36.1
+        Tue, 16 Aug 2022 10:02:59 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94FDF7F0B0
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Aug 2022 07:02:57 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id f20so15049741lfc.10
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Aug 2022 07:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=psbLplD4dNjEprFTWJqYf9xWkagYDHJoXwCz4vDrUHs=;
+        b=dFXJN9lxoFQT21kIAH+3QnGSecPFLqrXqVQffWWxJwGfBbNUcZdOSvcAQ9dO5HXpzt
+         98gSL5XQ4W2GVRVyDcE4pd8HRcQJSNS+CbTliv7y9VjEft7IX8Z9Cyyz3NnAva/w5YUI
+         5sVxjlp0JvT6tINKXhf6KXCXF9eyWU1yX5Fs9yHdS+PZeotlIm2ZEGYckS2rCYyWXNq/
+         35gwxkLnsxfvipc5H+OqjBT5wCc0bte03X8Pjh0onJC2+ke1XkWamze2F4GKdp6uGamZ
+         22352X45vda05IsXQencrp3Zl/pYr7+eNz379SYHAY0N8Mlb7ewZcMUtO751JmB1o45z
+         jmww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=psbLplD4dNjEprFTWJqYf9xWkagYDHJoXwCz4vDrUHs=;
+        b=F3/sLKak0C2WDwsaY5lYGtHMN2YZeTWko89WhVd2p1YYmCBV4kyNstTNCWE3wykrfo
+         i3vgU4GkHG6KhZIC+qdy7gb+FBklm/C++AfDHRQynBl+gqbRzzI8+IID0+XiS2LG9+Ra
+         sk3eRAaL1lSawpRpVrgfKvjyJC/T9VolVueGBcVNQT/y4+abCw2NcuHPPknZYR7bCmdj
+         BxFm0tGTyug1Fd+4VWS6Gojb/PpHevSh2m/f1TXB5iCbVjIEx/Z7HqbNW89LygzXh4dd
+         We9uFYI05nkCX5oON7X2onCiGODpNM4909+fOWC+tXOdDPl3fGGIZkUnFlu/dQv5GwZo
+         XDnw==
+X-Gm-Message-State: ACgBeo3mWapwCvMNKWtUfsELEsAXjGNXzjsFNThog2sYCxBRlbhXSfiJ
+        Dvv0IiRMILoro+LS6NCJ5I4p3SiHE7tVdA==
+X-Google-Smtp-Source: AA6agR52edQXKU2V2hqiLrVcNRtREoArsQDVxE22/dliHLoPDw6TjRqjqIf49mFpU0ljyLlEg3yIeg==
+X-Received: by 2002:a05:6512:12c4:b0:48f:aca0:f94e with SMTP id p4-20020a05651212c400b0048faca0f94emr7445636lfg.296.1660658575681;
+        Tue, 16 Aug 2022 07:02:55 -0700 (PDT)
+Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
+        by smtp.gmail.com with ESMTPSA id r27-20020a2eb61b000000b0025e739cd9a7sm1747902ljn.101.2022.08.16.07.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 07:02:55 -0700 (PDT)
+From:   Linus Walleij <linus.walleij@linaro.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH v3 00/16] Ux500 hash cleanup
+Date:   Tue, 16 Aug 2022 16:00:33 +0200
+Message-Id: <20220816140049.102306-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
- Delete the redundant word 'that'.
+This has been very sparingly maintained the last few years,
+but as it happens an active user appeared and sent me a
+bug report, so here is a series cleaning up the driver
+so we can maintain it going forward.
 
-Signed-off-by: Jilin Yuan <yuanjilin@cdjrlc.com>
----
- crypto/api.c            | 2 +-
- crypto/twofish_common.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Most patches are modernizations, using new frameworks and
+helpers.
 
-diff --git a/crypto/api.c b/crypto/api.c
-index 69508ae9345e..ab4b5e2b0756 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -321,7 +321,7 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
- 
- 	/*
- 	 * If the internal flag is set for a cipher, require a caller to
--	 * to invoke the cipher with the internal flag to use that cipher.
-+	 * invoke the cipher with the internal flag to use that cipher.
- 	 * Also, if a caller wants to allocate a cipher that may or may
- 	 * not be an internal cipher, use type | CRYPTO_ALG_INTERNAL and
- 	 * !(mask & CRYPTO_ALG_INTERNAL).
-diff --git a/crypto/twofish_common.c b/crypto/twofish_common.c
-index d23fa531b91f..f921f30334f4 100644
---- a/crypto/twofish_common.c
-+++ b/crypto/twofish_common.c
-@@ -298,7 +298,7 @@ static const u32 mds[4][256] = {
-  * multiplication is inefficient without hardware support.  To multiply
-  * faster, I make use of the fact x is a generator for the nonzero elements,
-  * so that every element p of GF(2)[x]/w(x) is either 0 or equal to (x)^n for
-- * some n in 0..254.  Note that that caret is exponentiation in GF(2^8),
-+ * some n in 0..254.  Note that caret is exponentiation in GF(2^8),
-  * *not* polynomial notation.  So if I want to compute pq where p and q are
-  * in GF(2^8), I can just say:
-  *    1. if p=0 or q=0 then pq=0
+The expensive self tests are passing fine after this series.
+
+I think it is a bit too big to backport to stable :/
+But please put it in as non-urgent fix.
+
+If this goes well the plan is to do the same for the crypto
+driver which has all the same problems.
+
+ChangeLog v2->v3:
+- Rebase on v6.0-rc1
+- Use accelerated noinc regmap MMIO
+
+ChangeLog v1->v2:
+- Iron out some minor runtime bugs.
+- Fix a regmap initialization error.
+- Fix up to use runtime PM and drop custom power states.
+
+Linus Walleij (16):
+  crypto: ux500/hash: Pass ctx to hash_setconfiguration()
+  crypto: ux500/hash: Get rid of custom device list
+  crypto: ux500/hash: Pass context to zero message digest
+  crypto: ux500/hash: Drop custom state save/restore
+  crypto: ux500/hash: Drop bit index
+  crypto: ux500/hash: Break while/do instead of if/else
+  crypto: ux500/hash: Rename and switch type of member
+  crypto: ux500/hash: Stop saving/restoring compulsively
+  crypto: ux500/hash: Get rid of state from request context
+  crypto: ux500/hash: Implement .export and .import
+  crypto: ux500/hash: Drop custom uint64 type
+  crypto: ux500/hash: Drop regulator handling
+  crypto: ux500/hash: Convert to regmap MMIO
+  crypto: ux500/hash: Use AMBA core primecell IDs
+  crypto: ux500/hash: Implement runtime PM
+  crypto: ux500/hash: Use accelerated noinc MMIO
+
+ drivers/crypto/ux500/Kconfig          |    1 +
+ drivers/crypto/ux500/hash/hash_alg.h  |  262 ++----
+ drivers/crypto/ux500/hash/hash_core.c | 1152 ++++++++++---------------
+ 3 files changed, 533 insertions(+), 882 deletions(-)
+
 -- 
-2.36.1
+2.37.2
 
