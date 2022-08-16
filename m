@@ -2,93 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF4DC2BB41
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 07:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44EA4C2BB41
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 08:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbiHPHz7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Aug 2022 03:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60770 "EHLO
+        id S232622AbiHPI1O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Aug 2022 04:27:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232155AbiHPHzW (ORCPT
+        with ESMTP id S232137AbiHPI0K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Aug 2022 03:55:22 -0400
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2404564C5
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Aug 2022 22:09:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1660626589;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=JUJQ7vkSNb+RnNIx9CGBZZIIU1Sz8rfGCe5AhhUa4PI=;
-    b=Xn3/V+nGJmQ+/XY59xgpShx7I5ZZoXENgolJX/0nVYszYAI3nt7fLoxf1J/glEKk9T
-    dWN5TQgZErV1XoTvI0unbQng8UIE6OmM+MVMRa3KRUs+gDYTUzWasImDsRD4KFZBBiUh
-    vVQzIs+UW+fa/8tyF2rHP5Tm2fBcIQr4gxzV8ER2Vp/Xdcu/KUSY2cIYPdtKejKiM3Wc
-    EE/ZR/BAfR9JKydjem1xSj96TPeQUMCJHso39ThYE/RohEs+pyqaVitX56EvI7GpcsC8
-    /LVq3qgt5e2Yh/r2mRjIbVBvblRBnijGhmlK4u1CPAFUYQCxURv76QwxFsumpGfxaZjx
-    ziXQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmgLKehaO2hZDSTWbg/LOA=="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.47.0 AUTH)
-    with ESMTPSA id k44a27y7G59kYqx
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 16 Aug 2022 07:09:46 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Robert Elliott <elliott@hpe.com>, tim.c.chen@linux.intel.com,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        toshi.kani@hpe.com, rwright@hpe.com
-Subject: Re: [PATCH] crypto: testmgr - don't generate WARN for missing modules
-Date:   Tue, 16 Aug 2022 07:09:44 +0200
-Message-ID: <2802022.gAprrWTQMp@tauon.chronox.de>
-In-Reply-To: <YvsEN+6k4lTvXY7I@gondor.apana.org.au>
-References: <20220813231443.2706-1-elliott@hpe.com> <Yvq65Xd6GjeLdmO5@sol.localdomain> <YvsEN+6k4lTvXY7I@gondor.apana.org.au>
+        Tue, 16 Aug 2022 04:26:10 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4661D13EC87;
+        Mon, 15 Aug 2022 22:56:34 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oNpZ0-00BVsf-F6; Tue, 16 Aug 2022 15:56:31 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 16 Aug 2022 13:56:30 +0800
+Date:   Tue, 16 Aug 2022 13:56:30 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Robert Elliott <elliott@hpe.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ardb@kernel.org, toshi.kani@hpe.com
+Subject: Re: [PATCH] crypto: tcrypt - remove mode=1000
+Message-ID: <YvsxjuBlOw6g4I/c@gondor.apana.org.au>
+References: <20220815042915.44547-1-elliott@hpe.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220815042915.44547-1-elliott@hpe.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 16. August 2022, 04:43:03 CEST schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Mon, Aug 15, 2022 at 02:30:13PM -0700, Eric Biggers wrote:
-> > Note that this is only a problem because tcrypt calls alg_test() directly.
-> >  The normal way that alg_test() gets called is for the registration-time
-> > self-test. It's not clear to me why tcrypt calls alg_test() directly; the
-> > registration-time test should be enough.  Herbert, do you know?
+On Sun, Aug 14, 2022 at 11:29:15PM -0500, Robert Elliott wrote:
+> The lists of algothms checked for existence by
+>     modprobe tcrypt mode=1000
+> generates three bogus errors:
+>     modprobe tcrypt mode=1000
 > 
-> The tcrypt code predates testmgr.  So at the beginning we only had
-> the enumerative testing.  Registration-time testing was added later.
+>     console log:
+>     tcrypt: alg rot13 not found
+>     tcrypt: alg cts not found
+>     tcrypt: alg arc4 not found
 > 
-> We could remove the enumerative testing, but I think the FIPS people
-> have grown rather attached to it because it ticks some sort of a box
-> at boot-time.
+> rot13 is not an algorithm in the crypto API or tested.
 > 
-> Stephane, would it be a problem for FIPS if we simply got rid of the
-> enumerative testing in tcrypt and instead relied on registration-time
-> testing?
-
-The tcrypt code has only one purpose for FIPS: to allocate all crypto 
-algorithms at boot time and thus to trigger the self test during boot time. 
-That was a requirement until some time ago. These requirements were relaxed a 
-bit such that a self test before first use is permitted, i.e. the approach we 
-have in testmgr.c.
-
-Therefore, presently we do not need this boot-time allocation of an algorithm 
-via tcrypt which means that from a FIPS perspective tcrypt is no longer 
-required.
+> cts is a wrapper, not a base algorithm.
 > 
-> Cheers,
+> arc4 is named ecb(arc4), not arc4.
+> 
+> Also, the list is missing numerous algorithms that are tested by
+> other test modes:
+>     blake2b-512
+>     blake2s-256
+>     crct10dif
+>     xxhash64
+>     ghash
+>     cast5
+>     sm4
+>     ansi_prng
+> 
+> Several of the algorithms are only available if
+> CONFIG_CRYPTO_USER_API_ENABLE_OBSOLETE is enabled:
+>     arc4
+>     khazad
+>     seed
+>     tea, xtea, xeta
+> 
+> Rather that fix that list, remove test mode=1000 entirely.
+> It seems to have limited utility, and a web search shows no
+> discussion of anybody using it.
+> 
+> Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Robert Elliott <elliott@hpe.com>
+> ---
+>  crypto/tcrypt.c | 28 ----------------------------
+>  1 file changed, 28 deletions(-)
 
+I think it would be better to use alg_test_descs as the source
+list of get rid of check.  But I never use this so unless someone
+else complains I'm fine with removing it.
 
-Ciao
-Stephan
-
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
