@@ -2,92 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD47C25B0E
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 11:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7808C25B0E
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Aug 2022 12:18:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235064AbiHPL5t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Aug 2022 07:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59460 "EHLO
+        id S235105AbiHPMS0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 Aug 2022 08:18:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235111AbiHPL5e (ORCPT
+        with ESMTP id S235020AbiHPMSI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Aug 2022 07:57:34 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A5213E8E
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Aug 2022 04:37:26 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id r69so8983484pgr.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Aug 2022 04:37:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=rSSYPTI2Wf57wn6lhKbY3EjS72ZBy6TOp30vK8NxH0U=;
-        b=mnxp/X6SDX9h6z/M1zEFPWWOLXCPUNv+I5iGrOciM2A+ERoE9qKKz0HvOfw0Tv5j6Z
-         mLxoyCSaLoNswAAjBjgP3aQ0BP6AdtVJcpmEruIobXT1roPZAAZ+jATVA06ksjNDA0l7
-         U9CtNPJ5nvmSCffOeKYW2Znx+oSFgDQo+I1gjmNZxn9FScurNSmuxAiZ/5/ToulCp1/a
-         23pO5xG/w6gfoFtxcPf9wCaoxfdSQuYp3EaCUtjvoQctHpjEtMCW3SC4bInnDIw/AZN1
-         8hf83gQNqjYtN622j/wsVy5migKrsNcq+fgv2TqrNuxuO5zUR3/Ti8iJTKe6eqjJ2o1w
-         h0GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=rSSYPTI2Wf57wn6lhKbY3EjS72ZBy6TOp30vK8NxH0U=;
-        b=UaXHmScMbHR9Ya8ZH+/SzoEdxWtD7XZWSkxNmaFHxTNIUsNOxstxiQHK5q70x9FY+C
-         2hsFtKQhux4Kt3bYvSewj53hZB8R4KfZ3L7cV/lKLZHOpsh2+vowzE4IqEKwWdREwlSG
-         gm3g2FXpOLMa+CNwJAwBy1lGmNK5NIqf88c8vizz4ZLHVxIv6MjFmJsVvD82HWVziT4P
-         ZUpOSd8fdjYqu+lNlFmlUG+d9Bnx9LfeGnnHkJdWsucLcAiiNpLz5bph9fQQ3sNNN3lj
-         3eJ5gEMtSuDCaeMc2VW+/H67iQF/8oo/b5zTYWyKBn+PqILNtYdhlBWnxAtJK//lgL1e
-         NG5w==
-X-Gm-Message-State: ACgBeo2GhEq7NGh3+w5ApJkZ9t66ZJsaV+WjlB8f8l/NYRquVPjz1AZj
-        wAoSeuOQAj5lmK5T8eP3shUnEfVu6/o=
-X-Google-Smtp-Source: AA6agR5Ma9WCHnYPKYqIco2NpJx3KyJ95qtFOHjqPgRdTp2soLPkaWC6au2OmIWJTSnxIRYTD+lcCg==
-X-Received: by 2002:aa7:954d:0:b0:52e:b22c:14a2 with SMTP id w13-20020aa7954d000000b0052eb22c14a2mr20756407pfq.45.1660649846271;
-        Tue, 16 Aug 2022 04:37:26 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id 72-20020a62164b000000b0052e82c7d91bsm8211929pfw.135.2022.08.16.04.37.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 04:37:25 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ye.xingchen@zte.com.cn
-To:     davem@davemloft.net
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] crypto: api - Avoid NULL pointer dereference in crypto_larval_destroy()
-Date:   Tue, 16 Aug 2022 11:37:22 +0000
-Message-Id: <20220816113722.82894-1-ye.xingchen@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Tue, 16 Aug 2022 08:18:08 -0400
+Received: from bg5.exmail.qq.com (bg4.exmail.qq.com [43.154.54.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25832DDF;
+        Tue, 16 Aug 2022 05:15:45 -0700 (PDT)
+X-QQ-mid: bizesmtp88t1660652127tpwbmw4y
+Received: from localhost.localdomain ( [182.148.12.144])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Tue, 16 Aug 2022 20:15:26 +0800 (CST)
+X-QQ-SSF: 01000000002000B0D000B00A0000000
+X-QQ-FEAT: 7jw2iSiCazqtwYDcJ+Li+DJ0HCwyu976NBVI15SXSx7Z0guy6XmDoekTOuxkJ
+        TAvnZJfUWdaNsE4TtrzsAZD2/ixAPKRrlj4c0FqCxfo6nzb+KsF6gvGU0ych4MUPw4zJ1Qy
+        aDuJZ/dNfO3SpoFTpCFM1LZEcELB6fsJGC+TzC24MguFehtbOsD2Rd9WxpvUKxrOK9aNqBI
+        OtWMuKFAn2ER3vlcjEsypv1eJtT1H4Ah9tDg2IGE/IUIAlOpeKq1jYAHOmpTYVL99l+rXsJ
+        5Qo2crIaycaAB9gHXqiGXh4Ekk6kuqvvnVw+/zLqW42Hw6nBEVlUaxwLWHBBMtWTBDKLmMe
+        tpku9OR35WzGk8g/JeK8YbfH69K+wAcli9fflQowS63Sf3B6lL4puD2YeiCfP2tLeNBF3LC
+X-QQ-GoodBg: 0
+From:   Jilin Yuan <yuanjilin@cdjrlc.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jilin Yuan <yuanjilin@cdjrlc.com>
+Subject: [PATCH] crypto: fix repeated words in comments
+Date:   Tue, 16 Aug 2022 20:15:19 +0800
+Message-Id: <20220816121519.60351-1-yuanjilin@cdjrlc.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+ Delete the redundant word 'that'.
 
-When we have no primary larval or when it's a software node, we may end up
- in the situation when larval is a NULL pointer. There is no point to look
-for secondary larval in such case. Add a necessary check to a condition.
-
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Jilin Yuan <yuanjilin@cdjrlc.com>
 ---
- crypto/api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/api.c            | 2 +-
+ crypto/twofish_common.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/api.c b/crypto/api.c
-index 69508ae9345e..f2399aac831d 100644
+index 69508ae9345e..ab4b5e2b0756 100644
 --- a/crypto/api.c
 +++ b/crypto/api.c
-@@ -96,7 +96,7 @@ static void crypto_larval_destroy(struct crypto_alg *alg)
- 	struct crypto_larval *larval = (void *)alg;
+@@ -321,7 +321,7 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
  
- 	BUG_ON(!crypto_is_larval(alg));
--	if (!IS_ERR_OR_NULL(larval->adult))
-+	if (larval && !IS_ERR_OR_NULL(larval->adult))
- 		crypto_mod_put(larval->adult);
- 	kfree(larval);
- }
+ 	/*
+ 	 * If the internal flag is set for a cipher, require a caller to
+-	 * to invoke the cipher with the internal flag to use that cipher.
++	 * invoke the cipher with the internal flag to use that cipher.
+ 	 * Also, if a caller wants to allocate a cipher that may or may
+ 	 * not be an internal cipher, use type | CRYPTO_ALG_INTERNAL and
+ 	 * !(mask & CRYPTO_ALG_INTERNAL).
+diff --git a/crypto/twofish_common.c b/crypto/twofish_common.c
+index d23fa531b91f..f921f30334f4 100644
+--- a/crypto/twofish_common.c
++++ b/crypto/twofish_common.c
+@@ -298,7 +298,7 @@ static const u32 mds[4][256] = {
+  * multiplication is inefficient without hardware support.  To multiply
+  * faster, I make use of the fact x is a generator for the nonzero elements,
+  * so that every element p of GF(2)[x]/w(x) is either 0 or equal to (x)^n for
+- * some n in 0..254.  Note that that caret is exponentiation in GF(2^8),
++ * some n in 0..254.  Note that caret is exponentiation in GF(2^8),
+  * *not* polynomial notation.  So if I want to compute pq where p and q are
+  * in GF(2^8), I can just say:
+  *    1. if p=0 or q=0 then pq=0
 -- 
-2.25.1
+2.36.1
+
