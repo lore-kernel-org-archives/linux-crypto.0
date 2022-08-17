@@ -2,238 +2,403 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF83C32771
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Aug 2022 16:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4267C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Aug 2022 23:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237189AbiHQQpa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Aug 2022 12:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33634 "EHLO
+        id S241653AbiHQXVX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Aug 2022 19:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238130AbiHQQpY (ORCPT
+        with ESMTP id S231510AbiHQXVV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Aug 2022 12:45:24 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A7C5AA0E;
-        Wed, 17 Aug 2022 09:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660754723; x=1692290723;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Nx5mmk70MR2vvj7Oyc43IjGFrUEvYIAc0Um7u/GzS9I=;
-  b=ennEyulHvTzvP0HyywD9PdWVtPcToECcgxCm7hiH+oR4RgVkQdJ8Mo0t
-   JtPTB3CqnqcO3qJVUDsRSGGwCF2X1F/pkT4NC7Lf74XICE1zrWSIc724H
-   pKZc0hGJ7via0AWpglvTOBT29f1obqHqD52VBbQSOsySWxgOG5lxVMhiV
-   5Oezl3/BGUKn4ICi1hQdDMcF/LHrjA4jqLFOCCgkx4AUWiP1AJbvbV63u
-   M3fO6UMfDhSuSXGiEhMzcbj726WeF8sX8PheT8RT2KKLkjHaN1pKg9g7l
-   IAoX+IQ1qkTlAJ6VybO62b+JxMNInTn0mNVzcFcKEZYRYt1jEzg0S0v6z
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10442"; a="378839391"
-X-IronPort-AV: E=Sophos;i="5.93,243,1654585200"; 
-   d="scan'208";a="378839391"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2022 09:44:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,243,1654585200"; 
-   d="scan'208";a="696844257"
-Received: from lkp-server02.sh.intel.com (HELO 81d7e1ade3ba) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Aug 2022 09:44:25 -0700
-Received: from kbuild by 81d7e1ade3ba with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oOM9Y-00018A-2W;
-        Wed, 17 Aug 2022 16:44:24 +0000
-Date:   Thu, 18 Aug 2022 00:43:37 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     platform-driver-x86@vger.kernel.org, linux-mm@kvack.org,
-        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD SUCCESS WITH WARNING
- 95d10484d66e54d5c01e36389e9318221fb8f60b
-Message-ID: <62fd1ab9.SkkTg97b0fVLQyM+%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 17 Aug 2022 19:21:21 -0400
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9614DA404E;
+        Wed, 17 Aug 2022 16:21:20 -0700 (PDT)
+Received: from pps.filterd (m0134420.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27HNKOQh020677;
+        Wed, 17 Aug 2022 23:21:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pps0720;
+ bh=UJv/2liIKuv56++kg5KhoLxF1aoiqDHXWk2kl06Nkqg=;
+ b=EUBhmw71DbsITFrrEy0HHLtG/9SPVsJ4DeECQ8xL+hV2Fn8Wy52cOtVsJeP2DHC6QqL1
+ srg3VLxxXxe080OmGg+iFFhT6Lm2XIsfJwXLza6n52Vxsb7HhgYkcD7FSa1+okteM3MH
+ oEd3R8ywqBv7Ie3xf8GpgRgrQkfUIiqTpe9OIu4qO/NVjUoE3Ad5o73MHhu71Z06XCZz
+ MR+ykeSOvOv2l650j+r6oyNvEYodeUMWdkJqe5zqplAKTtNiN9F9U6fxjlakgBQX9qwa
+ T6DVdmvUZzmNXIRUrGvMsRFX3cJG1eqAhTDONlH2GSz9dUM0HnMwjCJCA+Xicyb1xs5u LQ== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j19wer083-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Aug 2022 23:21:15 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 35BDFD2E5;
+        Wed, 17 Aug 2022 23:21:15 +0000 (UTC)
+Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id E463E80170A;
+        Wed, 17 Aug 2022 23:21:14 +0000 (UTC)
+From:   Robert Elliott <elliott@hpe.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        ebiggers@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Robert Elliott <elliott@hpe.com>
+Subject: [PATCH v2 03/10] crypto: Kconfig - move s390 entries to a submenu
+Date:   Wed, 17 Aug 2022 18:20:50 -0500
+Message-Id: <20220817232057.73643-4-elliott@hpe.com>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220817232057.73643-1-elliott@hpe.com>
+References: <20220815190608.47182-9-elliott@hpe.com>
+ <20220817232057.73643-1-elliott@hpe.com>
+X-Proofpoint-GUID: Z621KLWkd41IGiMOocGFz8uCykg7spHf
+X-Proofpoint-ORIG-GUID: Z621KLWkd41IGiMOocGFz8uCykg7spHf
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-17_15,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 bulkscore=0 adultscore=0 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=591 clxscore=1015 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208170088
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 95d10484d66e54d5c01e36389e9318221fb8f60b  Add linux-next specific files for 20220817
+Move CPU-specific crypto/Kconfig entries to arch/xxx/crypto/Kconfig
+and create a submenu for them under the Crypto API menu.
 
-Warning reports:
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Robert Elliott <elliott@hpe.com>
+---
+ arch/s390/crypto/Kconfig | 120 +++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig           | 118 +-------------------------------------
+ 2 files changed, 123 insertions(+), 115 deletions(-)
+ create mode 100644 arch/s390/crypto/Kconfig
 
-https://lore.kernel.org/linux-doc/202208162058.7apPivKL-lkp@intel.com
-https://lore.kernel.org/llvm/202207251313.gKhpElEq-lkp@intel.com
-
-Warning: (recently discovered and may have been fixed)
-
-Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/gpio/gpio-xilinx.txt
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:1046:5: warning: no previous prototype for 'fill_dc_scaling_info' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:1222:6: warning: no previous prototype for 'handle_cursor_update' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:152:6: warning: no previous prototype for 'modifier_has_dcc' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:1576:5: warning: no previous prototype for 'amdgpu_dm_plane_init' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:157:10: warning: no previous prototype for 'modifier_gfx9_swizzle_mode' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:752:5: warning: no previous prototype for 'fill_plane_buffer_attributes' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:83:31: warning: no previous prototype for 'amd_get_format_info' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:88:6: warning: no previous prototype for 'fill_blending_from_plane_state' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm_plane.c:992:5: warning: no previous prototype for 'dm_plane_helper_check_state' [-Wmissing-prototypes]
-drivers/gpu/drm/msm/disp/dpu1/dpu_kms.c:905:28: warning: variable 'top' set but not used [-Wunused-but-set-variable]
-drivers/iio/accel/bma400_core.c:1091 bma400_activity_event_en() error: uninitialized symbol 'field_value'.
-drivers/iio/cdc/ad7746.c:336:14: warning: use of uninitialized value '<unknown>' [CWE-457] [-Wanalyzer-use-of-uninitialized-value]
-drivers/platform/mellanox/mlxreg-lc.c:866 mlxreg_lc_probe() warn: passing zero to 'PTR_ERR'
-mm/memory_hotplug.c:343 __add_pages() error: uninitialized symbol 'err'.
-
-Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amd_get_format_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amdgpu_dm_plane_init
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-dm_plane_helper_check_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_blending_from_plane_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_dc_scaling_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_plane_buffer_attributes
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-handle_cursor_update
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_gfx9_swizzle_mode
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_has_dcc
-|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_kms.c:warning:variable-top-set-but-not-used
-|-- alpha-randconfig-c023-20220815
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amd_get_format_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amdgpu_dm_plane_init
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-dm_plane_helper_check_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_blending_from_plane_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_dc_scaling_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_plane_buffer_attributes
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-handle_cursor_update
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_gfx9_swizzle_mode
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_has_dcc
-|-- arc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amd_get_format_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amdgpu_dm_plane_init
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-dm_plane_helper_check_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_blending_from_plane_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_dc_scaling_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_plane_buffer_attributes
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-handle_cursor_update
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_gfx9_swizzle_mode
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_has_dcc
-|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_kms.c:warning:variable-top-set-but-not-used
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amd_get_format_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amdgpu_dm_plane_init
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-dm_plane_helper_check_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_blending_from_plane_state
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_dc_scaling_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-fill_plane_buffer_attributes
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-handle_cursor_update
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_gfx9_swizzle_mode
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-modifier_has_dcc
-|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_kms.c:warning:variable-top-set-but-not-used
-|-- arm-defconfig
-|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_kms.c:warning:variable-top-set-but-not-used
-|-- arm-randconfig-c002-20220817
-|   `-- drivers-iio-cdc-ad7746.c:warning:use-of-uninitialized-value-unknown-CWE
-|-- arm64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amd_get_format_info
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm_plane.c:warning:no-previous-prototype-for-amdgpu_dm_plane_init
-clang_recent_errors
-`-- mips-omega2p_defconfig
-    `-- lib-crypto-blake2s-selftest.c:warning:stack-frame-size-()-exceeds-limit-()-in-blake2s_selftest
-
-elapsed time: 727m
-
-configs tested: 81
-configs skipped: 2
-
-gcc tested configs:
-um                           x86_64_defconfig
-um                             i386_defconfig
-m68k                        stmark2_defconfig
-microblaze                      mmu_defconfig
-i386                                defconfig
-arm                         nhk8815_defconfig
-x86_64                           rhel-8.3-kvm
-arc                  randconfig-r043-20220815
-x86_64               randconfig-a001-20220815
-x86_64                              defconfig
-arc                               allnoconfig
-i386                 randconfig-a003-20220815
-x86_64                    rhel-8.3-kselftests
-arm                                 defconfig
-sh                        sh7757lcr_defconfig
-x86_64               randconfig-a003-20220815
-x86_64                               rhel-8.3
-alpha                             allnoconfig
-i386                 randconfig-a004-20220815
-mips                             allyesconfig
-csky                              allnoconfig
-riscv                             allnoconfig
-x86_64               randconfig-a002-20220815
-i386                 randconfig-a002-20220815
-powerpc                           allnoconfig
-x86_64               randconfig-a004-20220815
-x86_64                           allyesconfig
-alpha                            allyesconfig
-x86_64               randconfig-a006-20220815
-mips                            gpr_defconfig
-powerpc                          allmodconfig
-x86_64               randconfig-a005-20220815
-i386                 randconfig-a001-20220815
-sh                               allmodconfig
-i386                 randconfig-a006-20220815
-i386                 randconfig-a005-20220815
-x86_64                           rhel-8.3-syz
-m68k                             allmodconfig
-x86_64                          rhel-8.3-func
-arc                              allyesconfig
-x86_64                         rhel-8.3-kunit
-m68k                             allyesconfig
-i386                             allyesconfig
-i386                 randconfig-c001-20220815
-arm                              allyesconfig
-arm                         vf610m4_defconfig
-ia64                      gensparse_defconfig
-parisc64                         alldefconfig
-sh                          landisk_defconfig
-ia64                                defconfig
-powerpc                         wii_defconfig
-sh                                  defconfig
-arm64                            allyesconfig
-ia64                             allmodconfig
-arm                          simpad_defconfig
-sh                           se7750_defconfig
-powerpc                        cell_defconfig
-
-clang tested configs:
-x86_64               randconfig-a013-20220815
-x86_64               randconfig-a012-20220815
-x86_64               randconfig-a011-20220815
-x86_64               randconfig-a014-20220815
-hexagon              randconfig-r041-20220815
-powerpc                     ksi8560_defconfig
-s390                             alldefconfig
-x86_64               randconfig-a016-20220815
-arm                    vt8500_v6_v7_defconfig
-mips                          ath79_defconfig
-s390                 randconfig-r044-20220815
-x86_64               randconfig-a015-20220815
-i386                 randconfig-a012-20220815
-i386                 randconfig-a013-20220815
-hexagon              randconfig-r045-20220815
-i386                 randconfig-a011-20220815
-riscv                randconfig-r042-20220815
-i386                 randconfig-a015-20220815
-i386                 randconfig-a016-20220815
-i386                 randconfig-a014-20220815
-mips                        omega2p_defconfig
-x86_64                          rhel-8.3-rust
-powerpc                 mpc832x_mds_defconfig
-powerpc                      ppc64e_defconfig
-
+diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
+new file mode 100644
+index 000000000000..ef0651d71e9d
+--- /dev/null
++++ b/arch/s390/crypto/Kconfig
+@@ -0,0 +1,120 @@
++# SPDX-License-Identifier: GPL-2.0
++
++menu "Accelerated Cryptographic Algorithms for CPU (s390)"
++
++config CRYPTO_CRC32_S390
++	tristate "CRC-32 algorithms"
++	depends on S390
++	select CRYPTO_HASH
++	select CRC32
++	help
++	  Select this option if you want to use hardware accelerated
++	  implementations of CRC algorithms.  With this option, you
++	  can optimize the computation of CRC-32 (IEEE 802.3 Ethernet)
++	  and CRC-32C (Castagnoli).
++
++	  It is available with IBM z13 or later.
++
++config CRYPTO_SHA512_S390
++	tristate "SHA384 and SHA512 digest algorithm"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  SHA512 secure hash standard.
++
++	  It is available as of z10.
++
++config CRYPTO_SHA1_S390
++	tristate "SHA1 digest algorithm"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
++
++	  It is available as of z990.
++
++config CRYPTO_SHA256_S390
++	tristate "SHA256 digest algorithm"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  SHA256 secure hash standard (DFIPS 180-2).
++
++	  It is available as of z9.
++
++config CRYPTO_SHA3_256_S390
++	tristate "SHA3_224 and SHA3_256 digest algorithm"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  SHA3_256 secure hash standard.
++
++	  It is available as of z14.
++
++config CRYPTO_SHA3_512_S390
++	tristate "SHA3_384 and SHA3_512 digest algorithm"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  SHA3_512 secure hash standard.
++
++	  It is available as of z14.
++
++config CRYPTO_GHASH_S390
++	tristate "GHASH hash function"
++	depends on S390
++	select CRYPTO_HASH
++	help
++	  This is the s390 hardware accelerated implementation of GHASH,
++	  the hash function used in GCM (Galois/Counter mode).
++
++	  It is available as of z196.
++
++config CRYPTO_AES_S390
++	tristate "AES cipher algorithms"
++	depends on S390
++	select CRYPTO_ALGAPI
++	select CRYPTO_SKCIPHER
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  AES cipher algorithms (FIPS-197).
++
++	  As of z9 the ECB and CBC modes are hardware accelerated
++	  for 128 bit keys.
++	  As of z10 the ECB and CBC modes are hardware accelerated
++	  for all AES key sizes.
++	  As of z196 the CTR mode is hardware accelerated for all AES
++	  key sizes and XTS mode is hardware accelerated for 256 and
++	  512 bit keys.
++
++config CRYPTO_DES_S390
++	tristate "DES and Triple DES cipher algorithms"
++	depends on S390
++	select CRYPTO_ALGAPI
++	select CRYPTO_SKCIPHER
++	select CRYPTO_LIB_DES
++	help
++	  This is the s390 hardware accelerated implementation of the
++	  DES cipher algorithm (FIPS 46-2), and Triple DES EDE (FIPS 46-3).
++
++	  As of z990 the ECB and CBC mode are hardware accelerated.
++	  As of z196 the CTR mode is hardware accelerated.
++
++config CRYPTO_CHACHA_S390
++	tristate "ChaCha20 stream cipher"
++	depends on S390
++	select CRYPTO_SKCIPHER
++	select CRYPTO_LIB_CHACHA_GENERIC
++	select CRYPTO_ARCH_HAVE_LIB_CHACHA
++	help
++	  This is the s390 SIMD implementation of the ChaCha20 stream
++	  cipher (RFC 7539).
++
++	  It is available as of z13.
++
++endmenu
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index efb73dae2e52..5678f7f18b76 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -647,19 +647,6 @@ menuconfig CRYPTO
+ 	  which will enable any routine to use the CRC-32-IEEE 802.3 checksum
+ 	  and gain better performance as compared with the table implementation.
+ 
+-config CRYPTO_CRC32_S390
+-	tristate "CRC-32 algorithms"
+-	depends on S390
+-	select CRYPTO_HASH
+-	select CRC32
+-	help
+-	  Select this option if you want to use hardware accelerated
+-	  implementations of CRC algorithms.  With this option, you
+-	  can optimize the computation of CRC-32 (IEEE 802.3 Ethernet)
+-	  and CRC-32C (Castagnoli).
+-
+-	  It is available with IBM z13 or later.
+-
+ config CRYPTO_XXHASH
+ 	tristate "xxHash hash algorithm"
+ 	select CRYPTO_HASH
+@@ -852,16 +839,6 @@ menuconfig CRYPTO
+ 	  Extensions version 1 (AVX1), or Advanced Vector Extensions
+ 	  version 2 (AVX2) instructions, when available.
+ 
+-config CRYPTO_SHA512_S390
+-	tristate "SHA384 and SHA512 digest algorithm"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  SHA512 secure hash standard.
+-
+-	  It is available as of z10.
+-
+ config CRYPTO_SHA1_SPARC64
+ 	tristate "SHA1 digest algorithm (SPARC64)"
+ 	depends on SPARC64
+@@ -871,16 +848,6 @@ menuconfig CRYPTO
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+ 	  using sparc64 crypto instructions, when available.
+ 
+-config CRYPTO_SHA1_S390
+-	tristate "SHA1 digest algorithm"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
+-
+-	  It is available as of z990.
+-
+ config CRYPTO_SHA256
+ 	tristate "SHA224 and SHA256 digest algorithm"
+ 	select CRYPTO_HASH
+@@ -903,16 +870,6 @@ menuconfig CRYPTO
+ 	  SHA-256 secure hash standard (DFIPS 180-2) implemented
+ 	  using sparc64 crypto instructions, when available.
+ 
+-config CRYPTO_SHA256_S390
+-	tristate "SHA256 digest algorithm"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  SHA256 secure hash standard (DFIPS 180-2).
+-
+-	  It is available as of z9.
+-
+ config CRYPTO_SHA512
+ 	tristate "SHA384 and SHA512 digest algorithms"
+ 	select CRYPTO_HASH
+@@ -944,26 +901,6 @@ menuconfig CRYPTO
+ 	  References:
+ 	  http://keccak.noekeon.org/
+ 
+-config CRYPTO_SHA3_256_S390
+-	tristate "SHA3_224 and SHA3_256 digest algorithm"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  SHA3_256 secure hash standard.
+-
+-	  It is available as of z14.
+-
+-config CRYPTO_SHA3_512_S390
+-	tristate "SHA3_384 and SHA3_512 digest algorithm"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  SHA3_512 secure hash standard.
+-
+-	  It is available as of z14.
+-
+ config CRYPTO_SM3
+ 	tristate
+ 
+@@ -1024,16 +961,6 @@ menuconfig CRYPTO
+ 	  This is the x86_64 CLMUL-NI accelerated implementation of
+ 	  GHASH, the hash function used in GCM (Galois/Counter mode).
+ 
+-config CRYPTO_GHASH_S390
+-	tristate "GHASH hash function"
+-	depends on S390
+-	select CRYPTO_HASH
+-	help
+-	  This is the s390 hardware accelerated implementation of GHASH,
+-	  the hash function used in GCM (Galois/Counter mode).
+-
+-	  It is available as of z196.
+-
+ comment "Ciphers"
+ 
+ config CRYPTO_AES
+@@ -1135,23 +1062,6 @@ menuconfig CRYPTO
+ 	  for some popular block cipher mode is supported too, including
+ 	  ECB and CBC.
+ 
+-config CRYPTO_AES_S390
+-	tristate "AES cipher algorithms"
+-	depends on S390
+-	select CRYPTO_ALGAPI
+-	select CRYPTO_SKCIPHER
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  AES cipher algorithms (FIPS-197).
+-
+-	  As of z9 the ECB and CBC modes are hardware accelerated
+-	  for 128 bit keys.
+-	  As of z10 the ECB and CBC modes are hardware accelerated
+-	  for all AES key sizes.
+-	  As of z196 the CTR mode is hardware accelerated for all AES
+-	  key sizes and XTS mode is hardware accelerated for 256 and
+-	  512 bit keys.
+-
+ config CRYPTO_ANUBIS
+ 	tristate "Anubis cipher algorithm"
+ 	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+@@ -1382,19 +1292,6 @@ menuconfig CRYPTO
+ 	  algorithm are provided; regular processing one input block and
+ 	  one that processes three blocks parallel.
+ 
+-config CRYPTO_DES_S390
+-	tristate "DES and Triple DES cipher algorithms"
+-	depends on S390
+-	select CRYPTO_ALGAPI
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_LIB_DES
+-	help
+-	  This is the s390 hardware accelerated implementation of the
+-	  DES cipher algorithm (FIPS 46-2), and Triple DES EDE (FIPS 46-3).
+-
+-	  As of z990 the ECB and CBC mode are hardware accelerated.
+-	  As of z196 the CTR mode is hardware accelerated.
+-
+ config CRYPTO_FCRYPT
+ 	tristate "FCrypt cipher algorithm"
+ 	select CRYPTO_ALGAPI
+@@ -1448,18 +1345,6 @@ menuconfig CRYPTO
+ 	  SSSE3, AVX2, and AVX-512VL optimized implementations of the ChaCha20,
+ 	  XChaCha20, and XChaCha12 stream ciphers.
+ 
+-config CRYPTO_CHACHA_S390
+-	tristate "ChaCha20 stream cipher"
+-	depends on S390
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_LIB_CHACHA_GENERIC
+-	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	help
+-	  This is the s390 SIMD implementation of the ChaCha20 stream
+-	  cipher (RFC 7539).
+-
+-	  It is available as of z13.
+-
+ config CRYPTO_SEED
+ 	tristate "SEED cipher algorithm"
+ 	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
+@@ -1950,6 +1835,9 @@ menuconfig CRYPTO_DRBG_MENU
+ if PPC
+ source "arch/powerpc/crypto/Kconfig"
+ endif
++if S390
++source "arch/s390/crypto/Kconfig"
++endif
+ 
+ source "drivers/crypto/Kconfig"
+ source "crypto/asymmetric_keys/Kconfig"
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.37.1
+
