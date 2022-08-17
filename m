@@ -2,64 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27373C32773
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Aug 2022 08:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A2DC25B08
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Aug 2022 08:20:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234781AbiHQIOk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Aug 2022 04:14:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39272 "EHLO
+        id S232259AbiHQIUn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Aug 2022 04:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234606AbiHQIOc (ORCPT
+        with ESMTP id S238495AbiHQIUh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Aug 2022 04:14:32 -0400
-X-Greylist: delayed 511 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 17 Aug 2022 01:14:24 PDT
-Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06064E87E
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2022 01:14:24 -0700 (PDT)
-Received: by mail.fadrush.pl (Postfix, from userid 1002)
-        id 99EBC230E6; Wed, 17 Aug 2022 08:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
-        t=1660723552; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
-        h=Date:From:To:Subject:From;
-        b=JWq1P3+gX/WglLo6FkWFa9+iISESh0YGNGuK3XpF5UUGF+h+F5dwzrWhkEn0qXlwJ
-         PDklhiuB0adTlJTy3i+YsZBitDroFYfNcNNRdZbUCuD1I5qzdQAI7e4P6B5O462Fpg
-         pUdP7+AGkRp8BwrQLFv66Z97iO+QEny8qlIq7N/Cy8pj0SkwC2KtJ+TD87du6lxOxr
-         G5CsXmvauL/6wTit319ptADbAcL6ep/fw4/rPGGk3DUwbV2RFD1adET60FkPpoYvso
-         H2dSynmGREsIHtZLnyd+40DiPx537QDCby8rMwCJJW/aM905K/3UkSoNL1XIhWQpeU
-         +s964v8ye7B/g==
-Received: by mail.fadrush.pl for <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2022 08:05:31 GMT
-Message-ID: <20220817064500-0.1.12.8au6.0.9ii86afcik@fadrush.pl>
-Date:   Wed, 17 Aug 2022 08:05:31 GMT
-From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
-X-Mailer: mail.fadrush.pl
+        Wed, 17 Aug 2022 04:20:37 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD0F5A3E3;
+        Wed, 17 Aug 2022 01:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=FbA2D5Ytl8+XtaWqyY9MA5kUljBxAI9NwrGzxlRhdQk=; b=EFCB5EU9sU/o+jU27fJtSjV5w0
+        X+PBVw0yoVvPMJDNmJHygP8pfcG9OE0UGoD69l1lZAB7HdW5Pm1kQIJNQz1xzV5CVTtlnyV7RqLph
+        tvISqn1NRSaAGr/hkVcVNkIlK+Gv9tHxd66mSyZPpPQe124aCKJfFWQyH5fXGM9Emid7ULWv7ev4K
+        G9IheupG/D6E8JOMPsoX6O6Jb4uorIHT5DoUD5Zi6u9cCNO7PsAX3KObZnWUuXeoi4Z/YxLxwWOZv
+        nr9IJ69C6Jpnk4X2Wo0Ifq8MI4+0zxXN4HbGve5aqeeF7XNGafNee9zUPrt4+wnb38Lw1k07iCNyb
+        yOjNQzfg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oOEHc-003DEo-GU; Wed, 17 Aug 2022 08:20:16 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 806FB98007A; Wed, 17 Aug 2022 10:20:10 +0200 (CEST)
+Date:   Wed, 17 Aug 2022 10:20:10 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, Nadia Heninger <nadiah@cs.ucsd.edu>,
+        Thomas Ristenpart <ristenpart@cornell.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Florian Weimer <fweimer@redhat.com>
+Subject: Re: [PATCH RFC v1] random: implement getrandom() in vDSO
+Message-ID: <YvykurTz/O93AEIa@worktop.programming.kicks-ass.net>
+References: <20220729145525.1729066-1-Jason@zx2c4.com>
+ <CAHk-=wiLwz=9h9LD1-_yb1+T+u59a2EjTmMvCiGj4A-ZsPN1wA@mail.gmail.com>
+ <YuXCpyULk6jFgGV5@zx2c4.com>
+ <87zggnsqwj.ffs@tglx>
+ <Yuhe6IIFXqNMZs5b@zx2c4.com>
+ <87bkt2sqq4.ffs@tglx>
+ <YuktqQS7Rb0IbJNh@zx2c4.com>
+ <878ro6smmm.ffs@tglx>
+ <CAHmME9pNN6Pc_1NaMDv+hqv_ULXiVUYFXM=Xigu_StvGS_-53A@mail.gmail.com>
+ <87zggmqo0w.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zggmqo0w.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Wed, Aug 03, 2022 at 12:27:43AM +0200, Thomas Gleixner wrote:
+> Assumed that there is a sensible usecase, there is a way out and that's
+> exactly the library part. You can make that VDSO interface versioned and
+> provide a library in tools/random/ which goes in lockstep with the VDSO
+> changes.
 
-kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
-proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
-stwa firmie stabilny rozw=C3=B3j.=20
+Well.... there is still the old idea of making a genuine libkernel.so
+which is part of the kernel and provided as a virtual file (say in
+/sys/lib/).
 
-Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
-a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
-nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
-po rozwoju firmy.
-
-Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
-nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
-adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
-j=C4=85 je innym.
-
-Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
-o=C5=9Bwiadczonego doradcy finansowego?
-
-
-Pozdrawiam
-Jakub Olejniczak
+Since that's perfectly in lock-step with the kerne image, it can be
+used to avoid the vdso data layout compat issues. Only the actual
+symbols provided by the library are ABI constrained, not their
+implementation.
