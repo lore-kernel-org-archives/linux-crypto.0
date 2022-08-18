@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2882AC00140
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2726EC32789
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344764AbiHRRDL (ORCPT
+        id S1345209AbiHRRDQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Aug 2022 13:03:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35284 "EHLO
+        Thu, 18 Aug 2022 13:03:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344574AbiHRRAy (ORCPT
+        with ESMTP id S1345277AbiHRRBK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Aug 2022 13:00:54 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 929A6C9EB8
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:44 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id r16so2424441wrm.6
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:44 -0700 (PDT)
+        Thu, 18 Aug 2022 13:01:10 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDB3C00CA
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:56 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id k17so1134617wmr.2
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=eLy87IRVh4b6Em0nmlrAVYIKhrkSltNj2ViSGS4UTfA=;
-        b=XeSwAr9n/Pw5Fm5O7zSRaI6sLWfJJvFQzX9m5oz3ag1QJcf6ZYTV2ZvwG+utKZUWiH
-         0Ip4YOxZs6/cR6joQTCf4XbSlbnIdDIr0lyYowO6/cQLJVSzjKw8351B6vQFRELXcT6j
-         0Ln3/LwasJ/0jH96ZTUWY3vyu2LfwmREYmS+v++7BHaC2m3EtWRnX10RFm7KfP+sFuBS
-         O1bbaAlfSJWb02jRZvhXPAwdYGrmVYCNyW8sEeSbXvte9cUsFepUsfRrMUsDQb55C4SY
-         sCHmBpoHgKuQ699QNzWfZfspdizqugGaxKA9sBPOZEv2QTEvkr0VBRqLcIerGSTIOpYD
-         Zi6A==
+        bh=8ma5Ol24QeG3/DDgAehhLNXstU8Od+DxxiWWftpJxi8=;
+        b=Dyyr6Tu3fV/nmKH/FomCr8OnALOmbi2GIry7O4qybdOdRKrpHxUf3haR28ScOq4vQp
+         PRuHFb0LhAH6opVwhabnC1gc7myJ0S96G2KBXU/yAePzNLuJQTPytfZV78KOwfQ6AIY3
+         70QtzUKcIC4ZVPseBJKndk46EC+b82inP4fUkQGqUt8oRTAbDG4VXCTX385NCKYWyzJi
+         rg/H4INIdsyeEOhrO2sjmH2Hxw6hwKnZztxInsPxd9cWE1A2nlJ+dmPmHrwNDe+8LgNY
+         DME9mr8vak39op+HrvHLhrb3mLkGDzuf/CqR+aK0U4Fj793x+b/cw0Qwxe+2gECW8a2x
+         LLkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=eLy87IRVh4b6Em0nmlrAVYIKhrkSltNj2ViSGS4UTfA=;
-        b=2nAY0pvdiP4T/CPD18VXnE8EMh99DlFI+K0TB5Dom43O2QxVOwBHGclvHQ0UyxwkxL
-         jg6EICJAC15PzYZ2iSwSPvfj7aY4Ck9iWeL0Qz+KZ1x2WV9/2p6WLdkAaDwyYzquKbfy
-         E3iptPiRDUEweDGQLDdOwnq7v4Dcwh+UekgYwn4ssfHBjKV4M+G9oPnc66YbeouQ95Nu
-         O17d8BVs3kCLE7hr6Y3zBvVs7cHpUW9KRDCQ89tuPrjQDBIPkAxgIBapXPieJviPiIlc
-         agAA4wMMgMN187OjWgdbzvKaW3STf/cPSB5Gz1DJDlJirbIKYT762sC2/AO9DCZIGhHh
-         y33w==
-X-Gm-Message-State: ACgBeo0aTwo1/5huTbSIZVHXzswQ2Lo88smspDEzyV9IlfZR8BZJp+si
-        f5y/7ESBsbhp8cbXJmCb1/6DLw==
-X-Google-Smtp-Source: AA6agR4X1BygOh0f0Cqxna994IJRWQXJvGsePjkD+zeM92ZTlISux/tL5Ag/OSRUJQSYUVA6AzNqpQ==
-X-Received: by 2002:a05:6000:1704:b0:220:69a7:ec2b with SMTP id n4-20020a056000170400b0022069a7ec2bmr2234469wrc.436.1660842043096;
-        Thu, 18 Aug 2022 10:00:43 -0700 (PDT)
+        bh=8ma5Ol24QeG3/DDgAehhLNXstU8Od+DxxiWWftpJxi8=;
+        b=YEqkqHWB8m6GvHWNdShbE3wOZRjnR+bRFvRcitnaDG57VNjy+L+LmRvMyPwOhzCYx1
+         UuWmSLwT2xc2qVeOtkXoTV82UCPvMTxno2/b3WFdKDf2fonryCLJNwtMIRXlHNFJ6GIb
+         vCm64Z0TxowlKWJQe374G3u/nlCFZ+ZhV0okAR+F2tRGsQJeVkRZxQs2d+ITISxVzPhL
+         SdHxEand5LIMno6ocWlh1qCZtuob+P/CdpF8fxFIu54Cn6pmbKFAqb3lhr9JIfPOcDXk
+         HBtA17FXWP7EUErg789/fTe4/22tFfxCsnlreOadFLh7JX7M/4DcCth6YzsmR5n0zTjW
+         l+Jg==
+X-Gm-Message-State: ACgBeo0eZZ/+CY7Ul5w81Md2XppZCauoVJqnNzcIbpY8sSx9TVXPwr5q
+        fzyMkCj8FuqdS0oBmqt8qKrEuw==
+X-Google-Smtp-Source: AA6agR6EGfdN7r5kkm0GTVOJBZVq1ncE/GsFZw3mnOwZ9sBIGabObnZvk3+avhcWA5rIpDtpQxSQrQ==
+X-Received: by 2002:a05:600c:4ec9:b0:3a5:a567:137f with SMTP id g9-20020a05600c4ec900b003a5a567137fmr5725720wmq.46.1660842055023;
+        Thu, 18 Aug 2022 10:00:55 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm2662169wmb.34.2022.08.18.10.00.41
+        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm2662169wmb.34.2022.08.18.10.00.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 10:00:42 -0700 (PDT)
+        Thu, 18 Aug 2022 10:00:54 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -70,9 +70,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 20/31] net/tcp: Add tcp_hash_fail() ratelimited logs
-Date:   Thu, 18 Aug 2022 17:59:54 +0100
-Message-Id: <20220818170005.747015-21-dima@arista.com>
+Subject: [PATCH 28/31] selftest/tcp-ao: Add a test for MKT matching
+Date:   Thu, 18 Aug 2022 18:00:02 +0100
+Message-Id: <20220818170005.747015-29-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220818170005.747015-1-dima@arista.com>
 References: <20220818170005.747015-1-dima@arista.com>
@@ -82,188 +82,251 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a helper for logging connection-detailed messages for failed TCP
-hash verification (both MD5 and AO).
+Add TCP-AO tests on connect()/accept() pair.
+SNMP counters exposed by kernel are very useful here to verify the
+expected behavior of TCP-AO.
 
-Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-Co-developed-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/net/tcp.h    | 14 ++++++++++++--
- include/net/tcp_ao.h | 27 +++++++++++++++++++++++++++
- net/ipv4/tcp.c       | 23 +++++++++++++----------
- net/ipv4/tcp_ao.c    |  7 +++++++
- 4 files changed, 59 insertions(+), 12 deletions(-)
+ tools/testing/selftests/net/tcp_ao/Makefile   |   2 +-
+ .../selftests/net/tcp_ao/connect-deny.c       | 217 ++++++++++++++++++
+ 2 files changed, 218 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/connect-deny.c
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 94573219f58d..896db7ba0670 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2517,12 +2517,19 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
- 	int l3index;
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+index a178bde0af08..5064e34ebe38 100644
+--- a/tools/testing/selftests/net/tcp_ao/Makefile
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-TEST_BOTH_AF := connect icmps-discard icmps-accept
++TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
  
- 	/* Invalid option or two times meet any of auth options */
--	if (tcp_parse_auth_options(th, &md5_location, &aoh))
-+	if (tcp_parse_auth_options(th, &md5_location, &aoh)) {
-+		tcp_hash_fail("TCP segment has incorrect auth options set",
-+				family, skb, "");
- 		return SKB_DROP_REASON_TCP_AUTH_HDR;
-+	}
- 
- 	if (req) {
--		if (tcp_rsk_used_ao(req) != !!aoh)
-+		if (tcp_rsk_used_ao(req) != !!aoh) {
-+			tcp_hash_fail("TCP connection can't start/end using TCP-AO",
-+					family, skb, " %s",
-+					!aoh ? "missing AO" : "AO signed");
- 			return SKB_DROP_REASON_TCP_AOFAILURE;
-+		}
- 	}
- 
- 	/* sdif set, means packet ingressed via a device
-@@ -2545,11 +2552,14 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
- 					lockdep_sock_is_held(sk));
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOREQUIRED);
- 			atomic64_inc(&ao_info->counters.ao_required);
-+			tcp_hash_fail("AO hash is required, but not found",
-+					family, skb, "");
- 			return SKB_DROP_REASON_TCP_AONOTFOUND;
- 		}
- #endif
- 		if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family))) {
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFOUND);
-+			tcp_hash_fail("MD5 Hash not found", family, skb, "");
- 			return SKB_DROP_REASON_TCP_MD5NOTFOUND;
- 		}
- 		return SKB_NOT_DROPPED_YET;
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index dbeaa7d4e212..e99c8f300a5a 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -101,6 +101,33 @@ struct tcp_ao_info {
- int tcp_do_parse_auth_options(const struct tcphdr *th,
- 			      const u8 **md5_hash, const u8 **ao_hash);
- 
-+#define tcp_hash_fail(msg, family, skb, fmt, ...)			\
-+do {									\
-+	const struct tcphdr *th = tcp_hdr(skb);				\
-+	char hdr_flags[5] = {};						\
-+	char *f = hdr_flags;						\
-+									\
-+	if (th->fin)							\
-+		*f++ = 'F';						\
-+	if (th->syn)							\
-+		*f++ = 'S';						\
-+	if (th->rst)							\
-+		*f++ = 'R';						\
-+	if (th->ack)							\
-+		*f = 'A';						\
-+	if (family == AF_INET) {					\
-+		net_info_ratelimited("%s for (%pI4, %d)->(%pI4, %d) %s" fmt "\n", \
-+				msg, &ip_hdr(skb)->saddr, ntohs(th->source), \
-+				&ip_hdr(skb)->daddr, ntohs(th->dest),	\
-+				hdr_flags, ##__VA_ARGS__);		\
-+	} else {							\
-+		net_info_ratelimited("%s for [%pI6c]:%u->[%pI6c]:%u %s" fmt "\n", \
-+				msg, &ipv6_hdr(skb)->saddr, ntohs(th->source), \
-+				&ipv6_hdr(skb)->daddr, ntohs(th->dest),	\
-+				hdr_flags, ##__VA_ARGS__);		\
-+	}								\
-+} while (0)
+ TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
+ TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
+diff --git a/tools/testing/selftests/net/tcp_ao/connect-deny.c b/tools/testing/selftests/net/tcp_ao/connect-deny.c
+new file mode 100644
+index 000000000000..cf71dda52c49
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/connect-deny.c
+@@ -0,0 +1,217 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Author: Dmitry Safonov <dima@arista.com> */
++#include <inttypes.h>
++#include "aolib.h"
 +
- #ifdef CONFIG_TCP_AO
- /* TCP-AO structures and functions */
- 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8df03d456ebb..3ef9d69fa561 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4511,7 +4511,6 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
- 	 * o MD5 hash and we're not expecting one.
- 	 * o MD5 hash and its wrong.
- 	 */
--	const struct tcphdr *th = tcp_hdr(skb);
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct tcp_md5sig_key *key;
- 	int genhash;
-@@ -4521,6 +4520,7 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
- 
- 	if (!key && hash_location) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5UNEXPECTED);
-+		tcp_hash_fail("Unexpected MD5 Hash found", family, skb, "");
- 		return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
- 	}
- 
-@@ -4536,16 +4536,19 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
- 	if (genhash || memcmp(hash_location, newhash, 16) != 0) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
- 		if (family == AF_INET) {
--			net_info_ratelimited("MD5 Hash failed for (%pI4, %d)->(%pI4, %d)%s L3 index %d\n",
--					saddr, ntohs(th->source),
--					daddr, ntohs(th->dest),
--					genhash ? " tcp_v4_calc_md5_hash failed"
--					: "", l3index);
-+			tcp_hash_fail("MD5 Hash failed", AF_INET, skb, "%s L3 index %d",
-+				      genhash ? " tcp_v4_calc_md5_hash failed"
-+				      : "", l3index);
- 		} else {
--			net_info_ratelimited("MD5 Hash %s for [%pI6c]:%u->[%pI6c]:%u L3 index %d\n",
--					genhash ? "failed" : "mismatch",
--					saddr, ntohs(th->source),
--					daddr, ntohs(th->dest), l3index);
-+			if (genhash) {
-+				tcp_hash_fail("MD5 Hash failed",
-+					      AF_INET6, skb, " L3 index %d",
-+					      l3index);
-+			} else {
-+				tcp_hash_fail("MD5 Hash mismatch",
-+					      AF_INET6, skb, " L3 index %d",
-+					      l3index);
-+			}
- 		}
- 		return SKB_DROP_REASON_TCP_MD5FAILURE;
- 	}
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 3a33733a714d..4283e0193e2a 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -662,6 +662,8 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
- 		atomic64_inc(&info->counters.pkt_bad);
- 		atomic64_inc(&key->pkt_bad);
-+		tcp_hash_fail("AO hash wrong length", family, skb,
-+			      " %u != %d", maclen, tcp_ao_maclen(key));
- 		return SKB_DROP_REASON_TCP_AOFAILURE;
- 	}
- 
-@@ -672,6 +674,7 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
- 		atomic64_inc(&info->counters.pkt_bad);
- 		atomic64_inc(&key->pkt_bad);
-+		tcp_hash_fail("AO hash mismatch", family, skb, "");
- 		return SKB_DROP_REASON_TCP_AOFAILURE;
- 	}
- 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOGOOD);
-@@ -698,6 +701,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 	info = rcu_dereference(tcp_sk(sk)->ao_info);
- 	if (!info) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
-+		tcp_hash_fail("AO key not found", family, skb,
-+			      " keyid: %u", aoh->keyid);
- 		return SKB_DROP_REASON_TCP_AOUNEXPECTED;
- 	}
- 
-@@ -780,6 +785,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- key_not_found:
- 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
- 	atomic64_inc(&info->counters.key_not_found);
-+	tcp_hash_fail("Requested by the peer AO key id not found",
-+		      family, skb, "");
- 	return SKB_DROP_REASON_TCP_AOKEYNOTFOUND;
- }
- 
++typedef uint8_t fault_t;
++#define F_TIMEOUT	1
++#define F_KEYREJECT	2
++
++#define fault(type)	(inj == type)
++
++static void try_accept(const char *tst_name, unsigned port, const char *pwd,
++		       union tcp_addr addr, uint8_t prefix,
++		       uint8_t sndid, uint8_t rcvid, const char *cnt_name,
++		       fault_t inj)
++{
++	uint64_t before_cnt, after_cnt;
++	int lsk, err, sk = 0;
++	time_t timeout;
++
++	lsk = test_listen_socket(this_ip_addr, port, 1);
++
++	if (pwd && test_set_ao(lsk, pwd, 0, addr, prefix, sndid, rcvid))
++		test_error("setsockopt(TCP_AO)");
++
++	if (cnt_name)
++		before_cnt = netstat_get_one(cnt_name, NULL);
++
++	synchronize_threads(); /* preparations done */
++
++	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
++	err = test_wait_fd(lsk, timeout, 0);
++	if (err < 0)
++		test_error("test_wait_fd()");
++	else if (!err) {
++		if (!fault(F_TIMEOUT))
++			test_fail("timeouted for accept()");
++	} else {
++		if (fault(F_TIMEOUT))
++			test_fail("ready to accept");
++
++		sk = accept(lsk, NULL, NULL);
++		if (sk < 0) {
++			test_error("accept()");
++		} else {
++			if (fault(F_TIMEOUT))
++				test_fail("%s: accepted", tst_name);
++		}
++	}
++
++	close(lsk);
++
++	if (!cnt_name)
++		goto out;
++
++	after_cnt = netstat_get_one(cnt_name, NULL);
++
++	if (after_cnt <= before_cnt) {
++		test_fail("%s: %s counter did not increase: %zu <= %zu",
++				tst_name, cnt_name, after_cnt, before_cnt);
++	} else {
++		test_ok("%s: counter %s increased %zu => %zu",
++			tst_name, cnt_name, before_cnt, after_cnt);
++	}
++
++out:
++	synchronize_threads(); /* close() */
++	if (sk > 0)
++		close(sk);
++}
++
++static void *server_fn(void *arg)
++{
++	union tcp_addr wrong_addr, network_addr;
++	unsigned port = test_server_port;
++
++	if (inet_pton(TEST_FAMILY, TEST_WRONG_IP, &wrong_addr) != 1)
++		test_error("Can't convert ip address %s", TEST_WRONG_IP);
++
++	try_accept("Non-AO server + AO client", port++, NULL,
++		this_ip_dest, -1, 100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
++
++	try_accept("AO server + Non-AO client", port++, "password",
++		this_ip_dest, -1, 100, 100, "TCPAORequired", F_TIMEOUT);
++
++	try_accept("Wrong password", port++, "password2",
++		this_ip_dest, -1, 100, 100, "TCPAOBad", F_TIMEOUT);
++
++	try_accept("Wrong rcv id", port++, "password",
++		this_ip_dest, -1, 100, 101, "TCPAOKeyNotFound", F_TIMEOUT);
++
++	try_accept("Wrong snd id", port++, "password",
++		this_ip_dest, -1, 101, 100, "TCPAOGood", F_TIMEOUT);
++
++	try_accept("Server: Wrong addr", port++, "password",
++		wrong_addr, -1, 100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
++
++	try_accept("Client: Wrong addr", port++, NULL,
++		this_ip_dest, -1, 100, 100, NULL, F_TIMEOUT);
++
++	try_accept("rcv id != snd id", port++, "password",
++		this_ip_dest, -1, 200, 100, "TCPAOGood", 0);
++
++	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_addr) != 1)
++		test_error("Can't convert ip address %s", TEST_NETWORK);
++
++	try_accept("Server: prefix match", port++, "password",
++		network_addr, 16, 100, 100, "TCPAOGood", 0);
++
++	try_accept("Client: prefix match", port++, "password",
++		this_ip_dest, -1, 100, 100, "TCPAOGood", 0);
++
++	/* client exits */
++	synchronize_threads();
++	return NULL;
++}
++
++static void try_connect(const char *tst_name, unsigned port,
++			const char *pwd, union tcp_addr addr, uint8_t prefix,
++			uint8_t sndid, uint8_t rcvid, fault_t inj)
++{
++	time_t timeout;
++	int sk, ret;
++
++	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++	if (sk < 0)
++		test_error("socket()");
++
++	if (pwd && test_set_ao(sk, pwd, 0, addr, prefix, sndid, rcvid))
++		test_error("setsockopt(TCP_AO)");
++
++	synchronize_threads(); /* preparations done */
++
++	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
++	ret = _test_connect_socket(sk, this_ip_dest, port, timeout);
++
++	if (ret < 0) {
++		if (fault(F_KEYREJECT) && ret == -EKEYREJECTED) {
++			test_ok("%s: connect() was prevented", tst_name);
++			goto out;
++		} else if (ret == -ECONNREFUSED &&
++				(fault(F_TIMEOUT) || fault(F_KEYREJECT))) {
++			test_ok("%s: refused to connect", tst_name);
++			goto out;
++		} else {
++			test_error("%s: connect() returned %d", tst_name, ret);
++		}
++	}
++
++	if (ret == 0) {
++		if (fault(F_TIMEOUT))
++			test_ok("%s", tst_name);
++		else
++			test_fail("%s: failed to connect()", tst_name);
++	} else {
++		if (fault(F_TIMEOUT) || fault(F_KEYREJECT))
++			test_fail("%s: connected", tst_name);
++		else
++			test_ok("%s: connected", tst_name);
++	}
++
++out:
++	synchronize_threads(); /* close() */
++
++	if (ret > 0)
++		close(sk);
++}
++
++static void *client_fn(void *arg)
++{
++	union tcp_addr wrong_addr, network_addr;
++	unsigned port = test_server_port;
++
++	if (inet_pton(TEST_FAMILY, TEST_WRONG_IP, &wrong_addr) != 1)
++		test_error("Can't convert ip address %s", TEST_WRONG_IP);
++
++	try_connect("Non-AO server + AO client", port++, "password",
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("AO server + Non-AO client", port++, NULL,
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("Wrong password", port++, "password",
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("Wrong rcv id", port++, "password",
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("Wrong snd id", port++, "password",
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("Server: Wrong addr", port++, "password",
++			this_ip_dest, -1, 100, 100, F_TIMEOUT);
++
++	try_connect("Client: Wrong addr", port++, "password",
++			wrong_addr, -1, 100, 100, F_KEYREJECT);
++
++	try_connect("rcv id != snd id", port++, "password",
++			this_ip_dest, -1, 100, 200, 0);
++
++	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_addr) != 1)
++		test_error("Can't convert ip address %s", TEST_NETWORK);
++
++	try_connect("Server: prefix match", port++, "password",
++			this_ip_dest, -1, 100, 100, 0);
++
++	try_connect("Client: prefix match", port++, "password",
++			network_addr, 16, 100, 100, 0);
++
++	return NULL;
++}
++
++int main(int argc, char *argv[])
++{
++	test_init(20, server_fn, client_fn);
++	return 0;
++}
 -- 
 2.37.2
 
