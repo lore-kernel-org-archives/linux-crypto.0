@@ -2,325 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0F9C32773
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5DEC00140
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 18:01:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345325AbiHRRD1 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Aug 2022 13:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35050 "EHLO
+        id S239677AbiHRSBl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 Aug 2022 14:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345330AbiHRRCC (ORCPT
+        with ESMTP id S239225AbiHRSBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Aug 2022 13:02:02 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA4CC7FB6
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:57 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id k16so2409513wrx.11
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
-        b=Teqsh9jPSj29w3+e49qn4nNQqQi4z/uIEiTsRPvsCiYpskb3bEEDMtTPBy37u608BW
-         6UFd/eXMLnd1KcCJZDwj0HYeIgoh8P+aY5S5WAzqZjpDwGQr4MoZVRPCrxHW9ROETuUu
-         74ZvD46I/z0z8Zg6Io0sjMB+uC5Y2LEx6vQass4g5heUtzd5W/6T+dGECVMwMFr27s30
-         3ulendb0AxIcLWV+gY/u19K4dGTPHqtFGOTLQ0Eie6xfv5WKdVcfBnjQM4RdCeK7ozOk
-         OCoxh8CdP5e02ibkREqywDH4hsK1cf3g6xvSek+hwDHM6JPYcG7aSPMDWdyRVtw72FDS
-         yYVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
-        b=m2EQeDR0Z3Pd4zj+8i3gn2w3glz2fiUcma9HkHeIptb0h0nFmkJLFswLdVRiwDJon/
-         cNlkpfCoN6D4xZpbHzVZQu2JZOicFnOQCKomlCn0MsVHy90URy6cIABLJ/pa4PoE/nXj
-         QnnelO7XZ4pI9bICl4qXI8RfuJQh6tvrYiYDcGebY1W7OmNrHV5CU399mIxs8r0O1gEX
-         6tL5jhTNPwqMGMNKs8GJoww2ClZ7bo+ioRQsBhch8aie91bvmZOQZoeZ48JWLER5EJF3
-         DFXZ0nVN6zu3uYfmcN3sOoDnVkP6S6OTZIXn9MIh5Q4CQOlR7YF5UCEHDF24cDDuSc0C
-         daag==
-X-Gm-Message-State: ACgBeo17KeU+kIJpmaVQDnHn1fw+neTr22MAyGP+P/o6ZREjP7tFP7pc
-        mXoS7wm/1iOV87g/R/XIAXD8TQ==
-X-Google-Smtp-Source: AA6agR7Vb0bFgoD2qJiyQ23BGlj3voGN/B5kPQxJYXQKMoOSwXHat4SDaw80B88oY6LOmPfkF+HSrQ==
-X-Received: by 2002:a05:6000:178b:b0:222:c6c4:b42e with SMTP id e11-20020a056000178b00b00222c6c4b42emr2288254wrg.275.1660842056392;
-        Thu, 18 Aug 2022 10:00:56 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm2662169wmb.34.2022.08.18.10.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 10:00:56 -0700 (PDT)
-From:   Dmitry Safonov <dima@arista.com>
-To:     Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Cc:     Dmitry Safonov <dima@arista.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        David Ahern <dsahern@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 29/31] selftest/tcp-ao: Add test for TCP-AO add setsockopt() command
-Date:   Thu, 18 Aug 2022 18:00:03 +0100
-Message-Id: <20220818170005.747015-30-dima@arista.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220818170005.747015-1-dima@arista.com>
-References: <20220818170005.747015-1-dima@arista.com>
+        Thu, 18 Aug 2022 14:01:40 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B484621A
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 11:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660845699; x=1692381699;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dt1CVOrCoGLXfC/yX21PR0BoBJtQ3lUotxHE0OdISrM=;
+  b=dULVF8hGP55td1FK/9WVII9UKi3AD0b6W/c+qXWwICgEQA8Tm3UF9RX0
+   z059EB4FaoNnnfwEvvOolhYUu2Zr09wT9F/r5rwP25TKsK3FqHKry8DuA
+   gPxiD325Luzjr/sdOZ83mkeh5OH0KNjp0YK3WAIrUeAqArJ+9Av2Ip77F
+   LjZvjnUinuFE2h5TUpzrIp0LrmazQrFfYBeHRib63lthXHU4cVV/Iqgdu
+   UHVsy4Z1/lDuggC7vL7XRaRL1A4VCMivPppI08YwlpETZM1dV/9bXrB3t
+   iJPN+GmyczViDW7OcJ6vtBaiQJjkfQfcTeLWFh17Qt4UVD+eDr3sG3z4R
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10443"; a="294109406"
+X-IronPort-AV: E=Sophos;i="5.93,247,1654585200"; 
+   d="scan'208";a="294109406"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2022 11:01:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,247,1654585200"; 
+   d="scan'208";a="607919456"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga002.jf.intel.com with ESMTP; 18 Aug 2022 11:01:37 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Vlad Dronov <vdronov@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 0/9] crypto: qat - enable compression deflate algorithm
+Date:   Thu, 18 Aug 2022 19:01:11 +0100
+Message-Id: <20220818180120.63452-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Verify corner-cases for UAPI.
-Sample output:
-> # ./setsockopt-closed_ipv6
-> 1..16
-> # 9508[lib/setup.c:173] rand seed 1643819055
-> TAP version 13
-> ok 1 minimum size
-> ok 2 extended size
-> ok 3 bad algo
-> ok 4 bad ao flags
-> ok 5 empty prefix
-> ok 6 prefix, any addr
-> ok 7 no prefix, any addr
-> ok 8 too short prefix
-> ok 9 too big prefix
-> ok 10 too big maclen
-> ok 11 bad key flags
-> ok 12 too big keylen
-> not ok 13 duplicate: full copy: setsockopt() was expected to fail with 17
-> ok 14 duplicate: any addr key on the socket
-> ok 15 duplicate: add any addr key
-> not ok 16 duplicate: add any addr for the same subnet: setsockopt() was expected to fail with 17
+This set enables the offload of the compression deflate algorithm to QAT
+accelerators through the acomp API.
 
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- tools/testing/selftests/net/tcp_ao/Makefile   |   3 +-
- .../selftests/net/tcp_ao/setsockopt-closed.c  | 191 ++++++++++++++++++
- 2 files changed, 193 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+The first part of the set (patches 1 to 7) reworks and refactors logic
+that is specific to the crypto service in order to be used by the
+compression service.
+In particular, the first 5 patches rework the buffer list logic, which
+is used to map, unmap and convert scatterlists into the format that the
+QAT firmware can understand. These relocate the bufferlist logic to a
+separate file, change the interfaces so that the logic is service agnostic
+(not tied to compression or crypto) and extend the interface to allow an
+additional pre-allocated buffer for each destination scatter list which
+will be used to avoid premature overflows reported by the compression
+hardware.
+Patch 6 relocates the function qat_algs_alloc_flags() from a crypto
+specific header to qat_bl.h.
+Patch 7 moves and renames the configuration function for GEN2,
+qat_crypto_dev_config(), to a new file, adf_gen2_config.h, which
+contains the configuration logic for both crypto and compression
+instances for QAT GEN2 devices.
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 5064e34ebe38..a001dc2aed4e 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
-+TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
-+		setsockopt-closed
- 
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
-new file mode 100644
-index 000000000000..be2cbc407f60
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
-@@ -0,0 +1,191 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Author: Dmitry Safonov <dima@arista.com> */
-+#include <inttypes.h>
-+#include "../../../../include/linux/kernel.h"
-+#include "aolib.h"
-+
-+static void clean_ao(int sk, struct tcp_ao *ao)
-+{
-+	struct tcp_ao_del ao_del = {};
-+
-+	ao_del.tcpa_sndid = ao->tcpa_sndid;
-+	ao_del.tcpa_rcvid = ao->tcpa_rcvid;
-+	ao_del.tcpa_prefix = ao->tcpa_prefix;
-+	memcpy(&ao_del.tcpa_addr, &ao->tcpa_addr, sizeof(ao->tcpa_addr));
-+
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, &ao_del, sizeof(ao_del)))
-+		test_error("setsockopt(TCP_AO_DEL) failed to clean");
-+	close(sk);
-+}
-+
-+static void setsockopt_checked(int sk, int optname, struct tcp_ao *ao,
-+			       int err, const char *tst)
-+{
-+	int ret;
-+
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, optname, ao, sizeof(*ao));
-+	if (ret == -1) {
-+		if (errno == err) {
-+			test_ok("%s", tst);
-+			return;
-+		}
-+		test_fail("%s: setsockopt() returned %d", tst, err);
-+		return;
-+	}
-+
-+	if (err) {
-+		test_fail("%s: setsockopt() was expected to fail with %d", tst, err);
-+	} else {
-+		test_ok("%s", tst);
-+		test_verify_socket_ao(sk, ao);
-+	}
-+	clean_ao(sk, ao);
-+}
-+
-+static int prepare_defs(struct tcp_ao *ao)
-+{
-+	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (test_prepare_def_ao(ao, "password", 0, this_ip_dest, -1, 100, 100))
-+		test_error("prepare default tcp_ao");
-+
-+	return sk;
-+}
-+
-+static void test_extend(void)
-+{
-+	struct tcp_ao ao;
-+	struct {
-+		struct tcp_ao ao;
-+		char *extend[100];
-+	} ao_big = {};
-+	int ret, sk;
-+
-+	sk = prepare_defs(&ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO,
-+			&ao, offsetof(struct tcp_ao, tcpa_key));
-+	if (!ret) {
-+		test_fail("minminum size: accepted invalid size");
-+		clean_ao(sk, &ao);
-+	} else if (errno != EINVAL) {
-+		test_fail("minminum size: failed with %d", errno);
-+	} else {
-+		test_ok("minimum size");
-+	}
-+
-+	sk = prepare_defs(&ao_big.ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao_big.ao, sizeof(ao_big));
-+	if (ret) {
-+		test_fail("extended size: returned %d", ret);
-+	} else {
-+		test_ok("extended size");
-+		clean_ao(sk, &ao_big.ao);
-+	}
-+}
-+
-+static void einval_tests(void)
-+{
-+	struct tcp_ao ao;
-+	int sk;
-+
-+	sk = prepare_defs(&ao);
-+	strcpy(ao.tcpa_alg_name, "imaginary hash algo");
-+	setsockopt_checked(sk, TCP_AO, &ao, ENOENT, "bad algo");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_flags = (uint16_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad ao flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "empty prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 32;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, 0, "no prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 2;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too short prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 129;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_maclen = 100;
-+	setsockopt_checked(sk, TCP_AO, &ao, EMSGSIZE, "too big maclen");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keyflags = (uint8_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad key flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keylen = TCP_AO_MAXKEYLEN + 1;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big keylen");
-+}
-+
-+static void duplicate_tests(void)
-+{
-+	union tcp_addr network_dup;
-+	struct tcp_ao ao, ao2;
-+	int sk;
-+
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: full copy");
-+
-+	sk = prepare_defs(&ao);
-+	ao2 = ao;
-+	memcpy(&ao2.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao2.tcpa_prefix = 0;
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao2, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: any addr key on the socket");
-+
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr key");
-+
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_dup) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	if (test_prepare_def_ao(&ao, "password", 0, network_dup, 16, 100, 100))
-+		test_error("prepare default tcp_ao");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr for the same subnet");
-+}
-+
-+
-+static void *client_fn(void *arg)
-+{
-+	test_extend();
-+	einval_tests();
-+	duplicate_tests();
-+
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(16, client_fn, NULL);
-+	return 0;
-+}
+The last 2 patches in the set introduce all the infrastructure required
+to enable the compression service in the QAT driver and expose it through
+the acomp APIs.
+In particular, patch 8 introduces the logic related to the creation
+and handling of compression instances and their configuration.
+In addition, it adds the back-end for qat_deflate to plug into acomp,
+including the logic to build descriptors for the newly added GEN2 compression
+firmware APIs.
+This was all kept in a single patch to avoid introducing unused logic in
+the QAT driver in previous patches.
+
+Patch 9, extends the compression logic to support to QAT GEN4 devices.
+
+All new files in this set are marked as dual license. This is since
+portions of the QAT code are shared with QAT projects which are released
+under compatible licenses. Occasionally changes are brought back to the
+shared codebase used by those projects.
+
+Giovanni Cabiddu (9):
+  crypto: qat - relocate bufferlist logic
+  crypto: qat - change bufferlist logic interface
+  crypto: qat - generalize crypto request buffers
+  crypto: qat - extend buffer list interface
+  crypto: qat - relocate backlog related structures
+  crypto: qat - relocate qat_algs_alloc_flags()
+  crypto: qat - rename and relocate GEN2 config function
+  crypto: qat - expose deflate through acomp api for QAT GEN2
+  crypto: qat - enable deflate for QAT GEN4
+
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |   4 +-
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    |   2 +-
+ drivers/crypto/qat/qat_4xxx/adf_drv.c         | 145 ++++++-
+ .../crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c  |   4 +
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c        |   2 +-
+ .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |   4 +
+ .../crypto/qat/qat_c62x/adf_c62x_hw_data.c    |   4 +
+ drivers/crypto/qat/qat_c62x/adf_drv.c         |   2 +-
+ .../qat/qat_c62xvf/adf_c62xvf_hw_data.c       |   4 +
+ drivers/crypto/qat/qat_common/Makefile        |   8 +-
+ .../crypto/qat/qat_common/adf_accel_devices.h |  14 +
+ .../crypto/qat/qat_common/adf_cfg_strings.h   |   1 +
+ .../crypto/qat/qat_common/adf_common_drv.h    |   9 +-
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c   |   6 +
+ .../crypto/qat/qat_common/adf_gen2_config.c   | 206 +++++++++
+ .../crypto/qat/qat_common/adf_gen2_config.h   |  10 +
+ drivers/crypto/qat/qat_common/adf_gen2_dc.c   |  70 +++
+ drivers/crypto/qat/qat_common/adf_gen2_dc.h   |  10 +
+ drivers/crypto/qat/qat_common/adf_gen4_dc.c   |  83 ++++
+ drivers/crypto/qat/qat_common/adf_gen4_dc.h   |  10 +
+ drivers/crypto/qat/qat_common/adf_init.c      |  11 +
+ drivers/crypto/qat/qat_common/adf_sriov.c     |   4 +
+ drivers/crypto/qat/qat_common/icp_qat_fw.h    |  24 ++
+ .../crypto/qat/qat_common/icp_qat_fw_comp.h   | 404 ++++++++++++++++++
+ drivers/crypto/qat/qat_common/icp_qat_hw.h    |  66 +++
+ .../qat/qat_common/icp_qat_hw_20_comp.h       | 164 +++++++
+ .../qat/qat_common/icp_qat_hw_20_comp_defs.h  | 300 +++++++++++++
+ drivers/crypto/qat/qat_common/qat_algs.c      | 202 +--------
+ drivers/crypto/qat/qat_common/qat_algs_send.h |  16 +-
+ drivers/crypto/qat/qat_common/qat_bl.c        | 214 ++++++++++
+ drivers/crypto/qat/qat_common/qat_bl.h        |  61 +++
+ drivers/crypto/qat/qat_common/qat_comp_algs.c | 267 ++++++++++++
+ drivers/crypto/qat/qat_common/qat_comp_req.h  | 113 +++++
+ .../crypto/qat/qat_common/qat_compression.c   | 297 +++++++++++++
+ .../crypto/qat/qat_common/qat_compression.h   |  37 ++
+ drivers/crypto/qat/qat_common/qat_crypto.c    | 120 +-----
+ drivers/crypto/qat/qat_common/qat_crypto.h    |  55 +--
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |   4 +
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c     |   2 +-
+ .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |   4 +
+ 40 files changed, 2585 insertions(+), 378 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_config.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_config.h
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_dc.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen2_dc.h
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_dc.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_dc.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_comp.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw_20_comp.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw_20_comp_defs.h
+ create mode 100644 drivers/crypto/qat/qat_common/qat_bl.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_bl.h
+ create mode 100644 drivers/crypto/qat/qat_common/qat_comp_algs.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_comp_req.h
+ create mode 100644 drivers/crypto/qat/qat_common/qat_compression.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_compression.h
+
 -- 
-2.37.2
+2.37.1
 
