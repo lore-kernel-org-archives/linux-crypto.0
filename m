@@ -2,188 +2,290 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF57CC28B2B
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 03:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E31DC25B08
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 03:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242928AbiHRDA4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Aug 2022 23:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58906 "EHLO
+        id S242850AbiHRDsz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Aug 2022 23:48:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242541AbiHRDAy (ORCPT
+        with ESMTP id S237655AbiHRDsD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Aug 2022 23:00:54 -0400
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B21A6C48;
-        Wed, 17 Aug 2022 20:00:53 -0700 (PDT)
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27I2Vxrf012369;
-        Thu, 18 Aug 2022 03:00:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pps0720;
- bh=yRMgJGrSLBtALHc0ufAH+qIu3MhPIjACSRmqKcCt/kI=;
- b=f8WJ49zUaJ5TZkEjlO3VPuR/e+ilNKMXMvkkxPUpVPPD0zcXRJq1/mivs3ZuvryJbhnS
- Pos/9aYUICM2rs/o6mtnyorOPqxbiNeH4KLhuXTBQ0ieTIjT6S0JhFlqdVJvH5c/FKyD
- UypC6co2UA4lq5zw8ArPeJfdT+ZxKMEay1Bl/BkgrOjuR3gze9EIiOdO2hZWXm7P2lzb
- 6K2qYqBJHmX9K7dcxQV1Mg1aAVunKPkOPIykGJWK5xmtG/AwZ//qJzfCXguAff0dzWB2
- MNkspAdcRMySW2NvzIZHB8LlvyK0jhSsUXgpYV3695rP2wcp2DweMBDFC75ge2MuyWPH QQ== 
-Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j1b4e0vpa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Aug 2022 03:00:39 +0000
-Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 0DE5980791B;
-        Thu, 18 Aug 2022 03:00:37 +0000 (UTC)
-Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Wed, 17 Aug 2022 15:00:35 -1200
-Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
- p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
- via Frontend Transport; Wed, 17 Aug 2022 15:00:35 -1200
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Wed, 17 Aug 2022 15:00:34 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KYwSUvQWbRceGC3dNx/beq5JWA+HZpIlyRpUbddf86LFcqwVO1hpsrShq6KzXBeN+n8l8bHd+bLendPnT29e42CdgQgr390dh+XuEzTgripqRRs7sC16KCKodAjQbzVb+6Uz8TWQRmbLk8Ngp81yx2ZTNB1+MjKU0TAmnTAlXHceE4kEvrlTu54/lmDbzKnqZMhjxv2Y9qmDRO80vZjG0BvrCIGAw+SfQgdn+lABMu/DrxRMLZCc//N1hobb6E4FwQKJiDo2jUCBr7tYUZ4le0trypBPVQchQeE6QkoTcEYfbhHIoaTh4POyDJqP0IA+AKxeREJAhE+y7/7DlupUBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yRMgJGrSLBtALHc0ufAH+qIu3MhPIjACSRmqKcCt/kI=;
- b=ZHuvOMydoBgRvK8RWBJNBUPfqY6zlRc9d/BY1HfUbAq+vv/ATKw1xgLaNXUalq6DHISArfwK1c8oiNURBzN2igm35GEm0/HJ5DKBAP1ABaRIYrTQU+k2uFu9XKpK1tNKifuAF2FPHQzBxhC6y2UXji95v779W577IWGKFaHb27hIqovoTA9NoIRABwPKCcW/QugaVRXf4bD3vHS5nhEdQYXgPLBnaBFJsv2U0K3aNcL2oKmAMgKaW1eJtNhabRtAdEl4/b/syQqrQ74ODSugWaxDDBCUba5gNZPJTU6L5un5GxxQp+9RJ1z8D2s3V+AjDjS2RsmjIlV3kiL0rzwksw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
- by PH7PR84MB1368.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:152::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5525.10; Thu, 18 Aug
- 2022 03:00:33 +0000
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1cc2:4b7b:f4c5:fbb4]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1cc2:4b7b:f4c5:fbb4%5]) with mapi id 15.20.5525.011; Thu, 18 Aug 2022
- 03:00:33 +0000
-From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 00/10] crypto: Kconfig - simplify menus and help text
-Thread-Topic: [PATCH v2 00/10] crypto: Kconfig - simplify menus and help text
-Thread-Index: AQHYspAVhdnwrvKxPUuXHJ8Go7Hopq2z9JcAgAAB92A=
-Date:   Thu, 18 Aug 2022 03:00:33 +0000
-Message-ID: <MW5PR84MB18427C4AA54AE9D69BC70759AB6D9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20220815190608.47182-9-elliott@hpe.com>
- <20220817232057.73643-1-elliott@hpe.com> <Yv2oQijegCNFQMO1@sol.localdomain>
-In-Reply-To: <Yv2oQijegCNFQMO1@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fb09a073-e39a-4b98-7497-08da80c5d123
-x-ms-traffictypediagnostic: PH7PR84MB1368:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0SfZAJs4k4MG+hdYFDh+e3JcoYY2mC9lqWLDURTH1Hay+2/tuoK5OM7aCvuuKPWLA4f5bTrJ9Iu3KXK/j+5C8hs07k3YpiH+bUoOyfchiQZ5nzL32TgA/szIgB8hP3s9TQAq9oFks+y8pQxom47kURWqnlwhEQeooslTU1OhsC4qJ22LAiXe1/IMj35mIasqJDFHIRFRh76SpYgcwpX3eIW/xlFkBNFkAFFAURDtx9YiS3g/pMLgwdVXyAlHOsHxnZYUuyIilaVDle0VRZp026v7zEEA1UB1kd6uwk0RHth3pZlG2+VyESquf1cPbxpOHgligBkrhCnK+onBpQgB1WD9d/BvjhVUWhuG9z3x3hKGvcISFFfjs6FokvA2o/Dhnv/d16tAYBYs3mvwe953N6J9I040BxqYCEBvbVbhlV6E0EDhP7rcfaQk+WLDcQCvujgf3fkaqgrdCiig6wlnSbuO/llWbXe4WqahidHzuoGDzb2rUSL7amIA3KuCWzQWNbycSGPgIVLjBddI4uxvsLjnRMoA0zDcp6odEC/KGYXM0MabViKUEfF1TDOqSn3V/hEW6i7Kd9t+5G+GbrJOEx7/8vDI3rW4qSlwbbNwAhGXVBrDPj2PBp9HGAu3xrho5MjhcnIUZ+tQsv2hVDF6w5x2QTwjXrxXeOX8ZO80dj7aoeWfLLUtundQ/iIsCS/iKwQASqEFb9LbG6kS5BXNQZUkL7l2XZHQcUCuVIJiR5LBo8o3RQWb4DvShDMnkMzuIHOCAzui7lW8V9tgURQkXw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230016)(376002)(39860400002)(346002)(366004)(396003)(136003)(83380400001)(4326008)(41300700001)(7696005)(71200400001)(54906003)(478600001)(66556008)(8676002)(2906002)(55016003)(52536014)(66476007)(64756008)(6916009)(5660300002)(316002)(76116006)(66446008)(66946007)(8936002)(122000001)(82960400001)(53546011)(33656002)(9686003)(186003)(26005)(38070700005)(38100700002)(86362001)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Pz08TCWioij/dnWT5pl2DFO3hSjTmExhMc+/Yiqn4yqR0Zbq2kZgeRvlG1nR?=
- =?us-ascii?Q?MoUkSUoh1XpuAVB7bdDOnpDtZz+chfXvt/YATwnnRPBnzpHrQvtSXLNQAJYV?=
- =?us-ascii?Q?sR5km6ndbKR+J1sDiVg06pG1VIjDaAK9lWMX0k8FsG4sLRriCY2dqAE198X5?=
- =?us-ascii?Q?/TqEQu8ZhYzZDhzrfoc5HL3kCpvLfhvtAFgbb1Sd3IYjFJOQL0CMTfIo9Pwm?=
- =?us-ascii?Q?y+r2GHts4n4We6djtbJpjjgitE4waDWLKTEcRyazLjE1iit0FUXdnrJmBtpY?=
- =?us-ascii?Q?OSLcqZZ1o2DfBVXVteRXak7Gqz9QXp8kB1RPR/fZA9uDconc8v1ikzqn4XMc?=
- =?us-ascii?Q?ugCmjFXTcMHesXinNmmlajEii2bK9XUQzQjGoC6V3dNm9JmODQq3cNo0qUx2?=
- =?us-ascii?Q?n6p+fKhFDj2EmoNONEcmgigzmFJXlwh1Mx+mnO6Xiv487UIG3DSxvJSlDKWc?=
- =?us-ascii?Q?lO66PsxmH63qDFO7LHg7yMYNgw1837qHU92TXrgQShhyMsLX2kEvTamyDF8X?=
- =?us-ascii?Q?QhtLprldtYr+e5zA2pbutC2DZYrH85OViVlABzW0uyo49bM8SonYfIJklB8B?=
- =?us-ascii?Q?QVa2zthIVywJUrDOUZvQJknx2lmv6iTZNWn8GghzM6GJzKsNE4i5tWXQaAZP?=
- =?us-ascii?Q?EZusAxnJodiMcg8c4vGxrcIFxp4Jg3Z+GHax1S8fadDlcLQnPQr6mxyiN2wh?=
- =?us-ascii?Q?HIINBDUil2eVcNnQHRVlNqKVwGy/Qv2Oeyb7MkhWS6nBAMwgr6zxeHy8Co/k?=
- =?us-ascii?Q?+xXMBXB+LT+0FjKE12CObk25M6d+EcDIL4520q41cAVoPXm8z3MGc6TXw/0x?=
- =?us-ascii?Q?9xREWb4/Uds473yhXYNKL7wlVweJeAsofpu3dmDr5CVmd0jEtcQUrALWEz40?=
- =?us-ascii?Q?zlp+Hr5ds8aKVNBsvcS5tRW+fZ39QGWRyM5SRqTIshOLKTk2evLfl8qHtJIr?=
- =?us-ascii?Q?knzgiAq52SpBD1kO5WDZKUTDGLV+2AFRT/nC0DPjeg3tW/7jv3L67EbKvxTK?=
- =?us-ascii?Q?vlWUBBLIGjBLMfHP0saWBHfoZeMOpL7myaWFLFqukBwV35ux8o44umJYwppa?=
- =?us-ascii?Q?z1tCi6pzyXSt6BWnUQdI6kcTng46o9mEaQqghx5wvE5tPJhCcugDDx2jOkwn?=
- =?us-ascii?Q?B9oDS7jkK9qOh5aWcZ8dWyw0F+pwu+8lh1ej0Xgny3KyyaqD1VrlwoGP0/vT?=
- =?us-ascii?Q?/LcPiOcYkXmuZzkHr92KlJUfTD4HjumFZhqgmA7MZw5dMUqtJaC/dqQ04sgR?=
- =?us-ascii?Q?ZZZZLB9DTcc9gj1mIHK9RyvF+LT6sILgyAT0mWfuuygLc7MZ/fDwBzcIj68O?=
- =?us-ascii?Q?WaH+HJ8v3zJLkJ2CyWW/fXtxaaErRuQ/dA3TZZCRwTcwYExFO7XLGgSH4V+J?=
- =?us-ascii?Q?4ivFVCEAMmR3JK+f/DlMjwau7dN6rFYEe85wSwz0K5Bm8Z4ao6AydVn2OTCU?=
- =?us-ascii?Q?Xiuzg+69KEt0ughUuWpeb84V/l5i0bb0WHh+sQKkn8XHVqqxp1bPREFwrPbU?=
- =?us-ascii?Q?3S8M3/c2yHxAvs6mQIGAJl6VV0u8qbjBWC5nOIryBXl9TxDIzxjJpt3Kohu6?=
- =?us-ascii?Q?Cs6j0Dxprx/2CxsP78Q=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 17 Aug 2022 23:48:03 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACDC19411D
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2022 20:47:44 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id k3so251589ilv.11
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Aug 2022 20:47:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=awFGwwSRocOeifmjAPEDB1aSCbnwQlgCGRRbkk5b0mw=;
+        b=HuuwBZomHQD9jDKeuTr2VNO9olgvvd8D0ZYsRVU+dLL2RPb2ssLOWCDp2onOIcQ1PZ
+         kfoCj9T0R0Xfbfx7lF24moS/6w5INxaWGwptve9xDhrNP2Adv4KzaBkwltgUq1z21AWm
+         uHVDVvnl6LcFUbGVTqMFFxCD/aL6FhbjXqH7OMB/7kfR1fPv0czzY1fd//fIMposD07f
+         b9aTXeoPVIk/RWKntVLDYbMIHvqFhziJDS0KKv60RjWzmPM4vTWW81Fe2uEsoEo0KPwq
+         5EJFihNKM43HercJ872rCFaYNpPZ/exlMZgcpbYowu087PnQKgRbawlj5pxDv6RAdF1V
+         bqaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=awFGwwSRocOeifmjAPEDB1aSCbnwQlgCGRRbkk5b0mw=;
+        b=qTWEplDBcbR4Ovy/x5PkhtfqTcRw8Bj60UY8s/Ix00z/jr0MqB/SxvrcFhhR4jD2sS
+         zbPMz3r342BySexA+n1/f1u6uaJqIPqxkqE3YgRmBJVGXSrM1noMvuUzFfjZHwkpWbjV
+         B9OerbJ0v+FCVtDyc+jSCXgUz6pgnVzMGd1hxk+v6/DgZGq+Ibed1YQvd226wXdIJXx3
+         GsobyysjQ5PcR4G9ZcnIZ72mJchJt9ZB03xMLWEXkJ4VSYrwzHYc2HWAKptm9omPYKve
+         sjZN/nSN7bw4joBDb6oR0sChbLi6VptBEK/l2oUykykumvy5rQFxPBeigQPWPrMgHRfK
+         EwFA==
+X-Gm-Message-State: ACgBeo2VBuItIPuug23FJpHf75VsF3sF3mzeI3nuhung/s68OXFevAqH
+        tAseMx5dK90JEJZZgOpnLW6t+KH+LA5ROXDjjvO65A==
+X-Google-Smtp-Source: AA6agR4qMa4OQ91sIzkDhZ6sJxq3ep4yI+PyN9yclK8K6pKbEhOC904SXmSnOpmJe9LJ12apxNw4HTohCoA9TKmMWt0=
+X-Received: by 2002:a92:3652:0:b0:2df:4133:787 with SMTP id
+ d18-20020a923652000000b002df41330787mr590419ilf.39.1660794463902; Wed, 17 Aug
+ 2022 20:47:43 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb09a073-e39a-4b98-7497-08da80c5d123
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2022 03:00:33.1708
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /RvsI+kRWCrKsflrqxvbYrFO3zaaZUOnK9a/Jprue1OCAfe7MRK4iLtkYxk+scuH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR84MB1368
-X-OriginatorOrg: hpe.com
-X-Proofpoint-ORIG-GUID: CIyViv652bxXcOc2CYaDUtfhkWIKearL
-X-Proofpoint-GUID: CIyViv652bxXcOc2CYaDUtfhkWIKearL
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-17_17,2022-08-16_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208180009
+References: <cover.1655761627.git.ashish.kalra@amd.com> <34246866043db7bab34a92fe22f359667ab155a0.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <34246866043db7bab34a92fe22f359667ab155a0.1655761627.git.ashish.kalra@amd.com>
+From:   Alper Gun <alpergun@google.com>
+Date:   Wed, 17 Aug 2022 20:47:33 -0700
+Message-ID: <CABpDEukAEGwb9w12enO=fhSbHbchypsOdO2dkR4Jei3wDW6NWg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 39/49] KVM: SVM: Introduce ops for the post gfn
+ map and unmap
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Jun 20, 2022 at 4:12 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> When SEV-SNP is enabled in the guest VM, the guest memory pages can
+> either be a private or shared. A write from the hypervisor goes through
+> the RMP checks. If hardware sees that hypervisor is attempting to write
+> to a guest private page, then it triggers an RMP violation #PF.
+>
+> To avoid the RMP violation with GHCB pages, added new post_{map,unmap}_gfn
+> functions to verify if its safe to map GHCB pages.  Uses a spinlock to
+> protect against the page state change for existing mapped pages.
+>
+> Need to add generic post_{map,unmap}_gfn() ops that can be used to verify
+> that its safe to map a given guest page in the hypervisor.
+>
+> This patch will need to be revisited later after consensus is reached on
+> how to manage guest private memory as probably UPM private memslots will
+> be able to handle this page state change more gracefully.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  3 ++
+>  arch/x86/kvm/svm/sev.c             | 48 ++++++++++++++++++++++++++++--
+>  arch/x86/kvm/svm/svm.c             |  3 ++
+>  arch/x86/kvm/svm/svm.h             | 11 +++++++
+>  5 files changed, 64 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index e0068e702692..2dd2bc0cf4c3 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -130,6 +130,7 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+>  KVM_X86_OP(alloc_apic_backing_page)
+>  KVM_X86_OP_OPTIONAL(rmp_page_level_adjust)
+> +KVM_X86_OP(update_protected_guest_state)
+>
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_OPTIONAL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 49b217dc8d7e..8abc0e724f5c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1522,7 +1522,10 @@ struct kvm_x86_ops {
+>         unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+>
+>         void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+> +
+>         void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
+> +
+> +       int (*update_protected_guest_state)(struct kvm_vcpu *vcpu);
+>  };
+>
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index cb2d1bbb862b..4ed90331bca0 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -341,6 +341,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>                 if (ret)
+>                         goto e_free;
+>
+> +               spin_lock_init(&sev->psc_lock);
+>                 ret = sev_snp_init(&argp->error);
+>         } else {
+>                 ret = sev_platform_init(&argp->error);
+> @@ -2828,19 +2829,28 @@ static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+>  {
+>         struct vmcb_control_area *control = &svm->vmcb->control;
+>         u64 gfn = gpa_to_gfn(control->ghcb_gpa);
+> +       struct kvm_vcpu *vcpu = &svm->vcpu;
+>
+> -       if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
+> +       if (kvm_vcpu_map(vcpu, gfn, map)) {
+>                 /* Unable to map GHCB from guest */
+>                 pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+>                 return -EFAULT;
+>         }
+>
+> +       if (sev_post_map_gfn(vcpu->kvm, map->gfn, map->pfn)) {
+> +               kvm_vcpu_unmap(vcpu, map, false);
+> +               return -EBUSY;
+> +       }
+> +
+>         return 0;
+>  }
+>
+>  static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+>  {
+> -       kvm_vcpu_unmap(&svm->vcpu, map, true);
+> +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> +
+> +       kvm_vcpu_unmap(vcpu, map, true);
+> +       sev_post_unmap_gfn(vcpu->kvm, map->gfn, map->pfn);
+>  }
+>
+>  static void dump_ghcb(struct vcpu_svm *svm)
+> @@ -3383,6 +3393,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>                                 return PSC_UNDEF_ERR;
+>                 }
+>
+> +               spin_lock(&sev->psc_lock);
+> +
+>                 write_lock(&kvm->mmu_lock);
+>
+>                 rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+> @@ -3417,6 +3429,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+>
+>                 write_unlock(&kvm->mmu_lock);
+>
+> +               spin_unlock(&sev->psc_lock);
 
+There is a corner case where the psc_lock is not released. If
+kvm_mmu_get_tdp_walk fails, the lock will be kept and will cause soft
+lockup.
 
-> -----Original Message-----
-> From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Wednesday, August 17, 2022 9:48 PM
-> Subject: Re: [PATCH v2 00/10] crypto: Kconfig - simplify menus and help t=
-ext
->=20
-...
-> >
-> > Robert Elliott (10):
-> >   crypto: Kconfig - move mips entries to a submenu
-> >   crypto: Kconfig - move powerpc entries to a submenu
-> >   crypto: Kconfig - move s390 entries to a submenu
-> >   crypto: Kconfig - move sparc entries to a submenu
-> >   crypto: Kconfig - move x86 entries to a submenu
-> >   crypto: Kconfig - remove AES_ARM64 selection by SA2UL entry
-> >   crypto: Kconfig - move arm and arm64 menus to Crypto API page
-> >   crypto: Kconfig - sort the arm64 entries
-> >   crypto: Kconfig - sort the arm entries
-> >   crypto: Kconfig - add submenus
->=20
-> What commit does this series apply to?
-
-5.19-rc7:
-
-edbaae5c2910 crypto: Kconfig - move mips entries to a submenu
-57e81df8165b crypto: testmgr - make WARN prints consistent
-fa99961bb413 crypto: x86/sha512 - load based on CPU features
-5b2fb3a1500d ghes_edac: fix intermittent warm reset hang
-661204d2ad01 RDMA/irdma: Fix sleep from invalid context BUG
-85bdff84e6fd RDMA/irdma: Do not advertise 1GB page size for x722
-c24fa712938f gpiolib: cdev: Fix kernel doc for struct line
-7f1d458de3ab Linux 5.19-rc7
-
-I'll try including the git format-patch --base option next time.
-
+> +
+>                 if (rc) {
+>                         pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
+>                                            op, gpa, pfn, level, rc);
+> @@ -3965,3 +3979,33 @@ void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level)
+>         /* Adjust the level to keep the NPT and RMP in sync */
+>         *level = min_t(size_t, *level, rmp_level);
+>  }
+> +
+> +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       int level;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return 0;
+> +
+> +       spin_lock(&sev->psc_lock);
+> +
+> +       /* If pfn is not added as private then fail */
+> +       if (snp_lookup_rmpentry(pfn, &level) == 1) {
+> +               spin_unlock(&sev->psc_lock);
+> +               pr_err_ratelimited("failed to map private gfn 0x%llx pfn 0x%llx\n", gfn, pfn);
+> +               return -EBUSY;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return;
+> +
+> +       spin_unlock(&sev->psc_lock);
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index b24e0171cbf2..1c8e035ba011 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4734,7 +4734,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>         .vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+>
+>         .alloc_apic_backing_page = svm_alloc_apic_backing_page,
+> +
+>         .rmp_page_level_adjust = sev_rmp_page_level_adjust,
+> +
+> +       .update_protected_guest_state = sev_snp_update_protected_guest_state,
+>  };
+>
+>  /*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 54ff56cb6125..3fd95193ed8d 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -79,19 +79,25 @@ struct kvm_sev_info {
+>         bool active;            /* SEV enabled guest */
+>         bool es_active;         /* SEV-ES enabled guest */
+>         bool snp_active;        /* SEV-SNP enabled guest */
+> +
+>         unsigned int asid;      /* ASID used for this guest */
+>         unsigned int handle;    /* SEV firmware handle */
+>         int fd;                 /* SEV device fd */
+> +
+>         unsigned long pages_locked; /* Number of pages locked */
+>         struct list_head regions_list;  /* List of registered regions */
+> +
+>         u64 ap_jump_table;      /* SEV-ES AP Jump Table address */
+> +
+>         struct kvm *enc_context_owner; /* Owner of copied encryption context */
+>         struct list_head mirror_vms; /* List of VMs mirroring */
+>         struct list_head mirror_entry; /* Use as a list entry of mirrors */
+>         struct misc_cg *misc_cg; /* For misc cgroup accounting */
+>         atomic_t migration_in_progress;
+> +
+>         u64 snp_init_flags;
+>         void *snp_context;      /* SNP guest context page */
+> +       spinlock_t psc_lock;
+>  };
+>
+>  struct kvm_svm {
+> @@ -702,6 +708,11 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+>  struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>  void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
+> +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
+> +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
+> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+> +void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+> +int sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu);
+>
+>  /* vmenter.S */
+>
+> --
+> 2.25.1
+>
