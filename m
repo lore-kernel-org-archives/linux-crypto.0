@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3525C32774
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D35CC32773
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345263AbiHRRDI (ORCPT
+        id S1345264AbiHRRDJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Aug 2022 13:03:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59966 "EHLO
+        Thu, 18 Aug 2022 13:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345218AbiHRRAz (ORCPT
+        with ESMTP id S1345199AbiHRRAy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Aug 2022 13:00:55 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630FACAC4D
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:46 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id k9so2454507wri.0
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:46 -0700 (PDT)
+        Thu, 18 Aug 2022 13:00:54 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FE62C6FE6
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:45 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id r16so2424521wrm.6
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 10:00:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=E96d+BUrTn5halPp8rfKr4BR8z1gBILVpe/NiX4cSOM=;
-        b=eslQLaOzrcgU+TRthmIrk4mKFUgv2ctqWMVMZzQP0h0E239TBd1c7aKhEo7C/YzZ/C
-         n7qHTZ6qwnHwfEsyv3qjq4zdUnTSfph5M85c2pNWOQGAOexNTh9GYAIZFMPu/I222L9d
-         Mj+MEHoAnDCvD4C5aeMu+PBR7/Ka8JntqGQ9nNqXI9KTFsSJg2M5EbK+I6qTeVcf4hVE
-         TaNmgPLUqAEB4woL44kBOYSY5eqB8JRJnDJo4o7VirvB2PPy5MnHrZwXoWOckXR/DmEF
-         wv9LZpATOuEKyUYgXls4Qc48x1Cx/RXWfTZuJcv6SH1tOUV+reeKOAAqF7hL9Hcs4D04
-         kEig==
+        bh=3hTVNlZO4jE6tEhsq0GejCEG2lc+5LPQ2bOFsoDFWyg=;
+        b=kip3Q2jf2oIznTac2Yf76SyTOV49baVrjWDBMftNRWsFj7pMsBsGbrwJlbmdSap8+V
+         qMwY9EDQ8FMU4ls9KthKfw0Hg0Dkz5PW/SzjdYDyoyTuxyl/X4t3dBzoCeoFbss0R07e
+         vTKBWMqgEdoeD1of6zw8HxIUv8wGFkuJgCOqhie5VHvyp+Ki9RwW9KW11tqpnfnebr/B
+         FjPBd2k27B8a00SfhrxH7r5mg/BFSrOvHSQATfOf4ZST2p6HZAvKoFpEw71ynHIoPYMO
+         w+9p7Bl2CKQeAgYjw0yTZIbSST8arbFk5aXmNhmIG0mFxWETwirwForUt00ChM27cq3M
+         YUyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=E96d+BUrTn5halPp8rfKr4BR8z1gBILVpe/NiX4cSOM=;
-        b=Euaqy4jdXF2X+0lYFCve0UUji/Tlt8ALUGjzYZU/6ul8w7ippVvDDgSMmUKRQkVrlq
-         YRLRrBTNFfwYjDxYCE7qp4iEoH8OZVtuxZ88cZ0qkkpfDTR232JPkuFwO8DJ9Blu9txo
-         CA8z7PbnQx7dhZQMuU6pWqc0E/RFoDzBUd8PMx37+4nIOHqw5XnduEHmnxlZ4zT8ZA+v
-         Svk5FLf0egCVIQNDAMIuutVat9ACtlVk4qjLRa9UV7PY5YKzSt6r7LrzpaclTE/VJ+2/
-         5jczUB7OLbWwcQKyjaEIZSlQH2pjPciR4sSVVd54w4j7RWq9BJJGpoLQoWqDKB2EOffk
-         7h4A==
-X-Gm-Message-State: ACgBeo10Noa0aqlZLtrNl4TQy8qO95vc1iqDPVgpU9yhSMafQeTjblVN
-        NNiXMvauKjcWUvWzIsxtWArIPw==
-X-Google-Smtp-Source: AA6agR4jWu5q16URuIM703Kk3SvvJ3fM5QAgSFFuhVHEhWOkBCOL26w1vKN1rgalbG1P0R6Kg4uQJw==
-X-Received: by 2002:adf:e10c:0:b0:225:3168:c261 with SMTP id t12-20020adfe10c000000b002253168c261mr1433771wrz.159.1660842045923;
-        Thu, 18 Aug 2022 10:00:45 -0700 (PDT)
+        bh=3hTVNlZO4jE6tEhsq0GejCEG2lc+5LPQ2bOFsoDFWyg=;
+        b=m252UVfxKJJOe5fmRzdW6lq13J7cy44C34ySCGzehboUeyrNzgigs0EsS8keFr614u
+         YZBOSJSIxDlNJf5PW9Y4pvMUvKnNu1aYZYyIbcKdF2j5uT1lmo/nKqDV9ASaJiQzEoul
+         bCmiLI5n4JHoj8OwkcimLVxiQjNp0lKlu2v7NOyoVuHKhFdKsj1xcy441eQYsPAQ30Ir
+         owwnPTxDWbpD4QlRWUWQ3O4OGSsJGLl2WGFKV5ddEiePl4n5JSC1lB/1QNAJhY/vwH7k
+         03+f+FFSuJYPtmsq6hGh5vMAloqr34QQ1VXL1rFj5TU0/wYcQ8rmlBsMyqSK/GqvvGoZ
+         f8JA==
+X-Gm-Message-State: ACgBeo0vD9c1e3hl7IspfAiBVy6/J73Md0RGuLEpfmK05I7gsHMmbPgE
+        QHs1qAWw2b3It5OScw6xRb8I5w==
+X-Google-Smtp-Source: AA6agR7x3kNAyhJy7k6y5jahsTZurXrj9bcTnnSWcZXXwTswCwIwFXAgkLG4/om7CJtQEvr2T3JjtA==
+X-Received: by 2002:a05:6000:1681:b0:21f:16a6:626f with SMTP id y1-20020a056000168100b0021f16a6626fmr2103200wrd.717.1660842044501;
+        Thu, 18 Aug 2022 10:00:44 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm2662169wmb.34.2022.08.18.10.00.44
+        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm2662169wmb.34.2022.08.18.10.00.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 10:00:45 -0700 (PDT)
+        Thu, 18 Aug 2022 10:00:44 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -70,21 +70,30 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 22/31] net/tcp: Add option for TCP-AO to (not) hash header
-Date:   Thu, 18 Aug 2022 17:59:56 +0100
-Message-Id: <20220818170005.747015-23-dima@arista.com>
+Subject: [PATCH 21/31] net/tcp: Ignore specific ICMPs for TCP-AO connections
+Date:   Thu, 18 Aug 2022 17:59:55 +0100
+Message-Id: <20220818170005.747015-22-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220818170005.747015-1-dima@arista.com>
 References: <20220818170005.747015-1-dima@arista.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Provide setsockopt() key flag that makes TCP-AO exclude hashing TCP
-header for peers that match the key. This is needed for interraction
-with middleboxes that may change TCP options, see RFC5925 (9.2).
+Similarly to IPsec, RFC5925 prescribes:
+  ">> A TCP-AO implementation MUST default to ignore incoming ICMPv4
+  messages of Type 3 (destination unreachable), Codes 2-4 (protocol
+  unreachable, port unreachable, and fragmentation needed -- ’hard
+  errors’), and ICMPv6 Type 1 (destination unreachable), Code 1
+  (administratively prohibited) and Code 4 (port unreachable) intended
+  for connections in synchronized states (ESTABLISHED, FIN-WAIT-1, FIN-
+  WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match MKTs."
+
+A selftest (later in patch series) verifies that this attack is not
+possible in this TCP-AO implementation.
 
 Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
 Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
@@ -92,56 +101,246 @@ Co-developed-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/uapi/linux/tcp.h | 2 ++
- net/ipv4/tcp_ao.c        | 8 +++++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ include/net/tcp_ao.h      |  9 +++++
+ include/uapi/linux/snmp.h |  1 +
+ include/uapi/linux/tcp.h  |  1 +
+ net/ipv4/proc.c           |  1 +
+ net/ipv4/tcp_ao.c         | 70 ++++++++++++++++++++++++++++++++++++++-
+ net/ipv4/tcp_ipv4.c       |  5 +++
+ net/ipv6/tcp_ipv6.c       |  4 +++
+ 7 files changed, 90 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index 508bedbc6ad8..b60933ee2a27 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -347,6 +347,8 @@ struct tcp_diag_md5sig {
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index e99c8f300a5a..743a910ba508 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -25,6 +25,7 @@ struct tcp_ao_counters {
+ 	atomic64_t	pkt_bad;
+ 	atomic64_t	key_not_found;
+ 	atomic64_t	ao_required;
++	atomic64_t	dropped_icmp;
+ };
  
- #define TCP_AO_MAXKEYLEN	80
- 
-+#define TCP_AO_KEYF_EXCLUDE_OPT	(1 << 0)
-+
- #define TCP_AO_CMDF_CURR	(1 << 0)	/* Only checks field sndid */
- #define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
- #define TCP_AO_CMDF_ACCEPT_ICMP	(1 << 2)	/* Accept incoming ICMPs */
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 858295393643..6e18a8cdee90 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -586,7 +586,8 @@ int tcp_ao_hash_hdr(unsigned short int family, char *ao_hash,
- 						&saddr->a6, th->doff * 4))
- 			goto clear_hash;
- 	}
--	if (tcp_ao_hash_header(&hp, th, false,
-+	if (tcp_ao_hash_header(&hp, th,
-+			       !!(key->keyflags & TCP_AO_KEYF_EXCLUDE_OPT),
- 			       ao_hash, hash_offset, tcp_ao_maclen(key)))
- 		goto clear_hash;
- 	ahash_request_set_crypt(hp.req, NULL, ao_hash, 0);
-@@ -628,7 +629,8 @@ int tcp_ao_hash_skb(unsigned short int family,
- 		goto clear_hash;
- 	if (tcp_ao_hash_pseudoheader(family, sk, skb, &hp, skb->len))
- 		goto clear_hash;
--	if (tcp_ao_hash_header(&hp, th, false,
-+	if (tcp_ao_hash_header(&hp, th,
-+			       !!(key->keyflags & TCP_AO_KEYF_EXCLUDE_OPT),
- 			       ao_hash, hash_offset, tcp_ao_maclen(key)))
- 		goto clear_hash;
- 	if (tcp_ao_hash_skb_data(&hp, skb, th->doff << 2))
-@@ -1416,7 +1418,7 @@ static bool tcp_ao_mkt_overlap_v6(struct tcp_ao *cmd,
- 	return false;
+ struct tcp_ao_key {
+@@ -77,6 +78,9 @@ static inline unsigned int tcp_ao_digest_size(struct tcp_ao_key *key)
+ 	return key->digest_size;
  }
  
--#define TCP_AO_KEYF_ALL		(0)
-+#define TCP_AO_KEYF_ALL		(TCP_AO_KEYF_EXCLUDE_OPT)
++/* bits in 'ao_flags' */
++#define AO_ACCEPT_ICMPS		BIT(0)
++
+ struct tcp_ao_info {
+ 	struct hlist_head	head;
+ 	struct rcu_head		rcu;
+@@ -169,6 +173,7 @@ u32 tcp_ao_compute_sne(u32 sne, u32 seq, u32 new_seq);
+ void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp);
+ int tcp_ao_cache_traffic_keys(const struct sock *sk, struct tcp_ao_info *ao,
+ 			      struct tcp_ao_key *ao_key);
++bool tcp_ao_ignore_icmp(struct sock *sk, int type, int code);
+ enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
+ 			const struct sk_buff *skb, unsigned short int family,
+ 			const struct request_sock *req,
+@@ -239,6 +244,10 @@ void tcp_ao_connect_init(struct sock *sk);
+ 
+ #else /* CONFIG_TCP_AO */
+ 
++static inline bool tcp_ao_ignore_icmp(struct sock *sk, int type, int code)
++{
++	return false;
++}
+ static inline enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
+ 		const struct sk_buff *skb, unsigned short int family,
+ 		const struct request_sock *req, const struct tcp_ao_hdr *aoh)
+diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+index f09119db8b40..bc7655394e9a 100644
+--- a/include/uapi/linux/snmp.h
++++ b/include/uapi/linux/snmp.h
+@@ -296,6 +296,7 @@ enum
+ 	LINUX_MIB_TCPAOBAD,			/* TCPAOBad */
+ 	LINUX_MIB_TCPAOKEYNOTFOUND,		/* TCPAOKeyNotFound */
+ 	LINUX_MIB_TCPAOGOOD,			/* TCPAOGood */
++	LINUX_MIB_TCPAODROPPEDICMPS,		/* TCPAODroppedIcmps */
+ 	__LINUX_MIB_MAX
+ };
+ 
+diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+index 5369458ae89f..508bedbc6ad8 100644
+--- a/include/uapi/linux/tcp.h
++++ b/include/uapi/linux/tcp.h
+@@ -349,6 +349,7 @@ struct tcp_diag_md5sig {
+ 
+ #define TCP_AO_CMDF_CURR	(1 << 0)	/* Only checks field sndid */
+ #define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
++#define TCP_AO_CMDF_ACCEPT_ICMP	(1 << 2)	/* Accept incoming ICMPs */
+ 
+ struct tcp_ao { /* setsockopt(TCP_AO) */
+ 	struct __kernel_sockaddr_storage tcpa_addr;
+diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+index 1b5a078adcf1..ccfb7f51e82f 100644
+--- a/net/ipv4/proc.c
++++ b/net/ipv4/proc.c
+@@ -301,6 +301,7 @@ static const struct snmp_mib snmp4_net_list[] = {
+ 	SNMP_MIB_ITEM("TCPAOBad", LINUX_MIB_TCPAOBAD),
+ 	SNMP_MIB_ITEM("TCPAOKeyNotFound", LINUX_MIB_TCPAOKEYNOTFOUND),
+ 	SNMP_MIB_ITEM("TCPAOGood", LINUX_MIB_TCPAOGOOD),
++	SNMP_MIB_ITEM("TCPAODroppedIcmps", LINUX_MIB_TCPAODROPPEDICMPS),
+ 	SNMP_MIB_SENTINEL
+ };
+ 
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index 4283e0193e2a..858295393643 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -15,6 +15,7 @@
+ 
+ #include <net/tcp.h>
+ #include <net/ipv6.h>
++#include <net/icmp.h>
+ 
+ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
+ 			    unsigned int len)
+@@ -52,6 +53,63 @@ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
+ 	return 1;
+ }
+ 
++bool tcp_ao_ignore_icmp(struct sock *sk, int type, int code)
++{
++	struct tcp_ao_info *ao;
++	bool ignore_icmp = false;
++
++	/* RFC5925, 7.8:
++	 * >> A TCP-AO implementation MUST default to ignore incoming ICMPv4
++	 * messages of Type 3 (destination unreachable), Codes 2-4 (protocol
++	 * unreachable, port unreachable, and fragmentation needed -- ’hard
++	 * errors’), and ICMPv6 Type 1 (destination unreachable), Code 1
++	 * (administratively prohibited) and Code 4 (port unreachable) intended
++	 * for connections in synchronized states (ESTABLISHED, FIN-WAIT-1, FIN-
++	 * WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match MKTs.
++	 */
++	if (sk->sk_family == AF_INET) {
++		if (type != ICMP_DEST_UNREACH)
++			return false;
++		if (code < ICMP_PROT_UNREACH || code > ICMP_FRAG_NEEDED)
++			return false;
++	} else if (sk->sk_family == AF_INET6) {
++		if (type != ICMPV6_DEST_UNREACH)
++			return false;
++		if (code != ICMPV6_ADM_PROHIBITED && code != ICMPV6_PORT_UNREACH)
++			return false;
++	} else {
++		WARN_ON_ONCE(1);
++		return false;
++	}
++
++	rcu_read_lock();
++	switch (sk->sk_state) {
++	case TCP_TIME_WAIT:
++		ao = rcu_dereference(tcp_twsk(sk)->ao_info);
++		break;
++	case TCP_SYN_SENT:
++	case TCP_SYN_RECV:
++	case TCP_LISTEN:
++	case TCP_NEW_SYN_RECV:
++		/* RFC5925 specifies to ignore ICMPs *only* on connections
++		 * in synchronized states.
++		 */
++		rcu_read_unlock();
++		return false;
++	default:
++		ao = rcu_dereference(tcp_sk(sk)->ao_info);
++	}
++
++	if (ao && !(ao->ao_flags & AO_ACCEPT_ICMPS)) {
++		ignore_icmp = true;
++		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAODROPPEDICMPS);
++		atomic64_inc(&ao->counters.dropped_icmp);
++	}
++	rcu_read_unlock();
++
++	return ignore_icmp;
++}
++
+ struct tcp_ao_key *tcp_ao_do_lookup_keyid(struct tcp_ao_info *ao,
+ 					  int sndid, int rcvid)
+ {
+@@ -1360,7 +1418,7 @@ static bool tcp_ao_mkt_overlap_v6(struct tcp_ao *cmd,
+ 
+ #define TCP_AO_KEYF_ALL		(0)
  #define TCP_AO_CMDF_ADDMOD_VALID					\
- 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_ACCEPT_ICMP)
+-	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT)
++	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_ACCEPT_ICMP)
  #define TCP_AO_CMDF_DEL_VALID						\
+ 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT)
+ 
+@@ -1443,6 +1501,11 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
+ 	atomic64_set(&key->pkt_good, 0);
+ 	atomic64_set(&key->pkt_bad, 0);
+ 
++	if (cmd.tcpa_flags & TCP_AO_CMDF_ACCEPT_ICMP)
++		ao_info->ao_flags |= AO_ACCEPT_ICMPS;
++	else
++		ao_info->ao_flags &= ~AO_ACCEPT_ICMPS;
++
+ 	ret = tcp_ao_parse_crypto(&cmd, key);
+ 	if (ret < 0)
+ 		goto err_free_sock;
+@@ -1601,6 +1664,11 @@ static int tcp_ao_mod_cmd(struct sock *sk, unsigned short int family,
+ 	if (!ao_info)
+ 		return -ENOENT;
+ 	/* TODO: make tcp_ao_current_rnext() and flags set atomic */
++	if (cmd.tcpa_flags & TCP_AO_CMDF_ACCEPT_ICMP)
++		ao_info->ao_flags |= AO_ACCEPT_ICMPS;
++	else
++		ao_info->ao_flags &= ~AO_ACCEPT_ICMPS;
++
+ 	return tcp_ao_current_rnext(sk, cmd.tcpa_flags,
+ 			cmd.tcpa_current, cmd.tcpa_rnext);
+ }
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index a1e1a23abfea..bb4d208da8a8 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -484,6 +484,8 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
+ 		return -ENOENT;
+ 	}
+ 	if (sk->sk_state == TCP_TIME_WAIT) {
++		/* To increase the counter of ignored icmps for TCP-AO */
++		tcp_ao_ignore_icmp(sk, type, code);
+ 		inet_twsk_put(inet_twsk(sk));
+ 		return 0;
+ 	}
+@@ -498,6 +500,9 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
+ 	}
+ 
+ 	bh_lock_sock(sk);
++	if (tcp_ao_ignore_icmp(sk, type, code))
++		goto out;
++
+ 	/* If too many ICMPs get dropped on busy
+ 	 * servers this needs to be solved differently.
+ 	 * We do take care of PMTU discovery (RFC1191) special case :
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 8a27408549cd..78994d1cbc45 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -399,6 +399,8 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	}
+ 
+ 	if (sk->sk_state == TCP_TIME_WAIT) {
++		/* To increase the counter of ignored icmps for TCP-AO */
++		tcp_ao_ignore_icmp(sk, type, code);
+ 		inet_twsk_put(inet_twsk(sk));
+ 		return 0;
+ 	}
+@@ -410,6 +412,8 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 	}
+ 
+ 	bh_lock_sock(sk);
++	if (tcp_ao_ignore_icmp(sk, type, code))
++		goto out;
+ 	if (sock_owned_by_user(sk) && type != ICMPV6_PKT_TOOBIG)
+ 		__NET_INC_STATS(net, LINUX_MIB_LOCKDROPPEDICMPS);
+ 
 -- 
 2.37.2
 
