@@ -2,310 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0757DC25B08
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Aug 2022 23:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA19C25B08
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 00:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242378AbiHQXVl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Aug 2022 19:21:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46758 "EHLO
+        id S239261AbiHRAmp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 17 Aug 2022 20:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242243AbiHQXV3 (ORCPT
+        with ESMTP id S239102AbiHRAmo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Aug 2022 19:21:29 -0400
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F108A404D;
-        Wed, 17 Aug 2022 16:21:24 -0700 (PDT)
-Received: from pps.filterd (m0134420.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27HNK2P2020374;
-        Wed, 17 Aug 2022 23:21:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pps0720;
- bh=tUbh+vNC70urocfZcuHC8mry030DvJifO41MfmcUrTc=;
- b=A6Tv8X+QInwjSu1v+gJikbG9oRSqQITJotZplfPXNy9xvS+6yWdGonWHRayLxWidAfNd
- WA4e6ImZ8DfgUwiaMLyxFLm1lvhrHR3oQYL8ZnbbSgqvK4v9EXPJfV1V3d3t7Cw5bjAc
- hBoBFpqQFKlFuVG1QKX0GrLO+HkIcCaOAvJn83csi6bjQEKjOkaPn3O4J5LXRvsB0GQ6
- PB14tTYJANQ4sDDx8HLjgzSy/UGrthGLiYZrJdPtLDg1/GvTOdRUB+s7Tts0B3Fv6+j2
- kLahNAUAf++vQDCmz1UgV27B/kLh6EdxvNV949iClaHntqWRGG6Dtr1wUYr8sekRo8BS 5Q== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j19wer08d-1
+        Wed, 17 Aug 2022 20:42:44 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461919E100;
+        Wed, 17 Aug 2022 17:42:43 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27I0Hpit004012;
+        Thu, 18 Aug 2022 00:42:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=h+kCad6FaukL56RbduAxWPrAnskGs0Txy3LmDi1SL1c=;
+ b=h+65O5uQDVcp6eJXvyPMnxgRM7SBK2zX/yRWV7kPeh8NInU4UW8Dlr1eQVFJ+QaB8Bi/
+ YxtXoNzS+WzuFYLbreAh35OeXs8sMM/RkG+b4hFL5zNcQ9zYkY8Bv5t8pPwwxHEWTI+s
+ wIYzkNZRVlGxn15y2ODF+OTxkfXmNKffC2AtpH65lT6qRVvNhs5M73KA/CGk2fBKmKqo
+ /euFLIUmn+7RCURq+eRz553JGwzr4wiRX2VRFVAuPEp+OzzOK1ab66H9gd4HTwxHRz6n
+ uTvDKZB34jhKv9IJ7nHQwOTOfJTi/lqCQYJHH03Jpz+s8ACmy/6MM9JOAc19pESDsEJr ng== 
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1arj0hv7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Aug 2022 23:21:20 +0000
-Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 8E62D8001AE;
-        Wed, 17 Aug 2022 23:21:19 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 43D8B803ADE;
-        Wed, 17 Aug 2022 23:21:19 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        ebiggers@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 07/10] crypto: Kconfig - move arm and arm64 menus to Crypto API page
-Date:   Wed, 17 Aug 2022 18:20:54 -0500
-Message-Id: <20220817232057.73643-8-elliott@hpe.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220817232057.73643-1-elliott@hpe.com>
+        Thu, 18 Aug 2022 00:42:26 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27I0aFOh019036;
+        Thu, 18 Aug 2022 00:42:26 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma02wdc.us.ibm.com with ESMTP id 3hx3ka3tpd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 00:42:26 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27I0gPW549676638
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 00:42:25 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB3E828059;
+        Thu, 18 Aug 2022 00:42:25 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3F6B28058;
+        Thu, 18 Aug 2022 00:42:24 +0000 (GMT)
+Received: from [9.211.97.190] (unknown [9.211.97.190])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 00:42:24 +0000 (GMT)
+Message-ID: <e6e99e33-4279-690d-88b8-9e732551c17c@linux.vnet.ibm.com>
+Date:   Wed, 17 Aug 2022 20:42:24 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH v2 00/10] crypto: Kconfig - simplify menus and help text
+Content-Language: en-US
+To:     Robert Elliott <elliott@hpe.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ebiggers@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20220815190608.47182-9-elliott@hpe.com>
  <20220817232057.73643-1-elliott@hpe.com>
-MIME-Version: 1.0
+From:   Nayna <nayna@linux.vnet.ibm.com>
+In-Reply-To: <20220817232057.73643-1-elliott@hpe.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: 4rvn-bmJZa3fo7lhd-Xz4H-rY5tZYFLe
-X-Proofpoint-ORIG-GUID: 4rvn-bmJZa3fo7lhd-Xz4H-rY5tZYFLe
-X-HPE-SCL: -1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TGN3nS18HXhgoPp9DOSCIbXOxE_fQGuq
+X-Proofpoint-ORIG-GUID: TGN3nS18HXhgoPp9DOSCIbXOxE_fQGuq
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-17_15,2022-08-16_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 bulkscore=0 adultscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=840 clxscore=1015 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208170088
+ definitions=2022-08-17_17,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ mlxscore=0 adultscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2208170090
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move ARM- and ARM64-accelerated menus into a submenu under
-the Crypto API menu (paralleling all the architectures).
 
-Make each submenu always appear if the corresponding architecture
-is supported. Get rid of the ARM_CRYPTO and ARM64_CRYPTO symbols.
+On 8/17/22 19:20, Robert Elliott wrote:
+> Improve the "make menuconfig" experience under the
+> Cryptographic API page.
+>
+> The first of two patch series. This series extracts all the
+> architecture-specific entries from
+>      crypto/Kconfig
+> into
+>      arch/*/crypto/Kconfig
+>
+> A subsequent series will work on the entry titles and help text.
+>
+> Tested by running commands like these for arm, arm64, mips, powerpc,
+> sparc, s390, and x86:
+>      make ARCH=arm O=build-arm allmodconfig
+>      cd build-arm
+>      make ARCH=arm menuconfig
+>      make ARCH=arm CROSS_COMPILE=arm-linux-gnu- -j 55
+>
+> Notes:
+> 1. powerpc doesn't build for reasons unrelated to this series.
 
-The "ARM Accelerated" or "ARM64 Accelerated" entry disappears from:
-    General setup  --->
-    Platform selection  --->
-    Kernel Features  --->
-    Boot options  --->
-    Power management options  --->
-    CPU Power Management  --->
-[*] ACPI (Advanced Configuration and Power Interface) Support  --->
-[*] Virtualization  --->
-[*] ARM Accelerated Cryptographic Algorithms  --->
-     (or)
-[*] ARM64 Accelerated Cryptographic Algorithms  --->
-    ...
--*- Cryptographic API  --->
-    Library routines  --->
-    Kernel hacking  --->
+Did it build without this patchset ? Can you please share more details 
+on the error or reasons?
 
-and moves into the Cryptographic API menu, which now contains:
-      ...
-      Accelerated Cryptographic Algorithms for CPU (arm) --->
-      (or)
-      Accelerated Cryptographic Algorithms for CPU (arm64) --->
-[*]   Hardware crypto devices  --->
-      ...
+Thanks & Regards,
 
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Robert Elliott <elliott@hpe.com>
----
- arch/arm/Kconfig                         |  4 ----
- arch/arm/configs/exynos_defconfig        |  1 -
- arch/arm/configs/milbeaut_m10v_defconfig |  1 -
- arch/arm/configs/multi_v7_defconfig      |  1 -
- arch/arm/configs/omap2plus_defconfig     |  1 -
- arch/arm/configs/pxa_defconfig           |  1 -
- arch/arm/crypto/Kconfig                  | 11 ++---------
- arch/arm64/Kconfig                       |  3 ---
- arch/arm64/configs/defconfig             |  1 -
- arch/arm64/crypto/Kconfig                | 11 ++---------
- crypto/Kconfig                           |  6 ++++++
- drivers/crypto/Kconfig                   |  1 -
- drivers/net/Kconfig                      |  2 --
- 13 files changed, 10 insertions(+), 34 deletions(-)
-
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 7630ba9cb6cc..2b42c6ece2de 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1903,8 +1903,4 @@ menu "Power management options"
- 
- endmenu
- 
--if CRYPTO
--source "arch/arm/crypto/Kconfig"
--endif
--
- source "arch/arm/Kconfig.assembler"
-diff --git a/arch/arm/configs/exynos_defconfig b/arch/arm/configs/exynos_defconfig
-index aa061074db78..4ac1f1dcb429 100644
---- a/arch/arm/configs/exynos_defconfig
-+++ b/arch/arm/configs/exynos_defconfig
-@@ -34,7 +34,6 @@ CONFIG_NEON=y
- CONFIG_KERNEL_MODE_NEON=y
- CONFIG_PM_DEBUG=y
- CONFIG_PM_ADVANCED_DEBUG=y
--CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM_NEON=m
- CONFIG_CRYPTO_SHA256_ARM=m
- CONFIG_CRYPTO_SHA512_ARM=m
-diff --git a/arch/arm/configs/milbeaut_m10v_defconfig b/arch/arm/configs/milbeaut_m10v_defconfig
-index 7c07f9893a0f..ab0acf1e0a71 100644
---- a/arch/arm/configs/milbeaut_m10v_defconfig
-+++ b/arch/arm/configs/milbeaut_m10v_defconfig
-@@ -46,7 +46,6 @@ CONFIG_NEON=y
- CONFIG_KERNEL_MODE_NEON=y
- CONFIG_EFI_VARS=m
- CONFIG_EFI_CAPSULE_LOADER=m
--CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM_NEON=m
- CONFIG_CRYPTO_SHA1_ARM_CE=m
- CONFIG_CRYPTO_SHA2_ARM_CE=m
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index ce9826bce29b..ef6e2f9c3288 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -135,7 +135,6 @@ CONFIG_TRUSTED_FOUNDATIONS=y
- CONFIG_BCM47XX_NVRAM=y
- CONFIG_BCM47XX_SPROM=y
- CONFIG_EFI_CAPSULE_LOADER=m
--CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM_NEON=m
- CONFIG_CRYPTO_SHA1_ARM_CE=m
- CONFIG_CRYPTO_SHA2_ARM_CE=m
-diff --git a/arch/arm/configs/omap2plus_defconfig b/arch/arm/configs/omap2plus_defconfig
-index 9380df6b530f..85cd9d232f8d 100644
---- a/arch/arm/configs/omap2plus_defconfig
-+++ b/arch/arm/configs/omap2plus_defconfig
-@@ -54,7 +54,6 @@ CONFIG_CPU_IDLE=y
- CONFIG_ARM_CPUIDLE=y
- CONFIG_KERNEL_MODE_NEON=y
- CONFIG_PM_DEBUG=y
--CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM_NEON=m
- CONFIG_CRYPTO_SHA256_ARM=m
- CONFIG_CRYPTO_SHA512_ARM=m
-diff --git a/arch/arm/configs/pxa_defconfig b/arch/arm/configs/pxa_defconfig
-index 1db70dfd32d2..a97f9aca572c 100644
---- a/arch/arm/configs/pxa_defconfig
-+++ b/arch/arm/configs/pxa_defconfig
-@@ -743,7 +743,6 @@ CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_DEFLATE=y
- CONFIG_CRYPTO_LZO=y
--CONFIG_ARM_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM=m
- CONFIG_CRYPTO_SHA256_ARM=m
- CONFIG_CRYPTO_SHA512_ARM=m
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index e4dba5461cb3..f6edc8f19d17 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -1,13 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--menuconfig ARM_CRYPTO
--	bool "ARM Accelerated Cryptographic Algorithms"
--	depends on ARM
--	help
--	  Say Y here to choose from a selection of cryptographic algorithms
--	  implemented using ARM specific CPU features or instructions.
--
--if ARM_CRYPTO
-+menu "Accelerated Cryptographic Algorithms for CPU (arm)"
- 
- config CRYPTO_SHA1_ARM
- 	tristate "SHA1 digest algorithm (ARM-asm)"
-@@ -170,4 +163,4 @@ menuconfig ARM_CRYPTO
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 
--endif
-+endmenu
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 1652a9800ebe..78af1ffaa252 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2186,6 +2186,3 @@ menu "CPU Power Management"
- 
- source "arch/arm64/kvm/Kconfig"
- 
--if CRYPTO
--source "arch/arm64/crypto/Kconfig"
--endif # CRYPTO
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 7d1105343bc2..eac6f5bf4dea 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -108,7 +108,6 @@ CONFIG_ACPI_APEI_MEMORY_FAILURE=y
- CONFIG_ACPI_APEI_EINJ=y
- CONFIG_VIRTUALIZATION=y
- CONFIG_KVM=y
--CONFIG_ARM64_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM64_CE=y
- CONFIG_CRYPTO_SHA2_ARM64_CE=y
- CONFIG_CRYPTO_SHA512_ARM64_CE=m
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index ac85682c013c..5b4d4bfb0356 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -1,13 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--menuconfig ARM64_CRYPTO
--	bool "ARM64 Accelerated Cryptographic Algorithms"
--	depends on ARM64
--	help
--	  Say Y here to choose from a selection of cryptographic algorithms
--	  implemented using ARM64 specific CPU features or instructions.
--
--if ARM64_CRYPTO
-+menu "Accelerated Cryptographic Algorithms for CPU (arm64)"
- 
- config CRYPTO_SHA256_ARM64
- 	tristate "SHA-224/SHA-256 digest algorithm for arm64"
-@@ -132,4 +125,4 @@ menuconfig ARM64_CRYPTO
- 	select CRYPTO_AES_ARM64_NEON_BLK
- 	select CRYPTO_LIB_AES
- 
--endif
-+endmenu
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index f24ba726af25..b61626bf8ee2 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1245,6 +1245,12 @@ menuconfig CRYPTO_DRBG_MENU
- config CRYPTO_HASH_INFO
- 	bool
- 
-+if ARM
-+source "arch/arm/crypto/Kconfig"
-+endif
-+if ARM64
-+source "arch/arm64/crypto/Kconfig"
-+endif
- if MIPS
- source "arch/mips/crypto/Kconfig"
- endif
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 9728874f66a0..06c71b6da07e 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -802,7 +802,6 @@ menuconfig CRYPTO_HW
- config CRYPTO_DEV_SA2UL
- 	tristate "Support for TI security accelerator"
- 	depends on ARCH_K3 || COMPILE_TEST
--	select ARM64_CRYPTO
- 	select CRYPTO_AES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_AUTHENC
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 8c1eeb5a8db8..c94733b0b10f 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -85,8 +85,6 @@ menuconfig NETDEVICES
- 	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
- 	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
- 	select CRYPTO_CURVE25519_X86 if X86 && 64BIT
--	select ARM_CRYPTO if ARM
--	select ARM64_CRYPTO if ARM64
- 	select CRYPTO_CHACHA20_NEON if ARM || (ARM64 && KERNEL_MODE_NEON)
- 	select CRYPTO_POLY1305_NEON if ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_POLY1305_ARM if ARM
--- 
-2.37.1
+    - Nayna
 
