@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BC2C32774
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 20:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03659C32772
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 20:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345734AbiHRUBH (ORCPT
+        id S1345637AbiHRUBf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Aug 2022 16:01:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54908 "EHLO
+        Thu, 18 Aug 2022 16:01:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345660AbiHRUAr (ORCPT
+        with ESMTP id S1345707AbiHRUA7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Aug 2022 16:00:47 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B24D11D8;
-        Thu, 18 Aug 2022 13:00:45 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id o22so3188000edc.10;
-        Thu, 18 Aug 2022 13:00:45 -0700 (PDT)
+        Thu, 18 Aug 2022 16:00:59 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C97D1252;
+        Thu, 18 Aug 2022 13:00:49 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id r4so3196193edi.8;
+        Thu, 18 Aug 2022 13:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=e7myX/ND+nnIiOt3LqG3ckuwVwkBkqrIptHUR/Mrndk=;
-        b=WVavmcDqa5JmqnC6gdXmqv8HI/orgoJQWcID3pt1S9bFMe2NAcu8/Gox8Sy7S/LUvO
-         9JnSJpQAPk0YsK7O0AIOIjT3Z2fmkMkrE3IwULiJHyqX/ZsR1TEq0DoqlTqq45qxRdmW
-         /gYaT/JTB6cPJEWvr14W2M4v2vQ1jcK5ApxgppvIJOFdzROr0Zr4dTPzlrhPIzYkg17b
-         852Gqlkf52v0t88nEX2bey3u7JryN/18Ngr3UHgb62ucRYVMp5YvrO4vAYZF9R5DMoFD
-         yEC5QWRppPgyylVtdjtooKj10W7QRg6hNyopbnncZoXATdpqwgnTTVkLU8f8G0Ep9Mb0
-         omZg==
+        bh=fz9Xip6fpIPpoxcQh0P3hfzdJJCoggTYnPWhhC9vYvU=;
+        b=nMk9xygbf27n1rhKi7t1bO6wpN9z1t7wyfYjUZ/AiDS5/QIECI2qwbr2YdpO5jklnn
+         uwCxDSeVQNL0SfZMFeTKet/PGIiu2WcgBgONy3qSVMSHwBnTrLafwQW7704+KzWql5b8
+         tkRyY0UkIAhot0hkGrnMgiVb+tDCaMgTkxSL0sNebQTBct2kRRXJ5SgyGUbwWLipArrj
+         6oq8moc4pwvWUUkPWJStzPi6R3MCLlzsOjA7AtaheS6JZneWuH6CKY1spLpuIaFwUq3B
+         1daEiBkjSRqy8LJ+q7OUolDcPm0wVMLva7EoyW+IWuSfkSkbt1aagb+Vbqlc5TU+zG5c
+         1aVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=e7myX/ND+nnIiOt3LqG3ckuwVwkBkqrIptHUR/Mrndk=;
-        b=GIuw3eU7kWp9GhuzaMYJj28E5wWAnbao63IuH00L0h6nQTJxR40qkmlfpaK1BlsdQe
-         MN1r0oYVQZQOHpHynpYiElTeq5L7ZboN8hH8USUkT0YPTsg756vHve8IiGe2PReV3kUS
-         d27ElrCI8ZWVgjClZ8ql7WBtVNcd1IfvIVpQ57ugHsik1wiy5tVFlABKMFuIyO03Oa8F
-         eiv6qT4/59exAHhnOmDDRtxHdxqTxApnX+bP/L65pkH30rODuDmDS2uLnYRNrEDsSxWt
-         CSHehR+cuimPgdKZX6CrKILRQiEOfcHdZ89xFQYXrw6kkRGbblap5PB2p2p+5QqEfFCn
-         t6vw==
-X-Gm-Message-State: ACgBeo3L4oNMVbkjE8LUVJyFypcAkekb5xeUD1W5Qh9WMqyRN7zKvzTI
-        it9MRmuLxCJJZnBITBO4ebs=
-X-Google-Smtp-Source: AA6agR5ARHTZR1nGY8gbxIAeHQxGPuUjylheOU62AlIXzg+1eRstARycn9+O4biq50Ot+c7/NKqZQg==
-X-Received: by 2002:a05:6402:42d3:b0:435:2c49:313d with SMTP id i19-20020a05640242d300b004352c49313dmr3436835edc.86.1660852844709;
-        Thu, 18 Aug 2022 13:00:44 -0700 (PDT)
+        bh=fz9Xip6fpIPpoxcQh0P3hfzdJJCoggTYnPWhhC9vYvU=;
+        b=yZ3yvXFIP8L4t8XdD1YgujzMDjIugtl6qS0alc8MsCgmNeukEYL6hl/uywjs7sE7uU
+         HqiCCX21xs4EjRdWakubMN+9On/oSIeFLzzy2BFMr5/h8TZlk3db+LksBnifnnYsksjY
+         xiE2N8OzKuoCPe+FdaBgu6krUNQZ8KTeYRFIKoVP2Xv2muEHj8SWy+C3c6/26e1PrBAb
+         in1dqCSIRJln38A7qhxKkJD/bQKM7YwJHJT4xaTwLnGvC+bimF4hKOWVtFEiNaDc+Ysw
+         zN1MyWEH9xu3KJZy+Lns49z9lgdW/VJthBuR/IpM60coQb8RMLVvzoBplJoIpK+hDd3v
+         yAbQ==
+X-Gm-Message-State: ACgBeo1aqKfLfRyxPSwAjJfPwYgIdfpEfsOE7yMvER5ljKoE24Ig7ba3
+        tltENmq7g3ORNAc9J8UNz3I=
+X-Google-Smtp-Source: AA6agR6iwY9x8kl12nTZWk9P4D9Gn3eriM1icEnUb9iLvVsR1p40fCQWfJ4mWEu4Q09ingtDm9+R0g==
+X-Received: by 2002:a05:6402:4414:b0:434:f58c:ee2e with SMTP id y20-20020a056402441400b00434f58cee2emr3432413eda.362.1660852848372;
+        Thu, 18 Aug 2022 13:00:48 -0700 (PDT)
 Received: from localhost.localdomain ([2a04:241e:502:a080:17c8:ba1c:b6f3:3fe0])
-        by smtp.gmail.com with ESMTPSA id fw30-20020a170907501e00b00722e4bab163sm1215087ejc.200.2022.08.18.13.00.43
+        by smtp.gmail.com with ESMTPSA id fw30-20020a170907501e00b00722e4bab163sm1215087ejc.200.2022.08.18.13.00.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 13:00:44 -0700 (PDT)
+        Thu, 18 Aug 2022 13:00:47 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -69,9 +69,9 @@ Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 15/26] tcp: authopt: Add NOSEND/NORECV flags
-Date:   Thu, 18 Aug 2022 22:59:49 +0300
-Message-Id: <747981be06c06a5415d22cbd29a9b7c03706a913.1660852705.git.cdleonard@gmail.com>
+Subject: [PATCH v7 17/26] tcp: authopt: Add v4mapped ipv6 address support
+Date:   Thu, 18 Aug 2022 22:59:51 +0300
+Message-Id: <bdc3b4ca5eaec66d113f9740e43914174c38e5cc.1660852705.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1660852705.git.cdleonard@gmail.com>
 References: <cover.1660852705.git.cdleonard@gmail.com>
@@ -81,95 +81,101 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add flags to allow marking individual keys and invalid for send or recv.
-Making keys assymetric this way is not mentioned in RFC5925 but RFC8177
-requires that keys inside a keychain have independent "accept" and
-"send" lifetimes.
+Keys that are added with v4mapped ipv6 addresses will now be used for
+ipv4 packets. This outward behavior is similar to how MD5 support
+currently works.
 
-Flag names are negative so that the default behavior is for keys to be
-valid for both send and recv.
-
-Setting both NOSEND and NORECV for a certain peer address can be used on
-a listen socket can be used to mean "TCP-AO is required from this peer
-but no keys are currently valid".
+The implementation is different - v4mapped keys are still stored with
+ipv6 addresses.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- include/uapi/linux/tcp.h | 4 ++++
- net/ipv4/tcp_authopt.c   | 9 ++++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ net/ipv4/tcp_authopt.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index a7f5f918ed5a..ed27feb93b0e 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -401,16 +401,20 @@ struct tcp_authopt {
-  *
-  * @TCP_AUTHOPT_KEY_DEL: Delete the key and ignore non-id fields
-  * @TCP_AUTHOPT_KEY_EXCLUDE_OPTS: Exclude TCP options from signature
-  * @TCP_AUTHOPT_KEY_ADDR_BIND: Key only valid for `tcp_authopt.addr`
-  * @TCP_AUTHOPT_KEY_IFINDEX: Key only valid for `tcp_authopt.ifindex`
-+ * @TCP_AUTHOPT_KEY_NOSEND: Key invalid for send (expired)
-+ * @TCP_AUTHOPT_KEY_NORECV: Key invalid for recv (expired)
-  */
- enum tcp_authopt_key_flag {
- 	TCP_AUTHOPT_KEY_DEL = (1 << 0),
- 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS = (1 << 1),
- 	TCP_AUTHOPT_KEY_ADDR_BIND = (1 << 2),
- 	TCP_AUTHOPT_KEY_IFINDEX = (1 << 3),
-+	TCP_AUTHOPT_KEY_NOSEND = (1 << 4),
-+	TCP_AUTHOPT_KEY_NORECV = (1 << 5),
- };
- 
- /**
-  * enum tcp_authopt_alg - Algorithms for TCP Authentication Option
-  */
 diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index bb26fb1c8af2..0ead961fcfe0 100644
+index 0b6cbd6f5491..06f8df1d80c9 100644
 --- a/net/ipv4/tcp_authopt.c
 +++ b/net/ipv4/tcp_authopt.c
-@@ -374,10 +374,12 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_send(struct netns_tcp_aut
- 	int l3index = -1;
+@@ -301,27 +301,30 @@ static bool tcp_authopt_key_match_skb_addr(struct tcp_authopt_key_info *key,
+ 		struct sockaddr_in6 *key_addr = (struct sockaddr_in6 *)&key->addr;
  
- 	hlist_for_each_entry_rcu(key, &net->head, node, 0) {
- 		if (send_id >= 0 && key->send_id != send_id)
- 			continue;
-+		if (key->flags & TCP_AUTHOPT_KEY_NOSEND)
-+			continue;
- 		if (key->flags & TCP_AUTHOPT_KEY_ADDR_BIND)
- 			if (!tcp_authopt_key_match_sk_addr(key, addr_sk))
- 				continue;
- 		if (key->flags & TCP_AUTHOPT_KEY_IFINDEX) {
- 			if (l3index < 0)
-@@ -623,11 +625,13 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ 		return ipv6_prefix_equal(&ip6h->saddr,
+ 					 &key_addr->sin6_addr,
+ 					 key->prefixlen);
++	} else if (keyaf == AF_INET6 && iph->version == 4) {
++		struct sockaddr_in6 *key_addr = (struct sockaddr_in6 *)&key->addr;
++
++		/* handle ipv6-mapped-ipv4-addresses */
++		if (ipv6_addr_v4mapped(&key_addr->sin6_addr)) {
++			__be32 mask = inet_make_mask(key->prefixlen);
++			__be32 ipv4 = key_addr->sin6_addr.s6_addr32[3];
++
++			return (ipv4 & mask) == ipv4;
++		}
+ 	}
  
- #define TCP_AUTHOPT_KEY_KNOWN_FLAGS ( \
- 	TCP_AUTHOPT_KEY_DEL | \
- 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS | \
- 	TCP_AUTHOPT_KEY_ADDR_BIND | \
--	TCP_AUTHOPT_KEY_IFINDEX)
-+	TCP_AUTHOPT_KEY_IFINDEX | \
-+	TCP_AUTHOPT_KEY_NOSEND | \
-+	TCP_AUTHOPT_KEY_NORECV)
+-	/* This actually happens with ipv6-mapped-ipv4-addresses
+-	 * IPv6 listen sockets will be asked to validate ipv4 packets.
+-	 */
+ 	return false;
+ }
  
- int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ static bool tcp_authopt_key_match_sk_addr(struct tcp_authopt_key_info *key,
+ 					  const struct sock *addr_sk)
  {
- 	struct tcp_authopt_key opt;
- 	struct tcp_authopt_info *info;
-@@ -1534,10 +1538,13 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_recv(struct sock *sk,
+ 	u16 keyaf = key->addr.ss_family;
  
- 			if (l3index != key->l3index)
- 				continue;
- 		}
- 		*anykey = true;
-+		// If only keys with norecv flag are present still consider that
-+		if (key->flags & TCP_AUTHOPT_KEY_NORECV)
-+			continue;
- 		if (recv_id >= 0 && key->recv_id != recv_id)
- 			continue;
- 		if (better_key_match(result, key))
- 			result = key;
- 		else if (result)
+-	/* This probably can't happen even with ipv4-mapped-ipv6 */
+-	if (keyaf != addr_sk->sk_family)
+-		return false;
+-
+ 	if (keyaf == AF_INET) {
+ 		struct sockaddr_in *key_addr = (struct sockaddr_in *)&key->addr;
+ 		__be32 mask = inet_make_mask(key->prefixlen);
+ 
+ 		return (addr_sk->sk_daddr & mask) == key_addr->sin_addr.s_addr;
+@@ -330,10 +333,16 @@ static bool tcp_authopt_key_match_sk_addr(struct tcp_authopt_key_info *key,
+ 		struct sockaddr_in6 *key_addr = (struct sockaddr_in6 *)&key->addr;
+ 
+ 		return ipv6_prefix_equal(&addr_sk->sk_v6_daddr,
+ 					 &key_addr->sin6_addr,
+ 					 key->prefixlen);
++	} else if (keyaf == AF_INET6 && addr_sk->sk_family == AF_INET) {
++		struct sockaddr_in6 *key_addr = (struct sockaddr_in6 *)&key->addr;
++		__be32 mask = inet_make_mask(key->prefixlen);
++		__be32 ipv4 = key_addr->sin6_addr.s6_addr32[3];
++
++		return (addr_sk->sk_daddr & mask) == ipv4;
+ #endif
+ 	}
+ 
+ 	return false;
+ }
+@@ -1399,14 +1408,20 @@ static int __tcp_authopt_calc_mac(struct sock *sk,
+ 				  char *macbuf)
+ {
+ 	struct tcp_authopt_alg_pool *mac_pool;
+ 	u8 traffic_key[TCP_AUTHOPT_MAX_TRAFFIC_KEY_LEN];
+ 	int err;
+-	bool ipv6 = (sk->sk_family != AF_INET);
++	bool ipv6;
+ 
+-	if (sk->sk_family != AF_INET && sk->sk_family != AF_INET6)
+-		return -EINVAL;
++#if IS_ENABLED(CONFIG_IPV6)
++	if (input)
++		ipv6 = (skb->protocol == htons(ETH_P_IPV6));
++	else
++		ipv6 = (sk->sk_family == AF_INET6) && !ipv6_addr_v4mapped(&sk->sk_v6_daddr);
++#else
++	ipv6 = false;
++#endif
+ 
+ 	err = tcp_authopt_get_traffic_key(sk, skb, key, info, input, ipv6, traffic_key);
+ 	if (err)
+ 		return err;
+ 
 -- 
 2.25.1
 
