@@ -2,56 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9972C32774
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Aug 2022 11:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C62CDC32771
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Aug 2022 11:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348473AbiHSLFi (ORCPT
+        id S1348610AbiHSLGO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Aug 2022 07:05:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47124 "EHLO
+        Fri, 19 Aug 2022 07:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348539AbiHSLEy (ORCPT
+        with ESMTP id S1348611AbiHSLFy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:04:54 -0400
+        Fri, 19 Aug 2022 07:05:54 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6F8FBA57;
-        Fri, 19 Aug 2022 04:04:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D75FEC43
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Aug 2022 04:05:24 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oOzo0-00Cpol-EW; Fri, 19 Aug 2022 21:04:49 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Aug 2022 19:04:48 +0800
-Date:   Fri, 19 Aug 2022 19:04:48 +0800
+        id 1oOzoT-00Cpoy-PF; Fri, 19 Aug 2022 21:05:18 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Aug 2022 19:05:17 +0800
+Date:   Fri, 19 Aug 2022 19:05:17 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Shen <shenyang39@huawei.com>
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, wangzhou1@hisilicon.com,
-        liulongfang@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - remove unneeded hardware cache
- write back
-Message-ID: <Yv9uUDw/bX+HCcp2@gondor.apana.org.au>
-References: <20220813103545.27370-1-shenyang39@huawei.com>
+To:     Robert Elliott <elliott@hpe.com>
+Cc:     tim.c.chen@linux.intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, toshi.kani@hpe.com,
+        rwright@hpe.com, elliott@hpe.com
+Subject: Re: [PATCH] crypto: x86/sha512 - load based on CPU features
+Message-ID: <Yv9ubekvQiL3UGwd@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220813103545.27370-1-shenyang39@huawei.com>
+In-Reply-To: <20220813230431.2666-1-elliott@hpe.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Aug 13, 2022 at 06:35:45PM +0800, Yang Shen wrote:
-> From: Weili Qian <qianweili@huawei.com>
+Robert Elliott <elliott@hpe.com> wrote:
+> x86 optimized crypto modules built as modules rather than built-in
+> to the kernel end up as .ko files in the filesystem, e.g., in
+> /usr/lib/modules. If the filesystem itself is a module, these might
+> not be available when the crypto API is initialized, resulting in
+> the generic implementation being used (e.g., sha512_transform rather
+> than sha512_transform_avx2).
 > 
-> Data in the hardware cache needs to be written back to the memory
-> before the queue memory is released. Currently, the queue memory is
-> applied for when the driver is loaded and released when the driver is
-> removed. Therefore, the hardware cache does not need to be written back
-> when process puts queue.
+> In one test case, CPU utilization in the sha512 function dropped
+> from 15.34% to 7.18% after forcing loading of the optimized module.
 > 
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> Signed-off-by: Yang Shen <shenyang39@huawei.com>
+> Add module aliases for this x86 optimized crypto module based on CPU
+> feature bits so udev gets a chance to load them later in the boot
+> process when the filesystems are all running.
+> 
+> Signed-off-by: Robert Elliott <elliott@hpe.com>
 > ---
->  drivers/crypto/hisilicon/qm.c | 1 -
->  1 file changed, 1 deletion(-)
+> arch/x86/crypto/sha512_ssse3_glue.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
 Patch applied.  Thanks.
 -- 
