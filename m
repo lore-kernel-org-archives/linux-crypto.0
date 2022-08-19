@@ -2,172 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CEAC00140
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Aug 2022 21:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B5BAC25B0E
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Aug 2022 06:08:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346202AbiHRVA4 (ORCPT
+        id S1346182AbiHSGIR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Aug 2022 17:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35680 "EHLO
+        Fri, 19 Aug 2022 02:08:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346205AbiHRVAL (ORCPT
+        with ESMTP id S1345238AbiHSGIQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Aug 2022 17:00:11 -0400
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E83D34E8
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 14:00:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple; d=sang-engineering.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=k1; bh=+dr1LggFdbjOhfbt9cr0seNU2pY
-        oNd+1ACJ51dZG5J4=; b=gZEI51t24Ly6vgbS0YNlYYnMhwWmlcbGg9f0RYcf2/I
-        1oiFy0sO4O4pq/ZDaWlXxZqICSW2s2fcoB+g5toGV+hw61A9FsE9cfC22TUDaH8K
-        QLy7gGr+S7ax/2g0C1KeQlK3Xl+fDH9cqPGxmsBi3ZsJAd5Y+NolFijhlTliy/AU
-        =
-Received: (qmail 3959755 invoked from network); 18 Aug 2022 23:00:04 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 Aug 2022 23:00:04 +0200
-X-UD-Smtp-Session: l3s3148p1@7eD6Q4rmKd4ucref
-From:   Wolfram Sang <wsa+renesas@sang-engineering.com>
+        Fri, 19 Aug 2022 02:08:16 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914DC6342
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 23:08:14 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id y13so6941077ejp.13
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Aug 2022 23:08:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=Af+4xj435h7tYd148SgfWr1zA59+PnWfK6elz89ZgLM=;
+        b=Xd8NAKNiubTfxSsUtmJumEPpCI6vYOF5EL7eEqsASLzToqEfPk6XzX5naT+z+HYz8I
+         1w53N+2KRQhMMbNho1wRRAHnHctpEyn+ZAZ+My+y94GnQ5BUud/SCly6Wqagaak6riGw
+         VJXb180ImFH4mR4mo9owoXe/iiPOaEVE/QR7+wSIyjKVsRC6G/DI8OyjSBRW5Ayh2bkn
+         O1tiHylgbNmwwQh68r5Aw8twy4PJFSp+KXlV8SJ/KXety+QEl+w1NfyMTG+JMF9b+oyx
+         jE0UjBp39Rp78xg0g9guNVRyW5aG3Fb4qMhoEcrZPddQOIZtkz1omaYtCVqpw/Z4oEwE
+         JWUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=Af+4xj435h7tYd148SgfWr1zA59+PnWfK6elz89ZgLM=;
+        b=35bnIjknL5hymvOZVgEqaSj60R4z5ikTdiTO7soe6pvOjVWjXKcq/v3Jrw7DroPZ5E
+         R326tfraHskRinuaZfi1JOx4lIHKtuWiBrg7xcZhb7ZDEXdTpmnev5eNZ2OpPzO0uw7h
+         JdiRf2Fa5fHVhEmc3qb4mamwHY66aKV2aZ70tLR/Q6yg/eh1gLPXN4wf8oXJzkeFQxCt
+         OaeJkzIXmkJW76YRi/3a1yQz2OMQY6EI5ERCS3u5SGe1FayRIa4ReLd73FIeWlfdDp7s
+         bKak4542nDOMyKv3FtGFsc8gtSiwbYzbcWkijjNg1FWYoaHzrdofjK313DXw+kzx4zNW
+         04jg==
+X-Gm-Message-State: ACgBeo0JZLc3Wgd4KJkq6SsyuvQwB/UaTlQDJEi+cpJqV4JpK0lhpGbO
+        y34h+9Mc86iehA7tB3EIUJt0/Q==
+X-Google-Smtp-Source: AA6agR6s6z8H4PJAO2ZxVq5Iz7zKjhRBNrkLvhyCmREGjaDozeybRofTqZW61aHl+9y+8xWxNaWEhw==
+X-Received: by 2002:a17:907:da2:b0:731:60e4:2261 with SMTP id go34-20020a1709070da200b0073160e42261mr3844241ejc.679.1660889292785;
+        Thu, 18 Aug 2022 23:08:12 -0700 (PDT)
+Received: from lb02065.fritz.box ([2001:9e8:143b:fd00:5207:8c7f:747a:b80d])
+        by smtp.gmail.com with ESMTPSA id y14-20020a1709063a8e00b0073a644ef803sm1809660ejd.101.2022.08.18.23.08.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 23:08:11 -0700 (PDT)
+From:   Jack Wang <jinpu.wang@ionos.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
+Cc:     Corentin Labbe <clabbe@baylibre.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com
-Subject: [PATCH] crypto: move from strlcpy with unused retval to strscpy
-Date:   Thu, 18 Aug 2022 23:00:03 +0200
-Message-Id: <20220818210003.6649-1-wsa+renesas@sang-engineering.com>
-X-Mailer: git-send-email 2.35.1
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v1 07/19] crypto: gemin: Fix error check for dma_map_sg
+Date:   Fri, 19 Aug 2022 08:07:49 +0200
+Message-Id: <20220819060801.10443-8-jinpu.wang@ionos.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220819060801.10443-1-jinpu.wang@ionos.com>
+References: <20220819060801.10443-1-jinpu.wang@ionos.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Follow the advice of the below link and prefer 'strscpy' in this
-subsystem. Conversion is 1:1 because the return value is not used.
-Generated by a coccinelle script.
+dma_map_sg return 0 on error.
 
-Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
-Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: Corentin Labbe <clabbe@baylibre.com>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c   | 6 +++---
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 4 ++--
- drivers/crypto/qat/qat_common/adf_cfg.c             | 6 +++---
- drivers/crypto/qat/qat_common/adf_ctl_drv.c         | 2 +-
- drivers/crypto/qat/qat_common/adf_transport_debug.c | 2 +-
- 5 files changed, 10 insertions(+), 10 deletions(-)
+ drivers/crypto/gemini/sl3516-ce-cipher.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-index 40b482198ebc..23c6edc70914 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-@@ -97,7 +97,7 @@ static int dev_supports_eng_type(struct otx_cpt_eng_grps *eng_grps,
- static void set_ucode_filename(struct otx_cpt_ucode *ucode,
- 			       const char *filename)
- {
--	strlcpy(ucode->filename, filename, OTX_CPT_UCODE_NAME_LENGTH);
-+	strscpy(ucode->filename, filename, OTX_CPT_UCODE_NAME_LENGTH);
- }
- 
- static char *get_eng_type_str(int eng_type)
-@@ -138,7 +138,7 @@ static int get_ucode_type(struct otx_cpt_ucode_hdr *ucode_hdr, int *ucode_type)
- 	u32 i, val = 0;
- 	u8 nn;
- 
--	strlcpy(tmp_ver_str, ucode_hdr->ver_str, OTX_CPT_UCODE_VER_STR_SZ);
-+	strscpy(tmp_ver_str, ucode_hdr->ver_str, OTX_CPT_UCODE_VER_STR_SZ);
- 	for (i = 0; i < strlen(tmp_ver_str); i++)
- 		tmp_ver_str[i] = tolower(tmp_ver_str[i]);
- 
-@@ -1328,7 +1328,7 @@ static ssize_t ucode_load_store(struct device *dev,
- 
- 	eng_grps = container_of(attr, struct otx_cpt_eng_grps, ucode_load_attr);
- 	err_msg = "Invalid engine group format";
--	strlcpy(tmp_buf, buf, OTX_CPT_UCODE_NAME_LENGTH);
-+	strscpy(tmp_buf, buf, OTX_CPT_UCODE_NAME_LENGTH);
- 	start = tmp_buf;
- 
- 	has_se = has_ie = has_ae = false;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index f10050fead16..1577986677f6 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -68,7 +68,7 @@ static int is_2nd_ucode_used(struct otx2_cpt_eng_grp_info *eng_grp)
- static void set_ucode_filename(struct otx2_cpt_ucode *ucode,
- 			       const char *filename)
- {
--	strlcpy(ucode->filename, filename, OTX2_CPT_NAME_LENGTH);
-+	strscpy(ucode->filename, filename, OTX2_CPT_NAME_LENGTH);
- }
- 
- static char *get_eng_type_str(int eng_type)
-@@ -126,7 +126,7 @@ static int get_ucode_type(struct device *dev,
- 	int i, val = 0;
- 	u8 nn;
- 
--	strlcpy(tmp_ver_str, ucode_hdr->ver_str, OTX2_CPT_UCODE_VER_STR_SZ);
-+	strscpy(tmp_ver_str, ucode_hdr->ver_str, OTX2_CPT_UCODE_VER_STR_SZ);
- 	for (i = 0; i < strlen(tmp_ver_str); i++)
- 		tmp_ver_str[i] = tolower(tmp_ver_str[i]);
- 
-diff --git a/drivers/crypto/qat/qat_common/adf_cfg.c b/drivers/crypto/qat/qat_common/adf_cfg.c
-index e61b3e13db3b..1931e5b37f2b 100644
---- a/drivers/crypto/qat/qat_common/adf_cfg.c
-+++ b/drivers/crypto/qat/qat_common/adf_cfg.c
-@@ -251,13 +251,13 @@ int adf_cfg_add_key_value_param(struct adf_accel_dev *accel_dev,
- 		return -ENOMEM;
- 
- 	INIT_LIST_HEAD(&key_val->list);
--	strlcpy(key_val->key, key, sizeof(key_val->key));
-+	strscpy(key_val->key, key, sizeof(key_val->key));
- 
- 	if (type == ADF_DEC) {
- 		snprintf(key_val->val, ADF_CFG_MAX_VAL_LEN_IN_BYTES,
- 			 "%ld", (*((long *)val)));
- 	} else if (type == ADF_STR) {
--		strlcpy(key_val->val, (char *)val, sizeof(key_val->val));
-+		strscpy(key_val->val, (char *)val, sizeof(key_val->val));
- 	} else if (type == ADF_HEX) {
- 		snprintf(key_val->val, ADF_CFG_MAX_VAL_LEN_IN_BYTES,
- 			 "0x%lx", (unsigned long)val);
-@@ -315,7 +315,7 @@ int adf_cfg_section_add(struct adf_accel_dev *accel_dev, const char *name)
- 	if (!sec)
- 		return -ENOMEM;
- 
--	strlcpy(sec->name, name, sizeof(sec->name));
-+	strscpy(sec->name, name, sizeof(sec->name));
- 	INIT_LIST_HEAD(&sec->param_head);
- 	down_write(&cfg->lock);
- 	list_add_tail(&sec->list, &cfg->sec_list);
-diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-index e8ac932bbaab..508c18edd692 100644
---- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-@@ -363,7 +363,7 @@ static int adf_ctl_ioctl_get_status(struct file *fp, unsigned int cmd,
- 	dev_info.num_logical_accel = hw_data->num_logical_accel;
- 	dev_info.banks_per_accel = hw_data->num_banks
- 					/ hw_data->num_logical_accel;
--	strlcpy(dev_info.name, hw_data->dev_class->name, sizeof(dev_info.name));
-+	strscpy(dev_info.name, hw_data->dev_class->name, sizeof(dev_info.name));
- 	dev_info.instance_id = hw_data->instance_id;
- 	dev_info.type = hw_data->dev_class->type;
- 	dev_info.bus = accel_to_pci_dev(accel_dev)->bus->number;
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-index e69e5907f595..08bca1c506c0 100644
---- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-@@ -96,7 +96,7 @@ int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name)
- 	if (!ring_debug)
- 		return -ENOMEM;
- 
--	strlcpy(ring_debug->ring_name, name, sizeof(ring_debug->ring_name));
-+	strscpy(ring_debug->ring_name, name, sizeof(ring_debug->ring_name));
- 	snprintf(entry_name, sizeof(entry_name), "ring_%02d",
- 		 ring->ring_number);
- 
+diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
+index 14d0d83d388d..34fea8aa91b6 100644
+--- a/drivers/crypto/gemini/sl3516-ce-cipher.c
++++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
+@@ -149,7 +149,7 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
+ 	if (areq->src == areq->dst) {
+ 		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+ 				    DMA_BIDIRECTIONAL);
+-		if (nr_sgs <= 0 || nr_sgs > MAXDESC / 2) {
++		if (!nr_sgs || nr_sgs > MAXDESC / 2) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+ 			err = -EINVAL;
+ 			goto theend;
+@@ -158,14 +158,14 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
+ 	} else {
+ 		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+ 				    DMA_TO_DEVICE);
+-		if (nr_sgs <= 0 || nr_sgs > MAXDESC / 2) {
++		if (!nr_sgs || nr_sgs > MAXDESC / 2) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+ 			err = -EINVAL;
+ 			goto theend;
+ 		}
+ 		nr_sgd = dma_map_sg(ce->dev, areq->dst, sg_nents(areq->dst),
+ 				    DMA_FROM_DEVICE);
+-		if (nr_sgd <= 0 || nr_sgd > MAXDESC) {
++		if (!nr_sgd || nr_sgd > MAXDESC) {
+ 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgd);
+ 			err = -EINVAL;
+ 			goto theend_sgs;
 -- 
-2.35.1
+2.34.1
 
