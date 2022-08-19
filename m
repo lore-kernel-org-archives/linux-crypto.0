@@ -2,57 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C3BC32772
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Aug 2022 11:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 837FEC32771
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Aug 2022 11:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347439AbiHSLBd (ORCPT
+        id S1348321AbiHSLCT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Aug 2022 07:01:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42704 "EHLO
+        Fri, 19 Aug 2022 07:02:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348415AbiHSLBa (ORCPT
+        with ESMTP id S1348476AbiHSLCQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Aug 2022 07:01:30 -0400
+        Fri, 19 Aug 2022 07:02:16 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DBDF5CDD;
-        Fri, 19 Aug 2022 04:01:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 360E1F6191;
+        Fri, 19 Aug 2022 04:02:13 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oOzkX-00CpcP-Uw; Fri, 19 Aug 2022 21:01:15 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Aug 2022 19:01:13 +0800
-Date:   Fri, 19 Aug 2022 19:01:13 +0800
+        id 1oOzlO-00Cpe4-M5; Fri, 19 Aug 2022 21:02:07 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 Aug 2022 19:02:06 +0800
+Date:   Fri, 19 Aug 2022 19:02:06 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Zhuo Chen <chenzhuo.1@bytedance.com>
-Cc:     wangzhou1@hisilicon.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND] crypto: hisilicon - Remove
- pci_aer_clear_nonfatal_status() call
-Message-ID: <Yv9teZcrpM7D70xq@gondor.apana.org.au>
-References: <20220802032937.27117-1-chenzhuo.1@bytedance.com>
+To:     cgel.zte@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        ye.xingchen@zte.com.cn, zealci@zte.com.cn
+Subject: Re: [PATCH linux-next] crypto: sun8i-ce:using the
+ pm_runtime_resume_and_get  to simplify the code
+Message-ID: <Yv9trrHQ010I1/EF@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220802032937.27117-1-chenzhuo.1@bytedance.com>
+In-Reply-To: <20220802074820.1648786-1-ye.xingchen@zte.com.cn>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 02, 2022 at 11:29:37AM +0800, Zhuo Chen wrote:
-> Calls to pci_cleanup_aer_uncorrect_error_status() have already been
-> removed after commit 62b36c3ea664 ("PCI/AER: Remove
-> pci_cleanup_aer_uncorrect_error_status() calls"). But in commit
-> 6c6dd5802c2d ("crypto: hisilicon/qm - add controller reset interface")
-> pci_aer_clear_nonfatal_status() was used again, so remove it in
-> this patch.
+cgel.zte@gmail.com wrote:
+> From: ye xingchen <ye.xingchen@zte.com.cn>
 > 
-> note: pci_cleanup_aer_uncorrect_error_status() was renamed to
-> pci_aer_clear_nonfatal_status() in commit 894020fdd88c
-> ("PCI/AER: Rationalize error status register clearing")
+> Using pm_runtime_resume_and_get() to instade of  pm_runtime_get_sync
+> and pm_runtime_put_noidle.
 > 
-> Signed-off-by: Zhuo Chen <chenzhuo.1@bytedance.com>
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
 > ---
->  drivers/crypto/hisilicon/qm.c | 2 --
->  1 file changed, 2 deletions(-)
+> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
