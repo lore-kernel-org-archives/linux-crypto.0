@@ -2,70 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 941AEC25B08
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Aug 2022 18:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C259C25B08
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Aug 2022 18:43:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233494AbiHTSmv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 20 Aug 2022 14:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
+        id S233987AbiHTSnE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 20 Aug 2022 14:43:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbiHTSm1 (ORCPT
+        with ESMTP id S232389AbiHTSma (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Aug 2022 14:42:27 -0400
+        Sat, 20 Aug 2022 14:42:30 -0400
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568D645043;
-        Sat, 20 Aug 2022 11:42:26 -0700 (PDT)
-Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27KGCb8Y000527;
-        Sat, 20 Aug 2022 18:42:20 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193BD45061;
+        Sat, 20 Aug 2022 11:42:28 -0700 (PDT)
+Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27KI26Y6001472;
+        Sat, 20 Aug 2022 18:42:22 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pps0720;
- bh=T38/AyiNSJmlIFykxlxq8CX3IrZIufqRiclQzZFcHk0=;
- b=m07WYmJrFkgNgja36TXfY83EfcfGD5+S5RxvP/IBxSuSfsOKmqOGN/39UP/Pws2sx8QU
- U6IJaJO3XpOabn4NJnhDtUGLPwymrjPsLKAmVei/5fiutxRS3cIWTBus09cvjIF1fv+W
- EOUFYUdJsc6ZHgBxJmHvAChLekfs5MAjkdS7sTWa8r40ei7hT04TFERY2q3rDK1hyNCi
- BjScLL6srAOrLPL+gz7JBO27kOvS4qy0ln/loBnUHQuVVyUrOm8c8WhgKEJCxcjRliEt
- aLLj1HjdfC+K8Fgq4uS+mUhgJnHEgsL3OqwiY3pCGPEpS+1kGyvh516j+0u/a8PtMy7B +A== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pps0720;
+ bh=BMHbeSF7Zax8IGWzheB5as3XwYPKFZWjZEK0cJukBIA=;
+ b=atUjN7PmDwL1ROrf0f7/WqEMbvYTmspqWjeFTRlcrl2xQoHNudJa+a9cvuYqQ+hravI9
+ M1yia5XMi4c2H9Qks3wSadFBDozR6IgT9YyZ5O4NMSIgvXCmEwEHyK+wqv00uQX8dbLI
+ bN0aINFHFdP1O34y6u5qLtrMtLpDOaSgJA5r9P8DfJhkdtgAYBVCPbyXuotgZqmcDNzo
+ 8HWRr1HF/EfCmNsSmjQMFrGLvkvN1hYcxa/0eBqrN0i0lttdfeDFonNWqkOcmN2+49+b
+ OUmo2+G0Y2GwBQhJFS6PgGWDJxZnNtKypVmXbrTokMvlFLPTSskx7giS2TrfJ8Ttx9+O vA== 
 Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j32wvrjjt-1
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j2wqst5tu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 20 Aug 2022 18:42:20 +0000
+        Sat, 20 Aug 2022 18:42:22 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 90BE4D2E8;
-        Sat, 20 Aug 2022 18:42:19 +0000 (UTC)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id ACBD5D2E2;
+        Sat, 20 Aug 2022 18:42:21 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 4060C803510;
-        Sat, 20 Aug 2022 18:42:19 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 5C79E803510;
+        Sat, 20 Aug 2022 18:42:21 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         ebiggers@kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v3 11/17] crypto: Kconfig - simplify public-key entries
-Date:   Sat, 20 Aug 2022 13:41:45 -0500
-Message-Id: <20220820184151.1149247-12-elliott@hpe.com>
+Subject: [PATCH v3 13/17] crypto: Kconfig - simplify aead entries
+Date:   Sat, 20 Aug 2022 13:41:47 -0500
+Message-Id: <20220820184151.1149247-14-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220820184151.1149247-1-elliott@hpe.com>
 References: <20220817232057.73643-1-elliott@hpe.com>
  <20220820184151.1149247-1-elliott@hpe.com>
-X-Proofpoint-GUID: 47KsQ1xU5tBwv-kJSrUVJDk5-mZFp4vY
-X-Proofpoint-ORIG-GUID: 47KsQ1xU5tBwv-kJSrUVJDk5-mZFp4vY
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: PzNZaU4zuZeE8RK5QiSfXeZVo6r6JgAy
+X-Proofpoint-ORIG-GUID: PzNZaU4zuZeE8RK5QiSfXeZVo6r6JgAy
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-20_08,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2208200080
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ spamscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208200080
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -82,175 +81,143 @@ https references are still valid.
 
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/arm/crypto/Kconfig |  7 +++++-
- arch/x86/crypto/Kconfig |  7 +++++-
- crypto/Kconfig          | 55 +++++++++++++++++++++++++----------------
- 3 files changed, 46 insertions(+), 23 deletions(-)
+ arch/x86/crypto/Kconfig |  8 +++++--
+ crypto/Kconfig          | 48 +++++++++++++++++++++++++----------------
+ 2 files changed, 36 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index d73d19971b87..4b062bf53fa2 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -3,10 +3,15 @@
- menu "Accelerated Cryptographic Algorithms for CPU (arm)"
- 
- config CRYPTO_CURVE25519_NEON
--	tristate "NEON accelerated Curve25519 scalar multiplication library"
-+	tristate "Public key crypto: Curve25519 (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	help
-+	  Curve25519 algorithm
-+
-+	  Architecture: arm with
-+	  - NEON (Advanced SIMD) extensions
- 
- config CRYPTO_GHASH_ARM_CE
- 	tristate "PMULL-accelerated GHASH using NEON/ARMv8 Crypto Extensions"
 diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 04f4baea12a8..76229ccb79fd 100644
+index 03f9a3a35e42..93de2684b3dc 100644
 --- a/arch/x86/crypto/Kconfig
 +++ b/arch/x86/crypto/Kconfig
-@@ -3,10 +3,15 @@
- menu "Accelerated Cryptographic Algorithms for CPU (x86)"
+@@ -360,12 +360,16 @@ config CRYPTO_CHACHA20_X86_64
+ 	  XChaCha20, and XChaCha12 stream ciphers.
  
- config CRYPTO_CURVE25519_X86
--	tristate "x86_64 accelerated Curve25519 scalar multiplication library"
-+	tristate "Public key crypto: Curve25519 (ADX)"
+ config CRYPTO_AEGIS128_AESNI_SSE2
+-	tristate "AEGIS-128 AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
++	tristate "AEAD ciphers: AEGIS-128 (AES-NI/SSE2)"
  	depends on X86 && 64BIT
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	help
-+	  Curve25519 algorithm
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_SIMD
+ 	help
+-	 AESNI+SSE2 implementation of the AEGIS-128 dedicated AEAD algorithm.
++	  AEGIS-128 AEAD algorithm
 +
 +	  Architecture: x86_64 using:
-+	  - ADX (large integer arithmetic)
++	  - AES-NI (AES New Instructions)
++	  - SSE2 (Streaming SIMD Extensions 2)
  
- config CRYPTO_AES_NI_INTEL
- 	tristate "AES cipher algorithms (AES-NI)"
+ config CRYPTO_NHPOLY1305_SSE2
+ 	tristate "NHPoly1305 hash function (x86_64 SSE2 implementation)"
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 0d2342f92b1c..3694b2ff44f8 100644
+index a47d5d9d1180..9dab2c72f7fb 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -240,51 +240,60 @@ config CRYPTO_ENGINE
- menu "Public-key cryptography"
+@@ -779,49 +779,54 @@ config CRYPTO_NHPOLY1305
+ menu "AEAD (authenticated encryption with associated data) ciphers"
  
- config CRYPTO_RSA
--	tristate "RSA algorithm"
-+	tristate "RSA (Rivest-Shamir-Adleman)"
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_MANAGER
- 	select MPILIB
- 	select ASN1
+ config CRYPTO_AEGIS128
+-	tristate "AEGIS-128 AEAD algorithm"
++	tristate "AEGIS-128"
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_AES  # for AES S-box tables
  	help
--	  Generic implementation of the RSA public key algorithm.
-+	  RSA (Rivest-Shamir-Adleman) public key algorithm (RFC8017)
+-	 Support for the AEGIS-128 dedicated AEAD algorithm.
++	  AEGIS-128 AEAD algorithm
  
- config CRYPTO_DH
--	tristate "Diffie-Hellman algorithm"
-+	tristate "DH (Diffie-Hellman)"
- 	select CRYPTO_KPP
- 	select MPILIB
- 	help
--	  Generic implementation of the Diffie-Hellman algorithm.
-+	  DH (Diffie-Hellman) key exchange algorithm
- 
- config CRYPTO_DH_RFC7919_GROUPS
--	bool "Support for RFC 7919 FFDHE group parameters"
-+	bool "RFC 7919 FFDHE groups"
- 	depends on CRYPTO_DH
- 	select CRYPTO_RNG_DEFAULT
- 	help
--	  Provide support for RFC 7919 FFDHE group parameters. If unsure, say N.
-+	  FFDHE (Finite-Field-based Diffie-Hellman Ephemeral) groups
-+	  defined in RFC7919.
-+
-+	  Support these finite-field groups in DH key exchanges:
-+	  - ffdhe2048, ffdhe3072, ffdhe4096, ffdhe6144, ffdhe8192
-+
-+	  If unsure, say N.
- 
- config CRYPTO_ECC
- 	tristate
- 	select CRYPTO_RNG_DEFAULT
- 
- config CRYPTO_ECDH
--	tristate "ECDH algorithm"
-+	tristate "ECDH (Elliptic Curve Diffie-Hellman)"
- 	select CRYPTO_ECC
- 	select CRYPTO_KPP
- 	help
--	  Generic implementation of the ECDH algorithm
-+	  ECDH (Elliptic Curve Diffie-Hellman) key exchange algorithm
-+	  using curves P-192, P-256, and P-384 (FIPS 186)
- 
- config CRYPTO_ECDSA
--	tristate "ECDSA (NIST P192, P256 etc.) algorithm"
-+	tristate "ECDSA (Elliptic Curve Digital Signature Algorithm)"
- 	select CRYPTO_ECC
- 	select CRYPTO_AKCIPHER
- 	select ASN1
- 	help
--	  Elliptic Curve Digital Signature Algorithm (NIST P192, P256 etc.)
--	  is A NIST cryptographic standard algorithm. Only signature verification
--	  is implemented.
-+	  ECDSA (Elliptic Curve Digital Signature Algorithm) (FIPS 186,
-+	  ISO/IEC 14888-3)
-+	  using curves P-192, P-256, and P-384
-+
-+	  Only signature verification is implemented.
- 
- config CRYPTO_ECRDSA
--	tristate "EC-RDSA (GOST 34.10) algorithm"
-+	tristate "EC-RDSA (Elliptic Curve Russian Digital Signature Algorithm)"
- 	select CRYPTO_ECC
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_STREEBOG
-@@ -292,31 +301,35 @@ config CRYPTO_ECRDSA
- 	select ASN1
- 	help
- 	  Elliptic Curve Russian Digital Signature Algorithm (GOST R 34.10-2012,
--	  RFC 7091, ISO/IEC 14888-3:2018) is one of the Russian cryptographic
--	  standard algorithms (called GOST algorithms). Only signature verification
--	  is implemented.
-+	  RFC 7091, ISO/IEC 14888-3)
-+
-+	  One of the Russian cryptographic standard algorithms (called GOST
-+	  algorithms). Only signature verification is implemented.
- 
- config CRYPTO_SM2
--	tristate "SM2 algorithm"
-+	tristate "SM2 (ShangMi 2)"
- 	select CRYPTO_SM3
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_MANAGER
- 	select MPILIB
- 	select ASN1
- 	help
--	  Generic implementation of the SM2 public key algorithm. It was
--	  published by State Encryption Management Bureau, China.
-+	  SM2 (ShangMi 2) public key algorithm
-+
-+	  Published by State Encryption Management Bureau, China,
- 	  as specified by OSCCA GM/T 0003.1-2012 -- 0003.5-2012.
- 
- 	  References:
--	  https://tools.ietf.org/html/draft-shen-sm2-ecdsa-02
-+	  https://datatracker.ietf.org/doc/draft-shen-sm2-ecdsa/
- 	  http://www.oscca.gov.cn/sca/xxgk/2010-12/17/content_1002386.shtml
- 	  http://www.gmbz.org.cn/main/bzlb.html
- 
- config CRYPTO_CURVE25519
--	tristate "Curve25519 algorithm"
-+	tristate "Curve25519"
- 	select CRYPTO_KPP
- 	select CRYPTO_LIB_CURVE25519_GENERIC
+ config CRYPTO_AEGIS128_SIMD
+-	bool "Support SIMD acceleration for AEGIS-128"
++	bool "AEGIS-128 (arm NEON, arm64 NEON)"
+ 	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
+ 	default y
 +	help
-+	  Curve25519 elliptic curve (RFC7748)
++	  AEGIS-128 AEAD algorithm
++
++	  Architecture: arm or arm64 using:
++	  - NEON (Advanced SIMD) extension
  
- endmenu
+ config CRYPTO_CHACHA20POLY1305
+-	tristate "ChaCha20-Poly1305 AEAD support"
++	tristate "ChaCha20-Poly1305"
+ 	select CRYPTO_CHACHA20
+ 	select CRYPTO_POLY1305
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_MANAGER
+ 	help
+-	  ChaCha20-Poly1305 AEAD support, RFC7539.
+-
+-	  Support for the AEAD wrapper using the ChaCha20 stream cipher combined
+-	  with the Poly1305 authenticator. It is defined in RFC7539 for use in
+-	  IETF protocols.
++	  ChaCha20 stream cipher and Poly1305 authenticator combined
++	  mode (RFC8439)
  
+ config CRYPTO_CCM
+-	tristate "CCM support"
++	tristate "CCM (Counter with Cipher Block Chaining-Message Authentication Code)"
+ 	select CRYPTO_CTR
+ 	select CRYPTO_HASH
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_MANAGER
+ 	help
+-	  Support for Counter with CBC MAC. Required for IPsec.
++	  CCM (Counter with Cipher Block Chaining-Message Authentication Code)
++	  authenticated encryption mode (NIST SP800-38C)
+ 
+ config CRYPTO_GCM
+-	tristate "GCM/GMAC support"
++	tristate "GCM (Galois/Counter Mode) and GMAC (GCM Message Authentication Code)"
+ 	select CRYPTO_CTR
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_GHASH
+ 	select CRYPTO_NULL
+ 	select CRYPTO_MANAGER
+ 	help
+-	  Support for Galois/Counter Mode (GCM) and Galois Message
+-	  Authentication Code (GMAC). Required for IPSec.
++	  GCM (Galois/Counter Mode) authenticated encryption mode and GMAC
++	  (GCM Message Authentication Code) (NIST SP800-38D)
++
++	  This is required for IPSec ESP (XFRM_ESP).
+ 
+ config CRYPTO_SEQIV
+ 	tristate "Sequence Number IV Generator"
+@@ -831,8 +836,12 @@ config CRYPTO_SEQIV
+ 	select CRYPTO_RNG_DEFAULT
+ 	select CRYPTO_MANAGER
+ 	help
++	  Sequence Number IV generator
++
+ 	  This IV generator generates an IV based on a sequence number by
+-	  xoring it with a salt.  This algorithm is mainly useful for CTR
++	  xoring it with a salt.  This algorithm is mainly useful for CTR.
++
++	  This is required for IPsec ESP (XFRM_ESP).
+ 
+ config CRYPTO_ECHAINIV
+ 	tristate "Encrypted Chain IV Generator"
+@@ -841,16 +850,19 @@ config CRYPTO_ECHAINIV
+ 	select CRYPTO_RNG_DEFAULT
+ 	select CRYPTO_MANAGER
+ 	help
++	  Encrypted Chain IV generator
++
+ 	  This IV generator generates an IV based on the encryption of
+ 	  a sequence number xored with a salt.  This is the default
+ 	  algorithm for CBC.
+ 
+ config CRYPTO_ESSIV
+-	tristate "ESSIV support for block encryption"
++	tristate "Encrypted Salt-Sector IV Generator"
+ 	select CRYPTO_AUTHENC
+ 	help
+-	  Encrypted salt-sector initialization vector (ESSIV) is an IV
+-	  generation method that is used in some cases by fscrypt and/or
++	  Encrypted Salt-Sector IV generator
++
++	  This IV generator is used in some cases by fscrypt and/or
+ 	  dm-crypt. It uses the hash of the block encryption key as the
+ 	  symmetric key for a block encryption pass applied to the input
+ 	  IV, making low entropy IV sources more suitable for block
 -- 
 2.37.1
 
