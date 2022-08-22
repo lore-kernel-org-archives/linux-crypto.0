@@ -2,114 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16047C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Aug 2022 23:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5881BC28D13
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Aug 2022 03:39:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231765AbiHUXve (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Aug 2022 19:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47156 "EHLO
+        id S232059AbiHVDjG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 Aug 2022 23:39:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231328AbiHUXvd (ORCPT
+        with ESMTP id S231851AbiHVDjF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Aug 2022 19:51:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A9B1A078;
-        Sun, 21 Aug 2022 16:51:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BF22B60D57;
-        Sun, 21 Aug 2022 23:51:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 343C0C433D7;
-        Sun, 21 Aug 2022 23:51:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661125892;
-        bh=7QedBrBPobCgVlHtVTuuI4zsOXIu5+PiUEdMbLfNPOc=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=eTSOzacj8JuOB43GURSzL3FpXTIFbunEanZOBHfwFRNpRkLgXwBTJhM3KvkvGGcjc
-         CeYVZ5SDxtkupE6Q8xmCIywtmBcrWvtEkRvutYUcsYG+YvjmoAMWxyPeL+rIJq7znh
-         uS5ExRxJ5pq4mkSubUxHrLEcwyoOmKGH+Y8Qyb2qwtmTadfqo2itCc4NhW5cZKbG11
-         Qj0SfigqsReI2YvAt6FVR+OQdW4g+v/Tppl+ZWjAv95MQyo+t/mNL8CwEBAI2PzknL
-         z+MnuSi4Tg/aY4vHUPsyPQSevdoDxPPk2Xpme8/0eZXozl7yF/btOrAZ9yImFtt82z
-         zRAjhYrN3haOw==
-Message-ID: <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
-Date:   Sun, 21 Aug 2022 17:51:28 -0600
+        Sun, 21 Aug 2022 23:39:05 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD0C1EEDD;
+        Sun, 21 Aug 2022 20:39:03 -0700 (PDT)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4M9yhY2l9xzXdYd;
+        Mon, 22 Aug 2022 11:36:45 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 22 Aug 2022 11:39:02 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 22 Aug 2022 11:39:01 +0800
+Subject: Re: [PATCH v7 0/3] crypto: hisilicon - supports device isolation
+ feature
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+References: <20220806022943.47292-1-yekai13@huawei.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
+From:   "yekai (A)" <yekai13@huawei.com>
+Message-ID: <cffec511-dff2-5951-264a-1e82bb71e183@huawei.com>
+Date:   Mon, 22 Aug 2022 11:38:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
-Content-Language: en-US
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <dima@arista.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220818170005.747015-1-dima@arista.com>
- <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
-From:   David Ahern <dsahern@kernel.org>
-In-Reply-To: <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220806022943.47292-1-yekai13@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/21/22 2:34 PM, Leonard Crestez wrote:
-> On 8/18/22 19:59, Dmitry Safonov wrote:
->> This patchset implements the TCP-AO option as described in RFC5925. There
->> is a request from industry to move away from TCP-MD5SIG and it seems
->> the time
->> is right to have a TCP-AO upstreamed. This TCP option is meant to replace
->> the TCP MD5 option and address its shortcomings. Specifically, it
->> provides
->> more secure hashing, key rotation and support for long-lived connections
->> (see the summary of TCP-AO advantages over TCP-MD5 in (1.3) of RFC5925).
->> The patch series starts with six patches that are not specific to TCP-AO
->> but implement a general crypto facility that we thought is useful
->> to eliminate code duplication between TCP-MD5SIG and TCP-AO as well as
->> other
->> crypto users. These six patches are being submitted separately in
->> a different patchset [1]. Including them here will show better the gain
->> in code sharing. Next are 18 patches that implement the actual TCP-AO
->> option,
->> followed by patches implementing selftests.
->>
->> The patch set was written as a collaboration of three authors (in
->> alphabetical
->> order): Dmitry Safonov, Francesco Ruggeri and Salam Noureddine.
->> Additional
->> credits should be given to Prasad Koya, who was involved in early
->> prototyping
->> a few years back. There is also a separate submission done by Leonard
->> Crestez
->> whom we thank for his efforts getting an implementation of RFC5925
->> submitted
->> for review upstream [2]. This is an independent implementation that makes
->> different design decisions.
-> 
-> Is this based on something that Arista has had running for a while now
-> or is a recent new development?
-> 
 
-...
 
-> Seeing an entirely distinct unrelated implementation is very unexpected.
-> What made you do this?
-> 
+On 2022/8/6 10:29, Kai Ye wrote:
+> 1、Add the uacce hardware error isolation interface. Supports
+>    configures the hardware error isolation frequency.
+> 2、Defining the isolation strategy for ACC by uacce sysfs node. If the 
+>    number of hardware errors in a per hour exceeds the configured value,
+>    the device will not be available in user space. The VF device use the
+>    PF device isolation strategy.
+>    
+> changes v1->v2:
+> 	- deleted dev_to_uacce api.
+> 	- add vfs node doc. 
+> 	- move uacce->ref to driver.
+> changes v2->v3:
+> 	- deleted some redundant code.
+> 	- use qm state instead of reference count.
+> 	- add null pointer check.
+> 	- isolate_strategy_read() instead of a copy.
+> changes v3->v4:
+> 	- modify a comment
+> changes v4->v5:
+> 	- use bool instead of atomic.
+> 	- isolation frequency instead of isolation command.
+> changes v5->v6:
+> 	- add is_visible in uacce.
+> 	- add the description of the isolation strategy file node.
+> changes v6->v7
+> 	- add an example for isolate_strategy in Documentation.
+>
+> Kai Ye (3):
+>   uacce: supports device isolation feature
+>   Documentation: add a isolation strategy sysfs node for uacce
+>   crypto: hisilicon/qm - define the device isolation strategy
+>
+>  Documentation/ABI/testing/sysfs-driver-uacce |  26 +++
+>  drivers/crypto/hisilicon/qm.c                | 163 +++++++++++++++++--
+>  drivers/misc/uacce/uacce.c                   |  58 +++++++
+>  include/linux/hisi_acc_qm.h                  |   9 +
+>  include/linux/uacce.h                        |  11 ++
+>  5 files changed, 255 insertions(+), 12 deletions(-)
+>
+Hi,
 
-I am curious as well. You are well aware of Leonard's efforts which go
-back a long time, why go off and do a separate implementation?
+Just a friendly ping...
+
+thanks
+Kai
 
