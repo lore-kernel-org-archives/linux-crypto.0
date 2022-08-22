@@ -2,61 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B86C32774
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Aug 2022 18:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB579C28D13
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Aug 2022 20:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237725AbiHVSpD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Aug 2022 14:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45262 "EHLO
+        id S237475AbiHVUgA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 Aug 2022 16:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237666AbiHVSos (ORCPT
+        with ESMTP id S230393AbiHVUf7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2022 14:44:48 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40600BE16
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 11:42:47 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id c187-20020a1c35c4000000b003a30d88fe8eso8289557wma.2
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 11:42:47 -0700 (PDT)
+        Mon, 22 Aug 2022 16:35:59 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390A954CBC
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 13:35:57 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id k18-20020a05600c0b5200b003a5dab49d0bso6637520wmr.3
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 13:35:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=skzCG58l+HqXhjJKQO4lGgqfYIra8NXlt0XqK+Dm+co=;
-        b=dx3NiSAtEGzJGfO8Eei9gt+WPU+TFmsqSP8lo8aUcEY9SRecb90LQhJLHXFxWBkz+K
-         uebpZQ4QXAOzd1RmygSNSxE23ik1uofISPNpbwlPoZfs2hMc6aQoCuRVi5AbfJAoR59q
-         F9SOivk2DtOGDfzREl9zsRfm5Tuy1D9SB/efL3oVI/bLQ8MkeFByzi7UT7PF/VBZs+QD
-         pIsOBvF1hgJtGo1jIay6ibiSM5JR1GeaGaqKUtL2+5Ir51iBZ47BTHpdQgE4G94u03k+
-         z6brz9tx8VhuGIVUNGCckUNXmMco6QjXmzOJgpqYy8s/KbM3hDDipepQjHuerXJqjGSQ
-         6AWA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=oe+hCVRY8mVdSXGlr7AoccAGj15sOYXUCL367Mdx7zM=;
+        b=N9tHgb9q4+h1OvK/4VnJP3ueGjoRHIMuU0TlRrYHLsngrgSS63UvxMitocg12caVG4
+         CmRWPFkwCss4QJF7uUKoqOHwV78qe0Rr3Zx2orVJYR2xt/uR6cJhVDL94RXaM++4uSjC
+         IXx43Y3QL8ZK0JDqAXc9pCoNzadxE6lCE/bWACDuvSlQd5VS6GwZQ1QNHF6x1tQpo9xW
+         +OQih2eZpz8veAfONgoU/gvPOaacAbWX4NeDBMkXS3iL6q9Mijto1xjxZNqVkEZ7LbVs
+         rzZCIN5g8+215DoNCtyQINv8qvTN07P4TsHjH195Ed2RlvQTo2oxNiNZah4UQWyygdI7
+         NSYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=skzCG58l+HqXhjJKQO4lGgqfYIra8NXlt0XqK+Dm+co=;
-        b=un3OwcHupr+L9hSBl3mR0TXT+ebiHDEKSVeUkBQCH8LBMFoNmSoJqIDSOXesHjY4NJ
-         6RQPq084K8/1ZYzVKGMkoMmLYVGCykP7apc0DoYigYp6u8n7lH/JKTQsefjDBcCvyIZ3
-         icnMqbu2UiVkIkyHPVQVW/1J8pxPrIAiCVOf7GOSBUzbo5ZmAGkIYzn7fwSH1sah25Zt
-         sQgT1resGLNFuATGH6MhxP6aV4PZU/t11pwmWUarVeqoLsMFSBLQgFYwurJRscsXBHvq
-         tDAIXC+t34Pud2UsF9gcKGohvbqwHqHFmJap6FLCSQaiRJF/wB3IdvsAWfBPzCZ5BeA+
-         Be0g==
-X-Gm-Message-State: ACgBeo0exVGBaH/IH4ZHxHSkKU9a/l5sMm64ez/MP2xBX1ddG1xD6Ve+
-        wr7o6DvigiM3fEE1avzK6gdXbAQSwOSlfOeO7MdKfA==
-X-Google-Smtp-Source: AA6agR7AX0ck8HLTb7YMThG6aIE5+jGjKGhb7ts1QaiBVNTTBDpQ9FwDjv0asC2/z8+2U+UoH0eswifRgbTRzwQFffA=
-X-Received: by 2002:a7b:c8d3:0:b0:3a6:2e:d4a8 with SMTP id f19-20020a7bc8d3000000b003a6002ed4a8mr16289164wml.135.1661193765556;
- Mon, 22 Aug 2022 11:42:45 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=oe+hCVRY8mVdSXGlr7AoccAGj15sOYXUCL367Mdx7zM=;
+        b=Cv7AkibgGOgBtP88Yan2JGA5VnLcmzlcqG6XJvO67d4KmCqEXyvLoB4k68auO23WG4
+         OOwA4E9u39QH3vBQNxHZ+MXVcCfPZ5O4LPH6l+Vc+Y9c7oY5QX4h6Qxert2Y1mDzVy4m
+         L469gntMJvGsJNeKqVsxUMgZbcNhEBLfw22Np6J9EOKgh6bCwwWwErHgclLXL8n/rRBE
+         /lJ7huGCMSuvSXrGg5xIbLAdab8wH2jgBFE4PX5lbUAsiGdO+dIuQZUV6rjjxgmUEfH+
+         yWKq7H9HZMFOg7116f0fmLyAQVaacsboG76DFGQ+Mv6eoheJ+BcwERLoLmR3TdDNSoaP
+         VBgw==
+X-Gm-Message-State: ACgBeo0rgCcZ+5thkNFHgQFNZUcpeWDH9Jf07Rim3FFj6LR2vcE9VMQs
+        NN3f3/xAUOpjjMaDeX+F6G+oUQ==
+X-Google-Smtp-Source: AA6agR6F0YoOsnuMT7wA77t8oFLfSs88P9gGeFvJarx2oWNydFKsSLoaLRQDp03Wm9Oi+0YueGBfEw==
+X-Received: by 2002:a05:600c:4ec9:b0:3a5:a567:137f with SMTP id g9-20020a05600c4ec900b003a5a567137fmr79715wmq.46.1661200555727;
+        Mon, 22 Aug 2022 13:35:55 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm15521971wmb.34.2022.08.22.13.35.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Aug 2022 13:35:55 -0700 (PDT)
+Message-ID: <8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com>
+Date:   Mon, 22 Aug 2022 21:35:53 +0100
 MIME-Version: 1.0
-References: <20220818170005.747015-1-dima@arista.com> <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
-In-Reply-To: <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
-From:   Salam Noureddine <noureddine@arista.com>
-Date:   Mon, 22 Aug 2022 11:42:34 -0700
-Message-ID: <CAO7SqHBZMu1vX_a58ujOcNHaau19UtVbauB37Q0zRL-k3wqRXg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
 Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
-To:     Leonard Crestez <cdleonard@gmail.com>
-Cc:     Dmitry Safonov <dima@arista.com>,
+Content-Language: en-US
+To:     David Ahern <dsahern@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
         Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Ahern <dsahern@kernel.org>,
-        Andy Lutomirski <luto@amacapital.net>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
         Ard Biesheuvel <ardb@kernel.org>,
         Bob Gilligan <gilligan@arista.com>,
         Dmitry Safonov <0x7f454c46@gmail.com>,
@@ -66,130 +71,115 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Ivan Delalande <colona@arista.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220818170005.747015-1-dima@arista.com>
+ <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
+ <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Aug 21, 2022 at 1:34 PM Leonard Crestez <cdleonard@gmail.com> wrote=
-:
->
-> On 8/18/22 19:59, Dmitry Safonov wrote:
-> > This patchset implements the TCP-AO option as described in RFC5925. The=
-re
-> > is a request from industry to move away from TCP-MD5SIG and it seems th=
-e time
-> > is right to have a TCP-AO upstreamed. This TCP option is meant to repla=
-ce
-> > the TCP MD5 option and address its shortcomings.
-...
-> >
-> > The patch set was written as a collaboration of three authors (in alpha=
-betical
-> > order): Dmitry Safonov, Francesco Ruggeri and Salam Noureddine. Additio=
-nal
-> > credits should be given to Prasad Koya, who was involved in early proto=
-typing
-> > a few years back. There is also a separate submission done by Leonard C=
-restez
-> > whom we thank for his efforts getting an implementation of RFC5925 subm=
-itted
-> > for review upstream [2]. This is an independent implementation that mak=
-es
-> > different design decisions.
->
-> Is this based on something that Arista has had running for a while now
-> or is a recent new development?
->
+Hi Leonard, David,
 
-This is based on prototype code we had worked on internally three years
-ago. The implementation effort was restarted to get it over the finish
-line. For business reasons we had to have our own implementation ready
-and not tied to unmerged upstream code. Please also note that our
-implementation is based on linux-4.19 and was only ported forward to
-mainline recently. So it wasn=E2=80=99t ready to be submitted upstream.
+On 8/22/22 00:51, David Ahern wrote:
+> On 8/21/22 2:34 PM, Leonard Crestez wrote:
+>> On 8/18/22 19:59, Dmitry Safonov wrote:
+>>> This patchset implements the TCP-AO option as described in RFC5925. There
+>>> is a request from industry to move away from TCP-MD5SIG and it seems
+>>> the time
+>>> is right to have a TCP-AO upstreamed. This TCP option is meant to replace
+>>> the TCP MD5 option and address its shortcomings. Specifically, it
+>>> provides
+>>> more secure hashing, key rotation and support for long-lived connections
+>>> (see the summary of TCP-AO advantages over TCP-MD5 in (1.3) of RFC5925).
+>>> The patch series starts with six patches that are not specific to TCP-AO
+>>> but implement a general crypto facility that we thought is useful
+>>> to eliminate code duplication between TCP-MD5SIG and TCP-AO as well as
+>>> other
+>>> crypto users. These six patches are being submitted separately in
+>>> a different patchset [1]. Including them here will show better the gain
+>>> in code sharing. Next are 18 patches that implement the actual TCP-AO
+>>> option,
+>>> followed by patches implementing selftests.
+>>>
+>>> The patch set was written as a collaboration of three authors (in
+>>> alphabetical
+>>> order): Dmitry Safonov, Francesco Ruggeri and Salam Noureddine.
+>>> Additional
+>>> credits should be given to Prasad Koya, who was involved in early
+>>> prototyping
+>>> a few years back. There is also a separate submission done by Leonard
+>>> Crestez
+>>> whom we thank for his efforts getting an implementation of RFC5925
+>>> submitted
+>>> for review upstream [2]. This is an independent implementation that makes
+>>> different design decisions.
+>>
+>> Is this based on something that Arista has had running for a while now
+>> or is a recent new development?
+>>
+> 
+> ...
+> 
+>> Seeing an entirely distinct unrelated implementation is very unexpected.
+>> What made you do this?
+>>
+> 
+> I am curious as well. You are well aware of Leonard's efforts which go
+> back a long time, why go off and do a separate implementation?
 
-> > For example, we chose a similar design to the TCP-MD5SIG implementation=
- and
-> > used setsockopt()s to program per-socket keys, avoiding the extra compl=
-exity
-> > of managing a centralized key database in the kernel. A centralized dat=
-abase
-> > in the kernel has dubious benefits since it doesn=E2=80=99t eliminate p=
-er-socket
-> > setsockopts needed to specify which sockets need TCP-AO and what are th=
-e
-> > currently preferred keys. It also complicates traffic key caching and
-> > preventing deletion of in-use keys.
->
-> My implementation started with per-socket lists but switched to a global
-> list because this way is much easier to manage from userspace. In
-> practice userspace apps will want to ensure that all sockets use the
-> same set of keys anyway.
->
+When I started working on this, there was a prototype that was neither
+good for upstream, nor for customers. At the moment Leonard submitted
+his RFC, I was already giving feedback/reviews to local code and
+patches. So, as I was aware of the details of TCP-AO, I started giving
+Leonard feedback and reviews, based on what I've learned from RFC/code.
+I thought whatever code will make it upstream, it can benefit from my
+reviews. Some of my comments were based on a better code I saw locally,
+or a way of improving it that I've suggested to both sides.
 
-We did consider a global list early on but we didn=E2=80=99t find it
-beneficial. We still believe that per-socket lists reduce complexity
-of the implementation, are more scalable and ensure predictable
-behavior. Our expectation is that TCP-AO will be only useful for a
-limited set of routing applications, rather than used transparently
-like IPSEC for non-routing apps. We would be happy to discuss this in
-more detail.
+I'm quite happy that Leonard addressed some of my comments (i.e.
+extendable syscalls), I see that it improved his patches.
+On the other hand, some of the comments I've left moved to "known
+limitations" with no foreseeable plan to fix them, while they were
+addressed in local/Arista code.
 
-> > In this implementation, a centralized database of keys can be thought o=
-f
-> > as living in user space and user applications would have to program tho=
-se
-> > keys on matching sockets. On the server side, the user application prog=
-rams
-> > keys (MKTS in TCP-AO nomenclature) on the listening socket for all peer=
-s that
-> > are expected to connect. Prefix matching on the peer address is support=
-ed.
-...
->
-> My series doesn't try to prevent inconsistencies inside the key lists
-> because it's not clear that the kernel should prevent userspace from
-> shooting itself in the foot. Worst case is connection failure on
-> misconfiguration which seems fine.
->
-> The RFC doesn't specify in detail how key management is to be performed,
-> for example if two valid keys are available it doesn't mention which one
-> should be used. Some guidance is found in RFC8177 but again not very much=
-.
->
-> I implemented an ABI that can be used by userspace for RFC8177-style key
-> management and asked for feedback but received very little. If you had
-> come with a clear ABI proposal I would have tried to implement it.
->
-> Here's a link to our older discussion:
->
-> https://lore.kernel.org/netdev/e7f0449a-2bad-99ad-4737-016a0e6b8b84@gmail=
-.com/
->
-> Seeing an entirely distinct unrelated implementation is very unexpected.
-> What made you do this?
->
-> --
-> Regards,
-> Leonard
+And now a little bit more than a year later, it seems that the quality
+of local patches has reached a point where they can be submitted for
+an upstream review. So, please don't misunderstand me, it's not that
+"drop your implementation, take ours" and it's not that we've
+intentionally hidden that we're working on TCP-AO. It's that it is the
+first moment we can make upstream aware of an alternative implementation.
 
-Our goal was not to have a competing TCP-AO upstream submission but
-to implement the RFC for our customers to use. Had there been an
-already upstreamed implementation we would have used it and
-implemented customer requirements on top of it. Just like we do with
-all other kernel features. This is not a bad situation, we believe it
-is good for the upstream community to have two fully functioning
-implementations to consider. Possibly a third collaborative
-submission might emerge that takes the best of both. A year ago, there
-wasn=E2=80=99t much available online about TCP-AO besides the RFC. We are
-excited with the current interest in TCP-AO and hope to see it
-upstreamed soon.
+Personally, I think it's best for opensource community:
+- Arista's implementation is now public
+- there are now at least 4 people that understand RFC5925 and the
+  code/details
+- in a discussion, it will be possible to find what will be the best
+  from both implementations for Linux and come up with better code
 
-Best,
+At this particular moment, it seems neither of patch sets is ready to be
+merged "as-is". But it seems that there's enough interest from both
+sides and likely it guarantees that there will be enough effort to make
+something merge-able, that will work for all interested parties.
 
-Salam
+As for my part, I'm interested in the best code upstream, regardless who
+is the author. This includes:
+- reusing the existing TCP-MD5 code, rather than copying'n'pasting for
+  TCP-AO with intent to refactor it some day later
+- making setsockopt()s and other syscalls extendable
+- cover functionality with selftests
+- following RFC5925 in implementation, especially "required" and "must"
+  parts
+
+I hope that clarifies how and why now there are two patch sets that
+implement the same RFC/functionality.
+
+Thanks,
+          Dmitry
