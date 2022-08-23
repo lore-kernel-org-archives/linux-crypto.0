@@ -2,88 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD1DC32772
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 16:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E04FC32772
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 16:34:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244819AbiHWQdu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Aug 2022 12:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50534 "EHLO
+        id S244653AbiHWQeN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Aug 2022 12:34:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242776AbiHWQdL (ORCPT
+        with ESMTP id S244638AbiHWQde (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2022 12:33:11 -0400
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09617B78F;
-        Tue, 23 Aug 2022 07:51:35 -0700 (PDT)
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id C95A061EA192D;
-        Tue, 23 Aug 2022 16:51:33 +0200 (CEST)
-Message-ID: <6d6b6bcf-cab8-695b-568a-c1372ac531ee@molgen.mpg.de>
-Date:   Tue, 23 Aug 2022 16:51:33 +0200
+        Tue, 23 Aug 2022 12:33:34 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD00EE58B5;
+        Tue, 23 Aug 2022 07:50:47 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id w10so6229926edc.3;
+        Tue, 23 Aug 2022 07:50:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=9FkbKWfrE7syTvjgVRfTfp1QVZS5uNWK2l9/kYxbDIo=;
+        b=VqXQUoqNkfeNZyklgLrRt9wOSiknNhjeL9iSJXyh8uVPqmoM5JVXSZG7SfNasI+hwu
+         49/sW/PGdPuNWBLvLI/o5KGRWsw+vcWBIXbx0P7VHyKNERqOBBmUtWfGJUYUPwFImMX0
+         g9a7uAnzZVlSJc+n20RQ79RB56freCTS9pTrgQFwomdMcdjx/QDf4WAlPQBBemRqFXSZ
+         JbMX3xpc4C9HY9eu/RS6u0obRvUC0NjoeZjJ1nGt51Ytm9CV9UX8ZD8kXM8URhhWmEpL
+         2XAZm0uu0wRAjRr/DaNu+GzyK60zS2BUtxNodeoW2dHBsvASAI6QEkHmN3E7Qxq1ifF0
+         yApg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=9FkbKWfrE7syTvjgVRfTfp1QVZS5uNWK2l9/kYxbDIo=;
+        b=7FGz/EpxzdKPq2/NOtpPvCF2lRBSmsiT/z4SKOpes5Vviu1HZt4chcvf6IyWEjCCjs
+         TD3w2jnfvYU+YjzT8FBbHZS4SnHNu3MGIQvZKJ+Mryd6mnSGERCOpBkyBucqchOYdui/
+         qGtpIxtpDXLsNtFJKtbXZmq67rtQmOCGxZOIa/U0vQYngyvQnpgqTvJJaYQyLPPOTiNt
+         bKddA57IOcVOGq6qeE9T0wOCtzLn8RZ3JxbNzNKumldmKeKV5KEB5LCQcYjOi3gwymR9
+         PnfjdZuOSssmr9LeSdRUGFhF01OW2MNI3uO7dsqDDNcJT9OxxV2t1GFvdo+7ZhlZt9Z8
+         CLoA==
+X-Gm-Message-State: ACgBeo0Jj9TXqnv/gZDN+TNZ1lL7sjB3S6Y3PlDwrZdckeu16CCYuSUc
+        3ckKFZYxjPGg8qYj7xsJBMM=
+X-Google-Smtp-Source: AA6agR4fZaRj2PGPD9O/XDdU/NGZNcNJidhVlJtmFWx0E3P96etNLFWDppzqcmKdWMvosJjO67UJWg==
+X-Received: by 2002:aa7:ce0f:0:b0:445:f488:51ca with SMTP id d15-20020aa7ce0f000000b00445f48851camr408017edv.6.1661266246401;
+        Tue, 23 Aug 2022 07:50:46 -0700 (PDT)
+Received: from ?IPV6:2a04:241e:502:a09c:f5c4:cca0:9b39:e8aa? ([2a04:241e:502:a09c:f5c4:cca0:9b39:e8aa])
+        by smtp.gmail.com with ESMTPSA id w21-20020a1709061f1500b0072eddcc807fsm7589047ejj.155.2022.08.23.07.50.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Aug 2022 07:50:45 -0700 (PDT)
+Message-ID: <01f8616c-2904-42f1-1e59-ca4c71f7a9bd@gmail.com>
+Date:   Tue, 23 Aug 2022 17:50:43 +0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 19/31] net/tcp: Add TCP-AO SNE support
 Content-Language: en-US
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: kdf108_init() takes over 250 ms
+        linux-kernel@vger.kernel.org
+References: <20220818170005.747015-1-dima@arista.com>
+ <20220818170005.747015-20-dima@arista.com>
+From:   Leonard Crestez <cdleonard@gmail.com>
+In-Reply-To: <20220818170005.747015-20-dima@arista.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dear Stephan,
+On 8/18/22 19:59, Dmitry Safonov wrote:
+> Add Sequence Number Extension (SNE) extension for TCP-AO.
+> This is needed to protect long-living TCP-AO connections from replaying
+> attacks after sequence number roll-over, see RFC5925 (6.2).
 
+> +#ifdef CONFIG_TCP_AO
+> +	ao = rcu_dereference_protected(tp->ao_info,
+> +				       lockdep_sock_is_held((struct sock *)tp));
+> +	if (ao) {
+> +		if (ack < ao->snd_sne_seq)
+> +			ao->snd_sne++;
+> +		ao->snd_sne_seq = ack;
+> +	}
+> +#endif
+>   	tp->snd_una = ack;
+>   }
 
-On the Dell XPS 13 9370 with Debian sid/unstable, I noticed with Linux 
-5.18.16, that  `crypto_kdf108_init()` takes 263 ms to run even with 
-disabled self-tests:
+... snip ...
 
-```
-[    0.000000] Linux version 5.18.0-4-amd64 
-(debian-kernel@lists.debian.org) (gcc-11 (Debian 11.3.0-5) 11.3.0, GNU 
-ld (GNU Binutils for Debian) 2.38.90.20220713) #1 SMP PREEMPT_DYNAMIC 
-Debian 5.18.16-1 (2022-08-10)
-[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-5.18.0-4-amd64 
-root=UUID=56f398e0-1e25-4fda-aa9f-611dece4b333 ro quiet 
-module_blacklist=psmouse initcall_debug log_buf_len=4M cryptomgr.notests
-[…]
-[    0.000000] DMI: Dell Inc. XPS 13 9370/0RMYH9, BIOS 1.21.0 07/06/2022
-[…]
-[    0.272123] calling  x509_key_init+0x0/0x11 @ 1
-[    0.272125] Asymmetric key parser 'x509' registered
-[    0.272126] initcall x509_key_init+0x0/0x11 returned 0 after 1 usecs
-[    0.272127] calling  crypto_kdf108_init+0x0/0x149 @ 1
-[    0.530787] Freeing initrd memory: 39332K
-[    0.534667] alg: self-tests disabled
-[    0.534701] alg: self-tests for CTR-KDF (hmac(sha256)) passed
-[    0.534703] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 
-262573 usecs
-[    0.534708] calling  blkdev_init+0x0/0x20 @ 1
-[    0.534716] initcall blkdev_init+0x0/0x20 returned 0 after 5 usecs
-[    0.534718] calling  proc_genhd_init+0x0/0x46 @ 1
-[    0.534723] initcall proc_genhd_init+0x0/0x46 returned 0 after 3 usecs
-```
+> +#ifdef CONFIG_TCP_AO
+> +	ao = rcu_dereference_protected(tp->ao_info,
+> +				       lockdep_sock_is_held((struct sock *)tp));
+> +	if (ao) {
+> +		if (seq < ao->rcv_sne_seq)
+> +			ao->rcv_sne++;
+> +		ao->rcv_sne_seq = seq;
+> +	}
+> +#endif
+>   	WRITE_ONCE(tp->rcv_nxt, seq);
 
-With self-tests enabled it’s only less than a millisecond longer.
+It should always be the case that (rcv_nxt == rcv_sne_seq) and (snd_una 
+== snd_sne_seq) so the _sne_seq fields are redundant. It's possible to 
+avoid those extra fields.
 
-```
-[    0.282389] calling  crypto_kdf108_init+0x0/0x149 @ 1
-[    0.541096] Freeing initrd memory: 39332K
-[    0.545674] alg: self-tests for CTR-KDF (hmac(sha256)) passed
-[    0.545676] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 
-263284 usecs
-```
+However 8 bytes per TCP-AO socket is inconsequential.
 
-
-Kind regards,
-
-Paul
+--
+Regards,
+Leonard
