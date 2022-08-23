@@ -2,184 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB579C28D13
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Aug 2022 20:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD1DC32772
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 16:33:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237475AbiHVUgA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Aug 2022 16:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59412 "EHLO
+        id S244819AbiHWQdu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Aug 2022 12:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230393AbiHVUf7 (ORCPT
+        with ESMTP id S242776AbiHWQdL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Aug 2022 16:35:59 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390A954CBC
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 13:35:57 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id k18-20020a05600c0b5200b003a5dab49d0bso6637520wmr.3
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Aug 2022 13:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=oe+hCVRY8mVdSXGlr7AoccAGj15sOYXUCL367Mdx7zM=;
-        b=N9tHgb9q4+h1OvK/4VnJP3ueGjoRHIMuU0TlRrYHLsngrgSS63UvxMitocg12caVG4
-         CmRWPFkwCss4QJF7uUKoqOHwV78qe0Rr3Zx2orVJYR2xt/uR6cJhVDL94RXaM++4uSjC
-         IXx43Y3QL8ZK0JDqAXc9pCoNzadxE6lCE/bWACDuvSlQd5VS6GwZQ1QNHF6x1tQpo9xW
-         +OQih2eZpz8veAfONgoU/gvPOaacAbWX4NeDBMkXS3iL6q9Mijto1xjxZNqVkEZ7LbVs
-         rzZCIN5g8+215DoNCtyQINv8qvTN07P4TsHjH195Ed2RlvQTo2oxNiNZah4UQWyygdI7
-         NSYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=oe+hCVRY8mVdSXGlr7AoccAGj15sOYXUCL367Mdx7zM=;
-        b=Cv7AkibgGOgBtP88Yan2JGA5VnLcmzlcqG6XJvO67d4KmCqEXyvLoB4k68auO23WG4
-         OOwA4E9u39QH3vBQNxHZ+MXVcCfPZ5O4LPH6l+Vc+Y9c7oY5QX4h6Qxert2Y1mDzVy4m
-         L469gntMJvGsJNeKqVsxUMgZbcNhEBLfw22Np6J9EOKgh6bCwwWwErHgclLXL8n/rRBE
-         /lJ7huGCMSuvSXrGg5xIbLAdab8wH2jgBFE4PX5lbUAsiGdO+dIuQZUV6rjjxgmUEfH+
-         yWKq7H9HZMFOg7116f0fmLyAQVaacsboG76DFGQ+Mv6eoheJ+BcwERLoLmR3TdDNSoaP
-         VBgw==
-X-Gm-Message-State: ACgBeo0rgCcZ+5thkNFHgQFNZUcpeWDH9Jf07Rim3FFj6LR2vcE9VMQs
-        NN3f3/xAUOpjjMaDeX+F6G+oUQ==
-X-Google-Smtp-Source: AA6agR6F0YoOsnuMT7wA77t8oFLfSs88P9gGeFvJarx2oWNydFKsSLoaLRQDp03Wm9Oi+0YueGBfEw==
-X-Received: by 2002:a05:600c:4ec9:b0:3a5:a567:137f with SMTP id g9-20020a05600c4ec900b003a5a567137fmr79715wmq.46.1661200555727;
-        Mon, 22 Aug 2022 13:35:55 -0700 (PDT)
-Received: from [10.83.37.24] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id be13-20020a05600c1e8d00b003a511e92abcsm15521971wmb.34.2022.08.22.13.35.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Aug 2022 13:35:55 -0700 (PDT)
-Message-ID: <8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com>
-Date:   Mon, 22 Aug 2022 21:35:53 +0100
+        Tue, 23 Aug 2022 12:33:11 -0400
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09617B78F;
+        Tue, 23 Aug 2022 07:51:35 -0700 (PDT)
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id C95A061EA192D;
+        Tue, 23 Aug 2022 16:51:33 +0200 (CEST)
+Message-ID: <6d6b6bcf-cab8-695b-568a-c1372ac531ee@molgen.mpg.de>
+Date:   Tue, 23 Aug 2022 16:51:33 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
 Content-Language: en-US
-To:     David Ahern <dsahern@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220818170005.747015-1-dima@arista.com>
- <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
- <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
-From:   Dmitry Safonov <dima@arista.com>
-In-Reply-To: <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: kdf108_init() takes over 250 ms
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Leonard, David,
+Dear Stephan,
 
-On 8/22/22 00:51, David Ahern wrote:
-> On 8/21/22 2:34 PM, Leonard Crestez wrote:
->> On 8/18/22 19:59, Dmitry Safonov wrote:
->>> This patchset implements the TCP-AO option as described in RFC5925. There
->>> is a request from industry to move away from TCP-MD5SIG and it seems
->>> the time
->>> is right to have a TCP-AO upstreamed. This TCP option is meant to replace
->>> the TCP MD5 option and address its shortcomings. Specifically, it
->>> provides
->>> more secure hashing, key rotation and support for long-lived connections
->>> (see the summary of TCP-AO advantages over TCP-MD5 in (1.3) of RFC5925).
->>> The patch series starts with six patches that are not specific to TCP-AO
->>> but implement a general crypto facility that we thought is useful
->>> to eliminate code duplication between TCP-MD5SIG and TCP-AO as well as
->>> other
->>> crypto users. These six patches are being submitted separately in
->>> a different patchset [1]. Including them here will show better the gain
->>> in code sharing. Next are 18 patches that implement the actual TCP-AO
->>> option,
->>> followed by patches implementing selftests.
->>>
->>> The patch set was written as a collaboration of three authors (in
->>> alphabetical
->>> order): Dmitry Safonov, Francesco Ruggeri and Salam Noureddine.
->>> Additional
->>> credits should be given to Prasad Koya, who was involved in early
->>> prototyping
->>> a few years back. There is also a separate submission done by Leonard
->>> Crestez
->>> whom we thank for his efforts getting an implementation of RFC5925
->>> submitted
->>> for review upstream [2]. This is an independent implementation that makes
->>> different design decisions.
->>
->> Is this based on something that Arista has had running for a while now
->> or is a recent new development?
->>
-> 
-> ...
-> 
->> Seeing an entirely distinct unrelated implementation is very unexpected.
->> What made you do this?
->>
-> 
-> I am curious as well. You are well aware of Leonard's efforts which go
-> back a long time, why go off and do a separate implementation?
 
-When I started working on this, there was a prototype that was neither
-good for upstream, nor for customers. At the moment Leonard submitted
-his RFC, I was already giving feedback/reviews to local code and
-patches. So, as I was aware of the details of TCP-AO, I started giving
-Leonard feedback and reviews, based on what I've learned from RFC/code.
-I thought whatever code will make it upstream, it can benefit from my
-reviews. Some of my comments were based on a better code I saw locally,
-or a way of improving it that I've suggested to both sides.
+On the Dell XPS 13 9370 with Debian sid/unstable, I noticed with Linux 
+5.18.16, that  `crypto_kdf108_init()` takes 263 ms to run even with 
+disabled self-tests:
 
-I'm quite happy that Leonard addressed some of my comments (i.e.
-extendable syscalls), I see that it improved his patches.
-On the other hand, some of the comments I've left moved to "known
-limitations" with no foreseeable plan to fix them, while they were
-addressed in local/Arista code.
+```
+[    0.000000] Linux version 5.18.0-4-amd64 
+(debian-kernel@lists.debian.org) (gcc-11 (Debian 11.3.0-5) 11.3.0, GNU 
+ld (GNU Binutils for Debian) 2.38.90.20220713) #1 SMP PREEMPT_DYNAMIC 
+Debian 5.18.16-1 (2022-08-10)
+[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-5.18.0-4-amd64 
+root=UUID=56f398e0-1e25-4fda-aa9f-611dece4b333 ro quiet 
+module_blacklist=psmouse initcall_debug log_buf_len=4M cryptomgr.notests
+[…]
+[    0.000000] DMI: Dell Inc. XPS 13 9370/0RMYH9, BIOS 1.21.0 07/06/2022
+[…]
+[    0.272123] calling  x509_key_init+0x0/0x11 @ 1
+[    0.272125] Asymmetric key parser 'x509' registered
+[    0.272126] initcall x509_key_init+0x0/0x11 returned 0 after 1 usecs
+[    0.272127] calling  crypto_kdf108_init+0x0/0x149 @ 1
+[    0.530787] Freeing initrd memory: 39332K
+[    0.534667] alg: self-tests disabled
+[    0.534701] alg: self-tests for CTR-KDF (hmac(sha256)) passed
+[    0.534703] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 
+262573 usecs
+[    0.534708] calling  blkdev_init+0x0/0x20 @ 1
+[    0.534716] initcall blkdev_init+0x0/0x20 returned 0 after 5 usecs
+[    0.534718] calling  proc_genhd_init+0x0/0x46 @ 1
+[    0.534723] initcall proc_genhd_init+0x0/0x46 returned 0 after 3 usecs
+```
 
-And now a little bit more than a year later, it seems that the quality
-of local patches has reached a point where they can be submitted for
-an upstream review. So, please don't misunderstand me, it's not that
-"drop your implementation, take ours" and it's not that we've
-intentionally hidden that we're working on TCP-AO. It's that it is the
-first moment we can make upstream aware of an alternative implementation.
+With self-tests enabled it’s only less than a millisecond longer.
 
-Personally, I think it's best for opensource community:
-- Arista's implementation is now public
-- there are now at least 4 people that understand RFC5925 and the
-  code/details
-- in a discussion, it will be possible to find what will be the best
-  from both implementations for Linux and come up with better code
+```
+[    0.282389] calling  crypto_kdf108_init+0x0/0x149 @ 1
+[    0.541096] Freeing initrd memory: 39332K
+[    0.545674] alg: self-tests for CTR-KDF (hmac(sha256)) passed
+[    0.545676] initcall crypto_kdf108_init+0x0/0x149 returned 0 after 
+263284 usecs
+```
 
-At this particular moment, it seems neither of patch sets is ready to be
-merged "as-is". But it seems that there's enough interest from both
-sides and likely it guarantees that there will be enough effort to make
-something merge-able, that will work for all interested parties.
 
-As for my part, I'm interested in the best code upstream, regardless who
-is the author. This includes:
-- reusing the existing TCP-MD5 code, rather than copying'n'pasting for
-  TCP-AO with intent to refactor it some day later
-- making setsockopt()s and other syscalls extendable
-- cover functionality with selftests
-- following RFC5925 in implementation, especially "required" and "must"
-  parts
+Kind regards,
 
-I hope that clarifies how and why now there are two patch sets that
-implement the same RFC/functionality.
-
-Thanks,
-          Dmitry
+Paul
