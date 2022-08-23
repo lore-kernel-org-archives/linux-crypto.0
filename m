@@ -2,201 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF83C32774
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 16:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D275EC32772
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 16:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245061AbiHWQi0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Aug 2022 12:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55696 "EHLO
+        id S242523AbiHWQxp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Aug 2022 12:53:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245062AbiHWQhg (ORCPT
+        with ESMTP id S242879AbiHWQxY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2022 12:37:36 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7B16F278;
-        Tue, 23 Aug 2022 07:45:38 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id bj12so10857663ejb.13;
-        Tue, 23 Aug 2022 07:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=Xp12azsz2mcA1D+pCwTb7QzHx7vJCfU7QBtBOPIfqGI=;
-        b=nYTnfGoHuLEgzto2xQCl3xyYxG6a1ZP8vCa5qEWFIkagaBsgJJfPQ+CE85EPKLZa9x
-         meL+FfNyVT/CnRp5o7ucX+w8gdn0oX+Xgr0zDHJbxc/l9/uI27v+3JCErx06mmSTIinJ
-         9WP4G93cG//IJwewck7V2s0NVVL4QhAmbjg5HZdAbBIxe+PxPBo5EGkwcIRqqFJsxsrA
-         EfTcCOmB2HqD7Xf+Cfe2K0pVGVhSBN+rMPe7Q9QXUWsPGAo4kWFTSAaTaNZhVzT5m1z8
-         /YlQ/FhSMKM6fiTKnqEKnj9jsucEbg496z3l2Hnzy7k06ehpjlIkRNMMp0QBAZLLGzVv
-         hinQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=Xp12azsz2mcA1D+pCwTb7QzHx7vJCfU7QBtBOPIfqGI=;
-        b=s24C14R2mxm8PYpdvGbSrDpkgXbkgcSF9zslNXcADF2eu1OJsuRYqN41nI7od6D/+s
-         l7NC9xd3F0RkRb8lfIWwtYiiGob8E688pRo73FzBnr4h4Imz8etpmyvxhnoM7isFQUPA
-         YkuWEpub386jhnnECu208+JCTjZLh4Xl3f4WMTaeUUJhkx2KO9bxfuPIlgGubKtWImTy
-         2nQKy8mrQwB2NSLKSjPIuJtfau5VnKXeWaJauGTjUksD9kURNSeO5n77OsXvLIt1CA4r
-         BeWt/q6SpSoKxt0U0wQSeMTlg6oImlfVWfd8tqTVhewMvf8g8tFtNApA1NgcY9UFDa94
-         fuCA==
-X-Gm-Message-State: ACgBeo3hAhJrQwewf8rFnbk0DpAMBCPh216AALNFI5NS+zyhsb5IRJaH
-        8p5WrM86+7feqbuh3/vBsrw=
-X-Google-Smtp-Source: AA6agR5/uo2cN0jwt/fJtgv224c+BctP2Eh/UT482g31amCpKeS9r5eJePXY3Y0xHmQk+/Li73zllA==
-X-Received: by 2002:a17:906:6a0a:b0:73d:6c6a:1b8f with SMTP id qw10-20020a1709066a0a00b0073d6c6a1b8fmr9527542ejc.240.1661265937066;
-        Tue, 23 Aug 2022 07:45:37 -0700 (PDT)
-Received: from ?IPV6:2a04:241e:502:a09c:f5c4:cca0:9b39:e8aa? ([2a04:241e:502:a09c:f5c4:cca0:9b39:e8aa])
-        by smtp.gmail.com with ESMTPSA id dx9-20020a170906a84900b0073d8891b78dsm2244720ejb.90.2022.08.23.07.45.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Aug 2022 07:45:36 -0700 (PDT)
-Message-ID: <162ae93b-5589-fbde-c63b-749f21051784@gmail.com>
-Date:   Tue, 23 Aug 2022 17:45:34 +0300
+        Tue, 23 Aug 2022 12:53:24 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A38131A02;
+        Tue, 23 Aug 2022 06:21:39 -0700 (PDT)
+Received: from zn.tnic (p200300ea971b9893329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971b:9893:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CA7901EC059D;
+        Tue, 23 Aug 2022 15:21:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1661260893;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=88b9dtw5SGZz9ByR4SVq5jtelPnssUL5tht/iXbNMr0=;
+        b=pdIFFaLF2Q5y9bCJ1IXNDS6T4Wx4YgPc/b9z/mTBbXwTqFdUzRZMyThTsuC8nQblA+NIw+
+        yLDo4nIEPl/nfBvIJrqm5PSxkopiA4U0cqHMfliR6HYmWQcLLLGLR9WlAvXHJ9LuGWac95
+        qZyJxJ6DZFrPdZlQdErBqscKg5MLx5I=
+Date:   Tue, 23 Aug 2022 15:21:29 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
+ on fault
+Message-ID: <YwTUWUkDVW+936VR@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 08/31] net/tcp: Introduce TCP_AO setsockopt()s
-Content-Language: en-US
-To:     Dmitry Safonov <dima@arista.com>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        David Ahern <dsahern@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-References: <20220818170005.747015-1-dima@arista.com>
- <20220818170005.747015-9-dima@arista.com>
-From:   Leonard Crestez <cdleonard@gmail.com>
-In-Reply-To: <20220818170005.747015-9-dima@arista.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/18/22 19:59, Dmitry Safonov wrote:
-> Add 3 setsockopt()s:
-> 1. to add a new Master Key Tuple (MKT) on a socket
-> 2. to delete present MKT from a socket
-> 3. to change flags of an MKT
+On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Userspace has to introduce keys on every socket it wants to use TCP-AO
-> option on, similarly to TCP_MD5SIG/TCP_MD5SIG_EXT.
-> RFC5925 prohibits definition of MKTs that would match the same peer,
-> so do sanity checks on the data provided by userspace. Be as
-> conservative as possible, including refusal of defining MKT on
-> an established connection with no AO, removing the key in-use and etc.
+> When SEV-SNP is enabled globally, a write from the host goes through the
+> RMP check. If the hardware encounters the check failure, then it raises
+> the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
+> the debug.
 > 
-> (1) and (2) are to be used by userspace key manager to add/remove keys.
-> (3) main purpose is to set rnext_key, which (as prescribed by RFC5925)
-> is the key id that will be requested in TCP-AO header from the peer to
-> sign their segments with.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h |  7 +++++++
+>  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/mm/fault.c        | 17 +++++++++++----
+>  include/linux/sev.h        |  2 ++
+>  4 files changed, 65 insertions(+), 4 deletions(-)
 > 
-> At this moment the life of ao_info ends in tcp_v4_destroy_sock().
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 6ab872311544..c0c4df817159 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -113,6 +113,11 @@ struct __packed rmpentry {
+>  
+>  #define rmpentry_assigned(x)	((x)->info.assigned)
+>  #define rmpentry_pagesize(x)	((x)->info.pagesize)
+> +#define rmpentry_vmsa(x)	((x)->info.vmsa)
+> +#define rmpentry_asid(x)	((x)->info.asid)
+> +#define rmpentry_validated(x)	((x)->info.validated)
+> +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
+> +#define rmpentry_immutable(x)	((x)->info.immutable)
 
+If you're going to do that, use inline functions pls so that it checks
+the argument at least.
 
-> +#define TCP_AO			38	/* (Add/Set MKT) */
-> +#define TCP_AO_DEL		39	/* (Delete MKT) */
-> +#define TCP_AO_MOD		40	/* (Modify MKT) */
+Also, add such functions only when they're called multiple times - no
+need to add one for every field if you're going to access that field
+only once in the whole kernel.
 
-The TCP_AO_MOD sockopt doesn't actually modify and MKT, it only controls 
-per-socket properties. It is equivalent to my TCP_AUTHOPT sockopt while 
-TCP_AO is equivalent to TCP_AUTHOPT_KEY. My equivalent of TCP_AO_DEL 
-sockopt is a flag inside tcp_authopt_key.
+>  
+>  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+>  
+> @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
+>  bool snp_init(struct boot_params *bp);
+>  void snp_abort(void);
+>  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
+> +void dump_rmpentry(u64 pfn);
+>  #else
+>  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+>  static inline void sev_es_ist_exit(void) { }
+> @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
+>  {
+>  	return -ENOTTY;
+>  }
+> +static inline void dump_rmpentry(u64 pfn) {}
+>  #endif
+>  
+>  #endif
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 734cddd837f5..6640a639fffc 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
+>  	return entry;
+>  }
+>  
+> +void dump_rmpentry(u64 pfn)
 
-> +struct tcp_ao { /* setsockopt(TCP_AO) */
-> +	struct __kernel_sockaddr_storage tcpa_addr;
-> +	char	tcpa_alg_name[64];
-> +	__u16	tcpa_flags;
+External function - it better belong to a namespace:
 
-This field accept TCP_AO_CMDF_CURR and TCP_AO_CMDF_NEXT which means that 
-you are combining key addition with key selection. Not clear it 
-shouldn't just always be a separate sockopt?
+sev_dump_rmpentry()
 
-> +	__u8	tcpa_prefix;
-> +	__u8	tcpa_sndid;
-> +	__u8	tcpa_rcvid;
-> +	__u8	tcpa_maclen;
-> +	__u8	tcpa_keyflags;
-> +	__u8	tcpa_keylen;
-> +	__u8	tcpa_key[TCP_AO_MAXKEYLEN];
-> +} __attribute__((aligned(8)));
-> +
-> +struct tcp_ao_del { /* setsockopt(TCP_AO_DEL) */
-> +	struct __kernel_sockaddr_storage tcpa_addr;
-> +	__u16	tcpa_flags;
-> +	__u8	tcpa_prefix;
-> +	__u8	tcpa_sndid;
-> +	__u8	tcpa_rcvid;
-> +	__u8	tcpa_current;
-> +	__u8	tcpa_rnext;
-> +} __attribute__((aligned(8)));
-> +
-> +struct tcp_ao_mod { /* setsockopt(TCP_AO_MOD) */
-> +	__u16	tcpa_flags;
-> +	__u8	tcpa_current;
-> +	__u8	tcpa_rnext;
-> +} __attribute__((aligned(8)));
-
-This is quite similar to my "struct tcp_authopt" in the fact that it is 
-intented to support controlling the "current keys".
-
-* tcpa_current is equivalent to send_keyid
-* tcpa_rnext is equivalent to send_rnextkeyid
-
-I also have two fields called "recv_keyid" and "recv_rnextkeyid" which 
-inform userspace about what the remote is sending, I'm not seeing an 
-equivalent on your side.
-
-The specification around send_keyid in the RFC is conflicting:
-* User must be able to control it
-* Implementation must respect rnextkeyid in incoming packet
-
-I solved this apparent conflict by adding a 
-"TCP_AUTHOPT_FLAG_LOCK_KEYID" flag so that user can choose if it wants 
-to control the sending key or let it be controlled from the other side.
-
-The "send_rnextkeyid" is also optional in my patch, if 
-TCP_AUTHOPT_FLAG_LOCK_RNEXTKEYID is not passed then the recv_id of the 
-sending key is sent.
-
-Here's a link to my implementation of key selection controls:
-
-https://lore.kernel.org/netdev/2956d99e7fbf9ff2a8cc720c67baaef35bc32343.1660852705.git.cdleonard@gmail.com/
-
-> +static int tcp_ao_parse_crypto(struct tcp_ao *cmd, struct tcp_ao_key *key)
 > +{
-> +	unsigned int syn_tcp_option_space;
-> +	struct crypto_pool_ahash hp;
-> +	bool is_kdf_aes_128_cmac = false;
-> +	struct crypto_ahash *tfm;
-> +	int err, pool_id;
+> +	unsigned long pfn_end;
+> +	struct rmpentry *e;
+> +	int level;
 > +
-> +	/* Force null-termination of tcpa_alg_name */
-> +	cmd->tcpa_alg_name[ARRAY_SIZE(cmd->tcpa_alg_name) - 1] = '\0';
-> +
-> +	/* RFC5926, 3.1.1.2. KDF_AES_128_CMAC */
-> +	if (!strcmp("cmac(aes128)", cmd->tcpa_alg_name)) {
-> +		strcpy(cmd->tcpa_alg_name, "cmac(aes)");
-> +		is_kdf_aes_128_cmac = (cmd->tcpa_keylen != 16);
+> +	e = __snp_lookup_rmpentry(pfn, &level);
+> +	if (!e) {
+> +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
+
+Why alert?
+
+Dumping stuff is either pr_debug or pr_info...
+
+> +		return;
 > +	}
+> +
+> +	if (rmpentry_assigned(e)) {
+> +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
+> +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
+> +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
+> +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
+> +			rmpentry_validated(e));
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
 
-Only two algorithms are defined in RFC5926 and you have to treat one of 
-them as a special case. I remain convinced that generic support for 
-arbitrary algorithms is undesirable; it's better for the algorithm to be 
-specified as an enum.
+Who's "we"?
 
---
-Regards,
-Leonard
+> +	 * know what caused the RMP violation. To get some useful debug information,
+> +	 * let iterate through the entire 2MB region, and dump the RMP entries if
+> +	 * one of the bit in the RMP entry is set.
+> +	 */
+> +	pfn = pfn & ~(PTRS_PER_PMD - 1);
+> +	pfn_end = pfn + PTRS_PER_PMD;
+> +
+> +	while (pfn < pfn_end) {
+> +		e = __snp_lookup_rmpentry(pfn, &level);
+> +		if (!e)
+> +			return;
+> +
+> +		if (e->low || e->high)
+
+This is going to confuse people because they're going to miss a zero
+entry. Just dump the whole thing.
+
+...
+
+> @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+>  		show_ldttss(&gdt, "TR", tr);
+>  	}
+>  
+> -	dump_pagetable(address);
+> +	dump_pagetable(address, error_code & X86_PF_RMP);
+
+Eww.
+
+I'd prefer to see
+
+	pfn = dump_pagetable(address);
+
+	if (error_code & X86_PF_RMP)
+		sev_dump_rmpentry(pfn);
+
+instead of passing around this SEV-specific arg in generic x86 fault code.
+
+The change to return the pfn from dump_pagetable() should be a pre-patch ofc.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
