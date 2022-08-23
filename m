@@ -2,183 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36545C32774
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 18:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4628C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 20:06:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233790AbiHWSQo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Aug 2022 14:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
+        id S234013AbiHWUGm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Aug 2022 16:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbiHWSQY (ORCPT
+        with ESMTP id S231402AbiHWUGS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2022 14:16:24 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A02C520B7
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 09:31:31 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id e20so17159113wri.13
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 09:31:30 -0700 (PDT)
+        Tue, 23 Aug 2022 16:06:18 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FA368053E
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 12:23:37 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id bq11so11585314wrb.12
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 12:23:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc;
-        bh=nKoC8OE/O/GQsF3EPOMsruSTs9kLL6O0oaBfPq3e28g=;
-        b=SK7ynHMFvo1X+2v4fJkRdHRHQ1Ryfr6uKbFvpzEINyt6alx2V4q3i53DNdbSoUYAlA
-         Umo7SyI3XBZldXE3rT8UonEPS9tgLeakleqyt/vV3GzmDro1anDbdiOVuHTLnUyGL/WI
-         VPp1C0D4rueHf/CN4BMj2PNEEcP1C9htAj1bZw2Q2FxL9p7ddlSFNaGxHDryqN93l1pD
-         +YD9gPw+cJiR/3jxZT35YcDP4EtmaWabhbI31kerfPU+1GlzT+XewXDqUScid1rwZ9J1
-         3lb14OXgu5ZjS1/worMgsvXMSybqsUSpdL8miLbmTMvv6RDx3tWg6lx0osYH28xOKFoA
-         rA8A==
+        bh=EjIVVDKgfAQnTIDHdcgii05+dfZdL98r/ZOX4AyAXIQ=;
+        b=Bz6hrSMnZUAIEh8kyYJEhdmt9Abs8gtuk6WWV8UVViegyv1yBUIRpF+7JkuuhUfSI/
+         rmS6vJa2Sh+JAmIRmoH2m/UI0OmFPOuHhbHTwbwIV4wZwlddIgisZ4THhp2q01sywyIH
+         Hh0WeSm6TgtlGKLOqRbq4jIfwsyhC1MFztTMd3KUIlQOxf5bwGijguJbniSrr9ZTF0B+
+         66CgYodLOH8qEBXRZirm0Hc97k3H8IrR7Mt0tyDnVDsE5HDMXShvl0HUBYXjNrHYJaDL
+         fhY4/ai44IFYTsD4NDAuGfTbxDMuUShNs+r8QC5pvwGmTb9Znd1vK2oyh8wPiyra3RLQ
+         u18g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=nKoC8OE/O/GQsF3EPOMsruSTs9kLL6O0oaBfPq3e28g=;
-        b=G82fs8jRvFXiuOR4Kdk9CYsDa5/xaKOlrNywUp2RVRc+XGHi767xf+wM4TGomDTCWo
-         lCUif1BkjdUi5JZ5D1AjhYmsn6hEwEOXuZpVdq3mPyunCtkU2Mt5vMG/3fFJGwbgd1A4
-         YTg/w0NpGku5eTEnq5CPPqPULYCF10w1Ric3HZDkTtefTDDLo4H18hpWArDgVtNUf5nR
-         ime2/NxyaHpt+a4vgxnTHxoZ2qQiDTKtx/AoiEd9FDEp765GhxeGyU0XgDUR8Y5ccXuK
-         RphJl9IiH+gJEL3xGhEMSEOOyMQtgwLg3x2xBso2ceKYmcfyra3WHKTR4N1b9iwOWbdu
-         QHlg==
-X-Gm-Message-State: ACgBeo2W71NNz699WzxhhYYk2AfDXewoXIlD9b5c0bRN1WMZ0PJTO7yq
-        i+0mQ3pCJLhEbOTOly5QmGWbbw==
-X-Google-Smtp-Source: AA6agR5USOIOfMIu3eXWb5tNMXUpwOsRF3pXjUg/3KIyzqgQANYdz3Mucb1dJhvQB5q5M83QcbNCMA==
-X-Received: by 2002:a5d:5985:0:b0:222:c827:11d5 with SMTP id n5-20020a5d5985000000b00222c82711d5mr14038109wri.323.1661272289310;
-        Tue, 23 Aug 2022 09:31:29 -0700 (PDT)
+        bh=EjIVVDKgfAQnTIDHdcgii05+dfZdL98r/ZOX4AyAXIQ=;
+        b=u3TlVIyLLRg6yca/njHmiUF2XO1N54ETLWzn8tdVJlFfPGhvcU454AEaL8KFOv3WTS
+         lbFNNdiMd+hKsq94FS/Q8gi6L6drydsuyuB2v2tixSfuoQRHYDOS9XjHFxgQEIfHRUjG
+         0svDCSMNctMvclK+6+ECZem42Nh/xzz610236XgSopKssj3LYyLblE5LEmB8j77kpz2t
+         ET6NTLG9iyDBQbgrkYUZWq5OAtM/tX2J3i5zcriKb44JsvZE3PtLmTSmWiuUOLJxZCp5
+         +M4Bukrz2WmkacgrOfEm3SdEF3l4MBzHpXDWiCw63rRMrwdsfglKylG4P5GP3SakmKKD
+         SLSg==
+X-Gm-Message-State: ACgBeo3nUqtldxhCfsawUGcK1xrvbDebhjfbAwpijgEJxYiaXvMMfK0B
+        8L4vmAFzRWWGOb1rDkseZovjgA==
+X-Google-Smtp-Source: AA6agR6/zSRB/lRtSV4HO66inoRV2cHAdiu/d9FBXR4z4ZRCcp2Kgm9u1+FdHSX6aoT8nsyvrq2tzw==
+X-Received: by 2002:a5d:64ee:0:b0:225:6ad3:34df with SMTP id g14-20020a5d64ee000000b002256ad334dfmr1949606wri.313.1661282615706;
+        Tue, 23 Aug 2022 12:23:35 -0700 (PDT)
 Received: from [10.83.37.24] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id a14-20020adfed0e000000b0022511d35d5bsm14974943wro.12.2022.08.23.09.31.27
+        by smtp.gmail.com with ESMTPSA id h3-20020a05600c2ca300b003a5ea1cc63csm22779453wmc.39.2022.08.23.12.23.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Aug 2022 09:31:28 -0700 (PDT)
-Message-ID: <f3910cac-84c4-61fa-c06a-268ec171f464@arista.com>
-Date:   Tue, 23 Aug 2022 17:31:22 +0100
+        Tue, 23 Aug 2022 12:23:34 -0700 (PDT)
+Message-ID: <59313d4e-6934-77dd-f3a1-6c4d76f3c7d1@arista.com>
+Date:   Tue, 23 Aug 2022 20:23:28 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.12.0
-Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
+Subject: Re: [PATCH 6/6] net/ipv6: sr: Switch to using crypto_pool
 Content-Language: en-US
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        David Ahern <dsahern@kernel.org>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
+To:     liulongfang <liulongfang@huawei.com>, linux-kernel@vger.kernel.org
+Cc:     Dmitry Safonov <0x7f454c46@gmail.com>,
+        Andy Lutomirski <luto@amacapital.net>,
         Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
         Jakub Kicinski <kuba@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
         Paolo Abeni <pabeni@redhat.com>,
         Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>
-References: <20220818170005.747015-1-dima@arista.com>
- <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
- <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
- <8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com>
- <7ad5a9be-4ee9-bab2-4a70-b0f661f91beb@gmail.com>
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20220726201600.1715505-1-dima@arista.com>
+ <20220726201600.1715505-7-dima@arista.com>
+ <22bbcbf7-c51b-4933-af3d-feed77ffd352@huawei.com>
 From:   Dmitry Safonov <dima@arista.com>
-In-Reply-To: <7ad5a9be-4ee9-bab2-4a70-b0f661f91beb@gmail.com>
+In-Reply-To: <22bbcbf7-c51b-4933-af3d-feed77ffd352@huawei.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/23/22 16:30, Leonard Crestez wrote:
-> On 8/22/22 23:35, Dmitry Safonov wrote:
->> Hi Leonard, David,
+On 8/8/22 04:40, liulongfang wrote:
+> On 2022/7/27 4:16, Dmitry Safonov Wrote:
+>> The conversion to use crypto_pool has the following upsides:
+>> - now SR uses asynchronous API which may potentially free CPU cycles and
+>>   improve performance for of CPU crypto algorithm providers;
+>
+> Is there any specific test data for this performance improvement?
+> How much has the memory increased?
+> How much has the performance improved?
+
+I have no test data for this.
+The idea behind this improvement is the same as behind crypto ahash: if
+your CPU can benefit by offloading work to hw hash accelerator and there
+is a driver that provides crypto backend, you may certainly win some
+performance. The number depends on platform/driver in use.
+
+>> - hash descriptors now don't have to be allocated on boot, but only at
+>>   the moment SR starts using HMAC and until the last HMAC secret is
+>>   deleted;
+>> - potentially reuse ahash_request(s) for different users
+>> - allocate only one per-CPU scratch buffer rather than a new one for
+>>   each user
+>> - have a common API for net/ users that need ahash on RX/TX fast path
+
 [..]
->> At this particular moment, it seems neither of patch sets is ready to be
->> merged "as-is". But it seems that there's enough interest from both
->> sides and likely it guarantees that there will be enough effort to make
->> something merge-able, that will work for all interested parties.
->>
->> As for my part, I'm interested in the best code upstream, regardless who
->> is the author. This includes:
->> - reusing the existing TCP-MD5 code, rather than copying'n'pasting for
->>    TCP-AO with intent to refactor it some day later
-> 
-> I had a requirement to deploy on linux 5.4 so I very deliberately
-> avoided touching MD5. I'm not sure there very much duplication anyway.
-
-Yeah, I know what you mean: we deployed it on v4.19. But for the code
-upstream I personally prefer to see "reusing" rather than copying.
-Lesser code is easier to maintain in future.
-Upstream submissions in my view should be based on "what would be easier
-to maintain in future", rather than on "what would be easier to backport
-to my maintenance release".
-
->> - making setsockopt()s and other syscalls extendable
->> - cover functionality with selftests
-> 
-> My implementation is tested with a standalone python package, this is a
-> design choice which doesn't particularly matter.
-> 
->> - following RFC5925 in implementation, especially "required" and "must"
->>    parts
-> 
-> I'm not convinced that "don't delete current key" needs to be literally
-> interpreted as a hard requirement for the linux ABI. Most TCP RFCs don't
-> specify any sort of API at all and it would be entirely valid to
-> implement BGP-TCP-AO as a single executable with no internally
-> documented boundaries.
-
-I agree that RFC requirements and "musts" can be implemented in
-userspace, rather than in kernel. On the other hand, my opinion is that
-if you have "must"/"must not"/"required" in RFC and it's not hard to
-limit those in kernel, than you _should_ do it.
-In this point of view, debugging "hey, setsockopt() for key removal
-returned -EBUSY, what's going on?" is better than "hey, tcp connection
-died on my side and I didn't have tcp dump running, what was that?".
-
->> I hope that clarifies how and why now there are two patch sets that
->> implement the same RFC/functionality.
-> 
-> As far as I can tell the biggest problem is that is quite difficult to
-> implement the userspace side of TCP-AO complete with key rollover. Our
-> two implementation both claim to support this but through different ABI
-> and both require active management from userspace.
-> 
-> I think it would make sense to push key validity times and the key
-> selection policy entirely in the kernel so that it can handle key
-> rotation/expiration by itself. This way userspace only has to configure
-> the keys and doesn't have to touch established connections at all.
-
-Respectfully I disagree here. I think all such policies should be
-implemented in userspace. The kernel has to have as lesser as possible,
-but enough to provide a way to sign, verify, log messages on TCP segments.
-All the logic that may change, all business decisions and key management
-should be implemented in userspace, keeping the kernel part as easier in
-"KISS" sense as possible.
-
-> My series has a "flags" field on the key struct where it can filter by
-> IP, prefix, ifindex and so on. It would be possible to add additional
-> flags for making the key only valid between certain times (by wall time).
-> 
-> The kernel could then make key selections itself:
->  - send rnextkeyid based on the key with the longest recv lifetime
->  - send keyid based on remote rnextkeyid.
->    - If not applicable (rnextkeyid not found locally, or for SYN) pick
-> based on longest send lifetime.
->  - If all keys expire then return an error on write()
->  - Solve other ambiguities in a predictable way: if valid times are
-> equal then pick the lowest numeric send_id or recv_id.
-> 
-> Explicit key selection from userspace could still be supported but it
-> would be optional and most apps wouldn't bother implementing their own
-> policy. The biggest advantage is that it would be much easier for
-> applications to adopt TCP-AO.
-
-Personally, I would think that all you mentioned better stay in
-userspace app. The kernel should do as minimal and as much predictable
-as possible job here, without 10 possible outcomes. If you want to share
-the logic of key rotation/expiration, all timers and synchronization
-between different BGP applications, that would be a proper job for a
-shared library.
 
 Thanks,
           Dmitry
