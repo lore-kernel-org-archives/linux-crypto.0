@@ -2,230 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8386FC32789
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 17:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36545C32774
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Aug 2022 18:16:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbiHWRyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Aug 2022 13:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33588 "EHLO
+        id S233790AbiHWSQo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 Aug 2022 14:16:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232777AbiHWRxY (ORCPT
+        with ESMTP id S231572AbiHWSQY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Aug 2022 13:53:24 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEE75FAD2
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 08:55:04 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id m5so10608529qkk.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 08:55:04 -0700 (PDT)
+        Tue, 23 Aug 2022 14:16:24 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A02C520B7
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 09:31:31 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id e20so17159113wri.13
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 09:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=I+MhWIFw4wylC1ozMc1I6NteP9cQs0GMyFhEeS/9x94=;
-        b=ByX9H6uiDkTPWcwJ0OiX4RFt26I4cpIOa9/tKClIslXtzO8ndVu6rmalqMKsehV6U6
-         OMXrGiP47fpWkN0zkSQbaTYhFk+ubbOcVjS7s33KiAR7NnziPZ95Ie7cdV84vm9BL2k/
-         uLuerYI/aNzaJXAv6ZHVfy6IV9GMOvVyGY+2E=
+        d=arista.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=nKoC8OE/O/GQsF3EPOMsruSTs9kLL6O0oaBfPq3e28g=;
+        b=SK7ynHMFvo1X+2v4fJkRdHRHQ1Ryfr6uKbFvpzEINyt6alx2V4q3i53DNdbSoUYAlA
+         Umo7SyI3XBZldXE3rT8UonEPS9tgLeakleqyt/vV3GzmDro1anDbdiOVuHTLnUyGL/WI
+         VPp1C0D4rueHf/CN4BMj2PNEEcP1C9htAj1bZw2Q2FxL9p7ddlSFNaGxHDryqN93l1pD
+         +YD9gPw+cJiR/3jxZT35YcDP4EtmaWabhbI31kerfPU+1GlzT+XewXDqUScid1rwZ9J1
+         3lb14OXgu5ZjS1/worMgsvXMSybqsUSpdL8miLbmTMvv6RDx3tWg6lx0osYH28xOKFoA
+         rA8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=I+MhWIFw4wylC1ozMc1I6NteP9cQs0GMyFhEeS/9x94=;
-        b=OWVFSTBmh+wYsIOWO1YtnHg+exnopvWLnW885WlCSQcKT6Z+JPDc+aELOlU4UetDEd
-         skor0dGipPBghgTsQr5i0MeE8y3dBdLLOrlgdq8NP2xfc/LYBsaw9wrcDYDQ3d5SxOOL
-         cmSUaVPqsvImsCi/6K+0u0lH2KZiMGthZmTVdzlsrbfQbtRSiFPeB2PEfXw3IW4YJzOW
-         MUZ9KZ5GUf8BkLhT+vEt1lgarUg6khI4uMskV1BdNw1woOXTpiCbXny89W3J6dWWQuCL
-         KQGEDAt9hDktyvwhgK5GYbflSt2/Ru7lkxP69zcfBx0c+n8zC4DF9thkWSGtPBpkZI1v
-         6oKQ==
-X-Gm-Message-State: ACgBeo2xJnJHwYwhqjsy03dwUkh51+irh3j0xTSoNja61NA7Kvw8QJ2g
-        yrIN4H1N4A4V4uIelXahVu2qUgtOfCVbww==
-X-Google-Smtp-Source: AA6agR6Z/5z0zfK1Lw/zbWIonUTRWBnwZy3+t6qdtpbzAOqMPVy1ab/F5crA96OYWpHY0gHFfT3Elg==
-X-Received: by 2002:a05:620a:4042:b0:6bb:cdb:eef9 with SMTP id i2-20020a05620a404200b006bb0cdbeef9mr17037181qko.498.1661270103394;
-        Tue, 23 Aug 2022 08:55:03 -0700 (PDT)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
-        by smtp.gmail.com with ESMTPSA id k3-20020a05620a414300b006b942ae928bsm13330888qko.71.2022.08.23.08.55.03
-        for <linux-crypto@vger.kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=nKoC8OE/O/GQsF3EPOMsruSTs9kLL6O0oaBfPq3e28g=;
+        b=G82fs8jRvFXiuOR4Kdk9CYsDa5/xaKOlrNywUp2RVRc+XGHi767xf+wM4TGomDTCWo
+         lCUif1BkjdUi5JZ5D1AjhYmsn6hEwEOXuZpVdq3mPyunCtkU2Mt5vMG/3fFJGwbgd1A4
+         YTg/w0NpGku5eTEnq5CPPqPULYCF10w1Ric3HZDkTtefTDDLo4H18hpWArDgVtNUf5nR
+         ime2/NxyaHpt+a4vgxnTHxoZ2qQiDTKtx/AoiEd9FDEp765GhxeGyU0XgDUR8Y5ccXuK
+         RphJl9IiH+gJEL3xGhEMSEOOyMQtgwLg3x2xBso2ceKYmcfyra3WHKTR4N1b9iwOWbdu
+         QHlg==
+X-Gm-Message-State: ACgBeo2W71NNz699WzxhhYYk2AfDXewoXIlD9b5c0bRN1WMZ0PJTO7yq
+        i+0mQ3pCJLhEbOTOly5QmGWbbw==
+X-Google-Smtp-Source: AA6agR5USOIOfMIu3eXWb5tNMXUpwOsRF3pXjUg/3KIyzqgQANYdz3Mucb1dJhvQB5q5M83QcbNCMA==
+X-Received: by 2002:a5d:5985:0:b0:222:c827:11d5 with SMTP id n5-20020a5d5985000000b00222c82711d5mr14038109wri.323.1661272289310;
+        Tue, 23 Aug 2022 09:31:29 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id a14-20020adfed0e000000b0022511d35d5bsm14974943wro.12.2022.08.23.09.31.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Aug 2022 08:55:03 -0700 (PDT)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-33365a01f29so391297337b3.2
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Aug 2022 08:55:03 -0700 (PDT)
-X-Received: by 2002:a05:6830:58:b0:637:1974:140a with SMTP id
- d24-20020a056830005800b006371974140amr9735586otp.362.1661269795464; Tue, 23
- Aug 2022 08:49:55 -0700 (PDT)
+        Tue, 23 Aug 2022 09:31:28 -0700 (PDT)
+Message-ID: <f3910cac-84c4-61fa-c06a-268ec171f464@arista.com>
+Date:   Tue, 23 Aug 2022 17:31:22 +0100
 MIME-Version: 1.0
-References: <20220112211258.21115-1-chang.seok.bae@intel.com> <20220112211258.21115-8-chang.seok.bae@intel.com>
-In-Reply-To: <20220112211258.21115-8-chang.seok.bae@intel.com>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Tue, 23 Aug 2022 08:49:18 -0700
-X-Gmail-Original-Message-ID: <CAE=gft4P2iGJDiYJccZFR1VnNomQB7Uo522r2gvrfNY9oKz5jg@mail.gmail.com>
-Message-ID: <CAE=gft4P2iGJDiYJccZFR1VnNomQB7Uo522r2gvrfNY9oKz5jg@mail.gmail.com>
-Subject: Re: [PATCH v5 07/12] x86/cpu/keylocker: Load an internal wrapping key
- at boot-time
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        herbert@gondor.apana.org.au, Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org,
-        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>, bp@suse.de,
-        dave.hansen@linux.intel.com, mingo@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
-        ravi.v.shankar@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
+Content-Language: en-US
+To:     Leonard Crestez <cdleonard@gmail.com>,
+        David Ahern <dsahern@kernel.org>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>
+References: <20220818170005.747015-1-dima@arista.com>
+ <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
+ <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
+ <8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com>
+ <7ad5a9be-4ee9-bab2-4a70-b0f661f91beb@gmail.com>
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <7ad5a9be-4ee9-bab2-4a70-b0f661f91beb@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 1:21 PM Chang S. Bae <chang.seok.bae@intel.com> wrote:
->
-> The Internal Wrapping Key (IWKey) is an entity of Key Locker to encode a
-> clear text key into a key handle. This key is a pivot in protecting user
-> keys. So the value has to be randomized before being loaded in the
-> software-invisible CPU state.
->
-> IWKey needs to be established before the first user. Given that the only
-> proposed Linux use case for Key Locker is dm-crypt, the feature could be
-> lazily enabled when the first dm-crypt user arrives, but there is no
-> precedent for late enabling of CPU features and it adds maintenance burden
-> without demonstrative benefit outside of minimizing the visibility of
-> Key Locker to userspace.
->
-> The kernel generates random bytes and load them at boot time. These bytes
-> are flushed out immediately.
->
-> Setting the CR4.KL bit does not always enable the feature so ensure the
-> dynamic CPU bit (CPUID.AESKLE) is set before loading the key.
->
-> Given that the Linux Key Locker support is only intended for bare metal
-> dm-crypt consumption, and that switching IWKey per VM is untenable,
-> explicitly skip Key Locker setup in the X86_FEATURE_HYPERVISOR case.
->
-> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> Cc: x86@kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
-> Changes from RFC v2:
-> * Make bare metal only.
-> * Clean up the code (e.g. dynamically allocate the key cache).
->   (Dan Williams)
-> * Massage the changelog.
-> * Move out the LOADIWKEY wrapper and the Key Locker CPUID defines.
->
-> Note, Dan wonders that given that the only proposed Linux use case for
-> Key Locker is dm-crypt, the feature could be lazily enabled when the
-> first dm-crypt user arrives, but as Dave notes there is no precedent
-> for late enabling of CPU features and it adds maintenance burden
-> without demonstrative benefit outside of minimizing the visibility of
-> Key Locker to userspace.
-> ---
->  arch/x86/include/asm/keylocker.h |  9 ++++
->  arch/x86/kernel/Makefile         |  1 +
->  arch/x86/kernel/cpu/common.c     |  5 +-
->  arch/x86/kernel/keylocker.c      | 79 ++++++++++++++++++++++++++++++++
->  arch/x86/kernel/smpboot.c        |  2 +
->  5 files changed, 95 insertions(+), 1 deletion(-)
->  create mode 100644 arch/x86/kernel/keylocker.c
->
-> diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-> index e85dfb6c1524..820ac29c06d9 100644
-> --- a/arch/x86/include/asm/keylocker.h
-> +++ b/arch/x86/include/asm/keylocker.h
-> @@ -5,6 +5,7 @@
->
->  #ifndef __ASSEMBLY__
->
-> +#include <asm/processor.h>
->  #include <linux/bits.h>
->  #include <asm/fpu/types.h>
->
-> @@ -28,5 +29,13 @@ struct iwkey {
->  #define KEYLOCKER_CPUID_EBX_WIDE       BIT(2)
->  #define KEYLOCKER_CPUID_EBX_BACKUP     BIT(4)
->
-> +#ifdef CONFIG_X86_KEYLOCKER
-> +void setup_keylocker(struct cpuinfo_x86 *c);
-> +void destroy_keylocker_data(void);
-> +#else
-> +#define setup_keylocker(c) do { } while (0)
-> +#define destroy_keylocker_data() do { } while (0)
-> +#endif
-> +
->  #endif /*__ASSEMBLY__ */
->  #endif /* _ASM_KEYLOCKER_H */
-> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-> index 2ff3e600f426..e15efa238497 100644
-> --- a/arch/x86/kernel/Makefile
-> +++ b/arch/x86/kernel/Makefile
-> @@ -144,6 +144,7 @@ obj-$(CONFIG_PERF_EVENTS)           += perf_regs.o
->  obj-$(CONFIG_TRACING)                  += tracepoint.o
->  obj-$(CONFIG_SCHED_MC_PRIO)            += itmt.o
->  obj-$(CONFIG_X86_UMIP)                 += umip.o
-> +obj-$(CONFIG_X86_KEYLOCKER)            += keylocker.o
->
->  obj-$(CONFIG_UNWINDER_ORC)             += unwind_orc.o
->  obj-$(CONFIG_UNWINDER_FRAME_POINTER)   += unwind_frame.o
-> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> index 0083464de5e3..23b4aa437c1e 100644
-> --- a/arch/x86/kernel/cpu/common.c
-> +++ b/arch/x86/kernel/cpu/common.c
-> @@ -57,6 +57,8 @@
->  #include <asm/microcode_intel.h>
->  #include <asm/intel-family.h>
->  #include <asm/cpu_device_id.h>
-> +#include <asm/keylocker.h>
-> +
->  #include <asm/uv/uv.h>
->  #include <asm/sigframe.h>
->
-> @@ -1595,10 +1597,11 @@ static void identify_cpu(struct cpuinfo_x86 *c)
->         /* Disable the PN if appropriate */
->         squash_the_stupid_serial_number(c);
->
-> -       /* Set up SMEP/SMAP/UMIP */
-> +       /* Setup various Intel-specific CPU security features */
->         setup_smep(c);
->         setup_smap(c);
->         setup_umip(c);
-> +       setup_keylocker(c);
->
->         /* Enable FSGSBASE instructions if available. */
->         if (cpu_has(c, X86_FEATURE_FSGSBASE)) {
-> diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-> new file mode 100644
-> index 000000000000..87d775a65716
-> --- /dev/null
-> +++ b/arch/x86/kernel/keylocker.c
-> @@ -0,0 +1,79 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +/*
-> + * Setup Key Locker feature and support internal wrapping key
-> + * management.
-> + */
-> +
-> +#include <linux/random.h>
-> +#include <linux/poison.h>
-> +
-> +#include <asm/fpu/api.h>
-> +#include <asm/keylocker.h>
-> +#include <asm/tlbflush.h>
-> +
-> +static __initdata struct keylocker_setup_data {
-> +       struct iwkey key;
-> +} kl_setup;
-> +
-> +static void __init generate_keylocker_data(void)
-> +{
-> +       get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
-> +       get_random_bytes(&kl_setup.key.encryption_key, sizeof(kl_setup.key.encryption_key));
-> +}
-> +
-> +void __init destroy_keylocker_data(void)
-> +{
-> +       memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
-> +}
-> +
-> +static void __init load_keylocker(void)
+On 8/23/22 16:30, Leonard Crestez wrote:
+> On 8/22/22 23:35, Dmitry Safonov wrote:
+>> Hi Leonard, David,
+[..]
+>> At this particular moment, it seems neither of patch sets is ready to be
+>> merged "as-is". But it seems that there's enough interest from both
+>> sides and likely it guarantees that there will be enough effort to make
+>> something merge-able, that will work for all interested parties.
+>>
+>> As for my part, I'm interested in the best code upstream, regardless who
+>> is the author. This includes:
+>> - reusing the existing TCP-MD5 code, rather than copying'n'pasting for
+>>    TCP-AO with intent to refactor it some day later
+> 
+> I had a requirement to deploy on linux 5.4 so I very deliberately
+> avoided touching MD5. I'm not sure there very much duplication anyway.
 
-I am late to this party by 6 months, but:
-load_keylocker() cannot be __init, as it gets called during SMP core onlining.
+Yeah, I know what you mean: we deployed it on v4.19. But for the code
+upstream I personally prefer to see "reusing" rather than copying.
+Lesser code is easier to maintain in future.
+Upstream submissions in my view should be based on "what would be easier
+to maintain in future", rather than on "what would be easier to backport
+to my maintenance release".
+
+>> - making setsockopt()s and other syscalls extendable
+>> - cover functionality with selftests
+> 
+> My implementation is tested with a standalone python package, this is a
+> design choice which doesn't particularly matter.
+> 
+>> - following RFC5925 in implementation, especially "required" and "must"
+>>    parts
+> 
+> I'm not convinced that "don't delete current key" needs to be literally
+> interpreted as a hard requirement for the linux ABI. Most TCP RFCs don't
+> specify any sort of API at all and it would be entirely valid to
+> implement BGP-TCP-AO as a single executable with no internally
+> documented boundaries.
+
+I agree that RFC requirements and "musts" can be implemented in
+userspace, rather than in kernel. On the other hand, my opinion is that
+if you have "must"/"must not"/"required" in RFC and it's not hard to
+limit those in kernel, than you _should_ do it.
+In this point of view, debugging "hey, setsockopt() for key removal
+returned -EBUSY, what's going on?" is better than "hey, tcp connection
+died on my side and I didn't have tcp dump running, what was that?".
+
+>> I hope that clarifies how and why now there are two patch sets that
+>> implement the same RFC/functionality.
+> 
+> As far as I can tell the biggest problem is that is quite difficult to
+> implement the userspace side of TCP-AO complete with key rollover. Our
+> two implementation both claim to support this but through different ABI
+> and both require active management from userspace.
+> 
+> I think it would make sense to push key validity times and the key
+> selection policy entirely in the kernel so that it can handle key
+> rotation/expiration by itself. This way userspace only has to configure
+> the keys and doesn't have to touch established connections at all.
+
+Respectfully I disagree here. I think all such policies should be
+implemented in userspace. The kernel has to have as lesser as possible,
+but enough to provide a way to sign, verify, log messages on TCP segments.
+All the logic that may change, all business decisions and key management
+should be implemented in userspace, keeping the kernel part as easier in
+"KISS" sense as possible.
+
+> My series has a "flags" field on the key struct where it can filter by
+> IP, prefix, ifindex and so on. It would be possible to add additional
+> flags for making the key only valid between certain times (by wall time).
+> 
+> The kernel could then make key selections itself:
+>  - send rnextkeyid based on the key with the longest recv lifetime
+>  - send keyid based on remote rnextkeyid.
+>    - If not applicable (rnextkeyid not found locally, or for SYN) pick
+> based on longest send lifetime.
+>  - If all keys expire then return an error on write()
+>  - Solve other ambiguities in a predictable way: if valid times are
+> equal then pick the lowest numeric send_id or recv_id.
+> 
+> Explicit key selection from userspace could still be supported but it
+> would be optional and most apps wouldn't bother implementing their own
+> policy. The biggest advantage is that it would be much easier for
+> applications to adopt TCP-AO.
+
+Personally, I would think that all you mentioned better stay in
+userspace app. The kernel should do as minimal and as much predictable
+as possible job here, without 10 possible outcomes. If you want to share
+the logic of key rotation/expiration, all timers and synchronization
+between different BGP applications, that would be a proper job for a
+shared library.
+
+Thanks,
+          Dmitry
