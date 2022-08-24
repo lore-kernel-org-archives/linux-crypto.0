@@ -2,981 +2,185 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3938BC00140
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 15:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E959C00140
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 16:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239181AbiHXP72 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Aug 2022 11:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40694 "EHLO
+        id S238635AbiHXQYu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Aug 2022 12:24:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238994AbiHXP7T (ORCPT
+        with ESMTP id S237076AbiHXQYt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2022 11:59:19 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F187CB7B
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:16 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id s36-20020a17090a69a700b001faad0a7a34so2068744pjj.4
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc;
-        bh=TnU8X41OfPzH1OUWbjpmgF99MHek2e/7iN7G+fpdmeM=;
-        b=PGwS1ttcAU+/aINPL6FBy/8AOhk6T634V9LxMnF/i69jKoPYkavpIEvRRwQUMBeazi
-         vW8VlfHegOnk133AUfJVe7fKJ4UCTVcbQv7yPKlqYhMShchremH0FPpEkhbYnor5r0ia
-         VxktwqjvZ1PSSzCLXJv/L9p427nzcEcqp6feWUiWTuc4j3iF9HEMIvJTZujNg/nEpVtl
-         D7J2VLbT82MajMERP6ZtYlncqA47+dCvgUkYy3M18e+rg4UBVSeXKsVAo+UUZDFsyD2g
-         yDAPhMk8IGBCK2wipCcBJrBux0YNbntsdcRi2kWsfHSV6xPpo/KaZT9QG2dLyaKIWyUd
-         NpJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc;
-        bh=TnU8X41OfPzH1OUWbjpmgF99MHek2e/7iN7G+fpdmeM=;
-        b=7HGI0hEA/vnUfNuUI2CSfNgnwGcDuy1Bt5AJbLWGSUD/Fch1DTOPhAd+3kfNJcA0pU
-         hU3lht3nu7hw0+uhsoDQuPzYY1lP6VP2yYxJhLx/1gGCIdd6i/4X4ZhlrVrgw2XIfk22
-         1mrP7hphzFfmMdW3vFv6dJGJJASIfL8zfYjdJf1BTsi3fYVwSinFoANNMmvn9S59dHw0
-         sUOPzRMmFeNm7Ic/5FehehMpCjETF46VmRUovh/vpJk5wh0/AYIoCEShexl5+kPsug4R
-         rzwTK3uEPEgom6V3kdw4OZyLqb9whvKpQaJs2tW2AIUp2b/zze1KdD9tzK4kgrAYyijE
-         /3SA==
-X-Gm-Message-State: ACgBeo329BarcOlzvqDY27ON2zlGQGlpYoixx3SuecWZ0RDes130D9Ho
-        VQSmVw8PItKJboMWw7hd+6VXJJ1U1HM=
-X-Google-Smtp-Source: AA6agR7P9kb8ZViJJ/9enRUB0Zc8woGrDDZD7o9lTUC+KH3op0jqrXEG4p3FNYx2Mb8CNweSm2Yr5w==
-X-Received: by 2002:a17:902:be02:b0:172:d409:e057 with SMTP id r2-20020a170902be0200b00172d409e057mr19665591pls.90.1661356754656;
-        Wed, 24 Aug 2022 08:59:14 -0700 (PDT)
-Received: from localhost.localdomain ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id 12-20020a17090a034c00b001fb438fb772sm1540318pjf.56.2022.08.24.08.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 08:59:13 -0700 (PDT)
-From:   Taehee Yoo <ap420073@gmail.com>
-To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com
-Cc:     ap420073@gmail.com
-Subject: [PATCH 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64 assembler implementation of aria cipher
-Date:   Wed, 24 Aug 2022 15:58:51 +0000
-Message-Id: <20220824155852.12671-3-ap420073@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220824155852.12671-1-ap420073@gmail.com>
-References: <20220824155852.12671-1-ap420073@gmail.com>
+        Wed, 24 Aug 2022 12:24:49 -0400
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E4C1138;
+        Wed, 24 Aug 2022 09:24:47 -0700 (PDT)
+Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27OGI7k6010864;
+        Wed, 24 Aug 2022 16:24:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pps0720;
+ bh=GMbBZ3NNyTmW365D9ZbWGmYApa8GTvsTS0pPCMCISng=;
+ b=n2oclNrWTAvHoxAFbELnpQm1jwyf+DC0Mfj2DeGp39KJi8bb6D9a8x8Zynh/6jUwQ78/
+ z8esxZbziG3cCAh4If9mqL1eTzPpdw3Nbg5B2pGnB75LEHXu8YJL4RntQnLTUMq2L5TE
+ pOGOUecKSZLPvfq8x+aUPBhNiKpp0ZH4vLLmKU+xNPWgs/HNKQJywsWQyo5XA2nSbfZT
+ Yxpo+B++tcLiRQiBnxvaGJDFlYamwb2jqygxzeUZPJtrlwT0ANLrFU/9vNPv4JP+zf+s
+ 4uLnG1lm6NHljSjqv6zRIXdPJ/5gLY+c6xmTtpI7isi0OQa6GZGqBcg4C2ss9AX+To6R yw== 
+Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j5qctg1r9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Aug 2022 16:24:38 +0000
+Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id B51A0804CA9;
+        Wed, 24 Aug 2022 16:24:37 +0000 (UTC)
+Received: from p1wg14923.americas.hpqcorp.net (10.119.18.111) by
+ p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Wed, 24 Aug 2022 04:24:37 -1200
+Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
+ via Frontend Transport; Wed, 24 Aug 2022 04:24:37 -1200
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Wed, 24 Aug 2022 04:24:37 -1200
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N0sOz4bA4qkBLkutaLz+l90kw6K+r9vlX1eUUW9rSWjCbbxWLtCTW9ac4qdAobuD/bKByP7yPsRBS6bkK4/QGgev+bNi8VBm+stbpc0gZ0SW/tsY8EOqG5PeAnLmyroJOrjFxH5z4hnBd1+myhatl9+tV25boSokuCUEn8hNIsPB1tPNlZNXj3wCvGx93M+g6YzPpAAO5QpD1Qz7ucQdc+9YWPYEJ8ZvoNJ2osVpXBSUMvVH/CaC9DXnHRU3uoxF10z88PMXvAOcKRTtgpp1lcMjvmb9PeCILvcU1DXGOmpaSiEWGzVDpf7vZWk4NMtxK4zU4q0uVU1eZB9JtEqKEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GMbBZ3NNyTmW365D9ZbWGmYApa8GTvsTS0pPCMCISng=;
+ b=BgX0OxCuWPUsytc2TWAtI7jijFQ/qSp22KRxbxb4IW9vjiPqC9W0kkhOS8TaSAPYrSI1Sb83CIaCht184YxFCf+tLxit8mV82D/R3poSsHk9UCbOTkfSkt9+KaFoVJhYc0VlXAbE1TYmllAym2CBYKGLidvCkzyYT2kCgR2DwlSZp1Gs0oeE1mqLoC7SoWBazinVCgAfJkUR/NFGtAOPiQ2ftB6obB0x6fI0qTrUWwCFlXkdGdqzTjmXZ3LJqAkhYGBONKu1K4whnNUQcJWpHFgKTzwuMdqAZeEvtiEY1sH9ohNZl7ZR8LdH0tb+QVC6iYJss3TXn41rUeyNaj+qNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
+ by MW5PR84MB1716.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Wed, 24 Aug
+ 2022 16:24:36 +0000
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::1cc2:4b7b:f4c5:fbb4]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::1cc2:4b7b:f4c5:fbb4%5]) with mapi id 15.20.5525.011; Wed, 24 Aug 2022
+ 16:24:36 +0000
+From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
+To:     'Guanjun' <guanjun@linux.alibaba.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
+        "xuchun.shang@linux.alibaba.com" <xuchun.shang@linux.alibaba.com>,
+        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v1 5/9] crypto/ycc: Add skcipher algorithm support
+Thread-Topic: [PATCH v1 5/9] crypto/ycc: Add skcipher algorithm support
+Thread-Index: AQHYt592LeYGvN6dxkWzbHNUpEGlNa2+OPpw
+Date:   Wed, 24 Aug 2022 16:24:35 +0000
+Message-ID: <MW5PR84MB1842B41754897B029B6949E5AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com>
+ <1661334621-44413-6-git-send-email-guanjun@linux.alibaba.com>
+In-Reply-To: <1661334621-44413-6-git-send-email-guanjun@linux.alibaba.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 742d481a-6c7b-4140-d99a-08da85ed2296
+x-ms-traffictypediagnostic: MW5PR84MB1716:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xIuEDpUMTUGXQTQ1Z/6Sm6GGYrAF5zEs1uBgg9osHDFWMQojfnQflrRzCtE3jgb97z3H8MOwsSgtJU7J23ujmiIwPWr5eF1fKZOaQ7IfB7l8bdknExg69fVIuSzqE7c1W7NmkI+gc/l4Cf+qjZAUMqJRMvYa48npTjj71HecxSZlZ7bIWdMZoPBW8mmJWgSv5Q4206vJXkWWOjavk61VtCgKyAhwCDq6qwO8qdZOV3swpmfrZzP4or1DhmkrutThRVQUJ0/0H7dVfP6eouovzaFq6yS9jp/b+R2CZs/pIf83Z1nRf/I1V+IbV9EWc4XhOWSr6j5rf9tvVaCdwzbg5RzeXWV7YVCmmUiqgTns/ykPRSN3DUjCXcr7N0ZOXm+EQLmaMlUklP3qoXAScuvEpYx/BOJMLx94WYEL0T/OtfMzjlCQ12dQGHIoV1GLsV7aBNmB2yeXf315NE54eAoLsHdI4OgRCV7Q2Ug21y1YzFd8z6uOGi2CVjfXjc1OoLAmjfs52IrmAN/I+4yjM2yiJePMPlJcMb7mZmJtXYgsDlJhsVAO/XIFa/7tvXlev7A4eiagJzltry+yVei5ZEacRFfSN9UClglDd/DETSw2famyNHiBFUvjs5B2V501dNDrVxqdga+K9qZMV8n7LunZZEODjfx0/7so/NfaE8Qk90oY63tUGDCar+WEo4Jgd40OPC33In+Hd6zJKpbNmwArmblsbiFKrj+mYCT24SsvkdBC1fDPXO1LEFwLokBMOCSr9Tmnw4LGi23FNqDp2i2z7g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230016)(346002)(376002)(396003)(39860400002)(136003)(366004)(7696005)(6506007)(71200400001)(53546011)(86362001)(478600001)(26005)(54906003)(110136005)(55016003)(9686003)(186003)(4744005)(76116006)(4326008)(66556008)(66446008)(64756008)(66476007)(8676002)(52536014)(122000001)(38100700002)(66946007)(83380400001)(38070700005)(316002)(41300700001)(5660300002)(2906002)(8936002)(82960400001)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?o6IVN6eAzggXqwdfMHKrvow2GbJtimMzWd3g/hdTG9QBJhROBr9kIPorlMcs?=
+ =?us-ascii?Q?4qt14AVOf42Z751kvi/nvtJzK+W5RdWFIm3UixntnebfObI1ZSi/Wwexp3YO?=
+ =?us-ascii?Q?bUnNVafYXkXhPE8I3TMWfYLKMTn779eNGOfYvFcshnU69inojJjrIxhj4lFw?=
+ =?us-ascii?Q?zfMlVQBvPtPB7ggtQTilI6JikaPa7KpZCyhh+ic5AXbt7YHTA0d/Fnf1H+cf?=
+ =?us-ascii?Q?OL3rn3fLMYPGorxJ0hBF2zk5wvm5oh5NmxwDZZWOZbAaxNQwZ3itenvrHkgE?=
+ =?us-ascii?Q?SUOO6gJ4eGC5Z/zcCVqhvtRF0b/n/aRgADD4AsasYb8H2QLdmihXS5x47diG?=
+ =?us-ascii?Q?0kOe4mZCQfaUiyg6x8BshZj7mbwIiHFRpL7fW9dQV831/pS2WOSIl/2Z9GzR?=
+ =?us-ascii?Q?ewSFtzZMvlTcTzjLG4VbMuY9boNjlfEfv74dJEZEUjjT1IWI8jElQdyFQ/Nl?=
+ =?us-ascii?Q?GB3ncgcpZ1mx3GgpkctcTVcdujixvRM/m4g+yb7ZrOJSZk9EFDIWd+cp6zJ3?=
+ =?us-ascii?Q?8N//5sbINwHWQBrhyoEMwZe/I7VCJFJCOuhkiYXo8JZ9bfVwFpvxikSXkoGM?=
+ =?us-ascii?Q?XBwFtBvi6pfNfhB79YyBhrBTCpliLKaqRcSECRXAt6tl8ZyknyU2clsHprBt?=
+ =?us-ascii?Q?Z1zk1ilQjlIgruywbHOO/YdO68V5KBDoi4pr4UgWj8V4tcvF5eSj/JzzF7Zc?=
+ =?us-ascii?Q?CJKRg0tLUmtCuiFOdrG47I9EWTzYF5bHwcarrMh0Wdn52AG3txICTvF8LH24?=
+ =?us-ascii?Q?z7BMPiBQU6KZ9L0wMdzEzQqSgJbZ3cFnemDALFpTquGYVE6/3KFLTZBxHzmS?=
+ =?us-ascii?Q?VWWk7lJkoewCCUgGZbCd9rRbiYUwcVOrGNLVGT5pBo7hTcdq5GAGsq4yXpEw?=
+ =?us-ascii?Q?mFsSCwf6PmvisZDrTqnqaownmr+EAMNeS3lvtoNpL6T6epZs82rhwAVZo/jo?=
+ =?us-ascii?Q?iL0gVrAISUbgZFl/R50i8OpkM84fCvKh0kmRjf5MjDxkZPr2QoZemIY7XH75?=
+ =?us-ascii?Q?1H5GzMplzRzrzFyz//U9eypWPOtTHhVUoNMRbtV/1bykBhMz5ZNXfXwajNPR?=
+ =?us-ascii?Q?aoSdJpqN1yIvy54Fkf+ILIc9SqSQwEdscuPhgeblrQfQIxwcsOH/TLL9DyQP?=
+ =?us-ascii?Q?DiO7oF03te0SIzGuUvzi1M5JcMORCw6ckb2KFYmvWzQJ1YBKA5FtGpDegZn6?=
+ =?us-ascii?Q?5l/a0Fqm5gbD2r4D9+ex1JRYikXEkR/jgZwFxxM2dMUOzKM2pepIH0/xDLi8?=
+ =?us-ascii?Q?tdi7zB3Ogi+T928iwvsxbgUTD+DH7MPPT676Co3GnGPDgc7ONOe7h8pl0akR?=
+ =?us-ascii?Q?2isZ+lMDRjuP3aWdr1PdLbNCPvhWC4A2DBwsQzDPZulAd1+n7I3T7QWLAoqi?=
+ =?us-ascii?Q?hCf78V5K5KpKd41V9nAZPUGQTl5+cJmxoyC+kJFFvtkpwB1W0CjuRj6Wqv5P?=
+ =?us-ascii?Q?kHG+dmYJjwhGEPaIW2MWkw2E3jXtf9fhbJS1BZtnxbpduE3IE+Q7wxy1Vkc5?=
+ =?us-ascii?Q?llQpUamTJNHgAR1nqj2RuFv2ncXI2vSQAeMckVifu+ca3LXALerrFe+Q5hiV?=
+ =?us-ascii?Q?1Cc7kz4l4gU3qP0Oplo=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 742d481a-6c7b-4140-d99a-08da85ed2296
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2022 16:24:35.9933
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DrX+z068LTJqxoZWrpxP3lLacCeDhhOF1HdT/7YDifihJ5e9ptUbzpxkobu3h4Fu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR84MB1716
+X-OriginatorOrg: hpe.com
+X-Proofpoint-GUID: z6TuYAqT4rigk7sxHR-QKHq9rS4GjaeA
+X-Proofpoint-ORIG-GUID: z6TuYAqT4rigk7sxHR-QKHq9rS4GjaeA
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-24_09,2022-08-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ mlxlogscore=909 clxscore=1015 impostorscore=0 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208240061
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The implementation is based on the 32-bit implementation of the aria.
-Also, aria-avx process steps are the similar to the camellia-avx.
-1. Byteslice(16way)
-2. Add-round-key.
-3. Sbox
-4. Diffusion layer.
 
-Except for s-box, all steps are the same as the aria-generic
-implementation. s-box step is very similar to camellia and
-sm4 implementation.
 
-There are 4 s-boxes in the ARIA and the 2 s-boxes are the same as
-AES's s-boxes. The basic strategy is to use the aes-ni.
+> -----Original Message-----
+> From: 'Guanjun' <guanjun@linux.alibaba.com>
+> Sent: Wednesday, August 24, 2022 4:50 AM
+> Subject: [PATCH v1 5/9] crypto/ycc: Add skcipher algorithm support
+>=20
+...
 
-To calculate a first sbox, it just uses the aesenclast and then
-inverts shift_row.
-No more process is needed for this job because the first s-box is
-the same as the AES encryption s-box.
+> +static struct skcipher_alg ycc_skciphers[] =3D {
+> +	{
+> +		.base =3D {
+> +			.cra_name =3D "cbc(aes)",
+> +			.cra_driver_name =3D "ycc_cbc(aes)",
 
-To calculate a second sbox(invert of s1), it just uses the aesdeclast
-and then inverts shift_row.
-No more process is needed for this job because the second s-box is
-the same as the AES decryption s-box.
+In comparison, the aead driver puts the hardware driver name as a suffix,
+not a prefix, and uses dashes rather than underscores and parenthesis:
+> +			.cra_name =3D "gcm(aes)",
+> +			.cra_driver_name =3D "gcm-aes-ycc",
 
-To calculate a third and fourth s-boxes, it uses the aesenclast,
-then inverts shift_row, and affine transformation.
+and the pk driver uses a prefix with a dash:
+> +		.cra_name =3D "rsa",
+> +		.cra_driver_name =3D "ycc-rsa",
 
-The aria-generic implementation is based on a 32-bit implementation,
-not an 8-bit implementation. the aria-avx Diffusion Layer implementation
-is based on aria-generic implementation because 8-bit implementation is
-not fit for parallel implementation but 32-bit is enough to fit for this.
+Although the existing drivers are wildly inconsistent, it would be nice
+if this driver was at least consistent with itself. Suffixes with dashes
+seem to be the most popular, so consider these formats:
+  cbc-aes-ycc
+  gcm-aes-ycc
+  rsa-ycc
 
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
- arch/x86/crypto/Makefile                |   3 +
- arch/x86/crypto/aria-aesni-avx-asm_64.S | 648 ++++++++++++++++++++++++
- arch/x86/crypto/aria_aesni_avx_glue.c   | 165 ++++++
- crypto/Kconfig                          |  21 +
- 4 files changed, 837 insertions(+)
- create mode 100644 arch/x86/crypto/aria-aesni-avx-asm_64.S
- create mode 100644 arch/x86/crypto/aria_aesni_avx_glue.c
-
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 04d07ab744b2..3b1d701a4f6c 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -100,6 +100,9 @@ sm4-aesni-avx-x86_64-y := sm4-aesni-avx-asm_64.o sm4_aesni_avx_glue.o
- obj-$(CONFIG_CRYPTO_SM4_AESNI_AVX2_X86_64) += sm4-aesni-avx2-x86_64.o
- sm4-aesni-avx2-x86_64-y := sm4-aesni-avx2-asm_64.o sm4_aesni_avx2_glue.o
- 
-+obj-$(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) += aria-aesni-avx-x86_64.o
-+aria-aesni-avx-x86_64-y := aria-aesni-avx-asm_64.o aria_aesni_avx_glue.o
-+
- quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $< > $@
- $(obj)/%.S: $(src)/%.pl FORCE
-diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
-new file mode 100644
-index 000000000000..3d01f5229f72
---- /dev/null
-+++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
-@@ -0,0 +1,648 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * ARIA Cipher 16-way parallel algorithm (AVX)
-+ *
-+ * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
-+ *
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/frame.h>
-+
-+#define filter_8bit(x, lo_t, hi_t, mask4bit, tmp0)	\
-+	vpand x, mask4bit, tmp0;			\
-+	vpandn x, mask4bit, x;				\
-+	vpsrld $4, x, x;				\
-+							\
-+	vpshufb tmp0, lo_t, tmp0;			\
-+	vpshufb x, hi_t, x;				\
-+	vpxor tmp0, x, x;
-+
-+#define transpose_4x4(x0, x1, x2, x3, t1, t2)		\
-+	vpunpckhdq x1, x0, t2;				\
-+	vpunpckldq x1, x0, x0;				\
-+							\
-+	vpunpckldq x3, x2, t1;				\
-+	vpunpckhdq x3, x2, x2;				\
-+							\
-+	vpunpckhqdq t1, x0, x1;				\
-+	vpunpcklqdq t1, x0, x0;				\
-+							\
-+	vpunpckhqdq x2, t2, x3;				\
-+	vpunpcklqdq x2, t2, x2;
-+
-+#define byteslice_16x16b(a0, b0, c0, d0,		\
-+			 a1, b1, c1, d1,		\
-+			 a2, b2, c2, d2,		\
-+			 a3, b3, c3, d3,		\
-+			 st0, st1)			\
-+	vmovdqu d2, st0;				\
-+	vmovdqu d3, st1;				\
-+	transpose_4x4(a0, a1, a2, a3, d2, d3);		\
-+	transpose_4x4(b0, b1, b2, b3, d2, d3);		\
-+	vmovdqu st0, d2;				\
-+	vmovdqu st1, d3;				\
-+							\
-+	vmovdqu a0, st0;				\
-+	vmovdqu a1, st1;				\
-+	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
-+	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
-+							\
-+	vmovdqu .Lshufb_16x16b, a0;			\
-+	vmovdqu st1, a1;				\
-+	vpshufb a0, a2, a2;				\
-+	vpshufb a0, a3, a3;				\
-+	vpshufb a0, b0, b0;				\
-+	vpshufb a0, b1, b1;				\
-+	vpshufb a0, b2, b2;				\
-+	vpshufb a0, b3, b3;				\
-+	vpshufb a0, a1, a1;				\
-+	vpshufb a0, c0, c0;				\
-+	vpshufb a0, c1, c1;				\
-+	vpshufb a0, c2, c2;				\
-+	vpshufb a0, c3, c3;				\
-+	vpshufb a0, d0, d0;				\
-+	vpshufb a0, d1, d1;				\
-+	vpshufb a0, d2, d2;				\
-+	vpshufb a0, d3, d3;				\
-+	vmovdqu d3, st1;				\
-+	vmovdqu st0, d3;				\
-+	vpshufb a0, d3, a0;				\
-+	vmovdqu d2, st0;				\
-+							\
-+	transpose_4x4(a0, b0, c0, d0, d2, d3);		\
-+	transpose_4x4(a1, b1, c1, d1, d2, d3);		\
-+	vmovdqu st0, d2;				\
-+	vmovdqu st1, d3;				\
-+							\
-+	vmovdqu b0, st0;				\
-+	vmovdqu b1, st1;				\
-+	transpose_4x4(a2, b2, c2, d2, b0, b1);		\
-+	transpose_4x4(a3, b3, c3, d3, b0, b1);		\
-+	vmovdqu st0, b0;				\
-+	vmovdqu st1, b1;				\
-+	/* does not adjust output bytes inside vectors */
-+
-+#define debyteslice_16x16b(a0, b0, c0, d0,		\
-+			   a1, b1, c1, d1,		\
-+			   a2, b2, c2, d2,		\
-+			   a3, b3, c3, d3,		\
-+			   st0, st1)			\
-+	vmovdqu d2, st0;				\
-+	vmovdqu d3, st1;				\
-+	transpose_4x4(a0, a1, a2, a3, d2, d3);		\
-+	transpose_4x4(b0, b1, b2, b3, d2, d3);		\
-+	vmovdqu st0, d2;				\
-+	vmovdqu st1, d3;				\
-+							\
-+	vmovdqu a0, st0;				\
-+	vmovdqu a1, st1;				\
-+	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
-+	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
-+							\
-+	vmovdqu .Lshufb_16x16b, a0;			\
-+	vmovdqu st1, a1;				\
-+	vpshufb a0, a2, a2;				\
-+	vpshufb a0, a3, a3;				\
-+	vpshufb a0, b0, b0;				\
-+	vpshufb a0, b1, b1;				\
-+	vpshufb a0, b2, b2;				\
-+	vpshufb a0, b3, b3;				\
-+	vpshufb a0, a1, a1;				\
-+	vpshufb a0, c0, c0;				\
-+	vpshufb a0, c1, c1;				\
-+	vpshufb a0, c2, c2;				\
-+	vpshufb a0, c3, c3;				\
-+	vpshufb a0, d0, d0;				\
-+	vpshufb a0, d1, d1;				\
-+	vpshufb a0, d2, d2;				\
-+	vpshufb a0, d3, d3;				\
-+	vmovdqu d3, st1;				\
-+	vmovdqu st0, d3;				\
-+	vpshufb a0, d3, a0;				\
-+	vmovdqu d2, st0;				\
-+							\
-+	transpose_4x4(c0, d0, a0, b0, d2, d3);		\
-+	transpose_4x4(c1, d1, a1, b1, d2, d3);		\
-+	vmovdqu st0, d2;				\
-+	vmovdqu st1, d3;				\
-+							\
-+	vmovdqu b0, st0;				\
-+	vmovdqu b1, st1;				\
-+	transpose_4x4(c2, d2, a2, b2, b0, b1);		\
-+	transpose_4x4(c3, d3, a3, b3, b0, b1);		\
-+	vmovdqu st0, b0;				\
-+	vmovdqu st1, b1;				\
-+	/* does not adjust output bytes inside vectors */
-+
-+/* load blocks to registers and apply pre-whitening */
-+#define inpack16_pre(x0, x1, x2, x3,			\
-+		     x4, x5, x6, x7,			\
-+		     y0, y1, y2, y3,			\
-+		     y4, y5, y6, y7,			\
-+		     rio)				\
-+	vmovdqu (0 * 16)(rio), x0;			\
-+	vmovdqu (1 * 16)(rio), x1;			\
-+	vmovdqu (2 * 16)(rio), x2;			\
-+	vmovdqu (3 * 16)(rio), x3;			\
-+	vmovdqu (4 * 16)(rio), x4;			\
-+	vmovdqu (5 * 16)(rio), x5;			\
-+	vmovdqu (6 * 16)(rio), x6;			\
-+	vmovdqu (7 * 16)(rio), x7;			\
-+	vmovdqu (8 * 16)(rio), y0;			\
-+	vmovdqu (9 * 16)(rio), y1;			\
-+	vmovdqu (10 * 16)(rio), y2;			\
-+	vmovdqu (11 * 16)(rio), y3;			\
-+	vmovdqu (12 * 16)(rio), y4;			\
-+	vmovdqu (13 * 16)(rio), y5;			\
-+	vmovdqu (14 * 16)(rio), y6;			\
-+	vmovdqu (15 * 16)(rio), y7;
-+
-+/* byteslice pre-whitened blocks and store to temporary memory */
-+#define inpack16_post(x0, x1, x2, x3,			\
-+		      x4, x5, x6, x7,			\
-+		      y0, y1, y2, y3,			\
-+		      y4, y5, y6, y7,			\
-+		      mem_ab, mem_cd)			\
-+	byteslice_16x16b(x0, x1, x2, x3,		\
-+			 x4, x5, x6, x7,		\
-+			 y0, y1, y2, y3,		\
-+			 y4, y5, y6, y7,		\
-+			 (mem_ab), (mem_cd));		\
-+							\
-+	vmovdqu x0, 0 * 16(mem_ab);			\
-+	vmovdqu x1, 1 * 16(mem_ab);			\
-+	vmovdqu x2, 2 * 16(mem_ab);			\
-+	vmovdqu x3, 3 * 16(mem_ab);			\
-+	vmovdqu x4, 4 * 16(mem_ab);			\
-+	vmovdqu x5, 5 * 16(mem_ab);			\
-+	vmovdqu x6, 6 * 16(mem_ab);			\
-+	vmovdqu x7, 7 * 16(mem_ab);			\
-+	vmovdqu y0, 0 * 16(mem_cd);			\
-+	vmovdqu y1, 1 * 16(mem_cd);			\
-+	vmovdqu y2, 2 * 16(mem_cd);			\
-+	vmovdqu y3, 3 * 16(mem_cd);			\
-+	vmovdqu y4, 4 * 16(mem_cd);			\
-+	vmovdqu y5, 5 * 16(mem_cd);			\
-+	vmovdqu y6, 6 * 16(mem_cd);			\
-+	vmovdqu y7, 7 * 16(mem_cd);
-+
-+/* de-byteslice, apply post-whitening and store blocks */
-+#define outunpack16(x0, x1, x2, x3,			\
-+		    x4, x5, x6, x7,			\
-+		    y0, y1, y2, y3,			\
-+		    y4, y5, y6, y7,			\
-+		    mem_ab, mem_cd)			\
-+	debyteslice_16x16b(y0, y4, x0, x4,		\
-+			   y1, y5, x1, x5,		\
-+			   y2, y6, x2, x6,		\
-+			   y3, y7, x3, x7,		\
-+			   (mem_ab), (mem_cd));		\
-+	vmovdqu x0, 0 * 16(mem_ab);			\
-+	vmovdqu x1, 1 * 16(mem_ab);			\
-+	vmovdqu x2, 2 * 16(mem_ab);			\
-+	vmovdqu x3, 3 * 16(mem_ab);			\
-+	vmovdqu x4, 4 * 16(mem_ab);			\
-+	vmovdqu x5, 5 * 16(mem_ab);			\
-+	vmovdqu x6, 6 * 16(mem_ab);			\
-+	vmovdqu x7, 7 * 16(mem_ab);			\
-+	vmovdqu y0, 8 * 16(mem_ab);			\
-+	vmovdqu y1, 9 * 16(mem_ab);			\
-+	vmovdqu y2, 10 * 16(mem_ab);			\
-+	vmovdqu y3, 11 * 16(mem_ab);			\
-+	vmovdqu y4, 12 * 16(mem_ab);			\
-+	vmovdqu y5, 13 * 16(mem_ab);			\
-+	vmovdqu y6, 14 * 16(mem_ab);			\
-+	vmovdqu y7, 15 * 16(mem_ab);			\
-+
-+#define aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, idx)		\
-+	vmovdqu x0, ((idx + 0) * 16)(mem_tmp);		\
-+	vmovdqu x1, ((idx + 1) * 16)(mem_tmp);		\
-+	vmovdqu x2, ((idx + 2) * 16)(mem_tmp);		\
-+	vmovdqu x3, ((idx + 3) * 16)(mem_tmp);		\
-+	vmovdqu x4, ((idx + 4) * 16)(mem_tmp);		\
-+	vmovdqu x5, ((idx + 5) * 16)(mem_tmp);		\
-+	vmovdqu x6, ((idx + 6) * 16)(mem_tmp);		\
-+	vmovdqu x7, ((idx + 7) * 16)(mem_tmp);
-+
-+#define aria_load_state_8way(x0, x1, x2, x3,		\
-+			     x4, x5, x6, x7,		\
-+			     mem_tmp, idx)		\
-+	vmovdqu ((idx + 0) * 16)(mem_tmp), x0;		\
-+	vmovdqu ((idx + 1) * 16)(mem_tmp), x1;		\
-+	vmovdqu ((idx + 2) * 16)(mem_tmp), x2;		\
-+	vmovdqu ((idx + 3) * 16)(mem_tmp), x3;		\
-+	vmovdqu ((idx + 4) * 16)(mem_tmp), x4;		\
-+	vmovdqu ((idx + 5) * 16)(mem_tmp), x5;		\
-+	vmovdqu ((idx + 6) * 16)(mem_tmp), x6;		\
-+	vmovdqu ((idx + 7) * 16)(mem_tmp), x7;
-+
-+#define aria_ark_8way(x0, x1, x2, x3,			\
-+		      x4, x5, x6, x7,			\
-+		      t0, rk, idx, round)		\
-+	/* AddRoundKey */                               \
-+	vpbroadcastb ((round * 16) + idx + 3)(rk), t0;	\
-+	vpxor t0, x0, x0;				\
-+	vpbroadcastb ((round * 16) + idx + 2)(rk), t0;	\
-+	vpxor t0, x1, x1;				\
-+	vpbroadcastb ((round * 16) + idx + 1)(rk), t0;	\
-+	vpxor t0, x2, x2;				\
-+	vpbroadcastb ((round * 16) + idx + 0)(rk), t0;	\
-+	vpxor t0, x3, x3;				\
-+	vpbroadcastb ((round * 16) + idx + 7)(rk), t0;	\
-+	vpxor t0, x4, x4;				\
-+	vpbroadcastb ((round * 16) + idx + 6)(rk), t0;	\
-+	vpxor t0, x5, x5;				\
-+	vpbroadcastb ((round * 16) + idx + 5)(rk), t0;	\
-+	vpxor t0, x6, x6;				\
-+	vpbroadcastb ((round * 16) + idx + 4)(rk), t0;	\
-+	vpxor t0, x7, x7;
-+
-+#define aria_sbox_8way(x0, x1, x2, x3,			\
-+		       x4, x5, x6, x7,			\
-+		       t0, t1, t2, t3,			\
-+		       t4, t5, t6, t7)			\
-+	vpxor t0, t0, t0;				\
-+	vaesenclast t0, x0, x0;				\
-+	vaesenclast t0, x4, x4;				\
-+	vaesenclast t0, x1, x1;				\
-+	vaesenclast t0, x5, x5;				\
-+	vaesdeclast t0, x2, x2;				\
-+	vaesdeclast t0, x6, x6;				\
-+							\
-+	/* AES inverse shift rows */			\
-+	vmovdqa .Linv_shift_row, t0;			\
-+	vmovdqa .Lshift_row, t1;			\
-+	vpshufb t0, x0, x0;				\
-+	vpshufb t0, x4, x4;				\
-+	vpshufb t0, x1, x1;				\
-+	vpshufb t0, x5, x5;				\
-+	vpshufb t0, x3, x3;				\
-+	vpshufb t0, x7, x7;				\
-+	vpshufb t1, x2, x2;				\
-+	vpshufb t1, x6, x6;				\
-+							\
-+	vmovdqa .Linv_lo, t0;				\
-+	vmovdqa .Linv_hi, t1;				\
-+	vmovdqa .Ltf_lo_s2, t2;				\
-+	vmovdqa .Ltf_hi_s2, t3;				\
-+	vmovdqa .Ltf_lo_x2, t4;				\
-+	vmovdqa .Ltf_hi_x2, t5;				\
-+	vbroadcastss .L0f0f0f0f, t6;			\
-+							\
-+	/* extract multiplicative inverse */		\
-+	filter_8bit(x1, t0, t1, t6, t7);		\
-+	/* affine transformation for S2 */		\
-+	filter_8bit(x1, t2, t3, t6, t7);		\
-+	/* extract multiplicative inverse */		\
-+	filter_8bit(x5, t0, t1, t6, t7);		\
-+	/* affine transformation for S2 */		\
-+	filter_8bit(x5, t2, t3, t6, t7);		\
-+							\
-+	/* affine transformation for X2 */		\
-+	filter_8bit(x3, t4, t5, t6, t7);		\
-+	vpxor t7, t7, t7;				\
-+	vaesenclast t7, x3, x3;				\
-+	/* extract multiplicative inverse */		\
-+	filter_8bit(x3, t0, t1, t6, t7);		\
-+	/* affine transformation for X2 */		\
-+	filter_8bit(x7, t4, t5, t6, t7);		\
-+	vpxor t7, t7, t7;				\
-+	vaesenclast t7, x7, x7;                         \
-+	/* extract multiplicative inverse */		\
-+	filter_8bit(x7, t0, t1, t6, t7);
-+
-+#define aria_diff_m(x0, x1, x2, x3,			\
-+		    t0, t1, t2, t3)			\
-+	/* T = rotr32(X, 8); */				\
-+	/* X ^= T */					\
-+	vpxor x0, x3, t0;				\
-+	vpxor x1, x0, t1;				\
-+	vpxor x2, x1, t2;				\
-+	vpxor x3, x2, t3;				\
-+	/* X = T ^ rotr(X, 16); */			\
-+	vpxor t2, x0, x0;				\
-+	vpxor x1, t3, t3;				\
-+	vpxor t0, x2, x2;				\
-+	vpxor t1, x3, x1;				\
-+	vmovdqu t3, x3;
-+
-+#define aria_diff_word(x0, x1, x2, x3,			\
-+		       x4, x5, x6, x7,			\
-+		       y0, y1, y2, y3,			\
-+		       y4, y5, y6, y7)			\
-+	/* t1 ^= t2; */					\
-+	vpxor y0, x4, x4;				\
-+	vpxor y1, x5, x5;				\
-+	vpxor y2, x6, x6;				\
-+	vpxor y3, x7, x7;				\
-+							\
-+	/* t2 ^= t3; */					\
-+	vpxor y4, y0, y0;				\
-+	vpxor y5, y1, y1;				\
-+	vpxor y6, y2, y2;				\
-+	vpxor y7, y3, y3;				\
-+							\
-+	/* t0 ^= t1; */					\
-+	vpxor x4, x0, x0;				\
-+	vpxor x5, x1, x1;				\
-+	vpxor x6, x2, x2;				\
-+	vpxor x7, x3, x3;				\
-+							\
-+	/* t3 ^= t1; */					\
-+	vpxor x4, y4, y4;				\
-+	vpxor x5, y5, y5;				\
-+	vpxor x6, y6, y6;				\
-+	vpxor x7, y7, y7;				\
-+							\
-+	/* t2 ^= t0; */					\
-+	vpxor x0, y0, y0;				\
-+	vpxor x1, y1, y1;				\
-+	vpxor x2, y2, y2;				\
-+	vpxor x3, y3, y3;				\
-+							\
-+	/* t1 ^= t2; */					\
-+	vpxor y0, x4, x4;				\
-+	vpxor y1, x5, x5;				\
-+	vpxor y2, x6, x6;				\
-+	vpxor y3, x7, x7;
-+
-+#define aria_fe(x0, x1, x2, x3,				\
-+		x4, x5, x6, x7,				\
-+		y0, y1, y2, y3,				\
-+		y4, y5, y6, y7,				\
-+		mem_tmp, rk, round)			\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 8, round);		\
-+							\
-+	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
-+	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
-+	aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, 8);		\
-+							\
-+	aria_load_state_8way(x0, x1, x2, x3,		\
-+			     x4, x5, x6, x7,		\
-+			     mem_tmp, 0);		\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 0, round);		\
-+							\
-+	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
-+	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
-+	aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, 0);		\
-+	aria_load_state_8way(y0, y1, y2, y3,		\
-+			     y4, y5, y6, y7,		\
-+			     mem_tmp, 8);		\
-+	aria_diff_word(x0, x1, x2, x3,			\
-+		       x4, x5, x6, x7,			\
-+		       y0, y1, y2, y3,			\
-+		       y4, y5, y6, y7);			\
-+	/* aria_diff_byte() 				\
-+	 * T3 = ABCD -> BADC 				\
-+	 * T3 = y4, y5, y6, y7 -> y5, y4, y7, y6 	\
-+	 * T0 = ABCD -> CDAB 				\
-+	 * T0 = x0, x1, x2, x3 -> x2, x3, x0, x1 	\
-+	 * T1 = ABCD -> DCBA 				\
-+	 * T1 = x4, x5, x6, x7 -> x7, x6, x5, x4	\
-+	 */						\
-+	aria_diff_word(x2, x3, x0, x1,			\
-+		       x7, x6, x5, x4,			\
-+		       y0, y1, y2, y3,			\
-+		       y5, y4, y7, y6);			\
-+	aria_store_state_8way(x3, x2, x1, x0,		\
-+			      x6, x7, x4, x5,		\
-+			      mem_tmp, 0);
-+
-+#define aria_fo(x0, x1, x2, x3,				\
-+		x4, x5, x6, x7,				\
-+		y0, y1, y2, y3,				\
-+		y4, y5, y6, y7,				\
-+		mem_tmp, rk, round)			\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 8, round);		\
-+							\
-+	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
-+	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
-+	aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, 8);		\
-+							\
-+	aria_load_state_8way(x0, x1, x2, x3,		\
-+			     x4, x5, x6, x7,		\
-+			     mem_tmp, 0);		\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 0, round);		\
-+							\
-+	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
-+	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
-+	aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, 0);		\
-+	aria_load_state_8way(y0, y1, y2, y3,		\
-+			     y4, y5, y6, y7,		\
-+			     mem_tmp, 8);		\
-+	aria_diff_word(x0, x1, x2, x3,			\
-+		       x4, x5, x6, x7,			\
-+		       y0, y1, y2, y3,			\
-+		       y4, y5, y6, y7);			\
-+	/* aria_diff_byte() 				\
-+	 * T1 = ABCD -> BADC 				\
-+	 * T1 = x4, x5, x6, x7 -> x5, x4, x7, x6	\
-+	 * T2 = ABCD -> CDAB 				\
-+	 * T2 = y0, y1, y2, y3, -> y2, y3, y0, y1 	\
-+	 * T3 = ABCD -> DCBA 				\
-+	 * T3 = y4, y5, y6, y7 -> y7, y6, y5, y4 	\
-+	 */						\
-+	aria_diff_word(x0, x1, x2, x3,			\
-+		       x5, x4, x7, x6,			\
-+		       y2, y3, y0, y1,			\
-+		       y7, y6, y5, y4);			\
-+	aria_store_state_8way(x3, x2, x1, x0,		\
-+			      x6, x7, x4, x5,		\
-+			      mem_tmp, 0);
-+
-+#define aria_ff(x0, x1, x2, x3,				\
-+		x4, x5, x6, x7,				\
-+		y0, y1, y2, y3,				\
-+		y4, y5, y6, y7,				\
-+		mem_tmp, rk, round, last_round)		\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 8, round);		\
-+							\
-+	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 8, last_round);		\
-+							\
-+	aria_store_state_8way(x0, x1, x2, x3,		\
-+			      x4, x5, x6, x7,		\
-+			      mem_tmp, 8);		\
-+							\
-+	aria_load_state_8way(x0, x1, x2, x3,		\
-+			     x4, x5, x6, x7,		\
-+			     mem_tmp, 0);		\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 0, round);		\
-+							\
-+	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
-+		       y0, y1, y2, y3, y4, y5, y6, y7);	\
-+							\
-+	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
-+		      y0, rk, 0, last_round);		\
-+							\
-+	aria_load_state_8way(y0, y1, y2, y3,		\
-+			     y4, y5, y6, y7,		\
-+			     mem_tmp, 8);
-+
-+/* NB: section is mergeable, all elements must be aligned 16-byte blocks */
-+.section	.rodata.cst16, "aM", @progbits, 16
-+.align 16
-+
-+#define SHUFB_BYTES(idx) \
-+	0 + (idx), 4 + (idx), 8 + (idx), 12 + (idx)
-+
-+.Lshufb_16x16b:
-+	.byte SHUFB_BYTES(0), SHUFB_BYTES(1), SHUFB_BYTES(2), SHUFB_BYTES(3);
-+/* For isolating SubBytes from AESENCLAST, inverse shift row */
-+.Linv_shift_row:
-+	.byte 0x00, 0x0d, 0x0a, 0x07, 0x04, 0x01, 0x0e, 0x0b
-+	.byte 0x08, 0x05, 0x02, 0x0f, 0x0c, 0x09, 0x06, 0x03
-+.Lshift_row:
-+	.byte 0x00, 0x05, 0x0a, 0x0f, 0x04, 0x09, 0x0e, 0x03
-+	.byte 0x08, 0x0d, 0x02, 0x07, 0x0c, 0x01, 0x06, 0x0b
-+/* extract multiplicative inverse from subByte(x) */
-+.Linv_lo:
-+	.byte 0x05, 0x4f, 0x91, 0xdb, 0x2c, 0x66, 0xb8, 0xf2
-+	.byte 0x57, 0x1d, 0xc3, 0x89, 0x7e, 0x34, 0xea, 0xa0
-+.Linv_hi:
-+	.byte 0x00, 0xa4, 0x49, 0xed, 0x92, 0x36, 0xdb, 0x7f
-+	.byte 0x25, 0x81, 0x6c, 0xc8, 0xb7, 0x13, 0xfe, 0x5a
-+.Ltf_lo_s2:
-+	.byte 0xe2, 0x4e, 0x1f, 0xb3, 0x24, 0x88, 0xd9, 0x75
-+	.byte 0x61, 0xcd, 0x9c, 0x30, 0xa7, 0x0b, 0x5a, 0xf6
-+.Ltf_hi_s2:
-+	.byte 0x00, 0x26, 0xa7, 0x81, 0xfb, 0xdd, 0x5c, 0x7a
-+	.byte 0x5f, 0x79, 0xf8, 0xde, 0xa4, 0x82, 0x03, 0x25
-+.Ltf_lo_x2:
-+	.byte 0x2c, 0xf4, 0x14, 0xcc, 0x56, 0x8e, 0x6e, 0xb6
-+	.byte 0xed, 0x35, 0xd5, 0x0d, 0x97, 0x4f, 0xaf, 0x77
-+.Ltf_hi_x2:
-+	.byte 0x00, 0x75, 0x52, 0x27, 0xae, 0xdb, 0xfc, 0x89
-+	.byte 0xe8, 0x9d, 0xba, 0xcf, 0x46, 0x33, 0x14, 0x61
-+
-+/* 4-bit mask */
-+.section	.rodata.cst4.L0f0f0f0f, "aM", @progbits, 4
-+.align 4
-+.L0f0f0f0f:
-+	.long 0x0f0f0f0f
-+
-+.text
-+
-+.align 8
-+SYM_FUNC_START(aria_aesni_avx_crypt_16way)
-+	/* input:
-+	*      %rdi: rk
-+	*      %rsi: dst
-+	*      %rdx: src
-+	*      %rcx: rounds
-+	*/
-+
-+	FRAME_BEGIN
-+
-+	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		     %xmm15, %rdx);
-+
-+	movq	%rsi, %rax;
-+	leaq 8 * 16(%rax), %r8;
-+
-+	inpack16_post(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		      %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		      %xmm15, %rax, %r8);
-+	aria_fo(%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 0);
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 1);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 2);
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 3);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 4);
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 5);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 6);
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 7);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 8);
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 9);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 10);
-+	cmp $12, %rcx;
-+	jne .Laria192;
-+	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 11, 12);
-+	jmp .Laria_end;
-+.Laria192:
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 11);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 12);
-+	cmp $14, %rcx;
-+	jne .Laria256;
-+	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 13, 14);
-+	jmp .Laria_end;
-+.Laria256:
-+	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 13);
-+	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
-+		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%rax, %rdi, 14);
-+	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		%xmm15, %rax, %rdi, 15, 16);
-+.Laria_end:
-+	outunpack16(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
-+		    %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
-+		    %xmm15, %rax, %r8);
-+
-+	FRAME_END
-+	RET;
-+SYM_FUNC_END(aria_aesni_avx_crypt_16way)
-diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
-new file mode 100644
-index 000000000000..53121970d169
---- /dev/null
-+++ b/arch/x86/crypto/aria_aesni_avx_glue.c
-@@ -0,0 +1,165 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Glue Code for the AVX assembler implementation of the ARIA Cipher
-+ *
-+ * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
-+ */
-+
-+#include <crypto/algapi.h>
-+#include <crypto/internal/simd.h>
-+#include <crypto/aria.h>
-+#include <linux/crypto.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+
-+#include "ecb_cbc_helpers.h"
-+
-+asmlinkage void aria_aesni_avx_crypt_16way(const u32 *rk, u8 *dst,
-+					  const u8 *src, int rounds);
-+
-+static int ecb_do_encrypt(struct skcipher_request *req, const u32 *rkey)
-+{
-+	struct aria_ctx *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
-+	struct skcipher_walk walk;
-+	unsigned int nbytes;
-+	int err;
-+
-+	err = skcipher_walk_virt(&walk, req, false);
-+
-+	while ((nbytes = walk.nbytes) > 0) {
-+		const u8 *src = walk.src.virt.addr;
-+		u8 *dst = walk.dst.virt.addr;
-+
-+		kernel_fpu_begin();
-+		while (nbytes >= ARIA_AVX_BLOCK_SIZE) {
-+			aria_aesni_avx_crypt_16way(rkey, dst, src, ctx->rounds);
-+			dst += ARIA_AVX_BLOCK_SIZE;
-+			src += ARIA_AVX_BLOCK_SIZE;
-+			nbytes -= ARIA_AVX_BLOCK_SIZE;
-+		}
-+		while (nbytes >= ARIA_BLOCK_SIZE) {
-+			aria_encrypt(ctx, dst, src);
-+			dst += ARIA_BLOCK_SIZE;
-+			src += ARIA_BLOCK_SIZE;
-+			nbytes -= ARIA_BLOCK_SIZE;
-+		}
-+		kernel_fpu_end();
-+
-+		err = skcipher_walk_done(&walk, nbytes);
-+	}
-+
-+	return err;
-+}
-+
-+static int ecb_do_decrypt(struct skcipher_request *req, const u32 *rkey)
-+{
-+	struct aria_ctx *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
-+	struct skcipher_walk walk;
-+	unsigned int nbytes;
-+	int err;
-+
-+	err = skcipher_walk_virt(&walk, req, false);
-+
-+	while ((nbytes = walk.nbytes) > 0) {
-+		const u8 *src = walk.src.virt.addr;
-+		u8 *dst = walk.dst.virt.addr;
-+
-+		kernel_fpu_begin();
-+		while (nbytes >= ARIA_AVX_BLOCK_SIZE) {
-+			aria_aesni_avx_crypt_16way(rkey, dst, src, ctx->rounds);
-+			dst += ARIA_AVX_BLOCK_SIZE;
-+			src += ARIA_AVX_BLOCK_SIZE;
-+			nbytes -= ARIA_AVX_BLOCK_SIZE;
-+		}
-+		while (nbytes >= ARIA_BLOCK_SIZE) {
-+			aria_decrypt(ctx, dst, src);
-+			dst += ARIA_BLOCK_SIZE;
-+			src += ARIA_BLOCK_SIZE;
-+			nbytes -= ARIA_BLOCK_SIZE;
-+		}
-+		kernel_fpu_end();
-+
-+		err = skcipher_walk_done(&walk, nbytes);
-+	}
-+
-+	return err;
-+}
-+
-+static int aria_avx_ecb_encrypt(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	return ecb_do_encrypt(req, ctx->enc_key[0]);
-+}
-+
-+static int aria_avx_ecb_decrypt(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	return ecb_do_decrypt(req, ctx->dec_key[0]);
-+}
-+
-+static int aria_avx_set_key(struct crypto_skcipher *tfm, const u8 *key,
-+			    unsigned int keylen)
-+{
-+	return aria_set_key(&tfm->base, key, keylen);
-+}
-+
-+static struct skcipher_alg aria_algs[] = {
-+	{
-+		.base.cra_name		= "__ecb(aria)",
-+		.base.cra_driver_name	= "__ecb-aria-avx",
-+		.base.cra_priority	= 400,
-+		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct aria_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.min_keysize		= ARIA_MIN_KEY_SIZE,
-+		.max_keysize		= ARIA_MAX_KEY_SIZE,
-+		.setkey			= aria_avx_set_key,
-+		.encrypt		= aria_avx_ecb_encrypt,
-+		.decrypt		= aria_avx_ecb_decrypt,
-+	}
-+};
-+
-+static struct simd_skcipher_alg *aria_simd_algs[ARRAY_SIZE(aria_algs)];
-+
-+static int __init aria_avx_init(void)
-+{
-+	const char *feature_name;
-+
-+	if (!boot_cpu_has(X86_FEATURE_AVX) ||
-+	    !boot_cpu_has(X86_FEATURE_AES) ||
-+	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
-+		pr_info("AVX or AES-NI instructions are not detected.\n");
-+		return -ENODEV;
-+	}
-+
-+	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
-+				&feature_name)) {
-+		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		return -ENODEV;
-+	}
-+
-+	return simd_register_skciphers_compat(aria_algs,
-+					      ARRAY_SIZE(aria_algs),
-+					      aria_simd_algs);
-+}
-+
-+static void __exit aria_avx_exit(void)
-+{
-+	simd_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs),
-+				  aria_simd_algs);
-+}
-+
-+module_init(aria_avx_init);
-+module_exit(aria_avx_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
-+MODULE_DESCRIPTION("ARIA Cipher Algorithm, AVX/AES-NI optimized");
-+MODULE_ALIAS_CRYPTO("aria");
-+MODULE_ALIAS_CRYPTO("aria-aesni-avx");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index b1ccf873779d..cd63ea83ddd7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1659,6 +1659,27 @@ config CRYPTO_ARIA
- 	  See also:
- 	  <https://seed.kisa.or.kr/kisa/algorithm/EgovAriaInfo.do>
- 
-+config CRYPTO_ARIA_AESNI_AVX_X86_64
-+	tristate "ARIA cipher algorithm (x86_64/AES-NI/AVX)"
-+	depends on X86 && 64BIT
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_ARIA
-+	select CRYPTO_SIMD
-+	help
-+	  ARIA cipher algorithm (RFC5794).
-+
-+	  ARIA is a standard encryption algorithm of the Republic of Korea.
-+	  The ARIA specifies three key sizes and rounds.
-+	  128-bit: 12 rounds.
-+	  192-bit: 14 rounds.
-+	  256-bit: 16 rounds.
-+
-+	  This module provides the ARIA cipher algorithm that processes
-+	  sixteen blocks parallel using the AVX instruction set.
-+
-+	  See also:
-+	  <https://seed.kisa.or.kr/kisa/algorithm/EgovAriaInfo.do>
-+
- config CRYPTO_SERPENT
- 	tristate "Serpent cipher algorithm"
- 	select CRYPTO_ALGAPI
--- 
-2.17.1
 
