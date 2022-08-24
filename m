@@ -2,200 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6645BC00140
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 14:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F420C32796
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 15:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237624AbiHXO7h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Aug 2022 10:59:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54502 "EHLO
+        id S238135AbiHXP7N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Aug 2022 11:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237404AbiHXO7g (ORCPT
+        with ESMTP id S238837AbiHXP7M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2022 10:59:36 -0400
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D7789804;
-        Wed, 24 Aug 2022 07:59:35 -0700 (PDT)
-Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27OEsnFY019454;
-        Wed, 24 Aug 2022 14:59:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pps0720;
- bh=I94g1vQ9WtsGqRzaK889kWjLfZK4p4bzys64rOuxARo=;
- b=pByZ8la4tVtqEL0tCBB++ArIcmXh3i2jydXNkRfxi36Un309dNg8jewJ2u6/YYuA2kIw
- ekEV7HmLjJjqoe9bcqiMxOVvwBkbeix/f46y5Hw9wEO+8kOnr5bA5IQuQDIbyV903NCb
- GEDtk0F3TFfDoIdzwf96Y3n6l1YOepSVu41x5o7YV/odSbeKg4qoH4L5mfWKcpTS1DjI
- 8MJhBF0Bqh3Xkyjm0EPU6kJKGy7lZvmzsP4sBiDNCWxCwB5d+V2TiDAehVZ/RKDFZrNi
- iINmlXP421N2CIKW5OrNZa2/rkf2b2LwCYCOrO0zDMnvtcz4SllO1WuaGmBqITuJ4cM4 GA== 
-Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3j5p5ng2rc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Aug 2022 14:59:24 +0000
-Received: from p1wg14923.americas.hpqcorp.net (unknown [10.119.18.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 2D07848376;
-        Wed, 24 Aug 2022 14:58:01 +0000 (UTC)
-Received: from p1wg14925.americas.hpqcorp.net (10.119.18.114) by
- p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Wed, 24 Aug 2022 02:57:50 -1200
-Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
- via Frontend Transport; Wed, 24 Aug 2022 02:57:50 -1200
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Wed, 24 Aug 2022 02:57:50 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CSLYmo/hde+aAMYaE0nU6bPFwlRMUi+6mA1JnPdoTg46h/XLpEI7325Kr90ZDKhUs1IzyJxht5lgGuFbzAWkbHa7xnwFzUexMVQFaHTUjvwuGozkWpkz+pLrRNofEmZljdx6tLpmm76zinRNZpusAdHDsSUEmqD9f+YLMIXjVC4QyWeAB8ofIywxo3D9jo1g46XQzEwMaOmvThim+m6yAOkqSOuwNG2+BIFsXYS+A2FslJjGHE2OZqNHPJKDiO14urHkoNiFLkVktuBie4K5wiBxRnaCX1Inwz7zayxgEk62fGhAbLidYAZVyp2WKNAebiGhvgPKc1RwdaxEiIAsOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I94g1vQ9WtsGqRzaK889kWjLfZK4p4bzys64rOuxARo=;
- b=k2zDGkg3zcO1EYrcfqrVAjeZpHHJ0b83HiXB/GdSKFyC7We5/7caPwpopihCilubxFbKG1OfouBYHaxh9ZVOwAZDJfvOvUcMHo+CXOH8eQhK2xnujZy+yunIBrQDXhshhzsq4Z6vG/gtQDxWg7tOOOulKded1oTPKuboeWDOSp/58f1ISSaaFKP8gqjwxJw3TJIIfiW8S6RrWbIh0J+eMgevnhGdc+WFDpeKf3EzJfgUwFV/jynBNcZ2tnOAvo5GK8NaaCsSKQ31GQbnOjNrro2h8QI72BfYSJXCPutsGklhm85jo9kyBGsSfqF6tAqkzclpW827WQFmuhaNij+Bvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
- by PH7PR84MB1680.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:153::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Wed, 24 Aug
- 2022 14:57:49 +0000
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1cc2:4b7b:f4c5:fbb4]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::1cc2:4b7b:f4c5:fbb4%5]) with mapi id 15.20.5525.011; Wed, 24 Aug 2022
- 14:57:49 +0000
-From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     'Guanjun' <guanjun@linux.alibaba.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-CC:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
-        "xuchun.shang@linux.alibaba.com" <xuchun.shang@linux.alibaba.com>,
-        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex)
- accelerator driver
-Thread-Topic: [PATCH v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex)
- accelerator driver
-Thread-Index: AQHYt6DIoYTZkmXG+US+1DA83fb3r62+IYQw
-Date:   Wed, 24 Aug 2022 14:57:49 +0000
-Message-ID: <MW5PR84MB184271E7C3085CB1004ED6A6AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com>
- <1661334621-44413-2-git-send-email-guanjun@linux.alibaba.com>
-In-Reply-To: <1661334621-44413-2-git-send-email-guanjun@linux.alibaba.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 17e14311-7d89-4169-c3d0-08da85e1031f
-x-ms-traffictypediagnostic: PH7PR84MB1680:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7z80y1ra6T86NJ1Is7X181icvmK0rmYU4J1xEwahvA/KUoYx/NBcqKpJ124I267WM3zBFWhOY89XaxyEyFBE/WVPk9uaeVPtVs0q54HQhoHuSVWXAfQKBD0rQTW51++x7at5+/3LIeNKnZPYFvd7j7mXIDioPQ7uLqHA+GOq4/XnkzWnYlOJAcF/FbQzLI/6thHs7s6Cm+Pny3vqm4tpoP/0CqYf9E+Y8+oUAw+MKYNl/37cJnBob95gCYmnnk0oEjwtWj6ki1AJOeoBjnmPdkwAjknDvJOi/Pl/oFWSAibHz2dopRfaK1E+hJ41txacavAM89VZjHVhGm4M6kiHX5t7iv7MU8tFfSgdxloAEsUnFtM4is1ByGxeGpUcLrZEZCX26JWjmLDiaYYHkXA+AQZZwJHnDMtCKmkEnaw2uNOQAbFPFvQHAcALgxnX1tyMTBPZjGNw6fAE4he1dZAPMxswlv5QCEaVqDf3zLVLSLIrtOeVBzjRHa4Aw2JKSaUUy7/6WfZCnh7aFPM/bfPmzDa+iSKBNYXBqFZOugJRPlnzs2kn5y+k8YpZPnL8nLFf6ZPg2Uw6tETc+Yf0oqfm1TNu5d4SiKa11Tj050fqM95x+OSR3Y+mICl50ZUCm+sjpKvYf5YQ9sGqeW36uxxFD/g9PIOfxL93+iDZHCX0e0HSapv+mE8sQrTam4tXSyzPLuWDO+KUZ6TyVBKYmyZZ/3dyWqqBxzViTS/Kb7RYE71WQYBLtwzY8sgUV9CUNgmMrGTF1tJXsh7TGEvDObmd7g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230016)(366004)(136003)(39860400002)(396003)(376002)(346002)(66556008)(54906003)(55016003)(86362001)(110136005)(8676002)(4326008)(66446008)(64756008)(38100700002)(66476007)(186003)(66946007)(76116006)(7696005)(316002)(41300700001)(53546011)(6506007)(26005)(9686003)(82960400001)(38070700005)(478600001)(71200400001)(8936002)(122000001)(52536014)(83380400001)(2906002)(5660300002)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jrryLsnjGhgX6i16V2oF66pdF92WtJ7GDAc+zQf2cLtt9LjknV1uyPX1nKxZ?=
- =?us-ascii?Q?gGLjSztUuCeKGiEotGDChnCZiEs3QaD7A4aklyHKaX5Exn0Q9uYYsBk0QIpI?=
- =?us-ascii?Q?7khss27ZTUmp56epYUUzsyUFEBS8JPzOvrbBxJjPaSB79/QdrN15HOhX71IV?=
- =?us-ascii?Q?EYNKE8ca9XRKauPqST5dHMeEI7+oxQFb21djdN54byk1Lz/bNgXZIeebAK86?=
- =?us-ascii?Q?iWZP+wbkh4qP3ykkR9XA/m5psjU670HTwwNec1F0dwHSPWyUESnNMexVnzYB?=
- =?us-ascii?Q?dsib1JPcMvNLxM2zc6KuNin0aal83hQ0JO3dlTOkHiBgrlXH/woGy9WjPjz2?=
- =?us-ascii?Q?fXR7AIibC3rKIuFKXQH6SNk0bPFMjClg/vvOavAFUXFKd7F6BAPdPRcKebyh?=
- =?us-ascii?Q?iDnWDK0GMy+1HnCErtetDFCXguZKWKRc8WOnSN/+l726xh8Py+/RikKTSxCA?=
- =?us-ascii?Q?ip+td9AtRfKlt3FZkyCYWbpU3rGsLsUMGWsKzoFLDDZKc8zM6oCx95ol1WLv?=
- =?us-ascii?Q?LCHVJPo9j3YNVo+oYIg/3SZT4hZRwtFq0p+OUrtdfYOg9XRDIh3mvzgXoL3B?=
- =?us-ascii?Q?dkWYC/vTqlVjfUUNUjsLC6kdXRbGQtX3207wjBslzLPHg51ivZFnIvjiGYFU?=
- =?us-ascii?Q?pJ4eIfCmggI6bx0swPRCw+9msMCCdwLFPn8L9R2h1E4UFJ5Ku51K5sHR78nD?=
- =?us-ascii?Q?5g9oMZk0VtiQbh8WaXz9whFuo2R+vmGF2ULJ4H8qU9wkbEzioC8nvEODIiAN?=
- =?us-ascii?Q?7DbhBPYmwAJI+7GsG650VwjB/D/PyuVtVfFLwyQfTEs0NDLZlX5pIkLgAUZO?=
- =?us-ascii?Q?dP5fg+tw9JnVL+LbBabwq1ymF3Knkc49r3d2DXl4PBBKjtxkwbAeD9KbOchS?=
- =?us-ascii?Q?kbvc6bvLdkcNNkE7k+AGMFcCRa9s3LaT8XWBazhgqXnOL81nWrTJjYpq74fV?=
- =?us-ascii?Q?oxXTYbG58TRE5PSceRNOFbFamzqlriqxPSaJ+OF+uarNIKD0MIDL+WZsoS4O?=
- =?us-ascii?Q?Cpe4S5f+Xjlmkt2YMs8hGArUHe6YEOUxXfpjdX6v9NcJDdIbXyRBTLzpVe9w?=
- =?us-ascii?Q?//yLagWUhAD0CEu4TMEBWNjrF6BnCL5SzNJ/yc3sjMPy7ZhRSPeGK3dflJOm?=
- =?us-ascii?Q?zoE7AvjA1FcCC+mFUg0r7Oj4Pn3JYZ5yGRzgFQm8JFYZzOTug1JyszngZHea?=
- =?us-ascii?Q?snEazwaHw7sVcIOIZMRs3BIsxV27zD6B7evbsPHbv4RN0ETZLVM3OSsQ7M26?=
- =?us-ascii?Q?pcPWCvPI2rZVNCdSxOasE3CdUuEpcWU2aJA8wjRHHoIi6w78N281X1FF2NRN?=
- =?us-ascii?Q?TUkfjC5tYEvQc2o1bbaIy2mY2hCTphAbHldyQSA89mMQ/VIovqtUtr+KBJLU?=
- =?us-ascii?Q?bUjp465VEoxW15Yt7iqDHFA+1OWg4pyZLDZfkFzWzE9BLCnoK8VtEzej6AyV?=
- =?us-ascii?Q?oCACZ9ToAtwMDejWU62BjayRatl3oaxNkHgRwfB3+ndODFOyN2Z01DJ/1e3U?=
- =?us-ascii?Q?z/bFrhpAkA87CQw/YdiXxkw3xgKEEO6bJd2WmBe1Zcwk8wNzdpl4Us6VqDU3?=
- =?us-ascii?Q?nTm5RMz3Tqfpw/neOIs=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17e14311-7d89-4169-c3d0-08da85e1031f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2022 14:57:49.2739
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IbRP8so/hcqTdgVVp46hHAsB8BHcXwKQo/VY6F7nmFWlvhivPEfq9kQxYF9R6iFB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR84MB1680
-X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: 8Kn2qjEsHbhWPtVeIIqZ9XMd29S7RM7O
-X-Proofpoint-ORIG-GUID: 8Kn2qjEsHbhWPtVeIIqZ9XMd29S7RM7O
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-24_08,2022-08-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- phishscore=0 bulkscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2208240057
+        Wed, 24 Aug 2022 11:59:12 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48697CB77
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:08 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id u22so16023124plq.12
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:subject:cc:to:from:from:to:cc;
+        bh=2XM0vhvs5q/s2S654KAU02uD3fJjzxLaMAnECVEfqh8=;
+        b=YjMT1aOb6ImMg1QI9cFZHG8AbxrkRHyjucjFbJh/vmhELbCPruNSLBCQQGGCAq5CUF
+         0bg4scVnYSs7IpG4pBFki/UuQh24r90h8Jk1K/pPrhC05n6PqNHgSgaVtciVHxCdOv7m
+         bjSSsfr4luXDECS78Egq5sBVjSOjUr7KlfAkOfCtaZUR43P8gLeLAllBlNFeYTZrOhGH
+         XhL0ghMXxzOdCHK16fJB86u27W1TcU4w1DIwaIluAMd6B0W/P6k9/TvdWWzthdsKxakq
+         rP/pPLUmwXoBGaGYdjFZ+c8KYf4eXAiJi0sDAlYvjDx3ssveun4InyghEVLt2ATk7UOZ
+         62jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=2XM0vhvs5q/s2S654KAU02uD3fJjzxLaMAnECVEfqh8=;
+        b=OpdtmKfQGIgKLtpVBd7W71reKjEQo3jYSSakPTJv1cAfyqHtb9JmrnQ6AINPBYuj4X
+         u5uYT44gQ4GpSwwfHPRhFeoEwDC8WJ4Y3yasZ1ZzvTtFiPyfujYEEjjZU1qHkHL+661c
+         up7PVo9UReHaNMbt8/TShJCwZZyInhXMwM94D6R0o+aFht++IiRSd4DfQaOMFd+7SiUM
+         0M/cP/uKpzN7BhulhOvQPmxF+gtsRpp2L4qKtA/BCEDBojtzrTBgXHe+yRTJF7J9W+Zr
+         ymxlSufho/d9Vpifc60TAvgHWRDnqW2tvIULYy2K9hlXpXL4NGGO6LWT4j1YXKpuZbID
+         pLTw==
+X-Gm-Message-State: ACgBeo0SmAvgWySXkX9FNbZ+c09zYBnvC5yCbprB4snALqLE8RA6vvJi
+        a/rajcC6pP7ic2nTXN2sNCtScIfXP+M=
+X-Google-Smtp-Source: AA6agR5Ymk6pPVj2ttmgarI/miRajI7fzrjRxTarKLQ1+lNZPAfkJs5oO3edfrJdsC4xvU0yuVqD/A==
+X-Received: by 2002:a17:902:8643:b0:172:e067:d7ac with SMTP id y3-20020a170902864300b00172e067d7acmr16572251plt.164.1661356747934;
+        Wed, 24 Aug 2022 08:59:07 -0700 (PDT)
+Received: from localhost.localdomain ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 12-20020a17090a034c00b001fb438fb772sm1540318pjf.56.2022.08.24.08.59.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 08:59:07 -0700 (PDT)
+From:   Taehee Yoo <ap420073@gmail.com>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com
+Cc:     ap420073@gmail.com
+Subject: [PATCH 0/3] crypto: aria: add ARIA AES-NI/AVX/x86_64 implementation
+Date:   Wed, 24 Aug 2022 15:58:49 +0000
+Message-Id: <20220824155852.12671-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The purpose of this patchset is to support the implementation of ARIA-AVX.
+Many of the ideas in this implementation are from Camellia-avx,
+especially byte slicing.
+Like Camellia, ARIA also uses a 16way strategy.
 
+ARIA cipher algorithm is similar to AES.
+There are four s-boxes in the ARIA spec and the first and second s-boxes
+are the same as AES's s-boxes.
+Almost functions are based on aria-generic code except for s-box related
+function.
+The aria-avx doesn't implement the key expanding function.
+it only support encrypt() and decrypt().
 
-> -----Original Message-----
-> From: 'Guanjun' <guanjun@linux.alibaba.com>
-> Sent: Wednesday, August 24, 2022 4:50 AM
-> To: herbert@gondor.apana.org.au
-> Subject: [PATCH v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex)
-> accelerator driver
->=20
-...
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 3e6aa31..d739354 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -799,6 +799,8 @@ source "drivers/crypto/hisilicon/Kconfig"
->=20
->  source "drivers/crypto/amlogic/Kconfig"
->=20
-> +source "drivers/crypto/ycc/Kconfig"
-> +
->  config CRYPTO_DEV_SA2UL
->  	tristate "Support for TI security accelerator"
->  	depends on ARCH_K3 || COMPILE_TEST
+Encryption and Decryption logic is actually the same but it should use
+separated keys(encryption key and decryption key).
+En/Decryption steps are like below:
+1. Add-Round-Key
+2. S-box.
+3. Diffusion Layer.
 
-This menu isn't perfectly sorted, but since the new entry is for
-"Alibaba YCC", putting this at the top of the file would be
-better positioned for eventual sorting.
+There is no special thing in the Add-Round-Key step.
 
-Naming the directory alibaba/ rather than ycc/ might be more
-welcoming for future drivers, too.
+There are some notable things in s-box step.
+Like Camellia, it doesn't use a lookup table, instead, it uses aes-ni.
 
-...
-> diff --git a/drivers/crypto/ycc/Kconfig b/drivers/crypto/ycc/Kconfig
-> +++ b/drivers/crypto/ycc/Kconfig
-> @@ -0,0 +1,8 @@
-> +config CRYPTO_DEV_YCC
-> +	tristate "Support for Alibaba YCC cryptographic accelerator"
-> +	depends on CRYPTO && CRYPTO_HW && PCI
-> +	default n
-> +	help
-> +	  Enables the driver for the on-chip cryptographic accelerator of
-> +	  Alibaba Yitian SoCs which is based on ARMv9 architecture.
-> +	  If unsure say N.
+To calculate the first s-box, it just uses the aesenclast and then
+inverts shift_row. No more process is needed for this job because the
+first s-box is the same as the AES encryption s-box.
 
+To calculate a second s-box(invert of s1), it just uses the aesdeclast
+and then inverts shift_row. No more process is needed for this job
+because the second s-box is the same as the AES decryption s-box.
+
+To calculate a third and fourth s-boxes, it uses the aesenclast,
+then inverts shift_row, and affine transformation.
+
+The aria-generic implementation is based on a 32-bit implementation,
+not an 8-bit implementation.
+The aria-avx Diffusion Layer implementation is based on aria-generic
+implementation because 8-bit implementation is not fit for parallel
+implementation but 32-bit is fit for this.
+
+The first patch in this series is to export functions for aria-avx.
+The aria-avx uses existing functions in the aria-generic code.
+The second patch is to implement aria-avx.
+The last patch is to add async test for aria.
+
+Benchmarks:
+The tcrypt is used.
+cpu: i3-12100
+
+How to test:
+   modprobe aria-generic
+   tcrypt mode=610 num_mb=8192
+
+Result:
+    testing speed of multibuffer ecb(aria) (ecb(aria-generic)) encryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 534 cycles
+test 2 (128 bit key, 128 byte blocks): 1 operation in 2006 cycles
+test 3 (128 bit key, 256 byte blocks): 1 operation in 3674 cycles
+test 6 (128 bit key, 4096 byte blocks): 1 operation in 52374 cycles
+test 7 (256 bit key, 16 byte blocks): 1 operation in 608 cycles
+test 9 (256 bit key, 128 byte blocks): 1 operation in 2586 cycles
+test 10 (256 bit key, 256 byte blocks): 1 operation in 4707 cycles
+test 13 (256 bit key, 4096 byte blocks): 1 operation in 69794 cycles
+
+    testing speed of multibuffer ecb(aria) (ecb(aria-generic)) decryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 545 cycles
+test 2 (128 bit key, 128 byte blocks): 1 operation in 1995 cycles
+test 3 (128 bit key, 256 byte blocks): 1 operation in 3673 cycles
+test 6 (128 bit key, 4096 byte blocks): 1 operation in 52359 cycles
+test 7 (256 bit key, 16 byte blocks): 1 operation in 615 cycles
+test 9 (256 bit key, 128 byte blocks): 1 operation in 2588 cycles
+test 10 (256 bit key, 256 byte blocks): 1 operation in 4712 cycles
+test 13 (256 bit key, 4096 byte blocks): 1 operation in 69916 cycles
+
+How to test:
+   modprobe aria
+   tcrypt mode=610 num_mb=8192
+
+Result:
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx) encryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 727 cycles
+test 2 (128 bit key, 128 byte blocks): 1 operation in 2040 cycles
+test 3 (128 bit key, 256 byte blocks): 1 operation in 1399 cycles
+test 6 (128 bit key, 4096 byte blocks): 1 operation in 14758 cycles
+test 7 (256 bit key, 16 byte blocks): 1 operation in 702 cycles
+test 9 (256 bit key, 128 byte blocks): 1 operation in 2615 cycles
+test 10 (256 bit key, 256 byte blocks): 1 operation in 1677 cycles
+test 13 (256 bit key, 4096 byte blocks): 1 operation in 19454 cycles
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx) decryption
+test 0 (128 bit key, 16 byte blocks): 1 operation in 638 cycles
+test 2 (128 bit key, 128 byte blocks): 1 operation in 2090 cycles
+test 3 (128 bit key, 256 byte blocks): 1 operation in 1394 cycles
+test 6 (128 bit key, 4096 byte blocks): 1 operation in 14824 cycles
+test 7 (256 bit key, 16 byte blocks): 1 operation in 719 cycles
+test 9 (256 bit key, 128 byte blocks): 1 operation in 2633 cycles
+test 10 (256 bit key, 256 byte blocks): 1 operation in 1684 cycles
+test 13 (256 bit key, 4096 byte blocks): 1 operation in 19457 cycles
+
+Taehee Yoo (3):
+  crypto: aria: prepare generic module for optimized implementations
+  crypto: aria-avx: add AES-NI/AVX/x86_64 assembler implementation of
+    aria cipher
+  crypto: tcrypt: add async speed test for aria cipher
+
+ arch/x86/crypto/Makefile                |   3 +
+ arch/x86/crypto/aria-aesni-avx-asm_64.S | 648 ++++++++++++++++++++++++
+ arch/x86/crypto/aria_aesni_avx_glue.c   | 165 ++++++
+ crypto/Kconfig                          |  21 +
+ crypto/Makefile                         |   2 +-
+ crypto/{aria.c => aria_generic.c}       |  39 +-
+ crypto/tcrypt.c                         |  13 +
+ include/crypto/aria.h                   |  14 +-
+ 8 files changed, 889 insertions(+), 16 deletions(-)
+ create mode 100644 arch/x86/crypto/aria-aesni-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/aria_aesni_avx_glue.c
+ rename crypto/{aria.c => aria_generic.c} (86%)
+
+-- 
+2.17.1
 
