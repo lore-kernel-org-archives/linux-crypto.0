@@ -2,183 +2,228 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F420C32796
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EBC7C3F6B0
 	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 15:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238135AbiHXP7N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Aug 2022 11:59:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40550 "EHLO
+        id S238564AbiHXP7O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Aug 2022 11:59:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238837AbiHXP7M (ORCPT
+        with ESMTP id S238988AbiHXP7N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2022 11:59:12 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48697CB77
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:08 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id u22so16023124plq.12
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:08 -0700 (PDT)
+        Wed, 24 Aug 2022 11:59:13 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FC77D1D5
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:12 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id r15-20020a17090a1bcf00b001fabf42a11cso1916676pjr.3
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Aug 2022 08:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc;
-        bh=2XM0vhvs5q/s2S654KAU02uD3fJjzxLaMAnECVEfqh8=;
-        b=YjMT1aOb6ImMg1QI9cFZHG8AbxrkRHyjucjFbJh/vmhELbCPruNSLBCQQGGCAq5CUF
-         0bg4scVnYSs7IpG4pBFki/UuQh24r90h8Jk1K/pPrhC05n6PqNHgSgaVtciVHxCdOv7m
-         bjSSsfr4luXDECS78Egq5sBVjSOjUr7KlfAkOfCtaZUR43P8gLeLAllBlNFeYTZrOhGH
-         XhL0ghMXxzOdCHK16fJB86u27W1TcU4w1DIwaIluAMd6B0W/P6k9/TvdWWzthdsKxakq
-         rP/pPLUmwXoBGaGYdjFZ+c8KYf4eXAiJi0sDAlYvjDx3ssveun4InyghEVLt2ATk7UOZ
-         62jg==
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc;
+        bh=1qu5V0DP8HWjRSqLnBYWB7NCHdOr6P94AQoSSZBfjm8=;
+        b=k08zxUkY2+PMiHxVKHFwTgtjwTrZQjwub/107VYobleCDXuZX7Sm4vgRQXH7CP3Q1n
+         InO2jvZPCsI9ukL+EexJZvnTcIJ2DBnWfvlH7u/9K/CeEQ58OvEeWqxtCpwCntADx5gJ
+         Mj8bVeLC7hPW5aWKvkr8m5rYyR8uyIHASblkHUdprQMXrVWxyJZwocf6Dfv2k9x7P9RM
+         jhSlxFPFVMGhd9hrQBY3SZvlR7m9LzhiuvhTJcwl2UDMnBQB/h/niNYP8RJzR7lATokZ
+         HJeN11ZEmX7BIVspNNbUDOE13V9HwkNPhT5G1PCfX4/V6NT87CaPOs9EcpNRr3Lnp9Lf
+         G41w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=2XM0vhvs5q/s2S654KAU02uD3fJjzxLaMAnECVEfqh8=;
-        b=OpdtmKfQGIgKLtpVBd7W71reKjEQo3jYSSakPTJv1cAfyqHtb9JmrnQ6AINPBYuj4X
-         u5uYT44gQ4GpSwwfHPRhFeoEwDC8WJ4Y3yasZ1ZzvTtFiPyfujYEEjjZU1qHkHL+661c
-         up7PVo9UReHaNMbt8/TShJCwZZyInhXMwM94D6R0o+aFht++IiRSd4DfQaOMFd+7SiUM
-         0M/cP/uKpzN7BhulhOvQPmxF+gtsRpp2L4qKtA/BCEDBojtzrTBgXHe+yRTJF7J9W+Zr
-         ymxlSufho/d9Vpifc60TAvgHWRDnqW2tvIULYy2K9hlXpXL4NGGO6LWT4j1YXKpuZbID
-         pLTw==
-X-Gm-Message-State: ACgBeo0SmAvgWySXkX9FNbZ+c09zYBnvC5yCbprB4snALqLE8RA6vvJi
-        a/rajcC6pP7ic2nTXN2sNCtScIfXP+M=
-X-Google-Smtp-Source: AA6agR5Ymk6pPVj2ttmgarI/miRajI7fzrjRxTarKLQ1+lNZPAfkJs5oO3edfrJdsC4xvU0yuVqD/A==
-X-Received: by 2002:a17:902:8643:b0:172:e067:d7ac with SMTP id y3-20020a170902864300b00172e067d7acmr16572251plt.164.1661356747934;
-        Wed, 24 Aug 2022 08:59:07 -0700 (PDT)
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc;
+        bh=1qu5V0DP8HWjRSqLnBYWB7NCHdOr6P94AQoSSZBfjm8=;
+        b=COsQ5AxodQcCII8L9/piUizmAulLOB6I/YCE6gdmBD9BCfUFmsll4a3edCaeaTe1Yr
+         7Dt9meNvAL01wwOusI3n3H0cJkKI+vZxkUFM/H4WCpqTAeCIP1y99/FkCSA4wj7WZQjZ
+         uGBph44g1ybzVbWGiWPCVmQjPrymF2qfv+FsVOJ07He/HszNGAlTdqFf7EcAJ2aDNEAT
+         AHwDXKjbqPrmTTOBsO4vw/4WVuXmrQOqKUlzFAJxephC2vjGTINPN1BI0y/eiR51s7ws
+         THn8QXikIR/sFdxsJtmbbNSUe6lbkHCp1PtAKXsxJd6BjH+WATEWg73xfYJf6pZm897l
+         eWEQ==
+X-Gm-Message-State: ACgBeo1E0gQPXiGxCCKC7xeqh2pgTdmgHw/vuVZ+Hq7yKrAeJHjTXUhC
+        BAnB1T9wmZLB0PFBLCXe4L0a9943HP4=
+X-Google-Smtp-Source: AA6agR48vXIldc5uzvmPmqD6oO3b2DersqQbluu4CHQRWdj1kfaQ8FOUU2ixzY78/raFgytIfjqjow==
+X-Received: by 2002:a17:902:ef45:b0:170:8b19:4e0f with SMTP id e5-20020a170902ef4500b001708b194e0fmr29717127plx.120.1661356751253;
+        Wed, 24 Aug 2022 08:59:11 -0700 (PDT)
 Received: from localhost.localdomain ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id 12-20020a17090a034c00b001fb438fb772sm1540318pjf.56.2022.08.24.08.59.04
+        by smtp.gmail.com with ESMTPSA id 12-20020a17090a034c00b001fb438fb772sm1540318pjf.56.2022.08.24.08.59.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 08:59:07 -0700 (PDT)
+        Wed, 24 Aug 2022 08:59:10 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
         bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
         hpa@zytor.com
 Cc:     ap420073@gmail.com
-Subject: [PATCH 0/3] crypto: aria: add ARIA AES-NI/AVX/x86_64 implementation
-Date:   Wed, 24 Aug 2022 15:58:49 +0000
-Message-Id: <20220824155852.12671-1-ap420073@gmail.com>
+Subject: [PATCH 1/3] crypto: aria: prepare generic module for optimized implementations
+Date:   Wed, 24 Aug 2022 15:58:50 +0000
+Message-Id: <20220824155852.12671-2-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220824155852.12671-1-ap420073@gmail.com>
+References: <20220824155852.12671-1-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The purpose of this patchset is to support the implementation of ARIA-AVX.
-Many of the ideas in this implementation are from Camellia-avx,
-especially byte slicing.
-Like Camellia, ARIA also uses a 16way strategy.
+It renames aria to aria_generic and exports some functions such as
+aria_set_key(), aria_encrypt(), and aria_decrypt() to be able to be
+used by aria-avx implementation.
 
-ARIA cipher algorithm is similar to AES.
-There are four s-boxes in the ARIA spec and the first and second s-boxes
-are the same as AES's s-boxes.
-Almost functions are based on aria-generic code except for s-box related
-function.
-The aria-avx doesn't implement the key expanding function.
-it only support encrypt() and decrypt().
-
-Encryption and Decryption logic is actually the same but it should use
-separated keys(encryption key and decryption key).
-En/Decryption steps are like below:
-1. Add-Round-Key
-2. S-box.
-3. Diffusion Layer.
-
-There is no special thing in the Add-Round-Key step.
-
-There are some notable things in s-box step.
-Like Camellia, it doesn't use a lookup table, instead, it uses aes-ni.
-
-To calculate the first s-box, it just uses the aesenclast and then
-inverts shift_row. No more process is needed for this job because the
-first s-box is the same as the AES encryption s-box.
-
-To calculate a second s-box(invert of s1), it just uses the aesdeclast
-and then inverts shift_row. No more process is needed for this job
-because the second s-box is the same as the AES decryption s-box.
-
-To calculate a third and fourth s-boxes, it uses the aesenclast,
-then inverts shift_row, and affine transformation.
-
-The aria-generic implementation is based on a 32-bit implementation,
-not an 8-bit implementation.
-The aria-avx Diffusion Layer implementation is based on aria-generic
-implementation because 8-bit implementation is not fit for parallel
-implementation but 32-bit is fit for this.
-
-The first patch in this series is to export functions for aria-avx.
-The aria-avx uses existing functions in the aria-generic code.
-The second patch is to implement aria-avx.
-The last patch is to add async test for aria.
-
-Benchmarks:
-The tcrypt is used.
-cpu: i3-12100
-
-How to test:
-   modprobe aria-generic
-   tcrypt mode=610 num_mb=8192
-
-Result:
-    testing speed of multibuffer ecb(aria) (ecb(aria-generic)) encryption
-test 0 (128 bit key, 16 byte blocks): 1 operation in 534 cycles
-test 2 (128 bit key, 128 byte blocks): 1 operation in 2006 cycles
-test 3 (128 bit key, 256 byte blocks): 1 operation in 3674 cycles
-test 6 (128 bit key, 4096 byte blocks): 1 operation in 52374 cycles
-test 7 (256 bit key, 16 byte blocks): 1 operation in 608 cycles
-test 9 (256 bit key, 128 byte blocks): 1 operation in 2586 cycles
-test 10 (256 bit key, 256 byte blocks): 1 operation in 4707 cycles
-test 13 (256 bit key, 4096 byte blocks): 1 operation in 69794 cycles
-
-    testing speed of multibuffer ecb(aria) (ecb(aria-generic)) decryption
-test 0 (128 bit key, 16 byte blocks): 1 operation in 545 cycles
-test 2 (128 bit key, 128 byte blocks): 1 operation in 1995 cycles
-test 3 (128 bit key, 256 byte blocks): 1 operation in 3673 cycles
-test 6 (128 bit key, 4096 byte blocks): 1 operation in 52359 cycles
-test 7 (256 bit key, 16 byte blocks): 1 operation in 615 cycles
-test 9 (256 bit key, 128 byte blocks): 1 operation in 2588 cycles
-test 10 (256 bit key, 256 byte blocks): 1 operation in 4712 cycles
-test 13 (256 bit key, 4096 byte blocks): 1 operation in 69916 cycles
-
-How to test:
-   modprobe aria
-   tcrypt mode=610 num_mb=8192
-
-Result:
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx) encryption
-test 0 (128 bit key, 16 byte blocks): 1 operation in 727 cycles
-test 2 (128 bit key, 128 byte blocks): 1 operation in 2040 cycles
-test 3 (128 bit key, 256 byte blocks): 1 operation in 1399 cycles
-test 6 (128 bit key, 4096 byte blocks): 1 operation in 14758 cycles
-test 7 (256 bit key, 16 byte blocks): 1 operation in 702 cycles
-test 9 (256 bit key, 128 byte blocks): 1 operation in 2615 cycles
-test 10 (256 bit key, 256 byte blocks): 1 operation in 1677 cycles
-test 13 (256 bit key, 4096 byte blocks): 1 operation in 19454 cycles
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx) decryption
-test 0 (128 bit key, 16 byte blocks): 1 operation in 638 cycles
-test 2 (128 bit key, 128 byte blocks): 1 operation in 2090 cycles
-test 3 (128 bit key, 256 byte blocks): 1 operation in 1394 cycles
-test 6 (128 bit key, 4096 byte blocks): 1 operation in 14824 cycles
-test 7 (256 bit key, 16 byte blocks): 1 operation in 719 cycles
-test 9 (256 bit key, 128 byte blocks): 1 operation in 2633 cycles
-test 10 (256 bit key, 256 byte blocks): 1 operation in 1684 cycles
-test 13 (256 bit key, 4096 byte blocks): 1 operation in 19457 cycles
-
-Taehee Yoo (3):
-  crypto: aria: prepare generic module for optimized implementations
-  crypto: aria-avx: add AES-NI/AVX/x86_64 assembler implementation of
-    aria cipher
-  crypto: tcrypt: add async speed test for aria cipher
-
- arch/x86/crypto/Makefile                |   3 +
- arch/x86/crypto/aria-aesni-avx-asm_64.S | 648 ++++++++++++++++++++++++
- arch/x86/crypto/aria_aesni_avx_glue.c   | 165 ++++++
- crypto/Kconfig                          |  21 +
- crypto/Makefile                         |   2 +-
- crypto/{aria.c => aria_generic.c}       |  39 +-
- crypto/tcrypt.c                         |  13 +
- include/crypto/aria.h                   |  14 +-
- 8 files changed, 889 insertions(+), 16 deletions(-)
- create mode 100644 arch/x86/crypto/aria-aesni-avx-asm_64.S
- create mode 100644 arch/x86/crypto/aria_aesni_avx_glue.c
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
+ crypto/Makefile                   |  2 +-
+ crypto/{aria.c => aria_generic.c} | 39 +++++++++++++++++++++++++------
+ include/crypto/aria.h             | 14 +++++------
+ 3 files changed, 39 insertions(+), 16 deletions(-)
  rename crypto/{aria.c => aria_generic.c} (86%)
 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index a6f94e04e1da..303b21c43df0 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -149,7 +149,7 @@ obj-$(CONFIG_CRYPTO_TEA) += tea.o
+ obj-$(CONFIG_CRYPTO_KHAZAD) += khazad.o
+ obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
+ obj-$(CONFIG_CRYPTO_SEED) += seed.o
+-obj-$(CONFIG_CRYPTO_ARIA) += aria.o
++obj-$(CONFIG_CRYPTO_ARIA) += aria_generic.o
+ obj-$(CONFIG_CRYPTO_CHACHA20) += chacha_generic.o
+ obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
+ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+diff --git a/crypto/aria.c b/crypto/aria_generic.c
+similarity index 86%
+rename from crypto/aria.c
+rename to crypto/aria_generic.c
+index ac3dffac34bb..4cc29b82b99d 100644
+--- a/crypto/aria.c
++++ b/crypto/aria_generic.c
+@@ -16,6 +16,14 @@
+ 
+ #include <crypto/aria.h>
+ 
++static const u32 key_rc[20] = {
++	0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0,
++	0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0,
++	0xdb92371d, 0x2126e970, 0x03249775, 0x04e8c90e,
++	0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0,
++	0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0
++};
++
+ static void aria_set_encrypt_key(struct aria_ctx *ctx, const u8 *in_key,
+ 				 unsigned int key_len)
+ {
+@@ -25,7 +33,7 @@ static void aria_set_encrypt_key(struct aria_ctx *ctx, const u8 *in_key,
+ 	const u32 *ck;
+ 	int rkidx = 0;
+ 
+-	ck = &key_rc[(key_len - 16) / 8][0];
++	ck = &key_rc[(key_len - 16) / 2];
+ 
+ 	w0[0] = be32_to_cpu(key[0]);
+ 	w0[1] = be32_to_cpu(key[1]);
+@@ -163,8 +171,7 @@ static void aria_set_decrypt_key(struct aria_ctx *ctx)
+ 	}
+ }
+ 
+-static int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+-			unsigned int key_len)
++int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key, unsigned int key_len)
+ {
+ 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+@@ -179,6 +186,7 @@ static int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(aria_set_key);
+ 
+ static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
+ 			 u32 key[][ARIA_RD_KEY_WORDS])
+@@ -235,14 +243,30 @@ static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
+ 	dst[3] = cpu_to_be32(reg3);
+ }
+ 
+-static void aria_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++void aria_encrypt(void *_ctx, u8 *out, const u8 *in)
++{
++	struct aria_ctx *ctx = (struct aria_ctx *)_ctx;
++
++	__aria_crypt(ctx, out, in, ctx->enc_key);
++}
++EXPORT_SYMBOL_GPL(aria_encrypt);
++
++void aria_decrypt(void *_ctx, u8 *out, const u8 *in)
++{
++	struct aria_ctx *ctx = (struct aria_ctx *)_ctx;
++
++	__aria_crypt(ctx, out, in, ctx->dec_key);
++}
++EXPORT_SYMBOL_GPL(aria_decrypt);
++
++static void __aria_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	__aria_crypt(ctx, out, in, ctx->enc_key);
+ }
+ 
+-static void aria_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++static void __aria_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+@@ -263,8 +287,8 @@ static struct crypto_alg aria_alg = {
+ 			.cia_min_keysize	=	ARIA_MIN_KEY_SIZE,
+ 			.cia_max_keysize	=	ARIA_MAX_KEY_SIZE,
+ 			.cia_setkey		=	aria_set_key,
+-			.cia_encrypt		=	aria_encrypt,
+-			.cia_decrypt		=	aria_decrypt
++			.cia_encrypt		=	__aria_encrypt,
++			.cia_decrypt		=	__aria_decrypt
+ 		}
+ 	}
+ };
+@@ -286,3 +310,4 @@ MODULE_DESCRIPTION("ARIA Cipher Algorithm");
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
+ MODULE_ALIAS_CRYPTO("aria");
++MODULE_ALIAS_CRYPTO("aria-generic");
+diff --git a/include/crypto/aria.h b/include/crypto/aria.h
+index 4a86661788e8..5b9fe2a224df 100644
+--- a/include/crypto/aria.h
++++ b/include/crypto/aria.h
+@@ -28,6 +28,7 @@
+ #define ARIA_MIN_KEY_SIZE	16
+ #define ARIA_MAX_KEY_SIZE	32
+ #define ARIA_BLOCK_SIZE		16
++#define ARIA_AVX_BLOCK_SIZE	(ARIA_BLOCK_SIZE * 16)
+ #define ARIA_MAX_RD_KEYS	17
+ #define ARIA_RD_KEY_WORDS	(ARIA_BLOCK_SIZE / sizeof(u32))
+ 
+@@ -38,14 +39,6 @@ struct aria_ctx {
+ 	u32 dec_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
+ };
+ 
+-static const u32 key_rc[5][4] = {
+-	{ 0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0 },
+-	{ 0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0 },
+-	{ 0xdb92371d, 0x2126e970, 0x03249775, 0x04e8c90e },
+-	{ 0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0 },
+-	{ 0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0 }
+-};
+-
+ static const u32 s1[256] = {
+ 	0x00636363, 0x007c7c7c, 0x00777777, 0x007b7b7b,
+ 	0x00f2f2f2, 0x006b6b6b, 0x006f6f6f, 0x00c5c5c5,
+@@ -458,4 +451,9 @@ static inline void aria_gsrk(u32 *rk, u32 *x, u32 *y, u32 n)
+ 		((y[(q + 2) % 4]) << (32 - r));
+ }
+ 
++void aria_encrypt(void *ctx, u8 *out, const u8 *in);
++void aria_decrypt(void *ctx, u8 *out, const u8 *in);
++int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
++		 unsigned int key_len);
++
+ #endif
 -- 
 2.17.1
 
