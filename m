@@ -2,94 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5C6C00140
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 17:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED765C3F6B0
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Aug 2022 19:11:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240308AbiHXR4L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Aug 2022 13:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35068 "EHLO
+        id S236708AbiHXTLf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 Aug 2022 15:11:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239736AbiHXRzu (ORCPT
+        with ESMTP id S236283AbiHXTLe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2022 13:55:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB87219030;
-        Wed, 24 Aug 2022 10:55:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35FC161634;
-        Wed, 24 Aug 2022 17:55:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D2DC433C1;
-        Wed, 24 Aug 2022 17:55:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661363748;
-        bh=VmiW4sXUJt6tiJbrffJcavkP+6lH+jowV8hE7PB2wDw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S8QQKT15RqfGR4LpE1sIYwWPmynsCkAqvXLjqiEMaGcCGicmnPfaDTzbdeUJyKwoK
-         huwlzkB4RwvBSlhvgwHI/j7LCGg11Xe3lXxA3etw4sYcdCjkTXYrOEmYa07sCO037E
-         3Wp5ZWELQSNea3TmwwsCKqHmZDpi633bwVAXUdIUpNxyr2TKRmS0mgxcslE8GVsl/F
-         URcjcWJUVxTIenbGj8765ou71Wpzr2ZB/+Ilg5eFGBONU9IPfO0EVOAI5c8eUer2Nz
-         zmNkFnsaSCKyMhWVVxKzsCvR6tPpewmpy8TMddo1fHmCG/3Grpa1ZozxTPCghylxxB
-         fctVqJBERaGSA==
-Date:   Wed, 24 Aug 2022 10:55:47 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Andrew Lunn <andrew@lunn.ch>
-Cc:     Leonard Crestez <cdleonard@gmail.com>,
-        Dmitry Safonov <dima@arista.com>,
-        David Ahern <dsahern@kernel.org>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
+        Wed, 24 Aug 2022 15:11:34 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 650846171E;
+        Wed, 24 Aug 2022 12:11:32 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id r10so14685727oie.1;
+        Wed, 24 Aug 2022 12:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=IBiQsl90pDHRBwqe3+axgNXRFkm79+olwXba0W7edLk=;
+        b=LwVjVKEmD+5b78/bhquOFWgs5s6bgTgvTlxBNV7+f/UFG+zUl6YKTZtAPGIX1NQHtI
+         PqATEHDZjE+xeDBPRGHzuS9cfhC732dq3zHXVmBtlQgdZrU2K0+ylp8vqguwYTmeRJLO
+         3EcQTqsUP50v7BO9sV1P8OmqJXCA/q61fm5uXgWAWYZiu6v5yMvtEXwIqStQrTL5417Z
+         vvaUHtVUoO1xYfWJObeAD3E8CImrroBSqvxDKIef8HIHWsAW9JJosGdIlyPtCqzASDTA
+         neOUqwb9trliwKvKUwya+J5aC7517Kcw2B1TWKBIedWROue9Kx7DJUpx/A0ImoAIGu69
+         Pt0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=IBiQsl90pDHRBwqe3+axgNXRFkm79+olwXba0W7edLk=;
+        b=grxGRGAYo5E02Lez/dMSO3kg8s1Ih53TDpiOM5+OpHQbjFjCsChgYIGBywARu3i4Lz
+         /gTP8vDQ1PFG4PV30s26AOhd4JjdBbgMx3rT9hp/qCUQiS2Px2tBSuulQWg9jsyar/9f
+         fchHpgN2qYhYKZMOWcN2gZxsx7fZBaec0Z4WJBm7t2ytDB0cDn5wX5b5B3jvUcw3OGW4
+         zQHDtpUuCsYtf4hCBw7lJ/JKcT7DdpKP7PluREJeYOeI1DO/DL2G8x2y9fUgxnruIGir
+         8UXrhrbfiV7+Xr+gGLQl7CR2cT2Q6MTVxJ1mnng9NcamrdQyhP46osu4HPrhClnAMEev
+         gZNw==
+X-Gm-Message-State: ACgBeo3NoUyxyEwelGUd0XAQRJoqA5FoW1rN463SRmSKqgEWNx7b19/C
+        7spACsV0YooZZGFEscfMAkriK0b0Bic=
+X-Google-Smtp-Source: AA6agR4XoWfrSzx3hPN24v77RjyPRhd6uA4mVtiyDrrjcGFdzGVyGhRxmedlNYqTdvfO/FhJ4fdSBw==
+X-Received: by 2002:a05:6808:10d4:b0:344:f380:cf8c with SMTP id s20-20020a05680810d400b00344f380cf8cmr264079ois.27.1661368291712;
+        Wed, 24 Aug 2022 12:11:31 -0700 (PDT)
+Received: from localhost.localdomain (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.gmail.com with ESMTPSA id q44-20020a05687082ac00b0011ded9c762fsm405342oae.38.2022.08.24.12.11.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Aug 2022 12:11:31 -0700 (PDT)
+From:   Denis Kenzior <denkenz@gmail.com>
+To:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH 00/31] net/tcp: Add TCP-AO support
-Message-ID: <20220824105547.49d5bad2@kernel.org>
-In-Reply-To: <YwYdqEFQuQjXxATb@lunn.ch>
-References: <20220818170005.747015-1-dima@arista.com>
-        <fc05893d-7733-1426-3b12-7ba60ef2698f@gmail.com>
-        <a83e24c9-ab25-6ca0-8b81-268f92791ae5@kernel.org>
-        <8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com>
-        <7ad5a9be-4ee9-bab2-4a70-b0f661f91beb@gmail.com>
-        <YwYdqEFQuQjXxATb@lunn.ch>
+        Stefan Berger <stefanb@linux.ibm.com>
+Cc:     Denis Kenzior <denkenz@gmail.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH] KEYS: asymmetric: Fix ECDSA use via keyctl uapi
+Date:   Wed, 24 Aug 2022 14:04:09 -0500
+Message-Id: <20220824190409.4286-1-denkenz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 24 Aug 2022 14:46:32 +0200 Andrew Lunn wrote:
-> > I think it would make sense to push key validity times and the key selection
-> > policy entirely in the kernel so that it can handle key rotation/expiration
-> > by itself. This way userspace only has to configure the keys and doesn't
-> > have to touch established connections at all.  
-> 
-> I know nothing aobut TCP-AO, nor much about kTLS. But doesn't kTLS
-> have the same issue? Is there anything which can be learnt from kTLS?
-> Maybe the same mechanisms can be used? No point inventing something
-> new if you can copy/refactor working code?
+When support for ECDSA keys was added, constraints for data & signature
+sizes were never updated.  This makes it impossible to use such keys via
+keyctl API from userspace; fix that.
 
-kTLS does not support key rotation FWIW. It's extremely rare.
+Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA keys")
+Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+---
+ crypto/asymmetric_keys/public_key.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-> > My series has a "flags" field on the key struct where it can filter by IP,
-> > prefix, ifindex and so on. It would be possible to add additional flags for
-> > making the key only valid between certain times (by wall time).  
-> 
-> What out for wall clock time, it jumps around in funny ways. Plus the
-> kernel has no idea what time zone the wall the wall clock is mounted
-> on is in.
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 2f8352e88860..eca5671ad3f2 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -186,8 +186,28 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 
+ 	len = crypto_akcipher_maxsize(tfm);
+ 	info->key_size = len * 8;
+-	info->max_data_size = len;
+-	info->max_sig_size = len;
++
++	if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
++		/*
++		 * ECDSA key sizes are much smaller than RSA, and thus could
++		 * operate on (hashed) inputs that are larger than key size.
++		 * For example SHA384-hashed input used with secp256r1
++		 * based keys.  Set max_data_size to be at least as large as
++		 * the largest supported hash size (SHA512)
++		 */
++		info->max_data_size = 64;
++
++		/*
++		 * Verify takes ECDSA-Sig (described in RFC 5480) as input,
++		 * which is actually 2 'key_size'-bit integers encoded in
++		 * ASN.1.  Account for the ASN.1 encoding overhead here.
++		 */
++		info->max_sig_size = 2 * (len + 3) + 2;
++	} else {
++		info->max_data_size = len;
++		info->max_sig_size = len;
++	}
++
+ 	info->max_enc_size = len;
+ 	info->max_dec_size = len;
+ 	info->supported_ops = (KEYCTL_SUPPORTS_ENCRYPT |
+-- 
+2.35.1
 
-I'd do all of this over netlink, next-gen crypto on sockets is *the*
-reason I started the YAML work. Sadly my crypto config via netlink
-does not exist yet and is probably 2mo out ;(
