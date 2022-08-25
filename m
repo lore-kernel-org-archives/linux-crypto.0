@@ -2,87 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 453B3C28D13
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 13:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA8FAC28D13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 13:34:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242397AbiHYNKz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 09:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53062 "EHLO
+        id S240310AbiHYNe5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 09:34:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242093AbiHYNKx (ORCPT
+        with ESMTP id S241810AbiHYNem (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 09:10:53 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF83A50EB;
-        Thu, 25 Aug 2022 06:10:52 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MD3Ds583CznTXf;
-        Thu, 25 Aug 2022 21:08:29 +0800 (CST)
-Received: from [10.67.110.176] (10.67.110.176) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 25 Aug 2022 21:10:49 +0800
-Subject: Re: [PATCH -next 1/2] crypto: api - Fix IS_ERR() vs NULL check
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20220825084138.1881954-1-cuigaosheng1@huawei.com>
- <20220825084138.1881954-2-cuigaosheng1@huawei.com>
- <Ywc3u9ObRCpxQsK0@gondor.apana.org.au>
-From:   cuigaosheng <cuigaosheng1@huawei.com>
-Message-ID: <0ae57826-6a8c-b08b-2889-f91d50bf6e59@huawei.com>
-Date:   Thu, 25 Aug 2022 21:10:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Thu, 25 Aug 2022 09:34:42 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC989B56FE
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 06:34:27 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id l3so507739plb.10
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 06:34:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=cns6D+1+0Oxv9NsxBPCKZszyvBVw2C11vkAo53MfQtA=;
+        b=g/fyQy9LTe9V6aL9M4Dnnqv6BSBRIHrZBxodhJyT5urGTpyB9zs+9yI8XKplyNUbEY
+         EZk4mE9yljaemhn4M9INqU4A5WqNr9qKJqX/J75nnXwiZxvzcK2tXR52dzMndXOVdu7t
+         0wHSrFU5McO/RUqyh3bR0RcjLgVqjOXXVDsrVzXwwz+FqQumrC+txivZiQxwH4Q4uw5F
+         JVYAClXavBAgHxrtJipqyM5wPZqtxztr1Ckea6iNK99k4ECkwzBdEQaOE1OVo0W4egbb
+         ciNTXmu3m3VX1x3dN9aF8AulNRT0GT4Xf6JckF9nYku8dQdQvoefLdf2X0n4wl0SkbKE
+         +ohA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=cns6D+1+0Oxv9NsxBPCKZszyvBVw2C11vkAo53MfQtA=;
+        b=jxo+McTKHYsvwwZOp/KiGw6FvV1IXjH97un8/YRKabEc5EM7k7MoZd6mKd+lfuoe9I
+         NKCFvQdUjdBiRr8AlZBvvQqp3nOHDVgMNvGi3Kz3f2CQ+8xKY3WnQfW2tW6Tu2K0qkUh
+         r0fBWkwPa6F7Y9EnOaSah+n7D763Uzg0sAAzqF1Xt0iJ6EiBZi6lnTxMzYLhAsOMlAvj
+         3lUfFYWlz4x7jbe50VsdduEyzqngBEfL/ZmuAGDaFCTFsLgW2lvuy5XNNCan4oMPoBzM
+         wDgUFnABiAlaPdJAm2C+CY7dSnrdg3h2U3tm4CeBxF0j5cCZEnkZtMpEtLeHsso4yuUy
+         +cng==
+X-Gm-Message-State: ACgBeo2BXvW7LMlBiBZGXOwRUBQCzCV7A3orBtPJOyou10wlDKdklCxN
+        OKQjeDLAPKkwct1bA78E6Gc=
+X-Google-Smtp-Source: AA6agR5Wxw/GJCD5LVlZyUafWMfvz6eNiDdYeSE1QAuimsvKmx86tcwyq6i07QnfyO8c/M/fCfWjZg==
+X-Received: by 2002:a17:902:ced0:b0:172:e189:f709 with SMTP id d16-20020a170902ced000b00172e189f709mr3839058plg.63.1661434467478;
+        Thu, 25 Aug 2022 06:34:27 -0700 (PDT)
+Received: from [192.168.0.4] ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id oo16-20020a17090b1c9000b001fa867105a3sm1666135pjb.4.2022.08.25.06.34.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Aug 2022 06:34:26 -0700 (PDT)
+Message-ID: <0e87ff7a-463f-c14e-8deb-6f27feccd3ee@gmail.com>
+Date:   Thu, 25 Aug 2022 22:34:23 +0900
 MIME-Version: 1.0
-In-Reply-To: <Ywc3u9ObRCpxQsK0@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.110.176]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64 assembler
+ implementation of aria cipher
+Content-Language: en-US
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>
+References: <20220824155852.12671-1-ap420073@gmail.com>
+ <20220824155852.12671-3-ap420073@gmail.com>
+ <MW5PR84MB1842D91195D8B5F438230C18AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+From:   Taehee Yoo <ap420073@gmail.com>
+In-Reply-To: <MW5PR84MB1842D91195D8B5F438230C18AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for taking the time to review this patch.
+Hi Elliott, Robert
+Thank you so much for your review!
 
-crypto_alloc_test_larval() will return null if manager is disabled,
-it will not return error pointers, IS_ERR should not be used to checking
-return value, should we fix it? or use another solution?
+On 8/25/22 04:35, Elliott, Robert (Servers) wrote:
+ >> -----Original Message-----
+ >> From: Taehee Yoo <ap420073@gmail.com>
+ >> Sent: Wednesday, August 24, 2022 10:59 AM
+ >> Subject: [PATCH 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64 assembler
+ >> implementation of aria cipher
+ >>
+ > ...
+ >
+ >> +#include "ecb_cbc_helpers.h"
+ >> +
+ >> +asmlinkage void aria_aesni_avx_crypt_16way(const u32 *rk, u8 *dst,
+ >> +					  const u8 *src, int rounds);
+ >> +
+ >> +static int ecb_do_encrypt(struct skcipher_request *req, const u32 
+*rkey)
+ >> +{
+ >> +	struct aria_ctx *ctx =
+ >> crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
+ >> +	struct skcipher_walk walk;
+ >> +	unsigned int nbytes;
+ >> +	int err;
+ >> +
+ >> +	err = skcipher_walk_virt(&walk, req, false);
+ >> +
+ >> +	while ((nbytes = walk.nbytes) > 0) {
+ >> +		const u8 *src = walk.src.virt.addr;
+ >> +		u8 *dst = walk.dst.virt.addr;
+ >> +
+ >> +		kernel_fpu_begin();
+ >> +		while (nbytes >= ARIA_AVX_BLOCK_SIZE) {
+ >> +			aria_aesni_avx_crypt_16way(rkey, dst, src, ctx->rounds);
+ >> +			dst += ARIA_AVX_BLOCK_SIZE;
+ >> +			src += ARIA_AVX_BLOCK_SIZE;
+ >> +			nbytes -= ARIA_AVX_BLOCK_SIZE;
+ >> +		}
+ >> +		while (nbytes >= ARIA_BLOCK_SIZE) {
+ >> +			aria_encrypt(ctx, dst, src);
+ >> +			dst += ARIA_BLOCK_SIZE;
+ >> +			src += ARIA_BLOCK_SIZE;
+ >> +			nbytes -= ARIA_BLOCK_SIZE;
+ >> +		}
+ >> +		kernel_fpu_end();
+ >
+ > Is aria_encrypt() an FPU function that belongs between kernel_fpu_begin()
+ > and kernel_fpu_end()?
+ >
+ > Several drivers (camellia, serpent, twofish, cast5, cast6) use 
+ECB_WALK_START,
+ > ECB_BLOCK, and ECB_WALK_END macros for these loops. Those macros do 
+only call
+ > kernel_fpu_end() at the very end. That requires the functions to be 
+structured
+ > with (ctx, dst, src) arguments, not (rkey, dst, src, rounds).
+ >
 
-It would be helpful if you could give some advice or fix the problem by yourself.
+aria_{encrypt | decrypt}() are not FPU functions.
+I think if it uses the ECB macro, aria_{encrypt | decrypt}() will be 
+still in the FPU context.
+So, I will get them out of the kernel FPU context.
 
-Thanks very much!
-
-ÔÚ 2022/8/25 16:50, Herbert Xu Ð´µÀ:
-> On Thu, Aug 25, 2022 at 04:41:37PM +0800, Gaosheng Cui wrote:
->> The crypto_alloc_test_larval() will return null if manager is disabled,
->> it may not return error pointers, so using IS_ERR_OR_NULL()
->> to check the return value to fix this.
->>
->> The __crypto_register_alg() will return null if manager is disabled,
->> it may not return error pointers, so using IS_ERR_OR_NULL()
->> to check the return value to fix this.
->>
->> Fixes: cad439fc040e ("crypto: api - Do not create test larvals if manager is disabled")
->> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
->> ---
->>   crypto/algapi.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/crypto/algapi.c b/crypto/algapi.c
->> index 5c69ff8e8fa5..5a080b8aaa11 100644
->> --- a/crypto/algapi.c
->> +++ b/crypto/algapi.c
->> @@ -283,7 +283,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
->>   	}
->>   
->>   	larval = crypto_alloc_test_larval(alg);
->> -	if (IS_ERR(larval))
->> +	if (IS_ERR_OR_NULL(larval))
->>   		goto out;
-> A NULL indicates success, why are you jumping to the error path?
->
-> Cheers,
+Thank you so much!
+Taehee Yoo
