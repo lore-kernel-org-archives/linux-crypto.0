@@ -2,203 +2,199 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4487EECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 20:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3171ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 22:31:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242770AbiHYUg2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 16:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56180 "EHLO
+        id S244467AbiHYWb2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 18:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbiHYUg0 (ORCPT
+        with ESMTP id S244445AbiHYWb1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 16:36:26 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81566B56C5;
-        Thu, 25 Aug 2022 13:36:25 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id r83-20020a1c4456000000b003a5cb389944so3331983wma.4;
-        Thu, 25 Aug 2022 13:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=m4tEcGBACEGWaQEpUxdmWQR6J1Khyc3oluJxMJzdBgo=;
-        b=N2fAhrsl+kv9ZYKhW5EJYguEcSWxvXTY54bQUjLprmAcyC8Pa4oIWZXv2vCW7XK24I
-         hl9vRRFcXaUFvUSnB7MJmtdF8YRRYkL1ae2Xja7m2tThhuimRk0+anfJw1UAV7fpjscX
-         sROzAb/6r8vu5B2GH36HZ3Tmn1qmCzeTz8aBfi3WzC0FdoiJ2t/C7OG6Bqgu8DBDFcRE
-         SMpgZljWW6enGuPxxF7cmilQehbK/czz5o/Nx5bGDz6j+iEkhhoySaaISUzqTwG5I9p+
-         x5Phhdcjgh0mlWgWa7CSmPHetKPwnABLGOse9lGcbZLQSF67OvWd8mANePgcBA8pkM6i
-         /ZTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=m4tEcGBACEGWaQEpUxdmWQR6J1Khyc3oluJxMJzdBgo=;
-        b=JOHohJvWgZ9rq/XOcTrmKEgTMaQioDdz1ELL56iSl3hhS9I6577LeHqGITlioCtjZD
-         NdZ9MCjNs0RA0rgp+M3BpbHRGBdZafdBY5u3Atb7qBhc823HL8BaWJcXYazPm8FJZruY
-         +IdlNV4KJlTXIh6VFwcymHYb8VdQ9KVnY+FOAsrSzEWZsG5b2Kf7wPUihnA6uSzpSy6I
-         hM+YWu5djZ2xAEEyX6OEaII/YeNyIGc10S+JTlJRzdap625BSTCvd7GyGurbA1CtA+WJ
-         CEHOuf5lEWeOsQ3duVkcn/HxoOdM3iMZ4c5hER/b0MZVbUByJX6S+C16tj04ztHxUmvv
-         EBjg==
-X-Gm-Message-State: ACgBeo28yaG4y8V97NB7rR0S3Mj9faHHoQGbqpTWFR1N7CC7afcrQrfW
-        vmkImiLhHAdYimQDlX8Ot8Q=
-X-Google-Smtp-Source: AA6agR5nmXXz4cnhxS3dpy898DY4fWV2qphQL7t2YuAZhFtAOHTBLIUInnvIoHdSrPi8xqnPsqzwSQ==
-X-Received: by 2002:a05:600c:3c9:b0:3a5:c5b3:4bf with SMTP id z9-20020a05600c03c900b003a5c5b304bfmr9185791wmd.195.1661459784116;
-        Thu, 25 Aug 2022 13:36:24 -0700 (PDT)
-Received: from kista.localnet (82-149-1-172.dynamic.telemach.net. [82.149.1.172])
-        by smtp.gmail.com with ESMTPSA id n4-20020a05600c3b8400b003a608d69a64sm6328926wms.21.2022.08.25.13.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 13:36:23 -0700 (PDT)
-From:   Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Jack Wang <jinpu.wang@ionos.com>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Samuel Holland <samuel@sholland.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        Peng Wu <wupeng58@huawei.com>,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/6] crypto: allwinner: Fix dma_map_sg error check
-Date:   Thu, 25 Aug 2022 22:36:22 +0200
-Message-ID: <4734941.GXAFRqVoOG@kista>
-In-Reply-To: <20220825072421.29020-6-jinpu.wang@ionos.com>
-References: <20220825072421.29020-1-jinpu.wang@ionos.com> <20220825072421.29020-6-jinpu.wang@ionos.com>
+        Thu, 25 Aug 2022 18:31:27 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67968B941E
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 15:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1661466685; x=1693002685;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=pXWRUr7yy74YSO6PolHsHDXM3uM60SKPSfU0sqhXVlw=;
+  b=Yf9/Pne6aTwx27UTP6hucrCasFvT348ITLvezBKTZXP6ewc3FmK7NBfC
+   KfKuZIQkMvPuO9cbK/Aw/ZfZMMIQE7CCpG2PwOSKpxWNT45Fo7/2kSKBi
+   WZf6HpeMdWC02MH94z/yuGSzzYYpWZ2fhsukq13pCC0RDd8ue/x5VC1Vu
+   KTPJKGFs2nf2HcGrPIUO3Pm5eHdT4Kd5ms/Jye1p41372PwUrmEhJvGhf
+   7FN3RtHR9JeNpmIyAcBzkFW8/b3sLDLtnFTXI+7wXp0DmmKCxe9MFqNTe
+   Sb/z93HrD9uVJ2ZuiuAMx5nW+QR8wpv3V4ikawhBHf1204FDk5QHWh+38
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,264,1654531200"; 
+   d="scan'208";a="208130141"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Aug 2022 06:31:24 +0800
+IronPort-SDR: OSAknwsD9vhFrYcj7LYSsk+ACQIOR4qw2yy9RdZpileSPgQRqn8zj9+dEvvWbm0lV7IJUSZRED
+ 6CCPIbml8w12W2Fu0ZE5CBtqXEU2Z6W5LImOb8xOGHuNiAzl4eeELcpobC2701e1XlyZ6Yz+iG
+ ufIU1Eyqq84LIxfJPPAAZLo1/mBWBnJpO0qfiUmQt1LU6U02F/njNr8x5JiixP4pkyJtPQ9hiI
+ 4wbPRKPQQWjrLW90jJINcudbo3YFHId44N44HbwH5wCDnc0RxctIN9L219TrMfYWr4yijW1oPR
+ cPshbaTLrYHak3+pJe2F1lUm
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Aug 2022 14:52:00 -0700
+IronPort-SDR: ZBW03yyp7m6q+AHE+GNEhSdKu0VtzhnmPi5XN7TeMxLXtWMKp6vX3pbcE8WcySo9s00Qx+1CGU
+ m7Un/aBPSaVMFXipZTW4H93Xs1lZtneV0rH4cv4O1ST/CuZ/+z9f5p+i/+4r3PJFobo3wEajTw
+ C1EX1q0bj5I2LtP6omOKadl/bjtemyVXVX+BakcDne4J7M7rN/+KBNZ9y2JchEh3vTQ4DLJMzi
+ qi+3dIxX1uNoE/uNqg6NzHOS2+w/G9KWw+Ek1v0Ty4zel0FReHYo5cP9XttY3FzMQ5g7g0D/6L
+ t5k=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Aug 2022 15:31:24 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MDHkM5CGrz1Rwry
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 15:31:23 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1661466682; x=1664058683; bh=pXWRUr7yy74YSO6PolHsHDXM3uM60SKPSfU
+        0sqhXVlw=; b=DS5CoFc3iYU7cDPy9qH82TgEIsNMbhoT3C6WeVO1k1n8lfF5jOd
+        4QX9dz+jZ2zBT6lYcxg+KWIWNsTkP0T39GuuYt+Fb54L+Ay16HMoRx/umfqkrCTA
+        5g07OD/6ZWQNFpgrYTCY3b5VmwPIe8ZVeKZjxn3TcnZkMTLaDFOZPDoCaKqF7Yu0
+        M57XRvGIQ4ULgKrfH+zmolhYlxi9tLSaf3wHIfcYiq0AucN2J/i/m6EHR3ZASpwa
+        y4jnhHL1vOGRndZWTAVPX6+j9lVqy63Znj9K+/KI1ssi/+aLLozx85ixW9f3Xqhd
+        u67xga7LZad0mOnZ764Wv9X5dqdJcnCFLTw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id dxqUwUg8VYmr for <linux-crypto@vger.kernel.org>;
+        Thu, 25 Aug 2022 15:31:22 -0700 (PDT)
+Received: from [10.225.163.46] (unknown [10.225.163.46])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MDHk850sGz1RtVk;
+        Thu, 25 Aug 2022 15:31:12 -0700 (PDT)
+Message-ID: <bb0728d1-20fd-8b6d-5d42-a0c76b6d3e4b@opensource.wdc.com>
+Date:   Fri, 26 Aug 2022 07:31:11 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH 2/5] dt-bindings: ata: drop minItems equal to maxItems
+Content-Language: en-US
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Sylwester Nawrocki <s.nawrocki@samsung.com>,
+        Tomasz Figa <tomasz.figa@gmail.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrzej Hajda <andrzej.hajda@intel.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Robert Foss <robert.foss@linaro.org>,
+        Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+        Jonas Karlman <jonas@kwiboo.se>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Rob Clark <robdclark@gmail.com>,
+        Abhinav Kumar <quic_abhinavk@quicinc.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Sean Paul <sean@poorly.run>, Inki Dae <inki.dae@samsung.com>,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Marek Vasut <marex@denx.de>,
+        Krishna Manikandan <quic_mkrishn@quicinc.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org, linux-tegra@vger.kernel.org
+References: <20220825113334.196908-1-krzysztof.kozlowski@linaro.org>
+ <20220825113334.196908-2-krzysztof.kozlowski@linaro.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220825113334.196908-2-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dne =C4=8Detrtek, 25. avgust 2022 ob 09:24:20 CEST je Jack Wang napisal(a):
-> dma_map_sg return 0 on error.
->=20
-> Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Chen-Yu Tsai <wens@csie.org>
-> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
-> Cc: Samuel Holland <samuel@sholland.org>
-> Cc: Dan Carpenter <dan.carpenter@oracle.com>
-> Cc: Minghao Chi <chi.minghao@zte.com.cn>
-> Cc: Peng Wu <wupeng58@huawei.com>
-> Cc: Alexey Khoroshilov <khoroshilov@ispras.ru>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-sunxi@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
-> Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
-> Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+On 8/25/22 20:33, Krzysztof Kozlowski wrote:
+> minItems, if missing, are implicitly equal to maxItems, so drop
+> redundant piece to reduce size of code.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-Best regards,
-Jernej
 > ---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 +++---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 4 ++--
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 2 +-
->  4 files changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c index
-> 74b4e910a38d..be7f46faef7e 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-> @@ -208,7 +208,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engi=
-ne
-> *engine, void *async_req
->=20
->  	if (areq->src =3D=3D areq->dst) {
->  		nr_sgs =3D dma_map_sg(ce->dev, areq->src, ns,=20
-DMA_BIDIRECTIONAL);
-> -		if (nr_sgs <=3D 0 || nr_sgs > MAX_SG) {
-> +		if (!nr_sgs || nr_sgs > MAX_SG) {
->  			dev_err(ce->dev, "Invalid sg number %d\n",=20
-nr_sgs);
->  			err =3D -EINVAL;
->  			goto theend_iv;
-> @@ -216,13 +216,13 @@ static int sun8i_ce_cipher_prepare(struct
-> crypto_engine *engine, void *async_req nr_sgd =3D nr_sgs;
->  	} else {
->  		nr_sgs =3D dma_map_sg(ce->dev, areq->src, ns,=20
-DMA_TO_DEVICE);
-> -		if (nr_sgs <=3D 0 || nr_sgs > MAX_SG) {
-> +		if (!nr_sgs || nr_sgs > MAX_SG) {
->  			dev_err(ce->dev, "Invalid sg number %d\n",=20
-nr_sgs);
->  			err =3D -EINVAL;
->  			goto theend_iv;
->  		}
->  		nr_sgd =3D dma_map_sg(ce->dev, areq->dst, nd,=20
-DMA_FROM_DEVICE);
-> -		if (nr_sgd <=3D 0 || nr_sgd > MAX_SG) {
-> +		if (!nr_sgd || nr_sgd > MAX_SG) {
->  			dev_err(ce->dev, "Invalid sg number %d\n",=20
-nr_sgd);
->  			err =3D -EINVAL;
->  			goto theend_sgs;
-> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-> b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c index
-> 8b5b9b9d04c3..0e6843ec197f 100644
-> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-> @@ -389,7 +389,7 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, v=
-oid
-> *breq) cet->t_asym_ctl =3D 0;
->=20
->  	nr_sgs =3D dma_map_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
-> -	if (nr_sgs <=3D 0 || nr_sgs > MAX_SG) {
-> +	if (!nr_sgs || nr_sgs > MAX_SG) {
->  		dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
->  		err =3D -EINVAL;
->  		goto theend;
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c index
-> 910d6751644c..fdcc98cdecaa 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-> @@ -232,13 +232,13 @@ static int sun8i_ss_cipher(struct skcipher_request
-> *areq) nr_sgd =3D nr_sgs;
->  	} else {
->  		nr_sgs =3D dma_map_sg(ss->dev, areq->src, nsgs,=20
-DMA_TO_DEVICE);
-> -		if (nr_sgs <=3D 0 || nr_sgs > 8) {
-> +		if (!nr_sgs || nr_sgs > 8) {
->  			dev_err(ss->dev, "Invalid sg number %d\n",=20
-nr_sgs);
->  			err =3D -EINVAL;
->  			goto theend_iv;
->  		}
->  		nr_sgd =3D dma_map_sg(ss->dev, areq->dst, nsgd,=20
-DMA_FROM_DEVICE);
-> -		if (nr_sgd <=3D 0 || nr_sgd > 8) {
-> +		if (!nr_sgd || nr_sgd > 8) {
->  			dev_err(ss->dev, "Invalid sg number %d\n",=20
-nr_sgd);
->  			err =3D -EINVAL;
->  			goto theend_sgs;
-> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-> b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c index
-> 36a82b22953c..fcb8c41cc957 100644
-> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-> @@ -527,7 +527,7 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, v=
-oid
-> *breq) rctx->method =3D ss->variant->alg_hash[algt->ss_algo_id];
->=20
->  	nr_sgs =3D dma_map_sg(ss->dev, areq->src, sg_nents(areq->src),
-> DMA_TO_DEVICE); -	if (nr_sgs <=3D 0 || nr_sgs > MAX_SG) {
-> +	if (!nr_sgs || nr_sgs > MAX_SG) {
->  		dev_err(ss->dev, "Invalid sg number %d\n", nr_sgs);
->  		err =3D -EINVAL;
->  		goto theend;
-> --
-> 2.34.1
+>  Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml       | 1 -
+>  .../devicetree/bindings/ata/cortina,gemini-sata-bridge.yaml     | 2 --
+>  Documentation/devicetree/bindings/ata/sata_highbank.yaml        | 1 -
+>  3 files changed, 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml b/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+> index 235a93ac86b0..3766cc80cb17 100644
+> --- a/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+> +++ b/Documentation/devicetree/bindings/ata/brcm,sata-brcm.yaml
+> @@ -30,7 +30,6 @@ properties:
+>            - const: brcm,bcm-nsp-ahci
+>  
+>    reg:
+> -    minItems: 2
+>      maxItems: 2
+>  
+>    reg-names:
+> diff --git a/Documentation/devicetree/bindings/ata/cortina,gemini-sata-bridge.yaml b/Documentation/devicetree/bindings/ata/cortina,gemini-sata-bridge.yaml
+> index 21a90975593b..529093666508 100644
+> --- a/Documentation/devicetree/bindings/ata/cortina,gemini-sata-bridge.yaml
+> +++ b/Documentation/devicetree/bindings/ata/cortina,gemini-sata-bridge.yaml
+> @@ -22,7 +22,6 @@ properties:
+>      maxItems: 1
+>  
+>    resets:
+> -    minItems: 2
+>      maxItems: 2
+>      description: phandles to the reset lines for both SATA bridges
+>  
+> @@ -32,7 +31,6 @@ properties:
+>        - const: sata1
+>  
+>    clocks:
+> -    minItems: 2
+>      maxItems: 2
+>      description: phandles to the compulsory peripheral clocks
+>  
+> diff --git a/Documentation/devicetree/bindings/ata/sata_highbank.yaml b/Documentation/devicetree/bindings/ata/sata_highbank.yaml
+> index 49679b58041c..f23f26a8f21c 100644
+> --- a/Documentation/devicetree/bindings/ata/sata_highbank.yaml
+> +++ b/Documentation/devicetree/bindings/ata/sata_highbank.yaml
+> @@ -52,7 +52,6 @@ properties:
+>      minItems: 1
+>      maxItems: 8
+>      items:
+> -      minItems: 2
+>        maxItems: 2
+>  
+>    calxeda,tx-atten:
 
 
+-- 
+Damien Le Moal
+Western Digital Research
