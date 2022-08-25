@@ -2,122 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0B7C04AA5
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 12:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453B3C28D13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 13:10:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239700AbiHYMzd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 08:55:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53552 "EHLO
+        id S242397AbiHYNKz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 09:10:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242075AbiHYMzU (ORCPT
+        with ESMTP id S242093AbiHYNKx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 08:55:20 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF3D39B85;
-        Thu, 25 Aug 2022 05:55:16 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MD2sp0KvQzlWQ2;
-        Thu, 25 Aug 2022 20:51:58 +0800 (CST)
+        Thu, 25 Aug 2022 09:10:53 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF83A50EB;
+        Thu, 25 Aug 2022 06:10:52 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MD3Ds583CznTXf;
+        Thu, 25 Aug 2022 21:08:29 +0800 (CST)
 Received: from [10.67.110.176] (10.67.110.176) by
  kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 25 Aug 2022 20:55:13 +0800
-Subject: Re: [PATCH -next 2/2] crypto: crc32c - add missing Kconfig option
- select
+ 15.1.2375.24; Thu, 25 Aug 2022 21:10:49 +0800
+Subject: Re: [PATCH -next 1/2] crypto: api - Fix IS_ERR() vs NULL check
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20220825084138.1881954-1-cuigaosheng1@huawei.com>
- <20220825084138.1881954-3-cuigaosheng1@huawei.com>
- <Ywc36LxM2+0eqKu2@gondor.apana.org.au>
+ <20220825084138.1881954-2-cuigaosheng1@huawei.com>
+ <Ywc3u9ObRCpxQsK0@gondor.apana.org.au>
 From:   cuigaosheng <cuigaosheng1@huawei.com>
-Message-ID: <35ec0aed-ee54-b6ea-1d34-06839b20befb@huawei.com>
-Date:   Thu, 25 Aug 2022 20:55:12 +0800
+Message-ID: <0ae57826-6a8c-b08b-2889-f91d50bf6e59@huawei.com>
+Date:   Thu, 25 Aug 2022 21:10:49 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <Ywc36LxM2+0eqKu2@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <Ywc3u9ObRCpxQsK0@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.67.110.176]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  kwepemi500012.china.huawei.com (7.221.188.12)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for your reply.
+Thanks for taking the time to review this patch.
 
-While I was debugging the kernel code of linux-next, I start the kernel
-with qemu-system-arm with following commands:
+crypto_alloc_test_larval() will return null if manager is disabled,
+it will not return error pointers, IS_ERR should not be used to checking
+return value, should we fix it? or use another solution?
 
-     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- vexpress_defconfig
-     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j32
-     qemu-system-arm -M vexpress-a9 -m 1024M -s -nographic -kernel arch/arm/boot/zImage \
- Â                   -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -sd /home/rootfs.sd \
-                   Â -append "root=/dev/mmcblk0 rw console=ttyAMA0"
-
-But it failed, so I tried to locate the cause of the failure and finally found that
-it failed from this patch(cad439fc040e crypto: api - Do not create test larvals if manager is disabled)ï¼Œ
-logs as follows:
-> EXT4-fs (mmcblk0): Cannot load crc32c driver. VFS: Cannot open root 
-> device "mmcblk0" or unknown-block(179,0): error -80 Please append a 
-> correct "root=" boot option; here are the available partitions: 1f00 
-> 131072 mtdblock0 (driver?) 1f01 32768 mtdblock1 (driver?) b300 32768 
-> mmcblk0 driver: mmcblk Kernel panic - not syncing: VFS: Unable to 
-> mount root fs on unknown-block(179,0) CPU: 0 PID: 1 Comm: swapper/0 
-> Not tainted 5.15.0-rc1+ #1 Hardware name: ARM-Versatile Express 
-> [<8010f334>] (unwind_backtrace) from [<8010b08c>] 
-> (show_stack+0x10/0x14) [<8010b08c>] (show_stack) from [<8083f2a4>] 
-> (dump_stack_lvl+0x40/0x4c) [<8083f2a4>] (dump_stack_lvl) from 
-> [<8083b210>] (panic+0xf8/0x2f4) [<8083b210>] (panic) from [<80b0175c>] 
-> (mount_block_root+0x178/0x200) [<80b0175c>] (mount_block_root) from 
-> [<80b01bac>] (prepare_namespace+0x150/0x18c) [<80b01bac>] 
-> (prepare_namespace) from [<8084384c>] (kernel_init+0x10/0x124) 
-> [<8084384c>] (kernel_init) from [<80100130>] (ret_from_fork+0x14/0x24) 
-> Exception stack(0x8108bfb0 to 0x8108bff8) bfa0: ???????? ???????? 
-> ???????? ???????? bfc0: ???????? ???????? ???????? ???????? ???????? 
-> ???????? ???????? ???????? bfe0: ???????? ???????? ???????? ???????? 
-> ???????? ???????? ---[ end Kernel panic - not syncing: VFS: Unable to 
-> mount root fs on unknown-block(179,0) ]---
-
-In the patch, crypto_alloc_test_larval will return NULL if CONFIG_CRYPTO_MANAGER disabled, so
-I checked to see if this change was the cause "EXT4-fs (mmcblk0): Cannot load crc32c driver
-", the success logs does not have this error.
-
-When I enabled CONFIG_CRYPTO_MANAGER, kernel can be boot successfully.
-
-Could that be the reason? I would be very grateful if you could give me some advice.
+It would be helpful if you could give some advice or fix the problem by yourself.
 
 Thanks very much!
 
-åœ¨ 2022/8/25 16:50, Herbert Xu å†™é“:
-> On Thu, Aug 25, 2022 at 04:41:38PM +0800, Gaosheng Cui wrote:
->> The CRYPTO_CRC32C is using functions provided by CRYPTO_MANAGER,
->> otherwise the following error will occur:
+ÔÚ 2022/8/25 16:50, Herbert Xu Ð´µÀ:
+> On Thu, Aug 25, 2022 at 04:41:37PM +0800, Gaosheng Cui wrote:
+>> The crypto_alloc_test_larval() will return null if manager is disabled,
+>> it may not return error pointers, so using IS_ERR_OR_NULL()
+>> to check the return value to fix this.
 >>
->>      EXT4-fs (mmcblk0): Cannot load crc32c driver.
+>> The __crypto_register_alg() will return null if manager is disabled,
+>> it may not return error pointers, so using IS_ERR_OR_NULL()
+>> to check the return value to fix this.
 >>
->> So select CRYPTO_MANAGER when enable CRYPTO_CRC32C.
->>
+>> Fixes: cad439fc040e ("crypto: api - Do not create test larvals if manager is disabled")
 >> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
 >> ---
->>   crypto/Kconfig | 1 +
->>   1 file changed, 1 insertion(+)
+>>   crypto/algapi.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->> diff --git a/crypto/Kconfig b/crypto/Kconfig
->> index b1ccf873779d..7f124604323b 100644
->> --- a/crypto/Kconfig
->> +++ b/crypto/Kconfig
->> @@ -641,6 +641,7 @@ config CRYPTO_CRC32C
->>   	tristate "CRC32c CRC algorithm"
->>   	select CRYPTO_HASH
->>   	select CRC32
->> +	select CRYPTO_MANAGER
->>   	help
->>   	  Castagnoli, et al Cyclic Redundancy-Check Algorithm.  Used
->>   	  by iSCSI for header and data digests and by others.
-> Why exactly does it need CRYPTO_MANAGER?
+>> diff --git a/crypto/algapi.c b/crypto/algapi.c
+>> index 5c69ff8e8fa5..5a080b8aaa11 100644
+>> --- a/crypto/algapi.c
+>> +++ b/crypto/algapi.c
+>> @@ -283,7 +283,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
+>>   	}
+>>   
+>>   	larval = crypto_alloc_test_larval(alg);
+>> -	if (IS_ERR(larval))
+>> +	if (IS_ERR_OR_NULL(larval))
+>>   		goto out;
+> A NULL indicates success, why are you jumping to the error path?
 >
 > Cheers,
