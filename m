@@ -2,105 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB536C3F6B0
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 09:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5CAC28D13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 10:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240296AbiHYJaj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 05:30:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
+        id S233935AbiHYKZb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 06:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240130AbiHYJaV (ORCPT
+        with ESMTP id S240997AbiHYKZ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 05:30:21 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B845EDF3;
-        Thu, 25 Aug 2022 02:30:18 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oR9Bh-00Eyep-6u; Thu, 25 Aug 2022 19:30:10 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Aug 2022 17:30:09 +0800
-Date:   Thu, 25 Aug 2022 17:30:09 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>
-Subject: Re: [PATCH v3 10/16] crypto: ux500/hash: Implement .export and
- .import
-Message-ID: <YwdBIfASgGMDONx4@gondor.apana.org.au>
-References: <20220816140049.102306-1-linus.walleij@linaro.org>
- <20220816140049.102306-11-linus.walleij@linaro.org>
+        Thu, 25 Aug 2022 06:25:28 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A002357DD
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 03:25:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661423127; x=1692959127;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7zGSHvlNM41JBCYeDym4xsEg5nLgykMpvRD7iFwPfLM=;
+  b=JFe/WCUApXtce6rZTIP+Mtz8nooYSTtJ9dJt+pHhkSBou/8zO7ozFg3T
+   /QAEgZvNnGJOj9T1CY6kqyx4wibmyX2V5I3Ef6o829H2fVIJrCd2QEeyE
+   H4Iwd6EF/tB2pa+20iul41+89TlBYjFgLS44+yjNI99Rbfqjjw6221L+x
+   29nMs/uNx9coMqutmMOVT1xf+fj83pqNlmkiOxYkTkQNv/ZtSdyTLJbNY
+   84wSokqpPFAoHCW7Vf81OaefPQZP3MMOe2oixVhmxvu0Q3E1Xz2g3j8qR
+   itAqPRSYxdBPnjO4buUExhn0u835NMbJzKrkhv9LcG7kduBE+ElaaW0j5
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10449"; a="380497104"
+X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
+   d="scan'208";a="380497104"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2022 03:25:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,262,1654585200"; 
+   d="scan'208";a="606357192"
+Received: from sdpcloudhostegs034.jf.intel.com ([10.165.126.39])
+  by orsmga007.jf.intel.com with ESMTP; 25 Aug 2022 03:25:25 -0700
+From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: testmgr - fix indentation for test_acomp() args
+Date:   Thu, 25 Aug 2022 12:24:51 +0200
+Message-Id: <20220825102451.4600-1-lucas.segarra.fernandez@intel.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220816140049.102306-11-linus.walleij@linaro.org>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 04:00:43PM +0200, Linus Walleij wrote:
->
-> -static int ahash_noimport(struct ahash_request *req, const void *in)
-> +static int ahash_import(struct ahash_request *req, const void *in)
->  {
-> -	return -ENOSYS;
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-> +	struct hash_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct hash_device_data *device_data = ctx->device;
-> +	struct hash_req_ctx *req_ctx = ahash_request_ctx(req);
-> +	const struct hash_state *hstate = in;
-> +	int hash_mode = HASH_OPER_MODE_HASH;
-> +	u32 cr;
-> +	s32 count;
-> +
-> +	/* Restore software state */
-> +	req_ctx->length = hstate->length;
-> +	req_ctx->index = hstate->index;
-> +	req_ctx->dma_mode = hstate->dma_mode;
-> +	req_ctx->hw_initialized = hstate->hw_initialized;
-> +	memcpy(req_ctx->buffer, hstate->buffer, HASH_BLOCK_SIZE);
-> +
-> +	/*
-> +	 * Restore hardware state
-> +	 * INIT bit. Set this bit to 0b1 to reset the HASH processor core and
-> +	 * prepare the initialize the HASH accelerator to compute the message
-> +	 * digest of a new message.
-> +	 */
-> +	HASH_INITIALIZE;
-> +
-> +	cr = hstate->temp_cr;
-> +	writel_relaxed(cr & HASH_CR_RESUME_MASK, &device_data->base->cr);
-> +
-> +	if (readl(&device_data->base->cr) & HASH_CR_MODE_MASK)
-> +		hash_mode = HASH_OPER_MODE_HMAC;
-> +	else
-> +		hash_mode = HASH_OPER_MODE_HASH;
-> +
-> +	for (count = 0; count < HASH_CSR_COUNT; count++) {
-> +		if ((count >= 36) && (hash_mode == HASH_OPER_MODE_HASH))
-> +			break;
-> +		writel_relaxed(hstate->csr[count],
-> +			       &device_data->base->csrx[count]);
-> +	}
-> +
-> +	writel_relaxed(hstate->csfull, &device_data->base->csfull);
-> +	writel_relaxed(hstate->csdatain, &device_data->base->csdatain);
-> +	writel_relaxed(hstate->str_reg, &device_data->base->str);
-> +	writel_relaxed(cr, &device_data->base->cr);
-> +
-> +	return 0;
->  }
+Set right indentation for test_acomp().
 
-At any time we may have multiple requests outstanding for a given
-tfm/device, so I'm a bit worried with the direct writes to hardware
-in the import function.
+Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ crypto/testmgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Normally import just transfers data from the caller into the
-request object as a "soft" state, while the actual update/final
-functions will then move them into the hardware state as needed.
-
-Thanks,
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 99020fa36b96..bb3850dc0991 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3322,7 +3322,7 @@ static int test_comp(struct crypto_comp *tfm,
+ }
+ 
+ static int test_acomp(struct crypto_acomp *tfm,
+-			      const struct comp_testvec *ctemplate,
++		      const struct comp_testvec *ctemplate,
+ 		      const struct comp_testvec *dtemplate,
+ 		      int ctcount, int dtcount)
+ {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.37.1
+
