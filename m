@@ -2,148 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5848CC04AA5
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 01:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E8DC28D13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 07:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbiHYBan (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Aug 2022 21:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
+        id S236640AbiHYHYZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 03:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiHYBak (ORCPT
+        with ESMTP id S235550AbiHYHYY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Aug 2022 21:30:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DDD082D20;
-        Wed, 24 Aug 2022 18:30:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E3C91B824CF;
-        Thu, 25 Aug 2022 01:30:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28307C433D6;
-        Thu, 25 Aug 2022 01:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661391036;
-        bh=AIi+WB+TlhHAhAH6LiPvV1XFm+WV2u4SODERl2ylZH4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YAQB5VWXYYKZ8tErqSiheGgiURg99+M043/Yb9HrvZCkWeiVR3iWc7+LvhFmTn+e8
-         HbHRXTt917nXlviebHmNlN+AaqWsirwij7iaaCwJdqghmYdMXcjvLfNwz2bX99ZeeF
-         Mca1vW8EQQsrCTnFvLnpJqSjCTI3G92AYbjBcJ+2joeEZwMPuiePy5VwMZHm22I3kJ
-         YQrKtVjJIENDlaug6amebL0DZbGC2VSH28nkDcr9h4yHUSxF2vKaMfXvHGmllYv8Eq
-         ugR8IrvUtBgJvO0z3i8X/cpcG1guIFJ/1v6Z3AW+Qw643aXXYfVz9pMoW01H/YGK3O
-         aQVm9iDHl/4HA==
-Date:   Thu, 25 Aug 2022 04:30:29 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Message-ID: <YwbQtaaCkBwezpB+@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
- <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6qorwbAXaPaCaSm0SC9o2uQ9ZQzB6s1kBkvAv2D4tkUug@mail.gmail.com>
- <YwbQKeDRQF0XGWo7@kernel.org>
+        Thu, 25 Aug 2022 03:24:24 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850CE98D24
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:23 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id u9so8824885ejy.5
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc;
+        bh=SnII6Fo2+WTgXrCpEYWOd5rqFgnklJor6N4Ows/yZgk=;
+        b=U9MBgRLVFKT2BuVXmI7cAiVOqF5V4v2Rgazy2mJykJGQTPOtjdPQlnMc2WqZRkoOk9
+         vwS0rOjCh3If33dE5wmDRFFaMa9jakBa/P9Pmh7rwq9Iq9Um8vklHaqJoNj3BFH4WTl5
+         wqZhmDEFGJKL7fFE9Um6dOqUxFJAdOnzV6sjrG9b5TeIKJYg7KGxebAeCjgPELwpVZpO
+         7iKETCn5AS0JXPAmbzO9btppZO0jAe1unnjIpXfXhRQecW1R5b0sKCwsfzXW+nBoqS2l
+         Jo/rfkwiDQK6oYqwppLAW1wCXH2DF3aWyo0pvxTlMiJ11KTTqnpk0dLEr0Iq9eAaxucL
+         LAFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=SnII6Fo2+WTgXrCpEYWOd5rqFgnklJor6N4Ows/yZgk=;
+        b=SiP5gQFCeC9XsluqJMOJg9SugX4Lt/exNt26yE3agIngHfheYZp0//HPW0bny6rF9B
+         MXJ3nscKgBlexlKHr0UH2SYt0/rRF9a1z1x6Fb81Q9MHuItG0kIKRg8U07cKT0JgHIBE
+         FCcczW2zE85j6IVwFRAhoCZBvlCDlvBOJW8Y43DOwdKLc34c66HDeDDeyqGspnzcZLEX
+         r2lzF+xOf8gD+mSA2AfDPuu8w907YSIDhOCWT+93JPslj9qTpHdUHgUKxB4yMF+6VEIM
+         G6cnzIZStdr6niGOsAILOcpHA4RARB6uhBaUZeQV/SQJXR1wwuVI4CCgB1GahsXoC2mi
+         ITRw==
+X-Gm-Message-State: ACgBeo2cIpmjtu7JAranY0yAtUqmS1GEfPrgVJ072Bi7fO8kDRz/9IfI
+        T00eOkfs/s+R/9q+EEfIrlfDXBBDgbVRfg==
+X-Google-Smtp-Source: AA6agR4Bpo8DoRvmLzYOOK9j4RFiswlOIG+WYcA2J3rigargQ5xMz3skEnez478IzZz7NykwKzhaVA==
+X-Received: by 2002:a17:907:3f0c:b0:73d:60fc:6594 with SMTP id hq12-20020a1709073f0c00b0073d60fc6594mr1624484ejc.669.1661412262090;
+        Thu, 25 Aug 2022 00:24:22 -0700 (PDT)
+Received: from lb02065.fritz.box ([2001:9e8:142d:a900:eab:b5b1:a064:1d0d])
+        by smtp.gmail.com with ESMTPSA id ky12-20020a170907778c00b0073ce4abf093sm2032281ejc.214.2022.08.25.00.24.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Aug 2022 00:24:21 -0700 (PDT)
+From:   Jack Wang <jinpu.wang@ionos.com>
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Subject: [PATCH 0/6] Crypto: Fix dma_map_sg error check
+Date:   Thu, 25 Aug 2022 09:24:15 +0200
+Message-Id: <20220825072421.29020-1-jinpu.wang@ionos.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YwbQKeDRQF0XGWo7@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 04:28:12AM +0300, jarkko@kernel.org wrote:
-> On Tue, Jun 21, 2022 at 11:50:59AM -0600, Peter Gonda wrote:
-> > On Tue, Jun 21, 2022 at 11:45 AM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
-> > >
-> > > [AMD Official Use Only - General]
-> > >
-> > > Hello Peter,
-> > >
-> > > >> +bool iommu_sev_snp_supported(void)
-> > > >> +{
-> > > >> +       struct amd_iommu *iommu;
-> > > >> +
-> > > >> +       /*
-> > > >> +        * The SEV-SNP support requires that IOMMU must be enabled, and is
-> > > >> +        * not configured in the passthrough mode.
-> > > >> +        */
-> > > >> +       if (no_iommu || iommu_default_passthrough()) {
-> > > >> +               pr_err("SEV-SNP: IOMMU is either disabled or
-> > > >> + configured in passthrough mode.\n");
-> > >
-> > > > Like below could this say something like snp support is disabled because of iommu settings.
-> > >
-> > > Here we may need to be more precise with the error information indicating why SNP is not enabled.
-> > > Please note that this patch may actually become part of the IOMMU + SNP patch series, where
-> > > additional checks are done, for example, not enabling SNP if IOMMU v2 page tables are enabled,
-> > > so precise error information will be useful here.
-> > 
-> > I agree we should be more precise. I just thought we should explicitly
-> > state something like: "SEV-SNP: IOMMU is either disabled or configured
-> > in passthrough mode, SNP cannot be supported".
-> 
-> It really should be, in order to have any practical use:
-> 
-> 	if (no_iommu) {
-> 		pr_err("SEV-SNP: IOMMU is disabled.\n");
-> 		return false;
-> 	}
-> 
-> 	if (iommu_default_passthrough()) {
-> 		pr_err("SEV-SNP: IOMMU is configured in passthrough mode.\n");
-> 		return false;
-> 	}
-> 
-> The comment is *completely* redundant, it absolutely does
-> not serve any sane purpose. It just tells what the code
-> already clearly stating.
-> 
-> The combo error message on the other hand leaves you to
-> the question "which one was it", and for that reason
-> combining the checks leaves you to a louse debugging
-> experience.
+Hi, all,
 
-Also, are those really *errors*? That implies that there
-is something wrong.
+While working on a bugfix on RTRS[1], I noticed there are quite a few other
+drivers have the same problem, due to the fact dma_map_sg return 0 on error,
+not like most of the cases, return negative value for error.
 
-Since you can have a legit configuration, IMHO they should
-be either warn or info. What do you think?
+I "grep -A 5 dma_map_sg' in kernel tree, and audit/fix the one I feel is buggy,
+hence this patchset. As suggested by Christoph Hellwig, I now send the patches per
+subsystem, this is for crypto subsystem.
 
-They are definitely not errors.
+Thanks!
 
-BR, Jarkko
+[1] https://lore.kernel.org/linux-rdma/20220818105355.110344-1-haris.iqbal@ionos.com/T/#t
+
+
+Jack Wang (6):
+  crypto: gemin: Fix error check for dma_map_sg
+  crypto: sahara: Fix error check for dma_map_sg
+  crypto: qce: Fix dma_map_sg error check
+  crypto: amlogic: Fix dma_map_sg error check
+  crypto: allwinner: Fix dma_map_sg error check
+  crypto: ccree: Fix dma_map_sg error check
+
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 +++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 4 ++--
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 6 +++---
+ drivers/crypto/ccree/cc_buffer_mgr.c                | 2 +-
+ drivers/crypto/gemini/sl3516-ce-cipher.c            | 6 +++---
+ drivers/crypto/qce/aead.c                           | 4 ++--
+ drivers/crypto/qce/sha.c                            | 8 +++++---
+ drivers/crypto/qce/skcipher.c                       | 8 ++++----
+ drivers/crypto/sahara.c                             | 4 ++--
+ 11 files changed, 27 insertions(+), 25 deletions(-)
+
+-- 
+2.34.1
+
