@@ -2,62 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC9AC04AA5
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 07:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF24DC28D13
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 07:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237642AbiHYHY0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 03:24:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41076 "EHLO
+        id S237631AbiHYHY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 03:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237631AbiHYHYZ (ORCPT
+        with ESMTP id S235550AbiHYHY0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 03:24:25 -0400
+        Thu, 25 Aug 2022 03:24:26 -0400
 Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B83A1A73
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:24 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id y3so11432162ejc.1
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE6198D24
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:25 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id gb36so37769249ejc.10
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Aug 2022 00:24:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=4oX7Kz3MVV4hSXJmoV3BElc0F08jxmt7raiQQsmxayc=;
-        b=MW5H/NNoqjJGKjOXPEUp6diJ0Ebk/7ve+sG3Vf+l0KuUBAvXz50GCgcJA7dHF9RJ/F
-         YV/wOibDRkpDRz0sxjw3FI6zpSxqAJhGSdlI/poeQ1wGxShokSYfdqEa/N9SYMbHYltQ
-         8aS3yEcIDE5WMl1gLsBxto2pvSbrnNxlrdczPsANNjjd0el6V17a15Kru2mtpPeAaIlq
-         jkSt7scusL3g90qGNjr6AVdm+8+0TO+xzAz7a31PiMrRRq1SJ6r3Nez1lVaKTFkFn4uC
-         eCrb+CCZFAk7kAOIu8uO3XWZecG+oZ4w8EoHj8P8lfNlPvUmj/bsNUsKsWVOA5XumtFe
-         WGOw==
+        bh=aInweo0Jux9Z9X/Y92voM/oHOHIVny38ZqjCucXLbT4=;
+        b=dHcksVUiA9w8htpClZRDhOaLNpL+9hSosMEXX2NfcokwunPW5A0onEIjv6IornTEKR
+         ZBRez8/+vKN8ow12rGDC8Cyf33Zr/su0sWLGc5pQWvsKm7/nuk6IL7OKnFp6A5UBUGhM
+         NAWalusSZMvgk5WN/1mwf+6kWcur5LW0CCY800Vos6J4tZBLjqiyTSzHcg1j/48klvbx
+         lF+uhDYu+pHdxxgQaQsut9Hm+N/7nRDs6Tp0xIKbGtUePkAwzi7CtpyNDazJruIql6mn
+         /t9b5Kiq6P1Pgp3hxDWY1CC4zHAI02LusVz0U9SRS3o6k0MEpl3DEAV+xAnjmt6lZMvP
+         vOCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=4oX7Kz3MVV4hSXJmoV3BElc0F08jxmt7raiQQsmxayc=;
-        b=XfrkfMy3gALuXRNKlYD5YuNBBDD8jzSmb4wuVMPnM1Z9IbR7+wYcBnz8LWWq0Fda91
-         3tSeoSdLMqbRdlr3ueU1gIhZ1vDlITEF6u3uslCsRo2H00Nvu8lipOSI083CgNnskJoW
-         AGM0Sb/5VQfW5IUYDlkSOYUP7ulxAw5zevT4cC+o5X2NRR4qN5Fqnp9bArV+pehQ1wcN
-         cINnUjPnMe3Oq/H7SxWA/te3ctQNPmrbYITT5yuECzI0zcCrw2RmIlCd1jn5BFfu/t6H
-         F0v/F2ikz/moSxfEAE4v813X5UHrImxok0IFFMHGZaP66m3ky+8hkHPCxO3vS9E0AxlK
-         rHjw==
-X-Gm-Message-State: ACgBeo1lfzuSDsexKr8X6HuunGok6VkPmvavZaUM3efUrf6TXiif560r
-        GK0PBzQIaW6c0oSE9IXj5B8qOA==
-X-Google-Smtp-Source: AA6agR7lhsz5pWp2kpFfMDfBBKJfF6f8ewMsA/5Mzz4qzehyEEhDRGqQs7+PcOiIi+6aXE6zbycuUg==
-X-Received: by 2002:a17:907:970b:b0:73d:5a29:959 with SMTP id jg11-20020a170907970b00b0073d5a290959mr1656893ejc.183.1661412262910;
-        Thu, 25 Aug 2022 00:24:22 -0700 (PDT)
+        bh=aInweo0Jux9Z9X/Y92voM/oHOHIVny38ZqjCucXLbT4=;
+        b=eIGqLFqgpbAgbAptQLcNCFAPF2A39GIBf4n2DqykWEGpADTnAHyb/WGfkJe/nh8I/S
+         HgYpvobqabnvJwAh6eDV4CzSRkeqQ/uH/slOK2nENQPNSMLEVKfp9V1VpAJV2H6NQPXU
+         7Rk2MiACngNx7LNGyaSlcB9T1IxTvkzqqCF6MY2f/jnlDYFdybMz4uYSflqw3HnYj2YM
+         1+F5Z+Zdq2mnZMXht0SJTNz16MYBwS7tTQkZrynrRnmkvpc0BYOS/qyZa0wHSJI6cDXl
+         LzqWspbCDOsUZajZW50dxD9viP7gMU5CEUtcZ3/rw6E7ViR5DM92ixkruFnNxVVdTbmT
+         FATw==
+X-Gm-Message-State: ACgBeo1+RJD9dSfuu1cG8tkqckSQAyFH0/z7gJifk3C/5yEXF5teBcHZ
+        xJpwUO0/uxYQ1C1u3YcfaCLmxg==
+X-Google-Smtp-Source: AA6agR67uUPcSw52bekJ7oYloatLLfSvLZ9X56mb9YEMr7qZprZW2YIlziZh4QccZOKqrqQPG/g5pw==
+X-Received: by 2002:a17:906:6a2a:b0:73d:8246:f192 with SMTP id qw42-20020a1709066a2a00b0073d8246f192mr1584672ejc.507.1661412263665;
+        Thu, 25 Aug 2022 00:24:23 -0700 (PDT)
 Received: from lb02065.fritz.box ([2001:9e8:142d:a900:eab:b5b1:a064:1d0d])
-        by smtp.gmail.com with ESMTPSA id ky12-20020a170907778c00b0073ce4abf093sm2032281ejc.214.2022.08.25.00.24.22
+        by smtp.gmail.com with ESMTPSA id ky12-20020a170907778c00b0073ce4abf093sm2032281ejc.214.2022.08.25.00.24.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 00:24:22 -0700 (PDT)
+        Thu, 25 Aug 2022 00:24:23 -0700 (PDT)
 From:   Jack Wang <jinpu.wang@ionos.com>
 To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc:     Corentin Labbe <clabbe@baylibre.com>,
-        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/6] crypto: gemin: Fix error check for dma_map_sg
-Date:   Thu, 25 Aug 2022 09:24:16 +0200
-Message-Id: <20220825072421.29020-2-jinpu.wang@ionos.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/6] crypto: sahara: Fix error check for dma_map_sg
+Date:   Thu, 25 Aug 2022 09:24:17 +0200
+Message-Id: <20220825072421.29020-3-jinpu.wang@ionos.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220825072421.29020-1-jinpu.wang@ionos.com>
 References: <20220825072421.29020-1-jinpu.wang@ionos.com>
@@ -67,52 +64,42 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-dma_map_sg return 0 on error.
+dma_map_sg return 0 on error, it returns the number of
+DMA address segments mapped (this may be shorter
+than <nents> passed in if some elements of the scatter/gather
+list are physically or virtually adjacent and an IOMMU maps
+them with a single entry).
 
-Cc: Corentin Labbe <clabbe@baylibre.com>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
-Fixes: 46c5338db7bd ("crypto: sl3516 - Add sl3516 crypto engine")
+Fixes: 5de8875281e1 ("crypto: sahara - Add driver for SAHARA2 accelerator.")
 Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/crypto/gemini/sl3516-ce-cipher.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/sahara.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
-index 14d0d83d388d..34fea8aa91b6 100644
---- a/drivers/crypto/gemini/sl3516-ce-cipher.c
-+++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
-@@ -149,7 +149,7 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
- 	if (areq->src == areq->dst) {
- 		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
- 				    DMA_BIDIRECTIONAL);
--		if (nr_sgs <= 0 || nr_sgs > MAXDESC / 2) {
-+		if (!nr_sgs || nr_sgs > MAXDESC / 2) {
- 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
- 			err = -EINVAL;
- 			goto theend;
-@@ -158,14 +158,14 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
- 	} else {
- 		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
- 				    DMA_TO_DEVICE);
--		if (nr_sgs <= 0 || nr_sgs > MAXDESC / 2) {
-+		if (!nr_sgs || nr_sgs > MAXDESC / 2) {
- 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
- 			err = -EINVAL;
- 			goto theend;
- 		}
- 		nr_sgd = dma_map_sg(ce->dev, areq->dst, sg_nents(areq->dst),
- 				    DMA_FROM_DEVICE);
--		if (nr_sgd <= 0 || nr_sgd > MAXDESC) {
-+		if (!nr_sgd || nr_sgd > MAXDESC) {
- 			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgd);
- 			err = -EINVAL;
- 			goto theend_sgs;
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 457084b344c1..bb71aac30e2c 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -487,13 +487,13 @@ static int sahara_hw_descriptor_create(struct sahara_dev *dev)
+ 
+ 	ret = dma_map_sg(dev->device, dev->in_sg, dev->nb_in_sg,
+ 			 DMA_TO_DEVICE);
+-	if (ret != dev->nb_in_sg) {
++	if (!ret) {
+ 		dev_err(dev->device, "couldn't map in sg\n");
+ 		goto unmap_in;
+ 	}
+ 	ret = dma_map_sg(dev->device, dev->out_sg, dev->nb_out_sg,
+ 			 DMA_FROM_DEVICE);
+-	if (ret != dev->nb_out_sg) {
++	if (!ret) {
+ 		dev_err(dev->device, "couldn't map out sg\n");
+ 		goto unmap_out;
+ 	}
 -- 
 2.34.1
 
