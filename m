@@ -2,100 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB48C64991
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 14:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62954C32774
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Aug 2022 15:32:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241694AbiHYOYY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Aug 2022 10:24:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38852 "EHLO
+        id S242576AbiHYPcO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 Aug 2022 11:32:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241339AbiHYOXf (ORCPT
+        with ESMTP id S242851AbiHYPbx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Aug 2022 10:23:35 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0875FB6014;
-        Thu, 25 Aug 2022 07:23:31 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 12so18037027pga.1;
-        Thu, 25 Aug 2022 07:23:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc;
-        bh=cVU0VI6SHUHssnCSIRaLHSdROjTj9L70izUE69+SVQI=;
-        b=iyeuTXiHSUNy2JLfnzmnkGQBac1RWC4oduQxuaWC+q+SJbRjdpKqlX0/4EzSoBVRgb
-         Q+0KkXZ35/EWiIxymYBc6rZ53bXyImV9j+UTHri6pA8gSyXS19kub5PnMoeRf/Ab5HoN
-         8o4w3ilhynUVrB4sCn6Yo6PVAEGi7guxxZxA5Ws/ypvwkKOOY4NQJ1NYORW/G6zgeFAJ
-         Tlv/bG9T/H0f6dL6YCW7LSX7n4ej9R8ZteyIhqbjVSvZr4VBpEO6+953FdIV/P5Gcr+i
-         Q/7sqwCGhvojVOxXSIofPwZHurCDXFekWIATZC02M+p7i1zKzWh4IxjitDpGpYsOvlKj
-         7kmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc;
-        bh=cVU0VI6SHUHssnCSIRaLHSdROjTj9L70izUE69+SVQI=;
-        b=Y4a66fE6pdwGEvDn2qimzNX+scVuaeN4+xMS80tUAfCy+aHvWFzSvtBCtgOT9xs+s6
-         cdDaYhyB01JgVvk2CgBUPddU/CC3DoBI3vWq/FszCz0vwHPjruDf/6UxeOnD/5mSqb/e
-         hnb7MOQTpVrxrWht8O10cM8bYTtKmuHkjxm7FNCCvn8B/qTeIr4gvhd1VMcRKre5ZfLL
-         aD0y9ekdixKP9GGcvOqb6AJljZ/1csfQ786bSa3Inv9nSPg7sg4LfeZg2qHGzPvE9XAN
-         sR1f+A9zsOserQ9jo+37fQ4ooIcSgCxjvEx1E0S1Zl+FKGTOLzvqNwHHbuFAN7edjbpI
-         JfJw==
-X-Gm-Message-State: ACgBeo3C2RiTCILvNS36QEBlehKiatl+bPzt/4M6zmlyQtfRBwG+AASA
-        GPjxvBXkHHHbkpt9czpLKHw=
-X-Google-Smtp-Source: AA6agR47nAW/DbDYMnn/wzQQJNghFOEv8l4oZniUR/03+jNEV658GYe4pMs43MGah7jY4Rp48X4PSA==
-X-Received: by 2002:a05:6a00:1402:b0:536:bf1c:3d16 with SMTP id l2-20020a056a00140200b00536bf1c3d16mr4516591pfu.20.1661437410518;
-        Thu, 25 Aug 2022 07:23:30 -0700 (PDT)
-Received: from linux-l9pv.suse (123-194-152-128.dynamic.kbronet.com.tw. [123.194.152.128])
-        by smtp.gmail.com with ESMTPSA id l15-20020a170903120f00b0016bb24f5d19sm14962803plh.209.2022.08.25.07.23.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Aug 2022 07:23:30 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v9,4/4] Documentation/admin-guide/module-signing.rst: add openssl command option example for CodeSign EKU
-Date:   Thu, 25 Aug 2022 22:23:14 +0800
-Message-Id: <20220825142314.8406-5-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
-In-Reply-To: <20220825142314.8406-1-jlee@suse.com>
-References: <20220825142314.8406-1-jlee@suse.com>
+        Thu, 25 Aug 2022 11:31:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2408A74353;
+        Thu, 25 Aug 2022 08:31:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F135E61AB3;
+        Thu, 25 Aug 2022 15:31:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D1DAC433C1;
+        Thu, 25 Aug 2022 15:31:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661441503;
+        bh=T11/F7BgE239LRXHDyNOIUVXHmxFBP7bP1coH5+n/sE=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Pjhzv2oa3PwImoti6yU7jeDOfwVqlBMIFN4PYUzMz9WRHhJ98kn6+wlfMfgC2Tk3F
+         O8nwqpVNJtZtF4EBE1OudRwjzAA28z+Jmfvzt8+3bQorejZcd16iGpQRapgHfxm6hF
+         WXOYB2olpWvcJuR1uMm6PATb47ACaX8+e621jnzkRmshyp3BPpp2EoTOvj3Q7Rr9tf
+         Hj3uxTJg5mEXUqAKi4v/CoH+AR8ya/XJn16+HYuoS1IofkJUM0TWhgaw5au62FypxY
+         mBz5EzU1M68Q0SOqTei9X2De0GbfxELvQeRx9owQh80mD+g/VUuN0QFSJFcdzPM+nJ
+         xxcBt0i8wAFdQ==
+Message-ID: <97dc2f1d-081e-a182-cc4d-57e3df4742a0@kernel.org>
+Date:   Thu, 25 Aug 2022 08:31:42 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH 08/31] net/tcp: Introduce TCP_AO setsockopt()s
+Content-Language: en-US
+To:     Dmitry Safonov <dima@arista.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20220818170005.747015-1-dima@arista.com>
+ <20220818170005.747015-9-dima@arista.com>
+From:   David Ahern <dsahern@kernel.org>
+In-Reply-To: <20220818170005.747015-9-dima@arista.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add an openssl command option example for generating CodeSign extended
-key usage in X.509 when CONFIG_CHECK_CODESIGN_EKU is enabled.
+On 8/18/22 9:59 AM, Dmitry Safonov wrote:
+> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+> index 849bbf2d3c38..5369458ae89f 100644
+> --- a/include/uapi/linux/tcp.h
+> +++ b/include/uapi/linux/tcp.h
+> @@ -129,6 +129,9 @@ enum {
+>  
+>  #define TCP_TX_DELAY		37	/* delay outgoing packets by XX usec */
+>  
+> +#define TCP_AO			38	/* (Add/Set MKT) */
+> +#define TCP_AO_DEL		39	/* (Delete MKT) */
+> +#define TCP_AO_MOD		40	/* (Modify MKT) */
+>  
+>  #define TCP_REPAIR_ON		1
+>  #define TCP_REPAIR_OFF		0
+> @@ -344,6 +347,38 @@ struct tcp_diag_md5sig {
+>  
+>  #define TCP_AO_MAXKEYLEN	80
+>  
+> +#define TCP_AO_CMDF_CURR	(1 << 0)	/* Only checks field sndid */
+> +#define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
+> +
+> +struct tcp_ao { /* setsockopt(TCP_AO) */
+> +	struct __kernel_sockaddr_storage tcpa_addr;
+> +	char	tcpa_alg_name[64];
+> +	__u16	tcpa_flags;
+> +	__u8	tcpa_prefix;
+> +	__u8	tcpa_sndid;
+> +	__u8	tcpa_rcvid;
+> +	__u8	tcpa_maclen;
+> +	__u8	tcpa_keyflags;
+> +	__u8	tcpa_keylen;
+> +	__u8	tcpa_key[TCP_AO_MAXKEYLEN];
+> +} __attribute__((aligned(8)));
+> +
+> +struct tcp_ao_del { /* setsockopt(TCP_AO_DEL) */
+> +	struct __kernel_sockaddr_storage tcpa_addr;
+> +	__u16	tcpa_flags;
+> +	__u8	tcpa_prefix;
+> +	__u8	tcpa_sndid;
+> +	__u8	tcpa_rcvid;
+> +	__u8	tcpa_current;
+> +	__u8	tcpa_rnext;
+> +} __attribute__((aligned(8)));
+> +
+> +struct tcp_ao_mod { /* setsockopt(TCP_AO_MOD) */
+> +	__u16	tcpa_flags;
+> +	__u8	tcpa_current;
+> +	__u8	tcpa_rnext;
+> +} __attribute__((aligned(8)));
+> +
+>  /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
+>  
+>  #define TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT 0x1
 
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- Documentation/admin-guide/module-signing.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/admin-guide/module-signing.rst b/Documentation/admin-guide/module-signing.rst
-index 7d7c7c8a545c..ca3b8f19466c 100644
---- a/Documentation/admin-guide/module-signing.rst
-+++ b/Documentation/admin-guide/module-signing.rst
-@@ -170,6 +170,12 @@ generate the public/private key files::
- 	   -config x509.genkey -outform PEM -out kernel_key.pem \
- 	   -keyout kernel_key.pem
- 
-+When ``CONFIG_CHECK_CODESIGN_EKU`` option is enabled, the following openssl
-+command option should be added where for generating CodeSign extended key usage
-+in X.509::
-+
-+        -addext "extendedKeyUsage=codeSigning"
-+
- The full pathname for the resulting kernel_key.pem file can then be specified
- in the ``CONFIG_MODULE_SIG_KEY`` option, and the certificate and key therein will
- be used instead of an autogenerated keypair.
--- 
-2.26.2
+I do not see anything in the uapi that would specify the VRF for the
+address.
 
