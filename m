@@ -2,108 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 240F4ECAAD2
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 05:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 414FBECAAD2
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 07:23:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241159AbiHZFpZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Aug 2022 01:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46854 "EHLO
+        id S229970AbiHZHXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Aug 2022 03:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244907AbiHZFpY (ORCPT
+        with ESMTP id S244814AbiHZHXm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2022 01:45:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB93AA8962;
-        Thu, 25 Aug 2022 22:45:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26BA16195D;
-        Fri, 26 Aug 2022 05:45:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E1BC433C1;
-        Fri, 26 Aug 2022 05:45:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661492720;
-        bh=dvHGkLB4gEgzNYqdU8M9Nt8MYSoE1f2P6IGT8HDsfvo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OirB0Hf/pTYt+3QpWhoFleQ5R4EpQF2vuyC0ioyqByhMgAmF5ffJRfxQf6HRPMwYs
-         7Kir4WgSw++gRV/kd3zECCly0eivyiTIfhea08N3QnahGLMrHoMB12IrHvxyTUh6fG
-         +Rb7sU74/4R30+HbrhbJSbieTOlL5aFgfJmEznp+lL9VNtBrJAcswuQY5p2anGtkpa
-         T4q3PNG3SMCqRgWbufGT/++XlzbM2g/NRMskm/nc0ZDD3fG6H2WNNFFFzt3vNOG4RH
-         N5xhqsA1393sMjh9OqvjQZfEdQ7rr6hzBPVQfD+IinkpUpPKh8gwzdJUjI96/qMymz
-         +MKpNqHbqsQmA==
-Date:   Fri, 26 Aug 2022 08:45:13 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RESEND PATCH] KEYS: asymmetric: Fix ECDSA use via keyctl uapi
-Message-ID: <Ywhd6emoKvWgeB9O@kernel.org>
-References: <20220824190409.4286-1-denkenz@gmail.com>
+        Fri, 26 Aug 2022 03:23:42 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22E1D2EB8;
+        Fri, 26 Aug 2022 00:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AEKb3DwntGJTTjvDTJ6NmSnPWGwTdjV+VoVwaBrNJnk=; b=OkA+Cx6EfR/tlzYGyBhl8+vsbz
+        3Za4a2S7rWXT+HhqKqJf5T1BQjDBg0G3qCmFvzOIovSWOu8gzNUGDBDFdvC9A7GjkfCPQoguol4wb
+        i2FYfBbYPfPEJYIYgqTrsq73NtGhpvCFzME763sBZckOABZSOk1o8FpsX+2gRox1hKEIPonKZ62mA
+        q3QF0yn04z6diKaFQs+4rc8x6Q07IDs0V3o4yIIxk76ddrcyHQ1soQ+/ZvHu5zb2j5Zb4CAHARU7y
+        AyDgtU6LR8GLZDzV4Qn9MK8ODVMqXPWT4IFWRtLUdOwcWbM7GzHeMBwNrDyjMrrtda/fUtX//2pPM
+        5MPsMXcw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oRTgk-006HEO-Ko; Fri, 26 Aug 2022 07:23:34 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4AB7B98028D; Fri, 26 Aug 2022 09:23:33 +0200 (CEST)
+Date:   Fri, 26 Aug 2022 09:23:33 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Adam Langley <agl@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: Should Linux set the new constant-time mode CPU flags?
+Message-ID: <Ywh09ZXBZFA3R0W6@worktop.programming.kicks-ass.net>
+References: <YwgCrqutxmX0W72r@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220824190409.4286-1-denkenz@gmail.com>
+In-Reply-To: <YwgCrqutxmX0W72r@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 02:04:09PM -0500, Denis Kenzior wrote:
-> When support for ECDSA keys was added, constraints for data & signature
-> sizes were never updated.  This makes it impossible to use such keys via
-> keyctl API from userspace; fix that.
-
-Instead of "fix that" just describe the change.
-
-> Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA keys")
-> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
-> ---
->  crypto/asymmetric_keys/public_key.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
+On Thu, Aug 25, 2022 at 11:15:58PM +0000, Eric Biggers wrote:
+> Hi,
 > 
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index 2f8352e88860..eca5671ad3f2 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -186,8 +186,28 @@ static int software_key_query(const struct kernel_pkey_params *params,
->  
->  	len = crypto_akcipher_maxsize(tfm);
->  	info->key_size = len * 8;
-> -	info->max_data_size = len;
-> -	info->max_sig_size = len;
-> +
-> +	if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
-> +		/*
-> +		 * ECDSA key sizes are much smaller than RSA, and thus could
-> +		 * operate on (hashed) inputs that are larger than key size.
-> +		 * For example SHA384-hashed input used with secp256r1
-> +		 * based keys.  Set max_data_size to be at least as large as
-> +		 * the largest supported hash size (SHA512)
-> +		 */
-> +		info->max_data_size = 64;
-> +
-> +		/*
-> +		 * Verify takes ECDSA-Sig (described in RFC 5480) as input,
-> +		 * which is actually 2 'key_size'-bit integers encoded in
-> +		 * ASN.1.  Account for the ASN.1 encoding overhead here.
-> +		 */
-> +		info->max_sig_size = 2 * (len + 3) + 2;
-> +	} else {
-> +		info->max_data_size = len;
-> +		info->max_sig_size = len;
-> +	}
-> +
->  	info->max_enc_size = len;
->  	info->max_dec_size = len;
->  	info->supported_ops = (KEYCTL_SUPPORTS_ENCRYPT |
-> -- 
-> 2.35.1
+> Intel and ARM recently published documentation that says that no instructions
+> are guaranteed to be constant-time with respect to their data operands, unless a
+> "data independent timing" flag in the IA32_UARCH_MISC_CTL register (Intel) or
+> DIT register (arm64) is set:
 > 
+> * https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/data-operand-independent-timing-isa-guidance.html
+> * https://developer.arm.com/documentation/ddi0595/2021-06/AArch64-Registers/DIT--Data-Independent-Timing
+> 
+> This is a major problem for crypto code, which needs to be constant-time,
+> especially with respect to keys.  And since this is a CPU issue, it affects all
+> code running on the CPU.  While neither company is treating this as a security
+> disclosure, to me this looks exactly like a CPU vulnerability.
+> 
+> For Intel, given that the mitigation is to set an MSR flag, it seems that the
+> kernel will need to do that -- similar to the MSR flags that enable mitigations
+> for speculative execution vulnerabilities.
+> 
+> For arm64, it's not clear to me whether the DIT flag is privileged or not.  If
+> privileged, I expect it would need to be set by the kernel just like the Intel
+> flag.  If unprivileged, I expect there will still be work to do in the kernel,
+> as the flag will need to be set when running any crypto code in the kernel.
+> 
+> I'm wondering if people are aware of this issue, and whether anyone has any
+> thoughts on whether/where the kernel should be setting these new CPU flags.
+> There don't appear to have been any prior discussions about this.  (Thanks to
+> Adam Langley, who maintains BoringSSL, for bringing this to my attention.)
 
-The code change lgtm.
+Whichever way around I think you want OS support to make it a per-task
+property instead of a per CPU one.
 
-BR, Jarkko
+Also, *sigh* yet another MSR to touch :/
