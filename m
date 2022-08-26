@@ -2,89 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61490ECAAA3
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 05:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B78ECAAD2
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 05:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235185AbiHZFFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Aug 2022 01:05:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54034 "EHLO
+        id S244768AbiHZFHR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Aug 2022 01:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbiHZFFK (ORCPT
+        with ESMTP id S229662AbiHZFHQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2022 01:05:10 -0400
+        Fri, 26 Aug 2022 01:07:16 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131921CFE3;
-        Thu, 25 Aug 2022 22:05:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C275A6C11;
+        Thu, 25 Aug 2022 22:07:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C155CB82F77;
-        Fri, 26 Aug 2022 05:05:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306AAC433C1;
-        Fri, 26 Aug 2022 05:05:06 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DA399B80ABF;
+        Fri, 26 Aug 2022 05:07:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4FDC433D7;
+        Fri, 26 Aug 2022 05:07:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661490306;
-        bh=8yQmsLqSZ3CuFmHZG83IrH41ZXlR5zI210dsVdUm9/0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=o5pUNKFLdz2De65FImK8eRL+RZP1ZMKFXAfOUUrzWZMOQ0pJtVW1w8gNYusDmQua7
-         Y0yORGvnxuYDMV12ID6LA6ZDmAoP6NoZgLfEVtNNzKaOojdGhe1h3ry4VF7lGQLzwl
-         hMspS6OlRLUQKx4kg+nNjqzL9635eVR6VNbightJtPuwzHzOL/ZvPpMXun8dyFojTe
-         GGUxXT8EJc0ZKATV8dg1z7eNhgjjvgtt0dI8OhHUQReDXBAuYfmtEJdZZtlgmi2ykX
-         c3g0Kdz7nF5e7CgiVyWM0YhBv4x0MjZZRiGZCiPfwSj2QkYViPixQUsQ9K1G8ck5rh
-         JjSaJvx8+Nruw==
+        s=k20201202; t=1661490433;
+        bh=EhUBCrNn3AH2IoZWBlmeQVBIcyb6d3XAKROe8g5mp34=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sQZmA42nG8dvoHBFwRSrpQCkeVcTbAEBxs4ImjTc0FNoy9LLpe86uKOtMmsTZWyL7
+         NtlkeDvViQsYaTZQHYsSF73jWeMRunRL7fyIHnvfXT+eLA6agFU6j54kYtV2xuOkLM
+         HxqmP3YdMYe1pt1zpgWZ2u4yLZiyf8qTuP1uKm0LBd8F4varwUFAQS2Ra6OmSF3e2G
+         Dap4eNNHbXu78oaIAJVMr7elaAHrP2prPchejJ+RDhLxVRnJL67z98zvXor9wAl2xl
+         LCA2o0aCM+4wH28NSzgTTxG7OljTWm5H7mR18MpX3SMV9/O9P42D34Xof/lSSETr9H
+         wWNrYQbh5QqJA==
+Date:   Thu, 25 Aug 2022 22:07:11 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "Jason A . Donenfeld " <Jason@zx2c4.com>,
-        "Justin M . Forbes" <jforbes@fedoraproject.org>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH] crypto: lib - remove unneeded selection of XOR_BLOCKS
-Date:   Thu, 25 Aug 2022 22:04:56 -0700
-Message-Id: <20220826050456.101321-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.37.2
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
+        "Justin M. Forbes" <jforbes@fedoraproject.org>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] crypto: lib - move __crypto_xor into utils
+Message-ID: <YwhU/0XHDGIuiu5T@sol.localdomain>
+References: <20220725183636.97326-1-ebiggers@kernel.org>
+ <20220725183636.97326-3-ebiggers@kernel.org>
+ <YwhPtnL6yVG0K2Lo@sol.localdomain>
+ <YwhQIRVc60u4B9Bs@gondor.apana.org.au>
+ <YwhQmcgPpe2fpx86@sol.localdomain>
+ <YwhRpUcbqs1GGGU6@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YwhRpUcbqs1GGGU6@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Aug 26, 2022 at 12:52:53PM +0800, Herbert Xu wrote:
+> On Thu, Aug 25, 2022 at 09:48:25PM -0700, Eric Biggers wrote:
+> >
+> > The one I'm commenting on (patch 2 of 3).  But patch 1 is needed as a
+> > prerequisite.
+> 
+> Oh so it's just dropping the select? Can you please send me a
+> separate patch for the crypto tree with a Fixes header? I'll
+> deal with the merge conflict.
+> 
 
-CRYPTO_LIB_CHACHA_GENERIC doesn't need to select XOR_BLOCKS.  It perhaps
-was thought that it's needed for __crypto_xor, but that's not the case.
+Done: https://lore.kernel.org/r/20220826050456.101321-1-ebiggers@kernel.org
 
-Enabling XOR_BLOCKS is problematic because the XOR_BLOCKS code runs a
-benchmark when it is initialized.  That causes a boot time regression on
-systems that didn't have it enabled before.
-
-Therefore, remove this unnecessary and problematic selection.
-
-Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
-
-I've separated this fix out from the larger patch
-https://lore.kernel.org/r/20220725183636.97326-3-ebiggers@kernel.org
-that is currently queued in cryptodev.
-
- lib/crypto/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 9ff549f63540fa..47816af9a9d7e1 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -33,7 +33,6 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
- 
- config CRYPTO_LIB_CHACHA_GENERIC
- 	tristate
--	select XOR_BLOCKS
- 	help
- 	  This symbol can be depended upon by arch implementations of the
- 	  ChaCha library interface that require the generic code as a
-
-base-commit: 4c612826bec1441214816827979b62f84a097e91
--- 
-2.37.2
-
+- Eric
