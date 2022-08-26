@@ -2,55 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FB5ECAAA3
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 04:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61490ECAAA3
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 05:05:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233019AbiHZExE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Aug 2022 00:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37422 "EHLO
+        id S235185AbiHZFFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Aug 2022 01:05:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbiHZExE (ORCPT
+        with ESMTP id S229662AbiHZFFK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2022 00:53:04 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433FECE469;
-        Thu, 25 Aug 2022 21:53:03 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oRRKw-00FJ0j-2d; Fri, 26 Aug 2022 14:52:55 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 26 Aug 2022 12:52:54 +0800
-Date:   Fri, 26 Aug 2022 12:52:53 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
-        "Justin M. Forbes" <jforbes@fedoraproject.org>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] crypto: lib - move __crypto_xor into utils
-Message-ID: <YwhRpUcbqs1GGGU6@gondor.apana.org.au>
-References: <20220725183636.97326-1-ebiggers@kernel.org>
- <20220725183636.97326-3-ebiggers@kernel.org>
- <YwhPtnL6yVG0K2Lo@sol.localdomain>
- <YwhQIRVc60u4B9Bs@gondor.apana.org.au>
- <YwhQmcgPpe2fpx86@sol.localdomain>
+        Fri, 26 Aug 2022 01:05:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131921CFE3;
+        Thu, 25 Aug 2022 22:05:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C155CB82F77;
+        Fri, 26 Aug 2022 05:05:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306AAC433C1;
+        Fri, 26 Aug 2022 05:05:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661490306;
+        bh=8yQmsLqSZ3CuFmHZG83IrH41ZXlR5zI210dsVdUm9/0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=o5pUNKFLdz2De65FImK8eRL+RZP1ZMKFXAfOUUrzWZMOQ0pJtVW1w8gNYusDmQua7
+         Y0yORGvnxuYDMV12ID6LA6ZDmAoP6NoZgLfEVtNNzKaOojdGhe1h3ry4VF7lGQLzwl
+         hMspS6OlRLUQKx4kg+nNjqzL9635eVR6VNbightJtPuwzHzOL/ZvPpMXun8dyFojTe
+         GGUxXT8EJc0ZKATV8dg1z7eNhgjjvgtt0dI8OhHUQReDXBAuYfmtEJdZZtlgmi2ykX
+         c3g0Kdz7nF5e7CgiVyWM0YhBv4x0MjZZRiGZCiPfwSj2QkYViPixQUsQ9K1G8ck5rh
+         JjSaJvx8+Nruw==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A . Donenfeld " <Jason@zx2c4.com>,
+        "Justin M . Forbes" <jforbes@fedoraproject.org>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH] crypto: lib - remove unneeded selection of XOR_BLOCKS
+Date:   Thu, 25 Aug 2022 22:04:56 -0700
+Message-Id: <20220826050456.101321-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YwhQmcgPpe2fpx86@sol.localdomain>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 09:48:25PM -0700, Eric Biggers wrote:
->
-> The one I'm commenting on (patch 2 of 3).  But patch 1 is needed as a
-> prerequisite.
+From: Eric Biggers <ebiggers@google.com>
 
-Oh so it's just dropping the select? Can you please send me a
-separate patch for the crypto tree with a Fixes header? I'll
-deal with the merge conflict.
+CRYPTO_LIB_CHACHA_GENERIC doesn't need to select XOR_BLOCKS.  It perhaps
+was thought that it's needed for __crypto_xor, but that's not the case.
 
-Thanks,
+Enabling XOR_BLOCKS is problematic because the XOR_BLOCKS code runs a
+benchmark when it is initialized.  That causes a boot time regression on
+systems that didn't have it enabled before.
+
+Therefore, remove this unnecessary and problematic selection.
+
+Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+
+I've separated this fix out from the larger patch
+https://lore.kernel.org/r/20220725183636.97326-3-ebiggers@kernel.org
+that is currently queued in cryptodev.
+
+ lib/crypto/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 9ff549f63540fa..47816af9a9d7e1 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -33,7 +33,6 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 
+ config CRYPTO_LIB_CHACHA_GENERIC
+ 	tristate
+-	select XOR_BLOCKS
+ 	help
+ 	  This symbol can be depended upon by arch implementations of the
+ 	  ChaCha library interface that require the generic code as a
+
+base-commit: 4c612826bec1441214816827979b62f84a097e91
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.37.2
+
