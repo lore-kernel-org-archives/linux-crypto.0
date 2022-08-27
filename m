@@ -2,170 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECF8ECAAD6
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Aug 2022 20:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6909FECAAD4
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Aug 2022 02:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344651AbiHZUXN (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Aug 2022 16:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
+        id S232554AbiH0CrC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 Aug 2022 22:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231643AbiHZUXM (ORCPT
+        with ESMTP id S230499AbiH0CrC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Aug 2022 16:23:12 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AEEC88A1;
-        Fri, 26 Aug 2022 13:23:11 -0700 (PDT)
+        Fri, 26 Aug 2022 22:47:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7DFDAEFD
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Aug 2022 19:47:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 97635B83114;
-        Fri, 26 Aug 2022 20:23:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E74FDC433D6;
-        Fri, 26 Aug 2022 20:23:07 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D1C961DA7
+        for <linux-crypto@vger.kernel.org>; Sat, 27 Aug 2022 02:47:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C57CC433D7;
+        Sat, 27 Aug 2022 02:47:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661545388;
-        bh=7cCDjYToph++Z/ONuGisoLePKjQz5vPpNaRrGjuFxao=;
+        s=k20201202; t=1661568420;
+        bh=mangj+vb++MHHsg3fBqTxBLD1WQuU4hbCztJTRbTXXU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EmkGQofJICdXtAwYKaBLKXrvOrsaFzzle1UCo1WanL/8NWbeQlEur23/S9KadZC3c
-         oeXJn3xoNIvUur9FFx5vPZgKMNUM+IVC3tYxG86ejlTNhQkpMIDHiq6qjrmFNSsWhT
-         HBRczUOefGKJxiY45U/tnYmZm116gjfeQ5cLiWvsucdA0Ya0PGCdSo/5szlcRDAXtY
-         ZVbP9xr/DM2i/Dlcn/oi6K20htE2igPDRDfasgUZ5cqXejPBJiEu9vVyYy3HkEeadJ
-         nMCjpoWdXQ5W68V/sKZm0MXOJjJSKF/sOkI2yJ/k7/UPL5p1NYfmE7F0thfZx7p7zt
-         4wVgd5bNjdWkQ==
-Date:   Fri, 26 Aug 2022 23:23:00 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ben Boeckel <me@benboeckel.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Malte Gell <malte.gell@gmx.de>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Lee, Chun-Yi" <jlee@suse.com>
-Subject: Re: [PATCH v9,1/4] X.509: Add CodeSigning extended key usage parsing
-Message-ID: <YwkrpLPyU0huPduE@kernel.org>
-References: <20220825142314.8406-1-jlee@suse.com>
- <20220825142314.8406-2-jlee@suse.com>
+        b=tjelDWY4pJhdzMICcDQcZxLm05dETc9pD+vCEqdAwnSVMAQQpgeFdlwMkOXcjhWdZ
+         m3gyWGvC07sRAx0/f43a2nXssw+aMBNeH1wlbtJqiBqd2U704nL+GCzxDtnPT46eRt
+         h5B/TGduBKpIki2S3/vkDP1vegDp/twUlxzlecKWl97sT/Tl62B0XrSVIDpyIY2h1g
+         lLoG2LWYI+sJs3D3A+2p08GDrGqRV6QJfUcTUR23H18FkkLHNbPxVDm7pMSJyS/hR3
+         /FPY2e5VEXfiZxnXnotM6RBEIGjgoZNDbNWdDT7D3QWzaTO7tqQTHg7mVi8C3uDz9/
+         wfgAa+vNPOD8g==
+Date:   Fri, 26 Aug 2022 19:46:58 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, elliott@hpe.com
+Subject: Re: [PATCH v2 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64 assembler
+ implementation of aria cipher
+Message-ID: <YwmFouIyIlOMqKb4@sol.localdomain>
+References: <20220826053131.24792-1-ap420073@gmail.com>
+ <20220826053131.24792-3-ap420073@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220825142314.8406-2-jlee@suse.com>
+In-Reply-To: <20220826053131.24792-3-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 10:23:11PM +0800, Lee, Chun-Yi wrote:
-> This patch adds the logic for parsing the CodeSign extended key usage
-
-It's *not* a patch once it is applied.
-
-And isn't the identifier actually "codeSign", not "CodeSign"? Please,
-format identifier correctly in order not to cause confusion.
-
-So, how I would rewrite the first sentence, would be:
-
-  Add the logic for parsing codeSign extended key usage field, as
-  described in RFC2459, section "4.2.1.13  Extended key usage
-  field.
-
-E.g. it took me 15 minutes to review the commit message alone
-because I could not remember the RFC number off top of my head.
-
-> extension in X.509. The parsing result will be set to the
-> ext_key_usage
-> flag which is carried by public key. It can be used in the PKCS#7
-> verification.
-> 
-> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 25 +++++++++++++++++++++++
->  include/crypto/public_key.h               |  1 +
->  include/linux/oid_registry.h              |  5 +++++
->  3 files changed, 31 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 2899ed80bb18..1f67e0adef65 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -554,6 +554,8 @@ int x509_process_extension(void *context, size_t hdrlen,
->  	struct x509_parse_context *ctx = context;
->  	struct asymmetric_key_id *kid;
->  	const unsigned char *v = value;
-> +	int i = 0;
-> +	enum OID oid;
-
-I'd reorder the declarations (suggestion).
-
->  
->  	pr_debug("Extension: %u\n", ctx->last_oid);
->  
-> @@ -583,6 +585,29 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
->  
-> +	if (ctx->last_oid == OID_extKeyUsage) {
-> +		if (vlen < 2 ||
-> +		    v[0] != ((ASN1_UNIV << 6) | ASN1_CONS_BIT | ASN1_SEQ) ||
-> +		    v[1] != vlen - 2)
-> +			return -EBADMSG;
-> +		i += 2;
-> +
-> +		while (i < vlen) {
-> +			/* A 10 bytes EKU OID Octet blob =
-> +			 * ASN1_OID + size byte + 8 bytes OID */
-> +			if ((i + 10) > vlen || v[i] != ASN1_OID || v[i + 1] != 8)
-> +				return -EBADMSG;
-> +
-> +			oid = look_up_OID(v + i + 2, v[i + 1]);
-> +			if (oid == OID_codeSigning) {
-> +				ctx->cert->pub->ext_key_usage |= EKU_codeSigning;
-> +			}
-> +			i += 10;
-> +		}
-> +		pr_debug("extKeyUsage: %d\n", ctx->cert->pub->ext_key_usage);
-> +		return 0;
+On Fri, Aug 26, 2022 at 05:31:30AM +0000, Taehee Yoo wrote:
+> +static struct skcipher_alg aria_algs[] = {
+> +	{
+> +		.base.cra_name		= "__ecb(aria)",
+> +		.base.cra_driver_name	= "__ecb-aria-avx",
+> +		.base.cra_priority	= 400,
+> +		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
+> +		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
+> +		.base.cra_ctxsize	= sizeof(struct aria_ctx),
+> +		.base.cra_module	= THIS_MODULE,
+> +		.min_keysize		= ARIA_MIN_KEY_SIZE,
+> +		.max_keysize		= ARIA_MAX_KEY_SIZE,
+> +		.setkey			= aria_avx_set_key,
+> +		.encrypt		= aria_avx_ecb_encrypt,
+> +		.decrypt		= aria_avx_ecb_decrypt,
 > +	}
-> +
->  	return 0;
->  }
->  
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 68f7aa2a7e55..72c0fcc39d0f 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -28,6 +28,7 @@ struct public_key {
->  	bool key_is_private;
->  	const char *id_type;
->  	const char *pkey_algo;
-> +	unsigned int ext_key_usage : 9;      /* Extended Key Usage (9-bit) */
->  };
->  
->  extern void public_key_free(struct public_key *key);
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index 0f4a8903922a..460135c2d918 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -140,9 +140,14 @@ enum OID {
->  	OID_TPMImportableKey,		/* 2.23.133.10.1.4 */
->  	OID_TPMSealedData,		/* 2.23.133.10.1.5 */
->  
-> +	/* Extended key purpose OIDs [RFC 5280] */
-> +	OID_codeSigning,		/* 1.3.6.1.5.5.7.3.3 */
-> +
->  	OID__NR
->  };
->  
-> +#define EKU_codeSigning	(1 << 2)
-> +
->  extern enum OID look_up_OID(const void *data, size_t datasize);
->  extern int parse_OID(const void *data, size_t datasize, enum OID *oid);
->  extern int sprint_oid(const void *, size_t, char *, size_t);
-> -- 
-> 2.26.2
-> 
+> +};
 
-BR, Jarkko
+Why do you want ECB mode and nothing else?  At
+https://lore.kernel.org/r/51ce6519-9f03-81b6-78b0-43c313705e74@gmail.com
+you claimed that the use case for ARIA support in the kernel is kTLS.
+
+So you are using ECB mode in TLS?
+
+- Eric
