@@ -2,134 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF66CC0502E
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Aug 2022 04:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B93ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Aug 2022 19:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbiH1ESO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Aug 2022 00:18:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36414 "EHLO
+        id S229612AbiH1Twq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 28 Aug 2022 15:52:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiH1ESN (ORCPT
+        with ESMTP id S229557AbiH1Twp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Aug 2022 00:18:13 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4643CBE0;
-        Sat, 27 Aug 2022 21:18:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 14947B80AB0;
-        Sun, 28 Aug 2022 04:18:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A00DC433D6;
-        Sun, 28 Aug 2022 04:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661660289;
-        bh=b1DxuemUuHqOzbSQHotO5yGNBJEyQ9fNAcJWznoBnHo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nmqpvICagbOYzuUK7zRSHuKWYR4Q6wHz8Z9BkMNnSLOBbT3S9p5jf0P52D7k/ZA34
-         bP6vV99xNBskD3SnyAx9kgBAXl7RZWs0v8z8zyi4DZ49GSquJa1D52Nop6T5IsWn9b
-         50PJkZjDYXCr5OT1/m3MiZSXOT4WN1QSb+9RZEawAlQPjul2E9aPJSWl0qAp/0zVP0
-         TLRINEII6KF7d2AcAPgWVRhqFhnirzGoVeJ73gOpnN7pybKLs78LO5I1El23pKyXGq
-         jPA+f4DkI4LJcocNVCzvyeTM7yQdnYM+rQTA8bHrXCWMPlN69lDOPDJAvOETpgzis/
-         8N8bc3zBd4WMw==
-Date:   Sun, 28 Aug 2022 07:18:02 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     Peter Gonda <pgonda@google.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Message-ID: <YwrseptOq4tFPylD@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
- <SN6PR12MB2767A51D40E7F53395770DE58EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6qorwbAXaPaCaSm0SC9o2uQ9ZQzB6s1kBkvAv2D4tkUug@mail.gmail.com>
- <YwbQKeDRQF0XGWo7@kernel.org>
- <YwbQtaaCkBwezpB+@kernel.org>
- <SN6PR12MB27678E2944605E11B37267CC8E759@SN6PR12MB2767.namprd12.prod.outlook.com>
+        Sun, 28 Aug 2022 15:52:45 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D180BB496;
+        Sun, 28 Aug 2022 12:52:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=dPawHL8qAnBSGi4I39fEFzREdQv818UwwXOztMhoVdQ=; b=X+UvY2W12TyQc6OsZRi3aiZvaW
+        f8cuW5EYrweGPsGM+HwTgl0CEDlrB3qI6Mdmlqa2IhY64vk+b/JNTcEAEiQli2xh3QlyqQbvFuyT/
+        D9Vo7mNxiX6Kz+yVvhcOLlib0Cywczq2kwHQ5G/cT+xN/9cCYH2P5GhXnj3w8jqnBULBqAa5pz972
+        /h82yWUKAorMmsyf2+UkWrIOhF3qfNJhScxJxAl5NVbrwdU28dJmGrVE3WbtleUNpGHxVCynrws8W
+        pYP2ZzD6llox/7zmGdNAXaGpqwQuk8MDs0J3tEFefJqxj5AuwZGV6H/5D6whIKM0kKbhwGEardAFg
+        UP8Z/3Zg==;
+Received: from [2601:1c0:6280:3f0::a6b3] (helo=casper.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oSOKn-002TCH-16; Sun, 28 Aug 2022 19:52:41 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        kernel test robot <lkp@intel.com>, stable@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Paul Gazzillo <paul@pgazz.com>,
+        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] virt: sev-guest: fix kconfig warnings
+Date:   Sun, 28 Aug 2022 12:52:34 -0700
+Message-Id: <20220828195234.6604-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB27678E2944605E11B37267CC8E759@SN6PR12MB2767.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 06:54:16PM +0000, Kalra, Ashish wrote:
-> [AMD Official Use Only - General]
-> 
-> Hello Jarkko,
-> 
-> >> 
-> >> It really should be, in order to have any practical use:
-> >> 
-> >> 	if (no_iommu) {
-> >> 		pr_err("SEV-SNP: IOMMU is disabled.\n");
-> >> 		return false;
-> >> 	}
-> >> 
-> >> 	if (iommu_default_passthrough()) {
-> >> 		pr_err("SEV-SNP: IOMMU is configured in passthrough mode.\n");
-> >> 		return false;
-> >> 	}
-> >> 
-> >> The comment is *completely* redundant, it absolutely does not serve 
-> >> any sane purpose. It just tells what the code already clearly stating.
-> >> 
-> >> The combo error message on the other hand leaves you to the question 
-> >> "which one was it", and for that reason combining the checks leaves 
-> >> you to a louse debugging experience.
-> 
-> >Also, are those really *errors*? That implies that there is something wrong.
-> 
-> >Since you can have a legit configuration, IMHO they should be either warn or info. What do you think?
-> 
-> >They are definitely not errors
-> 
-> Yes, they can be warn or info, but as I mentioned above this patch is now part of IOMMU + SNP series,
-> so these comments are now relevant for that.
+Fix the SEV_GUEST Kconfig block to eliminate kconfig unmet
+dependency warnings:
 
-Yeah, warn/info/error is less relevant than the
-second point I was making.
+WARNING: unmet direct dependencies detected for CRYPTO_GCM
+  Depends on [n]: CRYPTO [=n]
+  Selected by [y]:
+  - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
 
-It's a good idea to spit out two instead of one
-to make best of spitting out anything in the first
-place :-) That way you make no mistake interpreting
-what does the log message connect to, which can
-sometimes make a difference while debugging a
-kernel issue.
+WARNING: unmet direct dependencies detected for CRYPTO_AEAD2
+  Depends on [n]: CRYPTO [=n]
+  Selected by [y]:
+  - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
 
-BR, Jarkko
+Fixes: fce96cf04430 ("virt: Add SEV-SNP guest driver")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: stable@vger.kernel.org
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Paul Gazzillo <paul@pgazz.com>
+Cc: Necip Fazil Yildiran <fazilyildiran@gmail.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ drivers/virt/coco/sev-guest/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/drivers/virt/coco/sev-guest/Kconfig
++++ b/drivers/virt/coco/sev-guest/Kconfig
+@@ -2,6 +2,7 @@ config SEV_GUEST
+ 	tristate "AMD SEV Guest driver"
+ 	default m
+ 	depends on AMD_MEM_ENCRYPT
++	select CRYPTO
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_GCM
+ 	help
