@@ -2,109 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB69ECAAD4
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 10:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FA5C0502C
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 16:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbiH2K5t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Aug 2022 06:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38578 "EHLO
+        id S230095AbiH2QkF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Aug 2022 12:40:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiH2K5r (ORCPT
+        with ESMTP id S229565AbiH2QkD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2022 06:57:47 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82795C9F0;
-        Mon, 29 Aug 2022 03:57:46 -0700 (PDT)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MGS673bCszHnVN;
-        Mon, 29 Aug 2022 18:55:59 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 29 Aug 2022 18:57:44 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 29 Aug 2022 18:57:44 +0800
-From:   "yekai (A)" <yekai13@huawei.com>
-Subject: Re: [PATCH v7 0/3] crypto: hisilicon - supports device isolation
- feature
-To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-References: <20220806022943.47292-1-yekai13@huawei.com>
- <cffec511-dff2-5951-264a-1e82bb71e183@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-Message-ID: <3fd1c0be-71d1-2402-395f-2fbb85f0d8ec@huawei.com>
-Date:   Mon, 29 Aug 2022 18:57:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Mon, 29 Aug 2022 12:40:03 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A873055AA;
+        Mon, 29 Aug 2022 09:39:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4F18BB81162;
+        Mon, 29 Aug 2022 16:39:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F9B0C433D6;
+        Mon, 29 Aug 2022 16:39:56 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LfnwDr2l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1661791194;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oF1j60atJlDmJ/i/cn/SVD6+lw8BdA37ZDx7OhjUUlY=;
+        b=LfnwDr2lKEuM/Iwq0wN8pMO7EITZzEXBK5Kj2tMINL0OnmV9YDrfbY2Q39x0MdvAPxPqU6
+        fNfDUe+vtWaZF0gRIt21dYVm25wBfkrMt3+G7os0IBL6FyocNXA5YinK8TyR1pNh4fvn6Y
+        6Am/7NMH2JQJRpwpE/jexjTKW7H4NVA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5635b464 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 29 Aug 2022 16:39:54 +0000 (UTC)
+Date:   Mon, 29 Aug 2022 12:39:53 -0400
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Adam Langley <agl@google.com>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: Should Linux set the new constant-time mode CPU flags?
+Message-ID: <Ywzr2d52ixYXUDWR@zx2c4.com>
+References: <YwgCrqutxmX0W72r@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <cffec511-dff2-5951-264a-1e82bb71e183@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YwgCrqutxmX0W72r@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Eric,
 
+On Thu, Aug 25, 2022 at 11:15:58PM +0000, Eric Biggers wrote:
+> I'm wondering if people are aware of this issue, and whether anyone has any
+> thoughts on whether/where the kernel should be setting these new CPU flags.
+> There don't appear to have been any prior discussions about this.  (Thanks to
 
-On 2022/8/22 11:38, yekai (A) wrote:
-> On 2022/8/6 10:29, Kai Ye wrote:
->> 1、Add the uacce hardware error isolation interface. Supports
->>    configures the hardware error isolation frequency.
->> 2、Defining the isolation strategy for ACC by uacce sysfs node. If the 
->>    number of hardware errors in a per hour exceeds the configured value,
->>    the device will not be available in user space. The VF device use the
->>    PF device isolation strategy.
->>    
->> changes v1->v2:
->> 	- deleted dev_to_uacce api.
->> 	- add vfs node doc. 
->> 	- move uacce->ref to driver.
->> changes v2->v3:
->> 	- deleted some redundant code.
->> 	- use qm state instead of reference count.
->> 	- add null pointer check.
->> 	- isolate_strategy_read() instead of a copy.
->> changes v3->v4:
->> 	- modify a comment
->> changes v4->v5:
->> 	- use bool instead of atomic.
->> 	- isolation frequency instead of isolation command.
->> changes v5->v6:
->> 	- add is_visible in uacce.
->> 	- add the description of the isolation strategy file node.
->> changes v6->v7
->> 	- add an example for isolate_strategy in Documentation.
->>
->> Kai Ye (3):
->>   uacce: supports device isolation feature
->>   Documentation: add a isolation strategy sysfs node for uacce
->>   crypto: hisilicon/qm - define the device isolation strategy
->>
->>  Documentation/ABI/testing/sysfs-driver-uacce |  26 +++
->>  drivers/crypto/hisilicon/qm.c                | 163 +++++++++++++++++--
->>  drivers/misc/uacce/uacce.c                   |  58 +++++++
->>  include/linux/hisi_acc_qm.h                  |   9 +
->>  include/linux/uacce.h                        |  11 ++
->>  5 files changed, 255 insertions(+), 12 deletions(-)
->>
-> Hi,
->
-> Just a friendly ping...
->
-> thanks
-> Kai
->
-> .
-Hi Greg KH
+Maybe it should be set unconditionally now, until we figure out how to
+make it more granular.
 
-Could you help me to apply this patchset?
+In terms of granularity, I saw other folks suggesting making it per-task
+(so, presumably, a prctl() knob), and others mentioning doing it just
+for kernel crypto. For the latter, I guess the crypto API could set it
+inside of its abstractions, and the various lib/crypto APIs could set it
+at invocation time. I wonder, though, what's the cost of
+enabling/disabling it? Would we in fact need a kind of lazy-deferred
+disabling, like we have with kernel_fpu_end()? I also wonder what
+crypto-adjacent code might wind up being missed if we're going function
+by function. Like, obviously we'd set this for crypto_memneq, but what
+about potential unprotected `==` of ID numbers that could leak some info
+in various protocols? What other subtle nearby code should we be
+thinking about, that relies on constant time logic but isn't neatly
+folded inside a crypto_do_something() function?
 
-thanks
-Kai
-
+Jason
