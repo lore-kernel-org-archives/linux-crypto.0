@@ -2,89 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 657ADECAAD2
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 19:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E868ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 19:56:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbiH2TJo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Aug 2022 15:09:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
+        id S229735AbiH2T4A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Aug 2022 15:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229731AbiH2TJl (ORCPT
+        with ESMTP id S229886AbiH2Tzu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2022 15:09:41 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADEC7E827;
-        Mon, 29 Aug 2022 12:09:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2400BB811C1;
-        Mon, 29 Aug 2022 19:09:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01A24C433C1;
-        Mon, 29 Aug 2022 19:09:36 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fxxJbh2C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1661800175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=se7iHVBPmFGtUkY2jW1ypnd8OsfvW6M/G2Rrn6yTXLg=;
-        b=fxxJbh2CmEGHAFmQppyVLivVtInkWs+D4yIevizSiev6bXgUAUU1sNVOdtQRANPUecF1zA
-        1A3kCvGzbuHfFYxKjl45J1aD3UTeL6QaGEDyhyj/NmWRlkRDHESTCErFlK6lNEHIiba/pi
-        1IXCxdMFAko30+Sa+D1qzFRcshvTO1w=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 53fce227 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 29 Aug 2022 19:09:35 +0000 (UTC)
-Date:   Mon, 29 Aug 2022 15:09:30 -0400
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Adam Langley <agl@google.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: Should Linux set the new constant-time mode CPU flags?
-Message-ID: <Yw0O6pQ7oKHGmQ0O@zx2c4.com>
-References: <YwgCrqutxmX0W72r@gmail.com>
- <Ywzr2d52ixYXUDWR@zx2c4.com>
- <Yw0Ah5m/2HDDvCjS@gmail.com>
+        Mon, 29 Aug 2022 15:55:50 -0400
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8621FCFB;
+        Mon, 29 Aug 2022 12:55:48 -0700 (PDT)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-11e9a7135easo9292486fac.6;
+        Mon, 29 Aug 2022 12:55:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=022FZqEM+NZk/+qjcdGcVImONgP3k7o4bYGRw++11q0=;
+        b=TcdHWNIivMlrJaRyfbKzK29apZdNivi3Sl1dayoRXqtxljG7MPpWphtUadyAIwgnRP
+         U9syAu9/3LPeyV893toKpSEnr2drx5X1Sguh+KRlyT0oKYSRZKLJ38X/K31uZ/VbY5JS
+         Y8/ftVug1f8WsyrqX0wBBsuAhx1+qBGBwqft3N7IiCyAUG4H413c9PqNNMsYR8iMSjef
+         sHWO6NkSDEFI3eA7zK0eceU2KK+sSm7sqebG45oPp11F8pgCQiNgQ5ltZvqPkTnDJkBc
+         13n+pri14vdaj6Zer9ytgyQIYanOV8Gh12XM0Ya1Ivld6w04CiZy9jI5zvwdGOHf73/9
+         8q7g==
+X-Gm-Message-State: ACgBeo3obwl2VgZIhAH6qpEXnf7bMnSCeuj63cTLAT9GtkfS9r/Emp9u
+        aqkoLZC3ri9iptjLSlas1w==
+X-Google-Smtp-Source: AA6agR4HrxNsAlmaBU/KnvvfB3vzL2uHFpEExor1t4Jl8og9mSVI0Y1aS92n6CWLoQsobrsXrw2Zdw==
+X-Received: by 2002:a05:6870:c68a:b0:11d:124c:5d37 with SMTP id cv10-20020a056870c68a00b0011d124c5d37mr8209083oab.64.1661802946957;
+        Mon, 29 Aug 2022 12:55:46 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id t7-20020a05683014c700b00616e2d2204csm6236948otq.21.2022.08.29.12.55.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Aug 2022 12:55:46 -0700 (PDT)
+Received: (nullmailer pid 2311548 invoked by uid 1000);
+        Mon, 29 Aug 2022 19:55:43 -0000
+Date:   Mon, 29 Aug 2022 14:55:43 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Sylwester Nawrocki <s.nawrocki@samsung.com>,
+        Daniel Vetter <daniel@ffwll.ch>, linux-kernel@vger.kernel.org,
+        Jonas Karlman <jonas@kwiboo.se>,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        Andrzej Hajda <andrzej.hajda@intel.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Inki Dae <inki.dae@samsung.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        linux-ide@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-tegra@vger.kernel.org, Sean Paul <sean@poorly.run>,
+        Stephen Boyd <sboyd@kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        linux-samsung-soc@vger.kernel.org,
+        Seung-Woo Kim <sw0312.kim@samsung.com>,
+        Rob Clark <robdclark@gmail.com>,
+        linux-renesas-soc@vger.kernel.org, freedreno@lists.freedesktop.org,
+        Abhinav Kumar <quic_abhinavk@quicinc.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Marek Vasut <marex@denx.de>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Krishna Manikandan <quic_mkrishn@quicinc.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        linux-crypto@vger.kernel.org, linux-clk@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Tomasz Figa <tomasz.figa@gmail.com>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Robert Foss <robert.foss@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 1/5] dt-bindings: socionext,uniphier-system-cache: drop
+ minItems equal to maxItems
+Message-ID: <20220829195543.GA2311490-robh@kernel.org>
+References: <20220825113334.196908-1-krzysztof.kozlowski@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yw0Ah5m/2HDDvCjS@gmail.com>
+In-Reply-To: <20220825113334.196908-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 06:08:07PM +0000, Eric Biggers wrote:
-> I'd much prefer it being set unconditionally by default as well, as making
-> everyone (both kernel and userspace) turn it on and off constantly would be a
-> nightmare.
+On Thu, 25 Aug 2022 14:33:30 +0300, Krzysztof Kozlowski wrote:
+> minItems, if missing, are implicitly equal to maxItems, so drop
+> redundant piece to reduce size of code.
 > 
-> Note that Intel's documentation says that CPUs before Ice Lake behave as if
-> DOITM is always set:
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  .../bindings/arm/socionext/socionext,uniphier-system-cache.yaml  | 1 -
+>  1 file changed, 1 deletion(-)
 > 
->     "For Intel® Core™ family processors based on microarchitectures before Ice
->     Lake and Intel Atom® family processors based on microarchitectures before
->     Gracemont that do not enumerate IA32_UARCH_MISC_CTL, developers may assume
->     that the instructions listed here operate as if DOITM is enabled."
-> 
-> (It's a bit ambiguous, as it leaves the door open to IA32_UARCH_MISC_CTL being
-> retroactively added to old CPUs.  But I assume that hasn't actually happened.)
-> 
-> So I think the logical approach is to unconditionally set DOITM by default, to
-> fix this CPU bug in Ice Lake and later and just bring things back to the way
-> they were in CPUs before Ice Lake.  With that as a baseline, we can then discuss
-> whether it's useful to provide ways to re-enable this CPU bug / "feature", for
-> people who want to get the performance boost (if one actually exists) of data
-> dependent timing after carefully assessing the risks.
-> 
-> The other way around, of making everything insecure by default, seems like a
-> really bad idea.
 
-Right. It's actually kind of surprising that Intel didn't already do
-this by default. Sure, maybe the Intel manual never explicitly
-guaranteed constant time, but a heck of a lot of code relies on that
-being the case.
-
-Jason
+Applied, thanks!
