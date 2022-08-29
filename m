@@ -2,88 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3843FECAAD2
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 10:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB69ECAAD4
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 10:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbiH2KuL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Aug 2022 06:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57890 "EHLO
+        id S229793AbiH2K5t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Aug 2022 06:57:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiH2KuK (ORCPT
+        with ESMTP id S229478AbiH2K5r (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2022 06:50:10 -0400
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A42EE14;
-        Mon, 29 Aug 2022 03:50:07 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-334dc616f86so184851077b3.8;
-        Mon, 29 Aug 2022 03:50:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=02up1+XGpVBi6AHgu/b3rfxqhl6KNaHX2V6z5XwpNUQ=;
-        b=FZYEAwYrJTXa7MsPzOQh2xbVZi1FbFX9IcQNMRkqQdm9zbUnGHL/idtZB+Wq+Bd7qY
-         k69FxQOyMPx8RL8rzQWnnrF67yiSpujwo6HL8Lq3ow7Gqb25hbVHnSWpUyjuqWTFAWIB
-         MD3IpffnxVIyhMOTKTO4wEOPkxSkVoZOu9QH60SBKzeXDeP6kwq+7NsIIPr48LMNETz7
-         YQMJmaUevpD+WacOBXcQav55ukD+LslXoHuhR/FTZ1WQEH7w8XLdYGyJGWryktR6Ex2W
-         biPYNa2pdTXWI4J00/thRIi6wN2As4wpQvkK1qjPq6bcK1wqBsJ+47BFACy0KCnIMf4m
-         DMRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=02up1+XGpVBi6AHgu/b3rfxqhl6KNaHX2V6z5XwpNUQ=;
-        b=NBWU5juqpDaKwigKzdJsy/wdlkB42tbN+zivpp0nwS6yMu4KdZM5BEg0yuqCIrZvBo
-         Niti1pGLjC+KW13S9XTkJi12MRQodCFQdw5TZcYRM5tH0SsLNquilXSh3vMY7LdYhbWH
-         cOGVDHcyXt8EBvDQRGZq9Jxcl15zHF7zfH0YIBp7CKV+wjwsfMQIDlMxfMxTfkmUnOze
-         yn17oxp7nfVTZZrUOZ2y/qM8oTFCUEAHwIP4J8ve2rqPiOUvjYf1HWr7cvbt8ZOZ6TVB
-         Eal1yvGznhUQ/lzeBc2yY0t8FXznyQsauwj5TUNZsr9d54jMlb+x9QuopsRuInYGPkBM
-         HIMg==
-X-Gm-Message-State: ACgBeo0F08/B0rs4aMAkg4Pf/mpW+WY365pL9i90Gle5o8X+5vUfUWOd
-        byDq05JVC/wAhDDGjnreI51Vhdeo2F1NiYv8JUk=
-X-Google-Smtp-Source: AA6agR6SKcxVKiwCDQPt+dP0L06eeP9L3P+uYhWmB35aaik/7nramB2p2rbW7TraVVfQlPcOhSTNk8A4YTSjFJy/9OI=
-X-Received: by 2002:a25:40c6:0:b0:67a:5c8a:21d2 with SMTP id
- n189-20020a2540c6000000b0067a5c8a21d2mr8144310yba.158.1661770206527; Mon, 29
- Aug 2022 03:50:06 -0700 (PDT)
+        Mon, 29 Aug 2022 06:57:47 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82795C9F0;
+        Mon, 29 Aug 2022 03:57:46 -0700 (PDT)
+Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MGS673bCszHnVN;
+        Mon, 29 Aug 2022 18:55:59 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 29 Aug 2022 18:57:44 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 29 Aug 2022 18:57:44 +0800
+From:   "yekai (A)" <yekai13@huawei.com>
+Subject: Re: [PATCH v7 0/3] crypto: hisilicon - supports device isolation
+ feature
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+References: <20220806022943.47292-1-yekai13@huawei.com>
+ <cffec511-dff2-5951-264a-1e82bb71e183@huawei.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
+Message-ID: <3fd1c0be-71d1-2402-395f-2fbb85f0d8ec@huawei.com>
+Date:   Mon, 29 Aug 2022 18:57:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-References: <20220829072035.1539399-1-neal_liu@aspeedtech.com>
-In-Reply-To: <20220829072035.1539399-1-neal_liu@aspeedtech.com>
-From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Date:   Mon, 29 Aug 2022 11:49:30 +0100
-Message-ID: <CADVatmNzj2XAPL5bA5JKW9gbMM7bUoOOqh=9+Fh4v79Z-=BjgQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aspeed: fix build module error
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <cffec511-dff2-5951-264a-1e82bb71e183@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 8:42 AM Neal Liu <neal_liu@aspeedtech.com> wrote:
->
-> If CONFIG_MODULES=y and CONFIG_CRYPTO_DEV_ASPEED=m,
-> build modpost would be failed.
->
-> Error messages:
->   ERROR: modpost: "aspeed_register_hace_hash_algs"
->   [drivers/crypto/aspeed/aspeed_crypto.ko] undefined!
->   ERROR: modpost: "aspeed_unregister_hace_hash_algs"
->   [drivers/crypto/aspeed/aspeed_crypto.ko] undefined!
->
-> Change build sequence to fix this.
->
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
 
-Tested-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
 
--- 
-Regards
-Sudip
+On 2022/8/22 11:38, yekai (A) wrote:
+> On 2022/8/6 10:29, Kai Ye wrote:
+>> 1、Add the uacce hardware error isolation interface. Supports
+>>    configures the hardware error isolation frequency.
+>> 2、Defining the isolation strategy for ACC by uacce sysfs node. If the 
+>>    number of hardware errors in a per hour exceeds the configured value,
+>>    the device will not be available in user space. The VF device use the
+>>    PF device isolation strategy.
+>>    
+>> changes v1->v2:
+>> 	- deleted dev_to_uacce api.
+>> 	- add vfs node doc. 
+>> 	- move uacce->ref to driver.
+>> changes v2->v3:
+>> 	- deleted some redundant code.
+>> 	- use qm state instead of reference count.
+>> 	- add null pointer check.
+>> 	- isolate_strategy_read() instead of a copy.
+>> changes v3->v4:
+>> 	- modify a comment
+>> changes v4->v5:
+>> 	- use bool instead of atomic.
+>> 	- isolation frequency instead of isolation command.
+>> changes v5->v6:
+>> 	- add is_visible in uacce.
+>> 	- add the description of the isolation strategy file node.
+>> changes v6->v7
+>> 	- add an example for isolate_strategy in Documentation.
+>>
+>> Kai Ye (3):
+>>   uacce: supports device isolation feature
+>>   Documentation: add a isolation strategy sysfs node for uacce
+>>   crypto: hisilicon/qm - define the device isolation strategy
+>>
+>>  Documentation/ABI/testing/sysfs-driver-uacce |  26 +++
+>>  drivers/crypto/hisilicon/qm.c                | 163 +++++++++++++++++--
+>>  drivers/misc/uacce/uacce.c                   |  58 +++++++
+>>  include/linux/hisi_acc_qm.h                  |   9 +
+>>  include/linux/uacce.h                        |  11 ++
+>>  5 files changed, 255 insertions(+), 12 deletions(-)
+>>
+> Hi,
+>
+> Just a friendly ping...
+>
+> thanks
+> Kai
+>
+> .
+Hi Greg KH
+
+Could you help me to apply this patchset?
+
+thanks
+Kai
+
