@@ -2,122 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7079ECAAD4
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Aug 2022 09:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80827ECAAD4
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Aug 2022 10:48:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbiH3Jhm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Aug 2022 05:37:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
+        id S229556AbiH3Ksi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Aug 2022 06:48:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230244AbiH3JhV (ORCPT
+        with ESMTP id S229561AbiH3Ksf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Aug 2022 05:37:21 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0B0E19
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Aug 2022 02:34:49 -0700 (PDT)
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id F39AA3F339
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Aug 2022 09:34:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1661852085;
-        bh=CHqY99GLtJsApSMjqMH/7szxzsT67JjTWutPGr/E5Rs=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=Vd/hI9mXWqotwiwE7y2zAKGBDpqDUhv2pYgE6d6XYYQ0soFMQsWQPis7rWhTC5V/n
-         x30/YFY2hfh2YkN9kKu0CZfulVp2rSQT8t2+L1YAr9Hrkj29vU14njvG9QHkoGusS7
-         whu4ONoIw/+lUFfbTwXKXPrhumxN/rzbQXuLwxM6RzhtR20gBKAG8eOwq+xcIKC6tU
-         ubSFH9RV4BwO7EEVShfg/efUvWvofMdkAMFDSD0iPFuxCpsYI8DQRgXVWwnw5fjaCa
-         AzZoPz03LrVKBoFCEznm6MuDvL+W5GgiIB0OWflD5OpHLQpIcVIQxfNOx8LhpAFFaY
-         7e2rmsMnXwrWw==
-Received: by mail-pl1-f197.google.com with SMTP id d6-20020a170902cec600b00174be1616c4so3780555plg.22
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Aug 2022 02:34:44 -0700 (PDT)
+        Tue, 30 Aug 2022 06:48:35 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90599DCFCE
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Aug 2022 03:48:34 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id q81so8859427iod.9
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Aug 2022 03:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=D+Zr5m06Dz7pd1eCr8Zp9JUK+jm0toq4g0HWVGImRYA=;
+        b=abgFhPl46C8ei+7f36OH7DAnCzAMmjSmJbnkvTvPumKxM3f1C6WzRbefKGvkLMtYsA
+         NxpwF8HNjVwrUZ6K95DrwmzLJHXoauPusJCJ4avSH0MRD+rplq5ciQoaVkW+htEFWz4W
+         sYCigAomDmWEBjn4ZQLux3KreIkC02bze3h9E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=CHqY99GLtJsApSMjqMH/7szxzsT67JjTWutPGr/E5Rs=;
-        b=n78JmOYhRWaoZ6HhS5CznkQV3rwvOYBtrQJzWNzfpKXvjdH7bB2oFVSDsSVuChcViy
-         4uVv2Mp0xdOkhdVDDI8VhaESutJbIx5+y2mNqlazCuojMZDkNF09FULZbylWKVdqY+x8
-         MFF3kWWWTVoa4njzM0GistE8SNIrAyfrx5ulRILH8VUqp1X/PPBwppwCKAHARt8PADzH
-         Vf78OuvUgX4NEPbLsaL+isLEv51fcAybIziW2Cdc65x4QaLVMsaz8Rw2o4p0DSRAtZoQ
-         vC1lRnPqindXY+ZDtL140h5LnuMp8JM3P7XlW2SXXst1HJGR9I4ejvv7l5l9dnRIUgy+
-         ERhw==
-X-Gm-Message-State: ACgBeo3uq5Vwwh/Xa3eLTk4W5KeEIPA+J8AOxcq0VjpW8uQMTNdzjE09
-        kzIc2x4ZV+UW7vUQW1XXDfd3vv01VSAX1oFNmIkN45+vZlBC59VxubNWdY7IZkBNmwb8P3Gf5Or
-        21kz6ijdk3U8DMJvUj1FJ8GzKdtZdZdtTwISZEGwt/Q==
-X-Received: by 2002:a17:90b:388f:b0:1f5:7748:9667 with SMTP id mu15-20020a17090b388f00b001f577489667mr23095652pjb.158.1661852083556;
-        Tue, 30 Aug 2022 02:34:43 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6Wk9P3i8UhaVxV9GyDBpsSXp0cc6E2T6UpDcQUroyyCgFNQDLxPK6AteHfPviKWoRcn/cnng==
-X-Received: by 2002:a17:90b:388f:b0:1f5:7748:9667 with SMTP id mu15-20020a17090b388f00b001f577489667mr23095634pjb.158.1661852083297;
-        Tue, 30 Aug 2022 02:34:43 -0700 (PDT)
-Received: from canonical.com (2001-b011-3815-3671-090c-7c62-b076-d6cb.dynamic-ip6.hinet.net. [2001:b011:3815:3671:90c:7c62:b076:d6cb])
-        by smtp.gmail.com with ESMTPSA id d81-20020a621d54000000b0052ac12e7596sm8734418pfd.114.2022.08.30.02.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 02:34:41 -0700 (PDT)
-From:   Koba Ko <koba.ko@canonical.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: crypto: ccp - Release dma channels before dmaengine unrgister
-Date:   Tue, 30 Aug 2022 17:34:39 +0800
-Message-Id: <20220830093439.951960-1-koba.ko@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=D+Zr5m06Dz7pd1eCr8Zp9JUK+jm0toq4g0HWVGImRYA=;
+        b=ZvfMMpW5tUmR7zPHaRrV0ImeMmtQZbV3/+wch77eoEse9dDvVj8VZmN2QmAPeg5rKn
+         cxn/KOMRq/wQ6lmz899vjjRHTvtHycgfP6FaCL/2UHu/dnB/vImqaENh89aWvIj7QSLD
+         2ySOGczDGoGB62NqPo+als3NGS2+zYy8qomxnpnud2mABzdiR3/jvpfZtbWMl8oxRSIS
+         CIbNnsDhUV/xBUaJ5fvjBykoc4s/XWinzQoL6Non5yBcr7DDLOcjZ1797fscVtEua6w1
+         YaioQPTxM3gUsc8WzIz4yUGGTbdBzP/Dx6IZg0kBf6tklEgjoxKU1/GKNEWv3eviwB1X
+         F8qA==
+X-Gm-Message-State: ACgBeo3JQY0cpQuXDLv3kA1ZiOQao5iEQBw0og7Tu5w//Jgz+b5lbdOZ
+        4opy2pgbYXYVldUg3SmzLhznvImy89DC64xvv8LWbq1NcgRqiAmX
+X-Google-Smtp-Source: AA6agR6iliUyUmz+S8kqdlyWYTe+420xcq+qusgU+R+5fk0mgQgTG3lhPxjIa7eRDTILKtYwB+ryOdEjtuc+NxjSFFc=
+X-Received: by 2002:a05:6602:15ce:b0:688:e4fd:bbfc with SMTP id
+ f14-20020a05660215ce00b00688e4fdbbfcmr10180294iow.121.1661856513754; Tue, 30
+ Aug 2022 03:48:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220729165954.991-1-ignat@cloudflare.com> <Yv9dvvy0rK/1T0sU@gondor.apana.org.au>
+ <CALrw=nEh7LX3DSCa3FTu8BYr4QWx+W2h3Jei9Qo67+XXH-Vegw@mail.gmail.com> <Yw3Rneo6Ik1QEfbG@gondor.apana.org.au>
+In-Reply-To: <Yw3Rneo6Ik1QEfbG@gondor.apana.org.au>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Tue, 30 Aug 2022 11:48:23 +0100
+Message-ID: <CALrw=nGJgMACrFVy+FVVCDb4H3wNUN2E-GLZaXzLsm3ReOUeVg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: akcipher - default implementations for setting
+ private/public keys
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A warning is shown during shutdown,
+On Tue, Aug 30, 2022 at 10:00 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Aug 29, 2022 at 11:48:23AM +0100, Ignat Korchagin wrote:
+> >
+> > I can only elaborate here as I didn't encounter any real-world
+> > use-cases, but may assume some limited crypto hardware device, which
+> > may somehow "encourage" doing public key operations in software and
+> > providing only "private-key" operations due to its limited resources.
+>
+> In general if a hardware is missing a piece of the functinoality
+> required by the API then it should implement a software fallback.
+>
+> The only time such a NULL helper would make sense if an algorithm
+> had no public key.
 
-__dma_async_device_channel_unregister called while 2 clients hold a reference
-WARNING: CPU: 15 PID: 1 at drivers/dma/dmaengine.c:1110 
-__dma_async_device_channel_unregister
+I vaguely remember some initial research in quantum-resistant
+signatures, which used HMAC for "signing" thus don't have any public
+keys. But it is way beyond my expertise to comment on the practicality
+and availability of such schemes.
 
-Call dma_release_channel for occupied channles 
-before dma_async_device_unregister.
+I'm more concerned here about a buggy "third-party" RSA driver, which
+may not implement the callback and which gets prioritised by the
+framework, thus giving the ability to trigger a NULL-ptr dereference
+from userspace via keyctl(2). I think the Crypto API framework should
+be a bit more robust to handle such a case, but I also understand that
+there are a lot of "if"s in this scenario and we can say it is up to
+crypto driver not to be buggy. Therefore, consider my opinion as not
+strong and I can post a v2, which does not provide a default stub for
+set_pub_key, if you prefer.
 
-Fixes: 4cbe9bc34ed0 ("crypto: ccp - ccp_dmaengine_unregister release dma channels")
-Signed-off-by: Koba Ko <koba.ko@canonical.com>
----
- drivers/crypto/ccp/ccp-dmaengine.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
-index 7d4b4ad1db1f3..ba3eb1ac3b55d 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -641,6 +641,10 @@ static void ccp_dma_release(struct ccp_device *ccp)
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
- 		chan = ccp->ccp_dma_chan + i;
- 		dma_chan = &chan->dma_chan;
-+
-+		if (dma_chan->client_count)
-+			dma_release_channel(dma_chan);
-+
- 		tasklet_kill(&chan->cleanup_tasklet);
- 		list_del_rcu(&dma_chan->device_node);
- 	}
-@@ -762,12 +766,14 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
- void ccp_dmaengine_unregister(struct ccp_device *ccp)
- {
- 	struct dma_device *dma_dev = &ccp->dma_dev;
-+	struct dma_chan *dma_chan;
-+	unsigned int i;
- 
- 	if (!dmaengine)
- 		return;
- 
--	dma_async_device_unregister(dma_dev);
- 	ccp_dma_release(ccp);
-+	dma_async_device_unregister(dma_dev);
- 
- 	kmem_cache_destroy(ccp->dma_desc_cache);
- 	kmem_cache_destroy(ccp->dma_cmd_cache);
--- 
-2.25.1
-
+Ignat
