@@ -2,78 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F773ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Aug 2022 20:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2590ECAAD2
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Aug 2022 03:02:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229950AbiH2UCM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Aug 2022 16:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43138 "EHLO
+        id S229508AbiH3DCy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 Aug 2022 23:02:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiH2UCL (ORCPT
+        with ESMTP id S230073AbiH3DCi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Aug 2022 16:02:11 -0400
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701E79752B;
-        Mon, 29 Aug 2022 13:02:10 -0700 (PDT)
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-11edd61a9edso5773873fac.5;
-        Mon, 29 Aug 2022 13:02:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=heDlxahlElGXVYwB2W6L7qQGe7aDiUidQ7Kv6j0r3rE=;
-        b=3pKca5LrgBZzgEvgAH1vI5fHTFCG1K8hfa6ioss/fBjQHstJ2b7i0DH+fOJ9Pg9P/m
-         q8eA3TJ7z/lRxDXkYwjvw2JjXOudY676Xq3Zf7hxuWTyJj8BGv0pfx+SIIKpGsNb8iIX
-         YyoBuCVYuunynUqQqUdJopm3/haVO49Fp6EqDHD8JAQYr8PERk5ZyUbKeqFQ31UXBIiN
-         K1uHbQiDwPFaXEK2FtNHi3e48xhlO4lmd+bviACeaFnUkg8Lth/vyyg7c9d9vNNX/mTS
-         g2VKxb6oPjo+LjB9+FnIrSuKjvhto/A0FCgLNVA9+pDx0qp/gLBnhw3/gv63L5iN7N0W
-         4Rsw==
-X-Gm-Message-State: ACgBeo1+mLYSvmFbhsP1gmFOKtWzqXD3pqj+G0U9KVTH4NEGD0J8ifDQ
-        PmiFJ+ftm4HnsTwj6lL2Aw==
-X-Google-Smtp-Source: AA6agR7imhGalw24paYm0hGoNiPCs9z3xZhA32pXWQg75grNPB3xOQUmklHt6R+BJxACdjCgZwSwEg==
-X-Received: by 2002:a05:6870:3906:b0:11e:4c51:13d1 with SMTP id b6-20020a056870390600b0011e4c5113d1mr8702681oap.281.1661803329741;
-        Mon, 29 Aug 2022 13:02:09 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id e20-20020a056830201400b006394756c04fsm6068234otp.0.2022.08.29.13.02.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Aug 2022 13:02:09 -0700 (PDT)
-Received: (nullmailer pid 2323558 invoked by uid 1000);
-        Mon, 29 Aug 2022 20:02:08 -0000
-Date:   Mon, 29 Aug 2022 15:02:08 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Jayesh Choudhary <j-choudhary@ti.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, davem@davemloft.net,
-        devicetree@vger.kernel.org, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au, j-keerthy@ti.com
-Subject: Re: [RESEND PATCH] dt-bindings: crypto: ti,sa2ul: drop dma-coherent
- property
-Message-ID: <20220829200208.GA2323499-robh@kernel.org>
-References: <20220826091142.262325-1-j-choudhary@ti.com>
+        Mon, 29 Aug 2022 23:02:38 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11287A1D6D;
+        Mon, 29 Aug 2022 20:02:32 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MGsSH3HYMzYcnL;
+        Tue, 30 Aug 2022 10:58:07 +0800 (CST)
+Received: from kwepemm600010.china.huawei.com (7.193.23.86) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 30 Aug 2022 11:02:30 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600010.china.huawei.com
+ (7.193.23.86) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 30 Aug
+ 2022 11:02:29 +0800
+From:   Sun Ke <sunke32@huawei.com>
+To:     <neal_liu@aspeedtech.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <joel@jms.id.au>
+CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kernel-janitors@vger.kernel.org>, <sunke32@huawei.com>
+Subject: [PATCH] crypto: aspeed: fix return value check in aspeed_hace_probe()
+Date:   Tue, 30 Aug 2022 11:13:47 +0800
+Message-ID: <20220830031347.810217-1-sunke32@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220826091142.262325-1-j-choudhary@ti.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600010.china.huawei.com (7.193.23.86)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 26 Aug 2022 14:41:42 +0530, Jayesh Choudhary wrote:
-> crypto driver itself is not dma-coherent. It is the dmaengine
-> that moves data and the buffers are to be mapped to the
-> dmaengine provider. So this property should be dropped.
-> 
-> Fixes: 2ce9a7299bf6 ('dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation')
-> Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
-> ---
-> 
-> Resending the patch as it got ACK-ed but did not get MERGED.
-> (https://lore.kernel.org/all/2935fd8e-ceda-fec9-db47-65d3ec142e32@linaro.org/)
-> We get some warnings which are expected. I will post the dt-node
-> fixes once this patch gets merged.
-> 
->  .../devicetree/bindings/crypto/ti,sa2ul.yaml        | 13 -------------
->  1 file changed, 13 deletions(-)
-> 
+In case of error, the function devm_ioremap_resource() returns
+ERR_PTR() not NULL. The NULL test in the return value check must be
+replaced with IS_ERR().
 
-Applied, thanks!
+Fixes: 108713a713c7 ("crypto: aspeed - Add HACE hash driver")
+Signed-off-by: Sun Ke <sunke32@huawei.com>
+---
+ drivers/crypto/aspeed/aspeed-hace.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/aspeed/aspeed-hace.c b/drivers/crypto/aspeed/aspeed-hace.c
+index 4fefc9e69d72..3f880aafb6a2 100644
+--- a/drivers/crypto/aspeed/aspeed-hace.c
++++ b/drivers/crypto/aspeed/aspeed-hace.c
+@@ -123,9 +123,9 @@ static int aspeed_hace_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, hace_dev);
+ 
+ 	hace_dev->regs = devm_ioremap_resource(&pdev->dev, res);
+-	if (!hace_dev->regs) {
++	if (IS_ERR(hace_dev->regs)) {
+ 		dev_err(&pdev->dev, "Failed to map resources\n");
+-		return -ENOMEM;
++		return PTR_ERR(hace_dev->regs);
+ 	}
+ 
+ 	/* Get irq number and register it */
+-- 
+2.31.1
+
