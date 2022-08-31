@@ -2,99 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD72ECAAD1
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 16:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0CFECAAD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 17:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbiHaQS2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Aug 2022 12:18:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
+        id S230151AbiHaRUK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 Aug 2022 13:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231281AbiHaQS1 (ORCPT
+        with ESMTP id S229691AbiHaRUH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2022 12:18:27 -0400
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B7ECEB36;
-        Wed, 31 Aug 2022 09:18:26 -0700 (PDT)
-Received: by mail-ej1-f50.google.com with SMTP id fy31so29012353ejc.6;
-        Wed, 31 Aug 2022 09:18:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=hs27A97tiJvrzqLEY67+ba99paoViVve8c+DJ3f+Pqg=;
-        b=7ZPyPyl13zsz6s+xdxlE3K2N0aCnxorUz/wVknrzi6UaziyKlsS9cJXprgkWfU5zFL
-         KrE7J7K+FEcPiPxC1sa86frQv+5H0zIOpwjoZb2JzxPh1z0k3eeLaDbWhlV+1UdKCI6G
-         6nQIXXXsmrp5E8tSJUGscVi/9GG2Fin1QVwL1ExdjX2UwKV+R6apktPQ/pEcp4HziAhm
-         i0ecyLjsYH1ybPDfR8KrJDNFrPm3bDWfeTDjr2V1Fm/E3pfOxAy2LFfTYfFj48R8+4PB
-         gQTOMwPhdgVdKIxQJrQ0ILNMSHqTBS8iqQJbIu6oE/vFSjznxn3IUoa6qqkTNjqj6H5E
-         6aNw==
-X-Gm-Message-State: ACgBeo23Yt8tGLvhfaR3vj4Uo6xnh6yAs854OTMvEtk9wB191uf7qWam
-        Jrp3DLC3cj4wNDPl7F1j8uuEUNUe0x773w==
-X-Google-Smtp-Source: AA6agR4HjXreg6GyPP2faOYPhvdwYt88YzaoF1YZO04ge0M4cM8Jr+yewDGui8ztp5XOVATFMO0Dpg==
-X-Received: by 2002:a17:907:2cd1:b0:730:a980:d593 with SMTP id hg17-20020a1709072cd100b00730a980d593mr20741096ejc.48.1661962704855;
-        Wed, 31 Aug 2022 09:18:24 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-022.fbsv.net. [2a03:2880:31ff:16::face:b00c])
-        by smtp.gmail.com with ESMTPSA id z63-20020a509e45000000b004478fdbe190sm9242412ede.10.2022.08.31.09.18.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 09:18:24 -0700 (PDT)
-Date:   Wed, 31 Aug 2022 09:18:18 -0700
-From:   Breno Leitao <leitao@debian.org>
-To:     cgel.zte@gmail.com
-Cc:     nayna@linux.ibm.com, pfsmorigo@gmail.com, mpe@ellerman.id.au,
-        npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Jinpeng Cui <cui.jinpeng2@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: Re: [PATCH linux-next] crypto: nx: remove redundant variable rc
-Message-ID: <Yw+JysFvbmW0yJL8@gmail.com>
-References: <20220831140248.303940-1-cui.jinpeng2@zte.com.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220831140248.303940-1-cui.jinpeng2@zte.com.cn>
+        Wed, 31 Aug 2022 13:20:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E6C32DB1;
+        Wed, 31 Aug 2022 10:20:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EC849B82209;
+        Wed, 31 Aug 2022 17:20:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A52A2C433C1;
+        Wed, 31 Aug 2022 17:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661966404;
+        bh=PTI3pquDblLkkQUGtkNM6wHryacO2lN9/Uf5YsR7VMU=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=CYxp8Jp2aGnetKhdKSIS0sJhaWvqVjWXzuVPhAyO1AP4lXDzwD27l4xPPciGL/NTG
+         CLbJGrBpf4oWswvDUikdWyIyL1DhQD7j+GTqMvFDW48uuwOfawy+VgFv4sxhxQT9mF
+         002pqwo7KCd3HPWEsybImtUIThjzpOum+hs0l9lEDOsm5iNeK57byGt1jBU/NzszYF
+         yzL7Yp6SaYthLBvAgIlipWAfv1SDv9htyOwvuOT5GJDiG9VV7sd3ODVyT/wGw/DOGE
+         PS21JUNacoi2wyYxmPDEhJUmgh6tGo99sLucdfo8MgIar67bhWDbhYjre9mf6YedlG
+         ezTo/sUcz7m2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8CFA1C4166F;
+        Wed, 31 Aug 2022 17:20:04 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.0
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
+References: <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
+ <Yr1XPJsAH2l1cx3A@gondor.apana.org.au> <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.0-p2
+X-PR-Tracked-Commit-Id: 874b301985ef2f89b8b592ad255e03fb6fbfe605
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2361d3841fddffdd4b495a4510c507f0b8f17061
+Message-Id: <166196640456.5039.7025978141773120093.pr-tracker-bot@kernel.org>
+Date:   Wed, 31 Aug 2022 17:20:04 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 02:02:48PM +0000, cgel.zte@gmail.com wrote:
-> From: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
-> 
-> Return value directly from set_msg_len() instead of
-> getting value from redundant variable rc.
-> 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
-Reviewed-by: Breno Leitao <leitao@debian.org>
+The pull request you sent on Wed, 31 Aug 2022 16:55:31 +0800:
 
-> ---
->  drivers/crypto/nx/nx-aes-ccm.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
-> index 3793885f928d..c843f4c6f684 100644
-> --- a/drivers/crypto/nx/nx-aes-ccm.c
-> +++ b/drivers/crypto/nx/nx-aes-ccm.c
-> @@ -134,7 +134,6 @@ static int generate_b0(u8 *iv, unsigned int assoclen, unsigned int authsize,
->  		       unsigned int cryptlen, u8 *b0)
->  {
->  	unsigned int l, lp, m = authsize;
-> -	int rc;
->  
->  	memcpy(b0, iv, 16);
->  
-> @@ -148,9 +147,7 @@ static int generate_b0(u8 *iv, unsigned int assoclen, unsigned int authsize,
->  	if (assoclen)
->  		*b0 |= 64;
->  
-> -	rc = set_msg_len(b0 + 16 - l, cryptlen, l);
-> -
-> -	return rc;
-> +	return set_msg_len(b0 + 16 - l, cryptlen, l);
->  }
->  
->  static int generate_pat(u8                   *iv,
-> -- 
-> 2.25.1
-> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.0-p2
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2361d3841fddffdd4b495a4510c507f0b8f17061
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
