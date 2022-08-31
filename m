@@ -2,120 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B427ECAAD3
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 18:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCB2ECAAD1
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 18:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233077AbiHaSkT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Aug 2022 14:40:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
+        id S232599AbiHaSsU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 Aug 2022 14:48:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232636AbiHaSjj (ORCPT
+        with ESMTP id S232482AbiHaSsT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2022 14:39:39 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FA261DB0
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:37:21 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id m17-20020a7bce11000000b003a5bedec07bso92817wmc.0
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:37:21 -0700 (PDT)
+        Wed, 31 Aug 2022 14:48:19 -0400
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB6F8543DC
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:48:16 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id s66so5291497vkb.4
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=Gu6lQeKRAmTnscQpGQRRWcZPQVAuazBQGzE1OcpBRZM=;
-        b=QGBW33llSjJF8ooJpWUjOHhRi3BuKrE1Iv15WhrM9uKzU1uoCRPJJG08GVSd6FUnVH
-         q+SbLLzsGLpr9JwDBImTM7lUZjoRsXN1DdLGdfVeKA+WmG5Qzbzs5cWDko9XYXuG38kJ
-         9T94rFRdOlyZwQ3Bxd5O7CNo6ugZBhwdIxPcI=
+        d=arista.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=dEU++UBToH866zrJEWnx3P4LrLN/LbOdcwtLNxqEBv8=;
+        b=U9ZebKNx1Snn9CscuSDhl5p+6YnZ1po5Ug1VuOaTebdwd2Tp0Ky9d5YyfV73lbMfsu
+         klznxiFzDFWfdcWTtHFNZ8VCCZW64v5k+4XeicE0IYnJyc5dawoFqjHC8yaRQSoSdiOv
+         I0zAhUk7IXlXYMO8n39DJhY1BOKnLiTLbLcjFcswCIl1ItmgOh65lrXWRK0LSTcm3xrh
+         7rXyHWFZgnvUU/dgiBactL0WsGoddNUOgExz4ILuuCn/5MLlTQjLhyc62Shbvb8kG307
+         CoMu9pBa3U5vAlrM74NYE/nwRie61x2184yMCnrhC+q2+gr04p1s0PZmFglsRPJpFLJw
+         aV8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=Gu6lQeKRAmTnscQpGQRRWcZPQVAuazBQGzE1OcpBRZM=;
-        b=vvm2r9Gnu1C0vwz6vPEMKhTOBNpDCT4JEGPTopEYzpfusFdBJYhPNLFVtK/BSJWtYp
-         8SrrMky4BTDavS5Hu3aeKSikiCWoPdp4brfLiJR7y4ej9V4D4i037we08jklG+8mvjLp
-         snKz7xPez57RLMgyDeDuhhY9Hzr50/eCkyD7NPvjm5qBuzAEK+kEE4aUgUGXgBxbl2jH
-         1KbkXKyWaGwjbHM78ce0JL9QLs9Pq47WGhBredEWPinZy0zLex6mjU7NiNmYrxQVG4ct
-         nFaKMkuTbkL1CQUss16nc5wvgVxWPpP91gv2XSzdw2bpGfEoajfWTM6MFH1J9lTdwszC
-         zBdw==
-X-Gm-Message-State: ACgBeo1Vy8wfmPjufzJ7LzYlDj+7lpCG+oFOuiN9Op5p/aoyf8kxFGWC
-        A2wpNh2p+10KatAMc7MGPtQiQw==
-X-Google-Smtp-Source: AA6agR6Eh4OvFNAhBbA/UM8ALcaEKdHMqVAihlobnQhJ2iKaWIlMBNa7jC6NkLPiGd3AijvS6K8clA==
-X-Received: by 2002:a05:600c:1c23:b0:3a5:d936:e5bb with SMTP id j35-20020a05600c1c2300b003a5d936e5bbmr2658685wms.59.1661971040435;
-        Wed, 31 Aug 2022 11:37:20 -0700 (PDT)
-Received: from localhost.localdomain ([2.216.100.221])
-        by smtp.gmail.com with ESMTPSA id h21-20020a05600c351500b003a502c23f2asm3322991wmq.16.2022.08.31.11.37.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 11:37:20 -0700 (PDT)
-From:   Ignat Korchagin <ignat@cloudflare.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kernel-team@cloudflare.com, Ignat Korchagin <ignat@cloudflare.com>
-Subject: [PATCH v2] crypto: akcipher - default implementation for setting a private key
-Date:   Wed, 31 Aug 2022 19:37:06 +0100
-Message-Id: <20220831183706.1600-1-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.30.2
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=dEU++UBToH866zrJEWnx3P4LrLN/LbOdcwtLNxqEBv8=;
+        b=dDKoNIPPG55xXKHLS8z2ZroEORCRGUHdaDQ9pOb94PoxHrbDhSFVApHwN/d79oTQME
+         AmM19NoIAyKDnDv/NBQaAhM1rRuPnyFKCZf1KqaK0iaqBa8NewjbVbVk9wO0J4mgIrwt
+         tCUxKu4Fs7Pek7t8bAOsTD34AKQxVicQGk+aqV0YZwCBpL73pCfk/gUGAap4rNU+XK9A
+         vxUxAadhuIsaDyhqllh+aMLc8gw3zk9ToaBzF1jmc1mSz9gMlDaMHWY3Ciw3TwCUfk5J
+         ndyxSSpZJJFbHvjkKEDwhlnlccKyldQRsz28M11neS3ML/9Um8wom8mrtGjzDw7j3F21
+         ltkA==
+X-Gm-Message-State: ACgBeo0fbAoARTXoZjxIZBALU9F2eeBsyo8snzqpBmq9Vxt9kj9N7Fen
+        hCJ5jni4mlnAPPSu4BQuy4QfIhGqFQdur5hB0Y2f8Q==
+X-Google-Smtp-Source: AA6agR68Q5/Um9DP/1wUPBFcazbxzIYSZ5kyi8FKvBJcKGJb+rF5p9ThPfzNKgX5rtEjjZIhEC8egXy9zVolXnf3S5s=
+X-Received: by 2002:a1f:1f49:0:b0:394:5a44:9a98 with SMTP id
+ f70-20020a1f1f49000000b003945a449a98mr5452642vkf.32.1661971695746; Wed, 31
+ Aug 2022 11:48:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220818170005.747015-1-dima@arista.com> <20220818170005.747015-9-dima@arista.com>
+ <162ae93b-5589-fbde-c63b-749f21051784@gmail.com>
+In-Reply-To: <162ae93b-5589-fbde-c63b-749f21051784@gmail.com>
+From:   Dmitry Safonov <dima@arista.com>
+Date:   Wed, 31 Aug 2022 19:48:02 +0100
+Message-ID: <CAGrbwDTW4_uVD+YbsL=jnfTGKAaHGOmzNZmpkSRi4xotzyNASg@mail.gmail.com>
+Subject: Re: [PATCH 08/31] net/tcp: Introduce TCP_AO setsockopt()s
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Changes from v1:
-  * removed the default implementation from set_pub_key: it is assumed that
-    an implementation must always have this callback defined as there are
-    no use case for an algorithm, which doesn't need a public key
+On 8/23/22 15:45, Leonard Crestez wrote:
+> On 8/18/22 19:59, Dmitry Safonov wrote:
+[..]
+>> +#define TCP_AO            38    /* (Add/Set MKT) */
+>> +#define TCP_AO_DEL        39    /* (Delete MKT) */
+>> +#define TCP_AO_MOD        40    /* (Modify MKT) */
+>
+> The TCP_AO_MOD sockopt doesn't actually modify and MKT, it only controls
+> per-socket properties. It is equivalent to my TCP_AUTHOPT sockopt while
+> TCP_AO is equivalent to TCP_AUTHOPT_KEY. My equivalent of TCP_AO_DEL
+> sockopt is a flag inside tcp_authopt_key.
 
-Many akcipher implementations (like ECDSA) support only signature
-verifications, so they don't have all callbacks defined.
+Fair point, the comment could be "Modify AO", rather than "Modify MKT".
+On the other side, this can later support more per-key changes than in
+the initial proposal: i.e., zero per-key counters. Password and rcv/snd
+ids can't change to follow RFC text, but non-essentials may.
+So, the comment to the command here is not really incorrect.
 
-Commit 78a0324f4a53 ("crypto: akcipher - default implementations for
-request callbacks") introduced default callbacks for sign/verify
-operations, which just return an error code.
+>> +struct tcp_ao { /* setsockopt(TCP_AO) */
+>> +    struct __kernel_sockaddr_storage tcpa_addr;
+>> +    char    tcpa_alg_name[64];
+>> +    __u16    tcpa_flags;
+>
+> This field accept TCP_AO_CMDF_CURR and TCP_AO_CMDF_NEXT which means that
+> you are combining key addition with key selection. Not clear it
+> shouldn't just always be a separate sockopt?
 
-However, these are not enough, because before calling sign the caller would
-likely call set_priv_key first on the instantiated transform (as the
-in-kernel testmgr does). This function does not have a default stub, so the
-kernel crashes, when trying to set a private key on an akcipher, which
-doesn't support signature generation.
+I don't see any downside. A user can add a key and start using it immediately
+with one syscall instead of two. It's not necessary, one can do it in
+2 setsockopt()s if they want.
 
-I've noticed this, when trying to add a KAT vector for ECDSA signature to
-the testmgr.
+[..]
+> I also have two fields called "recv_keyid" and "recv_rnextkeyid" which
+> inform userspace about what the remote is sending, I'm not seeing an
+> equivalent on your side.
 
-With this patch the testmgr returns an error in dmesg (as it should)
-instead of crashing the kernel NULL ptr dereference.
+Sounds like a good candidate for getsockopt() for logs/debugging.
 
-Fixes: 78a0324f4a53 ("crypto: akcipher - default implementations for request callbacks")
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
----
- crypto/akcipher.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> The specification around send_keyid in the RFC is conflicting:
+> * User must be able to control it
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index f866085c8a4a..ab975a420e1e 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -120,6 +120,12 @@ static int akcipher_default_op(struct akcipher_request *req)
- 	return -ENOSYS;
- }
+I don't see where you read it, care to point it out?
+I see choosing the current_key by marking the preferred key during
+an establishment of a connection, but I don't see any "MUST control
+current_key". We allow changing current_key, but that's actually
+not something required by RFC, the only thing required is to respect
+rnext_key that's asked by peer.
 
-+static int akcipher_default_set_key(struct crypto_akcipher *tfm,
-+				     const void *key, unsigned int keylen)
-+{
-+	return -ENOSYS;
-+}
-+
- int crypto_register_akcipher(struct akcipher_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
-@@ -132,6 +138,8 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
- 		alg->encrypt = akcipher_default_op;
- 	if (!alg->decrypt)
- 		alg->decrypt = akcipher_default_op;
-+	if (!alg->set_priv_key)
-+		alg->set_priv_key = akcipher_default_set_key;
+> * Implementation must respect rnextkeyid in incoming packet
+>
+> I solved this apparent conflict by adding a
+> "TCP_AUTHOPT_FLAG_LOCK_KEYID" flag so that user can choose if it wants
+> to control the sending key or let it be controlled from the other side.
 
- 	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
---
-2.36.1
+That's exactly violating the above "Implementation must respect
+rnextkeyid in incoming packet". See RFC5925 (7.5.2.e).
 
+[..]
+> Only two algorithms are defined in RFC5926 and you have to treat one of
+> them as a special case. I remain convinced that generic support for
+> arbitrary algorithms is undesirable; it's better for the algorithm to be
+> specified as an enum.
+
+On contrary, I see that as a really big feature. RFC5926 was published in 2010,
+when sha1 was yet hard to break. These days sha1 is considered insecure.
+I.e., the first link from Google:
+
+> Starting with version 56, released this month, Google Chrome will mark all
+> SHA-1-signed HTTPS certificates as unsafe. Other major browser vendors
+> plan to do the same.
+> "Hopefully these new efforts of Google of making a real-world attack possible
+> will lead to vendors and infrastructure managers quickly removing SHA-1 from
+> their products and configurations as, despite it being a deprecated algorithm,
+> some vendors still sell products that do not support more modern hashing
+> algorithms or charge an extra cost to do so," [..]
+
+So, why limit a new TCP sign feature to already insecure algorithms?
+One can already use any crypto algorithms for example, in tunnels.
+And I don't see any benefit in defining new magic macros, only downside.
+
+I prefer UAPI that takes crypto algo name as a string, rather than new
+defined magic number from one of kernel headers.
+IOW,
+: strcpy(ao.tcpa_alg_name, "cmac(aes128)");
+: setsockopt(sk, IPPROTO_TCP, opt, &ao, sizeof(ao));
+is better than
+: ao.tcp_alg = TCP_AO_CMAC_MAGIC_DEFINE;
+: setsockopt(sk, IPPROTO_TCP, opt, &ao, sizeof(ao));
+
+Neither I see a point in more patches adding new
+#define TCP_AO_NEW_ALGO
+
+BTW, I had some patches to add testing in fcnal-test.sh and covered
+the following algorithms, that worked just fine (test changes not
+included in v1):
+hmac(sha1) cmac(aes128) hmac(rmd128) hmac(rmd160) hmac(sha512)
+hmac(sha384) hmac(sha256) hmac(md5) hmac(sha224) hmac(sha3-512)
+
+No point in artificially disabling them or introducing new magic #defines.
+
+Thanks,
+          Dmitry
