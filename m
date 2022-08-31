@@ -2,174 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CFB9ECAAD4
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 17:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B427ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 18:40:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232002AbiHaRUs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Aug 2022 13:20:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42882 "EHLO
+        id S233077AbiHaSkT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 Aug 2022 14:40:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232006AbiHaRUk (ORCPT
+        with ESMTP id S232636AbiHaSjj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2022 13:20:40 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81301923F1
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 10:20:32 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id a22so8812443qtw.10
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 10:20:32 -0700 (PDT)
+        Wed, 31 Aug 2022 14:39:39 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FA261DB0
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:37:21 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id m17-20020a7bce11000000b003a5bedec07bso92817wmc.0
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 11:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=cloudflare.com; s=google;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=/I4y0YK+VpCO/CUay/PbDqOuvxIs0Un9wpsU5e2kzjo=;
-        b=ZShm0/XYuJ91hTuGCSE3w0AVpgFGdvzLcvwXIRu+Tb8xKhCSTVabC6cTnh9/gWfCY7
-         0/Te+wkwE2YF56S4LiVAFOCTjFg+7p3QuQloQSa7fNkg5qJUQKx+FBg9K+sYFA07t775
-         AxA2rQs/gZxof3K0I3ZwbS7eMN9wuHBq9EfVY=
+         :to:from:from:to:cc:subject:date;
+        bh=Gu6lQeKRAmTnscQpGQRRWcZPQVAuazBQGzE1OcpBRZM=;
+        b=QGBW33llSjJF8ooJpWUjOHhRi3BuKrE1Iv15WhrM9uKzU1uoCRPJJG08GVSd6FUnVH
+         q+SbLLzsGLpr9JwDBImTM7lUZjoRsXN1DdLGdfVeKA+WmG5Qzbzs5cWDko9XYXuG38kJ
+         9T94rFRdOlyZwQ3Bxd5O7CNo6ugZBhwdIxPcI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=/I4y0YK+VpCO/CUay/PbDqOuvxIs0Un9wpsU5e2kzjo=;
-        b=mgs4faC26vjPqztcs9EK8EPA7NdD/FO2p9EQttoCzx5MtU9XjQJwnPMCIAc1sIQ+Ww
-         eCx1DgQ1nDOcU6rNnO7kyWBTFrLYixKTKBJI4S69NlZm47uQQZahxparPGuH3VsBmWMl
-         jGHvmHhkeXX23zPqd9jUutrj6PjloAgnLAIN/IxpFzbgutMxpHDTWnxKkuBxusmKPZ45
-         1e1dIdioXXcNk9kfE65MVb4DHzgr5EgvHjBnVVOllOV3feughcig+PqYqFer5EhYH1FB
-         1y70UWuN4GMRGBQorUJORBtg5hJno00gm8oM+64VO86MI5JS+lqbApIl7RiGtpzwO1+m
-         B/Dw==
-X-Gm-Message-State: ACgBeo2HxuNk/l+PPX4P8LpKIhWZx5w9urdYJZ5gWsiqXZD/M7RI15zI
-        ERhc6SmVsTMuOJh4TvCQYzbfTA==
-X-Google-Smtp-Source: AA6agR42Ox0JL/UqP+ixpBQ44ewts/NNWEdi9NCccq0XABy/HDBNzkv4LB2frYvPED+ZG48V/r7Srw==
-X-Received: by 2002:ac8:5e0a:0:b0:344:9b69:eef0 with SMTP id h10-20020ac85e0a000000b003449b69eef0mr20114102qtx.666.1661966430257;
-        Wed, 31 Aug 2022 10:20:30 -0700 (PDT)
-Received: from trappist.c.googlers.com.com (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id ge17-20020a05622a5c9100b003430589dd34sm8962611qtb.57.2022.08.31.10.20.28
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=Gu6lQeKRAmTnscQpGQRRWcZPQVAuazBQGzE1OcpBRZM=;
+        b=vvm2r9Gnu1C0vwz6vPEMKhTOBNpDCT4JEGPTopEYzpfusFdBJYhPNLFVtK/BSJWtYp
+         8SrrMky4BTDavS5Hu3aeKSikiCWoPdp4brfLiJR7y4ej9V4D4i037we08jklG+8mvjLp
+         snKz7xPez57RLMgyDeDuhhY9Hzr50/eCkyD7NPvjm5qBuzAEK+kEE4aUgUGXgBxbl2jH
+         1KbkXKyWaGwjbHM78ce0JL9QLs9Pq47WGhBredEWPinZy0zLex6mjU7NiNmYrxQVG4ct
+         nFaKMkuTbkL1CQUss16nc5wvgVxWPpP91gv2XSzdw2bpGfEoajfWTM6MFH1J9lTdwszC
+         zBdw==
+X-Gm-Message-State: ACgBeo1Vy8wfmPjufzJ7LzYlDj+7lpCG+oFOuiN9Op5p/aoyf8kxFGWC
+        A2wpNh2p+10KatAMc7MGPtQiQw==
+X-Google-Smtp-Source: AA6agR6Eh4OvFNAhBbA/UM8ALcaEKdHMqVAihlobnQhJ2iKaWIlMBNa7jC6NkLPiGd3AijvS6K8clA==
+X-Received: by 2002:a05:600c:1c23:b0:3a5:d936:e5bb with SMTP id j35-20020a05600c1c2300b003a5d936e5bbmr2658685wms.59.1661971040435;
+        Wed, 31 Aug 2022 11:37:20 -0700 (PDT)
+Received: from localhost.localdomain ([2.216.100.221])
+        by smtp.gmail.com with ESMTPSA id h21-20020a05600c351500b003a502c23f2asm3322991wmq.16.2022.08.31.11.37.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 10:20:29 -0700 (PDT)
-From:   Sven van Ashbrook <svenva@chromium.org>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Alex Levin <levinale@google.com>, Rajat Jain <rajatja@google.com>,
-        Andrey Pronin <apronin@google.com>,
-        Stephen Boyd <swboyd@google.com>,
-        Sven van Ashbrook <svenva@chromium.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Petr Mladek <pmladek@suse.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org
-Subject: [PATCH v1 1/2] random: make add_hwgenerator_randomness() more flexible
-Date:   Wed, 31 Aug 2022 17:20:23 +0000
-Message-Id: <20220831172024.1613208-1-svenva@chromium.org>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
+        Wed, 31 Aug 2022 11:37:20 -0700 (PDT)
+From:   Ignat Korchagin <ignat@cloudflare.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kernel-team@cloudflare.com, Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH v2] crypto: akcipher - default implementation for setting a private key
+Date:   Wed, 31 Aug 2022 19:37:06 +0100
+Message-Id: <20220831183706.1600-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-add_hwgenerator_randomness() currently blocks until more entropy
-is needed. But, the required delay function will depend on the
-the caller: e.g. freezable kthreads have their own freezable_XXX()
-APIs; and delayed_work might prefer to use mod_delayed_work().
+Changes from v1:
+  * removed the default implementation from set_pub_key: it is assumed that
+    an implementation must always have this callback defined as there are
+    no use case for an algorithm, which doesn't need a public key
 
-To accommodate these requirements, remove the blocking wait, and
-let the function return the delay needed until more entropy is needed.
+Many akcipher implementations (like ECDSA) support only signature
+verifications, so they don't have all callbacks defined.
 
-Signed-off-by: Sven van Ashbrook <svenva@chromium.org>
+Commit 78a0324f4a53 ("crypto: akcipher - default implementations for
+request callbacks") introduced default callbacks for sign/verify
+operations, which just return an error code.
+
+However, these are not enough, because before calling sign the caller would
+likely call set_priv_key first on the instantiated transform (as the
+in-kernel testmgr does). This function does not have a default stub, so the
+kernel crashes, when trying to set a private key on an akcipher, which
+doesn't support signature generation.
+
+I've noticed this, when trying to add a KAT vector for ECDSA signature to
+the testmgr.
+
+With this patch the testmgr returns an error in dmesg (as it should)
+instead of crashing the kernel NULL ptr dereference.
+
+Fixes: 78a0324f4a53 ("crypto: akcipher - default implementations for request callbacks")
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 ---
+ crypto/akcipher.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
- drivers/char/hw_random/core.c |  7 +++++--
- drivers/char/random.c         | 13 ++++++-------
- include/linux/random.h        |  2 +-
- 3 files changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 16f227b995e8..3675122c6cce 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -491,6 +491,7 @@ static int __init register_miscdev(void)
- static int hwrng_fillfn(void *unused)
- {
- 	size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
-+	unsigned long delay;
- 	long rc;
- 
- 	while (!kthread_should_stop()) {
-@@ -526,8 +527,10 @@ static int hwrng_fillfn(void *unused)
- 			entropy_credit = entropy;
- 
- 		/* Outside lock, sure, but y'know: randomness. */
--		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
--					   entropy >> 10);
-+		delay = add_hwgenerator_randomness((void *)rng_fillbuf, rc,
-+						   entropy >> 10);
-+		if (delay > 0)
-+			schedule_timeout_interruptible(delay);
- 	}
- 	hwrng_fill = NULL;
- 	return 0;
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 79d7d4e4e582..7b6c27065cf9 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -686,7 +686,7 @@ static void __cold _credit_init_bits(size_t bits)
-  * the above entropy accumulation routines:
-  *
-  *	void add_device_randomness(const void *buf, size_t len);
-- *	void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
-+ *	unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
-  *	void add_bootloader_randomness(const void *buf, size_t len);
-  *	void add_vmfork_randomness(const void *unique_vm_id, size_t len);
-  *	void add_interrupt_randomness(int irq);
-@@ -702,8 +702,8 @@ static void __cold _credit_init_bits(size_t bits)
-  * available to them (particularly common in the embedded world).
-  *
-  * add_hwgenerator_randomness() is for true hardware RNGs, and will credit
-- * entropy as specified by the caller. If the entropy pool is full it will
-- * block until more entropy is needed.
-+ * entropy as specified by the caller. Returns number time delay in jiffies
-+ * until more entropy is needed.
-  *
-  * add_bootloader_randomness() is called by bootloader drivers, such as EFI
-  * and device tree, and credits its input depending on whether or not the
-@@ -857,10 +857,10 @@ EXPORT_SYMBOL(add_device_randomness);
- 
- /*
-  * Interface for in-kernel drivers of true hardware RNGs.
-- * Those devices may produce endless random bits and will be throttled
-+ * Those devices may produce endless random bits and should be throttled
-  * when our pool is full.
-  */
--void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
-+unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
- {
- 	mix_pool_bytes(buf, len);
- 	credit_init_bits(entropy);
-@@ -869,8 +869,7 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
- 	 * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
- 	 * we're not yet initialized.
- 	 */
--	if (!kthread_should_stop() && crng_ready())
--		schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
-+	return crng_ready() ? CRNG_RESEED_INTERVAL : 0;
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index f866085c8a4a..ab975a420e1e 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -120,6 +120,12 @@ static int akcipher_default_op(struct akcipher_request *req)
+ 	return -ENOSYS;
  }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
- 
-diff --git a/include/linux/random.h b/include/linux/random.h
-index 3fec206487f6..6608b0fb4402 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -17,7 +17,7 @@ void __init add_bootloader_randomness(const void *buf, size_t len);
- void add_input_randomness(unsigned int type, unsigned int code,
- 			  unsigned int value) __latent_entropy;
- void add_interrupt_randomness(int irq) __latent_entropy;
--void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
-+unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
- 
- #if defined(LATENT_ENTROPY_PLUGIN) && !defined(__CHECKER__)
- static inline void add_latent_entropy(void)
--- 
-2.37.2.672.g94769d06f0-goog
+
++static int akcipher_default_set_key(struct crypto_akcipher *tfm,
++				     const void *key, unsigned int keylen)
++{
++	return -ENOSYS;
++}
++
+ int crypto_register_akcipher(struct akcipher_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+@@ -132,6 +138,8 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
+ 		alg->encrypt = akcipher_default_op;
+ 	if (!alg->decrypt)
+ 		alg->decrypt = akcipher_default_op;
++	if (!alg->set_priv_key)
++		alg->set_priv_key = akcipher_default_set_key;
+
+ 	akcipher_prepare_alg(alg);
+ 	return crypto_register_alg(base);
+--
+2.36.1
 
