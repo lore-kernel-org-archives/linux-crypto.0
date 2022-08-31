@@ -2,112 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF712ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 01:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 840DBECAAA1
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 02:47:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231815AbiHaBDv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Aug 2022 21:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50350 "EHLO
+        id S229608AbiHaCrw convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 Aug 2022 22:47:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbiHaBDv (ORCPT
+        with ESMTP id S230175AbiHaCrv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Aug 2022 21:03:51 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DADAAEDAC;
-        Tue, 30 Aug 2022 18:03:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661907829; x=1693443829;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZZuvi0B/Gtgt7aqGUa3waYjoHFd0myWxVgCqaj6jMyo=;
-  b=QQHvSAeRTJA46roKqeruOQw6PzyAbWmN3ZC7xVtUjYGiYRqOqU4Vglut
-   m/93Co2JfJytw9jx/b0o0ms3XL8qZ9wZU+cLQFGfQhHs1ddI1HLBOXcem
-   NtH72LjPiPzhsk0x7zwSk7+2GSPTxX6sWW3Bm4F06zg22FOtUsP3wahlg
-   wdIdM9gRCuUs+4vy75JWKDtPIbanPEhtfnUQa/axBFhzm3coHFBhrotjM
-   9kgV1dz4gXezMwPlQbT9ooqHWKx/tBsACGqbrRCEhEXm7M6QIDKoeFxAz
-   IGj5AI4Z4AJMkf7UXRDPEhlzQs0SWpkCVYCz5PnE3B1h96zoG9Apdk0I8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="292919299"
-X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
-   d="scan'208";a="292919299"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 18:03:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
-   d="scan'208";a="940257117"
-Received: from lkp-server02.sh.intel.com (HELO 77b6d4e16fc5) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 30 Aug 2022 18:03:41 -0700
-Received: from kbuild by 77b6d4e16fc5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oTC8r-0000ox-0q;
-        Wed, 31 Aug 2022 01:03:41 +0000
-Date:   Wed, 31 Aug 2022 09:03:16 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Koba Ko <koba.ko@canonical.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, netdev@vger.kernel.org
-Subject: Re: crypto: ccp - Release dma channels before dmaengine unrgister
-Message-ID: <202208310843.cesiRP88-lkp@intel.com>
-References: <20220830093439.951960-1-koba.ko@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220830093439.951960-1-koba.ko@canonical.com>
+        Tue, 30 Aug 2022 22:47:51 -0400
+Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C944DB4EA1;
+        Tue, 30 Aug 2022 19:47:49 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VNoyAM8_1661914066;
+Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VNoyAM8_1661914066)
+          by smtp.aliyun-inc.com;
+          Wed, 31 Aug 2022 10:47:47 +0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex)
+ accelerator driver
+From:   guanjun <guanjun@linux.alibaba.com>
+In-Reply-To: <MW5PR84MB184271E7C3085CB1004ED6A6AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Date:   Wed, 31 Aug 2022 10:47:45 +0800
+Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
+        "xuchun.shang@linux.alibaba.com" <xuchun.shang@linux.alibaba.com>,
+        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2BDADCE3-5045-4BCF-88FF-76945A0780B3@linux.alibaba.com>
+References: <1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com>
+ <1661334621-44413-2-git-send-email-guanjun@linux.alibaba.com>
+ <MW5PR84MB184271E7C3085CB1004ED6A6AB739@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Koba,
+Hi Elliott,
+Thanks for your comments.
 
-Thank you for the patch! Perhaps something to improve:
+> 2022年8月24日 下午10:57，Elliott, Robert (Servers) <elliott@hpe.com> 写道：
+> 
+> 
+> 
+>> -----Original Message-----
+>> From: 'Guanjun' <guanjun@linux.alibaba.com>
+>> Sent: Wednesday, August 24, 2022 4:50 AM
+>> To: herbert@gondor.apana.org.au
+>> Subject: [PATCH v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex)
+>> accelerator driver
+>> 
+> ...
+>> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+>> index 3e6aa31..d739354 100644
+>> --- a/drivers/crypto/Kconfig
+>> +++ b/drivers/crypto/Kconfig
+>> @@ -799,6 +799,8 @@ source "drivers/crypto/hisilicon/Kconfig"
+>> 
+>> source "drivers/crypto/amlogic/Kconfig"
+>> 
+>> +source "drivers/crypto/ycc/Kconfig"
+>> +
+>> config CRYPTO_DEV_SA2UL
+>> 	tristate "Support for TI security accelerator"
+>> 	depends on ARCH_K3 || COMPILE_TEST
+> 
+> This menu isn't perfectly sorted, but since the new entry is for
+> "Alibaba YCC", putting this at the top of the file would be
+> better positioned for eventual sorting.
+> 
+> Naming the directory alibaba/ rather than ycc/ might be more
+> welcoming for future drivers, too.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.0-rc3 next-20220830]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Alibaba and T-Head (a semiconductor chip business entity of Alibaba Group) combined efforts
+on the platform Yitian, so our cryptographic accelerator which is integrated in Yitian was named YCC,
+the acronym for Yitian Cryptography Complex. We prefer ycc for our crypto related drivers.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Koba-Ko/crypto-ccp-Release-dma-channels-before-dmaengine-unrgister/20220830-173803
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20220831/202208310843.cesiRP88-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/5aa373b58528f3f99c5a010e76728776f0240603
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Koba-Ko/crypto-ccp-Release-dma-channels-before-dmaengine-unrgister/20220830-173803
-        git checkout 5aa373b58528f3f99c5a010e76728776f0240603
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/crypto/
+Anyway, thanks for your suggestions. I will adjust in alphabetical order in next version.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+Best regards,
+Guanjun
 
-All warnings (new ones prefixed by >>):
+> 
+> ...
+>> diff --git a/drivers/crypto/ycc/Kconfig b/drivers/crypto/ycc/Kconfig
+>> +++ b/drivers/crypto/ycc/Kconfig
+>> @@ -0,0 +1,8 @@
+>> +config CRYPTO_DEV_YCC
+>> +	tristate "Support for Alibaba YCC cryptographic accelerator"
+>> +	depends on CRYPTO && CRYPTO_HW && PCI
+>> +	default n
+>> +	help
+>> +	  Enables the driver for the on-chip cryptographic accelerator of
+>> +	  Alibaba Yitian SoCs which is based on ARMv9 architecture.
+>> +	  If unsure say N.
+> 
 
-   drivers/crypto/ccp/ccp-dmaengine.c: In function 'ccp_dmaengine_unregister':
->> drivers/crypto/ccp/ccp-dmaengine.c:770:22: warning: unused variable 'i' [-Wunused-variable]
-     770 |         unsigned int i;
-         |                      ^
->> drivers/crypto/ccp/ccp-dmaengine.c:769:26: warning: unused variable 'dma_chan' [-Wunused-variable]
-     769 |         struct dma_chan *dma_chan;
-         |                          ^~~~~~~~
-
-
-vim +/i +770 drivers/crypto/ccp/ccp-dmaengine.c
-
-   765	
-   766	void ccp_dmaengine_unregister(struct ccp_device *ccp)
-   767	{
-   768		struct dma_device *dma_dev = &ccp->dma_dev;
- > 769		struct dma_chan *dma_chan;
- > 770		unsigned int i;
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
