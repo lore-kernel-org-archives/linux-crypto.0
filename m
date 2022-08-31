@@ -2,79 +2,273 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0CFECAAD3
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 17:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F81FECAAD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Aug 2022 17:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbiHaRUK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Aug 2022 13:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41578 "EHLO
+        id S231484AbiHaRUr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 Aug 2022 13:20:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbiHaRUH (ORCPT
+        with ESMTP id S232011AbiHaRUk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Aug 2022 13:20:07 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E6C32DB1;
-        Wed, 31 Aug 2022 10:20:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EC849B82209;
-        Wed, 31 Aug 2022 17:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A52A2C433C1;
-        Wed, 31 Aug 2022 17:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661966404;
-        bh=PTI3pquDblLkkQUGtkNM6wHryacO2lN9/Uf5YsR7VMU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=CYxp8Jp2aGnetKhdKSIS0sJhaWvqVjWXzuVPhAyO1AP4lXDzwD27l4xPPciGL/NTG
-         CLbJGrBpf4oWswvDUikdWyIyL1DhQD7j+GTqMvFDW48uuwOfawy+VgFv4sxhxQT9mF
-         002pqwo7KCd3HPWEsybImtUIThjzpOum+hs0l9lEDOsm5iNeK57byGt1jBU/NzszYF
-         yzL7Yp6SaYthLBvAgIlipWAfv1SDv9htyOwvuOT5GJDiG9VV7sd3ODVyT/wGw/DOGE
-         PS21JUNacoi2wyYxmPDEhJUmgh6tGo99sLucdfo8MgIar67bhWDbhYjre9mf6YedlG
-         ezTo/sUcz7m2w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8CFA1C4166F;
-        Wed, 31 Aug 2022 17:20:04 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.0
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
-References: <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au> <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Yw8iAwgcPuBpGiGM@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.0-p2
-X-PR-Tracked-Commit-Id: 874b301985ef2f89b8b592ad255e03fb6fbfe605
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2361d3841fddffdd4b495a4510c507f0b8f17061
-Message-Id: <166196640456.5039.7025978141773120093.pr-tracker-bot@kernel.org>
-Date:   Wed, 31 Aug 2022 17:20:04 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Wed, 31 Aug 2022 13:20:40 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C37ED9E2E5
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 10:20:33 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id r6so11499859qtx.6
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Aug 2022 10:20:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc;
+        bh=SyLcqpHvP/Dxww6UQFwjysD5YzJ7EHxDql789Pl4OtM=;
+        b=oMRptfbELFmdJSHW/QEuPetgUH+I22kllPmA1kXOWeqSStrFRFXFib2/W7muRsBeQO
+         2W5/XdJfVvAlH1l2Nor64/fAgDI7iRqtEDE3hwJwiU3+o+1V4TV/9lyy/binjL6bpASS
+         LiMwkprEba6CnMn8fkgzv64joEXUiepbkP+mA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=SyLcqpHvP/Dxww6UQFwjysD5YzJ7EHxDql789Pl4OtM=;
+        b=Y0EF7O+NCotwuD0ZX8sWUoG68m3OWxyQ0Obnchcq6+WXEZglutLPHiNoHafEskXT6R
+         VKMh9MCSlTSp0Z6sxvYT8MxBY+jL+yrpZZN0H90yKW/HL0LbaiBbEEBvz4o+63u/BF/e
+         oftndWugjGJ4AyJPJqX9cO6BgoXDEUEGQnKjxiQYoDy8EisObID2NgzjsNxDHkxsB+Md
+         iNX3sBxQ/BnhjLQxDGxFCWbZ5FfTWw4qstRHhN3/Yxg+skMQLcgClberWxZjTLdIZ7pQ
+         k/wB5I12gVPSnob1h6ObP+XTUPnnOaF+c16BEJSGyY1a9l0DOWB8lC7qf/Rq/Prg+bFT
+         KDRg==
+X-Gm-Message-State: ACgBeo0X7bf4RTDt9Sb817mWZDPoWe4gsc03eRij06cre21koB8/q9UU
+        /UHA+/UT4HYDIvEyg/GHpx8cMA==
+X-Google-Smtp-Source: AA6agR4eoaT/16y28TB6ngRKEE+OZTwubs2MSerIMlxt3+iIByxOF9msh/3cim4Zwc7JH0D5ekw66g==
+X-Received: by 2002:ac8:5983:0:b0:344:5dcb:3b6b with SMTP id e3-20020ac85983000000b003445dcb3b6bmr20544262qte.503.1661966432766;
+        Wed, 31 Aug 2022 10:20:32 -0700 (PDT)
+Received: from trappist.c.googlers.com.com (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
+        by smtp.gmail.com with ESMTPSA id ge17-20020a05622a5c9100b003430589dd34sm8962611qtb.57.2022.08.31.10.20.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Aug 2022 10:20:32 -0700 (PDT)
+From:   Sven van Ashbrook <svenva@chromium.org>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Alex Levin <levinale@google.com>, Rajat Jain <rajatja@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Sven van Ashbrook <svenva@chromium.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v1 2/2] hwrng: core: fix potential suspend/resume race condition
+Date:   Wed, 31 Aug 2022 17:20:24 +0000
+Message-Id: <20220831172024.1613208-2-svenva@chromium.org>
+X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
+In-Reply-To: <20220831172024.1613208-1-svenva@chromium.org>
+References: <20220831172024.1613208-1-svenva@chromium.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 31 Aug 2022 16:55:31 +0800:
+The hwrng fill function runs as a normal kthread. This thread
+doesn't get frozen by the PM, i.e. it will keep running during,
+or in, system suspend. It may call the client driver's
+data_present()/data_read() functions during, or in, suspend;
+which may generate errors or warnings. For example, if the
+client driver uses an i2c bus, the following warning may be
+intermittently generated:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.0-p2
+  i2c: Transfer while suspended
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2361d3841fddffdd4b495a4510c507f0b8f17061
+Fix by converting the delay polled kthread into an ordered work
+queue running a single, self-rearming delayed_work. Make the
+workqueue WQ_FREEZABLE, so the PM will drain any work items
+before going into suspend. This prevents client drivers from
+being accessed during, or in, suspend.
 
-Thank you!
+Tested on a Chromebook containing an cr50 tpm over i2c. The test
+consists of 31000 suspend/resume cycles. Occasional
+"i2c: Transfer while suspended" warnings are seen. After applying
+this patch, these warnings disappear.
 
+This patch also does not appear to cause any regressions on the
+ChromeOS test queues.
+
+Signed-off-by: Sven van Ashbrook <svenva@chromium.org>
+---
+
+ drivers/char/hw_random/core.c | 95 +++++++++++++++++++----------------
+ 1 file changed, 51 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 3675122c6cce..ee85ca97d215 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -17,7 +17,7 @@
+ #include <linux/hw_random.h>
+ #include <linux/random.h>
+ #include <linux/kernel.h>
+-#include <linux/kthread.h>
++#include <linux/workqueue.h>
+ #include <linux/sched/signal.h>
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+@@ -28,14 +28,17 @@
+ 
+ #define RNG_MODULE_NAME		"hw_random"
+ 
+-static struct hwrng *current_rng;
+ /* the current rng has been explicitly chosen by user via sysfs */
+ static int cur_rng_set_by_user;
+-static struct task_struct *hwrng_fill;
++static struct workqueue_struct *hwrng_wq;
++static struct delayed_work hwrng_fill_dwork;
++static size_t entropy_credit;
++/* Protects rng_list, current_rng, is_hwrng_wq_running */
++static DEFINE_MUTEX(rng_mutex);
+ /* list of registered rngs */
+ static LIST_HEAD(rng_list);
+-/* Protects rng_list and current_rng */
+-static DEFINE_MUTEX(rng_mutex);
++static struct hwrng *current_rng;
++static bool is_hwrng_wq_running;
+ /* Protects rng read functions, data_avail, rng_buffer and rng_fillbuf */
+ static DEFINE_MUTEX(reading_mutex);
+ static int data_avail;
+@@ -488,37 +491,29 @@ static int __init register_miscdev(void)
+ 	return misc_register(&rng_miscdev);
+ }
+ 
+-static int hwrng_fillfn(void *unused)
++static void hwrng_fillfn(struct work_struct *unused)
+ {
+-	size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
++	unsigned short quality;
+ 	unsigned long delay;
++	struct hwrng *rng;
++	size_t entropy; /* in 1/1024 of a bit */
+ 	long rc;
+ 
+-	while (!kthread_should_stop()) {
+-		unsigned short quality;
+-		struct hwrng *rng;
+-
+-		rng = get_current_rng();
+-		if (IS_ERR(rng) || !rng)
+-			break;
+-		mutex_lock(&reading_mutex);
+-		rc = rng_get_data(rng, rng_fillbuf,
+-				  rng_buffer_size(), 1);
+-		if (current_quality != rng->quality)
+-			rng->quality = current_quality; /* obsolete */
+-		quality = rng->quality;
+-		mutex_unlock(&reading_mutex);
+-		put_rng(rng);
+-
+-		if (!quality)
+-			break;
++	rng = get_current_rng();
++	if (IS_ERR(rng) || !rng)
++		return;
++	mutex_lock(&reading_mutex);
++	rc = rng_get_data(rng, rng_fillbuf, rng_buffer_size(), 1);
++	if (current_quality != rng->quality)
++		rng->quality = current_quality; /* obsolete */
++	quality = rng->quality;
++	mutex_unlock(&reading_mutex);
++	put_rng(rng);
+ 
+-		if (rc <= 0) {
+-			pr_warn("hwrng: no data available\n");
+-			msleep_interruptible(10000);
+-			continue;
+-		}
++	if (!quality)
++		return;
+ 
++	if (rc > 0) {
+ 		/* If we cannot credit at least one bit of entropy,
+ 		 * keep track of the remainder for the next iteration
+ 		 */
+@@ -529,11 +524,11 @@ static int hwrng_fillfn(void *unused)
+ 		/* Outside lock, sure, but y'know: randomness. */
+ 		delay = add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+ 						   entropy >> 10);
+-		if (delay > 0)
+-			schedule_timeout_interruptible(delay);
++	} else {
++		pr_warn("hwrng: no data available\n");
++		delay = 10 * HZ;
+ 	}
+-	hwrng_fill = NULL;
+-	return 0;
++	mod_delayed_work(hwrng_wq, &hwrng_fill_dwork, delay);
+ }
+ 
+ static void hwrng_manage_rngd(struct hwrng *rng)
+@@ -541,14 +536,12 @@ static void hwrng_manage_rngd(struct hwrng *rng)
+ 	if (WARN_ON(!mutex_is_locked(&rng_mutex)))
+ 		return;
+ 
+-	if (rng->quality == 0 && hwrng_fill)
+-		kthread_stop(hwrng_fill);
+-	if (rng->quality > 0 && !hwrng_fill) {
+-		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
+-		if (IS_ERR(hwrng_fill)) {
+-			pr_err("hwrng_fill thread creation failed\n");
+-			hwrng_fill = NULL;
+-		}
++	if (rng->quality == 0 && is_hwrng_wq_running) {
++		cancel_delayed_work(&hwrng_fill_dwork);
++		is_hwrng_wq_running = false;
++	} else if (rng->quality > 0 && !is_hwrng_wq_running) {
++		mod_delayed_work(hwrng_wq, &hwrng_fill_dwork, 0);
++		is_hwrng_wq_running = true;
+ 	}
+ }
+ 
+@@ -631,8 +624,7 @@ void hwrng_unregister(struct hwrng *rng)
+ 	new_rng = get_current_rng_nolock();
+ 	if (list_empty(&rng_list)) {
+ 		mutex_unlock(&rng_mutex);
+-		if (hwrng_fill)
+-			kthread_stop(hwrng_fill);
++		cancel_delayed_work_sync(&hwrng_fill_dwork);
+ 	} else
+ 		mutex_unlock(&rng_mutex);
+ 
+@@ -703,17 +695,32 @@ static int __init hwrng_modinit(void)
+ 		return -ENOMEM;
+ 	}
+ 
++	/* ordered wq to mimic delay-polled kthread behaviour */
++	hwrng_wq = alloc_ordered_workqueue("hwrng",
++		WQ_FREEZABLE |	/* prevent work from running during suspend/resume */
++		WQ_MEM_RECLAIM	/* client drivers may need memory reclaim */
++	);
++	if (!hwrng_wq) {
++		kfree(rng_fillbuf);
++		kfree(rng_buffer);
++		return -ENOMEM;
++	}
++
+ 	ret = register_miscdev();
+ 	if (ret) {
++		destroy_workqueue(hwrng_wq);
+ 		kfree(rng_fillbuf);
+ 		kfree(rng_buffer);
+ 	}
+ 
++	INIT_DELAYED_WORK(&hwrng_fill_dwork, hwrng_fillfn);
++
+ 	return ret;
+ }
+ 
+ static void __exit hwrng_modexit(void)
+ {
++	destroy_workqueue(hwrng_wq);
+ 	mutex_lock(&rng_mutex);
+ 	BUG_ON(current_rng);
+ 	kfree(rng_buffer);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.37.2.672.g94769d06f0-goog
+
