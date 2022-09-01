@@ -2,79 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAFAECAAD2
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 19:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882F7ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 20:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234205AbiIATvz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Sep 2022 15:51:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37536 "EHLO
+        id S234779AbiIAUJw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Sep 2022 16:09:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234733AbiIATvw (ORCPT
+        with ESMTP id S229584AbiIAUJv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 15:51:52 -0400
+        Thu, 1 Sep 2022 16:09:51 -0400
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4ECA5A165
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 12:51:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE86FF68
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 13:09:47 -0700 (PDT)
 Received: from [10.0.0.10] (87-100-246-149.bb.dnainternet.fi [87.100.246.149])
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
         (Authenticated sender: jussi.kivilinna)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id D87CD1B001B0;
-        Thu,  1 Sep 2022 22:51:45 +0300 (EEST)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 07BC31B001B0;
+        Thu,  1 Sep 2022 23:09:46 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-        t=1662061906;
+        t=1662062986;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lbZzyLhP+GD+MOmFl3LUIL3OmLTAo1+/TnWHWGF5cWk=;
-        b=hWo9GFj8ukgnWqy09aln3my0g1AmPhEDkQkRW0nSshtmZzpqzc+OSW9RVZDe3QMlx2ZTSp
-        Hz0xdWt26i5BvKuyj7t7aHl8EKqhLgG74dUPj4TnI4X/q//NjrsujSS5nrO+eBJnlB0uGF
-        pdBubiq/Kc+ZChRnXlyPKfUMRsl/D3cR3BgXc5B5wOTeEwLLmK6JNZxL/0VwGv1TMt/BoC
-        blhOkheLse7mjixiYB+Oyc+nyCwFbRKmyO4iiD3Q79K2LsN6GkD4KNI7FDKKJ2fU8iGR3K
-        lJnHSwHPI7+R1H5X6SIw2wi/WZf71A++ArHvYpgvmMTt1quHcKt6CBjkcwZ9+w==
-Message-ID: <c6535c51-e069-ef46-3f7d-a08aecc0c957@iki.fi>
-Date:   Thu, 1 Sep 2022 22:51:45 +0300
+        bh=2on/NE8C06OpB4eHMAfiOhWwijuHFkO+CrLReU7rkKI=;
+        b=FcVAOLwwNQ2+TuUelNSQN8e3yUIIOvAP132KNAc/SGVrMOyM5ku8FtVATGYGlPZbRUmMWX
+        USQUQc3nqnzRfV7Jj75+ektpEq6xa9lN+j1E5TKSYctPfB5dn6HDLWFBP1riUDnokkikgy
+        Q4m7c/CZPRutmeQy4Jkdi3xc8BXv2zxLV8nrtWavypcX6PX92qLb+eTwXAoKrOsTBN0AbL
+        rjcitYyolzdGCzPYy8CBwP9aqvg872IbJM1BvFSyztj8RWD+9RFZUGOBuYAHCY55Rekd7b
+        KGSXUh/He7dUKOdzqu2QFeD72vuh07+r+w+71GIWhKGZ/SVH5imBYKMeg4sA2A==
+Message-ID: <afef1c3a-9a72-9006-da95-d63ec5aece5c@iki.fi>
+Date:   Thu, 1 Sep 2022 23:09:45 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
 Content-Language: en-US
 To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, elliott@hpe.com,
-        herbert@gondor.apana.org.au, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, davem@davemloft.net, bp@alien8.de,
-        x86@kernel.org, hpa@zytor.com
+Cc:     elliott@hpe.com, hpa@zytor.com, x86@kernel.org,
+        davem@davemloft.net, mingo@redhat.com, tglx@linutronix.de,
+        dave.hansen@linux.intel.com, bp@alien8.de,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 References: <20220826053131.24792-1-ap420073@gmail.com>
- <20220826053131.24792-3-ap420073@gmail.com>
 From:   Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH v2 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64 assembler
- implementation of aria cipher
-In-Reply-To: <20220826053131.24792-3-ap420073@gmail.com>
+Subject: Re: [PATCH v2 0/3] crypto: aria: add ARIA AES-NI/AVX/x86_64
+ implementation
+In-Reply-To: <20220826053131.24792-1-ap420073@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=jussi.kivilinna smtp.mailfrom=jussi.kivilinna@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1662061906; a=rsa-sha256;
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1662062986; a=rsa-sha256;
         cv=none;
-        b=ffqhKa622dsbYTbxK10nheWkHmhN9Oh66mPCvhj9VIdjVP7WtFle8brbseBOGmSigL5sIn
-        8Clnmsw+5YArMtEcA1d6ry5vaYsAzeQ3WUvEO1F3zklXKw9qk/CYjkY05zYVQ9GhUcKH7R
-        RZ0GvvBEqbcDH88TqTIH7c0jCGSsO2CkMfUTEyqEoqoNskKKWzkhUftA0OhbK70GKAz17Q
-        XxbicEF0Ki78FHhQlAukUSQFe/NJaVYahVtvxQPRgmlKPSOPKN2oa+OHyIK/FO6GMZfd96
-        LFYP3bKi6bdXEBYbjDgQgchLlGtrm39MOI0+vF+0JOmJ6Z4yv61ZotlHWDtQ7A==
+        b=WIwGOg2h0/yYGL2ugxZcSE8NyIkT5EduFT1uanlqlaECh5Y+0rX4JJeg8rTq/4FXpKw3wV
+        h+XOMcYhvZfboDdG9+8jcsj4GZPmkQtZCwgdEm4r6QG48zYm/FD7yqvIZnWAbkfXNH+ME/
+        b6t2tlhiz6Xd4aBnPF4tYKpHHAbAb5CcF9ncFEeGA7UZgiKBDGHRAfGhVMjGKZFC1Tz+66
+        i0c+DZajo/xoNJsVUCaHTEc9tf3VOu4o5HT4dCZoQ9s7ad9JmAByizjyFACfL7W85RbAVy
+        wisRDekuc5PwS1zKeYgiiTBLEzC8OOrkVvF4zpTnf0I3cj+rWB94ZR7y/HDKzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=lahtoruutu; t=1662061906;
+        s=lahtoruutu; t=1662062986;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lbZzyLhP+GD+MOmFl3LUIL3OmLTAo1+/TnWHWGF5cWk=;
-        b=GTvXByxhXOS8cum+Lr+70Ze02GyF3Q6qbsIve93FtHwpKF1aBCtO6NT10m/pKHvWWLObf/
-        /8mTgxbxnYtMMxTuVF/0sASgzFsFzVK4vadefp1BToFX5hBdQtc9ILh5Dd2j4kG/YsyOZs
-        C/OycD1bUwmOYztPAkL4BqlCvGHaanHKUkQ+5e5nuQTDrLoGBFeDBXOq98wMf/8DP3GOVY
-        7Vm+H8Q+Xl7OxUFJxduMKJllUuYNlSoH3pnMfuJJntv6AE24AytniuvJifRv0QiK8nae6a
-        u4eAGlQkcZ4ZYujpNS4kok0RT78AKNtloeTai6PRnKrYcQHJ533YpiBFjDvd1A==
+        bh=2on/NE8C06OpB4eHMAfiOhWwijuHFkO+CrLReU7rkKI=;
+        b=sNtM+I3SOgsmscSMeTwtLCwAbmHMbQtNiBpvSN7FTsaM8OkmRcHzIh9UqblECC4UesnyY2
+        H4U3kCFAS1QCnMFwOhfk2G/oXhpOC/yl5YiTLHCsdKtpTp/gFi+dyOpNIJR0rL/Wad5PYy
+        aRedbFqJAASg3N/wwqt1Vmb1MfsTEvFLQJe3dickeyncJx5ArVNooWdRQ9hTgeig/qBTam
+        VSH1lLImBWXlVPtAl0SrpYQBjB0cwYQYuzWvPZ9smCzMhIywWHatjvHl0T9fAyUg1QGSBO
+        u9egOIBlSn4aAdjV4qGj9d4anRGIclv3i4ar+MrQ8oRqUeuVigggR2mFiyhcVg==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -82,147 +81,173 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 Hello,
 
 On 26.8.2022 8.31, Taehee Yoo wrote:
-> +#define aria_sbox_8way(x0, x1, x2, x3,			\
-> +		       x4, x5, x6, x7,			\
-> +		       t0, t1, t2, t3,			\
-> +		       t4, t5, t6, t7)			\
-> +	vpxor t0, t0, t0;				\
-> +	vaesenclast t0, x0, x0;				\
-> +	vaesenclast t0, x4, x4;				\
-> +	vaesenclast t0, x1, x1;				\
-> +	vaesenclast t0, x5, x5;				\
-> +	vaesdeclast t0, x2, x2;				\
-> +	vaesdeclast t0, x6, x6;				\
-> +							\
-> +	/* AES inverse shift rows */			\
-> +	vmovdqa .Linv_shift_row, t0;			\
-> +	vmovdqa .Lshift_row, t1;			\
-> +	vpshufb t0, x0, x0;				\
-> +	vpshufb t0, x4, x4;				\
-> +	vpshufb t0, x1, x1;				\
-> +	vpshufb t0, x5, x5;				\
-> +	vpshufb t0, x3, x3;				\
-> +	vpshufb t0, x7, x7;				\
-> +	vpshufb t1, x2, x2;				\
-> +	vpshufb t1, x6, x6;				\
-> +							\
-> +	vmovdqa .Linv_lo, t0;				\
-> +	vmovdqa .Linv_hi, t1;				\
-> +	vmovdqa .Ltf_lo_s2, t2;				\
-> +	vmovdqa .Ltf_hi_s2, t3;				\
-> +	vmovdqa .Ltf_lo_x2, t4;				\
-> +	vmovdqa .Ltf_hi_x2, t5;				\
-> +	vbroadcastss .L0f0f0f0f, t6;			\
-> +							\
-> +	/* extract multiplicative inverse */		\
-> +	filter_8bit(x1, t0, t1, t6, t7);		\
-> +	/* affine transformation for S2 */		\
-> +	filter_8bit(x1, t2, t3, t6, t7);		\
+> The purpose of this patchset is to support the implementation of ARIA-AVX.
+> Many of the ideas in this implementation are from Camellia-avx,
+> especially byte slicing.
+> Like Camellia, ARIA also uses a 16way strategy.
+> 
+> ARIA cipher algorithm is similar to AES.
+> There are four s-boxes in the ARIA spec and the first and second s-boxes
+> are the same as AES's s-boxes.
+> Almost functions are based on aria-generic code except for s-box related
+> function.
+> The aria-avx doesn't implement the key expanding function.
+> it only support encrypt() and decrypt().
+> 
+> Encryption and Decryption logic is actually the same but it should use
+> separated keys(encryption key and decryption key).
+> En/Decryption steps are like below:
+> 1. Add-Round-Key
+> 2. S-box.
+> 3. Diffusion Layer.
+> 
+> There is no special thing in the Add-Round-Key step.
+> 
+> There are some notable things in s-box step.
+> Like Camellia, it doesn't use a lookup table, instead, it uses aes-ni.
+> 
+> To calculate the first s-box, it just uses the aesenclast and then
+> inverts shift_row. No more process is needed for this job because the
+> first s-box is the same as the AES encryption s-box.
+> 
+> To calculate a second s-box(invert of s1), it just uses the aesdeclast
+> and then inverts shift_row. No more process is needed for this job
+> because the second s-box is the same as the AES decryption s-box.
+> 
+> To calculate a third and fourth s-boxes, it uses the aesenclast,
+> then inverts shift_row, and affine transformation.
+> 
+> The aria-generic implementation is based on a 32-bit implementation,
+> not an 8-bit implementation.
+> The aria-avx Diffusion Layer implementation is based on aria-generic
+> implementation because 8-bit implementation is not fit for parallel
+> implementation but 32-bit is fit for this.
+> 
+> The first patch in this series is to export functions for aria-avx.
+> The aria-avx uses existing functions in the aria-generic code.
+> The second patch is to implement aria-avx.
+> The last patch is to add async test for aria.
+> 
+> Benchmarks:
+> The tcrypt is used.
+> cpu: i3-12100
 
-Here's room for improvement. These two affine transformations
-could be combined into single filter_8bit...
+This CPU also supports Galois Field New Instructions (GFNI) which are
+even better suited for accelerating ciphers that use same building
+blocks as AES. For example, I've recently implemented camellia using
+GFNI for libgcrypt [1].
 
-> +	/* extract multiplicative inverse */		\
-> +	filter_8bit(x5, t0, t1, t6, t7);		\
-> +	/* affine transformation for S2 */		\
-> +	filter_8bit(x5, t2, t3, t6, t7);		\
-> +							\
-> +	/* affine transformation for X2 */		\
-> +	filter_8bit(x3, t4, t5, t6, t7);		\
-> +	vpxor t7, t7, t7;				\
-> +	vaesenclast t7, x3, x3;				\
-> +	/* extract multiplicative inverse */		\
-> +	filter_8bit(x3, t0, t1, t6, t7);		\
-> +	/* affine transformation for X2 */		\
-> +	filter_8bit(x7, t4, t5, t6, t7);		\
-> +	vpxor t7, t7, t7;				\
-> +	vaesenclast t7, x7, x7;                         \
-> +	/* extract multiplicative inverse */		\
-> +	filter_8bit(x7, t0, t1, t6, t7);
-
-... as well as these two filter_8bit could be replaced with
-one operation if 'vaesenclast' would be changed to 'vaesdeclast'.
-
-With these optimizations, 'aria_sbox_8way' would look like this:
+I quickly hacked GFNI to your implementation and it gives nice extra
+bit of performance (~55% faster on Intel tiger-lake). Here's GFNI
+version of 'aria_sbox_8way', that I used:
 
 /////////////////////////////////////////////////////////
-#define aria_sbox_8way(x0, x1, x2, x3,			\
-		       x4, x5, x6, x7,			\
-		       t0, t1, t2, t3,			\
-		       t4, t5, t6, t7)			\
-	vpxor t7, t7, t7;				\
-	vmovdqa .Linv_shift_row, t0;			\
-	vmovdqa .Lshift_row, t1;			\
-	vpbroadcastd .L0f0f0f0f, t6;			\
-	vmovdqa .Ltf_lo__inv_aff__and__s2, t2;		\
-	vmovdqa .Ltf_hi__inv_aff__and__s2, t3;		\
-	vmovdqa .Ltf_lo__x2__and__fwd_aff, t4;		\
-	vmovdqa .Ltf_hi__x2__and__fwd_aff, t5;		\
-							\
-	vaesenclast t7, x0, x0;				\
-	vaesenclast t7, x4, x4;				\
-	vaesenclast t7, x1, x1;				\
-	vaesenclast t7, x5, x5;				\
-	vaesdeclast t7, x2, x2;				\
-	vaesdeclast t7, x6, x6;				\
-							\
-	/* AES inverse shift rows */			\
-	vpshufb t0, x0, x0;				\
-	vpshufb t0, x4, x4;				\
-	vpshufb t0, x1, x1;				\
-	vpshufb t0, x5, x5;				\
-	vpshufb t1, x3, x3;				\
-	vpshufb t1, x7, x7;				\
-	vpshufb t1, x2, x2;				\
-	vpshufb t1, x6, x6;				\
-							\
-	/* affine transformation for S2 */		\
-	filter_8bit(x1, t2, t3, t6, t0);		\
-	/* affine transformation for S2 */		\
-	filter_8bit(x5, t2, t3, t6, t0);		\
-							\
-	/* affine transformation for X2 */		\
-	filter_8bit(x3, t4, t5, t6, t0);		\
-	/* affine transformation for X2 */		\
-	filter_8bit(x7, t4, t5, t6, t0);		\
-	vaesdeclast t7, x3, x3;				\
-	vaesdeclast t7, x7, x7;
+#define aria_sbox_8way(x0, x1, x2, x3,                  \
+                        x4, x5, x6, x7,                  \
+                        t0, t1, t2, t3,                  \
+                        t4, t5, t6, t7)                  \
+         vpbroadcastq .Ltf_s2_bitmatrix, t0;             \
+         vpbroadcastq .Ltf_inv_bitmatrix, t1;            \
+         vpbroadcastq .Ltf_id_bitmatrix, t2;             \
+         vpbroadcastq .Ltf_aff_bitmatrix, t3;            \
+         vpbroadcastq .Ltf_x2_bitmatrix, t4;             \
+         vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;   \
+         vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;   \
+         vgf2p8affineqb $(tf_inv_const), t1, x2, x2;     \
+         vgf2p8affineqb $(tf_inv_const), t1, x6, x6;     \
+         vgf2p8affineinvqb $0, t2, x2, x2;               \
+         vgf2p8affineinvqb $0, t2, x6, x6;               \
+         vgf2p8affineinvqb $(tf_aff_const), t3, x0, x0;  \
+         vgf2p8affineinvqb $(tf_aff_const), t3, x4, x4;  \
+         vgf2p8affineqb $(tf_x2_const), t4, x3, x3;      \
+         vgf2p8affineqb $(tf_x2_const), t4, x7, x7;      \
+         vgf2p8affineinvqb $0, t2, x3, x3;               \
+         vgf2p8affineinvqb $0, t2, x7, x7;
 
-/* AES inverse affine and S2 combined:
-  *      1 1 0 0 0 0 0 1     x0     0
-  *      0 1 0 0 1 0 0 0     x1     0
-  *      1 1 0 0 1 1 1 1     x2     0
-  *      0 1 1 0 1 0 0 1     x3     1
-  *      0 1 0 0 1 1 0 0  *  x4  +  0
-  *      0 1 0 1 1 0 0 0     x5     0
-  *      0 0 0 0 0 1 0 1     x6     0
-  *      1 1 1 0 0 1 1 1     x7     1
-  */
-.Ltf_lo__inv_aff__and__s2:
-	.octa 0x92172DA81A9FA520B2370D883ABF8500
-.Ltf_hi__inv_aff__and__s2:
-	.octa 0x2B15FFC1AF917B45E6D8320C625CB688
+#define BV8(a0,a1,a2,a3,a4,a5,a6,a7) \
+         ( (((a0) & 1) << 0) | \
+           (((a1) & 1) << 1) | \
+           (((a2) & 1) << 2) | \
+           (((a3) & 1) << 3) | \
+           (((a4) & 1) << 4) | \
+           (((a5) & 1) << 5) | \
+           (((a6) & 1) << 6) | \
+           (((a7) & 1) << 7) )
 
-/* X2 and AES forward affine combined:
-  *      1 0 1 1 0 0 0 1     x0     0
-  *      0 1 1 1 1 0 1 1     x1     0
-  *      0 0 0 1 1 0 1 0     x2     1
-  *      0 1 0 0 0 1 0 0     x3     0
-  *      0 0 1 1 1 0 1 1  *  x4  +  0
-  *      0 1 0 0 1 0 0 0     x5     0
-  *      1 1 0 1 0 0 1 1     x6     0
-  *      0 1 0 0 1 0 1 0     x7     0
-  */
-.Ltf_lo__x2__and__fwd_aff:
-	.octa 0xEFAE0544FCBD1657B8F95213ABEA4100
-.Ltf_hi__x2__and__fwd_aff:
-	.octa 0x3F893781E95FE1576CDA64D2BA0CB204
+#define BM8X8(l0,l1,l2,l3,l4,l5,l6,l7) \
+         ( ((l7) << (0 * 8)) | \
+           ((l6) << (1 * 8)) | \
+           ((l5) << (2 * 8)) | \
+           ((l4) << (3 * 8)) | \
+           ((l3) << (4 * 8)) | \
+           ((l2) << (5 * 8)) | \
+           ((l1) << (6 * 8)) | \
+           ((l0) << (7 * 8)) )
+
+/* AES affine: */
+#define tf_aff_const BV8(1, 1, 0, 0, 0, 1, 1, 0)
+.Ltf_aff_bitmatrix:
+         .quad BM8X8(BV8(1, 0, 0, 0, 1, 1, 1, 1),
+                     BV8(1, 1, 0, 0, 0, 1, 1, 1),
+                     BV8(1, 1, 1, 0, 0, 0, 1, 1),
+                     BV8(1, 1, 1, 1, 0, 0, 0, 1),
+                     BV8(1, 1, 1, 1, 1, 0, 0, 0),
+                     BV8(0, 1, 1, 1, 1, 1, 0, 0),
+                     BV8(0, 0, 1, 1, 1, 1, 1, 0),
+                     BV8(0, 0, 0, 1, 1, 1, 1, 1))
+
+/* AES inverse affine: */
+#define tf_inv_const BV8(1, 0, 1, 0, 0, 0, 0, 0)
+.Ltf_inv_bitmatrix:
+         .quad BM8X8(BV8(0, 0, 1, 0, 0, 1, 0, 1),
+                     BV8(1, 0, 0, 1, 0, 0, 1, 0),
+                     BV8(0, 1, 0, 0, 1, 0, 0, 1),
+                     BV8(1, 0, 1, 0, 0, 1, 0, 0),
+                     BV8(0, 1, 0, 1, 0, 0, 1, 0),
+                     BV8(0, 0, 1, 0, 1, 0, 0, 1),
+                     BV8(1, 0, 0, 1, 0, 1, 0, 0),
+                     BV8(0, 1, 0, 0, 1, 0, 1, 0))
+
+/* S2: */
+#define tf_s2_const BV8(0, 1, 0, 0, 0, 1, 1, 1)
+.Ltf_s2_bitmatrix:
+         .quad BM8X8(BV8(0, 1, 0, 1, 0, 1, 1, 1),
+                     BV8(0, 0, 1, 1, 1, 1, 1, 1),
+                     BV8(1, 1, 1, 0, 1, 1, 0, 1),
+                     BV8(1, 1, 0, 0, 0, 0, 1, 1),
+                     BV8(0, 1, 0, 0, 0, 0, 1, 1),
+                     BV8(1, 1, 0, 0, 1, 1, 1, 0),
+                     BV8(0, 1, 1, 0, 0, 0, 1, 1),
+                     BV8(1, 1, 1, 1, 0, 1, 1, 0))
+
+/* X2: */
+#define tf_x2_const BV8(0, 0, 1, 1, 0, 1, 0, 0)
+.Ltf_x2_bitmatrix:
+         .quad BM8X8(BV8(0, 0, 0, 1, 1, 0, 0, 0),
+                     BV8(0, 0, 1, 0, 0, 1, 1, 0),
+                     BV8(0, 0, 0, 0, 1, 0, 1, 0),
+                     BV8(1, 1, 1, 0, 0, 0, 1, 1),
+                     BV8(1, 1, 1, 0, 1, 1, 0, 0),
+                     BV8(0, 1, 1, 0, 1, 0, 1, 1),
+                     BV8(1, 0, 1, 1, 1, 1, 0, 1),
+                     BV8(1, 0, 0, 1, 0, 0, 1, 1))
+
+/* Identity matrix: */
+.Ltf_id_bitmatrix:
+         .quad BM8X8(BV8(1, 0, 0, 0, 0, 0, 0, 0),
+                     BV8(0, 1, 0, 0, 0, 0, 0, 0),
+                     BV8(0, 0, 1, 0, 0, 0, 0, 0),
+                     BV8(0, 0, 0, 1, 0, 0, 0, 0),
+                     BV8(0, 0, 0, 0, 1, 0, 0, 0),
+                     BV8(0, 0, 0, 0, 0, 1, 0, 0),
+                     BV8(0, 0, 0, 0, 0, 0, 1, 0),
+                     BV8(0, 0, 0, 0, 0, 0, 0, 1))
 /////////////////////////////////////////////////////////
 
-I tested above quickly in userspace against aria-generic
-and your original aria-avx implementation and output matches
-to these references. In quick and dirty benchmark, function
-execution time was ~30% faster on AMD Zen3 and ~20% faster
-on Intel tiger-lake.
+GFNI also allows easy use of 256-bit vector registers so
+there is way to get additional 2x speed increase (but
+requires doubling number of parallel processed blocks).
 
 -Jussi
+
+[1] https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=blob;f=cipher/camellia-aesni-avx2-amd64.h#l80
