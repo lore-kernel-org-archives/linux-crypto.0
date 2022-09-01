@@ -2,252 +2,225 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 882F7ECAAD3
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 20:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D090ECAAD2
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 20:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234779AbiIAUJw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Sep 2022 16:09:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
+        id S231815AbiIAUcl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Sep 2022 16:32:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbiIAUJv (ORCPT
+        with ESMTP id S231443AbiIAUck (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 16:09:51 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE86FF68
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 13:09:47 -0700 (PDT)
-Received: from [10.0.0.10] (87-100-246-149.bb.dnainternet.fi [87.100.246.149])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: jussi.kivilinna)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 07BC31B001B0;
-        Thu,  1 Sep 2022 23:09:46 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-        t=1662062986;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2on/NE8C06OpB4eHMAfiOhWwijuHFkO+CrLReU7rkKI=;
-        b=FcVAOLwwNQ2+TuUelNSQN8e3yUIIOvAP132KNAc/SGVrMOyM5ku8FtVATGYGlPZbRUmMWX
-        USQUQc3nqnzRfV7Jj75+ektpEq6xa9lN+j1E5TKSYctPfB5dn6HDLWFBP1riUDnokkikgy
-        Q4m7c/CZPRutmeQy4Jkdi3xc8BXv2zxLV8nrtWavypcX6PX92qLb+eTwXAoKrOsTBN0AbL
-        rjcitYyolzdGCzPYy8CBwP9aqvg872IbJM1BvFSyztj8RWD+9RFZUGOBuYAHCY55Rekd7b
-        KGSXUh/He7dUKOdzqu2QFeD72vuh07+r+w+71GIWhKGZ/SVH5imBYKMeg4sA2A==
-Message-ID: <afef1c3a-9a72-9006-da95-d63ec5aece5c@iki.fi>
-Date:   Thu, 1 Sep 2022 23:09:45 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
+        Thu, 1 Sep 2022 16:32:40 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DA377961B;
+        Thu,  1 Sep 2022 13:32:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NCHntLMJeSicaMAY0wH/JqRXECod3GdYxCSwbCJRzb44u4EcaXcs7dCm7WQCge5H4C+Ixik4c2O8a2Gb0lEx0B4+c96+YJ2lg9Xd1aCGXjhsqfpAKpsiMDIC3oezq6l9pqjgh6q34ksYi7EDkpLxzJwXQ/3H5dVsKT31eqg/WsgU8RCNxJDdCmxjIG385X/8qLky+xEoyivrJspqPXlr3E6JsiBcZGcWRDww1cr/VKgifB7HfSCvvgmUtD80h6baYLgZNWAYXW9/cYef2oSUI+LBIRwZyikz0l8LcN4CzIypFTL0+suWp3Nk8IeDMJeC2sL/lYdFI+mAIM+h4WlYDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8z39LTGoqPC0gcqHK5cQackmxlAmSNi7bjy1vJ1zQzs=;
+ b=RNO0j9Qrr1ElZCYUdKc77DvURnqQlUNCK8FtZE0DWKpMLsZK1wdv8BMuAoCYugMUrFfZR6/EvvQ6PJUQhclbjnDsL7kk6vya6RI7WsFPSN8hiisGTQgLZLywby2Ogzc71IUlRxufenaGSKUNTqS3Hn2AkQPW5gk/Sy41qztDujDr5Rj3dNrjZFllsHiN6+ojQzrdhnvcedenEA6oJKHuFqRbGwd3YSJSrTteZQpvO0htkNTJoklXxncrYdhw2NR998JIp1PAPAa/5+MXNe05tMRgK02ueg9qLoAnRQ4BMAeC+Bik1hUCuHAEv1aAW/zyvMgq0R+0OXwKeVekYdxq6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8z39LTGoqPC0gcqHK5cQackmxlAmSNi7bjy1vJ1zQzs=;
+ b=rMZMq5hi21jdVmbgb9olYx0Ecc7nr9ZPzxogVH9Vps41B0ECF1Bqol91FgC6ErHNQ/TjdNcy89EQDP6L3gDRtUspcQfJn4iNqgN8IJy3EldL6mTVqqbgEEknrfT2y/Wo+kzUGZ6EsEaVJyIRic0zBDOW1EH7Vl7bMeqEbk0l238=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BY5PR12MB4259.namprd12.prod.outlook.com (2603:10b6:a03:202::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Thu, 1 Sep
+ 2022 20:32:36 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c%7]) with mapi id 15.20.5588.010; Thu, 1 Sep 2022
+ 20:32:36 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: RE: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Topic: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Index: AQHYrBDc30zm/ve2UUW13wSedLDd3a2nIMnggADB+gCAAMFX8IAieiDA
+Date:   Thu, 1 Sep 2022 20:32:35 +0000
+Message-ID: <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic>
+ <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YvN9bKQ0XtUVJE7z@zn.tnic>
+ <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     elliott@hpe.com, hpa@zytor.com, x86@kernel.org,
-        davem@davemloft.net, mingo@redhat.com, tglx@linutronix.de,
-        dave.hansen@linux.intel.com, bp@alien8.de,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-References: <20220826053131.24792-1-ap420073@gmail.com>
-From:   Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH v2 0/3] crypto: aria: add ARIA AES-NI/AVX/x86_64
- implementation
-In-Reply-To: <20220826053131.24792-1-ap420073@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=jussi.kivilinna smtp.mailfrom=jussi.kivilinna@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1662062986; a=rsa-sha256;
-        cv=none;
-        b=WIwGOg2h0/yYGL2ugxZcSE8NyIkT5EduFT1uanlqlaECh5Y+0rX4JJeg8rTq/4FXpKw3wV
-        h+XOMcYhvZfboDdG9+8jcsj4GZPmkQtZCwgdEm4r6QG48zYm/FD7yqvIZnWAbkfXNH+ME/
-        b6t2tlhiz6Xd4aBnPF4tYKpHHAbAb5CcF9ncFEeGA7UZgiKBDGHRAfGhVMjGKZFC1Tz+66
-        i0c+DZajo/xoNJsVUCaHTEc9tf3VOu4o5HT4dCZoQ9s7ad9JmAByizjyFACfL7W85RbAVy
-        wisRDekuc5PwS1zKeYgiiTBLEzC8OOrkVvF4zpTnf0I3cj+rWB94ZR7y/HDKzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=lahtoruutu; t=1662062986;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2on/NE8C06OpB4eHMAfiOhWwijuHFkO+CrLReU7rkKI=;
-        b=sNtM+I3SOgsmscSMeTwtLCwAbmHMbQtNiBpvSN7FTsaM8OkmRcHzIh9UqblECC4UesnyY2
-        H4U3kCFAS1QCnMFwOhfk2G/oXhpOC/yl5YiTLHCsdKtpTp/gFi+dyOpNIJR0rL/Wad5PYy
-        aRedbFqJAASg3N/wwqt1Vmb1MfsTEvFLQJe3dickeyncJx5ArVNooWdRQ9hTgeig/qBTam
-        VSH1lLImBWXlVPtAl0SrpYQBjB0cwYQYuzWvPZ9smCzMhIywWHatjvHl0T9fAyUg1QGSBO
-        u9egOIBlSn4aAdjV4qGj9d4anRGIclv3i4ar+MrQ8oRqUeuVigggR2mFiyhcVg==
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-08-10T21:14:04Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=39eeec9b-b36e-48b8-a410-dbbaae721fe1;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-09-01T20:32:33Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: d457c7cb-9ee6-4bed-95ef-d6ce5b1e22bd
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3bcfb976-df37-4480-1b90-08da8c591b08
+x-ms-traffictypediagnostic: BY5PR12MB4259:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: K3XVUbOYgCU9svDfd26fFZu+348F1R3MMIpX7y0e8QAdO8osFeN9JB30FSRE3Pr/LVymFknB48MCMEW/7pGgs8JeweJaRPXqteC4dU0xOQtONPGooBCId0FQD6mcCphIyDWx8FM+/5z7qsgeJD26gxRKRgC2McOSKE4Iyzh0Aod6Ji0YYIPLutxjqoPfbpzrz9iIL9p6CoEVbzNImgeO6m18ZlBSEjr+Kx4U3iCfJFNcaNKf3T5pZi9qyJ/n9lgP/3q0cw84TYjTYTyvv9+MQj7ft0bfUkunL/QhTTsPiyZlMcTDbudHuzpUqb6kmfCJL4qMSXIXlGEl6+QjZnneSsoOwQiM8KLPqjLn8RSH2FEKbkX7E0cYfYQ9AczhX74yQxDq9QEg+un35udvzlbvkJBgyHjGVc3WFQmh6h3Q0QIZM5KcLDF2JLB0DcwkaXqUWJALhrItz5JQqefYQMuYaLqT4+29mBNYcXR9SntAPPeoahwq/wztndZNMbgpmEcsLiaLZLuz6Jdnh/esCMtNw2IcLcUcNx3Yj4gwTg6CYhIcLbDj+KBOUh63Hua8amqoavt7gsZ2/dVW/0hgGE5E7ny5OgYzNgFOt4/H7NBg+w2aqMbdflgPZ2b7Lch5n8sCtCwjw+S1AwTnQVaIOJBqU0iJGNfCIi+JmlAtsYDds0lYwciPkza2gjayu3vH3jIUTODChyI3q5khqzn7loogN3jqNEbIE+F+FFPtKM3cO+7KkS4TX0K9ofbtjf/YCrTm2gZC2w3wtPQCNRR35RVcmw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(366004)(136003)(39860400002)(396003)(7406005)(52536014)(8936002)(5660300002)(7416002)(41300700001)(33656002)(76116006)(64756008)(478600001)(8676002)(66946007)(66476007)(66446008)(55016003)(4326008)(186003)(66556008)(86362001)(38070700005)(26005)(71200400001)(2906002)(7696005)(6506007)(9686003)(122000001)(38100700002)(6916009)(54906003)(316002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qzbav50R4JBChx3ZSz9n8K4iGM05eMCi5Yh7FSTwpyeTHwMIJ/dLxJTp8MoL?=
+ =?us-ascii?Q?xKu4ft7fqFlYnv4JvS4iNb5vyuULFiC7cjjVcR6Z2UFRolKbtqtOJtIKjvNL?=
+ =?us-ascii?Q?gxf7udF+0e3VfZZXFQNqszyiTwLcYG/iW6pP8iyySOd31Gj0BnHUhP61c+Co?=
+ =?us-ascii?Q?2WJipmSotcf74jG0r9niqnB9kI+HLv71iuSKJSn1gafztOjEWwsmsXY8aK/m?=
+ =?us-ascii?Q?HghLxMVqUQmxHhXz0g3jJy1Ubzc8a7WmedzUowP1oF9UfwEMLWHXFlHP/63n?=
+ =?us-ascii?Q?tLRD+4lb9GY1Neh/EYahhxCBMwz4zNRXse1lcL1ArbvZxMpW4oP9Aa8DJCtf?=
+ =?us-ascii?Q?6e1OLJhaWfKHifQyb2s/7pghxb/yMm+JWwpjbgXOYCNAUtq7gjAgopyGGF5M?=
+ =?us-ascii?Q?i87cABItmII7D/4K10nclIvBp5AxcFi0OlUADWuBp3Ud/TQDLVSJTQzwOsA/?=
+ =?us-ascii?Q?HZ8AIGw6mPotmdhMNbOj7CW0NVJn25mzNHuMUbCY+Wo2lAdto6JMZBkpGjE3?=
+ =?us-ascii?Q?N4oYVB6/xHBgRXvj82UBEiEODA8qU6L02EN6HJxI6gqBfAYKl6wPgdbkbwYs?=
+ =?us-ascii?Q?O5QIiNekkU5ehZpKnimp5BMLN40sqGqhYzm85dCrgWWMUTSRvoHuvbHNjgW2?=
+ =?us-ascii?Q?TnKXo8WpGL166a+Qg+vtp5NPuTBY1RXmbfibMgoeyAK5n6yl3j3REhsE2zFv?=
+ =?us-ascii?Q?r2fG4Y9pDfdqZfPnYu1CgGB9NwqzcPCbeQNvyrNYAvghz7ixVOOmWPZF7rfi?=
+ =?us-ascii?Q?PrbT54cbQgxJ92ww9eIoQpS7UZwrvW/W9fvXLlHp3gAtdhUv6OHMAyq3Fnxv?=
+ =?us-ascii?Q?qXr94VEUGtxppkf5paco8MdCniNYfL9hxY7njSJ4YY1UVX66r3BD5lVyrIhy?=
+ =?us-ascii?Q?UPrqrsH0VsfUz+ZH6It6La7/q3M9s0RCgqTiFPs7UXZ05Q3Aihu3Pa8PvGQs?=
+ =?us-ascii?Q?RTHVOP0rF4Q+nbKP8joa5bcT32mwqwCIDXDcNXycOe2M8RbCNnAyDbOctsmT?=
+ =?us-ascii?Q?ewQPQ5vVDOyW2ty049us6RD94/s46DMY/mCP5wAfU7te6X8jdkeM3OcJPhuH?=
+ =?us-ascii?Q?vTv6ieroAyv+VSxGR3T8/iQeYMX9MgRxD662PXZHB6mZ5Q4RiiVATcFiZHUG?=
+ =?us-ascii?Q?6mKbRs4fSQampptlQY1UQ6LmmRUrqksBzsRBIfkpQtFV6UgjNi793d5JBtNq?=
+ =?us-ascii?Q?RCaMsZGXr6NcANkOR44WXmGTd5t0v9fCc4NUFdD4cjlD2LrzPpB8sPLu8ds5?=
+ =?us-ascii?Q?okF1kNRgOQd22rBHSgEPkmyHHIZlHwKCbsCN29G9NL7vvF532UH/BnxuQ84n?=
+ =?us-ascii?Q?1u7pntl+XvbTxpO3uBu0v9BP0qZyrHIWksM2FbVPFn89Xeb0Ur3wSavDSYj8?=
+ =?us-ascii?Q?DptoPKgSAQhDsr4IX8A+eFmzaxf1gojP/6WSQREIFbRAOrOx16ECJj/LF4ND?=
+ =?us-ascii?Q?PpyKPDuP97pMequlmLKTuMQAxHFe7hCQrH0R1zvtsmGaubXmDQ0aHNBERCgP?=
+ =?us-ascii?Q?pmoD8O/AZSQ/OpOa9XqeiqSj9oEPeRItH+muV4lOmpLIXKw+SDLMPTgsfprf?=
+ =?us-ascii?Q?4dxD/Mf45+j/ZVqB0JQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bcfb976-df37-4480-1b90-08da8c591b08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2022 20:32:35.9215
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ngY8nOfNxEO+NDJVvLRn4U/sDR7CCkKXwnUqa62XZOOaU44Gq14TeB20zuCRlHFFc8DoaolATWttdbsnuu9eEA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4259
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+[AMD Official Use Only - General]
 
-On 26.8.2022 8.31, Taehee Yoo wrote:
-> The purpose of this patchset is to support the implementation of ARIA-AVX.
-> Many of the ideas in this implementation are from Camellia-avx,
-> especially byte slicing.
-> Like Camellia, ARIA also uses a 16way strategy.
-> 
-> ARIA cipher algorithm is similar to AES.
-> There are four s-boxes in the ARIA spec and the first and second s-boxes
-> are the same as AES's s-boxes.
-> Almost functions are based on aria-generic code except for s-box related
-> function.
-> The aria-avx doesn't implement the key expanding function.
-> it only support encrypt() and decrypt().
-> 
-> Encryption and Decryption logic is actually the same but it should use
-> separated keys(encryption key and decryption key).
-> En/Decryption steps are like below:
-> 1. Add-Round-Key
-> 2. S-box.
-> 3. Diffusion Layer.
-> 
-> There is no special thing in the Add-Round-Key step.
-> 
-> There are some notable things in s-box step.
-> Like Camellia, it doesn't use a lookup table, instead, it uses aes-ni.
-> 
-> To calculate the first s-box, it just uses the aesenclast and then
-> inverts shift_row. No more process is needed for this job because the
-> first s-box is the same as the AES encryption s-box.
-> 
-> To calculate a second s-box(invert of s1), it just uses the aesdeclast
-> and then inverts shift_row. No more process is needed for this job
-> because the second s-box is the same as the AES decryption s-box.
-> 
-> To calculate a third and fourth s-boxes, it uses the aesenclast,
-> then inverts shift_row, and affine transformation.
-> 
-> The aria-generic implementation is based on a 32-bit implementation,
-> not an 8-bit implementation.
-> The aria-avx Diffusion Layer implementation is based on aria-generic
-> implementation because 8-bit implementation is not fit for parallel
-> implementation but 32-bit is fit for this.
-> 
-> The first patch in this series is to export functions for aria-avx.
-> The aria-avx uses existing functions in the aria-generic code.
-> The second patch is to implement aria-avx.
-> The last patch is to add async test for aria.
-> 
-> Benchmarks:
-> The tcrypt is used.
-> cpu: i3-12100
+Hello Boris,
 
-This CPU also supports Galois Field New Instructions (GFNI) which are
-even better suited for accelerating ciphers that use same building
-blocks as AES. For example, I've recently implemented camellia using
-GFNI for libgcrypt [1].
+>> It is basically an index into the 4K page within the hugepage mapped=20
+>> in the RMP table or in other words an index into the RMP table entry=20
+>> for 4K page(s) corresponding to a hugepage.
 
-I quickly hacked GFNI to your implementation and it gives nice extra
-bit of performance (~55% faster on Intel tiger-lake). Here's GFNI
-version of 'aria_sbox_8way', that I used:
+>So pte_index(address) and for 1G pages, pmd_index(address).
 
-/////////////////////////////////////////////////////////
-#define aria_sbox_8way(x0, x1, x2, x3,                  \
-                        x4, x5, x6, x7,                  \
-                        t0, t1, t2, t3,                  \
-                        t4, t5, t6, t7)                  \
-         vpbroadcastq .Ltf_s2_bitmatrix, t0;             \
-         vpbroadcastq .Ltf_inv_bitmatrix, t1;            \
-         vpbroadcastq .Ltf_id_bitmatrix, t2;             \
-         vpbroadcastq .Ltf_aff_bitmatrix, t3;            \
-         vpbroadcastq .Ltf_x2_bitmatrix, t4;             \
-         vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;   \
-         vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;   \
-         vgf2p8affineqb $(tf_inv_const), t1, x2, x2;     \
-         vgf2p8affineqb $(tf_inv_const), t1, x6, x6;     \
-         vgf2p8affineinvqb $0, t2, x2, x2;               \
-         vgf2p8affineinvqb $0, t2, x6, x6;               \
-         vgf2p8affineinvqb $(tf_aff_const), t3, x0, x0;  \
-         vgf2p8affineinvqb $(tf_aff_const), t3, x4, x4;  \
-         vgf2p8affineqb $(tf_x2_const), t4, x3, x3;      \
-         vgf2p8affineqb $(tf_x2_const), t4, x7, x7;      \
-         vgf2p8affineinvqb $0, t2, x3, x3;               \
-         vgf2p8affineinvqb $0, t2, x7, x7;
+>So no reinventing the wheel if we already have helpers for that.
 
-#define BV8(a0,a1,a2,a3,a4,a5,a6,a7) \
-         ( (((a0) & 1) << 0) | \
-           (((a1) & 1) << 1) | \
-           (((a2) & 1) << 2) | \
-           (((a3) & 1) << 3) | \
-           (((a4) & 1) << 4) | \
-           (((a5) & 1) << 5) | \
-           (((a6) & 1) << 6) | \
-           (((a7) & 1) << 7) )
+>Yes that makes sense and pte_index(address) is exactly what is required fo=
+r 2M hugepages.
 
-#define BM8X8(l0,l1,l2,l3,l4,l5,l6,l7) \
-         ( ((l7) << (0 * 8)) | \
-           ((l6) << (1 * 8)) | \
-           ((l5) << (2 * 8)) | \
-           ((l4) << (3 * 8)) | \
-           ((l3) << (4 * 8)) | \
-           ((l2) << (5 * 8)) | \
-           ((l1) << (6 * 8)) | \
-           ((l0) << (7 * 8)) )
+>Will use pte_index() for 2M pages and pmd_index() for 1G pages.=20
 
-/* AES affine: */
-#define tf_aff_const BV8(1, 1, 0, 0, 0, 1, 1, 0)
-.Ltf_aff_bitmatrix:
-         .quad BM8X8(BV8(1, 0, 0, 0, 1, 1, 1, 1),
-                     BV8(1, 1, 0, 0, 0, 1, 1, 1),
-                     BV8(1, 1, 1, 0, 0, 0, 1, 1),
-                     BV8(1, 1, 1, 1, 0, 0, 0, 1),
-                     BV8(1, 1, 1, 1, 1, 0, 0, 0),
-                     BV8(0, 1, 1, 1, 1, 1, 0, 0),
-                     BV8(0, 0, 1, 1, 1, 1, 1, 0),
-                     BV8(0, 0, 0, 1, 1, 1, 1, 1))
+Had a relook into this.=20
 
-/* AES inverse affine: */
-#define tf_inv_const BV8(1, 0, 1, 0, 0, 0, 0, 0)
-.Ltf_inv_bitmatrix:
-         .quad BM8X8(BV8(0, 0, 1, 0, 0, 1, 0, 1),
-                     BV8(1, 0, 0, 1, 0, 0, 1, 0),
-                     BV8(0, 1, 0, 0, 1, 0, 0, 1),
-                     BV8(1, 0, 1, 0, 0, 1, 0, 0),
-                     BV8(0, 1, 0, 1, 0, 0, 1, 0),
-                     BV8(0, 0, 1, 0, 1, 0, 0, 1),
-                     BV8(1, 0, 0, 1, 0, 1, 0, 0),
-                     BV8(0, 1, 0, 0, 1, 0, 1, 0))
+As I mentioned earlier, this is computing an index into a 4K page within a =
+hugepage mapping,
+therefore, though pte_index() works for 2M pages, but pmd_index() will not =
+work for 1G pages.
 
-/* S2: */
-#define tf_s2_const BV8(0, 1, 0, 0, 0, 1, 1, 1)
-.Ltf_s2_bitmatrix:
-         .quad BM8X8(BV8(0, 1, 0, 1, 0, 1, 1, 1),
-                     BV8(0, 0, 1, 1, 1, 1, 1, 1),
-                     BV8(1, 1, 1, 0, 1, 1, 0, 1),
-                     BV8(1, 1, 0, 0, 0, 0, 1, 1),
-                     BV8(0, 1, 0, 0, 0, 0, 1, 1),
-                     BV8(1, 1, 0, 0, 1, 1, 1, 0),
-                     BV8(0, 1, 1, 0, 0, 0, 1, 1),
-                     BV8(1, 1, 1, 1, 0, 1, 1, 0))
+We basically need to do :
+pfn |=3D (address >> PAGE_SHIFT) & mask;
 
-/* X2: */
-#define tf_x2_const BV8(0, 0, 1, 1, 0, 1, 0, 0)
-.Ltf_x2_bitmatrix:
-         .quad BM8X8(BV8(0, 0, 0, 1, 1, 0, 0, 0),
-                     BV8(0, 0, 1, 0, 0, 1, 1, 0),
-                     BV8(0, 0, 0, 0, 1, 0, 1, 0),
-                     BV8(1, 1, 1, 0, 0, 0, 1, 1),
-                     BV8(1, 1, 1, 0, 1, 1, 0, 0),
-                     BV8(0, 1, 1, 0, 1, 0, 1, 1),
-                     BV8(1, 0, 1, 1, 1, 1, 0, 1),
-                     BV8(1, 0, 0, 1, 0, 0, 1, 1))
+where mask is the (number of 4K pages per hugepage) - 1
 
-/* Identity matrix: */
-.Ltf_id_bitmatrix:
-         .quad BM8X8(BV8(1, 0, 0, 0, 0, 0, 0, 0),
-                     BV8(0, 1, 0, 0, 0, 0, 0, 0),
-                     BV8(0, 0, 1, 0, 0, 0, 0, 0),
-                     BV8(0, 0, 0, 1, 0, 0, 0, 0),
-                     BV8(0, 0, 0, 0, 1, 0, 0, 0),
-                     BV8(0, 0, 0, 0, 0, 1, 0, 0),
-                     BV8(0, 0, 0, 0, 0, 0, 1, 0),
-                     BV8(0, 0, 0, 0, 0, 0, 0, 1))
-/////////////////////////////////////////////////////////
+So this still needs the original code but with a fix for mask computation a=
+s following :=20
 
-GFNI also allows easy use of 256-bit vector registers so
-there is way to get additional 2x speed increase (but
-requires doubling number of parallel processed blocks).
+static inline size_t pages_per_hpage(int level)
+        return page_level_size(level) / PAGE_SIZE;
+ }
+       =20
+static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long e=
+rror_code,
+                                      unsigned long address)
+ {     =20
+       ...=20
+       pfn =3D pte_pfn(*pte);
+       =20
+        /* If its large page then calculte the fault pfn */
+        if (level > PG_LEVEL_4K) {
++               /*
++                * index into the 4K page within the hugepage mapping
++                * in the RMP table
++                */
+                unsigned long mask;
+       =20
+-               mask =3D pages_per_hpage(level) - pages_per_hpage(level - 1=
+);
++              mask =3D pages_per_hpage(level) - 1;
+                pfn |=3D (address >> PAGE_SHIFT) & mask;
 
--Jussi
 
-[1] https://git.gnupg.org/cgi-bin/gitweb.cgi?p=libgcrypt.git;a=blob;f=cipher/camellia-aesni-avx2-amd64.h#l80
+Thanks,
+Ashish
