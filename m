@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BD3C0502C
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 12:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDECC65C0D
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 12:58:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233867AbiIAM6Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Sep 2022 08:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
+        id S234076AbiIAM6u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Sep 2022 08:58:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbiIAM5w (ORCPT
+        with ESMTP id S233767AbiIAM6M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 08:57:52 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DD689CD1
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 05:57:29 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id k9so22289572wri.0
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2022 05:57:29 -0700 (PDT)
+        Thu, 1 Sep 2022 08:58:12 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4F78B2E3
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 05:57:31 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id n17so22244038wrm.4
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2022 05:57:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=8+zNu8By2wCTRIvE0cQTAVxjDoLu9Skp/kq6mTlEw+Q=;
-        b=p8a5KvRCONLhmu6zby6kEv4aKsIiBM7aaxU2uTFFpJQedjHQY+APNBLXnPCdLD8+aV
-         wHPl8hJRdiDlQCDNbZefKDwaqhEkNOYNvoG7tN7xO8kynv8Zwb3y9QwlOjl1UMRAt2iM
-         6i/goxZ6s+Odu6IPyxfPMbpExNd/jPHl2rAnzl2beGZDPtIMPH8eZKCaGyxVc977NNxa
-         Z4nvFwiMdvvtf3IG9AsOBtkSCDilYA/hXrWmTp6lPRW7H+gji9GLzKdWhvBTSofiCs4M
-         Pbp1WTNDvdEuI/irO0e1htfir2wRaHhSLCHfg57m0R6FAnQvO23czPghjNwMFkBS0gWD
-         Clbw==
+        bh=k3IddiKdhwAn8qAKW9Ise9jrX8X5WN4qU+7hTXJ6Zgw=;
+        b=AhkIyTgcnHG10Ree4OY1PVF9qQRPyn0CCBRTQ+Fv09UKgTovgIssbpuHlvQZI0uDug
+         +JMd1g8HTbMzM+uADMM+0rNLU/Co8jGMCNGMmCgBK8mIdeW7387Qm25fa1ncI6ZD4zRO
+         b64+hYSf08A+INf8QuG+qlnSkEFitTzn73kXfwIpZ6Pj0F3b/DxdtVRyJfDpooqCliXw
+         K/8WeKMoGDZrcWlPIbpEtUn+POL5E6WiXANUAqoRYFEy02ZBC5lTW9qd4Td/DBsuWJmw
+         7X9DiWTs2SShedPRW7WAerxarg74PYKHqTPAYuMc/bORt8zA46q7N6OX0zSLimZUlccd
+         5nnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=8+zNu8By2wCTRIvE0cQTAVxjDoLu9Skp/kq6mTlEw+Q=;
-        b=4htzdVumJf0QEB0JNOo4Qx31MOJiHgqoct9VD5/HsQaA2cZQ4RY/APceq/00TCKMnm
-         WNkS/8VfnxjlTSvzIP1zydGwjVI3hXnaDSTU4yH2lyWFzieh6+xNQnirYVaBRab1judb
-         uKBZJM3SHQjZkBA6EpzBJxJepBb9STf4NVMtA95yOLpCgvfGFd1QrIg+yvfYOctLKUEv
-         3RG8gRSNBBaH0hMezZZDabW30DW6c+cdfMZ+B4CysORv2jYpelmF+pbQNwpF8m8nk5Gr
-         lOQXVBzFHFtyMbo0TxbwD5G/ipqGcUVs7MBjg33TYGAgNo4leYIpDmIOurfVbHLRldUH
-         z7Cg==
-X-Gm-Message-State: ACgBeo1H2d+Nc8XOOSadPifUbNm+2c2dqfnL3bc9TITHZHn1odyMkfSP
-        nWCnnYKlvuAgBI/PnqjvaHPtcA==
-X-Google-Smtp-Source: AA6agR6SUD1EDxEW3Vq1Epp8cElLMHgoapxAOByE3s44UA3hCev8yaZFTAmSEucphAao1zvftq5AWw==
-X-Received: by 2002:a5d:6d88:0:b0:222:c8e2:f5fb with SMTP id l8-20020a5d6d88000000b00222c8e2f5fbmr15173567wrs.35.1662037048187;
-        Thu, 01 Sep 2022 05:57:28 -0700 (PDT)
+        bh=k3IddiKdhwAn8qAKW9Ise9jrX8X5WN4qU+7hTXJ6Zgw=;
+        b=qJrRSv7eUPvc+fVEIZenJz+OIoiY3xm8skwCXOKdB9R9xIRefDuDn64o2y4wX1TE6S
+         0dW0X3oaJp28A8EFN6weWL59U3LOcmqFFenFyRkUr6W91EOlmAxSN3ymEREtxHcmG5X5
+         k2xfj0j9PfB+iJdbb8/OTDDGxZ2c92GGAjVbqEbI8kZijrsdO997D/uM8PkucLFEhZ2j
+         V/ergMp2jAmBwARanD5Uk0JRqOLr2GgsI1/GqpGlyoW/HLFJCf1rS+vj1MfIdlZ+mjum
+         6HXHCL7q93qslXthrYF1M7kKjmsW1TlrilQAP78yqwe0FZRzo7Y4wccrl8bs62e6gKYe
+         TNbA==
+X-Gm-Message-State: ACgBeo0+/SqG5lmd74tkqkF72gT4shwE5gPw40cJb6E9+NjcNFmIKyzH
+        krv40Ro0Up9hTLeZK8i+j59ICA==
+X-Google-Smtp-Source: AA6agR4NknvUa/onhuS7k29vNI4Ifn4H9nO4n3yinAyRKy/CXYF8Ph8QCCLByD7d9r8gL10tz5ccVA==
+X-Received: by 2002:adf:aa81:0:b0:225:2f16:177f with SMTP id h1-20020adfaa81000000b002252f16177fmr14902770wrc.433.1662037050267;
+        Thu, 01 Sep 2022 05:57:30 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id v5-20020a5d59c5000000b002257fd37877sm15556709wry.6.2022.09.01.05.57.27
+        by smtp.googlemail.com with ESMTPSA id v5-20020a5d59c5000000b002257fd37877sm15556709wry.6.2022.09.01.05.57.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 05:57:27 -0700 (PDT)
+        Thu, 01 Sep 2022 05:57:29 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, herbert@gondor.apana.org.au, ardb@kernel.org,
         davem@davemloft.net, krzysztof.kozlowski+dt@linaro.org,
@@ -57,9 +57,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
         Corentin Labbe <clabbe@baylibre.com>,
         John Keeping <john@metanate.com>
-Subject: [PATCH v9 11/33] crypto: rockchip: rewrite type
-Date:   Thu,  1 Sep 2022 12:56:48 +0000
-Message-Id: <20220901125710.3733083-12-clabbe@baylibre.com>
+Subject: [PATCH v9 13/33] crypto: rockchip: introduce PM
+Date:   Thu,  1 Sep 2022 12:56:50 +0000
+Message-Id: <20220901125710.3733083-14-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220901125710.3733083-1-clabbe@baylibre.com>
 References: <20220901125710.3733083-1-clabbe@baylibre.com>
@@ -69,183 +69,190 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of using a custom type for classify algorithms, let's just use
-already defined ones.
-And let's made a bit more verbose about what is registered.
+Add runtime PM support for rockchip crypto.
 
 Reviewed-by: John Keeping <john@metanate.com>
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c       | 26 +++++++++++++------
- drivers/crypto/rockchip/rk3288_crypto.h       |  7 +----
- drivers/crypto/rockchip/rk3288_crypto_ahash.c |  6 ++---
- .../crypto/rockchip/rk3288_crypto_skcipher.c  | 12 ++++-----
- 4 files changed, 28 insertions(+), 23 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c       | 51 ++++++++++++++++++-
+ drivers/crypto/rockchip/rk3288_crypto.h       |  1 +
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 10 ++++
+ .../crypto/rockchip/rk3288_crypto_skcipher.c  |  9 ++++
+ 4 files changed, 69 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 1afb65eee6c9..8f9664acc78d 100644
+index 3e1b4f3b2422..d9258b9e71b3 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -102,12 +102,22 @@ static int rk_crypto_register(struct rk_crypto_info *crypto_info)
+@@ -65,6 +65,48 @@ static void rk_crypto_disable_clk(struct rk_crypto_info *dev)
+ 	clk_disable_unprepare(dev->sclk);
+ }
  
- 	for (i = 0; i < ARRAY_SIZE(rk_cipher_algs); i++) {
- 		rk_cipher_algs[i]->dev = crypto_info;
--		if (rk_cipher_algs[i]->type == ALG_TYPE_CIPHER)
--			err = crypto_register_skcipher(
--					&rk_cipher_algs[i]->alg.skcipher);
--		else
--			err = crypto_register_ahash(
--					&rk_cipher_algs[i]->alg.hash);
-+		switch (rk_cipher_algs[i]->type) {
-+		case CRYPTO_ALG_TYPE_SKCIPHER:
-+			dev_info(crypto_info->dev, "Register %s as %s\n",
-+				 rk_cipher_algs[i]->alg.skcipher.base.cra_name,
-+				 rk_cipher_algs[i]->alg.skcipher.base.cra_driver_name);
-+			err = crypto_register_skcipher(&rk_cipher_algs[i]->alg.skcipher);
-+			break;
-+		case CRYPTO_ALG_TYPE_AHASH:
-+			dev_info(crypto_info->dev, "Register %s as %s\n",
-+				 rk_cipher_algs[i]->alg.hash.halg.base.cra_name,
-+				 rk_cipher_algs[i]->alg.hash.halg.base.cra_driver_name);
-+			err = crypto_register_ahash(&rk_cipher_algs[i]->alg.hash);
-+			break;
-+		default:
-+			dev_err(crypto_info->dev, "unknown algorithm\n");
-+		}
- 		if (err)
- 			goto err_cipher_algs;
- 	}
-@@ -115,7 +125,7 @@ static int rk_crypto_register(struct rk_crypto_info *crypto_info)
++/*
++ * Power management strategy: The device is suspended unless a TFM exists for
++ * one of the algorithms proposed by this driver.
++ */
++static int rk_crypto_pm_suspend(struct device *dev)
++{
++	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
++
++	rk_crypto_disable_clk(rkdev);
++	return 0;
++}
++
++static int rk_crypto_pm_resume(struct device *dev)
++{
++	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
++
++	return rk_crypto_enable_clk(rkdev);
++}
++
++static const struct dev_pm_ops rk_crypto_pm_ops = {
++	SET_RUNTIME_PM_OPS(rk_crypto_pm_suspend, rk_crypto_pm_resume, NULL)
++};
++
++static int rk_crypto_pm_init(struct rk_crypto_info *rkdev)
++{
++	int err;
++
++	pm_runtime_use_autosuspend(rkdev->dev);
++	pm_runtime_set_autosuspend_delay(rkdev->dev, 2000);
++
++	err = pm_runtime_set_suspended(rkdev->dev);
++	if (err)
++		return err;
++	pm_runtime_enable(rkdev->dev);
++	return err;
++}
++
++static void rk_crypto_pm_exit(struct rk_crypto_info *rkdev)
++{
++	pm_runtime_disable(rkdev->dev);
++}
++
+ static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
+ {
+ 	struct rk_crypto_info *dev  = platform_get_drvdata(dev_id);
+@@ -273,7 +315,9 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	crypto_engine_start(crypto_info->engine);
+ 	init_completion(&crypto_info->complete);
  
- err_cipher_algs:
- 	for (k = 0; k < i; k++) {
--		if (rk_cipher_algs[i]->type == ALG_TYPE_CIPHER)
-+		if (rk_cipher_algs[i]->type == CRYPTO_ALG_TYPE_SKCIPHER)
- 			crypto_unregister_skcipher(&rk_cipher_algs[k]->alg.skcipher);
- 		else
- 			crypto_unregister_ahash(&rk_cipher_algs[i]->alg.hash);
-@@ -128,7 +138,7 @@ static void rk_crypto_unregister(void)
- 	unsigned int i;
+-	rk_crypto_enable_clk(crypto_info);
++	err = rk_crypto_pm_init(crypto_info);
++	if (err)
++		goto err_pm;
  
- 	for (i = 0; i < ARRAY_SIZE(rk_cipher_algs); i++) {
--		if (rk_cipher_algs[i]->type == ALG_TYPE_CIPHER)
-+		if (rk_cipher_algs[i]->type == CRYPTO_ALG_TYPE_SKCIPHER)
- 			crypto_unregister_skcipher(&rk_cipher_algs[i]->alg.skcipher);
- 		else
- 			crypto_unregister_ahash(&rk_cipher_algs[i]->alg.hash);
+ 	err = rk_crypto_register(crypto_info);
+ 	if (err) {
+@@ -294,6 +338,8 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_register_alg:
++	rk_crypto_pm_exit(crypto_info);
++err_pm:
+ 	crypto_engine_exit(crypto_info->engine);
+ err_crypto:
+ 	dev_err(dev, "Crypto Accelerator not successfully registered\n");
+@@ -308,7 +354,7 @@ static int rk_crypto_remove(struct platform_device *pdev)
+ 	debugfs_remove_recursive(crypto_tmp->dbgfs_dir);
+ #endif
+ 	rk_crypto_unregister();
+-	rk_crypto_disable_clk(crypto_tmp);
++	rk_crypto_pm_exit(crypto_tmp);
+ 	crypto_engine_exit(crypto_tmp->engine);
+ 	return 0;
+ }
+@@ -318,6 +364,7 @@ static struct platform_driver crypto_driver = {
+ 	.remove		= rk_crypto_remove,
+ 	.driver		= {
+ 		.name	= "rk3288-crypto",
++		.pm		= &rk_crypto_pm_ops,
+ 		.of_match_table	= crypto_of_id_table,
+ 	},
+ };
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index 65ed645e0168..d924ea17402a 100644
+index 945a8184bbad..ddbb9246ce16 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.h
 +++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -232,18 +232,13 @@ struct rk_cipher_rctx {
- 	struct skcipher_request fallback_req;   // keep at the end
- };
- 
--enum alg_type {
--	ALG_TYPE_HASH,
--	ALG_TYPE_CIPHER,
--};
--
- struct rk_crypto_tmp {
-+	u32 type;
- 	struct rk_crypto_info		*dev;
- 	union {
- 		struct skcipher_alg	skcipher;
- 		struct ahash_alg	hash;
- 	} alg;
--	enum alg_type			type;
- };
- 
- extern struct rk_crypto_tmp rk_ecb_aes_alg;
+@@ -9,6 +9,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/debugfs.h>
+ #include <linux/delay.h>
++#include <linux/pm_runtime.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/engine.h>
+ #include <crypto/internal/hash.h>
 diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index edd40e16a3f0..d08e2438d356 100644
+index 8856c6226be6..137013bd4410 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -352,7 +352,7 @@ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+@@ -328,6 +328,7 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
+ 	struct ahash_alg *alg = __crypto_ahash_alg(tfm->__crt_alg);
+ 
+ 	const char *alg_name = crypto_tfm_alg_name(tfm);
++	int err;
+ 
+ 	algt = container_of(alg, struct rk_crypto_tmp, alg.hash);
+ 
+@@ -349,7 +350,15 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
+ 	tctx->enginectx.op.prepare_request = rk_hash_prepare;
+ 	tctx->enginectx.op.unprepare_request = rk_hash_unprepare;
+ 
++	err = pm_runtime_resume_and_get(tctx->dev->dev);
++	if (err < 0)
++		goto error_pm;
++
+ 	return 0;
++error_pm:
++	crypto_free_ahash(tctx->fallback_tfm);
++
++	return err;
+ }
+ 
+ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+@@ -357,6 +366,7 @@ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+ 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(tfm);
+ 
+ 	crypto_free_ahash(tctx->fallback_tfm);
++	pm_runtime_put_autosuspend(tctx->dev->dev);
  }
  
  struct rk_crypto_tmp rk_ahash_sha1 = {
--	.type = ALG_TYPE_HASH,
-+	.type = CRYPTO_ALG_TYPE_AHASH,
- 	.alg.hash = {
- 		.init = rk_ahash_init,
- 		.update = rk_ahash_update,
-@@ -382,7 +382,7 @@ struct rk_crypto_tmp rk_ahash_sha1 = {
- };
- 
- struct rk_crypto_tmp rk_ahash_sha256 = {
--	.type = ALG_TYPE_HASH,
-+	.type = CRYPTO_ALG_TYPE_AHASH,
- 	.alg.hash = {
- 		.init = rk_ahash_init,
- 		.update = rk_ahash_update,
-@@ -412,7 +412,7 @@ struct rk_crypto_tmp rk_ahash_sha256 = {
- };
- 
- struct rk_crypto_tmp rk_ahash_md5 = {
--	.type = ALG_TYPE_HASH,
-+	.type = CRYPTO_ALG_TYPE_AHASH,
- 	.alg.hash = {
- 		.init = rk_ahash_init,
- 		.update = rk_ahash_update,
 diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-index 67a7e05d5ae3..1ed297f5d809 100644
+index 91b8a4c574da..3bdb304aa794 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-@@ -468,7 +468,7 @@ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+@@ -454,6 +454,7 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	const char *name = crypto_tfm_alg_name(&tfm->base);
+ 	struct rk_crypto_tmp *algt;
++	int err;
+ 
+ 	algt = container_of(alg, struct rk_crypto_tmp, alg.skcipher);
+ 
+@@ -471,7 +472,14 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
+ 
+ 	ctx->enginectx.op.do_one_request = rk_cipher_run;
+ 
++	err = pm_runtime_resume_and_get(ctx->dev->dev);
++	if (err < 0)
++		goto error_pm;
++
+ 	return 0;
++error_pm:
++	crypto_free_skcipher(ctx->fallback_tfm);
++	return err;
+ }
+ 
+ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+@@ -480,6 +488,7 @@ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+ 
+ 	memzero_explicit(ctx->key, ctx->keylen);
+ 	crypto_free_skcipher(ctx->fallback_tfm);
++	pm_runtime_put_autosuspend(ctx->dev->dev);
  }
  
  struct rk_crypto_tmp rk_ecb_aes_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "ecb(aes)",
- 		.base.cra_driver_name	= "ecb-aes-rk",
-@@ -490,7 +490,7 @@ struct rk_crypto_tmp rk_ecb_aes_alg = {
- };
- 
- struct rk_crypto_tmp rk_cbc_aes_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "cbc(aes)",
- 		.base.cra_driver_name	= "cbc-aes-rk",
-@@ -513,7 +513,7 @@ struct rk_crypto_tmp rk_cbc_aes_alg = {
- };
- 
- struct rk_crypto_tmp rk_ecb_des_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "ecb(des)",
- 		.base.cra_driver_name	= "ecb-des-rk",
-@@ -535,7 +535,7 @@ struct rk_crypto_tmp rk_ecb_des_alg = {
- };
- 
- struct rk_crypto_tmp rk_cbc_des_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "cbc(des)",
- 		.base.cra_driver_name	= "cbc-des-rk",
-@@ -558,7 +558,7 @@ struct rk_crypto_tmp rk_cbc_des_alg = {
- };
- 
- struct rk_crypto_tmp rk_ecb_des3_ede_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "ecb(des3_ede)",
- 		.base.cra_driver_name	= "ecb-des3-ede-rk",
-@@ -580,7 +580,7 @@ struct rk_crypto_tmp rk_ecb_des3_ede_alg = {
- };
- 
- struct rk_crypto_tmp rk_cbc_des3_ede_alg = {
--	.type = ALG_TYPE_CIPHER,
-+	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.alg.skcipher = {
- 		.base.cra_name		= "cbc(des3_ede)",
- 		.base.cra_driver_name	= "cbc-des3-ede-rk",
 -- 
 2.35.1
 
