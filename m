@@ -2,265 +2,166 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D427DECAAD1
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 11:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC43CC54EE9
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Sep 2022 12:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234344AbiIALAp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Sep 2022 07:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
+        id S232813AbiIAM5X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Sep 2022 08:57:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbiIALAn (ORCPT
+        with ESMTP id S233309AbiIAM5U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 07:00:43 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9CD10F08F;
-        Thu,  1 Sep 2022 04:00:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MHAxYyxUgR/abIYCe2+tqPs37wMBg4sI4S4Xv4QcQS8=; b=B5OVANHSncb4o/i9LeD4iOlbBp
-        Lkm41yBotm9Rgq6eyqGORQkRoQKkM5uLMy/qVzC80T3GmvzA9RqJ1EH7YBsMkoMJWK7vet+rcu8Hj
-        1bkyB5Aih7cUb79kiDyEpXRh9NMgfuz8QoBrJ+hi9NPGTEKh7Zq+yh2NgfpxZMbPaAxW6AXD0Ed32
-        GLuyLeIfsFoAl2lnubUJLV/fEndhgDkjMHqGJO6jYNh4Ty2pMuP4BNLLPm6RQWyKKi8Irg/Jx6218
-        gq4rBpPES4CreTfsfWKhcYMFi8sUx5Y0bT6LTjMvPKI7sH8DpiIcJii0LuePKe9hQbEqjp8gP+liX
-        qpd9WFmw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oThvz-005yDA-Hg; Thu, 01 Sep 2022 11:00:31 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6DB0D3002C7;
-        Thu,  1 Sep 2022 13:00:29 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 522202B87B626; Thu,  1 Sep 2022 13:00:29 +0200 (CEST)
-Date:   Thu, 1 Sep 2022 13:00:29 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Adam Langley <agl@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: Should Linux set the new constant-time mode CPU flags?
-Message-ID: <YxCQzZqLZ49gLlrH@hirez.programming.kicks-ass.net>
-References: <YwgCrqutxmX0W72r@gmail.com>
- <Ywzr2d52ixYXUDWR@zx2c4.com>
- <6ec9cdab-db5b-ab28-c92d-79c3812dd369@intel.com>
+        Thu, 1 Sep 2022 08:57:20 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638E0767D
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Sep 2022 05:57:18 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id h204-20020a1c21d5000000b003a5b467c3abso1308763wmh.5
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Sep 2022 05:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=7ZlMqpIh3IyUq1dD/WzYgapnFJuX5D8gbR5mj33rR84=;
+        b=L9kP09nqRH+Z+bWAt0KuRPx2ICiZGYDf0QG4pqMW9mJHKChmL6+bIqrMDYTGkui8FF
+         b4n+l/zK7COuOfIqfV/9DHa/vWYUauG4RmYB/OlGdIJeFQfpkammZDjynZxYZ6SC/anh
+         +eDr7oKp9T4ayau0RAbt6/arHAXVBvaYwb6SKaoArrAq0C5Dx2W1YSLWWXyvaaon3ubA
+         BmnMXTKkuXJ1NxAo35VsPdSl1EGQ3P+sAc/Xt2uA1aYWKkGiDlupiFLCqrIjYeswWyrh
+         LBJz9cTpcU1FrM8UUzEDqqE/o6DsKMKsQ+LetpL0LNkhLmXMaPpTFN+i7omadyWAQjtt
+         aG+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=7ZlMqpIh3IyUq1dD/WzYgapnFJuX5D8gbR5mj33rR84=;
+        b=IC8/K48xHxafC8yrp+rQWfo0OInEgQgJ+jW79NJV9mL56qUtJ5bqmA/0qTcjRwmej1
+         gb0dEucTDfgQzy3UnDxWTkTPmjC5rJmmIYcmpn8ynw4LYLZWNNt01KMypVlQu59diHkw
+         1HRLUbDv3vlcouBIrPa2SQP2dIK/AnvF31zuy9ekou2bq+RrwM3psgN7ERfhXeK1WhbX
+         ZTPdl2nmDuiTuSiVzJWCxVHbBOiOvnMauq4zZeyOn23nKiRzet8WBhqAtoMI3TBr16iq
+         33A13LOctcbKKUY3MUmWREbaFtUw/Msy8iztnELaMLfoPz2BPxfzO7/aPcLcjOKrXTRg
+         tpvw==
+X-Gm-Message-State: ACgBeo1+v6EZ4n+eHdsUC+rB8Y9mTsJjh9GVdX7/g+nlsJvIDhXpVed9
+        W0x4Ki1bMebri2lwd3h47W42MkkhnZk5vw==
+X-Google-Smtp-Source: AA6agR4WxFW8MYMrAHnjtjYeK13E0krxBtcRYabXQEB9F9fEoJ3KLT3ciBgiYJKbXPpTmciIet5qbg==
+X-Received: by 2002:a05:600c:3541:b0:3a6:28e4:c458 with SMTP id i1-20020a05600c354100b003a628e4c458mr5162262wmq.188.1662037036916;
+        Thu, 01 Sep 2022 05:57:16 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id v5-20020a5d59c5000000b002257fd37877sm15556709wry.6.2022.09.01.05.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 05:57:16 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     heiko@sntech.de, herbert@gondor.apana.org.au, ardb@kernel.org,
+        davem@davemloft.net, krzysztof.kozlowski+dt@linaro.org,
+        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v9 00/33] crypto: rockchip: permit to pass self-tests
+Date:   Thu,  1 Sep 2022 12:56:37 +0000
+Message-Id: <20220901125710.3733083-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ec9cdab-db5b-ab28-c92d-79c3812dd369@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 07:25:29AM -0700, Dave Hansen wrote:
-> On 8/29/22 09:39, Jason A. Donenfeld wrote:
-> > On Thu, Aug 25, 2022 at 11:15:58PM +0000, Eric Biggers wrote:
-> >> I'm wondering if people are aware of this issue, and whether anyone has any
-> >> thoughts on whether/where the kernel should be setting these new CPU flags.
-> >> There don't appear to have been any prior discussions about this.  (Thanks to
-> > Maybe it should be set unconditionally now, until we figure out how to
-> > make it more granular.
-> 
-> Personally, I'm in this camp as well.  Let's be safe and set it by
-> default.  There's also this tidbit in the Intel docs (and chopping out a
-> bunch of the noise):
-> 
-> 	(On) processors based on microarchitectures before Ice Lake ...
-> 	the instructions listed here operate as if DOITM is enabled.
-> 
-> IOW, setting DOITM=0 isn't going back to the stone age.  At worst, I'd
-> guess that you're giving up some optimization that only shows up in very
-> recent CPUs in the first place.
-> 
-> If folks want DOITM=1 on their snazzy new CPUs, then they came come with
-> performance data to demonstrate the gain they'll get from adding kernel
-> code to get DOITM=1.  There are a range of ways we could handle it, all
-> the way from adding a command-line parameter to per-task management.
-> 
-> Anybody disagree?
+Hello
 
-Since I'm not feeling too well I figured I'd do something trivial and
-whipped up the below patch.
+The rockchip crypto driver is broken and do not pass self-tests.
+This serie's goal is to permit to become usable and pass self-tests.
 
+This whole serie is tested on a rk3328-rock64, rk3288-miqi and
+rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
 
----
- arch/x86/include/asm/cpufeatures.h |  3 ++
- arch/x86/include/asm/msr-index.h   |  4 +++
- arch/x86/kernel/cpu/common.c       | 69 ++++++++++++++++++++++++++++++--------
- arch/x86/kernel/cpu/scattered.c    |  1 +
- 4 files changed, 63 insertions(+), 14 deletions(-)
+Regards
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 333d94394516..9b92f4e5e80a 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -305,6 +305,7 @@
- #define X86_FEATURE_USE_IBPB_FW		(11*32+16) /* "" Use IBPB during runtime firmware calls */
- #define X86_FEATURE_RSB_VMEXIT_LITE	(11*32+17) /* "" Fill RSB on VM exit when EIBRS is enabled */
- #define X86_FEATURE_CALL_DEPTH		(11*32+18) /* "" Call depth tracking for RSB stuffing */
-+#define X86_FEATURE_MCDT_NO		(11*32+19) /* Not affected by MCDT */
- 
- /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
- #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
-@@ -460,5 +461,7 @@
- #define X86_BUG_MMIO_STALE_DATA		X86_BUG(25) /* CPU is affected by Processor MMIO Stale Data vulnerabilities */
- #define X86_BUG_RETBLEED		X86_BUG(26) /* CPU is affected by RETBleed */
- #define X86_BUG_EIBRS_PBRSB		X86_BUG(27) /* EIBRS is vulnerable to Post Barrier RSB Predictions */
-+#define X86_BUG_DOIT			X86_BUG(28)
-+#define X86_BUG_MCDT			X86_BUG(29)
- 
- #endif /* _ASM_X86_CPUFEATURES_H */
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 6674bdb096f3..08b4e0c2f7d3 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -119,6 +119,7 @@
- 						 * Not susceptible to
- 						 * TSX Async Abort (TAA) vulnerabilities.
- 						 */
-+#define ARCH_CAP_DOIT			BIT(12) /* Data Operand Independent Timing */
- #define ARCH_CAP_SBDR_SSDP_NO		BIT(13)	/*
- 						 * Not susceptible to SBDR and SSDP
- 						 * variants of Processor MMIO stale data
-@@ -155,6 +156,9 @@
- 						 * Return Stack Buffer Predictions.
- 						 */
- 
-+#define MSR_IA32_UARCH_MISC_CTL		0x00001b01
-+#define UARCH_MISC_DOIT			BIT(0)	/* Enable DOIT */
-+
- #define MSR_IA32_FLUSH_CMD		0x0000010b
- #define L1D_FLUSH			BIT(0)	/*
- 						 * Writeback and invalidate the
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 28eba74b93de..e9d5bc870696 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -568,6 +568,30 @@ static __init int setup_disable_pku(char *arg)
- __setup("nopku", setup_disable_pku);
- #endif /* CONFIG_X86_64 */
- 
-+static bool doit_disabled = false;
-+
-+static __init int setup_disable_doit(char *arg)
-+{
-+	pr_info("x86: 'nodoit' specified, not enabling Data Operand Independent Timing\n");
-+	doit_disabled = true;
-+	return 1;
-+}
-+__setup("nodoit", setup_disable_doit);
-+
-+static __always_inline void setup_doit(struct cpuinfo_x86 *c)
-+{
-+	u64 msr = 0;
-+
-+	if (!cpu_has(c, X86_BUG_DOIT))
-+		return;
-+
-+	if (!doit_disabled)
-+		return;
-+
-+	rdmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
-+	wrmsrl(MSR_IA32_UARCH_MISC_CTL, msr | UARCH_MISC_DOIT);
-+}
-+
- #ifdef CONFIG_X86_KERNEL_IBT
- 
- __noendbr u64 ibt_save(void)
-@@ -1249,6 +1273,8 @@ static const __initconst struct x86_cpu_id cpu_vuln_whitelist[] = {
- #define MMIO_SBDS	BIT(2)
- /* CPU is affected by RETbleed, speculating where you would not expect it */
- #define RETBLEED	BIT(3)
-+/* CPU might be affected by MXCSR Configuration Dependent Timing (MCDT) */
-+#define MCDT		BIT(4)
- 
- static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
- 	VULNBL_INTEL_STEPPINGS(IVYBRIDGE,	X86_STEPPING_ANY,		SRBDS),
-@@ -1260,20 +1286,26 @@ static const struct x86_cpu_id cpu_vuln_blacklist[] __initconst = {
- 	VULNBL_INTEL_STEPPINGS(BROADWELL_G,	X86_STEPPING_ANY,		SRBDS),
- 	VULNBL_INTEL_STEPPINGS(BROADWELL_X,	X86_STEPPING_ANY,		MMIO),
- 	VULNBL_INTEL_STEPPINGS(BROADWELL,	X86_STEPPING_ANY,		SRBDS),
--	VULNBL_INTEL_STEPPINGS(SKYLAKE_L,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(SKYLAKE_X,	X86_STEPPING_ANY,		MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(SKYLAKE,		X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(KABYLAKE_L,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(KABYLAKE,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(CANNONLAKE_L,	X86_STEPPING_ANY,		RETBLEED),
--	VULNBL_INTEL_STEPPINGS(ICELAKE_L,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(ICELAKE_D,	X86_STEPPING_ANY,		MMIO),
--	VULNBL_INTEL_STEPPINGS(ICELAKE_X,	X86_STEPPING_ANY,		MMIO),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x0, 0x0),	MMIO | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(LAKEFIELD,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED),
--	VULNBL_INTEL_STEPPINGS(ROCKETLAKE,	X86_STEPPING_ANY,		MMIO | RETBLEED),
-+	VULNBL_INTEL_STEPPINGS(SKYLAKE_L,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(SKYLAKE_X,	X86_STEPPING_ANY,		MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(SKYLAKE,		X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(KABYLAKE_L,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(KABYLAKE,	X86_STEPPING_ANY,		SRBDS | MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(CANNONLAKE_L,	X86_STEPPING_ANY,		RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(ICELAKE_L,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(ICELAKE_D,	X86_STEPPING_ANY,		MMIO | MCDT),
-+	VULNBL_INTEL_STEPPINGS(ICELAKE_X,	X86_STEPPING_ANY,		MMIO | MCDT),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPINGS(0x0, 0x0),	MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(COMETLAKE_L,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(LAKEFIELD,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(ROCKETLAKE,	X86_STEPPING_ANY,		MMIO | RETBLEED | MCDT),
-+	VULNBL_INTEL_STEPPINGS(TIGERLAKE,	X86_STEPPING_ANY,		MCDT),
-+	VULNBL_INTEL_STEPPINGS(TIGERLAKE_L,	X86_STEPPING_ANY,		MCDT),
-+	VULNBL_INTEL_STEPPINGS(ALDERLAKE,	X86_STEPPING_ANY,		MCDT),
-+	VULNBL_INTEL_STEPPINGS(ALDERLAKE_L,	X86_STEPPING_ANY,		MCDT),
-+	VULNBL_INTEL_STEPPINGS(ALDERLAKE_N,	X86_STEPPING_ANY,		MCDT),
-+
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS),
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT_D,	X86_STEPPING_ANY,		MMIO),
- 	VULNBL_INTEL_STEPPINGS(ATOM_TREMONT_L,	X86_STEPPING_ANY,		MMIO | MMIO_SBDS),
-@@ -1318,6 +1350,9 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
- 	    !(ia32_cap & ARCH_CAP_PSCHANGE_MC_NO))
- 		setup_force_cpu_bug(X86_BUG_ITLB_MULTIHIT);
- 
-+	if (ia32_cap & ARCH_CAP_DOIT)
-+		setup_force_cpu_bug(X86_BUG_DOIT);
-+
- 	if (cpu_matches(cpu_vuln_whitelist, NO_SPECULATION))
- 		return;
- 
-@@ -1388,6 +1423,11 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
- 			setup_force_cpu_bug(X86_BUG_RETBLEED);
- 	}
- 
-+	if (!cpu_has(c, X86_FEATURE_MCDT_NO)) {
-+		if (cpu_matches(cpu_vuln_blacklist, MCDT))
-+			setup_force_cpu_bug(X86_BUG_MCDT);
-+	}
-+
- 	if (cpu_has(c, X86_FEATURE_IBRS_ENHANCED) &&
- 	    !cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
- 	    !(ia32_cap & ARCH_CAP_PBRSB_NO))
-@@ -1869,6 +1909,7 @@ static void identify_cpu(struct cpuinfo_x86 *c)
- 	x86_init_rdrand(c);
- 	setup_pku(c);
- 	setup_cet(c);
-+	setup_doit(c);
- 
- 	/*
- 	 * Clear/Set all flags overridden by options, need do it
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index fd44b54c90d5..5063f8046554 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -27,6 +27,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_APERFMPERF,       CPUID_ECX,  0, 0x00000006, 0 },
- 	{ X86_FEATURE_EPB,		CPUID_ECX,  3, 0x00000006, 0 },
- 	{ X86_FEATURE_INTEL_PPIN,	CPUID_EBX,  0, 0x00000007, 1 },
-+	{ X86_FEATURE_MCDT_NO,		CPUID_ECX,  5, 0x00000007, 2 },
- 	{ X86_FEATURE_RRSBA_CTRL,	CPUID_EDX,  2, 0x00000007, 2 },
- 	{ X86_FEATURE_CQM_LLC,		CPUID_EDX,  1, 0x0000000f, 0 },
- 	{ X86_FEATURE_CQM_OCCUP_LLC,	CPUID_EDX,  0, 0x0000000f, 1 },
+Changes since v1:
+- select CRYPTO_ENGINE
+- forgot to free fallbacks TFMs
+- fixed kernel test robots warning
+- add the PM patch
+
+Changes since v2:
+- Added DMA clock back to 3288 since it dont work without it
+- fallback needed to select CBC and ECB configs
+- Added support for rk3399
+- Added more patch (style, read_poll_timeout)
+
+Changes since v3:
+- full rewrite of support for RK3399
+- splited dt-binding patch in two
+
+Changes since v4:
+- Another full rewrite of support for RK3399
+- Fixed dt-binding from Krzysztof Kozlowski's comments
+- Use readl_poll_timeout() instead of read_poll_timeout()
+- Rewrite the fallback SG tests
+
+Changes since v5:
+- fixed errors in DT binding patch
+
+Change since v6:
+- remove quotes around const values in dt-bindings
+
+Changes since v7:
+- added lot of reviewed/tested by
+- In patch 14: keep initial reset pulse.
+
+Changes since v8:
+- Removed some useless min/maxitems from dt-binding as reported by dt_binding_check
+
+Corentin Labbe (33):
+  crypto: rockchip: use dev_err for error message about interrupt
+  crypto: rockchip: do not use uninitialized variable
+  crypto: rockchip: do not do custom power management
+  crypto: rockchip: fix privete/private typo
+  crypto: rockchip: do not store mode globally
+  crypto: rockchip: add fallback for cipher
+  crypto: rockchip: add fallback for ahash
+  crypto: rockchip: better handle cipher key
+  crypto: rockchip: remove non-aligned handling
+  crypto: rockchip: rework by using crypto_engine
+  crypto: rockchip: rewrite type
+  crypto: rockchip: add debugfs
+  crypto: rockchip: introduce PM
+  crypto: rockchip: handle reset also in PM
+  crypto: rockchip: use clk_bulk to simplify clock management
+  crypto: rockchip: add myself as maintainer
+  crypto: rockchip: use read_poll_timeout
+  crypto: rockchip: fix style issue
+  crypto: rockchip: add support for rk3328
+  crypto: rockchip: rename ablk functions to cipher
+  crypto: rockchip: rework rk_handle_req function
+  crypto: rockchip: use a rk_crypto_info variable instead of lot of
+    indirection
+  crypto: rockchip: use the rk_crypto_info given as parameter
+  dt-bindings: crypto: convert rockchip-crypto to YAML
+  dt-bindings: crypto: rockchip: convert to new driver bindings
+  clk: rk3399: use proper crypto0 name
+  arm64: dts: rockchip: add rk3328 crypto node
+  arm64: dts: rockchip: rk3399: add crypto node
+  crypto: rockchip: store crypto_info in request context
+  crypto: rockchip: Check for clocks numbers and their frequencies
+  crypto: rockchip: rk_ahash_reg_init use crypto_info from parameter
+  crypto: rockchip: permit to have more than one reset
+  crypto: rockchip: Add support for RK3399
+
+ .../crypto/rockchip,rk3288-crypto.yaml        | 127 ++++
+ .../bindings/crypto/rockchip-crypto.txt       |  28 -
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/rockchip/rk3328.dtsi      |  11 +
+ arch/arm64/boot/dts/rockchip/rk3399.dtsi      |  20 +
+ drivers/crypto/Kconfig                        |  15 +
+ drivers/crypto/rockchip/rk3288_crypto.c       | 506 ++++++++--------
+ drivers/crypto/rockchip/rk3288_crypto.h       | 107 ++--
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 267 +++++----
+ .../crypto/rockchip/rk3288_crypto_skcipher.c  | 543 ++++++++++--------
+ include/dt-bindings/clock/rk3399-cru.h        |   6 +-
+ 11 files changed, 949 insertions(+), 688 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+ delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+
+-- 
+2.35.1
+
