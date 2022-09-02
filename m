@@ -2,90 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7942ECAAD5
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC69ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:25:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235758AbiIBKXW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Sep 2022 06:23:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60402 "EHLO
+        id S233640AbiIBKZy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:25:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbiIBKXW (ORCPT
+        with ESMTP id S235795AbiIBKZw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2022 06:23:22 -0400
+        Fri, 2 Sep 2022 06:25:52 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA78BA5725;
-        Fri,  2 Sep 2022 03:23:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A785926E;
+        Fri,  2 Sep 2022 03:25:50 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oU3pT-000KkZ-Ek; Fri, 02 Sep 2022 20:23:16 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:23:15 +0800
-Date:   Fri, 2 Sep 2022 18:23:15 +0800
+        id 1oU3rt-000Kmt-Km; Fri, 02 Sep 2022 20:25:46 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:25:45 +0800
+Date:   Fri, 2 Sep 2022 18:25:45 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     cuigaosheng <cuigaosheng1@huawei.com>
 Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next 2/2] crypto: crc32c - add missing Kconfig option
- select
-Message-ID: <YxHZk7ADgv0Tzl6W@gondor.apana.org.au>
+Subject: Re: [PATCH -next 1/2] crypto: api - Fix IS_ERR() vs NULL check
+Message-ID: <YxHaKSOedCC9DLX1@gondor.apana.org.au>
 References: <20220825084138.1881954-1-cuigaosheng1@huawei.com>
- <20220825084138.1881954-3-cuigaosheng1@huawei.com>
- <Ywc36LxM2+0eqKu2@gondor.apana.org.au>
- <35ec0aed-ee54-b6ea-1d34-06839b20befb@huawei.com>
+ <20220825084138.1881954-2-cuigaosheng1@huawei.com>
+ <Ywc3u9ObRCpxQsK0@gondor.apana.org.au>
+ <0ae57826-6a8c-b08b-2889-f91d50bf6e59@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <35ec0aed-ee54-b6ea-1d34-06839b20befb@huawei.com>
+In-Reply-To: <0ae57826-6a8c-b08b-2889-f91d50bf6e59@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 08:55:12PM +0800, cuigaosheng wrote:
-> Thanks for your reply.
+On Thu, Aug 25, 2022 at 09:10:49PM +0800, cuigaosheng wrote:
+> Thanks for taking the time to review this patch.
 > 
-> While I was debugging the kernel code of linux-next, I start the kernel
-> with qemu-system-arm with following commands:
-> 
->     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- vexpress_defconfig
->     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j32
->     qemu-system-arm -M vexpress-a9 -m 1024M -s -nographic -kernel arch/arm/boot/zImage \
->                    -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -sd /home/rootfs.sd \
->                    -append "root=/dev/mmcblk0 rw console=ttyAMA0"
-> 
-> But it failed, so I tried to locate the cause of the failure and finally found that
-> it failed from this patch(cad439fc040e crypto: api - Do not create test larvals if manager is disabled)，
-> logs as follows:
-> > EXT4-fs (mmcblk0): Cannot load crc32c driver. VFS: Cannot open root
-> > device "mmcblk0" or unknown-block(179,0): error -80 Please append a
-> > correct "root=" boot option; here are the available partitions: 1f00
-> > 131072 mtdblock0 (driver?) 1f01 32768 mtdblock1 (driver?) b300 32768
-> > mmcblk0 driver: mmcblk Kernel panic - not syncing: VFS: Unable to mount
-> > root fs on unknown-block(179,0) CPU: 0 PID: 1 Comm: swapper/0 Not
-> > tainted 5.15.0-rc1+ #1 Hardware name: ARM-Versatile Express [<8010f334>]
-> > (unwind_backtrace) from [<8010b08c>] (show_stack+0x10/0x14) [<8010b08c>]
-> > (show_stack) from [<8083f2a4>] (dump_stack_lvl+0x40/0x4c) [<8083f2a4>]
-> > (dump_stack_lvl) from [<8083b210>] (panic+0xf8/0x2f4) [<8083b210>]
-> > (panic) from [<80b0175c>] (mount_block_root+0x178/0x200) [<80b0175c>]
-> > (mount_block_root) from [<80b01bac>] (prepare_namespace+0x150/0x18c)
-> > [<80b01bac>] (prepare_namespace) from [<8084384c>]
-> > (kernel_init+0x10/0x124) [<8084384c>] (kernel_init) from [<80100130>]
-> > (ret_from_fork+0x14/0x24) Exception stack(0x8108bfb0 to 0x8108bff8)
-> > bfa0: ???????? ???????? ???????? ???????? bfc0: ???????? ????????
-> > ???????? ???????? ???????? ???????? ???????? ???????? bfe0: ????????
-> > ???????? ???????? ???????? ???????? ???????? ---[ end Kernel panic - not
-> > syncing: VFS: Unable to mount root fs on unknown-block(179,0) ]---
-> 
-> In the patch, crypto_alloc_test_larval will return NULL if CONFIG_CRYPTO_MANAGER disabled, so
-> I checked to see if this change was the cause "EXT4-fs (mmcblk0): Cannot load crc32c driver
-> ", the success logs does not have this error.
-> 
-> When I enabled CONFIG_CRYPTO_MANAGER, kernel can be boot successfully.
-> 
-> Could that be the reason? I would be very grateful if you could give me some advice.
+> crypto_alloc_test_larval() will return null if manager is disabled,
+> it will not return error pointers, IS_ERR should not be used to checking
+> return value, should we fix it? or use another solution?
 
-Can you please provide the whole .config file?
+That's because NULL is returned indicating success.  When a genuine
+error occurs then an error pointer will be returned.  IS_ERR will be
+true only in case of a genuine error.  It will be false when either
+NULL or a real larval pointer is returned.
 
-Thanks,
+You need to describe your problem more clearly as I have no idea what
+you're trying to fix.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
