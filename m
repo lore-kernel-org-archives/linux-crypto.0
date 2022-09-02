@@ -2,114 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDB2C6FA83
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 06:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E34ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 07:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235552AbiIBGwH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Sep 2022 02:52:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57482 "EHLO
+        id S232221AbiIBHbD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 03:31:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235539AbiIBGwF (ORCPT
+        with ESMTP id S229514AbiIBHbC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2022 02:52:05 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F91FA1D3D;
-        Thu,  1 Sep 2022 23:52:03 -0700 (PDT)
-Received: from nazgul.tnic (dynamic-089-204-154-243.89.204.154.pool.telefonica.de [89.204.154.243])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 36E0E1EC068D;
-        Fri,  2 Sep 2022 08:51:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1662101517;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=9kUEs2/T4DMChAR3xShTyboJxKta70IsCXwvaVK3RJY=;
-        b=YkYEER3f0hCMiu2oU1TYSJf3dywL4jvCMYwGQXlfBVN7MC+mkZWQP/M/Ng/Ihpcsob87+o
-        OTFSotKbnlSyf4Yepl+Yk9g2NYxVbVQp8sAg7K/BZSk4FZiAg31UuTN5gBp6/1ylaNkW0p
-        ZfisbV5h5VcrBtsUA117bTyfqibeZg4=
-Date:   Fri, 2 Sep 2022 08:52:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <YxGoBzOFT+sfwr4w@nazgul.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
- <YvKRjxgipxLSNCLe@zn.tnic>
- <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YvN9bKQ0XtUVJE7z@zn.tnic>
- <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com>
- <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com>
+        Fri, 2 Sep 2022 03:31:02 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39829AFB2;
+        Fri,  2 Sep 2022 00:31:00 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id u9-20020a17090a1f0900b001fde6477464so4699663pja.4;
+        Fri, 02 Sep 2022 00:31:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=otQ8hHJCbd4mIOyYrBE6xrrNXinh9eOjKzRA60c/oYE=;
+        b=XN0dQyhR+ApCIk1hP+qHX//4vn/ePtcWzh5jgq81LbY1nrxTyKx1ksEnAkk9oe14sA
+         R+NNsU/hGHKPLDCQ+02ymsuA4+MFfY2OKNO5Tde8QTSM4Hpm5gorpDko5WoF+JsgeauD
+         nsq2mw8zbLfHCsJr0C8iqhgLAq1DVb1KzPLs4cv4rilR9FUfYBXrqRtZXYriu/O3N+eC
+         VvhmpP0SuHGlcKdld7SV5DRUA5M0ot5oacWqwoVvFFFg5Gi3qlG8Y01RNk7XTOlD0S7s
+         /Vm0+zBpHQx9WiK7MMNbQQDF92640tMS7emfaKGVHfBpDKT9n1fKIcuiT8+LxndQVL9j
+         qf3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=otQ8hHJCbd4mIOyYrBE6xrrNXinh9eOjKzRA60c/oYE=;
+        b=qROBGhpsXGGzc38wvzlNOvBopgYwol1HUdml6v2AFdJXVelCSCasMqF8kJD//FXhDW
+         z3zl2ZhXJhDZNQZ9PeGgQR+yOVwmn6Uy5NhQQHwA8eqxbHxH9gneHD36feAZkRyJmY/L
+         Ehlfjf0VffQv/HBgFlgYqpHvZGD3tnFCsaUBd+dDuocUARxLwEyXSzfZlzQ60CbAbcxU
+         u4zQ9yasizJK32vcOTRMTydpPiH2uavYPFLsO/hmMfOv5yKUnB+hYy+D2ZW2jIA43KaN
+         l59DLqTRj80TMVI7RAV5tYD7LSCk8YA2O+EUFVuLN1SDn0Bc9/toc+5VRh7SEGtPh1Bn
+         +xgw==
+X-Gm-Message-State: ACgBeo2DhItmt7VicnGGdjLkheAqPQpcDd20+6leqxa6HuQ+XntmwnkW
+        VRuCBT99Hoe49JqkiHewdv8=
+X-Google-Smtp-Source: AA6agR7frwvs4z2Xkd/cDUv8GhGmoyWx3SbAYicBTSYaAPmO5qpNaPu0PYo4CMFbrUNVJaCX/fDt6w==
+X-Received: by 2002:a17:902:ef50:b0:170:9f15:b998 with SMTP id e16-20020a170902ef5000b001709f15b998mr34703564plx.102.1662103860438;
+        Fri, 02 Sep 2022 00:31:00 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id n13-20020a170903110d00b0016d72804664sm862528plh.205.2022.09.02.00.30.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Sep 2022 00:31:00 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To:     herbert@gondor.apana.org.au
+Cc:     leitao@debian.org, nayna@linux.ibm.com, pfsmorigo@gmail.com,
+        mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        ye xingchen <ye.xingchen@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] crypto: nx - Remove the unneeded result variable
+Date:   Fri,  2 Sep 2022 07:30:55 +0000
+Message-Id: <20220902073055.319464-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 08:32:35PM +0000, Kalra, Ashish wrote:
-> As I mentioned earlier, this is computing an index into a 4K page
-> within a hugepage mapping, therefore, though pte_index() works for 2M
-> pages, but pmd_index() will not work for 1G pages.
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-Why not? What exactly do you need to get here?
+Return the value set_msg_len() directly instead of storing it in another
+redundant variable.
 
-So the way I understand it is, you want to map the faulting address to a
-RMP entry. And that is either the 2M PMD entry when the page is a 1G one
-and the 4K PTE entry when the page is a 2M one?
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ drivers/crypto/nx/nx-aes-ccm.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Why doesn't pmd_index() work?
-
-Also, why isn't the lookup function's signature:
-
-int snp_lookup_rmpentry(unsigned long address, int *level)
-
-and all that logic to do the conversion to a PFN also not in it?
-
-Thx.
-
+diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
+index 3793885f928d..c843f4c6f684 100644
+--- a/drivers/crypto/nx/nx-aes-ccm.c
++++ b/drivers/crypto/nx/nx-aes-ccm.c
+@@ -134,7 +134,6 @@ static int generate_b0(u8 *iv, unsigned int assoclen, unsigned int authsize,
+ 		       unsigned int cryptlen, u8 *b0)
+ {
+ 	unsigned int l, lp, m = authsize;
+-	int rc;
+ 
+ 	memcpy(b0, iv, 16);
+ 
+@@ -148,9 +147,7 @@ static int generate_b0(u8 *iv, unsigned int assoclen, unsigned int authsize,
+ 	if (assoclen)
+ 		*b0 |= 64;
+ 
+-	rc = set_msg_len(b0 + 16 - l, cryptlen, l);
+-
+-	return rc;
++	return set_msg_len(b0 + 16 - l, cryptlen, l);
+ }
+ 
+ static int generate_pat(u8                   *iv,
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+2.25.1
