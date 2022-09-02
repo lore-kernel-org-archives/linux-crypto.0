@@ -2,52 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3C0C38145
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB004ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:40:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233647AbiIBK3i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Sep 2022 06:29:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41570 "EHLO
+        id S235920AbiIBKkL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:40:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233014AbiIBK3h (ORCPT
+        with ESMTP id S235127AbiIBKkL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2022 06:29:37 -0400
+        Fri, 2 Sep 2022 06:40:11 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7095BD1C8;
-        Fri,  2 Sep 2022 03:29:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79BB11707C;
+        Fri,  2 Sep 2022 03:40:06 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oU3vG-000Kqw-OC; Fri, 02 Sep 2022 20:29:15 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:29:14 +0800
-Date:   Fri, 2 Sep 2022 18:29:14 +0800
+        id 1oU45g-000L6B-07; Fri, 02 Sep 2022 20:40:01 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:39:59 +0800
+Date:   Fri, 2 Sep 2022 18:39:59 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] crypto: aspeed: fix build module error
-Message-ID: <YxHa+g256XL/vz8q@gondor.apana.org.au>
-References: <20220829072035.1539399-1-neal_liu@aspeedtech.com>
+To:     wangjianli <wangjianli@cdjrlc.com>
+Cc:     gcherian@marvell.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        wangjianli@cdjrlc.com
+Subject: Re: [PATCH] cavium/cpt: fix repeated words in comments
+Message-ID: <YxHdfyFhB1qmUKnC@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220829072035.1539399-1-neal_liu@aspeedtech.com>
+In-Reply-To: <20220823135528.64693-1-wangjianli@cdjrlc.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 03:20:35PM +0800, Neal Liu wrote:
->
->  obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) += aspeed-hace-hash.o
->  hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) := aspeed-hace-hash.o
->  obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) += aspeed-hace-crypto.o
->  hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) := aspeed-hace-crypto.o
+wangjianli <wangjianli@cdjrlc.com> wrote:
+> Delete the redundant word 'the'.
+> 
+> Signed-off-by: wangjianli <wangjianli@cdjrlc.com>
+> ---
+> drivers/crypto/cavium/cpt/cpt_hw_types.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Why are these two files being included twice? I think the obj-
-lines should be deleted.
+An identical patch has already been applied.
 
 Thanks,
 -- 
