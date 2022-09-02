@@ -2,78 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4279EECAAD5
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7942ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:23:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235505AbiIBKTQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Sep 2022 06:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52282 "EHLO
+        id S235758AbiIBKXW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:23:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230436AbiIBKTO (ORCPT
+        with ESMTP id S229621AbiIBKXW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2022 06:19:14 -0400
+        Fri, 2 Sep 2022 06:23:22 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53032BCCFD
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Sep 2022 03:19:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA78BA5725;
+        Fri,  2 Sep 2022 03:23:20 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oU3lW-000KgO-Cf; Fri, 02 Sep 2022 20:19:11 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:19:10 +0800
-Date:   Fri, 2 Sep 2022 18:19:10 +0800
+        id 1oU3pT-000KkZ-Ek; Fri, 02 Sep 2022 20:23:16 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:23:15 +0800
+Date:   Fri, 2 Sep 2022 18:23:15 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jack Wang <jinpu.wang@ionos.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/6] Crypto: Fix dma_map_sg error check
-Message-ID: <YxHYnnECfa2rlbrn@gondor.apana.org.au>
-References: <20220825072421.29020-1-jinpu.wang@ionos.com>
+To:     cuigaosheng <cuigaosheng1@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next 2/2] crypto: crc32c - add missing Kconfig option
+ select
+Message-ID: <YxHZk7ADgv0Tzl6W@gondor.apana.org.au>
+References: <20220825084138.1881954-1-cuigaosheng1@huawei.com>
+ <20220825084138.1881954-3-cuigaosheng1@huawei.com>
+ <Ywc36LxM2+0eqKu2@gondor.apana.org.au>
+ <35ec0aed-ee54-b6ea-1d34-06839b20befb@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220825072421.29020-1-jinpu.wang@ionos.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <35ec0aed-ee54-b6ea-1d34-06839b20befb@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 09:24:15AM +0200, Jack Wang wrote:
-> Hi, all,
+On Thu, Aug 25, 2022 at 08:55:12PM +0800, cuigaosheng wrote:
+> Thanks for your reply.
 > 
-> While working on a bugfix on RTRS[1], I noticed there are quite a few other
-> drivers have the same problem, due to the fact dma_map_sg return 0 on error,
-> not like most of the cases, return negative value for error.
+> While I was debugging the kernel code of linux-next, I start the kernel
+> with qemu-system-arm with following commands:
 > 
-> I "grep -A 5 dma_map_sg' in kernel tree, and audit/fix the one I feel is buggy,
-> hence this patchset. As suggested by Christoph Hellwig, I now send the patches per
-> subsystem, this is for crypto subsystem.
+>     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- vexpress_defconfig
+>     make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j32
+>     qemu-system-arm -M vexpress-a9 -m 1024M -s -nographic -kernel arch/arm/boot/zImage \
+>                    -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -sd /home/rootfs.sd \
+>                    -append "root=/dev/mmcblk0 rw console=ttyAMA0"
 > 
-> Thanks!
+> But it failed, so I tried to locate the cause of the failure and finally found that
+> it failed from this patch(cad439fc040e crypto: api - Do not create test larvals if manager is disabled)，
+> logs as follows:
+> > EXT4-fs (mmcblk0): Cannot load crc32c driver. VFS: Cannot open root
+> > device "mmcblk0" or unknown-block(179,0): error -80 Please append a
+> > correct "root=" boot option; here are the available partitions: 1f00
+> > 131072 mtdblock0 (driver?) 1f01 32768 mtdblock1 (driver?) b300 32768
+> > mmcblk0 driver: mmcblk Kernel panic - not syncing: VFS: Unable to mount
+> > root fs on unknown-block(179,0) CPU: 0 PID: 1 Comm: swapper/0 Not
+> > tainted 5.15.0-rc1+ #1 Hardware name: ARM-Versatile Express [<8010f334>]
+> > (unwind_backtrace) from [<8010b08c>] (show_stack+0x10/0x14) [<8010b08c>]
+> > (show_stack) from [<8083f2a4>] (dump_stack_lvl+0x40/0x4c) [<8083f2a4>]
+> > (dump_stack_lvl) from [<8083b210>] (panic+0xf8/0x2f4) [<8083b210>]
+> > (panic) from [<80b0175c>] (mount_block_root+0x178/0x200) [<80b0175c>]
+> > (mount_block_root) from [<80b01bac>] (prepare_namespace+0x150/0x18c)
+> > [<80b01bac>] (prepare_namespace) from [<8084384c>]
+> > (kernel_init+0x10/0x124) [<8084384c>] (kernel_init) from [<80100130>]
+> > (ret_from_fork+0x14/0x24) Exception stack(0x8108bfb0 to 0x8108bff8)
+> > bfa0: ???????? ???????? ???????? ???????? bfc0: ???????? ????????
+> > ???????? ???????? ???????? ???????? ???????? ???????? bfe0: ????????
+> > ???????? ???????? ???????? ???????? ???????? ---[ end Kernel panic - not
+> > syncing: VFS: Unable to mount root fs on unknown-block(179,0) ]---
 > 
-> [1] https://lore.kernel.org/linux-rdma/20220818105355.110344-1-haris.iqbal@ionos.com/T/#t
+> In the patch, crypto_alloc_test_larval will return NULL if CONFIG_CRYPTO_MANAGER disabled, so
+> I checked to see if this change was the cause "EXT4-fs (mmcblk0): Cannot load crc32c driver
+> ", the success logs does not have this error.
 > 
+> When I enabled CONFIG_CRYPTO_MANAGER, kernel can be boot successfully.
 > 
-> Jack Wang (6):
->   crypto: gemin: Fix error check for dma_map_sg
->   crypto: sahara: Fix error check for dma_map_sg
->   crypto: qce: Fix dma_map_sg error check
->   crypto: amlogic: Fix dma_map_sg error check
->   crypto: allwinner: Fix dma_map_sg error check
->   crypto: ccree: Fix dma_map_sg error check
-> 
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 +++---
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 4 ++--
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 2 +-
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 6 +++---
->  drivers/crypto/ccree/cc_buffer_mgr.c                | 2 +-
->  drivers/crypto/gemini/sl3516-ce-cipher.c            | 6 +++---
->  drivers/crypto/qce/aead.c                           | 4 ++--
->  drivers/crypto/qce/sha.c                            | 8 +++++---
->  drivers/crypto/qce/skcipher.c                       | 8 ++++----
->  drivers/crypto/sahara.c                             | 4 ++--
->  11 files changed, 27 insertions(+), 25 deletions(-)
+> Could that be the reason? I would be very grateful if you could give me some advice.
 
-These patches have already been applied to cryptodev.  However,
-upon further reflection I have decided to revert two of the patches
-which actually made the code less robust.
+Can you please provide the whole .config file?
 
 Thanks,
 -- 
