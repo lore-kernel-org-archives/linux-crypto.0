@@ -2,195 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0542C6FA82
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 03:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EF6C54EE9
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 06:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiIBDTJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Sep 2022 23:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50644 "EHLO
+        id S234778AbiIBGCA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 02:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232670AbiIBDTF (ORCPT
+        with ESMTP id S235316AbiIBGBm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 23:19:05 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D3B9FAAF;
-        Thu,  1 Sep 2022 20:19:01 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MJjhj41Z1zkWvc;
-        Fri,  2 Sep 2022 11:15:17 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 2 Sep 2022 11:18:59 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 2 Sep
- 2022 11:18:59 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
-        <yekai13@huawei.com>
-Subject: [PATCH v8 1/3] uacce: supports device isolation feature
-Date:   Fri, 2 Sep 2022 03:13:02 +0000
-Message-ID: <20220902031304.37516-2-yekai13@huawei.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220902031304.37516-1-yekai13@huawei.com>
-References: <20220902031304.37516-1-yekai13@huawei.com>
+        Fri, 2 Sep 2022 02:01:42 -0400
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60DE4ABD7B;
+        Thu,  1 Sep 2022 23:01:41 -0700 (PDT)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 2825eWm7091015;
+        Fri, 2 Sep 2022 13:40:33 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 2 Sep
+ 2022 14:00:16 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Dhananjay Phadke <dphadke@linux.microsoft.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Joel Stanley" <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        "Chia-Wei Wang --cc=linux-kernel @ vger . kernel . org" 
+        <chiawei_wang@aspeedtech.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-aspeed@lists.ozlabs.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <BMC-SW@aspeedtech.com>
+Subject: [PATCH v1 4/4] dt-bindings: bus: add documentation for Aspeed AHBC
+Date:   Fri, 2 Sep 2022 14:00:12 +0800
+Message-ID: <20220902060012.3758637-5-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220902060012.3758637-1-neal_liu@aspeedtech.com>
+References: <20220902060012.3758637-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 2825eWm7091015
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-UACCE adds the hardware error isolation API. Users can configure
-the isolation frequency by this sysfs node. UACCE reports the device
-isolate state to the user space. If the AER error frequency exceeds
-the value of setting for a certain period of time, the device will be
-isolated.
+Add device tree binding documentation for the Aspeed
+Advanced High-Performance Bus (AHB) Controller.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
 ---
- drivers/misc/uacce/uacce.c | 58 ++++++++++++++++++++++++++++++++++++++
- include/linux/uacce.h      | 11 ++++++++
- 2 files changed, 69 insertions(+)
+ .../bindings/bus/aspeed,ast2600-ahbc.yaml     | 39 +++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 281c54003edc..41f454c89cd1 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -7,6 +7,8 @@
- #include <linux/slab.h>
- #include <linux/uacce.h>
- 
-+#define MAX_ERR_ISOLATE_COUNT		65535
+diff --git a/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+new file mode 100644
+index 000000000000..ca09eb531666
+--- /dev/null
++++ b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+@@ -0,0 +1,39 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/bus/aspeed,ast2600-ahbc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- static struct class *uacce_class;
- static dev_t uacce_devt;
- static DEFINE_MUTEX(uacce_mutex);
-@@ -339,12 +341,57 @@ static ssize_t region_dus_size_show(struct device *dev,
- 		       uacce->qf_pg_num[UACCE_QFRT_DUS] << PAGE_SHIFT);
- }
- 
-+static ssize_t isolate_show(struct device *dev,
-+			    struct device_attribute *attr, char *buf)
-+{
-+	struct uacce_device *uacce = to_uacce_device(dev);
++title: ASPEED Advanced High-Performance Bus Controller (AHBC) Device Tree Bindings
 +
-+	if (!uacce->ops->get_isolate_state)
-+		return -ENODEV;
++maintainers:
++  - Neal Liu <neal_liu@aspeedtech.com>
++  - Chia-Wei Wang <chiawei_wang@aspeedtech.com>
 +
-+	return sysfs_emit(buf, "%d\n", uacce->ops->get_isolate_state(uacce));
-+}
++description: |
++  Advanced High-performance Bus Controller (AHBC) supports plenty of mechanisms
++  including a priority arbiter, an address decoder and a data multiplexer
++  to control the overall operations of Advanced Highperformance
++  Bus (AHB). AHB is the main system bus for ARM CPU to communicate with the
++  related peripherals.
 +
-+static ssize_t isolate_strategy_show(struct device *dev,
-+				     struct device_attribute *attr, char *buf)
-+{
-+	struct uacce_device *uacce = to_uacce_device(dev);
-+	u32 val;
++properties:
++  compatible:
++    enum:
++      - aspeed,ast2600-ahbc
 +
-+	val = uacce->ops->isolate_strategy_read(uacce);
-+	if (val > MAX_ERR_ISOLATE_COUNT)
-+		return -EINVAL;
++  reg:
++    maxItems: 1
 +
-+	return sysfs_emit(buf, "%u\n", val);
-+}
++required:
++  - compatible
++  - reg
 +
-+static ssize_t isolate_strategy_store(struct device *dev,
-+				      struct device_attribute *attr,
-+				      const char *buf, size_t count)
-+{
-+	struct uacce_device *uacce = to_uacce_device(dev);
-+	unsigned long val;
-+	int ret;
++additionalProperties: false
 +
-+	if (kstrtoul(buf, 0, &val) < 0)
-+		return -EINVAL;
-+
-+	if (val > MAX_ERR_ISOLATE_COUNT)
-+		return -EINVAL;
-+
-+	ret = uacce->ops->isolate_strategy_write(uacce, val);
-+
-+	return ret ? ret : count;
-+}
-+
- static DEVICE_ATTR_RO(api);
- static DEVICE_ATTR_RO(flags);
- static DEVICE_ATTR_RO(available_instances);
- static DEVICE_ATTR_RO(algorithms);
- static DEVICE_ATTR_RO(region_mmio_size);
- static DEVICE_ATTR_RO(region_dus_size);
-+static DEVICE_ATTR_RO(isolate);
-+static DEVICE_ATTR_RW(isolate_strategy);
- 
- static struct attribute *uacce_dev_attrs[] = {
- 	&dev_attr_api.attr,
-@@ -353,6 +400,8 @@ static struct attribute *uacce_dev_attrs[] = {
- 	&dev_attr_algorithms.attr,
- 	&dev_attr_region_mmio_size.attr,
- 	&dev_attr_region_dus_size.attr,
-+	&dev_attr_isolate.attr,
-+	&dev_attr_isolate_strategy.attr,
- 	NULL,
- };
- 
-@@ -368,6 +417,15 @@ static umode_t uacce_dev_is_visible(struct kobject *kobj,
- 	    (!uacce->qf_pg_num[UACCE_QFRT_DUS])))
- 		return 0;
- 
-+	if (attr == &dev_attr_isolate_strategy.attr &&
-+	    (!uacce->ops->isolate_strategy_read ||
-+	     !uacce->ops->isolate_strategy_write))
-+		return 0;
-+
-+	if (attr == &dev_attr_isolate.attr &&
-+	    !uacce->ops->get_isolate_state)
-+		return 0;
-+
- 	return attr->mode;
- }
- 
-diff --git a/include/linux/uacce.h b/include/linux/uacce.h
-index 48e319f40275..69e8f238d80c 100644
---- a/include/linux/uacce.h
-+++ b/include/linux/uacce.h
-@@ -30,6 +30,9 @@ struct uacce_qfile_region {
-  * @is_q_updated: check whether the task is finished
-  * @mmap: mmap addresses of queue to user space
-  * @ioctl: ioctl for user space users of the queue
-+ * @get_isolate_state: get the device state after set the isolate strategy
-+ * @isolate_strategy_write: stored the isolate strategy to the device
-+ * @isolate_strategy_read: read the isolate strategy value from the device
-  */
- struct uacce_ops {
- 	int (*get_available_instances)(struct uacce_device *uacce);
-@@ -43,6 +46,9 @@ struct uacce_ops {
- 		    struct uacce_qfile_region *qfr);
- 	long (*ioctl)(struct uacce_queue *q, unsigned int cmd,
- 		      unsigned long arg);
-+	enum uacce_dev_state (*get_isolate_state)(struct uacce_device *uacce);
-+	int (*isolate_strategy_write)(struct uacce_device *uacce, u32 freq);
-+	u32 (*isolate_strategy_read)(struct uacce_device *uacce);
- };
- 
- /**
-@@ -57,6 +63,11 @@ struct uacce_interface {
- 	const struct uacce_ops *ops;
- };
- 
-+enum uacce_dev_state {
-+	UACCE_DEV_NORMAL,
-+	UACCE_DEV_ISOLATE,
-+};
-+
- enum uacce_q_state {
- 	UACCE_Q_ZOMBIE = 0,
- 	UACCE_Q_INIT,
++examples:
++  - |
++    ahbc: bus@1e600000 {
++        compatible = "aspeed,ast2600-ahbc";
++        reg = <0x1e600000 0x100>;
++    };
 -- 
-2.17.1
+2.25.1
 
