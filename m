@@ -2,42 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F26C38145
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 03:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F46FECAAD3
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 03:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232782AbiIBDTI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232904AbiIBDTI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 1 Sep 2022 23:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50624 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231344AbiIBDTE (ORCPT
+        with ESMTP id S231577AbiIBDTF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Sep 2022 23:19:04 -0400
+        Thu, 1 Sep 2022 23:19:05 -0400
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 389EE83BCD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BFE844C0;
         Thu,  1 Sep 2022 20:19:01 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MJjgs697fzYcnb;
-        Fri,  2 Sep 2022 11:14:33 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MJjgt1JsjzYd3N;
+        Fri,  2 Sep 2022 11:14:34 +0800 (CST)
 Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2375.24; Fri, 2 Sep 2022 11:18:59 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
  (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 2 Sep
- 2022 11:18:58 +0800
+ 2022 11:18:59 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
         <yekai13@huawei.com>
-Subject: [PATCH v8 0/3] crypto: hisilicon - supports device isolation feature
-Date:   Fri, 2 Sep 2022 03:13:01 +0000
-Message-ID: <20220902031304.37516-1-yekai13@huawei.com>
+Subject: [PATCH v8 2/3] Documentation: add a isolation strategy sysfs node for uacce
+Date:   Fri, 2 Sep 2022 03:13:03 +0000
+Message-ID: <20220902031304.37516-3-yekai13@huawei.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220902031304.37516-1-yekai13@huawei.com>
+References: <20220902031304.37516-1-yekai13@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.67.165.24]
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  dggpeml100012.china.huawei.com (7.185.36.121)
@@ -46,47 +47,52 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1、Add the uacce hardware error isolation interface. Supports
-   configures the hardware error isolation frequency.
-2、Defining the isolation strategy for ACC by uacce sysfs node. If the 
-   number of hardware errors in a per hour exceeds the configured value,
-   the device will not be available in user space. The VF device use the
-   PF device isolation strategy.
-   
-changes v1->v2:
-	- deleted dev_to_uacce api.
-	- add vfs node doc. 
-	- move uacce->ref to driver.
-changes v2->v3:
-	- deleted some redundant code.
-	- use qm state instead of reference count.
-	- add null pointer check.
-	- isolate_strategy_read() instead of a copy.
-changes v3->v4:
-	- modify a comment
-changes v4->v5:
-	- use bool instead of atomic.
-	- isolation frequency instead of isolation command.
-changes v5->v6:
-	- add is_visible in uacce.
-	- add the description of the isolation strategy file node.
-changes v6->v7
-	- add an example for isolate_strategy in Documentation.
-changes v7->v8
-	- update the correct date.
+Update documentation describing sysfs node that could help to
+configure isolation strategy for users in the user space. And
+describing sysfs node that could read the device isolated state.
 
-Kai Ye (3):
-  uacce: supports device isolation feature
-  Documentation: add a isolation strategy sysfs node for uacce
-  crypto: hisilicon/qm - define the device isolation strategy
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
- Documentation/ABI/testing/sysfs-driver-uacce |  26 +++
- drivers/crypto/hisilicon/qm.c                | 163 +++++++++++++++++--
- drivers/misc/uacce/uacce.c                   |  58 +++++++
- include/linux/hisi_acc_qm.h                  |   9 +
- include/linux/uacce.h                        |  11 ++
- 5 files changed, 255 insertions(+), 12 deletions(-)
-
+diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+index 08f2591138af..af5bc2f326d2 100644
+--- a/Documentation/ABI/testing/sysfs-driver-uacce
++++ b/Documentation/ABI/testing/sysfs-driver-uacce
+@@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
+ Description:    Available instances left of the device
+                 Return -ENODEV if uacce_ops get_available_instances is not provided
+ 
++What:           /sys/class/uacce/<dev_name>/isolate_strategy
++Date:           Sep 2022
++KernelVersion:  6.0
++Contact:        linux-accelerators@lists.ozlabs.org
++Description:    (RW) Configure the frequency size for the hardware error
++                isolation strategy. This size is a configured integer value.
++                The default is 0. The maximum value is 65535. This value is a
++                threshold based on your driver strategies.
++
++                For example, in the hisilicon accelerator engine, first we will
++                time-stamp every slot AER error. Then check the AER error log
++                when the device AER error occurred. if the device slot AER error
++                count exceeds the preset the number of times in one hour, the
++                isolated state will be set to true. So the device will be
++                isolated. And the AER error log that exceed one hour will be
++                cleared. Of course, different strategies can be defined in
++                different drivers.
++
++What:           /sys/class/uacce/<dev_name>/isolate
++Date:           Sep 2022
++KernelVersion:  6.0
++Contact:        linux-accelerators@lists.ozlabs.org
++Description:    (R) A sysfs node that read the device isolated state. The value 1
++                means the device is unavailable. The 0 means the device is
++                available.
++
+ What:           /sys/class/uacce/<dev_name>/algorithms
+ Date:           Feb 2020
+ KernelVersion:  5.7
 -- 
 2.17.1
 
