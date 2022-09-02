@@ -2,76 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 307F2ECAAD5
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD0BC38145
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Sep 2022 10:19:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbiIBKOn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Sep 2022 06:14:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43392 "EHLO
+        id S233647AbiIBKTP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232619AbiIBKOT (ORCPT
+        with ESMTP id S232723AbiIBKTP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Sep 2022 06:14:19 -0400
+        Fri, 2 Sep 2022 06:19:15 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36633C1A;
-        Fri,  2 Sep 2022 03:14:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46043BD0B4;
+        Fri,  2 Sep 2022 03:19:14 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oU3gT-000KYi-9s; Fri, 02 Sep 2022 20:13:58 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:13:57 +0800
-Date:   Fri, 2 Sep 2022 18:13:57 +0800
+        id 1oU3ku-000Kds-Rx; Fri, 02 Sep 2022 20:18:33 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Sep 2022 18:18:32 +0800
+Date:   Fri, 2 Sep 2022 18:18:32 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Jack Wang <jinpu.wang@ionos.com>
-Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
-        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
+Cc:     linux-crypto@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/6] crypto: gemin: Fix error check for dma_map_sg
-Message-ID: <YxHXZbKnfe+5pIYz@gondor.apana.org.au>
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Peng Wu <wupeng58@huawei.com>,
+        Alexey Khoroshilov <khoroshilov@ispras.ru>,
+        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/6] crypto: allwinner: Fix dma_map_sg error check
+Message-ID: <YxHYeCSwfAEgMngX@gondor.apana.org.au>
 References: <20220825072421.29020-1-jinpu.wang@ionos.com>
- <20220825072421.29020-2-jinpu.wang@ionos.com>
+ <20220825072421.29020-6-jinpu.wang@ionos.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220825072421.29020-2-jinpu.wang@ionos.com>
+In-Reply-To: <20220825072421.29020-6-jinpu.wang@ionos.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 25, 2022 at 09:24:16AM +0200, Jack Wang wrote:
+On Thu, Aug 25, 2022 at 09:24:20AM +0200, Jack Wang wrote:
 > dma_map_sg return 0 on error.
 > 
-> Cc: Corentin Labbe <clabbe@baylibre.com>
-> Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Chen-Yu Tsai <wens@csie.org>
+> Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
+> Cc: Samuel Holland <samuel@sholland.org>
+> Cc: Dan Carpenter <dan.carpenter@oracle.com>
+> Cc: Minghao Chi <chi.minghao@zte.com.cn>
+> Cc: Peng Wu <wupeng58@huawei.com>
+> Cc: Alexey Khoroshilov <khoroshilov@ispras.ru>
 > Cc: linux-crypto@vger.kernel.org
 > Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-sunxi@lists.linux.dev
 > Cc: linux-kernel@vger.kernel.org
-> Fixes: 46c5338db7bd ("crypto: sl3516 - Add sl3516 crypto engine")
+> Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
+> Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
 > Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
->  drivers/crypto/gemini/sl3516-ce-cipher.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 +++---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 4 ++--
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 2 +-
+>  4 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
-> index 14d0d83d388d..34fea8aa91b6 100644
-> --- a/drivers/crypto/gemini/sl3516-ce-cipher.c
-> +++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
-> @@ -149,7 +149,7 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
+> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> index 74b4e910a38d..be7f46faef7e 100644
+> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+> @@ -208,7 +208,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+>  
 >  	if (areq->src == areq->dst) {
->  		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
->  				    DMA_BIDIRECTIONAL);
-> -		if (nr_sgs <= 0 || nr_sgs > MAXDESC / 2) {
-> +		if (!nr_sgs || nr_sgs > MAXDESC / 2) {
->  			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
->  			err = -EINVAL;
->  			goto theend;
+>  		nr_sgs = dma_map_sg(ce->dev, areq->src, ns, DMA_BIDIRECTIONAL);
+> -		if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+> +		if (!nr_sgs || nr_sgs > MAX_SG) {
 
-The original code is correct and this patch is arguably making it
-less robust.  So I'll drop this particular patch.
+This is also less robust than the original code and I'll be
+reverting it.
 
 Thanks,
 -- 
