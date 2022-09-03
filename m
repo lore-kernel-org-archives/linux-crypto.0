@@ -2,108 +2,186 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9B7ECAAD4
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Sep 2022 08:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B567ECAAD4
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Sep 2022 09:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231834AbiICIbY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Sep 2022 04:31:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33048 "EHLO
+        id S233265AbiICJgh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Sep 2022 05:36:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiICIbX (ORCPT
+        with ESMTP id S233112AbiICJgH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Sep 2022 04:31:23 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BBE101DD;
-        Sat,  3 Sep 2022 01:31:19 -0700 (PDT)
-Received: from [127.0.0.1] (dynamic-002-247-242-004.2.247.pool.telefonica.de [2.247.242.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 09E311EC06EE;
-        Sat,  3 Sep 2022 10:31:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1662193874;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dHXOkzxgjsBtZM539cRCQ2oOl4G/USWxuxSAXY3DyOs=;
-        b=Gs6Qlvxs8gNpEUHeMBASMK9yQo6Y7FspgcI4jU/TDL4PyDkxNsQfAH1Paj6VGlvA4fTxXc
-        rP1bxXy5M8rQhgmB6LUcaejLkEo6203LQUbYX892e1hz0XVqmaDIgGDePeuwjxC+1N/d/j
-        TivrvEgG+eKbx+fbHeDorEmyY6hdGcU=
-Date:   Sat, 03 Sep 2022 08:31:09 +0000
-From:   Boris Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: =?US-ASCII?Q?RE=3A_=5BPATCH_Part2_v6_09/49=5D_x86/fault=3A_Add_sup?= =?US-ASCII?Q?port_to_handle_the_RMP_fault_for_user_address?=
-In-Reply-To: <SN6PR12MB2767074DEB38477356A3C0F98E7D9@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <cover.1655761627.git.ashish.kalra@amd.com> <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com> <YvKRjxgipxLSNCLe@zn.tnic> <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com> <YvN9bKQ0XtUVJE7z@zn.tnic> <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com> <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com> <YxGoBzOFT+sfwr4w@nazgul.tnic> <SN6PR12MB2767E95BA3A99A6263F1F9AE8E7A9@SN6PR12MB2767.namprd12.prod.outlook.com> <YxLXJk36EKxldC1S@nazgul.tnic> <SN6PR12MB276767FDF3528BC1849EEA0A8E7D9@SN6PR12MB2767.namprd12.prod.outlook.com> <SN6PR12MB2767074DEB38477356A3C0F98E7D9@SN6PR12MB2767.namprd12.prod.outlook.com>
-Message-ID: <BC747219-7808-4C39-A17C-A76B35DD6CB3@alien8.de>
+        Sat, 3 Sep 2022 05:36:07 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65F4A2B27A;
+        Sat,  3 Sep 2022 02:36:01 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id p16so8053454ejb.9;
+        Sat, 03 Sep 2022 02:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=cYpK52+AbV0mo3/PdZ6oSyeezUksBCAZPCdP5o2p4qQ=;
+        b=hWeJbzzd5Vv/c7G5J+qdsWZWuyvLD+6FW7EBpWY1oyV2IimGtw91VnZU6ykBhKxRd0
+         HI/96YapkPZ/Qb4/kqaW4eEDuAyMD1X9WfXF6zxWTs/aQplO4nYBuINcP3ia27eqf4UJ
+         2zXJmG75WpnBUWPf0F56nYuPjp3tnu2DNOkcfSqkaCzC84w3M9Rllu3/iqK3KYKzo1Nd
+         yGl0dV5x1gEnElOVQSdnmI+bLDJGYJmn6UPajVPZUkas/IPEifhcQvJLO/1QIdBO7JOL
+         BchBJgDnma3ZtQNxffW+NjcqLme5Uch9iNbm/1uAVVrQ7p5rcvAPN15Nu2/qpTnbfII8
+         vThg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=cYpK52+AbV0mo3/PdZ6oSyeezUksBCAZPCdP5o2p4qQ=;
+        b=fy8LIHCeIild9gWHlppA3rxF+7zgqQUcnHFCj1M7zyeU8+P0+uvakNQHY0h3Qg+Tu3
+         JbeFYQYbN+9VjUnF1TDSQaJDVmNLCLz3plwieiZUQgB2AVwaQEK31/VhiIYfue2GtmKc
+         1Dmyv+ltgVVWg0qB920er6Z9av8OEGHLcZUDVM+ytgks+wZCQnKsTKxGKg2koiEYXYB+
+         YbOnPSeygIUkk62gHFcoRo7ptOONRt3HAlOagQyKtbaC1cs8Kgu5guGzUAmCNQOa0vId
+         0a4cAbEOID4VUnVgrJ8YD/ypwJaoP1ARpg34MSMfNQkcTnLc16DIujI5rYSX8xCeepFS
+         TLxw==
+X-Gm-Message-State: ACgBeo35dUyUywQl4Xpz3gUgRNVxjAt1vefQnU1Ji8/zNA8d6YWr1gsF
+        Uc+pGCoCDSZZdmwIdDMaKNY=
+X-Google-Smtp-Source: AA6agR4omMFKjEKOdgtb55PZdhzqZpjCSGctYWyltoqHlH76z+4YzTjZ+VzWrbhbU4D8lNkcPMiHmA==
+X-Received: by 2002:a17:906:5a64:b0:741:3586:92f with SMTP id my36-20020a1709065a6400b007413586092fmr25542689ejc.721.1662197759752;
+        Sat, 03 Sep 2022 02:35:59 -0700 (PDT)
+Received: from ?IPV6:2a04:241e:502:a09c:f5ae:4a6b:1158:493a? ([2a04:241e:502:a09c:f5ae:4a6b:1158:493a])
+        by smtp.gmail.com with ESMTPSA id 8-20020a170906328800b0073dbaeb50f6sm2259494ejw.169.2022.09.03.02.35.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 03 Sep 2022 02:35:59 -0700 (PDT)
+Message-ID: <64091cfa-b735-14d4-f184-b02333dd303c@gmail.com>
+Date:   Sat, 3 Sep 2022 12:35:56 +0300
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 08/31] net/tcp: Introduce TCP_AO setsockopt()s
+Content-Language: en-US
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+References: <20220818170005.747015-1-dima@arista.com>
+ <20220818170005.747015-9-dima@arista.com>
+ <162ae93b-5589-fbde-c63b-749f21051784@gmail.com>
+ <CAGrbwDTW4_uVD+YbsL=jnfTGKAaHGOmzNZmpkSRi4xotzyNASg@mail.gmail.com>
+From:   Leonard Crestez <cdleonard@gmail.com>
+In-Reply-To: <CAGrbwDTW4_uVD+YbsL=jnfTGKAaHGOmzNZmpkSRi4xotzyNASg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On September 3, 2022 6:57:51 AM UTC, "Kalra, Ashish" <Ashish=2EKalra@amd=2E=
-com> wrote:
->[AMD Official Use Only - General]
->
->So essentially we want to map the faulting address to a RMP entry, consid=
-ering the fact that a 2M host hugepage can be mapped as=20
->4K RMP table entries and 1G host hugepage can be mapped as 2M RMP table e=
-ntries=2E
+On 8/31/22 21:48, Dmitry Safonov wrote:
+> On 8/23/22 15:45, Leonard Crestez wrote:
+>> On 8/18/22 19:59, Dmitry Safonov wrote:
+> [..]
+>>> +#define TCP_AO            38    /* (Add/Set MKT) */
+>>> +#define TCP_AO_DEL        39    /* (Delete MKT) */
+>>> +#define TCP_AO_MOD        40    /* (Modify MKT) */
+>>
+>> The TCP_AO_MOD sockopt doesn't actually modify and MKT, it only controls
+>> per-socket properties. It is equivalent to my TCP_AUTHOPT sockopt while
+>> TCP_AO is equivalent to TCP_AUTHOPT_KEY. My equivalent of TCP_AO_DEL
+>> sockopt is a flag inside tcp_authopt_key.
+> 
+> Fair point, the comment could be "Modify AO", rather than "Modify MKT".
+> On the other side, this can later support more per-key changes than in
+> the initial proposal: i.e., zero per-key counters. Password and rcv/snd
+> ids can't change to follow RFC text, but non-essentials may.
+> So, the comment to the command here is not really incorrect.
 
-So something's seriously confusing or missing here because if you fault on=
- a 2M host page and the underlying RMP entries are 4K then you can use pte_=
-index()=2E
+I think it makes sense to at least separate per-key and per-socket 
+options. This way a sockopt for per-socket info doesn't contain fields 
+used to identify keys which is much clearer.
 
-If the host page is 1G and the underlying RMP entries are 2M, pmd_index() =
-should work here too=2E
+>> I also have two fields called "recv_keyid" and "recv_rnextkeyid" which
+>> inform userspace about what the remote is sending, I'm not seeing an
+>> equivalent on your side.
+> 
+> Sounds like a good candidate for getsockopt() for logs/debugging.
+> 
+>> The specification around send_keyid in the RFC is conflicting:
+>> * User must be able to control it
+> 
+> I don't see where you read it, care to point it out?
+> I see choosing the current_key by marking the preferred key during
+> an establishment of a connection, but I don't see any "MUST control
+> current_key". We allow changing current_key, but that's actually
+> not something required by RFC, the only thing required is to respect
+> rnext_key that's asked by peer.
+> 
+>> * Implementation must respect rnextkeyid in incoming packet
+>>
+>> I solved this apparent conflict by adding a
+>> "TCP_AUTHOPT_FLAG_LOCK_KEYID" flag so that user can choose if it wants
+>> to control the sending key or let it be controlled from the other side.
+> 
+> That's exactly violating the above "Implementation must respect
+> rnextkeyid in incoming packet". See RFC5925 (7.5.2.e).
 
-But this piecemeal back'n'forth doesn't seem to resolve this so I'd like t=
-o ask you pls to sit down, take your time and give a detailed example of th=
-e two possible cases and what the difference is between pte_/pmd_index and =
-your way=2E Feel free to add actual debug output and paste it here=2E
+This is based on paragraphs towards the end of Section 7.1:
 
-Thanks=2E
+ >> TCP SEND, or a sequence of commands resulting in a SEND, MUST be
+augmented so that the preferred outgoing MKT (current_key) and/or the
+preferred incoming MKT (rnext_key) of a connection can be indicated.
 
---=20
-Sent from a small device: formatting sux and brevity is inevitable=2E 
+This is for TCP SEND, not just open/connect. I'm reading this as a
+requirement that userspace *MUST* be able to control the current key. 
+Yes, it does seem contradict 7.5.2.e which is why I implemented this as 
+a "key lock flag".
+
+ >> TCP RECEIVE, or the sequence of commands resulting in a RECEIVE,
+MUST be augmented so that the KeyID and RNextKeyID of a recently
+received segment is available to the user out of band (e.g., as an
+additional parameter to RECEIVE or via a STATUS call).
+
+It seems to me that it *MUST* be possible for userspace to read the 
+incoming rnextkeyid and handle it by itself. It could choose to follow 
+7.5.2.e or it could do something entirely different. When it can't 
+respect rnextkeyid because the key is not yet valid then userspace has 
+more information to make an alternative current_key decision.
+
+> 
+> [..]
+>> Only two algorithms are defined in RFC5926 and you have to treat one of
+>> them as a special case. I remain convinced that generic support for
+>> arbitrary algorithms is undesirable; it's better for the algorithm to be
+>> specified as an enum.
+> 
+> So, why limit a new TCP sign feature to already insecure algorithms?
+> One can already use any crypto algorithms for example, in tunnels.
+> And I don't see any benefit in defining new magic macros, only downside.
+
+Adding support for arbitrary algorithms increases complexity for no 
+real-world gain. There are also lots of corner cases that must be 
+treated correctly like odd traffic_keylen and maclen, having an enum
+means that userspace can't attempt to trick us. The ABI is also smaller.
+
+There's also a special case in one of the two concrete KDFs defined by 
+RFC5925. What if there are more, will the ABI be expanded to support all 
+the cases?
+
+Disagreements over whether a particular form of extensibility is 
+"useful" are unlikely to result in any sort of useful conclusion. I'm 
+lazy so I only care about interop with existing implementations from 
+Juniper and Cisco.
+
+--
+Regards,
+Leonard
