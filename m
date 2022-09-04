@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C6FECAAD3
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Sep 2022 08:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DEEECAAD3
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Sep 2022 10:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbiIDIKE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Sep 2022 04:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
+        id S233236AbiIDKSM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Sep 2022 06:18:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbiIDIKC (ORCPT
+        with ESMTP id S232681AbiIDKSL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Sep 2022 04:10:02 -0400
+        Sun, 4 Sep 2022 06:18:11 -0400
 Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6043424F33;
-        Sun,  4 Sep 2022 01:10:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA494506D;
+        Sun,  4 Sep 2022 03:18:10 -0700 (PDT)
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 7F8A62013EB;
-        Sun,  4 Sep 2022 08:09:56 +0000 (UTC)
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id B44AF2013F1;
+        Sun,  4 Sep 2022 10:18:08 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 9EB01804A6; Sun,  4 Sep 2022 10:02:50 +0200 (CEST)
+        id C5B1780905; Sun,  4 Sep 2022 12:17:58 +0200 (CEST)
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     linux-kernel@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH] random / hw_random: core: start hwrng kthread also for untrusted sources
-Date:   Sun,  4 Sep 2022 10:02:47 +0200
-Message-Id: <20220904080247.7890-1-linux@dominikbrodowski.net>
+Subject: [PATCH] random: use hwgenerator randomness more frequently at early boot
+Date:   Sun,  4 Sep 2022 12:17:53 +0200
+Message-Id: <20220904101753.3050-1-linux@dominikbrodowski.net>
 X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -39,126 +39,87 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Start the hwrng kthread even if the hwrng source has a quality setting
-of zero. Then, every CRNG_RESEED_INTERVAL, one batch of data from this
-zero-quality hwrng source will be mixed into the CRNG pool.
+Mix in randomness from hw-rng sources more frequently during early
+boot, approximately once for every rng reseed.
 
-However, to avoid that an untrusted device assists in initializing the
-CRNG, go to sleep in add_hwgenerator_randomness() in case the entropy
-parameter passed to that function is zero.
-
-This patch is based on the assumption that data from a hwrng source
-will not actively harm the CRNG state, but that many hwrng sources
-(such as TPM devices), even though they are assigend a quality level of
-zero, actually provide some entropy, which is good to mix into the CRNG
-pool every once in a while.
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 ---
- drivers/char/hw_random/core.c | 36 ++++++++++-------------------------
- drivers/char/random.c         |  4 ++--
- 2 files changed, 12 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 16f227b995e8..edb86c0cccda 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -52,7 +52,7 @@ MODULE_PARM_DESC(default_quality,
- 
- static void drop_current_rng(void);
- static int hwrng_init(struct hwrng *rng);
--static void hwrng_manage_rngd(struct hwrng *rng);
-+static int hwrng_fillfn(void *unused);
- 
- static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
- 			       int wait);
-@@ -96,6 +96,15 @@ static int set_current_rng(struct hwrng *rng)
- 	drop_current_rng();
- 	current_rng = rng;
- 
-+	/* if necessary, start hwrng thread */
-+	if (!hwrng_fill) {
-+		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
-+		if (IS_ERR(hwrng_fill)) {
-+			pr_err("hwrng_fill thread creation failed\n");
-+			hwrng_fill = NULL;
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -167,8 +176,6 @@ static int hwrng_init(struct hwrng *rng)
- 		rng->quality = 1024;
- 	current_quality = rng->quality; /* obsolete */
- 
--	hwrng_manage_rngd(rng);
--
- 	return 0;
- }
- 
-@@ -454,10 +461,6 @@ static ssize_t rng_quality_store(struct device *dev,
- 	/* the best available RNG may have changed */
- 	ret = enable_best_rng();
- 
--	/* start/stop rngd if necessary */
--	if (current_rng)
--		hwrng_manage_rngd(current_rng);
--
- out:
- 	mutex_unlock(&rng_mutex);
- 	return ret ? ret : len;
-@@ -509,9 +512,6 @@ static int hwrng_fillfn(void *unused)
- 		mutex_unlock(&reading_mutex);
- 		put_rng(rng);
- 
--		if (!quality)
--			break;
--
- 		if (rc <= 0) {
- 			pr_warn("hwrng: no data available\n");
- 			msleep_interruptible(10000);
-@@ -533,22 +533,6 @@ static int hwrng_fillfn(void *unused)
- 	return 0;
- }
- 
--static void hwrng_manage_rngd(struct hwrng *rng)
--{
--	if (WARN_ON(!mutex_is_locked(&rng_mutex)))
--		return;
--
--	if (rng->quality == 0 && hwrng_fill)
--		kthread_stop(hwrng_fill);
--	if (rng->quality > 0 && !hwrng_fill) {
--		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
--		if (IS_ERR(hwrng_fill)) {
--			pr_err("hwrng_fill thread creation failed\n");
--			hwrng_fill = NULL;
--		}
--	}
--}
--
- int hwrng_register(struct hwrng *rng)
- {
- 	int err = -EINVAL;
+This patch is currently based on
+	[PATCH] random / hw_random: core: start hwrng kthread also for untrusted sources
+
+Jason, if you prefer that this patch can be applied first (as it
+makes sense also independently of the other patch), this ordering
+should be trivial to change.
+
+ drivers/char/random.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
+
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 79d7d4e4e582..b360ed4ece03 100644
+index b360ed4ece03..5559351f1259 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -867,9 +867,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+@@ -260,25 +260,35 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
+ }
+ 
+ /*
+- * Return whether the crng seed is considered to be sufficiently old
+- * that a reseeding is needed. This happens if the last reseeding
+- * was CRNG_RESEED_INTERVAL ago, or during early boot, at an interval
+- * proportional to the uptime.
++ * Return the interval to the next regular reseed of the crng. This
++ * equals CRNG_RESEED_INTERVAL, or during early boot, an interval
++ * proportional to the uptime,
+  */
+-static bool crng_has_old_seed(void)
++static unsigned int crng_interval(void)
+ {
+ 	static bool early_boot = true;
+-	unsigned long interval = CRNG_RESEED_INTERVAL;
+ 
+ 	if (unlikely(READ_ONCE(early_boot))) {
+ 		time64_t uptime = ktime_get_seconds();
+ 		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
+ 			WRITE_ONCE(early_boot, false);
+ 		else
+-			interval = max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
+-					 (unsigned int)uptime / 2 * HZ);
++			return max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
++				     (unsigned int)uptime / 2 * HZ);
+ 	}
+-	return time_is_before_jiffies(READ_ONCE(base_crng.birth) + interval);
++
++	return CRNG_RESEED_INTERVAL;
++}
++
++/*
++ * Return whether the crng seed is considered to be sufficiently old
++ * that a reseeding is needed. This happens if the last reseeding
++ * was CRNG_RESEED_INTERVAL ago, or during early boot, at an interval
++ * proportional to the uptime.
++ */
++static bool crng_has_old_seed(void)
++{
++	return time_is_before_jiffies(READ_ONCE(base_crng.birth) + crng_interval());
+ }
+ 
+ /*
+@@ -866,11 +876,11 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+ 	credit_init_bits(entropy);
  
  	/*
- 	 * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
--	 * we're not yet initialized.
-+	 * we're not yet initialized or this source isn't trusted.
+-	 * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
++	 * Throttle writing to once every reseed interval, unless
+ 	 * we're not yet initialized or this source isn't trusted.
  	 */
--	if (!kthread_should_stop() && crng_ready())
-+	if (!kthread_should_stop() && (crng_ready() || !entropy))
- 		schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
+ 	if (!kthread_should_stop() && (crng_ready() || !entropy))
+-		schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
++		schedule_timeout_interruptible(crng_interval());
  }
  EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+ 
 -- 
 2.37.3
 
