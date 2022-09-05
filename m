@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD7E8C6FA8D
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 07:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C2CC6FA86
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 07:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236947AbiIEHJF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 03:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
+        id S237485AbiIEHJH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 03:09:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237243AbiIEHHV (ORCPT
+        with ESMTP id S237142AbiIEHHU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 03:07:21 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CD93F30C;
-        Mon,  5 Sep 2022 00:06:57 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id b16so10098634edd.4;
-        Mon, 05 Sep 2022 00:06:57 -0700 (PDT)
+        Mon, 5 Sep 2022 03:07:20 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C303F302;
+        Mon,  5 Sep 2022 00:06:52 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id y3so15186881ejc.1;
+        Mon, 05 Sep 2022 00:06:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=TovwxS/IQLmo+Xng6jJuhfPGUn+AGzgUVGlc7q8PIhw=;
-        b=FC04oRxxg7A/FBOvJl0eh1L8qRBNmW2miLprJU3NgqFWQyzMkGWfPQf/hDXIxOxvVk
-         QsUVJ7O1cUfPUxzRe3nCk1lCxDZeIlK3ddUrReWNVwJFOYhAVTpscU7K7CABe2vDycxG
-         Hv8NcaAmVRIzQ0WN/HGKHezuBXGrlcEFSz2Ut5y9JQpi3OX7rv2bEnTGdH7pZ6VAKOzS
-         ATD21Cai526NqsoFY1IxUdRwlW//9Pm1QON9acQqQsTba6TSye+QHq8ch6S/BLfQhvCw
-         B5rJdNtt1fwNFi30W0PlhThXKtKB5GkklJ86GfpRpdzJm2rogjZnzjL1G2lGjp145uu0
-         7Mpw==
+        bh=utxtg9IZVwjgC6RJQQhltL787qSzW/51yGuH9rnx5/Q=;
+        b=fMTOWksiEyD6+PEElE2UoGKG1iq/iiY1q/XwfM7EEc37/Uu2W3sHZ7w8+CIPPfZa7G
+         LN125q7ottbebHvvWjbfz+CvGRK+9qIOrZt/1nn22BF/jY5/pIKttjrN8/UUI4d6dggU
+         0zbPugCZIEGG5rGEkU1OlE4NrRXUT56Rk0pu3pp+Z/qgMPiW+fiTJ+xtApqoAcj1RVGC
+         Vca/h9w/GQQo0Nap6+mlk6ixQAj8hoEkReOLYphxV0wFqK3HkwmApeD8/pTV5ErO9eH+
+         Q99Y4jFnjwHy8lybdDjKTUbL9zkT/7Tal7ESpDppshD2QwH1wRZbgnrjjuqLCiYFi/vn
+         OuHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=TovwxS/IQLmo+Xng6jJuhfPGUn+AGzgUVGlc7q8PIhw=;
-        b=EhJwl6g1nG1VvN6k08S1+yfDaeBWnUB68i2Mxcwk6w7RQFd1ZRo2UnNuSj0q0ZhLwn
-         AysJd50xGTFd2UCHL58YYXSA13hyYr9s42ENt4Mzta0dxELlPuUOeqpWEJF4awZoeKt+
-         +35fHBxF10B3t5PaGKJ+PjRrgKMS6tFiALy8lfiZtNmXvy1/GPbAUx4RZ2wVYa0yUyjw
-         joLXP6+QMUonG8HeqEPjfPpiWLGl2NfPkNuLQkUiinHZhMTrNajaf1osYw5uVMheyS0p
-         i7Ss2xtFlzRxbS757pVcG9BAntHIszBz8NOMUCZUSypQVdUHTkJkmmfMNRqLZIi0IHzC
-         o7uA==
-X-Gm-Message-State: ACgBeo1urUauFOKKGeicinphwswsNpZpSUpExd9tsA0llFXpjfFoo7uV
-        mpTK/ppkO1DRAKWEWTT9kVs=
-X-Google-Smtp-Source: AA6agR7COv6ceRdcHvs/XAlzrnv2vDerv3vPYXik0bPhzYI2V5KQ7Ls5JlVzdwWLcbBRB3Crnlji/w==
-X-Received: by 2002:a05:6402:3591:b0:448:a15e:3ca0 with SMTP id y17-20020a056402359100b00448a15e3ca0mr27555651edc.195.1662361616465;
-        Mon, 05 Sep 2022 00:06:56 -0700 (PDT)
+        bh=utxtg9IZVwjgC6RJQQhltL787qSzW/51yGuH9rnx5/Q=;
+        b=eNMZu0YP66jXCjwhWQmdODUOMlahidj+kLGRyV8U7znbLuexFDjZVkUg37ITZv/aDc
+         88PShY9/s0XK5GAs/HtpRlTQhdr6X0uaNSOXSZN+nnAnJAAJzz8iMzKsXwC+VfBpvO0A
+         rwe5WRm/JWIhtxw1rYNUu9PVWjMufGbixs5+tu6WYBZCE/6B7U3zyqMYw46Qwri64eU+
+         A5j4rnId+I23L/mwcYk5qGjAr3mml6yKsb7ihueurZVHt4B4kr+H4BE2BHvACatndfYg
+         QTfMcbwm76IhEG1i6XiUB2ttyAn0Xa4NlrsewgAMkrCYdvOVkzBOcxmXwVveznyapcdC
+         wuiw==
+X-Gm-Message-State: ACgBeo0B0VtlS0uY7SrYxFuCDBKopW4yDIQuUmHOiZ+5LcRlFQHsABDf
+        Pdx1IsMok+YoIrJeFhxsP7Q=
+X-Google-Smtp-Source: AA6agR7FXo3sWejox5nyoJTqZAOCVEwBHmIHLVhXEDtJTk0SO4/WpBxwD2B+gxfMoQOImCfk/xGw4g==
+X-Received: by 2002:a17:907:94c4:b0:741:9910:9dd with SMTP id dn4-20020a17090794c400b00741991009ddmr23623915ejc.568.1662361610581;
+        Mon, 05 Sep 2022 00:06:50 -0700 (PDT)
 Received: from localhost.localdomain ([2a04:241e:502:a080:40ec:9f50:387:3cfb])
-        by smtp.gmail.com with ESMTPSA id n27-20020a056402515b00b0043cf2e0ce1csm5882775edd.48.2022.09.05.00.06.54
+        by smtp.gmail.com with ESMTPSA id n27-20020a056402515b00b0043cf2e0ce1csm5882775edd.48.2022.09.05.00.06.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Sep 2022 00:06:55 -0700 (PDT)
+        Mon, 05 Sep 2022 00:06:50 -0700 (PDT)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -70,9 +70,9 @@ Cc:     Francesco Ruggeri <fruggeri@arista.com>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v8 23/26] tcp: authopt: Initial implementation of TCP_REPAIR_AUTHOPT
-Date:   Mon,  5 Sep 2022 10:05:59 +0300
-Message-Id: <ace7764cc7fca32864d09d4ee6042dc8b90cb773.1662361354.git.cdleonard@gmail.com>
+Subject: [PATCH v8 20/26] tcp: authopt: If no keys are valid for send report an error
+Date:   Mon,  5 Sep 2022 10:05:56 +0300
+Message-Id: <f302529ecfece72f1d599bb614e3358789c36aed.1662361354.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1662361354.git.cdleonard@gmail.com>
 References: <cover.1662361354.git.cdleonard@gmail.com>
@@ -82,226 +82,130 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to support TCP_REPAIR for connections using RFC5925
-Authentication Option add a sockopt to get/set ISN and SNE values.
+If this is not treated specially then when all keys are removed or
+expired then TCP will start sending unsigned packets which is
+undesirable. Instead try to report an error on key selection and
+propagate it to userspace.
 
-The TCP_REPAIR_AUTHOxpTP sockopt is only allowed when the socket is
-already in "repair" mode, this behavior is shared with other sockopts
-relevant to TCP_REPAIR.
+The error is assigned to sk_err and propagate it as soon as possible.
+In theory we could try to make the error "soft" and even let the
+connection continue if userspace adds a new key but the advantages are
+unclear.
 
-The setsockopt further requires the TCP_ESTABLISHED state, this is
-because it relies on snd_nxt which is only initialized after connect().
+Since userspace is responsible for managing keys it can also avoid
+sending unsigned packets by always closing the socket before removing
+the active last key.
 
-For SNE restoration we provide a full 64-bit sequence number on "get" and
-handle any recent 64-bit sequence number on "set", where recent means
-"within ~2GB to the current window".
+The specific error reported is ENOKEY.
 
-Linux tracks snd_sne and rcv_sne as the extension of snd_nxt and
-rcv_nxt but this is an implementation detail and snd_nxt doesn't even
-seem to be one of the values that can be read by userspace. Handling SNE
-with 64-bit values means userspace doesn't need to worry about matching
-snd_nxt.
+This requires changes inside TCP option write code to support aborting
+the actual packet send, until this point this did not happen in any
+scenario.
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- include/net/tcp_authopt.h |  2 ++
- include/uapi/linux/tcp.h  | 19 +++++++++++
- net/ipv4/tcp.c            | 23 ++++++++++++++
- net/ipv4/tcp_authopt.c    | 66 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 110 insertions(+)
+ net/ipv4/tcp_authopt.c |  4 ++++
+ net/ipv4/tcp_output.c  | 20 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-index 759b6d71fe86..5a8cea32a5f3 100644
---- a/include/net/tcp_authopt.h
-+++ b/include/net/tcp_authopt.h
-@@ -236,10 +236,12 @@ static inline void tcp_authopt_update_snd_sne(struct tcp_sock *tp, u32 seq)
- 						 lockdep_sock_is_held((struct sock *)tp));
- 		if (info)
- 			__tcp_authopt_update_snd_sne(tp, info, seq);
- 	}
- }
-+int tcp_get_authopt_repair_val(struct sock *sk, struct tcp_authopt_repair *opt);
-+int tcp_set_authopt_repair(struct sock *sk, sockptr_t optval, unsigned int optlen);
- #else
- static inline void tcp_authopt_clear(struct sock *sk)
- {
- }
- static inline int tcp_authopt_openreq(struct sock *newsk,
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index ff8b53f4209d..d6911d9c2b4e 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -128,10 +128,11 @@ enum {
- #define TCP_CM_INQ		TCP_INQ
- 
- #define TCP_TX_DELAY		37	/* delay outgoing packets by XX usec */
- #define TCP_AUTHOPT		38	/* TCP Authentication Option (RFC5925) */
- #define TCP_AUTHOPT_KEY		39	/* TCP Authentication Option Key (RFC5925) */
-+#define TCP_REPAIR_AUTHOPT	40
- 
- 
- #define TCP_REPAIR_ON		1
- #define TCP_REPAIR_OFF		0
- #define TCP_REPAIR_OFF_NO_WP	-1	/* Turn off without window probes */
-@@ -509,10 +510,28 @@ struct tcp_authopt_key {
- 	__u64	recv_lifetime_begin;
- 	/** @recv_lifetime_end: End of recv lifetime */
- 	__u64	recv_lifetime_end;
- };
- 
-+/**
-+ * struct tcp_authopt_repair - TCP_REPAIR information related to Authentication Option
-+ * @src_isn: Local Initial Sequence Number
-+ * @dst_isn: Remote Initial Sequence Number
-+ * @snd_sne: Sequence Number Extension for Send (upper 32 bits of snd_seq)
-+ * @rcv_sne: Sequence Number Extension for Recv (upper 32 bits of rcv_seq)
-+ * @snd_seq: Recent Send Sequence Number (lower 32 bits of snd_sne)
-+ * @rcv_seq: Recent Recv Sequence Number (lower 32 bits of rcv_sne)
-+ */
-+struct tcp_authopt_repair {
-+	__u32	src_isn;
-+	__u32	dst_isn;
-+	__u32	snd_sne;
-+	__u32	rcv_sne;
-+	__u32	snd_seq;
-+	__u32	rcv_seq;
-+};
-+
- /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
- 
- #define TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT 0x1
- struct tcp_zerocopy_receive {
- 	__u64 address;		/* in: address of mapping */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index dd31e78bd22d..1e0dcfae23f5 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3712,10 +3712,13 @@ static int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 		err = tcp_set_authopt(sk, optval, optlen);
- 		break;
- 	case TCP_AUTHOPT_KEY:
- 		err = tcp_set_authopt_key(sk, optval, optlen);
- 		break;
-+	case TCP_REPAIR_AUTHOPT:
-+		err = tcp_set_authopt_repair(sk, optval, optlen);
-+		break;
- #endif
- 	case TCP_USER_TIMEOUT:
- 		/* Cap the max time in ms TCP will retry or probe the window
- 		 * before giving up and aborting (ETIMEDOUT) a connection.
- 		 */
-@@ -4384,10 +4387,30 @@ static int do_tcp_getsockopt(struct sock *sk, int level,
- 			return -EFAULT;
- 		if (copy_to_user(optval, &info, len))
- 			return -EFAULT;
- 		return 0;
- 	}
-+	case TCP_REPAIR_AUTHOPT: {
-+		struct tcp_authopt_repair val;
-+		int err;
-+
-+		if (get_user(len, optlen))
-+			return -EFAULT;
-+
-+		lock_sock(sk);
-+		err = tcp_get_authopt_repair_val(sk, &val);
-+		release_sock(sk);
-+
-+		if (err)
-+			return err;
-+		len = min_t(unsigned int, len, sizeof(val));
-+		if (put_user(len, optlen))
-+			return -EFAULT;
-+		if (copy_to_user(optval, &val, len))
-+			return -EFAULT;
-+		return 0;
-+	}
- #endif
- 
- 	default:
- 		return -ENOPROTOOPT;
- 	}
 diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index b4158b430b79..1c571a977224 100644
+index ba16b8c50565..2a1ddae69b27 100644
 --- a/net/ipv4/tcp_authopt.c
 +++ b/net/ipv4/tcp_authopt.c
-@@ -1839,10 +1839,76 @@ int __tcp_authopt_inbound_check(struct sock *sk, struct sk_buff *skb,
- 	save_inbound_key_info(info, opt);
- 	return 1;
- }
- EXPORT_SYMBOL(__tcp_authopt_inbound_check);
+@@ -555,10 +555,12 @@ struct tcp_authopt_key_info *__tcp_authopt_select_key(const struct sock *sk,
+ 		if (info->flags & TCP_AUTHOPT_FLAG_LOCK_KEYID)
+ 			pref_send_id = info->user_pref_send_keyid;
+ 		else
+ 			pref_send_id = -1;
+ 		key = tcp_authopt_lookup_send(net, addr_sk, pref_send_id, rnextkeyid, &anykey);
++		if (!key && anykey)
++			return ERR_PTR(-ENOKEY);
  
-+int tcp_get_authopt_repair_val(struct sock *sk, struct tcp_authopt_repair *opt)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct tcp_authopt_info *info;
-+	int err;
-+
-+	memset(opt, 0, sizeof(*opt));
-+	sock_owned_by_me(sk);
-+	err = check_sysctl_tcp_authopt();
-+	if (err)
-+		return err;
-+	if (!tp->repair)
-+		return -EPERM;
-+
-+	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
-+	if (!info)
-+		return -ENOENT;
-+
-+	opt->dst_isn = info->dst_isn;
-+	opt->src_isn = info->src_isn;
-+	opt->rcv_sne = info->rcv_sne;
-+	opt->snd_sne = info->snd_sne;
-+	opt->rcv_seq = tp->rcv_nxt;
-+	opt->snd_seq = tp->snd_nxt;
-+
-+	return 0;
-+}
-+
-+int tcp_set_authopt_repair(struct sock *sk, sockptr_t optval, unsigned int optlen)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct tcp_authopt_info *info;
-+	struct tcp_authopt_repair val;
-+	int err;
-+
-+	sock_owned_by_me(sk);
-+	err = check_sysctl_tcp_authopt();
-+	if (err)
-+		return err;
-+
-+	if (optlen != sizeof(val))
-+		return -EFAULT;
-+	if (copy_from_sockptr(&val, optval, sizeof(val)))
-+		return -EFAULT;
-+
-+	/* tcp_authopt repair relies on fields that are only initialized after
-+	 * tcp_connect. Doing this setsockopt before connect() can't be correct
-+	 * so return an error.
-+	 */
-+	if (sk->sk_state != TCP_ESTABLISHED)
-+		return -EPERM;
-+
-+	info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
-+	if (!info)
-+		return -ENOENT;
-+	if (!tp->repair)
-+		return -EPERM;
-+
-+	info->dst_isn = val.dst_isn;
-+	info->src_isn = val.src_isn;
-+	info->rcv_sne = compute_sne(val.rcv_sne, val.rcv_seq, tp->rcv_nxt);
-+	info->snd_sne = compute_sne(val.snd_sne, val.snd_seq, tp->snd_nxt);
-+
-+	return 0;
-+}
-+
- #ifdef CONFIG_PROC_FS
- struct tcp_authopt_iter_state {
- 	struct seq_net_private p;
- };
+ 		return key;
+ 	}
  
+ 	/* Try to keep the same sending key unless user or peer requires a different key
+@@ -569,10 +571,12 @@ struct tcp_authopt_key_info *__tcp_authopt_select_key(const struct sock *sk,
+ 	else
+ 		pref_send_id = info->recv_rnextkeyid;
+ 
+ 	key = tcp_authopt_lookup_send(net, addr_sk, pref_send_id, rnextkeyid, &anykey);
+ 
++	if (!key && anykey)
++		return ERR_PTR(-ENOKEY);
+ 	if (!key)
+ 		return NULL;
+ 
+ 	info->send_keyid = key->send_id;
+ 	if (rnextkeyid) {
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index d48d5dc36916..e8a6fec22fbf 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -411,10 +411,11 @@ static inline bool tcp_urg_mode(const struct tcp_sock *tp)
+ #define OPTION_SACK_ADVERTISE	BIT(0)
+ #define OPTION_TS		BIT(1)
+ #define OPTION_MD5		BIT(2)
+ #define OPTION_WSCALE		BIT(3)
+ #define OPTION_AUTHOPT		BIT(4)
++#define OPTION_AUTHOPT_FAIL	BIT(5)
+ #define OPTION_FAST_OPEN_COOKIE	BIT(8)
+ #define OPTION_SMC		BIT(9)
+ #define OPTION_MPTCP		BIT(10)
+ 
+ static void smc_options_write(__be32 *ptr, u16 *options)
+@@ -783,10 +784,14 @@ static int tcp_authopt_init_options(const struct sock *sk,
+ {
+ #ifdef CONFIG_TCP_AUTHOPT
+ 	struct tcp_authopt_key_info *key;
+ 
+ 	key = tcp_authopt_select_key(sk, addr_sk, &opts->authopt_info, &opts->authopt_rnextkeyid);
++	if (IS_ERR(key)) {
++		opts->options |= OPTION_AUTHOPT_FAIL;
++		return TCPOLEN_AUTHOPT_OUTPUT;
++	}
+ 	if (key) {
+ 		opts->options |= OPTION_AUTHOPT;
+ 		opts->authopt_key = key;
+ 		return TCPOLEN_AUTHOPT_OUTPUT;
+ 	}
+@@ -1342,10 +1347,18 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 		 * release the following packet.
+ 		 */
+ 		if (tcp_skb_pcount(skb) > 1)
+ 			tcb->tcp_flags |= TCPHDR_PSH;
+ 	}
++#ifdef CONFIG_TCP_AUTHOPT
++	if (opts.options & OPTION_AUTHOPT_FAIL) {
++		rcu_read_unlock();
++		sk->sk_err = ENOKEY;
++		sk_error_report(sk);
++		return -ENOKEY;
++	}
++#endif
+ 	tcp_header_size = tcp_options_size + sizeof(struct tcphdr);
+ 
+ 	/* if no packet is in qdisc/device queue, then allow XPS to select
+ 	 * another queue. We can be called from tcp_tsq_handler()
+ 	 * which holds one reference to sk.
+@@ -3652,10 +3665,17 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 	/* bpf program will be interested in the tcp_flags */
+ 	TCP_SKB_CB(skb)->tcp_flags = TCPHDR_SYN | TCPHDR_ACK;
+ 	tcp_header_size = tcp_synack_options(sk, req, mss, skb, &opts, md5,
+ 					     foc, synack_type,
+ 					     syn_skb) + sizeof(*th);
++#ifdef CONFIG_TCP_AUTHOPT
++	if (opts.options & OPTION_AUTHOPT_FAIL) {
++		rcu_read_unlock();
++		kfree_skb(skb);
++		return NULL;
++	}
++#endif
+ 
+ 	skb_push(skb, tcp_header_size);
+ 	skb_reset_transport_header(skb);
+ 
+ 	th = (struct tcphdr *)skb->data;
 -- 
 2.25.1
 
