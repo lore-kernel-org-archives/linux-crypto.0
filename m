@@ -2,100 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F03ECAAD5
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 14:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D67ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 20:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236305AbiIEOWc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 10:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        id S231226AbiIEUYZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 16:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230293AbiIEOWc (ORCPT
+        with ESMTP id S230139AbiIEUYY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 10:22:32 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 896A13B958;
-        Mon,  5 Sep 2022 07:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=N7pFEpgeBITd5OyNwVUMI6CTbDxc2SQpld2QOauPWdU=; b=aof6Eyb7jjCXNwHwOoNzI7JX5Q
-        XfDCkDcFFfP3QOsO5n0j9PbnMzE99XZesQ0FP+ytaZKGolBb4Ozmgw5pInJje5pDV9FT/sNhFkJFX
-        qcAFjaEsHxtDxqT3L5LH30QD9UVehlEOIltBORXyGQndGAAKTkPDys1Y5DPgDdcbv4DiS7uMeTVKT
-        LE7NjptLVxKe7IL3JBQsjkM2PgFE0dbAhhczhr1VwmrmF8zHvP7e60CMjlg+PTGBQAwFSvzFpU80S
-        EKwXsGuKauhQBXgGUXTTaf6ZAgYiFC79ak2It1J/rRPQvMdV4o9WrluTJwDYQVPAFtNowdIJA0fIU
-        FaPhRx8A==;
-Received: from [2601:1c0:6280:3f0::a6b3]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oVCzT-004M2O-6j; Mon, 05 Sep 2022 14:22:19 +0000
-Message-ID: <c6335594-88f2-3769-234f-1135e3bb09b9@infradead.org>
-Date:   Mon, 5 Sep 2022 07:22:17 -0700
+        Mon, 5 Sep 2022 16:24:24 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC786171C
+        for <linux-crypto@vger.kernel.org>; Mon,  5 Sep 2022 13:24:19 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id s23so5768838wmj.4
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Sep 2022 13:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=wlyo+5iK/1uo9/64yjQ2ELZxRLIzl1XF18VskNivGNE=;
+        b=ETlCi5JPk/fvJRK3wkXwhNsSXmNCkUXKF2KR8HA0KOU+ga/StHDOaZUDBzOmJr/Zou
+         qlCCfMlzEjjH87shQ+AElP83rFCkLN/635NLcbvIwVxG5VyI42dKB3Ti94hZ9lwc+wFg
+         nbX0UBxLgo9gTV5+udOzLjXXxbq0mhfKcxy7QFWV6nsK6P2a7cBFdctqM6IOq0ytltBf
+         iHHw6ROWi+XmLxrgyDDt+N6sSw4UVeFOz35LZnM/hEJg7Wy7Z+L4jg+d/0so+aAv3GEM
+         Fn0MgGPhcjGEG5FX1W3gUA57aNXJ18/xj8W6CzaO0XZ2uMqpUtpqPgtWM5aBO13y0Owy
+         oIZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=wlyo+5iK/1uo9/64yjQ2ELZxRLIzl1XF18VskNivGNE=;
+        b=azZclQzDKqMB9y7qbyQRb34TvgafRj0W3eztulaQOCjciDig8fjJES0c6Jk7n+LRY5
+         GPlWFJHo6P5CiXcoZzEqiZX70LIKmuJR+QRLU/XX1Y7Wa3XQmjGtMZfYrLUXzJ+DqV6X
+         MSCcyKnovW17mlH6UedyLvzA09t/7zY+ZAfisOAMS2rmsmIUPNbbILRH3/oR0a39oqRQ
+         8nuhzJ7izYej95kyoY5zqFyHReBVI1mhUpnFRXeW26SnPvz5JQcIQKlFRda6AXpMreE4
+         CBjXOjpuwWJ6go2QtE0vmV+4yjWi7L8Wxm3aZTD8Tmi7S6tn+rT0DRJ2qxgcqZDYuP+5
+         7IKw==
+X-Gm-Message-State: ACgBeo3nac3dy41VSpTFViX616qg/ks54a6qRXMzmp7s7Cw88nNDZXMZ
+        BxapBrQAwuK0XngrX4Bye8EsPw==
+X-Google-Smtp-Source: AA6agR7KJn/aGLt/PsCEULFrz221gkhfqlcXADY+GUxjuKx3jSBzBosg6ByMqLWSXlmipfR3wgoLpQ==
+X-Received: by 2002:a05:600c:2193:b0:3a5:346f:57d0 with SMTP id e19-20020a05600c219300b003a5346f57d0mr11547037wme.124.1662409458450;
+        Mon, 05 Sep 2022 13:24:18 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id w4-20020adfee44000000b0022863c18b93sm5790695wro.13.2022.09.05.13.24.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Sep 2022 13:24:17 -0700 (PDT)
+Message-ID: <003aca05-00e6-8661-a330-686096be89bd@arista.com>
+Date:   Mon, 5 Sep 2022 21:24:09 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH v2] crypto: aspeed: fix format unexpected build warning
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH 25/31] selftests/net: Add TCP-AO library
 Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
+To:     Shuah Khan <skhan@linuxfoundation.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>
-Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>
-References: <20220905052449.1830669-1-neal_liu@aspeedtech.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20220905052449.1830669-1-neal_liu@aspeedtech.com>
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20220818170005.747015-1-dima@arista.com>
+ <20220818170005.747015-26-dima@arista.com>
+ <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 9/4/22 22:24, Neal Liu wrote:
-> This fixes the following similar build warning when
-> enabling compile test:
+On 8/23/22 16:47, Shuah Khan wrote:
+> On 8/18/22 10:59 AM, Dmitry Safonov wrote:
+>> Provide functions to create selftests dedicated to TCP-AO.
+>> They can run in parallel, as they use temporary net namespaces.
+>> They can be very specific to the feature being tested.
+>> This will allow to create a lot of TCP-AO tests, without complicating
+>> one binary with many --options and to create scenarios, that are
+>> hard to put in bash script that uses one binary.
+>>
+>> Signed-off-by: Dmitry Safonov <dima@arista.com>
+>> ---
+>>   tools/testing/selftests/Makefile              |   1 +
+>>   tools/testing/selftests/net/tcp_ao/.gitignore |   2 +
+>>   tools/testing/selftests/net/tcp_ao/Makefile   |  45 +++
+>>   tools/testing/selftests/net/tcp_ao/connect.c  |  81 +++++
+>>   .../testing/selftests/net/tcp_ao/lib/aolib.h  | 333 +++++++++++++++++
+>>   .../selftests/net/tcp_ao/lib/netlink.c        | 341 ++++++++++++++++++
+>>   tools/testing/selftests/net/tcp_ao/lib/proc.c | 267 ++++++++++++++
+>>   .../testing/selftests/net/tcp_ao/lib/setup.c  | 297 +++++++++++++++
+>>   tools/testing/selftests/net/tcp_ao/lib/sock.c | 294 +++++++++++++++
+>>   .../testing/selftests/net/tcp_ao/lib/utils.c  |  30 ++
+>>   10 files changed, 1691 insertions(+)
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/.gitignore
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/Makefile
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/connect.c
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/aolib.h
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/netlink.c
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/proc.c
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/setup.c
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/sock.c
+>>   create mode 100644 tools/testing/selftests/net/tcp_ao/lib/utils.c
+>>
+>> diff --git a/tools/testing/selftests/Makefile
+>> b/tools/testing/selftests/Makefile
+>> index 10b34bb03bc1..2a3b15a13ccb 100644
+>> --- a/tools/testing/selftests/Makefile
+>> +++ b/tools/testing/selftests/Makefile
+>> @@ -46,6 +46,7 @@ TARGETS += net
+>>   TARGETS += net/af_unix
+>>   TARGETS += net/forwarding
+>>   TARGETS += net/mptcp
+>> +TARGETS += net/tcp_ao
 > 
-> aspeed-hace-hash.c:188:9: warning: format '%x' expects argument of type
-> 'unsigned int', but argument 7 has type 'size_t' {aka 'long unsigned int'}
-> [-Wformat=]
+> Please look into a wayto invoke all of them instead of adding individual
+> net/* to the main Makefile. This list seems to be growing. :)
+
+Sent a patch separately to allow sub-dir defining their $(TARGETS):
+https://lore.kernel.org/all/20220905202108.89338-1-dima@arista.com/T/#u
+
+Will rebase this patch set if the other gets in :)
+
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
-
-> ---
-> v2: Use "%zu" format to print size_t.
+>>   TARGETS += netfilter
+>>   TARGETS += nsfs
+>>   TARGETS += pidfd
 > 
->  drivers/crypto/aspeed/aspeed-hace-hash.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/aspeed/aspeed-hace-hash.c b/drivers/crypto/aspeed/aspeed-hace-hash.c
-> index 0a44ffc0e13b..6e833d238253 100644
-> --- a/drivers/crypto/aspeed/aspeed-hace-hash.c
-> +++ b/drivers/crypto/aspeed/aspeed-hace-hash.c
-> @@ -185,7 +185,7 @@ static int aspeed_ahash_dma_prepare_sg(struct aspeed_hace_dev *hace_dev)
->  	remain = (rctx->total + rctx->bufcnt) % rctx->block_size;
->  	length = rctx->total + rctx->bufcnt - remain;
->  
-> -	AHASH_DBG(hace_dev, "%s:0x%x, %s:0x%x, %s:0x%x, %s:0x%x\n",
-> +	AHASH_DBG(hace_dev, "%s:0x%x, %s:%zu, %s:0x%x, %s:0x%x\n",
->  		  "rctx total", rctx->total, "bufcnt", rctx->bufcnt,
->  		  "length", length, "remain", remain);
->  
-> @@ -324,7 +324,7 @@ static int aspeed_hace_ahash_trigger(struct aspeed_hace_dev *hace_dev,
->  	struct ahash_request *req = hash_engine->req;
->  	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
->  
-> -	AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:0x%x\n",
-> +	AHASH_DBG(hace_dev, "src_dma:%zu, digest_dma:%zu, length:%zu\n",
->  		  hash_engine->src_dma, hash_engine->digest_dma,
->  		  hash_engine->src_length);
->  
+> [snip]
 
--- 
-~Randy
+[..]
+Thanks,
+          Dmitry
