@@ -2,74 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F473ECAAD3
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 11:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB98ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 12:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237863AbiIELFE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 07:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58702 "EHLO
+        id S230054AbiIEMC5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 08:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238097AbiIELE7 (ORCPT
+        with ESMTP id S237006AbiIEMC4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 07:04:59 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039371ADB2;
-        Mon,  5 Sep 2022 04:04:54 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oV9tz-001AdR-4B; Mon, 05 Sep 2022 21:04:28 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 05 Sep 2022 19:04:27 +0800
-Date:   Mon, 5 Sep 2022 19:04:27 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Subject: Re: [PATCH v2] crypto: aspeed: fix build module error
-Message-ID: <YxXXuyNrQIcMZBLI@gondor.apana.org.au>
-References: <20220905025433.1610696-1-neal_liu@aspeedtech.com>
+        Mon, 5 Sep 2022 08:02:56 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281FA5D0D9;
+        Mon,  5 Sep 2022 05:02:55 -0700 (PDT)
+Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MLnB12zYqzjXf8;
+        Mon,  5 Sep 2022 19:59:21 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 5 Sep 2022 20:02:53 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 5 Sep 2022 20:02:53 +0800
+Subject: Re: [PATCH v7 2/3] Documentation: add a isolation strategy sysfs node
+ for uacce
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@kernel.org>
+References: <20220806022943.47292-1-yekai13@huawei.com>
+ <20220806022943.47292-3-yekai13@huawei.com> <YxDJ6PEWd/3c1jPd@kroah.com>
+ <YxDlOFYih5tQ37Av@sol.localdomain> <YxD1byMGE03R8YWT@kroah.com>
+CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
+        <liulongfang@huawei.com>
+From:   "yekai (A)" <yekai13@huawei.com>
+Message-ID: <58cecd16-c992-c6b0-76b1-0ba7f2ac4845@huawei.com>
+Date:   Mon, 5 Sep 2022 20:02:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220905025433.1610696-1-neal_liu@aspeedtech.com>
+In-Reply-To: <YxD1byMGE03R8YWT@kroah.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 05, 2022 at 10:54:33AM +0800, Neal Liu wrote:
+
+
+On 2022/9/2 2:09, Greg KH wrote:
+> On Thu, Sep 01, 2022 at 10:00:40AM -0700, Eric Biggers wrote:
+>> On Thu, Sep 01, 2022 at 05:04:08PM +0200, Greg KH wrote:
+>>> On Sat, Aug 06, 2022 at 10:29:42AM +0800, Kai Ye wrote:
+>>>> Update documentation describing sysfs node that could help to
+>>>> configure isolation strategy for users in the user space. And
+>>>> describing sysfs node that could read the device isolated state.
+>>>>
+>>>> Signed-off-by: Kai Ye <yekai13@huawei.com>
+>>>> ---
+>>>>  Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
+>>>>  1 file changed, 26 insertions(+)
+>>>>
+>>>> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+>>>> index 08f2591138af..e09fd160d3fa 100644
+>>>> --- a/Documentation/ABI/testing/sysfs-driver-uacce
+>>>> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+>>>> @@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
+>>>>  Description:    Available instances left of the device
+>>>>                  Return -ENODEV if uacce_ops get_available_instances is not provided
+>>>>  
+>>>> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
+>>>> +Date:           Jul 2022
+>>> July was a while ago, you sent this patch in August :(
+>>>
+>> Does the date in the sysfs documentation files serve any purpose besides making
+>> people have to update their patchsets every month?
+>>
+>> The kernel version number would be more useful to readers of the documentation,
+>> and it wouldn't have to be updated quite as often.
+> True, I have seen people use that instead, or no date at all, I don't
+> require it.  But if you do put the field in there, it should at least be
+> correct :)
 >
-> diff --git a/drivers/crypto/aspeed/Makefile b/drivers/crypto/aspeed/Makefile
-> index 421e2ca9c53e..3be78cec0ecb 100644
-> --- a/drivers/crypto/aspeed/Makefile
-> +++ b/drivers/crypto/aspeed/Makefile
-> @@ -1,9 +1,6 @@
-> +hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) := aspeed-hace.o aspeed-hace-hash.o
-> +hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) := aspeed-hace.o aspeed-hace-crypto.o
-> +
->  obj-$(CONFIG_CRYPTO_DEV_ASPEED) += aspeed_crypto.o
-> -aspeed_crypto-objs := aspeed-hace.o	\
-> -		      $(hace-hash-y)	\
-> +aspeed_crypto-objs := $(hace-hash-y)	\
->  		      $(hace-crypto-y)
+> thanks,
+>
+> greg k-h
+> .
+>
+I have fixed the date in version v8
 
-Does this still build if both HASH and CRYPTO are off?
-
-I think this it's best if you do:
-
-hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) := aspeed-hace-hash.o
-hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) := aspeed-hace-crypto.o
-
-obj-$(CONFIG_CRYPTO_DEV_ASPEED) += aspeed_crypto.o
-aspeed_crypto-objs := aspeed-hace.o	\
-		      $(hace-hash-y)	\
-		      $(hace-crypto-y)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+thanks
+Kai
