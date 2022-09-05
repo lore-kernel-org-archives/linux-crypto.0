@@ -2,82 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BB7ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 04:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E16FECAAA1
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Sep 2022 05:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233916AbiIEEQD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 00:16:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40818 "EHLO
+        id S234907AbiIEFZG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 01:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232094AbiIEEQC (ORCPT
+        with ESMTP id S230013AbiIEFZF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 00:16:02 -0400
-Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.133.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD14D22534
-        for <linux-crypto@vger.kernel.org>; Sun,  4 Sep 2022 21:16:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
-        s=selector; t=1662351361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xyLRC/HXJQzbNsEggZ5hesrJmXE8eSpUpvyD9azmo18=;
-        b=hJIQtlL5XZ4ulE4O2+g7x/BWDVMYZXex3wmauON7H7tBZO5ljQnICruuRgy851IX38b2id
-        lxj6vd/Kultr9jI76Fi+h9R+CZG4c0Iz9Ld5mZAhbBRnheM2jwtTIScMBXwRvQffILeSNH
-        GD+gK45nfqBCb6FqLBB1knIKwnpI3H8afQAbdjBjKL3gOTB0c3+LUF0IcutpjQTPle/B7Y
-        +uef5LzeC7A/WQzT557Mfb/5iudVuGtL3eKKKDJYH/MDK8FHpexJF2HV7DnRpSr3kuD9DU
-        yH9+sJZVXwhyiCKYw8f/4dnGaFE3Jz0D4Rgu1mQmmkh9RAyqExVDJQ816zoDdA==
-Received: from mail.maxlinear.com (174-47-1-83.static.ctl.one [174.47.1.83])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- us-mta-321-WyYANILmOp6YjgdGpRM8Hg-1; Mon, 05 Sep 2022 00:14:52 -0400
-X-MC-Unique: WyYANILmOp6YjgdGpRM8Hg-1
-Received: from sgsxdev002.isng.phoenix.local (10.226.81.112) by
- mail.maxlinear.com (10.23.38.120) with Microsoft SMTP Server id 15.1.2375.24;
- Sun, 4 Sep 2022 21:14:49 -0700
-From:   Peter Harliman Liem <pliem@maxlinear.com>
-To:     <atenart@kernel.org>, <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-lgm-soc@maxlinear.com>,
-        "Peter Harliman Liem" <pliem@maxlinear.com>
-Subject: [PATCH 2/2] crypto: inside-secure - Select CRYPTO_AES config
-Date:   Mon, 5 Sep 2022 12:14:44 +0800
-Message-ID: <ba011c14c0467c094afb062c3fe2cafe16c2b6b0.1662351087.git.pliem@maxlinear.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <b08e76c7ff0e46e25e21ee0827fcf3b0e94556bf.1662351087.git.pliem@maxlinear.com>
-References: <b08e76c7ff0e46e25e21ee0827fcf3b0e94556bf.1662351087.git.pliem@maxlinear.com>
+        Mon, 5 Sep 2022 01:25:05 -0400
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93B114D32
+        for <linux-crypto@vger.kernel.org>; Sun,  4 Sep 2022 22:24:59 -0700 (PDT)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 28554xED058697;
+        Mon, 5 Sep 2022 13:04:59 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 5 Sep
+ 2022 13:24:53 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Randy Dunlap <rdunlap@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>
+CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v2] crypto: aspeed: fix format unexpected build warning
+Date:   Mon, 5 Sep 2022 13:24:49 +0800
+Message-ID: <20220905052449.1830669-1-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: maxlinear.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 28554xED058697
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CRYPTO_AES is needed for aes-related algo (e.g.
-safexcel-gcm-aes, safexcel-xcbc-aes, safexcel-cmac-aes).
-Without it, we observe failures when allocating transform
-for those algo.
+This fixes the following similar build warning when
+enabling compile test:
 
-Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
+aspeed-hace-hash.c:188:9: warning: format '%x' expects argument of type
+'unsigned int', but argument 7 has type 'size_t' {aka 'long unsigned int'}
+[-Wformat=]
+
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
 ---
- drivers/crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+v2: Use "%zu" format to print size_t.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 3e6aa319920b..b12d222e49a1 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -740,6 +740,7 @@ config CRYPTO_DEV_SAFEXCEL
- =09select CRYPTO_SHA512
- =09select CRYPTO_CHACHA20POLY1305
- =09select CRYPTO_SHA3
-+=09select CRYPTO_AES
- =09help
- =09  This driver interfaces with the SafeXcel EIP-97 and EIP-197 cryptogra=
-phic
- =09  engines designed by Inside Secure. It currently accelerates DES, 3DES=
- and
---=20
-2.17.1
+ drivers/crypto/aspeed/aspeed-hace-hash.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/aspeed/aspeed-hace-hash.c b/drivers/crypto/aspeed/aspeed-hace-hash.c
+index 0a44ffc0e13b..6e833d238253 100644
+--- a/drivers/crypto/aspeed/aspeed-hace-hash.c
++++ b/drivers/crypto/aspeed/aspeed-hace-hash.c
+@@ -185,7 +185,7 @@ static int aspeed_ahash_dma_prepare_sg(struct aspeed_hace_dev *hace_dev)
+ 	remain = (rctx->total + rctx->bufcnt) % rctx->block_size;
+ 	length = rctx->total + rctx->bufcnt - remain;
+ 
+-	AHASH_DBG(hace_dev, "%s:0x%x, %s:0x%x, %s:0x%x, %s:0x%x\n",
++	AHASH_DBG(hace_dev, "%s:0x%x, %s:%zu, %s:0x%x, %s:0x%x\n",
+ 		  "rctx total", rctx->total, "bufcnt", rctx->bufcnt,
+ 		  "length", length, "remain", remain);
+ 
+@@ -324,7 +324,7 @@ static int aspeed_hace_ahash_trigger(struct aspeed_hace_dev *hace_dev,
+ 	struct ahash_request *req = hash_engine->req;
+ 	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
+ 
+-	AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:0x%x\n",
++	AHASH_DBG(hace_dev, "src_dma:%zu, digest_dma:%zu, length:%zu\n",
+ 		  hash_engine->src_dma, hash_engine->digest_dma,
+ 		  hash_engine->src_length);
+ 
+-- 
+2.25.1
 
