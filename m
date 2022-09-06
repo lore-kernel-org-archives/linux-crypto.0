@@ -2,405 +2,248 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90549ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9B9ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:55:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233380AbiIFQtn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 12:49:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
+        id S233308AbiIFQzd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 12:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233387AbiIFQtV (ORCPT
+        with ESMTP id S238538AbiIFQxR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:49:21 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5F01D30C
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 09:34:50 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id e20so16260462wri.13
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:34:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=UMK536Buc3tyACpoqD9UkBRLk6CrV6AwT1m3G1iH3lY=;
-        b=W79QCDBfsBZhY3udIZXglanrIDIK2Ag1acFspTBUuEF1/zduN20nn5hDx0oEbVDSMK
-         D42ymkytni7ohKpgDiTTnfh0xZSCPowoGk/EGCUuXijnMyeFTOAeMw92RcCouQquFJKw
-         m7ZbK5S8QyorES2/LX7nPUU7GThTaJERju5MWunPdatU9CiIKW6MSqIPKwI43A9n5ONc
-         MG7PgczvAiv7WsYVx65gS5Y8wVJNMHgcuFnkofV6IxZt0WvuveZOE4Wr8MdVgZ2CpJTM
-         LaRgUp+qTdp5OcCZhqfOJFvnSOAV0iqXj1d5dKPxEDdbG64E9NWwcaerpXj3iryPfoIp
-         rRQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=UMK536Buc3tyACpoqD9UkBRLk6CrV6AwT1m3G1iH3lY=;
-        b=4aA1Z0li/hG8UausOPg05x5tW6UdCFmfgdDK5+BkA9zkVfsnWbImBkyKPOrSDJ1JB2
-         HViDlMsZzR1b5Lx0HZl43kTXrM5lzGXOmT1IoldA4RvSwIPVQWk2lrnov1j38yCsT3J0
-         8rnuApnNW+IJJJDgn6OdCQWZylpe1np1EIVoyDSVkNNGerxIWprr/UsBqPaix8SOqIbW
-         gBBb0m2X85IUBNCG3j/ZhrQO+dKf85MR1neSb3PbzvlSP0Tm/XeIjZCpKVvG6gRCiVqM
-         UVpS6ZhMCn5k1XQTucdpLFOwuNAesqeDxePoVDMRVhMYDMdrWrOYI0KN8R5/HJixHq8H
-         1AYg==
-X-Gm-Message-State: ACgBeo2z3tDgA2TOjQZzE4Dhbxg0G9FZFfLmVWuOQ78IxeEg9h6rNSGa
-        8b4EuUapGYm9ck+ReeOFCyd2dA==
-X-Google-Smtp-Source: AA6agR6+rkMERc3iXtzDpZ+FTje+AOXKMpuCsOvyq1Fd9KZABhY8d5Qu2LPDFxvU6PJAtNvmf5WUtw==
-X-Received: by 2002:a05:6000:1549:b0:225:652e:45d4 with SMTP id 9-20020a056000154900b00225652e45d4mr28679809wry.15.1662482089343;
-        Tue, 06 Sep 2022 09:34:49 -0700 (PDT)
-Received: from [10.83.37.24] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n5-20020a05600c304500b003a5de95b105sm20477031wmh.41.2022.09.06.09.34.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Sep 2022 09:34:48 -0700 (PDT)
-Message-ID: <8fb27342-2b32-b0e7-09d9-622ce16e8e76@arista.com>
-Date:   Tue, 6 Sep 2022 17:34:41 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH 25/31] selftests/net: Add TCP-AO library
+        Tue, 6 Sep 2022 12:53:17 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBDF41B797;
+        Tue,  6 Sep 2022 09:39:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jhzp1NRXCKK3MCFWsiolJjIOgE7ZdCRSNsplZ8af7dlBhC08bfxBzEe1B7T66EdcxNXzs1abRbDia9+ZZf9Eg3poFlW5QqFAOhsqUwgmq7uxNHdJL/B2KbZVDaACT/n6KEGoDMprQwFFkpEPbi1m5vTzLwtM92/OZ7O+YX9HESzUIEizvLg9HuPwNfgjbH90YhF39bxb3FPfAq+UoDwz5Ib7Ckg3oWAtaXeS4nSHi9XTSPSSl2GsaWxMX8R7SI+bOg/ClZGcfYn0QQY3dA81pTS1TFA41Ktyo9s9MSipaNu/B6TzsZFa2FkBn25QUkGMRrBb2QmFMjXW0iUivoogbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oWmlWHLEg3dzHYgNCLuruYnq9LNBymW1q3ShnzxhKNQ=;
+ b=Y5hh6ZofAkSu2L6ru17LosoKxJ1ekefS5Hgypf/wvEfxYAritDFLLle766ctCNfMk5L5Z925zro6lrxROGXclhEStGt6BGJoHPHbPQsHdUuYa0Xc7Y7g/s6tsHoEicLKXdpvU3GV06S1PV4Q2B/YIWu28uB/3DHQqUOre4yFSpIUuiFfUIxwOcxLptZQWuKXEp9lGs0kQ3zHQwOqH6QlcHVwBcrrBS/eCRCY9100qD24I2o7Qe0tflRteCe1ZAtQTZvLX++NJKHt6o37DvEo/CRq1L4S3SoH/ghJMnbbEazmAnVFjDJzkxdvxzYF18rVH1+E16tHCCbvcTjC9Ltn9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oWmlWHLEg3dzHYgNCLuruYnq9LNBymW1q3ShnzxhKNQ=;
+ b=qgyVMGNPuuMspJV/hvgsFzs4GkmoytGe8CDxpoLnyMGkYMRr+GdHSoRGfxSFI3cW8qmVMgWwYyi5CU954+5RUpIK4+FhARM/MW2gkLJBLD4LVdpezjNx0enbow1U5ZYgnFEq1dmNNgyTOpKhiQ4cL9yRwRCmmicjKGVZHGAKUoY=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SJ1PR12MB6028.namprd12.prod.outlook.com (2603:10b6:a03:489::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.16; Tue, 6 Sep
+ 2022 16:39:39 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c%7]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
+ 16:39:39 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     "Roth, Michael" <Michael.Roth@amd.com>
+CC:     Marc Orr <marcorr@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Topic: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Index: AQHYrBDc30zm/ve2UUW13wSedLDd3a3SXbsAgAA6ggCAAANnoIAAEL2AgAATsRA=
+Date:   Tue, 6 Sep 2022 16:39:38 +0000
+Message-ID: <SN6PR12MB276774A14FEBFF4E98AC07238E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic> <YxcgAk7AHWZVnSCJ@kernel.org>
+ <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
+ <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20220906150635.mhfvtl2xgdbzr7a5@amd.com>
+In-Reply-To: <20220906150635.mhfvtl2xgdbzr7a5@amd.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Shuah Khan <skhan@linuxfoundation.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        David Ahern <dsahern@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20220818170005.747015-1-dima@arista.com>
- <20220818170005.747015-26-dima@arista.com>
- <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
-From:   Dmitry Safonov <dima@arista.com>
-In-Reply-To: <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-09-06T16:17:04Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=d193e0ba-f1fb-4923-ae60-0e3235e310fc;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-09-06T16:39:37Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: a7704ebc-47eb-4048-890b-f70b5e9f3f6c
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: cf5a1174-dba4-4f32-c692-08da90266435
+x-ms-traffictypediagnostic: SJ1PR12MB6028:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Q10jA8J1/rvPuEjFbHmf5KVhblQndyrRa8kGGPqDRJIPc310cYqy1VECszemtOtaMJfuHxLhyu7Z3p55uPvejp490JYFAsfLDfcFdwcMInOly5mtBeBGR3LGE34dQkZCoqEkAe7dJWibGCrUCr0YcHnFp4/3RbhITgBzc4wN5y6SnxwNQVft8ards5tGD+E2u3O9dEz4Jo/ud3T+bbrG40aLhpcvpGlWkhpgiGaoB7dJDjNwCAPQAdf5XIbV8ff9rMfrVRPMMQQOQb071xjNJhvS97VbEbvFYgOrxNoDWxlztdJWG/TcOYkW6UnvkjheYo+urWubCgj4BmCzWdEY5lmOr/DpiXNir9VCipw7UAYy5rBxKwbsttNgJVSiJNlB+cMYLzFvoMaqZsDN7LxJJM6PpRB0UbVJwkNhZbd3hiTTIqThJr+kRCY4MZwTd8MdZD6MFiLmayQfYHMfPT7+UxXVFfa1NGD/8dnKWMlJbbdYwqMt9uMUc2IDZhiL4kK8PFZfe103vJhQ+jUD1yQnIvKtN1HiSUJ4zCwGA5sKibFo5smb4j9Zk6fCKfRyXkkcUwSbBky4kbn9ERo277hovOl33OpZD9SGsKzrY5omZ85KMxgSuj6c5HifeSd8vlyIkxNCOgxicQcHGFtpuqpKxpHBebmz+8lAoISyxQx2k8sOdDIVwR+ApRkK5jYraeXGSXxB7TeUt01GqapnTG2qiBjStlvHafvooLfopuQTBNatEYRoDhWoUuwVlGPd1+GIaToPG1nFd4jh0lpUUbnUKg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(366004)(136003)(346002)(39860400002)(376002)(38070700005)(41300700001)(38100700002)(122000001)(66446008)(66556008)(4326008)(66946007)(6636002)(64756008)(66476007)(316002)(76116006)(54906003)(8676002)(83380400001)(52536014)(55016003)(5660300002)(7416002)(2906002)(6862004)(9686003)(26005)(7406005)(8936002)(186003)(478600001)(33656002)(71200400001)(6506007)(86362001)(7696005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Qz14V5W797Hw4rld/KVIb8DnSCY39zEw5TqAe318X/nRtOrZ/vXzBeIK8HiL?=
+ =?us-ascii?Q?tUKe2WeDZf7mYVSfszFCcfTu/nCgsHocBSsahYXJuc+A5N2uQF2FjjuqLbwk?=
+ =?us-ascii?Q?Qq8hqobQh7IHLIbCTEGEkC4ZVr+OrYmjCXOknPtOoyHlp0arpsqdz3KxuJY4?=
+ =?us-ascii?Q?Y5xAoSWykUUSuaXsHEkud+4Mdqvqsxhuyk/u/M2BoyLS6ZfBZ5Xyg7DsWqsW?=
+ =?us-ascii?Q?8vKGJPwa6DADavkxZc/WE/DDWolXoyPDCnkb1qnNsQRncalpk7BcXGEmhqlr?=
+ =?us-ascii?Q?w7c+/ue7P/rzey11C1L033og31gCu0Ra0JYwZJ0uNELl8IQYduYkN22FHOuH?=
+ =?us-ascii?Q?sckyWr/rEb2o/bu2oSxIpPY32HqmKUzFVrhhyeNNam8JWs1O3P4ST/6n8t/o?=
+ =?us-ascii?Q?byCiFZbz2NRSxx368mTXKOUCaFuKOBWxVchegncjOMEWfyv3wL56zm7Gn8g0?=
+ =?us-ascii?Q?VWR3bAr8d3/qASqcS5GNqFnB8jHF8MH0cCxrAjsw3B0pUMb5PNZG3E4/j/v+?=
+ =?us-ascii?Q?JbPYG1CW1K185St4z7G635kOEvByrt3wbakmAIiOtYyWWoppqaIjnSMMsNYr?=
+ =?us-ascii?Q?x3ebVgegsVwQfCuJckQsk57x0FoYFlpM36WyV9LhyiojNw4TLpr5sMjARCVe?=
+ =?us-ascii?Q?RnTwaSQMkEyEuCnQgul8+YoSbV2Hko56d/z61d+19d6c6UAu3B52emelh8YX?=
+ =?us-ascii?Q?wUHmlDICddy/T+ZNDkjfEXb/0Izr2X3QaXxC1wYXkuSywe9nQuyTuQgr93f8?=
+ =?us-ascii?Q?3T/v6aSE6ZjW90QPddt2P93Vfx022Dsf9Oav7jO9wqcPtKezQgSA95jXQwzk?=
+ =?us-ascii?Q?1EjOQyQHG/nqN7mGjV0GXF3CYDcdArX6TsuqXXj14CGwARmIX6fOsvg1JdKL?=
+ =?us-ascii?Q?GHaxLqoht4lPcGHEz3Bq9R7Q2zM//JGR9cRB1xVi86xkCoA+cFb7rpncwAqz?=
+ =?us-ascii?Q?4SasKUWvcz6DkKqh0kBmfVogJIZR9LxF9HOxpw1d6tGFNXMFqbfVHeX///VO?=
+ =?us-ascii?Q?Yi1icinvBfenyMgljr44+RbL5Iz8iDOT0aNjnqJSl0lYQT31DjpfhieSYpBk?=
+ =?us-ascii?Q?9Bwqe52BInkMtKz1YFvrvakmLeALR+9uKMj5SUKQm3bZgJii+C/gSJ7zUwQq?=
+ =?us-ascii?Q?hD4LbNuJC2JpjCHD5rh2nwTiBj3GEwhy+geOVZIlPqNK2UxxXpoU1dKfawLe?=
+ =?us-ascii?Q?yeQB9k4nb7h8Vbm90/wLSxaq4mEmP1Dp/Q+8quaTxpm9izEK8OEgJhD1NRU6?=
+ =?us-ascii?Q?MrOmWlwlk98l13D/04D4DJTO0cg7zLR/NX1WLWtNXBJrIQTj1FxAH0L2vWyw?=
+ =?us-ascii?Q?sFSCf9mNVzrxyzUHMx01OfvvmoVEWR7CwxWajz2p2qSCwjiIHgxdoeJmjF29?=
+ =?us-ascii?Q?91FRf0OHta8Da+3xy7iHgfdw5MQLM9+TFWY1DZLj2sDsFcdCKeuEDuUGQRRS?=
+ =?us-ascii?Q?JllQZVKWk7VQLbBKeCR737BnT8o2o97w/MliF6IHQdppdWCmxEbaoxgq/4cR?=
+ =?us-ascii?Q?PAG9uJiFfVvW2Vr5PONPUmJOzZRmxvbXban7fCL2ZqB/uNnoT3Y03ZGFtsO+?=
+ =?us-ascii?Q?Rnmidv3+pcUy+hoAGi8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf5a1174-dba4-4f32-c692-08da90266435
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2022 16:39:39.0280
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: E7VOdRQNpzWQ8PJystqyf7pUrGZVj0DUWSt1TvW3TTU5zLLRldj9/GqSkLguxajxvHJDtKwfN7mZOJPviZQJbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6028
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/23/22 16:47, Shuah Khan wrote:
-> On 8/18/22 10:59 AM, Dmitry Safonov wrote:
-[..]
->> +
->> +__attribute__((__format__(__printf__, 2, 3)))
->> +static inline void __test_print(void (*fn)(const char *), const char
->> *fmt, ...)
->> +{
->> +#define TEST_MSG_BUFFER_SIZE 4096
->> +    char buf[TEST_MSG_BUFFER_SIZE];
->> +    va_list arg;
->> +
->> +    va_start(arg, fmt);
->> +    vsnprintf(buf, sizeof(buf), fmt, arg);
->> +    va_end(arg);
->> +    fn(buf);
->> +}
->> +
-> 
-> Is there a reason add these instead of using kselftest_* print
-> functions?
+[AMD Official Use Only - General]
 
-Inside __test_ok(), __test_msg(), __test_fail() and __test_error() are
-calling ksft_*() functions. kselftest_*() by themselves are not
-thread-safe and I was not sure if you would want them to be.
+>> >Actually, I don't think they're the same. I think Jarkko's version is c=
+orrect. Specifically:
+>> >- For level =3D PG_LEVEL_2M they're the same.
+>> >- For level =3D PG_LEVEL_1G:
+>> >The current code calculates a garbage mask:
+>> >mask =3D pages_per_hpage(level) - pages_per_hpage(level - 1); translate=
+s to:
+>> >>> hex(262144 - 512)
+>> >'0x3fe00'
+>>=20
+>> No actually this is not a garbage mask, as I explained in earlier=20
+>> responses we need to capture the address bits to get to the correct 4K i=
+ndex into the RMP table.
+>> Therefore, for level =3D PG_LEVEL_1G:
+>> mask =3D pages_per_hpage(level) - pages_per_hpage(level - 1) =3D> 0x3fe0=
+0 (which is the correct mask).
 
-> 
->> +#define test_print(fmt, ...)                        \
->> +    __test_print(__test_msg, "%ld[%s:%u] " fmt "\n",        \
->> +             syscall(SYS_gettid),                \
->> +             __FILE__, __LINE__, ##__VA_ARGS__)
->> +
->> +#define test_ok(fmt, ...)                        \
->> +    __test_print(__test_ok, fmt "\n", ##__VA_ARGS__)
->> +
->> +#define test_fail(fmt, ...)                        \
->> +do {                                    \
->> +    if (errno)                            \
->> +        __test_print(__test_fail, fmt ": %m\n", ##__VA_ARGS__);    \
->> +    else                                \
->> +        __test_print(__test_fail, fmt "\n", ##__VA_ARGS__);    \
->> +    test_failed();                            \
->> +} while(0)
->> +
->> +#define KSFT_FAIL  1
->> +#define test_error(fmt, ...)                        \
->> +do {                                    \
->> +    if (errno)                            \
->> +        __test_print(__test_error, "%ld[%s:%u] " fmt ": %m\n",    \
->> +                 syscall(SYS_gettid), __FILE__, __LINE__,    \
->> +                 ##__VA_ARGS__);                \
->> +    else                                \
->> +        __test_print(__test_error, "%ld[%s:%u] " fmt "\n",    \
->> +                 syscall(SYS_gettid), __FILE__, __LINE__,    \
->> +                 ##__VA_ARGS__);                \
->> +    exit(KSFT_FAIL);                        \
->> +} while(0)
->> +
-> 
-> Is there a reason add these instead of using kselftest_* print
-> functions?
+>That's the correct mask to grab the 2M-aligned address bits, e.g:
 
-The same reason: two or more threads my fail the test at the same
-moment, I needed some way of protecting the output.
+>  pfn_mask =3D 3fe00h =3D 11 1111 1110 0000 0000b
+ =20
+>  So the last 9 bits are ignored, e.g. anything PFNs that are multiples
+>  of 512 (2^9), and the upper bits comes from the 1GB PTE entry.
 
->> + * Timeout on syscalls where failure is not expected.
->> + * You may want to rise it if the test machine is very busy.
->> + */
->> +#ifndef TEST_TIMEOUT_SEC
->> +#define TEST_TIMEOUT_SEC    5
->> +#endif
->> +
-> 
-> Where is the TEST_TIMEOUT_SEC usually defined? Does this come
-> from shell wrapper that runs this test? Can we add a message before
-> starting the test print the timeout used?
+> But there is an open question of whether we actually want to index using =
+2M-aligned or specific 4K-aligned PFN indicated by the faulting address.
 
-Usually it's not re-defined and used as-is. Ifndef here is only to make
-it easier to recompile with another timeout const: one can just add
-CFLAGS+=-DTEST_TIMEOUT_SEC=10 and check if that helps on the busy hardware.
+>>=20
+>> >But I believe Jarkko's version calculates the correct mask (below), inc=
+orporating all 18 offset bits into the 1G page.
+>> >>> hex(262144 -1)
+>> >'0x3ffff'
+>>=20
+>> We can get this simply by doing (page_per_hpage(level)-1), but as I ment=
+ioned above this is not what we need.
 
+>If we actually want the 4K page, I think we would want to use the 0x3ffff =
+mask as Marc suggested to get to the specific 4K RMP entry, which I don't t=
+hink the current code is trying to do. But maybe that *should* be what we s=
+hould be doing.
 
->> +/*
->> + * Timeout on connect() where a failure is expected.
->> + * If set to 0 - kernel will try to retransmit SYN number of times,
->> set in
->> + * /proc/sys/net/ipv4/tcp_syn_retries
->> + * By default set to 1 to make tests pass faster on non-busy machine.
->> + */
->> +#ifndef TEST_RETRANSMIT_SEC
->> +#define TEST_RETRANSMIT_SEC    1
->> +#endif
->> +
-> 
-> Where would this TEST_RETRANSMIT_SEC defined usually?
+Ok, I agree to get to the specific 4K RMP entry.
 
-The same: I always used the default value, but protected by ifndef if
-one wants to increase the value.
+>Based on your earlier explanation, if we index into the RMP table using 2M=
+-aligned address, we might find that the entry does not have the page-size =
+bit set (maybe it was PSMASH'd for some reason).=20
 
->> +
->> +static inline int _test_connect_socket(int sk, const union tcp_addr
->> taddr,
->> +                    unsigned port, time_t timeout)
->> +{
->> +#ifdef IPV6_TEST
->> +    struct sockaddr_in6 addr = {
->> +        .sin6_family    = AF_INET6,
->> +        .sin6_port    = htons(port),
->> +        .sin6_addr    = taddr.a6,
->> +    };
->> +#else
->> +    struct sockaddr_in addr = {
->> +        .sin_family    = AF_INET,
->> +        .sin_port    = htons(port),
->> +        .sin_addr    = taddr.a4,
->> +    };
->> +#endif
-> 
-> Why do we defined these here - are they also defined in a kernel
-> header?
+I believe that PSMASH does update the 2M-aligned RMP table entry to the sma=
+shed page size.
+It sets all the 4K intermediate/smashed pages size to 4K and changes the pa=
+ge size of the base RMP table (2M-aligned) entry  to 4K.
 
-No, those functions are helpers that process family-specific members.
-IPV6_TEST is coming from Makefile:
-$(OUTPUT)/%_ipv6: %.c
-	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
+>If that's the cause we'd then have to calculate the index for the specific=
+ RMP entry for the specific 4K address that caused the fault, and then chec=
+k that instead.
 
-This way all tests can be compiled from the same code for both address
-families, resulting in *_ipv4 and *_ipv6 binaries that reuse all the
-code, but just have those #ifdef IPV6_TEST in places where test converts
-or produces IP addresses.
+>If however we simply index directly in the 4K RMP entry from the start,
+>snp_lookup_rmpentry() should still tell us whether the page is private or =
+not, because RMPUPDATE/PSMASH are both documented to also update the assign=
+ed bits for each 4K RMP entry even if you're using a 2M RMP entry and setti=
+ng the page-size >bit to cover the whole 2M range.
 
-[..]
->> +static inline int test_prepare_ao(struct tcp_ao *ao,
->> +        const char *alg, uint16_t flags,
->> +        union tcp_addr in_addr, uint8_t prefix,
->> +        uint8_t sndid, uint8_t rcvid, uint8_t maclen,
->> +        uint8_t keyflags, uint8_t keylen, const char *key)
->> +{
->> +#ifdef IPV6_TEST
->> +    struct sockaddr_in6 addr = {
->> +        .sin6_family    = AF_INET6,
->> +        .sin6_port    = 0,
->> +        .sin6_addr    = in_addr.a6,
->> +    };
->> +#else
->> +    struct sockaddr_in addr = {
->> +        .sin_family    = AF_INET,
->> +        .sin_port    = 0,
->> +        .sin_addr    = in_addr.a4,
->> +    };
->> +#endif
->> +
-> 
-> Same question here. In general having these ifdefs isn't ideal without
-> a good reason.
+I think it does make sense to index directly into the 4K RMP entry, as we s=
+hould be indexing into the most granular entry in the RMP table, and that w=
+ill have the page "assigned" information as both RMPUPDATE/PSMASH would upd=
+ate
+the assigned bits for each 4K RMP entry even if we using a 2MB RMP entry (t=
+his is an important point to note).
 
-Same as above.
+>Additionally, snp_lookup_rmpentry() already has logic to also go check the=
+ 2M-aligned RMP entry to provide an indication of what level it is mapped a=
+t in the RMP table, so we can still use that to determine if the host mappi=
+ng needs to be split or >not.
 
-> 
->> +    return test_prepare_ao_sockaddr(ao, alg, flags,
->> +            (void *)&addr, sizeof(addr), prefix, sndid, rcvid,
->> +            maclen, keyflags, keylen, key);
->> +}
->> +
->> +static inline int test_prepare_def_ao(struct tcp_ao *ao,
->> +        const char *key, uint16_t flags,
->> +        union tcp_addr in_addr, uint8_t prefix,
->> +        uint8_t sndid, uint8_t rcvid)
->> +{
->> +    if (prefix > DEFAULT_TEST_PREFIX)
->> +        prefix = DEFAULT_TEST_PREFIX;
->> +
->> +    return test_prepare_ao(ao, DEFAULT_TEST_ALGO, flags, in_addr,
->> +            prefix, sndid, rcvid, 0, 0, strlen(key), key);
->> +}
->> +
->> +extern int test_get_one_ao(int sk, struct tcp_ao_getsockopt *out,
->> +               uint16_t flags, void *addr, size_t addr_sz,
->> +               uint8_t prefix, uint8_t sndid, uint8_t rcvid);
->> +extern int test_cmp_getsockopt_setsockopt(const struct tcp_ao *a,
->> +                      const struct tcp_ao_getsockopt *b);
->> +
->> +static inline int test_verify_socket_ao(int sk, struct tcp_ao *ao)
->> +{
->> +    struct tcp_ao_getsockopt tmp;
->> +    int err;
->> +
->> +    err = test_get_one_ao(sk, &tmp, 0, &ao->tcpa_addr,
->> +            sizeof(ao->tcpa_addr), ao->tcpa_prefix,
->> +            ao->tcpa_sndid, ao->tcpa_rcvid);
->> +    if (err)
->> +        return err;
-> 
-> Is this always an error or could this a skip if dependencies aren't
-> met to run the test? This is a global comment for all error cases.
+Yes.
 
-Yeah, at this moment all tests will FAIL if CONFIG_TCP_AO is disabled.
-I'll look into making them SKIP when getsockopt()/setsockopt() returns
-ENOPROTOOPT in next versions of patches.
+>One thing that could use some confirmation is what happens if you do an RM=
+PUPDATE for a 2MB RMP entry, and then go back and try to RMPUPDATE a sub-pa=
+ge and change the assigned bit so it's not consistent with 2MB RMP entry. I=
+ would assume >that would fail the instruction, but we should confirm that =
+before relying on this logic.
 
-> 
->> +
->> +    return test_cmp_getsockopt_setsockopt(ao, &tmp);
->> +}
->> +
->> +static inline int test_set_ao(int sk, const char *key, uint16_t flags,
->> +                  union tcp_addr in_addr, uint8_t prefix,
->> +                  uint8_t sndid, uint8_t rcvid)
->> +{
->> +    struct tcp_ao tmp;
->> +    int err;
->> +
->> +    err = test_prepare_def_ao(&tmp, key, flags, in_addr,
->> +            prefix, sndid, rcvid);
->> +    if (err)
->> +        return err;
-> 
-> Same comment as above here.
-> 
->> +
->> +    if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &tmp, sizeof(tmp)) < 0)
->> +        return -errno;
->> +
->> +    return test_verify_socket_ao(sk, &tmp);
->> +}
->> +
->> +extern ssize_t test_server_run(int sk, ssize_t quota, time_t
->> timeout_sec);
->> +extern ssize_t test_client_loop(int sk, char *buf, size_t buf_sz,
->> +                const size_t msg_len, time_t timeout_sec);
->> +extern int test_client_verify(int sk, const size_t msg_len, const
->> size_t nr,
->> +                  time_t timeout_sec);
->> +
->> +struct netstat;
->> +extern struct netstat *netstat_read(void);
->> +extern void netstat_free(struct netstat *ns);
->> +extern void netstat_print_diff(struct netstat *nsa, struct netstat
->> *nsb);
->> +extern uint64_t netstat_get(struct netstat *ns,
->> +                const char *name, bool *not_found);
->> +
->> +static inline uint64_t netstat_get_one(const char *name, bool
->> *not_found)
->> +{
->> +    struct netstat *ns = netstat_read();
->> +    uint64_t ret;
->> +
->> +    ret = netstat_get(ns, name, not_found);
->> +
->> +    netstat_free(ns);
->> +    return ret;
->> +}
->> +
->> +#endif /* _AOLIB_H_ */
->> diff --git a/tools/testing/selftests/net/tcp_ao/lib/netlink.c
->> b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
->> new file mode 100644
->> index 000000000000..f04757c921d0
->> --- /dev/null
->> +++ b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
->> @@ -0,0 +1,341 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Original from tools/testing/selftests/net/ipsec.c */
->> +#include <linux/netlink.h>
->> +#include <linux/random.h>
->> +#include <linux/rtnetlink.h>
->> +#include <linux/veth.h>
->> +#include <net/if.h>
->> +#include <stdint.h>
->> +#include <string.h>
->> +#include <sys/socket.h>
->> +
->> +#include "aolib.h"
->> +
->> +#define MAX_PAYLOAD        2048
-> 
-> tools/testing/selftests/net/gro.c seem to define this as:
-> 
-> #define MAX_PAYLOAD (IP_MAXPACKET - sizeof(struct tcphdr) -
-> sizeof(struct ipv6hdr))
-> 
-> Can you do the same instead of hard-coding?
+I agree.
 
-I think I could look into way of dynamically allocate netlink buffer for
-requests, but I would say it's not as bad as it looks: the functions
-always use constant size of messages for the netlink messages, so the
-buffer size is always constant. And if anything doesn't fit, the helper
-rtattr_pack() will just fail the test and it'll be visible straight away.
-So, in my point of view, it could have been nicer, but this is the
-easiest and simplest way by allocating const buffer on stack, rather
-than dynamically.
-
->> +
->> +const struct sockaddr_in6 addr_any6 = {
->> +    .sin6_family    = AF_INET6,
->> +};
->> +
->> +const struct sockaddr_in addr_any4 = {
->> +    .sin_family    = AF_INET,
->> +};
->>
-> 
-> A couple of things to look at closely. For some failures such as
-> memory allocation for the test or not being able to open a file
-> 
-> fnetstat = fopen("/proc/net/netstat", "r");
-> 
-> Is this a failure or missing config or not having the right permissions
-> to open the fail. All of these cases would be a SKIP and not a test fail.
-
-That makes sense, I'll look into making tests SKIP on failed memory
-allocations or failed fopen()s.
-
-Thank you for the review,
-          Dmitry
+Thanks,
+Ashish
