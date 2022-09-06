@@ -2,87 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 989F4ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 02:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E88ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 03:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237829AbiIFCwB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 22:52:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
+        id S231991AbiIFDgB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 23:36:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231664AbiIFCwA (ORCPT
+        with ESMTP id S229916AbiIFDgA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 22:52:00 -0400
-Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.133.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E59F5F124
-        for <linux-crypto@vger.kernel.org>; Mon,  5 Sep 2022 19:51:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
-        s=selector; t=1662432718;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f9SNYQWnprxxClMNnaeVCmK6Kfg/AHOIpiytMtyCNb8=;
-        b=m4F37Bjc1x3XpYXwOxe7ItGlNnSxmw3m4nwR25fjdl8et6k1m7oBDq6FVM61KrhiIyO0Qq
-        x1wjYAOKwix1K/XgjznuDSfUez+tBwMZGXOa8nagXgQsAwoVQEkm19iMnzd16qmRQVFEdO
-        S6d1RAqP7WpVjfBhVpjOqG4jn8+zJajCz+73jyJpmr2CIyV/YfZyZUCwlZsfSrsvqhLz66
-        5A6U9dO4XQBdVo7wCI4QBZSi/8PZtzM7Rzm1AkPafYkLFbsIhdpB5WGqWAsYq77GshUAkj
-        PwPavKl2gFKqurKGS0mMsx2j+NlO36t17L+Ovr21AC9b1XUCaC5E96UxHXWQ+w==
-Received: from mail.maxlinear.com (174-47-1-83.static.ctl.one [174.47.1.83])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- us-mta-622-D6flh4ZTPpmVigD8flmrZg-2; Mon, 05 Sep 2022 22:51:56 -0400
-X-MC-Unique: D6flh4ZTPpmVigD8flmrZg-2
-Received: from sgsxdev002.isng.phoenix.local (10.226.81.112) by
- mail.maxlinear.com (10.23.38.120) with Microsoft SMTP Server id 15.1.2375.24;
- Mon, 5 Sep 2022 19:51:54 -0700
-From:   Peter Harliman Liem <pliem@maxlinear.com>
-To:     <atenart@kernel.org>, <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-lgm-soc@maxlinear.com>,
-        "Peter Harliman Liem" <pliem@maxlinear.com>
-Subject: [PATCH v2 2/2] crypto: inside-secure - Select CRYPTO_AES config
-Date:   Tue, 6 Sep 2022 10:51:50 +0800
-Message-ID: <60cb9b954bb079b1f12379821a64faff00bb368e.1662432407.git.pliem@maxlinear.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
-References: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: maxlinear.com
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+        Mon, 5 Sep 2022 23:36:00 -0400
+Received: from out199-18.us.a.mail.aliyun.com (out199-18.us.a.mail.aliyun.com [47.90.199.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EB358083;
+        Mon,  5 Sep 2022 20:35:57 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VOav19I_1662435353;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VOav19I_1662435353)
+          by smtp.aliyun-inc.com;
+          Tue, 06 Sep 2022 11:35:54 +0800
+From:   'Guanjun' <guanjun@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, elliott@hpe.com
+Cc:     zelin.deng@linux.alibaba.com, guanjun@linux.alibaba.com,
+        xuchun.shang@linux.alibaba.com, artie.ding@linux.alibaba.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND v1 0/9] Drivers for Alibaba YCC (Yitian Cryptography Complex) cryptographic accelerator
+Date:   Tue,  6 Sep 2022 11:35:44 +0800
+Message-Id: <1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CRYPTO_AES is needed for aes-related algo (e.g.
-safexcel-gcm-aes, safexcel-xcbc-aes, safexcel-cmac-aes).
-Without it, we observe failures when allocating transform
-for those algo.
+From: Guanjun <guanjun@linux.alibaba.com>
 
-Fixes: 363a90c2d517 ("crypto: safexcel/aes - switch to library version of k=
-ey expansion routine")
-Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
----
-v2:
- Add fixes tag
+Hi,
 
- drivers/crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
+cryptographic accelerator. Enables the on-chip cryptographic accelerator of
+Alibaba Yitian SoCs which based on ARMv9 architecture.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 3e6aa319920b..b12d222e49a1 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -740,6 +740,7 @@ config CRYPTO_DEV_SAFEXCEL
- =09select CRYPTO_SHA512
- =09select CRYPTO_CHACHA20POLY1305
- =09select CRYPTO_SHA3
-+=09select CRYPTO_AES
- =09help
- =09  This driver interfaces with the SafeXcel EIP-97 and EIP-197 cryptogra=
-phic
- =09  engines designed by Inside Secure. It currently accelerates DES, 3DES=
- and
---=20
-2.17.1
+It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
+
+I resend this patchset (see [1]) due to Herbert missed this email.
+
+I list the differences between the former version under [1]. Mainly according to Elliott's comments.
+
+Please help to review.
+
+Thanks,
+Guanjun.
+
+[1] https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
+
+v1 -> v1 RESEND:
+  - [01/09] Adjust the Kconfig entry in alphabetical order
+  - [05/09][07/09][08/09] Adjust the format of algorithm names
+
+Guanjun (3):
+  crypto/ycc: Add skcipher algorithm support
+  crypto/ycc: Add aead algorithm support
+  crypto/ycc: Add rsa algorithm support
+
+Xuchun Shang (1):
+  crypto/ycc: Add sm2 algorithm support
+
+Zelin Deng (5):
+  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+  crypto/ycc: Add ycc ring configuration
+  crypto/ycc: Add irq support for ycc kernel rings
+  crypto/ycc: Add device error handling support for ycc hw errors
+  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
+    entry
+
+ MAINTAINERS                            |   8 +
+ drivers/crypto/Kconfig                 |   2 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/ycc/Kconfig             |  18 +
+ drivers/crypto/ycc/Makefile            |   4 +
+ drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
+ drivers/crypto/ycc/sm2signature_asn1.h |  13 +
+ drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
+ drivers/crypto/ycc/ycc_cdev.c          |  86 +++
+ drivers/crypto/ycc/ycc_cdev.h          |  18 +
+ drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
+ drivers/crypto/ycc/ycc_drv.c           | 574 ++++++++++++++++++++
+ drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
+ drivers/crypto/ycc/ycc_isr.h           |  12 +
+ drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
+ drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
+ 19 files changed, 4721 insertions(+)
+ create mode 100644 drivers/crypto/ycc/Kconfig
+ create mode 100644 drivers/crypto/ycc/Makefile
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+ create mode 100644 drivers/crypto/ycc/ycc_aead.c
+ create mode 100644 drivers/crypto/ycc/ycc_algs.h
+ create mode 100644 drivers/crypto/ycc/ycc_cdev.c
+ create mode 100644 drivers/crypto/ycc/ycc_cdev.h
+ create mode 100644 drivers/crypto/ycc/ycc_dev.h
+ create mode 100644 drivers/crypto/ycc/ycc_drv.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.h
+ create mode 100644 drivers/crypto/ycc/ycc_pke.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.h
+ create mode 100644 drivers/crypto/ycc/ycc_ske.c
+
+-- 
+1.8.3.1
 
