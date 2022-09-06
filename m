@@ -2,281 +2,200 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DADC7ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 15:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8152ECAAD5
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 15:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232296AbiIFPDE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 11:03:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41852 "EHLO
+        id S236575AbiIFPMd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 11:12:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbiIFPCp (ORCPT
+        with ESMTP id S232795AbiIFPMA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 11:02:45 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C702AC276
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 07:17:19 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id q3so11425426pjg.3
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 07:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=+j4ngLEidLDoWH4lYh7XJRQiFBg9/g7VTw1Vm7SR9A0=;
-        b=d5PNZpnzvwHvosRxcq2fbaInTI96TYp6qDLB8koxhOOb3+VzjXTHYiwi2XiFS3UaGr
-         84pykmGBFGuO4AgF1bDfiouDNjYsZp9nOs15leDj/cNf57eK0iiDyH5J6sRpMbpQ0Kfg
-         Nj8fTn9Ot9Xye+h9sJbBg9SJlyMAp+XmNeLsA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=+j4ngLEidLDoWH4lYh7XJRQiFBg9/g7VTw1Vm7SR9A0=;
-        b=XO7yRdSlwMGH27Lqn4bao2CXA8Wm8refd5YUHh/tv/sm32NG8NF/qN0ozU9s7cmw8p
-         9OTfufTgD4eo7V2rBq49Of+K8OyAzrJOGqzX30YtPMo8p1qdYlicTYwzH444dWtpdgh2
-         lOmsflp6m23LSJ3w6HqdSuHZiSrDH3wHeXZ8qBiao+MGSjgmfT7sb/Bx37oyaNOep7NI
-         ZRUrwqBhBm/88AZehhXm8PR70ibCWwl+wimb8HourtdzUNZC/m9f0GFWAN3NzQ/UxMkt
-         UOgGKEbpQGMsJWJhE5Ac3/D4KZnxQa5vF1EpayJyV7BO4n0ZB5V7qVXoCW4hAbNq/qbI
-         7IOg==
-X-Gm-Message-State: ACgBeo1qHKqPz5hzF/0+VqU4RrlyNeG/XKoe8yqdhJ6ru5nyWtJsWReZ
-        kGholrO9Lv2MruICU2hcaHNxi8nVAPnPKV0oOD4WQQ==
-X-Google-Smtp-Source: AA6agR5gL7141ocVuqNdid444nlmHYa18Y6TXeuKossEc3lPZWLLtU93+J6ZJf9v1A4lWTPbR26XifHmENooJe0h5o0=
-X-Received: by 2002:a17:902:f7d2:b0:176:ca6b:eadb with SMTP id
- h18-20020a170902f7d200b00176ca6beadbmr4928847plw.173.1662473746499; Tue, 06
- Sep 2022 07:15:46 -0700 (PDT)
+        Tue, 6 Sep 2022 11:12:00 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on20614.outbound.protection.outlook.com [IPv6:2a01:111:f400:7ea9::614])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5DEADCDA;
+        Tue,  6 Sep 2022 07:25:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q5BRszhe+o4kWlWAs/0yGzS+HcVrjYsxeUfFncK4hU+/himrKGD/C4b5ZGFs3cbBeDTR3+tXBxyuGyeyHBaqoKKYhhGn7w7IeG9uBV9K/T8pddbL54V9uwjzUAtWy1ZlUm1jTGu/FhAANt7drxAX9q56K+0q1dbiyBT2b/pte8upmv5MVqdCzs++TG6u3z0f+b7V5qex63foSTpz/UqAWuboQjv8WmeTaYpZBb59R6uZoQ7fVW5O5EjdHCVXvww2yPhuxnYBMNa3niVbnGto0PawQ8oztqiJ3SAKUMJ0+RDYBZT6mWDIeTN0vBcvUguD4z8g9kp55dqSgtzGvvfTfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zQ/MlFYyodAAguSYuObGbAyCmFB3/08a+4aqOyRG87Q=;
+ b=JAfi38XWDfKcz9799OZ+a1G0ckpmku19OnTCHm+X6EbUMaHU4AMepCRhuwMbzAePBCzNl13U883mizxKzM234ucR5ABBqTCAdX9yaBfrh2TxVXpIF/GLOo16IRuxpp6kqkj4MXK8M3OqIp1aPHsrRA3jlWjwM2bcW/8kmHA6PbFM2HguV1WjruGXEzrTgQAOqKBCXWYY6N22XTqPiZLTa4GVtj3T2B3OSSdUEhTKlTjbJQReh6cS/gyV53Lwwbf4s+KhwIn5JP8/MhHsXCX3WtDQOI8dmQV/nd7nOppcSnV/YbqsPx9YgyD43Xj9wh0aZTgWggX+0TyAs5VnhhhBvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zQ/MlFYyodAAguSYuObGbAyCmFB3/08a+4aqOyRG87Q=;
+ b=ktB8Q81PMdZIVh3kg032aWK4wsDaxYNSEJndJu7Z5B8h1kUWsHV4C3Do3AqZ5WjwKE6Mb4uLA7ayhyRlP4Sor5198giUhwdfJpFne1wS7ClKZCNGJf63JQvS7UMu3VJ1a5c7zNT6HvdFx/vri9OH5Hap32qXQN/dfTGBpyrVBu0=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by DM6PR12MB4564.namprd12.prod.outlook.com (2603:10b6:5:2a9::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
+ 2022 14:17:15 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::e47d:1a95:23d5:922c%7]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
+ 14:17:15 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Marc Orr <marcorr@google.com>, Jarkko Sakkinen <jarkko@kernel.org>
+CC:     Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Topic: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Thread-Index: AQHYrBDc30zm/ve2UUW13wSedLDd3a3SXbsAgAA6ggCAAANnoA==
+Date:   Tue, 6 Sep 2022 14:17:15 +0000
+Message-ID: <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic> <YxcgAk7AHWZVnSCJ@kernel.org>
+ <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
+In-Reply-To: <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-09-06T14:06:41Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=7eb99206-0068-4541-a803-34a693d9a3c9;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-09-06T14:17:13Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 69caa24a-380f-4409-a410-78c56c332ffb
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e25bebf1-14a3-4e32-2ec4-08da90127fd9
+x-ms-traffictypediagnostic: DM6PR12MB4564:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ajGSMcTpX/h7X2uYgIY0Ekc985JqNEe8E+xeBKZYHf/DM7BFn1BcdxODlJzfNgFopD8A2hzrSxGMU6o7IZvz6owfW7kgEKWkJagB5Vm5eh4avZN4RkmhRDm/AcRdozXfo2NO/DezC5hu6DS1Gv49w6WPwPPccJfq/LBJwAza+sqRI4KkUYEsenwT7tjmGBlAjuzSLKV5x82/1GTSat18kAMozjjqEyrTXanTyVOL7KjPnCjmR02fgNExOBrNZ6PWJUZqR5gUZTHuYRAhz2La4efYeob22bvBeDih3hKqKqW1x8SRzuJJbkPdugoaj+JhyMuT7oBm1EqdOG0rBRDXRFZWWsceBYNH/Pr5s+GOEwQnCDET691mVjz2/hq+Mdcs0nqRJSsVy8AktXuyobkTBB8lX71MVzsoaIpxPsSYhjHgnjYrVUDcP36qlJ61bmGq79+xZjp5P8ynbZawZ6xR3+NzQ97tE3f8CqeGKgE1dtXrkVsydpKE3GE7XYob3SqGhWcp3suaLyHgiT4+FVr4YPzpKD9tKneJcoEA64us7XZuQNb5IhN6geHYUiNR7wfva8ghmw6cPNKLeKMIFFgK6w9ygh9UlCJgdGszMa8ewjGg8FFzOEQRIyLXDM4ozk1IYDBFJhHCgiiPQDXhvZy3gtrs7tZ7aGBogf3eu/a723/7iGnsN4UT8YqkewBMsZlrLQcEXln/FE+xd4ESg6CAOXfZ8aiPTwQiIdyxXc7uIjRZJ7wJqp0a9abNUX909atIULq/cyRkuqFaqTE9hEGguQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(376002)(39860400002)(346002)(396003)(4326008)(66556008)(66446008)(64756008)(66476007)(76116006)(66946007)(316002)(54906003)(8676002)(2906002)(5660300002)(33656002)(52536014)(8936002)(7406005)(7416002)(110136005)(478600001)(6506007)(7696005)(26005)(86362001)(71200400001)(9686003)(186003)(38070700005)(38100700002)(55016003)(41300700001)(122000001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TmtDV0FhdE9MNEptWmoyWXdjeXBDOUcxTFNLcWIyci9rdml3RWJUcUd1dmdt?=
+ =?utf-8?B?Q1pQMkxHeVA2RzhjWmFRaWtvSy9yVmgxemFSTzVtZUVmMnBic3M5MHlwaXdx?=
+ =?utf-8?B?ZnNQbHBqMXB1WFhsUGpwVnUxc2FOQS9sdEtJTUE5WHRRWmdjM1JqRHFiKzNr?=
+ =?utf-8?B?MkNYRHowbjVkTDNOOElRaElTVkRRKy9KamlGdWUweDV0UUFHR3hGUXFLR2w3?=
+ =?utf-8?B?S2hDalMweFNLdHQ5b3BEL1lhZlJhT1hmUWZ4U3BveE80Y3RtcllXRnBXSGJo?=
+ =?utf-8?B?SjV2cWs4RlFtejc4dVlBQkNCY3E1MXgxOEMzTzJ0bmpJelBSVlEvVXp4ZnNE?=
+ =?utf-8?B?ejhKemttK0JOY1ljWU9BUWcrVjI4RTd1OE9BallsYlAxS01saHpzWkprVkhh?=
+ =?utf-8?B?TkloUUxubTFSM2p0cXdkMUxJeHhqY1h4dVRweng2TlJlcERnL0dWcC96dy9I?=
+ =?utf-8?B?QU55Q3RZL1JKa3FNcVJzS2JXNnp0eDYvNGgvUmhzV3l4bWptM0ZvdXhibGEz?=
+ =?utf-8?B?STB4M1RGRkNlSDZ5YWRYSUdkeHVkczB1VVI1YzRkYWdIS3ZFeXpYUk8vL1lN?=
+ =?utf-8?B?ZVVEdHJmTGIzQWJKcGlkN3NHODhhbEpzVkRDUFM4TTFzb0J0TmpGYzFwSjFy?=
+ =?utf-8?B?NHdhNGJ0a083Z0phK0F6RjRVOE5UZkJkaXlOUXFJV01oS2NvdTh2NkVGaVcx?=
+ =?utf-8?B?ditnQytTT3B1b3V2NHlITzRkSWV1NGlOMTc3dGdWZGMwR2Y5SzhOaEcxaDZk?=
+ =?utf-8?B?VkpuWEdhSFVHeUxSM01INWlPQnFDakFGbTdVVzZJOWswaHYwMC82UnhZSlpY?=
+ =?utf-8?B?c3J0WnZ3VC9xNWQwd3BxVUhNSFFPMEhka1I4ci80c3BpNDdUMmVDWUszbjlj?=
+ =?utf-8?B?RzVZVWJhbUVra1dqTXpPcHJ5c0tpVWs1ckkvSHJsa1NWWlVwQ2hGSnJtZHI5?=
+ =?utf-8?B?bmV5M3lHUjZSdjRFTTE2QnhuWnhHcitRazFzVVdSYXMvZDRUc0pEbG5lY0dS?=
+ =?utf-8?B?K0t1YlBKdEcwYkJSZnBBUmM5YllhQ1VoeHRHUmozWnlDMnRqU1BjY3ora3d4?=
+ =?utf-8?B?eEJtaXI2MmtraHdGRHFZSEJTZFJsQ0R1a2JwbHpzRTBnN2J6QUJ0akFRK29u?=
+ =?utf-8?B?dFkzUkR5WTQvYXIzd1FNeGpHZzVJTjFrMnNXaHM3TnJaUjU0R2Z5STJtUnJ2?=
+ =?utf-8?B?WmlXbFhMV1ZrWkNLTzdCQ3o1czl5OEhtbkxJV0YzSWdtRkpHYXRySUV0eUpK?=
+ =?utf-8?B?K0UvTEx6K21HM3lBY0YxaFZyUlZxak9WWWhESmVDVVpGOXVBZTl1emdpZXVy?=
+ =?utf-8?B?WGZtSmNaU3d6b1dKRW1IOEFEY2lBRVBMMGFsK1A5TzJINkhRbXVGcUNlYVU1?=
+ =?utf-8?B?Q3lpdEd5aWNMakJaTEgxTUZVMGVwV3FQZHpLbWt1S1Zwdll1L2hoVWFXVEw2?=
+ =?utf-8?B?UjZuclUyV3FsVVVHZUExbW94dENmaFFTb0lCQmJldkNiQUx2ZzJ0Wk1qS0R0?=
+ =?utf-8?B?S1Vsd1Z2UHR1eVdmODQ1ZlVpWXkzc3dGeldvMVhYSUtSeEwzY1YvOFlzUndR?=
+ =?utf-8?B?eEtDRmFES05WNzBrNVVka1ZSTW9aNDBpdEY5c0wxVU4wdDNDMys0amxydHZI?=
+ =?utf-8?B?MGdFenk4RVlTckFhZFBuc2JSd2plQlFzR25SenphTHMwQkRrc2JTRzVSclg1?=
+ =?utf-8?B?MWZFcVRQWFBrc0dpMFFJck1Pc3hyVHVUV2xSa296MHBGWkZFanZHa1lBOFdm?=
+ =?utf-8?B?aHM0VnZPa2luUGUvZGs4RHVZcnVIbXhVNEpMMEp2VHBvem5rNGs1RmtEZ25K?=
+ =?utf-8?B?ZWhweHI0cnF6MGlYNzRRZlNweW56SVNtZThZb1hORS9UbXpqMlU1QmF5S2p2?=
+ =?utf-8?B?QWZmelJqV21hTFdLL2ZrcDErcEs2eEZXd3dwU0pJTDM5ejJjOGFjMjdnSjFz?=
+ =?utf-8?B?emQyUXhRRTNwSFhsV2dNWUkydTA5aTJRbWsxVzFpMVFyZEZ5RUhPeFRuWkdj?=
+ =?utf-8?B?NldsQVhUaTVrWFF1QjVEVzNkT2pOT1d6VUYrSzJkeHZWTTRVUFhBcHorbHJy?=
+ =?utf-8?B?OWJRTitEYzlKZGRIakwveUpzZjFaRkFPS2lwaE5HaU9XTGs0WFZsZ0pKRngy?=
+ =?utf-8?Q?DGcI=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20220831172024.1613208-1-svenva@chromium.org> <20220831172024.1613208-2-svenva@chromium.org>
-In-Reply-To: <20220831172024.1613208-2-svenva@chromium.org>
-From:   Sven van Ashbrook <svenva@chromium.org>
-Date:   Tue, 6 Sep 2022 10:15:35 -0400
-Message-ID: <CAG-rBihyZhanjiuqGGHMo-zB9YJ=FCaD+C-7R63FnVgKDsM+Mg@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] hwrng: core: fix potential suspend/resume race condition
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Alex Levin <levinale@google.com>, Rajat Jain <rajatja@google.com>,
-        Andrey Pronin <apronin@google.com>,
-        Stephen Boyd <swboyd@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e25bebf1-14a3-4e32-2ec4-08da90127fd9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2022 14:17:15.4472
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Z818de6bu/tbw2Secjzbq8G+16o5o4vApBrx5Wq3i4xC/lnIlirvxeK8EemkLjcEwTtO/EAZjIFc2LESq/qtXg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4564
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Any feedback on this patch, good/bad, any suggestions?
-
-Herbert, this patch should fix hw_random/core suspend/resume issues, without
-having to freeze the kthread - which should avoid the freeze regression problems
-that popped up.
-
-See earlier kthread freeze attempt here:
-https://lore.kernel.org/all/4a45b3e0-ed3a-61d3-bfc6-957c7ba631bb@maciej.szmigiero.name/T/#m2c37e2c176c4efc362116b57493749664b960f45
-
-I was hoping you could take a look.
-
-On Wed, Aug 31, 2022 at 1:20 PM Sven van Ashbrook <svenva@chromium.org> wrote:
->
-> The hwrng fill function runs as a normal kthread. This thread
-> doesn't get frozen by the PM, i.e. it will keep running during,
-> or in, system suspend. It may call the client driver's
-> data_present()/data_read() functions during, or in, suspend;
-> which may generate errors or warnings. For example, if the
-> client driver uses an i2c bus, the following warning may be
-> intermittently generated:
->
->   i2c: Transfer while suspended
->
-> Fix by converting the delay polled kthread into an ordered work
-> queue running a single, self-rearming delayed_work. Make the
-> workqueue WQ_FREEZABLE, so the PM will drain any work items
-> before going into suspend. This prevents client drivers from
-> being accessed during, or in, suspend.
->
-> Tested on a Chromebook containing an cr50 tpm over i2c. The test
-> consists of 31000 suspend/resume cycles. Occasional
-> "i2c: Transfer while suspended" warnings are seen. After applying
-> this patch, these warnings disappear.
->
-> This patch also does not appear to cause any regressions on the
-> ChromeOS test queues.
->
-> Signed-off-by: Sven van Ashbrook <svenva@chromium.org>
-> ---
->
->  drivers/char/hw_random/core.c | 95 +++++++++++++++++++----------------
->  1 file changed, 51 insertions(+), 44 deletions(-)
->
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 3675122c6cce..ee85ca97d215 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -17,7 +17,7 @@
->  #include <linux/hw_random.h>
->  #include <linux/random.h>
->  #include <linux/kernel.h>
-> -#include <linux/kthread.h>
-> +#include <linux/workqueue.h>
->  #include <linux/sched/signal.h>
->  #include <linux/miscdevice.h>
->  #include <linux/module.h>
-> @@ -28,14 +28,17 @@
->
->  #define RNG_MODULE_NAME                "hw_random"
->
-> -static struct hwrng *current_rng;
->  /* the current rng has been explicitly chosen by user via sysfs */
->  static int cur_rng_set_by_user;
-> -static struct task_struct *hwrng_fill;
-> +static struct workqueue_struct *hwrng_wq;
-> +static struct delayed_work hwrng_fill_dwork;
-> +static size_t entropy_credit;
-> +/* Protects rng_list, current_rng, is_hwrng_wq_running */
-> +static DEFINE_MUTEX(rng_mutex);
->  /* list of registered rngs */
->  static LIST_HEAD(rng_list);
-> -/* Protects rng_list and current_rng */
-> -static DEFINE_MUTEX(rng_mutex);
-> +static struct hwrng *current_rng;
-> +static bool is_hwrng_wq_running;
->  /* Protects rng read functions, data_avail, rng_buffer and rng_fillbuf */
->  static DEFINE_MUTEX(reading_mutex);
->  static int data_avail;
-> @@ -488,37 +491,29 @@ static int __init register_miscdev(void)
->         return misc_register(&rng_miscdev);
->  }
->
-> -static int hwrng_fillfn(void *unused)
-> +static void hwrng_fillfn(struct work_struct *unused)
->  {
-> -       size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
-> +       unsigned short quality;
->         unsigned long delay;
-> +       struct hwrng *rng;
-> +       size_t entropy; /* in 1/1024 of a bit */
->         long rc;
->
-> -       while (!kthread_should_stop()) {
-> -               unsigned short quality;
-> -               struct hwrng *rng;
-> -
-> -               rng = get_current_rng();
-> -               if (IS_ERR(rng) || !rng)
-> -                       break;
-> -               mutex_lock(&reading_mutex);
-> -               rc = rng_get_data(rng, rng_fillbuf,
-> -                                 rng_buffer_size(), 1);
-> -               if (current_quality != rng->quality)
-> -                       rng->quality = current_quality; /* obsolete */
-> -               quality = rng->quality;
-> -               mutex_unlock(&reading_mutex);
-> -               put_rng(rng);
-> -
-> -               if (!quality)
-> -                       break;
-> +       rng = get_current_rng();
-> +       if (IS_ERR(rng) || !rng)
-> +               return;
-> +       mutex_lock(&reading_mutex);
-> +       rc = rng_get_data(rng, rng_fillbuf, rng_buffer_size(), 1);
-> +       if (current_quality != rng->quality)
-> +               rng->quality = current_quality; /* obsolete */
-> +       quality = rng->quality;
-> +       mutex_unlock(&reading_mutex);
-> +       put_rng(rng);
->
-> -               if (rc <= 0) {
-> -                       pr_warn("hwrng: no data available\n");
-> -                       msleep_interruptible(10000);
-> -                       continue;
-> -               }
-> +       if (!quality)
-> +               return;
->
-> +       if (rc > 0) {
->                 /* If we cannot credit at least one bit of entropy,
->                  * keep track of the remainder for the next iteration
->                  */
-> @@ -529,11 +524,11 @@ static int hwrng_fillfn(void *unused)
->                 /* Outside lock, sure, but y'know: randomness. */
->                 delay = add_hwgenerator_randomness((void *)rng_fillbuf, rc,
->                                                    entropy >> 10);
-> -               if (delay > 0)
-> -                       schedule_timeout_interruptible(delay);
-> +       } else {
-> +               pr_warn("hwrng: no data available\n");
-> +               delay = 10 * HZ;
->         }
-> -       hwrng_fill = NULL;
-> -       return 0;
-> +       mod_delayed_work(hwrng_wq, &hwrng_fill_dwork, delay);
->  }
->
->  static void hwrng_manage_rngd(struct hwrng *rng)
-> @@ -541,14 +536,12 @@ static void hwrng_manage_rngd(struct hwrng *rng)
->         if (WARN_ON(!mutex_is_locked(&rng_mutex)))
->                 return;
->
-> -       if (rng->quality == 0 && hwrng_fill)
-> -               kthread_stop(hwrng_fill);
-> -       if (rng->quality > 0 && !hwrng_fill) {
-> -               hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
-> -               if (IS_ERR(hwrng_fill)) {
-> -                       pr_err("hwrng_fill thread creation failed\n");
-> -                       hwrng_fill = NULL;
-> -               }
-> +       if (rng->quality == 0 && is_hwrng_wq_running) {
-> +               cancel_delayed_work(&hwrng_fill_dwork);
-> +               is_hwrng_wq_running = false;
-> +       } else if (rng->quality > 0 && !is_hwrng_wq_running) {
-> +               mod_delayed_work(hwrng_wq, &hwrng_fill_dwork, 0);
-> +               is_hwrng_wq_running = true;
->         }
->  }
->
-> @@ -631,8 +624,7 @@ void hwrng_unregister(struct hwrng *rng)
->         new_rng = get_current_rng_nolock();
->         if (list_empty(&rng_list)) {
->                 mutex_unlock(&rng_mutex);
-> -               if (hwrng_fill)
-> -                       kthread_stop(hwrng_fill);
-> +               cancel_delayed_work_sync(&hwrng_fill_dwork);
->         } else
->                 mutex_unlock(&rng_mutex);
->
-> @@ -703,17 +695,32 @@ static int __init hwrng_modinit(void)
->                 return -ENOMEM;
->         }
->
-> +       /* ordered wq to mimic delay-polled kthread behaviour */
-> +       hwrng_wq = alloc_ordered_workqueue("hwrng",
-> +               WQ_FREEZABLE |  /* prevent work from running during suspend/resume */
-> +               WQ_MEM_RECLAIM  /* client drivers may need memory reclaim */
-> +       );
-> +       if (!hwrng_wq) {
-> +               kfree(rng_fillbuf);
-> +               kfree(rng_buffer);
-> +               return -ENOMEM;
-> +       }
-> +
->         ret = register_miscdev();
->         if (ret) {
-> +               destroy_workqueue(hwrng_wq);
->                 kfree(rng_fillbuf);
->                 kfree(rng_buffer);
->         }
->
-> +       INIT_DELAYED_WORK(&hwrng_fill_dwork, hwrng_fillfn);
-> +
->         return ret;
->  }
->
->  static void __exit hwrng_modexit(void)
->  {
-> +       destroy_workqueue(hwrng_wq);
->         mutex_lock(&rng_mutex);
->         BUG_ON(current_rng);
->         kfree(rng_buffer);
-> --
-> 2.37.2.672.g94769d06f0-goog
->
+W0FNRCBPZmZpY2lhbCBVc2UgT25seSAtIEdlbmVyYWxdDQoNCj4+IE9uIFR1ZSwgQXVnIDA5LCAy
+MDIyIGF0IDA2OjU1OjQzUE0gKzAyMDAsIEJvcmlzbGF2IFBldGtvdiB3cm90ZToNCj4+ID4gT24g
+TW9uLCBKdW4gMjAsIDIwMjIgYXQgMTE6MDM6NDNQTSArMDAwMCwgQXNoaXNoIEthbHJhIHdyb3Rl
+Og0KPj4gPiA+ICsgICBwZm4gPSBwdGVfcGZuKCpwdGUpOw0KPj4gPiA+ICsNCj4+ID4gPiArICAg
+LyogSWYgaXRzIGxhcmdlIHBhZ2UgdGhlbiBjYWxjdWx0ZSB0aGUgZmF1bHQgcGZuICovDQo+PiA+
+ID4gKyAgIGlmIChsZXZlbCA+IFBHX0xFVkVMXzRLKSB7DQo+PiA+ID4gKyAgICAgICAgICAgdW5z
+aWduZWQgbG9uZyBtYXNrOw0KPj4gPiA+ICsNCj4+ID4gPiArICAgICAgICAgICBtYXNrID0gcGFn
+ZXNfcGVyX2hwYWdlKGxldmVsKSAtIHBhZ2VzX3Blcl9ocGFnZShsZXZlbCAtIDEpOw0KPj4gPiA+
+ICsgICAgICAgICAgIHBmbiB8PSAoYWRkcmVzcyA+PiBQQUdFX1NISUZUKSAmIG1hc2s7DQo+PiA+
+DQo+PiA+IE9oIGJveSwgdGhpcyBpcyB1bm5lY2Vzc2FyaWx5IGNvbXBsaWNhdGVkLiBJc24ndCB0
+aGlzDQo+PiA+DQo+PiA+ICAgICAgIHBmbiB8PSBwdWRfaW5kZXgoYWRkcmVzcyk7DQo+PiA+DQo+
+PiA+IG9yDQo+PiA+ICAgICAgIHBmbiB8PSBwbWRfaW5kZXgoYWRkcmVzcyk7DQo+Pg0KPj4gSSBw
+bGF5ZWQgd2l0aCB0aGlzIGEgYml0IGFuZCBlbmRlZCB1cCB3aXRoDQo+Pg0KPj4gICAgICAgICBw
+Zm4gPSBwdGVfcGZuKCpwdGUpIHwgUEZOX0RPV04oYWRkcmVzcyAmIHBhZ2VfbGV2ZWxfbWFzayhs
+ZXZlbCANCj4+IC0gMSkpOw0KPj4NCj4+IFVubGVzcyBJIGdvdCBzb21ldGhpbmcgdGVycmlibHkg
+d3JvbmcsIHRoaXMgc2hvdWxkIGRvIHRoZSBzYW1lIChzZWUgDQo+PiB0aGUgYXR0YWNoZWQgcGF0
+Y2gpIGFzIHRoZSBleGlzdGluZyBjYWxjdWxhdGlvbnMuDQoNCj5BY3R1YWxseSwgSSBkb24ndCB0
+aGluayB0aGV5J3JlIHRoZSBzYW1lLiBJIHRoaW5rIEphcmtrbydzIHZlcnNpb24gaXMgY29ycmVj
+dC4gU3BlY2lmaWNhbGx5Og0KPi0gRm9yIGxldmVsID0gUEdfTEVWRUxfMk0gdGhleSdyZSB0aGUg
+c2FtZS4NCj4tIEZvciBsZXZlbCA9IFBHX0xFVkVMXzFHOg0KPlRoZSBjdXJyZW50IGNvZGUgY2Fs
+Y3VsYXRlcyBhIGdhcmJhZ2UgbWFzazoNCj5tYXNrID0gcGFnZXNfcGVyX2hwYWdlKGxldmVsKSAt
+IHBhZ2VzX3Blcl9ocGFnZShsZXZlbCAtIDEpOyB0cmFuc2xhdGVzIHRvOg0KPj4+IGhleCgyNjIx
+NDQgLSA1MTIpDQo+JzB4M2ZlMDAnDQoNCk5vIGFjdHVhbGx5IHRoaXMgaXMgbm90IGEgZ2FyYmFn
+ZSBtYXNrLCBhcyBJIGV4cGxhaW5lZCBpbiBlYXJsaWVyIHJlc3BvbnNlcyB3ZSBuZWVkIHRvIGNh
+cHR1cmUgdGhlIGFkZHJlc3MgYml0cyANCnRvIGdldCB0byB0aGUgY29ycmVjdCA0SyBpbmRleCBp
+bnRvIHRoZSBSTVAgdGFibGUuDQpUaGVyZWZvcmUsIGZvciBsZXZlbCA9IFBHX0xFVkVMXzFHOg0K
+bWFzayA9IHBhZ2VzX3Blcl9ocGFnZShsZXZlbCkgLSBwYWdlc19wZXJfaHBhZ2UobGV2ZWwgLSAx
+KSA9PiAweDNmZTAwICh3aGljaCBpcyB0aGUgY29ycmVjdCBtYXNrKS4NCg0KPkJ1dCBJIGJlbGll
+dmUgSmFya2tvJ3MgdmVyc2lvbiBjYWxjdWxhdGVzIHRoZSBjb3JyZWN0IG1hc2sgKGJlbG93KSwg
+aW5jb3Jwb3JhdGluZyBhbGwgMTggb2Zmc2V0IGJpdHMgaW50byB0aGUgMUcgcGFnZS4NCj4+PiBo
+ZXgoMjYyMTQ0IC0xKQ0KPicweDNmZmZmJw0KDQpXZSBjYW4gZ2V0IHRoaXMgc2ltcGx5IGJ5IGRv
+aW5nIChwYWdlX3Blcl9ocGFnZShsZXZlbCktMSksIGJ1dCBhcyBJIG1lbnRpb25lZCBhYm92ZSB0
+aGlzIGlzIG5vdCB3aGF0IHdlIG5lZWQuDQoNClRoYW5rcywNCkFzaGlzaA0K
