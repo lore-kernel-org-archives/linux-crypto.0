@@ -2,111 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D73DCECAAD3
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 02:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 989F4ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 02:52:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232871AbiIFCwA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Sep 2022 22:52:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38746 "EHLO
+        id S237829AbiIFCwB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Sep 2022 22:52:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231664AbiIFCv5 (ORCPT
+        with ESMTP id S231664AbiIFCwA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Sep 2022 22:51:57 -0400
+        Mon, 5 Sep 2022 22:52:00 -0400
 Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.133.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BA7647C8
-        for <linux-crypto@vger.kernel.org>; Mon,  5 Sep 2022 19:51:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E59F5F124
+        for <linux-crypto@vger.kernel.org>; Mon,  5 Sep 2022 19:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
-        s=selector; t=1662432716;
+        s=selector; t=1662432718;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NM+t79PpSUp/lFULvglYSiTQcuVObzQmfn1c1iAY8wg=;
-        b=kclRZgCBhlKIN3/VD2yp9d1XaQYFzsRO4rSGIDRjANXMqTIsJ4IpyIttAN0MQFtkaTs3A/
-        T+sc9EhGJNgo/Y7NXt54hfck44LHdK1t2pgYSg2Cs8MXVAvm58LrpYSuZSOuDlHnJOwoEd
-        PU4Z44Z8m7jdnmNNCAkMkxH+jCtzfHVTKAXea9JEXHJVeKa3pdUYYqM22JRm94wGwzh3d7
-        gMjrKK1ScVJ4s1xrfqHh7cNO6RJn3x4QQPnBh4MgzYhuk/P5Jc0JZrKvoNC02A82Nr7qjU
-        JLQ2hFqXEDA/32v6ejyHDZBXSUb+i1e80d58jhM5/ESFEPkbRei+GI5IVZbENA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f9SNYQWnprxxClMNnaeVCmK6Kfg/AHOIpiytMtyCNb8=;
+        b=m4F37Bjc1x3XpYXwOxe7ItGlNnSxmw3m4nwR25fjdl8et6k1m7oBDq6FVM61KrhiIyO0Qq
+        x1wjYAOKwix1K/XgjznuDSfUez+tBwMZGXOa8nagXgQsAwoVQEkm19iMnzd16qmRQVFEdO
+        S6d1RAqP7WpVjfBhVpjOqG4jn8+zJajCz+73jyJpmr2CIyV/YfZyZUCwlZsfSrsvqhLz66
+        5A6U9dO4XQBdVo7wCI4QBZSi/8PZtzM7Rzm1AkPafYkLFbsIhdpB5WGqWAsYq77GshUAkj
+        PwPavKl2gFKqurKGS0mMsx2j+NlO36t17L+Ovr21AC9b1XUCaC5E96UxHXWQ+w==
 Received: from mail.maxlinear.com (174-47-1-83.static.ctl.one [174.47.1.83])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- us-mta-622-hP6gg1kfOxK7O267I44RQg-1; Mon, 05 Sep 2022 22:51:55 -0400
-X-MC-Unique: hP6gg1kfOxK7O267I44RQg-1
+ us-mta-622-D6flh4ZTPpmVigD8flmrZg-2; Mon, 05 Sep 2022 22:51:56 -0400
+X-MC-Unique: D6flh4ZTPpmVigD8flmrZg-2
 Received: from sgsxdev002.isng.phoenix.local (10.226.81.112) by
  mail.maxlinear.com (10.23.38.120) with Microsoft SMTP Server id 15.1.2375.24;
- Mon, 5 Sep 2022 19:51:53 -0700
+ Mon, 5 Sep 2022 19:51:54 -0700
 From:   Peter Harliman Liem <pliem@maxlinear.com>
 To:     <atenart@kernel.org>, <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-lgm-soc@maxlinear.com>,
         "Peter Harliman Liem" <pliem@maxlinear.com>
-Subject: [PATCH v2 1/2] crypto: inside_secure - Avoid dma map if size is zero
-Date:   Tue, 6 Sep 2022 10:51:49 +0800
-Message-ID: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
+Subject: [PATCH v2 2/2] crypto: inside-secure - Select CRYPTO_AES config
+Date:   Tue, 6 Sep 2022 10:51:50 +0800
+Message-ID: <60cb9b954bb079b1f12379821a64faff00bb368e.1662432407.git.pliem@maxlinear.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
+References: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: maxlinear.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From commit d03c54419274 ("dma-mapping: disallow .map_sg
-operations from returning zero on error"), dma_map_sg()
-produces warning if size is 0. This results in visible
-warnings if crypto length is zero.
-To avoid that, we avoid calling dma_map_sg if size is zero.
+CRYPTO_AES is needed for aes-related algo (e.g.
+safexcel-gcm-aes, safexcel-xcbc-aes, safexcel-cmac-aes).
+Without it, we observe failures when allocating transform
+for those algo.
 
-Fixes: d03c54419274 ("dma-mapping: disallow .map_sg operations from returni=
-ng zero on error")
+Fixes: 363a90c2d517 ("crypto: safexcel/aes - switch to library version of k=
+ey expansion routine")
 Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
 ---
 v2:
  Add fixes tag
 
- drivers/crypto/inside-secure/safexcel_cipher.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypt=
-o/inside-secure/safexcel_cipher.c
-index d68ef16650d4..3775497775e0 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -737,14 +737,17 @@ static int safexcel_send_req(struct crypto_async_requ=
-est *base, int ring,
- =09=09=09=09max(totlen_src, totlen_dst));
- =09=09=09return -EINVAL;
- =09=09}
--=09=09dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRECTIONAL);
-+=09=09if (sreq->nr_src > 0)
-+=09=09=09dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRECTIONAL);
- =09} else {
- =09=09if (unlikely(totlen_src && (sreq->nr_src <=3D 0))) {
- =09=09=09dev_err(priv->dev, "Source buffer not large enough (need %d bytes=
-)!",
- =09=09=09=09totlen_src);
- =09=09=09return -EINVAL;
- =09=09}
--=09=09dma_map_sg(priv->dev, src, sreq->nr_src, DMA_TO_DEVICE);
-+
-+=09=09if (sreq->nr_src > 0)
-+=09=09=09dma_map_sg(priv->dev, src, sreq->nr_src, DMA_TO_DEVICE);
-=20
- =09=09if (unlikely(totlen_dst && (sreq->nr_dst <=3D 0))) {
- =09=09=09dev_err(priv->dev, "Dest buffer not large enough (need %d bytes)!=
-",
-@@ -753,7 +756,9 @@ static int safexcel_send_req(struct crypto_async_reques=
-t *base, int ring,
- =09=09=09=09     DMA_TO_DEVICE);
- =09=09=09return -EINVAL;
- =09=09}
--=09=09dma_map_sg(priv->dev, dst, sreq->nr_dst, DMA_FROM_DEVICE);
-+
-+=09=09if (sreq->nr_dst > 0)
-+=09=09=09dma_map_sg(priv->dev, dst, sreq->nr_dst, DMA_FROM_DEVICE);
- =09}
-=20
- =09memcpy(ctx->base.ctxr->data, ctx->key, ctx->key_len);
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 3e6aa319920b..b12d222e49a1 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -740,6 +740,7 @@ config CRYPTO_DEV_SAFEXCEL
+ =09select CRYPTO_SHA512
+ =09select CRYPTO_CHACHA20POLY1305
+ =09select CRYPTO_SHA3
++=09select CRYPTO_AES
+ =09help
+ =09  This driver interfaces with the SafeXcel EIP-97 and EIP-197 cryptogra=
+phic
+ =09  engines designed by Inside Secure. It currently accelerates DES, 3DES=
+ and
 --=20
 2.17.1
 
