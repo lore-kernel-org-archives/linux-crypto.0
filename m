@@ -2,145 +2,405 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA349C6FA83
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90549ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:49:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232571AbiIFQoR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 12:44:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60886 "EHLO
+        id S233380AbiIFQtn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 12:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238584AbiIFQnq (ORCPT
+        with ESMTP id S233387AbiIFQtV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:43:46 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23345F218
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 09:22:45 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id br15-20020a056830390f00b0061c9d73b8bdso8395876otb.6
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:22:45 -0700 (PDT)
+        Tue, 6 Sep 2022 12:49:21 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5F01D30C
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 09:34:50 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id e20so16260462wri.13
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=A4brQTvRlh4R5wPRp39SU02kPOk/lBeJHkJkNAOJzuE=;
-        b=isU9HDA1TFgFaIT1MAKrgwCsm+L+E2hAnFW3gXsCwQzf7nTHo/+zRFgKPs9wrf4qbA
-         1qf0eRE0B14dUZzgGu76iRnh8ybluQPmWi4sVXsx4cQVy+ZOc27LG/5Px+vewz7Kkz+v
-         6TFJ/SJ4CBKioqBXywGAptxXvfgWc009plbGo=
+        d=arista.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=UMK536Buc3tyACpoqD9UkBRLk6CrV6AwT1m3G1iH3lY=;
+        b=W79QCDBfsBZhY3udIZXglanrIDIK2Ag1acFspTBUuEF1/zduN20nn5hDx0oEbVDSMK
+         D42ymkytni7ohKpgDiTTnfh0xZSCPowoGk/EGCUuXijnMyeFTOAeMw92RcCouQquFJKw
+         m7ZbK5S8QyorES2/LX7nPUU7GThTaJERju5MWunPdatU9CiIKW6MSqIPKwI43A9n5ONc
+         MG7PgczvAiv7WsYVx65gS5Y8wVJNMHgcuFnkofV6IxZt0WvuveZOE4Wr8MdVgZ2CpJTM
+         LaRgUp+qTdp5OcCZhqfOJFvnSOAV0iqXj1d5dKPxEDdbG64E9NWwcaerpXj3iryPfoIp
+         rRQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=A4brQTvRlh4R5wPRp39SU02kPOk/lBeJHkJkNAOJzuE=;
-        b=gN4ikYewUBWovdFZxRXhdcXvm0/ZOYGEejujgzEo2SobdX3P9/ZW3pwErkJia232j8
-         uoZe6yH9Pet8f93jY8n30fwC8RSuR0uuN68MFO0zB0iwINdpcRphYpwcz6iLSWgFZotb
-         g1NK5QMB8EdqCe81vA4SsurjkDOmOhg95WM8w2AI79MWQtf3FW1ReFsxlq+jS536YKb3
-         bUHUh0lAHJIv/godGqHLIIwZP9fXodZQrK25UXnLji58bPvEA3AT49KR6l+xh/ldSkS5
-         NRWCGQx+G/hPazaup0D4jouFZ8n26T1zeOwBC8/XuyQwS7F0tz4K0/lw+lv+Ar3SYbzi
-         n5ew==
-X-Gm-Message-State: ACgBeo3YmfeckdZQMkaV13xEO/eaeyYw5f4vvElrvaaBCVJSMHIGh16b
-        ONCxiXxqyCnoPYmX3u9TlhSDZj9HPSpKow==
-X-Google-Smtp-Source: AA6agR4nEhp6EjF0zAwHcSuNQJyiczTINdv4jrDZKFbelzw5/yWb319XGDZomXC02ORo1ZM/Q51qwA==
-X-Received: by 2002:a9d:77c3:0:b0:637:36c1:475b with SMTP id w3-20020a9d77c3000000b0063736c1475bmr21647815otl.346.1662481365049;
-        Tue, 06 Sep 2022 09:22:45 -0700 (PDT)
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com. [209.85.160.52])
-        by smtp.gmail.com with ESMTPSA id cy16-20020a056870b69000b001227148da8csm435337oab.36.2022.09.06.09.22.43
-        for <linux-crypto@vger.kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=UMK536Buc3tyACpoqD9UkBRLk6CrV6AwT1m3G1iH3lY=;
+        b=4aA1Z0li/hG8UausOPg05x5tW6UdCFmfgdDK5+BkA9zkVfsnWbImBkyKPOrSDJ1JB2
+         HViDlMsZzR1b5Lx0HZl43kTXrM5lzGXOmT1IoldA4RvSwIPVQWk2lrnov1j38yCsT3J0
+         8rnuApnNW+IJJJDgn6OdCQWZylpe1np1EIVoyDSVkNNGerxIWprr/UsBqPaix8SOqIbW
+         gBBb0m2X85IUBNCG3j/ZhrQO+dKf85MR1neSb3PbzvlSP0Tm/XeIjZCpKVvG6gRCiVqM
+         UVpS6ZhMCn5k1XQTucdpLFOwuNAesqeDxePoVDMRVhMYDMdrWrOYI0KN8R5/HJixHq8H
+         1AYg==
+X-Gm-Message-State: ACgBeo2z3tDgA2TOjQZzE4Dhbxg0G9FZFfLmVWuOQ78IxeEg9h6rNSGa
+        8b4EuUapGYm9ck+ReeOFCyd2dA==
+X-Google-Smtp-Source: AA6agR6+rkMERc3iXtzDpZ+FTje+AOXKMpuCsOvyq1Fd9KZABhY8d5Qu2LPDFxvU6PJAtNvmf5WUtw==
+X-Received: by 2002:a05:6000:1549:b0:225:652e:45d4 with SMTP id 9-20020a056000154900b00225652e45d4mr28679809wry.15.1662482089343;
+        Tue, 06 Sep 2022 09:34:49 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id n5-20020a05600c304500b003a5de95b105sm20477031wmh.41.2022.09.06.09.34.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Sep 2022 09:22:43 -0700 (PDT)
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1278a61bd57so10888880fac.7
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:22:43 -0700 (PDT)
-X-Received: by 2002:a05:6808:3096:b0:342:ff93:4672 with SMTP id
- bl22-20020a056808309600b00342ff934672mr10837507oib.174.1662481362737; Tue, 06
- Sep 2022 09:22:42 -0700 (PDT)
+        Tue, 06 Sep 2022 09:34:48 -0700 (PDT)
+Message-ID: <8fb27342-2b32-b0e7-09d9-622ce16e8e76@arista.com>
+Date:   Tue, 6 Sep 2022 17:34:41 +0100
 MIME-Version: 1.0
-References: <20220112211258.21115-1-chang.seok.bae@intel.com>
- <20220112211258.21115-8-chang.seok.bae@intel.com> <CAE=gft4P2iGJDiYJccZFR1VnNomQB7Uo522r2gvrfNY9oKz5jg@mail.gmail.com>
- <763bddd2-2fc3-a857-0dff-a5ae4ae1f298@intel.com> <CAE=gft5VajfoAT6hVxiCzAMYiDV+pHRbC-F7s4+qK94qa0og5w@mail.gmail.com>
- <6f2dcc0c-99a2-8698-13ae-d5cbea9945b0@intel.com> <CAE=gft6sO85RBpfdXnR=_r=KGmVrx0mnBOHK7XadNk00gDr-WA@mail.gmail.com>
- <a3fd8d2d-72d0-ba13-ef77-caff2b239867@intel.com>
-In-Reply-To: <a3fd8d2d-72d0-ba13-ef77-caff2b239867@intel.com>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Tue, 6 Sep 2022 09:22:06 -0700
-X-Gmail-Original-Message-ID: <CAE=gft7BQAwHTxoCtSu-gHZDtcETvBM-nony_nzBD8ziE_HcZw@mail.gmail.com>
-Message-ID: <CAE=gft7BQAwHTxoCtSu-gHZDtcETvBM-nony_nzBD8ziE_HcZw@mail.gmail.com>
-Subject: Re: [PATCH v5 07/12] x86/cpu/keylocker: Load an internal wrapping key
- at boot-time
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        herbert@gondor.apana.org.au, Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org,
-        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>, bp@suse.de,
-        dave.hansen@linux.intel.com, mingo@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
-        ravi.v.shankar@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH 25/31] selftests/net: Add TCP-AO library
+Content-Language: en-US
+To:     Shuah Khan <skhan@linuxfoundation.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20220818170005.747015-1-dima@arista.com>
+ <20220818170005.747015-26-dima@arista.com>
+ <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <aa0143bc-b0d1-69fb-c117-1e7241f0ad89@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 4:16 PM Chang S. Bae <chang.seok.bae@intel.com> wrote:
->
-> On 8/25/2022 8:31 AM, Evan Green wrote:
-> >
-> > Here's the log I've got that pointed me down this path:
-> > https://pastebin.com/VvR1EHvE
->
->      <3>[43486.261583] x86/keylocker: The key backup access failed with
-> read error.
->      <3>[43486.261584] x86/keylocker: Failed to restore internal
-> wrapping key.
->
-> Looks like the IWKey backup was corrupted on that system.
->
-> > Relevant bit pasted below:
-> >
-> > <6>[43486.263035] Enabling non-boot CPUs ...
-> > <6>[43486.263081] x86: Booting SMP configuration:
-> > <6>[43486.263082] smpboot: Booting Node 0 Processor 1 APIC 0x1
-> > <2>[43486.264010] kernel tried to execute NX-protected page - exploit
-> > attempt? (uid: 0)
-> > <1>[43486.264019] BUG: unable to handle page fault for address: ffffffff94b483a6
-> > <1>[43486.264021] #PF: supervisor instruction fetch in kernel mode
-> > <1>[43486.264023] #PF: error_code(0x0011) - permissions violation
-> > <6>[43486.264025] PGD 391c0e067 P4D 391c0e067 PUD 391c0f063 PMD
-> > 10006c063 PTE 8000000392148163
-> > <4>[43486.264031] Oops: 0011 [#1] PREEMPT SMP NOPTI
-> > <4>[43486.264035] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G U
-> > 5.10.136-19391-gadfe4d4b8c04 #1
-> > b640352a7a0e5f1522aed724296ad63f90c007df
-> > <4>[43486.264036] Hardware name: Google Primus/Primus, BIOS
-> > Google_Primus.14505.145.0 06/23/2022
-> > <4>[43486.264042] RIP: 0010:load_keylocker+0x0/0x7f
->
-> But, I don't get the reason why it hit this. On the wake-up path,
-> copy_keylocker() is supposed to be called.
+On 8/23/22 16:47, Shuah Khan wrote:
+> On 8/18/22 10:59 AM, Dmitry Safonov wrote:
+[..]
+>> +
+>> +__attribute__((__format__(__printf__, 2, 3)))
+>> +static inline void __test_print(void (*fn)(const char *), const char
+>> *fmt, ...)
+>> +{
+>> +#define TEST_MSG_BUFFER_SIZE 4096
+>> +    char buf[TEST_MSG_BUFFER_SIZE];
+>> +    va_list arg;
+>> +
+>> +    va_start(arg, fmt);
+>> +    vsnprintf(buf, sizeof(buf), fmt, arg);
+>> +    va_end(arg);
+>> +    fn(buf);
+>> +}
+>> +
+> 
+> Is there a reason add these instead of using kselftest_* print
+> functions?
 
-Interesting, that's helpful. I thought I had a lead based on this,
-which was that in this case we were doing a hibernate to shutdown,
-rather than hibernate to S4. The IWKey backup is only valid down to
-S4, so a read error on resume from this type of hibernate might make
-sense. I know keylocker won't successfully maintain handles across a
-hibernate to shutdown and subsequent resume, but it shouldn't crash
-either.
+Inside __test_ok(), __test_msg(), __test_fail() and __test_error() are
+calling ksft_*() functions. kselftest_*() by themselves are not
+thread-safe and I was not sure if you would want them to be.
 
-But this still doesn't explain this crash, since in this case we're
-still on our way down and haven't even done the shutdown yet. We can
-see the "PM: hibernation: Image created (1536412 pages copied)" log
-line just before the keylocker read failure. So then it seems
-something's not working with the pre-hibernate CPU hotplug path?
+> 
+>> +#define test_print(fmt, ...)                        \
+>> +    __test_print(__test_msg, "%ld[%s:%u] " fmt "\n",        \
+>> +             syscall(SYS_gettid),                \
+>> +             __FILE__, __LINE__, ##__VA_ARGS__)
+>> +
+>> +#define test_ok(fmt, ...)                        \
+>> +    __test_print(__test_ok, fmt "\n", ##__VA_ARGS__)
+>> +
+>> +#define test_fail(fmt, ...)                        \
+>> +do {                                    \
+>> +    if (errno)                            \
+>> +        __test_print(__test_fail, fmt ": %m\n", ##__VA_ARGS__);    \
+>> +    else                                \
+>> +        __test_print(__test_fail, fmt "\n", ##__VA_ARGS__);    \
+>> +    test_failed();                            \
+>> +} while(0)
+>> +
+>> +#define KSFT_FAIL  1
+>> +#define test_error(fmt, ...)                        \
+>> +do {                                    \
+>> +    if (errno)                            \
+>> +        __test_print(__test_error, "%ld[%s:%u] " fmt ": %m\n",    \
+>> +                 syscall(SYS_gettid), __FILE__, __LINE__,    \
+>> +                 ##__VA_ARGS__);                \
+>> +    else                                \
+>> +        __test_print(__test_error, "%ld[%s:%u] " fmt "\n",    \
+>> +                 syscall(SYS_gettid), __FILE__, __LINE__,    \
+>> +                 ##__VA_ARGS__);                \
+>> +    exit(KSFT_FAIL);                        \
+>> +} while(0)
+>> +
+> 
+> Is there a reason add these instead of using kselftest_* print
+> functions?
+
+The same reason: two or more threads my fail the test at the same
+moment, I needed some way of protecting the output.
+
+>> + * Timeout on syscalls where failure is not expected.
+>> + * You may want to rise it if the test machine is very busy.
+>> + */
+>> +#ifndef TEST_TIMEOUT_SEC
+>> +#define TEST_TIMEOUT_SEC    5
+>> +#endif
+>> +
+> 
+> Where is the TEST_TIMEOUT_SEC usually defined? Does this come
+> from shell wrapper that runs this test? Can we add a message before
+> starting the test print the timeout used?
+
+Usually it's not re-defined and used as-is. Ifndef here is only to make
+it easier to recompile with another timeout const: one can just add
+CFLAGS+=-DTEST_TIMEOUT_SEC=10 and check if that helps on the busy hardware.
 
 
->
-> I added some printout in there, and it looks to be fine with me:
->
->      [  218.488711] Enabling non-boot CPUs ...
->      [  218.488794] x86: Booting SMP configuration:
->      [  218.488795] smpboot: Booting Node 0 Processor 1 APIC 0x1
->      [  218.490634] x86/keylocker: restore processor (id=1)
->      [  218.491186] CPU1 is up
->      ...
+>> +/*
+>> + * Timeout on connect() where a failure is expected.
+>> + * If set to 0 - kernel will try to retransmit SYN number of times,
+>> set in
+>> + * /proc/sys/net/ipv4/tcp_syn_retries
+>> + * By default set to 1 to make tests pass faster on non-busy machine.
+>> + */
+>> +#ifndef TEST_RETRANSMIT_SEC
+>> +#define TEST_RETRANSMIT_SEC    1
+>> +#endif
+>> +
+> 
+> Where would this TEST_RETRANSMIT_SEC defined usually?
 
-How were you exercising the CPU onlining in this case? Boot, cpu
-hotplug, or hibernate?
--Evan
+The same: I always used the default value, but protected by ifndef if
+one wants to increase the value.
+
+>> +
+>> +static inline int _test_connect_socket(int sk, const union tcp_addr
+>> taddr,
+>> +                    unsigned port, time_t timeout)
+>> +{
+>> +#ifdef IPV6_TEST
+>> +    struct sockaddr_in6 addr = {
+>> +        .sin6_family    = AF_INET6,
+>> +        .sin6_port    = htons(port),
+>> +        .sin6_addr    = taddr.a6,
+>> +    };
+>> +#else
+>> +    struct sockaddr_in addr = {
+>> +        .sin_family    = AF_INET,
+>> +        .sin_port    = htons(port),
+>> +        .sin_addr    = taddr.a4,
+>> +    };
+>> +#endif
+> 
+> Why do we defined these here - are they also defined in a kernel
+> header?
+
+No, those functions are helpers that process family-specific members.
+IPV6_TEST is coming from Makefile:
+$(OUTPUT)/%_ipv6: %.c
+	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
+
+This way all tests can be compiled from the same code for both address
+families, resulting in *_ipv4 and *_ipv6 binaries that reuse all the
+code, but just have those #ifdef IPV6_TEST in places where test converts
+or produces IP addresses.
+
+[..]
+>> +static inline int test_prepare_ao(struct tcp_ao *ao,
+>> +        const char *alg, uint16_t flags,
+>> +        union tcp_addr in_addr, uint8_t prefix,
+>> +        uint8_t sndid, uint8_t rcvid, uint8_t maclen,
+>> +        uint8_t keyflags, uint8_t keylen, const char *key)
+>> +{
+>> +#ifdef IPV6_TEST
+>> +    struct sockaddr_in6 addr = {
+>> +        .sin6_family    = AF_INET6,
+>> +        .sin6_port    = 0,
+>> +        .sin6_addr    = in_addr.a6,
+>> +    };
+>> +#else
+>> +    struct sockaddr_in addr = {
+>> +        .sin_family    = AF_INET,
+>> +        .sin_port    = 0,
+>> +        .sin_addr    = in_addr.a4,
+>> +    };
+>> +#endif
+>> +
+> 
+> Same question here. In general having these ifdefs isn't ideal without
+> a good reason.
+
+Same as above.
+
+> 
+>> +    return test_prepare_ao_sockaddr(ao, alg, flags,
+>> +            (void *)&addr, sizeof(addr), prefix, sndid, rcvid,
+>> +            maclen, keyflags, keylen, key);
+>> +}
+>> +
+>> +static inline int test_prepare_def_ao(struct tcp_ao *ao,
+>> +        const char *key, uint16_t flags,
+>> +        union tcp_addr in_addr, uint8_t prefix,
+>> +        uint8_t sndid, uint8_t rcvid)
+>> +{
+>> +    if (prefix > DEFAULT_TEST_PREFIX)
+>> +        prefix = DEFAULT_TEST_PREFIX;
+>> +
+>> +    return test_prepare_ao(ao, DEFAULT_TEST_ALGO, flags, in_addr,
+>> +            prefix, sndid, rcvid, 0, 0, strlen(key), key);
+>> +}
+>> +
+>> +extern int test_get_one_ao(int sk, struct tcp_ao_getsockopt *out,
+>> +               uint16_t flags, void *addr, size_t addr_sz,
+>> +               uint8_t prefix, uint8_t sndid, uint8_t rcvid);
+>> +extern int test_cmp_getsockopt_setsockopt(const struct tcp_ao *a,
+>> +                      const struct tcp_ao_getsockopt *b);
+>> +
+>> +static inline int test_verify_socket_ao(int sk, struct tcp_ao *ao)
+>> +{
+>> +    struct tcp_ao_getsockopt tmp;
+>> +    int err;
+>> +
+>> +    err = test_get_one_ao(sk, &tmp, 0, &ao->tcpa_addr,
+>> +            sizeof(ao->tcpa_addr), ao->tcpa_prefix,
+>> +            ao->tcpa_sndid, ao->tcpa_rcvid);
+>> +    if (err)
+>> +        return err;
+> 
+> Is this always an error or could this a skip if dependencies aren't
+> met to run the test? This is a global comment for all error cases.
+
+Yeah, at this moment all tests will FAIL if CONFIG_TCP_AO is disabled.
+I'll look into making them SKIP when getsockopt()/setsockopt() returns
+ENOPROTOOPT in next versions of patches.
+
+> 
+>> +
+>> +    return test_cmp_getsockopt_setsockopt(ao, &tmp);
+>> +}
+>> +
+>> +static inline int test_set_ao(int sk, const char *key, uint16_t flags,
+>> +                  union tcp_addr in_addr, uint8_t prefix,
+>> +                  uint8_t sndid, uint8_t rcvid)
+>> +{
+>> +    struct tcp_ao tmp;
+>> +    int err;
+>> +
+>> +    err = test_prepare_def_ao(&tmp, key, flags, in_addr,
+>> +            prefix, sndid, rcvid);
+>> +    if (err)
+>> +        return err;
+> 
+> Same comment as above here.
+> 
+>> +
+>> +    if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &tmp, sizeof(tmp)) < 0)
+>> +        return -errno;
+>> +
+>> +    return test_verify_socket_ao(sk, &tmp);
+>> +}
+>> +
+>> +extern ssize_t test_server_run(int sk, ssize_t quota, time_t
+>> timeout_sec);
+>> +extern ssize_t test_client_loop(int sk, char *buf, size_t buf_sz,
+>> +                const size_t msg_len, time_t timeout_sec);
+>> +extern int test_client_verify(int sk, const size_t msg_len, const
+>> size_t nr,
+>> +                  time_t timeout_sec);
+>> +
+>> +struct netstat;
+>> +extern struct netstat *netstat_read(void);
+>> +extern void netstat_free(struct netstat *ns);
+>> +extern void netstat_print_diff(struct netstat *nsa, struct netstat
+>> *nsb);
+>> +extern uint64_t netstat_get(struct netstat *ns,
+>> +                const char *name, bool *not_found);
+>> +
+>> +static inline uint64_t netstat_get_one(const char *name, bool
+>> *not_found)
+>> +{
+>> +    struct netstat *ns = netstat_read();
+>> +    uint64_t ret;
+>> +
+>> +    ret = netstat_get(ns, name, not_found);
+>> +
+>> +    netstat_free(ns);
+>> +    return ret;
+>> +}
+>> +
+>> +#endif /* _AOLIB_H_ */
+>> diff --git a/tools/testing/selftests/net/tcp_ao/lib/netlink.c
+>> b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
+>> new file mode 100644
+>> index 000000000000..f04757c921d0
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
+>> @@ -0,0 +1,341 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/* Original from tools/testing/selftests/net/ipsec.c */
+>> +#include <linux/netlink.h>
+>> +#include <linux/random.h>
+>> +#include <linux/rtnetlink.h>
+>> +#include <linux/veth.h>
+>> +#include <net/if.h>
+>> +#include <stdint.h>
+>> +#include <string.h>
+>> +#include <sys/socket.h>
+>> +
+>> +#include "aolib.h"
+>> +
+>> +#define MAX_PAYLOAD        2048
+> 
+> tools/testing/selftests/net/gro.c seem to define this as:
+> 
+> #define MAX_PAYLOAD (IP_MAXPACKET - sizeof(struct tcphdr) -
+> sizeof(struct ipv6hdr))
+> 
+> Can you do the same instead of hard-coding?
+
+I think I could look into way of dynamically allocate netlink buffer for
+requests, but I would say it's not as bad as it looks: the functions
+always use constant size of messages for the netlink messages, so the
+buffer size is always constant. And if anything doesn't fit, the helper
+rtattr_pack() will just fail the test and it'll be visible straight away.
+So, in my point of view, it could have been nicer, but this is the
+easiest and simplest way by allocating const buffer on stack, rather
+than dynamically.
+
+>> +
+>> +const struct sockaddr_in6 addr_any6 = {
+>> +    .sin6_family    = AF_INET6,
+>> +};
+>> +
+>> +const struct sockaddr_in addr_any4 = {
+>> +    .sin_family    = AF_INET,
+>> +};
+>>
+> 
+> A couple of things to look at closely. For some failures such as
+> memory allocation for the test or not being able to open a file
+> 
+> fnetstat = fopen("/proc/net/netstat", "r");
+> 
+> Is this a failure or missing config or not having the right permissions
+> to open the fail. All of these cases would be a SKIP and not a test fail.
+
+That makes sense, I'll look into making tests SKIP on failed memory
+allocations or failed fopen()s.
+
+Thank you for the review,
+          Dmitry
