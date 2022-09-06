@@ -2,155 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626B6ECAAD5
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA349C6FA83
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 16:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235392AbiIFQQv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 12:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34542 "EHLO
+        id S232571AbiIFQoR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 12:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235624AbiIFQQX (ORCPT
+        with ESMTP id S238584AbiIFQnq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:16:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1EDB488;
-        Tue,  6 Sep 2022 08:44:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A59B5B818C2;
-        Tue,  6 Sep 2022 15:44:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0043C433C1;
-        Tue,  6 Sep 2022 15:44:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662479069;
-        bh=qFOk6Wp6NGa1Ej+qcHbPtJExBc58ed/Pmqdo5YRCPig=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eiXfYf3T/gGNUT6915A9D2Q7+AAUG7dPXv1inXwV2KRquc0Vpy4fQCmWfAWv6UIZy
-         ul38C7L5QFDgOxcWixx9aHE1JYPngBP/l4hUN0nYK5LFncG4J7ZntKF5Q4nMN0bfvR
-         4T7yMDDVsh3onuYzC7zOwFIO2zOXeCkWo6afLSpKltK625RM14d5F5UJREXOnMEo/S
-         6gn768eCIJpQYeZJwrnIeha0S7hBYdm+NA5O2cVozNlrW4ugs06hKXsXLyu6VFwu3p
-         b63o4MrKg0ZvzPEarvd5tTxFX1h/U36VOonPRQqiasczJtjjmLCqlt2XK4Dx5h90Aw
-         7zcaaSu+b5NiA==
-Date:   Tue, 6 Sep 2022 18:44:23 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     Marc Orr <marcorr@google.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <Yxdq1yQw9f54aw4+@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
- <YvKRjxgipxLSNCLe@zn.tnic>
- <YxcgAk7AHWZVnSCJ@kernel.org>
- <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
- <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+        Tue, 6 Sep 2022 12:43:46 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23345F218
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 09:22:45 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id br15-20020a056830390f00b0061c9d73b8bdso8395876otb.6
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=A4brQTvRlh4R5wPRp39SU02kPOk/lBeJHkJkNAOJzuE=;
+        b=isU9HDA1TFgFaIT1MAKrgwCsm+L+E2hAnFW3gXsCwQzf7nTHo/+zRFgKPs9wrf4qbA
+         1qf0eRE0B14dUZzgGu76iRnh8ybluQPmWi4sVXsx4cQVy+ZOc27LG/5Px+vewz7Kkz+v
+         6TFJ/SJ4CBKioqBXywGAptxXvfgWc009plbGo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=A4brQTvRlh4R5wPRp39SU02kPOk/lBeJHkJkNAOJzuE=;
+        b=gN4ikYewUBWovdFZxRXhdcXvm0/ZOYGEejujgzEo2SobdX3P9/ZW3pwErkJia232j8
+         uoZe6yH9Pet8f93jY8n30fwC8RSuR0uuN68MFO0zB0iwINdpcRphYpwcz6iLSWgFZotb
+         g1NK5QMB8EdqCe81vA4SsurjkDOmOhg95WM8w2AI79MWQtf3FW1ReFsxlq+jS536YKb3
+         bUHUh0lAHJIv/godGqHLIIwZP9fXodZQrK25UXnLji58bPvEA3AT49KR6l+xh/ldSkS5
+         NRWCGQx+G/hPazaup0D4jouFZ8n26T1zeOwBC8/XuyQwS7F0tz4K0/lw+lv+Ar3SYbzi
+         n5ew==
+X-Gm-Message-State: ACgBeo3YmfeckdZQMkaV13xEO/eaeyYw5f4vvElrvaaBCVJSMHIGh16b
+        ONCxiXxqyCnoPYmX3u9TlhSDZj9HPSpKow==
+X-Google-Smtp-Source: AA6agR4nEhp6EjF0zAwHcSuNQJyiczTINdv4jrDZKFbelzw5/yWb319XGDZomXC02ORo1ZM/Q51qwA==
+X-Received: by 2002:a9d:77c3:0:b0:637:36c1:475b with SMTP id w3-20020a9d77c3000000b0063736c1475bmr21647815otl.346.1662481365049;
+        Tue, 06 Sep 2022 09:22:45 -0700 (PDT)
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com. [209.85.160.52])
+        by smtp.gmail.com with ESMTPSA id cy16-20020a056870b69000b001227148da8csm435337oab.36.2022.09.06.09.22.43
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 09:22:43 -0700 (PDT)
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-1278a61bd57so10888880fac.7
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 09:22:43 -0700 (PDT)
+X-Received: by 2002:a05:6808:3096:b0:342:ff93:4672 with SMTP id
+ bl22-20020a056808309600b00342ff934672mr10837507oib.174.1662481362737; Tue, 06
+ Sep 2022 09:22:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <20220112211258.21115-1-chang.seok.bae@intel.com>
+ <20220112211258.21115-8-chang.seok.bae@intel.com> <CAE=gft4P2iGJDiYJccZFR1VnNomQB7Uo522r2gvrfNY9oKz5jg@mail.gmail.com>
+ <763bddd2-2fc3-a857-0dff-a5ae4ae1f298@intel.com> <CAE=gft5VajfoAT6hVxiCzAMYiDV+pHRbC-F7s4+qK94qa0og5w@mail.gmail.com>
+ <6f2dcc0c-99a2-8698-13ae-d5cbea9945b0@intel.com> <CAE=gft6sO85RBpfdXnR=_r=KGmVrx0mnBOHK7XadNk00gDr-WA@mail.gmail.com>
+ <a3fd8d2d-72d0-ba13-ef77-caff2b239867@intel.com>
+In-Reply-To: <a3fd8d2d-72d0-ba13-ef77-caff2b239867@intel.com>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Tue, 6 Sep 2022 09:22:06 -0700
+X-Gmail-Original-Message-ID: <CAE=gft7BQAwHTxoCtSu-gHZDtcETvBM-nony_nzBD8ziE_HcZw@mail.gmail.com>
+Message-ID: <CAE=gft7BQAwHTxoCtSu-gHZDtcETvBM-nony_nzBD8ziE_HcZw@mail.gmail.com>
+Subject: Re: [PATCH v5 07/12] x86/cpu/keylocker: Load an internal wrapping key
+ at boot-time
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        herbert@gondor.apana.org.au, Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org,
+        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>, bp@suse.de,
+        dave.hansen@linux.intel.com, mingo@kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
+        ravi.v.shankar@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 02:17:15PM +0000, Kalra, Ashish wrote:
-> [AMD Official Use Only - General]
-> 
-> >> On Tue, Aug 09, 2022 at 06:55:43PM +0200, Borislav Petkov wrote:
-> >> > On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
-> >> > > +   pfn = pte_pfn(*pte);
-> >> > > +
-> >> > > +   /* If its large page then calculte the fault pfn */
-> >> > > +   if (level > PG_LEVEL_4K) {
-> >> > > +           unsigned long mask;
-> >> > > +
-> >> > > +           mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
-> >> > > +           pfn |= (address >> PAGE_SHIFT) & mask;
-> >> >
-> >> > Oh boy, this is unnecessarily complicated. Isn't this
-> >> >
-> >> >       pfn |= pud_index(address);
-> >> >
-> >> > or
-> >> >       pfn |= pmd_index(address);
-> >>
-> >> I played with this a bit and ended up with
-> >>
-> >>         pfn = pte_pfn(*pte) | PFN_DOWN(address & page_level_mask(level 
-> >> - 1));
-> >>
-> >> Unless I got something terribly wrong, this should do the same (see 
-> >> the attached patch) as the existing calculations.
-> 
-> >Actually, I don't think they're the same. I think Jarkko's version is correct. Specifically:
-> >- For level = PG_LEVEL_2M they're the same.
-> >- For level = PG_LEVEL_1G:
-> >The current code calculates a garbage mask:
-> >mask = pages_per_hpage(level) - pages_per_hpage(level - 1); translates to:
-> >>> hex(262144 - 512)
-> >'0x3fe00'
-> 
-> No actually this is not a garbage mask, as I explained in earlier responses we need to capture the address bits 
-> to get to the correct 4K index into the RMP table.
-> Therefore, for level = PG_LEVEL_1G:
-> mask = pages_per_hpage(level) - pages_per_hpage(level - 1) => 0x3fe00 (which is the correct mask).
-> 
-> >But I believe Jarkko's version calculates the correct mask (below), incorporating all 18 offset bits into the 1G page.
-> >>> hex(262144 -1)
-> >'0x3ffff'
-> 
-> We can get this simply by doing (page_per_hpage(level)-1), but as I mentioned above this is not what we need.
+On Wed, Aug 31, 2022 at 4:16 PM Chang S. Bae <chang.seok.bae@intel.com> wrote:
+>
+> On 8/25/2022 8:31 AM, Evan Green wrote:
+> >
+> > Here's the log I've got that pointed me down this path:
+> > https://pastebin.com/VvR1EHvE
+>
+>      <3>[43486.261583] x86/keylocker: The key backup access failed with
+> read error.
+>      <3>[43486.261584] x86/keylocker: Failed to restore internal
+> wrapping key.
+>
+> Looks like the IWKey backup was corrupted on that system.
+>
+> > Relevant bit pasted below:
+> >
+> > <6>[43486.263035] Enabling non-boot CPUs ...
+> > <6>[43486.263081] x86: Booting SMP configuration:
+> > <6>[43486.263082] smpboot: Booting Node 0 Processor 1 APIC 0x1
+> > <2>[43486.264010] kernel tried to execute NX-protected page - exploit
+> > attempt? (uid: 0)
+> > <1>[43486.264019] BUG: unable to handle page fault for address: ffffffff94b483a6
+> > <1>[43486.264021] #PF: supervisor instruction fetch in kernel mode
+> > <1>[43486.264023] #PF: error_code(0x0011) - permissions violation
+> > <6>[43486.264025] PGD 391c0e067 P4D 391c0e067 PUD 391c0f063 PMD
+> > 10006c063 PTE 8000000392148163
+> > <4>[43486.264031] Oops: 0011 [#1] PREEMPT SMP NOPTI
+> > <4>[43486.264035] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G U
+> > 5.10.136-19391-gadfe4d4b8c04 #1
+> > b640352a7a0e5f1522aed724296ad63f90c007df
+> > <4>[43486.264036] Hardware name: Google Primus/Primus, BIOS
+> > Google_Primus.14505.145.0 06/23/2022
+> > <4>[43486.264042] RIP: 0010:load_keylocker+0x0/0x7f
+>
+> But, I don't get the reason why it hit this. On the wake-up path,
+> copy_keylocker() is supposed to be called.
 
-I think you're correct, so I'll retry:
+Interesting, that's helpful. I thought I had a lead based on this,
+which was that in this case we were doing a hibernate to shutdown,
+rather than hibernate to S4. The IWKey backup is only valid down to
+S4, so a read error on resume from this type of hibernate might make
+sense. I know keylocker won't successfully maintain handles across a
+hibernate to shutdown and subsequent resume, but it shouldn't crash
+either.
 
-(address / PAGE_SIZE) & (pages_per_hpage(level) - pages_per_hpage(level - 1)) =
+But this still doesn't explain this crash, since in this case we're
+still on our way down and haven't even done the shutdown yet. We can
+see the "PM: hibernation: Image created (1536412 pages copied)" log
+line just before the keylocker read failure. So then it seems
+something's not working with the pre-hibernate CPU hotplug path?
 
-(address / PAGE_SIZE) & ((page_level_size(level) / PAGE_SIZE) - (page_level_size(level - 1) / PAGE_SIZE)) =
 
-[ factor out 1 / PAGE_SIZE ]
+>
+> I added some printout in there, and it looks to be fine with me:
+>
+>      [  218.488711] Enabling non-boot CPUs ...
+>      [  218.488794] x86: Booting SMP configuration:
+>      [  218.488795] smpboot: Booting Node 0 Processor 1 APIC 0x1
+>      [  218.490634] x86/keylocker: restore processor (id=1)
+>      [  218.491186] CPU1 is up
+>      ...
 
-(address & (page_level_size(level) - page_level_size(level - 1))) / PAGE_SIZE  =
-
-[ Substitute with PFN_DOWN() ] 
-
-PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)))
-
-So you can just:
-
-pfn = pte_pfn(*pte) | PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)));
-
-Which is IMHO way better still what it is now because no branching
-and no ad-hoc helpers (the current is essentially just page_level_size
-wrapper).
-
-BR, Jarkko
+How were you exercising the CPU onlining in this case? Boot, cpu
+hotplug, or hibernate?
+-Evan
