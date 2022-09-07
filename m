@@ -2,63 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB9BC38145
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 06:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88877C38145
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 06:30:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbiIGGNR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 02:13:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34198 "EHLO
+        id S229985AbiIGGaJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 02:30:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiIGGNM (ORCPT
+        with ESMTP id S229987AbiIGG3y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 02:13:12 -0400
+        Wed, 7 Sep 2022 02:29:54 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B477A9674C;
-        Tue,  6 Sep 2022 23:13:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C81183BC;
+        Tue,  6 Sep 2022 23:29:37 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oVoIf-001tpI-S9; Wed, 07 Sep 2022 16:12:38 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 Sep 2022 14:12:37 +0800
-Date:   Wed, 7 Sep 2022 14:12:37 +0800
+        id 1oVoYj-001uKt-VX; Wed, 07 Sep 2022 16:29:15 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 Sep 2022 14:29:13 +0800
+Date:   Wed, 7 Sep 2022 14:29:13 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v3] crypto: aspeed: fix format unexpected build warning
-Message-ID: <Yxg2VSC2ud/lgjik@gondor.apana.org.au>
-References: <20220907033431.402208-1-neal_liu@aspeedtech.com>
+To:     Sven van Ashbrook <svenva@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Alex Levin <levinale@google.com>,
+        Rajat Jain <rajatja@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] hwrng: core: fix potential suspend/resume race
+ condition
+Message-ID: <Yxg6OayyEFWIax/r@gondor.apana.org.au>
+References: <20220831172024.1613208-1-svenva@chromium.org>
+ <20220831172024.1613208-2-svenva@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220907033431.402208-1-neal_liu@aspeedtech.com>
+In-Reply-To: <20220831172024.1613208-2-svenva@chromium.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 07, 2022 at 11:34:31AM +0800, Neal Liu wrote:
-> This fixes the following similar build warning when
-> enabling compile test:
+On Wed, Aug 31, 2022 at 05:20:24PM +0000, Sven van Ashbrook wrote:
+> The hwrng fill function runs as a normal kthread. This thread
+> doesn't get frozen by the PM, i.e. it will keep running during,
+> or in, system suspend. It may call the client driver's
+> data_present()/data_read() functions during, or in, suspend;
+> which may generate errors or warnings. For example, if the
+> client driver uses an i2c bus, the following warning may be
+> intermittently generated:
 > 
-> aspeed-hace-hash.c:188:9: warning: format '%x' expects argument of type
-> 'unsigned int', but argument 7 has type 'size_t' {aka 'long unsigned int'}
-> [-Wformat=]
+>   i2c: Transfer while suspended
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> v3: Use "%pad" to print dma_addr_t type.
-> v2: Use "%zu" format to print size_t.
+> Fix by converting the delay polled kthread into an ordered work
+> queue running a single, self-rearming delayed_work. Make the
+> workqueue WQ_FREEZABLE, so the PM will drain any work items
+> before going into suspend. This prevents client drivers from
+> being accessed during, or in, suspend.
 > 
->  drivers/crypto/aspeed/aspeed-hace-hash.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Tested on a Chromebook containing an cr50 tpm over i2c. The test
+> consists of 31000 suspend/resume cycles. Occasional
+> "i2c: Transfer while suspended" warnings are seen. After applying
+> this patch, these warnings disappear.
+> 
+> This patch also does not appear to cause any regressions on the
+> ChromeOS test queues.
+> 
+> Signed-off-by: Sven van Ashbrook <svenva@chromium.org>
 
-Patch applied.  Thanks.
+The general concept seems to be fine.
+
+> -		if (rc <= 0) {
+> -			pr_warn("hwrng: no data available\n");
+> -			msleep_interruptible(10000);
+> -			continue;
+> -		}
+> +	if (!quality)
+> +		return;
+>  
+> +	if (rc > 0) {
+>  		/* If we cannot credit at least one bit of entropy,
+>  		 * keep track of the remainder for the next iteration
+>  		 */
+
+You need to refresh your patch-set against the latest tree.  This
+function has changed quite a bit.
+
+
+> @@ -541,14 +536,12 @@ static void hwrng_manage_rngd(struct hwrng *rng)
+>  	if (WARN_ON(!mutex_is_locked(&rng_mutex)))
+>  		return;
+>  
+> -	if (rng->quality == 0 && hwrng_fill)
+> -		kthread_stop(hwrng_fill);
+> -	if (rng->quality > 0 && !hwrng_fill) {
+> -		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
+> -		if (IS_ERR(hwrng_fill)) {
+> -			pr_err("hwrng_fill thread creation failed\n");
+> -			hwrng_fill = NULL;
+> -		}
+> +	if (rng->quality == 0 && is_hwrng_wq_running) {
+> +		cancel_delayed_work(&hwrng_fill_dwork);
+> +		is_hwrng_wq_running = false;
+> +	} else if (rng->quality > 0 && !is_hwrng_wq_running) {
+> +		mod_delayed_work(hwrng_wq, &hwrng_fill_dwork, 0);
+> +		is_hwrng_wq_running = true;
+>  	}
+>  }
+>  
+> @@ -631,8 +624,7 @@ void hwrng_unregister(struct hwrng *rng)
+>  	new_rng = get_current_rng_nolock();
+>  	if (list_empty(&rng_list)) {
+>  		mutex_unlock(&rng_mutex);
+> -		if (hwrng_fill)
+> -			kthread_stop(hwrng_fill);
+> +		cancel_delayed_work_sync(&hwrng_fill_dwork);
+
+What if hwrng_manage_rngd races against hwrng_unregister?
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
