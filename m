@@ -2,112 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D025FC38145
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 06:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E753CC38145
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 06:46:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiIGGpG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 02:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41190 "EHLO
+        id S229553AbiIGGql (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 02:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbiIGGpF (ORCPT
+        with ESMTP id S229502AbiIGGqk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 02:45:05 -0400
-X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 06 Sep 2022 23:45:02 PDT
-Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.129.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC094A11F
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 23:45:01 -0700 (PDT)
+        Wed, 7 Sep 2022 02:46:40 -0400
+Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.133.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4B88277D
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 23:46:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
-        s=selector; t=1662533101;
+        s=selector; t=1662533198;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:  references:references;
-        bh=XlEfWTXM9xLBeF7a3eztAviPGCqqY+d9bJIvSypIcdM=;
-        b=PlJgzaqKhDj92ymg0T5aSWZw4vC7xPnC9wTHQR5m1E6JCU3aJ/tw+UdJ2In5k5hW5F3D/C
-        dE9Me+22L8RZCaCvKkzSIvRRoZi5uP4IloJhpa526oSqwgoOrXAehS20IY8iR4bWn0LGf7
-        b2qFl0mltIBfKcs78eaO5N0A4SX1R9UP0AA2eY6j8TALZkqUVwZyyF9JL39tVU636QtAyg
-        4+fg/SwuXLWx5CAdrrqVPdJhii/vzb0sfnwjI7fkfX3EUx1ohZiZ7uQfTj8F4GiBxFuOGM
-        jIAJqYhPyEWAG2dyxy+zBKFTcisxH+XA4RCINWTrixymdLcQK9T3rJg6YfhUUg==
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176]) by
+        bh=wENIUjafMmTedK4Vzu4Xa73ZJBaqszSRBjtdYQiBkTI=;
+        b=WEHRvTmm/XCgZMhzu8PaqlihWO9hxaA9KEMBlIFzV5in5YfCztra5prIdeTAOGzDujskyF
+        qkE0HMN8ad0SNpNlW8/ozyOM2SVlj86TLWAK1J8XXSZeHpqcikaTYKJgzuHghCJmRtZ33T
+        oSQ6bMRQnrrazxHZKgsgouFdNajOx4cGFuS5Ieu4eouGyArt+9Gt4xmIBJcHBbkQdHjtPN
+        /6GSgze48EXpJQe6zoOaak4dYWYuJuxRDliac+IuudR7melbwIjnyL+TuuuVJBYzJqJsjy
+        xdNwrrgbDqFdAev/30QWRj3KzwOiUuFuQ2UinsAVc3d0YxUWnZ2PxMmjlUAi0w==
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com
+ (mail-dm3nam02lp2048.outbound.protection.outlook.com [104.47.56.48]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-451-7-5SHpjtNICOOnDvRJ40Hg-2; Wed, 07 Sep 2022 02:43:54 -0400
-X-MC-Unique: 7-5SHpjtNICOOnDvRJ40Hg-2
+ us-mta-484-r0WlRcLhMXaaHdlsbfA0JA-2; Wed, 07 Sep 2022 02:46:37 -0400
+X-MC-Unique: r0WlRcLhMXaaHdlsbfA0JA-2
 Received: from DM6PR19MB3163.namprd19.prod.outlook.com (2603:10b6:5:19a::23)
- by CO6PR19MB4769.namprd19.prod.outlook.com (2603:10b6:5:34d::6) with
+ by MN2PR19MB3933.namprd19.prod.outlook.com (2603:10b6:208:1e0::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.17; Wed, 7 Sep
- 2022 06:43:52 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.14; Wed, 7 Sep
+ 2022 06:46:32 +0000
 Received: from DM6PR19MB3163.namprd19.prod.outlook.com
  ([fe80::b841:6e14:1257:774a]) by DM6PR19MB3163.namprd19.prod.outlook.com
  ([fe80::b841:6e14:1257:774a%7]) with mapi id 15.20.5588.018; Wed, 7 Sep 2022
- 06:43:52 +0000
+ 06:46:32 +0000
 From:   Peter Harliman Liem <pliem@maxlinear.com>
 To:     Antoine Tenart <atenart@kernel.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         linux-lgm-soc <linux-lgm-soc@maxlinear.com>
-Subject: Re: [PATCH v2 1/2] crypto: inside_secure - Avoid dma map if size is
- zero
-Thread-Topic: [PATCH v2 1/2] crypto: inside_secure - Avoid dma map if size is
- zero
-Thread-Index: AQHYwZuhWToE3i/+MkuyVhPHlEoUrQ==
-Date:   Wed, 7 Sep 2022 06:43:51 +0000
-Message-ID: <DM6PR19MB31635CCFF3A6306FFB950701A1419@DM6PR19MB3163.namprd19.prod.outlook.com>
+Subject: Re: [PATCH v2 2/2] crypto: inside-secure - Select CRYPTO_AES config
+Thread-Topic: [PATCH v2 2/2] crypto: inside-secure - Select CRYPTO_AES config
+Thread-Index: AQHYwZuhJOtFv92MlU2QoKo8a0Nwig==
+Date:   Wed, 7 Sep 2022 06:46:32 +0000
+Message-ID: <DM6PR19MB31633BFB6AD885E0EAF68F14A1419@DM6PR19MB3163.namprd19.prod.outlook.com>
 References: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com>
- <166247285388.3585.6290053542530090542@kwain>
+ <60cb9b954bb079b1f12379821a64faff00bb368e.1662432407.git.pliem@maxlinear.com>
+ <166247313358.3585.5988889047992659412@kwain>
 Accept-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 85a0101f-2b8b-47a2-d0f0-08da909c53b7
-x-ms-traffictypediagnostic: CO6PR19MB4769:EE_
+x-ms-office365-filtering-correlation-id: 1419a4f3-b718-4de2-f872-08da909cb33e
+x-ms-traffictypediagnostic: MN2PR19MB3933:EE_
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0
-x-microsoft-antispam-message-info: u7QK612EVyXw0O8tLjnwcgToAZjVOGYhDh9YSThhfFuMWyuAayLuqRV3sM+9u8xtjBX8QRKkkv5nols+ul0fK4cPAcZ05TyFGqex+ICR8bXOsQIe95OVCZSBEWr4EBnid/FUllo+5s+N/0HEbUsy+PEW0ssLpK1XVAP39hO1/A7oWfyIS09MlE7THUXruN4qFRQ1DjbQbRjf+hmAl7wtkNLtHzmateBR/3hHZzff3dKpmGBpvn8ywxk3gvHJ6XOxIQ3rTGK8OrzxDFo93UC1tT6F4fhV98bEexPQ9i7gxgNh9d8Yrfmw2QYtI2M0uCuRJvZoTDJBezxkNcj6yPF+G5E34jM0Mj/sAoxSkrsh2wVQm9IbHXm7wZgzGTuKl7/QRY7guLBgnPLC+qteLsoxR9UNxvnqBYwOWgFFrI55fFE4oJGZmZiifcl2uBdNfG4PZJD0fc2cfxxlLNoKQGsmks9YMvoslaRCHuMCydYdpidolA5T4741wYf+HRS+tr6HLnVMT/EoM3CZprEhQj1XX+SWhko6nZrJViLrKWZ/1VARGxaz6Nrg1ZV0TgJwyAGXEQgCNd4b8pvQF3oy2lUUspiOvwGrpX9a6uzcAIXz6Cx/aGLoZVywF+0A6dW673PWsKH3viG/Gx1LX3R0vb7+MLbUCdngfqtXm0e6FPzg7e5T/x21A1ekO3aTWoaOgAckTNuH2lGME77LdtfKMHHqA+FC7PyBZOehu7AZpyGAlvOKSkH1+lREr1IcIeFc/GI2A7d69kHPfF/+OZxaLtspZA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR19MB3163.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(136003)(39850400004)(366004)(376002)(346002)(107886003)(76116006)(64756008)(66556008)(4326008)(8676002)(66446008)(66946007)(91956017)(66476007)(5660300002)(4744005)(6506007)(52536014)(26005)(7696005)(478600001)(53546011)(41300700001)(186003)(8936002)(71200400001)(55016003)(110136005)(54906003)(86362001)(83380400001)(316002)(9686003)(33656002)(38070700005)(122000001)(2906002)(38100700002);DIR:OUT;SFP:1102
+x-microsoft-antispam-message-info: cEPWBuk/X2PxLrj2OiWbr+FFPmnhMowrLSbOF6YKqI9TA0t2h+iWmwiYSfQOMhp7i35zL+HYRGr0ZdR6VNaztIkW4gALHNoSeMRZ3CWjCIA4poUiH+UWiOcNk8Tn191U/kSjlDh7J+G0nxrMhI6MotoScSQ8vbbA5rPIC8daXqcOq73pPW0aEzM7I/GYhNmMMq2gk1nqQkG2i59pz0EmikmTIBEbKi2Gm/XSwy4/KO2a749ewEE5pkX6JeHl7e93pOYCicwBXfXbsuqeKX3pGDQdhtt89pm7OC2TzEDPgbdyjO57zro4Q9rOco75R2ACYks/X1/JF74WSZfC9YCLSayKQ5AzvNshDjh089V9cJ80wSHIUR//49TqADafCZNm9NRxbPhcP/rNdEls2Q2FFJzhK8x2mly7lGHhtEPHmsW5jDZc/A4Ub6g1y9bN+Q2z89RVMlnk03+lYvoz/rdicpyRnxJywBTZQHwXfDGMNVj770KPF1nXTkoKb7ygSpXD/lK0ESrrWB1X/9E5/OVGQv3Ep7X4zTpOwfr1fYmqyEtqZeG3yJVHyg944PgSbfYkmSIjDDRtCdyeAIzygAFLvFo3SISNC/Bc8TrQoekRE6krOTC+eWwH+TGjzpcJ5k9MhXq6Ndfq/hvJscB92mM5TqOM810tIT2W5HruUVjH/H7AYkgG6OEV0uZ9sMv0ESwoq0DDygN1Mi9eaCgn3hUqYtFBzfszOd9xh/KtePUJr8Oz5CMg6hnt53Cdd+5aoLGmhmtgSd0cBaTcp+8mMj5oOQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR19MB3163.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(396003)(346002)(39850400004)(366004)(376002)(38100700002)(122000001)(45080400002)(316002)(4326008)(66556008)(76116006)(66476007)(8676002)(64756008)(66446008)(66946007)(91956017)(86362001)(38070700005)(33656002)(83380400001)(9686003)(107886003)(7696005)(6506007)(41300700001)(71200400001)(478600001)(26005)(53546011)(55016003)(110136005)(54906003)(8936002)(186003)(5660300002)(2906002)(52536014);DIR:OUT;SFP:1102
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uYWZymrie8+R+Uci9M1gyzNM7V2XnhtZoYHbn9dnXcUBZ27uJPnhNJ6J55/Q?=
- =?us-ascii?Q?sSCypYKfEWfycbdmvvWNTGSI7GDRSprQ2JCYJ29evDTarg7wFgPWo1pIkrYF?=
- =?us-ascii?Q?YzLsTZTG9yiUrtuHkfcjL1ZwnWBlFClW6wv2WsqNwhPKQ0iZZa2DqX7zhKTe?=
- =?us-ascii?Q?S5Fv1cIXGt9OOW8daOU4wRQaD4bcui4kX2JDIS1bMu1+hdLN6L9RD5RKbSPi?=
- =?us-ascii?Q?t6vff8qdqeNqwaPnmg3+cthv33FB5z2zcYCMHlF4BEeEV3Jercr41QB6sWX9?=
- =?us-ascii?Q?RtZph8vVLQw880zRrU0E4yQUWBiBzxvTYof/upS+jdb56Rfsze5PdMfR3LS9?=
- =?us-ascii?Q?hqXDeJJS0qHTO0o+n17PkyjKmZu0Yv02WmR8VOtmZs8FcKq78pudBpOgARHe?=
- =?us-ascii?Q?NJQGBzt6Wy49J6M5zepVYe2fO6VWLbw9/C+GmkW2j9qM3r2xAKDeQQqg7T42?=
- =?us-ascii?Q?uvWSYCL1acAxTTGvCRK/fQ1bXlhZD497EPXwKgr/JqoFuhft3WSD/fF4GZIa?=
- =?us-ascii?Q?oTRgAxPTq4JJjqz6mUnjbg+POyu1DdQe9lFmw54/H9hc2bWThvpzpVNgtbSl?=
- =?us-ascii?Q?0+9lvrKSejs9uIqwv1tfeBTe8aBxAfnLYB1jKADux78JXxLH3MRT9yZHOZKb?=
- =?us-ascii?Q?p3lj8tWHj5+ZOfRpkiy4+5LHCYCWdizXENjwj/0wCdgG6U/IG3rervJCx2qq?=
- =?us-ascii?Q?UEAP3RqHNW8ALCVpeMvJdDKe1HnzeBvn5a+Suv1eUXwaM/UUzJNnWByxwT/0?=
- =?us-ascii?Q?5Pt0k2SBX48PXeJ+g30Ai0T6P+gVwRF6s/76aCF7gjS47DmzmTvzCAt4PBeJ?=
- =?us-ascii?Q?MU25QsasH+4RLRlniS+MLhNOfXLqoHgZ3o6tIcE52kbdnFH5pX0ywRkjTeGZ?=
- =?us-ascii?Q?iX8LrEKHOUaqCAIY3xQGFnhLDptQosNrucex6nAJI7rCxB7Ib+/en/QJ9H3Z?=
- =?us-ascii?Q?tf4x2u41HRVT26bL9HOvyjq4d7TlKCpz9ZkBQXfOD1sTMto5+vBfjMa/FWrA?=
- =?us-ascii?Q?//3ji6c/V7r1ZKXy/cBzs0s/YXEUg3asnU4fsDSsBHK3Y9/0saxocUUiVAtQ?=
- =?us-ascii?Q?N+IrnAC4a1SWVEnFAIXTSPuTTlu3I3gK8DILgmKacb/FtJDEpd1BNERozrbi?=
- =?us-ascii?Q?qGQpmURRPmU1QjYzIq8F+A9kGPlmemWeA+2j98dJ1GFejEjTUJil7s8QW+YR?=
- =?us-ascii?Q?Nfl2moupQaS9JjUbquy7XN0ae8ZbYVxKL961u4KiJxqOwa7x4Z7wcYdjFCSw?=
- =?us-ascii?Q?AsAOJe0mnFbeOJ54nZZ/0wA2DjSN9W8DLUv4RcSIKzWwVXPokwAlIVLOxeuD?=
- =?us-ascii?Q?Npb61rP4K5uZctTWrYEUbc+4W1IO3A24bwxPew7fp94/9qwWDAgc7xYL/orM?=
- =?us-ascii?Q?WOJqcv3IUXW0bYfUnNc2Zy0EuBhFBg0a0hb6MEz3gcZ+oWUQYq7w0x8BxKeQ?=
- =?us-ascii?Q?zsVvRGL4x4gvnWBdVejK2iBcprm5IEMaXlTvUy/NSapMotQ681Rm74eJzsKj?=
- =?us-ascii?Q?obAbn6zi1DHtY/YZxmjnsyiR9YvpBjclut8WEC/zmkeXB5mRTFhZfdexJrzm?=
- =?us-ascii?Q?VN1yyUQb1DXfnkV6qN4msFpmbT5qJm5/fC6ejy3ANu7oMgQu+77bftEbLBik?=
- =?us-ascii?Q?wg=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5mD2TplFvjA4o6gbYXVt766Nia1LtIaQnq8MkMhG17ys+v3xE/xvQ5JuNEVy?=
+ =?us-ascii?Q?zHV5jlTSDCYnOgS0iJ2N5vtk1sg2vtUAEHj2xmYjTDnik0MIERtsFnpOsxen?=
+ =?us-ascii?Q?KqBSEo8IWumUjV1G1ZevBZ8U/3vNJHA6otHaGCbhqO8mb5KX3Sn+LUWvtKxn?=
+ =?us-ascii?Q?YTJUdI96gv88t5oVqnV4hXrKMsyTQ6m9G9mEKkcC9zGen/pnmW1WS4uggjlU?=
+ =?us-ascii?Q?VMhRklMWDkY6Ois5dYJOhGk3Pg2G0tFU9NdiezGDthpMGmJWNqh3GkgHXSvP?=
+ =?us-ascii?Q?LkB7rKjfdDEZHG/usHZcY/3/SxRrknm2wbAI49VzJylC4dFcF2WK3IpQeKsd?=
+ =?us-ascii?Q?W27O0mToMlpkBNYb5Oce+KGmqfL/QWjn4THQRiIphToBQoCeqdwmmVC2dxwx?=
+ =?us-ascii?Q?XbpPXbqtBJJctpHIpiTI4V5WOVg2sBGXwOX0l3B6tarlvsDBF4mLyIpqvpIv?=
+ =?us-ascii?Q?TobaG9mDlELv2puEr6rgub5Sk6rcOl6xXqWd5ccOd2eFJ4CMiH/zwX+PFVNr?=
+ =?us-ascii?Q?wsVMkBO3WyQf8tVk+djIEf5+6mX6lNjrWKY7onhagHHnT6BVezFTLOS35RU3?=
+ =?us-ascii?Q?JP0gzlMW74T0K958tmfiX41nnr0R15/vpgs58H/M4ixYppHtuaG9W91bDGuF?=
+ =?us-ascii?Q?SeR5ShTzR4MSFiA2lJc61TtAxmBOLYe+p/tHNaSU3yVXGPWDxbE/yDUdFUXl?=
+ =?us-ascii?Q?90Wd0aNf/lgJGx5Gtr+nudoRNUAvYxEYkU5AqvfgxB7jknh1F1bwi/DWw1bF?=
+ =?us-ascii?Q?SLkfoTAHcmElpGPeB4Bd2zK5kq0zGdXKVPW0U+xMUAFIv3dB743dE3lprusq?=
+ =?us-ascii?Q?gSjM+nstU2QAxcngthH7N5ryBCe1SChig4oStD+vc41t5PNsx4CjrdOIuT10?=
+ =?us-ascii?Q?U77R2RlAcM4mTvEaNlZ6dOk8Y5GI3NTk8EroF19tJwkvzpHGElbMej/gXqZ1?=
+ =?us-ascii?Q?H/VnptNQvyhHwtlUguHOk4J7yWTwLU5o34H284EPlbWXAxXv1JYIHPB4G2ls?=
+ =?us-ascii?Q?qhznqRY7sYjvSbLKsEgw+t03kmOqlxpHi79dwGkIGYGXnDrEUajLwbSrLwJP?=
+ =?us-ascii?Q?DA78r6OJrCbp8bFY2hFMm8awH7zBoPXoYfyrhks5C/TD7atJf3IWVe6jOCPi?=
+ =?us-ascii?Q?ICaDrVzpJTdeG27EtyMNE31/7l+xQBXA4cLBMIWtmzN6vQX50T8BznSzy9lf?=
+ =?us-ascii?Q?sXKMT1lISPLPZLJZku+qpAKy/9RdOAAP7dvxwI6yo+Vh5ABBY3w1Om7UO5vD?=
+ =?us-ascii?Q?XWU43lGS2Z/22VWyHSQfbEZvFlV/HtO0Ha02MGUy/XUXnbUt/ef0x2dWX6ly?=
+ =?us-ascii?Q?8nKsxpsyNnTCJ0aaR8teL5X6RoNj59xkvcsSP+FIIXavMutbUQ/HelDMSG0r?=
+ =?us-ascii?Q?HqfTHfREm6LQjbAwNdCfhYeTWNZYNquzMGANChNljQ14y7aeT+r1nbVHasQ1?=
+ =?us-ascii?Q?/v6W28lj+rv6WlaBK0ePXkzhpYnweKVF670TZfls8uT5kN+0O5XMaXta8gll?=
+ =?us-ascii?Q?4y9XdN8/TINpToYeCy057/H4BGyDkLLJNWE9HbvIMg5qhl9R9nI2ClZ7/GCK?=
+ =?us-ascii?Q?29Ta+NkA9UG/UUGgsAfQOnn+WqWN14BK/y5Ok0rNXYDppXV4phlGKVTXQ6wf?=
+ =?us-ascii?Q?mw=3D=3D?=
 MIME-Version: 1.0
 X-OriginatorOrg: maxlinear.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR19MB3163.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85a0101f-2b8b-47a2-d0f0-08da909c53b7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2022 06:43:51.9574
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1419a4f3-b718-4de2-f872-08da909cb33e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2022 06:46:32.2580
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: dac28005-13e0-41b8-8280-7663835f2b1d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wiXieM8V7PnAHJ3jmrQieEzRixUjzYMtEEMw9QhTXJo7ZZWxIUSO4YV9GpJNhvfVegG9HQuYpbos0EKuq0nQVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR19MB4769
+X-MS-Exchange-CrossTenant-userprincipalname: 3M+q+861D9yYj3DuvWkwbsgc9bon6Ao0/4lfXoriTJ4tovse/1LEYynbMVs84mnKo4ZR+pntWVOGizsmJ+n/cA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR19MB3933
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: maxlinear.com
 Content-Language: en-US
@@ -117,16 +115,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/9/2022 10:01 pm, Antoine Tenart wrote:=0A> Quoting Peter Harliman Liem=
- (2022-09-06 04:51:49)=0A>> From commit d03c54419274 ("dma-mapping: disallo=
-w .map_sg=0A>> operations from returning zero on error"), dma_map_sg()=0A>>=
- produces warning if size is 0. This results in visible=0A>> warnings if cr=
-ypto length is zero.=0A>> To avoid that, we avoid calling dma_map_sg if siz=
-e is zero.=0A>>=0A>> Fixes: d03c54419274 ("dma-mapping: disallow .map_sg op=
-erations from returning zero on error")=0A>=20=0A> You can't reference the =
-commit above, it's not introducing the issue but=0A> the warning itself. Th=
-e actual commit introducing the below logic should=0A> be referenced.=0A>=
-=20=0A> Alternatively since the warning was introduced latter than the logi=
-c and=0A> this is not a huge issue, you might resend it w/o the Fixes tag a=
-s well.=0ANoted.=0AI will remove the tag in v3.=0A=0AThanks!=0A=0A
+On 6/9/2022 10:05 pm, Antoine Tenart wrote:=0A>> CRYPTO_AES is needed for a=
+es-related algo (e.g.=0A>> safexcel-gcm-aes, safexcel-xcbc-aes, safexcel-cm=
+ac-aes).=0A>> Without it, we observe failures when allocating transform=0A>=
+> for those algo.=0A>>=0A>> Fixes: 363a90c2d517 ("crypto: safexcel/aes - sw=
+itch to library version of key expansion routine")=0A>=20=0A> The above com=
+mit explicitly switched crypto drivers to use the AES=0A> library instead o=
+f the generic AES cipher one, which seems like a good=0A> move. What are th=
+e issues you're encountering and why the AES lib makes=0A> the driver to fa=
+il?=0A=0AIf I load the kernel module (CONFIG_CRYPTO_MANAGER_DISABLE_TESTS i=
+s not=0Aset), I am getting failure messages below.=0AIMHO this happens beca=
+use some functions in the driver still rely on=0Ageneric AES cipher (e.g. r=
+efer to safexcel_aead_gcm_cra_init() or=0Asafexcel_xcbcmac_cra_init()), the=
+refore CONFIG_CRYPTO_AES is still needed.=0A=0AMaybe the alternative is to =
+switch all of them to use AES lib instead?=0ALet me know if you prefer this=
+.=0A=0AThanks!=0A=0A[  157.683462] alg: aead: failed to allocate transform =
+for=0Asafexcel-gcm-aes: -2=0A[  157.689054] ------------[ cut here ]-------=
+-----=0A[  157.693650] alg: self-tests for safexcel-gcm-aes (gcm(aes)) fail=
+ed=0A(rc=3D-2)=0A[  157.693696] WARNING: CPU: 3 PID: 164 at crypto/testmgr.=
+c:5804=0Aalg_test.part.0+0xd1/0x2f0 [cryptomgr]=0A[  157.709505] Modules li=
+nked in: crypto_safexcel(+) md5 sha512_generic=0Alibdes sha256_generic libs=
+ha256 sha1_gene=0Aric libsha1 libaes authenc cryptomgr akcipher crypto_acom=
+press kpp rng=0Acrypto_null crypto_hash skcipher aead cryp=0Ato_algapi=0A[ =
+ 157.729991] CPU: 3 PID: 164 Comm: cryptomgr_test Not tainted=0A6.0.0-rc3+ =
+#42=0A[  157.736900] RIP: 0010:alg_test.part.0+0xd1/0x2f0 [cryptomgr]=0A[  =
+157.742512] Code: 6c 85 db 0f 84 89 00 00 00 80 3d 59 6c 05 00 00 0f=0A85 0=
+8 40 00 00 89 d9 4c 89 f2 48 89 ee 48=0A c7 c7 40 1c 09 a0 e8 cc 17 28 e2 <=
+0f> 0b 48 8b 84 24 90 00 00 00 65 48=0A33 04 25 28 00 00 00 0f 85 eb=0A[  1=
+57.761177] RSP: 0018:ffffc90000557e40 EFLAGS: 00010246=0A[  157.766359] RAX=
+: 0000000000000000 RBX: 00000000fffffffe RCX:=0A0000000000000000=0A[  157.7=
+73440] RDX: 0000000000000001 RSI: 00000000ffffdfff RDI:=0A00000000ffffffff=
+=0A[  157.780528] RBP: ffff8880046ed200 R08: 0000000000000000 R09:=0Affffc9=
+0000557ce8=0A[  157.787610] R10: 0000000000000001 R11: 0000000000000003 R12=
+:=0A0000000000011083=0A[  157.794699] R13: 0000000000000400 R14: ffff888004=
+6ed280 R15:=0Affffffffffffffff=0A[  157.801780] FS:  0000000000000000(0000)=
+ GS:ffff88807a580000(0000)=0AknlGS:0000000000000000=0A[  157.809818] CS:  0=
+010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A[  157.815516] CR2: 0000560ce=
+ce6c0d8 CR3: 0000000002a0a000 CR4:=0A00000000001006a0=0A[  157.822608] Call=
+ Trace:=0A[  157.825018]  <TASK>=0A[  157.827104]  ? _raw_spin_unlock+0xd/0=
+x30=0A[  157.830989]  ? finish_task_switch+0x8a/0x260=0A[  157.835221]  ? _=
+_schedule+0x27c/0x670=0A[  157.838855]  ? 0xffffffffa004c000=0A[  157.84213=
+1]  cryptomgr_test+0x22/0x50 [cryptomgr]=0A[  157.846804]  kthread+0xd0/0x1=
+00=0A[  157.849908]  ? kthread_complete_and_exit+0x20/0x20=0A[  157.854664]=
+  ret_from_fork+0x1f/0x30=0A[  157.858209]  </TASK>=0A[  157.860346] ---[ e=
+nd trace 0000000000000000 ]---=0A[  157.908463] alg: hash: failed to alloca=
+te transform for=0Asafexcel-xcbc-aes: -2=0A[  157.914132] ------------[ cut=
+ here ]------------=0A=0A
 
