@@ -2,85 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7388DECAAD3
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 08:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC2BECAAD3
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 09:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbiIGIsf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 04:48:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56880 "EHLO
+        id S229488AbiIGJTD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 05:19:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbiIGIsc (ORCPT
+        with ESMTP id S229890AbiIGJTC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 04:48:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B70FCA7AA2
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 01:48:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E3A62B81ADB
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 08:48:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A3BDC433C1;
-        Wed,  7 Sep 2022 08:48:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662540501;
-        bh=DSSlvyJIYaiZo3JTisnVqvW/vHgnYFMuYvuJZHk/g/M=;
-        h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-        b=gPvkPgz4c19RDsKuXnB3QgYzLDkfJmbwYqK/H3xakVqFP7j6ALR9Sw0Uz7Urf+grJ
-         VynDcvKAXAmpkS/i22LXfMxXxylNc6YtpZ472iKMjLKGRvTqQLKmPJJYnGwEg9VVsc
-         vd/rBft16Hz1oQjkmJr7E9oUBC58H8jITE8K9I9/XHj0QArFI1o6rQWk6m87RyLepO
-         c5kKWnnhG+l7vxm8jvlvF9y9VaEu9Ku8rjhEmSJ6jENgRLmPoZc2bhHtnsSTlYhGm7
-         dNU4ErhescFqBZ8oFDRLcQ9+Svk74LmpYSvU4Mm/5uGWYhlVi3ZpHEpA1BqprIzcoI
-         hNxwTpPoZ/RwA==
-Content-Type: text/plain; charset="utf-8"
+        Wed, 7 Sep 2022 05:19:02 -0400
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14D296745
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 02:19:01 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-3457bc84d53so41659267b3.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Sep 2022 02:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=l0xEQsbE2eoqhPdBFlcigg1eN1FK5AXrP7+HDFAlaUE=;
+        b=sUS1aDgkN2F7qDNQFo7UhD5sIWnOsIti/09pvl8QW2dvlDcrWdWMWhSCBnJPOVWWw/
+         LCza7grxM0GEHXYfbaYp7mCIHrSp8qPirbI6CnCxPC7H8KmRqKXeSNY8eGYJ8GJ4hvCd
+         yHmviexb3XBBXRYvr7S4mRDKFgU5qbCOcTjSxxSusazG4KgJZEaEDoNrrosAdxpRq0L4
+         DM8qYmkbI4AnjMwS4GbqGFBy2HPy9VX16T1gHZ9uL24h/YYcwbmRMEC+CzIpqRpKM5Z8
+         NaQwiM6YY7HhhlVPucpDtDPxhSyDklnzVLhA2JzHYldjutBkTes37WSX25Q/xAZ4MAc9
+         +9eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=l0xEQsbE2eoqhPdBFlcigg1eN1FK5AXrP7+HDFAlaUE=;
+        b=JJR8DGvltQidm/kbRrlK/luwm5erdb7nvnu9/lszk7l6hFSd0Du0xG8VA7hgUOKr8D
+         43ixAIDrQrLDThoXejfIGkRMIF4Y4AhvR85kwhtByhnwj1vCL7YFOPWQsPsO+sUIHEHa
+         UjtPNlQqIIB/aOuXVezdDO/D8on5r2whiHkHaQn8QdCCiaFS5sv2HxzmmWZjlzYCR4BW
+         CVgwFjYk5RfuUAfr+6GKP31ZzSkYEtnFo5s06B4iIpYH2T0PBCUuoi36XcKsh64Jsinq
+         8VyEYIl0y6n7YHMIGrZNJYeYGqeEuNJefgI2OvbK9IAO1Gk5ROLJEL3lv/FdzwiBmS8D
+         pmUQ==
+X-Gm-Message-State: ACgBeo1TU/TAuuuT98bHoNSvUGl+waEb9i/nblX2wSPxMVg2rY+WFgiQ
+        vnVwebsJlbjUCRnJkpEQVVZicXdHG4H00cuqI56Wlg==
+X-Google-Smtp-Source: AA6agR4sGDmad8J6SsCn9OzzNznBTVx37Wjtmkh4S0tz8IuBXk4DHNwwKMcMYxXfF4zetY6o1eGSrmXVp75zdbZ5nV0=
+X-Received: by 2002:a81:92c4:0:b0:340:bd1f:3e35 with SMTP id
+ j187-20020a8192c4000000b00340bd1f3e35mr2227850ywg.324.1662542340831; Wed, 07
+ Sep 2022 02:19:00 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220906202017.5093fd23@canb.auug.org.au> <YxfFzGObDWsylCK+@quark>
+In-Reply-To: <YxfFzGObDWsylCK+@quark>
+From:   Alexander Potapenko <glider@google.com>
+Date:   Wed, 7 Sep 2022 11:18:24 +0200
+Message-ID: <CAG_fn=UcWy+gbYLDM2WQZ=BZuVRML17KJ0L+=zsSg7+yDo4oGA@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the mm tree with the crypto tree
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Robert Elliott <elliott@hpe.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <DM6PR19MB31633BFB6AD885E0EAF68F14A1419@DM6PR19MB3163.namprd19.prod.outlook.com>
-References: <de6de430fd9bbc2d38ff2d5a1ce89983421b9dda.1662432407.git.pliem@maxlinear.com> <60cb9b954bb079b1f12379821a64faff00bb368e.1662432407.git.pliem@maxlinear.com> <166247313358.3585.5988889047992659412@kwain> <DM6PR19MB31633BFB6AD885E0EAF68F14A1419@DM6PR19MB3163.namprd19.prod.outlook.com>
-From:   Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH v2 2/2] crypto: inside-secure - Select CRYPTO_AES config
-To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Peter Harliman Liem <pliem@maxlinear.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        linux-lgm-soc <linux-lgm-soc@maxlinear.com>
-Message-ID: <166254049905.4625.8082287890585826042@kwain>
-Date:   Wed, 07 Sep 2022 10:48:19 +0200
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting Peter Harliman Liem (2022-09-07 08:46:32)
-> On 6/9/2022 10:05 pm, Antoine Tenart wrote:
-> >> CRYPTO_AES is needed for aes-related algo (e.g.
-> >> safexcel-gcm-aes, safexcel-xcbc-aes, safexcel-cmac-aes).
-> >> Without it, we observe failures when allocating transform
-> >> for those algo.
-> >>
-> >> Fixes: 363a90c2d517 ("crypto: safexcel/aes - switch to library version=
- of key expansion routine")
-> >=20
-> > The above commit explicitly switched crypto drivers to use the AES
-> > library instead of the generic AES cipher one, which seems like a good
-> > move. What are the issues you're encountering and why the AES lib makes
-> > the driver to fail?
->=20
-> If I load the kernel module (CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not
-> set), I am getting failure messages below.
-> IMHO this happens because some functions in the driver still rely on
-> generic AES cipher (e.g. refer to safexcel_aead_gcm_cra_init() or
-> safexcel_xcbcmac_cra_init()), therefore CONFIG_CRYPTO_AES is still needed.
+On Wed, Sep 7, 2022 at 12:12 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Sep 06, 2022 at 08:20:17PM +1000, Stephen Rothwell wrote:
+> > diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+> > index 9bb0f7939c6b..856f5d8ca65f 100644
+> > --- a/arch/x86/crypto/Kconfig
+> > +++ b/arch/x86/crypto/Kconfig
+> > @@ -5,6 +5,7 @@ menu "Accelerated Cryptographic Algorithms for CPU (x86=
+)"
+> >  config CRYPTO_CURVE25519_X86
+> >       tristate "Public key crypto: Curve25519 (ADX)"
+> >       depends on X86 && 64BIT
+> > +     depends on !KMSAN # avoid false positives from assembly
+> >       select CRYPTO_LIB_CURVE25519_GENERIC
+> >       select CRYPTO_ARCH_HAVE_LIB_CURVE25519
+> >       help
+> > @@ -16,6 +17,7 @@ config CRYPTO_CURVE25519_X86
+> >  config CRYPTO_AES_NI_INTEL
+> >       tristate "Ciphers: AES, modes: ECB, CBC, CTS, CTR, XTR, XTS, GCM =
+(AES-NI)"
+> >       depends on X86
+> > +     depends on !KMSAN # avoid false positives from assembly
+> >       select CRYPTO_AEAD
+> >       select CRYPTO_LIB_AES
+> >       select CRYPTO_ALGAPI
+> > @@ -32,6 +34,7 @@ config CRYPTO_AES_NI_INTEL
+> >  config CRYPTO_BLOWFISH_X86_64
+> >       tristate "Ciphers: Blowfish, modes: ECB, CBC"
+> >       depends on X86 && 64BIT
+> > +     depends on !KMSAN # avoid false positives from assembly
+> >       select CRYPTO_SKCIPHER
+> >       select CRYPTO_BLOWFISH_COMMON
+> >       imply CRYPTO_CTR
+> > @@ -44,6 +47,7 @@ config CRYPTO_BLOWFISH_X86_64
+> >  config CRYPTO_CAMELLIA_X86_64
+> >       tristate "Ciphers: Camellia with modes: ECB, CBC"
+> >       depends on X86 && 64BIT
+> > +     depends on !KMSAN # avoid false positives from assembly
+> >       select CRYPTO_SKCIPHER
+> >       imply CRYPTO_CTR
+> >       help
+> > @@ -55,6 +59,7 @@ config CRYPTO_CAMELLIA_X86_64
+> >  config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+> >       tristate "Ciphers: Camellia with modes: ECB, CBC (AES-NI/AVX)"
+> >       depends on X86 && 64BIT
+> > +     depends on !KMSAN # avoid false positives from assembly
+> >       select CRYPTO_SKCIPHER
+> >       select CRYPTO_CAMELLIA_X86_64
+> >       select CRYPTO_SIMD
+>
+> Are there any options in arch/x86/crypto/Kconfig that *don't* need a depe=
+ndency
+> on !KMSAN?  If not, this could be done in a much simpler way.
 
-That's possible, and the right fix might be what you proposed. I think
-it would be nice to understand what is failing and where, so we have a
-good argument for restoring the AES dependency (or not).
+Am I understanding right that arch/x86/crypto is supposed to contain
+algorithms implemented in x86 assembly rather than plain C?
+If so, we should definitely disable all of them under KMSAN to avoid
+false positives. And, yes, in a simpler way :)
 
-> Maybe the alternative is to switch all of them to use AES lib instead?
-> Let me know if you prefer this.
+What's the best way to handle this? Send another patch series? Or
+maybe just an update for "crypto: kmsan: disable accelerated configs
+under KMSAN"?
 
-If the AES lib can be used instead of the AES generic implementation
-that would be great yes. If that's possible, depending on what is
-actually failing, yes please go for this solution. Otherwise restoring
-the AES dependency with a good explanation should work.
+> - Eric
 
-Thanks!
-Antoine
+
+
+--=20
+Alexander Potapenko
+Software Engineer
+
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
+
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
