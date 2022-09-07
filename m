@@ -2,210 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 244DAC54EE9
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 09:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C283CC38145
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 10:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbiIGJ7p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 05:59:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55724 "EHLO
+        id S229513AbiIGKHW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 06:07:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbiIGJ7W (ORCPT
+        with ESMTP id S229643AbiIGKHV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 05:59:22 -0400
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2042.outbound.protection.outlook.com [40.107.104.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0409B69C8;
-        Wed,  7 Sep 2022 02:58:48 -0700 (PDT)
+        Wed, 7 Sep 2022 06:07:21 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B88086700
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 03:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662545240; x=1694081240;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=xBCkoyESMw4Q2V8wxdUJfQFkNKicasvomXs3pa0o4L4=;
+  b=K80mMDdeh0utbsnkD4CWA7GUxnMsrZHYVCaexFeEkrR2jyN+ORrgYcZu
+   T70gb94A0xiT3Li87Rk8GBBQfJ4vqjMeUmonf6X8jMtfwbIRwDv2CTuyz
+   Y6RUtXN7cGqeiqnCTd1KWmCuok7gmedxwwolE5vrA/W5vP2miLElm8hzQ
+   IT5fS2BD9AYnJV/0kSxBjOfw8BbGtTUQ1Xan6EzhywDucZCq2ZE7Xd1KM
+   ZwholpGwgIPWqU3E4aQLrnZJ3dsK+2eC04yYV+m8RovFW6AT2Z6UYBRzD
+   qzz5EWdAFpGMRSR0DFjK3pTJroyox+IjlZIFOJv/mZqXHWyjN+p++jdOd
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10462"; a="323017683"
+X-IronPort-AV: E=Sophos;i="5.93,296,1654585200"; 
+   d="scan'208";a="323017683"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 03:07:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,296,1654585200"; 
+   d="scan'208";a="942827873"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP; 07 Sep 2022 03:07:20 -0700
+Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 7 Sep 2022 03:07:19 -0700
+Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
+ ORSMSX609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 7 Sep 2022 03:07:19 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Wed, 7 Sep 2022 03:07:19 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Wed, 7 Sep 2022 03:07:19 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YGZYGWwxfp0ybj77Z+7d/29eFKkdC02WV2leCNw0P8B7GFyd9ZTzYo294RmpL+7yldVERdDW4HW97z1Ip1zhhLBUoBs3U4wxFY8fqbjhpZjsHmOuRARYGRq/YO4azRM3czmjcsvzFnr0wnzmbJoLSFo7lcqX+0WDc28+YThFzn68dsVmbiu/zJqXDv/e3DYwOHJLBLGpTrPyqnD0bVZ/c9nFzXPyoQnBCWvk0TT0gmp7ANwUgEmkfvKeFiVpfNKh9l25yL3vrfZdAt+Cu63ALM1R5H2vVmNwebFmgEptrcUsODG5zIWcruCPyQC/iBf5Zv33wecJKgm/+oJQ5RnCmQ==
+ b=ao/sy6G4DfWY47B5wZc6j3btCgGwSKT/FBDRnxf5I7AuO70b7FAVp9QYEQrBSqH5FRtHZr9wVPa3AX7C5iqQFUGb2s59x2lkrStmTD/WkFM2N4Y9p1nypS/5x4XMuaCCXNM27efBP3dPXaM8J6iZZJxGqL7bGn7pqjAMtj00n9oqeJfPIyDZ3zdGum6hmZh6Uo4Qp3jgrDPpcOzX6eDyBFBLqc+IFO4D6GxXb1OatoTZ+0VdGkUG1TQ3Wp9c/dRRkqubo8IrXMlJhs1/lxut40c/MFnOWonOCsytUHF8Oos8xDRka6YIM8gO1obrmLbQgcStAkwb5B15MagGH1ZtYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L1dtBXh6X/qhduiuR3xxSk02R/+ZQNXdVaOhQu8oT3o=;
- b=RH6SatcTQKk0zLgnNHSjk23tcVvEQNhVU+wYhHc6PRMdEIkn/+uFiiqrgEKCF1wyCs+oTHUcSQXfEbs6wU+X8RnNBkk49hWrCGZjiNjTKERu7DbJ7xkDeDS0+y0uIdcuIrI68Ibali8PU4SV7y5UCuGeDRGUFgYHdMk97Jl2uqKKaCM1uZducVbn34BpJINEwE0G8d+CT6KWX5lVenf6NC9j6VpBnOpyFafzEdzy1HQ0AZjjI3DE8NPvsxWwdSejLVq+fmGyx8/eM6dmSGzzHpW3kgdt8r1YicJLJPNF9VioFmhVCXncnkl2dbbT/05FRJ+uf3dSTurHnYZcytyjdQ==
+ bh=kftFtg2wEFdStcuYZy+MVcPbRpMzvl3gQHp2daQ68iE=;
+ b=XzmqhubrR+vmkbzfKEMV9bOq7wuJ/ql+bgzbeLXUiBhiGqnybcF7CPgAN0VpNT0xcyPFUeC02083vSfZjDN0U1qZ4UCD6ef3y27ZuaF2ZASmxYCqTYyxPzRPkr2k8VQXh9/uM/Zd9y7jnSL5SBnj40LKtRGst0+XehISxTHMrmAIE0sHfYHourzdDy8WLYtRux73XzNiviHP7NUO3qBFXC+ZmiSuieZ6HcXr4jIwymkrKrNqiRAtGhX06h1uI6VOhPmEVfraht0TVmBYuCFBeEqE9WM81hfQ919ICuatVAxuVTdcSZqGKhPtNXrbvmiZlvrQbDBu0hg7RH/XK2aL4w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L1dtBXh6X/qhduiuR3xxSk02R/+ZQNXdVaOhQu8oT3o=;
- b=pn/3vnoKw6sxRZUdpIp4TGOjosRVWntmRK8E4OcQyN2LsIyFq08xP0goKuXG8e47kU3gNAuWA6XwS45Y71AwaaSjUFuBIQtxtQ13oQkXlt7/kU5p78FCITewRfyaIQ9X1HVB4VPqcCSI6TCc5S2mckQYKjo3F3+Z2J79CUMAtsQ=
-Received: from DU2PR04MB8630.eurprd04.prod.outlook.com (2603:10a6:10:2dd::15)
- by VI1PR04MB4158.eurprd04.prod.outlook.com (2603:10a6:803:42::28) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by BY5PR11MB3944.namprd11.prod.outlook.com (2603:10b6:a03:18e::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.18; Wed, 7 Sep
- 2022 09:58:46 +0000
-Received: from DU2PR04MB8630.eurprd04.prod.outlook.com
- ([fe80::6cde:8704:ed0a:c87b]) by DU2PR04MB8630.eurprd04.prod.outlook.com
- ([fe80::6cde:8704:ed0a:c87b%4]) with mapi id 15.20.5612.014; Wed, 7 Sep 2022
- 09:58:45 +0000
-From:   Pankaj Gupta <pankaj.gupta@nxp.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Wed, 7 Sep
+ 2022 10:07:17 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::9d94:4bbb:2730:639d]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::9d94:4bbb:2730:639d%5]) with mapi id 15.20.5566.015; Wed, 7 Sep 2022
+ 10:07:17 +0000
+Date:   Wed, 7 Sep 2022 11:07:07 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "jarkko@kernel.org" <jarkko@kernel.org>,
-        "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
-        "david@sigma-star.at" <david@sigma-star.at>,
-        "michael@walle.cc" <michael@walle.cc>,
-        "john.ernberg@actia.se" <john.ernberg@actia.se>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "richard@nod.at" <richard@nod.at>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        Sahil Malhotra <sahil.malhotra@nxp.com>,
-        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Subject: RE: [EXT] Re: [RFC PATCH HBK: 2/8] hw-bound-key: flag-is_hbk added to
- the tfm
-Thread-Topic: [EXT] Re: [RFC PATCH HBK: 2/8] hw-bound-key: flag-is_hbk added
- to the tfm
-Thread-Index: AQHYwbSROQtM17Y3rUes00GOEj1Wxa3R9HsAgAGPkHCAAA7BgIAAHQrw
-Date:   Wed, 7 Sep 2022 09:58:45 +0000
-Message-ID: <DU2PR04MB86308DB7CFBC7A31CEB612D295419@DU2PR04MB8630.eurprd04.prod.outlook.com>
-References: <20220906065157.10662-1-pankaj.gupta@nxp.com>
- <20220906065157.10662-3-pankaj.gupta@nxp.com>
- <YxbsBiCrIQT/0xz6@gondor.apana.org.au>
- <DU2PR04MB86308036FB517BF8CAD3D32795419@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <YxhHkz+UlE9XAG/Z@gondor.apana.org.au>
-In-Reply-To: <YxhHkz+UlE9XAG/Z@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU2PR04MB8630:EE_|VI1PR04MB4158:EE_
-x-ms-office365-filtering-correlation-id: 40e09fce-8c9d-48e6-77de-08da90b78dda
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wP04vsq+wJVFlW84b8xwmmG3RMmUsLYFfBuLC+Jb5E+2JS+wGbatpy+dW3/GU62auYGCLea2J4YJ2KAJ7emaf1v6y4SL16BmzaRitPobymnpJ+75VRG2i3Pje2PgvzNtQlX7GenY7isQoVa+5k0Ch0jBtQN8n1oiXPsbQxFI8qBrbXrbfEJz2wBVhXg1JGKx3v9EnUzZlxsWJy4TTEgKfbFnhmvKEKGHt8GtmuQ0+mVPWSoIjgCV7OsavNnoUKIwuH5d4gcPR32jVk83RtGVBzZGyPKq7eE2OCbZqUCz0DoGa2rrOfSQlNAILAoA2GDI3cO34P/W/P92fJuxjGNq2TBFgNV//6zQIdPf9OmgK1nE0G9S9K8v/bK2q/1t+4jgyvFVhPvDOVkk741obSZt9h0YC6Srj2gerY5tIgAdBfkyP9NfYMcL+G/gOvPLrA7cYDfllPvAj+T0HAsBMhIaQtMmeC6MuzSebw6aPmYH/h3rJ1qdgisuLTCJriuLKIOk6Dj3Adkw0Yi0lFlOhlTHA7XchcKlWzE9BU3xuc7W+W+bleFoOtrGev7FB7y1PHvxmvQ1H6J3FTRy7mOcUceFXQ/dX64gznfjueYpme+DSLCyi33IamfAW6PLxaSSraU12bLZqb7kFh5+9y14mzC9BMKg79d2juv1AiVhQK7yebJ3vIFGNPvuX0ZTMN9GPA9xQOZS7X/+XbX5K36PKHQOHwmdECi+XCFLicXBjzmLxCZBkzZkE3LJXkWb7OiVLQoiDu8o+Uf6fbQlSoP78PH8Etth6ujaFuImtvhEoO+9DvE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8630.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(396003)(39860400002)(366004)(136003)(346002)(55236004)(33656002)(53546011)(9686003)(26005)(55016003)(52536014)(316002)(64756008)(76116006)(66476007)(8676002)(478600001)(71200400001)(66946007)(54906003)(4326008)(66556008)(66446008)(2906002)(6916009)(83380400001)(86362001)(966005)(8936002)(41300700001)(38070700005)(44832011)(7416002)(5660300002)(122000001)(6506007)(7696005)(45080400002)(38100700002)(186003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Iu4bqgpIIZ8cSjS0t5FHlrY33N5WIm8OQO8aklly1yD8AIUdsFCit9ATfgTU?=
- =?us-ascii?Q?59IMszIcfjRDoxbLgnl+W5AZiZ5ESLZgfqqBobz4308N7k122L+fGYJxAqGh?=
- =?us-ascii?Q?h3d9ia1g933aIcJeoKmslzcmS1QQ2s6cNcxuftqkQZ9pqx22s9BPgHd/SS00?=
- =?us-ascii?Q?gi5st9XbGbZxpx6GjB0QAggt/SXB77bcB8mDbpF99saaoKxR/0A+XeLmrjqf?=
- =?us-ascii?Q?s/VwI24YxCMpZQzHPJZ6GmSv1pgQWKNUr5SaieUWhfrHX/kF3+IxlB5uN3vQ?=
- =?us-ascii?Q?Y+YuU9KBgaB2Us8ZaxyKIupoJ5LLXkB4YJhRgPF/ccMV36TwmrHs3WTMD/dE?=
- =?us-ascii?Q?1rYnzxnnZUqLKlJAOKxsLghfzcAy9XR9MR0N99DHUJ3YcAeVkaOpBQlYYjyP?=
- =?us-ascii?Q?afOGcjgm19375yzipWS5oC88uoYcmTzlgSTb2QxFsI4L9OXAkrHXznE0gpFZ?=
- =?us-ascii?Q?ycXihAw9ut85t+E3Ez8k/bdaBPPI1sOc4RgZ8IIhE1e5XMNfkK1tL+hQoYTV?=
- =?us-ascii?Q?PoTPfQpFD8GxQAzBEMdhnQ73eMuy+D7XBm5xW53PhVv4TdeY5v0WSsw4hkYd?=
- =?us-ascii?Q?ctolUTLICJz9rgZ2ubFADX/uAtrWYEUgVGQVVicZ3rtuMYqPOyNY5n1ufQAn?=
- =?us-ascii?Q?2vNkMOJlq/MTClR4s26jYgB/CkphuBDdjBgLmN6jdF5ALi+PyPL3uxMcYYRv?=
- =?us-ascii?Q?Uzc+hFn+UK8P3rtll7rhHp0CTr0tA/2bGrqTbxZ72479y/WCLp4oxLqTIo4a?=
- =?us-ascii?Q?2k1Rgf4cAq9LlqmhuWWu2zn14wAlHoW6dg/HrKLbo8IWAxxVNMoHfY93ON7E?=
- =?us-ascii?Q?Sv0WfVmc0QOmRwNYg7aN59xWoE57krcWMFiVBWr5/ZjS3biliz83KsfxDWD+?=
- =?us-ascii?Q?A+HXluUx8m1RBcsjshTmyBVB5DPqIoZYkdHCAY+51buMYYwtYa06R3RekGf+?=
- =?us-ascii?Q?hKlTht2QZw4D7QT0K7hn6uUfAS7HIACIdZooGTlJXBkY67OY5ukF82A6xn66?=
- =?us-ascii?Q?j/WU8zTx95hiOYQxcxDV1vG9LzvfDz1s61VTW5FsUBWuxEKfyZchCSZEJUEq?=
- =?us-ascii?Q?N6YzFnSdB8I1l6YHhf+ECCsEQdp8tDHXGkFrs6T7TklCbGi0lCx+RJs7hU91?=
- =?us-ascii?Q?zZI3i06Uf5EUtt/u3AZiH5wQQjkH5nrdRGRpNIK8kQcsSbWJQrKJgGDG3A4B?=
- =?us-ascii?Q?HDFYMDNPUUHkubB+LOYIYU3ZnF8WvL0zkFRG74aECcWjA/nxO/Vjkng3I+Iq?=
- =?us-ascii?Q?IwPGrjULrebRItIjh6IqYHpkSWHSQKtdm5cQpG0Hnhf6At+y4+1QvU8NMDJM?=
- =?us-ascii?Q?cYwaKX90G+5fMhheG5acJvL3gOkC4qTBb5ry7748qpxakjSYBOgFY1kRmhdb?=
- =?us-ascii?Q?s25zZBXM9KGh0UIfo0YnbsQrxvlTSuu6c53hqPwiICmP+79242y53XGwjqFf?=
- =?us-ascii?Q?D4kr7Oa6Q8LbVVkXLIjE+jpDZTwvQVAZelMN0bbkTEiBTLcd8se8qGb43cZ1?=
- =?us-ascii?Q?IbX7iCwO7/Bf+HyhNyKY4ymhtSc/dKDMVwfngtMqWSIo/smx6oUlOSeSOYsD?=
- =?us-ascii?Q?vKujqXFKCPxXCs6Fg4gzA0dOSYeeX2/pQZgB+Nik?=
+CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [BUG] crypto: qat - Mismatch in DMA mapping length in
+ qat_rsa_enc/qat_rsa_cb
+Message-ID: <YxhtSz6Y/tbi5pw6@gcabiddu-mobl1.ger.corp.intel.com>
+References: <YxhLgkOBQob6qdRy@gondor.apana.org.au>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <YxhLgkOBQob6qdRy@gondor.apana.org.au>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: PR3P191CA0030.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:102:54::35) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8bc7ed3d-0145-4b65-b351-08da90b8be95
+X-MS-TrafficTypeDiagnostic: BY5PR11MB3944:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 39qaOsupAhBCIEDqFigzjf0ZNmFq0KgAWVvgCntMmVZiBUKSvxabOOrlbRwJATbjI8M/llwwcqvlTRxMfdUGpr9F9Q/lUX2Z54UNp9YRQm6vFYAqrs+5/c3QK29pFTyPXKFM5qKsL7LPBm/Be4vKozUhP0uG+Y3st5zUF5OSz+pd4Sv0T+C8ZdtWcP0Q0nGN4+goOjP6z+HRTChr07wGHvumCkLFQminfXv8CF+HerNw1aVwqhimHqFBE5Zp08vUp0g4kB89UjUfxJZvm9/jor3VUHoGcEe6AIEW4aaLy/xL8hGCdMlKdXSOyisLf0tKvoGLihbpe/wTsJkSvxdThbE5f5vydnbG+0Wxq0s3jflg3IhX+HDacxyOuLgD+kI4cOEEwMdjIF2FbTe+qVHiKg3ToySd2dC+Ob3NcWBBN79B/VIptuci+4jsZQRedS/R+rK5ulxwMVIuPEjvCGjrfBOwP81XNQQtcraQEQlX59DqXkod8LGAXSfHnkwg6DKwLEZNbdQ72RYLkDm2FOLZYZQWjeTp5ry8YXZje51GTv+f2hrkJFwPTOhWwxpw407WXtA560uk095IDZqqSeiHA/Nwk58GJK3ENXoSZkXXTZWYNxuf6kA7io16Jydt69DRqAu2W8VZjofEIEB0Fn5hPwBvIUUCDHKXCwh+L4cGom58XRKxuPMwQwFkWw4UmmOV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(136003)(346002)(376002)(366004)(39860400002)(6486002)(478600001)(316002)(38100700002)(82960400001)(6916009)(86362001)(6506007)(6666004)(6512007)(36916002)(26005)(41300700001)(44832011)(2906002)(8676002)(66946007)(66476007)(4326008)(66556008)(5660300002)(8936002)(4744005)(83380400001)(186003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?34YGlu4n5MGf2EWIVkCPNkShyUmpIf1P3eXIzSgsfHG1lXBUVdZdzYAgR6Fn?=
+ =?us-ascii?Q?r3ev+R+5ijNP9GOFDbwQeFUqcq89nic14YmQyB0MWqokTRfXF7txON9VP8pJ?=
+ =?us-ascii?Q?TkVskuPUHHSGJQgDRbd9974wE+2qUit0PEg+AJaCNEofDwx4APF6xcMEj+UI?=
+ =?us-ascii?Q?ZHdiARLfz95nv1YjPozbUTeODmTKjZxVmclFnL2uhWRONlsL0cOOJ8e9hyCc?=
+ =?us-ascii?Q?EpRE8sinHT380RZYtsmPkY5ll+iAVUD96nrxDDC+wNSARZGe9v3oj8uSjgtZ?=
+ =?us-ascii?Q?jbpZCl1tdk3Zp+2vxlgPPv/t6bbgX5IVY/jiwwRA5flTCUCTycZh7PcUp5ac?=
+ =?us-ascii?Q?bKm8A6Nm5VzgcP7rWv2tusp7KDn/Yw/bAJqo+yZEcoK9Q/wAShkRV8j7oZq5?=
+ =?us-ascii?Q?iVX+m84HxU3qmL0FtwcQ95qo4ok0IJyjU5GBJrRN9eckwn1OZ5xpsn5PP47K?=
+ =?us-ascii?Q?gR11tXs9xPTewuTAObuIpQVXDDUW3AkrPtc1NZ5T1cpmZVXEYixs8S+aoXO1?=
+ =?us-ascii?Q?Y38YAsgh8/f8LzbOP6/Pj8pRWQ2uUGD2NBpJucE/ZDuz0pEhMvFZVV6HbVfS?=
+ =?us-ascii?Q?EfG4PCFVR5lf9OAgIhZ6sUSVsSVbGASqPnbRMH62JOtlBs87PaeMCqvfCVA4?=
+ =?us-ascii?Q?loTSev3jQ9KxCq4fGjpmm5QTc/PaEGD8pt04JgXp4QDykpGxseIho79JHfP3?=
+ =?us-ascii?Q?RxJQ+1IQFKyHeySi0lMUVHE8RTcweDIAD0WY9mEfdKrIy2Q25qebBvhvuovG?=
+ =?us-ascii?Q?pOFJOJPAT+ZAxRok5BINoTTj9mwcGeNrPw0QvhAbaOaXCyOE9Zoaljwid5CT?=
+ =?us-ascii?Q?oCkEvMedqAsNx1o/z23KO8S37ELHtzD46172Vc8BXkRPVLMLOwYxou/S6Fn4?=
+ =?us-ascii?Q?I8kD3DjzrFaUeEKiO45J0ZiDyDDo3QYqipmn/ACO1UDUSykl29OM5AIGpzA5?=
+ =?us-ascii?Q?d1R/XVttXOy0CQJLVhx21OafvvLBZRXCQ13iVjJD+avjo14QdNEhl31Wufvj?=
+ =?us-ascii?Q?H9VndmTjl8jkpspdnRvg6eG0gY1jVLlWEoMD/nk2oHFQfsiQUVzd8TKCOjbR?=
+ =?us-ascii?Q?n2vfXX3+iQ9DeLitjtQoddz/By2POJndcLmUpD77653+zI9zGHD2KIlKs4Fx?=
+ =?us-ascii?Q?GaNN9FI6uXkOxYS9WY5FGA/R7T39A/MJg1HCNet7c92bwGDHMbjPGM0vFM0S?=
+ =?us-ascii?Q?4Fe9tRHM1tDsm4BqP6qpyOVvsh2ivf7NQUpZgV/+2oFyYS5irj5aZ5OkoDTe?=
+ =?us-ascii?Q?W8MIa8qigvF+bLGzdJuJiBUNX19TOpto6fc2Y1lhEJKSf0EuK1jXM5ZgMmXp?=
+ =?us-ascii?Q?NRre5144dN2NvwRh+VOczqrcqAz5DV32+E3oB6Db1AJyOCZO/nDMVUiCA6EU?=
+ =?us-ascii?Q?PH2+mh6et/mG3q7wMzdp3UGj6ytoRW6IIpahjkqJ8Aukqr/1MU8efpKrb3w2?=
+ =?us-ascii?Q?QBSNwCz/NJRJydq8+lH58Uz5hflDDgV9GQyMRRBoYip+T81uCVvdXZs7x1xC?=
+ =?us-ascii?Q?Cz5hTlif5HqEe/e8Bv1gu4Nm1En5ZRuB/KJTMPwHy+AI9AfmYer5H1AG5nMp?=
+ =?us-ascii?Q?JVFYGR4qxC7ifuQStklgNJqOqnzhQQST0Ix6Ilz7POtoj0Ed1Y6kTwjCdlZm?=
+ =?us-ascii?Q?FQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bc7ed3d-0145-4b65-b351-08da90b8be95
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8630.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40e09fce-8c9d-48e6-77de-08da90b78dda
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2022 09:58:45.9041
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 10:07:17.3147
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lUziX6y1HKjC6NP7/jj04+eiiyNtWZx49o17T0yWPZhlqEEmMxQw0vWoM5jwgINbjGd1/oIvAV2qjRS/FC5f7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4158
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gvm5sEOcgGu/z+yxLYDBrdQFFv4IxBCyeTCElsPw/lC5ZXiTA4jiqhyVm20dq7UPzkMsIQlF/DPGXVi3RDI9gPcNlTkH0Igwuw7aBjTDubk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR11MB3944
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Sep 07, 2022 at 03:42:58PM +0800, Herbert Xu wrote:
+> Hi:
+> 
+> The function qat_rsa_enc maps req->phy_in with a length of 8 bytes,
+> but the function qat_rsa_cb unmaps it with a length of 64 bytes.
+> 
+> This causes the DMA API to generate warnings in debug mode.
+Thanks Herbert.
+I was aware of that. We have a set in review internally that fixes all
+warnings reported when CONFIG_DMA_API_DEBUG=y is selected.
 
-
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Wednesday, September 7, 2022 12:56 PM
-> To: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Cc: jarkko@kernel.org; a.fatoum@pengutronix.de; Jason@zx2c4.com;
-> jejb@linux.ibm.com; zohar@linux.ibm.com; dhowells@redhat.com;
-> sumit.garg@linaro.org; david@sigma-star.at; michael@walle.cc;
-> john.ernberg@actia.se; jmorris@namei.org; serge@hallyn.com;
-> davem@davemloft.net; j.luebbe@pengutronix.de; ebiggers@kernel.org;
-> richard@nod.at; keyrings@vger.kernel.org; linux-crypto@vger.kernel.org;
-> linux-integrity@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> security-module@vger.kernel.org; Sahil Malhotra
-> <sahil.malhotra@nxp.com>; Kshitiz Varshney <kshitiz.varshney@nxp.com>;
-> Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>
-> Subject: Re: [EXT] Re: [RFC PATCH HBK: 2/8] hw-bound-key: flag-is_hbk
-> added to the tfm
->=20
-> Caution: EXT Email
->=20
-> On Wed, Sep 07, 2022 at 07:22:42AM +0000, Pankaj Gupta wrote:
-> >
-> > Current support, does not permit the hardware to support both types of
-> keys: HBK & Plain Key, at the same time.
-> >
-> > This change is generic and permit any driver that supports both- HBK an=
-d
-> plain-key, to differentiate and use the keys accordingly.
->=20
-> Existing drivers simply register hardware keys under a different algorith=
-m
-> name, there is no reason why they can't coexist with a plain key.
->=20
-
-Thanks for the comments.
-
-Intention is to only secure the key buffer, at run-time.
-Not to change the working of the crypto algorithm. Algorithm would be worki=
-ng exactly same for plain and HBK.
-
-There are 3rd party IP(s), which uses kernel for crypto-algorithm's operati=
-ons.
-Modifying the algorithm name in these IP(s), is not always allowed or easy =
-to maintain.
-
-While, this patch-set allows to use the same algorithm name,=20
-and hence prevents any changes required to the user(3rd Party IPs) of kerne=
-l crypto layer.
+For this particular issue, e48767c17718 ("crypto: qat - reduce size of
+mapped region") needs to be reverted. This revert is included in the set
+that I'm going to send.
 
 Regards,
 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgondo
-> r.apana.org.au%2F~herbert%2F&amp;data=3D05%7C01%7Cpankaj.gupta%40nx
-> p.com%7C9bc412605fa243702f3a08da90a2602c%7C686ea1d3bc2b4c6fa92cd9
-> 9c5c301635%7C0%7C0%7C637981324324251974%7CUnknown%7CTWFpbGZs
-> b3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn
-> 0%3D%7C3000%7C%7C%7C&amp;sdata=3Db1ImbcEMa9jticFU7yrpwHXuuQEog
-> KLrjuiE%2FFpcYyA%3D&amp;reserved=3D0
-> PGP Key:
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgondo
-> r.apana.org.au%2F~herbert%2Fpubkey.txt&amp;data=3D05%7C01%7Cpankaj.g
-> upta%40nxp.com%7C9bc412605fa243702f3a08da90a2602c%7C686ea1d3bc2b
-> 4c6fa92cd99c5c301635%7C0%7C0%7C637981324324251974%7CUnknown%7C
-> TWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiL
-> CJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=3DcP4js5Q0QPBJfvlrYDi0j6R
-> IGFpqHtJOSa9C7YC2IXM%3D&amp;reserved=3D0
+-- 
+Giovanni
