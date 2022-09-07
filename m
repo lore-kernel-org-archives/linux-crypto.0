@@ -2,143 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6AEECAAD3
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 07:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9790CC38145
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 07:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbiIGH3G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 03:29:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32944 "EHLO
+        id S229717AbiIGHag (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 03:30:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbiIGH3F (ORCPT
+        with ESMTP id S229911AbiIGHaA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 03:29:05 -0400
-X-Greylist: delayed 87389 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 07 Sep 2022 00:29:04 PDT
-Received: from mail.3ffe.de (0001.3ffe.de [IPv6:2a01:4f8:c0c:9d57::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA9D255BD;
-        Wed,  7 Sep 2022 00:29:04 -0700 (PDT)
-Received: from 3ffe.de (0001.3ffe.de [IPv6:2a01:4f8:c0c:9d57::1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.3ffe.de (Postfix) with ESMTPSA id 3F84B1272;
-        Wed,  7 Sep 2022 09:29:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2022082101;
-        t=1662535742;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/XdYANHumvJoHiUgwc3LkZN9xfkFB4kHk29XFWva6fE=;
-        b=zGJyhVPnJouK84ClD1oot7n9AeY0TVJ0kr3AObUz+r/GGIfjl9q7tQnr4h6OOMPGfwP03c
-        jvA5iIrxzPU0iL5FxZve6/k7sJ1f+yko1FdSInTx+sHqXEU2LnlTITCjsXLx/cMq8NCHT3
-        F0TT3gOK9fnruhDPGa3Dsk/cCXA4Cuw43C4Wc7y5zYQwq0MK/z9CloO06j7er2u6sGvGeA
-        gUNd+vwujpgvH05bEVWQI8jgaBVd1viDZ5aEdUiDVUJK417YgCapxdBPU7OOImc/CYFHWj
-        q4ddqGntYWcm6PeU9tsQuZduV8WpUlxl0wFVvUBV2m6JGgAQwlr3DlheTbO8pw==
+        Wed, 7 Sep 2022 03:30:00 -0400
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A6E20BEB;
+        Wed,  7 Sep 2022 00:29:48 -0700 (PDT)
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from shine.dominikbrodowski.net (shine.brodo.linta [10.2.0.112])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 43D922013FE;
+        Wed,  7 Sep 2022 07:29:46 +0000 (UTC)
+Received: by shine.dominikbrodowski.net (Postfix, from userid 1000)
+        id 13E5AA00BF; Wed,  7 Sep 2022 08:54:10 +0200 (CEST)
+Date:   Wed, 7 Sep 2022 08:54:10 +0200
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, Jason@zx2c4.com,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random / hw_random: core: start hwrng kthread also for
+ untrusted sources
+Message-ID: <YxhAEmtVcdvIkX6Q@shine.dominikbrodowski.net>
+References: <20220904080247.7890-1-linux@dominikbrodowski.net>
+ <Yxg7WQ1UuskDrBVj@gondor.apana.org.au>
 MIME-Version: 1.0
-Date:   Wed, 07 Sep 2022 09:29:01 +0200
-From:   Michael Walle <michael@walle.cc>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>, a.fatoum@pengutronix.de
-Cc:     jarkko@kernel.org, Jason@zx2c4.com, jejb@linux.ibm.com,
-        zohar@linux.ibm.com, dhowells@redhat.com, sumit.garg@linaro.org,
-        david@sigma-star.at, john.ernberg@actia.se, jmorris@namei.org,
-        serge@hallyn.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-        j.luebbe@pengutronix.de, ebiggers@kernel.org, richard@nod.at,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Sahil Malhotra <sahil.malhotra@nxp.com>,
-        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Subject: Re: [EXT] Re: [RFC PATCH HBK: 0/8] HW BOUND KEY as TRUSTED KEY
-In-Reply-To: <DU2PR04MB8630C63609D6D785F12DEC6E95419@DU2PR04MB8630.eurprd04.prod.outlook.com>
-References: <20220906065157.10662-1-pankaj.gupta@nxp.com>
- <047746e1134d5bdce699d8c021f849b6@walle.cc>
- <DU2PR04MB8630C63609D6D785F12DEC6E95419@DU2PR04MB8630.eurprd04.prod.outlook.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <5d67b4d45aa1b2a3d2738c93edaeffdd@walle.cc>
-X-Sender: michael@walle.cc
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yxg7WQ1UuskDrBVj@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 2022-09-07 09:22, schrieb Pankaj Gupta:
->> -----Original Message-----
->> From: Michael Walle <michael@walle.cc>
->> Sent: Tuesday, September 6, 2022 12:43 PM
->> To: Pankaj Gupta <pankaj.gupta@nxp.com>
->> Cc: jarkko@kernel.org; a.fatoum@pengutronix.de; Jason@zx2c4.com;
->> jejb@linux.ibm.com; zohar@linux.ibm.com; dhowells@redhat.com;
->> sumit.garg@linaro.org; david@sigma-star.at; john.ernberg@actia.se;
->> jmorris@namei.org; serge@hallyn.com; herbert@gondor.apana.org.au;
->> davem@davemloft.net; j.luebbe@pengutronix.de; ebiggers@kernel.org;
->> richard@nod.at; keyrings@vger.kernel.org; 
->> linux-crypto@vger.kernel.org;
->> linux-integrity@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
->> security-module@vger.kernel.org; Sahil Malhotra
->> <sahil.malhotra@nxp.com>; Kshitiz Varshney <kshitiz.varshney@nxp.com>;
->> Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>
->> Subject: [EXT] Re: [RFC PATCH HBK: 0/8] HW BOUND KEY as TRUSTED KEY
->> 
->> Caution: EXT Email
->> 
->> Hi,
->> 
->> Am 2022-09-06 08:51, schrieb Pankaj Gupta:
->> > Hardware Bound key(HBK), is never acessible as plain key outside of
->> > the hardware boundary. Thus, it is un-usable, even if somehow fetched
->> > from kernel memory. It ensures run-time security.
->> >
->> > This patchset adds generic support for classing the Hardware Bound
->> > Key, based on:
->> >
->> > - Newly added flag-'is_hbk', added to the tfm.
->> >
->> >   Consumer of the kernel crypto api, after allocating
->> >   the transformation, sets this flag based on the basis
->> >   of the type of key consumer has.
->> >
->> > - This helps to influence the core processing logic
->> >   for the encapsulated algorithm.
->> >
->> > - This flag is set by the consumer after allocating
->> >   the tfm and before calling the function crypto_xxx_setkey().
->> >
->> > First implementation is based on CAAM.
->> >
->> > NXP built CAAM IP is the Cryptographic Acceleration and Assurance
->> > Module.
->> > This is contain by the i.MX and QorIQ SoCs by NXP.
->> >
->> > CAAM is a suitable backend (source) for kernel trusted keys.
->> > This backend source can be used for run-time security as well by
->> > generating the hardware bound key.
->> >
->> > Along with plain key, the CAAM generates black key. A black key is an
->> > encrypted key, which can only be decrypted inside CAAM. Hence, CAAM's
->> > black key can only be used by CAAM. Thus it is declared as a hardware
->> > bound key.
->> 
->> What is the difference to the current trusted keys with CAAM?
->> When I tested the patch series back then, I wasn't able to import a 
->> sealed
->> key on another board with the same SoC.
->> 
+Am Wed, Sep 07, 2022 at 02:34:01PM +0800 schrieb Herbert Xu:
+> Dominik Brodowski <linux@dominikbrodowski.net> wrote:
+> >
+> > diff --git a/drivers/char/random.c b/drivers/char/random.c
+> > index 79d7d4e4e582..b360ed4ece03 100644
+> > --- a/drivers/char/random.c
+> > +++ b/drivers/char/random.c
+> > @@ -867,9 +867,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+> > 
+> >        /*
+> >         * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
+> > -        * we're not yet initialized.
+> > +        * we're not yet initialized or this source isn't trusted.
+> >         */
+> > -       if (!kthread_should_stop() && crng_ready())
+> > +       if (!kthread_should_stop() && (crng_ready() || !entropy))
+> >                schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
+> > }
+> > EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
 > 
-> Currently, keys that are part of trusted key-ring, contains plain key.
-> 
-> With this patch-set, these key will become Hw Bound Key, which is not
-> a plain key anymore.
-> After this patch-set, if somehow the HB-key is retrieved from the
-> keyring, the retrieved key  would be un-usable without hw.
+> Couldn't you split this bit out?
 
-This doesn't answer my question why I couldn't import one key on
-another board with the same SoC.
+I could, but this would need to get merged before the patch to the hwrng
+core gets applied. What do you (and Jason) prefer?
 
-Ahmad (as you were the author of the original series), is this supposed
-to work or is the seal export already encrypted with the per SoC key?
-
--michael
+Thanks,
+	Dominik
