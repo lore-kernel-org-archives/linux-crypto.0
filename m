@@ -2,318 +2,190 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 660D4C54EE9
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Sep 2022 23:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9113C6FA86
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 01:53:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229956AbiIFXMN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 19:12:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39552 "EHLO
+        id S229482AbiIGBxV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 21:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiIFXMM (ORCPT
+        with ESMTP id S229551AbiIGBxU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 19:12:12 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1032F8983D
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Sep 2022 16:12:11 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-3454e58fe53so54934707b3.2
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Sep 2022 16:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=3JQEOWLEnbq0vh0DexQWukCn32UtKuHAkuSePHvQS0U=;
-        b=s6AtETKvIEGich4NCsx1yel+1DolsO2sKsFgEpHqRTbeTGZKGrClDeG5GhhXWR8hrx
-         daoxWL1CWmFXt3fW7Kc913NbYFOc80Yl0xiZAiXiS7Y9Vw4NrQLf+Y4E3OhCVXbQT4js
-         5SXv3R9HRws6h2IRAX3r/RqoMei7PiPzQv9x38YCrkvMqQpbM8vkLbK+yZ9/9mqML9ls
-         3AdN5CV8ovXKy+OOw+n4XLhCdGJDy5vsp9HOc5HhozgfQIQMagNp2DWdq9TA+8ltnSMn
-         CLVg2KaED+KzF4Ym6/eIEsIKXnJRo0nLbjanorWy/1dSgRT9JfGny3EfyOpUt1U8IcxT
-         EV6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=3JQEOWLEnbq0vh0DexQWukCn32UtKuHAkuSePHvQS0U=;
-        b=ygwbehaXyyUyk7srlaKE40/Ow756xze0IuJhYQ9EVAU6/BUGU8ce6kb6YXhbG4dqrv
-         smFOmLsei3q4RkSi1aJImIQHcMuwfcnDGhtLMNlL+3F3PmhXREVCDhoNJGSfa//ALI3I
-         FNyzuMiruy0KXQmnq7vIW6wsWPyDLa0itFmEkBar7rRP/o0LZhaDw4Dlwjk33cjoje1Y
-         SDCwXEMkfgwMd8Edzy58l86hAuXea1uhv+x0Akarg5MjjR5OztIVtkFRq5nRh4hW64+Q
-         NDsx7dzGwnNLRDJl9aOukyl3IMAEoVinro8ZSvy2wiQKfEtrNNPJiq3A5i0Eox5Sy8ux
-         WlAw==
-X-Gm-Message-State: ACgBeo3j5mFNdLB2k38LyXGudo1hYCggfLdSTQ6dPbW7XKubpBmda9pQ
-        OwUKOKCWmm0J2XJmNWwjv6xjYuBkx8Vrq7+Yk4Iviw==
-X-Google-Smtp-Source: AA6agR6iJPahWCZn85Dc9fpexgOabsPzYuH4RyQqw98pcGpM4zf2Y0z3+NUjPM5vbUISzN+6VH8o2Bz9HzkQCu3F1KQ=
-X-Received: by 2002:a0d:d5cd:0:b0:345:68b1:c06e with SMTP id
- x196-20020a0dd5cd000000b0034568b1c06emr780033ywd.489.1662505929988; Tue, 06
- Sep 2022 16:12:09 -0700 (PDT)
+        Tue, 6 Sep 2022 21:53:20 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DAFD84EEC;
+        Tue,  6 Sep 2022 18:53:17 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MMldk4z4xz4xDK;
+        Wed,  7 Sep 2022 11:53:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1662515595;
+        bh=aK8TtveelFEtYAjSL5unfQber2kPXp4XryNLKXgpSdk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=rx4JWPOdSPE857g1DRCWx83NiTybDAwtfBay62Y2Jvx34Dux8nTT3ylJ52jh29C93
+         A3pgKKGkKmlbI5JWL3Mda1HtgYA0JIVSK0w3f/mX2JEIUWhBzLMZTt/KPioObt3oOP
+         Usm3URn6gaNB0/adhU1FtfTH1DOvjvmN1HtS3Y9nTrDMydxc30OaKaB+vcHNKL2qko
+         6Zc6oCwj6MzVdPUhvwfYLu7ICpmnStWC6UpVg53X7SSb1wOnbtCYrkATS2xlt0vFfH
+         3lIpJyvEMTYzqKJJXigi6HBUFdbmFeQ9j2rO2yhCt7BQ16nuCUtziM1uOdet68w/za
+         eKzaH5AHvG5Vw==
+Date:   Wed, 7 Sep 2022 11:53:13 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Johnny Huang <johnny_huang@aspeedtech.com>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20220907115313.50b5f512@canb.auug.org.au>
 MIME-Version: 1.0
-References: <cover.1662361354.git.cdleonard@gmail.com> <298e4e87ce3a822b4217b309438483959082e6bb.1662361354.git.cdleonard@gmail.com>
-In-Reply-To: <298e4e87ce3a822b4217b309438483959082e6bb.1662361354.git.cdleonard@gmail.com>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Tue, 6 Sep 2022 16:11:58 -0700
-Message-ID: <CANn89iKq4rUkCwSSD-35u+Lb8s9u-8t5bj1=aZuQ8+oYwuC-Eg@mail.gmail.com>
-Subject: Re: [PATCH v8 08/26] tcp: authopt: Disable via sysctl by default
-To:     Leonard Crestez <cdleonard@gmail.com>
-Cc:     David Ahern <dsahern@kernel.org>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Philip Paeps <philip@trouble.is>,
-        Shuah Khan <shuah@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>,
-        netdev <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/9MhBwFrdEbe6pVwNWAIwfGC";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 5, 2022 at 12:06 AM Leonard Crestez <cdleonard@gmail.com> wrote:
->
-> This is mainly intended to protect against local privilege escalations
-> through a rarely used feature so it is deliberately not namespaced.
->
-> Enforcement is only at the setsockopt level, this should be enough to
-> ensure that the tcp_authopt_needed static key never turns on.
->
-> No effort is made to handle disabling when the feature is already in
-> use.
->
-> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
-> ---
->  Documentation/networking/ip-sysctl.rst |  6 ++++
->  include/net/tcp_authopt.h              |  1 +
->  net/ipv4/sysctl_net_ipv4.c             | 39 ++++++++++++++++++++++++++
->  net/ipv4/tcp_authopt.c                 | 25 +++++++++++++++++
->  4 files changed, 71 insertions(+)
->
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-> index a759872a2883..41be0e69d767 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -1038,10 +1038,16 @@ tcp_challenge_ack_limit - INTEGER
->         Note that this per netns rate limit can allow some side channel
->         attacks and probably should not be enabled.
->         TCP stack implements per TCP socket limits anyway.
->         Default: INT_MAX (unlimited)
->
-> +tcp_authopt - BOOLEAN
-> +       Enable the TCP Authentication Option (RFC5925), a replacement for TCP
-> +       MD5 Signatures (RFC2835).
-> +
-> +       Default: 0
-> +
->  UDP variables
->  =============
->
->  udp_l3mdev_accept - BOOLEAN
->         Enabling this option allows a "global" bound socket to work
-> diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-> index 7ad34a6987ec..1f5020b790dd 100644
-> --- a/include/net/tcp_authopt.h
-> +++ b/include/net/tcp_authopt.h
-> @@ -80,10 +80,11 @@ struct tcphdr_authopt {
->  };
->
->  #ifdef CONFIG_TCP_AUTHOPT
->  DECLARE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
->  #define tcp_authopt_needed (static_branch_unlikely(&tcp_authopt_needed_key))
-> +extern int sysctl_tcp_authopt;
->  void tcp_authopt_free(struct sock *sk, struct tcp_authopt_info *info);
->  void tcp_authopt_clear(struct sock *sk);
->  int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen);
->  int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *key);
->  int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen);
-> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-> index 5490c285668b..908a3ef15b47 100644
-> --- a/net/ipv4/sysctl_net_ipv4.c
-> +++ b/net/ipv4/sysctl_net_ipv4.c
-> @@ -17,10 +17,11 @@
->  #include <net/udp.h>
->  #include <net/cipso_ipv4.h>
->  #include <net/ping.h>
->  #include <net/protocol.h>
->  #include <net/netevent.h>
-> +#include <net/tcp_authopt.h>
->
->  static int tcp_retr1_max = 255;
->  static int ip_local_port_range_min[] = { 1, 1 };
->  static int ip_local_port_range_max[] = { 65535, 65535 };
->  static int tcp_adv_win_scale_min = -31;
-> @@ -413,10 +414,37 @@ static int proc_fib_multipath_hash_fields(struct ctl_table *table, int write,
->
->         return ret;
->  }
->  #endif
->
-> +#ifdef CONFIG_TCP_AUTHOPT
-> +static int proc_tcp_authopt(struct ctl_table *ctl,
-> +                           int write, void *buffer, size_t *lenp,
-> +                           loff_t *ppos)
-> +{
-> +       int val = sysctl_tcp_authopt;
+--Sig_/9MhBwFrdEbe6pVwNWAIwfGC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-val = READ_ONCE(sysctl_tcp_authopt);
+Hi all,
 
-> +       struct ctl_table tmp = {
-> +               .data = &val,
-> +               .mode = ctl->mode,
-> +               .maxlen = sizeof(val),
-> +               .extra1 = SYSCTL_ZERO,
-> +               .extra2 = SYSCTL_ONE,
-> +       };
-> +       int err;
-> +
-> +       err = proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
-> +       if (err)
-> +               return err;
-> +       if (sysctl_tcp_authopt && !val) {
+After merging the crypto tree, today's linux-next build (x86_64
+allmodconfig) failed like this:
 
-READ_ONCE(sysctl_tcp_authopt)
+In file included from include/linux/device.h:15,
+                 from include/linux/dma-mapping.h:7,
+                 from drivers/crypto/aspeed/aspeed-hace.h:9,
+                 from drivers/crypto/aspeed/aspeed-hace-hash.c:6:
+drivers/crypto/aspeed/aspeed-hace-hash.c: In function 'aspeed_ahash_dma_pre=
+pare_sg':
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
+argument of type 'unsigned int', but argument 7 has type 'size_t' {aka 'lon=
+g unsigned int'} [-Werror=3Dformat=3D]
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |                            ^~~~~~~
+include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
+_index_wrap'
+  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
+     \
+      |                              ^~~
+include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
+  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
+t), ##__VA_ARGS__)
+      |                                                          ^~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
+'dev_info'
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |         ^~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:188:9: note: in expansion of macro=
+ 'AHASH_DBG'
+  188 |         AHASH_DBG(hace_dev, "%s:0x%x, %s:0x%x, %s:0x%x, %s:0x%x\n",
+      |         ^~~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c: In function 'aspeed_hace_ahash_tr=
+igger':
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
+argument of type 'unsigned int', but argument 4 has type 'dma_addr_t' {aka =
+'long long unsigned int'} [-Werror=3Dformat=3D]
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |                            ^~~~~~~
+include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
+_index_wrap'
+  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
+     \
+      |                              ^~~
+include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
+  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
+t), ##__VA_ARGS__)
+      |                                                          ^~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
+'dev_info'
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |         ^~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
+ 'AHASH_DBG'
+  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
+0x%x\n",
+      |         ^~~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
+argument of type 'unsigned int', but argument 5 has type 'dma_addr_t' {aka =
+'long long unsigned int'} [-Werror=3Dformat=3D]
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |                            ^~~~~~~
+include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
+_index_wrap'
+  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
+     \
+      |                              ^~~
+include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
+  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
+t), ##__VA_ARGS__)
+      |                                                          ^~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
+'dev_info'
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |         ^~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
+ 'AHASH_DBG'
+  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
+0x%x\n",
+      |         ^~~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
+argument of type 'unsigned int', but argument 6 has type 'size_t' {aka 'lon=
+g unsigned int'} [-Werror=3Dformat=3D]
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |                            ^~~~~~~
+include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
+_index_wrap'
+  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
+     \
+      |                              ^~~
+include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
+  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
+t), ##__VA_ARGS__)
+      |                                                          ^~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
+'dev_info'
+   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
+      |         ^~~~~~~~
+drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
+ 'AHASH_DBG'
+  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
+0x%x\n",
+      |         ^~~~~~~~~
 
-Note that this test would still be racy, because another cpu might
-change sysctl_tcp_authopt right after the read.
+Caused by commit
 
-> +               net_warn_ratelimited("Enabling TCP Authentication Option is permanent\n");
-> +               return -EINVAL;
-> +       }
-> +       sysctl_tcp_authopt = val;
+  108713a713c7 ("crypto: aspeed - Add HACE hash driver")
 
-WRITE_ONCE(sysctl_tcp_authopt, val),  or even better:
+Exposed by commits
 
-if (val)
-     cmpxchg(&sysctl_tcp_authopt, 0, val);
+  2be570849efc ("crypto: aspeed - fix build module error")
+  31b39755e325 ("crypto: aspeed - Enable compile testing")
 
-> +       return 0;
-> +}
-> +#endif
-> +
->  static struct ctl_table ipv4_table[] = {
->         {
->                 .procname       = "tcp_max_orphans",
->                 .data           = &sysctl_tcp_max_orphans,
->                 .maxlen         = sizeof(int),
-> @@ -524,10 +552,21 @@ static struct ctl_table ipv4_table[] = {
->                 .mode           = 0644,
->                 .proc_handler   = proc_douintvec_minmax,
->                 .extra1         = &sysctl_fib_sync_mem_min,
->                 .extra2         = &sysctl_fib_sync_mem_max,
->         },
-> +#ifdef CONFIG_TCP_AUTHOPT
-> +       {
-> +               .procname       = "tcp_authopt",
-> +               .data           = &sysctl_tcp_authopt,
-> +               .maxlen         = sizeof(int),
-> +               .mode           = 0644,
-> +               .proc_handler   = proc_tcp_authopt,
-> +               .extra1         = SYSCTL_ZERO,
-> +               .extra2         = SYSCTL_ONE,
-> +       },
-> +#endif
->         { }
->  };
->
->  static struct ctl_table ipv4_net_table[] = {
->         /* tcp_max_tw_buckets must be first in this table. */
-> diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-> index 4f7cbe1e17f3..9d02da8d6964 100644
-> --- a/net/ipv4/tcp_authopt.c
-> +++ b/net/ipv4/tcp_authopt.c
-> @@ -4,10 +4,15 @@
->  #include <net/ipv6.h>
->  #include <net/tcp.h>
->  #include <linux/kref.h>
->  #include <crypto/hash.h>
->
-> +/* This is mainly intended to protect against local privilege escalations through
-> + * a rarely used feature so it is deliberately not namespaced.
-> + */
-> +int sysctl_tcp_authopt;
-> +
->  /* This is enabled when first struct tcp_authopt_info is allocated and never released */
->  DEFINE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
->  EXPORT_SYMBOL(tcp_authopt_needed_key);
->
->  /* All current algorithms have a mac length of 12 but crypto API digestsize can be larger */
-> @@ -437,17 +442,30 @@ static int _copy_from_sockptr_tolerant(u8 *dst,
->                 memset(dst + srclen, 0, dstlen - srclen);
->
->         return err;
->  }
->
-> +static int check_sysctl_tcp_authopt(void)
-> +{
-> +       if (!sysctl_tcp_authopt) {
+I have used the crypto tree from next-20220901 again today.
 
-READ_ONCE(...)
+--=20
+Cheers,
+Stephen Rothwell
 
-> +               net_warn_ratelimited("TCP Authentication Option disabled by sysctl.\n");
-> +               return -EPERM;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
->  {
->         struct tcp_authopt opt;
->         struct tcp_authopt_info *info;
->         int err;
->
->         sock_owned_by_me(sk);
-> +       err = check_sysctl_tcp_authopt();
-> +       if (err)
-> +               return err;
->
->         err = _copy_from_sockptr_tolerant((u8 *)&opt, sizeof(opt), optval, optlen);
->         if (err)
->                 return err;
->
-> @@ -465,13 +483,17 @@ int tcp_set_authopt(struct sock *sk, sockptr_t optval, unsigned int optlen)
->
->  int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
->  {
->         struct tcp_sock *tp = tcp_sk(sk);
->         struct tcp_authopt_info *info;
-> +       int err;
->
->         memset(opt, 0, sizeof(*opt));
->         sock_owned_by_me(sk);
-> +       err = check_sysctl_tcp_authopt();
-> +       if (err)
-> +               return err;
->
->         info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
->         if (!info)
->                 return -ENOENT;
->
-> @@ -493,10 +515,13 @@ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
->         struct netns_tcp_authopt *net = sock_net_tcp_authopt(sk);
->         struct tcp_authopt_alg_imp *alg;
->         int err;
->
->         sock_owned_by_me(sk);
-> +       err = check_sysctl_tcp_authopt();
-> +       if (err)
-> +               return err;
->         if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
->                 return -EPERM;
->
->         err = _copy_from_sockptr_tolerant((u8 *)&opt, sizeof(opt), optval, optlen);
->         if (err)
-> --
-> 2.25.1
->
+--Sig_/9MhBwFrdEbe6pVwNWAIwfGC
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmMX+YkACgkQAVBC80lX
+0GxVJggAi6xrORNxmIeqnCBZfOZHmb0f1kKUt+JgXgj3Wet/uuoEV/w+jGbxecyv
+BfotPZ2DVHMsGP/qUCxW7CSItDSjtA5t+8pqChG+C4IlAGcZOJ8SNSn37RQqL06p
+OQrgki9JgvE8pKeAXcwKjSPDjwaQdLA9aIjssUVKtQMlrOzB6M7Qwfn7GfXaiMfa
+N+mVUk0A+U2U941wtOUcJ+Iw++qenG46rcHr+Y4AxghBOe1icqg7/dE3njPMWZ7t
+Q3GfiR0BtDvRKX1ELexErbGUGksSjGb+TDDtsGQ600laIiBTqractI1eEG9gF/kj
+4neO1JOt6++4z4R7UkjjIyqXITG27Q==
+=URzr
+-----END PGP SIGNATURE-----
+
+--Sig_/9MhBwFrdEbe6pVwNWAIwfGC--
