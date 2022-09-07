@@ -2,60 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2009C54EE9
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 17:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15B2C38145
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 18:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbiIGR6d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 13:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43124 "EHLO
+        id S230400AbiIGSJT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 14:09:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbiIGR6c (ORCPT
+        with ESMTP id S229723AbiIGSJN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 13:58:32 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAE4B08A4;
-        Wed,  7 Sep 2022 10:58:31 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id gb36so32084501ejc.10;
-        Wed, 07 Sep 2022 10:58:31 -0700 (PDT)
+        Wed, 7 Sep 2022 14:09:13 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70BB677EBD;
+        Wed,  7 Sep 2022 11:09:12 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id dv25so2928429ejb.12;
+        Wed, 07 Sep 2022 11:09:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=4xioiLOgMPJ3We5Y6cKXMDxGgXtE1ROJYDQy7bUxt0k=;
-        b=gRZDPxf9542mvq2AOJyw0mKjn0nwQuapLL9CLPaGoG4dXGYoR20/koUZF2Nl/u/7vF
-         VQwKbQC4UVmdMQeRPgaLQul9bvTCRb4r0dvpdfD5vHFmH5eqoN9NBuCtRCAKA6E8nMuB
-         wniOChaRvndh/YjqBI67ZAB2RSCjLuzXdrwDV7YOb4jI8WmnSTGiLmgyiDi7QEVV+mBL
-         9+h/gINllJY+RdsKCySU+1SbZQ06+9ehlv6dx81eZ4hOfChnJUpuOBZw11ZCdvwoKPcW
-         OXw2IfvRFu/Rj5cFTpqXbzHKdaOnUPrHhXNPZWbqDgsP1cGvkgQyr7caEHgQ4xTl6XvS
-         8RFg==
+        bh=rfVlZdFyNY+a+CZnW8eNIktxjS2pSLRvf4SoDS42ZEc=;
+        b=bMEyL8mq7Frspx3FJg260Ba4BWd19uqOoD/nl5ulR9z+lTnnc2YC53xJfsUI/uK1/l
+         TrY2zDx37B3jKux2NbvrwmHAwOqaOOt/D7L+40q+kiCAOS8lNPsEMS0ec7ige9dCtwNr
+         SB9UtfHvzhybNaInW5ArDAx6n9AweaozyocNT8Vm4HXk1ZHWvbcTUuMirnVLQgmWU/mC
+         Bo8S7t485KRsivVHFAHndhBtk/NJbpfVZUTSUSVAvYRz40oYbeM8LyGYOAu42sc6n3kR
+         IuRU203RemodgiVdicbh1crBILTU8JmVrhjfwtjPxzqmKdzRwF8LeUFmUSipnYbWWEMz
+         1tnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=4xioiLOgMPJ3We5Y6cKXMDxGgXtE1ROJYDQy7bUxt0k=;
-        b=N9+Xyvl4Dagjd7S9Z1SebrIX/Yg03YsPyy4/o+gPbnCpDWwAcYIh9rnL7LHVibqrv+
-         oLD4NyBJVH5j8GV4ClxFTcrsIyVzli2LeXR42ehNe9tC09hvu+AyGtieT1mASm9FfJfP
-         Pq8gYaKnCp84Ul2s0WOPoWA5FSZn11CQDzD2bPEguiMo0XgJNxvIgbHn2mY4f5Zc1l2a
-         vtSqCSgj1eRrPkQgLbnaJOivpo9QTwRYQ5e+QrRDfCCAED8vTH/CRpq/o6rhlzt6+7kp
-         Bn+gkr6yUVEPfq2x7eXwfjLNldjeJ9q9AFNnKixa5uBvTgLCpQy9eVGFS8mNlj7YlE8h
-         gmMg==
-X-Gm-Message-State: ACgBeo33rmDgkyD7C/kA7Dqlb+MVjmKwdCySlJamfb6G1uIOM+Tcro7V
-        MVp/8VDay98l217lqy1gsZQ=
-X-Google-Smtp-Source: AA6agR4udnAIlquIOSv1uLg6eHLVGBwFPQhwCyn4HjSavBmbgemILYWwhQajMrrFoSTdVmM/JpjokA==
-X-Received: by 2002:a17:906:4795:b0:73d:d6e8:52a7 with SMTP id cw21-20020a170906479500b0073dd6e852a7mr3018739ejc.59.1662573509821;
-        Wed, 07 Sep 2022 10:58:29 -0700 (PDT)
+        bh=rfVlZdFyNY+a+CZnW8eNIktxjS2pSLRvf4SoDS42ZEc=;
+        b=nyt6xyEqdOSq3bxEBj6xRyyRpUu1vjWySk8o+srXIUzw+862fo+kVXViL13D7kVWOs
+         Jw4y+TOsHIGx1gJ3/RkvIAcC8avXI5er70sp4ZIl5SRiXITvdvPiEqp03enoz8vw4DG4
+         F71F4YIsYRcNI+FUmmIo00j6Vl10vL9v17+pyMzohf240U/K4WCSp3TEPdEW5m43+x0l
+         LJHZ2+FsLzuSoTSXrDMidcgnwcXIv8Hpl3zX4CF4uDgp4d4Hhfyq7WwapjbQVr35SK9O
+         SFLHYOZFpolfjyWwZbenTtbrDgnVJPPCXAWblPiKdmb4W1K5vBqMHdAGIQpHlcn1SGoK
+         t+WA==
+X-Gm-Message-State: ACgBeo0Ml8bqYNjjaxw1FtmSqV+TBeuH21ubQlKuFenNsnRM9B0RGBK1
+        sm0puQAAGO3Rw9r5IB0syeg=
+X-Google-Smtp-Source: AA6agR6EDqXZnqWcF2uXSuqxhTN1096/KgtqMjEOzBcDFk4E4aFEIcXJLT8dg2gFZlKWSjDZ6z4B1g==
+X-Received: by 2002:a17:907:1b12:b0:72f:9b44:f9e with SMTP id mp18-20020a1709071b1200b0072f9b440f9emr3216808ejc.653.1662574150847;
+        Wed, 07 Sep 2022 11:09:10 -0700 (PDT)
 Received: from ?IPV6:2a04:241e:502:a09c:cbe0:7b37:373:7410? ([2a04:241e:502:a09c:cbe0:7b37:373:7410])
-        by smtp.gmail.com with ESMTPSA id f10-20020aa7d84a000000b0043d1eff72b3sm5385254eds.74.2022.09.07.10.58.27
+        by smtp.gmail.com with ESMTPSA id kz3-20020a17090777c300b0073d68d2fc29sm28375ejc.218.2022.09.07.11.09.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Sep 2022 10:58:29 -0700 (PDT)
-Message-ID: <3a38fda6-eeae-8d6c-3eac-112abfc63015@gmail.com>
-Date:   Wed, 7 Sep 2022 20:58:27 +0300
+        Wed, 07 Sep 2022 11:09:10 -0700 (PDT)
+Message-ID: <9d26bcb4-b55f-29d5-9790-2a800b22a3a5@gmail.com>
+Date:   Wed, 7 Sep 2022 21:09:08 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH v8 08/26] tcp: authopt: Disable via sysctl by default
+Subject: Re: [PATCH v8 01/26] tcp: authopt: Initial support and key management
 Content-Language: en-US
 To:     Eric Dumazet <edumazet@google.com>
 Cc:     David Ahern <dsahern@kernel.org>,
@@ -82,123 +82,128 @@ Cc:     David Ahern <dsahern@kernel.org>,
         <linux-kselftest@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
 References: <cover.1662361354.git.cdleonard@gmail.com>
- <298e4e87ce3a822b4217b309438483959082e6bb.1662361354.git.cdleonard@gmail.com>
- <CANn89iKq4rUkCwSSD-35u+Lb8s9u-8t5bj1=aZuQ8+oYwuC-Eg@mail.gmail.com>
- <b951b8fb-f2b3-bcbb-8b7f-868b1f78f9bb@gmail.com>
- <CANn89iJ9XGKHV1F1uhKmWqyOdDjiBebo0FOb6SfCxcvE5XzJPQ@mail.gmail.com>
+ <0e4c0a98509b907e33c2f80b95cc6cfe713ac2b2.1662361354.git.cdleonard@gmail.com>
+ <CANn89i+a0mMUMhUhTPoshifNzzuR_gfThPKptB8cuBiw6Bs5jw@mail.gmail.com>
+ <4a47b4ea-750c-a569-5754-4aa0cd5218fc@gmail.com>
+ <CANn89i+028SO1q6Hz8E3X7mrzkGSW5mQSLaMj70qka7amsPZ3w@mail.gmail.com>
 From:   Leonard Crestez <cdleonard@gmail.com>
-In-Reply-To: <CANn89iJ9XGKHV1F1uhKmWqyOdDjiBebo0FOb6SfCxcvE5XzJPQ@mail.gmail.com>
+In-Reply-To: <CANn89i+028SO1q6Hz8E3X7mrzkGSW5mQSLaMj70qka7amsPZ3w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/7/22 20:04, Eric Dumazet wrote:
-> On Wed, Sep 7, 2022 at 9:53 AM Leonard Crestez <cdleonard@gmail.com> wrote:
->> On 9/7/22 02:11, Eric Dumazet wrote:
+
+
+On 9/7/22 19:28, Eric Dumazet wrote:
+> On Wed, Sep 7, 2022 at 9:19 AM Leonard Crestez <cdleonard@gmail.com> wrote:
+>>
+>> On 9/7/22 01:57, Eric Dumazet wrote:
 >>> On Mon, Sep 5, 2022 at 12:06 AM Leonard Crestez <cdleonard@gmail.com> wrote:
 >>>>
->>>> This is mainly intended to protect against local privilege escalations
->>>> through a rarely used feature so it is deliberately not namespaced.
+>>>> This commit adds support to add and remove keys but does not use them
+>>>> further.
 >>>>
->>>> Enforcement is only at the setsockopt level, this should be enough to
->>>> ensure that the tcp_authopt_needed static key never turns on.
+>>>> Similar to tcp md5 a single pointer to a struct tcp_authopt_info* struct
+>>>> is added to struct tcp_sock, this avoids increasing memory usage. The
+>>>> data structures related to tcp_authopt are initialized on setsockopt and
+>>>> only freed on socket close.
 >>>>
->>>> No effort is made to handle disabling when the feature is already in
->>>> use.
->>>>
->>>> Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
->>>> ---
->>>>    Documentation/networking/ip-sysctl.rst |  6 ++++
->>>>    include/net/tcp_authopt.h              |  1 +
->>>>    net/ipv4/sysctl_net_ipv4.c             | 39 ++++++++++++++++++++++++++
->>>>    net/ipv4/tcp_authopt.c                 | 25 +++++++++++++++++
->>>>    4 files changed, 71 insertions(+)
->>>>
->>>> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
->>>> index a759872a2883..41be0e69d767 100644
->>>> --- a/Documentation/networking/ip-sysctl.rst
->>>> +++ b/Documentation/networking/ip-sysctl.rst
->>>> @@ -1038,10 +1038,16 @@ tcp_challenge_ack_limit - INTEGER
->>>>           Note that this per netns rate limit can allow some side channel
->>>>           attacks and probably should not be enabled.
->>>>           TCP stack implements per TCP socket limits anyway.
->>>>           Default: INT_MAX (unlimited)
->>>>
->>>> +tcp_authopt - BOOLEAN
->>>> +       Enable the TCP Authentication Option (RFC5925), a replacement for TCP
->>>> +       MD5 Signatures (RFC2835).
->>>> +
->>>> +       Default: 0
->>>> +
+>>>
+>>> Thanks Leonard.
+>>>
+>>> Small points from my side, please find them attached.
 >>
 >> ...
 >>
->>>> +#ifdef CONFIG_TCP_AUTHOPT
->>>> +static int proc_tcp_authopt(struct ctl_table *ctl,
->>>> +                           int write, void *buffer, size_t *lenp,
->>>> +                           loff_t *ppos)
+>>>> +/* Free info and keys.
+>>>> + * Don't touch tp->authopt_info, it might not even be assigned yes.
+>>>> + */
+>>>> +void tcp_authopt_free(struct sock *sk, struct tcp_authopt_info *info)
 >>>> +{
->>>> +       int val = sysctl_tcp_authopt;
->>>
->>> val = READ_ONCE(sysctl_tcp_authopt);
->>>
->>>> +       struct ctl_table tmp = {
->>>> +               .data = &val,
->>>> +               .mode = ctl->mode,
->>>> +               .maxlen = sizeof(val),
->>>> +               .extra1 = SYSCTL_ZERO,
->>>> +               .extra2 = SYSCTL_ONE,
->>>> +       };
->>>> +       int err;
+>>>> +       kfree_rcu(info, rcu);
+>>>> +}
 >>>> +
->>>> +       err = proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
->>>> +       if (err)
->>>> +               return err;
->>>> +       if (sysctl_tcp_authopt && !val) {
+>>>> +/* Free everything and clear tcp_sock.authopt_info to NULL */
+>>>> +void tcp_authopt_clear(struct sock *sk)
+>>>> +{
+>>>> +       struct tcp_authopt_info *info;
+>>>> +
+>>>> +       info = rcu_dereference_protected(tcp_sk(sk)->authopt_info, lockdep_sock_is_held(sk));
+>>>> +       if (info) {
+>>>> +               tcp_authopt_free(sk, info);
+>>>> +               tcp_sk(sk)->authopt_info = NULL;
 >>>
->>> READ_ONCE(sysctl_tcp_authopt)
+>>> RCU rules at deletion mandate that the pointer must be cleared before
+>>> the call_rcu()/kfree_rcu() call.
 >>>
->>> Note that this test would still be racy, because another cpu might
->>> change sysctl_tcp_authopt right after the read.
+>>> It is possible that current MD5 code has an issue here, let's not copy/paste it.
 >>
->> What meaningful races are possible here? This is a variable that changes
->> from 0 to 1 at most once.
+>> OK. Is there a need for some special form of assignment or is current
+>> plain form enough?
 > 
-> Two cpus can issue writes of 0 and 1 values at the same time.
-> 
-> Depending on scheduling writing the 0 can 'win' the race and overwrite
-> the value back to 0.
-> 
-> This is in clear violation of the claim you are making (that the
-> sysctl can only go once from 0 to 1)
-
-Not clear why anyone would attempt to write 0, maybe to ensure that it's 
-still disabled?
-
-But you're right that userspace CAN do that and the kernel CAN misbehave 
-in this scenario so it would be better to just make the changes you 
-suggested.
-
->> In theory if two processes attempt to assign "non-zero" at the same time
->> then one will "win" and the other will get an error but races between
->> userspace writing different values are possible for any sysctl. The
->> solution seems to be "write sysctls from a single place".
->>
->> All the checks are in sockopts - in theory if the sysctl is written on
->> one CPU then a sockopt can still fail on another CPU until caches are
->> flushed. Is this what you're worried about?
->>
->> In theory doing READ_ONCE might incur a slight penalty on sockopt but
->> not noticeable.
-> 
-> Not at all. There is _no_ penalty using READ_ONCE(). Unless it is done
-> in a loop and this prevents some compiler optimization.
-> 
-> Please use WRITE_ONCE() and READ_ONCE() for all sysctl values used in
-> TCP stack (and elsewhere)
-> 
-> See all the silly patches we had recently.
+> It is the right way (when clearing the pointer), no need for another form.
 
 OK
+
+>>>> +/* checks that ipv4 or ipv6 addr matches. */
+>>>> +static bool ipvx_addr_match(struct sockaddr_storage *a1,
+>>>> +                           struct sockaddr_storage *a2)
+>>>> +{
+>>>> +       if (a1->ss_family != a2->ss_family)
+>>>> +               return false;
+>>>> +       if (a1->ss_family == AF_INET &&
+>>>> +           (((struct sockaddr_in *)a1)->sin_addr.s_addr !=
+>>>> +            ((struct sockaddr_in *)a2)->sin_addr.s_addr))
+>>>> +               return false;
+>>>> +       if (a1->ss_family == AF_INET6 &&
+>>>> +           !ipv6_addr_equal(&((struct sockaddr_in6 *)a1)->sin6_addr,
+>>>> +                            &((struct sockaddr_in6 *)a2)->sin6_addr))
+>>>> +               return false;
+>>>> +       return true;
+>>>> +}
+>>>
+>>> Always surprising to see this kind of generic helper being added in a patch.
+>>
+>> I remember looking for an equivalent and not finding it. Many places
+>> have distinct code paths for ipv4 and ipv6 and my use of
+>> "sockaddr_storage" as ipv4/ipv6 union is uncommon.
+> 
+> inetpeer_addr_cmp() might do it (and we also could fix a bug in it it
+> seems, at least for __tcp_get_metrics() usage :/
+
+That uses a different `struct inetpeer_addr` which also has some extra 
+"vif" fields for ipv4 that I don't know about.
+
+Everybody seems to be rolling their own ipv4/v6 union, other examples 
+are `struct tcp_md5_addr` and `xfrm_address_t`. struct sockaddr_storage 
+is "more standard" but also larger so maybe that's why others don't use it.
+
+>>>> +int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+>>>> +{
+>>>> +       struct tcp_sock *tp = tcp_sk(sk);
+>>>> +       struct tcp_authopt_info *info;
+>>>> +
+>>>> +       memset(opt, 0, sizeof(*opt));
+>>>> +       sock_owned_by_me(sk);
+>>>> +
+>>>> +       info = rcu_dereference_check(tp->authopt_info, lockdep_sock_is_held(sk));
+>>>
+>>> Probably not a big deal, but it seems the prior sock_owned_by_me()
+>>> might be redundant.
+>>
+>> The sock_owned_by_me call checks checks lockdep_sock_is_held
+>>
+>> The rcu_dereference_check call checks lockdep_sock_is_held ||
+>> rcu_read_lock_held()
+> 
+> Then if you own the socket lock, no need for rcu_dereference_check()
+> 
+> It could be instead an rcu_dereference_protected(). This is stronger, because
+> if your thread no longer owns the socket lock, but is inside
+> rcu_read_lock(), we would
+> still get a proper lockdep splat.
+
+Ok, I think there are several places where rcu_dereference_check is 
+incorrectly used instead of rcu_dereference_protected.
