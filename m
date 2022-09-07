@@ -2,190 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9113C6FA86
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 01:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC02AECAAD5
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 02:14:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiIGBxV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Sep 2022 21:53:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S229663AbiIGCOV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Sep 2022 22:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiIGBxU (ORCPT
+        with ESMTP id S229687AbiIGCOV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Sep 2022 21:53:20 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DAFD84EEC;
-        Tue,  6 Sep 2022 18:53:17 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MMldk4z4xz4xDK;
-        Wed,  7 Sep 2022 11:53:14 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1662515595;
-        bh=aK8TtveelFEtYAjSL5unfQber2kPXp4XryNLKXgpSdk=;
-        h=Date:From:To:Cc:Subject:From;
-        b=rx4JWPOdSPE857g1DRCWx83NiTybDAwtfBay62Y2Jvx34Dux8nTT3ylJ52jh29C93
-         A3pgKKGkKmlbI5JWL3Mda1HtgYA0JIVSK0w3f/mX2JEIUWhBzLMZTt/KPioObt3oOP
-         Usm3URn6gaNB0/adhU1FtfTH1DOvjvmN1HtS3Y9nTrDMydxc30OaKaB+vcHNKL2qko
-         6Zc6oCwj6MzVdPUhvwfYLu7ICpmnStWC6UpVg53X7SSb1wOnbtCYrkATS2xlt0vFfH
-         3lIpJyvEMTYzqKJJXigi6HBUFdbmFeQ9j2rO2yhCt7BQ16nuCUtziM1uOdet68w/za
-         eKzaH5AHvG5Vw==
-Date:   Wed, 7 Sep 2022 11:53:13 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Johnny Huang <johnny_huang@aspeedtech.com>,
-        Neal Liu <neal_liu@aspeedtech.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the crypto tree
-Message-ID: <20220907115313.50b5f512@canb.auug.org.au>
+        Tue, 6 Sep 2022 22:14:21 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A039F89CF7;
+        Tue,  6 Sep 2022 19:14:17 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oVkZX-001p2n-7V; Wed, 07 Sep 2022 12:13:48 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 Sep 2022 10:13:47 +0800
+Date:   Wed, 7 Sep 2022 10:13:47 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Neal Liu <neal_liu@aspeedtech.com>
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        BMC-SW@aspeedtech.com, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] crypto: aspeed: fix format unexpected build warning
+Message-ID: <Yxf+W/mJvnSKzQgM@gondor.apana.org.au>
+References: <20220905052449.1830669-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9MhBwFrdEbe6pVwNWAIwfGC";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220905052449.1830669-1-neal_liu@aspeedtech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/9MhBwFrdEbe6pVwNWAIwfGC
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 05, 2022 at 01:24:49PM +0800, Neal Liu wrote:
+>
+> @@ -324,7 +324,7 @@ static int aspeed_hace_ahash_trigger(struct aspeed_hace_dev *hace_dev,
+>  	struct ahash_request *req = hash_engine->req;
+>  	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
+>  
+> -	AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:0x%x\n",
+> +	AHASH_DBG(hace_dev, "src_dma:%zu, digest_dma:%zu, length:%zu\n",
+>  		  hash_engine->src_dma, hash_engine->digest_dma,
+>  		  hash_engine->src_length);
 
-Hi all,
+Shouldn't we use %pad instead of %zu for dma_addr_t (you'll also
+need to pass in a dma_addr_t pointer instead of the value)?
 
-After merging the crypto tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
-
-In file included from include/linux/device.h:15,
-                 from include/linux/dma-mapping.h:7,
-                 from drivers/crypto/aspeed/aspeed-hace.h:9,
-                 from drivers/crypto/aspeed/aspeed-hace-hash.c:6:
-drivers/crypto/aspeed/aspeed-hace-hash.c: In function 'aspeed_ahash_dma_pre=
-pare_sg':
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
-argument of type 'unsigned int', but argument 7 has type 'size_t' {aka 'lon=
-g unsigned int'} [-Werror=3Dformat=3D]
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |                            ^~~~~~~
-include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
-_index_wrap'
-  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
-     \
-      |                              ^~~
-include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
-  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
-t), ##__VA_ARGS__)
-      |                                                          ^~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
-'dev_info'
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |         ^~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:188:9: note: in expansion of macro=
- 'AHASH_DBG'
-  188 |         AHASH_DBG(hace_dev, "%s:0x%x, %s:0x%x, %s:0x%x, %s:0x%x\n",
-      |         ^~~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c: In function 'aspeed_hace_ahash_tr=
-igger':
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
-argument of type 'unsigned int', but argument 4 has type 'dma_addr_t' {aka =
-'long long unsigned int'} [-Werror=3Dformat=3D]
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |                            ^~~~~~~
-include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
-_index_wrap'
-  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
-     \
-      |                              ^~~
-include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
-  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
-t), ##__VA_ARGS__)
-      |                                                          ^~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
-'dev_info'
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |         ^~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
- 'AHASH_DBG'
-  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
-0x%x\n",
-      |         ^~~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
-argument of type 'unsigned int', but argument 5 has type 'dma_addr_t' {aka =
-'long long unsigned int'} [-Werror=3Dformat=3D]
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |                            ^~~~~~~
-include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
-_index_wrap'
-  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
-     \
-      |                              ^~~
-include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
-  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
-t), ##__VA_ARGS__)
-      |                                                          ^~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
-'dev_info'
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |         ^~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
- 'AHASH_DBG'
-  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
-0x%x\n",
-      |         ^~~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:28: error: format '%x' expects =
-argument of type 'unsigned int', but argument 6 has type 'size_t' {aka 'lon=
-g unsigned int'} [-Werror=3Dformat=3D]
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |                            ^~~~~~~
-include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk=
-_index_wrap'
-  110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                  =
-     \
-      |                              ^~~
-include/linux/dev_printk.h:150:58: note: in expansion of macro 'dev_fmt'
-  150 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fm=
-t), ##__VA_ARGS__)
-      |                                                          ^~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:10:9: note: in expansion of macro =
-'dev_info'
-   10 |         dev_info((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-      |         ^~~~~~~~
-drivers/crypto/aspeed/aspeed-hace-hash.c:327:9: note: in expansion of macro=
- 'AHASH_DBG'
-  327 |         AHASH_DBG(hace_dev, "src_dma:0x%x, digest_dma:0x%x, length:=
-0x%x\n",
-      |         ^~~~~~~~~
-
-Caused by commit
-
-  108713a713c7 ("crypto: aspeed - Add HACE hash driver")
-
-Exposed by commits
-
-  2be570849efc ("crypto: aspeed - fix build module error")
-  31b39755e325 ("crypto: aspeed - Enable compile testing")
-
-I have used the crypto tree from next-20220901 again today.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/9MhBwFrdEbe6pVwNWAIwfGC
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmMX+YkACgkQAVBC80lX
-0GxVJggAi6xrORNxmIeqnCBZfOZHmb0f1kKUt+JgXgj3Wet/uuoEV/w+jGbxecyv
-BfotPZ2DVHMsGP/qUCxW7CSItDSjtA5t+8pqChG+C4IlAGcZOJ8SNSn37RQqL06p
-OQrgki9JgvE8pKeAXcwKjSPDjwaQdLA9aIjssUVKtQMlrOzB6M7Qwfn7GfXaiMfa
-N+mVUk0A+U2U941wtOUcJ+Iw++qenG46rcHr+Y4AxghBOe1icqg7/dE3njPMWZ7t
-Q3GfiR0BtDvRKX1ELexErbGUGksSjGb+TDDtsGQ600laIiBTqractI1eEG9gF/kj
-4neO1JOt6++4z4R7UkjjIyqXITG27Q==
-=URzr
------END PGP SIGNATURE-----
-
---Sig_/9MhBwFrdEbe6pVwNWAIwfGC--
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
