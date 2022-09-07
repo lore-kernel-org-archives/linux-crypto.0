@@ -2,112 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FFDC38145
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 13:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57853C6FA89
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Sep 2022 13:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbiIGNDd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Sep 2022 09:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50348 "EHLO
+        id S230025AbiIGNFd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Sep 2022 09:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiIGNDc (ORCPT
+        with ESMTP id S230032AbiIGNFb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Sep 2022 09:03:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF876C12F
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 06:03:31 -0700 (PDT)
+        Wed, 7 Sep 2022 09:05:31 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E837924092;
+        Wed,  7 Sep 2022 06:05:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E90D618DC
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 13:03:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DA3C433D7;
-        Wed,  7 Sep 2022 13:03:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 95CC0B81CE1;
+        Wed,  7 Sep 2022 13:05:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B0FC433C1;
+        Wed,  7 Sep 2022 13:05:26 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="M1Roq5Qj"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="B/bcq3Ru"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1662555807;
+        t=1662555925;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7EEFaS3U7NKEZDeQU/Wq1ska++HOrCV8tO2oWqRVnoE=;
-        b=M1Roq5QjSSSPe06FdwCktJMG3usP33MKEXiRNIKM0253LAvLRHcLvnU6IdkGGbaC53iF8r
-        OXG8adyuafw7rmLJGPv69CUU5fXm/2XEuZkL2rAGqVAwQ06MUifsfQ+IfS4GtxtvUAVz9E
-        1ux5NRFicvz6LFd142W1nz6P66LM0W4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e03051b8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 7 Sep 2022 13:03:27 +0000 (UTC)
-Date:   Wed, 7 Sep 2022 15:03:22 +0200
+        bh=49NOxJ822bPKwRKlaVTKItq7gIJSVwe11b7c5oiqKNY=;
+        b=B/bcq3RufPZVcOE3bYtM1Cu6Nu2eQ1DnxseeoOi0D8PnXH5Pbmw0pbJ9vI9+wS4gdsAXVB
+        7Cv9pk/18GyUVNqpaZ1fQsU4EOkeNBzIMqEwjMNOQ+EHo8En3zs3r9u/JxtEXjiTbR+9wh
+        oYojDbW1tvT0lU1Z0FgcKe11XhiPqEQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 35c9180b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 7 Sep 2022 13:05:24 +0000 (UTC)
+Date:   Wed, 7 Sep 2022 15:05:20 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     "Guozihua (Scott)" <guozihua@huawei.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        zhongguohua <zhongguohua1@huawei.com>
-Subject: Re: Inquiry about the removal of flag O_NONBLOCK on /dev/random
-Message-ID: <YxiWmiLP11UxyTzs@zx2c4.com>
-References: <b9cb514c-30ed-0b8b-5d54-75001e07bd36@huawei.com>
- <YtjREZMzuppTJHeR@sol.localdomain>
- <a93995db-a738-8e4f-68f2-42d7efd3c77d@huawei.com>
- <Ytj3RnGtWqg18bxO@sol.localdomain>
- <YtksefZvcFiugeC1@zx2c4.com>
- <29c4a3ec-f23f-f17f-da49-7d79ad88e284@huawei.com>
- <Yt/LPr0uJVheDuuW@zx2c4.com>
- <4a794339-7aaa-8951-8d24-9bc8a79fa9f3@huawei.com>
- <761e849c-3b9d-418e-eb68-664f09b3c661@huawei.com>
- <CAHmME9qBs0EpBBrragaXFJJ+yKEfBdWGkkZp7T60vq8m8x+RdA@mail.gmail.com>
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] random / hw_random: core: start hwrng kthread also for
+ untrusted sources
+Message-ID: <YxiXEJ6up6XEW8SM@zx2c4.com>
+References: <20220904080247.7890-1-linux@dominikbrodowski.net>
+ <Yxg7WQ1UuskDrBVj@gondor.apana.org.au>
+ <YxhAEmtVcdvIkX6Q@shine.dominikbrodowski.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHmME9qBs0EpBBrragaXFJJ+yKEfBdWGkkZp7T60vq8m8x+RdA@mail.gmail.com>
+In-Reply-To: <YxhAEmtVcdvIkX6Q@shine.dominikbrodowski.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 12:16:56PM +0200, Jason A. Donenfeld wrote:
-> On Thu, Jul 28, 2022 at 10:25 AM Guozihua (Scott) <guozihua@huawei.com> wrote:
-> >
-> > On 2022/7/26 19:33, Guozihua (Scott) wrote:
-> > > On 2022/7/26 19:08, Jason A. Donenfeld wrote:
-> > >> Hi,
-> > >>
-> > >> On Tue, Jul 26, 2022 at 03:43:31PM +0800, Guozihua (Scott) wrote:
-> > >>> Thanks for all the comments on this inquiry. Does the community has any
-> > >>> channel to publishes changes like these? And will the man pages get
-> > >>> updated? If so, are there any time frame?
-> > >>
-> > >> I was under the impression you were ultimately okay with the status quo.
-> > >> Have I misunderstood you?
-> > >>
-> > >> Thanks,
-> > >> Jason
-> > >> .
+On Wed, Sep 07, 2022 at 08:54:10AM +0200, Dominik Brodowski wrote:
+> Am Wed, Sep 07, 2022 at 02:34:01PM +0800 schrieb Herbert Xu:
+> > Dominik Brodowski <linux@dominikbrodowski.net> wrote:
 > > >
-> > > Hi Jason.
-> > >
-> > > To clarify, I does not have any issue with this change. I asked here
-> > > only because I would like some background knowledge on this flag, to
-> > > ensure I am on the same page as the community regarding this flag and
-> > > the change. And it seems that I understands it correctly.
-> > >
-> > > However I do think it's a good idea to update the document soon to avoid
-> > > any misunderstanding in the future.
-> > >
-> >
-> > Our colleague suggests that we should inform users clearly about the
-> > change on the flag by returning -EINVAL when /dev/random gets this flag
-> > during boot process. Otherwise programs might silently block for a long
-> > time, causing other issues. Do you think this is a good way to prevent
-> > similar issues on this flag?
+> > > diff --git a/drivers/char/random.c b/drivers/char/random.c
+> > > index 79d7d4e4e582..b360ed4ece03 100644
+> > > --- a/drivers/char/random.c
+> > > +++ b/drivers/char/random.c
+> > > @@ -867,9 +867,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+> > > 
+> > >        /*
+> > >         * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
+> > > -        * we're not yet initialized.
+> > > +        * we're not yet initialized or this source isn't trusted.
+> > >         */
+> > > -       if (!kthread_should_stop() && crng_ready())
+> > > +       if (!kthread_should_stop() && (crng_ready() || !entropy))
+> > >                schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
+> > > }
+> > > EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+> > 
+> > Couldn't you split this bit out?
 > 
-> I still don't really understand what you want. First you said this was
-> a problem and we should reintroduce the old behavior. Then you said no
-> big deal and the docs just needed to be updated. Now you're saying
-> this is a problem and we should reintroduce the old behavior?
-> 
-> I'm just a bit lost on where we were in the conversation.
-> 
-> Also, could you let me know whether this is affecting real things for
-> Huawei, or if this is just something you happened to notice but
-> doesn't have any practical impact?
+> I could, but this would need to get merged before the patch to the hwrng
+> core gets applied. What do you (and Jason) prefer?
 
-Just following up on this again...
+Just split this out and send it to me, and I'll push it early in 6.1 so
+that it makes rc1, and then Herbert can apply the hwrng part separately
+whenever he sees fit.
+
+Jason
