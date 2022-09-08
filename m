@@ -2,126 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC78C6FA86
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 15:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C351C38145
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 20:01:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232867AbiIHPLl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Sep 2022 11:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47700 "EHLO
+        id S229659AbiIHUBM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Sep 2022 16:01:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232869AbiIHPLi (ORCPT
+        with ESMTP id S229560AbiIHUBK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Sep 2022 11:11:38 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8346A13B11A
-        for <linux-crypto@vger.kernel.org>; Thu,  8 Sep 2022 08:11:35 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id s206so17060623pgs.3
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Sep 2022 08:11:35 -0700 (PDT)
+        Thu, 8 Sep 2022 16:01:10 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567E9FE48E
+        for <linux-crypto@vger.kernel.org>; Thu,  8 Sep 2022 13:01:07 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id v16so904723ejr.10
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Sep 2022 13:01:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=aTBij0MKfHujyUmk5AcvjcEPDYsuhsMOVk1UDlCpwHM=;
-        b=M8sDj3UF6N8I7JnxOD5qpHcBpkICJr+jJbnZkTKusip2DzAxWgiNLQ6mj7h8OEkpD6
-         7fubBL7T9kK7c3AohI7ypbXz811/OZvC5CTxzgbqPwOybqN9tFi6uw95Zcd5vSciyPK4
-         S+W7qD3SR4im8zMU0XHmJV/sA6tAILo//CEVix9HLeB9cKQUbxOKii2rsTpxve1LMRmx
-         5FFykgBQ2jC1ECefm4B0Xb/aBy+8hjxOghGPi8x3hmyqP5wIoPkS8aXgm2XC5x1Dnxt4
-         BPW0xb5jRAoqOXGUXO/9jXwGdfBAV11vjdL1x2Ewj6q4oFlLSU6ZWuyxR/86W9GK6GRG
-         dpvw==
+        d=cloudflare.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=fN0GeuFGxW7e+hA0O5FTtJYzMqxXnxGIq7WFnXPSIRg=;
+        b=mPTji4z17seEkTNem2KAmdCxCaFbdgJIYNpsLlEJovsSXyYvfY/o+QOIUL3Agi61xa
+         rVAHFJ+v8eOKm9GhiAE0rZtvManiFijje4rGO0JfXNF56xn/gpS6mA7wO5YXJ5H3KwFG
+         6UuS+ActUTdCK415lmY2OCdXJVAgBJMB99y+k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=aTBij0MKfHujyUmk5AcvjcEPDYsuhsMOVk1UDlCpwHM=;
-        b=A2iiLxDROl+D6jzUvlfXBLXrMMBaN7UfeCNzu1r6dkpN+3eJ+rPS+5wtq/U9ZxVE8j
-         HVxz9/RagO0jjKjR4o5Eikr37DWMqV3R2a186s8cmr3O/qo+MtTx8sBCdLRaVAeQ28ZQ
-         bzyJaWYERcDgOC9yBryP0RCdV0W7uuft6iAruRuTDWa/ndKw+r1jW7oUaCtYGHkJim0g
-         LbfV4FWm1hiqQkkFvN8ekH7SwpMGeWa57VdxR0jt9A4TprnW9HvBHyyB7u6IpNOIMb0l
-         B30KWxDVakmDCFUsu2eIhRNAoijj4gufx63SYIC6SuWMbPRmDDiHiNuEYDHRnyYyJ0K6
-         zPWA==
-X-Gm-Message-State: ACgBeo3sruYSfih+9L6Di9UWLSAGAXAwjP89rwPI8tgPS+5dzJ0ElOlX
-        4tmBW6FjV6YsPQ1wG9cgQ4R1Cw==
-X-Google-Smtp-Source: AA6agR52H9GqkwF66V9j3sYZCEhIamP67gNhXAIhkPKoFl7VQPznDhLiYGxoAwhmixzGU+O0GNIEfA==
-X-Received: by 2002:a05:6a00:2395:b0:536:8296:51d5 with SMTP id f21-20020a056a00239500b00536829651d5mr9625772pfc.84.1662649894875;
-        Thu, 08 Sep 2022 08:11:34 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00174abcb02d6sm10263695plb.235.2022.09.08.08.11.34
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=fN0GeuFGxW7e+hA0O5FTtJYzMqxXnxGIq7WFnXPSIRg=;
+        b=p72EZJEvqginw7K9wI3JKIKP5IAeMh9y6ny2uoO5wAwZ5fXSW3GUTxNIKjNKKZIuc9
+         ODzkYr7A+BY9gktPpe+9gYpvSl5jV1g+K6AhoTijCD1awQSFpc5brLkCz2ZejuuCkOEW
+         LF/ugjv6IT0EpbPm49shOWgnQnFwxqPQN7pOeoB5SWH6okzTW49jO17kC3FmAqAy7Zvo
+         GG3Qkl0YCzcwbCzP+0kdyFRb9pvjusju1jcJBNblcvGEZx4Qu/yDiKWRWc+/3jxqJyOI
+         VnhLz+k2sLQAWeYOV0NWpYFxVgpjJBVUJwY2wE/xklFg47W088C7BPmxpgX5ubZLFPOK
+         HKqw==
+X-Gm-Message-State: ACgBeo3hNGh3lXpYxHT3RquRVvqIAM1UOWN3FWn9JrxKwt4dvxT16yes
+        +h7lU6A2pVMnHka2L7yhkPSlBUcYWCppZw==
+X-Google-Smtp-Source: AA6agR6/ZG7wHgtIrjHNEFE8k0AvwlriRp10A/a085EJsxSzD8Gz6NYeFMgFDYu12RMqHavUNiU6pQ==
+X-Received: by 2002:a17:907:3e94:b0:741:9ed8:9962 with SMTP id hs20-20020a1709073e9400b007419ed89962mr7406065ejc.482.1662667265819;
+        Thu, 08 Sep 2022 13:01:05 -0700 (PDT)
+Received: from localhost.localdomain ([104.28.243.158])
+        by smtp.gmail.com with ESMTPSA id kx11-20020a170907774b00b00778e3e2830esm521202ejc.9.2022.09.08.13.01.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 08:11:34 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 15:11:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Harald Hoyer <harald@profian.com>
-Cc:     ashish.kalra@amd.com, ak@linux.intel.com, alpergun@google.com,
-        ardb@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com,
-        dgilbert@redhat.com, dovmurik@linux.ibm.com, hpa@zytor.com,
-        jarkko@kernel.org, jmattson@google.com, jroedel@suse.de,
-        kirill@shutemov.name, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, luto@kernel.org,
-        marcorr@google.com, michael.roth@amd.com, mingo@redhat.com,
-        pbonzini@redhat.com, peterz@infradead.org, pgonda@google.com,
-        rientjes@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        slp@redhat.com, srinivas.pandruvada@linux.intel.com,
-        tglx@linutronix.de, thomas.lendacky@amd.com, tobin@ibm.com,
-        tony.luck@intel.com, vbabka@suse.cz, vkuznets@redhat.com,
-        x86@kernel.org
-Subject: Re: [[PATCH for v6]] KVM: SEV: fix snp_launch_finish
-Message-ID: <YxoGItJDTEjfctaS@google.com>
-References: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
- <20220908145557.1912158-1-harald@profian.com>
+        Thu, 08 Sep 2022 13:01:05 -0700 (PDT)
+From:   Ignat Korchagin <ignat@cloudflare.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     lei he <helei.sig11@bytedance.com>, kernel-team@cloudflare.com,
+        Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH 0/4] crypto: add ECDSA signature support to key retention service
+Date:   Thu,  8 Sep 2022 21:00:32 +0100
+Message-Id: <20220908200036.2034-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220908145557.1912158-1-harald@profian.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 08, 2022, Harald Hoyer wrote:
-> The `params.auth_key_en` indicator does _not_ specify, whether an
-> ID_AUTH struct should be sent or not, but, wheter the ID_AUTH struct
-> contains an author key or not. The firmware always expects an ID_AUTH block.
-> 
-> Link: https://lore.kernel.org/all/cover.1655761627.git.ashish.kalra@amd.com/
+Kernel Key Retention Service[1] is a useful building block to build secure
+production key management systems. One of its interesting features is
+support for asymmetric keys: we can allow a process to use a certain key
+(decrypt or sign data) without actually allowing the process to read the
+cryptographic key material. By doing so we protect our code from certain
+type of attacks, where a process memory memory leak actually leaks a
+potentially highly sensitive cryptographic material.
 
-Please provide feedback by directly responding to whatever patch/email is buggy.
-Or if that's too complicated for some reason (unlikely in this case), provide the
-fixup patch to the author *off-list*.
+But unfortunately only RSA algorithm was supported until now, because
+in-kernel ECDSA implementation supported signature verifications only.
 
-> Signed-off-by: Harald Hoyer <harald@profian.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 85357dc4d231..5cf4be6a33ba 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2242,17 +2242,18 @@ static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  
->  		data->id_block_en = 1;
->  		data->id_block_paddr = __sme_pa(id_block);
-> -	}
->  
-> -	if (params.auth_key_en) {
->  		id_auth = psp_copy_user_blob(params.id_auth_uaddr, KVM_SEV_SNP_ID_AUTH_SIZE);
->  		if (IS_ERR(id_auth)) {
->  			ret = PTR_ERR(id_auth);
->  			goto e_free_id_block;
->  		}
->  
-> -		data->auth_key_en = 1;
->  		data->id_auth_paddr = __sme_pa(id_auth);
-> +
-> +		if (params.auth_key_en) {
+This patchset implements in-kernel ECDSA signature generation and adds
+support for ECDSA signing in the key retention service. The key retention
+service support was taken out of a previous unmerged patchset from Lei He[2]
 
-While I'm here though...  Single line if-statements don't need curly braces.
+[1]: https://www.kernel.org/doc/html/latest/security/keys/core.html
+[2]: https://patchwork.kernel.org/project/linux-crypto/list/?series=653034&state=*
 
-> +			data->auth_key_en = 1;
-> +		}
->  	}
->  
->  	data->gctx_paddr = __psp_pa(sev->snp_context);
-> -- 
-> 2.37.1
-> 
+Ignat Korchagin (2):
+  crypto: add ECDSA signature generation support
+  crypto: add ECDSA test vectors from RFC 6979
+
+lei he (2):
+  crypto: pkcs8 parser support ECDSA private keys
+  crypto: remove unused field in pkcs8_parse_context
+
+ crypto/Kconfig                        |   3 +-
+ crypto/Makefile                       |   4 +-
+ crypto/asymmetric_keys/pkcs8.asn1     |   2 +-
+ crypto/asymmetric_keys/pkcs8_parser.c |  46 +++-
+ crypto/ecc.c                          |   9 +-
+ crypto/ecdsa.c                        | 373 +++++++++++++++++++++++++-
+ crypto/ecprivkey.asn1                 |   6 +
+ crypto/testmgr.c                      |  18 ++
+ crypto/testmgr.h                      | 333 +++++++++++++++++++++++
+ include/crypto/internal/ecc.h         |  11 +
+ 10 files changed, 788 insertions(+), 17 deletions(-)
+ create mode 100644 crypto/ecprivkey.asn1
+
+--
+2.36.1
+
