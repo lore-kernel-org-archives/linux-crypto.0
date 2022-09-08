@@ -2,161 +2,195 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2ECC6FA8A
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 06:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2D6C6FA83
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 07:47:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbiIHGgN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Sep 2022 02:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56550 "EHLO
+        id S230012AbiIHHrB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Sep 2022 03:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiIHGgB (ORCPT
+        with ESMTP id S230181AbiIHHrA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Sep 2022 02:36:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62AB4C0BD6
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Sep 2022 23:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662618959;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6satdqBnzaWL+j8s1zSOLKz7gVaAnF4gDLw4Fs5Ro4A=;
-        b=BzaxpKre82RbjL19WIRbco/NQv1yVwv3CuNBLJhdTnJzXcFkhGv7WcHpD8hq62M1GYexX9
-        kD3M055HgG9RKCtXTL62F6r4qwD28KExUz9p7a/Dl6nlJ71BOf0jNFbqEdJg+tdA+oy3be
-        f+EkYUGWw3GkYTtMxdARLYtXbEjysL4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-372-NRU-L2HyOoCsr0xAN0TYXA-1; Thu, 08 Sep 2022 02:35:58 -0400
-X-MC-Unique: NRU-L2HyOoCsr0xAN0TYXA-1
-Received: by mail-wm1-f72.google.com with SMTP id r10-20020a1c440a000000b003b3309435a9so232049wma.6
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Sep 2022 23:35:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=6satdqBnzaWL+j8s1zSOLKz7gVaAnF4gDLw4Fs5Ro4A=;
-        b=0riMOz2nFXbFRFwDc/lkZkOT5/trqM9hMkRaU2UbLCB/cf8AjEPjQMI+6uyo2iH4xu
-         XHU6sbXPdWHRkPpcR1/okBZr6vXV5LtxrJq99oqG3lggTPu3URDco1pey+yYSf1pqxQr
-         CliE0q2ESCxWyUA8BFRW0i4Q8GIvJ5y9l0+RU5yZOqeS2Y/CUqz+wEQrw8bqbn4wMWAo
-         1YfOK7gzmuoES3wJaver8cDhM5pR/rsN+PMxQSICjr6cweeKi56Tow/t9ww0yMG1bh8k
-         k3MGynfgsLE1gC0ZihDtlL2jss/7TBWfNIbKMIeae49pGoYU/8bkz/j45Q8SYJXFMPNw
-         p1Iw==
-X-Gm-Message-State: ACgBeo0+fC8Br1Ma5x2UxaPhJRZVholGHvyCGsMm3SIz/UOwa6lG2NM2
-        aiZWiVIwDD64BOQECVWyIFQRidYQDP6E0b/QLUrzGgDZT2vIDaYJ65dLhm1tiFWXvWxiVC8lZwp
-        MKAwP9tQWspwofdA0+bf1Ko6u
-X-Received: by 2002:a1c:f70e:0:b0:3a6:8c16:93a2 with SMTP id v14-20020a1cf70e000000b003a68c1693a2mr1051227wmh.184.1662618957343;
-        Wed, 07 Sep 2022 23:35:57 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4fc55aVw7fMNN37BscplwkSkD0HqrZDKNz9AuWXAC84228ec7akcGGmdT7pdRPk0uD5uXIIQ==
-X-Received: by 2002:a1c:f70e:0:b0:3a6:8c16:93a2 with SMTP id v14-20020a1cf70e000000b003a68c1693a2mr1051213wmh.184.1662618957125;
-        Wed, 07 Sep 2022 23:35:57 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-119-112.dyn.eolo.it. [146.241.119.112])
-        by smtp.gmail.com with ESMTPSA id l16-20020a05600c1d1000b003a30fbde91dsm1704892wms.20.2022.09.07.23.35.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 23:35:56 -0700 (PDT)
-Message-ID: <9bb98d13313d2ebeb5804d67285e8e6320ce4e74.camel@redhat.com>
-Subject: Re: [PATCH v8 01/26] tcp: authopt: Initial support and key
- management
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Leonard Crestez <cdleonard@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>
-Cc:     Francesco Ruggeri <fruggeri@arista.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Philip Paeps <philip@trouble.is>,
-        Shuah Khan <shuah@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 08 Sep 2022 08:35:55 +0200
-In-Reply-To: <0e4c0a98509b907e33c2f80b95cc6cfe713ac2b2.1662361354.git.cdleonard@gmail.com>
-References: <cover.1662361354.git.cdleonard@gmail.com>
-         <0e4c0a98509b907e33c2f80b95cc6cfe713ac2b2.1662361354.git.cdleonard@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        Thu, 8 Sep 2022 03:47:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68527C740B;
+        Thu,  8 Sep 2022 00:46:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EA48861B87;
+        Thu,  8 Sep 2022 07:46:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA39EC433D7;
+        Thu,  8 Sep 2022 07:46:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662623214;
+        bh=v1QudXHtVVOAARsA3M6UyAqD0An8z1adVccc10P8/gQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FWngtO/uE682HqTHNbN3KFgqd5xKxn2B447PBrPJYFmWe5EGJtwZqPSh6J1SCmcCv
+         03I50d31V7Y6c0bKPXvJuFqm/uG8jQuFl1mGIP8XiVdmRuIh82ezF6WNLKtHrhHPv2
+         xya81c/641ta6kqbnlYnmsL0z3FX05jUXkCBW++tXcwDpcTI/UfJLyeLidwsIb4Ty2
+         Zel2EUJsdv6y583uXJSEECjJWAAtrACzrCvTCa1WXtsxzc2nzmrRA4ahgjO25rPARk
+         PKgXmSZ7ga8Tw+njdKqpzqLJ1KFtx1gZf4ZbpPnW5yuYXvLcIqa/ERkhUb39oZY55N
+         qtsC7PFbx0mvA==
+Date:   Thu, 8 Sep 2022 10:46:48 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     Marc Orr <marcorr@google.com>, Borislav Petkov <bp@alien8.de>,
+        x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <Yxmd6ItV05ynoFar@kernel.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic>
+ <YxcgAk7AHWZVnSCJ@kernel.org>
+ <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
+ <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <Yxdq1yQw9f54aw4+@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Yxdq1yQw9f54aw4+@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-09-05 at 10:05 +0300, Leonard Crestez wrote:
-[...]
-> diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-> new file mode 100644
-> index 000000000000..d38e9c89c89d
-> --- /dev/null
-> +++ b/net/ipv4/tcp_authopt.c
-> @@ -0,0 +1,317 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +#include <net/tcp_authopt.h>
-> +#include <net/ipv6.h>
-> +#include <net/tcp.h>
-> +#include <linux/kref.h>
-> +
-> +/* This is enabled when first struct tcp_authopt_info is allocated and never released */
-> +DEFINE_STATIC_KEY_FALSE(tcp_authopt_needed_key);
-> +EXPORT_SYMBOL(tcp_authopt_needed_key);
-> +
-> +static inline struct netns_tcp_authopt *sock_net_tcp_authopt(const struct sock *sk)
-> +{
-> +	return &sock_net(sk)->tcp_authopt;
-> +}
+On Tue, Sep 06, 2022 at 06:44:23PM +0300, Jarkko Sakkinen wrote:
+> On Tue, Sep 06, 2022 at 02:17:15PM +0000, Kalra, Ashish wrote:
+> > [AMD Official Use Only - General]
+> > 
+> > >> On Tue, Aug 09, 2022 at 06:55:43PM +0200, Borislav Petkov wrote:
+> > >> > On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
+> > >> > > +   pfn = pte_pfn(*pte);
+> > >> > > +
+> > >> > > +   /* If its large page then calculte the fault pfn */
+> > >> > > +   if (level > PG_LEVEL_4K) {
+> > >> > > +           unsigned long mask;
+> > >> > > +
+> > >> > > +           mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
+> > >> > > +           pfn |= (address >> PAGE_SHIFT) & mask;
+> > >> >
+> > >> > Oh boy, this is unnecessarily complicated. Isn't this
+> > >> >
+> > >> >       pfn |= pud_index(address);
+> > >> >
+> > >> > or
+> > >> >       pfn |= pmd_index(address);
+> > >>
+> > >> I played with this a bit and ended up with
+> > >>
+> > >>         pfn = pte_pfn(*pte) | PFN_DOWN(address & page_level_mask(level 
+> > >> - 1));
+> > >>
+> > >> Unless I got something terribly wrong, this should do the same (see 
+> > >> the attached patch) as the existing calculations.
+> > 
+> > >Actually, I don't think they're the same. I think Jarkko's version is correct. Specifically:
+> > >- For level = PG_LEVEL_2M they're the same.
+> > >- For level = PG_LEVEL_1G:
+> > >The current code calculates a garbage mask:
+> > >mask = pages_per_hpage(level) - pages_per_hpage(level - 1); translates to:
+> > >>> hex(262144 - 512)
+> > >'0x3fe00'
+> > 
+> > No actually this is not a garbage mask, as I explained in earlier responses we need to capture the address bits 
+> > to get to the correct 4K index into the RMP table.
+> > Therefore, for level = PG_LEVEL_1G:
+> > mask = pages_per_hpage(level) - pages_per_hpage(level - 1) => 0x3fe00 (which is the correct mask).
+> > 
+> > >But I believe Jarkko's version calculates the correct mask (below), incorporating all 18 offset bits into the 1G page.
+> > >>> hex(262144 -1)
+> > >'0x3ffff'
+> > 
+> > We can get this simply by doing (page_per_hpage(level)-1), but as I mentioned above this is not what we need.
+> 
+> I think you're correct, so I'll retry:
+> 
+> (address / PAGE_SIZE) & (pages_per_hpage(level) - pages_per_hpage(level - 1)) =
+> 
+> (address / PAGE_SIZE) & ((page_level_size(level) / PAGE_SIZE) - (page_level_size(level - 1) / PAGE_SIZE)) =
+> 
+> [ factor out 1 / PAGE_SIZE ]
+> 
+> (address & (page_level_size(level) - page_level_size(level - 1))) / PAGE_SIZE  =
+> 
+> [ Substitute with PFN_DOWN() ] 
+> 
+> PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)))
+> 
+> So you can just:
+> 
+> pfn = pte_pfn(*pte) | PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)));
+> 
+> Which is IMHO way better still what it is now because no branching
+> and no ad-hoc helpers (the current is essentially just page_level_size
+> wrapper).
 
-Please have a look at PW report for this series, there are a bunch of
-issues to be addressed, e.g. above 'static inline' should be just
-'static'
+I created a small test program:
 
+$ cat test.c
+#include <stdio.h>
+int main(void)
+{
+        unsigned long arr[] = {0x8, 0x1000, 0x200000, 0x40000000, 0x8000000000};
+        int i;
 
-> +
-> +static void tcp_authopt_key_release_kref(struct kref *ref)
-> +{
-> +	struct tcp_authopt_key_info *key = container_of(ref, struct tcp_authopt_key_info, ref);
-> +
-> +	kfree_rcu(key, rcu);
-> +}
-> +
-> +static void tcp_authopt_key_put(struct tcp_authopt_key_info *key)
-> +{
-> +	if (key)
-> +		kref_put(&key->ref, tcp_authopt_key_release_kref);
-> +}
-> +
-> +static void tcp_authopt_key_del(struct netns_tcp_authopt *net,
-> +				struct tcp_authopt_key_info *key)
-> +{
-> +	lockdep_assert_held(&net->mutex);
-> +	hlist_del_rcu(&key->node);
-> +	key->flags |= TCP_AUTHOPT_KEY_DEL;
-> +	kref_put(&key->ref, tcp_authopt_key_release_kref);
-> +}
-> +
-> +/* Free info and keys.
-> + * Don't touch tp->authopt_info, it might not even be assigned yes.
-> + */
-> +void tcp_authopt_free(struct sock *sk, struct tcp_authopt_info *info)
+        for (i = 1; i < sizeof(arr)/sizeof(unsigned long); i++) {
+                printf("%048b\n", arr[i] - arr[i - 1]);
+                printf("%048b\n", (arr[i] - 1) ^ (arr[i - 1] - 1));
+        }
+}
 
-this need to be 'static'.
+kultaheltta in linux on  host-snp-v7 [?]
+$ gcc -o test test.c
 
-I'm sorry to bring the next topic this late (If already discussed, I
-missed that point), is possible to split this series in smaller chunks?
+kultaheltta in linux on  host-snp-v7 [?]
+$ ./test
+000000000000000000000000000000000000111111111000
+000000000000000000000000000000000000111111111000
+000000000000000000000000000111111111000000000000
+000000000000000000000000000111111111000000000000
+000000000000000000111111111000000000000000000000
+000000000000000000111111111000000000000000000000
+000000000000000011000000000000000000000000000000
+000000000000000011000000000000000000000000000000
 
+So the operation could be described as:
 
-Cheers,
+        pfn = PFN_DOWN(address & (~page_level_mask(level) ^ ~page_level_mask(level - 1)));
 
-Paolo
+Which IMHO already documents itself quite well: index
+with the granularity of PGD by removing bits used for
+PGD's below it.
 
+BR, Jarkko
