@@ -2,88 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 911E8C38145
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 20:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1835C38145
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Sep 2022 20:34:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiIHUBr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Sep 2022 16:01:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54526 "EHLO
+        id S229604AbiIHUeR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Sep 2022 16:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbiIHUBo (ORCPT
+        with ESMTP id S229492AbiIHUeR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Sep 2022 16:01:44 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AE56FE4BC
-        for <linux-crypto@vger.kernel.org>; Thu,  8 Sep 2022 13:01:14 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id b16so26041710edd.4
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Sep 2022 13:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=9Po1p0rTvG7YGCHnTloMal9wCRi9fHpBptpbCbwsONI=;
-        b=uq/1F+Jn3KbvrIbwUC2FgQsMGBcoqJcPk14nCHeuSDtIvGx0FY/HErATB7IZ7X/0Be
-         0x44zT1EiYD9LjBFOY2kB3tCyd2Zz/dY7Wv7qF4PZPpU7Ox8h+oq0REI93GPX1TB4RBP
-         aqq6GROLpsYHNtuc5LG0LEMWchpTXs+e+Fmp8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=9Po1p0rTvG7YGCHnTloMal9wCRi9fHpBptpbCbwsONI=;
-        b=Zzwu+gVU65WNvNLdwLeFivhpmPOlbccEPuwv8JX2QrXqcKTUovNvNQOHZzzLhs4/ZJ
-         nPTmL5k2zdbpAV4l6FQlw+0kMHkeuyTq4uRMV0nW7fE/nLLaxRO5T6gentN/BVRkIpSK
-         NZ5zRaaYx1+ZNDZwZdUh3OMyrtxHzS8Mp8Og4iuZK4g//VKlpVoSXfj9HKGpfzp9VNwi
-         A6N7/D9pOBYvVmqO6nmQ3vIWWUWGHrf61qTfCmP7rpKoBO24lRfUYjkiULu1KW3U4CEl
-         SpX35nxACIoAIDqrvLAzk8FEPl1DWScj+cTQqtkvBddZdytx45PXZWAsIwWev4qPSdmJ
-         J91w==
-X-Gm-Message-State: ACgBeo1F96SByidJEV8QJnxFCw9oXVm5wnJYe9QnOXVQ+9kTFPWiDyc5
-        Gt5ayJhR1LgDHf6K4tj8t0RxUzSqYjr+9g==
-X-Google-Smtp-Source: AA6agR4npFZGDVBKRyr5tobS4dLlprhevP2ZMxeJFfZyZE6JGoNKnvhUohU2xcPhJez/GiGB2UK7Rg==
-X-Received: by 2002:a05:6402:e94:b0:443:e3fe:7c87 with SMTP id h20-20020a0564020e9400b00443e3fe7c87mr8865411eda.144.1662667272600;
-        Thu, 08 Sep 2022 13:01:12 -0700 (PDT)
-Received: from localhost.localdomain ([104.28.243.158])
-        by smtp.gmail.com with ESMTPSA id kx11-20020a170907774b00b00778e3e2830esm521202ejc.9.2022.09.08.13.01.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 13:01:12 -0700 (PDT)
-From:   Ignat Korchagin <ignat@cloudflare.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     lei he <helei.sig11@bytedance.com>, kernel-team@cloudflare.com
-Subject: [PATCH 4/4] crypto: remove unused field in pkcs8_parse_context
-Date:   Thu,  8 Sep 2022 21:00:36 +0100
-Message-Id: <20220908200036.2034-5-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220908200036.2034-1-ignat@cloudflare.com>
-References: <20220908200036.2034-1-ignat@cloudflare.com>
+        Thu, 8 Sep 2022 16:34:17 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121F1F02BB;
+        Thu,  8 Sep 2022 13:34:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C784CB8227C;
+        Thu,  8 Sep 2022 20:34:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED387C433D7;
+        Thu,  8 Sep 2022 20:34:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662669253;
+        bh=xznb1RKBZH/nj2qdZlu+dotoTsJWwyQbwBXQt70aXfQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aV+WCP9SeYQN9/uvhmG0jzovy09Muqg0xuGb1GoH0fy5inl2zw+gC/19rPaudjVTv
+         Qo4D2iAs145mScERTpLbx1ipWCp42F1k/TmKYdEy0zVX8N2TouAtODomu711xjWyyD
+         r9zQKKZ27c8aU4m3/zaqB9d16l6a5SYVEuT/4IV/FCkJUxcUY0YgLo8BJCuW6f9VQX
+         SB8uDzPG7QdXAZeSI7QoeSMtFbkxk8pQEpN/3ZBzrva2lAA61x0+Ohiq6EBiMBLKOe
+         nujTj0rT4LvIcE38NM7aHZJ+TkhKsXHyavZoABrPJK+f/GAXRulwXDrepG26zyYclo
+         zR1K6o6wyldXw==
+Date:   Thu, 8 Sep 2022 23:34:07 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Harald Hoyer <harald@profian.com>, ashish.kalra@amd.com,
+        ak@linux.intel.com, alpergun@google.com, ardb@kernel.org,
+        bp@alien8.de, dave.hansen@linux.intel.com, dgilbert@redhat.com,
+        dovmurik@linux.ibm.com, hpa@zytor.com, jmattson@google.com,
+        jroedel@suse.de, kirill@shutemov.name, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, luto@kernel.org,
+        marcorr@google.com, michael.roth@amd.com, mingo@redhat.com,
+        pbonzini@redhat.com, peterz@infradead.org, pgonda@google.com,
+        rientjes@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        slp@redhat.com, srinivas.pandruvada@linux.intel.com,
+        tglx@linutronix.de, thomas.lendacky@amd.com, tobin@ibm.com,
+        tony.luck@intel.com, vbabka@suse.cz, vkuznets@redhat.com,
+        x86@kernel.org
+Subject: Re: [[PATCH for v6]] KVM: SEV: fix snp_launch_finish
+Message-ID: <YxpRv14+glaFpGsF@kernel.org>
+References: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
+ <20220908145557.1912158-1-harald@profian.com>
+ <YxoGItJDTEjfctaS@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxoGItJDTEjfctaS@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: lei he <helei.sig11@bytedance.com>
+On Thu, Sep 08, 2022 at 03:11:30PM +0000, Sean Christopherson wrote:
+> On Thu, Sep 08, 2022, Harald Hoyer wrote:
+> > The `params.auth_key_en` indicator does _not_ specify, whether an
+> > ID_AUTH struct should be sent or not, but, wheter the ID_AUTH struct
+> > contains an author key or not. The firmware always expects an ID_AUTH block.
+> > 
+> > Link: https://lore.kernel.org/all/cover.1655761627.git.ashish.kalra@amd.com/
+> 
+> Please provide feedback by directly responding to whatever patch/email is buggy.
+> Or if that's too complicated for some reason (unlikely in this case), provide the
+> fixup patch to the author *off-list*.
 
-remove unused field 'algo_oid' in pkcs8_parse_context
+I'd guess that'd be:
 
-Signed-off-by: lei he <helei.sig11@bytedance.com>
----
- crypto/asymmetric_keys/pkcs8_parser.c | 1 -
- 1 file changed, 1 deletion(-)
+https://lore.kernel.org/all/6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com/
 
-diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_keys/pkcs8_parser.c
-index e507c635ead5..f81317234331 100644
---- a/crypto/asymmetric_keys/pkcs8_parser.c
-+++ b/crypto/asymmetric_keys/pkcs8_parser.c
-@@ -21,7 +21,6 @@ struct pkcs8_parse_context {
- 	struct public_key *pub;
- 	unsigned long	data;			/* Start of data */
- 	enum OID	last_oid;		/* Last OID encountered */
--	enum OID	algo_oid;		/* Algorithm OID */
- 	u32		key_size;
- 	const void	*key;
- 	const void	*algo_param;
---
-2.36.1
-
+BR, Jarkko
