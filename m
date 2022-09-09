@@ -2,141 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A52F2ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Sep 2022 10:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2530ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Sep 2022 21:42:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiIIKuM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Sep 2022 06:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50218 "EHLO
+        id S231368AbiIIVmQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Sep 2022 17:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbiIIKth (ORCPT
+        with ESMTP id S230424AbiIIVmN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Sep 2022 06:49:37 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8F411829
-        for <linux-crypto@vger.kernel.org>; Fri,  9 Sep 2022 03:49:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662720572; x=1694256572;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=x5prW2ah25tO5V4phLQ9GuxORIJy7HrpayGmzP3LVVs=;
-  b=QHofpKkp+a/8a07/n4j9o/lbbMYE2bBkIouQiOE4sdqSHJXKIDc6zDkR
-   NHZe3iuCzWaAmjmfTYopRF7sYhBH5L5XDXeQExoz8QO8GVUjdld+Hn9sX
-   6jJ+Qglw1Z6Fy1PZXA5mQfsLF0LR3xl86NSitRzdzrdFsZ2YtRz40Vy87
-   fiHvNHNij8r+l5/JxacEgM+8L18+ooe8fntjSrVxTiFLVebtCU6nrnZqR
-   KVN4z9jyM7ABWhccnI9colj/FH9BTm913KbdS+RvC9GSnRGef0dxAF3qc
-   WxeUXLuYdd5gziXnNQoBDsuxlqBeJwi0wssZLwPE8nNZ0wqVjIdHHlS+i
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="295031012"
-X-IronPort-AV: E=Sophos;i="5.93,303,1654585200"; 
-   d="scan'208";a="295031012"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 03:49:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,303,1654585200"; 
-   d="scan'208";a="677115260"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga008.fm.intel.com with ESMTP; 09 Sep 2022 03:49:29 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Vlad Dronov <vdronov@redhat.com>,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Adam Guerin <adam.guerin@intel.com>
-Subject: [PATCH 3/3] crypto: qat - use reference to structure in dma_map_single()
-Date:   Fri,  9 Sep 2022 11:49:14 +0100
-Message-Id: <20220909104914.3351-4-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220909104914.3351-1-giovanni.cabiddu@intel.com>
-References: <20220909104914.3351-1-giovanni.cabiddu@intel.com>
+        Fri, 9 Sep 2022 17:42:13 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404B213B132
+        for <linux-crypto@vger.kernel.org>; Fri,  9 Sep 2022 14:42:11 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id v185-20020a1cacc2000000b003b42e4f278cso2614733wme.5
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Sep 2022 14:42:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=+7gUZTKN1RNnN3ci9/lyNR5cvcW0J68JTLhQ3vnxCGE=;
+        b=KI3FNKqXtOXA+08GsDYcQfo20rsDbEVGbB9PTviUFUhu87d38jUzyfdBaEdvr9wTu1
+         7YKzd0mtg8I2iVZxoQdRz+P8/MBaXB9JK8SPryzEvjv1NpXd18HwAkF4b9yEQ3Sn1n0F
+         yALnIP1cJimHIF/KBYvP49bxkem7XhcpEibS24SebYzxl4Y/k46SZ4yEdeSQywRRkAx0
+         tX/JfQ7kEjUQX6JYho7VjazrzbWkEj734S/ALCvkNqwCADJdyNhAXUxG5PqSEhSTtonG
+         yEtCgCC8ComGUSz+QpMvrTm4eteY323vBAUpb9X48G9Mpp7MR3HHlBM09JYELhydtXLG
+         dmCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=+7gUZTKN1RNnN3ci9/lyNR5cvcW0J68JTLhQ3vnxCGE=;
+        b=MQuM0uvu3TOALSWclC1lLz+z1JMA/3oiqsrjEjPwakTzV2+gNhPZojObc6/DeYGI/v
+         jrQGiprKTzQG94MAAjAxNuF1idCkvSAUz7oKuaepTX8+KDJCl5fKxCtLjXZfHJ5XzTFl
+         +6X/jU7EUUauE/VyGaEdVrhgfh9VEnE2EDcD9CK2/7lllW9WDdo7hmIZQoxYB7QFlmxs
+         CxBqHxPig02EoVeFxfIck3nhTKRburlivYQq+63rGPcYXmTuFQ7z09SCuLp/XmenMogl
+         mVVINI+eWpywUz7tyHpsoZkNUbHojnm3crXRPrjmaBCQ4apF+ATMyxURPhnwBcGcZcO+
+         yKrQ==
+X-Gm-Message-State: ACgBeo3Uld+Zxs9V78dr0xZ3vDjX9Zq4v+B08lDkwfQrowmEIwzSPXJJ
+        ZW5msiQgqfjYqP+dO2R9ril59lb5mXBc2s2O5nNrjg==
+X-Google-Smtp-Source: AA6agR6Us7LvGpTuE9bFLm53J4mE8TTx9hyp2wzRef3J/SA5Qz3Gfd+lkzE27Upvavl5JzDThz4Jf4TwvGXPEtb50QY=
+X-Received: by 2002:a7b:c056:0:b0:3b4:5f7f:16b6 with SMTP id
+ u22-20020a7bc056000000b003b45f7f16b6mr2718359wmc.135.1662759729393; Fri, 09
+ Sep 2022 14:42:09 -0700 (PDT)
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+References: <cover.1662361354.git.cdleonard@gmail.com>
+In-Reply-To: <cover.1662361354.git.cdleonard@gmail.com>
+From:   Salam Noureddine <noureddine@arista.com>
+Date:   Fri, 9 Sep 2022 14:41:58 -0700
+Message-ID: <CAO7SqHBGMY4u6H6+H8iy_aZEy3F55JkW05JfrB9HsLGNOjmFyA@mail.gmail.com>
+Subject: Re: [PATCH v8 00/26] tcp: Initial support for RFC5925 auth option
+To:     Leonard Crestez <cdleonard@gmail.com>
+Cc:     David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Philip Paeps <philip@trouble.is>,
+        Shuah Khan <shuah@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Yuchung Cheng <ycheng@google.com>,
+        Mat Martineau <mathew.j.martineau@linux.intel.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Ivan Delalande <colona@arista.com>,
+        Caowangbao <caowangbao@huawei.com>,
+        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Damian Muszynski <damian.muszynski@intel.com>
+Hi Leonard,
 
-When mapping the input and output parameters, the implementations of RSA
-and DH pass to the function dma_map_single() a pointer to the first
-member of the structure they want to map instead of a pointer to the
-actual structure.
-This results in set of warnings reported by the static analyser Smatch:
+On Mon, Sep 5, 2022 at 12:06 AM Leonard Crestez <cdleonard@gmail.com> wrote=
+:
+>
+> This is similar to TCP-MD5 in functionality but it's sufficiently
+> different that packet formats and interfaces are incompatible.
+> Compared to TCP-MD5 more algorithms are supported and multiple keys
+> can be used on the same connection but there is still no negotiation
+> mechanism.
+...
+>
+> A completely unrelated series that implements the same features was poste=
+d
+> recently: https://lore.kernel.org/netdev/20220818170005.747015-1-dima@ari=
+sta.com/
+>
+> The biggest difference is that this series puts TCP-AO key on a global
+> instead of per-socket list and that it attempts to make kernel-mode
+> key selection decisions instead of very strictly requiring userspace
+> to make all decisions.
+>
 
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:335 qat_dh_compute_value() error: dma_map_single_attrs() '&qat_req->in.dh.in.b' too small (8 vs 64)
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:341 qat_dh_compute_value() error: dma_map_single_attrs() '&qat_req->out.dh.r' too small (8 vs 64)
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:732 qat_rsa_enc() error: dma_map_single_attrs() '&qat_req->in.rsa.enc.m' too small (8 vs 64)
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:738 qat_rsa_enc() error: dma_map_single_attrs() '&qat_req->out.rsa.enc.c' too small (8 vs 64)
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:878 qat_rsa_dec() error: dma_map_single_attrs() '&qat_req->in.rsa.dec.c' too small (8 vs 64)
-    drivers/crypto/qat/qat_common/qat_asym_algs.c:884 qat_rsa_dec() error: dma_map_single_attrs() '&qat_req->out.rsa.dec.m' too small (8 vs 64)
+This is a departure from how md5 is implemented and the interface that
+BGP developers are used to. The reason you switched your implementation
+to a global database was to fix a minor race between key addition/deletion
+and connections being accepted on a listening socket. This race can be
+easily solved with a getsockopt() in user space. Thus it doesn=E2=80=99t ju=
+stify
+the complexity that a global key database brings to the implementation.
+I have a few issues with that design that I would like to point out.
 
-Where the address of the first element of a structure is used as an
-input for the function dma_map_single(), replace it with the address of
-the structure. This fix does not introduce any functional change as the
-addresses are the same.
+- Currently, a setsockopt on a given socket that adds a key will add it to =
+the
+global database. That opens up the door for buggy/malicious apps to install
+bogus keys and mess up the connections of other apps. Also, it seems unusua=
+l
+for a setsockopt to affect all sockets in a namespace. This requires all us=
+er
+space apps to play nicely together.
 
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Adam Guerin <adam.guerin@intel.com>
----
- drivers/crypto/qat/qat_common/qat_asym_algs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+- Having the keys be per-socket takes advantage of the existing socket lock=
+,
+simplifying synchronization and avoiding extra locks in the TCP stack.
 
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 85b0f30712e1..94a26702aeae 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -332,13 +332,13 @@ static int qat_dh_compute_value(struct kpp_request *req)
- 	qat_req->in.dh.in_tab[n_input_params] = 0;
- 	qat_req->out.dh.out_tab[1] = 0;
- 	/* Mapping in.in.b or in.in_g2.xa is the same */
--	qat_req->phy_in = dma_map_single(dev, &qat_req->in.dh.in.b,
-+	qat_req->phy_in = dma_map_single(dev, &qat_req->in.dh,
- 					 sizeof(struct qat_dh_input_params),
- 					 DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
- 		goto unmap_dst;
- 
--	qat_req->phy_out = dma_map_single(dev, &qat_req->out.dh.r,
-+	qat_req->phy_out = dma_map_single(dev, &qat_req->out.dh,
- 					  sizeof(struct qat_dh_output_params),
- 					  DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))
-@@ -729,13 +729,13 @@ static int qat_rsa_enc(struct akcipher_request *req)
- 
- 	qat_req->in.rsa.in_tab[3] = 0;
- 	qat_req->out.rsa.out_tab[1] = 0;
--	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa.enc.m,
-+	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa,
- 					 sizeof(struct qat_rsa_input_params),
- 					 DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
- 		goto unmap_dst;
- 
--	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa.enc.c,
-+	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa,
- 					  sizeof(struct qat_rsa_output_params),
- 					  DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))
-@@ -875,13 +875,13 @@ static int qat_rsa_dec(struct akcipher_request *req)
- 	else
- 		qat_req->in.rsa.in_tab[3] = 0;
- 	qat_req->out.rsa.out_tab[1] = 0;
--	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa.dec.c,
-+	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa,
- 					 sizeof(struct qat_rsa_input_params),
- 					 DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
- 		goto unmap_dst;
- 
--	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa.dec.m,
-+	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa,
- 					  sizeof(struct qat_rsa_output_params),
- 					  DMA_TO_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))
--- 
-2.37.1
+- Caching of traffic keys becomes much easier with per-socket keys. Once
+a connection is established it will typically have one or two keys on its l=
+ist
+with traffic keys cached. In your current implementation, a linked list of
+potentially thousands of keys has to be linearly searched for each packet
+and the traffic key has to be calculated before doing the actual hashing of
+the packet. We believe a linear search with the extra hashing to calculate
+the traffic keys will be detrimental to the performance of real world
+deployments.
 
+- Using a global database might have a benefit if the goal is to have
+user space apps use tcp-ao transparently without any modifications.
+This would require key matching on the local and remote ports.
+But again, do we expect any apps other than BGP/LDP using tcp-ao?
+If not, why the extra complexity in the kernel?
+
+
+> I believe my approach greatly simplifies userspace implementation.
+> The biggest difference in this iteration of the patch series is adding
+> per-key lifetime values based on RFC8177 in order to implement
+> kernel-mode key rollover.
+>
+
+We believe that key rotation should be done in user-space. One reason is th=
+at
+different vendors might have slightly different behaviors during key rotati=
+on
+and having the logic be in user-space is more flexible for fixing issues. I=
+t=E2=80=99s
+not fun having to patch the kernel every time an interop issue is discovere=
+d.
+
+
+> Older versions still required userspace to tweak the NOSEND/NORECV flags
+> and always pick rnextkeyid explicitly, but now no active "key management"
+> should be required on established socket - Just set correct flags and
+> expiration dates and the kernel can perform key rollover itself. You can
+> see a (simple) test of that behavior here:
+>
+...
+
+Best,
+
+Salam
