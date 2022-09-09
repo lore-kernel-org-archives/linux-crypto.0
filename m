@@ -2,58 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EE6ECAAD3
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Sep 2022 09:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA04CECAAD3
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Sep 2022 09:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231797AbiIIJJY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Sep 2022 05:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
+        id S230515AbiIIJtt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Sep 2022 05:49:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231968AbiIIJJU (ORCPT
+        with ESMTP id S231749AbiIIJtq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Sep 2022 05:09:20 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD92135D5B;
-        Fri,  9 Sep 2022 02:09:19 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oWa0M-002oG6-T3; Fri, 09 Sep 2022 19:08:56 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Sep 2022 17:08:54 +0800
-Date:   Fri, 9 Sep 2022 17:08:54 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     cgel.zte@gmail.com
-Cc:     leitao@debian.org, nayna@linux.ibm.com, pfsmorigo@gmail.com,
-        mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: Re: [PATCH linux-next] crypto: nx - Remove the unneeded result
- variable
-Message-ID: <YxsCplvrUl89F8B9@gondor.apana.org.au>
-References: <20220902073055.319464-1-ye.xingchen@zte.com.cn>
+        Fri, 9 Sep 2022 05:49:46 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D834766C;
+        Fri,  9 Sep 2022 02:49:44 -0700 (PDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MPB1L6qJWzZcP9;
+        Fri,  9 Sep 2022 17:45:10 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 9 Sep 2022 17:49:42 +0800
+Received: from localhost.localdomain (10.69.192.56) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 9 Sep 2022 17:49:41 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
+        Weili Qian <qianweili@huawei.com>
+Subject: [PATCH 00/10] crypto: hisilicon - support get device information from registers
+Date:   Fri, 9 Sep 2022 17:46:54 +0800
+Message-ID: <20220909094704.32099-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220902073055.319464-1-ye.xingchen@zte.com.cn>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 02, 2022 at 07:30:55AM +0000, cgel.zte@gmail.com wrote:
-> From: ye xingchen <ye.xingchen@zte.com.cn>
-> 
-> Return the value set_msg_len() directly instead of storing it in another
-> redundant variable.
-> 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
-> ---
->  drivers/crypto/nx/nx-aes-ccm.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+This patchset supports obtaining device information from
+device registers, including the supported algorithms,
+device features, and so on.
 
-Patch applied.  Thanks. 
+Weili Qian (6):
+  crypto: hisilicon/qm - get hardware features from hardware registers
+  crypto: hisilicon/qm - get qp num and depth from hardware registers
+  crypto: hisilicon/qm - add UACCE_CMD_QM_SET_QP_INFO support
+  crypto: hisilicon/qm - get error type from hardware registers
+  crypto: hisilicon/qm - support get device irq information from
+    hardware registers
+  crypto: hisilicon/zip - support zip capability
+
+Wenkai Lin (1):
+  crypto: hisilicon/sec - get algorithm bitmap from registers
+
+Zhiqi Song (3):
+  crypto: hisilicon/hpre - support hpre capability
+  crypto: hisilicon/hpre - optimize registration of ecdh
+  crypto: hisilicon - support get algs by the capability register
+
+ drivers/crypto/hisilicon/hpre/hpre.h        |   8 +-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 250 ++++---
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 208 +++++-
+ drivers/crypto/hisilicon/qm.c               | 765 +++++++++++++-------
+ drivers/crypto/hisilicon/sec2/sec.h         |  34 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  | 454 +++++++-----
+ drivers/crypto/hisilicon/sec2/sec_main.c    | 160 +++-
+ drivers/crypto/hisilicon/zip/zip.h          |   1 +
+ drivers/crypto/hisilicon/zip/zip_crypto.c   |  73 +-
+ drivers/crypto/hisilicon/zip/zip_main.c     | 256 +++++--
+ include/linux/hisi_acc_qm.h                 |  63 +-
+ include/uapi/misc/uacce/hisi_qm.h           |  17 +-
+ 12 files changed, 1589 insertions(+), 700 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.33.0
+
