@@ -2,86 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F71DC6FA82
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Sep 2022 10:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1108C54EE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Sep 2022 18:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231199AbiIMK3b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Sep 2022 06:29:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57714 "EHLO
+        id S232840AbiIMSvK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Sep 2022 14:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbiIMK33 (ORCPT
+        with ESMTP id S230463AbiIMSuy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Sep 2022 06:29:29 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7525C960;
-        Tue, 13 Sep 2022 03:29:25 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oY39f-004Bph-Lc; Tue, 13 Sep 2022 20:28:36 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Sep 2022 18:28:35 +0800
-Date:   Tue, 13 Sep 2022 18:28:35 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Varun Sethi <V.Sethi@nxp.com>
-Cc:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
-        "david@sigma-star.at" <david@sigma-star.at>,
-        "michael@walle.cc" <michael@walle.cc>,
-        "john.ernberg@actia.se" <john.ernberg@actia.se>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "richard@nod.at" <richard@nod.at>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        Sahil Malhotra <sahil.malhotra@nxp.com>,
-        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>
-Subject: Re: [EXT] Re: [RFC PATCH HBK: 2/8] hw-bound-key: flag-is_hbk added
- to the tfm
-Message-ID: <YyBbU9sNC88EXFJs@gondor.apana.org.au>
-References: <20220906065157.10662-1-pankaj.gupta@nxp.com>
- <20220906065157.10662-3-pankaj.gupta@nxp.com>
- <YxbsBiCrIQT/0xz6@gondor.apana.org.au>
- <DU2PR04MB86308036FB517BF8CAD3D32795419@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <YxhHkz+UlE9XAG/Z@gondor.apana.org.au>
- <DU2PR04MB86308DB7CFBC7A31CEB612D295419@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <YxhuC3QlurfSgdXG@gondor.apana.org.au>
- <AM9PR04MB8211C7D59379D4C9F877D20EE8449@AM9PR04MB8211.eurprd04.prod.outlook.com>
- <Yx/lc1YjWm9+df1r@gondor.apana.org.au>
- <AM9PR04MB82112828E21FDA2043073216E8479@AM9PR04MB8211.eurprd04.prod.outlook.com>
+        Tue, 13 Sep 2022 14:50:54 -0400
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.219])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7E95FC2
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Sep 2022 11:31:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1663093869;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:To:From:Cc:Date:From:
+    Subject:Sender;
+    bh=Z8rv4s6/7y6OAegqsq6trVbDNYSQFm3g6edM5eOLy9w=;
+    b=KoXyxkdHWjNzh4B/r+4jw9ukG0OGKkfgTR0+WiOtwvz/0KRAxmRsLyvmpGzAr1bV4k
+    YJFOgc5Ym5D1pw60II/3P7tFgbQtxC1ohlTXjT9vxZEcL84U4jWQQtSiWWiG2ul/4H6h
+    B74qj6+nBiyw+P9VdHCFQcRGVRuVlrsp9IQckngFeYuoFV7He5Wb4uGhuVCOxhz7d/38
+    9d1GI1W8jm8yEPa0SI2E7hFx1guVdt78RCTNQaqWrk388qD/+mettFOGtmZgCC0N/NYl
+    DU7LiEw6dx8uWaaBxVygXhNb6+m1+B1yo/50hn0TLFcAQtzoAy/VzFDR0l1lJvIWtO7+
+    BDiA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJPSf8yac"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 48.1.0 DYNA|AUTH)
+    with ESMTPSA id 5a21aay8DIV97v8
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 13 Sep 2022 20:31:09 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        GROSSSCHARTNER Benjamin <benjamin.grossschartner@thalesgroup.com>
+Subject: Re: drbg using jitterentropy_rng causes huge latencies
+Date:   Tue, 13 Sep 2022 20:31:09 +0200
+Message-ID: <2253976.ElGaqSPkdT@positron.chronox.de>
+In-Reply-To: <a6aff0c118df4497b5e988c42586f4e4@thalesgroup.com>
+References: <a6aff0c118df4497b5e988c42586f4e4@thalesgroup.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM9PR04MB82112828E21FDA2043073216E8479@AM9PR04MB8211.eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 13, 2022 at 10:01:13AM +0000, Varun Sethi wrote:
->
-> [Varun] The proposed patchset makes things more scalable. With the hardware backed key flag, there's no need for the security co-processor driver to register separate set of algorithms. This makes things simpler and more scalable for the consumers (OpenSSL, AF_ALG, KTLS etc), as they can continue to use standard set of algorithms and leave the key specific complexity to the driver.
+Am Montag, 12. September 2022, 10:16:17 CEST schrieb GROSSSCHARTNER Benjamin:
 
-Users already need to specify which driver they are going to use in
-order to actually access the hardware keys instead of getting a software
-implementation of the same algorithm.
+Hi GROSSSCHARTNER,
 
-So I don't see what extra burdens are placed on them by the current
-regime.
+> Would there be any chance to get such a patch merged?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If there is an issue it needs to be solved.
+
+But we need to be a bit careful: the Jitter RNG is mandatory when booting in 
+FIPS mode. Thus, when you consider a patch to make it selectable, please make 
+sure it is definitely selected when the FIPS option is selected.
+
+
+Ciao
+Stephan
+
+
