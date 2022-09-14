@@ -2,144 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76837ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Sep 2022 08:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00140ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Sep 2022 08:19:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbiINIGI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Sep 2022 04:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53530 "EHLO
+        id S229729AbiINITC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Sep 2022 04:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbiINIFz (ORCPT
+        with ESMTP id S229459AbiINITB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Sep 2022 04:05:55 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D146C54
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 01:05:54 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id jm11so14309353plb.13
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 01:05:54 -0700 (PDT)
+        Wed, 14 Sep 2022 04:19:01 -0400
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEFA5757B
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 01:19:00 -0700 (PDT)
+Received: by mail-yb1-xb34.google.com with SMTP id 198so16490243ybc.1
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 01:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=BqUhxcUOvv8EZWeVoadoEfAKAvxiKy4DFaV8F/F3nRo=;
-        b=Y45pldWaU7msnCMC3mB1XfdqYiXenh8aXHlb6P8wpifZtyvVUiC/Pmw9QwKSxvKaE1
-         5vCUZeWVnXL53VuRrWpqC7y1PQSe7vOrfidrlH914Nd9vnCG1aZejYGhPNdsgrnD5Smm
-         /VxtyFzzPQwbhCVzigMHS4tQiLksGnaZozE5ratC2Nr12jt2UGbq7KuGY95gkkT5Nr7P
-         QlAkTCyt4TIEYQ/FCiD1d6HvKJE59tarY+ga+VyyyjxeDhsob2/t6Uozzfn0gmp2BAea
-         2ebCdl6bZD9HrQpesANzLn3iVJ0t6GeI0W0uEcAhhlKoQjbI4C09YKx4Cw7P/AIku5Wn
-         77lA==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=HuIXq0gxsLhtrekbIwvVhrdsOJWyOZiMwcr+S3al2lw=;
+        b=cAprc2ENkwAzsA1ScDy+/sr6d/3f9p0nPP8Mc6N0iDX/hEs+T1BUfS8BVAHrFx8MBJ
+         HgdkV+kfd0A7J7ZkjA4pAMF35RkIlAimda9FEzqjxzOjqbAqi6UcEzmg80AYkWzJLeXI
+         zCakpoSPHtw0VWKrXcAwGiT2kHvjFGxiv1LWCO1x3nMcoFAgS40VLpeBMd2E2Sq2drcS
+         dOMWDCuymV7EHVprME2crDl+J9zBU+jt+l8DKpJSeYYBkVBy0Hjq4GnKe8WMKbvghvh6
+         wixA88tuAYTRq3++zVPDafixpOW89tYSoKU9nEYwEn2VMSK/OfJ9UcfIWE7GZqM+8IAZ
+         WeeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=BqUhxcUOvv8EZWeVoadoEfAKAvxiKy4DFaV8F/F3nRo=;
-        b=yC7Ix/EPCNYsqYch8+ZRMW2lOzpJxcXTZfF7mqzdtJ3OryNbaogTKgpn6iH1KYNZNi
-         esh8H3W29qudrESftRQWq/NLR1T0yi5dsbRwKis5Evd3g4LPMbAD3N1At2IEPPS07x77
-         Q+mo1kMkYOikwLccOvNOj6RnNqio+VyOYAEdWq0plQavKdq74KEERst+ZO+GdY6vghne
-         IBTb0j2/raZuPUh7d4VgKBTkKmcpIzROsce494GhPXliJLO509XFVQIIpP/eIPw+J5Pd
-         rkp2ZEU2UCz/MN2lNysDTU3vVlWhQ+SL6Pf2TsDkx1YqGvkXBqAivlmJ30KECBQowhGi
-         3K4w==
-X-Gm-Message-State: ACgBeo3UyZheoe/aHtLbgHtaMNSzXkVpiOYPgqcdVH+w6ctQsIHS+gRp
-        uGJzsNJFfA0wNEw1gXagy2jhxQ==
-X-Google-Smtp-Source: AA6agR4UATq2gDShvsXLljJKEJB7uvGsKLNEqlognTMeRcIxtphBnWCa23O0u7Vyr0cktSSkh1HKog==
-X-Received: by 2002:a17:90a:d804:b0:202:f247:91b0 with SMTP id a4-20020a17090ad80400b00202f24791b0mr3530610pjv.8.1663142753759;
-        Wed, 14 Sep 2022 01:05:53 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d8-20020a17090a6a4800b001fd7e56da4csm8460240pjm.39.2022.09.14.01.05.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Sep 2022 01:05:53 -0700 (PDT)
-Date:   Wed, 14 Sep 2022 08:05:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        jarkko@profian.com
-Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
- map and unmap
-Message-ID: <YyGLXXkFCmxBfu5U@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-40-brijesh.singh@amd.com>
- <YWYm/Gw8PbaAKBF0@google.com>
- <YWc+sRwHxEmcZZxB@google.com>
- <4e41dcff-7c7b-cf36-434a-c7732e7e8ff2@amd.com>
- <YWm3bOFcUSlyZjNb@google.com>
- <20220908212114.sqne7awimfwfztq7@amd.com>
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=HuIXq0gxsLhtrekbIwvVhrdsOJWyOZiMwcr+S3al2lw=;
+        b=IuidrwXf5d+lxlYhib9jha40AcvIHQ8nyv7MnuBB1ffU20oBSab17C+p87DAk8r5Km
+         hPKGkqrNAChunax2uS5d7Pfyq6dNJtQuwxSAmgOKEF0E46g2Q9QdkQ/3PmhzH8AX3Vn1
+         h6i1HWDf/N+6BQUeV/YMq5WMk0R2JwCdU5hARrbZ1l2//fY23UdobrKZejmTKbSY8e9T
+         np6Y8rN8yu23fL/pSxQOJsvzVsmaDWyR7LtbCGtKWRSJxTWHdOvWocXeOC/3lOLIpkCZ
+         xcV5HcB6MIa/i2X0VtP5ATO/xHuSvOcPWrSPqg3uYsf2pr491+5l8lFeD3vkEEwMtUUI
+         36ow==
+X-Gm-Message-State: ACrzQf0bzz+Wjob5FXbraaCn9Oe2zFTv+c+ZC8f6xwwclJaAiv3j0WW3
+        iyk+dBytyFxOw4v4Lk/c6C/24uUH+RMQZ5KlKUA/2w==
+X-Google-Smtp-Source: AMsMyM4gAetVuxJCy5rc8GccIvL8xPemtsGubVjAx9z1OYMfS0WxwpXd1nfRIx3By7x7exkAz6pnQPQ/bPRykgvkaz0=
+X-Received: by 2002:a25:3f03:0:b0:6af:f33f:7711 with SMTP id
+ m3-20020a253f03000000b006aff33f7711mr2350646yba.376.1663143538967; Wed, 14
+ Sep 2022 01:18:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220908212114.sqne7awimfwfztq7@amd.com>
+References: <20220909095811.2166073-1-glider@google.com> <20220913175210.50945edb0738bf95300dc500@linux-foundation.org>
+In-Reply-To: <20220913175210.50945edb0738bf95300dc500@linux-foundation.org>
+From:   Alexander Potapenko <glider@google.com>
+Date:   Wed, 14 Sep 2022 10:18:22 +0200
+Message-ID: <CAG_fn=XsmcKNi1Sg-HgP9Hh98mf910o0Uo4fCpwijiS_3adgyQ@mail.gmail.com>
+Subject: Re: [PATCH -next 1/2] x86: crypto: kmsan: revert !KMSAN dependencies
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Robert Elliott <elliott@hpe.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-next <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 08, 2022, Michael Roth wrote:
-> On Fri, Oct 15, 2021 at 05:16:28PM +0000, Sean Christopherson wrote:
-> So in the context of this interim solution, we're trying to look for a
-> solution that's simple enough that it can be used reliably, without
-> introducing too much additional complexity into KVM. There is one
-> approach that seems to fit that bill, that Brijesh attempted in an
-> earlier version of this series (I'm not sure what exactly was the
-> catalyst to changing the approach, as I wasn't really in the loop at
-> the time, but AIUI there weren't any showstoppers there, but please
-> correct me if I'm missing anything):
-> 
->  - if the host is writing to a page that it thinks is supposed to be
->    shared, and the guest switches it to private, we get an RMP fault
->    (actually, we will get a !PRESENT fault, since as of v5 we now
->    remove the mapping from the directmap as part of conversion)
->  - in the host #PF handler, if we see that the page is marked private
->    in the RMP table, simply switch it back to shared
->  - if this was a bug on the part of the host, then the guest will see
+On Wed, Sep 14, 2022 at 2:52 AM Andrew Morton <akpm@linux-foundation.org> w=
+rote:
+>
+> On Fri,  9 Sep 2022 11:58:10 +0200 Alexander Potapenko <glider@google.com=
+> wrote:
+>
+> > This patch reverts "crypto: Kconfig: fix up for "crypto: kmsan: disable
+> > accelerated configs under KMSAN" used by Stephen Rothwell to cleanly
+> > merge KMSAN patches into linux-next.
+> >
+> > Because now arch-specific crypto configs reside in a separate Kconfig
+> > file, we can disable them all by adding a single !KMSAN before includin=
+g
+> > that file (done in the following patch).
+> >
+> > Among others, this patch reverts !KMSAN check for
+> > CONFIG_CRYPTO_AEGIS128_SIMD, which is ARM-only and is hence unnecessary=
+,
+> > because KMSAN does not support ARM yet.
+>
+> As I understand it, these patches are against linux-next and only
+> linux-next because they pertain to linux-next's resolution of conflicts
+> between the MM tree and the crypto tree?
 
-As discussed off-list, attempting to fix up RMP violations in the host #PF handler
-is not a viable approach.  There was also extensive discussion on-list a while back:
+The thing is that this patch only makes sense with its counterpart
+that adds a !KMSAN condition on "source arch/x86/crypto/Kconfig", and
+the latter file is missing in the -mm tree.
 
-https://lore.kernel.org/all/8a244d34-2b10-4cf8-894a-1bf12b59cf92@www.fastmail.com
+> I'm not sure how to handle that, even if anyone wants to.  How about
+> you send an update to
+> git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm's mm-unstable
+> branch so the code which is there makes sense?  Then we'll ask Stephen
+> to redo the crypto tree resolution?
 
-> AIUI, this is still sort of an open question, but you noted how nuking
-> the directmap without any formalized interface for letting the kernel
-> know about it could be problematic down the road, which also sounds
-> like the sort of thing more suited for having UPM address at a more
-> general level, since there are similar requirements for TDX as well.
-> 
-> AIUI there are 2 main arguments against splitting the directmap:
->  a) we can't easily rebuild it atm
->  b) things like KSM might still tries to access private pages
-> 
-> But unmapping also suffers from a), since we still end up splitting the
-> directmap unless we remove pages in blocks of 2M.
+Because the crypto tree is moving code crypto/Kconfig to
+arch/x86/crypto/Kconfig, we'll still need to apply these two patches
+to the result of the crypto tree merge.
 
-But for UPM, it's easy to rebuild the direct map since there will be an explicit,
-kernel controlled point where the "inaccesible" memfd releases the private page.
+I was going to send out the updated patch series anyway (there are
+minor improvements to the core which let us drop "kmsan: unpoison @tlb
+in arch_tlb_gather_mmu()", also there's a new test case).
+I could drop "crypto: kmsan: disable accelerated configs under KMSAN"
+from it, so that it would be possible to enable accelerated configs
+under KMSAN at the cost of false positives (which are only visible if
+one builds with KMSAN).
+Then, once arch/x86/crypto/Kconfig hits -mm, I can send the remaining
+patch that disables accelerated crypto under KMSAN:
+https://lore.kernel.org/all/20220909095811.2166073-2-glider@google.com/
 
-> But nothing prevents a guest from switching a single 4K page to private, in
-> which case we are forced to split. That would be normal behavior on the part
-> of the guest for setting up GHCB pages/etc, so we still end up splitting the
-> directmap over time.
+Or I could just send v7 patches against mm-unstable and ask Stephen to
+apply both https://lore.kernel.org/all/20220909095811.2166073-2-glider@goog=
+le.com/
+and https://lore.kernel.org/all/20220909095811.2166073-2-glider@google.com/
+at merge time.
 
-The host actually isn't _forced_ to split with UPM.  One option would be to refuse
-to split the direct map and instead force userspace to eat the 2mb allocation even
-though it only wants to map a single 4kb chunk into the guest.  I don't know that
-that's a _good_ option, but it is an option.
+Which option is better?
+
+
+--
+Alexander Potapenko
+Software Engineer
+
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
+
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
