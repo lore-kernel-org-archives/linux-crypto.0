@@ -2,120 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD32C6FA89
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 14:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAA3ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 15:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbiIOOmx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Sep 2022 10:42:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39734 "EHLO
+        id S229665AbiIOPoV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Sep 2022 11:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbiIOOmw (ORCPT
+        with ESMTP id S229542AbiIOPoF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2022 10:42:52 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62FDD8C
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2022 07:42:50 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id f14so29782391lfg.5
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2022 07:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=WzKY19WlATzPVfjWML638L0xpeL6UYwE1yJ45I/Qe4c=;
-        b=mkjXKq0L1gE6sUmU7qAI+Vol+B0XZR0g0yca2k+PFxKonmhAB+tCnq6kRTf6Q+Kfkh
-         ksoCBORIf83GVqgYfnFgq1MLkIvDJOCpr/yQWXXDZOzomEsd8A5yMieujbGCTnDcg4V5
-         w6kFycoisvMLh+DDuXs2j+klxB4uTEWIFyHDkFeYCb6oJ1OUS///z1EoCfLwU+xYwpdE
-         woJZAi0HPvwwUwcXhybl0avMbAIPuP/K0jkZ12tnVc9rJxf4l6NozEehUlWwSSgTCQoE
-         Y8JJW4YeaztMDNIplC2WS5nOQbsXV0iLUI5IQYJUwnqYhAzEzh2Mb1oNEw0F3SZPKZm7
-         zyJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=WzKY19WlATzPVfjWML638L0xpeL6UYwE1yJ45I/Qe4c=;
-        b=t1CwwfBN9Ual+uhF7i4EEa6E4te+Ld8vf0A/fxXWWSaBMZQfYnuZjwE9wNOIJ/Z529
-         LPxsMwd6OJnC39Wp5Bak+/L08Vo/Cn/iF/ddmkuR1FX89qN0CRPyrcSn0vTYROTJHeEd
-         Q82miAQxFpaAABsLwwZ6RgvYBYf4oB9sHpsrh1o3wy3RL5Wxj0ehTxVSO6w2VbdSMz0A
-         PxjXIJ3MRFsgkyJKEm7CnJqTzFzfUn4vdE52NxepSFVrq9iMxkHTLrdCvVlzjH+VBhHg
-         KdZMFvGP8KjIT5HNl+/WdZetLiBeKuD82SLBv7uhvCpb03DFL+Tzuy5Hs/wVkZo/VPSl
-         45OQ==
-X-Gm-Message-State: ACrzQf146ltvid+DOXKVbrZbZy8iQQlinIT/w2V9RPpqIW/bbgRCrZq1
-        LCnWBNIQV0jOLeNvA43Y6EESIA==
-X-Google-Smtp-Source: AMsMyM6EuxVDO1/5rG6bQA27Gun6TqVZg0nEb5JNoe9sjRTnCxFH+9HkSPUtPFwrkNcWUmDbI0KX2w==
-X-Received: by 2002:ac2:418a:0:b0:48b:aa2:1d9f with SMTP id z10-20020ac2418a000000b0048b0aa21d9fmr86523lfh.195.1663252967602;
-        Thu, 15 Sep 2022 07:42:47 -0700 (PDT)
-Received: from [192.168.1.211] ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id k14-20020a2e920e000000b002677a3ad1d9sm3173178ljg.76.2022.09.15.07.42.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Sep 2022 07:42:47 -0700 (PDT)
-Message-ID: <806d5fc4-fb37-c60c-a11a-f73e5e21afb2@linaro.org>
-Date:   Thu, 15 Sep 2022 17:42:46 +0300
+        Thu, 15 Sep 2022 11:44:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B379D8048F;
+        Thu, 15 Sep 2022 08:44:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A4CE624B1;
+        Thu, 15 Sep 2022 15:44:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BF35C433D7;
+        Thu, 15 Sep 2022 15:44:02 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QBIF+TRm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1663256640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/yyWzHROU9kEnjmKKhzTY5LfkMeTLQIiTrmiEeAJ7no=;
+        b=QBIF+TRmrJ9BBoXcNSZPogvyVgAi6lpDHuhq6UZw7vtreOC75hxckoaDqZzRKME02yaXdr
+        APJItTxeyNIC1U5qJo+XwicF9EkTbTxkwVcThRaWmkMEtC7mVjwQ+dNRaSDRM67XIi3b26
+        f/JxHtHtWv4lRMfWilWmhYYCtkPtAbo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9114dced (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 15 Sep 2022 15:44:00 +0000 (UTC)
+Date:   Thu, 15 Sep 2022 16:43:54 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Sven van Ashbrook <svenva@chromium.org>, linux@dominikbrodowski.net
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Olivia Mackall <olivia@selenic.com>,
+        Alex Levin <levinale@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Rajat Jain <rajatja@google.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
+ outside function
+Message-ID: <YyNIOg1mtnzQz1H7@zx2c4.com>
+References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH 0/2] crypto: intel-fcs: Add crypto service driver for
- Intel SoCFPGA
-Content-Language: en-GB
-To:     wen.ping.teh@intel.com
-Cc:     bjorn.andersson@linaro.org, catalin.marinas@arm.com,
-        davem@davemloft.net, dinguyen@kernel.org,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shawnguo@kernel.org, will@kernel.org
-References: <2d24ed07-5501-5ee9-e2a9-34ef15216e28@linaro.org>
- <20220915135219.670329-1-wen.ping.teh@intel.com>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-In-Reply-To: <20220915135219.670329-1-wen.ping.teh@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 15/09/2022 16:52, wen.ping.teh@intel.com wrote:
-> From: wen.ping.teh@intel.com
+Hi Sven,
+
+On Thu, Sep 15, 2022 at 12:22:53AM +0000, Sven van Ashbrook wrote:
+> add_hwgenerator_randomness() currently blocks until more entropy
+> is needed. Move the blocking wait out of the function to the caller,
+> by letting the function return the number of jiffies needed to block.
 > 
->> From: Dmitry Baryshkov @ 2022-09-15 11:46 UTC (permalink / raw)
->>> From: wen.ping.teh@intel.com
->>>
->>>> This patch introduces a crypto service driver for Intel SoCFPGA
->>>> family. The FPGA Crypto Service (FCS) includes a large set of security
->>>> features that are provided by the Secure Device Manager(SDM) in FPGA.
->>>> The driver provide IOCTL interface for user to call the crypto services
->>>> and send them to SDM's mailbox.
->>>>
->>>> Teh Wen Ping (2):
->>>>    crypto: intel-fcs: crypto service driver for Intel SoCFPGA family
->>>>    arm64: defconfig: add CRYPTO_DEV_INTEL_FCS
->>> Hi,
->>>
->>> I just found out that there was a previous attempt to upstream this driver
->>> 2 years ago. It was NACK because it did not implement crypto API. Please
->>> drop this review.
->>> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg44701.html
->>>
->>> I will move this driver to drivers/misc.
->>
->> I think the proper solution would be to implement the existing API first
->> rather than adding a set of custom proprietary IOCTLs that nobody else
->> is going to use.
-> 
-> Could you explain what are the existing API that you are referring?
-> The FCS driver doesn't have API. Instead it uses IOCTLs to interact with user-space application to perform Intel SoCFPGA crypto features.
+> This is done to prepare the function's sole kernel caller from a
+> kthread to self-rearming delayed_work.
 
-The FCS driver doesn't. But Linux does.
+Isn't Dominik working on the same thing, but slightly different? I
+recall he sent a patch recently, which looked pretty good, except it
+just needed to be split up. I'm waiting for his v2. Does this build on
+that?
 
-For the hw random generators we have the struct hwrng/devm_hwrng_register().
-
-For AES, EC, etc. there are corresponding Crypto API. Based on your 
-patches I couldn't guess if your hardware is more of a TPM or a generic 
-crypto "accelerator". However Linux has support for both kinds of 
-hardware. Most likely the right interface is already there (or almost 
-there). In 90% of cases 'a custom bunch of IOCTLs' is not a correct one.
-
--- 
-With best wishes
-Dmitry
-
+Jason
