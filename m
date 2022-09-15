@@ -2,132 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A130C6FA82
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Sep 2022 20:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF67C6FA82
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 00:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbiINUxW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Sep 2022 16:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44296 "EHLO
+        id S229885AbiIOAXC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Sep 2022 20:23:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbiINUxT (ORCPT
+        with ESMTP id S229586AbiIOAXB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Sep 2022 16:53:19 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ADF77E30A;
-        Wed, 14 Sep 2022 13:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663188797; x=1694724797;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2ZBy574VPvpNgyR6nSsCWGAosoLWJlJ1Eve+1ru/t+Y=;
-  b=Cj4MZTxgNDVYCiNtI1D/z2UzEjhw+BI4O4xndh2LQaOY+4LOza6KRXCh
-   RAbEdG4rJ8gGqFV7SxCOBVr60F2gMQmCrN/LIkbH0mTu71gmsNUsx/7VQ
-   KCPdiGuAzBJYPeMeMe1kIJcQU+ZoFv4Vr/am3PenxT2RKMQHw+pHY3yXJ
-   qdSm/8/bjM/IG7LAFXJ6lrpGPeJ9Y/e27/Ac4mTL6rh6zv7V3vSQu3jQr
-   TdT+Re+ucbPi7uRQTJQKb3aQxDjv83jlH/Vyorwkwn0zoRMK1YEf0G+D6
-   F6xom0qB+GHzRR5TFTILTTOzlCCb75U2fmfyL4bxIdWN7Uw1eYR9gHbtL
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="298536608"
-X-IronPort-AV: E=Sophos;i="5.93,315,1654585200"; 
-   d="scan'208";a="298536608"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2022 13:53:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,315,1654585200"; 
-   d="scan'208";a="685450350"
-Received: from lkp-server01.sh.intel.com (HELO d6e6b7c4e5a2) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 14 Sep 2022 13:53:02 -0700
-Received: from kbuild by d6e6b7c4e5a2 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oYZNV-0000ZE-2b;
-        Wed, 14 Sep 2022 20:53:01 +0000
-Date:   Thu, 15 Sep 2022 04:52:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     wen.ping.teh@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Teh Wen Ping <wen.ping.teh@intel.com>
-Subject: Re: [PATCH 1/2] crypto: intel-fcs: crypto service driver for Intel
- SoCFPGA family
-Message-ID: <202209150451.PQ7ojJzq-lkp@intel.com>
-References: <20220914144320.605421-1-wen.ping.teh@intel.com>
+        Wed, 14 Sep 2022 20:23:01 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF148052F
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 17:23:00 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id c11so12454923qtw.8
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Sep 2022 17:23:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=eRiMKscQqGLWHiLc+7+i9xWjQkO+eAs1NiZ4jOvGS0U=;
+        b=DDKycVVoBoWbCM3nQMDQEe8g1JNrOsjXVyfZHCebseS4+afsgAkQYMIPCaGK1izdDM
+         jObnH0Dtsq8TtMdYHeoe8jd1zKZZhyuyg1q9B5mKnPFlbJJRuorQ+GIhMZ0dQtXWu7TW
+         j9Ta3r8XkKQ5zPasxQulLbgCtgRgUSGETaydY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=eRiMKscQqGLWHiLc+7+i9xWjQkO+eAs1NiZ4jOvGS0U=;
+        b=vxdAWpADFB2x1xKWNyzfv8JPDSAVDp0VpqLQbBqu9+roi+0VJCfoBXD8IjRXGVbttt
+         2oP08BtwSuoD7GUb3FQaKTG7Ycu0Uo+w4J7ySSiV+OTG4Btw9YCTKRjZ8d7tD2rnCSko
+         sFunFh4HADR0Kyrb6pdh+LMgojgMkNOCPLE84tTA/TQ02utA74/O92/0VAEPxLogatNQ
+         yooDT0T8Piu/YpTscj8TC73X7VDPu94whF72ELJwmbrLxj+rIoWXn730yHhLR+BNl4d+
+         choTM542+9RTe7mN8cxHup2pyGc/ugz+gd6rBAFBypusmD+C5pi53F07JgI6tuPRj40z
+         8esQ==
+X-Gm-Message-State: ACgBeo1/Y+5pypr2Wcgdm7cR4PZNoaz+/8tc6yQIZRW8n/9EVPY8Y3go
+        LB6B2WtmxeqyZZfWXaCyMTjboA==
+X-Google-Smtp-Source: AA6agR5n0qg3MJMUDrj6cUWrw4bfwjRO+f7dxAy+UMb7nJNVnhtqjMVgK7ybK2zcEHxqmw36epXNPg==
+X-Received: by 2002:a05:622a:38f:b0:35b:b8e7:82ef with SMTP id j15-20020a05622a038f00b0035bb8e782efmr13021242qtx.647.1663201379203;
+        Wed, 14 Sep 2022 17:22:59 -0700 (PDT)
+Received: from trappist.c.googlers.com.com (128.174.85.34.bc.googleusercontent.com. [34.85.174.128])
+        by smtp.gmail.com with ESMTPSA id m5-20020ac86885000000b0034367ec57ecsm2377611qtq.9.2022.09.14.17.22.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Sep 2022 17:22:58 -0700 (PDT)
+From:   Sven van Ashbrook <svenva@chromium.org>
+To:     LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Olivia Mackall <olivia@selenic.com>
+Cc:     Alex Levin <levinale@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Rajat Jain <rajatja@google.com>,
+        Sven van Ashbrook <svenva@chromium.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Subject: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait outside function
+Date:   Thu, 15 Sep 2022 00:22:53 +0000
+Message-Id: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
+X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220914144320.605421-1-wen.ping.teh@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+add_hwgenerator_randomness() currently blocks until more entropy
+is needed. Move the blocking wait out of the function to the caller,
+by letting the function return the number of jiffies needed to block.
 
-Thank you for the patch! Yet something to improve:
+This is done to prepare the function's sole kernel caller from a
+kthread to self-rearming delayed_work.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master arm64/for-next/core linus/master v6.0-rc5 next-20220914]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Sven van Ashbrook <svenva@chromium.org>
+---
 
-url:    https://github.com/intel-lab-lkp/linux/commits/wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: i386-randconfig-a006 (https://download.01.org/0day-ci/archive/20220915/202209150451.PQ7ojJzq-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/4cdd20e357a4c52a9479852d5464147100813280
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
-        git checkout 4cdd20e357a4c52a9479852d5464147100813280
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+Changes in v2:
+- justify patch as a preparation for next patch
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+ drivers/char/hw_random/core.c |  7 +++++--
+ drivers/char/random.c         | 13 ++++++-------
+ include/linux/random.h        |  2 +-
+ 3 files changed, 12 insertions(+), 10 deletions(-)
 
-All errors (new ones prefixed by >>):
-
-   In file included from <built-in>:1:
->> ./usr/include/linux/intel_fcs-ioctl.h:40:2: error: unknown type name 'uint32_t'
-           uint32_t test_bit:1;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:41:2: error: unknown type name 'uint32_t'
-           uint32_t rsvd:31;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:56:2: error: unknown type name 'uint32_t'
-           uint32_t size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:66:2: error: unknown type name 'uint32_t'
-           uint32_t size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:79:2: error: unknown type name 'uint32_t'
-           uint32_t size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:80:2: error: unknown type name 'uint32_t'
-           uint32_t c_status;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:92:2: error: unknown type name 'uint32_t'
-           uint32_t src_size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:94:2: error: unknown type name 'uint32_t'
-           uint32_t dst_size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:106:2: error: unknown type name 'uint32_t'
-           uint32_t src_size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:108:2: error: unknown type name 'uint32_t'
-           uint32_t dst_size;
-           ^
-   ./usr/include/linux/intel_fcs-ioctl.h:116:2: error: unknown type name 'uint32_t'
-           uint32_t rndm[8];
-           ^
-   11 errors generated.
-
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 16f227b995e8..3675122c6cce 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -491,6 +491,7 @@ static int __init register_miscdev(void)
+ static int hwrng_fillfn(void *unused)
+ {
+ 	size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
++	unsigned long delay;
+ 	long rc;
+ 
+ 	while (!kthread_should_stop()) {
+@@ -526,8 +527,10 @@ static int hwrng_fillfn(void *unused)
+ 			entropy_credit = entropy;
+ 
+ 		/* Outside lock, sure, but y'know: randomness. */
+-		add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+-					   entropy >> 10);
++		delay = add_hwgenerator_randomness((void *)rng_fillbuf, rc,
++						   entropy >> 10);
++		if (delay > 0)
++			schedule_timeout_interruptible(delay);
+ 	}
+ 	hwrng_fill = NULL;
+ 	return 0;
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 79d7d4e4e582..5dc949298f92 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -686,7 +686,7 @@ static void __cold _credit_init_bits(size_t bits)
+  * the above entropy accumulation routines:
+  *
+  *	void add_device_randomness(const void *buf, size_t len);
+- *	void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
++ *	unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
+  *	void add_bootloader_randomness(const void *buf, size_t len);
+  *	void add_vmfork_randomness(const void *unique_vm_id, size_t len);
+  *	void add_interrupt_randomness(int irq);
+@@ -702,8 +702,8 @@ static void __cold _credit_init_bits(size_t bits)
+  * available to them (particularly common in the embedded world).
+  *
+  * add_hwgenerator_randomness() is for true hardware RNGs, and will credit
+- * entropy as specified by the caller. If the entropy pool is full it will
+- * block until more entropy is needed.
++ * entropy as specified by the caller. Returns time delay in jiffies until
++ * more entropy is needed.
+  *
+  * add_bootloader_randomness() is called by bootloader drivers, such as EFI
+  * and device tree, and credits its input depending on whether or not the
+@@ -857,10 +857,10 @@ EXPORT_SYMBOL(add_device_randomness);
+ 
+ /*
+  * Interface for in-kernel drivers of true hardware RNGs.
+- * Those devices may produce endless random bits and will be throttled
++ * Those devices may produce endless random bits and should be throttled
+  * when our pool is full.
+  */
+-void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
++unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+ {
+ 	mix_pool_bytes(buf, len);
+ 	credit_init_bits(entropy);
+@@ -869,8 +869,7 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+ 	 * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
+ 	 * we're not yet initialized.
+ 	 */
+-	if (!kthread_should_stop() && crng_ready())
+-		schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
++	return crng_ready() ? CRNG_RESEED_INTERVAL : 0;
+ }
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+ 
+diff --git a/include/linux/random.h b/include/linux/random.h
+index 3fec206487f6..6608b0fb4402 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -17,7 +17,7 @@ void __init add_bootloader_randomness(const void *buf, size_t len);
+ void add_input_randomness(unsigned int type, unsigned int code,
+ 			  unsigned int value) __latent_entropy;
+ void add_interrupt_randomness(int irq) __latent_entropy;
+-void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
++unsigned long add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
+ 
+ #if defined(LATENT_ENTROPY_PLUGIN) && !defined(__CHECKER__)
+ static inline void add_latent_entropy(void)
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.37.2.789.g6183377224-goog
+
