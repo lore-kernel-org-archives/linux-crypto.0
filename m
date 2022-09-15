@@ -2,110 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76EBECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 17:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC40C6FA86
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 17:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbiIORTC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Sep 2022 13:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
+        id S229706AbiIORwQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Sep 2022 13:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiIORTB (ORCPT
+        with ESMTP id S229523AbiIORwP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2022 13:19:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5617182F95;
-        Thu, 15 Sep 2022 10:19:00 -0700 (PDT)
+        Thu, 15 Sep 2022 13:52:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595A0804A1;
+        Thu, 15 Sep 2022 10:52:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D18AE62598;
-        Thu, 15 Sep 2022 17:18:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 318DCC433C1;
-        Thu, 15 Sep 2022 17:18:57 +0000 (UTC)
-Date:   Thu, 15 Sep 2022 18:18:53 +0100
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E413D625B2;
+        Thu, 15 Sep 2022 17:52:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EFBC433C1;
+        Thu, 15 Sep 2022 17:52:11 +0000 (UTC)
+Date:   Thu, 15 Sep 2022 18:52:03 +0100
 From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, Adam Langley <agl@google.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Ard Biesheuvel <ardb@kernel.org>
 Subject: Re: Should Linux set the new constant-time mode CPU flags?
-Message-ID: <YyNefT72+OqkaPMS@arm.com>
+Message-ID: <YyNmQ2bPvf3B3Xvo@arm.com>
 References: <YwgCrqutxmX0W72r@gmail.com>
- <CAK8P3a3LnqdJ7bp+wjwUyb=7rQqL7W4nina-yQ5_Ff=XtaTr+A@mail.gmail.com>
+ <Ywzr2d52ixYXUDWR@zx2c4.com>
+ <6ec9cdab-db5b-ab28-c92d-79c3812dd369@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a3LnqdJ7bp+wjwUyb=7rQqL7W4nina-yQ5_Ff=XtaTr+A@mail.gmail.com>
+In-Reply-To: <6ec9cdab-db5b-ab28-c92d-79c3812dd369@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(catching up with this thread)
-
-On Fri, Aug 26, 2022 at 10:45:07AM +0200, Arnd Bergmann wrote:
-> On Fri, Aug 26, 2022 at 1:15 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> > For arm64, it's not clear to me whether the DIT flag is privileged or not.  If
-> > privileged, I expect it would need to be set by the kernel just like the Intel
-> > flag.  If unprivileged, I expect there will still be work to do in the kernel,
-> > as the flag will need to be set when running any crypto code in the kernel.
+On Tue, Aug 30, 2022 at 07:25:29AM -0700, Dave Hansen wrote:
+> On 8/29/22 09:39, Jason A. Donenfeld wrote:
+> > On Thu, Aug 25, 2022 at 11:15:58PM +0000, Eric Biggers wrote:
+> >> I'm wondering if people are aware of this issue, and whether anyone has any
+> >> thoughts on whether/where the kernel should be setting these new CPU flags.
+> >> There don't appear to have been any prior discussions about this.  (Thanks to
+> > Maybe it should be set unconditionally now, until we figure out how to
+> > make it more granular.
 > 
-> 7206dc93a58f ("arm64: Expose Arm v8.4 features") added the feature bit for
-> Armv8.4+ processors. From what I can tell from the documentation and the
-> kernel source, I see:
+> Personally, I'm in this camp as well.  Let's be safe and set it by
+> default.  There's also this tidbit in the Intel docs (and chopping out a
+> bunch of the noise):
 > 
-> - if the feature is set in HWCAP (or /proc/cpuinfo), then the instruction DIT
->   register is available in user space, and sensitive code can set or clear the
->   constant-time mode for the local thread.
+> 	(On) processors based on microarchitectures before Ice Lake ...
+> 	the instructions listed here operate as if DOITM is enabled.
+> 
+> IOW, setting DOITM=0 isn't going back to the stone age.  At worst, I'd
+> guess that you're giving up some optimization that only shows up in very
+> recent CPUs in the first place.
+> 
+> If folks want DOITM=1 on their snazzy new CPUs, then they came come with
+> performance data to demonstrate the gain they'll get from adding kernel
+> code to get DOITM=1.  There are a range of ways we could handle it, all
+> the way from adding a command-line parameter to per-task management.
+> 
+> Anybody disagree?
 
-Indeed, the arm64 DIT feature can be enabled in user space, subject to
-checking the HWCAP bit or the CPUID regs (via kernel trapping and
-emulation). The expectation was that some crypto routines would set it
-on function entry, restore it on return but...
+It's not my preferred option for arm64 but I admit the same reasoning
+could equally apply to us. If some existing crypto libraries relied on
+data independent timing for current CPUs but newer ones (with the DIT
+feature) come up with more aggressive, data-dependent optimisations,
+they may be caught off-guard. That said the ARM architecture spec never
+promised any timing, that's a micro-architecture detail and not all
+implementations are done by ARM Ltd. So I can't really tell what's out
+there.
 
-> - On CPUs without the feature (almost all ARMv8 ones), the register should
->   not betouched.
-
-That's one of the drawbacks of using the features in user-space (the
-instruction is not in the hint/nop space). It can be worked around with
-ifunc resolvers but with a slight overhead on function calling.
-
-> - The bit is context switched on kernel entry, so setting the bit in user space
->   does not change the behavior inside of a syscall
-> - If we add a user space interface for setting the bit per thread on x86,
->   the same interface could be supported to set the bit on arm64 to save
->   user space implementations the trouble of checking the feature bits
-
-A prctl() would do here but I think the default should be off or at
-least allow a sysctl to control this. Enabling DIT could have a small
-performance impact while lots of (most?) apps don't need such
-guarantees.
-
-For arm64, my preference is to have this option per-thread and even be
-able to toggle it within a thread (not sure that's possible on x86
-without a syscall).
-
-Other random ideas of deploying this (for arm64): have an ELF annotation
-that data independent timing is required. If that's on the main
-executable, the kernel could turn it on for the app. If it's on a
-(crypto) library, it's up to the dynamic loader to either turn it on for
-the whole app or just use some function veneers to save/restore it when
-the library code is executed.
-
-I assume having this per-thread would work on x86 as well but I'm not
-sure about the context switching cost.
-
-> - the in-kernel crypto code does not set the bit today but could be easily
->   changed to do this for CPUs that support it, if we can decide on a policy
->   for when to enable or disable it.
-
-In the kernel it's easier, at least for arm64, to enable it for specific
-functions (we can do boot-time code patching).
-
-Whichever way we support it, I'd rather not turn it on by default.
-Talking to some of the Arm microarchitects, such feature may prevent
-certain hardware optimisations.
+So I guess knobs for finer grained control would do, at least a sysctl
+(or cmdline) to turn it on/off globally and maybe a prctl() for user. We
+don't necessarily need this on arm64 but if x86 adds one, we might as
+well wire it up.
 
 -- 
 Catalin
