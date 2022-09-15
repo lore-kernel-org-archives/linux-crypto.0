@@ -2,128 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB28ECAAD3
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 10:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2976EECAAD3
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 12:00:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbiIOKL5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Sep 2022 06:11:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36778 "EHLO
+        id S229639AbiIOMAA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Sep 2022 08:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiIOKLz (ORCPT
+        with ESMTP id S229777AbiIOL7q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Sep 2022 06:11:55 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9373402D1;
-        Thu, 15 Sep 2022 03:11:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663236714; x=1694772714;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9pV9/hSeLiF6NvcT3SLriBKTjof61GiqelolE5VGU3c=;
-  b=HSkgdbqs39zUb4c9c85hVSh/9SW5hjuYygwOnHtlPa9F5FOSpXZcR8q0
-   73nF9ruz0RFe86//0E9TcqiMkdEkj03A5Y8PPCvlncczpwi6IgfkB511f
-   E46kLOdKgd15WujQRNGerkr03EQQec3hbGAyeBYsAknh+PInhujFjfkIw
-   SHUtxBSPf/xG3ezulyhNzpmeTHjciofX9ot31l9jIw2Rp66YbUXOSJMC4
-   nyVugZdcvKovGUCxyMDIC1kiI3hJfC+NJwFvP3xkgi3eaevZ3W/VCYfB2
-   rPnwzuBHLQT9d5mQMjqqd87AKv6QbvBKl6wOJHg2YOQz9qDhyjsZIG6ls
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="362632719"
-X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
-   d="scan'208";a="362632719"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 03:11:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
-   d="scan'208";a="945892694"
-Received: from lkp-server02.sh.intel.com (HELO 41300c7200ea) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Sep 2022 03:11:51 -0700
-Received: from kbuild by 41300c7200ea with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oYlqZ-0000Lx-0n;
-        Thu, 15 Sep 2022 10:11:51 +0000
-Date:   Thu, 15 Sep 2022 18:11:29 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     wen.ping.teh@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     kbuild-all@lists.01.org, Dinh Nguyen <dinguyen@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Teh Wen Ping <wen.ping.teh@intel.com>
-Subject: Re: [PATCH 1/2] crypto: intel-fcs: crypto service driver for Intel
- SoCFPGA family
-Message-ID: <202209151738.j2RLe6VA-lkp@intel.com>
-References: <20220914144320.605421-1-wen.ping.teh@intel.com>
+        Thu, 15 Sep 2022 07:59:46 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C493D101D3
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2022 04:59:43 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id bn9so21892368ljb.6
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Sep 2022 04:59:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=DNXgwpqPIIuqzQRBdCOMAHQNDRiIqcoEBtZfHuZEnuI=;
+        b=Caj3VE0KYQ63gm0H/qtyEmckga6j2I/I7D55jcaHYjmqyDSv+ubOmSFBm4UwYiZwEj
+         l+G7XHskToz21DpzHhpcowet1X5s99fybCUYrYGqmvYSQajPjWNsyM35vgnQylf8WslF
+         TFptD8xDF9wbNgffePeb4NucCk0csVT+6TDTQM3HtyyoEnnhQb9sJF7QLHbxcEOM0Cn1
+         Fxkr0iTDnGwtUnMREfoHSpNK0oXFYs8VGSbk6QtZGsXJLEvutY39a/HpQNwKYUxRW1Wg
+         XzSxXM7/JI2VMbo61Ty688oRW5cx7Culg2iZuJtB52ntm7hRVMS6NL3XQo2OLAP6Pc1Y
+         LwqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=DNXgwpqPIIuqzQRBdCOMAHQNDRiIqcoEBtZfHuZEnuI=;
+        b=2b4IWevxkeAm7MWhmn67JuqsBZ3bYkig9VBAOBjWd79enyvsnYpPgkVWcf0Am6ECgd
+         T3loXfNiRCHnVYyvkOgrU+xvIMNHBAksag0wUTLvmeH/g9yMOWr39Ph98ScSy4WOD931
+         hjg3S/PtjoDdBOShgoMnAgECkKbP4riU0djv9RwBaIB7qZog0TRmDEpKpjvwW7NEnF4Y
+         U0FsqMXhW5GO33yxQ3LVHkO3fDhGfByzNlyTCBJBYXwq9caCeNmRtCM0vLagLtADLVFq
+         h5GddwHpn7xC5ZAoQysuuRedOmR0B/YkPiIEnO0i20HiEoMI7H2vzUD16xD/hXNZlTWG
+         A1fA==
+X-Gm-Message-State: ACgBeo10eLTPz/ALJAc3IWKKXl38DbbNAWyUdr0+XUoR1+dPn6l1vTWx
+        cd6anwkdu7Dy4gsyiwdqwe2XZn8aafQSmQ==
+X-Google-Smtp-Source: AA6agR5IL9rhpZcQF9IYtFoiIZn0QLiK5ag2E6B4j9k5RGj66dITMVwJ1rApg5wOCUOIxxz9lCE/jA==
+X-Received: by 2002:ac2:4c50:0:b0:49a:3768:da81 with SMTP id o16-20020ac24c50000000b0049a3768da81mr6504701lfk.247.1663242374833;
+        Thu, 15 Sep 2022 04:46:14 -0700 (PDT)
+Received: from [192.168.1.211] ([37.153.55.125])
+        by smtp.gmail.com with ESMTPSA id 7-20020a2e0907000000b00261e7e7b698sm3096292ljj.123.2022.09.15.04.46.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Sep 2022 04:46:14 -0700 (PDT)
+Message-ID: <2d24ed07-5501-5ee9-e2a9-34ef15216e28@linaro.org>
+Date:   Thu, 15 Sep 2022 14:46:13 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220914144320.605421-1-wen.ping.teh@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH 0/2] crypto: intel-fcs: Add crypto service driver for
+ Intel SoCFPGA
+Content-Language: en-GB
+To:     wen.ping.teh@intel.com
+Cc:     bjorn.andersson@linaro.org, catalin.marinas@arm.com,
+        davem@davemloft.net, dinguyen@kernel.org,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shawnguo@kernel.org, will@kernel.org
+References: <20220914144137.605279-1-wen.ping.teh@intel.com>
+ <20220915032506.641639-1-wen.ping.teh@intel.com>
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+In-Reply-To: <20220915032506.641639-1-wen.ping.teh@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On 15/09/2022 06:25, wen.ping.teh@intel.com wrote:
+> From: wen.ping.teh@intel.com
+> 
+>> This patch introduces a crypto service driver for Intel SoCFPGA
+>> family. The FPGA Crypto Service (FCS) includes a large set of security
+>> features that are provided by the Secure Device Manager(SDM) in FPGA.
+>> The driver provide IOCTL interface for user to call the crypto services
+>> and send them to SDM's mailbox.
+>>
+>> Teh Wen Ping (2):
+>>   crypto: intel-fcs: crypto service driver for Intel SoCFPGA family
+>>   arm64: defconfig: add CRYPTO_DEV_INTEL_FCS
+> Hi,
+> 
+> I just found out that there was a previous attempt to upstream this driver
+> 2 years ago. It was NACK because it did not implement crypto API. Please
+> drop this review.
+> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg44701.html
+> 
+> I will move this driver to drivers/misc.
 
-Thank you for the patch! Yet something to improve:
-
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master arm64/for-next/core linus/master v6.0-rc5 next-20220914]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20220915/202209151738.j2RLe6VA-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/4cdd20e357a4c52a9479852d5464147100813280
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
-        git checkout 4cdd20e357a4c52a9479852d5464147100813280
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
->> ./usr/include/linux/intel_fcs-ioctl.h:40:9: error: unknown type name 'uint32_t'
-      40 |         uint32_t test_bit:1;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:41:9: error: unknown type name 'uint32_t'
-      41 |         uint32_t rsvd:31;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:56:9: error: unknown type name 'uint32_t'
-      56 |         uint32_t size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:66:9: error: unknown type name 'uint32_t'
-      66 |         uint32_t size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:79:9: error: unknown type name 'uint32_t'
-      79 |         uint32_t size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:80:9: error: unknown type name 'uint32_t'
-      80 |         uint32_t c_status;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:92:9: error: unknown type name 'uint32_t'
-      92 |         uint32_t src_size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:94:9: error: unknown type name 'uint32_t'
-      94 |         uint32_t dst_size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:106:9: error: unknown type name 'uint32_t'
-     106 |         uint32_t src_size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:108:9: error: unknown type name 'uint32_t'
-     108 |         uint32_t dst_size;
-         |         ^~~~~~~~
-   ./usr/include/linux/intel_fcs-ioctl.h:116:9: error: unknown type name 'uint32_t'
-     116 |         uint32_t rndm[8];
-         |         ^~~~~~~~
+I think the proper solution would be to implement the existing API first 
+rather than adding a set of custom proprietary IOCTLs that nobody else 
+is going to use.
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+With best wishes
+Dmitry
+
