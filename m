@@ -2,205 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6835CECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 03:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB28ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 10:11:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbiIODku (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Sep 2022 23:40:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54260 "EHLO
+        id S229690AbiIOKL5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Sep 2022 06:11:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230363AbiIODk1 (ORCPT
+        with ESMTP id S229986AbiIOKLz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Sep 2022 23:40:27 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9719630D;
-        Wed, 14 Sep 2022 20:39:50 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MSjWg58ntzNmGp;
-        Thu, 15 Sep 2022 11:35:11 +0800 (CST)
-Received: from ubuntu1804.huawei.com (10.67.174.58) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 15 Sep 2022 11:39:48 +0800
-From:   Xiu Jianfeng <xiujianfeng@huawei.com>
-To:     <dan.j.williams@intel.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <trix@redhat.com>, <jarkko@kernel.org>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: add __init/__exit annotations to init/exit funcs
-Date:   Thu, 15 Sep 2022 11:36:15 +0800
-Message-ID: <20220915033615.12478-1-xiujianfeng@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 15 Sep 2022 06:11:55 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9373402D1;
+        Thu, 15 Sep 2022 03:11:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663236714; x=1694772714;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9pV9/hSeLiF6NvcT3SLriBKTjof61GiqelolE5VGU3c=;
+  b=HSkgdbqs39zUb4c9c85hVSh/9SW5hjuYygwOnHtlPa9F5FOSpXZcR8q0
+   73nF9ruz0RFe86//0E9TcqiMkdEkj03A5Y8PPCvlncczpwi6IgfkB511f
+   E46kLOdKgd15WujQRNGerkr03EQQec3hbGAyeBYsAknh+PInhujFjfkIw
+   SHUtxBSPf/xG3ezulyhNzpmeTHjciofX9ot31l9jIw2Rp66YbUXOSJMC4
+   nyVugZdcvKovGUCxyMDIC1kiI3hJfC+NJwFvP3xkgi3eaevZ3W/VCYfB2
+   rPnwzuBHLQT9d5mQMjqqd87AKv6QbvBKl6wOJHg2YOQz9qDhyjsZIG6ls
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="362632719"
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="362632719"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 03:11:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="945892694"
+Received: from lkp-server02.sh.intel.com (HELO 41300c7200ea) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Sep 2022 03:11:51 -0700
+Received: from kbuild by 41300c7200ea with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oYlqZ-0000Lx-0n;
+        Thu, 15 Sep 2022 10:11:51 +0000
+Date:   Thu, 15 Sep 2022 18:11:29 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     wen.ping.teh@intel.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     kbuild-all@lists.01.org, Dinh Nguyen <dinguyen@kernel.org>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Teh Wen Ping <wen.ping.teh@intel.com>
+Subject: Re: [PATCH 1/2] crypto: intel-fcs: crypto service driver for Intel
+ SoCFPGA family
+Message-ID: <202209151738.j2RLe6VA-lkp@intel.com>
+References: <20220914144320.605421-1-wen.ping.teh@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.174.58]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220914144320.605421-1-wen.ping.teh@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add missing __init/__exit annotations to init/exit funcs.
+Hi,
 
-Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
----
- crypto/async_tx/raid6test.c | 4 ++--
- crypto/curve25519-generic.c | 4 ++--
- crypto/dh.c                 | 4 ++--
- crypto/ecdh.c               | 4 ++--
- crypto/ecdsa.c              | 4 ++--
- crypto/rsa.c                | 4 ++--
- crypto/sm2.c                | 4 ++--
- 7 files changed, 14 insertions(+), 14 deletions(-)
+Thank you for the patch! Yet something to improve:
 
-diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
-index c9d218e53bcb..9719c7520661 100644
---- a/crypto/async_tx/raid6test.c
-+++ b/crypto/async_tx/raid6test.c
-@@ -189,7 +189,7 @@ static int test(int disks, int *tests)
- }
- 
- 
--static int raid6_test(void)
-+static int __init raid6_test(void)
- {
- 	int err = 0;
- 	int tests = 0;
-@@ -236,7 +236,7 @@ static int raid6_test(void)
- 	return 0;
- }
- 
--static void raid6_test_exit(void)
-+static void __exit raid6_test_exit(void)
- {
- }
- 
-diff --git a/crypto/curve25519-generic.c b/crypto/curve25519-generic.c
-index bd88fd571393..d055b0784c77 100644
---- a/crypto/curve25519-generic.c
-+++ b/crypto/curve25519-generic.c
-@@ -72,12 +72,12 @@ static struct kpp_alg curve25519_alg = {
- 	.max_size		= curve25519_max_size,
- };
- 
--static int curve25519_init(void)
-+static int __init curve25519_init(void)
- {
- 	return crypto_register_kpp(&curve25519_alg);
- }
- 
--static void curve25519_exit(void)
-+static void __exit curve25519_exit(void)
- {
- 	crypto_unregister_kpp(&curve25519_alg);
- }
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 4406aeb1ff61..99c3b2ef7adc 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -893,7 +893,7 @@ static struct crypto_template crypto_ffdhe_templates[] = {};
- #endif /* CONFIG_CRYPTO_DH_RFC7919_GROUPS */
- 
- 
--static int dh_init(void)
-+static int __init dh_init(void)
- {
- 	int err;
- 
-@@ -911,7 +911,7 @@ static int dh_init(void)
- 	return 0;
- }
- 
--static void dh_exit(void)
-+static void __exit dh_exit(void)
- {
- 	crypto_unregister_templates(crypto_ffdhe_templates,
- 				    ARRAY_SIZE(crypto_ffdhe_templates));
-diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-index e4857d534344..80afee3234fb 100644
---- a/crypto/ecdh.c
-+++ b/crypto/ecdh.c
-@@ -200,7 +200,7 @@ static struct kpp_alg ecdh_nist_p384 = {
- 
- static bool ecdh_nist_p192_registered;
- 
--static int ecdh_init(void)
-+static int __init ecdh_init(void)
- {
- 	int ret;
- 
-@@ -227,7 +227,7 @@ static int ecdh_init(void)
- 	return ret;
- }
- 
--static void ecdh_exit(void)
-+static void __exit ecdh_exit(void)
- {
- 	if (ecdh_nist_p192_registered)
- 		crypto_unregister_kpp(&ecdh_nist_p192);
-diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index b3a8a6b572ba..fbd76498aba8 100644
---- a/crypto/ecdsa.c
-+++ b/crypto/ecdsa.c
-@@ -332,7 +332,7 @@ static struct akcipher_alg ecdsa_nist_p192 = {
- };
- static bool ecdsa_nist_p192_registered;
- 
--static int ecdsa_init(void)
-+static int __init ecdsa_init(void)
- {
- 	int ret;
- 
-@@ -359,7 +359,7 @@ static int ecdsa_init(void)
- 	return ret;
- }
- 
--static void ecdsa_exit(void)
-+static void __exit ecdsa_exit(void)
- {
- 	if (ecdsa_nist_p192_registered)
- 		crypto_unregister_akcipher(&ecdsa_nist_p192);
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index 0e555ee4addb..c50f2d2a4d06 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -327,7 +327,7 @@ static struct akcipher_alg rsa = {
- 	},
- };
- 
--static int rsa_init(void)
-+static int __init rsa_init(void)
- {
- 	int err;
- 
-@@ -344,7 +344,7 @@ static int rsa_init(void)
- 	return 0;
- }
- 
--static void rsa_exit(void)
-+static void __exit rsa_exit(void)
- {
- 	crypto_unregister_template(&rsa_pkcs1pad_tmpl);
- 	crypto_unregister_akcipher(&rsa);
-diff --git a/crypto/sm2.c b/crypto/sm2.c
-index f3e1592965c0..ed9307dac3d1 100644
---- a/crypto/sm2.c
-+++ b/crypto/sm2.c
-@@ -441,12 +441,12 @@ static struct akcipher_alg sm2 = {
- 	},
- };
- 
--static int sm2_init(void)
-+static int __init sm2_init(void)
- {
- 	return crypto_register_akcipher(&sm2);
- }
- 
--static void sm2_exit(void)
-+static void __exit sm2_exit(void)
- {
- 	crypto_unregister_akcipher(&sm2);
- }
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master arm64/for-next/core linus/master v6.0-rc5 next-20220914]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20220915/202209151738.j2RLe6VA-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/4cdd20e357a4c52a9479852d5464147100813280
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review wen-ping-teh-intel-com/crypto-intel-fcs-Add-crypto-service-driver-for-Intel-SoCFPGA/20220914-224700
+        git checkout 4cdd20e357a4c52a9479852d5464147100813280
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+>> ./usr/include/linux/intel_fcs-ioctl.h:40:9: error: unknown type name 'uint32_t'
+      40 |         uint32_t test_bit:1;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:41:9: error: unknown type name 'uint32_t'
+      41 |         uint32_t rsvd:31;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:56:9: error: unknown type name 'uint32_t'
+      56 |         uint32_t size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:66:9: error: unknown type name 'uint32_t'
+      66 |         uint32_t size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:79:9: error: unknown type name 'uint32_t'
+      79 |         uint32_t size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:80:9: error: unknown type name 'uint32_t'
+      80 |         uint32_t c_status;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:92:9: error: unknown type name 'uint32_t'
+      92 |         uint32_t src_size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:94:9: error: unknown type name 'uint32_t'
+      94 |         uint32_t dst_size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:106:9: error: unknown type name 'uint32_t'
+     106 |         uint32_t src_size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:108:9: error: unknown type name 'uint32_t'
+     108 |         uint32_t dst_size;
+         |         ^~~~~~~~
+   ./usr/include/linux/intel_fcs-ioctl.h:116:9: error: unknown type name 'uint32_t'
+     116 |         uint32_t rndm[8];
+         |         ^~~~~~~~
+
 -- 
-2.17.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
