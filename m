@@ -2,82 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656FFECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 03:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6835CECAAA1
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Sep 2022 03:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbiIODZ1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Sep 2022 23:25:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
+        id S229832AbiIODku (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Sep 2022 23:40:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230231AbiIODZ0 (ORCPT
+        with ESMTP id S230363AbiIODk1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Sep 2022 23:25:26 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642DC422F9;
-        Wed, 14 Sep 2022 20:25:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663212324; x=1694748324;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ZZsBcgBJQm4l4g5pNCmnqgaFEg0v9KwN5MLAaQq6q/0=;
-  b=Uc3JSgKEdV5CKa8ELqIp2QAe7V8LjJGqvd4Jv6TQzOXJiWcHCC5vB6GS
-   IAoyg8YmKdUO04maNZl1Y3Kx/WpsVbdwpi+il2ZK5AjF9ufguF2h9O0JH
-   a+UqdbDpT0pYl0/6Q2IYGMjHN/nP78Qnc1y9I6iK7nddoJAVVvEg6GNON
-   7Z6r6dWq/CyR1QVY74Qvm3DxpUZRF+BqUj9ngim/IhUnsFGkYcNUcBC6J
-   5BdYCw9ZotlPZfTD/QBo7UCkh5hFA379Hja9XAUr/V89tb6cymTa+zkDk
-   8Far6zACufu+oflV8Vm3HZcRigYzNOu+Jd86LfljnqxFIytL0GqoRaIZe
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="285641709"
-X-IronPort-AV: E=Sophos;i="5.93,316,1654585200"; 
-   d="scan'208";a="285641709"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2022 20:25:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,316,1654585200"; 
-   d="scan'208";a="742778603"
-Received: from unknown (HELO localhost.localdomain) ([10.226.216.116])
-  by orsmga004.jf.intel.com with ESMTP; 14 Sep 2022 20:25:18 -0700
-From:   wen.ping.teh@intel.com
-To:     wen.ping.teh@intel.com
-Cc:     bjorn.andersson@linaro.org, catalin.marinas@arm.com,
-        davem@davemloft.net, dinguyen@kernel.org,
-        dmitry.baryshkov@linaro.org, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shawnguo@kernel.org, will@kernel.org
-Subject: Re: [PATCH 0/2] crypto: intel-fcs: Add crypto service driver for Intel SoCFPGA
-Date:   Thu, 15 Sep 2022 11:25:06 +0800
-Message-Id: <20220915032506.641639-1-wen.ping.teh@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220914144137.605279-1-wen.ping.teh@intel.com>
-References: <20220914144137.605279-1-wen.ping.teh@intel.com>
+        Wed, 14 Sep 2022 23:40:27 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9719630D;
+        Wed, 14 Sep 2022 20:39:50 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MSjWg58ntzNmGp;
+        Thu, 15 Sep 2022 11:35:11 +0800 (CST)
+Received: from ubuntu1804.huawei.com (10.67.174.58) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 15 Sep 2022 11:39:48 +0800
+From:   Xiu Jianfeng <xiujianfeng@huawei.com>
+To:     <dan.j.williams@intel.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <trix@redhat.com>, <jarkko@kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: add __init/__exit annotations to init/exit funcs
+Date:   Thu, 15 Sep 2022 11:36:15 +0800
+Message-ID: <20220915033615.12478-1-xiujianfeng@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.67.174.58]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: wen.ping.teh@intel.com=0D
+Add missing __init/__exit annotations to init/exit funcs.
 
->This patch introduces a crypto service driver for Intel SoCFPGA=0D
->family. The FPGA Crypto Service (FCS) includes a large set of security=0D
->features that are provided by the Secure Device Manager(SDM) in FPGA.=0D
->The driver provide IOCTL interface for user to call the crypto services=0D
->and send them to SDM's mailbox.=0D
->=0D
->Teh Wen Ping (2):=0D
->  crypto: intel-fcs: crypto service driver for Intel SoCFPGA family=0D
->  arm64: defconfig: add CRYPTO_DEV_INTEL_FCS=0D
-Hi,=0D
-=0D
-I just found out that there was a previous attempt to upstream this driver=
-=0D
-2 years ago. It was NACK because it did not implement crypto API. Please=0D
-drop this review.=0D
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg44701.html=0D
-=0D
-I will move this driver to drivers/misc.=0D
-=0D
-Thanks,=0D
-Wen Ping=
+Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
+---
+ crypto/async_tx/raid6test.c | 4 ++--
+ crypto/curve25519-generic.c | 4 ++--
+ crypto/dh.c                 | 4 ++--
+ crypto/ecdh.c               | 4 ++--
+ crypto/ecdsa.c              | 4 ++--
+ crypto/rsa.c                | 4 ++--
+ crypto/sm2.c                | 4 ++--
+ 7 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
+index c9d218e53bcb..9719c7520661 100644
+--- a/crypto/async_tx/raid6test.c
++++ b/crypto/async_tx/raid6test.c
+@@ -189,7 +189,7 @@ static int test(int disks, int *tests)
+ }
+ 
+ 
+-static int raid6_test(void)
++static int __init raid6_test(void)
+ {
+ 	int err = 0;
+ 	int tests = 0;
+@@ -236,7 +236,7 @@ static int raid6_test(void)
+ 	return 0;
+ }
+ 
+-static void raid6_test_exit(void)
++static void __exit raid6_test_exit(void)
+ {
+ }
+ 
+diff --git a/crypto/curve25519-generic.c b/crypto/curve25519-generic.c
+index bd88fd571393..d055b0784c77 100644
+--- a/crypto/curve25519-generic.c
++++ b/crypto/curve25519-generic.c
+@@ -72,12 +72,12 @@ static struct kpp_alg curve25519_alg = {
+ 	.max_size		= curve25519_max_size,
+ };
+ 
+-static int curve25519_init(void)
++static int __init curve25519_init(void)
+ {
+ 	return crypto_register_kpp(&curve25519_alg);
+ }
+ 
+-static void curve25519_exit(void)
++static void __exit curve25519_exit(void)
+ {
+ 	crypto_unregister_kpp(&curve25519_alg);
+ }
+diff --git a/crypto/dh.c b/crypto/dh.c
+index 4406aeb1ff61..99c3b2ef7adc 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -893,7 +893,7 @@ static struct crypto_template crypto_ffdhe_templates[] = {};
+ #endif /* CONFIG_CRYPTO_DH_RFC7919_GROUPS */
+ 
+ 
+-static int dh_init(void)
++static int __init dh_init(void)
+ {
+ 	int err;
+ 
+@@ -911,7 +911,7 @@ static int dh_init(void)
+ 	return 0;
+ }
+ 
+-static void dh_exit(void)
++static void __exit dh_exit(void)
+ {
+ 	crypto_unregister_templates(crypto_ffdhe_templates,
+ 				    ARRAY_SIZE(crypto_ffdhe_templates));
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index e4857d534344..80afee3234fb 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -200,7 +200,7 @@ static struct kpp_alg ecdh_nist_p384 = {
+ 
+ static bool ecdh_nist_p192_registered;
+ 
+-static int ecdh_init(void)
++static int __init ecdh_init(void)
+ {
+ 	int ret;
+ 
+@@ -227,7 +227,7 @@ static int ecdh_init(void)
+ 	return ret;
+ }
+ 
+-static void ecdh_exit(void)
++static void __exit ecdh_exit(void)
+ {
+ 	if (ecdh_nist_p192_registered)
+ 		crypto_unregister_kpp(&ecdh_nist_p192);
+diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+index b3a8a6b572ba..fbd76498aba8 100644
+--- a/crypto/ecdsa.c
++++ b/crypto/ecdsa.c
+@@ -332,7 +332,7 @@ static struct akcipher_alg ecdsa_nist_p192 = {
+ };
+ static bool ecdsa_nist_p192_registered;
+ 
+-static int ecdsa_init(void)
++static int __init ecdsa_init(void)
+ {
+ 	int ret;
+ 
+@@ -359,7 +359,7 @@ static int ecdsa_init(void)
+ 	return ret;
+ }
+ 
+-static void ecdsa_exit(void)
++static void __exit ecdsa_exit(void)
+ {
+ 	if (ecdsa_nist_p192_registered)
+ 		crypto_unregister_akcipher(&ecdsa_nist_p192);
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 0e555ee4addb..c50f2d2a4d06 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -327,7 +327,7 @@ static struct akcipher_alg rsa = {
+ 	},
+ };
+ 
+-static int rsa_init(void)
++static int __init rsa_init(void)
+ {
+ 	int err;
+ 
+@@ -344,7 +344,7 @@ static int rsa_init(void)
+ 	return 0;
+ }
+ 
+-static void rsa_exit(void)
++static void __exit rsa_exit(void)
+ {
+ 	crypto_unregister_template(&rsa_pkcs1pad_tmpl);
+ 	crypto_unregister_akcipher(&rsa);
+diff --git a/crypto/sm2.c b/crypto/sm2.c
+index f3e1592965c0..ed9307dac3d1 100644
+--- a/crypto/sm2.c
++++ b/crypto/sm2.c
+@@ -441,12 +441,12 @@ static struct akcipher_alg sm2 = {
+ 	},
+ };
+ 
+-static int sm2_init(void)
++static int __init sm2_init(void)
+ {
+ 	return crypto_register_akcipher(&sm2);
+ }
+ 
+-static void sm2_exit(void)
++static void __exit sm2_exit(void)
+ {
+ 	crypto_unregister_akcipher(&sm2);
+ }
+-- 
+2.17.1
+
