@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7288DC54EE9
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 12:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA3AC54EE9
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 12:58:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiIPM6H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 08:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46350 "EHLO
+        id S229911AbiIPM6M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Sep 2022 08:58:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231139AbiIPM6C (ORCPT
+        with ESMTP id S229704AbiIPM6I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 08:58:02 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C20B7F244
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 05:58:00 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id s14-20020a17090a6e4e00b0020057c70943so25611699pjm.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 05:58:00 -0700 (PDT)
+        Fri, 16 Sep 2022 08:58:08 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F887FE58
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 05:58:05 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id y11so4070261pjv.4
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 05:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date;
-        bh=NhrqvZnuCci1IT2EJoYVm3Gz6nKG5qgvgSBl8lC0wuI=;
-        b=g8Z8/IKXJOcv5iloSzH+uybTFS1ICtauq+zJ+Z8SCZZ+b2hhbv0i4GVyeF1OZaoHFz
-         yRpBsTKu4xUoDs7iNyzLd4w8jDDL5V/CLfd8ZW93gyTthi35H1hgvm5nEx3F0H4wKUHM
-         rwgEzWRQHzy+qv9qlm4cqC9H1N4JDekGCUeAAkRvO0asca7V7Gbo+/ffd604+57cY5ng
-         UGs823lVNvzP2/Xvu3asSgIOhMGjewR2o7IrX6rL4A/WdTfk+qCzotn3tHrt2VUNNwMl
-         OuCyVVwbzg96bqp8CwT/t3SAO1QwaKxdW51rCI7wZO1HnbRUXALq4OL4Wcosc2TV7yVt
-         qYeg==
+        bh=+b1LNMkw+AsZnkJK2RUecEmgTskW+kmbfzR8NVlHipA=;
+        b=j+eyxj6OS5nMKPlJMzSmNmvCsxV0RB2jYdSZJyo8gJ+0q3IoYDya+Ccp8SvaEJT3Od
+         AJPRCaXqHJMoOavzv8UezumUHS25rOaXMwn4N0PHeUKu+wzpby5IcNEBkYERDvF0gZzC
+         MovaBjJhy4fdfBByeu18cdz0enEI8sk9JVn2GPnunXpkaOTjbSl3EXPO2DaPYHHOMk/f
+         c1ETkSrpdnD6ZTNldoSHBuAc821xY7IFfSQhkFcu3V001Pv13mG4Eqyd0MAfPPK85Ubw
+         baJyhlooHbwlAfB+BlXmVR+vm4edPf5y2YvIZcexmRuUanuJdsFWf/lEBqZaVqcZNgev
+         QJUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=NhrqvZnuCci1IT2EJoYVm3Gz6nKG5qgvgSBl8lC0wuI=;
-        b=Z47WgP3cM/rO6e4C7idHtn/SMFfnaKi12oKD0ijC9xiiBORPScL04BSfVkLfzeGmhN
-         ebg35ez5OqaKbAMomW4L64KieBFiIEuA0CRWS2vajrOWW9WodoJ0M6hTnHaGRVU3AGlx
-         Ff//EGl8MNsjMK1Guyu0M4WqffOAKIv8rZKWGl5vcczGoqZjvE89jLFcn9W9hmZA8crP
-         5oyAf3xVescprzBTNJRIh+E7fehw3Zvjejcc0hiYFMM7+ooBQH3PC12KyJaX45CGhaKL
-         ggWQ+2D87bnlXIRZkmmgbxjJOoCAYeASNMyFefYm/ec4gKw852ArJjyT8NHRq+yQge9v
-         jrNA==
-X-Gm-Message-State: ACrzQf0Ub/H29VkyqXgRhvP2YA7/WHiLJga+ZCBFYwVHOQf9RUqb61a/
-        Wm6TgUxN5yUi7wfs3BrV/xtdtzlj7LE=
-X-Google-Smtp-Source: AMsMyM7RTRg7SpbZTJQ+we3AbL/qvOFwFBHcwSMkpDrJaTXiHZfe0LguJL/PyAWweT10+D+hK/t5Sw==
-X-Received: by 2002:a17:902:e742:b0:176:dc6b:eecc with SMTP id p2-20020a170902e74200b00176dc6beeccmr4763422plf.104.1663333079435;
-        Fri, 16 Sep 2022 05:57:59 -0700 (PDT)
+        bh=+b1LNMkw+AsZnkJK2RUecEmgTskW+kmbfzR8NVlHipA=;
+        b=XXumjadq5UlU29csWI0hIoZJ+QPx67hnZTBryX9DlkFQavnvNIbq8Ss5rJHJ+X53tG
+         ptpxKj1vUH146PCBLRn1pC8hZLy/q3hULBOE2EYpDwulGwvQA2Aydbf5HeaNGHJEi81S
+         H6c8bzSpBGkkoC3yTfzSjwvIYf1GtxHXDmSOqL+RWBO3Ftk6e83AL62kdw6Iz5GxLdJJ
+         cHbOtbflm7aLKeWWMG9J9db+6pjBfzPUMt0RABtJcttSdIFGJiW27kNUs6CRh4EaBmf1
+         USM3qxmE1wRZCaOXnsXwGCFvEE87zqQSD1O2WfXcBuRynDlq8Tzja7nTfsCP9/Al2aKi
+         eb5g==
+X-Gm-Message-State: ACrzQf0d7OboxKqy5bjv73rf9B5fEqi9yBU7bHZwr3u/G5k29MlzTgwK
+        t6lpRlO7B3WxDoBl5+d7Imli80u4nWs=
+X-Google-Smtp-Source: AMsMyM7HRazGXfw0yLsibwNUyeSoUcSmnARIv6AIttJq/nd7zmfJ65vGQrqAXDp53qeATO3EZt8zpA==
+X-Received: by 2002:a17:902:d591:b0:172:689f:1059 with SMTP id k17-20020a170902d59100b00172689f1059mr4708648plh.121.1663333083682;
+        Fri, 16 Sep 2022 05:58:03 -0700 (PDT)
 Received: from localhost.localdomain ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id f20-20020a170902f39400b0017829a3df46sm11941062ple.204.2022.09.16.05.57.55
+        by smtp.gmail.com with ESMTPSA id f20-20020a170902f39400b0017829a3df46sm11941062ple.204.2022.09.16.05.57.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 05:57:58 -0700 (PDT)
+        Fri, 16 Sep 2022 05:58:02 -0700 (PDT)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
@@ -55,9 +55,9 @@ To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         hpa@zytor.com, jussi.kivilinna@iki.fi, elliott@hpe.com,
         peterz@infradead.org
 Cc:     ap420073@gmail.com
-Subject: [PATCH v4 1/3] crypto: aria: prepare generic module for optimized implementations
-Date:   Fri, 16 Sep 2022 12:57:34 +0000
-Message-Id: <20220916125736.23598-2-ap420073@gmail.com>
+Subject: [PATCH v4 2/3] crypto: aria-avx: add AES-NI/AVX/x86_64/GFNI assembler implementation of aria cipher
+Date:   Fri, 16 Sep 2022 12:57:35 +0000
+Message-Id: <20220916125736.23598-3-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220916125736.23598-1-ap420073@gmail.com>
 References: <20220916125736.23598-1-ap420073@gmail.com>
@@ -65,174 +65,1678 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It renames aria to aria_generic and exports some functions such as
-aria_set_key(), aria_encrypt(), and aria_decrypt() to be able to be
-used by aria-avx implementation.
+The implementation is based on the 32-bit implementation of the aria.
+Also, aria-avx process steps are the similar to the camellia-avx.
+1. Byteslice(16way)
+2. Add-round-key.
+3. Sbox
+4. Diffusion layer.
+
+Except for s-box, all steps are the same as the aria-generic
+implementation. s-box step is very similar to camellia and
+sm4 implementation.
+
+There are 2 implementations for s-box step.
+One is to use AES-NI and affine transformation, which is the same as
+Camellia, sm4, and others.
+Another is to use GFNI.
+GFNI implementation is faster than AES-NI implementation.
+So, it uses GFNI implementation if the running CPU supports GFNI.
+
+There are 4 s-boxes in the ARIA and the 2 s-boxes are the same as
+AES's s-boxes.
+
+To calculate the first sbox, it just uses the aesenclast and then
+inverts shift_row.
+No more process is needed for this job because the first s-box is
+the same as the AES encryption s-box.
+
+To calculate the second sbox(invert of s1), it just uses the aesdeclast
+and then inverts shift_row.
+No more process is needed for this job because the second s-box is
+the same as the AES decryption s-box.
+
+To calculate the third s-box, it uses the aesenclast,
+then affine transformation, which is combined AES inverse affine and
+ARIA S2.
+
+To calculate the last s-box, it uses the aesdeclast,
+then affine transformation, which is combined X2 and AES forward affine.
+
+The optimized third and last s-box logic and GFNI s-box logic are
+implemented by Jussi Kivilinna.
+
+The aria-generic implementation is based on a 32-bit implementation,
+not an 8-bit implementation. the aria-avx Diffusion Layer implementation
+is based on aria-generic implementation because 8-bit implementation is
+not fit for parallel implementation but 32-bit is enough to fit for this.
 
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v4:
- - No changes.
+ - Fix sparse warning.
+ - Remove .align statement for .text
+   - https://lkml.kernel.org/r/20220915111144.248229966@infradead.org
 
 v3:
- - No changes.
+ - Use ECB macro instead of opencode.
+ - Implement ctr(aria-avx).
+ - Improve performance(20% ~ 30%) with combined affine transformation
+   for S2 and X2.
+   - Implemented by Jussi Kivilinna.
+ - Improve performance( ~ 55%) with GFNI.
+   - Implemented by Jussi Kivilinna.
+ - Rebase and fix Kconfig
 
 v2:
- - No changes.
+ - Do not call non-FPU functions(aria_{encrypt | decrypt}()) in the
+   FPU context.
+ - Do not acquire FPU context for too long.
 
- crypto/Makefile                   |  2 +-
- crypto/{aria.c => aria_generic.c} | 39 +++++++++++++++++++++++++------
- include/crypto/aria.h             | 17 ++++++--------
- 3 files changed, 40 insertions(+), 18 deletions(-)
- rename crypto/{aria.c => aria_generic.c} (86%)
+ arch/x86/crypto/Kconfig                 |   18 +
+ arch/x86/crypto/Makefile                |    3 +
+ arch/x86/crypto/aria-aesni-avx-asm_64.S | 1303 +++++++++++++++++++++++
+ arch/x86/crypto/aria-avx.h              |   16 +
+ arch/x86/crypto/aria_aesni_avx_glue.c   |  213 ++++
+ 5 files changed, 1553 insertions(+)
+ create mode 100644 arch/x86/crypto/aria-aesni-avx-asm_64.S
+ create mode 100644 arch/x86/crypto/aria-avx.h
+ create mode 100644 arch/x86/crypto/aria_aesni_avx_glue.c
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index a6f94e04e1da..303b21c43df0 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -149,7 +149,7 @@ obj-$(CONFIG_CRYPTO_TEA) += tea.o
- obj-$(CONFIG_CRYPTO_KHAZAD) += khazad.o
- obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
- obj-$(CONFIG_CRYPTO_SEED) += seed.o
--obj-$(CONFIG_CRYPTO_ARIA) += aria.o
-+obj-$(CONFIG_CRYPTO_ARIA) += aria_generic.o
- obj-$(CONFIG_CRYPTO_CHACHA20) += chacha_generic.o
- obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
- obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
-diff --git a/crypto/aria.c b/crypto/aria_generic.c
-similarity index 86%
-rename from crypto/aria.c
-rename to crypto/aria_generic.c
-index ac3dffac34bb..4cc29b82b99d 100644
---- a/crypto/aria.c
-+++ b/crypto/aria_generic.c
-@@ -16,6 +16,14 @@
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index 9bb0f7939c6b..71c4c473d34b 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -286,6 +286,24 @@ config CRYPTO_TWOFISH_AVX_X86_64
  
- #include <crypto/aria.h>
+ 	  Processes eight blocks in parallel.
  
-+static const u32 key_rc[20] = {
-+	0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0,
-+	0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0,
-+	0xdb92371d, 0x2126e970, 0x03249775, 0x04e8c90e,
-+	0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0,
-+	0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0
++config CRYPTO_ARIA_AESNI_AVX_X86_64
++	tristate "Ciphers: ARIA with modes: ECB, CTR (AES-NI/AVX/GFNI)"
++	depends on X86 && 64BIT
++	select CRYPTO_SKCIPHER
++	select CRYPTO_SIMD
++	select CRYPTO_ALGAPI
++	select CRYPTO_ARIA
++	help
++	  Length-preserving cipher: ARIA cipher algorithms
++	  (RFC 5794) with ECB and CTR modes
++
++	  Architecture: x86_64 using:
++	  - AES-NI (AES New Instructions)
++	  - AVX (Advanced Vector Extensions)
++	  - GFNI (Galois Field New Instructions)
++
++	  Processes 16 blocks in parallel.
++
+ config CRYPTO_CHACHA20_X86_64
+ 	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (SSSE3/AVX2/AVX-512VL)"
+ 	depends on X86 && 64BIT
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 04d07ab744b2..3b1d701a4f6c 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -100,6 +100,9 @@ sm4-aesni-avx-x86_64-y := sm4-aesni-avx-asm_64.o sm4_aesni_avx_glue.o
+ obj-$(CONFIG_CRYPTO_SM4_AESNI_AVX2_X86_64) += sm4-aesni-avx2-x86_64.o
+ sm4-aesni-avx2-x86_64-y := sm4-aesni-avx2-asm_64.o sm4_aesni_avx2_glue.o
+ 
++obj-$(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) += aria-aesni-avx-x86_64.o
++aria-aesni-avx-x86_64-y := aria-aesni-avx-asm_64.o aria_aesni_avx_glue.o
++
+ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $< > $@
+ $(obj)/%.S: $(src)/%.pl FORCE
+diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+new file mode 100644
+index 000000000000..c75fd7d015ed
+--- /dev/null
++++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+@@ -0,0 +1,1303 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * ARIA Cipher 16-way parallel algorithm (AVX)
++ *
++ * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
++ *
++ */
++
++#include <linux/linkage.h>
++#include <asm/frame.h>
++
++/* struct aria_ctx: */
++#define enc_key 0
++#define dec_key 272
++#define rounds 544
++
++/* register macros */
++#define CTX %rdi
++
++
++#define BV8(a0, a1, a2, a3, a4, a5, a6, a7)		\
++	( (((a0) & 1) << 0) |				\
++	  (((a1) & 1) << 1) |				\
++	  (((a2) & 1) << 2) |				\
++	  (((a3) & 1) << 3) |				\
++	  (((a4) & 1) << 4) |				\
++	  (((a5) & 1) << 5) |				\
++	  (((a6) & 1) << 6) |				\
++	  (((a7) & 1) << 7) )
++
++#define BM8X8(l0, l1, l2, l3, l4, l5, l6, l7)		\
++	( ((l7) << (0 * 8)) |				\
++	  ((l6) << (1 * 8)) |				\
++	  ((l5) << (2 * 8)) |				\
++	  ((l4) << (3 * 8)) |				\
++	  ((l3) << (4 * 8)) |				\
++	  ((l2) << (5 * 8)) |				\
++	  ((l1) << (6 * 8)) |				\
++	  ((l0) << (7 * 8)) )
++
++#define inc_le128(x, minus_one, tmp)			\
++	vpcmpeqq minus_one, x, tmp;			\
++	vpsubq minus_one, x, x;				\
++	vpslldq $8, tmp, tmp;				\
++	vpsubq tmp, x, x;
++
++#define filter_8bit(x, lo_t, hi_t, mask4bit, tmp0)	\
++	vpand x, mask4bit, tmp0;			\
++	vpandn x, mask4bit, x;				\
++	vpsrld $4, x, x;				\
++							\
++	vpshufb tmp0, lo_t, tmp0;			\
++	vpshufb x, hi_t, x;				\
++	vpxor tmp0, x, x;
++
++#define transpose_4x4(x0, x1, x2, x3, t1, t2)		\
++	vpunpckhdq x1, x0, t2;				\
++	vpunpckldq x1, x0, x0;				\
++							\
++	vpunpckldq x3, x2, t1;				\
++	vpunpckhdq x3, x2, x2;				\
++							\
++	vpunpckhqdq t1, x0, x1;				\
++	vpunpcklqdq t1, x0, x0;				\
++							\
++	vpunpckhqdq x2, t2, x3;				\
++	vpunpcklqdq x2, t2, x2;
++
++#define byteslice_16x16b(a0, b0, c0, d0,		\
++			 a1, b1, c1, d1,		\
++			 a2, b2, c2, d2,		\
++			 a3, b3, c3, d3,		\
++			 st0, st1)			\
++	vmovdqu d2, st0;				\
++	vmovdqu d3, st1;				\
++	transpose_4x4(a0, a1, a2, a3, d2, d3);		\
++	transpose_4x4(b0, b1, b2, b3, d2, d3);		\
++	vmovdqu st0, d2;				\
++	vmovdqu st1, d3;				\
++							\
++	vmovdqu a0, st0;				\
++	vmovdqu a1, st1;				\
++	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
++	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
++							\
++	vmovdqu .Lshufb_16x16b, a0;			\
++	vmovdqu st1, a1;				\
++	vpshufb a0, a2, a2;				\
++	vpshufb a0, a3, a3;				\
++	vpshufb a0, b0, b0;				\
++	vpshufb a0, b1, b1;				\
++	vpshufb a0, b2, b2;				\
++	vpshufb a0, b3, b3;				\
++	vpshufb a0, a1, a1;				\
++	vpshufb a0, c0, c0;				\
++	vpshufb a0, c1, c1;				\
++	vpshufb a0, c2, c2;				\
++	vpshufb a0, c3, c3;				\
++	vpshufb a0, d0, d0;				\
++	vpshufb a0, d1, d1;				\
++	vpshufb a0, d2, d2;				\
++	vpshufb a0, d3, d3;				\
++	vmovdqu d3, st1;				\
++	vmovdqu st0, d3;				\
++	vpshufb a0, d3, a0;				\
++	vmovdqu d2, st0;				\
++							\
++	transpose_4x4(a0, b0, c0, d0, d2, d3);		\
++	transpose_4x4(a1, b1, c1, d1, d2, d3);		\
++	vmovdqu st0, d2;				\
++	vmovdqu st1, d3;				\
++							\
++	vmovdqu b0, st0;				\
++	vmovdqu b1, st1;				\
++	transpose_4x4(a2, b2, c2, d2, b0, b1);		\
++	transpose_4x4(a3, b3, c3, d3, b0, b1);		\
++	vmovdqu st0, b0;				\
++	vmovdqu st1, b1;				\
++	/* does not adjust output bytes inside vectors */
++
++#define debyteslice_16x16b(a0, b0, c0, d0,		\
++			   a1, b1, c1, d1,		\
++			   a2, b2, c2, d2,		\
++			   a3, b3, c3, d3,		\
++			   st0, st1)			\
++	vmovdqu d2, st0;				\
++	vmovdqu d3, st1;				\
++	transpose_4x4(a0, a1, a2, a3, d2, d3);		\
++	transpose_4x4(b0, b1, b2, b3, d2, d3);		\
++	vmovdqu st0, d2;				\
++	vmovdqu st1, d3;				\
++							\
++	vmovdqu a0, st0;				\
++	vmovdqu a1, st1;				\
++	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
++	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
++							\
++	vmovdqu .Lshufb_16x16b, a0;			\
++	vmovdqu st1, a1;				\
++	vpshufb a0, a2, a2;				\
++	vpshufb a0, a3, a3;				\
++	vpshufb a0, b0, b0;				\
++	vpshufb a0, b1, b1;				\
++	vpshufb a0, b2, b2;				\
++	vpshufb a0, b3, b3;				\
++	vpshufb a0, a1, a1;				\
++	vpshufb a0, c0, c0;				\
++	vpshufb a0, c1, c1;				\
++	vpshufb a0, c2, c2;				\
++	vpshufb a0, c3, c3;				\
++	vpshufb a0, d0, d0;				\
++	vpshufb a0, d1, d1;				\
++	vpshufb a0, d2, d2;				\
++	vpshufb a0, d3, d3;				\
++	vmovdqu d3, st1;				\
++	vmovdqu st0, d3;				\
++	vpshufb a0, d3, a0;				\
++	vmovdqu d2, st0;				\
++							\
++	transpose_4x4(c0, d0, a0, b0, d2, d3);		\
++	transpose_4x4(c1, d1, a1, b1, d2, d3);		\
++	vmovdqu st0, d2;				\
++	vmovdqu st1, d3;				\
++							\
++	vmovdqu b0, st0;				\
++	vmovdqu b1, st1;				\
++	transpose_4x4(c2, d2, a2, b2, b0, b1);		\
++	transpose_4x4(c3, d3, a3, b3, b0, b1);		\
++	vmovdqu st0, b0;				\
++	vmovdqu st1, b1;				\
++	/* does not adjust output bytes inside vectors */
++
++/* load blocks to registers and apply pre-whitening */
++#define inpack16_pre(x0, x1, x2, x3,			\
++		     x4, x5, x6, x7,			\
++		     y0, y1, y2, y3,			\
++		     y4, y5, y6, y7,			\
++		     rio)				\
++	vmovdqu (0 * 16)(rio), x0;			\
++	vmovdqu (1 * 16)(rio), x1;			\
++	vmovdqu (2 * 16)(rio), x2;			\
++	vmovdqu (3 * 16)(rio), x3;			\
++	vmovdqu (4 * 16)(rio), x4;			\
++	vmovdqu (5 * 16)(rio), x5;			\
++	vmovdqu (6 * 16)(rio), x6;			\
++	vmovdqu (7 * 16)(rio), x7;			\
++	vmovdqu (8 * 16)(rio), y0;			\
++	vmovdqu (9 * 16)(rio), y1;			\
++	vmovdqu (10 * 16)(rio), y2;			\
++	vmovdqu (11 * 16)(rio), y3;			\
++	vmovdqu (12 * 16)(rio), y4;			\
++	vmovdqu (13 * 16)(rio), y5;			\
++	vmovdqu (14 * 16)(rio), y6;			\
++	vmovdqu (15 * 16)(rio), y7;
++
++/* byteslice pre-whitened blocks and store to temporary memory */
++#define inpack16_post(x0, x1, x2, x3,			\
++		      x4, x5, x6, x7,			\
++		      y0, y1, y2, y3,			\
++		      y4, y5, y6, y7,			\
++		      mem_ab, mem_cd)			\
++	byteslice_16x16b(x0, x1, x2, x3,		\
++			 x4, x5, x6, x7,		\
++			 y0, y1, y2, y3,		\
++			 y4, y5, y6, y7,		\
++			 (mem_ab), (mem_cd));		\
++							\
++	vmovdqu x0, 0 * 16(mem_ab);			\
++	vmovdqu x1, 1 * 16(mem_ab);			\
++	vmovdqu x2, 2 * 16(mem_ab);			\
++	vmovdqu x3, 3 * 16(mem_ab);			\
++	vmovdqu x4, 4 * 16(mem_ab);			\
++	vmovdqu x5, 5 * 16(mem_ab);			\
++	vmovdqu x6, 6 * 16(mem_ab);			\
++	vmovdqu x7, 7 * 16(mem_ab);			\
++	vmovdqu y0, 0 * 16(mem_cd);			\
++	vmovdqu y1, 1 * 16(mem_cd);			\
++	vmovdqu y2, 2 * 16(mem_cd);			\
++	vmovdqu y3, 3 * 16(mem_cd);			\
++	vmovdqu y4, 4 * 16(mem_cd);			\
++	vmovdqu y5, 5 * 16(mem_cd);			\
++	vmovdqu y6, 6 * 16(mem_cd);			\
++	vmovdqu y7, 7 * 16(mem_cd);
++
++#define write_output(x0, x1, x2, x3,			\
++		     x4, x5, x6, x7,			\
++		     y0, y1, y2, y3,			\
++		     y4, y5, y6, y7,			\
++		     mem)				\
++	vmovdqu x0, 0 * 16(mem);			\
++	vmovdqu x1, 1 * 16(mem);			\
++	vmovdqu x2, 2 * 16(mem);			\
++	vmovdqu x3, 3 * 16(mem);			\
++	vmovdqu x4, 4 * 16(mem);			\
++	vmovdqu x5, 5 * 16(mem);			\
++	vmovdqu x6, 6 * 16(mem);			\
++	vmovdqu x7, 7 * 16(mem);			\
++	vmovdqu y0, 8 * 16(mem);			\
++	vmovdqu y1, 9 * 16(mem);			\
++	vmovdqu y2, 10 * 16(mem);			\
++	vmovdqu y3, 11 * 16(mem);			\
++	vmovdqu y4, 12 * 16(mem);			\
++	vmovdqu y5, 13 * 16(mem);			\
++	vmovdqu y6, 14 * 16(mem);			\
++	vmovdqu y7, 15 * 16(mem);			\
++
++#define aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, idx)		\
++	vmovdqu x0, ((idx + 0) * 16)(mem_tmp);		\
++	vmovdqu x1, ((idx + 1) * 16)(mem_tmp);		\
++	vmovdqu x2, ((idx + 2) * 16)(mem_tmp);		\
++	vmovdqu x3, ((idx + 3) * 16)(mem_tmp);		\
++	vmovdqu x4, ((idx + 4) * 16)(mem_tmp);		\
++	vmovdqu x5, ((idx + 5) * 16)(mem_tmp);		\
++	vmovdqu x6, ((idx + 6) * 16)(mem_tmp);		\
++	vmovdqu x7, ((idx + 7) * 16)(mem_tmp);
++
++#define aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, idx)		\
++	vmovdqu ((idx + 0) * 16)(mem_tmp), x0;		\
++	vmovdqu ((idx + 1) * 16)(mem_tmp), x1;		\
++	vmovdqu ((idx + 2) * 16)(mem_tmp), x2;		\
++	vmovdqu ((idx + 3) * 16)(mem_tmp), x3;		\
++	vmovdqu ((idx + 4) * 16)(mem_tmp), x4;		\
++	vmovdqu ((idx + 5) * 16)(mem_tmp), x5;		\
++	vmovdqu ((idx + 6) * 16)(mem_tmp), x6;		\
++	vmovdqu ((idx + 7) * 16)(mem_tmp), x7;
++
++#define aria_ark_8way(x0, x1, x2, x3,			\
++		      x4, x5, x6, x7,			\
++		      t0, rk, idx, round)		\
++	/* AddRoundKey */                               \
++	vpbroadcastb ((round * 16) + idx + 3)(rk), t0;	\
++	vpxor t0, x0, x0;				\
++	vpbroadcastb ((round * 16) + idx + 2)(rk), t0;	\
++	vpxor t0, x1, x1;				\
++	vpbroadcastb ((round * 16) + idx + 1)(rk), t0;	\
++	vpxor t0, x2, x2;				\
++	vpbroadcastb ((round * 16) + idx + 0)(rk), t0;	\
++	vpxor t0, x3, x3;				\
++	vpbroadcastb ((round * 16) + idx + 7)(rk), t0;	\
++	vpxor t0, x4, x4;				\
++	vpbroadcastb ((round * 16) + idx + 6)(rk), t0;	\
++	vpxor t0, x5, x5;				\
++	vpbroadcastb ((round * 16) + idx + 5)(rk), t0;	\
++	vpxor t0, x6, x6;				\
++	vpbroadcastb ((round * 16) + idx + 4)(rk), t0;	\
++	vpxor t0, x7, x7;
++
++#define aria_sbox_8way_gfni(x0, x1, x2, x3,		\
++			    x4, x5, x6, x7,		\
++			    t0, t1, t2, t3,		\
++			    t4, t5, t6, t7)		\
++	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
++	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
++	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
++	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
++	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
++	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
++	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
++	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
++	vgf2p8affineqb $(tf_inv_const), t1, x6, x6;	\
++	vgf2p8affineinvqb $0, t2, x2, x2;		\
++	vgf2p8affineinvqb $0, t2, x6, x6;		\
++	vgf2p8affineinvqb $(tf_aff_const), t3, x0, x0;	\
++	vgf2p8affineinvqb $(tf_aff_const), t3, x4, x4;	\
++	vgf2p8affineqb $(tf_x2_const), t4, x3, x3;	\
++	vgf2p8affineqb $(tf_x2_const), t4, x7, x7;	\
++	vgf2p8affineinvqb $0, t2, x3, x3;		\
++	vgf2p8affineinvqb $0, t2, x7, x7
++
++#define aria_sbox_8way(x0, x1, x2, x3,            	\
++		       x4, x5, x6, x7,			\
++		       t0, t1, t2, t3,			\
++		       t4, t5, t6, t7)			\
++	vpxor t7, t7, t7;				\
++	vmovdqa .Linv_shift_row, t0;			\
++	vmovdqa .Lshift_row, t1;			\
++	vpbroadcastd .L0f0f0f0f, t6;			\
++	vmovdqa .Ltf_lo__inv_aff__and__s2, t2;		\
++	vmovdqa .Ltf_hi__inv_aff__and__s2, t3;		\
++	vmovdqa .Ltf_lo__x2__and__fwd_aff, t4;		\
++	vmovdqa .Ltf_hi__x2__and__fwd_aff, t5;		\
++							\
++	vaesenclast t7, x0, x0;				\
++	vaesenclast t7, x4, x4;				\
++	vaesenclast t7, x1, x1;				\
++	vaesenclast t7, x5, x5;				\
++	vaesdeclast t7, x2, x2;				\
++	vaesdeclast t7, x6, x6;				\
++							\
++	/* AES inverse shift rows */			\
++	vpshufb t0, x0, x0;				\
++	vpshufb t0, x4, x4;				\
++	vpshufb t0, x1, x1;				\
++	vpshufb t0, x5, x5;				\
++	vpshufb t1, x3, x3;				\
++	vpshufb t1, x7, x7;				\
++	vpshufb t1, x2, x2;				\
++	vpshufb t1, x6, x6;				\
++							\
++	/* affine transformation for S2 */		\
++	filter_8bit(x1, t2, t3, t6, t0);		\
++	/* affine transformation for S2 */		\
++	filter_8bit(x5, t2, t3, t6, t0);		\
++							\
++	/* affine transformation for X2 */		\
++	filter_8bit(x3, t4, t5, t6, t0);		\
++	/* affine transformation for X2 */		\
++	filter_8bit(x7, t4, t5, t6, t0);		\
++	vaesdeclast t7, x3, x3;				\
++	vaesdeclast t7, x7, x7;
++
++#define aria_diff_m(x0, x1, x2, x3,			\
++		    t0, t1, t2, t3)			\
++	/* T = rotr32(X, 8); */				\
++	/* X ^= T */					\
++	vpxor x0, x3, t0;				\
++	vpxor x1, x0, t1;				\
++	vpxor x2, x1, t2;				\
++	vpxor x3, x2, t3;				\
++	/* X = T ^ rotr(X, 16); */			\
++	vpxor t2, x0, x0;				\
++	vpxor x1, t3, t3;				\
++	vpxor t0, x2, x2;				\
++	vpxor t1, x3, x1;				\
++	vmovdqu t3, x3;
++
++#define aria_diff_word(x0, x1, x2, x3,			\
++		       x4, x5, x6, x7,			\
++		       y0, y1, y2, y3,			\
++		       y4, y5, y6, y7)			\
++	/* t1 ^= t2; */					\
++	vpxor y0, x4, x4;				\
++	vpxor y1, x5, x5;				\
++	vpxor y2, x6, x6;				\
++	vpxor y3, x7, x7;				\
++							\
++	/* t2 ^= t3; */					\
++	vpxor y4, y0, y0;				\
++	vpxor y5, y1, y1;				\
++	vpxor y6, y2, y2;				\
++	vpxor y7, y3, y3;				\
++							\
++	/* t0 ^= t1; */					\
++	vpxor x4, x0, x0;				\
++	vpxor x5, x1, x1;				\
++	vpxor x6, x2, x2;				\
++	vpxor x7, x3, x3;				\
++							\
++	/* t3 ^= t1; */					\
++	vpxor x4, y4, y4;				\
++	vpxor x5, y5, y5;				\
++	vpxor x6, y6, y6;				\
++	vpxor x7, y7, y7;				\
++							\
++	/* t2 ^= t0; */					\
++	vpxor x0, y0, y0;				\
++	vpxor x1, y1, y1;				\
++	vpxor x2, y2, y2;				\
++	vpxor x3, y3, y3;				\
++							\
++	/* t1 ^= t2; */					\
++	vpxor y0, x4, x4;				\
++	vpxor y1, x5, x5;				\
++	vpxor y2, x6, x6;				\
++	vpxor y3, x7, x7;
++
++#define aria_fe(x0, x1, x2, x3,				\
++		x4, x5, x6, x7,				\
++		y0, y1, y2, y3,				\
++		y4, y5, y6, y7,				\
++		mem_tmp, rk, round)			\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 0);		\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);		\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x4, x5, x6, x7,			\
++		       y0, y1, y2, y3,			\
++		       y4, y5, y6, y7);			\
++	/* aria_diff_byte() 				\
++	 * T3 = ABCD -> BADC 				\
++	 * T3 = y4, y5, y6, y7 -> y5, y4, y7, y6 	\
++	 * T0 = ABCD -> CDAB 				\
++	 * T0 = x0, x1, x2, x3 -> x2, x3, x0, x1 	\
++	 * T1 = ABCD -> DCBA 				\
++	 * T1 = x4, x5, x6, x7 -> x7, x6, x5, x4	\
++	 */						\
++	aria_diff_word(x2, x3, x0, x1,			\
++		       x7, x6, x5, x4,			\
++		       y0, y1, y2, y3,			\
++		       y5, y4, y7, y6);			\
++	aria_store_state_8way(x3, x2, x1, x0,		\
++			      x6, x7, x4, x5,		\
++			      mem_tmp, 0);
++
++#define aria_fo(x0, x1, x2, x3,				\
++		x4, x5, x6, x7,				\
++		y0, y1, y2, y3,				\
++		y4, y5, y6, y7,				\
++		mem_tmp, rk, round)			\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 0);		\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);		\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x4, x5, x6, x7,			\
++		       y0, y1, y2, y3,			\
++		       y4, y5, y6, y7);			\
++	/* aria_diff_byte() 				\
++	 * T1 = ABCD -> BADC 				\
++	 * T1 = x4, x5, x6, x7 -> x5, x4, x7, x6	\
++	 * T2 = ABCD -> CDAB 				\
++	 * T2 = y0, y1, y2, y3, -> y2, y3, y0, y1 	\
++	 * T3 = ABCD -> DCBA 				\
++	 * T3 = y4, y5, y6, y7 -> y7, y6, y5, y4 	\
++	 */						\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x5, x4, x7, x6,			\
++		       y2, y3, y0, y1,			\
++		       y7, y6, y5, y4);			\
++	aria_store_state_8way(x3, x2, x1, x0,		\
++			      x6, x7, x4, x5,		\
++			      mem_tmp, 0);
++
++#define aria_ff(x0, x1, x2, x3,				\
++		x4, x5, x6, x7,				\
++		y0, y1, y2, y3,				\
++		y4, y5, y6, y7,				\
++		mem_tmp, rk, round, last_round)		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, last_round);		\
++							\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
++		       y0, y1, y2, y3, y4, y5, y6, y7);	\
++							\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, last_round);		\
++							\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);
++
++#define aria_fe_gfni(x0, x1, x2, x3,			\
++		     x4, x5, x6, x7,			\
++		     y0, y1, y2, y3,			\
++		     y4, y5, y6, y7,			\
++		     mem_tmp, rk, round)		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
++			    x6, x7, x4, x5,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
++			    x6, x7, x4, x5,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 0);		\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);		\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x4, x5, x6, x7,			\
++		       y0, y1, y2, y3,			\
++		       y4, y5, y6, y7);			\
++	/* aria_diff_byte() 				\
++	 * T3 = ABCD -> BADC 				\
++	 * T3 = y4, y5, y6, y7 -> y5, y4, y7, y6 	\
++	 * T0 = ABCD -> CDAB 				\
++	 * T0 = x0, x1, x2, x3 -> x2, x3, x0, x1 	\
++	 * T1 = ABCD -> DCBA 				\
++	 * T1 = x4, x5, x6, x7 -> x7, x6, x5, x4	\
++	 */						\
++	aria_diff_word(x2, x3, x0, x1,			\
++		       x7, x6, x5, x4,			\
++		       y0, y1, y2, y3,			\
++		       y5, y4, y7, y6);			\
++	aria_store_state_8way(x3, x2, x1, x0,		\
++			      x6, x7, x4, x5,		\
++			      mem_tmp, 0);
++
++#define aria_fo_gfni(x0, x1, x2, x3,			\
++		     x4, x5, x6, x7,			\
++		     y0, y1, y2, y3,			\
++		     y4, y5, y6, y7,			\
++		     mem_tmp, rk, round)		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
++			    x4, x5, x6, x7,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
++			    x4, x5, x6, x7,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_diff_m(x0, x1, x2, x3, y0, y1, y2, y3);	\
++	aria_diff_m(x4, x5, x6, x7, y0, y1, y2, y3);	\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 0);		\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);		\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x4, x5, x6, x7,			\
++		       y0, y1, y2, y3,			\
++		       y4, y5, y6, y7);			\
++	/* aria_diff_byte() 				\
++	 * T1 = ABCD -> BADC 				\
++	 * T1 = x4, x5, x6, x7 -> x5, x4, x7, x6	\
++	 * T2 = ABCD -> CDAB 				\
++	 * T2 = y0, y1, y2, y3, -> y2, y3, y0, y1 	\
++	 * T3 = ABCD -> DCBA 				\
++	 * T3 = y4, y5, y6, y7 -> y7, y6, y5, y4 	\
++	 */						\
++	aria_diff_word(x0, x1, x2, x3,			\
++		       x5, x4, x7, x6,			\
++		       y2, y3, y0, y1,			\
++		       y7, y6, y5, y4);			\
++	aria_store_state_8way(x3, x2, x1, x0,		\
++			      x6, x7, x4, x5,		\
++			      mem_tmp, 0);
++
++#define aria_ff_gfni(x0, x1, x2, x3,			\
++		x4, x5, x6, x7,				\
++		y0, y1, y2, y3,				\
++		y4, y5, y6, y7,				\
++		mem_tmp, rk, round, last_round)		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, round);		\
++							\
++	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
++			    x6, x7, x4, x5,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 8, last_round);		\
++							\
++	aria_store_state_8way(x0, x1, x2, x3,		\
++			      x4, x5, x6, x7,		\
++			      mem_tmp, 8);		\
++							\
++	aria_load_state_8way(x0, x1, x2, x3,		\
++			     x4, x5, x6, x7,		\
++			     mem_tmp, 0);		\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, round);		\
++							\
++	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
++			    x6, x7, x4, x5,		\
++			    y0, y1, y2, y3, 		\
++			    y4, y5, y6, y7);		\
++							\
++	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
++		      y0, rk, 0, last_round);		\
++							\
++	aria_load_state_8way(y0, y1, y2, y3,		\
++			     y4, y5, y6, y7,		\
++			     mem_tmp, 8);
++
++/* NB: section is mergeable, all elements must be aligned 16-byte blocks */
++.section	.rodata.cst16, "aM", @progbits, 16
++.align 16
++
++#define SHUFB_BYTES(idx) \
++	0 + (idx), 4 + (idx), 8 + (idx), 12 + (idx)
++
++.Lshufb_16x16b:
++	.byte SHUFB_BYTES(0), SHUFB_BYTES(1), SHUFB_BYTES(2), SHUFB_BYTES(3);
++/* For isolating SubBytes from AESENCLAST, inverse shift row */
++.Linv_shift_row:
++	.byte 0x00, 0x0d, 0x0a, 0x07, 0x04, 0x01, 0x0e, 0x0b
++	.byte 0x08, 0x05, 0x02, 0x0f, 0x0c, 0x09, 0x06, 0x03
++.Lshift_row:
++	.byte 0x00, 0x05, 0x0a, 0x0f, 0x04, 0x09, 0x0e, 0x03
++	.byte 0x08, 0x0d, 0x02, 0x07, 0x0c, 0x01, 0x06, 0x0b
++/* For CTR-mode IV byteswap */
++.Lbswap128_mask:
++	.byte 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08
++	.byte 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
++
++/* AES inverse affine and S2 combined:
++ *      1 1 0 0 0 0 0 1     x0     0
++ *      0 1 0 0 1 0 0 0     x1     0
++ *      1 1 0 0 1 1 1 1     x2     0
++ *      0 1 1 0 1 0 0 1     x3     1
++ *      0 1 0 0 1 1 0 0  *  x4  +  0
++ *      0 1 0 1 1 0 0 0     x5     0
++ *      0 0 0 0 0 1 0 1     x6     0
++ *      1 1 1 0 0 1 1 1     x7     1
++ */
++.Ltf_lo__inv_aff__and__s2:
++	.octa 0x92172DA81A9FA520B2370D883ABF8500
++.Ltf_hi__inv_aff__and__s2:
++	.octa 0x2B15FFC1AF917B45E6D8320C625CB688
++
++/* X2 and AES forward affine combined:
++ *      1 0 1 1 0 0 0 1     x0     0
++ *      0 1 1 1 1 0 1 1     x1     0
++ *      0 0 0 1 1 0 1 0     x2     1
++ *      0 1 0 0 0 1 0 0     x3     0
++ *      0 0 1 1 1 0 1 1  *  x4  +  0
++ *      0 1 0 0 1 0 0 0     x5     0
++ *      1 1 0 1 0 0 1 1     x6     0
++ *      0 1 0 0 1 0 1 0     x7     0
++ */
++.Ltf_lo__x2__and__fwd_aff:
++	.octa 0xEFAE0544FCBD1657B8F95213ABEA4100
++.Ltf_hi__x2__and__fwd_aff:
++	.octa 0x3F893781E95FE1576CDA64D2BA0CB204
++
++.section	.rodata.cst8, "aM", @progbits, 8
++.align 8
++/* AES affine: */
++#define tf_aff_const BV8(1, 1, 0, 0, 0, 1, 1, 0)
++.Ltf_aff_bitmatrix:
++	.quad BM8X8(BV8(1, 0, 0, 0, 1, 1, 1, 1),
++		    BV8(1, 1, 0, 0, 0, 1, 1, 1),
++		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 1, 0, 0, 0, 1),
++		    BV8(1, 1, 1, 1, 1, 0, 0, 0),
++		    BV8(0, 1, 1, 1, 1, 1, 0, 0),
++		    BV8(0, 0, 1, 1, 1, 1, 1, 0),
++		    BV8(0, 0, 0, 1, 1, 1, 1, 1))
++
++/* AES inverse affine: */
++#define tf_inv_const BV8(1, 0, 1, 0, 0, 0, 0, 0)
++.Ltf_inv_bitmatrix:
++	.quad BM8X8(BV8(0, 0, 1, 0, 0, 1, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 0, 1, 0),
++		    BV8(0, 1, 0, 0, 1, 0, 0, 1),
++		    BV8(1, 0, 1, 0, 0, 1, 0, 0),
++		    BV8(0, 1, 0, 1, 0, 0, 1, 0),
++		    BV8(0, 0, 1, 0, 1, 0, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 1, 0, 0),
++		    BV8(0, 1, 0, 0, 1, 0, 1, 0))
++
++/* S2: */
++#define tf_s2_const BV8(0, 1, 0, 0, 0, 1, 1, 1)
++.Ltf_s2_bitmatrix:
++	.quad BM8X8(BV8(0, 1, 0, 1, 0, 1, 1, 1),
++		    BV8(0, 0, 1, 1, 1, 1, 1, 1),
++		    BV8(1, 1, 1, 0, 1, 1, 0, 1),
++		    BV8(1, 1, 0, 0, 0, 0, 1, 1),
++		    BV8(0, 1, 0, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 0, 0, 1, 1, 1, 0),
++		    BV8(0, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 1, 0, 1, 1, 0))
++
++/* X2: */
++#define tf_x2_const BV8(0, 0, 1, 1, 0, 1, 0, 0)
++.Ltf_x2_bitmatrix:
++	.quad BM8X8(BV8(0, 0, 0, 1, 1, 0, 0, 0),
++		    BV8(0, 0, 1, 0, 0, 1, 1, 0),
++		    BV8(0, 0, 0, 0, 1, 0, 1, 0),
++		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 0, 1, 1, 0, 0),
++		    BV8(0, 1, 1, 0, 1, 0, 1, 1),
++		    BV8(1, 0, 1, 1, 1, 1, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 0, 1, 1))
++
++/* Identity matrix: */
++.Ltf_id_bitmatrix:
++	.quad BM8X8(BV8(1, 0, 0, 0, 0, 0, 0, 0),
++		    BV8(0, 1, 0, 0, 0, 0, 0, 0),
++		    BV8(0, 0, 1, 0, 0, 0, 0, 0),
++		    BV8(0, 0, 0, 1, 0, 0, 0, 0),
++		    BV8(0, 0, 0, 0, 1, 0, 0, 0),
++		    BV8(0, 0, 0, 0, 0, 1, 0, 0),
++		    BV8(0, 0, 0, 0, 0, 0, 1, 0),
++		    BV8(0, 0, 0, 0, 0, 0, 0, 1))
++
++/* 4-bit mask */
++.section	.rodata.cst4.L0f0f0f0f, "aM", @progbits, 4
++.align 4
++.L0f0f0f0f:
++	.long 0x0f0f0f0f
++
++.text
++
++SYM_FUNC_START_LOCAL(__aria_aesni_avx_crypt_16way)
++	/* input:
++	*      %r9: rk
++	*      %rsi: dst
++	*      %rdx: src
++	*      %xmm0..%xmm15: 16 byte-sliced blocks
++	*/
++
++	FRAME_BEGIN
++
++	movq %rsi, %rax;
++	leaq 8 * 16(%rax), %r8;
++
++	inpack16_post(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		      %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		      %xmm15, %rax, %r8);
++	aria_fo(%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 0);
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 1);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 2);
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 3);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 4);
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 5);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 6);
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 7);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 8);
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 9);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 10);
++	cmpl $12, rounds(CTX);
++	jne .Laria_192;
++	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 11, 12);
++	jmp .Laria_end;
++.Laria_192:
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 11);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 12);
++	cmpl $14, rounds(CTX);
++	jne .Laria_256;
++	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 13, 14);
++	jmp .Laria_end;
++.Laria_256:
++	aria_fe(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 13);
++	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
++		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		%rax, %r9, 14);
++	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 15, 16);
++.Laria_end:
++	debyteslice_16x16b(%xmm8, %xmm12, %xmm1, %xmm4,
++			   %xmm9, %xmm13, %xmm0, %xmm5,
++			   %xmm10, %xmm14, %xmm3, %xmm6,
++			   %xmm11, %xmm15, %xmm2, %xmm7,
++			   (%rax), (%r8));
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(__aria_aesni_avx_crypt_16way)
++
++SYM_FUNC_START(aria_aesni_avx_encrypt_16way)
++	/* input:
++	*      %rdi: ctx, CTX
++	*      %rsi: dst
++	*      %rdx: src
++	*/
++
++	FRAME_BEGIN
++
++	leaq enc_key(CTX), %r9;
++
++	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rdx);
++
++	call __aria_aesni_avx_crypt_16way;
++
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_encrypt_16way)
++
++SYM_FUNC_START(aria_aesni_avx_decrypt_16way)
++	/* input:
++	*      %rdi: ctx, CTX
++	*      %rsi: dst
++	*      %rdx: src
++	*/
++
++	FRAME_BEGIN
++
++	leaq dec_key(CTX), %r9;
++
++	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rdx);
++
++	call __aria_aesni_avx_crypt_16way;
++
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_decrypt_16way)
++
++SYM_FUNC_START_LOCAL(__aria_aesni_avx_ctr_gen_keystream_16way)
++	/* input:
++	*      %rdi: ctx
++	*      %rsi: dst
++	*      %rdx: src
++	*      %rcx: keystream
++	*      %r8: iv (big endian, 128bit)
++	*/
++
++	FRAME_BEGIN
++	/* load IV and byteswap */
++	vmovdqu (%r8), %xmm8;
++
++	vmovdqa .Lbswap128_mask (%rip), %xmm1;
++	vpshufb %xmm1, %xmm8, %xmm3; /* be => le */
++
++	vpcmpeqd %xmm0, %xmm0, %xmm0;
++	vpsrldq $8, %xmm0, %xmm0; /* low: -1, high: 0 */
++
++	/* construct IVs */
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm9;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm10;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm11;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm12;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm13;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm14;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm15;
++	vmovdqu %xmm8, (0 * 16)(%rcx);
++	vmovdqu %xmm9, (1 * 16)(%rcx);
++	vmovdqu %xmm10, (2 * 16)(%rcx);
++	vmovdqu %xmm11, (3 * 16)(%rcx);
++	vmovdqu %xmm12, (4 * 16)(%rcx);
++	vmovdqu %xmm13, (5 * 16)(%rcx);
++	vmovdqu %xmm14, (6 * 16)(%rcx);
++	vmovdqu %xmm15, (7 * 16)(%rcx);
++
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm8;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm9;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm10;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm11;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm12;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm13;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm14;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm15;
++	inc_le128(%xmm3, %xmm0, %xmm5); /* +1 */
++	vpshufb %xmm1, %xmm3, %xmm4;
++	vmovdqu %xmm4, (%r8);
++
++	vmovdqu (0 * 16)(%rcx), %xmm0;
++	vmovdqu (1 * 16)(%rcx), %xmm1;
++	vmovdqu (2 * 16)(%rcx), %xmm2;
++	vmovdqu (3 * 16)(%rcx), %xmm3;
++	vmovdqu (4 * 16)(%rcx), %xmm4;
++	vmovdqu (5 * 16)(%rcx), %xmm5;
++	vmovdqu (6 * 16)(%rcx), %xmm6;
++	vmovdqu (7 * 16)(%rcx), %xmm7;
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(__aria_aesni_avx_ctr_gen_keystream_16way)
++
++SYM_FUNC_START(aria_aesni_avx_ctr_crypt_16way)
++	/* input:
++	*      %rdi: ctx
++	*      %rsi: dst
++	*      %rdx: src
++	*      %rcx: keystream
++	*      %r8: iv (big endian, 128bit)
++	*/
++	FRAME_BEGIN
++
++	call __aria_aesni_avx_ctr_gen_keystream_16way;
++
++	leaq (%rsi), %r10;
++	leaq (%rdx), %r11;
++	leaq (%rcx), %rsi;
++	leaq (%rcx), %rdx;
++	leaq enc_key(CTX), %r9;
++
++	call __aria_aesni_avx_crypt_16way;
++
++	vpxor (0 * 16)(%r11), %xmm1, %xmm1;
++	vpxor (1 * 16)(%r11), %xmm0, %xmm0;
++	vpxor (2 * 16)(%r11), %xmm3, %xmm3;
++	vpxor (3 * 16)(%r11), %xmm2, %xmm2;
++	vpxor (4 * 16)(%r11), %xmm4, %xmm4;
++	vpxor (5 * 16)(%r11), %xmm5, %xmm5;
++	vpxor (6 * 16)(%r11), %xmm6, %xmm6;
++	vpxor (7 * 16)(%r11), %xmm7, %xmm7;
++	vpxor (8 * 16)(%r11), %xmm8, %xmm8;
++	vpxor (9 * 16)(%r11), %xmm9, %xmm9;
++	vpxor (10 * 16)(%r11), %xmm10, %xmm10;
++	vpxor (11 * 16)(%r11), %xmm11, %xmm11;
++	vpxor (12 * 16)(%r11), %xmm12, %xmm12;
++	vpxor (13 * 16)(%r11), %xmm13, %xmm13;
++	vpxor (14 * 16)(%r11), %xmm14, %xmm14;
++	vpxor (15 * 16)(%r11), %xmm15, %xmm15;
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %r10);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_ctr_crypt_16way)
++
++SYM_FUNC_START_LOCAL(__aria_aesni_avx_gfni_crypt_16way)
++	/* input:
++	*      %r9: rk
++	*      %rsi: dst
++	*      %rdx: src
++	*      %xmm0..%xmm15: 16 byte-sliced blocks
++	*/
++
++	FRAME_BEGIN
++
++	movq %rsi, %rax;
++	leaq 8 * 16(%rax), %r8;
++
++	inpack16_post(%xmm0, %xmm1, %xmm2, %xmm3,
++		      %xmm4, %xmm5, %xmm6, %xmm7,
++		      %xmm8, %xmm9, %xmm10, %xmm11,
++		      %xmm12, %xmm13, %xmm14,
++		      %xmm15, %rax, %r8);
++	aria_fo_gfni(%xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 0);
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 1);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 2);
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 3);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 4);
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 5);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 6);
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 7);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 8);
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 9);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 10);
++	cmpl $12, rounds(CTX);
++	jne .Laria_gfni_192;
++	aria_ff_gfni(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		%xmm15, %rax, %r9, 11, 12);
++	jmp .Laria_gfni_end;
++.Laria_gfni_192:
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 11);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 12);
++	cmpl $14, rounds(CTX);
++	jne .Laria_gfni_256;
++	aria_ff_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 13, 14);
++	jmp .Laria_gfni_end;
++.Laria_gfni_256:
++	aria_fe_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 13);
++	aria_fo_gfni(%xmm9, %xmm8, %xmm11, %xmm10,
++		     %xmm12, %xmm13, %xmm14, %xmm15,
++		     %xmm0, %xmm1, %xmm2, %xmm3,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %rax, %r9, 14);
++	aria_ff_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
++		     %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11,
++		     %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax, %r9, 15, 16);
++.Laria_gfni_end:
++	debyteslice_16x16b(%xmm8, %xmm12, %xmm1, %xmm4,
++			   %xmm9, %xmm13, %xmm0, %xmm5,
++			   %xmm10, %xmm14, %xmm3, %xmm6,
++			   %xmm11, %xmm15, %xmm2, %xmm7,
++			   (%rax), (%r8));
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(__aria_aesni_avx_gfni_crypt_16way)
++
++SYM_FUNC_START(aria_aesni_avx_gfni_encrypt_16way)
++	/* input:
++	*      %rdi: ctx, CTX
++	*      %rsi: dst
++	*      %rdx: src
++	*/
++
++	FRAME_BEGIN
++
++	leaq enc_key(CTX), %r9;
++
++	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rdx);
++
++	call __aria_aesni_avx_gfni_crypt_16way;
++
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_gfni_encrypt_16way)
++
++SYM_FUNC_START(aria_aesni_avx_gfni_decrypt_16way)
++	/* input:
++	*      %rdi: ctx, CTX
++	*      %rsi: dst
++	*      %rdx: src
++	*/
++
++	FRAME_BEGIN
++
++	leaq dec_key(CTX), %r9;
++
++	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rdx);
++
++	call __aria_aesni_avx_gfni_crypt_16way;
++
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %rax);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_gfni_decrypt_16way)
++
++SYM_FUNC_START(aria_aesni_avx_gfni_ctr_crypt_16way)
++	/* input:
++	*      %rdi: ctx
++	*      %rsi: dst
++	*      %rdx: src
++	*      %rcx: keystream
++	*      %r8: iv (big endian, 128bit)
++	*/
++	FRAME_BEGIN
++
++	call __aria_aesni_avx_ctr_gen_keystream_16way
++
++	leaq (%rsi), %r10;
++	leaq (%rdx), %r11;
++	leaq (%rcx), %rsi;
++	leaq (%rcx), %rdx;
++	leaq enc_key(CTX), %r9;
++
++	call __aria_aesni_avx_gfni_crypt_16way;
++
++	vpxor (0 * 16)(%r11), %xmm1, %xmm1;
++	vpxor (1 * 16)(%r11), %xmm0, %xmm0;
++	vpxor (2 * 16)(%r11), %xmm3, %xmm3;
++	vpxor (3 * 16)(%r11), %xmm2, %xmm2;
++	vpxor (4 * 16)(%r11), %xmm4, %xmm4;
++	vpxor (5 * 16)(%r11), %xmm5, %xmm5;
++	vpxor (6 * 16)(%r11), %xmm6, %xmm6;
++	vpxor (7 * 16)(%r11), %xmm7, %xmm7;
++	vpxor (8 * 16)(%r11), %xmm8, %xmm8;
++	vpxor (9 * 16)(%r11), %xmm9, %xmm9;
++	vpxor (10 * 16)(%r11), %xmm10, %xmm10;
++	vpxor (11 * 16)(%r11), %xmm11, %xmm11;
++	vpxor (12 * 16)(%r11), %xmm12, %xmm12;
++	vpxor (13 * 16)(%r11), %xmm13, %xmm13;
++	vpxor (14 * 16)(%r11), %xmm14, %xmm14;
++	vpxor (15 * 16)(%r11), %xmm15, %xmm15;
++	write_output(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
++		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
++		     %xmm15, %r10);
++
++	FRAME_END
++	RET;
++SYM_FUNC_END(aria_aesni_avx_gfni_ctr_crypt_16way)
+diff --git a/arch/x86/crypto/aria-avx.h b/arch/x86/crypto/aria-avx.h
+new file mode 100644
+index 000000000000..01e9a01dc157
+--- /dev/null
++++ b/arch/x86/crypto/aria-avx.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef ASM_X86_ARIA_AVX_H
++#define ASM_X86_ARIA_AVX_H
++
++#include <linux/types.h>
++
++#define ARIA_AESNI_PARALLEL_BLOCKS 16
++#define ARIA_AESNI_PARALLEL_BLOCK_SIZE  (ARIA_BLOCK_SIZE * 16)
++
++struct aria_avx_ops {
++	void (*aria_encrypt_16way)(const void *ctx, u8 *dst, const u8 *src);
++	void (*aria_decrypt_16way)(const void *ctx, u8 *dst, const u8 *src);
++	void (*aria_ctr_crypt_16way)(const void *ctx, u8 *dst, const u8 *src,
++				     u8 *keystream, u8 *iv);
++};
++#endif
+diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
+new file mode 100644
+index 000000000000..c561ea4fefa5
+--- /dev/null
++++ b/arch/x86/crypto/aria_aesni_avx_glue.c
+@@ -0,0 +1,213 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Glue Code for the AVX/AES-NI/GFNI assembler implementation of the ARIA Cipher
++ *
++ * Copyright (c) 2022 Taehee Yoo <ap420073@gmail.com>
++ */
++
++#include <crypto/algapi.h>
++#include <crypto/internal/simd.h>
++#include <crypto/aria.h>
++#include <linux/crypto.h>
++#include <linux/err.h>
++#include <linux/module.h>
++#include <linux/types.h>
++
++#include "ecb_cbc_helpers.h"
++#include "aria-avx.h"
++
++asmlinkage void aria_aesni_avx_encrypt_16way(const void *ctx, u8 *dst,
++					     const u8 *src);
++asmlinkage void aria_aesni_avx_decrypt_16way(const void *ctx, u8 *dst,
++					     const u8 *src);
++asmlinkage void aria_aesni_avx_ctr_crypt_16way(const void *ctx, u8 *dst,
++					       const u8 *src,
++					       u8 *keystream, u8 *iv);
++asmlinkage void aria_aesni_avx_gfni_encrypt_16way(const void *ctx, u8 *dst,
++						  const u8 *src);
++asmlinkage void aria_aesni_avx_gfni_decrypt_16way(const void *ctx, u8 *dst,
++						  const u8 *src);
++asmlinkage void aria_aesni_avx_gfni_ctr_crypt_16way(const void *ctx, u8 *dst,
++						    const u8 *src,
++						    u8 *keystream, u8 *iv);
++
++static struct aria_avx_ops aria_ops;
++
++static int ecb_do_encrypt(struct skcipher_request *req, const u32 *rkey)
++{
++	ECB_WALK_START(req, ARIA_BLOCK_SIZE, ARIA_AESNI_PARALLEL_BLOCKS);
++	ECB_BLOCK(ARIA_AESNI_PARALLEL_BLOCKS, aria_ops.aria_encrypt_16way);
++	ECB_BLOCK(1, aria_encrypt);
++	ECB_WALK_END();
++}
++
++static int ecb_do_decrypt(struct skcipher_request *req, const u32 *rkey)
++{
++	ECB_WALK_START(req, ARIA_BLOCK_SIZE, ARIA_AESNI_PARALLEL_BLOCKS);
++	ECB_BLOCK(ARIA_AESNI_PARALLEL_BLOCKS, aria_ops.aria_decrypt_16way);
++	ECB_BLOCK(1, aria_decrypt);
++	ECB_WALK_END();
++}
++
++static int aria_avx_ecb_encrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	return ecb_do_encrypt(req, ctx->enc_key[0]);
++}
++
++static int aria_avx_ecb_decrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	return ecb_do_decrypt(req, ctx->dec_key[0]);
++}
++
++static int aria_avx_set_key(struct crypto_skcipher *tfm, const u8 *key,
++			    unsigned int keylen)
++{
++	return aria_set_key(&tfm->base, key, keylen);
++}
++
++static int aria_avx_ctr_encrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_walk walk;
++	unsigned int nbytes;
++	int err;
++
++	err = skcipher_walk_virt(&walk, req, false);
++
++	while ((nbytes = walk.nbytes) > 0) {
++		const u8 *src = walk.src.virt.addr;
++		u8 *dst = walk.dst.virt.addr;
++
++		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
++			u8 keystream[ARIA_AESNI_PARALLEL_BLOCK_SIZE];
++
++			kernel_fpu_begin();
++			aria_ops.aria_ctr_crypt_16way(ctx, dst, src, keystream,
++						      walk.iv);
++			kernel_fpu_end();
++			dst += ARIA_AESNI_PARALLEL_BLOCK_SIZE;
++			src += ARIA_AESNI_PARALLEL_BLOCK_SIZE;
++			nbytes -= ARIA_AESNI_PARALLEL_BLOCK_SIZE;
++		}
++
++		while (nbytes >= ARIA_BLOCK_SIZE) {
++			u8 keystream[ARIA_BLOCK_SIZE];
++
++			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
++			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
++
++			aria_encrypt(ctx, keystream, keystream);
++
++			crypto_xor_cpy(dst, src, keystream, ARIA_BLOCK_SIZE);
++			dst += ARIA_BLOCK_SIZE;
++			src += ARIA_BLOCK_SIZE;
++			nbytes -= ARIA_BLOCK_SIZE;
++		}
++
++		if (walk.nbytes == walk.total && nbytes > 0) {
++			u8 keystream[ARIA_BLOCK_SIZE];
++
++			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
++			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
++
++			aria_encrypt(ctx, keystream, keystream);
++
++			crypto_xor_cpy(dst, src, keystream, nbytes);
++			dst += nbytes;
++			src += nbytes;
++			nbytes = 0;
++		}
++		err = skcipher_walk_done(&walk, nbytes);
++	}
++
++	return err;
++}
++
++static struct skcipher_alg aria_algs[] = {
++	{
++		.base.cra_name		= "__ecb(aria)",
++		.base.cra_driver_name	= "__ecb-aria-avx",
++		.base.cra_priority	= 400,
++		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
++		.base.cra_blocksize	= ARIA_BLOCK_SIZE,
++		.base.cra_ctxsize	= sizeof(struct aria_ctx),
++		.base.cra_module	= THIS_MODULE,
++		.min_keysize		= ARIA_MIN_KEY_SIZE,
++		.max_keysize		= ARIA_MAX_KEY_SIZE,
++		.setkey			= aria_avx_set_key,
++		.encrypt		= aria_avx_ecb_encrypt,
++		.decrypt		= aria_avx_ecb_decrypt,
++	}, {
++		.base.cra_name		= "__ctr(aria)",
++		.base.cra_driver_name	= "__ctr-aria-avx",
++		.base.cra_priority	= 400,
++		.base.cra_flags		= CRYPTO_ALG_INTERNAL,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct aria_ctx),
++		.base.cra_module	= THIS_MODULE,
++		.min_keysize		= ARIA_MIN_KEY_SIZE,
++		.max_keysize		= ARIA_MAX_KEY_SIZE,
++		.ivsize			= ARIA_BLOCK_SIZE,
++		.chunksize		= ARIA_BLOCK_SIZE,
++		.walksize		= 16 * ARIA_BLOCK_SIZE,
++		.setkey			= aria_avx_set_key,
++		.encrypt		= aria_avx_ctr_encrypt,
++		.decrypt		= aria_avx_ctr_encrypt,
++	}
 +};
 +
- static void aria_set_encrypt_key(struct aria_ctx *ctx, const u8 *in_key,
- 				 unsigned int key_len)
- {
-@@ -25,7 +33,7 @@ static void aria_set_encrypt_key(struct aria_ctx *ctx, const u8 *in_key,
- 	const u32 *ck;
- 	int rkidx = 0;
- 
--	ck = &key_rc[(key_len - 16) / 8][0];
-+	ck = &key_rc[(key_len - 16) / 2];
- 
- 	w0[0] = be32_to_cpu(key[0]);
- 	w0[1] = be32_to_cpu(key[1]);
-@@ -163,8 +171,7 @@ static void aria_set_decrypt_key(struct aria_ctx *ctx)
- 	}
- }
- 
--static int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
--			unsigned int key_len)
-+int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key, unsigned int key_len)
- {
- 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-@@ -179,6 +186,7 @@ static int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(aria_set_key);
- 
- static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
- 			 u32 key[][ARIA_RD_KEY_WORDS])
-@@ -235,14 +243,30 @@ static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
- 	dst[3] = cpu_to_be32(reg3);
- }
- 
--static void aria_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+void aria_encrypt(void *_ctx, u8 *out, const u8 *in)
++static struct simd_skcipher_alg *aria_simd_algs[ARRAY_SIZE(aria_algs)];
++
++static int __init aria_avx_init(void)
 +{
-+	struct aria_ctx *ctx = (struct aria_ctx *)_ctx;
++	const char *feature_name;
 +
-+	__aria_crypt(ctx, out, in, ctx->enc_key);
++	if (!boot_cpu_has(X86_FEATURE_AVX) ||
++	    !boot_cpu_has(X86_FEATURE_AES) ||
++	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
++		pr_info("AVX or AES-NI instructions are not detected.\n");
++		return -ENODEV;
++	}
++
++	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
++				&feature_name)) {
++		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		return -ENODEV;
++	}
++
++	if (boot_cpu_has(X86_FEATURE_GFNI)) {
++		aria_ops.aria_encrypt_16way = aria_aesni_avx_gfni_encrypt_16way;
++		aria_ops.aria_decrypt_16way = aria_aesni_avx_gfni_decrypt_16way;
++		aria_ops.aria_ctr_crypt_16way = aria_aesni_avx_gfni_ctr_crypt_16way;
++	} else {
++		aria_ops.aria_encrypt_16way = aria_aesni_avx_encrypt_16way;
++		aria_ops.aria_decrypt_16way = aria_aesni_avx_decrypt_16way;
++		aria_ops.aria_ctr_crypt_16way = aria_aesni_avx_ctr_crypt_16way;
++	}
++
++	return simd_register_skciphers_compat(aria_algs,
++					      ARRAY_SIZE(aria_algs),
++					      aria_simd_algs);
 +}
-+EXPORT_SYMBOL_GPL(aria_encrypt);
 +
-+void aria_decrypt(void *_ctx, u8 *out, const u8 *in)
++static void __exit aria_avx_exit(void)
 +{
-+	struct aria_ctx *ctx = (struct aria_ctx *)_ctx;
-+
-+	__aria_crypt(ctx, out, in, ctx->dec_key);
++	simd_unregister_skciphers(aria_algs, ARRAY_SIZE(aria_algs),
++				  aria_simd_algs);
 +}
-+EXPORT_SYMBOL_GPL(aria_decrypt);
 +
-+static void __aria_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
- 
- 	__aria_crypt(ctx, out, in, ctx->enc_key);
- }
- 
--static void aria_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void __aria_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct aria_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-@@ -263,8 +287,8 @@ static struct crypto_alg aria_alg = {
- 			.cia_min_keysize	=	ARIA_MIN_KEY_SIZE,
- 			.cia_max_keysize	=	ARIA_MAX_KEY_SIZE,
- 			.cia_setkey		=	aria_set_key,
--			.cia_encrypt		=	aria_encrypt,
--			.cia_decrypt		=	aria_decrypt
-+			.cia_encrypt		=	__aria_encrypt,
-+			.cia_decrypt		=	__aria_decrypt
- 		}
- 	}
- };
-@@ -286,3 +310,4 @@ MODULE_DESCRIPTION("ARIA Cipher Algorithm");
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
- MODULE_ALIAS_CRYPTO("aria");
-+MODULE_ALIAS_CRYPTO("aria-generic");
-diff --git a/include/crypto/aria.h b/include/crypto/aria.h
-index 4a86661788e8..254da46cc385 100644
---- a/include/crypto/aria.h
-+++ b/include/crypto/aria.h
-@@ -32,18 +32,10 @@
- #define ARIA_RD_KEY_WORDS	(ARIA_BLOCK_SIZE / sizeof(u32))
- 
- struct aria_ctx {
--	int key_length;
--	int rounds;
- 	u32 enc_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
- 	u32 dec_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
--};
--
--static const u32 key_rc[5][4] = {
--	{ 0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0 },
--	{ 0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0 },
--	{ 0xdb92371d, 0x2126e970, 0x03249775, 0x04e8c90e },
--	{ 0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0 },
--	{ 0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0 }
-+	int rounds;
-+	int key_length;
- };
- 
- static const u32 s1[256] = {
-@@ -458,4 +450,9 @@ static inline void aria_gsrk(u32 *rk, u32 *x, u32 *y, u32 n)
- 		((y[(q + 2) % 4]) << (32 - r));
- }
- 
-+void aria_encrypt(void *ctx, u8 *out, const u8 *in);
-+void aria_decrypt(void *ctx, u8 *out, const u8 *in);
-+int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+		 unsigned int key_len);
++module_init(aria_avx_init);
++module_exit(aria_avx_exit);
 +
- #endif
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
++MODULE_DESCRIPTION("ARIA Cipher Algorithm, AVX/AES-NI/GFNI optimized");
++MODULE_ALIAS_CRYPTO("aria");
++MODULE_ALIAS_CRYPTO("aria-aesni-avx");
 -- 
 2.17.1
 
