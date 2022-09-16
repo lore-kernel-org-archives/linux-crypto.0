@@ -2,78 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDC9C6FA92
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 10:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69014C6FA94
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 10:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230250AbiIPKyJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 06:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51162 "EHLO
+        id S231903AbiIPKyK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Sep 2022 06:54:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbiIPKxw (ORCPT
+        with ESMTP id S230370AbiIPKxx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 06:53:52 -0400
+        Fri, 16 Sep 2022 06:53:53 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E39ADCDA;
-        Fri, 16 Sep 2022 03:37:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D1BAAFAFC
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 03:37:11 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oZ8iN-005Gwa-Dv; Fri, 16 Sep 2022 20:36:56 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Sep 2022 18:36:55 +0800
-Date:   Fri, 16 Sep 2022 18:36:55 +0800
+        id 1oZ8iX-005Gwg-1W; Fri, 16 Sep 2022 20:37:06 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Sep 2022 18:37:04 +0800
+Date:   Fri, 16 Sep 2022 18:37:04 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Weili Qian <qianweili@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        wangzhou1@hisilicon.com, liulongfang@huawei.com
-Subject: Re: [PATCH 00/10] crypto: hisilicon - support get device information
- from registers
-Message-ID: <YyRRx8G76mPxBo6W@gondor.apana.org.au>
-References: <20220909094704.32099-1-qianweili@huawei.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Vlad Dronov <vdronov@redhat.com>
+Subject: Re: [PATCH 0/3] crypto: qat - fix DMA mappings
+Message-ID: <YyRR0KglVVuo05rm@gondor.apana.org.au>
+References: <20220909104914.3351-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220909094704.32099-1-qianweili@huawei.com>
+In-Reply-To: <20220909104914.3351-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 05:46:54PM +0800, Weili Qian wrote:
-> This patchset supports obtaining device information from
-> device registers, including the supported algorithms,
-> device features, and so on.
+On Fri, Sep 09, 2022 at 11:49:11AM +0100, Giovanni Cabiddu wrote:
+> This set fixes a set of issues related to an improper use of the DMA
+> APIs reported when CONFIG_DMA_API_DEBUG is selected and by the static
+> analyzer Smatch.
 > 
-> Weili Qian (6):
->   crypto: hisilicon/qm - get hardware features from hardware registers
->   crypto: hisilicon/qm - get qp num and depth from hardware registers
->   crypto: hisilicon/qm - add UACCE_CMD_QM_SET_QP_INFO support
->   crypto: hisilicon/qm - get error type from hardware registers
->   crypto: hisilicon/qm - support get device irq information from
->     hardware registers
->   crypto: hisilicon/zip - support zip capability
+> The first patch fixes an overlapping DMA mapping which occurs when
+> in-place operations that share the same buffers but a different
+> scatterlist structure are sent to the implementations of aead and
+> skcipher in the QAT driver.
+> The second commit reverts a patch that attempted to fix a warning
+> reported by Smatch. This improperly reduced the mapping size for the
+> region of memory used to store the input and output parameters that are
+> passed to the FW for performing the RSA and DH algorithms.
+> The last patch properly fixes the issues that the reverted commit
+> attempted to fix.
 > 
-> Wenkai Lin (1):
->   crypto: hisilicon/sec - get algorithm bitmap from registers
+> Damian Muszynski (2):
+>   crypto: qat - fix DMA transfer direction
+>   crypto: qat - use reference to structure in dma_map_single()
 > 
-> Zhiqi Song (3):
->   crypto: hisilicon/hpre - support hpre capability
->   crypto: hisilicon/hpre - optimize registration of ecdh
->   crypto: hisilicon - support get algs by the capability register
+> Giovanni Cabiddu (1):
+>   Revert "crypto: qat - reduce size of mapped region"
 > 
->  drivers/crypto/hisilicon/hpre/hpre.h        |   8 +-
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 250 ++++---
->  drivers/crypto/hisilicon/hpre/hpre_main.c   | 208 +++++-
->  drivers/crypto/hisilicon/qm.c               | 765 +++++++++++++-------
->  drivers/crypto/hisilicon/sec2/sec.h         |  34 +-
->  drivers/crypto/hisilicon/sec2/sec_crypto.c  | 454 +++++++-----
->  drivers/crypto/hisilicon/sec2/sec_main.c    | 160 +++-
->  drivers/crypto/hisilicon/zip/zip.h          |   1 +
->  drivers/crypto/hisilicon/zip/zip_crypto.c   |  73 +-
->  drivers/crypto/hisilicon/zip/zip_main.c     | 256 +++++--
->  include/linux/hisi_acc_qm.h                 |  63 +-
->  include/uapi/misc/uacce/hisi_qm.h           |  17 +-
->  12 files changed, 1589 insertions(+), 700 deletions(-)
+>  drivers/crypto/qat/qat_common/qat_algs.c      | 18 +++++++++-----
+>  drivers/crypto/qat/qat_common/qat_asym_algs.c | 24 +++++++++----------
+>  2 files changed, 24 insertions(+), 18 deletions(-)
 > 
 > -- 
-> 2.33.0
+> 2.37.1
 
 All applied.  Thanks. 
 -- 
