@@ -2,70 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A246ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 14:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2DDECAAD8
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 14:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231287AbiIPOZq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 10:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45440 "EHLO
+        id S230287AbiIPOvF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Sep 2022 10:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231529AbiIPOZX (ORCPT
+        with ESMTP id S229714AbiIPOvD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 10:25:23 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAEC89FAAB
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 07:25:18 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id a3so23841764lfk.9
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 07:25:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=KDdbJY+6Lwuy0ZMU2F8sRoi82Pbj6XOA2IBLb/eM6QI=;
-        b=KXcEsEm30D38YxlIGLkoYYPnodQAmfcqk8DkXGK46gKBXp/A2XcbeDg0gTIbWt6pM8
-         j12ShDHRzqATdHQQxaSUZWHeWpKdhBKB5nRSvtm45ITz4MiJJxIidPT9iitoRhhy30Zw
-         +KRC78zutPHNQxYvCSSpiPwahuY1ljCPJjbW0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=KDdbJY+6Lwuy0ZMU2F8sRoi82Pbj6XOA2IBLb/eM6QI=;
-        b=KqenCVO+XkJ65ARSllEIVQ6Z3sFvQdE++XiaN9S6GGMw+AGhiwvtBLENhiD2A3nlz4
-         RnlTmQ+Zq3QO8dUYrpm8XdBOAqHo7WwXPqSc5yNmhF+3LcSMOxNePfcp60t2y6wSq8vq
-         f7omGKH2zKo/18pVEtjvQKetMDgYwk9AcxFog7Nrjp0GwgRDVsjHE1bGJzunlPD8/BTe
-         34S9EtPkqNOyaMLA+MwGqA8/cAuT15mIvW3sPOAmgwQjh2SSu1YtCIzpW2jWRbphsWUO
-         SyNiajKAsFovyZz8PCXGqAylqt6cdH7IN9NswWa8GTXFrzz423ugwSch0+ibB9Zhv21+
-         JDCg==
-X-Gm-Message-State: ACrzQf0bKWGP1j6WB38HVs1qA9mwl17YBAxgyEmna6kpKUQ8TSvPZX2m
-        JAQL0YqYbcKXG9YEHrsWpKf2XKwLXQnU36OS
-X-Google-Smtp-Source: AMsMyM6WH9QwFWpQojDNMzQKoW0yPU2qOrprrzLeWysqLm7VJ9eRlSf5geKaSnfV/aNdukG/01UQfg==
-X-Received: by 2002:a05:6512:10d6:b0:49a:1fc0:cc62 with SMTP id k22-20020a05651210d600b0049a1fc0cc62mr1886108lfg.138.1663338316593;
-        Fri, 16 Sep 2022 07:25:16 -0700 (PDT)
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
-        by smtp.gmail.com with ESMTPSA id b13-20020a056512070d00b0049464d89e40sm3506423lfs.72.2022.09.16.07.25.11
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Sep 2022 07:25:13 -0700 (PDT)
-Received: by mail-lj1-f172.google.com with SMTP id bn9so26165931ljb.6
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 07:25:11 -0700 (PDT)
-X-Received: by 2002:a2e:a602:0:b0:264:5132:f59 with SMTP id
- v2-20020a2ea602000000b0026451320f59mr1620436ljp.0.1663338310469; Fri, 16 Sep
- 2022 07:25:10 -0700 (PDT)
+        Fri, 16 Sep 2022 10:51:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A98A572E;
+        Fri, 16 Sep 2022 07:51:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2EEF62C52;
+        Fri, 16 Sep 2022 14:51:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E58EBC43470;
+        Fri, 16 Sep 2022 14:51:00 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KlnuYh1s"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1663339856;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AQYiQoE1MzbspExjoxRIxp8659JqC9N66qASNbjnQqI=;
+        b=KlnuYh1sIGr8iLDnyM+oR6yvdq24Mjt7ZamBZ0JSxxSGkgc4FRdQprP+5+Bjt3yAL6YIB7
+        yqOyyKBd6P9kvimEiqKEMUDql0NS6+PZNFNjavhEaVHVq5YER6w0tDUwuDpWXJ4FBwbo79
+        gRldpBdze8LjSuUu0ZMBXHkrXyE0qYE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1f8ea2d5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Fri, 16 Sep 2022 14:50:55 +0000 (UTC)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-3450990b0aeso262117667b3.12;
+        Fri, 16 Sep 2022 07:50:55 -0700 (PDT)
+X-Gm-Message-State: ACrzQf2BAoZuRL2Uk/12ojcGA6HEUcIrGFUp9jQ8SO8ca83DtEhAguDa
+        nFtlgTj1fy5rIS354EphiTazMUKmOvfuxKMQoKc=
+X-Google-Smtp-Source: AMsMyM51XqKQyk4s+gVt6jlmvoxBMaNxeULYyZNPUl7oFIcgBDfSa9yp9k6H0qwzA8LOD3vyzz1NfXzFWJtdMAVT2qo=
+X-Received: by 2002:a81:d97:0:b0:348:f982:e2f7 with SMTP id
+ 145-20020a810d97000000b00348f982e2f7mr4722516ywn.414.1663339853668; Fri, 16
+ Sep 2022 07:50:53 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
- <YyNIOg1mtnzQz1H7@zx2c4.com> <CAG-rBijUSQ-kA0-pS=JCVX9ydeaSCd9Ub=yryGk4zsbcv3dTzQ@mail.gmail.com>
- <YyQWPcxG1Xc1qRWE@owl.dominikbrodowski.net>
-In-Reply-To: <YyQWPcxG1Xc1qRWE@owl.dominikbrodowski.net>
-From:   Sven van Ashbrook <svenva@chromium.org>
-Date:   Fri, 16 Sep 2022 10:24:58 -0400
-X-Gmail-Original-Message-ID: <CAM7w-FV8Vn_jUz1ExA5HHVz66sDzYw4vZw9EoxCHuGh_Fm3YiQ@mail.gmail.com>
-Message-ID: <CAM7w-FV8Vn_jUz1ExA5HHVz66sDzYw4vZw9EoxCHuGh_Fm3YiQ@mail.gmail.com>
+In-Reply-To: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 16 Sep 2022 15:50:41 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
+Message-ID: <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
 Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
  outside function
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        LKML <linux-kernel@vger.kernel.org>,
+To:     Sven van Ashbrook <svenva@chromium.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
         Olivia Mackall <olivia@selenic.com>,
         Alex Levin <levinale@google.com>,
         Andrey Pronin <apronin@google.com>,
@@ -80,20 +70,33 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dominik,
+Hi Sven,
 
-On Fri, Sep 16, 2022 at 2:24 AM Dominik Brodowski
-<linux@dominikbrodowski.net> wrote:
->
-> Indeed, our patches address different issues. I'm fine with both approaches,
-> i.e. my patches to be based on Sven's, or the other way round.
+On Thu, Sep 15, 2022 at 1:22 AM Sven van Ashbrook <svenva@chromium.org> wrote:
+> -       if (!kthread_should_stop() && crng_ready())
+> -               schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
+> +       return crng_ready() ? CRNG_RESEED_INTERVAL : 0;
 
-Sounds good! May I suggest then that you try to rebase your patch on top of
-mine. With a bit of luck, it will become simpler, with fewer kthread related
-footguns. I am available to help review.
+I was thinking the other day that under certain circumstances, it
+would be nice if random.c could ask hwrng for more bytes NOW, rather
+than waiting. With the code as it is currently, this could be
+accomplished by having a completion event or something similar to
+that. With your proposed change, now it's left up to the hwrng
+interface to handle.
 
-If your patch becomes more complicated however, we'll work the other way
-around.
+That's not the end of the world, but it does mean we'd have to come up
+with a patch down the line that exports a hwrng function saying, "stop
+the delays and schedule the worker NOW". Now impossible, just more
+complex, as now the state flow is split across two places. Wondering
+if you have any thoughts about this.
 
-How does that sound?
-Sven
+The other thing that occurred to me when reading this patch in context
+of the other one is that this sleep you're removing here is not the
+only sleep in the call chain. Each hwrng driver can also sleep, and
+many do, sometimes for a long time, blocking until there's data
+available, which might happen after minutes in some cases. So maybe
+that's something to think about in context of this patchset -- that
+just moving this to a delayed worker might not actually fix the issue
+you're having with sleeps.
+
+Jason
