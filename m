@@ -2,135 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38A9C54EE9
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 07:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E3CC6FA8B
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 09:24:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbiIPHII convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 03:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54884 "EHLO
+        id S230104AbiIPJYa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Sep 2022 05:24:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbiIPHIH (ORCPT
+        with ESMTP id S229585AbiIPJY1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 03:08:07 -0400
-Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08FA58C447;
-        Fri, 16 Sep 2022 00:08:05 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VPw-tZN_1663312082;
-Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VPw-tZN_1663312082)
-          by smtp.aliyun-inc.com;
-          Fri, 16 Sep 2022 15:08:03 +0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH RESEND v1 0/9] Drivers for Alibaba YCC (Yitian
- Cryptography Complex) cryptographic accelerator
-From:   guanjun <guanjun@linux.alibaba.com>
-In-Reply-To: <1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com>
-Date:   Fri, 16 Sep 2022 15:08:01 +0800
-Cc:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
-        xuchun.shang@linux.alibaba.com,
-        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <60CD0494-8A0F-4234-9599-21C94221FF32@linux.alibaba.com>
-References: <1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au,
-        "Elliott, Robert (Servers)" <elliott@hpe.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Fri, 16 Sep 2022 05:24:27 -0400
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B7667CB8
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 02:24:25 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-3454e58fe53so252798777b3.2
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 02:24:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=ICLxIYLKXePaeX7uqOrK23uRDuhGBueBgNNfHGZTbYo=;
+        b=iKuPoaJFZuGpISn2LNxjPZDTYltZp2yYz7EjsSDOTMSrsmWKISyQWE+8R0W3Noaxdh
+         J67WD0GhPNbs2ZfwpPxNgbFMM4v//+o2m6W92oNOWGoQp8Pm2HMq1js5UI1sFo87fUI9
+         MvqGeHVFn9D1YGWApSlPSYmnXrGlHwaLfjdQFN0BwObXO3DUgO3RrA6T3xaQqEPGLzXQ
+         0EXws5GnRh/SMbPaMkkyLZ+getRmmxwYdyMEUYQYwgzjcGGlv3ejcfImrZFEFoXl2eih
+         RHAeAef5dhW/OI5ZfMGUohaRMTire37kk8EJdr2qZumLOUhrmXM2g5T6Apj/GBOEG16z
+         rgaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=ICLxIYLKXePaeX7uqOrK23uRDuhGBueBgNNfHGZTbYo=;
+        b=OhM779S3C31sgrLV6ueMEXgGnVt+Ux8L2K+oY0Ua20pYZGXxfIr3XF9sJmDcW/b1Fr
+         ANyw9XZmREHKus1J1mCP17i0wm9tmVk3BQAB+8x04iJiv05W0J/EmRiDVyI5+B9BUfCG
+         sLTT6oASZ52MS6magfn3ukLH49jMI86AhNR8x/9R7SDdMPScaURwnb8Zz2EhNi5gRFhn
+         COXKQ7GRPMAJhmq7EIgETGx+SHWGbHu1iXcZS8c7wSp37crk9bS7VIveZhCPxQycBg9G
+         Na7JfjboTRBMmXat8mU9ptUWR6X5luaeMhWJ07TYocK2jcAF5s17ExFHO1Ts2rfd5cZt
+         vouw==
+X-Gm-Message-State: ACrzQf2pB3Z4S4OgbwLhuH3HGOn0E/yFoDPFc+0PpF02cG9ZLuS/1+98
+        noz/CTGvDcWGYSZFthHcpyp+dGYo4YRdPQlUj2igKA==
+X-Google-Smtp-Source: AMsMyM4IEyu4SELoiPZYqJXqFSsxD8xWUmDmdqx1BOynAfW+NapM9J/HLecVe0kFGIteirFbOOlJXPKdVbsta53L3Cs=
+X-Received: by 2002:a0d:d64b:0:b0:345:2455:a1c with SMTP id
+ y72-20020a0dd64b000000b0034524550a1cmr3593259ywd.295.1663320264035; Fri, 16
+ Sep 2022 02:24:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220909095811.2166073-1-glider@google.com> <20220909095811.2166073-2-glider@google.com>
+In-Reply-To: <20220909095811.2166073-2-glider@google.com>
+From:   Alexander Potapenko <glider@google.com>
+Date:   Fri, 16 Sep 2022 11:23:47 +0200
+Message-ID: <CAG_fn=UT24yoY=amdXF5gXQjM9jw8bMamjC-mqJndiXNtNhvLA@mail.gmail.com>
+Subject: Re: [PATCH -next 2/2] crypto: x86: kmsan: disable accelerated configs
+ in KMSAN builds
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Robert Elliott <elliott@hpe.com>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-next <linux-next@vger.kernel.org>,
+        Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Stephen,
+
+Please use this patch to replace "crypto: x86: kmsan: disable
+accelerated configs in KMSAN builds" when merging linux-mm into
+linux-next (assuming arch/x86/crypto/Kconfig is still in -next).
+
+On Fri, Sep 9, 2022 at 11:58 AM Alexander Potapenko <glider@google.com> wro=
+te:
+>
+> KMSAN is unable to understand when initialized values come from assembly.
+> Disable accelerated configs in KMSAN builds to prevent false positive
+> reports.
+>
+> Signed-off-by: Alexander Potapenko <glider@google.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Robert Elliott <elliott@hpe.com>
+> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-next@vger.kernel.org
+> ---
+>  crypto/Kconfig | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 40423a14f86f5..4a2915bd40d1f 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1430,7 +1430,9 @@ endif
+>  if SPARC
+>  source "arch/sparc/crypto/Kconfig"
+>  endif
+> -if X86
+> +# KMSAN is unable to understand when initialized values come from assemb=
+ly.
+> +# Disable accelerated configs to prevent false positive reports.
+> +if X86 && !KMSAN
+>  source "arch/x86/crypto/Kconfig"
+>  endif
+>
+> --
+> 2.37.2.789.g6183377224-goog
+>
 
 
-> 2022年9月6日 上午11:35，Guanjun <guanjun@linux.alibaba.com> 写道：
-> 
-> From: Guanjun <guanjun@linux.alibaba.com>
-> 
-> Hi,
-> 
-> This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
-> cryptographic accelerator. Enables the on-chip cryptographic accelerator of
-> Alibaba Yitian SoCs which based on ARMv9 architecture.
-> 
-> It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
-> 
-> I resend this patchset (see [1]) due to Herbert missed this email.
-> 
-> I list the differences between the former version under [1]. Mainly according to Elliott's comments.
-> 
-> Please help to review.
-> 
-> Thanks,
-> Guanjun.
-> 
-> [1] https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
-> 
-> v1 -> v1 RESEND:
->  - [01/09] Adjust the Kconfig entry in alphabetical order
->  - [05/09][07/09][08/09] Adjust the format of algorithm names
+--=20
+Alexander Potapenko
+Software Engineer
 
+Google Germany GmbH
+Erika-Mann-Stra=C3=9Fe, 33
+80636 M=C3=BCnchen
 
-This is a kindly ping :)
-
-BR,
-Guanjun
-
-> 
-> Guanjun (3):
->  crypto/ycc: Add skcipher algorithm support
->  crypto/ycc: Add aead algorithm support
->  crypto/ycc: Add rsa algorithm support
-> 
-> Xuchun Shang (1):
->  crypto/ycc: Add sm2 algorithm support
-> 
-> Zelin Deng (5):
->  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
->  crypto/ycc: Add ycc ring configuration
->  crypto/ycc: Add irq support for ycc kernel rings
->  crypto/ycc: Add device error handling support for ycc hw errors
->  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
->    entry
-> 
-> MAINTAINERS                            |   8 +
-> drivers/crypto/Kconfig                 |   2 +
-> drivers/crypto/Makefile                |   1 +
-> drivers/crypto/ycc/Kconfig             |  18 +
-> drivers/crypto/ycc/Makefile            |   4 +
-> drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
-> drivers/crypto/ycc/sm2signature_asn1.h |  13 +
-> drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
-> drivers/crypto/ycc/ycc_cdev.c          |  86 +++
-> drivers/crypto/ycc/ycc_cdev.h          |  18 +
-> drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
-> drivers/crypto/ycc/ycc_drv.c           | 574 ++++++++++++++++++++
-> drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
-> drivers/crypto/ycc/ycc_isr.h           |  12 +
-> drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
-> drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
-> 19 files changed, 4721 insertions(+)
-> create mode 100644 drivers/crypto/ycc/Kconfig
-> create mode 100644 drivers/crypto/ycc/Makefile
-> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
-> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
-> create mode 100644 drivers/crypto/ycc/ycc_aead.c
-> create mode 100644 drivers/crypto/ycc/ycc_algs.h
-> create mode 100644 drivers/crypto/ycc/ycc_cdev.c
-> create mode 100644 drivers/crypto/ycc/ycc_cdev.h
-> create mode 100644 drivers/crypto/ycc/ycc_dev.h
-> create mode 100644 drivers/crypto/ycc/ycc_drv.c
-> create mode 100644 drivers/crypto/ycc/ycc_isr.c
-> create mode 100644 drivers/crypto/ycc/ycc_isr.h
-> create mode 100644 drivers/crypto/ycc/ycc_pke.c
-> create mode 100644 drivers/crypto/ycc/ycc_ring.c
-> create mode 100644 drivers/crypto/ycc/ycc_ring.h
-> create mode 100644 drivers/crypto/ycc/ycc_ske.c
-> 
-> -- 
-> 1.8.3.1
-
+Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
+Registergericht und -nummer: Hamburg, HRB 86891
+Sitz der Gesellschaft: Hamburg
