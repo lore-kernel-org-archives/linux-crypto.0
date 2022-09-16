@@ -2,101 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2DDECAAD8
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 14:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B01ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 17:21:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbiIPOvF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 10:51:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54178 "EHLO
+        id S229621AbiIPRVJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Sep 2022 13:21:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbiIPOvD (ORCPT
+        with ESMTP id S229509AbiIPRVI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 10:51:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A98A572E;
-        Fri, 16 Sep 2022 07:51:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E2EEF62C52;
-        Fri, 16 Sep 2022 14:51:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E58EBC43470;
-        Fri, 16 Sep 2022 14:51:00 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KlnuYh1s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1663339856;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AQYiQoE1MzbspExjoxRIxp8659JqC9N66qASNbjnQqI=;
-        b=KlnuYh1sIGr8iLDnyM+oR6yvdq24Mjt7ZamBZ0JSxxSGkgc4FRdQprP+5+Bjt3yAL6YIB7
-        yqOyyKBd6P9kvimEiqKEMUDql0NS6+PZNFNjavhEaVHVq5YER6w0tDUwuDpWXJ4FBwbo79
-        gRldpBdze8LjSuUu0ZMBXHkrXyE0qYE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1f8ea2d5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 16 Sep 2022 14:50:55 +0000 (UTC)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-3450990b0aeso262117667b3.12;
-        Fri, 16 Sep 2022 07:50:55 -0700 (PDT)
-X-Gm-Message-State: ACrzQf2BAoZuRL2Uk/12ojcGA6HEUcIrGFUp9jQ8SO8ca83DtEhAguDa
-        nFtlgTj1fy5rIS354EphiTazMUKmOvfuxKMQoKc=
-X-Google-Smtp-Source: AMsMyM51XqKQyk4s+gVt6jlmvoxBMaNxeULYyZNPUl7oFIcgBDfSa9yp9k6H0qwzA8LOD3vyzz1NfXzFWJtdMAVT2qo=
-X-Received: by 2002:a81:d97:0:b0:348:f982:e2f7 with SMTP id
- 145-20020a810d97000000b00348f982e2f7mr4722516ywn.414.1663339853668; Fri, 16
- Sep 2022 07:50:53 -0700 (PDT)
+        Fri, 16 Sep 2022 13:21:08 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51E3D58DF3;
+        Fri, 16 Sep 2022 10:21:04 -0700 (PDT)
+Received: from [192.168.87.140] (unknown [50.35.69.86])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 995F62057C51;
+        Fri, 16 Sep 2022 10:21:03 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 995F62057C51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1663348863;
+        bh=A2ida2JImgsK4UkeYzeFjOJ0tiwuK8bnCdPdCjm9pt0=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=KYZtP4gviHGMnnV8Py6fBB0q97vzSmjwM0mh0A7YEkX6r+JJsTtmevZef37AZRmrW
+         jqQM+pwWFUeuhEKC9mTKJ+TK4VSrZFZ91mjysl8Qm6arIDSV1SL6V3hUB1w7rfjvlu
+         gUHI28DL+rg7ANZdVzP84ROKc+m3UX6rbX0lh3XQ=
+Message-ID: <4dc8b1a8-d7ef-844d-b48e-76fb8b91d96a@linux.microsoft.com>
+Date:   Fri, 16 Sep 2022 10:21:03 -0700
 MIME-Version: 1.0
-References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
-In-Reply-To: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 16 Sep 2022 15:50:41 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
-Message-ID: <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
- outside function
-To:     Sven van Ashbrook <svenva@chromium.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Olivia Mackall <olivia@selenic.com>,
-        Alex Levin <levinale@google.com>,
-        Andrey Pronin <apronin@google.com>,
-        Stephen Boyd <swboyd@google.com>,
-        Rajat Jain <rajatja@google.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Petr Mladek <pmladek@suse.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        "Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v2] crypto: aspeed: fix build module error
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Neal Liu <neal_liu@aspeedtech.com>
+Cc:     BMC-SW <BMC-SW@aspeedtech.com>, kernel test robot <lkp@intel.com>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20220905025433.1610696-1-neal_liu@aspeedtech.com>
+ <YxXXuyNrQIcMZBLI@gondor.apana.org.au>
+ <HK0PR06MB3202F47019416BA40859C7D4807E9@HK0PR06MB3202.apcprd06.prod.outlook.com>
+ <YyRS/71B4veWJgyl@gondor.apana.org.au>
+From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
+In-Reply-To: <YyRS/71B4veWJgyl@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sven,
+On 9/16/2022 3:42 AM, Herbert Xu wrote:
+>>> Does this still build if both HASH and CRYPTO are off?
+>>>
+>>> I think this it's best if you do:
+>>>
+>>> hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) :=
+>>> aspeed-hace-hash.o
+>>> hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) :=
+>>> aspeed-hace-crypto.o
+>>>
+>>> obj-$(CONFIG_CRYPTO_DEV_ASPEED) += aspeed_crypto.o
+>>> aspeed_crypto-objs := aspeed-hace.o	\
+>>> 		      $(hace-hash-y)	\
+>>> 		      $(hace-crypto-y)
+>>>
+>> aspeed-hace.o effects only if either hace-hash-y or hace-crypto-y.
+>> If we put aspeed-hace.o in aspeed_crypto-objs, but hace-hash-y and hace-crypto-y are empty, apseed-hace.o is just an useless driver which might still occupy system resources.
+> Apparently it doesn't build after all, at least not on m68k.
+> 
+> So please either adopt my suggestion above, or come up with another
+> way of preventing the build failure on m68k with both HASH and CRYPTO
+> disabled.
 
-On Thu, Sep 15, 2022 at 1:22 AM Sven van Ashbrook <svenva@chromium.org> wrote:
-> -       if (!kthread_should_stop() && crng_ready())
-> -               schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
-> +       return crng_ready() ? CRNG_RESEED_INTERVAL : 0;
+Curious why compiled on m68k? It's embedded controller in ARM based
+Aspeed SoCs. And there's "depends on ARCH_ASPEED" in Kconfig, need
+some additional dependencies?
 
-I was thinking the other day that under certain circumstances, it
-would be nice if random.c could ask hwrng for more bytes NOW, rather
-than waiting. With the code as it is currently, this could be
-accomplished by having a completion event or something similar to
-that. With your proposed change, now it's left up to the hwrng
-interface to handle.
-
-That's not the end of the world, but it does mean we'd have to come up
-with a patch down the line that exports a hwrng function saying, "stop
-the delays and schedule the worker NOW". Now impossible, just more
-complex, as now the state flow is split across two places. Wondering
-if you have any thoughts about this.
-
-The other thing that occurred to me when reading this patch in context
-of the other one is that this sleep you're removing here is not the
-only sleep in the call chain. Each hwrng driver can also sleep, and
-many do, sometimes for a long time, blocking until there's data
-available, which might happen after minutes in some cases. So maybe
-that's something to think about in context of this patchset -- that
-just moving this to a delayed worker might not actually fix the issue
-you're having with sleeps.
-
-Jason
+Regards,
+Dhananjay
