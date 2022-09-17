@@ -2,85 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B01ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Sep 2022 17:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20566C6FA86
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Sep 2022 06:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbiIPRVJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Sep 2022 13:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51230 "EHLO
+        id S229645AbiIQGyZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 17 Sep 2022 02:54:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiIPRVI (ORCPT
+        with ESMTP id S229652AbiIQGyW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Sep 2022 13:21:08 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51E3D58DF3;
-        Fri, 16 Sep 2022 10:21:04 -0700 (PDT)
-Received: from [192.168.87.140] (unknown [50.35.69.86])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 995F62057C51;
-        Fri, 16 Sep 2022 10:21:03 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 995F62057C51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1663348863;
-        bh=A2ida2JImgsK4UkeYzeFjOJ0tiwuK8bnCdPdCjm9pt0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=KYZtP4gviHGMnnV8Py6fBB0q97vzSmjwM0mh0A7YEkX6r+JJsTtmevZef37AZRmrW
-         jqQM+pwWFUeuhEKC9mTKJ+TK4VSrZFZ91mjysl8Qm6arIDSV1SL6V3hUB1w7rfjvlu
-         gUHI28DL+rg7ANZdVzP84ROKc+m3UX6rbX0lh3XQ=
-Message-ID: <4dc8b1a8-d7ef-844d-b48e-76fb8b91d96a@linux.microsoft.com>
-Date:   Fri, 16 Sep 2022 10:21:03 -0700
+        Sat, 17 Sep 2022 02:54:22 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3A45A88A
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 23:54:19 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id d2so3699255wrq.2
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Sep 2022 23:54:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date;
+        bh=1Nafsqgi+ey0lvESaq3P7Ed7c4PrgjcfWmeY/VtoS1k=;
+        b=hbkqdT6B0JIb5xRyjQ9vZaFUiaE2784NvVaLLdQGt0tGmAIHQd+hEL9UVXJH1zpQ4R
+         COcXfoxwhqnGAGGBffs3stiK0ijUBpxN7VoS8CaS2+4RWy9GzMo451qN69Ds1g2SByw/
+         QpH3scY0uUqXaUnKvc6rMjkHEIVNokwIi/buUXRd1CpTmHX+n5q8pavaxJPWENFfe4wA
+         k02b2clrS17Vx0PnbZfgusllPmk3xuFShima1mei6+iYOVPgoR7YE38bHbFqVrFZCFfj
+         VKS8VY0zKBgj1XZz9++/pZgyEMWkv/UpPog52PskeqVS2dxzNHCcVwS6RfnHh4b3MMzh
+         Wyxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=1Nafsqgi+ey0lvESaq3P7Ed7c4PrgjcfWmeY/VtoS1k=;
+        b=yU32EHw173+c3FSvcEFsO0EtYYJ2o92RxBU4eYg3so7n/eQ2PRh7ZeSxDkXtwX+c9r
+         F6oO+x1yArl2WA8w3ELib7PYxMUirlyb2caxEdgTBFHWqa2elMjVE+Xha1rqA9G5IpE4
+         UhiKSzXZHyErQ1yGEhqOHNPqpbYBeNEhQsK16scVpZkZI93tyuFPYcEpbjuu9rZf44Hm
+         rPzjvGNqRyKHjvhlFLTl2X3FAZuOyg9qk0AQMOUxBMYIiDtHDKykwP22B3A46UPIvnBn
+         TjpCHDrGcbBZ3cd7ZoOtbrw6I86ivr7eZT5+q7JAGOR96LYdcR5YURsEAhOtE9T6lJMc
+         /sTA==
+X-Gm-Message-State: ACrzQf2wK6IML95KA+M727kQr3JS5h5RUNMGB+SUR/vUN3zEnxfW0dHe
+        yHPiFLb6VXbhvkGeCEOmjuo=
+X-Google-Smtp-Source: AMsMyM5SsjWaQCzqj9tgf7b/iw1sUIKuj+Zy1CSKV2OTWTOy+/oMLHzvkEOg7w1SPFKKUgSNUsyKgA==
+X-Received: by 2002:adf:d088:0:b0:228:a789:ce1f with SMTP id y8-20020adfd088000000b00228a789ce1fmr4683212wrh.461.1663397658016;
+        Fri, 16 Sep 2022 23:54:18 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id d18-20020a05600c34d200b003b2878b9e0dsm5051092wmq.20.2022.09.16.23.54.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Sep 2022 23:54:17 -0700 (PDT)
+Date:   Sat, 17 Sep 2022 08:54:14 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Liu Shixin <liushixin2@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH] crypto: sun4i-ss - use DEFINE_SHOW_ATTRIBUTE to simplify
+ sun4i_ss_debugfs
+Message-ID: <YyVvFgHri4UmFOAU@Red>
+References: <20220916141340.2174495-1-liushixin2@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v2] crypto: aspeed: fix build module error
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Neal Liu <neal_liu@aspeedtech.com>
-Cc:     BMC-SW <BMC-SW@aspeedtech.com>, kernel test robot <lkp@intel.com>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-References: <20220905025433.1610696-1-neal_liu@aspeedtech.com>
- <YxXXuyNrQIcMZBLI@gondor.apana.org.au>
- <HK0PR06MB3202F47019416BA40859C7D4807E9@HK0PR06MB3202.apcprd06.prod.outlook.com>
- <YyRS/71B4veWJgyl@gondor.apana.org.au>
-From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
-In-Reply-To: <YyRS/71B4veWJgyl@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220916141340.2174495-1-liushixin2@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/16/2022 3:42 AM, Herbert Xu wrote:
->>> Does this still build if both HASH and CRYPTO are off?
->>>
->>> I think this it's best if you do:
->>>
->>> hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) :=
->>> aspeed-hace-hash.o
->>> hace-crypto-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) :=
->>> aspeed-hace-crypto.o
->>>
->>> obj-$(CONFIG_CRYPTO_DEV_ASPEED) += aspeed_crypto.o
->>> aspeed_crypto-objs := aspeed-hace.o	\
->>> 		      $(hace-hash-y)	\
->>> 		      $(hace-crypto-y)
->>>
->> aspeed-hace.o effects only if either hace-hash-y or hace-crypto-y.
->> If we put aspeed-hace.o in aspeed_crypto-objs, but hace-hash-y and hace-crypto-y are empty, apseed-hace.o is just an useless driver which might still occupy system resources.
-> Apparently it doesn't build after all, at least not on m68k.
+Le Fri, Sep 16, 2022 at 10:13:40PM +0800, Liu Shixin a écrit :
+> Use DEFINE_SHOW_ATTRIBUTE helper macro to simplify the code.
 > 
-> So please either adopt my suggestion above, or come up with another
-> way of preventing the build failure on m68k with both HASH and CRYPTO
-> disabled.
+> Signed-off-by: Liu Shixin <liushixin2@huawei.com>
+> ---
 
-Curious why compiled on m68k? It's embedded controller in ARM based
-Aspeed SoCs. And there's "depends on ARCH_ASPEED" in Kconfig, need
-some additional dependencies?
+Hello
 
-Regards,
-Dhananjay
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+
+Thanks
