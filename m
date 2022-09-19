@@ -2,133 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E255EECAAD3
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 15:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED7CECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 15:10:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbiISPJN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 11:09:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56204 "EHLO
+        id S229535AbiISPKs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 11:10:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbiISPJL (ORCPT
+        with ESMTP id S229528AbiISPKr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 11:09:11 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFA41FCE4
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 08:09:09 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a26so36482980ejc.4
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 08:09:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=29Q13qvIrzikJw/fUgHdsSOAwHmgeU1WfwREQ1Cge1Y=;
-        b=lwxdIbe5BjxF0HFPnwF9Ofpvu0luMg35Ct6ff/AF8HWxyNhmnKGYXO+mANg2sK0aRp
-         zDmKcO1OJAa/tYrxnxzBvTsVbyoz/6hGfgwWltTQlppuEsv2vmOuV0C99/+dJ3qo1nuD
-         nT6doWb23QqnDbH824dGANTgN7MsuOFdOTvQQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=29Q13qvIrzikJw/fUgHdsSOAwHmgeU1WfwREQ1Cge1Y=;
-        b=oU3Z2hEX+Um7zesy8YL8nImW+j9VgN5G8S1aPcFQJbliSf6p8qruBYHDYn0HEFRnGV
-         CBhngsftxADyHWmExfd4jHz7lAUDC0zKnGFPdDuGIOdEN0hJxGC/P5hgcqKsHij5GnhG
-         bYJlcs/rCaIc5t0/EqrC9u1+/vGF068wwSuY+gSgb73Ev4lbL8S6qrKSzEq7x22MhBCz
-         7o0frMhisoENg/BXI8xn/JL+K2k4Um0UkbXHOYneGnL+h7bN22IMrSU8DqRCaGQDI3fL
-         m83rDZSHNGTUsEz64XE34FejWd+TSoj5Kke4C3HpyLybdgbZn33TvEY3TcLnWOg65Vx9
-         JoyQ==
-X-Gm-Message-State: ACrzQf2BODPmBDEbVZsP+kEH49DsRfmcnWQtfKVSpy7JnZGZdzr5jSzP
-        Ok/uP7bqVbyk2ODuoijSHVYRtGFkvnYl2yY8
-X-Google-Smtp-Source: AMsMyM68SlImpfPQkp8zH1fdU8c6MKPCFdiNutVrGQ5eIhAUIvicf2UtAG3SFKsN9FJM7uF33yFq9Q==
-X-Received: by 2002:a17:907:980e:b0:77a:6958:5aa1 with SMTP id ji14-20020a170907980e00b0077a69585aa1mr13760115ejc.232.1663600147415;
-        Mon, 19 Sep 2022 08:09:07 -0700 (PDT)
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
-        by smtp.gmail.com with ESMTPSA id d15-20020a170906304f00b00772b5835c12sm15606171ejd.23.2022.09.19.08.09.07
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Sep 2022 08:09:07 -0700 (PDT)
-Received: by mail-ej1-f41.google.com with SMTP id y3so65279753ejc.1
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 08:09:07 -0700 (PDT)
-X-Received: by 2002:a05:651c:17a7:b0:261:c0b1:574b with SMTP id
- bn39-20020a05651c17a700b00261c0b1574bmr5541662ljb.40.1663599802963; Mon, 19
- Sep 2022 08:03:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
- <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
-In-Reply-To: <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
-From:   Sven van Ashbrook <svenva@chromium.org>
-Date:   Mon, 19 Sep 2022 11:03:11 -0400
-X-Gmail-Original-Message-ID: <CAM7w-FXHWzcN1Y7pwb6+1KA6A2oZRrfpOJdWFVWjRvjbp+DEOg@mail.gmail.com>
-Message-ID: <CAM7w-FXHWzcN1Y7pwb6+1KA6A2oZRrfpOJdWFVWjRvjbp+DEOg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
- outside function
-To:     Dominik Brodowski <linux@dominikbrodowski.net>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Mon, 19 Sep 2022 11:10:47 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8592A712;
+        Mon, 19 Sep 2022 08:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663600246; x=1695136246;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UB13A1XuABk+pdSrOQDK5a/k2hrx2eMwac3alMLt79U=;
+  b=n3AWe4mpqo8/kMJclJ10LTgwNja+U24bRiyGC8gBclP1WbcI5yAFI+8k
+   HUgKsV9XQkQp/505QOrIVAj74mMEpYh2unEY6ihNlKXsnk1ImRjJ85pGz
+   AkQESxuh4e7BZmRa8L0QaDl9fdK859oFpjihJDaXoffDdUo/KiY+uJFQw
+   ey24kjdF/86xenrVAw1bwXwCoFMB+R7BGTRyzS7HVQwD7SlAMDLoapnub
+   SMnQ9/rH49wvLlfySFqDalT4jKxF6TFuWVP7/l8NY+PcX7hjJh815VJha
+   yeh3E1+5f6IDB36ecDDpeRSKFd2gU3jGejPKEC0sJZOlcFE+g4u1AbcEt
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10475"; a="361164046"
+X-IronPort-AV: E=Sophos;i="5.93,328,1654585200"; 
+   d="scan'208";a="361164046"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2022 08:10:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,328,1654585200"; 
+   d="scan'208";a="947257761"
+Received: from lkp-server01.sh.intel.com (HELO c0a60f19fe7e) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 19 Sep 2022 08:10:43 -0700
+Received: from kbuild by c0a60f19fe7e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oaIPy-00023A-30;
+        Mon, 19 Sep 2022 15:10:42 +0000
+Date:   Mon, 19 Sep 2022 23:10:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>,
-        Alex Levin <levinale@google.com>,
-        Andrey Pronin <apronin@google.com>,
-        "Jason A. Donenfeld" <jason@zx2c4.com>,
-        Stephen Boyd <swboyd@google.com>,
-        Rajat Jain <rajatja@google.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Petr Mladek <pmladek@suse.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        "Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: Re: [PATCH] crypto: add rsize config to .config only if lib_poly1305
+ is set
+Message-ID: <202209192252.T6IGLNqC-lkp@intel.com>
+References: <20220919060342.26400-1-lukas.bulwahn@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220919060342.26400-1-lukas.bulwahn@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 16, 2022 at 10:51 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> The other thing that occurred to me when reading this patch in context
-> of the other one is that this sleep you're removing here is not the
-> only sleep in the call chain. Each hwrng driver can also sleep, and
-> many do, sometimes for a long time, blocking until there's data
-> available, which might happen after minutes in some cases. So maybe
-> that's something to think about in context of this patchset -- that
-> just moving this to a delayed worker might not actually fix the issue
-> you're having with sleeps.
->
+Hi Lukas,
 
-This is an excellent point. A look at tpm2_calc_ordinal_duration()
-reveals that tpm_transmit() may block for 300s at a time. So when
-we are using a WQ_FREEZABLE delayed_work, the PM may have to wait
-for up to 300s when draining the wq on suspend. That will introduce
-a lot of breakage in suspend/resume.
+I love your patch! Yet something to improve:
 
-Dominik: in light of this, please proceed with your patch, without
-rebasing it onto mine.
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.0-rc6 next-20220919]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-+ tpm maintainers Peter Huewe and Jarkko Sakkinen, a quick recap of
-the problem:
+url:    https://github.com/intel-lab-lkp/linux/commits/Lukas-Bulwahn/crypto-add-rsize-config-to-config-only-if-lib_poly1305-is-set/20220919-140531
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20220919/202209192252.T6IGLNqC-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 791a7ae1ba3efd6bca96338e10ffde557ba83920)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm cross compiling tool for clang build
+        # apt-get install binutils-arm-linux-gnueabi
+        # https://github.com/intel-lab-lkp/linux/commit/c1954797e493eabf02f354e290fe380ace0633e4
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Lukas-Bulwahn/crypto-add-rsize-config-to-config-only-if-lib_poly1305-is-set/20220919-140531
+        git checkout c1954797e493eabf02f354e290fe380ace0633e4
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/crypto/caam/
 
-- on ChromeOS we are seeing intermittent suspend/resume errors+warnings
-  related to activity of the core's hwrng_fillfn. this kthread keeps
-  runningduring suspend/resume. if this happens to kick off an bus (i2c)
-  transaction while the bus driver is in suspend, this triggers
-  a "Transfer while suspended" warning from the i2c core, followed by
-  an error return:
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-i2c_designware i2c_designware.1: Transfer while suspended
-tpm tpm0: i2c transfer failed (attempt 1/3): -108
-[ snip 10s of transfer failed attempts]
+All errors (new ones prefixed by >>):
 
-- in 2019, Stephen Boyd made an attempt at fixing this by making the
-  hwrng_fillfn kthread freezable. But a freezable thread requires
-  different API calls for scheduling, waiting, and timeout. This
-  generated regressions, so the solution had to be reverted.
+   In file included from drivers/crypto/caam/ctrl.c:15:
+   In file included from drivers/crypto/caam/compat.h:41:
+>> include/crypto/poly1305.h:56:32: error: use of undeclared identifier 'CONFIG_CRYPTO_LIB_POLY1305_RSIZE'
+                   struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
+                                                ^
+   1 error generated.
 
-https://patchwork.kernel.org/project/linux-crypto/patch/20190805233241.220521-1-swboyd@chromium.org/
 
-- the current patch attempts to halt hwrng_fillfn during suspend by
-  converting it to a self-rearming delayed_work. The PM drains all
-  work before going into suspend. But, the potential minute-long
-  blocking delays in tpm make this solution infeasible.
+vim +/CONFIG_CRYPTO_LIB_POLY1305_RSIZE +56 include/crypto/poly1305.h
 
-Peter and Jarkko, can you think of a possible way forward to eliminate
-the warnings+errors?
+878afc35cd28bc Eric Biggers       2018-11-16  40  
+2546f811ef45fc Martin Willi       2015-07-16  41  struct poly1305_desc_ctx {
+2546f811ef45fc Martin Willi       2015-07-16  42  	/* partial buffer */
+2546f811ef45fc Martin Willi       2015-07-16  43  	u8 buf[POLY1305_BLOCK_SIZE];
+2546f811ef45fc Martin Willi       2015-07-16  44  	/* bytes used in partial buffer */
+2546f811ef45fc Martin Willi       2015-07-16  45  	unsigned int buflen;
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  46  	/* how many keys have been set in r[] */
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  47  	unsigned short rset;
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  48  	/* whether s[] has been set */
+2546f811ef45fc Martin Willi       2015-07-16  49  	bool sset;
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  50  	/* finalize key */
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  51  	u32 s[4];
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  52  	/* accumulator */
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  53  	struct poly1305_state h;
+ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  54  	/* key */
+1c08a104360f3e Jason A. Donenfeld 2020-01-05  55  	union {
+1c08a104360f3e Jason A. Donenfeld 2020-01-05 @56  		struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
+1c08a104360f3e Jason A. Donenfeld 2020-01-05  57  		struct poly1305_core_key core_r;
+1c08a104360f3e Jason A. Donenfeld 2020-01-05  58  	};
+2546f811ef45fc Martin Willi       2015-07-16  59  };
+2546f811ef45fc Martin Willi       2015-07-16  60  
 
--Sven
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
