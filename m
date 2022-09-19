@@ -2,496 +2,273 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 199FAECAAA1
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 21:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACB1ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 21:38:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbiISVBs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 17:01:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34100 "EHLO
+        id S229548AbiISVil (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 17:38:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbiISVBO (ORCPT
+        with ESMTP id S229456AbiISViQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 17:01:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152874CA39;
-        Mon, 19 Sep 2022 14:01:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DD925B82076;
-        Mon, 19 Sep 2022 21:01:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D175C433D6;
-        Mon, 19 Sep 2022 21:00:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="JKJ8HNnd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1663621257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=P8nsYcfw0906oLqr46l4KFRxvKDrSDE9ZAD2yOL1xrQ=;
-        b=JKJ8HNnd91vSARdQudqALPbUN2a8AveZ390vDMzNmAE9QNRvEhjHQyMNY/Ldi3ydw+PAde
-        oQMm0M614o8gFGj/M7J7uvoR8WdHhPmNHkLw0xkc6xbnSHEvcab+Dui/5k+ZQUy0XJwIP4
-        LDDyx7A9E8MSV4+25/QWuM0UcKZopMU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a611b30a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 19 Sep 2022 21:00:56 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Lin Jinhan <troy.lin@rock-chips.com>, wevsty <ty@wevs.org>,
-        Mikhail Rudenko <mike.rudenko@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lin Huang <hl@rock-chips.com>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        linux-rockchip@lists.infradead.org
-Subject: [PATCH] hw_random: rockchip: import driver from vendor tree
-Date:   Mon, 19 Sep 2022 23:00:25 +0200
-Message-Id: <20220919210025.2376254-1-Jason@zx2c4.com>
+        Mon, 19 Sep 2022 17:38:16 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2AB1FCD0;
+        Mon, 19 Sep 2022 14:38:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AxEtujEobF6fJDoKm3KCzfaUoa4M46d9oA9Q7fPsOsg7p/aaavokYKo3lNnWZcLAYQ0VWFUK8aewadSbsQE7H620vMwE277o79Xgn/enzatbeJ5inuWh9qtyjTpY3e6YETwMgOt30iDcZnkN71l3VCVW7KVYxkBekkJJtOGLt3tXqADhyHipM382qrdubxhY5+Yfxh/uVJC3G1Fum38ybEXvkNLIhG8P8CxBsoSdYsj5ZwwA9ObjkV8TSCum81FfGfPVBJ/EvBaIkbdyVv+wjxsKUBXFZRsErP2tp9cmglnGHDqHccKMfP8pINoRCvf99pDDL1gLqq3YY/8e98wgig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xIz0SQ/Tzc5rl8GWGkVLuAlwnQoekbRMlkyXQlkZ9+U=;
+ b=fB258W81eO/vOjq+DDSLdVV02WJaBibkL/yqVpzEIIO0ulsoZ09h1d0eHnj9o6HMnp3oxj6sMxADUId65nsnt0iUWcSQbibj8IOvWnvfA6gk2+Dv8gqcjQOlJHV5bbxPK30CEu5vnam20DAiB9LUwSDOUDzZScg9vRu54JRKs4P706/N4tj3XCzCU10qJ2MCpoXqzwuXp+kHOkimPtp0xlYtU2wPSqXIIuK8Uhrqlh0wViEj1O7I7FE8b0oAQnBddEOPse2feZvSC+459T2rg489NXJc3SLSTS3NHjf8H07XBbijJe9JfvTnGkK83L9p6IRZc89JfSY8hP7IlyUxxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xIz0SQ/Tzc5rl8GWGkVLuAlwnQoekbRMlkyXQlkZ9+U=;
+ b=xpJK8veyJwd9daEKYkouoSP1EUWUdydEmnMCRpGQozuhR5kVE+CWjCtk3AM1ELoMnbd4Nz+9Ho+DWeC9r/z4eG4dyIKl+O6r5CDQfssJlIg/qaCnCgFNG0zrITaxluBN01Yhye9Ev7Iwqj7q3m28rCbj9RytFG9h3IRSyzv0koo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5632.16; Mon, 19 Sep 2022 21:38:07 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::c175:4c:c0d:1396]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::c175:4c:c0d:1396%4]) with mapi id 15.20.5632.021; Mon, 19 Sep 2022
+ 21:38:07 +0000
+Message-ID: <0716365f-3572-638b-e841-fcce7d30571a@amd.com>
+Date:   Mon, 19 Sep 2022 16:38:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Content-Language: en-US
+To:     Alper Gun <alpergun@google.com>, Peter Gonda <pgonda@google.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
+ <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BLAPR03CA0001.namprd03.prod.outlook.com
+ (2603:10b6:208:32b::6) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|DS7PR12MB6288:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddb351c6-0578-4cd8-17ab-08da9a873d73
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NZa6omdYdUo1HXpKOOBzHkRjrzCJ60oc/taLPJA50dCyXRP1ZmCCLWS9tnXSPjtLOhV30m6NZvm6+RBraKKL3QD5qfmNy7IT/elREF0+i8Ex47iS02KgpEJ8MZndm83+W70tLk2M3vfZMdA3NLyCX6SOcD+lSnnfZmUNHct23l5drckdtWtolybkt4yHWfCIn+gjbFqvT7hc1wyytb0iszD0thntBCHZ3lqcpxlNENxyYmJwX57vdb+Ghd97tAg2EfrXSJpMiSJMgzGqQKuGxdhwDAVjXVRqFpehDlxlpHoQXxabDf01grEwJZ+yuC6EL8EYYW5YCY0lrmzb/GRBhPcj5/EU3FmldvDb6XbLnz/lfJehTSpFQAjnLUXjy0i8WEl7gXq0Y2tyAfv+ZCtS+sCWnAX7IryPXlszCNqPdBbxvOes4h3HcZkyOQmfbRjvgsFBMNeW6SAk+axpDi9ukoOmRrpnFVeBEWzE6carlBAYLvsYpE6Sm3a6EjB0FOCq3PeptKB39acZncIsz7owMKl7ao/LWlqoMpFOLmjy9qeXR6ruXM9zxh85gdQ5xGgsEdC0t1CdklJDzCk0r/0OQhJ36/Wldhb2DHNHjAJh7wg1JUQLNcJuBDSQjai5Vd5W62yht4mC1KIyAtn0TeGtJ7eJa0nNqWJyf6+3htadYiy/fo/9ed3ryocG1zSl8XctXNzL8iA4zet2i8c+t6IorSSBx4uZNhho9401WYRnhHK9nF98WtTUXRdvb/jOrEDssfoDk2A3256LH+zw3JvZgcE1I4+usF5GOrCO6AIfZJQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(451199015)(86362001)(316002)(36756003)(31686004)(66946007)(7416002)(7406005)(5660300002)(6666004)(66476007)(38100700002)(8936002)(66556008)(478600001)(54906003)(110136005)(4326008)(41300700001)(2906002)(31696002)(26005)(8676002)(186003)(6512007)(83380400001)(6506007)(53546011)(2616005)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1MvTlhMVEtCWG1yMmRPc3VVQ3lTR3pjZlpmdDB0WXRhUjN4MmgxZDIyTXBU?=
+ =?utf-8?B?QWxJVDhOUk9YMWdVcW8zbWthTWZ4UnBFY2YvNXlWZDRSMGRKa1RkRXlxSFow?=
+ =?utf-8?B?czllZHN4VVJnb0dvby94VEQvbjVYUkM3NWRhUW9DZTNUNm5GTWpCN1FIL21P?=
+ =?utf-8?B?aWJKYlRmSWgrc0RjaGsreXpmRG1VM2IvQkErMDVFYUFJam5BTEhjVGQ4UHly?=
+ =?utf-8?B?Qkt5ZkNVS0dPVXZ0ZlJqN0dHdnliTXgrNldnN2RoNW5UOUhFZUJhNUFMTXlj?=
+ =?utf-8?B?OUYvanN4SjVKOFIybmF1VWRZMTVwczdHbGhYWjZKRTJ5bWhaYmZURVdzdS9K?=
+ =?utf-8?B?cFlSRmhid1JVa3RGTGhRSDA2UEQzZ2RNemorcHdFQWwzaUVPNERhOWsydEJ3?=
+ =?utf-8?B?UFNTdGNOeXV4bXIwUnlqZEJySGlCbERSL3k1eDR3ZWJhUVp5T1p5MWhud3Fy?=
+ =?utf-8?B?bVFRMVlCcXFrQmpBUHEvVm5XTURaWkNQdmswTjhRWDZ5YUJiek1VQjZ4OHdi?=
+ =?utf-8?B?L3Z6eUt2cWVQOUdPWURxYXlEZlh6VFB4NjhZSVlmTTNYYzRjN0FaN2dabEt5?=
+ =?utf-8?B?czFBOEM1N2ZOeUtsbFgvc3MrcHhVRk8yd3hVT2FaSFRlYzVHL3k0NS9WK2V4?=
+ =?utf-8?B?NGQ0OHdnd3U3cVFTdzRQanNuM0dBcmRZNmVNUklreGFGL1dIeG5QQlMxU2c3?=
+ =?utf-8?B?bC9RWXNjd1hKbTE1TDk2MXQ5MkdWM1Jyd1ljRnB6VzRqTFl3ZG9XMEJOY2Zl?=
+ =?utf-8?B?ZmtUb28rb2FKdkM5bzZJdDltbmhJazYyTm9HUmFWdXVmeHp3VWY5T0VTQ0RK?=
+ =?utf-8?B?ZzU3Y3c5QXg0M0N5S0FVTS9kbm9QdFE0WXFOa0E0WnhIWHBmNWQ3ZEZJMUxB?=
+ =?utf-8?B?bHhVSGJTSDRPaDdlL3UyQy8rQnBYbWZvcHZFNVF3cEE2ZEg0aG12bmtRZXJL?=
+ =?utf-8?B?cWpOUXBLa2dab3I2Ky8reXFxNi9jajc1WnYvb2R3Rm9pSzhvcERlZE84ZUhm?=
+ =?utf-8?B?NE9GNC9aY3M5cUh3UmorV3ZTQ2xZZlBDYnlvcVFWU3VLK3JkSmt1emE3Tm11?=
+ =?utf-8?B?MkY5L1N4RVZmM3dZRyt4YytINXM4QzBlZTk5T0ZQMzJsNjJVUDVlL2RQalpQ?=
+ =?utf-8?B?RXlTdDgrd1hJcHk3WUN0M0dWVmtWZzVMMDhLZE53VlZZdER0bHpzTHlpazBx?=
+ =?utf-8?B?eVlRNmhUUk1yeHJyVHdvd2MrSUNHclVGTVpOWEgrQnhNR29YNGY4WmRGMUJ0?=
+ =?utf-8?B?Uk0vZ3JCejE5aDNXeW1KbUcyUTBLeXBwTzJDYUtDbFRCVEVCTEU2NlBBeFlv?=
+ =?utf-8?B?YmZKZXJXNmtiVnJKU3Z3RW4xS3lrYXVjTVBSbmdOMXlDa1ZxdURQZ1BmMUVH?=
+ =?utf-8?B?dUFxNm1yVWFIN2hKd1AzK0ZnY3IvSXB6R2dnRUlHUkVFaEJKK2JSL051Vngv?=
+ =?utf-8?B?cjhJQVFuR212RDJ1OXYyMjM3cTU2cXhVbFh1K1pBMHpCb3ZmaU5sMGdzT1N0?=
+ =?utf-8?B?ZDRVRVRqMGExZDYyS1cyZ1pOTFplUzNQeU90ak9BbG9oRjIxT1NuL2xrRFVO?=
+ =?utf-8?B?QVJDY0IyYXc5alM5VjNmOUtXRmVzeXM2cFNPWHdUampROStYMTR4L3QycDU2?=
+ =?utf-8?B?RGtPSW9jRkJiWjlQQUhIT3k0d09SMHlwUlowNHExU3ZWQVFZTlJCclNDWTho?=
+ =?utf-8?B?NDNjVmZEZmF2dHJBSEx1enZFc0xsbGlieVZreUlMa1U4MXN6dzZpSTNYRnE5?=
+ =?utf-8?B?clZzR3RkZXh1clEvcC9PRXJlQ0s1bGN3WU5tVkxJMGhHMjZZdWtzWXNoZFFv?=
+ =?utf-8?B?cnVIaFFKaDc0azhZeWUraDkrd0QvOHpyTWhuUUkrekxmMDNiQVppTTJ3eHMr?=
+ =?utf-8?B?NWZOeWhnbmdvSUVqTVlOVXlXUHpqOE94RHAxRnlrNnY4U1N4UzQ4b0ZDb1A3?=
+ =?utf-8?B?VEYxc29SYmpwVU5JZHBsV2ZGUkkya09MNVlyRjVzc0xyam5QKyt5SHFFL0VM?=
+ =?utf-8?B?TTVuQ3ZLayt6N21rYVpHMEs3d01Nb3pXc1RJOEFZNVN2V2hleUNQb2lSQ2lw?=
+ =?utf-8?B?Zi94bWxJTEswUUZwNnVsZWVXZ0dGSDdXa0crL21ST3ZlaE9zZnhEUFpsdDZt?=
+ =?utf-8?Q?5k7RN5+5TKZoe9iF8o+wqYolY?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddb351c6-0578-4cd8-17ab-08da9a873d73
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2022 21:38:07.0917
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fdSuZ8IP8gURyVrrMYXYFblRNp8yI3n/Z5vg+lq3Lj+i5sCnuatDJkvj5//Lvfhsr+75qArXsCfJ6BRWa6aRUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6288
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Rockchip driver has long existed out of tree, but not upstream.
-There is support for it upstream in u-boot, but not in Linux proper.
-This commit imports the GPLv2 driver written by Lin Jinhan, together
-with the DTS and config blobs from Wevsty.
+On 9/19/22 12:53, Alper Gun wrote:
+> On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
+>>
+>>> +
+>>> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op, gpa_t gpa,
+>>> +                                         int level)
+>>> +{
+>>> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+>>> +       struct kvm *kvm = vcpu->kvm;
+>>> +       int rc, npt_level;
+>>> +       kvm_pfn_t pfn;
+>>> +       gpa_t gpa_end;
+>>> +
+>>> +       gpa_end = gpa + page_level_size(level);
+>>> +
+>>> +       while (gpa < gpa_end) {
+>>> +               /*
+>>> +                * If the gpa is not present in the NPT then build the NPT.
+>>> +                */
+>>> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
+>>> +               if (rc)
+>>> +                       return -EINVAL;
+>>> +
+>>> +               if (op == SNP_PAGE_STATE_PRIVATE) {
+>>> +                       hva_t hva;
+>>> +
+>>> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
+>>> +                               return -EINVAL;
+>>> +
+>>> +                       /*
+>>> +                        * Verify that the hva range is registered. This enforcement is
+>>> +                        * required to avoid the cases where a page is marked private
+>>> +                        * in the RMP table but never gets cleanup during the VM
+>>> +                        * termination path.
+>>> +                        */
+>>> +                       mutex_lock(&kvm->lock);
+>>> +                       rc = is_hva_registered(kvm, hva, page_level_size(level));
+>>> +                       mutex_unlock(&kvm->lock);
+>>> +                       if (!rc)
+>>> +                               return -EINVAL;
+>>> +
+>>> +                       /*
+>>> +                        * Mark the userspace range unmerable before adding the pages
+>>> +                        * in the RMP table.
+>>> +                        */
+>>> +                       mmap_write_lock(kvm->mm);
+>>> +                       rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
+>>> +                       mmap_write_unlock(kvm->mm);
+>>> +                       if (rc)
+>>> +                               return -EINVAL;
+>>> +               }
+>>> +
+>>> +               write_lock(&kvm->mmu_lock);
+>>> +
+>>> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+>>> +               if (!rc) {
+>>> +                       /*
+>>> +                        * This may happen if another vCPU unmapped the page
+>>> +                        * before we acquire the lock. Retry the PSC.
+>>> +                        */
+>>> +                       write_unlock(&kvm->mmu_lock);
+>>> +                       return 0;
+>>> +               }
+>>
+>> I think we want to return -EAGAIN or similar if we want the caller to
+>> retry, right? I think returning 0 here hides the error.
+>>
+> 
+> The problem here is that the caller(linux guest kernel) doesn't retry
+> if PSC fails. The current implementation in the guest kernel is that
+> if a page state change request fails, it terminates the VM with
+> GHCB_TERM_PSC reason.
+> Returning 0 here is not a good option because it will fail the PSC
+> silently and will probably cause a nested RMP fault later. Returning
 
-Co-authored-by: Lin Jinhan <troy.lin@rock-chips.com>
-Co-authored-by: wevsty <ty@wevs.org>
-Tested-by: Mikhail Rudenko <mike.rudenko@gmail.com>
-Cc: Heiko Stuebner <heiko@sntech.de>
-Cc: Lin Huang <hl@rock-chips.com>
-Cc: Shawn Lin <shawn.lin@rock-chips.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-rockchip@lists.infradead.org
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/arm64/boot/dts/rockchip/rk3328.dtsi |  11 +
- arch/arm64/boot/dts/rockchip/rk3399.dtsi |  10 +
- drivers/char/hw_random/Kconfig           |  13 +
- drivers/char/hw_random/Makefile          |   1 +
- drivers/char/hw_random/rockchip-rng.c    | 330 +++++++++++++++++++++++
- 5 files changed, 365 insertions(+)
- create mode 100644 drivers/char/hw_random/rockchip-rng.c
+Returning 0 here is ok because the PSC current index into the PSC 
+structure will not be updated and the guest will then retry (see the loop 
+in vmgexit_psc() in arch/x86/kernel/sev.c).
 
-diff --git a/arch/arm64/boot/dts/rockchip/rk3328.dtsi b/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-index 49ae15708a0b..f52589f5aa59 100644
---- a/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3328.dtsi
-@@ -279,6 +279,17 @@ &pdmm0_sdi2_sleep
- 		status = "disabled";
- 	};
- 
-+	rng: rng@ff060000 {
-+		compatible = "rockchip,cryptov1-rng";
-+		reg = <0x0 0xff060000 0x0 0x4000>;
-+
-+		clocks = <&cru SCLK_CRYPTO>, <&cru HCLK_CRYPTO_SLV>;
-+		clock-names = "clk_crypto", "hclk_crypto";
-+		assigned-clocks = <&cru SCLK_CRYPTO>, <&cru HCLK_CRYPTO_SLV>;
-+		assigned-clock-rates = <150000000>, <100000000>;
-+		status = "disabled";
-+	};
-+
- 	grf: syscon@ff100000 {
- 		compatible = "rockchip,rk3328-grf", "syscon", "simple-mfd";
- 		reg = <0x0 0xff100000 0x0 0x1000>;
-diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-index 9d5b0e8c9cca..bd5ce85a063a 100644
---- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-@@ -2042,6 +2042,16 @@ edp_in_vopl: endpoint@1 {
- 		};
- 	};
- 
-+	rng: rng@ff8b8000 {
-+		compatible = "rockchip,cryptov1-rng";
-+		reg = <0x0 0xff8b8000 0x0 0x1000>;
-+		clocks = <&cru SCLK_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
-+		clock-names = "clk_crypto", "hclk_crypto";
-+		assigned-clocks = <&cru SCLK_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
-+		assigned-clock-rates = <150000000>, <100000000>;
-+		status = "okay";
-+	};
-+
- 	gpu: gpu@ff9a0000 {
- 		compatible = "rockchip,rk3399-mali", "arm,mali-t860";
- 		reg = <0x0 0xff9a0000 0x0 0x10000>;
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 3da8e85f8aae..1dbe9a9b2944 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -372,6 +372,19 @@ config HW_RANDOM_STM32
- 
- 	  If unsure, say N.
- 
-+config HW_RANDOM_ROCKCHIP
-+	tristate "Rockchip Random Number Generator support"
-+	depends on ARCH_ROCKCHIP
-+	default HW_RANDOM
-+	help
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on Rockchip cpus.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called rockchip-rng.
-+
-+	  If unsure, say Y.
-+
- config HW_RANDOM_PIC32
- 	tristate "Microchip PIC32 Random Number Generator support"
- 	depends on HW_RANDOM && MACH_PIC32
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 3e948cf04476..852fb42e225b 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -34,6 +34,7 @@ obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
- obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
- obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
- obj-$(CONFIG_HW_RANDOM_STM32) += stm32-rng.o
-+obj-$(CONFIG_HW_RANDOM_ROCKCHIP) += rockchip-rng.o
- obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
- obj-$(CONFIG_HW_RANDOM_MESON) += meson-rng.o
- obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
-diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
-new file mode 100644
-index 000000000000..c0121f1f542e
---- /dev/null
-+++ b/drivers/char/hw_random/rockchip-rng.c
-@@ -0,0 +1,330 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * rockchip-rng.c Random Number Generator driver for the Rockchip
-+ *
-+ * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
-+ * Author: Lin Jinhan <troy.lin@rock-chips.com>
-+ *
-+ */
-+#include <linux/clk.h>
-+#include <linux/hw_random.h>
-+#include <linux/iopoll.h>
-+#include <linux/module.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+
-+#define _SBF(s, v)	((v) << (s))
-+#define HIWORD_UPDATE(val, mask, shift) \
-+			((val) << (shift) | (mask) << ((shift) + 16))
-+
-+#define ROCKCHIP_AUTOSUSPEND_DELAY		100
-+#define ROCKCHIP_POLL_PERIOD_US			100
-+#define ROCKCHIP_POLL_TIMEOUT_US		10000
-+#define RK_MAX_RNG_BYTE				(32)
-+
-+#define CRYPTO_V1_CTRL				0x0008
-+#define CRYPTO_V1_RNG_START			BIT(8)
-+#define CRYPTO_V1_RNG_FLUSH			BIT(9)
-+#define CRYPTO_V1_TRNG_CTRL			0x0200
-+#define CRYPTO_V1_OSC_ENABLE			BIT(16)
-+#define CRYPTO_V1_TRNG_SAMPLE_PERIOD(x)		(x)
-+#define CRYPTO_V1_TRNG_DOUT_0			0x0204
-+
-+#define CRYPTO_V2_RNG_CTL			0x0400
-+#define CRYPTO_V2_RNG_64_BIT_LEN		_SBF(4, 0x00)
-+#define CRYPTO_V2_RNG_128_BIT_LEN		_SBF(4, 0x01)
-+#define CRYPTO_V2_RNG_192_BIT_LEN		_SBF(4, 0x02)
-+#define CRYPTO_V2_RNG_256_BIT_LEN		_SBF(4, 0x03)
-+#define CRYPTO_V2_RNG_FATESY_SOC_RING		_SBF(2, 0x00)
-+#define CRYPTO_V2_RNG_SLOWER_SOC_RING_0		_SBF(2, 0x01)
-+#define CRYPTO_V2_RNG_SLOWER_SOC_RING_1		_SBF(2, 0x02)
-+#define CRYPTO_V2_RNG_SLOWEST_SOC_RING		_SBF(2, 0x03)
-+#define CRYPTO_V2_RNG_ENABLE			BIT(1)
-+#define CRYPTO_V2_RNG_START			BIT(0)
-+#define CRYPTO_V2_RNG_SAMPLE_CNT		0x0404
-+#define CRYPTO_V2_RNG_DOUT_0			0x0410
-+
-+struct rk_rng_soc_data {
-+	const char * const *clks;
-+	int clks_num;
-+	int (*rk_rng_read)(struct hwrng *rng, void *buf, size_t max, bool wait);
-+};
-+
-+struct rk_rng {
-+	struct device		*dev;
-+	struct hwrng		rng;
-+	void __iomem		*mem;
-+	struct rk_rng_soc_data	*soc_data;
-+	u32			clk_num;
-+	struct clk_bulk_data	*clk_bulks;
-+};
-+
-+static const char * const rk_rng_v1_clks[] = {
-+	"hclk_crypto",
-+	"clk_crypto",
-+};
-+
-+static const char * const rk_rng_v2_clks[] = {
-+	"hclk_crypto",
-+	"aclk_crypto",
-+	"clk_crypto",
-+	"clk_crypto_apk",
-+};
-+
-+static void rk_rng_writel(struct rk_rng *rng, u32 val, u32 offset)
-+{
-+	__raw_writel(val, rng->mem + offset);
-+}
-+
-+static u32 rk_rng_readl(struct rk_rng *rng, u32 offset)
-+{
-+	return __raw_readl(rng->mem + offset);
-+}
-+
-+static int rk_rng_init(struct hwrng *rng)
-+{
-+	int ret;
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+
-+	ret = clk_bulk_prepare_enable(rk_rng->clk_num, rk_rng->clk_bulks);
-+	if (ret < 0) {
-+		dev_err(rk_rng->dev, "failed to enable clks %d\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void rk_rng_cleanup(struct hwrng *rng)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+
-+	clk_bulk_disable_unprepare(rk_rng->clk_num, rk_rng->clk_bulks);
-+}
-+
-+static void rk_rng_read_regs(struct rk_rng *rng, u32 offset, void *buf,
-+			     size_t size)
-+{
-+	u32 i, sample;
-+
-+	for (i = 0; i < size; i += 4) {
-+		sample = rk_rng_readl(rng, offset + i);
-+		memcpy(buf + i, &sample, sizeof(sample));
-+	}
-+}
-+
-+static int rk_rng_v1_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	int ret = 0;
-+	u32 reg_ctrl = 0;
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+
-+	ret = pm_runtime_get_sync(rk_rng->dev);
-+	if (ret < 0) {
-+		pm_runtime_put_noidle(rk_rng->dev);
-+		return ret;
-+	}
-+
-+	/* enable osc_ring to get entropy, sample period is set as 100 */
-+	reg_ctrl = CRYPTO_V1_OSC_ENABLE | CRYPTO_V1_TRNG_SAMPLE_PERIOD(100);
-+	rk_rng_writel(rk_rng, reg_ctrl, CRYPTO_V1_TRNG_CTRL);
-+
-+	reg_ctrl = HIWORD_UPDATE(CRYPTO_V1_RNG_START, CRYPTO_V1_RNG_START, 0);
-+
-+	rk_rng_writel(rk_rng, reg_ctrl, CRYPTO_V1_CTRL);
-+
-+	ret = readl_poll_timeout(rk_rng->mem + CRYPTO_V1_CTRL, reg_ctrl,
-+				 !(reg_ctrl & CRYPTO_V1_RNG_START),
-+				 ROCKCHIP_POLL_PERIOD_US,
-+				 ROCKCHIP_POLL_TIMEOUT_US);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = min_t(size_t, max, RK_MAX_RNG_BYTE);
-+
-+	rk_rng_read_regs(rk_rng, CRYPTO_V1_TRNG_DOUT_0, buf, ret);
-+
-+out:
-+	/* close TRNG */
-+	rk_rng_writel(rk_rng, HIWORD_UPDATE(0, CRYPTO_V1_RNG_START, 0),
-+		      CRYPTO_V1_CTRL);
-+
-+	pm_runtime_mark_last_busy(rk_rng->dev);
-+	pm_runtime_put_sync_autosuspend(rk_rng->dev);
-+
-+	return ret;
-+}
-+
-+static int rk_rng_v2_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	int ret = 0;
-+	u32 reg_ctrl = 0;
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+
-+	ret = pm_runtime_get_sync(rk_rng->dev);
-+	if (ret < 0) {
-+		pm_runtime_put_noidle(rk_rng->dev);
-+		return ret;
-+	}
-+
-+	/* enable osc_ring to get entropy, sample period is set as 100 */
-+	rk_rng_writel(rk_rng, 100, CRYPTO_V2_RNG_SAMPLE_CNT);
-+
-+	reg_ctrl |= CRYPTO_V2_RNG_256_BIT_LEN;
-+	reg_ctrl |= CRYPTO_V2_RNG_SLOWER_SOC_RING_0;
-+	reg_ctrl |= CRYPTO_V2_RNG_ENABLE;
-+	reg_ctrl |= CRYPTO_V2_RNG_START;
-+
-+	rk_rng_writel(rk_rng, HIWORD_UPDATE(reg_ctrl, 0xffff, 0),
-+			CRYPTO_V2_RNG_CTL);
-+
-+	ret = readl_poll_timeout(rk_rng->mem + CRYPTO_V2_RNG_CTL, reg_ctrl,
-+				 !(reg_ctrl & CRYPTO_V2_RNG_START),
-+				 ROCKCHIP_POLL_PERIOD_US,
-+				 ROCKCHIP_POLL_TIMEOUT_US);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = min_t(size_t, max, RK_MAX_RNG_BYTE);
-+
-+	rk_rng_read_regs(rk_rng, CRYPTO_V2_RNG_DOUT_0, buf, ret);
-+
-+out:
-+	/* close TRNG */
-+	rk_rng_writel(rk_rng, HIWORD_UPDATE(0, 0xffff, 0), CRYPTO_V2_RNG_CTL);
-+
-+	pm_runtime_mark_last_busy(rk_rng->dev);
-+	pm_runtime_put_sync_autosuspend(rk_rng->dev);
-+
-+	return ret;
-+}
-+
-+static const struct rk_rng_soc_data rk_rng_v1_soc_data = {
-+	.clks_num = ARRAY_SIZE(rk_rng_v1_clks),
-+	.clks = rk_rng_v1_clks,
-+	.rk_rng_read = rk_rng_v1_read,
-+};
-+
-+static const struct rk_rng_soc_data rk_rng_v2_soc_data = {
-+	.clks_num = ARRAY_SIZE(rk_rng_v2_clks),
-+	.clks = rk_rng_v2_clks,
-+	.rk_rng_read = rk_rng_v2_read,
-+};
-+
-+static const struct of_device_id rk_rng_dt_match[] = {
-+	{
-+		.compatible = "rockchip,cryptov1-rng",
-+		.data = (void *)&rk_rng_v1_soc_data,
-+	},
-+	{
-+		.compatible = "rockchip,cryptov2-rng",
-+		.data = (void *)&rk_rng_v2_soc_data,
-+	},
-+	{ },
-+};
-+
-+MODULE_DEVICE_TABLE(of, rk_rng_dt_match);
-+
-+static int rk_rng_probe(struct platform_device *pdev)
-+{
-+	int i;
-+	int ret;
-+	struct rk_rng *rk_rng;
-+	struct device_node *np = pdev->dev.of_node;
-+	const struct of_device_id *match;
-+
-+	rk_rng = devm_kzalloc(&pdev->dev, sizeof(struct rk_rng), GFP_KERNEL);
-+	if (!rk_rng)
-+		return -ENOMEM;
-+
-+	match = of_match_node(rk_rng_dt_match, np);
-+	rk_rng->soc_data = (struct rk_rng_soc_data *)match->data;
-+
-+	rk_rng->dev = &pdev->dev;
-+	rk_rng->rng.name    = "rockchip";
-+#ifndef CONFIG_PM
-+	rk_rng->rng.init    = rk_rng_init;
-+	rk_rng->rng.cleanup = rk_rng_cleanup,
-+#endif
-+	rk_rng->rng.read    = rk_rng->soc_data->rk_rng_read;
-+	rk_rng->rng.quality = 1024;
-+
-+	rk_rng->clk_bulks =
-+		devm_kzalloc(&pdev->dev, sizeof(*rk_rng->clk_bulks) *
-+			     rk_rng->soc_data->clks_num, GFP_KERNEL);
-+
-+	rk_rng->clk_num = rk_rng->soc_data->clks_num;
-+
-+	for (i = 0; i < rk_rng->soc_data->clks_num; i++)
-+		rk_rng->clk_bulks[i].id = rk_rng->soc_data->clks[i];
-+
-+	rk_rng->mem = devm_of_iomap(&pdev->dev, pdev->dev.of_node, 0, NULL);
-+	if (IS_ERR(rk_rng->mem))
-+		return PTR_ERR(rk_rng->mem);
-+
-+	ret = devm_clk_bulk_get(&pdev->dev, rk_rng->clk_num,
-+				rk_rng->clk_bulks);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to get clks property\n");
-+		return ret;
-+	}
-+
-+	platform_set_drvdata(pdev, rk_rng);
-+
-+	pm_runtime_set_autosuspend_delay(&pdev->dev,
-+					ROCKCHIP_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(&pdev->dev);
-+	pm_runtime_enable(&pdev->dev);
-+
-+	ret = devm_hwrng_register(&pdev->dev, &rk_rng->rng);
-+	if (ret) {
-+		pm_runtime_dont_use_autosuspend(&pdev->dev);
-+		pm_runtime_disable(&pdev->dev);
-+	}
-+
-+	return ret;
-+}
-+
-+#ifdef CONFIG_PM
-+static int rk_rng_runtime_suspend(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	rk_rng_cleanup(&rk_rng->rng);
-+
-+	return 0;
-+}
-+
-+static int rk_rng_runtime_resume(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	return rk_rng_init(&rk_rng->rng);
-+}
-+
-+static const struct dev_pm_ops rk_rng_pm_ops = {
-+	SET_RUNTIME_PM_OPS(rk_rng_runtime_suspend,
-+				rk_rng_runtime_resume, NULL)
-+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-+				pm_runtime_force_resume)
-+};
-+#endif
-+
-+static struct platform_driver rk_rng_driver = {
-+	.driver	= {
-+		.name	= "rockchip-rng",
-+#ifdef CONFIG_PM
-+		.pm	= &rk_rng_pm_ops,
-+#endif
-+		.of_match_table = rk_rng_dt_match,
-+	},
-+	.probe	= rk_rng_probe,
-+};
-+
-+module_platform_driver(rk_rng_driver);
-+
-+MODULE_DESCRIPTION("ROCKCHIP H/W Random Number Generator driver");
-+MODULE_AUTHOR("Lin Jinhan <troy.lin@rock-chips.com>");
-+MODULE_LICENSE("GPL v2");
--- 
-2.37.3
+Thanks,
+Tom
 
+> an error also terminates the guest immediately with current guest
+> implementation. I think the best approach here is adding a retry logic
+> to this function. Retrying without returning an error should help it
+> work because snp_check_and_build_npt will be called again and in the
+> second attempt this should work.
+> 
+>>> +
+>>> +               /*
+>>> +                * Adjust the level so that we don't go higher than the backing
+>>> +                * page level.
+>>> +                */
+>>> +               level = min_t(size_t, level, npt_level);
+>>> +
+>>> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op, level);
+>>> +
+>>> +               switch (op) {
+>>> +               case SNP_PAGE_STATE_SHARED:
+>>> +                       rc = snp_make_page_shared(kvm, gpa, pfn, level);
+>>> +                       break;
+>>> +               case SNP_PAGE_STATE_PRIVATE:
+>>> +                       rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
+>>> +                       break;
+>>> +               default:
+>>> +                       rc = -EINVAL;
+>>> +                       break;
+>>> +               }
+>>> +
+>>> +               write_unlock(&kvm->mmu_lock);
+>>> +
+>>> +               if (rc) {
+>>> +                       pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
+>>> +                                          op, gpa, pfn, level, rc);
+>>> +                       return rc;
+>>> +               }
+>>> +
+>>> +               gpa = gpa + page_level_size(level);
+>>> +       }
+>>> +
+>>> +       return 0;
+>>> +}
+>>> +
