@@ -2,73 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 508D8C54EE9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 09:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FA7ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 09:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbiISJPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 05:15:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
+        id S229892AbiISJdm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 05:33:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiISJPh (ORCPT
+        with ESMTP id S230122AbiISJdh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 05:15:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7693E24BF4;
-        Mon, 19 Sep 2022 02:15:36 -0700 (PDT)
+        Mon, 19 Sep 2022 05:33:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C07140A2;
+        Mon, 19 Sep 2022 02:33:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2CE44B80946;
-        Mon, 19 Sep 2022 09:15:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D454C433C1;
-        Mon, 19 Sep 2022 09:15:33 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IFsPslV8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1663578930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B4GNXlutcVJv+lzFkU+fXLn2WjBirheENfIaXdm+UOc=;
-        b=IFsPslV8VOM/JYzC6RpT35FR0vF4u7CXL3EhBCTCLqsBn2fqCyZ/flACrmpGIv7Rb1iebL
-        GUfUoz3xKvpSXhscqXgroMK09B9gQf0DEYWBQ6fL7HHTpERVxpaNmmNGHEUK1N9IfoUOB9
-        9il14Dwe1n4jABvndprBbXDdTquDey4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8dc0f153 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 19 Sep 2022 09:15:30 +0000 (UTC)
-Received: by mail-vs1-f41.google.com with SMTP id m66so29197179vsm.12;
-        Mon, 19 Sep 2022 02:15:29 -0700 (PDT)
-X-Gm-Message-State: ACrzQf1DFTZtSD9BAxjMXYnMdaiLV2AtBPxmE2kDoUxDKhcmZ9mbyzag
-        zF98Hpuj86gujzLue+wJ+auQKpss/wtQuciTa3g=
-X-Google-Smtp-Source: AMsMyM66EqAG4i9aY3Rht4pK16ziCNKhRlhjbO5eGIR14yQ9uVLz95OO0NaO7s4+u32astKtFEk9SCyaSsgq4waO4C4=
-X-Received: by 2002:a67:e401:0:b0:398:89f1:492f with SMTP id
- d1-20020a67e401000000b0039889f1492fmr6264056vsf.21.1663578929003; Mon, 19 Sep
- 2022 02:15:29 -0700 (PDT)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 154ED60F99;
+        Mon, 19 Sep 2022 09:33:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A6D9C433D7;
+        Mon, 19 Sep 2022 09:33:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1663580015;
+        bh=sXaESeI9KLY37vE8YRK7ngG6mV0/XxtLB0fUxYPXA2c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=srRfoAbZjrOWGV248YikFk4lX1JffZgCUR/nD2Q1XnID0m6HU6C9bKV+vQqB3Jfxs
+         CfYZUbXmiD6orqzbOamy7ZpHUR9RzzyKzCdYNgS+0R/u9lal5+mFlkOdgjHlb96abL
+         O7xPYcObnwaX2qPXUhwydnPsht+hA1rtCYutlRzU=
+Date:   Mon, 19 Sep 2022 11:34:02 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "yekai (A)" <yekai13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com,
+        liulongfang@huawei.com
+Subject: Re: [PATCH v8 2/3] Documentation: add a isolation strategy sysfs
+ node for uacce
+Message-ID: <Yyg3ig+Y/w9eS6h0@kroah.com>
+References: <20220902031304.37516-1-yekai13@huawei.com>
+ <20220902031304.37516-3-yekai13@huawei.com>
+ <Yxr5BpM+VIjKhVpZ@kroah.com>
+ <45a50cf5-7416-4fcf-925b-ecca787425a5@huawei.com>
 MIME-Version: 1.0
-References: <4deaa04b-f103-9cc4-7946-9ea69afd94d0@leemhuis.info>
-In-Reply-To: <4deaa04b-f103-9cc4-7946-9ea69afd94d0@leemhuis.info>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 19 Sep 2022 10:15:16 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pVCgY7kD9C=N77cYnwk89ryeZh+UWTUs660VgVQ0AaRQ@mail.gmail.com>
-Message-ID: <CAHmME9pVCgY7kD9C=N77cYnwk89ryeZh+UWTUs660VgVQ0AaRQ@mail.gmail.com>
-Subject: Re: [REGESSION] Bug 216502 - slow crng initialization on Rockchip
- 3399 (Friendyarm NanoPi M4)
-To:     regressions@leemhuis.info
-Cc:     Mikhail Rudenko <mike.rudenko@gmail.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@google.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45a50cf5-7416-4fcf-925b-ecca787425a5@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 18, 2022 at 1:17 PM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> Hi, this is your Linux kernel regression tracker speaking.
->
-> I noticed a regression report in bugzilla.kernel.org. As many (most?)
+On Mon, Sep 19, 2022 at 11:21:30AM +0800, yekai (A) wrote:
+> 
+> 
+> On 2022/9/9 16:27, Greg KH wrote:
+> > On Fri, Sep 02, 2022 at 03:13:03AM +0000, Kai Ye wrote:
+> >> Update documentation describing sysfs node that could help to
+> >> configure isolation strategy for users in the user space. And
+> >> describing sysfs node that could read the device isolated state.
+> >>
+> >> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> >> ---
+> >>  Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
+> >>  1 file changed, 26 insertions(+)
+> >>
+> >> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+> >> index 08f2591138af..af5bc2f326d2 100644
+> >> --- a/Documentation/ABI/testing/sysfs-driver-uacce
+> >> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+> >> @@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
+> >>  Description:    Available instances left of the device
+> >>                  Return -ENODEV if uacce_ops get_available_instances is not provided
+> >>  
+> >> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
+> >> +Date:           Sep 2022
+> >> +KernelVersion:  6.0
+> >> +Contact:        linux-accelerators@lists.ozlabs.org
+> >> +Description:    (RW) Configure the frequency size for the hardware error
+> >> +                isolation strategy. This size is a configured integer value.
+> >> +                The default is 0. The maximum value is 65535. This value is a
+> >> +                threshold based on your driver strategies.
+> > I do not understand what the units are here.
+> >
+> > How is anyone supposed to know what they are?
+> 
+> This unit is the number of times. Number of occurrences in a period, also means threshold.
+> If the number of device pci AER error exceeds the threshold in a time window, the device is
+> isolated. 
 
-I saw. I'll follow up there rather than splitting the thread to here.
+Please document this very very well.
+
+> >> +                For example, in the hisilicon accelerator engine, first we will
+> >> +                time-stamp every slot AER error. Then check the AER error log
+> >> +                when the device AER error occurred. if the device slot AER error
+> >> +                count exceeds the preset the number of times in one hour, the
+> >> +                isolated state will be set to true. So the device will be
+> >> +                isolated. And the AER error log that exceed one hour will be
+> >> +                cleared. Of course, different strategies can be defined in
+> >> +                different drivers.
+> > So this file can contain values of different units depending on the
+> > different driver that creates it?  How is anyone supposed to know what
+> > it is and what it should be?
+> >
+> > This feels very loose, please define this much better so that it can be
+> > understood and maintained properly.
+> >
+> > thanks,
+> >
+> > greg k-h
+> > .
+> >
+> Yes,  We started out with the idea of not restricting the different drive,  only specifying the input and output.
+> Because we think different drivers require different processing  strategy.
+
+What different drivers?  You only have one!  And why do you need a
+framework for only one driver?  You should only add that when you have
+multiple users to ensure you got the framework correct otherwise you do
+not know how it will be used.
+
+thanks,
+
+greg k-h
