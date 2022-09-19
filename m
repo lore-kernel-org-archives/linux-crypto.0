@@ -2,207 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C181CECAAD3
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 12:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A57C6FA8B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 13:43:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbiISMIL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 08:08:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37056 "EHLO
+        id S230230AbiISNnU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 09:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbiISMIF (ORCPT
+        with ESMTP id S230482AbiISNnS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 08:08:05 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916402B25B;
-        Mon, 19 Sep 2022 05:08:02 -0700 (PDT)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MWNg512lbzHnxJ;
-        Mon, 19 Sep 2022 20:05:53 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 19 Sep 2022 20:08:00 +0800
-Received: from localhost.localdomain (10.67.164.66) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 19 Sep 2022 20:08:00 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <gregkh@linuxfoundation.org>
-Subject: [RFC PATCH 4/6] crypto: benchmark - add help information
-Date:   Mon, 19 Sep 2022 20:05:35 +0800
-Message-ID: <20220919120537.39258-5-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20220919120537.39258-1-shenyang39@huawei.com>
-References: <20220919120537.39258-1-shenyang39@huawei.com>
+        Mon, 19 Sep 2022 09:43:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5262229E
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 06:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663594995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XAQ4C8p526IwfywWHvDt2bP3t+cfJKiAuugWFxjBeBk=;
+        b=gLWz5xnjmG3/gwDiTNyn0M2ngQWlwMIkqiti22GwmL0S0qDl9gxLZzUJVUI7jKIBNMiTcq
+        hGnOzkVgWkN2wtpzAOPvLbw5opTJItw5hntTggBzZhGjfE1zSSX+UrKglISia0RFqvwO2D
+        Kl231P5j4kSPLfSyN4wnLLdiVftWtQQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-175-m7uMEVL3PEO3rwyjHKygLg-1; Mon, 19 Sep 2022 09:43:10 -0400
+X-MC-Unique: m7uMEVL3PEO3rwyjHKygLg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB7301C0BC6D;
+        Mon, 19 Sep 2022 13:43:08 +0000 (UTC)
+Received: from starship (unknown [10.40.192.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 681AD1121314;
+        Mon, 19 Sep 2022 13:43:02 +0000 (UTC)
+Message-ID: <ec4b176036d33ad99fceb43b104cf9be8aca105a.camel@redhat.com>
+Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
+ configurations
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Mon, 19 Sep 2022 16:43:00 +0300
+In-Reply-To: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+         <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.164.66]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a new module parameters 'help' to make users understand the benchmark
-module parameters. And due to the algorithms have different notes, add
-a new callback 'help' to show the differences.
+On Mon, 2022-08-01 at 19:05 +0300, Maxim Levitsky wrote:
+> On Thu, 2022-07-28 at 10:30 +0300, Maxim Levitsky wrote:
+> > On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
+> > > This patch series aims to harden the cpuid code against the case when
+> > > the hypervisor exposes a broken CPUID configuration to the guest,
+> > > in the form of having a feature disabled but not features that depend on it.
+> > > 
+> > > This is the more generic way to fix kernel panic in aes-ni kernel driver,
+> > > which was triggered by CPUID configuration in which AVX is disabled but
+> > > not AVX2.
+> > > 
+> > > https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> > > 
+> > > This was tested by booting a guest with AVX disabled and not AVX2,
+> > > and observing that both a warning is now printed in dmesg, and
+> > > that avx2 is gone from /proc/cpuinfo.
+> > > 
+> > > V2:
+> > > 
+> > > I hopefully addressed all the (very good) review feedback.
+> > > 
+> > > Best regards,
+> > > 	Maxim Levitsky
+> > > 
+> > > Maxim Levitsky (5):
+> > >   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
+> > >   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+> > >   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
+> > >   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
+> > >   x86/cpuid: check for dependencies violations in CPUID and attempt to
+> > >     fix them
+> > > 
+> > >  arch/x86/events/intel/lbr.c       |  2 +-
+> > >  arch/x86/include/asm/cpufeature.h |  1 +
+> > >  arch/x86/kernel/cpu/common.c      | 51 +-------------------
+> > >  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
+> > >  4 files changed, 74 insertions(+), 60 deletions(-)
+> > > 
+> > > -- 
+> > > 2.34.3
+> > > 
+> > > 
+> > A very kind ping on these patches.
+> 
+> Another kind ping on these patches.
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
----
- crypto/benchmark/benchmark.c | 79 ++++++++++++++++++++++++++++++++++++
- crypto/benchmark/bm_comp.c   | 10 +++++
- crypto/benchmark/bm_comp.h   |  1 +
- 3 files changed, 90 insertions(+)
+Another very gentle ping on these patches.
 
-diff --git a/crypto/benchmark/benchmark.c b/crypto/benchmark/benchmark.c
-index b5dcf5829b22..a3ccd8955eaa 100644
---- a/crypto/benchmark/benchmark.c
-+++ b/crypto/benchmark/benchmark.c
-@@ -32,6 +32,12 @@ struct crypto_bm_alg_ops {
- 	int (*create_req)(struct crypto_bm_base *base, u32 idx);
- 	void (*release_req)(struct crypto_bm_base *base, u32 idx);
- 	int (*perf)(struct crypto_bm_thread_data *data);
-+	void (*help)(void);
-+};
-+
-+struct crypto_bm_mp_info {
-+	const char *mp;
-+	const char *help_info;
- };
- 
- struct {
-@@ -51,6 +57,9 @@ struct {
- #define threadnum_desc		"Testing thread number, one 'crypto_tfm' per thread. 0/1 (default 1 thread), 2(2 threads) ..."
- #define time_desc		"Testing time, the unit is second, 0/1 (default 1 s), 2(2 s) ..."
- #define run_desc		"Start/stop all the tests based on the configuration, 0(default, not run, stop), or run"
-+#define help_desc		"Some help information. Echo a module parameter can get the info " \
-+				"of module parameter. Cat 'help' directly can get the help "\
-+				"information provided by 'algtype'."
- 
- static atomic_t benchmark_status;
- 
-@@ -75,11 +84,47 @@ static struct crypto_bm_alg_ops benchmark_ops[] = {
- 		.create_req	= crypto_bm_create_req_comp,
- 		.release_req	= crypto_bm_release_req_comp,
- 		.perf		= crypto_bm_perf_comp,
-+		.help		= crypto_bm_help_comp,
- 	}, {
- 		/* sentinel */
- 	}
- };
- 
-+static struct crypto_bm_mp_info modules_help[] = {
-+	{
-+		.mp		= "algorithm",
-+		.help_info	= "Please input a crypto supported algorithm name.\n"
-+				  "The algorithm name can be found on /proc/crypto.",
-+	}, {
-+		.mp		= "algtype",
-+		.help_info	= "Please input a valid value to choose algorithm class.\n"
-+				  "0: CRYPTO_BM_COMP",
-+	}, {
-+		.mp		= "inputsize",
-+		.help_info	= "Please input a valid value as testing input size.",
-+	}, {
-+		.mp		= "loop",
-+		.help_info	= "Please input the send loop times.",
-+	}, {
-+		.mp		= "numamask",
-+		.help_info	= "Please input a bitmap as testing numa nodes.",
-+	}, {
-+		.mp		= "optype",
-+		.help_info	= "Please input a valid value for testing operation.\n"
-+				  "Can get the algorithm type support optype by cat 'help'."
-+	}, {
-+		.mp		= "reqnum",
-+		.help_info	= "Please input a valid value for per thread request number.",
-+	}, {
-+		.mp		= "threadnum",
-+		.help_info	= "Please input a valid value for creating threads.\n"
-+				  "One thread will create a crypto_tfm.",
-+	}, {
-+		.mp		= "time",
-+		.help_info	= "Please input a valid value for testing time.",
-+	}
-+};
-+
- static int crypto_bm_algorithm_param_set(const char *val, const struct kernel_param *kp)
- {
- 	char *s = strstrip((char *)val);
-@@ -103,6 +148,40 @@ static const struct kernel_param_ops alg_ops = {
- module_param_cb(algorithm, &alg_ops, &benchmark_attrs.algorithm, 0644);
- MODULE_PARM_DESC(algorithm, algorithm_desc);
- 
-+static int crypto_bm_help_param_set(const char *val, const struct kernel_param *kp)
-+{
-+	int size = ARRAY_SIZE(modules_help);
-+	char *s = strstrip((char *)val);
-+	int i;
-+
-+	for (i = 0; i < size; i++) {
-+		if (!strcmp(s, modules_help[i].mp))
-+			pr_err("%s\n", modules_help[i].help_info);
-+	}
-+
-+	return 0;
-+}
-+
-+static int crypto_bm_help_param_get(char *val, const struct kernel_param *kp)
-+{
-+	u32 idx = benchmark_attrs.algtype;
-+
-+	if (idx >= CRYPTO_BM_ALG_MAX)
-+		return -EINVAL;
-+
-+	benchmark_ops[idx].help();
-+
-+	return 0;
-+}
-+
-+static const struct kernel_param_ops help_ops = {
-+	.set = crypto_bm_help_param_set,
-+	.get = crypto_bm_help_param_get,
-+};
-+
-+module_param_cb(help, &help_ops, NULL, 0644);
-+MODULE_PARM_DESC(help, help_desc);
-+
- static int crypto_bm_numamask_param_set(const char *val, const struct kernel_param *kp)
- {
- 	if (atomic_read(&benchmark_status))
-diff --git a/crypto/benchmark/bm_comp.c b/crypto/benchmark/bm_comp.c
-index 2772a8e86e2e..62192a55b2ab 100644
---- a/crypto/benchmark/bm_comp.c
-+++ b/crypto/benchmark/bm_comp.c
-@@ -423,3 +423,13 @@ int crypto_bm_perf_comp(struct crypto_bm_thread_data *data)
- 
- 	return ret;
- }
-+
-+void crypto_bm_help_comp(void)
-+{
-+	pr_err("Welcome to use the crypto benchmark to test compress algorithm!\n"
-+	       "There ars some different moduel parameters requirement:\n"
-+	       "optype: 0 for compression, 1 for decompression\n"
-+	       "inputsize: for compression, the inputsize is src_len,\n"
-+	       "           for decompression, the inputsize is dst_len, and the src_len will depend on the data compression ratio.\n"
-+	       );
-+}
-diff --git a/crypto/benchmark/bm_comp.h b/crypto/benchmark/bm_comp.h
-index 78b45f8b22a6..aedafde2c3ad 100644
---- a/crypto/benchmark/bm_comp.h
-+++ b/crypto/benchmark/bm_comp.h
-@@ -14,5 +14,6 @@ void crypto_bm_release_tfm_comp(struct crypto_bm_base *base, u32 idx);
- int crypto_bm_create_req_comp(struct crypto_bm_base *base, u32 idx);
- void crypto_bm_release_req_comp(struct crypto_bm_base *base, u32 idx);
- int crypto_bm_perf_comp(struct crypto_bm_thread_data *data);
-+void crypto_bm_help_comp(void);
- 
- #endif
--- 
-2.24.0
+Best regards,
+	Maxim Levitsky
+> 
+> 
+> Best regards,
+> 	Maxim Levitsky
+> > Best regards,
+> > 	Maxim Levitsky
+
 
