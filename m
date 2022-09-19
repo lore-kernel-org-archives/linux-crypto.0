@@ -2,91 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B587C6FA82
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Sep 2022 22:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FE2ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 02:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbiIRWNH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Sep 2022 18:13:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
+        id S229505AbiISCo4 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 18 Sep 2022 22:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiIRWNF (ORCPT
+        with ESMTP id S229610AbiISCoz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Sep 2022 18:13:05 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A3517ABD;
-        Sun, 18 Sep 2022 15:13:02 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MW2B46Lltz4xG5;
-        Mon, 19 Sep 2022 08:13:00 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1663539181;
-        bh=BZX022bh+nPw/hwDWob48F2NZDzNbTSK9yDNkN0pEYw=;
-        h=Date:From:To:Cc:Subject:From;
-        b=MWvsaGSqKQ/cwQvGuGwRguUNMOrslR7g1goWIu2sns7wIAYe5HQAeIQ1FDYPq2m8N
-         dnRgp3RV6BPj+/rZ7plQJiQ3tbZ0YMR16KFR+J6fgEot8yV1HdcGYF1Fq8Gyyz0h0D
-         AQicC8uwenMk7xXURuBmW2nQMTbavg8RmxvVoal7vXEL7AAq4LNkAGgNyAhyWa6vDq
-         0NpWzcjq45vEu7nm94utPbx8neJyL4NqmZ46uZV3vtp2yPCmhRLZvhEo5I5UwRapw1
-         8e+JmE0LWf678BHa2nsc4S2vpnFKUjciIPvHNmbDo4tFiOJPxjgmoF5QW0avaq6uMq
-         9oqDoTm6zbHYg==
-Date:   Mon, 19 Sep 2022 08:12:59 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Damian Muszynski <damian.muszynski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the crypto tree
-Message-ID: <20220919081259.714b81f8@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Bu+ro+KfrWd+.tE29xPJY5g";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        Sun, 18 Sep 2022 22:44:55 -0400
+Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FB6B483;
+        Sun, 18 Sep 2022 19:44:53 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R991e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQ4Z7nR_1663555489;
+Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VQ4Z7nR_1663555489)
+          by smtp.aliyun-inc.com;
+          Mon, 19 Sep 2022 10:44:50 +0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH RESEND v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography
+ Complex) accelerator driver
+From:   guanjun <guanjun@linux.alibaba.com>
+In-Reply-To: <YyRDbT0fQQwsVpKL@gondor.apana.org.au>
+Date:   Mon, 19 Sep 2022 10:44:48 +0800
+Cc:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
+        xuchun.shang@linux.alibaba.com,
+        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <368EB6AC-85CB-4709-AE57-D1E3431FB415@linux.alibaba.com>
+References: <1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com>
+ <1662435353-114812-2-git-send-email-guanjun@linux.alibaba.com>
+ <YyRDbT0fQQwsVpKL@gondor.apana.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/Bu+ro+KfrWd+.tE29xPJY5g
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-In commit
+> 2022年9月16日 下午5:35，Herbert Xu <herbert@gondor.apana.org.au> 写道：
+> 
+> On Tue, Sep 06, 2022 at 11:35:45AM +0800, 'Guanjun' wrote:
+> .
+>> +static const struct file_operations ycc_fops = {
+>> +	.open = ycc_cdev_open,
+>> +	.release = ycc_cdev_release,
+>> +	.unlocked_ioctl = ycc_cdev_ioctl,
+>> +};
+> 
+> What is this device for? It doesn't seem to do anything so why
+> not jsut drop it?
 
-  cf5bb835b7c8 ("crypto: qat - fix DMA transfer direction")
+This device is reserved for future use. Now it does nothing actually.
+I will drop it in next version.
+Thank you very much!
 
-Fixes tag
+Regards,
+Guanjun
 
-  Fixes: d370cec ("crypto: qat - Intel(R) QAT crypto interface")
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-    This can be fixed for the future by setting core.abbrev to 12 (or
-    more) or (for git v2.11 or later) just making sure it is not set
-    (or set to "auto").
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Bu+ro+KfrWd+.tE29xPJY5g
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmMnl+sACgkQAVBC80lX
-0GwFPgf9FVAwfShK+/u6ZLHQ/NrqlNng6CHgdfvsRzwfuWeIWEvEeVT+T83s43Nr
-/SSoiU0nYWVjd0L2ayKhNoGNaPebMt2ecgTQZqHj2deuylm+1mfTTjhXRiAmqPL6
-XDxTF3ePg4GJprfV0ObyZEHiiQnInsO/GtKtCGffYqdtpWH8biYbQuCEacO/Ig7z
-hEyO6k74V6kYyB/hrDbV4kUVzpRTIyD92NvKM2I3kbneRHvHld8ho8+CoX692W8l
-su8Tnt2beT7NJAlJxUzrrX6qOeKZq/aRTUy0HqGLPconXohk0BG+kMgsssrqW7ih
-xcmJVQ5UBUWm17CU2XWHEGnsopC3qg==
-=5YEk
------END PGP SIGNATURE-----
-
---Sig_/Bu+ro+KfrWd+.tE29xPJY5g--
