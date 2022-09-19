@@ -2,317 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B7BC54EE9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 15:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC1CECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 17:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiISP2A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 11:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32782 "EHLO
+        id S229522AbiISRT5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 13:19:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiISP17 (ORCPT
+        with ESMTP id S229638AbiISRTz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 11:27:59 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D995FD4E;
-        Mon, 19 Sep 2022 08:27:57 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28JDOMkg013592;
-        Mon, 19 Sep 2022 15:27:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2022-7-12;
- bh=grwk+7Nf2V7P+kMswQ9g8hLs9YrvDULViQFD/H06sUU=;
- b=YxsE9E9dL88dgnVycioXJQKY+d4P66jFbzCU5ACy8PPf4AfpGm4p8SEtYDJB/ZbFGd8v
- v8lU1K4TGGYJQ9tPCeNoMpq4LA7cVmzsjUwBFgnKFhI+g73rNU7rkRohCuOhmykhjibj
- wnsQyyFNNUxO+UwH8uJT8CVZTsI2g7xb8YO1b/hG0sK7nWU73Vuo7BlSow0lyDCDuYz8
- kSHob3szyY8iYPWb+Ky/+1iqe6SQ3LMX2ehLRDh1SYHKy0JS6YiTkvv6PFd08fmsi17U
- XKuRDTsdmbjroOVOTPF+ABxtFtTADvqDnuZLtdc8btv4upLpL7PpiY3KNPTuvkWMq9nq Ag== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3jn6f0c3bc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Sep 2022 15:27:47 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 28JDjjJr009513;
-        Mon, 19 Sep 2022 15:27:46 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2047.outbound.protection.outlook.com [104.47.66.47])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3jp3c7umqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Sep 2022 15:27:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j7+97RqwmzFUrZmB65L4d+Z4MK12znWWZ1fUYabgaTHX4OmfuxG5/T4tf36ccwcL2vFo7f0EO63vAOcPq7G33QjyGQnFIqm/f0YQhnb/BXJyykOyywprFYtlyKbIG/YlL+1wT2fUtAHI/7VSJbZK2PwzNocRVQKqESKfjKJmhoF5fUkzLobZBp8bzDBqZY1oy6QZ1msHaJkajxDWEy2y1WVjNo60xXklM4TOcMuhIs74o1ropFH6c/2vh3v7e2Eichy50Felm8lMRT5WOH49Orfcko6EcbwDcP/N5k/R0ZWoQRar/c2wr/n4FB6ZhMCF7CM/YwukI6rBd/k7pTXNOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=grwk+7Nf2V7P+kMswQ9g8hLs9YrvDULViQFD/H06sUU=;
- b=i7qkl7mUkYBk96niJOvr++foSSLt/hYm8EKPx1FwhPfXHRPnRgNpe4Akksc04xc8LBFSZajuurKQOLPWu5zg2KlyIt8d60u9QRfrfNs2s/U2t5c9/ScsxiBmXVwjdHL6IR5LQen2oNGIwj7ZaeLr321cD4w59Y5I7+NQ4EGT+mNWftIRJRHKDuMOK0wzY+v5fG2Ki7zLhLyo37g3gNvEgqrTkqfqjEqtshlCUpD//n8gFGLpeCRKxh2LVpPW1ny7MRY9qBl/7mTQf5N52MskkAAjKwq32wpimTNf+IJaC3TCvH4c77BbaTi0qLd+I3ZpbKl81/7A4cw/+L6LFo1PtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Mon, 19 Sep 2022 13:19:55 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E66681658D
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 10:19:53 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id a8so47979908lff.13
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 10:19:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=grwk+7Nf2V7P+kMswQ9g8hLs9YrvDULViQFD/H06sUU=;
- b=lZgJjLfIDAId/fvO7gmbX5lJJpyRaZtr+a4xcLWyvjRYUKxTiH8U6+ZnITPxNxhevznPSqdxtN/dotsjQMcEdNh9CXm25V0iFnKcVU2C/w85pxU8CgQNwb3Yf67f425aTRu9LY+MJ3cHwqzAcEfxwWwCkvs7UytYY2mkjQ8fQWc=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by PH0PR10MB5819.namprd10.prod.outlook.com (2603:10b6:510:141::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.19; Mon, 19 Sep
- 2022 15:27:44 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::64a1:f8fa:afd0:1eda]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::64a1:f8fa:afd0:1eda%4]) with mapi id 15.20.5632.015; Mon, 19 Sep 2022
- 15:27:44 +0000
-Date:   Mon, 19 Sep 2022 11:27:40 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     eadavis@sina.com
-Cc:     syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
-Message-ID: <20220919152740.t7keqbjfvl4ylf77@oracle.com>
-References: <000000000000122cfc05e8f8d09b@google.com>
- <20220919010555.130609-1-eadavis@sina.com>
- <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
-X-ClientProxiedBy: BL1PR13CA0141.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::26) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=dRf0ty06/uotKyN1jAoSPPbSnVAvm0buWGfL71jirrE=;
+        b=RC/Vi3Kc9McNRFaLh5HLy+9shoIAOcCiokeINHvd0TsUg1EChRhJCYFS3Nf3K+9Q7G
+         fvg0JgltwdUiR9FsG9L97XUYl6DR6T2vKj56jFI86zKWmD3c4bw/C1KoPyJ0dLxbYWUW
+         m6ST2MtAyJxyFlVpsgSOXIzQ3pV7NTOo4sSqs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=dRf0ty06/uotKyN1jAoSPPbSnVAvm0buWGfL71jirrE=;
+        b=0wkNtYyJkbHjzVT46dZbbjhAV4eYOC3EU5OXKFnCcOA0qvNRSjJrgwOki3VMWc8V0L
+         NgH+Jnu95wZo3jXEoEB3g+0f+Dg/f1rD+PjirMUkovcWEOoHwNA2oltx0NfldMvLjF5x
+         M2CNiX0hwo9UwvEysmZcmbgqSS5GEkvzZhm7S59S2BIHj4VFcyQPj1Hw7W1Xcz978+Ln
+         R0ZvnnT+6vAPfXLHaNdQAiy6sHroOF4lvv3GHScp/66XIk6GaeYF/Rlynt5okNc20mN0
+         9NmS0PCGSLl2bsEZY++eZ/kFkgnWTh0wziQ/a0E+Ngl7uxnwx3SFBJCl5JvSLqe+jj7G
+         DDBw==
+X-Gm-Message-State: ACrzQf0duhET/LD8FVXzkH5s5BYr1m+6c5dbRhPO1wul0D2SGGJCYrzy
+        nNZiA7WHVs+xStDiSvxCzR0+K7/tUl69MHIaz14=
+X-Google-Smtp-Source: AMsMyM4PTUAYIoyJbf9IJoA999ACzTT3axPBfTiPntazgMNWIIPjiWx57pMdxIQfoPrf8URPLr1Vxw==
+X-Received: by 2002:a05:6512:22c7:b0:49f:c780:4886 with SMTP id g7-20020a05651222c700b0049fc7804886mr945356lfu.389.1663607992323;
+        Mon, 19 Sep 2022 10:19:52 -0700 (PDT)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id s9-20020ac25c49000000b0049493c14b17sm5264131lfp.181.2022.09.19.10.19.51
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Sep 2022 10:19:52 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id h3so26299978lja.1
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 10:19:51 -0700 (PDT)
+X-Received: by 2002:a05:651c:178d:b0:261:bd23:a5f8 with SMTP id
+ bn13-20020a05651c178d00b00261bd23a5f8mr5202580ljb.411.1663607990563; Mon, 19
+ Sep 2022 10:19:50 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|PH0PR10MB5819:EE_
-X-MS-Office365-Filtering-Correlation-Id: 565f8520-9fe6-464a-384b-08da9a537ffd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0eK4w8uV4M9tjpvYSxakaUXZMOrIG6fmydrZ2kyUvTf6RWWCQ1Kkehxrj4qL+mS7ykEuW7RExWMPEfbIZ1vcVW8SmpSfEHzTSoEomjJGOY+nRpwnxcBLBOPKCYZkYTtaqtPLz2OiwZf2Z98b1pOuq01W2kMcvaKLBwPyp+1koZourcgDYHS1VjCYkWXfFTqJc1Z2a0kFXZ93v3MxYmEOKmPjqJp8iZ/tJlch5VhFTsBJb1s+OvsQiOnyX++3mR9JT9JLklrFBfrV7k8sPv7aeQskjjVi45whJ+Hpj4/Z5SB9K3YnSaC4UjaCvZGkQBrp0zThxa2e+1o9ria8oD1BB4nSwuHsLnDp2r6SN6U6/UuYXDjIGQ/0TYDa8UfzU8EqEisl6EdwT4mxYX0LevCgJZZBZcNqNq31HXY7PpdZdqlHJXNG44qzRgKVMHPU1knWrGv41FwDh+H6d0OXqxY3wZWSiIknnIyIH/jV32wupwISFJDJqrifsTZ8mWLJ7VBQ/j4/4JzTc/H2FcxGHsJpjudOhUmZym4zZBB1x6bRKieAeyrQJpICgwY1dqqMKVcJSC2CP9pkJpA83/ZdBgs+aCdeRwVCBMMqBXwcN97VJ02HP5DaYXjRXeca9rierTUL6+ybV7WyKJvk5UR7ZUBV/nijwKOQtzRJP2s4eanmvf7W18uUkgk9aEkUygJV4ni+IQhNh+Nh0gbZjmFEyaguVZZPEGb+rSoI8rdO/pohQPd1GFVJy3bATiet33Gdvi2jUeBrd24QNoFy5nmyiELyBg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(136003)(366004)(396003)(376002)(346002)(451199015)(6916009)(186003)(2616005)(1076003)(86362001)(83380400001)(38350700002)(38100700002)(8936002)(66946007)(41300700001)(66556008)(66476007)(4326008)(8676002)(2906002)(26005)(52116002)(5660300002)(6666004)(6512007)(6506007)(316002)(6486002)(478600001)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qphM5omHVGKTenjs8RObbxeLH0hCgiFlNhe1uS/f7UrZ7kuniok+KUFWihcF?=
- =?us-ascii?Q?Q9MCE4N70+RVgzCTfMSDkWHbF7V6zAP1TrGs00PW0OLqkwbu9HIKuMgmgs+6?=
- =?us-ascii?Q?xsFgNWt4D/2uBtR8OrGdlLvB9n7+Jq/HxASEB2Ib/BqX8dMDbqiXROnWw/Cx?=
- =?us-ascii?Q?h5gpsCfC6sqP89MchlNx4LrgpjUTQv4b4QeOlxXnfFqYhT0tXwJEcV3acuju?=
- =?us-ascii?Q?J2CC+8L0pdoOeQhNx15vgwsegceh3BCS2tVE/lPSd630nSTgYjsoZ+fpnpMV?=
- =?us-ascii?Q?NiiRKQpHRFgc6IyqRQYWtw3QpigPh/sZoVyfuM669FhodCj/L7wB1OonF3xw?=
- =?us-ascii?Q?34tJ6FMZHsIMwkeCp44QZZFL8uxCG/FOegQxMFR4wFGRLKtxvpAbQXg2U2u9?=
- =?us-ascii?Q?X8YXBDN9ZJo1K/nltzcBpDR+mzLGL6Et6o7L7vGC84kB6On8U7X5rAR2eFIE?=
- =?us-ascii?Q?YvAfZDl3zMLcXWlK5fzOp6lkW4g+LXhmqWSaUUSFsrmm7Au1IvZptuImDaf0?=
- =?us-ascii?Q?h2q/o6mavkbPMMC9HZhfrNZvKcPnWJUpgMCA6MF0d5FPEENUMnJLBScNTLVP?=
- =?us-ascii?Q?q/S1Upru9b83jefF77wLMPWnXgjqKMFk8RrJbvZrjaYjr2GLJLiWKTFVJxvp?=
- =?us-ascii?Q?BlP0djtDhJcFxnQHSTzkL+89SdpG97+k3FHpEuNazznLs4ASHHdAc2LVJh0w?=
- =?us-ascii?Q?S/UkJ+4W88LVWy7tpz2/thgkoLnl3jlD8gO7Hkj8mn0tdKFzeLOr0VW/fJgx?=
- =?us-ascii?Q?9VPBT/33Y2pB93J/QRc7uc88SCiwRMGAKPxCdpACpRdyUBWfYiIyvEKXDcSf?=
- =?us-ascii?Q?P4xFLolKptEEeC+WVu3SdaP6lqt0vnFYymyfPor7GnD/5VPdFEq5OahoxXsO?=
- =?us-ascii?Q?q058+pvnn/jdk+fWY6M2NhurBzD0iN1vFa72u9VSFIjl5s2CSfqQhN/56Nhx?=
- =?us-ascii?Q?f9V/lDTLfYG2s6tCdb7uuusgt8QY/Zw7dwgGho0ufhB/pXItK+lL5soksyXs?=
- =?us-ascii?Q?JIt/+F21o+Fesu7I8jTaqR64jl0uvpX4KBkVBcHqY61SwflrTba7IO+BLGB7?=
- =?us-ascii?Q?ZrHKUo+KGx78t9m0rpBr/K9Vr5fvc3FXP+Gmlc7NjCeeBCvrw2w/T9WZVMyS?=
- =?us-ascii?Q?Cu9pPy9kpd/zxqEE0SOvXXJp6dqseBvDY1dQLH9seInDcbZdYfoMD5S/EbWk?=
- =?us-ascii?Q?bqgnh5mCLLwD04ezpHsRWMmuCszzkmoMZ2WaLBQKVQm7azbcuqdsTtzFJSTM?=
- =?us-ascii?Q?tBtaR95zOkDFSO0RZzM9k9xwDGN2aL4WH36yhZCDpio+xvfTW0AjeMOwAVZ9?=
- =?us-ascii?Q?Y/+18ELwWrhGkDOIrZzongIEwsMepvjtXf63D9177fuRHMET2IdCN1DILF3g?=
- =?us-ascii?Q?DfBP/OLtf4bEkkWxhB0/MkhVurRChbWAMaXU0hclnvAcor6RuKzJfLMcdnNe?=
- =?us-ascii?Q?wjFapkOHYLbATQYkJMw0kKVx35/xuYA8sn8dG4dZ6Z8ZKwChIAmlTkBB4sBA?=
- =?us-ascii?Q?+1k4dLdmXrU1LcQ+q51UarNm+2kUCffmo06DLR1B8UjdQCehaEULleG2sg/C?=
- =?us-ascii?Q?MkBquCO0UPIMc2kg7lcVh+TAUIM5PX4KoL6QHZd10cg+caydpHj9XcmIU3ep?=
- =?us-ascii?Q?BQ=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 565f8520-9fe6-464a-384b-08da9a537ffd
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2022 15:27:44.7874
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9kp16OLmhhly02dZuaHIPf4etnKV2szbZAyEfRvPUQiPUhbvSuHPSXQjss4T340MSWTBAWsDplKSoULG6Qzk/MHuHqxOmu3/s8cDrB0uXoE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5819
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-19_05,2022-09-16_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2209190103
-X-Proofpoint-GUID: 4xzFUL4pjK5iu2xp0RQdJCBUkGWcyJ3X
-X-Proofpoint-ORIG-GUID: 4xzFUL4pjK5iu2xp0RQdJCBUkGWcyJ3X
+References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
+ <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com>
+ <CAM7w-FXHWzcN1Y7pwb6+1KA6A2oZRrfpOJdWFVWjRvjbp+DEOg@mail.gmail.com> <CAHmME9qmiNcs6iye=Yjnpfx7vy6QMd8t8nuVOg7omOhOdkN-Hw@mail.gmail.com>
+In-Reply-To: <CAHmME9qmiNcs6iye=Yjnpfx7vy6QMd8t8nuVOg7omOhOdkN-Hw@mail.gmail.com>
+From:   Sven van Ashbrook <svenva@chromium.org>
+Date:   Mon, 19 Sep 2022 13:19:39 -0400
+X-Gmail-Original-Message-ID: <CAM7w-FULuCCww8DMyvTuU_SLuyZWqfv3sVbvPtBorYEbhGUuUA@mail.gmail.com>
+Message-ID: <CAM7w-FULuCCww8DMyvTuU_SLuyZWqfv3sVbvPtBorYEbhGUuUA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
+ outside function
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Olivia Mackall <olivia@selenic.com>,
+        Alex Levin <levinale@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Rajat Jain <rajatja@google.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        "Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 11:12:48AM -0400, Daniel Jordan wrote:
-> Hi Edward,
-> 
-> On Mon, Sep 19, 2022 at 09:05:55AM +0800, eadavis@sina.com wrote:
-> > From: Edward Adam Davis <eadavis@sina.com>
-> > 
-> > Parallelized object serialization uses spin_unlock for unlocking a spin lock
-> > that was previously locked with spin_lock.
-> 
-> There's nothing unusual about that, though?
-> 
-> > This caused the following lockdep warning about an inconsistent lock
-> > state:
-> > 
-> >         inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
-> 
-> Neither HARDIRQ-ON-W nor IN-HARDIRQ-W appear in the syzbot report, did
-> you mean SOFTIRQ-ON-W and IN-SOFTIRQ-W?
-> 
-> > We must use spin_lock_irqsave, because it is possible to trigger tipc 
-> > from an irq handler.
-> 
-> A softirq handler, not a hardirq handler.  I'd suggest using
-> spin_lock_bh() instead of _irqsave in your patch.
-> 
-> 
-> A Fixes tag would be helpful for stable and folks backporting this fix
-> to understand what kernel versions are affected.
-> 
-> > WARNING: inconsistent lock state
-> > 6.0.0-rc5-syzkaller-00025-g3245cb65fd91 #0 Not tainted
-> > --------------------------------
-> > inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-> > syz-executor.2/27685 [HC0[0]:SC1[1]:HE1:SE0] takes:
-> > ffffe8ffffc7d280 (&pd_list->lock){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:349 [inline]
-> > ffffe8ffffc7d280 (&pd_list->lock){+.?.}-{2:2}, at: padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
-> > {SOFTIRQ-ON-W} state was registered at:
-> >   lock_acquire kernel/locking/lockdep.c:5666 [inline]
-> >   lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
-> >   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-> >   _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
-> >   spin_lock include/linux/spinlock.h:349 [inline]
-> >   padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
-> >   pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:89
-> >   padata_do_parallel+0x87b/0xa10 kernel/padata.c:217
-> >   pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:117
-> >   crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
-> >   tls_do_encryption net/tls/tls_sw.c:529 [inline]
-> >   tls_push_record+0x13e8/0x3260 net/tls/tls_sw.c:762
-> >   bpf_exec_tx_verdict+0xd82/0x11a0 net/tls/tls_sw.c:802
-> >   tls_sw_sendmsg+0xa62/0x1820 net/tls/tls_sw.c:1014
-> >   inet6_sendmsg+0x99/0xe0 net/ipv6/af_inet6.c:653
-> >   sock_sendmsg_nosec net/socket.c:714 [inline]
-> >   sock_sendmsg+0xcf/0x120 net/socket.c:734
-> >   sock_write_iter+0x291/0x3d0 net/socket.c:1108
-> >   call_write_iter include/linux/fs.h:2187 [inline]
-> >   new_sync_write fs/read_write.c:491 [inline]
-> >   vfs_write+0x9e9/0xdd0 fs/read_write.c:578
-> >   ksys_write+0x1e8/0x250 fs/read_write.c:631
-> >   do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
-> >   __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
-> >   do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
-> >   entry_SYSENTER_compat_after_hwframe+0x70/0x82
-> > irq event stamp: 740
-> > hardirqs last  enabled at (740): [<ffffffff814919a0>] __local_bh_enable_ip+0xa0/0x120 kernel/softirq.c:401
-> > hardirqs last disabled at (739): [<ffffffff814919c3>] __local_bh_enable_ip+0xc3/0x120 kernel/softirq.c:378
-> > softirqs last  enabled at (0): [<ffffffff8146f02e>] copy_process+0x213e/0x7090 kernel/fork.c:2202
-> > softirqs last disabled at (717): [<ffffffff81491843>] invoke_softirq kernel/softirq.c:445 [inline]
-> > softirqs last disabled at (717): [<ffffffff81491843>] __irq_exit_rcu+0x123/0x180 kernel/softirq.c:650
-> > 
-> > other info that might help us debug this:
-> >  Possible unsafe locking scenario:
-> > 
-> >        CPU0
-> >        ----
-> >   lock(&pd_list->lock);
-> >   <Interrupt>
-> >     lock(&pd_list->lock);
-> > 
-> >  *** DEADLOCK ***
-> > 
-> > 4 locks held by syz-executor.2/27685:
-> >  #0: ffff8880445f0460 (sb_writers#3){.+.+}-{0:0}, at: open_last_lookups fs/namei.c:3470 [inline]
-> >  #0: ffff8880445f0460 (sb_writers#3){.+.+}-{0:0}, at: path_openat+0x2613/0x28f0 fs/namei.c:3688
-> >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: inode_lock_shared include/linux/fs.h:766 [inline]
-> >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: open_last_lookups fs/namei.c:3480 [inline]
-> >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: path_openat+0x1514/0x28f0 fs/namei.c:3688
-> >  #2: ffffc900001e0d70 ((&d->timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:31 [inline]
-> >  #2: ffffc900001e0d70 ((&d->timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1464
-> >  #3: ffffffff8bf89400 (rcu_read_lock){....}-{1:2}, at: buf_msg net/tipc/msg.h:202 [inline]
-> >  #3: ffffffff8bf89400 (rcu_read_lock){....}-{1:2}, at: tipc_bearer_xmit_skb+0x8c/0x410 net/tipc/bearer.c:550
-> > 
-> > stack backtrace:
-> > CPU: 1 PID: 27685 Comm: syz-executor.2 Not tainted 6.0.0-rc5-syzkaller-00025-g3245cb65fd91 #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/26/2022
-> > Call Trace:
-> >  <IRQ>
-> >  __dump_stack lib/dump_stack.c:88 [inline]
-> >  dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
-> >  print_usage_bug kernel/locking/lockdep.c:3961 [inline]
-> >  valid_state kernel/locking/lockdep.c:3973 [inline]
-> >  mark_lock_irq kernel/locking/lockdep.c:4176 [inline]
-> >  mark_lock.part.0.cold+0x18/0xd8 kernel/locking/lockdep.c:4632
-> >  mark_lock kernel/locking/lockdep.c:4596 [inline]
-> >  mark_usage kernel/locking/lockdep.c:4527 [inline]
-> >  __lock_acquire+0x11d9/0x56d0 kernel/locking/lockdep.c:5007
-> >  lock_acquire kernel/locking/lockdep.c:5666 [inline]
-> >  lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
-> >  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-> >  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
-> >  spin_lock include/linux/spinlock.h:349 [inline]
-> >  padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
-> >  pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:89
-> >  padata_do_parallel+0x87b/0xa10 kernel/padata.c:217
-> >  pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:117
-> >  crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
-> >  tipc_aead_encrypt net/tipc/crypto.c:821 [inline]
-> >  tipc_crypto_xmit+0xf7a/0x2af0 net/tipc/crypto.c:1756
-> >  tipc_bearer_xmit_skb+0x1ed/0x410 net/tipc/bearer.c:557
-> >  tipc_disc_timeout+0x75e/0xcb0 net/tipc/discover.c:335
-> >  call_timer_fn+0x1a0/0x6b0 kernel/time/timer.c:1474
-> >  expire_timers kernel/time/timer.c:1519 [inline]
-> >  __run_timers.part.0+0x674/0xa80 kernel/time/timer.c:1790
-> >  __run_timers kernel/time/timer.c:1768 [inline]
-> >  run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1803
-> >  __do_softirq+0x1d3/0x9c6 kernel/softirq.c:571
-> >  invoke_softirq kernel/softirq.c:445 [inline]
-> >  __irq_exit_rcu+0x123/0x180 kernel/softirq.c:650
-> >  irq_exit_rcu+0x5/0x20 kernel/softirq.c:662
-> >  sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1106
-> >  </IRQ>
-> 
-> The changelog doesn't explain the problem or why the proposed solution
-> fixes it.
-> 
-> If I can read these splats right, it seems lockdep is complaining about
-> how a task can take the reorder lock when softirqs are enabled
-> (SOFTIRQ-ON-W) as in the tls_push_record() stack, but also when it's in
-> softirq context (IN-SOFTIRQ-W), as in the tipc_disc_timeout() stack.  So
-> it should be enough to disable softirq here.
+On Mon, Sep 19, 2022 at 11:06 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> By the way, there was a recent ath9k patch that kind of went to a
+> similar tune. [...] Maybe that's a potential solution here, or
+> something similar to it.
 
-...to avoid a deadlock.  Helpful to include the impact to the user too.
+Jason was kind enough to point me to the patch in question:
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=36cb6494429bd64b27b7ff8b4af56f8e526da2b4
 
-> 
-> > Signed-off-by: Edward Adam Davis <eadavis@sina.com>
-> > Reported-by: syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com
-> > ---
-> >  kernel/padata.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/kernel/padata.c b/kernel/padata.c
-> > index e5819bb8bd1d..38c7b17da796 100644
-> > --- a/kernel/padata.c
-> > +++ b/kernel/padata.c
-> > @@ -388,14 +388,15 @@ void padata_do_serial(struct padata_priv *padata)
-> >  	int hashed_cpu = padata_cpu_hash(pd, padata->seq_nr);
-> >  	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
-> >  	struct padata_priv *cur;
-> > +	unsigned long flags;
-> >  
-> > -	spin_lock(&reorder->lock);
-> > +	spin_lock_irqsave(&reorder->lock, flags);
-> >  	/* Sort in ascending order of sequence number. */
-> >  	list_for_each_entry_reverse(cur, &reorder->list, list)
-> >  		if (cur->seq_nr < padata->seq_nr)
-> >  			break;
-> >  	list_add(&padata->list, &cur->list);
-> > -	spin_unlock(&reorder->lock);
-> > +	spin_unlock_irqrestore(&reorder->lock, flags);
-> >  
-> >  	/*
-> >  	 * Ensure the addition to the reorder list is ordered correctly
-> > -- 
-> > 2.37.2
-> > 
+This patch limits the long sleep inside the fillfn kthread, by
+terminating the sleep on
+hwrng_unregister().
+
+This doesn't appear like a viable approach for the suspend/resume issue?
+- there is a great multitude of tpm_msleep()/msleep() calls in the tpm's
+  rng_get_data() path. They would all have to be made interruptible.
+- even if interrupted successfully, now the kthread must be blocked until
+  after resume. If so, what is the point of using a non-freezable kthread.
