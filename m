@@ -2,74 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FE2ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 02:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5E5ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 03:21:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbiISCo4 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Sep 2022 22:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35718 "EHLO
+        id S229494AbiISDVg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 18 Sep 2022 23:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiISCoz (ORCPT
+        with ESMTP id S229473AbiISDVf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Sep 2022 22:44:55 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FB6B483;
-        Sun, 18 Sep 2022 19:44:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R991e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQ4Z7nR_1663555489;
-Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VQ4Z7nR_1663555489)
-          by smtp.aliyun-inc.com;
-          Mon, 19 Sep 2022 10:44:50 +0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH RESEND v1 1/9] crypto/ycc: Add YCC (Yitian Cryptography
- Complex) accelerator driver
-From:   guanjun <guanjun@linux.alibaba.com>
-In-Reply-To: <YyRDbT0fQQwsVpKL@gondor.apana.org.au>
-Date:   Mon, 19 Sep 2022 10:44:48 +0800
-Cc:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
-        "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
-        xuchun.shang@linux.alibaba.com,
-        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <368EB6AC-85CB-4709-AE57-D1E3431FB415@linux.alibaba.com>
-References: <1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com>
- <1662435353-114812-2-git-send-email-guanjun@linux.alibaba.com>
- <YyRDbT0fQQwsVpKL@gondor.apana.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Sun, 18 Sep 2022 23:21:35 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DC4627E;
+        Sun, 18 Sep 2022 20:21:33 -0700 (PDT)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MW8xM1kQYzlVyV;
+        Mon, 19 Sep 2022 11:17:27 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 19 Sep 2022 11:21:31 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 19 Sep 2022 11:21:31 +0800
+Subject: Re: [PATCH v8 2/3] Documentation: add a isolation strategy sysfs node
+ for uacce
+To:     Greg KH <gregkh@linuxfoundation.org>
+References: <20220902031304.37516-1-yekai13@huawei.com>
+ <20220902031304.37516-3-yekai13@huawei.com> <Yxr5BpM+VIjKhVpZ@kroah.com>
+CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
+        <liulongfang@huawei.com>
+From:   "yekai (A)" <yekai13@huawei.com>
+Message-ID: <45a50cf5-7416-4fcf-925b-ecca787425a5@huawei.com>
+Date:   Mon, 19 Sep 2022 11:21:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <Yxr5BpM+VIjKhVpZ@kroah.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-> 2022年9月16日 下午5:35，Herbert Xu <herbert@gondor.apana.org.au> 写道：
-> 
-> On Tue, Sep 06, 2022 at 11:35:45AM +0800, 'Guanjun' wrote:
+On 2022/9/9 16:27, Greg KH wrote:
+> On Fri, Sep 02, 2022 at 03:13:03AM +0000, Kai Ye wrote:
+>> Update documentation describing sysfs node that could help to
+>> configure isolation strategy for users in the user space. And
+>> describing sysfs node that could read the device isolated state.
+>>
+>> Signed-off-by: Kai Ye <yekai13@huawei.com>
+>> ---
+>>  Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
+>>  1 file changed, 26 insertions(+)
+>>
+>> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+>> index 08f2591138af..af5bc2f326d2 100644
+>> --- a/Documentation/ABI/testing/sysfs-driver-uacce
+>> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+>> @@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
+>>  Description:    Available instances left of the device
+>>                  Return -ENODEV if uacce_ops get_available_instances is not provided
+>>  
+>> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
+>> +Date:           Sep 2022
+>> +KernelVersion:  6.0
+>> +Contact:        linux-accelerators@lists.ozlabs.org
+>> +Description:    (RW) Configure the frequency size for the hardware error
+>> +                isolation strategy. This size is a configured integer value.
+>> +                The default is 0. The maximum value is 65535. This value is a
+>> +                threshold based on your driver strategies.
+> I do not understand what the units are here.
+>
+> How is anyone supposed to know what they are?
+
+This unit is the number of times. Number of occurrences in a period, also means threshold.
+If the number of device pci AER error exceeds the threshold in a time window, the device is
+isolated. 
+
+>> +                For example, in the hisilicon accelerator engine, first we will
+>> +                time-stamp every slot AER error. Then check the AER error log
+>> +                when the device AER error occurred. if the device slot AER error
+>> +                count exceeds the preset the number of times in one hour, the
+>> +                isolated state will be set to true. So the device will be
+>> +                isolated. And the AER error log that exceed one hour will be
+>> +                cleared. Of course, different strategies can be defined in
+>> +                different drivers.
+> So this file can contain values of different units depending on the
+> different driver that creates it?  How is anyone supposed to know what
+> it is and what it should be?
+>
+> This feels very loose, please define this much better so that it can be
+> understood and maintained properly.
+>
+> thanks,
+>
+> greg k-h
 > .
->> +static const struct file_operations ycc_fops = {
->> +	.open = ycc_cdev_open,
->> +	.release = ycc_cdev_release,
->> +	.unlocked_ioctl = ycc_cdev_ioctl,
->> +};
-> 
-> What is this device for? It doesn't seem to do anything so why
-> not jsut drop it?
-
-This device is reserved for future use. Now it does nothing actually.
-I will drop it in next version.
-Thank you very much!
-
-Regards,
-Guanjun
-
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
+>
+Yes,  We started out with the idea of not restricting the different drive,  only specifying the input and output.
+Because we think different drivers require different processing  strategy.
