@@ -2,111 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5E5ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 03:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA5DECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 06:03:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229494AbiISDVg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Sep 2022 23:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
+        id S229686AbiISGD5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 02:03:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiISDVf (ORCPT
+        with ESMTP id S229551AbiISGDz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Sep 2022 23:21:35 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DC4627E;
-        Sun, 18 Sep 2022 20:21:33 -0700 (PDT)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MW8xM1kQYzlVyV;
-        Mon, 19 Sep 2022 11:17:27 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 19 Sep 2022 11:21:31 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 19 Sep 2022 11:21:31 +0800
-Subject: Re: [PATCH v8 2/3] Documentation: add a isolation strategy sysfs node
- for uacce
-To:     Greg KH <gregkh@linuxfoundation.org>
-References: <20220902031304.37516-1-yekai13@huawei.com>
- <20220902031304.37516-3-yekai13@huawei.com> <Yxr5BpM+VIjKhVpZ@kroah.com>
-CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>
-From:   "yekai (A)" <yekai13@huawei.com>
-Message-ID: <45a50cf5-7416-4fcf-925b-ecca787425a5@huawei.com>
-Date:   Mon, 19 Sep 2022 11:21:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <Yxr5BpM+VIjKhVpZ@kroah.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+        Mon, 19 Sep 2022 02:03:55 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B671A3B2;
+        Sun, 18 Sep 2022 23:03:54 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id z2so3712708edi.1;
+        Sun, 18 Sep 2022 23:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=hNkWjE/9Kwd5ORgfArcfRMKxkmzooXQeBJ1ffgMnYrI=;
+        b=ONSPNefHyAbPuD0lt0We4tBQj5e0H1KXH7cf8n6tNI7HVbmeCZpjuVw6CSegwcHzLh
+         8RFHC7yjGrsBthhRORjBz5pJ1YpiA0L2X+r+i6uuwoxX6HuucZ88n7PVU3sXRoLhsP15
+         FH2HZdrsWreeQfe+XAKn0AZCtqlx0e1utY6Gs3dJB4WRGcmQ4zpZ6lY+hBWEJ/Az2oSn
+         IS3lliUBaTEyOCVX4Q8YvbH1EucjcBBd6IQK2vH3Qu6ufwG/s3NBJz+48mJVZdibrSr+
+         6WVAVZF/andqDFI09HQZNN4PJSjPJYkDfhN831Iu6av/Q1qcNlTjnO4VCTd60RtagdSQ
+         p1Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=hNkWjE/9Kwd5ORgfArcfRMKxkmzooXQeBJ1ffgMnYrI=;
+        b=N2RUDptZ9Ux+qjcdxWP6ZIzj0B6MPG6wWCgyEN82pvpWodfwgTDy2bD4iYw7ZwNuC5
+         +N17+lvznt9nKMLNELgNHpl0QlUXTmbcbDuUNqB/dy1mMluiuqkL3BBlADlMBCtiTAS3
+         9tSlmVEWxMlc73G8zT7m0h9mDEroavIc851Z8w/I2a/2JwivNBvBARZV+Wm5tH/RSO0t
+         hzfyS0j7m/UfC1zLDbttv7xiPbA+QHD1J1g3v1FiiQF2EWDlczKQOIfVCZL/k2VpghGO
+         zkZpry9sZPFWr51f+paeG/iqIDngGIZTFRC7VjGgXlOJKBicZV5zuPBjox96w8FCTr+u
+         YCjg==
+X-Gm-Message-State: ACrzQf1fgSCLHLwh5mFDP+ybkQehayiYLA1btoFrDFhnQ7xhfI+3IL8X
+        TokEDLD3M4Ybv7t2aNwGf3M=
+X-Google-Smtp-Source: AMsMyM7LNV2tIc76VxxWIejr7nctP8TLuA3LfJ87Rjz8csTkkDMHaoqsEi6/ROZnZk1S5Rho1xoqrA==
+X-Received: by 2002:a05:6402:440d:b0:450:de54:3fcf with SMTP id y13-20020a056402440d00b00450de543fcfmr14018826eda.312.1663567433443;
+        Sun, 18 Sep 2022 23:03:53 -0700 (PDT)
+Received: from felia.fritz.box (200116b826812b0018444688cfe72784.dip.versatel-1u1.de. [2001:16b8:2681:2b00:1844:4688:cfe7:2784])
+        by smtp.gmail.com with ESMTPSA id k22-20020a17090632d600b00780982d77d1sm5639168ejk.154.2022.09.18.23.03.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Sep 2022 23:03:53 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] crypto: add rsize config to .config only if lib_poly1305 is set
+Date:   Mon, 19 Sep 2022 08:03:42 +0200
+Message-Id: <20220919060342.26400-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The config CRYPTO_LIB_POLY1305_RSIZE should only be part of a kernel
+build configuration (.config file) when config CRYPTO_LIB_POLY1305 is set.
 
+Add a suitable dependency for CONFIG_CRYPTO_LIB_POLY1305_RSIZE.
 
-On 2022/9/9 16:27, Greg KH wrote:
-> On Fri, Sep 02, 2022 at 03:13:03AM +0000, Kai Ye wrote:
->> Update documentation describing sysfs node that could help to
->> configure isolation strategy for users in the user space. And
->> describing sysfs node that could read the device isolated state.
->>
->> Signed-off-by: Kai Ye <yekai13@huawei.com>
->> ---
->>  Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
->>  1 file changed, 26 insertions(+)
->>
->> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
->> index 08f2591138af..af5bc2f326d2 100644
->> --- a/Documentation/ABI/testing/sysfs-driver-uacce
->> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
->> @@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
->>  Description:    Available instances left of the device
->>                  Return -ENODEV if uacce_ops get_available_instances is not provided
->>  
->> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
->> +Date:           Sep 2022
->> +KernelVersion:  6.0
->> +Contact:        linux-accelerators@lists.ozlabs.org
->> +Description:    (RW) Configure the frequency size for the hardware error
->> +                isolation strategy. This size is a configured integer value.
->> +                The default is 0. The maximum value is 65535. This value is a
->> +                threshold based on your driver strategies.
-> I do not understand what the units are here.
->
-> How is anyone supposed to know what they are?
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ lib/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-This unit is the number of times. Number of occurrences in a period, also means threshold.
-If the number of device pci AER error exceeds the threshold in a time window, the device is
-isolated. 
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 7e9683e9f5c6..71b90952e496 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -84,6 +84,7 @@ config CRYPTO_LIB_DES
+ 
+ config CRYPTO_LIB_POLY1305_RSIZE
+ 	int
++	depends on CRYPTO_LIB_POLY1305
+ 	default 2 if MIPS
+ 	default 11 if X86_64
+ 	default 9 if ARM || ARM64
+-- 
+2.17.1
 
->> +                For example, in the hisilicon accelerator engine, first we will
->> +                time-stamp every slot AER error. Then check the AER error log
->> +                when the device AER error occurred. if the device slot AER error
->> +                count exceeds the preset the number of times in one hour, the
->> +                isolated state will be set to true. So the device will be
->> +                isolated. And the AER error log that exceed one hour will be
->> +                cleared. Of course, different strategies can be defined in
->> +                different drivers.
-> So this file can contain values of different units depending on the
-> different driver that creates it?  How is anyone supposed to know what
-> it is and what it should be?
->
-> This feels very loose, please define this much better so that it can be
-> understood and maintained properly.
->
-> thanks,
->
-> greg k-h
-> .
->
-Yes,  We started out with the idea of not restricting the different drive,  only specifying the input and output.
-Because we think different drivers require different processing  strategy.
