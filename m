@@ -2,48 +2,38 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A57C6FA8B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 13:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3C4C54EE9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 14:31:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbiISNnU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 09:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
+        id S229803AbiISObl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 10:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbiISNnS (ORCPT
+        with ESMTP id S229830AbiISObk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 09:43:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5262229E
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 06:43:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663594995;
+        Mon, 19 Sep 2022 10:31:40 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7400F19C06;
+        Mon, 19 Sep 2022 07:31:38 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e79d329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e79d:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 686171EC0230;
+        Mon, 19 Sep 2022 16:31:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1663597892;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XAQ4C8p526IwfywWHvDt2bP3t+cfJKiAuugWFxjBeBk=;
-        b=gLWz5xnjmG3/gwDiTNyn0M2ngQWlwMIkqiti22GwmL0S0qDl9gxLZzUJVUI7jKIBNMiTcq
-        hGnOzkVgWkN2wtpzAOPvLbw5opTJItw5hntTggBzZhGjfE1zSSX+UrKglISia0RFqvwO2D
-        Kl231P5j4kSPLfSyN4wnLLdiVftWtQQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-175-m7uMEVL3PEO3rwyjHKygLg-1; Mon, 19 Sep 2022 09:43:10 -0400
-X-MC-Unique: m7uMEVL3PEO3rwyjHKygLg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB7301C0BC6D;
-        Mon, 19 Sep 2022 13:43:08 +0000 (UTC)
-Received: from starship (unknown [10.40.192.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 681AD1121314;
-        Mon, 19 Sep 2022 13:43:02 +0000 (UTC)
-Message-ID: <ec4b176036d33ad99fceb43b104cf9be8aca105a.camel@redhat.com>
-Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
- configurations
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=aOFLwruiG67vJseMHd1aWtOXV4a+xdwAVmA/Tm3D62A=;
+        b=MF31u7W0nciM6gYqCIXOPlJ8PFI3wvqW3+y/53XxRIsto/JsN4N9wwAsYownZNlxxJirxK
+        kPEgRIyry9VZN8H5PB/O+2qeF/5ohzv9ZKiaOKNQktePrMBligl79aCa7043gwsOXH1iDd
+        TEDaelCyuNn5racZYOJ3D5E8Wd/QHbU=
+Date:   Mon, 19 Sep 2022 16:31:32 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Josh Poimboeuf <jpoimboe@kernel.org>,
         Namhyung Kim <namhyung@kernel.org>,
@@ -54,7 +44,6 @@ Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Tim Chen <tim.c.chen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
         "David S. Miller" <davem@davemloft.net>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -68,75 +57,54 @@ Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Date:   Mon, 19 Sep 2022 16:43:00 +0300
-In-Reply-To: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
+ instead of clear_cpu_cap
+Message-ID: <Yyh9RDbaRqUR1XSW@zn.tnic>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
-         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
-         <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20220718141123.136106-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220718141123.136106-2-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-08-01 at 19:05 +0300, Maxim Levitsky wrote:
-> On Thu, 2022-07-28 at 10:30 +0300, Maxim Levitsky wrote:
-> > On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
-> > > This patch series aims to harden the cpuid code against the case when
-> > > the hypervisor exposes a broken CPUID configuration to the guest,
-> > > in the form of having a feature disabled but not features that depend on it.
-> > > 
-> > > This is the more generic way to fix kernel panic in aes-ni kernel driver,
-> > > which was triggered by CPUID configuration in which AVX is disabled but
-> > > not AVX2.
-> > > 
-> > > https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
-> > > 
-> > > This was tested by booting a guest with AVX disabled and not AVX2,
-> > > and observing that both a warning is now printed in dmesg, and
-> > > that avx2 is gone from /proc/cpuinfo.
-> > > 
-> > > V2:
-> > > 
-> > > I hopefully addressed all the (very good) review feedback.
-> > > 
-> > > Best regards,
-> > > 	Maxim Levitsky
-> > > 
-> > > Maxim Levitsky (5):
-> > >   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
-> > >   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
-> > >   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
-> > >   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
-> > >   x86/cpuid: check for dependencies violations in CPUID and attempt to
-> > >     fix them
-> > > 
-> > >  arch/x86/events/intel/lbr.c       |  2 +-
-> > >  arch/x86/include/asm/cpufeature.h |  1 +
-> > >  arch/x86/kernel/cpu/common.c      | 51 +-------------------
-> > >  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
-> > >  4 files changed, 74 insertions(+), 60 deletions(-)
-> > > 
-> > > -- 
-> > > 2.34.3
-> > > 
-> > > 
-> > A very kind ping on these patches.
+On Mon, Jul 18, 2022 at 05:11:19PM +0300, Maxim Levitsky wrote:
+> clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
+> except that the latter also sets a bit in 'cpu_caps_cleared' which
+> later clears the same cap in secondary cpus, which is likely
+> what is meant here.
 > 
-> Another kind ping on these patches.
-
-Another very gentle ping on these patches.
-
-Best regards,
-	Maxim Levitsky
+> Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
 > 
+> Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/events/intel/lbr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Best regards,
-> 	Maxim Levitsky
-> > Best regards,
-> > 	Maxim Levitsky
+> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+> index 13179f31fe10fa..b08715172309a7 100644
+> --- a/arch/x86/events/intel/lbr.c
+> +++ b/arch/x86/events/intel/lbr.c
+> @@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
+>  	return;
+>  
+>  clear_arch_lbr:
+> -	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
+> +	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
 
+setup_clear_cpu_cap() has a very specific purpose - see
+apply_forced_caps().
 
+This whole call sequence is an early_initcall() which is way after the
+whole CPU features picking apart happens.
+
+So what is actually this fixing?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
