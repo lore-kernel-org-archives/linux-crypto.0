@@ -2,145 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ACBC54EE9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 10:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD88C54EE9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 12:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbiISKvO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 06:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41048 "EHLO
+        id S230071AbiISMIF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 08:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiISKuv (ORCPT
+        with ESMTP id S230004AbiISMIE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 06:50:51 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EF712A8B
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Sep 2022 03:45:24 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MWLql0JkxzHnx5;
-        Mon, 19 Sep 2022 18:43:15 +0800 (CST)
-Received: from [10.67.110.173] (10.67.110.173) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+        Mon, 19 Sep 2022 08:08:04 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E4D2A411;
+        Mon, 19 Sep 2022 05:08:02 -0700 (PDT)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MWNfK2FVdzpSyh;
+        Mon, 19 Sep 2022 20:05:13 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 19 Sep 2022 18:45:22 +0800
-Message-ID: <5a375c35-66f6-b377-8ffb-58006b151d60@huawei.com>
-Date:   Mon, 19 Sep 2022 18:45:22 +0800
+ 15.1.2375.31; Mon, 19 Sep 2022 20:08:00 +0800
+Received: from localhost.localdomain (10.67.164.66) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 19 Sep 2022 20:07:59 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <gregkh@linuxfoundation.org>
+Subject: [RFC PATCH 0/6] crypto: benchmark - add the crypto benchmark
+Date:   Mon, 19 Sep 2022 20:05:31 +0800
+Message-ID: <20220919120537.39258-1-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: Inquiry about the removal of flag O_NONBLOCK on /dev/random
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        zhongguohua <zhongguohua1@huawei.com>
-References: <a93995db-a738-8e4f-68f2-42d7efd3c77d@huawei.com>
- <Ytj3RnGtWqg18bxO@sol.localdomain> <YtksefZvcFiugeC1@zx2c4.com>
- <29c4a3ec-f23f-f17f-da49-7d79ad88e284@huawei.com>
- <Yt/LPr0uJVheDuuW@zx2c4.com>
- <4a794339-7aaa-8951-8d24-9bc8a79fa9f3@huawei.com>
- <761e849c-3b9d-418e-eb68-664f09b3c661@huawei.com>
- <CAHmME9qBs0EpBBrragaXFJJ+yKEfBdWGkkZp7T60vq8m8x+RdA@mail.gmail.com>
- <YxiWmiLP11UxyTzs@zx2c4.com>
- <efb1e667-d63a-ddb1-d003-f8ba5d506c29@huawei.com>
- <Yxm7OKZxT7tXsTgx@zx2c4.com>
- <ca31cb51-30b8-e970-c33c-7b848ae5ed45@huawei.com>
- <CAHmME9qWQxkDRY+TG=QL_mSZqd+vNTn186L4kbZfKEbimQcD0Q@mail.gmail.com>
-From:   "Guozihua (Scott)" <guozihua@huawei.com>
-In-Reply-To: <CAHmME9qWQxkDRY+TG=QL_mSZqd+vNTn186L4kbZfKEbimQcD0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.173]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500024.china.huawei.com (7.185.36.203)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.164.66]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/9/19 18:40, Jason A. Donenfeld wrote:
-> Hi,
-> 
-> On Mon, Sep 19, 2022 at 11:27 AM Guozihua (Scott) <guozihua@huawei.com> wrote:
->>
->> On 2022/9/8 17:51, Jason A. Donenfeld wrote:
->>> Hi,
->>>
->>> On Thu, Sep 08, 2022 at 11:31:31AM +0800, Guozihua (Scott) wrote:
->>>> For example:
->>>>
->>>>
->>>> --
->>>> Best
->>>> GUO Zihua
->>>>
->>>> --
->>>> Best
->>>> GUO Zihua
->>>
->>> Looks like you forgot to paste the example...
->>>
->>>> Thank you for the timely respond and your patient. And sorry for the
->>>> confusion.
->>>>
->>>> First of all, what we think is that this change (removing O_NONBLOCK) is
->>>> reasonable. However, this do cause issue during the test on one of our
->>>> product which uses O_NONBLOCK flag the way I presented earlier in the
->>>> Linux 4.4 era. Thus our colleague suggests that returning -EINVAL when
->>>> this flag is received would be a good way to indicate this change.
->>>
->>> No, I don't think it's wise to introduce yet *new* behavior (your
->>> proposed -EINVAL). That would just exacerbate the (mostly) invisible
->>> breakage from the 5.6-era change.
->>>
->>> The question now before us is whether to bring back the behavior that
->>> was there pre-5.6, or to keep the behavior that has existed since 5.6.
->>> Accidental regressions like this (I assume it was accidental, at least)
->>> that are unnoticed for so long tend to ossify and become the new
->>> expected behavior. It's been around 2.5 years since 5.6, and this is the
->>> first report of breakage. But the fact that it does break things for you
->>> *is* still significant.
->>>
->>> If this was just something you noticed during idle curiosity but doesn't
->>> have a real impact on anything, then I'm inclined to think we shouldn't
->>> go changing the behavior /again/ after 2.5 years. But it sounds like
->>> actually you have a real user space in a product that stopped working
->>> when you tried to upgrade the kernel from 4.4 to one >5.6. If this is
->>> the case, then this sounds truly like a userspace-breaking regression,
->>> which we should fix by restoring the old behavior. Can you confirm this
->>> is the case? And in the meantime, I'll prepare a patch for restoring
->>> that old behavior.
->>>
->>> Jason
->>> .
->>
->> Hi Jason
->>
->> Thank for your patience.
->>
->> To answer your question, yes, we do have a userspace program reading
->> /dev/random during early boot which relies on O_NONBLOCK. And this
->> change do breaks it. The userspace program comes from 4.4 era, and as
->> 4.4 is going EOL, we are switching to 5.10 and the breakage is reported.
->>
->> It would be great if the kernel is able to restore this flag for
->> backward compatibility.
-> 
-> Alright then. Sounds like a clear case of userspace being broken. I'll
-> include https://git.zx2c4.com/linux-rng/commit/?id=b931eaf6ef5cef474a1171542a872a5e270e3491
-> or similar in my pull for 6.1, if that's okay with you. For 6.0, we're
-> already at rc6, so maybe better to let this one stew for a bit longer,
-> given the change, unless you feel strongly about having it earlier, I
-> guess.
-> 
-> Jason
-> .
+Add crypto benchmark - A tool to help the users quickly get the
+performance of a algorithm registered in crypto.
 
-Hi Jason
+The tool tries to use the same API to unify the processes of different
+algorithms. The algorithm can do some private operations in the callbacks.
+For users, they can see the unified configuration parameters, rather than
+a set of configuration parameters corresponding to each algorithm.
 
-That's OK with us. Thanks.
+This tool can provide users with the ability to test the performance of
+algorithms in some specific scenarios. At present, the following parameters
+are selected for users configuration: block size, block number,
+thread number, bound numa and request number for per tfm. These parameters
+can help users simulate approximate business scenarios.
 
--- 
-Best
-GUO Zihua
+For the RFC version, the compression benchmark test is supported.
+I did some verification on Kunpeng920.
+
+The first test case is for zlib-deflate software algorithm.
+The cpu frequency is 2.6 GHz. I want to show you the influence of these
+parameters.
+
+The configuration is following:
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 1024,
+loop 1, numamask 0x0, optype 0, reqnum 1, threadnum 1, time 1.
+The result is :
+Crypto benchmark result:
+        throughput      pps             time
+        150 MB/s        150 kPP/s       1000 ms
+
+And then change the block size:
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 8192,
+loop 1, numamask 0x0, optype 0, reqnum 1, threadnum 1, time 1.
+Crypto benchmark result:
+        throughput      pps             time
+        473 MB/s        59 kPP/s        1005 ms
+
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 65536,
+loop 1, numamask 0x0, optype 0, reqnum 1, threadnum 1, time 1.
+Crypto benchmark result:
+        throughput      pps             time
+        421 MB/s        6 kPP/s         1038 ms
+
+With the test, users can know that the throughput and pps are both
+influenced by block size on this server. And the throughput has a peak
+value while the pps is inverse ratio with bolck size increasing.
+Due to the software algorithm, thread number will linear increase the
+result while it is less than cpu number and other parameters have little
+influence on performance.
+
+The second test case is for zlib-deflate hardware. The tested parameters
+has the same effect on hardware. Here I test the parameter 'reqnum'.
+The software algorithm register to synchronous process. So here it is
+useless for software performance.
+
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 8192,
+loop 1, numamask 0x0, optype 0, reqnum 1, threadnum 1, time 1.
+Crypto benchmark result:
+        throughput      pps             time
+        367 MB/s        46 kPP/s        941 ms
+
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 8192,
+loop 1, numamask 0x0, optype 0, reqnum 10, threadnum 1, time 1.
+Crypto benchmark result:
+        throughput      pps             time
+        3507 MB/s       438 kPP/s       1003 ms
+
+run set: algorithm zlib-deflate, algtype CRYPTO_COMPRESS, inputsize 8192,
+loop 1, numamask 0x0, optype 0, reqnum 100, threadnum 1, time 1.
+Crypto benchmark result:
+        throughput      pps             time
+        6318 MB/s       790 kPP/s       1093 ms
+
+So we can know that for asynchronous algorithms, request number for per
+tfm also influence the throughput and pps until a peak value.
+
+So with this tool, we can get a quick verification for different platform
+and get some reference for business scenarios configuration.
+
+Yang Shen (6):
+  moduleparams: Add hexulong type parameter
+  crypto: benchmark - add a crypto benchmark tool
+  crytpo: benchmark - support compression/decompresssion
+  crypto: benchmark - add help information
+  crypto: benchmark - add API documentation
+  MAINTAINERS: add crypto benchmark MAINTAINER
+
+ Documentation/crypto/benchmark.rst | 104 +++++
+ MAINTAINERS                        |   7 +
+ crypto/Kconfig                     |   2 +
+ crypto/Makefile                    |   5 +
+ crypto/benchmark/Kconfig           |  11 +
+ crypto/benchmark/Makefile          |   3 +
+ crypto/benchmark/benchmark.c       | 599 +++++++++++++++++++++++++++++
+ crypto/benchmark/benchmark.h       |  76 ++++
+ crypto/benchmark/bm_comp.c         | 435 +++++++++++++++++++++
+ crypto/benchmark/bm_comp.h         |  19 +
+ include/linux/moduleparam.h        |   7 +-
+ kernel/params.c                    |   1 +
+ 12 files changed, 1268 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/crypto/benchmark.rst
+ create mode 100644 crypto/benchmark/Kconfig
+ create mode 100644 crypto/benchmark/Makefile
+ create mode 100644 crypto/benchmark/benchmark.c
+ create mode 100644 crypto/benchmark/benchmark.h
+ create mode 100644 crypto/benchmark/bm_comp.c
+ create mode 100644 crypto/benchmark/bm_comp.h
+
+--
+2.24.0
