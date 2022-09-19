@@ -2,109 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3C4C54EE9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 14:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6224ECAAD3
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 15:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbiISObl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 10:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        id S229560AbiISPGK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 11:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbiISObk (ORCPT
+        with ESMTP id S229574AbiISPGJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 10:31:40 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7400F19C06;
-        Mon, 19 Sep 2022 07:31:38 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e79d329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e79d:329c:23ff:fea6:a903])
+        Mon, 19 Sep 2022 11:06:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 406632A244;
+        Mon, 19 Sep 2022 08:06:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 686171EC0230;
-        Mon, 19 Sep 2022 16:31:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1663597892;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7FC94B81C88;
+        Mon, 19 Sep 2022 15:06:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8740C43140;
+        Mon, 19 Sep 2022 15:06:01 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DTemwdZG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1663599957;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=aOFLwruiG67vJseMHd1aWtOXV4a+xdwAVmA/Tm3D62A=;
-        b=MF31u7W0nciM6gYqCIXOPlJ8PFI3wvqW3+y/53XxRIsto/JsN4N9wwAsYownZNlxxJirxK
-        kPEgRIyry9VZN8H5PB/O+2qeF/5ohzv9ZKiaOKNQktePrMBligl79aCa7043gwsOXH1iDd
-        TEDaelCyuNn5racZYOJ3D5E8Wd/QHbU=
-Date:   Mon, 19 Sep 2022 16:31:32 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
- instead of clear_cpu_cap
-Message-ID: <Yyh9RDbaRqUR1XSW@zn.tnic>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-2-mlevitsk@redhat.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=zKkl3xs4dw9Lj94MomA5+nV3PBnjgpv2vQC+E9dtRb0=;
+        b=DTemwdZG2NWKTArNvqDEty4lsvTYPeqccgWfm4uOUcZdI+X5XgGDhxRw3fcLxHsuDmRYzP
+        +aAo9H2Ej6mPRpJSwdttRXAnDa+6IIZruvUJmY5vlKmyFCGQ38akyEPaHP6udMZRUOr7MW
+        Vx3at90n9QEQke9/wFxdNDHJ/838lzc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c802ce19 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 19 Sep 2022 15:05:56 +0000 (UTC)
+Received: by mail-vs1-f46.google.com with SMTP id h1so30193492vsr.11;
+        Mon, 19 Sep 2022 08:05:56 -0700 (PDT)
+X-Gm-Message-State: ACrzQf0yA3cJtP0Lo7RM67yJNzqdQcVgN6s2/j3bVEgE52wmVp/ZWDpd
+        jXhu8j9v25nBv9niwwzk0BS2eWwLS7NLdAgafaA=
+X-Google-Smtp-Source: AMsMyM567j3Pj5pr8wh9Nv9BjTKNZ26smjhrXY029BSGlw07mcfnzhEdyT9CaygUAEd3qOg24KoPZzpRJvw+fOYZ1SM=
+X-Received: by 2002:a67:e401:0:b0:398:89f1:492f with SMTP id
+ d1-20020a67e401000000b0039889f1492fmr6927638vsf.21.1663599954306; Mon, 19 Sep
+ 2022 08:05:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220718141123.136106-2-mlevitsk@redhat.com>
+References: <20220915002235.v2.1.I7c0a79e9b3c52584f5b637fde5f1d6f807605806@changeid>
+ <CAHmME9rhunb05DEnc=UfGr8k9_LBi1NW2Hi0OsRbGwcCN2NzjQ@mail.gmail.com> <CAM7w-FXHWzcN1Y7pwb6+1KA6A2oZRrfpOJdWFVWjRvjbp+DEOg@mail.gmail.com>
+In-Reply-To: <CAM7w-FXHWzcN1Y7pwb6+1KA6A2oZRrfpOJdWFVWjRvjbp+DEOg@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 19 Sep 2022 17:05:41 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qmiNcs6iye=Yjnpfx7vy6QMd8t8nuVOg7omOhOdkN-Hw@mail.gmail.com>
+Message-ID: <CAHmME9qmiNcs6iye=Yjnpfx7vy6QMd8t8nuVOg7omOhOdkN-Hw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] random: move add_hwgenerator_randomness()'s wait
+ outside function
+To:     Sven van Ashbrook <svenva@chromium.org>
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Olivia Mackall <olivia@selenic.com>,
+        Alex Levin <levinale@google.com>,
+        Andrey Pronin <apronin@google.com>,
+        Stephen Boyd <swboyd@google.com>,
+        Rajat Jain <rajatja@google.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        "Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 05:11:19PM +0300, Maxim Levitsky wrote:
-> clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
-> except that the latter also sets a bit in 'cpu_caps_cleared' which
-> later clears the same cap in secondary cpus, which is likely
-> what is meant here.
-> 
-> Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
-> 
-> Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/events/intel/lbr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-> index 13179f31fe10fa..b08715172309a7 100644
-> --- a/arch/x86/events/intel/lbr.c
-> +++ b/arch/x86/events/intel/lbr.c
-> @@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
->  	return;
->  
->  clear_arch_lbr:
-> -	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
-> +	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
+On Mon, Sep 19, 2022 at 5:03 PM Sven van Ashbrook <svenva@chromium.org> wrote:
+>
+> On Fri, Sep 16, 2022 at 10:51 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > The other thing that occurred to me when reading this patch in context
+> > of the other one is that this sleep you're removing here is not the
+> > only sleep in the call chain. Each hwrng driver can also sleep, and
+> > many do, sometimes for a long time, blocking until there's data
+> > available, which might happen after minutes in some cases. So maybe
+> > that's something to think about in context of this patchset -- that
+> > just moving this to a delayed worker might not actually fix the issue
+> > you're having with sleeps.
+> >
+>
+> This is an excellent point. A look at tpm2_calc_ordinal_duration()
+> reveals that tpm_transmit() may block for 300s at a time. So when
+> we are using a WQ_FREEZABLE delayed_work, the PM may have to wait
+> for up to 300s when draining the wq on suspend. That will introduce
+> a lot of breakage in suspend/resume.
+>
+> Dominik: in light of this, please proceed with your patch, without
+> rebasing it onto mine.
+>
+> + tpm maintainers Peter Huewe and Jarkko Sakkinen, a quick recap of
+> the problem:
+>
+> - on ChromeOS we are seeing intermittent suspend/resume errors+warnings
+>   related to activity of the core's hwrng_fillfn. this kthread keeps
+>   runningduring suspend/resume. if this happens to kick off an bus (i2c)
+>   transaction while the bus driver is in suspend, this triggers
+>   a "Transfer while suspended" warning from the i2c core, followed by
+>   an error return:
+>
+> i2c_designware i2c_designware.1: Transfer while suspended
+> tpm tpm0: i2c transfer failed (attempt 1/3): -108
+> [ snip 10s of transfer failed attempts]
+>
+> - in 2019, Stephen Boyd made an attempt at fixing this by making the
+>   hwrng_fillfn kthread freezable. But a freezable thread requires
+>   different API calls for scheduling, waiting, and timeout. This
+>   generated regressions, so the solution had to be reverted.
+>
+> https://patchwork.kernel.org/project/linux-crypto/patch/20190805233241.220521-1-swboyd@chromium.org/
+>
+> - the current patch attempts to halt hwrng_fillfn during suspend by
+>   converting it to a self-rearming delayed_work. The PM drains all
+>   work before going into suspend. But, the potential minute-long
+>   blocking delays in tpm make this solution infeasible.
+>
+> Peter and Jarkko, can you think of a possible way forward to eliminate
+> the warnings+errors?
+>
+> -Sven
 
-setup_clear_cpu_cap() has a very specific purpose - see
-apply_forced_caps().
 
-This whole call sequence is an early_initcall() which is way after the
-whole CPU features picking apart happens.
+By the way, there was a recent ath9k patch that kind of went to a
+similar tune. The solution was to make ath9k's hwrng driver sleep
+using a hwrng-specific sleep function that allowed the core framework
+to cancel that sleep. Maybe that's a potential solution here, or
+something similar to it. Might be worth taking a look at that patch. I
+think it's in one of Herbert's trees.
 
-So what is actually this fixing?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
