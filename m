@@ -2,100 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30EC1ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 06:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA1CECAAD8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 07:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230419AbiITGsC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Sep 2022 02:48:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40562 "EHLO
+        id S229559AbiITHah (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Sep 2022 03:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230320AbiITGsA (ORCPT
+        with ESMTP id S229557AbiITHag (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Sep 2022 02:48:00 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B205E322;
-        Mon, 19 Sep 2022 23:47:58 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id l10so1427322plb.10;
-        Mon, 19 Sep 2022 23:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=/0Rz+GvF75/viJBLBQEbjgxFNtevAf1f19ZOsGn6xi4=;
-        b=qh+ChxHC4uR5klCXtcOjAj1X+W2LtQ/QqVQ2Q7Jo9+fZTVVaW8YzwGVfiwk4yyuyXG
-         NKA3KublXvFN2Ax747Y0MPS9dNbxIJG3eRiJR5OTauPBVbGLlcmRMxgcekw5N03ak37L
-         pvPGSaKdLC4xTAMZSorUrirNa5ExFzPVlOsySzC+hhqDZDCHgE35aptcJS2Oj3ai4HoT
-         VzH7to0IBR1F/X3i3gjOmMY/ye0kirpNOVkub0lv+lTssA8PtMVnW2fvau7wJul7rV1g
-         E5MFk5610LiZy6mcjq51fPfdhb2ztWDpX4rYS8VEWQcQFiHktANzHBEtU2I/Cr4nCLXs
-         TnUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=/0Rz+GvF75/viJBLBQEbjgxFNtevAf1f19ZOsGn6xi4=;
-        b=1LnKVoyGKRHMDeTRdVuNDOL+KW72YF1oa4eAOgBh98uc3RR1UVGIKgw/cv524fkjf8
-         6qyEdqAsdSWTU7J5jrZllNT7MpBgFMWyaDPgP1sOzmbtBhVbKMNqUNXKAnuyiWmPlyxS
-         NbQzahWVkb0Nvib9A4drpRc1LvzaBTEnj1Pz0yomglaEKKmurlgUfhnva5Rm9DDhI95m
-         4iU+NJxlG/kig2kaZElxTGKYBLU7CsUYFU4oQkCyiGrXdPWGQKpXKaqrQU28Z5y6HC8D
-         R97l3ppYZz0pUWpqDmx/uLDDhezZ7Awo/IK1ixcCXOweOzOs12rz2qOlcG06nxMGvV56
-         ROtA==
-X-Gm-Message-State: ACrzQf3qPU9CiAm0nqsyK7rmduKr46zwWkNCutQCKCW3jttvNQsT9L5J
-        Gcp8jMR1H4OZAfFoozpA2Eo=
-X-Google-Smtp-Source: AMsMyM4wFjJ7dfYYWjRmeijZNDdyYepAdqexPx6ifurY8mKAZ94mGA4Rd77hVQjppW0uyneefh1ZEA==
-X-Received: by 2002:a17:902:ee54:b0:178:7040:f87c with SMTP id 20-20020a170902ee5400b001787040f87cmr3533573plo.8.1663656478359;
-        Mon, 19 Sep 2022 23:47:58 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id z20-20020aa79f94000000b00543780ba53asm650468pfr.124.2022.09.19.23.47.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 23:47:58 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ye.xingchen@zte.com.cn
-To:     herbert@gondor.apana.org.au
-Cc:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] crypto: octeontx2 - Remove the unneeded result variable
-Date:   Tue, 20 Sep 2022 06:47:54 +0000
-Message-Id: <20220920064754.215430-1-ye.xingchen@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Tue, 20 Sep 2022 03:30:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C818A5EDD3;
+        Tue, 20 Sep 2022 00:30:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF4086202A;
+        Tue, 20 Sep 2022 07:30:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE29EC433C1;
+        Tue, 20 Sep 2022 07:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1663659032;
+        bh=kh4OSvjPZPtz1jxHi5/yOoKyEiwAorfd2yO5ngDd0lA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QuY1L0PnlU8afKCJz1EjxkqA9H3HSEcxyS0jTzaaDXUbAqU3n6b1EQBeqL+QkB5bP
+         GRRF/ZxMN0L/moJPh/bb95T1C1916kyDSupGTYG7KRNtPNrRVIPlZjspEfQCpKLEns
+         NE36SPEsbk1VBt3jrurvrFf8cljQfOpXvagb6M6s=
+Date:   Tue, 20 Sep 2022 09:31:01 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yang Shen <shenyang39@huawei.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [RFC PATCH 2/6] crypto: benchmark - add a crypto benchmark tool
+Message-ID: <YylsNQb/EjUqkWEZ@kroah.com>
+References: <20220919120537.39258-1-shenyang39@huawei.com>
+ <20220919120537.39258-3-shenyang39@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220919120537.39258-3-shenyang39@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+On Mon, Sep 19, 2022 at 08:05:33PM +0800, Yang Shen wrote:
+> Provide a crypto benchmark to help the developer quickly get the
+> performance of a algorithm registered in crypto.
+> 
+> Due to the crypto algorithms have multifarious parameters, the tool
+> cannot support all test scenes. In order to provide users with simple
+> and easy-to-use tools and support as many test scenarios as possible,
+> benchmark refers to the crypto method to provide a unified struct
+> 'crypto_bm_ops'. And the algorithm registers its own callbacks to parse
+> the user's input. In crypto, a algorithm class has multiple algorithms,
+> but all of them uses the same API. So in the benchmark, a algorithm
+> class uses the same 'ops' and distinguish specific algorithm by name.
+> 
+> First, consider the performance calculation model. Considering the
+> crypto subsystem model, a reasonable process code based on crypto api
+> should create a numa node based 'crypto_tfm' in advance and apply for
+> a certain amount of 'crypto_req' according to their own business.
+> In the real business processing stage, the thread send tasks based on
+> 'crypto_req' and wait for completion.
+> 
+> Therefore, the benchmark will create 'crypto_tfm' and 'crypto_req' at
+> first, and then count all requests time to calculate performance.
+> So the result is the pure algorithm performance. When each algorithm
+> class implements its own 'ops', it needs to pay attention to the content
+> completed in the callback. Before the 'ops.perf', the tool had better
+> prepare the request data set. And in order to avoid the false high
+> performance of the algorithm caused by the false cache and TLB hit rate,
+> the size of data set should be larger than 'crypto_req' number.
+> The 'crypto_bm_ops' has following api:
+>  - init & uninit
+>  The initialize related functions. Algorithm can do some private setting.
+>  - create_tfm & release_tfm
+>  The 'crypto_tfm' related functions. Algorithm has different tfm name in
+>  crypto. But they both has a member named tfm, so use tfm to stand for
+>  algorithm handle. The benchmark has provides the tfm array.
+>  - create_req & release_req
+>  The 'crypto_req' related functions. The callbacks should create a 'reqnum'
+>  'crypto_req' group in struct 'crypto_bm_base'. And the also suggest
+>  prepare the request data in this function. In order to avoid the false
+>  high performance of the algorithm caused by the false cache and TLB hit
+>  rate, the size of data set should be larger than 'crypto_req' number.
+>  - perf
+>  The request sending functions. The registrant should use parameter 'loop'
+>  to send requests repeatly. And update the count in struct
+>  'crypto_bm_thread_data'.
+> 
+> Then consider the parameters that user can configure. Generally speaking,
+> the following parameters will affect the performance of the algorithm:
+> tfm number, request number, block size, numa node. And some parameters
+> will affect the stability of performance: testing time and requests sent
+> number. To sum up, the benchmark has following parameters:
+>  - algorithm
+>  The testing algorithm name. Showed in /proc/crypto.
+>  - algtype
+>  The testing algorithm class. Can get the algorithm class by echo 'algtype'
+>  to /sys/module/crypto_benchmark/parameters/help.
+>  - inputsize
+>  The testing length that can greatly impact performance. Such as data size
+>  for compress or key length for encryption.
+>  - loop
+>  The testing loop times. Avoid performance fluctuations caused by
+>  environment.
+>  - numamask
+>  The testing bind numamask. Used for allocate memory, create threads and
+>  create 'crypto_tfm'.
+>  - optype
+>  The testing algorithm operation type. Can get the algorithm available
+>  operation types by cat /sys/module/crypto_benchmark/parameters/help
+>  with specified 'algtype'.
+>  - reqnum
+>  The testing request number for per tfm. Used for test asynchrony api
+>  performance.
+>  - threadnum
+>  The testing thread number. To simplify model, create a 'crypto_tfm' per
+>  thread.
+>  - time
+>  The testing time. Used for stop the test thread.
+>  - run
+>  Start or stop the test.
+> 
+> Users can configure parameters under
+> /sys/modules/crypto_benchmark/parameters/.
 
-Return the value otx2_cpt_send_mbox_msg() directly instead of storing it
-in another redundant variable.
+Please don't use module parameters for stuff like this, use configfs
+which was designed for this type of interactions.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+thanks,
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-index 02cb9e44afd8..75c403f2b1d9 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
-@@ -191,7 +191,6 @@ int otx2_cptvf_send_kvf_limits_msg(struct otx2_cptvf_dev *cptvf)
- 	struct otx2_mbox *mbox = &cptvf->pfvf_mbox;
- 	struct pci_dev *pdev = cptvf->pdev;
- 	struct mbox_msghdr *req;
--	int ret;
- 
- 	req = (struct mbox_msghdr *)
- 	      otx2_mbox_alloc_msg_rsp(mbox, 0, sizeof(*req),
-@@ -204,7 +203,5 @@ int otx2_cptvf_send_kvf_limits_msg(struct otx2_cptvf_dev *cptvf)
- 	req->sig = OTX2_MBOX_REQ_SIG;
- 	req->pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->vf_id, 0);
- 
--	ret = otx2_cpt_send_mbox_msg(mbox, pdev);
--
--	return ret;
-+	return otx2_cpt_send_mbox_msg(mbox, pdev);
- }
--- 
-2.25.1
+greg k-h
