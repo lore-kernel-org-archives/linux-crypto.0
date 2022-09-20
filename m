@@ -2,83 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0F0C6FA8E
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 14:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA99ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 14:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231770AbiITORu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Sep 2022 10:17:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58736 "EHLO
+        id S231640AbiITOXV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Sep 2022 10:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231580AbiITORZ (ORCPT
+        with ESMTP id S231641AbiITOW5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Sep 2022 10:17:25 -0400
+        Tue, 20 Sep 2022 10:22:57 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D185723B;
-        Tue, 20 Sep 2022 07:14:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007061115;
+        Tue, 20 Sep 2022 07:22:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7B0F6622C9;
-        Tue, 20 Sep 2022 14:14:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 573DBC433D6;
-        Tue, 20 Sep 2022 14:14:49 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E71C6204E;
+        Tue, 20 Sep 2022 14:22:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4568C4347C;
+        Tue, 20 Sep 2022 14:22:01 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Qt6+LjC5"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="X2L/pZ7L"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1663683287;
+        t=1663683719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=xGcIeiqeQ+HS0QuciXX8z8BYA5ktdXUWt1D1mDhVW+s=;
-        b=Qt6+LjC5kuokCGDGfgat4875HqXzeIURqazycms/NKkiX8SYTZHrVXV45XWn5D8ygnEvhW
-        AHcJvWyjE1gNwF1zKKyQN+uee5HrlRYn1A5qChtKBQHFELsXB12LiBs2jxElD0pPILKVOM
-        z1PmnADb8NGYvEiVlxLUo8FWId9DMEQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2e2f7f43 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 20 Sep 2022 14:14:47 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] random: throttle hwrng writes if no entropy is credited
-Date:   Tue, 20 Sep 2022 16:14:38 +0200
-Message-Id: <20220920141438.2782446-1-Jason@zx2c4.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eAFMvr0uN4pEiPJeHRaNx8VoWQp+qnmXgnVisuTo3XQ=;
+        b=X2L/pZ7L6j1WQNpk33ZKOo99n9zwesyEvNkUoPSJ6NO8IjRI/rjhrb+/52UsPCsPzQvk9P
+        kIHITIBIzfJ/mqALie6ZYfJW11eaq39HS2PNnFDgF900+/rNmzZzcfnJvxlDgVm5rFUH6k
+        EzIljyF8z1q95ZoOpGv1/GGbgaRzCbE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 763cec8b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 20 Sep 2022 14:21:58 +0000 (UTC)
+Received: by mail-ua1-f53.google.com with SMTP id b7so1133144uas.2;
+        Tue, 20 Sep 2022 07:21:58 -0700 (PDT)
+X-Gm-Message-State: ACrzQf1OTlA1+n7tHx9neRJvRJigGqqoDUE0z+jbCDlxZOSqAJGIuEnV
+        ZvS/gkgNIT4Pxmy9GkKAQ+qyVwVjHeW3NP2NF3Q=
+X-Google-Smtp-Source: AMsMyM5U9OdjHhD9hRLrBdQvnPilyOJmKzVebRHySYrdstlVc47SUfNjrITsT8ba6EcN0+EjNe4LsZKhVml/B7hd+hA=
+X-Received: by 2002:ab0:5a24:0:b0:3af:fbb1:2dfb with SMTP id
+ l33-20020ab05a24000000b003affbb12dfbmr8893357uad.27.1663683717649; Tue, 20
+ Sep 2022 07:21:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220904080247.7890-1-linux@dominikbrodowski.net> <Yxg7WQ1UuskDrBVj@gondor.apana.org.au>
+In-Reply-To: <Yxg7WQ1UuskDrBVj@gondor.apana.org.au>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 20 Sep 2022 16:21:46 +0200
+X-Gmail-Original-Message-ID: <CAHmME9oVKzJtAaBmtrrUT1n2f0_41wu2VF295ONKV3WUotbYxw@mail.gmail.com>
+Message-ID: <CAHmME9oVKzJtAaBmtrrUT1n2f0_41wu2VF295ONKV3WUotbYxw@mail.gmail.com>
+Subject: Re: [PATCH] random / hw_random: core: start hwrng kthread also for
+ untrusted sources
+To:     herbert@gondor.apana.org.au
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This value is currently never set to zero, because the hwrng thread only
-runs if it's going to be non-zero. This is an oversight, however, that
-Dominik is working on fixing. In preparation for this, and so that
-there's less coordination required between my tree and Herbert's, make
-this currently useless, but not harmful, change here now, in hopes that
-Dominik can make the corresponding change in the hwrng core later.
+On Wed, Sep 7, 2022 at 8:34 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Dominik Brodowski <linux@dominikbrodowski.net> wrote:
+> >
+> > diff --git a/drivers/char/random.c b/drivers/char/random.c
+> > index 79d7d4e4e582..b360ed4ece03 100644
+> > --- a/drivers/char/random.c
+> > +++ b/drivers/char/random.c
+> > @@ -867,9 +867,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
+> >
+> >        /*
+> >         * Throttle writing to once every CRNG_RESEED_INTERVAL, unless
+> > -        * we're not yet initialized.
+> > +        * we're not yet initialized or this source isn't trusted.
+> >         */
+> > -       if (!kthread_should_stop() && crng_ready())
+> > +       if (!kthread_should_stop() && (crng_ready() || !entropy))
+> >                schedule_timeout_interruptible(CRNG_RESEED_INTERVAL);
+> > }
+> > EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+>
+> Couldn't you split this bit out?
 
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It's been two weeks and Dominik hasn't posted anything new, so I'm
+going to do that for him. Patch incoming (retaining his authorship).
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 16e0c5f6cf2f..520a385c7dab 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -865,9 +865,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
- 
- 	/*
- 	 * Throttle writing to once every reseed interval, unless we're not yet
--	 * initialized.
-+	 * initialized or no entropy is credited.
- 	 */
--	if (!kthread_should_stop() && crng_ready())
-+	if (!kthread_should_stop() && (crng_ready() || !entropy))
- 		schedule_timeout_interruptible(crng_reseed_interval());
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
--- 
-2.37.3
-
+Jason
