@@ -2,136 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA1CECAAD8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 07:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D842C54EE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 08:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbiITHah (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Sep 2022 03:30:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35566 "EHLO
+        id S230490AbiITIDQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Sep 2022 04:03:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbiITHag (ORCPT
+        with ESMTP id S230515AbiITIBv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Sep 2022 03:30:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C818A5EDD3;
-        Tue, 20 Sep 2022 00:30:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EF4086202A;
-        Tue, 20 Sep 2022 07:30:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE29EC433C1;
-        Tue, 20 Sep 2022 07:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1663659032;
-        bh=kh4OSvjPZPtz1jxHi5/yOoKyEiwAorfd2yO5ngDd0lA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QuY1L0PnlU8afKCJz1EjxkqA9H3HSEcxyS0jTzaaDXUbAqU3n6b1EQBeqL+QkB5bP
-         GRRF/ZxMN0L/moJPh/bb95T1C1916kyDSupGTYG7KRNtPNrRVIPlZjspEfQCpKLEns
-         NE36SPEsbk1VBt3jrurvrFf8cljQfOpXvagb6M6s=
-Date:   Tue, 20 Sep 2022 09:31:01 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Yang Shen <shenyang39@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC PATCH 2/6] crypto: benchmark - add a crypto benchmark tool
-Message-ID: <YylsNQb/EjUqkWEZ@kroah.com>
-References: <20220919120537.39258-1-shenyang39@huawei.com>
- <20220919120537.39258-3-shenyang39@huawei.com>
+        Tue, 20 Sep 2022 04:01:51 -0400
+Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.129.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7146642C2
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 01:01:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
+        s=selector; t=1663660909;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UBElztSxJ1rdBS50z2Hh+xljndSP253b3OPRrTnscxQ=;
+        b=ByzcBrxRaf8bYEPI7zE7VITvzf/7AzLipeLGJfeP8P56neBdKN3xd38PtTRGqm6I/lBOuA
+        GHNvkGmgmm11Yc2gvvYDskTs1m+J2f0/FxgWt4EutXOznSD/XcN9vC95cMj8cO2u1r6vKD
+        bf5akZXfPfmksV0VFimHSiYQNHrXvthbcFnooEc/eGsPKW1AOWzKcJTFo3IVWyw0gg/NnD
+        9lMkdpLkJgvMglYCeG+PhIohgg0FTNZ4aWMf+nUk0453Hh1BSbWun4Dg3j+f4+n8X3x5o6
+        FcLfk+/J4Qpung2wifqhe3xBcaU69OUeqvnVI7FWx3T2kT4ovKI4BgtxBa987w==
+Received: from mail.maxlinear.com (174-47-1-84.static.ctl.one [174.47.1.84])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ us-mta-235-nEWdcjjDOR-NiH6cM9J8hQ-3; Tue, 20 Sep 2022 04:01:48 -0400
+X-MC-Unique: nEWdcjjDOR-NiH6cM9J8hQ-3
+Received: from sgsxdev002.isng.phoenix.local (10.226.81.112) by
+ mail.maxlinear.com (10.23.38.119) with Microsoft SMTP Server id 15.1.2375.24;
+ Tue, 20 Sep 2022 01:01:44 -0700
+From:   Peter Harliman Liem <pliem@maxlinear.com>
+To:     <atenart@kernel.org>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-lgm-soc@maxlinear.com>,
+        "Peter Harliman Liem" <pliem@maxlinear.com>
+Subject: [PATCH 2/3] crypto: inside-secure - Add fw_little_endian option
+Date:   Tue, 20 Sep 2022 16:01:38 +0800
+Message-ID: <29cf210c9adce088bc50248ad46255d883bd5edc.1663660578.git.pliem@maxlinear.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1663660578.git.pliem@maxlinear.com>
+References: <cover.1663660578.git.pliem@maxlinear.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220919120537.39258-3-shenyang39@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: maxlinear.com
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 08:05:33PM +0800, Yang Shen wrote:
-> Provide a crypto benchmark to help the developer quickly get the
-> performance of a algorithm registered in crypto.
-> 
-> Due to the crypto algorithms have multifarious parameters, the tool
-> cannot support all test scenes. In order to provide users with simple
-> and easy-to-use tools and support as many test scenarios as possible,
-> benchmark refers to the crypto method to provide a unified struct
-> 'crypto_bm_ops'. And the algorithm registers its own callbacks to parse
-> the user's input. In crypto, a algorithm class has multiple algorithms,
-> but all of them uses the same API. So in the benchmark, a algorithm
-> class uses the same 'ops' and distinguish specific algorithm by name.
-> 
-> First, consider the performance calculation model. Considering the
-> crypto subsystem model, a reasonable process code based on crypto api
-> should create a numa node based 'crypto_tfm' in advance and apply for
-> a certain amount of 'crypto_req' according to their own business.
-> In the real business processing stage, the thread send tasks based on
-> 'crypto_req' and wait for completion.
-> 
-> Therefore, the benchmark will create 'crypto_tfm' and 'crypto_req' at
-> first, and then count all requests time to calculate performance.
-> So the result is the pure algorithm performance. When each algorithm
-> class implements its own 'ops', it needs to pay attention to the content
-> completed in the callback. Before the 'ops.perf', the tool had better
-> prepare the request data set. And in order to avoid the false high
-> performance of the algorithm caused by the false cache and TLB hit rate,
-> the size of data set should be larger than 'crypto_req' number.
-> The 'crypto_bm_ops' has following api:
->  - init & uninit
->  The initialize related functions. Algorithm can do some private setting.
->  - create_tfm & release_tfm
->  The 'crypto_tfm' related functions. Algorithm has different tfm name in
->  crypto. But they both has a member named tfm, so use tfm to stand for
->  algorithm handle. The benchmark has provides the tfm array.
->  - create_req & release_req
->  The 'crypto_req' related functions. The callbacks should create a 'reqnum'
->  'crypto_req' group in struct 'crypto_bm_base'. And the also suggest
->  prepare the request data in this function. In order to avoid the false
->  high performance of the algorithm caused by the false cache and TLB hit
->  rate, the size of data set should be larger than 'crypto_req' number.
->  - perf
->  The request sending functions. The registrant should use parameter 'loop'
->  to send requests repeatly. And update the count in struct
->  'crypto_bm_thread_data'.
-> 
-> Then consider the parameters that user can configure. Generally speaking,
-> the following parameters will affect the performance of the algorithm:
-> tfm number, request number, block size, numa node. And some parameters
-> will affect the stability of performance: testing time and requests sent
-> number. To sum up, the benchmark has following parameters:
->  - algorithm
->  The testing algorithm name. Showed in /proc/crypto.
->  - algtype
->  The testing algorithm class. Can get the algorithm class by echo 'algtype'
->  to /sys/module/crypto_benchmark/parameters/help.
->  - inputsize
->  The testing length that can greatly impact performance. Such as data size
->  for compress or key length for encryption.
->  - loop
->  The testing loop times. Avoid performance fluctuations caused by
->  environment.
->  - numamask
->  The testing bind numamask. Used for allocate memory, create threads and
->  create 'crypto_tfm'.
->  - optype
->  The testing algorithm operation type. Can get the algorithm available
->  operation types by cat /sys/module/crypto_benchmark/parameters/help
->  with specified 'algtype'.
->  - reqnum
->  The testing request number for per tfm. Used for test asynchrony api
->  performance.
->  - threadnum
->  The testing thread number. To simplify model, create a 'crypto_tfm' per
->  thread.
->  - time
->  The testing time. Used for stop the test thread.
->  - run
->  Start or stop the test.
-> 
-> Users can configure parameters under
-> /sys/modules/crypto_benchmark/parameters/.
+This is to add fw_little_endian option, which can
+be used for platform which firmware is using little-endian
+(instead of big-endian).
 
-Please don't use module parameters for stuff like this, use configfs
-which was designed for this type of interactions.
+Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 15 +++++++++++----
+ drivers/crypto/inside-secure/safexcel.h |  1 +
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-thanks,
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/insid=
+e-secure/safexcel.c
+index 02c103da09a9..955170d2dd7c 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -316,14 +316,21 @@ static void eip197_init_firmware(struct safexcel_cryp=
+to_priv *priv)
+ static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
+ =09=09=09=09  const struct firmware *fw)
+ {
+-=09const __be32 *data =3D (const __be32 *)fw->data;
++=09const u32 *data =3D (const u32 *)fw->data;
++=09u32 val;
+ =09int i;
+=20
+ =09/* Write the firmware */
+-=09for (i =3D 0; i < fw->size / sizeof(u32); i++)
+-=09=09writel(be32_to_cpu(data[i]),
++=09for (i =3D 0; i < fw->size / sizeof(u32); i++) {
++=09=09if (priv->data->fw_little_endian)
++=09=09=09val =3D le32_to_cpu(data[i]);
++=09=09else
++=09=09=09val =3D be32_to_cpu(data[i]);
++
++=09=09writel(val,
+ =09=09       priv->base + EIP197_CLASSIFICATION_RAMS +
+-=09=09       i * sizeof(__be32));
++=09=09       i * sizeof(*data));
++=09}
+=20
+ =09/* Exclude final 2 NOPs from size */
+ =09return i - EIP197_FW_TERMINAL_NOPS;
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/insid=
+e-secure/safexcel.h
+index 1b8ccb33202b..a89dd8dc1ddd 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -735,6 +735,7 @@ enum safexcel_eip_version {
+=20
+ struct safexcel_of_data {
+ =09enum safexcel_eip_version version;
++=09bool fw_little_endian;
+ };
+=20
+ /* Priority we use for advertising our algorithms */
+--=20
+2.17.1
 
-greg k-h
