@@ -2,110 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6093AC54EE9
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 06:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9E7C54EE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 06:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbiITGCv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Sep 2022 02:02:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33152 "EHLO
+        id S230514AbiITGfo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Sep 2022 02:35:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230320AbiITGCt (ORCPT
+        with ESMTP id S231149AbiITGfL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Sep 2022 02:02:49 -0400
-X-Greylist: delayed 443 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 19 Sep 2022 23:02:44 PDT
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA175C9CF;
-        Mon, 19 Sep 2022 23:02:44 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id E4C2D205E3;
-        Tue, 20 Sep 2022 07:54:44 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id swpeMJd9catj; Tue, 20 Sep 2022 07:54:44 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 6396520561;
-        Tue, 20 Sep 2022 07:54:44 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-        by mailout2.secunet.com (Postfix) with ESMTP id 52A6C80004A;
-        Tue, 20 Sep 2022 07:54:44 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 20 Sep 2022 07:54:44 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 20 Sep
- 2022 07:54:43 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-        id 75FF531829FB; Tue, 20 Sep 2022 07:54:43 +0200 (CEST)
-Date:   Tue, 20 Sep 2022 07:54:43 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     <eadavis@sina.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
-Message-ID: <20220920055443.GI2950045@gauss3.secunet.de>
-References: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
- <20220920003908.391835-1-eadavis@sina.com>
- <20220920014711.bvreurf4ex44w6oj@oracle.com>
+        Tue, 20 Sep 2022 02:35:11 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B7F5F7E1;
+        Mon, 19 Sep 2022 23:33:05 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so1463229pjh.3;
+        Mon, 19 Sep 2022 23:33:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=vhbOwJSDUYuRzvxtE8zipskqo4rv7Uj75crKwV3e0iw=;
+        b=UXNsBcooe9CV7oF34Ltcymj8wrpt64YjVyGls8ZzzmAq6pW4hY4v1shjUuZhMdDWcK
+         z65/k6rHQ2FswK2Oa588ia0i6kLMZwBZWn3qk1u6OJabOEG2pAbKDbXh9Q0yuP6WHzHj
+         g430DrdIt9uAmrfqbRqY83dOtMkp9Ur8EcMCsvSQFm2e+MPK0XCtWy7dly5g1zTqTXiA
+         VYR3GHifndta3hLq2JWdrwdtOExd/O7WqbbYJb3jI4uHkTcJD/1s6Wg+9dclcNKe6cqi
+         OLlat0iPpKeacXrlYwrAyf/4FarTQUSCVXOFxtDKmcuzkuOfrXoXLjbjTc/Njk9GyD0L
+         qlVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=vhbOwJSDUYuRzvxtE8zipskqo4rv7Uj75crKwV3e0iw=;
+        b=O7TSNWppcKAam8UZeUILSyXOsjb884Ku0vEA/tS65BVUgoPNsEMEv4LYxbAASPZcHC
+         ffOY700kseXpHGnie0a+ULc8dvtkXjtX8Dt0bkSN0aVgbMgnJYjFACriGsXj47TR3Pgf
+         RoQLUkOn9eEGdHl4aE7373fIufqG0EDogv7BX+uR0ERCuPRDqZTaJq0EbYMA4iKjChag
+         GOdlQfDqcAKS1l89f5W+Jtx5U+AUvzS9n8dbye76Pry5U6EBMFvQrfmJwsdR/82ppVh8
+         R+9tzHa2+HzUGchpaL73UDHM2o/ga3obWOQXJfi1dJeQuxeD2X/0FvXmGyJdAfy+ywuy
+         zRZA==
+X-Gm-Message-State: ACrzQf0sJgTgI7dPloy5oJV8AKdIhi7w/5vrFh+YQATBrCYayfj81FGl
+        /eTVRkkZg0rVXksfJItgzkc=
+X-Google-Smtp-Source: AMsMyM5FW/IgJJkZRsjpbESbS/BJ59tE4hfou5pqEJwqF8YLbivlqRjzLSMlIS2nrAhVmOdtFa6pyQ==
+X-Received: by 2002:a17:90b:3147:b0:203:6eaa:4894 with SMTP id ip7-20020a17090b314700b002036eaa4894mr2253934pjb.230.1663655577955;
+        Mon, 19 Sep 2022 23:32:57 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id s17-20020a170902ea1100b0016edd557412sm517557plg.201.2022.09.19.23.32.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Sep 2022 23:32:56 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To:     herbert@gondor.apana.org.au
+Cc:     thomas.lendacky@amd.com, john.allen@amd.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ye xingchen <ye.xingchen@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] crypto: ccp: Remove the unneeded result variable
+Date:   Tue, 20 Sep 2022 06:32:52 +0000
+Message-Id: <20220920063252.215144-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220920014711.bvreurf4ex44w6oj@oracle.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 09:47:11PM -0400, Daniel Jordan wrote:
-> On Tue, Sep 20, 2022 at 08:39:08AM +0800, eadavis@sina.com wrote:
-> > From: Edward Adam Davis <eadavis@sina.com>
-> > 
-> > On Mon, 19 Sep 2022 11:12:48 -0400, Daniel Jordan wrote:
-> > > Hi Edward,
-> > > 
-> > > On Mon, Sep 19, 2022 at 09:05:55AM +0800, eadavis@sina.com wrote:
-> > > > From: Edward Adam Davis <eadavis@sina.com>
-> > > > 
-> > > > Parallelized object serialization uses spin_unlock for unlocking a spin lock
-> > > > that was previously locked with spin_lock.
-> > > 
-> > > There's nothing unusual about that, though?
-> > > 
-> > > > This caused the following lockdep warning about an inconsistent lock
-> > > > state:
-> > > > 
-> > > >         inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
-> > > 
-> > > Neither HARDIRQ-ON-W nor IN-HARDIRQ-W appear in the syzbot report, did
-> > > you mean SOFTIRQ-ON-W and IN-SOFTIRQ-W?
-> > Yes, I want say: inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-> > > 
-> > > > We must use spin_lock_irqsave, because it is possible to trigger tipc 
-> > > > from an irq handler.
-> > > 
-> > > A softirq handler, not a hardirq handler.  I'd suggest using
-> > > spin_lock_bh() instead of _irqsave in your patch.
-> > I think _irqsave better than _bh, it can save the irq context, but _bh not, 
-> > and in tipc call trace contain SOFTIRQ-ON-W and IN-SOFTIRQ-W.
-> 
-> _irqsave saving the context is about handling nested hardirq disables.
-> It's not needed here since we don't need to care about disabling
-> hardirq.
-> 
-> _bh is for disabling softirq, a different context from hardirq.  We want
-> _bh here since the deadlock happens when a CPU takes the lock in both
-> task and softirq context.  padata uses _bh lock variants because it can
-> be called in softirq context but not hardirq.  Let's be consistent and
-> do it in this case too.
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-padata_do_serial is called with BHs off, so using spin_lock_bh should not
-fix anything here. I guess the problem is that we call padata_find_next
-after we enabled the BHs in padata_reorder.
+Return the value ccp_crypto_enqueue_request() directly instead of storing
+it in another redundant variable.
+
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ drivers/crypto/ccp/ccp-crypto-des3.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/ccp/ccp-crypto-des3.c b/drivers/crypto/ccp/ccp-crypto-des3.c
+index ec97daf0fcb7..278636ed251a 100644
+--- a/drivers/crypto/ccp/ccp-crypto-des3.c
++++ b/drivers/crypto/ccp/ccp-crypto-des3.c
+@@ -64,7 +64,6 @@ static int ccp_des3_crypt(struct skcipher_request *req, bool encrypt)
+ 	struct ccp_des3_req_ctx *rctx = skcipher_request_ctx(req);
+ 	struct scatterlist *iv_sg = NULL;
+ 	unsigned int iv_len = 0;
+-	int ret;
+ 
+ 	if (!ctx->u.des3.key_len)
+ 		return -EINVAL;
+@@ -100,9 +99,7 @@ static int ccp_des3_crypt(struct skcipher_request *req, bool encrypt)
+ 	rctx->cmd.u.des3.src_len = req->cryptlen;
+ 	rctx->cmd.u.des3.dst = req->dst;
+ 
+-	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
+-
+-	return ret;
++	return ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
+ }
+ 
+ static int ccp_des3_encrypt(struct skcipher_request *req)
+-- 
+2.25.1
