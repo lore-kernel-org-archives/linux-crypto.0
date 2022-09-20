@@ -2,331 +2,337 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EF9C6FA8B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Sep 2022 23:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C30C6FA82
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Sep 2022 01:47:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbiISXrH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Sep 2022 19:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47596 "EHLO
+        id S229824AbiITBrd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Sep 2022 21:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbiISXrG (ORCPT
+        with ESMTP id S229774AbiITBrc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Sep 2022 19:47:06 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2060.outbound.protection.outlook.com [40.107.93.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851544F3B3;
-        Mon, 19 Sep 2022 16:47:05 -0700 (PDT)
+        Mon, 19 Sep 2022 21:47:32 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F72A53033;
+        Mon, 19 Sep 2022 18:47:30 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28JMinKT006527;
+        Tue, 20 Sep 2022 01:47:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2022-7-12;
+ bh=9iD5USZvB16AVVkG4yrC05YxW7LDiDMhlgCSXpFCCgg=;
+ b=pMT+PIxiTC001yKYyzxJ13kPMncGTSix+w328guCLoZPtrxrT+yRH34/U+OSZfZGgb8z
+ wjbZL3NhJahdx1cDIbtRn2IHWcs/Zbba4r4h/Qkd0CK55Rawv1ld2cYpD468Hxo9QLnb
+ ZUXj5TYChylrN7XsVhbf+bcj3BZ9nddcEJ5WK/psvkvdDrgtTmjLa+Y13Gvv9NhxOPZy
+ cEekYZfsmgGhZ/ynjPo5+wu8LlKTu3NkzkU1DqT+SIAAURNebQOutRGaZ9h/saNWo0nG
+ W3AV8SIm5ItSUjp6qIkvhwzXh8jJKunGL25OpPHES7vMoAPZfTQ0+b+y62HI9nGUuCIY aA== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3jn68rder6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Sep 2022 01:47:18 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 28K0bJLb036355;
+        Tue, 20 Sep 2022 01:47:18 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2109.outbound.protection.outlook.com [104.47.70.109])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3jp39d777u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Sep 2022 01:47:17 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LN9cI0Zu4J0d6VQGm5PwHj+tFdCgAFQkgXs5J8Hhkuwc8N5jhn8u9Q54qGRFteCfZEGWUfNNJ6xIgzJie7yenSci+b0/rbJeEija/14SyCzGFj3YJYsyTHd3KGt88TYNYms4Ww5DQaOtE0eB+qf1fa7zFYzDvDwnpalflEwu3mrTDIfQEbZ3KjUUk5fJ44Tb1ppFy9QyKELo4pDLS9BKzsxH8U/fzWLSuLshEChpFQX4Zf40TTqeT9hZT4qeSa+iPmmsM7J2UJ2ma78YGjqFdyz3yufd+tO4q1OvyZgrqNdu0pxm6WLHr6ANsPbRxXkA1D6hzg3767q2kxKlm2sVXw==
+ b=E5JeGHHHeBwCjlKGCrAZOikxkk6pyjBPv6ECfxjHpsqFLOCi/mJ+ZvZyklAMK4qSVmAotdGwkEvvb6fPPE8RFtURdHjw/ih99r6iYxKUm7sHhudxiIlppl2C884cYmH5n/yl6Hi3GCR7pgxwgI/IHDKjCP6uoKl4Vaph2eKC5FKmiNUr9T9VfTcLtL2+uk8zwRx9Ia4zh/XCIxr+9V5LHXh4ysDaddX75nOQZlZRcMP/5w15sSBsBDK36RXV/qs64FbWel7keU8rQ+jbNqUDdXZbb50NYpHltylmzvxYXEzWfsJ1W3ThuvytiNJvTxPwycnNZ0a+PFs4BdipNd9R1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Df1Qft9DOKFHkGisPgguY/CcqjU/CvKnGNSPmNm+erI=;
- b=EWBWxond+UN6JGFPmcwrTi4Fsu6GDPRUXwUNXpgNBqmiGX4cyrbBAFtg7XwErO7v3ZWYovlv7H4RCjb5+UFw/FPOE9tU3v3vCJKCMZfqUFNmWPaH5pBJzYUtZroCoKLtd/FbrszhgDc4S2gDiJ8TxeQ5jMeg5aG6xulT199ihmLrYAeFs1BrHaSgcdauE4WSyCVFGB/1YolqJlyCPk0FfpVQrAPRk534MoO3aE6Ob81CyA3tkj/VF6PU7ha9mYNxSAggh8T9vlfSBZHgTjFZ4oPxMIUQqA1eliVPlyPHD4abjJA+K/ClGCa0FqLd3CpwtAkkPDcYJa9VM9fkPyAfpg==
+ bh=9iD5USZvB16AVVkG4yrC05YxW7LDiDMhlgCSXpFCCgg=;
+ b=k6PVu4R7ICaXS+/8uh4GNtMKVVLS0nk119xzybELyBdwz2XX/lC3I0EeD7vrtgFoXvv5o2NK6pB192+9yO4r4dVWMUrqB9h98cdhdNPpIxr0jeMJlhgESANRe8pIbMw1JtYgSUW+I0IT3N8GhrsibfTgFVXvJDoHPeXi1yBB3mE0sff6GrmDwUT6gf6nLiylaeXQXkYpM3+GXQStAuS/x8cxMcfAf7cLPw9V/ZbCZVAQyY1Acy2qnGXFNLlnynLdUVS16DU7hSN8pj0Ug3fwJg7LrHF3Pi1Y1T/jktPCcHiXacMCzX/q+lcvRJKGNZraxX6NYMq1l+64oHbhqV8gMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Df1Qft9DOKFHkGisPgguY/CcqjU/CvKnGNSPmNm+erI=;
- b=Xdo9AXS05sQS3sjF70Et0z7EroSpUVmfzef/522AF/7xjeTclgfvce2+E/+Z2MeGPwBkHP5ICEVAdi+Fdf3/0GTswvPg+4Au+c+s4IOcIEj/OHalUJbQUUGv5BCi3AcOg9/cT/dfckSyt3xVw1tcOHnofwSOeL0UaN7FNhhX+8E=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by DM4PR12MB5343.namprd12.prod.outlook.com (2603:10b6:5:389::17) with
+ bh=9iD5USZvB16AVVkG4yrC05YxW7LDiDMhlgCSXpFCCgg=;
+ b=PKpl/e5td+Ks3FF1aJCGlgFTzk5iMtT1xQTmXpkfUAZ0A1/HmynGRP0N+OGB/jKPQj8Coj37q3jx0Os13y6tlfvQNHtGXtduKYRqdxTtx9B9PYuSpP1shuf9HpjGSsW9R2EKkw+1TEMRrpfLK7y+30YnsNpYxHFj4qzuShwGMiA=
+Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
+ by BN0PR10MB4934.namprd10.prod.outlook.com (2603:10b6:408:120::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.21; Mon, 19 Sep
- 2022 23:47:01 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::e47d:1a95:23d5:922c]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::e47d:1a95:23d5:922c%7]) with mapi id 15.20.5632.021; Mon, 19 Sep 2022
- 23:47:01 +0000
-Message-ID: <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
-Date:   Mon, 19 Sep 2022 23:46:55 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
- Page State Change VMGEXIT
-Content-Language: en-US
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Alper Gun <alpergun@google.com>
-Cc:     Peter Gonda <pgonda@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
- <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
- <0716365f-3572-638b-e841-fcce7d30571a@amd.com>
- <CABpDEu=quPsv6cXfbvpsGS2N+5Pcw7inCfmv=sx3-VaK0UE76g@mail.gmail.com>
- <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com>
-From:   Ashish Kalra <ashkalra@amd.com>
-In-Reply-To: <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BL1P223CA0021.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:208:2c4::26) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.21; Tue, 20 Sep
+ 2022 01:47:15 +0000
+Received: from SA1PR10MB5711.namprd10.prod.outlook.com
+ ([fe80::610f:82ba:a9ad:bd65]) by SA1PR10MB5711.namprd10.prod.outlook.com
+ ([fe80::610f:82ba:a9ad:bd65%7]) with mapi id 15.20.5632.021; Tue, 20 Sep 2022
+ 01:47:15 +0000
+Date:   Mon, 19 Sep 2022 21:47:11 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     eadavis@sina.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        steffen.klassert@secunet.com,
+        syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
+Message-ID: <20220920014711.bvreurf4ex44w6oj@oracle.com>
+References: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
+ <20220920003908.391835-1-eadavis@sina.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220920003908.391835-1-eadavis@sina.com>
+X-ClientProxiedBy: BLAPR03CA0033.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::8) To SA1PR10MB5711.namprd10.prod.outlook.com
+ (2603:10b6:806:23e::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|DM4PR12MB5343:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48e316d6-8358-4a8c-3090-08da9a993f44
+X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|BN0PR10MB4934:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d05bc94-144e-48f6-da6b-08da9aaa0b1b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iTRNTh9uUK7l2luv1/+2KGHAtasU1Y7c5OIVj34rLu3JAd/LQQcsgu2k4UlUC0snBMLFJKVIfGULKE2rZ520RhCeBGligp9B0IH1ZDhdevzFQjYWdvFSpIs9/5y8niqigkZFCxZntNgwGWdc2wT94NS/mt0iOKN0d4gNrqoKKYzaRvVvto6UCaTrQghmwsnyPAWM3Qv9HM5OKr142zTkMtpFu6ciTRiRL8TH0nIURsoG/Sddfwa51Z+pwN/MyhZW26w3FIlIaQVYICXA294fqTW4haa/IuuOvxWpy8M+G0edobUQTbDglQikcQz/3t8fy6nhmwszClKAtocmBsLSOKEnyHtecV/IOO8YMG2vvYQAUMgxFMzdtlRMpfUaApg1429ki2Z6fzFR3UUmpXoXa6RTVB7Mwo5QgCKMNbJJk6rXR5g+ppob3YQsFOq0MDQNTYsPj8BVNDs+1jczVZq5rk/0e6UMieTtzJg+VyGXJoFn5OoSQrEWzRPRWHUNltvI7I6uZ9NrqPzDr02CSbUSxP7ZPBiJcLTAIpjh2Dw7Xvx9fqFLLftODUsQY9rY/UYyGZpDaBtfEs5tfEVTHd6mudLeprYuz8EtA9dRSh+gwgGuMPE6aZVwOCXI54fxBXGTV11sTFOJBURVZ6AjjOwWUUxvZIXphIffmofhlTjHHp7WyOssUxWxqyHvPcCVVfndAzrUTfMFU19SRUcf9CxpZ+PN3Uk6Nx+6ZwmsueTfAyxZwONAZepSnyCTDeP9s4hmuYItUOFikmqloB6KtFFy/c1OOnmtHcXcDEhzF60HVxU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(39860400002)(396003)(346002)(376002)(136003)(451199015)(2616005)(2906002)(54906003)(53546011)(41300700001)(6506007)(6666004)(4326008)(8676002)(66556008)(83380400001)(66476007)(66946007)(316002)(110136005)(6486002)(36756003)(7406005)(7416002)(5660300002)(186003)(31696002)(8936002)(478600001)(6512007)(38100700002)(26005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: fplXWCzLAebgvP6D+zYyOHQSkuzpeM8hz3VZltHqGhtomhPLUaUhijbMtvmtIllWGV4BGYXuIFT1U4Akj2+Q7tP/XCiqyFE1XKZ0gp2MEniFnrijqInucqmcue0Hg4hul1liVAqRxaO6xrAY0lZIbvSexeuAHfbuch6ojrNU4TgOo87NX8j6AV2JCCrM5M8pKVMRmA/uefebv1As8Pifj+lwv81ePY8T5TrwTXnhVKr9Bf1M4DFpPMm9H4DLbgLDoaPRKisb1U0bNpBM9tIMNrE2jD5flbHetJ7NRoN1XFXRgp0uN6ztM5/c9fANpaGHbYsQ51IOlBfipt1pCb5Ijer6z9nPaRwizzRO31ECEMu+qnfYYymIGBqpdIeBIhaGi8HnNXWyEXLr1IJywJae+I2pfIWP5ID3OCcdHgvTW8YcoIYA+Dnd67TtRIehTvhXyeqRv4+n47Crnkz4TrXMIIU6ZczQEo/UJq40lgxkdH437+YzxUHHSEO6B/CXMgM9QrdfL87XNI1Y1oxzN7uxBQ9JkdRIV2CKO5sBhr+yhIJH6PeXMemVNCDYBaQ/ZmTETkGz5G3JASImw5rIjyP87EXOjZiWMl4dxrKeO0jeB0lpzcFxZpQbcYLbmuA2xgZlTLQQbTIzOeBsbJY2TI8XWgcyvu0Fiv2Upnvh6EqwBhlUZ8hVkI/dLhj1jGfHUDY7Rlh6EDG4fCXFZFAV4UiY3i3qZs6LoWMp0E9zEx3p/86YU4sKRw/4P7DejTtUEJnRGA5mxzIQHc9FvpYwAMQR3g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(396003)(39860400002)(376002)(136003)(451199015)(36756003)(2906002)(316002)(8676002)(38350700002)(38100700002)(4326008)(66476007)(5660300002)(66556008)(66946007)(6916009)(8936002)(86362001)(1076003)(186003)(478600001)(2616005)(6512007)(26005)(52116002)(6666004)(83380400001)(41300700001)(6506007)(6486002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R0t2bGEyYmN5NzhqVmg1TnR3aEt2U1lVTmh5NER0VGVJck5rYXdhTDJVanJ6?=
- =?utf-8?B?ay9DWDduMk9WQnQ2MEp5aXdwU1d1QzZaNy9wbHBzK1UxMFJGY3pYVVVxTktT?=
- =?utf-8?B?VEpmSmExSW1LcnpQaDdXcFV1MFNPWThtcWhOYWF4T3ZFcWNXNm5GeFFlQXU0?=
- =?utf-8?B?cUFJZWZTTWJkNjJVcWo2UzdQNnI4MEFRTktsQjBlUWREakl1OGRYYVp3Z0VG?=
- =?utf-8?B?UEhUK0E5ODR1aFJKS2wvOFQxWGJrZ3VHWjErK3VrNGh5QUlYOXNSSkZrQ0RT?=
- =?utf-8?B?d2JHTDlGM2FNczJUVkxyUk5pRlp1MmFqb0k4U0M4R21paUJUZzBzMkkwQ293?=
- =?utf-8?B?aC9aa2dPakNDTnlrRWViUUhBSlkwWmVOR1ZMZGJXd2dINCtwV0NsUXZlK09u?=
- =?utf-8?B?Z3JQaW9zTkhUOG9UNUI0MGJkRmtuQy83VGhBOHpRdURRRlRCeWhlR051cUNL?=
- =?utf-8?B?dDdNVFRSaDYweVhhNWhSRlYwSHY2b1BVTWMybnk0dForc0pmTFNFZlcyRHFC?=
- =?utf-8?B?ai8vcTMyZTgyeFQxR0F4SjU2T2laNnZkR3dKemFsamE2Z0xuaE5tQjZjTkh4?=
- =?utf-8?B?TXRMMTZnVEtkRVZ5UkV5aHV5QUVQa3hwSm95WmlYd3dqRk1NSjZlcW1ZcXl0?=
- =?utf-8?B?a2pqdjQ3NVZ6WDJOcTJFckFPVlNOT1dCVlZkVm1DVnFic043SEd1ZjlpRGNR?=
- =?utf-8?B?R2xiNWxPN2ZUZXBQNmNJYTRBL2Y1aHB1cEJMaHZPbHRRTnhPUEJkeCt5VWFi?=
- =?utf-8?B?aFFqMEp5MmUrUmplWFVtKzdWTnNKcnd1Si9aNDNsVTNLME42U2ZmNmxQVHJt?=
- =?utf-8?B?OGl6VEZjSjh2WWtkWTkvR1BvWWNSNHlyN1YzQWdWdDNnY2hhUjBKR2RKMHB5?=
- =?utf-8?B?NnNLNXl0VXJtTU5DMUtVa2I0RjNOdFhUQU1qcHpKSDF0VEMvTVBYaVBwSVZr?=
- =?utf-8?B?cGNIVDZtQ05zamNobDZpeEhKdE81SWZUcTE1WFBKUmE0OWdrRHd3UUpoQm4r?=
- =?utf-8?B?UDhqYXJ0aTVKWEtNYmdoYk0xOStxYS85Q1ZxNi83eGxheitLckNUT0Fwa2w0?=
- =?utf-8?B?S3BlVUlGZVdTSldlbitpK3F6aS9pS1Z4WEdFb2plV1FXcG5RZVVmcWdVTW1W?=
- =?utf-8?B?NW82bjdROWVsdzRJa2NLdjRGZWxHSTU4emdVWWs4SVZ4VTFkTkZvdE13bFdK?=
- =?utf-8?B?YXAxaUhhd2JsbEs3am1ZNk1ML1VFUUthSVZ4aDlUOEQ1N25FMEM4bnJFelFH?=
- =?utf-8?B?UGZ1NmpFNGNnaHR5b2c1UWVBSVRURnBOcGt4d2czTUZzMklnVDdzd2FvcDQy?=
- =?utf-8?B?OHZWQkVKQXFjblFpSmM4WEtzd3JkTjJlNWtjeFUwRkRNb1B2eGVncWlvZ1Yw?=
- =?utf-8?B?QTJJVXJlMFFXN0ZPQzQ4WHN1bjNVY3M5bE5mNEJFNmt6VTBMS0tPYXNHY2lN?=
- =?utf-8?B?YUpNSzRodk8wNXU4cmUzaEFsU0FvSFRRYXlQbUl0M0JyTU5WbytHRXdWa0VS?=
- =?utf-8?B?YVVqcWtSTFFubHBLeGZIY1Jpalo4YW50aCtva1RmdDhTa2lDYWV4SUpuL0ww?=
- =?utf-8?B?V1RwT1oycktnM0NwU04vT2xsbGlWTGpiN3h6Y2xxWTNjQnZUTHpnQkswcURm?=
- =?utf-8?B?OWtqLytRaTl0VnlFQUFTNTIwNi9CWWVYWU1LVEVqTzJPTEM1TExwVVAwVng2?=
- =?utf-8?B?cWs0am50UEhjcTN0U1JrdWlKOUJYQnhGTFZEcWsyaklKOTFUTnYzS3BoWlND?=
- =?utf-8?B?TTZKaFpkQVVTdGEvSjQwNWRsVnlGWmpTdEhNZ2pwekhsYzY0NEIzVzhZQ0tp?=
- =?utf-8?B?TXllMVprTlRRbTlFUGhOWWVDenMzREtoSXliaTRqUUYwdHFwckpmdGV1L0pt?=
- =?utf-8?B?QWNsUEFRSXIyYXFrUlhnWi85SFFJMEEwTUJac2VzTUFLNlErUjVYWkc2SVhB?=
- =?utf-8?B?L2FKdFpCTE5HY1B4VWV6MkZtVjNBQWJWRFNIbHpGblgvRjFNSEd2T1p0dzNC?=
- =?utf-8?B?cHVRd0RuREovTEZST1QyYnhaSDR2R1hXazcySGZWcG00bEM1c3pDcy9YRmdF?=
- =?utf-8?B?MmhWYjJuRVk5aXExUkp0Qk4vVUJ2TGJIRXg0cmhuNW54N0ZUNmllUTV2S2k2?=
- =?utf-8?Q?bqbnB/rOO0mBuMdhJvjapWrLD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48e316d6-8358-4a8c-3090-08da9a993f44
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?G+FLxWpswXehXOLRyrnhxtgxjrxQi+ic7c2IYewEMuFEayIq1s+v0YrdqWjL?=
+ =?us-ascii?Q?o0pRzTqnFpVFkxHlHjiuJE9v7NMHWqcY45QxYt0z/ZsItW8IXdLvFhaitgOn?=
+ =?us-ascii?Q?t72Ue4PXO6S6LE7yt+imrCuCXAXUWkruy0v7mimSbpHPEhooPhmEyHABfSE1?=
+ =?us-ascii?Q?OviROfCYnXuaX6Y7oZ0uiN71AY0Xeatw3ZhXkYMeFCtaKPHjKBQ3pttttvRn?=
+ =?us-ascii?Q?is0+9d1JPRWSdJHcyAYGVspVJ3k7gv9NN7PJGlWI6f60UpHqwEzgfQGgq9US?=
+ =?us-ascii?Q?LOaFyFR9oczPakCoMtOTqZzdDF66SUcZApTboAi5WsDqbXVut0KJLV0XZUiN?=
+ =?us-ascii?Q?bmZOrcmEbdt6+SmPueaBVsCFrM3DEXF+cY0Br2Is4b55e1+EUKmtlwBMI7tq?=
+ =?us-ascii?Q?X57L5d2Rdw+FSpgATvE1D5yk0gYTLbX9uCnMSifMGTaDsh92HuEX2QrkpgiR?=
+ =?us-ascii?Q?0JoAb+gt9hHsyNP6V4a+eDRql/5XYwd1gTk9iSGigtxB9uY4kYghTS0s9/d6?=
+ =?us-ascii?Q?4Pi6yM12ulrR7gkm+MP/EP9f+nDiJgMjqjHWLdeNa0CI/1kQ2GyOs8WkDeSB?=
+ =?us-ascii?Q?45Wt85+w7ux2Dr65+LYLDJB8CFd58PbIweozqSNNXP9OVkyC1CotjamptVVu?=
+ =?us-ascii?Q?jk9J3qRugqTYb3e/nqawjUESsE5mTulYj4TmXYkrCp25izUUWAPJR4LnIC3P?=
+ =?us-ascii?Q?NUJvcD5XH6Bq5gLdj28FqLCVkiGRSS3favsxWGJINH595gF5tbNAkgAXXc2M?=
+ =?us-ascii?Q?4IaTlig1de+Khb0XFaTS2aFRiKGyolE2NR28+xZ2ZHqoeFvp/RdMXYthSaDa?=
+ =?us-ascii?Q?8mmzw+YAwXWRLQuG7QdlX/0ExSE8JO+AiNfoDHHrE36dbJx252XG43hd5CTd?=
+ =?us-ascii?Q?kjqKzSGGeEUVPLjCsaDo9yGXfncfDmR7G8ckfo8IxOLmX4vpuKHYStTMX6VN?=
+ =?us-ascii?Q?6dCJzRDaOJAHM+rlLkPf31eSMvAk93dygbMIwdfFaRusfUT+Q8/xv9vCR181?=
+ =?us-ascii?Q?Z4CWmlD/mPU1miq6sOXACKZYbYeb0Oggd8PxUqVHRGD/CanTNdyQYHLh0Edz?=
+ =?us-ascii?Q?PTV1vjYAScOTpoVGGLYHqsr999Y6rBIWVd3FMpe3+110y4t2Uiby3YWoQzuG?=
+ =?us-ascii?Q?y++LGWkqK9jhRnrhqKS/kyQAR7+3U5fiiE4LODEDorrvCMVRjGIP1NXZ+I+s?=
+ =?us-ascii?Q?pd0ZjftjMc1C9I1ebxa06iq/TprxFyDlbZ5Jnjuxg1hqLPdfhTOfR3QxeNBS?=
+ =?us-ascii?Q?fmAAMIuVq0pvB0ahedbX/UjY97J8MXgq95b/Ru6GDR294gNHuYGKsZyaQZxo?=
+ =?us-ascii?Q?nk6phPU6kSoY1aB+tJig4CMFtcs19W841yesGI88c9YGKFbNEC1B6jkE7WZB?=
+ =?us-ascii?Q?zRHGES1aR8+ITHcRFnXyJSkNrBCa+RJYbNXZUcvCq//nCGYn3gU4JelV69OA?=
+ =?us-ascii?Q?XY2q5E2tfnOCwfK1Qh60IZs0uarmtcOmtsGnzk3dUDCzJwLvg6LJfMhmJgDS?=
+ =?us-ascii?Q?Cbjilrt9DjsmofLsmGyWRfHw7caRj1s9VVrVT6yoGeFOaqxlAEhF5mEFjd6H?=
+ =?us-ascii?Q?H0+tTOibgo9I6hihxnEznG3+AkVz9EMNOKstbEy9ePddpC0uU/OSopkGJdMb?=
+ =?us-ascii?Q?ug=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d05bc94-144e-48f6-da6b-08da9aaa0b1b
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2022 23:47:01.0797
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2022 01:47:15.6431
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NtIS6ocbAMOcHeGq4R5GJc8CFClLek9kHGx52/QStoH5G6qJEy0FfdFZ7sIe/JPcss3i8KW6SCXcEMRFp0wQLQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5343
+X-MS-Exchange-CrossTenant-UserPrincipalName: DSvOBA8D4fgeP/mOlmX/znZ1xzOQswqLPiClABxFsx4+ym5JQ4mfRU17efvZgzOzJfJhGTMPKIGlbc8/0HlToZklvFwuJ4vbdHnXHiNccyA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB4934
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-19_05,2022-09-16_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2209200009
+X-Proofpoint-GUID: hXJC3RPl8lpz0kZqd0-lyKNO1lNDw6zC
+X-Proofpoint-ORIG-GUID: hXJC3RPl8lpz0kZqd0-lyKNO1lNDw6zC
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Sep 20, 2022 at 08:39:08AM +0800, eadavis@sina.com wrote:
+> From: Edward Adam Davis <eadavis@sina.com>
+> 
+> On Mon, 19 Sep 2022 11:12:48 -0400, Daniel Jordan wrote:
+> > Hi Edward,
+> > 
+> > On Mon, Sep 19, 2022 at 09:05:55AM +0800, eadavis@sina.com wrote:
+> > > From: Edward Adam Davis <eadavis@sina.com>
+> > > 
+> > > Parallelized object serialization uses spin_unlock for unlocking a spin lock
+> > > that was previously locked with spin_lock.
+> > 
+> > There's nothing unusual about that, though?
+> > 
+> > > This caused the following lockdep warning about an inconsistent lock
+> > > state:
+> > > 
+> > >         inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
+> > 
+> > Neither HARDIRQ-ON-W nor IN-HARDIRQ-W appear in the syzbot report, did
+> > you mean SOFTIRQ-ON-W and IN-SOFTIRQ-W?
+> Yes, I want say: inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+> > 
+> > > We must use spin_lock_irqsave, because it is possible to trigger tipc 
+> > > from an irq handler.
+> > 
+> > A softirq handler, not a hardirq handler.  I'd suggest using
+> > spin_lock_bh() instead of _irqsave in your patch.
+> I think _irqsave better than _bh, it can save the irq context, but _bh not, 
+> and in tipc call trace contain SOFTIRQ-ON-W and IN-SOFTIRQ-W.
 
-On 9/19/22 22:18, Tom Lendacky wrote:
-> On 9/19/22 17:02, Alper Gun wrote:
->> On Mon, Sep 19, 2022 at 2:38 PM Tom Lendacky 
->> <thomas.lendacky@amd.com> wrote:
->>>
->>> On 9/19/22 12:53, Alper Gun wrote:
->>>> On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
->>>>>
->>>>>> +
->>>>>> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, 
->>>>>> enum psc_op op, gpa_t gpa,
->>>>>> +                                         int level)
->>>>>> +{
->>>>>> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
->>>>>> +       struct kvm *kvm = vcpu->kvm;
->>>>>> +       int rc, npt_level;
->>>>>> +       kvm_pfn_t pfn;
->>>>>> +       gpa_t gpa_end;
->>>>>> +
->>>>>> +       gpa_end = gpa + page_level_size(level);
->>>>>> +
->>>>>> +       while (gpa < gpa_end) {
->>>>>> +               /*
->>>>>> +                * If the gpa is not present in the NPT then 
->>>>>> build the NPT.
->>>>>> +                */
->>>>>> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
->>>>>> +               if (rc)
->>>>>> +                       return -EINVAL;
->>>>>> +
->>>>>> +               if (op == SNP_PAGE_STATE_PRIVATE) {
->>>>>> +                       hva_t hva;
->>>>>> +
->>>>>> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
->>>>>> +                               return -EINVAL;
->>>>>> +
->>>>>> +                       /*
->>>>>> +                        * Verify that the hva range is 
->>>>>> registered. This enforcement is
->>>>>> +                        * required to avoid the cases where a 
->>>>>> page is marked private
->>>>>> +                        * in the RMP table but never gets 
->>>>>> cleanup during the VM
->>>>>> +                        * termination path.
->>>>>> +                        */
->>>>>> +                       mutex_lock(&kvm->lock);
->>>>>> +                       rc = is_hva_registered(kvm, hva, 
->>>>>> page_level_size(level));
->>>>>> +                       mutex_unlock(&kvm->lock);
->>>>>> +                       if (!rc)
->>>>>> +                               return -EINVAL;
->>>>>> +
->>>>>> +                       /*
->>>>>> +                        * Mark the userspace range unmerable 
->>>>>> before adding the pages
->>>>>> +                        * in the RMP table.
->>>>>> +                        */
->>>>>> +                       mmap_write_lock(kvm->mm);
->>>>>> +                       rc = snp_mark_unmergable(kvm, hva, 
->>>>>> page_level_size(level));
->>>>>> +                       mmap_write_unlock(kvm->mm);
->>>>>> +                       if (rc)
->>>>>> +                               return -EINVAL;
->>>>>> +               }
->>>>>> +
->>>>>> +               write_lock(&kvm->mmu_lock);
->>>>>> +
->>>>>> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, 
->>>>>> &npt_level);
->>>>>> +               if (!rc) {
->>>>>> +                       /*
->>>>>> +                        * This may happen if another vCPU 
->>>>>> unmapped the page
->>>>>> +                        * before we acquire the lock. Retry the 
->>>>>> PSC.
->>>>>> +                        */
->>>>>> + write_unlock(&kvm->mmu_lock);
->>>>>> +                       return 0;
->>>>>> +               }
->>>>>
->>>>> I think we want to return -EAGAIN or similar if we want the caller to
->>>>> retry, right? I think returning 0 here hides the error.
->>>>>
->>>>
->>>> The problem here is that the caller(linux guest kernel) doesn't retry
->>>> if PSC fails. The current implementation in the guest kernel is that
->>>> if a page state change request fails, it terminates the VM with
->>>> GHCB_TERM_PSC reason.
->>>> Returning 0 here is not a good option because it will fail the PSC
->>>> silently and will probably cause a nested RMP fault later. Returning
->>>
->>> Returning 0 here is ok because the PSC current index into the PSC
->>> structure will not be updated and the guest will then retry (see the 
->>> loop
->>> in vmgexit_psc() in arch/x86/kernel/sev.c).
->>>
->>> Thanks,
->>> Tom
->>
->> But the host code updates the index. It doesn't leave the loop because
->> rc is 0. The guest will think that it is successful.
->> rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
->> if (rc)
->> goto out;
->>
->> Also the page state change request with MSR is not retried. It
->> terminates the VM if the MSR request fails.
->
-> Ah, right. I see what you mean. It should probably return a -EAGAIN 
-> instead of 0 and then the if (rc) check should be modified to 
-> specifically look for -EAGAIN and goto out after setting rc to 0.
->
-> But that does leave the MSR protocol open to the problem that you 
-> mention, so, yes, retry logic in snp_handle_page_state_change() for a 
-> -EAGAIN seems reasonable.
->
-> Thanks,
-> Tom
+_irqsave saving the context is about handling nested hardirq disables.
+It's not needed here since we don't need to care about disabling
+hardirq.
 
-I believe it makes more sense to add the retry logic within 
-__snp_handle_page_state_change() itself, as that will make it work for 
-both the GHCB MSR protocol and the GHCB VMGEXIT requests.
+_bh is for disabling softirq, a different context from hardirq.  We want
+_bh here since the deadlock happens when a CPU takes the lock in both
+task and softirq context.  padata uses _bh lock variants because it can
+be called in softirq context but not hardirq.  Let's be consistent and
+do it in this case too.
 
-Thanks, Ashish
+> > A Fixes tag would be helpful for stable and folks backporting this fix
+> > to understand what kernel versions are affected.
+> Yes, I will add it, thanks for your suggestion, and add Cc for the "Fixes" 
+> owner.
+> > 
+> > > WARNING: inconsistent lock state
+> > > 6.0.0-rc5-syzkaller-00025-g3245cb65fd91 #0 Not tainted
+> > > --------------------------------
+> > > inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+> > > syz-executor.2/27685 [HC0[0]:SC1[1]:HE1:SE0] takes:
+> > > ffffe8ffffc7d280 (&pd_list->lock){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:349 [inline]
+> > > ffffe8ffffc7d280 (&pd_list->lock){+.?.}-{2:2}, at: padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
+> > > {SOFTIRQ-ON-W} state was registered at:
+> > >   lock_acquire kernel/locking/lockdep.c:5666 [inline]
+> > >   lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
+> > >   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+> > >   _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
+> > >   spin_lock include/linux/spinlock.h:349 [inline]
+> > >   padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
+> > >   pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:89
+> > >   padata_do_parallel+0x87b/0xa10 kernel/padata.c:217
+> > >   pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:117
+> > >   crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
+> > >   tls_do_encryption net/tls/tls_sw.c:529 [inline]
+> > >   tls_push_record+0x13e8/0x3260 net/tls/tls_sw.c:762
+> > >   bpf_exec_tx_verdict+0xd82/0x11a0 net/tls/tls_sw.c:802
+> > >   tls_sw_sendmsg+0xa62/0x1820 net/tls/tls_sw.c:1014
+> > >   inet6_sendmsg+0x99/0xe0 net/ipv6/af_inet6.c:653
+> > >   sock_sendmsg_nosec net/socket.c:714 [inline]
+> > >   sock_sendmsg+0xcf/0x120 net/socket.c:734
+> > >   sock_write_iter+0x291/0x3d0 net/socket.c:1108
+> > >   call_write_iter include/linux/fs.h:2187 [inline]
+> > >   new_sync_write fs/read_write.c:491 [inline]
+> > >   vfs_write+0x9e9/0xdd0 fs/read_write.c:578
+> > >   ksys_write+0x1e8/0x250 fs/read_write.c:631
+> > >   do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+> > >   __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
+> > >   do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
+> > >   entry_SYSENTER_compat_after_hwframe+0x70/0x82
+> > > irq event stamp: 740
+> > > hardirqs last  enabled at (740): [<ffffffff814919a0>] __local_bh_enable_ip+0xa0/0x120 kernel/softirq.c:401
+> > > hardirqs last disabled at (739): [<ffffffff814919c3>] __local_bh_enable_ip+0xc3/0x120 kernel/softirq.c:378
+> > > softirqs last  enabled at (0): [<ffffffff8146f02e>] copy_process+0x213e/0x7090 kernel/fork.c:2202
+> > > softirqs last disabled at (717): [<ffffffff81491843>] invoke_softirq kernel/softirq.c:445 [inline]
+> > > softirqs last disabled at (717): [<ffffffff81491843>] __irq_exit_rcu+0x123/0x180 kernel/softirq.c:650
+> > > 
+> > > other info that might help us debug this:
+> > >  Possible unsafe locking scenario:
+> > > 
+> > >        CPU0
+> > >        ----
+> > >   lock(&pd_list->lock);
+> > >   <Interrupt>
+> > >     lock(&pd_list->lock);
+> > > 
+> > >  *** DEADLOCK ***
+> > > 
+> > > 4 locks held by syz-executor.2/27685:
+> > >  #0: ffff8880445f0460 (sb_writers#3){.+.+}-{0:0}, at: open_last_lookups fs/namei.c:3470 [inline]
+> > >  #0: ffff8880445f0460 (sb_writers#3){.+.+}-{0:0}, at: path_openat+0x2613/0x28f0 fs/namei.c:3688
+> > >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: inode_lock_shared include/linux/fs.h:766 [inline]
+> > >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: open_last_lookups fs/namei.c:3480 [inline]
+> > >  #1: ffff8880465111a0 (&sb->s_type->i_mutex_key#9){++++}-{3:3}, at: path_openat+0x1514/0x28f0 fs/namei.c:3688
+> > >  #2: ffffc900001e0d70 ((&d->timer)){+.-.}-{0:0}, at: lockdep_copy_map include/linux/lockdep.h:31 [inline]
+> > >  #2: ffffc900001e0d70 ((&d->timer)){+.-.}-{0:0}, at: call_timer_fn+0xd5/0x6b0 kernel/time/timer.c:1464
+> > >  #3: ffffffff8bf89400 (rcu_read_lock){....}-{1:2}, at: buf_msg net/tipc/msg.h:202 [inline]
+> > >  #3: ffffffff8bf89400 (rcu_read_lock){....}-{1:2}, at: tipc_bearer_xmit_skb+0x8c/0x410 net/tipc/bearer.c:550
+> > > 
+> > > stack backtrace:
+> > > CPU: 1 PID: 27685 Comm: syz-executor.2 Not tainted 6.0.0-rc5-syzkaller-00025-g3245cb65fd91 #0
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/26/2022
+> > > Call Trace:
+> > >  <IRQ>
+> > >  __dump_stack lib/dump_stack.c:88 [inline]
+> > >  dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+> > >  print_usage_bug kernel/locking/lockdep.c:3961 [inline]
+> > >  valid_state kernel/locking/lockdep.c:3973 [inline]
+> > >  mark_lock_irq kernel/locking/lockdep.c:4176 [inline]
+> > >  mark_lock.part.0.cold+0x18/0xd8 kernel/locking/lockdep.c:4632
+> > >  mark_lock kernel/locking/lockdep.c:4596 [inline]
+> > >  mark_usage kernel/locking/lockdep.c:4527 [inline]
+> > >  __lock_acquire+0x11d9/0x56d0 kernel/locking/lockdep.c:5007
+> > >  lock_acquire kernel/locking/lockdep.c:5666 [inline]
+> > >  lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
+> > >  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+> > >  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
+> > >  spin_lock include/linux/spinlock.h:349 [inline]
+> > >  padata_do_serial+0x21e/0x4b0 kernel/padata.c:392
+> > >  pcrypt_aead_enc+0x57/0x70 crypto/pcrypt.c:89
+> > >  padata_do_parallel+0x87b/0xa10 kernel/padata.c:217
+> > >  pcrypt_aead_encrypt+0x39f/0x4d0 crypto/pcrypt.c:117
+> > >  crypto_aead_encrypt+0xaa/0xf0 crypto/aead.c:94
+> > >  tipc_aead_encrypt net/tipc/crypto.c:821 [inline]
+> > >  tipc_crypto_xmit+0xf7a/0x2af0 net/tipc/crypto.c:1756
+> > >  tipc_bearer_xmit_skb+0x1ed/0x410 net/tipc/bearer.c:557
+> > >  tipc_disc_timeout+0x75e/0xcb0 net/tipc/discover.c:335
+> > >  call_timer_fn+0x1a0/0x6b0 kernel/time/timer.c:1474
+> > >  expire_timers kernel/time/timer.c:1519 [inline]
+> > >  __run_timers.part.0+0x674/0xa80 kernel/time/timer.c:1790
+> > >  __run_timers kernel/time/timer.c:1768 [inline]
+> > >  run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1803
+> > >  __do_softirq+0x1d3/0x9c6 kernel/softirq.c:571
+> > >  invoke_softirq kernel/softirq.c:445 [inline]
+> > >  __irq_exit_rcu+0x123/0x180 kernel/softirq.c:650
+> > >  irq_exit_rcu+0x5/0x20 kernel/softirq.c:662
+> > >  sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1106
+> > >  </IRQ>
+> > 
+> > The changelog doesn't explain the problem or why the proposed solution
+> > fixes it.
+> > 
+> > If I can read these splats right, it seems lockdep is complaining about
+> > how a task can take the reorder lock when softirqs are enabled
+> > (SOFTIRQ-ON-W) as in the tls_push_record() stack, but also when it's in
+> > softirq context (IN-SOFTIRQ-W), as in the tipc_disc_timeout() stack.  So
+> > it should be enough to disable softirq here.
+> Yes, I agree with what you said earlier, But the softirq is already on before
+> the tipc_bearer_xmit_skb(), that is, (SOFTIRQ-ON-W) and (IN-SOFTIRQ-W) will 
+> be included in the call trace of TIPC.
 
->
->>
->>>
->>>> an error also terminates the guest immediately with current guest
->>>> implementation. I think the best approach here is adding a retry logic
->>>> to this function. Retrying without returning an error should help it
->>>> work because snp_check_and_build_npt will be called again and in the
->>>> second attempt this should work.
->>>>
->>>>>> +
->>>>>> +               /*
->>>>>> +                * Adjust the level so that we don't go higher 
->>>>>> than the backing
->>>>>> +                * page level.
->>>>>> +                */
->>>>>> +               level = min_t(size_t, level, npt_level);
->>>>>> +
->>>>>> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op, 
->>>>>> level);
->>>>>> +
->>>>>> +               switch (op) {
->>>>>> +               case SNP_PAGE_STATE_SHARED:
->>>>>> +                       rc = snp_make_page_shared(kvm, gpa, pfn, 
->>>>>> level);
->>>>>> +                       break;
->>>>>> +               case SNP_PAGE_STATE_PRIVATE:
->>>>>> +                       rc = rmp_make_private(pfn, gpa, level, 
->>>>>> sev->asid, false);
->>>>>> +                       break;
->>>>>> +               default:
->>>>>> +                       rc = -EINVAL;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +
->>>>>> +               write_unlock(&kvm->mmu_lock);
->>>>>> +
->>>>>> +               if (rc) {
->>>>>> +                       pr_err_ratelimited("Error op %d gpa %llx 
->>>>>> pfn %llx level %d rc %d\n",
->>>>>> +                                          op, gpa, pfn, level, rc);
->>>>>> +                       return rc;
->>>>>> +               }
->>>>>> +
->>>>>> +               gpa = gpa + page_level_size(level);
->>>>>> +       }
->>>>>> +
->>>>>> +       return 0;
->>>>>> +}
->>>>>> +
+I hope what I said above about hard vs soft irq clears this up.
+
+> > 
+> > > Signed-off-by: Edward Adam Davis <eadavis@sina.com>
+> > > Reported-by: syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com
+> > > ---
+> > >  kernel/padata.c | 5 +++--
+> > >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/kernel/padata.c b/kernel/padata.c
+> > > index e5819bb8bd1d..38c7b17da796 100644
+> > > --- a/kernel/padata.c
+> > > +++ b/kernel/padata.c
+> > > @@ -388,14 +388,15 @@ void padata_do_serial(struct padata_priv *padata)
+> > >  	int hashed_cpu = padata_cpu_hash(pd, padata->seq_nr);
+> > >  	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
+> > >  	struct padata_priv *cur;
+> > > +	unsigned long flags;
+> > >  
+> > > -	spin_lock(&reorder->lock);
+> > > +	spin_lock_irqsave(&reorder->lock, flags);
+> > >  	/* Sort in ascending order of sequence number. */
+> > >  	list_for_each_entry_reverse(cur, &reorder->list, list)
+> > >  		if (cur->seq_nr < padata->seq_nr)
+> > >  			break;
+> > >  	list_add(&padata->list, &cur->list);
+> > > -	spin_unlock(&reorder->lock);
+> > > +	spin_unlock_irqrestore(&reorder->lock, flags);
+> > >  
+> > >  	/*
+> > >  	 * Ensure the addition to the reorder list is ordered correctly
+> > > -- 
+> > > 2.37.2
+> > > 
