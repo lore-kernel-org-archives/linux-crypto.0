@@ -2,134 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9818C6FA82
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 03:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA268C6FA90
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 03:07:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbiIUDEu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Sep 2022 23:04:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33858 "EHLO
+        id S229905AbiIUDHK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Sep 2022 23:07:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbiIUDEr (ORCPT
+        with ESMTP id S230054AbiIUDHI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Sep 2022 23:04:47 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA79E101DE;
-        Tue, 20 Sep 2022 20:04:43 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MXNWD2JDTzHpcr;
-        Wed, 21 Sep 2022 11:02:32 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 21 Sep 2022 11:04:41 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 21 Sep 2022 11:04:41 +0800
-Subject: Re: [PATCH v8 2/3] Documentation: add a isolation strategy sysfs node
- for uacce
-To:     Greg KH <gregkh@linuxfoundation.org>
-References: <20220902031304.37516-1-yekai13@huawei.com>
- <20220902031304.37516-3-yekai13@huawei.com> <Yxr5BpM+VIjKhVpZ@kroah.com>
- <45a50cf5-7416-4fcf-925b-ecca787425a5@huawei.com>
- <Yyg3ig+Y/w9eS6h0@kroah.com>
-CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>
-From:   "yekai (A)" <yekai13@huawei.com>
-Message-ID: <ff94b31b-7428-efbb-afa8-1b24f6afc02b@huawei.com>
-Date:   Wed, 21 Sep 2022 11:04:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Tue, 20 Sep 2022 23:07:08 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7F817E015
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 20:07:05 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id bh13so4627843pgb.4
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 20:07:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=RP/caS4k+vesM0CIuvxZsJk410Ex/gFQMNBRq9bVzyM=;
+        b=eZeYSMXHVVqYPsM9TEiuYxVPWCxElo2q5vJrD/tlmINXA+cfV7umyG3GTuN3AGbTxb
+         imHSLRtysmwPySq+gbc1ax0j4AFvgFxI7n16eGESuYqqSYKrpliTaqhJKc6XGJCK0jM0
+         X1kxEmCimxP212cpKl3+E8wViBMMqvNfQp1LSjwgNUMMFkLdzB5NxqYOeapgruEr0w5E
+         dQKv5hduqfioF+Cj26fWAhiL9WVFtGkcOUtZHJembo9kMuhaJwDXN8XzvOXI9muewrS0
+         3/g/GdLhCm9n5N5EvpnIjlf0gUNpkGMyHsss5OwIFy1Y1WdPBAYdDlR7fmYvpeZTHsWH
+         kB8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=RP/caS4k+vesM0CIuvxZsJk410Ex/gFQMNBRq9bVzyM=;
+        b=50ljYvrPKGX38r1q4v1IlkJwk45T48s5L1fNSZQTiEKIuERsZZ0+dvx/VivIHlvSCT
+         dSRXH+mUjdB8ZTyR11cvK6T/XpPBT1TKJBx8QpW95EZ35mZhAVH98/pDoNRASb6wxQEZ
+         iWVPKaio/ZZMow8j+bpzvtwIEakcHaudTi0agiNctkc+G42WfeQ/7ZSxCu8E3M6tU6zj
+         xVnIDgGhfGImzcGbiINIYMgh/4b505EVOF7ZKbtNR7fC7opuTrqXH0+Lgjbkrni/VFMR
+         VP8amMRVp7yYRyF5Urc0BEObr1GxQcnZ3F37jgoj8OGcuCXZmntXdjKPCUVBABJ8MdIH
+         f/3w==
+X-Gm-Message-State: ACrzQf0fZMRJsZRPoYol4lI79VOHe5ZYHZAQma71fXK5ACIPNjF2LlCu
+        dKJLzI+w3tFXBrDR6i2HLI1V4w==
+X-Google-Smtp-Source: AMsMyM7vVL5mcvDYb2/3vYQblfdRKQXt71WVm4AzOi9UUbWzVe39x4rCrgvnnz5XJ4tpKKYz77A/mg==
+X-Received: by 2002:a63:e442:0:b0:438:7919:adf with SMTP id i2-20020a63e442000000b0043879190adfmr22828745pgk.4.1663729625212;
+        Tue, 20 Sep 2022 20:07:05 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:1c61:8e50:8ba8:7ad7:f34c:2f5])
+        by smtp.gmail.com with ESMTPSA id y23-20020aa78f37000000b0053e61633057sm690846pfr.132.2022.09.20.20.07.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Sep 2022 20:07:04 -0700 (PDT)
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+To:     dmaengine@vger.kernel.org
+Cc:     agross@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        thara.gopinath@gmail.com, devicetree@vger.kernel.org,
+        andersson@kernel.org, bhupesh.sharma@linaro.org,
+        bhupesh.linux@gmail.com, vkoul@kernel.org,
+        Jordan Crouse <jorcrous@amazon.com>
+Subject: [PATCH v7 0/1] dma: qcom: bam_dma: Add support to initialize interconnect path
+Date:   Wed, 21 Sep 2022 08:36:48 +0530
+Message-Id: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-In-Reply-To: <Yyg3ig+Y/w9eS6h0@kroah.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Changes since v6:
+=================
+- v6 can be seen here: https://lore.kernel.org/linux-arm-msm/30756e6f-952f-ccf2-b493-e515ba4f0a64@linaro.org/
+- As per Krzysztof's suggestion on v6, clubbed the crypto driver and
+  dt-bindings changes together. Now the overall v5 patchset into 3
+  separate patchsets, one each for the following areas to allow easier
+  review and handling from the maintainer:
+        arm-msm, crypto and dma
+- This patch targets the dma tree specifically.
 
+Changes since v5:
+=================
+- v5 can be seen here: https://lore.kernel.org/lkml/20211110105922.217895-1-bhupesh.sharma@linaro.org/
+- As per Bjorn's suggestion on irc, broke down the patchset into 4
+  separate patchsets, one each for the following areas to allow easier
+  review and handling from the maintainer:
+        arm-msm, crypto, dma and devicetree
+- Addressed Rob's, Vladimir's and Bjorn's review comments received on
+  v5.
+- Added Tested-by from Jordan received on the v5.
 
-On 2022/9/19 17:34, Greg KH wrote:
-> On Mon, Sep 19, 2022 at 11:21:30AM +0800, yekai (A) wrote:
->>
->> On 2022/9/9 16:27, Greg KH wrote:
->>> On Fri, Sep 02, 2022 at 03:13:03AM +0000, Kai Ye wrote:
->>>> Update documentation describing sysfs node that could help to
->>>> configure isolation strategy for users in the user space. And
->>>> describing sysfs node that could read the device isolated state.
->>>>
->>>> Signed-off-by: Kai Ye <yekai13@huawei.com>
->>>> ---
->>>>  Documentation/ABI/testing/sysfs-driver-uacce | 26 ++++++++++++++++++++
->>>>  1 file changed, 26 insertions(+)
->>>>
->>>> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
->>>> index 08f2591138af..af5bc2f326d2 100644
->>>> --- a/Documentation/ABI/testing/sysfs-driver-uacce
->>>> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
->>>> @@ -19,6 +19,32 @@ Contact:        linux-accelerators@lists.ozlabs.org
->>>>  Description:    Available instances left of the device
->>>>                  Return -ENODEV if uacce_ops get_available_instances is not provided
->>>>  
->>>> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
->>>> +Date:           Sep 2022
->>>> +KernelVersion:  6.0
->>>> +Contact:        linux-accelerators@lists.ozlabs.org
->>>> +Description:    (RW) Configure the frequency size for the hardware error
->>>> +                isolation strategy. This size is a configured integer value.
->>>> +                The default is 0. The maximum value is 65535. This value is a
->>>> +                threshold based on your driver strategies.
->>> I do not understand what the units are here.
->>>
->>> How is anyone supposed to know what they are?
->> This unit is the number of times. Number of occurrences in a period, also means threshold.
->> If the number of device pci AER error exceeds the threshold in a time window, the device is
->> isolated. 
-> Please document this very very well.
->
->>>> +                For example, in the hisilicon accelerator engine, first we will
->>>> +                time-stamp every slot AER error. Then check the AER error log
->>>> +                when the device AER error occurred. if the device slot AER error
->>>> +                count exceeds the preset the number of times in one hour, the
->>>> +                isolated state will be set to true. So the device will be
->>>> +                isolated. And the AER error log that exceed one hour will be
->>>> +                cleared. Of course, different strategies can be defined in
->>>> +                different drivers.
->>> So this file can contain values of different units depending on the
->>> different driver that creates it?  How is anyone supposed to know what
->>> it is and what it should be?
->>>
->>> This feels very loose, please define this much better so that it can be
->>> understood and maintained properly.
->>>
->>> thanks,
->>>
->>> greg k-h
->>> .
->>>
->> Yes,  We started out with the idea of not restricting the different drive,  only specifying the input and output.
->> Because we think different drivers require different processing  strategy.
-> What different drivers?  You only have one!  And why do you need a
-> framework for only one driver?  You should only add that when you have
-> multiple users to ensure you got the framework correct otherwise you do
-> not know how it will be used.
->
-> thanks,
->
-> greg k-h
-> .
->
-ok . I will move isolation strategy from qm to uacce in the next version. 
+Changes since v4:
+=================
+- v4 for sm8250 can be seen here: https://lore.kernel.org/linux-arm-msm/20211013105541.68045-1-bhupesh.sharma@linaro.org/
+- v1 for sm8150 qce enablement can be seen here: https://lore.kernel.org/linux-arm-msm/20211013165823.88123-1-bhupesh.sharma@linaro.org/
+- Merged the sm8150 and sm8250 enablement patches in the same patchset,
+  as per suggestions from Bjorn.
+- Dropped a couple of patches from v4, as these have been picked by
+  Bjorn already via his tree.
+- Addressed review comments from Vladimir, Thara and Rob.
+- Collect Reviewed-by from Rob and Thara on some of the patches from the
+  v4 patchset.
 
-it can be understood and maintained properly.
+Changes since v3:
+=================
+- v3 can be seen here: https://lore.kernel.org/linux-arm-msm/20210519143700.27392-1-bhupesh.sharma@linaro.org/
+- Dropped a couple of patches from v3, on basis of the review comments:
+   ~ [PATCH 13/17] crypto: qce: core: Make clocks optional
+   ~ [PATCH 15/17] crypto: qce: Convert the device found dev_dbg() to dev_info()
+- Addressed review comments from Thara, Rob and Stephan Gerhold.
+- Collect Reviewed-by from Rob and Thara on some of the patches from the
+  v3 patchset.
 
-thanks
+Changes since v2:
+=================
+- v2 can be seen here: https://lore.kernel.org/dmaengine/20210505213731.538612-1-bhupesh.sharma@linaro.org/
+- Drop a couple of patches from v1, which tried to address the defered
+  probing of qce driver in case bam dma driver is not yet probed.
+  Replace it instead with a single (simpler) patch [PATCH 16/17].
+- Convert bam dma and qce crypto dt-bindings to YAML.
+- Addressed review comments from Thara, Bjorn, Vinod and Rob.
 
-Kai 
+Changes since v1:
+=================
+- v1 can be seen here: https://lore.kernel.org/linux-arm-msm/20210310052503.3618486-1-bhupesh.sharma@linaro.org/
+- v1 did not work well as reported earlier by Dmitry, so v2 contains the following
+  changes/fixes:
+  ~ Enable the interconnect path b/w BAM DMA and main memory first
+    before trying to access the BAM DMA registers.
+  ~ Enable the interconnect path b/w qce crytpo and main memory first
+    before trying to access the qce crypto registers.
+  ~ Make sure to document the required and optional properties for both
+    BAM DMA and qce crypto drivers.
+  ~ Add a few debug related print messages in case the qce crypto driver
+    passes or fails to probe.
+  ~ Convert the qce crypto driver probe to a defered one in case the BAM DMA
+    or the interconnect driver(s) (needed on specific Qualcomm parts) are not
+    yet probed.
+
+BAM dma engine associated with certain Qualcomm Snapdragon hardware blocks requires
+relevant interconnect pieces be initialized prior to the dma engine initialization.
+For e.g. crypto bam dma engine on sm8250. 
+
+Such requirement is passed on to the bam dma driver from dt via the "interconnects"
+property. Add support in bam_dma driver to check whether the interconnect
+path is accessible/enabled prior to attempting driver intializations.
+
+If interconnects are not yet setup, defer the BAM DMA driver probe().
+
+Tested on sm8150-mtp, sa8155p-adp, sm8250-mtp and RB5 boards.
+
+Cc: vkoul@kernel.org
+Cc: thara.gopinath@gmail.com
+Cc: andersson@kernel.org
+Tested-by: Jordan Crouse <jorcrous@amazon.com>
+
+Thara Gopinath (1):
+  dma: qcom: bam_dma: Add support to initialize interconnect path
+
+ drivers/dma/qcom/bam_dma.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+-- 
+2.37.1
 
