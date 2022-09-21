@@ -2,147 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFE3C32771
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 08:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF69ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 09:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231437AbiIUIUc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Sep 2022 04:20:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40188 "EHLO
+        id S230419AbiIUJOa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Sep 2022 05:14:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbiIUIUF (ORCPT
+        with ESMTP id S231285AbiIUJOL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2022 04:20:05 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF61237CF;
-        Wed, 21 Sep 2022 01:20:03 -0700 (PDT)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MXWSq0b6qzlWmK;
-        Wed, 21 Sep 2022 16:15:55 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 21 Sep 2022 16:20:02 +0800
-Received: from [10.67.103.158] (10.67.103.158) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 21 Sep 2022 16:20:01 +0800
-Message-ID: <69a629de-a2f8-202c-da31-a5f11c87427a@huawei.com>
-Date:   Wed, 21 Sep 2022 16:20:01 +0800
+        Wed, 21 Sep 2022 05:14:11 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9288E452
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Sep 2022 02:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663751618; x=1695287618;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LTq3z5bw0idCyJW7ACZWXh0z/fEdKp/vHv4ZUPquF9c=;
+  b=HtoPDO2couy/5MdubfLpbqk2qiATiE7eVLkuj1japeUv855hINrokkLo
+   MXX+oWl+BkKsMGOtsoYy3EAeYuVSwr7oJEOmk4+qEC4qmQ7RiJzLWQLVK
+   G3qq/UV4w/Ju6jfTh/yUKbs5FVIQO7TTmG26BxPXdvMauiMSTxHcHB5Dp
+   sNdsCYF6kDbMkjj61Ti4d1tS2ok83BvPjfHuyKGWgg39TUnrLSb4YEEbm
+   hOOeAFRmenbxWEGWg+l/Ttv1JnVnfRlo5r/v1WIUr+DHv0a2BvfQVmfAL
+   bmZapZ2oUFaNnOvnrirsi1Lwfp1YJlZBGoKnM2lq9bLTLcY8SUMRNfc0e
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="282996122"
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="282996122"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2022 02:13:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="596899920"
+Received: from silpixa00400295.ir.intel.com ([10.237.213.194])
+  by orsmga006.jf.intel.com with ESMTP; 21 Sep 2022 02:13:36 -0700
+From:   Adam Guerin <adam.guerin@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Adam Guerin <adam.guerin@intel.com>,
+        Ciunas Bennett <ciunas.bennett@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2] crypto: qat - add limit to linked list parsing
+Date:   Wed, 21 Sep 2022 10:09:24 +0100
+Message-Id: <20220921090923.213968-1-adam.guerin@intel.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [RFC PATCH 2/6] crypto: benchmark - add a crypto benchmark tool
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <20220919120537.39258-1-shenyang39@huawei.com>
- <20220919120537.39258-3-shenyang39@huawei.com> <YylsNQb/EjUqkWEZ@kroah.com>
-From:   Yang Shen <shenyang39@huawei.com>
-In-Reply-To: <YylsNQb/EjUqkWEZ@kroah.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.158]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+adf_copy_key_value_data() copies data from userland to kernel, based on
+a linked link provided by userland. If userland provides a circular
+list (or just a very long one) then it would drive a long loop where
+allocation occurs in every loop. This could lead to low memory conditions.
+Adding a limit to stop endless loop.
 
+Signed-off-by: Adam Guerin <adam.guerin@intel.com>
+Co-developed-by: Ciunas Bennett <ciunas.bennett@intel.com>
+Signed-off-by: Ciunas Bennett <ciunas.bennett@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+v2: improved patch based off feedback from ML
+drivers/crypto/qat/qat_common/adf_ctl_drv.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-在 2022/9/20 15:31, Greg KH 写道:
-> On Mon, Sep 19, 2022 at 08:05:33PM +0800, Yang Shen wrote:
->> Provide a crypto benchmark to help the developer quickly get the
->> performance of a algorithm registered in crypto.
->>
->> Due to the crypto algorithms have multifarious parameters, the tool
->> cannot support all test scenes. In order to provide users with simple
->> and easy-to-use tools and support as many test scenarios as possible,
->> benchmark refers to the crypto method to provide a unified struct
->> 'crypto_bm_ops'. And the algorithm registers its own callbacks to parse
->> the user's input. In crypto, a algorithm class has multiple algorithms,
->> but all of them uses the same API. So in the benchmark, a algorithm
->> class uses the same 'ops' and distinguish specific algorithm by name.
->>
->> First, consider the performance calculation model. Considering the
->> crypto subsystem model, a reasonable process code based on crypto api
->> should create a numa node based 'crypto_tfm' in advance and apply for
->> a certain amount of 'crypto_req' according to their own business.
->> In the real business processing stage, the thread send tasks based on
->> 'crypto_req' and wait for completion.
->>
->> Therefore, the benchmark will create 'crypto_tfm' and 'crypto_req' at
->> first, and then count all requests time to calculate performance.
->> So the result is the pure algorithm performance. When each algorithm
->> class implements its own 'ops', it needs to pay attention to the content
->> completed in the callback. Before the 'ops.perf', the tool had better
->> prepare the request data set. And in order to avoid the false high
->> performance of the algorithm caused by the false cache and TLB hit rate,
->> the size of data set should be larger than 'crypto_req' number.
->> The 'crypto_bm_ops' has following api:
->>   - init & uninit
->>   The initialize related functions. Algorithm can do some private setting.
->>   - create_tfm & release_tfm
->>   The 'crypto_tfm' related functions. Algorithm has different tfm name in
->>   crypto. But they both has a member named tfm, so use tfm to stand for
->>   algorithm handle. The benchmark has provides the tfm array.
->>   - create_req & release_req
->>   The 'crypto_req' related functions. The callbacks should create a 'reqnum'
->>   'crypto_req' group in struct 'crypto_bm_base'. And the also suggest
->>   prepare the request data in this function. In order to avoid the false
->>   high performance of the algorithm caused by the false cache and TLB hit
->>   rate, the size of data set should be larger than 'crypto_req' number.
->>   - perf
->>   The request sending functions. The registrant should use parameter 'loop'
->>   to send requests repeatly. And update the count in struct
->>   'crypto_bm_thread_data'.
->>
->> Then consider the parameters that user can configure. Generally speaking,
->> the following parameters will affect the performance of the algorithm:
->> tfm number, request number, block size, numa node. And some parameters
->> will affect the stability of performance: testing time and requests sent
->> number. To sum up, the benchmark has following parameters:
->>   - algorithm
->>   The testing algorithm name. Showed in /proc/crypto.
->>   - algtype
->>   The testing algorithm class. Can get the algorithm class by echo 'algtype'
->>   to /sys/module/crypto_benchmark/parameters/help.
->>   - inputsize
->>   The testing length that can greatly impact performance. Such as data size
->>   for compress or key length for encryption.
->>   - loop
->>   The testing loop times. Avoid performance fluctuations caused by
->>   environment.
->>   - numamask
->>   The testing bind numamask. Used for allocate memory, create threads and
->>   create 'crypto_tfm'.
->>   - optype
->>   The testing algorithm operation type. Can get the algorithm available
->>   operation types by cat /sys/module/crypto_benchmark/parameters/help
->>   with specified 'algtype'.
->>   - reqnum
->>   The testing request number for per tfm. Used for test asynchrony api
->>   performance.
->>   - threadnum
->>   The testing thread number. To simplify model, create a 'crypto_tfm' per
->>   thread.
->>   - time
->>   The testing time. Used for stop the test thread.
->>   - run
->>   Start or stop the test.
->>
->> Users can configure parameters under
->> /sys/modules/crypto_benchmark/parameters/.
-> Please don't use module parameters for stuff like this, use configfs
-> which was designed for this type of interactions.
->
-> thanks,
->
-> greg k-h
-Got it!
+diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+index 508c18edd692..82b69e1f725b 100644
+--- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
++++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+@@ -16,6 +16,9 @@
+ #include "adf_cfg_common.h"
+ #include "adf_cfg_user.h"
+ 
++#define ADF_CFG_MAX_SECTION 512
++#define ADF_CFG_MAX_KEY_VAL 256
++
+ #define DEVICE_NAME "qat_adf_ctl"
+ 
+ static DEFINE_MUTEX(adf_ctl_lock);
+@@ -137,10 +140,11 @@ static int adf_copy_key_value_data(struct adf_accel_dev *accel_dev,
+ 	struct adf_user_cfg_key_val key_val;
+ 	struct adf_user_cfg_key_val *params_head;
+ 	struct adf_user_cfg_section section, *section_head;
++	int i, j;
+ 
+ 	section_head = ctl_data->config_section;
+ 
+-	while (section_head) {
++	for (i = 0; section_head && i < ADF_CFG_MAX_SECTION; i++) {
+ 		if (copy_from_user(&section, (void __user *)section_head,
+ 				   sizeof(*section_head))) {
+ 			dev_err(&GET_DEV(accel_dev),
+@@ -156,7 +160,7 @@ static int adf_copy_key_value_data(struct adf_accel_dev *accel_dev,
+ 
+ 		params_head = section.params;
+ 
+-		while (params_head) {
++		for (j = 0; params_head && j < ADF_CFG_MAX_KEY_VAL; j++) {
+ 			if (copy_from_user(&key_val, (void __user *)params_head,
+ 					   sizeof(key_val))) {
+ 				dev_err(&GET_DEV(accel_dev),
 
-Thanks,
-
-Yang
+base-commit: 8aee6d5494bfb2e535307eb3e80e38cc5cc1c7a6
+-- 
+2.37.3
 
