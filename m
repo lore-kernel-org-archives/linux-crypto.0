@@ -2,63 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987A7C32771
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 08:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F32C32771
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 08:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230527AbiIUIAy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Sep 2022 04:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39880 "EHLO
+        id S231407AbiIUIUE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Sep 2022 04:20:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbiIUIAx (ORCPT
+        with ESMTP id S231410AbiIUITn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2022 04:00:53 -0400
-Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D3B82847
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Sep 2022 01:00:51 -0700 (PDT)
-Received: by mail.fadrush.pl (Postfix, from userid 1002)
-        id 0571122F9C; Wed, 21 Sep 2022 08:00:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
-        t=1663747250; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
-        h=Date:From:To:Subject:From;
-        b=Xo2s5+Sf2LUMql2+mnfBU5dnjvLc/lhZ0ybmllqmRSh+pFkDZArR2Cw9+bVu/QgpF
-         eoA3tEDmCsXmVinBeGBCP5gkJFZ1/a2S5Iz8TDznNSvqAguhppxV9bPMEtux6xP3bh
-         TCZCbTLzZZbeYb4MICnEJrv6yHRasjUs1mfDq+p8Nzdv+0z9iDWhPQ/3KnFl2rZ4f6
-         KxBgtQI2o5MshErOyBVWG//jk+eK0tqsZJKBgv8NISgCPYmEWCALA7XrNRuB0o0qEF
-         xPAlQzbL2DY4dqz6Lv93z6yw/OnU1q7T9cSnkjDhB2rPyEBfgPfkHeJbdXQgIS5sAc
-         xo85atpRQU/FQ==
-Received: by mail.fadrush.pl for <linux-crypto@vger.kernel.org>; Wed, 21 Sep 2022 08:00:31 GMT
-Message-ID: <20220921064500-0.1.1r.gs43.0.hcdhbxldnt@fadrush.pl>
-Date:   Wed, 21 Sep 2022 08:00:31 GMT
-From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
-X-Mailer: mail.fadrush.pl
+        Wed, 21 Sep 2022 04:19:43 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9D1895ED;
+        Wed, 21 Sep 2022 01:19:25 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MXWTT6X3SzpTtm;
+        Wed, 21 Sep 2022 16:16:29 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
+ dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 21 Sep 2022 16:19:18 +0800
+Received: from [10.67.103.158] (10.67.103.158) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 21 Sep 2022 16:19:18 +0800
+Message-ID: <3dd984c1-d17f-0a6a-c52e-87e161f867fc@huawei.com>
+Date:   Wed, 21 Sep 2022 16:19:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [RFC PATCH 0/6] crypto: benchmark - add the crypto benchmark
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <gregkh@linuxfoundation.org>
+References: <20220919120537.39258-1-shenyang39@huawei.com>
+ <Yyl5yKQCAgPBbFd7@gondor.apana.org.au>
+From:   Yang Shen <shenyang39@huawei.com>
+In-Reply-To: <Yyl5yKQCAgPBbFd7@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.103.158]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
-
-kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
-proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
-stwa firmie stabilny rozw=C3=B3j.=20
-
-Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
-a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
-nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
-po rozwoju firmy.
-
-Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
-nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
-adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
-j=C4=85 je innym.
-
-Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
-o=C5=9Bwiadczonego doradcy finansowego?
 
 
-Pozdrawiam
-Jakub Olejniczak
+在 2022/9/20 16:28, Herbert Xu 写道:
+> On Mon, Sep 19, 2022 at 08:05:31PM +0800, Yang Shen wrote:
+>> Add crypto benchmark - A tool to help the users quickly get the
+>> performance of a algorithm registered in crypto.
+> Please explain how this relates to the existing speed testing
+> functionality in tcrypt.
+>
+> Thanks,
+
+In fact, the purpose for I is to get a crypto benchmark tool which is 
+customizable
+and easy to called. For example, I test the hardware performance every 
+rc1 to check
+whether the modification of the common module affects it. For me, I need 
+to test
+the mutil threads, mutil numas, mutil requests of one tfm and so on. 
+These test
+cases are used to simulate some service scenarios. And in these cases, I 
+can find
+if any common module apply a patch that has an impact on us.
+
+I know the tcrypt.ko has the speed test cases. But the tcrypt.ko test 
+case is fixed.
+If I understand correctly, the design model of tcrypt.ko is test the 
+algorithms with
+determined case conditions. It can provide some standardized testing to 
+ensure
+that the implementation of the algorithm meets the requirements. This is a
+reasonable developer test tool, but it is not flexible enough for 
+testers and users.
+
+There are two main reasons for this:
+1> For testers, the performance is not only related to algorithms and 
+algorithm
+configurations. Many configurations may have obvious effect on 
+performance which
+are not provided on tcrypt.ko. Of course, this problem can fix by add 
+these as module
+parameters.
+2> For users, a friendly tool is that they can use the tool directly 
+rather to need to
+watch the source code to know how to use it. In tcrypt.ko, users need to 
+get the 'mode'
+number of case they want to test if exist.
+
+So this tool's original intention is to allow users test more complex 
+scenarios and get the
+parameters usage directly.
+
+If I have any misunderstanding about tcrypt.ko, please correct me. And 
+I'll try to use the
+tcrytp.ko to meet my request.
+
+Thanks,
+
+Yang
