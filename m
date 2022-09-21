@@ -2,130 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33346ECAAD8
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 04:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C26C6FA82
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 06:01:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbiIUEv1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Sep 2022 00:51:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58104 "EHLO
+        id S229453AbiIUGA4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Sep 2022 02:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiIUEvJ (ORCPT
+        with ESMTP id S229632AbiIUGAz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2022 00:51:09 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8179E7D7B5
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 21:51:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663735866; x=1695271866;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UW395vIxglVQDSDO3HwtYk1twddnHI3slTRWZcVfxnY=;
-  b=Tlx0GdJ/368jeMwn4yrTd8n0j3I7gPvZyb3IkOSQEQ0bgg+fNRkOHtxo
-   GWL05JPLcauRsiHuA2ms2hri6sVNkIkvY+E/e6qI1Xl4FnmEuKl/FGtcD
-   gvWwqdiPN+7VhcUjXMqxZb/s7hhv8srdiKJ5EZ28i9X5fk1GfSf+rnj2M
-   8OKtOqJEYsdiOzlVrwTPDQh0am6Azc5E9uu5gaVRv+pJjzbmQse3CM02I
-   DzeQ7+EPtTbUE982owfjF/2ZIX3uEhaqLr92LHoloyNwUAAL9bKv1znLX
-   U6IuBUYHPG+HFNDP7LrdvQYId+TeInEQ8AzpSgdL1uaTlx1PKawShoJX/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="286968369"
-X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
-   d="scan'208";a="286968369"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 21:51:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
-   d="scan'208";a="652379705"
-Received: from lkp-server01.sh.intel.com (HELO c0a60f19fe7e) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 20 Sep 2022 21:51:04 -0700
-Received: from kbuild by c0a60f19fe7e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oarhP-0003FB-2A;
-        Wed, 21 Sep 2022 04:51:03 +0000
-Date:   Wed, 21 Sep 2022 12:50:59 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Peter Harliman Liem <pliem@maxlinear.com>, atenart@kernel.org,
-        herbert@gondor.apana.org.au
-Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
-        linux-lgm-soc@maxlinear.com,
-        Peter Harliman Liem <pliem@maxlinear.com>
-Subject: Re: [PATCH 2/3] crypto: inside-secure - Add fw_little_endian option
-Message-ID: <202209211245.XnqzyM7N-lkp@intel.com>
-References: <29cf210c9adce088bc50248ad46255d883bd5edc.1663660578.git.pliem@maxlinear.com>
+        Wed, 21 Sep 2022 02:00:55 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56CC5465B
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:00:53 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id o99-20020a17090a0a6c00b002039c4fce53so7662431pjo.2
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:00:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=KTDGCxw9K/m0IE28tp7il5a/gdZmEgkpTgtAKS0w1hU=;
+        b=zavTnr75v0R2Jmu8cIoC0kmMrrhsQQvbhW76Hf66/C/jT2G1mWEnnpJ839PsBq9ELp
+         WFiSsmkvt/IRYSgzyhQZrWfyWDBFRYEclPg69lfizcQH8FTm6mcKCIY3RVp9ovgBAZqn
+         FneLIZUucl1wT2e1UotyqMwmUJIsNdx9CU548SnPmQfYWrYCsRqzXlQlcF/r7DEd5vkh
+         P++dGV1h5bDlep/rHlOeYtQc7prD+FFwcLltzSbrZL2ebtvx32c7hQVjVlxQtGgYB3sA
+         fSzp8HAmHl0ezYQJtWqGLgk8IDLleBqVMVq04kaXPjLNGp5rPrbCfGRA+8rjboJj02oM
+         UqFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=KTDGCxw9K/m0IE28tp7il5a/gdZmEgkpTgtAKS0w1hU=;
+        b=BwHnPXlaPma6fCce0x6KtJCYrDPe1tUZE/b6ceRBbSC8q8R7rN4iJT7AfgkB8zubZQ
+         vRo3UcC05ETuwPkU+5Nmu5gUYekYQEsVqDpLXWndhT/eogG5uTo7T6vD2HF58EfNj4cN
+         d5oqQL3jagSGovz61EBOJN8eZO7G4orH3Y0TwtYLbw+9asbgvqrduSYprbyLIYbSNhzA
+         yCUQu7QcYiFmakm0jBquMcpmYEqQecLAX7764s+txZXEWZfFM/8XF/qLlmkiBYp7deri
+         O7nuyBowKW6X7JwLvhZGSZxHicOE+6fSQPV1HNgncdD0uiFox85nFzEYsAiR2SxjwYrY
+         yXiQ==
+X-Gm-Message-State: ACrzQf3sCaJpZlzcPULIOOl2/XAly4rsfNd++KilJnc0q7IFPwhgoZK/
+        Y068tJPlA+WP4lpBbDER+c1EBg==
+X-Google-Smtp-Source: AMsMyM48UUe5Twj+PpfUDK1ckCFUCCN/BxyPPQt5HtY9M4iS4sCaXZhdfbYcbPvZflpt/9ByE6wOgA==
+X-Received: by 2002:a17:902:f394:b0:176:b7b7:2 with SMTP id f20-20020a170902f39400b00176b7b70002mr3132765ple.57.1663740053290;
+        Tue, 20 Sep 2022 23:00:53 -0700 (PDT)
+Received: from ?IPV6:2401:4900:1c61:8e50:8ba8:7ad7:f34c:2f5? ([2401:4900:1c61:8e50:8ba8:7ad7:f34c:2f5])
+        by smtp.gmail.com with ESMTPSA id 21-20020a170902c21500b00177efb56475sm998181pll.85.2022.09.20.23.00.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Sep 2022 23:00:52 -0700 (PDT)
+Message-ID: <05a1447e-51b1-cd6b-36bc-98f011e786e0@linaro.org>
+Date:   Wed, 21 Sep 2022 11:30:46 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29cf210c9adce088bc50248ad46255d883bd5edc.1663660578.git.pliem@maxlinear.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v7 4/9] dt-bindings: qcom-qce: Add new SoC compatible
+ strings for qcom-qce
+Content-Language: en-US
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org, robh+dt@kernel.org,
+        linux-arm-msm@vger.kernel.org, thara.gopinath@gmail.com,
+        robh@kernel.org, andersson@kernel.org, bhupesh.linux@gmail.com,
+        davem@davemloft.net, Jordan Crouse <jorcrous@amazon.com>
+References: <20220920114051.1116441-1-bhupesh.sharma@linaro.org>
+ <20220920114051.1116441-5-bhupesh.sharma@linaro.org>
+ <0a6b443c-33b4-5fc7-5a2f-e55f5387999f@linaro.org>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+In-Reply-To: <0a6b443c-33b4-5fc7-5a2f-e55f5387999f@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Peter,
 
-Thank you for the patch! Perhaps something to improve:
+On 9/20/22 8:40 PM, Krzysztof Kozlowski wrote:
+> On 20/09/2022 13:40, Bhupesh Sharma wrote:
+>> Newer Qualcomm chips support newer versions of the qce crypto IP, so add
+>> soc specific compatible strings for qcom-qce instead of using crypto
+>> IP version specific ones.
+>>
+>> Keep the old strings for backward-compatibility, but mark them as
+>> deprecated.
+>>
+>> Cc: Bjorn Andersson <andersson@kernel.org>
+>> Reviewed-by: Rob Herring <robh@kernel.org>
+>> Tested-by: Jordan Crouse <jorcrous@amazon.com>
+>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>> ---
+>>   .../devicetree/bindings/crypto/qcom-qce.yaml         | 12 ++++++++++--
+>>   1 file changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> index 4e00e7925fed..aa2f676f5382 100644
+>> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> @@ -15,7 +15,15 @@ description:
+>>   
+>>   properties:
+>>     compatible:
+>> -    const: qcom,crypto-v5.1
+>> +    enum:
+>> +      - qcom,crypto-v5.1 # Deprecated. Kept only for backward compatibility
+> 
+> No changes since v6.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.0-rc6 next-20220920]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Right. v7 is just to propose the new subset of patchsets and ordering 
+(since we changed it from v5 - which was a single patchset) and get some 
+early feedback and comments and get to know if the respective 
+maintainers are fine with the patch ordering, cc-list etc.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Harliman-Liem/crypto-inside-secure-Expand-soc-data-structure/20220920-170235
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: parisc-randconfig-s051-20220921 (https://download.01.org/0day-ci/archive/20220921/202209211245.XnqzyM7N-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 12.1.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/637d1b2810d1e9da47b6a637f9cea7c5bb4bf765
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Peter-Harliman-Liem/crypto-inside-secure-Expand-soc-data-structure/20220920-170235
-        git checkout 637d1b2810d1e9da47b6a637f9cea7c5bb4bf765
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=parisc SHELL=/bin/bash drivers/crypto/inside-secure/
+I will surely include your comments in v8.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
->> drivers/crypto/inside-secure/safexcel.c:326:31: sparse: sparse: cast to restricted __le32
-   drivers/crypto/inside-secure/safexcel.c:328:31: sparse: sparse: cast to restricted __be32
-
-vim +326 drivers/crypto/inside-secure/safexcel.c
-
-   315	
-   316	static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
-   317					  const struct firmware *fw)
-   318	{
-   319		const u32 *data = (const u32 *)fw->data;
-   320		u32 val;
-   321		int i;
-   322	
-   323		/* Write the firmware */
-   324		for (i = 0; i < fw->size / sizeof(u32); i++) {
-   325			if (priv->data->fw_little_endian)
- > 326				val = le32_to_cpu(data[i]);
-   327			else
-   328				val = be32_to_cpu(data[i]);
-   329	
-   330			writel(val,
-   331			       priv->base + EIP197_CLASSIFICATION_RAMS +
-   332			       i * sizeof(*data));
-   333		}
-   334	
-   335		/* Exclude final 2 NOPs from size */
-   336		return i - EIP197_FW_TERMINAL_NOPS;
-   337	}
-   338	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Thanks,
+Bhupesh
