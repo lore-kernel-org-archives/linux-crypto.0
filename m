@@ -2,63 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37915C32771
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 06:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98113ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 06:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbiIUGQd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Sep 2022 02:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
+        id S229766AbiIUG1Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Sep 2022 02:27:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbiIUGQb (ORCPT
+        with ESMTP id S229669AbiIUG1P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2022 02:16:31 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3757FFB2
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:16:29 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id rt12so2910775pjb.1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:16:29 -0700 (PDT)
+        Wed, 21 Sep 2022 02:27:15 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5858048B
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:27:04 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id a3so7526076lfk.9
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Sep 2022 23:27:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=HZLYiNEjRcKw3klqYTO7kBwCBzLEHz3GnBytTHIhZBQ=;
-        b=yYs52SMiJTjR1PL0GZki28IXpJDV8ybztDMtG5jwodsotczaqAb/ajbXWFzb2TldRT
-         S0P53IZ21DbXdP3gpgS6DE3yvVAY9IfIfSK4lEeMB+Ty781mlo3T/JuH4/dGMh6c7RnL
-         bLb8i6yyKDIhFcqeg0EG5abdjZpNNzY7Fx39H4H7wNhPBQQ+hz0AGGi3JWky1EpNwFKU
-         zWXqBzmVdCYfzPaWaklMS11680zs6ZHbbWz5BNfYP+M7vHoFmqG2Txr0+TJM3uiBBa8B
-         uDbguENilE7LvKix0oiXPv+ToFfINiTRGlDQ9eS7H6ZY1wmmsioACRJ+hSTBcPqmCXDB
-         qRcg==
+        bh=Ggttj0ip5WkBjYpw/WnMtLi+fMdRVX8SYzRnIBF97Go=;
+        b=gLNHjBBY/9pUni386AGpx3O5RYp5Fpj57LUMKRw4EAfeA4lfc8LwA9I0XXj+8DtbU1
+         ieiDGYfv4vNdKyxTVdTy9i5g6Uf9XI/b42ByyBRI1K1nnOn3gZ5fbutzNpgzVNpDK4dV
+         lPMOdtRLs9fOZaKkLq2Ux/QzwuzVwItSFKiSWhAtC2aYqYQ6wLz+OZWKP1tiM4SKeEWh
+         biYCSeyIAjOwT+78hvXPVLTxy1Glc/PlFuJCKt5HRzN3fbkLo4i8afe/xf1PfwXigjCV
+         QG+jsscYr65htWCnsNga28Uomb+ilWsJiNEZtxhLdVgHXRL3hfFvGE9ft1ZMNEKV7DZt
+         /uNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=HZLYiNEjRcKw3klqYTO7kBwCBzLEHz3GnBytTHIhZBQ=;
-        b=bh8rPpEF10Or67P/OKwkZ5Zde2aro1umISKTCckwXTNShIXsTjfLvgr6TXtj/1Xk+d
-         MhU4w8dr7TRlbF4TlVQXlPxanwSCzfG5z1usxQFHKsTwYR34o4b2kV6lTctdngOnbl/Z
-         p9f/WkFh7m17uphXVGq3AnhcbBIzrn/LfT5kz6nZEF1L78MJEAfofbCyouJH3kWML32j
-         zZvMPj+BCIF4B+0bQ0d8i/qkVOSbhO5Pp8VBma9NzcQdQKR2pBViAcRYEHxYgbTYtgoE
-         CuOWz7cP36smQOGESdBBjVvU587X/3nJTUYYUKQKujbAlTkScyydOFCqUB9mDx8jn/7J
-         r1FQ==
-X-Gm-Message-State: ACrzQf0+CYt7pe7csRTub3XyBjw5qze6Ls8Gm77aVJpEq41Pp0dcBBXq
-        Aj1540neCHIN3NcUfAzaPQSLUg==
-X-Google-Smtp-Source: AMsMyM5Mzwt7zm2xVZRnyhLdY/pWEBix3FgD4qFtPkYJjoTnxEbUUgyNK9/yAiTS2+3HW+NE80U1og==
-X-Received: by 2002:a17:90b:3149:b0:202:e9e9:632f with SMTP id ip9-20020a17090b314900b00202e9e9632fmr7972919pjb.96.1663740988455;
-        Tue, 20 Sep 2022 23:16:28 -0700 (PDT)
-Received: from ?IPV6:2401:4900:1c61:8e50:8ba8:7ad7:f34c:2f5? ([2401:4900:1c61:8e50:8ba8:7ad7:f34c:2f5])
-        by smtp.gmail.com with ESMTPSA id g10-20020a170902c38a00b001750b31faabsm987104plg.262.2022.09.20.23.16.22
+        bh=Ggttj0ip5WkBjYpw/WnMtLi+fMdRVX8SYzRnIBF97Go=;
+        b=0PigPe5ZTw3dY6D4RfwFynXwke54+r690Jw1OAYJ/cAXJo9b+1eOJaF/7spko6XuIw
+         wt0P/0sfrKrSPMidVPvyi/it7ZTEAeSElQU72UV/BqNB9yfsgHbN7ZyZg4FhrUu7ZB+2
+         uKs/282y1UjLGaCxS6e1gM6DIlSq9wAQh1cmSz1S1REkj9U58XfWygQz/OkT85qm9jn1
+         GuSe9rZGmtxEJRnOJO84exJKZprKnYHTPNC7iawUtCMH7yA9RyXXVI+l0r/bNwBEejyU
+         Xvw5fYS67diNAmkSySCOK+bLm4HANAgTifNvL4JpJZUz6rsIga35DilyOb8Qmj4hM1r+
+         uypQ==
+X-Gm-Message-State: ACrzQf1rRC69dKouKg4uA5kYp8ZENDx64hoLiNj/TDCoMOykIOCIl/oa
+        pGKCWvMyN9m1ZSfYtArsWcx8Aw==
+X-Google-Smtp-Source: AMsMyM4v+9XrSkx4lonMl2BGq54oTlZZAdiyICLhFmj2KBH2DN43yIwR/rXT2bvseQKlycSOMZUvNQ==
+X-Received: by 2002:a05:6512:4005:b0:49e:6f0a:b09e with SMTP id br5-20020a056512400500b0049e6f0ab09emr9123696lfb.330.1663741623117;
+        Tue, 20 Sep 2022 23:27:03 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id m3-20020a2ea883000000b0026c34bed71csm291411ljq.87.2022.09.20.23.27.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 23:16:26 -0700 (PDT)
-Message-ID: <9b111583-519b-95a6-15b5-243e88dc8d39@linaro.org>
-Date:   Wed, 21 Sep 2022 11:46:21 +0530
+        Tue, 20 Sep 2022 23:27:02 -0700 (PDT)
+Message-ID: <37b509ff-4fc2-73f1-b135-c0930075ec29@linaro.org>
+Date:   Wed, 21 Sep 2022 08:27:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
+ Thunderbird/91.13.0
 Subject: Re: [PATCH v7 6/9] crypto: qce: core: Add new compatibles for qce
  crypto driver
 Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
 Cc:     agross@kernel.org, herbert@gondor.apana.org.au,
         linux-kernel@vger.kernel.org, robh+dt@kernel.org,
@@ -68,94 +68,110 @@ Cc:     agross@kernel.org, herbert@gondor.apana.org.au,
 References: <20220920114051.1116441-1-bhupesh.sharma@linaro.org>
  <20220920114051.1116441-7-bhupesh.sharma@linaro.org>
  <b4016460-f43a-13f8-432e-47c27237e005@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-In-Reply-To: <b4016460-f43a-13f8-432e-47c27237e005@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <9b111583-519b-95a6-15b5-243e88dc8d39@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <9b111583-519b-95a6-15b5-243e88dc8d39@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 9/20/22 8:42 PM, Krzysztof Kozlowski wrote:
-> On 20/09/2022 13:40, Bhupesh Sharma wrote:
->> Since we decided to use soc specific compatibles for describing
->> the qce crypto IP nodes in the device-trees, adapt the driver
->> now to handle the same.
->>
->> Keep the old deprecated compatible strings still in the driver,
->> to ensure backward compatibility.
->>
->> Cc: Bjorn Andersson <andersson@kernel.org>
->> Cc: Rob Herring <robh@kernel.org>
->> Cc: herbert@gondor.apana.org.au
->> Tested-by: Jordan Crouse <jorcrous@amazon.com>
->> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
->> ---
->>   drivers/crypto/qce/core.c | 9 +++++++++
->>   1 file changed, 9 insertions(+)
->>
->> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
->> index 63be06df5519..99ed540611ab 100644
->> --- a/drivers/crypto/qce/core.c
->> +++ b/drivers/crypto/qce/core.c
->> @@ -291,8 +291,17 @@ static int qce_crypto_remove(struct platform_device *pdev)
->>   }
->>   
->>   static const struct of_device_id qce_crypto_of_match[] = {
->> +	/* Following two entries are deprecated (kept only for backward compatibility) */
->>   	{ .compatible = "qcom,crypto-v5.1", },
->>   	{ .compatible = "qcom,crypto-v5.4", },
+On 21/09/2022 08:16, Bhupesh Sharma wrote:
 > 
-> This is okay, so there is no ABI break.
-
-Great. Thanks for the confirmation.
-
->> +	/* Add compatible strings as per updated dt-bindings, here: */
->> +	{ .compatible = "qcom,ipq4019-qce", },
->> +	{ .compatible = "qcom,ipq6018-qce", },
->> +	{ .compatible = "qcom,ipq8074-qce", },
->> +	{ .compatible = "qcom,msm8996-qce", },
->> +	{ .compatible = "qcom,sdm845-qce", },
->> +	{ .compatible = "qcom,sm8150-qce", },
->> +	{ .compatible = "qcom,sm8250-qce", },
 > 
-> This is a bit odd... you have 7 devices which are simply compatible or
-> even the same. This should be instead one compatible.
+> On 9/20/22 8:42 PM, Krzysztof Kozlowski wrote:
+>> On 20/09/2022 13:40, Bhupesh Sharma wrote:
+>>> Since we decided to use soc specific compatibles for describing
+>>> the qce crypto IP nodes in the device-trees, adapt the driver
+>>> now to handle the same.
+>>>
+>>> Keep the old deprecated compatible strings still in the driver,
+>>> to ensure backward compatibility.
+>>>
+>>> Cc: Bjorn Andersson <andersson@kernel.org>
+>>> Cc: Rob Herring <robh@kernel.org>
+>>> Cc: herbert@gondor.apana.org.au
+>>> Tested-by: Jordan Crouse <jorcrous@amazon.com>
+>>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>>> ---
+>>>   drivers/crypto/qce/core.c | 9 +++++++++
+>>>   1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+>>> index 63be06df5519..99ed540611ab 100644
+>>> --- a/drivers/crypto/qce/core.c
+>>> +++ b/drivers/crypto/qce/core.c
+>>> @@ -291,8 +291,17 @@ static int qce_crypto_remove(struct platform_device *pdev)
+>>>   }
+>>>   
+>>>   static const struct of_device_id qce_crypto_of_match[] = {
+>>> +	/* Following two entries are deprecated (kept only for backward compatibility) */
+>>>   	{ .compatible = "qcom,crypto-v5.1", },
+>>>   	{ .compatible = "qcom,crypto-v5.4", },
+>>
+>> This is okay, so there is no ABI break.
 > 
-> I don't really get why do you want to deprecate "qcom,crypto-v5.1".
-> Commit msg only says "we decided" but I do not know who is "we" and "why
-> we decided like this". If you want to deprecate it, perfectly fine by
-> me, but please say in commit msg why you are doing it.
+> Great. Thanks for the confirmation.
+> 
+>>> +	/* Add compatible strings as per updated dt-bindings, here: */
+>>> +	{ .compatible = "qcom,ipq4019-qce", },
+>>> +	{ .compatible = "qcom,ipq6018-qce", },
+>>> +	{ .compatible = "qcom,ipq8074-qce", },
+>>> +	{ .compatible = "qcom,msm8996-qce", },
+>>> +	{ .compatible = "qcom,sdm845-qce", },
+>>> +	{ .compatible = "qcom,sm8150-qce", },
+>>> +	{ .compatible = "qcom,sm8250-qce", },
+>>
+>> This is a bit odd... you have 7 devices which are simply compatible or
+>> even the same. This should be instead one compatible.
+>>
+>> I don't really get why do you want to deprecate "qcom,crypto-v5.1".
+>> Commit msg only says "we decided" but I do not know who is "we" and "why
+>> we decided like this". If you want to deprecate it, perfectly fine by
+>> me, but please say in commit msg why you are doing it.
+> 
+> I understand. This patchset has been in flight for some time and hence I 
+> might have missed sharing some detailed information about the review 
+> comments and rework done along the way (in the cover letter for this 
+> series).
+> 
+> Coming back to your concern, here is the relevant background:
+> - Please see: 
+> https://lore.kernel.org/linux-arm-msm/20210316222825.GA3792517@robh.at.kernel.org/
+> 
+> - Rob shared some comments on the v1 series regarding the soc-specific 
+> compatibles. He mentioned in the above thread that 'you should stick 
+> with SoC specific compatibles as *everyone* else does (including most 
+> QCom bindings).'
+> 
+> - So, while I had proposed "qcom,crypto-v5.1" (for ipq6018) and 
+> "qcom,crypto-v5.4" (for sdm845, sm8150) etc. as the compatible(s) in the 
+> v1 series, I shifted to using the soc-specific compatibles from the v2 
+> series, onwards.
 
-I understand. This patchset has been in flight for some time and hence I 
-might have missed sharing some detailed information about the review 
-comments and rework done along the way (in the cover letter for this 
-series).
+Then the reason could be - Reviewers preferred SoC-based compatible
+instead of IP-block-version-based.
 
-Coming back to your concern, here is the relevant background:
-- Please see: 
-https://lore.kernel.org/linux-arm-msm/20210316222825.GA3792517@robh.at.kernel.org/
+What is confusing is the difference between that link and here. That
+link wanted to introduce 4 different compatibles... and here you have
+even 7 compatibles being the same.
 
-- Rob shared some comments on the v1 series regarding the soc-specific 
-compatibles. He mentioned in the above thread that 'you should stick 
-with SoC specific compatibles as *everyone* else does (including most 
-QCom bindings).'
+> 
+> - Basically, since we are going to have newer qce IP versions available 
+> in near future, e.g. "qcom,crypto-v5.5" etc, and we will have 2 or more 
+> SoCs also sharing 1 version, these compatibles would grow and become 
+> more confusing. IMO, having a soc-specific compatible in such cases is 
+> probably a much cleaner approach.
+> 
+> Hope this helps answer some of your concerns and provides some relevant 
+> background information.
 
-- So, while I had proposed "qcom,crypto-v5.1" (for ipq6018) and 
-"qcom,crypto-v5.4" (for sdm845, sm8150) etc. as the compatible(s) in the 
-v1 series, I shifted to using the soc-specific compatibles from the v2 
-series, onwards.
+Sure, but I still think you should have only one compatible in the
+driver in such case. You don't have differences between them from the
+driver point of view, so the devices seem to be compatible.
 
-- Basically, since we are going to have newer qce IP versions available 
-in near future, e.g. "qcom,crypto-v5.5" etc, and we will have 2 or more 
-SoCs also sharing 1 version, these compatibles would grow and become 
-more confusing. IMO, having a soc-specific compatible in such cases is 
-probably a much cleaner approach.
+If not, what are the differences?
 
-Hope this helps answer some of your concerns and provides some relevant 
-background information.
-
-Thanks,
-Bhupesh
+Best regards,
+Krzysztof
