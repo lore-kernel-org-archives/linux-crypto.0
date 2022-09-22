@@ -2,131 +2,159 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D937C54EE9
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 10:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0614CC6FA91
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 11:28:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiIVKzp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 06:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56884 "EHLO
+        id S229767AbiIVL2p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 07:28:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230449AbiIVKzo (ORCPT
+        with ESMTP id S231576AbiIVL2C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 06:55:44 -0400
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629019E105;
-        Thu, 22 Sep 2022 03:55:41 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 0ABEC20519;
-        Thu, 22 Sep 2022 12:55:39 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ZL9nvv1PUCu7; Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 71E7020460;
-        Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-        by mailout1.secunet.com (Postfix) with ESMTP id 60A0A80004A;
-        Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 22 Sep 2022 12:55:38 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 22 Sep
- 2022 12:55:37 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-        id 58ED43180DDF; Thu, 22 Sep 2022 12:55:37 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 12:55:37 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     <eadavis@sina.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
-Message-ID: <20220922105537.GI2950045@gauss3.secunet.de>
-References: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
- <20220920003908.391835-1-eadavis@sina.com>
- <20220920014711.bvreurf4ex44w6oj@oracle.com>
- <20220920055443.GI2950045@gauss3.secunet.de>
- <20220920141057.cy54d5ukflrgay3a@oracle.com>
- <20220921073616.GZ2950045@gauss3.secunet.de>
- <20220921185138.c6chlv77ugfrsukj@oracle.com>
+        Thu, 22 Sep 2022 07:28:02 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A203DF3B2;
+        Thu, 22 Sep 2022 04:27:59 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id b5so684933pgb.6;
+        Thu, 22 Sep 2022 04:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=kkfx7Fevmf9ZuILb+byihiERfjDZD0PuCn1s3gjuL4I=;
+        b=WoOxf7cWwNlJN6Lk6O8ZjbQq20/N9c13Ufw6DEN+6C1oPUT2WNqr3s5hVsKtFiP9AR
+         BTmBhvl2pYdOCNxSDhabQd6aoPPNsRqu9G3wl0JMnvrhCyP85uxYABNk3ix+Zu6Vpz8S
+         mgCDSvIf6bh3ThSdLy1xeNPrhRmj8a7LDr0AV9bvHrEVFwW7MXhNiERvpweRfUsZVBCv
+         zBBiU16tbJMm8YcuGYk8/xR6bRoRtu/RwpRcHTDu83NKATIf9yPh5KSQ3HygD51J6mzy
+         gi0pKkGuw1fK0VmO1VonD9T/i/7Y/LitpFDA6b/qzCVnGJgKorCaXIqhc0RrncyFD8yi
+         N5Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=kkfx7Fevmf9ZuILb+byihiERfjDZD0PuCn1s3gjuL4I=;
+        b=sVAcAOYFln/rFtZ5Vntia8uyqopOPqEI4wa/1+eR7omhHT8KMZLIQm76tW3kVu8dmp
+         89MlWSmLNELEe8YLsFltBZV44Ec7QFkI0vv9sc5JJKuz5CNQrckCTUTly3FdpUw7HiMF
+         QiL6WpjGRa+2e5UQ1YgsMhan/IAWWRS0rnV3u6YnXjdHGWqm5iNWspX4LkU+Pn58xaZx
+         WjTET/QF4/SCuvR6Vuj+S0NAq2cDNPCKH+CJNLhlYDmr2qbJJETQUo2hiloGU/q2o+JJ
+         ROYhnOmwQ88TnVaWx5yb53mUDA+oCS0kLD/CAs4fDSCodIMHn/jQnFwgk7ACJmNkrsko
+         LyTg==
+X-Gm-Message-State: ACrzQf2zBd9S0SLF579oxV0sjUn5wdM65pg9NOZs0nEw/5LJlqrlPW3B
+        PpQX/0SPlRzIzGNItgYyy8jDfnJRFoY=
+X-Google-Smtp-Source: AMsMyM45zgWaG9FK2QT0v34YBHhIAhx5q6fXw7CMlhT9AFIOiNSfiN/qCn/rR1vf80BiTXn5gQMN9w==
+X-Received: by 2002:a63:a14:0:b0:439:e41a:6646 with SMTP id 20-20020a630a14000000b00439e41a6646mr2605351pgk.513.1663846078282;
+        Thu, 22 Sep 2022 04:27:58 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id n8-20020a170902e54800b0016c0b0fe1c6sm3871321plf.73.2022.09.22.04.27.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 04:27:57 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ye xingchen <ye.xingchen@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] crypto: zip - remove the unneeded result variable
+Date:   Thu, 22 Sep 2022 11:27:53 +0000
+Message-Id: <20220922112753.236815-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220921185138.c6chlv77ugfrsukj@oracle.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 02:51:38PM -0400, Daniel Jordan wrote:
-> On Wed, Sep 21, 2022 at 09:36:16AM +0200, Steffen Klassert wrote:
-> > On Tue, Sep 20, 2022 at 10:10:57AM -0400, Daniel Jordan wrote:
-> > > Yeah, padata_do_serial can be called with BHs off, like in the tipc
-> > > stack, but there are also cases where BHs can be on, like lockdep said
-> > > here:
-> > 
-> > padata_do_serial was designed to run with BHs off, it is a bug if it
-> > runs with BHs on. But I don't see a case where this can happen. The
-> > only user of padata_do_serial is pcrypt in its serialization callbacks
-> > (pcrypt_aead_enc, pcrypt_aead_dec) and the async crypto callback
-> > pcrypt_aead_done. pcrypt_aead_enc and pcrypt_aead_dec are issued via
-> > the padata_serial_worker with the padata->serial call. BHs are
-> > off here. The crypto callback also runs with BHs off.
-> > 
-> > What do I miss here?
-> 
-> Ugh.. this newer, buggy part of padata_do_parallel:
-> 
->   /* Maximum works limit exceeded, run in the current task. */
->   padata->parallel(padata);
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-Oh well...
+Return the value directly instead of storing it in another redundant
+variable.
 
-> This skips the usual path in padata_parallel_worker, which disables BHs.
-> They should be left off in the above case too.
-> 
-> What about this?
-> 
-> ---8<---
-> 
-> Subject: [PATCH] padata: always leave BHs disabled when running ->parallel()
-> 
-> A deadlock can happen when an overloaded system runs ->parallel() in the
-> context of the current task:
-> 
->     padata_do_parallel
->       ->parallel()
->         pcrypt_aead_enc/dec
->           padata_do_serial
->             spin_lock(&reorder->lock) // BHs still enabled
->               <interrupt>
->                 ...
->                   __do_softirq
->                     ...
->                       padata_do_serial
->                         spin_lock(&reorder->lock)
-> 
-> It's a bug for BHs to be on in _do_serial as Steffen points out, so
-> ensure they're off in the "current task" case like they are in
-> padata_parallel_worker to avoid this situation.
-> 
-> Reported-by: syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com
-> Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
-> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ drivers/crypto/cavium/zip/zip_crypto.c | 30 ++++++--------------------
+ 1 file changed, 6 insertions(+), 24 deletions(-)
 
-Yes, that makes sense.
-
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
-
-But we also should look at the call to padata_find_next where BHs are
-on. padata_find_next takes the same lock as padata_do_serial, so this
-might be a candidate for a deadlock too.
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+index 7df71fcebe8f..1046a746d36f 100644
+--- a/drivers/crypto/cavium/zip/zip_crypto.c
++++ b/drivers/crypto/cavium/zip/zip_crypto.c
+@@ -198,22 +198,16 @@ static int zip_decompress(const u8 *src, unsigned int slen,
+ /* Legacy Compress framework start */
+ int zip_alloc_comp_ctx_deflate(struct crypto_tfm *tfm)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
+ 
+-	ret = zip_ctx_init(zip_ctx, 0);
+-
+-	return ret;
++	return zip_ctx_init(zip_ctx, 0);
+ }
+ 
+ int zip_alloc_comp_ctx_lzs(struct crypto_tfm *tfm)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
+ 
+-	ret = zip_ctx_init(zip_ctx, 1);
+-
+-	return ret;
++	return zip_ctx_init(zip_ctx, 1);
+ }
+ 
+ void zip_free_comp_ctx(struct crypto_tfm *tfm)
+@@ -227,24 +221,18 @@ int  zip_comp_compress(struct crypto_tfm *tfm,
+ 		       const u8 *src, unsigned int slen,
+ 		       u8 *dst, unsigned int *dlen)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
+ 
+-	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
+-
+-	return ret;
++	return zip_compress(src, slen, dst, dlen, zip_ctx);
+ }
+ 
+ int  zip_comp_decompress(struct crypto_tfm *tfm,
+ 			 const u8 *src, unsigned int slen,
+ 			 u8 *dst, unsigned int *dlen)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
+ 
+-	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
+-
+-	return ret;
++	return zip_decompress(src, slen, dst, dlen, zip_ctx);
+ } /* Legacy compress framework end */
+ 
+ /* SCOMP framework start */
+@@ -298,22 +286,16 @@ int zip_scomp_compress(struct crypto_scomp *tfm,
+ 		       const u8 *src, unsigned int slen,
+ 		       u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx  = ctx;
+ 
+-	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
+-
+-	return ret;
++	return zip_compress(src, slen, dst, dlen, zip_ctx);
+ }
+ 
+ int zip_scomp_decompress(struct crypto_scomp *tfm,
+ 			 const u8 *src, unsigned int slen,
+ 			 u8 *dst, unsigned int *dlen, void *ctx)
+ {
+-	int ret;
+ 	struct zip_kernel_ctx *zip_ctx = ctx;
+ 
+-	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
+-
+-	return ret;
++	return zip_decompress(src, slen, dst, dlen, zip_ctx);
+ } /* SCOMP framework end */
+-- 
+2.25.1
