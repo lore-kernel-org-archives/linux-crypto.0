@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24499C6FA82
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 13:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A496CC6FA86
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 13:18:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229901AbiIVNOP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 09:14:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
+        id S229710AbiIVNRt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 09:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiIVNOO (ORCPT
+        with ESMTP id S230514AbiIVNRY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 09:14:14 -0400
+        Thu, 22 Sep 2022 09:17:24 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A44EA59C;
-        Thu, 22 Sep 2022 06:14:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11A1AECCF9;
+        Thu, 22 Sep 2022 06:17:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 772D96338E;
-        Thu, 22 Sep 2022 13:14:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAA7BC43140;
-        Thu, 22 Sep 2022 13:14:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8790B63383;
+        Thu, 22 Sep 2022 13:17:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB225C433D7;
+        Thu, 22 Sep 2022 13:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663852452;
-        bh=fNgGRurTHx6e54748ie56cxwpBqgA20LmVhFU/CTT/4=;
+        s=k20201202; t=1663852641;
+        bh=x9EZseEA0PIBQdEf8joKTvvbD5nJbC3PTH3Wh3WrbXQ=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=RHOmGrGoYKgd9F069CvVZ9MLgM22iF8DaoSk+9N/YbhiYj0dlq8pRiGxbMm0GUlrT
-         1s+CbsMS3q7qH/kph59yi6xAWcu/LHWXGWUfbRRurOTU0L7oghrQYOr6n+EtjVYT5C
-         QeGzfV8poAFtENO3Uf0oL+rfXHRUM1swIRLAv3d/k5Ls7ONHDpbE4ddMJt+eqpTdD1
-         IA3oz7oUwOl5r8EzaL4FfRUraH0WsRrfOMerW2sgZlvx90XfMwIEEdtevD6dLj+5LI
-         GRHzdRTLLXNwGXMqy5kDMYN88qqGoRaX/UJ/MXT+u8mhmow/5krLscw8AsVcziQGPQ
-         8jhRwZG8W+AiQ==
-Received: by mail-lf1-f54.google.com with SMTP id a2so14621442lfb.6;
-        Thu, 22 Sep 2022 06:14:12 -0700 (PDT)
-X-Gm-Message-State: ACrzQf3m5t3cShj2sR42zn9sR3Ec+yuViJfHOj1q2Fu1IEm0tRuCl5hD
-        rYzN3UdsdD6U0bK/YyTkRQD/9jQJ87TpCJAOiHw=
-X-Google-Smtp-Source: AMsMyM62FN66QhEr2E9WQ4yTIqwM3yXIz+ExidSVsP5kh+/j6z5bqfvmxKldJJ0afDSWIJAzCyFH9TdTjL1zoGky9Fs=
-X-Received: by 2002:a05:6512:4024:b0:497:4db:6ad0 with SMTP id
- br36-20020a056512402400b0049704db6ad0mr1296066lfb.637.1663852450898; Thu, 22
- Sep 2022 06:14:10 -0700 (PDT)
+        b=uPNbRC2HKIPvUhAP9prxhTxQaJzsQNl1L7xgfCFWTwJ7pAWN86OMYoNdM31Xuz1AQ
+         Aiej/HWDhE7mKe3XzEIqO/c3grUzbBn9j/HWkSt0HmDDhGXHYUZHyjOtaPzJXVP1Ho
+         Zvp6F8EGu96G6oPJij9C8YaprqjoH8p5IKgTR4YBVmXoSJwZ0sAafVN4g1Rrfglwbo
+         kKU5Obvso02WvQr+3BQ9DMPBE5x1UWJoZGZsMpCwldplYI7UrIolDa9xVEkdhcObzl
+         tHNf9TV/yTRwDE4Y48b9YUfJmTVR7Yr6RMYSd434MITAvxj4cTNBJ7nPAeo/0YtN5u
+         B5lF/gCfOJzCg==
+Received: by mail-lj1-f179.google.com with SMTP id a14so10950433ljj.8;
+        Thu, 22 Sep 2022 06:17:20 -0700 (PDT)
+X-Gm-Message-State: ACrzQf2YeMBYgUmKsSNLpCAf9P/9wO1B/p31YSMxERyaTrlXv5quDEtX
+        HonbvKHO0NakWT9LF1sG0/bF2G2bxoXRn7vRNVc=
+X-Google-Smtp-Source: AMsMyM6q3bBLBY2OjqmXgTbgtxJ7IhRQqk58EtZ9+ZiyWfMOCOSN3Wd6huyQ/rfigeiPhnyFyUZfn79+676BO0lVmNI=
+X-Received: by 2002:a2e:9115:0:b0:26a:c086:5138 with SMTP id
+ m21-20020a2e9115000000b0026ac0865138mr1001036ljg.189.1663852639014; Thu, 22
+ Sep 2022 06:17:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220922130452.233323-1-chenzhongjin@huawei.com> <20220922130452.233323-2-chenzhongjin@huawei.com>
-In-Reply-To: <20220922130452.233323-2-chenzhongjin@huawei.com>
+References: <20220922130452.233323-1-chenzhongjin@huawei.com> <20220922130452.233323-3-chenzhongjin@huawei.com>
+In-Reply-To: <20220922130452.233323-3-chenzhongjin@huawei.com>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 22 Sep 2022 15:13:59 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
-Message-ID: <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
-Subject: Re: [PATCH -next 1/3] arm64: efi-header: Mark efi header as data
+Date:   Thu, 22 Sep 2022 15:17:07 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFtx0OZozwedDsUJotfPi8Ugrcy2J+ee_YH4nb=36W2dQ@mail.gmail.com>
+Message-ID: <CAMj1kXFtx0OZozwedDsUJotfPi8Ugrcy2J+ee_YH4nb=36W2dQ@mail.gmail.com>
+Subject: Re: [PATCH -next 2/3] arm64: head: Mark constants as data
 To:     Chen Zhongjin <chenzhongjin@huawei.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
@@ -61,45 +61,49 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Thu, 22 Sept 2022 at 15:08, Chen Zhongjin <chenzhongjin@huawei.com> wrote:
 >
-> This file only contains a set of constants forming the efi header.
->
-> Make the constants part of data symbols by wrapping them with
-> SYM_DATA.
+> Add data annotations to constants part of the image header.
 >
 > Signed-off-by: Julien Thierry <jthierry@redhat.com>
 > Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
 > Reviewed-by: Mark Brown <broonie@kernel.org>
-
-Why is this necessary? These are not emitted into a .text section, and
-are not even covered by the kernel's mapping of memory. So the .L
-prefixed labels are deliberate: it prevents the symbols from polluting
-the symbol namespace with symbols pointing nowhere.
-
-
 > ---
->  arch/arm64/kernel/efi-header.S | 2 ++
->  1 file changed, 2 insertions(+)
+>  arch/arm64/kernel/head.S | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> diff --git a/arch/arm64/kernel/efi-header.S b/arch/arm64/kernel/efi-header.S
-> index 28d8a5dca5f1..3eacd27ab761 100644
-> --- a/arch/arm64/kernel/efi-header.S
-> +++ b/arch/arm64/kernel/efi-header.S
-> @@ -28,6 +28,7 @@
->         .macro  __EFI_PE_HEADER
->  #ifdef CONFIG_EFI
->         .set    .Lpe_header_offset, . - .L_head
-> +SYM_DATA_START_LOCAL(arm64_efi_header)
->         .long   PE_MAGIC
->         .short  IMAGE_FILE_MACHINE_ARM64                // Machine
->         .short  .Lsection_count                         // NumberOfSections
-> @@ -160,6 +161,7 @@
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index 814b6587ccb7..f298e88e2d23 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -57,9 +57,10 @@
+>         /*
+>          * DO NOT MODIFY. Image header expected by Linux boot-loaders.
+>          */
+> -       efi_signature_nop                       // special NOP to identity as PE/COFF executable
+> +SYM_DATA_LOCAL(efi_nop, efi_signature_nop)     // special NOP to identity as PE/COFF executable
+
+This is an instruction not data
+
+>         b       primary_entry                   // branch to kernel start, magic
+> -       .quad   0                               // Image load offset from start of RAM, little-endian
+> +SYM_DATA_LOCAL(_zero_reserved, .quad   0)      // Image load offset from start of RAM, little-endian
+
+Why convert this quad? And why does it need a symbol?
+
+> +SYM_DATA_START_LOCAL(_arm64_common_header)
+>         le64sym _kernel_size_le                 // Effective size of kernel image, little-endian
+>         le64sym _kernel_flags_le                // Informative flags, little-endian
+>         .quad   0                               // reserved
+
+But not this one?
+
+> @@ -67,6 +68,7 @@
+>         .quad   0                               // reserved
+>         .ascii  ARM64_IMAGE_MAGIC               // Magic number
+>         .long   .Lpe_header_offset              // Offset to the PE header.
+> +SYM_DATA_END(_arm64_common_header)
 >
->         .balign SEGMENT_ALIGN
->  .Lefi_header_end:
-> +SYM_DATA_END_LABEL(arm64_efi_header, SYM_L_LOCAL, efi_header_end)
->  #else
->         .set    .Lpe_header_offset, 0x0
->  #endif
+>         __EFI_PE_HEADER
+>
 > --
 > 2.17.1
 >
