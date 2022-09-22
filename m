@@ -2,159 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0614CC6FA91
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 11:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC43C54EE9
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 13:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbiIVL2p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 07:28:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52284 "EHLO
+        id S229762AbiIVNIq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 09:08:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbiIVL2C (ORCPT
+        with ESMTP id S231771AbiIVNIp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 07:28:02 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A203DF3B2;
-        Thu, 22 Sep 2022 04:27:59 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id b5so684933pgb.6;
-        Thu, 22 Sep 2022 04:27:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=kkfx7Fevmf9ZuILb+byihiERfjDZD0PuCn1s3gjuL4I=;
-        b=WoOxf7cWwNlJN6Lk6O8ZjbQq20/N9c13Ufw6DEN+6C1oPUT2WNqr3s5hVsKtFiP9AR
-         BTmBhvl2pYdOCNxSDhabQd6aoPPNsRqu9G3wl0JMnvrhCyP85uxYABNk3ix+Zu6Vpz8S
-         mgCDSvIf6bh3ThSdLy1xeNPrhRmj8a7LDr0AV9bvHrEVFwW7MXhNiERvpweRfUsZVBCv
-         zBBiU16tbJMm8YcuGYk8/xR6bRoRtu/RwpRcHTDu83NKATIf9yPh5KSQ3HygD51J6mzy
-         gi0pKkGuw1fK0VmO1VonD9T/i/7Y/LitpFDA6b/qzCVnGJgKorCaXIqhc0RrncyFD8yi
-         N5Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=kkfx7Fevmf9ZuILb+byihiERfjDZD0PuCn1s3gjuL4I=;
-        b=sVAcAOYFln/rFtZ5Vntia8uyqopOPqEI4wa/1+eR7omhHT8KMZLIQm76tW3kVu8dmp
-         89MlWSmLNELEe8YLsFltBZV44Ec7QFkI0vv9sc5JJKuz5CNQrckCTUTly3FdpUw7HiMF
-         QiL6WpjGRa+2e5UQ1YgsMhan/IAWWRS0rnV3u6YnXjdHGWqm5iNWspX4LkU+Pn58xaZx
-         WjTET/QF4/SCuvR6Vuj+S0NAq2cDNPCKH+CJNLhlYDmr2qbJJETQUo2hiloGU/q2o+JJ
-         ROYhnOmwQ88TnVaWx5yb53mUDA+oCS0kLD/CAs4fDSCodIMHn/jQnFwgk7ACJmNkrsko
-         LyTg==
-X-Gm-Message-State: ACrzQf2zBd9S0SLF579oxV0sjUn5wdM65pg9NOZs0nEw/5LJlqrlPW3B
-        PpQX/0SPlRzIzGNItgYyy8jDfnJRFoY=
-X-Google-Smtp-Source: AMsMyM45zgWaG9FK2QT0v34YBHhIAhx5q6fXw7CMlhT9AFIOiNSfiN/qCn/rR1vf80BiTXn5gQMN9w==
-X-Received: by 2002:a63:a14:0:b0:439:e41a:6646 with SMTP id 20-20020a630a14000000b00439e41a6646mr2605351pgk.513.1663846078282;
-        Thu, 22 Sep 2022 04:27:58 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id n8-20020a170902e54800b0016c0b0fe1c6sm3871321plf.73.2022.09.22.04.27.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 04:27:57 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ye.xingchen@zte.com.cn
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] crypto: zip - remove the unneeded result variable
-Date:   Thu, 22 Sep 2022 11:27:53 +0000
-Message-Id: <20220922112753.236815-1-ye.xingchen@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Thu, 22 Sep 2022 09:08:45 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E200EBBD5;
+        Thu, 22 Sep 2022 06:08:36 -0700 (PDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.54])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MYFqG2G3lz14S3P;
+        Thu, 22 Sep 2022 21:04:26 +0800 (CST)
+Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 22 Sep 2022 21:08:34 +0800
+Received: from ubuntu1804.huawei.com (10.67.175.36) by
+ dggpemm500013.china.huawei.com (7.185.36.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 22 Sep 2022 21:08:34 +0800
+From:   Chen Zhongjin <chenzhongjin@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <broonie@kernel.org>,
+        <ardb@kernel.org>, <maz@kernel.org>, <mark.rutland@arm.com>,
+        <anshuman.khandual@arm.com>, <chenzhongjin@huawei.com>
+Subject: [PATCH -next 1/3] arm64: efi-header: Mark efi header as data
+Date:   Thu, 22 Sep 2022 21:04:50 +0800
+Message-ID: <20220922130452.233323-2-chenzhongjin@huawei.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220922130452.233323-1-chenzhongjin@huawei.com>
+References: <20220922130452.233323-1-chenzhongjin@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.175.36]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500013.china.huawei.com (7.185.36.172)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+This file only contains a set of constants forming the efi header.
 
-Return the value directly instead of storing it in another redundant
-variable.
+Make the constants part of data symbols by wrapping them with
+SYM_DATA.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Julien Thierry <jthierry@redhat.com>
+Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- drivers/crypto/cavium/zip/zip_crypto.c | 30 ++++++--------------------
- 1 file changed, 6 insertions(+), 24 deletions(-)
+ arch/arm64/kernel/efi-header.S | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-index 7df71fcebe8f..1046a746d36f 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.c
-+++ b/drivers/crypto/cavium/zip/zip_crypto.c
-@@ -198,22 +198,16 @@ static int zip_decompress(const u8 *src, unsigned int slen,
- /* Legacy Compress framework start */
- int zip_alloc_comp_ctx_deflate(struct crypto_tfm *tfm)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
+diff --git a/arch/arm64/kernel/efi-header.S b/arch/arm64/kernel/efi-header.S
+index 28d8a5dca5f1..3eacd27ab761 100644
+--- a/arch/arm64/kernel/efi-header.S
++++ b/arch/arm64/kernel/efi-header.S
+@@ -28,6 +28,7 @@
+ 	.macro	__EFI_PE_HEADER
+ #ifdef CONFIG_EFI
+ 	.set	.Lpe_header_offset, . - .L_head
++SYM_DATA_START_LOCAL(arm64_efi_header)
+ 	.long	PE_MAGIC
+ 	.short	IMAGE_FILE_MACHINE_ARM64		// Machine
+ 	.short	.Lsection_count				// NumberOfSections
+@@ -160,6 +161,7 @@
  
--	ret = zip_ctx_init(zip_ctx, 0);
--
--	return ret;
-+	return zip_ctx_init(zip_ctx, 0);
- }
- 
- int zip_alloc_comp_ctx_lzs(struct crypto_tfm *tfm)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
- 
--	ret = zip_ctx_init(zip_ctx, 1);
--
--	return ret;
-+	return zip_ctx_init(zip_ctx, 1);
- }
- 
- void zip_free_comp_ctx(struct crypto_tfm *tfm)
-@@ -227,24 +221,18 @@ int  zip_comp_compress(struct crypto_tfm *tfm,
- 		       const u8 *src, unsigned int slen,
- 		       u8 *dst, unsigned int *dlen)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
- 
--	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
--
--	return ret;
-+	return zip_compress(src, slen, dst, dlen, zip_ctx);
- }
- 
- int  zip_comp_decompress(struct crypto_tfm *tfm,
- 			 const u8 *src, unsigned int slen,
- 			 u8 *dst, unsigned int *dlen)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx = crypto_tfm_ctx(tfm);
- 
--	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
--
--	return ret;
-+	return zip_decompress(src, slen, dst, dlen, zip_ctx);
- } /* Legacy compress framework end */
- 
- /* SCOMP framework start */
-@@ -298,22 +286,16 @@ int zip_scomp_compress(struct crypto_scomp *tfm,
- 		       const u8 *src, unsigned int slen,
- 		       u8 *dst, unsigned int *dlen, void *ctx)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx  = ctx;
- 
--	ret = zip_compress(src, slen, dst, dlen, zip_ctx);
--
--	return ret;
-+	return zip_compress(src, slen, dst, dlen, zip_ctx);
- }
- 
- int zip_scomp_decompress(struct crypto_scomp *tfm,
- 			 const u8 *src, unsigned int slen,
- 			 u8 *dst, unsigned int *dlen, void *ctx)
- {
--	int ret;
- 	struct zip_kernel_ctx *zip_ctx = ctx;
- 
--	ret = zip_decompress(src, slen, dst, dlen, zip_ctx);
--
--	return ret;
-+	return zip_decompress(src, slen, dst, dlen, zip_ctx);
- } /* SCOMP framework end */
+ 	.balign	SEGMENT_ALIGN
+ .Lefi_header_end:
++SYM_DATA_END_LABEL(arm64_efi_header, SYM_L_LOCAL, efi_header_end)
+ #else
+ 	.set	.Lpe_header_offset, 0x0
+ #endif
 -- 
-2.25.1
+2.17.1
+
