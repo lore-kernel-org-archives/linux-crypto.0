@@ -2,121 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9281AC6FA86
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 14:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CD7C6FA91
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 14:33:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbiIVOZv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 10:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43032 "EHLO
+        id S230514AbiIVOds (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 10:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231846AbiIVOZj (ORCPT
+        with ESMTP id S231524AbiIVOd3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 10:25:39 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7057798A57;
-        Thu, 22 Sep 2022 07:25:34 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MYHZK38VTzHpvG;
-        Thu, 22 Sep 2022 22:23:21 +0800 (CST)
-Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 22 Sep 2022 22:25:32 +0800
-Received: from [10.67.108.67] (10.67.108.67) by dggpemm500013.china.huawei.com
- (7.185.36.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 22 Sep
- 2022 22:25:31 +0800
-Message-ID: <71274d7a-8a79-3954-d462-5cc8b5a5e874@huawei.com>
-Date:   Thu, 22 Sep 2022 22:25:31 +0800
+        Thu, 22 Sep 2022 10:33:29 -0400
+Received: from maillog.nuvoton.com (maillog.nuvoton.com [202.39.227.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1F0A3F50BA;
+        Thu, 22 Sep 2022 07:33:24 -0700 (PDT)
+Received: from NTHCCAS04.nuvoton.com (NTHCCAS04.nuvoton.com [10.1.8.29])
+        by maillog.nuvoton.com (Postfix) with ESMTP id E86811C8116A;
+        Thu, 22 Sep 2022 22:22:21 +0800 (CST)
+Received: from NTHCML01B.nuvoton.com (10.1.8.178) by NTHCCAS04.nuvoton.com
+ (10.1.8.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 22
+ Sep 2022 22:22:21 +0800
+Received: from NTHCCAS04.nuvoton.com (10.1.8.29) by NTHCML01B.nuvoton.com
+ (10.1.8.178) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2176.2; Thu, 22 Sep
+ 2022 22:22:21 +0800
+Received: from taln60.nuvoton.co.il (10.191.1.180) by NTHCCAS04.nuvoton.com
+ (10.1.12.25) with Microsoft SMTP Server id 15.1.2176.2 via Frontend
+ Transport; Thu, 22 Sep 2022 22:22:21 +0800
+Received: by taln60.nuvoton.co.il (Postfix, from userid 10070)
+        id 8489E637C4; Thu, 22 Sep 2022 17:22:20 +0300 (IDT)
+From:   Tomer Maimon <tmaimon77@gmail.com>
+To:     <avifishman70@gmail.com>, <tali.perry1@gmail.com>,
+        <joel@jms.id.au>, <venture@google.com>, <yuenn@google.com>,
+        <benjaminfair@google.com>, <olivia@selenic.com>,
+        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>
+CC:     <openbmc@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        Tomer Maimon <tmaimon77@gmail.com>
+Subject: [PATCH v1 2/2] hwrng: npcm: Add NPCM8XX support
+Date:   Thu, 22 Sep 2022 17:22:16 +0300
+Message-ID: <20220922142216.17581-3-tmaimon77@gmail.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20220922142216.17581-1-tmaimon77@gmail.com>
+References: <20220922142216.17581-1-tmaimon77@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0
-Subject: Re: [PATCH -next 1/3] arm64: efi-header: Mark efi header as data
-Content-Language: en-US
-To:     Ard Biesheuvel <ardb@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <broonie@kernel.org>,
-        <maz@kernel.org>, <mark.rutland@arm.com>,
-        <anshuman.khandual@arm.com>
-References: <20220922130452.233323-1-chenzhongjin@huawei.com>
- <20220922130452.233323-2-chenzhongjin@huawei.com>
- <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
-From:   Chen Zhongjin <chenzhongjin@huawei.com>
-In-Reply-To: <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.108.67]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500013.china.huawei.com (7.185.36.172)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Adding RNG NPCM8XX support to NPCM RNG driver.
+RNG NPCM8XX uses a different clock prescaler.
 
-On 2022/9/22 21:13, Ard Biesheuvel wrote:
-> On Thu, 22 Sept 2022 at 15:08, Chen Zhongjin <chenzhongjin@huawei.com> wrote:
->> This file only contains a set of constants forming the efi header.
->>
->> Make the constants part of data symbols by wrapping them with
->> SYM_DATA.
->>
->> Signed-off-by: Julien Thierry <jthierry@redhat.com>
->> Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
->> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Why is this necessary? These are not emitted into a .text section, and
-> are not even covered by the kernel's mapping of memory. So the .L
-> prefixed labels are deliberate: it prevents the symbols from polluting
-> the symbol namespace with symbols pointing nowhere.
->
-This is basically because when I'm developing objtool and these 
-constants will disrupts
+As part of adding NPCM8XX support:
+- Add NPCM8XX specific compatible string.
+- Add NPCM8XX specific clock prescaler.
 
-the instruction decoding so I just mark them as x86 did.
+Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+---
+ drivers/char/hw_random/npcm-rng.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/char/hw_random/npcm-rng.c b/drivers/char/hw_random/npcm-rng.c
+index 1ec5f267a656..705be9ccae31 100644
+--- a/drivers/char/hw_random/npcm-rng.c
++++ b/drivers/char/hw_random/npcm-rng.c
+@@ -18,10 +18,11 @@
+ #define NPCM_RNGD_REG		0x04	/* Data register */
+ #define NPCM_RNGMODE_REG	0x08	/* Mode register */
+ 
+-#define NPCM_RNG_CLK_SET_25MHZ	GENMASK(4, 3) /* 20-25 MHz */
+-#define NPCM_RNG_DATA_VALID	BIT(1)
+-#define NPCM_RNG_ENABLE		BIT(0)
+-#define NPCM_RNG_M1ROSEL	BIT(1)
++#define NPCM_RNG_CLK_SET_25MHZ		GENMASK(4, 3) /* 20-25 MHz */
++#define NPCM_RNG_CLK_SET_62_5MHZ	BIT(2) /* 60-80 MHz */
++#define NPCM_RNG_DATA_VALID		BIT(1)
++#define NPCM_RNG_ENABLE			BIT(0)
++#define NPCM_RNG_M1ROSEL		BIT(1)
+ 
+ #define NPCM_RNG_TIMEOUT_USEC	20000
+ #define NPCM_RNG_POLL_USEC	1000
+@@ -31,14 +32,14 @@
+ struct npcm_rng {
+ 	void __iomem *base;
+ 	struct hwrng rng;
++	u32 clkp;
+ };
+ 
+ static int npcm_rng_init(struct hwrng *rng)
+ {
+ 	struct npcm_rng *priv = to_npcm_rng(rng);
+ 
+-	writel(NPCM_RNG_CLK_SET_25MHZ | NPCM_RNG_ENABLE,
+-	       priv->base + NPCM_RNGCS_REG);
++	writel(priv->clkp | NPCM_RNG_ENABLE, priv->base + NPCM_RNGCS_REG);
+ 
+ 	return 0;
+ }
+@@ -47,7 +48,7 @@ static void npcm_rng_cleanup(struct hwrng *rng)
+ {
+ 	struct npcm_rng *priv = to_npcm_rng(rng);
+ 
+-	writel(NPCM_RNG_CLK_SET_25MHZ, priv->base + NPCM_RNGCS_REG);
++	writel(priv->clkp, priv->base + NPCM_RNGCS_REG);
+ }
+ 
+ static int npcm_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -102,6 +103,11 @@ static int npcm_rng_probe(struct platform_device *pdev)
+ 	pm_runtime_use_autosuspend(&pdev->dev);
+ 	pm_runtime_enable(&pdev->dev);
+ 
++	if (of_device_is_compatible(pdev->dev.of_node, "nuvoton,npcm750-rng"))
++		priv->clkp = NPCM_RNG_CLK_SET_25MHZ;
++	if (of_device_is_compatible(pdev->dev.of_node, "nuvoton,npcm845-rng"))
++		priv->clkp = NPCM_RNG_CLK_SET_62_5MHZ;
++
+ #ifndef CONFIG_PM
+ 	priv->rng.init = npcm_rng_init;
+ 	priv->rng.cleanup = npcm_rng_cleanup;
+@@ -163,6 +169,7 @@ static const struct dev_pm_ops npcm_rng_pm_ops = {
+ 
+ static const struct of_device_id rng_dt_id[] __maybe_unused = {
+ 	{ .compatible = "nuvoton,npcm750-rng",  },
++	{ .compatible = "nuvoton,npcm845-rng",  },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, rng_dt_id);
+-- 
+2.33.0
 
-I tried to sent this patch set is because now the objtool patch set is 
-growing huge so I
-
-want to split some independent part. But now I found you are right that 
-this are
-
-meaningless. They are not even inside vmlinux. I'll discard them.
-
-
-Sorry for bothering and thanks for your advise and patient!
-
-Best,
-
-Chen
-
->> ---
->>   arch/arm64/kernel/efi-header.S | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/arch/arm64/kernel/efi-header.S b/arch/arm64/kernel/efi-header.S
->> index 28d8a5dca5f1..3eacd27ab761 100644
->> --- a/arch/arm64/kernel/efi-header.S
->> +++ b/arch/arm64/kernel/efi-header.S
->> @@ -28,6 +28,7 @@
->>          .macro  __EFI_PE_HEADER
->>   #ifdef CONFIG_EFI
->>          .set    .Lpe_header_offset, . - .L_head
->> +SYM_DATA_START_LOCAL(arm64_efi_header)
->>          .long   PE_MAGIC
->>          .short  IMAGE_FILE_MACHINE_ARM64                // Machine
->>          .short  .Lsection_count                         // NumberOfSections
->> @@ -160,6 +161,7 @@
->>
->>          .balign SEGMENT_ALIGN
->>   .Lefi_header_end:
->> +SYM_DATA_END_LABEL(arm64_efi_header, SYM_L_LOCAL, efi_header_end)
->>   #else
->>          .set    .Lpe_header_offset, 0x0
->>   #endif
->> --
->> 2.17.1
->>
