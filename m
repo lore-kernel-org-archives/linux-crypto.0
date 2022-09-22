@@ -2,103 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B49C6FA82
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 17:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434C5C54EE9
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 17:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbiIVR3o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 13:29:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
+        id S231987AbiIVRaW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 13:30:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231990AbiIVR3l (ORCPT
+        with ESMTP id S232067AbiIVRaN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 13:29:41 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D292120AE
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:29:35 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id h3so11872493lja.1
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:29:35 -0700 (PDT)
+        Thu, 22 Sep 2022 13:30:13 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6019A9E7
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:30:09 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id a10so11916487ljq.0
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=+5ktU3TDpe3BHuTbwoZ764cAXObTROyDXShVbxkedjg=;
-        b=WTOkIz1x4ybGbAs8B/cWZxP4QvzdnlgE7FCibEM9pXldRAzbcaEDIstRmDAHw+YjNm
-         BXbx/lu11awGrUGl7Tlf5SbXmWj7WLXV3l3snFERdhhF5LViUFN5ssoDWYiOT4oy4zGI
-         qVd+pFrmxNkPaEfTitlmlZBlDJKUd+ZSryHLHjYeRnZef76RYm0Zhao4haRXI8SqnHbe
-         TsbpNlygaJ2++kfT0qeVw3z8nyyWsoci1UWTypk40t9PWx5sdPF6f7wBVolOXBSmoRXM
-         9yiPtC3rEwrCycOzSW8BSmY/bMx7hgZvLO/Uv2tnJP//qwc4Xh6B/yEZGAZkV5lNEgHE
-         geOg==
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=3d4XtRz1UVTn9UF6tNTg+CLRSot5BsaX/kpuz1aoWSk=;
+        b=gzyjrFUWv6sH5AP1pBpkvTbYf2jzgM5J6nmbzm5OLICG5oHqLOc42PB0JjTtgfVYQz
+         BF/uvdqnVUjIG0gUSDXOAGX43nM6ksXQIiY1tSzXR1SMOmRV5qUiDglZFJX41AHE3giu
+         tg/8D7PwcQb91U9TFbzIK7dI4g4owsWB+m2N+6yfrX+ZQdJ2gu9iY63t5Yq16lfgOhyE
+         0Dh288gd7F5g/9azqxGNWT9Vw9AZd7/KGEigtoukXStyVge9qfZvf9M4unSyF+lhL/Hs
+         AjpOOO/Vvn6DR5nNwV7Y3lC+pNxU9oAWVvO2ucAaZXVvRZzPcLjP7UaIuHmIFAASf5QE
+         O7ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=+5ktU3TDpe3BHuTbwoZ764cAXObTROyDXShVbxkedjg=;
-        b=0GzAk1rExo6T1SPs+VgeEIvtRRBejDJIXUnMyHYyhjmCRk8Nx2XoajW/zTuZeVunRt
-         HAFggMdz/1c8iPJ5bvKNCinOlXqrgXEXSQ0bdS0hf4TIgY55OaqREc025JPy/1A9mpi0
-         XaRRHzu4rlUz94m5OQrIgwm0fF20/V3rKJhR5U12f7qNuEUa4svdKj/tXNr1tkblsMty
-         3SQRFDhoPparTYseYFsxX9smJVKX9wz20gQfYme/aQtGkgEATmyOaEdmXcBZr28xUpC0
-         n0jkyNetch1zB3KvLF44nIIGWnz3R/6T61E2bY3uiLuOYddisCX8DK2QH+wLLTi83YMV
-         AJow==
-X-Gm-Message-State: ACrzQf3Hpv6xjt28E/OuLwvQxy9LItecq9DTGFZilUwpXw+svNbqEjee
-        feIOWZ3VfZFgZyWIS37IqnDipw==
-X-Google-Smtp-Source: AMsMyM7q+CRO6rvOlarBOiLCvoTHsA/CVxmXYPQcgm3Xy63aIchuZFS+ZWs5+S7YO+//DL44qYUztA==
-X-Received: by 2002:a2e:bd09:0:b0:264:6516:93f9 with SMTP id n9-20020a2ebd09000000b00264651693f9mr1503819ljq.127.1663867773771;
-        Thu, 22 Sep 2022 10:29:33 -0700 (PDT)
-Received: from krzk-bin (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.gmail.com with ESMTPSA id r10-20020ac24d0a000000b0048af3c090f8sm1039477lfi.13.2022.09.22.10.29.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 10:29:33 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 19:29:31 +0200
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Tomer Maimon <tmaimon77@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, joel@jms.id.au, yuenn@google.com,
-        tali.perry1@gmail.com, benjaminfair@google.com,
-        krzysztof.kozlowski+dt@linaro.org, avifishman70@gmail.com,
-        devicetree@vger.kernel.org, venture@google.com,
-        linux-crypto@vger.kernel.org, olivia@selenic.com,
-        openbmc@lists.ozlabs.org, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=3d4XtRz1UVTn9UF6tNTg+CLRSot5BsaX/kpuz1aoWSk=;
+        b=IF8k7lCJ53g2BKz07dcYwmEq5WUhYyJI5r3JsktEhZWqNNY4CpHiLwjBySC26fV4RT
+         +gRkczCwNGHR0sinOXdcp5aINYSS9GR7OZpylIsVXszbpz3PYQ2X4Q2H83Fn6DrKRqus
+         QPBTR9xHg8dzN1Whk4FUTWKv7IYt8nNOdkNi0jbV7CF1KPmQFBTAXXJEM3vXVFUdvYnL
+         gGITl8E1RbBofZm1RtVuWxXkLqb3hav/G2EWswBWMQX+3jFvuGELDlDr6A4CoWRyFbHY
+         okpPjtkmW4FLNSrhYm94un7xRFKSrWXyuBKFPTiHJN0oj25iEb5fDoBLrciOwYtY0/Zu
+         l8Sg==
+X-Gm-Message-State: ACrzQf2IoI5ObeNyzwne29mXaGj/aFoeiVDZ4UGgjAFiw65WuzpOEOMj
+        3WnLhai6qBMtWgkHbew/4EfxQQ==
+X-Google-Smtp-Source: AMsMyM6UoHvK8OQptpz3VhwCgTvbTRlcBxKMUrZWJW1n57MxTQw07sco9Ija42Do0y41A8n03+5iNQ==
+X-Received: by 2002:a2e:a54c:0:b0:26c:50c6:75c1 with SMTP id e12-20020a2ea54c000000b0026c50c675c1mr1540727ljn.408.1663867807861;
+        Thu, 22 Sep 2022 10:30:07 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id h14-20020a05651c124e00b00266af46abccsm1011655ljh.72.2022.09.22.10.30.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Sep 2022 10:30:07 -0700 (PDT)
+Message-ID: <14c980cf-314f-811f-98b8-18457625c2d6@linaro.org>
+Date:   Thu, 22 Sep 2022 19:30:06 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
 Subject: Re: [PATCH v1 1/2] dt-bindings: rng: nuvoton,npcm-rng: Add npcm845
  compatible string
-Message-ID: <20220922172931.rf37x4xig5znjvlu@krzk-bin>
+Content-Language: en-US
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To:     Tomer Maimon <tmaimon77@gmail.com>, avifishman70@gmail.com,
+        tali.perry1@gmail.com, joel@jms.id.au, venture@google.com,
+        yuenn@google.com, benjaminfair@google.com, olivia@selenic.com,
+        herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org
+Cc:     openbmc@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
 References: <20220922142216.17581-1-tmaimon77@gmail.com>
  <20220922142216.17581-2-tmaimon77@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220922142216.17581-2-tmaimon77@gmail.com>
+ <29d54940-997a-865a-b9d0-c043a8c9ce99@linaro.org>
+In-Reply-To: <29d54940-997a-865a-b9d0-c043a8c9ce99@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 22 Sep 2022 17:22:15 +0300, Tomer Maimon wrote:
-> Add a compatible string for Nuvoton BMC NPCM845 RNG.
+On 22/09/2022 17:08, Krzysztof Kozlowski wrote:
+> On 22/09/2022 16:22, Tomer Maimon wrote:
+>> Add a compatible string for Nuvoton BMC NPCM845 RNG.
+>>
+>> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+>> ---
+>>  Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml | 4 +++-
 > 
-> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
-> ---
->  Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+And un-acked. Test your patches.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml:20:9: [warning] wrong indentation: expected 6 but found 8 (indentation)
+Please run `make dt_binding_check` (see
+Documentation/devicetree/bindings/writing-schema.rst for instructions).
 
-dtschema/dtc warnings/errors:
+Best regards,
+Krzysztof
 
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/patch/1681163
-
-This check can fail if there are any dependencies. The base for a patch
-series is generally the most recent rc1.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit.
