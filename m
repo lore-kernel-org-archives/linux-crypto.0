@@ -2,229 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E917CC6FA82
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Sep 2022 18:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 197B0ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 02:38:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbiIUSv6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Sep 2022 14:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
+        id S229673AbiIVCiU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Sep 2022 22:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiIUSv5 (ORCPT
+        with ESMTP id S229667AbiIVCiT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Sep 2022 14:51:57 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AD979AF95;
-        Wed, 21 Sep 2022 11:51:56 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28LIBBgi030322;
-        Wed, 21 Sep 2022 18:51:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2022-7-12;
- bh=XQcYyLCcmQyAQNtZnxqDEpu66Qtd4Kmf8BlzsoXcick=;
- b=okKAhyAVPUIlweumwpgmbb7D8ARo+HfNlTzv2gTHhrO1QZ/Gwe+2UFxdVWUBAVoj2JWj
- aPmp+CD3nFuwTprQ87GiGFo4Y8/0CGBVx71TXO/P8+F/p4Ch+kW/xiVJ26N+acrgMjU7
- ADx/5clhFZHzd7bhIYEYgT1gzXq3dj0S5sz26lTQdCmsva/puls9qW9MxJco6gHiSR5P
- efR3Z30AWJHmLFtFHE76rewLZE+nDJNAzvWUB/8F39jivg4VGbkJFgMaXEYolWoRudu1
- SWq784mTm0SGgl9pw5MtIVh10GdJc43yMqBA6huK7LMaa5cqvMTFVj+zSY9OBdkpex8I Iw== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3jn688jwwq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Sep 2022 18:51:46 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 28LICCaJ009922;
-        Wed, 21 Sep 2022 18:51:44 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2041.outbound.protection.outlook.com [104.47.56.41])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3jp3caf16r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Sep 2022 18:51:44 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cexDLvkohta7UW7YinVtz2krrDwfUTQUvJiNj13XQZVQQUFFUyLsz4hr/U7yHiKJtEzzF/n6qCFic8Ks4wmzinU6Habe5sMw6SKIFVogu36gcwxdT3n6T52MDjbQZ+YoK96v9yzv79ufd8OQicLQPcMzIRTpw2DZZWTv2bCL1HcCqaEXKBFql0Ru/snG+upTJlOahEKmiYtUGLPShlFuCJFkmg6qNuvFibQ0iGg4ThsjRm0DUVZLzd3XKH4jbMnrP7zrgB0UJY8EJLnRMyDzF77FpY33JnTGMLhu1lC3pD5rHvcykI0clTpnhxbgKW54HYAcY9EvyQJzG06cHDcZsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XQcYyLCcmQyAQNtZnxqDEpu66Qtd4Kmf8BlzsoXcick=;
- b=PcRjx2Cg7R9L2pMEt4LEBegoITFiSFwiaY3g+L1bX1GJ/V/4X1KdAVGKYYCr/9JbKISEuwr+n690sCOBncRSQOy/4fbdhQTABiljG3n5FT2faTuqr5JMysIUQXBTIM7vi/BAYha9BXcGEdTQxtTuJb8ticVSoFSnjU94E9BrOD8XwWBI8SV3Uxf/19ecwM717EGa8ia61oKUhAkuxqxSAIwGFgNorzRRBAptgmgFfd78QdKP1qfwHoirYEHr3K25TERTo94VK9EJv6oqNvGHQYA/x/pSZ7ay0sauP4UzMUFs0pBbEmSH6c5mzVqIiRApDzCAxJK+muJwEStS0h2z/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XQcYyLCcmQyAQNtZnxqDEpu66Qtd4Kmf8BlzsoXcick=;
- b=UVinQTcFaPoch1JlWa3H813aHJyBzNzRqC2yYQzEI/SrZw1BJCQ/XtfJ2ON/l1WVwKtf1mq17g/cvzFaO/VSZcDVbnlIx6N+WylqWgCXcWdpDJ4PdXZP/nz9QmpBg5U+qP25aheAmB5xPxfkTHHgLjxlEDsYTCp9wu+L/fVPaJU=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SJ0PR10MB4720.namprd10.prod.outlook.com (2603:10b6:a03:2d7::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.16; Wed, 21 Sep
- 2022 18:51:42 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::610f:82ba:a9ad:bd65]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::610f:82ba:a9ad:bd65%7]) with mapi id 15.20.5654.017; Wed, 21 Sep 2022
- 18:51:42 +0000
-Date:   Wed, 21 Sep 2022 14:51:38 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     eadavis@sina.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
-Message-ID: <20220921185138.c6chlv77ugfrsukj@oracle.com>
-References: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
- <20220920003908.391835-1-eadavis@sina.com>
- <20220920014711.bvreurf4ex44w6oj@oracle.com>
- <20220920055443.GI2950045@gauss3.secunet.de>
- <20220920141057.cy54d5ukflrgay3a@oracle.com>
- <20220921073616.GZ2950045@gauss3.secunet.de>
+        Wed, 21 Sep 2022 22:38:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F5EAC25B;
+        Wed, 21 Sep 2022 19:38:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E881763145;
+        Thu, 22 Sep 2022 02:38:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1A36C433D6;
+        Thu, 22 Sep 2022 02:38:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663814297;
+        bh=MOtwl9mtwhtHTWDeXYdNcwvXQVIElYFyIDDemYh6RtQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=twmF+KMsN6Awv35vKFSKmpcxIR9EJ/rmGSpB1v+r1o1Q4xXjCNi8Zdmv44LIDZsTu
+         /qREctSOI92mNJI03HKwsbvummXIha6buUJLJCVbM5J3938Yd6lB2ukaZ71KWYCRT2
+         4XUSqL99aNvOIdWODuqKAdfYgwZZUywPHNEarGPMd3OsSRk8SuA4DiDxofSaTn3cs9
+         AcQTp0jHWmuvV5QDnvvmkPzGl/uoEejgYBrZrO9TnDLPDFvpU4wYcWJV5A3/JEarmI
+         2euJ+VWZLrutaD4s7aim7XbmQaTHZTLtSYz0qBRqbeXRF9kDndnAZ3K0Oc+Ic4P19R
+         RV4t6khNZM3mA==
+Date:   Thu, 22 Sep 2022 08:08:13 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     dmaengine@vger.kernel.org, agross@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, thara.gopinath@gmail.com,
+        devicetree@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v7 1/1] dma: qcom: bam_dma: Add support to initialize
+ interconnect path
+Message-ID: <YyvKlWgaPVV3su8f@matsya>
+References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
+ <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220921073616.GZ2950045@gauss3.secunet.de>
-X-ClientProxiedBy: BL0PR1501CA0006.namprd15.prod.outlook.com
- (2603:10b6:207:17::19) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|SJ0PR10MB4720:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb85bbba-38cd-4aa0-0afa-08da9c0252d8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VxmzfxCOGVBZ6kmHxswPIshm25/22OvxJ3syIjG+kPPugpwCxh3m5uaP3gG7cvOCtpug7ZrGGq7Eu08nLcUK/EXrRnGTPfbksgqfpV+kEY6PUKRcKNW9XgGi60En11/uU3zATRhEEJGO12Nt9TmQaWVmrLqbMl7mx/UC0cDJwskeLI8k3JPQuhjooY7vJnpkq45nGT6tmn5CuUAosrMybMW12lZh3yitLkzJi90neDY3KuzvG82nAX98AHZ7j3KQsAr5F+6vXofntyMZLkWnMUAZNk1uvo+s/XCVYzvMK7ny0+HKi8MWht+1QCug1VsZwbo3+/kV4uv13g1se6HXF19dCbGMHkpWshUNOYbCxKpUQbwKBc8xeT6WoL4P2Uua78RBtVssCVp8cbMWM7N6w8QMwGz/VIep5um3EW5M2hyppbtCqz6fxP5onVfuLT+sAOyrDNmsjnCXDMA8q6ORmG3cVAKVrNRjtEJy4AOaf9OZY8BopwfXVweQjTczsDXpBbt3lipBCQ0h4ijWJdfI4yQo67YEVCl6WbEmVh9jEfs5RWoavJKcjZ9pfTG2aRImQrNzB9+9KFBr0eT9GmOsc+SYE4MGITf4+shS+rvITBCxw+WRqkdSx7L+NAlK+AAZA8CVxBWTe/z371DEhF8OC96wM7iCT99QeuZSBYm4LwClHvziFpaT3JfGIYiQiGu0X/y1qzAKcWeiwyPMC2C3OVAADovPiKnh5ahqz+kX27EE6UwpqODFVWx7F/8WwhRj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(396003)(136003)(39860400002)(346002)(451199015)(2906002)(36756003)(4326008)(66556008)(66476007)(83380400001)(38100700002)(38350700002)(8676002)(5660300002)(66946007)(6916009)(86362001)(316002)(41300700001)(8936002)(186003)(1076003)(2616005)(478600001)(6512007)(26005)(6506007)(6486002)(6666004)(52116002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?s0eggLRn7bau+Bh39h7yAUC5NGJbfDXf56EBbnzZl4ADwbOV7xQcs37YXvxX?=
- =?us-ascii?Q?b5hAntuyCyZ1Nb67gxrcC4wepx5yb0dfOVr5Mjcz7k/bqiglUF/qu4FfOOwE?=
- =?us-ascii?Q?67Myw0eOED8xJDS709QibHHsAkd0ojCMcYrIeWY3o86eSacyD/peoow5FsHO?=
- =?us-ascii?Q?J3D6rk76eAb2kCkJIk1wtAwYZsajsoAOhQd0IHQ7n7IuhjLQ4MyLGBPwGVKO?=
- =?us-ascii?Q?o87YABJqJpj/qKTJAE4sFIitF/oewtu275zCy6LqKQtAXpLUHNHQ7GE505as?=
- =?us-ascii?Q?sahqWKYKTl3V3ZJisAzJHULt6hVHUeHUcn/3pHcUN92FmBI1xhe0rowhUHPH?=
- =?us-ascii?Q?O3+O4vQEsKn1MH0qC6KTQTOvZUFuxMyotnR5e2ZCB7EfnktMDJoI9IQS/ZSi?=
- =?us-ascii?Q?MbLbtGnTFdYwFMifh4lkyaPVBdXHi9nRfnyf9uqRioRnsyAfDeKF3s3bDFix?=
- =?us-ascii?Q?LkG8B6cKD+c6Srujh51wk0pNv34gzunK46vPT9M3/09eswGHPPYcyFo3fFpC?=
- =?us-ascii?Q?4JdwFJKENkE9MnMPvKjOwlW5Ie203WgX68yKeN/zpR+Wl8VPpGn9SODkzQVB?=
- =?us-ascii?Q?OwsUtF9O5EqrH4af+jXm+ZRuiy5Fr44MfaZOdaFpoIvXTcuR/Iiqa8zi8WSe?=
- =?us-ascii?Q?pM7deDz25KXvILx0M3nDSynbXE1s+oVCJ94CpXu6W0trpdRQxSJvbYYpNuJv?=
- =?us-ascii?Q?gTwDS8RncvnUFlM6bV4fSR0QPTABKitVSUwIpzqkU8H7bwwh8mV/+Gm7TI8n?=
- =?us-ascii?Q?Nd3oTtmC9cRd6gWHtnF0C5s7puMHbdz0bqzywN6k01rEc4wl281i0cWMN/sg?=
- =?us-ascii?Q?VaB+AkjcfRsPQGULMAhfolYpT+GFwRRPiQPtVmLkCFGL/cYsQj0Bw0aLWyGO?=
- =?us-ascii?Q?wPn+lW+rD4myfIqUVSoKonZuaNZdhm0OgixZy4qoPM5T40otaghv6jVDO+hi?=
- =?us-ascii?Q?pDbHXN1yvCJ0Zl+/zHP7Oq9V1BeeVEm+4UzknbfTV+0WjVaygAhfYFbkco8D?=
- =?us-ascii?Q?uF4Zbw97UI6oRZUz3i/WSyDMEej2jYdI5xvoXYaFGETPeLrp9uQseura3nNC?=
- =?us-ascii?Q?Pdu5ifySt2npMDpOLPjaVn0Bqkwz2nXevtoQICl2OaXjrpfQ00ZRO3a5vmgE?=
- =?us-ascii?Q?/9jpNFsGpYHzNfW98fbq7epZYwP1oI6mh4VbNglhEgTX6zx7dLHQPJzDqGJT?=
- =?us-ascii?Q?vJqZuAxdnXE4JsxMOTjGBxHiZCI5d5TaGHPWZ6Fhpg2ioqXOiObASPAHdjPk?=
- =?us-ascii?Q?KbjOsuXjmTm/hjj8/oY5A6M44V4IosP80fpyJCKamJ6sFUd9Yt4TryfOhuhh?=
- =?us-ascii?Q?zicCXsLPKLpxGBFWrn3tJ9pxUiRpAZhZrpxIqwAtqN+cSyNExgk8Kc+Fc6So?=
- =?us-ascii?Q?Dqq0LzosBJlU40j8sVFxCawdZQzFMhr9NpB66m0OyfWNhzY5HdlLQVSzWcgd?=
- =?us-ascii?Q?VJ7l9tKgXXdwzdIbSr+hTIiri91HlCoPHRQrC9J4V0aYE4ASEWHv92wKm+z2?=
- =?us-ascii?Q?BdOG5Zj2liu8menAhnOitHeL6xL2VSzkDFqwpt1vaHKnlG//CVcplL+RRnsS?=
- =?us-ascii?Q?uMPB6mrS8Phd+e+JX5y60oM7zIH8ua+VAnWoK4g8S0eOe2x/AFtBBlgfF/l0?=
- =?us-ascii?Q?Sw=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb85bbba-38cd-4aa0-0afa-08da9c0252d8
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2022 18:51:42.4478
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: giMgrqAeVWyKEYwlRc0XF6efMB4cQLRev1t2mRvFngDENoo3BFyNlDrRDG6bPyvRTNJQtfmYdEml1oJlp3oEE+S2qUXdSexhnIPsa2RS1Go=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4720
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-21_09,2022-09-20_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2209210126
-X-Proofpoint-GUID: nOe2zmgZHZrVzM0qXWNEGewvrxrIUeml
-X-Proofpoint-ORIG-GUID: nOe2zmgZHZrVzM0qXWNEGewvrxrIUeml
+In-Reply-To: <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 09:36:16AM +0200, Steffen Klassert wrote:
-> On Tue, Sep 20, 2022 at 10:10:57AM -0400, Daniel Jordan wrote:
-> > Yeah, padata_do_serial can be called with BHs off, like in the tipc
-> > stack, but there are also cases where BHs can be on, like lockdep said
-> > here:
+On 21-09-22, 08:36, Bhupesh Sharma wrote:
+> From: Thara Gopinath <thara.gopinath@gmail.com>
 > 
-> padata_do_serial was designed to run with BHs off, it is a bug if it
-> runs with BHs on. But I don't see a case where this can happen. The
-> only user of padata_do_serial is pcrypt in its serialization callbacks
-> (pcrypt_aead_enc, pcrypt_aead_dec) and the async crypto callback
-> pcrypt_aead_done. pcrypt_aead_enc and pcrypt_aead_dec are issued via
-> the padata_serial_worker with the padata->serial call. BHs are
-> off here. The crypto callback also runs with BHs off.
+> BAM dma engine associated with certain hardware blocks could require
+> relevant interconnect pieces be initialized prior to the dma engine
+> initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
+> is passed on to the bam dma driver from dt via the "interconnects"
+> property. Add support in bam_dma driver to check whether the interconnect
+> path is accessible/enabled prior to attempting driver intializations.
 > 
-> What do I miss here?
+> If interconnects are not yet setup, defer the BAM DMA driver probe().
+> 
+> Cc: Bjorn Andersson <andersson@kernel.org>
+> Cc: Rob Herring <robh@kernel.org>
+> Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
+> ---
+>  drivers/dma/qcom/bam_dma.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+> index 2ff787df513e..a5b0cf28ffb7 100644
+> --- a/drivers/dma/qcom/bam_dma.c
+> +++ b/drivers/dma/qcom/bam_dma.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/io.h>
+>  #include <linux/init.h>
+> +#include <linux/interconnect.h>
+>  #include <linux/slab.h>
+>  #include <linux/module.h>
+>  #include <linux/interrupt.h>
+> @@ -394,6 +395,7 @@ struct bam_device {
+>  	const struct reg_offset_data *layout;
+>  
+>  	struct clk *bamclk;
+> +	struct icc_path *mem_path;
+>  	int irq;
+>  
+>  	/* dma start transaction tasklet */
+> @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
+>  	if (IS_ERR(bdev->bamclk))
+>  		return PTR_ERR(bdev->bamclk);
+>  
+> +	/* Ensure that interconnects are initialized */
+> +	bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
+> +	if (IS_ERR(bdev->mem_path)) {
+> +		ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
+> +				    "failed to acquire icc path\n");
+> +		return ret;
+> +	}
 
-Ugh.. this newer, buggy part of padata_do_parallel:
+So this makes us fail on older DT where icc path may not be present.
+Should this not be an optional thing?
 
-  /* Maximum works limit exceeded, run in the current task. */
-  padata->parallel(padata);
+> +
+>  	ret = clk_prepare_enable(bdev->bamclk);
+>  	if (ret) {
+>  		dev_err(bdev->dev, "failed to prepare/enable clock\n");
+> -- 
+> 2.37.1
 
-This skips the usual path in padata_parallel_worker, which disables BHs.
-They should be left off in the above case too.
-
-What about this?
-
----8<---
-
-Subject: [PATCH] padata: always leave BHs disabled when running ->parallel()
-
-A deadlock can happen when an overloaded system runs ->parallel() in the
-context of the current task:
-
-    padata_do_parallel
-      ->parallel()
-        pcrypt_aead_enc/dec
-          padata_do_serial
-            spin_lock(&reorder->lock) // BHs still enabled
-              <interrupt>
-                ...
-                  __do_softirq
-                    ...
-                      padata_do_serial
-                        spin_lock(&reorder->lock)
-
-It's a bug for BHs to be on in _do_serial as Steffen points out, so
-ensure they're off in the "current task" case like they are in
-padata_parallel_worker to avoid this situation.
-
-Reported-by: syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com
-Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
----
- kernel/padata.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index e5819bb8bd1d..97f51e0c1776 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -207,14 +207,16 @@ int padata_do_parallel(struct padata_shell *ps,
- 	pw = padata_work_alloc();
- 	spin_unlock(&padata_works_lock);
- 
-+	if (!pw) {
-+		/* Maximum works limit exceeded, run in the current task. */
-+		padata->parallel(padata);
-+	}
-+
- 	rcu_read_unlock_bh();
- 
- 	if (pw) {
- 		padata_work_init(pw, padata_parallel_worker, padata, 0);
- 		queue_work(pinst->parallel_wq, &pw->pw_work);
--	} else {
--		/* Maximum works limit exceeded, run in the current task. */
--		padata->parallel(padata);
- 	}
- 
- 	return 0;
 -- 
-2.37.2
-
+~Vinod
