@@ -2,98 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D48C6FA82
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 14:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9281AC6FA86
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 14:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbiIVOCC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 10:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57930 "EHLO
+        id S230165AbiIVOZv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 10:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230033AbiIVOB5 (ORCPT
+        with ESMTP id S231846AbiIVOZj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 10:01:57 -0400
-Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62583D0795;
-        Thu, 22 Sep 2022 07:01:55 -0700 (PDT)
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 304A8201342;
-        Thu, 22 Sep 2022 14:01:53 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 2B27B80607; Thu, 22 Sep 2022 15:51:05 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 15:51:05 +0200
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] random: throttle hwrng writes if no entropy is credited
-Message-ID: <YyxoSV3p0JPMMeWO@owl.dominikbrodowski.net>
-References: <20220920141438.2782446-1-Jason@zx2c4.com>
+        Thu, 22 Sep 2022 10:25:39 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7057798A57;
+        Thu, 22 Sep 2022 07:25:34 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MYHZK38VTzHpvG;
+        Thu, 22 Sep 2022 22:23:21 +0800 (CST)
+Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
+ dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 22 Sep 2022 22:25:32 +0800
+Received: from [10.67.108.67] (10.67.108.67) by dggpemm500013.china.huawei.com
+ (7.185.36.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 22 Sep
+ 2022 22:25:31 +0800
+Message-ID: <71274d7a-8a79-3954-d462-5cc8b5a5e874@huawei.com>
+Date:   Thu, 22 Sep 2022 22:25:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220920141438.2782446-1-Jason@zx2c4.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0
+Subject: Re: [PATCH -next 1/3] arm64: efi-header: Mark efi header as data
+Content-Language: en-US
+To:     Ard Biesheuvel <ardb@kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <broonie@kernel.org>,
+        <maz@kernel.org>, <mark.rutland@arm.com>,
+        <anshuman.khandual@arm.com>
+References: <20220922130452.233323-1-chenzhongjin@huawei.com>
+ <20220922130452.233323-2-chenzhongjin@huawei.com>
+ <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
+From:   Chen Zhongjin <chenzhongjin@huawei.com>
+In-Reply-To: <CAMj1kXGSjGr_yBC_9DiFu4k3JpDRPB+BPuKdNu2XeSWT2BSZvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.108.67]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500013.china.huawei.com (7.185.36.172)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+Hi,
 
-thanks for splitting this change out of my other patch. You can add my
-Signed-off-by, but I'd like to suggest rewriting the commit message as
-follows (please modify as needed):
+On 2022/9/22 21:13, Ard Biesheuvel wrote:
+> On Thu, 22 Sept 2022 at 15:08, Chen Zhongjin <chenzhongjin@huawei.com> wrote:
+>> This file only contains a set of constants forming the efi header.
+>>
+>> Make the constants part of data symbols by wrapping them with
+>> SYM_DATA.
+>>
+>> Signed-off-by: Julien Thierry <jthierry@redhat.com>
+>> Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
+>> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Why is this necessary? These are not emitted into a .text section, and
+> are not even covered by the kernel's mapping of memory. So the .L
+> prefixed labels are deliberate: it prevents the symbols from polluting
+> the symbol namespace with symbols pointing nowhere.
+>
+This is basically because when I'm developing objtool and these 
+constants will disrupts
+
+the instruction decoding so I just mark them as x86 did.
 
 
-In case a hwrng source does not provide (trusted) entropy, it cannot
-assist in initializing the CRNG. Therefore, in case
-add_hwgenerator_randomness() is called with the entropy parameter set
-to zero, go to sleep until one reseed interval has passed.
+I tried to sent this patch set is because now the objtool patch set is 
+growing huge so I
 
-While the hwrng thread currently only runs under conditions where this
-is non-zero, this change is not harmful and prepares for future updates
-to the hwrng core.
+want to split some independent part. But now I found you are right that 
+this are
 
-
-Thanks,
-	Dominik
+meaningless. They are not even inside vmlinux. I'll discard them.
 
 
+Sorry for bothering and thanks for your advise and patient!
 
+Best,
 
-Am Tue, Sep 20, 2022 at 04:14:38PM +0200 schrieb Jason A. Donenfeld:
-> This value is currently never set to zero, because the hwrng thread only
-> runs if it's going to be non-zero. This is an oversight, however, that
-> Dominik is working on fixing. In preparation for this, and so that
-> there's less coordination required between my tree and Herbert's, make
-> this currently useless, but not harmful, change here now, in hopes that
-> Dominik can make the corresponding change in the hwrng core later.
-> 
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 16e0c5f6cf2f..520a385c7dab 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -865,9 +865,9 @@ void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy)
->  
->  	/*
->  	 * Throttle writing to once every reseed interval, unless we're not yet
-> -	 * initialized.
-> +	 * initialized or no entropy is credited.
->  	 */
-> -	if (!kthread_should_stop() && crng_ready())
-> +	if (!kthread_should_stop() && (crng_ready() || !entropy))
->  		schedule_timeout_interruptible(crng_reseed_interval());
->  }
->  EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-> -- 
-> 2.37.3
-> 
+Chen
+
+>> ---
+>>   arch/arm64/kernel/efi-header.S | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/arch/arm64/kernel/efi-header.S b/arch/arm64/kernel/efi-header.S
+>> index 28d8a5dca5f1..3eacd27ab761 100644
+>> --- a/arch/arm64/kernel/efi-header.S
+>> +++ b/arch/arm64/kernel/efi-header.S
+>> @@ -28,6 +28,7 @@
+>>          .macro  __EFI_PE_HEADER
+>>   #ifdef CONFIG_EFI
+>>          .set    .Lpe_header_offset, . - .L_head
+>> +SYM_DATA_START_LOCAL(arm64_efi_header)
+>>          .long   PE_MAGIC
+>>          .short  IMAGE_FILE_MACHINE_ARM64                // Machine
+>>          .short  .Lsection_count                         // NumberOfSections
+>> @@ -160,6 +161,7 @@
+>>
+>>          .balign SEGMENT_ALIGN
+>>   .Lefi_header_end:
+>> +SYM_DATA_END_LABEL(arm64_efi_header, SYM_L_LOCAL, efi_header_end)
+>>   #else
+>>          .set    .Lpe_header_offset, 0x0
+>>   #endif
+>> --
+>> 2.17.1
+>>
