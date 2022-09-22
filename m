@@ -2,146 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29476C6FA8B
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 09:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D937C54EE9
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 10:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbiIVJVI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 05:21:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57736 "EHLO
+        id S229470AbiIVKzp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 06:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiIVJVA (ORCPT
+        with ESMTP id S230449AbiIVKzo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 05:21:00 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D25611164;
-        Thu, 22 Sep 2022 02:20:58 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id 63so11887459ybq.4;
-        Thu, 22 Sep 2022 02:20:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=2+S7HlEBuVCJM6F80dB4f4rhA0eBwB5EJEsljjj7oEQ=;
-        b=R61FC6aLSg96pCV7GEgkVJaRSMSzV4HdLoxaGeQqb6KMHlOElwQFntvX2tiU8aHuSr
-         kuY33t90hDFNARwlj4HAGOOK/Ragw8GM1WaZ63Y/q213syPamW2RSRhyJ0uSIw2kzXPp
-         r7AshXemKH5rGdmvklR/pmijvIjz/3i1eE4EkfaPDBPQVEww4AJMw9tLMJ/7oWHs/70u
-         6JnJzh2bcBv2FFftlv2rhJfFM0G4ZsYjf0+I6q7anQT3JW6tEYYCtLcrM2do2JT2tknk
-         23glncEimVMOmnZmFtNlprQj2K/M+2dMZUf2NmXO59pcScVGS+YobiNU9Q4xL9Q00V4q
-         KVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=2+S7HlEBuVCJM6F80dB4f4rhA0eBwB5EJEsljjj7oEQ=;
-        b=nFOd1zpqVKsxqXeILdrwwFM1AJjhl4g58zPk5mPK4q0nz2ggSv/Xs4C6t7n2A0irEB
-         H0uQknpP6pjAaYdTpj1YWB7vmTOqSLZeIO3yXFYh/QpUqe5W1j34X2Laq0eoZ/Fmwrst
-         N2aQ5jqfD43qYhivNxT31wUz5uW/dm7bysmykvsF43lRQRPyAXKJQqSb2cdgoqVX4Ix0
-         36HPzmIXSrHaCzpLVS+7QTBTHN2wwVtM/LD/+bQZ9OBS2eKYtfJJFzb0pUG88xIntwW7
-         GtItHcdcvOX+i/MWciNS+q+BcQqNKNr+JgPEpByvtkJ71NpszbI+i4SVuaVHIspV9fe7
-         OQSw==
-X-Gm-Message-State: ACrzQf2D+4Xy+FUytauXou6zw99W5knIPZ5wG4AX/icgRMG2OSDGBE3b
-        HU7YuGcJSL/ENrCOpNKfPsjc3OxkFhO2Zwh0y28=
-X-Google-Smtp-Source: AMsMyM5EyN7u4n8EdbXrBjCRzmUqkG32AKx0gm9gp4ayEyX1apBgRrSArCx2QDVBntwIADukECOsIoP/EiUdHpNR/MM=
-X-Received: by 2002:a25:bd52:0:b0:6b4:22fa:8226 with SMTP id
- p18-20020a25bd52000000b006b422fa8226mr2621525ybm.31.1663838457943; Thu, 22
- Sep 2022 02:20:57 -0700 (PDT)
+        Thu, 22 Sep 2022 06:55:44 -0400
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629019E105;
+        Thu, 22 Sep 2022 03:55:41 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id 0ABEC20519;
+        Thu, 22 Sep 2022 12:55:39 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id ZL9nvv1PUCu7; Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 71E7020460;
+        Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+        by mailout1.secunet.com (Postfix) with ESMTP id 60A0A80004A;
+        Thu, 22 Sep 2022 12:55:38 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 22 Sep 2022 12:55:38 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 22 Sep
+ 2022 12:55:37 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+        id 58ED43180DDF; Thu, 22 Sep 2022 12:55:37 +0200 (CEST)
+Date:   Thu, 22 Sep 2022 12:55:37 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+CC:     <eadavis@sina.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH] padata: fix lockdep warning in padata serialization
+Message-ID: <20220922105537.GI2950045@gauss3.secunet.de>
+References: <20220919151248.smfo7nq6yoqzy2vo@oracle.com>
+ <20220920003908.391835-1-eadavis@sina.com>
+ <20220920014711.bvreurf4ex44w6oj@oracle.com>
+ <20220920055443.GI2950045@gauss3.secunet.de>
+ <20220920141057.cy54d5ukflrgay3a@oracle.com>
+ <20220921073616.GZ2950045@gauss3.secunet.de>
+ <20220921185138.c6chlv77ugfrsukj@oracle.com>
 MIME-Version: 1.0
-References: <20220919060342.26400-1-lukas.bulwahn@gmail.com> <202209192252.T6IGLNqC-lkp@intel.com>
-In-Reply-To: <202209192252.T6IGLNqC-lkp@intel.com>
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Date:   Thu, 22 Sep 2022 11:20:47 +0200
-Message-ID: <CAKXUXMy=1_AvqwhjEzaov5jj4sCiB5vB67QsXA395-J7N2Vtqg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: add rsize config to .config only if lib_poly1305
- is set
-To:     kernel test robot <lkp@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, llvm@lists.linux.dev,
-        kbuild-all@lists.01.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220921185138.c6chlv77ugfrsukj@oracle.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 5:10 PM kernel test robot <lkp@intel.com> wrote:
->
-> Hi Lukas,
->
-> I love your patch! Yet something to improve:
+On Wed, Sep 21, 2022 at 02:51:38PM -0400, Daniel Jordan wrote:
+> On Wed, Sep 21, 2022 at 09:36:16AM +0200, Steffen Klassert wrote:
+> > On Tue, Sep 20, 2022 at 10:10:57AM -0400, Daniel Jordan wrote:
+> > > Yeah, padata_do_serial can be called with BHs off, like in the tipc
+> > > stack, but there are also cases where BHs can be on, like lockdep said
+> > > here:
+> > 
+> > padata_do_serial was designed to run with BHs off, it is a bug if it
+> > runs with BHs on. But I don't see a case where this can happen. The
+> > only user of padata_do_serial is pcrypt in its serialization callbacks
+> > (pcrypt_aead_enc, pcrypt_aead_dec) and the async crypto callback
+> > pcrypt_aead_done. pcrypt_aead_enc and pcrypt_aead_dec are issued via
+> > the padata_serial_worker with the padata->serial call. BHs are
+> > off here. The crypto callback also runs with BHs off.
+> > 
+> > What do I miss here?
+> 
+> Ugh.. this newer, buggy part of padata_do_parallel:
+> 
+>   /* Maximum works limit exceeded, run in the current task. */
+>   padata->parallel(padata);
 
-Thanks, kernel test robot ;)
+Oh well...
 
-Okay, I see that I need to reiterate on this patch. The crypto caam
-driver pulls in a number of headers without a dependency with Kconfig
-on the corresponding config symbol here. I will check if I find a good
-solution for that.
+> This skips the usual path in padata_parallel_worker, which disables BHs.
+> They should be left off in the above case too.
+> 
+> What about this?
+> 
+> ---8<---
+> 
+> Subject: [PATCH] padata: always leave BHs disabled when running ->parallel()
+> 
+> A deadlock can happen when an overloaded system runs ->parallel() in the
+> context of the current task:
+> 
+>     padata_do_parallel
+>       ->parallel()
+>         pcrypt_aead_enc/dec
+>           padata_do_serial
+>             spin_lock(&reorder->lock) // BHs still enabled
+>               <interrupt>
+>                 ...
+>                   __do_softirq
+>                     ...
+>                       padata_do_serial
+>                         spin_lock(&reorder->lock)
+> 
+> It's a bug for BHs to be on in _do_serial as Steffen points out, so
+> ensure they're off in the "current task" case like they are in
+> padata_parallel_worker to avoid this situation.
+> 
+> Reported-by: syzbot+bc05445bc14148d51915@syzkaller.appspotmail.com
+> Fixes: 4611ce224688 ("padata: allocate work structures for parallel jobs from a pool")
+> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-For now, this patch can be ignored until I find time to send out a patch v2.
+Yes, that makes sense.
 
-Lukas
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
->
-> [auto build test ERROR on herbert-cryptodev-2.6/master]
-> [also build test ERROR on herbert-crypto-2.6/master linus/master v6.0-rc6 next-20220919]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Lukas-Bulwahn/crypto-add-rsize-config-to-config-only-if-lib_poly1305-is-set/20220919-140531
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> config: arm-defconfig (https://download.01.org/0day-ci/archive/20220919/202209192252.T6IGLNqC-lkp@intel.com/config)
-> compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 791a7ae1ba3efd6bca96338e10ffde557ba83920)
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # install arm cross compiling tool for clang build
->         # apt-get install binutils-arm-linux-gnueabi
->         # https://github.com/intel-lab-lkp/linux/commit/c1954797e493eabf02f354e290fe380ace0633e4
->         git remote add linux-review https://github.com/intel-lab-lkp/linux
->         git fetch --no-tags linux-review Lukas-Bulwahn/crypto-add-rsize-config-to-config-only-if-lib_poly1305-is-set/20220919-140531
->         git checkout c1954797e493eabf02f354e290fe380ace0633e4
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/crypto/caam/
->
-> If you fix the issue, kindly add following tag where applicable
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->    In file included from drivers/crypto/caam/ctrl.c:15:
->    In file included from drivers/crypto/caam/compat.h:41:
-> >> include/crypto/poly1305.h:56:32: error: use of undeclared identifier 'CONFIG_CRYPTO_LIB_POLY1305_RSIZE'
->                    struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
->                                                 ^
->    1 error generated.
->
->
-> vim +/CONFIG_CRYPTO_LIB_POLY1305_RSIZE +56 include/crypto/poly1305.h
->
-> 878afc35cd28bc Eric Biggers       2018-11-16  40
-> 2546f811ef45fc Martin Willi       2015-07-16  41  struct poly1305_desc_ctx {
-> 2546f811ef45fc Martin Willi       2015-07-16  42        /* partial buffer */
-> 2546f811ef45fc Martin Willi       2015-07-16  43        u8 buf[POLY1305_BLOCK_SIZE];
-> 2546f811ef45fc Martin Willi       2015-07-16  44        /* bytes used in partial buffer */
-> 2546f811ef45fc Martin Willi       2015-07-16  45        unsigned int buflen;
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  46        /* how many keys have been set in r[] */
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  47        unsigned short rset;
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  48        /* whether s[] has been set */
-> 2546f811ef45fc Martin Willi       2015-07-16  49        bool sset;
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  50        /* finalize key */
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  51        u32 s[4];
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  52        /* accumulator */
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  53        struct poly1305_state h;
-> ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  54        /* key */
-> 1c08a104360f3e Jason A. Donenfeld 2020-01-05  55        union {
-> 1c08a104360f3e Jason A. Donenfeld 2020-01-05 @56                struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
-> 1c08a104360f3e Jason A. Donenfeld 2020-01-05  57                struct poly1305_core_key core_r;
-> 1c08a104360f3e Jason A. Donenfeld 2020-01-05  58        };
-> 2546f811ef45fc Martin Willi       2015-07-16  59  };
-> 2546f811ef45fc Martin Willi       2015-07-16  60
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://01.org/lkp
+But we also should look at the call to padata_find_next where BHs are
+on. padata_find_next takes the same lock as padata_do_serial, so this
+might be a candidate for a deadlock too.
