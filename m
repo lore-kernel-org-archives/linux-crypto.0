@@ -2,96 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434C5C54EE9
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Sep 2022 17:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F63ECAAD8
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 01:30:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231987AbiIVRaW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Sep 2022 13:30:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41044 "EHLO
+        id S230144AbiIWBaA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Sep 2022 21:30:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232067AbiIVRaN (ORCPT
+        with ESMTP id S229759AbiIWB37 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Sep 2022 13:30:13 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6019A9E7
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:30:09 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id a10so11916487ljq.0
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Sep 2022 10:30:09 -0700 (PDT)
+        Thu, 22 Sep 2022 21:29:59 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB453C144;
+        Thu, 22 Sep 2022 18:29:58 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id x1so10431637plv.5;
+        Thu, 22 Sep 2022 18:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=3d4XtRz1UVTn9UF6tNTg+CLRSot5BsaX/kpuz1aoWSk=;
-        b=gzyjrFUWv6sH5AP1pBpkvTbYf2jzgM5J6nmbzm5OLICG5oHqLOc42PB0JjTtgfVYQz
-         BF/uvdqnVUjIG0gUSDXOAGX43nM6ksXQIiY1tSzXR1SMOmRV5qUiDglZFJX41AHE3giu
-         tg/8D7PwcQb91U9TFbzIK7dI4g4owsWB+m2N+6yfrX+ZQdJ2gu9iY63t5Yq16lfgOhyE
-         0Dh288gd7F5g/9azqxGNWT9Vw9AZd7/KGEigtoukXStyVge9qfZvf9M4unSyF+lhL/Hs
-         AjpOOO/Vvn6DR5nNwV7Y3lC+pNxU9oAWVvO2ucAaZXVvRZzPcLjP7UaIuHmIFAASf5QE
-         O7ng==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=BIsSLdpidxx83exFCWBH/9sXWFQ6C6T0sUJqOwQ+WAM=;
+        b=H64amwKiVWi1ibBYEVckNwt8RPPV2++7FhaWICVgrkFwMTuP0zDO1pGiZVIMrPgtpw
+         awb9DX2sEf5eq/pqOblPEAx1pLwwaQb+9lS3e1eq9purgn/fv11Jzdoedv52H2133tsW
+         mAsH3JcoUOt30CimhM7M9dGm4Q8FsGG8ak8gXxFcoSu72bTez0dWhj2bwNPkjiOyXnNc
+         hxJZI2tBMj6yC72ggdn98foByJPW5TWYTToWEG9dCccPjrllQA4ktDz44jTS7neYro/o
+         WGdW5FxZShAn7QB9tWu81+jf9mzzTKqGtM0jYbeciApPCm3iue8UVSmyCMroYUiTyNwf
+         mddg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=3d4XtRz1UVTn9UF6tNTg+CLRSot5BsaX/kpuz1aoWSk=;
-        b=IF8k7lCJ53g2BKz07dcYwmEq5WUhYyJI5r3JsktEhZWqNNY4CpHiLwjBySC26fV4RT
-         +gRkczCwNGHR0sinOXdcp5aINYSS9GR7OZpylIsVXszbpz3PYQ2X4Q2H83Fn6DrKRqus
-         QPBTR9xHg8dzN1Whk4FUTWKv7IYt8nNOdkNi0jbV7CF1KPmQFBTAXXJEM3vXVFUdvYnL
-         gGITl8E1RbBofZm1RtVuWxXkLqb3hav/G2EWswBWMQX+3jFvuGELDlDr6A4CoWRyFbHY
-         okpPjtkmW4FLNSrhYm94un7xRFKSrWXyuBKFPTiHJN0oj25iEb5fDoBLrciOwYtY0/Zu
-         l8Sg==
-X-Gm-Message-State: ACrzQf2IoI5ObeNyzwne29mXaGj/aFoeiVDZ4UGgjAFiw65WuzpOEOMj
-        3WnLhai6qBMtWgkHbew/4EfxQQ==
-X-Google-Smtp-Source: AMsMyM6UoHvK8OQptpz3VhwCgTvbTRlcBxKMUrZWJW1n57MxTQw07sco9Ija42Do0y41A8n03+5iNQ==
-X-Received: by 2002:a2e:a54c:0:b0:26c:50c6:75c1 with SMTP id e12-20020a2ea54c000000b0026c50c675c1mr1540727ljn.408.1663867807861;
-        Thu, 22 Sep 2022 10:30:07 -0700 (PDT)
-Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.gmail.com with ESMTPSA id h14-20020a05651c124e00b00266af46abccsm1011655ljh.72.2022.09.22.10.30.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Sep 2022 10:30:07 -0700 (PDT)
-Message-ID: <14c980cf-314f-811f-98b8-18457625c2d6@linaro.org>
-Date:   Thu, 22 Sep 2022 19:30:06 +0200
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=BIsSLdpidxx83exFCWBH/9sXWFQ6C6T0sUJqOwQ+WAM=;
+        b=bh6mJfr8GgySfskqFhOrYab12M1XCoVSc26WN3px7Qizq2nF9z8/XqNp8s4ZpF/bWk
+         Fjb+Nt91nratyLr1ZL2yyvfkzUf8Kk3WAH5pa7SGdKDAj+1Xc9c8guKlyAderECtGPFs
+         5OpSIEgL17DDQ+JXbDFUHfVKcM5Fxk7kDSfemjCyentkLBklhzhIxThMYPw9I9TMqEwq
+         Wqlnz49gF6wQ6oMpAtX7RxEovJxQKcEaVZB0O5ZoyVkjqVVZAihURc8AivbjcvhaM9FA
+         zDfVOfkY14zrURl5h7VC2RrCqAaXJynHyoCx31VPMGH6a809Ho88SOGzxqvG44wjRkvb
+         Bg6Q==
+X-Gm-Message-State: ACrzQf01Dwm7yy5CY0ePWDb758du8vlBjR54TCKsXgFweexuts/0DNLt
+        I5BKlOk358M3cMNs0UllIBE=
+X-Google-Smtp-Source: AMsMyM5sQV32DSU4gTRnx+H/DnIhx/iC6CDKvN+XUwW7p3J8d2TvbUwBif8Sef367c6Y7ULxWKw3UA==
+X-Received: by 2002:a17:903:4112:b0:178:29d8:6d56 with SMTP id r18-20020a170903411200b0017829d86d56mr6194493pld.143.1663896597816;
+        Thu, 22 Sep 2022 18:29:57 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id i9-20020a17090332c900b00176b63535ccsm4760363plr.193.2022.09.22.18.29.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 18:29:57 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To:     herbert@gondor.apana.org.au
+Cc:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+        davem@davemloft.net, keescook@chromium.org, gustavoars@kernel.org,
+        colin.i.king@gmail.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ye xingchen <ye.xingchen@zte.com.cn>
+Subject: [PATCH linux-next] crypto: marvell/octeontx - use sysfs_emit() to instead of scnprintf()
+Date:   Fri, 23 Sep 2022 01:29:52 +0000
+Message-Id: <20220923012952.238269-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v1 1/2] dt-bindings: rng: nuvoton,npcm-rng: Add npcm845
- compatible string
-Content-Language: en-US
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Tomer Maimon <tmaimon77@gmail.com>, avifishman70@gmail.com,
-        tali.perry1@gmail.com, joel@jms.id.au, venture@google.com,
-        yuenn@google.com, benjaminfair@google.com, olivia@selenic.com,
-        herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org
-Cc:     openbmc@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20220922142216.17581-1-tmaimon77@gmail.com>
- <20220922142216.17581-2-tmaimon77@gmail.com>
- <29d54940-997a-865a-b9d0-c043a8c9ce99@linaro.org>
-In-Reply-To: <29d54940-997a-865a-b9d0-c043a8c9ce99@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/09/2022 17:08, Krzysztof Kozlowski wrote:
-> On 22/09/2022 16:22, Tomer Maimon wrote:
->> Add a compatible string for Nuvoton BMC NPCM845 RNG.
->>
->> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
->> ---
->>  Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.yaml | 4 +++-
-> 
-> 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-And un-acked. Test your patches.
+Replace the open-code with sysfs_emit() to simplify the code.
 
-Please run `make dt_binding_check` (see
-Documentation/devicetree/bindings/writing-schema.rst for instructions).
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Best regards,
-Krzysztof
-
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
+index 36d72e35ebeb..88a41d1ca5f6 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
+@@ -661,7 +661,7 @@ static ssize_t vf_type_show(struct device *dev,
+ 		msg = "Invalid";
+ 	}
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%s\n", msg);
++	return sysfs_emit(buf, "%s\n", msg);
+ }
+ 
+ static ssize_t vf_engine_group_show(struct device *dev,
+@@ -670,7 +670,7 @@ static ssize_t vf_engine_group_show(struct device *dev,
+ {
+ 	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", cptvf->vfgrp);
++	return sysfs_emit(buf, "%d\n", cptvf->vfgrp);
+ }
+ 
+ static ssize_t vf_engine_group_store(struct device *dev,
+@@ -706,7 +706,7 @@ static ssize_t vf_coalesc_time_wait_show(struct device *dev,
+ {
+ 	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%d\n",
++	return sysfs_emit(buf, "%d\n",
+ 			 cptvf_read_vq_done_timewait(cptvf));
+ }
+ 
+@@ -716,7 +716,7 @@ static ssize_t vf_coalesc_num_wait_show(struct device *dev,
+ {
+ 	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
+ 
+-	return scnprintf(buf, PAGE_SIZE, "%d\n",
++	return sysfs_emit(buf, "%d\n",
+ 			 cptvf_read_vq_done_numwait(cptvf));
+ }
+ 
+-- 
+2.25.1
