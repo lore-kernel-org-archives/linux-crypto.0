@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4861DC04A95
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D2FC07E9D
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232779AbiIWURX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:17:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44054 "EHLO
+        id S233019AbiIWUR0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:17:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232870AbiIWUPW (ORCPT
+        with ESMTP id S232953AbiIWUPY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:15:22 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F90B133CB4
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:11 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id z6so1605363wrq.1
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:11 -0700 (PDT)
+        Fri, 23 Sep 2022 16:15:24 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00FA13506B
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id c11so1519263wrp.11
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=8ma5Ol24QeG3/DDgAehhLNXstU8Od+DxxiWWftpJxi8=;
-        b=UFHQlfaGDMqQ64/kz4XSLGDjHcLsMZ/w7rbnBj0h1DCSYTYvIaj5wzL9rEI+6HklyN
-         rAm3Nrd0V7qQEBPxAj4jGVjhSEgniN1ipI8nwBikAm/eJoaqT0dtXq9aEO/siUJj+BM3
-         EsWI9DWks5n0Y5U0+eNE5T+CAB95cNjRyo190QezN8NgGOeyo1E9pduxglSvwhEmtZI2
-         w2bbsgUq46eMPt69jTBEJWKdVWwWISG3GYW62AEN+RkyfN+6vQEQyKT+FBBACYxBmhqF
-         UE/BQPmyzEj+2SeOi8KicMHCNwd/9OTpUiCcHktMJPqBcX3iN50x/PyHEwfQuWUKbTX2
-         L9uQ==
+        bh=QSlxelZmZQkauh748b/7aNwlVR4EaKtqFDpMBsT7q2s=;
+        b=U6NipO/WIQWxS/+Jj3d/rVPxFAUKikH5/3i+w/aOIgkOpIBtgKhtkrV3ClKF7MyDGa
+         MxEWLc2NhU4QPjlJxtZO4qziF0EFHJLKqGcuAzHAfyYYazgxLCJIm1oq3ee9oLKqcM1E
+         1d1fBFIMAtmLQYGJwlus2jofkrfEGouUvI0g8hAWL4ojN1v6JxLErDYCoHPX030i48FA
+         B3pgPR6DYKK4dkwNqmAhsrFnrGQY5jsR+LVEwwDiCD3CS7JEZ/DoXuk8Y1L24RspQR1e
+         +HTd+azien7FwppHeI+V/vzKOt7oV8kZHmVgHSaqqbFPSnLx6+XfWG/fBXnF4Wn1rkIy
+         FDFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=8ma5Ol24QeG3/DDgAehhLNXstU8Od+DxxiWWftpJxi8=;
-        b=Id0QI27hUCT1ekvkp1x/sWC4vcHKNu3qAB4T3omjFJ+2vVAYeLVbu+Sekk1K8nyRqw
-         iSN7zu8ccpCKXPp9pDG2WroroRAiF/NTOk/9H95RO3h9pkWz/HfS1mfrHf8X8kQeAoJz
-         ieNj0lVR+CSHJ+EF/hA9RgTj7wMFP9Ti3rp/4gp9aeQjaIvQ5iAifCH2yVEG/nxOR3ez
-         zG13IxbHA2PZCoeUfNBhOqPt+n5BDmBlz+AwexLoD4XR04UE75+sydrUl+7dlq6t1y5K
-         y2l/eq/D+kwcv5mXDURHLNgac5FMvZBrdp11KsSReXjZsH7Sc1hlF1HqbgyXkKU4ijmR
-         JtdQ==
-X-Gm-Message-State: ACrzQf1HopZzIJoUTjdrqU0jHnadi+61C1gNF8LXKop6tfXvJzwoFAUc
-        OZZ1uXVOXlSbWjCaptNZ/sBUmw==
-X-Google-Smtp-Source: AMsMyM6R081AsD5FRHemwMM/H2uDoxUMO32PC4eSc2TYLRgEQIT9QoZOkpxpGV7xSZmbY4crl3aKug==
-X-Received: by 2002:adf:dc92:0:b0:22a:415f:8dd7 with SMTP id r18-20020adfdc92000000b0022a415f8dd7mr6046550wrj.708.1663964050759;
-        Fri, 23 Sep 2022 13:14:10 -0700 (PDT)
+        bh=QSlxelZmZQkauh748b/7aNwlVR4EaKtqFDpMBsT7q2s=;
+        b=bnlX83u7T4KUiGRxWe7/OmIdX1m6Kj25r8rj7xh/R24VYwy0iN1E4h1jYSChxD+XOL
+         kZri5o+DlcxfYb7wPdwOVuVG8cKRs2ZFhE9dlxhL2+R5hlQjxXnYjIc2e5qVvVFOvDtt
+         z5yeipZLqXYsLjqfM18RuxIlaxGDeS/vpBUUiE6sfhSHuWofMXTPBHtXHXI7UzDNwp2H
+         5cDuhAU+fiSuX0fBx8yRsNXX/RI2eKy0oDEHovGaV/A4GSE/rWkI3WTcwyXq0egNd0R8
+         U6ng0DdhpzxEaXi9C9L9ktvgmLwQ4s7AIkTq0RamEMlm7lxeP3oDJS4nvl1NcolYJ2l5
+         +G0g==
+X-Gm-Message-State: ACrzQf3oCw/b2s5qFHQRM9F2qwLdj5UZGjBIrKGbD0aJnFjOxOHAlkTw
+        gW6VvOBdu5ghv0C7LBtKzWSnDw==
+X-Google-Smtp-Source: AMsMyM4Mco6j50zScn0pA1uSr0W0RCMLK0MagZMF94m1Efp9WHSd2cOmkVjbX1l1RMC/fTgjGZzsJw==
+X-Received: by 2002:a5d:6808:0:b0:22a:c437:5b36 with SMTP id w8-20020a5d6808000000b0022ac4375b36mr6285460wru.459.1663964044375;
+        Fri, 23 Sep 2022 13:14:04 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.09
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:10 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:03 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,9 +71,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 28/35] selftest/tcp-ao: Add a test for MKT matching
-Date:   Fri, 23 Sep 2022 21:13:12 +0100
-Message-Id: <20220923201319.493208-29-dima@arista.com>
+Subject: [PATCH v2 24/35] net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
+Date:   Fri, 23 Sep 2022 21:13:08 +0100
+Message-Id: <20220923201319.493208-25-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
@@ -83,251 +83,82 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add TCP-AO tests on connect()/accept() pair.
-SNMP counters exposed by kernel are very useful here to verify the
-expected behavior of TCP-AO.
+Delete becomes very, very fast - almost free, but after setsockopt()
+syscall returns, the key is still alive until next RCU grace period.
+Which is fine for listen sockets as userspace needs to be aware of
+setsockopt(TCP_AO) and accept() race and resolve it with verification
+by getsockopt() after TCP connection was accepted.
 
+The benchmark results (on non-loaded box, worse with more RCU work pending):
+> ok 33    Worst case delete    16384 keys: min=5ms max=10ms mean=6.93904ms stddev=0.263421
+> ok 34        Add a new key    16384 keys: min=1ms max=4ms mean=2.17751ms stddev=0.147564
+> ok 35 Remove random-search    16384 keys: min=5ms max=10ms mean=6.50243ms stddev=0.254999
+> ok 36         Remove async    16384 keys: min=0ms max=0ms mean=0.0296107ms stddev=0.0172078
+
+Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
+Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
+Co-developed-by: Salam Noureddine <noureddine@arista.com>
+Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile   |   2 +-
- .../selftests/net/tcp_ao/connect-deny.c       | 217 ++++++++++++++++++
- 2 files changed, 218 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/connect-deny.c
+ include/uapi/linux/tcp.h |  3 +++
+ net/ipv4/tcp_ao.c        | 17 ++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index a178bde0af08..5064e34ebe38 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect icmps-discard icmps-accept
-+TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
+diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+index 453187d21da8..42850ae6e99d 100644
+--- a/include/uapi/linux/tcp.h
++++ b/include/uapi/linux/tcp.h
+@@ -353,6 +353,9 @@ struct tcp_diag_md5sig {
+ #define TCP_AO_CMDF_CURR	(1 << 0)	/* Only checks field sndid */
+ #define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
+ #define TCP_AO_CMDF_ACCEPT_ICMP	(1 << 2)	/* Accept incoming ICMPs */
++#define TCP_AO_CMDF_DEL_ASYNC	(1 << 3)	/* Asynchronious delete, valid
++						 * only for listen sockets
++						 */
  
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/connect-deny.c b/tools/testing/selftests/net/tcp_ao/connect-deny.c
-new file mode 100644
-index 000000000000..cf71dda52c49
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/connect-deny.c
-@@ -0,0 +1,217 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Author: Dmitry Safonov <dima@arista.com> */
-+#include <inttypes.h>
-+#include "aolib.h"
-+
-+typedef uint8_t fault_t;
-+#define F_TIMEOUT	1
-+#define F_KEYREJECT	2
-+
-+#define fault(type)	(inj == type)
-+
-+static void try_accept(const char *tst_name, unsigned port, const char *pwd,
-+		       union tcp_addr addr, uint8_t prefix,
-+		       uint8_t sndid, uint8_t rcvid, const char *cnt_name,
-+		       fault_t inj)
-+{
-+	uint64_t before_cnt, after_cnt;
-+	int lsk, err, sk = 0;
-+	time_t timeout;
-+
-+	lsk = test_listen_socket(this_ip_addr, port, 1);
-+
-+	if (pwd && test_set_ao(lsk, pwd, 0, addr, prefix, sndid, rcvid))
-+		test_error("setsockopt(TCP_AO)");
-+
-+	if (cnt_name)
-+		before_cnt = netstat_get_one(cnt_name, NULL);
-+
-+	synchronize_threads(); /* preparations done */
-+
-+	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
-+	err = test_wait_fd(lsk, timeout, 0);
-+	if (err < 0)
-+		test_error("test_wait_fd()");
-+	else if (!err) {
-+		if (!fault(F_TIMEOUT))
-+			test_fail("timeouted for accept()");
-+	} else {
-+		if (fault(F_TIMEOUT))
-+			test_fail("ready to accept");
-+
-+		sk = accept(lsk, NULL, NULL);
-+		if (sk < 0) {
-+			test_error("accept()");
-+		} else {
-+			if (fault(F_TIMEOUT))
-+				test_fail("%s: accepted", tst_name);
-+		}
+ #define TCP_AO_GET_CURR		TCP_AO_CMDF_CURR
+ #define TCP_AO_GET_NEXT		TCP_AO_CMDF_NEXT
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index 8f569f43e9c2..ed8cacb61694 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -1461,7 +1461,7 @@ static inline bool tcp_ao_mkt_overlap_v6(struct tcp_ao *cmd,
+ #define TCP_AO_CMDF_ADDMOD_VALID					\
+ 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_ACCEPT_ICMP)
+ #define TCP_AO_CMDF_DEL_VALID						\
+-	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT)
++	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_DEL_ASYNC)
+ #define TCP_AO_GETF_VALID						\
+ 	(TCP_AO_GET_ALL | TCP_AO_GET_CURR | TCP_AO_GET_NEXT)
+ 
+@@ -1586,11 +1586,26 @@ static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_key *key,
+ 
+ 	hlist_del_rcu(&key->node);
+ 
++	/* Support for async delete on listening sockets: as they don't
++	 * need current_key/rnext_key maintaining, we don't need to check
++	 * them and we can just free all resources in RCU fashion.
++	 */
++	if (cmd->tcpa_flags & TCP_AO_CMDF_DEL_ASYNC) {
++		if (sk->sk_state != TCP_LISTEN)
++			return -EINVAL;
++		atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
++		call_rcu(&key->rcu, tcp_ao_key_free_rcu);
++		return 0;
 +	}
 +
-+	close(lsk);
-+
-+	if (!cnt_name)
-+		goto out;
-+
-+	after_cnt = netstat_get_one(cnt_name, NULL);
-+
-+	if (after_cnt <= before_cnt) {
-+		test_fail("%s: %s counter did not increase: %zu <= %zu",
-+				tst_name, cnt_name, after_cnt, before_cnt);
-+	} else {
-+		test_ok("%s: counter %s increased %zu => %zu",
-+			tst_name, cnt_name, before_cnt, after_cnt);
-+	}
-+
-+out:
-+	synchronize_threads(); /* close() */
-+	if (sk > 0)
-+		close(sk);
-+}
-+
-+static void *server_fn(void *arg)
-+{
-+	union tcp_addr wrong_addr, network_addr;
-+	unsigned port = test_server_port;
-+
-+	if (inet_pton(TEST_FAMILY, TEST_WRONG_IP, &wrong_addr) != 1)
-+		test_error("Can't convert ip address %s", TEST_WRONG_IP);
-+
-+	try_accept("Non-AO server + AO client", port++, NULL,
-+		this_ip_dest, -1, 100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
-+
-+	try_accept("AO server + Non-AO client", port++, "password",
-+		this_ip_dest, -1, 100, 100, "TCPAORequired", F_TIMEOUT);
-+
-+	try_accept("Wrong password", port++, "password2",
-+		this_ip_dest, -1, 100, 100, "TCPAOBad", F_TIMEOUT);
-+
-+	try_accept("Wrong rcv id", port++, "password",
-+		this_ip_dest, -1, 100, 101, "TCPAOKeyNotFound", F_TIMEOUT);
-+
-+	try_accept("Wrong snd id", port++, "password",
-+		this_ip_dest, -1, 101, 100, "TCPAOGood", F_TIMEOUT);
-+
-+	try_accept("Server: Wrong addr", port++, "password",
-+		wrong_addr, -1, 100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
-+
-+	try_accept("Client: Wrong addr", port++, NULL,
-+		this_ip_dest, -1, 100, 100, NULL, F_TIMEOUT);
-+
-+	try_accept("rcv id != snd id", port++, "password",
-+		this_ip_dest, -1, 200, 100, "TCPAOGood", 0);
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_addr) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+
-+	try_accept("Server: prefix match", port++, "password",
-+		network_addr, 16, 100, 100, "TCPAOGood", 0);
-+
-+	try_accept("Client: prefix match", port++, "password",
-+		this_ip_dest, -1, 100, 100, "TCPAOGood", 0);
-+
-+	/* client exits */
-+	synchronize_threads();
-+	return NULL;
-+}
-+
-+static void try_connect(const char *tst_name, unsigned port,
-+			const char *pwd, union tcp_addr addr, uint8_t prefix,
-+			uint8_t sndid, uint8_t rcvid, fault_t inj)
-+{
-+	time_t timeout;
-+	int sk, ret;
-+
-+	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (pwd && test_set_ao(sk, pwd, 0, addr, prefix, sndid, rcvid))
-+		test_error("setsockopt(TCP_AO)");
-+
-+	synchronize_threads(); /* preparations done */
-+
-+	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
-+	ret = _test_connect_socket(sk, this_ip_dest, port, timeout);
-+
-+	if (ret < 0) {
-+		if (fault(F_KEYREJECT) && ret == -EKEYREJECTED) {
-+			test_ok("%s: connect() was prevented", tst_name);
-+			goto out;
-+		} else if (ret == -ECONNREFUSED &&
-+				(fault(F_TIMEOUT) || fault(F_KEYREJECT))) {
-+			test_ok("%s: refused to connect", tst_name);
-+			goto out;
-+		} else {
-+			test_error("%s: connect() returned %d", tst_name, ret);
-+		}
-+	}
-+
-+	if (ret == 0) {
-+		if (fault(F_TIMEOUT))
-+			test_ok("%s", tst_name);
-+		else
-+			test_fail("%s: failed to connect()", tst_name);
-+	} else {
-+		if (fault(F_TIMEOUT) || fault(F_KEYREJECT))
-+			test_fail("%s: connected", tst_name);
-+		else
-+			test_ok("%s: connected", tst_name);
-+	}
-+
-+out:
-+	synchronize_threads(); /* close() */
-+
-+	if (ret > 0)
-+		close(sk);
-+}
-+
-+static void *client_fn(void *arg)
-+{
-+	union tcp_addr wrong_addr, network_addr;
-+	unsigned port = test_server_port;
-+
-+	if (inet_pton(TEST_FAMILY, TEST_WRONG_IP, &wrong_addr) != 1)
-+		test_error("Can't convert ip address %s", TEST_WRONG_IP);
-+
-+	try_connect("Non-AO server + AO client", port++, "password",
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("AO server + Non-AO client", port++, NULL,
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("Wrong password", port++, "password",
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("Wrong rcv id", port++, "password",
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("Wrong snd id", port++, "password",
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("Server: Wrong addr", port++, "password",
-+			this_ip_dest, -1, 100, 100, F_TIMEOUT);
-+
-+	try_connect("Client: Wrong addr", port++, "password",
-+			wrong_addr, -1, 100, 100, F_KEYREJECT);
-+
-+	try_connect("rcv id != snd id", port++, "password",
-+			this_ip_dest, -1, 100, 200, 0);
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_addr) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+
-+	try_connect("Server: prefix match", port++, "password",
-+			this_ip_dest, -1, 100, 100, 0);
-+
-+	try_connect("Client: prefix match", port++, "password",
-+			network_addr, 16, 100, 100, 0);
-+
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(20, server_fn, client_fn);
-+	return 0;
-+}
+ 	/* At this moment another CPU could have looked this key up
+ 	 * while it was unlinked from the list. Wait for RCU grace period,
+ 	 * after which the key is off-list and can't be looked up again;
+ 	 * the rx path [just before RCU came] might have used it and set it
+ 	 * as current_key (very unlikely).
++	 * Free the key with next RCU grace period (in case it was
++	 * current_key before tcp_ao_current_rnext() might have
++	 * changed it in forced-delete).
+ 	 */
+ 	synchronize_rcu();
+ 	err = tcp_ao_current_rnext(sk, cmd->tcpa_flags,
 -- 
 2.37.2
 
