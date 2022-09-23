@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A88CC6FA83
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD3D4C04A95
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232941AbiIWUR0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39350 "EHLO
+        id S233027AbiIWURa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232940AbiIWUPX (ORCPT
+        with ESMTP id S232971AbiIWUP3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:15:23 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B35135044
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id t7so1533106wrm.10
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
+        Fri, 23 Sep 2022 16:15:29 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD41135711
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:18 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id y5so1595879wrh.3
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
-        b=LVXtBJy1Z/GJQVIKE2FDxWZ9hfhZJoY8eJ7OLcD0rbKsFpBj9gHpth4IpqE+WoZBAZ
-         8MtIPl8VVCb8O11afBQ8kJpZwYfseGrP2UyOKpibm87wsH1fQkkklfySY4lOKDwI8OwP
-         xWzuUQQWn3ruqaqXa8hO9pxbEiF7akSpkYv3P36+91RpMrjFYcEwzb7ex4vvNf+ttoPO
-         viJAMw/pn/DwMbA3ehyhC0iI7TK7nyGvRfOKtqaE08MFc+zHwE92qXFhyugsc+25sar6
-         v1FdrVUSSp+XMtAZ9xDmxcf2fX/erJUvsWOiKq5LgBiUZxnr0Wv2JLVQcq6NLJXWeXmY
-         8Cew==
+        bh=LqvkFCVCjfa7ILnjOvpfFzjAz1hFv+OuedSgBSKgSnc=;
+        b=dASSeeXmaKEDFIEpWQgMRlQAuiOWIUSOdmJjKkGDgoXy9J72ds0K0tj0DjLpitLAfb
+         pyHEkrfVsIUPlTrJPZQQrU3X9umCQ792x+u5AbB122ybV+ilTXp6bq/nBS4pA0hfSig0
+         mu2fuMKTAbtsNpktGbK/6jCSk9WkPaYwOENc3cKWa6XnVaoRj+7pVX9oHV2BLGiblrLO
+         hvJKAJEtHqZfbzVUsh6cIP1J9GDYgZu5OT1eLeLxVSDvz2guAINOaEYT3QBRv6cUrAMc
+         nF3GiqN1pkXy/k5ddngK74F67NKvHx+p+Pobe6oS5St4ZewXcQdZfr3KZUFQ8IXvKHVp
+         CQ3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
-        b=VxOom1htCMHF2OEnwV+PtCWTfyTkaEamQ6XwJBdOYVSCMC/FJN+ChrKCOY3OeYfVyT
-         wGUXC+E2QvvFwZZ3qbZPzvV2vgcKPUV7cgMz+Cm5wPWcbAISJXvuunkRvm/++cjouO+S
-         Y6vo2ufdhNDDalBnwEA8Vq3reAIOdrfe5DHEio0rvIifv8eX+7uGGDiZ4S6GyALp9W+S
-         IA1E0ndvuBwvAv2s2OUWpyS6Vxx4nSwqaKXhXjfMxWb0M941QZ/IF+aEXleRusIntDnm
-         UPnK7DspSQvdU2SAaML0gjAV//admGFDCweyHzbGkJ0UVeO/SghZp9h776u0AobodtMz
-         SBNw==
-X-Gm-Message-State: ACrzQf2AOnJidVe7zH9Q3Yy4DkijHCSwAvOnCTJ8rsjV+j9fgEoXjFkv
-        8oKBRUoa+aZryzIdrbB7sMyRrw==
-X-Google-Smtp-Source: AMsMyM412ce+3x41p2+xdKr69DMd17SdmUBcsHgqcKrP8N2/oRtXsN98o461kOv8KBQXmVXcIJP0lg==
-X-Received: by 2002:a5d:6d0b:0:b0:22a:ca5b:a37e with SMTP id e11-20020a5d6d0b000000b0022aca5ba37emr6221812wrq.383.1663964052251;
-        Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
+        bh=LqvkFCVCjfa7ILnjOvpfFzjAz1hFv+OuedSgBSKgSnc=;
+        b=tD5cQMdGm5Sz/Dyk9grbDuMz5lHiEIbRSwsS9LldsHpkFg2X9GiAg7g11hnA+TkfdZ
+         XWbRxZ/W/4+YWdk/wnLFqCgra+T4gLkDCAmS6NbaRnEJvKMO5CjzaCEcTQ7QnB5v8lvg
+         J8/fKR+q0xpr8rEBE9oC6gZnV7mWaSg/KY38lbR/1iaq8Suhs3DjchVD67OqZYrCJd/b
+         legjVKQ+wOnnqd5Fh7huJAGgTp/RpwzYBXXOXlfkvEDg6avWoey271BnulShf2xqZbcn
+         emt+EEiDVxrR/xvvioeqV5+MfZhQb3LLojRGkQG6u/In/ng+7XWIynZ/nFb6N+IqBpbu
+         200g==
+X-Gm-Message-State: ACrzQf2U7Gavh+HzooQRKx39nm1WibH7Yg1lfP1sQYOVfH9gKJ8MoylY
+        dZsOhm1CVE03rtzlzNDfmwovpQ==
+X-Google-Smtp-Source: AMsMyM5qnhpllhRG2HKj/CG2nloo2ZUCnGNX01syZ4Z9PMofeVZUxk7mfTuQotLNdmwmS810AYgEjA==
+X-Received: by 2002:a5d:69ca:0:b0:228:dd17:9534 with SMTP id s10-20020a5d69ca000000b00228dd179534mr6602076wrw.652.1663964058126;
+        Fri, 23 Sep 2022 13:14:18 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.10
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:11 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:17 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,9 +71,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 29/35] selftest/tcp-ao: Add test for TCP-AO add setsockopt() command
-Date:   Fri, 23 Sep 2022 21:13:13 +0100
-Message-Id: <20220923201319.493208-30-dima@arista.com>
+Subject: [PATCH v2 33/35] selftest/nettest: Rename md5_prefix* => auth_prefix*
+Date:   Fri, 23 Sep 2022 21:13:17 +0100
+Message-Id: <20220923201319.493208-34-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
@@ -83,245 +83,108 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Verify corner-cases for UAPI.
-Sample output:
-> # ./setsockopt-closed_ipv6
-> 1..16
-> # 9508[lib/setup.c:173] rand seed 1643819055
-> TAP version 13
-> ok 1 minimum size
-> ok 2 extended size
-> ok 3 bad algo
-> ok 4 bad ao flags
-> ok 5 empty prefix
-> ok 6 prefix, any addr
-> ok 7 no prefix, any addr
-> ok 8 too short prefix
-> ok 9 too big prefix
-> ok 10 too big maclen
-> ok 11 bad key flags
-> ok 12 too big keylen
-> not ok 13 duplicate: full copy: setsockopt() was expected to fail with 17
-> ok 14 duplicate: any addr key on the socket
-> ok 15 duplicate: add any addr key
-> not ok 16 duplicate: add any addr for the same subnet: setsockopt() was expected to fail with 17
+Now it's going to be used for TCP-AO testing too.
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile   |   3 +-
- .../selftests/net/tcp_ao/setsockopt-closed.c  | 191 ++++++++++++++++++
- 2 files changed, 193 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+ tools/testing/selftests/net/nettest.c | 28 +++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 5064e34ebe38..a001dc2aed4e 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
-+TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
-+		setsockopt-closed
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index 35831bc3da24..3a887ef783cd 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -97,11 +97,11 @@ struct sock_args {
  
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
-new file mode 100644
-index 000000000000..be2cbc407f60
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
-@@ -0,0 +1,191 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Author: Dmitry Safonov <dima@arista.com> */
-+#include <inttypes.h>
-+#include "../../../../include/linux/kernel.h"
-+#include "aolib.h"
-+
-+static void clean_ao(int sk, struct tcp_ao *ao)
-+{
-+	struct tcp_ao_del ao_del = {};
-+
-+	ao_del.tcpa_sndid = ao->tcpa_sndid;
-+	ao_del.tcpa_rcvid = ao->tcpa_rcvid;
-+	ao_del.tcpa_prefix = ao->tcpa_prefix;
-+	memcpy(&ao_del.tcpa_addr, &ao->tcpa_addr, sizeof(ao->tcpa_addr));
-+
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, &ao_del, sizeof(ao_del)))
-+		test_error("setsockopt(TCP_AO_DEL) failed to clean");
-+	close(sk);
-+}
-+
-+static void setsockopt_checked(int sk, int optname, struct tcp_ao *ao,
-+			       int err, const char *tst)
-+{
-+	int ret;
-+
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, optname, ao, sizeof(*ao));
-+	if (ret == -1) {
-+		if (errno == err) {
-+			test_ok("%s", tst);
-+			return;
-+		}
-+		test_fail("%s: setsockopt() returned %d", tst, err);
-+		return;
-+	}
-+
-+	if (err) {
-+		test_fail("%s: setsockopt() was expected to fail with %d", tst, err);
-+	} else {
-+		test_ok("%s", tst);
-+		test_verify_socket_ao(sk, ao);
-+	}
-+	clean_ao(sk, ao);
-+}
-+
-+static int prepare_defs(struct tcp_ao *ao)
-+{
-+	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (test_prepare_def_ao(ao, "password", 0, this_ip_dest, -1, 100, 100))
-+		test_error("prepare default tcp_ao");
-+
-+	return sk;
-+}
-+
-+static void test_extend(void)
-+{
-+	struct tcp_ao ao;
-+	struct {
-+		struct tcp_ao ao;
-+		char *extend[100];
-+	} ao_big = {};
-+	int ret, sk;
-+
-+	sk = prepare_defs(&ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO,
-+			&ao, offsetof(struct tcp_ao, tcpa_key));
-+	if (!ret) {
-+		test_fail("minminum size: accepted invalid size");
-+		clean_ao(sk, &ao);
-+	} else if (errno != EINVAL) {
-+		test_fail("minminum size: failed with %d", errno);
-+	} else {
-+		test_ok("minimum size");
-+	}
-+
-+	sk = prepare_defs(&ao_big.ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao_big.ao, sizeof(ao_big));
-+	if (ret) {
-+		test_fail("extended size: returned %d", ret);
-+	} else {
-+		test_ok("extended size");
-+		clean_ao(sk, &ao_big.ao);
-+	}
-+}
-+
-+static void einval_tests(void)
-+{
-+	struct tcp_ao ao;
-+	int sk;
-+
-+	sk = prepare_defs(&ao);
-+	strcpy(ao.tcpa_alg_name, "imaginary hash algo");
-+	setsockopt_checked(sk, TCP_AO, &ao, ENOENT, "bad algo");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_flags = (uint16_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad ao flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "empty prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 32;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, 0, "no prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 2;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too short prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 129;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_maclen = 100;
-+	setsockopt_checked(sk, TCP_AO, &ao, EMSGSIZE, "too big maclen");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keyflags = (uint8_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad key flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keylen = TCP_AO_MAXKEYLEN + 1;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big keylen");
-+}
-+
-+static void duplicate_tests(void)
-+{
-+	union tcp_addr network_dup;
-+	struct tcp_ao ao, ao2;
-+	int sk;
-+
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: full copy");
-+
-+	sk = prepare_defs(&ao);
-+	ao2 = ao;
-+	memcpy(&ao2.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao2.tcpa_prefix = 0;
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao2, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: any addr key on the socket");
-+
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr key");
-+
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_dup) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	if (test_prepare_def_ao(&ao, "password", 0, network_dup, 16, 100, 100))
-+		test_error("prepare default tcp_ao");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr for the same subnet");
-+}
-+
-+
-+static void *client_fn(void *arg)
-+{
-+	test_extend();
-+	einval_tests();
-+	duplicate_tests();
-+
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(16, client_fn, NULL);
-+	return 0;
-+}
+ 	const char *password;
+ 	/* prefix for MD5 password */
+-	const char *md5_prefix_str;
++	const char *auth_prefix_str;
+ 	union {
+ 		struct sockaddr_in v4;
+ 		struct sockaddr_in6 v6;
+-	} md5_prefix;
++	} auth_prefix;
+ 	unsigned int prefix_len;
+ 	/* 0: default, -1: force off, +1: force on */
+ 	int bind_key_ifindex;
+@@ -271,7 +271,7 @@ static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args
+ 		md5sig.tcpm_flags |= TCP_MD5SIG_FLAG_PREFIX;
+ 
+ 		md5sig.tcpm_prefixlen = args->prefix_len;
+-		addr = &args->md5_prefix;
++		addr = &args->auth_prefix;
+ 	}
+ 	memcpy(&md5sig.tcpm_addr, addr, alen);
+ 
+@@ -311,13 +311,13 @@ static int tcp_md5_remote(int sd, struct sock_args *args)
+ 	switch (args->version) {
+ 	case AF_INET:
+ 		sin.sin_port = htons(args->port);
+-		sin.sin_addr = args->md5_prefix.v4.sin_addr;
++		sin.sin_addr = args->auth_prefix.v4.sin_addr;
+ 		addr = &sin;
+ 		alen = sizeof(sin);
+ 		break;
+ 	case AF_INET6:
+ 		sin6.sin6_port = htons(args->port);
+-		sin6.sin6_addr = args->md5_prefix.v6.sin6_addr;
++		sin6.sin6_addr = args->auth_prefix.v6.sin6_addr;
+ 		addr = &sin6;
+ 		alen = sizeof(sin6);
+ 		break;
+@@ -750,11 +750,11 @@ static int convert_addr(struct sock_args *args, const char *_str,
+ 	case ADDR_TYPE_MD5_PREFIX:
+ 		desc = "md5 prefix";
+ 		if (family == AF_INET) {
+-			args->md5_prefix.v4.sin_family = AF_INET;
+-			addr = &args->md5_prefix.v4.sin_addr;
++			args->auth_prefix.v4.sin_family = AF_INET;
++			addr = &args->auth_prefix.v4.sin_addr;
+ 		} else if (family == AF_INET6) {
+-			args->md5_prefix.v6.sin6_family = AF_INET6;
+-			addr = &args->md5_prefix.v6.sin6_addr;
++			args->auth_prefix.v6.sin6_family = AF_INET6;
++			addr = &args->auth_prefix.v6.sin6_addr;
+ 		} else
+ 			return 1;
+ 
+@@ -837,8 +837,8 @@ static int validate_addresses(struct sock_args *args)
+ 	    convert_addr(args, args->remote_addr_str, ADDR_TYPE_REMOTE) < 0)
+ 		return 1;
+ 
+-	if (args->md5_prefix_str &&
+-	    convert_addr(args, args->md5_prefix_str,
++	if (args->auth_prefix_str &&
++	    convert_addr(args, args->auth_prefix_str,
+ 			 ADDR_TYPE_MD5_PREFIX) < 0)
+ 		return 1;
+ 
+@@ -2020,7 +2020,7 @@ int main(int argc, char *argv[])
+ 			args.password = optarg;
+ 			break;
+ 		case 'm':
+-			args.md5_prefix_str = optarg;
++			args.auth_prefix_str = optarg;
+ 			break;
+ 		case 'S':
+ 			args.use_setsockopt = 1;
+@@ -2079,13 +2079,13 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	if (args.password && (!args.use_md5 ||
+-	      (!args.has_remote_ip && !args.md5_prefix_str) ||
++	      (!args.has_remote_ip && !args.auth_prefix_str) ||
+ 	      args.type != SOCK_STREAM)) {
+ 		log_error("MD5 passwords apply to TCP only and require a remote ip for the password\n");
+ 		return 1;
+ 	}
+ 
+-	if ((args.md5_prefix_str || args.use_md5) && !args.password) {
++	if ((args.auth_prefix_str || args.use_md5) && !args.password) {
+ 		log_error("Prefix range for MD5 protection specified without a password\n");
+ 		return 1;
+ 	}
 -- 
 2.37.2
 
