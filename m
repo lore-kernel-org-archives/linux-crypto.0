@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D2FC07E9D
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A88CC6FA83
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233019AbiIWUR0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232941AbiIWUR0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 23 Sep 2022 16:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44224 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232953AbiIWUPY (ORCPT
+        with ESMTP id S232940AbiIWUPX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:15:24 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00FA13506B
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id c11so1519263wrp.11
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
+        Fri, 23 Sep 2022 16:15:23 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B35135044
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id t7so1533106wrm.10
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=QSlxelZmZQkauh748b/7aNwlVR4EaKtqFDpMBsT7q2s=;
-        b=U6NipO/WIQWxS/+Jj3d/rVPxFAUKikH5/3i+w/aOIgkOpIBtgKhtkrV3ClKF7MyDGa
-         MxEWLc2NhU4QPjlJxtZO4qziF0EFHJLKqGcuAzHAfyYYazgxLCJIm1oq3ee9oLKqcM1E
-         1d1fBFIMAtmLQYGJwlus2jofkrfEGouUvI0g8hAWL4ojN1v6JxLErDYCoHPX030i48FA
-         B3pgPR6DYKK4dkwNqmAhsrFnrGQY5jsR+LVEwwDiCD3CS7JEZ/DoXuk8Y1L24RspQR1e
-         +HTd+azien7FwppHeI+V/vzKOt7oV8kZHmVgHSaqqbFPSnLx6+XfWG/fBXnF4Wn1rkIy
-         FDFg==
+        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
+        b=LVXtBJy1Z/GJQVIKE2FDxWZ9hfhZJoY8eJ7OLcD0rbKsFpBj9gHpth4IpqE+WoZBAZ
+         8MtIPl8VVCb8O11afBQ8kJpZwYfseGrP2UyOKpibm87wsH1fQkkklfySY4lOKDwI8OwP
+         xWzuUQQWn3ruqaqXa8hO9pxbEiF7akSpkYv3P36+91RpMrjFYcEwzb7ex4vvNf+ttoPO
+         viJAMw/pn/DwMbA3ehyhC0iI7TK7nyGvRfOKtqaE08MFc+zHwE92qXFhyugsc+25sar6
+         v1FdrVUSSp+XMtAZ9xDmxcf2fX/erJUvsWOiKq5LgBiUZxnr0Wv2JLVQcq6NLJXWeXmY
+         8Cew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=QSlxelZmZQkauh748b/7aNwlVR4EaKtqFDpMBsT7q2s=;
-        b=bnlX83u7T4KUiGRxWe7/OmIdX1m6Kj25r8rj7xh/R24VYwy0iN1E4h1jYSChxD+XOL
-         kZri5o+DlcxfYb7wPdwOVuVG8cKRs2ZFhE9dlxhL2+R5hlQjxXnYjIc2e5qVvVFOvDtt
-         z5yeipZLqXYsLjqfM18RuxIlaxGDeS/vpBUUiE6sfhSHuWofMXTPBHtXHXI7UzDNwp2H
-         5cDuhAU+fiSuX0fBx8yRsNXX/RI2eKy0oDEHovGaV/A4GSE/rWkI3WTcwyXq0egNd0R8
-         U6ng0DdhpzxEaXi9C9L9ktvgmLwQ4s7AIkTq0RamEMlm7lxeP3oDJS4nvl1NcolYJ2l5
-         +G0g==
-X-Gm-Message-State: ACrzQf3oCw/b2s5qFHQRM9F2qwLdj5UZGjBIrKGbD0aJnFjOxOHAlkTw
-        gW6VvOBdu5ghv0C7LBtKzWSnDw==
-X-Google-Smtp-Source: AMsMyM4Mco6j50zScn0pA1uSr0W0RCMLK0MagZMF94m1Efp9WHSd2cOmkVjbX1l1RMC/fTgjGZzsJw==
-X-Received: by 2002:a5d:6808:0:b0:22a:c437:5b36 with SMTP id w8-20020a5d6808000000b0022ac4375b36mr6285460wru.459.1663964044375;
-        Fri, 23 Sep 2022 13:14:04 -0700 (PDT)
+        bh=AK4InlvF9B1QaPzw96JloJQ6G3mOJmIdQ9aUwWnWzUc=;
+        b=VxOom1htCMHF2OEnwV+PtCWTfyTkaEamQ6XwJBdOYVSCMC/FJN+ChrKCOY3OeYfVyT
+         wGUXC+E2QvvFwZZ3qbZPzvV2vgcKPUV7cgMz+Cm5wPWcbAISJXvuunkRvm/++cjouO+S
+         Y6vo2ufdhNDDalBnwEA8Vq3reAIOdrfe5DHEio0rvIifv8eX+7uGGDiZ4S6GyALp9W+S
+         IA1E0ndvuBwvAv2s2OUWpyS6Vxx4nSwqaKXhXjfMxWb0M941QZ/IF+aEXleRusIntDnm
+         UPnK7DspSQvdU2SAaML0gjAV//admGFDCweyHzbGkJ0UVeO/SghZp9h776u0AobodtMz
+         SBNw==
+X-Gm-Message-State: ACrzQf2AOnJidVe7zH9Q3Yy4DkijHCSwAvOnCTJ8rsjV+j9fgEoXjFkv
+        8oKBRUoa+aZryzIdrbB7sMyRrw==
+X-Google-Smtp-Source: AMsMyM412ce+3x41p2+xdKr69DMd17SdmUBcsHgqcKrP8N2/oRtXsN98o461kOv8KBQXmVXcIJP0lg==
+X-Received: by 2002:a5d:6d0b:0:b0:22a:ca5b:a37e with SMTP id e11-20020a5d6d0b000000b0022aca5ba37emr6221812wrq.383.1663964052251;
+        Fri, 23 Sep 2022 13:14:12 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.02
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:03 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:11 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,9 +71,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 24/35] net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
-Date:   Fri, 23 Sep 2022 21:13:08 +0100
-Message-Id: <20220923201319.493208-25-dima@arista.com>
+Subject: [PATCH v2 29/35] selftest/tcp-ao: Add test for TCP-AO add setsockopt() command
+Date:   Fri, 23 Sep 2022 21:13:13 +0100
+Message-Id: <20220923201319.493208-30-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
@@ -83,82 +83,245 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Delete becomes very, very fast - almost free, but after setsockopt()
-syscall returns, the key is still alive until next RCU grace period.
-Which is fine for listen sockets as userspace needs to be aware of
-setsockopt(TCP_AO) and accept() race and resolve it with verification
-by getsockopt() after TCP connection was accepted.
+Verify corner-cases for UAPI.
+Sample output:
+> # ./setsockopt-closed_ipv6
+> 1..16
+> # 9508[lib/setup.c:173] rand seed 1643819055
+> TAP version 13
+> ok 1 minimum size
+> ok 2 extended size
+> ok 3 bad algo
+> ok 4 bad ao flags
+> ok 5 empty prefix
+> ok 6 prefix, any addr
+> ok 7 no prefix, any addr
+> ok 8 too short prefix
+> ok 9 too big prefix
+> ok 10 too big maclen
+> ok 11 bad key flags
+> ok 12 too big keylen
+> not ok 13 duplicate: full copy: setsockopt() was expected to fail with 17
+> ok 14 duplicate: any addr key on the socket
+> ok 15 duplicate: add any addr key
+> not ok 16 duplicate: add any addr for the same subnet: setsockopt() was expected to fail with 17
 
-The benchmark results (on non-loaded box, worse with more RCU work pending):
-> ok 33    Worst case delete    16384 keys: min=5ms max=10ms mean=6.93904ms stddev=0.263421
-> ok 34        Add a new key    16384 keys: min=1ms max=4ms mean=2.17751ms stddev=0.147564
-> ok 35 Remove random-search    16384 keys: min=5ms max=10ms mean=6.50243ms stddev=0.254999
-> ok 36         Remove async    16384 keys: min=0ms max=0ms mean=0.0296107ms stddev=0.0172078
-
-Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-Co-developed-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/uapi/linux/tcp.h |  3 +++
- net/ipv4/tcp_ao.c        | 17 ++++++++++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/tcp_ao/Makefile   |   3 +-
+ .../selftests/net/tcp_ao/setsockopt-closed.c  | 191 ++++++++++++++++++
+ 2 files changed, 193 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index 453187d21da8..42850ae6e99d 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -353,6 +353,9 @@ struct tcp_diag_md5sig {
- #define TCP_AO_CMDF_CURR	(1 << 0)	/* Only checks field sndid */
- #define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
- #define TCP_AO_CMDF_ACCEPT_ICMP	(1 << 2)	/* Accept incoming ICMPs */
-+#define TCP_AO_CMDF_DEL_ASYNC	(1 << 3)	/* Asynchronious delete, valid
-+						 * only for listen sockets
-+						 */
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+index 5064e34ebe38..a001dc2aed4e 100644
+--- a/tools/testing/selftests/net/tcp_ao/Makefile
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+-TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
++TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
++		setsockopt-closed
  
- #define TCP_AO_GET_CURR		TCP_AO_CMDF_CURR
- #define TCP_AO_GET_NEXT		TCP_AO_CMDF_NEXT
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 8f569f43e9c2..ed8cacb61694 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -1461,7 +1461,7 @@ static inline bool tcp_ao_mkt_overlap_v6(struct tcp_ao *cmd,
- #define TCP_AO_CMDF_ADDMOD_VALID					\
- 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_ACCEPT_ICMP)
- #define TCP_AO_CMDF_DEL_VALID						\
--	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT)
-+	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_DEL_ASYNC)
- #define TCP_AO_GETF_VALID						\
- 	(TCP_AO_GET_ALL | TCP_AO_GET_CURR | TCP_AO_GET_NEXT)
- 
-@@ -1586,11 +1586,26 @@ static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_key *key,
- 
- 	hlist_del_rcu(&key->node);
- 
-+	/* Support for async delete on listening sockets: as they don't
-+	 * need current_key/rnext_key maintaining, we don't need to check
-+	 * them and we can just free all resources in RCU fashion.
-+	 */
-+	if (cmd->tcpa_flags & TCP_AO_CMDF_DEL_ASYNC) {
-+		if (sk->sk_state != TCP_LISTEN)
-+			return -EINVAL;
-+		atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
-+		call_rcu(&key->rcu, tcp_ao_key_free_rcu);
-+		return 0;
+ TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
+ TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
+diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+new file mode 100644
+index 000000000000..be2cbc407f60
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+@@ -0,0 +1,191 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Author: Dmitry Safonov <dima@arista.com> */
++#include <inttypes.h>
++#include "../../../../include/linux/kernel.h"
++#include "aolib.h"
++
++static void clean_ao(int sk, struct tcp_ao *ao)
++{
++	struct tcp_ao_del ao_del = {};
++
++	ao_del.tcpa_sndid = ao->tcpa_sndid;
++	ao_del.tcpa_rcvid = ao->tcpa_rcvid;
++	ao_del.tcpa_prefix = ao->tcpa_prefix;
++	memcpy(&ao_del.tcpa_addr, &ao->tcpa_addr, sizeof(ao->tcpa_addr));
++
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, &ao_del, sizeof(ao_del)))
++		test_error("setsockopt(TCP_AO_DEL) failed to clean");
++	close(sk);
++}
++
++static void setsockopt_checked(int sk, int optname, struct tcp_ao *ao,
++			       int err, const char *tst)
++{
++	int ret;
++
++	errno = 0;
++	ret = setsockopt(sk, IPPROTO_TCP, optname, ao, sizeof(*ao));
++	if (ret == -1) {
++		if (errno == err) {
++			test_ok("%s", tst);
++			return;
++		}
++		test_fail("%s: setsockopt() returned %d", tst, err);
++		return;
 +	}
 +
- 	/* At this moment another CPU could have looked this key up
- 	 * while it was unlinked from the list. Wait for RCU grace period,
- 	 * after which the key is off-list and can't be looked up again;
- 	 * the rx path [just before RCU came] might have used it and set it
- 	 * as current_key (very unlikely).
-+	 * Free the key with next RCU grace period (in case it was
-+	 * current_key before tcp_ao_current_rnext() might have
-+	 * changed it in forced-delete).
- 	 */
- 	synchronize_rcu();
- 	err = tcp_ao_current_rnext(sk, cmd->tcpa_flags,
++	if (err) {
++		test_fail("%s: setsockopt() was expected to fail with %d", tst, err);
++	} else {
++		test_ok("%s", tst);
++		test_verify_socket_ao(sk, ao);
++	}
++	clean_ao(sk, ao);
++}
++
++static int prepare_defs(struct tcp_ao *ao)
++{
++	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++
++	if (sk < 0)
++		test_error("socket()");
++
++	if (test_prepare_def_ao(ao, "password", 0, this_ip_dest, -1, 100, 100))
++		test_error("prepare default tcp_ao");
++
++	return sk;
++}
++
++static void test_extend(void)
++{
++	struct tcp_ao ao;
++	struct {
++		struct tcp_ao ao;
++		char *extend[100];
++	} ao_big = {};
++	int ret, sk;
++
++	sk = prepare_defs(&ao);
++	errno = 0;
++	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO,
++			&ao, offsetof(struct tcp_ao, tcpa_key));
++	if (!ret) {
++		test_fail("minminum size: accepted invalid size");
++		clean_ao(sk, &ao);
++	} else if (errno != EINVAL) {
++		test_fail("minminum size: failed with %d", errno);
++	} else {
++		test_ok("minimum size");
++	}
++
++	sk = prepare_defs(&ao_big.ao);
++	errno = 0;
++	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao_big.ao, sizeof(ao_big));
++	if (ret) {
++		test_fail("extended size: returned %d", ret);
++	} else {
++		test_ok("extended size");
++		clean_ao(sk, &ao_big.ao);
++	}
++}
++
++static void einval_tests(void)
++{
++	struct tcp_ao ao;
++	int sk;
++
++	sk = prepare_defs(&ao);
++	strcpy(ao.tcpa_alg_name, "imaginary hash algo");
++	setsockopt_checked(sk, TCP_AO, &ao, ENOENT, "bad algo");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_flags = (uint16_t)(-1);
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad ao flags");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_prefix = 0;
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "empty prefix");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_prefix = 32;
++	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "prefix, any addr");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_prefix = 0;
++	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
++	setsockopt_checked(sk, TCP_AO, &ao, 0, "no prefix, any addr");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_prefix = 2;
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too short prefix");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_prefix = 129;
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big prefix");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_maclen = 100;
++	setsockopt_checked(sk, TCP_AO, &ao, EMSGSIZE, "too big maclen");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_keyflags = (uint8_t)(-1);
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad key flags");
++
++	sk = prepare_defs(&ao);
++	ao.tcpa_keylen = TCP_AO_MAXKEYLEN + 1;
++	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big keylen");
++}
++
++static void duplicate_tests(void)
++{
++	union tcp_addr network_dup;
++	struct tcp_ao ao, ao2;
++	int sk;
++
++	sk = prepare_defs(&ao);
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
++		test_error("setsockopt()");
++	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: full copy");
++
++	sk = prepare_defs(&ao);
++	ao2 = ao;
++	memcpy(&ao2.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
++	ao2.tcpa_prefix = 0;
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao2, sizeof(ao)))
++		test_error("setsockopt()");
++	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: any addr key on the socket");
++
++	sk = prepare_defs(&ao);
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
++		test_error("setsockopt()");
++	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
++	ao.tcpa_prefix = 0;
++	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr key");
++
++
++	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_dup) != 1)
++		test_error("Can't convert ip address %s", TEST_NETWORK);
++	sk = prepare_defs(&ao);
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
++		test_error("setsockopt()");
++	if (test_prepare_def_ao(&ao, "password", 0, network_dup, 16, 100, 100))
++		test_error("prepare default tcp_ao");
++	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr for the same subnet");
++}
++
++
++static void *client_fn(void *arg)
++{
++	test_extend();
++	einval_tests();
++	duplicate_tests();
++
++	return NULL;
++}
++
++int main(int argc, char *argv[])
++{
++	test_init(16, client_fn, NULL);
++	return 0;
++}
 -- 
 2.37.2
 
