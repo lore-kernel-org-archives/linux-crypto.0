@@ -2,568 +2,203 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CD7C6FA83
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:19:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 343F7C04A95
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 21:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbiIWUTn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:19:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43636 "EHLO
+        id S232003AbiIWVZp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Sep 2022 17:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232924AbiIWURP (ORCPT
+        with ESMTP id S230018AbiIWVZV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:17:15 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141B31EC42
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:39 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id g3so1506912wrq.13
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:39 -0700 (PDT)
+        Fri, 23 Sep 2022 17:25:21 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9167122A51
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 14:25:18 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id n15so1811183wrq.5
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 14:25:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=vGJ3kSV/z/TY65CJkdoX1ty3nkbmUWg0sp73bEAPcbA=;
-        b=GGl8V5YYoj1u0p17YcK3WgwSDsDtSHpMdCEkuN8IZH1+JHySCBaJ9Kfh2raQeR61OP
-         Ch0MtHEvaMwtjDjXOKFTIjnDM34qkxUeZC0hCPp560qKJseL81ovvIcvG5z97TrRUO9w
-         SmH0FyfcjeogHKJHzLiQbNA0NvQEDotXU5VFmcu3vFgFpDAA01kIKt7+/AzahRUX0Uhc
-         Av0HH0kFNvDEbF9cLEe40kzZRMINYGROkuqOS77PNJ2w0AjjO0VSdsva2LhnEJf5dtmx
-         IO4ou+73F+Fv+Z1N83816cjvOSJH4FCZqR9o8K8C3tbax8aJsYzwFTwssBKboeWD5h2Y
-         dCPQ==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=QYrS8aOXLdxfqH2E62RLs+f9pZwOFHbwNujxln9jHyA=;
+        b=Hi/H8ExZPdy/8PAaeHOmAMG4nWm4ghmynArm3W8PbYmlmyXQ3uIANZI82QLoqaM/LK
+         +BoF/anj5m2URzuhNwoMgMAMxabnMnq0TO2Mz77ywAMxXgtrWK1r0jmiNeCZaaH17+PQ
+         2HCNtgyOGG518WvjJ9V0TKkzJ5TBAUuYfyeN/vBZhTcNKOzzD+4+5D1xg3B6OTjW1T8K
+         HG8S3fcDIGgnHrdWp4sK+r4pIfxNjSkX7BW3xbZ4j4wvtHbQ7Za1Jveq2/M0Qdo0tZWS
+         95pG0iCzlH34rashvM5klN6fQaN0NnuvRo5txYugnQNmUZiwLK5xZN/0QlfY/dRrTLs6
+         HzCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=vGJ3kSV/z/TY65CJkdoX1ty3nkbmUWg0sp73bEAPcbA=;
-        b=1Ja8fHxkxvgCPrOvIvIuUhm8MDmFW4sIDlGJWM7ZkKQPGg79OBiSj0pWniB01KNdSR
-         EZgtXM4FNOoGY4id1MJZn4/jwqnST4Zxv4cVdtpV+JGR0B88h7EBdb0YqwHaaqOKa1Ge
-         ZcBwxDr7SjUdsR//fynN20HxbQZZIVRhcD0Wzo5TvHI7XX3HC6mBgGtFv8u6I0iy7K7Q
-         ys+K7rwG7CZQvCPsLyBBdEFNOV7CHe6y9h3caTWuPjBKUk4JoMIdSLHS1rbM/Dz5a83b
-         5nO9Joxds493otulU6nwBNle055T2S8a6Jfw3KVyCCrABzE5dapgkDR1eBXKs/r8Wj75
-         ykAw==
-X-Gm-Message-State: ACrzQf3LU3816zZGzmes6YqCVRZST+AYvImIyahNLhi0q8EzZFP7MoLB
-        Uv4uIu/FND7q7T5sgq95tO9E1w==
-X-Google-Smtp-Source: AMsMyM7T3Lp+hwySehW1+5Sm0y5+nZs0WaCyuijdS7rcqqxlXSGqvQOmB8dBkYrIawXPtbQomX16Zg==
-X-Received: by 2002:a5d:45cc:0:b0:228:d72b:7a79 with SMTP id b12-20020a5d45cc000000b00228d72b7a79mr6005866wrs.460.1663964055199;
-        Fri, 23 Sep 2022 13:14:15 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
-From:   Dmitry Safonov <dima@arista.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=QYrS8aOXLdxfqH2E62RLs+f9pZwOFHbwNujxln9jHyA=;
+        b=2uEsHLKyzS9PACn2bflTE93Fr6fRmkdzF4x7NqMjd5jJXMYU63RDxBh5UvF0/epkaf
+         9lyC+MdlHOmljBGBYjAhHFltEA0n3YCYebvLnrmukp2R6CLECoCQ2z6rQ1j8b3Qrbarl
+         TOGpplsUN/VstA5/XYNTFLq87PpAV9CNdzwJDUsKIk/0QRNSzX6ksS/K1fTrTRlCrkAU
+         NAC4QXjLDDmU04od4/kJN2UCkg9GeJvSQufQRwGfdSGC+qn/WQO2VBxkHWZZ+gIhFuCC
+         BuB4d5hotgVzO2EZ978Vpza8NDu7m81DjTAupIfzOoAMAAPajPi0fcyd+5qHk7Illt2I
+         8ZQQ==
+X-Gm-Message-State: ACrzQf34LrWAcuov2H2jLB4JqKJ6fsN2HLmuTEybLqc6keWWe9h3ygre
+        XyIqVa2dYwc1VM+BSjvOzKKoMg==
+X-Google-Smtp-Source: AMsMyM7gocVlrtj5dqu1OiHtiRCqcKRbRfs4z/zcbr9ci9j7iMZlVMSPxnq0HVdqw7xJsq30MrKBAA==
+X-Received: by 2002:a5d:47c5:0:b0:22a:6d4c:f21e with SMTP id o5-20020a5d47c5000000b0022a6d4cf21emr6462523wrc.417.1663968317189;
+        Fri, 23 Sep 2022 14:25:17 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id u9-20020a056000038900b002252884cc91sm8155982wrf.43.2022.09.23.14.25.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 14:25:16 -0700 (PDT)
+Message-ID: <3cf03d51-74db-675c-b392-e4647fa5b5a6@arista.com>
+Date:   Fri, 23 Sep 2022 22:25:09 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH v2 00/35] net/tcp: Add TCP-AO support
+Content-Language: en-US
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     Dmitry Safonov <dima@arista.com>,
-        Andy Lutomirski <luto@amacapital.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Leonard Crestez <cdleonard@gmail.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
         Ard Biesheuvel <ardb@kernel.org>,
         Bob Gilligan <gilligan@arista.com>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         "David S. Miller" <davem@davemloft.net>,
         Dmitry Safonov <0x7f454c46@gmail.com>,
         Eric Biggers <ebiggers@kernel.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Ivan Delalande <colona@arista.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
         Paolo Abeni <pabeni@redhat.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 31/35] selftests/aolib: Add test/benchmark for removing MKTs
-Date:   Fri, 23 Sep 2022 21:13:15 +0100
-Message-Id: <20220923201319.493208-32-dima@arista.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20220923201319.493208-1-dima@arista.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sample output:
-> 1..36
-> # 1106[lib/setup.c:207] rand seed 1660754406
-> TAP version 13
-> ok 1   Worst case connect       512 keys: min=0ms max=1ms mean=0.583329ms stddev=0.076376
-> ok 2 Connect random-search      512 keys: min=0ms max=1ms mean=0.53412ms stddev=0.0516779
-> ok 3    Worst case delete       512 keys: min=2ms max=11ms mean=6.04139ms stddev=0.245792
-> ok 4        Add a new key       512 keys: min=0ms max=13ms mean=0.673415ms stddev=0.0820618
-> ok 5 Remove random-search       512 keys: min=5ms max=9ms mean=6.65969ms stddev=0.258064
-> ok 6         Remove async       512 keys: min=0ms max=0ms mean=0.041825ms stddev=0.0204512
-> ok 7   Worst case connect       1024 keys: min=0ms max=2ms mean=0.520357ms stddev=0.0721358
-> ok 8 Connect random-search      1024 keys: min=0ms max=2ms mean=0.535312ms stddev=0.0517355
-> ok 9    Worst case delete       1024 keys: min=5ms max=9ms mean=8.27219ms stddev=0.287614
-> ok 10        Add a new key      1024 keys: min=0ms max=1ms mean=0.688121ms stddev=0.0829531
-> ok 11 Remove random-search      1024 keys: min=5ms max=9ms mean=8.37649ms stddev=0.289422
-> ok 12         Remove async      1024 keys: min=0ms max=0ms mean=0.0457096ms stddev=0.0213798
-> ok 13   Worst case connect      2048 keys: min=0ms max=2ms mean=0.748804ms stddev=0.0865335
-> ok 14 Connect random-search     2048 keys: min=0ms max=2ms mean=0.782993ms stddev=0.0625697
-> ok 15    Worst case delete      2048 keys: min=5ms max=10ms mean=8.23106ms stddev=0.286898
-> ok 16        Add a new key      2048 keys: min=0ms max=1ms mean=0.812988ms stddev=0.0901658
-> ok 17 Remove random-search      2048 keys: min=8ms max=9ms mean=8.84949ms stddev=0.297481
-> ok 18         Remove async      2048 keys: min=0ms max=0ms mean=0.0297223ms stddev=0.0172402
-> ok 19   Worst case connect      4096 keys: min=1ms max=5ms mean=1.53352ms stddev=0.123836
-> ok 20 Connect random-search     4096 keys: min=1ms max=5ms mean=1.52226ms stddev=0.0872429
-> ok 21    Worst case delete      4096 keys: min=5ms max=9ms mean=8.25874ms stddev=0.28738
-> ok 22        Add a new key      4096 keys: min=0ms max=3ms mean=1.67382ms stddev=0.129376
-> ok 23 Remove random-search      4096 keys: min=5ms max=10ms mean=8.26178ms stddev=0.287433
-> ok 24         Remove async      4096 keys: min=0ms max=0ms mean=0.0340009ms stddev=0.0184393
-> ok 25   Worst case connect      8192 keys: min=2ms max=4ms mean=2.86208ms stddev=0.169177
-> ok 26 Connect random-search     8192 keys: min=2ms max=4ms mean=2.87592ms stddev=0.119915
-> ok 27    Worst case delete      8192 keys: min=6ms max=11ms mean=7.55291ms stddev=0.274826
-> ok 28        Add a new key      8192 keys: min=1ms max=5ms mean=2.56797ms stddev=0.160249
-> ok 29 Remove random-search      8192 keys: min=5ms max=10ms mean=7.14002ms stddev=0.267208
-> ok 30         Remove async      8192 keys: min=0ms max=0ms mean=0.0320066ms stddev=0.0178904
-> ok 31   Worst case connect      16384 keys: min=5ms max=6ms mean=5.55334ms stddev=0.235655
-> ok 32 Connect random-search     16384 keys: min=5ms max=6ms mean=5.52614ms stddev=0.166225
-> ok 33    Worst case delete      16384 keys: min=5ms max=11ms mean=7.39109ms stddev=0.271866
-> ok 34        Add a new key      16384 keys: min=2ms max=4ms mean=3.35799ms stddev=0.183248
-> ok 35 Remove random-search      16384 keys: min=5ms max=8ms mean=6.86078ms stddev=0.261931
-> ok 36         Remove async      16384 keys: min=0ms max=0ms mean=0.0302384ms stddev=0.0173892
-> # Totals: pass:36 fail:0 xfail:0 xpass:0 skip:0 error:0
+On 9/23/22 21:12, Dmitry Safonov wrote:
+> Changes from v1:
+> - Building now with CONFIG_IPV6=n (kernel test robot <lkp@intel.com>)
+> - Added missing static declarations for local functions
+>   (kernel test robot <lkp@intel.com>)
+> - Addressed static analyzer and review comments by Dan Carpenter
+>   (thanks, they were very useful!)
+> - Fix elif without defined() for !CONFIG_TCP_AO
+> - Recursively build selftests/net/tcp_ao (Shuah Khan), patches in:
+>   https://lore.kernel.org/all/20220919201958.279545-1-dima@arista.com/T/#u
+> - Don't leak crypto_pool reference when TCP-MD5 key is modified/changed
+> - Add TCP-AO support for nettest.c and fcnal-test.sh
+>   (will be used for VRF testing in later versions)
+> 
+> Version 1: https://lore.kernel.org/all/20220818170005.747015-1-dima@arista.com/T/#u
 
-From it it's visible that the current simplified approach with
-linked-list of MKTs scales quite fine even for thousands of keys.
-And that also means that the majority of the time for delete is eaten by
-synchronize_rcu() [which I can confirm separately by tracing].
+I think it's worth answering the question: why am I continuing sending
+patches for TCP-AO support when there's already another proposal? [1]
+Pre-history how we end up with the second approach is here: [2]
+TLDR; we had a customer and a deadline to deliver, I've given reviews to
+Leonard, but in the end it seems to me what we got is worth submitting
+as it's better in my view in many aspects.
 
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- tools/testing/selftests/net/tcp_ao/Makefile   |   4 +-
- .../selftests/net/tcp_ao/bench-lookups.c      | 403 ++++++++++++++++++
- 2 files changed, 406 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/bench-lookups.c
+The biggest differences between two proposals, that I care about
+(design-decisions, not implementation details):
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index da44966f3687..a4af7d4da169 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
--		setsockopt-closed unsigned-md5
-+		setsockopt-closed unsigned-md5 bench-lookups
- 
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-@@ -46,3 +46,5 @@ $(OUTPUT)/%_ipv6: %.c
- 
- $(OUTPUT)/icmps-accept_ipv4: CFLAGS+= -DTEST_ICMPS_ACCEPT
- $(OUTPUT)/icmps-accept_ipv6: CFLAGS+= -DTEST_ICMPS_ACCEPT
-+$(OUTPUT)/bench-lookups_ipv4: LDFLAGS+= -lm
-+$(OUTPUT)/bench-lookups_ipv6: LDFLAGS+= -lm
-diff --git a/tools/testing/selftests/net/tcp_ao/bench-lookups.c b/tools/testing/selftests/net/tcp_ao/bench-lookups.c
-new file mode 100644
-index 000000000000..41456d85e06a
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/bench-lookups.c
-@@ -0,0 +1,403 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Author: Dmitry Safonov <dima@arista.com> */
-+#include <arpa/inet.h>
-+#include <inttypes.h>
-+#include <math.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <time.h>
-+
-+#include "../../../../include/linux/bits.h"
-+#include "../../../../include/linux/kernel.h"
-+#include "aolib.h"
-+
-+#define AO_KEY_SZ	300 /* ~= sizeof(struct tcp_ao_key) */
-+#define NR_ITERS	100 /* number of times to run gathering statistics */
-+
-+#ifdef IPV6_TEST
-+typedef struct in6_addr ipaddr_t;
-+static ipaddr_t get_ipaddr_t(ipaddr_t net, size_t n)
-+{
-+	ipaddr_t ret = net;
-+
-+	ret.s6_addr32[3] = htonl(n & (BIT(32) - 1));
-+	ret.s6_addr32[2] = htonl((n >> 32) & (BIT(32) - 1));
-+
-+	return ret;
-+}
-+#else
-+typedef struct in_addr ipaddr_t;
-+static ipaddr_t get_ipaddr_t(ipaddr_t net, size_t n)
-+{
-+	ipaddr_t ret;
-+
-+	ret.s_addr = htonl(ntohl(net.s_addr) + n);
-+	return ret;
-+}
-+#endif
-+
-+static void gen_test_ips(ipaddr_t *ips, size_t ips_nr, bool use_rand)
-+{
-+	ipaddr_t net;
-+	size_t i, j;
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &net) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+
-+	if (!use_rand) {
-+		for (i = 0; i < ips_nr; i++)
-+			ips[i] = get_ipaddr_t(net, 2 * i + 1);
-+		return;
-+	}
-+	for (i = 0; i < ips_nr; i++) {
-+		size_t r = (size_t)random() | 0x1;
-+
-+		ips[i] = get_ipaddr_t(net, r);
-+
-+		for (j = i - 1; j > 0 && i > 0; j--) {
-+			if (!memcmp(&ips[i], &ips[j], sizeof(ipaddr_t))) {
-+				i--; /* collision */
-+				break;
-+			}
-+		}
-+	}
-+}
-+
-+static void test_add_routes(ipaddr_t *ips, size_t ips_nr)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < ips_nr; i++) {
-+		union tcp_addr *p = (union tcp_addr *)&ips[i];
-+
-+		if (ip_route_add(veth_name, TEST_FAMILY, this_ip_addr, *p))
-+			test_error("Failed to add route");
-+	}
-+}
-+
-+static void server_apply_keys(int lsk, ipaddr_t *ips, size_t ips_nr)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < ips_nr; i++) {
-+		union tcp_addr *p = (union tcp_addr *)&ips[i];
-+
-+		if (test_set_ao(lsk, "password", 0, *p, -1, 100, 100))
-+			test_error("setsockopt(TCP_AO)");
-+	}
-+}
-+
-+static const size_t nr_keys[] = { 512, 1024, 2048, 4096, 8192, 16384 };
-+static ipaddr_t *test_ips;
-+
-+struct bench_stats {
-+	uint64_t min;
-+	uint64_t max;
-+	uint64_t nr;
-+	double mean;
-+	double s2;
-+};
-+
-+static struct bench_tests {
-+	struct bench_stats delete_last_key;
-+	struct bench_stats add_key;
-+	struct bench_stats delete_rand_key;
-+	struct bench_stats connect_last_key;
-+	struct bench_stats connect_rand_key;
-+	struct bench_stats delete_async;
-+} bench_results[ARRAY_SIZE(nr_keys)];
-+
-+#define NSEC_PER_SEC 1000000000ULL
-+
-+static void measure_call(struct bench_stats *st,
-+			 void (*f)(int, void *), int sk, void *arg)
-+{
-+	struct timespec start = {}, end = {};
-+	double delta;
-+	uint64_t nsec;
-+
-+	if (clock_gettime(CLOCK_MONOTONIC, &start))
-+		test_error("clock_gettime()");
-+
-+	f(sk, arg);
-+
-+	if (clock_gettime(CLOCK_MONOTONIC, &end))
-+		test_error("clock_gettime()");
-+
-+	nsec = (end.tv_sec - start.tv_sec) * NSEC_PER_SEC;
-+	if (end.tv_nsec >= start.tv_nsec)
-+		nsec += end.tv_nsec - start.tv_nsec;
-+	else
-+		nsec -= start.tv_nsec - end.tv_nsec;
-+
-+	if (st->nr == 0) {
-+		st->min = st->max = nsec;
-+	} else {
-+		if (st->min > nsec)
-+			st->min = nsec;
-+		if (st->max < nsec)
-+			st->max = nsec;
-+	}
-+
-+	/* Welford-Knuth algorithm */
-+	st->nr++;
-+	delta = (double)nsec - st->mean;
-+	st->mean += delta / st->nr;
-+	st->s2 += delta * ((double)nsec - st->mean);
-+}
-+
-+static void delete_mkt(int sk, void *arg)
-+{
-+	struct tcp_ao_del *ao = arg;
-+
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, ao, sizeof(*ao)))
-+		test_error("setsockopt(TCP_AO_DEL)");
-+}
-+
-+static void add_back_mkt(int sk, void *arg)
-+{
-+	union tcp_addr *p = arg;
-+
-+	if (test_set_ao(sk, "password", 0, *p, -1, 100, 100))
-+		test_error("setsockopt(TCP_AO)");
-+}
-+
-+static void memcpy_sockaddr(void *dest, union tcp_addr *in_addr)
-+{
-+#ifdef IPV6_TEST
-+	struct sockaddr_in6 addr = {
-+		.sin6_family	= AF_INET6,
-+		.sin6_port	= 0,
-+		.sin6_addr	= in_addr->a6,
-+	};
-+#else
-+	struct sockaddr_in addr = {
-+		.sin_family	= AF_INET,
-+		.sin_port	= 0,
-+		.sin_addr	= in_addr->a4,
-+	};
-+#endif
-+
-+	memcpy(dest, &addr, sizeof(addr));
-+}
-+
-+static void bench_delete(int lsk, struct bench_stats *add,
-+			 struct bench_stats *del,
-+			 ipaddr_t *ips, size_t ips_nr,
-+			 bool rand_order, bool async)
-+{
-+	struct tcp_ao_del ao_del = {};
-+	union tcp_addr *p;
-+	size_t i;
-+
-+	ao_del.tcpa_sndid = 100;
-+	ao_del.tcpa_rcvid = 100;
-+	if (async)
-+		ao_del.tcpa_flags = TCP_AO_CMDF_DEL_ASYNC;
-+	ao_del.tcpa_prefix = DEFAULT_TEST_PREFIX;
-+
-+	/* Remove the first added */
-+	p = (union tcp_addr *)&ips[0];
-+	memcpy_sockaddr(&ao_del.tcpa_addr, p);
-+
-+	for (i = 0; i < NR_ITERS; i++) {
-+		measure_call(del, delete_mkt, lsk, (void *)&ao_del);
-+
-+		/* Restore it back */
-+		measure_call(add, add_back_mkt, lsk, (void *)p);
-+
-+		/*
-+		 * Slowest for FILO-linked-list:
-+		 * on (i) iteration removing ips[i] element. When it gets
-+		 * added to the list back - it becomes first to fetch, so
-+		 * on (i + 1) iteration go to ips[i + 1] element.
-+		 */
-+		if (rand_order)
-+			p = (union tcp_addr *)&ips[rand() % ips_nr];
-+		else
-+			p = (union tcp_addr *)&ips[i % ips_nr];
-+		memcpy_sockaddr(&ao_del.tcpa_addr, p);
-+	}
-+}
-+
-+static void bench_connect_srv(int lsk, ipaddr_t *ips, size_t ips_nr)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < NR_ITERS; i++) {
-+		int err, sk;
-+
-+		synchronize_threads();
-+
-+		err = test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0);
-+		if (!err)
-+			test_error("timeouted for accept()");
-+		else if (err < 0)
-+			test_error("test_wait_fd()");
-+
-+		sk = accept(lsk, NULL, NULL);
-+		if (sk < 0)
-+			test_error("accept()");
-+
-+		close(sk);
-+	}
-+}
-+
-+static void test_print_stats(const char *desc, size_t nr, struct bench_stats *bs)
-+{
-+	test_ok("%20s\t%zu keys: min=%" PRIu64 "ms max=%" PRIu64 "ms mean=%gms stddev=%g",
-+		desc, nr, bs->min / 1000000, bs->max / 1000000,
-+		bs->mean / 1000000, sqrt((bs->mean / 1000000) / bs->nr));
-+}
-+
-+static void *server_fn(void *arg)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < ARRAY_SIZE(nr_keys); i++) {
-+		struct bench_tests *bt = &bench_results[i];
-+		int lsk;
-+
-+		test_ips = malloc(nr_keys[i] * sizeof(ipaddr_t));
-+		if (!test_ips)
-+			test_error("malloc()");
-+
-+		lsk = test_listen_socket(this_ip_addr, test_server_port + i, 1);
-+
-+		gen_test_ips(test_ips, nr_keys[i], false);
-+		test_add_routes(test_ips, nr_keys[i]);
-+		test_set_optmem(AO_KEY_SZ * nr_keys[i]);
-+		server_apply_keys(lsk, test_ips, nr_keys[i]);
-+
-+		synchronize_threads();
-+		bench_connect_srv(lsk, test_ips, nr_keys[i]);
-+		bench_connect_srv(lsk, test_ips, nr_keys[i]);
-+
-+		/* The worst case for FILO-list */
-+		bench_delete(lsk, &bt->add_key, &bt->delete_last_key,
-+			     test_ips, nr_keys[i], false, false);
-+		test_print_stats("Worst case delete",
-+				nr_keys[i], &bt->delete_last_key);
-+		test_print_stats("Add a new key",
-+				nr_keys[i], &bt->add_key);
-+
-+		bench_delete(lsk, &bt->add_key, &bt->delete_rand_key,
-+			     test_ips, nr_keys[i], true, false);
-+		test_print_stats("Remove random-search",
-+				nr_keys[i], &bt->delete_rand_key);
-+
-+		bench_delete(lsk, &bt->add_key, &bt->delete_async,
-+			     test_ips, nr_keys[i], false, true);
-+		test_print_stats("Remove async", nr_keys[i], &bt->delete_async);
-+
-+		free(test_ips);
-+		close(lsk);
-+	}
-+
-+	return NULL;
-+}
-+
-+static void connect_client(int sk, void *arg)
-+{
-+	size_t *p = arg;
-+
-+	if (test_connect_socket(sk, this_ip_dest, test_server_port + *p) <= 0)
-+		test_error("failed to connect()");
-+}
-+
-+static void client_addr_setup(int sk, union tcp_addr taddr)
-+{
-+#ifdef IPV6_TEST
-+	struct sockaddr_in6 addr = {
-+		.sin6_family	= AF_INET6,
-+		.sin6_port	= 0,
-+		.sin6_addr	= taddr.a6,
-+	};
-+#else
-+	struct sockaddr_in addr = {
-+		.sin_family	= AF_INET,
-+		.sin_port	= 0,
-+		.sin_addr	= taddr.a4,
-+	};
-+#endif
-+	int ret;
-+
-+	ret = ip_addr_add(veth_name, TEST_FAMILY, taddr, TEST_PREFIX);
-+	if (ret && ret != -EEXIST)
-+		test_error("Failed to add ip address");
-+	ret = ip_route_add(veth_name, TEST_FAMILY, taddr, this_ip_dest);
-+	if (ret && ret != -EEXIST)
-+		test_error("Failed to add route");
-+
-+	if (bind(sk, &addr, sizeof(addr)))
-+		test_error("bind()");
-+}
-+
-+static void bench_connect_client(size_t port_off, struct bench_tests *bt,
-+		ipaddr_t *ips, size_t ips_nr, bool rand_order)
-+{
-+	struct bench_stats *con;
-+	union tcp_addr *p;
-+	size_t i;
-+
-+	if (rand_order)
-+		con = &bt->connect_rand_key;
-+	else
-+		con = &bt->connect_last_key;
-+
-+	p = (union tcp_addr *)&ips[0];
-+
-+	for (i = 0; i < NR_ITERS; i++) {
-+		int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+
-+		if (sk < 0)
-+			test_error("socket()");
-+
-+		client_addr_setup(sk, *p);
-+		if (test_set_ao(sk, "password", 0, this_ip_dest, -1, 100, 100))
-+			test_error("setsockopt(TCP_AO)");
-+
-+		synchronize_threads();
-+
-+		measure_call(con, connect_client, sk, (void *)&port_off);
-+
-+		close(sk);
-+
-+		/*
-+		 * Slowest for FILO-linked-list:
-+		 * on (i) iteration removing ips[i] element. When it gets
-+		 * added to the list back - it becomes first to fetch, so
-+		 * on (i + 1) iteration go to ips[i + 1] element.
-+		 */
-+		if (rand_order)
-+			p = (union tcp_addr *)&ips[rand() % ips_nr];
-+		else
-+			p = (union tcp_addr *)&ips[i % ips_nr];
-+	}
-+}
-+
-+static void *client_fn(void *arg)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < ARRAY_SIZE(nr_keys); i++) {
-+		struct bench_tests *bt = &bench_results[i];
-+
-+		synchronize_threads();
-+		bench_connect_client(i, bt, test_ips, nr_keys[i], false);
-+		test_print_stats("Worst case connect",
-+				nr_keys[i], &bt->connect_last_key);
-+
-+		bench_connect_client(i, bt, test_ips, nr_keys[i], false);
-+		test_print_stats("Connect random-search",
-+				nr_keys[i], &bt->connect_last_key);
-+	}
-+	synchronize_threads();
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(36, server_fn, client_fn);
-+	return 0;
-+}
--- 
-2.37.2
+1. Per-netns TCP-AO keys vs per-socket TCP-AO keys. The reasons why this
+proposal is using per-socket keys (that are added like TCP-MD5 keys with
+setsockopt()) are:
+- They scale better: you don't have to lookup in netns database for a
+key. This is a major thing for Arista: we have to support customers that
+want more than 1000 peers with possible multiple keys per-peer. This
+scales well when the keys are split by design for each socket on every
+established connection.
+- TCP-AO doesn't require CAP_NET_ADMIN for usage.
+- TCP-AO is not meant to be transparent (like ipsec tunnels) for
+applications. The users are BGP applications which already know what
+they need.
+- Leonard's proposal has weird semantics when setsockopt() on some
+socket will change keys on other sockets in that network namespace. It
+should have been rather netlink-managed API or something of the kind if
+the keys are per-netns.
 
+2. This proposal seeks to do less in kernel space and leave more
+decision-making to the userspace. It is another major disagreement with
+Leonard's proposal, which seeks to add a key lifetime, key rotation
+logic and all other business-logic details into the kernel, while here
+those decisions are left for the userspace.
+If I understood Leonard correctly, he is placing more things in kernel
+to simplify migration for user applications from TCP-MD5 to TCP-AO. I
+rather think that would be a job for a shared library if that's needed.
+As per my perception (1) was also done to relieve userspace from the job
+of removing an outdated key simultaneously from all users in netns,
+while in this proposal this job is left for userspace to use available
+IPC methods. Essentially, I think TCP-AO in kernel should do only
+minimum that can't be done "reasonably" in userspace. By "reasonably" I
+mean without moving the TCP-IP stack into userspace.
+
+3. Re-using existing kernel code vs copy'n'pasting it, leaving
+refactoring for later. I'm a big fan of reusing existing functions. I
+think lesser amount of code in the end reduces the burden of maintenance
+as well as simplifies the code (both reading and changing). I can see
+Leonard's point of simplifying backports to stable releases that he
+ships to customers, but I think any upstream proposal should add less
+code and try reusing more.
+
+4. Following RFC5925 closer to text. RFC says that rnext_key from the
+peer MUST be respected, as well as that current_key MUST not be removed
+on an established connection. In this proposal if the requirements of
+RFC can be met, they are followed, rather than broken.
+
+5. Using ahash instead of shash. If there's a hardware accelerator - why
+not using it? This proposal uses crypto_ahash through per-CPU pool of
+crypto requests (crypto_pool).
+
+6. Hash algorithm UAPI: magic constants vs hash name as char *. This is
+a thing I've asked Leonard multiple times and what he refuses to change
+in his patches: let the UAPI have `char tcpa_alg_name[64]' and just pass
+it to crypto_* layer. There is no need for #define MY_HASHING_ALGO 0x2
+and another in-kernel array to convert the magic number to algorithm
+string in order to pass it to crypto.
+The algorithm names are flexible: we already have customer's request to
+use other than RFC5926 required hashing algorithms. And I don't see any
+value in this middle-layer. This is already what kernel does, see for
+example, include/uapi/linux/xfrm.h, grep for alg_name.
+
+7. Adding traffic keys from the beginning. The proposal would be
+incomplete without having traffic keys: they are pre-calculated in this
+proposal, so the TCP stack doesn't have to do hashing twice (first for
+calculation of the traffic key) for every segment on established
+connections. This proposal has them naturally per-socket.
+
+I think those are the biggest differences in the approaches and they are
+enough to submit a concurrent proposal. Salam, Francesco, please add if
+I've missed any other disagreement or major architectural/design
+difference in the proposals.
+
+> In TODO (expect in next versions):
+> - selftests on older kernels (or with CONFIG_TCP_AO=n) should exit with
+>   SKIP, not FAIL
+> - Support VRFs in setsockopt()
+> - setsockopt() UAPI padding + a test that structures are of the same
+>   size on 32-bit as on 64-bit platforms
+> - IPv4-mapped-IPv6 addresses (might be working, but no selftest now)
+> - Remove CONFIG_TCP_AO dependency on CONFIG_TCP_MD5SIG
+> - Add TCP-AO static key
+> - Measure/benchmark TCP-AO and regular TCP connections
+> - setsockopt(TCP_REPAIR) with TCP-AO
+[..]
+[1]:
+https://lore.kernel.org/linux-crypto/cover.1662361354.git.cdleonard@gmail.com/
+[2]:
+https://lore.kernel.org/all/8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com/T/#u
+
+Thanks,
+          Dmitry
