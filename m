@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FAFC04A95
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498CBC6FA86
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbiIWUTm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:19:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
+        id S232944AbiIWUTp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233007AbiIWURQ (ORCPT
+        with ESMTP id S232933AbiIWURW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:17:16 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F32275CC
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:41 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id l8so896445wmi.2
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:41 -0700 (PDT)
+        Fri, 23 Sep 2022 16:17:22 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887AB2E9DB
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:44 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id y5so1595984wrh.3
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=MBUbVFEwLKRBMspXhOcGFGb+XB56PAssdDrUuZX7LcI=;
-        b=BUoIFDeYrIxQrj3hU9Z4alXjH8JiNKMCggSBFtQw0j1YHnb99sszOxDOrTCxrPvDaQ
-         l20BxkdZwnekHZXcQ+m9IKbP40Q/Owkf05BqWOAHja877GCa+pocNjc20uUcQyGd4HXr
-         u52B6+A2xqenAbuha4N8TBmTy752uVW6RqSXyk1SPhJi05UAsFVobLKTbTuYvPeHeXF7
-         KGvZjSGQ0tKWE5asp0k0vyyPfB7gTnBrCXtNNRXKCftP/Wwn0jvsfqF7CboK1UXsFFj0
-         CK4F55hqTKDRTszut8xIwYSz3TjXsg5kSbPRq59RoCXlXH4gTg76WHDY50i5S0DpLFgB
-         dEqw==
+        bh=wu+vO3HU4o0igy8GwnrpzU8jWtgbJXoh+Dvw0e8+tOY=;
+        b=c1nkNJqhfqUxQjnNUQ0Ob1lw5cZc0i9GB2b5k4yGEh2DyxGpquj5QoYRQhwAO2Rvmc
+         dYVbaprQys3GpbSRLHEU/ix6mYD8xler7hL4JCb0XgQex1hZb3L2TXwZ8CmZr9PfMBIa
+         DarRdQ0A/aIpH1Oo1bFTfUUDgjs63VmqfC/bzYLdFV4Wuzfrbjn2EUmwnvnAzcoqM3r8
+         kmSvRU80fJA91QHqH2rZ2JMaOH2fjGBjM9liqIwoCqoXQ5P6Vnf1kyz7GdKYHqCfv1+2
+         GPwW0y9Q80FkKL4uDJta3nBThKMI39Yh1oLn5FFEAiY50KibkfM2hNCzlcK867wn9iW8
+         O/dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=MBUbVFEwLKRBMspXhOcGFGb+XB56PAssdDrUuZX7LcI=;
-        b=2ObI3Wqf+gxLyNd9Z2dslARtCgd5y+EN6dvTs8LuMDbnFggPrwgECpOsDzdmBCZgM2
-         Fj4t9xIz7gKHcUfiBiMzB+qbCj1NQu4q7CVfN6iIUx54ZaBECSD61nNjy2vBRXuGcigj
-         XpJABbZ/9jQIgkRfbxCuCnd7dLVwcV0r/k0BZwK+A7Um2JtMj3RMZlO72UVtmEUOEX6/
-         jkbFvZFEDkEtLmgwR40LJt6tWDwm/ly8ymE9u6eLzFgxPwBTS3eqLpi32xJuyaSq2dNZ
-         C4Qvubt9PIjiGwriAaBeUa/y3Ru1zPoM4ckQ4lK9G6iwkyrBYSWOcQ8x2cY/wSJNTWV1
-         3gXQ==
-X-Gm-Message-State: ACrzQf3JsScLx5gZNKg6WqhQVCuHx6wJJ/9basA5/Sol3J/0JfI3Wuwg
-        Kg+jQUxc/TBxgImhRT9boEPsIQ==
-X-Google-Smtp-Source: AMsMyM5xGXGdrqU8YiG6eAh4VWNw66yB4OS1OY8oEL31WrISPTZ956Il8jxnH0YNLIbaXO/C1IAgmQ==
-X-Received: by 2002:a05:600c:6026:b0:3b5:b00:3a5a with SMTP id az38-20020a05600c602600b003b50b003a5amr4045888wmb.108.1663964056743;
-        Fri, 23 Sep 2022 13:14:16 -0700 (PDT)
+        bh=wu+vO3HU4o0igy8GwnrpzU8jWtgbJXoh+Dvw0e8+tOY=;
+        b=Rm3bZSWsYVrR6jzFxUHseCH8WAnifQ2m07co9+OuWcG1CQ5f7l2QPXhr8mCbEsmSy6
+         c5UfMnj+wIuoYIwOZgM4MPpJnvngA4CjuIRQpxVj7pmWiAN715FBc9+ZiWNKm+6OV51N
+         QTFUJWBkXaeYVUedHGpgmYKHdnoJLnzyMhgJV2We3mTck50097NEAK8admZGlf7KOsIR
+         aFuBH34WVb1RH0+xCdcdkmrZk+lciuO2SA5rKrcqfi+qRolpC0RGC4TZ7IiG1XVm/ARp
+         K2J54gsAql3kj7joHEam0cKBndoH8Ca0JDo9MuBIwirWEkx37ow/sMXv8eaK9GIAcGTU
+         yrkA==
+X-Gm-Message-State: ACrzQf2HJzrJXF5FLWdOnZ+4aBP65MiMamETwbTZGgYo4L2RfqbGNKR3
+        yzgKc/geYRE+WKfwCLtHPy3wfQ==
+X-Google-Smtp-Source: AMsMyM71ktVFGj+2D0qOBagBqYkBArxbmqLqyO6Rx6+7SwV356P/qZcRhYzSy2+naL6g8c6QPbhLgw==
+X-Received: by 2002:a05:6000:144c:b0:22b:dda:eeb0 with SMTP id v12-20020a056000144c00b0022b0ddaeeb0mr6511078wrx.335.1663964059768;
+        Fri, 23 Sep 2022 13:14:19 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.15
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:16 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:19 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,9 +71,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 32/35] selftests/nettest: Remove client_pw
-Date:   Fri, 23 Sep 2022 21:13:16 +0100
-Message-Id: <20220923201319.493208-33-dima@arista.com>
+Subject: [PATCH v2 34/35] selftests/nettest: Add TCP-AO support
+Date:   Fri, 23 Sep 2022 21:13:18 +0100
+Message-Id: <20220923201319.493208-35-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
@@ -83,680 +83,294 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use -X to set md5 password string and -M to set authentication method as
-TCP-MD5. Remove client_pw as not needed. This will allow to add an
-option to use TCP-AO as authentication method.
-Note, that use_md5 is a bit, rather than an enum member like
-`authentication_method` - this will allow to call nettest the way that
-it'll try to connect with both tcp-md5 and tcp-ao setsocketopt()
-[which shouldn't be allowed].
+Roughly, the same as TCP-MD5 support.
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/fcnal-test.sh | 232 +++++++++++-----------
- tools/testing/selftests/net/nettest.c     |  26 ++-
- 2 files changed, 128 insertions(+), 130 deletions(-)
+ tools/testing/selftests/net/nettest.c | 179 +++++++++++++++++++++++---
+ 1 file changed, 160 insertions(+), 19 deletions(-)
 
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index 03b586760164..321cbb0b55c4 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -843,9 +843,9 @@ ipv4_tcp_md5_novrf()
- 
- 	# basic use case
- 	log_start
--	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: Single address config"
- 
- 	# client sends MD5, server not configured
-@@ -853,23 +853,23 @@ ipv4_tcp_md5_novrf()
- 	show_hint "Should timeout due to MD5 mismatch"
- 	run_cmd nettest -s &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Server no config, client uses password"
- 
- 	# wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: Client uses wrong password"
- 
- 	# client from different address
- 	log_start
- 	show_hint "Should timeout due to MD5 mismatch"
--	run_cmd nettest -s -M ${MD5_PW} -m ${NSB_LO_IP} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NSB_LO_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Client address does not match address configured with password"
- 
- 	#
-@@ -878,25 +878,25 @@ ipv4_tcp_md5_novrf()
- 
- 	# client in prefix
- 	log_start
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest  -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: Prefix config"
- 
- 	# client in prefix, wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: Prefix config, client uses wrong password"
- 
- 	# client outside of prefix
- 	log_start
- 	show_hint "Should timeout due to MD5 mismatch"
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
- }
- 
-@@ -911,9 +911,9 @@ ipv4_tcp_md5()
- 
- 	# basic use case
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Single address config"
- 
- 	# client sends MD5, server not configured
-@@ -921,23 +921,23 @@ ipv4_tcp_md5()
- 	show_hint "Should timeout since server does not have MD5 auth"
- 	run_cmd nettest -s -I ${VRF} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Server no config, client uses password"
- 
- 	# wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Client uses wrong password"
- 
- 	# client from different address
- 	log_start
- 	show_hint "Should timeout since server config differs from client"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_LO_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_LO_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Client address does not match address configured with password"
- 
- 	#
-@@ -946,25 +946,25 @@ ipv4_tcp_md5()
- 
- 	# client in prefix
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest  -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config"
- 
- 	# client in prefix, wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config, client uses wrong password"
- 
- 	# client outside of prefix
- 	log_start
- 	show_hint "Should timeout since client address is outside of prefix"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config, client address not in configured prefix"
- 
- 	#
-@@ -972,74 +972,74 @@ ipv4_tcp_md5()
- 	#
- 
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest  -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF"
- 
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsc nettest  -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsc nettest  -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF"
- 
- 	log_start
- 	show_hint "Should timeout since client in default VRF uses VRF password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsc nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF with VRF pw"
- 
- 	log_start
- 	show_hint "Should timeout since client in VRF uses default VRF password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF with default VRF pw"
- 
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest  -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest  -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF"
- 
- 	log_start
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsc nettest  -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsc nettest  -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF"
- 
- 	log_start
- 	show_hint "Should timeout since client in default VRF uses VRF password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsc nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF with VRF pw"
- 
- 	log_start
- 	show_hint "Should timeout since client in VRF uses default VRF password"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} &
--	run_cmd nettest -s -M ${MD5_WRONG_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} &
-+	run_cmd nettest -s -M -X ${MD5_WRONG_PW} -m ${NS_NET} &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF with default VRF pw"
- 
- 	#
- 	# negative tests
- 	#
- 	log_start
--	run_cmd nettest -s -I ${NSA_DEV} -M ${MD5_PW} -m ${NSB_IP}
-+	run_cmd nettest -s -I ${NSA_DEV} -M -X ${MD5_PW} -m ${NSB_IP}
- 	log_test $? 1 "MD5: VRF: Device must be a VRF - single address"
- 
- 	log_start
--	run_cmd nettest -s -I ${NSA_DEV} -M ${MD5_PW} -m ${NS_NET}
-+	run_cmd nettest -s -I ${NSA_DEV} -M -X ${MD5_PW} -m ${NS_NET}
- 	log_test $? 1 "MD5: VRF: Device must be a VRF - prefix"
- 
- 	test_ipv4_md5_vrf__vrf_server__no_bind_ifindex
-@@ -1050,16 +1050,16 @@ test_ipv4_md5_vrf__vrf_server__no_bind_ifindex()
- {
- 	log_start
- 	show_hint "Simulates applications using VRF without TCP_MD5SIG_FLAG_IFINDEX"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: VRF-bound server, unbound key accepts connection"
- 
- 	log_start
- 	show_hint "Binding both the socket and the key is not required but it works"
--	run_cmd nettest -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
-+	run_cmd nettest -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: VRF-bound server, bound key accepts connection"
- }
- 
-@@ -1071,27 +1071,27 @@ test_ipv4_md5_vrf__global_server__bind_ifindex0()
- 	set_sysctl net.ipv4.tcp_l3mdev_accept=1
- 
- 	log_start
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Global server, Key bound to ifindex=0 rejects VRF connection"
- 
- 	log_start
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} --force-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsc nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Global server, key bound to ifindex=0 accepts non-VRF connection"
- 	log_start
- 
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsb nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsb nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Global server, key not bound to ifindex accepts VRF connection"
- 
- 	log_start
--	run_cmd nettest -s -M ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
-+	run_cmd nettest -s -M -X ${MD5_PW} -m ${NS_NET} --no-bind-key-ifindex &
- 	sleep 1
--	run_cmd_nsc nettest -r ${NSA_IP} -X ${MD5_PW}
-+	run_cmd_nsc nettest -r ${NSA_IP} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Global server, key not bound to ifindex accepts non-VRF connection"
- 
- 	# restore value
-@@ -2431,9 +2431,9 @@ ipv6_tcp_md5_novrf()
- 
- 	# basic use case
- 	log_start
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: Single address config"
- 
- 	# client sends MD5, server not configured
-@@ -2441,23 +2441,23 @@ ipv6_tcp_md5_novrf()
- 	show_hint "Should timeout due to MD5 mismatch"
- 	run_cmd nettest -6 -s &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Server no config, client uses password"
- 
- 	# wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: Client uses wrong password"
- 
- 	# client from different address
- 	log_start
- 	show_hint "Should timeout due to MD5 mismatch"
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NSB_LO_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NSB_LO_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Client address does not match address configured with password"
- 
- 	#
-@@ -2466,25 +2466,25 @@ ipv6_tcp_md5_novrf()
- 
- 	# client in prefix
- 	log_start
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: Prefix config"
- 
- 	# client in prefix, wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: Prefix config, client uses wrong password"
- 
- 	# client outside of prefix
- 	log_start
- 	show_hint "Should timeout due to MD5 mismatch"
--	run_cmd nettest -6 -s -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
- }
- 
-@@ -2499,9 +2499,9 @@ ipv6_tcp_md5()
- 
- 	# basic use case
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Single address config"
- 
- 	# client sends MD5, server not configured
-@@ -2509,23 +2509,23 @@ ipv6_tcp_md5()
- 	show_hint "Should timeout since server does not have MD5 auth"
- 	run_cmd nettest -6 -s -I ${VRF} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Server no config, client uses password"
- 
- 	# wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Client uses wrong password"
- 
- 	# client from different address
- 	log_start
- 	show_hint "Should timeout since server config differs from client"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_LO_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_LO_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Client address does not match address configured with password"
- 
- 	#
-@@ -2534,25 +2534,25 @@ ipv6_tcp_md5()
- 
- 	# client in prefix
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config"
- 
- 	# client in prefix, wrong password
- 	log_start
- 	show_hint "Should timeout since client uses wrong password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config, client uses wrong password"
- 
- 	# client outside of prefix
- 	log_start
- 	show_hint "Should timeout since client address is outside of prefix"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config, client address not in configured prefix"
- 
- 	#
-@@ -2560,74 +2560,74 @@ ipv6_tcp_md5()
- 	#
- 
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF"
- 
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsc nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 0 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF"
- 
- 	log_start
- 	show_hint "Should timeout since client in default VRF uses VRF password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsc nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in default VRF with VRF pw"
- 
- 	log_start
- 	show_hint "Should timeout since client in VRF uses default VRF password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NSB_IP6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NSB_IP6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NSB_IP6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Single address config in default VRF and VRF, conn in VRF with default VRF pw"
- 
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF"
- 
- 	log_start
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsc nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 0 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF"
- 
- 	log_start
- 	show_hint "Should timeout since client in default VRF uses VRF password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsc nettest -6 -r ${NSA_IP6} -X ${MD5_PW}
-+	run_cmd_nsc nettest -6 -r ${NSA_IP6} -M -X ${MD5_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in default VRF with VRF pw"
- 
- 	log_start
- 	show_hint "Should timeout since client in VRF uses default VRF password"
--	run_cmd nettest -6 -s -I ${VRF} -M ${MD5_PW} -m ${NS_NET6} &
--	run_cmd nettest -6 -s -M ${MD5_WRONG_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -I ${VRF} -M -X ${MD5_PW} -m ${NS_NET6} &
-+	run_cmd nettest -6 -s -M -X ${MD5_WRONG_PW} -m ${NS_NET6} &
- 	sleep 1
--	run_cmd_nsb nettest -6 -r ${NSA_IP6} -X ${MD5_WRONG_PW}
-+	run_cmd_nsb nettest -6 -r ${NSA_IP6} -M -X ${MD5_WRONG_PW}
- 	log_test $? 2 "MD5: VRF: Prefix config in default VRF and VRF, conn in VRF with default VRF pw"
- 
- 	#
- 	# negative tests
- 	#
- 	log_start
--	run_cmd nettest -6 -s -I ${NSA_DEV} -M ${MD5_PW} -m ${NSB_IP6}
-+	run_cmd nettest -6 -s -I ${NSA_DEV} -M -X ${MD5_PW} -m ${NSB_IP6}
- 	log_test $? 1 "MD5: VRF: Device must be a VRF - single address"
- 
- 	log_start
--	run_cmd nettest -6 -s -I ${NSA_DEV} -M ${MD5_PW} -m ${NS_NET6}
-+	run_cmd nettest -6 -s -I ${NSA_DEV} -M -X ${MD5_PW} -m ${NS_NET6}
- 	log_test $? 1 "MD5: VRF: Device must be a VRF - prefix"
- 
- }
 diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
-index d9a6fd2cd9d3..35831bc3da24 100644
+index 3a887ef783cd..e9d6c15c014a 100644
 --- a/tools/testing/selftests/net/nettest.c
 +++ b/tools/testing/selftests/net/nettest.c
-@@ -76,7 +76,8 @@ struct sock_args {
- 		     has_grp:1,
+@@ -77,7 +77,9 @@ struct sock_args {
  		     has_expected_laddr:1,
  		     has_expected_raddr:1,
--		     bind_test_only:1;
-+		     bind_test_only:1,
-+		     use_md5:1;
+ 		     bind_test_only:1,
+-		     use_md5:1;
++		     use_md5:1,
++		     use_tcpao:1,
++		     tcp_ao_excopts:1;
  
  	unsigned short port;
  
-@@ -95,7 +96,6 @@ struct sock_args {
+@@ -96,7 +98,7 @@ struct sock_args {
  	const char *serverns;
  
  	const char *password;
--	const char *client_pw;
- 	/* prefix for MD5 password */
- 	const char *md5_prefix_str;
+-	/* prefix for MD5 password */
++	/* prefix for MD5/TCP-AO password */
+ 	const char *auth_prefix_str;
  	union {
-@@ -1538,7 +1538,7 @@ static int do_server(struct sock_args *args, int ipc_fd)
+ 		struct sockaddr_in v4;
+@@ -105,6 +107,8 @@ struct sock_args {
+ 	unsigned int prefix_len;
+ 	/* 0: default, -1: force off, +1: force on */
+ 	int bind_key_ifindex;
++	unsigned tcp_ao_sndid, tcp_ao_rcvid, tcp_ao_maclen;
++	char *tcp_ao_algo;
+ 
+ 	/* expected addresses and device index for connection */
+ 	const char *expected_dev;
+@@ -297,7 +301,67 @@ static int tcp_md5sig(int sd, void *addr, socklen_t alen, struct sock_args *args
+ 	return rc;
+ }
+ 
+-static int tcp_md5_remote(int sd, struct sock_args *args)
++static int tcp_ao(int sd, void *addr, socklen_t alen, struct sock_args *args)
++{
++	int keylen = strlen(args->password);
++	struct tcp_ao ao = {};
++	int opt = TCP_AO;
++	int rc;
++
++	if (keylen > TCP_AO_MAXKEYLEN) {
++		log_error("key length is too big");
++		return -1;
++	}
++	ao.tcpa_keylen = keylen;
++	memcpy(ao.tcpa_key, args->password, keylen);
++	if (args->tcp_ao_algo)
++		strcpy(ao.tcpa_alg_name, args->tcp_ao_algo);
++	else
++		strcpy(ao.tcpa_alg_name, "cmac(aes128)");
++	if (args->tcp_ao_maclen)
++		ao.tcpa_maclen = args->tcp_ao_maclen;
++
++	ao.tcpa_sndid = args->tcp_ao_sndid;
++	ao.tcpa_rcvid = args->tcp_ao_rcvid;
++	if (args->tcp_ao_excopts)
++		ao.tcpa_keyflags |= TCP_AO_KEYF_EXCLUDE_OPT;
++
++	if (args->prefix_len) {
++		ao.tcpa_prefix = args->prefix_len;
++	} else {
++		switch (args->version) {
++		case AF_INET:
++			ao.tcpa_prefix = 32;
++			break;
++		case AF_INET6:
++			ao.tcpa_prefix = 128;
++			break;
++		default:
++			log_error("unknown address family\n");
++			exit(1);
++		}
++	}
++	memcpy(&ao.tcpa_addr, addr, alen);
++
++	/* FIXME: Remove once matching by port is supported */
++	if (args->version == AF_INET) {
++		struct sockaddr_in *sin = (void *)&ao.tcpa_addr;
++
++		sin->sin_port = htons(0);
++	} else if (args->version == AF_INET6) {
++		struct sockaddr_in6 *sin6 = (void *)&ao.tcpa_addr;
++
++		sin6->sin6_port = htons(0);
++	}
++
++	rc = setsockopt(sd, IPPROTO_TCP, opt, &ao, sizeof(ao));
++	if (rc < 0)
++		log_err_errno("setsockopt(TCP_AO)");
++
++	return rc;
++}
++
++static int tcp_auth_remote(int sd, struct sock_args *args)
+ {
+ 	struct sockaddr_in sin = {
+ 		.sin_family = AF_INET,
+@@ -326,7 +390,10 @@ static int tcp_md5_remote(int sd, struct sock_args *args)
+ 		exit(1);
+ 	}
+ 
+-	if (tcp_md5sig(sd, addr, alen, args))
++	if (args->use_md5 && tcp_md5sig(sd, addr, alen, args))
++		return -1;
++
++	if (args->use_tcpao && tcp_ao(sd, addr, alen, args))
+ 		return -1;
+ 
+ 	return 0;
+@@ -1538,10 +1605,8 @@ static int do_server(struct sock_args *args, int ipc_fd)
  		return rc;
  	}
  
--	if (args->password && tcp_md5_remote(lsd, args)) {
-+	if (args->use_md5 && tcp_md5_remote(lsd, args)) {
- 		close(lsd);
- 		goto err_exit;
- 	}
-@@ -1662,7 +1662,7 @@ static int connectsock(void *addr, socklen_t alen, struct sock_args *args)
- 	if (args->type != SOCK_STREAM)
- 		goto out;
+-	if (args->use_md5 && tcp_md5_remote(lsd, args)) {
+-		close(lsd);
+-		goto err_exit;
+-	}
++	if (tcp_auth_remote(lsd, args))
++		goto err_close;
  
--	if (args->password && tcp_md5sig(sd, addr, alen, args))
-+	if (args->use_md5 && tcp_md5sig(sd, addr, alen, args))
+ 	ipc_write(ipc_fd, 1);
+ 	while (1) {
+@@ -1590,6 +1655,8 @@ static int do_server(struct sock_args *args, int ipc_fd)
+ 	close(lsd);
+ 
+ 	return rc;
++err_close:
++	close(lsd);
+ err_exit:
+ 	ipc_write(ipc_fd, 0);
+ 	return 1;
+@@ -1665,6 +1732,9 @@ static int connectsock(void *addr, socklen_t alen, struct sock_args *args)
+ 	if (args->use_md5 && tcp_md5sig(sd, addr, alen, args))
  		goto err;
  
++	if (args->use_tcpao && tcp_ao(sd, addr, alen, args))
++		goto err;
++
  	if (args->bind_test_only)
-@@ -1743,8 +1743,6 @@ static int do_client(struct sock_args *args)
- 		break;
- 	}
+ 		goto out;
  
--	args->password = args->client_pw;
--
- 	if (args->has_grp)
- 		sd = msock_client(args);
- 	else
-@@ -1854,7 +1852,7 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
+@@ -1791,6 +1861,44 @@ static char *random_msg(int len)
+ 	return m;
+ }
+ 
++static void strip_newlines(char *str)
++{
++	size_t i = strlen(str);
++
++	for (; i > 0; i--) {
++		if (str[i - 1] != '\n')
++			return;
++		str[i - 1] = '\0';
++	}
++}
++
++static int set_tcp_ao_param(struct sock_args *args, const char *opt)
++{
++	char *end, *sep = strstr(opt, ":");
++	unsigned long tmp;
++
++	errno = 0;
++	if (sep == NULL)
++		goto err_fail;
++
++	tmp = strtoul(opt, &end, 0);
++	if (errno || tmp > 255 || end != sep)
++		goto err_fail;
++	args->tcp_ao_sndid = (unsigned) tmp;
++
++	tmp = strtoul(++sep, &end, 0);
++	if (errno || tmp > 255 || (*end != '\n' && *end != '\0'))
++		goto err_fail;
++	args->tcp_ao_rcvid = (unsigned) tmp;
++
++	return 0;
++
++err_fail:
++	fprintf(stderr, "TCP-AO argument format is sndid:rcvid where ids in [0,255]\n"
++			"Example: -T 100:200\n");
++	return -1;
++}
++
+ static int ipc_child(int fd, struct sock_args *args)
+ {
+ 	char *outbuf, *errbuf;
+@@ -1852,13 +1960,19 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
  	return client_status;
  }
  
--#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:M:X:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbqf"
-+#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:MX:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbqf"
- #define OPT_FORCE_BIND_KEY_IFINDEX 1001
- #define OPT_NO_BIND_KEY_IFINDEX 1002
+-#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:MX:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbqf"
+-#define OPT_FORCE_BIND_KEY_IFINDEX 1001
+-#define OPT_NO_BIND_KEY_IFINDEX 1002
++#define GETOPT_STR  "sr:l:c:p:t:g:P:DRn:MT:X:m:d:I:BN:O:SCi6xL:0:1:2:3:Fbqf"
++#define OPT_FORCE_BIND_KEY_IFINDEX	1001
++#define OPT_NO_BIND_KEY_IFINDEX		1002
++#define OPT_TCPAO_ALGO			1003
++#define OPT_TCPAO_MACLEN		1004
++#define OPT_TCPAO_EXCOPTS		1005
  
-@@ -1897,8 +1895,8 @@ static void print_usage(char *prog)
- 	"    -L len        send random message of given length\n"
+ static struct option long_opts[] = {
+-	{"force-bind-key-ifindex", 0, 0, OPT_FORCE_BIND_KEY_IFINDEX},
+-	{"no-bind-key-ifindex", 0, 0, OPT_NO_BIND_KEY_IFINDEX},
++	{"force-bind-key-ifindex",	0, 0, OPT_FORCE_BIND_KEY_IFINDEX},
++	{"no-bind-key-ifindex",		0, 0, OPT_NO_BIND_KEY_IFINDEX},
++	{"tcpao_algo",			1, 0, OPT_TCPAO_ALGO },
++	{"tcpao_maclen",		1, 0, OPT_TCPAO_MACLEN },
++	{"tcpao_excopts",		0, 0, OPT_TCPAO_EXCOPTS },
+ 	{0, 0, 0, 0}
+ };
+ 
+@@ -1896,8 +2010,12 @@ static void print_usage(char *prog)
  	"    -n num        number of times to send message\n"
  	"\n"
--	"    -M password   use MD5 sum protection\n"
--	"    -X password   MD5 password for client mode\n"
-+	"    -M            use MD5 sum protection\n"
-+	"    -X password   MD5 password\n"
- 	"    -m prefix/len prefix and length to use for MD5 key\n"
+ 	"    -M            use MD5 sum protection\n"
+-	"    -X password   MD5 password\n"
+-	"    -m prefix/len prefix and length to use for MD5 key\n"
++	"    -T snd:rcvid  use TCP authopt (RFC5925) with snd/rcv ids\n"
++	"    --tcpao_algo=algo      TCP-AO hashing algorithm [valid with -T]\n"
++	"    --tcpao_maclen=maclen  TCP-AO MAC length [valid with -T]\n"
++	"    --tcpao_excopts        Exclude TCP options [valid with -T]\n"
++	"    -X password   MD5/TCP-AO password\n"
++	"    -m prefix/len prefix and length to use for MD5/TCP-AO key\n"
  	"    --no-bind-key-ifindex: Force TCP_MD5SIG_FLAG_IFINDEX off\n"
  	"    --force-bind-key-ifindex: Force TCP_MD5SIG_FLAG_IFINDEX on\n"
-@@ -2010,7 +2008,7 @@ int main(int argc, char *argv[])
- 			msg = random_msg(atoi(optarg));
- 			break;
- 		case 'M':
--			args.password = optarg;
-+			args.use_md5 = 1;
- 			break;
- 		case OPT_FORCE_BIND_KEY_IFINDEX:
- 			args.bind_key_ifindex = 1;
-@@ -2019,7 +2017,7 @@ int main(int argc, char *argv[])
+ 	"        (default: only if -I is passed)\n"
+@@ -2016,6 +2134,29 @@ int main(int argc, char *argv[])
+ 		case OPT_NO_BIND_KEY_IFINDEX:
  			args.bind_key_ifindex = -1;
  			break;
++		case OPT_TCPAO_ALGO:
++			args.tcp_ao_algo = strdup(optarg);
++			strip_newlines(args.tcp_ao_algo);
++			if (strlen(args.tcp_ao_algo) == 0) {
++				fprintf(stderr, "Invalid argument --tcpao_algo=%s\n", optarg);
++				return 1;
++			}
++			break;
++		case OPT_TCPAO_MACLEN:
++			if (str_to_uint(optarg, 1, 255, &tmp) != 0) {
++				fprintf(stderr, "Invalid --tcpao_maclen=%s\n", optarg);
++				return 1;
++			}
++			args.tcp_ao_maclen = tmp;
++			break;
++		case OPT_TCPAO_EXCOPTS:
++			args.tcp_ao_excopts = 1;
++			break;
++		case 'T':
++			args.use_tcpao = 1;
++			if (set_tcp_ao_param(&args, optarg))
++				return 1;
++			break;
  		case 'X':
--			args.client_pw = optarg;
-+			args.password = optarg;
+ 			args.password = optarg;
  			break;
- 		case 'm':
- 			args.md5_prefix_str = optarg;
-@@ -2080,14 +2078,14 @@ int main(int argc, char *argv[])
+@@ -2078,15 +2219,15 @@ int main(int argc, char *argv[])
  		}
  	}
  
--	if (args.password &&
--	    ((!args.has_remote_ip && !args.md5_prefix_str) ||
-+	if (args.password && (!args.use_md5 ||
-+	      (!args.has_remote_ip && !args.md5_prefix_str) ||
+-	if (args.password && (!args.use_md5 ||
++	if (args.password && ((!args.use_md5 && !args.use_tcpao) ||
+ 	      (!args.has_remote_ip && !args.auth_prefix_str) ||
  	      args.type != SOCK_STREAM)) {
- 		log_error("MD5 passwords apply to TCP only and require a remote ip for the password\n");
+-		log_error("MD5 passwords apply to TCP only and require a remote ip for the password\n");
++		log_error("TCP-MD5/TCP-AO passwords apply to TCP only and require a remote ip for the password\n");
  		return 1;
  	}
  
--	if (args.md5_prefix_str && !args.password) {
-+	if ((args.md5_prefix_str || args.use_md5) && !args.password) {
- 		log_error("Prefix range for MD5 protection specified without a password\n");
+-	if ((args.auth_prefix_str || args.use_md5) && !args.password) {
+-		log_error("Prefix range for MD5 protection specified without a password\n");
++	if ((args.auth_prefix_str || args.use_md5 || args.use_tcpao) && !args.password) {
++		log_error("Prefix range for TCP-MD5/TCP-AO protection specified without a password\n");
  		return 1;
  	}
+ 
 -- 
 2.37.2
 
