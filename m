@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DA4C6FA86
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D04FC6FA8E
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:18:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233079AbiIWUR6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232975AbiIWUR6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 23 Sep 2022 16:17:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39112 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232976AbiIWUQv (ORCPT
+        with ESMTP id S232981AbiIWUQv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 23 Sep 2022 16:16:51 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D8D12AEC3
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF36137449
         for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:21 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id iv17so883386wmb.4
+Received: by mail-wr1-x433.google.com with SMTP id n15so1572255wrq.5
         for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=JFjhAHpFFFmaQQ0V2wacUF3AxKnhpL22mGbabAPp8aE=;
-        b=U2B3npP8gkMEOkRi4wVIL0bQgXss+js2hdI4rF6Dy18vWPSnAUjuTjf8VjXa6moc5w
-         iBCFyFzoqUcA5jDLQeCL3nYThtMylfbb3FwGut/S+isajDJp0AeeiNGz/C+6CFNLff/7
-         EbHBJRy724Xv3uUR66twatOntM2mbdZzQZhWH1piK8Id1f4atg79y5ANO3yVbUHLZRm3
-         al2qAvgYvplyqSWsc2mJ7ZJKnlXqrK1QlH+a8oIcrA8vyygvUBJ73dC8N9o+Zxp9I7wv
-         jTQmfPJgZY+QO9yLwOv8ifhzikXIR81WIS2/lmENyMSwPIFK+rhBiix4Doukg63Drzz/
-         zs3w==
+        bh=Ydq4gDYbjLtnKvxrpJL2GRMLSma78RPxUuEkwI41l8E=;
+        b=f3oZmNeUp9afzgXeAu2SEtc03zWVvS/bFNuSQMb9Bwe9FLv1krLcZlZsuyRR+Bohix
+         CRggCqo9wbEFPvk3O396RLDxMPrkIs+xvZfDzSI+FgFx2XH+rtpN3aoI9PG0R//UsTGE
+         pV5YCmlpoJvsLoDDIX0yJHcmHGpneIYZ5mnEp8okPjYnrkCSNmNc6kzqWzLGJM8qA3bp
+         90P6W3PWZQC4+TWetHfVxbfWQD+Ggsjsz6FVTscMVqHHKF8BFF/mufmV6DJT+VFD52Oz
+         FlmcNFuwL+6PrTDsDMynyavF7lcZ/aR9axVakmWR1QC3D2n+jXdYYJOTeQLqVu9bbC09
+         /F4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=JFjhAHpFFFmaQQ0V2wacUF3AxKnhpL22mGbabAPp8aE=;
-        b=qMEp4GqH2i4H9Hv4IYQG4RMYUmtcwxg2YSL3pJwwjLYALOrDUzYeslfMOQe/AnYZuz
-         S3zCz2ZbUbuRG669NBIc4+htICmXVhptgDDvBhHOSzUdXnby19ZscgQDXZSzmZsxd1aY
-         phK7xJtaAjQPxKKfKYxBLiBftlEcKbSUs4CYvUKRZRgbX9BV2zSp2qWQkgQXeXLDkrAc
-         Q0GEs9/F3GCSTotoQD6g4RC8RSHy80bvMnHJVP6L86koPWU7fOrNbRHVVT8B5RFNorv6
-         1rdnB+etLRkVa/P8ra/yAVUj6GAdCgMGVcwzKDPwArwnhEML2ySngRKeb6J4uCbSdFv8
-         5Fzg==
-X-Gm-Message-State: ACrzQf0BrU7isl0zkAd2jkmapcQwlXq6Fe+G1C6NEpwAcRpHfPY/pBDa
-        0eD6wP6wU4B1odBDpXB/Yj2pqw==
-X-Google-Smtp-Source: AMsMyM7NxyaV1x09lJUHFGRDISTJJ8ivsPNnMQ8gb/vfUTcWiJk0+gVU7fn9DKHn9x9MuGAkDBKmvg==
-X-Received: by 2002:a05:600c:198a:b0:3b4:c06a:28b1 with SMTP id t10-20020a05600c198a00b003b4c06a28b1mr14406432wmq.72.1663964047596;
-        Fri, 23 Sep 2022 13:14:07 -0700 (PDT)
+        bh=Ydq4gDYbjLtnKvxrpJL2GRMLSma78RPxUuEkwI41l8E=;
+        b=L0LJkT39e9DinSaR+s9ga3eRVMpZOLBJ+t5TQT0F8HgMmXbvcrZctGt8sNBlbUasms
+         4ZGxWJuEsPjeo3mcXrtFqiSXucFGz75AvN7sj69P6DcV/eDSrXdmnTt6pimrOqiHWa5c
+         8wb1yTKfJzGesWSX7Wh7QfJDmCZeBJC+9A31L8gxqYKY605LsWCOnN9vfbIcTRirW+kK
+         jGaOjtxYti7+wvPf0I8sAY0lp268gNpywSC/eye2qky6Q793D72/vuLxTnIy4PkF0vcM
+         6jO68PhPTysUDYvQlVEph+KUjwvQByKaeWOQtX2QtfLPY7ZZ693EzjBgQeXwATtQwnTx
+         5MpA==
+X-Gm-Message-State: ACrzQf0G+hZswqDCERiJy8BV2ZTFH58vpksgx0ZyQMP7W+AVEiXtXBMa
+        P0BgUS+9AM9iPqnWUEYukKYoYw==
+X-Google-Smtp-Source: AMsMyM4C0bQF8+9SPdoG6arhqfUnKO+oE1W6O+fFk5IUDvBn9U0zV/yUpqb56vCaB8skQfZ2Py4h7Q==
+X-Received: by 2002:a5d:5543:0:b0:22a:f885:b4dd with SMTP id g3-20020a5d5543000000b0022af885b4ddmr6143828wrw.93.1663964061365;
+        Fri, 23 Sep 2022 13:14:21 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.06
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:07 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:20 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,543 +71,385 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 26/35] selftests/net: Verify that TCP-AO complies with ignoring ICMPs
-Date:   Fri, 23 Sep 2022 21:13:10 +0100
-Message-Id: <20220923201319.493208-27-dima@arista.com>
+Subject: [PATCH v2 35/35] selftests/fcnal-test.sh: Add TCP-AO tests
+Date:   Fri, 23 Sep 2022 21:13:19 +0100
+Message-Id: <20220923201319.493208-36-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hand-crafted ICMP packets are sent to the server, the server checks for
-hard/soft errors and fails if any.
+These are basic TCP-AO functionality tests, more detailed coverage with
+functional testing is done by selftests/net/tcp_ao library and binaries.
 
-Expected output for ipv4 version:
-> # ./icmps-discard_ipv4
-> 1..3
-> # 3164[lib/setup.c:166] rand seed 1642623745
-> TAP version 13
-> # 3164[lib/proc.c:207]    Snmp6             Ip6InReceives: 0 => 1
-> # 3164[lib/proc.c:207]    Snmp6             Ip6InNoRoutes: 0 => 1
-> # 3164[lib/proc.c:207]    Snmp6               Ip6InOctets: 0 => 76
-> # 3164[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 0 => 1
-> # 3164[lib/proc.c:207]      Tcp                    InSegs: 2 => 203
-> # 3164[lib/proc.c:207]      Tcp                   OutSegs: 1 => 202
-> # 3164[lib/proc.c:207]  IcmpMsg                   InType3: 0 => 543
-> # 3164[lib/proc.c:207]     Icmp                    InMsgs: 0 => 543
-> # 3164[lib/proc.c:207]     Icmp            InDestUnreachs: 0 => 543
-> # 3164[lib/proc.c:207]       Ip                InReceives: 2 => 746
-> # 3164[lib/proc.c:207]       Ip                InDelivers: 2 => 746
-> # 3164[lib/proc.c:207]       Ip               OutRequests: 1 => 202
-> # 3164[lib/proc.c:207]    IpExt                  InOctets: 132 => 61684
-> # 3164[lib/proc.c:207]    IpExt                 OutOctets: 68 => 31324
-> # 3164[lib/proc.c:207]    IpExt               InNoECTPkts: 2 => 744
-> # 3164[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
-> # 3164[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 200
-> # 3164[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 199
-> # 3164[lib/proc.c:207]   TcpExt                 TCPAOGood: 2 => 203
-> # 3164[lib/proc.c:207]   TcpExt         TCPAODroppedIcmps: 0 => 541
-> ok 1 InDestUnreachs delivered 543
-> ok 2 Server survived 20000 bytes of traffic
-> ok 3 ICMPs ignored 541
-> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Expected output for ipv6 version:
-> # ./icmps-discard_ipv6
-> 1..3
-> # 3186[lib/setup.c:166] rand seed 1642623803
-> TAP version 13
-> # 3186[lib/proc.c:207]    Snmp6             Ip6InReceives: 4 => 568
-> # 3186[lib/proc.c:207]    Snmp6             Ip6InDelivers: 3 => 564
-> # 3186[lib/proc.c:207]    Snmp6            Ip6OutRequests: 2 => 204
-> # 3186[lib/proc.c:207]    Snmp6            Ip6InMcastPkts: 1 => 4
-> # 3186[lib/proc.c:207]    Snmp6           Ip6OutMcastPkts: 0 => 1
-> # 3186[lib/proc.c:207]    Snmp6               Ip6InOctets: 320 => 70420
-> # 3186[lib/proc.c:207]    Snmp6              Ip6OutOctets: 160 => 35512
-> # 3186[lib/proc.c:207]    Snmp6          Ip6InMcastOctets: 72 => 336
-> # 3186[lib/proc.c:207]    Snmp6         Ip6OutMcastOctets: 0 => 76
-> # 3186[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 4 => 568
-> # 3186[lib/proc.c:207]    Snmp6               Icmp6InMsgs: 1 => 361
-> # 3186[lib/proc.c:207]    Snmp6              Icmp6OutMsgs: 1 => 2
-> # 3186[lib/proc.c:207]    Snmp6       Icmp6InDestUnreachs: 0 => 360
-> # 3186[lib/proc.c:207]    Snmp6      Icmp6OutMLDv2Reports: 0 => 1
-> # 3186[lib/proc.c:207]    Snmp6              Icmp6InType1: 0 => 360
-> # 3186[lib/proc.c:207]    Snmp6           Icmp6OutType143: 0 => 1
-> # 3186[lib/proc.c:207]      Tcp                    InSegs: 2 => 203
-> # 3186[lib/proc.c:207]      Tcp                   OutSegs: 1 => 202
-> # 3186[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
-> # 3186[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 200
-> # 3186[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 199
-> # 3186[lib/proc.c:207]   TcpExt                 TCPAOGood: 2 => 203
-> # 3186[lib/proc.c:207]   TcpExt         TCPAODroppedIcmps: 0 => 360
-> ok 1 Icmp6InDestUnreachs delivered 360
-> ok 2 Server survived 20000 bytes of traffic
-> ok 3 ICMPs ignored 360
-> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+Sample output:
+> TEST: Global server - ns-A IP                                                 [ OK ]
+> TEST: Global server - ns-A loopback IP                                        [ OK ]
+> TEST: Device server - ns-A IP                                                 [ OK ]
+> TEST: No server - ns-A IP                                                     [ OK ]
+> TEST: No server - ns-A loopback IP                                            [ OK ]
+> TEST: Client - ns-B IP                                                        [ OK ]
+> TEST: Client, device bind - ns-B IP                                           [ OK ]
+> TEST: No server, unbound client - ns-B IP                                     [ OK ]
+> TEST: No server, device client - ns-B IP                                      [ OK ]
+> TEST: Client - ns-B loopback IP                                               [ OK ]
+> TEST: Client, device bind - ns-B loopback IP                                  [ OK ]
+> TEST: No server, unbound client - ns-B loopback IP                            [ OK ]
+> TEST: No server, device client - ns-B loopback IP                             [ OK ]
+> TEST: Global server, local connection - ns-A IP                               [ OK ]
+> TEST: Global server, local connection - ns-A loopback IP                      [ OK ]
+> TEST: Global server, local connection - loopback                              [ OK ]
+> TEST: Device server, unbound client, local connection - ns-A IP               [ OK ]
+> TEST: Device server, unbound client, local connection - ns-A loopback IP      [ OK ]
+> TEST: Device server, unbound client, local connection - loopback              [ OK ]
+> TEST: Global server, device client, local connection - ns-A IP                [ OK ]
+> TEST: Global server, device client, local connection - ns-A loopback IP       [ OK ]
+> TEST: Global server, device client, local connection - loopback               [ OK ]
+> TEST: Device server, device client, local connection - ns-A IP                [ OK ]
+> TEST: No server, device client, local conn - ns-A IP                          [ OK ]
+> TEST: MD5: Single address config                                              [ OK ]
+> TEST: MD5: Server no config, client uses password                             [ OK ]
+> TEST: MD5: Client uses wrong password                                         [ OK ]
+> TEST: MD5: Client address does not match address configured with password     [ OK ]
+> TEST: MD5: Prefix config                                                      [ OK ]
+> TEST: MD5: Prefix config, client uses wrong password                          [ OK ]
+> TEST: MD5: Prefix config, client address not in configured prefix             [ OK ]
+> TEST: TCP-AO [hmac(sha1):12]: Single address config                           [ OK ]
+> TEST: TCP-AO [hmac(sha1):12]: Server no config, client uses password          [ OK ]
+> TEST: TCP-AO [hmac(sha1):12]: Client uses wrong password                      [ OK ]
+> TEST: TCP-AO [cmac(aes128):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [cmac(aes128):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [cmac(aes128):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(rmd160):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [hmac(rmd160):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [hmac(rmd160):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(sha512):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [hmac(sha512):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [hmac(sha512):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(sha384):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [hmac(sha384):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [hmac(sha384):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(sha256):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [hmac(sha256):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [hmac(sha256):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(md5):12]: Single address config                            [ OK ]
+> TEST: TCP-AO [hmac(md5):12]: Server no config, client uses password           [ OK ]
+> TEST: TCP-AO [hmac(md5):12]: Client uses wrong password                       [ OK ]
+> TEST: TCP-AO [hmac(sha224):12]: Single address config                         [ OK ]
+> TEST: TCP-AO [hmac(sha224):12]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [hmac(sha224):12]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(sha3-512):12]: Single address config                       [ OK ]
+> TEST: TCP-AO [hmac(sha3-512):12]: Server no config, client uses password      [ OK ]
+> TEST: TCP-AO [hmac(sha3-512):12]: Client uses wrong password                  [ OK ]
+> TEST: TCP-AO: Client address does not match address configured with password  [ OK ]
+> TEST: TCP-AO: Prefix config                                                   [ OK ]
+> TEST: TCP-AO: Prefix config, client uses wrong password                       [ OK ]
+> TEST: TCP-AO: Prefix config, client address not in configured prefix          [ OK ]
+> TEST: TCP-AO: Different key ids                                               [ OK ]
+> TEST: TCP-AO: Wrong keyid                                                     [ OK ]
+> TEST: TCP-AO [cmac(aes128):16]: Single address config                         [ OK ]
+> TEST: TCP-AO [cmac(aes128):16]: Server no config, client uses password        [ OK ]
+> TEST: TCP-AO [cmac(aes128):16]: Client uses wrong password                    [ OK ]
+> TEST: TCP-AO [hmac(sha1):16]: Single address config                           [ OK ]
+> TEST: TCP-AO [hmac(sha1):16]: Server no config, client uses password          [ OK ]
+> TEST: TCP-AO [hmac(sha1):16]: Client uses wrong password                      [ OK ]
+> TEST: TCP-AO [cmac(aes128):4]: Single address config                          [ OK ]
+> TEST: TCP-AO [cmac(aes128):4]: Server no config, client uses password         [ OK ]
+> TEST: TCP-AO [cmac(aes128):4]: Client uses wrong password                     [ OK ]
+> TEST: TCP-AO [hmac(sha1):4]: Single address config                            [ OK ]
+> TEST: TCP-AO [hmac(sha1):4]: Server no config, client uses password           [ OK ]
+> TEST: TCP-AO [hmac(sha1):4]: Client uses wrong password                       [ OK ]
+> TEST: TCP-AO: add MD5 and TCP-AO for the same peer address                    [ OK ]
+> TEST: TCP-AO: MD5 and TCP-AO on connect()                                     [ OK ]
+> TEST: TCP-AO: Exclude TCP options                                             [ OK ]
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile   |   2 +-
- .../selftests/net/tcp_ao/icmps-discard.c      | 434 ++++++++++++++++++
- 2 files changed, 435 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/icmps-discard.c
+ tools/testing/selftests/net/fcnal-test.sh | 239 ++++++++++++++++++++++
+ 1 file changed, 239 insertions(+)
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index cb23d67944d7..9acfd782c20f 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect
-+TEST_BOTH_AF := connect icmps-discard
+diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
+index 321cbb0b55c4..fdd762408dc2 100755
+--- a/tools/testing/selftests/net/fcnal-test.sh
++++ b/tools/testing/selftests/net/fcnal-test.sh
+@@ -76,6 +76,12 @@ BCAST_IP=255.255.255.255
  
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/icmps-discard.c b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
-new file mode 100644
-index 000000000000..16d691809567
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
-@@ -0,0 +1,434 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Selftest that verifies that incomping ICMPs are ignored,
-+ * the TCP connection stays alive, no hard or soft errors get reported
-+ * to the usespace and the counter for ignored ICMPs is updated.
-+ *
-+ * RFC5925, 7.8:
-+ * >> A TCP-AO implementation MUST default to ignore incoming ICMPv4
-+ * messages of Type 3 (destination unreachable), Codes 2-4 (protocol
-+ * unreachable, port unreachable, and fragmentation needed -- ’hard
-+ * errors’), and ICMPv6 Type 1 (destination unreachable), Code 1
-+ * (administratively prohibited) and Code 4 (port unreachable) intended
-+ * for connections in synchronized states (ESTABLISHED, FIN-WAIT-1, FIN-
-+ * WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match MKTs.
-+ *
-+ * Author: Dmitry Safonov <dima@arista.com>
-+ */
-+#include <inttypes.h>
-+#include <linux/icmp.h>
-+#include <linux/icmpv6.h>
-+#include <linux/ipv6.h>
-+#include <netinet/in.h>
-+#include <netinet/ip.h>
-+#include <sys/socket.h>
-+#include "aolib.h"
-+
-+#ifndef SOL_TCP
-+/* can't include <netinet/tcp.h> as including <linux/tcp.h> */
-+# define SOL_TCP		6	/* TCP level */
-+#endif
-+
-+const size_t packets_nr = 20;
-+const size_t packet_size = 100;
-+const char *tcpao_icmps	= "TCPAODroppedIcmps";
-+
-+#ifdef IPV6_TEST
-+const char *dst_unreach	= "Icmp6InDestUnreachs";
-+const int sk_ip_level	= SOL_IPV6;
-+const int sk_recverr	= IPV6_RECVERR;
-+#else
-+const char *dst_unreach	= "InDestUnreachs";
-+const int sk_ip_level	= SOL_IP;
-+const int sk_recverr	= IP_RECVERR;
-+#endif
-+
-+#define test_icmps_fail test_fail
-+#define test_icmps_ok test_ok
-+
-+static void serve_interfered(int sk)
+ MD5_PW=abc123
+ MD5_WRONG_PW=abc1234
++AO_PW=abc123
++AO_WRONG_PW=abc1234
++AO_HASH_ALGOS="hmac(sha1) cmac(aes128)"
++AO_HASH_ALGOS+=" hmac(rmd160) hmac(sha512)"
++AO_HASH_ALGOS+=" hmac(sha384) hmac(sha256) hmac(md5)"
++AO_HASH_ALGOS+=" hmac(sha224) hmac(sha3-512)"
+ 
+ MCAST=ff02::1
+ # set after namespace create
+@@ -900,6 +906,123 @@ ipv4_tcp_md5_novrf()
+ 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
+ }
+ 
++#
++# TCP-AO tests without VRF
++#
++ipv4_tcp_ao_algos()
 +{
-+	ssize_t test_quota = packet_size * packets_nr * 10;
-+	uint64_t dest_unreach_a, dest_unreach_b;
-+	uint64_t icmp_ignored_a, icmp_ignored_b;
-+	bool counter_not_found;
-+	struct netstat *ns_after, *ns_before;
-+	ssize_t bytes;
++	# basic use case
++	log_start
++	run_cmd nettest -s -T 100:100 --tcpao_algo=$1 --tcpao_maclen=$2 \
++			-X ${AO_PW} -m ${NSB_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 --tcpao_algo=$1 \
++			    --tcpao_maclen=$2 -X ${AO_PW}
++	log_test $? 0 "TCP-AO [$1:$2]: Single address config"
 +
-+	ns_before = netstat_read();
-+	dest_unreach_a = netstat_get(ns_before, dst_unreach, NULL);
-+	icmp_ignored_a = netstat_get(ns_before, tcpao_icmps, NULL);
-+	bytes = test_server_run(sk, test_quota, 0);
-+	ns_after = netstat_read();
-+	netstat_print_diff(ns_before, ns_after);
-+	dest_unreach_b = netstat_get(ns_after, dst_unreach, NULL);
-+	icmp_ignored_b = netstat_get(ns_after, tcpao_icmps,
-+					&counter_not_found);
++	# client sends TCP-AO, server not configured
++	log_start
++	show_hint "Should timeout due to TCP-AO password mismatch"
++	run_cmd nettest -s &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 --tcpao_algo=$1 \
++			    --tcpao_maclen=$2 -X ${AO_PW}
++	log_test $? 2 "TCP-AO [$1:$2]: Server no config, client uses password"
 +
-+	netstat_free(ns_before);
-+	netstat_free(ns_after);
-+
-+	if (dest_unreach_a >= dest_unreach_b) {
-+		test_fail("%s counter didn't change: %" PRIu64 " >= %" PRIu64,
-+				dst_unreach, dest_unreach_a, dest_unreach_b);
-+		return;
-+	} else {
-+		test_ok("%s delivered %" PRIu64,
-+				dst_unreach, dest_unreach_b - dest_unreach_a);
-+	}
-+	if (bytes < 0) {
-+		test_icmps_fail("server failed with %zd: %s", bytes, strerrordesc_np(-bytes));
-+	} else {
-+		test_icmps_ok("Server survived %zd bytes of traffic", test_quota);
-+	}
-+	if (counter_not_found) {
-+		test_fail("Not found %s counter", tcpao_icmps);
-+		return;
-+	}
-+	if (icmp_ignored_a >= icmp_ignored_b) {
-+		test_icmps_fail("%s counter didn't change: %" PRIu64 " >= %" PRIu64,
-+				tcpao_icmps, icmp_ignored_a, icmp_ignored_b);
-+		return;
-+	}
-+	test_icmps_ok("ICMPs ignored %" PRIu64, icmp_ignored_b - icmp_ignored_a);
++	# wrong password
++	log_start
++	show_hint "Should timeout since client uses wrong password"
++	run_cmd nettest -s -T 100:100 --tcpao_algo=$1 --tcpao_maclen=$2 \
++			-X ${AO_PW} -m ${NSB_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 --tcpao_algo=$1  \
++			    --tcpao_maclen=$2 -X ${AO_WRONG_PW}
++	log_test $? 2 "TCP-AO [$1:$2]: Client uses wrong password"
 +}
 +
-+static void *server_fn(void *arg)
++ipv4_tcp_ao_novrf()
 +{
-+	int val, err, sk, lsk;
-+	uint16_t flags = 0;
++	#
++	# single address
++	#
++	for i in $AO_HASH_ALGOS ; do
++		ipv4_tcp_ao_algos $i 12
++	done
 +
-+	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
++	# client from different address
++	log_start
++	show_hint "Should timeout due to TCP-AO address mismatch"
++	run_cmd nettest -s -T 100:100 -X ${AO_PW} -m ${NSB_LO_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Client address does not match address configured with password"
 +
-+	if (test_set_ao(lsk, "password", flags, this_ip_dest, -1, 100, 100))
-+		test_error("setsockopt(TCP_AO)");
-+	synchronize_threads();
++	# client in prefix
++	log_start
++	run_cmd nettest -s -T 100:100 -X ${AO_PW} -m ${NS_NET} &
++	sleep 1
++	run_cmd_nsb nettest  -r ${NSA_IP} -T 100:100 -X ${AO_PW}
++	log_test $? 0 "TCP-AO: Prefix config"
 +
-+	err = test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0);
-+	if (!err)
-+		test_error("timeouted for accept()");
-+	else if (err < 0)
-+		test_error("test_wait_fd()");
++	# client in prefix, wrong password
++	log_start
++	show_hint "Should timeout since client uses wrong password"
++	run_cmd nettest -s -T 100:100 -X ${AO_PW} -m ${NS_NET} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 -X ${AO_WRONG_PW}
++	log_test $? 2 "TCP-AO: Prefix config, client uses wrong password"
 +
-+	sk = accept(lsk, NULL, NULL);
-+	if (sk < 0)
-+		test_error("accept()");
++	# client outside of prefix
++	log_start
++	show_hint "Should timeout due to address out of TCP-AO prefix mismatch"
++	run_cmd nettest -s -T 100:100 -X ${AO_PW} -m ${NS_NET} &
++	sleep 1
++	run_cmd_nsb nettest -c ${NSB_LO_IP} -r ${NSA_IP} -T 100:100 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Prefix config, client address not in configured prefix"
 +
-+	/* Fail on hard ip errors, such as dest unreachable (RFC1122) */
-+	val = 1;
-+	if (setsockopt(sk, sk_ip_level, sk_recverr, &val, sizeof(val)))
-+		test_error("setsockopt()");
++	# TCP-AO more specific tests
++	# sendid != rcvid
++	log_start
++	run_cmd nettest -s -T 100:101 -X ${AO_PW} -m ${NSB_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 101:100 -X ${AO_PW}
++	log_test $? 0 "TCP-AO: Different key ids"
 +
-+	synchronize_threads();
++	# Wrong keyid
++	log_start
++	show_hint "Should timeout due to a wrong keyid"
++	run_cmd nettest -s -T 100:100 -X ${AO_PW} -m ${NSB_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 101:101 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Wrong keyid"
 +
-+	serve_interfered(sk);
-+	return NULL;
++	# Variable maclen
++	ipv4_tcp_ao_algos "cmac(aes128)" 16
++	ipv4_tcp_ao_algos "hmac(sha1)" 16
++	ipv4_tcp_ao_algos "cmac(aes128)" 4
++	ipv4_tcp_ao_algos "hmac(sha1)" 4
++
++	# MD5 and TCP-AO for the same peer
++	log_start
++	run_cmd nettest -s -T 100:100 -M -X ${AO_PW} -m ${NSB_IP}
++	log_test $? 1 "TCP-AO: add MD5 and TCP-AO for the same peer address"
++
++	# Connect with both TCP-AO and MD5 on the socket
++	log_start
++	show_hint "Should fail to connect with both MD5 and TCP-AO on the socket"
++	run_cmd nettest -s -T 100:100 -M -X ${AO_PW} -m ${NSB_IP} &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 100:100 -M -X ${AO_PW}
++	log_test $? 1 "TCP-AO: MD5 and TCP-AO on connect()"
++
++	# Exclude TCP options
++	log_start
++	run_cmd nettest -s -T 100:101 -X ${AO_PW} -m ${NSB_IP} --tcpao_excopts &
++	sleep 1
++	run_cmd_nsb nettest -r ${NSA_IP} -T 101:100 -X ${AO_PW} --tcpao_excopts
++	log_test $? 0 "TCP-AO: Exclude TCP options"
 +}
 +
-+static size_t packets_sent;
-+static size_t icmps_sent;
-+
-+static uint32_t checksum4_nofold(void *data, size_t len, uint32_t sum)
+ #
+ # MD5 tests with VRF
+ #
+@@ -1217,6 +1340,7 @@ ipv4_tcp_novrf()
+ 	log_test_addr ${a} $? 1 "No server, device client, local conn"
+ 
+ 	ipv4_tcp_md5_novrf
++	ipv4_tcp_ao_novrf
+ }
+ 
+ ipv4_tcp_vrf()
+@@ -2488,6 +2612,120 @@ ipv6_tcp_md5_novrf()
+ 	log_test $? 2 "MD5: Prefix config, client address not in configured prefix"
+ }
+ 
++ipv6_tcp_ao_algos()
 +{
-+	uint16_t *words = data;
-+	size_t i;
++	# basic use case
++	log_start
++	run_cmd nettest -6 -s -T 100:100 --tcpao_algo=$1 --tcpao_maclen=$2 \
++			-X ${AO_PW} -m ${NSB_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 --tcpao_algo=$1  \
++			    --tcpao_maclen=$2 -X ${AO_PW}
++	log_test $? 0 "TCP-AO [$1:$2]: Single address config"
 +
-+	for (i = 0; i < len / sizeof(uint16_t); i++)
-+		sum += words[i];
-+	if (len & 1)
-+		sum += ((char *)data)[len - 1];
-+	return sum;
++	# client sends TCP-AO, server not configured
++	log_start
++	show_hint "Should timeout since server does not have TCP-AO auth"
++	run_cmd nettest -6 -s &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 --tcpao_algo=$1  \
++			    --tcpao_maclen=$2 -X ${AO_PW}
++	log_test $? 2 "TCP-AO [$1:$2]: Server no config, client uses password"
++
++	# wrong password
++	log_start
++	show_hint "Should timeout since client uses wrong password"
++	run_cmd nettest -6 -s -T 100:100 --tcpao_algo=$1 --tcpao_maclen=$2 \
++			-X ${AO_PW} -m ${NSB_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 --tcpao_algo=$1 \
++			    --tcpao_maclen=$2 -X ${AO_WRONG_PW}
++	log_test $? 2 "TCP-AO [$1:$2]: Client uses wrong password"
 +}
 +
-+static uint16_t checksum4_fold(void *data, size_t len, uint32_t sum)
++ipv6_tcp_ao_novrf()
 +{
-+	sum = checksum4_nofold(data, len, sum);
-+	while (sum > 0xFFFF)
-+		sum = (sum & 0xFFFF) + (sum >> 16);
-+	return ~sum;
++	#
++	# single address
++	#
++	for i in $AO_HASH_ALGOS ; do
++		ipv6_tcp_ao_algos $i 12
++	done
++
++	# client from different address
++	log_start
++	show_hint "Should timeout since server config differs from client"
++	run_cmd nettest -6 -s -T 100:100 -X ${AO_PW} -m ${NSB_LO_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Client address does not match address configured with password"
++
++	# client in prefix
++	log_start
++	run_cmd nettest -6 -s -T 100:100 -X ${AO_PW} -m ${NS_NET6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 -X ${AO_PW}
++	log_test $? 0 "TCP-AO: Prefix config"
++
++	# client in prefix, wrong password
++	log_start
++	show_hint "Should timeout since client uses wrong password"
++	run_cmd nettest -6 -s -T 100:100 -X ${AO_PW} -m ${NS_NET6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 -X ${AO_WRONG_PW}
++	log_test $? 2 "TCP-AO: Prefix config, client uses wrong password"
++
++	# client outside of prefix
++	log_start
++	show_hint "Should timeout since client address is outside of prefix"
++	run_cmd nettest -6 -s -T 100:100 -X ${AO_PW} -m ${NS_NET6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -c ${NSB_LO_IP6} -r ${NSA_IP6} -T 100:100 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Prefix config, client address not in configured prefix"
++
++	# TCP-AO more specific tests
++	# sendid != rcvid
++	log_start
++	run_cmd nettest -6 -s -T 100:101 -X ${AO_PW} -m ${NSB_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 101:100 -X ${AO_PW}
++	log_test $? 0 "TCP-AO: Different key ids"
++
++	# Wrong keyid
++	log_start
++	show_hint "Should timeout due to a wrong keyid"
++	run_cmd nettest -6 -s -T 100:100 -X ${AO_PW} -m ${NSB_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 101:101 -X ${AO_PW}
++	log_test $? 2 "TCP-AO: Wrong keyid"
++
++	# Variable maclen
++	ipv6_tcp_ao_algos "cmac(aes128)" 16
++	ipv6_tcp_ao_algos "hmac(sha1)" 16
++	ipv6_tcp_ao_algos "cmac(aes128)" 4
++	ipv6_tcp_ao_algos "hmac(sha1)" 4
++
++	# MD5 and TCP-AO for the same peer
++	log_start
++	run_cmd nettest -6 -s -T 100:100 -M -X ${AO_PW} -m ${NSB_IP6}
++	log_test $? 1 "TCP-AO: add MD5 and TCP-AO for the same peer address"
++
++	# Connect with both TCP-AO and MD5 on the socket
++	log_start
++	show_hint "Should fail to connect with both MD5 and TCP-AO on the socket"
++	run_cmd nettest -6 -s -T 100:100 -M -X ${AO_PW} -m ${NSB_IP6} &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 100:100 -M -X ${AO_PW}
++	log_test $? 1 "TCP-AO: MD5 and TCP-AO on connect()"
++
++	# Exclude TCP options
++	log_start
++	run_cmd nettest -6 -s -T 100:101 -X ${AO_PW} -m ${NSB_IP6} --tcpao_excopts &
++	sleep 1
++	run_cmd_nsb nettest -6 -r ${NSA_IP6} -T 101:100 -X ${AO_PW} --tcpao_excopts
++	log_test $? 0 "TCP-AO: Exclude TCP options"
 +}
 +
-+static void set_ip4hdr(struct iphdr *iph, size_t packet_len, int proto,
-+		struct sockaddr_in *src, struct sockaddr_in *dst)
-+{
-+	iph->version	= 4;
-+	iph->ihl	= 5;
-+	iph->tos	= 0;
-+	iph->tot_len	= htons(packet_len);
-+	iph->ttl	= 2;
-+	iph->protocol	= proto;
-+	iph->saddr	= src->sin_addr.s_addr;
-+	iph->daddr	= dst->sin_addr.s_addr;
-+	iph->check	= checksum4_fold((void *)iph, iph->ihl << 1, 0);
-+}
-+
-+static void icmp_interfere4(uint8_t type, uint8_t code, uint32_t rcv_nxt,
-+		struct sockaddr_in *src, struct sockaddr_in *dst)
-+{
-+	int sk = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
-+	struct {
-+		struct iphdr iph;
-+		struct icmphdr icmph;
-+		struct iphdr iphe;
-+		struct {
-+			uint16_t sport;
-+			uint16_t dport;
-+			uint32_t seq;
-+		} tcph;
-+	} packet = {};
-+	size_t packet_len;
-+	ssize_t bytes;
-+
-+	if (sk < 0)
-+		test_error("socket(AF_INET, SOCK_RAW, IPPROTO_RAW)");
-+
-+	packet_len = sizeof(packet);
-+	set_ip4hdr(&packet.iph, packet_len, IPPROTO_ICMP, src, dst);
-+
-+	packet.icmph.type = type;
-+	packet.icmph.code = code;
-+	if (code == ICMP_FRAG_NEEDED) {
-+		randomize_buffer(&packet.icmph.un.frag.mtu,
-+				sizeof(packet.icmph.un.frag.mtu));
-+	}
-+
-+	packet_len = sizeof(packet.iphe) + sizeof(packet.tcph);
-+	set_ip4hdr(&packet.iphe, packet_len, IPPROTO_TCP, dst, src);
-+
-+	packet.tcph.sport = dst->sin_port;
-+	packet.tcph.dport = src->sin_port;
-+	packet.tcph.seq = htonl(rcv_nxt);
-+
-+	packet_len = sizeof(packet) - sizeof(packet.iph);
-+	packet.icmph.checksum = checksum4_fold((void *)&packet.icmph,
-+						packet_len, 0);
-+
-+	bytes = sendto(sk, &packet, sizeof(packet), 0,
-+			(struct sockaddr*)dst, sizeof(*dst));
-+	if (bytes != sizeof(packet))
-+		test_error("send(): %zd", bytes);
-+	icmps_sent++;
-+
-+	close(sk);
-+}
-+
-+static void set_ip6hdr(struct ipv6hdr *iph, size_t packet_len, int proto,
-+		struct sockaddr_in6 *src, struct sockaddr_in6 *dst)
-+{
-+	iph->version		= 6;
-+	iph->payload_len	= htons(packet_len);
-+	iph->nexthdr		= proto;
-+	iph->hop_limit		= 2;
-+	iph->saddr		= src->sin6_addr;
-+	iph->daddr		= dst->sin6_addr;
-+}
-+
-+static inline uint16_t csum_fold(uint32_t csum)
-+{
-+	uint32_t sum = csum;
-+	sum = (sum & 0xffff) + (sum >> 16);
-+	sum = (sum & 0xffff) + (sum >> 16);
-+	return (uint16_t)~sum;
-+}
-+
-+static inline uint32_t csum_add(uint32_t csum, uint32_t addend)
-+{
-+	uint32_t res = csum;
-+
-+	res += addend;
-+	return res + (res < addend);
-+}
-+
-+__attribute__ ((noinline)) uint32_t checksum6_nofold(void *data, size_t len, uint32_t sum)
-+{
-+	uint16_t *words = data;
-+	size_t i;
-+
-+	for (i = 0; i < len / sizeof(uint16_t); i++)
-+		sum = csum_add(sum, words[i]);
-+	if (len & 1)
-+		sum = csum_add(sum, ((char *)data)[len - 1]);
-+	return sum;
-+}
-+
-+__attribute__ ((noinline)) uint16_t icmp6_checksum(struct sockaddr_in6 *src,
-+			struct sockaddr_in6 *dst,
-+			void *ptr, size_t len, uint8_t proto)
-+{
-+	struct {
-+		struct in6_addr saddr;
-+		struct in6_addr daddr;
-+		uint32_t payload_len;
-+		uint8_t zero[3];
-+		uint8_t nexthdr;
-+	} pseudo_header = {};
-+	uint32_t sum;
-+
-+	pseudo_header.saddr		= src->sin6_addr;
-+	pseudo_header.daddr		= dst->sin6_addr;
-+	pseudo_header.payload_len	= htonl(len);
-+	pseudo_header.nexthdr		= proto;
-+
-+	sum = checksum6_nofold(&pseudo_header, sizeof(pseudo_header), 0);
-+	sum = checksum6_nofold(ptr, len, sum);
-+
-+	return csum_fold(sum);
-+}
-+
-+static void icmp6_interfere(int type, int code, uint32_t rcv_nxt,
-+		struct sockaddr_in6 *src, struct sockaddr_in6 *dst)
-+{
-+	int sk = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
-+	struct sockaddr_in6 dst_raw = *dst;
-+	struct {
-+		struct ipv6hdr iph;
-+		struct icmp6hdr icmph;
-+		struct ipv6hdr iphe;
-+		struct {
-+			uint16_t sport;
-+			uint16_t dport;
-+			uint32_t seq;
-+		} tcph;
-+	} packet = {};
-+	size_t packet_len;
-+	ssize_t bytes;
-+
-+
-+	if (sk < 0)
-+		test_error("socket(AF_INET6, SOCK_RAW, IPPROTO_RAW)");
-+
-+	packet_len = sizeof(packet) - sizeof(packet.iph);
-+	set_ip6hdr(&packet.iph, packet_len, IPPROTO_ICMPV6, src, dst);
-+
-+	packet.icmph.icmp6_type = type;
-+	packet.icmph.icmp6_code = code;
-+
-+	packet_len = sizeof(packet.iphe) + sizeof(packet.tcph);
-+	set_ip6hdr(&packet.iphe, packet_len, IPPROTO_TCP, dst, src);
-+
-+	packet.tcph.sport = dst->sin6_port;
-+	packet.tcph.dport = src->sin6_port;
-+	packet.tcph.seq = htonl(rcv_nxt);
-+
-+	packet_len = sizeof(packet) - sizeof(packet.iph);
-+
-+	packet.icmph.icmp6_cksum = icmp6_checksum(src, dst,
-+			(void *)&packet.icmph, packet_len, IPPROTO_ICMPV6);
-+
-+	dst_raw.sin6_port = htons(IPPROTO_RAW);
-+	bytes = sendto(sk, &packet, sizeof(packet), 0,
-+			(struct sockaddr*)&dst_raw, sizeof(dst_raw));
-+	if (bytes != sizeof(packet))
-+		test_error("send(): %zd", bytes);
-+	icmps_sent++;
-+
-+	close(sk);
-+}
-+
-+static uint32_t get_rcv_nxt(int sk)
-+{
-+	int val = TCP_REPAIR_ON;
-+	uint32_t ret;
-+	socklen_t sz = sizeof(ret);
-+
-+	if (setsockopt(sk, SOL_TCP, TCP_REPAIR, &val, sizeof(val)))
-+		test_error("setsockopt(TCP_REPAIR)");
-+	val = TCP_RECV_QUEUE;
-+	if (setsockopt(sk, SOL_TCP, TCP_REPAIR_QUEUE, &val, sizeof(val)))
-+		test_error("setsockopt(TCP_REPAIR_QUEUE)");
-+	if (getsockopt(sk, SOL_TCP, TCP_QUEUE_SEQ, &ret, &sz))
-+		test_error("getsockopt(TCP_QUEUE_SEQ)");
-+	val = TCP_REPAIR_OFF_NO_WP;
-+	if (setsockopt(sk, SOL_TCP, TCP_REPAIR, &val, sizeof(val)))
-+		test_error("setsockopt(TCP_REPAIR)");
-+	return ret;
-+}
-+
-+static void icmp_interfere(const size_t nr, uint32_t rcv_nxt, void *src, void *dst)
-+{
-+	struct sockaddr_in *saddr4 = src;
-+	struct sockaddr_in *daddr4 = dst;
-+	struct sockaddr_in6 *saddr6 = src;
-+	struct sockaddr_in6 *daddr6 = dst;
-+	size_t i;
-+
-+	if (saddr4->sin_family != daddr4->sin_family)
-+		test_error("Different address families");
-+
-+	for (i = 0; i < nr; i++) {
-+		if (saddr4->sin_family == AF_INET) {
-+			icmp_interfere4(ICMP_DEST_UNREACH, ICMP_PROT_UNREACH,
-+					rcv_nxt, saddr4, daddr4);
-+			icmp_interfere4(ICMP_DEST_UNREACH, ICMP_PORT_UNREACH,
-+					rcv_nxt, saddr4, daddr4);
-+			icmp_interfere4(ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
-+					rcv_nxt, saddr4, daddr4);
-+			icmps_sent += 3;
-+		} else if (saddr4->sin_family == AF_INET6) {
-+			icmp6_interfere(ICMPV6_DEST_UNREACH,
-+					ICMPV6_ADM_PROHIBITED,
-+					rcv_nxt, saddr6, daddr6);
-+			icmp6_interfere(ICMPV6_DEST_UNREACH,
-+					ICMPV6_PORT_UNREACH,
-+					rcv_nxt, saddr6, daddr6);
-+			icmps_sent += 2;
-+		} else {
-+			test_error("Not ip address family");
-+		}
-+	}
-+}
-+
-+static void send_interfered(int sk)
-+{
-+	const unsigned timeout = TEST_TIMEOUT_SEC;
-+	struct sockaddr_in6 src, dst;
-+	socklen_t addr_sz;
-+
-+	addr_sz = sizeof(src);
-+	if (getsockname(sk, &src, &addr_sz))
-+		test_error("getsockname()");
-+	addr_sz = sizeof(dst);
-+	if (getpeername(sk, &dst, &addr_sz))
-+		test_error("getpeername()");
-+
-+	while (1) {
-+		uint32_t rcv_nxt;
-+
-+		if (test_client_verify(sk, packet_size, packets_nr, timeout)) {
-+			test_fail("client: connection is broken");
-+			return;
-+		}
-+		packets_sent += packets_nr;
-+		rcv_nxt = get_rcv_nxt(sk);
-+		icmp_interfere(packets_nr, rcv_nxt, (void *)&src, (void *)&dst);
-+	}
-+}
-+
-+static void *client_fn(void *arg)
-+{
-+	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (test_set_ao(sk, "password", 0, this_ip_dest, -1, 100, 100))
-+		test_error("setsockopt(TCP_AO)");
-+
-+	synchronize_threads();
-+	if (test_connect_socket(sk, this_ip_dest, test_server_port) <= 0)
-+		test_error("failed to connect()");
-+	synchronize_threads();
-+
-+	send_interfered(sk);
-+
-+	/* Not expecting client to quit */
-+	test_fail("client disconnected");
-+
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(3, server_fn, client_fn);
-+	return 0;
-+}
+ #
+ # MD5 tests with VRF
+ #
+@@ -2750,6 +2988,7 @@ ipv6_tcp_novrf()
+ 	done
+ 
+ 	ipv6_tcp_md5_novrf
++	ipv6_tcp_ao_novrf
+ }
+ 
+ ipv6_tcp_vrf()
 -- 
 2.37.2
 
