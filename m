@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD71C07E9D
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D90C6FA83
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Sep 2022 20:17:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233034AbiIWURh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39364 "EHLO
+        id S233074AbiIWUR5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:17:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232136AbiIWUPf (ORCPT
+        with ESMTP id S232977AbiIWUQv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:15:35 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B5F135061
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id z6so1605607wrq.1
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:14 -0700 (PDT)
+        Fri, 23 Sep 2022 16:16:51 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2813013571C
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:19 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id o5so899486wms.1
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Sep 2022 13:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=U38qHd/2cGlOOAg9pewo5FAQzc3pYM6VmdaPe+uIwj8=;
-        b=OrrwXNw9TcepNJoAAzv8fu39hTAch0GzL2oXzmrw0DEd5SDJmRIPntgLCzrPgttqHD
-         pfmJCCOuvQL+hboUB2Hem8jcGAgh/MFOiJw6AGREHCigLuDGVTHHWwkSlKhx0yS5FGcl
-         S30bvTNyUGmvgeDVdC21r98Pgj24wPSzFjuJJo2qgXmjgMafWkuXSR7NnSY8cCSkb7cW
-         R9ffJKe1LRhJ5gYJX9ui6f17YAoFI6vDP7tuEHUAZVnnTnMzuzYGKprDOAe4YzPjE/zW
-         ztjv1q6oCLiNrgDqNFXFbyDe6Gx1KbfE6aY5wmIqO2Kp1dix2yVMVt1THXIbJW6vm5/x
-         STmQ==
+        bh=6JEtek2Y7rM+cJSPbM8FsaEFwhMIZ+whA+Lhvbk5Mtc=;
+        b=U71dT084xbkT1bJSU/0qvl9Kh50BEHmCfhLJ9+LkMdvekw3goG8XoIzxtVvyjCbJhz
+         trxBgHc+LTwUSZdqTb8s0+B8dGu4gxYsOpLEbsMJPVsBNt6oivNpEU+aaS3iHPqBJWZ8
+         6Eosp88GTRSplA9ess8xuQigedgqg6LWJ6iGlud8cZf180HXOIgMzJGwwoyJlRKcBuDz
+         R98JKSkLuRZ2aX4AI9sIUMRNAgOz8QX1x6W0fboWKnd1meIYjN8onoeNuqbIqln2Isa4
+         55+FiYwNOB6Js8BVrIFQHLU3cceIDKKNAQ2U71DDbaXBEsSK3N243LU/lCiqwxiG3J13
+         3arQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=U38qHd/2cGlOOAg9pewo5FAQzc3pYM6VmdaPe+uIwj8=;
-        b=pR5lVC/rhjql4r0mu0auE5AK/5iOeHtY/dn5CMFQ6IuYVDVrXlHY/mUn+CKJMerQqf
-         lxr8wBimqnsgGdJTxnQZvvtqXt1enmFE5iyuwLGKjwE/JzYy+waj45pLpmwDXtu1h+Di
-         RNVYfws1l/wxHRVDU/RQOAj+C1iMJAsz8sfgrwDOOfHPYurSlCppkm5NZyud0K2s4tye
-         lHIUvl7/qHQqeMaC1xxEv9EPikqefZ2MuF81PQFCOfdBkrfmUJWMr16I1ruZrWkyXJj/
-         V0+pduBkiBS0wGjZ1j9uSJD0JkJzi6ApbfogCxSXi6xencnUtLDsxebdup/47pRsiqL/
-         ZV0Q==
-X-Gm-Message-State: ACrzQf3UVY0kd374iHdn8A5qONVXudG5tF0fQXyUk0J7cJo1pXNuf3md
-        DYSiS+erg+BDaT7RyrD6T+pXcw==
-X-Google-Smtp-Source: AMsMyM46MASWsIJe4oJn+4k2/dBHh2kHhxfqrSPkWp9FLfgHltKoBz+2d1iDoqLUHlYM9FP+mKsbdQ==
-X-Received: by 2002:a5d:6852:0:b0:228:c94b:a5b0 with SMTP id o18-20020a5d6852000000b00228c94ba5b0mr6053207wrw.540.1663964053686;
-        Fri, 23 Sep 2022 13:14:13 -0700 (PDT)
+        bh=6JEtek2Y7rM+cJSPbM8FsaEFwhMIZ+whA+Lhvbk5Mtc=;
+        b=OPQ5F0o1aoGfwYxL/EcDpSFZ3l6ffluV6kxrZ1vePV+026Hw68djO8zkCAAPwirUzG
+         84+GiNauawnyJQIVq++ZNKLjGlMPz3b94McxEzD0lu4cLJHqCxeNEE9Al2tLWgF6GA41
+         PqMpezViK1201CUoT8uSUGDBf/VapoXp4+f/VjOMuungqWARTzRKh1orhh5KwlDMAbJ7
+         qu6uZfGrWsi8mPA0AYkH6VllEft40bpsfmcgAdjD2i4Sp23wN5ZktukOULrp7/rmuZyL
+         O0tFdaQDBh1f7kxeAK2XHC3xH531w2WhvkNjTK/F9VfRxWFsg9E++YaxCnRV2k6lasay
+         /hfg==
+X-Gm-Message-State: ACrzQf0PFS90GRxc40gQyq6TkCb96y2YD1efS4q2zLs1qX42MIMVseT+
+        lkcYLjLCVXjDrm/KqGZj3ZYnAg==
+X-Google-Smtp-Source: AMsMyM6q56K5Om8jamQJOFalU4yvCdDsaB4nTEpSOXDQrxDbL/tm0spc4e/SHz9K0VbruJxwXvp9+g==
+X-Received: by 2002:a05:600c:5124:b0:3b4:faef:87be with SMTP id o36-20020a05600c512400b003b4faef87bemr7409832wms.68.1663964046013;
+        Fri, 23 Sep 2022 13:14:06 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.12
+        by smtp.gmail.com with ESMTPSA id k11-20020a05600c0b4b00b003b492753826sm3281056wmr.43.2022.09.23.13.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 13:14:13 -0700 (PDT)
+        Fri, 23 Sep 2022 13:14:05 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -71,9 +71,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 30/35] selftests/tcp-ao: Add TCP-AO + TCP-MD5 + no sign listen socket tests
-Date:   Fri, 23 Sep 2022 21:13:14 +0100
-Message-Id: <20220923201319.493208-31-dima@arista.com>
+Subject: [PATCH v2 25/35] selftests/net: Add TCP-AO library
+Date:   Fri, 23 Sep 2022 21:13:09 +0100
+Message-Id: <20220923201319.493208-26-dima@arista.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220923201319.493208-1-dima@arista.com>
 References: <20220923201319.493208-1-dima@arista.com>
@@ -83,114 +83,439 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The test plan was (most of tests have all 3 client types):
-1. TCP-AO listen (INADDR_ANY)
-2. TCP-MD5 listen (INADDR_ANY)
-3. non-signed listen (INADDR_ANY)
-4. TCP-AO + TCP-MD5 listen (prefix)
-5. TCP-AO subprefix add failure [checked in setsockopt-closed.c]
-6. TCP-AO out of prefix connect [checked in connect-deny.c]
-7. TCP-AO + TCP-MD5 on connect()
-8. TCP-AO intersect with TCP-MD5 failure
-9. Established TCP-AO: add TCP-MD5 key
-10. Established TCP-MD5: add TCP-AO key
-11. Established non-signed: add TCP-AO key
-
-Output produced:
-1..42
-TAP version 13
-ok 1 AO server (INADDR_ANY): AO client: connected
-ok 2 AO server (INADDR_ANY): AO client: counter TCPAOGood increased 0 => 2
-ok 3 AO server (INADDR_ANY): MD5 client
-ok 4 AO server (INADDR_ANY): MD5 client: counter TCPMD5Unexpected increased 0 => 1
-ok 5 AO server (INADDR_ANY): no sign client: counter TCPAORequired increased 0 => 1
-ok 6 AO server (INADDR_ANY): unsigned client
-ok 7 MD5 server (INADDR_ANY): AO client: counter TCPAOKeyNotFound increased 0 => 1
-ok 8 MD5 server (INADDR_ANY): AO client
-ok 9 MD5 server (INADDR_ANY): MD5 client: connected
-ok 10 MD5 server (INADDR_ANY): no sign client: counter TCPMD5NotFound increased 0 => 1
-ok 11 MD5 server (INADDR_ANY): no sign client
-ok 12 no sign server: AO client
-ok 13 no sign server: AO client: counter TCPAOKeyNotFound increased 1 => 2
-ok 14 no sign server: MD5 client
-ok 15 no sign server: MD5 client: counter TCPMD5Unexpected increased 1 => 2
-ok 16 no sign server: no sign client: connected
-ok 17 no sign server: no sign client: counter CurrEstab increased 0 => 1
-ok 18 AO+MD5 server: AO client (matching): connected
-ok 19 AO+MD5 server: AO client (matching): counter TCPAOGood increased 4 => 6
-ok 20 AO+MD5 server: AO client (misconfig, matching MD5)
-ok 21 AO+MD5 server: AO client (misconfig, matching MD5): counter TCPAOKeyNotFound increased 2 => 3
-ok 22 AO+MD5 server: AO client (misconfig, non-matching): counter TCPAOKeyNotFound increased 3 => 4
-ok 23 AO+MD5 server: AO client (misconfig, non-matching)
-ok 24 AO+MD5 server: MD5 client (matching): connected
-ok 25 AO+MD5 server: MD5 client (misconfig, matching AO)
-ok 26 AO+MD5 server: MD5 client (misconfig, matching AO): counter TCPMD5Unexpected increased 2 => 3
-ok 27 AO+MD5 server: MD5 client (misconfig, non-matching): counter TCPMD5Unexpected increased 3 => 4
-ok 28 AO+MD5 server: MD5 client (misconfig, non-matching)
-ok 29 AO+MD5 server: no sign client (unmatched): connected
-ok 30 AO+MD5 server: no sign client (unmatched): counter CurrEstab increased 0 => 1
-ok 31 AO+MD5 server: no sign client (misconfig, matching AO)
-ok 32 AO+MD5 server: no sign client (misconfig, matching AO): counter TCPAORequired increased 1 => 2
-ok 33 AO+MD5 server: no sign client (misconfig, matching MD5)
-ok 34 AO+MD5 server: no sign client (misconfig, matching MD5): counter TCPMD5NotFound increased 1 => 2
-ok 35 AO+MD5 server: client with both [TCP-MD5] and TCP-AO keys: connect() was prevented
-ok 36 AO+MD5 server: client with both TCP-MD5 and [TCP-AO] keys: connect() was prevented
-ok 37 TCP-AO established: add TCP-MD5 key: postfailed as expected
-ok 38 TCP-AO established: add TCP-MD5 key: counter TCPAOGood increased 7 => 9
-ok 39 TCP-MD5 established: add TCP-AO key: postfailed as expected
-ok 40 non-signed established: add TCP-AO key: postfailed as expected
-ok 41 non-signed established: add TCP-AO key: counter CurrEstab increased 0 => 1
-ok 42 TCP-AO key intersects with TCP-MD5 key: prefailed as expected
+Provide functions to create selftests dedicated to TCP-AO.
+They can run in parallel, as they use temporary net namespaces.
+They can be very specific to the feature being tested.
+This will allow to create a lot of TCP-AO tests, without complicating
+one binary with many --options and to create scenarios, that are
+hard to put in bash script that uses one binary.
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile   |   2 +-
- .../selftests/net/tcp_ao/unsigned-md5.c       | 483 ++++++++++++++++++
- 2 files changed, 484 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/unsigned-md5.c
+ tools/testing/selftests/Makefile              |   1 +
+ tools/testing/selftests/net/tcp_ao/.gitignore |   2 +
+ tools/testing/selftests/net/tcp_ao/Makefile   |  45 +++
+ tools/testing/selftests/net/tcp_ao/connect.c  |  81 +++++
+ .../testing/selftests/net/tcp_ao/lib/aolib.h  | 333 +++++++++++++++++
+ .../selftests/net/tcp_ao/lib/netlink.c        | 341 ++++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/proc.c | 267 ++++++++++++++
+ .../testing/selftests/net/tcp_ao/lib/setup.c  | 297 +++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/sock.c | 294 +++++++++++++++
+ .../testing/selftests/net/tcp_ao/lib/utils.c  |  30 ++
+ 10 files changed, 1691 insertions(+)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/.gitignore
+ create mode 100644 tools/testing/selftests/net/tcp_ao/Makefile
+ create mode 100644 tools/testing/selftests/net/tcp_ao/connect.c
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/aolib.h
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/netlink.c
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/proc.c
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/setup.c
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/sock.c
+ create mode 100644 tools/testing/selftests/net/tcp_ao/lib/utils.c
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index a001dc2aed4e..da44966f3687 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
--		setsockopt-closed
-+		setsockopt-closed unsigned-md5
- 
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/unsigned-md5.c b/tools/testing/selftests/net/tcp_ao/unsigned-md5.c
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 1fc89b8ef433..f547db175507 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -48,6 +48,7 @@ TARGETS += net
+ TARGETS += net/af_unix
+ TARGETS += net/forwarding
+ TARGETS += net/mptcp
++TARGETS += net/tcp_ao
+ TARGETS += netfilter
+ TARGETS += nsfs
+ TARGETS += pidfd
+diff --git a/tools/testing/selftests/net/tcp_ao/.gitignore b/tools/testing/selftests/net/tcp_ao/.gitignore
 new file mode 100644
-index 000000000000..d62c47617dbf
+index 000000000000..e8bb81b715b7
 --- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/unsigned-md5.c
-@@ -0,0 +1,483 @@
++++ b/tools/testing/selftests/net/tcp_ao/.gitignore
+@@ -0,0 +1,2 @@
++*_ipv4
++*_ipv6
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+new file mode 100644
+index 000000000000..cb23d67944d7
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -0,0 +1,45 @@
++# SPDX-License-Identifier: GPL-2.0
++TEST_BOTH_AF := connect
++
++TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
++TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
++
++TEST_GEN_PROGS := $(TEST_IPV4_PROGS) $(TEST_IPV6_PROGS)
++
++top_srcdir	  := ../../../../..
++KSFT_KHDR_INSTALL := 1
++include ../../lib.mk
++
++HOSTAR ?= ar
++
++# Drop it on port to linux/master with commit 8ce72dc32578
++.DEFAULT_GOAL := all
++
++LIBDIR	:= $(OUTPUT)/lib
++LIB	:= $(LIBDIR)/libaotst.a
++LDLIBS	+= $(LIB) -pthread
++LIBDEPS	:= lib/aolib.h Makefile
++
++CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
++CFLAGS	+= -I ../../../../../usr/include/ -iquote $(LIBDIR)
++CFLAGS	+= -I ../../../../include/
++
++# Library
++LIBSRC	:= setup.c netlink.c utils.c sock.c proc.c
++LIBOBJ	:= $(LIBSRC:%.c=$(LIBDIR)/%.o)
++EXTRA_CLEAN += $(LIBOBJ) $(LIB)
++
++$(LIB): $(LIBOBJ)
++	$(HOSTAR) rcs $@ $^
++
++$(LIBDIR)/%.o: ./lib/%.c $(LIBDEPS)
++	$(CC) $< $(CFLAGS) $(CPPFLAGS) -o $@ -c
++
++$(TEST_GEN_PROGS): $(LIB)
++
++$(OUTPUT)/%_ipv4: %.c
++	$(LINK.c) $^ $(LDLIBS) -o $@
++
++$(OUTPUT)/%_ipv6: %.c
++	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
++
+diff --git a/tools/testing/selftests/net/tcp_ao/connect.c b/tools/testing/selftests/net/tcp_ao/connect.c
+new file mode 100644
+index 000000000000..02aa50f0266c
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/connect.c
+@@ -0,0 +1,81 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Author: Dmitry Safonov <dima@arista.com> */
 +#include <inttypes.h>
 +#include "aolib.h"
-+#include "../../../../include/linux/bits.h"
 +
-+typedef uint8_t fault_t;
-+#define F_TIMEOUT	1
-+#define F_KEYREJECT	2
-+#define F_PREINSTALL	3
-+#define F_POSTINSTALL	4
-+
-+#define fault(type)	(inj == type)
-+
-+static const char *md5_password = "Some evil genius, enemy to mankind, must have been the first contriver.";
-+static const char *ao_password = "In this hour, I do not believe that any darkness will endure.";
-+
-+static union tcp_addr client2;
-+static union tcp_addr client3;
-+
-+static int test_set_md5(int sk, const union tcp_addr in_addr, uint8_t prefix)
++static void *server_fn(void *arg)
 +{
-+	size_t pwd_len = strlen(md5_password);
-+	struct tcp_md5sig md5sig = {};
++	int err, sk, lsk;
++	ssize_t bytes;
++
++	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
++
++	if (test_set_ao(lsk, "password", 0, this_ip_dest, -1, 100, 100))
++		test_error("setsockopt(TCP_AO)");
++	synchronize_threads();
++
++	err = test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0);
++	if (!err)
++		test_error("timeouted for accept()");
++	else if (err < 0)
++		test_error("test_wait_fd()");
++
++	sk = accept(lsk, NULL, NULL);
++	if (sk < 0)
++		test_error("accept()");
++
++	synchronize_threads();
++
++	bytes = test_server_run(sk, 0, 0);
++
++	test_fail("server served: %zd", bytes);
++	return NULL;
++}
++
++static void *client_fn(void *arg)
++{
++	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++	uint64_t before_aogood, after_aogood;
++	const size_t nr_packets = 20;
++	struct netstat *ns_before, *ns_after;
++
++	if (sk < 0)
++		test_error("socket()");
++
++	if (test_set_ao(sk, "password", 0, this_ip_dest, -1, 100, 100))
++		test_error("setsockopt(TCP_AO)");
++
++	synchronize_threads();
++	if (test_connect_socket(sk, this_ip_dest, test_server_port) <= 0)
++		test_error("failed to connect()");
++	synchronize_threads();
++
++	ns_before = netstat_read();
++	before_aogood = netstat_get(ns_before, "TCPAOGood", NULL);
++	if (test_client_verify(sk, 100, nr_packets, TEST_TIMEOUT_SEC)) {
++		test_fail("verify failed");
++		return NULL;
++	}
++
++	ns_after = netstat_read();
++	after_aogood = netstat_get(ns_after, "TCPAOGood", NULL);
++	netstat_print_diff(ns_before, ns_after);
++	netstat_free(ns_before);
++	netstat_free(ns_after);
++
++	if (nr_packets > (after_aogood - before_aogood)) {
++		test_fail("TCPAOGood counter mismatch: %zu > (%zu - %zu)",
++				nr_packets, after_aogood, before_aogood);
++		return NULL;
++	}
++
++	test_ok("connect TCPAOGood %" PRIu64 " => %" PRIu64 ", sent %" PRIu64,
++			before_aogood, after_aogood, nr_packets);
++	return NULL;
++}
++
++int main(int argc, char *argv[])
++{
++	test_init(1, server_fn, client_fn);
++	return 0;
++}
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/aolib.h b/tools/testing/selftests/net/tcp_ao/lib/aolib.h
+new file mode 100644
+index 000000000000..d5810fd04816
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/aolib.h
+@@ -0,0 +1,333 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * TCP-AO selftest library. Provides helpers to unshare network
++ * namespaces, create veth, assign ip addresses, set routes,
++ * manipulate socket options, read network counter and etc.
++ * Author: Dmitry Safonov <dima@arista.com>
++ */
++#ifndef _AOLIB_H_
++#define _AOLIB_H_
++
++#include <arpa/inet.h>
++#include <errno.h>
++#include <linux/snmp.h>
++#include <linux/tcp.h>
++#include <netinet/in.h>
++#include <stdarg.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++
++#include "../../../../../include/linux/stringify.h"
++
++/* Working around ksft, see the comment in lib/setup.c */
++extern void __test_msg(const char *buf);
++extern void __test_ok(const char *buf);
++extern void __test_fail(const char *buf);
++extern void __test_error(const char *buf);
++
++__attribute__((__format__(__printf__, 2, 3)))
++static inline void __test_print(void (*fn)(const char *), const char *fmt, ...)
++{
++#define TEST_MSG_BUFFER_SIZE 4096
++	char buf[TEST_MSG_BUFFER_SIZE];
++	va_list arg;
++
++	va_start(arg, fmt);
++	vsnprintf(buf, sizeof(buf), fmt, arg);
++	va_end(arg);
++	fn(buf);
++}
++
++#define test_print(fmt, ...)						\
++	__test_print(__test_msg, "%ld[%s:%u] " fmt "\n",		\
++		     syscall(SYS_gettid),				\
++		     __FILE__, __LINE__, ##__VA_ARGS__)
++
++#define test_ok(fmt, ...)						\
++	__test_print(__test_ok, fmt "\n", ##__VA_ARGS__)
++
++#define test_fail(fmt, ...)						\
++do {									\
++	if (errno)							\
++		__test_print(__test_fail, fmt ": %m\n", ##__VA_ARGS__);	\
++	else								\
++		__test_print(__test_fail, fmt "\n", ##__VA_ARGS__);	\
++	test_failed();							\
++} while(0)
++
++#define KSFT_FAIL  1
++#define test_error(fmt, ...)						\
++do {									\
++	if (errno)							\
++		__test_print(__test_error, "%ld[%s:%u] " fmt ": %m\n",	\
++			     syscall(SYS_gettid), __FILE__, __LINE__,	\
++			     ##__VA_ARGS__);				\
++	else								\
++		__test_print(__test_error, "%ld[%s:%u] " fmt "\n",	\
++			     syscall(SYS_gettid), __FILE__, __LINE__,	\
++			     ##__VA_ARGS__);				\
++	exit(KSFT_FAIL);						\
++} while(0)
++
++union tcp_addr {
++	struct in_addr a4;
++	struct in6_addr a6;
++};
++
++typedef void *(*thread_fn)(void*);
++extern void test_failed(void);
++extern void __test_init(unsigned int ntests, int family, unsigned prefix,
++			union tcp_addr addr1, union tcp_addr addr2,
++			thread_fn peer1, thread_fn peer2);
++
++static inline void test_init2(unsigned int ntests,
++			      thread_fn peer1, thread_fn peer2,
++			      int family, unsigned prefix,
++			      const char *addr1, const char *addr2)
++{
++	union tcp_addr taddr1, taddr2;
++
++	if (inet_pton(family, addr1, &taddr1) != 1)
++		test_error("Can't convert ip address %s", addr1);
++	if (inet_pton(family, addr2, &taddr2) != 1)
++		test_error("Can't convert ip address %s", addr2);
++
++	__test_init(ntests, family, prefix, taddr1, taddr2, peer1, peer2);
++}
++extern void test_add_destructor(void (*d)(void));
++extern void test_set_optmem(size_t value);
++
++extern const struct sockaddr_in6 addr_any6;
++extern const struct sockaddr_in addr_any4;
++
++#ifdef IPV6_TEST
++# define __TEST_CLIENT_IP(n)	("2001:db8:" __stringify(n) "::1")
++# define TEST_CLIENT_IP	__TEST_CLIENT_IP(1)
++# define TEST_WRONG_IP	"2001:db8:253::1"
++# define TEST_SERVER_IP	"2001:db8:254::1"
++# define TEST_NETWORK	"2001::"
++# define TEST_PREFIX	128
++# define TEST_FAMILY	AF_INET6
++# define SOCKADDR_ANY	addr_any6
++#else
++# define __TEST_CLIENT_IP(n)	("10.0." __stringify(n) ".1")
++# define TEST_CLIENT_IP	__TEST_CLIENT_IP(1)
++# define TEST_WRONG_IP	"10.0.253.1"
++# define TEST_SERVER_IP	"10.0.254.1"
++# define TEST_NETWORK	"10.0.0.0"
++# define TEST_PREFIX	32
++# define TEST_FAMILY	AF_INET
++# define SOCKADDR_ANY	addr_any4
++#endif
++
++static inline void test_init(unsigned int ntests,
++			     thread_fn peer1, thread_fn peer2)
++{
++	test_init2(ntests, peer1, peer2, TEST_FAMILY, TEST_PREFIX,
++			TEST_SERVER_IP, TEST_CLIENT_IP);
++}
++extern void synchronize_threads(void);
++extern void switch_ns(int fd);
++
++extern __thread union tcp_addr this_ip_addr;
++extern __thread union tcp_addr this_ip_dest;
++extern int test_family;
++
++extern void randomize_buffer(void *buf, size_t buflen);
++extern const char veth_name[];
++extern int add_veth(const char *name, int nsfda, int nsfdb);
++extern int ip_addr_add(const char *intf, int family,
++		       union tcp_addr addr, uint8_t prefix);
++extern int ip_route_add(const char *intf, int family,
++			union tcp_addr src, union tcp_addr dst);
++extern int link_set_up(const char *intf);
++
++extern const unsigned test_server_port;
++extern int test_wait_fd(int sk, time_t sec, bool write);
++extern int __test_connect_socket(int sk, void *addr, size_t addr_sz,
++				 time_t timeout);
++extern int __test_listen_socket(int backlog, void *addr, size_t addr_sz);
++
++static inline int test_listen_socket(const union tcp_addr taddr, unsigned port,
++				     int backlog)
++{
++#ifdef IPV6_TEST
++	struct sockaddr_in6 addr = {
++		.sin6_family	= AF_INET6,
++		.sin6_port	= htons(port),
++		.sin6_addr	= taddr.a6,
++	};
++#else
++	struct sockaddr_in addr = {
++		.sin_family	= AF_INET,
++		.sin_port	= htons(port),
++		.sin_addr	= taddr.a4,
++	};
++#endif
++	return __test_listen_socket(backlog, (void *)&addr, sizeof(addr));
++}
++
++#ifndef DEFAULT_TEST_ALGO
++#define DEFAULT_TEST_ALGO	"cmac(aes128)"
++#endif
++
++#ifdef IPV6_TEST
++#define DEFAULT_TEST_PREFIX	128
++#else
++#define DEFAULT_TEST_PREFIX	32
++#endif
++
++/*
++ * Timeout on syscalls where failure is not expected.
++ * You may want to rise it if the test machine is very busy.
++ */
++#ifndef TEST_TIMEOUT_SEC
++#define TEST_TIMEOUT_SEC	5
++#endif
++
++/*
++ * Timeout on connect() where a failure is expected.
++ * If set to 0 - kernel will try to retransmit SYN number of times, set in
++ * /proc/sys/net/ipv4/tcp_syn_retries
++ * By default set to 1 to make tests pass faster on non-busy machine.
++ */
++#ifndef TEST_RETRANSMIT_SEC
++#define TEST_RETRANSMIT_SEC	1
++#endif
++
++
++static inline int _test_connect_socket(int sk, const union tcp_addr taddr,
++					unsigned port, time_t timeout)
++{
++#ifdef IPV6_TEST
++	struct sockaddr_in6 addr = {
++		.sin6_family	= AF_INET6,
++		.sin6_port	= htons(port),
++		.sin6_addr	= taddr.a6,
++	};
++#else
++	struct sockaddr_in addr = {
++		.sin_family	= AF_INET,
++		.sin_port	= htons(port),
++		.sin_addr	= taddr.a4,
++	};
++#endif
++	return __test_connect_socket(sk, (void *)&addr, sizeof(addr), timeout);
++}
++
++static inline int test_connect_socket(int sk,
++		const union tcp_addr taddr, unsigned port)
++{
++	return _test_connect_socket(sk, taddr, port, TEST_TIMEOUT_SEC);
++}
++
++extern int test_prepare_ao_sockaddr(struct tcp_ao *ao,
++		const char *alg, uint16_t flags,
++		void *addr, size_t addr_sz, uint8_t prefix,
++		uint8_t sndid, uint8_t rcvid, uint8_t maclen,
++		uint8_t keyflags, uint8_t keylen, const char *key);
++
++static inline int test_prepare_ao(struct tcp_ao *ao,
++		const char *alg, uint16_t flags,
++		union tcp_addr in_addr, uint8_t prefix,
++		uint8_t sndid, uint8_t rcvid, uint8_t maclen,
++		uint8_t keyflags, uint8_t keylen, const char *key)
++{
 +#ifdef IPV6_TEST
 +	struct sockaddr_in6 addr = {
 +		.sin6_family	= AF_INET6,
@@ -205,451 +530,1345 @@ index 000000000000..d62c47617dbf
 +	};
 +#endif
 +
++	return test_prepare_ao_sockaddr(ao, alg, flags,
++			(void *)&addr, sizeof(addr), prefix, sndid, rcvid,
++			maclen, keyflags, keylen, key);
++}
++
++static inline int test_prepare_def_ao(struct tcp_ao *ao,
++		const char *key, uint16_t flags,
++		union tcp_addr in_addr, uint8_t prefix,
++		uint8_t sndid, uint8_t rcvid)
++{
 +	if (prefix > DEFAULT_TEST_PREFIX)
 +		prefix = DEFAULT_TEST_PREFIX;
 +
-+	md5sig.tcpm_keylen = pwd_len;
-+	memcpy(md5sig.tcpm_key, md5_password, pwd_len);
-+	md5sig.tcpm_flags = TCP_MD5SIG_FLAG_PREFIX;
-+	md5sig.tcpm_prefixlen = prefix;
-+	memcpy(&md5sig.tcpm_addr, &addr, sizeof(addr));
-+
-+	return setsockopt(sk, IPPROTO_TCP, TCP_MD5SIG_EXT,
-+			  &md5sig, sizeof(md5sig));
++	return test_prepare_ao(ao, DEFAULT_TEST_ALGO, flags, in_addr,
++			prefix, sndid, rcvid, 0, 0, strlen(key), key);
 +}
 +
-+static void try_accept(const char *tst_name, unsigned port,
-+		       union tcp_addr *md5_addr, uint8_t md5_prefix,
-+		       union tcp_addr *ao_addr, uint8_t ao_prefix,
-+		       uint8_t sndid, uint8_t rcvid, const char *cnt_name,
-+		       fault_t inj)
++extern int test_get_one_ao(int sk, struct tcp_ao_getsockopt *out,
++			   uint16_t flags, void *addr, size_t addr_sz,
++			   uint8_t prefix, uint8_t sndid, uint8_t rcvid);
++extern int test_cmp_getsockopt_setsockopt(const struct tcp_ao *a,
++					  const struct tcp_ao_getsockopt *b);
++
++static inline int test_verify_socket_ao(int sk, struct tcp_ao *ao)
 +{
-+	uint64_t before_cnt, after_cnt;
-+	int lsk, err, sk = 0;
-+	time_t timeout;
++	struct tcp_ao_getsockopt tmp;
++	int err;
 +
-+	lsk = test_listen_socket(this_ip_addr, port, 1);
++	err = test_get_one_ao(sk, &tmp, 0, &ao->tcpa_addr,
++			sizeof(ao->tcpa_addr), ao->tcpa_prefix,
++			ao->tcpa_sndid, ao->tcpa_rcvid);
++	if (err)
++		return err;
 +
-+	if (md5_addr && test_set_md5(lsk, *md5_addr, md5_prefix))
-+		test_error("setsockopt(TCP_MD5SIG_EXT)");
++	return test_cmp_getsockopt_setsockopt(ao, &tmp);
++}
 +
-+	if (ao_addr && test_set_ao(lsk, ao_password, 0, *ao_addr,
-+				   ao_prefix, sndid, rcvid))
-+		test_error("setsockopt(TCP_AO)");
++static inline int test_set_ao(int sk, const char *key, uint16_t flags,
++			      union tcp_addr in_addr, uint8_t prefix,
++			      uint8_t sndid, uint8_t rcvid)
++{
++	struct tcp_ao tmp;
++	int err;
 +
-+	if (cnt_name)
-+		before_cnt = netstat_get_one(cnt_name, NULL);
++	err = test_prepare_def_ao(&tmp, key, flags, in_addr,
++			prefix, sndid, rcvid);
++	if (err)
++		return err;
 +
-+	synchronize_threads(); /* preparations done */
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &tmp, sizeof(tmp)) < 0)
++		return -errno;
 +
-+	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
-+	err = test_wait_fd(lsk, timeout, 0);
-+	if (err < 0)
-+		test_error("test_wait_fd()");
-+	else if (!err) {
-+		if (!fault(F_TIMEOUT))
-+			test_fail("timeouted for accept()");
-+	} else {
-+		if (fault(F_TIMEOUT))
-+			test_fail("ready to accept");
++	return test_verify_socket_ao(sk, &tmp);
++}
 +
-+		sk = accept(lsk, NULL, NULL);
-+		if (sk < 0) {
-+			test_error("accept()");
-+		} else {
-+			if (fault(F_TIMEOUT))
-+				test_fail("%s: accepted", tst_name);
-+		}
++extern ssize_t test_server_run(int sk, ssize_t quota, time_t timeout_sec);
++extern ssize_t test_client_loop(int sk, char *buf, size_t buf_sz,
++				const size_t msg_len, time_t timeout_sec);
++extern int test_client_verify(int sk, const size_t msg_len, const size_t nr,
++			      time_t timeout_sec);
++
++struct netstat;
++extern struct netstat *netstat_read(void);
++extern void netstat_free(struct netstat *ns);
++extern void netstat_print_diff(struct netstat *nsa, struct netstat *nsb);
++extern uint64_t netstat_get(struct netstat *ns,
++			    const char *name, bool *not_found);
++
++static inline uint64_t netstat_get_one(const char *name, bool *not_found)
++{
++	struct netstat *ns = netstat_read();
++	uint64_t ret;
++
++	ret = netstat_get(ns, name, not_found);
++
++	netstat_free(ns);
++	return ret;
++}
++
++#endif /* _AOLIB_H_ */
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/netlink.c b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
+new file mode 100644
+index 000000000000..f04757c921d0
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/netlink.c
+@@ -0,0 +1,341 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Original from tools/testing/selftests/net/ipsec.c */
++#include <linux/netlink.h>
++#include <linux/random.h>
++#include <linux/rtnetlink.h>
++#include <linux/veth.h>
++#include <net/if.h>
++#include <stdint.h>
++#include <string.h>
++#include <sys/socket.h>
++
++#include "aolib.h"
++
++#define MAX_PAYLOAD		2048
++
++static int netlink_sock(int *sock, uint32_t *seq_nr, int proto)
++{
++	if (*sock > 0) {
++		seq_nr++;
++		return 0;
 +	}
 +
-+	close(lsk);
-+
-+	if (!cnt_name)
-+		goto out;
-+
-+	after_cnt = netstat_get_one(cnt_name, NULL);
-+
-+	if (after_cnt <= before_cnt) {
-+		test_fail("%s: %s counter did not increase: %zu <= %zu",
-+				tst_name, cnt_name, after_cnt, before_cnt);
-+	} else {
-+		test_ok("%s: counter %s increased %zu => %zu",
-+			tst_name, cnt_name, before_cnt, after_cnt);
++	*sock = socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, proto);
++	if (*sock <= 0) {
++		test_print("socket(AF_NETLINK)");
++		return -1;
 +	}
 +
-+out:
-+	synchronize_threads(); /* close() */
-+	if (sk > 0)
-+		close(sk);
-+}
++	randomize_buffer(seq_nr, sizeof(*seq_nr));
 +
-+static void server_add_routes(void)
-+{
-+	int family = TEST_FAMILY;
-+
-+	synchronize_threads(); /* client_add_ips() */
-+
-+	if (ip_route_add(veth_name, family, this_ip_addr, client2))
-+		test_error("Failed to add route");
-+	if (ip_route_add(veth_name, family, this_ip_addr, client3))
-+		test_error("Failed to add route");
-+}
-+
-+static void server_add_fail_tests(unsigned *port)
-+{
-+	union tcp_addr addr_any = {};
-+
-+	try_accept("TCP-AO established: add TCP-MD5 key", (*port)++, NULL, 0,
-+		   &addr_any, 0, 100, 100, "TCPAOGood", 0);
-+	try_accept("TCP-MD5 established: add TCP-AO key", (*port)++, &addr_any, 0,
-+		   NULL, 0, 0, 0, NULL, 0);
-+	try_accept("non-signed established: add TCP-AO key", (*port)++, NULL, 0,
-+		   NULL, 0, 0, 0, "CurrEstab", 0);
-+}
-+
-+static void *server_fn(void *arg)
-+{
-+	unsigned port = test_server_port;
-+	union tcp_addr addr_any = {};
-+
-+	server_add_routes();
-+
-+	try_accept("AO server (INADDR_ANY): AO client", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, "TCPAOGood", 0);
-+	try_accept("AO server (INADDR_ANY): MD5 client", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, "TCPMD5Unexpected", F_TIMEOUT);
-+	try_accept("AO server (INADDR_ANY): no sign client", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, "TCPAORequired", F_TIMEOUT);
-+
-+	try_accept("MD5 server (INADDR_ANY): AO client", port++, &addr_any, 0,
-+		   NULL, 0, 0, 0, "TCPAOKeyNotFound", F_TIMEOUT);
-+	try_accept("MD5 server (INADDR_ANY): MD5 client", port++, &addr_any, 0,
-+		   NULL, 0, 0, 0, NULL, 0);
-+	try_accept("MD5 server (INADDR_ANY): no sign client", port++, &addr_any, 0,
-+		   NULL, 0, 0, 0, "TCPMD5NotFound", F_TIMEOUT);
-+
-+	try_accept("no sign server: AO client", port++, NULL, 0,
-+		   NULL, 0, 0, 0, "TCPAOKeyNotFound", F_TIMEOUT);
-+	try_accept("no sign server: MD5 client", port++, NULL, 0,
-+		   NULL, 0, 0, 0, "TCPMD5Unexpected", F_TIMEOUT);
-+	try_accept("no sign server: no sign client", port++, NULL, 0,
-+		   NULL, 0, 0, 0, "CurrEstab", 0);
-+
-+	try_accept("AO+MD5 server: AO client (matching)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPAOGood", 0);
-+	try_accept("AO+MD5 server: AO client (misconfig, matching MD5)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
-+	try_accept("AO+MD5 server: AO client (misconfig, non-matching)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPAOKeyNotFound", F_TIMEOUT);
-+	try_accept("AO+MD5 server: MD5 client (matching)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, NULL, 0);
-+	try_accept("AO+MD5 server: MD5 client (misconfig, matching AO)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPMD5Unexpected", F_TIMEOUT);
-+	try_accept("AO+MD5 server: MD5 client (misconfig, non-matching)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPMD5Unexpected", F_TIMEOUT);
-+	try_accept("AO+MD5 server: no sign client (unmatched)", port++,
-+		&this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "CurrEstab", 0);
-+	try_accept("AO+MD5 server: no sign client (misconfig, matching AO)",
-+		port++, &this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPAORequired", F_TIMEOUT);
-+	try_accept("AO+MD5 server: no sign client (misconfig, matching MD5)",
-+		port++, &this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, "TCPMD5NotFound", F_TIMEOUT);
-+
-+	try_accept("AO+MD5 server: client with both [TCP-MD5] and TCP-AO keys",
-+		port++, &this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, NULL, F_TIMEOUT);
-+	try_accept("AO+MD5 server: client with both TCP-MD5 and [TCP-AO] keys",
-+		port++, &this_ip_dest, TEST_PREFIX, &client2, TEST_PREFIX,
-+		100, 100, NULL, F_TIMEOUT);
-+
-+	server_add_fail_tests(&port);
-+
-+	/* client exits */
-+	synchronize_threads();
-+	return NULL;
-+}
-+
-+static int client_bind(int sk, union tcp_addr bind_addr)
-+{
-+#ifdef IPV6_TEST
-+	struct sockaddr_in6 addr = {
-+		.sin6_family	= AF_INET6,
-+		.sin6_port	= 0,
-+		.sin6_addr	= bind_addr.a6,
-+	};
-+#else
-+	struct sockaddr_in addr = {
-+		.sin_family	= AF_INET,
-+		.sin_port	= 0,
-+		.sin_addr	= bind_addr.a4,
-+	};
-+#endif
-+	return bind(sk, &addr, sizeof(addr));
-+}
-+
-+static void try_connect(const char *tst_name, unsigned port,
-+		       union tcp_addr *md5_addr, uint8_t md5_prefix,
-+		       union tcp_addr *ao_addr, uint8_t ao_prefix,
-+		       uint8_t sndid, uint8_t rcvid, fault_t inj,
-+		       union tcp_addr *bind_addr)
-+{
-+	time_t timeout;
-+	int sk, ret;
-+
-+	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (bind_addr && client_bind(sk, *bind_addr))
-+		test_error("bind()");
-+
-+	if (md5_addr && test_set_md5(sk, *md5_addr, md5_prefix))
-+		test_error("setsockopt(TCP_MD5SIG_EXT)");
-+
-+	if (ao_addr && test_set_ao(sk, ao_password, 0, *ao_addr,
-+				   ao_prefix, sndid, rcvid))
-+		test_error("setsockopt(TCP_AO)");
-+
-+	synchronize_threads(); /* preparations done */
-+
-+	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
-+	ret = _test_connect_socket(sk, this_ip_dest, port, timeout);
-+
-+	if (ret < 0) {
-+		if (fault(F_KEYREJECT) && ret == -EKEYREJECTED) {
-+			test_ok("%s: connect() was prevented", tst_name);
-+			goto out;
-+		} else if (ret == -ECONNREFUSED &&
-+				(fault(F_TIMEOUT) || fault(F_KEYREJECT))) {
-+			test_ok("%s: refused to connect", tst_name);
-+			goto out;
-+		} else {
-+			test_error("%s: connect() returned %d", tst_name, ret);
-+		}
-+	}
-+
-+	if (ret == 0) {
-+		if (fault(F_TIMEOUT))
-+			test_ok("%s", tst_name);
-+		else
-+			test_fail("%s: failed to connect()", tst_name);
-+	} else {
-+		if (fault(F_TIMEOUT) || fault(F_KEYREJECT))
-+			test_fail("%s: connected", tst_name);
-+		else
-+			test_ok("%s: connected", tst_name);
-+	}
-+
-+out:
-+	synchronize_threads(); /* close() */
-+	/* _test_connect_socket() cleans up on failure */
-+	if (ret > 0)
-+		close(sk);
-+}
-+
-+#define PREINSTALL_MD5	BIT(1)
-+#define POSTINSTALL_MD5	BIT(2)
-+#define PREINSTALL_AO	BIT(3)
-+#define POSTINSTALL_AO	BIT(4)
-+
-+static void try_to_add(const char *tst_name, unsigned port,
-+		       unsigned strategy,
-+		       union tcp_addr md5_addr, uint8_t md5_prefix,
-+		       union tcp_addr ao_addr, uint8_t ao_prefix,
-+		       uint8_t sndid, uint8_t rcvid, fault_t inj)
-+{
-+	time_t timeout;
-+	int sk, ret;
-+
-+	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (client_bind(sk, this_ip_addr))
-+		test_error("bind()");
-+
-+	if (strategy & PREINSTALL_MD5) {
-+		if (test_set_md5(sk, md5_addr, md5_prefix))
-+			test_error("setsockopt(TCP_MD5SIG_EXT)");
-+	}
-+
-+	if (strategy & PREINSTALL_AO) {
-+		if (test_set_ao(sk, ao_password, 0, ao_addr,
-+				ao_prefix, sndid, rcvid)) {
-+			if (fault(F_PREINSTALL)) {
-+				test_ok("%s: prefailed as expected", tst_name);
-+				goto out_no_sync;
-+			} else {
-+				test_error("setsockopt(TCP_AO)");
-+			}
-+		} else if (fault(F_PREINSTALL)) {
-+			test_fail("%s: setsockopt()s were expected to fail", tst_name);
-+			goto out_no_sync;
-+		}
-+	}
-+
-+	synchronize_threads(); /* preparations done */
-+
-+	timeout = fault(F_TIMEOUT) ? TEST_RETRANSMIT_SEC : TEST_TIMEOUT_SEC;
-+	ret = _test_connect_socket(sk, this_ip_dest, port, timeout);
-+
-+	if (ret <= 0) {
-+		test_error("%s: connect() returned %d", tst_name, ret);
-+		goto out;
-+	}
-+
-+	if (strategy & POSTINSTALL_MD5) {
-+		if (test_set_md5(sk, md5_addr, md5_prefix)) {
-+			if (fault(F_POSTINSTALL)) {
-+				test_ok("%s: postfailed as expected", tst_name);
-+				goto out;
-+			} else {
-+				test_error("setsockopt(TCP_MD5SIG_EXT)");
-+			}
-+		} else if (fault(F_POSTINSTALL)) {
-+			test_fail("%s: post setsockopt() was expected to fail", tst_name);
-+			goto out;
-+		}
-+	}
-+
-+	if (strategy & POSTINSTALL_AO) {
-+		if (test_set_ao(sk, ao_password, 0, ao_addr,
-+				ao_prefix, sndid, rcvid)) {
-+			if (fault(F_POSTINSTALL)) {
-+				test_ok("%s: postfailed as expected", tst_name);
-+				goto out;
-+			} else {
-+				test_error("setsockopt(TCP_AO)");
-+			}
-+		} else if (fault(F_POSTINSTALL)) {
-+			test_fail("%s: post setsockopt() was expected to fail", tst_name);
-+			goto out;
-+		}
-+	}
-+
-+out:
-+	synchronize_threads(); /* close() */
-+out_no_sync:
-+	/* _test_connect_socket() cleans up on failure */
-+	if (ret > 0)
-+		close(sk);
-+}
-+
-+static void client_add_ip(union tcp_addr *client, const char *ip)
-+{
-+	int family = TEST_FAMILY;
-+
-+	if (inet_pton(family, ip, client) != 1)
-+		test_error("Can't convert ip address %s", ip);
-+
-+	if (ip_addr_add(veth_name, family, *client, TEST_PREFIX))
-+		test_error("Failed to add ip address");
-+	if (ip_route_add(veth_name, family, *client, this_ip_dest))
-+		test_error("Failed to add route");
-+}
-+
-+static void client_add_ips(void)
-+{
-+	client_add_ip(&client2, __TEST_CLIENT_IP(2));
-+	client_add_ip(&client3, __TEST_CLIENT_IP(3));
-+	synchronize_threads(); /* server_add_routes() */
-+}
-+
-+static void client_add_fail_tests(unsigned *port)
-+{
-+	try_to_add("TCP-AO established: add TCP-MD5 key",
-+		   (*port)++, POSTINSTALL_MD5 | PREINSTALL_AO,
-+		   this_ip_dest, TEST_PREFIX, this_ip_dest, TEST_PREFIX,
-+		   100, 100, F_POSTINSTALL);
-+	try_to_add("TCP-MD5 established: add TCP-AO key",
-+		   (*port)++, PREINSTALL_MD5 | POSTINSTALL_AO,
-+		   this_ip_dest, TEST_PREFIX, this_ip_dest, TEST_PREFIX,
-+		   100, 100, F_POSTINSTALL);
-+	try_to_add("non-signed established: add TCP-AO key",
-+		   (*port)++, POSTINSTALL_AO,
-+		   this_ip_dest, TEST_PREFIX, this_ip_dest, TEST_PREFIX,
-+		   100, 100, F_POSTINSTALL);
-+
-+	try_to_add("TCP-AO key intersects with TCP-MD5 key",
-+		   (*port), PREINSTALL_MD5 | PREINSTALL_AO,
-+		   this_ip_addr, TEST_PREFIX, this_ip_addr, TEST_PREFIX,
-+		   100, 100, F_PREINSTALL);
-+}
-+
-+static void *client_fn(void *arg)
-+{
-+	unsigned port = test_server_port;
-+	union tcp_addr addr_any = {};
-+
-+	client_add_ips();
-+
-+	try_connect("AO server (INADDR_ANY): AO client", port++, NULL, 0,
-+		    &addr_any, 0, 100, 100, 0, &this_ip_addr);
-+	try_connect("AO server (INADDR_ANY): MD5 client", port++, &addr_any, 0,
-+		    NULL, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+	try_connect("AO server (INADDR_ANY): unsigned client", port++, NULL, 0,
-+		    NULL, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+
-+	try_connect("MD5 server (INADDR_ANY): AO client", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+	try_connect("MD5 server (INADDR_ANY): MD5 client", port++, &addr_any, 0,
-+		   NULL, 0, 100, 100, 0, &this_ip_addr);
-+	try_connect("MD5 server (INADDR_ANY): no sign client", port++, NULL, 0,
-+		   NULL, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+
-+	try_connect("no sign server: AO client", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+	try_connect("no sign server: MD5 client", port++, &addr_any, 0,
-+		   NULL, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+	try_connect("no sign server: no sign client", port++, NULL, 0,
-+		   NULL, 0, 100, 100, 0, &this_ip_addr);
-+
-+	try_connect("AO+MD5 server: AO client (matching)", port++, NULL, 0,
-+		   &addr_any, 0, 100, 100, 0, &client2);
-+	try_connect("AO+MD5 server: AO client (misconfig, matching MD5)",
-+		   port++, NULL, 0, &addr_any, 0, 100, 100,
-+		   F_TIMEOUT, &this_ip_addr);
-+	try_connect("AO+MD5 server: AO client (misconfig, non-matching)",
-+		   port++, NULL, 0, &addr_any, 0, 100, 100,
-+		   F_TIMEOUT, &client3);
-+	try_connect("AO+MD5 server: MD5 client (matching)", port++, &addr_any, 0,
-+		   NULL, 0, 100, 100, 0, &this_ip_addr);
-+	try_connect("AO+MD5 server: MD5 client (misconfig, matching AO)",
-+		   port++, &addr_any, 0, NULL, 0, 100, 100, F_TIMEOUT, &client2);
-+	try_connect("AO+MD5 server: MD5 client (misconfig, non-matching)",
-+		   port++, &addr_any, 0, NULL, 0, 100, 100, F_TIMEOUT, &client3);
-+	try_connect("AO+MD5 server: no sign client (unmatched)",
-+		   port++, NULL, 0, NULL, 0, 100, 100, 0, &client3);
-+	try_connect("AO+MD5 server: no sign client (misconfig, matching AO)",
-+		   port++, NULL, 0, NULL, 0, 100, 100, F_TIMEOUT, &client2);
-+	try_connect("AO+MD5 server: no sign client (misconfig, matching MD5)",
-+		   port++, NULL, 0, NULL, 0, 100, 100, F_TIMEOUT, &this_ip_addr);
-+
-+	try_connect("AO+MD5 server: client with both [TCP-MD5] and TCP-AO keys",
-+		   port++, &this_ip_addr, TEST_PREFIX,
-+		   &client2, TEST_PREFIX, 100, 100, F_KEYREJECT, &this_ip_addr);
-+	try_connect("AO+MD5 server: client with both TCP-MD5 and [TCP-AO] keys",
-+		   port++, &this_ip_addr, TEST_PREFIX,
-+		   &client2, TEST_PREFIX, 100, 100, F_KEYREJECT, &client2);
-+
-+	client_add_fail_tests(&port);
-+
-+	return NULL;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	test_init(42, server_fn, client_fn);
 +	return 0;
 +}
++
++static int netlink_check_answer(int sock, bool quite)
++{
++	struct nlmsgerror {
++		struct nlmsghdr hdr;
++		int error;
++		struct nlmsghdr orig_msg;
++	} answer;
++
++	if (recv(sock, &answer, sizeof(answer), 0) < 0) {
++		test_print("recv()");
++		return -1;
++	} else if (answer.hdr.nlmsg_type != NLMSG_ERROR) {
++		test_print("expected NLMSG_ERROR, got %d",
++			   (int)answer.hdr.nlmsg_type);
++		return -1;
++	} else if (answer.error) {
++		if (!quite) {
++			test_print("NLMSG_ERROR: %d: %s",
++				answer.error, strerror(-answer.error));
++		}
++		return answer.error;
++	}
++
++	return 0;
++}
++
++static inline struct rtattr *rtattr_hdr(struct nlmsghdr *nh)
++{
++	return (struct rtattr *)((char *)(nh) + RTA_ALIGN((nh)->nlmsg_len));
++}
++
++static int rtattr_pack(struct nlmsghdr *nh, size_t req_sz,
++		unsigned short rta_type, const void *payload, size_t size)
++{
++	/* NLMSG_ALIGNTO == RTA_ALIGNTO, nlmsg_len already aligned */
++	struct rtattr *attr = rtattr_hdr(nh);
++	size_t nl_size = RTA_ALIGN(nh->nlmsg_len) + RTA_LENGTH(size);
++
++	if (req_sz < nl_size) {
++		test_print("req buf is too small: %zu < %zu", req_sz, nl_size);
++		return -1;
++	}
++	nh->nlmsg_len = nl_size;
++
++	attr->rta_len = RTA_LENGTH(size);
++	attr->rta_type = rta_type;
++	memcpy(RTA_DATA(attr), payload, size);
++
++	return 0;
++}
++
++static struct rtattr *_rtattr_begin(struct nlmsghdr *nh, size_t req_sz,
++		unsigned short rta_type, const void *payload, size_t size)
++{
++	struct rtattr *ret = rtattr_hdr(nh);
++
++	if (rtattr_pack(nh, req_sz, rta_type, payload, size))
++		return 0;
++
++	return ret;
++}
++
++static inline struct rtattr *rtattr_begin(struct nlmsghdr *nh, size_t req_sz,
++		unsigned short rta_type)
++{
++	return _rtattr_begin(nh, req_sz, rta_type, 0, 0);
++}
++
++static inline void rtattr_end(struct nlmsghdr *nh, struct rtattr *attr)
++{
++	char *nlmsg_end = (char *)nh + nh->nlmsg_len;
++
++	attr->rta_len = nlmsg_end - (char *)attr;
++}
++
++static int veth_pack_peerb(struct nlmsghdr *nh, size_t req_sz,
++		const char *peer, int ns)
++{
++	struct ifinfomsg pi;
++	struct rtattr *peer_attr;
++
++	memset(&pi, 0, sizeof(pi));
++	pi.ifi_family	= AF_UNSPEC;
++	pi.ifi_change	= 0xFFFFFFFF;
++
++	peer_attr = _rtattr_begin(nh, req_sz, VETH_INFO_PEER, &pi, sizeof(pi));
++	if (!peer_attr)
++		return -1;
++
++	if (rtattr_pack(nh, req_sz, IFLA_IFNAME, peer, strlen(peer)))
++		return -1;
++
++	if (rtattr_pack(nh, req_sz, IFLA_NET_NS_FD, &ns, sizeof(ns)))
++		return -1;
++
++	rtattr_end(nh, peer_attr);
++
++	return 0;
++}
++
++static int __add_veth(int sock, uint32_t seq, const char *name,
++		      int ns_a, int ns_b)
++{
++	uint16_t flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_EXCL | NLM_F_CREATE;
++	struct {
++		struct nlmsghdr		nh;
++		struct ifinfomsg	info;
++		char			attrbuf[MAX_PAYLOAD];
++	} req;
++	const char veth_type[] = "veth";
++	struct rtattr *link_info, *info_data;
++
++	memset(&req, 0, sizeof(req));
++	req.nh.nlmsg_len	= NLMSG_LENGTH(sizeof(req.info));
++	req.nh.nlmsg_type	= RTM_NEWLINK;
++	req.nh.nlmsg_flags	= flags;
++	req.nh.nlmsg_seq	= seq;
++	req.info.ifi_family	= AF_UNSPEC;
++	req.info.ifi_change	= 0xFFFFFFFF;
++
++	if (rtattr_pack(&req.nh, sizeof(req), IFLA_IFNAME, name, strlen(name)))
++		return -1;
++
++	if (rtattr_pack(&req.nh, sizeof(req), IFLA_NET_NS_FD, &ns_a, sizeof(ns_a)))
++		return -1;
++
++	link_info = rtattr_begin(&req.nh, sizeof(req), IFLA_LINKINFO);
++	if (!link_info)
++		return -1;
++
++	if (rtattr_pack(&req.nh, sizeof(req), IFLA_INFO_KIND, veth_type, sizeof(veth_type)))
++		return -1;
++
++	info_data = rtattr_begin(&req.nh, sizeof(req), IFLA_INFO_DATA);
++	if (!info_data)
++		return -1;
++
++	if (veth_pack_peerb(&req.nh, sizeof(req), name, ns_b))
++		return -1;
++
++	rtattr_end(&req.nh, info_data);
++	rtattr_end(&req.nh, link_info);
++
++	if (send(sock, &req, req.nh.nlmsg_len, 0) < 0) {
++		test_print("send()");
++		return -1;
++	}
++	return netlink_check_answer(sock, false);
++}
++
++int add_veth(const char *name, int nsfda, int nsfdb)
++{
++	int route_sock = -1, ret;
++	uint32_t route_seq;
++
++	if (netlink_sock(&route_sock, &route_seq, NETLINK_ROUTE))
++		test_error("Failed to open netlink route socket\n");
++
++	ret = __add_veth(route_sock, route_seq++, name, nsfda, nsfdb);
++	close(route_sock);
++	return ret;
++}
++
++static int __ip_addr_add(int sock, uint32_t seq, const char *intf,
++			 int family, union tcp_addr addr, uint8_t prefix)
++{
++	uint16_t flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_EXCL | NLM_F_CREATE;
++	struct {
++		struct nlmsghdr		nh;
++		struct ifaddrmsg	info;
++		char			attrbuf[MAX_PAYLOAD];
++	} req;
++	size_t addr_len = (family == AF_INET) ? sizeof(struct in_addr) :
++						sizeof(struct in6_addr);
++
++	memset(&req, 0, sizeof(req));
++	req.nh.nlmsg_len	= NLMSG_LENGTH(sizeof(req.info));
++	req.nh.nlmsg_type	= RTM_NEWADDR;
++	req.nh.nlmsg_flags	= flags;
++	req.nh.nlmsg_seq	= seq;
++	req.info.ifa_family	= family;
++	req.info.ifa_prefixlen	= prefix;
++	req.info.ifa_index	= if_nametoindex(intf);
++	req.info.ifa_flags	= IFA_F_NODAD;
++
++	if (rtattr_pack(&req.nh, sizeof(req), IFA_LOCAL, &addr, addr_len))
++		return -1;
++
++	if (send(sock, &req, req.nh.nlmsg_len, 0) < 0) {
++		test_print("send()");
++		return -1;
++	}
++	return netlink_check_answer(sock, true);
++}
++
++int ip_addr_add(const char *intf, int family,
++		union tcp_addr addr, uint8_t prefix)
++{
++	int route_sock = -1, ret;
++	uint32_t route_seq;
++
++	if (netlink_sock(&route_sock, &route_seq, NETLINK_ROUTE))
++		test_error("Failed to open netlink route socket\n");
++
++	ret = __ip_addr_add(route_sock, route_seq++, intf,
++			    family, addr, prefix);
++
++	close(route_sock);
++	return ret;
++}
++
++static int __ip_route_add(int sock, uint32_t seq, const char *intf, int family,
++			  union tcp_addr src, union tcp_addr dst)
++{
++	struct {
++		struct nlmsghdr	nh;
++		struct rtmsg	rt;
++		char		attrbuf[MAX_PAYLOAD];
++	} req;
++	unsigned int index = if_nametoindex(intf);
++	size_t addr_len = (family == AF_INET) ? sizeof(struct in_addr) :
++						sizeof(struct in6_addr);
++
++	memset(&req, 0, sizeof(req));
++	req.nh.nlmsg_len	= NLMSG_LENGTH(sizeof(req.rt));
++	req.nh.nlmsg_type	= RTM_NEWROUTE;
++	req.nh.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ACK | NLM_F_CREATE;
++	req.nh.nlmsg_seq	= seq;
++	req.rt.rtm_family	= family;
++	req.rt.rtm_dst_len	= (family == AF_INET) ? 32 : 128;
++	req.rt.rtm_table	= RT_TABLE_MAIN;
++	req.rt.rtm_protocol	= RTPROT_BOOT;
++	req.rt.rtm_scope	= RT_SCOPE_UNIVERSE;
++	req.rt.rtm_type		= RTN_UNICAST;
++
++	if (rtattr_pack(&req.nh, sizeof(req), RTA_DST, &dst, addr_len))
++		return -1;
++
++	if (rtattr_pack(&req.nh, sizeof(req), RTA_PREFSRC, &src, addr_len))
++		return -1;
++
++	if (rtattr_pack(&req.nh, sizeof(req), RTA_OIF, &index, sizeof(index)))
++		return -1;
++
++	if (send(sock, &req, req.nh.nlmsg_len, 0) < 0) {
++		test_print("send()");
++		return -1;
++	}
++
++	return netlink_check_answer(sock, true);
++}
++
++int ip_route_add(const char *intf, int family,
++		 union tcp_addr src, union tcp_addr dst)
++{
++	int route_sock = -1, ret;
++	uint32_t route_seq;
++
++	if (netlink_sock(&route_sock, &route_seq, NETLINK_ROUTE))
++		test_error("Failed to open netlink route socket\n");
++
++	ret = __ip_route_add(route_sock, route_seq++, intf, family, src, dst);
++	if (ret == -EEXIST) /* ignoring */
++		ret = 0;
++
++	close(route_sock);
++	return ret;
++}
++
++static int __link_set_up(int sock, uint32_t seq, const char *intf)
++{
++	struct {
++		struct nlmsghdr		nh;
++		struct ifinfomsg	info;
++		char			attrbuf[MAX_PAYLOAD];
++	} req;
++
++	memset(&req, 0, sizeof(req));
++	req.nh.nlmsg_len	= NLMSG_LENGTH(sizeof(req.info));
++	req.nh.nlmsg_type	= RTM_NEWLINK;
++	req.nh.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ACK;
++	req.nh.nlmsg_seq	= seq;
++	req.info.ifi_family	= AF_UNSPEC;
++	req.info.ifi_change	= 0xFFFFFFFF;
++	req.info.ifi_index	= if_nametoindex(intf);
++	req.info.ifi_flags	= IFF_UP;
++	req.info.ifi_change	= IFF_UP;
++
++	if (send(sock, &req, req.nh.nlmsg_len, 0) < 0) {
++		test_print("send()");
++		return -1;
++	}
++	return netlink_check_answer(sock, false);
++}
++
++int link_set_up(const char *intf)
++{
++	int route_sock = -1, ret;
++	uint32_t route_seq;
++
++	if (netlink_sock(&route_sock, &route_seq, NETLINK_ROUTE))
++		test_error("Failed to open netlink route socket\n");
++
++	ret = __link_set_up(route_sock, route_seq++, intf);
++
++	close(route_sock);
++	return ret;
++}
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/proc.c b/tools/testing/selftests/net/tcp_ao/lib/proc.c
+new file mode 100644
+index 000000000000..815bb7b5975a
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/proc.c
+@@ -0,0 +1,267 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <inttypes.h>
++#include <pthread.h>
++#include <stdio.h>
++#include "../../../../../include/linux/compiler.h"
++#include "../../../../../include/linux/kernel.h"
++#include "aolib.h"
++
++struct netstat_counter {
++	uint64_t val;
++	char *name;
++};
++
++struct netstat {
++	char *header_name;
++	struct netstat *next;
++	size_t counters_nr;
++	struct netstat_counter *counters;
++};
++
++static struct netstat *lookup_type(struct netstat *ns,
++		const char *type, size_t len)
++{
++	while (ns != NULL) {
++		size_t cmp = max(len, strlen(ns->header_name));
++
++		if (!strncmp(ns->header_name, type, cmp))
++			return ns;
++		ns = ns->next;
++	}
++	return NULL;
++}
++
++static struct netstat *lookup_get(struct netstat *ns,
++				  const char *type, const size_t len)
++{
++	struct netstat *ret;
++
++	ret = lookup_type(ns, type, len);
++	if (ret != NULL)
++		return ret;
++
++	ret = malloc(sizeof(struct netstat));
++	if (!ret)
++		test_error("malloc()");
++
++	ret->header_name = strndup(type, len);
++	if (ret->header_name == NULL)
++		test_error("strndup()");
++	ret->next = ns;
++	ret->counters_nr = 0;
++	ret->counters = NULL;
++
++	return ret;
++}
++
++static struct netstat *lookup_get_column(struct netstat *ns, const char *line)
++{
++	char *column;
++
++	column = strchr(line, ':');
++	if (!column)
++		test_error("can't parse netstat file");
++
++	return lookup_get(ns, line, column - line);
++}
++
++static void netstat_read_type(FILE *fnetstat, struct netstat **dest, char *line)
++{
++	struct netstat *type = lookup_get_column(*dest, line);
++	const char *pos = line;
++	size_t i, nr_elems = 0;
++	char tmp;
++
++	while ((pos = strchr(pos, ' '))) {
++		nr_elems++;
++		pos++;
++	}
++
++	*dest = type;
++	type->counters = reallocarray(type->counters,
++				type->counters_nr + nr_elems,
++				sizeof(struct netstat_counter));
++	if (!type->counters)
++		test_error("reallocarray()");
++
++	pos = strchr(line, ' ') + 1;
++
++	if (fscanf(fnetstat, type->header_name) == EOF)
++		test_error("fscanf(%s)", type->header_name);
++	if (fread(&tmp, 1, 1, fnetstat) != 1 || tmp != ':')
++		test_error("Unexpected netstat format (%c)", tmp);
++
++	for (i = type->counters_nr; i < type->counters_nr + nr_elems; i++) {
++		struct netstat_counter *nc = &type->counters[i];
++		const char *new_pos = strchr(pos, ' ');
++		const char *fmt = " %" PRIu64;
++
++		if (new_pos == NULL)
++			new_pos = strchr(pos, '\n');
++
++		nc->name = strndup(pos, new_pos - pos);
++		if (nc->name == NULL)
++			test_error("strndup()");
++
++		if (unlikely(!strcmp(nc->name, "MaxConn")))
++			fmt = " %" PRId64; /* MaxConn is signed, RFC 2012 */
++		if (fscanf(fnetstat, fmt, &nc->val) != 1)
++			test_error("fscanf(%s)", nc->name);
++		pos = new_pos + 1;
++	}
++	type->counters_nr += nr_elems;
++
++	if (fread(&tmp, 1, 1, fnetstat) != 1 || tmp != '\n')
++		test_error("Unexpected netstat format");
++}
++
++static const char *snmp6_name = "Snmp6";
++static void snmp6_read(FILE *fnetstat, struct netstat **dest)
++{
++	struct netstat *type = lookup_get(*dest, snmp6_name, strlen(snmp6_name));
++	char *counter_name;
++	size_t i;
++
++	for (i = type->counters_nr;; i++) {
++		struct netstat_counter *nc;
++		uint64_t counter;
++
++		if (fscanf(fnetstat, "%ms", &counter_name) == EOF)
++			break;
++		if (fscanf(fnetstat, "%" PRIu64, &counter) == EOF)
++			test_error("Unexpected snmp6 format");
++		type->counters = reallocarray(type->counters, i + 1,
++					sizeof(struct netstat_counter));
++		if (!type->counters)
++			test_error("reallocarray()");
++		nc = &type->counters[i];
++		nc->name = counter_name;
++		nc->val = counter;
++	}
++	type->counters_nr = i;
++	*dest = type;
++}
++
++struct netstat *netstat_read(void)
++{
++	struct netstat *ret = 0;
++	size_t line_sz = 0;
++	char *line = NULL;
++	FILE *fnetstat;
++
++	errno = 0;
++	fnetstat = fopen("/proc/net/netstat", "r");
++	if (fnetstat == NULL)
++		test_error("failed to open /proc/net/netstat");
++
++	while (getline(&line, &line_sz, fnetstat) != -1)
++		netstat_read_type(fnetstat, &ret, line);
++	fclose(fnetstat);
++
++	errno = 0;
++	fnetstat = fopen("/proc/net/snmp", "r");
++	if (fnetstat == NULL)
++		test_error("failed to open /proc/net/snmp");
++
++	while (getline(&line, &line_sz, fnetstat) != -1)
++		netstat_read_type(fnetstat, &ret, line);
++	fclose(fnetstat);
++
++	errno = 0;
++	fnetstat = fopen("/proc/net/snmp6", "r");
++	if (fnetstat == NULL)
++		test_error("failed to open /proc/net/snmp6");
++
++	snmp6_read(fnetstat, &ret);
++	fclose(fnetstat);
++
++	free(line);
++	return ret;
++}
++
++void netstat_free(struct netstat *ns)
++{
++	while (ns != NULL) {
++		struct netstat *prev = ns;
++		size_t i;
++
++		free(ns->header_name);
++		for (i = 0; i < ns->counters_nr; i++)
++			free(ns->counters[i].name);
++		free(ns->counters);
++		ns = ns->next;
++		free(prev);
++	}
++}
++
++static void inline
++__netstat_print_diff(uint64_t a, struct netstat *nsb, size_t i)
++{
++	if (unlikely(!strcmp(nsb->header_name, "MaxConn"))) {
++		test_print("%8s %25s: %" PRId64 " => %" PRId64,
++				nsb->header_name, nsb->counters[i].name,
++				a, nsb->counters[i].val);
++		return;
++	}
++
++	test_print("%8s %25s: %" PRIu64 " => %" PRIu64, nsb->header_name,
++			nsb->counters[i].name, a, nsb->counters[i].val);
++}
++
++void netstat_print_diff(struct netstat *nsa, struct netstat *nsb)
++{
++	size_t i, j;
++
++	while (nsb != NULL) {
++		if (unlikely(strcmp(nsb->header_name, nsa->header_name))) {
++			for (i = 0; i < nsb->counters_nr; i++)
++				__netstat_print_diff(0, nsb, i);
++			nsb = nsb->next;
++			continue;
++		}
++
++		if (nsb->counters_nr < nsa->counters_nr)
++			test_error("Unexpected: some counters dissapeared!");
++
++		for (j = 0, i = 0; i < nsb->counters_nr; i++) {
++			if (strcmp(nsb->counters[i].name, nsa->counters[j].name)) {
++				__netstat_print_diff(0, nsb, i);
++				continue;
++			}
++
++			if (nsa->counters[j].val == nsb->counters[i].val) {
++				j++;
++				continue;
++			}
++
++			__netstat_print_diff(nsa->counters[j].val, nsb, i);
++			j++;
++		}
++		if (j != nsa->counters_nr)
++			test_error("Unexpected: some counters dissapeared!");
++
++		nsb = nsb->next;
++		nsa = nsa->next;
++	}
++}
++
++uint64_t netstat_get(struct netstat *ns, const char *name, bool *not_found)
++{
++	if (not_found)
++		*not_found = false;
++
++	while (ns != NULL) {
++		size_t i;
++
++		for (i = 0; i < ns->counters_nr; i++) {
++			if (!strcmp(name, ns->counters[i].name))
++				return ns->counters[i].val;
++		}
++
++		ns = ns->next;
++	}
++
++	if (not_found)
++		*not_found = true;
++	return 0;
++}
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/setup.c b/tools/testing/selftests/net/tcp_ao/lib/setup.c
+new file mode 100644
+index 000000000000..b47672a2a5c0
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/setup.c
+@@ -0,0 +1,297 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <fcntl.h>
++#include <pthread.h>
++#include <sched.h>
++#include <signal.h>
++#include "aolib.h"
++
++/*
++ * Can't be included in the header: it defines static variables which
++ * will be unique to every object. Let's include it only once here.
++ */
++#include "../../../kselftest.h"
++
++/* Prevent overriding of one thread's output by another */
++static pthread_mutex_t ksft_print_lock = PTHREAD_MUTEX_INITIALIZER;
++
++void __test_msg(const char *buf)
++{
++	pthread_mutex_lock(&ksft_print_lock);
++	ksft_print_msg(buf);
++	pthread_mutex_unlock(&ksft_print_lock);
++}
++void __test_ok(const char *buf)
++{
++	pthread_mutex_lock(&ksft_print_lock);
++	ksft_test_result_pass(buf);
++	pthread_mutex_unlock(&ksft_print_lock);
++}
++void __test_fail(const char *buf)
++{
++	pthread_mutex_lock(&ksft_print_lock);
++	ksft_test_result_fail(buf);
++	pthread_mutex_unlock(&ksft_print_lock);
++}
++
++void __test_error(const char *buf)
++{
++	pthread_mutex_lock(&ksft_print_lock);
++	ksft_test_result_error(buf);
++	pthread_mutex_unlock(&ksft_print_lock);
++}
++
++static volatile int failed;
++
++void test_failed(void)
++{
++	failed = 1;
++}
++
++static void test_exit(void)
++{
++	if (failed)
++		ksft_exit_fail();
++	else
++		ksft_exit_pass();
++}
++
++struct dlist_t {
++	void (*destruct)(void);
++	struct dlist_t *next;
++};
++static struct dlist_t *destructors_list;
++
++void test_add_destructor(void (*d)(void))
++{
++	struct dlist_t *p;
++
++	p = malloc(sizeof(struct dlist_t));
++	if (p == NULL)
++		test_error("malloc() failed");
++
++	p->next = destructors_list;
++	p->destruct = d;
++	destructors_list = p;
++}
++
++static void test_destructor(void) __attribute__((destructor));
++static void test_destructor(void)
++{
++	while (destructors_list) {
++		struct dlist_t *p = destructors_list->next;
++
++		destructors_list->destruct();
++		free(destructors_list);
++		destructors_list = p;
++	}
++	test_exit();
++}
++
++static void sig_int(int signo)
++{
++	test_error("Caught SIGINT - exiting");
++}
++
++static int open_netns(void)
++{
++	const char *netns_path = "/proc/self/ns/net";
++	int fd;
++
++	fd = open(netns_path, O_RDONLY);
++	if (fd <= 0)
++		test_error("open(%s)", netns_path);
++	return fd;
++}
++
++static int unshare_open(void)
++{
++	if (unshare(CLONE_NEWNET) != 0)
++		test_error("unshare()");
++
++	return open_netns();
++}
++
++void switch_ns(int fd)
++{
++	if (setns(fd, CLONE_NEWNET))
++		test_error("setns()");
++}
++
++int switch_save_ns(int new_ns)
++{
++	int ret = open_netns();
++
++	switch_ns(new_ns);
++	return ret;
++}
++
++static int nsfd_outside	= -1;
++static int nsfd_parent	= -1;
++static int nsfd_child	= -1;
++const char veth_name[]	= "ktst-veth";
++
++static void init_namespaces(void)
++{
++	nsfd_outside = open_netns();
++	nsfd_parent = unshare_open();
++	nsfd_child = unshare_open();
++}
++
++static void link_init(const char *veth, int family, uint8_t prefix,
++		      union tcp_addr addr, union tcp_addr dest)
++{
++	if (link_set_up(veth))
++		test_error("Failed to set link up");
++	if (ip_addr_add(veth, family, addr, prefix))
++		test_error("Failed to add ip address");
++	if (ip_route_add(veth, family, addr, dest))
++		test_error("Failed to add route");
++}
++
++static unsigned nr_threads = 1;
++
++static pthread_mutex_t sync_lock = PTHREAD_MUTEX_INITIALIZER;
++static pthread_cond_t sync_cond = PTHREAD_COND_INITIALIZER;
++static volatile unsigned stage_threads[2];
++static volatile unsigned stage_nr;
++
++/* synchronize all threads in the same stage */
++void synchronize_threads(void)
++{
++	unsigned q = stage_nr;
++
++	pthread_mutex_lock(&sync_lock);
++	stage_threads[q]++;
++	if (stage_threads[q] == nr_threads) {
++		stage_nr ^= 1;
++		stage_threads[stage_nr] = 0;
++		pthread_cond_signal(&sync_cond);
++	}
++	while (stage_threads[q] < nr_threads)
++		pthread_cond_wait(&sync_cond, &sync_lock);
++	pthread_mutex_unlock(&sync_lock);
++}
++
++__thread union tcp_addr this_ip_addr;
++__thread union tcp_addr this_ip_dest;
++int test_family;
++
++struct new_pthread_arg {
++	thread_fn	func;
++	union tcp_addr	my_ip;
++	union tcp_addr	dest_ip;
++};
++static void *new_pthread_entry(void *arg)
++{
++	struct new_pthread_arg *p = arg;
++
++	this_ip_addr = p->my_ip;
++	this_ip_dest = p->dest_ip;
++	p->func(NULL); /* shouldn't return */
++	exit(KSFT_FAIL);
++}
++
++void __test_init(unsigned int ntests, int family, unsigned prefix,
++			union tcp_addr addr1, union tcp_addr addr2,
++			thread_fn peer1, thread_fn peer2)
++{
++	struct sigaction sa = {
++		.sa_handler = sig_int,
++		.sa_flags = SA_RESTART,
++	};
++	time_t seed = time(NULL);
++
++	test_family = family;
++	ksft_set_plan(ntests);
++
++	test_print("rand seed %u", (unsigned int)seed);
++	srand(seed);
++
++	sigemptyset(&sa.sa_mask);
++	if (sigaction(SIGINT, &sa, NULL))
++		test_error("Can't set SIGINT handler");
++
++	ksft_print_header();
++	init_namespaces();
++
++	if (add_veth(veth_name, nsfd_parent, nsfd_child))
++		test_error("Failed to add veth");
++
++	switch_ns(nsfd_child);
++	link_init(veth_name, family, prefix, addr2, addr1);
++	if (peer2) {
++		struct new_pthread_arg targ;
++		pthread_t t;
++
++		targ.my_ip = addr2;
++		targ.dest_ip = addr1;
++		targ.func = peer2;
++		nr_threads++;
++		if (pthread_create(&t, NULL, new_pthread_entry, &targ))
++			test_error("Failed to create pthread");
++	}
++	switch_ns(nsfd_parent);
++	link_init(veth_name, family, prefix, addr1, addr2);
++
++	this_ip_addr = addr1;
++	this_ip_dest = addr2;
++	peer1(NULL);
++	if (failed)
++		exit(KSFT_FAIL);
++	else
++		exit(KSFT_PASS);
++}
++
++/* /proc/sys/net/core/optmem_max artifically limits the amount of memory
++ * that can be allocated with sock_kmalloc() on each socket in the system.
++ * It is not virtualized, so it has to written outside test namespaces.
++ * To be nice a test will revert optmem back to the old value.
++ * Keeping it simple without any file lock, which means the tests that
++ * need to set/increase optmem value shouldn't run in parallel.
++ * Also, not re-entrant.
++ */
++static const char *optmem_file = "/proc/sys/net/core/optmem_max";
++static size_t saved_optmem;
++
++static void __test_set_optmem(size_t new, size_t *old)
++{
++	FILE *foptmem;
++	int old_ns;
++
++	old_ns = switch_save_ns(nsfd_outside);
++	foptmem = fopen(optmem_file, "r+");
++	if (!foptmem)
++		test_error("failed to open %s", optmem_file);
++
++	if (old != NULL) {
++		if (fscanf(foptmem, "%zu", old) != 1)
++			test_error("can't read from %s", optmem_file);
++		fclose(foptmem);
++		foptmem = fopen(optmem_file, "w");
++		if (!foptmem)
++			test_error("failed to open %s", optmem_file);
++	}
++
++	if (fprintf(foptmem, "%zu", new) <= 0)
++		test_error("can't write %zu to %s", new, optmem_file);
++	fclose(foptmem);
++	switch_ns(old_ns);
++}
++
++static void test_revert_optmem(void)
++{
++	if (saved_optmem == 0)
++		return;
++
++	__test_set_optmem(saved_optmem, NULL);
++}
++
++void test_set_optmem(size_t value)
++{
++	if (saved_optmem == 0) {
++		__test_set_optmem(value, &saved_optmem);
++		test_add_destructor(test_revert_optmem);
++	} else {
++		__test_set_optmem(value, NULL);
++	}
++}
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/sock.c b/tools/testing/selftests/net/tcp_ao/lib/sock.c
+new file mode 100644
+index 000000000000..c0b0ac77b644
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/sock.c
+@@ -0,0 +1,294 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <alloca.h>
++#include <fcntl.h>
++#include <string.h>
++#include "../../../../../include/linux/kernel.h"
++#include "../../../../../include/linux/stringify.h"
++#include "aolib.h"
++
++const unsigned test_server_port = 7010;
++int __test_listen_socket(int backlog, void *addr, size_t addr_sz)
++{
++	int err, sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++	long flags;
++
++	if (sk < 0)
++		test_error("socket()");
++
++	err = setsockopt(sk, SOL_SOCKET, SO_BINDTODEVICE, veth_name,
++			 strlen(veth_name) + 1);
++	if (err < 0)
++		test_error("setsockopt(SO_BINDTODEVICE)");
++
++	if (bind(sk, (struct sockaddr *)addr, addr_sz) < 0)
++		test_error("bind()");
++
++	flags = fcntl(sk, F_GETFL);
++	if ((flags < 0) || (fcntl(sk, F_SETFL, flags | O_NONBLOCK) < 0))
++		test_error("fcntl()");
++
++	if (listen(sk, backlog))
++		test_error("listen()");
++
++	return sk;
++}
++
++int test_wait_fd(int sk, time_t sec, bool write)
++{
++	struct timeval tv = { .tv_sec = sec };
++	struct timeval *ptv = NULL;
++	fd_set fds, efds;
++	int ret;
++	socklen_t slen = sizeof(ret);
++
++	FD_ZERO(&fds);
++	FD_SET(sk, &fds);
++	FD_ZERO(&efds);
++	FD_SET(sk, &efds);
++
++	if (sec)
++		ptv = &tv;
++
++	errno = 0;
++	if (write)
++		ret = select(sk + 1, NULL, &fds, &efds, ptv);
++	else
++		ret = select(sk + 1, &fds, NULL, &efds, ptv);
++	if (ret <= 0)
++		return -errno;
++
++	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &ret, &slen) || ret)
++		return -ret;
++	return sk;
++}
++
++int __test_connect_socket(int sk, void *addr, size_t addr_sz, time_t timeout)
++{
++	long flags;
++	int err;
++
++	err = setsockopt(sk, SOL_SOCKET, SO_BINDTODEVICE, veth_name,
++			 strlen(veth_name) + 1);
++	if (err < 0)
++		test_error("setsockopt(SO_BINDTODEVICE)");
++
++	if (!timeout) {
++		err = connect(sk, addr, addr_sz);
++		if (err) {
++			err = -errno;
++			goto out;
++		}
++		return 0;
++	}
++
++	flags = fcntl(sk, F_GETFL);
++	if ((flags < 0) || (fcntl(sk, F_SETFL, flags | O_NONBLOCK) < 0))
++		test_error("fcntl()");
++
++	if (connect(sk, addr, addr_sz) < 0) {
++		if (errno != EINPROGRESS) {
++			err = -errno;
++			goto out;
++		}
++		err = test_wait_fd(sk, timeout, 1);
++		if (err <= 0)
++			goto out;
++	}
++	return sk;
++
++out:
++	close(sk);
++	return err;
++}
++
++int test_prepare_ao_sockaddr(struct tcp_ao *ao, const char *alg, uint16_t flags,
++		void *addr, size_t addr_sz, uint8_t prefix,
++		uint8_t sndid, uint8_t rcvid, uint8_t maclen,
++		uint8_t keyflags, uint8_t keylen, const char *key)
++{
++	memset(ao, 0, sizeof(struct tcp_ao));
++
++	ao->tcpa_flags		= flags;
++	ao->tcpa_prefix		= prefix;
++	ao->tcpa_sndid		= sndid;
++	ao->tcpa_rcvid		= rcvid;
++	ao->tcpa_maclen		= maclen;
++	ao->tcpa_keyflags	= keyflags;
++	ao->tcpa_keylen		= keylen;
++
++	memcpy(&ao->tcpa_addr, addr, addr_sz);
++
++	if (strlen(alg) > 64)
++		return -ENOBUFS;
++	strncpy(ao->tcpa_alg_name, alg, 64);
++
++	memcpy(ao->tcpa_key, key,
++		(TCP_AO_MAXKEYLEN < keylen) ? TCP_AO_MAXKEYLEN : keylen);
++	return 0;
++}
++
++int test_get_one_ao(int sk, struct tcp_ao_getsockopt *out, uint16_t flags,
++		void *addr, size_t addr_sz, uint8_t prefix,
++		uint8_t sndid, uint8_t rcvid)
++{
++	struct tcp_ao_getsockopt tmp = {};
++	socklen_t tmp_sz = sizeof(tmp);
++	int ret;
++
++	memcpy(&tmp.addr, addr, addr_sz);
++	tmp.prefix = prefix;
++	tmp.sndid  = sndid;
++	tmp.rcvid  = rcvid;
++	tmp.flags  = flags;
++	tmp.nkeys  = 1;
++
++	ret = getsockopt(sk, IPPROTO_TCP, TCP_AO_GET, &tmp, &tmp_sz);
++	if (ret)
++		return ret;
++	if (tmp.nkeys != 1)
++		return -ENOENT;
++	*out = tmp;
++	return 0;
++}
++
++int test_cmp_getsockopt_setsockopt(const struct tcp_ao *a,
++				   const struct tcp_ao_getsockopt *b)
++{
++	bool is_kdf_aes_128_cmac = false;
++
++	if (!strcmp("cmac(aes128)", a->tcpa_alg_name))
++		is_kdf_aes_128_cmac = (a->tcpa_keylen != 16);
++
++#define __cmp_ao(member)						\
++	if (b->member != a->tcpa_##member) {				\
++		test_fail("getsockopt(): " __stringify(member) " %u != %u",	\
++				b->member, a->tcpa_##member);		\
++		return -1;						\
++	}
++	__cmp_ao(sndid);
++	__cmp_ao(rcvid);
++	__cmp_ao(prefix);
++	__cmp_ao(keyflags);
++	if (a->tcpa_maclen) {
++		__cmp_ao(maclen);
++	} else if (b->maclen != 12) {
++		test_fail("getsockopt(): expected default maclen 12, but it's %u",
++				b->maclen);
++		return -1;
++	}
++	if (!is_kdf_aes_128_cmac) {
++		__cmp_ao(keylen);
++	} else if (b->keylen != 16) {
++		test_fail("getsockopt(): expected keylen 16 for cmac(aes128), but it's %u",
++				b->keylen);
++		return -1;
++	}
++#undef __cmp_ao
++	if (!is_kdf_aes_128_cmac && memcmp(b->key, a->tcpa_key, a->tcpa_keylen)) {
++		test_fail("getsockopt(): returned key is different `%s' != `%s'",
++				b->key, a->tcpa_key);
++		return -1;
++	}
++	if (memcmp(&b->addr, &a->tcpa_addr, sizeof(b->addr))) {
++		test_fail("getsockopt(): returned address is different");
++		return -1;
++	}
++	if (!is_kdf_aes_128_cmac && strcmp(b->alg_name, a->tcpa_alg_name)) {
++		test_fail("getsockopt(): returned algorithm is different");
++		return -1;
++	}
++	if (is_kdf_aes_128_cmac && strcmp(b->alg_name, "cmac(aes)")) {
++		test_fail("getsockopt(): returned algorithm is different");
++		return -1;
++	}
++	return 0;
++}
++
++#define TEST_BUF_SIZE 4096
++ssize_t test_server_run(int sk, ssize_t quota, time_t timeout_sec)
++{
++	ssize_t total = 0;
++
++	do {
++		char buf[TEST_BUF_SIZE];
++		ssize_t bytes, sent;
++		int ret;
++
++		ret = test_wait_fd(sk, timeout_sec, 0);
++		if (ret <= 0)
++			return ret;
++
++		bytes = recv(sk, buf, sizeof(buf), 0);
++
++		if (bytes < 0)
++			test_error("recv(): %zd", bytes);
++		if (bytes == 0)
++			break;
++
++		ret = test_wait_fd(sk, timeout_sec, 1);
++		if (ret <= 0)
++			return ret;
++
++		sent = send(sk, buf, bytes, 0);
++		if (sent == 0)
++			break;
++		if (sent != bytes)
++			test_error("send()");
++		total += bytes;
++	} while (!quota || total < quota);
++
++	return total;
++}
++
++ssize_t test_client_loop(int sk, char *buf, size_t buf_sz,
++			 const size_t msg_len, time_t timeout_sec)
++{
++	char msg[msg_len];
++	int nodelay = 1;
++	size_t i;
++
++	if (setsockopt(sk, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)))
++		test_error("setsockopt(TCP_NODELAY)");
++
++	for (i = 0; i < buf_sz; i += min(msg_len, buf_sz - i)) {
++		size_t sent, bytes = min(msg_len, buf_sz - i);
++		int ret;
++
++		ret = test_wait_fd(sk, timeout_sec, 1);
++		if (ret <= 0)
++			return ret;
++
++		sent = send(sk, buf + i, bytes, 0);
++		if (sent == 0)
++			break;
++		if (sent != bytes)
++			test_error("send()");
++
++		ret = test_wait_fd(sk, timeout_sec, 0);
++		if (ret <= 0)
++			return ret;
++
++		bytes = recv(sk, msg, sizeof(msg), 0);
++		if (bytes < 0)
++			test_error("recv(): %zd", bytes);
++		if (bytes != sent)
++			test_error("recv(): %zd != %zd", bytes, sent);
++		if (memcmp(buf + i, msg, bytes) != 0) {
++			test_fail("received message differs");
++			return -1;
++		}
++	}
++	return i;
++}
++
++int test_client_verify(int sk, const size_t msg_len, const size_t nr,
++		       time_t timeout_sec)
++{
++	size_t buf_sz = msg_len * nr;
++	char *buf = alloca(buf_sz);
++
++	randomize_buffer(buf, buf_sz);
++	if (test_client_loop(sk, buf, buf_sz, msg_len, timeout_sec) != buf_sz)
++		return -1;
++	return 0;
++}
+diff --git a/tools/testing/selftests/net/tcp_ao/lib/utils.c b/tools/testing/selftests/net/tcp_ao/lib/utils.c
+new file mode 100644
+index 000000000000..372daca525f5
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/lib/utils.c
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++#include "aolib.h"
++#include <string.h>
++
++void randomize_buffer(void *buf, size_t buflen)
++{
++	int *p = (int *)buf;
++	size_t words = buflen / sizeof(int);
++	size_t leftover = buflen % sizeof(int);
++
++	if (!buflen)
++		return;
++
++	while (words--)
++		*p++ = rand();
++
++	if (leftover) {
++		int tmp = rand();
++
++		memcpy(buf + buflen - leftover, &tmp, leftover);
++	}
++}
++
++const struct sockaddr_in6 addr_any6 = {
++	.sin6_family	= AF_INET6,
++};
++
++const struct sockaddr_in addr_any4 = {
++	.sin_family	= AF_INET,
++};
 -- 
 2.37.2
 
