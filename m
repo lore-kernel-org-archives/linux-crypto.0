@@ -2,86 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B75C6C32771
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 07:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CA4C07E9D
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 07:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233551AbiIXHZp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Sep 2022 03:25:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58152 "EHLO
+        id S233437AbiIXHbH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Sep 2022 03:31:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233437AbiIXHZf (ORCPT
+        with ESMTP id S233048AbiIXHbH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Sep 2022 03:25:35 -0400
+        Sat, 24 Sep 2022 03:31:07 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7781E12AE9;
-        Sat, 24 Sep 2022 00:24:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B871E3C5;
+        Sat, 24 Sep 2022 00:31:05 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1obzWU-007vmx-Ty; Sat, 24 Sep 2022 17:24:28 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Sep 2022 15:24:26 +0800
-Date:   Sat, 24 Sep 2022 15:24:26 +0800
+        id 1obzcr-007vwW-Gi; Sat, 24 Sep 2022 17:31:02 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Sep 2022 15:31:01 +0800
+Date:   Sat, 24 Sep 2022 15:31:01 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ignat Korchagin <ignat@cloudflare.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lei he <helei.sig11@bytedance.com>, kernel-team@cloudflare.com
-Subject: Re: [PATCH 0/4] crypto: add ECDSA signature support to key retention
- service
-Message-ID: <Yy6wqqVpUCeQKrdh@gondor.apana.org.au>
-References: <20220908200036.2034-1-ignat@cloudflare.com>
+To:     williamsukatube@163.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        williamsukatube@163.com
+Subject: Re: [PATCH -next] hwrng: Remove duplicate include
+Message-ID: <Yy6yNaTVnwvHaN8U@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220908200036.2034-1-ignat@cloudflare.com>
+In-Reply-To: <20220917095505.5646-1-williamsukatube@163.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 08, 2022 at 09:00:32PM +0100, Ignat Korchagin wrote:
-> Kernel Key Retention Service[1] is a useful building block to build secure
-> production key management systems. One of its interesting features is
-> support for asymmetric keys: we can allow a process to use a certain key
-> (decrypt or sign data) without actually allowing the process to read the
-> cryptographic key material. By doing so we protect our code from certain
-> type of attacks, where a process memory memory leak actually leaks a
-> potentially highly sensitive cryptographic material.
+williamsukatube@163.com wrote:
+> From: William Dean <williamsukatube@163.com>
 > 
-> But unfortunately only RSA algorithm was supported until now, because
-> in-kernel ECDSA implementation supported signature verifications only.
+> In file: drivers/char/hw_random/core.c,
+> '#include <linux/random.h>' has included at line: 18,
+> now it is duplicated include at line: 24, so delete duplicated include.
 > 
-> This patchset implements in-kernel ECDSA signature generation and adds
-> support for ECDSA signing in the key retention service. The key retention
-> service support was taken out of a previous unmerged patchset from Lei He[2]
+> Signed-off-by: William Dean <williamsukatube@163.com>
+> ---
+> drivers/char/hw_random/core.c | 1 -
+> 1 file changed, 1 deletion(-)
 > 
-> [1]: https://www.kernel.org/doc/html/latest/security/keys/core.html
-> [2]: https://patchwork.kernel.org/project/linux-crypto/list/?series=653034&state=*
-> 
-> Ignat Korchagin (2):
->   crypto: add ECDSA signature generation support
->   crypto: add ECDSA test vectors from RFC 6979
-> 
-> lei he (2):
->   crypto: pkcs8 parser support ECDSA private keys
->   crypto: remove unused field in pkcs8_parse_context
-> 
->  crypto/Kconfig                        |   3 +-
->  crypto/Makefile                       |   4 +-
->  crypto/asymmetric_keys/pkcs8.asn1     |   2 +-
->  crypto/asymmetric_keys/pkcs8_parser.c |  46 +++-
->  crypto/ecc.c                          |   9 +-
->  crypto/ecdsa.c                        | 373 +++++++++++++++++++++++++-
->  crypto/ecprivkey.asn1                 |   6 +
->  crypto/testmgr.c                      |  18 ++
->  crypto/testmgr.h                      | 333 +++++++++++++++++++++++
->  include/crypto/internal/ecc.h         |  11 +
->  10 files changed, 788 insertions(+), 17 deletions(-)
->  create mode 100644 crypto/ecprivkey.asn1
-> 
-> --
-> 2.36.1
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 16f227b995e8..56d171cd2fc6 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -21,7 +21,6 @@
+> #include <linux/sched/signal.h>
+> #include <linux/miscdevice.h>
+> #include <linux/module.h>
+> -#include <linux/random.h>
+> #include <linux/sched.h>
+> #include <linux/slab.h>
+> #include <linux/uaccess.h>
 
-I need acks for patches 3-4 from David.  Thanks!
+This is supposed to be sorted so please remove the other inclusion
+instead.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
