@@ -2,69 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CA4C07E9D
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 07:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3590C32771
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 07:41:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233437AbiIXHbH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Sep 2022 03:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43208 "EHLO
+        id S233473AbiIXHlY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Sep 2022 03:41:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbiIXHbH (ORCPT
+        with ESMTP id S233536AbiIXHlX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Sep 2022 03:31:07 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B871E3C5;
-        Sat, 24 Sep 2022 00:31:05 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1obzcr-007vwW-Gi; Sat, 24 Sep 2022 17:31:02 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Sep 2022 15:31:01 +0800
-Date:   Sat, 24 Sep 2022 15:31:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     williamsukatube@163.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        williamsukatube@163.com
-Subject: Re: [PATCH -next] hwrng: Remove duplicate include
-Message-ID: <Yy6yNaTVnwvHaN8U@gondor.apana.org.au>
+        Sat, 24 Sep 2022 03:41:23 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58871103FD9;
+        Sat, 24 Sep 2022 00:41:20 -0700 (PDT)
+Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MZLSg3sydzlX5j;
+        Sat, 24 Sep 2022 15:37:07 +0800 (CST)
+Received: from dggpeml500005.china.huawei.com (7.185.36.59) by
+ dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Sat, 24 Sep 2022 15:41:18 +0800
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpeml500005.china.huawei.com (7.185.36.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Sat, 24 Sep 2022 15:41:18 +0800
+From:   Zhiqi Song <songzhiqi1@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <fanghao11@huawei.com>,
+        <liulongfang@huawei.com>
+Subject: [PATCH] crypto: hisilicon/hpre - fix resource leak in remove process
+Date:   Sat, 24 Sep 2022 15:38:31 +0800
+Message-ID: <20220924073831.38479-1-songzhiqi1@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220917095505.5646-1-williamsukatube@163.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500005.china.huawei.com (7.185.36.59)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-williamsukatube@163.com wrote:
-> From: William Dean <williamsukatube@163.com>
-> 
-> In file: drivers/char/hw_random/core.c,
-> '#include <linux/random.h>' has included at line: 18,
-> now it is duplicated include at line: 24, so delete duplicated include.
-> 
-> Signed-off-by: William Dean <williamsukatube@163.com>
-> ---
-> drivers/char/hw_random/core.c | 1 -
-> 1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 16f227b995e8..56d171cd2fc6 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -21,7 +21,6 @@
-> #include <linux/sched/signal.h>
-> #include <linux/miscdevice.h>
-> #include <linux/module.h>
-> -#include <linux/random.h>
-> #include <linux/sched.h>
-> #include <linux/slab.h>
-> #include <linux/uaccess.h>
+In hpre_remove(), when the disable operation of qm sriov failed,
+the following logic should continue to be executed to release the
+remaining resources that have been allocated, instead of returning
+directly, otherwise there will be resource leakage.
 
-This is supposed to be sorted so please remove the other inclusion
-instead.
+Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-Thanks,
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 471e5ca720f5..baf1faec7046 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -1437,18 +1437,12 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ static void hpre_remove(struct pci_dev *pdev)
+ {
+ 	struct hisi_qm *qm = pci_get_drvdata(pdev);
+-	int ret;
+ 
+ 	hisi_qm_pm_uninit(qm);
+ 	hisi_qm_wait_task_finish(qm, &hpre_devices);
+ 	hisi_qm_alg_unregister(qm, &hpre_devices);
+-	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
+-		ret = hisi_qm_sriov_disable(pdev, true);
+-		if (ret) {
+-			pci_err(pdev, "Disable SRIOV fail!\n");
+-			return;
+-		}
+-	}
++	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
++		hisi_qm_sriov_disable(pdev, true);
+ 
+ 	hpre_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.33.0
+
