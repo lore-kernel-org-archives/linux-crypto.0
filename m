@@ -2,85 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3590C32771
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 07:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D79C32771
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 08:18:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbiIXHlY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Sep 2022 03:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57876 "EHLO
+        id S233717AbiIXISn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Sep 2022 04:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233536AbiIXHlX (ORCPT
+        with ESMTP id S233751AbiIXISJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Sep 2022 03:41:23 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58871103FD9;
-        Sat, 24 Sep 2022 00:41:20 -0700 (PDT)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MZLSg3sydzlX5j;
-        Sat, 24 Sep 2022 15:37:07 +0800 (CST)
-Received: from dggpeml500005.china.huawei.com (7.185.36.59) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 24 Sep 2022 15:41:18 +0800
-Received: from localhost.localdomain (10.69.192.56) by
- dggpeml500005.china.huawei.com (7.185.36.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 24 Sep 2022 15:41:18 +0800
-From:   Zhiqi Song <songzhiqi1@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <fanghao11@huawei.com>,
-        <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/hpre - fix resource leak in remove process
-Date:   Sat, 24 Sep 2022 15:38:31 +0800
-Message-ID: <20220924073831.38479-1-songzhiqi1@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Sat, 24 Sep 2022 04:18:09 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57061131
+        for <linux-crypto@vger.kernel.org>; Sat, 24 Sep 2022 01:16:49 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oc0L7-007wck-5k; Sat, 24 Sep 2022 18:16:46 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Sep 2022 16:16:45 +0800
+Date:   Sat, 24 Sep 2022 16:16:45 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Peter Harliman Liem <pliem@maxlinear.com>
+Cc:     atenart@kernel.org, linux-crypto@vger.kernel.org,
+        linux-lgm-soc@maxlinear.com
+Subject: Re: [PATCH v3 1/2] crypto: inside_secure - Avoid dma map if size is
+ zero
+Message-ID: <Yy687arNycXkbXED@gondor.apana.org.au>
+References: <c10f8274fafd4f6afe92d0a2716ec5a38ca02cc8.1663055663.git.pliem@maxlinear.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500005.china.huawei.com (7.185.36.59)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c10f8274fafd4f6afe92d0a2716ec5a38ca02cc8.1663055663.git.pliem@maxlinear.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In hpre_remove(), when the disable operation of qm sriov failed,
-the following logic should continue to be executed to release the
-remaining resources that have been allocated, instead of returning
-directly, otherwise there will be resource leakage.
+On Tue, Sep 13, 2022 at 04:03:47PM +0800, Peter Harliman Liem wrote:
+> >From commit d03c54419274 ("dma-mapping: disallow .map_sg
+> operations from returning zero on error"), dma_map_sg()
+> produces warning if size is 0. This results in visible
+> warnings if crypto length is zero.
+> To avoid that, we avoid calling dma_map_sg if size is zero.
+> 
+> Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
+> ---
+> v3:
+>  Remove fixes tag
+>  Add corresponding change for dma_unmap_sg
+> v2:
+>  Add fixes tag
+> 
+>  .../crypto/inside-secure/safexcel_cipher.c    | 44 +++++++++++++------
+>  1 file changed, 31 insertions(+), 13 deletions(-)
 
-Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 471e5ca720f5..baf1faec7046 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -1437,18 +1437,12 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- static void hpre_remove(struct pci_dev *pdev)
- {
- 	struct hisi_qm *qm = pci_get_drvdata(pdev);
--	int ret;
- 
- 	hisi_qm_pm_uninit(qm);
- 	hisi_qm_wait_task_finish(qm, &hpre_devices);
- 	hisi_qm_alg_unregister(qm, &hpre_devices);
--	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
--		ret = hisi_qm_sriov_disable(pdev, true);
--		if (ret) {
--			pci_err(pdev, "Disable SRIOV fail!\n");
--			return;
--		}
--	}
-+	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
-+		hisi_qm_sriov_disable(pdev, true);
- 
- 	hpre_debugfs_exit(qm);
- 	hisi_qm_stop(qm, QM_NORMAL);
+All applied.  Thanks.
 -- 
-2.33.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
