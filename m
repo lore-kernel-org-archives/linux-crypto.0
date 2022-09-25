@@ -2,107 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B6CC04A95
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Sep 2022 10:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF3BC6FA82
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Sep 2022 14:17:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbiIYKAj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Sep 2022 06:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
+        id S230059AbiIYOR1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 25 Sep 2022 10:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbiIYKAi (ORCPT
+        with ESMTP id S229574AbiIYOR0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Sep 2022 06:00:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641CC25C54;
-        Sun, 25 Sep 2022 03:00:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BA64E60DFB;
-        Sun, 25 Sep 2022 10:00:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E0E5C433C1;
-        Sun, 25 Sep 2022 10:00:34 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Fpm8nP0f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1664100032;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NQwKz8Q4mOrZejIu/u6IGYD9+wqNWFOpyS9jS1HdV5w=;
-        b=Fpm8nP0fyUK9BqpO+w/wSq9lNPRP1OEBEn7zfIkIrIW+ItAzHxynSI7JLh3p2nrqodD5wP
-        1nza4xqcPctVHmE6Ev4cfubkOQvQkWxlCWHAVOwAXfpKEVPUDhug1OgCuDvqGapHNz6LfO
-        LJtA7X38ov4EWDQN+BltuIaXeIV/4gE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5f6a0196 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sun, 25 Sep 2022 10:00:32 +0000 (UTC)
-Date:   Sun, 25 Sep 2022 12:00:29 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Sun, 25 Sep 2022 10:17:26 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 54F7329830;
+        Sun, 25 Sep 2022 07:17:25 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id BA24792009C; Sun, 25 Sep 2022 16:17:22 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id B3C1B92009B;
+        Sun, 25 Sep 2022 15:17:22 +0100 (BST)
+Date:   Sun, 25 Sep 2022 15:17:22 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Arnd Bergmann <arnd@arndb.de>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Subject: Re: [PATCH v6 09/17] mips: use fallback for random_get_entropy()
  instead of just c0 random
-Message-ID: <YzAmvfQcY2/gGwFQ@zx2c4.com>
-References: <20220423212623.1957011-1-Jason@zx2c4.com>
- <20220423212623.1957011-10-Jason@zx2c4.com>
- <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk>
- <YmicjVbkcppfzE1E@zx2c4.com>
- <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
- <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk>
+In-Reply-To: <YzAmvfQcY2/gGwFQ@zx2c4.com>
+Message-ID: <alpine.DEB.2.21.2209251449290.29493@angie.orcam.me.uk>
+References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-10-Jason@zx2c4.com> <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk> <YmicjVbkcppfzE1E@zx2c4.com> <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
+ <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk> <YzAmvfQcY2/gGwFQ@zx2c4.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Maciej,
+Hi Jason,
 
-On Fri, Jun 24, 2022 at 02:25:17PM +0100, Maciej W. Rozycki wrote:
-> Hi Jason,
-> 
-> > > There is lots of optimization potential on a few fronts we've identified
-> > > in this thread. Let's save these for a follow-up. I'd rather this
-> > > initial one be at least somewhat simple, so that as it gets optimized,
-> > > it'll be easy to handle regressions. Also, it probably makes sense for
-> > > you to send the patches for these, since you have both the hardware
-> > > chops and the hardware itself to assess these ideas. I am interested in
-> > > the topic though, so please do CC me.
+> >  Unfortunately I'm a little stuck at the moment, especially as one of my
+> > main MIPS machines (a 5Kc Malta system) died mid-May while operating.  It 
+> > seems to be a faulty CPU core card and the base board may be fine, though 
+> > I cannot know for sure as I only have one each and I don't have a logic 
+> > analyser or at least a JTAG probe to peek at the system and see what's 
+> > going on inside.
 > > 
-> > Everything has been upstream for a little while now, which means
-> > development of this can move back to the proper MIPS tree like normal.
-> > Did you want to submit some optimizations? Would be happy to look at
-> > whatever you have in mind.
+> >  If anyone knows a source of a replacement Malta, preferably with a 5Kc 
+> > CoreLV CPU module or another 64-bit hard core card (a number of different 
+> > ones have been made), then I'll appreciate if you let me know.  I feel 
+> > rather depressed knowing that many if not most hit the scrapper already 
+> > while they could still find a good use.  Somehow it is easier to get way 
+> > more obsolete hardware from 1980/90s just because it was general purpose 
+> > rather than niche.
+> > 
+> >  Otherwise I'll try to get back to this stuff later in the year with 
+> > whatever I have that still runs, but don't hold your breath.  Sorry!
 > 
->  Thank you for the heads-up!
-> 
->  Unfortunately I'm a little stuck at the moment, especially as one of my
-> main MIPS machines (a 5Kc Malta system) died mid-May while operating.  It 
-> seems to be a faulty CPU core card and the base board may be fine, though 
-> I cannot know for sure as I only have one each and I don't have a logic 
-> analyser or at least a JTAG probe to peek at the system and see what's 
-> going on inside.
-> 
->  If anyone knows a source of a replacement Malta, preferably with a 5Kc 
-> CoreLV CPU module or another 64-bit hard core card (a number of different 
-> ones have been made), then I'll appreciate if you let me know.  I feel 
-> rather depressed knowing that many if not most hit the scrapper already 
-> while they could still find a good use.  Somehow it is easier to get way 
-> more obsolete hardware from 1980/90s just because it was general purpose 
-> rather than niche.
-> 
->  Otherwise I'll try to get back to this stuff later in the year with 
-> whatever I have that still runs, but don't hold your breath.  Sorry!
-> 
->   Maciej
+> Just thought I'd poke you about this, on the off chance that you found
+> some new hardware and feel like tinkering around with cycle counters
+> again. Some old MIPS platforms were recently dropped, too, which makes
+> me wonder whether there's some room for more simplification here.
 
-Just thought I'd poke you about this, on the off chance that you found
-some new hardware and feel like tinkering around with cycle counters
-again. Some old MIPS platforms were recently dropped, too, which makes
-me wonder whether there's some room for more simplification here.
+ I have a replacement CPU module now, but it is not the same as the old 
+one was and it has a built-in different system controller (a MIPS SOC-it 
+IP implementation) rather than a discrete Galileo GT-64120A chip the 
+original module had.
 
-Jason
+ And the system controller suffers from PCI handling issues, i.e. the 
+YAMON firmware hangs in PCI enumeration if there are more than 2 buses 
+present (my configuration used to have 3) and in Linux one of the option 
+cards seems not to respond to MMIO accesses (a mapping error?), with 
+exactly the same hardware configuration that worked just fine with the 
+Galileo.  I had to pull some hardware to make the system boot at all.
+
+ It's not clear to me yet if these are symptoms of hardware errata or bugs 
+in the respective pieces of software, but I fear debugging fatal issues 
+has to take precedence over optimisations for me, so I have to defer cycle 
+counter tinkering yet more.
+
+ NB the replacement CPU module is also 32-bit rather than 64-bit as the 
+broken one was and therefore I'm still looking for a replacement 64-bit 
+CPU module.  Malta CPU modules seem exceedingly scarce nowadays, it seems 
+easier to track down a 30 years old MIPS R3000 DECstation machine, sigh...
+
+  Maciej
