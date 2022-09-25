@@ -2,81 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B09B8C07E9D
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Sep 2022 11:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B6CC04A95
+	for <linux-crypto@archiver.kernel.org>; Sun, 25 Sep 2022 10:00:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbiIXLHX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Sep 2022 07:07:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56870 "EHLO
+        id S229829AbiIYKAj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 25 Sep 2022 06:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbiIXLHW (ORCPT
+        with ESMTP id S229763AbiIYKAi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Sep 2022 07:07:22 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9455D433B;
-        Sat, 24 Sep 2022 04:07:20 -0700 (PDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MZR4f2tvdzHqJN;
-        Sat, 24 Sep 2022 19:05:06 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 24 Sep 2022 19:07:19 +0800
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 24 Sep 2022 19:07:18 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/qm - re-enable communicate interrupt before notifying PF
-Date:   Sat, 24 Sep 2022 19:04:31 +0800
-Message-ID: <20220924110431.31271-1-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Sun, 25 Sep 2022 06:00:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641CC25C54;
+        Sun, 25 Sep 2022 03:00:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BA64E60DFB;
+        Sun, 25 Sep 2022 10:00:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E0E5C433C1;
+        Sun, 25 Sep 2022 10:00:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Fpm8nP0f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1664100032;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NQwKz8Q4mOrZejIu/u6IGYD9+wqNWFOpyS9jS1HdV5w=;
+        b=Fpm8nP0fyUK9BqpO+w/wSq9lNPRP1OEBEn7zfIkIrIW+ItAzHxynSI7JLh3p2nrqodD5wP
+        1nza4xqcPctVHmE6Ev4cfubkOQvQkWxlCWHAVOwAXfpKEVPUDhug1OgCuDvqGapHNz6LfO
+        LJtA7X38ov4EWDQN+BltuIaXeIV/4gE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5f6a0196 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sun, 25 Sep 2022 10:00:32 +0000 (UTC)
+Date:   Sun, 25 Sep 2022 12:00:29 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Subject: Re: [PATCH v6 09/17] mips: use fallback for random_get_entropy()
+ instead of just c0 random
+Message-ID: <YzAmvfQcY2/gGwFQ@zx2c4.com>
+References: <20220423212623.1957011-1-Jason@zx2c4.com>
+ <20220423212623.1957011-10-Jason@zx2c4.com>
+ <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk>
+ <YmicjVbkcppfzE1E@zx2c4.com>
+ <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
+ <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-After the device is reset, the VF needs to re-enable communication
-interrupt before the VF sends restart complete message to the PF.
-If the interrupt is re-enabled after the VF notifies the PF, the PF
-may fail to send messages to the VF after receiving VF's restart
-complete message.
+Hey Maciej,
 
-Fixes: 760fe22cf5e9 ("crypto: hisilicon/qm - update reset flow")
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Jun 24, 2022 at 02:25:17PM +0100, Maciej W. Rozycki wrote:
+> Hi Jason,
+> 
+> > > There is lots of optimization potential on a few fronts we've identified
+> > > in this thread. Let's save these for a follow-up. I'd rather this
+> > > initial one be at least somewhat simple, so that as it gets optimized,
+> > > it'll be easy to handle regressions. Also, it probably makes sense for
+> > > you to send the patches for these, since you have both the hardware
+> > > chops and the hardware itself to assess these ideas. I am interested in
+> > > the topic though, so please do CC me.
+> > 
+> > Everything has been upstream for a little while now, which means
+> > development of this can move back to the proper MIPS tree like normal.
+> > Did you want to submit some optimizations? Would be happy to look at
+> > whatever you have in mind.
+> 
+>  Thank you for the heads-up!
+> 
+>  Unfortunately I'm a little stuck at the moment, especially as one of my
+> main MIPS machines (a 5Kc Malta system) died mid-May while operating.  It 
+> seems to be a faulty CPU core card and the base board may be fine, though 
+> I cannot know for sure as I only have one each and I don't have a logic 
+> analyser or at least a JTAG probe to peek at the system and see what's 
+> going on inside.
+> 
+>  If anyone knows a source of a replacement Malta, preferably with a 5Kc 
+> CoreLV CPU module or another 64-bit hard core card (a number of different 
+> ones have been made), then I'll appreciate if you let me know.  I feel 
+> rather depressed knowing that many if not most hit the scrapper already 
+> while they could still find a good use.  Somehow it is easier to get way 
+> more obsolete hardware from 1980/90s just because it was general purpose 
+> rather than niche.
+> 
+>  Otherwise I'll try to get back to this stuff later in the year with 
+> whatever I have that still runs, but don't hold your breath.  Sorry!
+> 
+>   Maciej
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 8b387de69d22..8b5218686b9e 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -5725,6 +5725,7 @@ static void qm_pf_reset_vf_done(struct hisi_qm *qm)
- 		cmd = QM_VF_START_FAIL;
- 	}
- 
-+	qm_cmd_init(qm);
- 	ret = qm_ping_pf(qm, cmd);
- 	if (ret)
- 		dev_warn(&pdev->dev, "PF responds timeout in reset done!\n");
-@@ -5786,7 +5787,6 @@ static void qm_pf_reset_vf_process(struct hisi_qm *qm,
- 		goto err_get_status;
- 
- 	qm_pf_reset_vf_done(qm);
--	qm_cmd_init(qm);
- 
- 	dev_info(dev, "device reset done.\n");
- 
--- 
-2.33.0
+Just thought I'd poke you about this, on the off chance that you found
+some new hardware and feel like tinkering around with cycle counters
+again. Some old MIPS platforms were recently dropped, too, which makes
+me wonder whether there's some room for more simplification here.
 
+Jason
