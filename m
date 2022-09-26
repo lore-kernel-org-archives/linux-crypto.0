@@ -2,279 +2,177 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF24C07E9D
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 16:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDE8C32771
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 17:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229638AbiIZQaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Sep 2022 12:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
+        id S231240AbiIZRpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Sep 2022 13:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbiIZQ3w (ORCPT
+        with ESMTP id S229715AbiIZRpU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:29:52 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9408251427
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Sep 2022 08:19:30 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id x29so7862916ljq.2
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Sep 2022 08:19:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
-        b=Y5alOsje+V17Mvu/UEe7LvpZijxhzaul2BWGDT5bztSMyS9dMJlmavzjn+2deaq5tw
-         XvNm10CbZ4ZLITBQuIdLXCkRvPCo3ttVoMGyxzaON3gVItEvPjupvJPPUWnuX4u3O3tn
-         co73Ml8h2TBj2tZ3Q+cEwbmMhaCQyZnb/jmJORcXwiChwx+Tu1zvYoIOQ+pro7NVexxo
-         vWL6d8nrSBsIC6Mcn75pHch+puY3c+/i3igKsdBO2b6YYYhHXs9n3RQDStIPYiKWQRyr
-         lGrB/fhsUdaZ7+jLdk8uF+Qc0ur1rup4v+UwMl6mX5qWWYXjsMM4rzFwlIKmKZM9pxrk
-         cvoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
-        b=vsqTBe6Kqzlr37hQy+kO2+DiD/IYTLAOB7PUcFsuKDtTUed5sbhjU7sLtYRPNQp08E
-         TinUPhKwSqpKLJaV3GiiFixsxj2iUJXZR+MwLcjGClcEpR4EliYzMlT6BE6ODsqG6DGI
-         KWJ5AfID+CckYOl+Tvd3lNzI1EIYVK0D1l9a5wP8ze5T5x9RHuZ0wnhuA8M576Rh8i1+
-         99BxQCkU4DYrehF5s8YEUlHHaCiNGJLn52s1d8Tttr9VUkr2MB4HWPCV9yHDj+iKxuX9
-         qQXHkgawZj87Iom8pdRH+XVHN1vmOdR6DQrglHKmx6FD1FpzY7F4r4dodOAHmiKo0qnt
-         zgNA==
-X-Gm-Message-State: ACrzQf31XcWYK4KIiX/oPu7VI4Jz3Bsx1xfyJnGczhQ2BnZKwftgK+uX
-        wRcuCuBWFOXz9qkdA4kO5flHZq/Cv5NKFFtv88YdqA==
-X-Google-Smtp-Source: AMsMyM6+y6FU6UQ6FRNs597KPkJSz9uCZoF/CXoGwAr/mTWlHtClwgzOToRRC2voZPY2KOrU2AZgoD/DEnDfu92c2EM=
-X-Received: by 2002:a2e:983:0:b0:26c:5b0e:f5e4 with SMTP id
- 125-20020a2e0983000000b0026c5b0ef5e4mr7720323ljj.502.1664205567769; Mon, 26
- Sep 2022 08:19:27 -0700 (PDT)
+        Mon, 26 Sep 2022 13:45:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2421F696DB;
+        Mon, 26 Sep 2022 10:14:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F159261070;
+        Mon, 26 Sep 2022 17:14:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5FA3C433C1;
+        Mon, 26 Sep 2022 17:14:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664212488;
+        bh=oU8fn0BSKQJ81q0PJD4003aYsQpw2jnsAd7aL0fi5nI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rsxD7Ezrth60I4eEJPxOWVxcAYT2+wvpZ0iLXxTkTwgbAKPsnHPVrnHZUJkn/mAtn
+         M9DC0FakD7h5p5ZpwtaScOq0NkEKGdLXtf7N9QA8/r6tTs8Cjsjbo/5WKt9/5ROSbD
+         Sc8lIErYHDImiS+EabT9oWGV62HB7RgUR03qP/IEsTsg1aTWGdIGhL9xkFm2A0VjU1
+         bsc1YryL1H9Epxf3UOjmRM1vqcvE3WVM0iYFE0w6fUwVBDEb7zHrP9bqPE/xWEBgoY
+         hKW9OKepxAq0AKO/57OTL7Aoe63pnrdTvFfJsrQJhrmmqiBoTNATuhAwR903oAbwIl
+         goVPh7lyg0Puw==
+Date:   Mon, 26 Sep 2022 18:14:37 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 16/16] crypto: arm64/sm4 - add ARMv9 SVE cryptography
+ acceleration implementation
+Message-ID: <YzHd/U9vvSwuhKsx@sirena.org.uk>
+References: <20220926093620.99898-1-tianjia.zhang@linux.alibaba.com>
+ <20220926093620.99898-17-tianjia.zhang@linux.alibaba.com>
+ <CAMj1kXF8Fi9cG4p6udRYT4LbCAj0UBXQL12nmQBFEWvZsVX7Wg@mail.gmail.com>
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
- <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
- <0716365f-3572-638b-e841-fcce7d30571a@amd.com> <CABpDEu=quPsv6cXfbvpsGS2N+5Pcw7inCfmv=sx3-VaK0UE76g@mail.gmail.com>
- <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com> <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
-In-Reply-To: <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 26 Sep 2022 09:19:15 -0600
-Message-ID: <CAMkAt6o=G7W3pRgVYiBKK5RjQskMfzL_9me2Hcr7_e9rTHuStw@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
- Page State Change VMGEXIT
-To:     Ashish Kalra <ashkalra@amd.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Alper Gun <alpergun@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="f7AumrwylgGDBblN"
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXF8Fi9cG4p6udRYT4LbCAj0UBXQL12nmQBFEWvZsVX7Wg@mail.gmail.com>
+X-Cookie: You may be recognized soon.  Hide.
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 5:47 PM Ashish Kalra <ashkalra@amd.com> wrote:
->
->
-> On 9/19/22 22:18, Tom Lendacky wrote:
-> > On 9/19/22 17:02, Alper Gun wrote:
-> >> On Mon, Sep 19, 2022 at 2:38 PM Tom Lendacky
-> >> <thomas.lendacky@amd.com> wrote:
-> >>>
-> >>> On 9/19/22 12:53, Alper Gun wrote:
-> >>>> On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
-> >>>>>
-> >>>>>> +
-> >>>>>> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu,
-> >>>>>> enum psc_op op, gpa_t gpa,
-> >>>>>> +                                         int level)
-> >>>>>> +{
-> >>>>>> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
-> >>>>>> +       struct kvm *kvm = vcpu->kvm;
-> >>>>>> +       int rc, npt_level;
-> >>>>>> +       kvm_pfn_t pfn;
-> >>>>>> +       gpa_t gpa_end;
-> >>>>>> +
-> >>>>>> +       gpa_end = gpa + page_level_size(level);
-> >>>>>> +
-> >>>>>> +       while (gpa < gpa_end) {
-> >>>>>> +               /*
-> >>>>>> +                * If the gpa is not present in the NPT then
-> >>>>>> build the NPT.
-> >>>>>> +                */
-> >>>>>> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
-> >>>>>> +               if (rc)
-> >>>>>> +                       return -EINVAL;
-> >>>>>> +
-> >>>>>> +               if (op == SNP_PAGE_STATE_PRIVATE) {
-> >>>>>> +                       hva_t hva;
-> >>>>>> +
-> >>>>>> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
-> >>>>>> +                               return -EINVAL;
-> >>>>>> +
-> >>>>>> +                       /*
-> >>>>>> +                        * Verify that the hva range is
-> >>>>>> registered. This enforcement is
-> >>>>>> +                        * required to avoid the cases where a
-> >>>>>> page is marked private
-> >>>>>> +                        * in the RMP table but never gets
-> >>>>>> cleanup during the VM
-> >>>>>> +                        * termination path.
-> >>>>>> +                        */
-> >>>>>> +                       mutex_lock(&kvm->lock);
-> >>>>>> +                       rc = is_hva_registered(kvm, hva,
-> >>>>>> page_level_size(level));
-> >>>>>> +                       mutex_unlock(&kvm->lock);
-> >>>>>> +                       if (!rc)
-> >>>>>> +                               return -EINVAL;
-> >>>>>> +
-> >>>>>> +                       /*
-> >>>>>> +                        * Mark the userspace range unmerable
-> >>>>>> before adding the pages
-> >>>>>> +                        * in the RMP table.
-> >>>>>> +                        */
-> >>>>>> +                       mmap_write_lock(kvm->mm);
-> >>>>>> +                       rc = snp_mark_unmergable(kvm, hva,
-> >>>>>> page_level_size(level));
-> >>>>>> +                       mmap_write_unlock(kvm->mm);
-> >>>>>> +                       if (rc)
-> >>>>>> +                               return -EINVAL;
-> >>>>>> +               }
-> >>>>>> +
-> >>>>>> +               write_lock(&kvm->mmu_lock);
-> >>>>>> +
-> >>>>>> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn,
-> >>>>>> &npt_level);
-> >>>>>> +               if (!rc) {
-> >>>>>> +                       /*
-> >>>>>> +                        * This may happen if another vCPU
-> >>>>>> unmapped the page
-> >>>>>> +                        * before we acquire the lock. Retry the
-> >>>>>> PSC.
-> >>>>>> +                        */
-> >>>>>> + write_unlock(&kvm->mmu_lock);
-> >>>>>> +                       return 0;
-> >>>>>> +               }
-> >>>>>
-> >>>>> I think we want to return -EAGAIN or similar if we want the caller to
-> >>>>> retry, right? I think returning 0 here hides the error.
-> >>>>>
-> >>>>
-> >>>> The problem here is that the caller(linux guest kernel) doesn't retry
-> >>>> if PSC fails. The current implementation in the guest kernel is that
-> >>>> if a page state change request fails, it terminates the VM with
-> >>>> GHCB_TERM_PSC reason.
-> >>>> Returning 0 here is not a good option because it will fail the PSC
-> >>>> silently and will probably cause a nested RMP fault later. Returning
-> >>>
-> >>> Returning 0 here is ok because the PSC current index into the PSC
-> >>> structure will not be updated and the guest will then retry (see the
-> >>> loop
-> >>> in vmgexit_psc() in arch/x86/kernel/sev.c).
-> >>>
-> >>> Thanks,
-> >>> Tom
-> >>
-> >> But the host code updates the index. It doesn't leave the loop because
-> >> rc is 0. The guest will think that it is successful.
-> >> rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
-> >> if (rc)
-> >> goto out;
-> >>
-> >> Also the page state change request with MSR is not retried. It
-> >> terminates the VM if the MSR request fails.
-> >
-> > Ah, right. I see what you mean. It should probably return a -EAGAIN
-> > instead of 0 and then the if (rc) check should be modified to
-> > specifically look for -EAGAIN and goto out after setting rc to 0.
-> >
-> > But that does leave the MSR protocol open to the problem that you
-> > mention, so, yes, retry logic in snp_handle_page_state_change() for a
-> > -EAGAIN seems reasonable.
-> >
-> > Thanks,
-> > Tom
->
-> I believe it makes more sense to add the retry logic within
-> __snp_handle_page_state_change() itself, as that will make it work for
-> both the GHCB MSR protocol and the GHCB VMGEXIT requests.
 
-You are suggesting we just retry 'kvm_mmu_get_tdp_walk' inside of
-__snp_handle_page_state_change()? That should work but how many times
-do we retry? If we return EAGAIN or error we can leave it up to the
-caller
+--f7AumrwylgGDBblN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> Thanks, Ashish
->
-> >
-> >>
-> >>>
-> >>>> an error also terminates the guest immediately with current guest
-> >>>> implementation. I think the best approach here is adding a retry logic
-> >>>> to this function. Retrying without returning an error should help it
-> >>>> work because snp_check_and_build_npt will be called again and in the
-> >>>> second attempt this should work.
-> >>>>
-> >>>>>> +
-> >>>>>> +               /*
-> >>>>>> +                * Adjust the level so that we don't go higher
-> >>>>>> than the backing
-> >>>>>> +                * page level.
-> >>>>>> +                */
-> >>>>>> +               level = min_t(size_t, level, npt_level);
-> >>>>>> +
-> >>>>>> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op,
-> >>>>>> level);
-> >>>>>> +
-> >>>>>> +               switch (op) {
-> >>>>>> +               case SNP_PAGE_STATE_SHARED:
-> >>>>>> +                       rc = snp_make_page_shared(kvm, gpa, pfn,
-> >>>>>> level);
-> >>>>>> +                       break;
-> >>>>>> +               case SNP_PAGE_STATE_PRIVATE:
-> >>>>>> +                       rc = rmp_make_private(pfn, gpa, level,
-> >>>>>> sev->asid, false);
-> >>>>>> +                       break;
-> >>>>>> +               default:
-> >>>>>> +                       rc = -EINVAL;
-> >>>>>> +                       break;
-> >>>>>> +               }
-> >>>>>> +
-> >>>>>> +               write_unlock(&kvm->mmu_lock);
-> >>>>>> +
-> >>>>>> +               if (rc) {
-> >>>>>> +                       pr_err_ratelimited("Error op %d gpa %llx
-> >>>>>> pfn %llx level %d rc %d\n",
-> >>>>>> +                                          op, gpa, pfn, level, rc);
-> >>>>>> +                       return rc;
-> >>>>>> +               }
-> >>>>>> +
-> >>>>>> +               gpa = gpa + page_level_size(level);
-> >>>>>> +       }
-> >>>>>> +
-> >>>>>> +       return 0;
-> >>>>>> +}
-> >>>>>> +
+On Mon, Sep 26, 2022 at 12:02:04PM +0200, Ard Biesheuvel wrote:
+
+> Given that we currently do not support the use of SVE in kernel mode,
+> this patch cannot be accepted at this time (but the rest of the series
+> looks reasonable to me, although I have only skimmed over the patches)
+
+> In view of the disappointing benchmark results below, I don't think
+> this is worth the hassle at the moment. If we can find a case where
+> using SVE in kernel mode truly makes a [favorable] difference, we can
+> revisit this, but not without a thorough analysis of the impact it
+> will have to support SVE in the kernel. Also, the fact that SVE may
+
+The kernel code doesn't really distinguish between FPSIMD and SVE in
+terms of state management, and with the sharing of the V and Z registers
+the architecture is very similar too so it shouldn't be too much hassle,
+the only thing we should need is some management for the VL when
+starting kernel mode SVE (probably just setting the maximum VL as a
+first pass).
+
+The current code should *work* and on a system with only a single VL
+supported it'd be equivalent since setting the VL is a noop, it'd just
+mean that any kernel mode SVE would end up using whatever the last VL
+set on the PE happened to be in which could result in inconsistent
+performance.=20
+
+> also cover cryptographic extensions does not necessarily imply that a
+> micro-architecture will perform those crypto transformations in
+> parallel and so the performance may be the same even if VL > 128.
+
+Indeed, though so long as the performance is comparable I guess it
+doesn't really hurt - if we run into situations where for some
+implementations SVE performs worse then we'd need to do something more
+complicated than just using SVE if it's available but...
+
+> In summary, please drop this patch for now, and once there are more
+> encouraging performance numbers, please resubmit it as part of a
+> series that explicitly enables SVE in kernel mode on arm64, and
+> documents the requirements and constraints.
+
+=2E..in any case as you say until there are cases where SVE does better
+for some in kernel use case we probably just shouldn't merge things.
+
+Having said that I have been tempted to put together a branch which has
+a kernel_sve_begin() implementation and collects proposed algorithm
+implementations so they're there for people to experiment with as new
+hardware becomes available.  There's clearly interest in trying to use
+SVE in kernel and it makes sense to try to avoid common pitfalls and
+reduce duplication of effort.
+
+A couple of very minor comments on the patch:
+
+> > +config CRYPTO_SM4_ARM64_SVE_CE_BLK
+> > +       tristate "Ciphers: SM4, modes: ECB/CBC/CFB/CTR (ARMv9 cryptogra=
+phy
+> +acceleration with SVE2)"
+> > +       depends on KERNEL_MODE_NEON
+> > +       select CRYPTO_SKCIPHER
+> > +       select CRYPTO_SM4
+> > +       select CRYPTO_SM4_ARM64_CE_BLK
+> > +       help
+
+Our current baseline binutils version requirement predates SVE support
+so we'd either need to manually encode all SVE instructions used or add
+suitable dependency.  The dependency seems a lot more reasonable here,
+and we could require a new enough version to avoid the manual encoding
+that is done in the patch (though I've not checked how new a version
+that'd end up requiring, it might be unreasonable so perhaps just
+depending on binutils having basic SVE support and continuing with the
+manual encoding might be more helpful).
+
+> > +.macro sm4e, vd, vn
+> > +       .inst 0xcec08400 | (.L\vn << 5) | .L\vd
+> > +.endm
+
+For any manual encodings that do get left it'd be good to note the
+binutils and LLVM versions which support the instruction so we can
+hopefully at some point switch to assembling them normally.
+
+> > +static int __init sm4_sve_ce_init(void)
+> > +{
+> > +       if (sm4_sve_get_vl() <=3D 16)
+> > +               return -ENODEV;
+
+I'm not clear what this check is attempting to guard against - what's
+the issue with larger VLs?
+
+If it is needed then we already have a sve_get_vl() in the core kernel
+which we should probably be making available to modules rather than
+having them open code something (eg, making it a static inline rather
+than putting it in asm).
+
+--f7AumrwylgGDBblN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMx3fwACgkQJNaLcl1U
+h9C8Pgf9GG6I05ACG8YLcqEf0Y5yObFlPelhwSsSzTXK+0+/qIciuuTFJnnq0/Bm
+0+uR1I3XV5kCEsQRyeiXgOqzpkXdsy5ggrY29lme2tnBMA5DTV9/rhDdyoIdMcG4
+JUVAdgFQ5UfZeLUkMTYreey6trdhQqJwi++7+oZBKnO59jmud3Mp6s0g4E++Kjv/
+GvNSjKTOYl82Y433h5GvQ9J14zr/Vu2ZPj3H7XowF4HbFAu9VysfLtNmSSukK2Nu
+fXAru8Tfoz3CxrvTUWcaYOU/5I+0uuVUiIdvpeyQHW+Z8KoKE0Bh+w9Y0GK8WoeL
+AJGmPrT9aUIP7QgrTreHldsucUjVwA==
+=wgDg
+-----END PGP SIGNATURE-----
+
+--f7AumrwylgGDBblN--
