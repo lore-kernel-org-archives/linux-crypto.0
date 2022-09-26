@@ -2,23 +2,23 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AFAC6FA86
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 09:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FDBC6FA83
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 09:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234995AbiIZJhZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Sep 2022 05:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
+        id S234634AbiIZJhr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Sep 2022 05:37:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234470AbiIZJhA (ORCPT
+        with ESMTP id S234331AbiIZJhB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2022 05:37:00 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D084E237F5;
-        Mon, 26 Sep 2022 02:36:41 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VQkJzEH_1664184995;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VQkJzEH_1664184995)
+        Mon, 26 Sep 2022 05:37:01 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE63240B6;
+        Mon, 26 Sep 2022 02:36:34 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VQjskWT_1664184988;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VQjskWT_1664184988)
           by smtp.aliyun-inc.com;
-          Mon, 26 Sep 2022 17:36:36 +0800
+          Mon, 26 Sep 2022 17:36:29 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -32,9 +32,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH 06/16] crypto: arm64/sm4 - refactor and simplify CE implementation
-Date:   Mon, 26 Sep 2022 17:36:10 +0800
-Message-Id: <20220926093620.99898-7-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH 02/16] crypto: arm64/sm3 - add NEON assembly implementation
+Date:   Mon, 26 Sep 2022 17:36:06 +0800
+Message-Id: <20220926093620.99898-3-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 In-Reply-To: <20220926093620.99898-1-tianjia.zhang@linux.alibaba.com>
 References: <20220926093620.99898-1-tianjia.zhang@linux.alibaba.com>
@@ -44,1149 +44,782 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch does not add new features, but only refactors and simplifies the
-implementation of the Crypto Extension acceleration of the SM4 algorithm:
+This patch adds the NEON acceleration implementation of the SM3 hash
+algorithm. The main algorithm is based on SM3 NEON accelerated work of
+the libgcrypt project.
 
-Extract the macro optimized by SM4 Crypto Extension for reuse in the
-subsequent optimization of CCM/GCM modes.
+Benchmark on T-Head Yitian-710 2.75 GHz, the data comes from the 326 mode
+of tcrypt, and compares the performance data of sm3-generic and sm3-ce.
+The abscissas are blocks of different lengths. The data is tabulated and
+the unit is Mb/s:
 
-Encryption in CBC and CFB modes processes four blocks at a time instead of
-one, allowing the ld1 instruction to load 64 bytes of data at a time, which
-will reduces unnecessary memory accesses.
-
-CBC/CFB/CTR makes full use of free registers to reduce redundant memory
-accesses, and rearranges some instructions to improve out-of-order execution
-capabilities.
+update-size    |      16      64     256    1024    2048    4096    8192
+---------------+--------------------------------------------------------
+sm3-generic    |  185.24  221.28  301.26  307.43  300.83  308.82  308.91
+sm3-neon       |  171.81  220.20  322.94  339.28  334.09  343.61  343.87
+sm3-ce         |  227.48  333.48  502.62  527.87  520.45  534.91  535.40
 
 Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- arch/arm64/crypto/sm4-ce-asm.h  | 209 +++++++++++
- arch/arm64/crypto/sm4-ce-core.S | 646 ++++++++++++++------------------
- arch/arm64/crypto/sm4-ce-glue.c |  64 ++--
- 3 files changed, 519 insertions(+), 400 deletions(-)
- create mode 100644 arch/arm64/crypto/sm4-ce-asm.h
+ arch/arm64/crypto/Kconfig         |  11 +
+ arch/arm64/crypto/Makefile        |   3 +
+ arch/arm64/crypto/sm3-neon-core.S | 600 ++++++++++++++++++++++++++++++
+ arch/arm64/crypto/sm3-neon-glue.c | 103 +++++
+ 4 files changed, 717 insertions(+)
+ create mode 100644 arch/arm64/crypto/sm3-neon-core.S
+ create mode 100644 arch/arm64/crypto/sm3-neon-glue.c
 
-diff --git a/arch/arm64/crypto/sm4-ce-asm.h b/arch/arm64/crypto/sm4-ce-asm.h
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 8bd80508a710..4b121dc0cfba 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -96,6 +96,17 @@ config CRYPTO_SHA3_ARM64
+ 	  Architecture: arm64 using:
+ 	  - ARMv8.2 Crypto Extensions
+ 
++config CRYPTO_SM3_NEON
++	tristate "Hash functions: SM3 (NEON)"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_HASH
++	select CRYPTO_SM3
++	help
++	  SM3 (ShangMi 3) secure hash function (OSCCA GM/T 0004-2012)
++
++	  Architecture: arm64 using:
++	  - NEON (Advanced SIMD) extensions
++
+ config CRYPTO_SM3_ARM64_CE
+ 	tristate "Hash functions: SM3 (ARMv8.2 Crypto Extensions)"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index 24bb0c4610de..087f1625e775 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -17,6 +17,9 @@ sha512-ce-y := sha512-ce-glue.o sha512-ce-core.o
+ obj-$(CONFIG_CRYPTO_SHA3_ARM64) += sha3-ce.o
+ sha3-ce-y := sha3-ce-glue.o sha3-ce-core.o
+ 
++obj-$(CONFIG_CRYPTO_SM3_NEON) += sm3-neon.o
++sm3-neon-y := sm3-neon-glue.o sm3-neon-core.o
++
+ obj-$(CONFIG_CRYPTO_SM3_ARM64_CE) += sm3-ce.o
+ sm3-ce-y := sm3-ce-glue.o sm3-ce-core.o
+ 
+diff --git a/arch/arm64/crypto/sm3-neon-core.S b/arch/arm64/crypto/sm3-neon-core.S
 new file mode 100644
-index 000000000000..7ea98e42e779
+index 000000000000..3e3b4e5c736f
 --- /dev/null
-+++ b/arch/arm64/crypto/sm4-ce-asm.h
-@@ -0,0 +1,209 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
++++ b/arch/arm64/crypto/sm3-neon-core.S
+@@ -0,0 +1,600 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * SM4 helper macros for Crypto Extensions
++ * sm3-neon-core.S - SM3 secure hash using NEON instructions
++ *
++ * Linux/arm64 port of the libgcrypt SM3 implementation for AArch64
++ *
++ * Copyright (C) 2021 Jussi Kivilinna <jussi.kivilinna@iki.fi>
++ * Copyright (c) 2022 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++/* Context structure */
++
++#define state_h0 0
++#define state_h1 4
++#define state_h2 8
++#define state_h3 12
++#define state_h4 16
++#define state_h5 20
++#define state_h6 24
++#define state_h7 28
++
++/* Stack structure */
++
++#define STACK_W_SIZE        (32 * 2 * 3)
++
++#define STACK_W             (0)
++#define STACK_SIZE          (STACK_W + STACK_W_SIZE)
++
++/* Register macros */
++
++#define RSTATE x0
++#define RDATA  x1
++#define RNBLKS x2
++#define RKPTR  x28
++#define RFRAME x29
++
++#define ra w3
++#define rb w4
++#define rc w5
++#define rd w6
++#define re w7
++#define rf w8
++#define rg w9
++#define rh w10
++
++#define t0 w11
++#define t1 w12
++#define t2 w13
++#define t3 w14
++#define t4 w15
++#define t5 w16
++#define t6 w17
++
++#define k_even w19
++#define k_odd w20
++
++#define addr0 x21
++#define addr1 x22
++
++#define s0 w23
++#define s1 w24
++#define s2 w25
++#define s3 w26
++
++#define W0 v0
++#define W1 v1
++#define W2 v2
++#define W3 v3
++#define W4 v4
++#define W5 v5
++
++#define XTMP0 v6
++#define XTMP1 v7
++#define XTMP2 v16
++#define XTMP3 v17
++#define XTMP4 v18
++#define XTMP5 v19
++#define XTMP6 v20
++
++/* Helper macros. */
++
++#define _(...) /*_*/
++
++#define clear_vec(x) \
++	movi	x.8h, #0;
++
++#define rolw(o, a, n) \
++	ror	o, a, #(32 - n);
++
++/* Round function macros. */
++
++#define GG1_1(x, y, z, o, t) \
++	eor	o, x, y;
++#define GG1_2(x, y, z, o, t) \
++	eor	o, o, z;
++#define GG1_3(x, y, z, o, t)
++
++#define FF1_1(x, y, z, o, t) GG1_1(x, y, z, o, t)
++#define FF1_2(x, y, z, o, t)
++#define FF1_3(x, y, z, o, t) GG1_2(x, y, z, o, t)
++
++#define GG2_1(x, y, z, o, t) \
++	bic	o, z, x;
++#define GG2_2(x, y, z, o, t) \
++	and	t, y, x;
++#define GG2_3(x, y, z, o, t) \
++	eor	o, o, t;
++
++#define FF2_1(x, y, z, o, t) \
++	eor	o, x, y;
++#define FF2_2(x, y, z, o, t) \
++	and	t, x, y; \
++	and	o, o, z;
++#define FF2_3(x, y, z, o, t) \
++	eor	o, o, t;
++
++#define R(i, a, b, c, d, e, f, g, h, k, K_LOAD, round, widx, wtype, IOP, iop_param) \
++	K_LOAD(round);                                                        \
++	ldr	t5, [sp, #(wtype##_W1_ADDR(round, widx))];                    \
++	rolw(t0, a, 12);                              /* rol(a, 12) => t0 */  \
++      IOP(1, iop_param);                                                      \
++	FF##i##_1(a, b, c, t1, t2);                                           \
++	ldr	t6, [sp, #(wtype##_W1W2_ADDR(round, widx))];                  \
++	add	k, k, e;                                                      \
++      IOP(2, iop_param);                                                      \
++	GG##i##_1(e, f, g, t3, t4);                                           \
++	FF##i##_2(a, b, c, t1, t2);                                           \
++      IOP(3, iop_param);                                                      \
++	add	k, k, t0;                                                     \
++	add	h, h, t5;                                                     \
++	add	d, d, t6;                     /* w1w2 + d => d */             \
++      IOP(4, iop_param);                                                      \
++	rolw(k, k, 7);                        /* rol (t0 + e + t), 7) => k */ \
++	GG##i##_2(e, f, g, t3, t4);                                           \
++	add	h, h, k;                      /* h + w1 + k => h */           \
++      IOP(5, iop_param);                                                      \
++	FF##i##_3(a, b, c, t1, t2);                                           \
++	eor	t0, t0, k;                    /* k ^ t0 => t0 */              \
++	GG##i##_3(e, f, g, t3, t4);                                           \
++	add	d, d, t1;                     /* FF(a,b,c) + d => d */        \
++      IOP(6, iop_param);                                                      \
++	add	t3, t3, h;                    /* GG(e,f,g) + h => t3 */       \
++	rolw(b, b, 9);                        /* rol(b, 9) => b */            \
++	eor	h, t3, t3, ror #(32-9);                                       \
++      IOP(7, iop_param);                                                      \
++	add	d, d, t0;                     /* t0 + d => d */               \
++	rolw(f, f, 19);                       /* rol(f, 19) => f */           \
++      IOP(8, iop_param);                                                      \
++	eor	h, h, t3, ror #(32-17);       /* P0(t3) => h */
++
++#define R1(a, b, c, d, e, f, g, h, k, K_LOAD, round, widx, wtype, IOP, iop_param) \
++	R(1, ##a, ##b, ##c, ##d, ##e, ##f, ##g, ##h, ##k, K_LOAD, round, widx, wtype, IOP, iop_param)
++
++#define R2(a, b, c, d, e, f, g, h, k, K_LOAD, round, widx, wtype, IOP, iop_param) \
++	R(2, ##a, ##b, ##c, ##d, ##e, ##f, ##g, ##h, ##k, K_LOAD, round, widx, wtype, IOP, iop_param)
++
++#define KL(round) \
++	ldp	k_even, k_odd, [RKPTR, #(4*(round))];
++
++/* Input expansion macros. */
++
++/* Byte-swapped input address. */
++#define IW_W_ADDR(round, widx, offs) \
++	(STACK_W + ((round) / 4) * 64 + (offs) + ((widx) * 4))
++
++/* Expanded input address. */
++#define XW_W_ADDR(round, widx, offs) \
++	(STACK_W + ((((round) / 3) - 4) % 2) * 64 + (offs) + ((widx) * 4))
++
++/* Rounds 1-12, byte-swapped input block addresses. */
++#define IW_W1_ADDR(round, widx)   IW_W_ADDR(round, widx, 32)
++#define IW_W1W2_ADDR(round, widx) IW_W_ADDR(round, widx, 48)
++
++/* Rounds 1-12, expanded input block addresses. */
++#define XW_W1_ADDR(round, widx)   XW_W_ADDR(round, widx, 0)
++#define XW_W1W2_ADDR(round, widx) XW_W_ADDR(round, widx, 16)
++
++/* Input block loading.
++ * Interleaving within round function needed for in-order CPUs. */
++#define LOAD_W_VEC_1_1() \
++	add	addr0, sp, #IW_W1_ADDR(0, 0);
++#define LOAD_W_VEC_1_2() \
++	add	addr1, sp, #IW_W1_ADDR(4, 0);
++#define LOAD_W_VEC_1_3() \
++	ld1	{W0.16b}, [RDATA], #16;
++#define LOAD_W_VEC_1_4() \
++	ld1	{W1.16b}, [RDATA], #16;
++#define LOAD_W_VEC_1_5() \
++	ld1	{W2.16b}, [RDATA], #16;
++#define LOAD_W_VEC_1_6() \
++	ld1	{W3.16b}, [RDATA], #16;
++#define LOAD_W_VEC_1_7() \
++	rev32	XTMP0.16b, W0.16b;
++#define LOAD_W_VEC_1_8() \
++	rev32	XTMP1.16b, W1.16b;
++#define LOAD_W_VEC_2_1() \
++	rev32	XTMP2.16b, W2.16b;
++#define LOAD_W_VEC_2_2() \
++	rev32	XTMP3.16b, W3.16b;
++#define LOAD_W_VEC_2_3() \
++	eor	XTMP4.16b, XTMP1.16b, XTMP0.16b;
++#define LOAD_W_VEC_2_4() \
++	eor	XTMP5.16b, XTMP2.16b, XTMP1.16b;
++#define LOAD_W_VEC_2_5() \
++	st1	{XTMP0.16b}, [addr0], #16;
++#define LOAD_W_VEC_2_6() \
++	st1	{XTMP4.16b}, [addr0]; \
++	add	addr0, sp, #IW_W1_ADDR(8, 0);
++#define LOAD_W_VEC_2_7() \
++	eor	XTMP6.16b, XTMP3.16b, XTMP2.16b;
++#define LOAD_W_VEC_2_8() \
++	ext	W0.16b, XTMP0.16b, XTMP0.16b, #8;  /* W0: xx, w0, xx, xx */
++#define LOAD_W_VEC_3_1() \
++	mov	W2.16b, XTMP1.16b;                 /* W2: xx, w6, w5, w4 */
++#define LOAD_W_VEC_3_2() \
++	st1	{XTMP1.16b}, [addr1], #16;
++#define LOAD_W_VEC_3_3() \
++	st1	{XTMP5.16b}, [addr1]; \
++	ext	W1.16b, XTMP0.16b, XTMP0.16b, #4;  /* W1: xx, w3, w2, w1 */
++#define LOAD_W_VEC_3_4() \
++	ext	W3.16b, XTMP1.16b, XTMP2.16b, #12; /* W3: xx, w9, w8, w7 */
++#define LOAD_W_VEC_3_5() \
++	ext	W4.16b, XTMP2.16b, XTMP3.16b, #8;  /* W4: xx, w12, w11, w10 */
++#define LOAD_W_VEC_3_6() \
++	st1	{XTMP2.16b}, [addr0], #16;
++#define LOAD_W_VEC_3_7() \
++	st1	{XTMP6.16b}, [addr0];
++#define LOAD_W_VEC_3_8() \
++	ext	W5.16b, XTMP3.16b, XTMP3.16b, #4;  /* W5: xx, w15, w14, w13 */
++
++#define LOAD_W_VEC_1(iop_num, ...) \
++	LOAD_W_VEC_1_##iop_num()
++#define LOAD_W_VEC_2(iop_num, ...) \
++	LOAD_W_VEC_2_##iop_num()
++#define LOAD_W_VEC_3(iop_num, ...) \
++	LOAD_W_VEC_3_##iop_num()
++
++/* Message scheduling. Note: 3 words per vector register.
++ * Interleaving within round function needed for in-order CPUs. */
++#define SCHED_W_1_1(round, w0, w1, w2, w3, w4, w5) \
++	/* Load (w[i - 16]) => XTMP0 */            \
++	/* Load (w[i - 13]) => XTMP5 */            \
++	ext	XTMP0.16b, w0.16b, w0.16b, #12;    /* XTMP0: w0, xx, xx, xx */
++#define SCHED_W_1_2(round, w0, w1, w2, w3, w4, w5) \
++	ext	XTMP5.16b, w1.16b, w1.16b, #12;
++#define SCHED_W_1_3(round, w0, w1, w2, w3, w4, w5) \
++	ext	XTMP0.16b, XTMP0.16b, w1.16b, #12; /* XTMP0: xx, w2, w1, w0 */
++#define SCHED_W_1_4(round, w0, w1, w2, w3, w4, w5) \
++	ext	XTMP5.16b, XTMP5.16b, w2.16b, #12;
++#define SCHED_W_1_5(round, w0, w1, w2, w3, w4, w5) \
++	/* w[i - 9] == w3 */                       \
++	/* W3 ^ XTMP0 => XTMP0 */                  \
++	eor	XTMP0.16b, XTMP0.16b, w3.16b;
++#define SCHED_W_1_6(round, w0, w1, w2, w3, w4, w5) \
++	/* w[i - 3] == w5 */                       \
++	/* rol(XMM5, 15) ^ XTMP0 => XTMP0 */       \
++	/* rol(XTMP5, 7) => XTMP1 */               \
++	add	addr0, sp, #XW_W1_ADDR((round), 0); \
++	shl	XTMP2.4s, w5.4s, #15;
++#define SCHED_W_1_7(round, w0, w1, w2, w3, w4, w5) \
++	shl	XTMP1.4s, XTMP5.4s, #7;
++#define SCHED_W_1_8(round, w0, w1, w2, w3, w4, w5) \
++	sri	XTMP2.4s, w5.4s, #(32-15);
++#define SCHED_W_2_1(round, w0, w1, w2, w3, w4, w5) \
++	sri	XTMP1.4s, XTMP5.4s, #(32-7);
++#define SCHED_W_2_2(round, w0, w1, w2, w3, w4, w5) \
++	eor	XTMP0.16b, XTMP0.16b, XTMP2.16b;
++#define SCHED_W_2_3(round, w0, w1, w2, w3, w4, w5) \
++	/* w[i - 6] == W4 */                       \
++	/* W4 ^ XTMP1 => XTMP1 */                  \
++	eor	XTMP1.16b, XTMP1.16b, w4.16b;
++#define SCHED_W_2_4(round, w0, w1, w2, w3, w4, w5) \
++	/* P1(XTMP0) ^ XTMP1 => W0 */              \
++	shl	XTMP3.4s, XTMP0.4s, #15;
++#define SCHED_W_2_5(round, w0, w1, w2, w3, w4, w5) \
++	shl	XTMP4.4s, XTMP0.4s, #23;
++#define SCHED_W_2_6(round, w0, w1, w2, w3, w4, w5) \
++	eor	w0.16b, XTMP1.16b, XTMP0.16b;
++#define SCHED_W_2_7(round, w0, w1, w2, w3, w4, w5) \
++	sri	XTMP3.4s, XTMP0.4s, #(32-15);
++#define SCHED_W_2_8(round, w0, w1, w2, w3, w4, w5) \
++	sri	XTMP4.4s, XTMP0.4s, #(32-23);
++#define SCHED_W_3_1(round, w0, w1, w2, w3, w4, w5) \
++	eor	w0.16b, w0.16b, XTMP3.16b;
++#define SCHED_W_3_2(round, w0, w1, w2, w3, w4, w5) \
++	/* Load (w[i - 3]) => XTMP2 */             \
++	ext	XTMP2.16b, w4.16b, w4.16b, #12;
++#define SCHED_W_3_3(round, w0, w1, w2, w3, w4, w5) \
++	eor	w0.16b, w0.16b, XTMP4.16b;
++#define SCHED_W_3_4(round, w0, w1, w2, w3, w4, w5) \
++	ext	XTMP2.16b, XTMP2.16b, w5.16b, #12;
++#define SCHED_W_3_5(round, w0, w1, w2, w3, w4, w5) \
++	/* W1 ^ W2 => XTMP3 */                     \
++	eor	XTMP3.16b, XTMP2.16b, w0.16b;
++#define SCHED_W_3_6(round, w0, w1, w2, w3, w4, w5)
++#define SCHED_W_3_7(round, w0, w1, w2, w3, w4, w5) \
++	st1	{XTMP2.16b-XTMP3.16b}, [addr0];
++#define SCHED_W_3_8(round, w0, w1, w2, w3, w4, w5)
++
++#define SCHED_W_W0W1W2W3W4W5_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W0, W1, W2, W3, W4, W5)
++#define SCHED_W_W0W1W2W3W4W5_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W0, W1, W2, W3, W4, W5)
++#define SCHED_W_W0W1W2W3W4W5_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W0, W1, W2, W3, W4, W5)
++
++#define SCHED_W_W1W2W3W4W5W0_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W1, W2, W3, W4, W5, W0)
++#define SCHED_W_W1W2W3W4W5W0_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W1, W2, W3, W4, W5, W0)
++#define SCHED_W_W1W2W3W4W5W0_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W1, W2, W3, W4, W5, W0)
++
++#define SCHED_W_W2W3W4W5W0W1_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W2, W3, W4, W5, W0, W1)
++#define SCHED_W_W2W3W4W5W0W1_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W2, W3, W4, W5, W0, W1)
++#define SCHED_W_W2W3W4W5W0W1_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W2, W3, W4, W5, W0, W1)
++
++#define SCHED_W_W3W4W5W0W1W2_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W3, W4, W5, W0, W1, W2)
++#define SCHED_W_W3W4W5W0W1W2_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W3, W4, W5, W0, W1, W2)
++#define SCHED_W_W3W4W5W0W1W2_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W3, W4, W5, W0, W1, W2)
++
++#define SCHED_W_W4W5W0W1W2W3_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W4, W5, W0, W1, W2, W3)
++#define SCHED_W_W4W5W0W1W2W3_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W4, W5, W0, W1, W2, W3)
++#define SCHED_W_W4W5W0W1W2W3_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W4, W5, W0, W1, W2, W3)
++
++#define SCHED_W_W5W0W1W2W3W4_1(iop_num, round) \
++	SCHED_W_1_##iop_num(round, W5, W0, W1, W2, W3, W4)
++#define SCHED_W_W5W0W1W2W3W4_2(iop_num, round) \
++	SCHED_W_2_##iop_num(round, W5, W0, W1, W2, W3, W4)
++#define SCHED_W_W5W0W1W2W3W4_3(iop_num, round) \
++	SCHED_W_3_##iop_num(round, W5, W0, W1, W2, W3, W4)
++
++
++	/*
++	 * Transform blocks*64 bytes (blocks*16 32-bit words) at 'src'.
++	 *
++	 * void sm3_neon_transform(struct sm3_state *sst, u8 const *src,
++	 *                         int blocks)
++	 */
++	.text
++.align 3
++SYM_FUNC_START(sm3_neon_transform)
++	ldp		ra, rb, [RSTATE, #0]
++	ldp		rc, rd, [RSTATE, #8]
++	ldp		re, rf, [RSTATE, #16]
++	ldp		rg, rh, [RSTATE, #24]
++
++	stp		x28, x29, [sp, #-16]!
++	stp		x19, x20, [sp, #-16]!
++	stp		x21, x22, [sp, #-16]!
++	stp		x23, x24, [sp, #-16]!
++	stp		x25, x26, [sp, #-16]!
++	mov		RFRAME, sp
++
++	sub		addr0, sp, #STACK_SIZE
++	adr_l		RKPTR, .LKtable
++	and		sp, addr0, #(~63)
++
++	/* Preload first block. */
++	LOAD_W_VEC_1(1, 0)
++	LOAD_W_VEC_1(2, 0)
++	LOAD_W_VEC_1(3, 0)
++	LOAD_W_VEC_1(4, 0)
++	LOAD_W_VEC_1(5, 0)
++	LOAD_W_VEC_1(6, 0)
++	LOAD_W_VEC_1(7, 0)
++	LOAD_W_VEC_1(8, 0)
++	LOAD_W_VEC_2(1, 0)
++	LOAD_W_VEC_2(2, 0)
++	LOAD_W_VEC_2(3, 0)
++	LOAD_W_VEC_2(4, 0)
++	LOAD_W_VEC_2(5, 0)
++	LOAD_W_VEC_2(6, 0)
++	LOAD_W_VEC_2(7, 0)
++	LOAD_W_VEC_2(8, 0)
++	LOAD_W_VEC_3(1, 0)
++	LOAD_W_VEC_3(2, 0)
++	LOAD_W_VEC_3(3, 0)
++	LOAD_W_VEC_3(4, 0)
++	LOAD_W_VEC_3(5, 0)
++	LOAD_W_VEC_3(6, 0)
++	LOAD_W_VEC_3(7, 0)
++	LOAD_W_VEC_3(8, 0)
++
++.balign 16
++.Loop:
++	/* Transform 0-3 */
++	R1(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 0, 0, IW, _, 0)
++	R1(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  1, 1, IW, _, 0)
++	R1(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 2, 2, IW, _, 0)
++	R1(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  3, 3, IW, _, 0)
++
++	/* Transform 4-7 + Precalc 12-14 */
++	R1(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 4, 0, IW, _, 0)
++	R1(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  5, 1, IW, _, 0)
++	R1(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 6, 2, IW, SCHED_W_W0W1W2W3W4W5_1, 12)
++	R1(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  7, 3, IW, SCHED_W_W0W1W2W3W4W5_2, 12)
++
++	/* Transform 8-11 + Precalc 12-17 */
++	R1(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 8, 0, IW, SCHED_W_W0W1W2W3W4W5_3, 12)
++	R1(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  9, 1, IW, SCHED_W_W1W2W3W4W5W0_1, 15)
++	R1(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 10, 2, IW, SCHED_W_W1W2W3W4W5W0_2, 15)
++	R1(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  11, 3, IW, SCHED_W_W1W2W3W4W5W0_3, 15)
++
++	/* Transform 12-14 + Precalc 18-20 */
++	R1(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 12, 0, XW, SCHED_W_W2W3W4W5W0W1_1, 18)
++	R1(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  13, 1, XW, SCHED_W_W2W3W4W5W0W1_2, 18)
++	R1(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 14, 2, XW, SCHED_W_W2W3W4W5W0W1_3, 18)
++
++	/* Transform 15-17 + Precalc 21-23 */
++	R1(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  15, 0, XW, SCHED_W_W3W4W5W0W1W2_1, 21)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 16, 1, XW, SCHED_W_W3W4W5W0W1W2_2, 21)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  17, 2, XW, SCHED_W_W3W4W5W0W1W2_3, 21)
++
++	/* Transform 18-20 + Precalc 24-26 */
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 18, 0, XW, SCHED_W_W4W5W0W1W2W3_1, 24)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  19, 1, XW, SCHED_W_W4W5W0W1W2W3_2, 24)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 20, 2, XW, SCHED_W_W4W5W0W1W2W3_3, 24)
++
++	/* Transform 21-23 + Precalc 27-29 */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  21, 0, XW, SCHED_W_W5W0W1W2W3W4_1, 27)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 22, 1, XW, SCHED_W_W5W0W1W2W3W4_2, 27)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  23, 2, XW, SCHED_W_W5W0W1W2W3W4_3, 27)
++
++	/* Transform 24-26 + Precalc 30-32 */
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 24, 0, XW, SCHED_W_W0W1W2W3W4W5_1, 30)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  25, 1, XW, SCHED_W_W0W1W2W3W4W5_2, 30)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 26, 2, XW, SCHED_W_W0W1W2W3W4W5_3, 30)
++
++	/* Transform 27-29 + Precalc 33-35 */
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  27, 0, XW, SCHED_W_W1W2W3W4W5W0_1, 33)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 28, 1, XW, SCHED_W_W1W2W3W4W5W0_2, 33)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  29, 2, XW, SCHED_W_W1W2W3W4W5W0_3, 33)
++
++	/* Transform 30-32 + Precalc 36-38 */
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 30, 0, XW, SCHED_W_W2W3W4W5W0W1_1, 36)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  31, 1, XW, SCHED_W_W2W3W4W5W0W1_2, 36)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 32, 2, XW, SCHED_W_W2W3W4W5W0W1_3, 36)
++
++	/* Transform 33-35 + Precalc 39-41 */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  33, 0, XW, SCHED_W_W3W4W5W0W1W2_1, 39)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 34, 1, XW, SCHED_W_W3W4W5W0W1W2_2, 39)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  35, 2, XW, SCHED_W_W3W4W5W0W1W2_3, 39)
++
++	/* Transform 36-38 + Precalc 42-44 */
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 36, 0, XW, SCHED_W_W4W5W0W1W2W3_1, 42)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  37, 1, XW, SCHED_W_W4W5W0W1W2W3_2, 42)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 38, 2, XW, SCHED_W_W4W5W0W1W2W3_3, 42)
++
++	/* Transform 39-41 + Precalc 45-47 */
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  39, 0, XW, SCHED_W_W5W0W1W2W3W4_1, 45)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 40, 1, XW, SCHED_W_W5W0W1W2W3W4_2, 45)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  41, 2, XW, SCHED_W_W5W0W1W2W3W4_3, 45)
++
++	/* Transform 42-44 + Precalc 48-50 */
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 42, 0, XW, SCHED_W_W0W1W2W3W4W5_1, 48)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  43, 1, XW, SCHED_W_W0W1W2W3W4W5_2, 48)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 44, 2, XW, SCHED_W_W0W1W2W3W4W5_3, 48)
++
++	/* Transform 45-47 + Precalc 51-53 */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  45, 0, XW, SCHED_W_W1W2W3W4W5W0_1, 51)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 46, 1, XW, SCHED_W_W1W2W3W4W5W0_2, 51)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  47, 2, XW, SCHED_W_W1W2W3W4W5W0_3, 51)
++
++	/* Transform 48-50 + Precalc 54-56 */
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 48, 0, XW, SCHED_W_W2W3W4W5W0W1_1, 54)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  49, 1, XW, SCHED_W_W2W3W4W5W0W1_2, 54)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 50, 2, XW, SCHED_W_W2W3W4W5W0W1_3, 54)
++
++	/* Transform 51-53 + Precalc 57-59 */
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  51, 0, XW, SCHED_W_W3W4W5W0W1W2_1, 57)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 52, 1, XW, SCHED_W_W3W4W5W0W1W2_2, 57)
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  53, 2, XW, SCHED_W_W3W4W5W0W1W2_3, 57)
++
++	/* Transform 54-56 + Precalc 60-62 */
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 54, 0, XW, SCHED_W_W4W5W0W1W2W3_1, 60)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  55, 1, XW, SCHED_W_W4W5W0W1W2W3_2, 60)
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 56, 2, XW, SCHED_W_W4W5W0W1W2W3_3, 60)
++
++	/* Transform 57-59 + Precalc 63 */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  57, 0, XW, SCHED_W_W5W0W1W2W3W4_1, 63)
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 58, 1, XW, SCHED_W_W5W0W1W2W3W4_2, 63)
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  59, 2, XW, SCHED_W_W5W0W1W2W3W4_3, 63)
++
++	/* Transform 60 */
++	R2(ra, rb, rc, rd, re, rf, rg, rh, k_even, KL, 60, 0, XW, _, _)
++	subs		RNBLKS, RNBLKS, #1
++	b.eq		.Lend
++
++	/* Transform 61-63 + Preload next block */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  61, 1, XW, LOAD_W_VEC_1, _)
++	ldp		s0, s1, [RSTATE, #0]
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 62, 2, XW, LOAD_W_VEC_2, _)
++	ldp		s2, s3, [RSTATE, #8]
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  63, 0, XW, LOAD_W_VEC_3, _)
++
++	/* Update the chaining variables. */
++	eor		ra, ra, s0
++	eor		rb, rb, s1
++	ldp		s0, s1, [RSTATE, #16]
++	eor		rc, rc, s2
++	ldp		k_even, k_odd, [RSTATE, #24]
++	eor		rd, rd, s3
++	eor		re, re, s0
++	stp		ra, rb, [RSTATE, #0]
++	eor		rf, rf, s1
++	stp		rc, rd, [RSTATE, #8]
++	eor		rg, rg, k_even
++	stp		re, rf, [RSTATE, #16]
++	eor		rh, rh, k_odd
++	stp		rg, rh, [RSTATE, #24]
++	b		.Loop
++
++.Lend:
++	/* Transform 61-63 */
++	R2(rd, ra, rb, rc, rh, re, rf, rg, k_odd,  _,  61, 1, XW, _, _)
++	ldp		s0, s1, [RSTATE, #0]
++	R2(rc, rd, ra, rb, rg, rh, re, rf, k_even, KL, 62, 2, XW, _, _)
++	ldp		s2, s3, [RSTATE, #8]
++	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  63, 0, XW, _, _)
++
++	/* Update the chaining variables. */
++	eor		ra, ra, s0
++	clear_vec(W0)
++	eor		rb, rb, s1
++	clear_vec(W1)
++	ldp		s0, s1, [RSTATE, #16]
++	clear_vec(W2)
++	eor		rc, rc, s2
++	clear_vec(W3)
++	ldp		k_even, k_odd, [RSTATE, #24]
++	clear_vec(W4)
++	eor		rd, rd, s3
++	clear_vec(W5)
++	eor		re, re, s0
++	clear_vec(XTMP0)
++	stp		ra, rb, [RSTATE, #0]
++	clear_vec(XTMP1)
++	eor		rf, rf, s1
++	clear_vec(XTMP2)
++	stp		rc, rd, [RSTATE, #8]
++	clear_vec(XTMP3)
++	eor		rg, rg, k_even
++	clear_vec(XTMP4)
++	stp		re, rf, [RSTATE, #16]
++	clear_vec(XTMP5)
++	eor		rh, rh, k_odd
++	clear_vec(XTMP6)
++	stp		rg, rh, [RSTATE, #24]
++
++	/* Clear message expansion area */
++	add		addr0, sp, #STACK_W
++	st1		{W0.16b-W3.16b}, [addr0], #64
++	st1		{W0.16b-W3.16b}, [addr0], #64
++	st1		{W0.16b-W3.16b}, [addr0]
++
++	mov		sp, RFRAME
++
++	ldp		x25, x26, [sp], #16
++	ldp		x23, x24, [sp], #16
++	ldp		x21, x22, [sp], #16
++	ldp		x19, x20, [sp], #16
++	ldp		x28, x29, [sp], #16
++
++	ret
++SYM_FUNC_END(sm3_neon_transform)
++
++
++	.section	".rodata", "a"
++
++	.align 4
++.LKtable:
++	.long 0x79cc4519, 0xf3988a32, 0xe7311465, 0xce6228cb
++	.long 0x9cc45197, 0x3988a32f, 0x7311465e, 0xe6228cbc
++	.long 0xcc451979, 0x988a32f3, 0x311465e7, 0x6228cbce
++	.long 0xc451979c, 0x88a32f39, 0x11465e73, 0x228cbce6
++	.long 0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c
++	.long 0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce
++	.long 0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec
++	.long 0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5
++	.long 0x7a879d8a, 0xf50f3b14, 0xea1e7629, 0xd43cec53
++	.long 0xa879d8a7, 0x50f3b14f, 0xa1e7629e, 0x43cec53d
++	.long 0x879d8a7a, 0x0f3b14f5, 0x1e7629ea, 0x3cec53d4
++	.long 0x79d8a7a8, 0xf3b14f50, 0xe7629ea1, 0xcec53d43
++	.long 0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c
++	.long 0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce
++	.long 0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec
++	.long 0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5
+diff --git a/arch/arm64/crypto/sm3-neon-glue.c b/arch/arm64/crypto/sm3-neon-glue.c
+new file mode 100644
+index 000000000000..7182ee683f14
+--- /dev/null
++++ b/arch/arm64/crypto/sm3-neon-glue.c
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * sm3-neon-glue.c - SM3 secure hash using NEON instructions
++ *
 + * Copyright (C) 2022 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 + */
 +
-+#define SM4_PREPARE(ptr)					\
-+	ld1		{v24.16b-v27.16b}, [ptr], #64;		\
-+	ld1		{v28.16b-v31.16b}, [ptr];
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <asm/unaligned.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
++#include <crypto/sm3.h>
++#include <crypto/sm3_base.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
 +
-+#define SM4_CRYPT_BLK_BE(b0)					\
-+	sm4e		b0.4s, v24.4s;				\
-+	sm4e		b0.4s, v25.4s;				\
-+	sm4e		b0.4s, v26.4s;				\
-+	sm4e		b0.4s, v27.4s;				\
-+	sm4e		b0.4s, v28.4s;				\
-+	sm4e		b0.4s, v29.4s;				\
-+	sm4e		b0.4s, v30.4s;				\
-+	sm4e		b0.4s, v31.4s;				\
-+	rev64		b0.4s, b0.4s;				\
-+	ext		b0.16b, b0.16b, b0.16b, #8;		\
-+	rev32		b0.16b, b0.16b;
 +
-+#define SM4_CRYPT_BLK(b0)					\
-+	rev32		b0.16b, b0.16b;				\
-+	SM4_CRYPT_BLK_BE(b0);
++asmlinkage void sm3_neon_transform(struct sm3_state *sst, u8 const *src,
++				   int blocks);
 +
-+#define SM4_CRYPT_BLK2_BE(b0, b1)				\
-+	sm4e		b0.4s, v24.4s;				\
-+	sm4e		b1.4s, v24.4s;				\
-+	sm4e		b0.4s, v25.4s;				\
-+	sm4e		b1.4s, v25.4s;				\
-+	sm4e		b0.4s, v26.4s;				\
-+	sm4e		b1.4s, v26.4s;				\
-+	sm4e		b0.4s, v27.4s;				\
-+	sm4e		b1.4s, v27.4s;				\
-+	sm4e		b0.4s, v28.4s;				\
-+	sm4e		b1.4s, v28.4s;				\
-+	sm4e		b0.4s, v29.4s;				\
-+	sm4e		b1.4s, v29.4s;				\
-+	sm4e		b0.4s, v30.4s;				\
-+	sm4e		b1.4s, v30.4s;				\
-+	sm4e		b0.4s, v31.4s;				\
-+	sm4e		b1.4s, v31.4s;				\
-+	rev64		b0.4s, b0.4s;				\
-+	rev64		b1.4s, b1.4s;				\
-+	ext		b0.16b, b0.16b, b0.16b, #8;		\
-+	ext		b1.16b, b1.16b, b1.16b, #8;		\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+
-+#define SM4_CRYPT_BLK2(b0, b1)					\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+	SM4_CRYPT_BLK2_BE(b0, b1);
-+
-+#define SM4_CRYPT_BLK4_BE(b0, b1, b2, b3)			\
-+	sm4e		b0.4s, v24.4s;				\
-+	sm4e		b1.4s, v24.4s;				\
-+	sm4e		b2.4s, v24.4s;				\
-+	sm4e		b3.4s, v24.4s;				\
-+	sm4e		b0.4s, v25.4s;				\
-+	sm4e		b1.4s, v25.4s;				\
-+	sm4e		b2.4s, v25.4s;				\
-+	sm4e		b3.4s, v25.4s;				\
-+	sm4e		b0.4s, v26.4s;				\
-+	sm4e		b1.4s, v26.4s;				\
-+	sm4e		b2.4s, v26.4s;				\
-+	sm4e		b3.4s, v26.4s;				\
-+	sm4e		b0.4s, v27.4s;				\
-+	sm4e		b1.4s, v27.4s;				\
-+	sm4e		b2.4s, v27.4s;				\
-+	sm4e		b3.4s, v27.4s;				\
-+	sm4e		b0.4s, v28.4s;				\
-+	sm4e		b1.4s, v28.4s;				\
-+	sm4e		b2.4s, v28.4s;				\
-+	sm4e		b3.4s, v28.4s;				\
-+	sm4e		b0.4s, v29.4s;				\
-+	sm4e		b1.4s, v29.4s;				\
-+	sm4e		b2.4s, v29.4s;				\
-+	sm4e		b3.4s, v29.4s;				\
-+	sm4e		b0.4s, v30.4s;				\
-+	sm4e		b1.4s, v30.4s;				\
-+	sm4e		b2.4s, v30.4s;				\
-+	sm4e		b3.4s, v30.4s;				\
-+	sm4e		b0.4s, v31.4s;				\
-+	sm4e		b1.4s, v31.4s;				\
-+	sm4e		b2.4s, v31.4s;				\
-+	sm4e		b3.4s, v31.4s;				\
-+	rev64		b0.4s, b0.4s;				\
-+	rev64		b1.4s, b1.4s;				\
-+	rev64		b2.4s, b2.4s;				\
-+	rev64		b3.4s, b3.4s;				\
-+	ext		b0.16b, b0.16b, b0.16b, #8;		\
-+	ext		b1.16b, b1.16b, b1.16b, #8;		\
-+	ext		b2.16b, b2.16b, b2.16b, #8;		\
-+	ext		b3.16b, b3.16b, b3.16b, #8;		\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+	rev32		b2.16b, b2.16b;				\
-+	rev32		b3.16b, b3.16b;
-+
-+#define SM4_CRYPT_BLK4(b0, b1, b2, b3)				\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+	rev32		b2.16b, b2.16b;				\
-+	rev32		b3.16b, b3.16b;				\
-+	SM4_CRYPT_BLK4_BE(b0, b1, b2, b3);
-+
-+#define SM4_CRYPT_BLK8_BE(b0, b1, b2, b3, b4, b5, b6, b7)	\
-+	sm4e		b0.4s, v24.4s;				\
-+	sm4e		b1.4s, v24.4s;				\
-+	sm4e		b2.4s, v24.4s;				\
-+	sm4e		b3.4s, v24.4s;				\
-+	sm4e		b4.4s, v24.4s;				\
-+	sm4e		b5.4s, v24.4s;				\
-+	sm4e		b6.4s, v24.4s;				\
-+	sm4e		b7.4s, v24.4s;				\
-+	sm4e		b0.4s, v25.4s;				\
-+	sm4e		b1.4s, v25.4s;				\
-+	sm4e		b2.4s, v25.4s;				\
-+	sm4e		b3.4s, v25.4s;				\
-+	sm4e		b4.4s, v25.4s;				\
-+	sm4e		b5.4s, v25.4s;				\
-+	sm4e		b6.4s, v25.4s;				\
-+	sm4e		b7.4s, v25.4s;				\
-+	sm4e		b0.4s, v26.4s;				\
-+	sm4e		b1.4s, v26.4s;				\
-+	sm4e		b2.4s, v26.4s;				\
-+	sm4e		b3.4s, v26.4s;				\
-+	sm4e		b4.4s, v26.4s;				\
-+	sm4e		b5.4s, v26.4s;				\
-+	sm4e		b6.4s, v26.4s;				\
-+	sm4e		b7.4s, v26.4s;				\
-+	sm4e		b0.4s, v27.4s;				\
-+	sm4e		b1.4s, v27.4s;				\
-+	sm4e		b2.4s, v27.4s;				\
-+	sm4e		b3.4s, v27.4s;				\
-+	sm4e		b4.4s, v27.4s;				\
-+	sm4e		b5.4s, v27.4s;				\
-+	sm4e		b6.4s, v27.4s;				\
-+	sm4e		b7.4s, v27.4s;				\
-+	sm4e		b0.4s, v28.4s;				\
-+	sm4e		b1.4s, v28.4s;				\
-+	sm4e		b2.4s, v28.4s;				\
-+	sm4e		b3.4s, v28.4s;				\
-+	sm4e		b4.4s, v28.4s;				\
-+	sm4e		b5.4s, v28.4s;				\
-+	sm4e		b6.4s, v28.4s;				\
-+	sm4e		b7.4s, v28.4s;				\
-+	sm4e		b0.4s, v29.4s;				\
-+	sm4e		b1.4s, v29.4s;				\
-+	sm4e		b2.4s, v29.4s;				\
-+	sm4e		b3.4s, v29.4s;				\
-+	sm4e		b4.4s, v29.4s;				\
-+	sm4e		b5.4s, v29.4s;				\
-+	sm4e		b6.4s, v29.4s;				\
-+	sm4e		b7.4s, v29.4s;				\
-+	sm4e		b0.4s, v30.4s;				\
-+	sm4e		b1.4s, v30.4s;				\
-+	sm4e		b2.4s, v30.4s;				\
-+	sm4e		b3.4s, v30.4s;				\
-+	sm4e		b4.4s, v30.4s;				\
-+	sm4e		b5.4s, v30.4s;				\
-+	sm4e		b6.4s, v30.4s;				\
-+	sm4e		b7.4s, v30.4s;				\
-+	sm4e		b0.4s, v31.4s;				\
-+	sm4e		b1.4s, v31.4s;				\
-+	sm4e		b2.4s, v31.4s;				\
-+	sm4e		b3.4s, v31.4s;				\
-+	sm4e		b4.4s, v31.4s;				\
-+	sm4e		b5.4s, v31.4s;				\
-+	sm4e		b6.4s, v31.4s;				\
-+	sm4e		b7.4s, v31.4s;				\
-+	rev64		b0.4s, b0.4s;				\
-+	rev64		b1.4s, b1.4s;				\
-+	rev64		b2.4s, b2.4s;				\
-+	rev64		b3.4s, b3.4s;				\
-+	rev64		b4.4s, b4.4s;				\
-+	rev64		b5.4s, b5.4s;				\
-+	rev64		b6.4s, b6.4s;				\
-+	rev64		b7.4s, b7.4s;				\
-+	ext		b0.16b, b0.16b, b0.16b, #8;		\
-+	ext		b1.16b, b1.16b, b1.16b, #8;		\
-+	ext		b2.16b, b2.16b, b2.16b, #8;		\
-+	ext		b3.16b, b3.16b, b3.16b, #8;		\
-+	ext		b4.16b, b4.16b, b4.16b, #8;		\
-+	ext		b5.16b, b5.16b, b5.16b, #8;		\
-+	ext		b6.16b, b6.16b, b6.16b, #8;		\
-+	ext		b7.16b, b7.16b, b7.16b, #8;		\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+	rev32		b2.16b, b2.16b;				\
-+	rev32		b3.16b, b3.16b;				\
-+	rev32		b4.16b, b4.16b;				\
-+	rev32		b5.16b, b5.16b;				\
-+	rev32		b6.16b, b6.16b;				\
-+	rev32		b7.16b, b7.16b;
-+
-+#define SM4_CRYPT_BLK8(b0, b1, b2, b3, b4, b5, b6, b7)		\
-+	rev32		b0.16b, b0.16b;				\
-+	rev32		b1.16b, b1.16b;				\
-+	rev32		b2.16b, b2.16b;				\
-+	rev32		b3.16b, b3.16b;				\
-+	rev32		b4.16b, b4.16b;				\
-+	rev32		b5.16b, b5.16b;				\
-+	rev32		b6.16b, b6.16b;				\
-+	rev32		b7.16b, b7.16b;				\
-+	SM4_CRYPT_BLK8_BE(b0, b1, b2, b3, b4, b5, b6, b7);
-diff --git a/arch/arm64/crypto/sm4-ce-core.S b/arch/arm64/crypto/sm4-ce-core.S
-index 934e0f093279..41fc745a8528 100644
---- a/arch/arm64/crypto/sm4-ce-core.S
-+++ b/arch/arm64/crypto/sm4-ce-core.S
-@@ -10,10 +10,12 @@
- 
- #include <linux/linkage.h>
- #include <asm/assembler.h>
-+#include "sm4-ce-asm.h"
- 
- .arch	armv8-a+crypto
- 
--.irp b, 0, 1, 2, 3, 4, 5, 6, 7, 16, 20, 24, 25, 26, 27, 28, 29, 30, 31
-+.irp b, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, \
-+		20, 24, 25, 26, 27, 28, 29, 30, 31
- 	.set .Lv\b\().4s, \b
- .endr
- 
-@@ -34,174 +36,6 @@
- 
- #define RIV	v20
- 
--/* Helper macros. */
--
--#define PREPARE                                       \
--	ld1		{v24.16b-v27.16b}, [x0], #64; \
--	ld1		{v28.16b-v31.16b}, [x0];
--
--#define SM4_CRYPT_BLK(b0)                           \
--	rev32		b0.16b, b0.16b;             \
--	sm4e		b0.4s, v24.4s;              \
--	sm4e		b0.4s, v25.4s;              \
--	sm4e		b0.4s, v26.4s;              \
--	sm4e		b0.4s, v27.4s;              \
--	sm4e		b0.4s, v28.4s;              \
--	sm4e		b0.4s, v29.4s;              \
--	sm4e		b0.4s, v30.4s;              \
--	sm4e		b0.4s, v31.4s;              \
--	rev64		b0.4s, b0.4s;               \
--	ext		b0.16b, b0.16b, b0.16b, #8; \
--	rev32		b0.16b, b0.16b;
--
--#define SM4_CRYPT_BLK4(b0, b1, b2, b3)              \
--	rev32		b0.16b, b0.16b;             \
--	rev32		b1.16b, b1.16b;             \
--	rev32		b2.16b, b2.16b;             \
--	rev32		b3.16b, b3.16b;             \
--	sm4e		b0.4s, v24.4s;              \
--	sm4e		b1.4s, v24.4s;              \
--	sm4e		b2.4s, v24.4s;              \
--	sm4e		b3.4s, v24.4s;              \
--	sm4e		b0.4s, v25.4s;              \
--	sm4e		b1.4s, v25.4s;              \
--	sm4e		b2.4s, v25.4s;              \
--	sm4e		b3.4s, v25.4s;              \
--	sm4e		b0.4s, v26.4s;              \
--	sm4e		b1.4s, v26.4s;              \
--	sm4e		b2.4s, v26.4s;              \
--	sm4e		b3.4s, v26.4s;              \
--	sm4e		b0.4s, v27.4s;              \
--	sm4e		b1.4s, v27.4s;              \
--	sm4e		b2.4s, v27.4s;              \
--	sm4e		b3.4s, v27.4s;              \
--	sm4e		b0.4s, v28.4s;              \
--	sm4e		b1.4s, v28.4s;              \
--	sm4e		b2.4s, v28.4s;              \
--	sm4e		b3.4s, v28.4s;              \
--	sm4e		b0.4s, v29.4s;              \
--	sm4e		b1.4s, v29.4s;              \
--	sm4e		b2.4s, v29.4s;              \
--	sm4e		b3.4s, v29.4s;              \
--	sm4e		b0.4s, v30.4s;              \
--	sm4e		b1.4s, v30.4s;              \
--	sm4e		b2.4s, v30.4s;              \
--	sm4e		b3.4s, v30.4s;              \
--	sm4e		b0.4s, v31.4s;              \
--	sm4e		b1.4s, v31.4s;              \
--	sm4e		b2.4s, v31.4s;              \
--	sm4e		b3.4s, v31.4s;              \
--	rev64		b0.4s, b0.4s;               \
--	rev64		b1.4s, b1.4s;               \
--	rev64		b2.4s, b2.4s;               \
--	rev64		b3.4s, b3.4s;               \
--	ext		b0.16b, b0.16b, b0.16b, #8; \
--	ext		b1.16b, b1.16b, b1.16b, #8; \
--	ext		b2.16b, b2.16b, b2.16b, #8; \
--	ext		b3.16b, b3.16b, b3.16b, #8; \
--	rev32		b0.16b, b0.16b;             \
--	rev32		b1.16b, b1.16b;             \
--	rev32		b2.16b, b2.16b;             \
--	rev32		b3.16b, b3.16b;
--
--#define SM4_CRYPT_BLK8(b0, b1, b2, b3, b4, b5, b6, b7) \
--	rev32		b0.16b, b0.16b;             \
--	rev32		b1.16b, b1.16b;             \
--	rev32		b2.16b, b2.16b;             \
--	rev32		b3.16b, b3.16b;             \
--	rev32		b4.16b, b4.16b;             \
--	rev32		b5.16b, b5.16b;             \
--	rev32		b6.16b, b6.16b;             \
--	rev32		b7.16b, b7.16b;             \
--	sm4e		b0.4s, v24.4s;              \
--	sm4e		b1.4s, v24.4s;              \
--	sm4e		b2.4s, v24.4s;              \
--	sm4e		b3.4s, v24.4s;              \
--	sm4e		b4.4s, v24.4s;              \
--	sm4e		b5.4s, v24.4s;              \
--	sm4e		b6.4s, v24.4s;              \
--	sm4e		b7.4s, v24.4s;              \
--	sm4e		b0.4s, v25.4s;              \
--	sm4e		b1.4s, v25.4s;              \
--	sm4e		b2.4s, v25.4s;              \
--	sm4e		b3.4s, v25.4s;              \
--	sm4e		b4.4s, v25.4s;              \
--	sm4e		b5.4s, v25.4s;              \
--	sm4e		b6.4s, v25.4s;              \
--	sm4e		b7.4s, v25.4s;              \
--	sm4e		b0.4s, v26.4s;              \
--	sm4e		b1.4s, v26.4s;              \
--	sm4e		b2.4s, v26.4s;              \
--	sm4e		b3.4s, v26.4s;              \
--	sm4e		b4.4s, v26.4s;              \
--	sm4e		b5.4s, v26.4s;              \
--	sm4e		b6.4s, v26.4s;              \
--	sm4e		b7.4s, v26.4s;              \
--	sm4e		b0.4s, v27.4s;              \
--	sm4e		b1.4s, v27.4s;              \
--	sm4e		b2.4s, v27.4s;              \
--	sm4e		b3.4s, v27.4s;              \
--	sm4e		b4.4s, v27.4s;              \
--	sm4e		b5.4s, v27.4s;              \
--	sm4e		b6.4s, v27.4s;              \
--	sm4e		b7.4s, v27.4s;              \
--	sm4e		b0.4s, v28.4s;              \
--	sm4e		b1.4s, v28.4s;              \
--	sm4e		b2.4s, v28.4s;              \
--	sm4e		b3.4s, v28.4s;              \
--	sm4e		b4.4s, v28.4s;              \
--	sm4e		b5.4s, v28.4s;              \
--	sm4e		b6.4s, v28.4s;              \
--	sm4e		b7.4s, v28.4s;              \
--	sm4e		b0.4s, v29.4s;              \
--	sm4e		b1.4s, v29.4s;              \
--	sm4e		b2.4s, v29.4s;              \
--	sm4e		b3.4s, v29.4s;              \
--	sm4e		b4.4s, v29.4s;              \
--	sm4e		b5.4s, v29.4s;              \
--	sm4e		b6.4s, v29.4s;              \
--	sm4e		b7.4s, v29.4s;              \
--	sm4e		b0.4s, v30.4s;              \
--	sm4e		b1.4s, v30.4s;              \
--	sm4e		b2.4s, v30.4s;              \
--	sm4e		b3.4s, v30.4s;              \
--	sm4e		b4.4s, v30.4s;              \
--	sm4e		b5.4s, v30.4s;              \
--	sm4e		b6.4s, v30.4s;              \
--	sm4e		b7.4s, v30.4s;              \
--	sm4e		b0.4s, v31.4s;              \
--	sm4e		b1.4s, v31.4s;              \
--	sm4e		b2.4s, v31.4s;              \
--	sm4e		b3.4s, v31.4s;              \
--	sm4e		b4.4s, v31.4s;              \
--	sm4e		b5.4s, v31.4s;              \
--	sm4e		b6.4s, v31.4s;              \
--	sm4e		b7.4s, v31.4s;              \
--	rev64		b0.4s, b0.4s;               \
--	rev64		b1.4s, b1.4s;               \
--	rev64		b2.4s, b2.4s;               \
--	rev64		b3.4s, b3.4s;               \
--	rev64		b4.4s, b4.4s;               \
--	rev64		b5.4s, b5.4s;               \
--	rev64		b6.4s, b6.4s;               \
--	rev64		b7.4s, b7.4s;               \
--	ext		b0.16b, b0.16b, b0.16b, #8; \
--	ext		b1.16b, b1.16b, b1.16b, #8; \
--	ext		b2.16b, b2.16b, b2.16b, #8; \
--	ext		b3.16b, b3.16b, b3.16b, #8; \
--	ext		b4.16b, b4.16b, b4.16b, #8; \
--	ext		b5.16b, b5.16b, b5.16b, #8; \
--	ext		b6.16b, b6.16b, b6.16b, #8; \
--	ext		b7.16b, b7.16b, b7.16b, #8; \
--	rev32		b0.16b, b0.16b;             \
--	rev32		b1.16b, b1.16b;             \
--	rev32		b2.16b, b2.16b;             \
--	rev32		b3.16b, b3.16b;             \
--	rev32		b4.16b, b4.16b;             \
--	rev32		b5.16b, b5.16b;             \
--	rev32		b6.16b, b6.16b;             \
--	rev32		b7.16b, b7.16b;
--
- 
- .align 3
- SYM_FUNC_START(sm4_ce_expand_key)
-@@ -268,7 +102,7 @@ SYM_FUNC_START(sm4_ce_crypt_block)
- 	 *   x1: dst
- 	 *   x2: src
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
- 
- 	ld1		{v0.16b}, [x2];
- 	SM4_CRYPT_BLK(v0);
-@@ -285,7 +119,7 @@ SYM_FUNC_START(sm4_ce_crypt)
- 	 *   x2: src
- 	 *   w3: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
- 
- .Lcrypt_loop_blk:
- 	sub		w3, w3, #8;
-@@ -337,26 +171,50 @@ SYM_FUNC_START(sm4_ce_cbc_enc)
- 	 *   x3: iv (big endian, 128 bit)
- 	 *   w4: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
-+
-+	ld1		{RIV.16b}, [x3]
-+
-+.Lcbc_enc_loop_4x:
-+	cmp		w4, #4
-+	blt		.Lcbc_enc_loop_1x
-+
-+	sub		w4, w4, #4
- 
--	ld1		{RIV.16b}, [x3];
-+	ld1		{v0.16b-v3.16b}, [x2], #64
- 
--.Lcbc_enc_loop:
--	sub		w4, w4, #1;
-+	eor		v0.16b, v0.16b, RIV.16b
-+	SM4_CRYPT_BLK(v0)
-+	eor		v1.16b, v1.16b, v0.16b
-+	SM4_CRYPT_BLK(v1)
-+	eor		v2.16b, v2.16b, v1.16b
-+	SM4_CRYPT_BLK(v2)
-+	eor		v3.16b, v3.16b, v2.16b
-+	SM4_CRYPT_BLK(v3)
- 
--	ld1		{RTMP0.16b}, [x2], #16;
--	eor		RIV.16b, RIV.16b, RTMP0.16b;
-+	st1		{v0.16b-v3.16b}, [x1], #64
-+	mov		RIV.16b, v3.16b
- 
--	SM4_CRYPT_BLK(RIV);
-+	cbz		w4, .Lcbc_enc_end
-+	b		.Lcbc_enc_loop_4x
- 
--	st1		{RIV.16b}, [x1], #16;
-+.Lcbc_enc_loop_1x:
-+	sub		w4, w4, #1
- 
--	cbnz		w4, .Lcbc_enc_loop;
-+	ld1		{v0.16b}, [x2], #16
- 
-+	eor		RIV.16b, RIV.16b, v0.16b
-+	SM4_CRYPT_BLK(RIV)
-+
-+	st1		{RIV.16b}, [x1], #16
-+
-+	cbnz		w4, .Lcbc_enc_loop_1x
-+
-+.Lcbc_enc_end:
- 	/* store new IV */
--	st1		{RIV.16b}, [x3];
-+	st1		{RIV.16b}, [x3]
- 
--	ret;
-+	ret
- SYM_FUNC_END(sm4_ce_cbc_enc)
- 
- .align 3
-@@ -368,79 +226,93 @@ SYM_FUNC_START(sm4_ce_cbc_dec)
- 	 *   x3: iv (big endian, 128 bit)
- 	 *   w4: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
- 
--	ld1		{RIV.16b}, [x3];
-+	ld1		{RIV.16b}, [x3]
- 
--.Lcbc_loop_blk:
--	sub		w4, w4, #8;
--	tbnz		w4, #31, .Lcbc_tail8;
-+.Lcbc_dec_loop_8x:
-+	sub		w4, w4, #8
-+	tbnz		w4, #31, .Lcbc_dec_4x
- 
--	ld1		{v0.16b-v3.16b}, [x2], #64;
--	ld1		{v4.16b-v7.16b}, [x2];
-+	ld1		{v0.16b-v3.16b}, [x2], #64
-+	ld1		{v4.16b-v7.16b}, [x2], #64
- 
--	SM4_CRYPT_BLK8(v0, v1, v2, v3, v4, v5, v6, v7);
-+	rev32		v8.16b, v0.16b
-+	rev32		v9.16b, v1.16b
-+	rev32		v10.16b, v2.16b
-+	rev32		v11.16b, v3.16b
-+	rev32		v12.16b, v4.16b
-+	rev32		v13.16b, v5.16b
-+	rev32		v14.16b, v6.16b
-+	rev32		v15.16b, v7.16b
- 
--	sub		x2, x2, #64;
--	eor		v0.16b, v0.16b, RIV.16b;
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v1.16b, v1.16b, RTMP0.16b;
--	eor		v2.16b, v2.16b, RTMP1.16b;
--	eor		v3.16b, v3.16b, RTMP2.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
-+	SM4_CRYPT_BLK8_BE(v8, v9, v10, v11, v12, v13, v14, v15)
- 
--	eor		v4.16b, v4.16b, RTMP3.16b;
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v5.16b, v5.16b, RTMP0.16b;
--	eor		v6.16b, v6.16b, RTMP1.16b;
--	eor		v7.16b, v7.16b, RTMP2.16b;
-+	eor		v8.16b, v8.16b, RIV.16b
-+	eor		v9.16b, v9.16b, v0.16b
-+	eor		v10.16b, v10.16b, v1.16b
-+	eor		v11.16b, v11.16b, v2.16b
-+	eor		v12.16b, v12.16b, v3.16b
-+	eor		v13.16b, v13.16b, v4.16b
-+	eor		v14.16b, v14.16b, v5.16b
-+	eor		v15.16b, v15.16b, v6.16b
- 
--	mov		RIV.16b, RTMP3.16b;
--	st1		{v4.16b-v7.16b}, [x1], #64;
-+	st1		{v8.16b-v11.16b}, [x1], #64
-+	st1		{v12.16b-v15.16b}, [x1], #64
- 
--	cbz		w4, .Lcbc_end;
--	b		.Lcbc_loop_blk;
-+	mov		RIV.16b, v7.16b
- 
--.Lcbc_tail8:
--	add		w4, w4, #8;
--	cmp		w4, #4;
--	blt		.Lcbc_tail4;
-+	cbz		w4, .Lcbc_dec_end
-+	b		.Lcbc_dec_loop_8x
- 
--	sub		w4, w4, #4;
-+.Lcbc_dec_4x:
-+	add		w4, w4, #8
-+	cmp		w4, #4
-+	blt		.Lcbc_dec_loop_1x
- 
--	ld1		{v0.16b-v3.16b}, [x2];
-+	sub		w4, w4, #4
- 
--	SM4_CRYPT_BLK4(v0, v1, v2, v3);
-+	ld1		{v0.16b-v3.16b}, [x2], #64
- 
--	eor		v0.16b, v0.16b, RIV.16b;
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v1.16b, v1.16b, RTMP0.16b;
--	eor		v2.16b, v2.16b, RTMP1.16b;
--	eor		v3.16b, v3.16b, RTMP2.16b;
-+	rev32		v8.16b, v0.16b
-+	rev32		v9.16b, v1.16b
-+	rev32		v10.16b, v2.16b
-+	rev32		v11.16b, v3.16b
- 
--	mov		RIV.16b, RTMP3.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
-+	SM4_CRYPT_BLK4_BE(v8, v9, v10, v11)
- 
--	cbz		w4, .Lcbc_end;
-+	eor		v8.16b, v8.16b, RIV.16b
-+	eor		v9.16b, v9.16b, v0.16b
-+	eor		v10.16b, v10.16b, v1.16b
-+	eor		v11.16b, v11.16b, v2.16b
- 
--.Lcbc_tail4:
--	sub		w4, w4, #1;
-+	st1		{v8.16b-v11.16b}, [x1], #64
- 
--	ld1		{v0.16b}, [x2];
-+	mov		RIV.16b, v3.16b
- 
--	SM4_CRYPT_BLK(v0);
-+	cbz		w4, .Lcbc_dec_end
- 
--	eor		v0.16b, v0.16b, RIV.16b;
--	ld1		{RIV.16b}, [x2], #16;
--	st1		{v0.16b}, [x1], #16;
-+.Lcbc_dec_loop_1x:
-+	sub		w4, w4, #1
-+
-+	ld1		{v0.16b}, [x2], #16
-+
-+	rev32		v8.16b, v0.16b
-+
-+	SM4_CRYPT_BLK_BE(v8)
- 
--	cbnz		w4, .Lcbc_tail4;
-+	eor		v8.16b, v8.16b, RIV.16b
-+	st1		{v8.16b}, [x1], #16
- 
--.Lcbc_end:
-+	mov		RIV.16b, v0.16b
-+
-+	cbnz		w4, .Lcbc_dec_loop_1x
-+
-+.Lcbc_dec_end:
- 	/* store new IV */
--	st1		{RIV.16b}, [x3];
-+	st1		{RIV.16b}, [x3]
- 
--	ret;
-+	ret
- SYM_FUNC_END(sm4_ce_cbc_dec)
- 
- .align 3
-@@ -452,25 +324,57 @@ SYM_FUNC_START(sm4_ce_cfb_enc)
- 	 *   x3: iv (big endian, 128 bit)
- 	 *   w4: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
-+
-+	ld1		{RIV.16b}, [x3]
-+
-+.Lcfb_enc_loop_4x:
-+	cmp		w4, #4
-+	blt		.Lcfb_enc_loop_1x
-+
-+	sub		w4, w4, #4
-+
-+	ld1		{v0.16b-v3.16b}, [x2], #64
-+
-+	rev32		v8.16b, RIV.16b
-+	SM4_CRYPT_BLK_BE(v8)
-+	eor		v0.16b, v0.16b, v8.16b
-+
-+	rev32		v8.16b, v0.16b
-+	SM4_CRYPT_BLK_BE(v8)
-+	eor		v1.16b, v1.16b, v8.16b
-+
-+	rev32		v8.16b, v1.16b
-+	SM4_CRYPT_BLK_BE(v8)
-+	eor		v2.16b, v2.16b, v8.16b
-+
-+	rev32		v8.16b, v2.16b
-+	SM4_CRYPT_BLK_BE(v8)
-+	eor		v3.16b, v3.16b, v8.16b
- 
--	ld1		{RIV.16b}, [x3];
-+	st1		{v0.16b-v3.16b}, [x1], #64
-+	mov		RIV.16b, v3.16b
- 
--.Lcfb_enc_loop:
--	sub		w4, w4, #1;
-+	cbz		w4, .Lcfb_enc_end
-+	b		.Lcfb_enc_loop_4x
- 
--	SM4_CRYPT_BLK(RIV);
-+.Lcfb_enc_loop_1x:
-+	sub		w4, w4, #1
- 
--	ld1		{RTMP0.16b}, [x2], #16;
--	eor		RIV.16b, RIV.16b, RTMP0.16b;
--	st1		{RIV.16b}, [x1], #16;
-+	ld1		{v0.16b}, [x2], #16
- 
--	cbnz		w4, .Lcfb_enc_loop;
-+	SM4_CRYPT_BLK(RIV)
-+	eor		RIV.16b, RIV.16b, v0.16b
- 
-+	st1		{RIV.16b}, [x1], #16
-+
-+	cbnz		w4, .Lcfb_enc_loop_1x
-+
-+.Lcfb_enc_end:
- 	/* store new IV */
--	st1		{RIV.16b}, [x3];
-+	st1		{RIV.16b}, [x3]
- 
--	ret;
-+	ret
- SYM_FUNC_END(sm4_ce_cfb_enc)
- 
- .align 3
-@@ -482,79 +386,91 @@ SYM_FUNC_START(sm4_ce_cfb_dec)
- 	 *   x3: iv (big endian, 128 bit)
- 	 *   w4: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
- 
--	ld1		{v0.16b}, [x3];
-+	ld1		{RIV.16b}, [x3]
- 
--.Lcfb_loop_blk:
--	sub		w4, w4, #8;
--	tbnz		w4, #31, .Lcfb_tail8;
-+.Lcfb_dec_loop_8x:
-+	sub		w4, w4, #8
-+	tbnz		w4, #31, .Lcfb_dec_4x
- 
--	ld1		{v1.16b, v2.16b, v3.16b}, [x2], #48;
--	ld1		{v4.16b-v7.16b}, [x2];
-+	ld1		{v0.16b-v3.16b}, [x2], #64
-+	ld1		{v4.16b-v7.16b}, [x2], #64
- 
--	SM4_CRYPT_BLK8(v0, v1, v2, v3, v4, v5, v6, v7);
-+	rev32		v8.16b, RIV.16b
-+	rev32		v9.16b, v0.16b
-+	rev32		v10.16b, v1.16b
-+	rev32		v11.16b, v2.16b
-+	rev32		v12.16b, v3.16b
-+	rev32		v13.16b, v4.16b
-+	rev32		v14.16b, v5.16b
-+	rev32		v15.16b, v6.16b
- 
--	sub		x2, x2, #48;
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	eor		v1.16b, v1.16b, RTMP1.16b;
--	eor		v2.16b, v2.16b, RTMP2.16b;
--	eor		v3.16b, v3.16b, RTMP3.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
-+	SM4_CRYPT_BLK8_BE(v8, v9, v10, v11, v12, v13, v14, v15)
- 
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v4.16b, v4.16b, RTMP0.16b;
--	eor		v5.16b, v5.16b, RTMP1.16b;
--	eor		v6.16b, v6.16b, RTMP2.16b;
--	eor		v7.16b, v7.16b, RTMP3.16b;
--	st1		{v4.16b-v7.16b}, [x1], #64;
-+	mov		RIV.16b, v7.16b
- 
--	mov		v0.16b, RTMP3.16b;
-+	eor		v0.16b, v0.16b, v8.16b
-+	eor		v1.16b, v1.16b, v9.16b
-+	eor		v2.16b, v2.16b, v10.16b
-+	eor		v3.16b, v3.16b, v11.16b
-+	eor		v4.16b, v4.16b, v12.16b
-+	eor		v5.16b, v5.16b, v13.16b
-+	eor		v6.16b, v6.16b, v14.16b
-+	eor		v7.16b, v7.16b, v15.16b
- 
--	cbz		w4, .Lcfb_end;
--	b		.Lcfb_loop_blk;
-+	st1		{v0.16b-v3.16b}, [x1], #64
-+	st1		{v4.16b-v7.16b}, [x1], #64
- 
--.Lcfb_tail8:
--	add		w4, w4, #8;
--	cmp		w4, #4;
--	blt		.Lcfb_tail4;
-+	cbz		w4, .Lcfb_dec_end
-+	b		.Lcfb_dec_loop_8x
- 
--	sub		w4, w4, #4;
-+.Lcfb_dec_4x:
-+	add		w4, w4, #8
-+	cmp		w4, #4
-+	blt		.Lcfb_dec_loop_1x
- 
--	ld1		{v1.16b, v2.16b, v3.16b}, [x2];
-+	sub		w4, w4, #4
- 
--	SM4_CRYPT_BLK4(v0, v1, v2, v3);
-+	ld1		{v0.16b-v3.16b}, [x2], #64
- 
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	eor		v1.16b, v1.16b, RTMP1.16b;
--	eor		v2.16b, v2.16b, RTMP2.16b;
--	eor		v3.16b, v3.16b, RTMP3.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
-+	rev32		v8.16b, RIV.16b
-+	rev32		v9.16b, v0.16b
-+	rev32		v10.16b, v1.16b
-+	rev32		v11.16b, v2.16b
- 
--	mov		v0.16b, RTMP3.16b;
-+	SM4_CRYPT_BLK4_BE(v8, v9, v10, v11)
- 
--	cbz		w4, .Lcfb_end;
-+	mov		RIV.16b, v3.16b
- 
--.Lcfb_tail4:
--	sub		w4, w4, #1;
-+	eor		v0.16b, v0.16b, v8.16b
-+	eor		v1.16b, v1.16b, v9.16b
-+	eor		v2.16b, v2.16b, v10.16b
-+	eor		v3.16b, v3.16b, v11.16b
- 
--	SM4_CRYPT_BLK(v0);
-+	st1		{v0.16b-v3.16b}, [x1], #64
- 
--	ld1		{RTMP0.16b}, [x2], #16;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	st1		{v0.16b}, [x1], #16;
-+	cbz		w4, .Lcfb_dec_end
-+
-+.Lcfb_dec_loop_1x:
-+	sub		w4, w4, #1
-+
-+	ld1		{v0.16b}, [x2], #16
- 
--	mov		v0.16b, RTMP0.16b;
-+	SM4_CRYPT_BLK(RIV)
- 
--	cbnz		w4, .Lcfb_tail4;
-+	eor		RIV.16b, RIV.16b, v0.16b
-+	st1		{RIV.16b}, [x1], #16
- 
--.Lcfb_end:
-+	mov		RIV.16b, v0.16b
-+
-+	cbnz		w4, .Lcfb_dec_loop_1x
-+
-+.Lcfb_dec_end:
- 	/* store new IV */
--	st1		{v0.16b}, [x3];
-+	st1		{RIV.16b}, [x3]
- 
--	ret;
-+	ret
- SYM_FUNC_END(sm4_ce_cfb_dec)
- 
- .align 3
-@@ -566,95 +482,99 @@ SYM_FUNC_START(sm4_ce_ctr_enc)
- 	 *   x3: ctr (big endian, 128 bit)
- 	 *   w4: nblocks
- 	 */
--	PREPARE;
-+	SM4_PREPARE(x0)
- 
--	ldp		x7, x8, [x3];
--	rev		x7, x7;
--	rev		x8, x8;
-+	ldp		x7, x8, [x3]
-+	rev		x7, x7
-+	rev		x8, x8
- 
--.Lctr_loop_blk:
--	sub		w4, w4, #8;
--	tbnz		w4, #31, .Lctr_tail8;
-+.Lctr_loop_8x:
-+	sub		w4, w4, #8
-+	tbnz		w4, #31, .Lctr_4x
- 
--#define inc_le128(vctr)                     \
--	mov		vctr.d[1], x8;      \
--	mov		vctr.d[0], x7;      \
--	adds		x8, x8, #1;         \
--	adc		x7, x7, xzr;        \
--	rev64		vctr.16b, vctr.16b;
-+#define inc_le128(vctr)					\
-+		mov		vctr.d[1], x8;		\
-+		mov		vctr.d[0], x7;		\
-+		adds		x8, x8, #1;		\
-+		rev64		vctr.16b, vctr.16b;	\
-+		adc		x7, x7, xzr;
- 
- 	/* construct CTRs */
--	inc_le128(v0);			/* +0 */
--	inc_le128(v1);			/* +1 */
--	inc_le128(v2);			/* +2 */
--	inc_le128(v3);			/* +3 */
--	inc_le128(v4);			/* +4 */
--	inc_le128(v5);			/* +5 */
--	inc_le128(v6);			/* +6 */
--	inc_le128(v7);			/* +7 */
-+	inc_le128(v0)			/* +0 */
-+	inc_le128(v1)			/* +1 */
-+	inc_le128(v2)			/* +2 */
-+	inc_le128(v3)			/* +3 */
-+	inc_le128(v4)			/* +4 */
-+	inc_le128(v5)			/* +5 */
-+	inc_le128(v6)			/* +6 */
-+	inc_le128(v7)			/* +7 */
-+
-+	ld1		{v8.16b-v11.16b}, [x2], #64
-+	ld1		{v12.16b-v15.16b}, [x2], #64
-+
-+	SM4_CRYPT_BLK8(v0, v1, v2, v3, v4, v5, v6, v7)
-+
-+	eor		v0.16b, v0.16b, v8.16b
-+	eor		v1.16b, v1.16b, v9.16b
-+	eor		v2.16b, v2.16b, v10.16b
-+	eor		v3.16b, v3.16b, v11.16b
-+	eor		v4.16b, v4.16b, v12.16b
-+	eor		v5.16b, v5.16b, v13.16b
-+	eor		v6.16b, v6.16b, v14.16b
-+	eor		v7.16b, v7.16b, v15.16b
-+
-+	st1		{v0.16b-v3.16b}, [x1], #64
-+	st1		{v4.16b-v7.16b}, [x1], #64
-+
-+	cbz		w4, .Lctr_end
-+	b		.Lctr_loop_8x
-+
-+.Lctr_4x:
-+	add		w4, w4, #8
-+	cmp		w4, #4
-+	blt		.Lctr_loop_1x
-+
-+	sub		w4, w4, #4
- 
--	SM4_CRYPT_BLK8(v0, v1, v2, v3, v4, v5, v6, v7);
--
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	eor		v1.16b, v1.16b, RTMP1.16b;
--	eor		v2.16b, v2.16b, RTMP2.16b;
--	eor		v3.16b, v3.16b, RTMP3.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
-+	/* construct CTRs */
-+	inc_le128(v0)			/* +0 */
-+	inc_le128(v1)			/* +1 */
-+	inc_le128(v2)			/* +2 */
-+	inc_le128(v3)			/* +3 */
- 
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v4.16b, v4.16b, RTMP0.16b;
--	eor		v5.16b, v5.16b, RTMP1.16b;
--	eor		v6.16b, v6.16b, RTMP2.16b;
--	eor		v7.16b, v7.16b, RTMP3.16b;
--	st1		{v4.16b-v7.16b}, [x1], #64;
-+	ld1		{v8.16b-v11.16b}, [x2], #64
- 
--	cbz		w4, .Lctr_end;
--	b		.Lctr_loop_blk;
-+	SM4_CRYPT_BLK4(v0, v1, v2, v3)
- 
--.Lctr_tail8:
--	add		w4, w4, #8;
--	cmp		w4, #4;
--	blt		.Lctr_tail4;
-+	eor		v0.16b, v0.16b, v8.16b
-+	eor		v1.16b, v1.16b, v9.16b
-+	eor		v2.16b, v2.16b, v10.16b
-+	eor		v3.16b, v3.16b, v11.16b
- 
--	sub		w4, w4, #4;
-+	st1		{v0.16b-v3.16b}, [x1], #64
- 
--	/* construct CTRs */
--	inc_le128(v0);			/* +0 */
--	inc_le128(v1);			/* +1 */
--	inc_le128(v2);			/* +2 */
--	inc_le128(v3);			/* +3 */
-+	cbz		w4, .Lctr_end
- 
--	SM4_CRYPT_BLK4(v0, v1, v2, v3);
--
--	ld1		{RTMP0.16b-RTMP3.16b}, [x2], #64;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	eor		v1.16b, v1.16b, RTMP1.16b;
--	eor		v2.16b, v2.16b, RTMP2.16b;
--	eor		v3.16b, v3.16b, RTMP3.16b;
--	st1		{v0.16b-v3.16b}, [x1], #64;
--
--	cbz		w4, .Lctr_end;
--
--.Lctr_tail4:
--	sub		w4, w4, #1;
-+.Lctr_loop_1x:
-+	sub		w4, w4, #1
- 
- 	/* construct CTRs */
--	inc_le128(v0);
-+	inc_le128(v0)
- 
--	SM4_CRYPT_BLK(v0);
-+	ld1		{v8.16b}, [x2], #16
- 
--	ld1		{RTMP0.16b}, [x2], #16;
--	eor		v0.16b, v0.16b, RTMP0.16b;
--	st1		{v0.16b}, [x1], #16;
-+	SM4_CRYPT_BLK(v0)
-+
-+	eor		v0.16b, v0.16b, v8.16b
-+	st1		{v0.16b}, [x1], #16
- 
--	cbnz		w4, .Lctr_tail4;
-+	cbnz		w4, .Lctr_loop_1x
- 
- .Lctr_end:
- 	/* store new CTR */
--	rev		x7, x7;
--	rev		x8, x8;
--	stp		x7, x8, [x3];
-+	rev		x7, x7
-+	rev		x8, x8
-+	stp		x7, x8, [x3]
- 
--	ret;
-+	ret
- SYM_FUNC_END(sm4_ce_ctr_enc)
-diff --git a/arch/arm64/crypto/sm4-ce-glue.c b/arch/arm64/crypto/sm4-ce-glue.c
-index 496d55c0d01a..e56e81b1f35f 100644
---- a/arch/arm64/crypto/sm4-ce-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-glue.c
-@@ -26,9 +26,9 @@ asmlinkage void sm4_ce_crypt_block(const u32 *rkey, u8 *dst, const u8 *src);
- asmlinkage void sm4_ce_crypt(const u32 *rkey, u8 *dst, const u8 *src,
- 			     unsigned int nblks);
- asmlinkage void sm4_ce_cbc_enc(const u32 *rkey, u8 *dst, const u8 *src,
--			       u8 *iv, unsigned int nblks);
-+			       u8 *iv, unsigned int nblocks);
- asmlinkage void sm4_ce_cbc_dec(const u32 *rkey, u8 *dst, const u8 *src,
--			       u8 *iv, unsigned int nblks);
-+			       u8 *iv, unsigned int nblocks);
- asmlinkage void sm4_ce_cfb_enc(const u32 *rkey, u8 *dst, const u8 *src,
- 			       u8 *iv, unsigned int nblks);
- asmlinkage void sm4_ce_cfb_dec(const u32 *rkey, u8 *dst, const u8 *src,
-@@ -94,66 +94,56 @@ static int sm4_ecb_decrypt(struct skcipher_request *req)
- 	return sm4_ecb_do_crypt(req, ctx->rkey_dec);
- }
- 
--static int sm4_cbc_encrypt(struct skcipher_request *req)
-+static int sm4_cbc_crypt(struct skcipher_request *req,
-+			 struct sm4_ctx *ctx, bool encrypt)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_walk walk;
- 	unsigned int nbytes;
- 	int err;
- 
- 	err = skcipher_walk_virt(&walk, req, false);
-+	if (err)
-+		return err;
- 
- 	while ((nbytes = walk.nbytes) > 0) {
- 		const u8 *src = walk.src.virt.addr;
- 		u8 *dst = walk.dst.virt.addr;
--		unsigned int nblks;
-+		unsigned int nblocks;
- 
--		kernel_neon_begin();
-+		nblocks = nbytes / SM4_BLOCK_SIZE;
-+		if (nblocks) {
-+			kernel_neon_begin();
- 
--		nblks = BYTES2BLKS(nbytes);
--		if (nblks) {
--			sm4_ce_cbc_enc(ctx->rkey_enc, dst, src, walk.iv, nblks);
--			nbytes -= nblks * SM4_BLOCK_SIZE;
--		}
-+			if (encrypt)
-+				sm4_ce_cbc_enc(ctx->rkey_enc, dst, src,
-+					       walk.iv, nblocks);
-+			else
-+				sm4_ce_cbc_dec(ctx->rkey_dec, dst, src,
-+					       walk.iv, nblocks);
- 
--		kernel_neon_end();
-+			kernel_neon_end();
-+		}
- 
--		err = skcipher_walk_done(&walk, nbytes);
-+		err = skcipher_walk_done(&walk, nbytes % SM4_BLOCK_SIZE);
- 	}
- 
- 	return err;
- }
- 
--static int sm4_cbc_decrypt(struct skcipher_request *req)
-+static int sm4_cbc_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
- 
--	while ((nbytes = walk.nbytes) > 0) {
--		const u8 *src = walk.src.virt.addr;
--		u8 *dst = walk.dst.virt.addr;
--		unsigned int nblks;
--
--		kernel_neon_begin();
--
--		nblks = BYTES2BLKS(nbytes);
--		if (nblks) {
--			sm4_ce_cbc_dec(ctx->rkey_dec, dst, src, walk.iv, nblks);
--			nbytes -= nblks * SM4_BLOCK_SIZE;
--		}
--
--		kernel_neon_end();
-+	return sm4_cbc_crypt(req, ctx, true);
-+}
- 
--		err = skcipher_walk_done(&walk, nbytes);
--	}
-+static int sm4_cbc_decrypt(struct skcipher_request *req)
++static int sm3_neon_update(struct shash_desc *desc, const u8 *data,
++			   unsigned int len)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct sm4_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	return err;
-+	return sm4_cbc_crypt(req, ctx, false);
- }
- 
- static int sm4_cfb_encrypt(struct skcipher_request *req)
++	if (!crypto_simd_usable()) {
++		sm3_update(shash_desc_ctx(desc), data, len);
++		return 0;
++	}
++
++	kernel_neon_begin();
++	sm3_base_do_update(desc, data, len, sm3_neon_transform);
++	kernel_neon_end();
++
++	return 0;
++}
++
++static int sm3_neon_final(struct shash_desc *desc, u8 *out)
++{
++	if (!crypto_simd_usable()) {
++		sm3_final(shash_desc_ctx(desc), out);
++		return 0;
++	}
++
++	kernel_neon_begin();
++	sm3_base_do_finalize(desc, sm3_neon_transform);
++	kernel_neon_end();
++
++	return sm3_base_finish(desc, out);
++}
++
++static int sm3_neon_finup(struct shash_desc *desc, const u8 *data,
++			  unsigned int len, u8 *out)
++{
++	if (!crypto_simd_usable()) {
++		struct sm3_state *sctx = shash_desc_ctx(desc);
++
++		if (len)
++			sm3_update(sctx, data, len);
++		sm3_final(sctx, out);
++		return 0;
++	}
++
++	kernel_neon_begin();
++	if (len)
++		sm3_base_do_update(desc, data, len, sm3_neon_transform);
++	sm3_base_do_finalize(desc, sm3_neon_transform);
++	kernel_neon_end();
++
++	return sm3_base_finish(desc, out);
++}
++
++static struct shash_alg sm3_alg = {
++	.digestsize		= SM3_DIGEST_SIZE,
++	.init			= sm3_base_init,
++	.update			= sm3_neon_update,
++	.final			= sm3_neon_final,
++	.finup			= sm3_neon_finup,
++	.descsize		= sizeof(struct sm3_state),
++	.base.cra_name		= "sm3",
++	.base.cra_driver_name	= "sm3-neon",
++	.base.cra_blocksize	= SM3_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
++	.base.cra_priority	= 200,
++};
++
++static int __init sm3_neon_init(void)
++{
++	return crypto_register_shash(&sm3_alg);
++}
++
++static void __exit sm3_neon_fini(void)
++{
++	crypto_unregister_shash(&sm3_alg);
++}
++
++module_init(sm3_neon_init);
++module_exit(sm3_neon_fini);
++
++MODULE_DESCRIPTION("SM3 secure hash using NEON instructions");
++MODULE_AUTHOR("Jussi Kivilinna <jussi.kivilinna@iki.fi>");
++MODULE_AUTHOR("Tianjia Zhang <tianjia.zhang@linux.alibaba.com>");
++MODULE_LICENSE("GPL v2");
 -- 
 2.24.3 (Apple Git-128)
 
