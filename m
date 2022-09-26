@@ -2,127 +2,279 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA81C6FA86
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 14:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF24C07E9D
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Sep 2022 16:30:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbiIZOsM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Sep 2022 10:48:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50472 "EHLO
+        id S229638AbiIZQaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Sep 2022 12:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234674AbiIZOrs (ORCPT
+        with ESMTP id S229646AbiIZQ3w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:47:48 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05F6B1D4;
-        Mon, 26 Sep 2022 06:12:42 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e74d329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e74d:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED5171EC051E;
-        Mon, 26 Sep 2022 15:12:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1664197956;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=WoAsNIjxtOydRj3E9e8AKmT+MPVf0jUVuDQQzfJocNg=;
-        b=YlkrwAcwyMQjQRO0wTBEUyoDvIIogt7PwJBqH9c6yVxgqYlhBY5xt3oHREab1EXAgd1+Jt
-        ajd5Z6pFsRNvdhCy0jlBQv3Pytt9U52OucBWsQsAJGfx18Xvd1FQyx1QD2bygaB9ytBcb2
-        ccjY1VjlLyZmDeDfFXjwOze/QNV1TC0=
-Date:   Mon, 26 Sep 2022 15:12:32 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
- instead of clear_cpu_cap
-Message-ID: <YzGlQBkCSJxY+8Jf@zn.tnic>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-2-mlevitsk@redhat.com>
- <Yyh9RDbaRqUR1XSW@zn.tnic>
- <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
+        Mon, 26 Sep 2022 12:29:52 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9408251427
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Sep 2022 08:19:30 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id x29so7862916ljq.2
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Sep 2022 08:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
+        b=Y5alOsje+V17Mvu/UEe7LvpZijxhzaul2BWGDT5bztSMyS9dMJlmavzjn+2deaq5tw
+         XvNm10CbZ4ZLITBQuIdLXCkRvPCo3ttVoMGyxzaON3gVItEvPjupvJPPUWnuX4u3O3tn
+         co73Ml8h2TBj2tZ3Q+cEwbmMhaCQyZnb/jmJORcXwiChwx+Tu1zvYoIOQ+pro7NVexxo
+         vWL6d8nrSBsIC6Mcn75pHch+puY3c+/i3igKsdBO2b6YYYhHXs9n3RQDStIPYiKWQRyr
+         lGrB/fhsUdaZ7+jLdk8uF+Qc0ur1rup4v+UwMl6mX5qWWYXjsMM4rzFwlIKmKZM9pxrk
+         cvoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
+        b=vsqTBe6Kqzlr37hQy+kO2+DiD/IYTLAOB7PUcFsuKDtTUed5sbhjU7sLtYRPNQp08E
+         TinUPhKwSqpKLJaV3GiiFixsxj2iUJXZR+MwLcjGClcEpR4EliYzMlT6BE6ODsqG6DGI
+         KWJ5AfID+CckYOl+Tvd3lNzI1EIYVK0D1l9a5wP8ze5T5x9RHuZ0wnhuA8M576Rh8i1+
+         99BxQCkU4DYrehF5s8YEUlHHaCiNGJLn52s1d8Tttr9VUkr2MB4HWPCV9yHDj+iKxuX9
+         qQXHkgawZj87Iom8pdRH+XVHN1vmOdR6DQrglHKmx6FD1FpzY7F4r4dodOAHmiKo0qnt
+         zgNA==
+X-Gm-Message-State: ACrzQf31XcWYK4KIiX/oPu7VI4Jz3Bsx1xfyJnGczhQ2BnZKwftgK+uX
+        wRcuCuBWFOXz9qkdA4kO5flHZq/Cv5NKFFtv88YdqA==
+X-Google-Smtp-Source: AMsMyM6+y6FU6UQ6FRNs597KPkJSz9uCZoF/CXoGwAr/mTWlHtClwgzOToRRC2voZPY2KOrU2AZgoD/DEnDfu92c2EM=
+X-Received: by 2002:a2e:983:0:b0:26c:5b0e:f5e4 with SMTP id
+ 125-20020a2e0983000000b0026c5b0ef5e4mr7720323ljj.502.1664205567769; Mon, 26
+ Sep 2022 08:19:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
+ <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
+ <0716365f-3572-638b-e841-fcce7d30571a@amd.com> <CABpDEu=quPsv6cXfbvpsGS2N+5Pcw7inCfmv=sx3-VaK0UE76g@mail.gmail.com>
+ <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com> <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
+In-Reply-To: <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 26 Sep 2022 09:19:15 -0600
+Message-ID: <CAMkAt6o=G7W3pRgVYiBKK5RjQskMfzL_9me2Hcr7_e9rTHuStw@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+To:     Ashish Kalra <ashkalra@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Alper Gun <alpergun@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 11:20:47AM +0300, Maxim Levitsky wrote:
-> If I understand that correctly, the difference between clear_cpu_cap and setup_clear_cpu_cap
-> is that setup_clear_cpu_cap should be called early when only the boot cpu is running and it 
+On Mon, Sep 19, 2022 at 5:47 PM Ashish Kalra <ashkalra@amd.com> wrote:
 >
-> 1. works on 'boot_cpu_data' which represents the boot cpu.
-> 2. sets a bit in 'cpu_caps_cleared' which are later applied to all CPUs, including these that are hotplugged.
+>
+> On 9/19/22 22:18, Tom Lendacky wrote:
+> > On 9/19/22 17:02, Alper Gun wrote:
+> >> On Mon, Sep 19, 2022 at 2:38 PM Tom Lendacky
+> >> <thomas.lendacky@amd.com> wrote:
+> >>>
+> >>> On 9/19/22 12:53, Alper Gun wrote:
+> >>>> On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
+> >>>>>
+> >>>>>> +
+> >>>>>> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu,
+> >>>>>> enum psc_op op, gpa_t gpa,
+> >>>>>> +                                         int level)
+> >>>>>> +{
+> >>>>>> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> >>>>>> +       struct kvm *kvm = vcpu->kvm;
+> >>>>>> +       int rc, npt_level;
+> >>>>>> +       kvm_pfn_t pfn;
+> >>>>>> +       gpa_t gpa_end;
+> >>>>>> +
+> >>>>>> +       gpa_end = gpa + page_level_size(level);
+> >>>>>> +
+> >>>>>> +       while (gpa < gpa_end) {
+> >>>>>> +               /*
+> >>>>>> +                * If the gpa is not present in the NPT then
+> >>>>>> build the NPT.
+> >>>>>> +                */
+> >>>>>> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
+> >>>>>> +               if (rc)
+> >>>>>> +                       return -EINVAL;
+> >>>>>> +
+> >>>>>> +               if (op == SNP_PAGE_STATE_PRIVATE) {
+> >>>>>> +                       hva_t hva;
+> >>>>>> +
+> >>>>>> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +
+> >>>>>> +                       /*
+> >>>>>> +                        * Verify that the hva range is
+> >>>>>> registered. This enforcement is
+> >>>>>> +                        * required to avoid the cases where a
+> >>>>>> page is marked private
+> >>>>>> +                        * in the RMP table but never gets
+> >>>>>> cleanup during the VM
+> >>>>>> +                        * termination path.
+> >>>>>> +                        */
+> >>>>>> +                       mutex_lock(&kvm->lock);
+> >>>>>> +                       rc = is_hva_registered(kvm, hva,
+> >>>>>> page_level_size(level));
+> >>>>>> +                       mutex_unlock(&kvm->lock);
+> >>>>>> +                       if (!rc)
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +
+> >>>>>> +                       /*
+> >>>>>> +                        * Mark the userspace range unmerable
+> >>>>>> before adding the pages
+> >>>>>> +                        * in the RMP table.
+> >>>>>> +                        */
+> >>>>>> +                       mmap_write_lock(kvm->mm);
+> >>>>>> +                       rc = snp_mark_unmergable(kvm, hva,
+> >>>>>> page_level_size(level));
+> >>>>>> +                       mmap_write_unlock(kvm->mm);
+> >>>>>> +                       if (rc)
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               write_lock(&kvm->mmu_lock);
+> >>>>>> +
+> >>>>>> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn,
+> >>>>>> &npt_level);
+> >>>>>> +               if (!rc) {
+> >>>>>> +                       /*
+> >>>>>> +                        * This may happen if another vCPU
+> >>>>>> unmapped the page
+> >>>>>> +                        * before we acquire the lock. Retry the
+> >>>>>> PSC.
+> >>>>>> +                        */
+> >>>>>> + write_unlock(&kvm->mmu_lock);
+> >>>>>> +                       return 0;
+> >>>>>> +               }
+> >>>>>
+> >>>>> I think we want to return -EAGAIN or similar if we want the caller to
+> >>>>> retry, right? I think returning 0 here hides the error.
+> >>>>>
+> >>>>
+> >>>> The problem here is that the caller(linux guest kernel) doesn't retry
+> >>>> if PSC fails. The current implementation in the guest kernel is that
+> >>>> if a page state change request fails, it terminates the VM with
+> >>>> GHCB_TERM_PSC reason.
+> >>>> Returning 0 here is not a good option because it will fail the PSC
+> >>>> silently and will probably cause a nested RMP fault later. Returning
+> >>>
+> >>> Returning 0 here is ok because the PSC current index into the PSC
+> >>> structure will not be updated and the guest will then retry (see the
+> >>> loop
+> >>> in vmgexit_psc() in arch/x86/kernel/sev.c).
+> >>>
+> >>> Thanks,
+> >>> Tom
+> >>
+> >> But the host code updates the index. It doesn't leave the loop because
+> >> rc is 0. The guest will think that it is successful.
+> >> rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
+> >> if (rc)
+> >> goto out;
+> >>
+> >> Also the page state change request with MSR is not retried. It
+> >> terminates the VM if the MSR request fails.
+> >
+> > Ah, right. I see what you mean. It should probably return a -EAGAIN
+> > instead of 0 and then the if (rc) check should be modified to
+> > specifically look for -EAGAIN and goto out after setting rc to 0.
+> >
+> > But that does leave the MSR protocol open to the problem that you
+> > mention, so, yes, retry logic in snp_handle_page_state_change() for a
+> > -EAGAIN seems reasonable.
+> >
+> > Thanks,
+> > Tom
+>
+> I believe it makes more sense to add the retry logic within
+> __snp_handle_page_state_change() itself, as that will make it work for
+> both the GHCB MSR protocol and the GHCB VMGEXIT requests.
 
-Yes.
+You are suggesting we just retry 'kvm_mmu_get_tdp_walk' inside of
+__snp_handle_page_state_change()? That should work but how many times
+do we retry? If we return EAGAIN or error we can leave it up to the
+caller
 
-> On the other hand the clear_cpu_cap just affects the given 'struct cpuinfo_x86'.
-
-Yes.
-
-> Call of 'clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR)' is weird since it still affects 'boot_cpu_data'
-> but doesn't affect 'cpu_caps_cleared'
-
-Yes.
-
-> I assumed that this was a mistake and the intention was to disable the feature on all CPUs.
-
-peterz says yes.
-
-> I need this patch because in the next patch, I change the clear_cpu_cap such as it detects being
-> called on boot_cpu_data and in this case also clears bits in 'cpu_caps_cleared', thus
-> while this patch does introduce a functional change, the next patch doesn't since this is the only
-> place where clear_cpu_cap is called explicitly on 'boot_cpu_data'
-
-This is not needed - this patch doing setup_clear_cpu_cap() should suffice.
-
-But, there must be something you're fixing with this. Which is it? Some
-weird virt config?
-
-> I do now notice that initcalls are run after smp is initialized, which
-> means that this code doesn't really disable the CPUID feature on all
-> CPUs at all.
-
-Well, not exactly. There's do_pre_smp_calls() which is where the
-early_initcall() thing is run.
-
-So setup_clear_cpu_cap() will make sure that the feature bit is cleared
-when the APs come online.
-
-Do you have a virt configuration where you can test this case where the
-feature flag is clear on all CPUs when it fails?
-
-I.e., "arch_lbr" will disappear in /proc/cpuinfo completely.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>
+> Thanks, Ashish
+>
+> >
+> >>
+> >>>
+> >>>> an error also terminates the guest immediately with current guest
+> >>>> implementation. I think the best approach here is adding a retry logic
+> >>>> to this function. Retrying without returning an error should help it
+> >>>> work because snp_check_and_build_npt will be called again and in the
+> >>>> second attempt this should work.
+> >>>>
+> >>>>>> +
+> >>>>>> +               /*
+> >>>>>> +                * Adjust the level so that we don't go higher
+> >>>>>> than the backing
+> >>>>>> +                * page level.
+> >>>>>> +                */
+> >>>>>> +               level = min_t(size_t, level, npt_level);
+> >>>>>> +
+> >>>>>> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op,
+> >>>>>> level);
+> >>>>>> +
+> >>>>>> +               switch (op) {
+> >>>>>> +               case SNP_PAGE_STATE_SHARED:
+> >>>>>> +                       rc = snp_make_page_shared(kvm, gpa, pfn,
+> >>>>>> level);
+> >>>>>> +                       break;
+> >>>>>> +               case SNP_PAGE_STATE_PRIVATE:
+> >>>>>> +                       rc = rmp_make_private(pfn, gpa, level,
+> >>>>>> sev->asid, false);
+> >>>>>> +                       break;
+> >>>>>> +               default:
+> >>>>>> +                       rc = -EINVAL;
+> >>>>>> +                       break;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               write_unlock(&kvm->mmu_lock);
+> >>>>>> +
+> >>>>>> +               if (rc) {
+> >>>>>> +                       pr_err_ratelimited("Error op %d gpa %llx
+> >>>>>> pfn %llx level %d rc %d\n",
+> >>>>>> +                                          op, gpa, pfn, level, rc);
+> >>>>>> +                       return rc;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               gpa = gpa + page_level_size(level);
+> >>>>>> +       }
+> >>>>>> +
+> >>>>>> +       return 0;
+> >>>>>> +}
+> >>>>>> +
