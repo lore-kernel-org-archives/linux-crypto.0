@@ -2,171 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A67FFC07E9D
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 04:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC87C07E9D
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 07:55:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiI0Ea6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Sep 2022 00:30:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47134 "EHLO
+        id S230209AbiI0Hzh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Sep 2022 03:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiI0Ea5 (ORCPT
+        with ESMTP id S229508AbiI0Hzh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Sep 2022 00:30:57 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9977B82746;
-        Mon, 26 Sep 2022 21:30:54 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R291e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VQq1JZ-_1664253048;
-Received: from 30.240.100.75(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VQq1JZ-_1664253048)
-          by smtp.aliyun-inc.com;
-          Tue, 27 Sep 2022 12:30:50 +0800
-Message-ID: <0d3188a0-3e6f-4999-9fe8-92509d7cf0d5@linux.alibaba.com>
-Date:   Tue, 27 Sep 2022 12:30:48 +0800
+        Tue, 27 Sep 2022 03:55:37 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4121D7EFDF
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:55:34 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id fn7-20020a05600c688700b003b4fb113b86so4991113wmb.0
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=EkRR0v4G8ofAqP0Ws7FzBj1ighAgVhnEvfou5TdghMc=;
+        b=s9pMIR9CgB0cOWbWfGf0csNlRX6iruaDGJ9YoZvCuaxLeL49RTkhiuSIGJMEc3p6MN
+         H6ibXp68+bZTduTG/zokic03qEUwKzK1xTfPaiHocVD28WFj2ZKsI84WzR1hHBUDLue4
+         Kxxxfgj/Psn0XtmKJ7kMtWNEO+Y3IR6bqtlpKGfdCuZe9UdPg6ufYxkSOUo0OxrnVbzr
+         CMVazCw09LG7zb5Ur32Bvo/DLvP3Ve0XGoMMfU0iplmdfPSOsVApYAIdm7L3G4paOfcQ
+         HNhrx5F9a5hmNWztehhRzKymyVNavGMuHLiOvRcv0qbyTcmOZZpvcbK3yK1mpUvWJRt7
+         LCig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=EkRR0v4G8ofAqP0Ws7FzBj1ighAgVhnEvfou5TdghMc=;
+        b=5xlQQ8eMeEbz7NFHJRTo2WdpFF0U36eACJSxx/RieAv42MOCuK8u2dzDXAfIdm5JYF
+         sr42PT5r8vGePgfxytDKrwr7WC5xjv8j4TxyiFABfjCiFMTizipVvQUXsQvNkQ6ZWmGq
+         0v1doPP2auWM3NAzyfQvxMhG+g4+2slST1FtD14+DreSIFVxBt2GBFFrYkoPSqMlGDNH
+         st1x3AM4bGSWw4HHC6AZ6+k9j5UM9QxpRkdgCy1CV3Zo2E7cd8Q36o4DqZDiGMcHU+IR
+         vsBs3sHYz8Zhos1nJvPVdLmM1GRRp36iB2qka7fMVnnsIXb6u+3xJQLcS7SKZPRuK8XC
+         Zj3A==
+X-Gm-Message-State: ACrzQf0zxJbZ1rlKi6ujr66L+4Bhi1Gk49ab/CxPSdUMHplhJgLaUXFr
+        Tf/xsDxLyQhuzkAGoXyYCFtC7Q==
+X-Google-Smtp-Source: AMsMyM6q51eUecwVRkTgS+bNASlnTW4m2r8gUYUbzMw20c/e1XRnJt7Cck3a15gsqaDieemNNmYoXg==
+X-Received: by 2002:a7b:c8d6:0:b0:3b4:868b:afc3 with SMTP id f22-20020a7bc8d6000000b003b4868bafc3mr1576471wml.66.1664265332801;
+        Tue, 27 Sep 2022 00:55:32 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id x8-20020adfdcc8000000b0022afbd02c69sm1076654wrm.56.2022.09.27.00.55.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 00:55:31 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     heiko@sntech.de, ardb@kernel.org, davem@davemloft.net,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v10 00/33] crypto: rockchip: permit to pass self-tests
+Date:   Tue, 27 Sep 2022 07:54:38 +0000
+Message-Id: <20220927075511.3147847-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH 16/16] crypto: arm64/sm4 - add ARMv9 SVE cryptography
- acceleration implementation
-Content-Language: en-US
-To:     Mark Brown <broonie@kernel.org>, Ard Biesheuvel <ardb@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com
-References: <20220926093620.99898-1-tianjia.zhang@linux.alibaba.com>
- <20220926093620.99898-17-tianjia.zhang@linux.alibaba.com>
- <CAMj1kXF8Fi9cG4p6udRYT4LbCAj0UBXQL12nmQBFEWvZsVX7Wg@mail.gmail.com>
- <YzHd/U9vvSwuhKsx@sirena.org.uk>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <YzHd/U9vvSwuhKsx@sirena.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mark,
+Hello
 
-On 9/27/22 1:14 AM, Mark Brown wrote:
-> On Mon, Sep 26, 2022 at 12:02:04PM +0200, Ard Biesheuvel wrote:
-> 
->> Given that we currently do not support the use of SVE in kernel mode,
->> this patch cannot be accepted at this time (but the rest of the series
->> looks reasonable to me, although I have only skimmed over the patches)
-> 
->> In view of the disappointing benchmark results below, I don't think
->> this is worth the hassle at the moment. If we can find a case where
->> using SVE in kernel mode truly makes a [favorable] difference, we can
->> revisit this, but not without a thorough analysis of the impact it
->> will have to support SVE in the kernel. Also, the fact that SVE may
-> 
-> The kernel code doesn't really distinguish between FPSIMD and SVE in
-> terms of state management, and with the sharing of the V and Z registers
-> the architecture is very similar too so it shouldn't be too much hassle,
-> the only thing we should need is some management for the VL when
-> starting kernel mode SVE (probably just setting the maximum VL as a
-> first pass).
-> 
-> The current code should *work* and on a system with only a single VL
-> supported it'd be equivalent since setting the VL is a noop, it'd just
-> mean that any kernel mode SVE would end up using whatever the last VL
-> set on the PE happened to be in which could result in inconsistent
-> performance.
-> 
->> also cover cryptographic extensions does not necessarily imply that a
->> micro-architecture will perform those crypto transformations in
->> parallel and so the performance may be the same even if VL > 128.
-> 
-> Indeed, though so long as the performance is comparable I guess it
-> doesn't really hurt - if we run into situations where for some
-> implementations SVE performs worse then we'd need to do something more
-> complicated than just using SVE if it's available but...
-> 
->> In summary, please drop this patch for now, and once there are more
->> encouraging performance numbers, please resubmit it as part of a
->> series that explicitly enables SVE in kernel mode on arm64, and
->> documents the requirements and constraints.
-> 
-> ...in any case as you say until there are cases where SVE does better
-> for some in kernel use case we probably just shouldn't merge things.
-> 
-> Having said that I have been tempted to put together a branch which has
-> a kernel_sve_begin() implementation and collects proposed algorithm
-> implementations so they're there for people to experiment with as new
-> hardware becomes available.  There's clearly interest in trying to use
-> SVE in kernel and it makes sense to try to avoid common pitfalls and
-> reduce duplication of effort.
-> 
+The rockchip crypto driver is broken and do not pass self-tests.
+This serie's goal is to permit to become usable and pass self-tests.
 
-Your reply helped me a lot, I did encounter problems when using qemu VL
-larger than 128-bit environment, but I also tested it with the pure
-user-mode library libgcrypt, it seems to be normal, maybe in 128-bit
-It's just a coincidence that it works fine in the physical machine.
+This whole serie is tested on a rk3328-rock64, rk3288-miqi and
+rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
 
-I am looking forward to your experimental branch, and I believe that
-there will be breakthroughs in hardware in the near future.
+Regards
 
-> A couple of very minor comments on the patch:
-> 
->>> +config CRYPTO_SM4_ARM64_SVE_CE_BLK
->>> +       tristate "Ciphers: SM4, modes: ECB/CBC/CFB/CTR (ARMv9 cryptography
->> +acceleration with SVE2)"
->>> +       depends on KERNEL_MODE_NEON
->>> +       select CRYPTO_SKCIPHER
->>> +       select CRYPTO_SM4
->>> +       select CRYPTO_SM4_ARM64_CE_BLK
->>> +       help
-> 
-> Our current baseline binutils version requirement predates SVE support
-> so we'd either need to manually encode all SVE instructions used or add
-> suitable dependency.  The dependency seems a lot more reasonable here,
-> and we could require a new enough version to avoid the manual encoding
-> that is done in the patch (though I've not checked how new a version
-> that'd end up requiring, it might be unreasonable so perhaps just
-> depending on binutils having basic SVE support and continuing with the
-> manual encoding might be more helpful).
-> 
->>> +.macro sm4e, vd, vn
->>> +       .inst 0xcec08400 | (.L\vn << 5) | .L\vd
->>> +.endm
-> 
-> For any manual encodings that do get left it'd be good to note the
-> binutils and LLVM versions which support the instruction so we can
-> hopefully at some point switch to assembling them normally.
-> 
->>> +static int __init sm4_sve_ce_init(void)
->>> +{
->>> +       if (sm4_sve_get_vl() <= 16)
->>> +               return -ENODEV;
-> 
-> I'm not clear what this check is attempting to guard against - what's
-> the issue with larger VLs?
+Changes since v1:
+- select CRYPTO_ENGINE
+- forgot to free fallbacks TFMs
+- fixed kernel test robots warning
+- add the PM patch
 
-Since there is no physical environment, this check is based on my naive
-assumption that the performance when VL is 256-bit should theoretically
-be twice that of 128-bit, because SVE needs to handle more complex data
-shifting operations and CTR incrementing operations, so When VL is
-greater than or equal to 256 bits, the use of SVE will bring performance
-improvement, otherwise it is a suitable choice to degenerate to CE.
+Changes since v2:
+- Added DMA clock back to 3288 since it dont work without it
+- fallback needed to select CBC and ECB configs
+- Added support for rk3399
+- Added more patch (style, read_poll_timeout)
 
-Now it seems that this assumption itself is not valid, I will drop
-this patch first.
+Changes since v3:
+- full rewrite of support for RK3399
+- splited dt-binding patch in two
 
-> 
-> If it is needed then we already have a sve_get_vl() in the core kernel
-> which we should probably be making available to modules rather than
-> having them open code something (eg, making it a static inline rather
-> than putting it in asm).
+Changes since v4:
+- Another full rewrite of support for RK3399
+- Fixed dt-binding from Krzysztof Kozlowski's comments
+- Use readl_poll_timeout() instead of read_poll_timeout()
+- Rewrite the fallback SG tests
 
-Yes, I agree, exporting sve_get_vl() to the module is the more
-appropriate approach.
+Changes since v5:
+- fixed errors in DT binding patch
 
-Best regards,
-Tianjia
+Change since v6:
+- remove quotes around const values in dt-bindings
+
+Changes since v7:
+- added lot of reviewed/tested by
+- In patch 14: keep initial reset pulse.
+
+Changes since v8:
+- Removed some useless min/maxitems from dt-binding as reported by dt_binding_check
+
+Change since v9:
+- removed redundant rst_ from reset-names
+- reworked patch #25 commit message
+
+Corentin Labbe (33):
+  crypto: rockchip: use dev_err for error message about interrupt
+  crypto: rockchip: do not use uninitialized variable
+  crypto: rockchip: do not do custom power management
+  crypto: rockchip: fix privete/private typo
+  crypto: rockchip: do not store mode globally
+  crypto: rockchip: add fallback for cipher
+  crypto: rockchip: add fallback for ahash
+  crypto: rockchip: better handle cipher key
+  crypto: rockchip: remove non-aligned handling
+  crypto: rockchip: rework by using crypto_engine
+  crypto: rockchip: rewrite type
+  crypto: rockchip: add debugfs
+  crypto: rockchip: introduce PM
+  crypto: rockchip: handle reset also in PM
+  crypto: rockchip: use clk_bulk to simplify clock management
+  crypto: rockchip: add myself as maintainer
+  crypto: rockchip: use read_poll_timeout
+  crypto: rockchip: fix style issue
+  crypto: rockchip: add support for rk3328
+  crypto: rockchip: rename ablk functions to cipher
+  crypto: rockchip: rework rk_handle_req function
+  crypto: rockchip: use a rk_crypto_info variable instead of lot of
+    indirection
+  crypto: rockchip: use the rk_crypto_info given as parameter
+  dt-bindings: crypto: convert rockchip-crypto to YAML
+  dt-bindings: crypto: rockchip: add new compatible
+  clk: rk3399: use proper crypto0 name
+  arm64: dts: rockchip: add rk3328 crypto node
+  arm64: dts: rockchip: rk3399: add crypto node
+  crypto: rockchip: store crypto_info in request context
+  crypto: rockchip: Check for clocks numbers and their frequencies
+  crypto: rockchip: rk_ahash_reg_init use crypto_info from parameter
+  crypto: rockchip: permit to have more than one reset
+  crypto: rockchip: Add support for RK3399
+
+ .../crypto/rockchip,rk3288-crypto.yaml        | 127 ++++
+ .../bindings/crypto/rockchip-crypto.txt       |  28 -
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/rockchip/rk3328.dtsi      |  11 +
+ arch/arm64/boot/dts/rockchip/rk3399.dtsi      |  20 +
+ drivers/crypto/Kconfig                        |  15 +
+ drivers/crypto/rockchip/rk3288_crypto.c       | 506 ++++++++--------
+ drivers/crypto/rockchip/rk3288_crypto.h       | 107 ++--
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 267 +++++----
+ .../crypto/rockchip/rk3288_crypto_skcipher.c  | 543 ++++++++++--------
+ include/dt-bindings/clock/rk3399-cru.h        |   6 +-
+ 11 files changed, 949 insertions(+), 688 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+ delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+
+-- 
+2.35.1
 
