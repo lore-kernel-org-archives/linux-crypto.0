@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D419CC07E9D
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 07:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B3BC54EE9
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 07:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231486AbiI0H6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Sep 2022 03:58:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38510 "EHLO
+        id S231425AbiI0H61 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Sep 2022 03:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbiI0H5Q (ORCPT
+        with ESMTP id S231515AbiI0H5X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Sep 2022 03:57:16 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D9AAE9C7
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:56:09 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id o20-20020a05600c4fd400b003b4a516c479so4968210wmq.1
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:56:09 -0700 (PDT)
+        Tue, 27 Sep 2022 03:57:23 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61FE9AE9F4
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:56:10 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id t4so5974803wmj.5
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Sep 2022 00:56:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=5JnoAw4X1z7bCscIjsjfjSMoE54Bwt7ulA7ZsyJ5jyg=;
-        b=BAEIwPdPo97GcH+1wCKYAvWzAKOymsVbLsGocAIxNn6gxhCoMqYd5T+1ct3/STEMc0
-         P88AJfOkg1nRgg3ELPKYgEXSPs5bG5jfe34eznuA2GSLRs6cT0awTDEFkjwoDio3bJsh
-         gHJiOv2k2UKAV7JkG4LPvNvA/kNpHHClPSdyDK1q4ZZoihg45ujIrrJYViNPRmip1yiS
-         GbAVKvWMtHaPz4BoVgnl114K/5Y19j3p5Rtg84C8YwjhtW4JFbowgU4NHcUbw/sEM2EU
-         owzHS9E+tJGEgHZnC24mSqSaKbeEz4Hn4YbSmGsp5KZduNJiI+s5oEwacyOvdAGsgUJP
-         vwjA==
+        bh=z10vTtQ4qHSJZ9nRrmQY5lLp9Bvyc0G2kDbemdDveLc=;
+        b=SUtWt/yKk8dwQYXBM4pX0YSAMwhU0ggta2eQ2yzWE3hZuzbqcAra+8iI1B43bIaLde
+         2A5pKkjX7yk/Ek7bmehuqmQsmxxHC7tGVGUTB9P3weCNedcwxv2TbavFR7/94cJMiKBg
+         GDLHG/gw8KymsHp402S2SKJ57hI1Crk1V/vmJGaSqUcOMlE808U4gcA+45+bv29Mlo9v
+         cczjPNLpUfrYxoQcled6pr02jRD8OzLNZX4rqOuu+AKIEvyECAACnj7lKco/su8KTFtV
+         ICkdHA72mnoM156gkzmBCTRv/g55zJuHF437s8jfbVy+bPoJly6lTWmH2el8NhUSvFCT
+         o6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=5JnoAw4X1z7bCscIjsjfjSMoE54Bwt7ulA7ZsyJ5jyg=;
-        b=KIfc9hhI1fumNCcNZX9LJjmwlsEd1Xw92kugm9MTc/btc01ZiN+onWEQz7HYYBkD/K
-         E6+wyHuo64Pmg2kWxNFMBUDBY1zAWNy/kBqW+EuxrMUBCUEFppyyrivtSXBIarVUROOW
-         DNK+qlBmivKi+kxDqf856qdatuOp3rgDRHk9RvDc9v/+cKKh4d4dZNBp6NNaV6Kiyc6j
-         CSUoZCqRRfV925ula2xx9hUGcqRiGGKJr2TG0tfCBC9OhU4oVX9dI5HJltYNtTpAbTER
-         qob47blOPivftQKNW7wYJ1vYZv5K0/kgV+U5dBaK0GUEFhtITK05lpBatMtCREL1IY7h
-         ovdg==
-X-Gm-Message-State: ACrzQf1iUE/GeqrCsqG88HL5Oy1B1LqLPKfrvVWHDYPechhXKgpu78Ox
-        Oa/9lUN2JHP7c60LmiKtDNMgaw==
-X-Google-Smtp-Source: AMsMyM4uL0HObRJBotMMVGLYbEpvjLQleTH4GKMAsTIxMiv2kESR0p82m1H8rmbo2gqmUlSYI2Y8FQ==
-X-Received: by 2002:a05:600c:1f05:b0:3b4:ae0a:b2e5 with SMTP id bd5-20020a05600c1f0500b003b4ae0ab2e5mr1691511wmb.104.1664265348751;
-        Tue, 27 Sep 2022 00:55:48 -0700 (PDT)
+        bh=z10vTtQ4qHSJZ9nRrmQY5lLp9Bvyc0G2kDbemdDveLc=;
+        b=cr+pRUNjmJfT7fs2k3pFhfFBQ4sXARwhdYBVQ4DF/zGMw0gPXrOytluKpJXDJujpV7
+         MZMjaGy/UHFpX25jahGbMeNDoRwL1REL1JQBMh9zxhE6suTDK7KAGQ2ix29L4rocgA6F
+         5dstloTG6AuhqMVomUHvQwnIFHeFZCg7IQHQqdi4wLt1oMivIATdmZ+znpJ1q7XnmHcs
+         JeJCNGUzL1672g35wDXAudF48rTfxbWY154fQ0bEZrPidpnrLAcVbp6FEpfYr38YMTTC
+         iHlSL2vMNs/+8QWRFsbhaIpXs23/YCuP39hL0uHcS+/rOkUkKRWsBai4uDKUDJkhEySf
+         E27A==
+X-Gm-Message-State: ACrzQf2ygKT2czcp8j34aRoBmBwRfeVrQG2iyzgD4E1FQ93D0qfgTupM
+        wKfy1no9bRY6b5xT68RNOadqlA==
+X-Google-Smtp-Source: AMsMyM4BaygUsH/WyeQVQo3CW9varbVyVY8PtLnBUqF7L7qtyzWYzthtkrR1qRH4omU72F2l8jzJYA==
+X-Received: by 2002:a05:600c:1c03:b0:3b4:618b:5d14 with SMTP id j3-20020a05600c1c0300b003b4618b5d14mr1534048wms.59.1664265369832;
+        Tue, 27 Sep 2022 00:56:09 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id x8-20020adfdcc8000000b0022afbd02c69sm1076654wrm.56.2022.09.27.00.55.47
+        by smtp.googlemail.com with ESMTPSA id x8-20020adfdcc8000000b0022afbd02c69sm1076654wrm.56.2022.09.27.00.56.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 00:55:48 -0700 (PDT)
+        Tue, 27 Sep 2022 00:56:09 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, ardb@kernel.org, davem@davemloft.net,
         herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
@@ -57,9 +57,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
         linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v10 14/33] crypto: rockchip: handle reset also in PM
-Date:   Tue, 27 Sep 2022 07:54:52 +0000
-Message-Id: <20220927075511.3147847-15-clabbe@baylibre.com>
+Subject: [PATCH v10 32/33] crypto: rockchip: permit to have more than one reset
+Date:   Tue, 27 Sep 2022 07:55:10 +0000
+Message-Id: <20220927075511.3147847-33-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220927075511.3147847-1-clabbe@baylibre.com>
 References: <20220927075511.3147847-1-clabbe@baylibre.com>
@@ -69,69 +69,27 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-reset could be handled by PM functions.
-We keep the initial reset pulse to be sure the hw is a know device state
-after probe.
+The RK3399 has 3 resets, so the driver to handle multiple resets.
+This is done by using devm_reset_control_array_get_exclusive().
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index d9258b9e71b3..399829ef92e0 100644
+index 232dc625d6e5..d96f375423d5 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -74,14 +74,23 @@ static int rk_crypto_pm_suspend(struct device *dev)
- 	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
- 
- 	rk_crypto_disable_clk(rkdev);
-+	reset_control_assert(rkdev->rst);
-+
- 	return 0;
- }
- 
- static int rk_crypto_pm_resume(struct device *dev)
- {
- 	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = rk_crypto_enable_clk(rkdev);
-+	if (ret)
-+		return ret;
-+
-+	reset_control_deassert(rkdev->rst);
-+	return 0;
- 
--	return rk_crypto_enable_clk(rkdev);
- }
- 
- static const struct dev_pm_ops rk_crypto_pm_ops = {
-@@ -222,13 +231,6 @@ static void rk_crypto_unregister(void)
+@@ -281,7 +281,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 		return -EINVAL;
  	}
- }
  
--static void rk_crypto_action(void *data)
--{
--	struct rk_crypto_info *crypto_info = data;
--
--	reset_control_assert(crypto_info->rst);
--}
--
- static const struct of_device_id crypto_of_id_table[] = {
- 	{ .compatible = "rockchip,rk3288-crypto" },
- 	{}
-@@ -258,10 +260,6 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 	usleep_range(10, 20);
- 	reset_control_deassert(crypto_info->rst);
- 
--	err = devm_add_action_or_reset(dev, rk_crypto_action, crypto_info);
--	if (err)
--		goto err_crypto;
--
- 	crypto_info->reg = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(crypto_info->reg)) {
- 		err = PTR_ERR(crypto_info->reg);
+-	crypto_info->rst = devm_reset_control_get(dev, "crypto-rst");
++	crypto_info->rst = devm_reset_control_array_get_exclusive(dev);
+ 	if (IS_ERR(crypto_info->rst)) {
+ 		err = PTR_ERR(crypto_info->rst);
+ 		goto err_crypto;
 -- 
 2.35.1
 
