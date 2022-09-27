@@ -2,201 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80121C32771
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 01:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E21C6C07E9D
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 03:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbiI0B5X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Sep 2022 21:57:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55538 "EHLO
+        id S231185AbiI0DN0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Sep 2022 23:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbiI0B5U (ORCPT
+        with ESMTP id S231164AbiI0DM2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Sep 2022 21:57:20 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0180A5C7E;
-        Mon, 26 Sep 2022 18:57:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 506C8B81645;
-        Tue, 27 Sep 2022 01:57:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19ED2C433D7;
-        Tue, 27 Sep 2022 01:57:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664243834;
-        bh=hrS6WN/hzNkgLnU3iJZev4toNEQdI/Dak5tUFKl9pbA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=A7CLbDT4evKQjGkrYtH2DXV+uQZOI1O2wKhpC9dtZS2T0CU/SJNvpG8p+gV/EJc48
-         fMBGk45mQrFY23JYpQWqVUPLsNUolhgCwcqIVsrV0Zw/TcaDFQJ5XioRGfn645UxLm
-         jCBRYDq1NOJw7oNP8e1lFu0M6kyYgyf+otTAPA40TarJmIiLap0FNTxw5g7vHX+Sl8
-         95VlhfHZ8nUd+azARnL5yGlRmd/FQd0BfzQrCzcFQbhEd8OnpC9gRTmulNSVDR6vXR
-         m/V9gZJgVtEanJxjt+i8X1aBMY7gCLaMbXBLsfEJNAHPCyxqeeywX1oRsZmsxyBAbQ
-         uXMDNaXyjg1QQ==
-Message-ID: <407fd9c5-d2ed-831f-5284-b8c4177a5e51@kernel.org>
-Date:   Mon, 26 Sep 2022 19:57:12 -0600
+        Mon, 26 Sep 2022 23:12:28 -0400
+Received: from us-smtp-delivery-115.mimecast.com (us-smtp-delivery-115.mimecast.com [170.10.133.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6811C5D118
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Sep 2022 20:10:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maxlinear.com;
+        s=selector; t=1664248223;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f5KqD4AXNLeulyrOVo52Gu9w6zx7SQ1kM2L3Wg2nWcE=;
+        b=ZU88/6CEFHYRdM7CgaMERfYhvY97KHXQUtdg6CrZPTZhPO4jR1OYv+Gub9gfM13VibLecc
+        YJvJJqh3cQT0Jjg4o13fn6GcaSm/cEh0Rg83KcPHjyuxGBhX9GIhMDUU+J7W8GTHVacC66
+        MPgzphkbhHWglOxSFqU3DekXqMchq1ypmhmmg9CcgIqeKdrfN2hXAKqGdYKFY5y6xTULxl
+        szJU5oCKtBhIPWCrHJluGWxJjHr39T/rgEJOHCbH7ysKFivG61v1r5IK3nGAMtjj68gCSs
+        jf7gzm5pA5TrWO3ZI2q9xiSXZG+qD/jzLTv7ekFzVWAuh0T7Zf7E6sTl4wcRvg==
+Received: from mail.maxlinear.com (174-47-1-83.static.ctl.one [174.47.1.83])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ us-mta-496-jwznOG5TO563IXWtGdT8-g-2; Mon, 26 Sep 2022 23:10:21 -0400
+X-MC-Unique: jwznOG5TO563IXWtGdT8-g-2
+Received: from sgsxdev002.isng.phoenix.local (10.226.81.112) by
+ mail.maxlinear.com (10.23.38.120) with Microsoft SMTP Server id 15.1.2375.24;
+ Mon, 26 Sep 2022 20:10:19 -0700
+From:   Peter Harliman Liem <pliem@maxlinear.com>
+To:     <atenart@kernel.org>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-lgm-soc@maxlinear.com>,
+        <pvanleeuwen@rambus.com>, Peter Harliman Liem <pliem@maxlinear.com>
+Subject: [PATCH v2 2/3] crypto: inside-secure - Add fw_little_endian option
+Date:   Tue, 27 Sep 2022 11:10:09 +0800
+Message-ID: <d9d673107f08be9abbbf31a199d4ca26bf985283.1664247167.git.pliem@maxlinear.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1664247167.git.pliem@maxlinear.com>
+References: <cover.1664247167.git.pliem@maxlinear.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH v2 00/35] net/tcp: Add TCP-AO support
-Content-Language: en-US
-To:     Dmitry Safonov <dima@arista.com>, linux-kernel@vger.kernel.org,
-        Eric Dumazet <edumazet@google.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Leonard Crestez <cdleonard@gmail.com>
-Cc:     Andy Lutomirski <luto@amacapital.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20220923201319.493208-1-dima@arista.com>
- <3cf03d51-74db-675c-b392-e4647fa5b5a6@arista.com>
-From:   David Ahern <dsahern@kernel.org>
-In-Reply-To: <3cf03d51-74db-675c-b392-e4647fa5b5a6@arista.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: maxlinear.com
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/23/22 2:25 PM, Dmitry Safonov wrote:
-> On 9/23/22 21:12, Dmitry Safonov wrote:
->> Changes from v1:
->> - Building now with CONFIG_IPV6=n (kernel test robot <lkp@intel.com>)
->> - Added missing static declarations for local functions
->>   (kernel test robot <lkp@intel.com>)
->> - Addressed static analyzer and review comments by Dan Carpenter
->>   (thanks, they were very useful!)
->> - Fix elif without defined() for !CONFIG_TCP_AO
->> - Recursively build selftests/net/tcp_ao (Shuah Khan), patches in:
->>   https://lore.kernel.org/all/20220919201958.279545-1-dima@arista.com/T/#u
->> - Don't leak crypto_pool reference when TCP-MD5 key is modified/changed
->> - Add TCP-AO support for nettest.c and fcnal-test.sh
->>   (will be used for VRF testing in later versions)
+This is to add fw_little_endian option, which can
+be used for platform which firmware is using little-endian
+(instead of big-endian).
 
-The patchset is large enough, so deferring feature addons like VRF to a
-follow on set is fine. That said, it needs to be clear that the UAPI
-will support VRF from the onset, so please state how VRF support will be
-added.
+Signed-off-by: Peter Harliman Liem <pliem@maxlinear.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 14 ++++++++++----
+ drivers/crypto/inside-secure/safexcel.h |  1 +
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
->>
->> Version 1: https://lore.kernel.org/all/20220818170005.747015-1-dima@arista.com/T/#u
-> 
-> I think it's worth answering the question: why am I continuing sending
-> patches for TCP-AO support when there's already another proposal? [1]
-> Pre-history how we end up with the second approach is here: [2]
-> TLDR; we had a customer and a deadline to deliver, I've given reviews to
-> Leonard, but in the end it seems to me what we got is worth submitting
-> as it's better in my view in many aspects.
-> 
-> The biggest differences between two proposals, that I care about
-> (design-decisions, not implementation details):
-
-Thanks for the adding the comparison on the 2 implementations.
-
-> 
-> 1. Per-netns TCP-AO keys vs per-socket TCP-AO keys. The reasons why this
-> proposal is using per-socket keys (that are added like TCP-MD5 keys with
-> setsockopt()) are:
-> - They scale better: you don't have to lookup in netns database for a
-> key. This is a major thing for Arista: we have to support customers that
-> want more than 1000 peers with possible multiple keys per-peer. This
-> scales well when the keys are split by design for each socket on every
-> established connection.
-> - TCP-AO doesn't require CAP_NET_ADMIN for usage.
-> - TCP-AO is not meant to be transparent (like ipsec tunnels) for
-> applications. The users are BGP applications which already know what
-> they need.
-> - Leonard's proposal has weird semantics when setsockopt() on some
-> socket will change keys on other sockets in that network namespace. It
-> should have been rather netlink-managed API or something of the kind if
-> the keys are per-netns.
-> 
-> 2. This proposal seeks to do less in kernel space and leave more
-> decision-making to the userspace. It is another major disagreement with
-
-I do agree that complexity should be in userspace.
-
-
-> Leonard's proposal, which seeks to add a key lifetime, key rotation
-> logic and all other business-logic details into the kernel, while here
-> those decisions are left for the userspace.
-> If I understood Leonard correctly, he is placing more things in kernel
-> to simplify migration for user applications from TCP-MD5 to TCP-AO. I
-> rather think that would be a job for a shared library if that's needed.
-> As per my perception (1) was also done to relieve userspace from the job
-> of removing an outdated key simultaneously from all users in netns,
-> while in this proposal this job is left for userspace to use available
-> IPC methods. Essentially, I think TCP-AO in kernel should do only
-> minimum that can't be done "reasonably" in userspace. By "reasonably" I
-> mean without moving the TCP-IP stack into userspace.
-> 
-> 3. Re-using existing kernel code vs copy'n'pasting it, leaving
-> refactoring for later. I'm a big fan of reusing existing functions. I
-> think lesser amount of code in the end reduces the burden of maintenance
-> as well as simplifies the code (both reading and changing). I can see
-> Leonard's point of simplifying backports to stable releases that he
-> ships to customers, but I think any upstream proposal should add less
-> code and try reusing more.
-> 
-> 4. Following RFC5925 closer to text. RFC says that rnext_key from the
-> peer MUST be respected, as well as that current_key MUST not be removed
-> on an established connection. In this proposal if the requirements of
-> RFC can be met, they are followed, rather than broken.
-> 
-> 5. Using ahash instead of shash. If there's a hardware accelerator - why
-> not using it? This proposal uses crypto_ahash through per-CPU pool of
-> crypto requests (crypto_pool).
-> 
-> 6. Hash algorithm UAPI: magic constants vs hash name as char *. This is
-> a thing I've asked Leonard multiple times and what he refuses to change
-> in his patches: let the UAPI have `char tcpa_alg_name[64]' and just pass
-> it to crypto_* layer. There is no need for #define MY_HASHING_ALGO 0x2
-> and another in-kernel array to convert the magic number to algorithm
-> string in order to pass it to crypto.
-> The algorithm names are flexible: we already have customer's request to
-> use other than RFC5926 required hashing algorithms. And I don't see any
-> value in this middle-layer. This is already what kernel does, see for
-> example, include/uapi/linux/xfrm.h, grep for alg_name.
-> 
-> 7. Adding traffic keys from the beginning. The proposal would be
-> incomplete without having traffic keys: they are pre-calculated in this
-> proposal, so the TCP stack doesn't have to do hashing twice (first for
-> calculation of the traffic key) for every segment on established
-> connections. This proposal has them naturally per-socket.
-> 
-> I think those are the biggest differences in the approaches and they are
-> enough to submit a concurrent proposal. Salam, Francesco, please add if
-> I've missed any other disagreement or major architectural/design
-> difference in the proposals.
-> 
->> In TODO (expect in next versions):
->> - selftests on older kernels (or with CONFIG_TCP_AO=n) should exit with
->>   SKIP, not FAIL
->> - Support VRFs in setsockopt()
->> - setsockopt() UAPI padding + a test that structures are of the same
->>   size on 32-bit as on 64-bit platforms
->> - IPv4-mapped-IPv6 addresses (might be working, but no selftest now)
->> - Remove CONFIG_TCP_AO dependency on CONFIG_TCP_MD5SIG
->> - Add TCP-AO static key
->> - Measure/benchmark TCP-AO and regular TCP connections
->> - setsockopt(TCP_REPAIR) with TCP-AO
-> [..]
-> [1]:
-> https://lore.kernel.org/linux-crypto/cover.1662361354.git.cdleonard@gmail.com/
-> [2]:
-> https://lore.kernel.org/all/8097c38e-e88e-66ad-74d3-2f4a9e3734f4@arista.com/T/#u
-> 
-> Thanks,
->           Dmitry
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/insid=
+e-secure/safexcel.c
+index 8f4872470529..4d6d64ff9a0f 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -316,14 +316,20 @@ static void eip197_init_firmware(struct safexcel_cryp=
+to_priv *priv)
+ static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
+ =09=09=09=09  const struct firmware *fw)
+ {
+-=09const __be32 *data =3D (const __be32 *)fw->data;
++=09u32 val;
+ =09int i;
+=20
+ =09/* Write the firmware */
+-=09for (i =3D 0; i < fw->size / sizeof(u32); i++)
+-=09=09writel(be32_to_cpu(data[i]),
++=09for (i =3D 0; i < fw->size / sizeof(u32); i++) {
++=09=09if (priv->data->fw_little_endian)
++=09=09=09val =3D le32_to_cpu(((const __le32 *)fw->data)[i]);
++=09=09else
++=09=09=09val =3D be32_to_cpu(((const __be32 *)fw->data)[i]);
++
++=09=09writel(val,
+ =09=09       priv->base + EIP197_CLASSIFICATION_RAMS +
+-=09=09       i * sizeof(__be32));
++=09=09       i * sizeof(val));
++=09}
+=20
+ =09/* Exclude final 2 NOPs from size */
+ =09return i - EIP197_FW_TERMINAL_NOPS;
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/insid=
+e-secure/safexcel.h
+index e8da8b30a392..f049293870b4 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -735,6 +735,7 @@ enum safexcel_eip_version {
+=20
+ struct safexcel_priv_data {
+ =09enum safexcel_eip_version version;
++=09bool fw_little_endian;
+ };
+=20
+ /* Priority we use for advertising our algorithms */
+--=20
+2.17.1
 
