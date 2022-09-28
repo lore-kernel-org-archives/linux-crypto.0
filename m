@@ -2,90 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C71F0C32771
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 16:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A7AC32771
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 18:45:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234240AbiI1Que (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Sep 2022 12:50:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41174 "EHLO
+        id S234253AbiI1SpX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Sep 2022 14:45:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234278AbiI1Quc (ORCPT
+        with ESMTP id S234211AbiI1SpU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Sep 2022 12:50:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2FD7754A;
-        Wed, 28 Sep 2022 09:50:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 887B061F2D;
-        Wed, 28 Sep 2022 16:50:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AE28C433D6;
-        Wed, 28 Sep 2022 16:50:26 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BtbkVSOz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1664383824;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=MPljTNW527gCkehfhx8+XdIZwq9wSOk7roP1gIrDLuo=;
-        b=BtbkVSOzwf0mLL7A4X2f+vXElefHugzoYFA0h0lt2b6NqsFsPkYD5Vju2wkvDmmW8X8jSC
-        GxUeZzLv2cKZ4dngbOw6SPyH4Z2gW+DFa7/DUWw3yVK7NuRGF6KOeyDEq/x/G23+grpgxc
-        32Icf+qZ/9i78XsM+sRklrylcE9Q0Qs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ef8b7b80 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 28 Sep 2022 16:50:24 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] random: add 8-bit and 16-bit batches
-Date:   Wed, 28 Sep 2022 18:50:18 +0200
-Message-Id: <20220928165018.73496-1-Jason@zx2c4.com>
+        Wed, 28 Sep 2022 14:45:20 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C891615C;
+        Wed, 28 Sep 2022 11:45:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=APfnm3ZojMt3MIVmwB4HuYwLCCZIT+HXpyNFwym09G5eOyPTzvzt8KS5Wj71g9OJ44CIZ55YraCQPX3hak5z6yEomx6HgfnVQPMRxiUzkM4AyATvjlgBmM07ThFMPQgadPFYplBBb9MtPlIucYFFl09LwE0mu6I5mgs7pue1IntMoo9eJoEtyQ5FfT6XdFxfIrBuuQwpXfKdBPvQ40Y4WVt2TnVThoY6WHuy7J39Pn4zH6GEhuPmXbjBY/PRBlV0sLURnmqpHomv5kEHYSBe+cwAeEp0GzPuzWnPwgNYb31DIobrYG5KF2Q0l+e6Nutdi0IfahIwcf/qQ06PoFzN6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7338DyfAYmFWtd48FePCvMlZm8mI4MEqqYuX8f7/yTw=;
+ b=ldksk4V+kovRvRqcMuSfrp0PoVgTUJrufKOoD6fZoO5lFvUbnJFvh6F+f0TxzTsKU8+drV2FhfRCYhYZE/S4Yd2J5VBk3uzAZ2mdU96+ClJIr8e6rwmU/MaT9nZhKIAc12NUYy+YRbCklcIkjoVs85+ghVD/HqsGol2ZvCUMbRfUiolqAr2vjEA46cKKb8Ps3nqh8Scc/sd97Be6Stc7O0NovADWhyKxulgOezGrHJIIrl2CvFEtucoLjFm5HRXYIWSxwm3DpmuNt+PvNG5u3+akKWrlkuyGA2CCz9fePVHokUj5RYJ1WKn3dCKBn8qgZ3bR4BioWZjEt2nZh+13SA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7338DyfAYmFWtd48FePCvMlZm8mI4MEqqYuX8f7/yTw=;
+ b=H7tseHVKR1VLAqin+LsxcZ87nQdWJPhgTy4Q6FknlvVAYzOg6X71gYQfPfZ+i7QfIxmGc+wsNkYB046ik6FrM1qfvdH1x0zSQT9xUbznPfarfocY4h6uqW2+6nkDdPLCdhR6F7zuiO6Jl6KyP40kJfZhuk263lCXNhbjVtrNyNA=
+Received: from DS7PR05CA0101.namprd05.prod.outlook.com (2603:10b6:8:56::21) by
+ DM6PR12MB4356.namprd12.prod.outlook.com (2603:10b6:5:2aa::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.17; Wed, 28 Sep 2022 18:45:16 +0000
+Received: from CY4PEPF0000B8E9.namprd05.prod.outlook.com
+ (2603:10b6:8:56:cafe::43) by DS7PR05CA0101.outlook.office365.com
+ (2603:10b6:8:56::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.13 via Frontend
+ Transport; Wed, 28 Sep 2022 18:45:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000B8E9.mail.protection.outlook.com (10.167.241.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5676.13 via Frontend Transport; Wed, 28 Sep 2022 18:45:16 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Wed, 28 Sep
+ 2022 13:45:15 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     <mario.limonciello@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "John Allen" <john.allen@amd.com>
+CC:     <stable@vger.kernel.org>,
+        Rijo-john Thomas <Rijo-john.Thomas@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: ccp: Add support for TEE for PCI ID 0x14CA
+Date:   Wed, 28 Sep 2022 13:45:05 -0500
+Message-ID: <20220928184506.13981-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8E9:EE_|DM6PR12MB4356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62dcf765-d12c-4a6f-c471-08daa18195ec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DnAD+TRy5W3qZwNJmmKw6eZBD5a3H173HSQkXCj7edK2nuEwk+tGTyy9D9KnkIYUA9hKw78fnWsNTpLiGSxTgnOGaFFNCnZzuhScmDrQQVOKXDATgt25oTOZzNzxrpbL+REUXF0wXdzqz8FdTaikOylMMfUYZwjjEh4cWoK7DYzD8rTjPHf9npLHjHGfKw5zZpgW+T3mygAXe6hOXILB4nnJZHswl7gJ5rDUMDdFKAZNEIxMDKSWjim/H5NgyKqOGdohc0EGm7++jLaM/IIPz1cFo4cpYOylr9Eb32z55Get3dWU+kmkFr8a9WrKg8AL0tKslchMnLyiI728E4y8GRwhPSe0ktzN2h1aLdbjcOhmENRUgvxxgX0rRVG7eJs1gCRW/Rm34vzLNz7TU+4G0L3gIMVosfIZ48ArMVGGUyeWmq3jG1Qun8Iuse5Y3XFQT8H4Cj1Bm7mQIbVhGylrXzej8/4s5ND5er8hd3aGJViMoF4tU0w1DndHLY1YkIS/Eb30ZRV0EP8BaV33wOQ618ZBvjwCCf48Yugl3L168fzirKRONK1t/UDgqHbH4RDkqAQSqMJ64xN3LsEROr574gf+plcuXUAcCYeXtdxEMbiG721mAP7Hz7AGYepS2Lpor8Wr9ZHTsmlx2MNAjS32ffOqQA5uRi4OsyevOnHaAfMcboBkFLUf3u2RQiVeTjoaKrD4vJdiOW9ongZ45OX+exBSeoJNw7ZwMM5C6blgIDRQJcaquSfG3pnNvcLn/gvKduE+jEBk2ooZFLj6Z8Cfe21e6poleOrCD4hFnJ7BZrlptGdJijkdmtkK4Urjxihz
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(376002)(346002)(396003)(451199015)(40470700004)(46966006)(36840700001)(8676002)(4326008)(54906003)(70586007)(70206006)(6636002)(40460700003)(86362001)(316002)(478600001)(110136005)(40480700001)(36756003)(47076005)(426003)(83380400001)(7696005)(6666004)(5660300002)(2616005)(44832011)(8936002)(2906002)(336012)(26005)(1076003)(16526019)(186003)(41300700001)(82740400003)(81166007)(82310400005)(356005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 18:45:16.3271
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62dcf765-d12c-4a6f-c471-08daa18195ec
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8E9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4356
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There are numerous places in the kernel that would be sped up by having
-smaller batches. Currently those callsites do `get_random_u32() & 0xff`
-or similar. Since these are pretty spread out, and will require patches
-to multiple different trees, let's get ahead of the curve and lay the
-foundation for `get_random_u8()` and `get_random_u16()`, so that it's
-then possible to start submitting conversion patches leisurely.
+SoCs containing 0x14CA are present both in datacenter parts that
+support SEV as well as client parts that support TEE.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: stable@vger.kernel.org # 5.15+
+Tested-by: Rijo-john Thomas <Rijo-john.Thomas@amd.com>
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/char/random.c  | 2 ++
- include/linux/random.h | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/crypto/ccp/sp-pci.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index f2aa3ab1b458..64ee16ffb8b7 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -506,6 +506,8 @@ EXPORT_SYMBOL(get_random_ ##type);
- 
- DEFINE_BATCHED_ENTROPY(u64)
- DEFINE_BATCHED_ENTROPY(u32)
-+DEFINE_BATCHED_ENTROPY(u16)
-+DEFINE_BATCHED_ENTROPY(u8)
- 
- #ifdef CONFIG_SMP
- /*
-diff --git a/include/linux/random.h b/include/linux/random.h
-index a9e6e16f9774..2c130f8f18e5 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -38,6 +38,8 @@ static inline int unregister_random_vmfork_notifier(struct notifier_block *nb) {
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 792d6da7f0c0..084d052fddcc 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -381,6 +381,15 @@ static const struct psp_vdata pspv3 = {
+ 	.inten_reg		= 0x10690,
+ 	.intsts_reg		= 0x10694,
+ };
++
++static const struct psp_vdata pspv4 = {
++	.sev			= &sevv2,
++	.tee			= &teev1,
++	.feature_reg		= 0x109fc,
++	.inten_reg		= 0x10690,
++	.intsts_reg		= 0x10694,
++};
++
  #endif
  
- void get_random_bytes(void *buf, size_t len);
-+u8 get_random_u8(void);
-+u16 get_random_u16(void);
- u32 get_random_u32(void);
- u64 get_random_u64(void);
- static inline unsigned int get_random_int(void)
+ static const struct sp_dev_vdata dev_vdata[] = {
+@@ -426,7 +435,7 @@ static const struct sp_dev_vdata dev_vdata[] = {
+ 	{	/* 5 */
+ 		.bar = 2,
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+-		.psp_vdata = &pspv2,
++		.psp_vdata = &pspv4,
+ #endif
+ 	},
+ 	{	/* 6 */
 -- 
-2.37.3
+2.34.1
 
