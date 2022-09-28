@@ -2,107 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C70C07E9D
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Sep 2022 21:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E255C04A95
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 07:40:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbiI0Vjp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Sep 2022 17:39:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46414 "EHLO
+        id S233535AbiI1Hkc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Sep 2022 03:40:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231218AbiI0Vjl (ORCPT
+        with ESMTP id S233318AbiI1Hjx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Sep 2022 17:39:41 -0400
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1335CD1;
-        Tue, 27 Sep 2022 14:39:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
-        Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=2JMLfcmZeS6Sxey/juZszgrKjCQGK3qAWvZUg82Nalo=; b=DE817yt/jIg3i8+SdpFozjOoLX
-        O9WbPIlD+89sho1SMwwgLDKgMTxPJwFlwnO2Yido0b1bzVUUsqddDjM7x7NK2I/ulnI9GjVPKYrjs
-        DUlaIwgsY8rTKxQbPKyjuBWOyZw6RYW1pdR1WtXme2ayi1MXPD1OPnUbUxA2LYt1lQgiEPl4LSO5N
-        VUsD4IvPYZydEbA/mjKYd1Mn+iSOKXjYct3TGTJwRQnEDuvlMWOJwsed/5pMkpdUze9Gjzs6GTanC
-        uH01DAX1kp89bLWi23bY4hX07VpgzFxj4Cfm8J+LX+nrnY7sTliWjTpXAtvVk/mToI1ukf/w7uJzY
-        8frYoYTw==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1odIId-00C1hi-Hs; Tue, 27 Sep 2022 23:39:31 +0200
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1odIIc-000VSP-3D;
-        Tue, 27 Sep 2022 23:39:31 +0200
-Date:   Tue, 27 Sep 2022 23:39:30 +0200
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     heiko@sntech.de, davem@davemloft.net, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH RFT 4/5] crypto: rockchip: support the new crypto IP for
- rk3568/rk3588
-Message-ID: <YzNtkiR/dD0aEZrv@aurel32.net>
-Mail-Followup-To: Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-References: <20220927080048.3151911-1-clabbe@baylibre.com>
- <20220927080048.3151911-5-clabbe@baylibre.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220927080048.3151911-5-clabbe@baylibre.com>
-User-Agent: Mutt/2.2.7 (2022-08-07)
+        Wed, 28 Sep 2022 03:39:53 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918071129C3;
+        Wed, 28 Sep 2022 00:38:11 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R751e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VQv1uEy_1664350687;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VQv1uEy_1664350687)
+          by smtp.aliyun-inc.com;
+          Wed, 28 Sep 2022 15:38:08 +0800
+From:   'Guanjun' <guanjun@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, elliott@hpe.com
+Cc:     zelin.deng@linux.alibaba.com, guanjun@linux.alibaba.com,
+        xuchun.shang@linux.alibaba.com, artie.ding@linux.alibaba.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/9] Drivers for Alibaba YCC (Yitian Cryptography Complex) cryptographic accelerator
+Date:   Wed, 28 Sep 2022 15:37:58 +0800
+Message-Id: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-09-27 08:00, Corentin Labbe wrote:
-> Rockchip rk3568 and rk3588 have a common crypto offloader IP.
-> This driver adds support for it.
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  drivers/crypto/rockchip/Kconfig               |  28 +
->  drivers/crypto/rockchip/Makefile              |   5 +
->  drivers/crypto/rockchip/rk3588_crypto.c       | 646 ++++++++++++++++++
->  drivers/crypto/rockchip/rk3588_crypto.h       | 221 ++++++
->  drivers/crypto/rockchip/rk3588_crypto_ahash.c | 346 ++++++++++
->  .../crypto/rockchip/rk3588_crypto_skcipher.c  | 340 +++++++++
->  6 files changed, 1586 insertions(+)
->  create mode 100644 drivers/crypto/rockchip/rk3588_crypto.c
->  create mode 100644 drivers/crypto/rockchip/rk3588_crypto.h
->  create mode 100644 drivers/crypto/rockchip/rk3588_crypto_ahash.c
->  create mode 100644 drivers/crypto/rockchip/rk3588_crypto_skcipher.c
-> 
-> diff --git a/drivers/crypto/rockchip/Kconfig b/drivers/crypto/rockchip/Kconfig
-> index 1010d897d9ef..84ca1081fd0c 100644
-> --- a/drivers/crypto/rockchip/Kconfig
-> +++ b/drivers/crypto/rockchip/Kconfig
-> @@ -26,3 +26,31 @@ config CRYPTO_DEV_ROCKCHIP_DEBUG
->  	  Say y to enable Rockchip crypto debug stats.
->  	  This will create /sys/kernel/debug/rk3288_crypto/stats for displaying
->  	  the number of requests per algorithm and other internal stats.
-> +
-> +config CRYPTO_DEV_ROCKCHIP2
-> +	tristate "Rockchip's cryptographic offloader V2"
-> +	depends on OF && ARCH_ROCKCHIP
-> +	depends on PM
-> +	select CRYPTO_ECB
-> +	select CRYPTO_CBC
-> +	select CRYPTO_AES
-> +	select CRYPTO_MD5
-> +	select CRYPTO_SHA1
-> +	select CRYPTO_SHA256
-> +	select CRYPTO_SM3
+From: Guanjun <guanjun@linux.alibaba.com>
 
-That should be CRYPTO_SM3_GENERIC
+Hi,
+
+This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
+cryptographic accelerator. Enables the on-chip cryptographic accelerator of
+Alibaba Yitian SoCs which is based on ARMv9 architecture.
+
+It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
+
+Please help to review.
+
+Thanks,
+Guanjun.
+
+Change log:
+v1 RESEND -> v2:
+ - [01/09] Remove char device that is not used now.
+
+v1 -> v1 RESEND:
+  - [01/09] Adjust the Kconfig entry in alphabetical order
+  - [05/09][07/09][08/09] Adjust the format of algorithm names
+
+v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
+v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
+
+Guanjun (3):
+  crypto/ycc: Add skcipher algorithm support
+  crypto/ycc: Add aead algorithm support
+  crypto/ycc: Add rsa algorithm support
+
+Xuchun Shang (1):
+  crypto/ycc: Add sm2 algorithm support
+
+Zelin Deng (5):
+  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+  crypto/ycc: Add ycc ring configuration
+  crypto/ycc: Add irq support for ycc kernel rings
+  crypto/ycc: Add device error handling support for ycc hw errors
+  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
+    entry
+
+ MAINTAINERS                            |   8 +
+ drivers/crypto/Kconfig                 |   2 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/ycc/Kconfig             |  18 +
+ drivers/crypto/ycc/Makefile            |   4 +
+ drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
+ drivers/crypto/ycc/sm2signature_asn1.h |  13 +
+ drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
+ drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
+ drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
+ drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
+ drivers/crypto/ycc/ycc_isr.h           |  12 +
+ drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
+ drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
+ 17 files changed, 4610 insertions(+)
+ create mode 100644 drivers/crypto/ycc/Kconfig
+ create mode 100644 drivers/crypto/ycc/Makefile
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+ create mode 100644 drivers/crypto/ycc/ycc_aead.c
+ create mode 100644 drivers/crypto/ycc/ycc_algs.h
+ create mode 100644 drivers/crypto/ycc/ycc_dev.h
+ create mode 100644 drivers/crypto/ycc/ycc_drv.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.h
+ create mode 100644 drivers/crypto/ycc/ycc_pke.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.h
+ create mode 100644 drivers/crypto/ycc/ycc_ske.c
 
 -- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+1.8.3.1
+
