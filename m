@@ -2,111 +2,186 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E255C04A95
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 07:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD62C6FA86
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 07:40:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233535AbiI1Hkc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Sep 2022 03:40:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
+        id S233761AbiI1Hkg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Sep 2022 03:40:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233318AbiI1Hjx (ORCPT
+        with ESMTP id S233711AbiI1Hj6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Sep 2022 03:39:53 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918071129C3;
-        Wed, 28 Sep 2022 00:38:11 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R751e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VQv1uEy_1664350687;
-Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VQv1uEy_1664350687)
+        Wed, 28 Sep 2022 03:39:58 -0400
+Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4003010D645;
+        Wed, 28 Sep 2022 00:38:14 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VQv0o2K_1664350691;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VQv0o2K_1664350691)
           by smtp.aliyun-inc.com;
-          Wed, 28 Sep 2022 15:38:08 +0800
+          Wed, 28 Sep 2022 15:38:12 +0800
 From:   'Guanjun' <guanjun@linux.alibaba.com>
 To:     herbert@gondor.apana.org.au, elliott@hpe.com
 Cc:     zelin.deng@linux.alibaba.com, guanjun@linux.alibaba.com,
         xuchun.shang@linux.alibaba.com, artie.ding@linux.alibaba.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/9] Drivers for Alibaba YCC (Yitian Cryptography Complex) cryptographic accelerator
-Date:   Wed, 28 Sep 2022 15:37:58 +0800
-Message-Id: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
+Subject: [PATCH v2 3/9] crypto/ycc: Add irq support for ycc kernel rings
+Date:   Wed, 28 Sep 2022 15:38:01 +0800
+Message-Id: <1664350687-47330-4-git-send-email-guanjun@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
+References: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Guanjun <guanjun@linux.alibaba.com>
+From: Zelin Deng <zelin.deng@linux.alibaba.com>
 
-Hi,
+Each kernel ring has its own command done irq. Temporarily user rings
+will not enable irq.
 
-This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
-cryptographic accelerator. Enables the on-chip cryptographic accelerator of
-Alibaba Yitian SoCs which is based on ARMv9 architecture.
+Signed-off-by: Zelin Deng <zelin.deng@linux.alibaba.com>
+---
+ drivers/crypto/ycc/ycc_isr.c | 92 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 80 insertions(+), 12 deletions(-)
 
-It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
-
-Please help to review.
-
-Thanks,
-Guanjun.
-
-Change log:
-v1 RESEND -> v2:
- - [01/09] Remove char device that is not used now.
-
-v1 -> v1 RESEND:
-  - [01/09] Adjust the Kconfig entry in alphabetical order
-  - [05/09][07/09][08/09] Adjust the format of algorithm names
-
-v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
-v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
-
-Guanjun (3):
-  crypto/ycc: Add skcipher algorithm support
-  crypto/ycc: Add aead algorithm support
-  crypto/ycc: Add rsa algorithm support
-
-Xuchun Shang (1):
-  crypto/ycc: Add sm2 algorithm support
-
-Zelin Deng (5):
-  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
-  crypto/ycc: Add ycc ring configuration
-  crypto/ycc: Add irq support for ycc kernel rings
-  crypto/ycc: Add device error handling support for ycc hw errors
-  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
-    entry
-
- MAINTAINERS                            |   8 +
- drivers/crypto/Kconfig                 |   2 +
- drivers/crypto/Makefile                |   1 +
- drivers/crypto/ycc/Kconfig             |  18 +
- drivers/crypto/ycc/Makefile            |   4 +
- drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
- drivers/crypto/ycc/sm2signature_asn1.h |  13 +
- drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
- drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
- drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
- drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
- drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
- drivers/crypto/ycc/ycc_isr.h           |  12 +
- drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
- drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
- drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
- drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
- 17 files changed, 4610 insertions(+)
- create mode 100644 drivers/crypto/ycc/Kconfig
- create mode 100644 drivers/crypto/ycc/Makefile
- create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
- create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
- create mode 100644 drivers/crypto/ycc/ycc_aead.c
- create mode 100644 drivers/crypto/ycc/ycc_algs.h
- create mode 100644 drivers/crypto/ycc/ycc_dev.h
- create mode 100644 drivers/crypto/ycc/ycc_drv.c
- create mode 100644 drivers/crypto/ycc/ycc_isr.c
- create mode 100644 drivers/crypto/ycc/ycc_isr.h
- create mode 100644 drivers/crypto/ycc/ycc_pke.c
- create mode 100644 drivers/crypto/ycc/ycc_ring.c
- create mode 100644 drivers/crypto/ycc/ycc_ring.h
- create mode 100644 drivers/crypto/ycc/ycc_ske.c
-
+diff --git a/drivers/crypto/ycc/ycc_isr.c b/drivers/crypto/ycc/ycc_isr.c
+index cd2a2d7..a86c8d7 100644
+--- a/drivers/crypto/ycc/ycc_isr.c
++++ b/drivers/crypto/ycc/ycc_isr.c
+@@ -12,6 +12,17 @@
+ #include <linux/interrupt.h>
+ 
+ #include "ycc_isr.h"
++#include "ycc_dev.h"
++#include "ycc_ring.h"
++
++
++static irqreturn_t ycc_resp_isr(int irq, void *data)
++{
++	struct ycc_ring *ring = (struct ycc_ring *)data;
++
++	tasklet_hi_schedule(&ring->resp_handler);
++	return IRQ_HANDLED;
++}
+ 
+ /*
+  * TODO: will implement when ycc ring actually work.
+@@ -38,11 +49,13 @@ static irqreturn_t ycc_g_err_isr(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-/*
+- * TODO: will implement when ycc ring actually work.
+- */
+ void ycc_resp_process(uintptr_t ring_addr)
+ {
++	struct ycc_ring *ring = (struct ycc_ring *)ring_addr;
++
++	ycc_dequeue(ring);
++	if (ring->ydev->is_polling)
++		tasklet_hi_schedule(&ring->resp_handler);
+ }
+ 
+ int ycc_enable_msix(struct ycc_dev *ydev)
+@@ -83,34 +96,89 @@ static void ycc_cleanup_global_err_workqueue(struct ycc_dev *ydev)
+ 		destroy_workqueue(ydev->dev_err_q);
+ }
+ 
+-/*
+- * TODO: Just request irq for global err. Irq for each ring
+- * will be requested when ring actually work.
+- */
+ int ycc_alloc_irqs(struct ycc_dev *ydev)
+ {
+ 	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
+ 	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
+-	int ret;
++	int cpu, cpus = num_online_cpus();
++	int ret, i, j;
+ 
++	/* The 0 - (YCC_RINGPAIR_NUM-1) are rings irqs, the last one is dev error irq */
+ 	sprintf(ydev->err_irq_name, "ycc_dev_%d_global_err", ydev->id);
+ 	ret = request_irq(pci_irq_vector(rcec_pdev, num),
+ 			  ycc_g_err_isr, 0, ydev->err_irq_name, ydev);
+-	if (ret)
++	if (ret) {
+ 		pr_err("Failed to alloc global irq interrupt for dev: %d\n", ydev->id);
++		goto out;
++	}
++
++	if (ydev->is_polling)
++		goto out;
++
++	for (i = 0; i < num; i++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
++
++		ydev->msi_name[i] = kzalloc(16, GFP_KERNEL);
++		if (!ydev->msi_name[i])
++			goto free_irq;
++		snprintf(ydev->msi_name[i], 16, "ycc_ring_%d", i);
++		ret = request_irq(pci_irq_vector(rcec_pdev, i), ycc_resp_isr,
++				  0, ydev->msi_name[i], &ydev->rings[i]);
++		if (ret) {
++			kfree(ydev->msi_name[i]);
++			goto free_irq;
++		}
++		if (!ydev->is_vf)
++			cpu = (i % YCC_RINGPAIR_NUM) % cpus;
++		else
++			cpu = smp_processor_id() % cpus;
++
++		ret = irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i),
++					    get_cpu_mask(cpu));
++		if (ret) {
++			free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
++			kfree(ydev->msi_name[i]);
++			goto free_irq;
++		}
++	}
++
++	return 0;
++
++free_irq:
++	for (j = 0; j < i; j++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
++
++		free_irq(pci_irq_vector(rcec_pdev, j), &ydev->rings[j]);
++		kfree(ydev->msi_name[j]);
++	}
++	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
++out:
+ 
+ 	return ret;
+ }
+ 
+-/*
+- * TODO: Same as the allocate action.
+- */
+ void ycc_free_irqs(struct ycc_dev *ydev)
+ {
+ 	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
+ 	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
++	int i;
+ 
++	/* Free device err irq */
+ 	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
++
++	if (ydev->is_polling)
++		return;
++
++	for (i = 0; i < num; i++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
++
++		irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i), NULL);
++		free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
++		kfree(ydev->msi_name[i]);
++	}
+ }
+ 
+ int ycc_init_global_err(struct ycc_dev *ydev)
 -- 
 1.8.3.1
 
