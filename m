@@ -2,78 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 195D3C4167D
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 13:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C766EC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 14:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235025AbiI2Nbf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Sep 2022 09:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48114 "EHLO
+        id S234411AbiI2Odx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Sep 2022 10:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234922AbiI2Nbc (ORCPT
+        with ESMTP id S235814AbiI2Odi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2022 09:31:32 -0400
-Received: from maillog.nuvoton.com (maillog.nuvoton.com [202.39.227.15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A12DD137460;
-        Thu, 29 Sep 2022 06:31:27 -0700 (PDT)
-Received: from NTHCCAS04.nuvoton.com (NTHCCAS04.nuvoton.com [10.1.8.29])
-        by maillog.nuvoton.com (Postfix) with ESMTP id 6A28D1C80E70;
-        Thu, 29 Sep 2022 21:31:25 +0800 (CST)
-Received: from NTHCML01A.nuvoton.com (10.1.8.177) by NTHCCAS04.nuvoton.com
- (10.1.8.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 29
- Sep 2022 21:31:25 +0800
-Received: from NTHCCAS04.nuvoton.com (10.1.8.29) by NTHCML01A.nuvoton.com
- (10.1.8.177) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2176.2; Thu, 29 Sep
- 2022 21:31:24 +0800
-Received: from taln60.nuvoton.co.il (10.191.1.180) by NTHCCAS04.nuvoton.com
- (10.1.12.25) with Microsoft SMTP Server id 15.1.2176.2 via Frontend
- Transport; Thu, 29 Sep 2022 21:31:24 +0800
-Received: by taln60.nuvoton.co.il (Postfix, from userid 10070)
-        id A1B97637C4; Thu, 29 Sep 2022 16:31:23 +0300 (IDT)
-From:   Tomer Maimon <tmaimon77@gmail.com>
-To:     <avifishman70@gmail.com>, <tali.perry1@gmail.com>,
-        <joel@jms.id.au>, <venture@google.com>, <yuenn@google.com>,
-        <benjaminfair@google.com>, <olivia@selenic.com>,
-        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>
-CC:     <openbmc@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        Tomer Maimon <tmaimon77@gmail.com>
-Subject: [PATCH v2 0/2] rng: npcm: add Arbel NPCM8XX support
-Date:   Thu, 29 Sep 2022 16:31:09 +0300
-Message-ID: <20220929133111.73897-1-tmaimon77@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        Thu, 29 Sep 2022 10:33:38 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71FD1C26F9
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 07:33:27 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id bu25so2549933lfb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 07:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=1Du+LCP4zo2JIvr0KRiMiBlM15dglqZfGoGPYt4had4=;
+        b=X5fyPN/suqcgHeLtbGI2GxpL3HBgnu/OxfV5+pN0HPNynf/bXHC5BZ5rn619NrHC7+
+         jmBKTEb3MjfvOPVbqMhw7cE01/QMuvWz3v8sJXexiMqYTamHBxbSQAKtbXJ4R+2mfv43
+         6tH7CkMzmK0FxSEmfAfkULZhKyIUWXWP7Ms1Ng1m2ubiop/o2GnRHNsQcu7IPy8c5+jn
+         RBkHhXc3rf4QHi1sfb7r5kSgABjIKamw5mgdLtQxJ4+St2RrXaT22007dPjQT7XkeVTD
+         hfuq9kcoLlFfDOIMut7wVpPQKk5GJSH3kB9F/boaDGFGjFJSWMbyhYaF3sSNUFzUnJ9y
+         T8Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=1Du+LCP4zo2JIvr0KRiMiBlM15dglqZfGoGPYt4had4=;
+        b=fTibYqCl3cQx+7mlGytoH5l+sb/mLzwEAEtgdxC09Eln0lfixDV+XpGWep/L6mI66P
+         YcsBv+XF9KLSioB87w/xvExTVORB4SP6cxsmm0I16miIulPvDxSzwAKOjkGByZYvGuj+
+         Dxhho+DFAUkTVSH5FAEA5SyvcZ2bDjwm7uWEkC1UUK2KIwONepaA1RntwsJYlncq1fv7
+         waQ+os8N3FVEur4rsFVq9ZX4xqHU79dNu0HNehZA7SmNDNBbuj1ilrXb4QNBHyPluibZ
+         aYGlpJEc0ONIa6SAlcWpY2m7/fH2AQOATrl4XIvxa99whpukYuapeo0XV93tlry85uEH
+         LTYA==
+X-Gm-Message-State: ACrzQf2H4UT0Q7pFgVUvsNm5Qn6XkFDXtYF6fJdXD2BDVFPrABU5prXG
+        YhG1OQqmPsJzOUK7dEtcCI9u9Q==
+X-Google-Smtp-Source: AMsMyM78X6A0lJO+2KyzfxmyCRQIKMwSdmnQXFMMKcYiuOkV8KHto6m1G+GLQmFGKcMFzjFvOOLKjw==
+X-Received: by 2002:a05:6512:1047:b0:49d:a875:8d90 with SMTP id c7-20020a056512104700b0049da8758d90mr1589006lfb.630.1664462005219;
+        Thu, 29 Sep 2022 07:33:25 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id d15-20020ac244cf000000b00497ab39bcd0sm803711lfm.96.2022.09.29.07.33.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Sep 2022 07:33:24 -0700 (PDT)
+Message-ID: <0cb853c1-0c07-bf59-3c7b-e9366d7db5b0@linaro.org>
+Date:   Thu, 29 Sep 2022 16:33:23 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH v2 1/2] dt-bindings: rng: nuvoton,npcm-rng: Add npcm845
+ compatible string
+Content-Language: en-US
+To:     Tomer Maimon <tmaimon77@gmail.com>, avifishman70@gmail.com,
+        tali.perry1@gmail.com, joel@jms.id.au, venture@google.com,
+        yuenn@google.com, benjaminfair@google.com, olivia@selenic.com,
+        herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org
+Cc:     openbmc@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+References: <20220929133111.73897-1-tmaimon77@gmail.com>
+ <20220929133111.73897-2-tmaimon77@gmail.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20220929133111.73897-2-tmaimon77@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch set adds Arbel NPCM8XX Random Number Generator(RNG) support 
-to RNG NPCM driver.
+On 29/09/2022 15:31, Tomer Maimon wrote:
+> Add a compatible string for Nuvoton BMC NPCM845 RNG.
+> 
+> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 
-The NPCM8XX RNG uses different prescalar clock value.
 
-The NPCM RNG driver was tested on the NPCM845 evaluation board.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Addressed comments from:
- - Krzysztof Kozlowski: https://www.spinics.net/lists/kernel/msg4523771.html
-			https://www.spinics.net/lists/kernel/msg4523585.html
-
-Changes since version 1:
- - Fix dt-binding document warning.
- - Use driver data to handle architecture specific clock prescaler.
-
-Tomer Maimon (2):
-  dt-bindings: rng: nuvoton,npcm-rng: Add npcm845 compatible string
-  hwrng: npcm: Add NPCM8XX support
-
- .../devicetree/bindings/rng/nuvoton,npcm-rng.yaml  |  4 +++-
- drivers/char/hw_random/npcm-rng.c                  | 14 ++++++++++----
- 2 files changed, 13 insertions(+), 5 deletions(-)
-
--- 
-2.33.0
+Best regards,
+Krzysztof
 
