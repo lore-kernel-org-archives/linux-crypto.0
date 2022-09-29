@@ -2,114 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37379C04A95
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 07:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B112C43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 10:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235196AbiI2HpT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Sep 2022 03:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34406 "EHLO
+        id S235539AbiI2KbQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Sep 2022 06:31:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235104AbiI2HpS (ORCPT
+        with ESMTP id S235511AbiI2KbP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2022 03:45:18 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68835AC53
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 00:45:12 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id l18so792583wrw.9
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 00:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date:from:to:cc
-         :subject:date;
-        bh=guoNLlLK+w+Celq4Xs8AUibS5WLsjCvsO7YfOGTaInU=;
-        b=Y+rRU8KWKGamxRVQBlnjssoWflVvUel0TRkBu/ixzRRosKwL3tpkpFu/tlbtGSjABT
-         Ap8uEGQIMjaUagsF8Whox/TJN4SPhvMGNQlxdGypGLna4zs4kOMpDsZPHTWCk8Ix2+bK
-         6g5UtGpVGAI3sIVza2zjDBqv13XtBGAx9DYqLeELHEtKdw/HQw8Uw9ZXQVK9vFPgCosH
-         +4SnNVsqVpnqlrziBgsIB/rkUUXD60nEztCGRwP6SKxMFlFfLnapzGl4bnCddTxBgR7Z
-         5+OlEMxcfMwAyLjltlJZBBP6niz/+jniu25Sj46SteH/K5O0FVvsz5fdjHdFxO5bHTar
-         9S3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=guoNLlLK+w+Celq4Xs8AUibS5WLsjCvsO7YfOGTaInU=;
-        b=uyqzILzM8nrahsmdixHb08727gMaHNld9VlYitB05BDnTNlBDPCuwCznpf5Xkhkg/W
-         gtH5332mcVnMqaxDQFjxOSp+wbT8bv+tqwBey39Ne1tuu9swoC4zgrLF+Ja1qxlUVwR+
-         5Bl3DeLAzGf0/mIRT2dFdY9KE6l7t51xhzY7njuj89/CRwaLIZD0PVqSV5ZUsmLaw3+7
-         GAkuyn/GN28fliJAtFgzlbZof8e9H6HRTzAMxhrhJi3XreDzqYvZSe1y8L55iphwUN65
-         M/tumS00efw8RqBvj9DvtwsLvB7G6hVWG2mSIeCTwrfLo8kGU10hWRjZcTuI0gjU/uSr
-         K5xw==
-X-Gm-Message-State: ACrzQf38DNonmjwwrNOS9X5NRh/oCPFXjdUmQ9k4m9P+7A1hJ+wkKMg6
-        UDT4pyKpFh+SU/Upi2N4XrDJog==
-X-Google-Smtp-Source: AMsMyM5qOr+aKl6CXVmJsgvwSPzOsOYlyFFdl+ywgcOSzX9E3l2wuQHCXQIF2AtTfj4K9rQjaguPYA==
-X-Received: by 2002:adf:f342:0:b0:22c:c3ea:c6da with SMTP id e2-20020adff342000000b0022cc3eac6damr1151741wrp.567.1664437511407;
-        Thu, 29 Sep 2022 00:45:11 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id w1-20020a5d5441000000b0022cc0a2cbecsm5625633wrv.15.2022.09.29.00.45.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 00:45:11 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 09:45:09 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Robin Murphy <robin.murphy@arm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lin Jinhan <troy.lin@rock-chips.com>, wevsty <ty@wevs.org>,
-        Mikhail Rudenko <mike.rudenko@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lin Huang <hl@rock-chips.com>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH] hw_random: rockchip: import driver from vendor tree
-Message-ID: <YzVNBcF7TCDldPwF@Red>
-References: <20220919210025.2376254-1-Jason@zx2c4.com>
- <32f8797a-4b65-69df-ee8e-7891a6b4f1af@arm.com>
- <YzMm4d3sZBHpitm9@aurel32.net>
- <YzNTB+RQK6yITi7/@Red>
- <YzNthZ0MtfwjIqdH@aurel32.net>
+        Thu, 29 Sep 2022 06:31:15 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CCDC12AEF6;
+        Thu, 29 Sep 2022 03:31:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 8D59ACE2165;
+        Thu, 29 Sep 2022 10:31:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E296C433D6;
+        Thu, 29 Sep 2022 10:31:07 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZGVo5oIP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1664447464;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=h81hop0B1+xC7B49mum+yJfc8MsW0yx1h63GCp9GbX0=;
+        b=ZGVo5oIPwO8k0ZCAj61ZkruJKe3SGg+nTBUvLkVnBYuR5ud4KF937Q/pVvImUWXCcBZFCX
+        Jk6kZrC7B4AW7WcGH06OkP7M0FXCHQB0FtXmVghCm+g8JFS8gJbT8Ua0PyfhwDpEpkfzzY
+        lfHfE+7WBwtk+/mz+BeEJ8YVVy/zpHw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c3102c19 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 29 Sep 2022 10:31:03 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Marco Elver <elver@google.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH] prandom: make use of smaller types in prandom_u32_max
+Date:   Thu, 29 Sep 2022 12:30:59 +0200
+Message-Id: <20220929103059.277230-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YzNthZ0MtfwjIqdH@aurel32.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Sep 27, 2022 at 11:39:17PM +0200, Aurelien Jarno a écrit :
-> On 2022-09-27 21:46, LABBE Corentin wrote:
-> > Le Tue, Sep 27, 2022 at 06:37:53PM +0200, Aurelien Jarno a écrit :
-> > > On 2022-09-20 10:35, Robin Murphy wrote:
-> > > > On 2022-09-19 22:00, Jason A. Donenfeld wrote:
-> > > > > The Rockchip driver has long existed out of tree, but not upstream.
-> > > > > There is support for it upstream in u-boot, but not in Linux proper.
-> > > > > This commit imports the GPLv2 driver written by Lin Jinhan, together
-> > > > > with the DTS and config blobs from Wevsty.
-> > > > 
-> > > > Note that Corentin has a series enabling the full crypto driver for 
-> > > > RK3328 and RK3399[1], so it would seem more sensible to add TRNG support 
-> > > > to that. Having confliciting compatibles for the same hardware that 
-> > > > force the user to change their DT to choose one functionality or the 
-> > > > other isn't good (plus there's also no binding for this one).
-> > > 
-> > > It might make sense for the cryptov1-rng driver (I haven't checked). For
-> > > the cryptov2-rng driver, I looked at the RK3568 TRM (I can't find the
-> > > RK3588 one), and from what I understand crypto and TRNG are two
-> > > different devices, using different address spaces, clock, reset and
-> > > interrupts. The vendor kernel uses two different drivers.
-> > > 
-> > 
-> > I confirm that TRNG is not on the same IP on rk3568, something I didnt remark when doing my V2 driver. (I need to remove rng clock from rk3568 dt).
-> > But the rk3588 crypto IP and the TRNG are in the same device.
-> 
-> Ok, thanks for confirming about the rk3568. It seems the only one in the
-> family with separate devices for TRNG and crypto. Does it means we need
-> a separate TRNG driver only for it? Or could we handle it the same way
-> than for instance rk3588 anyway?
+When possible at compile-time, make use of smaller types in
+prandom_u32_max(), so that we can use smaller batches from random.c,
+which in turn leads to a 2x or 4x performance boost. This makes a
+difference, for example, in kfence, which needs a fast stream of small
+numbers (booleans).
 
-I just got now the part 1 of rk3588 TRM which I has missing and it show some conflicting information.
-rk3588 seems to have both a dedicated TRNG (TRNG_NS/TRNG_S) with dedicated address space and a TRNG inside the crypto IP.
-But for the moment, the TRNG inside crypto IP seems defective.
+At the same time, we use the occasion to update the old documentation on
+these functions. prandom_u32() and prandom_bytes() have direct
+replacements now in random.h, while prandom_u32_max() remains useful as
+a prandom.h function, since it's not cryptographically secure by virtue
+of not being evenly distributed.
+
+Cc: Marco Elver <elver@google.com>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ include/linux/prandom.h | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/include/linux/prandom.h b/include/linux/prandom.h
+index deace5fb4e62..78db003bc290 100644
+--- a/include/linux/prandom.h
++++ b/include/linux/prandom.h
+@@ -12,11 +12,13 @@
+ #include <linux/percpu.h>
+ #include <linux/random.h>
+ 
++/* Deprecated: use get_random_u32 instead. */
+ static inline u32 prandom_u32(void)
+ {
+ 	return get_random_u32();
+ }
+ 
++/* Deprecated: use get_random_bytes instead. */
+ static inline void prandom_bytes(void *buf, size_t nbytes)
+ {
+ 	return get_random_bytes(buf, nbytes);
+@@ -37,17 +39,20 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state);
+  * prandom_u32_max - returns a pseudo-random number in interval [0, ep_ro)
+  * @ep_ro: right open interval endpoint
+  *
+- * Returns a pseudo-random number that is in interval [0, ep_ro). Note
+- * that the result depends on PRNG being well distributed in [0, ~0U]
+- * u32 space. Here we use maximally equidistributed combined Tausworthe
+- * generator, that is, prandom_u32(). This is useful when requesting a
+- * random index of an array containing ep_ro elements, for example.
++ * Returns a pseudo-random number that is in interval [0, ep_ro). This is
++ * useful when requesting a random index of an array containing ep_ro elements,
++ * for example. The result is somewhat biased when ep_ro is not a power of 2,
++ * so do not use this for cryptographic purposes.
+  *
+  * Returns: pseudo-random number in interval [0, ep_ro)
+  */
+ static inline u32 prandom_u32_max(u32 ep_ro)
+ {
+-	return (u32)(((u64) prandom_u32() * ep_ro) >> 32);
++	if (__builtin_constant_p(ep_ro <= 1U << 8) && ep_ro <= 1U << 8)
++		return (get_random_u8() * ep_ro) >> 8;
++	if (__builtin_constant_p(ep_ro <= 1U << 16) && ep_ro <= 1U << 16)
++		return (get_random_u16() * ep_ro) >> 16;
++	return ((u64)get_random_u32() * ep_ro) >> 32;
+ }
+ 
+ /*
+-- 
+2.37.3
 
