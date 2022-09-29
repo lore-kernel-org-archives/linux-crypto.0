@@ -2,102 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCCFC04A95
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Sep 2022 22:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8BFC04A95
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 04:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233803AbiI1WYu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Sep 2022 18:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41570 "EHLO
+        id S234455AbiI2ERW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Sep 2022 00:17:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234078AbiI1WYt (ORCPT
+        with ESMTP id S234032AbiI2ERV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:24:49 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C692018B;
-        Wed, 28 Sep 2022 15:24:46 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id cc5so21857765wrb.6;
-        Wed, 28 Sep 2022 15:24:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=tOCqao0F0QwSSCGrvEuCDfM8iTqn8ZX98V4N0X8hr3Y=;
-        b=XScKVakNg/IrTdv6P6I92z+G9E2jmAA/hory7em/M8GNMUaNnGu22NDfC3NM21+dSo
-         EdpCCD5iO0ddI6UiA2j9EtpLRkPYu53XYy/VaLyi9uefs/XXLc9u6wDNLWwDwH1xfCEW
-         JbhX97lZ1ssGGLQD735t6HtopU35eXou3UoCFHsP49WjyMOVtIUkq5w7+ig369HovQpa
-         azVWKjXdDnyimh3jZvy0HrX8rZ1sBYqceAK82tY64CzOurwCMNy7v+4UKACfCihuARdz
-         9YMt5WlB20cixH1o6i4vi1eYhqfm5ySzUC6GxnXPSwjcKKaLVMzOnbDPNX5cKVaKbDrH
-         fRDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=tOCqao0F0QwSSCGrvEuCDfM8iTqn8ZX98V4N0X8hr3Y=;
-        b=gYKDIYqhy7VugM/rV4bIXosWwxwBR0qfazvJF+2gN+b7uQt7tp1lFpEmpMsnCmEucw
-         OOZt3kTK1SurgJcc78ZRw+OqMnxSr2uCgmL+PK8NyGQVLFN+Ic7X7El5f8cduldAGyVD
-         1jOH6tZYCBmlN+x5V+mQt1p8dStAxbG+Ncjdo957IKF3Y+snfSiUosvkWNPyPxc8F0YY
-         3N5IeHWKwPYmP6zXE9X5J8VcRxzBqCy7To41HHXdByGrE7bR5w6DtLlQS8tTbt3iYcDQ
-         TgtqitcQsWH5qQy9vaNroQ94xuBVpAX2yK3cCV3x0BTiVB9e7XocztEcmJB45mhYHLxV
-         15vQ==
-X-Gm-Message-State: ACrzQf05akSmVNmxsK8sXigDyC6ySsXMPbi+kHAtr61JMyD1xEHlv36n
-        cnzBmcyvroVfVyKSYv+40h9EnoLZsA3wGg==
-X-Google-Smtp-Source: AMsMyM6Dx3qK/uOKDRkcxuP3IeSlkDVMCFpOi2jj5uBMViSsDQ+R61gatBIT/3Zw/8lMBGlFnvacSQ==
-X-Received: by 2002:a05:6000:10d2:b0:228:d60b:6d5a with SMTP id b18-20020a05600010d200b00228d60b6d5amr41346wrx.146.1664403885112;
-        Wed, 28 Sep 2022 15:24:45 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id k1-20020a056000004100b00228dbf15072sm585114wrx.62.2022.09.28.15.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:24:44 -0700 (PDT)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: stm32 - Fix spelling mistake "wite" -> "write"
-Date:   Wed, 28 Sep 2022 23:24:43 +0100
-Message-Id: <20220928222443.68705-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Thu, 29 Sep 2022 00:17:21 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A9C122062;
+        Wed, 28 Sep 2022 21:17:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1664425040; x=1695961040;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=wFlxZMLVP1hnVG3Oy50gkOZI84xSvz1wJ7g0p5WA184=;
+  b=IYKDkz6Jny4+D3ZvUOFZUzhl0frowUcemWwqvIq7eC2CVv2fWAEvktmN
+   kXfmwKnZDBnFvO/845eX2k2Pmm6Eo/5HhvqLg8hgctJFbwGpA+cB8o9xn
+   AkoRQ67zpKzimM3HwqXnz0cm/H+nQGoSXqGyLPpKwK+h+QkcfAQOrTOQf
+   KD5wNoaWyf5xsBT7s0IgbYCT/yTgP4f+kiTo2y+97BmeZy0ONUbivLZGr
+   jwndJa2vY6c3WDIc/9Epl32jayLyTUBfYodA7hoYPzk+01KPBhh48YOlL
+   5oMoaWysD4DiORJi1aO7E6OFWBNnS6VNdFehyBA3SC1meFMeWuCl936JL
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="363632708"
+X-IronPort-AV: E=Sophos;i="5.93,354,1654585200"; 
+   d="scan'208";a="363632708"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2022 21:17:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="690661734"
+X-IronPort-AV: E=Sophos;i="5.93,354,1654585200"; 
+   d="scan'208";a="690661734"
+Received: from unknown (HELO localhost.localdomain) ([10.226.216.116])
+  by fmsmga004.fm.intel.com with ESMTP; 28 Sep 2022 21:17:16 -0700
+From:   wen.ping.teh@intel.com
+To:     dmitry.baryshkov@linaro.org
+Cc:     bjorn.andersson@linaro.org, catalin.marinas@arm.com,
+        davem@davemloft.net, dinguyen@kernel.org,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shawnguo@kernel.org,
+        wen.ping.teh@intel.com, will@kernel.org
+Subject: Re: [PATCH 0/2] crypto: intel-fcs: Add crypto service driver for Intel SoCFPGA
+Date:   Thu, 29 Sep 2022 12:16:55 +0800
+Message-Id: <20220929041655.3239948-1-wen.ping.teh@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <806d5fc4-fb37-c60c-a11a-f73e5e21afb2@linaro.org>
+References: <806d5fc4-fb37-c60c-a11a-f73e5e21afb2@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There are a couple of spelling mistakes in dev_err messages. Fix them.
+From: wen.ping.teh@intel.com=0D
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/crypto/stm32/stm32-cryp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index 59ef541123ae..59638dfce573 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -1400,7 +1400,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 	/* wait end of process */
- 	err = stm32_cryp_wait_output(cryp);
- 	if (err) {
--		dev_err(cryp->dev, "Timeout (wite ccm padded data)\n");
-+		dev_err(cryp->dev, "Timeout (write ccm padded data)\n");
- 		return stm32_cryp_finish_req(cryp, err);
- 	}
- 
-@@ -1440,7 +1440,7 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
- 	/* h) wait for completion */
- 	err = stm32_cryp_wait_busy(cryp);
- 	if (err)
--		dev_err(cryp->dev, "Timeout (wite ccm padded data)\n");
-+		dev_err(cryp->dev, "Timeout (write ccm padded data)\n");
- 
- 	/* i) run the he normal Final phase */
- 	stm32_cryp_finish_req(cryp, err);
--- 
-2.37.1
-
+> From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>=0D
+>> From: wen.ping.teh@intel.com=0D
+>> =0D
+>>> From: Dmitry Baryshkov @ 2022-09-15 11:46 UTC (permalink / raw)=0D
+>>>> From: wen.ping.teh@intel.com=0D
+>>>>=0D
+>>>>> This patch introduces a crypto service driver for Intel SoCFPGA=0D
+>>>>> family. The FPGA Crypto Service (FCS) includes a large set of securit=
+y=0D
+>>>>> features that are provided by the Secure Device Manager(SDM) in FPGA.=
+=0D
+>>>>> The driver provide IOCTL interface for user to call the crypto servic=
+es=0D
+>>>>> and send them to SDM's mailbox.=0D
+>>>>>=0D
+>>>>> Teh Wen Ping (2):=0D
+>>>>>    crypto: intel-fcs: crypto service driver for Intel SoCFPGA family=
+=0D
+>>>>>    arm64: defconfig: add CRYPTO_DEV_INTEL_FCS=0D
+>>>> Hi,=0D
+>>>>=0D
+>>>> I just found out that there was a previous attempt to upstream this dr=
+iver=0D
+>>>> 2 years ago. It was NACK because it did not implement crypto API. Plea=
+se=0D
+>>>> drop this review.=0D
+>>>> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg44701.htm=
+l=0D
+>>>>=0D
+>>>> I will move this driver to drivers/misc.=0D
+>>>=0D
+>>> I think the proper solution would be to implement the existing API firs=
+t=0D
+>>> rather than adding a set of custom proprietary IOCTLs that nobody else=
+=0D
+>>> is going to use.=0D
+>> =0D
+>> Could you explain what are the existing API that you are referring?=0D
+>> The FCS driver doesn't have API. Instead it uses IOCTLs to interact with=
+ user-space application to perform Intel SoCFPGA crypto features.=0D
+>=0D
+> The FCS driver doesn't. But Linux does.=0D
+>=0D
+> For the hw random generators we have the struct hwrng/devm_hwrng_register=
+().=0D
+>=0D
+> For AES, EC, etc. there are corresponding Crypto API. Based on your =0D
+> patches I couldn't guess if your hardware is more of a TPM or a generic =
+=0D
+> crypto "accelerator". However Linux has support for both kinds of =0D
+> hardware. Most likely the right interface is already there (or almost =0D
+> there). In 90% of cases 'a custom bunch of IOCTLs' is not a correct one.=
+=0D
+=0D
+Thanks for the feedback Dmitry. We will look into the available Linux crypt=
+o API and how our driver can use them.=0D
+This is will take some time but we will try to check the proper solution.=0D
+=0D
+Thanks=0D
+Wen Ping=0D
