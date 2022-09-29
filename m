@@ -2,101 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263CCC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 20:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EC4C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Sep 2022 22:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiI2Udv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Sep 2022 16:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33474 "EHLO
+        id S229723AbiI2WPC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Sep 2022 18:15:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbiI2Udv (ORCPT
+        with ESMTP id S229759AbiI2WPA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2022 16:33:51 -0400
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95DF1296B2;
-        Thu, 29 Sep 2022 13:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=4+GjA4+t+FzJUOojt9RIJscA2LdcugK+jY+KWvx9VGc=; b=GUY4j4gO6c8Nj/KLnYCcpKa/mN
-        Kh7jelRHhC5GURsBbQwvuOZgWHzubD8jwPw+iPVY5nLpL5Y9jE+LNP05kuBpvF1LY9V395zwMMFBQ
-        2njCRDh/UhL6z/FNqLT+OLnf9kcGE87y3Iy8SfD4pUoeBqkVlBgh6OhfiiGbMhqG0qSnHCTh/aYCD
-        jMJe60bpAfuXHVI/c94vb/vgkzLg/lE6wQ6mr2bUXz76ju7uryMX8X4yYovELCXBVBZ21UG8vSq7o
-        EDfghfU8so6cambSalU5n2GNDeKNx39RTG0rLd1R2GMdaQwsp80Z16wPgWiTMfYus9PC2R7KciNyO
-        DpMxVX/g==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1oe0Dq-00DTdP-EC; Thu, 29 Sep 2022 22:33:30 +0200
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1oe0Dp-001WpD-2o;
-        Thu, 29 Sep 2022 22:33:29 +0200
-Date:   Thu, 29 Sep 2022 22:33:29 +0200
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     LABBE Corentin <clabbe@baylibre.com>
-Cc:     heiko@sntech.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        Thu, 29 Sep 2022 18:15:00 -0400
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29654D4D7;
+        Thu, 29 Sep 2022 15:14:59 -0700 (PDT)
+Received: by mail-oo1-f45.google.com with SMTP id t4-20020a4aa3c4000000b00475624f2369so1064329ool.3;
+        Thu, 29 Sep 2022 15:14:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=G3ixGfgN7BtiMl2GIJrXgjiRG+Ja3k65KHc2UeJTU2Y=;
+        b=3Jy9NYvuo6n5zW/SIcC7pJw4ycEoWa/XAmrcfGAa8BZ3Q+FBQzh7oN30mHLnVxKOz5
+         GY440sl+r72Vi0oJ3R+Q1GmirwEjgRVIfBClc50+2N1hMNzqakTHrwj/aAgapFjYTm2G
+         iYRyBKMCeRzX5xFuAHid1QO4LJJhe7scjHGVEwhwc83bJQ9124qcFWPrRiQShcIwNDE1
+         P51TVtEr0AZ6p1xak5bexumL6IBmOL0ExKzuQZ87avfRD879MP6Il+F5kuwnjDNPvvyf
+         6bL52CdB1iTGgjuQRwsyaCZxl9Y/jpUDJhwdCuX5VJmjpI3CI62iZ/mf4y2p0oRuWL9E
+         2qNQ==
+X-Gm-Message-State: ACrzQf1YWJKbAQYHJqfT1R27bq3aI0MpQ2OZAxaduJYMF9Klp2haPYxm
+        hME6e/aZve5lHFI3wUrKaQ==
+X-Google-Smtp-Source: AMsMyM6X8fuxncInKY1HHajfMs3xBeGsJpxqmoGci0kg/caJyZtFTBc6uzl+qdSsE6tynspmpVwZHw==
+X-Received: by 2002:a9d:666:0:b0:655:d979:8a6 with SMTP id 93-20020a9d0666000000b00655d97908a6mr2406280otn.200.1664489699187;
+        Thu, 29 Sep 2022 15:14:59 -0700 (PDT)
+Received: from macbook.herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id c6-20020a9d7846000000b0065892f42157sm199147otm.75.2022.09.29.15.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 15:14:58 -0700 (PDT)
+Received: (nullmailer pid 2862895 invoked by uid 1000);
+        Thu, 29 Sep 2022 22:14:57 -0000
+Date:   Thu, 29 Sep 2022 17:14:57 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, devicetree@vger.kernel.org,
+        herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, mturquette@baylibre.com,
+        linux-rockchip@lists.infradead.org, davem@davemloft.net,
+        linux-clk@vger.kernel.org, ardb@kernel.org,
         krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH RFT 0/5] crypto: rockchip: add crypto offloader V2
-Message-ID: <YzYBGQeaouraFDyo@aurel32.net>
-Mail-Followup-To: LABBE Corentin <clabbe@baylibre.com>, heiko@sntech.de,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-References: <20220927080048.3151911-1-clabbe@baylibre.com>
- <YzNsgjPFwVEDo4E4@aurel32.net>
- <YzVKR0DjpXT/bB8J@Red>
+        linux-crypto@vger.kernel.org, sboyd@kernel.org
+Subject: Re: [PATCH v10 25/33] dt-bindings: crypto: rockchip: add new
+ compatible
+Message-ID: <166448969734.2862850.15734713971995985090.robh@kernel.org>
+References: <20220927075511.3147847-1-clabbe@baylibre.com>
+ <20220927075511.3147847-26-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <YzVKR0DjpXT/bB8J@Red>
-User-Agent: Mutt/2.2.7 (2022-08-07)
+In-Reply-To: <20220927075511.3147847-26-clabbe@baylibre.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-09-29 09:33, LABBE Corentin wrote:
-> Le Tue, Sep 27, 2022 at 11:34:58PM +0200, Aurelien Jarno a =C3=A9crit :
-> > On 2022-09-27 08:00, Corentin Labbe wrote:
-> > > Hello
-> > >=20
-> > > Rockchip rk3568 and rk3588 have a common crypto offloader IP different
-> > > than rk3228 one.
-> > > I started to work the driver for this IP on a rk3588 based board, but=
- this SoC
-> > > is still not upstream.
-> > > So it is why I send this serie asking for test since I own no rk3568 =
-and
-> > > I need to be sure datasheet is right.
-> >=20
-> > I did a quick test, and it doesn't seem to work. I get:
-> >=20
-> > rk3588-crypto fe380000.crypto: DMA timeout
-> > rk3588-crypto fe380000.crypto: DMA timeout
-> >=20
-> > That's on an ODROID-M1 board, so with the set of patches I sent
-> > yesterday to support it.
->=20
-> Thanks for testing it, probably I did something wrong because I got a suc=
-cessfull test by someone on #linux-rockchip.
-> But I dont know on which board it is, and it was on my debug tree, so pro=
-bably cleaned something wrong before sending the patchs.
->=20
-> If I sent you a link to my tree, could you retry ?
+On Tue, 27 Sep 2022 07:55:03 +0000, Corentin Labbe wrote:
+> Since driver support new compatible, we need to update the driver bindings.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  .../crypto/rockchip,rk3288-crypto.yaml        | 79 +++++++++++++++++--
+>  1 file changed, 71 insertions(+), 8 deletions(-)
+> 
 
-Yep, I can try that.
-
-Regards
-Aurelien
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Reviewed-by: Rob Herring <robh@kernel.org>
