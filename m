@@ -2,137 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC43DC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 06:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3AAC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 16:40:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbiI3Gcp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Sep 2022 02:32:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
+        id S229971AbiI3Qke (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Sep 2022 12:40:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbiI3Gcm (ORCPT
+        with ESMTP id S232098AbiI3Qkb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Sep 2022 02:32:42 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD741F7EF7
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 23:32:37 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id s26so3369564pgv.7
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Sep 2022 23:32:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=3/r9sEUFsrXGDfR2A939Zx+57F6Hk0ETCIfd1KtmpRg=;
-        b=rmmTyeDlrcMvucl2X8jk6lyNFKDDEWmaR1R4JCIcG898/vY5v/QeVWWbr7ND97HZXm
-         jjLvF6wZNjMY29QFrhV+SvySRh5+x87c6qfpna+BvQkNsSVfc+gMOpL896GSnQCdD+ek
-         ARz9Ah2SCAXym3K6YdRXhYuMFrEfU0d7HWvRmgxLanc/WwRPzE8JZrTMyiaczojlMQMA
-         t6jsQAtYH2Prs8btPOienzHK6sKYqrnzWmlj0K9klmUYm/TYAkUf9tYEFlH5ZGQdTiaJ
-         NxTnaNZBMdy5cNDXoo3fYw5Pt6JDEOD6oyf9mAVaQX/yGNdxADrTvLNSZoABBhn0aVwj
-         EjmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=3/r9sEUFsrXGDfR2A939Zx+57F6Hk0ETCIfd1KtmpRg=;
-        b=dksoKPq8vz6JX+fOFA9zk0NNl3Hc3nU7tWP+JKApJeT4yiZI/Np4HBZU6XhISWJee9
-         SpjqtaFMU9upIB0K6RsqI/QcvYzVvceNA1TUaGOCVsj78kCnRPvSAanc4eyO7rWka7OY
-         q9vlIYQ+zwwcLstobWTaM8b5+7rGBi+vcjGHY9dP5/bTZCF3YZulg0gyfg5tph3fDD8p
-         m3kqGiiXu9ytP/U/09KBlIH0yiISZ6s5CqBb+F8z+OwnnPEHIQnBxR+zo0sRfDxeqCoG
-         HQhTYtWZpcMq7mguBq2DiWQ2yG1vUr3oncaM6NKNCczfLJKcw0RKVo0BKDFnG2qHQBor
-         sleg==
-X-Gm-Message-State: ACrzQf1rV06WL/E2rTMSoTAOh/OKJQ5OveiuDbucoJD+GCVGyB0nqeU7
-        O7Ko1JF9uO1tTs92qwiifHUSWw==
-X-Google-Smtp-Source: AMsMyM75BgOGM6enaUG+dcjqUPmj+21zjwkjTEJhxTbztGdX3rV1Ju/EWf7NfE5uXStduInthENftw==
-X-Received: by 2002:a63:f014:0:b0:43c:2ad9:ae9 with SMTP id k20-20020a63f014000000b0043c2ad90ae9mr6385345pgh.8.1664519556735;
-        Thu, 29 Sep 2022 23:32:36 -0700 (PDT)
-Received: from [10.76.53.66] ([61.120.150.74])
-        by smtp.gmail.com with ESMTPSA id o1-20020a17090ab88100b00203059fc75bsm865642pjr.5.2022.09.29.23.32.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Sep 2022 23:32:36 -0700 (PDT)
-Message-ID: <e8a49353-8ade-79c3-474d-90b5079f38ca@bytedance.com>
-Date:   Fri, 30 Sep 2022 14:31:28 +0800
+        Fri, 30 Sep 2022 12:40:31 -0400
+Received: from smtp.smtpout.orange.fr (smtp09.smtpout.orange.fr [80.12.242.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BACDAFA5D8
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Sep 2022 09:40:30 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.100.34])
+        by smtp.orange.fr with ESMTPA
+        id eIwYoMAPUr5PdeIwYoJg1U; Fri, 30 Sep 2022 18:32:58 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 30 Sep 2022 18:32:58 +0200
+X-ME-IP: 86.243.100.34
+Message-ID: <cecca972-33c8-03a9-d632-c85ed06dff8b@wanadoo.fr>
+Date:   Fri, 30 Sep 2022 18:32:53 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: Re: [PATCH v2 RESEND] virtio-crypto: fix memory-leak
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     mst@redhat.com, arei.gonglei@huawei.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220919075158.3625-1-helei.sig11@bytedance.com>
- <YzaJPuXVrB97ixvI@gondor.apana.org.au>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <YzaJPuXVrB97ixvI@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: cavium - prevent integer overflow loading
+ firmware
+Content-Language: fr
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        George Cherian <gcherian@marvell.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Daney <david.daney@cavium.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <YygPj8aYTvApOQFB@kili>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <YygPj8aYTvApOQFB@kili>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 9/30/22 14:14, Herbert Xu wrote:
-> On Mon, Sep 19, 2022 at 03:51:58PM +0800, Lei He wrote:
->> From: lei he <helei.sig11@bytedance.com>
->>
->> Fix memory-leak for virtio-crypto akcipher request, this problem is
->> introduced by 59ca6c93387d3(virtio-crypto: implement RSA algorithm).
->> The leak can be reproduced and tested with the following script
->> inside virtual machine:
->>
->> #!/bin/bash
->>
->> LOOP_TIMES=10000
->>
->> # required module: pkcs8_key_parser, virtio_crypto
->> modprobe pkcs8_key_parser # if CONFIG_PKCS8_PRIVATE_KEY_PARSER=m
->> modprobe virtio_crypto # if CONFIG_CRYPTO_DEV_VIRTIO=m
->> rm -rf /tmp/data
->> dd if=/dev/random of=/tmp/data count=1 bs=230
->>
->> # generate private key and self-signed cert
->> openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem \
->> 		-outform der -out cert.der  \
->> 		-subj "/C=CN/ST=GD/L=SZ/O=vihoo/OU=dev/CN=always.com/emailAddress=yy@always.com"
->> # convert private key from pem to der
->> openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out key.der
->>
->> # add key
->> PRIV_KEY_ID=`cat key.der | keyctl padd asymmetric test_priv_key @s`
->> echo "priv key id = "$PRIV_KEY_ID
->> PUB_KEY_ID=`cat cert.der | keyctl padd asymmetric test_pub_key @s`
->> echo "pub key id = "$PUB_KEY_ID
->>
->> # query key
->> keyctl pkey_query $PRIV_KEY_ID 0
->> keyctl pkey_query $PUB_KEY_ID 0
->>
->> # here we only run pkey_encrypt becasuse it is the fastest interface
->> function bench_pub() {
->> 	keyctl pkey_encrypt $PUB_KEY_ID 0 /tmp/data enc=pkcs1 >/tmp/enc.pub
->> }
->>
->> # do bench_pub in loop to obtain the memory leak
->> for (( i = 0; i < ${LOOP_TIMES}; ++i )); do
->> 	bench_pub
->> done
->>
->> Signed-off-by: lei he <helei.sig11@bytedance.com>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
->> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
->> ---
->>   drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 4 ++++
->>   1 file changed, 4 insertions(+)
+Le 19/09/2022 à 08:43, Dan Carpenter a écrit :
+> The "code_length" value comes from the firmware file.  If your firmware
+> is untrusted realistically there is probably very little you can do to
+> protect yourself.  Still we try to limit the damage as much as possible.
+> Also Smatch marks any data read from the filesystem as untrusted and
+> prints warnings if it not capped correctly.
 > 
-> Patch applied.  Thanks.
+> The "ntohl(ucode->code_length) * 2" multiplication can have an
+> integer overflow.
+> 
+> Fixes: 9e2c7d99941d ("crypto: cavium - Add Support for Octeon-tx CPT Engine")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+> v2: The first code removed the " * 2" so it would have caused immediate
+>      memory corruption and crashes.
+> 
+>      Also in version 2 I combine the "if (!mcode->code_size) {" check
+>      with the overflow check for better readability.
+> 
+>   drivers/crypto/cavium/cpt/cptpf_main.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
+> index 8c32d0eb8fcf..6872ac344001 100644
+> --- a/drivers/crypto/cavium/cpt/cptpf_main.c
+> +++ b/drivers/crypto/cavium/cpt/cptpf_main.c
+> @@ -253,6 +253,7 @@ static int cpt_ucode_load_fw(struct cpt_device *cpt, const u8 *fw, bool is_ae)
+>   	const struct firmware *fw_entry;
+>   	struct device *dev = &cpt->pdev->dev;
+>   	struct ucode_header *ucode;
+> +	unsigned int code_length;
+>   	struct microcode *mcode;
+>   	int j, ret = 0;
+>   
+> @@ -263,11 +264,12 @@ static int cpt_ucode_load_fw(struct cpt_device *cpt, const u8 *fw, bool is_ae)
+>   	ucode = (struct ucode_header *)fw_entry->data;
+>   	mcode = &cpt->mcode[cpt->next_mc_idx];
+>   	memcpy(mcode->version, (u8 *)fw_entry->data, CPT_UCODE_VERSION_SZ);
+> -	mcode->code_size = ntohl(ucode->code_length) * 2;
+> -	if (!mcode->code_size) {
+> +	code_length = ntohl(ucode->code_length);
+> +	if (code_length == 0 || code_length >= INT_MAX / 2) {
 
 Hi,
 
-I noticed that MST has already applied on vhost branch.
-https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?h=vhost&id=1bedcf22c081a6e9943f09937b2da8d3ef52d20d
+out of curiosity,
 
-Thanks.
+'code_length' is 'unsigned int'
+'mcode->code_size' is u32.
 
--- 
-zhenwei pi
+Why not UINT_MAX / 2?
+
+CJ
+
+>   		ret = -EINVAL;
+>   		goto fw_release;
+>   	}
+> +	mcode->code_size = code_length * 2;
+>   
+>   	mcode->is_ae = is_ae;
+>   	mcode->core_mask = 0ULL;
+
