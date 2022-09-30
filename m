@@ -2,51 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D49C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 02:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40297C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 03:48:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbiI3CuJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Sep 2022 22:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54648 "EHLO
+        id S230094AbiI3DsJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Sep 2022 23:48:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiI3CuI (ORCPT
+        with ESMTP id S229696AbiI3DsH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2022 22:50:08 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFF271996;
-        Thu, 29 Sep 2022 19:50:03 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oe662-00A2aU-6G; Fri, 30 Sep 2022 12:49:51 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Sep 2022 10:49:50 +0800
-Date:   Fri, 30 Sep 2022 10:49:50 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Longfang Liu <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Thu, 29 Sep 2022 23:48:07 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E69A1D73DF;
+        Thu, 29 Sep 2022 20:48:06 -0700 (PDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Mdx030mVfzHtpR;
+        Fri, 30 Sep 2022 11:43:15 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 30 Sep 2022 11:48:04 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 30 Sep 2022 11:48:03 +0800
 Subject: Re: [PATCH] crypto/hisilicon: Add null judgment to the callback
  interface
-Message-ID: <YzZZTsIHLSkuufeb@gondor.apana.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
 References: <20220930024320.29922-1-liulongfang@huawei.com>
+ <YzZZTsIHLSkuufeb@gondor.apana.org.au>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <717adf23-3080-5041-14ed-6ab5dcaddbf9@huawei.com>
+Date:   Fri, 30 Sep 2022 11:48:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220930024320.29922-1-liulongfang@huawei.com>
+In-Reply-To: <YzZZTsIHLSkuufeb@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 30, 2022 at 10:43:20AM +0800, Longfang Liu wrote:
-> The algorithm acceleration function interface provided by the
-> current crypto subsystem is in asynchronous mode, but some users
-> will call it in synchronous mode, thus not providing a callback
-> interface for the "base.complete" of the request.
+On 2022/9/30 10:49, Herbert Xu wrote:
+> On Fri, Sep 30, 2022 at 10:43:20AM +0800, Longfang Liu wrote:
+>> The algorithm acceleration function interface provided by the
+>> current crypto subsystem is in asynchronous mode, but some users
+>> will call it in synchronous mode, thus not providing a callback
+>> interface for the "base.complete" of the request.
+> 
+> Please give more details.  Who is calling the callback functions
+> in synchronous mode?
+> 
 
-Please give more details.  Who is calling the callback functions
-in synchronous mode?
+Even if the task is sent in synchronous mode, when using the hardware
+driver, the hardware still informs the driver software through an
+interrupt after completing the task, and the workqueue in the driver
+software will call this callback function.
 
+And I found that the device drivers of other manufacturers under the
+crypto subsystem are also in this asynchronous mode, and this problem
+is also encountered when using the synchronous mode.
+
+> Thanks,
+> 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Longfang.
