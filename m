@@ -2,75 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40297C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 03:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC76EC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Sep 2022 04:54:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbiI3DsJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Sep 2022 23:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40688 "EHLO
+        id S230127AbiI3EyK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Sep 2022 00:54:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbiI3DsH (ORCPT
+        with ESMTP id S230427AbiI3EyJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Sep 2022 23:48:07 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E69A1D73DF;
-        Thu, 29 Sep 2022 20:48:06 -0700 (PDT)
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Mdx030mVfzHtpR;
-        Fri, 30 Sep 2022 11:43:15 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 30 Sep 2022 11:48:04 +0800
-Received: from [10.67.102.118] (10.67.102.118) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 30 Sep 2022 11:48:03 +0800
-Subject: Re: [PATCH] crypto/hisilicon: Add null judgment to the callback
- interface
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20220930024320.29922-1-liulongfang@huawei.com>
- <YzZZTsIHLSkuufeb@gondor.apana.org.au>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <717adf23-3080-5041-14ed-6ab5dcaddbf9@huawei.com>
-Date:   Fri, 30 Sep 2022 11:48:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 30 Sep 2022 00:54:09 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F89120BE1;
+        Thu, 29 Sep 2022 21:53:33 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oe7zt-00A3yT-LX; Fri, 30 Sep 2022 14:51:38 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Sep 2022 12:51:37 +0800
+Date:   Fri, 30 Sep 2022 12:51:37 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Yang Shen <shenyang39@huawei.com>
+Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, gregkh@linuxfoundation.org
+Subject: Re: [RFC PATCH 0/6] crypto: benchmark - add the crypto benchmark
+Message-ID: <YzZ12Y/kEF4DrQV6@gondor.apana.org.au>
+References: <20220919120537.39258-1-shenyang39@huawei.com>
+ <Yyl5yKQCAgPBbFd7@gondor.apana.org.au>
+ <3dd984c1-d17f-0a6a-c52e-87e161f867fc@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <YzZZTsIHLSkuufeb@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.102.118]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3dd984c1-d17f-0a6a-c52e-87e161f867fc@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/9/30 10:49, Herbert Xu wrote:
-> On Fri, Sep 30, 2022 at 10:43:20AM +0800, Longfang Liu wrote:
->> The algorithm acceleration function interface provided by the
->> current crypto subsystem is in asynchronous mode, but some users
->> will call it in synchronous mode, thus not providing a callback
->> interface for the "base.complete" of the request.
-> 
-> Please give more details.  Who is calling the callback functions
-> in synchronous mode?
-> 
+On Wed, Sep 21, 2022 at 04:19:18PM +0800, Yang Shen wrote:
+>
+> I know the tcrypt.ko has the speed test cases. But the tcrypt.ko test case
+> is fixed.
+> If I understand correctly, the design model of tcrypt.ko is test the
+> algorithms with
+> determined case conditions. It can provide some standardized testing to
+> ensure
+> that the implementation of the algorithm meets the requirements. This is a
+> reasonable developer test tool, but it is not flexible enough for testers
+> and users.
 
-Even if the task is sent in synchronous mode, when using the hardware
-driver, the hardware still informs the driver software through an
-interrupt after completing the task, and the workqueue in the driver
-software will call this callback function.
+How about improving tcrypt then? We're not going to have two things
+in the kernel that do the same thing unless you provide a clear path
+of eliminating one of them.
 
-And I found that the device drivers of other manufacturers under the
-crypto subsystem are also in this asynchronous mode, and this problem
-is also encountered when using the synchronous mode.
-
-> Thanks,
-> 
-Thanks,
-Longfang.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
