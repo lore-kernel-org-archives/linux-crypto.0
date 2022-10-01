@@ -2,103 +2,212 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C254C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Oct 2022 09:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD865C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Oct 2022 17:33:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229461AbiJAJVl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Oct 2022 05:21:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49468 "EHLO
+        id S229511AbiJARdp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 1 Oct 2022 13:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiJAJVj (ORCPT
+        with ESMTP id S229447AbiJARdn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Oct 2022 05:21:39 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAC8B875;
-        Sat,  1 Oct 2022 02:21:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Sat, 1 Oct 2022 13:33:43 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B2624B;
+        Sat,  1 Oct 2022 10:33:38 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e707329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e707:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 65A20B80E4A;
-        Sat,  1 Oct 2022 09:21:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6850AC433D6;
-        Sat,  1 Oct 2022 09:21:35 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="J7Gv+Xte"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1664616092;
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4ADFF1EC0528;
+        Sat,  1 Oct 2022 19:33:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1664645613;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=if3fWvrKon9mvOiTFOqskJT1rNyZazpBxNeaBASmzcw=;
-        b=J7Gv+Xte2zkH3fows144+91p5bwA3nYCyD+OXNjiT+5vHvD2mOhk1E9dhAKJ8lbQypx7hO
-        U3qeURYe0+JaYgpa495EGvLbd0up8zXFXl14d3h7e4NzBTlV7oXUKp30O4POg276vsZ3wf
-        NUpib5a5L+DnSeGHqJwtPsy/e55yuqg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b19daad9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sat, 1 Oct 2022 09:21:32 +0000 (UTC)
-Date:   Sat, 1 Oct 2022 11:21:30 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
-Message-ID: <YzgGmh6EQtWzO4HV@zx2c4.com>
-References: <20220930231050.749824-1-Jason@zx2c4.com>
- <20220930231050.749824-2-Jason@zx2c4.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=RIAHQvcTp1IhnuHkExqToXgHdcRkReCkndMAHTNwQEI=;
+        b=lACJkGYm0mYkI2Vxsy72UegxjesbPKSc9LFwT2R0w05XLTwT/bGMh5s5BOOWOxnCUjFkrX
+        ktOdrsiZrU1yVrH3PpnRfljEqRfsoKEvgR9iGpCGGqX88ZbLkrn35OFr8Ea2BdD1qqLhxV
+        j7Nbn+Ns5+T0040/2lbKUrPSILpReUk=
+Date:   Sat, 1 Oct 2022 19:33:27 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize
+ the AMD-SP for SEV-SNP
+Message-ID: <Yzh558vy+rJfsBBq@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220930231050.749824-2-Jason@zx2c4.com>
+In-Reply-To: <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 01, 2022 at 01:10:50AM +0200, Jason A. Donenfeld wrote:
-> Rather than merely hoping that the callback gets called on another CPU,
-> arrange for that to actually happen, by round robining which CPU the
-> timer fires on. This way, on multiprocessor machines, we exacerbate
-> jitter by touching the same memory from multiple different cores.
-> 
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index fdf15f5c87dd..74627b53179a 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -1209,6 +1209,7 @@ static void __cold try_to_generate_entropy(void)
->  	struct entropy_timer_state stack;
->  	unsigned int i, num_different = 0;
->  	unsigned long last = random_get_entropy();
-> +	int cpu = -1;
+On Mon, Jun 20, 2022 at 11:04:29PM +0000, Ashish Kalra wrote:
+> +static int __sev_snp_init_locked(int *error)
+> +{
+> +	struct psp_device *psp = psp_master;
+> +	struct sev_device *sev;
+> +	int rc = 0;
+> +
+> +	if (!psp || !psp->sev_data)
+> +		return -ENODEV;
+> +
+> +	sev = psp->sev_data;
+> +
+> +	if (sev->snp_inited)
+
+snp_inited? That's silly.
+
+	snp_initialized
+
+pls.
+
+> +		return 0;
+> +
+> +	/*
+> +	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
+
+	/* Clear MSR_VM_HSAVE_PA on all cores before SNP_INIT */
+
+> +	 * across all cores.
+> +	 */
+> +	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+> +
+> +	/* Issue the SNP_INIT firmware command. */
+
+Useless comment.
+
+> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT, NULL, error);
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* Prepare for first SNP guest launch after INIT */
+> +	wbinvd_on_all_cpus();
+
+Can you put a wbinvd() in snp_set_hsave_pa() instead and save yourself
+the second IPI?
+
+Or is that order of the commands:
+
+	1. clear MSR IPI
+	2. SNP_INIT
+	3. WBINVD IPI
+	4. ...
+
+mandatory?
+
+...
+
+> +static int __sev_snp_shutdown_locked(int *error)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	int ret;
+> +
+> +	if (!sev->snp_inited)
+> +		return 0;
+> +
+> +	/* SHUTDOWN requires the DF_FLUSH */
+> +	wbinvd_on_all_cpus();
+> +	__sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+
+Why isn't this retval checked?
+
+> +
+> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN, NULL, error);
+> +	if (ret) {
+> +		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
+> +		return ret;
+> +	}
+> +
+> +	sev->snp_inited = false;
+> +	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
+> +
+> +	return ret;
+> +}
+
+...
+
+>  void sev_dev_destroy(struct psp_device *psp)
+> @@ -1287,6 +1385,26 @@ void sev_pci_init(void)
+>  		}
+>  	}
 >  
->  	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
->  		stack.entropy = random_get_entropy();
-> @@ -1223,8 +1224,17 @@ static void __cold try_to_generate_entropy(void)
->  	stack.samples = 0;
->  	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
->  	while (!crng_ready() && !signal_pending(current)) {
-> -		if (!timer_pending(&stack.timer))
-> -			mod_timer(&stack.timer, jiffies);
-> +		if (!timer_pending(&stack.timer)) {
-> +			preempt_disable();
-> +			do {
-> +				cpu = cpumask_next(cpu, cpu_online_mask);
-> +				if (cpu == nr_cpumask_bits)
-> +					cpu = cpumask_first(cpu_online_mask);
-> +			} while (cpu == smp_processor_id() && cpumask_weight(cpu_online_mask) > 1);
-> +			stack.timer.expires = jiffies;
-> +			add_timer_on(&stack.timer, cpu);
+> +	/*
+> +	 * If boot CPU supports the SNP, then first attempt to initialize
 
-Sultan points out that timer_pending() returns false before the function
-has actually run, while add_timer_on() adds directly to the timer base,
-which means del_timer_sync() might fail to notice a pending timer, which
-means UaF. This seems like a somewhat hard problem to solve. So I think
-I'll just drop this patch 2/2 here until a better idea comes around.
+s/the SNP/SNP/g
 
-Jason
+> +	 * the SNP firmware.
+> +	 */
+> +	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+> +		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+> +			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+> +				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+> +		} else {
+> +			rc = sev_snp_init(&error);
+> +			if (rc) {
+> +				/*
+> +				 * If we failed to INIT SNP then don't abort the probe.
+
+Who's "we"?
+
+> +				 * Continue to initialize the legacy SEV firmware.
+> +				 */
+> +				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+> +			}
+> +		}
+> +	}
+> +
+>  	/* Obtain the TMR memory area for SEV-ES use */
+>  	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+>  	if (!sev_es_tmr)
+
+...
+
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 01ba9dc46ca3..ef4d42e8c96e 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -769,6 +769,20 @@ struct sev_data_snp_init_ex {
+>   */
+>  int sev_platform_init(int *error);
+>  
+> +/**
+> + * sev_snp_init - perform SEV SNP_INIT command
+> + *
+> + * @error: SEV command return code
+> + *
+> + * Returns:
+> + * 0 if the SEV successfully processed the command
+> + * -%ENODEV    if the SEV device is not available
+> + * -%ENOTSUPP  if the SEV does not support SEV
+> + * -%ETIMEDOUT if the SEV command timed out
+> + * -%EIO       if the SEV returned a non-zero return code
+
+Something's weird with those args. I think it should be
+
+	%-ENODEV
+
+and so on...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
