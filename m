@@ -2,45 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99036C43219
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Oct 2022 17:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1967AC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Oct 2022 17:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbiJCRLR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Oct 2022 13:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39068 "EHLO
+        id S229683AbiJCRpp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Oct 2022 13:45:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229730AbiJCRLL (ORCPT
+        with ESMTP id S229709AbiJCRpf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Oct 2022 13:11:11 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2051.outbound.protection.outlook.com [40.107.243.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EAC326D9;
-        Mon,  3 Oct 2022 10:11:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B0d/+qZ8CvTo5oJzx6hfjzOuSURAhCkVB0k/2W7BuH0R8fMRDo79cDPm/Rp8XBhDqqlG/7YIzxbspnAEVqijeiLFb6wLNNx6I9qf8PhgwGM7oAugNktv5x7knGVgwEjjO6pJedEPbI8Av7WPNKF9X4L5Fr3swq+SCbDbtFEWedt6CPxTtN/eYn5AT67YfZjJX0MSBc3u150ZG2jy5u2PH/KyHllhEXJuuYdOKsEwnmApuGs0isuf6zRKoJiV0KFGVX5hb2hIO1frKokR5YoG2ALWfDMN6f00gFG7EyXCCZueQRtC38SX8+mPvC9KE3HdiUgTrgG0Y90EA8VCevC6Kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/+QHiJat/9QoWg+U1vqEeOeQNW19tbz8TVALRdXsnBk=;
- b=UVitdE22Hh/kHHUI6VJF3QkjeBoCUI8McsQvsdBYJ7SUqd0HkOfm8zJPCIhvV9JUL/F9MqPxpWzZ7C5YRdUZRH1OeCu7urLkKEArCUrsU4lPv2ZNWygUw6W0U2DFd7piLa3YZ/z8mKpwNvE/VqAqTpHnSkhherHS9SCFh79yXyWxQMysA0yn+Bz59eOeVyNX8/4YVmdIpj5K+ls5vuz2cFS3pcfuGHXjwgVgLYgx9U8lnJKDJlK0zgxZ249GP0tfrWmyzf/+mikdCbkNX4AEBm9RF5KAj1LFPrV5HtaUAx6I1ppCBT/TtDT26DvwBuERArjJhwGbCwbwDExptlzA4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/+QHiJat/9QoWg+U1vqEeOeQNW19tbz8TVALRdXsnBk=;
- b=eLOHhs6qDua1Oo1BXes1Lbf7HuNprFiSHWvUcDQ73mIWPxM0A9N7c4VOQJLFLzxutBVedWhs/GzgbixMWlP7aImpAGaKCXVzM/M04LZhLCvU2zDxs1BSP8AXpjOodopzQwTc8b8Lfjgzg5RXI3sLlRQ9zqETHooTwYW7P1AV/Qc=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by MN2PR12MB4519.namprd12.prod.outlook.com (2603:10b6:208:262::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.28; Mon, 3 Oct
- 2022 17:11:05 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8588:d2f4:2eb9:7021]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8588:d2f4:2eb9:7021%4]) with mapi id 15.20.5676.024; Mon, 3 Oct 2022
- 17:11:05 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     "x86@kernel.org" <x86@kernel.org>,
+        Mon, 3 Oct 2022 13:45:35 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45CC01AD8F;
+        Mon,  3 Oct 2022 10:45:28 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e749329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e749:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E039F1EC026E;
+        Mon,  3 Oct 2022 19:45:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1664819122;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=plJ2XzPIs7brq2OHEhWH7olZUohmW4drMik6bkobaK8=;
+        b=h/NWZd03ZDDYChaZJG9X1m8XSdmrio7RdvYAB9fvU6LnkKsu556+yU34LFEPtT4S0+DtbK
+        bkbEzT5/xoQqrTUBJf2dnKJofdXjuRz9CJjLNUDgzHADxBWNuBhA5+z32F5YXOvWQX6gwB
+        67IRwD39ZaSHFdkca/nu44PvYz/l40k=
+Date:   Mon, 3 Oct 2022 19:45:18 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
@@ -77,142 +69,42 @@ CC:     "x86@kernel.org" <x86@kernel.org>,
         "alpergun@google.com" <alpergun@google.com>,
         "dgilbert@redhat.com" <dgilbert@redhat.com>,
         "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: RE: [PATCH Part2 v6 13/49] crypto:ccp: Provide APIs to issue SEV-SNP
+Subject: Re: [PATCH Part2 v6 13/49] crypto:ccp: Provide APIs to issue SEV-SNP
  commands
-Thread-Topic: [PATCH Part2 v6 13/49] crypto:ccp: Provide APIs to issue SEV-SNP
- commands
-Thread-Index: AQHY1dLd4Juks83jB0yfjCsoLH1Lj638u9DQgAAfqQCAAA0/0A==
-Date:   Mon, 3 Oct 2022 17:11:05 +0000
-Message-ID: <SN6PR12MB276753083B811B1055FDE6408E5B9@SN6PR12MB2767.namprd12.prod.outlook.com>
+Message-ID: <YzsfroL1/6D8rVTF@zn.tnic>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
  <a63de5e687c530849312099ee02007089b67e92f.1655761627.git.ashish.kalra@amd.com>
  <YzigaOHddWU706H5@zn.tnic>
  <SN6PR12MB2767062CAD241C0BAFB7FAD98E5B9@SN6PR12MB2767.namprd12.prod.outlook.com>
  <YzsK+szsWoAlMsrR@zn.tnic>
-In-Reply-To: <YzsK+szsWoAlMsrR@zn.tnic>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-10-03T17:04:24Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=0f60104c-ea94-440a-bbd0-e104c7a35760;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-10-03T17:11:02Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 2f36f64f-a384-45a7-b24b-7ce1cbdedfaf
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR12MB2767:EE_|MN2PR12MB4519:EE_
-x-ms-office365-filtering-correlation-id: 2600d402-72c8-4233-4808-08daa562418e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: bRkaG5MVa3SJ+9JSo8wEdG+0PZrTzlQhvgc3U4IILnOR5qZTQKiFhfuiBdQM+g9qvis952qH6/MiUKXXpZKtTzG3Z6lK2a8qE6PftedZYzlJvVygTgrNnxHJL0Cf/7yppRbBGBH1RAGnWx5G4MPb/jEIbSe7NdurX9ng/gdkvUpaPa4hsrOWs3/zqWUkPlo9BzwMbyRJNvojtua/UvwAcTmmWlduEcgs5wsT0PwZcAUUxNQ/I26OfhuumUixbpaFibqNiZIFE3akkn6ZCy0S0QSdcbjEWmn+ZlOAfb380dieeZ5kNVQ0o6oMpz+hoo3jlL0sRWCFn4ImaaYRM882nXCNkOQkBKZd6WgGs6wkToGyVmbdYZeJt3kr9mTPXmm5TEETDavVv0pJUgYr7VUkdvyxTzzQWeHvXNDd/jP4CWTui5daKv+TXpa2vEWDRk0gQ3iPX8alVftV/Jw4C99fyC1yo9avWQ1X/qn4buzjCZxZxAVZIq+hq9e3b/XbOsCAZi/aiRYK1+EHKHlWwalW2koZzX/xqlkwpQbsj0z2WZ8rUvI73vJiY+Bg4J/GI2ZWdN6vjIpmEdAWuxbw/el8dCz1bgDBwQUhcBIwpROzj7jBfJFvsmJneANT4+Mre6cNKqbbPQKgpWCzGufhSwSxw8bY1nL1RV0CT+4FRb4dZwmnPb9cq4NC8+nI2KHcI6SyFmqDn0JMs5IkNVBxBUdrI3nCsD8XNihD2+V2qz4UojDQ59IlS9mF65H6+A46nQIWChRTP4clRj1mWh/jjTsrF9tRN/KkXYoo3s0nGtH4TpU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(39860400002)(396003)(366004)(136003)(451199015)(33656002)(86362001)(55016003)(38070700005)(54906003)(38100700002)(6916009)(316002)(8676002)(122000001)(71200400001)(64756008)(8936002)(7406005)(7416002)(5660300002)(52536014)(66476007)(66446008)(66556008)(66946007)(76116006)(2906002)(41300700001)(478600001)(66574015)(7696005)(6506007)(186003)(4326008)(966005)(9686003)(26005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?ah2S6xRDI/Gh6Dho1IkXk56eit1eWbr5DC8ukzsO9hkcodchWAL17VpQa5?=
- =?iso-8859-2?Q?2cfT5vPuTm/JNOhoA+znZHF1FEP+k8iXXKesluRmYKIiHQmm7xepF+dDBz?=
- =?iso-8859-2?Q?XQcY0qFJ4btft3o5f0HRUPublUPpupf4WhoFHF3YLTmo3451BGCTVt+K0x?=
- =?iso-8859-2?Q?lkzxFkA0aNmwWrbHaPyRp4W1YVslcFT1fTJYUMNMFRNvsXP6sdOFBHFUIE?=
- =?iso-8859-2?Q?UWkYRq+099iS3QTEZsGTSHCOvm7SWPSDO4nVUV295XPFRpa7Q/yZpobS6U?=
- =?iso-8859-2?Q?yhHFttT8j+ZZXXFJ5WucgOD35paxIcBcriqp3C0JxWMNsXD7EIo9Ra7dnO?=
- =?iso-8859-2?Q?N3K6TLdQJP+JVuuoddwfrh3uCQWbEI9RDIWqNhutr4RNn0kZAr3LD1Cc5X?=
- =?iso-8859-2?Q?GP0v2LzzzUTeQ9etwfvRRWwGX43O3WJbXBiQ7L3RR5s/dFkTWN32H0Tfoz?=
- =?iso-8859-2?Q?oz7iUC5B8l0BfuFfppmisEdiyqJ6pjmDGg6um6cOLb1SosPH6lQTkSJ7Y3?=
- =?iso-8859-2?Q?zCy4RMGKIcKH5+pPh9+wkzXYqzwOKWPwhxX9maE5ZgPDu0lO3zLOgJt+4w?=
- =?iso-8859-2?Q?4vhGlCoR+eLYXWs29ikrtq9p2ZH1S24MGC3YZPOUK/R1gs03bYgT0Nhh1t?=
- =?iso-8859-2?Q?HNC5i5a+/Je3J0OWsGyDZemd/K21jHyIG1Nb9avAvnXLj+Lqir9oxZcjhS?=
- =?iso-8859-2?Q?t7py9MNKgkiP5j5NxBfJ5C/cwLwCbtkYhy42UB1sxBTbiQXJYFxOFuEDyh?=
- =?iso-8859-2?Q?omKvSIn73enIYC2hzAImbrjChPxVDwiXybRT6R1rnF+omXX9lxCKXqVola?=
- =?iso-8859-2?Q?dcy4bEdR55QyUCglyiz32g6Bm8wgUi8K7vVSN+i0nz80O8zYUR5PX/G690?=
- =?iso-8859-2?Q?4hVTUHKseIiT8WTd8wrgXJFBy9CuCqHpq9tM4nJtdE5KKaH1qG6rut4zNU?=
- =?iso-8859-2?Q?r0b5OVUOW6OUPKT0TayALmk+iIT6StZ6yQYos3T3ZlOkHbPCLk+bthn+gP?=
- =?iso-8859-2?Q?M1iASrpjLLOT2m7vEIQPCF2GlbtYKr1PKlRcqxS0rjuMyeyKWHj6Gv6JZt?=
- =?iso-8859-2?Q?FaKtRoiDweEq75SZxbRUwSPZkasXz5x2y2khlTxE90e0DooRX0iEFDdJQa?=
- =?iso-8859-2?Q?2PVmFl6Qg9ue7knMbLwXLLfIlP7pIr9kQBk0yzQCSmHHFJU53a5m99buGG?=
- =?iso-8859-2?Q?MRrmNgyE4FBnmiyFXVVUIit6KG/sdPp4nPLvV+T0peRhalxYsTQyiJKrLp?=
- =?iso-8859-2?Q?h/B+FI3IUHuchiPKmmMUIF0tmwrBfjiOxS4fll3gtG2zDf6w3vF7KTRrHy?=
- =?iso-8859-2?Q?9ogqe0j3kJYIV/NPYbVj+jWFw6YquU9gZATLJStl2w0FJYNlljE7ruKxQX?=
- =?iso-8859-2?Q?SuAHmTsCAnv/GOYdPuCFKdi560uQyKQFvgRQ3DNFU5ZPcz5gVTzCRYbiIB?=
- =?iso-8859-2?Q?5K9xzYOUvqCaavkEBKd6gHk/KZOW+YHcPoXG9fWnJLNCTxceQ65qbWf4at?=
- =?iso-8859-2?Q?19ejp6zoLh9d6n8ltui8084m16rdX27JtdGrKrNsYRq3QJWMn19LRok+rp?=
- =?iso-8859-2?Q?//5ud4qdJdoufiNVJoxVhaguQNqgfcDP6GTAk65OPX5v6cp7Jsiclu+9qb?=
- =?iso-8859-2?Q?yCUylGHYAVy20=3D?=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+ <SN6PR12MB276753083B811B1055FDE6408E5B9@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2600d402-72c8-4233-4808-08daa562418e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2022 17:11:05.0943
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GmKeL5kGdpx+7turGCQ+HqyTrMU4GaBlprFdABPouMC7eLOenlHpmPmmieGwTx8GW1M8RvzeCWjN1vDYtOAvUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4519
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB276753083B811B1055FDE6408E5B9@SN6PR12MB2767.namprd12.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Mon, Oct 03, 2022 at 05:11:05PM +0000, Kalra, Ashish wrote:
+> They are basically providing the APIs for the hypervisor to manage a
+> SNP guest.
 
->> There are actually only 8 functions
+Yes, I know. But that is not my question. Lemme try again.
 
->Only 8?
+My previous comment was:
 
->Lemme ask it differently then: what is the point of the wrappers at all?
+"I think you should simply export sev_do_cmd() and call it instead."
 
-They are basically providing the APIs for the hypervisor to manage a SNP gu=
-est.
+In this case, the API is a single function - sev_do_cmd() - which the
+hypervisor calls.
 
-And this is the original commit for the API to manage the SEV guest:
+So my question still stands: why is it better to have silly wrappers
+of sev_do_cmd() instead of having the hypervisor call sev_do_cmd()
+directly?
 
-commit 200664d5237f3f8cd2a2f9f5c5dea08502336bd1
-Author: Brijesh Singh <brijesh.singh@amd.com>
-Date:   Mon Dec 4 10:57:28 2017 -0600
+-- 
+Regards/Gruss,
+    Boris.
 
-    crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support
-   =20
-    AMD's new Secure Encrypted Virtualization (SEV) feature allows the
-    memory contents of virtual machines to be transparently encrypted with =
-a
-    key unique to the VM. The programming and management of the encryption
-    keys are handled by the AMD Secure Processor (AMD-SP) which exposes the
-    commands for these tasks. The complete spec is available at:
-   =20
-    http://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-   =20
-    Extend the AMD-SP driver to provide the following support:
-   =20
-     - an in-kernel API to communicate with the SEV firmware. The API can b=
-e
-       used by the hypervisor to create encryption context for a SEV guest.
-   =20
-     - a userspace IOCTL to manage the platform certificates.
-   =20
-    Cc: Paolo Bonzini <pbonzini@redhat.com>
-    Cc: "Radim Kr=E8m=E1=F8" <rkrcmar@redhat.com>
-    Cc: Borislav Petkov <bp@suse.de>
-    Cc: Herbert Xu <herbert@gondor.apana.org.au>
-    Cc: Gary Hook <gary.hook@amd.com>
-    Cc: Tom Lendacky <thomas.lendacky@amd.com>
-    Cc: linux-crypto@vger.kernel.org
-    Cc: kvm@vger.kernel.org
-    Cc: linux-kernel@vger.kernel.org
-    Improvements-by: Borislav Petkov <bp@suse.de>
-    Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-
-
-Thanks,
-Ashish
+https://people.kernel.org/tglx/notes-about-netiquette
