@@ -2,121 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2774FC433FE
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Oct 2022 20:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4DFC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Oct 2022 11:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbiJAUR7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Oct 2022 16:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44610 "EHLO
+        id S229476AbiJCLSS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Oct 2022 07:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbiJAUR5 (ORCPT
+        with ESMTP id S229507AbiJCLSS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Oct 2022 16:17:57 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C223911D;
-        Sat,  1 Oct 2022 13:17:55 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e707329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e707:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F09741EC04DA;
-        Sat,  1 Oct 2022 22:17:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1664655469;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=tXCw4blOG+lgy0RC4YVDWEQazozj/sfZ7AxmRf2ywac=;
-        b=Ilt2Azug3dgD7p5q8FQ6FAcg3y4AxHmVpXskS1Rdymmr14GKLinVzTb6x0N0DPGVGZ+YWL
-        I8HeuPZPKq/nHiLmefe8/8hZFuIN3Hj4skqvfwNEHH3msW+wK/mvst85sbei5JlEy6hWE8
-        IIkNRyj0e2hpKjLtle207nbefi4lk1o=
-Date:   Sat, 1 Oct 2022 22:17:44 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 13/49] crypto:ccp: Provide APIs to issue SEV-SNP
- commands
-Message-ID: <YzigaOHddWU706H5@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <a63de5e687c530849312099ee02007089b67e92f.1655761627.git.ashish.kalra@amd.com>
+        Mon, 3 Oct 2022 07:18:18 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5C040BD7
+        for <linux-crypto@vger.kernel.org>; Mon,  3 Oct 2022 04:18:17 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id w18so7476940wro.7
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Oct 2022 04:18:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date;
+        bh=zUqA9dEEEJ7hEJcQLWCwrav5hCDSb2JcPcZFlYmYDaQ=;
+        b=S45W3iOGRh/R0OtZRvge6cpIOwMboA34XKFCtdz1lfKjgbu0mtL7axvYSTwDA+cysk
+         67K4US2o/sJ4TmfcgtUaJ6JGWpJ9fu+g4g1zJtpKLroibXsrAQPW7F1Irqi0VHWf4xWM
+         qsNvt4q0CrFtr/WzYMqUx21Wd4X0JekDOP/ZqsstmddiD8UMyUIaoWhFgFJfKqHZzrDv
+         KwspYPMprcz9oRPEsDshKKIpS+fmVOc1CwozrbvwQfMzIJbSJVA3e00MHuO5vdwsdqfO
+         dnaNgIiyJW1ueN7MNDICl/0qIWtEOtOtCRBtTqtLuMAlVPU2A8Mmh2t2bw3nur5mpnze
+         uCVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=zUqA9dEEEJ7hEJcQLWCwrav5hCDSb2JcPcZFlYmYDaQ=;
+        b=uNsaQZgfOXwmBpQSuOJDbx8wvCsiZ/bjj+8NpWBaHEuwRpPA/U3K8g/3ut6X4cbbfI
+         6jvzBTuSQ4ry3yBR3uFz42z8nLPLkw+4uEriho+2NdKBMr4QnyuE93c+MbHV2MEmQWXj
+         geOidNiKvk+MdRf+iC+nXJ61qmNzztfoiPYtdpokSVzLxvKvaYxzTLOJGQUmHgj+4s9z
+         u+dOCL5Km6sGZGQqGvoFzGX4u0wYBfs5YgN8dEXfu5TLhuOmQ6ILq4ZR90q+QUwYXxGr
+         b1ysnqiKwJgZDSzatEikNfyRu9bjqCSOKUCwXS4iFjU9j0diotRXdZ+kKiGygzUsHwKz
+         SQQg==
+X-Gm-Message-State: ACrzQf0n/DMEIuC85qSwNIIXLJd1wDOYHBrhbpetV/UYlm3uxIAyWuOT
+        wmfBPECu83AwZzIT2j4lWlM=
+X-Google-Smtp-Source: AMsMyM6V7No0uuqvh9S0QJhdc3X7w4j/ujTqHz923EBf1gxXy1oBv415KE07SiPs/pM91yX6ZTkmzQ==
+X-Received: by 2002:a05:6000:982:b0:229:79e5:6a96 with SMTP id by2-20020a056000098200b0022979e56a96mr12450056wrb.469.1664795895651;
+        Mon, 03 Oct 2022 04:18:15 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id x12-20020a05600c2d0c00b003b51369fbbbsm16550909wmf.4.2022.10.03.04.18.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Oct 2022 04:18:15 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 13:18:11 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linus Walleij <linusw@kernel.org>,
+        Imre Kaloz <kaloz@openwrt.org>,
+        Krzysztof Halasa <khalasa@piap.pl>
+Subject: Re: crypto: ixp4xx - Fix sparse warnings
+Message-ID: <YzrE82pApo21c8tj@Red>
+References: <YzaIHqpGR60bQMt0@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a63de5e687c530849312099ee02007089b67e92f.1655761627.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YzaIHqpGR60bQMt0@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:04:45PM +0000, Ashish Kalra wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+Le Fri, Sep 30, 2022 at 02:09:34PM +0800, Herbert Xu a écrit :
+> This fixes a number of trivial sparse warnings in ixp4xx.
 > 
-> Provide the APIs for the hypervisor to manage an SEV-SNP guest. The
-> commands for SEV-SNP is defined in the SEV-SNP firmware specification.
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++
->  include/linux/psp-sev.h      | 73 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 97 insertions(+)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index f1173221d0b9..35d76333e120 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1205,6 +1205,30 @@ int sev_guest_df_flush(int *error)
->  }
->  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
->  
-> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_decommission);
-> +
-> +int snp_guest_df_flush(int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_df_flush);
-> +
-> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_page_reclaim);
-> +
-> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
-> +{
-> +	return sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, data, error);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
 
-So this mindless repetition is getting annoying. I see ~70 SEV commands.
-Adding ~70 functions which parrot all the same call to sev_do_cmd() is
-just insane.
+Hello
 
-I think you should simply export sev_do_cmd() and call it instead.
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-on: intel-ixp42x-welltech-epbx100
 
-Yes, when it turns out that a command and the preparation to issue it
-before it starts repeating pretty often, you could do a helper. But
-adding those silly wrappers doesn't bring anything besides confusion and
-code bloat.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks
