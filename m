@@ -2,441 +2,194 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A765C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Oct 2022 08:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E667C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Oct 2022 09:52:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbiJDIyk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Oct 2022 04:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55550 "EHLO
+        id S229688AbiJDJwl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Oct 2022 05:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbiJDIyi (ORCPT
+        with ESMTP id S229446AbiJDJwR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Oct 2022 04:54:38 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AFFD129;
-        Tue,  4 Oct 2022 01:54:33 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ofdh4-00BKPP-1W; Tue, 04 Oct 2022 19:54:27 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Oct 2022 16:54:26 +0800
-Date:   Tue, 4 Oct 2022 16:54:25 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Update for 6.1
-Message-ID: <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
-References: <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+        Tue, 4 Oct 2022 05:52:17 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2062a.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F8315FD6
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Oct 2022 02:51:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n80Z5WOTFUy7n9OWUqxyzmimgya3PhbKUwKZC2tBLucnZvcg8/ARNa7qixtCPZjpJSV8vUIZpuK08YxFIsGXHaDbdd/poaVnKRz2Kr4DNM48Vt3VgKeDqQ3T7thCtKiUBgUL4fT/Ty4wjo2OQ6dzwxWycazCHYGH12GvmCIrbXudVHzS974MaidrabRwa6/DEGlaEBoh6Nlid2eqpy4fMjibQkOXfqV4y7C3lt6v26j/iIKUkF1E7MkkEHO5vtks2ZY2mqT/o++6kAp7y+X6IznfXcmAQZYES5AVQj8aW5JFgsnRJTB87CtnefKzI7EZp/OfYitjkes0KXqd/5DvGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F3oo7L8nhoTDk0hjtVdsdt4KSxQFQFuqwNDyPnFxI7w=;
+ b=Uwo6xMZtgLe9mh4Zs1gg/hAIdiMEtI/3HRwUwXlTKXBeFDpJTI2so1eoR04wLTLozgXC3fejhQT5KVp/02pVqr9UuWZk+ezGgXrzuXRzrwsKxlXf6W5+ezC85qXi+bFvSUTa5OkbaJJUGa4jKmUx4+mW1oKFtR8SOOjtth/l0ec6fkKMmtTP8U8ytwti5uoRFTRY6jO7v5NvlYqHA22PMR9nWdvqMOKgpsHwgAbny0iB17QTOgVG/JET4emIIaIHCVHyBdmD9C09XK4mJya1MSA5OjbKLCiqtK2PIfQZg383LiFjmLOTkDLZZPkm1GJ8DMCKSyh4dI16wfoTq1SrvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F3oo7L8nhoTDk0hjtVdsdt4KSxQFQFuqwNDyPnFxI7w=;
+ b=1d/MVaP1FK219ME6RwWlnwxtlKFPm8KtScDOxUSu0xOzkojqB2dEM63YDkQjBqIagAMX26MjbcpqDWsFBdeBzWMx9Exr4kAQgIOHDPJCpMNOK30kW8O6cwvaP8qtzBlut3ZsqHbPkYtrSg5KHi90kPIfaJW2gGdIQ1u8q2VRuos=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ MN0PR12MB6320.namprd12.prod.outlook.com (2603:10b6:208:3d3::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.24; Tue, 4 Oct 2022 09:51:08 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::e0fb:6f05:f125:c002]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::e0fb:6f05:f125:c002%3]) with mapi id 15.20.5676.028; Tue, 4 Oct 2022
+ 09:51:08 +0000
+Message-ID: <a9ea7eac-0fa4-63dd-42ad-87109c8fe0e4@amd.com>
+Date:   Tue, 4 Oct 2022 15:20:57 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: Early init for few crypto modules for Secure Guests
+Content-Language: en-US
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>, ketanch@iitk.ac.in
+References: <c6fb9b25-a4b6-2e4a-2dd1-63adda055a49@amd.com>
+ <CAMj1kXF2sfsXhE9dq5b77nnzHEZHkMa+b2VUCCw7gtRL6mEwEw@mail.gmail.com>
+ <CAMj1kXGzKO8=F2RzFBObPYb7J-hSj-esHJ8oCC-1fsV-B028EQ@mail.gmail.com>
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <CAMj1kXGzKO8=F2RzFBObPYb7J-hSj-esHJ8oCC-1fsV-B028EQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0107.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9b::17) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MN0PR12MB6320:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2c2d2b9-55aa-4331-100c-08daa5edf60e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BCVfZJhX6kC4FqgvZ6MUntrZxue+39+AxdMOGrKk1k3iKlMYLbVJOCB77Dax44lTpJGmInK2Lo0H5pAZEGf4fU/gPM93BjtzRjxUBbmE+x85LlJjbKc/5aK+h3vxyAwUMYSo+ZfSOlHyGhtsXfNCqESya+Km58+F0d4rc/5ZwqVG79nsuodDCA5n0674WSV9wmupSBjSv44vwIyf0Xjhtoj2Q2L+3gnDGZ1A3lpYNZe6Owg9mmo+TZ0LAGI8cmT+s+nfUMzBrY/fpPY5ES4Wy6B2gCfZjP/wfHtrn32Pn0fF7GjESHWJewFiXE3vlm4iF96iVElGFAoQNEfnbxVqQxKm1v9USnIPCXzDK7OB9LgztjD4ZZhliCAJG3W2qBUZlOwCcYHoNjzgOMu9swNM9OgYYWLwMWoxONmBx4lU0ky6cFeovDhWGUXMm9pw83yNMQVNipi0WowsaqpPjkC2xuT1pXnrXRNYxaToYDWKrZAflo67lndexyNhIEbyowAZZ0ZGlRoQYl6QPx05mBybrawkJElkZ5hRpvTtNBbcvKL52hifmbQTWv4ZQhkKxzjkmWFU90q2JHPwYnINknqW2uvijk/WKM2+jEzeZ+K3na+3kOL5O3gQde1SuccrtjSL3rtKHFvcAtb1DTOS0LA9Zybm5n6LS3L1MQUCCNCMnvyCeDG66rUg+iHADZhapTcV1kXNViik0IedvszhuAeHtmDs+RsBoy/0ZoSrPo6BSga3OToD+VS5Gksv/r8sbd5a9BlMGbDWDvTSbb02rHyEVrphHMwzRtrMnaZY+C3TO44=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(376002)(396003)(346002)(136003)(39860400002)(451199015)(31686004)(186003)(2616005)(83380400001)(66476007)(38100700002)(66556008)(66946007)(478600001)(5660300002)(8676002)(4326008)(31696002)(8936002)(26005)(316002)(2906002)(6486002)(6512007)(6666004)(6506007)(36756003)(41300700001)(6916009)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bG10dmxEU3VzU1NTSVlLUEE1cGVjdGxCNVZ2RXAxbGRZZTVsUE5SNmpJMUJ2?=
+ =?utf-8?B?TDh6OGVLdjVYa3l5UEp1V1MyWlE0SGlyUUVyV3hMN2VRRXdtcUZha0UxdGdB?=
+ =?utf-8?B?aUt0TGhOYmJnUGZIZkpSNTM2bVQ3K09kSWczZEZuV1hPVmpDLzBYWnpKZFo1?=
+ =?utf-8?B?OTZuWjFlbE9rcXJtcjdSeXQ0cjRIVDB3cDdmUGs1eHFjVW9OZUZ2U3A1QkFl?=
+ =?utf-8?B?bkhrcGQyWHJyc1ZMUE1tVTBOSDRoYXpsM0ZrdGpzZ0h1VFZTOS9kbmNaUlR2?=
+ =?utf-8?B?K1B3ZlBuQmZUZ3JSQ045cHduN1c3QStOSEhkeTRLOFBjbzZNZ3RYMWMvc29t?=
+ =?utf-8?B?b0orMzlwNUJYQytXQzgvSVZ5VTRHTDhYVlBSQjd3SFM0YkFxQWF0Mm5KRzFl?=
+ =?utf-8?B?eXBFN3RxNERWN2h4YXZRTFBzS0VoVThpWitJRCtYcUhyRjBCL0tzSTdkZGJF?=
+ =?utf-8?B?L3RYczBHZmhaNy94ZTVRbW5pUFo0azU5RC9yUVhrSkdjK2RYZlRHM3ZMSC90?=
+ =?utf-8?B?VnQ0VlBwckkrMmNSYzhxWWJDaTdvZXhCSTJ0bW9OaGJsYVlVN0tTdlV0YWxU?=
+ =?utf-8?B?ZkU0ejZDNFNocE9FVzNZMnl2WEhjcHJ2KzU0dXQyejQ3M1VaQnk0dUpGOXpo?=
+ =?utf-8?B?T2NLMkx1VE9JS3ArSXVwN0lkVVNVYzcrSE9ZUFh2L1hQcVBSM3BzYjEyaHZk?=
+ =?utf-8?B?WTZpOFIwVThBSVBoRlVGdk5BMWMzUnJ3M05CaURRSW4wT01wZE82ZVFZNVhL?=
+ =?utf-8?B?Y3NvbjNvbzdxdjU1QzhuM1VkeXZ2K2YxaVpqSlNEVkpJVTBQVytQVFBsYzgw?=
+ =?utf-8?B?TUEzanpnbXI1eHZkN1A2Q3EwQ0RWcGliNGk4L1Nsd3JpYXpZL0QvUmpDZ1Vk?=
+ =?utf-8?B?VnJuRkkvbUtVVkJVV2F2NCtCL2tLYXBPTFZDYmpIRzMyL0JtV0tMNHVieVlM?=
+ =?utf-8?B?OGhQVUQwQ0wzMityM0NNQ096a0liVHNOTlhwL2VQa3BIZ1ZGSzI2WURYTVZU?=
+ =?utf-8?B?TG5LeXlSUU9yamQxb0l0bHVWOVQ1WlVWY0xFV0RiUXJxWVVETkhsaGZBNkJz?=
+ =?utf-8?B?VlhJM3hRVWQ5S0hGV3dIaVpIMzdvVllqN1cySEZvNzkxRlJsa290bE5lQnJC?=
+ =?utf-8?B?bS96RXdaNGtReFpLQmw5cnF1RUNkQnk0YlJKYmJMUXpLYTVNb3BLWitHYlBt?=
+ =?utf-8?B?Z3Zudi9tb1FpSUViU0F5M2tFMFlRR0VaUmgyUHpKNUQxRHVWWlgxM0JQSjA5?=
+ =?utf-8?B?RXhhUFZCSis2ZkxRcHB0djZEVWVFK3N4eDFHVTdEanYrTkNZcUJkeEhTbHpz?=
+ =?utf-8?B?VnZwc0F2Tk4zNDI0OVB5cjBLSWNOb01MWTlFWFVDYmwzREhnYzByUnRWaXhK?=
+ =?utf-8?B?RXl4RXJWb2M4ekZWcFY3QVluQklZOEZGeVZmcStEbitwVmJ3RlllbjZURThl?=
+ =?utf-8?B?Q0VwOUtaOTZDODdoSXVzVjFLa2VURnlCQWxzeFhlckhuYSsyVU5oeXl4OXBQ?=
+ =?utf-8?B?Sm4yVmVoTEZqY1A4azJ3UGgxQ1RrV1p3Qng1a0ZhRWJmSkR4SDBBa0xrQWUx?=
+ =?utf-8?B?bWI2dWY5NmV6ZHJqRTFNR3BGY3pCdG5zZHNjQUN1M21KN3UzSk43VHZFYTFR?=
+ =?utf-8?B?eUNZVm9uNEprRWE2SUhNS0E2R1hZcjdJd29xQkczZkYwUWRBNExmT0V0RVRP?=
+ =?utf-8?B?Z1N3dzhIdndiN0tEUWUxc0ZNczlHVTRycEpYU3VwM2pnbnVwLzlCakhzaHZV?=
+ =?utf-8?B?SkJHUGttbDB5ZHlqNlBwTlkrSUZyeFF4eGViN2wrakIwMXRtdG15Vm91TkhD?=
+ =?utf-8?B?ZWx6ZzBsaUxPdDR2cUFScE41LzlYYnZ6QnJtbXlXNFRzVjdGM2dqWGdodzRh?=
+ =?utf-8?B?SHg3K1drTDBWaDlJeVpXbU9OQTNWZVE5bVl1V0pJekNESFBmMUszbzFaNzI5?=
+ =?utf-8?B?UGVIdzV5TXU4am9xamRGdEw5ZmkrTkFZakdwQ1UwbzVEUUU1cVdLTXVhTDVu?=
+ =?utf-8?B?QjJxNDAxVno0cURtajA1NFIrVzMzR3lSaDJWcFUwQUV2OWRYTEg0dDhSTUhn?=
+ =?utf-8?B?T0NiQjhpb0RZWlMzeDJiM0FBeDdUVzlkend4YmRZb3luWmZEdFowT0x1VFB3?=
+ =?utf-8?Q?H0gDMw/8R/eEFV0Rl3Y0eqvqK?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2c2d2b9-55aa-4331-100c-08daa5edf60e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2022 09:51:08.2013
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dULMD8VK1tZcPNAlhCEev6npcmO7pUzMM4Xm7liN1NPnPUi1YCxGJQ/4+W8WYWlO+nXvXDGne/0kGtRZifZweg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6320
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On 04/10/22 13:58, Ard Biesheuvel wrote:
+> On Tue, 4 Oct 2022 at 10:24, Ard Biesheuvel <ardb@kernel.org> wrote:
+>>
+>> On Tue, 4 Oct 2022 at 06:41, Nikunj A. Dadhania <nikunj@amd.com> wrote:
+>>>
+>>> Hi!
+>>>
+>>> We are trying to implement Secure TSC feature for AMD SNP guests [1]. During the boot-up of the
+>>> secondary cpus, SecureTSC enabled guests need to query TSC info from Security processor (PSP).
+>>> This communication channel is encrypted between the security processor and the guest,
+>>> hypervisor is just the conduit to deliver the guest messages to the security processor.
+>>> Each message is protected with an AEAD (AES-256 GCM).
+>>>
+>>> As the TSC info is needed during the smpboot phase, few crypto modules need to be loaded early
+>>> to use the crypto api for encryption/decryption of SNP Guest messages.
+>>>
+>>> I was able to get the SNP Guest messages working with initializing few crypto modules using
+>>> early_initcall() instead of subsys_initcall().
+>>>
+>>> Require suggestion/inputs if this is acceptable. List of modules that was changed
+>>> to early_initcall:
+>>>
+>>> early_initcall(aes_init);
+>>> early_initcall(cryptomgr_init);
+>>> early_initcall(crypto_ctr_module_init);
+>>> early_initcall(crypto_gcm_module_init);
+>>> early_initcall(ghash_mod_init);
+>>>
+>>
+>> I understand the need for this, but I think it is a bad idea. These
+>> will run even before SMP bringup, and before pure initcalls, which are
+>> documented as
+> 
+> /*
+>  * A "pure" initcall has no dependencies on anything else, and purely
+>  * initializes variables that couldn't be statically initialized.
+>  */> 
+> So basically, you should not be relying on any global infrastructure
+> to have been initialized. This is also something that may cause
+> different problems on different architectures, and doing this only for
+> x86 seems like a problem as well.
+> 
+> Can you elaborate a bit on the use case? 
 
-The following changes since commit 874b301985ef2f89b8b592ad255e03fb6fbfe605:
+Parameters used in TSC value calculation is controlled by
+the hypervisor and a malicious hypervisor can prevent guest from
+moving forward. Secure TSC allows guest to securely use rdtsc/rdtscp
+as the parameters being used now cannot be changed by hypervisor once
+the guest is launched.
 
-  crypto: lib - remove unneeded selection of XOR_BLOCKS (2022-08-26 18:40:14 +0800)
+For the boot-cpu, TSC_SCALE/OFFSET is initialized as part of the guest 
+launch process. During the secure guest boot, boot cpu will start bringing 
+up the secondary CPUs. While creation of secondary CPU, TSC_SCALE/OFFSET 
+field needs to be initialized appropriately. SNP Guest messages are the 
+mechanism to communicate with the PSP to prevent risks from a malicious 
+hypervisor snooping.
 
-are available in the Git repository at:
+The PSP firmware provides each guests with four Virtual Machine Platform 
+Communication key(VMPCK) and is passed to the guest using a special secrets page 
+as part of the guest launch process. The key is either with the guest or the 
+PSP firmware.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v6.1-p1
+The messages exchanged between the guest and the PSP firmware is 
+encrypted/decrypted using this key.
 
-for you to fetch changes up to b411b1a0c8bddd470fc8c3457629ac25a168cba0:
+> AES in GCM mode seems like a
+> thing that we might be able to add to the crypto library API without
+> much hassle (which already has a minimal implementation of AES)
 
-  crypto: aspeed - Remove redundant dev_err call (2022-09-30 13:59:13 +0800)
+That will be great !
 
-----------------------------------------------------------------
-This update includes the following changes:
-
-API:
-
-- Feed untrusted RNGs into /dev/random.
-- Allow HWRNG sleeping to be more interruptible.
-- Create lib/utils module.
-- Setting private keys no longer required for akcipher.
-- Remove tcrypt mode=1000.
-- Reorganised Kconfig entries.
-
-Algorithms:
-
-- Load x86/sha512 based on CPU features.
-- Add AES-NI/AVX/x86_64/GFNI assembler implementation of aria cipher.
-
-Drivers:
-
-- Add HACE crypto driver aspeed.
-
-----------------------------------------------------------------
-Adam Guerin (1):
-      crypto: qat - add limit to linked list parsing
-
-Damian Muszynski (2):
-      crypto: qat - fix DMA transfer direction
-      crypto: qat - use reference to structure in dma_map_single()
-
-Dan Carpenter (2):
-      crypto: marvell/octeontx - prevent integer overflows
-      crypto: cavium - prevent integer overflow loading firmware
-
-Dominik Brodowski (1):
-      hwrng: core - start hwrng kthread also for untrusted sources
-
-Dong Chuanjian (1):
-      crypto: drbg - remove unnecessary (void*) conversions
-
-Eric Biggers (3):
-      crypto: lib - create utils module and move __crypto_memneq into it
-      crypto: lib - move __crypto_xor into utils
-      crypto: lib - remove __HAVE_ARCH_CRYPTO_MEMNEQ
-
-Gaosheng Cui (3):
-      crypto: bcm - Simplify obtain the name for cipher
-      crypto: aead - Remove unused inline functions from aead
-      crypto: scatterwalk - Remove unused inline function scatterwalk_aligned()
-
-Giovanni Cabiddu (1):
-      Revert "crypto: qat - reduce size of mapped region"
-
-Herbert Xu (7):
-      crypto: qcom-rng - Fix qcom_rng_of_match unused warning
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-      Revert "crypto: gemini - Fix error check for dma_map_sg"
-      Revert "crypto: allwinner - Fix dma_map_sg error check"
-      crypto: aspeed - Enable compile testing
-      crypto: aspeed - Fix sparse warnings
-      crypto: artpec6 - Fix printk warning on size_t/%d
-
-Ignat Korchagin (1):
-      crypto: akcipher - default implementation for setting a private key
-
-Jack Wang (6):
-      crypto: gemini - Fix error check for dma_map_sg
-      crypto: sahara - Fix error check for dma_map_sg
-      crypto: qce - Fix dma_map_sg error check
-      crypto: amlogic - Fix dma_map_sg error check
-      crypto: allwinner - Fix dma_map_sg error check
-      crypto: ccree - Fix dma_map_sg error check
-
-Jacky Li (2):
-      crypto: ccp - Initialize PSP when reading psp data file failed
-      crypto: ccp - Fail the PSP initialization when writing psp data file failed
-
-James Cowgill (1):
-      hwrng: arm-smccc-trng - fix NO_ENTROPY handling
-
-Jarkko Sakkinen (1):
-      crypto: ccp - Add a quirk to firmware update
-
-Jason A. Donenfeld (1):
-      hwrng: core - let sleep be interrupted when unregistering hwrng
-
-Jason Wang (2):
-      crypto: cavium - Fix comment typo
-      crypto: api - Fix comment typo
-
-Jean Delvare (1):
-      crypto: keembay-ocs - Drop obsolete dependency on COMPILE_TEST
-
-Junchong Pan (1):
-      crypto: hisilicon/qm - remove unneeded data storage
-
-Kai Ye (3):
-      crypto: hisilicon/qm - no judgment in the back process
-      crypto: hisilicon/sec - delete redundant blank lines
-      crypto: hisilicon/qm - fix the qos value initialization
-
-Koba Ko (1):
-      crypto: ccp - Release dma channels before dmaengine unrgister
-
-Kshitiz Varshney (1):
-      hwrng: imx-rngc - Moving IRQ handler registering after imx_rngc_irq_mask_clear()
-
-Liu Shixin (1):
-      crypto: sun4i-ss - use DEFINE_SHOW_ATTRIBUTE to simplify sun4i_ss_debugfs
-
-Lucas Segarra Fernandez (3):
-      crypto: testmgr - extend acomp tests for NULL destination buffer
-      crypto: testmgr - fix indentation for test_acomp() args
-      crypto: qat - fix default value of WDT timer
-
-Lukas Bulwahn (2):
-      crypto: arm64 - revert unintended config name change for CRYPTO_SHA1_ARM64_CE
-      crypto: blake2s - revert unintended config addition of CRYPTO_BLAKE2S
-
-Martin Kaiser (3):
-      hwrng: imx-rngc - use KBUILD_MODNAME as driver name
-      hwrng: imx-rngc - use devm_clk_get_enabled
-      hwrng: imx-rngc - use devres for hwrng registration
-
-Neal Liu (8):
-      crypto: aspeed - Add HACE hash driver
-      dt-bindings: clock: Add AST2500/AST2600 HACE reset definition
-      ARM: dts: aspeed: Add HACE device controller node
-      dt-bindings: crypto: add documentation for aspeed hace
-      crypto: aspeed - add HACE crypto driver
-      crypto: aspeed - fix build module error
-      crypto: aspeed: fix format unexpected build warning
-      crypto: aspeed - fix build error when only CRYPTO_DEV_ASPEED is enabled
-
-Peter Harliman Liem (3):
-      crypto: inside-secure - Change swab to swab32
-      crypto: inside_secure - Avoid dma map if size is zero
-      crypto: inside-secure - Replace generic aes with libaes
-
-Robert Elliott (20):
-      crypto: x86/sha512 - load based on CPU features
-      crypto: testmgr - don't generate WARN for missing modules
-      crypto: tcrypt - remove mode=1000
-      crypto: Kconfig - move mips entries to a submenu
-      crypto: Kconfig - move powerpc entries to a submenu
-      crypto: Kconfig - move s390 entries to a submenu
-      crypto: Kconfig - move sparc entries to a submenu
-      crypto: Kconfig - move x86 entries to a submenu
-      crypto: Kconfig - remove AES_ARM64 ref by SA2UL
-      crypto: Kconfig - submenus for arm and arm64
-      crypto: Kconfig - sort the arm64 entries
-      crypto: Kconfig - sort the arm entries
-      crypto: Kconfig - add submenus
-      crypto: Kconfig - simplify public-key entries
-      crypto: Kconfig - simplify CRC entries
-      crypto: Kconfig - simplify aead entries
-      crypto: Kconfig - simplify hash entries
-      crypto: Kconfig - simplify userspace entries
-      crypto: Kconfig - simplify cipher entries
-      crypto: Kconfig - simplify compression/RNG entries
-
-Shang XiaoJing (1):
-      crypto: aspeed - Remove redundant dev_err call
-
-Srinivas Kerekare (1):
-      crypto: qat - add check to validate firmware images
-
-Sun Ke (1):
-      crypto: aspeed - fix return value check in aspeed_hace_probe()
-
-Taehee Yoo (3):
-      crypto: aria - prepare generic module for optimized implementations
-      crypto: aria-avx - add AES-NI/AVX/x86_64/GFNI assembler implementation of aria cipher
-      crypto: tcrypt - add async speed test for aria cipher
-
-Tuo Cao (1):
-      crypto: artpec6 - move spin_lock_bh to spin_lock in tasklet
-
-Weili Qian (12):
-      crypto: hisilicon/hpre - change return type of hpre_cluster_inqry_write()
-      crypto: hisilicon/qm - fix missing destroy qp_idr
-      crypto: hisilicon/qm - remove unneeded hardware cache write back
-      crypto: hisilicon/qm - check mailbox operation result
-      crypto: hisilicon/qm - fix missing put dfx access
-      crypto: hisilicon/qm - return failure if vfs_num exceeds total VFs
-      crypto: hisilicon/qm - get hardware features from hardware registers
-      crypto: hisilicon/qm - get qp num and depth from hardware registers
-      crypto: hisilicon/qm - add UACCE_CMD_QM_SET_QP_INFO support
-      crypto: hisilicon/qm - get error type from hardware registers
-      crypto: hisilicon/qm - support get device irq information from hardware registers
-      crypto: hisilicon/zip - support zip capability
-
-Wenkai Lin (1):
-      crypto: hisilicon/sec - get algorithm bitmap from registers
-
-Wolfram Sang (2):
-      crypto: core - move from strlcpy with unused retval to strscpy
-      crypto: drivers - move from strlcpy with unused retval to strscpy
-
-Xiu Jianfeng (1):
-      crypto: add __init/__exit annotations to init/exit funcs
-
-Yang Shen (2):
-      crypto: hisilicon/zip - optimization for performance
-      crypto: hisilicon/zip - some misc cleanup
-
-Ye Weihua (1):
-      crypto: hisilicon/zip - fix mismatch in get/set sgl_sge_nr
-
-YueHaibing (1):
-      crypto: aspeed - Fix check for platform_get_irq() errors
-
-Zhengchao Shao (1):
-      crypto: sahara - don't sleep when in softirq
-
-Zhiqi Song (3):
-      crypto: hisilicon/hpre - support hpre capability
-      crypto: hisilicon/hpre - optimize registration of ecdh
-      crypto: hisilicon - support get algs by the capability register
-
-Zhuo Chen (1):
-      crypto: hisilicon - Remove pci_aer_clear_nonfatal_status() call
-
-lei he (1):
-      crypto: virtio - fix memory-leak
-
-wangjianli (3):
-      crypto: n2 - fix repeated words in comments
-      crypto: marvell/octeontx - fix repeated words in comments
-      crypto: bcm - fix repeated words in comments
-
-ye xingchen (7):
-      crypto: sun8i-ce - using the pm_runtime_resume_and_get to simplify the code
-      crypto: octeontx - Remove the unneeded result variable
-      crypto: nx - Remove the unneeded result variable
-      crypto: ccp - Remove the unneeded result variable
-      crypto: octeontx2 - Remove the unneeded result variable
-      crypto: zip - remove the unneeded result variable
-      crypto: marvell/octeontx - use sysfs_emit() to instead of scnprintf()
-
- .../bindings/crypto/aspeed,ast2500-hace.yaml       |   53 +
- .../virt/kvm/x86/amd-memory-encryption.rst         |    5 +-
- MAINTAINERS                                        |    7 +
- arch/arm/Kconfig                                   |    4 -
- arch/arm/boot/dts/aspeed-g5.dtsi                   |    8 +
- arch/arm/boot/dts/aspeed-g6.dtsi                   |    8 +
- arch/arm/configs/exynos_defconfig                  |    1 -
- arch/arm/configs/milbeaut_m10v_defconfig           |    1 -
- arch/arm/configs/multi_v7_defconfig                |    1 -
- arch/arm/configs/omap2plus_defconfig               |    1 -
- arch/arm/configs/pxa_defconfig                     |    1 -
- arch/arm/crypto/Kconfig                            |  238 ++-
- arch/arm64/Kconfig                                 |    3 -
- arch/arm64/configs/defconfig                       |    1 -
- arch/arm64/crypto/Kconfig                          |  279 ++-
- arch/mips/crypto/Kconfig                           |   74 +
- arch/powerpc/crypto/Kconfig                        |   97 +
- arch/s390/crypto/Kconfig                           |  135 ++
- arch/sparc/crypto/Kconfig                          |   90 +
- arch/x86/crypto/Kconfig                            |  484 +++++
- arch/x86/crypto/Makefile                           |    3 +
- arch/x86/crypto/aria-aesni-avx-asm_64.S            | 1303 ++++++++++++
- arch/x86/crypto/aria-avx.h                         |   16 +
- arch/x86/crypto/aria_aesni_avx_glue.c              |  213 ++
- arch/x86/crypto/sha512_ssse3_glue.c                |   10 +
- crypto/Kconfig                                     | 2225 +++++++-------------
- crypto/Makefile                                    |    2 +-
- crypto/akcipher.c                                  |    8 +
- crypto/algapi.c                                    |   71 -
- crypto/api.c                                       |    4 +-
- crypto/{aria.c => aria_generic.c}                  |   39 +-
- crypto/async_tx/raid6test.c                        |    4 +-
- crypto/curve25519-generic.c                        |    4 +-
- crypto/dh.c                                        |    4 +-
- crypto/drbg.c                                      |   12 +-
- crypto/ecdh.c                                      |    4 +-
- crypto/ecdsa.c                                     |    4 +-
- crypto/essiv.c                                     |    2 +-
- crypto/rsa.c                                       |    4 +-
- crypto/sm2.c                                       |    4 +-
- crypto/tcrypt.c                                    |   53 +-
- crypto/testmgr.c                                   |   38 +-
- drivers/char/hw_random/arm_smccc_trng.c            |    4 +-
- drivers/char/hw_random/core.c                      |   55 +-
- drivers/char/hw_random/imx-rngc.c                  |   51 +-
- drivers/crypto/Kconfig                             |    3 +-
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c  |   16 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c  |    6 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c        |    6 +-
- drivers/crypto/aspeed/Kconfig                      |   48 +
- drivers/crypto/aspeed/Makefile                     |    7 +
- drivers/crypto/aspeed/aspeed-hace-crypto.c         | 1133 ++++++++++
- drivers/crypto/aspeed/aspeed-hace-hash.c           | 1391 ++++++++++++
- drivers/crypto/aspeed/aspeed-hace.c                |  284 +++
- drivers/crypto/aspeed/aspeed-hace.h                |  298 +++
- drivers/crypto/axis/artpec6_crypto.c               |    6 +-
- drivers/crypto/bcm/cipher.c                        |    4 +-
- drivers/crypto/bcm/cipher.h                        |    2 +-
- drivers/crypto/cavium/cpt/cpt_hw_types.h           |    2 +-
- drivers/crypto/cavium/cpt/cptpf_main.c             |    6 +-
- drivers/crypto/cavium/zip/zip_crypto.c             |   30 +-
- drivers/crypto/ccp/ccp-crypto-des3.c               |    5 +-
- drivers/crypto/ccp/ccp-dmaengine.c                 |    6 +-
- drivers/crypto/ccp/sev-dev.c                       |   78 +-
- drivers/crypto/ccree/cc_buffer_mgr.c               |    2 +-
- drivers/crypto/hisilicon/hpre/hpre.h               |    8 +-
- drivers/crypto/hisilicon/hpre/hpre_crypto.c        |  250 ++-
- drivers/crypto/hisilicon/hpre/hpre_main.c          |  216 +-
- drivers/crypto/hisilicon/qm.c                      |  906 ++++----
- drivers/crypto/hisilicon/sec2/sec.h                |   34 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.c         |  456 ++--
- drivers/crypto/hisilicon/sec2/sec_main.c           |  160 +-
- drivers/crypto/hisilicon/zip/zip.h                 |    3 +-
- drivers/crypto/hisilicon/zip/zip_crypto.c          |  134 +-
- drivers/crypto/hisilicon/zip/zip_main.c            |  266 ++-
- drivers/crypto/inside-secure/safexcel_cipher.c     |   60 +-
- drivers/crypto/inside-secure/safexcel_hash.c       |   67 +-
- drivers/crypto/keembay/Kconfig                     |    4 +-
- drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h |    2 +-
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c  |   24 +-
- drivers/crypto/marvell/octeontx/otx_cptvf_main.c   |    8 +-
- drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c   |   20 +-
- .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    |    4 +-
- drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |    5 +-
- drivers/crypto/n2_core.c                           |    2 +-
- drivers/crypto/nx/nx-aes-ccm.c                     |    5 +-
- drivers/crypto/qat/qat_common/adf_cfg.c            |    6 +-
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |   10 +-
- drivers/crypto/qat/qat_common/adf_gen4_hw_data.h   |    2 +-
- .../crypto/qat/qat_common/adf_transport_debug.c    |    2 +-
- drivers/crypto/qat/qat_common/icp_qat_uclo.h       |    3 +-
- drivers/crypto/qat/qat_common/qat_algs.c           |   18 +-
- drivers/crypto/qat/qat_common/qat_asym_algs.c      |   24 +-
- drivers/crypto/qat/qat_common/qat_uclo.c           |   56 +-
- drivers/crypto/qce/aead.c                          |    4 +-
- drivers/crypto/qce/sha.c                           |    8 +-
- drivers/crypto/qce/skcipher.c                      |    8 +-
- drivers/crypto/qcom-rng.c                          |    7 +-
- drivers/crypto/sahara.c                            |   22 +-
- .../crypto/virtio/virtio_crypto_akcipher_algs.c    |    4 +
- drivers/net/Kconfig                                |    2 -
- drivers/net/wireless/ath/ath9k/rng.c               |    3 +-
- include/crypto/aria.h                              |   17 +-
- include/crypto/internal/aead.h                     |   25 -
- include/crypto/scatterwalk.h                       |    6 -
- include/dt-bindings/clock/aspeed-clock.h           |    1 +
- include/dt-bindings/clock/ast2600-clock.h          |    1 +
- include/linux/hisi_acc_qm.h                        |   63 +-
- include/linux/hw_random.h                          |    3 +
- include/uapi/misc/uacce/hisi_qm.h                  |   17 +-
- lib/Kconfig                                        |    3 -
- lib/Makefile                                       |    1 -
- lib/crypto/Kconfig                                 |    7 +-
- lib/crypto/Makefile                                |    3 +
- lib/{ => crypto}/memneq.c                          |    7 +-
- lib/crypto/utils.c                                 |   88 +
- 117 files changed, 9052 insertions(+), 2965 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2500-hace.yaml
- create mode 100644 arch/mips/crypto/Kconfig
- create mode 100644 arch/powerpc/crypto/Kconfig
- create mode 100644 arch/s390/crypto/Kconfig
- create mode 100644 arch/sparc/crypto/Kconfig
- create mode 100644 arch/x86/crypto/Kconfig
- create mode 100644 arch/x86/crypto/aria-aesni-avx-asm_64.S
- create mode 100644 arch/x86/crypto/aria-avx.h
- create mode 100644 arch/x86/crypto/aria_aesni_avx_glue.c
- rename crypto/{aria.c => aria_generic.c} (86%)
- create mode 100644 drivers/crypto/aspeed/Kconfig
- create mode 100644 drivers/crypto/aspeed/Makefile
- create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace-hash.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace.h
- rename lib/{ => crypto}/memneq.c (98%)
- create mode 100644 lib/crypto/utils.c
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Nikunj
