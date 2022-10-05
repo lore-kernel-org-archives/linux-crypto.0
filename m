@@ -2,80 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DED2C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Oct 2022 13:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB72C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Oct 2022 13:18:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiJENOO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Oct 2022 09:14:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
+        id S229724AbiJENSq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Oct 2022 09:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbiJENON (ORCPT
+        with ESMTP id S229507AbiJENSo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Oct 2022 09:14:13 -0400
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3417E792E3;
-        Wed,  5 Oct 2022 06:14:12 -0700 (PDT)
-Received: by mail-oo1-f51.google.com with SMTP id c13-20020a4ac30d000000b0047663e3e16bso10774046ooq.6;
-        Wed, 05 Oct 2022 06:14:12 -0700 (PDT)
+        Wed, 5 Oct 2022 09:18:44 -0400
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEA70C4E;
+        Wed,  5 Oct 2022 06:18:42 -0700 (PDT)
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-1322fa1cf6fso12576902fac.6;
+        Wed, 05 Oct 2022 06:18:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Us1gbC0HCIGjXgoBGtMUQS365+04o6By1VntKrKN464=;
-        b=Sun6GD+miNNsQW6w7TMvH/NdjSyz40tCEzaF3oqGKdSVamE2khdBcFknO21YkhJPK4
-         kG0YNVwHch0IhPgu0rQrn9JBGe8hDbJ6CoRCWqN0HDUoJBVrkgDyFLU4uZNcaJwNoDxq
-         QxiSAyqjdD28ymegwtHtOP/jhHmdS8GkWnNQHvHwKH3nqgGD7+ef5V3dVZYycLCDI69L
-         EAJCwpjyPdL1XASGRdRfFir14jrHGpLHQBKsnUv0MP9rfVenCePRiT/IuGVjipo+OJZP
-         tGQaba3E02Sp8TJUk2E2eRtv+T1bULfTOetXItewUWS1Ji2AwRuMPIf7OR91di6lohlt
-         v4ZA==
-X-Gm-Message-State: ACrzQf0dUJkpulFoPuBzgoUCVfwPhcLrQKHm3POnsAufLFnuYkkZ0HeE
-        p6H2cjU3shQmLMhs/ZjN+A==
-X-Google-Smtp-Source: AMsMyM4yGZNVEZO0gUm6Y1ZYmOt9sQSiHOUHoREsWyfAZ4rDf7s5fnnpasq/0f77SctWwdx487lmtw==
-X-Received: by 2002:a05:6830:3115:b0:658:ea61:249c with SMTP id b21-20020a056830311500b00658ea61249cmr12204357ots.225.1664975651409;
-        Wed, 05 Oct 2022 06:14:11 -0700 (PDT)
+        bh=H7WBRE0TSwdycfwFVKlR15yRSU1xPZaaPnpCRj9i22Y=;
+        b=2YzFbEre5D1Lowapj2AMwX8Epvsi9QAZYdO7FBPBdtCM0pnwTtmhelfmB7ctjhXZ/z
+         xYLBvlxMudxl3D9w6VEYgAFjJjNCpinlNhsJTwLUjl1ioI2EMT0JbR2/x9LnJdpngPo1
+         2B3dnS3+EvYDhNh45UJmMrVkYelq6qc01BtNo1y+oVLZbUkYLhFqQBd6XD/lbOXT6qRh
+         VHw1a2Sv/cYUMBDYnr406p0m80fmX6eKJCMkWLchlKU7VFkA20U28YdggzhZp8Tlolpn
+         7uIf5aizgXxIE8Hvup8hN62hOpqnzHnM1v1fyBqx/EWb6GTJSrF74oxXCvTQ8+34r7aU
+         B46g==
+X-Gm-Message-State: ACrzQf0hjM48xz2/ixFcyEhtwgfVhUCbU613+DiKmqw91AzQZd3Wehiv
+        OCUNopM8YfjO3uHa9bsfPQ==
+X-Google-Smtp-Source: AMsMyM5uI5qcnh4ZkcNOCX8kxN3upY5M61WbvqR4W6U8P6mgzfD71aGVQ1+C94drZG57R5BM77aAkA==
+X-Received: by 2002:a05:6870:738d:b0:131:f040:fb49 with SMTP id z13-20020a056870738d00b00131f040fb49mr2520243oam.253.1664975922025;
+        Wed, 05 Oct 2022 06:18:42 -0700 (PDT)
 Received: from robh_at_kernel.org ([2607:fb90:5fee:ea3a:4239:ad4:650a:6e66])
-        by smtp.gmail.com with ESMTPSA id p189-20020acabfc6000000b00350f17527fesm4170243oif.28.2022.10.05.06.14.08
+        by smtp.gmail.com with ESMTPSA id v14-20020a056870424e00b0011e73536301sm2486442oac.52.2022.10.05.06.18.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 06:14:09 -0700 (PDT)
-Received: (nullmailer pid 3256258 invoked by uid 1000);
-        Wed, 05 Oct 2022 13:14:08 -0000
-Date:   Wed, 5 Oct 2022 08:14:08 -0500
+        Wed, 05 Oct 2022 06:18:41 -0700 (PDT)
+Received: (nullmailer pid 3261036 invoked by uid 1000);
+        Wed, 05 Oct 2022 13:18:40 -0000
+Date:   Wed, 5 Oct 2022 08:18:40 -0500
 From:   Rob Herring <robh@kernel.org>
 To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     Andrew Jeffery <andrew@aj.id.au>, linux-crypto@vger.kernel.org,
-        linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        devicetree@vger.kernel.org,
-        "Chia-Wei Wang --cc=linux-kernel @ vger . kernel . org" 
-        <chiawei_wang@aspeedtech.com>,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org, Joel Stanley <joel@jms.id.au>
-Subject: Re: [PATCH v2 3/4] dt-bindings: crypto: add documentation for Aspeed
- ACRY
-Message-ID: <166497564756.3256206.1489547324996590627.robh@kernel.org>
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        "Chia-Wei Wang --cc=linux-kernel @ vger . kernel . org" 
+        <chiawei_wang@aspeedtech.com>, linux-crypto@vger.kernel.org,
+        linux-aspeed@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] dt-bindings: bus: add documentation for Aspeed
+ AHBC
+Message-ID: <20221005131840.GA3256371-robh@kernel.org>
 References: <20221004032841.3714928-1-neal_liu@aspeedtech.com>
- <20221004032841.3714928-4-neal_liu@aspeedtech.com>
+ <20221004032841.3714928-5-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221004032841.3714928-4-neal_liu@aspeedtech.com>
+In-Reply-To: <20221004032841.3714928-5-neal_liu@aspeedtech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 04 Oct 2022 11:28:40 +0800, Neal Liu wrote:
+On Tue, Oct 04, 2022 at 11:28:41AM +0800, Neal Liu wrote:
 > Add device tree binding documentation for the Aspeed
-> ECDSA/RSA ACRY Engines Controller.
+> Advanced High-Performance Bus (AHB) Controller.
 > 
 > Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
 > ---
->  .../bindings/crypto/aspeed,ast2600-acry.yaml  | 49 +++++++++++++++++++
->  MAINTAINERS                                   |  2 +-
->  2 files changed, 50 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
+>  .../bindings/bus/aspeed,ast2600-ahbc.yaml     | 46 +++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
 > 
+> diff --git a/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+> new file mode 100644
+> index 000000000000..c42a350d30a1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+> @@ -0,0 +1,46 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/bus/aspeed,ast2600-ahbc.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: ASPEED Advanced High-Performance Bus Controller (AHBC) Device Tree Bindings
+> +
+> +maintainers:
+> +  - Neal Liu <neal_liu@aspeedtech.com>
+> +  - Chia-Wei Wang <chiawei_wang@aspeedtech.com>
+> +
+> +description: |
+> +  Advanced High-performance Bus Controller (AHBC) supports plenty of mechanisms
+> +  including a priority arbiter, an address decoder and a data multiplexer
+> +  to control the overall operations of Advanced High-performance
+> +  Bus (AHB). AHB is the main system bus for ARM CPU to communicate with the
+> +  related peripherals.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - aspeed,ast2600-ahbc
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    bus {
+> +        compatible = "simple-bus";
+> +        #address-cells = <1>;
+> +        #size-cells = <1>;
+> +        ranges;
+> +
+> +        ahbc: bus@1e600000 {
+> +            compatible = "aspeed,ast2600-ahbc";
+> +            reg = <0x1e600000 0x100>;
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Devices on the AHB bus should be child nodes here. Unless this is just 
+for device master interface to memory, but that's not what the 
+description says.
+
+Rob
