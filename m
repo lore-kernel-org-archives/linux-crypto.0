@@ -2,128 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57751C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 16:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91362C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 16:39:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbiJFQ1c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 12:27:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
+        id S230129AbiJFQjw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 12:39:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231789AbiJFQZv (ORCPT
+        with ESMTP id S229555AbiJFQjv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 12:25:51 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFCE4E607;
-        Thu,  6 Oct 2022 09:25:48 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 2FBBB218E0;
-        Thu,  6 Oct 2022 16:25:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1665073547; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XCQ01W/Zak7b1/Z15iSFiNNO+LnDKjRUCwgq9owN358=;
-        b=BuCJHwpPWmPIMX1bCVa8JvF5Z7d74n/yJTO58u9Flcub7+SsSH8xi8XlpREVi0km3sCU9I
-        n49kVMdngxh5xHUcQ7JaAcHnUNwcTFTbcX666mAdObWVWWOiQa+NDqw9MObg2XVpG17TSv
-        v1FutPp1yNGHL7WKXiiXO6EFByUMvOk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1665073547;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XCQ01W/Zak7b1/Z15iSFiNNO+LnDKjRUCwgq9owN358=;
-        b=SBbeuIQGR7WWo1BYruUMTbe52g3YJZXPJmGbNwSK0jCwlB3l1oeiG8qTbAyyKKzsNlfKnK
-        YUPXB99RMPIak5BQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E0B0413AC8;
-        Thu,  6 Oct 2022 16:25:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id UOdXNooBP2OJIwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 06 Oct 2022 16:25:46 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 30DD3A06E9; Thu,  6 Oct 2022 18:25:46 +0200 (CEST)
-Date:   Thu, 6 Oct 2022 18:25:46 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mm@kvack.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] treewide: use get_random_u32() when possible
-Message-ID: <20221006162546.hgkrftnsk5p3sug7@quack3>
-References: <20221006132510.23374-1-Jason@zx2c4.com>
- <20221006132510.23374-4-Jason@zx2c4.com>
+        Thu, 6 Oct 2022 12:39:51 -0400
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA4E1209D;
+        Thu,  6 Oct 2022 09:39:50 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id g28so2531275pfk.8;
+        Thu, 06 Oct 2022 09:39:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=kI+Hy1fopJBk2WLyhqkwFmt1bdUHIknRqdw/wRFVZbg=;
+        b=C32d970mDhqv88cer4zVCq7IkNLCLjHjSzPXtDRTvxM/U34npugQ3sbl0zt1XkapSz
+         HwTyOUP3r7doj5bG0vHB7WPnndktkGxhlTIT/mtRpRzg4RWjYj7PFvUD5ZA4H4wvuzcz
+         Jb2zdwBGQ6eAJNa6kBdNevzf+mfv3CetZRKhOpk8RS5+3wwB3GQpnV78wHlIMfRMQyjq
+         CweWjyORJrdRab/wh78wr3k2R3C2xxPeIiqhKJ0JS7X+mFQDxpd3ruPLW/V7grxIBfZN
+         b9v85A+xVsxLXiSOYlS6r4xuFb4zgrpMkOz4wqX1dr+Hhqet0WU3QhKb50kqSI/1f5JZ
+         oSYA==
+X-Gm-Message-State: ACrzQf3foCcloURPh9IHSE7q6fGriT5WcMP5z8piGJJisFh+sevwRaHw
+        x7JgYZW+fMgJA9bhdpY/sWxAiqnKJQM=
+X-Google-Smtp-Source: AMsMyM770LljWrp5Q4xIriT9pYW6hWLwVtO/x0/Mnhn/PfGZNdDiWtbrRKBLP5YulKLkaD8WLnraRg==
+X-Received: by 2002:a65:6d8a:0:b0:43c:9fcc:cb24 with SMTP id bc10-20020a656d8a000000b0043c9fcccb24mr605969pgb.477.1665074389518;
+        Thu, 06 Oct 2022 09:39:49 -0700 (PDT)
+Received: from sultan-box.localdomain ([142.147.89.230])
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902bb8100b0017bf6061ee4sm4779760pls.117.2022.10.06.09.39.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 09:39:48 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 09:39:46 -0700
+From:   Sultan Alsawaf <sultan@kerneltoast.com>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
+Message-ID: <Yz8E0lSmsMMB6KeO@sultan-box.localdomain>
+References: <20220930231050.749824-1-Jason@zx2c4.com>
+ <20220930231050.749824-2-Jason@zx2c4.com>
+ <YzgGmh6EQtWzO4HV@zx2c4.com>
+ <Yz2+UsgVGRSm+o7W@linutronix.de>
+ <Yz3yQzaNUcdIuUMX@zx2c4.com>
+ <Yz55w4gNtZn8JzmG@linutronix.de>
+ <Yz7JXEaTFWa1VLKJ@zx2c4.com>
+ <Yz7M5zJmzKSk/LYH@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221006132510.23374-4-Jason@zx2c4.com>
+In-Reply-To: <Yz7M5zJmzKSk/LYH@linutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu 06-10-22 07:25:08, Jason A. Donenfeld wrote:
-> The prandom_u32() function has been a deprecated inline wrapper around
-> get_random_u32() for several releases now, and compiles down to the
-> exact same code. Replace the deprecated wrapper with a direct call to
-> the real function.
+Hi Sebastian,
+
+On Thu, Oct 06, 2022 at 02:41:11PM +0200, Sebastian Andrzej Siewior wrote:
+> On 2022-10-06 06:26:04 [-0600], Jason A. Donenfeld wrote:
+> > e) del_timer_sync() on line 5 is called, and its `base->running_timer !=
+> >    timer` check is false, because of step (c).
 > 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> If `base->running_timer != timer` then the timer ('s callback) is not
+> currently active/ running. Therefore it can be removed from the timer
+> bucket (in case it is pending in the future).
+> If `base->running_timer == timer` then the timer ('s callback) is
+> currently active. del_timer_sync() will loop in cpu_relax() until the
+> callback finished. And then try again.
+> > f) `stack.timer` gets freed / goes out of scope.
+> > 
+> > g) The callback scheduled from step (b) runs, and we have a UaF.
+> > 
+> > That's, anyway, what I understand Sultan to have pointed out to me. In
+> > looking at this closely, though, to write this email, I noticed that
+> > add_timer_on() does set TIMER_MIGRATING, which lock_timer_base() spins
+> > on. So actually, maybe this scenario should be accounted for? Sultan, do
+> > you care to comment here?
+> 
+> During TIMER_MIGRATING the del_timer_sync() caller will spin until the
+> condition is over. So it can remove the timer from the right bucket and
+> check if it is active vs the right bucket.
 
-Looks good. Feel free to add:
+My concern stems from the design of add_timer_on(). Specifically, add_timer_on()
+expects the timer to not already be pending or running.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Because of this, add_timer_on() doesn't check `base->running_timer` and doesn't
+wait for the timer to finish running, because it expects the timer to be
+completely idle. Giving add_timer_on() a timer which is already running is a
+bug, as made clear by the `BUG_ON(timer_pending(timer) || !timer->function);`.
 
-for the ext4 bits.
+But since a timer is marked as not-pending prior to when it runs, add_timer_on()
+can't detect if the timer is actively running; the above BUG_ON() won't be
+tripped. So the UaF scenario I forsee is that doing this:
+    add_timer_on(timer, 0);
+    // timer is actively running on CPU0, timer is no longer pending
+    add_timer_on(timer, 1); // changes timer base, won't wait for timer to stop
+    del_timer_sync(timer); // only checks CPU1 timer base for the running timer
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+may result in the del_timer_sync() not waiting for the timer function to finish
+running on CPU0 from the `add_timer_on(timer, 0);`, since add_timer_on() won't
+wait for the timer function to finish running before changing the timer base.
+And since Jason's timer is declared on the stack, his timer callback function
+would dereference `stack.timer` after it's been freed.
+
+> Sebastian
+
+Sultan
