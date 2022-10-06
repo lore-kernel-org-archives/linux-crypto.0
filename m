@@ -2,76 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6049DC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 06:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65973C43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 08:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbiJFGqd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 02:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45120 "EHLO
+        id S230286AbiJFIzo convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 04:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230128AbiJFGqc (ORCPT
+        with ESMTP id S229844AbiJFIzn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 02:46:32 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0BD8A7DD;
-        Wed,  5 Oct 2022 23:46:30 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 08:46:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1665038788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0EvcY12akHbBMuHyFiQ/dz49uFOmgCXQuCdnSEWvOeI=;
-        b=tcjwFrkHdzvvH91jeJZS4dgO5lcvpV6GSFGLZuSGCERs7TtCblTyJvKN8M8b7ZL/tjzllY
-        uT0DjCjjEJSHGXVCJnih0QhtMsey2NASLqUYpi/jJ4WCul5PHAEDEeVhsOYvqb7aQeUqRj
-        okLJO8pce5TBfzC9OgfOpIsYKPaZFKk4himhP6vZSubo6rXphS2k/ohibwpD5Oapb/6ySW
-        ExQURIzwkztQKTD4OIX4rmBjUeKYfiTIoET6dya4JJAamWSa4JQg/SxCMkk1tKhMz6p9Ya
-        HP2N59cq+TLyh3qHprA6hcN6Q1pDSkB492XbXhDtNniFNnR7En//hvTuVH1s/Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1665038788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0EvcY12akHbBMuHyFiQ/dz49uFOmgCXQuCdnSEWvOeI=;
-        b=eDSz1xb5CBft1AXQc1oiUkwTchoAC6ZuGGcQiJxj/+7KyAtY9Ti47B+J4smGNgmJUOZ/jx
-        i0WtJi0s5tmlCqDA==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
-Message-ID: <Yz55w4gNtZn8JzmG@linutronix.de>
-References: <20220930231050.749824-1-Jason@zx2c4.com>
- <20220930231050.749824-2-Jason@zx2c4.com>
- <YzgGmh6EQtWzO4HV@zx2c4.com>
- <Yz2+UsgVGRSm+o7W@linutronix.de>
- <Yz3yQzaNUcdIuUMX@zx2c4.com>
+        Thu, 6 Oct 2022 04:55:43 -0400
+X-Greylist: delayed 1199 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 06 Oct 2022 01:55:39 PDT
+Received: from ouvsmtp1.octopuce.fr (ouvsmtp1.octopuce.fr [194.36.166.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACE795E40;
+        Thu,  6 Oct 2022 01:55:39 -0700 (PDT)
+Received: from panel.vitry.ouvaton.coop (unknown [194.36.166.20])
+        by ouvsmtp1.octopuce.fr (Postfix) with ESMTPS id 7717D173;
+        Thu,  6 Oct 2022 10:17:18 +0200 (CEST)
+Received: from sm.ouvaton.coop (ouvadm.octopuce.fr [194.36.166.2])
+        by panel.vitry.ouvaton.coop (Postfix) with ESMTPSA id 376215E16F9;
+        Thu,  6 Oct 2022 10:17:18 +0200 (CEST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yz3yQzaNUcdIuUMX@zx2c4.com>
+Date:   Thu, 06 Oct 2022 08:17:18 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+From:   "Yann Droneaud" <ydroneaud@opteya.com>
+Message-ID: <125581881ad4aa85b2dadfe0d7338af9901caa03@opteya.com>
+Subject: Re: [PATCH v1 0/5] treewide cleanup of random integer usage
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        "Julia Lawall" <Julia.Lawall@inria.fr>,
+        "Nicolas Palix" <nicolas.palix@imag.fr>, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20221005214844.2699-1-Jason@zx2c4.com>
+References: <20221005214844.2699-1-Jason@zx2c4.com>
+X-Originating-IP: 10.0.20.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-10-05 23:08:19 [+0200], Jason A. Donenfeld wrote:
-> Hi Sebastian,
-Hi Jason,
+Hi,
 
-> On Wed, Oct 05, 2022 at 07:26:42PM +0200, Sebastian Andrzej Siewior wrote:
-> > That del_timer_sync() at the end is what you want. If the timer is
-> > pending (as in enqueued in the timer wheel) then it will be removed
-> > before it is invoked. If the timer's callback is invoked then it will
-> > spin until the callback is done.
+6 octobre 2022 à 04:51 "Jason A. Donenfeld" a écrit:
+
 > 
-> del_timer_sync() is not guaranteed to succeed with add_timer_on() being
-> used in conjunction with timer_pending() though. That's why I've
-> abandoned this.
+> This is a five part treewide cleanup of random integer handling. The
+> rules for random integers are:
+> 
+> - If you want a secure or an insecure random u64, use get_random_u64().
+> - If you want a secure or an insecure random u32, use get_random_u32().
+>  * The old function prandom_u32() has been deprecated for a while now
+>  and is just a wrapper around get_random_u32().
+> - If you want a secure or an insecure random u16, use get_random_u16().
+> - If you want a secure or an insecure random u8, use get_random_u8().
+> - If you want secure or insecure random bytes, use get_random_bytes().
+>  * The old function prandom_bytes() has been deprecated for a while now
+>  and has long been a wrapper around get_random_bytes().
+> - If you want a non-uniform random u32, u16, or u8 bounded by a certain
+>  open interval maximum, use prandom_u32_max().
+>  * I say "non-uniform", because it doesn't do any rejection sampling or
+>  divisions. Hence, it stays within the prandom_* namespace.
+> 
+> These rules ought to be applied uniformly, so that we can clean up the
+> deprecated functions, and earn the benefits of using the modern
+> functions. In particular, in addition to the boring substitutions, this
+> patchset accomplishes a few nice effects:
+> 
+> - By using prandom_u32_max() with an upper-bound that the compiler can
+>  prove at compile-time is ≤65536 or ≤256, internally get_random_u16()
+>  or get_random_u8() is used, which wastes fewer batched random bytes,
+>  and hence has higher throughput.
+> 
+> - By using prandom_u32_max() instead of %, when the upper-bound is not a
+>  constant, division is still avoided, because prandom_u32_max() uses
+>  a faster multiplication-based trick instead.
+> 
+> - By using get_random_u16() or get_random_u8() in cases where the return
+>  value is intended to indeed be a u16 or a u8, we waste fewer batched
+>  random bytes, and hence have higher throughput.
+> 
+> So, based on those rules and benefits from following them, this patchset
+> breaks down into the following five steps:
+> 
+> 1) Replace `prandom_u32() % max` and variants thereof with
+>  prandom_u32_max(max).
+> 
+> 2) Replace `(type)get_random_u32()` and variants thereof with
+>  get_random_u16() or get_random_u8(). I took the pains to actually
+>  look and see what every lvalue type was across the entire tree.
+> 
+> 3) Replace remaining deprecated uses of prandom_u32() with
+>  get_random_u32(). 
+> 
+> 4) Replace remaining deprecated uses of prandom_bytes() with
+>  get_random_bytes().
+> 
+> 5) Remove the deprecated and now-unused prandom_u32() and
+>  prandom_bytes() inline wrapper functions.
+> 
 
-But why? The timer is added to a timer-base on a different CPU. Should
-work.
+Did you use some coccinelle patches ? Or other semantic patch tool ?
 
-> Jason
+Maybe we could introduce some coccinelle patch to ensure future get_random_u{16,32,64} usages be checked and patched to use the best fit.
 
-Sebastian
+Regards.
+
+-- 
+Yann Droneaud
+OPTEYA
