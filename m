@@ -2,86 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29F9C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 270B4C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:41:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231452AbiJFMl3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 08:41:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50122 "EHLO
+        id S231243AbiJFMlt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 08:41:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231200AbiJFMlV (ORCPT
+        with ESMTP id S230371AbiJFMls (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 08:41:21 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791488E9B8;
-        Thu,  6 Oct 2022 05:41:15 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 14:41:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1665060073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6MMPcKf9F1/2/vMYQPdhouNSSpWXHJ8lbaTT/pcZEL8=;
-        b=B4jDCZe45EMiTYcRwUxKpJFXs+GVJcNEfl3cK+Vqnv3flta+Ciey7tUEaVX98drlabNwGt
-        s2R0wIGEg9qvqDK5maqph1ChgESQ4yCCRBWE9r5GWBjxlrPVYFlJPwHQnL60p3xYzG/HcQ
-        JaGfSs39F4kxKiTc8tXw160j56br2f8q9+zHRsLFEQ4ROh9EVsdGRWYuKsRfqQcXR8R6nF
-        MnaQKGmg3GMGQ35QeRxmtzvs7TtY9jsxo76b3osu/KEzB0kd5uNu44CI2HPoNqE80oZyJ1
-        ZhDQAt641axip/h4GBwlYTeichbuXW5gZsLXYlRXZlIk59eeHtJkRw42pugkYg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1665060073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6MMPcKf9F1/2/vMYQPdhouNSSpWXHJ8lbaTT/pcZEL8=;
-        b=0131keFlC/RIBFVE8ywl48xXejRD4/fVEA0gq9uJVZELDvY2AfHZa5t/1mfSHgAfWZGeoC
-        epMyZYPAHK5Vs0Bg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
-Message-ID: <Yz7M5zJmzKSk/LYH@linutronix.de>
-References: <20220930231050.749824-1-Jason@zx2c4.com>
- <20220930231050.749824-2-Jason@zx2c4.com>
- <YzgGmh6EQtWzO4HV@zx2c4.com>
- <Yz2+UsgVGRSm+o7W@linutronix.de>
- <Yz3yQzaNUcdIuUMX@zx2c4.com>
- <Yz55w4gNtZn8JzmG@linutronix.de>
- <Yz7JXEaTFWa1VLKJ@zx2c4.com>
+        Thu, 6 Oct 2022 08:41:48 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2879B8F950;
+        Thu,  6 Oct 2022 05:41:48 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.west.internal (Postfix) with ESMTP id 99075320090D;
+        Thu,  6 Oct 2022 08:41:45 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Thu, 06 Oct 2022 08:41:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1665060105; x=
+        1665146505; bh=WjfN3TnG3qyIp+b77nmfwa/0mGwvYTAgTe3PiH8ciEE=; b=W
+        cl/t60RHccMRbIHxNtZppCSGv+KOGIG8iyciTRiIkmxlKm/MZBBKvbwiAnpxaD8T
+        BwL//MpPzgRNUqF6OJY2t+baiVRpJtI+o/bSz+Il9b+RjJ1CZxQFZ8vSjg+YxUG+
+        MqJ+2PeL8zO4ukHP/NwRBww7XIypeJ5yh4anM0wCFdI/0SyYfUPlzkDqVBLtHk9p
+        iVGmZLsULN7JTDF4EAdRzprGOm6nInRsIhN18gVLnm668myEORgmwkbzqOloHy9m
+        xUHvVSnXxPAK5hdPgAYmzw4pZ8Jn4lIg0WVEAQplL9Ot5a3B1QmGs53uSP9ga7ZL
+        6q6kvnoKOek0NAw1EiyJQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1665060105; x=1665146505; bh=WjfN3TnG3qyIp
+        +b77nmfwa/0mGwvYTAgTe3PiH8ciEE=; b=BFZYF9gXLkSbDZHyxHzhBjPsY0R0t
+        WHiUm2vlPDiOXSkd8tuR/ov0+L3wREOdmJSgXTwxBBYeBlQfeQM70z46pfJvP1+A
+        sYnhMWMG4lgmrCevaW5n/7Q3v/2MSDPOSZ44tMC5eymjFPcdFNLdYFe/oKq89Ie3
+        Ir7tqxFfCIR8jLPin5rvtpjtOTOIGqB1A51DacMV+pWzE08SzeRp36z/REhWf1PN
+        2Op5dYFPm+Xc3wv6eamrpVSZMv0rEIDI6wUtWib1F9BLjcq9oogZuD6wuaiMZrfb
+        WULL9CLod1fyHtnG/vIsKnLAyQtAcbCb2rfLsAIKMrbFSVGWpEdSCrdDw==
+X-ME-Sender: <xms:B80-Yz230Gol5ZsN305g5vda9sgmTF2Jj7QFTSDK65QixInnufiJFQ>
+    <xme:B80-YyHvsBkXgIGh7cDi_pts6YaarCeEcRITfE__hFxGDVpjliOko0Xl770y6g7pd
+    M1HgUqV-GTlNU2HAws>
+X-ME-Received: <xmr:B80-Yz7P-e51cRaEyPWZrILIqpQo037ZLsvj-xuik-3lM82VUaif0EhceVt2QXBozevoKvw6IXi6-0OfWascDEdeqlndwLLCRCAW>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeeihedgheehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkrhhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegv
+    nhcuuehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeduteehgfefudfffeelfffhheejgfdvfffhledvueekudeuieegueejieff
+    vdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hmvgessggvnhgsohgvtghkvghlrdhnvght
+X-ME-Proxy: <xmx:B80-Y41dmkadIYs_oMXZBoivvasthp8GFDy7FLiyBnqh6UwRVwQHkw>
+    <xmx:B80-Y2FHBoC3JsDIF1p0ZZDqV6GUEHo8pEzpaskN82DrQU3lx7BebA>
+    <xmx:B80-Y58mIJNlaASd6QTkImhS3Am2DRugin2253QiW4ajPqDMvKSaIw>
+    <xmx:Cc0-Y5bv-TC9YXZspjWrC4mBc0i-uNmb0ESAeNCEF9nXSdj7Hbv4tg>
+Feedback-ID: iffc1478b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Oct 2022 08:41:43 -0400 (EDT)
+Date:   Thu, 6 Oct 2022 08:42:32 -0400
+From:   Ben Boeckel <me@benboeckel.net>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc:     jarkko@kernel.org, a.fatoum@pengutronix.de, gilad@benyossef.com,
+        Jason@zx2c4.com, jejb@linux.ibm.com, zohar@linux.ibm.com,
+        dhowells@redhat.com, sumit.garg@linaro.org, david@sigma-star.at,
+        michael@walle.cc, john.ernberg@actia.se, jmorris@namei.org,
+        serge@hallyn.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+        j.luebbe@pengutronix.de, ebiggers@kernel.org, richard@nod.at,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, sahil.malhotra@nxp.com,
+        kshitiz.varshney@nxp.com, horia.geanta@nxp.com, V.Sethi@nxp.com
+Subject: Re: [PATCH v0 6/8] KEYS: trusted: caam based black key
+Message-ID: <Yz7NOB1vePLE4yoB@megas.dev.benboeckel.internal>
+Reply-To: list.lkml.keyrings@me.benboeckel.net
+References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
+ <20221006130837.17587-7-pankaj.gupta@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Yz7JXEaTFWa1VLKJ@zx2c4.com>
+In-Reply-To: <20221006130837.17587-7-pankaj.gupta@nxp.com>
+User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-10-06 06:26:04 [-0600], Jason A. Donenfeld wrote:
-> e) del_timer_sync() on line 5 is called, and its `base->running_timer !=
->    timer` check is false, because of step (c).
+On Thu, Oct 06, 2022 at 18:38:35 +0530, Pankaj Gupta wrote:
+> - CAAM supports two types of black keys:
+>   -- Plain key encrypted with ECB
+>   -- Plain key encrypted with CCM
 
-If `base->running_timer != timer` then the timer ('s callback) is not
-currently active/ running. Therefore it can be removed from the timer
-bucket (in case it is pending in the future).
-If `base->running_timer == timer` then the timer ('s callback) is
-currently active. del_timer_sync() will loop in cpu_relax() until the
-callback finished. And then try again.
+What is a "black key"? Is this described in the documentation or local
+comments at all? (I know I'm unfamiliar with CAAM, but maybe this should
+be mentioned somewhere?).
 
-> f) `stack.timer` gets freed / goes out of scope.
-> 
-> g) The callback scheduled from step (b) runs, and we have a UaF.
-> 
-> That's, anyway, what I understand Sultan to have pointed out to me. In
-> looking at this closely, though, to write this email, I noticed that
-> add_timer_on() does set TIMER_MIGRATING, which lock_timer_base() spins
-> on. So actually, maybe this scenario should be accounted for? Sultan, do
-> you care to comment here?
+>   Note: Due to robustness, default encytption used for black key is CCM.
+                                     ^^^^^^^^^^ encryption
 
-During TIMER_MIGRATING the del_timer_sync() caller will spin until the
-condition is over. So it can remove the timer from the right bucket and
-check if it is active vs the right bucket.
+What "robustness"? Surely there's some more technical details involved
+here?
 
-> Jason
+> - A black key blob is generated, and added to trusted key payload.
+>   This is done as part of sealing operation, that was triggered as a result of:
+>   -- new key generation
+>   -- load key,
 
-Sebastian
+It seems that "black keys" are what the uapi calls "hw". I think this
+should be mentioned in the commit message (and CAAM docs).
+
+What do other keytypes do if `hw` is requested and it's not possible
+(say, `big_key`)?
+
+Thanks,
+
+--Ben
