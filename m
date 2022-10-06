@@ -2,260 +2,220 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B13C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 22:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA560C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 23:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232064AbiJFWhe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 18:37:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56366 "EHLO
+        id S232290AbiJFXhL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 19:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232110AbiJFWhc (ORCPT
+        with ESMTP id S232217AbiJFXhF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 18:37:32 -0400
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33D9F252C;
-        Thu,  6 Oct 2022 15:37:27 -0700 (PDT)
-Received: from pps.filterd (m0134420.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 296Lo2xg028782;
-        Thu, 6 Oct 2022 22:37:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pps0720;
- bh=rc1eSB//t36JGFSMPIYD6WvUbxbmez76ZMUGGs5nJTI=;
- b=ZFEr9C6zrZAV6MjZyHA4bf3JnYE2HZuNC8J8jRZxVcM5C8WFr5fherR3yR0vZ49bM0YD
- AhXbboNbz4//2fcBr4FVkNt0zCbW3qKo60x2fi7DA+8LBnu4duX1PYfQfmzqX1hniiW6
- RNuZqjEnED4MrBMM55RXHzESd3JaSSCGZZfVD2vGftx5dEsn4WCcQtoQIcgB90nRBUCY
- tX0qHv/IbGaQf3iCIJI0p+v7/nOcXs6CocUYWQxUSY6g1ujiD5Fkq+dBEBDsgxDyKL2V
- VwFDunt3YPjoYgO154E/zGwGNpZfx7V9ElepgI/1CLprg/OQBOEwuQYSn8gKnT9pcc9V tg== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k27950b7w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Oct 2022 22:37:24 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Thu, 6 Oct 2022 19:37:05 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F03EEB7E1;
+        Thu,  6 Oct 2022 16:37:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 087E9806B59;
-        Thu,  6 Oct 2022 22:32:23 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id AE57E8038CA;
-        Thu,  6 Oct 2022 22:32:23 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tim.c.chen@linux.intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [RFC PATCH 3/7] crypto: x86/crc - limit FPU preemption
-Date:   Thu,  6 Oct 2022 17:31:47 -0500
-Message-Id: <20221006223151.22159-4-elliott@hpe.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221006223151.22159-1-elliott@hpe.com>
-References: <20221006223151.22159-1-elliott@hpe.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id B07B7B821EA;
+        Thu,  6 Oct 2022 23:37:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08300C433C1;
+        Thu,  6 Oct 2022 23:36:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IOQ1bXhF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665099413;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eDWvYu+uSvuLU1D2yrcps4Uxg3s4afpQR1DZP1HAENk=;
+        b=IOQ1bXhFd3q9+RqlaN9MoWoMb9hyeq0A9ZZHsjT7H7aJth5PyzgIFsO5RZ+IGkqpoVM4vs
+        G1fhQ2wIq1VD89DBIQN9w7YwWxcZC7kUxAooqITvAEdpg/3zs8L5I8+aGBoP4EPhTcYjjM
+        7a1SFu0rQgOf0f04kGQaSuHs/qYIRR4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e1098d12 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 6 Oct 2022 23:36:53 +0000 (UTC)
+Received: by mail-vs1-f44.google.com with SMTP id h4so3494548vsr.11;
+        Thu, 06 Oct 2022 16:36:52 -0700 (PDT)
+X-Gm-Message-State: ACrzQf1TOlBL9WnO/NrZIZyjGBn5ukDeQw/0ECGPpkR+WaKxQK8erd/2
+        /cQN6L+VjtaxFvYQwZI/iE1XpRFjd/wCVAQO/xs=
+X-Google-Smtp-Source: AMsMyM5tvZWHSrcOLtkY/lX0Q7Qvr/oXlGj5vIRT4adjylKOfvaHnErU8AKkQNdqtGo/HZJDgntpViQRNpApZtsIptY=
+X-Received: by 2002:a05:6102:2908:b0:398:ac40:d352 with SMTP id
+ cz8-20020a056102290800b00398ac40d352mr1292105vsb.55.1665099409449; Thu, 06
+ Oct 2022 16:36:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: Luei-Eh2Ae2Z24fI054UdPMjt7E04wS7
-X-Proofpoint-GUID: Luei-Eh2Ae2Z24fI054UdPMjt7E04wS7
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-06_05,2022-10-06_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 suspectscore=0 adultscore=0 spamscore=0 bulkscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210060133
+Received: by 2002:ab0:6ed0:0:b0:3d9:6dfd:499 with HTTP; Thu, 6 Oct 2022
+ 16:36:48 -0700 (PDT)
+In-Reply-To: <6396875c-146a-acf5-dd9e-7f93ba1b4bc3@csgroup.eu>
+References: <20221006165346.73159-1-Jason@zx2c4.com> <20221006165346.73159-4-Jason@zx2c4.com>
+ <848ed24c-13ef-6c38-fd13-639b33809194@csgroup.eu> <CAHmME9raQ4E00r9r8NyWJ17iSXE_KniTG0onCNAfMmfcGar1eg@mail.gmail.com>
+ <f10fcfbf-2da6-cf2d-6027-fbf8b52803e9@csgroup.eu> <6396875c-146a-acf5-dd9e-7f93ba1b4bc3@csgroup.eu>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 6 Oct 2022 17:36:48 -0600
+X-Gmail-Original-Message-ID: <CAHmME9pE4saqnwxhsAwt-xegYGjsavPOGnHCbZhUXD7kaJ+GAA@mail.gmail.com>
+Message-ID: <CAHmME9pE4saqnwxhsAwt-xegYGjsavPOGnHCbZhUXD7kaJ+GAA@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] treewide: use get_random_u32() when possible
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "patches@lists.linux.dev" <patches@lists.linux.dev>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>,
+        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As done by the ECB and CBC helpers in arch/x86/crypt/ecb_cbc_helpers.h,
-limit the number of bytes processed between kernel_fpu_begin() and
-kernel_fpu_end() calls.
+On 10/6/22, Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
+>
+>
+> Le 06/10/2022 =C3=A0 19:31, Christophe Leroy a =C3=A9crit :
+>>
+>>
+>> Le 06/10/2022 =C3=A0 19:24, Jason A. Donenfeld a =C3=A9crit :
+>>> Hi Christophe,
+>>>
+>>> On Thu, Oct 6, 2022 at 11:21 AM Christophe Leroy
+>>> <christophe.leroy@csgroup.eu> wrote:
+>>>> Le 06/10/2022 =C3=A0 18:53, Jason A. Donenfeld a =C3=A9crit :
+>>>>> The prandom_u32() function has been a deprecated inline wrapper aroun=
+d
+>>>>> get_random_u32() for several releases now, and compiles down to the
+>>>>> exact same code. Replace the deprecated wrapper with a direct call to
+>>>>> the real function. The same also applies to get_random_int(), which i=
+s
+>>>>> just a wrapper around get_random_u32().
+>>>>>
+>>>>> Reviewed-by: Kees Cook <keescook@chromium.org>
+>>>>> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk> # for sch_c=
+ake
+>>>>> Acked-by: Chuck Lever <chuck.lever@oracle.com> # for nfsd
+>>>>> Reviewed-by: Jan Kara <jack@suse.cz> # for ext4
+>>>>> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+>>>>> ---
+>>>>
+>>>>> diff --git a/arch/powerpc/kernel/process.c
+>>>>> b/arch/powerpc/kernel/process.c
+>>>>> index 0fbda89cd1bb..9c4c15afbbe8 100644
+>>>>> --- a/arch/powerpc/kernel/process.c
+>>>>> +++ b/arch/powerpc/kernel/process.c
+>>>>> @@ -2308,6 +2308,6 @@ void notrace __ppc64_runlatch_off(void)
+>>>>>    unsigned long arch_align_stack(unsigned long sp)
+>>>>>    {
+>>>>>        if (!(current->personality & ADDR_NO_RANDOMIZE) &&
+>>>>> randomize_va_space)
+>>>>> -             sp -=3D get_random_int() & ~PAGE_MASK;
+>>>>> +             sp -=3D get_random_u32() & ~PAGE_MASK;
+>>>>>        return sp & ~0xf;
+>>>>
+>>>> Isn't that a candidate for prandom_u32_max() ?
+>>>>
+>>>> Note that sp is deemed to be 16 bytes aligned at all time.
+>>>
+>>> Yes, probably. It seemed non-trivial to think about, so I didn't. But
+>>> let's see here... maybe it's not too bad:
+>>>
+>>> If PAGE_MASK is always ~(PAGE_SIZE-1), then ~PAGE_MASK is
+>>> (PAGE_SIZE-1), so prandom_u32_max(PAGE_SIZE) should yield the same
+>>> thing? Is that accurate? And holds across platforms (this comes up a
+>>> few places)? If so, I'll do that for a v4.
+>>>
+>>
+>> On powerpc it is always (from arch/powerpc/include/asm/page.h) :
+>>
+>> /*
+>>   * Subtle: (1 << PAGE_SHIFT) is an int, not an unsigned long. So if we
+>>   * assign PAGE_MASK to a larger type it gets extended the way we want
+>>   * (i.e. with 1s in the high bits)
+>>   */
+>> #define PAGE_MASK      (~((1 << PAGE_SHIFT) - 1))
+>>
+>> #define PAGE_SIZE        (1UL << PAGE_SHIFT)
+>>
+>>
+>> So it would work I guess.
+>
+> But taking into account that sp must remain 16 bytes aligned, would it
+> be better to do something like ?
+>
+> 	sp -=3D prandom_u32_max(PAGE_SIZE >> 4) << 4;
+>
+> 	return sp;
 
-Those functions call preempt_disable() and preempt_enable(), so
-the CPU core is unavailable for scheduling while running, leading to:
-    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: {12-... } 22 jiffies s: 277 root: 0x1/.
+Does this assume that sp is already aligned at the beginning of the
+function? I'd assume from the function's name that this isn't the
+case?
 
-Fixes: 78c37d191dd6 ("crypto: crc32 - add crc32 pclmulqdq implementation and wrappers for table implementation")
-Fixes: 6a8ce1ef3940 ("crypto: crc32c - Optimize CRC32C calculation with PCLMULQDQ instruction")
-Fixes: 0b95a7f85718 ("crypto: crct10dif - Glue code to cast accelerated CRCT10DIF assembly as a crypto transform")
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Robert Elliott <elliott@hpe.com>
----
- arch/x86/crypto/crc32-pclmul_glue.c     | 18 ++++++++++----
- arch/x86/crypto/crc32c-intel_glue.c     | 32 ++++++++++++++++++++-----
- arch/x86/crypto/crct10dif-pclmul_glue.c | 32 ++++++++++++++++++++-----
- 3 files changed, 66 insertions(+), 16 deletions(-)
-
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-index 288200fe7b4e..7cf65dc726c4 100644
---- a/arch/x86/crypto/crc32-pclmul_glue.c
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -49,6 +49,8 @@
- #define SCALE_F			16L	/* size of xmm register */
- #define SCALE_F_MASK		(SCALE_F - 1)
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- u32 crc32_pclmul_le_16(unsigned char const *buffer, size_t len, u32 crc32);
- 
- static u32 __attribute__((pure))
-@@ -57,6 +59,7 @@ static u32 __attribute__((pure))
- 	unsigned int iquotient;
- 	unsigned int iremainder;
- 	unsigned int prealign;
-+	unsigned int chunk;
- 
- 	if (len < PCLMUL_MIN_LEN + SCALE_F_MASK || !crypto_simd_usable())
- 		return crc32_le(crc, p, len);
-@@ -73,12 +76,19 @@ static u32 __attribute__((pure))
- 	iquotient = len & (~SCALE_F_MASK);
- 	iremainder = len & SCALE_F_MASK;
- 
--	kernel_fpu_begin();
--	crc = crc32_pclmul_le_16(p, iquotient, crc);
--	kernel_fpu_end();
-+	do {
-+		chunk = min(iquotient, FPU_BYTES);
-+		iquotient -= chunk;
-+
-+		kernel_fpu_begin();
-+		crc = crc32_pclmul_le_16(p, chunk, crc);
-+		kernel_fpu_end();
-+
-+		p += chunk;
-+	} while (iquotient);
- 
- 	if (iremainder)
--		crc = crc32_le(crc, p + iquotient, iremainder);
-+		crc = crc32_le(crc, p, iremainder);
- 
- 	return crc;
- }
-diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-index c5c965b694c6..b277c215f0fb 100644
---- a/arch/x86/crypto/crc32c-intel_glue.c
-+++ b/arch/x86/crypto/crc32c-intel_glue.c
-@@ -44,6 +44,8 @@
-  */
- #define CRC32C_PCL_BREAKEVEN	512
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage unsigned int crc_pcl(const u8 *buffer, int len,
- 				unsigned int crc_init);
- #endif /* CONFIG_X86_64 */
-@@ -155,15 +157,23 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
- 			       unsigned int len)
- {
- 	u32 *crcp = shash_desc_ctx(desc);
-+	unsigned int chunk;
- 
- 	/*
- 	 * use faster PCL version if datasize is large enough to
- 	 * overcome kernel fpu state save/restore overhead
- 	 */
- 	if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
--		kernel_fpu_begin();
--		*crcp = crc_pcl(data, len, *crcp);
--		kernel_fpu_end();
-+		do {
-+			chunk = min(len, FPU_BYTES);
-+			len -= chunk;
-+
-+			kernel_fpu_begin();
-+			*crcp = crc_pcl(data, chunk, *crcp);
-+			kernel_fpu_end();
-+
-+			data += chunk;
-+		} while (len);
- 	} else
- 		*crcp = crc32c_intel_le_hw(*crcp, data, len);
- 	return 0;
-@@ -172,10 +182,20 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
- static int __crc32c_pcl_intel_finup(u32 *crcp, const u8 *data, unsigned int len,
- 				u8 *out)
- {
-+	unsigned int chunk;
-+
- 	if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
--		kernel_fpu_begin();
--		*(__le32 *)out = ~cpu_to_le32(crc_pcl(data, len, *crcp));
--		kernel_fpu_end();
-+		do {
-+			chunk = min(len, FPU_BYTES);
-+			len -= chunk;
-+
-+			kernel_fpu_begin();
-+			*crcp = crc_pcl(data, chunk, *crcp);
-+			kernel_fpu_end();
-+
-+			data += chunk;
-+		} while (len);
-+		*(__le32 *)out = ~cpu_to_le32(*crcp);
- 	} else
- 		*(__le32 *)out =
- 			~cpu_to_le32(crc32c_intel_le_hw(*crcp, data, len));
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index 7c5a32282d51..bcd362df6b62 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -36,6 +36,8 @@
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
- 
- struct chksum_desc_ctx {
-@@ -55,11 +57,19 @@ static int chksum_update(struct shash_desc *desc, const u8 *data,
- 			 unsigned int length)
- {
- 	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
-+	unsigned int chunk;
- 
- 	if (length >= 16 && crypto_simd_usable()) {
--		kernel_fpu_begin();
--		ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
--		kernel_fpu_end();
-+		do {
-+			chunk = min(length, FPU_BYTES);
-+			length -= chunk;
-+
-+			kernel_fpu_begin();
-+			ctx->crc = crc_t10dif_pcl(ctx->crc, data, chunk);
-+			kernel_fpu_end();
-+
-+			data += chunk;
-+		} while (length);
- 	} else
- 		ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
- 	return 0;
-@@ -75,10 +85,20 @@ static int chksum_final(struct shash_desc *desc, u8 *out)
- 
- static int __chksum_finup(__u16 crc, const u8 *data, unsigned int len, u8 *out)
- {
-+	unsigned int chunk;
-+
- 	if (len >= 16 && crypto_simd_usable()) {
--		kernel_fpu_begin();
--		*(__u16 *)out = crc_t10dif_pcl(crc, data, len);
--		kernel_fpu_end();
-+		do {
-+			chunk = min(len, FPU_BYTES);
-+			len -= chunk;
-+
-+			kernel_fpu_begin();
-+			crc = crc_t10dif_pcl(crc, data, chunk);
-+			kernel_fpu_end();
-+
-+			data += chunk;
-+		} while (len);
-+		*(__u16 *)out = crc;
- 	} else
- 		*(__u16 *)out = crc_t10dif_generic(crc, data, len);
- 	return 0;
--- 
-2.37.3
-
+Jason
