@@ -2,103 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 424AAC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D29F9C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:41:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiJFMgW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 08:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
+        id S231452AbiJFMl3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 08:41:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229796AbiJFMgU (ORCPT
+        with ESMTP id S231200AbiJFMlV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 08:36:20 -0400
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE4CF85A8E;
-        Thu,  6 Oct 2022 05:36:18 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.west.internal (Postfix) with ESMTP id A3BA73200805;
-        Thu,  6 Oct 2022 08:36:13 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Thu, 06 Oct 2022 08:36:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1665059773; x=
-        1665146173; bh=x/5eQeyF8wgxc3lBlMlLCE+D3SClhrVS+22aVr9TqjU=; b=q
-        +sgP3Tc/y297yW5XXTzhrO4+Qo6cxIjnmKI3zcvscNQwafBSie53iKn3KCSwJfSu
-        LC0WbgPyKW5Xc1UsQeJw3PwnECIjH8emzV0abYkXYxgCyh4Gif+antZgx7LNbqW/
-        9ddmEF/4b1GoW4FR/glvrutlElogDrL8gehTfKvuFoMmfdaH8IUKwgLo3V5fqDhp
-        32qlfia1GOqZZHrvoJbZln9rdSqlXgXoBI6QVb49px5nZOCs9Qkgp6CQQr3eLstx
-        5n9t028e3VkD6mHwgaCLAwsPE3fQyy2exQFRWiILShrXZJPMQ54fDVu5LnvuXa1o
-        tdXfQNwPw4cYE1X5fJARw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1665059773; x=1665146173; bh=x/5eQeyF8wgxc
-        3lBlMlLCE+D3SClhrVS+22aVr9TqjU=; b=raTmo2i386qfqhru2VjLPvoZMtJmv
-        nQQUiMPj6BWtWemO+UGjVXK8d9R+RQmHOFFWPV+rNcHEJY9k3pi2O7t4j3FPMCbE
-        +KOHy9DafDsRDnMY62SGvTRuRIi+orJuaksZxtHJfDQfx91niWX1tZ/Ol1RqVVB7
-        E9v9n7DveTFJTfHzGasj+FOQcQXoP+VhYB8lL95tZ1/DU3PWNghTYIxCUQSQYlAL
-        FUrSyHDLa+0TIMVMpvWm9DTnTn887/j+xiXEBrCRIeY3IX6vcD39kiT/i2bkYFdO
-        8SJYRtMINHRPKkewjt6UTPVgbti/V1PGgKReavF0D4ZQhQVulCmPhei3w==
-X-ME-Sender: <xms:uss-Y1vYy2Vqs8hF-ULSkI7VRJTg5ui-mHr7WbUC_8PfV6Q0F4lqlw>
-    <xme:uss-Y-f8BiJcJaRYQThmkup6rV_TuuP7O6V5dMhJpqiHDTSybh6J3nXc3I-bN9mPM
-    4OA5ryUbinLOfVRNws>
-X-ME-Received: <xmr:uss-Y4yQhTLgH2hwlyfhykGdjoe0LOt5x-YQ0KRx0v1n-odCTikP1z3yc3cK7_hZ1zRHEQXD_XIHNgX9J_GLvQeFXiSRLd3o903R>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeeihedgheegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkrhhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegv
-    nhcuuehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeduteehgfefudfffeelfffhheejgfdvfffhledvueekudeuieegueejieff
-    vdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hmvgessggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:uss-Y8O_r3BBxeFMpfHX33weeXb5KKr6skLM9dBoKh0TLy3GXSsvRQ>
-    <xmx:uss-Y1-cJf9I8_HXk2-JQg_xeoQ4dFfS7l1r1V-Dl8O4Merzz4bJmA>
-    <xmx:uss-Y8WK-3erQvyA7yRtCKK6hrIVzT3Fo7WJjEmsrGHY3cMikx92rw>
-    <xmx:vcs-Y5Sbjc3jYNXO0uaAfqH0Nh35mLLSQDxdAnpMI3L5oTp3d7IyrQ>
-Feedback-ID: iffc1478b:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Oct 2022 08:36:10 -0400 (EDT)
-Date:   Thu, 6 Oct 2022 08:37:00 -0400
-From:   Ben Boeckel <me@benboeckel.net>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc:     jarkko@kernel.org, a.fatoum@pengutronix.de, gilad@benyossef.com,
-        Jason@zx2c4.com, jejb@linux.ibm.com, zohar@linux.ibm.com,
-        dhowells@redhat.com, sumit.garg@linaro.org, david@sigma-star.at,
-        michael@walle.cc, john.ernberg@actia.se, jmorris@namei.org,
-        serge@hallyn.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-        j.luebbe@pengutronix.de, ebiggers@kernel.org, richard@nod.at,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, sahil.malhotra@nxp.com,
-        kshitiz.varshney@nxp.com, horia.geanta@nxp.com, V.Sethi@nxp.com
-Subject: Re: [PATCH v0 2/8] keys-trusted: new cmd line option added
-Message-ID: <Yz7L7KZ4WVW6XBmx@megas.dev.benboeckel.internal>
-Reply-To: list.lkml.keyrings@me.benboeckel.net
-References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
- <20221006130837.17587-3-pankaj.gupta@nxp.com>
+        Thu, 6 Oct 2022 08:41:21 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791488E9B8;
+        Thu,  6 Oct 2022 05:41:15 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 14:41:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1665060073;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6MMPcKf9F1/2/vMYQPdhouNSSpWXHJ8lbaTT/pcZEL8=;
+        b=B4jDCZe45EMiTYcRwUxKpJFXs+GVJcNEfl3cK+Vqnv3flta+Ciey7tUEaVX98drlabNwGt
+        s2R0wIGEg9qvqDK5maqph1ChgESQ4yCCRBWE9r5GWBjxlrPVYFlJPwHQnL60p3xYzG/HcQ
+        JaGfSs39F4kxKiTc8tXw160j56br2f8q9+zHRsLFEQ4ROh9EVsdGRWYuKsRfqQcXR8R6nF
+        MnaQKGmg3GMGQ35QeRxmtzvs7TtY9jsxo76b3osu/KEzB0kd5uNu44CI2HPoNqE80oZyJ1
+        ZhDQAt641axip/h4GBwlYTeichbuXW5gZsLXYlRXZlIk59eeHtJkRw42pugkYg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1665060073;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6MMPcKf9F1/2/vMYQPdhouNSSpWXHJ8lbaTT/pcZEL8=;
+        b=0131keFlC/RIBFVE8ywl48xXejRD4/fVEA0gq9uJVZELDvY2AfHZa5t/1mfSHgAfWZGeoC
+        epMyZYPAHK5Vs0Bg==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sultan Alsawaf <sultan@kerneltoast.com>
+Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
+Message-ID: <Yz7M5zJmzKSk/LYH@linutronix.de>
+References: <20220930231050.749824-1-Jason@zx2c4.com>
+ <20220930231050.749824-2-Jason@zx2c4.com>
+ <YzgGmh6EQtWzO4HV@zx2c4.com>
+ <Yz2+UsgVGRSm+o7W@linutronix.de>
+ <Yz3yQzaNUcdIuUMX@zx2c4.com>
+ <Yz55w4gNtZn8JzmG@linutronix.de>
+ <Yz7JXEaTFWa1VLKJ@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221006130837.17587-3-pankaj.gupta@nxp.com>
-User-Agent: Mutt/2.2.7 (2022-08-07)
+In-Reply-To: <Yz7JXEaTFWa1VLKJ@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 18:38:31 +0530, Pankaj Gupta wrote:
-> Changes done:
-> - new cmd line option "hw" needs to be suffix, to generate the
->   hw bound key.
+On 2022-10-06 06:26:04 [-0600], Jason A. Donenfeld wrote:
+> e) del_timer_sync() on line 5 is called, and its `base->running_timer !=
+>    timer` check is false, because of step (c).
 
-`Documentation/` is silent on this. Can you please add this there?
+If `base->running_timer != timer` then the timer ('s callback) is not
+currently active/ running. Therefore it can be removed from the timer
+bucket (in case it is pending in the future).
+If `base->running_timer == timer` then the timer ('s callback) is
+currently active. del_timer_sync() will loop in cpu_relax() until the
+callback finished. And then try again.
 
-Other than that, is `hw` really a good name for this? Are there virtual
-devices for these things that can make them not hardware in some way?
-Is there a better name in such a case? Maybe something "device"
-oriented?
+> f) `stack.timer` gets freed / goes out of scope.
+> 
+> g) The callback scheduled from step (b) runs, and we have a UaF.
+> 
+> That's, anyway, what I understand Sultan to have pointed out to me. In
+> looking at this closely, though, to write this email, I noticed that
+> add_timer_on() does set TIMER_MIGRATING, which lock_timer_base() spins
+> on. So actually, maybe this scenario should be accounted for? Sultan, do
+> you care to comment here?
 
---Ben
+During TIMER_MIGRATING the del_timer_sync() caller will spin until the
+condition is over. So it can remove the timer from the right bucket and
+check if it is active vs the right bucket.
+
+> Jason
+
+Sebastian
