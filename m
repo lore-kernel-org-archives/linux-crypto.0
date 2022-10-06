@@ -2,112 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B6CC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424AAC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Oct 2022 12:36:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230516AbiJFM0N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 08:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50780 "EHLO
+        id S229514AbiJFMgW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Oct 2022 08:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiJFM0M (ORCPT
+        with ESMTP id S229796AbiJFMgU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 08:26:12 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3DA7679;
-        Thu,  6 Oct 2022 05:26:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 94AE2B81A76;
-        Thu,  6 Oct 2022 12:26:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2444C433D7;
-        Thu,  6 Oct 2022 12:26:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TsTm67Ll"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665059166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6iPbXN5uNEWV3YZEUMKktzYcuhWOhctZeQ02euetF3U=;
-        b=TsTm67LlKD3Gjx0PkIPYMdh+9AE8HCA9QwFABcH6wyYNxUdbzfLcKHnWSK9lhDBErZJmos
-        TCnYP4JIuDGVr3slI2hykp9bmVEX2jhkw3DUVyqEFLkbgaf2uDc97s0J4Jpj3NmnMbmXmX
-        vwh/HpR0E/moBel5/P+VZgtJsON2D2A=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8808a601 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 6 Oct 2022 12:26:05 +0000 (UTC)
-Date:   Thu, 6 Oct 2022 06:26:04 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
-Message-ID: <Yz7JXEaTFWa1VLKJ@zx2c4.com>
-References: <20220930231050.749824-1-Jason@zx2c4.com>
- <20220930231050.749824-2-Jason@zx2c4.com>
- <YzgGmh6EQtWzO4HV@zx2c4.com>
- <Yz2+UsgVGRSm+o7W@linutronix.de>
- <Yz3yQzaNUcdIuUMX@zx2c4.com>
- <Yz55w4gNtZn8JzmG@linutronix.de>
+        Thu, 6 Oct 2022 08:36:20 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE4CF85A8E;
+        Thu,  6 Oct 2022 05:36:18 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.west.internal (Postfix) with ESMTP id A3BA73200805;
+        Thu,  6 Oct 2022 08:36:13 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Thu, 06 Oct 2022 08:36:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1665059773; x=
+        1665146173; bh=x/5eQeyF8wgxc3lBlMlLCE+D3SClhrVS+22aVr9TqjU=; b=q
+        +sgP3Tc/y297yW5XXTzhrO4+Qo6cxIjnmKI3zcvscNQwafBSie53iKn3KCSwJfSu
+        LC0WbgPyKW5Xc1UsQeJw3PwnECIjH8emzV0abYkXYxgCyh4Gif+antZgx7LNbqW/
+        9ddmEF/4b1GoW4FR/glvrutlElogDrL8gehTfKvuFoMmfdaH8IUKwgLo3V5fqDhp
+        32qlfia1GOqZZHrvoJbZln9rdSqlXgXoBI6QVb49px5nZOCs9Qkgp6CQQr3eLstx
+        5n9t028e3VkD6mHwgaCLAwsPE3fQyy2exQFRWiILShrXZJPMQ54fDVu5LnvuXa1o
+        tdXfQNwPw4cYE1X5fJARw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1665059773; x=1665146173; bh=x/5eQeyF8wgxc
+        3lBlMlLCE+D3SClhrVS+22aVr9TqjU=; b=raTmo2i386qfqhru2VjLPvoZMtJmv
+        nQQUiMPj6BWtWemO+UGjVXK8d9R+RQmHOFFWPV+rNcHEJY9k3pi2O7t4j3FPMCbE
+        +KOHy9DafDsRDnMY62SGvTRuRIi+orJuaksZxtHJfDQfx91niWX1tZ/Ol1RqVVB7
+        E9v9n7DveTFJTfHzGasj+FOQcQXoP+VhYB8lL95tZ1/DU3PWNghTYIxCUQSQYlAL
+        FUrSyHDLa+0TIMVMpvWm9DTnTn887/j+xiXEBrCRIeY3IX6vcD39kiT/i2bkYFdO
+        8SJYRtMINHRPKkewjt6UTPVgbti/V1PGgKReavF0D4ZQhQVulCmPhei3w==
+X-ME-Sender: <xms:uss-Y1vYy2Vqs8hF-ULSkI7VRJTg5ui-mHr7WbUC_8PfV6Q0F4lqlw>
+    <xme:uss-Y-f8BiJcJaRYQThmkup6rV_TuuP7O6V5dMhJpqiHDTSybh6J3nXc3I-bN9mPM
+    4OA5ryUbinLOfVRNws>
+X-ME-Received: <xmr:uss-Y4yQhTLgH2hwlyfhykGdjoe0LOt5x-YQ0KRx0v1n-odCTikP1z3yc3cK7_hZ1zRHEQXD_XIHNgX9J_GLvQeFXiSRLd3o903R>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeeihedgheegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkrhhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegv
+    nhcuuehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeduteehgfefudfffeelfffhheejgfdvfffhledvueekudeuieegueejieff
+    vdeigeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hmvgessggvnhgsohgvtghkvghlrdhnvght
+X-ME-Proxy: <xmx:uss-Y8O_r3BBxeFMpfHX33weeXb5KKr6skLM9dBoKh0TLy3GXSsvRQ>
+    <xmx:uss-Y1-cJf9I8_HXk2-JQg_xeoQ4dFfS7l1r1V-Dl8O4Merzz4bJmA>
+    <xmx:uss-Y8WK-3erQvyA7yRtCKK6hrIVzT3Fo7WJjEmsrGHY3cMikx92rw>
+    <xmx:vcs-Y5Sbjc3jYNXO0uaAfqH0Nh35mLLSQDxdAnpMI3L5oTp3d7IyrQ>
+Feedback-ID: iffc1478b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Oct 2022 08:36:10 -0400 (EDT)
+Date:   Thu, 6 Oct 2022 08:37:00 -0400
+From:   Ben Boeckel <me@benboeckel.net>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc:     jarkko@kernel.org, a.fatoum@pengutronix.de, gilad@benyossef.com,
+        Jason@zx2c4.com, jejb@linux.ibm.com, zohar@linux.ibm.com,
+        dhowells@redhat.com, sumit.garg@linaro.org, david@sigma-star.at,
+        michael@walle.cc, john.ernberg@actia.se, jmorris@namei.org,
+        serge@hallyn.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+        j.luebbe@pengutronix.de, ebiggers@kernel.org, richard@nod.at,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, sahil.malhotra@nxp.com,
+        kshitiz.varshney@nxp.com, horia.geanta@nxp.com, V.Sethi@nxp.com
+Subject: Re: [PATCH v0 2/8] keys-trusted: new cmd line option added
+Message-ID: <Yz7L7KZ4WVW6XBmx@megas.dev.benboeckel.internal>
+Reply-To: list.lkml.keyrings@me.benboeckel.net
+References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
+ <20221006130837.17587-3-pankaj.gupta@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Yz55w4gNtZn8JzmG@linutronix.de>
+In-Reply-To: <20221006130837.17587-3-pankaj.gupta@nxp.com>
+User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 08:46:27AM +0200, Sebastian Andrzej Siewior wrote:
-> On 2022-10-05 23:08:19 [+0200], Jason A. Donenfeld wrote:
-> > Hi Sebastian,
-> Hi Jason,
-> 
-> > On Wed, Oct 05, 2022 at 07:26:42PM +0200, Sebastian Andrzej Siewior wrote:
-> > > That del_timer_sync() at the end is what you want. If the timer is
-> > > pending (as in enqueued in the timer wheel) then it will be removed
-> > > before it is invoked. If the timer's callback is invoked then it will
-> > > spin until the callback is done.
-> > 
-> > del_timer_sync() is not guaranteed to succeed with add_timer_on() being
-> > used in conjunction with timer_pending() though. That's why I've
-> > abandoned this.
-> 
-> But why? The timer is added to a timer-base on a different CPU. Should
-> work.
+On Thu, Oct 06, 2022 at 18:38:31 +0530, Pankaj Gupta wrote:
+> Changes done:
+> - new cmd line option "hw" needs to be suffix, to generate the
+>   hw bound key.
 
-So it's easier to talk about, I'll number a few lines:
+`Documentation/` is silent on this. Can you please add this there?
 
- 1 while (conditions) {
- 2     if (!timer_pending(&stack.timer))
- 3         add_timer_on(&stack.timer, some_next_cpu);
- 4 }
- 5 del_timer_sync(&stack.timer);
+Other than that, is `hw` really a good name for this? Are there virtual
+devices for these things that can make them not hardware in some way?
+Is there a better name in such a case? Maybe something "device"
+oriented?
 
-
-Then, steps to cause UaF:
-
-a) add_timer_on() on line 3 is called from CPU 1 and pends the timer on
-   CPU 2.
-
-b) Just before the timer callback runs, not after, timer_pending() is
-   made false, so the condition on line 2 holds true again.
-
-c) add_timer_on() on line 3 is called from CPU 1 and pends the timer on
-   CPU 3.
-
-d) The conditions on line 1 are made false, and the loop breaks.
-
-e) del_timer_sync() on line 5 is called, and its `base->running_timer !=
-   timer` check is false, because of step (c).
-
-f) `stack.timer` gets freed / goes out of scope.
-
-g) The callback scheduled from step (b) runs, and we have a UaF.
-
-That's, anyway, what I understand Sultan to have pointed out to me. In
-looking at this closely, though, to write this email, I noticed that
-add_timer_on() does set TIMER_MIGRATING, which lock_timer_base() spins
-on. So actually, maybe this scenario should be accounted for? Sultan, do
-you care to comment here?
-
-Jason
+--Ben
