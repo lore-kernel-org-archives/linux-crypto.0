@@ -2,178 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 754ECC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 21:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FC2C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 21:55:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiJGVnJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 17:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
+        id S229695AbiJGVzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 17:55:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiJGVnH (ORCPT
+        with ESMTP id S229777AbiJGVzE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 17:43:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D3411C6E9
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 14:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665178985;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=G87IKnTFlRlP5ZA/YM0aUFdTmppoFiXpaMJaSdjq7DA=;
-        b=TwCSt4Wm5IFN4/uWg+5x8XfwJqB/MgTcYa4RLPW5exKs51zGRga57HqULW0ezEtpJH+ynE
-        FzpjcG+pRGJMYhBq/15mirjsWbuVev7NdHPJZ/WxHGPEg8V579sCoctjGW3rv2L32xfg/X
-        lerCA+dJSYHiUrj1VfkkcMlvh20iC/4=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-269-f-zJBHUDM52STC87gld7og-1; Fri, 07 Oct 2022 17:43:04 -0400
-X-MC-Unique: f-zJBHUDM52STC87gld7og-1
-Received: by mail-oi1-f199.google.com with SMTP id bg13-20020a056808178d00b003540e5f75b7so3395548oib.7
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Oct 2022 14:43:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G87IKnTFlRlP5ZA/YM0aUFdTmppoFiXpaMJaSdjq7DA=;
-        b=YyU8LPPNu+vwVndiR54LyFjWROD9UWQRagKSDeiz/DOPik+1k4HWri4GmWp7ipjxQ2
-         ZjUVG9ODDakTKwktjrWJvI03s9wvLBOPm+puBJCHLgjJUg60LxGRqT3Jm8irq2w2crRU
-         w73SAgVe3YdFB+bCBYlYqGmRYnHtwv3EmkzwUYKww6e/kJmNR+K7UYVmtKv9Vr06g7aL
-         pAdaBqzXh34rDIT+WTb/SugdiXKGCXV87Sk0jkH22x7UQoGP79V4PrxC3SSIj8qpGH6c
-         VnO92PnoYP5j+4yH66VtLxlv+zbSr15GR/AboACzdIL7iohtf1vPUEXOU9ZJRQB+zJg8
-         aY2g==
-X-Gm-Message-State: ACrzQf0XYMSBqbGzuOTjjUSefR4fbxZYYW42LlhMr/GAkOyP0kGL56eK
-        tKhn53mURVFh4ItXkjwrV/p4qNfLAKh+p91l5TVc8KET0XjrvqwsjQygDpVkDBWacfql/R/7Z79
-        lTYl8xCwUUHxgCYdy9tFUXxSG
-X-Received: by 2002:a05:6870:9107:b0:132:b47e:2c76 with SMTP id o7-20020a056870910700b00132b47e2c76mr9271728oae.203.1665178982291;
-        Fri, 07 Oct 2022 14:43:02 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7T1AloyETxY3BAZyZfMe6U/mXW2p2VpMBIVV621kKpq04eX/S6hmYsylQdmGFWsqrPrhuWaQ==
-X-Received: by 2002:a05:6870:9107:b0:132:b47e:2c76 with SMTP id o7-20020a056870910700b00132b47e2c76mr9271682oae.203.1665178980604;
-        Fri, 07 Oct 2022 14:43:00 -0700 (PDT)
-Received: from ?IPv6:2804:1b3:a801:9473:d360:c737:7c9c:d52b? ([2804:1b3:a801:9473:d360:c737:7c9c:d52b])
-        by smtp.gmail.com with ESMTPSA id f13-20020a056830204d00b006594674d4ddsm1768654otp.44.2022.10.07.14.42.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 14:43:00 -0700 (PDT)
-Message-ID: <b23b08274ccff99fb341ea272e968f72c2e289ce.camel@redhat.com>
-Subject: Re: [PATCH v1 1/1] crypto/pcrypt: Do not use isolated CPUs for
- callback
-From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras@redhat.com>
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 07 Oct 2022 18:42:57 -0300
-In-Reply-To: <Yz1/TVUV+KnLvodg@fuller.cnet>
-References: <20221004062536.280712-1-leobras@redhat.com>
-         <Yz1/TVUV+KnLvodg@fuller.cnet>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 
+        Fri, 7 Oct 2022 17:55:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13F23F318
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 14:55:03 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C130C61DF6
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 21:55:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3065CC433D7
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 21:55:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665179702;
+        bh=wQrjTImctRkR7wPbuDz6RXmupPHNOQ/LD+KDKr2vXrA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=CE3lYiZnJEAIaaUshHuItl2AKCicjBucX9s1WzPQsfc+6XFreYXUrlNn3Ox+y2PeE
+         WQJMrS5D4eJvNJ1kE9KjiJopPd6Aw6dvd5S2y1h3F1SSE/9xqdUd1gF5Z6YIllIQ2D
+         c2EVevB7QOcCyWVX54VlK41pJLQfklNYoNEjTSFIoA9c0zpRnTkX0E7sSp/EQfT34k
+         IzCIDNf6nBI2KC1O7VWDtqkTACJl51EDelOer9+vsFWj6vEUJa+RIfLy9HHiAYzaV0
+         uUDBPjDIdve6Ees4Nk9k9IUBAkm3mOX6Jp1NYULiFCkuXCAdCRGYsqtWbbS8z2TlxC
+         IUUeRozMGvYXg==
+Received: by mail-lj1-f175.google.com with SMTP id f9so7146458ljk.12
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Oct 2022 14:55:02 -0700 (PDT)
+X-Gm-Message-State: ACrzQf2ldMKXV5fHPkeIQyL0IXedjhcLawzxxywJeFerXeBtMuDENx/O
+        +LP4XmlKA1CUDa0KLwt41KrnjM7RhmG5dAE0sPI=
+X-Google-Smtp-Source: AMsMyM6xT/H8rawGUKT7mLAXaqs2iu3MRqmIlWMenmCEU5j7SxcJkDh5rpqUnop+0oXOurj8HRs36tLX7hpLzZWnTbw=
+X-Received: by 2002:a2e:b621:0:b0:26e:535f:a90f with SMTP id
+ s1-20020a2eb621000000b0026e535fa90fmr1480221ljn.69.1665179700248; Fri, 07 Oct
+ 2022 14:55:00 -0700 (PDT)
 MIME-Version: 1.0
+References: <20221004044912.24770-1-ap420073@gmail.com> <Yzu8Kd2botr3eegj@gondor.apana.org.au>
+ <f7c52ed1-8061-8147-f676-86190118cc56@gmail.com> <MW5PR84MB18420D6E1A31D9C765EF6ED4AB5A9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <MW5PR84MB18420D6E1A31D9C765EF6ED4AB5A9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 7 Oct 2022 23:54:49 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGmKunh-OCvGFf8T6KJJXSHRYzacjSojBD3__u0o-3D1w@mail.gmail.com>
+Message-ID: <CAMj1kXGmKunh-OCvGFf8T6KJJXSHRYzacjSojBD3__u0o-3D1w@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86: Do not acquire fpu context for too long
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
+Cc:     Taehee Yoo <ap420073@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "ebiggers@google.com" <ebiggers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2022-10-05 at 09:57 -0300, Marcelo Tosatti wrote:
-> On Tue, Oct 04, 2022 at 03:25:37AM -0300, Leonardo Bras wrote:
-> > Currently pcrypt_aead_init_tfm() will pick callback cpus (ctx->cb_cpu)
-> > from any online cpus. Later padata_reorder() will queue_work_on() the
-> > chosen cb_cpu.
-> >=20
-> > This is undesired if the chosen cb_cpu is listed as isolated (i.e. usin=
-g
-> > isolcpus=3D... kernel parameter), since the work queued will interfere =
-with
-> > the workload on the isolated cpu.
-> >=20
-> > Make sure isolated cpus are not used for pcrypt.
-> >=20
-> > Signed-off-by: Leonardo Bras <leobras@redhat.com>
-> > ---
-> >  crypto/pcrypt.c | 10 +++++++---
-> >  1 file changed, 7 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-> > index 9d10b846ccf73..9017d08c91a8d 100644
-> > --- a/crypto/pcrypt.c
-> > +++ b/crypto/pcrypt.c
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/kobject.h>
-> >  #include <linux/cpu.h>
-> >  #include <crypto/pcrypt.h>
-> > +#include <linux/sched/isolation.h>
-> > =20
-> >  static struct padata_instance *pencrypt;
-> >  static struct padata_instance *pdecrypt;
-> > @@ -175,13 +176,16 @@ static int pcrypt_aead_init_tfm(struct crypto_aea=
-d *tfm)
-> >  	struct pcrypt_instance_ctx *ictx =3D aead_instance_ctx(inst);
-> >  	struct pcrypt_aead_ctx *ctx =3D crypto_aead_ctx(tfm);
-> >  	struct crypto_aead *cipher;
-> > +	struct cpumask non_isolated;
-> > +
-> > +	cpumask_and(&non_isolated, cpu_online_mask, housekeeping_cpumask(HK_T=
-YPE_DOMAIN));
->=20
-> Since certain systems do not use isolcpus=3Ddomain, so please use a flag
-> that is setup by nohz_full=3D, for example HK_FLAG_MISC:
->=20
-> static int __init housekeeping_nohz_full_setup(char *str)
-> {
->         unsigned long flags;
->=20
->         flags =3D HK_FLAG_TICK | HK_FLAG_WQ | HK_FLAG_TIMER | HK_FLAG_RCU=
- |
->                 HK_FLAG_MISC | HK_FLAG_KTHREAD;
->=20
->         return housekeeping_setup(str, flags);
-> }
-> __setup("nohz_full=3D", housekeeping_nohz_full_setup);
+On Tue, 4 Oct 2022 at 17:17, Elliott, Robert (Servers) <elliott@hpe.com> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Taehee Yoo <ap420073@gmail.com>
+> > Sent: Tuesday, October 4, 2022 1:02 AM
+> > To: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: linux-crypto@vger.kernel.org; davem@davemloft.net; tglx@linutronix.de;
+> > mingo@redhat.com; bp@alien8.de; dave.hansen@linux.intel.com; x86@kernel.org;
+> > hpa@zytor.com; ardb@kernel.org; ebiggers@google.com
+> > Subject: Re: [PATCH] crypto: x86: Do not acquire fpu context for too long
+> >
+> > Hi Herbert,
+> > Thanks a lot for your review!
+> >
+> > On 10/4/22 13:52, Herbert Xu wrote:
+> >  > On Tue, Oct 04, 2022 at 04:49:12AM +0000, Taehee Yoo wrote:
+> >  >>
+> >  >>   #define ECB_WALK_START(req, bsize, fpu_blocks) do {                     \
+> >  >>           void *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));   \
+> >  >> + unsigned int walked_bytes = 0;                                  \
+> >  >>           const int __bsize = (bsize);                                    \
+> >  >>           struct skcipher_walk walk;                                      \
+> >  >> - int err = skcipher_walk_virt(&walk, (req), false);              \
+> >  >> + int err;                                                        \
+> >  >> +                                                                 \
+> >  >> + err = skcipher_walk_virt(&walk, (req), false);                  \
+> >  >>           while (walk.nbytes > 0) {                                       \
+> >  >> -         unsigned int nbytes = walk.nbytes;                      \
+> >  >> -         bool do_fpu = (fpu_blocks) != -1 &&                     \
+> >  >> -                       nbytes >= (fpu_blocks) * __bsize;         \
+> >  >>                   const u8 *src = walk.src.virt.addr;                     \
+> >  >> -         u8 *dst = walk.dst.virt.addr;                           \
+> >  >>                   u8 __maybe_unused buf[(bsize)];                         \
+> >  >> -         if (do_fpu) kernel_fpu_begin()
+> >  >> +         u8 *dst = walk.dst.virt.addr;                           \
+> >  >> +         unsigned int nbytes;                                    \
+> >  >> +         bool do_fpu;                                            \
+> >  >> +                                                                 \
+> >  >> +         if (walk.nbytes - walked_bytes > ECB_CBC_WALK_MAX) {    \
+> >  >> +                 nbytes = ECB_CBC_WALK_MAX;                      \
+> >  >> +                 walked_bytes += ECB_CBC_WALK_MAX;               \
+> >  >> +         } else {                                                \
+> >  >> +                 nbytes = walk.nbytes - walked_bytes;            \
+> >  >> +                 walked_bytes = walk.nbytes;                     \
+> >  >> +         }                                                       \
+> >  >> +                                                                 \
+> >  >> +         do_fpu = (fpu_blocks) != -1 &&                          \
+> >  >> +                  nbytes >= (fpu_blocks) * __bsize;              \
+> >  >> +         if (do_fpu)                                             \
+> >  >> +                 kernel_fpu_begin()
+> >  >>
+> >  >>   #define CBC_WALK_START(req, bsize, fpu_blocks)                          \
+> >  >>           ECB_WALK_START(req, bsize, fpu_blocks)
+> >  >> @@ -65,8 +81,12 @@
+> >  >>   } while (0)
+> >  >>
+> >  >>   #define ECB_WALK_END()                                                  \
+> >  >> -         if (do_fpu) kernel_fpu_end();                           \
+> >  >> +         if (do_fpu)                                             \
+> >  >> +                 kernel_fpu_end();                               \
+> >  >> +         if (walked_bytes < walk.nbytes)                         \
+> >  >> +                 continue;                                       \
+> >  >>                   err = skcipher_walk_done(&walk, nbytes);                \
+> >  >> +         walked_bytes = 0;                                       \
+> >  >>           }                                                               \
+> >  >>           return err;                                                     \
+> >  >>   } while (0)
+> >  >
+> >  > skcipher_walk_* is supposed to return at most a page.  Why is this
+> >  > necessary?
+> >  >
+> >  > Cheers,
+> >
+> > I referred to below link.
+> > https://lore.kernel.org/all/MW5PR84MB18426EBBA3303770A8BC0BDFAB759@MW5PR84MB18
+> > 42.NAMPRD84.PROD.OUTLOOK.COM/
+> >
+> > Sorry for that I didn't check that skcipher_walk_* returns only under 4K
+> > sizes.
+> > So, I thought fpu context would be too long.
+> > But, I just checked the skcipher_walk_*, and it's right, it returns
+> > under 4K sizes.
+> > So, there are no problems as you mentioned.
+> >
+> > Thank you so much!
+> > Taehee Yoo
+>
+> I think functions using the ECB and CBC macros (and
+> those helper functions) are safe  - notice the third
+> argument is called fpu_blocks. So, Aria's ECB mode is
+> probably safe. There are no CTR macros, so that needs
+> to be checked more carefully.
+>
+> We need to check all the functions that don't use the
+> macros and functions. The SHA functions (I've started
+> working on a patch for those).
+>
+> Running modprobe tcrypt mode=0, I encountered RCU stalls
+> on these:
+>         tcrypt: testing encryption speed of sync skcipher cts(cbc(aes)) using cts(cbc(aes-aesni))
+>         tcrypt: testing encryption speed of sync skcipher cfb(aes) using cfb(aes-aesni)
+>
+> aesni-intel_glue.c registers "__cts(cbs(aes))", not "cts(cbc(aes-aesni)",
+> and doesn't register any cfb algorithms, so those tests are using the
+> generic templates, which must not be breaking up the loops as needed.
+>
 
-Oh, sure.=C2=A0
-Since we are talking about WorkQueues, I think it makes sense to pick
-HK_FLAG_WQ.=20
-
->=20
-> Also, shouldnt you use cpumask_t ?/
-
-Yeah, I think so.=C2=A0
-I was quick to choose the 'struct cpumask' because all functions would oper=
-ate
-in this variable type, but yeah, I think it makes sense to have this variab=
-le
-being opaque here.
-
->=20
-> Looks good otherwise.
->=20
-> Thanks!
-
-Thank you for reviewing!=20
-
-Leo
-
->=20
->=20
-> > =20
-> >  	cpu_index =3D (unsigned int)atomic_inc_return(&ictx->tfm_count) %
-> > -		    cpumask_weight(cpu_online_mask);
-> > +		    cpumask_weight(&non_isolated);
-> > =20
-> > -	ctx->cb_cpu =3D cpumask_first(cpu_online_mask);
-> > +	ctx->cb_cpu =3D cpumask_first(&non_isolated);
-> >  	for (cpu =3D 0; cpu < cpu_index; cpu++)
-> > -		ctx->cb_cpu =3D cpumask_next(ctx->cb_cpu, cpu_online_mask);
-> > +		ctx->cb_cpu =3D cpumask_next(ctx->cb_cpu, &non_isolated);
-> > =20
-> >  	cipher =3D crypto_spawn_aead(&ictx->spawn);
-> > =20
-> > --=20
-> > 2.37.3
-> >=20
-> >=20
->=20
-
+These all use the aes-aesni cipher wrapped in various layers of
+generic code. The core cipher puts kernel_fpu_begin/end around every
+AES block {16 bytes) it processes, so I doubt that the crypto code is
+at fault here, unless the issues is in tcrypt itself.
