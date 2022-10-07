@@ -2,468 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 329FDC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 03:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9821C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 04:53:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbiJGD2X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Oct 2022 23:28:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
+        id S229484AbiJGExy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 00:53:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbiJGD2V (ORCPT
+        with ESMTP id S229452AbiJGExx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Oct 2022 23:28:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08866B8C15;
-        Thu,  6 Oct 2022 20:28:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 71D5561240;
-        Fri,  7 Oct 2022 03:28:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73BBBC433D6;
-        Fri,  7 Oct 2022 03:28:17 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="akoE2Fvy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665113295;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uPNB36BzWAD0XiB0qY+sJgcivuXHHQm1+0Nq15qRnv8=;
-        b=akoE2Fvy6mGBx36EvVAPpL17QggFxvKq6GGW7+JBufE8AHNTkhSP1CnscrrILglo89xqT4
-        F02ETTSquX0GgBWOTBVhzVoGIYpOSM46iu0TecVhpnzkRdh4qUfaI8+7D5BcgQeNY3+ooP
-        9J7oYv/1vbD1p0i/W94z0KkqA3OBFqc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a7b2780b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 7 Oct 2022 03:28:15 +0000 (UTC)
-Received: by mail-vs1-xe2c.google.com with SMTP id v68so2948936vsb.1;
-        Thu, 06 Oct 2022 20:28:15 -0700 (PDT)
-X-Gm-Message-State: ACrzQf2/0FTlCKROfcOXkOXGOkYrhER81xb+drccvt++XcjukkeR014M
-        sSOcKXcOn3MoeLrNcPBFStBl7HQ9Mt1RQQyuFfY=
-X-Google-Smtp-Source: AMsMyM58pN1t7S+vKJk7YUp/bqCsOknO9CVyazw0zjPk2OdvJ9TxLPO6QVksRgu+L0rVvUtPyS0ByQb4sHjfhx/aSm4=
-X-Received: by 2002:a67:e401:0:b0:398:89f1:492f with SMTP id
- d1-20020a67e401000000b0039889f1492fmr1924805vsf.21.1665112993319; Thu, 06 Oct
- 2022 20:23:13 -0700 (PDT)
+        Fri, 7 Oct 2022 00:53:53 -0400
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01olkn2101.outbound.protection.outlook.com [40.92.99.101])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C2ABEF8E;
+        Thu,  6 Oct 2022 21:53:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dPisCov5ujOra4dT0gIp9aVLVbbPjVl27LcSHszcKxQtzUZ4lmpA9b8/Zlv/9/XyZ2Cq43wRz4V9u2aXs0npUDzrKTic1jU6rAQzB2nSWceF8G9ShjfVs5t3iQTwp9Zv6eFgPPHAAqv0wB009jw/qw/9VsmjXshm2pSruibp5V1r4b3R7byQzzJTRz3RkabNiDIhpW6x7c5sZ5Wl/Hx7DO8yXTas2S9rihpXRLIRMaJGtwWyV8PjSW3Hq5E57EOi9z7aSzcIqZCUSD+k2Cu5G4kVkUbY0St2qolLGgHpkPxADW+V5dF2UjBQz6jxK/GTQfllm03wiLuNeaYyWgm7xg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DBgcEtGSwfrmAXMTFxX3P8TCc/LuaVFAUzlc2/vlMes=;
+ b=nrAp4vvAio4WMO1FiZdsY/6/ZVO5gZNFaXU8mqPGngQ0jb1gFHPHazsKJfSaefqaLKsNF3fM2IoM8pZyFjCd2zgFMx1uabiLhS+HAnnZ8QtartxwjeV0K/vn1MSHDN8xFEiLwe1EjvCAd96EGA7voEpwhicMpv3TD45EnWKukMz6OWzbINvC6aitKqwkZCu8RVxL0g5cf4b6ij3pko6gWbd6B4aJ3Quq6+GZ+d+9pODxa2dYWGOMqm1+2PO3Mjd8mRm457J4ssM9v5JAzgUt4k/O9j3lmpe/eSC3J3Q+Y4gVj9yOlGRjBoZq+zJ4kbStqvoL50cy3we9Go0fRUKoAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DBgcEtGSwfrmAXMTFxX3P8TCc/LuaVFAUzlc2/vlMes=;
+ b=ohmz6xXHGdb5EwWFjyv6+LiEcVqrgDyjG02eAu0G2fXE4FZoyNC8AJsMRafBTH/SZtAOHQNjp+bYdUzMxRqxNLC69nJpOhlg70sOXxZARMd2KHQFpt5zMEB7DuXNXT0i1uvpacd4SxZZJrt8OohMvgyBL7zir7Vz/Roglo6HTuDgCbd12LbVbaDNwO3Vy+t+d+qXBlQqHFTXqpkf8RgK5nxn/pR4+gC0vqWe5UlE+p+uc7OCIFwgeDbgfWHI+jIDiUBBitAXys8MfHUnak5d/OTDlEIqcHtTvZjzbgN+hXjqZ91OpAmNfNe3Rm4Q6bJ9ovN6X3yedX6yLiIKluPNPA==
+Received: from TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:252::12)
+ by TYWP286MB2234.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:171::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Fri, 7 Oct
+ 2022 04:53:48 +0000
+Received: from TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2260:9c8e:887:2057]) by TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2260:9c8e:887:2057%6]) with mapi id 15.20.5676.031; Fri, 7 Oct 2022
+ 04:53:48 +0000
+Message-ID: <TY3P286MB261125CD3D2FCB6F390F34D1985F9@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Date:   Fri, 7 Oct 2022 12:53:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+To:     clabbe@baylibre.com
+Cc:     davem@davemloft.net, devicetree@vger.kernel.org, heiko@sntech.de,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        robh+dt@kernel.org
+References: <20220927080048.3151911-5-clabbe@baylibre.com>
+From:   Shengyu Qu <wiagn233@outlook.com>
+Subject: Re: [PATCH RFT 4/5] crypto: rockchip: support the new crypto IP for
+ rk3568/rk3588
+In-Reply-To: <20220927080048.3151911-5-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TMN:  [0vdiqqlHM1zUuViTnuXij3RxWTAVsg9W]
+X-ClientProxiedBy: SG2PR02CA0135.apcprd02.prod.outlook.com
+ (2603:1096:4:188::23) To TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:252::12)
+X-Microsoft-Original-Message-ID: <1ffb32b1-3dcf-593f-018b-54024d437348@outlook.com>
 MIME-Version: 1.0
-Received: by 2002:ab0:6ed0:0:b0:3d9:6dfd:499 with HTTP; Thu, 6 Oct 2022
- 20:23:12 -0700 (PDT)
-In-Reply-To: <6c0f1d6a-27e6-5a82-956e-a4f12e0a51bf@gmail.com>
-References: <20221006165346.73159-1-Jason@zx2c4.com> <20221006165346.73159-5-Jason@zx2c4.com>
- <6c0f1d6a-27e6-5a82-956e-a4f12e0a51bf@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 6 Oct 2022 21:23:12 -0600
-X-Gmail-Original-Message-ID: <CAHmME9rG6GAK6k-GZCBwUR-r2PLDipm--utApBtBHHRveCFEqA@mail.gmail.com>
-Message-ID: <CAHmME9rG6GAK6k-GZCBwUR-r2PLDipm--utApBtBHHRveCFEqA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] treewide: use get_random_bytes when possible
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY3P286MB2611:EE_|TYWP286MB2234:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69f666d0-383a-41ae-ab8b-08daa81feb60
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5XNkUzoQ6/sNHC7Q+FQLl2y+h2phgAtizg/3hPObNYrvFt/Y2NaXSfjz+THvYmme7PSJm4ebkrgkUnMh9sC//W9MS1y7WFe0UjJjr5Y1kB36Y9AlEwII8yKd0wkqm1MAlFngR9Wxc1a+IFmfBONzkjBxc2deNyWzREJAqpuH6MZpjiAVdxuW7/pG0r+llUub2inOAoEa8UaZwKTGuarEoV8T7MHXPVly5QNyo8WCmIFwTWjbVE9U6L7hp7ffZP7uBt0VldS9ad32efPS9oUYGFjCl6wpnL6pi5SG9wqeqjwW2KItiOoKViKcgds+qRcrLp/4MdcAmzcnQHWTpSUPFcLB5eaCcfXTC53na/d0sRmiGjQMCky7rZlxmUavoaJVEqs8lmjAkh+/XYPuwUpZyF0dVf7R1exnbjx908RAQTT4VR5dqNNyOl2IY8cvQOKvfhS7mym4D6JFicrnP041VGYBCroxP+Wri3aLPI5W3RbltFBOLmYtFAX3LUkIcSbQ9gF2QVSApgkNKVs2FXx+E4QUtiFRAv0J7Lpl9ilI8x8ssnNZycqtlPMErsh1urDHiwWT/IJV8u62rP/khwRmWtkcX62kXm9ccoc28DTelE+U6nQt2+Ab6NLeZl4G8uOcoy+9l6uRzs44H1G4S3PTcey2hWKmOZ6XsbBSgZuKGN8=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N21WeUJuMWM5dDVFQXRpZXZVZXFBVEREM2MvSytZbjQxaTRLVGF3bDgwQjZG?=
+ =?utf-8?B?dFB2NFNnVmZlSXg2THlFRDZPYWxVT3JkWlhlNXpZVFFPVC9yVE54U05qUGRN?=
+ =?utf-8?B?NUxETFdSVFVwS1R4L2lJYmtFVnRKeDE3U2tGeTFIeGdYTU5nR0pIeHJBdHNq?=
+ =?utf-8?B?ejhkbjBVcTlBRm1yQkdXRStJSUZhOVVjc1U0SnAwdFY4aElMdjNMQVVUbHFE?=
+ =?utf-8?B?UU5wbWhVSFQzK1hwcjhQQm43ZTFkK1c2R2dRNFMrMTZTcEVlMk5EWFp2am9N?=
+ =?utf-8?B?bU9sYjhTUWJ0eTlLN3FHTG5sMTVELzltSEd6OG1Ia056T2FMRUVGNVZyMTEy?=
+ =?utf-8?B?WVA4dkgyVmhWT2xtT3hLQUFMOTZERUZqa0dJRGtPcmNvTW0rODk4cTNNTUFG?=
+ =?utf-8?B?ZVRPVVBud1NMRGRlckh0Qk0xYmZlam5jakd4RnN1MUpHcWNLWFFoWGdxZmpo?=
+ =?utf-8?B?TENtdjB6RW9ob2FvcDZLbXpFdzVjcFRNcXQyaHBNQmFSczlGT3pjMUpmQTdO?=
+ =?utf-8?B?NWxHaFExMk14ODI3cU5rdlM0N0o0MzZJMlhBR0p0MmUwMXNjQXByUXBKcTBp?=
+ =?utf-8?B?WDJBWUVuMVVEQ3VMTS95cGtjQkZrOVN1L1pmd05ZVk9uNzlDQkp0RXhUVzF0?=
+ =?utf-8?B?NnJIaVEzUEQ3Lzd3U3ZLOW9vWTYyRFNoU2JqQzE5S3FzK3FoNnV1Wll6Tkhh?=
+ =?utf-8?B?MndLTThHRlRHTkRIZDZrQXhqWU5TbnZuVDQzR2gzZUREZ3JSTm9zUnF4ZTN1?=
+ =?utf-8?B?MTA3TldJZlhhVFJ3bHpUbCs2ZStvRTUySkJ4Sm1USnVhNm1xNHBrWFY3eHBD?=
+ =?utf-8?B?N1NpLzhXNjE0d1N4OWhrcFhCTVRlLzBxdE9OeVNyTlZZL0FSZGxBV0IydGlC?=
+ =?utf-8?B?aUEvV01FSjFTbmxYMk1wOXhvQ2NtdW1xbTVSTkl0UVZubWF5UXB5Ym8rNUtS?=
+ =?utf-8?B?YVNjK0J3UExuM09CUGhGZTFPa0I1Z0R5NzNkZExDNWpXN1ZNYmlyV3pmWEtF?=
+ =?utf-8?B?eEYvQWNtcWFWQzI2R1draFh3RXVycks5azNueFAvc1Z2RHVORFNMSWZPVzJr?=
+ =?utf-8?B?UGFuekF5S2R4S3hybkFMMnBKSEdJV3dZSFVJdWhRTkRkdzRSUmFuTDNQWEdX?=
+ =?utf-8?B?NE1MVlNJRmVybjJTMFZqWU1zcVRMcFZkVFhhYXJ6RitHY0ZSUTNHYjVDbEJt?=
+ =?utf-8?B?anU1M3pqRkszQlpEM05pYTRZK1VlejJ6WWRPL0dEbjB0TmlIWldsOGR4QWVi?=
+ =?utf-8?B?ZkIraEQ1aW8yQW94RnFURC9RRGEzODdYL1czVlA2TGRLTmEzVzlWQ1hHUWU2?=
+ =?utf-8?B?VlNMc3crL3U4ZFc4bnMrcHNVQnduSXp4eWZDdEI2Q3dRUXdQU2ZTc2hMblBY?=
+ =?utf-8?B?WWg2b014MXdqcnNVNGdIK3QvZUVJZjJWZFRaVldXNSt6MlZZNTJWRUpSL3RV?=
+ =?utf-8?B?SGFnOG16bFhxUVpmTzJyLzRCbTlvdkNjQXVqam95ZzJiZ0FWRlBjZ2JBQjZa?=
+ =?utf-8?B?enpWVk81UkNxVC8wZ3gzZUdTNG1WUUZxdTlVRUVlN2ZVb0tjeVJrVkNGK29z?=
+ =?utf-8?B?R3FBM3k5cDNQS3c5VldobjJBdG9WZkpVL2ZpVnVvV1g5YXRtekdnYk5sVUV4?=
+ =?utf-8?B?TGROK3pYejZBWU83dXJYWUdTZHJBZE50ek5oQXlGNDF2Q3k2MUJRY0JQNld3?=
+ =?utf-8?B?MjB2K0pkdmZoWUJWTnRUVFU1Q0NGaWs5Mk5rMXROYkhuM3hZNkowV2ZnPT0=?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69f666d0-383a-41ae-ab8b-08daa81feb60
+X-MS-Exchange-CrossTenant-AuthSource: TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2022 04:53:48.5158
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWP286MB2234
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/6/22, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
-> On 10/6/22 23:53, Jason A. Donenfeld wrote:
->> The prandom_bytes() function has been a deprecated inline wrapper around
->> get_random_bytes() for several releases now, and compiles down to the
->> exact same code. Replace the deprecated wrapper with a direct call to
->> the real function.
->>
->> Reviewed-by: Kees Cook <keescook@chromium.org>
->> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->> ---
->>  arch/powerpc/crypto/crc-vpmsum_test.c       |  2 +-
->>  block/blk-crypto-fallback.c                 |  2 +-
->>  crypto/async_tx/raid6test.c                 |  2 +-
->>  drivers/dma/dmatest.c                       |  2 +-
->>  drivers/mtd/nand/raw/nandsim.c              |  2 +-
->>  drivers/mtd/tests/mtd_nandecctest.c         |  2 +-
->>  drivers/mtd/tests/speedtest.c               |  2 +-
->>  drivers/mtd/tests/stresstest.c              |  2 +-
->>  drivers/net/ethernet/broadcom/bnxt/bnxt.c   |  2 +-
->>  drivers/net/ethernet/rocker/rocker_main.c   |  2 +-
->>  drivers/net/wireguard/selftest/allowedips.c | 12 ++++++------
->>  fs/ubifs/debug.c                            |  2 +-
->>  kernel/kcsan/selftest.c                     |  2 +-
->>  lib/random32.c                              |  2 +-
->>  lib/test_objagg.c                           |  2 +-
->>  lib/uuid.c                                  |  2 +-
->>  net/ipv4/route.c                            |  2 +-
->>  net/mac80211/rc80211_minstrel_ht.c          |  2 +-
->>  net/sched/sch_pie.c                         |  2 +-
->>  19 files changed, 24 insertions(+), 24 deletions(-)
->>
->> diff --git a/arch/powerpc/crypto/crc-vpmsum_test.c
->> b/arch/powerpc/crypto/crc-vpmsum_test.c
->> index c1c1ef9457fb..273c527868db 100644
->> --- a/arch/powerpc/crypto/crc-vpmsum_test.c
->> +++ b/arch/powerpc/crypto/crc-vpmsum_test.c
->> @@ -82,7 +82,7 @@ static int __init crc_test_init(void)
->>
->>  			if (len <= offset)
->>  				continue;
->> -			prandom_bytes(data, len);
->> +			get_random_bytes(data, len);
->>  			len -= offset;
->>
->>  			crypto_shash_update(crct10dif_shash, data+offset, len);
->> diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
->> index 621abd1b0e4d..ad9844c5b40c 100644
->> --- a/block/blk-crypto-fallback.c
->> +++ b/block/blk-crypto-fallback.c
->> @@ -539,7 +539,7 @@ static int blk_crypto_fallback_init(void)
->>  	if (blk_crypto_fallback_inited)
->>  		return 0;
->>
->> -	prandom_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
->> +	get_random_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
->>
->>  	err = bioset_init(&crypto_bio_split, 64, 0, 0);
->>  	if (err)
->> diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
->> index c9d218e53bcb..f74505f2baf0 100644
->> --- a/crypto/async_tx/raid6test.c
->> +++ b/crypto/async_tx/raid6test.c
->> @@ -37,7 +37,7 @@ static void makedata(int disks)
->>  	int i;
->>
->>  	for (i = 0; i < disks; i++) {
->> -		prandom_bytes(page_address(data[i]), PAGE_SIZE);
->> +		get_random_bytes(page_address(data[i]), PAGE_SIZE);
->>  		dataptrs[i] = data[i];
->>  		dataoffs[i] = 0;
->>  	}
->> diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
->> index 9fe2ae794316..ffe621695e47 100644
->> --- a/drivers/dma/dmatest.c
->> +++ b/drivers/dma/dmatest.c
->> @@ -312,7 +312,7 @@ static unsigned long dmatest_random(void)
->>  {
->>  	unsigned long buf;
->>
->> -	prandom_bytes(&buf, sizeof(buf));
->> +	get_random_bytes(&buf, sizeof(buf));
->>  	return buf;
->>  }
->>
->> diff --git a/drivers/mtd/nand/raw/nandsim.c
->> b/drivers/mtd/nand/raw/nandsim.c
->> index 4bdaf4aa7007..c941a5a41ea6 100644
->> --- a/drivers/mtd/nand/raw/nandsim.c
->> +++ b/drivers/mtd/nand/raw/nandsim.c
->> @@ -1393,7 +1393,7 @@ static int ns_do_read_error(struct nandsim *ns, int
->> num)
->>  	unsigned int page_no = ns->regs.row;
->>
->>  	if (ns_read_error(page_no)) {
->> -		prandom_bytes(ns->buf.byte, num);
->> +		get_random_bytes(ns->buf.byte, num);
->>  		NS_WARN("simulating read error in page %u\n", page_no);
->>  		return 1;
->>  	}
->> diff --git a/drivers/mtd/tests/mtd_nandecctest.c
->> b/drivers/mtd/tests/mtd_nandecctest.c
->> index 1c7201b0f372..440988562cfd 100644
->> --- a/drivers/mtd/tests/mtd_nandecctest.c
->> +++ b/drivers/mtd/tests/mtd_nandecctest.c
->> @@ -266,7 +266,7 @@ static int nand_ecc_test_run(const size_t size)
->>  		goto error;
->>  	}
->>
->> -	prandom_bytes(correct_data, size);
->> +	get_random_bytes(correct_data, size);
->>  	ecc_sw_hamming_calculate(correct_data, size, correct_ecc, sm_order);
->>  	for (i = 0; i < ARRAY_SIZE(nand_ecc_test); i++) {
->>  		nand_ecc_test[i].prepare(error_data, error_ecc,
->> diff --git a/drivers/mtd/tests/speedtest.c
->> b/drivers/mtd/tests/speedtest.c
->> index c9ec7086bfa1..075bce32caa5 100644
->> --- a/drivers/mtd/tests/speedtest.c
->> +++ b/drivers/mtd/tests/speedtest.c
->> @@ -223,7 +223,7 @@ static int __init mtd_speedtest_init(void)
->>  	if (!iobuf)
->>  		goto out;
->>
->> -	prandom_bytes(iobuf, mtd->erasesize);
->> +	get_random_bytes(iobuf, mtd->erasesize);
->>
->>  	bbt = kzalloc(ebcnt, GFP_KERNEL);
->>  	if (!bbt)
->> diff --git a/drivers/mtd/tests/stresstest.c
->> b/drivers/mtd/tests/stresstest.c
->> index d2faaca7f19d..75b6ddc5dc4d 100644
->> --- a/drivers/mtd/tests/stresstest.c
->> +++ b/drivers/mtd/tests/stresstest.c
->> @@ -183,7 +183,7 @@ static int __init mtd_stresstest_init(void)
->>  		goto out;
->>  	for (i = 0; i < ebcnt; i++)
->>  		offsets[i] = mtd->erasesize;
->> -	prandom_bytes(writebuf, bufsize);
->> +	get_random_bytes(writebuf, bufsize);
->>
->>  	bbt = kzalloc(ebcnt, GFP_KERNEL);
->>  	if (!bbt)
->> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> index 96da0ba3d507..354953df46a1 100644
->> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> @@ -3874,7 +3874,7 @@ static void bnxt_init_vnics(struct bnxt *bp)
->>
->>  		if (bp->vnic_info[i].rss_hash_key) {
->>  			if (i == 0)
->> -				prandom_bytes(vnic->rss_hash_key,
->> +				get_random_bytes(vnic->rss_hash_key,
->>  					      HW_HASH_KEY_SIZE);
->>  			else
->>  				memcpy(vnic->rss_hash_key,
->> diff --git a/drivers/net/ethernet/rocker/rocker_main.c
->> b/drivers/net/ethernet/rocker/rocker_main.c
->> index 8c3bbafabb07..cd4488efe0a4 100644
->> --- a/drivers/net/ethernet/rocker/rocker_main.c
->> +++ b/drivers/net/ethernet/rocker/rocker_main.c
->> @@ -224,7 +224,7 @@ static int rocker_dma_test_offset(const struct rocker
->> *rocker,
->>  	if (err)
->>  		goto unmap;
->>
->> -	prandom_bytes(buf, ROCKER_TEST_DMA_BUF_SIZE);
->> +	get_random_bytes(buf, ROCKER_TEST_DMA_BUF_SIZE);
->>  	for (i = 0; i < ROCKER_TEST_DMA_BUF_SIZE; i++)
->>  		expect[i] = ~buf[i];
->>  	err = rocker_dma_test_one(rocker, wait, ROCKER_TEST_DMA_CTRL_INVERT,
->> diff --git a/drivers/net/wireguard/selftest/allowedips.c
->> b/drivers/net/wireguard/selftest/allowedips.c
->> index dd897c0740a2..19eac00b2381 100644
->> --- a/drivers/net/wireguard/selftest/allowedips.c
->> +++ b/drivers/net/wireguard/selftest/allowedips.c
->> @@ -284,7 +284,7 @@ static __init bool randomized_test(void)
->>  	mutex_lock(&mutex);
->>
->>  	for (i = 0; i < NUM_RAND_ROUTES; ++i) {
->> -		prandom_bytes(ip, 4);
->> +		get_random_bytes(ip, 4);
->>  		cidr = prandom_u32_max(32) + 1;
->>  		peer = peers[prandom_u32_max(NUM_PEERS)];
->>  		if (wg_allowedips_insert_v4(&t, (struct in_addr *)ip, cidr,
->> @@ -299,7 +299,7 @@ static __init bool randomized_test(void)
->>  		}
->>  		for (j = 0; j < NUM_MUTATED_ROUTES; ++j) {
->>  			memcpy(mutated, ip, 4);
->> -			prandom_bytes(mutate_mask, 4);
->> +			get_random_bytes(mutate_mask, 4);
->>  			mutate_amount = prandom_u32_max(32);
->>  			for (k = 0; k < mutate_amount / 8; ++k)
->>  				mutate_mask[k] = 0xff;
->> @@ -328,7 +328,7 @@ static __init bool randomized_test(void)
->>  	}
->>
->>  	for (i = 0; i < NUM_RAND_ROUTES; ++i) {
->> -		prandom_bytes(ip, 16);
->> +		get_random_bytes(ip, 16);
->>  		cidr = prandom_u32_max(128) + 1;
->>  		peer = peers[prandom_u32_max(NUM_PEERS)];
->>  		if (wg_allowedips_insert_v6(&t, (struct in6_addr *)ip, cidr,
->> @@ -343,7 +343,7 @@ static __init bool randomized_test(void)
->>  		}
->>  		for (j = 0; j < NUM_MUTATED_ROUTES; ++j) {
->>  			memcpy(mutated, ip, 16);
->> -			prandom_bytes(mutate_mask, 16);
->> +			get_random_bytes(mutate_mask, 16);
->>  			mutate_amount = prandom_u32_max(128);
->>  			for (k = 0; k < mutate_amount / 8; ++k)
->>  				mutate_mask[k] = 0xff;
->> @@ -381,13 +381,13 @@ static __init bool randomized_test(void)
->>
->>  	for (j = 0;; ++j) {
->>  		for (i = 0; i < NUM_QUERIES; ++i) {
->> -			prandom_bytes(ip, 4);
->> +			get_random_bytes(ip, 4);
->>  			if (lookup(t.root4, 32, ip) != horrible_allowedips_lookup_v4(&h,
->> (struct in_addr *)ip)) {
->>  				horrible_allowedips_lookup_v4(&h, (struct in_addr *)ip);
->>  				pr_err("allowedips random v4 self-test: FAIL\n");
->>  				goto free;
->>  			}
->> -			prandom_bytes(ip, 16);
->> +			get_random_bytes(ip, 16);
->>  			if (lookup(t.root6, 128, ip) != horrible_allowedips_lookup_v6(&h,
->> (struct in6_addr *)ip)) {
->>  				pr_err("allowedips random v6 self-test: FAIL\n");
->>  				goto free;
->> diff --git a/fs/ubifs/debug.c b/fs/ubifs/debug.c
->> index f4d3b568aa64..3f128b9fdfbb 100644
->> --- a/fs/ubifs/debug.c
->> +++ b/fs/ubifs/debug.c
->> @@ -2581,7 +2581,7 @@ static int corrupt_data(const struct ubifs_info *c,
->> const void *buf,
->>  	if (ffs)
->>  		memset(p + from, 0xFF, to - from);
->>  	else
->> -		prandom_bytes(p + from, to - from);
->> +		get_random_bytes(p + from, to - from);
->>
->>  	return to;
->>  }
->> diff --git a/kernel/kcsan/selftest.c b/kernel/kcsan/selftest.c
->> index 58b94deae5c0..00cdf8fa5693 100644
->> --- a/kernel/kcsan/selftest.c
->> +++ b/kernel/kcsan/selftest.c
->> @@ -46,7 +46,7 @@ static bool __init test_encode_decode(void)
->>  		unsigned long addr;
->>  		size_t verif_size;
->>
->> -		prandom_bytes(&addr, sizeof(addr));
->> +		get_random_bytes(&addr, sizeof(addr));
->>  		if (addr < PAGE_SIZE)
->>  			addr = PAGE_SIZE;
->>
->> diff --git a/lib/random32.c b/lib/random32.c
->> index d4f19e1a69d4..32060b852668 100644
->> --- a/lib/random32.c
->> +++ b/lib/random32.c
->> @@ -69,7 +69,7 @@ EXPORT_SYMBOL(prandom_u32_state);
->>   *	@bytes: the requested number of bytes
->>   *
->>   *	This is used for pseudo-randomness with no outside seeding.
->> - *	For more random results, use prandom_bytes().
->> + *	For more random results, use get_random_bytes().
->>   */
->>  void prandom_bytes_state(struct rnd_state *state, void *buf, size_t
->> bytes)
->>  {
->> diff --git a/lib/test_objagg.c b/lib/test_objagg.c
->> index da137939a410..c0c957c50635 100644
->> --- a/lib/test_objagg.c
->> +++ b/lib/test_objagg.c
->> @@ -157,7 +157,7 @@ static int test_nodelta_obj_get(struct world *world,
->> struct objagg *objagg,
->>  	int err;
->>
->>  	if (should_create_root)
->> -		prandom_bytes(world->next_root_buf,
->> +		get_random_bytes(world->next_root_buf,
->>  			      sizeof(world->next_root_buf));
->>
->>  	objagg_obj = world_obj_get(world, objagg, key_id);
->> diff --git a/lib/uuid.c b/lib/uuid.c
->> index 562d53977cab..e309b4c5be3d 100644
->> --- a/lib/uuid.c
->> +++ b/lib/uuid.c
->> @@ -52,7 +52,7 @@ EXPORT_SYMBOL(generate_random_guid);
->>
->>  static void __uuid_gen_common(__u8 b[16])
->>  {
->> -	prandom_bytes(b, 16);
->> +	get_random_bytes(b, 16);
->>  	/* reversion 0b10 */
->>  	b[8] = (b[8] & 0x3F) | 0x80;
->>  }
->> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
->> index 1a37a07c7163..cd1fa9f70f1a 100644
->> --- a/net/ipv4/route.c
->> +++ b/net/ipv4/route.c
->> @@ -3719,7 +3719,7 @@ int __init ip_rt_init(void)
->>
->>  	ip_idents = idents_hash;
->>
->> -	prandom_bytes(ip_idents, (ip_idents_mask + 1) * sizeof(*ip_idents));
->> +	get_random_bytes(ip_idents, (ip_idents_mask + 1) * sizeof(*ip_idents));
->>
->>  	ip_tstamps = idents_hash + (ip_idents_mask + 1) * sizeof(*ip_idents);
->>
->> diff --git a/net/mac80211/rc80211_minstrel_ht.c
->> b/net/mac80211/rc80211_minstrel_ht.c
->> index 5f27e6746762..39fb4e2d141a 100644
->> --- a/net/mac80211/rc80211_minstrel_ht.c
->> +++ b/net/mac80211/rc80211_minstrel_ht.c
->> @@ -2033,7 +2033,7 @@ static void __init init_sample_table(void)
->>
->>  	memset(sample_table, 0xff, sizeof(sample_table));
->>  	for (col = 0; col < SAMPLE_COLUMNS; col++) {
->> -		prandom_bytes(rnd, sizeof(rnd));
->> +		get_random_bytes(rnd, sizeof(rnd));
->>  		for (i = 0; i < MCS_GROUP_RATES; i++) {
->>  			new_idx = (i + rnd[i]) % MCS_GROUP_RATES;
->>  			while (sample_table[col][new_idx] != 0xff)
->> diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
->> index 5a457ff61acd..66b2b23e8cd1 100644
->> --- a/net/sched/sch_pie.c
->> +++ b/net/sched/sch_pie.c
->> @@ -72,7 +72,7 @@ bool pie_drop_early(struct Qdisc *sch, struct pie_params
->> *params,
->>  	if (vars->accu_prob >= (MAX_PROB / 2) * 17)
->>  		return true;
->>
->> -	prandom_bytes(&rnd, 8);
->> +	get_random_bytes(&rnd, 8);
->>  	if ((rnd >> BITS_PER_BYTE) < local_prob) {
->>  		vars->accu_prob = 0;
->>  		return true;
->
-> Are there cases where calling get_random_bytes() is not possible?
+Dear Corentin,
 
-Yes, but that has absolutely zero bearing whatsoever on this patch
-4/5, considering the code this generates is identical. If you have
-serious questions about contexts the rng can operate in, please start
-another thread, where you can flesh out that inquiry a but more.
+According to official document
 
-Jason
+(https://github.com/JeffyCN/rockchip_mirrors/blob/docs/Common/CRYPTO/Rockchip_Developer_Guide_Crypto_HWRNG_CN.pdf)
+
+Seems they have just updated downstream source to support more algorithms
+
+such as RSA. So it would be better to sync your code with downstream driver
+
+for more feature.
+
+Shengyu
+
