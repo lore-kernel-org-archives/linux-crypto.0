@@ -2,104 +2,242 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F9AC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 16:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD4CC43217
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 17:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbiJGQSL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 12:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
+        id S229602AbiJGRNK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 13:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbiJGQSK (ORCPT
+        with ESMTP id S229628AbiJGRNI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 12:18:10 -0400
-Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [212.27.42.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20820D7E3B
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 09:18:06 -0700 (PDT)
-Received: from mail.corsac.net (unknown [82.66.73.9])
-        by smtp2-g21.free.fr (Postfix) with ESMTPS id CB68C2003E0
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 18:18:03 +0200 (CEST)
-Received: from scapa.corsac.net (unknown [IPv6:2a01:e0a:2ff:c170:6af7:28ff:fe8d:2119])
-        by mail.corsac.net (Postfix) with ESMTPS id 9752498
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 18:17:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=corsac.net; s=2021;
-        t=1665159478; bh=EIm0pn66qhkBTaobK+hjbKVLCyGkpJraC17Do5PJF8Q=;
-        h=Subject:From:To:Cc:Date:From;
-        b=A8YhAlAUf3PdB72DlqQdHOObFpP2BCSg7TFolsxRA0iXWVAbaU7SR1MBqcQYgVi6w
-         pTERyOLopMznOq2cr/1Gc3MdSGg2A8flv5VVHyiLfTc15M6Gft4IrJRkqde1FF8AFd
-         nOWM+D+ouCAd7Vq9mS2LJuJxPHi7gAWiOLHgVOTZbXRa/MxuS5kfvJhQOZQRQRPpLp
-         bWhH7Y+SzL4+VPY+f1ia+GVBqSk+mV1gpn9v0OZsa1stLX4f5BAEQgNHOX9AM8TMf5
-         5/u4DSci/ebQNq9IgzniFXYGS25Qso+oDtToBeAy6rohDYrSq4uDkil7AJcJtR596P
-         hcOYKOuAc3KZQ==
-Received: from corsac (uid 1000)
-        (envelope-from corsac@corsac.net)
-        id a0180
-        by scapa.corsac.net (DragonFly Mail Agent v0.13);
-        Fri, 07 Oct 2022 18:17:58 +0200
-Message-ID: <a378dcbc2a7ccb0353beb23b69039117ecbe8114.camel@corsac.net>
-Subject: crypto_alg_lookup() returning -80 (ELIBBAD)
-From:   Yves-Alexis Perez <corsac@corsac.net>
-To:     linux-crypto@vger.kernel.org
-Cc:     Tobias Brunner <tobias@strongswan.org>
-Date:   Fri, 07 Oct 2022 18:17:53 +0200
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.44.4-1 
+        Fri, 7 Oct 2022 13:13:08 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5475AD77D8
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Oct 2022 10:12:45 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id h8-20020a17090a054800b00205ccbae31eso7748692pjf.5
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Oct 2022 10:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=r+ar3rF5Nifj4ZH0w5BLPJvorwhCPz9FpYPvkQg1fFY=;
+        b=lnyLGuYmjS75CgXIYPygwDolRfcdA6yOcav2EBBasADUNmB+X4q/LGyG3GplPLKF4D
+         kbVVCg/8bBMxcfD9rLKmUEYYLhbyeB5zPm6ZDbYMckDnSVVJGqQeX6zA9l/IbMFC0x6e
+         tEj8qeloPyDPz0HyArmtPjFAzjrVIlk8ES+6Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r+ar3rF5Nifj4ZH0w5BLPJvorwhCPz9FpYPvkQg1fFY=;
+        b=R5rpWFsK5UDTcLVKPEMNVfJ5qtNOxsMLJ50OM134aove3ao2fPxKH3cZHhu4xJk5DW
+         hukF9RhOEAkTuBmW3zOyawuDYBycdvWxuqk1lbJQtPX4daDwRL2FTm5VgKDSkF3Z6AR/
+         JqtWAuLg6E0SkTAjdhl/wLPF0p09yg62HZiHFFWj2aYW8d0HMbRZt/J9PTXETFKsuNmN
+         44iTZSiko/8LFnDPdCT9nGR0Pj35keMyXlRx1GmHIaAsbyfW5r/pzNGRPKdX2VQmKnjS
+         iAKiO7bFcnswqCHvaT/sByFiW2dtSwG/hDSDqjQmMTTTY7rQN4qZJRthxcJNct83NXuP
+         TMpw==
+X-Gm-Message-State: ACrzQf0oYq/OGaXDSS+5hHLnQE3Rfqt3ncMJVvcRuHeqTY9rIXzrPEZQ
+        xYZn05+iOf4hu4WhQeDVv8jB3A==
+X-Google-Smtp-Source: AMsMyM5FdSz2fuOhnh7+TfKkWyevTFzVNHatDVk0F2miilQc1NJEc103WmEytUatslzSlAWFEVnJrw==
+X-Received: by 2002:a17:902:f707:b0:17f:8541:c04b with SMTP id h7-20020a170902f70700b0017f8541c04bmr6026417plo.98.1665162764769;
+        Fri, 07 Oct 2022 10:12:44 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id q13-20020aa7842d000000b0056234327070sm1944049pfn.95.2022.10.07.10.12.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 10:12:43 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 10:12:42 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "patches@lists.linux.dev" <patches@lists.linux.dev>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>, Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v3 3/5] treewide: use get_random_u32() when possible
+Message-ID: <202210071010.52C672FA9@keescook>
+References: <20221006165346.73159-1-Jason@zx2c4.com>
+ <20221006165346.73159-4-Jason@zx2c4.com>
+ <848ed24c-13ef-6c38-fd13-639b33809194@csgroup.eu>
+ <CAHmME9raQ4E00r9r8NyWJ17iSXE_KniTG0onCNAfMmfcGar1eg@mail.gmail.com>
+ <f10fcfbf-2da6-cf2d-6027-fbf8b52803e9@csgroup.eu>
+ <6396875c-146a-acf5-dd9e-7f93ba1b4bc3@csgroup.eu>
+ <CAHmME9pE4saqnwxhsAwt-xegYGjsavPOGnHCbZhUXD7kaJ+GAA@mail.gmail.com>
+ <501b0fc3-6c67-657f-781e-25ee0283bc2e@csgroup.eu>
+ <Y0Ayvov/KQmrIwTS@zx2c4.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y0Ayvov/KQmrIwTS@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+On Fri, Oct 07, 2022 at 08:07:58AM -0600, Jason A. Donenfeld wrote:
+> On Fri, Oct 07, 2022 at 04:57:24AM +0000, Christophe Leroy wrote:
+> > 
+> > 
+> > Le 07/10/2022 à 01:36, Jason A. Donenfeld a écrit :
+> > > On 10/6/22, Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
+> > >>
+> > >>
+> > >> Le 06/10/2022 à 19:31, Christophe Leroy a écrit :
+> > >>>
+> > >>>
+> > >>> Le 06/10/2022 à 19:24, Jason A. Donenfeld a écrit :
+> > >>>> Hi Christophe,
+> > >>>>
+> > >>>> On Thu, Oct 6, 2022 at 11:21 AM Christophe Leroy
+> > >>>> <christophe.leroy@csgroup.eu> wrote:
+> > >>>>> Le 06/10/2022 à 18:53, Jason A. Donenfeld a écrit :
+> > >>>>>> The prandom_u32() function has been a deprecated inline wrapper around
+> > >>>>>> get_random_u32() for several releases now, and compiles down to the
+> > >>>>>> exact same code. Replace the deprecated wrapper with a direct call to
+> > >>>>>> the real function. The same also applies to get_random_int(), which is
+> > >>>>>> just a wrapper around get_random_u32().
+> > >>>>>>
+> > >>>>>> Reviewed-by: Kees Cook <keescook@chromium.org>
+> > >>>>>> Acked-by: Toke Høiland-Jørgensen <toke@toke.dk> # for sch_cake
+> > >>>>>> Acked-by: Chuck Lever <chuck.lever@oracle.com> # for nfsd
+> > >>>>>> Reviewed-by: Jan Kara <jack@suse.cz> # for ext4
+> > >>>>>> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > >>>>>> ---
+> > >>>>>
+> > >>>>>> diff --git a/arch/powerpc/kernel/process.c
+> > >>>>>> b/arch/powerpc/kernel/process.c
+> > >>>>>> index 0fbda89cd1bb..9c4c15afbbe8 100644
+> > >>>>>> --- a/arch/powerpc/kernel/process.c
+> > >>>>>> +++ b/arch/powerpc/kernel/process.c
+> > >>>>>> @@ -2308,6 +2308,6 @@ void notrace __ppc64_runlatch_off(void)
+> > >>>>>>     unsigned long arch_align_stack(unsigned long sp)
+> > >>>>>>     {
+> > >>>>>>         if (!(current->personality & ADDR_NO_RANDOMIZE) &&
+> > >>>>>> randomize_va_space)
+> > >>>>>> -             sp -= get_random_int() & ~PAGE_MASK;
+> > >>>>>> +             sp -= get_random_u32() & ~PAGE_MASK;
+> > >>>>>>         return sp & ~0xf;
+> > >>>>>
+> > >>>>> Isn't that a candidate for prandom_u32_max() ?
+> > >>>>>
+> > >>>>> Note that sp is deemed to be 16 bytes aligned at all time.
+> > >>>>
+> > >>>> Yes, probably. It seemed non-trivial to think about, so I didn't. But
+> > >>>> let's see here... maybe it's not too bad:
+> > >>>>
+> > >>>> If PAGE_MASK is always ~(PAGE_SIZE-1), then ~PAGE_MASK is
+> > >>>> (PAGE_SIZE-1), so prandom_u32_max(PAGE_SIZE) should yield the same
+> > >>>> thing? Is that accurate? And holds across platforms (this comes up a
+> > >>>> few places)? If so, I'll do that for a v4.
+> > >>>>
+> > >>>
+> > >>> On powerpc it is always (from arch/powerpc/include/asm/page.h) :
+> > >>>
+> > >>> /*
+> > >>>    * Subtle: (1 << PAGE_SHIFT) is an int, not an unsigned long. So if we
+> > >>>    * assign PAGE_MASK to a larger type it gets extended the way we want
+> > >>>    * (i.e. with 1s in the high bits)
+> > >>>    */
+> > >>> #define PAGE_MASK      (~((1 << PAGE_SHIFT) - 1))
+> > >>>
+> > >>> #define PAGE_SIZE        (1UL << PAGE_SHIFT)
+> > >>>
+> > >>>
+> > >>> So it would work I guess.
+> > >>
+> > >> But taking into account that sp must remain 16 bytes aligned, would it
+> > >> be better to do something like ?
+> > >>
+> > >> 	sp -= prandom_u32_max(PAGE_SIZE >> 4) << 4;
+> > >>
+> > >> 	return sp;
+> > > 
+> > > Does this assume that sp is already aligned at the beginning of the
+> > > function? I'd assume from the function's name that this isn't the
+> > > case?
+> > 
+> > Ah you are right, I overlooked it.
+> 
+> So I think to stay on the safe side, I'm going to go with
+> `prandom_u32_max(PAGE_SIZE)`. Sound good?
 
-Hi list,
+Given these kinds of less mechanical changes, it may make sense to split
+these from the "trivial" conversions in a treewide patch. The chance of
+needing a revert from the simple 1:1 conversions is much lower than the
+need to revert by-hand changes.
 
-since some time (and I'm unsure exactly when) my strongSwan IKE/IPsec setup=
- at
-home doesn't work anymore, with charon reporting
-(https://pastebin.com/7tThD1B5):
+The Cocci script I suggested in my v1 review gets 80% of the first
+patch, for example.
 
-received netlink error: Accessing a corrupted shared library (80)
-
-This is on a Debian Bullseye machine running Debian kernel 5.10.140-1 (5.10=
-.0-
-18-amd64).
-
-With some help from Tobias Brunner (from strongSwan project) I tried to deb=
-ug
-the issue (I was already fairly certain it was a local issue because if the
-standard Debian kernel started misbehaving like that we would have a whole =
-lot
-more reports everywhere. Removing strongSwan from the equation, I tried to
-inject directly an xfrm state with ip (the parameter are a bit bogus but I
-don't think it matters at that point):
-
-ip xfrm state add src 10.0.0.1 dst 10.0.0.2 proto esp spi 123456 sel src
-10.0.0.3 dst 10.0.0.4 enc aes 0xabcdefabcdef
-RTNETLINK answers: Accessing a corrupted shared library
-
-I tried on a different Debian box and the output is:
-
-ip xfrm state add src 10.0.0.1 dst 10.0.0.2 proto esp spi 123456 sel src
-10.0.0.3 dst 10.0.0.4 enc aes  0xaabbccddee
-RTNETLINK answers: Invalid argument
-
-So there's definitely something fishy in my kernel and I'm unsure why.
-
-Would anyone have a clue about what is happening here, and any idea how to
-debug further?
-
-Regards,
-- --=20
-Yves-Alexis
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8vi34Qgfo83x35gF3rYcyPpXRFsFAmNAUTEACgkQ3rYcyPpX
-RFtDUAf/Vu0Ls/bNtEXp1JoxmJucztLoUBGZyaLs1fnxig5TzlLAohOF2OjV1ykh
-U3m4fCRqM5JThpLLyISoch4PNBRnjMaR58l/fnvpeEgI7TmBXwJiA4IiVQuvfos/
-jxrlp8tAQUvJCm1Se8NGeolBTi0a+SngHig+mW0ix4jde1NKOWdVJ6MZPQgcSIM9
-eI8Rdvska6RToQ6VsyscjhjdM6HS6sk7/2me3CF4ezcn3atAJwTANMwLv1Y4CS0x
-UeT/HVdWCqPptYUDgyLhcF6OC49wjQ79zTfZcQOGYHJTNh9Q3rXXsLqICYsRaTiU
-SXzhPZzOaALKeTfY1jXw0LAFfSwdnQ=3D=3D
-=3Dkv2/
------END PGP SIGNATURE-----
+-- 
+Kees Cook
