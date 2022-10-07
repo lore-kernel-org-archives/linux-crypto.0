@@ -2,123 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33374C43219
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 09:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 404CEC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 09:27:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbiJGJ0O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 05:26:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
+        id S229776AbiJGJ1n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 05:27:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiJGJ0M (ORCPT
+        with ESMTP id S229924AbiJGJ11 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 05:26:12 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B844F2513;
-        Fri,  7 Oct 2022 02:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665134771; x=1696670771;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YIsvu8HuZoKfT0WBNxjXL2VasbVdSxWppe8Gs3rIq6U=;
-  b=lgV+Escms5zyViBvmedV3BHNjjb3FjjYj3Vz3SzYv4k0JXq+4hjSlm7Z
-   r4wxpTH0Ri9xpOMDvtHwj7d93ePr3ndqye1fjavDVQQ+SETk4itjJWcSm
-   wa8rwMZIT/8eJXO8VmESYry5dyAie8TXc4x4yNV3pM5aWwoQPO3bkgpkS
-   5FwlBOd0Tn2PaEuo4c362qsQW98fTFbIC1/XD4vUU2g+dv369hvJQlOyO
-   kia5cm/CgIT7PszSeLeDt+YUCfvMLXWgB9lh/d1JZONjtIsUmsVYuIlsY
-   aADoUXeW7RL6U688rIGXycyhSIPVhJPCvgocB1YG8oOBtTC77bqJsmGC+
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="302414297"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="302414297"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 02:26:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="658277156"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="658277156"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga001.jf.intel.com with ESMTP; 07 Oct 2022 02:26:03 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-        id 6645E17E; Fri,  7 Oct 2022 12:26:23 +0300 (EEST)
-Date:   Fri, 7 Oct 2022 12:26:23 +0300
-From:   Mika Westerberg <mika.westerberg@linux.intel.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph B??hmwalder <christoph.boehmwalder@linbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        Toke H??iland-J??rgensen <toke@toke.dk>,
-        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v3 3/5] treewide: use get_random_u32() when possible
-Message-ID: <Yz/wv0sqBR+J+jy+@black.fi.intel.com>
-References: <20221006165346.73159-1-Jason@zx2c4.com>
- <20221006165346.73159-4-Jason@zx2c4.com>
+        Fri, 7 Oct 2022 05:27:27 -0400
+Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386E7120BEA;
+        Fri,  7 Oct 2022 02:27:23 -0700 (PDT)
+Received: by mail-vk1-xa36.google.com with SMTP id e5so1977169vkg.6;
+        Fri, 07 Oct 2022 02:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EBvzhpA1ilBmSuclZNbt7jPWQVvqovwgFUoNfbc62WE=;
+        b=CcT7uFsYbZXoKkJXSE5fuJ4vzMiUduzUSOOXuPNBi5GgkjCt50hukC36ZcQBZDlRnJ
+         npmFFFR+q4ljsNjsZIAhA9n1a8wUTPfPXjxdJ81FaQK5EmFVypqXAYH7Pn1SWU4e/w5V
+         v3oHO+AocG/3Au4/pa+3ZJpCRvBiHEhW8PcTKwyV3t77fl2ntXUY6Tc8stVMHXy9ut6k
+         0mS+43cYyEbrVIDSCPedvWVnEz7kPgR3S/X1XB3TdqTL6y700WtCG0JXx4i1maKaR5CV
+         C+YkDz+YKX1gyMxzQLO5AOt0Yhi8u+U0blrKQ1nOYInxVWJUouxhKaCDFtnh5mZH5bZb
+         4cYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EBvzhpA1ilBmSuclZNbt7jPWQVvqovwgFUoNfbc62WE=;
+        b=ZA2QOIYrNP5RFcUsEw1/pBtY2x4yXjxn+bYO8aATors9O5LbmbLQYkZHJ2HN/3jCno
+         xQdcY8DDNvDTpPJkNbxoI6MO7Dd5s8/5P2ASM5W1+9K0bkr/kV/4Rd3dEswdYHxUS9fI
+         lGSnO/OE/sVhHAizaz982DIp+fDrzu9PRQyABp1xwe+rwNXrz8KFfFKe1SPHcPZvPDvT
+         +Fvn81fKmg0PCtX37K6I9b1iiNarzodXi8OdDdvTPP0Vo4dgysmJ/LjvDmY9Ym2UocIV
+         zrtRTdNvqWihU9fcu44eQq2AcZa/qrlYqaLhbsdvk08mn7mbjr9ekvf9vwEzDBoLVuyL
+         4EUA==
+X-Gm-Message-State: ACrzQf3vFtgpcY2fUF9OvaGjvuGTMixDc7onrTK7xozilsuniGljr9VZ
+        YoYckvBgC89UmIFr94hHOFR9om/t1lLFYC0jU5CbVEjk
+X-Google-Smtp-Source: AMsMyM6ieDg7cDTYsWkX+0GWd0kWRE9/AcBS0rAj0X/Qk7lOCdEzmR7P76ksqlcCb+1NF99/eqDMyMvqAQQd4bezydA=
+X-Received: by 2002:a1f:9cc5:0:b0:3a2:bd20:8fc6 with SMTP id
+ f188-20020a1f9cc5000000b003a2bd208fc6mr2142380vke.22.1665134841729; Fri, 07
+ Oct 2022 02:27:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221006165346.73159-4-Jason@zx2c4.com>
+References: <CAK6vGwma1mALwE1zDUqXhGP+YHjtXdPipykui3Tt0a6NL_KOqw@mail.gmail.com>
+ <2DC5A71F-F7B7-401B-954E-6A0656BDC6A9@oracle.com>
+In-Reply-To: <2DC5A71F-F7B7-401B-954E-6A0656BDC6A9@oracle.com>
+From:   jaganmohan kanakala <jaganmohan.kanakala@gmail.com>
+Date:   Fri, 7 Oct 2022 14:57:10 +0530
+Message-ID: <CAK6vGwkWCAnKd_rCQm1_vX67o29nXUOYmbSZ8E=VNe--wKgcOQ@mail.gmail.com>
+Subject: Re: LINUX NFS support for SHA256 hash types
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 10:53:44AM -0600, Jason A. Donenfeld wrote:
->  drivers/thunderbolt/xdomain.c                  |  2 +-
+Hi Chuck,
 
-Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+Many thanks for your confirmation. It helped me a lot.
+
+BR,
+Jaganmohan K
+
+On Thu, 29 Sept 2022 at 21:48, Chuck Lever III <chuck.lever@oracle.com> wrote:
+>
+>
+>
+> > On Sep 28, 2022, at 8:04 AM, jaganmohan kanakala <jaganmohan.kanakala@gmail.com> wrote:
+> >
+> > Hi Linux-NFS team,
+> >
+> > I'm trying to set up the Kerberos5 setup with MIT as the KDC on my
+> > RHEL 8 machines.
+> > I'm able to get the setup working with Kerberos encryption types where
+> > the hash type is SHA1 (aes128-cts-hmac-sha1-96 and
+> > aes256-cts-hmac-sha1-96).
+> >
+> > As SHA1 is kind of obsolete, my goal is to get my setup working for
+> > SHA256 hash types (aes128-cts-hmac-sha256-128,
+> > aes256-cts-hmac-sha384-192).
+> >
+> > I tried that. The communication between the Linux client and MIT KDC
+> > is aes128-cts-hmac-sha256-128, but the communication between the Linux
+> > client and Linux NFS server is only aes256-cts-hmac-sha1-96.
+> >
+> > When I checked the Linux upstream code I see that there is no support
+> > for SHA256 (and above) hash types.
+> >
+> > https://github.com/torvalds/linux/blob/5bfc75d92efd494db37f5c4c173d3639d4772966/net/sunrpc/auth_gss/gss_krb5_mech.c
+> >
+> > Have I looked at the right source code?
+> > Does the latest Linux NFS server has support for kerberos encryption
+> > types aes128-cts-hmac-sha256-128, aes256-cts-hmac-sha384-192 ?
+> >
+> > Can anyone confirm?
+>
+> As far as I know, the Linux in-kernel SunRPC RPCSEC GSS implementation
+> does not support the new encryption types defined in RFC 8009. That
+> means neither the in-kernel client or server support these types at
+> this time.
+>
+> I'm not aware of plans to implement support for these. Cc'ing the
+> crypto mailing list to see if others are considering it.
+>
+>
+> --
+> Chuck Lever
+>
+>
+>
