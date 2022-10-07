@@ -2,433 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E26FC41535
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 18:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD962C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 20:24:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229945AbiJGSEA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 14:04:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33106 "EHLO
+        id S230102AbiJGUYK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 16:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiJGSDJ (ORCPT
+        with ESMTP id S229459AbiJGUYJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 14:03:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184BD108DEE;
-        Fri,  7 Oct 2022 11:02:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6E103B821F5;
-        Fri,  7 Oct 2022 18:02:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27EFDC433D6;
-        Fri,  7 Oct 2022 18:02:04 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PmMb1PAn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665165723;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yjWHeA/Gl9LnO2t3qTWiPef5h/0YtShOrNIMnseFojM=;
-        b=PmMb1PAntQObNQ/lzC9xGXWAWq9X4asK7PZDX/1unNuSXRvp4iFFHq850rto8PDLMgZcxh
-        dTMhNHN2Ot7VyvX7xk17++/TQ7qCKaWwxQyszpMgcXMy5XCb5m1MumWAe9XZRIHkp0H/rX
-        z09MvGonBdBWvRgC/IAmtje2gJ3lPmQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e9827c9f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 7 Oct 2022 18:02:03 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org
-Subject: [PATCH v4 5/6] treewide: use get_random_bytes when possible
-Date:   Fri,  7 Oct 2022 12:01:06 -0600
-Message-Id: <20221007180107.216067-6-Jason@zx2c4.com>
-In-Reply-To: <20221007180107.216067-1-Jason@zx2c4.com>
-References: <20221007180107.216067-1-Jason@zx2c4.com>
+        Fri, 7 Oct 2022 16:24:09 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2042.outbound.protection.outlook.com [40.107.94.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7B7103D9A;
+        Fri,  7 Oct 2022 13:24:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T2QUQ66ZoQ0fmRtLv7k6q9UQ8gyD7Nlm2o5Xh00ma0B1Tw/6zkVIx7P2dTe9YXM8IC1mqYhcWWOM8+hxQYn3wHJBSHAvgnZfRGSEYaTnhmC+fkL/HXr/fT9/2syu1l8sRTfru3GgjkIMNUrcLGR4ymBU3aiuZaftTcvmVwOluV/zrU2LiRMkU3tEsV2IPdpdqnqyPsJlu5a3beW/Xq8JXBDqaB8vaFhFa0DTHgvPMKnLOjOOiyDhqnlLxaZf9VMw15MAlD5gx1Kelex0DW69hktSzdurWIuiwRugdVKiAbKXPX9ulFsqeMd5CMr7znE0HevNmfj0esedANgk5DAMUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ISOMExvuCJ2p2bBun7RGjp/SW/5GhHfpg+TvsuQsaxo=;
+ b=KvxIqPWBsS+dXHcVNq8mQY9QGTsWv8bbWOtjkxtkJeDo4jFiBR26FJfk4KpjPu6CxKF1fjoYJbCZ3H94bN/i68wktHwiROaz1Ifr7hXECgNLUODz8QSJGWCuhPRQBGE3RsBl0rstvvHDytivY9PXSg1Fo19E38KTlvLnou6YlcyuvCE5Q8vm/axGZ1XLtPKqW+KMDcazeyd03yFduU3BjaKvn+k2JOnD0sqACCf/OlZ6s8G4C3GYwTiwG7J1zI/scKq0mgzXEQky55BNyFwvb2bxa+ZfMZ2hnS6ZmO604jh8qviarVNbeKmCeBRHxIpAeVlZtBnEVL7lchDau4VaHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ISOMExvuCJ2p2bBun7RGjp/SW/5GhHfpg+TvsuQsaxo=;
+ b=5ZjG4CHhyTvcF+2RpUkzth2v1+Fl4L8GCARWBVMPymh7EtxkEaKgAaS875rJJqheS0qeQcFlFYXNcIGZHvmJn+XABHHtGe2elif3BgLCVKWlQQRRaONb+TII7shVN4p/0Gnr9meCrCv8GmIyFQ8JabG46n2Z/s15jVGR61xmKoE=
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by BL1PR12MB5825.namprd12.prod.outlook.com (2603:10b6:208:394::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Fri, 7 Oct
+ 2022 20:24:07 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::76ec:6acf:dd4d:76a3]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::76ec:6acf:dd4d:76a3%9]) with mapi id 15.20.5676.030; Fri, 7 Oct 2022
+ 20:24:07 +0000
+From:   "Limonciello, Mario" <Mario.Limonciello@amd.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Allen, John" <John.Allen@amd.com>
+Subject: RE: [PATCH] crypto: ccp: Add support for TEE for PCI ID 0x14CA
+Thread-Topic: [PATCH] crypto: ccp: Add support for TEE for PCI ID 0x14CA
+Thread-Index: AQHY02p0eBeAgQpQKUasEaFL5KUsXK4Dbg9Q
+Date:   Fri, 7 Oct 2022 20:24:06 +0000
+Message-ID: <MN0PR12MB61017C926551A7F6D908F6ADE25F9@MN0PR12MB6101.namprd12.prod.outlook.com>
+References: <20220928184506.13981-1-mario.limonciello@amd.com>
+In-Reply-To: <20220928184506.13981-1-mario.limonciello@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Enabled=true;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_SetDate=2022-10-07T20:22:05Z;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Method=Privileged;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_Name=Public-AIP 2.0;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_ActionId=16898a47-f234-442a-b391-e470c042d299;
+ MSIP_Label_d4243a53-6221-4f75-8154-e4b33a5707a1_ContentBits=1
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_enabled: true
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_setdate: 2022-10-07T20:24:04Z
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_method: Privileged
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_name: Public-AIP 2.0
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_actionid: c216383b-3a6d-4a6a-9773-7008ccf80e33
+msip_label_d4243a53-6221-4f75-8154-e4b33a5707a1_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR12MB6101:EE_|BL1PR12MB5825:EE_
+x-ms-office365-filtering-correlation-id: 27123ebd-f9cb-4724-cd76-08daa8a1e280
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Sdr8GNeP6zCBXkN4qnfVBxOX8mrH+e8Jm4j8DUkUdsOtabAzZM3u91SK5DtXT519HBuznXgT466evyNPpvocpHY8WRzsicEGKVm1GyrwstV9Y6R5XHBg8vHq21DVmujCh9Gl6cqMbH57JB24Iwhw/jCQjLap3TLrGREuwE5Ba5fBesOwKGuuk1L7kvpF8muNtEM9vDhsJtzepuKmGE4W3mgA9HCcly+aMuaCBHUuEAmbWSKsHwczzH20BMI5nsBxrPQYcRONNpEHFROEBoRwk01yh2HL6yLmduR7hbr0xMJnI2f6hMJMeV2Kg5WG/4Lg3Iv8pD/BHgIjXX5gX/x7sRic8aefThMFl+gUly5zyxgFMpp03atxo8wqA2N6d1OoLADGJO2Zj7oVPs4pllGCM5OMgh0LwVsKN1PWsYhFWFWc1Zl/4MB/MNDTusghwWr/gbwWpsoWx6pA4jsre9QtZdJjGlOhvfLLlC6S88pLglUio8uuPmsis/UO0wX6CJcvlU3WwYxbv6YwFnNGsWScjdVxf90qa+DHnrM1qJfl1yI+wqCmaLUNNC2SjEkQggbk8PJTWWhgIygoKNJZ32qdi4jkqWAxaDCE5ygBbP4GxxMc0jI8jKJH+UwljOwIokQudRtMlNeKcMFBEdYjr9IpWwoCnjHsR6Cjk6OjzpQhTy9AEUHerf3oMQcqlN/5a0VpMkoc8fs4eG+em52Zl7MezVuLiULaXFt3/niBc+TqY39daFz8zBGBz+N4FzHj9/nX62lHhXOSnY0IKtE7DGqHCQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(376002)(346002)(136003)(366004)(451199015)(8936002)(71200400001)(52536014)(9686003)(186003)(2906002)(83380400001)(7696005)(6916009)(6506007)(26005)(66556008)(55016003)(53546011)(64756008)(41300700001)(4326008)(316002)(54906003)(8676002)(66476007)(66446008)(76116006)(478600001)(5660300002)(66946007)(38070700005)(33656002)(86362001)(122000001)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tqhXivAUp0kLRdeEgb95OQWR/3wewdzvmmdhuabDjXDBQkTyXB06wbmwRLqE?=
+ =?us-ascii?Q?gy53rRxnXKl3QMnGRcJfDw/pdsW74haSTIdvJ8zUo7nVoGldhwDO0GVuFOtj?=
+ =?us-ascii?Q?Uqw+YoElg3Ynl//TveubFMIkAPCfyP4gtKFqrh4wesaF8D3lx67tmNZgAC4x?=
+ =?us-ascii?Q?Nsu4IvYdVzOngtjZHbYMjaVJxKM3krtSniezwuwMVZ+4iRXh1cW1xswc1sQ1?=
+ =?us-ascii?Q?f8AV3y3+ITOcvOop6dD8EwdUm/x/Q1GTJAs9/QJw4Q5WWcrkyiAvdP7axTLn?=
+ =?us-ascii?Q?Lav+V1yzxh5Fo7Q04LeIxysEdlnHB6N8E+XR2FO7XCe3TrZ+v1GzNdybtk9l?=
+ =?us-ascii?Q?SnXwL2dkKMNjQWJKnvwr4it13kigafWMr65rO7PdOS8iWpomHBZ3Iwl0ksV9?=
+ =?us-ascii?Q?JyxS44Aayl2xEufM8UwtRFH1REyfmGrxibMD6lEnbAFAZvctooEpvwA7eZEX?=
+ =?us-ascii?Q?dv8hSXwcKEgX0LZtI8cFmPOqAjP/UNOS23swAdd1Wis81X4hFhoM+8fUdvSk?=
+ =?us-ascii?Q?qhv/xqvyOJrC7rEnseQlqgET/q4Jkg5m6MDCjA8HA0QBb6SHD4TY17gKE1ZK?=
+ =?us-ascii?Q?6pnUgy8UF81NthnnpFabLNaR9e9nq7tkzAuUt+8DyCHLVE25dmm7bUrJ3hKj?=
+ =?us-ascii?Q?K4ylJzf963adUu39q0mrC8J1gncmu3wd8BX91Zi1pIKM0oQKYcEbLvlKR2Hn?=
+ =?us-ascii?Q?kTLwaZeZq+lqFOz5EAvTHKWnSg89qlNxnB0qrjypWZSLsAKpdmyvploG55tp?=
+ =?us-ascii?Q?4yOaRgxZxFS3T2ROCR5qZmwI069Gb1F8PGXoptGYhmB5sWcyBSzlfbm4FiNt?=
+ =?us-ascii?Q?IgiT0ui+Hy6pbEp/rQJsrumYRTDVp5YMX6KcxejRcvtcQq4cT7vXilI1Sh4k?=
+ =?us-ascii?Q?0DbpHK+S3EJYKk2ZmQ4QTlzE1pTaFSYrovyeZgQsKqq08CCo4snZck8VjixQ?=
+ =?us-ascii?Q?aRvRZ762L/cupLr9Tl8x37Mr365OD2O0pAo5rhOaXQ3c5/Fnh3MVZ9m8qMmH?=
+ =?us-ascii?Q?3hspjN/WR9gGUkI9c4KPxnrC/ZYnJz3ZDexm//gqIgL3NG54JrqZwVls+mvY?=
+ =?us-ascii?Q?3HY7FijnWmRfJNNvZU1P9pPt2TGcNIO4iT1DCO73hQhTx0Gx+bWIJtlOlT30?=
+ =?us-ascii?Q?2l2AfLNhue8UOn++ZpqABb+nNVnbWtQTQMlIipv94rKD2LkBHBX1oOM+5gyJ?=
+ =?us-ascii?Q?cD/mDxP9+GasOuQEyxkB5+siP3KHA/ZvABf0zeKyrCD0dOqaRRrT4+fqUB3N?=
+ =?us-ascii?Q?PTD2zerfefbMd34vnSMPRGdc8Hjj+VffTeqkgfNUmaZcPXCpy/gh8DLRgaad?=
+ =?us-ascii?Q?3EToLPuOFrAdGp1nAC+Um8CE0EA2sKOpCIObJUpFvC5xpYIYicUOIgKdr2Tn?=
+ =?us-ascii?Q?50pLoYoY/iU6mKH+7gv11R43Wxabp5PhbpH/wVHeM7bJMFDukoXVdzRQxUlv?=
+ =?us-ascii?Q?bZT2e2qCtxU1WdjUeDuuzN0J5QfEyu03aDgMPUcX2dNn+ZcdPFgbfcUQTYSz?=
+ =?us-ascii?Q?8F65fKLK7Y63Pne20akXjTJmc17eaRhGWxH0/TJRhsvYrRBkNW5LkoURAYTH?=
+ =?us-ascii?Q?jv/hJ+QeppqMeOmPAhc=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27123ebd-f9cb-4724-cd76-08daa8a1e280
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2022 20:24:06.9014
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l8WsBSLTeTHPDZ0PHFZwea9GmU1YG2/oRm/2l6Iq27nmQW9Cr+SbMQiLDYJr7VdRAWhoNNj3jYbEuINejwa5sQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5825
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The prandom_bytes() function has been a deprecated inline wrapper around
-get_random_bytes() for several releases now, and compiles down to the
-exact same code. Replace the deprecated wrapper with a direct call to
-the real function.
+[Public]
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu> # powerpc
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/powerpc/crypto/crc-vpmsum_test.c       |  2 +-
- block/blk-crypto-fallback.c                 |  2 +-
- crypto/async_tx/raid6test.c                 |  2 +-
- drivers/dma/dmatest.c                       |  2 +-
- drivers/mtd/nand/raw/nandsim.c              |  2 +-
- drivers/mtd/tests/mtd_nandecctest.c         |  2 +-
- drivers/mtd/tests/speedtest.c               |  2 +-
- drivers/mtd/tests/stresstest.c              |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c   |  2 +-
- drivers/net/ethernet/rocker/rocker_main.c   |  2 +-
- drivers/net/wireguard/selftest/allowedips.c | 12 ++++++------
- fs/ubifs/debug.c                            |  2 +-
- kernel/kcsan/selftest.c                     |  2 +-
- lib/random32.c                              |  2 +-
- lib/test_objagg.c                           |  2 +-
- lib/uuid.c                                  |  2 +-
- net/ipv4/route.c                            |  2 +-
- net/mac80211/rc80211_minstrel_ht.c          |  2 +-
- net/sched/sch_pie.c                         |  2 +-
- 19 files changed, 24 insertions(+), 24 deletions(-)
+> -----Original Message-----
+> From: Limonciello, Mario <Mario.Limonciello@amd.com>
+> Sent: Wednesday, September 28, 2022 13:45
+> To: Limonciello, Mario <Mario.Limonciello@amd.com>; Lendacky, Thomas
+> <Thomas.Lendacky@amd.com>; Allen, John <John.Allen@amd.com>
+> Cc: stable@vger.kernel.org; Thomas, Rijo-john <Rijo-
+> john.Thomas@amd.com>; Herbert Xu <herbert@gondor.apana.org.au>;
+> David S. Miller <davem@davemloft.net>; linux-crypto@vger.kernel.org;
+> linux-kernel@vger.kernel.org
+> Subject: [PATCH] crypto: ccp: Add support for TEE for PCI ID 0x14CA
+>=20
+> SoCs containing 0x14CA are present both in datacenter parts that
+> support SEV as well as client parts that support TEE.
+>=20
+> Cc: stable@vger.kernel.org # 5.15+
+> Tested-by: Rijo-john Thomas <Rijo-john.Thomas@amd.com>
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> ---
+>  drivers/crypto/ccp/sp-pci.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+> index 792d6da7f0c0..084d052fddcc 100644
+> --- a/drivers/crypto/ccp/sp-pci.c
+> +++ b/drivers/crypto/ccp/sp-pci.c
+> @@ -381,6 +381,15 @@ static const struct psp_vdata pspv3 =3D {
+>  	.inten_reg		=3D 0x10690,
+>  	.intsts_reg		=3D 0x10694,
+>  };
+> +
+> +static const struct psp_vdata pspv4 =3D {
+> +	.sev			=3D &sevv2,
+> +	.tee			=3D &teev1,
+> +	.feature_reg		=3D 0x109fc,
+> +	.inten_reg		=3D 0x10690,
+> +	.intsts_reg		=3D 0x10694,
+> +};
+> +
+>  #endif
+>=20
+>  static const struct sp_dev_vdata dev_vdata[] =3D {
+> @@ -426,7 +435,7 @@ static const struct sp_dev_vdata dev_vdata[] =3D {
+>  	{	/* 5 */
+>  		.bar =3D 2,
+>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+> -		.psp_vdata =3D &pspv2,
+> +		.psp_vdata =3D &pspv4,
+>  #endif
+>  	},
+>  	{	/* 6 */
+> --
+> 2.34.1
 
-diff --git a/arch/powerpc/crypto/crc-vpmsum_test.c b/arch/powerpc/crypto/crc-vpmsum_test.c
-index c1c1ef9457fb..273c527868db 100644
---- a/arch/powerpc/crypto/crc-vpmsum_test.c
-+++ b/arch/powerpc/crypto/crc-vpmsum_test.c
-@@ -82,7 +82,7 @@ static int __init crc_test_init(void)
- 
- 			if (len <= offset)
- 				continue;
--			prandom_bytes(data, len);
-+			get_random_bytes(data, len);
- 			len -= offset;
- 
- 			crypto_shash_update(crct10dif_shash, data+offset, len);
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 621abd1b0e4d..ad9844c5b40c 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -539,7 +539,7 @@ static int blk_crypto_fallback_init(void)
- 	if (blk_crypto_fallback_inited)
- 		return 0;
- 
--	prandom_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
-+	get_random_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
- 
- 	err = bioset_init(&crypto_bio_split, 64, 0, 0);
- 	if (err)
-diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
-index c9d218e53bcb..f74505f2baf0 100644
---- a/crypto/async_tx/raid6test.c
-+++ b/crypto/async_tx/raid6test.c
-@@ -37,7 +37,7 @@ static void makedata(int disks)
- 	int i;
- 
- 	for (i = 0; i < disks; i++) {
--		prandom_bytes(page_address(data[i]), PAGE_SIZE);
-+		get_random_bytes(page_address(data[i]), PAGE_SIZE);
- 		dataptrs[i] = data[i];
- 		dataoffs[i] = 0;
- 	}
-diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
-index 9fe2ae794316..ffe621695e47 100644
---- a/drivers/dma/dmatest.c
-+++ b/drivers/dma/dmatest.c
-@@ -312,7 +312,7 @@ static unsigned long dmatest_random(void)
- {
- 	unsigned long buf;
- 
--	prandom_bytes(&buf, sizeof(buf));
-+	get_random_bytes(&buf, sizeof(buf));
- 	return buf;
- }
- 
-diff --git a/drivers/mtd/nand/raw/nandsim.c b/drivers/mtd/nand/raw/nandsim.c
-index 4bdaf4aa7007..c941a5a41ea6 100644
---- a/drivers/mtd/nand/raw/nandsim.c
-+++ b/drivers/mtd/nand/raw/nandsim.c
-@@ -1393,7 +1393,7 @@ static int ns_do_read_error(struct nandsim *ns, int num)
- 	unsigned int page_no = ns->regs.row;
- 
- 	if (ns_read_error(page_no)) {
--		prandom_bytes(ns->buf.byte, num);
-+		get_random_bytes(ns->buf.byte, num);
- 		NS_WARN("simulating read error in page %u\n", page_no);
- 		return 1;
- 	}
-diff --git a/drivers/mtd/tests/mtd_nandecctest.c b/drivers/mtd/tests/mtd_nandecctest.c
-index 1c7201b0f372..440988562cfd 100644
---- a/drivers/mtd/tests/mtd_nandecctest.c
-+++ b/drivers/mtd/tests/mtd_nandecctest.c
-@@ -266,7 +266,7 @@ static int nand_ecc_test_run(const size_t size)
- 		goto error;
- 	}
- 
--	prandom_bytes(correct_data, size);
-+	get_random_bytes(correct_data, size);
- 	ecc_sw_hamming_calculate(correct_data, size, correct_ecc, sm_order);
- 	for (i = 0; i < ARRAY_SIZE(nand_ecc_test); i++) {
- 		nand_ecc_test[i].prepare(error_data, error_ecc,
-diff --git a/drivers/mtd/tests/speedtest.c b/drivers/mtd/tests/speedtest.c
-index c9ec7086bfa1..075bce32caa5 100644
---- a/drivers/mtd/tests/speedtest.c
-+++ b/drivers/mtd/tests/speedtest.c
-@@ -223,7 +223,7 @@ static int __init mtd_speedtest_init(void)
- 	if (!iobuf)
- 		goto out;
- 
--	prandom_bytes(iobuf, mtd->erasesize);
-+	get_random_bytes(iobuf, mtd->erasesize);
- 
- 	bbt = kzalloc(ebcnt, GFP_KERNEL);
- 	if (!bbt)
-diff --git a/drivers/mtd/tests/stresstest.c b/drivers/mtd/tests/stresstest.c
-index d2faaca7f19d..75b6ddc5dc4d 100644
---- a/drivers/mtd/tests/stresstest.c
-+++ b/drivers/mtd/tests/stresstest.c
-@@ -183,7 +183,7 @@ static int __init mtd_stresstest_init(void)
- 		goto out;
- 	for (i = 0; i < ebcnt; i++)
- 		offsets[i] = mtd->erasesize;
--	prandom_bytes(writebuf, bufsize);
-+	get_random_bytes(writebuf, bufsize);
- 
- 	bbt = kzalloc(ebcnt, GFP_KERNEL);
- 	if (!bbt)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 96da0ba3d507..354953df46a1 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3874,7 +3874,7 @@ static void bnxt_init_vnics(struct bnxt *bp)
- 
- 		if (bp->vnic_info[i].rss_hash_key) {
- 			if (i == 0)
--				prandom_bytes(vnic->rss_hash_key,
-+				get_random_bytes(vnic->rss_hash_key,
- 					      HW_HASH_KEY_SIZE);
- 			else
- 				memcpy(vnic->rss_hash_key,
-diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
-index 8c3bbafabb07..cd4488efe0a4 100644
---- a/drivers/net/ethernet/rocker/rocker_main.c
-+++ b/drivers/net/ethernet/rocker/rocker_main.c
-@@ -224,7 +224,7 @@ static int rocker_dma_test_offset(const struct rocker *rocker,
- 	if (err)
- 		goto unmap;
- 
--	prandom_bytes(buf, ROCKER_TEST_DMA_BUF_SIZE);
-+	get_random_bytes(buf, ROCKER_TEST_DMA_BUF_SIZE);
- 	for (i = 0; i < ROCKER_TEST_DMA_BUF_SIZE; i++)
- 		expect[i] = ~buf[i];
- 	err = rocker_dma_test_one(rocker, wait, ROCKER_TEST_DMA_CTRL_INVERT,
-diff --git a/drivers/net/wireguard/selftest/allowedips.c b/drivers/net/wireguard/selftest/allowedips.c
-index dd897c0740a2..19eac00b2381 100644
---- a/drivers/net/wireguard/selftest/allowedips.c
-+++ b/drivers/net/wireguard/selftest/allowedips.c
-@@ -284,7 +284,7 @@ static __init bool randomized_test(void)
- 	mutex_lock(&mutex);
- 
- 	for (i = 0; i < NUM_RAND_ROUTES; ++i) {
--		prandom_bytes(ip, 4);
-+		get_random_bytes(ip, 4);
- 		cidr = prandom_u32_max(32) + 1;
- 		peer = peers[prandom_u32_max(NUM_PEERS)];
- 		if (wg_allowedips_insert_v4(&t, (struct in_addr *)ip, cidr,
-@@ -299,7 +299,7 @@ static __init bool randomized_test(void)
- 		}
- 		for (j = 0; j < NUM_MUTATED_ROUTES; ++j) {
- 			memcpy(mutated, ip, 4);
--			prandom_bytes(mutate_mask, 4);
-+			get_random_bytes(mutate_mask, 4);
- 			mutate_amount = prandom_u32_max(32);
- 			for (k = 0; k < mutate_amount / 8; ++k)
- 				mutate_mask[k] = 0xff;
-@@ -328,7 +328,7 @@ static __init bool randomized_test(void)
- 	}
- 
- 	for (i = 0; i < NUM_RAND_ROUTES; ++i) {
--		prandom_bytes(ip, 16);
-+		get_random_bytes(ip, 16);
- 		cidr = prandom_u32_max(128) + 1;
- 		peer = peers[prandom_u32_max(NUM_PEERS)];
- 		if (wg_allowedips_insert_v6(&t, (struct in6_addr *)ip, cidr,
-@@ -343,7 +343,7 @@ static __init bool randomized_test(void)
- 		}
- 		for (j = 0; j < NUM_MUTATED_ROUTES; ++j) {
- 			memcpy(mutated, ip, 16);
--			prandom_bytes(mutate_mask, 16);
-+			get_random_bytes(mutate_mask, 16);
- 			mutate_amount = prandom_u32_max(128);
- 			for (k = 0; k < mutate_amount / 8; ++k)
- 				mutate_mask[k] = 0xff;
-@@ -381,13 +381,13 @@ static __init bool randomized_test(void)
- 
- 	for (j = 0;; ++j) {
- 		for (i = 0; i < NUM_QUERIES; ++i) {
--			prandom_bytes(ip, 4);
-+			get_random_bytes(ip, 4);
- 			if (lookup(t.root4, 32, ip) != horrible_allowedips_lookup_v4(&h, (struct in_addr *)ip)) {
- 				horrible_allowedips_lookup_v4(&h, (struct in_addr *)ip);
- 				pr_err("allowedips random v4 self-test: FAIL\n");
- 				goto free;
- 			}
--			prandom_bytes(ip, 16);
-+			get_random_bytes(ip, 16);
- 			if (lookup(t.root6, 128, ip) != horrible_allowedips_lookup_v6(&h, (struct in6_addr *)ip)) {
- 				pr_err("allowedips random v6 self-test: FAIL\n");
- 				goto free;
-diff --git a/fs/ubifs/debug.c b/fs/ubifs/debug.c
-index f4d3b568aa64..3f128b9fdfbb 100644
---- a/fs/ubifs/debug.c
-+++ b/fs/ubifs/debug.c
-@@ -2581,7 +2581,7 @@ static int corrupt_data(const struct ubifs_info *c, const void *buf,
- 	if (ffs)
- 		memset(p + from, 0xFF, to - from);
- 	else
--		prandom_bytes(p + from, to - from);
-+		get_random_bytes(p + from, to - from);
- 
- 	return to;
- }
-diff --git a/kernel/kcsan/selftest.c b/kernel/kcsan/selftest.c
-index 58b94deae5c0..00cdf8fa5693 100644
---- a/kernel/kcsan/selftest.c
-+++ b/kernel/kcsan/selftest.c
-@@ -46,7 +46,7 @@ static bool __init test_encode_decode(void)
- 		unsigned long addr;
- 		size_t verif_size;
- 
--		prandom_bytes(&addr, sizeof(addr));
-+		get_random_bytes(&addr, sizeof(addr));
- 		if (addr < PAGE_SIZE)
- 			addr = PAGE_SIZE;
- 
-diff --git a/lib/random32.c b/lib/random32.c
-index d4f19e1a69d4..32060b852668 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -69,7 +69,7 @@ EXPORT_SYMBOL(prandom_u32_state);
-  *	@bytes: the requested number of bytes
-  *
-  *	This is used for pseudo-randomness with no outside seeding.
-- *	For more random results, use prandom_bytes().
-+ *	For more random results, use get_random_bytes().
-  */
- void prandom_bytes_state(struct rnd_state *state, void *buf, size_t bytes)
- {
-diff --git a/lib/test_objagg.c b/lib/test_objagg.c
-index da137939a410..c0c957c50635 100644
---- a/lib/test_objagg.c
-+++ b/lib/test_objagg.c
-@@ -157,7 +157,7 @@ static int test_nodelta_obj_get(struct world *world, struct objagg *objagg,
- 	int err;
- 
- 	if (should_create_root)
--		prandom_bytes(world->next_root_buf,
-+		get_random_bytes(world->next_root_buf,
- 			      sizeof(world->next_root_buf));
- 
- 	objagg_obj = world_obj_get(world, objagg, key_id);
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 562d53977cab..e309b4c5be3d 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -52,7 +52,7 @@ EXPORT_SYMBOL(generate_random_guid);
- 
- static void __uuid_gen_common(__u8 b[16])
- {
--	prandom_bytes(b, 16);
-+	get_random_bytes(b, 16);
- 	/* reversion 0b10 */
- 	b[8] = (b[8] & 0x3F) | 0x80;
- }
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 1a37a07c7163..cd1fa9f70f1a 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -3719,7 +3719,7 @@ int __init ip_rt_init(void)
- 
- 	ip_idents = idents_hash;
- 
--	prandom_bytes(ip_idents, (ip_idents_mask + 1) * sizeof(*ip_idents));
-+	get_random_bytes(ip_idents, (ip_idents_mask + 1) * sizeof(*ip_idents));
- 
- 	ip_tstamps = idents_hash + (ip_idents_mask + 1) * sizeof(*ip_idents);
- 
-diff --git a/net/mac80211/rc80211_minstrel_ht.c b/net/mac80211/rc80211_minstrel_ht.c
-index 5f27e6746762..39fb4e2d141a 100644
---- a/net/mac80211/rc80211_minstrel_ht.c
-+++ b/net/mac80211/rc80211_minstrel_ht.c
-@@ -2033,7 +2033,7 @@ static void __init init_sample_table(void)
- 
- 	memset(sample_table, 0xff, sizeof(sample_table));
- 	for (col = 0; col < SAMPLE_COLUMNS; col++) {
--		prandom_bytes(rnd, sizeof(rnd));
-+		get_random_bytes(rnd, sizeof(rnd));
- 		for (i = 0; i < MCS_GROUP_RATES; i++) {
- 			new_idx = (i + rnd[i]) % MCS_GROUP_RATES;
- 			while (sample_table[col][new_idx] != 0xff)
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index 5a457ff61acd..66b2b23e8cd1 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -72,7 +72,7 @@ bool pie_drop_early(struct Qdisc *sch, struct pie_params *params,
- 	if (vars->accu_prob >= (MAX_PROB / 2) * 17)
- 		return true;
- 
--	prandom_bytes(&rnd, 8);
-+	get_random_bytes(&rnd, 8);
- 	if ((rnd >> BITS_PER_BYTE) < local_prob) {
- 		vars->accu_prob = 0;
- 		return true;
--- 
-2.37.3
+Herbert,
 
+I noticed you sent out the 6.1 PR already.  So I Just wanted to make sure t=
+his
+didn't get overlooked as it's already got a T-b/A-b.
+
+Thanks!
