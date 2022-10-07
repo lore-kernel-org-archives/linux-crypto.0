@@ -2,118 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404CEC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 09:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F33BC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 14:01:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbiJGJ1n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 05:27:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60074 "EHLO
+        id S229561AbiJGOBc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 10:01:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbiJGJ11 (ORCPT
+        with ESMTP id S229508AbiJGOBc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 05:27:27 -0400
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386E7120BEA;
-        Fri,  7 Oct 2022 02:27:23 -0700 (PDT)
-Received: by mail-vk1-xa36.google.com with SMTP id e5so1977169vkg.6;
-        Fri, 07 Oct 2022 02:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EBvzhpA1ilBmSuclZNbt7jPWQVvqovwgFUoNfbc62WE=;
-        b=CcT7uFsYbZXoKkJXSE5fuJ4vzMiUduzUSOOXuPNBi5GgkjCt50hukC36ZcQBZDlRnJ
-         npmFFFR+q4ljsNjsZIAhA9n1a8wUTPfPXjxdJ81FaQK5EmFVypqXAYH7Pn1SWU4e/w5V
-         v3oHO+AocG/3Au4/pa+3ZJpCRvBiHEhW8PcTKwyV3t77fl2ntXUY6Tc8stVMHXy9ut6k
-         0mS+43cYyEbrVIDSCPedvWVnEz7kPgR3S/X1XB3TdqTL6y700WtCG0JXx4i1maKaR5CV
-         C+YkDz+YKX1gyMxzQLO5AOt0Yhi8u+U0blrKQ1nOYInxVWJUouxhKaCDFtnh5mZH5bZb
-         4cYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EBvzhpA1ilBmSuclZNbt7jPWQVvqovwgFUoNfbc62WE=;
-        b=ZA2QOIYrNP5RFcUsEw1/pBtY2x4yXjxn+bYO8aATors9O5LbmbLQYkZHJ2HN/3jCno
-         xQdcY8DDNvDTpPJkNbxoI6MO7Dd5s8/5P2ASM5W1+9K0bkr/kV/4Rd3dEswdYHxUS9fI
-         lGSnO/OE/sVhHAizaz982DIp+fDrzu9PRQyABp1xwe+rwNXrz8KFfFKe1SPHcPZvPDvT
-         +Fvn81fKmg0PCtX37K6I9b1iiNarzodXi8OdDdvTPP0Vo4dgysmJ/LjvDmY9Ym2UocIV
-         zrtRTdNvqWihU9fcu44eQq2AcZa/qrlYqaLhbsdvk08mn7mbjr9ekvf9vwEzDBoLVuyL
-         4EUA==
-X-Gm-Message-State: ACrzQf3vFtgpcY2fUF9OvaGjvuGTMixDc7onrTK7xozilsuniGljr9VZ
-        YoYckvBgC89UmIFr94hHOFR9om/t1lLFYC0jU5CbVEjk
-X-Google-Smtp-Source: AMsMyM6ieDg7cDTYsWkX+0GWd0kWRE9/AcBS0rAj0X/Qk7lOCdEzmR7P76ksqlcCb+1NF99/eqDMyMvqAQQd4bezydA=
-X-Received: by 2002:a1f:9cc5:0:b0:3a2:bd20:8fc6 with SMTP id
- f188-20020a1f9cc5000000b003a2bd208fc6mr2142380vke.22.1665134841729; Fri, 07
- Oct 2022 02:27:21 -0700 (PDT)
+        Fri, 7 Oct 2022 10:01:32 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8A746863;
+        Fri,  7 Oct 2022 07:01:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 42CF9B82368;
+        Fri,  7 Oct 2022 14:01:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44117C433C1;
+        Fri,  7 Oct 2022 14:01:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eMCVtSIA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665151283;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gc+CTi0hqBE3lv4NHtn9VPsuSbCsIec3x1VhFKhhbrM=;
+        b=eMCVtSIAFSVzWvb99HpdTXgmU0BBpUkV95Gs9m2hWOhSiO03vj/K0wS3A0qjE65faEY4w3
+        SOm5LT6ctH/uviYCmYsc1Fagrc3RKmUY4eUsErD8BhzNz/YJ9wIthFNa2V2k+NBp83FEsm
+        MxBpYBslAxVsUjdJVFrjmpcSq8fPfw0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 49238bd1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Fri, 7 Oct 2022 14:01:23 +0000 (UTC)
+Date:   Fri, 7 Oct 2022 08:01:20 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        tglx@linutronix.de
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sultan Alsawaf <sultan@kerneltoast.com>
+Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
+Message-ID: <Y0AxMObsOLfqEjLt@zx2c4.com>
+References: <20220930231050.749824-1-Jason@zx2c4.com>
+ <20220930231050.749824-2-Jason@zx2c4.com>
+ <YzgGmh6EQtWzO4HV@zx2c4.com>
+ <Yz2+UsgVGRSm+o7W@linutronix.de>
+ <Yz3yQzaNUcdIuUMX@zx2c4.com>
+ <Yz55w4gNtZn8JzmG@linutronix.de>
+ <Yz7JXEaTFWa1VLKJ@zx2c4.com>
 MIME-Version: 1.0
-References: <CAK6vGwma1mALwE1zDUqXhGP+YHjtXdPipykui3Tt0a6NL_KOqw@mail.gmail.com>
- <2DC5A71F-F7B7-401B-954E-6A0656BDC6A9@oracle.com>
-In-Reply-To: <2DC5A71F-F7B7-401B-954E-6A0656BDC6A9@oracle.com>
-From:   jaganmohan kanakala <jaganmohan.kanakala@gmail.com>
-Date:   Fri, 7 Oct 2022 14:57:10 +0530
-Message-ID: <CAK6vGwkWCAnKd_rCQm1_vX67o29nXUOYmbSZ8E=VNe--wKgcOQ@mail.gmail.com>
-Subject: Re: LINUX NFS support for SHA256 hash types
-To:     Chuck Lever III <chuck.lever@oracle.com>
-Cc:     Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Yz7JXEaTFWa1VLKJ@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Chuck,
+On Thu, Oct 06, 2022 at 06:26:04AM -0600, Jason A. Donenfeld wrote:
+> On Thu, Oct 06, 2022 at 08:46:27AM +0200, Sebastian Andrzej Siewior wrote:
+> > On 2022-10-05 23:08:19 [+0200], Jason A. Donenfeld wrote:
+> > > Hi Sebastian,
+> > Hi Jason,
+> > 
+> > > On Wed, Oct 05, 2022 at 07:26:42PM +0200, Sebastian Andrzej Siewior wrote:
+> > > > That del_timer_sync() at the end is what you want. If the timer is
+> > > > pending (as in enqueued in the timer wheel) then it will be removed
+> > > > before it is invoked. If the timer's callback is invoked then it will
+> > > > spin until the callback is done.
+> > > 
+> > > del_timer_sync() is not guaranteed to succeed with add_timer_on() being
+> > > used in conjunction with timer_pending() though. That's why I've
+> > > abandoned this.
+> > 
+> > But why? The timer is added to a timer-base on a different CPU. Should
+> > work.
+> 
+> So it's easier to talk about, I'll number a few lines:
+> 
+>  1 while (conditions) {
+>  2     if (!timer_pending(&stack.timer))
+>  3         add_timer_on(&stack.timer, some_next_cpu);
+>  4 }
+>  5 del_timer_sync(&stack.timer);
+> 
+> 
+> Then, steps to cause UaF:
+> 
+> a) add_timer_on() on line 3 is called from CPU 1 and pends the timer on
+>    CPU 2.
+> 
+> b) Just before the timer callback runs, not after, timer_pending() is
+>    made false, so the condition on line 2 holds true again.
+> 
+> c) add_timer_on() on line 3 is called from CPU 1 and pends the timer on
+>    CPU 3.
+> 
+> d) The conditions on line 1 are made false, and the loop breaks.
+> 
+> e) del_timer_sync() on line 5 is called, and its `base->running_timer !=
+>    timer` check is false, because of step (c).
+> 
+> f) `stack.timer` gets freed / goes out of scope.
+> 
+> g) The callback scheduled from step (b) runs, and we have a UaF.
 
-Many thanks for your confirmation. It helped me a lot.
+Here's a reproducer of this flow, which prints out:
 
-BR,
-Jaganmohan K
+    [    4.157610] wireguard: Stack on cpu 1 is corrupt
 
-On Thu, 29 Sept 2022 at 21:48, Chuck Lever III <chuck.lever@oracle.com> wrote:
->
->
->
-> > On Sep 28, 2022, at 8:04 AM, jaganmohan kanakala <jaganmohan.kanakala@gmail.com> wrote:
-> >
-> > Hi Linux-NFS team,
-> >
-> > I'm trying to set up the Kerberos5 setup with MIT as the KDC on my
-> > RHEL 8 machines.
-> > I'm able to get the setup working with Kerberos encryption types where
-> > the hash type is SHA1 (aes128-cts-hmac-sha1-96 and
-> > aes256-cts-hmac-sha1-96).
-> >
-> > As SHA1 is kind of obsolete, my goal is to get my setup working for
-> > SHA256 hash types (aes128-cts-hmac-sha256-128,
-> > aes256-cts-hmac-sha384-192).
-> >
-> > I tried that. The communication between the Linux client and MIT KDC
-> > is aes128-cts-hmac-sha256-128, but the communication between the Linux
-> > client and Linux NFS server is only aes256-cts-hmac-sha1-96.
-> >
-> > When I checked the Linux upstream code I see that there is no support
-> > for SHA256 (and above) hash types.
-> >
-> > https://github.com/torvalds/linux/blob/5bfc75d92efd494db37f5c4c173d3639d4772966/net/sunrpc/auth_gss/gss_krb5_mech.c
-> >
-> > Have I looked at the right source code?
-> > Does the latest Linux NFS server has support for kerberos encryption
-> > types aes128-cts-hmac-sha256-128, aes256-cts-hmac-sha384-192 ?
-> >
-> > Can anyone confirm?
->
-> As far as I know, the Linux in-kernel SunRPC RPCSEC GSS implementation
-> does not support the new encryption types defined in RFC 8009. That
-> means neither the in-kernel client or server support these types at
-> this time.
->
-> I'm not aware of plans to implement support for these. Cc'ing the
-> crypto mailing list to see if others are considering it.
->
->
-> --
-> Chuck Lever
->
->
->
+diff --git a/drivers/net/wireguard/main.c b/drivers/net/wireguard/main.c
+index ee4da9ab8013..5c61f49918f2 100644
+--- a/drivers/net/wireguard/main.c
++++ b/drivers/net/wireguard/main.c
+@@ -17,10 +17,40 @@
+ #include <linux/genetlink.h>
+ #include <net/rtnetlink.h>
+
++struct state {
++	struct timer_list timer;
++	char valid[8];
++};
++
++static void fire(struct timer_list *timer)
++{
++	struct state *stack = container_of(timer, struct state, timer);
++	mdelay(1000);
++	pr_err("Stack on cpu %d is %s\n", raw_smp_processor_id(), stack->valid);
++}
++
++static void do_the_thing(struct work_struct *work)
++{
++	struct state stack = { .valid = "valid" };
++	timer_setup_on_stack(&stack.timer, fire, 0);
++	stack.timer.expires = jiffies;
++	add_timer_on(&stack.timer, 1);
++	while (timer_pending(&stack.timer))
++		cpu_relax();
++	stack.timer.expires = jiffies;
++	add_timer_on(&stack.timer, 2);
++	del_timer_sync(&stack.timer);
++	memcpy(&stack.valid, "corrupt", 8);
++}
++
++static DECLARE_DELAYED_WORK(reproducer, do_the_thing);
++
+ static int __init wg_mod_init(void)
+ {
+ 	int ret;
+
++	schedule_delayed_work_on(0, &reproducer, HZ * 3);
++
+ 	ret = wg_allowedips_slab_init();
+ 	if (ret < 0)
+ 		goto err_allowedips;
+
