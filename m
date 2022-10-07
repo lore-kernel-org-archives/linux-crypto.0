@@ -2,73 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA2DC4321E
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 06:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857CCC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Oct 2022 07:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229790AbiJGG7k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Oct 2022 02:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41914 "EHLO
+        id S229890AbiJGH32 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Oct 2022 03:29:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiJGG7h (ORCPT
+        with ESMTP id S229672AbiJGH31 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Oct 2022 02:59:37 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F402FDB58;
-        Thu,  6 Oct 2022 23:59:31 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oghJT-00COYa-KE; Fri, 07 Oct 2022 17:58:28 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Oct 2022 14:58:27 +0800
-Date:   Fri, 7 Oct 2022 14:58:27 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc:     jarkko@kernel.org, a.fatoum@pengutronix.de, gilad@benyossef.com,
-        Jason@zx2c4.com, jejb@linux.ibm.com, zohar@linux.ibm.com,
-        dhowells@redhat.com, sumit.garg@linaro.org, david@sigma-star.at,
-        michael@walle.cc, john.ernberg@actia.se, jmorris@namei.org,
-        serge@hallyn.com, davem@davemloft.net, j.luebbe@pengutronix.de,
-        ebiggers@kernel.org, richard@nod.at, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, sahil.malhotra@nxp.com,
-        kshitiz.varshney@nxp.com, horia.geanta@nxp.com, V.Sethi@nxp.com
-Subject: Re: [PATCH v0 3/8] crypto: hbk flags & info added to the tfm
-Message-ID: <Yz/OEwDtyTm+VH0p@gondor.apana.org.au>
-References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
- <20221006130837.17587-4-pankaj.gupta@nxp.com>
+        Fri, 7 Oct 2022 03:29:27 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB99A8CC5;
+        Fri,  7 Oct 2022 00:29:26 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 09:29:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1665127764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lm+zJyR+J0G7xaOdlpm9edaU2VI7rEYfISYTe41x2PI=;
+        b=1+2khprDTIdzHGT8gt5NhRut+zyzZ8CxhkV/oPv1dk8sj+Vpvf1NpGTbi3vStdqKfJNyC2
+        H6I25/mr3cEs/pVduMdjjGX6P9xCHCu9slxeyI330aXwozBAsawDeZXwf3puTOOvSRfTeB
+        AdnjgkQibDQLCveE5/FN9ai3SxCimFq+pcHvUdGNqJFquccW0CE2ijMh+qxgIaSvm6D/QB
+        K6cW+coCp+zD28NjSprpOdGoCJI/Uf7pFwxoBH/uB1tq4jLleSaVG/JswoI2AtizwMqnuh
+        ttAn3hrwDeDAjFBynQyfaDMh7q47owBSMA9Hc9LS8d7EOsWXl6RhQbiGmCxwAg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1665127764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lm+zJyR+J0G7xaOdlpm9edaU2VI7rEYfISYTe41x2PI=;
+        b=VYPDss3M7TloK6FZDiEAotco6oYekfafspRvFm0VQJ98qrcYv7Q4TxpNt0kbx76i7zUrXP
+        RLxZ9QcIG9GZpyAA==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Sultan Alsawaf <sultan@kerneltoast.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH 2/2] random: spread out jitter callback to different CPUs
+Message-ID: <Yz/VU/FhdgspxFdh@linutronix.de>
+References: <20220930231050.749824-1-Jason@zx2c4.com>
+ <20220930231050.749824-2-Jason@zx2c4.com>
+ <YzgGmh6EQtWzO4HV@zx2c4.com>
+ <Yz2+UsgVGRSm+o7W@linutronix.de>
+ <Yz3yQzaNUcdIuUMX@zx2c4.com>
+ <Yz55w4gNtZn8JzmG@linutronix.de>
+ <Yz7JXEaTFWa1VLKJ@zx2c4.com>
+ <Yz7M5zJmzKSk/LYH@linutronix.de>
+ <Yz8E0lSmsMMB6KeO@sultan-box.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221006130837.17587-4-pankaj.gupta@nxp.com>
+In-Reply-To: <Yz8E0lSmsMMB6KeO@sultan-box.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 06:38:32PM +0530, Pankaj Gupta wrote:
-> Consumer of the kernel crypto api, after allocating
-> the transformation (tfm), sets the:
-> - flag 'is_hbk'
-> - structure 'struct hw_bound_key_info hbk_info'
-> based on the type of key, the consumer is using.
-> 
-> This helps:
-> 
-> - This helps to influence the core processing logic
->   for the encapsulated algorithm.
-> - This flag is set by the consumer after allocating
->   the tfm and before calling the function crypto_xxx_setkey().
-> 
-> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-> ---
->  include/linux/crypto.h | 5 +++++
->  1 file changed, 5 insertions(+)
+On 2022-10-06 09:39:46 [-0700], Sultan Alsawaf wrote:
+> Hi Sebastian,
+Hi Sultan,
 
-Nack.  You still have not provided a convincing argument why
-this is necessary since there are plenty of existing drivers in
-the kernel already providing similar features.
+> But since a timer is marked as not-pending prior to when it runs, add_timer_on()
+> can't detect if the timer is actively running; the above BUG_ON() won't be
+> tripped. So the UaF scenario I forsee is that doing this:
+>     add_timer_on(timer, 0);
+>     // timer is actively running on CPU0, timer is no longer pending
+>     add_timer_on(timer, 1); // changes timer base, won't wait for timer to stop
+>     del_timer_sync(timer); // only checks CPU1 timer base for the running timer
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+/me taking notes.
+
+> Sultan
+
+Sebastian
