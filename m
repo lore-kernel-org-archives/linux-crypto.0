@@ -2,114 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE27EC43217
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Oct 2022 15:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F94C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Oct 2022 16:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbiJHPhi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Oct 2022 11:37:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56922 "EHLO
+        id S229886AbiJHQyA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 8 Oct 2022 12:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiJHPhh (ORCPT
+        with ESMTP id S229894AbiJHQx7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Oct 2022 11:37:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6310B3F1EE;
-        Sat,  8 Oct 2022 08:37:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B0D2C60A0F;
-        Sat,  8 Oct 2022 15:37:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6325DC433D6;
-        Sat,  8 Oct 2022 15:37:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1665243455;
-        bh=iZs4LS2c78mWTK7VP9rYv0Gd7Qjrrk7FRFLOtLI7jIE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lpPo/FwsRx8A1pEIFq0YgzBE1yJUA/ftclR7pjjmkm3BCTs9ykaCaGipjTgZ2RrqF
-         G0/1Rl4a9+kU2ICW186Oe5J0xg7g1U3glZrfVWobe1UK+MUIqWbN273i1QVNGsmeQ9
-         ddRoAQjkMz3vc5+dmmxBpuMuIV8SZkRQZD25nr8M=
-Date:   Sat, 8 Oct 2022 17:38:15 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
+        Sat, 8 Oct 2022 12:53:59 -0400
+X-Greylist: delayed 479 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 08 Oct 2022 09:53:58 PDT
+Received: from mxout4.routing.net (mxout4.routing.net [IPv6:2a03:2900:1:a::9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8826C4316A
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Oct 2022 09:53:58 -0700 (PDT)
+Received: from mxbox2.masterlogin.de (unknown [192.168.10.89])
+        by mxout4.routing.net (Postfix) with ESMTP id CDE6E1008F7;
+        Sat,  8 Oct 2022 16:45:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+        s=20200217; t=1665247557;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ukf4dE615x0DESNVVTZIQKgBm7oCRLwwO/K4NDp2D4U=;
+        b=RGW/fnkVu099eEytt5RqUWDS3UiEsoxLt9uwoxVrN+7FkATC4gQCslUR3Hyiwhv+FNxbSc
+        0H9+ektC1+w/udzgxvx9wZJlGN4HOe1SG1ml5kjdU132rGAaf1evJ4Th8sgibOJL4aT1Wx
+        UfQBUZvuro6h4BYmiN6jTCsYsIS9U0I=
+Received: from frank-G5.. (fttx-pool-217.61.149.60.bambit.de [217.61.149.60])
+        by mxbox2.masterlogin.de (Postfix) with ESMTPSA id 1421710042C;
+        Sat,  8 Oct 2022 16:45:57 +0000 (UTC)
+From:   Frank Wunderlich <linux@fw-web.de>
+To:     linux-mediatek@lists.infradead.org
+Cc:     "Mingming.Su" <Mingming.Su@mediatek.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v5 0/7] treewide cleanup of random integer usage
-Message-ID: <Y0GZZ71Ugh9Ev99R@kroah.com>
-References: <20221008055359.286426-1-Jason@zx2c4.com>
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Frank Wunderlich <frank-w@public-files.de>
+Subject: [PATCH] hwrng: mediatek: add mt7986 support
+Date:   Sat,  8 Oct 2022 18:45:53 +0200
+Message-Id: <20221008164553.113260-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221008055359.286426-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+X-Mail-ID: 955c1372-43fb-49a3-a48a-2ecb07b1de5f
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 07, 2022 at 11:53:52PM -0600, Jason A. Donenfeld wrote:
-> Changes v4->v5:
-> - Coccinelle is now used for as much mechanical aspects as possible,
->   with mechanical parts split off from non-mechanical parts. This should
->   drastically reduce the amount of code that needs to be reviewed
->   carefully. Each commit mentions now if it was done by hand or is
->   mechanical.
+From: "Mingming.Su" <Mingming.Su@mediatek.com>
 
-All look good to me, thanks for the cleanups.
+1. Add trng compatible name for MT7986
+2. Fix mtk_rng_wait_ready() function
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Mingming.Su <Mingming.Su@mediatek.com>
+Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+---
+ drivers/char/hw_random/mtk-rng.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
+index 6c00ea008555..aa993753ab12 100644
+--- a/drivers/char/hw_random/mtk-rng.c
++++ b/drivers/char/hw_random/mtk-rng.c
+@@ -22,7 +22,7 @@
+ #define RNG_AUTOSUSPEND_TIMEOUT		100
+ 
+ #define USEC_POLL			2
+-#define TIMEOUT_POLL			20
++#define TIMEOUT_POLL			60
+ 
+ #define RNG_CTRL			0x00
+ #define RNG_EN				BIT(0)
+@@ -77,7 +77,7 @@ static bool mtk_rng_wait_ready(struct hwrng *rng, bool wait)
+ 		readl_poll_timeout_atomic(priv->base + RNG_CTRL, ready,
+ 					  ready & RNG_READY, USEC_POLL,
+ 					  TIMEOUT_POLL);
+-	return !!ready;
++	return !!(ready & RNG_READY);
+ }
+ 
+ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+@@ -179,6 +179,7 @@ static const struct dev_pm_ops mtk_rng_pm_ops = {
+ #endif	/* CONFIG_PM */
+ 
+ static const struct of_device_id mtk_rng_match[] = {
++	{ .compatible = "mediatek,mt7986-rng" },
+ 	{ .compatible = "mediatek,mt7623-rng" },
+ 	{},
+ };
+-- 
+2.34.1
+
