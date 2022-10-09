@@ -2,133 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B174C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Oct 2022 12:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26855C43219
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Oct 2022 14:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbiJIMmu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Oct 2022 08:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60710 "EHLO
+        id S229937AbiJIOSL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 9 Oct 2022 10:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbiJIMmr (ORCPT
+        with ESMTP id S229854AbiJIOSJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Oct 2022 08:42:47 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D4D2E681;
-        Sun,  9 Oct 2022 05:42:46 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 78so8272570pgb.13;
-        Sun, 09 Oct 2022 05:42:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7OLqkk8/7TR7bcVpCw07PeB/AEHPG8uMPNz4yLkdUC0=;
-        b=D5Ct5XYeRJf8KqSlA79lx6ZoBHRS87zyEcdDZEzSz6LhBBNmx694oQfENUfLSJKK9r
-         rcGMHDbYfQpYnp0jaEicsbtv2ynsNhuyC/w778dGgfAAqFGEsC7ib2ORma0mew+1FvEm
-         ZlXUwsiLqVgeUCF54cvnl1IUkqqWi42wCWyc0OMxuO8WGx6vl/XnZRYiJop5C9Ltez9S
-         /HhCHRWjRj/IgEIjDtdeOW0p48AZp9/3xLfBzS8kOjllu6Gdo803OUVI9URo/Vo6bQx0
-         TIRsOLIf94KAaFjcjaxSvaZRUWoHE8le1QLQYtntJPFBjyufrtuvQm8vf17rrZzSx4N6
-         jsew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7OLqkk8/7TR7bcVpCw07PeB/AEHPG8uMPNz4yLkdUC0=;
-        b=sBcAdTKsvJVNSNzUQN02sMLFn/E0/X/5vEkkVj+TNQIO+mlWCpgDyTK+gPUCmUcuUv
-         UhrErIyxSGAVTX0phwbu3RkVuQ+U/HLHrGpCQdlqJYTBQJCLRcM8AHVjQWOP8RdLBRhK
-         Jz/VznYm2nDJXMZEeNskhRkeylNp88ZVa6LHrIZcLrl0TjCHsrd7BtnZxn0M0uEBI3OI
-         d254u+uR++TE22wom9OC5fVyoG6/WV35p3DEU9CZUA3ty6BetWOqDI9Tn9aoWRT7PjwR
-         C9ggzNmlR1pEe0exUWJEA90EDsNz1N/gFmcXDYUzC755An8M2IRlzi4Ubql7x6ckVkeO
-         VKnw==
-X-Gm-Message-State: ACrzQf0jEPhAyUXnowVWS1xpr+TiUDUT9ioZWSAaviJylzW8Rn4zp3YK
-        7hkxK763XuotEs+YJFu0ko8=
-X-Google-Smtp-Source: AMsMyM73OUboZjqeQR6HfjGWD4U6YNPZ3ecayau6gTg4ME2ViEYnV3zK8tJSYWjIa0MnHdRyKNfQDQ==
-X-Received: by 2002:a63:6909:0:b0:41c:9f4f:a63c with SMTP id e9-20020a636909000000b0041c9f4fa63cmr12958871pgc.76.1665319365996;
-        Sun, 09 Oct 2022 05:42:45 -0700 (PDT)
-Received: from debian.me (subs02-180-214-232-80.three.co.id. [180.214.232.80])
-        by smtp.gmail.com with ESMTPSA id p2-20020a170902a40200b001750792f20asm4643851plq.238.2022.10.09.05.42.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Oct 2022 05:42:45 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id E15061039BF; Sun,  9 Oct 2022 19:42:41 +0700 (WIB)
-Date:   Sun, 9 Oct 2022 19:42:41 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Jiangshan Yi <13667453960@163.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        giovanni.cabiddu@intel.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiangshan Yi <yijiangshan@kylinos.cn>,
-        k2ci <kernel-bot@kylinos.cn>
-Subject: Re: [PATCH] crypto: qat - fix spelling typo in comment
-Message-ID: <Y0LBwe4/K2hnchRC@debian.me>
-References: <20221009091519.3152948-1-13667453960@163.com>
+        Sun, 9 Oct 2022 10:18:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CF626ADE;
+        Sun,  9 Oct 2022 07:18:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A6EE7B80D2B;
+        Sun,  9 Oct 2022 14:18:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 659D2C433D6;
+        Sun,  9 Oct 2022 14:17:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YgHbN0I0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665325077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oirLAgHKzqbm2tDuRRRruxvBPFu6OuA1m1Bdo0JewVo=;
+        b=YgHbN0I0lUsk61F/tkacjTtELz9m0jTOee92icnhvNyHJrs9iBf1nxk5rIk4LCzkioh8sG
+        190YFxxX+8obr4IDytSpJV/y+LGJPtZT2kSp6+N5MRfHp0a/WJLUeHRU53NaAsEmu2d/gM
+        WcwjBCYWAwT/EnbHfbZZP/9zFIVJmUM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 76b4077f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sun, 9 Oct 2022 14:17:57 +0000 (UTC)
+Date:   Sun, 9 Oct 2022 08:17:41 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>, Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        loongarch@lists.linux.dev, netdev@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v5 0/7] treewide cleanup of random integer usage
+Message-ID: <Y0LYBaooZKDbL93G@zx2c4.com>
+References: <20221008055359.286426-1-Jason@zx2c4.com>
+ <202210082028.692DFA21@keescook>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FF6OHtQv1OVujNNT"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221009091519.3152948-1-13667453960@163.com>
+In-Reply-To: <202210082028.692DFA21@keescook>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sat, Oct 08, 2022 at 08:41:14PM -0700, Kees Cook wrote:
+> On Fri, Oct 07, 2022 at 11:53:52PM -0600, Jason A. Donenfeld wrote:
+> > This is a five part treewide cleanup of random integer handling. The
+> > rules for random integers are:
+> 
+> Reviewing the delta between of my .cocci rules and your v5, everything
+> matches, except for get_random_int() conversions for files not in
+> your tree:
+> [...]
+> So, I guess I mean to say that "prandom: remove unused functions" is
+> going to cause some pain. :) Perhaps don't push that to -next, and do a
+> final pass next merge window to catch any new stuff, and then send those
+> updates and the removal before -rc1 closes?
 
---FF6OHtQv1OVujNNT
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ooof. Actually I think what I'll do is include a suggested diff for the
+merge commit that fixes up the remaining two thankfully trivial cases.
 
-On Sun, Oct 09, 2022 at 05:15:19PM +0800, Jiangshan Yi wrote:
-> From: Jiangshan Yi <yijiangshan@kylinos.cn>
->=20
-> Fix spelling typo in comment.
->=20
-
-What comment are you referring? I have to see the actual diff below.
-
-Anyways, for similar typofixes patches, you need to describe what words
-you are correcting and where you do the fix.
-
-Also, if you send the patch from a different address than From: line
-in the patch, you need to have Signed-off-by for the sender address.
-
-> Reported-by: k2ci <kernel-bot@kylinos.cn>
-> Signed-off-by: Jiangshan Yi <yijiangshan@kylinos.cn>
-> ---
->  drivers/crypto/qat/qat_common/adf_transport_access_macros.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h =
-b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-> index 3b6b0267bbec..d3667dbd9826 100644
-> --- a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-> +++ b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-> @@ -37,7 +37,7 @@
->  #define ADF_SIZE_TO_RING_SIZE_IN_BYTES(SIZE) ((1 << (SIZE - 1)) << 7)
->  #define ADF_RING_SIZE_IN_BYTES_TO_SIZE(SIZE) ((1 << (SIZE - 1)) >> 7)
-> =20
-> -/* Minimum ring bufer size for memory allocation */
-> +/* Minimum ring buffer size for memory allocation */
->  #define ADF_RING_SIZE_BYTES_MIN(SIZE) \
->  	((SIZE < ADF_SIZE_TO_RING_SIZE_IN_BYTES(ADF_RING_SIZE_4K)) ? \
->  		ADF_SIZE_TO_RING_SIZE_IN_BYTES(ADF_RING_SIZE_4K) : SIZE)
-=20
-Oh, you refer to comment for ADF_RING_SIZE_BYTES_MIN() macro.
-The patch does s/bufer/buffer/.
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---FF6OHtQv1OVujNNT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY0LBuwAKCRD2uYlJVVFO
-o3aFAP9y3fTmuQN/W+GzjlLzAAHPgHIU2nnTRWW2oB5BrrZWhAD+OIqszJ8iFlg7
-GEHhezJNyBZOyYJCVvFXL9yOr3uWRwY=
-=MU34
------END PGP SIGNATURE-----
-
---FF6OHtQv1OVujNNT--
+Jason
