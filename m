@@ -2,78 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 911C5C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Oct 2022 09:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0C0C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Oct 2022 09:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229459AbiJIJQg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Oct 2022 05:16:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48996 "EHLO
+        id S229776AbiJIJxP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 9 Oct 2022 05:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbiJIJQf (ORCPT
+        with ESMTP id S229747AbiJIJxO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Oct 2022 05:16:35 -0400
-Received: from mail-m972.mail.163.com (mail-m972.mail.163.com [123.126.97.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 098D26547;
-        Sun,  9 Oct 2022 02:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Po3Gd
-        8OWRlXIk1kE/BKrCYk99pzyKqg0DCJzmRulfFc=; b=pAcMjdSfugwjp22HOwFWe
-        PKRJDXnbQ51+eCBje+XCwdtos1zp+gUWI3lXz4Wwet/Bt4YTcZnk726ImkjLhheN
-        5ZAI0VQPM19SRuVLZnu77KhBez+wJaxjmXLoHcyP8MX1fcxQV10q+ooWXDkat8mX
-        EBYmF3oKZj3KsBllyh0Rss=
-Received: from localhost.localdomain (unknown [116.128.244.169])
-        by smtp2 (Coremail) with SMTP id GtxpCgDXE9pBkUJj9IXCjw--.50958S2;
-        Sun, 09 Oct 2022 17:15:46 +0800 (CST)
-From:   Jiangshan Yi <13667453960@163.com>
+        Sun, 9 Oct 2022 05:53:14 -0400
+Received: from cmccmta2.chinamobile.com (cmccmta2.chinamobile.com [221.176.66.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C211825C5E
+        for <linux-crypto@vger.kernel.org>; Sun,  9 Oct 2022 02:53:10 -0700 (PDT)
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.83])
+        by rmmx-syy-dmz-app05-12005 (RichMail) with SMTP id 2ee563429a0447c-a7b4d;
+        Sun, 09 Oct 2022 17:53:08 +0800 (CST)
+X-RM-TRANSID: 2ee563429a0447c-a7b4d
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from localhost.localdomain (unknown[223.108.79.103])
+        by rmsmtp-syy-appsvrnew02-12027 (RichMail) with SMTP id 2efb634299f518f-345f5;
+        Sun, 09 Oct 2022 17:53:07 +0800 (CST)
+X-RM-TRANSID: 2efb634299f518f-345f5
+From:   jianchunfu <jianchunfu@cmss.chinamobile.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     giovanni.cabiddu@intel.com, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiangshan Yi <yijiangshan@kylinos.cn>,
-        k2ci <kernel-bot@kylinos.cn>
-Subject: [PATCH] crypto: qat - fix spelling typo in comment
-Date:   Sun,  9 Oct 2022 17:15:19 +0800
-Message-Id: <20221009091519.3152948-1-13667453960@163.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: GtxpCgDXE9pBkUJj9IXCjw--.50958S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrury7Jr47ZFy5JF4rCFWrGrg_yoWktrg_CF
-        48urZrWF1xGa1fArs09ayavr1Fv3s0yrW8uFn8W393C3sxJay8Kr93XF1DA347Cr4UJa1f
-        uanrK3W2yw4UtjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1U73JUUUUU==
-X-Originating-IP: [116.128.244.169]
-X-CM-SenderInfo: bprtllyxuvjmiwq6il2tof0z/1tbivgKV+1Zce8IfVQABsq
+Cc:     linux-crypto@vger.kernel.org,
+        jianchunfu <jianchunfu@cmss.chinamobile.com>
+Subject: [PATCH] crypto: talitos - Use the defined variable to clean code
+Date:   Sun,  9 Oct 2022 17:52:54 +0800
+Message-Id: <20221009095254.2406-1-jianchunfu@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.18.4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jiangshan Yi <yijiangshan@kylinos.cn>
+Use the defined variable "dev" to make the code cleaner.
 
-Fix spelling typo in comment.
-
-Reported-by: k2ci <kernel-bot@kylinos.cn>
-Signed-off-by: Jiangshan Yi <yijiangshan@kylinos.cn>
+Signed-off-by: jianchunfu <jianchunfu@cmss.chinamobile.com>
 ---
- drivers/crypto/qat/qat_common/adf_transport_access_macros.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/talitos.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-index 3b6b0267bbec..d3667dbd9826 100644
---- a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-+++ b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-@@ -37,7 +37,7 @@
- #define ADF_SIZE_TO_RING_SIZE_IN_BYTES(SIZE) ((1 << (SIZE - 1)) << 7)
- #define ADF_RING_SIZE_IN_BYTES_TO_SIZE(SIZE) ((1 << (SIZE - 1)) >> 7)
- 
--/* Minimum ring bufer size for memory allocation */
-+/* Minimum ring buffer size for memory allocation */
- #define ADF_RING_SIZE_BYTES_MIN(SIZE) \
- 	((SIZE < ADF_SIZE_TO_RING_SIZE_IN_BYTES(ADF_RING_SIZE_4K)) ? \
- 		ADF_SIZE_TO_RING_SIZE_IN_BYTES(ADF_RING_SIZE_4K) : SIZE)
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index c9ad6c213..71db6450b 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1999,7 +1999,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 		/* Buffer up to one whole block */
+ 		nents = sg_nents_for_len(areq->src, nbytes);
+ 		if (nents < 0) {
+-			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			dev_err(dev, "Invalid number of src SG.\n");
+ 			return nents;
+ 		}
+ 		sg_copy_to_buffer(areq->src, nents,
+@@ -2040,7 +2040,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 			offset = nbytes_to_hash - req_ctx->nbuf;
+ 		nents = sg_nents_for_len(areq->src, offset);
+ 		if (nents < 0) {
+-			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			dev_err(dev, "Invalid number of src SG.\n");
+ 			return nents;
+ 		}
+ 		sg_copy_to_buffer(areq->src, nents,
+@@ -2054,7 +2054,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 	if (to_hash_later) {
+ 		nents = sg_nents_for_len(areq->src, nbytes);
+ 		if (nents < 0) {
+-			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			dev_err(dev, "Invalid number of src SG.\n");
+ 			return nents;
+ 		}
+ 		sg_pcopy_to_buffer(areq->src, nents,
 -- 
-2.25.1
+2.18.4
 
 
-No virus found
-		Checked by Hillstone Network AntiVirus
 
