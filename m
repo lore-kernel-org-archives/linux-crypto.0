@@ -2,189 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D65C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 16:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FF0C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 16:16:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbiJJQMT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Oct 2022 12:12:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        id S229606AbiJJQQc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Oct 2022 12:16:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbiJJQMS (ORCPT
+        with ESMTP id S229911AbiJJQQZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Oct 2022 12:12:18 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D35D183BA;
-        Mon, 10 Oct 2022 09:12:17 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id d26so18770758eje.10;
-        Mon, 10 Oct 2022 09:12:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=06YPU7ggBln/wZcgryqzM4AGHEXt2ZDt7Fv32u04GYA=;
-        b=hO9jmumfqQwp743uSG1lIMLx97RYcAcEeO+TJm3ml3BYhHbTLncLTszFcOImH821B8
-         ICtBJPXXJodACD5X+I8NIKDZiBONQ7CNxXifMUJLXxgiU9oCYx/B0waMetzOmgrgABMU
-         lZRfJaMj+nyevUABhYcAFng85tle76YOA1wfewT6oqn+gPsCoAWorpYnfscAUbxXjrLm
-         MZm9gRS42P865+Z2fK51ATfsFuVm5am4lPCWLVqyNKfp0nldbI2U7N2IykT8+kcGUAVG
-         d1R6DAH1XaWV7ijb9MIuNCaZgtvcqgozAdmqNwpeokUM/rJYPZAqMoRmW71BcOkTj0jN
-         kZxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=06YPU7ggBln/wZcgryqzM4AGHEXt2ZDt7Fv32u04GYA=;
-        b=nZs8YfB/F35iZTUq3v+LVQHs0J0n8FBvdY5546uc1KpG4R9eroTrhbDyXitl9BFfo8
-         /TbzzU2OthWD9Ann2I25wWo7R17yl7q8YJAuwjIOZSNVHBTKujU5O6UlL9UtTNu2gh1R
-         E6PgEovfNjITVRQcEyQGGscxSR8nk1tHAS5Ad6/5rX7swnQRu6VCBlmi+baAAJcsBN0j
-         0XYa8jgIJIxb7g/hjAMUIH4U2F8//q2Dgjv+/ExJgoZhfVIFczupTxYxecPYFAtqWkc1
-         14KN617pBvL1FKJgOz5Boer5YzBv9KFBkYI1La9hv1y4ljkPahApoJwBE38d7aO2Zc+2
-         vjzA==
-X-Gm-Message-State: ACrzQf0dnQBKgR3RjQvE79Bu9dqpJCbpox2QwYjYUQVxbeiuof4rLNyp
-        WySsSEAfbglvKSAgiQISd0wysL1QX8XXSzDWYco=
-X-Google-Smtp-Source: AMsMyM6p45xDzmbwRXzsXOSY0Npo5cVslI6LDiHI+0A0EnR8aAFsrTIh1haKlZze1xIlK+2vBjrg4LhH2qODR5iWA5M=
-X-Received: by 2002:a17:907:97c2:b0:78d:accc:c0a9 with SMTP id
- js2-20020a17090797c200b0078dacccc0a9mr6236985ejc.312.1665418335550; Mon, 10
- Oct 2022 09:12:15 -0700 (PDT)
+        Mon, 10 Oct 2022 12:16:25 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE8117E04;
+        Mon, 10 Oct 2022 09:16:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 49562CE1300;
+        Mon, 10 Oct 2022 16:16:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D20FC433B5;
+        Mon, 10 Oct 2022 16:16:21 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WFRemyA7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665418578;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=An7SxgPJME6TRH3eE7R/BWGywdOawFEUlLC5A6+4ELg=;
+        b=WFRemyA7W+cllJ9sEiVWidp03OANuZ1+x/HOPET7yswqUgQob1hYglK/U/t+crkhnv5knc
+        9XwpM/3lxxTBIuypdqgRNtEbje3Mqg0Ex2mHZbO5HclQkEGL1VV8D5SJJVZpGtrxVI+5Xe
+        qft4ju5Ib5bMdEYqC55z987Ak+MoKMw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 80c18cd4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 10 Oct 2022 16:16:17 +0000 (UTC)
+Received: by mail-vs1-f50.google.com with SMTP id l127so11740702vsc.3;
+        Mon, 10 Oct 2022 09:16:17 -0700 (PDT)
+X-Gm-Message-State: ACrzQf2iJXpzW6aipef77AZA6whw6rcr4iyFFBGUp9kFREw46MzxJFVR
+        dgnZufqSBSzEcawt8hQNWHf2au5RhAwxiYAA49s=
+X-Google-Smtp-Source: AMsMyM7svWfaQu7wb8PyYpdklzz8Js1WuE1s5ndZYDCcjHFKl6TMfUwV3CN2MNetHHeOPcZ+pNbn+U80k7UxwbxXUvA=
+X-Received: by 2002:a67:c297:0:b0:3a7:5f0c:54c4 with SMTP id
+ k23-20020a67c297000000b003a75f0c54c4mr6907769vsj.76.1665418576377; Mon, 10
+ Oct 2022 09:16:16 -0700 (PDT)
 MIME-Version: 1.0
-From:   Wei Chen <harperchen1110@gmail.com>
-Date:   Tue, 11 Oct 2022 00:11:39 +0800
-Message-ID: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
-Subject: INFO: rcu detected stall in hwrng_fillfn
-To:     mpm@selenic.com, herbert@gondor.apana.org.au,
-        linux@dominikbrodowski.net, ebiggers@google.com, Jason@zx2c4.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
+In-Reply-To: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 10 Oct 2022 10:16:05 -0600
+X-Gmail-Original-Message-ID: <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
+Message-ID: <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
+Subject: Re: INFO: rcu detected stall in hwrng_fillfn
+To:     Wei Chen <harperchen1110@gmail.com>
+Cc:     mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux@dominikbrodowski.net, ebiggers@google.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dear Linux Developer,
-
-Recently when using our tool to fuzz kernel, the following crash was triggered:
-
-HEAD commit: c5eb0a61238d Linux 5.18-rc6
-git tree: upstream
-compiler: clang 12.0.0
-console output:
-https://drive.google.com/file/d/1JHFwMk9CWxcUbREbJehKSd98-AvyT3DA/view?usp=sharing
-kernel config: https://drive.google.com/file/d/12fNP5UArsFqTi2jjGomWuCk5evtgU0Gu/view?usp=sharing
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: Wei Chen <harperchen1110@gmail.com>
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: Tasks blocked on level-0 rcu_node (CPUs 0-0): P6559/1:b..l
-(detected by 0, t=24003 jiffies, g=61277, q=132)
-task:sshd            state:R  running task     stack:22448 pid: 6559
-ppid:  6396 flags:0x00004002
-Call Trace:
- <TASK>
- __schedule+0xb8e/0x1140
- preempt_schedule+0x12b/0x180
- preempt_schedule_thunk+0x16/0x18
- __local_bh_enable_ip+0x14b/0x1c0
- ip_finish_output2+0xdb2/0x19b0
- __ip_queue_xmit+0x11bb/0x1c20
- __tcp_transmit_skb+0x1e33/0x3410
- tcp_write_xmit+0x1b6e/0x77a0
- __tcp_push_pending_frames+0x8e/0x260
- tcp_sendmsg_locked+0x390e/0x4740
- tcp_sendmsg+0x2c/0x40
- sock_write_iter+0x398/0x520
- vfs_write+0xa02/0xd20
- ksys_write+0x16b/0x2a0
- do_syscall_64+0x3d/0x90
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f59438db970
-RSP: 002b:00007ffcf76d77b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000034 RCX: 00007f59438db970
-RDX: 0000000000000034 RSI: 000056378c676f48 RDI: 0000000000000003
-RBP: 000056378c65dfa0 R08: 00007ffcf77cd080 R09: 0000000000000070
-R10: 00007ffcf77cd118 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffcf76d784f R14: 000056378b47bbe7 R15: 0000000000000003
- </TASK>
-rcu: rcu_preempt kthread timer wakeup didn't happen for 20549 jiffies!
-g61277 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
-rcu: Possible timer handling issue on cpu=0 timer-softirq=24406
-rcu: rcu_preempt kthread starved for 20550 jiffies! g61277 f0x0
-RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=0
-rcu: Unless rcu_preempt kthread gets sufficient CPU time, OOM is now
-expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:I stack:27792 pid:   16 ppid:     2 flags:0x00004000
-Call Trace:
- <TASK>
- __schedule+0xb8e/0x1140
- schedule+0xeb/0x1b0
- schedule_timeout+0x1aa/0x2f0
- rcu_gp_fqs_loop+0x1fd/0x770
- rcu_gp_kthread+0xa5/0x340
- kthread+0x266/0x300
- ret_from_fork+0x1f/0x30
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-NMI backtrace for cpu 0
-CPU: 0 PID: 735 Comm: hwrng Not tainted 5.18.0-rc6 #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.13.0-1ubuntu1.1 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x1b1/0x28e
- nmi_cpu_backtrace+0x40e/0x440
- nmi_trigger_cpumask_backtrace+0x16a/0x280
- rcu_check_gp_kthread_starvation+0x1f9/0x270
- rcu_sched_clock_irq+0x255f/0x2d60
- update_process_times+0x197/0x200
- tick_sched_timer+0x376/0x540
- __hrtimer_run_queues+0x4cb/0xa60
- hrtimer_interrupt+0x3b3/0x1040
- __sysvec_apic_timer_interrupt+0xf9/0x280
- sysvec_apic_timer_interrupt+0x8c/0xb0
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x12/0x20
-RIP: 0010:iowrite16+0x1d/0x80
-Code: 80 61 fd 5b 5d c3 0f 1f 80 00 00 00 00 55 53 48 89 f3 89 fd e8
-c4 80 61 fd 48 81 fb 00 00 04 00 72 0a e8 b6 80 61 fd 66 89 2b <eb> 58
-48 81 fb 01 00 01 00 72 0e e8 a3 80 61 fd 0f b7 d3 89 e8 66
-RSP: 0018:ffffc900036dfd08 EFLAGS: 00000293
-RAX: ffffffff8422337a RBX: ffffc90000093000 RCX: ffff888019864880
-RDX: 0000000000000000 RSI: ffffc90000093000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff8492ecd7 R09: ffff888105b34540
-R10: fffff520006dbfc0 R11: 0000000000000000 R12: dffffc0000000000
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888105bedc00
- vp_notify+0x52/0x70
- virtqueue_kick+0x3bf/0x5e0
- copy_data+0x24a/0x390
- virtio_read+0xc5/0x200
- hwrng_fillfn+0x14a/0x470
- kthread+0x266/0x300
- ret_from_fork+0x1f/0x30
- </TASK>
-----------------
-Code disassembly (best guess):
-   0: 80 61 fd 5b          andb   $0x5b,-0x3(%rcx)
-   4: 5d                    pop    %rbp
-   5: c3                    retq
-   6: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
-   d: 55                    push   %rbp
-   e: 53                    push   %rbx
-   f: 48 89 f3              mov    %rsi,%rbx
-  12: 89 fd                mov    %edi,%ebp
-  14: e8 c4 80 61 fd        callq  0xfd6180dd
-  19: 48 81 fb 00 00 04 00 cmp    $0x40000,%rbx
-  20: 72 0a                jb     0x2c
-  22: e8 b6 80 61 fd        callq  0xfd6180dd
-  27: 66 89 2b              mov    %bp,(%rbx)
-* 2a: eb 58                jmp    0x84 <-- trapping instruction
-  2c: 48 81 fb 01 00 01 00 cmp    $0x10001,%rbx
-  33: 72 0e                jb     0x43
-  35: e8 a3 80 61 fd        callq  0xfd6180dd
-  3a: 0f b7 d3              movzwl %bx,%edx
-  3d: 89 e8                mov    %ebp,%eax
-  3f: 66                    data16
-
-Best,
-Wei
+Interesting that you're seeing this on a 5.18-rc6 kernel. That means
+it's *not* caused by the recent changes. (And the virtio hwrng driver
+has quality=1000 anyway.)
