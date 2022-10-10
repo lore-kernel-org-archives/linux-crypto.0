@@ -2,169 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0F5C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 15:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D65C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 16:12:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiJJPhR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Oct 2022 11:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
+        id S229802AbiJJQMT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Oct 2022 12:12:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiJJPhQ (ORCPT
+        with ESMTP id S229677AbiJJQMS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Oct 2022 11:37:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C88771BC5;
-        Mon, 10 Oct 2022 08:37:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ED6C660F69;
-        Mon, 10 Oct 2022 15:37:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293DBC433C1;
-        Mon, 10 Oct 2022 15:37:13 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ppcXTPB+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665416231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sBj5n8AeywXS5nBd6mMPaCC8APWIC2bqj8ZV7OMzNDI=;
-        b=ppcXTPB+D/rSVYbNWHtYjGfYdaN+yA7n5mGjk25di8AVpcNxtQSABFIFG1CpPPJbIXU4tl
-        MU+fr/ns+9f2eNYvubOh9Row2wL/0AnrM39wFla0zzfBjmFiuA0Ana3LVk18Wnb/uyRa25
-        jck+BzVaDZYmAgC6aK77KsFdlzNReII=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3616f1ca (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 10 Oct 2022 15:37:11 +0000 (UTC)
-Date:   Mon, 10 Oct 2022 09:37:07 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Mark Brown <broonie@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kernelci-results@groups.io, bot@kernelci.org,
-        gtucker@collabora.com, linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hw_random: bcm2835: use hwrng_msleep() instead of
- cpu_relax()
-Message-ID: <Y0Q8I6YXsBNLBiix@zx2c4.com>
-References: <Y0QjkjU4bsOHWFOd@sirena.org.uk>
- <20221010150607.720600-1-Jason@zx2c4.com>
+        Mon, 10 Oct 2022 12:12:18 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D35D183BA;
+        Mon, 10 Oct 2022 09:12:17 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id d26so18770758eje.10;
+        Mon, 10 Oct 2022 09:12:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=06YPU7ggBln/wZcgryqzM4AGHEXt2ZDt7Fv32u04GYA=;
+        b=hO9jmumfqQwp743uSG1lIMLx97RYcAcEeO+TJm3ml3BYhHbTLncLTszFcOImH821B8
+         ICtBJPXXJodACD5X+I8NIKDZiBONQ7CNxXifMUJLXxgiU9oCYx/B0waMetzOmgrgABMU
+         lZRfJaMj+nyevUABhYcAFng85tle76YOA1wfewT6oqn+gPsCoAWorpYnfscAUbxXjrLm
+         MZm9gRS42P865+Z2fK51ATfsFuVm5am4lPCWLVqyNKfp0nldbI2U7N2IykT8+kcGUAVG
+         d1R6DAH1XaWV7ijb9MIuNCaZgtvcqgozAdmqNwpeokUM/rJYPZAqMoRmW71BcOkTj0jN
+         kZxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=06YPU7ggBln/wZcgryqzM4AGHEXt2ZDt7Fv32u04GYA=;
+        b=nZs8YfB/F35iZTUq3v+LVQHs0J0n8FBvdY5546uc1KpG4R9eroTrhbDyXitl9BFfo8
+         /TbzzU2OthWD9Ann2I25wWo7R17yl7q8YJAuwjIOZSNVHBTKujU5O6UlL9UtTNu2gh1R
+         E6PgEovfNjITVRQcEyQGGscxSR8nk1tHAS5Ad6/5rX7swnQRu6VCBlmi+baAAJcsBN0j
+         0XYa8jgIJIxb7g/hjAMUIH4U2F8//q2Dgjv+/ExJgoZhfVIFczupTxYxecPYFAtqWkc1
+         14KN617pBvL1FKJgOz5Boer5YzBv9KFBkYI1La9hv1y4ljkPahApoJwBE38d7aO2Zc+2
+         vjzA==
+X-Gm-Message-State: ACrzQf0dnQBKgR3RjQvE79Bu9dqpJCbpox2QwYjYUQVxbeiuof4rLNyp
+        WySsSEAfbglvKSAgiQISd0wysL1QX8XXSzDWYco=
+X-Google-Smtp-Source: AMsMyM6p45xDzmbwRXzsXOSY0Npo5cVslI6LDiHI+0A0EnR8aAFsrTIh1haKlZze1xIlK+2vBjrg4LhH2qODR5iWA5M=
+X-Received: by 2002:a17:907:97c2:b0:78d:accc:c0a9 with SMTP id
+ js2-20020a17090797c200b0078dacccc0a9mr6236985ejc.312.1665418335550; Mon, 10
+ Oct 2022 09:12:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221010150607.720600-1-Jason@zx2c4.com>
+From:   Wei Chen <harperchen1110@gmail.com>
+Date:   Tue, 11 Oct 2022 00:11:39 +0800
+Message-ID: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
+Subject: INFO: rcu detected stall in hwrng_fillfn
+To:     mpm@selenic.com, herbert@gondor.apana.org.au,
+        linux@dominikbrodowski.net, ebiggers@google.com, Jason@zx2c4.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 09:06:07AM -0600, Jason A. Donenfeld wrote:
-> Rather than busy looping, yield back to the scheduler and sleep for a
-> bit in the event that there's no data. This should hopefully prevent the
-> stalls that Mark reported:
-> 
-> <6>[    3.362859] Freeing initrd memory: 16196K
-> <3>[   23.160131] rcu: INFO: rcu_sched self-detected stall on CPU
-> <3>[   23.166057] rcu:  0-....: (2099 ticks this GP) idle=03b4/1/0x40000002 softirq=28/28 fqs=1050
-> <4>[   23.174895]       (t=2101 jiffies g=-1147 q=2353 ncpus=4)
-> <4>[   23.180203] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
-> <4>[   23.186125] Hardware name: BCM2835
-> <4>[   23.189837] PC is at bcm2835_rng_read+0x30/0x6c
-> <4>[   23.194709] LR is at hwrng_fillfn+0x71/0xf4
-> <4>[   23.199218] pc : [<c07ccdc8>]    lr : [<c07cb841>]    psr: 40000033
-> <4>[   23.205840] sp : f093df70  ip : 00000000  fp : 00000000
-> <4>[   23.211404] r10: c3c7e800  r9 : 00000000  r8 : c17e6b20
-> <4>[   23.216968] r7 : c17e6b64  r6 : c18b0a74  r5 : c07ccd99  r4 : c3f171c0
-> <4>[   23.223855] r3 : 000fffff  r2 : 00000040  r1 : c3c7e800  r0 : c3f171c0
-> <4>[   23.230743] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment none
-> <4>[   23.238426] Control: 50c5387d  Table: 0020406a  DAC: 00000051
-> <4>[   23.244519] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
-> 
-> Link: https://lore.kernel.org/all/Y0QJLauamRnCDUef@sirena.org.uk/
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> I haven't tested this. Somebody with access to that kernel CI infra that
-> triggered this will need to test.
+Dear Linux Developer,
 
-So I succeeded at testing this, sort of. I was able to reproduce the
-hang on a CONFIG_PREEMPT=n kernel with this diff:
+Recently when using our tool to fuzz kernel, the following crash was triggered:
 
-diff --git a/drivers/net/wireguard/main.c b/drivers/net/wireguard/main.c
-index ee4da9ab8013..19e1186f0db0 100644
---- a/drivers/net/wireguard/main.c
-+++ b/drivers/net/wireguard/main.c
-@@ -15,12 +15,29 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/genetlink.h>
-+#include <linux/hw_random.h>
- #include <net/rtnetlink.h>
+HEAD commit: c5eb0a61238d Linux 5.18-rc6
+git tree: upstream
+compiler: clang 12.0.0
+console output:
+https://drive.google.com/file/d/1JHFwMk9CWxcUbREbJehKSd98-AvyT3DA/view?usp=sharing
+kernel config: https://drive.google.com/file/d/12fNP5UArsFqTi2jjGomWuCk5evtgU0Gu/view?usp=sharing
 
-+static int derp_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	if (wait) {
-+		for (;;)
-+			cpu_relax();
-+	}
-+	return 0;
-+}
-+
-+static struct hwrng derp_ops = {
-+	.name = "flurpderp",
-+	.read = derp_rng_read,
-+};
-+
- static int __init wg_mod_init(void)
- {
- 	int ret;
+Unfortunately, I don't have any reproducer for this crash yet.
 
-+	hwrng_register(&derp_ops);
-+
- 	ret = wg_allowedips_slab_init();
- 	if (ret < 0)
- 		goto err_allowedips;
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: Wei Chen <harperchen1110@gmail.com>
 
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: Tasks blocked on level-0 rcu_node (CPUs 0-0): P6559/1:b..l
+(detected by 0, t=24003 jiffies, g=61277, q=132)
+task:sshd            state:R  running task     stack:22448 pid: 6559
+ppid:  6396 flags:0x00004002
+Call Trace:
+ <TASK>
+ __schedule+0xb8e/0x1140
+ preempt_schedule+0x12b/0x180
+ preempt_schedule_thunk+0x16/0x18
+ __local_bh_enable_ip+0x14b/0x1c0
+ ip_finish_output2+0xdb2/0x19b0
+ __ip_queue_xmit+0x11bb/0x1c20
+ __tcp_transmit_skb+0x1e33/0x3410
+ tcp_write_xmit+0x1b6e/0x77a0
+ __tcp_push_pending_frames+0x8e/0x260
+ tcp_sendmsg_locked+0x390e/0x4740
+ tcp_sendmsg+0x2c/0x40
+ sock_write_iter+0x398/0x520
+ vfs_write+0xa02/0xd20
+ ksys_write+0x16b/0x2a0
+ do_syscall_64+0x3d/0x90
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f59438db970
+RSP: 002b:00007ffcf76d77b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000034 RCX: 00007f59438db970
+RDX: 0000000000000034 RSI: 000056378c676f48 RDI: 0000000000000003
+RBP: 000056378c65dfa0 R08: 00007ffcf77cd080 R09: 0000000000000070
+R10: 00007ffcf77cd118 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffcf76d784f R14: 000056378b47bbe7 R15: 0000000000000003
+ </TASK>
+rcu: rcu_preempt kthread timer wakeup didn't happen for 20549 jiffies!
+g61277 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+rcu: Possible timer handling issue on cpu=0 timer-softirq=24406
+rcu: rcu_preempt kthread starved for 20550 jiffies! g61277 f0x0
+RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=0
+rcu: Unless rcu_preempt kthread gets sufficient CPU time, OOM is now
+expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:I stack:27792 pid:   16 ppid:     2 flags:0x00004000
+Call Trace:
+ <TASK>
+ __schedule+0xb8e/0x1140
+ schedule+0xeb/0x1b0
+ schedule_timeout+0x1aa/0x2f0
+ rcu_gp_fqs_loop+0x1fd/0x770
+ rcu_gp_kthread+0xa5/0x340
+ kthread+0x266/0x300
+ ret_from_fork+0x1f/0x30
+ </TASK>
+rcu: Stack dump where RCU GP kthread last ran:
+NMI backtrace for cpu 0
+CPU: 0 PID: 735 Comm: hwrng Not tainted 5.18.0-rc6 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x1b1/0x28e
+ nmi_cpu_backtrace+0x40e/0x440
+ nmi_trigger_cpumask_backtrace+0x16a/0x280
+ rcu_check_gp_kthread_starvation+0x1f9/0x270
+ rcu_sched_clock_irq+0x255f/0x2d60
+ update_process_times+0x197/0x200
+ tick_sched_timer+0x376/0x540
+ __hrtimer_run_queues+0x4cb/0xa60
+ hrtimer_interrupt+0x3b3/0x1040
+ __sysvec_apic_timer_interrupt+0xf9/0x280
+ sysvec_apic_timer_interrupt+0x8c/0xb0
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x12/0x20
+RIP: 0010:iowrite16+0x1d/0x80
+Code: 80 61 fd 5b 5d c3 0f 1f 80 00 00 00 00 55 53 48 89 f3 89 fd e8
+c4 80 61 fd 48 81 fb 00 00 04 00 72 0a e8 b6 80 61 fd 66 89 2b <eb> 58
+48 81 fb 01 00 01 00 72 0e e8 a3 80 61 fd 0f b7 d3 89 e8 66
+RSP: 0018:ffffc900036dfd08 EFLAGS: 00000293
+RAX: ffffffff8422337a RBX: ffffc90000093000 RCX: ffff888019864880
+RDX: 0000000000000000 RSI: ffffc90000093000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff8492ecd7 R09: ffff888105b34540
+R10: fffff520006dbfc0 R11: 0000000000000000 R12: dffffc0000000000
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff888105bedc00
+ vp_notify+0x52/0x70
+ virtqueue_kick+0x3bf/0x5e0
+ copy_data+0x24a/0x390
+ virtio_read+0xc5/0x200
+ hwrng_fillfn+0x14a/0x470
+ kthread+0x266/0x300
+ ret_from_fork+0x1f/0x30
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0: 80 61 fd 5b          andb   $0x5b,-0x3(%rcx)
+   4: 5d                    pop    %rbp
+   5: c3                    retq
+   6: 0f 1f 80 00 00 00 00 nopl   0x0(%rax)
+   d: 55                    push   %rbp
+   e: 53                    push   %rbx
+   f: 48 89 f3              mov    %rsi,%rbx
+  12: 89 fd                mov    %edi,%ebp
+  14: e8 c4 80 61 fd        callq  0xfd6180dd
+  19: 48 81 fb 00 00 04 00 cmp    $0x40000,%rbx
+  20: 72 0a                jb     0x2c
+  22: e8 b6 80 61 fd        callq  0xfd6180dd
+  27: 66 89 2b              mov    %bp,(%rbx)
+* 2a: eb 58                jmp    0x84 <-- trapping instruction
+  2c: 48 81 fb 01 00 01 00 cmp    $0x10001,%rbx
+  33: 72 0e                jb     0x43
+  35: e8 a3 80 61 fd        callq  0xfd6180dd
+  3a: 0f b7 d3              movzwl %bx,%edx
+  3d: 89 e8                mov    %ebp,%eax
+  3f: 66                    data16
 
-Next, I changed the cpu_relax() into hwrng_msleep(), as this patch does:
-
-diff --git a/drivers/net/wireguard/main.c b/drivers/net/wireguard/main.c
-index ee4da9ab8013..19e1186f0db0 100644
---- a/drivers/net/wireguard/main.c
-+++ b/drivers/net/wireguard/main.c
-@@ -15,12 +15,29 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/genetlink.h>
-+#include <linux/hw_random.h>
- #include <net/rtnetlink.h>
-
-+static int derp_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	if (wait) {
-+		for (;;)
-+			hwrng_msleep(rng, 1000);
-+	}
-+	return 0;
-+}
-+
-+static struct hwrng derp_ops = {
-+	.name = "flurpderp",
-+	.read = derp_rng_read,
-+};
-+
- static int __init wg_mod_init(void)
- {
- 	int ret;
-
-+	hwrng_register(&derp_ops);
-+
- 	ret = wg_allowedips_slab_init();
- 	if (ret < 0)
- 		goto err_allowedips;
-
-And then the problem went away.
-
-So I think this patch is a good one.
-
-Jason
+Best,
+Wei
