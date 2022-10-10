@@ -2,64 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FF0C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 16:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3C6C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 16:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbiJJQQc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Oct 2022 12:16:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41986 "EHLO
+        id S229764AbiJJQ0Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Oct 2022 12:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiJJQQZ (ORCPT
+        with ESMTP id S229790AbiJJQ0C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Oct 2022 12:16:25 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE8117E04;
-        Mon, 10 Oct 2022 09:16:24 -0700 (PDT)
+        Mon, 10 Oct 2022 12:26:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BADB41004A;
+        Mon, 10 Oct 2022 09:25:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 49562CE1300;
-        Mon, 10 Oct 2022 16:16:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D20FC433B5;
-        Mon, 10 Oct 2022 16:16:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 793DA60FB6;
+        Mon, 10 Oct 2022 16:25:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2493DC433C1;
+        Mon, 10 Oct 2022 16:25:15 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WFRemyA7"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hKX58m4S"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665418578;
+        t=1665419113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=An7SxgPJME6TRH3eE7R/BWGywdOawFEUlLC5A6+4ELg=;
-        b=WFRemyA7W+cllJ9sEiVWidp03OANuZ1+x/HOPET7yswqUgQob1hYglK/U/t+crkhnv5knc
-        9XwpM/3lxxTBIuypdqgRNtEbje3Mqg0Ex2mHZbO5HclQkEGL1VV8D5SJJVZpGtrxVI+5Xe
-        qft4ju5Ib5bMdEYqC55z987Ak+MoKMw=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 80c18cd4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 10 Oct 2022 16:16:17 +0000 (UTC)
-Received: by mail-vs1-f50.google.com with SMTP id l127so11740702vsc.3;
-        Mon, 10 Oct 2022 09:16:17 -0700 (PDT)
-X-Gm-Message-State: ACrzQf2iJXpzW6aipef77AZA6whw6rcr4iyFFBGUp9kFREw46MzxJFVR
-        dgnZufqSBSzEcawt8hQNWHf2au5RhAwxiYAA49s=
-X-Google-Smtp-Source: AMsMyM7svWfaQu7wb8PyYpdklzz8Js1WuE1s5ndZYDCcjHFKl6TMfUwV3CN2MNetHHeOPcZ+pNbn+U80k7UxwbxXUvA=
-X-Received: by 2002:a67:c297:0:b0:3a7:5f0c:54c4 with SMTP id
- k23-20020a67c297000000b003a75f0c54c4mr6907769vsj.76.1665418576377; Mon, 10
- Oct 2022 09:16:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
-In-Reply-To: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
+        bh=d+L1uK7+UFXjdLSmw+INFF3+OueVNNJPFpoH4rnfXRY=;
+        b=hKX58m4SkxMn/4N2BcZIg6c3o9EQ0i0NW4OerpIDzbkNjeukCo4rcAnX2cWJwxIIKVSVJa
+        fndWIcyVHryp7okrgaLhyAbfDqRBYBEBV9+kUvak7uq3NgknwUFfVtPJEW7GWFatboBqL1
+        AcOwLf3bWLsEuYfe5t5xuG4SJrCrjnQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d9b333b9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 10 Oct 2022 16:25:13 +0000 (UTC)
+Date:   Mon, 10 Oct 2022 10:25:11 -0600
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 10 Oct 2022 10:16:05 -0600
-X-Gmail-Original-Message-ID: <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
-Message-ID: <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
-Subject: Re: INFO: rcu detected stall in hwrng_fillfn
 To:     Wei Chen <harperchen1110@gmail.com>
 Cc:     mpm@selenic.com, herbert@gondor.apana.org.au,
         linux@dominikbrodowski.net, ebiggers@google.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: INFO: rcu detected stall in hwrng_fillfn
+Message-ID: <Y0RHZ1ZIRcaIssHl@zx2c4.com>
+References: <CAO4mrff==O4pbJc+OjnrLz3so1D6spp_YvOkSiu-cFp3z8ZbHQ@mail.gmail.com>
+ <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rX9rtfvHreQFmNbp1RZmm0+VfU7LVPPVVYmk1-ME6sqg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Interesting that you're seeing this on a 5.18-rc6 kernel. That means
-it's *not* caused by the recent changes. (And the virtio hwrng driver
-has quality=1000 anyway.)
+On Mon, Oct 10, 2022 at 10:16:05AM -0600, Jason A. Donenfeld wrote:
+> Interesting that you're seeing this on a 5.18-rc6 kernel. That means
+> it's *not* caused by the recent changes. (And the virtio hwrng driver
+> has quality=1000 anyway.)
+
+Oh, I think this was fixed in 5.19 by
+228432551bd8783211e494ab35f42a4344580502?
