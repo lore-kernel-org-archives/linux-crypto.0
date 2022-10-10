@@ -2,112 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A64FC43217
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 15:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0F5C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Oct 2022 15:37:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiJJPP6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Oct 2022 11:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47634 "EHLO
+        id S229514AbiJJPhR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Oct 2022 11:37:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbiJJPP5 (ORCPT
+        with ESMTP id S229487AbiJJPhQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Oct 2022 11:15:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85DC5756D;
-        Mon, 10 Oct 2022 08:15:56 -0700 (PDT)
+        Mon, 10 Oct 2022 11:37:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C88771BC5;
+        Mon, 10 Oct 2022 08:37:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3C89660F7B;
-        Mon, 10 Oct 2022 15:15:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49220C433C1;
-        Mon, 10 Oct 2022 15:15:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ED6C660F69;
+        Mon, 10 Oct 2022 15:37:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293DBC433C1;
+        Mon, 10 Oct 2022 15:37:13 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="edLZ0aGR"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ppcXTPB+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665414951;
+        t=1665416231;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=nXnY72mFsROmabRvf0J+Pa5RaskNobc+nX3HeIF4L9E=;
-        b=edLZ0aGRKciBgrABCWwLTufhUStuvzwDRVkxkjKFePW+lIvwIpj0q6oKVCBECn48iexD0q
-        f7ldV0FN6C5s9vl2nK7StLKdvr8cL1OjlA2j46fZFDVa+UAmKdnQOqkv/DyQDLX+HIniGg
-        DvENCbC1YiSe+oWCytb5/z0zOJAMvXA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b7dc69e1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 10 Oct 2022 15:15:51 +0000 (UTC)
-Date:   Mon, 10 Oct 2022 09:15:48 -0600
+        bh=sBj5n8AeywXS5nBd6mMPaCC8APWIC2bqj8ZV7OMzNDI=;
+        b=ppcXTPB+D/rSVYbNWHtYjGfYdaN+yA7n5mGjk25di8AVpcNxtQSABFIFG1CpPPJbIXU4tl
+        MU+fr/ns+9f2eNYvubOh9Row2wL/0AnrM39wFla0zzfBjmFiuA0Ana3LVk18Wnb/uyRa25
+        jck+BzVaDZYmAgC6aK77KsFdlzNReII=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3616f1ca (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 10 Oct 2022 15:37:11 +0000 (UTC)
+Date:   Mon, 10 Oct 2022 09:37:07 -0600
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>,
-        "gilad@benyossef.com" <gilad@benyossef.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
-        "david@sigma-star.at" <david@sigma-star.at>,
-        "michael@walle.cc" <michael@walle.cc>,
-        "john.ernberg@actia.se" <john.ernberg@actia.se>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "richard@nod.at" <richard@nod.at>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        Sahil Malhotra <sahil.malhotra@nxp.com>,
-        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Subject: Re: [EXT] Re: [PATCH v0 3/8] crypto: hbk flags & info added to the
- tfm
-Message-ID: <Y0Q3JKnWSNIC4Xlu@zx2c4.com>
-References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
- <20221006130837.17587-4-pankaj.gupta@nxp.com>
- <Yz/OEwDtyTm+VH0p@gondor.apana.org.au>
- <DU2PR04MB8630CBBB8ABDC3768320C18195209@DU2PR04MB8630.eurprd04.prod.outlook.com>
+To:     Mark Brown <broonie@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        kernelci-results@groups.io, bot@kernelci.org,
+        gtucker@collabora.com, linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hw_random: bcm2835: use hwrng_msleep() instead of
+ cpu_relax()
+Message-ID: <Y0Q8I6YXsBNLBiix@zx2c4.com>
+References: <Y0QjkjU4bsOHWFOd@sirena.org.uk>
+ <20221010150607.720600-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <DU2PR04MB8630CBBB8ABDC3768320C18195209@DU2PR04MB8630.eurprd04.prod.outlook.com>
+In-Reply-To: <20221010150607.720600-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 11:15:00AM +0000, Pankaj Gupta wrote:
-> > Nack.  You still have not provided a convincing argument why this is necessary
-> > since there are plenty of existing drivers in the kernel already providing similar
-> > features.
-> > 
-> CAAM is used as a trusted source for trusted keyring. CAAM can expose
-> these keys either as plain key or HBK(hardware bound key- managed by
-> the hardware only and never visible in plain outside of hardware).
+On Mon, Oct 10, 2022 at 09:06:07AM -0600, Jason A. Donenfeld wrote:
+> Rather than busy looping, yield back to the scheduler and sleep for a
+> bit in the event that there's no data. This should hopefully prevent the
+> stalls that Mark reported:
 > 
-> Thus, Keys that are inside CAAM-backed-trusted-keyring, can either be
-> plain key or HBK. So the trusted-key-payload requires additional flag
-> & info(key-encryption-protocol)  to help differentiate it from each
-> other. Now when CAAM trusted-key is presented to the kernel crypto
-> framework, the additional information associated with the key, needs
-> to be passed to the hardware driver. Currently the kernel keyring and
-> kernel crypto frameworks are associated for plain key, but completely
-> dis-associated for HBK. This patch addresses this problem.
+> <6>[    3.362859] Freeing initrd memory: 16196K
+> <3>[   23.160131] rcu: INFO: rcu_sched self-detected stall on CPU
+> <3>[   23.166057] rcu:  0-....: (2099 ticks this GP) idle=03b4/1/0x40000002 softirq=28/28 fqs=1050
+> <4>[   23.174895]       (t=2101 jiffies g=-1147 q=2353 ncpus=4)
+> <4>[   23.180203] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
+> <4>[   23.186125] Hardware name: BCM2835
+> <4>[   23.189837] PC is at bcm2835_rng_read+0x30/0x6c
+> <4>[   23.194709] LR is at hwrng_fillfn+0x71/0xf4
+> <4>[   23.199218] pc : [<c07ccdc8>]    lr : [<c07cb841>]    psr: 40000033
+> <4>[   23.205840] sp : f093df70  ip : 00000000  fp : 00000000
+> <4>[   23.211404] r10: c3c7e800  r9 : 00000000  r8 : c17e6b20
+> <4>[   23.216968] r7 : c17e6b64  r6 : c18b0a74  r5 : c07ccd99  r4 : c3f171c0
+> <4>[   23.223855] r3 : 000fffff  r2 : 00000040  r1 : c3c7e800  r0 : c3f171c0
+> <4>[   23.230743] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment none
+> <4>[   23.238426] Control: 50c5387d  Table: 0020406a  DAC: 00000051
+> <4>[   23.244519] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
 > 
-> Similar capabilities (trusted source), are there in other crypto
-> accelerators on NXP SoC(s). Having hardware specific crypto algorithm
-> name, does not seems to be a scalable solution.
+> Link: https://lore.kernel.org/all/Y0QJLauamRnCDUef@sirena.org.uk/
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> I haven't tested this. Somebody with access to that kernel CI infra that
+> triggered this will need to test.
 
-Do you mean to say that other drivers that use hardware-backed keys do
-so by setting "cra_name" to something particular? Like instead of "aes"
-it'd be "aes-but-special-for-this-driver"? If so, that would seem to
-break the design of the crypto API. Which driver did you see that does
-this? Or perhaps, more generally, what are the drivers that Herbert is
-talking about when he mentions the "plenty of existing drivers" that
-already do this?
+So I succeeded at testing this, sort of. I was able to reproduce the
+hang on a CONFIG_PREEMPT=n kernel with this diff:
+
+diff --git a/drivers/net/wireguard/main.c b/drivers/net/wireguard/main.c
+index ee4da9ab8013..19e1186f0db0 100644
+--- a/drivers/net/wireguard/main.c
++++ b/drivers/net/wireguard/main.c
+@@ -15,12 +15,29 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/genetlink.h>
++#include <linux/hw_random.h>
+ #include <net/rtnetlink.h>
+
++static int derp_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	if (wait) {
++		for (;;)
++			cpu_relax();
++	}
++	return 0;
++}
++
++static struct hwrng derp_ops = {
++	.name = "flurpderp",
++	.read = derp_rng_read,
++};
++
+ static int __init wg_mod_init(void)
+ {
+ 	int ret;
+
++	hwrng_register(&derp_ops);
++
+ 	ret = wg_allowedips_slab_init();
+ 	if (ret < 0)
+ 		goto err_allowedips;
+
+
+Next, I changed the cpu_relax() into hwrng_msleep(), as this patch does:
+
+diff --git a/drivers/net/wireguard/main.c b/drivers/net/wireguard/main.c
+index ee4da9ab8013..19e1186f0db0 100644
+--- a/drivers/net/wireguard/main.c
++++ b/drivers/net/wireguard/main.c
+@@ -15,12 +15,29 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/genetlink.h>
++#include <linux/hw_random.h>
+ #include <net/rtnetlink.h>
+
++static int derp_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	if (wait) {
++		for (;;)
++			hwrng_msleep(rng, 1000);
++	}
++	return 0;
++}
++
++static struct hwrng derp_ops = {
++	.name = "flurpderp",
++	.read = derp_rng_read,
++};
++
+ static int __init wg_mod_init(void)
+ {
+ 	int ret;
+
++	hwrng_register(&derp_ops);
++
+ 	ret = wg_allowedips_slab_init();
+ 	if (ret < 0)
+ 		goto err_allowedips;
+
+And then the problem went away.
+
+So I think this patch is a good one.
 
 Jason
