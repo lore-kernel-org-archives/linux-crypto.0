@@ -2,203 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52516C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 18:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E53B4C43219
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 20:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbiJKSUu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Oct 2022 14:20:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59094 "EHLO
+        id S230000AbiJKUCX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Oct 2022 16:02:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbiJKSUt (ORCPT
+        with ESMTP id S230005AbiJKUCF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Oct 2022 14:20:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B27D402D9
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2022 11:20:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665512446;
+        Tue, 11 Oct 2022 16:02:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E67609AF9E;
+        Tue, 11 Oct 2022 13:01:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BFF95612C4;
+        Tue, 11 Oct 2022 20:01:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6889C433D7;
+        Tue, 11 Oct 2022 20:01:51 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="l0by20+e"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665518510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/OTQRN3juAPW8yoc48eb9FvOlYwsRSyxzmGbpR/0Igk=;
-        b=MfsPePtvtZoPY5Ojs5hsZM+R+2D+T8BmA1FadvgH1wewtR+tMIH3/gvCSnLyQfitMPUY9d
-        7NsKkEpddn6/h9kXw2d9P2s+lHaBTKIM4O8x7xlPD5SzWJImKb9JLBth/IrAF4AOUtYIYT
-        i316zcgAJsYZqD+XVHexu7uIq1jlIpw=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-377-qETtm0bBMqmJnlLx6sDOWQ-1; Tue, 11 Oct 2022 14:20:44 -0400
-X-MC-Unique: qETtm0bBMqmJnlLx6sDOWQ-1
-Received: by mail-oo1-f70.google.com with SMTP id i25-20020a4a6f59000000b004758bda2303so8154301oof.0
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2022 11:20:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/OTQRN3juAPW8yoc48eb9FvOlYwsRSyxzmGbpR/0Igk=;
-        b=AP8fhtbHevmO2n83NBGzh17mSGaWU4dveuZsajmVWWPfPiCj4+8KtoXgfdv5+wUB3L
-         ysnrbZsXq8Xf//n0u1wst5yhZYZMFYeZoh6nFdAqzW69vCp822ozYqQR6nCgSQhurIaX
-         ESSAdV2HIkw7bUD2nb3qsdhh3VC05lD6aqsHyHWjSZBmNgN+YgoxcOJwh1ah/XG6ll/D
-         rWyI0ENp7QkcxqagUp9W0Nzzu6lDjydT2veS36nwPuQHjJ3R9ZoeDQA5FHPhbLdXtTER
-         ohUImNzTdTp+j68PQl1ckBqhpz6ozVSZssF803A945QoseYgNXXtv98AGomVY9gTP7lh
-         V/yw==
-X-Gm-Message-State: ACrzQf1Tvn+eZysZq6jHNBf3N3PfxRGrtkmdxIjFnf9WFjwpkqFxwY9H
-        oySW5fYnJeQH5H+NsK3awtPAhS9VoChvgBDl2w3Vu/ahzRGZ9M8KIn+94TReGy9Yfw/xfW8R+Uh
-        wNr73fWHJRsINOteVdj2v/Nj/
-X-Received: by 2002:a05:6870:15d4:b0:12b:8d8d:1001 with SMTP id k20-20020a05687015d400b0012b8d8d1001mr284819oad.137.1665512443596;
-        Tue, 11 Oct 2022 11:20:43 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4YkT+TbXMLE0XB+SAOjd79C2564H5qmOYCwIn4lHaeaWlTipoc33/Rvo3NUpdBjRdA4Em3Qw==
-X-Received: by 2002:a05:6870:15d4:b0:12b:8d8d:1001 with SMTP id k20-20020a05687015d400b0012b8d8d1001mr284809oad.137.1665512443355;
-        Tue, 11 Oct 2022 11:20:43 -0700 (PDT)
-Received: from ?IPv6:2804:1b3:a801:9473:d360:c737:7c9c:d52b? ([2804:1b3:a801:9473:d360:c737:7c9c:d52b])
-        by smtp.gmail.com with ESMTPSA id k16-20020a0568080e9000b003549db40f38sm1878229oil.46.2022.10.11.11.20.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 11:20:42 -0700 (PDT)
-Message-ID: <3d6d47035f8897542a4786eef5a6b8885f4caaf0.camel@redhat.com>
-Subject: Re: [PATCH v1 1/1] crypto/pcrypt: Do not use isolated CPUs for
- callback
-From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras@redhat.com>
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 11 Oct 2022 15:20:39 -0300
-In-Reply-To: <b23b08274ccff99fb341ea272e968f72c2e289ce.camel@redhat.com>
-References: <20221004062536.280712-1-leobras@redhat.com>
-         <Yz1/TVUV+KnLvodg@fuller.cnet>
-         <b23b08274ccff99fb341ea272e968f72c2e289ce.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 
+        bh=/8LEP6iTQrSruVuUlMCIfaNsSoU3M6nvioOPFUPzrh0=;
+        b=l0by20+ebmJonHYlRKOQTn2Rq/LTha1yH59+bV2KEU74nVxvpahVEdVt1xI2f62NLBAgn3
+        twsEZXzZOJm9ZMzTNMu4Omevnc6Vjr/aqBgSm2Zr1v9v/kRjssiiteoY/bB3tR2Ys4R5Cx
+        Xs4GBoajGWwllSQHEx3cJfpFhjyEW8I=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 50afa035 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 11 Oct 2022 20:01:50 +0000 (UTC)
+Date:   Tue, 11 Oct 2022 14:01:45 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Pankaj Gupta <pankaj.gupta@nxp.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>,
+        "gilad@benyossef.com" <gilad@benyossef.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
+        "david@sigma-star.at" <david@sigma-star.at>,
+        "michael@walle.cc" <michael@walle.cc>,
+        "john.ernberg@actia.se" <john.ernberg@actia.se>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "richard@nod.at" <richard@nod.at>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        Sahil Malhotra <sahil.malhotra@nxp.com>,
+        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>
+Subject: Re: [EXT] Re: [PATCH v0 3/8] crypto: hbk flags & info added to the
+ tfm
+Message-ID: <Y0XLqd/+C1sxq2G0@zx2c4.com>
+References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
+ <20221006130837.17587-4-pankaj.gupta@nxp.com>
+ <Yz/OEwDtyTm+VH0p@gondor.apana.org.au>
+ <DU2PR04MB8630CBBB8ABDC3768320C18195209@DU2PR04MB8630.eurprd04.prod.outlook.com>
+ <Y0Q3JKnWSNIC4Xlu@zx2c4.com>
+ <Y0UxY51KQoKCq59o@gondor.apana.org.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y0UxY51KQoKCq59o@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2022-10-07 at 18:42 -0300, Leonardo Br=C3=A1s wrote:
-> On Wed, 2022-10-05 at 09:57 -0300, Marcelo Tosatti wrote:
-> > On Tue, Oct 04, 2022 at 03:25:37AM -0300, Leonardo Bras wrote:
-> > > Currently pcrypt_aead_init_tfm() will pick callback cpus (ctx->cb_cpu=
-)
-> > > from any online cpus. Later padata_reorder() will queue_work_on() the
-> > > chosen cb_cpu.
-> > >=20
-> > > This is undesired if the chosen cb_cpu is listed as isolated (i.e. us=
-ing
-> > > isolcpus=3D... kernel parameter), since the work queued will interfer=
-e with
-> > > the workload on the isolated cpu.
-> > >=20
-> > > Make sure isolated cpus are not used for pcrypt.
-> > >=20
-> > > Signed-off-by: Leonardo Bras <leobras@redhat.com>
-> > > ---
-> > >  crypto/pcrypt.c | 10 +++++++---
-> > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-> > > index 9d10b846ccf73..9017d08c91a8d 100644
-> > > --- a/crypto/pcrypt.c
-> > > +++ b/crypto/pcrypt.c
-> > > @@ -16,6 +16,7 @@
-> > >  #include <linux/kobject.h>
-> > >  #include <linux/cpu.h>
-> > >  #include <crypto/pcrypt.h>
-> > > +#include <linux/sched/isolation.h>
-> > > =20
-> > >  static struct padata_instance *pencrypt;
-> > >  static struct padata_instance *pdecrypt;
-> > > @@ -175,13 +176,16 @@ static int pcrypt_aead_init_tfm(struct crypto_a=
-ead *tfm)
-> > >  	struct pcrypt_instance_ctx *ictx =3D aead_instance_ctx(inst);
-> > >  	struct pcrypt_aead_ctx *ctx =3D crypto_aead_ctx(tfm);
-> > >  	struct crypto_aead *cipher;
-> > > +	struct cpumask non_isolated;
-> > > +
-> > > +	cpumask_and(&non_isolated, cpu_online_mask, housekeeping_cpumask(HK=
-_TYPE_DOMAIN));
-> >=20
-> > Since certain systems do not use isolcpus=3Ddomain, so please use a fla=
-g
-> > that is setup by nohz_full=3D, for example HK_FLAG_MISC:
-> >=20
-> > static int __init housekeeping_nohz_full_setup(char *str)
-> > {
-> >         unsigned long flags;
-> >=20
-> >         flags =3D HK_FLAG_TICK | HK_FLAG_WQ | HK_FLAG_TIMER | HK_FLAG_R=
-CU |
-> >                 HK_FLAG_MISC | HK_FLAG_KTHREAD;
-> >=20
-> >         return housekeeping_setup(str, flags);
-> > }
-> > __setup("nohz_full=3D", housekeeping_nohz_full_setup);
->=20
-> Oh, sure.=C2=A0
-> Since we are talking about WorkQueues, I think it makes sense to pick
-> HK_FLAG_WQ.=20
->=20
-> >=20
-> > Also, shouldnt you use cpumask_t ?/
->=20
-> Yeah, I think so.=C2=A0
-> I was quick to choose the 'struct cpumask' because all functions would op=
-erate
-> in this variable type, but yeah, I think it makes sense to have this vari=
-able
-> being opaque here.
+On Tue, Oct 11, 2022 at 05:03:31PM +0800, Herbert Xu wrote:
+> On Mon, Oct 10, 2022 at 09:15:48AM -0600, Jason A. Donenfeld wrote:
+> >
+> > Do you mean to say that other drivers that use hardware-backed keys do
+> > so by setting "cra_name" to something particular? Like instead of "aes"
+> > it'd be "aes-but-special-for-this-driver"? If so, that would seem to
+> > break the design of the crypto API. Which driver did you see that does
+> > this? Or perhaps, more generally, what are the drivers that Herbert is
+> > talking about when he mentions the "plenty of existing drivers" that
+> > already do this?
+> 
+> Grep for paes for the existing drivers that support this.  I don't
+> have anything against this feature per se, but the last thing we
+> want is a proliferation of different ways of doing the same thing.
 
-In fact, it seems neither 'struct cpumask' nor 'cpumask_t' are recommended =
-to be
-used allocated in the stack, due to the large size it can get (up to 1kB).=
-=C2=A0
+I've got no stake in this, but isn't the whole idea that if you specify
+"aes" you get AES, and if you specify "cbc(aes)" you get AES-CBC, and so
+forth? And so leaking implementation details into the algorithm name
+feels like it breaks the abstraction a bit.
 
-At include/linux/cpumask.h we have:
-'cpumask_var_t: struct cpumask for stack usage'
-which should work better at least for init functions like this.
+Rather, drivers that do AES should be called "aes". For this hardware
+key situation, I guess that means keys have a type (in-memory vs
+hardware-resident). Then, a crypto operation takes an "algorithm" and a
+"key", and the abstraction then picks the best implementation that's
+compatible with both the "algorithm" and the "key".
 
-In other cases, I see 'static cpumask_t' being used to avoid the allocation
-overhead, but it's probably due to the functions being called in very speci=
-fic
-scenarios. It could mean trouble if multiple cpus try to use it at once.
+I haven't looked carefully, but I assume that's more or less what this
+patchset does.
 
-What do you recommend on it?
+If you don't want a proliferation of different ways of doing the same
+thing, maybe the requirement should be that the author of this series
+also converts the existing "paes" kludge to use the new thing he's
+proposing?
 
-Best regards,
-Leo
+Or maybe the "paes" kludge is better for other reasons? I don't know
+really. Just my 2¢, but feel free to disregard, as I really have nothing
+to do with this change.
 
->=20
-> >=20
-> > Looks good otherwise.
-> >=20
-> > Thanks!
->=20
-> Thank you for reviewing!=20
->=20
-> Leo
->=20
-> >=20
-> >=20
-> > > =20
-> > >  	cpu_index =3D (unsigned int)atomic_inc_return(&ictx->tfm_count) %
-> > > -		    cpumask_weight(cpu_online_mask);
-> > > +		    cpumask_weight(&non_isolated);
-> > > =20
-> > > -	ctx->cb_cpu =3D cpumask_first(cpu_online_mask);
-> > > +	ctx->cb_cpu =3D cpumask_first(&non_isolated);
-> > >  	for (cpu =3D 0; cpu < cpu_index; cpu++)
-> > > -		ctx->cb_cpu =3D cpumask_next(ctx->cb_cpu, cpu_online_mask);
-> > > +		ctx->cb_cpu =3D cpumask_next(ctx->cb_cpu, &non_isolated);
-> > > =20
-> > >  	cipher =3D crypto_spawn_aead(&ictx->spawn);
-> > > =20
-> > > --=20
-> > > 2.37.3
-> > >=20
-> > >=20
-> >=20
->=20
-
+Jason
