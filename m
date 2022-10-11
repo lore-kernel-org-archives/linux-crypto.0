@@ -2,148 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8043DC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 21:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C541C43219
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 23:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbiJKVll (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Oct 2022 17:41:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50052 "EHLO
+        id S229595AbiJKXCA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Oct 2022 19:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiJKVlj (ORCPT
+        with ESMTP id S229616AbiJKXB5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Oct 2022 17:41:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0349A02F7;
-        Tue, 11 Oct 2022 14:41:37 -0700 (PDT)
+        Tue, 11 Oct 2022 19:01:57 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A9B95E63;
+        Tue, 11 Oct 2022 16:01:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C81DD608C0;
-        Tue, 11 Oct 2022 21:41:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E5CC433D6;
-        Tue, 11 Oct 2022 21:41:34 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5E2E8B817F6;
+        Tue, 11 Oct 2022 23:01:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9723CC433D6;
+        Tue, 11 Oct 2022 23:01:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665524495;
-        bh=i0m1nXSGQ7El8zKzDjINCWdp5TGe82jc/TYesmzF5iE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BxVPDy7544JIgvkVqmCAsUmBwUC+QkgAdtyfDN26P27d3ZwGZr1KYoUXoDAoOWlEh
-         5Va9mHXs9PXPW9GxorQePLAkVQtT8vsgpFOGYgxb5Dp7n6MbdaKkzjpXpoTMgvgm0Z
-         UcOfs+7AwSrHEEItI+UBKXlSa33oGVn6vyquazKRciv4T97UcOqliEEUxGtwuTpogb
-         QFa+4+8ZXsXj8DAt49C8gVgPzfbhO7B6ejBjhDaKD+R6eANOyYode7LJps5xRoVmAR
-         w1SNI7ll/J4AkmGcLGwT3rw6SSUrD6SoPwFGoXAzz9fPX4Qo/X6erxfCQ/qd/LCMSX
-         KEncYvs4YMOHQ==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-fscrypt@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
-Subject: [PATCH] fscrypt: fix keyring memory leak on mount failure
-Date:   Tue, 11 Oct 2022 14:38:38 -0700
-Message-Id: <20221011213838.209879-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <0000000000009aad5e05eac85f36@google.com>
-References: <0000000000009aad5e05eac85f36@google.com>
+        s=k20201202; t=1665529308;
+        bh=gCI+X2WOw4l6GrJak35sDaAf8gDE0fXgutS5wo82m0c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AJFptayVxOqteJVOLykn7hUdHTEFBSFYdPDnURZs6EbQ5lnc5EDwMPEWLIY2Zkc6k
+         ToDJ69GFb03nJ1ZHa3Bu1XZh90AT8husNifCGxqExcBTtq73zRbzdbLGz1yV1PS0BR
+         YgADbRNTz4kaxl1FPtL5h69IOLIEA3uAgLFu6LoZOj6vAhrzGGJogNzed4iTNoQ9kU
+         RplOVmj/pT0WrloWUBcPNyJldLUtdrL9BReJJkpTFUke93m8zD4dIphjguaBr6M6BU
+         xC/9Fc6Zmo9mtTlbNcRQZT+mur3mj5hpEnCkCHrxZUfVSrUfpxEhWQqxTOA+fraPtq
+         COtQHCYR1WDtw==
+Date:   Tue, 11 Oct 2022 16:01:44 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        loongarch@lists.linux.dev, netdev@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v6 0/7] treewide cleanup of random integer usage
+Message-ID: <20221011160144.1c0dc2af@kernel.org>
+In-Reply-To: <20221010230613.1076905-1-Jason@zx2c4.com>
+References: <20221010230613.1076905-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Mon, 10 Oct 2022 17:06:06 -0600 Jason A. Donenfeld wrote:
+> - If you want a secure or an insecure random u64, use get_random_u64().
+> - If you want a secure or an insecure random u32, use get_random_u32().
+>   * The old function prandom_u32() has been deprecated for a while now
+>     and is just a wrapper around get_random_u32(). Same for
+>     get_random_int().
+> - If you want a secure or an insecure random u16, use get_random_u16().
+> - If you want a secure or an insecure random u8, use get_random_u8().
+> - If you want secure or insecure random bytes, use get_random_bytes().
+>   * The old function prandom_bytes() has been deprecated for a while now
+>     and has long been a wrapper around get_random_bytes().
+> - If you want a non-uniform random u32, u16, or u8 bounded by a certain
+>   open interval maximum, use prandom_u32_max().
+>   * I say "non-uniform", because it doesn't do any rejection sampling or
+>     divisions. Hence, it stays within the prandom_* namespace.
 
-Commit d7e7b9af104c ("fscrypt: stop using keyrings subsystem for
-fscrypt_master_key") moved the keyring destruction from __put_super() to
-generic_shutdown_super() so that the filesystem's block device(s) are
-still available.  Unfortunately, this causes a memory leak in the case
-where a mount is attempted with the test_dummy_encryption mount option,
-but the mount fails after the option has already been processed.
-
-To fix this, attempt the keyring destruction in both places.
-
-Reported-by: syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
-Fixes: d7e7b9af104c ("fscrypt: stop using keyrings subsystem for fscrypt_master_key")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/crypto/keyring.c     | 17 +++++++++++------
- fs/super.c              |  3 ++-
- include/linux/fscrypt.h |  4 ++--
- 3 files changed, 15 insertions(+), 9 deletions(-)
-
-diff --git a/fs/crypto/keyring.c b/fs/crypto/keyring.c
-index 1cca09aa43f8b..2a24b1f0ae688 100644
---- a/fs/crypto/keyring.c
-+++ b/fs/crypto/keyring.c
-@@ -205,14 +205,19 @@ static int allocate_filesystem_keyring(struct super_block *sb)
- }
- 
- /*
-- * This is called at unmount time to release all encryption keys that have been
-- * added to the filesystem, along with the keyring that contains them.
-+ * Release all encryption keys that have been added to the filesystem, along
-+ * with the keyring that contains them.
-  *
-- * Note that besides clearing and freeing memory, this might need to evict keys
-- * from the keyslots of an inline crypto engine.  Therefore, this must be called
-- * while the filesystem's underlying block device(s) are still available.
-+ * This is called at unmount time.  The filesystem's underlying block device(s)
-+ * are still available at this time; this is important because after user file
-+ * accesses have been allowed, this function may need to evict keys from the
-+ * keyslots of an inline crypto engine, which requires the block device(s).
-+ *
-+ * This is also called when the super_block is being freed.  This is needed to
-+ * avoid a memory leak if mounting fails after the "test_dummy_encryption"
-+ * option was processed, as in that case the unmount-time call isn't made.
-  */
--void fscrypt_sb_delete(struct super_block *sb)
-+void fscrypt_destroy_keyring(struct super_block *sb)
- {
- 	struct fscrypt_keyring *keyring = sb->s_master_keys;
- 	size_t i;
-diff --git a/fs/super.c b/fs/super.c
-index 6a82660e1adba..8d39e4f11cfa3 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -291,6 +291,7 @@ static void __put_super(struct super_block *s)
- 		WARN_ON(s->s_inode_lru.node);
- 		WARN_ON(!list_empty(&s->s_mounts));
- 		security_sb_free(s);
-+		fscrypt_destroy_keyring(s);
- 		put_user_ns(s->s_user_ns);
- 		kfree(s->s_subtype);
- 		call_rcu(&s->rcu, destroy_super_rcu);
-@@ -479,7 +480,7 @@ void generic_shutdown_super(struct super_block *sb)
- 		evict_inodes(sb);
- 		/* only nonzero refcount inodes can have marks */
- 		fsnotify_sb_delete(sb);
--		fscrypt_sb_delete(sb);
-+		fscrypt_destroy_keyring(sb);
- 		security_sb_delete(sb);
- 
- 		if (sb->s_dio_done_wq) {
-diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
-index cad78b569c7ef..4f5f8a6512132 100644
---- a/include/linux/fscrypt.h
-+++ b/include/linux/fscrypt.h
-@@ -307,7 +307,7 @@ fscrypt_free_dummy_policy(struct fscrypt_dummy_policy *dummy_policy)
- }
- 
- /* keyring.c */
--void fscrypt_sb_delete(struct super_block *sb);
-+void fscrypt_destroy_keyring(struct super_block *sb);
- int fscrypt_ioctl_add_key(struct file *filp, void __user *arg);
- int fscrypt_add_test_dummy_key(struct super_block *sb,
- 			       const struct fscrypt_dummy_policy *dummy_policy);
-@@ -521,7 +521,7 @@ fscrypt_free_dummy_policy(struct fscrypt_dummy_policy *dummy_policy)
- }
- 
- /* keyring.c */
--static inline void fscrypt_sb_delete(struct super_block *sb)
-+static inline void fscrypt_destroy_keyring(struct super_block *sb)
- {
- }
- 
-
-base-commit: 041bc24d867a2a577a06534d6d25e500b24a01ef
--- 
-2.37.3
-
+Acked-by: Jakub Kicinski <kuba@kernel.org>
