@@ -2,123 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C541C43219
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 23:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C28B3C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Oct 2022 23:07:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbiJKXCA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Oct 2022 19:02:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41736 "EHLO
+        id S229451AbiJKXHp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Oct 2022 19:07:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiJKXB5 (ORCPT
+        with ESMTP id S229527AbiJKXHo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Oct 2022 19:01:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A9B95E63;
-        Tue, 11 Oct 2022 16:01:54 -0700 (PDT)
+        Tue, 11 Oct 2022 19:07:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E18C143179;
+        Tue, 11 Oct 2022 16:07:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5E2E8B817F6;
-        Tue, 11 Oct 2022 23:01:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9723CC433D6;
-        Tue, 11 Oct 2022 23:01:45 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 95A3FB80EA9;
+        Tue, 11 Oct 2022 23:07:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F92EC433C1;
+        Tue, 11 Oct 2022 23:07:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665529308;
-        bh=gCI+X2WOw4l6GrJak35sDaAf8gDE0fXgutS5wo82m0c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=AJFptayVxOqteJVOLykn7hUdHTEFBSFYdPDnURZs6EbQ5lnc5EDwMPEWLIY2Zkc6k
-         ToDJ69GFb03nJ1ZHa3Bu1XZh90AT8husNifCGxqExcBTtq73zRbzdbLGz1yV1PS0BR
-         YgADbRNTz4kaxl1FPtL5h69IOLIEA3uAgLFu6LoZOj6vAhrzGGJogNzed4iTNoQ9kU
-         RplOVmj/pT0WrloWUBcPNyJldLUtdrL9BReJJkpTFUke93m8zD4dIphjguaBr6M6BU
-         xC/9Fc6Zmo9mtTlbNcRQZT+mur3mj5hpEnCkCHrxZUfVSrUfpxEhWQqxTOA+fraPtq
-         COtQHCYR1WDtw==
-Date:   Tue, 11 Oct 2022 16:01:44 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v6 0/7] treewide cleanup of random integer usage
-Message-ID: <20221011160144.1c0dc2af@kernel.org>
-In-Reply-To: <20221010230613.1076905-1-Jason@zx2c4.com>
-References: <20221010230613.1076905-1-Jason@zx2c4.com>
+        s=k20201202; t=1665529650;
+        bh=SErtSIzqJxf+58W8QNfx55+T8mc2aypbI8+RKkBM1NU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rKxbc3kMqi/LJTyTUGXFRLKx3dYkrBmlCOsXgRH+zLTGOe+s+BU6aFd36t2Fg4GT0
+         wu4xJ9phEcXV7ySn8/qU7s/u555o2LpoE5VCCEwPnmcaPdhy5qVg5H9EADieyF6LSc
+         wWNK21Ze42XzpKMuOyRkRNIcBcmGVbP7Hohe2bsBQ9XbshxFIuLmJgcRa2w9sgLcqD
+         UMLJKusnEJqS/GnkDEUDukGMoHbXSR6wmyxdVX0eewKY2/TXm0Eyb0qoLBC/T0NIsU
+         RD64piGKrTIqnQ+Rhc2ISuGdI0wAdbZaln5POCyVJUbQyjaJ0FmLRPSNcYPU+Bb/GK
+         eOXuzAdtvtvoA==
+Date:   Tue, 11 Oct 2022 16:07:27 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Frederick Lawler <fred@cloudflare.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net, hch@lst.de,
+        smueller@chronox.de, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kernel-team@cloudflare.com,
+        Ondrej Mosnacek <omosnace@redhat.com>
+Subject: Re: [RFC PATCH 1/1] crypto: af_alg - Support symmetric encryption
+ via keyring keys
+Message-ID: <Y0X3L/jhinCqJXxj@sol.localdomain>
+References: <20221004212927.1539105-1-fred@cloudflare.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221004212927.1539105-1-fred@cloudflare.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 10 Oct 2022 17:06:06 -0600 Jason A. Donenfeld wrote:
-> - If you want a secure or an insecure random u64, use get_random_u64().
-> - If you want a secure or an insecure random u32, use get_random_u32().
->   * The old function prandom_u32() has been deprecated for a while now
->     and is just a wrapper around get_random_u32(). Same for
->     get_random_int().
-> - If you want a secure or an insecure random u16, use get_random_u16().
-> - If you want a secure or an insecure random u8, use get_random_u8().
-> - If you want secure or insecure random bytes, use get_random_bytes().
->   * The old function prandom_bytes() has been deprecated for a while now
->     and has long been a wrapper around get_random_bytes().
-> - If you want a non-uniform random u32, u16, or u8 bounded by a certain
->   open interval maximum, use prandom_u32_max().
->   * I say "non-uniform", because it doesn't do any rejection sampling or
->     divisions. Hence, it stays within the prandom_* namespace.
+Hi Frederick,
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, Oct 04, 2022 at 04:29:27PM -0500, Frederick Lawler wrote:
+> We want to leverage keyring to store sensitive keys, and then use those
+> keys for symmetric encryption via the crypto API. Among the key types we
+> wish to support are: user, logon, encrypted, and trusted.
+> 
+> User key types are already able to have their data copied to user space,
+> but logon does not support this. Further, trusted and encrypted keys will
+> return their encrypted data back to user space on read, which make them not
+> ideal for symmetric encryption.
+> 
+> To support symmetric encryption for these key types, add a new
+> ALG_SET_KEY_BY_KEY_SERIAL setsockopt() option to the crypto API. This
+> allows users to pass a key_serial_t to the crypto API to perform
+> symmetric encryption. The behavior is the same as ALG_SET_KEY, but
+> the crypto key data is copied in kernel space from a keyring key,
+> which allows for the support of logon, encrypted, and trusted key types.
+> 
+> Keyring keys must have the KEY_(POS|USR|GRP|OTH)_SEARCH permission set
+> to leverage this feature. This follows the asymmetric_key type where key
+> lookup calls eventually lead to keyring_search_rcu() without the
+> KEYRING_SEARCH_NO_CHECK_PERM flag set.
+> 
+> Signed-off-by: Frederick Lawler <fred@cloudflare.com>
+
+There was a similar patch several years ago by Ondrej Mosnacek:
+https://lore.kernel.org/linux-crypto/20190521100034.9651-1-omosnace@redhat.com/T/#u
+
+Have you addressed all the feedback that was raised on that one?
+
+Two random nits below:
+
+> +	*dest_len = key->datalen;
+> +	*dest = kmalloc(*dest_len, GFP_KERNEL);
+> +	if (!*dest)
+> +		return -ENOMEM;
+> +
+> +	memcpy(*dest, ukp->data, *dest_len);
+
+This should use kmemdup().
+
+> +	} else if (IS_ENABLED(CONFIG_ENCRYPTED_KEYS) &&
+> +			   !strcmp(key->type->name, "encrypted")) {
+> +		read_key = &read_key_type_encrypted;
+> +	} else if (IS_ENABLED(CONFIG_TRUSTED_KEYS) &&
+> +			   !strcmp(key->type->name, "trusted")) {
+> +		read_key = &read_key_type_trusted;
+
+These need to use IS_REACHABLE(), not IS_ENABLED().
+
+- Eric
