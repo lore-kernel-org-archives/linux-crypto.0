@@ -2,75 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5342C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 15:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BA2C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 16:22:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbiJLPVa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 11:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52822 "EHLO
+        id S229978AbiJLQWh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 12:22:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiJLPV3 (ORCPT
+        with ESMTP id S230008AbiJLQWb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 11:21:29 -0400
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 101F7DD886;
-        Wed, 12 Oct 2022 08:21:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1665588082;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=YIHasWTRuNMrnwJtbfmb3Tp7u61kv2WGbfpow4gG9/w=;
-    b=Ylm3PXFWtnzC6bE9VBzHCPvyvKoVszSqWNSamPecx4chnPt6Am6g61FBnKwW+3E5OX
-    scPD9Wjb3SnRygPoGAI0t1LoVF+Qw7sWHGkEIH5jjVqa3dv/m0aejlfrNVhENRd/D1fR
-    mNicX5uBKl0SHRoFRaQEW//7gsOUMPfI4zzo0P9CgosKMBCDTt2eyG6rT2lGWWNtK+i/
-    78fCz/MuYjtMnEggENzp0C4AeRBWrZBj5vEMvID5dFPrzyVz0TycnJUeVLUC/+OdQ38u
-    EBNzLPjrc/ObDbR0CwqkI3Y6Z1+1zHE/tN+zj7ve0rQTLb+W+NpvZORqfbPJrHCIhDXP
-    aOrw==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJfSfIdNJ"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 48.2.0 DYNA|AUTH)
-    with ESMTPSA id za5fe3y9CFLLGJi
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Wed, 12 Oct 2022 17:21:21 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Frederick Lawler <fred@cloudflare.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net, hch@lst.de,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kernel-team@cloudflare.com, Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [RFC PATCH 1/1] crypto: af_alg - Support symmetric encryption via keyring keys
-Date:   Wed, 12 Oct 2022 17:21:21 +0200
-Message-ID: <6063928.z1iD19Vvxs@tauon.chronox.de>
-In-Reply-To: <cc5c3efe-7dc3-65d6-d7d9-761bfc2c9711@cloudflare.com>
-References: <20221004212927.1539105-1-fred@cloudflare.com> <Y0X3L/jhinCqJXxj@sol.localdomain> <cc5c3efe-7dc3-65d6-d7d9-761bfc2c9711@cloudflare.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+        Wed, 12 Oct 2022 12:22:31 -0400
+X-Greylist: delayed 632 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Oct 2022 09:22:20 PDT
+Received: from smtp.cesky-hosting.cz (smtp.cesky-hosting.cz [IPv6:2a00:1ed0:2:0:1:5bef:c8ee:1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12CFDED21;
+        Wed, 12 Oct 2022 09:22:20 -0700 (PDT)
+X-Virus-Scanned: Debian amavisd-new at smtp.cesky-hosting.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=elrest.cz;
+        s=rampa2-202208; t=1665591114;
+        bh=Kxemadi69pFkVKEwR5Ct+aURnZswpdi+grRKg9XSUXM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bAJz+2sz2IMgY6tsPsXGxVq5bdbCyOqe0lEq1PgQ5u3JnITtPyURer2dO+loY7E5x
+         ES28+H560S8Lw3Yr6erJ9FdbqY8sQckLpc2YuRtsT+J911nqp+ERQ3aFJPGDP/oXg7
+         4jvGrefQ1rnZSwsi6lJYW4AC8ZIQsdPeVv2huIXYWEEL8SOV6M67z+9dm5QpgePIUZ
+         6/uzYAvHawwfnfHHQmMEFbrDKJFnem3we8VmIab58vwiJL46zo0WjDDbprT6IdSQ8y
+         jWjub3fTeVjqu6L2U/u49zsdHpy1qBqP9VmtcTcvrt6cbQEiVT/B3ztfQgLX+yyu/M
+         9D3XpiQJPxiqw==
+X-Thin-Conversation: conversation
+Received: from localhost.localdomain (unknown [5.181.92.50])
+        (Authenticated sender: tomas.marek@elrest.cz)
+        by smtp.cesky-hosting.cz (Postfix) with ESMTPSA id 81D451498;
+        Wed, 12 Oct 2022 18:11:54 +0200 (CEST)
+From:   Tomas Marek <tomas.marek@elrest.cz>
+To:     mpm@selenic.com, herbert@gondor.apana.org.au
+Cc:     mcoquelin.stm32@gmail.com, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        alexandre.torgue@foss.st.com, oleg.karfich@wago.com,
+        Tomas Marek <tomas.marek@elrest.cz>
+Subject: [PATCH 1/2] hwrng: stm32 - fix number of returned bytes on read
+Date:   Wed, 12 Oct 2022 18:09:23 +0200
+Message-Id: <20221012160924.12226-2-tomas.marek@elrest.cz>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20221012160924.12226-1-tomas.marek@elrest.cz>
+References: <20221012160924.12226-1-tomas.marek@elrest.cz>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 12. Oktober 2022, 16:49:56 CEST schrieb Frederick Lawler:
+The stm32_rng_read() function uses `retval` variable as a counter of
+generated random bytes. However, the same variable is used to store
+a result of the polling function in case the driver is waiting until
+the TRNG is ready. The TRNG generates random numbers by 16B. One
+loop read 4B. So, the function calls the polling every 16B, i.e.
+every 4th loop. The `retval` counter is reset on poll call and only
+number of bytes read after the last poll call is returned to the
+caller. The remaining sampled random bytes (for example 48 out of
+64 in case 64 bytes are read) are not used.
 
-Hi Frederick,
+Use different variable to store the polling function result and
+do not overwrite `retval` counter.
 
-> I believe I've addressed most of the feedback. Starting with we agree
-> preferring key_serial_t. I changed to to use IS_REACHABLE(), and set
-> ALG_SET_KEY_BY_KEY_SERIAL to 10 leaving a comment about libkcapi
-> reserving values 7-9.
+Cc: Oleg Karfich <oleg.karfich@wago.com>
+Signed-off-by: Tomas Marek <tomas.marek@elrest.cz>
+---
+ drivers/char/hw_random/stm32-rng.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-This reservation should not be observed. I provided patches for adding AF_ALG 
-interfaces for KPP and AKCIPHER some time ago which were rejected. Libkcapi 
-still contains the interface implementations but are not compiled by default. 
-
-As the patches are rejected, their values should not be considered as 
-relevant. Thus, I think your patch should not keep holes in the numbers.
-
-Ciao
-Stephan
-
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index bc22178f83e8..8eaacefd498b 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -49,11 +49,13 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 		/* Manage timeout which is based on timer and take */
+ 		/* care of initial delay time when enabling rng	*/
+ 		if (!sr && wait) {
+-			retval = readl_relaxed_poll_timeout_atomic(priv->base
++			int ret;
++
++			ret = readl_relaxed_poll_timeout_atomic(priv->base
+ 								   + RNG_SR,
+ 								   sr, sr,
+ 								   10, 50000);
+-			if (retval)
++			if (ret)
+ 				dev_err((struct device *)priv->rng.priv,
+ 					"%s: timeout %x!\n", __func__, sr);
+ 		}
+-- 
+2.17.1
 
