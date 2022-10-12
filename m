@@ -2,273 +2,272 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42013C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B7FC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:00:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbiJLWAe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 18:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        id S229550AbiJLWAn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 18:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiJLWAU (ORCPT
+        with ESMTP id S229972AbiJLWA3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 18:00:20 -0400
+        Wed, 12 Oct 2022 18:00:29 -0400
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB343E742;
-        Wed, 12 Oct 2022 15:00:11 -0700 (PDT)
-Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CL7nUZ016092;
-        Wed, 12 Oct 2022 21:59:59 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C1E422C0;
+        Wed, 12 Oct 2022 15:00:12 -0700 (PDT)
+Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CKwqKa008071;
+        Wed, 12 Oct 2022 21:59:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=PJ23TVkPoznEmI/AzY+zwfyDq1fzzxeVCOJWO7ijd2E=;
- b=NOgzVQ6FqkEG8LF7XdZO10hs5ViDwApvL5Rc/w9UogENt2AtV+dZVdTI1fnlCldKSRs+
- BTzEab8hy5QFzbnfcxL6rVMEf4YFlWfUyy3lLmGyJuh/8MeLSDhKr29y6w29WSznkYCG
- V64eeYk+kEod5S7mijkokBYrgW/7d1/lP8nYaa3b535if8SWJUhcGjsMJdR8c5YRF1yM
- UNOmlNeqAG+RcXRR+jEhs+veQsKQriTQkQgDW2hnq6ecMrJqxDKPpscNFPc831sqpSnf
- Q64CkZX/bpfrU4QBPHKLWsdbeQ71XA64u2cRLyW23Mh/rxrLgKz28Dj67EPZCCCMF34Z 6w== 
+ bh=QTkyAOc86d/ALjZrO/JAy9mwf2Rc5zZNS5XWX8x3KVU=;
+ b=F15R0CXaZFRQYQbo63rBujJeUwVGm5wVfZpKkJGSgieEZcMt2EFbdYPECgs4xLBYmb4k
+ LVjfvJsuUDHHZj9eaItdHeqAsp7HgE4dtBkHmImBJydkqiJ0E0738Wk7VR7cisacdOxN
+ l0BjpNb0qPwiM8UHOBG2Qv6gzu4KWUOV8yvHUOJH2pSKyYygfoYBFiAL/HmDfHLeDbaM
+ xNHt+gQuiWoWktqp09iNI4/5DMoIzqVQdnGB+Vy4RlbDPgBPq+L/EiMrPrdag1c/Y4n0
+ XOXJAzx4LoOKDOUfQEWSczS8mtxI+JV3QPrIBo95k4OevsH35qrm1Sd2X87xZta2SmJb ww== 
 Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k657j8a4y-1
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k653c8daf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 21:59:59 +0000
+        Wed, 12 Oct 2022 21:59:52 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 81D031396A;
-        Wed, 12 Oct 2022 21:59:58 +0000 (UTC)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id DFE7613965;
+        Wed, 12 Oct 2022 21:59:51 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 28796805032;
-        Wed, 12 Oct 2022 21:59:58 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 853DA808EE1;
+        Wed, 12 Oct 2022 21:59:51 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 09/19] crypto: x86 - use common macro for FPU limit
-Date:   Wed, 12 Oct 2022 16:59:21 -0500
-Message-Id: <20221012215931.3896-10-elliott@hpe.com>
+Subject: [PATCH v2 05/19] crypto: x86/crc - limit FPU preemption
+Date:   Wed, 12 Oct 2022 16:59:17 -0500
+Message-Id: <20221012215931.3896-6-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221012215931.3896-1-elliott@hpe.com>
 References: <20221006223151.22159-1-elliott@hpe.com>
  <20221012215931.3896-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: cvBzHnz1Jrp4-w5puDxizPr6_DNBD6L8
-X-Proofpoint-GUID: cvBzHnz1Jrp4-w5puDxizPr6_DNBD6L8
+X-Proofpoint-GUID: P2-UHsNACr6wYY-UIFlHqmPBROyZAoO5
+X-Proofpoint-ORIG-GUID: P2-UHsNACr6wYY-UIFlHqmPBROyZAoO5
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-12_11,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 spamscore=0
- phishscore=0 impostorscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210120138
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 bulkscore=0 priorityscore=1501 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2210120138
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use a common macro name (FPU_BYTES) for the limit of the number of bytes
-processed within kernel_fpu_begin and kernel_fpu_end rather than
-using SZ_4K (which is a signed value), or a magic value of 4096U.
+As done by the ECB and CBC helpers in arch/x86/crypt/ecb_cbc_helpers.h,
+limit the number of bytes processed between kernel_fpu_begin() and
+kernel_fpu_end() calls.
 
-Use unsigned int rather than size_t for some of the arguments to
-avoid typecasting for the min() macro.
+Those functions call preempt_disable() and preempt_enable(), so
+the CPU core is unavailable for scheduling while running, leading to:
+    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: ...
 
+Fixes: 78c37d191dd6 ("crypto: crc32 - add crc32 pclmulqdq implementation and wrappers for table implementation")
+Fixes: 6a8ce1ef3940 ("crypto: crc32c - Optimize CRC32C calculation with PCLMULQDQ instruction")
+Fixes: 0b95a7f85718 ("crypto: crct10dif - Glue code to cast accelerated CRCT10DIF assembly as a crypto transform")
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/x86/crypto/blake2s-glue.c         |  7 ++++---
- arch/x86/crypto/chacha_glue.c          |  4 +++-
- arch/x86/crypto/nhpoly1305-avx2-glue.c |  4 +++-
- arch/x86/crypto/nhpoly1305-sse2-glue.c |  4 +++-
- arch/x86/crypto/poly1305_glue.c        | 25 ++++++++++++++-----------
- arch/x86/crypto/polyval-clmulni_glue.c |  5 +++--
- 6 files changed, 30 insertions(+), 19 deletions(-)
+ arch/x86/crypto/crc32-pclmul_asm.S      |  6 ++--
+ arch/x86/crypto/crc32-pclmul_glue.c     | 19 ++++++++----
+ arch/x86/crypto/crc32c-intel_glue.c     | 29 ++++++++++++++----
+ arch/x86/crypto/crct10dif-pclmul_glue.c | 39 ++++++++++++++++++++-----
+ 4 files changed, 71 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
-index aaba21230528..3054ee7fa219 100644
---- a/arch/x86/crypto/blake2s-glue.c
-+++ b/arch/x86/crypto/blake2s-glue.c
-@@ -16,6 +16,8 @@
- #include <asm/processor.h>
- #include <asm/simd.h>
+diff --git a/arch/x86/crypto/crc32-pclmul_asm.S b/arch/x86/crypto/crc32-pclmul_asm.S
+index ca53e96996ac..9abd861636c3 100644
+--- a/arch/x86/crypto/crc32-pclmul_asm.S
++++ b/arch/x86/crypto/crc32-pclmul_asm.S
+@@ -72,15 +72,15 @@
+ .text
+ /**
+  *      Calculate crc32
+- *      BUF - buffer (16 bytes aligned)
+- *      LEN - sizeof buffer (16 bytes aligned), LEN should be grater than 63
++ *      BUF - buffer - must be 16 bytes aligned
++ *      LEN - sizeof buffer - must be multiple of 16 bytes and greater than 63
+  *      CRC - initial crc32
+  *      return %eax crc32
+  *      uint crc32_pclmul_le_16(unsigned char const *buffer,
+  *	                     size_t len, uint crc32)
+  */
+ 
+-SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
++SYM_FUNC_START(crc32_pclmul_le_16)
+ 	movdqa  (BUF), %xmm1
+ 	movdqa  0x10(BUF), %xmm2
+ 	movdqa  0x20(BUF), %xmm3
+diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
+index 98cf3b4e4c9f..38539c6edfe5 100644
+--- a/arch/x86/crypto/crc32-pclmul_glue.c
++++ b/arch/x86/crypto/crc32-pclmul_glue.c
+@@ -46,6 +46,8 @@
+ #define SCALE_F			16L	/* size of xmm register */
+ #define SCALE_F_MASK		(SCALE_F - 1)
  
 +#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
 +
- asmlinkage void blake2s_compress_ssse3(struct blake2s_state *state,
- 				       const u8 *block, const size_t nblocks,
- 				       const u32 inc);
-@@ -29,8 +31,7 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
- void blake2s_compress(struct blake2s_state *state, const u8 *block,
- 		      size_t nblocks, const u32 inc)
- {
--	/* SIMD disables preemption, so relax after processing each page. */
--	BUILD_BUG_ON(SZ_4K / BLAKE2S_BLOCK_SIZE < 8);
-+	BUILD_BUG_ON(FPU_BYTES / BLAKE2S_BLOCK_SIZE < 8);
+ u32 crc32_pclmul_le_16(unsigned char const *buffer, size_t len, u32 crc32);
  
- 	if (!static_branch_likely(&blake2s_use_ssse3) || !may_use_simd()) {
- 		blake2s_compress_generic(state, block, nblocks, inc);
-@@ -39,7 +40,7 @@ void blake2s_compress(struct blake2s_state *state, const u8 *block,
+ static u32 __attribute__((pure))
+@@ -70,12 +72,19 @@ static u32 __attribute__((pure))
+ 	iquotient = len & (~SCALE_F_MASK);
+ 	iremainder = len & SCALE_F_MASK;
  
- 	do {
- 		const size_t blocks = min_t(size_t, nblocks,
--					    SZ_4K / BLAKE2S_BLOCK_SIZE);
-+					    FPU_BYTES / BLAKE2S_BLOCK_SIZE);
- 
- 		kernel_fpu_begin();
- 		if (IS_ENABLED(CONFIG_AS_AVX512) &&
-diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-index 7b3a1cf0984b..0d7e172862db 100644
---- a/arch/x86/crypto/chacha_glue.c
-+++ b/arch/x86/crypto/chacha_glue.c
-@@ -15,6 +15,8 @@
- #include <linux/sizes.h>
- #include <asm/simd.h>
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
+-	kernel_fpu_begin();
+-	crc = crc32_pclmul_le_16(p, iquotient, crc);
+-	kernel_fpu_end();
++	do {
++		unsigned int chunk = min(iquotient, FPU_BYTES);
 +
- asmlinkage void chacha_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 				       unsigned int len, int nrounds);
- asmlinkage void chacha_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
-@@ -147,7 +149,7 @@ void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
- 		return chacha_crypt_generic(state, dst, src, bytes, nrounds);
- 
- 	do {
--		unsigned int todo = min_t(unsigned int, bytes, SZ_4K);
-+		unsigned int todo = min(bytes, FPU_BYTES);
- 
- 		kernel_fpu_begin();
- 		chacha_dosimd(state, dst, src, todo, nrounds);
-diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-index 8ea5ab0f1ca7..59615ae95e86 100644
---- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
-+++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-@@ -13,6 +13,8 @@
- #include <linux/sizes.h>
- #include <asm/simd.h>
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
++		kernel_fpu_begin();
++		crc = crc32_pclmul_le_16(p, chunk, crc);
++		kernel_fpu_end();
 +
- asmlinkage void nh_avx2(const u32 *key, const u8 *message, size_t message_len,
- 			u8 hash[NH_HASH_BYTES]);
++		iquotient -= chunk;
++		p += chunk;
++	} while (iquotient >= PCLMUL_MIN_LEN);
  
-@@ -30,7 +32,7 @@ static int nhpoly1305_avx2_update(struct shash_desc *desc,
- 		return crypto_nhpoly1305_update(desc, src, srclen);
+-	if (iremainder)
+-		crc = crc32_le(crc, p + iquotient, iremainder);
++	if (iquotient || iremainder)
++		crc = crc32_le(crc, p, iquotient + iremainder);
  
- 	do {
--		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
-+		unsigned int n = min(srclen, FPU_BYTES);
- 
- 		kernel_fpu_begin();
- 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_avx2);
-diff --git a/arch/x86/crypto/nhpoly1305-sse2-glue.c b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-index 2b353d42ed13..bf91c375821a 100644
---- a/arch/x86/crypto/nhpoly1305-sse2-glue.c
-+++ b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-@@ -13,6 +13,8 @@
- #include <linux/sizes.h>
- #include <asm/simd.h>
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage void nh_sse2(const u32 *key, const u8 *message, size_t message_len,
- 			u8 hash[NH_HASH_BYTES]);
- 
-@@ -30,7 +32,7 @@ static int nhpoly1305_sse2_update(struct shash_desc *desc,
- 		return crypto_nhpoly1305_update(desc, src, srclen);
- 
- 	do {
--		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
-+		unsigned int n = min(srclen, FPU_BYTES);
- 
- 		kernel_fpu_begin();
- 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_sse2);
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 1dfb8af48a3c..3764301bdf1b 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -15,20 +15,24 @@
- #include <asm/intel-family.h>
- #include <asm/simd.h>
- 
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage void poly1305_init_x86_64(void *ctx,
- 				     const u8 key[POLY1305_BLOCK_SIZE]);
- asmlinkage void poly1305_blocks_x86_64(void *ctx, const u8 *inp,
--				       const size_t len, const u32 padbit);
-+				       const unsigned int len,
-+				       const u32 padbit);
- asmlinkage void poly1305_emit_x86_64(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
- 				     const u32 nonce[4]);
- asmlinkage void poly1305_emit_avx(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
- 				  const u32 nonce[4]);
--asmlinkage void poly1305_blocks_avx(void *ctx, const u8 *inp, const size_t len,
--				    const u32 padbit);
--asmlinkage void poly1305_blocks_avx2(void *ctx, const u8 *inp, const size_t len,
--				     const u32 padbit);
-+asmlinkage void poly1305_blocks_avx(void *ctx, const u8 *inp,
-+				    const unsigned int len, const u32 padbit);
-+asmlinkage void poly1305_blocks_avx2(void *ctx, const u8 *inp,
-+				     const unsigned int len, const u32 padbit);
- asmlinkage void poly1305_blocks_avx512(void *ctx, const u8 *inp,
--				       const size_t len, const u32 padbit);
-+				       const unsigned int len,
-+				       const u32 padbit);
- 
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx);
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx2);
-@@ -86,14 +90,13 @@ static void poly1305_simd_init(void *ctx, const u8 key[POLY1305_BLOCK_SIZE])
- 	poly1305_init_x86_64(ctx, key);
+ 	return crc;
  }
- 
--static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
-+static void poly1305_simd_blocks(void *ctx, const u8 *inp, unsigned int len,
- 				 const u32 padbit)
- {
- 	struct poly1305_arch_internal *state = ctx;
- 
--	/* SIMD disables preemption, so relax after processing each page. */
--	BUILD_BUG_ON(SZ_4K < POLY1305_BLOCK_SIZE ||
--		     SZ_4K % POLY1305_BLOCK_SIZE);
-+	BUILD_BUG_ON(FPU_BYTES < POLY1305_BLOCK_SIZE ||
-+		     FPU_BYTES % POLY1305_BLOCK_SIZE);
- 
- 	if (!static_branch_likely(&poly1305_use_avx) ||
- 	    (len < (POLY1305_BLOCK_SIZE * 18) && !state->is_base2_26) ||
-@@ -104,7 +107,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- 	}
- 
- 	do {
--		const size_t bytes = min_t(size_t, len, SZ_4K);
-+		const unsigned int bytes = min(len, FPU_BYTES);
- 
- 		kernel_fpu_begin();
- 		if (IS_ENABLED(CONFIG_AS_AVX512) && static_branch_likely(&poly1305_use_avx512))
-diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
-index b7664d018851..2502964afef6 100644
---- a/arch/x86/crypto/polyval-clmulni_glue.c
-+++ b/arch/x86/crypto/polyval-clmulni_glue.c
-@@ -29,6 +29,8 @@
- 
- #define NUM_KEY_POWERS	8
+diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+index feccb5254c7e..ece620227057 100644
+--- a/arch/x86/crypto/crc32c-intel_glue.c
++++ b/arch/x86/crypto/crc32c-intel_glue.c
+@@ -41,6 +41,8 @@
+  */
+ #define CRC32C_PCL_BREAKEVEN	512
  
 +#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
 +
- struct polyval_tfm_ctx {
- 	/*
- 	 * These powers must be in the order h^8, ..., h^1.
-@@ -123,8 +125,7 @@ static int polyval_x86_update(struct shash_desc *desc,
- 	}
+ asmlinkage unsigned int crc_pcl(const u8 *buffer, int len,
+ 				unsigned int crc_init);
+ #endif /* CONFIG_X86_64 */
+@@ -158,9 +160,16 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
+ 	 * overcome kernel fpu state save/restore overhead
+ 	 */
+ 	if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
+-		kernel_fpu_begin();
+-		*crcp = crc_pcl(data, len, *crcp);
+-		kernel_fpu_end();
++		do {
++			unsigned int chunk = min(len, FPU_BYTES);
++
++			kernel_fpu_begin();
++			*crcp = crc_pcl(data, chunk, *crcp);
++			kernel_fpu_end();
++
++			len -= chunk;
++			data += chunk;
++		} while (len);
+ 	} else
+ 		*crcp = crc32c_intel_le_hw(*crcp, data, len);
+ 	return 0;
+@@ -170,9 +179,17 @@ static int __crc32c_pcl_intel_finup(u32 *crcp, const u8 *data, unsigned int len,
+ 				u8 *out)
+ {
+ 	if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
+-		kernel_fpu_begin();
+-		*(__le32 *)out = ~cpu_to_le32(crc_pcl(data, len, *crcp));
+-		kernel_fpu_end();
++		do {
++			unsigned int chunk = min(len, FPU_BYTES);
++
++			kernel_fpu_begin();
++			*crcp = crc_pcl(data, chunk, *crcp);
++			kernel_fpu_end();
++
++			len -= chunk;
++			data += chunk;
++		} while (len);
++		*(__le32 *)out = ~cpu_to_le32(*crcp);
+ 	} else
+ 		*(__le32 *)out =
+ 			~cpu_to_le32(crc32c_intel_le_hw(*crcp, data, len));
+diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
+index 71291d5af9f4..54a537fc88ee 100644
+--- a/arch/x86/crypto/crct10dif-pclmul_glue.c
++++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
+@@ -34,6 +34,10 @@
+ #include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
  
- 	while (srclen >= POLYVAL_BLOCK_SIZE) {
--		/* Allow rescheduling every 4K bytes. */
--		nblocks = min(srclen, 4096U) / POLYVAL_BLOCK_SIZE;
-+		nblocks = min(srclen, FPU_BYTES) / POLYVAL_BLOCK_SIZE;
- 		internal_polyval_update(tctx, src, nblocks, dctx->buffer);
- 		srclen -= nblocks * POLYVAL_BLOCK_SIZE;
- 		src += nblocks * POLYVAL_BLOCK_SIZE;
++#define PCLMUL_MIN_LEN 16U /* minimum size of buffer for crc_t10dif_pcl */
++
++#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
++
+ asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
+ 
+ struct chksum_desc_ctx {
+@@ -54,10 +58,19 @@ static int chksum_update(struct shash_desc *desc, const u8 *data,
+ {
+ 	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+ 
+-	if (length >= 16 && crypto_simd_usable()) {
+-		kernel_fpu_begin();
+-		ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
+-		kernel_fpu_end();
++	if (length >= PCLMUL_MIN_LEN && crypto_simd_usable()) {
++		do {
++			unsigned int chunk = min(length, FPU_BYTES);
++
++			kernel_fpu_begin();
++			ctx->crc = crc_t10dif_pcl(ctx->crc, data, chunk);
++			kernel_fpu_end();
++
++			length -= chunk;
++			data += chunk;
++		} while (length >= PCLMUL_MIN_LEN);
++		if (length)
++			ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
+ 	} else
+ 		ctx->crc = crc_t10dif_generic(ctx->crc, data, length);
+ 	return 0;
+@@ -73,10 +86,20 @@ static int chksum_final(struct shash_desc *desc, u8 *out)
+ 
+ static int __chksum_finup(__u16 crc, const u8 *data, unsigned int len, u8 *out)
+ {
+-	if (len >= 16 && crypto_simd_usable()) {
+-		kernel_fpu_begin();
+-		*(__u16 *)out = crc_t10dif_pcl(crc, data, len);
+-		kernel_fpu_end();
++	if (len >= PCLMUL_MIN_LEN && crypto_simd_usable()) {
++		do {
++			unsigned int chunk = min(len, FPU_BYTES);
++
++			kernel_fpu_begin();
++			crc = crc_t10dif_pcl(crc, data, chunk);
++			kernel_fpu_end();
++
++			len -= chunk;
++			data += chunk;
++		} while (len >= PCLMUL_MIN_LEN);
++		if (len)
++			crc = crc_t10dif_generic(crc, data, len);
++		*(__u16 *)out = crc;
+ 	} else
+ 		*(__u16 *)out = crc_t10dif_generic(crc, data, len);
+ 	return 0;
 -- 
 2.37.3
 
