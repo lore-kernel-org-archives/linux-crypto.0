@@ -2,179 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF5FC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 06:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8D6C43219
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 08:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbiJLGId (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 02:08:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
+        id S229809AbiJLIyX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 04:54:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbiJLGIb (ORCPT
+        with ESMTP id S229818AbiJLIyB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 02:08:31 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42911DE90
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2022 23:08:30 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id b2so15313342plc.7
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Oct 2022 23:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iXPwhDEno8WppMwcdGdxGZla4T7knIHdP81b3128AZY=;
-        b=Oxt3WPazMlkrL7mVCN99lrZpczJFc0ojBx7zjFnv6PAXWotZLTJOoHBd+LRRtCzt50
-         /nCkp0weW1Uo7hhz1YS6fX4wolxAgEvOHU3CMQqJncVg+/7dEACnS8Sa7KZZJFohWjtM
-         9x7raVqQeiF9z+BQSAl0X6zskUuqn+8RNf1Taop8BTmUth09CswthLeNj+TMQWWU3gvt
-         W8jXzxdBr+YPJQHSw33ceRFC1NXsxtigjFZqdoEjA5BUsx+Ajv3PxLG2sNqc63i8z2BD
-         vBJRRlO+FEWJClGcfXhE5v++2DLhN+YYvJ6vaPKdRjakfCP8/S1DhPxeIcBV6/ckxgVw
-         pnNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iXPwhDEno8WppMwcdGdxGZla4T7knIHdP81b3128AZY=;
-        b=SZJIrBuO19aEx+Yo8Dwgs0x73J3rh6N34eqtGfYBQt1SCJc6yjnP68J1LOc8KP2twX
-         FMtSDvZp7+84YjGxTwDhVS3n4NIcsyn3VSZVEkbwUWWKcWhOVcoTBFvDXgmxH3Flltze
-         NmzipSmI2Jo8bsDomrMHe/THw7fsi+I810l4fkdWhSPxUOKQAOyvmyHTHnHhezf/mMKA
-         v6Jb8Kqz41cU2csx1Lavjr3W/wmCpzpvlUmA9qkaOeFLf4fvWnVcqfQWHaGKlAVZFjxf
-         xi22fIYTbOYVGUFyHISvaWjUy1emTdmkzPY2qugiiMTuVwILpOUZd+1rNcQPoCGrba7a
-         8JbQ==
-X-Gm-Message-State: ACrzQf1qgkA9RKV38QB63tkkstqSIAsS6BD1SrYSnfurn/GfqGXHRzlQ
-        wlIxpm5o8KRvG//hWNdUsD8=
-X-Google-Smtp-Source: AMsMyM5RNs8KeGWo/M7rxjuhEe2o37SqdeT8IJgvwuPtgFwWl3kSdGmHNy8I0s5ujD4QtxDGg9ivjQ==
-X-Received: by 2002:a17:903:2347:b0:181:33f0:f64e with SMTP id c7-20020a170903234700b0018133f0f64emr21060431plh.106.1665554909660;
-        Tue, 11 Oct 2022 23:08:29 -0700 (PDT)
-Received: from [192.168.123.100] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id pf15-20020a17090b1d8f00b00200a85fa777sm604912pjb.1.2022.10.11.23.08.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Oct 2022 23:08:29 -0700 (PDT)
-Message-ID: <d12093d7-d01c-081f-fa04-c608f8021a60@gmail.com>
-Date:   Wed, 12 Oct 2022 15:08:24 +0900
+        Wed, 12 Oct 2022 04:54:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B730B97B4;
+        Wed, 12 Oct 2022 01:53:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2E793B819D0;
+        Wed, 12 Oct 2022 08:52:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72CCDC433D6;
+        Wed, 12 Oct 2022 08:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665564739;
+        bh=jlyAJtmCR8ZWkVcxBk7C7KpvDq/ZundskWWe+5hPx2M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=K8lXhZfRVcF2qxnlvxyWO+zxwhfmjU/pQncOgsTi5A1I+TIRYhdy4akxBXJEUU1/r
+         IAYRYhZwaqMZBg1aB1xgyuiOHK4/x3i03PqsDDWRuAHTjB8sI56bWKhMUdP260NQse
+         BuwF5BdNuMpOL++ePlqTfnVOsarxs0KesGqkJ1XFZS56yLlzCH3p0kKNuvPq4wb6w6
+         zkFkgALlemphkOzByRYpQufQGJ5/UsP6xIQBcNCxYce6HFKfpMrvk1g5Xzd8gaHWN6
+         0W/vknHyWKPoyT5Bp69M0HtRf945En1K9xEUYumDmIQu3Ml7R9Eb15ZhoVbnrdXRbH
+         R61NmqugEO+DA==
+Date:   Wed, 12 Oct 2022 11:52:15 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc:     a.fatoum@pengutronix.de, gilad@benyossef.com, Jason@zx2c4.com,
+        jejb@linux.ibm.com, zohar@linux.ibm.com, dhowells@redhat.com,
+        sumit.garg@linaro.org, david@sigma-star.at, michael@walle.cc,
+        john.ernberg@actia.se, jmorris@namei.org, serge@hallyn.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        j.luebbe@pengutronix.de, ebiggers@kernel.org, richard@nod.at,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, sahil.malhotra@nxp.com,
+        kshitiz.varshney@nxp.com, horia.geanta@nxp.com, V.Sethi@nxp.com
+Subject: Re: [PATCH v0 1/8] hw-bound-key: introducing the generic structure
+Message-ID: <Y0aAP/NvH9mgAi8n@kernel.org>
+References: <20221006130837.17587-1-pankaj.gupta@nxp.com>
+ <20221006130837.17587-2-pankaj.gupta@nxp.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH] crypto: x86: Do not acquire fpu context for too long
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "ebiggers@google.com" <ebiggers@google.com>
-References: <20221004044912.24770-1-ap420073@gmail.com>
- <Yzu8Kd2botr3eegj@gondor.apana.org.au>
- <f7c52ed1-8061-8147-f676-86190118cc56@gmail.com>
- <MW5PR84MB18420D6E1A31D9C765EF6ED4AB5A9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
- <CAMj1kXGmKunh-OCvGFf8T6KJJXSHRYzacjSojBD3__u0o-3D1w@mail.gmail.com>
- <MW5PR84MB1842762F8B2ABC27A1A13614AB5E9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
- <Y0JoDWx0Q5BmO/wR@gondor.apana.org.au>
- <MW5PR84MB1842FD77B90B1553367235CEAB219@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <MW5PR84MB1842FD77B90B1553367235CEAB219@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221006130837.17587-2-pankaj.gupta@nxp.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Elliott, Robert
+On Thu, Oct 06, 2022 at 06:38:30PM +0530, Pankaj Gupta wrote:
+> Hardware bound keys buffer has additional information,
+> that will be accessed using this new structure.
 
-2022. 10. 10. 오전 4:58에 Elliott, Robert (Servers) 이(가) 쓴 글:
- >
- >
- >> -----Original Message-----
- >> From: Herbert Xu <herbert@gondor.apana.org.au>
- >> Sent: Sunday, October 9, 2022 1:20 AM
- >> To: Elliott, Robert (Servers) <elliott@hpe.com>
- >> Cc: Ard Biesheuvel <ardb@kernel.org>; Taehee Yoo 
-<ap420073@gmail.com>; linux-
- >> crypto@vger.kernel.org; davem@davemloft.net; tglx@linutronix.de;
- >> mingo@redhat.com; bp@alien8.de; dave.hansen@linux.intel.com; 
-x86@kernel.org;
- >> hpa@zytor.com; ebiggers@google.com
- >> Subject: Re: [PATCH] crypto: x86: Do not acquire fpu context for too 
-long
- >>
- >> On Sat, Oct 08, 2022 at 07:48:07PM +0000, Elliott, Robert (Servers) 
-wrote:
- >>>
- >>> Perhaps the cycles mode needs to call cond_resched() too?
- >>
- >> Yes, just make the cond_resched unconditional.  Having a few too many
- >> rescheds shouldn't be an issue.
- >
- > This looks promising. I was able to trigger a lot of rcu stalls by 
-setting:
- >    echo 2 > /sys/module/rcupdate/parameters/rcu_cpu_stall_timeout
- >    echo 200 > /sys/module/rcupdate/parameters/rcu_exp_cpu_stall_timeout
- >
- > and running these concurrently:
- >    watch -n 0 modprobe tcrypt=200
- >    watch -n 0 module tcrypt=0 through 999
- >
- > After changing tcrypt to call cond_resched in both cases, I don't see any
- > more rcu stalls.
- >
- > I am getting miscompares from the extended self-test for crc32 and
- > crct10dif, and will investigate those further.
- >
- > BTW, the way tcrypt always refuses to load leads to an ever-growing 
-list in
- > the Call Traces:
- >
- > kernel: Unloaded tainted modules: tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 t
- > crypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1
- > tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1
- >   tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():
- > 1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 
-tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt():1 tcrypt()
- > :1 tcrypt():1 tcrypt():1 tcrypt():1
- >
- >
- >
+I don't really understand what I should get from this.
 
-I tested mb_aead as well.
+It lacks motivation and function of this structure, even
+the name of the structure.
 
-I can find rcu stalls easily while testing gcm(aes-generic) with the 
-below commands.
-#shell1
-while :
-do
-     modprobe tcrypt mode=215 num_mb=1024
-done
-#shell2
-while :
-do
-     modprobe tcrypt mode=0
-done
+Hardware bound key does not mean anything at all without
+a context. I don't know what it is.
 
-Then, I added cond_resched() as you mentioned.
+> 
+> structure members are:
+> - flags, flags for hardware specific information.
+> - key_sz, size of the plain key.
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index a82679b576bb..eeb3abb4eece 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -415,6 +415,7 @@ static void test_mb_aead_speed(const char *algo, int 
-enc, int secs,
-                         } else {
-                                 ret = test_mb_aead_cycles(data, enc, bs,
-                                                           num_mb);
-+                               cond_resched();
-                         }
+Who cares listing member names?
 
-I can't see rcu stalls anymore, I think it works well.
+> 
+> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> ---
+>  include/linux/hw_bound_key.h | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+>  create mode 100644 include/linux/hw_bound_key.h
+> 
+> diff --git a/include/linux/hw_bound_key.h b/include/linux/hw_bound_key.h
+> new file mode 100644
+> index 000000000000..e7f152410438
+> --- /dev/null
+> +++ b/include/linux/hw_bound_key.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only
+> + *
+> + * Copyright 2022 NXP
+> + * Author: Pankaj Gupta <pankaj.gupta@nxp.com>
+
+Formatting here is incorrect and there is no such license in
+existence as "GPL-2.0-only".
+
+Should probably be:
+
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Copyright (C) 2022 NXP Semiconductors N.V.
+ */
+
+Author-field is redundant as it is part of the git metadata.
+Also it is inaccurate description of authorship, as a file
+can have multiple contributors over time.
+
+This all is documented in 
+
+https://www.kernel.org/doc/html/latest/process/license-rules.html
+
+> + */
+> +
+> +#ifndef _HW_BOUND_KEY_H
+> +#define _HW_BOUND_KEY_H
+> +
+> +#include "types.h"
+> +
+> +struct hw_bound_key_info {
+> +	/* Key types specific to the hw. [Implementation Defined]
+> +	 */
+> +	uint8_t flags;
+> +	uint8_t reserved;
+> +	/* Plain key size.
+> +	 */
+> +	uint16_t key_sz;
+> +};
+> +
+> +#define set_hbk_info(hbk_info, hw_flags, key_len) do {\
+> +	hbk_info->flags = hw_flags;\
+> +	hbk_info->key_sz = key_len;\
+> +} while (0)
+> +
+> +#endif /* _HW_BOUND_KEY_H */
+> -- 
+> 2.17.1
+> 
+
+BR, Jarkko
