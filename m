@@ -2,281 +2,355 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8E3C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFEAC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbiJLWEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 18:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42338 "EHLO
+        id S229972AbiJLWEt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 18:04:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbiJLWDo (ORCPT
+        with ESMTP id S229978AbiJLWEB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 18:03:44 -0400
+        Wed, 12 Oct 2022 18:04:01 -0400
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1F912C8A3;
-        Wed, 12 Oct 2022 15:01:20 -0700 (PDT)
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CKwflC006339;
-        Wed, 12 Oct 2022 21:59:50 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B116A13954B;
+        Wed, 12 Oct 2022 15:01:28 -0700 (PDT)
+Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CL7Wtg016423;
+        Wed, 12 Oct 2022 22:00:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=pkIjY3xNYdD7u0iVrBec5NLvLKLYByXvLSfeEAPzOWA=;
- b=H/+AVupIA0qT3WW+ZAU2dM2Gj2l3wqwR0WsAa/VfsVsS5iNMLJC7y8Ht8zY9f5OvhkBx
- 2yLbpwmj37y7COimS4bcYZXap7tWfA+f9jfIliFcbQ+513C5zXVqoqpMPMUKpaQZdv18
- hktdM2YGYo3tRFTVAi7YV1xAMWnSW89cLVpbAz4A923DrH/GUDNRl5Ld07SqTiP+PXvj
- VO8N9e4AHFDwKfHaVK05G3rZ6EdQ3Am7Xvyz8NwOIvIN/3DX0mQtHBM0ONsISnk24f22
- +trjHtXOEgf2mx27hfc02CqJehN6CTaOKRtBmoBwWIjCo4twBOe4dR3MxIan4xh9zojX PQ== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k653c8da7-1
+ bh=X7Go4viamzwOn3WUTwlo1LbW+Q0tptmA7a1g3x+mSls=;
+ b=P89Qz77nTHr377CTaQ/w4cfXZnv9P2GTFzorUYCdAaLW32Qi5hAMB4PfaApAqOM+RWxF
+ 8nI7zrA1czGGQBc3YGt2cA6JnciH+Gbw1GHXRFLLupGSzxZxweyF7CPlwRJkv7XvV8mB
+ 8R0w32EgX5W8nusFomefeeoeWXOMzh6S5y3EwWzlliueSEDXbc1KsoVwXSI9ObAJispM
+ U1I0Zx0SbTwNj+jh387WY1LA7nvqHRpUjOqIYINF2JnZYDV6t2E9xiDJncFAw/clHFX+
+ 53fDY8vxloTFZayxAiee7eslHFFtuyuCUeuvRhHI/QcM6F3AZwBxxhU1mPzNdLd5gjRE jw== 
+Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k657c8adb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 21:59:50 +0000
+        Wed, 12 Oct 2022 22:00:11 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 8611C806B5C;
-        Wed, 12 Oct 2022 21:59:49 +0000 (UTC)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id C626129585;
+        Wed, 12 Oct 2022 22:00:10 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 28602808ECE;
-        Wed, 12 Oct 2022 21:59:49 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 6DADB807DA5;
+        Wed, 12 Oct 2022 22:00:10 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
-Date:   Wed, 12 Oct 2022 16:59:16 -0500
-Message-Id: <20221012215931.3896-5-elliott@hpe.com>
+Subject: [PATCH v2 18/19] crypto: x86 - standardize not loaded prints
+Date:   Wed, 12 Oct 2022 16:59:30 -0500
+Message-Id: <20221012215931.3896-19-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221012215931.3896-1-elliott@hpe.com>
 References: <20221006223151.22159-1-elliott@hpe.com>
  <20221012215931.3896-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: Uwyq1NOSShnQQpJzF5T27vXCpBPm0wlx
-X-Proofpoint-ORIG-GUID: Uwyq1NOSShnQQpJzF5T27vXCpBPm0wlx
+X-Proofpoint-ORIG-GUID: 82XBGjj4A8ErvKSGv2QYlO_RI8X_yhn1
+X-Proofpoint-GUID: 82XBGjj4A8ErvKSGv2QYlO_RI8X_yhn1
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-12_11,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210120138
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ phishscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210120138
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As done by the ECB and CBC helpers in arch/x86/crypt/ecb_cbc_helpers.h,
-limit the number of bytes processed between kernel_fpu_begin() and
-kernel_fpu_end() calls.
+Standardize the prints that additional required CPU features are not
+present along with the main CPU features (e.g., OSXSAVE is not
+present along with AVX).
 
-Those functions call preempt_disable() and preempt_enable(), so
-the CPU core is unavailable for scheduling while running.
+Although modules are not supposed to print unless loaded and
+active, these are existing exceptions.
 
-This leads to "rcu_preempt detected expedited stalls" with stack dumps
-pointing to the optimized hash function if the module is loaded and
-used a lot:
-    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: ...
-
-For example, that can occur during boot with the stack track pointing
-to the sha512-x86 function if the system set to use SHA-512 for
-module signing. The call trace includes:
-    module_sig_check
-    mod_verify_sig
-    pkcs7_verify
-    pkcs7_digest
-    sha512_finup
-    sha512_base_do_update
-
-Fixes: 66be89515888 ("crypto: sha1 - SSSE3 based SHA1 implementation for x86-64")
-Fixes: 8275d1aa6422 ("crypto: sha256 - Create module providing optimized SHA256 routines using SSSE3, AVX or AVX2 instructions.")
-Fixes: 87de4579f92d ("crypto: sha512 - Create module providing optimized SHA512 routines using SSSE3, AVX or AVX2 instructions.")
-Fixes: aa031b8f702e ("crypto: x86/sha512 - load based on CPU features")
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/x86/crypto/sha1_ssse3_glue.c   | 32 ++++++++++++++++++++++++-----
- arch/x86/crypto/sha256_ssse3_glue.c | 32 ++++++++++++++++++++++++-----
- arch/x86/crypto/sha512_ssse3_glue.c | 32 ++++++++++++++++++++++++-----
- 3 files changed, 81 insertions(+), 15 deletions(-)
+ arch/x86/crypto/aegis128-aesni-glue.c      | 4 +++-
+ arch/x86/crypto/aria_aesni_avx_glue.c      | 4 ++--
+ arch/x86/crypto/camellia_aesni_avx2_glue.c | 5 +++--
+ arch/x86/crypto/camellia_aesni_avx_glue.c  | 5 +++--
+ arch/x86/crypto/cast5_avx_glue.c           | 3 ++-
+ arch/x86/crypto/cast6_avx_glue.c           | 3 ++-
+ arch/x86/crypto/crc32-pclmul_glue.c        | 4 +++-
+ arch/x86/crypto/nhpoly1305-avx2-glue.c     | 4 +++-
+ arch/x86/crypto/serpent_avx2_glue.c        | 8 +++++---
+ arch/x86/crypto/serpent_avx_glue.c         | 3 ++-
+ arch/x86/crypto/sm3_avx_glue.c             | 7 ++++---
+ arch/x86/crypto/sm4_aesni_avx2_glue.c      | 5 +++--
+ arch/x86/crypto/sm4_aesni_avx_glue.c       | 5 +++--
+ arch/x86/crypto/twofish_avx_glue.c         | 3 ++-
+ 14 files changed, 40 insertions(+), 23 deletions(-)
 
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 44340a1139e0..a9f5779b41ca 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -26,6 +26,8 @@
- #include <crypto/sha1_base.h>
- #include <asm/simd.h>
+diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
+index e8eaf79ef220..aa94b9f8703c 100644
+--- a/arch/x86/crypto/aegis128-aesni-glue.c
++++ b/arch/x86/crypto/aegis128-aesni-glue.c
+@@ -281,8 +281,10 @@ static int __init crypto_aegis128_aesni_module_init(void)
  
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- static int sha1_update(struct shash_desc *desc, const u8 *data,
- 			     unsigned int len, sha1_block_fn *sha1_xform)
+ 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+-	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
++	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL)) {
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (SSE2, AESNI) not supported\n");
+ 		return -ENODEV;
++	}
+ 
+ 	ret = simd_register_aeads_compat(&crypto_aegis128_aesni_alg, 1,
+ 					  &simd_alg);
+diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
+index d58fb995a266..24982450a125 100644
+--- a/arch/x86/crypto/aria_aesni_avx_glue.c
++++ b/arch/x86/crypto/aria_aesni_avx_glue.c
+@@ -176,13 +176,13 @@ static int __init aria_avx_init(void)
+ 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX or AES-NI instructions are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AES-NI, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU extended feature '%s' is not supported\n", feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+index e6c4ed1e40d2..bc6862077984 100644
+--- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+@@ -123,13 +123,14 @@ static int __init camellia_aesni_init(void)
+ 	    !boot_cpu_has(X86_FEATURE_AVX2) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX2 or AES-NI instructions are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AVX2, AESNI, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
+index 6a9eadf0fe90..96e7e1accb6c 100644
+--- a/arch/x86/crypto/camellia_aesni_avx_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+@@ -121,13 +121,14 @@ static int __init camellia_aesni_init(void)
+ 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX or AES-NI instructions are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AESNI, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+index b5ae17c3ac53..89650fffb550 100644
+--- a/arch/x86/crypto/cast5_avx_glue.c
++++ b/arch/x86/crypto/cast5_avx_glue.c
+@@ -114,7 +114,8 @@ static int __init cast5_init(void)
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++		feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index d1c14a5f80d7..d69f62ac9553 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -114,7 +114,8 @@ static int __init cast6_init(void)
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
+index c56d3d3ab0a0..4cf86f8f9428 100644
+--- a/arch/x86/crypto/crc32-pclmul_glue.c
++++ b/arch/x86/crypto/crc32-pclmul_glue.c
+@@ -192,8 +192,10 @@ static int __init crc32_pclmul_mod_init(void)
  {
-@@ -41,9 +43,18 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
- 	 */
- 	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
+ 	int ret;
  
--	kernel_fpu_begin();
--	sha1_base_do_update(desc, data, len, sha1_xform);
--	kernel_fpu_end();
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha1_base_do_update(desc, data, chunk, sha1_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
+-	if (!x86_match_cpu(module_cpu_ids))
++	if (!x86_match_cpu(module_cpu_ids)) {
++		pr_info("CPU-optimized crypto module not loaded, required CPU feature (PCLMULQDQ) not supported\n");
+ 		return -ENODEV;
++	}
  
- 	return 0;
- }
-@@ -54,9 +65,20 @@ static int sha1_finup(struct shash_desc *desc, const u8 *data,
- 	if (!crypto_simd_usable())
- 		return crypto_sha1_finup(desc, data, len, out);
+ 	ret = crypto_register_shash(&alg);
+ 	if (!ret)
+diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
+index 2dc7b618771f..834bf64bb160 100644
+--- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
++++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
+@@ -74,8 +74,10 @@ static int __init nhpoly1305_mod_init(void)
+ 		return -ENODEV;
  
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha1_base_do_update(desc, data, chunk, sha1_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
-+
- 	kernel_fpu_begin();
--	if (len)
--		sha1_base_do_update(desc, data, len, sha1_xform);
- 	sha1_base_do_finalize(desc, sha1_xform);
- 	kernel_fpu_end();
+ 	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
+-	    !boot_cpu_has(X86_FEATURE_OSXSAVE))
++	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX2, OSXSAVE) not supported\n");
+ 		return -ENODEV;
++	}
  
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 3a5f6be7dbba..322c8aa907af 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -40,6 +40,8 @@
- #include <linux/string.h>
- #include <asm/simd.h>
+ 	ret = crypto_register_shash(&nhpoly1305_alg);
+ 	if (!ret)
+diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
+index bf59addaf804..4bd59ccea69a 100644
+--- a/arch/x86/crypto/serpent_avx2_glue.c
++++ b/arch/x86/crypto/serpent_avx2_glue.c
+@@ -112,13 +112,15 @@ static int __init serpent_avx2_init(void)
  
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
- 				       const u8 *data, int blocks);
+ 		return -ENODEV;
  
-@@ -58,9 +60,18 @@ static int _sha256_update(struct shash_desc *desc, const u8 *data,
- 	 */
- 	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
+-	if (!boot_cpu_has(X86_FEATURE_AVX2) || !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX2 instructions are not detected.\n");
++	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
++	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX2, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
  
--	kernel_fpu_begin();
--	sha256_base_do_update(desc, data, len, sha256_xform);
--	kernel_fpu_end();
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha256_base_do_update(desc, data, chunk, sha256_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
+diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
+index 7b0c02a61552..853b48677d2b 100644
+--- a/arch/x86/crypto/serpent_avx_glue.c
++++ b/arch/x86/crypto/serpent_avx_glue.c
+@@ -121,7 +121,8 @@ static int __init serpent_init(void)
  
- 	return 0;
- }
-@@ -71,9 +82,20 @@ static int sha256_finup(struct shash_desc *desc, const u8 *data,
- 	if (!crypto_simd_usable())
- 		return crypto_sha256_finup(desc, data, len, out);
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
  
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha256_base_do_update(desc, data, chunk, sha256_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
-+
- 	kernel_fpu_begin();
--	if (len)
--		sha256_base_do_update(desc, data, len, sha256_xform);
- 	sha256_base_do_finalize(desc, sha256_xform);
- 	kernel_fpu_end();
+diff --git a/arch/x86/crypto/sm3_avx_glue.c b/arch/x86/crypto/sm3_avx_glue.c
+index 532f07b05745..5250fee79147 100644
+--- a/arch/x86/crypto/sm3_avx_glue.c
++++ b/arch/x86/crypto/sm3_avx_glue.c
+@@ -131,18 +131,19 @@ static int __init sm3_avx_mod_init(void)
+ 		return -ENODEV;
  
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 6d3b85e53d0e..fd5075a32613 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -39,6 +39,8 @@
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
+ 	if (!boot_cpu_has(X86_FEATURE_AVX)) {
+-		pr_info("AVX instruction are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, required CPU feature (AVX) not supported\n");
+ 		return -ENODEV;
+ 	}
  
-+#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+
- asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
- 				       const u8 *data, int blocks);
+ 	if (!boot_cpu_has(X86_FEATURE_BMI2)) {
+-		pr_info("BMI2 instruction are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, required CPU feature (BMI2) not supported\n");
+ 		return -ENODEV;
+ 	}
  
-@@ -57,9 +59,18 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
- 	 */
- 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
  
--	kernel_fpu_begin();
--	sha512_base_do_update(desc, data, len, sha512_xform);
--	kernel_fpu_end();
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha512_base_do_update(desc, data, chunk, sha512_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
+diff --git a/arch/x86/crypto/sm4_aesni_avx2_glue.c b/arch/x86/crypto/sm4_aesni_avx2_glue.c
+index 42819ee5d36d..cdd7ca92ca61 100644
+--- a/arch/x86/crypto/sm4_aesni_avx2_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx2_glue.c
+@@ -152,13 +152,14 @@ static int __init sm4_init(void)
+ 	    !boot_cpu_has(X86_FEATURE_AVX2) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX2 or AES-NI instructions are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AVX2, AESNI, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
  
- 	return 0;
- }
-@@ -70,9 +81,20 @@ static int sha512_finup(struct shash_desc *desc, const u8 *data,
- 	if (!crypto_simd_usable())
- 		return crypto_sha512_finup(desc, data, len, out);
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
  
-+	do {
-+		unsigned int chunk = min(len, FPU_BYTES);
-+
-+		if (chunk) {
-+			kernel_fpu_begin();
-+			sha512_base_do_update(desc, data, chunk, sha512_xform);
-+			kernel_fpu_end();
-+		}
-+
-+		len -= chunk;
-+		data += chunk;
-+	} while (len);
-+
- 	kernel_fpu_begin();
--	if (len)
--		sha512_base_do_update(desc, data, len, sha512_xform);
- 	sha512_base_do_finalize(desc, sha512_xform);
- 	kernel_fpu_end();
+diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
+index 8a25376d341f..a2ae3d1e0a4a 100644
+--- a/arch/x86/crypto/sm4_aesni_avx_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
+@@ -468,13 +468,14 @@ static int __init sm4_init(void)
+ 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
+ 	    !boot_cpu_has(X86_FEATURE_AES) ||
+ 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
+-		pr_info("AVX or AES-NI instructions are not detected.\n");
++		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AESNI, OSXSAVE) not supported\n");
+ 		return -ENODEV;
+ 	}
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+ 				&feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
+ 
+diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
+index ccf016bf6ef2..70167dd01816 100644
+--- a/arch/x86/crypto/twofish_avx_glue.c
++++ b/arch/x86/crypto/twofish_avx_glue.c
+@@ -123,7 +123,8 @@ static int __init twofish_init(void)
+ 		return -ENODEV;
+ 
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, &feature_name)) {
+-		pr_info("CPU feature '%s' is not supported.\n", feature_name);
++		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
++			feature_name);
+ 		return -ENODEV;
+ 	}
  
 -- 
 2.37.3
