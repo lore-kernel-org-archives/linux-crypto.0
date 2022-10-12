@@ -2,744 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F05B9C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 10:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61422C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 12:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbiJLK02 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 06:26:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
+        id S229560AbiJLMmr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 08:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbiJLK01 (ORCPT
+        with ESMTP id S229526AbiJLMmr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 06:26:27 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7681376559
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Oct 2022 03:26:23 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id bp15so25069796lfb.13
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Oct 2022 03:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rCtqbtuul6Phe1lX48/9+aSyo6AqZCVbumJmeR7I48s=;
-        b=arQaDwDVoAEBgiAya9baEkymKax5nw2Ijw7myQvIck9F+SD2Yimm+M/Czfsvoqqlo5
-         aviYAv18cUX/JOl8QxtukoUgryI79NZmVZNORUaLMjBMFY2lSeTsqY7Zi4Lj+6AZTS/s
-         ooDCAuUGBCi+Xt1P/RSc6LhlCJdSqeU0mBQdFFBM8gmMb/ayx3KMFiaIR6zp0bjOEOmq
-         1Qj9rR9idKBkg8xU5f14EGZnWyiDsi+sJdfF0zCbi2pBxDq1icJdAfVagyi4laRzjOgm
-         Lic+5VF9NBwU//XZ4VeBAC9FCRKn6qeYk1FanQDdjtO9wuzykwvuQ3b3VMRnapB2SdTI
-         2joQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rCtqbtuul6Phe1lX48/9+aSyo6AqZCVbumJmeR7I48s=;
-        b=CFUz+czm+5vBoRz9zLWK62HDFe48uuoKVAhs6NqQRQ4K2kw7ajK4GYdI9uRB4MUC2e
-         x4XFMiBVOaWhLksvIIXwFdgZgAVh76n8uoDsZizMq8n0g1ODLuHh6xfdN3hqCyfmzCLC
-         4r2WwBmdX6Z7H0CJ5ENuC0TAUk0zCwVCCNjjfMs0SmPtc5/Tz9CNhSSqQG3O9yYUYdVF
-         l4D8hDNC6C9xTjxtWBM0w/8q949IWK1xrhXQili2KnVcbgbu+SIKmItYRkOZcOhfn4yb
-         nj3GrY4B0icvhToDcMIPq+2bV29Zk8mh+zzGuAf+GMIn+YbbnPWNJCg3KDxqQfyB2Ou6
-         e9OA==
-X-Gm-Message-State: ACrzQf3bohB9xXfhLPiztc23AS1EndvwATiRhs5aN2UdZtGSbtvtHPvF
-        iCzTrlq6isLcYXSq2m4YzC5eSBiz9oaq9YMSTZuouA==
-X-Google-Smtp-Source: AMsMyM7HmOtJYq7TijFDL0sAk8TgcfE/RuUliz5TNdszRjudTG7NVNUhHIHpeOoonmSStG+6f1HdD02gP+Rc+jCkG7c=
-X-Received: by 2002:a05:6512:104c:b0:4a2:6cee:ae17 with SMTP id
- c12-20020a056512104c00b004a26ceeae17mr9785191lfb.417.1665570381301; Wed, 12
- Oct 2022 03:26:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <0000000000009aad5e05eac85f36@google.com> <Y0aHieBUF+CY2rTT@gondor.apana.org.au>
-In-Reply-To: <Y0aHieBUF+CY2rTT@gondor.apana.org.au>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Wed, 12 Oct 2022 12:26:09 +0200
-Message-ID: <CACT4Y+bATweY=FD-9+FN3nyTjuN7mNy6QM8y6GeSzPdjzo4R-w@mail.gmail.com>
-Subject: Re: [syzbot] memory leak in crypto_create_tfm_node
+        Wed, 12 Oct 2022 08:42:47 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2079.outbound.protection.outlook.com [40.107.220.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D33BC90DE;
+        Wed, 12 Oct 2022 05:42:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JB8Gl1IRTAqgo6m/EdBjspTfR3Y9h03li872OrDFJVVG81XbY0F5Ix8NPKIbHhBn02fURGneg+i3/EKU3Xpj3lMzPHiGsj8/UOcxWA6DEKqPuNc17iIvew9kf5s4eHiAw3h6uwB+Jm+8jYEEMgUxtep7jJWfRWL2AXCd8c7XCPPhVxNGAJncMVAMHOL4AkZWGMhL5mMD3icHOC2bR3E/3Yp8i2TKojJ4FhCdg2/pgQ0FjbHqCL4zcBydgTE/xrD/bgcLvUrIQAZMg2FRm0HuJC+Vj+srKZBLvssmqNtgbTQYj1yWWXLB3ivXXoV40RfvupUU2bpmzG2z73uP1PiZRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VD93p044ff7lTrk9QAjCPDYxpdDlJMiFRNNCfLJ3TyE=;
+ b=T1IemTBKfnEf6Tb+b5QjJ+WIOHNqQvQQJNoE2X/hATTMvjRY8QwXaDFeJ951a8gx8NVLxHNV97a3skkSYfO+4oR5qWa+Ejam8iKteuFRA3QQG3qqLAdzCOi8WQEutWpH8FF+Nj23Okq+8ZRDV5esXO9LuOto+pMVYqbTRF8mD1b7KSxAA0aCQuazfMUzSThg+yKB45KwjERczRSBzT44yAkB14Yf89+wuBd1d9SsVmAxhBILyttTwLwEPIuu6H1ZXh0tRqlJK1u1u2KNYKYdTm0ioSXWsJqXqoryaVP+q4sdDSFRORmvzLFw5SF4h6zYrppxS3iJKDTdJ293HxlrDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VD93p044ff7lTrk9QAjCPDYxpdDlJMiFRNNCfLJ3TyE=;
+ b=aYSmuyqdRtf74Yva8o8+Wvn+/1b5YTIMT3uTLuEibDXUGB20upVb+BzooVurfNL63eNtuqzMvt/jEwdRssgaZbUtpt4NFocrn/29Kn5cyAtafc+KkZ6nuorMl3R4SP5Rq/useCUEZYU6EAvcrs04dq1fJQdXCadhM6OvDq4nrWw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by PH7PR12MB5759.namprd12.prod.outlook.com (2603:10b6:510:1d2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.36; Wed, 12 Oct
+ 2022 12:42:34 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::76ec:6acf:dd4d:76a3]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::76ec:6acf:dd4d:76a3%9]) with mapi id 15.20.5676.030; Wed, 12 Oct 2022
+ 12:42:34 +0000
+Message-ID: <4e1bfb2e-cd9a-6b41-520e-dbf3746a2af8@amd.com>
+Date:   Wed, 12 Oct 2022 07:42:32 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH] crypto: ccp: Add support for TEE for PCI ID 0x14CA
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     syzbot <syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-fscrypt@vger.kernel.org, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Cc:     "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Allen, John" <John.Allen@amd.com>
+References: <20220928184506.13981-1-mario.limonciello@amd.com>
+ <MN0PR12MB61017C926551A7F6D908F6ADE25F9@MN0PR12MB6101.namprd12.prod.outlook.com>
+ <Y0aJhAmgF1mpxqNL@gondor.apana.org.au>
+Content-Language: en-US
+From:   Mario Limonciello <mario.limonciello@amd.com>
+In-Reply-To: <Y0aJhAmgF1mpxqNL@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR01CA0015.prod.exchangelabs.com (2603:10b6:805:b6::28)
+ To MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|PH7PR12MB5759:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6bb49f2f-c7f9-4614-f1e0-08daac4f3ca6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BjRariAPIe39D4ZUw0GlVJCeIFDxVSdrPEYLo4PYiX6+b8OSvy8iBtU6li1Ldwe75LZHsjt5vVAvzTNurcPmu1pf4XOj16+KoHI9bmxdz0kwl5rSBy+FnBBksTHLtYlBQgFEuGB9c977rq0DXn1XljelytkObrYb1YYJvD+cQJrKv0DaViKTFSrpt5GBdbi0n2x5zFcj3qy6e/VUM0qIWByVDelRkzyJaFnhc53ekI8+DkF0/eFfow4Gg8wVSbECQCzTZznzgkL77ktc+5yIyrO4cswtC9t3MRK06LCPjnLLvAxo8hU7iP8LxCjrhm8nEcC3o6iiqte40R58azcBSsncaWMKieShvfdK9UmpTbR4XP+0ze91pbmVX5K7BC4sUtOezaEc5H9q6uesS0tY6R6/3GAE6oqcX2Xy6+6433mL020u0CJxxUA4JIIjQtQn0mT+BbWxlvjq9H8p5BRF1pLVeMV4mfNjqqiI2U9iI5SgIOb2GhwMKRV+lDmaZfSRDp/Fia6KfI/ibAMLJWYs57hOCDZO426jdHHLsc026yZM0j3kQH8mzaMl8ilEGaZsQwLm0ToqD6dd2Dq91TX2bRMgz7W4ENJoo0zY8Q+Tbl+YBoZ4OGdeXBws/0R+Etjsszq8sTngWXmMrzH3IodbbklVY7IkYmVKMfhjmVEPiDQiJ2Db7+DPHNKmNPtEEz0BaYOkfKEgzBSvLrVLW1zREgsl8mTh6jKUSNxfMiY0suqj8Xd9U6pAMVV3Nv42vLfCku6Cb2/IREYHnBwXh9DXG6mZcCzhvu9NL4XZ8pK32RA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(346002)(396003)(39860400002)(136003)(451199015)(2616005)(186003)(31686004)(8936002)(2906002)(6506007)(5660300002)(86362001)(36756003)(478600001)(6916009)(38100700002)(44832011)(53546011)(54906003)(83380400001)(31696002)(26005)(66946007)(316002)(66556008)(8676002)(4326008)(6486002)(4744005)(66476007)(6512007)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlJZMS9wK0dNRWlZejNXRS9mMTMyZWNYODFSdGNiK0F1ay9hWXV4WS8zYkQ0?=
+ =?utf-8?B?dVFJRnkwR2hIbnJ3UE5iUGtYMnY1Y3lOS1NqQ0FxYlZraVZiNzMxRFk0dDlo?=
+ =?utf-8?B?NmY4R3hwaml6M2FqRHpOTWh5SEJ2MUFoVXdDR2xvWVNOWmppV0F5Z21zdGdV?=
+ =?utf-8?B?b29Fc0kwcXpRUVRFZWI1dmNLelcwM3lwL3IwVXNlQjhzeGlBb3BqOWxzV3hE?=
+ =?utf-8?B?RUNCMUpFWVUxdzU4dlZRYVdaaXVzYlJjaHo2T05ESzVEQmxWandHaXdUR09U?=
+ =?utf-8?B?SU9jSnZVVVVoMklTNUszdktDa3VsemRuV0xhWnVHM0pJTUluWlVnOTFTUEk1?=
+ =?utf-8?B?ZlJmVzhCRlR1NWZQTEVqdGsvSk9FdkpSRU1vdFc1SnROYStiVGdxTFBScDc1?=
+ =?utf-8?B?eDQreTJlT2FpVmJGN3dNUkdTQ3ljWXkwV1IwSGYwQ2R2dXBLSWp5ZUd5ZXhy?=
+ =?utf-8?B?TWVIQXI1akdqWGg2V1dROE14djdJRDVDOGh4OENiN1lNQVArMmFOblp2SDRV?=
+ =?utf-8?B?WHZwVVkxdWROeVNDUDl4TGM4ZjF3U3QrMkRIS2sxdUF4MkYwN0Z5MWtxM01F?=
+ =?utf-8?B?bnhDZkZJR1hmZjhlUTBWUUFpajk2QVhCY3ZVRkVCSXBKREZ5NEVhTmNIVU5s?=
+ =?utf-8?B?eHphWDVPUXRaVEYzNldraDFObXFtM3BQcFhPbS9pcnZzZVVYYmpSRGtWV3c0?=
+ =?utf-8?B?MVl1UUIyVDAvWFlSVkZsWnFJc2ZOaGJIVms1MHNxTUhOSUdLQ3pPUlV1d3RI?=
+ =?utf-8?B?clhsQW5MZDJ1RHlyVFpiQkR5QlVkTlI5c1VrWWVXdk5BSExkYTVXNzJnalRt?=
+ =?utf-8?B?aVJYS2tPZWtrYnJkMGZDK1RMQ0tuYjA1dTQvczV2Z0RkcmdJTlVEZTNsKzdw?=
+ =?utf-8?B?dngySy9GSUgwNGg1UUNQNDFjcWhJRkxnY2ZaREVkOXQ0UnJyYlhXU0tsSkE0?=
+ =?utf-8?B?RlhsQ3pTaERma09UN1g3NTY2UjRabWZkS2Y3Z3RydTI2YmRJaFJJczh0QmN3?=
+ =?utf-8?B?MnNsaXQ1ZTdtblNKTWoxaDhJNW5XNU1PTEpFbVlWZFZLODYyNktMa1RFakZa?=
+ =?utf-8?B?WVBvTDVXRGtNaE8wdUdBQk5vSUpXOTdDbE5GZkpNdWNna0hmTC9QNzdMVk1o?=
+ =?utf-8?B?eDVIMFNmWHFzTUdYMkVYbVFsY1c3VWVqZ2lOdHc5RWFhT3NUVlhRVk95MXVG?=
+ =?utf-8?B?eUFUdUNOQlc3bW1OcUV6K1lwRzgxbnA5RE1qdEFtTHoyTC96cldzYlQ5TUw2?=
+ =?utf-8?B?MFVMRDRvd0I3c3RyVURzZUJaVGFoQzVXUjFJckNQdTlIdHhFVFg5cFVITkVp?=
+ =?utf-8?B?NnVLQU9IQnMxSGJLNGFJUFBEM2gweU1UdkRTWWtxbUdMOFRxWC9PWHVqd1By?=
+ =?utf-8?B?SnNQemJJM29PbjRSNWxuckVtZ1Jkc3JhYmZkQ0RRZlgvKyt2S1lwSEZYL1k1?=
+ =?utf-8?B?WHFKdGJGVVJleHBBcUt3LzhqQis1K3JLNnQ3SU5KeWdmbWJSM0JvUkQvWUJW?=
+ =?utf-8?B?VG5Zc25mSjFFd3lDMDZwaGlUdGxLVkFpeE1ialRzRnF4ek9IQXpRWlhqc2xJ?=
+ =?utf-8?B?V001ZkFHUFVpMWY2cThpNzk4a2tqRTlzZlRSSEtNSThnaEptMUg0WE5NNHJy?=
+ =?utf-8?B?NFIyM3VEdFRkSGQ5MDU1ZlAzY3dZN2dPQnhWazhEKzl1MnltUmJYMEZTYWp2?=
+ =?utf-8?B?emRENVlGR2xMbE1DL1lya3g0bXZud3Z2eHlGVDZyMmduRzN6NzBFU2pJVXJ4?=
+ =?utf-8?B?M2wxVnRqa1EzaURlRmoyUS8xYmxESUZkVGtrOHJGNCtPRTUyYlREMklibVVW?=
+ =?utf-8?B?OEZjaTJjOWU3S1FKRzFidDdOQnpnZ2dhSG8vU2N3eFVHQkJnMFZlZHdYSHZ2?=
+ =?utf-8?B?SHVoVHNXRE5GQlJIb1JnUG5IZEhmUVNxL3pwbGwzdS9ZaDQvbUlSYUtDNm1H?=
+ =?utf-8?B?cnNqMmZ1VWI5QWh5bWFISit1S2FkZXJ1T016S0ZLZnJsUzJxUG51a2xleFl0?=
+ =?utf-8?B?QmxXelZGb2tkN0VPbWEzR3R5Q2Frb0xPVnJhVkovSzlTTUs2ZjBoQ3RReTBk?=
+ =?utf-8?B?cFIyaUdQbTBuQkt1eWZGS3pneEFCZW5rbG8rQnBqc216c3VLUkxPVHU4YTNW?=
+ =?utf-8?Q?H2M85Ik/+nEZbsppKwNsm5T7h?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bb49f2f-c7f9-4614-f1e0-08daac4f3ca6
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2022 12:42:34.8032
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +echtYFIPF8QzbBFS6usijur+/X/CdOrCJAY7QwPEattCXLvvCR2jw1js8/dsoemvRbhYFRcOzG8jlh+/+7NvQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5759
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 12 Oct 2022 at 11:23, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Hi:
->
-> I presume this is a leak in fscrypt (or perhaps something at an
-> even higher level).
-
-Eric sent this:
-
-[PATCH] fscrypt: fix keyring memory leak on mount failure
-https://lore.kernel.org/all/20221011213838.209879-1-ebiggers@kernel.org/
-
-
-
+On 10/12/22 04:31, Herbert Xu wrote:
+> On Fri, Oct 07, 2022 at 08:24:06PM +0000, Limonciello, Mario wrote:
+>>
+>> I noticed you sent out the 6.1 PR already.  So I Just wanted to make sure this
+>> didn't get overlooked as it's already got a T-b/A-b.
+> 
+> Hi Mario:
+> 
+> This didn't make the deadline for inclusion in my 6.1 PR.  Is there
+> any reason why it has to go in this merge window rather than the next?
+> 
 > Thanks,
->
-> On Tue, Oct 11, 2022 at 01:46:41PM -0700, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    4c86114194e6 Merge tag 'iomap-6.1-merge-1' of git://git.ke..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=104827bc880000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=10f41fbb818af57a
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=104c2a89561289cec13e
-> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17a1d5fa880000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f77e34880000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/47a35ffaaa39/disk-4c861141.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/cc11d48eaf17/vmlinux-4c861141.xz
-> > mounted in repro: https://storage.googleapis.com/syzbot-assets/c14465c5ddba/mount_0.gz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff8881024bd800 (size 512):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 21.340s)
-> >   hex dump (first 32 bytes):
-> >     d8 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     e0 be 2a 82 ff ff ff ff 68 fc 1c 08 81 88 ff ff  ..*.....h.......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810eb2e740 (size 32):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 21.340s)
-> >   hex dump (first 32 bytes):
-> >     d0 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     00 00 00 00 00 00 00 00 20 cb c7 85 ff ff ff ff  ........ .......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a50f5>] crypto_create_tfm crypto/internal.h:92 [inline]
-> >     [<ffffffff822a50f5>] crypto_spawn_tfm2+0x45/0x90 crypto/algapi.c:803
-> >     [<ffffffff822b4c1b>] crypto_spawn_shash include/crypto/internal/hash.h:231 [inline]
-> >     [<ffffffff822b4c1b>] hmac_init_tfm+0x3b/0xa0 crypto/hmac.c:152
-> >     [<ffffffff822ac8c7>] crypto_shash_init_tfm+0x77/0xf0 crypto/shash.c:440
-> >     [<ffffffff822a2f52>] crypto_create_tfm_node+0x52/0x130 crypto/api.c:512
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a9a1800 (size 2048):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 21.340s)
-> >   hex dump (first 32 bytes):
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >   backtrace:
-> >     [<ffffffff8168ecf6>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168ecf6>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168ecf6>] allocate_filesystem_keyring fs/crypto/keyring.c:194 [inline]
-> >     [<ffffffff8168ecf6>] do_add_master_key fs/crypto/keyring.c:502 [inline]
-> >     [<ffffffff8168ecf6>] add_master_key+0x2c6/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a820800 (size 1024):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 21.340s)
-> >   hex dump (first 32 bytes):
-> >     00 b0 a4 0e 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-> >     58 19 9a 0a 81 88 ff ff 00 00 00 00 00 00 00 00  X...............
-> >   backtrace:
-> >     [<ffffffff8168e25a>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168e25a>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168e25a>] add_new_master_key+0x4a/0x250 fs/crypto/keyring.c:418
-> >     [<ffffffff8168ec10>] do_add_master_key fs/crypto/keyring.c:504 [inline]
-> >     [<ffffffff8168ec10>] add_master_key+0x1e0/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff8881024bd800 (size 512):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 24.890s)
-> >   hex dump (first 32 bytes):
-> >     d8 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     e0 be 2a 82 ff ff ff ff 68 fc 1c 08 81 88 ff ff  ..*.....h.......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810eb2e740 (size 32):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 24.890s)
-> >   hex dump (first 32 bytes):
-> >     d0 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     00 00 00 00 00 00 00 00 20 cb c7 85 ff ff ff ff  ........ .......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a50f5>] crypto_create_tfm crypto/internal.h:92 [inline]
-> >     [<ffffffff822a50f5>] crypto_spawn_tfm2+0x45/0x90 crypto/algapi.c:803
-> >     [<ffffffff822b4c1b>] crypto_spawn_shash include/crypto/internal/hash.h:231 [inline]
-> >     [<ffffffff822b4c1b>] hmac_init_tfm+0x3b/0xa0 crypto/hmac.c:152
-> >     [<ffffffff822ac8c7>] crypto_shash_init_tfm+0x77/0xf0 crypto/shash.c:440
-> >     [<ffffffff822a2f52>] crypto_create_tfm_node+0x52/0x130 crypto/api.c:512
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a9a1800 (size 2048):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 24.890s)
-> >   hex dump (first 32 bytes):
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >   backtrace:
-> >     [<ffffffff8168ecf6>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168ecf6>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168ecf6>] allocate_filesystem_keyring fs/crypto/keyring.c:194 [inline]
-> >     [<ffffffff8168ecf6>] do_add_master_key fs/crypto/keyring.c:502 [inline]
-> >     [<ffffffff8168ecf6>] add_master_key+0x2c6/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a820800 (size 1024):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 24.890s)
-> >   hex dump (first 32 bytes):
-> >     00 b0 a4 0e 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-> >     58 19 9a 0a 81 88 ff ff 00 00 00 00 00 00 00 00  X...............
-> >   backtrace:
-> >     [<ffffffff8168e25a>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168e25a>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168e25a>] add_new_master_key+0x4a/0x250 fs/crypto/keyring.c:418
-> >     [<ffffffff8168ec10>] do_add_master_key fs/crypto/keyring.c:504 [inline]
-> >     [<ffffffff8168ec10>] add_master_key+0x1e0/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff8881024bd800 (size 512):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 27.260s)
-> >   hex dump (first 32 bytes):
-> >     d8 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     e0 be 2a 82 ff ff ff ff 68 fc 1c 08 81 88 ff ff  ..*.....h.......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810eb2e740 (size 32):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 27.260s)
-> >   hex dump (first 32 bytes):
-> >     d0 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     00 00 00 00 00 00 00 00 20 cb c7 85 ff ff ff ff  ........ .......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a50f5>] crypto_create_tfm crypto/internal.h:92 [inline]
-> >     [<ffffffff822a50f5>] crypto_spawn_tfm2+0x45/0x90 crypto/algapi.c:803
-> >     [<ffffffff822b4c1b>] crypto_spawn_shash include/crypto/internal/hash.h:231 [inline]
-> >     [<ffffffff822b4c1b>] hmac_init_tfm+0x3b/0xa0 crypto/hmac.c:152
-> >     [<ffffffff822ac8c7>] crypto_shash_init_tfm+0x77/0xf0 crypto/shash.c:440
-> >     [<ffffffff822a2f52>] crypto_create_tfm_node+0x52/0x130 crypto/api.c:512
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a9a1800 (size 2048):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 27.260s)
-> >   hex dump (first 32 bytes):
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >   backtrace:
-> >     [<ffffffff8168ecf6>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168ecf6>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168ecf6>] allocate_filesystem_keyring fs/crypto/keyring.c:194 [inline]
-> >     [<ffffffff8168ecf6>] do_add_master_key fs/crypto/keyring.c:502 [inline]
-> >     [<ffffffff8168ecf6>] add_master_key+0x2c6/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a820800 (size 1024):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 27.260s)
-> >   hex dump (first 32 bytes):
-> >     00 b0 a4 0e 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-> >     58 19 9a 0a 81 88 ff ff 00 00 00 00 00 00 00 00  X...............
-> >   backtrace:
-> >     [<ffffffff8168e25a>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168e25a>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168e25a>] add_new_master_key+0x4a/0x250 fs/crypto/keyring.c:418
-> >     [<ffffffff8168ec10>] do_add_master_key fs/crypto/keyring.c:504 [inline]
-> >     [<ffffffff8168ec10>] add_master_key+0x1e0/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff8881024bd800 (size 512):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 28.460s)
-> >   hex dump (first 32 bytes):
-> >     d8 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     e0 be 2a 82 ff ff ff ff 68 fc 1c 08 81 88 ff ff  ..*.....h.......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810eb2e740 (size 32):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 28.460s)
-> >   hex dump (first 32 bytes):
-> >     d0 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     00 00 00 00 00 00 00 00 20 cb c7 85 ff ff ff ff  ........ .......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a50f5>] crypto_create_tfm crypto/internal.h:92 [inline]
-> >     [<ffffffff822a50f5>] crypto_spawn_tfm2+0x45/0x90 crypto/algapi.c:803
-> >     [<ffffffff822b4c1b>] crypto_spawn_shash include/crypto/internal/hash.h:231 [inline]
-> >     [<ffffffff822b4c1b>] hmac_init_tfm+0x3b/0xa0 crypto/hmac.c:152
-> >     [<ffffffff822ac8c7>] crypto_shash_init_tfm+0x77/0xf0 crypto/shash.c:440
-> >     [<ffffffff822a2f52>] crypto_create_tfm_node+0x52/0x130 crypto/api.c:512
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a9a1800 (size 2048):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 28.460s)
-> >   hex dump (first 32 bytes):
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >   backtrace:
-> >     [<ffffffff8168ecf6>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168ecf6>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168ecf6>] allocate_filesystem_keyring fs/crypto/keyring.c:194 [inline]
-> >     [<ffffffff8168ecf6>] do_add_master_key fs/crypto/keyring.c:502 [inline]
-> >     [<ffffffff8168ecf6>] add_master_key+0x2c6/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a820800 (size 1024):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 28.460s)
-> >   hex dump (first 32 bytes):
-> >     00 b0 a4 0e 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-> >     58 19 9a 0a 81 88 ff ff 00 00 00 00 00 00 00 00  X...............
-> >   backtrace:
-> >     [<ffffffff8168e25a>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168e25a>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168e25a>] add_new_master_key+0x4a/0x250 fs/crypto/keyring.c:418
-> >     [<ffffffff8168ec10>] do_add_master_key fs/crypto/keyring.c:504 [inline]
-> >     [<ffffffff8168ec10>] add_master_key+0x1e0/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff8881024bd800 (size 512):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 29.660s)
-> >   hex dump (first 32 bytes):
-> >     d8 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     e0 be 2a 82 ff ff ff ff 68 fc 1c 08 81 88 ff ff  ..*.....h.......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810eb2e740 (size 32):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 29.660s)
-> >   hex dump (first 32 bytes):
-> >     d0 00 00 00 00 00 00 00 00 00 00 00 ff ff ff ff  ................
-> >     00 00 00 00 00 00 00 00 20 cb c7 85 ff ff ff ff  ........ .......
-> >   backtrace:
-> >     [<ffffffff822a2f30>] kmalloc_node include/linux/slab.h:623 [inline]
-> >     [<ffffffff822a2f30>] kzalloc_node include/linux/slab.h:744 [inline]
-> >     [<ffffffff822a2f30>] crypto_create_tfm_node+0x30/0x130 crypto/api.c:504
-> >     [<ffffffff822a50f5>] crypto_create_tfm crypto/internal.h:92 [inline]
-> >     [<ffffffff822a50f5>] crypto_spawn_tfm2+0x45/0x90 crypto/algapi.c:803
-> >     [<ffffffff822b4c1b>] crypto_spawn_shash include/crypto/internal/hash.h:231 [inline]
-> >     [<ffffffff822b4c1b>] hmac_init_tfm+0x3b/0xa0 crypto/hmac.c:152
-> >     [<ffffffff822ac8c7>] crypto_shash_init_tfm+0x77/0xf0 crypto/shash.c:440
-> >     [<ffffffff822a2f52>] crypto_create_tfm_node+0x52/0x130 crypto/api.c:512
-> >     [<ffffffff822a3816>] crypto_alloc_tfm_node+0x96/0x180 crypto/api.c:588
-> >     [<ffffffff8168ccdc>] fscrypt_init_hkdf+0x3c/0x180 fs/crypto/hkdf.c:75
-> >     [<ffffffff8168eb90>] add_master_key+0x160/0x370 fs/crypto/keyring.c:535
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a9a1800 (size 2048):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 29.660s)
-> >   hex dump (first 32 bytes):
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >   backtrace:
-> >     [<ffffffff8168ecf6>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168ecf6>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168ecf6>] allocate_filesystem_keyring fs/crypto/keyring.c:194 [inline]
-> >     [<ffffffff8168ecf6>] do_add_master_key fs/crypto/keyring.c:502 [inline]
-> >     [<ffffffff8168ecf6>] add_master_key+0x2c6/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > BUG: memory leak
-> > unreferenced object 0xffff88810a820800 (size 1024):
-> >   comm "syz-executor361", pid 3670, jiffies 4294954234 (age 29.660s)
-> >   hex dump (first 32 bytes):
-> >     00 b0 a4 0e 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-> >     58 19 9a 0a 81 88 ff ff 00 00 00 00 00 00 00 00  X...............
-> >   backtrace:
-> >     [<ffffffff8168e25a>] kmalloc include/linux/slab.h:600 [inline]
-> >     [<ffffffff8168e25a>] kzalloc include/linux/slab.h:733 [inline]
-> >     [<ffffffff8168e25a>] add_new_master_key+0x4a/0x250 fs/crypto/keyring.c:418
-> >     [<ffffffff8168ec10>] do_add_master_key fs/crypto/keyring.c:504 [inline]
-> >     [<ffffffff8168ec10>] add_master_key+0x1e0/0x370 fs/crypto/keyring.c:554
-> >     [<ffffffff8168f233>] fscrypt_add_test_dummy_key+0x93/0xc0 fs/crypto/keyring.c:801
-> >     [<ffffffff8180b59a>] ext4_check_test_dummy_encryption fs/ext4/super.c:2680 [inline]
-> >     [<ffffffff8180b59a>] ext4_check_opt_consistency+0x79a/0xb80 fs/ext4/super.c:2735
-> >     [<ffffffff818119f6>] __ext4_fill_super fs/ext4/super.c:5095 [inline]
-> >     [<ffffffff818119f6>] ext4_fill_super+0xb66/0x5080 fs/ext4/super.c:5648
-> >     [<ffffffff815e7851>] get_tree_bdev+0x1f1/0x320 fs/super.c:1323
-> >     [<ffffffff815e5a88>] vfs_get_tree+0x28/0x100 fs/super.c:1530
-> >     [<ffffffff81629be7>] do_new_mount fs/namespace.c:3040 [inline]
-> >     [<ffffffff81629be7>] path_mount+0xc37/0x10d0 fs/namespace.c:3370
-> >     [<ffffffff8162a7ce>] do_mount fs/namespace.c:3383 [inline]
-> >     [<ffffffff8162a7ce>] __do_sys_mount fs/namespace.c:3591 [inline]
-> >     [<ffffffff8162a7ce>] __se_sys_mount fs/namespace.c:3568 [inline]
-> >     [<ffffffff8162a7ce>] __x64_sys_mount+0x18e/0x1d0 fs/namespace.c:3568
-> >     [<ffffffff8460f1e5>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >     [<ffffffff8460f1e5>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-> >     [<ffffffff84800087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> >
-> > executing program
-> > executing program
-> > executing program
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> > syzbot can test patches for this issue, for details see:
-> > https://goo.gl/tpsmEJ#testing-patches
->
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/Y0aHieBUF%2BCY2rTT%40gondor.apana.org.au.
+
+Some other maintainers take new IDs as fixes.  Particularly when they're 
+good candidates for cc stable.
+
+The main reason I wanted to see it sooner is so that it has more time to 
+percolate to the various downstream distros so that errors stemming from 
+the lack of this ID declaration aren't prevalent when using this SOC.
