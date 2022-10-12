@@ -2,356 +2,181 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFEAC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E29C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbiJLWEt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 18:04:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42742 "EHLO
+        id S229470AbiJLWx5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 18:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbiJLWEB (ORCPT
+        with ESMTP id S229494AbiJLWx4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 18:04:01 -0400
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B116A13954B;
-        Wed, 12 Oct 2022 15:01:28 -0700 (PDT)
-Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CL7Wtg016423;
-        Wed, 12 Oct 2022 22:00:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pps0720;
- bh=X7Go4viamzwOn3WUTwlo1LbW+Q0tptmA7a1g3x+mSls=;
- b=P89Qz77nTHr377CTaQ/w4cfXZnv9P2GTFzorUYCdAaLW32Qi5hAMB4PfaApAqOM+RWxF
- 8nI7zrA1czGGQBc3YGt2cA6JnciH+Gbw1GHXRFLLupGSzxZxweyF7CPlwRJkv7XvV8mB
- 8R0w32EgX5W8nusFomefeeoeWXOMzh6S5y3EwWzlliueSEDXbc1KsoVwXSI9ObAJispM
- U1I0Zx0SbTwNj+jh387WY1LA7nvqHRpUjOqIYINF2JnZYDV6t2E9xiDJncFAw/clHFX+
- 53fDY8vxloTFZayxAiee7eslHFFtuyuCUeuvRhHI/QcM6F3AZwBxxhU1mPzNdLd5gjRE jw== 
-Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k657c8adb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 22:00:11 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id C626129585;
-        Wed, 12 Oct 2022 22:00:10 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 6DADB807DA5;
-        Wed, 12 Oct 2022 22:00:10 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 18/19] crypto: x86 - standardize not loaded prints
-Date:   Wed, 12 Oct 2022 16:59:30 -0500
-Message-Id: <20221012215931.3896-19-elliott@hpe.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221012215931.3896-1-elliott@hpe.com>
-References: <20221006223151.22159-1-elliott@hpe.com>
- <20221012215931.3896-1-elliott@hpe.com>
+        Wed, 12 Oct 2022 18:53:56 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F21311877C
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Oct 2022 15:53:55 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id p16so25251iod.6
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Oct 2022 15:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RQNjMU9F7vPSKS5uWf+TJ+P/AZGC+XAnlHRyO/MXA08=;
+        b=rEFHKVqXjRvwQxwzGNNKKFp9aOGsLl53zJS6B4HC04ArBiJtVtMayr7GLgt65O+xtM
+         XSii2F5kbX/kegvMstg+rbvPHPeaMkSzCFYq6w70RrfeBBgGGoaM4ENO9LCmsIWUWwDE
+         eT2JK8bZsylPfKGQ7s4U+Cb/JN39xCy4jiycSKOf9k8zvlQzvZkLieDkLuJQoOGN6pMW
+         0YpmVTJWofQHNkSH9CJ5f0t4QaVOBbQk7q0xtASQHjdEhZuCd8xQATwsDwqRpwIOesq1
+         YBzAX5ooidsB6GNtasb8F4BlSnmBBl31994gI/IcgXqb1zyWn8D0pHaeHb0Bm97dxjfs
+         E18w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RQNjMU9F7vPSKS5uWf+TJ+P/AZGC+XAnlHRyO/MXA08=;
+        b=LqjV4SVHQ0gCn9S3usF9sozWkgRwOxDRhmFJnFG38T4b5rMX7nfDheYIBIRfHXiTW/
+         Lukj087pHqo8vAGNZGVMNhf0R4JhuuMJkWH9xNeaDQCGSGYSF+rJDOyO5J19yIAWZ+O2
+         62/mQI8mKZd/4YGlroq52CvqPZmhY+eIOVl9y7AODfMyY5t0yeYlQw/GTg+fLCvTqyLh
+         pd/z6a1We9wUN2YKI1/A+qD2crOzTs4F88YVryfoiZPyY+jseK2U/f1iXdLu0MXwPY6u
+         M4YzUIRs5LnXE+PzY5xhyS1g3gzoi6CyxM5R7Q1YTb6ILiQVqXJNiKcKu9BFLMfIbsw8
+         bIAQ==
+X-Gm-Message-State: ACrzQf0MFTQmiU7GxTJhT51tuGG/pbatM/t1+1RObDpnm4SQ0lGGMWzc
+        B9DJVbqWqy1kwZONWOxCarBWSYxiUmZky6J+NmXT3Q==
+X-Google-Smtp-Source: AMsMyM7e+//UCnfRh+nTLZE0owcwmsn4kCNm6rKOkfT2PnUs3F5HM7g0xf1cXM3+hs8+Yq0l9mPms5F8A4MHIDVW4Zs=
+X-Received: by 2002:a5e:d506:0:b0:6a4:b8b3:a6f0 with SMTP id
+ e6-20020a5ed506000000b006a4b8b3a6f0mr14689600iom.138.1665615234351; Wed, 12
+ Oct 2022 15:53:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 82XBGjj4A8ErvKSGv2QYlO_RI8X_yhn1
-X-Proofpoint-GUID: 82XBGjj4A8ErvKSGv2QYlO_RI8X_yhn1
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-12_11,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
- phishscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210120138
+References: <cover.1655761627.git.ashish.kalra@amd.com> <d7decd3cb48d962da086afb65feb94a124e5c537.1655761627.git.ashish.kalra@amd.com>
+ <CABpDEukNp9eH8jXpv6+Dun+e943AbEMA6G68uQu=TrOLSvh_oA@mail.gmail.com> <318682c1-34a5-44e3-a15e-ef71067d4fd7@amd.com>
+In-Reply-To: <318682c1-34a5-44e3-a15e-ef71067d4fd7@amd.com>
+From:   Alper Gun <alpergun@google.com>
+Date:   Wed, 12 Oct 2022 15:53:43 -0700
+Message-ID: <CABpDEun0KTeWXqRS0Xj5mDTajix_xGt5DTpqtK_wfGcSH3Cu1Q@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 41/49] KVM: SVM: Add support to handle the RMP
+ nested page fault
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Standardize the prints that additional required CPU features are not
-present along with the main CPU features (e.g., OSXSAVE is not
-present along with AVX).
+On Mon, Oct 10, 2022 at 7:32 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
+>
+> Hello Alper,
+>
+> On 10/10/2022 5:03 PM, Alper Gun wrote:
+> > On Mon, Jun 20, 2022 at 4:13 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >>
+> >> From: Brijesh Singh <brijesh.singh@amd.com>
+> >>
+> >> When SEV-SNP is enabled in the guest, the hardware places restrictions on
+> >> all memory accesses based on the contents of the RMP table. When hardware
+> >> encounters RMP check failure caused by the guest memory access it raises
+> >> the #NPF. The error code contains additional information on the access
+> >> type. See the APM volume 2 for additional information.
+> >>
+> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> >> ---
+> >>   arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
+> >>   arch/x86/kvm/svm/svm.c | 14 +++++---
+> >>   2 files changed, 86 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> >> index 4ed90331bca0..7fc0fad87054 100644
+> >> --- a/arch/x86/kvm/svm/sev.c
+> >> +++ b/arch/x86/kvm/svm/sev.c
+> >> @@ -4009,3 +4009,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> >>
+> >>          spin_unlock(&sev->psc_lock);
+> >>   }
+> >> +
+> >> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+> >> +{
+> >> +       int rmp_level, npt_level, rc, assigned;
+> >> +       struct kvm *kvm = vcpu->kvm;
+> >> +       gfn_t gfn = gpa_to_gfn(gpa);
+> >> +       bool need_psc = false;
+> >> +       enum psc_op psc_op;
+> >> +       kvm_pfn_t pfn;
+> >> +       bool private;
+> >> +
+> >> +       write_lock(&kvm->mmu_lock);
+> >> +
+> >> +       if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level)))
+> >> +               goto unlock;
+> >> +
+> >> +       assigned = snp_lookup_rmpentry(pfn, &rmp_level);
+> >> +       if (unlikely(assigned < 0))
+> >> +               goto unlock;
+> >> +
+> >> +       private = !!(error_code & PFERR_GUEST_ENC_MASK);
+> >> +
+> >> +       /*
+> >> +        * If the fault was due to size mismatch, or NPT and RMP page level's
+> >> +        * are not in sync, then use PSMASH to split the RMP entry into 4K.
+> >> +        */
+> >> +       if ((error_code & PFERR_GUEST_SIZEM_MASK) ||
+> >> +           (npt_level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M && private)) {
+> >> +               rc = snp_rmptable_psmash(kvm, pfn);
+> >
+> >
+> > Regarding this case:
+> > RMP level is 4K
+> > Page table level is 2M
+> >
+> > Does this also cause a page fault with size mismatch? If so, we
+> > shouldn't try psmash because the rmp entry is already 4K.
+> >
+> > I see these errors in our tests and I think it may be happening
+> > because rmp size is already 4K.
+> >
+> > [ 1848.752952] psmash failed, gpa 0x191560000 pfn 0x536cd60 rc 7
+> > [ 2922.879635] psmash failed, gpa 0x102830000 pfn 0x37c8230 rc 7
+> > [ 3010.983090] psmash failed, gpa 0x104220000 pfn 0x6cf1e20 rc 7
+> > [ 3170.792050] psmash failed, gpa 0x108a80000 pfn 0x20e0080 rc 7
+> > [ 3345.955147] psmash failed, gpa 0x11b480000 pfn 0x1545e480 rc 7
+> >
+> > Shouldn't we use AND instead of OR in the if statement?
+> >
+>
+> I believe this we can't do, looking at the typical usage case below :
+>
+> [   37.243969] #VMEXIT (NPF) - SIZEM, err 0xc80000005 npt_level 2,
+> rmp_level 2, private 1
+> [   37.243973] trying psmash gpa 0x7f790000 pfn 0x1f5d90
+>
+> This is typically the case with #VMEXIT(NPF) with SIZEM error code, when
+> the guest tries to do PVALIDATE on 4K GHCB pages, in this case both the
+> RMP table and NPT will be optimally setup to 2M hugepage as can be seen.
+>
+> Is it possible to investigate in more depth, when is the this case being
+> observed:
 
-Although modules are not supposed to print unless loaded and
-active, these are existing exceptions.
+Yes, I added more logs and I can see that these errors happen when RMP
+level is 4K and NPT level is 2M.
+psmash fails as expected. I think it is just a log, there is no real
+issue but the best is not trying psmash if rmp level is 4K.
 
-Signed-off-by: Robert Elliott <elliott@hpe.com>
----
- arch/x86/crypto/aegis128-aesni-glue.c      | 4 +++-
- arch/x86/crypto/aria_aesni_avx_glue.c      | 4 ++--
- arch/x86/crypto/camellia_aesni_avx2_glue.c | 5 +++--
- arch/x86/crypto/camellia_aesni_avx_glue.c  | 5 +++--
- arch/x86/crypto/cast5_avx_glue.c           | 3 ++-
- arch/x86/crypto/cast6_avx_glue.c           | 3 ++-
- arch/x86/crypto/crc32-pclmul_glue.c        | 4 +++-
- arch/x86/crypto/nhpoly1305-avx2-glue.c     | 4 +++-
- arch/x86/crypto/serpent_avx2_glue.c        | 8 +++++---
- arch/x86/crypto/serpent_avx_glue.c         | 3 ++-
- arch/x86/crypto/sm3_avx_glue.c             | 7 ++++---
- arch/x86/crypto/sm4_aesni_avx2_glue.c      | 5 +++--
- arch/x86/crypto/sm4_aesni_avx_glue.c       | 5 +++--
- arch/x86/crypto/twofish_avx_glue.c         | 3 ++-
- 14 files changed, 40 insertions(+), 23 deletions(-)
-
-diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
-index e8eaf79ef220..aa94b9f8703c 100644
---- a/arch/x86/crypto/aegis128-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128-aesni-glue.c
-@@ -281,8 +281,10 @@ static int __init crypto_aegis128_aesni_module_init(void)
- 
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
-+	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL)) {
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (SSE2, AESNI) not supported\n");
- 		return -ENODEV;
-+	}
- 
- 	ret = simd_register_aeads_compat(&crypto_aegis128_aesni_alg, 1,
- 					  &simd_alg);
-diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
-index d58fb995a266..24982450a125 100644
---- a/arch/x86/crypto/aria_aesni_avx_glue.c
-+++ b/arch/x86/crypto/aria_aesni_avx_glue.c
-@@ -176,13 +176,13 @@ static int __init aria_avx_init(void)
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
- 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX or AES-NI instructions are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AES-NI, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU extended feature '%s' is not supported\n", feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-index e6c4ed1e40d2..bc6862077984 100644
---- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-@@ -123,13 +123,14 @@ static int __init camellia_aesni_init(void)
- 	    !boot_cpu_has(X86_FEATURE_AVX2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
- 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX2 or AES-NI instructions are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AVX2, AESNI, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
-index 6a9eadf0fe90..96e7e1accb6c 100644
---- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-@@ -121,13 +121,14 @@ static int __init camellia_aesni_init(void)
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
- 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX or AES-NI instructions are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AESNI, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
-index b5ae17c3ac53..89650fffb550 100644
---- a/arch/x86/crypto/cast5_avx_glue.c
-+++ b/arch/x86/crypto/cast5_avx_glue.c
-@@ -114,7 +114,8 @@ static int __init cast5_init(void)
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+		feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
-index d1c14a5f80d7..d69f62ac9553 100644
---- a/arch/x86/crypto/cast6_avx_glue.c
-+++ b/arch/x86/crypto/cast6_avx_glue.c
-@@ -114,7 +114,8 @@ static int __init cast6_init(void)
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-index c56d3d3ab0a0..4cf86f8f9428 100644
---- a/arch/x86/crypto/crc32-pclmul_glue.c
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -192,8 +192,10 @@ static int __init crc32_pclmul_mod_init(void)
- {
- 	int ret;
- 
--	if (!x86_match_cpu(module_cpu_ids))
-+	if (!x86_match_cpu(module_cpu_ids)) {
-+		pr_info("CPU-optimized crypto module not loaded, required CPU feature (PCLMULQDQ) not supported\n");
- 		return -ENODEV;
-+	}
- 
- 	ret = crypto_register_shash(&alg);
- 	if (!ret)
-diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-index 2dc7b618771f..834bf64bb160 100644
---- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
-+++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-@@ -74,8 +74,10 @@ static int __init nhpoly1305_mod_init(void)
- 		return -ENODEV;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE))
-+	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX2, OSXSAVE) not supported\n");
- 		return -ENODEV;
-+	}
- 
- 	ret = crypto_register_shash(&nhpoly1305_alg);
- 	if (!ret)
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index bf59addaf804..4bd59ccea69a 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -112,13 +112,15 @@ static int __init serpent_avx2_init(void)
- 
- 		return -ENODEV;
- 
--	if (!boot_cpu_has(X86_FEATURE_AVX2) || !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX2 instructions are not detected.\n");
-+	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
-+	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX2, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 7b0c02a61552..853b48677d2b 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -121,7 +121,8 @@ static int __init serpent_init(void)
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/sm3_avx_glue.c b/arch/x86/crypto/sm3_avx_glue.c
-index 532f07b05745..5250fee79147 100644
---- a/arch/x86/crypto/sm3_avx_glue.c
-+++ b/arch/x86/crypto/sm3_avx_glue.c
-@@ -131,18 +131,19 @@ static int __init sm3_avx_mod_init(void)
- 		return -ENODEV;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX)) {
--		pr_info("AVX instruction are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, required CPU feature (AVX) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!boot_cpu_has(X86_FEATURE_BMI2)) {
--		pr_info("BMI2 instruction are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, required CPU feature (BMI2) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/sm4_aesni_avx2_glue.c b/arch/x86/crypto/sm4_aesni_avx2_glue.c
-index 42819ee5d36d..cdd7ca92ca61 100644
---- a/arch/x86/crypto/sm4_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/sm4_aesni_avx2_glue.c
-@@ -152,13 +152,14 @@ static int __init sm4_init(void)
- 	    !boot_cpu_has(X86_FEATURE_AVX2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
- 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX2 or AES-NI instructions are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AVX2, AESNI, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
-index 8a25376d341f..a2ae3d1e0a4a 100644
---- a/arch/x86/crypto/sm4_aesni_avx_glue.c
-+++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
-@@ -468,13 +468,14 @@ static int __init sm4_init(void)
- 	if (!boot_cpu_has(X86_FEATURE_AVX) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
- 	    !boot_cpu_has(X86_FEATURE_OSXSAVE)) {
--		pr_info("AVX or AES-NI instructions are not detected.\n");
-+		pr_info("CPU-optimized crypto module not loaded, all required CPU features (AVX, AESNI, OSXSAVE) not supported\n");
- 		return -ENODEV;
- 	}
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
- 				&feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index ccf016bf6ef2..70167dd01816 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -123,7 +123,8 @@ static int __init twofish_init(void)
- 		return -ENODEV;
- 
- 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, &feature_name)) {
--		pr_info("CPU feature '%s' is not supported.\n", feature_name);
-+		pr_info("CPU-optimized crypto module not loaded, CPU extended feature '%s' is not supported\n",
-+			feature_name);
- 		return -ENODEV;
- 	}
- 
--- 
-2.37.3
-
+> RMP level is 4K
+> Page table level is 2M
+> We shouldn't try psmash because the rmp entry is already 4K.
+>
+> Thanks,
+> Ashish
+>
+> > if ((error_code & PFERR_GUEST_SIZEM_MASK) && ...
+> >
