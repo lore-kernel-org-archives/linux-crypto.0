@@ -2,695 +2,282 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7831AC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8E3C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Oct 2022 22:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbiJLWDF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Oct 2022 18:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39094 "EHLO
+        id S229735AbiJLWEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Oct 2022 18:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiJLWBj (ORCPT
+        with ESMTP id S229816AbiJLWDo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Oct 2022 18:01:39 -0400
+        Wed, 12 Oct 2022 18:03:44 -0400
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8860610324C;
-        Wed, 12 Oct 2022 15:00:27 -0700 (PDT)
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CKWT9x015442;
-        Wed, 12 Oct 2022 22:00:13 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1F912C8A3;
+        Wed, 12 Oct 2022 15:01:20 -0700 (PDT)
+Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CKwflC006339;
+        Wed, 12 Oct 2022 21:59:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=K0yyN1Z9ykifAfRg9N8WShvUGMpa8FIhYC0CUsfvRDw=;
- b=mVhez82LOF2jhuRvGSI27LUkKOAUZ1b+Edj+9zvfQvsFVE3ngyNXmhmblWCmkUoyVzXx
- P4Q8i6D3de3Hw9zHBntr2L1AoqeBKOMtukz5H+kYMbH/6Fnog9chP1WlXbydGN/tiLhv
- e/Yy/WdEbxii64ByH/EoxRuYQXLjHYzASqr2bx1q12AsL6z8wFOGDZdvumKL9GAnQFUb
- uXkO98EWWUSOgjlzsSqJVqiZftJdj6UXObapdVRgGkHh4XnIBp5ewl7GY3s1Pk5adaYW
- wA2bGojpRB/fXeN0ES2aO3wdXEjMdDxPO8qLsekzkH5tUHcGhI5ZpV/amfBi4QJPpP04 tQ== 
-Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k615t2eth-1
+ bh=pkIjY3xNYdD7u0iVrBec5NLvLKLYByXvLSfeEAPzOWA=;
+ b=H/+AVupIA0qT3WW+ZAU2dM2Gj2l3wqwR0WsAa/VfsVsS5iNMLJC7y8Ht8zY9f5OvhkBx
+ 2yLbpwmj37y7COimS4bcYZXap7tWfA+f9jfIliFcbQ+513C5zXVqoqpMPMUKpaQZdv18
+ hktdM2YGYo3tRFTVAi7YV1xAMWnSW89cLVpbAz4A923DrH/GUDNRl5Ld07SqTiP+PXvj
+ VO8N9e4AHFDwKfHaVK05G3rZ6EdQ3Am7Xvyz8NwOIvIN/3DX0mQtHBM0ONsISnk24f22
+ +trjHtXOEgf2mx27hfc02CqJehN6CTaOKRtBmoBwWIjCo4twBOe4dR3MxIan4xh9zojX PQ== 
+Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k653c8da7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 22:00:12 +0000
+        Wed, 12 Oct 2022 21:59:50 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 013CBD268;
-        Wed, 12 Oct 2022 22:00:11 +0000 (UTC)
+        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 8611C806B5C;
+        Wed, 12 Oct 2022 21:59:49 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 9B9058038C2;
-        Wed, 12 Oct 2022 22:00:11 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 28602808ECE;
+        Wed, 12 Oct 2022 21:59:49 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 19/19] crypto: x86/sha - register only the best function
-Date:   Wed, 12 Oct 2022 16:59:31 -0500
-Message-Id: <20221012215931.3896-20-elliott@hpe.com>
+Subject: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
+Date:   Wed, 12 Oct 2022 16:59:16 -0500
+Message-Id: <20221012215931.3896-5-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221012215931.3896-1-elliott@hpe.com>
 References: <20221006223151.22159-1-elliott@hpe.com>
  <20221012215931.3896-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: MtKhtP7F9kP6sMI-XKAtztT-zs2OFsZc
-X-Proofpoint-ORIG-GUID: MtKhtP7F9kP6sMI-XKAtztT-zs2OFsZc
+X-Proofpoint-GUID: Uwyq1NOSShnQQpJzF5T27vXCpBPm0wlx
+X-Proofpoint-ORIG-GUID: Uwyq1NOSShnQQpJzF5T27vXCpBPm0wlx
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-12_11,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- mlxlogscore=999 lowpriorityscore=0 suspectscore=0 adultscore=0
- impostorscore=0 mlxscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210120138
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 bulkscore=0 priorityscore=1501 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2210120138
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Don't register and unregister each of the functions from least-
-to most-optimized (SSSE3 then AVX then AVX2); determine the
-most-optimized function and load only that version.
+As done by the ECB and CBC helpers in arch/x86/crypt/ecb_cbc_helpers.h,
+limit the number of bytes processed between kernel_fpu_begin() and
+kernel_fpu_end() calls.
 
-Suggested-by: Tim Chen <tim.c.chen@linux.intel.com>
+Those functions call preempt_disable() and preempt_enable(), so
+the CPU core is unavailable for scheduling while running.
+
+This leads to "rcu_preempt detected expedited stalls" with stack dumps
+pointing to the optimized hash function if the module is loaded and
+used a lot:
+    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: ...
+
+For example, that can occur during boot with the stack track pointing
+to the sha512-x86 function if the system set to use SHA-512 for
+module signing. The call trace includes:
+    module_sig_check
+    mod_verify_sig
+    pkcs7_verify
+    pkcs7_digest
+    sha512_finup
+    sha512_base_do_update
+
+Fixes: 66be89515888 ("crypto: sha1 - SSSE3 based SHA1 implementation for x86-64")
+Fixes: 8275d1aa6422 ("crypto: sha256 - Create module providing optimized SHA256 routines using SSSE3, AVX or AVX2 instructions.")
+Fixes: 87de4579f92d ("crypto: sha512 - Create module providing optimized SHA512 routines using SSSE3, AVX or AVX2 instructions.")
+Fixes: aa031b8f702e ("crypto: x86/sha512 - load based on CPU features")
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/x86/crypto/sha1_ssse3_glue.c   | 139 ++++++++++++-------------
- arch/x86/crypto/sha256_ssse3_glue.c | 154 ++++++++++++++--------------
- arch/x86/crypto/sha512_ssse3_glue.c | 120 ++++++++++++----------
- 3 files changed, 210 insertions(+), 203 deletions(-)
+ arch/x86/crypto/sha1_ssse3_glue.c   | 32 ++++++++++++++++++++++++-----
+ arch/x86/crypto/sha256_ssse3_glue.c | 32 ++++++++++++++++++++++++-----
+ arch/x86/crypto/sha512_ssse3_glue.c | 32 ++++++++++++++++++++++++-----
+ 3 files changed, 81 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index edffc33bd12e..90a86d737bcf 100644
+index 44340a1139e0..a9f5779b41ca 100644
 --- a/arch/x86/crypto/sha1_ssse3_glue.c
 +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -123,17 +123,16 @@ static struct shash_alg sha1_ssse3_alg = {
- 	}
- };
+@@ -26,6 +26,8 @@
+ #include <crypto/sha1_base.h>
+ #include <asm/simd.h>
  
--static int register_sha1_ssse3(void)
--{
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
--		return crypto_register_shash(&sha1_ssse3_alg);
--	return 0;
--}
--
-+static bool sha1_ssse3_registered;
-+static bool sha1_avx_registered;
-+static bool sha1_avx2_registered;
-+static bool sha1_ni_registered;
- static void unregister_sha1_ssse3(void)
- {
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
-+	if (sha1_ssse3_registered) {
- 		crypto_unregister_shash(&sha1_ssse3_alg);
-+		sha1_ssse3_registered = 0;
-+	}
- }
- 
- asmlinkage void sha1_transform_avx(struct sha1_state *state,
-@@ -172,28 +171,12 @@ static struct shash_alg sha1_avx_alg = {
- 	}
- };
- 
--static bool avx_usable(void)
--{
--	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
--		if (boot_cpu_has(X86_FEATURE_AVX))
--			pr_info("AVX detected but unusable.\n");
--		return false;
--	}
--
--	return true;
--}
--
--static int register_sha1_avx(void)
--{
--	if (avx_usable())
--		return crypto_register_shash(&sha1_avx_alg);
--	return 0;
--}
--
- static void unregister_sha1_avx(void)
- {
--	if (avx_usable())
-+	if (sha1_avx_registered) {
- 		crypto_unregister_shash(&sha1_avx_alg);
-+		sha1_avx_registered = 0;
-+	}
- }
- 
- #define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
-@@ -201,16 +184,6 @@ static void unregister_sha1_avx(void)
- asmlinkage void sha1_transform_avx2(struct sha1_state *state,
- 				    const u8 *data, int blocks);
- 
--static bool avx2_usable(void)
--{
--	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2)
--		&& boot_cpu_has(X86_FEATURE_BMI1)
--		&& boot_cpu_has(X86_FEATURE_BMI2))
--		return true;
--
--	return false;
--}
--
- static void sha1_apply_transform_avx2(struct sha1_state *state,
- 				      const u8 *data, int blocks)
- {
-@@ -254,17 +227,13 @@ static struct shash_alg sha1_avx2_alg = {
- 	}
- };
- 
--static int register_sha1_avx2(void)
--{
--	if (avx2_usable())
--		return crypto_register_shash(&sha1_avx2_alg);
--	return 0;
--}
- 
- static void unregister_sha1_avx2(void)
- {
--	if (avx2_usable())
-+	if (sha1_avx2_registered) {
- 		crypto_unregister_shash(&sha1_avx2_alg);
-+		sha1_avx2_registered = 0;
-+	}
- }
- 
- #ifdef CONFIG_AS_SHA1_NI
-@@ -304,13 +273,6 @@ static struct shash_alg sha1_ni_alg = {
- 	}
- };
- 
--static int register_sha1_ni(void)
--{
--	if (boot_cpu_has(X86_FEATURE_SHA_NI))
--		return crypto_register_shash(&sha1_ni_alg);
--	return 0;
--}
--
- static const struct x86_cpu_id module_cpu_ids[] = {
- 	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
- 	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
-@@ -322,44 +284,79 @@ MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
- 
- static void unregister_sha1_ni(void)
- {
--	if (boot_cpu_has(X86_FEATURE_SHA_NI))
-+	if (sha1_ni_registered) {
- 		crypto_unregister_shash(&sha1_ni_alg);
-+		sha1_ni_registered = 0;
-+	}
- }
- 
- #else
--static inline int register_sha1_ni(void) { return 0; }
- static inline void unregister_sha1_ni(void) { }
- #endif
- 
- static int __init sha1_ssse3_mod_init(void)
- {
--	if (register_sha1_ssse3())
--		goto fail;
-+	const char *feature_name;
-+	const char *driver_name = NULL;
-+	int ret;
- 
- 	if (!x86_match_cpu(module_cpu_ids))
- 		return -ENODEV;
- 
--	if (register_sha1_avx()) {
--		unregister_sha1_ssse3();
--		goto fail;
--	}
-+	/* SHA-NI */
-+	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
- 
--	if (register_sha1_avx2()) {
--		unregister_sha1_avx();
--		unregister_sha1_ssse3();
--		goto fail;
--	}
-+		ret = crypto_register_shash(&sha1_ni_alg);
-+		if (!ret)
-+			sha1_ni_registered = 1;
- 
--	if (register_sha1_ni()) {
--		unregister_sha1_avx2();
--		unregister_sha1_avx();
--		unregister_sha1_ssse3();
--		goto fail;
-+	/* AVX2 */
-+	} else if (boot_cpu_has(X86_FEATURE_AVX2)) {
++#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
 +
-+		if (boot_cpu_has(X86_FEATURE_BMI1) &&
-+		    boot_cpu_has(X86_FEATURE_BMI2)) {
+ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len, sha1_block_fn *sha1_xform)
+ {
+@@ -41,9 +43,18 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 	 */
+ 	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
+ 
+-	kernel_fpu_begin();
+-	sha1_base_do_update(desc, data, len, sha1_xform);
+-	kernel_fpu_end();
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
 +
-+			ret = crypto_register_shash(&sha1_avx2_alg);
-+			if (!ret) {
-+				sha1_avx2_registered = 1;
-+				driver_name = sha1_avx2_alg.base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX2-optimized version not engaged, all required features (AVX2, BMI1, BMI2) not supported\n");
++		if (chunk) {
++			kernel_fpu_begin();
++			sha1_base_do_update(desc, data, chunk, sha1_xform);
++			kernel_fpu_end();
 +		}
 +
-+	/* AVX */
-+	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
-+
-+		if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
-+			       &feature_name)) {
-+
-+			ret = crypto_register_shash(&sha1_avx_alg);
-+			if (!ret) {
-+				sha1_avx_registered = 1;
-+				driver_name = sha1_avx_alg.base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX-optimized version not engaged, CPU extended feature '%s' is not supported\n",
-+				feature_name);
-+		}
-+
-+	/* SSE3 */
-+	} else if (boot_cpu_has(X86_FEATURE_SSSE3)) {
-+		ret = crypto_register_shash(&sha1_ssse3_alg);
-+		if (!ret) {
-+			sha1_ssse3_registered = 1;
-+			driver_name = sha1_ssse3_alg.base.cra_driver_name;
-+		}
- 	}
++		len -= chunk;
++		data += chunk;
++	} while (len);
  
-+	pr_info("CPU-optimized crypto module loaded (SSSE3=%s, AVX=%s, AVX2=%s, SHA-NI=%s): driver=%s\n",
-+		sha1_ssse3_registered ? "yes" : "no",
-+		sha1_avx_registered ? "yes" : "no",
-+		sha1_avx2_registered ? "yes" : "no",
-+		sha1_ni_registered ? "yes" : "no",
-+		driver_name);
  	return 0;
--fail:
--	return -ENODEV;
  }
+@@ -54,9 +65,20 @@ static int sha1_finup(struct shash_desc *desc, const u8 *data,
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha1_finup(desc, data, len, out);
  
- static void __exit sha1_ssse3_mod_fini(void)
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
++
++		if (chunk) {
++			kernel_fpu_begin();
++			sha1_base_do_update(desc, data, chunk, sha1_xform);
++			kernel_fpu_end();
++		}
++
++		len -= chunk;
++		data += chunk;
++	} while (len);
++
+ 	kernel_fpu_begin();
+-	if (len)
+-		sha1_base_do_update(desc, data, len, sha1_xform);
+ 	sha1_base_do_finalize(desc, sha1_xform);
+ 	kernel_fpu_end();
+ 
 diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 8a0fb308fbba..cd7bf2b48f3d 100644
+index 3a5f6be7dbba..322c8aa907af 100644
 --- a/arch/x86/crypto/sha256_ssse3_glue.c
 +++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -150,19 +150,18 @@ static struct shash_alg sha256_ssse3_algs[] = { {
- 	}
- } };
+@@ -40,6 +40,8 @@
+ #include <linux/string.h>
+ #include <asm/simd.h>
  
--static int register_sha256_ssse3(void)
--{
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
--		return crypto_register_shashes(sha256_ssse3_algs,
--				ARRAY_SIZE(sha256_ssse3_algs));
--	return 0;
--}
-+static bool sha256_ssse3_registered;
-+static bool sha256_avx_registered;
-+static bool sha256_avx2_registered;
-+static bool sha256_ni_registered;
- 
- static void unregister_sha256_ssse3(void)
- {
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
-+	if (sha256_ssse3_registered) {
- 		crypto_unregister_shashes(sha256_ssse3_algs,
- 				ARRAY_SIZE(sha256_ssse3_algs));
-+		sha256_ssse3_registered = 0;
-+	}
- }
- 
- asmlinkage void sha256_transform_avx(struct sha256_state *state,
-@@ -215,30 +214,13 @@ static struct shash_alg sha256_avx_algs[] = { {
- 	}
- } };
- 
--static bool avx_usable(void)
--{
--	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
--		if (boot_cpu_has(X86_FEATURE_AVX))
--			pr_info("AVX detected but unusable.\n");
--		return false;
--	}
--
--	return true;
--}
--
--static int register_sha256_avx(void)
--{
--	if (avx_usable())
--		return crypto_register_shashes(sha256_avx_algs,
--				ARRAY_SIZE(sha256_avx_algs));
--	return 0;
--}
--
- static void unregister_sha256_avx(void)
- {
--	if (avx_usable())
-+	if (sha256_avx_registered) {
- 		crypto_unregister_shashes(sha256_avx_algs,
- 				ARRAY_SIZE(sha256_avx_algs));
-+		sha256_avx_registered = 0;
-+	}
- }
- 
- asmlinkage void sha256_transform_rorx(struct sha256_state *state,
-@@ -291,28 +273,13 @@ static struct shash_alg sha256_avx2_algs[] = { {
- 	}
- } };
- 
--static bool avx2_usable(void)
--{
--	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2) &&
--		    boot_cpu_has(X86_FEATURE_BMI2))
--		return true;
--
--	return false;
--}
--
--static int register_sha256_avx2(void)
--{
--	if (avx2_usable())
--		return crypto_register_shashes(sha256_avx2_algs,
--				ARRAY_SIZE(sha256_avx2_algs));
--	return 0;
--}
--
- static void unregister_sha256_avx2(void)
- {
--	if (avx2_usable())
-+	if (sha256_avx2_registered) {
- 		crypto_unregister_shashes(sha256_avx2_algs,
- 				ARRAY_SIZE(sha256_avx2_algs));
-+		sha256_avx2_registered = 0;
-+	}
- }
- 
- #ifdef CONFIG_AS_SHA256_NI
-@@ -375,55 +342,92 @@ static const struct x86_cpu_id module_cpu_ids[] = {
- };
- MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
- 
--static int register_sha256_ni(void)
--{
--	if (boot_cpu_has(X86_FEATURE_SHA_NI))
--		return crypto_register_shashes(sha256_ni_algs,
--				ARRAY_SIZE(sha256_ni_algs));
--	return 0;
--}
--
- static void unregister_sha256_ni(void)
- {
--	if (boot_cpu_has(X86_FEATURE_SHA_NI))
-+	if (sha256_ni_registered) {
- 		crypto_unregister_shashes(sha256_ni_algs,
- 				ARRAY_SIZE(sha256_ni_algs));
-+		sha256_ni_registered = 0;
-+	}
- }
- 
- #else
--static inline int register_sha256_ni(void) { return 0; }
- static inline void unregister_sha256_ni(void) { }
- #endif
- 
- static int __init sha256_ssse3_mod_init(void)
- {
--	if (!x86_match_cpu(module_cpu_ids))
-+	const char *feature_name;
-+	const char *driver_name = NULL;
-+	const char *driver_name2 = NULL;
-+	int ret;
++#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
 +
-+	if (!x86_match_cpu(module_cpu_ids)) {
-+		pr_info("CPU-optimized crypto module not loaded, required CPU features (SSSE3, AVX, AVX2, or SHA-NI) not supported\n");
- 		return -ENODEV;
-+	}
+ asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
+ 				       const u8 *data, int blocks);
  
--	if (register_sha256_ssse3())
--		goto fail;
-+	/* SHA-NI */
-+	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+@@ -58,9 +60,18 @@ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+ 	 */
+ 	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
  
--	if (register_sha256_avx()) {
--		unregister_sha256_ssse3();
--		goto fail;
--	}
-+		ret = crypto_register_shashes(sha256_ni_algs,
-+						ARRAY_SIZE(sha256_ni_algs));
-+		if (!ret) {
-+			sha256_ni_registered = 1;
-+			driver_name = sha256_ni_algs[0].base.cra_driver_name;
-+			driver_name2 = sha256_ni_algs[1].base.cra_driver_name;
-+		}
- 
--	if (register_sha256_avx2()) {
--		unregister_sha256_avx();
--		unregister_sha256_ssse3();
--		goto fail;
--	}
-+	/* AVX2 */
-+	} else if (boot_cpu_has(X86_FEATURE_AVX2)) {
+-	kernel_fpu_begin();
+-	sha256_base_do_update(desc, data, len, sha256_xform);
+-	kernel_fpu_end();
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
 +
-+		if (boot_cpu_has(X86_FEATURE_BMI2)) {
-+			ret = crypto_register_shashes(sha256_avx2_algs,
-+						ARRAY_SIZE(sha256_avx2_algs));
-+			if (!ret) {
-+				sha256_avx2_registered = 1;
-+				driver_name = sha256_avx2_algs[0].base.cra_driver_name;
-+				driver_name2 = sha256_avx2_algs[1].base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX2-optimized version not engaged, all required CPU features (AVX2, BMI2) not supported\n");
-+		}
- 
--	if (register_sha256_ni()) {
--		unregister_sha256_avx2();
--		unregister_sha256_avx();
--		unregister_sha256_ssse3();
--		goto fail;
-+	/* AVX */
-+	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
-+
-+		if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
-+			       &feature_name)) {
-+			ret = crypto_register_shashes(sha256_avx_algs,
-+						ARRAY_SIZE(sha256_avx_algs));
-+			if (!ret) {
-+				sha256_avx_registered = 1;
-+				driver_name = sha256_avx_algs[0].base.cra_driver_name;
-+				driver_name2 = sha256_avx_algs[1].base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX-optimized version not engaged, CPU extended feature '%s' is not supported\n",
-+				feature_name);
++		if (chunk) {
++			kernel_fpu_begin();
++			sha256_base_do_update(desc, data, chunk, sha256_xform);
++			kernel_fpu_end();
 +		}
 +
-+	/* SSE3 */
-+	} else if (boot_cpu_has(X86_FEATURE_SSSE3)) {
-+		ret = crypto_register_shashes(sha256_ssse3_algs,
-+					      ARRAY_SIZE(sha256_ssse3_algs));
-+		if (!ret) {
-+			sha256_ssse3_registered = 1;
-+			driver_name = sha256_ssse3_algs[0].base.cra_driver_name;
-+			driver_name2 = sha256_ssse3_algs[1].base.cra_driver_name;
-+		}
- 	}
++		len -= chunk;
++		data += chunk;
++	} while (len);
  
-+	pr_info("CPU-optimized crypto module loaded (SSSE3=%s, AVX=%s, AVX2=%s, SHA-NI=%s): drivers=%s, %s\n",
-+		sha256_ssse3_registered ? "yes" : "no",
-+		sha256_avx_registered ? "yes" : "no",
-+		sha256_avx2_registered ? "yes" : "no",
-+		sha256_ni_registered ? "yes" : "no",
-+		driver_name, driver_name2);
  	return 0;
--fail:
--	return -ENODEV;
  }
+@@ -71,9 +82,20 @@ static int sha256_finup(struct shash_desc *desc, const u8 *data,
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha256_finup(desc, data, len, out);
  
- static void __exit sha256_ssse3_mod_fini(void)
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
++
++		if (chunk) {
++			kernel_fpu_begin();
++			sha256_base_do_update(desc, data, chunk, sha256_xform);
++			kernel_fpu_end();
++		}
++
++		len -= chunk;
++		data += chunk;
++	} while (len);
++
+ 	kernel_fpu_begin();
+-	if (len)
+-		sha256_base_do_update(desc, data, len, sha256_xform);
+ 	sha256_base_do_finalize(desc, sha256_xform);
+ 	kernel_fpu_end();
+ 
 diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index fd5075a32613..df9f8207cc79 100644
+index 6d3b85e53d0e..fd5075a32613 100644
 --- a/arch/x86/crypto/sha512_ssse3_glue.c
 +++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -149,33 +149,21 @@ static struct shash_alg sha512_ssse3_algs[] = { {
- 	}
- } };
+@@ -39,6 +39,8 @@
+ #include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
  
--static int register_sha512_ssse3(void)
--{
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
--		return crypto_register_shashes(sha512_ssse3_algs,
--			ARRAY_SIZE(sha512_ssse3_algs));
--	return 0;
--}
-+static bool sha512_ssse3_registered;
-+static bool sha512_avx_registered;
-+static bool sha512_avx2_registered;
- 
- static void unregister_sha512_ssse3(void)
- {
--	if (boot_cpu_has(X86_FEATURE_SSSE3))
-+	if (sha512_ssse3_registered) {
- 		crypto_unregister_shashes(sha512_ssse3_algs,
- 			ARRAY_SIZE(sha512_ssse3_algs));
-+		sha512_ssse3_registered = 0;
-+	}
- }
- 
- asmlinkage void sha512_transform_avx(struct sha512_state *state,
- 				     const u8 *data, int blocks);
--static bool avx_usable(void)
--{
--	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
--		if (boot_cpu_has(X86_FEATURE_AVX))
--			pr_info("AVX detected but unusable.\n");
--		return false;
--	}
--
--	return true;
--}
- 
- static int sha512_avx_update(struct shash_desc *desc, const u8 *data,
- 		       unsigned int len)
-@@ -225,19 +213,13 @@ static struct shash_alg sha512_avx_algs[] = { {
- 	}
- } };
- 
--static int register_sha512_avx(void)
--{
--	if (avx_usable())
--		return crypto_register_shashes(sha512_avx_algs,
--			ARRAY_SIZE(sha512_avx_algs));
--	return 0;
--}
--
- static void unregister_sha512_avx(void)
- {
--	if (avx_usable())
-+	if (sha512_avx_registered) {
- 		crypto_unregister_shashes(sha512_avx_algs,
- 			ARRAY_SIZE(sha512_avx_algs));
-+		sha512_avx_registered = 0;
-+	}
- }
- 
- asmlinkage void sha512_transform_rorx(struct sha512_state *state,
-@@ -291,22 +273,6 @@ static struct shash_alg sha512_avx2_algs[] = { {
- 	}
- } };
- 
--static bool avx2_usable(void)
--{
--	if (avx_usable() && boot_cpu_has(X86_FEATURE_AVX2) &&
--		    boot_cpu_has(X86_FEATURE_BMI2))
--		return true;
--
--	return false;
--}
--
--static int register_sha512_avx2(void)
--{
--	if (avx2_usable())
--		return crypto_register_shashes(sha512_avx2_algs,
--			ARRAY_SIZE(sha512_avx2_algs));
--	return 0;
--}
- static const struct x86_cpu_id module_cpu_ids[] = {
- 	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
- 	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
-@@ -317,33 +283,73 @@ MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
- 
- static void unregister_sha512_avx2(void)
- {
--	if (avx2_usable())
-+	if (sha512_avx2_registered) {
- 		crypto_unregister_shashes(sha512_avx2_algs,
- 			ARRAY_SIZE(sha512_avx2_algs));
-+		sha512_avx2_registered = 0;
-+	}
- }
- 
- static int __init sha512_ssse3_mod_init(void)
- {
--	if (!x86_match_cpu(module_cpu_ids))
-+	const char *feature_name;
-+	const char *driver_name = NULL;
-+	const char *driver_name2 = NULL;
-+	int ret;
++#define FPU_BYTES 4096U /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
 +
-+	if (!x86_match_cpu(module_cpu_ids)) {
-+		pr_info("CPU-optimized crypto module not loaded, required CPU features (SSSE3, AVX, or AVX2) not supported\n");
- 		return -ENODEV;
-+	}
+ asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
+ 				       const u8 *data, int blocks);
  
--	if (register_sha512_ssse3())
--		goto fail;
-+	/* AVX2 */
-+	if (boot_cpu_has(X86_FEATURE_AVX2)) {
-+		if (boot_cpu_has(X86_FEATURE_BMI2)) {
-+			ret = crypto_register_shashes(sha512_avx2_algs,
-+					ARRAY_SIZE(sha512_avx2_algs));
-+			if (!ret) {
-+				sha512_avx2_registered = 1;
-+				driver_name = sha512_avx2_algs[0].base.cra_driver_name;
-+				driver_name2 = sha512_avx2_algs[1].base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX2-optimized version not engaged, all required CPU features (AVX2, BMI2) not supported\n");
-+		}
+@@ -57,9 +59,18 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 	 */
+ 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
  
--	if (register_sha512_avx()) {
--		unregister_sha512_ssse3();
--		goto fail;
--	}
-+	/* AVX */
-+	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
+-	kernel_fpu_begin();
+-	sha512_base_do_update(desc, data, len, sha512_xform);
+-	kernel_fpu_end();
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
 +
-+		if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
-+				       &feature_name)) {
-+			ret = crypto_register_shashes(sha512_avx_algs,
-+					ARRAY_SIZE(sha512_avx_algs));
-+			if (!ret) {
-+				sha512_avx_registered = 1;
-+				driver_name = sha512_avx_algs[0].base.cra_driver_name;
-+				driver_name2 = sha512_avx_algs[1].base.cra_driver_name;
-+			}
-+		} else {
-+			pr_info("AVX-optimized version not engaged, CPU extended feature '%s' is not supported\n",
-+				feature_name);
++		if (chunk) {
++			kernel_fpu_begin();
++			sha512_base_do_update(desc, data, chunk, sha512_xform);
++			kernel_fpu_end();
 +		}
++
++		len -= chunk;
++		data += chunk;
++	} while (len);
  
--	if (register_sha512_avx2()) {
--		unregister_sha512_avx();
--		unregister_sha512_ssse3();
--		goto fail;
-+	/* SSE3 */
-+	} else if (boot_cpu_has(X86_FEATURE_SSSE3)) {
-+		ret = crypto_register_shashes(sha512_ssse3_algs,
-+					ARRAY_SIZE(sha512_ssse3_algs));
-+		if (!ret) {
-+			sha512_ssse3_registered = 1;
-+			driver_name = sha512_ssse3_algs[0].base.cra_driver_name;
-+			driver_name2 = sha512_ssse3_algs[1].base.cra_driver_name;
-+		}
- 	}
- 
-+	pr_info("CPU-optimized crypto module loaded (SSSE3=%s, AVX=%s, AVX2=%s): drivers=%s, %s\n",
-+		sha512_ssse3_registered ? "yes" : "no",
-+		sha512_avx_registered ? "yes" : "no",
-+		sha512_avx2_registered ? "yes" : "no",
-+		driver_name, driver_name2);
  	return 0;
--fail:
--	return -ENODEV;
  }
+@@ -70,9 +81,20 @@ static int sha512_finup(struct shash_desc *desc, const u8 *data,
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha512_finup(desc, data, len, out);
  
- static void __exit sha512_ssse3_mod_fini(void)
++	do {
++		unsigned int chunk = min(len, FPU_BYTES);
++
++		if (chunk) {
++			kernel_fpu_begin();
++			sha512_base_do_update(desc, data, chunk, sha512_xform);
++			kernel_fpu_end();
++		}
++
++		len -= chunk;
++		data += chunk;
++	} while (len);
++
+ 	kernel_fpu_begin();
+-	if (len)
+-		sha512_base_do_update(desc, data, len, sha512_xform);
+ 	sha512_base_do_finalize(desc, sha512_xform);
+ 	kernel_fpu_end();
+ 
 -- 
 2.37.3
 
