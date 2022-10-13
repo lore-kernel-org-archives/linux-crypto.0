@@ -2,182 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761A8C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 22:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 461DCC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 23:00:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbiJMWwY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 18:52:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51076 "EHLO
+        id S229498AbiJMXAG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 19:00:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbiJMWwW (ORCPT
+        with ESMTP id S229485AbiJMXAE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 18:52:22 -0400
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CFFF3C152;
-        Thu, 13 Oct 2022 15:52:20 -0700 (PDT)
-Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
-        by mx0a-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29DMdS2p021069;
-        Thu, 13 Oct 2022 22:52:12 GMT
+        Thu, 13 Oct 2022 19:00:04 -0400
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D739413DE2;
+        Thu, 13 Oct 2022 16:00:01 -0700 (PDT)
+Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29DJ21wx010798;
+        Thu, 13 Oct 2022 22:59:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : references : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=pps0720;
- bh=5h5N7NC1lFM5s6F8z203/iF7cx5ODpMXXq1TYAg4Gg0=;
- b=Kdp/8nHxDcF1Qyc2y5HWY8IGH9FYK6gHauXN1FTmibG0Y442HjcvWx5nmGzq0yX93hP1
- pVvUQES7t9IvWPuPIF3p1BfL8k45NRLk6ocAUvFCxVC0Uh7A24wi/hN/WYab+R8eGm7M
- k3rbijzAPSpvqUNo6eEGeHo/dHrhA6lbnK2GDlq2KZDl+tqgUhtbYFsMsyeEMH9Z0RLr
- PzxSag2MEAvAQf5CtCc95jXVrL+hn23B9Re7JaArrRtn/SkpS9zCHESfaZwmfIKtyPVr
- QrFPYSofXn/vTFTCghvCljS/JibhV5pfb1wgwbaAe5ixPkClah0Zom3Cua5W4K5RqqAv rg== 
-Received: from p1lg14881.it.hpe.com (p1lg14881.it.hpe.com [16.230.97.202])
-        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3k6sk3h3qc-1
+ bh=W7WAWxEfrxaKiOj1UJv1Yfnk7gbXWkIagp6JIcoMh1w=;
+ b=Y1HrsxyuqyTgB1IIkkXoq7VAKOBdA4iJxPNeafqOgjIzrXuqOzJzFXg9GfVUiuaCTlVO
+ 5lVrX9h+BvM+feuJvxzZ1VNHaFpbh9eKTzO+XI6dYJF6OTKi0GdGxNX0u2ExKdlOCD4p
+ V4M+y19PwSDviD0NHhKbtucwJuM2adw8r8BUJdMsgMCCHWmJc3VYghVG0Ie9KYoJSmpQ
+ bKxEH/Opy/wMLUDI2LwDJ9ClE8IgrV7jt3G5eH5ct+jVMcVlZSJyTDOuPR4mLC3w2qoc
+ x3T46M44E3szarrSMX7f48Rc1B5AYwYsW+OHiX3NQVQb3NNtVTU2Nt0PZRnoQyvNBzyN Pg== 
+Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3k6r4nhuy5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Oct 2022 22:52:12 +0000
-Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
+        Thu, 13 Oct 2022 22:59:46 +0000
+Received: from p1wg14923.americas.hpqcorp.net (unknown [10.119.18.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 5705280470F;
-        Thu, 13 Oct 2022 22:52:11 +0000 (UTC)
-Received: from p1wg14923.americas.hpqcorp.net (10.119.18.111) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Thu, 13 Oct 2022 10:52:11 -1200
-Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 5F7F2D268;
+        Thu, 13 Oct 2022 22:59:45 +0000 (UTC)
+Received: from p1wg14928.americas.hpqcorp.net (10.119.18.116) by
  p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
- via Frontend Transport; Thu, 13 Oct 2022 10:52:11 -1200
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Thu, 13 Oct 2022 10:52:10 -1200
+ 15.2.986.15; Thu, 13 Oct 2022 10:59:09 -1200
+Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
+ p1wg14928.americas.hpqcorp.net (10.119.18.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
+ via Frontend Transport; Thu, 13 Oct 2022 10:59:09 -1200
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Thu, 13 Oct 2022 22:59:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C/UNkGfQc6zh1sRo9JPo95UnL++psbUa17n1GNahesTGwCQhbq3LnHMngsBQAQVBQsAv3r2W9RjHKgq0UPh0zXGF6h4Z7WoIhgK2OhvhuxCKjD42ORWDh8Qm7kw5hOg8M8lA31Soo8/TqHwNj5WJ0NPxonpN/FTVxSLx1F/LOYtvagCI+X9m6MOJkaWAU5621Mj7K3S3ukNlqF+Bi8NchX4Ll3ESdz1wcBpvh6PxeKug3hoBbS5h+gZum7vZ88Gd1mraFJfuZyBtGyGPTkCaolKpHHO9KQxRjd8FcfwQNiK3lqCqTOPuZOUoAvdP4TKsB69EtIWFyZ1p3wSzuRFlZQ==
+ b=XEIuXHj3r4qOhwWSo0PPNhjUfJo/ZX+I4aArbTuJEXSuWqYiBMiTAWFqIInHFLH00o43F9FX7D3NlW/SQk9+u1sPWchE3uNSHdpGnzGM7erjAjv1nWlq7g/ykn4aljJF0OLJBFjQzhpdh9uCm6Qce8lVgLTyJ/XuTLuqDoVwFtUcgAwqp5OoeQ9vyUTRoQwDmGyk4HdWD8RKS18TE+ccW4IHOwijbF7Y28kXvTM0ff6HBwJFfME23S2OTye5mGuMVaFC0ZIF2EX9Hfids89BiLFafsZyuQmmupSpKn0Z1DcXJmRMpEFuNhJp/Rwf3do9RpR/oiK6sLiiBP/eKKijbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5h5N7NC1lFM5s6F8z203/iF7cx5ODpMXXq1TYAg4Gg0=;
- b=NVMgTnK/wmlaFCefRkRv3Mw8O0QdH7/t5KjKK0zZ0woTT50yjkXmuCwaFExPJGojtcavp8riPGJoQRJMWOPV9ATZw431ls3i9EoNuWw2lvYdeve20Gq4HKXOyd5DpeRhKiIYnBzsf8TYUcaYMZqCCHnVKxInz2NUsHnMJhgcOIpuzwmzAc1+lbUMeDUPBiu4GBP9DR+1JJIZpl6c6mqJbMMH1oTxPbYuz+yxvXF3S0A8cmaVNFZQxOzkXuPV6anWaDzFuCly0PzSPBnlzULPVVWeQ3/MrC582AWMHC26j7zgYPzc2wcMpytjuhGSYnPJvtIgkIjDvv/q76aZHOHCdA==
+ bh=W7WAWxEfrxaKiOj1UJv1Yfnk7gbXWkIagp6JIcoMh1w=;
+ b=jthhDV6yORIoBsGL9lq1qhEo9M4m3w1Pjqlj1+eVZc3wlB6UkvcLsoYvqLZhYHd2BYwxURTYuW/dwUcTOAWodesGKjcvRN24SFUszzODI0pZXmNZ7xttouDwxJane8Yxn2UNo1f3J3DD+9MT3GZb1HtdrGhqvFOQzfkc2HqS3sfgJ8//7tRVkKlpvNZgQl7v0FzzwpHlJHVKsVTMfBvyyCHHFD5seMveBdRU9Bxi07vQMJyDVjOKiXBrd/CpL19eejb7GsTg3b+G4P9Ie1J1GDQLqiqwBEcEfwx7EG0EKa0HIEhPP82xOZ0/bwI1qKopaJ2GcTqhbN2Zn5Cv60Qz2Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
  header.d=hpe.com; arc=none
 Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
- by MW4PR84MB1779.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1b2::7) with
+ by PH0PR84MB1479.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:172::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Thu, 13 Oct
- 2022 22:52:10 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Thu, 13 Oct
+ 2022 22:59:08 +0000
 Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::c023:cb9a:111f:a1b2]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::c023:cb9a:111f:a1b2%5]) with mapi id 15.20.5723.026; Thu, 13 Oct 2022
- 22:52:09 +0000
+ 22:59:08 +0000
 From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+CC:     "davem@davemloft.net" <davem@davemloft.net>,
         "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
         "ap420073@gmail.com" <ap420073@gmail.com>,
         "ardb@kernel.org" <ardb@kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 08/19] crypto: x86/ghash - limit FPU preemption
-Thread-Topic: [PATCH v2 08/19] crypto: x86/ghash - limit FPU preemption
-Thread-Index: AQHY3oYM3+AW/SnRa0SGahudUyKccq4L1eiAgAEXJ1A=
-Date:   Thu, 13 Oct 2022 22:52:09 +0000
-Message-ID: <MW5PR84MB1842F8D372B8EA06EC1349A9AB259@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Subject: RE: [PATCH v2 19/19] crypto: x86/sha - register only the best
+ function
+Thread-Topic: [PATCH v2 19/19] crypto: x86/sha - register only the best
+ function
+Thread-Index: AQHY3oYZWhwetsqvHEyoRk+vwsij2q4L1yqAgAAdJoCAAPumkA==
+Date:   Thu, 13 Oct 2022 22:59:08 +0000
+Message-ID: <MW5PR84MB184271D5A2BAE2F2DFBA7463AB259@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
 References: <20221006223151.22159-1-elliott@hpe.com>
  <20221012215931.3896-1-elliott@hpe.com>
- <20221012215931.3896-9-elliott@hpe.com> <Y0eqIQ9PC3Edd+D/@sol.localdomain>
-In-Reply-To: <Y0eqIQ9PC3Edd+D/@sol.localdomain>
+ <20221012215931.3896-20-elliott@hpe.com> <Y0erL2k1PGVN4qme@sol.localdomain>
+ <Y0fDo/VaEB8Gx4Ee@gondor.apana.org.au>
+In-Reply-To: <Y0fDo/VaEB8Gx4Ee@gondor.apana.org.au>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|MW4PR84MB1779:EE_
-x-ms-office365-filtering-correlation-id: f7c4e57f-03d6-4daf-0fdd-08daad6d8fa3
+x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|PH0PR84MB1479:EE_
+x-ms-office365-filtering-correlation-id: 7d0d1993-8692-45f8-ecef-08daad6e88f9
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: I4D3lq8QD5JOwcKdf767kkWq+umesCiRJO5Z5C8v5FPhMCm5nIJVtVj+9oPs7Q0ATh1fdvcV+ovk4qP5FkKhXtZirYdBEeqtQyLb2fge9YrwwD//K+2GPw9/aSvVsGStpF1kGBaORI2hTGyam14XSa3Lkn6XgWoqRdjb1GKBE/0oYWRZ5BHtaSfBpbp1A1XNQtgUhbe+KbzISnHOaBP1+gkP8nsLFcXMT3aJc6wszTyr/YN/n02At7BVwKU1mB8+vJal4+g2Jj3KBxga/TuYWx2tvUZArzl4frPfHiTrx+fN++ijc8uohewYqnRmvXR0m3sLOp/TL67Vp4v1ni5PeRPk0Mw+Cma5Bo++IKJG8F3W2FDyn7SP/FzajGq6DCKQx+OMqdm5pFshWiJ6AXpd4c2QfmljB5xQD/kIxAw/tfpykDEbnYYmupPpBFA8xwVRtbmFZeNi0iE1eDorrx1OFThcaSTgy+u7y9RFMCe8XiQriyXT55xtavrHE2vjYCC7G4H981ZihOkhCVCNMRfjo7ucmbCUIcd4vtbdPSYQjXqNCJU0zQ60DqSyDeJi7JQYdhKSApvXx/nhY6uOJ/hE1a7wR5PSogLR9Br/UEIdkyEJUq7bZhbVNFs0FchGfgVYWsCACMSuO8rHl91PzjvaRVu0ZhKn1o0D4NyV6u9eg0pjaGJNQFOH383QBfm0DkB9rWkTeN4oAKHiUAz2aKy/tDx3qb0NBOlKEy/eHPDJUZmb8rrpD/kZ3rYTBNe68Kndbg7yWcXM1F2eKKGmZoAMpA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(396003)(376002)(366004)(39860400002)(346002)(136003)(451199015)(33656002)(86362001)(4744005)(2906002)(38100700002)(5660300002)(122000001)(82960400001)(186003)(83380400001)(38070700005)(7696005)(6506007)(26005)(9686003)(478600001)(6916009)(54906003)(66446008)(66556008)(76116006)(66946007)(316002)(71200400001)(66476007)(52536014)(4326008)(41300700001)(8936002)(8676002)(64756008)(55016003);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: GvAKbQ6U9+Sdgg3sNOJ6wiGYXPXM/w4OsXTu4HQ++slGrIBIypSH/GwwoVk3IzVgSEvWQGDQeGydQvZtjRpJUBBgUZ6Neh2V4jVPovyfyxAq33V+GonoYiiGqLNWU+vEIE9UD9AkVPRUJQ4/pSBeaF2//dLy3xSLsN4HYQ+NixJr/42f6pD1rKQS5g2R/qS2ijARtM6Uq3gkO0pi0NPNOTURAmCw3LcTJkzEWj6s+X4MXSps04p8KOSpVqvZ2c8xyWjVCY+AmIDfvUpPTibcvuGhaXgDScJYAir2D8dWU5/wTEr8B/WeISNL4jgOT0yLmMdpo2nUHwlBP8hztEzct8bYsw1yuxYiCBej8BJJpo8VTa9OpuqE/gSRcuqdvA4sGyn29yP9oR/fO+Ln6+Sg6lXdMIjzuEVLCUpmiPc7TrAsNHUXt/yLd46WHJi4OwW89+tjYIwhaV7vRafEQXBNix9aC87et0SNesAdqmcuVgpCtp0cPwJAIhLuh6Kje4OBQSyxkGMhVOaLbcxbTcvsEFEh13sV3s+nMmVVzrySWUUU/G2YNv88oChZAs/YVF/bwIhP7NePHQJFPCdWVq6VE+zaWeA6aedBWCwcUFFbrjSo7d7ugJLbKERd/PuM0kvldOiRscsC3pI3GEbpDUIcdO8hSG7tAY5o6l4HA33bEVjFmlc7LM3u6PcZI66fhFiY585KXZTiArLQWXgP/aYRyc4bwbYbmP1QGp3QyDwPvjIUtsViFpw/GEZhRf0WQ+RcujKuQUdAA3FrvkYlw9Negg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(366004)(396003)(136003)(376002)(346002)(451199015)(41300700001)(122000001)(316002)(76116006)(8936002)(110136005)(66556008)(54906003)(4326008)(66476007)(8676002)(66446008)(2906002)(64756008)(66946007)(52536014)(5660300002)(9686003)(82960400001)(26005)(71200400001)(83380400001)(86362001)(33656002)(38100700002)(7696005)(6506007)(478600001)(55016003)(38070700005)(53546011)(186003);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?r8TCRb95FWbr0fCZSFH4sL6CMZbjvAUFktbOZyA8PnUso+gUMqrEuA2+WIL7?=
- =?us-ascii?Q?wW5rM3j9O0egOrXCkUakFDV1yYgJAIl5xbN64BZwCSRdtpR8FqJUu+RcLj4G?=
- =?us-ascii?Q?/n/bgKybyPhNoTTM0RsOGQqAfwC9/qmJAEbhO7+UEwqw4j7v9w1AMCQiIUUK?=
- =?us-ascii?Q?DEo3ljmRDa14WE1ZyPDFb3xN4KzOe0xuu8OZUCsLWk07Do28ctx1EvaZkn9m?=
- =?us-ascii?Q?yaV/wKlqSDX6wG4X1mNst38UEnZql3G2veOUJu7M7XPZ0ol4JUJK+4fGT4qw?=
- =?us-ascii?Q?oRX0fG9HJabrXjQB5+9R2cViDklJWs4oj8Zjq+0qGo1XXQFNJ5vqO42ZtF6d?=
- =?us-ascii?Q?BDfkePQ0qUlzz9hfqs4otbIbVgV4Q11vQ/xzg0JrsduWO+IG8sQGPHDUYajg?=
- =?us-ascii?Q?JoW8T4AIf8kGpB/PQwZA8ZF64i1e8R0IMoFsPiojQKhhdQLyfCelM0bzYcy5?=
- =?us-ascii?Q?b3dzWZPOwqY3wp5XD7P+e7O3Ukjw08PaJjQS/mpuYsnogA5t96Rj+bbS2kNX?=
- =?us-ascii?Q?c7EsGdBX9YFHZsSW2osqJ9pKwounCOcpLt6DrETD+4Mhvkv3x1OYWIEFjtOd?=
- =?us-ascii?Q?nBA7d/JRbcDAj+kE4dcvr956qtpdzbduDND7SOW31AjP+gvsco8GaVe79UwV?=
- =?us-ascii?Q?Sor/VymuYvcFqgvabF/K41P/f+WqaKwuGdPC2Ad24xa6jGh0lqLarmz2NIc/?=
- =?us-ascii?Q?toucTjD7Jd10vcMsyHbPorYIZUbd/5CYQpc71tJHty+HaMByL7I/tD5YEJAn?=
- =?us-ascii?Q?kPvzc7I1F7pxn9UrAa4u+HzW9IWQzAXiv3xlLw9BzD2St0GNR1OXN9bx9gat?=
- =?us-ascii?Q?OG4ldwzqYIxZHQSVNQcYD93LcsV4JSagzlCc43Bn8u6DswRjTnToxJRqGg5u?=
- =?us-ascii?Q?qBUFc6kBHBZR4kwD0ZXdjCU5egZGqcbhR8yo8i0QX5RAdZ14Q8wVv9g4f9Pr?=
- =?us-ascii?Q?0YqihQfJ9jhuOGCiRoOI3F0tHoPlSxPHJQepHTjXKgDvFuxvvsltLuq+/SYu?=
- =?us-ascii?Q?i91KJUhGr45xmchIhzbVOGjbSncw5bFUWZePNabklu6uhuvPhVhHDsjnAScg?=
- =?us-ascii?Q?Db37k3cEvJxqbO2pTcD+Bc0jVmpErKGLt7OThE9k4ksqKZWEK7VaYeexfaFn?=
- =?us-ascii?Q?6KQxFXYliISIIhwJeI4eS6RedcQ2UEYVsRV6f5j42B3YqFrjUiQB7dKKdW/8?=
- =?us-ascii?Q?ze8bkbQkTMaw6o2+QGyt2PkhlNeo8e4y5aGipNqIuxzwJ8dF4SHzBgLX/Xr2?=
- =?us-ascii?Q?5kC5I9wk6oAofa6KoRbj2v8znSAey+CXufO6In2v2W1+ouhEDhQkVc2c5ja0?=
- =?us-ascii?Q?Z5h7XSv6XT6FUlVuFWyezh6voqCc+eGRccoXDaQPI8rJ2dxPvNdE7QE9P1pX?=
- =?us-ascii?Q?3YelSoX7JtsCnUx0EcGZlCgEwp6bllYapjVlb89RiiOK4rHUMrenXTZgyFE2?=
- =?us-ascii?Q?7ECH3IBZi/jzaxpjE5QIbPUpElG+GjpYUOZRnV+YydH4X3+UFmWwhN+wtfi7?=
- =?us-ascii?Q?BfLL1wqK3JKrQVddZIl7Rdpq9TQ8/nBMwW8vMzYmL/gOKIHqrldO1QkuTx1W?=
- =?us-ascii?Q?tM+pA8HSpjRbkzAekb0=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DUqz2YIkWcCwZPOWp2BQHyPjqE7/O9U+oWUPZZTLXB9FZXcqIbS17+eAxR5R?=
+ =?us-ascii?Q?F7kbKnW4wG7rd+L6SHKRupc1lmq3vdoFk0jNqRsfT3Cif3hog1O//vQK2AjI?=
+ =?us-ascii?Q?a76TM42i6jXa1VHQsYN223tBBs1PqIECr08yoBPy5luVfFWgx1rmQE7WOZNU?=
+ =?us-ascii?Q?EQchGoTof37K+5Dj1SFI2q7nPfqZROOecvwyywgggaR7CbuvMjU9EnpXfL1t?=
+ =?us-ascii?Q?v3Mj7YnhDEPYrEtZFcEzDJ+sr53Hjxg3YfgtM4LAmfZWSBuZlpOtAEY/XWqK?=
+ =?us-ascii?Q?qPIzU+SXtRYDeAdXaf9Cz0bjJ/0yTwp23SOzToPq+GKwGhcFUwTjFhQnI/Rv?=
+ =?us-ascii?Q?JoHuk+VnPKigp60tJVAnhszVJKdjWqdqOAZlgzyqfYMnG7E6wgp5YdgZbJx5?=
+ =?us-ascii?Q?9dqj6HN5EbmHGtbXuPypq8+HpwERDqDU9XRyFadSv9Dsy1I7/GUn/nMni6CZ?=
+ =?us-ascii?Q?kyqxNdgQGuGcYgLuEt4nsRKGE9nopOX3jqMcJ8wLvaKi1U4voSv39MsLi40T?=
+ =?us-ascii?Q?vjcvznNT6kxrQpqdXgnZGFRamXwb6gM5umFWLWIiXd3BuG4ejvv1yiiDgI6e?=
+ =?us-ascii?Q?rob72BeDP8VlscnW4lcIuwWQaAYiVyYzCwHqQLxwIGrza/3JQHtgvYREBTcp?=
+ =?us-ascii?Q?uGkFs3FLMPVemRMJoO1rJiKx8TX1F9pONOZ55RoZbfwTZ/UshZAedcDE6QQd?=
+ =?us-ascii?Q?Am6GHi0WfBCk3Oq5a3zOFuOxoKfEeLdJYVpwGQVDnIzQMG5kS/XIecOiKSZD?=
+ =?us-ascii?Q?TisRfzhChkjLL/oAgYNBln6GFNBmRBb/yDo4AU8Iy2JQAz8L0V2jIOW6N0y1?=
+ =?us-ascii?Q?2NJawXFcRQj1CDSaYcehLRDhlDV7t+7lg+vaJWFmuQZuKVmGD7Mpr/IQvUsx?=
+ =?us-ascii?Q?d1SO08dho9+Kv+KrcEHjK2iVX12HEl0zCCp/7nU3QdFunUWSwji4e1JiduFz?=
+ =?us-ascii?Q?ksIze42+x3OHHhnLYcSS3MWUwWwVw7hU59+yBSWW//TuUPteM7/q4wEvVmgc?=
+ =?us-ascii?Q?9lmuav7SD2WLpxGiG3iZXG/FfmkzbYAIcZDd/X2pIreHOT6EBO/2DT2dO3SE?=
+ =?us-ascii?Q?X+l9q54FNO1TVOvQKXcaNxH4dRF+yYGV0mnvDUsCXl2kSBSxogu2ur3Y/yJn?=
+ =?us-ascii?Q?UhNoe22LOOZvc6B+SO9voGg7BzAfIUu0FX19rgkbxTMn//PAIYIA1WltmRmg?=
+ =?us-ascii?Q?dltWYj/TwCTViqxPRk37TGCxIXboeMV66yN3bEOYWSYyzWnRbh/Xe2mfoGOv?=
+ =?us-ascii?Q?bXblF+ipx7texGAcmQyV+cASaRE4oOpUM+2CWXWNjnlXNoX9AAvun6VqGpHD?=
+ =?us-ascii?Q?0i1f1LCdyxKKUUAEPJP+NHY6i8Tcp8Dsr5tUwANin8CFNT4rODrmfgxtzAC/?=
+ =?us-ascii?Q?stT7nPGENnN017/qH+3NUzkKFKW9Txeb/tN/zLsl/GEK2Suv5MRtPnf/9jpA?=
+ =?us-ascii?Q?sCOezO3jm6de6biZpU97Fpu9AfK8mvyuoxLYpp3aPoZi5Vry3VZolagPHjUz?=
+ =?us-ascii?Q?kFB0tCW9fHMWF6WEU+9Ya/19fYMimq6i0c+zSGJAMhbz+MhmVj2UiSklDmdq?=
+ =?us-ascii?Q?JFe5g+e2I2Pevl/DfDg=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7c4e57f-03d6-4daf-0fdd-08daad6d8fa3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2022 22:52:09.8903
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d0d1993-8692-45f8-ecef-08daad6e88f9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2022 22:59:08.1809
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: svRtghv0PXmBgktIUZgWJwg9IJKRg4zWHv+2orQqlM+502bm10PCInwxP1QkX7t7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR84MB1779
+X-MS-Exchange-CrossTenant-userprincipalname: CdOlCJVsOJtB73RGOH5/tng8DVIOtLV+ok53nIz84snQm9xyJ7gi72/TA4QQObai
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR84MB1479
 X-OriginatorOrg: hpe.com
-X-Proofpoint-ORIG-GUID: UzEK99qEAV6x5hXoPYYz6WRESiPln3IB
-X-Proofpoint-GUID: UzEK99qEAV6x5hXoPYYz6WRESiPln3IB
+X-Proofpoint-GUID: OZGk7mkqf2nH7nPy-TYq5E_HMTIhQvqe
+X-Proofpoint-ORIG-GUID: OZGk7mkqf2nH7nPy-TYq5E_HMTIhQvqe
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-13_08,2022-10-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 clxscore=1015 mlxlogscore=884
- impostorscore=0 spamscore=0 suspectscore=0 phishscore=0 mlxscore=0
- bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210130127
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=925 lowpriorityscore=0 clxscore=1015
+ phishscore=0 bulkscore=0 priorityscore=1501 adultscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210130128
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-> > +	while (srclen >=3D GHASH_BLOCK_SIZE) {
-> > +		unsigned int fpulen =3D min(srclen, FPU_BYTES);
-> > +
-> > +		kernel_fpu_begin();
-> > +		while (fpulen >=3D GHASH_BLOCK_SIZE) {
-> > +			int n =3D min_t(unsigned int, fpulen, GHASH_BLOCK_SIZE);
-> > +
-> > +			clmul_ghash_update(dst, src, n, &ctx->shash);
-> > +
-> > +			srclen -=3D n;
-> > +			fpulen -=3D n;
-> > +			src +=3D n;
-> > +		}
-> > +		kernel_fpu_end();
-> > +	}
+> -----Original Message-----
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Thursday, October 13, 2022 2:52 AM
+> To: Eric Biggers <ebiggers@kernel.org>
+> Cc: Elliott, Robert (Servers) <elliott@hpe.com>; davem@davemloft.net;
+> tim.c.chen@linux.intel.com; ap420073@gmail.com; ardb@kernel.org; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH v2 19/19] crypto: x86/sha - register only the best
+> function
 >=20
-> Another loop that doesn't make sense.  Why is this only passing 16 bytes =
-at a
-> time into the assembly code?  There shouldn't be an inner loop here at al=
-l.
+> On Wed, Oct 12, 2022 at 11:07:43PM -0700, Eric Biggers wrote:
+> >
+> > I thought that it's done the way it is so that it's easy to run the sel=
+f-
+> tests
+> > for all the different variants.
+>=20
+> Yes, we should keep it that way so that it's easy to test the
+> different code paths for correctness and/or speed.
 
-Thanks, copied the pattern from another function whose assembly function
-had a size limit. clmul_ghash_update looks ready for all sizes, so I'll
-simplify that.
+I have done some testing with extra patches that do that for
+that very reason. Is there much overhead from having a module
+loaded and registered in the crypto system, but not being
+chosen for use?
+
+The current sha modules register SSSE3, then register AVX and
+unregister SSSE3, then register AVX2 and unregister AVX...
+good testing for the unregister function, but not real helpful
+for users.
+
 
