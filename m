@@ -2,87 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDFFC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 19:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654A7C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 19:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbiJMTFd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 15:05:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45920 "EHLO
+        id S229771AbiJMTMI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 15:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiJMTFc (ORCPT
+        with ESMTP id S230078AbiJMTLu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 15:05:32 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5305E84E71
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Oct 2022 12:05:29 -0700 (PDT)
+        Thu, 13 Oct 2022 15:11:50 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 710C9E4E5E
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Oct 2022 12:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1665687927;
-        bh=JkkGbOrcjjRuW4KeCwf2Ign9inZRbe+hMZq8NVTB7kg=;
+        s=badeba3b8450; t=1665688306;
+        bh=vMnMvN2Vormu2vCNvhs5YyBOVabvMXVZ700gLozC4kQ=;
         h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=Qm9aFpFYgy7p197Q+UrN/TU754jinUunD+ZFGBe0nC4skVB9955Xz9p7usCxixXAi
-         x4NS7nyfhyDuC/pOG8Uc+NxaAq20FYaab3fmXs7MQe/at7LaZ+iupzxnyrtZrZiS7O
-         hnaucdOrxnyjQGWDDx6NBg+AZY83I/2U/KSbKxy8=
+        b=PBVVImJ2SPsKu3K2n37MF+scFMXpnXb6Fsqs07GTaeBmpk2KAwdVmV4mKXkc1Q10L
+         wEZohrk7a8xooxRz+4dPHDF0i3R1hYa9LuLMQvb6snNUd39UYw5BVv3yxYFOVgdcJC
+         RuQp9EDPDBQFuFUjXCVC9xB3ekgVIq2Hhp2inc74=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from fedora.willemsstb.de ([94.31.86.22]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MC30P-1or3Ls3Bjp-00CNGS; Thu, 13
- Oct 2022 20:40:29 +0200
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1Mqb1c-1pVbIb45Ro-00mZ5Z; Thu, 13
+ Oct 2022 20:40:30 +0200
 From:   Markus Stockhausen <markus.stockhausen@gmx.de>
 To:     linux-crypto@vger.kernel.org
 Cc:     Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH 3/6] crypto/realtek: hash algorithms
-Date:   Thu, 13 Oct 2022 20:40:23 +0200
-Message-Id: <20221013184026.63826-4-markus.stockhausen@gmx.de>
+Subject: [PATCH 4/6] crypto/realtek: skcipher algorithms
+Date:   Thu, 13 Oct 2022 20:40:24 +0200
+Message-Id: <20221013184026.63826-5-markus.stockhausen@gmx.de>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221013184026.63826-1-markus.stockhausen@gmx.de>
 References: <20221013184026.63826-1-markus.stockhausen@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vqqXUhAwW8s6PJVujFOZYQlQtOlxCvHlT+I7IFCRMozC5IdEmEg
- yKJ4gATiAl35HUd+xWsv2fkoobtRZXkGqnK3FLr96R/dOxCVEz7v5EW7lNE21Bl0i03NBf3
- ZreSM51/biDU+tL6PXY9FW1TS0CF3P0b6atdWb7FTV3l62y33+0q3P9xp55258Qe1FN93Bc
- WBf/r++tEmhfrfsV+ylXg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:U+AaJdy7nwQ=:SNxAxgkrcafBHLOwqMqTVW
- QHRUSr+zaR5rx9ycZC2NDzz0Ah1P9zNRA2Y3uDm5ZWZ7ZaRjBdC/JeQ2FXSFhnJbi/OcuThNb
- 7h5RAAMKrXxD56nsyJxLAuRDGXVVywEFfO1O1NtedU9YeYwkMB+wVXBRzMSQxdV/msL9GmYzK
- nUuQgnObDVY6oWaff8k1nHN+kSgO6c6l74WRm5TKmvrtWd3USelJGM8e/D1VQMNA4mEys5zi6
- iizoo3+QfiJNt6j/2gpe/XQkKe0oxjJyEIzsS/4AsdiAlwIV9gd9MMe6kaZPEm96e6tHiqrVV
- meeuOFkWHPfhGw4lRyix5KjKKw3p9Ry/txLf8MnnfrCtTvMnt4PWOPfTY9hWL1Iht/pw7grjy
- PaKAoXA7BGNY98a58X+O+8f2AVDNk3nrrsuiOngBrUHSQwRSk4NtSuKRIzvh8biIefVqDzvS5
- ttfHTUTVLcoRDeLqsbEbOfGfEL7BmTiXM14syltVsnGprIEG+zU+UoNkTohubilJI+Py3giIm
- WPn6J2DjwUL8GXeqWp5E8GffK3BTm/PMufU+saCAZwlX4aih5uqV5+vCowFO4dwBringbd0Vn
- lFnLuGLz0Km+U49x6W6b9AnXUuyumqeE5JmktY0e+i65r3UaUZ9chcrzZDxhNO4hBNx10rM0f
- BywsEHJE9FrAf/v5tYmhuXXUZ/u3rJLWPrjSWhd0y8oS3ImfWY4LibvugYITaBMAfz4sNQxPB
- JD0pwa+eaC4LKFcTeGm/h/eh1xRYUKrlfFpAB2y0qAOH6zPNShKkBMw56TmWP8a8gzwPXx6bD
- FAGl1jATRPMoAac2b6lyTN801+3OlZq6S4V/AwbDHu1GrPwq/nYJTDHIq/vOY/NNAUSLhqVbb
- 2pCE/cL8RNoVPcYvjmvSLTHMsJAROtITe5+O+fListpUhBagDbLQFSZmdPy5c5Sf591hk3xYJ
- eK+HDs7EYzhxh7N73lZuRzMGA8ptjkdORa06qsIXo26YYXHfjIkNq3OZ6ZFnMn8EiTPXVZ0Sr
- +d1YSKieEwRApAL1jj7k2EictY2hwfn35PiXXtTTHdYpFmni5fJBJ51W3uVpzdmCC8JchpZZV
- Xz1o3YZKhFS62wYTVvSCUwh6alK5KjSc0We9r08Hz4j4Ghs7MQDg5yNf+oBmS203edpA3sEfA
- GRreTtriqqTxDNic6UaE90ZQcJZ1gxy1YF3voLkWJXQ5W0ccc2LpGQnMvKNV+w5L0kVWcV+S9
- FCl3Ct9XAA7Qp+vC7EzE3KTP8lgSQvwuCMmig4ubqwsCOR7aIxScCcup6TEeMWGRL9luhYX7b
- TdG2xb6IQAYGOTkU6JIh1xrwf+G+WU8rUeeHUzarmbr9tjWCv3dzZ3jxhJG1Gz2XsT6QgONAs
- tAUJLA8PECTl/8HbE/CLljMzf3IpgrNxuNza+oxI3bqNfmisKJE7HgyqLkMQ7s9QCHWf8c9zJ
- n+zaHLgCCKbwNagmBLulNBasfEzVEKyWel/22vZH8x6qot7fShlAgs2gagGPb8zcgDzvd9YZ6
- qThdbE3C1SkVqX34eeFN1hnOBcF922rzGq5ODdQuNbOE3
+X-Provags-ID: V03:K1:XIUA76as5s1cvVn6eFdlCZXpqlrL/PP/F87PWSz3ajQhILeIZec
+ tlKMdqUe+iR1MK55PICJeaeS92zHqRyjv4LTwdfGwmninDQRk2JDu1N80a9w7aVsv5gJbrv
+ pEpgj3ZQ6aukppuqh4VQpJ9YFLcKxdhyERAq8HfYNy9Ohxu+H6Vv62Zj7qNbSFTIMiIQ1lo
+ PwcZtJpPzMrch0zlCqIuA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:W3Mlv0hDdEo=:lobCYeDYgZXvnRrwDpS39S
+ VK1xl4ppM8prn54irghqfn630hAnoPBttnfZvuyJWDmffLzqwfYpG3hwp7KqVB4l2l3EFz2Q7
+ ImgvCQFYKhRTpEsStOe+pKUjK8Yzut+cKJERMrZJB/kvhbfNLyD5s9Bo5xQ4EPe9//HbVMKov
+ v7HNSmu7T14CBvVQHxq16LNNNqE8vElo0R8mc4doNgeMiFUNiZ+Pjc32gThHXyXWjix+l17dN
+ DLAqEuAlqxjEtcuU4ezZnAxF5irdnKU9q3F6JI+S8s/QYnGlw+16iAknxFePHIsqzZHR7F5aE
+ CSZlfcMXO+JTrx+ZPMe2xlY+4vL4ErFFDYNq1PfTgn3oRPHfLtGXAS+qU4o03BkuiHbaG10kO
+ xVGvwpFzdnzc4rOw4Y2aHfJUC5D61rzGwK8HzHFzJiUqLxgHeGz1WGpyRlImgqmqVubEZlX8p
+ QI1DC5Pm1iqrNmKs02jO9zcVKzy7gvK8Q7Rk1oFC3Wtyn+XZ6LJBpb8PUyYIKgHxknIwDjsRG
+ j7FQBlgdZfSSMpSjCOvExPVida/bXQF4kIgH+OXAlW7Pc07XCb0grh4U7mU0x8p9lNlxPURBo
+ FkZzZe/mW5uUUlShI0ObqQpugE8+FOPru8QMsIeFnf1Gx0FpJgF5/fkNFgDN0OlHRoCjIA67j
+ CKZmvfMB7FxgfuKltH+WuS6jt0JC/hGbJFC7pzk1wR9K+qhXzBNanyoXnZ/ycXvKmB9/RA1sc
+ GNrFlqrG0Qf+vTHo2XCPNw/v0zkXKT3iUfj3pdBTfdNTiNOIv0Uxa25zg9QTE4UOdR7jUf/23
+ bRF6qeGoCpT1YazJZGX/4SLmapobBKYejXAbfY3xgihOuTLQlpc2d35MAZBk43P0wLf/bS0b3
+ 958dGqlOLY8C7iFO6vlX+55CMHah8dM1HYF4McxpmjjpSf3LvYA4gMmipcWQfYsEFMUYbV1D2
+ VT4uiiDygA3IIwizEGU87XnWlnEWBgQWefMPVsAs7KP0hiRjHytSCEAaMWtovYLx49mXLoub7
+ OL+LzIjIeqECFGSgDAWsmbdxFDQmT22fVqMQ/U2BCJiccZaTHpen0xZ8tLss556MzBR6Xn6XC
+ OSO1DVA6FJqpUXma+zvUDVQgwXIHkKTVurjgdSD0DCAK08c0K9+3EVGNHsNS39gaMSedfc4Mp
+ x24tp78Ngzg2KYsY+Qu1KFSYg6n2VhD+UP1KvA19pe3tg4ZXt50shJOCZcCOA8VvonHz0XQpa
+ io905aR/wVb7waXMDg/Cz3/gHaqIUGbZqC5SaaThR5Xd+dTCLizx7OsINa2hL1WxQ7CURLv1j
+ nYHC3KtsW2PX/LKhJKmf32pWkQ1akK4n1Mz2H69z9KACEoN5ZOSD2OOPzRmDBvvMswn8jZjCK
+ Zej0xJu3VBY3OU+GfbT28xZCHgOeL27noUQEMcYQqxMIInCZDAuKOPMFSGnB1AINKYwPLrdO8
+ +zNtI0JzJ0Em3mP+7pV1u3xENl57tdjDDffrkANZoV6Wlgi/7DNGM4lbksKYdtwA4eMSq21Ze
+ i5lrrRJG4Co7FzCaWZ46zfjjzqkUpLyfnr59NCXc23Bpu
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add md5/sha1 hash algorithms for new Realtek crypto device.
+Add ecb(aes), cbc(aes) and ctr(aes) skcipher algorithms for
+new Realtek crypto device.
 
 Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 =2D--
- drivers/crypto/realtek/realtek_crypto_ahash.c | 406 ++++++++++++++++++
- 1 file changed, 406 insertions(+)
- create mode 100644 drivers/crypto/realtek/realtek_crypto_ahash.c
+ .../crypto/realtek/realtek_crypto_skcipher.c  | 361 ++++++++++++++++++
+ 1 file changed, 361 insertions(+)
+ create mode 100644 drivers/crypto/realtek/realtek_crypto_skcipher.c
 
-diff --git a/drivers/crypto/realtek/realtek_crypto_ahash.c b/drivers/crypt=
-o/realtek/realtek_crypto_ahash.c
+diff --git a/drivers/crypto/realtek/realtek_crypto_skcipher.c b/drivers/cr=
+ypto/realtek/realtek_crypto_skcipher.c
 new file mode 100644
-index 000000000000..eba83451fac1
+index 000000000000..6e2cde77b4d4
 =2D-- /dev/null
-+++ b/drivers/crypto/realtek/realtek_crypto_ahash.c
-@@ -0,0 +1,406 @@
++++ b/drivers/crypto/realtek/realtek_crypto_skcipher.c
+@@ -0,0 +1,361 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Crypto acceleration support for Realtek crypto engine. Based on ideas =
@@ -92,409 +93,365 @@ from
 + * Copyright (c) 2022, Markus Stockhausen <markus.stockhausen@gmx.de>
 + */
 +
-+#include <crypto/internal/hash.h>
++#include <crypto/internal/skcipher.h>
 +#include <linux/dma-mapping.h>
 +
 +#include "realtek_crypto.h"
 +
-+static inline struct ahash_request *fallback_request_ctx(struct ahash_req=
-uest *areq)
++static inline void rtcr_inc_iv(u8 *iv, int cnt)
 +{
-+	char *p =3D (char *)ahash_request_ctx(areq);
++	u32 *ctr =3D (u32 *)iv + 4;
++	u32 old, new, carry =3D cnt;
 +
-+	return (struct ahash_request *)(p + offsetof(struct rtcr_ahash_req, vect=
-or));
++	/* avoid looping with crypto_inc() */
++	do {
++		old =3D be32_to_cpu(*--ctr);
++		new =3D old + carry;
++		*ctr =3D cpu_to_be32(new);
++		carry =3D (new < old) && (ctr > (u32 *)iv) ? 1 : 0;
++	} while (carry);
 +}
 +
-+static inline void *fallback_export_state(void *export)
++static inline void rtcr_cut_skcipher_len(int *reqlen, int opmode, u8 *iv)
 +{
-+	char *p =3D (char *)export;
++	int len =3D min(*reqlen, RTCR_MAX_REQ_SIZE);
 +
-+	return (void *)(p + offsetof(struct rtcr_ahash_req, vector));
++	if (opmode & RTCR_SRC_OP_CRYPT_CTR) {
++		/* limit data as engine does not wrap around cleanly */
++		u32 ctr =3D be32_to_cpu(*((u32 *)iv + 3));
++		int blocks =3D min(~ctr, 0x3fffu) + 1;
++
++		len =3D min(blocks * AES_BLOCK_SIZE, len);
++	}
++
++	*reqlen =3D len;
 +}
 +
-+static int rtcr_process_hash(struct ahash_request *areq, int opmode)
++static inline void rtcr_max_skcipher_len(int *reqlen, struct scatterlist =
+**sg,
++					 int *sgoff, int *sgcnt)
 +{
-+	unsigned int len, nextbuflen, datalen, padlen, reqlen;
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(areq);
-+	struct rtcr_ahash_ctx *hctx =3D crypto_ahash_ctx(tfm);
-+	int sgcnt =3D hreq->state & RTCR_REQ_SG_MASK;
-+	struct rtcr_crypto_dev *cdev =3D hctx->cdev;
-+	struct scatterlist *sg =3D areq->src;
-+	int idx, srcidx, dstidx, ret;
-+	u64 pad[RTCR_HASH_PAD_SIZE];
-+	char *ppad;
++	int len, cnt, sgnoff, sgmax =3D RTCR_MAX_SG_SKCIPHER, datalen, maxlen =
+=3D *reqlen;
++	struct scatterlist *sgn;
 +
-+	/* Quick checks if processing is really needed */
-+	if (unlikely(!areq->nbytes) && !(opmode & RTCR_HASH_FINAL))
-+		return 0;
++redo:
++	datalen =3D cnt =3D 0;
++	sgnoff =3D *sgoff;
++	sgn =3D *sg;
 +
-+	if (hreq->buflen + areq->nbytes < 64 && !(opmode & RTCR_HASH_FINAL)) {
-+		hreq->buflen +=3D sg_pcopy_to_buffer(areq->src, sg_nents(areq->src),
-+						   hreq->buf + hreq->buflen,
-+						   areq->nbytes, 0);
-+		return 0;
++	while (sgn && (datalen < maxlen) && (cnt < sgmax)) {
++		cnt++;
++		len =3D min((int)sg_dma_len(sgn) - sgnoff, maxlen - datalen);
++		datalen +=3D len;
++		if (len + sgnoff < sg_dma_len(sgn)) {
++			sgnoff =3D sgnoff + len;
++			break;
++		}
++		sgn =3D sg_next(sgn);
++		sgnoff =3D 0;
++		if (unlikely((cnt =3D=3D sgmax) && (datalen < AES_BLOCK_SIZE))) {
++			/* expand search to get at least one block */
++			sgmax =3D AES_BLOCK_SIZE;
++			maxlen =3D min(maxlen, AES_BLOCK_SIZE);
++		}
 +	}
 +
-+	/* calculate required parts of the request */
-+	datalen =3D (opmode & RTCR_HASH_UPDATE) ? areq->nbytes : 0;
-+	if (opmode & RTCR_HASH_FINAL) {
-+		nextbuflen =3D 0;
-+		padlen =3D 64 - ((hreq->buflen + datalen) & 63);
-+		if (padlen < 9)
-+			padlen +=3D 64;
-+		hreq->totallen +=3D hreq->buflen + datalen;
-+
-+		memset(pad, 0, sizeof(pad) - sizeof(u64));
-+		ppad =3D (char *)&pad[RTCR_HASH_PAD_SIZE] - padlen;
-+		*ppad =3D 0x80;
-+		pad[RTCR_HASH_PAD_SIZE - 1] =3D hreq->state & RTCR_REQ_MD5 ?
-+					      cpu_to_le64(hreq->totallen << 3) :
-+					      cpu_to_be64(hreq->totallen << 3);
-+	} else {
-+		nextbuflen =3D (hreq->buflen + datalen) & 63;
-+		padlen =3D 0;
-+		datalen -=3D nextbuflen;
-+		hreq->totallen +=3D hreq->buflen + datalen;
++	if (unlikely((datalen < maxlen) && (datalen & (AES_BLOCK_SIZE - 1)))) {
++		/* recalculate to get aligned size */
++		maxlen =3D datalen & ~(AES_BLOCK_SIZE - 1);
++		goto redo;
 +	}
-+	reqlen =3D hreq->buflen + datalen + padlen;
 +
-+	/* Write back any uncommitted data to memory. */
-+	if (hreq->buflen)
-+		dma_sync_single_for_device(cdev->dev, virt_to_phys(hreq->buf),
-+					   hreq->buflen, DMA_TO_DEVICE);
-+	if (padlen)
-+		dma_sync_single_for_device(cdev->dev, virt_to_phys(ppad),
-+					   padlen, DMA_TO_DEVICE);
-+	if (datalen)
-+		dma_map_sg(cdev->dev, sg, sgcnt, DMA_TO_DEVICE);
++	*sg =3D sgn;
++	*sgoff =3D sgnoff;
++	*sgcnt =3D cnt;
++	*reqlen =3D datalen;
++}
++
++static int rtcr_process_skcipher(struct skcipher_request *sreq, int opmod=
+e)
++{
++	char *dataout, *iv, ivbk[AES_BLOCK_SIZE], datain[AES_BLOCK_SIZE];
++	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(sreq);
++	struct rtcr_skcipher_ctx *sctx =3D crypto_skcipher_ctx(tfm);
++	int totallen =3D sreq->cryptlen, sgoff =3D 0, dgoff =3D 0;
++	int padlen, sgnoff, sgcnt, reqlen, ret, fblen;
++	struct rtcr_crypto_dev *cdev =3D sctx->cdev;
++	struct scatterlist *sg =3D sreq->src, *sgn;
++	int idx, srcidx, dstidx, len, datalen;
++
++	if (!totallen)
++		return 0;
++
++	if ((totallen & (AES_BLOCK_SIZE - 1)) && (!(opmode & RTCR_SRC_OP_CRYPT_C=
+TR)))
++		return -EINVAL;
++
++redo:
++	sgnoff =3D sgoff;
++	sgn =3D sg;
++	datalen =3D totallen;
++
++	/* limit input so that engine can process it */
++	rtcr_cut_skcipher_len(&datalen, opmode, sreq->iv);
++	rtcr_max_skcipher_len(&datalen, &sgn, &sgnoff, &sgcnt);
++
++	/* CTR padding */
++	padlen =3D (AES_BLOCK_SIZE - datalen) & (AES_BLOCK_SIZE - 1);
++	reqlen =3D datalen + padlen;
++
++	fblen =3D 0;
++	if (sgcnt > RTCR_MAX_SG_SKCIPHER) {
++		/* single AES block with too many SGs */
++		fblen =3D datalen;
++		sg_pcopy_to_buffer(sg, sgcnt, datain, datalen, sgoff);
++	}
++
++	if ((opmode & RTCR_SRC_OP_CRYPT_CBC) &&
++	    (!(opmode & RTCR_SRC_OP_KAM_ENC))) {
++		/* CBC decryption IV might get overwritten */
++		sg_pcopy_to_buffer(sg, sgcnt, ivbk, AES_BLOCK_SIZE,
++				   sgoff + datalen - AES_BLOCK_SIZE);
++	}
 +
 +	/* Get free space in the ring */
-+	sgcnt =3D 1 + (hreq->buflen ? 1 : 0) + (datalen ? sgcnt : 0) + (padlen ?=
- 1 : 0);
++	if (padlen || (datalen + dgoff > sg_dma_len(sreq->dst))) {
++		len =3D datalen;
++	} else {
++		len =3D RTCR_WB_LEN_SG_DIRECT;
++		dataout =3D sg_virt(sreq->dst) + dgoff;
++	}
 +
-+	ret =3D rtcr_alloc_ring(cdev, sgcnt, &srcidx, &dstidx, RTCR_WB_LEN_HASH,=
- NULL);
++	ret =3D rtcr_alloc_ring(cdev, 2 + (fblen ? 1 : sgcnt) + (padlen ? 1 : 0)=
+,
++			      &srcidx, &dstidx, len, &dataout);
 +	if (ret)
 +		return ret;
++
++	/* Write back any uncommitted data to memory */
++	if (dataout =3D=3D sg_virt(sreq->src) + sgoff) {
++		dma_map_sg(cdev->dev, sg, sgcnt, DMA_BIDIRECTIONAL);
++	} else {
++		dma_sync_single_for_device(cdev->dev, virt_to_phys(dataout),
++					   reqlen, DMA_BIDIRECTIONAL);
++		if (fblen)
++			dma_sync_single_for_device(cdev->dev, virt_to_phys(datain),
++						   reqlen, DMA_TO_DEVICE);
++		else
++			dma_map_sg(cdev->dev, sg, sgcnt, DMA_TO_DEVICE);
++	}
++
++	if (sreq->iv)
++		dma_sync_single_for_device(cdev->dev, virt_to_phys(sreq->iv),
++					   AES_BLOCK_SIZE, DMA_TO_DEVICE);
 +	/*
 +	 * Feed input data into the rings. Start with destination ring and fill
 +	 * source ring afterwards. Ensure that the owner flag of the first sourc=
 e
 +	 * ring is the last that becomes visible to the engine.
 +	 */
-+	rtcr_add_dst_to_ring(cdev, dstidx, NULL, 0, hreq->vector, 0);
++	rtcr_add_dst_to_ring(cdev, dstidx, dataout, reqlen, sreq->dst, dgoff);
 +
-+	idx =3D srcidx;
-+	if (hreq->buflen) {
++	idx =3D rtcr_inc_src_idx(srcidx, 1);
++	rtcr_add_src_to_ring(cdev, idx, sreq->iv, AES_BLOCK_SIZE, reqlen);
++
++	if (fblen) {
 +		idx =3D rtcr_inc_src_idx(idx, 1);
-+		rtcr_add_src_to_ring(cdev, idx, hreq->buf, hreq->buflen, reqlen);
++		rtcr_add_src_to_ring(cdev, idx, (void *)datain, fblen, reqlen);
 +	}
 +
++	datalen -=3D fblen;
 +	while (datalen) {
-+		len =3D min(sg_dma_len(sg), datalen);
++		len =3D min((int)sg_dma_len(sg) - sgoff, datalen);
 +
 +		idx =3D rtcr_inc_src_idx(idx, 1);
-+		rtcr_add_src_to_ring(cdev, idx, sg_virt(sg), len, reqlen);
++		rtcr_add_src_to_ring(cdev, idx, sg_virt(sg) + sgoff, len, reqlen);
 +
 +		datalen -=3D len;
-+		if (datalen)
-+			sg =3D sg_next(sg);
++		sg =3D sg_next(sg);
++		sgoff =3D 0;
 +	}
 +
 +	if (padlen) {
 +		idx =3D rtcr_inc_src_idx(idx, 1);
-+		rtcr_add_src_to_ring(cdev, idx, ppad, padlen, reqlen);
++		rtcr_add_src_to_ring(cdev, idx, (void *)empty_zero_page, padlen, reqlen=
+);
 +	}
 +
 +	rtcr_add_src_pad_to_ring(cdev, idx, reqlen);
-+	rtcr_add_src_ahash_to_ring(cdev, srcidx, hctx->opmode, reqlen);
++	rtcr_add_src_skcipher_to_ring(cdev, srcidx, opmode, reqlen, sctx);
 +
 +	/* Off we go */
 +	rtcr_kick_engine(cdev);
 +	if (rtcr_wait_for_request(cdev, dstidx))
 +		return -EINVAL;
 +
-+	hreq->state |=3D RTCR_REQ_FB_ACT;
-+	hreq->buflen =3D nextbuflen;
++	/* Handle IV feedback as engine does not provide it */
++	if (opmode & RTCR_SRC_OP_CRYPT_CTR) {
++		rtcr_inc_iv(sreq->iv, reqlen / AES_BLOCK_SIZE);
++	} else if (opmode & RTCR_SRC_OP_CRYPT_CBC) {
++		iv =3D opmode & RTCR_SRC_OP_KAM_ENC ?
++		     dataout + reqlen - AES_BLOCK_SIZE : ivbk;
++		memcpy(sreq->iv, iv, AES_BLOCK_SIZE);
++	}
 +
-+	if (nextbuflen)
-+		sg_pcopy_to_buffer(sg, sg_nents(sg), hreq->buf, nextbuflen, len);
-+	if (padlen)
-+		memcpy(areq->result, hreq->vector, crypto_ahash_digestsize(tfm));
++	sg =3D sgn;
++	sgoff =3D sgnoff;
++	dgoff +=3D reqlen;
++	totallen -=3D min(reqlen, totallen);
++
++	if (totallen)
++		goto redo;
 +
 +	return 0;
 +}
 +
-+static void rtcr_check_request(struct ahash_request *areq, int opmode)
++static int rtcr_skcipher_encrypt(struct skcipher_request *sreq)
 +{
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	struct scatterlist *sg =3D areq->src;
-+	int reqlen, sgcnt, sgmax;
++	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(sreq);
++	struct rtcr_skcipher_ctx *sctx =3D crypto_skcipher_ctx(tfm);
++	int opmode =3D sctx->opmode | RTCR_SRC_OP_KAM_ENC;
 +
-+	if (hreq->state & RTCR_REQ_FB_ACT)
-+		return;
-+
-+	if (reqlen > RTCR_MAX_REQ_SIZE) {
-+		hreq->state |=3D RTCR_REQ_FB_ACT;
-+		return;
-+	}
-+
-+	sgcnt =3D 0;
-+	sgmax =3D RTCR_MAX_SG_AHASH - (hreq->buflen ? 1 : 0);
-+	reqlen =3D areq->nbytes;
-+	if (!(opmode & RTCR_HASH_FINAL)) {
-+		reqlen -=3D (hreq->buflen + reqlen) & 63;
-+		sgmax--;
-+	}
-+
-+	while (reqlen > 0) {
-+		reqlen -=3D sg_dma_len(sg);
-+		sgcnt++;
-+		sg =3D sg_next(sg);
-+	}
-+
-+	if (sgcnt > sgmax)
-+		hreq->state |=3D RTCR_REQ_FB_ACT;
-+	else
-+		hreq->state =3D (hreq->state & ~RTCR_REQ_SG_MASK) | sgcnt;
++	return rtcr_process_skcipher(sreq, opmode);
 +}
 +
-+static bool rtcr_check_fallback(struct ahash_request *areq)
++static int rtcr_skcipher_decrypt(struct skcipher_request *sreq)
 +{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(areq);
-+	struct rtcr_ahash_ctx *hctx =3D crypto_ahash_ctx(tfm);
-+	union rtcr_fallback_state state;
++	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(sreq);
++	struct rtcr_skcipher_ctx *sctx =3D crypto_skcipher_ctx(tfm);
++	int opmode =3D sctx->opmode;
 +
-+	if (!(hreq->state & RTCR_REQ_FB_ACT))
-+		return false;
++	opmode |=3D sctx->opmode & RTCR_SRC_OP_CRYPT_CTR ?
++		  RTCR_SRC_OP_KAM_ENC : RTCR_SRC_OP_KAM_DEC;
 +
-+	if (!(hreq->state & RTCR_REQ_FB_RDY)) {
-+		/* Convert state to generic fallback state */
-+		if (hreq->state & RTCR_REQ_MD5) {
-+			memcpy(state.md5.hash, hreq->vector, MD5_DIGEST_SIZE);
-+			if (hreq->totallen)
-+				cpu_to_le32_array(state.md5.hash, 4);
-+			memcpy(state.md5.block, hreq->buf, SHA1_BLOCK_SIZE);
-+			state.md5.byte_count =3D hreq->totallen + (u64)hreq->buflen;
-+		} else {
-+			memcpy(state.sha1.state, hreq->vector, SHA1_DIGEST_SIZE);
-+			memcpy(state.sha1.buffer, &hreq->buf, SHA1_BLOCK_SIZE);
-+			state.sha1.count =3D hreq->totallen + (u64)hreq->buflen;
-+		}
-+	}
-+
-+	ahash_request_set_tfm(freq, hctx->fback);
-+	ahash_request_set_crypt(freq, areq->src, areq->result, areq->nbytes);
-+
-+	if (!(hreq->state & RTCR_REQ_FB_RDY)) {
-+		crypto_ahash_import(freq, &state);
-+		hreq->state |=3D RTCR_REQ_FB_RDY;
-+	}
-+
-+	return true;
++	return rtcr_process_skcipher(sreq, opmode);
 +}
 +
-+static int rtcr_ahash_init(struct ahash_request *areq)
++static int rtcr_skcipher_setkey(struct crypto_skcipher *cipher,
++				const u8 *key, unsigned int keylen)
 +{
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(areq);
-+	int ds =3D crypto_ahash_digestsize(tfm);
++	struct crypto_tfm *tfm =3D crypto_skcipher_tfm(cipher);
++	struct rtcr_skcipher_ctx *sctx =3D crypto_tfm_ctx(tfm);
++	struct rtcr_crypto_dev *cdev =3D sctx->cdev;
++	struct crypto_aes_ctx kctx;
++	int p, i;
 +
-+	memset(hreq, 0, sizeof(*hreq));
++	if (aes_expandkey(&kctx, key, keylen))
++		return -EINVAL;
 +
-+	hreq->vector[0] =3D SHA1_H0;
-+	hreq->vector[1] =3D SHA1_H1;
-+	hreq->vector[2] =3D SHA1_H2;
-+	hreq->vector[3] =3D SHA1_H3;
-+	hreq->vector[4] =3D SHA1_H4;
++	sctx->keylen =3D keylen;
++	sctx->opmode =3D (sctx->opmode & ~RTCR_SRC_OP_CIPHER_MASK) |
++			RTCR_SRC_OP_CIPHER_FROM_KEY(keylen);
 +
-+	hreq->state |=3D (ds =3D=3D MD5_DIGEST_SIZE) ? RTCR_REQ_MD5 : RTCR_REQ_S=
-HA1;
++	memcpy(sctx->key_enc, key, keylen);
++	/* decryption key is derived from expanded key */
++	p =3D ((keylen / 4) + 6) * 4;
++	for (i =3D 0; i < 8; i++) {
++		sctx->key_dec[i] =3D cpu_to_le32(kctx.key_enc[p + i]);
++		if (i =3D=3D 3)
++			p -=3D keylen =3D=3D AES_KEYSIZE_256 ? 8 : 6;
++	}
++
++	dma_sync_single_for_device(cdev->dev, virt_to_phys(sctx->key_enc),
++				   2 * AES_KEYSIZE_256, DMA_TO_DEVICE);
 +
 +	return 0;
 +}
 +
-+static int rtcr_ahash_update(struct ahash_request *areq)
++static int rtcr_skcipher_cra_init(struct crypto_tfm *tfm)
 +{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+
-+	rtcr_check_request(areq, RTCR_HASH_UPDATE);
-+	if (rtcr_check_fallback(areq))
-+		return crypto_ahash_update(freq);
-+	return rtcr_process_hash(areq, RTCR_HASH_UPDATE);
-+}
-+
-+static int rtcr_ahash_final(struct ahash_request *areq)
-+{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+
-+	if (rtcr_check_fallback(areq))
-+		return crypto_ahash_final(freq);
-+
-+	return rtcr_process_hash(areq, RTCR_HASH_FINAL);
-+}
-+
-+static int rtcr_ahash_finup(struct ahash_request *areq)
-+{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+
-+	rtcr_check_request(areq, RTCR_HASH_FINAL | RTCR_HASH_UPDATE);
-+	if (rtcr_check_fallback(areq))
-+		return crypto_ahash_finup(freq);
-+
-+	return rtcr_process_hash(areq, RTCR_HASH_FINAL | RTCR_HASH_UPDATE);
-+}
-+
-+static int rtcr_ahash_digest(struct ahash_request *areq)
-+{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+	int ret;
-+
-+	ret =3D rtcr_ahash_init(areq);
-+	if (ret)
-+		return ret;
-+
-+	rtcr_check_request(areq, RTCR_HASH_FINAL | RTCR_HASH_UPDATE);
-+	if (rtcr_check_fallback(areq))
-+		return crypto_ahash_digest(freq);
-+
-+	return rtcr_process_hash(areq, RTCR_HASH_FINAL | RTCR_HASH_UPDATE);
-+}
-+
-+static int rtcr_ahash_import(struct ahash_request *areq, const void *in)
-+{
-+	const void *fexp =3D (const void *)fallback_export_state((void *)in);
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	const struct rtcr_ahash_req *hexp =3D in;
-+
-+	hreq->state =3D hexp->state;
-+	if (hreq->state & RTCR_REQ_FB_ACT)
-+		hreq->state |=3D RTCR_REQ_FB_RDY;
-+
-+	if (rtcr_check_fallback(areq))
-+		return crypto_ahash_import(freq, fexp);
-+
-+	memcpy(hreq, hexp, sizeof(struct rtcr_ahash_req));
-+
-+	return 0;
-+}
-+
-+static int rtcr_ahash_export(struct ahash_request *areq, void *out)
-+{
-+	struct ahash_request *freq =3D fallback_request_ctx(areq);
-+	struct rtcr_ahash_req *hreq =3D ahash_request_ctx(areq);
-+	void *fexp =3D fallback_export_state(out);
-+	struct rtcr_ahash_req *hexp =3D out;
-+
-+	if (rtcr_check_fallback(areq)) {
-+		hexp->state =3D hreq->state;
-+		return crypto_ahash_export(freq, fexp);
-+	}
-+
-+	memcpy(hexp, hreq, sizeof(struct rtcr_ahash_req));
-+
-+	return 0;
-+}
-+
-+static int rtcr_ahash_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_ahash *ahash =3D __crypto_ahash_cast(tfm);
-+	struct rtcr_ahash_ctx *hctx =3D crypto_tfm_ctx(tfm);
-+	struct rtcr_crypto_dev *cdev =3D hctx->cdev;
++	struct rtcr_skcipher_ctx *sctx =3D crypto_tfm_ctx(tfm);
 +	struct rtcr_alg_template *tmpl;
 +
-+	tmpl =3D container_of(__crypto_ahash_alg(tfm->__crt_alg),
-+			     struct rtcr_alg_template, alg.ahash);
++	tmpl =3D container_of(tfm->__crt_alg, struct rtcr_alg_template,
++			    alg.skcipher.base);
 +
-+	hctx->cdev =3D tmpl->cdev;
-+	hctx->opmode =3D tmpl->opmode;
-+	hctx->fback =3D crypto_alloc_ahash(crypto_tfm_alg_name(tfm), 0,
-+					 CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-+
-+	if (IS_ERR(hctx->fback)) {
-+		dev_err(cdev->dev, "could not allocate fallback for %s\n",
-+			crypto_tfm_alg_name(tfm));
-+		return PTR_ERR(hctx->fback);
-+	}
-+
-+	crypto_ahash_set_reqsize(ahash, max(sizeof(struct rtcr_ahash_req),
-+					    offsetof(struct rtcr_ahash_req, vector) +
-+					    sizeof(struct ahash_request) +
-+					    crypto_ahash_reqsize(hctx->fback)));
++	sctx->cdev =3D tmpl->cdev;
++	sctx->opmode =3D tmpl->opmode;
 +
 +	return 0;
 +}
 +
-+static void rtcr_ahash_cra_exit(struct crypto_tfm *tfm)
++static void rtcr_skcipher_cra_exit(struct crypto_tfm *tfm)
 +{
-+	struct rtcr_ahash_ctx *hctx =3D crypto_tfm_ctx(tfm);
++	void *ctx =3D crypto_tfm_ctx(tfm);
 +
-+	crypto_free_ahash(hctx->fback);
++	memzero_explicit(ctx, tfm->__crt_alg->cra_ctxsize);
 +}
 +
-+struct rtcr_alg_template rtcr_ahash_md5 =3D {
-+	.type =3D RTCR_ALG_AHASH,
-+	.opmode =3D RTCR_SRC_OP_MS_HASH | RTCR_SRC_OP_HASH_MD5,
-+	.alg.ahash =3D {
-+		.init =3D rtcr_ahash_init,
-+		.update =3D rtcr_ahash_update,
-+		.final =3D rtcr_ahash_final,
-+		.finup =3D rtcr_ahash_finup,
-+		.export =3D rtcr_ahash_export,
-+		.import =3D rtcr_ahash_import,
-+		.digest =3D rtcr_ahash_digest,
-+		.halg =3D {
-+			.digestsize =3D MD5_DIGEST_SIZE,
-+			/* statesize calculated during initialization */
-+			.base =3D {
-+				.cra_name =3D "md5",
-+				.cra_driver_name =3D "realtek-md5",
-+				.cra_priority =3D 300,
-+				.cra_flags =3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize =3D SHA1_BLOCK_SIZE,
-+				.cra_ctxsize =3D sizeof(struct rtcr_ahash_ctx),
-+				.cra_alignmask =3D 0,
-+				.cra_init =3D rtcr_ahash_cra_init,
-+				.cra_exit =3D rtcr_ahash_cra_exit,
-+				.cra_module =3D THIS_MODULE,
-+			}
-+		}
-+	}
++struct rtcr_alg_template rtcr_skcipher_ecb_aes =3D {
++	.type =3D RTCR_ALG_SKCIPHER,
++	.opmode =3D RTCR_SRC_OP_MS_CRYPTO | RTCR_SRC_OP_CRYPT_ECB,
++	.alg.skcipher =3D {
++		.setkey =3D rtcr_skcipher_setkey,
++		.encrypt =3D rtcr_skcipher_encrypt,
++		.decrypt =3D rtcr_skcipher_decrypt,
++		.min_keysize =3D AES_MIN_KEY_SIZE,
++		.max_keysize =3D AES_MAX_KEY_SIZE,
++		.base =3D {
++			.cra_name =3D "ecb(aes)",
++			.cra_driver_name =3D "realtek-ecb-aes",
++			.cra_priority =3D 300,
++			.cra_flags =3D CRYPTO_ALG_ASYNC,
++			.cra_blocksize =3D AES_BLOCK_SIZE,
++			.cra_ctxsize =3D sizeof(struct rtcr_skcipher_ctx),
++			.cra_alignmask =3D 0,
++			.cra_init =3D rtcr_skcipher_cra_init,
++			.cra_exit =3D rtcr_skcipher_cra_exit,
++			.cra_module =3D THIS_MODULE,
++		},
++	},
 +};
 +
-+struct rtcr_alg_template rtcr_ahash_sha1 =3D {
-+	.type =3D RTCR_ALG_AHASH,
-+	.opmode =3D RTCR_SRC_OP_MS_HASH | RTCR_SRC_OP_HASH_SHA1,
-+	.alg.ahash =3D {
-+		.init =3D rtcr_ahash_init,
-+		.update =3D rtcr_ahash_update,
-+		.final =3D rtcr_ahash_final,
-+		.finup =3D rtcr_ahash_finup,
-+		.export =3D rtcr_ahash_export,
-+		.import =3D rtcr_ahash_import,
-+		.digest =3D rtcr_ahash_digest,
-+		.halg =3D {
-+			.digestsize =3D SHA1_DIGEST_SIZE,
-+			/* statesize calculated during initialization */
-+			.base =3D {
-+				.cra_name =3D "sha1",
-+				.cra_driver_name =3D "realtek-sha1",
-+				.cra_priority =3D 300,
-+				.cra_flags =3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize =3D SHA1_BLOCK_SIZE,
-+				.cra_ctxsize =3D sizeof(struct rtcr_ahash_ctx),
-+				.cra_alignmask =3D 0,
-+				.cra_init =3D rtcr_ahash_cra_init,
-+				.cra_exit =3D rtcr_ahash_cra_exit,
-+				.cra_module =3D THIS_MODULE,
-+			}
-+		}
-+	}
++struct rtcr_alg_template rtcr_skcipher_cbc_aes =3D {
++	.type =3D RTCR_ALG_SKCIPHER,
++	.opmode =3D RTCR_SRC_OP_MS_CRYPTO | RTCR_SRC_OP_CRYPT_CBC,
++	.alg.skcipher =3D {
++		.setkey =3D rtcr_skcipher_setkey,
++		.encrypt =3D rtcr_skcipher_encrypt,
++		.decrypt =3D rtcr_skcipher_decrypt,
++		.min_keysize =3D AES_MIN_KEY_SIZE,
++		.max_keysize =3D AES_MAX_KEY_SIZE,
++		.ivsize	=3D AES_BLOCK_SIZE,
++		.base =3D {
++			.cra_name =3D "cbc(aes)",
++			.cra_driver_name =3D "realtek-cbc-aes",
++			.cra_priority =3D 300,
++			.cra_flags =3D CRYPTO_ALG_ASYNC,
++			.cra_blocksize =3D AES_BLOCK_SIZE,
++			.cra_ctxsize =3D sizeof(struct rtcr_skcipher_ctx),
++			.cra_alignmask =3D 0,
++			.cra_init =3D rtcr_skcipher_cra_init,
++			.cra_exit =3D rtcr_skcipher_cra_exit,
++			.cra_module =3D THIS_MODULE,
++		},
++	},
++};
++
++struct rtcr_alg_template rtcr_skcipher_ctr_aes =3D {
++	.type =3D RTCR_ALG_SKCIPHER,
++	.opmode =3D RTCR_SRC_OP_MS_CRYPTO | RTCR_SRC_OP_CRYPT_CTR,
++	.alg.skcipher =3D {
++		.setkey =3D rtcr_skcipher_setkey,
++		.encrypt =3D rtcr_skcipher_encrypt,
++		.decrypt =3D rtcr_skcipher_decrypt,
++		.min_keysize =3D AES_MIN_KEY_SIZE,
++		.max_keysize =3D AES_MAX_KEY_SIZE,
++		.ivsize	=3D AES_BLOCK_SIZE,
++		.base =3D {
++			.cra_name =3D "ctr(aes)",
++			.cra_driver_name =3D "realtek-ctr-aes",
++			.cra_priority =3D 300,
++			.cra_flags =3D CRYPTO_ALG_ASYNC,
++			.cra_blocksize =3D 1,
++			.cra_ctxsize =3D sizeof(struct rtcr_skcipher_ctx),
++			.cra_alignmask =3D 0,
++			.cra_init =3D rtcr_skcipher_cra_init,
++			.cra_exit =3D rtcr_skcipher_cra_exit,
++			.cra_module =3D THIS_MODULE,
++		},
++	},
 +};
 =2D-
 2.37.3
