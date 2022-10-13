@@ -2,219 +2,268 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82516C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 14:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5541C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 15:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiJMOp1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 10:45:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44402 "EHLO
+        id S229534AbiJMPBh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 11:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbiJMOp0 (ORCPT
+        with ESMTP id S229889AbiJMPBS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 10:45:26 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425DB5F217;
-        Thu, 13 Oct 2022 07:45:24 -0700 (PDT)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29DEJ9qX008445;
-        Thu, 13 Oct 2022 14:45:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2022-7-12;
- bh=jkKbp4YDMsFPRqDZ84qYi3JUY9SKCUo7uTCD52SoCIU=;
- b=IhJ+npqnyDSnNKD1TBai8VhzQV+T5aaK7KfA94UQqVFjstgFMkgjsm1r0KWRM80qMYpN
- hSp9kUBlIS7k1d8FV8qJWbf79piLHkevzVQxfNNB63PThwLDD6vB6dmjF0SygmTj8KTk
- ywryF3p2wgx+ey+JsfdAB2MxDwW7QT1NKGWu//4uQqxlJI1ZtDFF1i1Y9hKHtZ82fsEO
- 8GB7obUoMPticx/c+2if8uCpKg/TOZ6XN4vrbjTF/Bt19LEydeCfeKUQFnr2mgv8eTKX
- Bc/nH6HWFd2nh1aTAlefrTnOMwIhTBfXrLL0JnsL5zq2sEBydR0A4b/McYSdAcyAG//W sg== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3k30ttdc5n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Oct 2022 14:45:13 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 29DDObbe001723;
-        Thu, 13 Oct 2022 14:45:12 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3k2yn6a0jq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Oct 2022 14:45:12 +0000
+        Thu, 13 Oct 2022 11:01:18 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D197C112AA8;
+        Thu, 13 Oct 2022 08:00:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H9brz8b5yczAu/2W2PzpkU7EaMMGed8K6uvIhloL9P+YNJ3907qmV6EHRExYTpo/MU3Muk4Sj+LdgeqwYFSj5MtAEOkDj4prGjIdxYBLBeVgPPaXOd/UnNpM7t+D1dKLTmoSkg5qBG3A2+nfD595ZLIl6VFLqi3PV4l3jhvzJkATeo7vzSCYBYHPMG+M/coSuE9KF4zPWIoEzGdsBjlG1m/uLoNm+5zntUuaDEFVUxAVo84U6atw08hsR7Zq6jy9E5BFkLU7RxRS2PA+2ynKGFOmamxRuI4vQXKbh09oAlG8roVvyUBu+YE65KQg4GrHLyL2ILVtno0UyBj10M3xEA==
+ b=Q+Y2W15TkUNywiHr9XIWAST37KvSVytwQaHw6rMDIJs+K3rEDx1zNr3TIFENHJFjXNMVbkAUgDdC4aGvgd3fOZkaNesRDu4xRtJvJa0qwTFiTMDFOTAs91OLybJGqu9xj5XTl9ddv2oa9/EpPEKUyiH5WYQ39Z7WLbdlxMhjDvptRidrTVRySD6sHHQM7XxHfdoCrTYzmXyhzH5r0obIx4ZcQ1137GnOtqzpSC4nxDW+hCdUCcw2YyLazPVnlpvW0LJqBqRcSuch0l/GHjebnZTdlzKYIstQKvUL40dFlTyNm1KWSrWdCWg3r1JeCdDzkKbI8IMrgRU1H1XcpNub1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jkKbp4YDMsFPRqDZ84qYi3JUY9SKCUo7uTCD52SoCIU=;
- b=ly2hDxmJLRe5x7+XTRnn+OWI+MwcU+xpbNF5vyuMkQzQtfZbHpVCKzoJc65sY+G9yPy53Alm0UrkCsn+UhWEg/6TV2ixUTXGJ9et4almTEWuMUTnIXx/nl1gx/qpOeb4ZWc2OkKHSeITXUPiNoRsXhnVowWHLzFF0W5MNGQCyPySNdgtyXSujR4rOcwk0JyrAR5tuQeBXEQahev1Afw3t9QyrvNxR2n1BUTVwU7G+6ioJECMwnokRpC/8QpPC7U9d2l91zukGsvpU0A+XtVAYyFnhlxIoCK68e5K7GPyp0fEDgqxSoomlzjh0LDeQoNdQqJMzp28kSSf3YcdflccFg==
+ bh=KHwS9YLdqFBBh+1b3GNUkIYE40pPi50wbowpa8OGkMk=;
+ b=P4f+YJBZlfBeCnfd3LT23gdcsQ8erEZUhbzY9YeFbaIK5DfruqCsci8QciURrdINCTZN3hzxkGHTnuOfqftuYqq5fsS1ZWjfJs+YUmvpVlmaEcLN8U2i07pwa3aMH0Ssz16dsO/d+ZDgSw+mb3oGu4gj+UhiHpZ1kwmh59myYlp8uVPUliynCItzxMmFjF8BWMjgNLA2iU8bmPBKe+zzZ3tuUX0Ta+qPp+ZwypRe0gkNFDUSv4aRRs7atCHmGSKPhdBF6tqtSFA/jEf78YqM4cRrdcRjF9nxXG7ZzhWCntE3r/Z0OUoFK0ptcfoeL0s/Rtjrm9KrDF/1YIShcVLaSA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jkKbp4YDMsFPRqDZ84qYi3JUY9SKCUo7uTCD52SoCIU=;
- b=QgO+DSeAUVH3VpT+73bO1Spr1oPXCZ5HIZXztzx2q8ZeaZnhmvBpB75txNwRJrNE4kRO7nihtJFSzr2nYMVwaTm3Ecnd3GBtrc/tu3U2UG4B4Rm1fR09Uq0e7HeEfME25vEdp1/rLaly2rkHaSIoYE7zUazN/ygh5bGM5uW3FZ0=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by IA0PR10MB6721.namprd10.prod.outlook.com
- (2603:10b6:208:441::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Thu, 13 Oct
- 2022 14:45:10 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::1b8e:540e:10f0:9aec]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::1b8e:540e:10f0:9aec%4]) with mapi id 15.20.5676.031; Thu, 13 Oct 2022
- 14:45:09 +0000
-Date:   Thu, 13 Oct 2022 17:44:44 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     George Cherian <gcherian@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Daney <david.daney@cavium.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: cavium - prevent integer overflow loading
- firmware
-Message-ID: <Y0gkXAkIjeoAkQJ/@kadam>
-References: <YygPj8aYTvApOQFB@kili>
- <cecca972-33c8-03a9-d632-c85ed06dff8b@wanadoo.fr>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cecca972-33c8-03a9-d632-c85ed06dff8b@wanadoo.fr>
-X-ClientProxiedBy: JN2P275CA0016.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::28)
- To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+ bh=KHwS9YLdqFBBh+1b3GNUkIYE40pPi50wbowpa8OGkMk=;
+ b=OxbAC1MyiyOl89GDvASqgbGita1CuXRe2h19gGorTLVx3OI0EbJ90XRlImQi4RucnbB9zUlTd52UoCMtt6/B+L93Sns0MQpPtCsbVt+cSuCzJx69njlypcQfIgwt7cGhY+PgWwObKWjK574pf2l4igYCdTUfxZEgusKDQ0iO9Js=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by MN0PR12MB6150.namprd12.prod.outlook.com (2603:10b6:208:3c6::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.32; Thu, 13 Oct
+ 2022 15:00:56 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967%7]) with mapi id 15.20.5723.026; Thu, 13 Oct 2022
+ 15:00:56 +0000
+Message-ID: <087931d7-4639-afde-fce3-bf916201ec3e@amd.com>
+Date:   Thu, 13 Oct 2022 10:00:49 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 41/49] KVM: SVM: Add support to handle the RMP
+ nested page fault
+Content-Language: en-US
+To:     Alper Gun <alpergun@google.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <d7decd3cb48d962da086afb65feb94a124e5c537.1655761627.git.ashish.kalra@amd.com>
+ <CABpDEukNp9eH8jXpv6+Dun+e943AbEMA6G68uQu=TrOLSvh_oA@mail.gmail.com>
+ <318682c1-34a5-44e3-a15e-ef71067d4fd7@amd.com>
+ <CABpDEun0KTeWXqRS0Xj5mDTajix_xGt5DTpqtK_wfGcSH3Cu1Q@mail.gmail.com>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <CABpDEun0KTeWXqRS0Xj5mDTajix_xGt5DTpqtK_wfGcSH3Cu1Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR11CA0007.namprd11.prod.outlook.com
+ (2603:10b6:610:54::17) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWHPR1001MB2365:EE_|IA0PR10MB6721:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b01259d-2ec6-458e-d7c4-08daad2986a4
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|MN0PR12MB6150:EE_
+X-MS-Office365-Filtering-Correlation-Id: 960c526d-2362-4805-284d-08daad2bbb58
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6KH5Z5h+mLjGitJ7OFGmcTfuA6Kg9W8ognSZgkJ7ZLhcTSPO+P39WxLQCRFaSEc5QnGP3bgBT+jZkUYvWfqQdVjYRRojr6FCr9ugk1IegN3zcPwN+E8SQ1gukmiR2FAqZHwn7WcxMNZdgCASlE4j1NV809IJG65sxPgTE+hnMLofM2xztW8n3H3otIEoiKG0vu4WWAIBnhPktDaDWXiJmADO3ugl4MYCer662mhHHEFAsSAvP632vUUtp99AKvG4RTcOgHNeIydzBfsErCTSROF2nUjZLyTJZRJmmL/3aLiofoOEALSemLbU3lH2ugyNblioywkdhIj0a33+yxlmd/0p3Gb/kjWw7sY1tDljm2hybKSVUz4IEDd5fdHLqVEdvhvzpGhKgNX8B/IN54Ri/hjEBxPbqpMOQgrTCzlAYXJ/SpUP/b05oD1HvfP4aBEJyc6RinHOkFYjSHKT2ORJ8K25MBnJ51MvH7rhJm3iiz7hjgw+f3bTnCl7ryilIaw7i3x+XizZ7vM5iwLVghKSd2B/nZgjVrF1XKKIcX63YE8AwJayVrCUj6OCKKBNUgV1VNpn3p3gL4dNKsuhpNQDI5ed8ypMZwmsQv2DVMqJ3LWPHlpdwl2cFp4qCj/0aIiogepwemcApwcwmbbcVOjs8yIlUd2RH+jWTBbygH/4JkXTiN6SWyVLhOWZD5VAnRWmvfuEA7AVaePocV++/4BXww==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(376002)(136003)(346002)(39860400002)(366004)(396003)(451199015)(8936002)(6916009)(186003)(2906002)(5660300002)(86362001)(41300700001)(54906003)(26005)(6486002)(478600001)(4326008)(8676002)(66476007)(66556008)(66946007)(44832011)(83380400001)(316002)(6512007)(6666004)(9686003)(38100700002)(6506007)(33716001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: E1G9NkIFTJ/jxAKfCyiETleGpLCLiUkGqNveKCmAVOO3CbR/TuejS3NXafTaycbeNdiDy2efiREFl8gkcz6+WA+jC+sdwhexBwLaGgqM2SU0V5Cb8h7bMkQi/hEaDEYrOVr8BgHTTCslsItYxutySwHhV+GjIz9d7xJt0T4VsO9cRMCPLZCjQm4BUSCokkJa8WMXP/nyMblf6t6CnO8nlJ5YVIfy3ixUiG4upkuzQltDj/ukIIncld349rf3j69qRRtIMsW4hy0AfU3QsR1IMtjt+D7vBegRr+u/t5jI2yiOs7a8Shl5HI12c/19dYupnCYUiwuJRI2xs6IFEmSaroUOUpYn25UaE4yLsA2NuOBb4YmJAPfies6i64iCViriIxv7/ujnMgeMsJ0/fvT7xS/RRyL7inlUWUggj/mj4Gk9L69w/lhwVBVH8NVPhPwoyKp+/itLoxDZpC9xEkW4feHJzLFsZ76tOndaU96nNhc/kDptctP1TUJmu6VPaxhesTwwrkjVtZ1Zdt5LD0viIZfzSAmOd0iJorcS/DIqVYTkd8Zy9s1Pp7zI1/4g7XTookvr9WlUaoyr3pCUiIILg+hXrdsMnDH3EByUXFa4kKpwy2TzCe0bqjdYXxaKwGNi877HxTtzLUeEBkwLts2HFPmxf9P2scdffyewqB6KzO2nFI58TqRvPOCU7fpPrPr+1jJAL1JQlNp9+zXK7bPmhFblZc0DlbEtfZ7KMzrzedOAiEVsuB8aNMTPt5BPsO0XyeX9sMHeZajBwZejDQK2dkbT8PlXKglEOcl2uzYu/Xw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(39860400002)(376002)(366004)(396003)(451199015)(6486002)(31686004)(6916009)(316002)(31696002)(478600001)(38100700002)(86362001)(186003)(36756003)(26005)(6666004)(6512007)(2616005)(8936002)(7406005)(4326008)(83380400001)(2906002)(7416002)(8676002)(6506007)(53546011)(66476007)(66556008)(5660300002)(66946007)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?K3RunRNj+GqY/NZAncwqryYSef8jZ/f/PZAWkIE/PtMzhcQFoWcImkF6amcY?=
- =?us-ascii?Q?ZwsXf4N21gliaV+p+Bl97Uu6hFF3sgSubjte0Xbwfkf/vUSRreDh40piN9jm?=
- =?us-ascii?Q?ZA4Has/+gy/uTyvf8BWKRfII8JQuXIG383ctJHd3nlTQFkOzK4C7mg9/3e4d?=
- =?us-ascii?Q?NSmJlfZS6DUD4mfkDeOJgM3YnGhKjSXi8yxtmu1AgMuvCm66DAT2buwwWhWL?=
- =?us-ascii?Q?w2vlUKZaKfoPYBurMXXqNWlB1TEADQQ5R2gTb+A9PMfNDc8Egt3mtq+yzMZn?=
- =?us-ascii?Q?YmSMzwYBzOLxIWl+f8Y8MlJGdFRiCaAiWZsw1wSDJLZaKJIKNyWVo/5VOaIZ?=
- =?us-ascii?Q?uL5N+sHTlJDrAy2GYz8SXhO+tl0NItiput25OIJ39w26bmICZLPzF8SFh/wn?=
- =?us-ascii?Q?iBNFs5rVe6XVDQclAn+kC0FWgVe7kEYQ9UWn05tZGw0ZItdLkSyTa81mWyUx?=
- =?us-ascii?Q?BRLc7PVbc4Z2lIxZfhwGYPkRibngz2uoAzxpsTRVOWsJtbSbnDvxtJ7zy1Bs?=
- =?us-ascii?Q?3n01lgQFDzRn83PTVG9Jr33mOut7O86mGAPtvIMIMJcpE00om6hxaOEET7kf?=
- =?us-ascii?Q?QOBkwdYC65A7aDq7k1Rwoeavq6ZjsXxjc06UarqjwD15us9S/kN0MCFSmszg?=
- =?us-ascii?Q?oPRJvpEX784veMuctWcLWEZ6OeUl3YaFUhBpJhREI+o6zWS5/b07n2J0eYSM?=
- =?us-ascii?Q?RPuzuOeHnWhmKtt0ypehkEGkz/YePEpwkihvl59iI+281TFKiy6IjlxhGEfU?=
- =?us-ascii?Q?bph+Rw+Tmx1KjI34u6O9Aajq7N+KXR9cY4BHF+fyw2V2pgJrt8hkblKWCWHr?=
- =?us-ascii?Q?qf7yCWmMVecXUygfikEK8oj295qm2/i/2Nn6oZXBdmhiEvQnQF1zt1Fa3clP?=
- =?us-ascii?Q?ymB1YDMhYBj5jBLZO8M+K0IBME9jYW4x47NWXAxJqvd5gUQycNlrPsCnkSo7?=
- =?us-ascii?Q?iQxFvGCkGvHBphMZfsLnJwdd8Zspx0AE7fkbfjchSfUY4b0B7PPFGeKV87vW?=
- =?us-ascii?Q?qb3Pn+LBBCxRZ0xOeIDS9qW/mZuA7PDOP+wwE9VhC4kzVKBzzKG78NGJ5xvM?=
- =?us-ascii?Q?ZNrw2vXctJj1xcQL4qgpodJg2ZEJmTIjWpKwFEQ1MHlJNJO7iQ05O3T+OHo8?=
- =?us-ascii?Q?Ganogm27O9WG8gzgcvr8tpmR8xT/+WF5lCydyYy6PJfNatL8SHgOJqfll8pE?=
- =?us-ascii?Q?JEPLxk8JKkPKdXfdJw+hezO0o7AIX+0rW8Tb87yHRrnXzQHPh80JVLCY20fa?=
- =?us-ascii?Q?Ueqyohr4egwBM/nP/OU/CCv8MVPUgMs1RzCIzsi8Xs6Ti+yWPIVOqb3tWka2?=
- =?us-ascii?Q?OpWsLjC8VQ+Y1SpeptEVlZBrO/+E/7jbPA2O0s09MQISAv9RM8I884y4NzDI?=
- =?us-ascii?Q?GFWjhBCNczrthcXzdyAjAhhzL8XLiDgGhkuFJOfSoHcCwsUvyOmZB/EpX7Iz?=
- =?us-ascii?Q?fT7BBgq8R5dAYMrCG9ge9AAezpuNM1S1SGlZX6kpIqQat1Iny2yqX8LSmV+X?=
- =?us-ascii?Q?Uz6X5eXd7w8wEHGHnVg/j1ZsTCKh9aE1F5HXewt/C2goIz3MYTzs0GBg0quJ?=
- =?us-ascii?Q?luQ4BwtLU9HfBC5wJ6CEzhftwbbyWY/BiuD/L0JYQ8C5Fr2WRngOVORfFQpC?=
- =?us-ascii?Q?Fw=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b01259d-2ec6-458e-d7c4-08daad2986a4
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NjBCZ2Nua0NPU29QcnhtUjZ5V3lHazRBQjZ6bWd3YkE5UG5MTDl1YzYvUXhF?=
+ =?utf-8?B?TnJTa01hRlVQYWprSVk4MlZEbldNREZOOWc5RkVWKzRzdzhneW9XT3FtZTNn?=
+ =?utf-8?B?S2ZnbjJwNmdiU2VrVUI1am5EOGEvQXVGdThyUEdIREdEbllTcjRiY0Rab2xI?=
+ =?utf-8?B?ZGxmczNmU3phdXlzNENzaGdNRzVKRUNMbFp0U3RkRGhnS3d3Y3hJaWRVSGZk?=
+ =?utf-8?B?S3EzU1RHYVVURGNCWCt1V0lwbHJtUDlNdjFVeWJpNXpCYy91NkhEdWFwd0FH?=
+ =?utf-8?B?dmo3d2pXNzh6RlhPS0pkWEtsek1pNCtITlBWbUNneGJOMXUyd3BRWnNmN3Ru?=
+ =?utf-8?B?ZlFnTXVFcXd6RTlHQVNMMWdpNkErSXpURlM1YW1aTnkxTDdPYlNuVEZGUEhW?=
+ =?utf-8?B?Q0R6VVcxbjN5R1FJajVjd3VCTHljVWdhQTNjcTREL3FkQVhpemYyZHpubTIv?=
+ =?utf-8?B?bHBMWi9CZ0RHL0tOM0dTMEZZbFVkVWtaSUJYMEM0d2oxdG0vMDgzWTBLaGNx?=
+ =?utf-8?B?c3NhSDR5RWVpU1diZHhxWGwxVU9TbS96dHh3V1VoUWFyMVBVZTl0ckxKRG95?=
+ =?utf-8?B?YmxmV1ZWem5nR3NWOVgxdXRLNEtXY1JRWG9uL1hMT2FGNzlNOU90WUpHcS94?=
+ =?utf-8?B?STZ0WVVvMHdieHlLUUp4TXFjS3l5ek9vUE5yVCtOMEtjUVZjb2h4OENDb2Mr?=
+ =?utf-8?B?c0lBVG9iSkhibW9ydXZWT3dOajBodXpwSElOME1vejdQbTc3V20zVWZGT3Uv?=
+ =?utf-8?B?T0R4M2lYYTJ0MzhOdmg1cHZEUlYzcEpESXhtSzV3V1B0N2pTelk2Vi9uTU9D?=
+ =?utf-8?B?R1FsNkNtanovTTZUdXpTd2YvM0p3alZPT1l0b2VKSUJGSjNQVTR0ckdFaGFa?=
+ =?utf-8?B?OUlUREI5TS9xdFRjbmhPRUMvTE8wb3MyaS9xYnZQdjJWU2p5UXhJRzd3MG5Y?=
+ =?utf-8?B?aENuMjBpT3JDSWhaVjVoaVNhL0RKSlo3ZWMycXh0c2txczB4TU5qamdYTnEv?=
+ =?utf-8?B?UFlNcFpzOTd3RjFoY3hFWndsNmx0YW5OV3N1K2x5c2hYL2F6ZWpyQisxd3Bs?=
+ =?utf-8?B?T083c3AzeDkwSTU3OG5TaUtSWVNLM1dOenZkbjZMdkNLenZBSi9adFV4dnFE?=
+ =?utf-8?B?ekxXQmt5Y1Y4WDM5RytGNS9PZDVqZUVzR0J6TzE0MjJpUVdaR0g4Yy9FbWRa?=
+ =?utf-8?B?Q2U3WjNNSUR3dkdhU3dIU2x1N2xYRVIwV1dzNlZwSFRnV1c2NEcvdHdoWDdI?=
+ =?utf-8?B?cUgyMTBaS2gwWGR3WGhTckxFNWh6RjU2V283QWtrYzE1dXQzZml3U1VSSW5u?=
+ =?utf-8?B?dnIvOE5icTB5RVpmZHRPYXBPSmVsbjZqUGhURThFd2JPZFFnQjlpZEhUdmVU?=
+ =?utf-8?B?MjFPMHdIWDQ5WmNXVGlwQWpDbmtxQTZQOS9Nb1FILy9HSzJXQTJXNTA3NEIy?=
+ =?utf-8?B?a3NZNFB6cE5NUHN1SUs4UDdxNUJOVm1USWRGc1NqZVBQcFp0dnZicVlNR2FS?=
+ =?utf-8?B?OUtIelhCckFYSDdEVDBNbEJlWTlPTGhJUHNQbDdYZGxUcjlFNU9xeVlLVHVV?=
+ =?utf-8?B?enJQZSs5K0RtTVNqUzhqVTJIRlB5alJMQkdHSWFuaTVGOFIrRnhVZFlmdUs1?=
+ =?utf-8?B?ajZaVUNQNnhzTGFscm9ZQWRrRWhBK0Y2YW1wS2lPNHRvMU0xUXJjdW85b2FO?=
+ =?utf-8?B?eEhEMDZ5ZUNzMUtia0Rqc1dYUFlpY3l5UlNscld2dnZnUnR3ckluRjhKUVFo?=
+ =?utf-8?B?dk5iTjcxczV1c2k1ZjZRZ3kxc0hxekpVYTFEaGtIN1VlNFE2bzB4Rno4d2NJ?=
+ =?utf-8?B?YVVIMlI2bm1QZzdaYUZrSngzK1lZNjZicGwvRFNkcXMwTnNQSkFTQkhMYjhj?=
+ =?utf-8?B?WXNIczBCWDcvcG5FTDU3RE9jQTZMc0h3N2NuTnZwRmpHUFR5MWZWK0ZmWGY1?=
+ =?utf-8?B?UnA4UHBPNHJibXBjVERuSjk2UjNpOEJOaVNjakZkQzFrS29CK0MxTyt1ZjJx?=
+ =?utf-8?B?K0VBenJTc1hhRnZQamYxcm1HUlRCN3hab0Erc002RHZLcjVIOFFRcEJ3TGdZ?=
+ =?utf-8?B?Nk53dlB2czFtTjZVZEhuNVdkbGRqTG9yLzRoZWlERlBBVFlFWVJueTRWOE00?=
+ =?utf-8?Q?wURBnu8nnQF98FGXCHkVzvdY9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 960c526d-2362-4805-284d-08daad2bbb58
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2022 14:45:09.8529
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2022 15:00:56.7630
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eykLabLdLo7wGTO+eiP3jFkX3TpH6TBS2YQIEIAlDT1BgIg56Ymw/GeC1U01U11+gyrN4uJPC+kvdV+hlGOokKSoxDyMwy1ZUGcn1uv0uBc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB6721
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-13_08,2022-10-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- phishscore=0 mlxscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210130086
-X-Proofpoint-GUID: nf2QE93IWYVoAZ-RGvquFYslnUl-8xxv
-X-Proofpoint-ORIG-GUID: nf2QE93IWYVoAZ-RGvquFYslnUl-8xxv
+X-MS-Exchange-CrossTenant-UserPrincipalName: Adg5HvlSdDo8CFrmPrRVs2fDZKr7NqrNSM2DCQHQCe5jhAyosnFD6Jrxp2wEsnOA2wkHK85coULIeaQM13qD1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6150
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 30, 2022 at 06:32:53PM +0200, Christophe JAILLET wrote:
-> Le 19/09/2022 ? 08:43, Dan Carpenter a ?crit?:
-> > The "code_length" value comes from the firmware file.  If your firmware
-> > is untrusted realistically there is probably very little you can do to
-> > protect yourself.  Still we try to limit the damage as much as possible.
-> > Also Smatch marks any data read from the filesystem as untrusted and
-> > prints warnings if it not capped correctly.
-> > 
-> > The "ntohl(ucode->code_length) * 2" multiplication can have an
-> > integer overflow.
-> > 
-> > Fixes: 9e2c7d99941d ("crypto: cavium - Add Support for Octeon-tx CPT Engine")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > ---
-> > v2: The first code removed the " * 2" so it would have caused immediate
-> >      memory corruption and crashes.
-> > 
-> >      Also in version 2 I combine the "if (!mcode->code_size) {" check
-> >      with the overflow check for better readability.
-> > 
-> >   drivers/crypto/cavium/cpt/cptpf_main.c | 6 ++++--
-> >   1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
-> > index 8c32d0eb8fcf..6872ac344001 100644
-> > --- a/drivers/crypto/cavium/cpt/cptpf_main.c
-> > +++ b/drivers/crypto/cavium/cpt/cptpf_main.c
-> > @@ -253,6 +253,7 @@ static int cpt_ucode_load_fw(struct cpt_device *cpt, const u8 *fw, bool is_ae)
-> >   	const struct firmware *fw_entry;
-> >   	struct device *dev = &cpt->pdev->dev;
-> >   	struct ucode_header *ucode;
-> > +	unsigned int code_length;
-> >   	struct microcode *mcode;
-> >   	int j, ret = 0;
-> > @@ -263,11 +264,12 @@ static int cpt_ucode_load_fw(struct cpt_device *cpt, const u8 *fw, bool is_ae)
-> >   	ucode = (struct ucode_header *)fw_entry->data;
-> >   	mcode = &cpt->mcode[cpt->next_mc_idx];
-> >   	memcpy(mcode->version, (u8 *)fw_entry->data, CPT_UCODE_VERSION_SZ);
-> > -	mcode->code_size = ntohl(ucode->code_length) * 2;
-> > -	if (!mcode->code_size) {
-> > +	code_length = ntohl(ucode->code_length);
-> > +	if (code_length == 0 || code_length >= INT_MAX / 2) {
+On 10/12/2022 5:53 PM, Alper Gun wrote:
+> On Mon, Oct 10, 2022 at 7:32 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
+>>
+>> Hello Alper,
+>>
+>> On 10/10/2022 5:03 PM, Alper Gun wrote:
+>>> On Mon, Jun 20, 2022 at 4:13 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>>>>
+>>>> From: Brijesh Singh <brijesh.singh@amd.com>
+>>>>
+>>>> When SEV-SNP is enabled in the guest, the hardware places restrictions on
+>>>> all memory accesses based on the contents of the RMP table. When hardware
+>>>> encounters RMP check failure caused by the guest memory access it raises
+>>>> the #NPF. The error code contains additional information on the access
+>>>> type. See the APM volume 2 for additional information.
+>>>>
+>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>> ---
+>>>>    arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
+>>>>    arch/x86/kvm/svm/svm.c | 14 +++++---
+>>>>    2 files changed, 86 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>> index 4ed90331bca0..7fc0fad87054 100644
+>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>> @@ -4009,3 +4009,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+>>>>
+>>>>           spin_unlock(&sev->psc_lock);
+>>>>    }
+>>>> +
+>>>> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+>>>> +{
+>>>> +       int rmp_level, npt_level, rc, assigned;
+>>>> +       struct kvm *kvm = vcpu->kvm;
+>>>> +       gfn_t gfn = gpa_to_gfn(gpa);
+>>>> +       bool need_psc = false;
+>>>> +       enum psc_op psc_op;
+>>>> +       kvm_pfn_t pfn;
+>>>> +       bool private;
+>>>> +
+>>>> +       write_lock(&kvm->mmu_lock);
+>>>> +
+>>>> +       if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level)))
+>>>> +               goto unlock;
+>>>> +
+>>>> +       assigned = snp_lookup_rmpentry(pfn, &rmp_level);
+>>>> +       if (unlikely(assigned < 0))
+>>>> +               goto unlock;
+>>>> +
+>>>> +       private = !!(error_code & PFERR_GUEST_ENC_MASK);
+>>>> +
+>>>> +       /*
+>>>> +        * If the fault was due to size mismatch, or NPT and RMP page level's
+>>>> +        * are not in sync, then use PSMASH to split the RMP entry into 4K.
+>>>> +        */
+>>>> +       if ((error_code & PFERR_GUEST_SIZEM_MASK) ||
+>>>> +           (npt_level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M && private)) {
+>>>> +               rc = snp_rmptable_psmash(kvm, pfn);
+>>>
+>>>
+>>> Regarding this case:
+>>> RMP level is 4K
+>>> Page table level is 2M
+>>>
+>>> Does this also cause a page fault with size mismatch? If so, we
+>>> shouldn't try psmash because the rmp entry is already 4K.
+>>>
+>>> I see these errors in our tests and I think it may be happening
+>>> because rmp size is already 4K.
+>>>
+>>> [ 1848.752952] psmash failed, gpa 0x191560000 pfn 0x536cd60 rc 7
+>>> [ 2922.879635] psmash failed, gpa 0x102830000 pfn 0x37c8230 rc 7
+>>> [ 3010.983090] psmash failed, gpa 0x104220000 pfn 0x6cf1e20 rc 7
+>>> [ 3170.792050] psmash failed, gpa 0x108a80000 pfn 0x20e0080 rc 7
+>>> [ 3345.955147] psmash failed, gpa 0x11b480000 pfn 0x1545e480 rc 7
+>>>
+>>> Shouldn't we use AND instead of OR in the if statement?
+>>>
+>>
+>> I believe this we can't do, looking at the typical usage case below :
+>>
+>> [   37.243969] #VMEXIT (NPF) - SIZEM, err 0xc80000005 npt_level 2,
+>> rmp_level 2, private 1
+>> [   37.243973] trying psmash gpa 0x7f790000 pfn 0x1f5d90
+>>
+>> This is typically the case with #VMEXIT(NPF) with SIZEM error code, when
+>> the guest tries to do PVALIDATE on 4K GHCB pages, in this case both the
+>> RMP table and NPT will be optimally setup to 2M hugepage as can be seen.
+>>
+>> Is it possible to investigate in more depth, when is the this case being
+>> observed:
 > 
-> Hi,
+> Yes, I added more logs and I can see that these errors happen when RMP
+> level is 4K and NPT level is 2M.
+> psmash fails as expected. I think it is just a log, there is no real
+> issue but the best is not trying psmash if rmp level is 4K.
 > 
-> out of curiosity,
-> 
-> 'code_length' is 'unsigned int'
-> 'mcode->code_size' is u32.
-> 
-> Why not UINT_MAX / 2?
 
-Sorry for not responding earlier.  UINT_MAX / 2 would have worked here.
+Now, the SIZEM bit is only set when PVALIDATE or RMPADJUST fails due to
+guest attempting to validate a 4K page that is backed by a 2MB RMP 
+entry, which is not the case here as RMP level is 4K.
 
-There was a similar issue in ucode_load() and in that code if you wanted
-to use UINT_MAX then you would have had to write something like:
+Also, this does not fall into the second case for the same reason.
 
-	if (code_length >= (UINT_MAX - 16) / 2)
+#NPF will happen during Guest page table walk if RMP checks fail
+for 2M nested page and RMP.SubPage_Count !=0 OR
+RMP.PageSize != Nested table page size, but then that shouldn't have
+the SIZEM fault bit set.
 
-That is sort of 9th grade algebra level of complicated.  But I've messed
-it up basic algebra before and I've seen other people mess up their
-integer overflow tests as well.
+This raises concern about some existing race condition, it probably
+can race with
+snp_handle_page_state_change()->snp_make_page_shared()->snp_rmptable_psmash(),
+but that code path seems to be protected from this nested RMP #PF 
+handler as they both acquire the kvm->mmu_lock.
 
-So I decided it was easier to just use INT_MAX / 2 consistently
-everywhere.  The real values are not going to be anywhere near that
-high so it doesn't affect runtime at all.
+So, this still needs more investigation.
 
-Also while I was writing this patch back in September, I saw someone
-had changed one of INT_MAX checks to UINT_MAX.  For no reason at all.
-It doesn't affect runtime.  They didn't tell me at all.  I was
-unspeakably annoyed and I vowed to hold a grudge about this for all
-time.  But unfortunately I forgotten the details so they're essentially
-forgiven at this point...
+Can you share what kind of tests are you running to reproduce this
+issue ?
 
-regards,
-dan carpenter
+Thanks,
+Ashish
+
+>> RMP level is 4K
+>> Page table level is 2M
+>> We shouldn't try psmash because the rmp entry is already 4K.
+>>
+>> Thanks,
+>> Ashish
+>>
+>>> if ((error_code & PFERR_GUEST_SIZEM_MASK) && ...
+>>>
