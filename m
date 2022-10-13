@@ -2,73 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE694C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 06:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87403C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 06:40:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbiJMGI6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 02:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42430 "EHLO
+        id S229507AbiJMGk4 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 02:40:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiJMGI5 (ORCPT
+        with ESMTP id S229491AbiJMGk4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 02:08:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E57612C8A9;
-        Wed, 12 Oct 2022 23:08:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D6992616FF;
-        Thu, 13 Oct 2022 06:08:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC585C433D6;
-        Thu, 13 Oct 2022 06:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665641335;
-        bh=qHJMJEcih6so6BSzh3Q2gwqEnOlegjhfiSsSBu1WH+4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bCwMgpN2NFm8ny18yJEmxvIZNxPQFDDV277F93hsyKONkNcKoEkxBJG3jD3V5rhx3
-         kV5U25IQhZ2gi/i3ILOKgpiuEGkPEAW/59psMoED2p+N6nVN4nnxsClNrYu1hTJhdz
-         11+Kl0R1jaLVffsHoIc9U4WCR+A9Bor4KozjzeE5YO4107ZyXlePTXrUqVGncy/a+M
-         xMV/t0PjO4NyYQm6q5p0KbyVrcvlxUeNxB99ug9y/9+owthOnQG4jThY9E++fQqgNI
-         EdBOYhDv6i8GSWOQ9S+gk5UIjJ5F2OoViNKXfpqhh3cQ0GYfBg3sk6NPVSR4Ycx23p
-         gKzeS102hvYNw==
-Date:   Wed, 12 Oct 2022 23:08:53 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
-        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
+        Thu, 13 Oct 2022 02:40:56 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2B1631C0;
+        Wed, 12 Oct 2022 23:40:54 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VS2O8nf_1665643251;
+Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VS2O8nf_1665643251)
+          by smtp.aliyun-inc.com;
+          Thu, 13 Oct 2022 14:40:52 +0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v2 0/9] Drivers for Alibaba YCC (Yitian Cryptography
+ Complex) cryptographic accelerator
+From:   guanjun <guanjun@linux.alibaba.com>
+In-Reply-To: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
+Date:   Thu, 13 Oct 2022 14:40:50 +0800
+Cc:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
+        xuchun.shang@linux.alibaba.com,
+        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
-Message-ID: <Y0erdZ/tJWgm4KKi@sol.localdomain>
-References: <20221006223151.22159-1-elliott@hpe.com>
- <20221012215931.3896-1-elliott@hpe.com>
- <20221012215931.3896-5-elliott@hpe.com>
- <Y0eosAIgkvMzYJz8@sol.localdomain>
- <Y0eqe5lbazXzpM/K@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y0eqe5lbazXzpM/K@gondor.apana.org.au>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <16B87FEE-50FE-4FEC-AA3E-7AF0B0C83F1F@linux.alibaba.com>
+References: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au,
+        "Elliott, Robert (Servers)" <elliott@hpe.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 13, 2022 at 02:04:43PM +0800, Herbert Xu wrote:
-> On Wed, Oct 12, 2022 at 10:57:04PM -0700, Eric Biggers wrote:
-> >
-> > 'len' can't be 0 at the beginning of this loop, so the 'if (chunk)' check isn't
-> > needed.  And it wouldn't make sense even if 'len' could be 0, since a while loop
-> > could just be used in that case.
+
+
+> 2022年9月28日 下午3:37，Guanjun <guanjun@linux.alibaba.com> 写道：
 > 
-> I don't see anything preventing len from being zero if this gets
-> called directly by a user of the Crypto API through crypto_shash_update.
-> But yes a while loop would be a lot cleaner.
+> From: Guanjun <guanjun@linux.alibaba.com>
+> 
+> Hi,
 > 
 
-When len == 0, the following path is taken instead:
+Hi Herbert, Elliott,
 
-        if (!crypto_simd_usable() ||
-            (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
-                return crypto_sha1_update(desc, data, len);
+> This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
+> cryptographic accelerator. Enables the on-chip cryptographic accelerator of
+> Alibaba Yitian SoCs which is based on ARMv9 architecture.
+> 
+> It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
+> 
+> Please help to review.
+> 
+> Thanks,
+> Guanjun.
+> 
+> Change log:
+> v1 RESEND -> v2:
+> - [01/09] Remove char device that is not used now.
 
-- Eric
+Do you have any comments about this v2 patchset?
+
+Thank you very much for code review!
+
+BR,
+Guanjun
+
+> 
+> v1 -> v1 RESEND:
+>  - [01/09] Adjust the Kconfig entry in alphabetical order
+>  - [05/09][07/09][08/09] Adjust the format of algorithm names
+> 
+> v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
+> v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
+> 
+> Guanjun (3):
+>  crypto/ycc: Add skcipher algorithm support
+>  crypto/ycc: Add aead algorithm support
+>  crypto/ycc: Add rsa algorithm support
+> 
+> Xuchun Shang (1):
+>  crypto/ycc: Add sm2 algorithm support
+> 
+> Zelin Deng (5):
+>  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+>  crypto/ycc: Add ycc ring configuration
+>  crypto/ycc: Add irq support for ycc kernel rings
+>  crypto/ycc: Add device error handling support for ycc hw errors
+>  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
+>    entry
+> 
+> MAINTAINERS                            |   8 +
+> drivers/crypto/Kconfig                 |   2 +
+> drivers/crypto/Makefile                |   1 +
+> drivers/crypto/ycc/Kconfig             |  18 +
+> drivers/crypto/ycc/Makefile            |   4 +
+> drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
+> drivers/crypto/ycc/sm2signature_asn1.h |  13 +
+> drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
+> drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
+> drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
+> drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
+> drivers/crypto/ycc/ycc_isr.h           |  12 +
+> drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
+> drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
+> 17 files changed, 4610 insertions(+)
+> create mode 100644 drivers/crypto/ycc/Kconfig
+> create mode 100644 drivers/crypto/ycc/Makefile
+> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
+> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+> create mode 100644 drivers/crypto/ycc/ycc_aead.c
+> create mode 100644 drivers/crypto/ycc/ycc_algs.h
+> create mode 100644 drivers/crypto/ycc/ycc_dev.h
+> create mode 100644 drivers/crypto/ycc/ycc_drv.c
+> create mode 100644 drivers/crypto/ycc/ycc_isr.c
+> create mode 100644 drivers/crypto/ycc/ycc_isr.h
+> create mode 100644 drivers/crypto/ycc/ycc_pke.c
+> create mode 100644 drivers/crypto/ycc/ycc_ring.c
+> create mode 100644 drivers/crypto/ycc/ycc_ring.h
+> create mode 100644 drivers/crypto/ycc/ycc_ske.c
+> 
+> -- 
+> 1.8.3.1
+
