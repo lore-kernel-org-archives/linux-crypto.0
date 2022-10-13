@@ -2,136 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87403C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 06:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E709C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 07:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229507AbiJMGk4 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 02:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59844 "EHLO
+        id S229527AbiJMHvB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 03:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiJMGk4 (ORCPT
+        with ESMTP id S229462AbiJMHvA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 02:40:56 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2B1631C0;
-        Wed, 12 Oct 2022 23:40:54 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VS2O8nf_1665643251;
-Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VS2O8nf_1665643251)
-          by smtp.aliyun-inc.com;
-          Thu, 13 Oct 2022 14:40:52 +0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH v2 0/9] Drivers for Alibaba YCC (Yitian Cryptography
- Complex) cryptographic accelerator
-From:   guanjun <guanjun@linux.alibaba.com>
-In-Reply-To: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
-Date:   Thu, 13 Oct 2022 14:40:50 +0800
-Cc:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
-        xuchun.shang@linux.alibaba.com,
-        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
+        Thu, 13 Oct 2022 03:51:00 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1503FAA62;
+        Thu, 13 Oct 2022 00:50:58 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oiszO-00EEfc-0N; Thu, 13 Oct 2022 18:50:47 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Oct 2022 15:50:45 +0800
+Date:   Thu, 13 Oct 2022 15:50:45 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
+        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <16B87FEE-50FE-4FEC-AA3E-7AF0B0C83F1F@linux.alibaba.com>
-References: <1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au,
-        "Elliott, Robert (Servers)" <elliott@hpe.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+Subject: Re: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
+Message-ID: <Y0fDVXHvD+Ak/BMt@gondor.apana.org.au>
+References: <20221006223151.22159-1-elliott@hpe.com>
+ <20221012215931.3896-1-elliott@hpe.com>
+ <20221012215931.3896-5-elliott@hpe.com>
+ <Y0eosAIgkvMzYJz8@sol.localdomain>
+ <Y0eqe5lbazXzpM/K@gondor.apana.org.au>
+ <Y0erdZ/tJWgm4KKi@sol.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y0erdZ/tJWgm4KKi@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Oct 12, 2022 at 11:08:53PM -0700, Eric Biggers wrote:
+.
+> When len == 0, the following path is taken instead:
+> 
+>         if (!crypto_simd_usable() ||
+>             (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+>                 return crypto_sha1_update(desc, data, len);
 
+Good point, I missed that.
 
-> 2022年9月28日 下午3:37，Guanjun <guanjun@linux.alibaba.com> 写道：
-> 
-> From: Guanjun <guanjun@linux.alibaba.com>
-> 
-> Hi,
-> 
-
-Hi Herbert, Elliott,
-
-> This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
-> cryptographic accelerator. Enables the on-chip cryptographic accelerator of
-> Alibaba Yitian SoCs which is based on ARMv9 architecture.
-> 
-> It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
-> 
-> Please help to review.
-> 
-> Thanks,
-> Guanjun.
-> 
-> Change log:
-> v1 RESEND -> v2:
-> - [01/09] Remove char device that is not used now.
-
-Do you have any comments about this v2 patchset?
-
-Thank you very much for code review!
-
-BR,
-Guanjun
-
-> 
-> v1 -> v1 RESEND:
->  - [01/09] Adjust the Kconfig entry in alphabetical order
->  - [05/09][07/09][08/09] Adjust the format of algorithm names
-> 
-> v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
-> v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
-> 
-> Guanjun (3):
->  crypto/ycc: Add skcipher algorithm support
->  crypto/ycc: Add aead algorithm support
->  crypto/ycc: Add rsa algorithm support
-> 
-> Xuchun Shang (1):
->  crypto/ycc: Add sm2 algorithm support
-> 
-> Zelin Deng (5):
->  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
->  crypto/ycc: Add ycc ring configuration
->  crypto/ycc: Add irq support for ycc kernel rings
->  crypto/ycc: Add device error handling support for ycc hw errors
->  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
->    entry
-> 
-> MAINTAINERS                            |   8 +
-> drivers/crypto/Kconfig                 |   2 +
-> drivers/crypto/Makefile                |   1 +
-> drivers/crypto/ycc/Kconfig             |  18 +
-> drivers/crypto/ycc/Makefile            |   4 +
-> drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
-> drivers/crypto/ycc/sm2signature_asn1.h |  13 +
-> drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
-> drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
-> drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
-> drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
-> drivers/crypto/ycc/ycc_isr.h           |  12 +
-> drivers/crypto/ycc/ycc_pke.c           | 944 +++++++++++++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
-> drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
-> drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
-> 17 files changed, 4610 insertions(+)
-> create mode 100644 drivers/crypto/ycc/Kconfig
-> create mode 100644 drivers/crypto/ycc/Makefile
-> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
-> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
-> create mode 100644 drivers/crypto/ycc/ycc_aead.c
-> create mode 100644 drivers/crypto/ycc/ycc_algs.h
-> create mode 100644 drivers/crypto/ycc/ycc_dev.h
-> create mode 100644 drivers/crypto/ycc/ycc_drv.c
-> create mode 100644 drivers/crypto/ycc/ycc_isr.c
-> create mode 100644 drivers/crypto/ycc/ycc_isr.h
-> create mode 100644 drivers/crypto/ycc/ycc_pke.c
-> create mode 100644 drivers/crypto/ycc/ycc_ring.c
-> create mode 100644 drivers/crypto/ycc/ycc_ring.h
-> create mode 100644 drivers/crypto/ycc/ycc_ske.c
-> 
-> -- 
-> 1.8.3.1
-
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
