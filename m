@@ -2,164 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F874C43219
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 18:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F56C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 18:46:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbiJMSoE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 14:44:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57926 "EHLO
+        id S231901AbiJMSqa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 14:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231643AbiJMSn1 (ORCPT
+        with ESMTP id S231387AbiJMSqP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 14:43:27 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D18917D865
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Oct 2022 11:41:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1665686429;
-        bh=pa627hHCH4XvoenmN7b1ozZmVDCAJga7SwCgpoWlv7c=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-        b=YAmP1HSaEzIWQFWuu7RcMQuXBQgpqhudxhFTWxW9GGLPBX64hN4WCelXq9YEmBpn9
-         OM/sBYYBeKOuSt8+UfjufkxJ64k2mb0bflVZGa1W5SI0CAPd3vGo++Gpj2etXJhw7q
-         b5jJG3YFdg2uunk4Zmkaf3VpVxbT7tOj/zlMRsjU=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from fedora.willemsstb.de ([94.31.86.22]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MXp9Y-1odUht19US-00YBVB; Thu, 13
- Oct 2022 20:40:29 +0200
-From:   Markus Stockhausen <markus.stockhausen@gmx.de>
-To:     linux-crypto@vger.kernel.org
-Cc:     Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH 0/6] crypto/realtek: add new driver
-Date:   Thu, 13 Oct 2022 20:40:20 +0200
-Message-Id: <20221013184026.63826-1-markus.stockhausen@gmx.de>
-X-Mailer: git-send-email 2.37.3
+        Thu, 13 Oct 2022 14:46:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6234190E6A
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Oct 2022 11:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665686476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aO9uwyAWNrITIE0HcaM8sZnAKHxlA4eUnkHhusC4UKE=;
+        b=HUAZBmVZdC5JKhxZJiN2OvTGJyteki3L6JkJ0BZ6KKo/i+Jnvp1EApRGP+SMMY4szhMMJb
+        quwQzWDK7nnbLQ1Z+3hHi4F0yApuLJJW59Dd4w23yRwtke4AUYC3K99S5FZsTiY36PZ71r
+        kDYhzkm6lCCiRg6HvYqkZf8QS8KF4+Q=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-151-C_euQGe4MK6awbdrlhA1RA-1; Thu, 13 Oct 2022 14:41:15 -0400
+X-MC-Unique: C_euQGe4MK6awbdrlhA1RA-1
+Received: by mail-oi1-f199.google.com with SMTP id a14-20020a05680802ce00b00354516db947so1099986oid.10
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Oct 2022 11:41:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aO9uwyAWNrITIE0HcaM8sZnAKHxlA4eUnkHhusC4UKE=;
+        b=2kMvjCnwqFgnWP4xTxZxZNAF8js6eOOYBtjSTZ9uITpMYiGqGIbCp7u1MkRG6o6Kxm
+         eTVNgLvMVhqKvtCyDuUSXWQ00GRw3+aPr4BoXfdiCW2SIr86TPIUcg/vU5BXKDEcyBO7
+         /VKqipladJKsJpPCWdssIY05pfJ59cbTDlear5xaxAjKqiG2J7v8OdDvf2BUpgh3Ujkr
+         R3j0rtPT5uZuhZFu4RCL9SCOhhBqN7OQYf8XBbGuDckevIBL+u7svEuHwMndkUN80hRk
+         mDIEbJbGX+2J+EvD1ndXzhBmDZQ3+uCXR8TCpyJKcefnbm4smdO7KALD6Z8ZtKeTW5JW
+         BGpw==
+X-Gm-Message-State: ACrzQf3gYb7XzM7CHUUhuHE9ryY7DC/CikBiJeDqPPPjK3jrFrKgCiaj
+        BWstmi2q7y6ODzz4f5WuAGrlCceeavxqk2pXn4hAXEhxnSEHzmLfOrHSeisO9Yi+v75fwuVdNd9
+        FgIiTQWpoVuRyccJQx8x6eKe2
+X-Received: by 2002:a05:6870:596:b0:12d:91cd:cf36 with SMTP id m22-20020a056870059600b0012d91cdcf36mr6446059oap.84.1665686474649;
+        Thu, 13 Oct 2022 11:41:14 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM52k3vKtIVGL+BfBIsY/ib9UZWiX3f2GV5v2CeLaUkMNUjAO0cLO7Cc3TLwdOlxaDtAQIvz/Q==
+X-Received: by 2002:a05:6870:596:b0:12d:91cd:cf36 with SMTP id m22-20020a056870059600b0012d91cdcf36mr6446050oap.84.1665686474448;
+        Thu, 13 Oct 2022 11:41:14 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a801:9473:d360:c737:7c9c:d52b])
+        by smtp.gmail.com with ESMTPSA id v13-20020a05683024ad00b006618ad77a63sm244521ots.74.2022.10.13.11.41.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Oct 2022 11:41:14 -0700 (PDT)
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Phil Auld <pauld@redhat.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Wang Yufen <wangyufen@huawei.com>, mtosatti@redhat.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 4/4] crypto/pcrypt: Do not use isolated CPUs for callback
+Date:   Thu, 13 Oct 2022 15:40:29 -0300
+Message-Id: <20221013184028.129486-5-leobras@redhat.com>
+X-Mailer: git-send-email 2.38.0
+In-Reply-To: <20221013184028.129486-1-leobras@redhat.com>
+References: <20221013184028.129486-1-leobras@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:BKV//vM0ihh2fNBpCq1bi2j6EphNZzKvCBccyyQQptlz3v3peoM
- mQdjKK9OdcWstkVbqQJe3ijKOHlQk+k7XNpZmsZcPnVWcnRoGXa1DNGGUIEQtXCJ3Ogo/JT
- zzWhZcgXe6ZYTnzm7SoTK7FqlOFrYIOUBPGWIcxNMOSizSc5rnDbw3GWSEl6MuJd1cjzLUe
- LEfxNG8hwvgx6r+EcD9oA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tQT6JSGZccs=:28uyKNMgVB/+qMt+okoZ+t
- M2FQyTzG9+hfqLnyoZFOiiphc/X1+a0gNNMzEiA4Rq22lKNaEePrwWcp4cHh41C10pW79uc5z
- /diLXjxaYmN1UiNYTd2kv+AYEeQpU6Qo4uSct9buGIwnDH5x1t4bwoVZb0wMFVMnRD/Yakv/z
- BbrAJZCKjy4SqAeYPJA+HCE1eCyMnOZqJ92fv9oP4ZuM3o5ZUstMlN5fAUjvnVnTQFsfrWUp/
- 6fsBqGZXByTKP2KZf51gLJChIpH2TJTrN81dzaSu/5uh4tyJwtx+wNSXWpCuhX2awaIwvJ9f0
- oYeGxQ5xebpjGWnJUK4djjT3Un9zw0g74h/0ikD6RFW2DTg1XLPbR9BoIH7gixQDvVXIQdsMa
- 0ldULOA07vgLijHA/f2NNyxG+dREbg94y6FkedKCqHFUol1giPVZ2tTQm+Ittys6qfmo8oci+
- Jga+dAsVdoyVLq39mn/CN7pKT4kQbA1Tu9DR7a4zjsoQ3T6F9aOY7tbEAoCL8mHp2ogSwSvza
- erN6S0yuMNlY48u+lbDPAf4Pej89AYurMpZg93mGQIFGa9Uw2DxS/KI+4murjFVKRpK0EgKTx
- /1hSu1uEd3FV2MjZJD6nmzrl+JwBJIy842hWfLqkoyMP/0z2+5fy/y8d7O1jR42ev2j8GS16K
- a6NDqFoxAm2HsrSJCPyPfJqcT2Rrw0WrrERwO9TBXTPvA1aVHOxxLLhHJG1z8lGFqfraV7fxh
- HN663OUX3AMQxvr49THfcxbIZ01a9F2Wf9n1BcdDRMc4hzLpERMwfT5C9iWatqr7zznYTuIz+
- U6pROGVsK3MbaYzUDq44TlyKhnkOOzwmDa5xfTMDUTS08ecIIi87xnQr/V4nc9Ti+7+F1hB+1
- 8sTOSAxTCQtvQzxfIbrkucy7TSWaqXoA54q9eGCKowR/4TiU6L4rduZ0XIe3wds923C/Zk9BC
- eD3Fv/pnamH4d13FHiQH5/de6wOe3F1nwWgLJzs/bdq8/9OA9ngRNorHGyhuDETCI3/MZbw+F
- teBf6tDwr5fn8UJ3x6UsATmLRbBYG9fETI4oEfNVWL2bg6WzcCmTFT/ZvxsW32MWx66ZqTisu
- iWWKhO30m33UkCGvpzcYNQhD9phRcYPmO0Xx3ZelZuBuB8fSSfCLFpn7I8aWuyQLxKnNQn6LC
- KpWCSfTfC6NBKSK3xgMqx3TcOGcv9aUqdTsTtvG1yoXBXmltH2s7P9jz8TQX3zD6uLSW8p9fz
- 8uPiHoRTKkhCmwJtcfa0PuZnqZyk1vQf5THOKcxZxzU+RK1WRgIWXg7RYCtkHXZlQUH5Pj2dP
- uLlJNpQam7k4MIy8QOZsXCIhKTAa6V3ag6VUj93Dwm4Gf+9OrNv72apPfm4oO5+tPz5i4Rozy
- DEJN9PnRRtDD1ZoHy/ujvNGZCL0cXpBHRLnK8FSrf7g4C9xfxfslShpER+L/WcTn22nV9zcTJ
- Y8HJiiPMwAR0WJH+SfCfvqie+zQPQC5r0HAdY5hEUTpHdFXeRKhTQEN8A4Xd7R5BN8seQNE1H
- IxQNS/s3uC3SRzFrQTeUS9cQbePnXmKAhbqAXaOVcnAaw
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This driver adds support for the Realtek crypto engine. It provides hardwa=
-re
-accelerated AES, SHA1 & MD5 algorithms. It is included in SoCs of the RTL8=
-38x
-series, such as RTL8380, RTL8381, RTL8382, as well as SoCs from the RTL930=
-x
-series, such as RTL9301, RTL9302 and RTL9303. Some little endian and ARM b=
-ased
-Realtek SoCs seem to have this engine too. Nevertheless this patch was onl=
-y
-developed and verified on MIPS big endian devices.
+Currently pcrypt_aead_init_tfm() will pick callback cpus (ctx->cb_cpu)
+from any online cpus. Later padata_reorder() will queue_work_on() the
+chosen cb_cpu.
 
-Module has been successfully tested with
-- lots of module loads/unloads with crypto manager extra tests enabled.
-- openssl devcrypto benchmarking
-- tcrypt.ko benchmarking
+This is undesired if the chosen cb_cpu is listed as isolated (i.e. using
+isolcpus=... or nohz_full=... kernel parameters), since the work queued
+will interfere with the workload on the isolated cpu.
 
-Benchmarks from tcrypt.ko mode=3D600, 402, 403 sec=3D5 on a 800 MHz RTL930=
-1 SoC can
-be summed up as follows:
-- with smallest block sizes the engine is 8-10 times slower than software
-- sweet spot (harware speed =3D software speed) starts at 256 byte blocks
-- With large blocks the engine is round about 2 times faster than software
-- md5 performance is always worse than software
+Make sure isolated cpus are not used for pcrypt.
 
-op/s with default software algorithms:
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-ecb(aes) 128 bit encrypt    513593  165651   44233   11264    7846    1411
-ecb(aes) 128 bit decrypt    514819  165792   44259   11268    7851    1411
-ecb(aes) 192 bit encrypt    455136  142680   37761    9579    6673    1198
-ecb(aes) 192 bit decrypt    456524  142836   37790    9584    6675    1200
-ecb(aes) 256 bit encrypt    412102  125771   33038    8361    5825    1048
-ecb(aes) 256 bit decrypt    412321  125800   33056    8368    5827    1048
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-cbc(aes) 128 bit encrypt    476081  154228   41307   10520    7331    1318
-cbc(aes) 128 bit decrypt    462068  152934   41228   10516    7326    1315
-cbc(aes) 192 bit encrypt    426126  133894   35598    9041    6297    1132
-cbc(aes) 192 bit decrypt    416446  133116   35542    9040    6296    1131
-cbc(aes) 256 bit encrypt    386841  118950   31382    7953    5539     996
-cbc(aes) 256 bit decrypt    379032  118209   31324    7952    5537     995
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-ctr(aes) 128 bit encrypt    475435  152852   40825   10372    7225    1299
-ctr(aes) 128 bit decrypt    475804  152852   40862   10374    7227    1299
-ctr(aes) 192 bit encrypt    426900  133025   35230    8940    6228    1120
-ctr(aes) 192 bit decrypt    427377  133030   35235    8942    6228    1120
-ctr(aes) 256 bit encrypt    388872  118259   31086    7875    5484     985
-ctr(aes) 256 bit decrypt    388862  118260   31100    7875    5483     985
-                      16 B    64 B   256 B  1024 B  2048 B  4096 B  8192 B
-md5                 600185  365210  166293   52399   27389   14011    7068
-sha1                230154  124734   52979   16055    8322    4237    2137
+Signed-off-by: Leonardo Bras <leobras@redhat.com>
+---
+ crypto/pcrypt.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-op/s with module and hardware offloading enabled:
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-ecb(aes) 128 bit encrypt     65062   58964   41380   19433   14884    2712
-ecb(aes) 128 bit decrypt     65288   58507   40417   18854   14400    2627
-ecb(aes) 192 bit encrypt     65233   57798   39236   17849   13534    2468
-ecb(aes) 192 bit decrypt     65377   57100   38444   17336   13147    2406
-ecb(aes) 256 bit encrypt     65064   56928   37400   16496   12432    2270
-ecb(aes) 256 bit decrypt     64932   56115   36833   16064   12097    2219
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-cbc(aes) 128 bit encrypt     64246   58073   40720   19361   14878    2718
-cbc(aes) 128 bit decrypt     60969   55128   38904   18630   14184    2614
-cbc(aes) 192 bit encrypt     64211   56854   38787   17793   13571    2468
-cbc(aes) 192 bit decrypt     60948   53947   37209   17097   12955    2390
-cbc(aes) 256 bit encrypt     63920   55889   37128   16502   12430    2267
-cbc(aes) 256 bit decrypt     60680   53174   35787   15819   11961    2200
-                              16 B    64 B   256 B  1024 B  1472 B  8192 B
-ctr(aes) 128 bit encrypt     64452   58387   40897   19401   14921    2710
-ctr(aes) 128 bit decrypt     64425   58244   41016   19433   14747    2710
-ctr(aes) 192 bit encrypt     64513   57115   38884   17860   13547    2468
-ctr(aes) 192 bit decrypt     64531   57116   39088   17785   13510    2468
-ctr(aes) 256 bit encrypt     64284   56094   37254   16524   12411    2267
-ctr(aes) 256 bit decrypt     64272   56321   37296   16436   12411    2265
-                      16 B    64 B   256 B  1024 B  2048 B  4096 B  8192 B
-md5                  47224   44513   39175   25264   17199   10548    5874
-sha1                 46389   43578   36878   22501   14890    8796    4835
-
-Markus Stockhausen (6)
-  crypto/realtek: header definitions
-  crypto/realtek: core functions
-  crypto/realtek: hash algorithms
-  crypto/realtek: skcipher algorithms
-  crypto/realtek: enable module
-  crypto/realtek: add devicetree documentation
-
-/devicetree/bindings/crypto/realtek,realtek-crypto.yaml|   51 +
-drivers/crypto/Kconfig                                 |   13
-drivers/crypto/Makefile                                |    1
-drivers/crypto/realtek/Makefile                        |    5
-drivers/crypto/realtek/realtek_crypto.c                |  472 ++++++++++
-drivers/crypto/realtek/realtek_crypto.h                |  325 ++++++
-drivers/crypto/realtek/realtek_crypto_ahash.c          |  406 ++++++++
-drivers/crypto/realtek/realtek_crypto_skcipher.c       |  361 +++++++
-8 files changed, 1634 insertions(+)
-
-
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 9d10b846ccf73..0162629a03957 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -16,6 +16,7 @@
+ #include <linux/kobject.h>
+ #include <linux/cpu.h>
+ #include <crypto/pcrypt.h>
++#include <linux/sched/isolation.h>
+ 
+ static struct padata_instance *pencrypt;
+ static struct padata_instance *pdecrypt;
+@@ -175,13 +176,15 @@ static int pcrypt_aead_init_tfm(struct crypto_aead *tfm)
+ 	struct pcrypt_instance_ctx *ictx = aead_instance_ctx(inst);
+ 	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct crypto_aead *cipher;
++	const cpumask_t *hk_wq = housekeeping_cpumask(HK_TYPE_WQ);
+ 
+ 	cpu_index = (unsigned int)atomic_inc_return(&ictx->tfm_count) %
+-		    cpumask_weight(cpu_online_mask);
++		    cpumask_weight_and(hk_wq, cpu_online_mask);
+ 
+-	ctx->cb_cpu = cpumask_first(cpu_online_mask);
++	ctx->cb_cpu = cpumask_first_and(hk_wq, cpu_online_mask);
+ 	for (cpu = 0; cpu < cpu_index; cpu++)
+-		ctx->cb_cpu = cpumask_next(ctx->cb_cpu, cpu_online_mask);
++		ctx->cb_cpu = cpumask_next_and(ctx->cb_cpu, hk_wq,
++					       cpu_online_mask);
+ 
+ 	cipher = crypto_spawn_aead(&ictx->spawn);
+ 
+-- 
+2.38.0
 
