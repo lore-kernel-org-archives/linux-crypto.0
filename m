@@ -2,256 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A78C5C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 15:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D66DC4321E
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Oct 2022 16:21:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbiJMPPd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Oct 2022 11:15:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46386 "EHLO
+        id S229830AbiJMQVe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Oct 2022 12:21:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbiJMPPc (ORCPT
+        with ESMTP id S229534AbiJMQVd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Oct 2022 11:15:32 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43541BC62B;
-        Thu, 13 Oct 2022 08:15:28 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e733329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e733:329c:23ff:fea6:a903])
+        Thu, 13 Oct 2022 12:21:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CBCBA3F69;
+        Thu, 13 Oct 2022 09:21:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CF5B01EC064E;
-        Thu, 13 Oct 2022 17:15:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1665674122;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 182AB6173A;
+        Thu, 13 Oct 2022 16:21:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5671C433D6;
+        Thu, 13 Oct 2022 16:21:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GP4P33Go"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665678086;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=BxnWw47WYQ2Rd0ryZEoZGtMXC47/yHMYat/iIrPgZcw=;
-        b=afoCRuEWH+GTymUBeY2g6XheR8ovjS20OpCNHyMXhtOOr0NLl4oHSxCq6HnUtLkdAxg9zf
-        GHDQQ2HadRqEIdaMl3VtOQKtHzKaIoPY7Pk1Hp4F/7Y/4BA+z2YbWUwg16pSniaeTsYX6c
-        ZfNiSxF6r9SRNWZOAaxx48DAJASLFT0=
-Date:   Thu, 13 Oct 2022 17:15:18 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y0grhk1sq2tf/tUl@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=kPntWr7A6bA616PExnbnx5reDbccdV4V+F7u1oTVbdw=;
+        b=GP4P33GoTZTXwgHWO1z/FqyjryY8qsqfXNBCumID69G06rmzAbuflrmGXm0knLxOwy6AOV
+        r5Se8is8rcJ8teWZq2zoRDvfJGTZawQk7FulxMoGHupIBrT9us1rnRt6jRmg3GIbXoJ/w6
+        20UjSRmQn/6S5nyrDvb7rvSacSvCVHE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5f752f1b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 13 Oct 2022 16:21:25 +0000 (UTC)
+Date:   Thu, 13 Oct 2022 10:21:18 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Rolf Eike Beer <eike-kernel@sf-tec.de>
+Cc:     Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
+        patches@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Graf <tgraf@suug.ch>, kasan-dev@googlegroups.com,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kernel-janitors@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        loongarch@lists.linux.dev, netdev@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v6 5/7] treewide: use get_random_u32() when possible
+Message-ID: <Y0g6/sIJMq/JRe6y@zx2c4.com>
+References: <20221010230613.1076905-1-Jason@zx2c4.com>
+ <3026360.ZldQQBzMgz@eto.sf-tec.de>
+ <20221013101635.GB11818@breakpoint.cc>
+ <11986571.xaOnivgMc4@eto.sf-tec.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <11986571.xaOnivgMc4@eto.sf-tec.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 11:05:01PM +0000, Ashish Kalra wrote:
-> +static void snp_leak_pages(unsigned long pfn, unsigned int npages)
+On Thu, Oct 13, 2022 at 01:40:40PM +0200, Rolf Eike Beer wrote:
+> Am Donnerstag, 13. Oktober 2022, 12:16:35 CEST schrieb Florian Westphal:
+> > Rolf Eike Beer <eike-kernel@sf-tec.de> wrote:
+> > > Florian, can you comment and maybe fix it?
+> > 
+> > Can't comment, do not remember -- this was 5 years ago.
+> > 
+> > > Or you wanted to move the variable before the loop and keep the random
+> > > state between the loops and only reseed when all '1' bits have been
+> > > consumed.
+> > Probably.  No clue, best to NOT change it to not block Jasons series and
+> > then just simplify this and remove all the useless shifts.
+> 
+> Sure. Jason, just in case you are going to do a v7 this could move to u8 then.
 
-That function name looks wrong.
+Indeed I think this is one to send individually to netdev@ once the tree
+opens there for 6.2.
 
-> +{
-> +	WARN(1, "psc failed, pfn 0x%lx pages %d (leaking)\n", pfn, npages);
-> +	while (npages--) {
-> +		memory_failure(pfn, 0);
-		^^^^^^^^^^^^^^^^^^^^^^
-
-Why?
-
- * This function is called by the low level machine check code
- * of an architecture when it detects hardware memory corruption
- * of a page. It tries its best to recover, which includes
- * dropping pages, killing processes etc.
-
-I don't think you wanna do that.
-
-It looks like you want to prevent the page from being used again but not
-mark it as PG_hwpoison and whatnot. PG_reserved perhaps?
-
-> +		dump_rmpentry(pfn);
-> +		pfn++;
-> +	}
-> +}
-> +
-> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages, bool locked)
-> +{
-> +	struct sev_data_snp_page_reclaim data;
-> +	int ret, err, i, n = 0;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		memset(&data, 0, sizeof(data));
-> +		data.paddr = pfn << PAGE_SHIFT;
-
-Oh wow, this is just silly. A struct for a single u64. Just use a
-
-	u64 paddr;
-
-directly. But we had this topic already...
-
-> +
-> +		if (locked)
-
-Ew, that's never a good design - conditional locking.
-
-> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> +		else
-> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-
-<---- newline here.
-
-> +		if (ret)
-> +			goto cleanup;
-> +
-> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-> +		if (ret)
-> +			goto cleanup;
-> +
-> +		pfn++;
-> +		n++;
-> +	}
-> +
-> +	return 0;
-> +
-> +cleanup:
-> +	/*
-> +	 * If failed to reclaim the page then page is no longer safe to
-> +	 * be released, leak it.
-> +	 */
-> +	snp_leak_pages(pfn, npages - n);
-
-So this looks real weird: we go and reclaim pages, we hit an error
-during reclaiming a page X somewhere in-between and then we go and mark
-the *remaining* pages as not to be used?!
-
-Why?
-
-Why not only that *one* page which failed and then we continue with the
-rest?!
-
-> +	return ret;
-> +}
-> +
-> +static inline int rmp_make_firmware(unsigned long pfn, int level)
-> +{
-> +	return rmp_make_private(pfn, 0, level, 0, true);
-> +}
-
-That's a silly wrapper used only once. Just do at the callsite:
-
-	/* Mark this page as belonging to firmware */
-	rc = rmp_make_private(pfn, 0, level, 0, true);
-
-> +
-> +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, bool to_fw, bool locked,
-> +			     bool need_reclaim)
-
-Tangential to the above, this is just nuts with those bool arguments.
-Just look at the callsites: do you understand what they do?
-
-	snp_set_rmp_state(paddr, npages, true, locked, false);
-
-what does that do? You need to go up to the definition of the function,
-count the arguments and see what that "true" arg stands for.
-
-What you should do instead is, have separate helpers which do only one
-thing:
-
-	rmp_mark_pages_firmware();
-	rmp_mark_pages_shared();
-	rmp_mark_pages_...
-
-and then have the *callers* issue snp_reclaim_pages() when needed. So you'd have
-
-	rmp_mark_pages_firmware();
-	rmp_mark_pages_shared()
-
-and __snp_free_firmware_pages() would do
-
-	rmp_mark_pages_shared();
-	snp_reclaim_pages();
-
-and so on.
-
-And then if you need locking, the callers can decide which sev_do_cmd
-variant to issue.
-
-And then if you have common code fragments which you can unify into a
-bigger helper function, *then* you can do that.
-
-Instead of multiplexing it this way. Which makes it really hard to
-follow what the code does.
-
-
-> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT; /* Cbit maybe set in the paddr */
-
-No side comments pls.
-
-> +	int rc, n = 0, i;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		if (to_fw)
-> +			rc = rmp_make_firmware(pfn, PG_LEVEL_4K);
-> +		else
-> +			rc = need_reclaim ? snp_reclaim_pages(pfn, 1, locked) :
-> +					    rmp_make_shared(pfn, PG_LEVEL_4K);
-> +		if (rc)
-> +			goto cleanup;
-> +
-> +		pfn++;
-> +		n++;
-> +	}
-> +
-> +	return 0;
-> +
-> +cleanup:
-> +	/* Try unrolling the firmware state changes */
-> +	if (to_fw) {
-> +		/*
-> +		 * Reclaim the pages which were already changed to the
-> +		 * firmware state.
-> +		 */
-> +		snp_reclaim_pages(paddr >> PAGE_SHIFT, n, locked);
-> +
-> +		return rc;
-> +	}
-> +
-> +	/*
-> +	 * If failed to change the page state to shared, then its not safe
-> +	 * to release the page back to the system, leak it.
-> +	 */
-> +	snp_leak_pages(pfn, npages - n);
-> +
-> +	return rc;
-> +}
-
-...
-
-> +void snp_free_firmware_page(void *addr)
-> +{
-> +	if (!addr)
-> +		return;
-> +
-> +	__snp_free_firmware_pages(virt_to_page(addr), 0, false);
-> +}
-> +EXPORT_SYMBOL(snp_free_firmware_page);
-
-EXPORT_SYMBOL_GPL() ofc.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
