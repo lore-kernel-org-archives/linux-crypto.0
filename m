@@ -2,58 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29575C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 08:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E8C3C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 08:29:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbiJNI0M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Oct 2022 04:26:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42454 "EHLO
+        id S229543AbiJNI3d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Oct 2022 04:29:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbiJNI0M (ORCPT
+        with ESMTP id S229504AbiJNI3b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Oct 2022 04:26:12 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7741C208B;
-        Fri, 14 Oct 2022 01:26:07 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ojG0z-00EdPa-VO; Fri, 14 Oct 2022 19:25:59 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Oct 2022 16:25:57 +0800
-Date:   Fri, 14 Oct 2022 16:25:57 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Shen <shenyang39@huawei.com>
-Cc:     davem@davemloft.net, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, gregkh@linuxfoundation.org
-Subject: Re: [RFC PATCH 0/6] crypto: benchmark - add the crypto benchmark
-Message-ID: <Y0kdFaXQtsJxgrC0@gondor.apana.org.au>
-References: <20220919120537.39258-1-shenyang39@huawei.com>
- <Yyl5yKQCAgPBbFd7@gondor.apana.org.au>
- <3dd984c1-d17f-0a6a-c52e-87e161f867fc@huawei.com>
- <YzZ12Y/kEF4DrQV6@gondor.apana.org.au>
- <09d0686b-1955-c63d-c02d-fb0d2db42672@huawei.com>
+        Fri, 14 Oct 2022 04:29:31 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425871C25D2;
+        Fri, 14 Oct 2022 01:29:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=gD39mBbo0s0UHYxPnZ34EfcXGTw8rckrJNocMHrWBSw=; b=UgSEIjRpo8QQ6VdXqqsR63zRgt
+        ylKpQJPUyweLufskIjrb8gvM9b78nEcOO4QtONDjOoOuZYqGod6cnJAxyrumh86ggF4OLWXjhjgjp
+        I3+vtCg5SbKRSCOJXJX3APOHORxYj46N64JOnsb/Tz4DFhP6Lq40frO/3PrbLcVBdReVPwATApgyA
+        zvxE0q/yo9L75twoJikwyaAQsRToWyjQJ5NyEpC/kbx977dn8mPKRTh42grM7XmaQeuQYd/nYs9mR
+        NqudyS26pk8TArNtJU1Ulqu5dkJb2VwCNZgRJ4vHic1LlLtYq+0J3Os9xMF8ZItYmWaqSLGCneW0l
+        RLZtuGTQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ojG3p-007TAC-90; Fri, 14 Oct 2022 08:28:53 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1BEC930012F;
+        Fri, 14 Oct 2022 10:28:46 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id D31C6203CF67F; Fri, 14 Oct 2022 10:28:46 +0200 (CEST)
+Date:   Fri, 14 Oct 2022 10:28:46 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Leonardo Bras <leobras@redhat.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Phil Auld <pauld@redhat.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Wang Yufen <wangyufen@huawei.com>, mtosatti@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] sched/isolation: Fix style issues reported by
+ checkpatch
+Message-ID: <Y0kdvpcrCCD9qY8q@hirez.programming.kicks-ass.net>
+References: <20221013184028.129486-1-leobras@redhat.com>
+ <20221013184028.129486-2-leobras@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <09d0686b-1955-c63d-c02d-fb0d2db42672@huawei.com>
+In-Reply-To: <20221013184028.129486-2-leobras@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 09:43:40AM +0800, Yang Shen wrote:
->
-> Got it. I'll try to support this on the tcrypt.
+On Thu, Oct 13, 2022 at 03:40:26PM -0300, Leonardo Bras wrote:
+> scripts/checkpatch.pl warns about:
+> - extern prototypes should be avoided in .h files
 
-Before you get too far into this, please note that I have no
-preference as to whether you go with tcrypt or your new benchmark
-code.
+Checkpatch is wrong... :-)
 
-My only requirement is that we pick one mechanism.
-
-But obivously others might have a preference so you should try
-to produce RFCs as early as possible.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+(and yeah, I know the opinions on extern are divided, but I like it)
