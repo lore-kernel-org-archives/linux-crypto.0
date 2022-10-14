@@ -2,123 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF31C43217
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 09:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D8DC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 10:08:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiJNJnx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Oct 2022 05:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35104 "EHLO
+        id S230064AbiJNKIA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Oct 2022 06:08:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiJNJnv (ORCPT
+        with ESMTP id S229970AbiJNKHy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Oct 2022 05:43:51 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAD114DF3F;
-        Fri, 14 Oct 2022 02:43:50 -0700 (PDT)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MphDH4vnYz1P7RV;
-        Fri, 14 Oct 2022 17:39:11 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 14 Oct 2022 17:43:48 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Fri, 14 Oct
- 2022 17:43:48 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
-Subject: [PATCH 2/3] crypto: hisilicon/qm - add pci bdf number check
-Date:   Fri, 14 Oct 2022 09:38:06 +0000
-Message-ID: <20221014093807.3101-3-yekai13@huawei.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20221014093807.3101-1-yekai13@huawei.com>
-References: <20221014093807.3101-1-yekai13@huawei.com>
+        Fri, 14 Oct 2022 06:07:54 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8F715381B
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Oct 2022 03:07:52 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id bu30so6796153wrb.8
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Oct 2022 03:07:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kPSC14H4qvXkT9TYkAZgmifJI9m19ef7qgoJ4OsHyyg=;
+        b=vnlPWAmwmg0Zu0PEMDLBoa6dhUKeqWzyoHwUBGMfJ7nVwamcozMkMIhqh6E/zs7Y31
+         bPNQRhSvMPKWcsBOvMJKluiIsuLnfxFpqHpTXCZAONw2Ppgoq9JpNDaBcoXk9hmT63dH
+         sKKlPQlXA4+rChv4Xrri3HQgo+D86h/YVo40Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kPSC14H4qvXkT9TYkAZgmifJI9m19ef7qgoJ4OsHyyg=;
+        b=NTdkYHdyPjfzRNrDv5GWczxxoD7GJBh4fTLx1seplMWpOL7Br12wllttXTxhug+cRK
+         8XF5nwsKnbRBhwBPuslgxKm/CTNY2PtoN+WYRObjuD+mH9Zdxd09pS4jSyZgc1a+4BCf
+         onNyIaedSCDS8CkpsrqmWYchM1hEsrWN9xlAR5AzgXtmY16uRD7QAg+3Tmc0xooYjBhs
+         J1W/DVJ8rWb5hwvYmp01ZY+s2ZSglxxr/j+K+/GjO5m0Sncb9YHuoW7uIw0V6gmHKYVq
+         4ZaWiwZN/SQIuCQvSoPl5nUtDtLLsnYHB0ArYaFPqSWXtzvpF0fgaDNlpRJJwg5J7Kks
+         SRwQ==
+X-Gm-Message-State: ACrzQf37A3Z5VOdcYXy4zaGT0kutnH5mqWNW0j0FZfBePdoLmX5o/G/x
+        AMQgT6abmwOhQ6N9DROTblGbbw==
+X-Google-Smtp-Source: AMsMyM63n0BME1wzakGcd9fpHxmmjPaT7s3n01NO4QiDx0MC/YSVqw0PfekfOqiRcGaQE7RhMCABWg==
+X-Received: by 2002:adf:9dd0:0:b0:22c:d6cc:b387 with SMTP id q16-20020adf9dd0000000b0022cd6ccb387mr2922910wre.353.1665742071061;
+        Fri, 14 Oct 2022 03:07:51 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:c7c:5308:6600:49a0:d6bf:5c1a:f3da])
+        by smtp.gmail.com with ESMTPSA id c15-20020a5d414f000000b002285f73f11dsm1931008wrq.81.2022.10.14.03.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Oct 2022 03:07:50 -0700 (PDT)
+From:   Ignat Korchagin <ignat@cloudflare.com>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kernel-team@cloudflare.com, lei he <helei.sig11@bytedance.com>,
+        Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH v2 0/4] crypto, keys: add ECDSA signature support to key retention service
+Date:   Fri, 14 Oct 2022 11:07:33 +0100
+Message-Id: <20221014100737.94742-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.37.0 (Apple Git-136)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pci bdf number check is added for qos written by using the pci api.
+Changes from v1:
+  * fixed code format
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 37 ++++++++++++-----------------------
- 1 file changed, 12 insertions(+), 25 deletions(-)
+Kernel Key Retention Service[1] is a useful building block to build secure
+production key management systems. One of its interesting features is
+support for asymmetric keys: we can allow a process to use a certain key
+(decrypt or sign data) without actually allowing the process to read the
+cryptographic key material. By doing so we protect our code from certain
+type of attacks, where a process memory memory leak actually leaks a
+potentially highly sensitive cryptographic material.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 335e58018a31..661cc964e2eb 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4591,49 +4591,36 @@ static ssize_t qm_algqos_read(struct file *filp, char __user *buf,
- 	return ret;
- }
- 
--static ssize_t qm_qos_value_init(const char *buf, unsigned long *val)
--{
--	int buflen = strlen(buf);
--	int ret, i;
--
--	for (i = 0; i < buflen; i++) {
--		if (!isdigit(buf[i]))
--			return -EINVAL;
--	}
--
--	ret = sscanf(buf, "%lu", val);
--	if (ret != QM_QOS_VAL_NUM)
--		return -EINVAL;
--
--	return 0;
--}
--
- static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
- 			       unsigned long *val,
- 			       unsigned int *fun_index)
- {
-+	struct bus_type *bus_type = qm->pdev->dev.bus;
- 	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
- 	char val_buf[QM_DBG_READ_LEN] = {0};
--	u32 tmp1, device, function;
--	int ret, bus;
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+	int ret;
- 
- 	ret = sscanf(buf, "%s %s", tbuf_bdf, val_buf);
- 	if (ret != QM_QOS_PARAM_NUM)
- 		return -EINVAL;
- 
--	ret = qm_qos_value_init(val_buf, val);
-+	ret = kstrtoul(val_buf, 10, val);
- 	if (ret || *val == 0 || *val > QM_QOS_MAX_VAL) {
- 		pci_err(qm->pdev, "input qos value is error, please set 1~1000!\n");
- 		return -EINVAL;
- 	}
- 
--	ret = sscanf(tbuf_bdf, "%u:%x:%u.%u", &tmp1, &bus, &device, &function);
--	if (ret != QM_QOS_BDF_PARAM_NUM) {
--		pci_err(qm->pdev, "input pci bdf value is error!\n");
--		return -EINVAL;
-+	dev = bus_find_device_by_name(bus_type, NULL, tbuf_bdf);
-+	if (!dev) {
-+		pci_err(qm->pdev, "input pci bdf number is error!\n");
-+		return -ENODEV;
- 	}
- 
--	*fun_index = PCI_DEVFN(device, function);
-+	pdev = container_of(dev, struct pci_dev, dev);
-+
-+	*fun_index = pdev->devfn;
- 
- 	return 0;
- }
+But unfortunately only RSA algorithm was supported until now, because
+in-kernel ECDSA implementation supported signature verifications only.
+
+This patchset implements in-kernel ECDSA signature generation and adds
+support for ECDSA signing in the key retention service. The key retention
+service support was taken out of a previous unmerged patchset from Lei He[2]
+
+[1]: https://www.kernel.org/doc/html/latest/security/keys/core.html
+[2]: https://patchwork.kernel.org/project/linux-crypto/list/?series=653034&state=*
+
+Ignat Korchagin (2):
+  crypto: add ECDSA signature generation support
+  crypto: add ECDSA test vectors from RFC 6979
+
+lei he (2):
+  crypto: pkcs8 parser support ECDSA private keys
+  crypto: remove unused field in pkcs8_parse_context
+
+ crypto/Kconfig                        |   3 +-
+ crypto/Makefile                       |   4 +-
+ crypto/asymmetric_keys/pkcs8.asn1     |   2 +-
+ crypto/asymmetric_keys/pkcs8_parser.c |  46 +++-
+ crypto/ecc.c                          |   9 +-
+ crypto/ecdsa.c                        | 373 +++++++++++++++++++++++++-
+ crypto/ecprivkey.asn1                 |   6 +
+ crypto/testmgr.c                      |  18 ++
+ crypto/testmgr.h                      | 333 +++++++++++++++++++++++
+ include/crypto/internal/ecc.h         |  10 +
+ 10 files changed, 787 insertions(+), 17 deletions(-)
+ create mode 100644 crypto/ecprivkey.asn1
+
 -- 
-2.33.0
+2.30.2
 
