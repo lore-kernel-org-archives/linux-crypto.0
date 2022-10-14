@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F62C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 20:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DA3C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 21:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbiJNUAW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Oct 2022 16:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57718 "EHLO
+        id S229648AbiJNVJX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Oct 2022 17:09:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbiJNUAU (ORCPT
+        with ESMTP id S229652AbiJNVJV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Oct 2022 16:00:20 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2057.outbound.protection.outlook.com [40.107.237.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7460B8E7A9;
-        Fri, 14 Oct 2022 13:00:18 -0700 (PDT)
+        Fri, 14 Oct 2022 17:09:21 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08ACD1DC822;
+        Fri, 14 Oct 2022 14:09:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iAcSEtgoAvH2jMbHy/tHYM6ocOcA/KQO8sJ6HOp+CmgJf2c8d9Y9JDzszqHK4jjMJov8L/fKoBcBZuyMEWKdVF1OYb6qBp7UwBrjHwUrE2Y/DP/Sx2dQS5AzCgdICVMOI6hfW4w+OJ+5k0jsnuQCApWqV10yPlXWDzwlXuJUPIjQaY963q9p/soEC93j6ApCrtlCjBzTOTmpUH01ssqi9VBysct3ZfEzs6DsnsbdjETsw+drGcm4kGnn8VtaMSqgPTU/KmKHn9xxnI40rcRzn6nM6ROv/3uyCOG1pM1pG5zPywfR8FF5gbtSPZcygkR/9cYaKbwj0bbVuaGqqBKf/g==
+ b=LQVNXbW7AeG4KVVje8L5lcAkvW6FvuCMmV2ApPR31j3wtr5DyYA4sPmCH70kYm3+CFQez5CzYNmoRe1U2Tg8RBRITSxvGFursMPV52MWfbBtPkP9vd5jKt32uUo5Z6LiabGO4AZqm+QGMZALrfhWbDwW+/qgRzlQL478nvWgqEdwQe12Lekdk9+l0FVFFuGHhgVDfBQsY1n9njBG7JHElVEyxQNveKr4mkZf6qevPcqLONt1ZVBqj3pLtspRcQtHyKupGq5pTqd7unNMhgdoW6uQl4YHZ1EKZiySA9gl7cN97Xcf1b0CuRr1mFUlSyxqzrEnB3KDqnfiHn3urGaXcg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gEkf8qVerPjr6EMXSOjekh7ie6Af1vYnbzkPYpoJgYc=;
- b=cu4GuzV9hExz2kM/C2eCpY5iti2ggb9i8N1AoV60Ym8tOxmFEvZZByoKDi0CRxJCCZ6ZaHoF1z5xA/gxBNMjAqWj8D7IGJ9MON/2Auw9TNanwt1Rdf/SHGXRnNrrInaOk61OxO1xjgsCPfPYhnBC8XpvQSfSLU0VFg7430jAbWiunk8JM/Npz7YTyYshl5svGcsJU9quQb/fVhY+Cw75aqNk0nEvrMi3isjkOD2uz04q6wemd+w94xd1zORNoFVn9dLH6zEwzrvvahb7BBhtZnFQtQHQ7WpTQLVLTqsaWJeiHHj5jiRMFrBeaV0li62ycZgfuCogK2beQic1EDnhsg==
+ bh=aFfwb7Ia6RjTQLBtQ1zxJKKj2IeqG0FMS0QPRb7sPQY=;
+ b=ZFinu+eX0t/hwiQ5T5ugtBaUPFlT3dNiiIuQCc1TRyzQlhhnZNHXkp1LePGEI9rrI8VzeFK6FU8HNqzLv4s/PBl140rwLZVQ9RJOoNn/UpjjiDH0MXLatzTUIINf8enL6IAHrlh1cC0FgTJj+6L+5WHorEDvk2y8078y+8zKYpA0RTm05uV0F/WmnvE5Qanqq3vgXf8GpMopF1nH8sKGEykFbjeQBpIRthFRG8R82E7NqwrmQ34GSaQ16qk7tPVQjkKpU/OJT85kXRnCXXUhQZCWIBylebDKEl+/HvONp/Fn8MwL+1rZfuhxb31P9T7b60aXafMeZ4W8Ecvff1cIhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gEkf8qVerPjr6EMXSOjekh7ie6Af1vYnbzkPYpoJgYc=;
- b=KberASEIOGMotxudR9sfUuLpdUmIFlwxG0Zqc0HPlpZsj/xdv9fJaAagyhGSaQDCM2yp5y28Rld63r7lyA1gLSs9a/zc7RGwjxJmwvnkrZvAeU2UVWMKB1oSsBGO4E/yrSirywItuD1N1lv3/mBXYuO20uTHlZgMfxvntR+SyJE=
+ bh=aFfwb7Ia6RjTQLBtQ1zxJKKj2IeqG0FMS0QPRb7sPQY=;
+ b=vRnBPGcOPszYRUmaE1zE9EcAp6hWW8qOufRqSP7Bnx3qlYPnpShAAgikezsPB0AMo/saUCUsMV8RoxQcfN+IFZtBKJY8SDMziTKaYs83uM27BMDG9yj9qp6O50yRe5YxSTAEquZvcG7xv/DWBi/Lp4FVZeaY2Slii+WoKhsx08o=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by BY5PR12MB4193.namprd12.prod.outlook.com (2603:10b6:a03:20c::19) with
+ by BL1PR12MB5285.namprd12.prod.outlook.com (2603:10b6:208:31f::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.29; Fri, 14 Oct
- 2022 20:00:14 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Fri, 14 Oct
+ 2022 21:09:17 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::6dad:12a0:10d6:5967]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::6dad:12a0:10d6:5967%7]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022
- 20:00:14 +0000
-Message-ID: <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
-Date:   Fri, 14 Oct 2022 15:00:09 -0500
+ 21:09:17 +0000
+Message-ID: <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
+Date:   Fri, 14 Oct 2022 16:09:11 -0500
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.1
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
+Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
 Content-Language: en-US
 To:     Borislav Petkov <bp@alien8.de>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -62,314 +62,260 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
         dgilbert@redhat.com, jarkko@kernel.org
 References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
+ <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
+ <Yzh558vy+rJfsBBq@zn.tnic>
 From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <Y0grhk1sq2tf/tUl@zn.tnic>
+In-Reply-To: <Yzh558vy+rJfsBBq@zn.tnic>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR17CA0014.namprd17.prod.outlook.com
- (2603:10b6:610:53::24) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH0PR03CA0237.namprd03.prod.outlook.com
+ (2603:10b6:610:e7::32) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|BY5PR12MB4193:EE_
-X-MS-Office365-Filtering-Correlation-Id: 359dc2ae-e177-4767-8536-08daae1eb57a
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|BL1PR12MB5285:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33bf375b-a75e-47e0-a1dd-08daae285ab6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0e+lmwMs7CE+YETS5WYN8Z5KywhrX0sxbCKoo8ATX/cT+w15eiKtqDvja2wbMlowSkM2zprSMVb8noQmSvugC9xIEkYQuazR2edXulE6HtheZClL+9F181aLBmiT6KKmiQtkjZiJcUghBzscmqaEBugMiU9CgWyVvatdfQT9KaOvDExBS1723aSGmr0eQSYOKJdw9zwsLyISEsPuO2E1YBrJp1J8E2E3L7J3Cmb9T/AcbDdK6yDJNfns1sLm0orwJ16RakVlGJs1srTvQR+1Ay+JcTQUxWvHF5b5pmGK0f0yS5/GGf65AvdHLbR+njYr3ABES4wMfcgytvhWNk4YFffSzuQ6kpz8DBLlTxJfwhqXTt4Gban720IFcjL6lb8IXfiXdL+daDyMj/Rg4ZX6giEVTeCojY8OpSodKpEmbc0bjp7zvP0ske4GaVmZMScUaa/9OcFJk0RPHCopFcPPYl2Q3uWYi0zrhTQ+DMw2R0f3UbxsrGM+BpKRJqq371/6tdDQC9vNB6FqEFKnR2tvkp3pL5V5lzds42GWsQf/hUBfjzipZeqkoFQ8SC15u1LJxKGuy2tNhFwx2px6GVtTZ1fNKx7Ld0aeXzdQe9noWQUrnv2ITBqZ2VIwRcTLTUzihOn1i4JpMdYe83uVpt2DHowGsVAq6SIGIr/neLYvB1TalqloYQVAh8RTuNWQMwaQPMYdfQ4eBmZz4oQwpxO6n671Qalqq+0MoU30VUmkO83Qjd/8n/YtmpRSt3gZO9dpnz2AWVbIHGw+AXi+fJOGpo6JTIJf7dZE4K/LvuUYbBg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(136003)(396003)(366004)(39860400002)(451199015)(66476007)(4326008)(66946007)(316002)(6916009)(66556008)(8676002)(38100700002)(36756003)(7416002)(41300700001)(478600001)(8936002)(2906002)(7406005)(5660300002)(6666004)(53546011)(6506007)(186003)(2616005)(6512007)(26005)(31696002)(83380400001)(6486002)(86362001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 4tuYATPjushDpxgCFQjPWuImmo3E5scs6dJZnbUBi4DSKdrS63NKjKxIbXXrvPlNhq6Ymjr6oKcONt+jC5/BomRJSXOFaltzqzMxK+nC8JkcF6CGRoqVq5PmjRsNiKWDjEDU9qzzXr0Tpk9jIH+y0pCds9Kf89h0DuPNfRH4Sgqx3y0KLNe3CGI/AfBibhRufijvLCRGd7Lif0q6ElqxdKqBJfuDkBomG/8X8+9zuCK4WPwESaTDmyjOI2Z6FhlXAv6PMVpLrSNsfYRYq9SdE0nxM3J0nUEVwcijN8JwcN06ychCDgJQHJxttsotfaMphcLFJ+75sOFbitZteFv38g5WWykwMIqu1mwRPtJ/2ItWGPYKDN/6qzQwxVIfRxOpR20H9cZ/8l9pbfrkIaC/xr9wOU2K0csQwktCS2XRe+n0yYZ2WX6QCiz2zKl3Ip5ut4+e9YCRGBtJBUmapjAnHAtQKNobwVI8zb0j6ryfgjIg+GsK9h+F2/v4PwXmgH58GmwHCxaMxthcGwAayBcdjHyyRpTRzAVYlPpITMuw4pycGMzmuBXBumj1BPQWxC1AB9dfGQkzqBmTsO5NGGlxI5yByDbDbnhQ2eRj2xBAygtXFmToFi+kasyeXemhGZTEIS7hTHlsQFNDeIQk2eDzadlf1hThzbP3E4/5e2tCuHkb9M52WmoDjP5nUGogAazipHOd01l4Iqz7jf/7pVdMKdlmnm4hMSdfUrfSL/C3+Je4oL7GOSKNyhD6odJL76vOrbQr1NmzE3N/OoFRqXGveYFvu3X8uiyoDwhPhiN1HEgwkGCUNzsw60qisA0NWfhLBvo4LjYS9nCAb3ewnZ2Gqg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(346002)(366004)(376002)(136003)(451199015)(5660300002)(7406005)(7416002)(2906002)(38100700002)(2616005)(6506007)(41300700001)(26005)(83380400001)(8936002)(186003)(31696002)(53546011)(86362001)(6512007)(36756003)(478600001)(316002)(6916009)(31686004)(66946007)(8676002)(66476007)(4326008)(66556008)(6666004)(6486002)(43740500002)(45980500001)(134885004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QWYxUmZuaWpCaVRzQjBGaWZoN1pTNWw1YXhuMmRBOWNwdVJuK1ZwZDlYb3BK?=
- =?utf-8?B?QVl4bmpFZUlmby9ueFpQUDNHUnpReiticXZTSjk0Y2tPTElTbmtLZ3Z4YWgz?=
- =?utf-8?B?VEI4aVZ6ZFFEUnBsa2xBcDhTWksweUVPOVc3L3Q5ZmZnbU5hblM1Zmg1cUl5?=
- =?utf-8?B?cHBKWDhHNk5pYVlVSFlTNXlGL2FTYlcyNnhsczhub2ZETHhGWERwQm1ERVhX?=
- =?utf-8?B?dTBEZ1g4TXBsb3VJc3RCcFdyQnFYNTFQNG84MnBZTU9uNklVVEg3UDRLRmZO?=
- =?utf-8?B?ckFHUTB4ODNBZlVwQjh2ZzZSVDAzZU82MXhjcWVZMjJsVUxjWFBQTndvcEhl?=
- =?utf-8?B?UXBpdXBmaGtHVHBIbEczOHVVMUV0NzhycisvV3RPMGIya2hHY2JuVHBLckMv?=
- =?utf-8?B?NW45d0dhaVcxSFRxbDNFUVA4SUg3NnZWWUtxbStOcDN4dmlqM3ZwT2E4bWlp?=
- =?utf-8?B?U1pvZWdxT2w0M1A4T1FWQ0tJKzdHclVnOTdvcnRET3M2STZGZEVvMUIxazl0?=
- =?utf-8?B?aysrSFFtWTlXa2FSQ1MzdFlqMHBMYUw0QXYyemdKc0ZqSGpDM0VreEx4dmNV?=
- =?utf-8?B?dzFZakFtZEl6SGJuNS9acmFNMUlOaUU2Sko3V3pmN21YelM5NlVGeVd5K1dU?=
- =?utf-8?B?UHV5dGdMV1d1RUF3WUVzc04wRWZwR0huMFVCZFlZaXVmdjZ4MW01eC9LWUd5?=
- =?utf-8?B?TlExeUdBUmlGazVwTWY5UDJsOW1OcXBDWEROMG5rL09BQ2s2WldRbVgvNEhC?=
- =?utf-8?B?d1ZXNmd4ZVA0QnQ0Mm1wRG5wbkFkSExuM2VsU00zcVEwMjZ0MXo1MUZPZUd4?=
- =?utf-8?B?R2w5U3cyeHZFYmtnRXBIaXRXZGlIWEhDV2lMYUFjYTFTcTNseHRoV1VtYU9T?=
- =?utf-8?B?VDh1UjRMbVVSZThneGExSVFyT2V6Zi9memgvYmFNa1RJb1FvOWtOc1hJeVBK?=
- =?utf-8?B?U1UrWTNudWlLQTFYbGt2UE11Mld3TENoWGJLMHk5ZXpSb09SVlZlU2RIZW5J?=
- =?utf-8?B?N25uZEhRUDAvaUxnc1k0VTNvZVJnYWY1YzZwK3VDQmc3SUFOdkNBN1g3MDNM?=
- =?utf-8?B?bnJwUG1aOFl5V1lGYWlmV0V3akJTV1JpYVduemJ4TTgzSmhJUUJoMnArR25P?=
- =?utf-8?B?clpXRE9RSVg4Q2RrN0RQT3d4dDgyVkU4bEFrWkdQdnlmem1rU3BNVGVFWXlZ?=
- =?utf-8?B?MjZWODJxNkpRbVFnUk4rN2h0WXVnT0dEeUtWWlFEcEJGcEQzYUpRWWo5NXpl?=
- =?utf-8?B?anhKM2ovLzFublA0a0F0ZjZUVkNjWmhaV3ZzSEpmSVFITXIwSGhhRnAvRzhq?=
- =?utf-8?B?Umw5NVRtMmpZTkxteXVaUi9iQmR1K3NRWW51dGUwYTFWTGg5a1ZrL1pVQnRk?=
- =?utf-8?B?RjZGQzBHaTNrL1Z3cHdHOHJKT1dWNVBkWWRlaUcvalQwY0RNT01jZS9CYnJK?=
- =?utf-8?B?YUlqWDhmL29LYU9BRTkzLzJROU1Vb01JVmdjT05ZUndiS1NZb3dyQmZQU1Fy?=
- =?utf-8?B?aktWLzAyakZDVS9kcHFVenF6ZVFrV2pDVTNHSGlIeEgrdXVlc3hIOXBudHRy?=
- =?utf-8?B?WUw0NFlGdHVNbG5pSEt5VmhqcjNqWmR6Ykd0V1pOMWdJcklmMkx0cGQ0MzRK?=
- =?utf-8?B?WmdWY29MNS9yN2M3Qkx5eGNRS3l0YStZb1Z0TzllVFR3V2RManRITWRZMWxx?=
- =?utf-8?B?Ym5LWWpnZm5ZSFhqbWJDcEVmbmlSQk1zQnVrSnlpVmF1TkI0NWtMblI1c3hC?=
- =?utf-8?B?NmQvN1VWUGEvUG1sdmJId0ltZ21NYUtDWDFqYUlaNGVZcjZpNE14NG9wSHh1?=
- =?utf-8?B?SUZzK21RMmt3VHczSGpOOW5yaHR6SzJwN3l6cDIxSjdBKy9ZcWtRU0c4Zmly?=
- =?utf-8?B?anpWbFIvUS9kYVl6dC9XTHN3YXBHNGtFenBoK2ZtbFFLZXhCWVNlVUlYdjVE?=
- =?utf-8?B?MkV1M3E4eFVQL3AyQzU5bElCdUFFL1oxRFVOLzdRQVZoQzA0WjZVc0xCbHla?=
- =?utf-8?B?RCtYM08xUzg2ZFJaWHZIdUtqbitOYVMxRDdaN2JjVnhrQ2VTaU54Z1JVWEZl?=
- =?utf-8?B?Zk5EL0NmVzA2dnJYNzQ4WlloUVFveG5NMXpTSlVHS3kvcFZjK2tqZWdLR0Vj?=
- =?utf-8?Q?cUflPwgaFAqvPz15vw+Mt0sT3?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0FkbE9UWWJhbzYzTEVFa2c1R3ZLWTR3MndFcnZ1ZXcxc1dPOHVTVGt4SVQ3?=
+ =?utf-8?B?dGRuRFRpdi9JNXFFNFlFR1pYQ1p5MG1XQldONnV2NDEzQWtTdC9mNEd6aVlQ?=
+ =?utf-8?B?cE1sY0R6elRKU2xyUXVoY2RmMWwzVUNKZW44aGlPOEhvb05NM0lYc1o0YzZs?=
+ =?utf-8?B?WlFVVEk3a0lwMGxJU09SS0pZOHRFbTQ1VW5WTWxSK0Q5OEkxNGZLeWY2Wlk2?=
+ =?utf-8?B?cDh5ZW5MYmxBY0o1Z0NyZWFTemlOZ2dQamVTSm40ZVBkZWo0RUtuOWI2SmN2?=
+ =?utf-8?B?ZVJKUjR3YVkyMHhmTnRqUGRodE0rSTVLQU56c0VQcGRjamZ0bXc1cHM5eStq?=
+ =?utf-8?B?SHdxd1ZBWjFnOGdBOXNNWjd2OVRsVUR6RGJ1TTRzd2R4TzRrcytNWDF5Y1pQ?=
+ =?utf-8?B?MHhJZ051ZUV4MllDNXZ5K2U0MzN3dmxMbDZPcnpwYjB2M2pZWkRCVGwwQ1Rh?=
+ =?utf-8?B?bTBNY2Z2VUtKMXBtbVV0Y2FUbWtUTk5RZSt3WU1WbEZ0L3A5UEgzZTFsZXZB?=
+ =?utf-8?B?L2c1R0Evb0F6OWRFTlJ4T3RnZ2pOSCtNSC9aZ1FSdGI0Y3ovMjBGSG0rQWRZ?=
+ =?utf-8?B?ZmxzREU2VTd3bUU0NFFxWmhkdVpUNEc1QTY1bndTendRV3ZNbGlGZzIvdlky?=
+ =?utf-8?B?N2xLWjhKc2hKdFp4T2RVemRPWC9vS1U2d1l2cHptUU1xSWhNUWE1WWhOYzlM?=
+ =?utf-8?B?dGE1RElXQzBRd3RHVzEyYmdkS0VVbnBUVm9wbGYyd3dPVzh1eVljT015aE9G?=
+ =?utf-8?B?UDZtU05LRlBLdXJmMDEzZnRua2E5VVh3OEI1Snp1Vk15V05ZNUc4WG1Wc1BN?=
+ =?utf-8?B?bU1yaFNjZG5yR3YvUTd2UVdCRXIrTFlqcUtPSE53UEx0QWNTUWRYNTc0WVZG?=
+ =?utf-8?B?UVIwaVpWampadTd5c25mUFg3ZVNIUURHdjgwekhqUmdaMjUwSHc5ZzRxazB5?=
+ =?utf-8?B?VnRLaEo3N2FzTXBsNi80akF1S29aTzU2Q1VKTTY2REhBSTdCMmxFbVkvLzBY?=
+ =?utf-8?B?NjlDMDFXd2NBZlpoUkFxdnJDZzBvQXFGT0hxN3d1OEpVblNtajB6VWR0ZlBh?=
+ =?utf-8?B?MWFRM1FpbmRnRm1SRTBJOXhaOWJQVW9JU094OVBjeVJKZTZLUGdmbVFOaXU3?=
+ =?utf-8?B?MnRYS0NIT0F3Rnc3QXFveFJ4T0orTSt0MjIwT1BLcHZzTUo0UklTajFkd3Ey?=
+ =?utf-8?B?dDRCOVU5aGZLWnQvZSttK0gwQ1c2Z0FRWk1EbG02Znp2ZytrMFkwZnVlR2Y5?=
+ =?utf-8?B?ZUtTQkhoR1VnUzlSWEcxQ2duQmtHdHQ5TExvQ1ZZL2l1SzUwU3ZOYzF6aENR?=
+ =?utf-8?B?dFNTRXdkWFVEMnowZ2VrbXphY1RtMys5L0xiS2tacVNBR1NaWUt1cEVTdG9q?=
+ =?utf-8?B?NTJBZnREU1hwb2pUUVZObDd1STdFcWo4eXRid1pQcTZiM0ZOTGVwb0huZ0Jq?=
+ =?utf-8?B?TERneFlxRXRYcTBPQUVWSkN5MnN0eTgyQTM2dEU4OW5qbCs4enRTSGFkZlMw?=
+ =?utf-8?B?bHFRcjBVSVd1NnRobk1lc1lwSnJNOVVGNmo2bHZRVk5Ec1U4OTM2dXQ2QnhY?=
+ =?utf-8?B?MXFNZmE1MDg5RC9FcWhDaEY1RStzVTduRWlJbGYyeENBSnVZdDdIb0x6cVcx?=
+ =?utf-8?B?cWl0dXhFem9MUGhnMW1pVWZBR3JFTlp1Sm56WnZNdCtRcDI2V25XNkRvNWdR?=
+ =?utf-8?B?ckVHSU1NS2txWmlnZVhrWU1wK0NpbUJHQkQvbmRIYWkydlk1VDl5KzZKazVY?=
+ =?utf-8?B?NWhLUFBTM0VqVmpLQ1doczFYTnpucDVQWjcrSFpMWWVXWlVKUWVWQmRWYWE4?=
+ =?utf-8?B?RVdvZzVuSmJYZlRHUkdTSzhCaG9DRnEvWjhTdEZSakYyZUx1S0huQWVvbGpx?=
+ =?utf-8?B?TC93Ly9QUklmUVZ0MnVoS2l1VFFRRXNSaG1PbERaSUN5OEN5Q0UvNlFabjBH?=
+ =?utf-8?B?WmhaUmhidGRiZG5xVTRZVzhIRWZWWHF4dkpFVkFITWxYOTIrZ1ZLOW9qeldJ?=
+ =?utf-8?B?WGNaeEdFUW8zc3R3QVFxTkNhdXpLVjlrL1JGbE5qVElZbGQ0YUd5WkVkelJ4?=
+ =?utf-8?B?K0hDM1ZpQ3lKTEIycU84TDkzejJZdlVBdFc4U2dIVmZRSmJMdUFVTkFhWVNT?=
+ =?utf-8?Q?ynOLJ7s0hpUAhHFwMfxmV8koL?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 359dc2ae-e177-4767-8536-08daae1eb57a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33bf375b-a75e-47e0-a1dd-08daae285ab6
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2022 20:00:14.4866
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2022 21:09:17.2220
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yn3nBb1jB/M4FycKBc/zNk6h4SAvMujtadguuyCHfbb8/ks+wMheKnVN5pFTqwCPZJM9WC55PM3OPA9CowMHBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4193
+X-MS-Exchange-CrossTenant-UserPrincipalName: m+dmuQlzjT0iyDW2peREH0XfStT89gCFdE/rC7Tti7tFS3XQO2NLucSl5HbI2MvnffyW5hVjFO4rFGnExqSSXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5285
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hello Boris,
 
-On 10/13/2022 10:15 AM, Borislav Petkov wrote:
-> On Mon, Jun 20, 2022 at 11:05:01PM +0000, Ashish Kalra wrote:
->> +static void snp_leak_pages(unsigned long pfn, unsigned int npages)
-> 
-> That function name looks wrong.
-> 
+On 10/1/2022 12:33 PM, Borislav Petkov wrote:
+> On Mon, Jun 20, 2022 at 11:04:29PM +0000, Ashish Kalra wrote:
+>> +static int __sev_snp_init_locked(int *error)
 >> +{
->> +	WARN(1, "psc failed, pfn 0x%lx pages %d (leaking)\n", pfn, npages);
->> +	while (npages--) {
->> +		memory_failure(pfn, 0);
-> 		^^^^^^^^^^^^^^^^^^^^^^
-> 
-> Why?
-
-The page was in FW state and we couldn't transition it back to HV/Shared
-state, any access to this page can cause RMP #PF.
-
-> 
->   * This function is called by the low level machine check code
->   * of an architecture when it detects hardware memory corruption
->   * of a page. It tries its best to recover, which includes
->   * dropping pages, killing processes etc.
-> 
-> I don't think you wanna do that.
-> 
-> It looks like you want to prevent the page from being used again but not
-> mark it as PG_hwpoison and whatnot. PG_reserved perhaps?
-
-  * PG_reserved is set for special pages. The "struct page" of such a
-  * page should in general not be touched (e.g. set dirty) except by its
-  * owner.
-
-If it is "still" accessed/touched then it can cause RMP #PF.
-On the other hand,
-
-  * PG_hwpoison... Accessing is
-  * not safe since it may cause another machine check. Don't touch!
-
-That sounds exactly the state we want these page(s) to be in ?
-
-Another possibility is PG_error.
-
-> 
->> +		dump_rmpentry(pfn);
->> +		pfn++;
->> +	}
->> +}
+>> +	struct psp_device *psp = psp_master;
+>> +	struct sev_device *sev;
+>> +	int rc = 0;
 >> +
->> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages, bool locked)
->> +{
->> +	struct sev_data_snp_page_reclaim data;
->> +	int ret, err, i, n = 0;
+>> +	if (!psp || !psp->sev_data)
+>> +		return -ENODEV;
 >> +
->> +	for (i = 0; i < npages; i++) {
->> +		memset(&data, 0, sizeof(data));
->> +		data.paddr = pfn << PAGE_SHIFT;
-> 
-> Oh wow, this is just silly. A struct for a single u64. Just use a
-> 
-> 	u64 paddr;
-Ok.
-> 
-> directly. But we had this topic already...
-> 
+>> +	sev = psp->sev_data;
 >> +
->> +		if (locked)
+>> +	if (sev->snp_inited)
 > 
-> Ew, that's never a good design - conditional locking.
+> snp_inited? That's silly.
+> 
+> 	snp_initialized
+> 
+> pls.
 
-There is a previous suggestion to change `sev_cmd_mutex` to some sort of 
-nesting lock type to clean up this if (locked) code, though AFAIK, there 
-is no support for nesting lock types.
+Yes.
 
 > 
->> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
->> +		else
->> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> 
-> <---- newline here.
-> 
->> +		if (ret)
->> +			goto cleanup;
+>> +		return 0;
 >> +
->> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
->> +		if (ret)
->> +			goto cleanup;
->> +
->> +		pfn++;
->> +		n++;
->> +	}
->> +
->> +	return 0;
->> +
->> +cleanup:
 >> +	/*
->> +	 * If failed to reclaim the page then page is no longer safe to
->> +	 * be released, leak it.
+>> +	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
+> 
+> 	/* Clear MSR_VM_HSAVE_PA on all cores before SNP_INIT */
+> 
+>> +	 * across all cores.
 >> +	 */
->> +	snp_leak_pages(pfn, npages - n);
-> 
-> So this looks real weird: we go and reclaim pages, we hit an error
-> during reclaiming a page X somewhere in-between and then we go and mark
-> the *remaining* pages as not to be used?!
-> 
-> Why?
-> 
-> Why not only that *one* page which failed and then we continue with the
-> rest?!
-
-I agree and will change to this approach.
-
-> 
->> +	return ret;
->> +}
+>> +	on_each_cpu(snp_set_hsave_pa, NULL, 1);
 >> +
->> +static inline int rmp_make_firmware(unsigned long pfn, int level)
->> +{
->> +	return rmp_make_private(pfn, 0, level, 0, true);
->> +}
+>> +	/* Issue the SNP_INIT firmware command. */
 > 
-> That's a silly wrapper used only once. Just do at the callsite:
+> Useless comment.
 > 
-> 	/* Mark this page as belonging to firmware */
-> 	rc = rmp_make_private(pfn, 0, level, 0, true);
-> 
-Ok.
-
->> +
->> +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, bool to_fw, bool locked,
->> +			     bool need_reclaim)
-> 
-> Tangential to the above, this is just nuts with those bool arguments.
-> Just look at the callsites: do you understand what they do?
-> 
-> 	snp_set_rmp_state(paddr, npages, true, locked, false);
-> 
-> what does that do? You need to go up to the definition of the function,
-> count the arguments and see what that "true" arg stands for.
-
-I totally agree, this is simply unreadable.
-
-And this has been mentioned previously too ...
-This function can do a lot and when I read the call sites its hard to
-see what its doing since we have a combination of arguments which tell
-us what behavior is happening ...
-
-> 
-> What you should do instead is, have separate helpers which do only one
-> thing:
-> 
-> 	rmp_mark_pages_firmware();
-> 	rmp_mark_pages_shared();
-> 	rmp_mark_pages_...
-> 
-> and then have the *callers* issue snp_reclaim_pages() when needed. So you'd have
-> 
-> 	rmp_mark_pages_firmware();
-> 	rmp_mark_pages_shared()
-> 
-> and __snp_free_firmware_pages() would do
-> 
-> 	rmp_mark_pages_shared();
-> 	snp_reclaim_pages();
-> 
-Actually, this only needs to call snp_reclaim_pages().
-
-> and so on.
-> 
-> And then if you need locking, the callers can decide which sev_do_cmd
-> variant to issue.
-> 
-> And then if you have common code fragments which you can unify into a
-> bigger helper function, *then* you can do that.
-> 
-> Instead of multiplexing it this way. Which makes it really hard to
-> follow what the code does.
-> 
-
-Sure i will do this cleanup.
-
-> 
->> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT; /* Cbit maybe set in the paddr */
-> 
-> No side comments pls.
-> 
->> +	int rc, n = 0, i;
->> +
->> +	for (i = 0; i < npages; i++) {
->> +		if (to_fw)
->> +			rc = rmp_make_firmware(pfn, PG_LEVEL_4K);
->> +		else
->> +			rc = need_reclaim ? snp_reclaim_pages(pfn, 1, locked) :
->> +					    rmp_make_shared(pfn, PG_LEVEL_4K);
->> +		if (rc)
->> +			goto cleanup;
->> +
->> +		pfn++;
->> +		n++;
->> +	}
->> +
->> +	return 0;
->> +
->> +cleanup:
->> +	/* Try unrolling the firmware state changes */
->> +	if (to_fw) {
->> +		/*
->> +		 * Reclaim the pages which were already changed to the
->> +		 * firmware state.
->> +		 */
->> +		snp_reclaim_pages(paddr >> PAGE_SHIFT, n, locked);
->> +
+>> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT, NULL, error);
+>> +	if (rc)
 >> +		return rc;
+>> +
+>> +	/* Prepare for first SNP guest launch after INIT */
+>> +	wbinvd_on_all_cpus();
+> 
+> Can you put a wbinvd() in snp_set_hsave_pa() instead and save yourself
+> the second IPI?
+> 
+> Or is that order of the commands:
+> 
+> 	1. clear MSR IPI
+> 	2. SNP_INIT
+> 	3. WBINVD IPI
+> 	4. ...
+> 
+> mandatory?
+> 
+
+Yes, we need to do:
+
+wbinvd_on_all_cpus();
+SNP_DF_FLUSH
+
+Need to ensure all the caches are clear before launching the first guest 
+and this has to be a combination of WBINVD and SNP_DF_FLUSH command.
+
+> ...
+> 
+>> +static int __sev_snp_shutdown_locked(int *error)
+>> +{
+>> +	struct sev_device *sev = psp_master->sev_data;
+>> +	int ret;
+>> +
+>> +	if (!sev->snp_inited)
+>> +		return 0;
+>> +
+>> +	/* SHUTDOWN requires the DF_FLUSH */
+>> +	wbinvd_on_all_cpus();
+>> +	__sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+> 
+> Why isn't this retval checked?
+
+ From the SNP FW ABI specs, for the SNP_SHUTDOWN command:
+
+Firmware checks for every encryption capable ASID that the ASID is not 
+in use by a guest and a DF_FLUSH is not required. If a DF_FLUSH is 
+required, the firmware returns DFFLUSH_REQUIRED.
+
+Considering that SNP_SHUTDOWN command will check if DF_FLUSH was
+required and if so, and not invoked before that command, returns
+an error indicating that DFFLUSH is required.
+
+This way, we can cleverly avoid taking the error code path for
+DF_FLUSH command here and instead let the SNP_SHUTDOWN command
+failure below indicate if DF_FLUSH command failed.
+
+This also ensures that we always invoke SNP_SHUTDOWN command,
+irrespective of SNP_DF_FLUSH command failure as SNP_DF_FLUSH may
+actually not be required by the SHUTDOWN command.
+
+> 
+>> +
+>> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN, NULL, error);
+>> +	if (ret) {
+>> +		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
+>> +		return ret;
 >> +	}
 >> +
->> +	/*
->> +	 * If failed to change the page state to shared, then its not safe
->> +	 * to release the page back to the system, leak it.
->> +	 */
->> +	snp_leak_pages(pfn, npages - n);
+>> +	sev->snp_inited = false;
+>> +	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
 >> +
->> +	return rc;
+>> +	return ret;
 >> +}
 > 
 > ...
 > 
->> +void snp_free_firmware_page(void *addr)
->> +{
->> +	if (!addr)
->> +		return;
+>>   void sev_dev_destroy(struct psp_device *psp)
+>> @@ -1287,6 +1385,26 @@ void sev_pci_init(void)
+>>   		}
+>>   	}
+>>   
+>> +	/*
+>> +	 * If boot CPU supports the SNP, then first attempt to initialize
+> 
+> s/the SNP/SNP/g
+> 
+>> +	 * the SNP firmware.
+>> +	 */
+>> +	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+>> +		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+>> +			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+>> +				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+>> +		} else {
+>> +			rc = sev_snp_init(&error);
+>> +			if (rc) {
+>> +				/*
+>> +				 * If we failed to INIT SNP then don't abort the probe.
+> 
+> Who's "we"?
+> 
+>> +				 * Continue to initialize the legacy SEV firmware.
+>> +				 */
+>> +				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+>> +			}
+>> +		}
+>> +	}
 >> +
->> +	__snp_free_firmware_pages(virt_to_page(addr), 0, false);
->> +}
->> +EXPORT_SYMBOL(snp_free_firmware_page);
+>>   	/* Obtain the TMR memory area for SEV-ES use */
+>>   	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+>>   	if (!sev_es_tmr)
 > 
-> EXPORT_SYMBOL_GPL() ofc.
+> ...
 > 
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index 01ba9dc46ca3..ef4d42e8c96e 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -769,6 +769,20 @@ struct sev_data_snp_init_ex {
+>>    */
+>>   int sev_platform_init(int *error);
+>>   
+>> +/**
+>> + * sev_snp_init - perform SEV SNP_INIT command
+>> + *
+>> + * @error: SEV command return code
+>> + *
+>> + * Returns:
+>> + * 0 if the SEV successfully processed the command
+>> + * -%ENODEV    if the SEV device is not available
+>> + * -%ENOTSUPP  if the SEV does not support SEV
+>> + * -%ETIMEDOUT if the SEV command timed out
+>> + * -%EIO       if the SEV returned a non-zero return code
+> 
+> Something's weird with those args. I think it should be
+> 
+> 	%-ENODEV
+> 
+> and so on...
+> 
+
+Yes, off course %-<errno>
 
 Thanks,
 Ashish
