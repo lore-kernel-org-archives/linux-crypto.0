@@ -2,83 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B86DC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 11:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CADF3C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Oct 2022 11:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbiJNLBW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Oct 2022 07:01:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46834 "EHLO
+        id S229609AbiJNLGy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Oct 2022 07:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbiJNLBU (ORCPT
+        with ESMTP id S229625AbiJNLGx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Oct 2022 07:01:20 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19F261C880A
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Oct 2022 04:01:17 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-91-GFLKovP8PUiYyqSFZun4Kw-1; Fri, 14 Oct 2022 12:01:15 +0100
-X-MC-Unique: GFLKovP8PUiYyqSFZun4Kw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Fri, 14 Oct
- 2022 12:01:13 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.040; Fri, 14 Oct 2022 12:01:13 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
-        Robert Elliott <elliott@hpe.com>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        "ap420073@gmail.com" <ap420073@gmail.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
-Thread-Topic: [PATCH v2 04/19] crypto: x86/sha - limit FPU preemption
-Thread-Index: AQHY3p5YDK4bZkqaZ0OuLicTma4hgK4NuQjg
-Date:   Fri, 14 Oct 2022 11:01:12 +0000
-Message-ID: <96ed3206ef2a499f9bf95476e21608c0@AcuMS.aculab.com>
-References: <20221006223151.22159-1-elliott@hpe.com>
- <20221012215931.3896-1-elliott@hpe.com>
- <20221012215931.3896-5-elliott@hpe.com> <Y0deya7WnwS0HMwl@zx2c4.com>
-In-Reply-To: <Y0deya7WnwS0HMwl@zx2c4.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 14 Oct 2022 07:06:53 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 432F01C3E43;
+        Fri, 14 Oct 2022 04:06:50 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1ojIWF-00EgYJ-Ny; Fri, 14 Oct 2022 22:06:24 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Oct 2022 19:06:23 +0800
+Date:   Fri, 14 Oct 2022 19:06:23 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Mark Brown <broonie@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        kernelci-results@groups.io, bot@kernelci.org,
+        gtucker@collabora.com, linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hw_random: bcm2835: use hwrng_msleep() instead of
+ cpu_relax()
+Message-ID: <Y0lCr9f0fekMgASN@gondor.apana.org.au>
+References: <Y0QjkjU4bsOHWFOd@sirena.org.uk>
+ <20221010150607.720600-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221010150607.720600-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDEzIE9jdG9iZXIgMjAyMiAwMTo0Mg0K
-Li4uDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2NyeXB0by9zaGExX3Nzc2UzX2dsdWUuYyBi
-L2FyY2gveDg2L2NyeXB0by9zaGExX3Nzc2UzX2dsdWUuYw0KPiA+IGluZGV4IDQ0MzQwYTExMzll
-MC4uYTlmNTc3OWI0MWNhIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gveDg2L2NyeXB0by9zaGExX3Nz
-c2UzX2dsdWUuYw0KPiA+ICsrKyBiL2FyY2gveDg2L2NyeXB0by9zaGExX3Nzc2UzX2dsdWUuYw0K
-PiA+IEBAIC0yNiw2ICsyNiw4IEBADQo+ID4gICNpbmNsdWRlIDxjcnlwdG8vc2hhMV9iYXNlLmg+
-DQo+ID4gICNpbmNsdWRlIDxhc20vc2ltZC5oPg0KPiA+DQo+ID4gKyNkZWZpbmUgRlBVX0JZVEVT
-IDQwOTZVIC8qIGF2b2lkIGtlcm5lbF9mcHVfYmVnaW4vZW5kIHNjaGVkdWxlci9yY3Ugc3RhbGxz
-ICovDQo+IA0KPiBEZWNsYXJlIHRoaXMgaW5zaWRlIHRoZSBmdW5jdGlvbiBpdCdzIHVzZWQgYXMg
-YW4gdW50eXBlZCBlbnVtLCBhbmQgZ2l2ZQ0KPiBpdCBhIGJldHRlciBuYW1lLCBsaWtlIEJZVEVT
-X1BFUl9GUFUuDQoNCklzbid0ICdieXRlcycgdGhlIHdyb25nIHVuaXQgYW55d2F5Pw0KQXQgbGVh
-c3QgaXQgb3VnaHQgdG8gYmUgJ2Nsb2Nrcycgc28gaXQgY2FuIGJlIGRpdmlkZWQgYnkgdGhlDQoo
-YXBwcm94aW1hdGUpICdjbG9ja3MgcGVyIGJ5dGUnIG9mIHRoZSBhbGdvcml0aG0uDQoNClNvbWV0
-aGluZyBsaWtlIGEgY3JjIGlzIGxpa2VseSB0byBiZSBmYXIgZmFzdGVyIHRoYW4gQUVTLg0KDQpD
-bGVhcmx5IHRoZSBhY3R1YWwgcmVxdWlyZWQgdW5pdHMgYXJlIG1pY3Jvc2Vjb25kcy4NCkJ1dCBk
-ZXBlbmRpbmcgb24gdGhlIGFjdHVhbCBjcHUgZnJlcXVlbmN5IGlzIGEgYml0IGhhcmQuDQpBbmQg
-cGVvcGxlIHJ1bm5pbmcgZmFzdGVyIGNwdSBtYXkgd2FudCBsb3dlciBsYXRlbmN5IGFueXdheS4N
-ClNvIGEgdHlwaWNhbCBzbG93IGNwdSBmcmVxdWVuY3kgaXMgcHJvYmFibHkgb2suDQoNClRoZSBh
-Y3R1YWwgYXJjaGl0ZWN0dXJlIGRlcGVuZGFudCBjb25zdGFudCByZWFsbHkgb3VnaHQNCnRvIGJl
-IGRlZmluZWQgd2l0aCBrZXJuZWxfZnB1X2JlZ2luKCkuDQoNCglEYXZpZA0KDQotDQpSZWdpc3Rl
-cmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtl
-eW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
+On Mon, Oct 10, 2022 at 09:06:07AM -0600, Jason A. Donenfeld wrote:
+> Rather than busy looping, yield back to the scheduler and sleep for a
+> bit in the event that there's no data. This should hopefully prevent the
+> stalls that Mark reported:
+> 
+> <6>[    3.362859] Freeing initrd memory: 16196K
+> <3>[   23.160131] rcu: INFO: rcu_sched self-detected stall on CPU
+> <3>[   23.166057] rcu:  0-....: (2099 ticks this GP) idle=03b4/1/0x40000002 softirq=28/28 fqs=1050
+> <4>[   23.174895]       (t=2101 jiffies g=-1147 q=2353 ncpus=4)
+> <4>[   23.180203] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
+> <4>[   23.186125] Hardware name: BCM2835
+> <4>[   23.189837] PC is at bcm2835_rng_read+0x30/0x6c
+> <4>[   23.194709] LR is at hwrng_fillfn+0x71/0xf4
+> <4>[   23.199218] pc : [<c07ccdc8>]    lr : [<c07cb841>]    psr: 40000033
+> <4>[   23.205840] sp : f093df70  ip : 00000000  fp : 00000000
+> <4>[   23.211404] r10: c3c7e800  r9 : 00000000  r8 : c17e6b20
+> <4>[   23.216968] r7 : c17e6b64  r6 : c18b0a74  r5 : c07ccd99  r4 : c3f171c0
+> <4>[   23.223855] r3 : 000fffff  r2 : 00000040  r1 : c3c7e800  r0 : c3f171c0
+> <4>[   23.230743] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment none
+> <4>[   23.238426] Control: 50c5387d  Table: 0020406a  DAC: 00000051
+> <4>[   23.244519] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
+> 
+> Link: https://lore.kernel.org/all/Y0QJLauamRnCDUef@sirena.org.uk/
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> I haven't tested this. Somebody with access to that kernel CI infra that
+> triggered this will need to test.
+> 
+>  drivers/char/hw_random/bcm2835-rng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
