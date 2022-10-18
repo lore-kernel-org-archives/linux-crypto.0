@@ -2,81 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47763C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 07:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC38C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 07:10:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiJRHEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Oct 2022 03:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43562 "EHLO
+        id S229926AbiJRHKT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Oct 2022 03:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbiJRHE3 (ORCPT
+        with ESMTP id S230098AbiJRHKQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2022 03:04:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DFC13DDA;
-        Tue, 18 Oct 2022 00:04:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A6CC061487;
-        Tue, 18 Oct 2022 07:04:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2AB3C433C1;
-        Tue, 18 Oct 2022 07:04:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666076666;
-        bh=nzOkWr31YDiUOeIbP4635LhimacOpccRoPiypQjEzA8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EOnM0MeBov5bhe9aPWFjq9/qju0h1sLn4ikh0b+N16j6eKKRq4sl4qL7enrW/bMUx
-         c1HQguA+ds7DQo0tJNARGtxUOy6mgr/9OPQIMdb7LexoALaeMpktI5JhU/MLrlrgAV
-         MUZrj6pfr7H0X/yphD3LL9OnX/5k7EAc8rErw35LdKuq5ADTam26azDrVEKgh0zjSX
-         dN1B6Zfp8Dtv7j0jeSYYZ/rsLASxZDSucOypJw4J/BK+qFAJQoRJnSkS/qDARbdpHa
-         lpupiXAbvjtoYbFbYnjMoAtdmmC26A9p+RIFTaKAho2Zni595cROGiZ9IoP+MPZaBk
-         NfImpGadDPPxg==
-Date:   Tue, 18 Oct 2022 00:04:24 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        sneves@dei.uc.pt
-Subject: Re: [PATCH] random: use rejection sampling for uniform bounded
- random integers
-Message-ID: <Y05P+KTzFHGaK4C3@sol.localdomain>
-References: <20221017023752.3907-1-Jason@zx2c4.com>
- <Y02ehdiCtHyLErB8@sol.localdomain>
- <Y046F2pGjC0apna0@zx2c4.com>
+        Tue, 18 Oct 2022 03:10:16 -0400
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B6D786E3;
+        Tue, 18 Oct 2022 00:10:14 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0VSTUHWa_1666077009;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VSTUHWa_1666077009)
+          by smtp.aliyun-inc.com;
+          Tue, 18 Oct 2022 15:10:10 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v2 00/15] Optimizing SM3 and SM4 algorithms using arm64 NEON/CE instructions
+Date:   Tue, 18 Oct 2022 15:09:51 +0800
+Message-Id: <20221018071006.5717-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y046F2pGjC0apna0@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 11:31:03PM -0600, Jason A. Donenfeld wrote:
-> On Mon, Oct 17, 2022 at 11:27:17AM -0700, Eric Biggers wrote:
-> > On Sun, Oct 16, 2022 at 08:37:53PM -0600, Jason A. Donenfeld wrote:
-> > > In order to be efficient, we implement a kernel-specific variant of
-> > > Daniel Lemire's algorithm from "Fast Random Integer Generation in an
-> > > Interval", linked below. The kernel's variant takes advantage of
-> > > constant folding to avoid divisions entirely in the vast majority of
-> > > cases, works on both 32-bit and 64-bit architectures, and requests a
-> > > minimal amount of bytes from the RNG.
-> > > 
-> > > Link: https://arxiv.org/pdf/1805.10941.pdf
-> > 
-> > Thanks for doing this!  Your code looks correct, but it was hard for me to
-> > understand until I read the paper that is linked to.  Could you include a brief
-> > comment in the code that explains the algorithm?  Also, though the code looks
-> > correct, I assume that you've also explicitly tested that each of the four code
-> > paths produce uniform random numbers as intended?
-> 
-> Yes, I've tested those, and they work. (Threw a lot of cores and ram at
-> it.)
-> 
-> I could include a comment, sure. What do you have in mind? A
-> line-by-line thing, or just a short blurb at the top of the function?
-> 
-> Jason
+Hi folks,
 
-A comment at the top of the function would be good.
+This series of patches uses different arm64 instruction sets to optimize
+the SM3 and SM4 algorithms, as well as the optimization of different
+modes of SM4.
 
-- Eric
+patch 1-2:   NEON instruction set optimization for SM3
+patch 3:     Refactored and streamlined SM4 NEON instruction implementation
+patch 4-5:   support test for new SM4 mode
+patch 6-8:   Refactored and streamlined SM4 CE instruction implementation
+patch 9-12:  CE accelerated implementation of SM4 CTS/XTS/ESSIV
+patch 13:    CE accelerated implementation of SM4 CMAC/XCBC/CBCMAC
+patch 14-15: CE accelerated implementation of SM4 CCM/GCM
+
+v2 changes:
+  - remove ARMv9 SVE acceleration implementation
+  - rebase onto v6.1-rc1
+
+Cheers,
+Tianjia
+
+Tianjia Zhang (15):
+  crypto: arm64/sm3 - raise the priority of the CE implementation
+  crypto: arm64/sm3 - add NEON assembly implementation
+  crypto: arm64/sm4 - refactor and simplify NEON implementation
+  crypto: testmgr - add SM4 cts-cbc/essiv/xts/xcbc test vectors
+  crypto: tcrypt - add SM4 cts-cbc/essiv/xts/xcbc test
+  crypto: arm64/sm4 - refactor and simplify CE implementation
+  crypto: arm64/sm4 - simplify sm4_ce_expand_key() of CE implementation
+  crypto: arm64/sm4 - export reusable CE acceleration functions
+  crypto: arm64/sm4 - add CE implementation for CTS-CBC mode
+  crypto: arm64/sm4 - add CE implementation for XTS mode
+  crypto: essiv - allow digestsize to be greater than keysize
+  crypto: arm64/sm4 - add CE implementation for ESSIV mode
+  crypto: arm64/sm4 - add CE implementation for cmac/xcbc/cbcmac
+  crypto: arm64/sm4 - add CE implementation for CCM mode
+  crypto: arm64/sm4 - add CE implementation for GCM mode
+
+ arch/arm64/crypto/Kconfig           |   47 +-
+ arch/arm64/crypto/Makefile          |    9 +
+ arch/arm64/crypto/sm3-ce-glue.c     |    2 +-
+ arch/arm64/crypto/sm3-neon-core.S   |  600 +++++++++++++
+ arch/arm64/crypto/sm3-neon-glue.c   |  103 +++
+ arch/arm64/crypto/sm4-ce-asm.h      |  209 +++++
+ arch/arm64/crypto/sm4-ce-ccm-core.S |  328 +++++++
+ arch/arm64/crypto/sm4-ce-ccm-glue.c |  303 +++++++
+ arch/arm64/crypto/sm4-ce-core.S     | 1247 ++++++++++++++++++---------
+ arch/arm64/crypto/sm4-ce-gcm-core.S |  741 ++++++++++++++++
+ arch/arm64/crypto/sm4-ce-gcm-glue.c |  286 ++++++
+ arch/arm64/crypto/sm4-ce-glue.c     |  703 ++++++++++++++-
+ arch/arm64/crypto/sm4-ce.h          |   16 +
+ arch/arm64/crypto/sm4-neon-core.S   |  630 +++++++++-----
+ arch/arm64/crypto/sm4-neon-glue.c   |  172 +---
+ crypto/essiv.c                      |   11 +-
+ crypto/tcrypt.c                     |   28 +
+ crypto/testmgr.c                    |   25 +
+ crypto/testmgr.h                    | 1161 +++++++++++++++++++++++++
+ 19 files changed, 5852 insertions(+), 769 deletions(-)
+ create mode 100644 arch/arm64/crypto/sm3-neon-core.S
+ create mode 100644 arch/arm64/crypto/sm3-neon-glue.c
+ create mode 100644 arch/arm64/crypto/sm4-ce-asm.h
+ create mode 100644 arch/arm64/crypto/sm4-ce-ccm-core.S
+ create mode 100644 arch/arm64/crypto/sm4-ce-ccm-glue.c
+ create mode 100644 arch/arm64/crypto/sm4-ce-gcm-core.S
+ create mode 100644 arch/arm64/crypto/sm4-ce-gcm-glue.c
+ create mode 100644 arch/arm64/crypto/sm4-ce.h
+
+-- 
+2.24.3 (Apple Git-128)
+
