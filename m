@@ -2,72 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82317C43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C4BC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 04:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbiJRAxJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47506 "EHLO
+        id S230084AbiJREEm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Oct 2022 00:04:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiJRAxJ (ORCPT
+        with ESMTP id S230076AbiJREEh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:53:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E099B816B6;
-        Mon, 17 Oct 2022 17:52:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 60096B80DAC;
-        Tue, 18 Oct 2022 00:52:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D01C433C1;
-        Tue, 18 Oct 2022 00:52:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666054366;
-        bh=uxY/367ILC9MijFRSeHxRt+n73GNDXQPlO80EctYxss=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kF4b9k+Mcf6aXpz1PsDID2GTUSxrQRRM8AWedfKXS8oxhNkqV8+uw+gZtNT8uHraO
-         XLXGdljsHj/psr7KaN/AJcGD1tUu+UPhzuFvaF48thXts3ZA0b8o46p0pBTPYmd+w2
-         W+IIxWVUq10RZ/t+9FbOg2vuG1ZeuldZCftPTHYGljPoFdtCCt4bQ7dZ7vCF2c7y2+
-         Ici8JFR3U1QZ2QAyLMaCCWVLi1nVo3MvHSMU7k4Fi7K1BtZBLDkCK6JixE0v3p8mrB
-         KlieMCL+ETjbB9LKMpeIbgM9jBtfvtsyMsUUaoq6AsaZ77v6CqreajiIVj1TtOaX9Y
-         JRjtvjFMfV7kA==
-Date:   Mon, 17 Oct 2022 17:52:44 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-fscrypt@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
-Subject: Re: [PATCH] fscrypt: fix keyring memory leak on mount failure
-Message-ID: <Y0343O5W7ehNUDP8@sol.localdomain>
-References: <0000000000009aad5e05eac85f36@google.com>
- <20221011213838.209879-1-ebiggers@kernel.org>
+        Tue, 18 Oct 2022 00:04:37 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA07412751;
+        Mon, 17 Oct 2022 21:04:32 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1okdp1-00Foo3-6i; Tue, 18 Oct 2022 15:03:20 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Oct 2022 12:03:19 +0800
+Date:   Tue, 18 Oct 2022 12:03:19 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Nathan Huckleberry <nhuck@google.com>,
+        Bruno Goncalves <bgoncalv@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: x86/polyval - Fix crashes when keys are not
+ 16-byte aligned
+Message-ID: <Y04lhwMechdfBkUU@gondor.apana.org.au>
+References: <20221017222620.715153-1-nhuck@google.com>
+ <Y03fBQPM7h7+cfGK@sol.localdomain>
+ <CAJkfWY5CXFQfSkM=U6u_DdLjDyLDoubqy2FeSZg5k7GBkOTnsQ@mail.gmail.com>
+ <Y03vYKwgdK34Hyfh@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221011213838.209879-1-ebiggers@kernel.org>
+In-Reply-To: <Y03vYKwgdK34Hyfh@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 11, 2022 at 02:38:38PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Commit d7e7b9af104c ("fscrypt: stop using keyrings subsystem for
-> fscrypt_master_key") moved the keyring destruction from __put_super() to
-> generic_shutdown_super() so that the filesystem's block device(s) are
-> still available.  Unfortunately, this causes a memory leak in the case
-> where a mount is attempted with the test_dummy_encryption mount option,
-> but the mount fails after the option has already been processed.
-> 
-> To fix this, attempt the keyring destruction in both places.
-> 
-> Reported-by: syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
-> Fixes: d7e7b9af104c ("fscrypt: stop using keyrings subsystem for fscrypt_master_key")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Mon, Oct 17, 2022 at 05:12:16PM -0700, Eric Biggers wrote:
+>
+> arm64 defines ARCH_DMA_MINALIGN to 128, so I don't think the same issue applies
+> there.  Also the instructions used don't assume aligned addresses.
 
-Applied to fscrypt.git#for-stable for 6.1.
+Note that arm64 may lower ARCH_KMALLOC_MINALIGN to 8 soon.
 
-As usual, I'd greatly appreciate reviews though...
-
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
