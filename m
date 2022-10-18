@@ -2,58 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C4BC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 04:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F313CC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 05:31:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbiJREEm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Oct 2022 00:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39580 "EHLO
+        id S229779AbiJRFbQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Oct 2022 01:31:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbiJREEh (ORCPT
+        with ESMTP id S230004AbiJRFbN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2022 00:04:37 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA07412751;
-        Mon, 17 Oct 2022 21:04:32 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1okdp1-00Foo3-6i; Tue, 18 Oct 2022 15:03:20 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Oct 2022 12:03:19 +0800
-Date:   Tue, 18 Oct 2022 12:03:19 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        Tue, 18 Oct 2022 01:31:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539C697EF9;
+        Mon, 17 Oct 2022 22:31:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CEBE9B81CD8;
+        Tue, 18 Oct 2022 05:31:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D9CC433D6;
+        Tue, 18 Oct 2022 05:31:08 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZhjdXf/B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1666071066;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IfT8FCupjHgZShjL2XGDOSYwTJpe93DPuuQkU3piicg=;
+        b=ZhjdXf/BO0yg8xyeMOcbErVr8U5H9y5p392jqGgNvaDo+uqbkzrANQdCWQWNB9+eGzkLcm
+        Mm4wu0FXwGgPwmHIGjPf/0N5QCC3V/55TiulLd3yYNDODqZjq1P2VI/vd1mFlK/h2uf1k3
+        AoRm6OzhTdhOLnE3GexEGZu5cPaTTz0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b57869f6 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 18 Oct 2022 05:31:05 +0000 (UTC)
+Date:   Mon, 17 Oct 2022 23:31:03 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Nathan Huckleberry <nhuck@google.com>,
-        Bruno Goncalves <bgoncalv@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: x86/polyval - Fix crashes when keys are not
- 16-byte aligned
-Message-ID: <Y04lhwMechdfBkUU@gondor.apana.org.au>
-References: <20221017222620.715153-1-nhuck@google.com>
- <Y03fBQPM7h7+cfGK@sol.localdomain>
- <CAJkfWY5CXFQfSkM=U6u_DdLjDyLDoubqy2FeSZg5k7GBkOTnsQ@mail.gmail.com>
- <Y03vYKwgdK34Hyfh@sol.localdomain>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        sneves@dei.uc.pt
+Subject: Re: [PATCH] random: use rejection sampling for uniform bounded
+ random integers
+Message-ID: <Y046F2pGjC0apna0@zx2c4.com>
+References: <20221017023752.3907-1-Jason@zx2c4.com>
+ <Y02ehdiCtHyLErB8@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y03vYKwgdK34Hyfh@sol.localdomain>
+In-Reply-To: <Y02ehdiCtHyLErB8@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 05:12:16PM -0700, Eric Biggers wrote:
->
-> arm64 defines ARCH_DMA_MINALIGN to 128, so I don't think the same issue applies
-> there.  Also the instructions used don't assume aligned addresses.
+On Mon, Oct 17, 2022 at 11:27:17AM -0700, Eric Biggers wrote:
+> On Sun, Oct 16, 2022 at 08:37:53PM -0600, Jason A. Donenfeld wrote:
+> > In order to be efficient, we implement a kernel-specific variant of
+> > Daniel Lemire's algorithm from "Fast Random Integer Generation in an
+> > Interval", linked below. The kernel's variant takes advantage of
+> > constant folding to avoid divisions entirely in the vast majority of
+> > cases, works on both 32-bit and 64-bit architectures, and requests a
+> > minimal amount of bytes from the RNG.
+> > 
+> > Link: https://arxiv.org/pdf/1805.10941.pdf
+> 
+> Thanks for doing this!  Your code looks correct, but it was hard for me to
+> understand until I read the paper that is linked to.  Could you include a brief
+> comment in the code that explains the algorithm?  Also, though the code looks
+> correct, I assume that you've also explicitly tested that each of the four code
+> paths produce uniform random numbers as intended?
 
-Note that arm64 may lower ARCH_KMALLOC_MINALIGN to 8 soon.
+Yes, I've tested those, and they work. (Threw a lot of cores and ram at
+it.)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I could include a comment, sure. What do you have in mind? A
+line-by-line thing, or just a short blurb at the top of the function?
+
+Jason
