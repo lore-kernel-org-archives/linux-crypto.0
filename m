@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F6FC43219
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D586C43219
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232013AbiJRARp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55224 "EHLO
+        id S232182AbiJRAiJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231716AbiJRAQ0 (ORCPT
+        with ESMTP id S229623AbiJRAhw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:16:26 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0E7F88A01;
-        Mon, 17 Oct 2022 17:13:20 -0700 (PDT)
+        Mon, 17 Oct 2022 20:37:52 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F848E9A3;
+        Mon, 17 Oct 2022 17:37:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D86661302;
-        Tue, 18 Oct 2022 00:09:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3880C433D6;
-        Tue, 18 Oct 2022 00:09:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6257FB81620;
+        Tue, 18 Oct 2022 00:11:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E49C433D7;
+        Tue, 18 Oct 2022 00:11:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666051783;
-        bh=RSGgGtk0YTsjWbz6ye3C8AS4eZR6iyFcHaLNzhOaBv8=;
+        s=k20201202; t=1666051865;
+        bh=NRxYzbakGYqdmEX9CLQwT6zIywJ3iuGNp/WtoYk+/GI=;
         h=From:To:Cc:Subject:Date:From;
-        b=QuPnAHINw4SK3eghOPcUUgDn4HmZOYg6Wqf94+6ON3QFpYxadBhSdYS7KLHNDsS5g
-         OaQzI93q3P657inYRM4SBxSJddp8/FMVFVA+gJ/4ghRUgJ4X1+w6a3H3V2Acvr9HXZ
-         1+x2xAIMwDB70/VpnuiOAAlJtvKR2cIFa7P7DzneALO0lcfp2syiWukVSqoimyD9zC
-         1pRvstk81voIvp+TChoL2Irr+Z0FyttjWsPkmtUrMqp7emIOS3TeCS9BQSbL5otIT6
-         lIQWQ8ufKz1Zhx8iA1V93WWs5/WY9m7o9Sz3opsmFdRO0qQv7LE3VgMKvy1Ck5O/52
-         dkiM19hx9zuYg==
+        b=vCoOZxG8X9we+uHzSWN//b0TBnBg5ez8VDgH6mCHTfGt7ScbYHY5Naw+hrrNFXWh3
+         Gr5mDtMVoE3LrgFTPjRJ8AFtxZlKZU7s/b9W8FObsOML1A8F5hHwnhBeFjvYWx3Fq1
+         muj6KGWJ6Lx8q+DVua6cdwvYLrNFwG0sCe+ZAENSdPiKnCcTaz7b3T7ILTGBKIT/YS
+         VwAN9zIKCCMFZ6tug621IoobSY7wbkum3sJ1BSipUfr4lHr5WKdOWr+LNO1uNAZ5yZ
+         dGUkLDH0+Mcm7PFdx0ZwOhJnd+0CuHtmF1aBqUGqyD2GMk9/UCPeisiYqydJ6brwWS
+         tvWyKlyc7rfzg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -39,9 +39,9 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Vinod Koul <vkoul@kernel.org>, Sasha Levin <sashal@kernel.org>,
         agross@kernel.org, andersson@kernel.org, davem@davemloft.net,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 01/21] crypto: qcom-rng - Fix qcom_rng_of_match unused warning
-Date:   Mon, 17 Oct 2022 20:09:20 -0400
-Message-Id: <20221018000940.2731329-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 01/13] crypto: qcom-rng - Fix qcom_rng_of_match unused warning
+Date:   Mon, 17 Oct 2022 20:10:50 -0400
+Message-Id: <20221018001102.2731930-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 X-stable: review
@@ -72,18 +72,18 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
-index 031b5f701a0a..72dd1a4ebac4 100644
+index 6cc4fd005fe0..648e3bc9c4e9 100644
 --- a/drivers/crypto/qcom-rng.c
 +++ b/drivers/crypto/qcom-rng.c
-@@ -9,6 +9,7 @@
+@@ -8,6 +8,7 @@
+ #include <linux/clk.h>
  #include <linux/crypto.h>
- #include <linux/io.h>
  #include <linux/iopoll.h>
 +#include <linux/kernel.h>
  #include <linux/module.h>
  #include <linux/of.h>
  #include <linux/platform_device.h>
-@@ -201,15 +202,13 @@ static int qcom_rng_remove(struct platform_device *pdev)
+@@ -200,15 +201,13 @@ static int qcom_rng_remove(struct platform_device *pdev)
  	return 0;
  }
  
