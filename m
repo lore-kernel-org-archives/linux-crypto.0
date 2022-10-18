@@ -2,129 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF16C43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82317C43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230322AbiJRAjF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:39:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48032 "EHLO
+        id S230090AbiJRAxJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:53:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231993AbiJRAir (ORCPT
+        with ESMTP id S229900AbiJRAxJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:38:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE8A31372;
-        Mon, 17 Oct 2022 17:38:31 -0700 (PDT)
+        Mon, 17 Oct 2022 20:53:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E099B816B6;
+        Mon, 17 Oct 2022 17:52:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 46D0D61325;
-        Tue, 18 Oct 2022 00:10:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9118EC43142;
-        Tue, 18 Oct 2022 00:10:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 60096B80DAC;
+        Tue, 18 Oct 2022 00:52:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D01C433C1;
+        Tue, 18 Oct 2022 00:52:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666051833;
-        bh=+LBArGdX0j3n5IqfNBzHwnlpAdY9FxZUW3+O8Byj3io=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=J+c7+LOp38c4FGxBdS3CfAvchSeIH+E4ZGGLfaHnm0rujADvqcoOdRmt4eU4mqjzC
-         e5ely9Zo2HocZVeHR+vItEboxcJFWEdvP32CayzT5Pvayi3WdPPLIJ4GhP2Q8RY9Rz
-         Fp31RgpCXcL2AuX831QYwucJjovfoxI/7mjCRYLiSHrZU+bnanGQJMskqIxwYfMQN6
-         robDgkxK1XsULGvxPfJrpwvSvwTwDPpTqQb1r6DlDfjR5585M12+hJKiHRMnJqiI7r
-         5Lh/bbC1tgy0zRdLue6qbE2Mt4QZkMAaEiOUdV/av8PfwR8aO4DHFicEHsvtnII2+F
-         azucW8pUknyCw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        Harald Hoyer <harald@profian.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, brijesh.singh@amd.com,
-        john.allen@amd.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 02/16] crypto: ccp - Add a quirk to firmware update
-Date:   Mon, 17 Oct 2022 20:10:15 -0400
-Message-Id: <20221018001029.2731620-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221018001029.2731620-1-sashal@kernel.org>
-References: <20221018001029.2731620-1-sashal@kernel.org>
+        s=k20201202; t=1666054366;
+        bh=uxY/367ILC9MijFRSeHxRt+n73GNDXQPlO80EctYxss=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kF4b9k+Mcf6aXpz1PsDID2GTUSxrQRRM8AWedfKXS8oxhNkqV8+uw+gZtNT8uHraO
+         XLXGdljsHj/psr7KaN/AJcGD1tUu+UPhzuFvaF48thXts3ZA0b8o46p0pBTPYmd+w2
+         W+IIxWVUq10RZ/t+9FbOg2vuG1ZeuldZCftPTHYGljPoFdtCCt4bQ7dZ7vCF2c7y2+
+         Ici8JFR3U1QZ2QAyLMaCCWVLi1nVo3MvHSMU7k4Fi7K1BtZBLDkCK6JixE0v3p8mrB
+         KlieMCL+ETjbB9LKMpeIbgM9jBtfvtsyMsUUaoq6AsaZ77v6CqreajiIVj1TtOaX9Y
+         JRjtvjFMfV7kA==
+Date:   Mon, 17 Oct 2022 17:52:44 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fscrypt@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
+Subject: Re: [PATCH] fscrypt: fix keyring memory leak on mount failure
+Message-ID: <Y0343O5W7ehNUDP8@sol.localdomain>
+References: <0000000000009aad5e05eac85f36@google.com>
+ <20221011213838.209879-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221011213838.209879-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jarkko Sakkinen <jarkko@profian.com>
+On Tue, Oct 11, 2022 at 02:38:38PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Commit d7e7b9af104c ("fscrypt: stop using keyrings subsystem for
+> fscrypt_master_key") moved the keyring destruction from __put_super() to
+> generic_shutdown_super() so that the filesystem's block device(s) are
+> still available.  Unfortunately, this causes a memory leak in the case
+> where a mount is attempted with the test_dummy_encryption mount option,
+> but the mount fails after the option has already been processed.
+> 
+> To fix this, attempt the keyring destruction in both places.
+> 
+> Reported-by: syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
+> Fixes: d7e7b9af104c ("fscrypt: stop using keyrings subsystem for fscrypt_master_key")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-[ Upstream commit b3b9fdf1a9be4266b01a2063b1f37cdc20806e3b ]
+Applied to fscrypt.git#for-stable for 6.1.
 
-A quirk for fixing the committed TCB version, when upgrading from a
-firmware version earlier than 1.50. This is a known issue, and the
-documented workaround is to load the firmware twice.
+As usual, I'd greatly appreciate reviews though...
 
-Currently, this issue requires the  following workaround:
-
-sudo modprobe -r kvm_amd
-sudo modprobe -r ccp
-sudo modprobe ccp
-sudo modprobe kvm_amd
-
-Implement this workaround inside kernel by checking whether the API
-version is less than 1.50, and if so, download the firmware twice.
-This addresses the TCB version issue.
-
-Link: https://lore.kernel.org/all/de02389f-249d-f565-1136-4af3655fab2a@profian.com/
-Reported-by: Harald Hoyer <harald@profian.com>
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index ed39a22e1b2b..0ea441e82bf9 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -528,6 +528,11 @@ static int sev_update_firmware(struct device *dev)
- 	struct page *p;
- 	u64 data_size;
- 
-+	if (!sev_version_greater_or_equal(0, 15)) {
-+		dev_dbg(dev, "DOWNLOAD_FIRMWARE not supported\n");
-+		return -1;
-+	}
-+
- 	if (sev_get_firmware(dev, &firmware) == -ENOENT) {
- 		dev_dbg(dev, "No SEV firmware file present\n");
- 		return -1;
-@@ -560,6 +565,14 @@ static int sev_update_firmware(struct device *dev)
- 	data->len = firmware->size;
- 
- 	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+
-+	/*
-+	 * A quirk for fixing the committed TCB version, when upgrading from
-+	 * earlier firmware version than 1.50.
-+	 */
-+	if (!ret && !sev_version_greater_or_equal(1, 50))
-+		ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+
- 	if (ret)
- 		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
- 	else
-@@ -1074,8 +1087,7 @@ void sev_pci_init(void)
- 	if (sev_get_api_version())
- 		goto err;
- 
--	if (sev_version_greater_or_equal(0, 15) &&
--	    sev_update_firmware(sev->dev) == 0)
-+	if (sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
- 
- 	/* Obtain the TMR memory area for SEV-ES use */
--- 
-2.35.1
-
+- Eric
