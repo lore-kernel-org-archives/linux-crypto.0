@@ -2,53 +2,47 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4A9C4321E
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B96EC43219
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 00:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231419AbiJRAL0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36734 "EHLO
+        id S230388AbiJRALl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:11:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230417AbiJRAKe (ORCPT
+        with ESMTP id S230291AbiJRAKp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:10:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D14870B9;
-        Mon, 17 Oct 2022 17:08:51 -0700 (PDT)
+        Mon, 17 Oct 2022 20:10:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B829895E0;
+        Mon, 17 Oct 2022 17:08:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E1B8E612FD;
-        Tue, 18 Oct 2022 00:08:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996F9C433D7;
-        Tue, 18 Oct 2022 00:08:45 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 52338B81BF5;
+        Tue, 18 Oct 2022 00:08:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E11ADC433C1;
+        Tue, 18 Oct 2022 00:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666051727;
-        bh=8F8gsq3wEiSLz7ZdSR0nDtrQ/AqYVXz1uWIv+7VrN44=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IG1l6ZdYITWzoU/W45fJGOSSiqMkyXyrHt3BG6dWBdNcWlNIlryyvodh8oYjc9+Sd
-         q+/+eSP7su3AvKcXds6yHB2gr1+vbWubRqd6xzuWydQf/PswLNvoYiEE5seoApbJjp
-         jIr9gm/JFaWnPJ/wAF+G4EB5OG3LLJ+dty+RyHkp7AQVU865J0DiK5VSU1OA1CZPmx
-         u+suhPjospsvbFeQL1OCnlqrAV+BHI5gi6qKRaJHL0cDAX1pa6mDyRYcb8Wtx5llfh
-         9kTinbF5EbyfHoiAJGJUiUjyXxueFP64eL7FyYiBKe9wH7rSERRU1AUSEcu9DOb8ol
-         SrvAmsKvhDxpg==
+        s=k20201202; t=1666051722;
+        bh=RSGgGtk0YTsjWbz6ye3C8AS4eZR6iyFcHaLNzhOaBv8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=TyJRSoWF4T9r8H7WIjbynD45RTdziVaLMhJT0atKIk5Zf0BKedKojaVKzZUqbElw7
+         UQsS5/9UeE2kJu4tsZIuZRISpiuV704lsgFtUSm9fFmknNAPWNq4W6bBsoF7H45s2s
+         4LahkGE+ZrqpYP3QlRHH1945498IhMgC5XrNd0RpQtBYufJPH3d3SCB1ofgu1lTmmi
+         FJ63Wc64z+tjFNycRJhsP8R+woZDVHWtE040M+cwrIN697hfuDo6fhuJeWIfzB3daC
+         IxdAkqSouvSgbSaUPjop2D4jV34eJ+2pzYsROpMuHEr3cNp0TmDC/MB9gjpyGqHT5T
+         VWZ9GmlP0tV0g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jacky Li <jackyli@google.com>, Peter Gonda <pgonda@google.com>,
-        Alper Gun <alpergun@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, pbonzini@redhat.com,
-        corbet@lwn.net, brijesh.singh@amd.com, john.allen@amd.com,
-        davem@davemloft.net, like.xu.linux@gmail.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 03/29] crypto: ccp - Initialize PSP when reading psp data file failed
-Date:   Mon, 17 Oct 2022 20:08:12 -0400
-Message-Id: <20221018000839.2730954-3-sashal@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        kernel test robot <lkp@intel.com>,
+        Vinod Koul <vkoul@kernel.org>, Sasha Levin <sashal@kernel.org>,
+        agross@kernel.org, andersson@kernel.org, davem@davemloft.net,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.19 01/29] crypto: qcom-rng - Fix qcom_rng_of_match unused warning
+Date:   Mon, 17 Oct 2022 20:08:10 -0400
+Message-Id: <20221018000839.2730954-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221018000839.2730954-1-sashal@kernel.org>
-References: <20221018000839.2730954-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -57,139 +51,56 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jacky Li <jackyli@google.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit d8da2da21fdb1f5964c11c00f0cc84fb0edf31d0 ]
+[ Upstream commit 882aa6525cabcfa0cea61e1a19c9af4c543118ac ]
 
-Currently the OS fails the PSP initialization when the file specified at
-'init_ex_path' does not exist or has invalid content. However the SEV
-spec just requires users to allocate 32KB of 0xFF in the file, which can
-be taken care of by the OS easily.
+Module device tables need to be declared as maybe_unused because
+they will be unused when built-in and the corresponding option is
+also disabled.
 
-To improve the robustness during the PSP init, leverage the retry
-mechanism and continue the init process:
+This patch adds the maybe_unused attributes to OF and ACPI.  This
+also allows us to remove the ifdef around the ACPI data structure.
 
-Before the first INIT_EX call, if the content is invalid or missing,
-continue the process by feeding those contents into PSP instead of
-aborting. PSP will then override it with 32KB 0xFF and return
-SEV_RET_SECURE_DATA_INVALID status code. In the second INIT_EX call,
-this 32KB 0xFF content will then be fed and PSP will write the valid
-data to the file.
-
-In order to do this, sev_read_init_ex_file should only be called once
-for the first INIT_EX call. Calling it again for the second INIT_EX call
-will cause the invalid file content overwriting the valid 32KB 0xFF data
-provided by PSP in the first INIT_EX call.
-
-Co-developed-by: Peter Gonda <pgonda@google.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Signed-off-by: Jacky Li <jackyli@google.com>
-Reported-by: Alper Gun <alpergun@google.com>
-Acked-by: David Rientjes <rientjes@google.com>
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Reviewed-by: Vinod Koul <vkoul@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../virt/kvm/x86/amd-memory-encryption.rst    |  5 ++-
- drivers/crypto/ccp/sev-dev.c                  | 36 +++++++++++--------
- 2 files changed, 24 insertions(+), 17 deletions(-)
+ drivers/crypto/qcom-rng.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 2d307811978c..935aaeb97fe6 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -89,9 +89,8 @@ context. In a typical workflow, this command should be the first command issued.
+diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
+index 031b5f701a0a..72dd1a4ebac4 100644
+--- a/drivers/crypto/qcom-rng.c
++++ b/drivers/crypto/qcom-rng.c
+@@ -9,6 +9,7 @@
+ #include <linux/crypto.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/platform_device.h>
+@@ -201,15 +202,13 @@ static int qcom_rng_remove(struct platform_device *pdev)
+ 	return 0;
+ }
  
- The firmware can be initialized either by using its own non-volatile storage or
- the OS can manage the NV storage for the firmware using the module parameter
--``init_ex_path``. The file specified by ``init_ex_path`` must exist. To create
--a new NV storage file allocate the file with 32KB bytes of 0xFF as required by
--the SEV spec.
-+``init_ex_path``. If the file specified by ``init_ex_path`` does not exist or
-+is invalid, the OS will create or override the file with output from PSP.
+-#if IS_ENABLED(CONFIG_ACPI)
+-static const struct acpi_device_id qcom_rng_acpi_match[] = {
++static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
+ 	{ .id = "QCOM8160", .driver_data = 1 },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(acpi, qcom_rng_acpi_match);
+-#endif
  
- Returns: 0 on success, -negative on error
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index b292641c8a99..8512101f0bdf 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -211,18 +211,24 @@ static int sev_read_init_ex_file(void)
- 	if (IS_ERR(fp)) {
- 		int ret = PTR_ERR(fp);
- 
--		dev_err(sev->dev,
--			"SEV: could not open %s for read, error %d\n",
--			init_ex_path, ret);
-+		if (ret == -ENOENT) {
-+			dev_info(sev->dev,
-+				"SEV: %s does not exist and will be created later.\n",
-+				init_ex_path);
-+			ret = 0;
-+		} else {
-+			dev_err(sev->dev,
-+				"SEV: could not open %s for read, error %d\n",
-+				init_ex_path, ret);
-+		}
- 		return ret;
- 	}
- 
- 	nread = kernel_read(fp, sev_init_ex_buffer, NV_LENGTH, NULL);
- 	if (nread != NV_LENGTH) {
--		dev_err(sev->dev,
--			"SEV: failed to read %u bytes to non volatile memory area, ret %ld\n",
-+		dev_info(sev->dev,
-+			"SEV: could not read %u bytes to non volatile memory area, ret %ld\n",
- 			NV_LENGTH, nread);
--		return -EIO;
- 	}
- 
- 	dev_dbg(sev->dev, "SEV: read %ld bytes from NV file\n", nread);
-@@ -410,17 +416,12 @@ static int __sev_init_locked(int *error)
- static int __sev_init_ex_locked(int *error)
- {
- 	struct sev_data_init_ex data;
--	int ret;
- 
- 	memset(&data, 0, sizeof(data));
- 	data.length = sizeof(data);
- 	data.nv_address = __psp_pa(sev_init_ex_buffer);
- 	data.nv_len = NV_LENGTH;
- 
--	ret = sev_read_init_ex_file();
--	if (ret)
--		return ret;
--
- 	if (sev_es_tmr) {
- 		/*
- 		 * Do not include the encryption mask on the physical
-@@ -439,7 +440,7 @@ static int __sev_platform_init_locked(int *error)
- {
- 	struct psp_device *psp = psp_master;
- 	struct sev_device *sev;
--	int rc, psp_ret = -1;
-+	int rc = 0, psp_ret = -1;
- 	int (*init_function)(int *error);
- 
- 	if (!psp || !psp->sev_data)
-@@ -450,8 +451,15 @@ static int __sev_platform_init_locked(int *error)
- 	if (sev->state == SEV_STATE_INIT)
- 		return 0;
- 
--	init_function = sev_init_ex_buffer ? __sev_init_ex_locked :
--			__sev_init_locked;
-+	if (sev_init_ex_buffer) {
-+		init_function = __sev_init_ex_locked;
-+		rc = sev_read_init_ex_file();
-+		if (rc)
-+			return rc;
-+	} else {
-+		init_function = __sev_init_locked;
-+	}
-+
- 	rc = init_function(&psp_ret);
- 	if (rc && psp_ret == SEV_RET_SECURE_DATA_INVALID) {
- 		/*
+-static const struct of_device_id qcom_rng_of_match[] = {
++static const struct of_device_id __maybe_unused qcom_rng_of_match[] = {
+ 	{ .compatible = "qcom,prng", .data = (void *)0},
+ 	{ .compatible = "qcom,prng-ee", .data = (void *)1},
+ 	{}
 -- 
 2.35.1
 
