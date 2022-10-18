@@ -2,78 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F313CC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 05:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47763C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 07:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229779AbiJRFbQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Oct 2022 01:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43956 "EHLO
+        id S229719AbiJRHEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Oct 2022 03:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbiJRFbN (ORCPT
+        with ESMTP id S230028AbiJRHE3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2022 01:31:13 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539C697EF9;
-        Mon, 17 Oct 2022 22:31:12 -0700 (PDT)
+        Tue, 18 Oct 2022 03:04:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DFC13DDA;
+        Tue, 18 Oct 2022 00:04:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CEBE9B81CD8;
-        Tue, 18 Oct 2022 05:31:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D9CC433D6;
-        Tue, 18 Oct 2022 05:31:08 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZhjdXf/B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1666071066;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IfT8FCupjHgZShjL2XGDOSYwTJpe93DPuuQkU3piicg=;
-        b=ZhjdXf/BO0yg8xyeMOcbErVr8U5H9y5p392jqGgNvaDo+uqbkzrANQdCWQWNB9+eGzkLcm
-        Mm4wu0FXwGgPwmHIGjPf/0N5QCC3V/55TiulLd3yYNDODqZjq1P2VI/vd1mFlK/h2uf1k3
-        AoRm6OzhTdhOLnE3GexEGZu5cPaTTz0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b57869f6 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 18 Oct 2022 05:31:05 +0000 (UTC)
-Date:   Mon, 17 Oct 2022 23:31:03 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A6CC061487;
+        Tue, 18 Oct 2022 07:04:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2AB3C433C1;
+        Tue, 18 Oct 2022 07:04:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666076666;
+        bh=nzOkWr31YDiUOeIbP4635LhimacOpccRoPiypQjEzA8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EOnM0MeBov5bhe9aPWFjq9/qju0h1sLn4ikh0b+N16j6eKKRq4sl4qL7enrW/bMUx
+         c1HQguA+ds7DQo0tJNARGtxUOy6mgr/9OPQIMdb7LexoALaeMpktI5JhU/MLrlrgAV
+         MUZrj6pfr7H0X/yphD3LL9OnX/5k7EAc8rErw35LdKuq5ADTam26azDrVEKgh0zjSX
+         dN1B6Zfp8Dtv7j0jeSYYZ/rsLASxZDSucOypJw4J/BK+qFAJQoRJnSkS/qDARbdpHa
+         lpupiXAbvjtoYbFbYnjMoAtdmmC26A9p+RIFTaKAho2Zni595cROGiZ9IoP+MPZaBk
+         NfImpGadDPPxg==
+Date:   Tue, 18 Oct 2022 00:04:24 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         sneves@dei.uc.pt
 Subject: Re: [PATCH] random: use rejection sampling for uniform bounded
  random integers
-Message-ID: <Y046F2pGjC0apna0@zx2c4.com>
+Message-ID: <Y05P+KTzFHGaK4C3@sol.localdomain>
 References: <20221017023752.3907-1-Jason@zx2c4.com>
  <Y02ehdiCtHyLErB8@sol.localdomain>
+ <Y046F2pGjC0apna0@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y02ehdiCtHyLErB8@sol.localdomain>
+In-Reply-To: <Y046F2pGjC0apna0@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 11:27:17AM -0700, Eric Biggers wrote:
-> On Sun, Oct 16, 2022 at 08:37:53PM -0600, Jason A. Donenfeld wrote:
-> > In order to be efficient, we implement a kernel-specific variant of
-> > Daniel Lemire's algorithm from "Fast Random Integer Generation in an
-> > Interval", linked below. The kernel's variant takes advantage of
-> > constant folding to avoid divisions entirely in the vast majority of
-> > cases, works on both 32-bit and 64-bit architectures, and requests a
-> > minimal amount of bytes from the RNG.
+On Mon, Oct 17, 2022 at 11:31:03PM -0600, Jason A. Donenfeld wrote:
+> On Mon, Oct 17, 2022 at 11:27:17AM -0700, Eric Biggers wrote:
+> > On Sun, Oct 16, 2022 at 08:37:53PM -0600, Jason A. Donenfeld wrote:
+> > > In order to be efficient, we implement a kernel-specific variant of
+> > > Daniel Lemire's algorithm from "Fast Random Integer Generation in an
+> > > Interval", linked below. The kernel's variant takes advantage of
+> > > constant folding to avoid divisions entirely in the vast majority of
+> > > cases, works on both 32-bit and 64-bit architectures, and requests a
+> > > minimal amount of bytes from the RNG.
+> > > 
+> > > Link: https://arxiv.org/pdf/1805.10941.pdf
 > > 
-> > Link: https://arxiv.org/pdf/1805.10941.pdf
+> > Thanks for doing this!  Your code looks correct, but it was hard for me to
+> > understand until I read the paper that is linked to.  Could you include a brief
+> > comment in the code that explains the algorithm?  Also, though the code looks
+> > correct, I assume that you've also explicitly tested that each of the four code
+> > paths produce uniform random numbers as intended?
 > 
-> Thanks for doing this!  Your code looks correct, but it was hard for me to
-> understand until I read the paper that is linked to.  Could you include a brief
-> comment in the code that explains the algorithm?  Also, though the code looks
-> correct, I assume that you've also explicitly tested that each of the four code
-> paths produce uniform random numbers as intended?
+> Yes, I've tested those, and they work. (Threw a lot of cores and ram at
+> it.)
+> 
+> I could include a comment, sure. What do you have in mind? A
+> line-by-line thing, or just a short blurb at the top of the function?
+> 
+> Jason
 
-Yes, I've tested those, and they work. (Threw a lot of cores and ram at
-it.)
+A comment at the top of the function would be good.
 
-I could include a comment, sure. What do you have in mind? A
-line-by-line thing, or just a short blurb at the top of the function?
-
-Jason
+- Eric
