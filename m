@@ -2,151 +2,221 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B9CC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 13:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FE3C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Oct 2022 17:35:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231246AbiJRNxJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Oct 2022 09:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60414 "EHLO
+        id S229526AbiJRRfD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Oct 2022 13:35:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJRNxG (ORCPT
+        with ESMTP id S229691AbiJRRfC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Oct 2022 09:53:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 899B6CF846
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2022 06:53:04 -0700 (PDT)
+        Tue, 18 Oct 2022 13:35:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D09552DE9;
+        Tue, 18 Oct 2022 10:35:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 72CDC615A6
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2022 13:53:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E9FC43144
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2022 13:53:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666101182;
-        bh=BSDYmUetwBIPUtsDuswHZpT1TQxNmKAicztx7uSV49g=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ScZsWveHb+u1Tt+GMgzrCyl7aRK7mMnXAYdJ1QXozNMg1KQpA5w3R6CQmloYkISLz
-         6mpJ3Gr+0ZWLkr0kQfRbisLYYDAyAY3qybCJkFCRbKS5EYYUbscMZytEjeGMV6+mcd
-         WRNEzifu57gzP+dC/G322+G+fVtGGNP9AGDvcsvLZvkUroc7ZijQ5bvo2dckkuGqBf
-         D0/+wsWQFjDxjQmOMEK6NlVWufAees5ln0XpfPIVoHJS482Enq2BG+ej417CC/fFe+
-         ROfVhxR7ggHYlT1SVsSmjWU94lmPfbCIrBkXRITcuQKUY2H+ebt39ZmrPk2v2BR5H1
-         anex2k90QeQ9w==
-Received: by mail-lf1-f54.google.com with SMTP id d6so22591968lfs.10
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Oct 2022 06:53:02 -0700 (PDT)
-X-Gm-Message-State: ACrzQf3hMEK9kvMyfafQv6mhTKrzgcd9HMYkI979S6ye1vVjLV2FUVDV
-        bhFeTtsnGmAk8JbKb/MW7/kud0Pd42KJbunpLTk=
-X-Google-Smtp-Source: AMsMyM5WELQTYNAzvJaBUvA55snbSzQinMexjqa4ilJV8sT9I+IB6caOiUY31Y52nDonnkdRKyKK3fWhNVmwGRUa6Og=
-X-Received: by 2002:a05:6512:104a:b0:4a2:9c7b:c9c with SMTP id
- c10-20020a056512104a00b004a29c7b0c9cmr999036lfb.122.1666101180786; Tue, 18
- Oct 2022 06:53:00 -0700 (PDT)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 383A6B82081;
+        Tue, 18 Oct 2022 17:35:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B258C433D6;
+        Tue, 18 Oct 2022 17:34:58 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ImkinLzb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1666114496;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7XMkYIGMgupwppPotNYu9obKkCzLFIuRLklhiM2amjU=;
+        b=ImkinLzbFY4YpsK1seMTWP+u+P5GLQwArJpGW+7FbAh3BBn6fhl9ko0a92FkbbTl8zrxBL
+        0dlL6OrN8tkgLWDk6VFz1hDUSBr8XAixPZkd+yHTsTh66FJ4NKp08eaem6vR4WHY3taPBi
+        0PTdAMiC5aZRtKTyi5vJ3yZM3YrtPAI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d1abb0b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 18 Oct 2022 17:34:55 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     sneves@dei.uc.pt, ebiggers@kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v2] random: use rejection sampling for uniform bounded random integers
+Date:   Tue, 18 Oct 2022 11:34:21 -0600
+Message-Id: <20221018173420.127174-1-Jason@zx2c4.com>
+In-Reply-To: <Y05P+KTzFHGaK4C3@sol.localdomain>
+References: <Y05P+KTzFHGaK4C3@sol.localdomain>
 MIME-Version: 1.0
-References: <20221014104713.2613195-1-ardb@kernel.org> <Y02c4kfTIj4XZxNV@sol.localdomain>
-In-Reply-To: <Y02c4kfTIj4XZxNV@sol.localdomain>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 18 Oct 2022 15:52:49 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXF9A4z=_XeT7F-4gVxz7zwgaTqYtoN9G36LSpK9Vr2CFQ@mail.gmail.com>
-Message-ID: <CAMj1kXF9A4z=_XeT7F-4gVxz7zwgaTqYtoN9G36LSpK9Vr2CFQ@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: gcmaes - Provide minimal library implementation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, keescook@chromium.org,
-        jason@zx2c4.com, herbert@gondor.apana.org.au,
-        Nikunj A Dadhania <nikunj@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Oct 2022 at 20:20, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Fri, Oct 14, 2022 at 12:47:13PM +0200, Ard Biesheuvel wrote:
-> > Note that table based AES implementations are susceptible to known
-> > plaintext timing attacks on the encryption key. The AES library already
-> > attempts to mitigate this to some extent, but given that the counter
-> > mode encryption used by GCM operates exclusively on known plaintext by
-> > construction (the IV and therefore the initial counter value are known
-> > to an attacker), let's take some extra care to mitigate this, by calling
-> > the AES library with interrupts disabled.
->
-> Note that crypto/gf128mul.c has no mitigations against timing attacks.  I take
-> it that is something that needs to be tolerated here?
->
+Until the very recent commits, many bounded random integers were
+calculated using `get_random_u32() % max_plus_one`, which not only
+incurs the price of a division -- indicating performance mostly was not
+a real issue -- but also does not result in a uniformly distributed
+output if max_plus_one is not a power of two. Recent commits moved to
+using `prandom_u32_max(max_plus_one)`, which replaces the division with
+a faster multiplication, but still does not solve the issue with
+non-uniform output.
 
-Ah good point - I misremembered and thought that the 'slow' version
-without the expanded key uses not table lookups at all.
+For some users, maybe this isn't a problem, and for others, maybe it is,
+but for the majority of users, probably the question has never been
+posed and analyzed, and nobody thought much about it, probably assuming
+random is random is random. In other words, the unthinking expectation
+of most users is likely that the resultant numbers are uniform.
 
-I can add a patch to address this, it doesn't seem all that difficult
-to remove the table lookups and data or key dependent conditionals.
+So we implement here an efficient way of generating uniform bounded
+random integers. Through use of compile-time evaluation, and avoiding
+divisions as much as possible, this commit introduces no measurable
+overhead. At least for hot-path uses tested, any potential difference
+was lost in the noise. On both clang and gcc, code generation is pretty
+small.
 
-> > diff --git a/include/crypto/gcm.h b/include/crypto/gcm.h
-> > index 9d7eff04f224..dfbc381df5ae 100644
-> > --- a/include/crypto/gcm.h
-> > +++ b/include/crypto/gcm.h
-> > @@ -3,6 +3,9 @@
-> >
-> >  #include <linux/errno.h>
-> >
-> > +#include <crypto/aes.h>
-> > +#include <crypto/gf128mul.h>
-> > +
-> >  #define GCM_AES_IV_SIZE 12
-> >  #define GCM_RFC4106_IV_SIZE 8
-> >  #define GCM_RFC4543_IV_SIZE 8
-> > @@ -60,4 +63,67 @@ static inline int crypto_ipsec_check_assoclen(unsigned int assoclen)
-> >
-> >       return 0;
-> >  }
-> > +
-> > +struct gcmaes_ctx {
-> > +     be128                   ghash_key;
-> > +     struct crypto_aes_ctx   aes_ctx;
-> > +     unsigned int            authsize;
-> > +};
-> > +
-> > +/**
-> > + * gcmaes_expandkey - Expands the AES and GHASH keys for the GCM-AES key
-> > + *                 schedule
-> > + *
-> > + * @ctx:     The data structure that will hold the GCM-AES key schedule
-> > + * @key:     The AES encryption input key
-> > + * @keysize: The length in bytes of the input key
-> > + * @authsize:        The size in bytes of the GCM authentication tag
-> > + *
-> > + * Returns 0 on success, or -EINVAL if @keysize or @authsize contain values
-> > + * that are not permitted by the GCM specification.
-> > + */
-> > +int gcmaes_expandkey(struct gcmaes_ctx *ctx, const u8 *key,
-> > +                  unsigned int keysize, unsigned int authsize);
->
-> These comments are duplicated in the .c file too.  They should be in just one
-> place, probably the .c file since that approach is more common in the kernel.
->
+The new function, get_random_u32_below(), lives in random.h, rather than
+prandom.h, and has a "get_random_xxx" function name, because it is
+suitable for all uses, including cryptography.
 
-OK
+In order to be efficient, we implement a kernel-specific variant of
+Daniel Lemire's algorithm from "Fast Random Integer Generation in an
+Interval", linked below. The kernel's variant takes advantage of
+constant folding to avoid divisions entirely in the vast majority of
+cases, works on both 32-bit and 64-bit architectures, and requests a
+minimal amount of bytes from the RNG.
 
-> Also, this seems to be intended to be a kerneldoc comment, but the return value
-> isn't documented in the correct format.  It needs to be "Return:".  Try this:
->
-> $ ./scripts/kernel-doc -v -none lib/crypto/gcmaes.c
-> lib/crypto/gcmaes.c:35: info: Scanning doc for function gcmaes_expandkey
-> lib/crypto/gcmaes.c:48: warning: No description found for return value of 'gcmaes_expandkey'
-> lib/crypto/gcmaes.c:114: info: Scanning doc for function gcmaes_encrypt
-> lib/crypto/gcmaes.c:142: info: Scanning doc for function gcmaes_decrypt
-> lib/crypto/gcmaes.c:162: warning: No description found for return value of 'gcmaes_decrypt'
->
+Link: https://arxiv.org/pdf/1805.10941.pdf
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+Changes v1->v2:
+- Add a few explanatory comments.
 
-OK, will fix.
+ drivers/char/random.c   | 22 ++++++++++++++++++++++
+ include/linux/prandom.h | 18 ++----------------
+ include/linux/random.h  | 40 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 64 insertions(+), 16 deletions(-)
 
-> > +config CRYPTO_LIB_GCMAES
-> > +     tristate
-> > +     select CRYPTO_GF128MUL
-> > +     select CRYPTO_LIB_AES
-> > +     select CRYPTO_LIB_UTILS
->
-> Doesn't this mean that crypto/gf128mul.c needs to be moved into lib/crypto/?
->
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 2fe28eeb2f38..e3cf4f51ed58 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -160,6 +160,7 @@ EXPORT_SYMBOL(wait_for_random_bytes);
+  *	u8 get_random_u8()
+  *	u16 get_random_u16()
+  *	u32 get_random_u32()
++ *	u32 get_random_u32_below(u32 ceil)
+  *	u64 get_random_u64()
+  *	unsigned long get_random_long()
+  *
+@@ -510,6 +511,27 @@ DEFINE_BATCHED_ENTROPY(u16)
+ DEFINE_BATCHED_ENTROPY(u32)
+ DEFINE_BATCHED_ENTROPY(u64)
+ 
++u32 __get_random_u32_below(u32 ceil)
++{
++	/*
++	 * This is the slow path for variable ceil. It is still fast, most of
++	 * the time, by doing traditional reciprocal multiplication and
++	 * opportunistically comparing the lower half to ceil itself, before
++	 * falling back to computing a larger bound, and then rejecting samples
++	 * whose lower half would indicate a range indivisible by ceil. The use
++	 * of `-ceil % ceil` is analogous to `2^32 % ceil`, but is computable
++	 * in 32-bits.
++	 */
++	u64 mult = (u64)ceil * get_random_u32();
++	if (unlikely((u32)mult < ceil)) {
++		u32 bound = -ceil % ceil;
++		while (unlikely((u32)mult < bound))
++			mult = (u64)ceil * get_random_u32();
++	}
++	return mult >> 32;
++}
++EXPORT_SYMBOL(__get_random_u32_below);
++
+ #ifdef CONFIG_SMP
+ /*
+  * This function is called when the CPU is coming up, with entry
+diff --git a/include/linux/prandom.h b/include/linux/prandom.h
+index e0a0759dd09c..1f4a0de7b019 100644
+--- a/include/linux/prandom.h
++++ b/include/linux/prandom.h
+@@ -23,24 +23,10 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state);
+ #define prandom_init_once(pcpu_state)			\
+ 	DO_ONCE(prandom_seed_full_state, (pcpu_state))
+ 
+-/**
+- * prandom_u32_max - returns a pseudo-random number in interval [0, ep_ro)
+- * @ep_ro: right open interval endpoint
+- *
+- * Returns a pseudo-random number that is in interval [0, ep_ro). This is
+- * useful when requesting a random index of an array containing ep_ro elements,
+- * for example. The result is somewhat biased when ep_ro is not a power of 2,
+- * so do not use this for cryptographic purposes.
+- *
+- * Returns: pseudo-random number in interval [0, ep_ro)
+- */
++/* Deprecated: use get_random_u32_below() instead. */
+ static inline u32 prandom_u32_max(u32 ep_ro)
+ {
+-	if (__builtin_constant_p(ep_ro <= 1U << 8) && ep_ro <= 1U << 8)
+-		return (get_random_u8() * ep_ro) >> 8;
+-	if (__builtin_constant_p(ep_ro <= 1U << 16) && ep_ro <= 1U << 16)
+-		return (get_random_u16() * ep_ro) >> 16;
+-	return ((u64)get_random_u32() * ep_ro) >> 32;
++	return get_random_u32_below(ep_ro);
+ }
+ 
+ /*
+diff --git a/include/linux/random.h b/include/linux/random.h
+index 147a5e0d0b8e..3a82c0a8bc46 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -51,6 +51,46 @@ static inline unsigned long get_random_long(void)
+ #endif
+ }
+ 
++u32 __get_random_u32_below(u32 ceil);
++
++/*
++ * Returns a random integer in the interval [0, ceil), with uniform
++ * distribution, suitable for all uses. Fastest when ceil is a constant, but
++ * still fast for variable ceil as well.
++ */
++static inline u32 get_random_u32_below(u32 ceil)
++{
++	if (!__builtin_constant_p(ceil))
++		return __get_random_u32_below(ceil);
++
++	/*
++	 * For the fast path, below, all operations on ceil are precomputed by
++	 * the compiler, so this incurs no overhead for checking pow2, doing
++	 * divisions, or branching based on integer size. The resultant
++	 * algorithm does traditional reciprocal multiplication (typically
++	 * optimized by the compiler into shifts and adds), rejecting samples
++	 * whose lower half would indicate a range indivisible by ceil.
++	 */
++	BUILD_BUG_ON_MSG(!ceil, "get_random_u32_below() must take ceil > 0");
++	if (ceil <= 1)
++		return 0;
++	for (;;) {
++		if (ceil <= 1U << 8) {
++			u32 mult = ceil * get_random_u8();
++			if (likely(is_power_of_2(ceil) || (u8)mult >= (1U << 8) % ceil))
++				return mult >> 8;
++		} else if (ceil <= 1U << 16) {
++			u32 mult = ceil * get_random_u16();
++			if (likely(is_power_of_2(ceil) || (u16)mult >= (1U << 16) % ceil))
++				return mult >> 16;
++		} else {
++			u64 mult = (u64)ceil * get_random_u32();
++			if (likely(is_power_of_2(ceil) || (u32)mult >= -ceil % ceil))
++				return mult >> 32;
++		}
++	}
++}
++
+ /*
+  * On 64-bit architectures, protect against non-terminated C string overflows
+  * by zeroing out the first byte of the canary; this leaves 56 bits of entropy.
+-- 
+2.37.3
 
-Probably, I'll address that as well in v3.
-
-Thanks,
-Ard.
