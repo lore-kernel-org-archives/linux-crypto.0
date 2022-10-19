@@ -2,146 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519C7C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Oct 2022 08:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17653C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Oct 2022 12:01:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230201AbiJSIh4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Oct 2022 04:37:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54248 "EHLO
+        id S232279AbiJSMBJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Oct 2022 08:01:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbiJSIhd (ORCPT
+        with ESMTP id S232302AbiJSL7v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Oct 2022 04:37:33 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851967E31B;
-        Wed, 19 Oct 2022 01:37:30 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 19 Oct 2022 07:59:51 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E4E129741;
+        Wed, 19 Oct 2022 04:37:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8A774339DA;
-        Wed, 19 Oct 2022 08:37:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1666168648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qPk+7KJG/hENNIRans/TaYIf8cB/olSwAdJS6bByusQ=;
-        b=sbu5QmuD5hMfVso6xNbaey8BXdTICxX0QJIyj+zGamtTVZA3XrzfkmprCbaJCQof4QagCt
-        UMDPeanrrGRLIoH6oVp4Wm/aY6XA/94xo7RFPyNdAasI9nOZvs+MBi/023hxnrAJ8WvuhK
-        qG6MICJ2dw5PaqdZZTSnHE2IcOVc6Sc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1666168648;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qPk+7KJG/hENNIRans/TaYIf8cB/olSwAdJS6bByusQ=;
-        b=huKMRmkzkKOWK6c3+pNQ++3VFnwwWIJMujRYg2MGpRG6My0bGRwOBCLlxXYsfQnm008dSd
-        UUpdKfJqF3WL6gAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 76EF613345;
-        Wed, 19 Oct 2022 08:37:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id lv4HHUi3T2NfZQAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 19 Oct 2022 08:37:28 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Martin Doucha <mdoucha@suse.cz>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH 5/5] padata: avoid potential UAFs to the padata_shell from padata_reorder()
-Date:   Wed, 19 Oct 2022 10:37:08 +0200
-Message-Id: <20221019083708.27138-6-nstange@suse.de>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221019083708.27138-1-nstange@suse.de>
-References: <20221019083708.27138-1-nstange@suse.de>
+        by ams.source.kernel.org (Postfix) with ESMTPS id DEA90B82325;
+        Wed, 19 Oct 2022 11:36:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D96C433B5;
+        Wed, 19 Oct 2022 11:36:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666179397;
+        bh=1u/C5nVuSOViooeK4YNtQMbHDMKvy++Dv8cZcqjakKo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jyJciBHE0mwnlIMcQaBjaTLKgXRF17XAqgSXsHGdJ+0l+Iu9MNcw3H5ZSeTbywpx0
+         T9CK7VrK7thyRppIrbhkVhHvfh/4xd+HaJw4SZny9adchpWxMrwAGO6GQY364GlVA4
+         Jp5QLyLkWOk7Bpq660A6CA1aihyFZuob4DDdMVpw4SC4Cr3Wy6GGcMZKIeIK8aFbfL
+         6lP1BdIE5ZBfftNPedtJ81CdECx6vUu7vHhRSm3OFpRwmzbJIA99qHcdIf408ExSRC
+         Clga2oTETymK9UUcuoAmuY7JkUyAQHzWsFAywSyCGo63BfPSDHL/wHHITyMJ02MNH7
+         adRfXyuR+aJ+w==
+Date:   Wed, 19 Oct 2022 13:36:33 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
+Subject: Re: [PATCH] fscrypt: fix keyring memory leak on mount failure
+Message-ID: <20221019113633.jt6khltk6nsy666p@wittgenstein>
+References: <0000000000009aad5e05eac85f36@google.com>
+ <20221011213838.209879-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221011213838.209879-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Even though the parallel_data "pd" instance passed to padata_reorder() is
-guaranteed to exist as per the reference held by its callers, the same is
-not true for the associated padata_shell, pd->ps. More specifically, once
-the last padata_priv request has been completed, either at entry from
-padata_reorder() or concurrently to it, the padata API users are well
-within their right to free the padata_shell instance.
+On Tue, Oct 11, 2022 at 02:38:38PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Commit d7e7b9af104c ("fscrypt: stop using keyrings subsystem for
+> fscrypt_master_key") moved the keyring destruction from __put_super() to
+> generic_shutdown_super() so that the filesystem's block device(s) are
+> still available.  Unfortunately, this causes a memory leak in the case
+> where a mount is attempted with the test_dummy_encryption mount option,
+> but the mount fails after the option has already been processed.
+> 
+> To fix this, attempt the keyring destruction in both places.
+> 
+> Reported-by: syzbot+104c2a89561289cec13e@syzkaller.appspotmail.com
+> Fixes: d7e7b9af104c ("fscrypt: stop using keyrings subsystem for fscrypt_master_key")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
 
-Note that this is a purely theoretical issue, it has not been actually
-observed. Yet it's worth fixing for the sake of robustness.
-
-Exploit the fact that as long as there are any not yet completed
-padata_priv's around on any of the percpu reorder queues, pd->ps is
-guaranteed to exist. Make padata_reorder() to load from pd->ps only when
-it's known that there is at least one in-flight padata_priv object to
-reorder. Note that this involves moving pd->ps accesses to under the
-reorder->lock as appropriate, so that the found padata_priv object won't
-get dequeued and completed concurrently from a different context.
-
-Fixes: bbefa1dd6a6d ("crypto: pcrypt - Avoid deadlock by using per-instance
-                      padata queues")
-Signed-off-by: Nicolai Stange <nstange@suse.de>
----
- kernel/padata.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index e9eab3e94cfc..fa4818b81eca 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -286,7 +286,6 @@ static struct padata_priv *padata_dequeue_next(struct parallel_data *pd)
- 
- static bool padata_reorder(struct parallel_data *pd)
- {
--	struct padata_instance *pinst = pd->ps->pinst;
- 	int cb_cpu;
- 	struct padata_priv *padata;
- 	struct padata_serial_queue *squeue;
-@@ -323,7 +322,11 @@ static bool padata_reorder(struct parallel_data *pd)
- 		list_add_tail(&padata->list, &squeue->serial.list);
- 		spin_unlock(&squeue->serial.lock);
- 
--		queue_work_on(cb_cpu, pinst->serial_wq, &squeue->work);
-+		/*
-+		 * Note: as long as there are requests in-flight,
-+		 * pd->ps is guaranteed to exist.
-+		 */
-+		queue_work_on(cb_cpu, pd->ps->pinst->serial_wq, &squeue->work);
- 	}
- 
- 	spin_unlock_bh(&pd->lock);
-@@ -340,14 +343,23 @@ static bool padata_reorder(struct parallel_data *pd)
- 
- 	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
- 	if (!list_empty(&reorder->list)) {
-+		bool reenqueued;
-+
- 		spin_lock(&reorder->lock);
- 		if (!__padata_find_next(pd, reorder)) {
- 			spin_unlock(&reorder->lock);
- 			return false;
- 		}
-+
-+		/*
-+		 * Note: as long as there are requests in-flight,
-+		 * pd->ps is guaranteed to exist.
-+		 */
-+		reenqueued = queue_work(pd->ps->pinst->serial_wq,
-+					&pd->reorder_work);
- 		spin_unlock(&reorder->lock);
- 
--		return queue_work(pinst->serial_wq, &pd->reorder_work);
-+		return reenqueued;
- 	}
- 
- 	return false;
--- 
-2.37.3
-
+Looks good,
+Reviewed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
