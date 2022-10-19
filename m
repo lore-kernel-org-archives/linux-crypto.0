@@ -2,104 +2,199 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620BEC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Oct 2022 14:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F08E3C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Oct 2022 18:49:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231699AbiJSO5m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Oct 2022 10:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50814 "EHLO
+        id S229731AbiJSStI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Oct 2022 14:49:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbiJSO5P (ORCPT
+        with ESMTP id S231208AbiJSSs7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Oct 2022 10:57:15 -0400
-X-Greylist: delayed 571 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Oct 2022 07:50:45 PDT
-Received: from mail.steuer-voss.de (mail.steuer-voss.de [85.183.69.95])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735034BD19;
-        Wed, 19 Oct 2022 07:50:44 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at mail.steuer-voss.de
-Received: by mail.steuer-voss.de (Postfix, from userid 1000)
-        id 48E1B1B0E; Wed, 19 Oct 2022 16:41:08 +0200 (CEST)
-From:   Nikolaus Voss <nv@vosn.de>
-To:     "Horia Geanta" <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 19 Oct 2022 14:44:56 +0200
-Subject: [PATCH] crypto: caam: blob_gen.c: warn if key is insecure
-Message-Id: <20221019144108.48E1B1B0E@mail.steuer-voss.de>
+        Wed, 19 Oct 2022 14:48:59 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E481D3C59;
+        Wed, 19 Oct 2022 11:48:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RhP1UfS4a8P2Ys/htG1wUq9lz9xJzA/OfKLLXst38m1reaOgrqGik0qlCzsBTMJpA7rlUYtRmnORq4hmrqYtbyLF/Nrkz6KRDvbR15YhcJ5hHmFPN4O6n7xIrrSYqjq1ZOSMge5zrQXKdZJxloiLPcmEUva1K8gOJyXiUmoHyJgAR9rFbCnWCKWlvKfcv2Fi/iBjTz0vq0ps5l/GJP5Tbp/5gC2VPIAxA24vdtmacUuyWjogjyUHEl53Dt9V6/wTlduh28AUTs5oyzD2yGoEcl5pL5GMMtZufUH3ifnUO0iaT4CBX1+zEwnak/a8ZKT6glSDfxauF9UEgDfVzjcfnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oeuHJ5ix0QerSQILlXdrXnTORdS2TPIk5iiyBcbHJPk=;
+ b=iiiS3msUyiltGMRw+7jfhFc/l/JAbdVigjjdRiKCsjEChkpKUY9y0edxEaVIXOZ+RB8aC3xEdgx9wxU8X2GHVv5+aGwd2xsdbuhL4Fs1qHrWGjii2Y7HIE2+pY6jwVOZm1SCh/DdiJf39qr0sU5tBaXObTupMXRxS6FzotjYl0BHRAWrw/sgpEBCSWRRkO10QKZDdQwvHAHYN28RclKuV+McaNLFvWGpKqQeRHAVYhLOosDEHrDntoaGUSZtcl6evExd9lGl22hxOUxDGD6YTyAM/Nm7fARzb7zoiL7MXgrGD46U6GRvPiXT1V4ekIS17ZwlDjHYuO+hyVuVLWF0bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oeuHJ5ix0QerSQILlXdrXnTORdS2TPIk5iiyBcbHJPk=;
+ b=E3GZcH7dO0YEL+dI+SeiMv7zaDfPMT0jhMdIDe7PsLyLFVvmxlp4/lk15iM+21rlWIRJg+7x9ZTYPqcj9F8aTq2jKaWR8gOUqEr1T/7hWXtg5JC/Tu1lV1G7uIAgY2abxUpYb7z+R+sWyOO9a3T8QPjFYtyO8Pv9xQyiUAOSg5Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA0PR12MB4366.namprd12.prod.outlook.com (2603:10b6:806:72::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.33; Wed, 19 Oct
+ 2022 18:48:55 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967%7]) with mapi id 15.20.5723.033; Wed, 19 Oct 2022
+ 18:48:55 +0000
+Message-ID: <d3ab29c8-8f22-28eb-dfe3-6100a8f16e4b@amd.com>
+Date:   Wed, 19 Oct 2022 13:48:48 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Content-Language: en-US
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
+ <Yzh558vy+rJfsBBq@zn.tnic> <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
+In-Reply-To: <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR03CA0022.namprd03.prod.outlook.com
+ (2603:10b6:208:23a::27) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SA0PR12MB4366:EE_
+X-MS-Office365-Filtering-Correlation-Id: 768a53b1-f975-4c87-c832-08dab20292af
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: veh7vrUsvQnYm3IXZo7QVtFOYP9uR8k/BiV5zNsVVUM0qWiqoy16wfTwzPBX03STiqHb7qYI/0GaD6W8sQu6TT4OwabN15CHON3J4RoliBGYGo65B54PNoPAx6u0QzuXHLzTm9XI+syN+/1mXMtQnDjWjSEJ7JvE/I8GzyKS1sXxiRTOcD6RykMotLDaaoo3fDITWRf9flwaYJLsM+8Z9GIpsrsORSCDvl6FWnXV8eLs5m2T51Xswqn642JHxYvnTLJ17sY0rCR/tZDwIBhDw6pNMQ7xi66tMmhClweK6bRrC347eC11JiChgly2RoaqIJl75vs3n5ntV5X7CiZs0faG8VlZ9m2apoX0F27QNb1I6KWzMRW+2H4x0HQ/HO8SbkmPzmn9VnHVbQBFz6molpf6kdUky8+PS8f41cTGkAbNZaSk6NQwJZotwHi3pWz0CMrG3iVLIDyHDdC5y0IZ9Kw2eCHLffT/M8aq8BPB9AYVRGmfVkJCU4fmB+dqepxb5zcYWsYos5UoOog+fuahHn/5EwroGiIDFOCrBHFMT7zgF+bi6gKp3M4M/J3x1sWTD2Lc56mlo6OhGOW8wB0CHNkfirmbiEzg8EMDfTzekqasqbaeHBKdyrLGaQybekD4WC0U66mOjvNOprODNO9ZpvaBn01OU4P25eA0m4LZP4k1NnaFbIWkyndqXmEchWu/7cVK1Gm6/YtqYl1xN72Oz7wMBv+AuYY5o2P1YtE1/x55z15DHGTNJdhgoQDoDWg9dTFfLcxloTBr+5elWNeRZ4bNU/PwGwaAij9ipbfuTJsh/qu1cxcRB7kRDV/TGvwg
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(39860400002)(396003)(346002)(366004)(451199015)(66556008)(31686004)(36756003)(186003)(86362001)(41300700001)(38100700002)(6666004)(83380400001)(2616005)(6506007)(66476007)(5660300002)(2906002)(478600001)(6916009)(6486002)(7416002)(31696002)(8936002)(316002)(4326008)(8676002)(26005)(7406005)(66946007)(6512007)(43740500002)(45980500001)(134885004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SUttbFRyTThVWXVKUzhaaHdUQW5MZm4vS3N6VDA5by9scWVXSEZtYmRObzlP?=
+ =?utf-8?B?aWtjdFV2Vlo2aGcvc0ZvZHkyZWtFUG1LYlJ1d1RtbDNxZ1l0ZkVvVGRKU2Rl?=
+ =?utf-8?B?SmpKckk1TzJJWjlEeENFZnJKYW80YnBtNTRuWXhhNnN3TEMwYUtyRGlUaTRH?=
+ =?utf-8?B?OHFuSEMxd0pqeFNkSEVCL3pvM0x6S1ZxUmhPQ3lodjUrUWN3UmgwOXFQZjIr?=
+ =?utf-8?B?dlBXT3pxdDJzL2duNjNBRVRIZG9oc2V3SWtKZENGL0pua3FIYU5QQ1NJaTVo?=
+ =?utf-8?B?N3BhYzhWc20zUjhTejd2bERkc21KekNDbndXQzZWTzUyV3RtRlVHVVRoeVBy?=
+ =?utf-8?B?dVQzU1NoQng5ZnozcnpXUDRNd1lsZm1RNUg1alZXc0dvcHVLZjkzMmhIdDBV?=
+ =?utf-8?B?NnVMcTFTdG9mQkROT2pWdE4yWFAzUFdiamd3YytJTzRlN1IrUHpOWG1EZHNQ?=
+ =?utf-8?B?QzZFMkpzN2dUcjFQRXZjMTBrNUhBS25TZFQxV0E4T0gyZmZCWk9hQjgrRDZW?=
+ =?utf-8?B?VWlwWGo4NmNQZ2hGOWRSOWxqcXdjQlNDdDk0aVNnb1BtUTQzckRncHBSUVZ1?=
+ =?utf-8?B?eW1laVFrb3laUm5MWmJjMk1sdGUvVWNrV21XWXl4dWRsWGx6YzNyZmMvVXAy?=
+ =?utf-8?B?WGROanlxSVdrcXY2cjNMZWo2VVpraXp0UmtCMko4ZzJPTVBoWHZZbm5IcmRt?=
+ =?utf-8?B?a2ZFOFpPbVdZRFFGYXFCN2l4My9iRVdCVm5vbEF0OG03OHFqT0w5cWlodkJU?=
+ =?utf-8?B?c243NXNWbjNURzg3Rlc3UnNDS3luWWVUL2VsaUpla2tIaUFrMDQzUDFGUXlB?=
+ =?utf-8?B?Z1M1SU9wNXYyZlhnVkxMRkR0QUE2V3Y2K00xTmpqcnZreFVBV3Rta25QQkFa?=
+ =?utf-8?B?N1l5TVlqTEdxVmgxZ0oyWEZvQzN6bStGQU54VUkrNGU5b1NESDl0a29uZjhT?=
+ =?utf-8?B?RWpJNlBYVjBqemFCeUl6ZE1XMmdzU3hFOWVYZm1XVkVGM21Fa0gvWTlTQzFU?=
+ =?utf-8?B?L1EwUGxaUGhMdGUvc09HZC83bmljVER0U0p1S1pWMkoyRzJZMkExSTFwZ2x5?=
+ =?utf-8?B?OHB4dkQzbHkvOEE3Yk91eG1sTGh4MHlNM0VZS2l2N0hEYjl1VXJDTmRKaTNr?=
+ =?utf-8?B?d1h4SE9Fc2gvclZtV0dEaVBmMmM2YlFUTSszYUVZUkpqeHZOcmRWclltbFlR?=
+ =?utf-8?B?TGFHL2taK1N2Q2ZlTmlETDJSbmJGRHFFVUhuaUtXYTVPWWlVYTZkOUdpWmxw?=
+ =?utf-8?B?ZXJpOURkQWpYM1NOSUNRYlUzQ2tOV2Flc0drU2NSamV6ejN1eFZsWTBmNFZ6?=
+ =?utf-8?B?WWY2STBWUk9VRi9JZlJpUmxlRWloV3hxUThvRTZQUWpNNTVGd3pRQys1c25V?=
+ =?utf-8?B?b0JoeFpQd3IrZHRyU1dabWhJWm84Zm1GSkJadUFRdmtOVFF5UzJCQVVKMFVG?=
+ =?utf-8?B?Sk9vN2Jzdk9xTHJwQ3lxUkk0Nm5kRFBHVGtpT1RkUkdiN21IS3NsMVFBQ1dy?=
+ =?utf-8?B?eUY0OTY1cElZWkthQ01sV1RqUGNNVGpDNXM4dmV6L2liVk9aWlU5U3V1UEVr?=
+ =?utf-8?B?ZjBzU05NbUJ6OWFSZ1A0VzJzeExxV054c1RScFBvS3hPdHM3d2dBOTFrR05q?=
+ =?utf-8?B?SnJxRTlUZzNwRUpsV2VoN3NEV1RzZFJjbkkwcGYzMTdoOUxqaFptVFJsSGlE?=
+ =?utf-8?B?Ym13ZEhVV2pwOGZJdWg5U21SMkFKT2tFR2txSzAveFE1am1LN2l3dUtNNHRP?=
+ =?utf-8?B?cjgvMHEwbGdUTTU0OUtQY1Q4QVFRY25lNUNiNXZwSStjZVV3Y0xKNnJ5dG1z?=
+ =?utf-8?B?QWhLbG9DSEJoNXkwQW4wdFllYTBOcjlPUWtmYjYrSCtQVjkyTVdMdWhkSXBZ?=
+ =?utf-8?B?d295YjhiM1Y1UU02dXM3MHlUenhsak1zeTlvWlhGREVRR3IxY1k5S08zQ3dx?=
+ =?utf-8?B?Q1VPYkNHYlRJaHJDRGtnbW1HTVdmejVKL1hsK0FEMktKamJRMnhGUjdlWWNR?=
+ =?utf-8?B?Mlp5bWZ4c2ZjRUJsMkdlRW9ia1pWSk8wMkRSU041QTZSSXA4UEw2eS9tNVJT?=
+ =?utf-8?B?b21xRk81SzkzZU1LVC9sbWkxcFEwUXl5a0Z5WGFKVEJNRjNlWVVvb1VIdlVp?=
+ =?utf-8?Q?kpFkybzNYqW0p5V6+J+tTrPaO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 768a53b1-f975-4c87-c832-08dab20292af
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2022 18:48:54.9518
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OjqqwdMU7mK9EQ6DuooJ4DhAXUJvIdfJFLr/H/MA9o4AnEntg1z/7BznUbFPVLxdJqtSXQRSxJtysJxFu3s/xQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4366
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If CAAM is not in "trusted" or "secure" state, a fixed non-volatile key
-is used instead of the unique device key. This is the default mode of
-operation without secure boot (HAB). In this scenario, CAAM encrypted
-blobs should be used only for testing but not in a production
-environment, so issue a warning.
+Another follow up:
 
-Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
----
- drivers/crypto/caam/blob_gen.c | 8 ++++++++
- drivers/crypto/caam/regs.h     | 3 +++
- 2 files changed, 11 insertions(+)
+>>>   int sev_platform_init(int *error);
+>>> +/**
+>>> + * sev_snp_init - perform SEV SNP_INIT command
+>>> + *
+>>> + * @error: SEV command return code
+>>> + *
+>>> + * Returns:
+>>> + * 0 if the SEV successfully processed the command
+>>> + * -%ENODEV    if the SEV device is not available
+>>> + * -%ENOTSUPP  if the SEV does not support SEV
+>>> + * -%ETIMEDOUT if the SEV command timed out
+>>> + * -%EIO       if the SEV returned a non-zero return code
+>>
+>> Something's weird with those args. I think it should be
+>>
+>>     %-ENODEV
+>>
+>> and so on...
+>>
+> 
+> Yes, off course %-<errno>
+> 
 
-diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
-index 6345c7269eb0..f3e741393f65 100644
---- a/drivers/crypto/caam/blob_gen.c
-+++ b/drivers/crypto/caam/blob_gen.c
-@@ -6,6 +6,7 @@
- 
- #define pr_fmt(fmt) "caam blob_gen: " fmt
- 
-+#include <linux/bitfield.h>
- #include <linux/device.h>
- #include <soc/fsl/caam-blob.h>
- 
-@@ -62,11 +63,13 @@ int caam_process_blob(struct caam_blob_priv *priv,
- 		      struct caam_blob_info *info, bool encap)
- {
- 	struct caam_blob_job_result testres;
-+	const struct caam_drv_private *ctrlpriv;
- 	struct device *jrdev = &priv->jrdev;
- 	dma_addr_t dma_in, dma_out;
- 	int op = OP_PCLID_BLOB;
- 	size_t output_len;
- 	u32 *desc;
-+	u32 moo;
- 	int ret;
- 
- 	if (info->key_mod_len > CAAM_BLOB_KEYMOD_LENGTH)
-@@ -100,6 +103,11 @@ int caam_process_blob(struct caam_blob_priv *priv,
- 		goto out_unmap_in;
- 	}
- 
-+	ctrlpriv = dev_get_drvdata(jrdev->parent);
-+	moo = FIELD_GET(CSTA_MOO, ctrlpriv->ctrl->perfmon.status);
-+	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
-+		dev_warn(jrdev, "using insecure test key!\n");
-+
- 	/*
- 	 * A data blob is encrypted using a blob key (BK); a random number.
- 	 * The BK is used as an AES-CCM key. The initial block (B0) and the
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 66d6dad841bb..b7de5fb5e056 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -426,6 +426,9 @@ struct caam_perfmon {
- 	u32 rsvd2;
- #define CSTA_PLEND		BIT(10)
- #define CSTA_ALT_PLEND		BIT(18)
-+#define CSTA_MOO		GENMASK(9, 8)
-+#define CSTA_MOO_SECURE	1
-+#define CSTA_MOO_TRUSTED	3
- 	u32 status;		/* CSTA - CAAM Status */
- 	u64 rsvd3;
- 
--- 
-2.34.1
+I see that other drivers are also using the same convention:
 
+include/linux/regset.h:
+..
+/**
+  * user_regset_set_fn - type of @set function in &struct user_regset
+  * @target:     thread being examined
+  * @regset:     regset being examined
+  * @pos:        offset into the regset data to access, in bytes
+  * @count:      amount of data to copy, in bytes
+  * @kbuf:       if not %NULL, a kernel-space pointer to copy from
+  * @ubuf:       if @kbuf is %NULL, a user-space pointer to copy from
+  *
+  * Store register values.  Return %0 on success; -%EIO or -%ENODEV
+  * are usual failure returns.  The @pos and @count values are in
+...
+
+include/linux/psp-tee.h:
+..
+/**
+  * psp_tee_process_cmd() - Process command in Trusted Execution Environment
+  * @cmd_id:     TEE command ID (&enum tee_cmd_id)
+  * @buf:        Command buffer for TEE processing. On success, is updated
+  *              with the response
+  * @len:        Length of command buffer in bytes
+  * @status:     On success, holds the TEE command execution status
+  *
+  * This function submits a command to the Trusted OS for processing in the
+  * TEE environment and waits for a response or until the command times out.
+  *
+  * Returns:
+  * 0 if TEE successfully processed the command
+  * -%ENODEV    if PSP device not available
+  * -%EINVAL    if invalid input
+  * -%ETIMEDOUT if TEE command timed out
+  * -%EBUSY     if PSP device is not responsive
+  */
+...
+
+Thanks,
+Ashish
