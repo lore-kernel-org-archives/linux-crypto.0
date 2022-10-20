@@ -2,37 +2,28 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2DAC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 09:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AAFC43219
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 09:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbiJTJAB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:00:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49662 "EHLO
+        id S230398AbiJTJGI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Oct 2022 05:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiJTJAA (ORCPT
+        with ESMTP id S230273AbiJTJGG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:00:00 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8413B40E09;
-        Thu, 20 Oct 2022 01:59:58 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e710329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e710:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 113011EC072D;
-        Thu, 20 Oct 2022 10:59:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1666256393;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Bs1/OT7XUduIKrkt7gmt/mUSJU7zQYJbSy05qdldQNg=;
-        b=JqkuLsWX55sdDVkn/5SupKyGgqEoWX2+xhPhAfsJc2jAKR6ytCr3JkrdemqyaJfyDVlUAY
-        iejUF6bQy87xJ4Iyxep3XVaNnBA3THZeZMAjR9AQGFwtQtHgkWERKPSFeX2rybcyeCpkYV
-        ghzhPd7L6QZ0fjSBTJnVEvi4hr+OHAM=
-Date:   Thu, 20 Oct 2022 10:59:48 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Thu, 20 Oct 2022 05:06:06 -0400
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0D1169126;
+        Thu, 20 Oct 2022 02:06:01 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1olRTd-004BAg-EG; Thu, 20 Oct 2022 17:05:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Oct 2022 17:05:09 +0800
+Date:   Thu, 20 Oct 2022 17:05:09 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -59,43 +50,35 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
 Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
  instead of clear_cpu_cap
-Message-ID: <Y1EOBAaLbv2CXBDL@zn.tnic>
+Message-ID: <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
  <20220718141123.136106-2-mlevitsk@redhat.com>
  <Yyh9RDbaRqUR1XSW@zn.tnic>
  <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
  <YzGlQBkCSJxY+8Jf@zn.tnic>
  <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
+ <Y1EOBAaLbv2CXBDL@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
+In-Reply-To: <Y1EOBAaLbv2CXBDL@zn.tnic>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 01:49:34PM +0300, Maxim Levitsky wrote:
-> Patch 5 is the main fix - it makes the kernel to be tolerant to a
-> broken CPUID config (coming hopefully from hypervisor), where you have
-> a feature (AVX2 in my case) but not a feature on which this feature
-> depends (AVX).
+On Thu, Oct 20, 2022 at 10:59:48AM +0200, Borislav Petkov wrote:
+>
+> I really really don't like it when people are fixing the wrong thing.
+> 
+> Why does the kernel need to get fixed when something else can't get its
+> CPUID dependencies straight? I don't even want to know why something
+> would set AVX2 without AVX?!?!
 
-I really really don't like it when people are fixing the wrong thing.
+That's exactly what I said when this was first reported to me as
+a crypto bug :)
 
-Why does the kernel need to get fixed when something else can't get its
-CPUID dependencies straight? I don't even want to know why something
-would set AVX2 without AVX?!?!
-
-Srsly.
-
-Some of your other bits look sensible and I'd take a deeper look but
-this does not make any sense. This is a hypervisor problem - not a
-kernel one.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Cheers,
+--
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
