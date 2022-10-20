@@ -2,49 +2,38 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BE9C43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 10:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94B4C43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 11:13:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbiJTKYO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Oct 2022 06:24:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
+        id S230254AbiJTLNj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Oct 2022 07:13:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiJTKXS (ORCPT
+        with ESMTP id S231267AbiJTLNh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2022 06:23:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37573100BDD
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Oct 2022 03:21:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666261303;
+        Thu, 20 Oct 2022 07:13:37 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3AB7119BC4;
+        Thu, 20 Oct 2022 04:13:32 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e710329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e710:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5AF701EC01A9;
+        Thu, 20 Oct 2022 13:13:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1666264406;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IP4XVtyT8sCR5WHZQvsMW5lgFqpDy1UbjPyj0MmEvlQ=;
-        b=O1WgzPOO0lJU7S9ieSIVPF8MrzdcMTh5US+Lv0MmqwBAwdbc/JlneiGPnQExELzUAqhF2d
-        kL7S9PF0ajRO6suFtQBb860mIZ1onnWsxiqaOXFxlbwl+ySa70rcuFgtgfIgbn1fIWd9Xg
-        4JIA38h5HJn5DeeafkcZDRFaBewPGQc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-287-1xAhMVMYMIGJYmgBfYmMCw-1; Thu, 20 Oct 2022 06:21:40 -0400
-X-MC-Unique: 1xAhMVMYMIGJYmgBfYmMCw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AE19B185A7AC;
-        Thu, 20 Oct 2022 10:21:38 +0000 (UTC)
-Received: from starship (ovpn-192-51.brq.redhat.com [10.40.192.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 20D4E40C6E16;
-        Thu, 20 Oct 2022 10:21:31 +0000 (UTC)
-Message-ID: <3cc09554f20231aecdf0cd762a282c42aee9273c.camel@redhat.com>
-Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
- instead of clear_cpu_cap
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=j2i2KgCp3P7IRZRg0PairiL8EiPXc7wkVc3ASgZ2HEs=;
+        b=nvGUaSvR6A9hfSBZvJ2166fkCoN9jlFe7Fz9VBt1MIcQ9aCGKXY9k1PjxuqUW6hj1PLxCz
+        o3aYLOAoDJ0TbLhc52+8EmfoJdd0E/dLM7hI2Twbaq9PVxSx5pMQQK2e6JGboEmfVImLQz
+        6GMqiNGgihuUQoLtrN87k/YQWhoBmuo=
+Date:   Thu, 20 Oct 2022 13:13:22 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -68,54 +57,39 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Date:   Thu, 20 Oct 2022 13:21:30 +0300
-In-Reply-To: <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
+Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
+ instead of clear_cpu_cap
+Message-ID: <Y1EtUiyXkPlCe8/Z@zn.tnic>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
-         <20220718141123.136106-2-mlevitsk@redhat.com> <Yyh9RDbaRqUR1XSW@zn.tnic>
-         <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
-         <YzGlQBkCSJxY+8Jf@zn.tnic>
-         <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
-         <Y1EOBAaLbv2CXBDL@zn.tnic> <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20220718141123.136106-2-mlevitsk@redhat.com>
+ <Yyh9RDbaRqUR1XSW@zn.tnic>
+ <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
+ <YzGlQBkCSJxY+8Jf@zn.tnic>
+ <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
+ <Y1EOBAaLbv2CXBDL@zn.tnic>
+ <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
+ <3cc09554f20231aecdf0cd762a282c42aee9273c.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3cc09554f20231aecdf0cd762a282c42aee9273c.camel@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2022-10-20 at 17:05 +0800, Herbert Xu wrote:
-> On Thu, Oct 20, 2022 at 10:59:48AM +0200, Borislav Petkov wrote:
-> > I really really don't like it when people are fixing the wrong thing.
-> > 
-> > Why does the kernel need to get fixed when something else can't get its
-> > CPUID dependencies straight? I don't even want to know why something
-> > would set AVX2 without AVX?!?!
-> 
-> That's exactly what I said when this was first reported to me as
-> a crypto bug :)
+On Thu, Oct 20, 2022 at 01:21:30PM +0300, Maxim Levitsky wrote:
+> I agree with you, however this patch series is just
+> refactoring/hardening of the kernel - if the kernel can avoid crashing
+> - why not.
 
-I agree with you, however this patch series is just refactoring/hardening of the kernel -
-if the kernel can avoid crashing - why not.
+Because we're already drowning in patches which are trying to fix real
+problems. If we open the floodgates on alleged hardening just because
+some other part of the stack is misbehaving, there'll be no end of it.
 
-Of course the hypervisor should not present such broken configurations to the guest - 
-in fact the guest kernel can't fix this - guest userspace will still see wrong CPUID and
-can still crash.
+Thx.
 
-TL;DR - this patch series is not intended to workaround a broken hypervisor and such,
-it is just a hardening against misconfiguration.
+-- 
+Regards/Gruss,
+    Boris.
 
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> 
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
