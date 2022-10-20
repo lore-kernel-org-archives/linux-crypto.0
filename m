@@ -2,73 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D51C43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 22:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B454C43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 23:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbiJTWpS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Oct 2022 18:45:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37526 "EHLO
+        id S229604AbiJTXnF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Oct 2022 19:43:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbiJTWoz (ORCPT
+        with ESMTP id S229552AbiJTXnD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2022 18:44:55 -0400
-Received: from tartarus.angband.pl (tartarus.angband.pl [51.83.246.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBD8D53D1C;
-        Thu, 20 Oct 2022 15:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=angband.pl;
-        s=tartarus; h=In-Reply-To:Subject:Date:To:From:Resent-To:Resent-Message-ID:
-        Resent-Date:Resent-From:Sender:Reply-To:Message-ID:Cc:MIME-Version:
-        Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-        Resent-Sender:Resent-Cc:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=dW9mkBx9jLRsimZLAz0B3bLaKX0xCXq7JSRZy/CFr/g=; b=LtubnEUXBrLfo9M+fvEypOjH/q
-        aFj6Yt6rXv5vShEP9wvMFv4WGyguqiqsxuIkPLbLlL6GgTnX65VqHkZWUoTTaufbO1GDgCI5/iKY7
-        LPeT14gSNwRWHjMa22OSJlS/uIoEufdngAkx/LgWEHyzwqsYt0RjAasfJYUE7s4rzfkw=;
-Received: from kilobyte by tartarus.angband.pl with local (Exim 4.94.2)
-        (envelope-from <kilobyte@angband.pl>)
-        id 1oleHI-009OZY-DT; Fri, 21 Oct 2022 00:44:40 +0200
-From:   Adam Borowski <kilobyte@angband.pl>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 14 Sep 2022 22:13:43 +0200
-Subject: [PATCH 2/6] certs: fips test: fix build failure with
- PKCS7_MESSAGE_PARSER=m
-In-Reply-To: <S229853AbiJTWkg/20221020224036Z+12888@vger.kernel.org>
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Mail-From: kilobyte@angband.pl
-X-SA-Exim-Scanned: No (on tartarus.angband.pl); SAEximRunCond expanded to false
+        Thu, 20 Oct 2022 19:43:03 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C44616DC38
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Oct 2022 16:43:01 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id t25so1043002qkm.2
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Oct 2022 16:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q3AP/tQZsCGWdqocUdGbR0U8FOgV3GYYbflK+bE4iCU=;
+        b=n3in2a6l84dZ4h43JiWPEaU07Ag4vYTbida9+trrLRkXvVMbPcyx6HxtX8lAajFZFC
+         DtoagUZ1PTH2sW0BvUiuWacOoD+b0oHxbdazrKo7R18xXMv8a3vvGZGyW62mYg4k6lkt
+         3/foqWE3SI3G+FIcfErHPBsohl89rS5d99nOCfhFM+R8EWwDBwnmrXXAOdtpDHqEUdZo
+         oMi4qWhGG7oSMxykmVnWYIwNz7FJ2k300VniYOJMoYM5/+paUqv5Ir8yBWQ898/Yzkzm
+         ihj9GA65p7uqsk6bsfytPAf9WygErO/AX5iGn+8DsaW97NMJqf1dnss8tzD88E+2Oquw
+         RSDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q3AP/tQZsCGWdqocUdGbR0U8FOgV3GYYbflK+bE4iCU=;
+        b=RORjCLoBGW/ZY2ZPCu1r8bJvxi4l0AZN01YYbdP2YogehnI9hI3l96lPGH9n+2Hjvu
+         jB+dsBaqLDceGWGpBy1xRy+pBSBTKmvdue/W6WnKeZYRYJQKu/qVmFrVbhsWK5uckVLV
+         XK8dejJkcisEvB6s/bZkmE2LjGfHl9qUeinEj0rV7XRu55arTVpiDUNhT2n+JuRv9w7U
+         p5blVh9N0nQaQO+QBSUeLfDGGGsj65gdxVLo6ZPBZ20iBOS2mzDrUMmTKku+jThTI0MP
+         0WCEFgfNKks1dlleaqahDTNDXDWBPRgwN0yr6+D4eQSo5Of2bZjE0OFm6+r2uPm9OMbY
+         VcBQ==
+X-Gm-Message-State: ACrzQf0V4huOcVKMhhHMPbQkhDY/2J9vV6AEg1c6yqCeh91KojJwvnds
+        Ck/SKvz2l+gxo/RCMRZpR0nXOA==
+X-Google-Smtp-Source: AMsMyM77ieCA9Ka3hBL0aoBJg1xvsJRStZW8qEvdIlyx1P3eg6ZqCcE+FSB11I0sMIsyLJKF0HZlSQ==
+X-Received: by 2002:a05:620a:13b6:b0:6ee:cf79:bfa1 with SMTP id m22-20020a05620a13b600b006eecf79bfa1mr11569554qki.15.1666309380684;
+        Thu, 20 Oct 2022 16:43:00 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id y13-20020a05620a25cd00b006bbf85cad0fsm8537748qko.20.2022.10.20.16.42.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Oct 2022 16:42:59 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1olfBj-00B3Bu-0U;
+        Thu, 20 Oct 2022 20:42:59 -0300
+Date:   Thu, 20 Oct 2022 20:42:58 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>,
+        "gilad@benyossef.com" <gilad@benyossef.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
+        "david@sigma-star.at" <david@sigma-star.at>,
+        "michael@walle.cc" <michael@walle.cc>,
+        "john.ernberg@actia.se" <john.ernberg@actia.se>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
+        "richard@nod.at" <richard@nod.at>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        Sahil Malhotra <sahil.malhotra@nxp.com>,
+        Kshitiz Varshney <kshitiz.varshney@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>
+Subject: Re: [EXT] Re: [PATCH v0 3/8] crypto: hbk flags & info added to the
+ tfm
+Message-ID: <Y1HdAmy6ZfN8f5hJ@ziepe.ca>
+References: <Yz/OEwDtyTm+VH0p@gondor.apana.org.au>
+ <DU2PR04MB8630CBBB8ABDC3768320C18195209@DU2PR04MB8630.eurprd04.prod.outlook.com>
+ <Y0Q3JKnWSNIC4Xlu@zx2c4.com>
+ <Y0UxY51KQoKCq59o@gondor.apana.org.au>
+ <Y0XLqd/+C1sxq2G0@zx2c4.com>
+ <Y0aDiLp7BztzwNez@gondor.apana.org.au>
+ <Y0m2TU5k78I1AR+p@ziepe.ca>
+ <Y1DN3SqEyFZd9i37@sol.localdomain>
+ <Y1GgSX+ZmOsxhB2N@ziepe.ca>
+ <Y1G9hKPT1MNQQxcG@sol.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1G9hKPT1MNQQxcG@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-Id: <S230100AbiJTWpS/20221020224519Z+12903@vger.kernel.org>
 
-ld: crypto/asymmetric_keys/selftest.o: in function `fips_signature_selftest':
-selftest.c:(.init.text+0xcd): undefined reference to `pkcs7_parse_message'
-ld: selftest.c:(.init.text+0x103): undefined reference to `pkcs7_supply_detached_data'
-ld: selftest.c:(.init.text+0x10d): undefined reference to `pkcs7_verify'
-ld: selftest.c:(.init.text+0x135): undefined reference to `pkcs7_validate_trust'
-ld: selftest.c:(.init.text+0x157): undefined reference to `pkcs7_free_message'
+On Thu, Oct 20, 2022 at 02:28:36PM -0700, Eric Biggers wrote:
+> On Thu, Oct 20, 2022 at 04:23:53PM -0300, Jason Gunthorpe wrote:
+> > On Wed, Oct 19, 2022 at 09:26:05PM -0700, Eric Biggers wrote:
+> > 
+> > > Are you referring to the support for hardware-wrapped inline crypto keys?  It
+> > > isn't upstream yet, but my latest patchset is at
+> > > https://lore.kernel.org/linux-fscrypt/20220927014718.125308-2-ebiggers@kernel.org/T/#u.
+> > > There's also a version of it used by some Android devices already.  Out of
+> > > curiosity, are you using it in an Android device, or have you adopted it in some
+> > > other downstream?
+> > 
+> > Unrelated to Android, similar functionality, but slightly different
+> > ultimate purpose. We are going to be sending a fscrypt patch series
+> > for mlx5 and nvme soonish.
+> 
+> That's interesting, though also slightly scary in that it sounds like you've
+> already shipped some major fscrypt changes without review!
 
-Fixes: 3cde3174eb910513d32a9ec8a9b95ea59be833df
-Signed-off-by: Adam Borowski <kilobyte@angband.pl>
----
- crypto/asymmetric_keys/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Heh, says the Android guy :)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 3df3fe4ed95f..fe007db96c69 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -83,6 +83,6 @@ config FIPS_SIGNATURE_SELFTEST
- 	  for FIPS.
- 	depends on KEYS
- 	depends on ASYMMETRIC_KEY_TYPE
--	depends on PKCS7_MESSAGE_PARSER
-+	depends on PKCS7_MESSAGE_PARSER=y
- 
- endif # ASYMMETRIC_KEY_TYPE
--- 
-2.37.2.609.g9ff673ca1a
+Fortunately nothing major, we are enterprise focused, we need stuff in
+real distros - we know know how to do it.
 
+> > That sounds disappointing that we are now having parallel ways for the
+> > admin to manipulate kernel owned keys.
+> 
+> Well, the keyrings subsystem never worked properly for fscrypt anyway.  At most,
+> it's only useful for providing the key to the filesystem initially (by passing a
+> key ID to FS_IOC_ADD_ENCRYPTION_KEY, instead of the key bytes), similar to what
+> dm-crypt allows.  After that, the keyrings subsystem plays no role.
+
+Sure, but loading the key into the keyring should allow many different
+options, including things like TPM PCR secured keys (eg like
+bitlocker) - we shouldn't allow user space the ability to see the key
+data at all.
+
+Duplicating this in every subsystem makes no sense, there is a
+reasonable role for the keyring to play in solving these kinds of
+problems for everything.
+
+Jason
