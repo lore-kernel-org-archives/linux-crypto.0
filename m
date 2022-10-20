@@ -2,28 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AAFC43219
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 09:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BE9C43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Oct 2022 10:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiJTJGI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42080 "EHLO
+        id S229604AbiJTKYO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Oct 2022 06:24:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230273AbiJTJGG (ORCPT
+        with ESMTP id S229861AbiJTKXS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:06:06 -0400
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0D1169126;
-        Thu, 20 Oct 2022 02:06:01 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1olRTd-004BAg-EG; Thu, 20 Oct 2022 17:05:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Oct 2022 17:05:09 +0800
-Date:   Thu, 20 Oct 2022 17:05:09 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
+        Thu, 20 Oct 2022 06:23:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37573100BDD
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Oct 2022 03:21:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666261303;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IP4XVtyT8sCR5WHZQvsMW5lgFqpDy1UbjPyj0MmEvlQ=;
+        b=O1WgzPOO0lJU7S9ieSIVPF8MrzdcMTh5US+Lv0MmqwBAwdbc/JlneiGPnQExELzUAqhF2d
+        kL7S9PF0ajRO6suFtQBb860mIZ1onnWsxiqaOXFxlbwl+ySa70rcuFgtgfIgbn1fIWd9Xg
+        4JIA38h5HJn5DeeafkcZDRFaBewPGQc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-287-1xAhMVMYMIGJYmgBfYmMCw-1; Thu, 20 Oct 2022 06:21:40 -0400
+X-MC-Unique: 1xAhMVMYMIGJYmgBfYmMCw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AE19B185A7AC;
+        Thu, 20 Oct 2022 10:21:38 +0000 (UTC)
+Received: from starship (ovpn-192-51.brq.redhat.com [10.40.192.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 20D4E40C6E16;
+        Thu, 20 Oct 2022 10:21:31 +0000 (UTC)
+Message-ID: <3cc09554f20231aecdf0cd762a282c42aee9273c.camel@redhat.com>
+Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
+ instead of clear_cpu_cap
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -43,42 +64,58 @@ Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
         Kan Liang <kan.liang@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
         Jiri Olsa <jolsa@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         linux-perf-users@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
- instead of clear_cpu_cap
-Message-ID: <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
+Date:   Thu, 20 Oct 2022 13:21:30 +0300
+In-Reply-To: <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-2-mlevitsk@redhat.com>
- <Yyh9RDbaRqUR1XSW@zn.tnic>
- <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
- <YzGlQBkCSJxY+8Jf@zn.tnic>
- <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
- <Y1EOBAaLbv2CXBDL@zn.tnic>
+         <20220718141123.136106-2-mlevitsk@redhat.com> <Yyh9RDbaRqUR1XSW@zn.tnic>
+         <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
+         <YzGlQBkCSJxY+8Jf@zn.tnic>
+         <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
+         <Y1EOBAaLbv2CXBDL@zn.tnic> <Y1EPRauBmAXMVrCa@loth.rohan.me.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1EOBAaLbv2CXBDL@zn.tnic>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 20, 2022 at 10:59:48AM +0200, Borislav Petkov wrote:
->
-> I really really don't like it when people are fixing the wrong thing.
+On Thu, 2022-10-20 at 17:05 +0800, Herbert Xu wrote:
+> On Thu, Oct 20, 2022 at 10:59:48AM +0200, Borislav Petkov wrote:
+> > I really really don't like it when people are fixing the wrong thing.
+> > 
+> > Why does the kernel need to get fixed when something else can't get its
+> > CPUID dependencies straight? I don't even want to know why something
+> > would set AVX2 without AVX?!?!
 > 
-> Why does the kernel need to get fixed when something else can't get its
-> CPUID dependencies straight? I don't even want to know why something
-> would set AVX2 without AVX?!?!
+> That's exactly what I said when this was first reported to me as
+> a crypto bug :)
 
-That's exactly what I said when this was first reported to me as
-a crypto bug :)
+I agree with you, however this patch series is just refactoring/hardening of the kernel -
+if the kernel can avoid crashing - why not.
 
-Cheers,
---
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Of course the hypervisor should not present such broken configurations to the guest - 
+in fact the guest kernel can't fix this - guest userspace will still see wrong CPUID and
+can still crash.
+
+TL;DR - this patch series is not intended to workaround a broken hypervisor and such,
+it is just a hardening against misconfiguration.
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
+
+
