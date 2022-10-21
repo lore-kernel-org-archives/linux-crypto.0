@@ -2,102 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE90EC4321E
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 10:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FFEC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 10:53:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230180AbiJUKwq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Oct 2022 06:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59448 "EHLO
+        id S229911AbiJUKxR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Oct 2022 06:53:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiJUKwp (ORCPT
+        with ESMTP id S229711AbiJUKxQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2022 06:52:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E771885A6;
-        Fri, 21 Oct 2022 03:52:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A1B0EB82B8F;
-        Fri, 21 Oct 2022 10:52:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AC6DC433D6;
-        Fri, 21 Oct 2022 10:52:33 +0000 (UTC)
-Date:   Fri, 21 Oct 2022 11:52:30 +0100
-From:   Mark Brown <broonie@debian.org>
-To:     Adam Borowski <kilobyte@angband.pl>
-Cc:     linux-kernel@lists.debian.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Jiaxin Yu <jiaxin.yu@mediatek.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>,
-        linux-mediatek@lists.infradead.org, alsa-devel@alsa-project.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-mtd@lists.infradead.org, linux-spi@vger.kernel.org,
-        Yong Zhi <yong.zhi@intel.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Bingbu Cao <bingbu.cao@intel.com>,
-        Dan Scally <djrscally@gmail.com>,
-        Tianshu Qiu <tian.shu.qiu@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-media@vger.kernel.org, Khalil Blaiech <kblaiech@nvidia.com>,
-        Asmaa Mnebhi <asmaa@nvidia.com>, linux-i2c@vger.kernel.org,
-        Cezary Rojewski <cezary.rojewski@intel.com>,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-        Bard Liao <yung-chuan.liao@linux.intel.com>,
-        Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
-        Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, Brent Lu <brent.lu@intel.com>
-Subject: Re: [PATCH 0/6] a pile of randconfig fixes
-Message-ID: <Y1J57jJ1+FTG7U9O@sirena.org.uk>
-References: <20221020221749.33746-1-kilobyte@angband.pl>
+        Fri, 21 Oct 2022 06:53:16 -0400
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7569624C104;
+        Fri, 21 Oct 2022 03:53:15 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1olpdj-004cxK-0C; Fri, 21 Oct 2022 18:53:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Oct 2022 18:53:11 +0800
+Date:   Fri, 21 Oct 2022 18:53:11 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Kai Ye <yekai13@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH v2 1/3] crypto: hisilicon/qm - increase the memory of
+ local variables
+Message-ID: <Y1J6F2ZEyRC19xy7@gondor.apana.org.au>
+References: <20221014100319.5259-1-yekai13@huawei.com>
+ <20221014100319.5259-2-yekai13@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="wWcrkmaG6Bl+vyW8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221020221749.33746-1-kilobyte@angband.pl>
-X-Cookie: On the eighth day, God created FORTRAN.
+In-Reply-To: <20221014100319.5259-2-yekai13@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Oct 14, 2022 at 10:03:17AM +0000, Kai Ye wrote:
+> Increase the buffer to prevent stack overflow by fuzz test.
+> 
+> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index e3edb176d976..5d79e9f0e7e1 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -250,7 +250,6 @@
+>  #define QM_QOS_MIN_CIR_B		100
+>  #define QM_QOS_MAX_CIR_U		6
+>  #define QM_QOS_MAX_CIR_S		11
+> -#define QM_QOS_VAL_MAX_LEN		32
+>  #define QM_DFX_BASE		0x0100000
+>  #define QM_DFX_STATE1		0x0104000
+>  #define QM_DFX_STATE2		0x01040C8
+> @@ -4612,7 +4611,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
+>  			       unsigned int *fun_index)
+>  {
+>  	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
+> -	char val_buf[QM_QOS_VAL_MAX_LEN] = {0};
+> +	char val_buf[QM_DBG_READ_LEN] = {0};
 
---wWcrkmaG6Bl+vyW8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Please document how this value was derived in the patch log.
 
-On Fri, Oct 21, 2022 at 12:17:49AM +0200, Adam Borowski wrote:
-
-> I've been doing randconfig build tests for quite a while, here's a pile of
-> fixes.  I'm not sure what's the best way to submit these: do you folks
-> prefer a series like this, or a number of individual submissions?
-
-Individual submissions would cut down on the noise from the enormous CC
-list.  If you were going to send as a patch series it should be a single
-message per patch as covered in sumbitting-patches.rst.
-
---wWcrkmaG6Bl+vyW8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNSee4ACgkQJNaLcl1U
-h9BDwgf+IkbiCFyXzVrO3F8yBx883iUJM3R8A5LPsrxScBUzS3Nu7PgzWmko3Bfa
-wm/rXizNrMQPDqUakrtR8duh+w/eL6Lz3YrZEQEaM2fd8+MayJt9tXB4o/qfcrBc
-B3o7lbqL9Hp0yqRKKG8orcvyiJDpOh2Z+zLAYqy+LuFLuiv6kSKu8h7c2vm7DKCw
-+wGkRN5blfrYPHGOoU/r6oqjT2qx6BFUsXpnILPw2XRtXlkYv37BLu4rRgZ7qc+D
-Afo+DwE5y6d9t9ebOL0UjvgveEysSY3VksxCcjtWru+wN/bjPbET1VFJUrfbMyGf
-y+JN6EsaYWeKmGsk5T5pZ5XczMBC+A==
-=kG7z
------END PGP SIGNATURE-----
-
---wWcrkmaG6Bl+vyW8--
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
