@@ -2,47 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98328C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 11:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA8BC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 11:39:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229515AbiJULiO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Oct 2022 07:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56252 "EHLO
+        id S229894AbiJULjZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Oct 2022 07:39:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbiJULiK (ORCPT
+        with ESMTP id S230009AbiJULjY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2022 07:38:10 -0400
+        Fri, 21 Oct 2022 07:39:24 -0400
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DA71867BD
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Oct 2022 04:38:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CCCCC9;
+        Fri, 21 Oct 2022 04:39:19 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1olqL8-004dyB-PF; Fri, 21 Oct 2022 19:38:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Oct 2022 19:38:03 +0800
-Date:   Fri, 21 Oct 2022 19:38:03 +0800
+        id 1olqMF-004dzU-4V; Fri, 21 Oct 2022 19:39:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Oct 2022 19:39:11 +0800
+Date:   Fri, 21 Oct 2022 19:39:11 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     jianchunfu <jianchunfu@cmss.chinamobile.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: talitos - Use the defined variable to clean code
-Message-ID: <Y1KEm6Mw9ulxROLA@gondor.apana.org.au>
-References: <20221009095254.2406-1-jianchunfu@cmss.chinamobile.com>
+To:     Tomas Marek <tomas.marek@elrest.cz>
+Cc:     mpm@selenic.com, mcoquelin.stm32@gmail.com,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        alexandre.torgue@foss.st.com, oleg.karfich@wago.com
+Subject: Re: [PATCH 0/2] hwrng: stm32 - improve performance
+Message-ID: <Y1KE3zg3cn7kVH5t@gondor.apana.org.au>
+References: <20221012160924.12226-1-tomas.marek@elrest.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221009095254.2406-1-jianchunfu@cmss.chinamobile.com>
+In-Reply-To: <20221012160924.12226-1-tomas.marek@elrest.cz>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Oct 09, 2022 at 05:52:54PM +0800, jianchunfu wrote:
-> Use the defined variable "dev" to make the code cleaner.
+On Wed, Oct 12, 2022 at 06:09:22PM +0200, Tomas Marek wrote:
+> Fix issues in the STM32 TRNG driver to improve performance.
 > 
-> Signed-off-by: jianchunfu <jianchunfu@cmss.chinamobile.com>
-> ---
->  drivers/crypto/talitos.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Tomas Marek (2):
+>   hwrng: stm32 - fix number of returned bytes on read
+>   hwrng: stm32 - fix read of the last word
+> 
+>  drivers/char/hw_random/stm32-rng.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> -- 
+> 2.17.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
