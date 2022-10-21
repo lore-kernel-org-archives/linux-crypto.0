@@ -2,72 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FFEC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 10:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD560C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 11:00:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiJUKxR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Oct 2022 06:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
+        id S229734AbiJULA4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Oct 2022 07:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiJUKxQ (ORCPT
+        with ESMTP id S229695AbiJULAz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2022 06:53:16 -0400
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7569624C104;
-        Fri, 21 Oct 2022 03:53:15 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1olpdj-004cxK-0C; Fri, 21 Oct 2022 18:53:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Oct 2022 18:53:11 +0800
-Date:   Fri, 21 Oct 2022 18:53:11 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kai Ye <yekai13@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH v2 1/3] crypto: hisilicon/qm - increase the memory of
- local variables
-Message-ID: <Y1J6F2ZEyRC19xy7@gondor.apana.org.au>
-References: <20221014100319.5259-1-yekai13@huawei.com>
- <20221014100319.5259-2-yekai13@huawei.com>
+        Fri, 21 Oct 2022 07:00:55 -0400
+X-Greylist: delayed 4381 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 21 Oct 2022 04:00:52 PDT
+Received: from cp70.redewt.net (cp70.redewt.net [185.240.248.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5359222F07
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Oct 2022 04:00:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=my-algarve-property.com; s=default; h=Content-Type:MIME-Version:Message-ID:
+        Reply-To:From:Date:Subject:To:Sender:Cc:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=mlDQ5fqM9YSap1dDs4yCzZ0JgGFjiBLeojST3tQ4IcA=; b=HIDQimO1M4J7Uck126fdUj559F
+        eA4Unt5mT3OSuldpxdNI+rsj+qnIs48IGQuCcJ6yWd7KG/aEuCDAHwzOTk7IMcgEgOREfB0nEzUyu
+        AKPkpqcxAMbk2d7ZvS4AIeV9ibn0OMss1DGrxTkF7GbCIpywr2k7uwqEYjDik7qF54CqN8ai4DXJc
+        my2CWOadjG7HlfSRqJ8cPzcNDfCJKda5WBJ9Mt7bMRsVyNm1GpmJGcG74deox/1+INBKx3r3IlqOz
+        vdjO80jVogQckmvtGqac9R9qNoeFYcn7qIrgxbF6+DJ877QCARU7hN0+0T0nBecZXvxzgkZZyzOe4
+        /MYDxH5w==;
+Received: from myalgarveprop by cp70.redewt.net with local (Exim 4.95)
+        (envelope-from <geral@my-algarve-property.com>)
+        id 1olod1-0003jj-3K
+        for linux-crypto@vger.kernel.org;
+        Fri, 21 Oct 2022 10:47:47 +0100
+To:     linux-crypto@vger.kernel.org
+Subject: Copy of: anal_sex_pic_gallery xsg.page.link/aKV4#
+X-PHP-Script: my-algarve-property.com/index.php for 178.45.119.121, 178.45.119.121
+X-PHP-Filename: /home/myalgarveprop/public_html/index.php REMOTE_ADDR: 178.45.119.121
+Date:   Fri, 21 Oct 2022 10:47:47 +0100
+From:   My Algarve Property <geral@my-algarve-property.com>
+Reply-To: "best_porn_and_sex vbf.page.link/oUjU#Avaib" 
+          <linux-crypto@vger.kernel.org>
+Message-ID: <1f56647092fe6a6367983683f36a9bc2@my-algarve-property.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221014100319.5259-2-yekai13@huawei.com>
+Content-Type: text/plain; charset=utf-8
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cp70.redewt.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [1538 990] / [47 12]
+X-AntiAbuse: Sender Address Domain - my-algarve-property.com
+X-Get-Message-Sender-Via: cp70.redewt.net: authenticated_id: myalgarveprop/from_h
+X-Authenticated-Sender: cp70.redewt.net: geral@my-algarve-property.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 10:03:17AM +0000, Kai Ye wrote:
-> Increase the buffer to prevent stack overflow by fuzz test.
-> 
-> Signed-off-by: Kai Ye <yekai13@huawei.com>
-> ---
->  drivers/crypto/hisilicon/qm.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index e3edb176d976..5d79e9f0e7e1 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -250,7 +250,6 @@
->  #define QM_QOS_MIN_CIR_B		100
->  #define QM_QOS_MAX_CIR_U		6
->  #define QM_QOS_MAX_CIR_S		11
-> -#define QM_QOS_VAL_MAX_LEN		32
->  #define QM_DFX_BASE		0x0100000
->  #define QM_DFX_STATE1		0x0104000
->  #define QM_DFX_STATE2		0x01040C8
-> @@ -4612,7 +4611,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
->  			       unsigned int *fun_index)
->  {
->  	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
-> -	char val_buf[QM_QOS_VAL_MAX_LEN] = {0};
-> +	char val_buf[QM_DBG_READ_LEN] = {0};
+This is a copy of the following message you sent to Geral MyAlgarveProperty via My Algarve Property
 
-Please document how this value was derived in the patch log.
+This is an enquiry email via https://my-algarve-property.com/ from:
+best_porn_and_sex
+ vbf.page.link/oUjU#
+Avaib <linux-crypto@vger.kernel.org>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+free_sex_flicks
+ nhg.page.link/dPJK#
+
