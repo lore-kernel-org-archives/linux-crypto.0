@@ -2,89 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF70FC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 13:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20776FA373E
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Oct 2022 16:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230470AbiJUNVI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Oct 2022 09:21:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38914 "EHLO
+        id S230258AbiJUQT7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Oct 2022 12:19:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230434AbiJUNVC (ORCPT
+        with ESMTP id S230436AbiJUQTy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2022 09:21:02 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B064625F8CB
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Oct 2022 06:20:59 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id m29-20020a05600c3b1d00b003c6bf423c71so5020218wms.0
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Oct 2022 06:20:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i4JniJFO6Hdg6kNwzrb/PJxlNwEXD1oSoB9sUXNG4AA=;
-        b=KRlIyg/u0tYE5oXblsqDn0dKMd0L7zGHX6PBqE0FCsXsswAwYwco4EFIifQX1ONRW7
-         7SaxqLXoSX6mu1Nh7ZFBbvmyXI2zg460zs6nvIAzibw99XZD5uOSyJeIKhOB72YFyDgg
-         3T83bJoFOthQsg53QXGuHLHDoMzER0ebn5zLuxpbZDeCHq+H0KPoig72NBZrimtkxYpq
-         b5eafxr1uEdcRgvlELg8MnV1TgbO4LZTQEqMQuZttox39NTLfsx8LcDBrDYfCjafaAWe
-         Bdv3Yorx+J/XB99YCmhkDaU/qsOy3bnicMiZjV6mqZbIe2KUqJ4/1QLDu3qhTOvNf2fv
-         TYHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i4JniJFO6Hdg6kNwzrb/PJxlNwEXD1oSoB9sUXNG4AA=;
-        b=3qW+fltZdyAa69EMoFbTPhltvdtxogDZsb7aIWuXqlmjE3rv/4+wQ6MUZIpRrZPzMd
-         azSfK0jsmB+a5iWPI4p7PSp8VvzlzH2+HJxynheVKpqLv0EryeQtQ7QRcEsdQJlKAWMb
-         OaPYDX/84U6JA38iWV3jNEeMc3OHdGXkNB7xlSf5a6lGhbIvwEV8q9A+fa73F9Ek/dn8
-         CwL1Y16wWwcdstLSucLZBA/aCL+qPX9FtNVgwo7sTHK1iowTVXBVXnxmJLYeDSBtMrvt
-         julMmelmpac3K5l+G33Q0kRWtTsKHxGQ6LlilaN7iZ8IXWwyWHhVGYiBOn5EVPoazj7f
-         Vpwg==
-X-Gm-Message-State: ACrzQf3OB5jkrJHcYqVS6LMBFK2kjbCSX/GrsF5ziN3//oiHI4Smq0Yi
-        V17tgVTPszK11jX+LUssL19KyA==
-X-Google-Smtp-Source: AMsMyM5J4fLco6qzthaoFkH7ErTin58+NxkdGFINMqMFdhJr2i4VdFMQGgMTPWCWXWc+HK19vznoiQ==
-X-Received: by 2002:a05:600c:354d:b0:3c8:4b2d:f3fb with SMTP id i13-20020a05600c354d00b003c84b2df3fbmr310079wmq.188.1666358457786;
-        Fri, 21 Oct 2022 06:20:57 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id g5-20020a5d4885000000b0022e55f40bc7sm18738768wrq.82.2022.10.21.06.20.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 06:20:57 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 15:20:53 +0200
-From:   Corentin LABBE <clabbe@baylibre.com>
-To:     heiko@sntech.de, ardb@kernel.org, davem@davemloft.net,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v10 00/33] crypto: rockchip: permit to pass self-tests
-Message-ID: <Y1KctXMZ1+c5uQqd@Red>
-References: <20220927075511.3147847-1-clabbe@baylibre.com>
+        Fri, 21 Oct 2022 12:19:54 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D557D4456E;
+        Fri, 21 Oct 2022 09:19:36 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e769329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e769:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0CC6D1EC0731;
+        Fri, 21 Oct 2022 18:19:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1666369174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=osvnA1VVG8lOO7CofSEE3U1qKE+FmJzIhRV7z1btuj4=;
+        b=kTrJPiFSirvT8QAitnYEpzpcdMbtcXA5yOQxTep7XgZPzoZ7lttGRZVygRLbYsnaOD+LzU
+        /RhEgA3iGecU55zSIGnw2ZiO8DllFm7LXz29lmQH3D3HkNrqJcr2lCuQHbKV8uRxNlwMvW
+        ITkPMYEdCWAcH8rJMRHThhLuixBO9Z8=
+Date:   Fri, 21 Oct 2022 18:19:29 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
+ setup_clear_cpu_cap()/clear_cpu_cap()
+Message-ID: <Y1LGkTXCksqAYLHD@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+ <20220718141123.136106-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220927075511.3147847-1-clabbe@baylibre.com>
+In-Reply-To: <20220718141123.136106-3-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Sep 27, 2022 at 07:54:38AM +0000, Corentin Labbe a écrit :
-> Hello
+On Mon, Jul 18, 2022 at 05:11:20PM +0300, Maxim Levitsky wrote:
+> Currently setup_clear_cpu_cap passes NULL 'struct cpuinfo_x86*'
+> to clear_cpu_cap to indicate that capability should be cleared from boot_cpu_data.
 > 
-> The rockchip crypto driver is broken and do not pass self-tests.
-> This serie's goal is to permit to become usable and pass self-tests.
+> Later that is used in clear_feature to do recursive call to
+> clear_cpu_cap together with clearing the feature bit from 'cpu_caps_cleared'
 > 
-> This whole serie is tested on a rk3328-rock64, rk3288-miqi and
-> rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
+> Remove that code and just call the do_clear_cpu_cap on boot_cpu_data directly
+> from the setup_clear_cpu_cap.
 > 
-> Regards
+> The only functional change this introduces is that now calling clear_cpu_cap
+> explicitly on boot_cpu_data also sets the bits in cpu_caps_cleared,
+> which is the only thing that makes sense anyway.
 > 
+> All callers of both functions were checked for this and fixed.
 
-Hello
+Change looks ok. What I can't grok is this sentence: what was checked
+and fixed where?
 
-Gentle ping since it is a month since this serie was sent and no comment was made (except some reviewed-by).
-So I think it is ready to be merged, probably thought the crypto tree.
+What does need fixing and why?
 
-Regards
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
