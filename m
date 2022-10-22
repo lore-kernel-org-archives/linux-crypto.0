@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0C8FA373F
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Oct 2022 01:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754A2FA3742
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Oct 2022 01:44:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiJVBof (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Oct 2022 21:44:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56446 "EHLO
+        id S229940AbiJVBos (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Oct 2022 21:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbiJVBod (ORCPT
+        with ESMTP id S229947AbiJVBoh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Oct 2022 21:44:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 685131F2FA;
-        Fri, 21 Oct 2022 18:44:32 -0700 (PDT)
+        Fri, 21 Oct 2022 21:44:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBDE1386B9;
+        Fri, 21 Oct 2022 18:44:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EE6C361FB4;
-        Sat, 22 Oct 2022 01:44:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85F06C43148;
-        Sat, 22 Oct 2022 01:44:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7582C61FB9;
+        Sat, 22 Oct 2022 01:44:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8EB2C43141;
+        Sat, 22 Oct 2022 01:44:32 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZSLnssMM"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RYModmzz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1666403062;
+        t=1666403065;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=29Qx1OOG1bJVKU5nLBC6PT0Zulbd8r14TiIGy8T/ClE=;
-        b=ZSLnssMM0XXH+M9MGOvoehNy19YdOKzTX6iGl0UHOqI4RWMitRvRr1WskqdMj90Ml9VLrJ
-        IuhsEuEmVy8Qa+CESsXjAN4xPt6P8dHKXQt/9Pr9gQfngTcBY2HhGL5NsPrr+AQLmBIcrW
-        /z7HeLfTwAnxeups3mxxZjvOWG4zu2Y=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b3ec9f35 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sat, 22 Oct 2022 01:44:22 +0000 (UTC)
+        bh=6V7n7WLPPuhmK3sEMGuUnn+DVRADTUodeMZgVjm6mzw=;
+        b=RYModmzzec1OgskkcQmS88KlPnl8bEDxVs4NFDzK61wcmW5QvikH5xeZo68AnjN6PonqCT
+        u/znWy0ao8IKhXHXs/gq7RjG6sZSoZ1g/F1NTIf3MbxHxZ33HyaUZgMQA9GjldEfSrFsFn
+        1AU24c29vQR9f+tA0s5hbhp1IEc7HeQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bec1a5aa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sat, 22 Oct 2022 01:44:25 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
@@ -68,9 +68,9 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: [PATCH v1 2/5] prandom: remove prandom_u32_max()
-Date:   Fri, 21 Oct 2022 21:44:00 -0400
-Message-Id: <20221022014403.3881893-3-Jason@zx2c4.com>
+Subject: [PATCH v1 4/5] treewide: use get_random_u32_{above,below}() instead of manual loop
+Date:   Fri, 21 Oct 2022 21:44:02 -0400
+Message-Id: <20221022014403.3881893-5-Jason@zx2c4.com>
 In-Reply-To: <20221022014403.3881893-1-Jason@zx2c4.com>
 References: <20221022014403.3881893-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -79,31 +79,172 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With no more users left, we can finally remove this function. Its
-replacement is get_random_u32_below().
+These cases were done with this Coccinelle:
+
+@@
+expression E;
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (I > E);
++   I = get_random_u32_below(E + 1);
+
+@@
+expression E;
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (I >= E);
++   I = get_random_u32_below(E);
+
+@@
+expression E;
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (I < E);
++   I = get_random_u32_above(E - 1);
+
+@@
+expression E;
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (I <= E);
++   I = get_random_u32_above(E);
+
+@@
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (!I);
++   I = get_random_u32_above(0);
+
+@@
+identifier I;
+@@
+-   do {
+      ...
+-     I = get_random_u32();
+      ...
+-   } while (I == 0);
++   I = get_random_u32_above(0);
+
+@@
+expression E;
+identifier I;
+@@
+- E + 1 + get_random_u32_below(U32_MAX - E)
++ get_random_u32_above(E)
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- include/linux/prandom.h | 6 ------
- 1 file changed, 6 deletions(-)
+ fs/ext4/mmp.c            | 8 +-------
+ lib/test_fprobe.c        | 5 +----
+ lib/test_kprobes.c       | 5 +----
+ net/ipv6/output_core.c   | 8 +-------
+ net/vmw_vsock/af_vsock.c | 3 +--
+ 5 files changed, 5 insertions(+), 24 deletions(-)
 
-diff --git a/include/linux/prandom.h b/include/linux/prandom.h
-index 1f4a0de7b019..8272c08f3951 100644
---- a/include/linux/prandom.h
-+++ b/include/linux/prandom.h
-@@ -23,12 +23,6 @@ void prandom_seed_full_state(struct rnd_state __percpu *pcpu_state);
- #define prandom_init_once(pcpu_state)			\
- 	DO_ONCE(prandom_seed_full_state, (pcpu_state))
- 
--/* Deprecated: use get_random_u32_below() instead. */
--static inline u32 prandom_u32_max(u32 ep_ro)
--{
--	return get_random_u32_below(ep_ro);
--}
--
- /*
-  * Handle minimum values for seeds
+diff --git a/fs/ext4/mmp.c b/fs/ext4/mmp.c
+index 588cb09c5291..4681fff6665f 100644
+--- a/fs/ext4/mmp.c
++++ b/fs/ext4/mmp.c
+@@ -262,13 +262,7 @@ void ext4_stop_mmpd(struct ext4_sb_info *sbi)
   */
+ static unsigned int mmp_new_seq(void)
+ {
+-	u32 new_seq;
+-
+-	do {
+-		new_seq = get_random_u32();
+-	} while (new_seq > EXT4_MMP_SEQ_MAX);
+-
+-	return new_seq;
++	return get_random_u32_below(EXT4_MMP_SEQ_MAX + 1);
+ }
+ 
+ /*
+diff --git a/lib/test_fprobe.c b/lib/test_fprobe.c
+index e0381b3ec410..1fb56cf5e5ce 100644
+--- a/lib/test_fprobe.c
++++ b/lib/test_fprobe.c
+@@ -144,10 +144,7 @@ static unsigned long get_ftrace_location(void *func)
+ 
+ static int fprobe_test_init(struct kunit *test)
+ {
+-	do {
+-		rand1 = get_random_u32();
+-	} while (rand1 <= div_factor);
+-
++	rand1 = get_random_u32_above(div_factor);
+ 	target = fprobe_selftest_target;
+ 	target2 = fprobe_selftest_target2;
+ 	target_ip = get_ftrace_location(target);
+diff --git a/lib/test_kprobes.c b/lib/test_kprobes.c
+index eeb1d728d974..1c95e5719802 100644
+--- a/lib/test_kprobes.c
++++ b/lib/test_kprobes.c
+@@ -339,10 +339,7 @@ static int kprobes_test_init(struct kunit *test)
+ 	stacktrace_target = kprobe_stacktrace_target;
+ 	internal_target = kprobe_stacktrace_internal_target;
+ 	stacktrace_driver = kprobe_stacktrace_driver;
+-
+-	do {
+-		rand1 = get_random_u32();
+-	} while (rand1 <= div_factor);
++	rand1 = get_random_u32_above(div_factor);
+ 	return 0;
+ }
+ 
+diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
+index 2685c3f15e9d..b5205311f372 100644
+--- a/net/ipv6/output_core.c
++++ b/net/ipv6/output_core.c
+@@ -15,13 +15,7 @@ static u32 __ipv6_select_ident(struct net *net,
+ 			       const struct in6_addr *dst,
+ 			       const struct in6_addr *src)
+ {
+-	u32 id;
+-
+-	do {
+-		id = get_random_u32();
+-	} while (!id);
+-
+-	return id;
++	return get_random_u32_above(0);
+ }
+ 
+ /* This function exists only for tap drivers that must support broken
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index f185f57c34e7..9cfed7fd8740 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -626,8 +626,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+ 	struct sockaddr_vm new_addr;
+ 
+ 	if (!port)
+-		port = LAST_RESERVED_PORT + 1 +
+-			get_random_u32_below(U32_MAX - LAST_RESERVED_PORT);
++		port = get_random_u32_above(LAST_RESERVED_PORT);
+ 
+ 	vsock_addr_init(&new_addr, addr->svm_cid, addr->svm_port);
+ 
 -- 
 2.38.1
 
