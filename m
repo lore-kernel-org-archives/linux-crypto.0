@@ -2,109 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B01AC04A95
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Oct 2022 11:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F018ECDFA1
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Oct 2022 18:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiJVLEM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 Oct 2022 07:04:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60034 "EHLO
+        id S229506AbiJVSos (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 22 Oct 2022 14:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbiJVLDZ (ORCPT
+        with ESMTP id S229491AbiJVSor (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Oct 2022 07:03:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A6C140A6;
-        Sat, 22 Oct 2022 03:21:31 -0700 (PDT)
+        Sat, 22 Oct 2022 14:44:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7474248D1;
+        Sat, 22 Oct 2022 11:44:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CE36760BBF;
-        Sat, 22 Oct 2022 10:21:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97FEC433D6;
-        Sat, 22 Oct 2022 10:21:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1666434090;
-        bh=4VayhwOVTKVAjPqqz97sF96LRLG+KRcajksLHZHtUxk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=wOx3mp5ksWJtvhNhAOmZUG8X3+HuRkTdY9Nc7h6cWFEIxsW4svt4t9REDVX0plI4T
-         0jvG2TdFgRx98jdox1K2bPVjxSRKOYymF+6X8vmbsIcB0hIMeoD9P7/9qN6LIAT+Ko
-         fQekZTeUTocY/mdL9wRqCZaeHaw+pLcmNqIWDT+k=
-Date:   Sat, 22 Oct 2022 12:21:27 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3B6986068B;
+        Sat, 22 Oct 2022 18:44:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3F6AC433D7;
+        Sat, 22 Oct 2022 18:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666464281;
+        bh=rOUU30Ns40RaPB0p9BJDk4013bR8TLp0a0aP/lu3CGw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=QH1i6VZDzmLtoKIfZRdZlY5d0nnl5DOOq4/LqxYE5FlmXq1e/ayVWYrKNPQTQfyTm
+         lDWgFVezS94kXpPQqLVZatcxNDhidctINkWrhuWdQswTmu6mz+CfseCYZ+3W8aNf/D
+         BNkZScXW3d2V3kASY+/66HDGLtFJ5ipyIa5e8xIAsg2O2gipHt0u3nXAKd6fgttKgZ
+         NC4qpNwwmaHrG3GXHMyiFE9RiFlknggaV/ZCAfsoGqw84Y8dfHy2yZiRWd2Z5DPiV2
+         OT+zRHLzLLt4Xmw92V6rNOqAbn6uKoF3nU46vq2IUtHpqclZiRhC/zWn5A1+rqtQtz
+         yzpn0LslOhDww==
+From:   SeongJae Park <sj@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+Cc:     linux-kernel@vger.kernel.org, "Kees Cook" <keescook@chromium.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Russell King" <linux@armlinux.org.uk>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+        "Heiko Carstens" <hca@linux.ibm.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Jani Nikula" <jani.nikula@linux.intel.com>,
+        "Jason Gunthorpe" <jgg@nvidia.com>,
+        "Sakari Ailus" <sakari.ailus@linux.intel.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        "Andreas Dilger" <adilger.kernel@dilger.ca>,
+        "Jaegeuk Kim" <jaegeuk@kernel.org>,
+        "Richard Weinberger" <richard@nod.at>,
         "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        "SeongJae Park" <sj@kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Michael Ellerman" <mpe@ellerman.id.au>,
+        "Helge Deller" <deller@gmx.de>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: Re: [PATCH v1 0/5] convert tree to
- get_random_u32_{below,above,between}()
-Message-ID: <Y1PEJxnlY7dh4yK8@kroah.com>
-References: <20221022014403.3881893-1-Jason@zx2c4.com>
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        damon@lists.linux.dev, linux-mm@kvack.org
+Subject: Re: [PATCH v1 1/5] treewide: use get_random_u32_below() instead of deprecated function
+Date:   Sat, 22 Oct 2022 18:44:36 +0000
+Message-Id: <20221022184436.33750-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221022014403.3881893-2-Jason@zx2c4.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221022014403.3881893-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 09:43:58PM -0400, Jason A. Donenfeld wrote:
-> Hey everyone,
+Hi Jason,
+
+Cc-ing damon@lists.linux.dev and linux-mm@kvack.org.
+
+On Fri, 21 Oct 2022 21:43:59 -0400 "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
+
+> This is a simple mechanical transformation done by:
 > 
-> Here's the second and final tranche of tree-wide conversions to get
-> random integer handling a bit tamer. It's predominantly another
-> Coccinelle-based patchset.
+> @@
+> expression E;
+> @@
+> - prandom_u32_max(E)
+> + get_random_u32_below(E)
 > 
-> First we s/prandom_u32_max/get_random_u32_below/, since the former is
-> just a deprecated alias for the latter. Then in the next commit we can
-> remove prandom_u32_max all together. I'm quite happy about finally being
-> able to do that. It means that prandom.h is now only for deterministic and 
-> repeatable randomness, not non-deterministic/cryptographic randomness.
-> That line is no longer blurred.
-> 
-> Then, in order to clean up a bunch of inefficient patterns, we introduce
-> two trivial static inline helper functions built on top of
-> get_random_u32_below: get_random_u32_above and get_random_u32_between.
-> These are pretty straight forward to use and understand. Then the final
-> two patches convert some gnarly open-coded number juggling to use these
-> helpers.
-> 
-> I've used Coccinelle for all the treewide patches, so hopefully review
-> is rather uneventful. I didn't accept all of the changes that Coccinelle
-> proposed, though, as these tend to be somewhat context-specific. I erred
-> on the side of just going with the most obvious cases, at least this
-> time through. And then we can address more complicated cases through
-> actual maintainer trees.
-> 
-> Since get_random_u32_below() sits in my random.git tree, these patches
-> too will flow through that same tree.
-> 
-> Regards,
-> Jason
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+[...]
+>  include/linux/damon.h                         |  2 +-
+
+For the damon.h part,
+
+Reviewed-by: SeongJae Park <sj@kernel.org>
 
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Thanks,
+SJ
