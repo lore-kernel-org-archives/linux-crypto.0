@@ -2,93 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E5AC04A95
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 07:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E85FA373E
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 08:31:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231769AbiJYHlI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 03:41:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
+        id S232265AbiJYIbH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 04:31:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231913AbiJYHlD (ORCPT
+        with ESMTP id S232261AbiJYIbF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 03:41:03 -0400
-Received: from out199-9.us.a.mail.aliyun.com (out199-9.us.a.mail.aliyun.com [47.90.199.9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239221162C5;
-        Tue, 25 Oct 2022 00:41:01 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VT2-i3n_1666683654;
-Received: from 30.240.99.167(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VT2-i3n_1666683654)
-          by smtp.aliyun-inc.com;
-          Tue, 25 Oct 2022 15:40:57 +0800
-Message-ID: <93a9e613-c4ee-e2f8-63d0-45119c031670@linux.alibaba.com>
-Date:   Tue, 25 Oct 2022 15:40:53 +0800
+        Tue, 25 Oct 2022 04:31:05 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F86541A6;
+        Tue, 25 Oct 2022 01:31:01 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e753329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e753:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 457331EC064C;
+        Tue, 25 Oct 2022 10:31:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1666686660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=SsCnaY6vsw/dlWcb5dAlVwUs2sKUOOm4xMSiV3vNbVc=;
+        b=erN1LR4tBXE7W+2GQ21IylqAaTg3ibHJFZBzxlPhJR2N+B40rgmHY8IbEnrxZgvdUnmZ7l
+        2UrDoeUh/cI1b94V/yzn43xMsPQmRb0CJ3ZlOSF+QMqruxwiiwQZQ1KUHCYTUNrZjImCG+
+        Mjw1VpelZAdMyy4Xjpx0d5aG9UwNN0c=
+Date:   Tue, 25 Oct 2022 10:30:56 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize
+ the AMD-SP for SEV-SNP
+Message-ID: <Y1eewE4wj7MwXpFz@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
+ <Yzh558vy+rJfsBBq@zn.tnic>
+ <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH v2 12/15] crypto: arm64/sm4 - add CE implementation for
- ESSIV mode
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com
-References: <20221018071006.5717-1-tianjia.zhang@linux.alibaba.com>
- <20221018071006.5717-13-tianjia.zhang@linux.alibaba.com>
- <Y1DHb66VYPzFlTwh@sol.localdomain>
- <6d2a98f4-c50d-d05b-4a24-08fdd3ee20fa@linux.alibaba.com>
- <Y1dyNWSdCesQlWm8@sol.localdomain>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <Y1dyNWSdCesQlWm8@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Fri, Oct 14, 2022 at 04:09:11PM -0500, Kalra, Ashish wrote:
+> Yes, we need to do:
+> 
+> wbinvd_on_all_cpus();
+> SNP_DF_FLUSH
+> 
+> Need to ensure all the caches are clear before launching the first guest and
+> this has to be a combination of WBINVD and SNP_DF_FLUSH command.
 
-On 10/25/22 1:20 PM, Eric Biggers wrote:
-> On Fri, Oct 21, 2022 at 10:47:14AM +0800, Tianjia Zhang wrote:
->> Hi Eric,
->>
->> On 10/20/22 11:58 AM, Eric Biggers wrote:
->>> On Tue, Oct 18, 2022 at 03:10:03PM +0800, Tianjia Zhang wrote:
->>>> This patch is a CE-optimized assembly implementation for ESSIV mode.
->>>> The assembly part is realized by reusing the CBC mode.
->>>>
->>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>>
->>> Is there still a use case for CBC-ESSIV mode these days, now that everyone is
->>> using XTS instead?
->>>
->>> - Eric
->>
->> The mainstream is already using XTS, but CBC-ESSIV is still an optional
->> backup algorithm, especially in block crypto and fscrypto, I'm currently
->> working on supporting the SM4 algorithm for these subsystems.
->>
-> 
-> The only reason that AES-CBC-ESSIV support was added to fs/crypto/ was because
-> someone had a low-power embedded device with a hardware crypto accelerator that
-> only supported AES-CBC.
-> 
-> Nothing like that is relevant here, as this is just a software implementation.
-> 
-> Please just don't include ESSIV.  There's no need to implement random useless
-> algorithms.  It could always be added later if a use case actually arises.
-> 
-> - Eric
+Ok.
 
-Thanks for this information, I will remove the ESSIV code in the next
-patch.
+> > Why isn't this retval checked?
+> 
+> From the SNP FW ABI specs, for the SNP_SHUTDOWN command:
+> 
+> Firmware checks for every encryption capable ASID that the ASID is not in
+> use by a guest and a DF_FLUSH is not required. If a DF_FLUSH is required,
+> the firmware returns DFFLUSH_REQUIRED.
+>
+> Considering that SNP_SHUTDOWN command will check if DF_FLUSH was
+> required and if so, and not invoked before that command, returns
+> an error indicating that DFFLUSH is required.
+> 
+> This way, we can cleverly avoid taking the error code path for
+> DF_FLUSH command here and instead let the SNP_SHUTDOWN command
+> failure below indicate if DF_FLUSH command failed.
+> 
+> This also ensures that we always invoke SNP_SHUTDOWN command,
+> irrespective of SNP_DF_FLUSH command failure as SNP_DF_FLUSH may
+> actually not be required by the SHUTDOWN command.
 
-Best regards,
-Tianjia
+This all sounds just silly. The proper way to do this is:
+
+retry:
+        ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN, NULL, error);
+        if (ret == DFFLUSH_REQUIRED) {
+		ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+		if (ret)
+			"... DF_FLUSH failed...";
+
+		goto retry;
+	}
+
+I'm assuming here the firmware is smart enough to not keep returning
+DFFLUSH_REQUIRED constantly and cause an endless loop.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
