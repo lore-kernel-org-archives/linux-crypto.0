@@ -2,73 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92908C38A2D
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 05:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E5AC04A95
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 07:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiJYFcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 01:32:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51298 "EHLO
+        id S231769AbiJYHlI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 03:41:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbiJYFcb (ORCPT
+        with ESMTP id S231913AbiJYHlD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 01:32:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1B410F8A3
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Oct 2022 22:32:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B877661746
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Oct 2022 05:32:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0957C433D7;
-        Tue, 25 Oct 2022 05:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666675950;
-        bh=eoUq+qDRD06XalwYr/1zr8rSnoH2yIwW4iIoE6ZSenw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=f6w/bAdKmyY8rvfGv+EX/Z/MkZIvCnTXwo1IjtBQOWNyqV7RpCFCmfnYuTSTVFHHw
-         tMTr5Jk2XSmzDvgg8F/ZFyYbLKA5Y9SQud4oIGwZUZAyItKFcxs8rx3JPyko/iBB9g
-         f9R9zb/vznKLqy1pAGCVbYtxvcgy0NRRC4ovwjFLv2BUsxpEJE28uBbqwMzkhcfvWZ
-         Mz5A0C+q5ZyUje2oYyfBfjIkGKhpe3lyaHrr4qH7DkywMmumMzKR2tIVJ4MNWXtAWn
-         fgbOtnDIunZyb8hyr/Lz+LOOpml2R83SCX3NVB7lNzvF2o9BbnH7HKcRcEXYugQDyY
-         jfNUd45rBJm1w==
-Date:   Mon, 24 Oct 2022 22:32:28 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        keescook@chromium.org, jason@zx2c4.com, nikunj@amd.com
-Subject: Re: [PATCH v4 3/3] crypto: aesgcm - Provide minimal library
- implementation
-Message-ID: <Y1d07G+jIeGron7E@sol.localdomain>
-References: <20221024063052.109148-1-ardb@kernel.org>
- <20221024063052.109148-4-ardb@kernel.org>
+        Tue, 25 Oct 2022 03:41:03 -0400
+Received: from out199-9.us.a.mail.aliyun.com (out199-9.us.a.mail.aliyun.com [47.90.199.9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239221162C5;
+        Tue, 25 Oct 2022 00:41:01 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VT2-i3n_1666683654;
+Received: from 30.240.99.167(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VT2-i3n_1666683654)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Oct 2022 15:40:57 +0800
+Message-ID: <93a9e613-c4ee-e2f8-63d0-45119c031670@linux.alibaba.com>
+Date:   Tue, 25 Oct 2022 15:40:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024063052.109148-4-ardb@kernel.org>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v2 12/15] crypto: arm64/sm4 - add CE implementation for
+ ESSIV mode
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com
+References: <20221018071006.5717-1-tianjia.zhang@linux.alibaba.com>
+ <20221018071006.5717-13-tianjia.zhang@linux.alibaba.com>
+ <Y1DHb66VYPzFlTwh@sol.localdomain>
+ <6d2a98f4-c50d-d05b-4a24-08fdd3ee20fa@linux.alibaba.com>
+ <Y1dyNWSdCesQlWm8@sol.localdomain>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <Y1dyNWSdCesQlWm8@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 08:30:52AM +0200, Ard Biesheuvel wrote:
-> The former concern is addressed trivially, given that the function call
-> API uses 32-bit signed types for the input lengths. It is still up to
-> the caller to avoid IV reuse in general, but this is not something we
-> can police at the implementation level.
+Hi Eric,
 
-This doesn't seem to have been any note left about this in the code itself.
-Sizes are usually size_t, so if another type is used intentionally, that should
-be carefully documented.
+On 10/25/22 1:20 PM, Eric Biggers wrote:
+> On Fri, Oct 21, 2022 at 10:47:14AM +0800, Tianjia Zhang wrote:
+>> Hi Eric,
+>>
+>> On 10/20/22 11:58 AM, Eric Biggers wrote:
+>>> On Tue, Oct 18, 2022 at 03:10:03PM +0800, Tianjia Zhang wrote:
+>>>> This patch is a CE-optimized assembly implementation for ESSIV mode.
+>>>> The assembly part is realized by reusing the CBC mode.
+>>>>
+>>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>>>
+>>> Is there still a use case for CBC-ESSIV mode these days, now that everyone is
+>>> using XTS instead?
+>>>
+>>> - Eric
+>>
+>> The mainstream is already using XTS, but CBC-ESSIV is still an optional
+>> backup algorithm, especially in block crypto and fscrypto, I'm currently
+>> working on supporting the SM4 algorithm for these subsystems.
+>>
+> 
+> The only reason that AES-CBC-ESSIV support was added to fs/crypto/ was because
+> someone had a low-power embedded device with a hardware crypto accelerator that
+> only supported AES-CBC.
+> 
+> Nothing like that is relevant here, as this is just a software implementation.
+> 
+> Please just don't include ESSIV.  There's no need to implement random useless
+> algorithms.  It could always be added later if a use case actually arises.
+> 
+> - Eric
 
-Also, does it really need to be signed?
+Thanks for this information, I will remove the ESSIV code in the next
+patch.
 
-> +int __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,
-> +				const u8 *src, int crypt_len, const u8 *assoc,
-> +				int assoc_len, const u8 iv[GCM_AES_IV_SIZE],
-> +				const u8 *authtag);
-
-This returns 0 or -EBADMSG, which is inconsistent with
-chacha20poly1305_decrypt() which returns a bool.  It would be nice if the
-different algorithms would use consistent conventions.
-
--  Eric
+Best regards,
+Tianjia
