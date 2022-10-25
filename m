@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3349DFA3742
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 09:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B44FA373E
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 09:59:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231624AbiJYJ7U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 05:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42002 "EHLO
+        id S231578AbiJYJ7V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 05:59:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232158AbiJYJ6u (ORCPT
+        with ESMTP id S232068AbiJYJ6j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 05:58:50 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C24170DFC;
-        Tue, 25 Oct 2022 02:53:46 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2irHS_1666691623;
-Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2irHS_1666691623)
+        Tue, 25 Oct 2022 05:58:39 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 778BA12FFBA;
+        Tue, 25 Oct 2022 02:53:40 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R831e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2jq9f_1666691617;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2jq9f_1666691617)
           by smtp.aliyun-inc.com;
-          Tue, 25 Oct 2022 17:53:44 +0800
+          Tue, 25 Oct 2022 17:53:38 +0800
 From:   'Guanjun' <guanjun@linux.alibaba.com>
 To:     herbert@gondor.apana.org.au, elliott@hpe.com
 Cc:     zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
         guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
-Subject: [PATCH v3 7/9] crypto/ycc: Add rsa algorithm support
-Date:   Tue, 25 Oct 2022 17:53:34 +0800
-Message-Id: <1666691616-69983-8-git-send-email-guanjun@linux.alibaba.com>
+Subject: [PATCH v3 1/9] crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+Date:   Tue, 25 Oct 2022 17:53:28 +0800
+Message-Id: <1666691616-69983-2-git-send-email-guanjun@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
 References: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
@@ -34,862 +34,824 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Guanjun <guanjun@linux.alibaba.com>
+From: Zelin Deng <zelin.deng@linux.alibaba.com>
 
-Support rsa algorithm for ycc. That includes encryption\decryption
-and verification\signature
+YCC (Yitian Cryptography Complex) is designed to accelerate the process
+of encryption and decryption. Yitian is the name of Alibaba SoCs
+which is based on ARMv9 architecture.
 
+This patch aims to add driver with basic pci settings and irq requests.
+
+Signed-off-by: Zelin Deng <zelin.deng@linux.alibaba.com>
+Co-developed-by: Jiankang Chen <jkchen@linux.alibaba.com>
+Signed-off-by: Jiankang Chen <jkchen@linux.alibaba.com>
 Signed-off-by: Guanjun <guanjun@linux.alibaba.com>
 ---
- drivers/crypto/ycc/Makefile   |   2 +-
- drivers/crypto/ycc/ycc_algs.h |  44 +++
- drivers/crypto/ycc/ycc_drv.c  |   7 +
- drivers/crypto/ycc/ycc_pke.c  | 696 ++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ycc/ycc_ring.h |  23 ++
- 5 files changed, 771 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/ycc/ycc_pke.c
+ drivers/crypto/Kconfig       |   2 +
+ drivers/crypto/Makefile      |   1 +
+ drivers/crypto/ycc/Kconfig   |   8 +
+ drivers/crypto/ycc/Makefile  |   3 +
+ drivers/crypto/ycc/ycc_dev.h | 148 +++++++++++++++
+ drivers/crypto/ycc/ycc_drv.c | 444 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_isr.c | 117 ++++++++++++
+ drivers/crypto/ycc/ycc_isr.h |  12 ++
+ 8 files changed, 735 insertions(+)
+ create mode 100644 drivers/crypto/ycc/Kconfig
+ create mode 100644 drivers/crypto/ycc/Makefile
+ create mode 100644 drivers/crypto/ycc/ycc_dev.h
+ create mode 100644 drivers/crypto/ycc/ycc_drv.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.h
 
-diff --git a/drivers/crypto/ycc/Makefile b/drivers/crypto/ycc/Makefile
-index d629dd5..d1f22a9 100644
---- a/drivers/crypto/ycc/Makefile
-+++ b/drivers/crypto/ycc/Makefile
-@@ -1,3 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_YCC) += ycc.o
--ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o ycc_ske.o ycc_aead.o
-+ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o ycc_ske.o ycc_aead.o ycc_pke.o
-diff --git a/drivers/crypto/ycc/ycc_algs.h b/drivers/crypto/ycc/ycc_algs.h
-index e3be83ec..6a13230a 100644
---- a/drivers/crypto/ycc/ycc_algs.h
-+++ b/drivers/crypto/ycc/ycc_algs.h
-@@ -76,6 +76,13 @@ enum ycc_cmd_id {
- 	YCC_CMD_GCM_DEC,
- 	YCC_CMD_CCM_ENC,
- 	YCC_CMD_CCM_DEC, /* 0x28 */
-+
-+	YCC_CMD_RSA_ENC = 0x83,
-+	YCC_CMD_RSA_DEC,
-+	YCC_CMD_RSA_CRT_DEC,
-+	YCC_CMD_RSA_CRT_SIGN,
-+	YCC_CMD_RSA_SIGN,
-+	YCC_CMD_RSA_VERIFY, /* 0x88 */
- };
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 55e75fb..f0c4aee 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -818,4 +818,6 @@ config CRYPTO_DEV_SA2UL
+ source "drivers/crypto/keembay/Kconfig"
+ source "drivers/crypto/aspeed/Kconfig"
  
- struct ycc_crypto_ctx {
-@@ -121,10 +128,47 @@ struct ycc_crypto_req {
- 	};
- };
- 
-+#define YCC_RSA_KEY_SZ_512	64
-+#define YCC_RSA_KEY_SZ_1536	192
-+#define YCC_RSA_CRT_PARAMS	5
-+#define YCC_RSA_E_SZ_MAX	8
-+#define YCC_CMD_DATA_ALIGN_SZ	64
-+#define YCC_PIN_SZ		16
++source "drivers/crypto/ycc/Kconfig"
 +
-+struct ycc_pke_ctx {
-+	struct rsa_key *rsa_key;
-+
-+	void *priv_key_vaddr;
-+	dma_addr_t priv_key_paddr;
-+	void *pub_key_vaddr;
-+	dma_addr_t pub_key_paddr;
-+
-+	unsigned int key_len;
-+	unsigned int e_len;
-+	bool crt_mode;
-+	struct ycc_ring *ring;
-+	struct crypto_akcipher *soft_tfm;
-+};
-+
-+struct ycc_pke_req {
-+	void *src_vaddr;
-+	dma_addr_t src_paddr;
-+	void *dst_vaddr;
-+	dma_addr_t dst_paddr;
-+
-+	struct ycc_cmd_desc desc;
-+	union {
-+		struct ycc_pke_ctx *ctx;
-+	};
-+	struct akcipher_request *req;
-+};
-+
- #define YCC_DEV(ctx)		(&(ctx)->ring->ydev->pdev->dev)
- 
- int ycc_sym_register(void);
- void ycc_sym_unregister(void);
- int ycc_aead_register(void);
- void ycc_aead_unregister(void);
-+int ycc_pke_register(void);
-+void ycc_pke_unregister(void);
- #endif
-diff --git a/drivers/crypto/ycc/ycc_drv.c b/drivers/crypto/ycc/ycc_drv.c
-index cd583d7..4a4d5cb 100644
---- a/drivers/crypto/ycc/ycc_drv.c
-+++ b/drivers/crypto/ycc/ycc_drv.c
-@@ -98,8 +98,14 @@ int ycc_algorithm_register(void)
- 	if (ret)
- 		goto unregister_sym;
- 
-+	ret = ycc_pke_register();
-+	if (ret)
-+		goto unregister_aead;
-+
- 	return 0;
- 
-+unregister_aead:
-+	ycc_aead_unregister();
- unregister_sym:
- 	ycc_sym_unregister();
- err:
-@@ -115,6 +121,7 @@ void ycc_algorithm_unregister(void)
- 	if (atomic_dec_return(&ycc_algs_refcnt))
- 		return;
- 
-+	ycc_pke_unregister();
- 	ycc_aead_unregister();
- 	ycc_sym_unregister();
- }
-diff --git a/drivers/crypto/ycc/ycc_pke.c b/drivers/crypto/ycc/ycc_pke.c
+ endif # CRYPTO_HW
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 116de17..a667775 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -52,4 +52,5 @@ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+ obj-y += xilinx/
+ obj-y += hisilicon/
+ obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
++obj-$(CONFIG_CRYPTO_DEV_YCC) += ycc/
+ obj-y += keembay/
+diff --git a/drivers/crypto/ycc/Kconfig b/drivers/crypto/ycc/Kconfig
 new file mode 100644
-index 00000000..3debd80
+index 00000000..6e88ecb
 --- /dev/null
-+++ b/drivers/crypto/ycc/ycc_pke.c
-@@ -0,0 +1,696 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/drivers/crypto/ycc/Kconfig
+@@ -0,0 +1,8 @@
++config CRYPTO_DEV_YCC
++	tristate "Support for Alibaba YCC cryptographic accelerator"
++	depends on CRYPTO && CRYPTO_HW && PCI
++	default n
++	help
++	  Enables the driver for the on-chip cryptographic accelerator of
++	  Alibaba Yitian SoCs which is based on ARMv9 architecture.
++	  If unsure say N.
+diff --git a/drivers/crypto/ycc/Makefile b/drivers/crypto/ycc/Makefile
+new file mode 100644
+index 00000000..ef28b7c
+--- /dev/null
++++ b/drivers/crypto/ycc/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0
++obj-$(CONFIG_CRYPTO_DEV_YCC) += ycc.o
++ycc-objs := ycc_drv.o ycc_isr.o
+diff --git a/drivers/crypto/ycc/ycc_dev.h b/drivers/crypto/ycc/ycc_dev.h
+new file mode 100644
+index 00000000..e5f76af
+--- /dev/null
++++ b/drivers/crypto/ycc/ycc_dev.h
+@@ -0,0 +1,148 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __YCC_DEV_H
++#define __YCC_DEV_H
++#include <linux/platform_device.h>
++#include <linux/pci.h>
 +
-+#define pr_fmt(fmt) "YCC: Crypto: " fmt
++#define YCC_MAX_DEBUGFS_NAME		20
 +
-+#include <crypto/internal/akcipher.h>
-+#include <crypto/internal/rsa.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/crypto.h>
-+#include <linux/mpi.h>
-+#include "ycc_algs.h"
++#define PCI_VENDOR_ID_YCC		0x1DED
++#define PCI_DEVICE_ID_RCEC		0x8003
++#define PCI_DEVICE_ID_RCIEP		0x8001
 +
-+static int ycc_rsa_done_callback(void *ptr, u16 state)
++#define YCC_RINGPAIR_NUM		48
++#define YCC_IRQS			(YCC_RINGPAIR_NUM + 1)
++
++#define RING_STOP_BIT			BIT(15)
++#define RING_CFG_RING_SZ		GENMASK(2, 0)
++#define RING_CFG_INT_TH			GENMASK(15, 8)
++#define RING_ERR_AXI			BIT(0)
++#define RING_PENDING_CNT		GENMASK(9, 0)
++
++#define YCC_SEC_CFG_BAR			0
++#define YCC_NSEC_CFG_BAR		1
++#define YCC_SEC_Q_BAR			2
++#define YCC_NSEC_Q_BAR			3
++
++/* YCC secure configuration register offset */
++#define REG_YCC_CTL			0x18
++#define REG_YCC_GO			0x50
++#define REG_YCC_HCLK_INT_STATUS		0x54
++#define REG_YCC_XCLK_INT_STATUS		0x58
++#define REG_YCC_XCLK_MEM_ECC_EN_0	0x5c
++#define REG_YCC_XCLK_MEM_ECC_EN_1	0x60
++#define REG_YCC_XCLK_MEM_ECC_COR_0	0x74
++#define REG_YCC_XCLK_MEM_ECC_COR_1	0x78
++#define REG_YCC_XCLK_MEM_ECC_UNCOR_0	0x80
++#define REG_YCC_XCLK_MEM_ECC_UNCOR_1	0x84
++#define REG_YCC_HCLK_MEM_ECC_EN		0x88
++#define REG_YCC_HCLK_MEM_ECC_COR	0x94
++#define REG_YCC_HCLK_MEM_ECC_UNCOR	0x98
++
++#define REG_YCC_DEV_INT_MASK		0xA4
++#define REG_YCC_HCLK_INT_MASK		0xE4
++#define REG_YCC_XCLK_INT_MASK		0xE8
++
++/* ring register offset */
++#define REG_RING_CMD_BASE_ADDR_LO	0x00
++#define REG_RING_CMD_BASE_ADDR_HI	0x04
++#define REG_RING_CMD_WR_PTR		0x08
++#define REG_RING_CMD_RD_PTR		0x0C
++#define REG_RING_RSP_BASE_ADDR_LO	0x10
++#define REG_RING_RSP_BASE_ADDR_HI	0x14
++#define REG_RING_RSP_WR_PTR		0x18
++#define REG_RING_RSP_RD_PTR		0x1C
++#define REG_RING_CFG			0x20
++#define REG_RING_TO_TH			0x24
++#define REG_RING_STATUS			0x28
++#define REG_RING_PENDING_CMD		0x2C
++#define REG_RING_RSP_WR_SHADOWN_PTR	0x30
++#define REG_RING_RSP_AFULL_TH		0x34
++
++#define YCC_HCLK_AHB_ERR		BIT(0)
++#define YCC_HCLK_SHIELD_ERR		BIT(1)
++#define YCC_HCLK_TRNG_ERR		BIT(2)
++#define YCC_HCLK_EFUSE_ERR		BIT(3)
++#define YCC_HCLK_INIT_ERR		GENMASK(30, 16)
++#define YCC_HCLK_CB_TRNG_ERR		BIT(31)
++
++#define YCC_CTRL_IRAM_EN		BIT(1)
++#define YCC_CTRL_SEC_EN			BIT(3)
++
++#define YCC_GO_PWRON			BIT(0)
++#define YCC_GO_ENABLED			BIT(1)
++
++#define PCI_EXR_DEVCTL_TRP		BIT(21)
++#define PCI_EXP_DEVCTL_FLREN		BIT(15)
++
++#define YDEV_STATUS_BIND		0
++#define YDEV_STATUS_INIT		1
++#define YDEV_STATUS_RESET		2
++#define YDEV_STATUS_READY		3
++#define YDEV_STATUS_ERR			4
++#define YDEV_STATUS_SRIOV		5
++
++struct ycc_bar {
++	void __iomem *vaddr;
++	resource_size_t paddr;
++	resource_size_t size;
++};
++
++enum ycc_dev_type {
++	YCC_RCIEP,
++	YCC_RCEC,
++};
++
++struct ycc_dev {
++	struct list_head list;
++	struct pci_dev *pdev;
++
++	u32 type;
++	int id;
++	int node;
++	const char *dev_name;
++	struct ycc_bar ycc_bars[4];
++	struct ycc_dev *assoc_dev;
++
++	bool is_polling;
++	unsigned long status;
++	struct workqueue_struct *dev_err_q;
++	char err_irq_name[32];
++	struct work_struct work;
++	char *msi_name[48];
++	struct dentry *debug_dir;
++	atomic_t refcnt;
++
++	bool sec;
++	bool is_vf;
++	bool enable_vf;
++};
++
++#define YCC_CSR_WR(csr_base, csr_offset, val)		\
++	__raw_writel(val, csr_base + csr_offset)
++#define YCC_CSR_RD(csr_base, csr_offset)		\
++	__raw_readl(csr_base + csr_offset)
++
++static inline void ycc_dev_get(struct ycc_dev *ydev)
 +{
-+	struct ycc_pke_req *rsa_req = (struct ycc_pke_req *)ptr;
-+	struct ycc_pke_ctx *ctx = rsa_req->ctx;
-+	struct akcipher_request *req = rsa_req->req;
-+	struct device *dev = YCC_DEV(ctx);
-+	unsigned int dma_length = ctx->key_len;
-+
-+	if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id == YCC_CMD_RSA_VERIFY)
-+		dma_length = ctx->key_len << 1;
-+
-+	/* For signature verify, dst is NULL */
-+	if (rsa_req->dst_vaddr) {
-+		sg_copy_from_buffer(req->dst, sg_nents_for_len(req->dst, req->dst_len),
-+				    rsa_req->dst_vaddr, req->dst_len);
-+		dma_free_coherent(dev, ALIGN(ctx->key_len, 64),
-+				  rsa_req->dst_vaddr, rsa_req->dst_paddr);
-+	}
-+	dma_free_coherent(dev, ALIGN(dma_length, 64),
-+			  rsa_req->src_vaddr, rsa_req->src_paddr);
-+
-+	if (req->base.complete)
-+		req->base.complete(&req->base, state == CMD_SUCCESS ? 0 : -EBADMSG);
-+
-+	return 0;
++	atomic_inc(&ydev->refcnt);
 +}
 +
-+static int ycc_prepare_dma_buf(struct ycc_pke_req *rsa_req, int is_src)
++static inline void ycc_dev_put(struct ycc_dev *ydev)
 +{
-+	struct ycc_pke_ctx *ctx = rsa_req->ctx;
-+	struct akcipher_request *req = rsa_req->req;
-+	struct device *dev = YCC_DEV(ctx);
-+	unsigned int dma_length = ctx->key_len;
-+	dma_addr_t tmp;
-+	void *ptr;
-+	int shift;
++	atomic_dec(&ydev->refcnt);
++}
++
++static inline void ycc_g_err_mask(void *vaddr)
++{
++	/* This will mask all error interrupt */
++	YCC_CSR_WR(vaddr, REG_YCC_DEV_INT_MASK, (u32)~0);
++}
++
++static inline void ycc_g_err_unmask(void *vaddr)
++{
++	/* This will unmask all error interrupt */
++	YCC_CSR_WR(vaddr, REG_YCC_DEV_INT_MASK, 0);
++}
++
++#endif
+diff --git a/drivers/crypto/ycc/ycc_drv.c b/drivers/crypto/ycc/ycc_drv.c
+new file mode 100644
+index 00000000..f056d21
+--- /dev/null
++++ b/drivers/crypto/ycc/ycc_drv.c
+@@ -0,0 +1,444 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * YCC: Drivers for Alibaba YCC (Yitian Cryptography Complex) cryptographic
++ *   accelerator. Enables the on-chip cryptographic accelerator of Alibaba
++ *   Yitian SoCs which is based on ARMv9 architecture.
++ *
++ * Copyright (C) 2020-2022 Alibaba Corporation. All rights reserved.
++ * Author: Zelin Deng <zelin.deng@linux.alibaba.com>
++ * Author: Guanjun <guanjun@linux.alibaba.com>
++ */
++
++#define pr_fmt(fmt) "YCC: " fmt
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/iommu.h>
++#include <linux/errno.h>
++#include <linux/pci.h>
++#include <linux/mm.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/delay.h>
++#include <linux/dma-mapping.h>
++#include <linux/debugfs.h>
++
++#include "ycc_isr.h"
++
++static const char ycc_name[] = "ycc";
++
++static bool is_polling = true;
++module_param(is_polling, bool, 0644);
++
++LIST_HEAD(ycc_table);
++DEFINE_MUTEX(ycc_mutex);
++
++/*
++ * Each ycc device (RCIEP or RCEC) supports upto 48 VFs
++ * when enables SR-IOV. So each socket has 98 devices,
++ * includes 2 PFs and 96 VFs.
++ */
++#define YCC_MAX_DEVICES		(98 * 4) /* Assume 4 sockets */
++static DEFINE_IDR(ycc_idr);
++
++static int ycc_device_flr(struct pci_dev *pdev, struct pci_dev *rcec_pdev)
++{
++	int ret;
 +
 +	/*
-+	 * Ycc requires 2 key_len blocks, the first block stores
-+	 * message pre-padding with 0, the second block stores signature.
-+	 * LCKF akcipher verify, the first sg contains signature and
-+	 * the second contains message while src_len is signature
-+	 * length, dst len is message length
++	 * NOTE: When rciep gets FLR, its associated rcec gets reset as well.
++	 * It does not make sense that individual pcie device should impact
++	 * others. Before it has been fixed on silicon side, add a workaround to
++	 * do FLR properly -- save both pci states and restore them latter.
 +	 */
-+	if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id == YCC_CMD_RSA_VERIFY) {
-+		dma_length = ctx->key_len << 1;
-+		shift = ctx->key_len - req->dst_len;
-+	} else {
-+		shift = ctx->key_len - req->src_len;
++	ret = pci_save_state(pdev);
++	if (ret) {
++		pr_err("Failed to save pci state\n");
++		return ret;
 +	}
 +
-+	if (unlikely(shift < 0))
-+		return -EINVAL;
-+
-+	ptr = dma_alloc_coherent(dev, ALIGN(dma_length, 64), &tmp, GFP_ATOMIC);
-+	if (unlikely(!ptr)) {
-+		pr_err("Failed to alloc dma for %s data\n", is_src ? "src" : "dst");
-+		return -ENOMEM;
++	ret = pci_save_state(rcec_pdev);
++	if (ret) {
++		pr_err("Failed to save RCEC pci state\n");
++		return ret;
 +	}
 +
-+	memset(ptr, 0, ALIGN(dma_length, 64));
-+	if (is_src) {
-+		if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id ==
-+		    YCC_CMD_RSA_VERIFY) {
-+			/* Copy msg first with prepadding 0 */
-+			sg_copy_buffer(req->src, sg_nents(req->src), ptr + shift,
-+				       req->dst_len, req->src_len, 1);
-+			/* Copy signature */
-+			sg_copy_buffer(req->src, sg_nents(req->src), ptr + ctx->key_len,
-+				       req->src_len, 0, 1);
-+		} else {
-+			sg_copy_buffer(req->src, sg_nents(req->src), ptr + shift,
-+				       req->src_len, 0, 1);
-+		}
-+		rsa_req->src_vaddr = ptr;
-+		rsa_req->src_paddr = tmp;
-+	} else {
-+		rsa_req->dst_vaddr = ptr;
-+		rsa_req->dst_paddr = tmp;
-+	}
++	pcie_reset_flr(pdev, 0);
++	pcie_reset_flr(rcec_pdev, 0);
++
++	pci_restore_state(pdev);
++	pci_restore_state(rcec_pdev);
 +
 +	return 0;
 +}
 +
-+/*
-+ * Using public key to encrypt or verify
-+ */
-+static int ycc_rsa_submit_pub(struct akcipher_request *req, bool is_enc)
++static int ycc_resource_setup(struct ycc_dev *ydev)
 +{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ycc_pke_req *rsa_req = akcipher_request_ctx(req);
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_rsa_enc_cmd *rsa_enc_cmd;
-+	struct ycc_ring *ring = ctx->ring;
-+	struct device *dev = YCC_DEV(ctx);
-+	struct ycc_flags *aflags;
-+	int ret = -ENOMEM;
++	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
++	struct pci_dev *pdev = ydev->pdev;
++	struct ycc_bar *abar, *cfg_bar;
++	u32 hclk_status;
++	int ret;
 +
-+	if (req->dst_len > ctx->key_len || req->src_len > ctx->key_len)
-+		return -EINVAL;
++	ret = ycc_device_flr(pdev, rcec_pdev);
++	if (ret)
++		return ret;
 +
-+	rsa_req->ctx = ctx;
-+	rsa_req->req = req;
-+
-+	if (unlikely(!ctx->pub_key_vaddr))
-+		return -EINVAL;
-+
-+	aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
-+	if (!aflags)
-+		goto out;
-+
-+	aflags->ptr = (void *)rsa_req;
-+	aflags->ycc_done_callback = ycc_rsa_done_callback;
-+
-+	memset(&rsa_req->desc, 0, sizeof(rsa_req->desc));
-+	rsa_req->desc.private_ptr = (u64)(void *)aflags;
-+
-+	rsa_enc_cmd         = &rsa_req->desc.cmd.rsa_enc_cmd;
-+	rsa_enc_cmd->cmd_id = is_enc ? YCC_CMD_RSA_ENC : YCC_CMD_RSA_VERIFY;
-+	rsa_enc_cmd->keyptr = ctx->pub_key_paddr;
-+	rsa_enc_cmd->elen   = ctx->e_len << 3;
-+	rsa_enc_cmd->nlen   = ctx->key_len << 3;
-+
-+	ret = ycc_prepare_dma_buf(rsa_req, 1);
-+	if (unlikely(ret))
-+		goto free_aflags;
-+
-+	rsa_enc_cmd->sptr = rsa_req->src_paddr;
-+	if (is_enc) {
-+		ret = ycc_prepare_dma_buf(rsa_req, 0);
-+		if (unlikely(ret))
-+			goto free_src;
-+
-+		rsa_enc_cmd->dptr = rsa_req->dst_paddr;
-+	} else {
-+		rsa_req->dst_vaddr = NULL;
++	ret = pci_request_regions(pdev, ydev->dev_name);
++	if (ret) {
++		pr_err("Failed to request RCIEP mem regions\n");
++		return ret;
 +	}
 +
-+	ret = ycc_enqueue(ring, (u8 *)&rsa_req->desc);
-+	if (!ret)
-+		return -EINPROGRESS;
++	ret = -EIO;
++	cfg_bar = &ydev->ycc_bars[YCC_SEC_CFG_BAR];
++	cfg_bar->paddr = pci_resource_start(pdev, YCC_SEC_CFG_BAR);
++	cfg_bar->size = pci_resource_len(pdev, YCC_SEC_CFG_BAR);
++	cfg_bar->vaddr = ioremap(cfg_bar->paddr, cfg_bar->size);
++	if (!cfg_bar->vaddr) {
++		pr_err("Failed to ioremap RCIEP cfg bar\n");
++		goto release_mem_regions;
++	}
 +
-+	if (rsa_req->dst_vaddr)
-+		dma_free_coherent(dev, ALIGN(ctx->key_len, 64),
-+				  rsa_req->dst_vaddr, rsa_req->dst_paddr);
++	ycc_g_err_mask(cfg_bar->vaddr);
 +
-+free_src:
-+	dma_free_coherent(dev, ALIGN(is_enc ? ctx->key_len : ctx->key_len << 1, 64),
-+			  rsa_req->src_vaddr, rsa_req->src_paddr);
-+free_aflags:
-+	kfree(aflags);
++	YCC_CSR_WR(cfg_bar->vaddr, REG_YCC_CTL, 0|YCC_CTRL_IRAM_EN);
++	YCC_CSR_WR(cfg_bar->vaddr, REG_YCC_GO, 0|YCC_GO_PWRON);
++
++	/* Waiting for ycc firmware ready, 1000ms is recommended by the HW designers */
++	mdelay(1000);
++	if (!(YCC_CSR_RD(cfg_bar->vaddr, REG_YCC_GO) & YCC_GO_ENABLED)) {
++		pr_err("Failed to set ycc enabled\n");
++		goto iounmap_cfg_bar;
++	}
++
++	/* Check HCLK status register, some error may happen at PWRON stage */
++	hclk_status = YCC_CSR_RD(cfg_bar->vaddr, REG_YCC_HCLK_INT_STATUS);
++	if (hclk_status & YCC_HCLK_INIT_ERR) {
++		pr_err("Error happened when ycc was initializing\n");
++		goto iounmap_cfg_bar;
++	}
++
++	abar = &ydev->ycc_bars[YCC_NSEC_Q_BAR];
++	abar->paddr = pci_resource_start(pdev, YCC_NSEC_Q_BAR);
++	abar->size = pci_resource_len(pdev, YCC_NSEC_Q_BAR);
++	abar->vaddr = pci_iomap(pdev, YCC_NSEC_Q_BAR, abar->size);
++	if (!abar->vaddr) {
++		pr_err("Failed to ioremap RCIEP queue bar\n");
++		goto iounmap_cfg_bar;
++	}
++
++	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
++	if (ret < 0) {
++		pr_info("Failed to set DMA bit mask 64, try 32\n");
++		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
++		if (ret < 0)
++			goto iounmap_queue_bar;
++	}
++
++	ret = ycc_enable_msix(ydev);
++	if (ret <= 0) {
++		pr_err("Failed to enable msix, ret: %d\n", ret);
++		ret = (ret == 0) ? -EINVAL : ret;
++		goto iounmap_queue_bar;
++	}
++
++	ret = ycc_init_global_err(ydev);
++	if (ret) {
++		pr_err("Failed to enable global err\n");
++		goto disable_msix;
++	}
++
++	ret = ycc_alloc_irqs(ydev);
++	if (ret) {
++		pr_err("Failed to alloc irqs\n");
++		goto deinit_g_err;
++	}
++
++	YCC_CSR_WR(cfg_bar->vaddr, REG_YCC_HCLK_INT_STATUS, ~0);
++	ycc_g_err_unmask(cfg_bar->vaddr);
++	return 0;
++
++deinit_g_err:
++	ycc_deinit_global_err(ydev);
++disable_msix:
++	ycc_disable_msix(ydev);
++iounmap_queue_bar:
++	iounmap(abar->vaddr);
++iounmap_cfg_bar:
++	iounmap(cfg_bar->vaddr);
++release_mem_regions:
++	pci_release_regions(pdev);
++	return ret;
++}
++
++static void ycc_resource_free(struct ycc_dev *ydev)
++{
++	ycc_deinit_global_err(ydev);
++	ycc_free_irqs(ydev);
++	ycc_disable_msix(ydev);
++	iounmap(ydev->ycc_bars[YCC_SEC_CFG_BAR].vaddr);
++	iounmap(ydev->ycc_bars[YCC_NSEC_Q_BAR].vaddr);
++	pci_release_regions(ydev->pdev);
++}
++
++static inline bool ycc_rcec_match(struct pci_dev *pdev0, struct pci_dev *pdev1)
++{
++	return pdev0->bus->number == pdev1->bus->number;
++}
++
++static int ycc_rcec_bind(struct ycc_dev *ydev)
++{
++	struct ycc_dev *assoc_dev, *rciep, *rcec;
++	struct list_head *itr;
++	int ret = 0;
++
++	if (list_empty(&ycc_table))
++		return ret;
++
++	list_for_each(itr, &ycc_table) {
++		assoc_dev = list_entry(itr, struct ycc_dev, list);
++		/* not in the same pci bus */
++		if (!ycc_rcec_match(ydev->pdev, assoc_dev->pdev))
++			continue;
++
++		/* if sriov is enabled, it could be the same */
++		if (ydev == assoc_dev)
++			continue;
++
++		/* if sriov is enabled, found other VFs */
++		if (ydev->type == assoc_dev->type)
++			continue;
++
++		/* have been bound */
++		if (test_bit(YDEV_STATUS_BIND, &assoc_dev->status))
++			continue;
++
++		/* assocated device has been enabled sriov */
++		if (test_bit(YDEV_STATUS_SRIOV, &assoc_dev->status))
++			break;
++
++		ydev->assoc_dev = assoc_dev;
++		assoc_dev->assoc_dev = ydev;
++		rciep = (ydev->type == YCC_RCIEP) ? ydev : ydev->assoc_dev;
++		rcec = rciep->assoc_dev;
++
++		ret = sysfs_create_link(&rcec->pdev->dev.kobj,
++					&rciep->pdev->dev.kobj, "ycc_rciep");
++		if (ret)
++			goto out;
++
++		ret = sysfs_create_link(&rciep->pdev->dev.kobj,
++					&rcec->pdev->dev.kobj, "ycc_rcec");
++		if (ret)
++			goto remove_rciep_link;
++
++		ret = ycc_resource_setup(rciep);
++		if (ret)
++			goto remove_rcec_link;
++
++		set_bit(YDEV_STATUS_READY, &rciep->status);
++		set_bit(YDEV_STATUS_BIND, &rciep->status);
++		set_bit(YDEV_STATUS_READY, &rcec->status);
++		set_bit(YDEV_STATUS_BIND, &rcec->status);
++		break;
++	}
++
++	return ret;
++
++remove_rcec_link:
++	sysfs_remove_link(&rciep->pdev->dev.kobj, "ycc_rcec");
++remove_rciep_link:
++	sysfs_remove_link(&rcec->pdev->dev.kobj, "ycc_rciep");
 +out:
 +	return ret;
 +}
 +
-+/*
-+ * Using private key to decrypt or signature
-+ */
-+static int ycc_rsa_submit_priv(struct akcipher_request *req, bool is_dec)
++static void ycc_rcec_unbind(struct ycc_dev *ydev)
 +{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ycc_pke_req *rsa_req = akcipher_request_ctx(req);
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_rsa_dec_cmd *rsa_dec_cmd;
-+	struct ycc_ring *ring = ctx->ring;
-+	struct device *dev = YCC_DEV(ctx);
-+	struct ycc_flags *aflags;
-+	int ret = -ENOMEM;
++	struct ycc_dev *rciep, *rcec;
 +
-+	if (req->dst_len > ctx->key_len || req->src_len > ctx->key_len)
-+		return -EINVAL;
-+
-+	rsa_req->ctx = ctx;
-+	rsa_req->req = req;
-+
-+	if (unlikely(!ctx->priv_key_vaddr))
-+		return -EINVAL;
-+
-+	aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
-+	if (!aflags)
-+		goto out;
-+
-+	aflags->ptr = (void *)rsa_req;
-+	aflags->ycc_done_callback = ycc_rsa_done_callback;
-+
-+	memset(&rsa_req->desc, 0, sizeof(rsa_req->desc));
-+	rsa_req->desc.private_ptr = (u64)(void *)aflags;
-+
-+	rsa_dec_cmd         = &rsa_req->desc.cmd.rsa_dec_cmd;
-+	rsa_dec_cmd->keyptr = ctx->priv_key_paddr;
-+	rsa_dec_cmd->elen   = ctx->e_len << 3;
-+	rsa_dec_cmd->nlen   = ctx->key_len << 3;
-+	if (ctx->crt_mode)
-+		rsa_dec_cmd->cmd_id = is_dec ? YCC_CMD_RSA_CRT_DEC : YCC_CMD_RSA_CRT_SIGN;
-+	else
-+		rsa_dec_cmd->cmd_id = is_dec ? YCC_CMD_RSA_DEC : YCC_CMD_RSA_SIGN;
-+
-+	ret = ycc_prepare_dma_buf(rsa_req, 1);
-+	if (unlikely(ret))
-+		goto free_aflags;
-+
-+	ret = ycc_prepare_dma_buf(rsa_req, 0);
-+	if (unlikely(ret))
-+		goto free_src;
-+
-+	rsa_dec_cmd->sptr = rsa_req->src_paddr;
-+	rsa_dec_cmd->dptr = rsa_req->dst_paddr;
-+
-+	ret = ycc_enqueue(ring, (u8 *)&rsa_req->desc);
-+	if (!ret)
-+		return -EINPROGRESS;
-+
-+	dma_free_coherent(dev, ALIGN(ctx->key_len, 64), rsa_req->dst_vaddr,
-+			  rsa_req->dst_paddr);
-+free_src:
-+	dma_free_coherent(dev, ALIGN(ctx->key_len, 64), rsa_req->src_vaddr,
-+			  rsa_req->src_paddr);
-+free_aflags:
-+	kfree(aflags);
-+out:
-+	return ret;
-+}
-+
-+static inline bool ycc_rsa_do_soft(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_dev *ydev = ctx->ring->ydev;
-+
-+	if (ctx->key_len == YCC_RSA_KEY_SZ_512 ||
-+	    ctx->key_len == YCC_RSA_KEY_SZ_1536 ||
-+	    !test_bit(YDEV_STATUS_READY, &ydev->status))
-+		return true;
-+
-+	return false;
-+}
-+
-+enum rsa_ops {
-+	RSA_ENC,
-+	RSA_DEC,
-+	RSA_SIGN,
-+	RSA_VERIFY,
-+};
-+
-+static inline int ycc_rsa_soft_fallback(struct akcipher_request *req, int ops)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	int ret = -EINVAL;
-+
-+	akcipher_request_set_tfm(req, ctx->soft_tfm);
-+
-+	switch (ops) {
-+	case RSA_ENC:
-+		ret = crypto_akcipher_encrypt(req);
-+		break;
-+	case RSA_DEC:
-+		ret = crypto_akcipher_decrypt(req);
-+		break;
-+	case RSA_SIGN:
-+		ret = crypto_akcipher_sign(req);
-+		break;
-+	case RSA_VERIFY:
-+		ret = crypto_akcipher_verify(req);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	akcipher_request_set_tfm(req, tfm);
-+	return ret;
-+}
-+
-+static int ycc_rsa_encrypt(struct akcipher_request *req)
-+{
-+	if (ycc_rsa_do_soft(req))
-+		return ycc_rsa_soft_fallback(req, RSA_ENC);
-+
-+	return ycc_rsa_submit_pub(req, true);
-+}
-+
-+static int ycc_rsa_decrypt(struct akcipher_request *req)
-+{
-+	if (ycc_rsa_do_soft(req))
-+		return ycc_rsa_soft_fallback(req, RSA_DEC);
-+
-+	return ycc_rsa_submit_priv(req, true);
-+}
-+
-+static int ycc_rsa_verify(struct akcipher_request *req)
-+{
-+	if (ycc_rsa_do_soft(req))
-+		return ycc_rsa_soft_fallback(req, RSA_VERIFY);
-+
-+	return ycc_rsa_submit_pub(req, false);
-+}
-+
-+static int ycc_rsa_sign(struct akcipher_request *req)
-+{
-+	if (ycc_rsa_do_soft(req))
-+		return ycc_rsa_soft_fallback(req, RSA_SIGN);
-+
-+	return ycc_rsa_submit_priv(req, false);
-+}
-+
-+static int ycc_rsa_validate_n(unsigned int len)
-+{
-+	unsigned int bitslen = len << 3;
-+
-+	switch (bitslen) {
-+	case 512:
-+	case 1024:
-+	case 1536:
-+	case 2048:
-+	case 3072:
-+	case 4096:
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static void __ycc_rsa_drop_leading_zeros(const u8 **ptr, size_t *len)
-+{
-+	if (!*ptr)
++	if (!test_bit(YDEV_STATUS_BIND, &ydev->status))
 +		return;
 +
-+	while (!**ptr && *len) {
-+		(*ptr)++;
-+		(*len)--;
-+	}
++	rciep = (ydev->type == YCC_RCIEP) ? ydev : ydev->assoc_dev;
++	rcec = rciep->assoc_dev;
++
++	clear_bit(YDEV_STATUS_READY, &rciep->status);
++	clear_bit(YDEV_STATUS_READY, &rcec->status);
++	clear_bit(YDEV_STATUS_BIND, &rciep->status);
++	clear_bit(YDEV_STATUS_BIND, &rcec->status);
++	sysfs_remove_link(&rcec->pdev->dev.kobj, "ycc_rciep");
++	sysfs_remove_link(&rciep->pdev->dev.kobj, "ycc_rcec");
++	ycc_resource_free(rciep);
++	rciep->assoc_dev = NULL;
++	rcec->assoc_dev = NULL;
 +}
 +
-+static int ycc_rsa_set_n(struct ycc_pke_ctx *ctx, const char *value,
-+			 size_t value_len, bool private)
++static int ycc_dev_add(struct ycc_dev *ydev)
 +{
-+	const char *ptr = value;
-+
-+	/* e should be set before n as we need e_len */
-+	if (!ctx->e_len || !value_len)
-+		return -EINVAL;
-+
-+	if (!ctx->key_len)
-+		ctx->key_len = value_len;
-+
-+	if (private && !ctx->crt_mode)
-+		memcpy(ctx->priv_key_vaddr + ctx->e_len + YCC_PIN_SZ +
-+		       ctx->rsa_key->d_sz, ptr, value_len);
-+
-+	memcpy(ctx->pub_key_vaddr + ctx->e_len, ptr, value_len);
-+	return 0;
-+}
-+
-+static int ycc_rsa_set_e(struct ycc_pke_ctx *ctx, const char *value,
-+			 size_t value_len, bool private)
-+{
-+	const char *ptr = value;
-+
-+	if (!ctx->key_len || !value_len || value_len > YCC_RSA_E_SZ_MAX)
-+		return -EINVAL;
-+
-+	ctx->e_len = value_len;
-+	if (private)
-+		memcpy(ctx->priv_key_vaddr, ptr, value_len);
-+
-+	memcpy(ctx->pub_key_vaddr, ptr, value_len);
-+	return 0;
-+}
-+
-+static int ycc_rsa_set_d(struct ycc_pke_ctx *ctx, const char *value,
-+			 size_t value_len)
-+{
-+	const char *ptr = value;
-+
-+	if (!ctx->key_len || !value_len || value_len > ctx->key_len)
-+		return -EINVAL;
-+
-+	memcpy(ctx->priv_key_vaddr + ctx->e_len + YCC_PIN_SZ, ptr, value_len);
-+	return 0;
-+}
-+
-+static int ycc_rsa_set_crt_param(char *param, size_t half_key_len,
-+				 const char *value, size_t value_len)
-+{
-+	const char *ptr = value;
-+	size_t len = value_len;
-+
-+	if (!len || len > half_key_len)
-+		return -EINVAL;
-+
-+	memcpy(param, ptr, len);
-+	return 0;
-+}
-+
-+static int ycc_rsa_setkey_crt(struct ycc_pke_ctx *ctx, struct rsa_key *rsa_key)
-+{
-+	unsigned int half_key_len = ctx->key_len >> 1;
-+	u8 *tmp = (u8 *)ctx->priv_key_vaddr;
 +	int ret;
 +
-+	tmp += ctx->rsa_key->e_sz + 16;
-+	/* TODO: rsa_key is better to be kept original */
-+	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->p, rsa_key->p_sz);
++	mutex_lock(&ycc_mutex);
++	ret = ycc_rcec_bind(ydev);
 +	if (ret)
-+		goto err;
++		goto out;
++	list_add_tail(&ydev->list, &ycc_table);
 +
-+	tmp += half_key_len;
-+	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->q, rsa_key->q_sz);
-+	if (ret)
-+		goto err;
-+
-+	tmp += half_key_len;
-+	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->dp, rsa_key->dp_sz);
-+	if (ret)
-+		goto err;
-+
-+	tmp += half_key_len;
-+	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->dq, rsa_key->dq_sz);
-+	if (ret)
-+		goto err;
-+
-+	tmp += half_key_len;
-+	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->qinv, rsa_key->qinv_sz);
-+	if (ret)
-+		goto err;
-+
-+	ctx->crt_mode = true;
-+	return 0;
-+
-+err:
-+	ctx->crt_mode = false;
++out:
++	mutex_unlock(&ycc_mutex);
 +	return ret;
 +}
 +
-+static void ycc_rsa_clear_ctx(struct ycc_pke_ctx *ctx)
++static void ycc_dev_del(struct ycc_dev *ydev)
 +{
-+	struct device *dev = YCC_DEV(ctx);
-+	size_t size;
-+
-+	if (ctx->pub_key_vaddr) {
-+		size = ALIGN(ctx->rsa_key->e_sz + ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
-+		dma_free_coherent(dev, size, ctx->pub_key_vaddr, ctx->pub_key_paddr);
-+		ctx->pub_key_vaddr = NULL;
-+	}
-+
-+	if (ctx->priv_key_vaddr) {
-+		size = ALIGN(ctx->rsa_key->e_sz + YCC_PIN_SZ + ctx->rsa_key->d_sz +
-+			     ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
-+		memzero_explicit(ctx->priv_key_vaddr, size);
-+		dma_free_coherent(dev, size, ctx->priv_key_vaddr, ctx->priv_key_paddr);
-+		ctx->priv_key_vaddr = NULL;
-+	}
-+
-+	if (ctx->rsa_key) {
-+		memzero_explicit(ctx->rsa_key, sizeof(struct rsa_key));
-+		kfree(ctx->rsa_key);
-+		ctx->rsa_key = NULL;
-+	}
-+
-+	ctx->key_len = 0;
-+	ctx->e_len = 0;
-+	ctx->crt_mode = false;
++	mutex_lock(&ycc_mutex);
++	ycc_rcec_unbind(ydev);
++	list_del(&ydev->list);
++	mutex_unlock(&ycc_mutex);
 +}
 +
-+static void ycc_rsa_drop_leading_zeros(struct rsa_key *rsa_key)
++static inline int ycc_rciep_init(struct ycc_dev *ydev)
 +{
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->n, &rsa_key->n_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->e, &rsa_key->e_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->d, &rsa_key->d_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->p, &rsa_key->p_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->q, &rsa_key->q_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->dp, &rsa_key->dp_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->dq, &rsa_key->dq_sz);
-+	__ycc_rsa_drop_leading_zeros(&rsa_key->qinv, &rsa_key->qinv_sz);
++	struct pci_dev *pdev = ydev->pdev;
++	char name[YCC_MAX_DEBUGFS_NAME + 1];
++	int idr;
++
++	ydev->sec = false;
++	ydev->dev_name = ycc_name;
++	ydev->is_polling = is_polling;
++
++	idr = idr_alloc(&ycc_idr, ydev, 0, YCC_MAX_DEVICES, GFP_KERNEL);
++	if (idr < 0) {
++		pr_err("Failed to allocate idr for RCIEP device\n");
++		return idr;
++	}
++
++	ydev->id = idr;
++
++	snprintf(name, YCC_MAX_DEBUGFS_NAME, "ycc_%02x:%02d.%02d",
++		 pdev->bus->number, PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn));
++	ydev->debug_dir = debugfs_create_dir(name, NULL);
++	/* If failed to create debugfs, driver can still work */
++	if (IS_ERR_OR_NULL(ydev->debug_dir)) {
++		pr_warn("Failed to create debugfs for RCIEP device\n");
++		ydev->debug_dir = NULL;
++	}
++
++	return 0;
 +}
 +
-+static int ycc_rsa_alloc_key(struct ycc_pke_ctx *ctx, bool priv)
++static int ycc_drv_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 +{
-+	struct device *dev = YCC_DEV(ctx);
-+	struct rsa_key *rsa_key = ctx->rsa_key;
-+	unsigned int half_key_len;
-+	size_t size;
++	struct ycc_dev *ydev;
++	struct device *dev = &pdev->dev;
++	int node = dev_to_node(dev);
++	int ret = -ENOMEM;
++
++	ydev = kzalloc_node(sizeof(struct ycc_dev), GFP_KERNEL, node);
++	if (!ydev)
++		return ret;
++
++	ret = pci_enable_device(pdev);
++	if (ret) {
++		pr_err("Failed to enable pci device\n");
++		goto free_ydev;
++	}
++	pci_set_master(pdev);
++	pci_set_drvdata(pdev, ydev);
++
++	ydev->pdev = pdev;
++	ydev->is_vf = false;
++	ydev->enable_vf = false;
++	ydev->node = node;
++	if (id->device == PCI_DEVICE_ID_RCIEP) {
++		ydev->type = YCC_RCIEP;
++		ret = ycc_rciep_init(ydev);
++		if (ret)
++			goto disable_ydev;
++	} else {
++		ydev->type = YCC_RCEC;
++	}
++
++	ret = ycc_dev_add(ydev);
++	if (ret)
++		goto remove_debugfs;
++
++	return ret;
++
++remove_debugfs:
++	if (ydev->type == YCC_RCIEP) {
++		debugfs_remove_recursive(ydev->debug_dir);
++		idr_remove(&ycc_idr, ydev->id);
++	}
++disable_ydev:
++	pci_disable_device(pdev);
++free_ydev:
++	pr_err("Failed to probe %s\n", ydev->type == YCC_RCIEP ? "RCIEP" : "RCEC");
++	kfree(ydev);
++	return ret;
++}
++
++static void ycc_drv_remove(struct pci_dev *pdev)
++{
++	struct ycc_dev *ydev = pci_get_drvdata(pdev);
++
++	ycc_dev_del(ydev);
++	if (ydev->type == YCC_RCIEP) {
++		debugfs_remove_recursive(ydev->debug_dir);
++		idr_remove(&ycc_idr, ydev->id);
++	}
++
++	pci_disable_sriov(pdev);
++	pci_disable_device(pdev);
++	kfree(ydev);
++}
++
++/*
++ * SRIOV is not supported now.
++ */
++static int ycc_drv_sriov_configure(struct pci_dev *pdev, int numvfs)
++{
++	return -EFAULT;
++}
++
++static const struct pci_device_id ycc_id_table[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_YCC, PCI_DEVICE_ID_RCIEP) },
++	{ PCI_DEVICE(PCI_VENDOR_ID_YCC, PCI_DEVICE_ID_RCEC) },
++	{ 0, }
++};
++MODULE_DEVICE_TABLE(pci, ycc_id_table);
++
++static struct pci_driver ycc_driver = {
++	.name		= "ycc",
++	.id_table	= ycc_id_table,
++	.probe		= ycc_drv_probe,
++	.remove		= ycc_drv_remove,
++	.sriov_configure = ycc_drv_sriov_configure,
++};
++
++static int __init ycc_drv_init(void)
++{
 +	int ret;
 +
-+	ycc_rsa_drop_leading_zeros(rsa_key);
-+	ctx->key_len = rsa_key->n_sz;
-+
-+	ret = ycc_rsa_validate_n(ctx->key_len);
-+	if (ret) {
-+		pr_err("Invalid n size:%d bits\n", ctx->key_len << 3);
++	ret = pci_register_driver(&ycc_driver);
++	if (ret)
 +		goto out;
-+	}
-+
-+	ret = -ENOMEM;
-+	if (priv) {
-+		if (!(rsa_key->p_sz + rsa_key->q_sz + rsa_key->dp_sz +
-+		      rsa_key->dq_sz + rsa_key->qinv_sz)) {
-+			size = ALIGN(rsa_key->e_sz + YCC_PIN_SZ + rsa_key->d_sz +
-+				     ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
-+		} else {
-+			half_key_len = ctx->key_len >> 1;
-+			size = ALIGN(rsa_key->e_sz + YCC_PIN_SZ + half_key_len *
-+				     YCC_RSA_CRT_PARAMS, YCC_CMD_DATA_ALIGN_SZ);
-+			ctx->crt_mode = true;
-+		}
-+		ctx->priv_key_vaddr = dma_alloc_coherent(dev, size,
-+							 &ctx->priv_key_paddr,
-+							 GFP_KERNEL);
-+		if (!ctx->priv_key_vaddr)
-+			goto out;
-+		memset(ctx->priv_key_vaddr, 0, size);
-+	}
-+
-+	if (!ctx->pub_key_vaddr) {
-+		size = ALIGN(ctx->key_len + rsa_key->e_sz, YCC_CMD_DATA_ALIGN_SZ);
-+		ctx->pub_key_vaddr = dma_alloc_coherent(dev, size,
-+							&ctx->pub_key_paddr,
-+							GFP_KERNEL);
-+		if (!ctx->pub_key_vaddr)
-+			goto out;
-+		memset(ctx->pub_key_vaddr, 0, size);
-+	}
-+
-+	ret = ycc_rsa_set_e(ctx, rsa_key->e, rsa_key->e_sz, priv);
-+	if (ret) {
-+		pr_err("Failed to set e for rsa %s key\n", priv ? "private" : "public");
-+		goto out;
-+	}
-+
-+	ret = ycc_rsa_set_n(ctx, rsa_key->n, rsa_key->n_sz, priv);
-+	if (ret) {
-+		pr_err("Failed to set n for rsa private key\n");
-+		goto out;
-+	}
-+
-+	if (priv) {
-+		if (ctx->crt_mode) {
-+			ret = ycc_rsa_setkey_crt(ctx, rsa_key);
-+			if (ret) {
-+				pr_err("Failed to set private key for rsa crt key\n");
-+				goto out;
-+			}
-+		} else {
-+			ret = ycc_rsa_set_d(ctx, rsa_key->d, rsa_key->d_sz);
-+			if (ret) {
-+				pr_err("Failed to set d for rsa private key\n");
-+				goto out;
-+			}
-+		}
-+	}
 +
 +	return 0;
 +
 +out:
-+	ycc_rsa_clear_ctx(ctx);
 +	return ret;
 +}
 +
-+static int ycc_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
-+			  unsigned int keylen, bool priv)
++static void __exit ycc_drv_exit(void)
 +{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct rsa_key *rsa_key;
-+	int ret;
++	pci_unregister_driver(&ycc_driver);
++}
 +
-+	if (priv)
-+		ret = crypto_akcipher_set_priv_key(ctx->soft_tfm, key, keylen);
-+	else
-+		ret = crypto_akcipher_set_pub_key(ctx->soft_tfm, key, keylen);
-+	if (ret)
-+		return ret;
++module_init(ycc_drv_init);
++module_exit(ycc_drv_exit);
++MODULE_AUTHOR("Zelin Deng <zelin.deng@linux.alibaba.com>");
++MODULE_AUTHOR("Guanjun <guanjun@linux.alibaba.com>");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Driver for Alibaba YCC cryptographic accelerator");
+diff --git a/drivers/crypto/ycc/ycc_isr.c b/drivers/crypto/ycc/ycc_isr.c
+new file mode 100644
+index 00000000..f2f751c
+--- /dev/null
++++ b/drivers/crypto/ycc/ycc_isr.c
+@@ -0,0 +1,117 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+	ycc_rsa_clear_ctx(ctx);
++#define pr_fmt(fmt) "YCC: " fmt
 +
-+	rsa_key = kzalloc(sizeof(struct rsa_key), GFP_KERNEL);
-+	if (!rsa_key)
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/pci.h>
++#include <linux/slab.h>
++#include <linux/errno.h>
++#include <linux/delay.h>
++#include <linux/interrupt.h>
++
++#include "ycc_isr.h"
++
++/*
++ * TODO: will implement when ycc ring actually work.
++ */
++static void ycc_process_global_err(struct work_struct *work)
++{
++}
++
++static irqreturn_t ycc_g_err_isr(int irq, void *data)
++{
++	struct ycc_dev *ydev = (struct ycc_dev *)data;
++	struct ycc_bar *cfg_bar;
++
++	if (test_and_set_bit(YDEV_STATUS_ERR, &ydev->status))
++		return IRQ_HANDLED;
++
++	/* Mask global errors until it has been processed */
++	cfg_bar = &ydev->ycc_bars[YCC_SEC_CFG_BAR];
++	ycc_g_err_mask(cfg_bar->vaddr);
++
++	clear_bit(YDEV_STATUS_READY, &ydev->status);
++
++	schedule_work(&ydev->work);
++	return IRQ_HANDLED;
++}
++
++int ycc_enable_msix(struct ycc_dev *ydev)
++{
++	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
++
++	/* Disable intx explicitly */
++	return pci_alloc_irq_vectors(rcec_pdev, YCC_IRQS, YCC_IRQS, PCI_IRQ_MSIX);
++}
++
++void ycc_disable_msix(struct ycc_dev *ydev)
++{
++	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
++
++	pci_free_irq_vectors(rcec_pdev);
++}
++
++static int ycc_setup_global_err_workqueue(struct ycc_dev *ydev)
++{
++	char name[32] = {0};
++
++	sprintf(name, "ycc_dev_%d_g_errd", ydev->id);
++	INIT_WORK(&ydev->work, ycc_process_global_err);
++
++	/* Allocated, but not used temporarily */
++	ydev->dev_err_q = alloc_workqueue(name, WQ_UNBOUND, 0);
++	if (!ydev->dev_err_q) {
++		pr_err("Failed to alloc workqueue for dev: %d\n", ydev->id);
 +		return -ENOMEM;
-+
-+	if (priv)
-+		ret = rsa_parse_priv_key(rsa_key, key, keylen);
-+	else if (!ctx->pub_key_vaddr)
-+		ret = rsa_parse_pub_key(rsa_key, key, keylen);
-+	if (ret) {
-+		pr_err("Failed to parse %s key\n", priv ? "private" : "public");
-+		kfree(rsa_key);
-+		return ret;
 +	}
 +
-+	ctx->rsa_key = rsa_key;
-+	return ycc_rsa_alloc_key(ctx, priv);
-+}
-+
-+static int ycc_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
-+			     unsigned int keylen)
-+{
-+	return ycc_rsa_setkey(tfm, key, keylen, false);
-+}
-+
-+static int ycc_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
-+			      unsigned int keylen)
-+{
-+	return ycc_rsa_setkey(tfm, key, keylen, true);
-+}
-+
-+static unsigned int ycc_rsa_max_size(struct crypto_akcipher *tfm)
-+{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	/*
-+	 * 512 and 1536 bits key size are not supported by YCC,
-+	 * we use soft tfm instead
-+	 */
-+	if (ctx->key_len == YCC_RSA_KEY_SZ_512 ||
-+	    ctx->key_len == YCC_RSA_KEY_SZ_1536)
-+		return crypto_akcipher_maxsize(ctx->soft_tfm);
-+
-+	return ctx->rsa_key ? ctx->key_len : 0;
-+}
-+
-+static int ycc_rsa_init(struct crypto_akcipher *tfm)
-+{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_ring *ring;
-+
-+	ctx->soft_tfm = crypto_alloc_akcipher("rsa-generic", 0, 0);
-+	if (IS_ERR(ctx->soft_tfm)) {
-+		pr_err("Can not alloc_akcipher!\n");
-+		return PTR_ERR(ctx->soft_tfm);
-+	}
-+
-+	/* Reserve enough space if soft request reqires additional space */
-+	akcipher_set_reqsize(tfm, sizeof(struct ycc_pke_req) +
-+			     crypto_akcipher_alg(ctx->soft_tfm)->reqsize);
-+
-+	ring = ycc_crypto_get_ring();
-+	if (!ring) {
-+		crypto_free_akcipher(ctx->soft_tfm);
-+		return -EINVAL;
-+	}
-+
-+	ctx->ring = ring;
-+	ctx->key_len = 0;
 +	return 0;
 +}
 +
-+static void ycc_rsa_exit(struct crypto_akcipher *tfm)
++static void ycc_cleanup_global_err_workqueue(struct ycc_dev *ydev)
 +{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	if (ctx->ring)
-+		ycc_crypto_free_ring(ctx->ring);
-+
-+	ycc_rsa_clear_ctx(ctx);
-+	crypto_free_akcipher(ctx->soft_tfm);
++	if (ydev->dev_err_q)
++		destroy_workqueue(ydev->dev_err_q);
 +}
 +
-+static struct akcipher_alg ycc_rsa = {
-+	.base = {
-+		.cra_name = "rsa",
-+		.cra_driver_name = "rsa-ycc",
-+		.cra_priority = 1000,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct ycc_pke_ctx),
-+	},
-+	.sign = ycc_rsa_sign,
-+	.verify = ycc_rsa_verify,
-+	.encrypt = ycc_rsa_encrypt,
-+	.decrypt = ycc_rsa_decrypt,
-+	.set_pub_key = ycc_rsa_setpubkey,
-+	.set_priv_key = ycc_rsa_setprivkey,
-+	.max_size = ycc_rsa_max_size,
-+	.init = ycc_rsa_init,
-+	.exit = ycc_rsa_exit,
-+};
-+
-+int ycc_pke_register(void)
++/*
++ * TODO: Just request irq for global err. Irq for each ring
++ * will be requested when ring actually work.
++ */
++int ycc_alloc_irqs(struct ycc_dev *ydev)
 +{
-+	return crypto_register_akcipher(&ycc_rsa);
++	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
++	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
++	int ret;
++
++	sprintf(ydev->err_irq_name, "ycc_dev_%d_global_err", ydev->id);
++	ret = request_irq(pci_irq_vector(rcec_pdev, num),
++			  ycc_g_err_isr, 0, ydev->err_irq_name, ydev);
++	if (ret)
++		pr_err("Failed to alloc global irq interrupt for dev: %d\n", ydev->id);
++
++	return ret;
 +}
 +
-+void ycc_pke_unregister(void)
++/*
++ * TODO: Same as the allocate action.
++ */
++void ycc_free_irqs(struct ycc_dev *ydev)
 +{
-+	crypto_unregister_akcipher(&ycc_rsa);
++	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
++	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
++
++	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
 +}
-diff --git a/drivers/crypto/ycc/ycc_ring.h b/drivers/crypto/ycc/ycc_ring.h
-index 2caa9e0..c47fc18 100644
---- a/drivers/crypto/ycc/ycc_ring.h
-+++ b/drivers/crypto/ycc/ycc_ring.h
-@@ -100,9 +100,32 @@ struct ycc_aead_cmd {
- 	u8 taglen;	/* authenc size */
- } __packed;
- 
-+struct ycc_rsa_enc_cmd {
-+	u8 cmd_id;
-+	u64 sptr:48;
-+	u16 key_id;
-+	u64 keyptr:48;	/* public key e+n Bytes */
-+	u16 elen;	/* bits not byte */
-+	u16 nlen;
-+	u64 dptr:48;
-+} __packed;
 +
-+struct ycc_rsa_dec_cmd {
-+	u8 cmd_id;
-+	u64 sptr:48;
-+	u16 key_id;
-+	u16 kek_id;
-+	u64 keyptr:48;	/* private key e + pin + d + n */
-+	u16 elen;	/* bits not byte */
-+	u16 nlen;
-+	u64 dptr:48;
-+} __packed;
++int ycc_init_global_err(struct ycc_dev *ydev)
++{
++	return ycc_setup_global_err_workqueue(ydev);
++}
 +
- union ycc_real_cmd {
- 	struct ycc_skcipher_cmd ske_cmd;
- 	struct ycc_aead_cmd aead_cmd;
-+	struct ycc_rsa_enc_cmd rsa_enc_cmd;
-+	struct ycc_rsa_dec_cmd rsa_dec_cmd;
- 	u8 padding[32];
- };
- 
++void ycc_deinit_global_err(struct ycc_dev *ydev)
++{
++	ycc_cleanup_global_err_workqueue(ydev);
++}
+diff --git a/drivers/crypto/ycc/ycc_isr.h b/drivers/crypto/ycc/ycc_isr.h
+new file mode 100644
+index 00000000..8318a6f
+--- /dev/null
++++ b/drivers/crypto/ycc/ycc_isr.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __YCC_ISR_H
++
++#include "ycc_dev.h"
++
++int ycc_enable_msix(struct ycc_dev *ydev);
++void ycc_disable_msix(struct ycc_dev *ydev);
++int ycc_alloc_irqs(struct ycc_dev *ydev);
++void ycc_free_irqs(struct ycc_dev *ydev);
++int ycc_init_global_err(struct ycc_dev *ydev);
++void ycc_deinit_global_err(struct ycc_dev *ydev);
++#endif
 -- 
 1.8.3.1
 
