@@ -2,96 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A4FC04A95
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 10:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D0FC04A95
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 12:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231523AbiJYK1l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 06:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45836 "EHLO
+        id S232568AbiJYMw7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 08:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232324AbiJYK1M (ORCPT
+        with ESMTP id S232571AbiJYMwB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 06:27:12 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2C6160ECF;
-        Tue, 25 Oct 2022 03:25:42 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e753329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e753:329c:23ff:fea6:a903])
+        Tue, 25 Oct 2022 08:52:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11A315FF8
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Oct 2022 05:49:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C44E21EC03B9;
-        Tue, 25 Oct 2022 12:25:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1666693540;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=+geCwvxqT0myxZwE/PtJNWuF3ki1qM+58+9jGmk0+NA=;
-        b=QQmmBLsxaQ8Bj0ngcqs073Mv4GhGx8R/7EvI2yQ0oTRpnmgVXmmIW5JbwdhSXX6kTn5NXf
-        YXO+eYDiY/vhREBTWCVEionVrdwyNaIdtQO9FxHa5VrfMUThQoc9PY6PFOZslR+/E5H1aT
-        zYI89obq143eoU/a5IKjcDtSKRUzWJ4=
-Date:   Tue, 25 Oct 2022 12:25:36 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>, vbabka@suse.cz
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y1e5oC9QyDlKpxZ9@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
- <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3C9656190E
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Oct 2022 12:49:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A084BC43470
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Oct 2022 12:49:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666702151;
+        bh=pn5WWsG1lQ2xaUHJwXQ9SZKo6QxRqX9z+SXjmgXixcs=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=t+KHtLRjdLlWfhrr9Q2yQouRsOg4ETNK1ksIA2JbBoUNuiT2Km9RUs/E5hv0O91n/
+         A+mBABPZMhdpevR6lHaAPRhcSTrGufwzoruLLXPN1M4C/5gPMyV6+X8ok2wNXjG6z3
+         VBY7DB5Qakw3OXitNLIBIhpIoNgjbpdmfQQ1K36ZAEK5IrgUEK3IsPoKv4w1y0E9Ge
+         0gx+I/LpD87b2IvGDEOhULWJDHFe1ODxoTtEH0VUWfipAux0CxSkZvcXxFp9bDzxv/
+         0oa+HTRhK+otTlIBCplhozfQ7dHsDYxLol+6gy8fGOtNt83qvXnqtcN8h/eL724gdu
+         L9K3UQ3nkerlw==
+Received: by mail-lf1-f52.google.com with SMTP id bp15so21681227lfb.13
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Oct 2022 05:49:11 -0700 (PDT)
+X-Gm-Message-State: ACrzQf14TAqf6sdM2cRL9tES5+ZbLmxbf/fYE7jGcH9lk0IGeJunOyJ8
+        Ka8q6+24KrcIoJNzgXNs/Jj+dRAAeRCbUrS4rg8=
+X-Google-Smtp-Source: AMsMyM5GCKmayR9NRp+uYusbAnNCAOyFWswpu8M05PAh1gm645eBe/kUDqWfaXx41QayaPzxxblonU2WxGZ4Q/aj3Is=
+X-Received: by 2002:ac2:4c47:0:b0:4a2:c07b:4b62 with SMTP id
+ o7-20020ac24c47000000b004a2c07b4b62mr12946385lfk.426.1666702149638; Tue, 25
+ Oct 2022 05:49:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+References: <20221024063052.109148-1-ardb@kernel.org> <20221024063052.109148-4-ardb@kernel.org>
+ <Y1d07G+jIeGron7E@sol.localdomain>
+In-Reply-To: <Y1d07G+jIeGron7E@sol.localdomain>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 25 Oct 2022 14:48:57 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFcaZLq98OVkov6g7xo43z1dj2Q1v9pt_ESYED6++pV0Q@mail.gmail.com>
+Message-ID: <CAMj1kXFcaZLq98OVkov6g7xo43z1dj2Q1v9pt_ESYED6++pV0Q@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] crypto: aesgcm - Provide minimal library implementation
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        keescook@chromium.org, jason@zx2c4.com, nikunj@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 03:00:09PM -0500, Kalra, Ashish wrote:
-> If it is "still" accessed/touched then it can cause RMP #PF.
-> On the other hand,
-> 
->  * PG_hwpoison... Accessing is
->  * not safe since it may cause another machine check. Don't touch!
-> 
-> That sounds exactly the state we want these page(s) to be in ?
-> 
-> Another possibility is PG_error.
+On Tue, 25 Oct 2022 at 07:32, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Mon, Oct 24, 2022 at 08:30:52AM +0200, Ard Biesheuvel wrote:
+> > The former concern is addressed trivially, given that the function call
+> > API uses 32-bit signed types for the input lengths. It is still up to
+> > the caller to avoid IV reuse in general, but this is not something we
+> > can police at the implementation level.
+>
+> This doesn't seem to have been any note left about this in the code itself.
+> Sizes are usually size_t, so if another type is used intentionally, that should
+> be carefully documented.
+>
+> Also, does it really need to be signed?
+>
 
-Something like this:
+I'll add a comment in the code where the counter increment occurs.
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index e66f7aa3191d..baffa9c0dc30 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -186,6 +186,7 @@ enum pageflags {
- 	 * THP.
- 	 */
- 	PG_has_hwpoisoned = PG_error,
-+	PG_offlimits = PG_hwpoison,
- #endif
- 
- 	/* non-lru isolated movable page */
+Using int is easier because I can use signed comparison with 0 to
+decide whether we are done. We don't need the range so unless someone
+feels using unsigned int is essential here, I am going to leave it as
+is.
 
-and SNP will have to depend on CONFIG_MEMORY_FAILURE.
 
-But I'd let mm folks correct me here on the details.
+> > +int __must_check aesgcm_decrypt(const struct aesgcm_ctx *ctx, u8 *dst,
+> > +                             const u8 *src, int crypt_len, const u8 *assoc,
+> > +                             int assoc_len, const u8 iv[GCM_AES_IV_SIZE],
+> > +                             const u8 *authtag);
+>
+> This returns 0 or -EBADMSG, which is inconsistent with
+> chacha20poly1305_decrypt() which returns a bool.  It would be nice if the
+> different algorithms would use consistent conventions.
+>
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+I'll change that.
