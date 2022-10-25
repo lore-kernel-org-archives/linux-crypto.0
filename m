@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7420BECDFA1
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 13:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4595ECDFA1
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 14:26:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232905AbiJYNag (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 09:30:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43576 "EHLO
+        id S230345AbiJYO0B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 10:26:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232878AbiJYNaW (ORCPT
+        with ESMTP id S231629AbiJYOZ7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 09:30:22 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B11EB745;
-        Tue, 25 Oct 2022 06:30:17 -0700 (PDT)
+        Tue, 25 Oct 2022 10:25:59 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50CFEBD045;
+        Tue, 25 Oct 2022 07:25:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666704617; x=1698240617;
+  t=1666707958; x=1698243958;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=KkAVZF9FlFYgjvfF+NeTwj+PeZ9VYWNWbUqnI7ab/cg=;
-  b=Gw2m+ApchvCEIDKYny+t9BvvAqDMIkVtju6LbmLszATg0As2b94JLtY1
-   67EWGzcc8U5bwUkx3jYZBpGufUec342GHxcRRqT3xURwiVznDOIU0PRvd
-   +3doiZizZmzKHUT2JTXiWA2GqrL6KdGthc0zhXm3Wwe0JDD0KQm0vCOu/
-   tJyYq4RlGgG1RNMYy73B67McPW3/n5jzEwti5bj/TSizX5aUoAeF6DQqZ
-   Pb0DG/nNq+TzrNimbcFOKeJXm9NvEVLCds3w8Iui37xoJtwla4S53OIMf
-   LeKYmCUHDlJ8/zYrKjgh7W9ejRda8guWKOQw/tulSWjRrv3zQOkXwFnn5
+  bh=e+EgFvkS0+lp0qEJ9lMTF7Izk/AdZ7VKP8GbyLGxXcw=;
+  b=XPLtGhgGp/9QXeM0uBLOdiaBA89A7yq096iauWKO+5+uGq26aozmB41z
+   c1tzkD3TP3THPG/JktpjOyMcelFKLS8kLAETrrqWM+/pNmNaVRUfdyXMf
+   RcOy3+QWroBYkYw8+ogoUImMoujyZcLgUHwgqA9CmdRcHMWpoWmIIWPEF
+   we28plt3UcIxiQGdAVfSPuYFdGY3fdE6XY4hzqotFAL8D7Xd9HSrFuJWg
+   wZMhK7p8gtigEaBo37O9oqdenFEwZTldNVSZ51AvU8NvBxT3oAq2NfbiW
+   evXI/oS1/u1mzU8pdSC66MktF57d1mQu2WkHyCs7BH5ZraMiBvFowzVb5
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="290973749"
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="394002119"
 X-IronPort-AV: E=Sophos;i="5.95,212,1661842800"; 
-   d="gz'50?scan'50,208,50";a="290973749"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2022 06:30:16 -0700
+   d="gz'50?scan'50,208,50";a="394002119"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2022 07:19:16 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="664907221"
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="700554376"
 X-IronPort-AV: E=Sophos;i="5.95,212,1661842800"; 
-   d="gz'50?scan'50,208,50";a="664907221"
+   d="gz'50?scan'50,208,50";a="700554376"
 Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 25 Oct 2022 06:30:12 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 25 Oct 2022 07:19:13 -0700
 Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1onK0R-0006Iu-3C;
-        Tue, 25 Oct 2022 13:30:12 +0000
-Date:   Tue, 25 Oct 2022 21:30:00 +0800
+        id 1onKls-0006Kq-2Z;
+        Tue, 25 Oct 2022 14:19:12 +0000
+Date:   Tue, 25 Oct 2022 22:18:29 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     'Guanjun' <guanjun@linux.alibaba.com>, herbert@gondor.apana.org.au,
         elliott@hpe.com
@@ -51,19 +51,20 @@ Cc:     oe-kbuild-all@lists.linux.dev, zelin.deng@linux.alibaba.com,
         artie.ding@linux.alibaba.com, guanjun@linux.alibaba.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         xuchun.shang@linux.alibaba.com
-Subject: Re: [PATCH v3 2/9] crypto/ycc: Add ycc ring configuration
-Message-ID: <202210252148.A4QBddOX-lkp@intel.com>
-References: <1666691616-69983-3-git-send-email-guanjun@linux.alibaba.com>
+Subject: Re: [PATCH v3 4/9] crypto/ycc: Add device error handling support for
+ ycc hw errors
+Message-ID: <202210252252.yjggm8TV-lkp@intel.com>
+References: <1666691616-69983-5-git-send-email-guanjun@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="YD5EEmFTPmxIvpcs"
+Content-Type: multipart/mixed; boundary="a/DnloV4WR/AjTp8"
 Content-Disposition: inline
-In-Reply-To: <1666691616-69983-3-git-send-email-guanjun@linux.alibaba.com>
+In-Reply-To: <1666691616-69983-5-git-send-email-guanjun@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---YD5EEmFTPmxIvpcs
+--a/DnloV4WR/AjTp8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -79,17 +80,17 @@ https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221025-180005
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/1666691616-69983-3-git-send-email-guanjun%40linux.alibaba.com
-patch subject: [PATCH v3 2/9] crypto/ycc: Add ycc ring configuration
+patch link:    https://lore.kernel.org/r/1666691616-69983-5-git-send-email-guanjun%40linux.alibaba.com
+patch subject: [PATCH v3 4/9] crypto/ycc: Add device error handling support for ycc hw errors
 config: sparc-allyesconfig (attached as .config)
 compiler: sparc64-linux-gcc (GCC) 12.1.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/5ca4b99caab6eb8aaae9fa3793f0eb5ad7b4e973
+        # https://github.com/intel-lab-lkp/linux/commit/944c3c90dbd0017bbe59ea4ae5cfe2fb01f13a0e
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221025-180005
-        git checkout 5ca4b99caab6eb8aaae9fa3793f0eb5ad7b4e973
+        git checkout 944c3c90dbd0017bbe59ea4ae5cfe2fb01f13a0e
         # save the config file
         mkdir build_dir && cp config build_dir/.config
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sparc SHELL=/bin/bash drivers/crypto/ycc/
@@ -99,36 +100,109 @@ If you fix the issue, kindly add following tag where applicable
 
 All warnings (new ones prefixed by >>):
 
->> drivers/crypto/ycc/ycc_isr.c:44:6: warning: no previous prototype for 'ycc_resp_process' [-Wmissing-prototypes]
-      44 | void ycc_resp_process(uintptr_t ring_addr)
-         |      ^~~~~~~~~~~~~~~~
---
->> drivers/crypto/ycc/ycc_ring.c:518:6: warning: no previous prototype for 'ycc_handle_resp' [-Wmissing-prototypes]
-     518 | void ycc_handle_resp(struct ycc_ring *ring, struct ycc_resp_desc *desc)
+   drivers/crypto/ycc/ycc_ring.c:536:6: warning: no previous prototype for 'ycc_handle_resp' [-Wmissing-prototypes]
+     536 | void ycc_handle_resp(struct ycc_ring *ring, struct ycc_resp_desc *desc)
          |      ^~~~~~~~~~~~~~~
+>> drivers/crypto/ycc/ycc_ring.c:588:6: warning: no previous prototype for 'ycc_clear_cmd_ring' [-Wmissing-prototypes]
+     588 | void ycc_clear_cmd_ring(struct ycc_ring *ring)
+         |      ^~~~~~~~~~~~~~~~~~
+>> drivers/crypto/ycc/ycc_ring.c:613:6: warning: no previous prototype for 'ycc_clear_resp_ring' [-Wmissing-prototypes]
+     613 | void ycc_clear_resp_ring(struct ycc_ring *ring)
+         |      ^~~~~~~~~~~~~~~~~~~
 
 
-vim +/ycc_resp_process +44 drivers/crypto/ycc/ycc_isr.c
+vim +/ycc_clear_cmd_ring +588 drivers/crypto/ycc/ycc_ring.c
 
-    40	
-    41	/*
-    42	 * TODO: will implement when ycc ring actually work.
-    43	 */
-  > 44	void ycc_resp_process(uintptr_t ring_addr)
-    45	{
-    46	}
-    47	
+   535	
+ > 536	void ycc_handle_resp(struct ycc_ring *ring, struct ycc_resp_desc *desc)
+   537	{
+   538		struct ycc_flags *aflag;
+   539	
+   540		dma_rmb();
+   541	
+   542		aflag = (struct ycc_flags *)desc->private_ptr;
+   543		if (!aflag || (u64)aflag == CMD_INVALID_CONTENT_U64) {
+   544			pr_debug("Invalid command aflag\n");
+   545			return;
+   546		}
+   547	
+   548		ycc_check_cmd_state(desc->state);
+   549		aflag->ycc_done_callback(aflag->ptr, desc->state);
+   550	
+   551		memset(desc, CMD_INVALID_CONTENT_U8, sizeof(*desc));
+   552		kfree(aflag);
+   553	}
+   554	
+   555	/*
+   556	 * dequeue, read response descriptor
+   557	 */
+   558	void ycc_dequeue(struct ycc_ring *ring)
+   559	{
+   560		struct ycc_resp_desc *resp;
+   561		int cnt = 0;
+   562	
+   563		if (!test_bit(YDEV_STATUS_READY, &ring->ydev->status) || ycc_ring_stopped(ring))
+   564			return;
+   565	
+   566		ring->resp_wr_ptr = YCC_CSR_RD(ring->csr_vaddr, REG_RING_RSP_WR_PTR);
+   567		while (!ycc_ring_empty(ring)) {
+   568			resp = (struct ycc_resp_desc *)ring->resp_base_vaddr +
+   569				ring->resp_rd_ptr;
+   570			ycc_handle_resp(ring, resp);
+   571	
+   572			cnt++;
+   573			ring->nr_resps++;
+   574			if (++ring->resp_rd_ptr == ring->max_desc)
+   575				ring->resp_rd_ptr = 0;
+   576		}
+   577	
+   578		if (cnt)
+   579			YCC_CSR_WR(ring->csr_vaddr, REG_RING_RSP_RD_PTR, ring->resp_rd_ptr);
+   580	}
+   581	
+   582	/*
+   583	 * Clear incompletion cmds in command queue while rollback cmd_wr_ptr.
+   584	 *
+   585	 * Note: Make sure been invoked when error occurs in YCC internal and
+   586	 * YCC status is not ready.
+   587	 */
+ > 588	void ycc_clear_cmd_ring(struct ycc_ring *ring)
+   589	{
+   590		struct ycc_cmd_desc *desc = NULL;
+   591	
+   592		ring->cmd_rd_ptr = YCC_CSR_RD(ring->csr_vaddr, REG_RING_CMD_RD_PTR);
+   593		ring->cmd_wr_ptr = YCC_CSR_RD(ring->csr_vaddr, REG_RING_CMD_WR_PTR);
+   594	
+   595		while (ring->cmd_rd_ptr != ring->cmd_wr_ptr) {
+   596			desc = (struct ycc_cmd_desc *)ring->cmd_base_vaddr +
+   597				ring->cmd_rd_ptr;
+   598			ycc_cancel_cmd(ring, desc);
+   599	
+   600			if (--ring->cmd_wr_ptr == 0)
+   601				ring->cmd_wr_ptr = ring->max_desc;
+   602		}
+   603	
+   604		YCC_CSR_WR(ring->csr_vaddr, REG_RING_CMD_WR_PTR, ring->cmd_wr_ptr);
+   605	}
+   606	
+   607	/*
+   608	 * Clear response queue
+   609	 *
+   610	 * Note: Make sure been invoked when error occurs in YCC internal and
+   611	 * YCC status is not ready.
+   612	 */
+ > 613	void ycc_clear_resp_ring(struct ycc_ring *ring)
 
 -- 
 0-DAY CI Kernel Test Service
 https://01.org/lkp
 
---YD5EEmFTPmxIvpcs
+--a/DnloV4WR/AjTp8
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICNXbV2MAAy5jb25maWcAlFxbc9u4kn6fX6HyvMxUbRJfEp9MbfkBJEERI5KgCVCy8sJS
+H4sICM7mV2MAAy5jb25maWcAlFxbc9u4kn6fX6HyvMxUbRJfEp9MbfkBJEERI5KgCVCy8sJS
 FCXjGsfKSvLsyfn12w3eGiCoZF8S8+sGCDQafQOoX3/5dcZeTvuvm9PjdvP09H32Zfe8O2xO
 u0+zz49Pu/+eRXKWSz3jkdCvgTl9fH7595vjt81hO7t9ffn68tVhezVb7A7Pu6dZuH/+/Pjl
 BZo/7p9/+fWXUOaxmNdhWC95qYTMa80f9N2FaX779tUTdvbqy3Y7+20ehr/Prq5fX72+vCDt
@@ -1512,4 +1586,4 @@ gibn20Kr+Q89bZ3kERboFW4wXes3UX6yiNcKWcBKl0ZyYddW9L5lvIpVsceTrtcZrM7dSzLW
 drOtXxjwvt5lRSQgrBwcl+TQ72xwBC+/fDADAVeP0nools7bvJt9m1wr1XTMdHToVYT7jAtR
 Rum2Ssw26cu+NeD5/yMtCUg23wQA
 
---YD5EEmFTPmxIvpcs--
+--a/DnloV4WR/AjTp8--
