@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F5CFA373E
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 09:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C89FA3740
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 09:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231696AbiJYJ7R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 05:59:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42018 "EHLO
+        id S231221AbiJYJ7U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 05:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbiJYJ6u (ORCPT
+        with ESMTP id S231208AbiJYJ6m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 05:58:50 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B21818B77B;
-        Tue, 25 Oct 2022 02:53:48 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2i6s5_1666691625;
-Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2i6s5_1666691625)
+        Tue, 25 Oct 2022 05:58:42 -0400
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A717916F743;
+        Tue, 25 Oct 2022 02:53:42 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2irFY_1666691619;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2irFY_1666691619)
           by smtp.aliyun-inc.com;
-          Tue, 25 Oct 2022 17:53:45 +0800
+          Tue, 25 Oct 2022 17:53:40 +0800
 From:   'Guanjun' <guanjun@linux.alibaba.com>
 To:     herbert@gondor.apana.org.au, elliott@hpe.com
 Cc:     zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
         guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
-Subject: [PATCH v3 8/9] crypto/ycc: Add sm2 algorithm support
-Date:   Tue, 25 Oct 2022 17:53:35 +0800
-Message-Id: <1666691616-69983-9-git-send-email-guanjun@linux.alibaba.com>
+Subject: [PATCH v3 3/9] crypto/ycc: Add irq support for ycc kernel rings
+Date:   Tue, 25 Oct 2022 17:53:30 +0800
+Message-Id: <1666691616-69983-4-git-send-email-guanjun@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
 References: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
@@ -34,416 +34,154 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Xuchun Shang <xuchun.shang@linux.alibaba.com>
+From: Zelin Deng <zelin.deng@linux.alibaba.com>
 
-Only support verification through sm2 at present.
+Each kernel ring has its own command done irq. Temporarily user rings
+will not enable irq.
 
-Signed-off-by: Xuchun Shang <xuchun.shang@linux.alibaba.com>
+Signed-off-by: Zelin Deng <zelin.deng@linux.alibaba.com>
 ---
- drivers/crypto/ycc/Makefile            |   4 +
- drivers/crypto/ycc/sm2signature_asn1.c |  38 +++++
- drivers/crypto/ycc/sm2signature_asn1.h |  13 ++
- drivers/crypto/ycc/ycc_algs.h          |   2 +
- drivers/crypto/ycc/ycc_pke.c           | 252 ++++++++++++++++++++++++++++++++-
- drivers/crypto/ycc/ycc_ring.h          |   8 ++
- 6 files changed, 316 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
- create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+ drivers/crypto/ycc/ycc_isr.c | 92 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 80 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/ycc/Makefile b/drivers/crypto/ycc/Makefile
-index d1f22a9..fb42eec 100644
---- a/drivers/crypto/ycc/Makefile
-+++ b/drivers/crypto/ycc/Makefile
-@@ -1,3 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_YCC) += ycc.o
- ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o ycc_ske.o ycc_aead.o ycc_pke.o
-+
-+ifndef CONFIG_CRYPTO_SM2
-+ycc-objs += sm2signature_asn1.o
-+endif
-diff --git a/drivers/crypto/ycc/sm2signature_asn1.c b/drivers/crypto/ycc/sm2signature_asn1.c
-new file mode 100644
-index 00000000..1fd15c1
---- /dev/null
-+++ b/drivers/crypto/ycc/sm2signature_asn1.c
-@@ -0,0 +1,38 @@
-+/*
-+ * Automatically generated by asn1_compiler.  Do not edit
-+ *
-+ * ASN.1 parser for sm2signature
-+ */
-+#include <linux/asn1_ber_bytecode.h>
-+#include "sm2signature_asn1.h"
-+
-+enum sm2signature_actions {
-+	ACT_sm2_get_signature_r = 0,
-+	ACT_sm2_get_signature_s = 1,
-+	NR__sm2signature_actions = 2
-+};
-+
-+static const asn1_action_t sm2signature_action_table[NR__sm2signature_actions] = {
-+	[0] = sm2_get_signature_r,
-+	[1] = sm2_get_signature_s,
-+};
-+
-+static const unsigned char sm2signature_machine[] = {
-+	// Sm2Signature
-+	[0] = ASN1_OP_MATCH,
-+	[1] = _tag(UNIV, CONS, SEQ),
-+	[2] =  ASN1_OP_MATCH_ACT,		// sig_r
-+	[3] =  _tag(UNIV, PRIM, INT),
-+	[4] =  _action(ACT_sm2_get_signature_r),
-+	[5] =  ASN1_OP_MATCH_ACT,		// sig_s
-+	[6] =  _tag(UNIV, PRIM, INT),
-+	[7] =  _action(ACT_sm2_get_signature_s),
-+	[8] = ASN1_OP_END_SEQ,
-+	[9] = ASN1_OP_COMPLETE,
-+};
-+
-+const struct asn1_decoder sm2signature_decoder = {
-+	.machine = sm2signature_machine,
-+	.machlen = sizeof(sm2signature_machine),
-+	.actions = sm2signature_action_table,
-+};
-diff --git a/drivers/crypto/ycc/sm2signature_asn1.h b/drivers/crypto/ycc/sm2signature_asn1.h
-new file mode 100644
-index 00000000..192c9e1
---- /dev/null
-+++ b/drivers/crypto/ycc/sm2signature_asn1.h
-@@ -0,0 +1,13 @@
-+/*
-+ * Automatically generated by asn1_compiler.  Do not edit
-+ *
-+ * ASN.1 parser for sm2signature
-+ */
-+#include <linux/asn1_decoder.h>
-+
-+extern const struct asn1_decoder sm2signature_decoder;
-+
-+extern int sm2_get_signature_r(void *context, size_t hdrlen,
-+		unsigned char tag, const void *value, size_t vlen);
-+extern int sm2_get_signature_s(void *context, size_t hdrlen,
-+		unsigned char tag, const void *value, size_t vlen);
-diff --git a/drivers/crypto/ycc/ycc_algs.h b/drivers/crypto/ycc/ycc_algs.h
-index 6a13230a..26323a8 100644
---- a/drivers/crypto/ycc/ycc_algs.h
-+++ b/drivers/crypto/ycc/ycc_algs.h
-@@ -77,6 +77,8 @@ enum ycc_cmd_id {
- 	YCC_CMD_CCM_ENC,
- 	YCC_CMD_CCM_DEC, /* 0x28 */
+diff --git a/drivers/crypto/ycc/ycc_isr.c b/drivers/crypto/ycc/ycc_isr.c
+index cd2a2d7..a86c8d7 100644
+--- a/drivers/crypto/ycc/ycc_isr.c
++++ b/drivers/crypto/ycc/ycc_isr.c
+@@ -12,6 +12,17 @@
+ #include <linux/interrupt.h>
  
-+	YCC_CMD_SM2_VERIFY = 0x47,
+ #include "ycc_isr.h"
++#include "ycc_dev.h"
++#include "ycc_ring.h"
 +
- 	YCC_CMD_RSA_ENC = 0x83,
- 	YCC_CMD_RSA_DEC,
- 	YCC_CMD_RSA_CRT_DEC,
-diff --git a/drivers/crypto/ycc/ycc_pke.c b/drivers/crypto/ycc/ycc_pke.c
-index 3debd80..ad72d12 100644
---- a/drivers/crypto/ycc/ycc_pke.c
-+++ b/drivers/crypto/ycc/ycc_pke.c
-@@ -8,6 +8,8 @@
- #include <linux/dma-mapping.h>
- #include <linux/crypto.h>
- #include <linux/mpi.h>
 +
-+#include "sm2signature_asn1.h"
- #include "ycc_algs.h"
++static irqreturn_t ycc_resp_isr(int irq, void *data)
++{
++	struct ycc_ring *ring = (struct ycc_ring *)data;
++
++	tasklet_hi_schedule(&ring->resp_handler);
++	return IRQ_HANDLED;
++}
  
- static int ycc_rsa_done_callback(void *ptr, u16 state)
-@@ -666,6 +668,224 @@ static void ycc_rsa_exit(struct crypto_akcipher *tfm)
- 	crypto_free_akcipher(ctx->soft_tfm);
+ /*
+  * TODO: will implement when ycc ring actually work.
+@@ -38,11 +49,13 @@ static irqreturn_t ycc_g_err_isr(int irq, void *data)
+ 	return IRQ_HANDLED;
  }
  
-+#define MPI_NBYTES(m)	((mpi_get_nbits(m) + 7) / 8)
+-/*
+- * TODO: will implement when ycc ring actually work.
+- */
+ void ycc_resp_process(uintptr_t ring_addr)
+ {
++	struct ycc_ring *ring = (struct ycc_ring *)ring_addr;
 +
-+static int ycc_sm2_done_callback(void *ptr, u16 state)
-+{
-+	struct ycc_pke_req *sm2_req = (struct ycc_pke_req *)ptr;
-+	struct ycc_pke_ctx *ctx = sm2_req->ctx;
-+	struct akcipher_request *req = sm2_req->req;
-+	struct device *dev = YCC_DEV(ctx);
-+
-+	dma_free_coherent(dev, 128, sm2_req->src_vaddr, sm2_req->src_paddr);
-+
-+	if (req->base.complete)
-+		req->base.complete(&req->base, state == CMD_SUCCESS ? 0 : -EBADMSG);
-+	return 0;
-+}
-+
-+struct sm2_signature_ctx {
-+	MPI sig_r;
-+	MPI sig_s;
-+};
-+
-+#ifndef CONFIG_CRYPTO_SM2
-+int sm2_get_signature_r(void *context, size_t hdrlen, unsigned char tag,
-+			const void *value, size_t vlen)
-+{
-+	struct sm2_signature_ctx *sig = context;
-+
-+	if (!value || !vlen)
-+		return -EINVAL;
-+
-+	sig->sig_r = mpi_read_raw_data(value, vlen);
-+	if (!sig->sig_r)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+int sm2_get_signature_s(void *context, size_t hdrlen, unsigned char tag,
-+			const void *value, size_t vlen)
-+{
-+	struct sm2_signature_ctx *sig = context;
-+
-+	if (!value || !vlen)
-+		return -EINVAL;
-+
-+	sig->sig_s = mpi_read_raw_data(value, vlen);
-+	if (!sig->sig_s)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+#endif
-+
-+static int ycc_sm2_verify(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct ycc_pke_req *sm2_req = akcipher_request_ctx(req);
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_sm2_verify_cmd *sm2_verify_cmd;
-+	struct ycc_dev *ydev = ctx->ring->ydev;
-+	struct ycc_ring *ring = ctx->ring;
-+	struct device *dev = YCC_DEV(ctx);
-+	struct sm2_signature_ctx sig;
-+	struct ycc_flags *aflags;
-+	u8 buffer[80] = {0};
-+	int ret;
-+
-+	/* Do software fallback */
-+	if (!test_bit(YDEV_STATUS_READY, &ydev->status) || ctx->key_len) {
-+		akcipher_request_set_tfm(req, ctx->soft_tfm);
-+		ret = crypto_akcipher_verify(req);
-+		akcipher_request_set_tfm(req, tfm);
-+		return ret;
++	ycc_dequeue(ring);
++	if (ring->ydev->is_polling)
++		tasklet_hi_schedule(&ring->resp_handler);
+ }
+ 
+ int ycc_enable_msix(struct ycc_dev *ydev)
+@@ -83,34 +96,89 @@ static void ycc_cleanup_global_err_workqueue(struct ycc_dev *ydev)
+ 		destroy_workqueue(ydev->dev_err_q);
+ }
+ 
+-/*
+- * TODO: Just request irq for global err. Irq for each ring
+- * will be requested when ring actually work.
+- */
+ int ycc_alloc_irqs(struct ycc_dev *ydev)
+ {
+ 	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
+ 	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
+-	int ret;
++	int cpu, cpus = num_online_cpus();
++	int ret, i, j;
+ 
++	/* The 0 - (YCC_RINGPAIR_NUM-1) are rings irqs, the last one is dev error irq */
+ 	sprintf(ydev->err_irq_name, "ycc_dev_%d_global_err", ydev->id);
+ 	ret = request_irq(pci_irq_vector(rcec_pdev, num),
+ 			  ycc_g_err_isr, 0, ydev->err_irq_name, ydev);
+-	if (ret)
++	if (ret) {
+ 		pr_err("Failed to alloc global irq interrupt for dev: %d\n", ydev->id);
++		goto out;
 +	}
 +
-+	if (req->src_len > 72 || req->src_len < 70 || req->dst_len != 32)
-+		return -EINVAL;
-+
-+	sm2_req->ctx = ctx;
-+	sm2_req->req = req;
-+
-+	sg_copy_buffer(req->src, sg_nents(req->src), buffer, req->src_len, 0, 1);
-+	sig.sig_r = NULL;
-+	sig.sig_s = NULL;
-+	ret = asn1_ber_decoder(&sm2signature_decoder, &sig, buffer, req->src_len);
-+	if (ret)
-+		return -EINVAL;
-+
-+	ret = mpi_print(GCRYMPI_FMT_USG, buffer, MPI_NBYTES(sig.sig_r),
-+			(size_t *)NULL, sig.sig_r);
-+	if (ret)
-+		return -EINVAL;
-+
-+	ret = mpi_print(GCRYMPI_FMT_USG, buffer + MPI_NBYTES(sig.sig_r),
-+			MPI_NBYTES(sig.sig_s), (size_t *)NULL, sig.sig_s);
-+	if (ret)
-+		return -EINVAL;
-+
-+	ret = -ENOMEM;
-+	/* Alloc dma for src, as verify has no output */
-+	sm2_req->src_vaddr = dma_alloc_coherent(dev, 128, &sm2_req->src_paddr,
-+						GFP_ATOMIC);
-+	if (!sm2_req->src_vaddr)
++	if (ydev->is_polling)
 +		goto out;
 +
-+	sg_copy_buffer(req->src, sg_nents(req->src), sm2_req->src_vaddr,
-+		       req->dst_len, req->src_len, 1);
-+	memcpy(sm2_req->src_vaddr + 32, buffer, 64);
++	for (i = 0; i < num; i++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
 +
-+	sm2_req->dst_vaddr = NULL;
++		ydev->msi_name[i] = kzalloc(16, GFP_KERNEL);
++		if (!ydev->msi_name[i])
++			goto free_irq;
++		snprintf(ydev->msi_name[i], 16, "ycc_ring_%d", i);
++		ret = request_irq(pci_irq_vector(rcec_pdev, i), ycc_resp_isr,
++				  0, ydev->msi_name[i], &ydev->rings[i]);
++		if (ret) {
++			kfree(ydev->msi_name[i]);
++			goto free_irq;
++		}
++		if (!ydev->is_vf)
++			cpu = (i % YCC_RINGPAIR_NUM) % cpus;
++		else
++			cpu = smp_processor_id() % cpus;
 +
-+	aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
-+	if (!aflags)
-+		goto free_src;
++		ret = irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i),
++					    get_cpu_mask(cpu));
++		if (ret) {
++			free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
++			kfree(ydev->msi_name[i]);
++			goto free_irq;
++		}
++	}
 +
-+	aflags->ptr = (void *)sm2_req;
-+	aflags->ycc_done_callback = ycc_sm2_done_callback;
++	return 0;
 +
-+	memset(&sm2_req->desc, 0, sizeof(sm2_req->desc));
-+	sm2_req->desc.private_ptr = (u64)(void *)aflags;
++free_irq:
++	for (j = 0; j < i; j++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
 +
-+	sm2_verify_cmd         = &sm2_req->desc.cmd.sm2_verify_cmd;
-+	sm2_verify_cmd->cmd_id = YCC_CMD_SM2_VERIFY;
-+	sm2_verify_cmd->sptr   = sm2_req->src_paddr;
-+	sm2_verify_cmd->keyptr = ctx->pub_key_paddr;
-+
-+	ret = ycc_enqueue(ring, (u8 *)&sm2_req->desc);
-+	if (!ret)
-+		return -EINPROGRESS;
-+
-+	kfree(aflags);
-+free_src:
-+	dma_free_coherent(dev, 128, sm2_req->src_vaddr, sm2_req->src_paddr);
++		free_irq(pci_irq_vector(rcec_pdev, j), &ydev->rings[j]);
++		kfree(ydev->msi_name[j]);
++	}
++	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
 +out:
-+	return ret;
-+}
-+
-+static unsigned int ycc_sm2_max_size(struct crypto_akcipher *tfm)
-+{
-+	return PAGE_SIZE;
-+}
-+
-+static int ycc_sm2_setpubkey(struct crypto_akcipher *tfm, const void *key,
-+			     unsigned int keylen)
-+{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct device *dev = YCC_DEV(ctx);
-+	int ret;
-+
-+	ret = crypto_akcipher_set_pub_key(ctx->soft_tfm, key, keylen);
-+	if (ret)
-+		return ret;
-+
-+	/* Always alloc 64 bytes for pub key */
-+	ctx->pub_key_vaddr = dma_alloc_coherent(dev, 64, &ctx->pub_key_paddr,
-+						GFP_KERNEL);
-+	if (!ctx->pub_key_vaddr)
-+		return -ENOMEM;
-+
-+	/*
-+	 * Uncompressed key 65 bytes with 0x04 flag
-+	 * Compressed key 33 bytes with 0x02 or 0x03 flag
-+	 */
-+	switch (keylen) {
-+	case 65:
-+		if (*(u8 *)key != 0x04)
-+			return -EINVAL;
-+		memcpy(ctx->pub_key_vaddr, key + 1, 64);
-+		break;
-+	case 64:
-+		memcpy(ctx->pub_key_vaddr, key, 64);
-+		break;
-+	case 33:
-+		return 0; /* TODO: use sw temporary */
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ycc_sm2_init(struct crypto_akcipher *tfm)
-+{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct ycc_ring *ring;
-+
-+	ctx->soft_tfm = crypto_alloc_akcipher("sm2-generic", 0, 0);
-+	if (IS_ERR(ctx->soft_tfm))
-+		return PTR_ERR(ctx->soft_tfm);
-+
-+	/* Reserve enough space if soft request reqires additional space */
-+	akcipher_set_reqsize(tfm, sizeof(struct ycc_pke_req) +
-+			     crypto_akcipher_alg(ctx->soft_tfm)->reqsize);
-+
-+	ring = ycc_crypto_get_ring();
-+	if (!ring) {
-+		crypto_free_akcipher(ctx->soft_tfm);
-+		return -ENODEV;
-+	}
-+
-+	ctx->ring = ring;
-+	return 0;
-+}
-+
-+static void ycc_sm2_exit(struct crypto_akcipher *tfm)
-+{
-+	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct device *dev = YCC_DEV(ctx);
-+
-+	if (ctx->ring)
-+		ycc_crypto_free_ring(ctx->ring);
-+
-+	if (ctx->pub_key_vaddr)
-+		dma_free_coherent(dev, 64, ctx->pub_key_vaddr, ctx->pub_key_paddr);
-+
-+	crypto_free_akcipher(ctx->soft_tfm);
-+}
-+
- static struct akcipher_alg ycc_rsa = {
- 	.base = {
- 		.cra_name = "rsa",
-@@ -685,12 +905,42 @@ static void ycc_rsa_exit(struct crypto_akcipher *tfm)
- 	.exit = ycc_rsa_exit,
- };
  
-+static struct akcipher_alg ycc_sm2 = {
-+	.base = {
-+		.cra_name = "sm2",
-+		.cra_driver_name = "sm2-ycc",
-+		.cra_priority = 1000,
-+		.cra_module = THIS_MODULE,
-+		.cra_ctxsize = sizeof(struct ycc_pke_ctx),
-+	},
-+	.verify = ycc_sm2_verify,
-+	.set_pub_key = ycc_sm2_setpubkey,
-+	.max_size = ycc_sm2_max_size,
-+	.init = ycc_sm2_init,
-+	.exit = ycc_sm2_exit,
-+};
-+
- int ycc_pke_register(void)
- {
--	return crypto_register_akcipher(&ycc_rsa);
-+	int ret;
-+
-+	ret = crypto_register_akcipher(&ycc_rsa);
-+	if (ret) {
-+		pr_err("Failed to register rsa\n");
-+		return ret;
-+	}
-+
-+	ret = crypto_register_akcipher(&ycc_sm2);
-+	if (ret) {
-+		crypto_unregister_akcipher(&ycc_rsa);
-+		pr_err("Failed to register sm2\n");
-+	}
-+
-+	return ret;
+ 	return ret;
  }
  
- void ycc_pke_unregister(void)
+-/*
+- * TODO: Same as the allocate action.
+- */
+ void ycc_free_irqs(struct ycc_dev *ydev)
  {
- 	crypto_unregister_akcipher(&ycc_rsa);
-+	crypto_unregister_akcipher(&ycc_sm2);
- }
-diff --git a/drivers/crypto/ycc/ycc_ring.h b/drivers/crypto/ycc/ycc_ring.h
-index c47fc18..6dafdc7 100644
---- a/drivers/crypto/ycc/ycc_ring.h
-+++ b/drivers/crypto/ycc/ycc_ring.h
-@@ -121,11 +121,19 @@ struct ycc_rsa_dec_cmd {
- 	u64 dptr:48;
- } __packed;
+ 	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
+ 	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
++	int i;
  
-+struct ycc_sm2_verify_cmd {
-+	u8 cmd_id;
-+	u64 sptr:48;
-+	u16 key_id;
-+	u64 keyptr:48;
-+} __packed;
++	/* Free device err irq */
+ 	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
 +
- union ycc_real_cmd {
- 	struct ycc_skcipher_cmd ske_cmd;
- 	struct ycc_aead_cmd aead_cmd;
- 	struct ycc_rsa_enc_cmd rsa_enc_cmd;
- 	struct ycc_rsa_dec_cmd rsa_dec_cmd;
-+	struct ycc_sm2_verify_cmd sm2_verify_cmd;
- 	u8 padding[32];
- };
++	if (ydev->is_polling)
++		return;
++
++	for (i = 0; i < num; i++) {
++		if (ydev->rings[i].type != KERN_RING)
++			continue;
++
++		irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i), NULL);
++		free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
++		kfree(ydev->msi_name[i]);
++	}
+ }
  
+ int ycc_init_global_err(struct ycc_dev *ydev)
 -- 
 1.8.3.1
 
