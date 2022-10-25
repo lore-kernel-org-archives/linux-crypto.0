@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2DDFA3741
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3349DFA3742
 	for <linux-crypto@archiver.kernel.org>; Tue, 25 Oct 2022 09:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231751AbiJYJ7S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Oct 2022 05:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
+        id S231624AbiJYJ7U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Oct 2022 05:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230453AbiJYJ6j (ORCPT
+        with ESMTP id S232158AbiJYJ6u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Oct 2022 05:58:39 -0400
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839CB16F745;
-        Tue, 25 Oct 2022 02:53:41 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2jqAE_1666691618;
-Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2jqAE_1666691618)
+        Tue, 25 Oct 2022 05:58:50 -0400
+Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C24170DFC;
+        Tue, 25 Oct 2022 02:53:46 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VT2irHS_1666691623;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT2irHS_1666691623)
           by smtp.aliyun-inc.com;
-          Tue, 25 Oct 2022 17:53:39 +0800
+          Tue, 25 Oct 2022 17:53:44 +0800
 From:   'Guanjun' <guanjun@linux.alibaba.com>
 To:     herbert@gondor.apana.org.au, elliott@hpe.com
 Cc:     zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
         guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
-Subject: [PATCH v3 2/9] crypto/ycc: Add ycc ring configuration
-Date:   Tue, 25 Oct 2022 17:53:29 +0800
-Message-Id: <1666691616-69983-3-git-send-email-guanjun@linux.alibaba.com>
+Subject: [PATCH v3 7/9] crypto/ycc: Add rsa algorithm support
+Date:   Tue, 25 Oct 2022 17:53:34 +0800
+Message-Id: <1666691616-69983-8-git-send-email-guanjun@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
 References: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
@@ -34,897 +34,862 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Zelin Deng <zelin.deng@linux.alibaba.com>
+From: Guanjun <guanjun@linux.alibaba.com>
 
-There're 2 types of functional rings, kernel ring and user ring.
-All kernel rings must be initialized in kernel driver while user rings
-are not supported now.
+Support rsa algorithm for ycc. That includes encryption\decryption
+and verification\signature
 
-Signed-off-by: Zelin Deng <zelin.deng@linux.alibaba.com>
+Signed-off-by: Guanjun <guanjun@linux.alibaba.com>
 ---
  drivers/crypto/ycc/Makefile   |   2 +-
- drivers/crypto/ycc/ycc_dev.h  |   6 +
- drivers/crypto/ycc/ycc_drv.c  |  59 ++++-
- drivers/crypto/ycc/ycc_isr.c  |   7 +
- drivers/crypto/ycc/ycc_ring.c | 562 ++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ycc/ycc_ring.h | 111 +++++++++
- 6 files changed, 745 insertions(+), 2 deletions(-)
- create mode 100644 drivers/crypto/ycc/ycc_ring.c
- create mode 100644 drivers/crypto/ycc/ycc_ring.h
+ drivers/crypto/ycc/ycc_algs.h |  44 +++
+ drivers/crypto/ycc/ycc_drv.c  |   7 +
+ drivers/crypto/ycc/ycc_pke.c  | 696 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.h |  23 ++
+ 5 files changed, 771 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/ycc/ycc_pke.c
 
 diff --git a/drivers/crypto/ycc/Makefile b/drivers/crypto/ycc/Makefile
-index ef28b7c..31aae9c 100644
+index d629dd5..d1f22a9 100644
 --- a/drivers/crypto/ycc/Makefile
 +++ b/drivers/crypto/ycc/Makefile
 @@ -1,3 +1,3 @@
  # SPDX-License-Identifier: GPL-2.0
  obj-$(CONFIG_CRYPTO_DEV_YCC) += ycc.o
--ycc-objs := ycc_drv.o ycc_isr.o
-+ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o
-diff --git a/drivers/crypto/ycc/ycc_dev.h b/drivers/crypto/ycc/ycc_dev.h
-index e5f76af..dda82b0f 100644
---- a/drivers/crypto/ycc/ycc_dev.h
-+++ b/drivers/crypto/ycc/ycc_dev.h
-@@ -104,10 +104,16 @@ struct ycc_dev {
- 	struct ycc_bar ycc_bars[4];
- 	struct ycc_dev *assoc_dev;
+-ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o ycc_ske.o ycc_aead.o
++ycc-objs := ycc_drv.o ycc_isr.o ycc_ring.o ycc_ske.o ycc_aead.o ycc_pke.o
+diff --git a/drivers/crypto/ycc/ycc_algs.h b/drivers/crypto/ycc/ycc_algs.h
+index e3be83ec..6a13230a 100644
+--- a/drivers/crypto/ycc/ycc_algs.h
++++ b/drivers/crypto/ycc/ycc_algs.h
+@@ -76,6 +76,13 @@ enum ycc_cmd_id {
+ 	YCC_CMD_GCM_DEC,
+ 	YCC_CMD_CCM_ENC,
+ 	YCC_CMD_CCM_DEC, /* 0x28 */
++
++	YCC_CMD_RSA_ENC = 0x83,
++	YCC_CMD_RSA_DEC,
++	YCC_CMD_RSA_CRT_DEC,
++	YCC_CMD_RSA_CRT_SIGN,
++	YCC_CMD_RSA_SIGN,
++	YCC_CMD_RSA_VERIFY, /* 0x88 */
+ };
  
-+	int max_desc;
-+	int user_rings;
- 	bool is_polling;
- 	unsigned long status;
- 	struct workqueue_struct *dev_err_q;
- 	char err_irq_name[32];
+ struct ycc_crypto_ctx {
+@@ -121,10 +128,47 @@ struct ycc_crypto_req {
+ 	};
+ };
+ 
++#define YCC_RSA_KEY_SZ_512	64
++#define YCC_RSA_KEY_SZ_1536	192
++#define YCC_RSA_CRT_PARAMS	5
++#define YCC_RSA_E_SZ_MAX	8
++#define YCC_CMD_DATA_ALIGN_SZ	64
++#define YCC_PIN_SZ		16
 +
-+	struct ycc_ring *rings;
-+	unsigned long ring_bitmap;
++struct ycc_pke_ctx {
++	struct rsa_key *rsa_key;
 +
- 	struct work_struct work;
- 	char *msi_name[48];
- 	struct dentry *debug_dir;
++	void *priv_key_vaddr;
++	dma_addr_t priv_key_paddr;
++	void *pub_key_vaddr;
++	dma_addr_t pub_key_paddr;
++
++	unsigned int key_len;
++	unsigned int e_len;
++	bool crt_mode;
++	struct ycc_ring *ring;
++	struct crypto_akcipher *soft_tfm;
++};
++
++struct ycc_pke_req {
++	void *src_vaddr;
++	dma_addr_t src_paddr;
++	void *dst_vaddr;
++	dma_addr_t dst_paddr;
++
++	struct ycc_cmd_desc desc;
++	union {
++		struct ycc_pke_ctx *ctx;
++	};
++	struct akcipher_request *req;
++};
++
+ #define YCC_DEV(ctx)		(&(ctx)->ring->ydev->pdev->dev)
+ 
+ int ycc_sym_register(void);
+ void ycc_sym_unregister(void);
+ int ycc_aead_register(void);
+ void ycc_aead_unregister(void);
++int ycc_pke_register(void);
++void ycc_pke_unregister(void);
+ #endif
 diff --git a/drivers/crypto/ycc/ycc_drv.c b/drivers/crypto/ycc/ycc_drv.c
-index f056d21..8d0fcfd 100644
+index cd583d7..4a4d5cb 100644
 --- a/drivers/crypto/ycc/ycc_drv.c
 +++ b/drivers/crypto/ycc/ycc_drv.c
-@@ -24,11 +24,16 @@
- #include <linux/debugfs.h>
+@@ -98,8 +98,14 @@ int ycc_algorithm_register(void)
+ 	if (ret)
+ 		goto unregister_sym;
  
- #include "ycc_isr.h"
-+#include "ycc_ring.h"
- 
- static const char ycc_name[] = "ycc";
- 
-+static int max_desc = 256;
-+static int user_rings;
- static bool is_polling = true;
-+module_param(max_desc, int, 0644);
- module_param(is_polling, bool, 0644);
-+module_param(user_rings, int, 0644);
- 
- LIST_HEAD(ycc_table);
- DEFINE_MUTEX(ycc_mutex);
-@@ -41,6 +46,35 @@
- #define YCC_MAX_DEVICES		(98 * 4) /* Assume 4 sockets */
- static DEFINE_IDR(ycc_idr);
- 
-+static int ycc_dev_debugfs_statistics_show(struct seq_file *s, void *p)
-+{
-+	struct ycc_dev *ydev = (struct ycc_dev *)s->private;
-+	struct ycc_ring *ring;
-+	int i;
++	ret = ycc_pke_register();
++	if (ret)
++		goto unregister_aead;
 +
-+	seq_printf(s, "name, type, nr_binds, nr_cmds, nr_resps\n");
-+	for (i = 0; i < YCC_RINGPAIR_NUM; i++) {
-+		ring = ydev->rings + i;
-+		seq_printf(s, "Ring%02d, %d, %llu, %llu, %llu\n", ring->ring_id,
-+			   ring->type, ring->nr_binds, ring->nr_cmds, ring->nr_resps);
-+	}
-+
-+	return 0;
-+}
-+
-+static int ycc_dev_debugfs_statistics_open(struct inode *inode, struct file *filp)
-+{
-+	return single_open(filp, ycc_dev_debugfs_statistics_show, inode->i_private);
-+}
-+
-+static const struct file_operations ycc_dev_statistics_fops = {
-+	.open		= ycc_dev_debugfs_statistics_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+	.owner		= THIS_MODULE,
-+};
-+
- static int ycc_device_flr(struct pci_dev *pdev, struct pci_dev *rcec_pdev)
- {
- 	int ret;
-@@ -136,11 +170,21 @@ static int ycc_resource_setup(struct ycc_dev *ydev)
- 			goto iounmap_queue_bar;
- 	}
- 
-+	/* User ring is not supported temporarily */
-+	ydev->user_rings = 0;
-+	user_rings = 0;
-+
-+	ret = ycc_dev_rings_init(ydev, max_desc, user_rings);
-+	if (ret) {
-+		pr_err("Failed to init ycc rings\n");
-+		goto iounmap_queue_bar;
-+	}
-+
- 	ret = ycc_enable_msix(ydev);
- 	if (ret <= 0) {
- 		pr_err("Failed to enable msix, ret: %d\n", ret);
- 		ret = (ret == 0) ? -EINVAL : ret;
--		goto iounmap_queue_bar;
-+		goto release_rings;
- 	}
- 
- 	ret = ycc_init_global_err(ydev);
-@@ -163,12 +207,15 @@ static int ycc_resource_setup(struct ycc_dev *ydev)
- 	ycc_deinit_global_err(ydev);
- disable_msix:
- 	ycc_disable_msix(ydev);
-+release_rings:
-+	ycc_dev_rings_release(ydev, user_rings);
- iounmap_queue_bar:
- 	iounmap(abar->vaddr);
- iounmap_cfg_bar:
- 	iounmap(cfg_bar->vaddr);
- release_mem_regions:
- 	pci_release_regions(pdev);
-+
- 	return ret;
- }
- 
-@@ -177,6 +224,7 @@ static void ycc_resource_free(struct ycc_dev *ydev)
- 	ycc_deinit_global_err(ydev);
- 	ycc_free_irqs(ydev);
- 	ycc_disable_msix(ydev);
-+	ycc_dev_rings_release(ydev, ydev->user_rings);
- 	iounmap(ydev->ycc_bars[YCC_SEC_CFG_BAR].vaddr);
- 	iounmap(ydev->ycc_bars[YCC_NSEC_Q_BAR].vaddr);
- 	pci_release_regions(ydev->pdev);
-@@ -301,12 +349,15 @@ static void ycc_dev_del(struct ycc_dev *ydev)
- static inline int ycc_rciep_init(struct ycc_dev *ydev)
- {
- 	struct pci_dev *pdev = ydev->pdev;
-+	struct dentry *debugfs;
- 	char name[YCC_MAX_DEBUGFS_NAME + 1];
- 	int idr;
- 
- 	ydev->sec = false;
- 	ydev->dev_name = ycc_name;
- 	ydev->is_polling = is_polling;
-+	ydev->user_rings = user_rings;
-+	ydev->max_desc = max_desc;
- 
- 	idr = idr_alloc(&ycc_idr, ydev, 0, YCC_MAX_DEVICES, GFP_KERNEL);
- 	if (idr < 0) {
-@@ -323,6 +374,11 @@ static inline int ycc_rciep_init(struct ycc_dev *ydev)
- 	if (IS_ERR_OR_NULL(ydev->debug_dir)) {
- 		pr_warn("Failed to create debugfs for RCIEP device\n");
- 		ydev->debug_dir = NULL;
-+	} else {
-+		debugfs = debugfs_create_file("statistics", 0400, ydev->debug_dir,
-+				(void *)ydev, &ycc_dev_statistics_fops);
-+		if (IS_ERR_OR_NULL(debugfs))
-+			pr_warn("Failed to create statistics entry for RCIEP device\n");
- 	}
- 
  	return 0;
-@@ -351,6 +407,7 @@ static int ycc_drv_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	ydev->is_vf = false;
- 	ydev->enable_vf = false;
- 	ydev->node = node;
-+	ydev->ring_bitmap = 0;
- 	if (id->device == PCI_DEVICE_ID_RCIEP) {
- 		ydev->type = YCC_RCIEP;
- 		ret = ycc_rciep_init(ydev);
-diff --git a/drivers/crypto/ycc/ycc_isr.c b/drivers/crypto/ycc/ycc_isr.c
-index f2f751c..cd2a2d7 100644
---- a/drivers/crypto/ycc/ycc_isr.c
-+++ b/drivers/crypto/ycc/ycc_isr.c
-@@ -38,6 +38,13 @@ static irqreturn_t ycc_g_err_isr(int irq, void *data)
- 	return IRQ_HANDLED;
- }
  
-+/*
-+ * TODO: will implement when ycc ring actually work.
-+ */
-+void ycc_resp_process(uintptr_t ring_addr)
-+{
-+}
-+
- int ycc_enable_msix(struct ycc_dev *ydev)
- {
- 	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
-diff --git a/drivers/crypto/ycc/ycc_ring.c b/drivers/crypto/ycc/ycc_ring.c
++unregister_aead:
++	ycc_aead_unregister();
+ unregister_sym:
+ 	ycc_sym_unregister();
+ err:
+@@ -115,6 +121,7 @@ void ycc_algorithm_unregister(void)
+ 	if (atomic_dec_return(&ycc_algs_refcnt))
+ 		return;
+ 
++	ycc_pke_unregister();
+ 	ycc_aead_unregister();
+ 	ycc_sym_unregister();
+ }
+diff --git a/drivers/crypto/ycc/ycc_pke.c b/drivers/crypto/ycc/ycc_pke.c
 new file mode 100644
-index 00000000..d808054
+index 00000000..3debd80
 --- /dev/null
-+++ b/drivers/crypto/ycc/ycc_ring.c
-@@ -0,0 +1,562 @@
++++ b/drivers/crypto/ycc/ycc_pke.c
+@@ -0,0 +1,696 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+#define pr_fmt(fmt) "YCC: Ring: " fmt
++#define pr_fmt(fmt) "YCC: Crypto: " fmt
 +
-+#include <linux/kernel.h>
-+#include <linux/spinlock.h>
-+#include <linux/rbtree.h>
-+#include <linux/slab.h>
-+#include <linux/pci.h>
-+#include <linux/errno.h>
++#include <crypto/internal/akcipher.h>
++#include <crypto/internal/rsa.h>
++#include <crypto/scatterwalk.h>
 +#include <linux/dma-mapping.h>
-+#include <linux/seq_file.h>
-+#include <linux/debugfs.h>
-+#include <linux/delay.h>
++#include <linux/crypto.h>
++#include <linux/mpi.h>
++#include "ycc_algs.h"
 +
-+#include "ycc_dev.h"
-+#include "ycc_ring.h"
-+
-+#define YCC_CMD_DESC_SIZE	64
-+#define YCC_RESP_DESC_SIZE	16
-+#define YCC_RING_CSR_STRIDE	0x1000
-+
-+extern struct list_head ycc_table;
-+extern void ycc_resp_process(uintptr_t ring_addr);
-+
-+static struct rb_root ring_rbtree = RB_ROOT;
-+static DEFINE_SPINLOCK(ring_rbtree_lock);
-+
-+/*
-+ * Show the status of specified ring's command queue and
-+ * response queue.
-+ */
-+static int ycc_ring_debugfs_status_show(struct seq_file *s, void *p)
++static int ycc_rsa_done_callback(void *ptr, u16 state)
 +{
-+	struct ycc_ring *ring = (struct ycc_ring *)s->private;
++	struct ycc_pke_req *rsa_req = (struct ycc_pke_req *)ptr;
++	struct ycc_pke_ctx *ctx = rsa_req->ctx;
++	struct akcipher_request *req = rsa_req->req;
++	struct device *dev = YCC_DEV(ctx);
++	unsigned int dma_length = ctx->key_len;
 +
-+	seq_printf(s, "Ring ID: %d\n", ring->ring_id);
-+	seq_printf(s, "Desscriptor Entry Size: %d, CMD Descriptor Size: %d, RESP Descriptor Size :%d\n",
-+		   ring->max_desc, YCC_CMD_DESC_SIZE, YCC_RESP_DESC_SIZE);
-+	seq_printf(s, "CMD base addr:%llx, RESP base addr:%llx\n",
-+		   ring->cmd_base_paddr, ring->resp_base_paddr);
-+	seq_printf(s, "CMD wr ptr:%d, CMD rd ptr: %d\n",
-+		   YCC_CSR_RD(ring->csr_vaddr, REG_RING_CMD_WR_PTR),
-+		   YCC_CSR_RD(ring->csr_vaddr, REG_RING_CMD_RD_PTR));
-+	seq_printf(s, "RESP rd ptr:%d, RESP wr ptr: %d\n",
-+		   YCC_CSR_RD(ring->csr_vaddr, REG_RING_RSP_RD_PTR),
-+		   YCC_CSR_RD(ring->csr_vaddr, REG_RING_RSP_WR_PTR));
++	if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id == YCC_CMD_RSA_VERIFY)
++		dma_length = ctx->key_len << 1;
++
++	/* For signature verify, dst is NULL */
++	if (rsa_req->dst_vaddr) {
++		sg_copy_from_buffer(req->dst, sg_nents_for_len(req->dst, req->dst_len),
++				    rsa_req->dst_vaddr, req->dst_len);
++		dma_free_coherent(dev, ALIGN(ctx->key_len, 64),
++				  rsa_req->dst_vaddr, rsa_req->dst_paddr);
++	}
++	dma_free_coherent(dev, ALIGN(dma_length, 64),
++			  rsa_req->src_vaddr, rsa_req->src_paddr);
++
++	if (req->base.complete)
++		req->base.complete(&req->base, state == CMD_SUCCESS ? 0 : -EBADMSG);
 +
 +	return 0;
 +}
 +
-+static int ycc_ring_debugfs_status_open(struct inode *inode, struct file *filp)
++static int ycc_prepare_dma_buf(struct ycc_pke_req *rsa_req, int is_src)
 +{
-+	return single_open(filp, ycc_ring_debugfs_status_show, inode->i_private);
-+}
++	struct ycc_pke_ctx *ctx = rsa_req->ctx;
++	struct akcipher_request *req = rsa_req->req;
++	struct device *dev = YCC_DEV(ctx);
++	unsigned int dma_length = ctx->key_len;
++	dma_addr_t tmp;
++	void *ptr;
++	int shift;
 +
-+static const struct file_operations ycc_ring_status_fops = {
-+	.open		= ycc_ring_debugfs_status_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+	.owner		= THIS_MODULE,
-+};
++	/*
++	 * Ycc requires 2 key_len blocks, the first block stores
++	 * message pre-padding with 0, the second block stores signature.
++	 * LCKF akcipher verify, the first sg contains signature and
++	 * the second contains message while src_len is signature
++	 * length, dst len is message length
++	 */
++	if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id == YCC_CMD_RSA_VERIFY) {
++		dma_length = ctx->key_len << 1;
++		shift = ctx->key_len - req->dst_len;
++	} else {
++		shift = ctx->key_len - req->src_len;
++	}
 +
-+/*
-+ * Dump the raw content of specified ring's command queue and
-+ * response queue.
-+ */
-+static int ycc_ring_debugfs_dump_show(struct seq_file *s, void *p)
-+{
-+	struct ycc_ring *ring = (struct ycc_ring *)s->private;
-+
-+	seq_printf(s, "Ring ID: %d\n", ring->ring_id);
-+	seq_puts(s, "-------- Ring CMD Descriptors --------\n");
-+	seq_hex_dump(s, "", DUMP_PREFIX_ADDRESS, 32, 4, ring->cmd_base_vaddr,
-+		     YCC_CMD_DESC_SIZE * ring->max_desc, false);
-+	seq_puts(s, "-------- Ring RESP Descriptors --------\n");
-+	seq_hex_dump(s, "", DUMP_PREFIX_ADDRESS, 32, 4, ring->resp_base_vaddr,
-+		     YCC_RESP_DESC_SIZE * ring->max_desc, false);
-+
-+	return 0;
-+}
-+
-+static int ycc_ring_debugfs_dump_open(struct inode *inode, struct file *filp)
-+{
-+	return single_open(filp, ycc_ring_debugfs_dump_show, inode->i_private);
-+}
-+
-+static const struct file_operations ycc_ring_dump_fops = {
-+	.open		= ycc_ring_debugfs_dump_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+	.owner		= THIS_MODULE,
-+};
-+
-+/*
-+ * Create debugfs for rings, only for KERN_RING
-+ * "/sys/kernel/debugfs/ycc_b:d.f/ring${x}"
-+ */
-+static int ycc_create_ring_debugfs(struct ycc_ring *ring)
-+{
-+	struct dentry *debugfs;
-+	char name[8];
-+
-+	if (!ring || !ring->ydev || !ring->ydev->debug_dir)
++	if (unlikely(shift < 0))
 +		return -EINVAL;
 +
-+	snprintf(name, sizeof(name), "ring%02d", ring->ring_id);
-+	debugfs = debugfs_create_dir(name, ring->ydev->debug_dir);
-+	if (IS_ERR_OR_NULL(debugfs))
++	ptr = dma_alloc_coherent(dev, ALIGN(dma_length, 64), &tmp, GFP_ATOMIC);
++	if (unlikely(!ptr)) {
++		pr_err("Failed to alloc dma for %s data\n", is_src ? "src" : "dst");
++		return -ENOMEM;
++	}
++
++	memset(ptr, 0, ALIGN(dma_length, 64));
++	if (is_src) {
++		if (rsa_req->desc.cmd.rsa_enc_cmd.cmd_id ==
++		    YCC_CMD_RSA_VERIFY) {
++			/* Copy msg first with prepadding 0 */
++			sg_copy_buffer(req->src, sg_nents(req->src), ptr + shift,
++				       req->dst_len, req->src_len, 1);
++			/* Copy signature */
++			sg_copy_buffer(req->src, sg_nents(req->src), ptr + ctx->key_len,
++				       req->src_len, 0, 1);
++		} else {
++			sg_copy_buffer(req->src, sg_nents(req->src), ptr + shift,
++				       req->src_len, 0, 1);
++		}
++		rsa_req->src_vaddr = ptr;
++		rsa_req->src_paddr = tmp;
++	} else {
++		rsa_req->dst_vaddr = ptr;
++		rsa_req->dst_paddr = tmp;
++	}
++
++	return 0;
++}
++
++/*
++ * Using public key to encrypt or verify
++ */
++static int ycc_rsa_submit_pub(struct akcipher_request *req, bool is_enc)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ycc_pke_req *rsa_req = akcipher_request_ctx(req);
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct ycc_rsa_enc_cmd *rsa_enc_cmd;
++	struct ycc_ring *ring = ctx->ring;
++	struct device *dev = YCC_DEV(ctx);
++	struct ycc_flags *aflags;
++	int ret = -ENOMEM;
++
++	if (req->dst_len > ctx->key_len || req->src_len > ctx->key_len)
++		return -EINVAL;
++
++	rsa_req->ctx = ctx;
++	rsa_req->req = req;
++
++	if (unlikely(!ctx->pub_key_vaddr))
++		return -EINVAL;
++
++	aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
++	if (!aflags)
 +		goto out;
 +
-+	ring->debug_dir = debugfs;
++	aflags->ptr = (void *)rsa_req;
++	aflags->ycc_done_callback = ycc_rsa_done_callback;
 +
-+	debugfs = debugfs_create_file("status", 0400, ring->debug_dir,
-+				      (void *)ring, &ycc_ring_status_fops);
-+	if (IS_ERR_OR_NULL(debugfs))
-+		goto remove_debugfs;
++	memset(&rsa_req->desc, 0, sizeof(rsa_req->desc));
++	rsa_req->desc.private_ptr = (u64)(void *)aflags;
 +
-+	debugfs = debugfs_create_file("dump", 0400, ring->debug_dir,
-+				      (void *)ring, &ycc_ring_dump_fops);
-+	if (IS_ERR_OR_NULL(debugfs))
-+		goto remove_debugfs;
++	rsa_enc_cmd         = &rsa_req->desc.cmd.rsa_enc_cmd;
++	rsa_enc_cmd->cmd_id = is_enc ? YCC_CMD_RSA_ENC : YCC_CMD_RSA_VERIFY;
++	rsa_enc_cmd->keyptr = ctx->pub_key_paddr;
++	rsa_enc_cmd->elen   = ctx->e_len << 3;
++	rsa_enc_cmd->nlen   = ctx->key_len << 3;
 +
-+	return 0;
++	ret = ycc_prepare_dma_buf(rsa_req, 1);
++	if (unlikely(ret))
++		goto free_aflags;
 +
-+remove_debugfs:
-+	debugfs_remove_recursive(ring->debug_dir);
-+out:
-+	ring->debug_dir = NULL;
-+	return PTR_ERR(debugfs);
-+}
++	rsa_enc_cmd->sptr = rsa_req->src_paddr;
++	if (is_enc) {
++		ret = ycc_prepare_dma_buf(rsa_req, 0);
++		if (unlikely(ret))
++			goto free_src;
 +
-+static void ycc_remove_ring_debugfs(struct ycc_ring *ring)
-+{
-+	debugfs_remove_recursive(ring->debug_dir);
-+}
-+
-+/*
-+ * Allocate memory for rings and initiate basic fields
-+ */
-+static int ycc_alloc_rings(struct ycc_dev *ydev)
-+{
-+	int num = YCC_RINGPAIR_NUM;
-+	struct ycc_bar *abar;
-+	u32 i;
-+
-+	if (ydev->rings)
-+		return 0;
-+
-+	if (ydev->is_vf) {
-+		num = 1;
-+		abar = &ydev->ycc_bars[0];
-+	} else if (ydev->sec) {
-+		abar = &ydev->ycc_bars[YCC_SEC_Q_BAR];
++		rsa_enc_cmd->dptr = rsa_req->dst_paddr;
 +	} else {
-+		abar = &ydev->ycc_bars[YCC_NSEC_Q_BAR];
++		rsa_req->dst_vaddr = NULL;
 +	}
 +
-+	ydev->rings = kzalloc_node(num * sizeof(struct ycc_ring),
-+				   GFP_KERNEL, ydev->node);
-+	if (!ydev->rings)
-+		return -ENOMEM;
++	ret = ycc_enqueue(ring, (u8 *)&rsa_req->desc);
++	if (!ret)
++		return -EINPROGRESS;
 +
-+	for (i = 0; i < num; i++) {
-+		ydev->rings[i].ring_id = i;
-+		ydev->rings[i].ydev = ydev;
-+		ydev->rings[i].csr_vaddr = abar->vaddr + i * YCC_RING_CSR_STRIDE;
-+		ydev->rings[i].csr_paddr = abar->paddr + i * YCC_RING_CSR_STRIDE;
++	if (rsa_req->dst_vaddr)
++		dma_free_coherent(dev, ALIGN(ctx->key_len, 64),
++				  rsa_req->dst_vaddr, rsa_req->dst_paddr);
++
++free_src:
++	dma_free_coherent(dev, ALIGN(is_enc ? ctx->key_len : ctx->key_len << 1, 64),
++			  rsa_req->src_vaddr, rsa_req->src_paddr);
++free_aflags:
++	kfree(aflags);
++out:
++	return ret;
++}
++
++/*
++ * Using private key to decrypt or signature
++ */
++static int ycc_rsa_submit_priv(struct akcipher_request *req, bool is_dec)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ycc_pke_req *rsa_req = akcipher_request_ctx(req);
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct ycc_rsa_dec_cmd *rsa_dec_cmd;
++	struct ycc_ring *ring = ctx->ring;
++	struct device *dev = YCC_DEV(ctx);
++	struct ycc_flags *aflags;
++	int ret = -ENOMEM;
++
++	if (req->dst_len > ctx->key_len || req->src_len > ctx->key_len)
++		return -EINVAL;
++
++	rsa_req->ctx = ctx;
++	rsa_req->req = req;
++
++	if (unlikely(!ctx->priv_key_vaddr))
++		return -EINVAL;
++
++	aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
++	if (!aflags)
++		goto out;
++
++	aflags->ptr = (void *)rsa_req;
++	aflags->ycc_done_callback = ycc_rsa_done_callback;
++
++	memset(&rsa_req->desc, 0, sizeof(rsa_req->desc));
++	rsa_req->desc.private_ptr = (u64)(void *)aflags;
++
++	rsa_dec_cmd         = &rsa_req->desc.cmd.rsa_dec_cmd;
++	rsa_dec_cmd->keyptr = ctx->priv_key_paddr;
++	rsa_dec_cmd->elen   = ctx->e_len << 3;
++	rsa_dec_cmd->nlen   = ctx->key_len << 3;
++	if (ctx->crt_mode)
++		rsa_dec_cmd->cmd_id = is_dec ? YCC_CMD_RSA_CRT_DEC : YCC_CMD_RSA_CRT_SIGN;
++	else
++		rsa_dec_cmd->cmd_id = is_dec ? YCC_CMD_RSA_DEC : YCC_CMD_RSA_SIGN;
++
++	ret = ycc_prepare_dma_buf(rsa_req, 1);
++	if (unlikely(ret))
++		goto free_aflags;
++
++	ret = ycc_prepare_dma_buf(rsa_req, 0);
++	if (unlikely(ret))
++		goto free_src;
++
++	rsa_dec_cmd->sptr = rsa_req->src_paddr;
++	rsa_dec_cmd->dptr = rsa_req->dst_paddr;
++
++	ret = ycc_enqueue(ring, (u8 *)&rsa_req->desc);
++	if (!ret)
++		return -EINPROGRESS;
++
++	dma_free_coherent(dev, ALIGN(ctx->key_len, 64), rsa_req->dst_vaddr,
++			  rsa_req->dst_paddr);
++free_src:
++	dma_free_coherent(dev, ALIGN(ctx->key_len, 64), rsa_req->src_vaddr,
++			  rsa_req->src_paddr);
++free_aflags:
++	kfree(aflags);
++out:
++	return ret;
++}
++
++static inline bool ycc_rsa_do_soft(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct ycc_dev *ydev = ctx->ring->ydev;
++
++	if (ctx->key_len == YCC_RSA_KEY_SZ_512 ||
++	    ctx->key_len == YCC_RSA_KEY_SZ_1536 ||
++	    !test_bit(YDEV_STATUS_READY, &ydev->status))
++		return true;
++
++	return false;
++}
++
++enum rsa_ops {
++	RSA_ENC,
++	RSA_DEC,
++	RSA_SIGN,
++	RSA_VERIFY,
++};
++
++static inline int ycc_rsa_soft_fallback(struct akcipher_request *req, int ops)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++	int ret = -EINVAL;
++
++	akcipher_request_set_tfm(req, ctx->soft_tfm);
++
++	switch (ops) {
++	case RSA_ENC:
++		ret = crypto_akcipher_encrypt(req);
++		break;
++	case RSA_DEC:
++		ret = crypto_akcipher_decrypt(req);
++		break;
++	case RSA_SIGN:
++		ret = crypto_akcipher_sign(req);
++		break;
++	case RSA_VERIFY:
++		ret = crypto_akcipher_verify(req);
++		break;
++	default:
++		break;
 +	}
 +
++	akcipher_request_set_tfm(req, tfm);
++	return ret;
++}
++
++static int ycc_rsa_encrypt(struct akcipher_request *req)
++{
++	if (ycc_rsa_do_soft(req))
++		return ycc_rsa_soft_fallback(req, RSA_ENC);
++
++	return ycc_rsa_submit_pub(req, true);
++}
++
++static int ycc_rsa_decrypt(struct akcipher_request *req)
++{
++	if (ycc_rsa_do_soft(req))
++		return ycc_rsa_soft_fallback(req, RSA_DEC);
++
++	return ycc_rsa_submit_priv(req, true);
++}
++
++static int ycc_rsa_verify(struct akcipher_request *req)
++{
++	if (ycc_rsa_do_soft(req))
++		return ycc_rsa_soft_fallback(req, RSA_VERIFY);
++
++	return ycc_rsa_submit_pub(req, false);
++}
++
++static int ycc_rsa_sign(struct akcipher_request *req)
++{
++	if (ycc_rsa_do_soft(req))
++		return ycc_rsa_soft_fallback(req, RSA_SIGN);
++
++	return ycc_rsa_submit_priv(req, false);
++}
++
++static int ycc_rsa_validate_n(unsigned int len)
++{
++	unsigned int bitslen = len << 3;
++
++	switch (bitslen) {
++	case 512:
++	case 1024:
++	case 1536:
++	case 2048:
++	case 3072:
++	case 4096:
++		return 0;
++	default:
++		return -EINVAL;
++	}
++}
++
++static void __ycc_rsa_drop_leading_zeros(const u8 **ptr, size_t *len)
++{
++	if (!*ptr)
++		return;
++
++	while (!**ptr && *len) {
++		(*ptr)++;
++		(*len)--;
++	}
++}
++
++static int ycc_rsa_set_n(struct ycc_pke_ctx *ctx, const char *value,
++			 size_t value_len, bool private)
++{
++	const char *ptr = value;
++
++	/* e should be set before n as we need e_len */
++	if (!ctx->e_len || !value_len)
++		return -EINVAL;
++
++	if (!ctx->key_len)
++		ctx->key_len = value_len;
++
++	if (private && !ctx->crt_mode)
++		memcpy(ctx->priv_key_vaddr + ctx->e_len + YCC_PIN_SZ +
++		       ctx->rsa_key->d_sz, ptr, value_len);
++
++	memcpy(ctx->pub_key_vaddr + ctx->e_len, ptr, value_len);
 +	return 0;
 +}
 +
-+/*
-+ * Free memory for rings
-+ */
-+static void ycc_free_rings(struct ycc_dev *ydev)
++static int ycc_rsa_set_e(struct ycc_pke_ctx *ctx, const char *value,
++			 size_t value_len, bool private)
 +{
-+	kfree(ydev->rings);
-+	ydev->rings = NULL;
-+}
++	const char *ptr = value;
 +
-+/*
-+ * Initiate ring and create command queue and response queue.
-+ */
-+static int ycc_init_ring(struct ycc_ring *ring, u32 max_desc)
-+{
-+	struct ycc_dev *ydev = ring->ydev;
-+	u32 cmd_ring_size, resp_ring_size;
++	if (!ctx->key_len || !value_len || value_len > YCC_RSA_E_SZ_MAX)
++		return -EINVAL;
 +
-+	ring->type = KERN_RING;
-+	ring->max_desc = max_desc;
++	ctx->e_len = value_len;
++	if (private)
++		memcpy(ctx->priv_key_vaddr, ptr, value_len);
 +
-+	cmd_ring_size = ring->max_desc * YCC_CMD_DESC_SIZE;
-+	resp_ring_size = ring->max_desc * YCC_RESP_DESC_SIZE;
-+
-+	ring->cmd_base_vaddr = dma_alloc_coherent(&ydev->pdev->dev,
-+						  cmd_ring_size,
-+						  &ring->cmd_base_paddr,
-+						  GFP_KERNEL);
-+	if (!ring->cmd_base_vaddr) {
-+		pr_err("Failed to alloc cmd dma memory\n");
-+		return -ENOMEM;
-+	}
-+	memset(ring->cmd_base_vaddr, CMD_INVALID_CONTENT_U8, cmd_ring_size);
-+
-+	ring->resp_base_vaddr = dma_alloc_coherent(&ydev->pdev->dev,
-+						   resp_ring_size,
-+						   &ring->resp_base_paddr,
-+						   GFP_KERNEL);
-+	if (!ring->resp_base_vaddr) {
-+		pr_err("Failed to alloc resp dma memory\n");
-+		dma_free_coherent(&ydev->pdev->dev, cmd_ring_size,
-+				  ring->cmd_base_vaddr, ring->cmd_base_paddr);
-+		return -ENOMEM;
-+	}
-+	memset(ring->resp_base_vaddr, CMD_INVALID_CONTENT_U8, resp_ring_size);
-+
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_RSP_AFULL_TH, 0);
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_CMD_BASE_ADDR_LO,
-+					(u32)ring->cmd_base_paddr & 0xffffffff);
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_CMD_BASE_ADDR_HI,
-+					((u64)ring->cmd_base_paddr >> 32) & 0xffffffff);
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_RSP_BASE_ADDR_LO,
-+					(u32)ring->resp_base_paddr & 0xffffffff);
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_RSP_BASE_ADDR_HI,
-+					((u64)ring->resp_base_paddr >> 32) & 0xffffffff);
-+
-+	if (ycc_create_ring_debugfs(ring))
-+		pr_warn("Failed to create debugfs entry for ring: %d\n", ring->ring_id);
-+
-+	atomic_set(&ring->ref_cnt, 0);
-+	spin_lock_init(&ring->lock);
++	memcpy(ctx->pub_key_vaddr, ptr, value_len);
 +	return 0;
 +}
 +
-+/*
-+ * Release dma memory for command queue and response queue.
-+ */
-+static void ycc_release_ring(struct ycc_ring *ring)
++static int ycc_rsa_set_d(struct ycc_pke_ctx *ctx, const char *value,
++			 size_t value_len)
 +{
-+	u32 ring_size;
++	const char *ptr = value;
 +
-+	/* This ring should not be in use here */
-+	WARN_ON(atomic_read(&ring->ref_cnt));
++	if (!ctx->key_len || !value_len || value_len > ctx->key_len)
++		return -EINVAL;
 +
-+	if (ring->cmd_base_vaddr) {
-+		ring_size = ring->max_desc * YCC_CMD_DESC_SIZE;
-+		dma_free_coherent(&ring->ydev->pdev->dev, ring_size,
-+				  ring->cmd_base_vaddr,
-+				  ring->cmd_base_paddr);
-+		ring->cmd_base_vaddr = NULL;
-+	}
-+	if (ring->resp_base_vaddr) {
-+		ring_size = ring->max_desc * YCC_RESP_DESC_SIZE;
-+		dma_free_coherent(&ring->ydev->pdev->dev, ring_size,
-+				  ring->resp_base_vaddr,
-+				  ring->resp_base_paddr);
-+		ring->resp_base_vaddr = NULL;
-+	}
-+
-+	ycc_remove_ring_debugfs(ring);
-+	ring->type = FREE_RING;
++	memcpy(ctx->priv_key_vaddr + ctx->e_len + YCC_PIN_SZ, ptr, value_len);
++	return 0;
 +}
 +
-+int ycc_dev_rings_init(struct ycc_dev *ydev, u32 max_desc, int user_rings)
++static int ycc_rsa_set_crt_param(char *param, size_t half_key_len,
++				 const char *value, size_t value_len)
 +{
-+	int kern_rings = YCC_RINGPAIR_NUM - user_rings;
-+	struct ycc_ring *ring;
-+	int ret, i;
++	const char *ptr = value;
++	size_t len = value_len;
 +
-+	ret = ycc_alloc_rings(ydev);
++	if (!len || len > half_key_len)
++		return -EINVAL;
++
++	memcpy(param, ptr, len);
++	return 0;
++}
++
++static int ycc_rsa_setkey_crt(struct ycc_pke_ctx *ctx, struct rsa_key *rsa_key)
++{
++	unsigned int half_key_len = ctx->key_len >> 1;
++	u8 *tmp = (u8 *)ctx->priv_key_vaddr;
++	int ret;
++
++	tmp += ctx->rsa_key->e_sz + 16;
++	/* TODO: rsa_key is better to be kept original */
++	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->p, rsa_key->p_sz);
++	if (ret)
++		goto err;
++
++	tmp += half_key_len;
++	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->q, rsa_key->q_sz);
++	if (ret)
++		goto err;
++
++	tmp += half_key_len;
++	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->dp, rsa_key->dp_sz);
++	if (ret)
++		goto err;
++
++	tmp += half_key_len;
++	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->dq, rsa_key->dq_sz);
++	if (ret)
++		goto err;
++
++	tmp += half_key_len;
++	ret = ycc_rsa_set_crt_param(tmp, half_key_len, rsa_key->qinv, rsa_key->qinv_sz);
++	if (ret)
++		goto err;
++
++	ctx->crt_mode = true;
++	return 0;
++
++err:
++	ctx->crt_mode = false;
++	return ret;
++}
++
++static void ycc_rsa_clear_ctx(struct ycc_pke_ctx *ctx)
++{
++	struct device *dev = YCC_DEV(ctx);
++	size_t size;
++
++	if (ctx->pub_key_vaddr) {
++		size = ALIGN(ctx->rsa_key->e_sz + ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
++		dma_free_coherent(dev, size, ctx->pub_key_vaddr, ctx->pub_key_paddr);
++		ctx->pub_key_vaddr = NULL;
++	}
++
++	if (ctx->priv_key_vaddr) {
++		size = ALIGN(ctx->rsa_key->e_sz + YCC_PIN_SZ + ctx->rsa_key->d_sz +
++			     ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
++		memzero_explicit(ctx->priv_key_vaddr, size);
++		dma_free_coherent(dev, size, ctx->priv_key_vaddr, ctx->priv_key_paddr);
++		ctx->priv_key_vaddr = NULL;
++	}
++
++	if (ctx->rsa_key) {
++		memzero_explicit(ctx->rsa_key, sizeof(struct rsa_key));
++		kfree(ctx->rsa_key);
++		ctx->rsa_key = NULL;
++	}
++
++	ctx->key_len = 0;
++	ctx->e_len = 0;
++	ctx->crt_mode = false;
++}
++
++static void ycc_rsa_drop_leading_zeros(struct rsa_key *rsa_key)
++{
++	__ycc_rsa_drop_leading_zeros(&rsa_key->n, &rsa_key->n_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->e, &rsa_key->e_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->d, &rsa_key->d_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->p, &rsa_key->p_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->q, &rsa_key->q_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->dp, &rsa_key->dp_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->dq, &rsa_key->dq_sz);
++	__ycc_rsa_drop_leading_zeros(&rsa_key->qinv, &rsa_key->qinv_sz);
++}
++
++static int ycc_rsa_alloc_key(struct ycc_pke_ctx *ctx, bool priv)
++{
++	struct device *dev = YCC_DEV(ctx);
++	struct rsa_key *rsa_key = ctx->rsa_key;
++	unsigned int half_key_len;
++	size_t size;
++	int ret;
++
++	ycc_rsa_drop_leading_zeros(rsa_key);
++	ctx->key_len = rsa_key->n_sz;
++
++	ret = ycc_rsa_validate_n(ctx->key_len);
 +	if (ret) {
-+		pr_err("Failed to allocate memory for rings\n");
++		pr_err("Invalid n size:%d bits\n", ctx->key_len << 3);
++		goto out;
++	}
++
++	ret = -ENOMEM;
++	if (priv) {
++		if (!(rsa_key->p_sz + rsa_key->q_sz + rsa_key->dp_sz +
++		      rsa_key->dq_sz + rsa_key->qinv_sz)) {
++			size = ALIGN(rsa_key->e_sz + YCC_PIN_SZ + rsa_key->d_sz +
++				     ctx->key_len, YCC_CMD_DATA_ALIGN_SZ);
++		} else {
++			half_key_len = ctx->key_len >> 1;
++			size = ALIGN(rsa_key->e_sz + YCC_PIN_SZ + half_key_len *
++				     YCC_RSA_CRT_PARAMS, YCC_CMD_DATA_ALIGN_SZ);
++			ctx->crt_mode = true;
++		}
++		ctx->priv_key_vaddr = dma_alloc_coherent(dev, size,
++							 &ctx->priv_key_paddr,
++							 GFP_KERNEL);
++		if (!ctx->priv_key_vaddr)
++			goto out;
++		memset(ctx->priv_key_vaddr, 0, size);
++	}
++
++	if (!ctx->pub_key_vaddr) {
++		size = ALIGN(ctx->key_len + rsa_key->e_sz, YCC_CMD_DATA_ALIGN_SZ);
++		ctx->pub_key_vaddr = dma_alloc_coherent(dev, size,
++							&ctx->pub_key_paddr,
++							GFP_KERNEL);
++		if (!ctx->pub_key_vaddr)
++			goto out;
++		memset(ctx->pub_key_vaddr, 0, size);
++	}
++
++	ret = ycc_rsa_set_e(ctx, rsa_key->e, rsa_key->e_sz, priv);
++	if (ret) {
++		pr_err("Failed to set e for rsa %s key\n", priv ? "private" : "public");
++		goto out;
++	}
++
++	ret = ycc_rsa_set_n(ctx, rsa_key->n, rsa_key->n_sz, priv);
++	if (ret) {
++		pr_err("Failed to set n for rsa private key\n");
++		goto out;
++	}
++
++	if (priv) {
++		if (ctx->crt_mode) {
++			ret = ycc_rsa_setkey_crt(ctx, rsa_key);
++			if (ret) {
++				pr_err("Failed to set private key for rsa crt key\n");
++				goto out;
++			}
++		} else {
++			ret = ycc_rsa_set_d(ctx, rsa_key->d, rsa_key->d_sz);
++			if (ret) {
++				pr_err("Failed to set d for rsa private key\n");
++				goto out;
++			}
++		}
++	}
++
++	return 0;
++
++out:
++	ycc_rsa_clear_ctx(ctx);
++	return ret;
++}
++
++static int ycc_rsa_setkey(struct crypto_akcipher *tfm, const void *key,
++			  unsigned int keylen, bool priv)
++{
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++	struct rsa_key *rsa_key;
++	int ret;
++
++	if (priv)
++		ret = crypto_akcipher_set_priv_key(ctx->soft_tfm, key, keylen);
++	else
++		ret = crypto_akcipher_set_pub_key(ctx->soft_tfm, key, keylen);
++	if (ret)
++		return ret;
++
++	ycc_rsa_clear_ctx(ctx);
++
++	rsa_key = kzalloc(sizeof(struct rsa_key), GFP_KERNEL);
++	if (!rsa_key)
++		return -ENOMEM;
++
++	if (priv)
++		ret = rsa_parse_priv_key(rsa_key, key, keylen);
++	else if (!ctx->pub_key_vaddr)
++		ret = rsa_parse_pub_key(rsa_key, key, keylen);
++	if (ret) {
++		pr_err("Failed to parse %s key\n", priv ? "private" : "public");
++		kfree(rsa_key);
 +		return ret;
 +	}
 +
-+	for (i = 0; i < kern_rings; i++) {
-+		ring = &ydev->rings[i];
-+		ret = ycc_init_ring(ring, max_desc);
-+		if (ret)
-+			goto free_kern_rings;
-+
-+		tasklet_init(&ring->resp_handler, ycc_resp_process, (uintptr_t)ring);
-+	}
-+
-+	return 0;
-+
-+free_kern_rings:
-+	while (i--) {
-+		ring = &ydev->rings[i];
-+		ycc_release_ring(ring);
-+	}
-+
-+	ycc_free_rings(ydev);
-+	return ret;
++	ctx->rsa_key = rsa_key;
++	return ycc_rsa_alloc_key(ctx, priv);
 +}
 +
-+void ycc_dev_rings_release(struct ycc_dev *ydev, int user_rings)
++static int ycc_rsa_setpubkey(struct crypto_akcipher *tfm, const void *key,
++			     unsigned int keylen)
 +{
-+	int kern_rings = YCC_RINGPAIR_NUM - user_rings;
-+	struct ycc_ring *ring;
-+	int i;
-+
-+	for (i = 0; i < kern_rings; i++) {
-+		ring = &ydev->rings[i];
-+
-+		tasklet_kill(&ring->resp_handler);
-+		ycc_release_ring(ring);
-+	}
-+
-+	ycc_free_rings(ydev);
++	return ycc_rsa_setkey(tfm, key, keylen, false);
 +}
 +
-+/*
-+ * Check if the command queue is full.
-+ */
-+static inline bool ycc_ring_full(struct ycc_ring *ring)
++static int ycc_rsa_setprivkey(struct crypto_akcipher *tfm, const void *key,
++			      unsigned int keylen)
 +{
-+	return ring->cmd_rd_ptr == (ring->cmd_wr_ptr + 1) % ring->max_desc;
++	return ycc_rsa_setkey(tfm, key, keylen, true);
 +}
 +
-+/*
-+ * Check if the response queue is empty
-+ */
-+static inline bool ycc_ring_empty(struct ycc_ring *ring)
++static unsigned int ycc_rsa_max_size(struct crypto_akcipher *tfm)
 +{
-+	return ring->resp_rd_ptr == ring->resp_wr_ptr;
-+}
-+
-+#define __rb_node_to_type(a)	rb_entry(a, struct ycc_ring, node)
-+
-+static inline bool ycc_ring_less(struct rb_node *a, const struct rb_node *b)
-+{
-+	return (atomic_read(&__rb_node_to_type(a)->ref_cnt)
-+		< atomic_read(&__rb_node_to_type(b)->ref_cnt));
-+}
-+
-+static struct ycc_ring *ycc_select_ring(void)
-+{
-+	struct ycc_ring *found = NULL;
-+	struct rb_node *rnode;
-+	struct list_head *itr;
-+	struct ycc_dev *ydev;
-+	int idx;
-+
-+	if (list_empty(&ycc_table))
-+		return NULL;
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
 +
 +	/*
-+	 * No need to protect the list through lock here. The external
-+	 * ycc_table list only insert/remove entry when probing/removing
-+	 * the driver. Before calling this function, the reference count
-+	 * of THIS_MODULE has increased in the crypto layer. So removing
-+	 * driver will be blocked at present. Meanwhile, inserting new entry
-+	 * to the list has no impact on 'reading' behavior.
++	 * 512 and 1536 bits key size are not supported by YCC,
++	 * we use soft tfm instead
 +	 */
-+	list_for_each(itr, &ycc_table) {
-+		ydev = list_entry(itr, struct ycc_dev, list);
++	if (ctx->key_len == YCC_RSA_KEY_SZ_512 ||
++	    ctx->key_len == YCC_RSA_KEY_SZ_1536)
++		return crypto_akcipher_maxsize(ctx->soft_tfm);
 +
-+		/* RCEC has no rings */
-+		if (ydev->type != YCC_RCIEP)
-+			continue;
-+
-+		/* RCIEP is not ready */
-+		if (!test_bit(YDEV_STATUS_READY, &ydev->status))
-+			continue;
-+
-+		do {
-+			idx = find_first_zero_bit(&ydev->ring_bitmap, YCC_RINGPAIR_NUM);
-+			if (idx == YCC_RINGPAIR_NUM)
-+				break;
-+
-+			found = ydev->rings + idx;
-+			if (found->type != KERN_RING) {
-+				/* Found ring is not for kernel, mark it and continue */
-+				set_bit(idx, &ydev->ring_bitmap);
-+				continue;
-+			}
-+		} while (test_and_set_bit(idx, &ydev->ring_bitmap));
-+
-+		if (idx < YCC_RINGPAIR_NUM && found)
-+			goto out;
-+	}
-+
-+	/*
-+	 * We didn't find the exact ring which means each ring
-+	 * has been occupied. Fallback to slow path.
-+	 */
-+	spin_lock(&ring_rbtree_lock);
-+	rnode = rb_first(&ring_rbtree);
-+	rb_erase(rnode, &ring_rbtree);
-+	spin_unlock(&ring_rbtree_lock);
-+
-+	found = __rb_node_to_type(rnode);
-+
-+out:
-+	ycc_ring_get(found);
-+	spin_lock(&ring_rbtree_lock);
-+	rb_add(&found->node, &ring_rbtree, ycc_ring_less);
-+	spin_unlock(&ring_rbtree_lock);
-+	return found;
++	return ctx->rsa_key ? ctx->key_len : 0;
 +}
 +
-+/*
-+ * Bind the ring to crypto
-+ */
-+struct ycc_ring *ycc_crypto_get_ring(void)
++static int ycc_rsa_init(struct crypto_akcipher *tfm)
 +{
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
 +	struct ycc_ring *ring;
 +
-+	ring = ycc_select_ring();
-+	if (ring) {
-+		ycc_dev_get(ring->ydev);
-+		ring->nr_binds++;
-+		if (ring->ydev->is_polling && atomic_read(&ring->ref_cnt) == 1)
-+			tasklet_hi_schedule(&ring->resp_handler);
++	ctx->soft_tfm = crypto_alloc_akcipher("rsa-generic", 0, 0);
++	if (IS_ERR(ctx->soft_tfm)) {
++		pr_err("Can not alloc_akcipher!\n");
++		return PTR_ERR(ctx->soft_tfm);
 +	}
 +
-+	return ring;
-+}
++	/* Reserve enough space if soft request reqires additional space */
++	akcipher_set_reqsize(tfm, sizeof(struct ycc_pke_req) +
++			     crypto_akcipher_alg(ctx->soft_tfm)->reqsize);
 +
-+void ycc_crypto_free_ring(struct ycc_ring *ring)
-+{
-+	struct rb_node *rnode = &ring->node;
-+
-+	spin_lock(&ring_rbtree_lock);
-+	rb_erase(rnode, &ring_rbtree);
-+	if (atomic_dec_and_test(&ring->ref_cnt)) {
-+		clear_bit(ring->ring_id, &ring->ydev->ring_bitmap);
-+		tasklet_kill(&ring->resp_handler);
-+	} else {
-+		rb_add(rnode, &ring_rbtree, ycc_ring_less);
-+	}
-+
-+	spin_unlock(&ring_rbtree_lock);
-+
-+	ycc_dev_put(ring->ydev);
-+}
-+
-+/*
-+ * Submit command to ring's command queue.
-+ */
-+int ycc_enqueue(struct ycc_ring *ring, void *cmd)
-+{
-+	int ret = 0;
-+
-+	if (!ring || !ring->ydev || !cmd)
++	ring = ycc_crypto_get_ring();
++	if (!ring) {
++		crypto_free_akcipher(ctx->soft_tfm);
 +		return -EINVAL;
-+
-+	spin_lock_bh(&ring->lock);
-+	if (!test_bit(YDEV_STATUS_READY, &ring->ydev->status) || ycc_ring_stopped(ring)) {
-+		pr_debug("Enqueue error, device status: %ld, ring stopped: %d\n",
-+			 ring->ydev->status, ycc_ring_stopped(ring));
-+
-+		/* Fallback to software */
-+		ret = -EAGAIN;
-+		goto out;
 +	}
 +
-+	ring->cmd_rd_ptr = YCC_CSR_RD(ring->csr_vaddr, REG_RING_CMD_RD_PTR);
-+	if (ycc_ring_full(ring)) {
-+		pr_debug("Enqueue error, ring %d is full\n", ring->ring_id);
-+		ret = -EAGAIN;
-+		goto out;
-+	}
-+
-+	memcpy(ring->cmd_base_vaddr + ring->cmd_wr_ptr * YCC_CMD_DESC_SIZE, cmd,
-+	       YCC_CMD_DESC_SIZE);
-+
-+	/* Ensure that cmd_wr_ptr update after memcpy */
-+	dma_wmb();
-+	if (++ring->cmd_wr_ptr == ring->max_desc)
-+		ring->cmd_wr_ptr = 0;
-+
-+	ring->nr_cmds++;
-+	YCC_CSR_WR(ring->csr_vaddr, REG_RING_CMD_WR_PTR, ring->cmd_wr_ptr);
-+
-+out:
-+	spin_unlock_bh(&ring->lock);
-+	return ret;
++	ctx->ring = ring;
++	ctx->key_len = 0;
++	return 0;
 +}
 +
-+static inline void ycc_check_cmd_state(u16 state)
++static void ycc_rsa_exit(struct crypto_akcipher *tfm)
 +{
-+	switch (state) {
-+	case CMD_SUCCESS:
-+		break;
-+	case CMD_ILLEGAL:
-+		pr_debug("Illegal command\n");
-+		break;
-+	case CMD_UNDERATTACK:
-+		pr_debug("Attack is detected\n");
-+		break;
-+	case CMD_INVALID:
-+		pr_debug("Invalid command\n");
-+		break;
-+	case CMD_ERROR:
-+		pr_debug("Command error\n");
-+		break;
-+	case CMD_EXCESS:
-+		pr_debug("Excess permission\n");
-+		break;
-+	case CMD_KEY_ERROR:
-+		pr_debug("Invalid internal key\n");
-+		break;
-+	case CMD_VERIFY_ERROR:
-+		pr_debug("Mac/tag verify failed\n");
-+		break;
-+	default:
-+		pr_debug("Unknown error\n");
-+		break;
-+	}
++	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
++
++	if (ctx->ring)
++		ycc_crypto_free_ring(ctx->ring);
++
++	ycc_rsa_clear_ctx(ctx);
++	crypto_free_akcipher(ctx->soft_tfm);
 +}
 +
-+void ycc_handle_resp(struct ycc_ring *ring, struct ycc_resp_desc *desc)
++static struct akcipher_alg ycc_rsa = {
++	.base = {
++		.cra_name = "rsa",
++		.cra_driver_name = "rsa-ycc",
++		.cra_priority = 1000,
++		.cra_module = THIS_MODULE,
++		.cra_ctxsize = sizeof(struct ycc_pke_ctx),
++	},
++	.sign = ycc_rsa_sign,
++	.verify = ycc_rsa_verify,
++	.encrypt = ycc_rsa_encrypt,
++	.decrypt = ycc_rsa_decrypt,
++	.set_pub_key = ycc_rsa_setpubkey,
++	.set_priv_key = ycc_rsa_setprivkey,
++	.max_size = ycc_rsa_max_size,
++	.init = ycc_rsa_init,
++	.exit = ycc_rsa_exit,
++};
++
++int ycc_pke_register(void)
 +{
-+	struct ycc_flags *aflag;
-+
-+	dma_rmb();
-+
-+	aflag = (struct ycc_flags *)desc->private_ptr;
-+	if (!aflag || (u64)aflag == CMD_INVALID_CONTENT_U64) {
-+		pr_debug("Invalid command aflag\n");
-+		return;
-+	}
-+
-+	ycc_check_cmd_state(desc->state);
-+	aflag->ycc_done_callback(aflag->ptr, desc->state);
-+
-+	memset(desc, CMD_INVALID_CONTENT_U8, sizeof(*desc));
-+	kfree(aflag);
++	return crypto_register_akcipher(&ycc_rsa);
 +}
 +
-+/*
-+ * dequeue, read response descriptor
-+ */
-+void ycc_dequeue(struct ycc_ring *ring)
++void ycc_pke_unregister(void)
 +{
-+	struct ycc_resp_desc *resp;
-+	int cnt = 0;
-+
-+	if (!test_bit(YDEV_STATUS_READY, &ring->ydev->status) || ycc_ring_stopped(ring))
-+		return;
-+
-+	ring->resp_wr_ptr = YCC_CSR_RD(ring->csr_vaddr, REG_RING_RSP_WR_PTR);
-+	while (!ycc_ring_empty(ring)) {
-+		resp = (struct ycc_resp_desc *)ring->resp_base_vaddr +
-+			ring->resp_rd_ptr;
-+		ycc_handle_resp(ring, resp);
-+
-+		cnt++;
-+		ring->nr_resps++;
-+		if (++ring->resp_rd_ptr == ring->max_desc)
-+			ring->resp_rd_ptr = 0;
-+	}
-+
-+	if (cnt)
-+		YCC_CSR_WR(ring->csr_vaddr, REG_RING_RSP_RD_PTR, ring->resp_rd_ptr);
++	crypto_unregister_akcipher(&ycc_rsa);
 +}
 diff --git a/drivers/crypto/ycc/ycc_ring.h b/drivers/crypto/ycc/ycc_ring.h
-new file mode 100644
-index 00000000..eb3e6f9
---- /dev/null
+index 2caa9e0..c47fc18 100644
+--- a/drivers/crypto/ycc/ycc_ring.h
 +++ b/drivers/crypto/ycc/ycc_ring.h
-@@ -0,0 +1,111 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#ifndef __YCC_RING_H
-+#define __YCC_RING_H
-+
-+#include <linux/spinlock.h>
-+#include <linux/interrupt.h>
-+
-+#include "ycc_dev.h"
-+
-+#define CMD_ILLEGAL			0x15
-+#define CMD_UNDERATTACK			0x25
-+#define CMD_INVALID			0x35
-+#define CMD_ERROR			0x45
-+#define CMD_EXCESS			0x55
-+#define CMD_KEY_ERROR			0x65
-+#define CMD_VERIFY_ERROR		0x85
-+#define CMD_SUCCESS			0xa5
-+#define CMD_CANCELLED			0xff
-+
-+#define CMD_INVALID_CONTENT_U8		0x7f
-+#define CMD_INVALID_CONTENT_U64		0x7f7f7f7f7f7f7f7fULL
-+
-+enum ring_type {
-+	FREE_RING,
-+	USER_RING,
-+	KERN_RING,
-+	INVAL_RING,
-+};
-+
-+struct ycc_ring {
-+	u16 ring_id;
-+	u32 status;
-+
-+	struct rb_node node;
-+	atomic_t ref_cnt;
-+
-+	void __iomem *csr_vaddr;	/* config register address */
-+	resource_size_t csr_paddr;
-+	struct ycc_dev *ydev;		/* belongs to which ydev */
-+	struct dentry *debug_dir;
-+
-+	u32 max_desc;		/* max desc entry numbers */
-+	u32 irq_th;
-+	spinlock_t lock;	/* used to send cmd, protect write ptr */
-+	enum ring_type type;
-+
-+	void *cmd_base_vaddr;	/* base addr of cmd ring */
-+	dma_addr_t cmd_base_paddr;
-+	u16 cmd_wr_ptr;		/* current cmd write pointer */
-+	u16 cmd_rd_ptr;		/* current cmd read pointer */
-+	void *resp_base_vaddr;	/* base addr of resp ring */
-+	dma_addr_t resp_base_paddr;
-+	u16 resp_wr_ptr;	/* current resp write pointer */
-+	u16 resp_rd_ptr;	/* current resp read pointer */
-+
-+	struct tasklet_struct resp_handler;
-+
-+	/* for statistics */
-+	u64 nr_binds;
-+	u64 nr_cmds;
-+	u64 nr_resps;
-+};
-+
-+struct ycc_flags {
-+	void *ptr;
-+	int (*ycc_done_callback)(void *ptr, u16 state);
-+};
-+
-+struct ycc_resp_desc {
-+	u64 private_ptr;
-+	u16 state;
-+	u8 reserved[6];
-+};
-+
-+union ycc_real_cmd {
-+	/*
-+	 * TODO: Real command will implement when
-+	 * corresponding algorithm is ready
-+	 */
-+	u8 padding[32];
-+};
-+
-+struct ycc_cmd_desc {
-+	union ycc_real_cmd cmd;
-+	u64 private_ptr;
-+	u8 reserved0[16];
-+	u8 reserved1[8];
+@@ -100,9 +100,32 @@ struct ycc_aead_cmd {
+ 	u8 taglen;	/* authenc size */
+ } __packed;
+ 
++struct ycc_rsa_enc_cmd {
++	u8 cmd_id;
++	u64 sptr:48;
++	u16 key_id;
++	u64 keyptr:48;	/* public key e+n Bytes */
++	u16 elen;	/* bits not byte */
++	u16 nlen;
++	u64 dptr:48;
 +} __packed;
 +
-+static inline void ycc_ring_get(struct ycc_ring *ring)
-+{
-+	atomic_inc(&ring->ref_cnt);
-+}
++struct ycc_rsa_dec_cmd {
++	u8 cmd_id;
++	u64 sptr:48;
++	u16 key_id;
++	u16 kek_id;
++	u64 keyptr:48;	/* private key e + pin + d + n */
++	u16 elen;	/* bits not byte */
++	u16 nlen;
++	u64 dptr:48;
++} __packed;
 +
-+static inline void ycc_ring_put(struct ycc_ring *ring)
-+{
-+	atomic_dec(&ring->ref_cnt);
-+}
-+
-+static inline bool ycc_ring_stopped(struct ycc_ring *ring)
-+{
-+	return !!(YCC_CSR_RD(ring->csr_vaddr, REG_RING_CFG) & RING_STOP_BIT);
-+}
-+
-+int ycc_enqueue(struct ycc_ring *ring, void *cmd);
-+void ycc_dequeue(struct ycc_ring *ring);
-+struct ycc_ring *ycc_crypto_get_ring(void);
-+void ycc_crypto_free_ring(struct ycc_ring *ring);
-+int ycc_dev_rings_init(struct ycc_dev *ydev, u32 max_desc, int user_rings);
-+void ycc_dev_rings_release(struct ycc_dev *ydev, int user_rings);
-+#endif
+ union ycc_real_cmd {
+ 	struct ycc_skcipher_cmd ske_cmd;
+ 	struct ycc_aead_cmd aead_cmd;
++	struct ycc_rsa_enc_cmd rsa_enc_cmd;
++	struct ycc_rsa_dec_cmd rsa_dec_cmd;
+ 	u8 padding[32];
+ };
+ 
 -- 
 1.8.3.1
 
