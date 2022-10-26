@@ -2,108 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42675C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Oct 2022 07:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D69C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Oct 2022 09:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233306AbiJZHls (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Oct 2022 03:41:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41832 "EHLO
+        id S232994AbiJZJDq convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Oct 2022 05:03:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233317AbiJZHln (ORCPT
+        with ESMTP id S231341AbiJZJDp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2022 03:41:43 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF9EBEFB4
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Oct 2022 00:41:38 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id j15so14384568wrq.3
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Oct 2022 00:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qX+c/eqfKIRmSzQ2TAxdY0LKUbRjF3m5mcG02oMGx8Q=;
-        b=EGnZTiW4mN/u1L+KFftDWxXLRHrI00+AmvAaQQQ1bURMf22zv1OHtlPR/H7SUlo1xJ
-         fTLksIEiBVk/vYtUiqhHH+WeQMz81sDDpni+g1os3iml+wBrTaKNtPzeQ2gi9kupiQXT
-         iz7ggqhUEm8RugKYJkKqp+ZxE3PnQPjCAKtlF1m1brJaP3z5MqAuxVPc0vPN7sSxpbsg
-         anaIGMEx4eOGC7OC8w5Jhy264e2k+OotLo1DqfjJEhvn5EhZWLsI3Kv3iik8lHFDUNrG
-         il8K4Mejef+FYzG1mGYubXfdTuAIloBpBQv3eUuIaoVWb4faCOB6LwD+KrRuFx0eGNNO
-         vyrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qX+c/eqfKIRmSzQ2TAxdY0LKUbRjF3m5mcG02oMGx8Q=;
-        b=y97P907IOJUJhQ/aq9XGzMz4ehb3iwgy9aTSDk2MVNFCZd9E6Cfyf30uC6MEBxMy6Z
-         eQhI3n0hwHdOQrLSYW8qnpIttZDj6kLvNZ1+jWtDrqe/7dVL3CcIIJzAY3tPfwLumwQN
-         VRehxENjIHec/FYQrm5eoWLeWprvvl+vRhjh455pEv7k4Gz+dPMHHEbbZqWS2IogvHqO
-         xr1Cnr9Nj4AkxM7+qNwKB8hIFybfNOvlT/FY03UWhYkR7LiCkEd2z6qwh8Id7q6SoZQD
-         /0+x01nUnZ4Jzo8Q93fz0whs7NYf5ViFgAR4PzY6WO9kUq/nB5dpJt0H8SJHq3YvjqVq
-         Y/3A==
-X-Gm-Message-State: ACrzQf3pMzryejgt7qoW0JQqR/926VdSQ2IChpYvaV42c42d0rT7tqbH
-        LG7iN1+P3d2rVTV87S3GOoQ21g==
-X-Google-Smtp-Source: AMsMyM5S7b7nFZ2PlRcs8UPcZE5oWqjrYPqMzqX/eLf5/1gT4eLBzzOdYfUXPmu8eE/ZrDy9n/VKEg==
-X-Received: by 2002:a5d:46c1:0:b0:236:6a2f:9e53 with SMTP id g1-20020a5d46c1000000b002366a2f9e53mr12098440wrs.256.1666770096085;
-        Wed, 26 Oct 2022 00:41:36 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id bd14-20020a05600c1f0e00b003b492753826sm1054980wmb.43.2022.10.26.00.41.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 00:41:35 -0700 (PDT)
-Date:   Wed, 26 Oct 2022 09:41:30 +0200
-From:   Corentin LABBE <clabbe@baylibre.com>
-To:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>,
-        herbert@gondor.apana.org.au
-Cc:     ardb@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
-        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v10 00/33] crypto: rockchip: permit to pass self-tests
-Message-ID: <Y1jkqiYjXT30/hk5@Red>
-References: <20220927075511.3147847-1-clabbe@baylibre.com>
- <Y1KctXMZ1+c5uQqd@Red>
- <4780296.31r3eYUQgx@diego>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4780296.31r3eYUQgx@diego>
+        Wed, 26 Oct 2022 05:03:45 -0400
+Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8E698362;
+        Wed, 26 Oct 2022 02:03:43 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VT6gSr0_1666775020;
+Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VT6gSr0_1666775020)
+          by smtp.aliyun-inc.com;
+          Wed, 26 Oct 2022 17:03:41 +0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v3 0/9] Drivers for Alibaba YCC (Yitian Cryptography
+ Complex) cryptographic accelerator
+From:   guanjun <guanjun@linux.alibaba.com>
+In-Reply-To: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
+Date:   Wed, 26 Oct 2022 17:03:39 +0800
+Cc:     "zelin.deng@linux.alibaba.com" <zelin.deng@linux.alibaba.com>,
+        "artie.ding@linux.alibaba.com" <artie.ding@linux.alibaba.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xuchun.shang@linux.alibaba.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <73066E97-4ED2-46DA-BAD5-4F0DFC95C1C5@linux.alibaba.com>
+References: <1666691616-69983-1-git-send-email-guanjun@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au,
+        "Elliott, Robert (Servers)" <elliott@hpe.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Fri, Oct 21, 2022 at 07:09:53PM +0200, Heiko St�bner a �crit :
-> Am Freitag, 21. Oktober 2022, 15:20:53 CEST schrieb Corentin LABBE:
-> > Le Tue, Sep 27, 2022 at 07:54:38AM +0000, Corentin Labbe a �crit :
-> > > Hello
-> > > 
-> > > The rockchip crypto driver is broken and do not pass self-tests.
-> > > This serie's goal is to permit to become usable and pass self-tests.
-> > > 
-> > > This whole serie is tested on a rk3328-rock64, rk3288-miqi and
-> > > rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
-> > > 
-> > > Regards
-> > > 
-> > 
-> > Hello
-> > 
-> > Gentle ping since it is a month since this serie was sent and no comment was made (except some reviewed-by).
-> > So I think it is ready to be merged, probably thought the crypto tree.
+
+
+> 2022年10月25日 下午5:53，Guanjun <guanjun@linux.alibaba.com> 写道：
 > 
-> ideally everything _except_ patches
->  26 +27+28
-> would go through the crypto tree.
+> From: Guanjun <guanjun@linux.alibaba.com>
 > 
-> So if possible I'd like to pick up those (clock + arm64-dts patches)
-> after the crypto people are satisfied with the driver changes.
+> Hi,
 > 
+> This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
+> cryptographic accelerator. Enables the on-chip cryptographic accelerator of
+> Alibaba Yitian SoCs which is based on ARMv9 architecture.
+> 
+> It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
+> 
+> Additionally, this patchset has rebase Linux upstream tree and ensure no compile
+> warnings. -- As Herbert's comments said in v2.
 
-Hello
+Hi Herbert,
 
-I agree with this way.
+Very sorry for this disturb email. For some reasons, I didn’t get your point exactly that you mentioned in v2.
+So I recall this patchset. I will ensure that no compile warnings with sparse turned on before submitting next version.
 
-Herbert any thought ?
+Thanks
+Guanjun
 
-Regards
+> 
+> Please help to review.
+> 
+> Thanks,
+> Guanjun.
+> 
+> Change log:
+> v2 -> v3:
+> - [01/09] Fix the lost "$" in Makefile
+> - [08/09] Fix compile warnings when both CONFIG_CRYPTO_SM2 and CONFIG_CRYPTO_DEV_YCC are enabled
+> 
+> v1 RESEND -> v2:
+> - [01/09] Remove char device that is not used now.
+> 
+> v1 -> v1 RESEND:
+>  - [01/09] Adjust the Kconfig entry in alphabetical order
+>  - [05/09][07/09][08/09] Adjust the format of algorithm names
+> 
+> v2: https://lore.kernel.org/all/1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com/
+> v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
+> v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
+> 
+> 
+> Guanjun (3):
+>  crypto/ycc: Add skcipher algorithm support
+>  crypto/ycc: Add aead algorithm support
+>  crypto/ycc: Add rsa algorithm support
+> 
+> Xuchun Shang (1):
+>  crypto/ycc: Add sm2 algorithm support
+> 
+> Zelin Deng (5):
+>  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+>  crypto/ycc: Add ycc ring configuration
+>  crypto/ycc: Add irq support for ycc kernel rings
+>  crypto/ycc: Add device error handling support for ycc hw errors
+>  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
+>    entry
+> 
+> MAINTAINERS                            |   8 +
+> drivers/crypto/Kconfig                 |   2 +
+> drivers/crypto/Makefile                |   1 +
+> drivers/crypto/ycc/Kconfig             |  18 +
+> drivers/crypto/ycc/Makefile            |   7 +
+> drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
+> drivers/crypto/ycc/sm2signature_asn1.h |  13 +
+> drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
+> drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
+> drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
+> drivers/crypto/ycc/ycc_isr.c           | 279 ++++++++++
+> drivers/crypto/ycc/ycc_isr.h           |  12 +
+> drivers/crypto/ycc/ycc_pke.c           | 946 +++++++++++++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_ring.c          | 652 +++++++++++++++++++++++
+> drivers/crypto/ycc/ycc_ring.h          | 168 ++++++
+> drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
+> 17 files changed, 4615 insertions(+)
+> create mode 100644 drivers/crypto/ycc/Kconfig
+> create mode 100644 drivers/crypto/ycc/Makefile
+> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
+> create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+> create mode 100644 drivers/crypto/ycc/ycc_aead.c
+> create mode 100644 drivers/crypto/ycc/ycc_algs.h
+> create mode 100644 drivers/crypto/ycc/ycc_dev.h
+> create mode 100644 drivers/crypto/ycc/ycc_drv.c
+> create mode 100644 drivers/crypto/ycc/ycc_isr.c
+> create mode 100644 drivers/crypto/ycc/ycc_isr.h
+> create mode 100644 drivers/crypto/ycc/ycc_pke.c
+> create mode 100644 drivers/crypto/ycc/ycc_ring.c
+> create mode 100644 drivers/crypto/ycc/ycc_ring.h
+> create mode 100644 drivers/crypto/ycc/ycc_ske.c
+> 
+> -- 
+> 1.8.3.1
+
