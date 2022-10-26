@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB8FC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Oct 2022 23:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B103CC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Oct 2022 23:26:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbiJZXOf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Oct 2022 19:14:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52042 "EHLO
+        id S234138AbiJZX0y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Oct 2022 19:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiJZXOc (ORCPT
+        with ESMTP id S233987AbiJZX0k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Oct 2022 19:14:32 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A9DB1F;
-        Wed, 26 Oct 2022 16:14:25 -0700 (PDT)
+        Wed, 26 Oct 2022 19:26:40 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1285A8A4;
+        Wed, 26 Oct 2022 16:24:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666826065; x=1698362065;
+  t=1666826663; x=1698362663;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=Teqs67Z3ERA6oqTPNWw78Lyr/6kCzNBljMXfpXmm7l4=;
-  b=TIgwYo26XoZ2OOceidpIcGlw3Bhqu449KWQDUWHnUIfgnzypVIEZR9QT
-   810dlaBKgzy8mbqVa32dpQsxnTytjBWhmOn4WgXcWMu7inMj6x31uQjLD
-   71qWu2kdRz2EODWQw3TtDN52g5AN3jMqCfBt29gQhscPLtYR1am1iwxux
-   Wvl9zd31NlmgcETSdaH/U1+gqTspgUMwpGtVV85LQJ0DfGTgvUWkzUMBD
-   GjiQ++RHN8sGBLzVK3sSO31xlUFaVlTISZbiZTbh4E+037CrxgnYEcRs3
-   4kzs+iwWYEjSZKAgHA7r4gq/xh8f3Mhba4skx5bZNdJRrbt7hZf5PKOcl
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="305697011"
+  bh=arQWAcTmgvq63yxeS0uBuI3kCbZ9aukkDZfmd4KGEDw=;
+  b=NMM6fOK3ein4cTbfWK+WulLPmJqoOOhxr6v5OyMaAQcpHdXMIjxM0wM/
+   oKjPHLDCBulOWrQBZca7zUnA1aFC/Wtcg26Uv3yRvSXHrbXXWeI4G8zn6
+   LZ0xaHktF5J9+ebdlCX24H7dnyGDuIMegze5m2t6UuU4oqj5nusZAUzIO
+   lV+c+JoLzTjcMKj4s5ENL4aCFaHL8cpFc9KgcLHuesL+8EJviAGNjCaoK
+   k9KEwmayH5+IyTpyQMSp+QMcLR2x5wGP+L1HQEQa5aSxmKDyd2Hq3vNtW
+   LxMbtaHxc+vssz+wfBpA+1U78sVE1ARWDOZ55riHm48HPRoveGAnD5SEO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="308078633"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="305697011"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:14:24 -0700
+   d="scan'208";a="308078633"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:24:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="583337815"
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="961411607"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="583337815"
+   d="scan'208";a="961411607"
 Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 26 Oct 2022 16:14:20 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 26 Oct 2022 16:24:20 -0700
 Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1onpbH-0007yO-2q;
-        Wed, 26 Oct 2022 23:14:19 +0000
-Date:   Thu, 27 Oct 2022 07:13:45 +0800
+        id 1onpky-0007yq-0P;
+        Wed, 26 Oct 2022 23:24:20 +0000
+Date:   Thu, 27 Oct 2022 07:23:51 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     'Guanjun' <guanjun@linux.alibaba.com>, herbert@gondor.apana.org.au,
         elliott@hpe.com
@@ -51,36 +51,36 @@ Cc:     oe-kbuild-all@lists.linux.dev, zelin.deng@linux.alibaba.com,
         artie.ding@linux.alibaba.com, guanjun@linux.alibaba.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         xuchun.shang@linux.alibaba.com
-Subject: Re: [PATCH v3 6/9] crypto/ycc: Add aead algorithm support
-Message-ID: <202210270700.kKTwVLWy-lkp@intel.com>
-References: <1666691616-69983-7-git-send-email-guanjun@linux.alibaba.com>
+Subject: Re: [PATCH v3 8/9] crypto/ycc: Add sm2 algorithm support
+Message-ID: <202210270717.Q41s39IU-lkp@intel.com>
+References: <1666691616-69983-9-git-send-email-guanjun@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="QCWcPjRB//y5MKTb"
+Content-Type: multipart/mixed; boundary="nEHW480F0zDk0UWK"
 Content-Disposition: inline
-In-Reply-To: <1666691616-69983-7-git-send-email-guanjun@linux.alibaba.com>
+In-Reply-To: <1666691616-69983-9-git-send-email-guanjun@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---QCWcPjRB//y5MKTb
+--nEHW480F0zDk0UWK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 Hi 'Guanjun',
 
-Thank you for the patch! Perhaps something to improve:
+Thank you for the patch! Yet something to improve:
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.1-rc2 next-20221026]
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.1-rc2 next-20221026]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221025-180005
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/1666691616-69983-7-git-send-email-guanjun%40linux.alibaba.com
-patch subject: [PATCH v3 6/9] crypto/ycc: Add aead algorithm support
+patch link:    https://lore.kernel.org/r/1666691616-69983-9-git-send-email-guanjun%40linux.alibaba.com
+patch subject: [PATCH v3 8/9] crypto/ycc: Add sm2 algorithm support
 config: csky-randconfig-s033-20221026
 compiler: csky-linux-gcc (GCC) 12.1.0
 reproduce:
@@ -88,131 +88,26 @@ reproduce:
         chmod +x ~/bin/make.cross
         # apt-get install sparse
         # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/04c66693149fbf08645a6f86656cf27c07ab1cd0
+        # https://github.com/intel-lab-lkp/linux/commit/ee2cc8ab8fc1a832e55588b81520beeee39647a3
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221025-180005
-        git checkout 04c66693149fbf08645a6f86656cf27c07ab1cd0
+        git checkout ee2cc8ab8fc1a832e55588b81520beeee39647a3
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=csky SHELL=/bin/bash drivers/crypto/ycc/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=csky SHELL=/bin/bash
 
 If you fix the issue, kindly add following tag where applicable
 | Reported-by: kernel test robot <lkp@intel.com>
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/ycc/ycc_aead.c:440:38: sparse: sparse: non size-preserving pointer to integer cast
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-vim +440 drivers/crypto/ycc/ycc_aead.c
-
-   368	
-   369	static int ycc_aead_submit_desc(struct aead_request *aead_req, u8 cmd)
-   370	{
-   371		struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
-   372		struct ycc_crypto_ctx *ctx = crypto_aead_ctx(tfm);
-   373		struct ycc_crypto_req *req = aead_request_ctx(aead_req);
-   374		struct ycc_flags *aflags;
-   375		int taglen = crypto_aead_authsize(tfm);
-   376		u16 new_aad_len;
-   377		u32 new_cryptlen;
-   378		struct crypto_aes_ctx aes_ctx;
-   379		u8 tag[16];
-   380		u8 ziv[16] = {0};
-   381		__be32 counter = cpu_to_be32(1);
-   382		int ret = 0;
-   383	
-   384		/*
-   385		 * YCC hw does not support gcm zero length plaintext. According to spec
-   386		 * if cryptlen is 0, just do aes_encrypt against IV
-   387		 */
-   388		if (aead_req->cryptlen == 0 && cmd == YCC_CMD_GCM_ENC) {
-   389			ret = aes_expandkey(&aes_ctx, ctx->cipher_key, ctx->keysize);
-   390			if (ret)
-   391				return ret;
-   392			memcpy(ziv, aead_req->iv, 12);
-   393			memcpy(ziv + 12, &counter, 4);
-   394			aes_encrypt(&aes_ctx, tag, ziv);
-   395			sg_copy_from_buffer(aead_req->dst,
-   396					    sg_nents_for_len(aead_req->dst, taglen),
-   397					    tag, taglen);
-   398			return 0;
-   399		}
-   400	
-   401		if (aead_req->cryptlen == taglen && cmd == YCC_CMD_GCM_DEC) {
-   402			ret = aes_expandkey(&aes_ctx, ctx->cipher_key, ctx->keysize);
-   403			if (ret)
-   404				return ret;
-   405			/* Skip aad */
-   406			sg_copy_buffer(aead_req->src,
-   407				       sg_nents_for_len(aead_req->src, taglen),
-   408				       tag, taglen, aead_req->assoclen, 1);
-   409			aes_decrypt(&aes_ctx, ziv, tag);
-   410			sg_copy_from_buffer(aead_req->dst,
-   411					    sg_nents_for_len(aead_req->dst, taglen),
-   412					    ziv, taglen);
-   413			return 0;
-   414		}
-   415	
-   416		memset(req, 0, sizeof(*req));
-   417		req->ctx = ctx;
-   418		req->aead_req = aead_req;
-   419	
-   420		ret = ycc_aead_fill_key(req);
-   421		if (ret)
-   422			return ret;
-   423	
-   424		req->src_vaddr = ycc_aead_format_data(req, &new_aad_len, &new_cryptlen, cmd);
-   425		if (!req->src_vaddr)
-   426			goto free_key;
-   427	
-   428		ret = ycc_aead_sg_map(req);
-   429		if (ret)
-   430			goto unformat;
-   431	
-   432		ret = -ENOMEM;
-   433		aflags = kzalloc(sizeof(struct ycc_flags), GFP_ATOMIC);
-   434		if (!aflags)
-   435			goto sg_unmap;
-   436	
-   437		memset(&req->desc.cmd, 0, sizeof(union ycc_real_cmd));
-   438		aflags->ptr = (void *)req;
-   439		aflags->ycc_done_callback = ycc_aead_callback;
- > 440		req->desc.private_ptr = (u64)aflags;
-   441		req->desc.cmd.aead_cmd.cmd_id = cmd;
-   442		req->desc.cmd.aead_cmd.mode = ctx->mode;
-   443		req->desc.cmd.aead_cmd.sptr = req->src_paddr;
-   444		req->desc.cmd.aead_cmd.dptr = req->dst_paddr;
-   445		if (cmd == YCC_CMD_GCM_DEC || cmd == YCC_CMD_CCM_DEC)
-   446			new_cryptlen = aead_req->cryptlen - taglen;
-   447		req->desc.cmd.aead_cmd.dlen = new_cryptlen;
-   448		req->desc.cmd.aead_cmd.keyptr = req->key_paddr;
-   449		req->desc.cmd.aead_cmd.aadlen = new_aad_len;
-   450		req->desc.cmd.aead_cmd.taglen = taglen;
-   451	
-   452		/* 4. submit desc to cmd queue */
-   453		ret = ycc_enqueue(ctx->ring, &req->desc);
-   454		if (!ret)
-   455			return -EINPROGRESS;
-   456	
-   457		pr_err("Failed to submit desc to ring\n");
-   458		kfree(aflags);
-   459	
-   460	sg_unmap:
-   461		ycc_aead_sg_unmap(req);
-   462	unformat:
-   463		ycc_aead_unformat_data(req);
-   464	free_key:
-   465		memset(req->key_vaddr, 0, 64);
-   466		dma_free_coherent(YCC_DEV(ctx), 64, req->key_vaddr, req->key_paddr);
-   467		req->key_vaddr = NULL;
-   468		return ret;
-   469	}
-   470	
+>> ERROR: modpost: "sm2signature_decoder" [drivers/crypto/ycc/ycc.ko] undefined!
 
 -- 
 0-DAY CI Kernel Test Service
 https://01.org/lkp
 
---QCWcPjRB//y5MKTb
+--nEHW480F0zDk0UWK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: attachment; filename=config
 
@@ -6270,7 +6165,7 @@ CONFIG_TEST_BITMAP=y
 CONFIG_TEST_UUID=y
 CONFIG_TEST_XARRAY=y
 # CONFIG_TEST_RHASHTABLE is not set
-CONFIG_TEST_SIPHASH=m
+# CONFIG_TEST_SIPHASH is not set
 CONFIG_TEST_IDA=m
 CONFIG_TEST_PARMAN=m
 CONFIG_TEST_LKM=m
@@ -6290,4 +6185,4 @@ CONFIG_TEST_FREE_PAGES=y
 CONFIG_WARN_ABI_ERRORS=y
 # end of Kernel hacking
 
---QCWcPjRB//y5MKTb--
+--nEHW480F0zDk0UWK--
