@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3708BFA3743
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5E3FA3740
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:48:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236591AbiJ0Urf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Oct 2022 16:47:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39058 "EHLO
+        id S237027AbiJ0UsD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Oct 2022 16:48:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236613AbiJ0UqF (ORCPT
+        with ESMTP id S236795AbiJ0Uq4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:46:05 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB5759410B
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:16 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id g12so4146418wrs.10
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:16 -0700 (PDT)
+        Thu, 27 Oct 2022 16:46:56 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F62B95AE1
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:21 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id v130-20020a1cac88000000b003bcde03bd44so5030854wme.5
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZzygEftNO9uBdJknMQ3dhxwVGxhJy8qR9pjIa567u0c=;
-        b=JNp/w2XJApiAeK7vMWWUdv/UbmD0LTMBL6M3w9fA0WXnyA4Mm0lRgekv/8jYJ7p18y
-         FvKDHoXPmWN+OVGkg//1cKy66LggGeimv6xdNszL0KxKsucAQKuHeJjLBGXUL3v9znd5
-         RflDxQ9X55gcRckyft1/q9jIPHmT+ukquplV66tVgvD5uCFmxFM8AczKuwKHM0MWDZOK
-         xw8oCc/2Nony+P0EX50yxoSic3Ocwt5Rj36w8V3lorICqgx3Id5GarxbtnyS4Q1V0oMm
-         nhpuneU7l6C9juebD1jjKANYgVAGYT6KAlmQcUbGnEkoXfGo+hiP4FpXIbob044VZUbZ
-         5+oQ==
+        bh=gvBXVhpcez3XO6Nwqh+zOqiYrLDIacbTKCXk4BjRv5s=;
+        b=Z8PpdAqqLG+AGpd66BAet9X6Fv80W/8P937UE8S+yQNaeJMuJrIi1kPg5bS2RI1OPD
+         09AvAHVlARgtYke5uCesAim0uJbWxSBWRw+o2hBejZh/MFJ+kV29R96EuEON/1+bYZtT
+         wji29Zh36zeZU4dXFtF4OWAB9o89wezEVDNn8nZhDxgPsVCXL6CNA8NFWoTnnPR+LxZi
+         Y9V01B8k0vNg4H3HBGoYHSwATqESwLRojHSR6XB021D05rF/5bQdB/n0DbPxKt4f6je4
+         AKOESphu0YkETf1SZAN10+18mSdzqCN7Yxox5Vc1jGkUZ/XQM89w92fjojjzeHBUvH+k
+         5/HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZzygEftNO9uBdJknMQ3dhxwVGxhJy8qR9pjIa567u0c=;
-        b=zoZpkUM9Ma6XvBox0fhu7wpadGa+aev6H+Ugvtabj/Rg87gdMooSlR8yduB1pu9UB6
-         a/MY1p22g1tRR99f3MMrzdXP+URsiudz2Ix3XrrsQE9fQhgl7iE27xTqbflbkeCY2pQM
-         2Me0CGXPWE1PXwndobSsA+f6IK64kH5GAJmj1oiSV1zkzDUglOnCgXwK051G9Vvo4nic
-         5R+MtLSPpWcsiIII9d6T8aBof/U6GAsZ0vp8bIYwOxMkV4Gwp7d8T3xeRffSgAMISlyy
-         oS/pE7AbPqJEiHdvLxcURW1qHBhHsutfXtEzOU26KVRXGeUZSOFloMlMhCvifG8DFxpH
-         LXBg==
-X-Gm-Message-State: ACrzQf2hvrJxMJHLKszcZwytWGar5xmMG9PLGsLR1GQq6SAw65uVtame
-        sXNQAHWe9skBN92+5aRl7Z5Lkw==
-X-Google-Smtp-Source: AMsMyM48M1KauTSA3pgUBI4zJ/+sM//1uN+9fzykaMfEh2Fs0cBjL5jpdnCtCEKsDft3DVUxuq6R5Q==
-X-Received: by 2002:a05:6000:184:b0:236:7685:7e6d with SMTP id p4-20020a056000018400b0023676857e6dmr13904166wrx.305.1666903456416;
-        Thu, 27 Oct 2022 13:44:16 -0700 (PDT)
+        bh=gvBXVhpcez3XO6Nwqh+zOqiYrLDIacbTKCXk4BjRv5s=;
+        b=q5cUadX+DyomDL21XOXmyglKRYYwa9Ey071gcPYUGxAhTPFSHmekrM2Zne/g48eq+n
+         wzxsLN282wrG34KJ38RUoDI7xBH75NA3TJBWxGaK5sWCDZkgeTJsG89qG5q7eqX9O6pP
+         bdipD2QonYjqlM2BXTNa4b30GP3FtWx9/QtE2PDHI+pWvMbzdpjvTHhRWifGE8rkzeZV
+         oSBD6AvtVguSyiV3trEAxp2AcKojsNOwq8mFpSgRd7YNUoiG2u2UXf4rEjj9WDnrF9n+
+         oUzqoYuvZ089lwFG5YpsYMyvTTabhRh5hHkefAv2HPzUWFFya/NUYq1KstwydFtYPflz
+         P9rA==
+X-Gm-Message-State: ACrzQf2fLRTGq0bS1ce19SogYuU0LOwGUz8MkL/lIyH2qKuSSog7eDqi
+        Uv3/jCSb9wGZIdBgUyLIMAIFxA==
+X-Google-Smtp-Source: AMsMyM7vEz5hsLAmtl7hI8821p0XsCoWUDY9fREyn9UuivLByQo+kHXLcj59zWAkmK9Ml3k2eekqTA==
+X-Received: by 2002:a05:600c:1e2a:b0:3c8:353b:253f with SMTP id ay42-20020a05600c1e2a00b003c8353b253fmr7307325wmb.51.1666903459436;
+        Thu, 27 Oct 2022 13:44:19 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.15
+        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 13:44:15 -0700 (PDT)
+        Thu, 27 Oct 2022 13:44:19 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -72,9 +72,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 14/36] net/tcp: Add TCP-AO sign to twsk
-Date:   Thu, 27 Oct 2022 21:43:25 +0100
-Message-Id: <20221027204347.529913-15-dima@arista.com>
+Subject: [PATCH v3 16/36] net/tcp: Sign SYN-ACK segments with TCP-AO
+Date:   Thu, 27 Oct 2022 21:43:27 +0100
+Message-Id: <20221027204347.529913-17-dima@arista.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221027204347.529913-1-dima@arista.com>
 References: <20221027204347.529913-1-dima@arista.com>
@@ -84,11 +84,9 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for sockets in time-wait state.
-ao_info as well as all keys are inherited on transition to time-wait
-socket. The lifetime of ao_info is now protected by ref counter, so
-that tcp_ao_destroy_sock() will destruct it only when the last user is
-gone.
+Similarly to RST segments, wire SYN-ACKs to TCP-AO.
+tcp_rsk_used_ao() is handy here to check if the request socket used AO
+and needs a signature on the outgoing segments.
 
 Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
 Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
@@ -96,407 +94,200 @@ Co-developed-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/linux/tcp.h      |  3 ++
- include/net/tcp_ao.h     | 11 +++++--
- net/ipv4/tcp_ao.c        | 47 ++++++++++++++++++++++----
- net/ipv4/tcp_ipv4.c      | 71 ++++++++++++++++++++++++++++++++++++----
- net/ipv4/tcp_minisocks.c |  4 ++-
- net/ipv6/tcp_ipv6.c      | 45 ++++++++++++++++++++++---
- 6 files changed, 159 insertions(+), 22 deletions(-)
+ include/net/tcp.h     |  4 ++++
+ include/net/tcp_ao.h  |  6 ++++++
+ net/ipv4/tcp_ao.c     | 14 ++++++++++++++
+ net/ipv4/tcp_ipv4.c   |  1 +
+ net/ipv4/tcp_output.c | 37 +++++++++++++++++++++++++++++++------
+ net/ipv6/tcp_ao.c     | 14 ++++++++++++++
+ net/ipv6/tcp_ipv6.c   |  1 +
+ 7 files changed, 71 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index fd248875b0a9..6630a8195ea6 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -497,6 +497,9 @@ struct tcp_timewait_sock {
- #ifdef CONFIG_TCP_MD5SIG
- 	struct tcp_md5sig_key	  *tw_md5_key;
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index bda03d4925ed..5855ca6f1437 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2119,6 +2119,10 @@ struct tcp_request_sock_ops {
+ 					       int sndid, int rcvid);
+ 	int			(*ao_calc_key)(struct tcp_ao_key *mkt, u8 *key,
+ 						struct request_sock *sk);
++	int		(*ao_synack_hash)(char *ao_hash, struct tcp_ao_key *mkt,
++					  struct request_sock *req,
++					  const struct sk_buff *skb,
++					  int hash_offset, u32 sne);
  #endif
-+#ifdef CONFIG_TCP_AO
-+	struct tcp_ao_info	  *ao_info;
-+#endif
- };
- 
- static inline struct tcp_timewait_sock *tcp_twsk(const struct sock *sk)
+ #ifdef CONFIG_SYN_COOKIES
+ 	__u32 (*cookie_init_seq)(const struct sk_buff *skb,
 diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index d359fbf89da8..9804881fd2bf 100644
+index e93db866bd44..731f0d6263db 100644
 --- a/include/net/tcp_ao.h
 +++ b/include/net/tcp_ao.h
-@@ -85,6 +85,7 @@ struct tcp_ao_info {
- 	u32			snd_sne_seq;
- 	u32			rcv_sne;
- 	u32			rcv_sne_seq;
-+	atomic_t		refcnt;		/* Protects twsk destruction */
- };
- 
- #ifdef CONFIG_TCP_AO
-@@ -117,8 +118,9 @@ int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
- struct tcp_ao_key *tcp_ao_do_lookup_sndid(const struct sock *sk, u8 keyid);
- int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
- 			    unsigned int len);
--void tcp_ao_destroy_sock(struct sock *sk);
-+void tcp_ao_destroy_sock(struct sock *sk, bool twsk);
- u32 tcp_ao_compute_sne(u32 sne, u32 seq, u32 new_seq);
-+void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp);
- int tcp_ao_cache_traffic_keys(const struct sock *sk, struct tcp_ao_info *ao,
- 			      struct tcp_ao_key *ao_key);
- struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
-@@ -169,7 +171,7 @@ static inline struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
- 	return NULL;
- }
- 
--static inline void tcp_ao_destroy_sock(struct sock *sk)
-+static inline void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
- {
- }
- 
-@@ -177,6 +179,11 @@ static inline void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb)
- {
- }
- 
-+static inline void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw,
-+				    struct tcp_sock *tp)
-+{
-+}
-+
- static inline void tcp_ao_connect_init(struct sock *sk)
- {
- }
+@@ -139,6 +139,9 @@ int tcp_ao_hash_hdr(unsigned short family, char *ao_hash,
+ int tcp_v4_parse_ao(struct sock *sk, int optname, sockptr_t optval, int optlen);
+ struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
+ 				    int sndid, int rcvid);
++int tcp_v4_ao_synack_hash(char *ao_hash, struct tcp_ao_key *mkt,
++			  struct request_sock *req, const struct sk_buff *skb,
++			  int hash_offset, u32 sne);
+ int tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
+ 			  const struct sock *sk,
+ 			  __be32 sisn, __be32 disn, bool send);
+@@ -173,6 +176,9 @@ int tcp_v6_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
+ 		       const u8 *tkey, int hash_offset, u32 sne);
+ int tcp_v6_parse_ao(struct sock *sk, int cmd,
+ 		    sockptr_t optval, int optlen);
++int tcp_v6_ao_synack_hash(char *ao_hash, struct tcp_ao_key *ao_key,
++			  struct request_sock *req, const struct sk_buff *skb,
++			  int hash_offset, u32 sne);
+ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb);
+ void tcp_ao_connect_init(struct sock *sk);
+ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
 diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index e20e3b435ce1..09d5cee7c6d7 100644
+index c9d3e29a28f1..e24a90505f08 100644
 --- a/net/ipv4/tcp_ao.c
 +++ b/net/ipv4/tcp_ao.c
-@@ -75,8 +75,13 @@ struct tcp_ao_key *tcp_ao_do_lookup_sndid(const struct sock *sk, u8 keyid)
- 	struct tcp_ao_key *key;
- 	struct tcp_ao_info *ao;
- 
--	ao = rcu_dereference_check(tcp_sk(sk)->ao_info,
--				   lockdep_sock_is_held(sk));
-+	if (sk->sk_state == TCP_TIME_WAIT)
-+		ao = rcu_dereference_check(tcp_twsk(sk)->ao_info,
-+					   lockdep_sock_is_held(sk));
-+	else
-+		ao = rcu_dereference_check(tcp_sk(sk)->ao_info,
-+					   lockdep_sock_is_held(sk));
-+
- 	if (!ao)
- 		return NULL;
- 
-@@ -177,6 +182,7 @@ static struct tcp_ao_info *tcp_ao_alloc_info(gfp_t flags,
- 	if (!ao)
- 		return NULL;
- 	INIT_HLIST_HEAD(&ao->head);
-+	atomic_set(&ao->refcnt, 1);
- 
- 	if (cloned_from)
- 		ao->ao_flags = cloned_from->ao_flags;
-@@ -196,27 +202,54 @@ static void tcp_ao_key_free_rcu(struct rcu_head *head)
- 	kfree(key);
+@@ -604,6 +604,20 @@ int tcp_v4_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
+ 			       tkey, hash_offset, sne);
  }
  
--void tcp_ao_destroy_sock(struct sock *sk)
-+void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
- {
- 	struct tcp_ao_info *ao;
- 	struct tcp_ao_key *key;
- 	struct hlist_node *n;
- 
--	ao = rcu_dereference_protected(tcp_sk(sk)->ao_info, 1);
--	tcp_sk(sk)->ao_info = NULL;
-+	if (twsk) {
-+		ao = rcu_dereference_protected(tcp_twsk(sk)->ao_info, 1);
-+		tcp_twsk(sk)->ao_info = NULL;
-+	} else {
-+		ao = rcu_dereference_protected(tcp_sk(sk)->ao_info, 1);
-+		tcp_sk(sk)->ao_info = NULL;
-+	}
- 
--	if (!ao)
-+	if (!ao || !atomic_dec_and_test(&ao->refcnt))
- 		return;
- 
- 	hlist_for_each_entry_safe(key, n, &ao->head, node) {
- 		hlist_del_rcu(&key->node);
--		atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
-+		if (!twsk)
-+			atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
- 		call_rcu(&key->rcu, tcp_ao_key_free_rcu);
- 	}
- 
- 	kfree_rcu(ao, rcu);
- }
- 
-+void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp)
++int tcp_v4_ao_synack_hash(char *ao_hash, struct tcp_ao_key *ao_key,
++			  struct request_sock *req, const struct sk_buff *skb,
++			  int hash_offset, u32 sne)
 +{
-+	struct tcp_ao_info *ao_info = rcu_dereference_protected(tp->ao_info, 1);
++	char traffic_key[TCP_AO_MAX_HASH_SIZE] __tcp_ao_key_align;
 +
-+	if (ao_info) {
-+		struct tcp_ao_key *key;
-+		struct hlist_node *n;
-+		int omem = 0;
++	tcp_v4_ao_calc_key_rsk(ao_key, traffic_key, req);
 +
-+		hlist_for_each_entry_safe(key, n, &ao_info->head, node) {
-+			omem += tcp_ao_sizeof_key(key);
-+		}
++	tcp_ao_hash_skb(AF_INET, ao_hash, ao_key, req_to_sk(req), skb,
++			traffic_key, hash_offset, sne);
 +
-+		atomic_inc(&ao_info->refcnt);
-+		atomic_sub(omem, &(((struct sock *)tp)->sk_omem_alloc));
-+		rcu_assign_pointer(tcptw->ao_info, ao_info);
-+	} else {
-+		tcptw->ao_info = NULL;
-+	}
++	return 0;
 +}
 +
- /* 4 tuple and ISNs are expected in NBO */
- static int tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
- 			      __be32 saddr, __be32 daddr,
+ struct tcp_ao_key *tcp_v4_ao_lookup_rsk(const struct sock *sk,
+ 					struct request_sock *req,
+ 					int sndid, int rcvid)
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index b76933bb073e..fcf61b5bc581 100644
+index 47325f148f29..37f344e2ae6b 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
-@@ -823,7 +823,10 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
- 			struct tcp_ao_info *ao_info;
- 			u8 keyid;
- 
--			ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
-+			if (sk->sk_state == TCP_TIME_WAIT)
-+				ao_info = rcu_dereference(tcp_twsk(sk)->ao_info);
-+			else
-+				ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
- 
- 			/* XXX: optimize by using cached traffic key depending
- 			 * on socket state
-@@ -926,16 +929,16 @@ static void tcp_v4_send_ack(const struct sock *sk,
- 			    struct sk_buff *skb, u32 seq, u32 ack,
- 			    u32 win, u32 tsval, u32 tsecr, int oif,
- 			    struct tcp_md5sig_key *key,
-+			    struct tcp_ao_key *ao_key,
-+			    u8 *traffic_key,
-+			    u8 rcv_next,
-+			    u32 ao_sne,
- 			    int reply_flags, u8 tos)
- {
- 	const struct tcphdr *th = tcp_hdr(skb);
- 	struct {
- 		struct tcphdr th;
--		__be32 opt[(TCPOLEN_TSTAMP_ALIGNED >> 2)
--#ifdef CONFIG_TCP_MD5SIG
--			   + (TCPOLEN_MD5SIG_ALIGNED >> 2)
--#endif
--			];
-+		__be32 opt[(MAX_TCP_OPTION_SPACE  >> 2)];
- 	} rep;
- 	struct net *net = sock_net(sk);
- 	struct ip_reply_arg arg;
-@@ -981,6 +984,25 @@ static void tcp_v4_send_ack(const struct sock *sk,
- 				    ip_hdr(skb)->daddr, &rep.th);
- 	}
+@@ -1678,6 +1678,7 @@ const struct tcp_request_sock_ops tcp_request_sock_ipv4_ops = {
+ #ifdef CONFIG_TCP_AO
+ 	.ao_lookup	=	tcp_v4_ao_lookup_rsk,
+ 	.ao_calc_key	=	tcp_v4_ao_calc_key_rsk,
++	.ao_synack_hash	=	tcp_v4_ao_synack_hash,
  #endif
-+#ifdef CONFIG_TCP_AO
-+	if (ao_key) {
-+		int offset = (tsecr) ? 3 : 0;
-+
-+		rep.opt[offset++] = htonl((TCPOPT_AO << 24) |
-+					  (tcp_ao_len(ao_key) << 16) |
-+					  (ao_key->sndid << 8) | rcv_next);
-+		arg.iov[0].iov_len += round_up(tcp_ao_len(ao_key), 4);
-+		rep.th.doff = arg.iov[0].iov_len / 4;
-+
-+		tcp_ao_hash_hdr(AF_INET, (char *)&rep.opt[offset],
-+				ao_key, traffic_key,
-+				(union tcp_ao_addr *)&ip_hdr(skb)->saddr,
-+				(union tcp_ao_addr *)&ip_hdr(skb)->daddr,
-+				&rep.th, ao_sne);
-+	}
-+	WARN_ON_ONCE(key && ao_key);
-+#endif
-+	/* XXX: TCP-AO: hash ACK header */
- 	arg.flags = reply_flags;
- 	arg.csum = csum_tcpudp_nofold(ip_hdr(skb)->daddr,
- 				      ip_hdr(skb)->saddr, /* XXX */
-@@ -1014,6 +1036,36 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
- {
- 	struct inet_timewait_sock *tw = inet_twsk(sk);
- 	struct tcp_timewait_sock *tcptw = tcp_twsk(sk);
+ #ifdef CONFIG_SYN_COOKIES
+ 	.cookie_init_seq =	cookie_v4_init_sequence,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 758c4a6e851b..3a121d9cd6dd 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3637,6 +3637,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 	struct inet_request_sock *ireq = inet_rsk(req);
+ 	const struct tcp_sock *tp = tcp_sk(sk);
+ 	struct tcp_md5sig_key *md5 = NULL;
 +	struct tcp_ao_key *ao_key = NULL;
-+	u8 *traffic_key = NULL;
-+	u8 rcv_next = 0;
-+	u32 ao_sne = 0;
+ 	struct tcp_out_options opts;
+ 	struct sk_buff *skb;
+ 	int tcp_header_size;
+@@ -3687,16 +3688,32 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 			tcp_rsk(req)->snt_synack = tcp_skb_timestamp_us(skb);
+ 	}
+ 
+-#ifdef CONFIG_TCP_MD5SIG
++#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+ 	rcu_read_lock();
+-	md5 = tcp_rsk(req)->af_specific->req_md5_lookup(sk, req_to_sk(req));
+ #endif
++	if (tcp_rsk_used_ao(req)) {
 +#ifdef CONFIG_TCP_AO
-+	struct tcp_ao_info *ao_info = NULL;
-+	const struct tcp_ao_hdr *aoh;
-+#endif
-+
-+#ifdef CONFIG_TCP_AO
-+	if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
-+		goto out; /* something is wrong with the sign */
-+
-+	/* FIXME: we haven't verified the segment to-be-acked */
-+	if (aoh)
-+		ao_key = tcp_ao_do_lookup_sndid(sk, aoh->rnext_keyid);
-+
-+	if (ao_key) {
-+		traffic_key = snd_other_key(ao_key);
-+		ao_info = rcu_dereference(tcptw->ao_info);
-+		/* It's possible we can get rid of computing the sne
-+		 * below since sne probably doesn't change once we are
-+		 * in timewait state.
++		/* TODO: what should we do if the key is no longer available on
++		 * the listening socket? Maybe we can try a different matching
++		 * key (without sndid match). If that also fails what should
++		 * we do? We currently send an unsigned synack. It's probably
++		 * better to not send anything.
 +		 */
-+		ao_sne = tcp_ao_compute_sne(ao_info->snd_sne,
-+					    ao_info->snd_sne_seq,
-+					    tcptw->tw_snd_nxt);
-+		rcv_next = ao_info->rnext_key->rcvid;
++		ao_key = tcp_sk(sk)->af_specific->ao_lookup(sk, req_to_sk(req),
++						    tcp_rsk(req)->ao_keyid, -1);
++#endif
++	} else {
++#ifdef CONFIG_TCP_MD5SIG
++		md5 = tcp_rsk(req)->af_specific->req_md5_lookup(sk,
++								req_to_sk(req));
++#endif
 +	}
+ 	skb_set_hash(skb, tcp_rsk(req)->txhash, PKT_HASH_TYPE_L4);
+ 	/* bpf program will be interested in the tcp_flags */
+ 	TCP_SKB_CB(skb)->tcp_flags = TCPHDR_SYN | TCPHDR_ACK;
+ 	tcp_header_size = tcp_synack_options(sk, req, mss, skb, &opts, md5,
+-					     NULL, foc, synack_type,
+-					     syn_skb) + sizeof(*th);
++					     ao_key, foc, synack_type, syn_skb)
++					+ sizeof(*th);
+ 
+ 	skb_push(skb, tcp_header_size);
+ 	skb_reset_transport_header(skb);
+@@ -3716,7 +3733,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 
+ 	/* RFC1323: The window in SYN & SYN/ACK segments is never scaled. */
+ 	th->window = htons(min(req->rsk_rcv_wnd, 65535U));
+-	tcp_options_write(th, NULL, NULL, &opts, NULL);
++	tcp_options_write(th, NULL, tcp_rsk(req), &opts, NULL);
+ 	th->doff = (tcp_header_size >> 2);
+ 	__TCP_INC_STATS(sock_net(sk), TCP_MIB_OUTSEGS);
+ 
+@@ -3724,7 +3741,15 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 	/* Okay, we have all we need - do the md5 hash if needed */
+ 	if (md5)
+ 		tcp_rsk(req)->af_specific->calc_md5_hash(opts.hash_location,
+-					       md5, req_to_sk(req), skb);
++					md5, req_to_sk(req), skb);
 +#endif
- 
- 	tcp_v4_send_ack(sk, skb,
- 			tcptw->tw_snd_nxt, tcptw->tw_rcv_nxt,
-@@ -1022,10 +1074,14 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
- 			tcptw->tw_ts_recent,
- 			tw->tw_bound_dev_if,
- 			tcp_twsk_md5_key(tcptw),
-+			ao_key, traffic_key, rcv_next, ao_sne,
- 			tw->tw_transparent ? IP_REPLY_ARG_NOSRCCHECK : 0,
- 			tw->tw_tos
- 			);
- 
 +#ifdef CONFIG_TCP_AO
-+out:
++	if (ao_key)
++		tcp_rsk(req)->af_specific->ao_synack_hash(opts.hash_location,
++					ao_key, req, skb,
++					opts.hash_location - (u8 *)th, 0);
 +#endif
- 	inet_twsk_put(tw);
- }
- 
-@@ -1055,6 +1111,7 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 			req->ts_recent,
- 			0,
- 			tcp_md5_do_lookup(sk, l3index, addr, AF_INET),
-+			NULL, NULL, 0, 0,
- 			inet_rsk(req)->no_srccheck ? IP_REPLY_ARG_NOSRCCHECK : 0,
- 			ip_hdr(skb)->tos);
- }
-@@ -2400,7 +2457,7 @@ void tcp_v4_destroy_sock(struct sock *sk)
- 		rcu_assign_pointer(tp->md5sig_info, NULL);
- 	}
++#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+ 	rcu_read_unlock();
  #endif
--	tcp_ao_destroy_sock(sk);
-+	tcp_ao_destroy_sock(sk, false);
  
- 	/* Clean up a referenced TCP bind bucket. */
- 	if (inet_csk(sk)->icsk_bind_hash)
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index f7a75dce140b..87cf3073b6c2 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -246,7 +246,7 @@ EXPORT_SYMBOL(tcp_timewait_state_process);
- void tcp_time_wait(struct sock *sk, int state, int timeo)
+diff --git a/net/ipv6/tcp_ao.c b/net/ipv6/tcp_ao.c
+index 31ae504af8e6..526bbe232a64 100644
+--- a/net/ipv6/tcp_ao.c
++++ b/net/ipv6/tcp_ao.c
+@@ -123,3 +123,17 @@ int tcp_v6_parse_ao(struct sock *sk, int cmd,
  {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
--	const struct tcp_sock *tp = tcp_sk(sk);
-+	struct tcp_sock *tp = tcp_sk(sk);
- 	struct net *net = sock_net(sk);
- 	struct inet_timewait_sock *tw;
- 
-@@ -305,6 +305,7 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- 			}
- 		} while (0);
- #endif
-+		tcp_ao_time_wait(tcptw, tp);
- 
- 		/* Get the TIME_WAIT timeout firing. */
- 		if (timeo < rto)
-@@ -359,6 +360,7 @@ void tcp_twsk_destructor(struct sock *sk)
- 			call_rcu(&twsk->tw_md5_key->rcu, tcp_md5_twsk_free_rcu);
- 	}
- #endif
-+	tcp_ao_destroy_sock(sk, true);
+ 	return tcp_parse_ao(sk, cmd, AF_INET6, optval, optlen);
  }
- EXPORT_SYMBOL_GPL(tcp_twsk_destructor);
- 
++
++int tcp_v6_ao_synack_hash(char *ao_hash, struct tcp_ao_key *ao_key,
++			  struct request_sock *req, const struct sk_buff *skb,
++			  int hash_offset, u32 sne)
++{
++	char traffic_key[TCP_AO_MAX_HASH_SIZE] __tcp_ao_key_align;
++
++	tcp_v6_ao_calc_key_rsk(ao_key, traffic_key, req);
++
++	tcp_ao_hash_skb(AF_INET6, ao_hash, ao_key, req_to_sk(req), skb,
++			traffic_key, hash_offset, sne);
++
++	return 0;
++}
 diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 23e0d4ffc007..7bd4d0bb77cd 100644
+index 88a8e6ce41dc..10ac715217cb 100644
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
-@@ -1126,7 +1126,10 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
- 		ao_key = tcp_ao_do_lookup_sndid(sk, aoh->rnext_keyid);
- 
- 		if (ao_key) {
--			ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
-+			if (sk->sk_state == TCP_TIME_WAIT)
-+				ao_info = rcu_dereference(tcp_twsk(sk)->ao_info);
-+			else
-+				ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
- 
- 			/* XXX: optimize by using cached traffic key depending
- 			 * on socket state
-@@ -1178,24 +1181,56 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
- static void tcp_v6_send_ack(const struct sock *sk, struct sk_buff *skb, u32 seq,
- 			    u32 ack, u32 win, u32 tsval, u32 tsecr, int oif,
- 			    struct tcp_md5sig_key *key, u8 tclass,
--			    __be32 label, u32 priority, u32 txhash)
-+			    __be32 label, u32 priority, u32 txhash,
-+			    struct tcp_ao_key *ao_key, char *tkey,
-+			    u8 rcv_next, u32 ao_sne)
- {
- 	tcp_v6_send_response(sk, skb, seq, ack, win, tsval, tsecr, oif, key, 0,
--			     tclass, label, priority, txhash, NULL, NULL, 0, 0);
-+			     tclass, label, priority, txhash,
-+			     ao_key, tkey, rcv_next, ao_sne);
- }
- 
- static void tcp_v6_timewait_ack(struct sock *sk, struct sk_buff *skb)
- {
- 	struct inet_timewait_sock *tw = inet_twsk(sk);
- 	struct tcp_timewait_sock *tcptw = tcp_twsk(sk);
-+	struct tcp_ao_key *ao_key = NULL;
-+	u8 *traffic_key = NULL;
-+	u8 rcv_next = 0;
-+	u32 ao_sne = 0;
-+#ifdef CONFIG_TCP_AO
-+	struct tcp_ao_info *ao_info;
-+	const struct tcp_ao_hdr *aoh;
-+
-+	ao_info = rcu_dereference(tcptw->ao_info);
-+	if (ao_info) {
-+		/* Invalid TCP option size or twice included auth */
-+		if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
-+			goto out;
-+		/* FIXME: we haven't verified the segment to-be-acked */
-+		if (aoh)
-+			ao_key = tcp_ao_do_lookup_sndid(sk, aoh->rnext_keyid);
-+		if (ao_key) {
-+			traffic_key = snd_other_key(ao_key);
-+			/* rcv_next switches to our rcv_next */
-+			rcv_next = ao_info->rnext_key->rcvid;
-+			ao_sne = tcp_ao_compute_sne(ao_info->snd_sne,
-+						    ao_info->snd_sne_seq,
-+						    tcptw->tw_snd_nxt);
-+		}
-+	}
-+#endif
- 
- 	tcp_v6_send_ack(sk, skb, tcptw->tw_snd_nxt, tcptw->tw_rcv_nxt,
- 			tcptw->tw_rcv_wnd >> tw->tw_rcv_wscale,
- 			tcp_time_stamp_raw() + tcptw->tw_ts_offset,
- 			tcptw->tw_ts_recent, tw->tw_bound_dev_if, tcp_twsk_md5_key(tcptw),
- 			tw->tw_tclass, cpu_to_be32(tw->tw_flowlabel), tw->tw_priority,
--			tw->tw_txhash);
-+			tw->tw_txhash, ao_key, traffic_key, rcv_next, ao_sne);
- 
-+#ifdef CONFIG_TCP_AO
-+out:
-+#endif
- 	inet_twsk_put(tw);
- }
- 
-@@ -1222,7 +1257,7 @@ static void tcp_v6_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 			req->ts_recent, sk->sk_bound_dev_if,
- 			tcp_v6_md5_do_lookup(sk, &ipv6_hdr(skb)->saddr, l3index),
- 			ipv6_get_dsfield(ipv6_hdr(skb)), 0, sk->sk_priority,
--			tcp_rsk(req)->txhash);
-+			tcp_rsk(req)->txhash, NULL, NULL, 0, 0);
- }
- 
- 
+@@ -856,6 +856,7 @@ const struct tcp_request_sock_ops tcp_request_sock_ipv6_ops = {
+ #ifdef CONFIG_TCP_AO
+ 	.ao_lookup	=	tcp_v6_ao_lookup_rsk,
+ 	.ao_calc_key	=	tcp_v6_ao_calc_key_rsk,
++	.ao_synack_hash =	tcp_v6_ao_synack_hash,
+ #endif
+ #ifdef CONFIG_SYN_COOKIES
+ 	.cookie_init_seq =	cookie_v6_init_sequence,
 -- 
 2.38.1
 
