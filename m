@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 608A1ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C430BFA3745
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235121AbiJ0Utu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S237059AbiJ0Utu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 27 Oct 2022 16:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237121AbiJ0UsO (ORCPT
+        with ESMTP id S237029AbiJ0UsN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:48:14 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A363DCA
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:38 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id bs21so4168227wrb.4
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:38 -0700 (PDT)
+        Thu, 27 Oct 2022 16:48:13 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1BAB5590
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:36 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id w14so4155631wru.8
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kP+SAh+F64ZkLFr52URQ+wzrGshBfXjUpIMRDp+w/YQ=;
-        b=cjMFkXCN4OjefEPDADI83YvwiOmM1qytWHgGNelAN009vdYvGIkY/Q7uaAdtyFEzE8
-         paYJTrR5gn0aUFKNDEsNIy1KbtVTChRSbBHjTOeXWj+IpauZaycnbpOJCwPuf9+wUxZm
-         4NCYOREUuXnpfaOQX+letnek2oWN4OUe8Oq3uOhM7HE+m41ri79jqVH+JP/E1BtUkC/9
-         H52jpASiiO4tr7hNkSVdD+AIl3AKLW0JkY7anJ7C6kT2AbDyUeX2cmMhHr9OIO9K1N+/
-         vjsHW0ebaiPJa90XBql9eGGp0iVpEMGL94eO3d+xKkk+fn9mB7LBpji+Ex5hF4WBt6q5
-         B1cw==
+        bh=zKqpBppUUTfj8qPMla2g/eqAPUAs1l844TLIW4L/wKM=;
+        b=aZ4J6HLyTTtGQQ3ADZYb5vbN8t8obXuP8POZjn8duiWtHgn9fBwnmHEQSRrwL94vk1
+         c+rGmQZI1E69hkTQaJW/EDCo9lF3LmKXtzk8xE/XzrgrLWgMnv2q2dqtjgJZ0ZHwp92t
+         uF+lXT3lbGRsZ3F32JPkmlYcDqQqwPKD/FGvoYSPRcG41IWF2ZafRJll1rrI3EJ2OCwL
+         IL6tSdLYnnuok3K6cRzjgu2gaElPqBamWPU+auDQ2nT40gGMqqDnZJskjajmS76+anCq
+         Oes34gjuUr5I4xRMPjMffXDWAY+59+dgVZRqzgZg2PUVenbTwEfrZDmB+jNweyXvt86w
+         S1VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kP+SAh+F64ZkLFr52URQ+wzrGshBfXjUpIMRDp+w/YQ=;
-        b=c+ke6Gu1FyPd0hoUk9ANSg/N+v5iTewDwlLl0Rcf3ggRhQZxCPgnqyj8wEbe/11cwu
-         I62GflglUnBlvs7YvBKXMvoIoeNpb5ykz44ZTgfAQ9lY34V2DNtyClHBLjTh5urripuz
-         kd9EfUc3677asbkSMBwpJkXKMOVt2E/uFV4E3iNjKYIhIHIz2D6Pz6Wt9g4kKdO0SbLN
-         nKzF8/AzOvuzY2fnZXoWRAYBkBibqiGpqE40rptQcefkVp6gGeQ6XyLwcO6T+gnvRBF9
-         oUxlrWYRPd+YbYlmQDFO2bDlPEsL83F9oqPYuz/x0A78ZH8ggFgoKE1Aip4Ntcy7sFXq
-         c/UQ==
-X-Gm-Message-State: ACrzQf1J6Vl914j7VA68H2QraeoRkOgPHgNvA4koQot1vCv/AINvKb2f
-        pc9hUVHLU9jc5XWJrUdr+pPq9w==
-X-Google-Smtp-Source: AMsMyM5vCqk71RZPJ/r8tzBefdkb+G+uw3UohC97chYG1D+N0POj8bODmJ3NxPNdNtv2JPvA2He2eg==
-X-Received: by 2002:a5d:590d:0:b0:236:4ddd:1869 with SMTP id v13-20020a5d590d000000b002364ddd1869mr23913510wrd.709.1666903477662;
-        Thu, 27 Oct 2022 13:44:37 -0700 (PDT)
+        bh=zKqpBppUUTfj8qPMla2g/eqAPUAs1l844TLIW4L/wKM=;
+        b=BYxa2Oy18vUrkfrjA+O93Lg0RtyEt0Cs4TpXDSyligfKQPuY4/0UmFdU7Nb3typw+C
+         dgJc0gp3GP3xc6+KO6PxPBBOND9KBzbiZTRQrIdEMP/Mbt/BmM5blF2bAPQaZ7PmTwW9
+         Qw54QqWxffCL6e8CLzAhU8IiyzyhtFVpub/sOiWDYpkSf5/bExulx1PKeB2bx4Gw8LRc
+         oBrWLN1vJmMxGlQ69o5NPZXIQ9xxYbN5e/RIO52GYRIJf27K8jUUaaINAdF7PX2sf9F1
+         SMoQ9gBydPMrg8/drZoHmOMq1XIpDy03zO1QR6O/GMTiggiorzREZfCq+DzpaX/07RoZ
+         5d0A==
+X-Gm-Message-State: ACrzQf118JK44pOxOjKGuXpR7nz4pkIQqISVA+YZ1FfSKXvX1d1Lb2Fu
+        syYPu7a6waMMM8dMo5wNZI2xXBHNoPAgzd6p
+X-Google-Smtp-Source: AMsMyM7Z5vqlZqy5fRHJB0X8pJfRxiOkaNIUHdsp+IDiax0jjvjbsv3Nl0jPqc60AydiovlC6uYS4g==
+X-Received: by 2002:a05:6000:811:b0:236:622d:a7d6 with SMTP id bt17-20020a056000081100b00236622da7d6mr19178998wrb.258.1666903465241;
+        Thu, 27 Oct 2022 13:44:25 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.36
+        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 13:44:37 -0700 (PDT)
+        Thu, 27 Oct 2022 13:44:24 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -72,9 +72,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 28/36] selftest/net: Add TCP-AO ICMPs accept test
-Date:   Thu, 27 Oct 2022 21:43:39 +0100
-Message-Id: <20221027204347.529913-29-dima@arista.com>
+Subject: [PATCH v3 20/36] net/tcp: Add tcp_hash_fail() ratelimited logs
+Date:   Thu, 27 Oct 2022 21:43:31 +0100
+Message-Id: <20221027204347.529913-21-dima@arista.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221027204347.529913-1-dima@arista.com>
 References: <20221027204347.529913-1-dima@arista.com>
@@ -84,137 +84,188 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reverse to icmps-discard test: the server accepts ICMPs, using
-TCP_AO_CMDF_ACCEPT_ICMP and it is expected to fail under ICMP
-flood from client. Test that the default pre-TCP-AO behaviour functions
-when TCP_AO_CMDF_ACCEPT_ICMP is set.
+Add a helper for logging connection-detailed messages for failed TCP
+hash verification (both MD5 and AO).
 
-Expected output for ipv4 version (in case it receives ICMP_PROT_UNREACH):
-> # ./icmps-accept_ipv4
-> 1..3
-> # 3209[lib/setup.c:166] rand seed 1642623870
-> TAP version 13
-> # 3209[lib/proc.c:207]    Snmp6             Ip6InReceives: 0 => 1
-> # 3209[lib/proc.c:207]    Snmp6             Ip6InNoRoutes: 0 => 1
-> # 3209[lib/proc.c:207]    Snmp6               Ip6InOctets: 0 => 76
-> # 3209[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 0 => 1
-> # 3209[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
-> # 3209[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
-> # 3209[lib/proc.c:207]  IcmpMsg                   InType3: 0 => 4
-> # 3209[lib/proc.c:207]     Icmp                    InMsgs: 0 => 4
-> # 3209[lib/proc.c:207]     Icmp            InDestUnreachs: 0 => 4
-> # 3209[lib/proc.c:207]       Ip                InReceives: 3 => 27
-> # 3209[lib/proc.c:207]       Ip                InDelivers: 3 => 27
-> # 3209[lib/proc.c:207]       Ip               OutRequests: 2 => 22
-> # 3209[lib/proc.c:207]    IpExt                  InOctets: 288 => 3420
-> # 3209[lib/proc.c:207]    IpExt                 OutOctets: 124 => 3244
-> # 3209[lib/proc.c:207]    IpExt               InNoECTPkts: 3 => 25
-> # 3209[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
-> # 3209[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
-> # 3209[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
-> # 3209[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
-> ok 1 InDestUnreachs delivered 4
-> ok 2 server failed with -92: Protocol not available
-> ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
-> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Expected output for ipv6 version (in case it receives ADM_PROHIBITED):
-> # ./icmps-accept_ipv6
-> 1..3
-> # 3277[lib/setup.c:166] rand seed 1642624035
-> TAP version 13
-> # 3277[lib/proc.c:207]    Snmp6             Ip6InReceives: 6 => 31
-> # 3277[lib/proc.c:207]    Snmp6             Ip6InDelivers: 4 => 29
-> # 3277[lib/proc.c:207]    Snmp6            Ip6OutRequests: 4 => 24
-> # 3277[lib/proc.c:207]    Snmp6               Ip6InOctets: 592 => 4492
-> # 3277[lib/proc.c:207]    Snmp6              Ip6OutOctets: 332 => 3852
-> # 3277[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 6 => 31
-> # 3277[lib/proc.c:207]    Snmp6               Icmp6InMsgs: 1 => 6
-> # 3277[lib/proc.c:207]    Snmp6       Icmp6InDestUnreachs: 0 => 5
-> # 3277[lib/proc.c:207]    Snmp6              Icmp6InType1: 0 => 5
-> # 3277[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
-> # 3277[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
-> # 3277[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
-> # 3277[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
-> # 3277[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
-> # 3277[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
-> ok 1 Icmp6InDestUnreachs delivered 5
-> ok 2 server failed with -13: Permission denied
-> ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
-> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-With some luck the server may fail with ECONNREFUSED (depending on what
-icmp packet was delivered firstly).
-For the kernel error handlers see: tab_unreach[] and icmp_err_convert[].
-
+Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
+Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
+Co-developed-by: Salam Noureddine <noureddine@arista.com>
+Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile     |  4 +++-
- .../testing/selftests/net/tcp_ao/icmps-accept.c |  1 +
- .../selftests/net/tcp_ao/icmps-discard.c        | 17 +++++++++++++++--
- 3 files changed, 19 insertions(+), 3 deletions(-)
- create mode 120000 tools/testing/selftests/net/tcp_ao/icmps-accept.c
+ include/net/tcp.h    | 14 ++++++++++++--
+ include/net/tcp_ao.h | 27 +++++++++++++++++++++++++++
+ net/ipv4/tcp.c       | 23 +++++++++++++----------
+ net/ipv4/tcp_ao.c    |  7 +++++++
+ 4 files changed, 59 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 9acfd782c20f..a178bde0af08 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect icmps-discard
-+TEST_BOTH_AF := connect icmps-discard icmps-accept
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 72a1fe015c57..5512eb940441 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2527,12 +2527,19 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
+ 	int l3index;
  
- TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
- TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-@@ -43,3 +43,5 @@ $(OUTPUT)/%_ipv4: %.c
- $(OUTPUT)/%_ipv6: %.c
- 	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
+ 	/* Invalid option or two times meet any of auth options */
+-	if (tcp_parse_auth_options(th, &md5_location, &aoh))
++	if (tcp_parse_auth_options(th, &md5_location, &aoh)) {
++		tcp_hash_fail("TCP segment has incorrect auth options set",
++				family, skb, "");
+ 		return SKB_DROP_REASON_TCP_AUTH_HDR;
++	}
  
-+$(OUTPUT)/icmps-accept_ipv4: CFLAGS+= -DTEST_ICMPS_ACCEPT
-+$(OUTPUT)/icmps-accept_ipv6: CFLAGS+= -DTEST_ICMPS_ACCEPT
-diff --git a/tools/testing/selftests/net/tcp_ao/icmps-accept.c b/tools/testing/selftests/net/tcp_ao/icmps-accept.c
-new file mode 120000
-index 000000000000..0a5bb85eb260
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/icmps-accept.c
-@@ -0,0 +1 @@
-+icmps-discard.c
-\ No newline at end of file
-diff --git a/tools/testing/selftests/net/tcp_ao/icmps-discard.c b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
-index 07eba1308b4e..d90017dfc20d 100644
---- a/tools/testing/selftests/net/tcp_ao/icmps-discard.c
-+++ b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
-@@ -43,8 +43,17 @@ const int sk_ip_level	= SOL_IP;
- const int sk_recverr	= IP_RECVERR;
+ 	if (req) {
+-		if (tcp_rsk_used_ao(req) != !!aoh)
++		if (tcp_rsk_used_ao(req) != !!aoh) {
++			tcp_hash_fail("TCP connection can't start/end using TCP-AO",
++					family, skb, " %s",
++					!aoh ? "missing AO" : "AO signed");
+ 			return SKB_DROP_REASON_TCP_AOFAILURE;
++		}
+ 	}
+ 
+ 	/* sdif set, means packet ingressed via a device
+@@ -2555,11 +2562,14 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
+ 					lockdep_sock_is_held(sk));
+ 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOREQUIRED);
+ 			atomic64_inc(&ao_info->counters.ao_required);
++			tcp_hash_fail("AO hash is required, but not found",
++					family, skb, "");
+ 			return SKB_DROP_REASON_TCP_AONOTFOUND;
+ 		}
  #endif
+ 		if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family))) {
+ 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFOUND);
++			tcp_hash_fail("MD5 Hash not found", family, skb, "");
+ 			return SKB_DROP_REASON_TCP_MD5NOTFOUND;
+ 		}
+ 		return SKB_NOT_DROPPED_YET;
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index cc9925644118..b5ebc133399e 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -98,6 +98,33 @@ struct tcp_ao_info {
+ 	atomic_t		refcnt;		/* Protects twsk destruction */
+ };
  
--#define test_icmps_fail test_fail
--#define test_icmps_ok test_ok
-+/*
-+ * Server is expected to fail with hard error if
-+ * TCP_AO_CMDF_ACCEPT_ICMP is set
-+ */
-+#ifdef TEST_ICMPS_ACCEPT
-+# define test_icmps_fail test_ok
-+# define test_icmps_ok test_fail
-+#else
-+# define test_icmps_fail test_fail
-+# define test_icmps_ok test_ok
-+#endif
- 
- static void serve_interfered(int sk)
- {
-@@ -98,6 +107,10 @@ static void *server_fn(void *arg)
- 
- 	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
- 
-+#ifdef TEST_ICMPS_ACCEPT
-+	flags = TCP_AO_CMDF_ACCEPT_ICMP;
-+#endif
++#define tcp_hash_fail(msg, family, skb, fmt, ...)			\
++do {									\
++	const struct tcphdr *th = tcp_hdr(skb);				\
++	char hdr_flags[5] = {};						\
++	char *f = hdr_flags;						\
++									\
++	if (th->fin)							\
++		*f++ = 'F';						\
++	if (th->syn)							\
++		*f++ = 'S';						\
++	if (th->rst)							\
++		*f++ = 'R';						\
++	if (th->ack)							\
++		*f = 'A';						\
++	if (family == AF_INET) {					\
++		net_info_ratelimited("%s for (%pI4, %d)->(%pI4, %d) %s" fmt "\n", \
++				msg, &ip_hdr(skb)->saddr, ntohs(th->source), \
++				&ip_hdr(skb)->daddr, ntohs(th->dest),	\
++				hdr_flags, ##__VA_ARGS__);		\
++	} else {							\
++		net_info_ratelimited("%s for [%pI6c]:%u->[%pI6c]:%u %s" fmt "\n", \
++				msg, &ipv6_hdr(skb)->saddr, ntohs(th->source), \
++				&ipv6_hdr(skb)->daddr, ntohs(th->dest),	\
++				hdr_flags, ##__VA_ARGS__);		\
++	}								\
++} while (0)
 +
- 	if (test_set_ao(lsk, "password", flags, this_ip_dest, -1, 100, 100))
- 		test_error("setsockopt(TCP_AO)");
- 	synchronize_threads();
+ #ifdef CONFIG_TCP_AO
+ /* TCP-AO structures and functions */
+ 
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 7bfbb6330752..8d64bdec3af8 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4523,7 +4523,6 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+ 	 * o MD5 hash and we're not expecting one.
+ 	 * o MD5 hash and its wrong.
+ 	 */
+-	const struct tcphdr *th = tcp_hdr(skb);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	struct tcp_md5sig_key *key;
+ 	int genhash;
+@@ -4533,6 +4532,7 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+ 
+ 	if (!key && hash_location) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5UNEXPECTED);
++		tcp_hash_fail("Unexpected MD5 Hash found", family, skb, "");
+ 		return SKB_DROP_REASON_TCP_MD5UNEXPECTED;
+ 	}
+ 
+@@ -4548,16 +4548,19 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+ 	if (genhash || memcmp(hash_location, newhash, 16) != 0) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5FAILURE);
+ 		if (family == AF_INET) {
+-			net_info_ratelimited("MD5 Hash failed for (%pI4, %d)->(%pI4, %d)%s L3 index %d\n",
+-					saddr, ntohs(th->source),
+-					daddr, ntohs(th->dest),
+-					genhash ? " tcp_v4_calc_md5_hash failed"
+-					: "", l3index);
++			tcp_hash_fail("MD5 Hash failed", AF_INET, skb, "%s L3 index %d",
++				      genhash ? " tcp_v4_calc_md5_hash failed"
++				      : "", l3index);
+ 		} else {
+-			net_info_ratelimited("MD5 Hash %s for [%pI6c]:%u->[%pI6c]:%u L3 index %d\n",
+-					genhash ? "failed" : "mismatch",
+-					saddr, ntohs(th->source),
+-					daddr, ntohs(th->dest), l3index);
++			if (genhash) {
++				tcp_hash_fail("MD5 Hash failed",
++					      AF_INET6, skb, " L3 index %d",
++					      l3index);
++			} else {
++				tcp_hash_fail("MD5 Hash mismatch",
++					      AF_INET6, skb, " L3 index %d",
++					      l3index);
++			}
+ 		}
+ 		return SKB_DROP_REASON_TCP_MD5FAILURE;
+ 	}
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index cdd4e4ed69cf..307b279d55f5 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -708,6 +708,8 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
+ 		atomic64_inc(&info->counters.pkt_bad);
+ 		atomic64_inc(&key->pkt_bad);
++		tcp_hash_fail("AO hash wrong length", family, skb,
++			      " %u != %d", maclen, tcp_ao_maclen(key));
+ 		return SKB_DROP_REASON_TCP_AOFAILURE;
+ 	}
+ 
+@@ -718,6 +720,7 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
+ 		atomic64_inc(&info->counters.pkt_bad);
+ 		atomic64_inc(&key->pkt_bad);
++		tcp_hash_fail("AO hash mismatch", family, skb, "");
+ 		return SKB_DROP_REASON_TCP_AOFAILURE;
+ 	}
+ 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOGOOD);
+@@ -744,6 +747,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 	info = rcu_dereference(tcp_sk(sk)->ao_info);
+ 	if (!info) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
++		tcp_hash_fail("AO key not found", family, skb,
++			      " keyid: %u", aoh->keyid);
+ 		return SKB_DROP_REASON_TCP_AOUNEXPECTED;
+ 	}
+ 
+@@ -838,6 +843,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ key_not_found:
+ 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
+ 	atomic64_inc(&info->counters.key_not_found);
++	tcp_hash_fail("Requested by the peer AO key id not found",
++		      family, skb, "");
+ 	return SKB_DROP_REASON_TCP_AOKEYNOTFOUND;
+ }
+ 
 -- 
 2.38.1
 
