@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EF8FA3748
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 608CBFA3743
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237223AbiJ0Uwi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S237208AbiJ0Uwi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 27 Oct 2022 16:52:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46864 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237212AbiJ0Uv4 (ORCPT
+        with ESMTP id S237224AbiJ0Uv4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 27 Oct 2022 16:51:56 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0430E923E4
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04727923E6
         for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:45:25 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5so1794152wmo.1
+Received: by mail-wm1-x32d.google.com with SMTP id c7-20020a05600c0ac700b003c6cad86f38so5042155wmr.2
         for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RiUzQY/KDOVQ9OpO7U/pjYWKIDHSHLqGcD95KlhxZRE=;
-        b=cCJ7TNvnRDYM8NVUP7gAR+/UvYLpXy8bhDJB+F+2c8SxLYPWwFOnMqWyvzrsKBRWpQ
-         ajD1KUi0H+UQIQoXweFZ/g15baxLVxe4QfNJb6/H/tXRZG58x4/sBcbvyRG6ybVtNDML
-         wWqZtw2qn4XaaIuF9XrEVliJk45Bt4zRrarh4SANuJ9Crg7J43ztNsCgbhL8jybg0mK4
-         ZzBV+Juh41FLKorJDTRfqJ+iG37yhhn6+e5kVOnIXLOUBZPsYOpS3MhSexqo6gNFfBns
-         MrGXZKGtAN7LZPMLWD7mnqp4AfcuNTl7XcvG9jriee5qhAzfNIE087AgyACP56GUT4Pm
-         1QUA==
+        bh=gcnCCWJ3sL3TtkhLDR3iQ6YWDc5hGDSAP+7E0rj/5N8=;
+        b=Q51oFphuhArXiss7MWYKI3XIAKHdzgaQOZ840/iKcKQTKTQLp69qm8IeLrEfgBqn+W
+         da26eefmJTUL0LD7tDKR+Zy7JyjFOTQbwRNpXlvPVkQmF9D4TIkwNL1LQtT0wg5Mm4i8
+         oLIGOavmc3oGNJ87t5bz2FwIaK5eiGZ47lG2pY8Hffo0knjfNfDG8jl3PZRB5B9+bxew
+         iWFdk6/GbviJwIRg3nTXlSdBzIskwwPty79iS2NeQkMEj6SHfsX7l+UhmMGa1qHlaSJ9
+         w6FHaoXvggqmZIIjTZm7e2su5QgkC89+vG7MCKSv8APtuhiZbNzyKSb2PMNW8JY6CIFx
+         Vvpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RiUzQY/KDOVQ9OpO7U/pjYWKIDHSHLqGcD95KlhxZRE=;
-        b=ku56u/FvizGwqMUTBLXZByfhrgJg5wNQTn5fXE/sxzbuSPcUts2bP+6g+7TxTER2d1
-         8B++Qng5n9YirTQEdOUf+1jgQQY+zfNRYgpdHC6HdKD/ftu6f0HMH8nvl5uR8mMEjfkR
-         Q0xLoWqyesIe1PnZ34J8v77u+QgvJCzzetUx889HsEf9BbUqMcTG7QnVr27v95cC4BGr
-         cc6hlkQglInBMtJCEeRJXi4I9VQKBvY7cACWApgZX7pyvyIH1G1TKCAKgwu1OEtqyJc9
-         E+aCaJsUhxsjiWhfpoCQhWxbuvHl/UB4tH/rA6fKfqlmjElGUGaUmB4vf0OfoX3z1eTL
-         ELlA==
-X-Gm-Message-State: ACrzQf15SNM0dWNHyivsVhbgdBMfrW0SzIDfG3JVaBgAa+WqXcM1SE4x
-        6RKKDLk127RzVVZjpWGGD38Fbw==
-X-Google-Smtp-Source: AMsMyM5Hav1UL9exmQ7gJ56RA3Xu8SsGKY9DmS/6nfnlhg3pgZgYwcgV0syDrqZl7lrauKdTco6LZQ==
-X-Received: by 2002:a05:600c:5127:b0:3c6:47ff:5d33 with SMTP id o39-20020a05600c512700b003c647ff5d33mr7500384wms.68.1666903480665;
-        Thu, 27 Oct 2022 13:44:40 -0700 (PDT)
+        bh=gcnCCWJ3sL3TtkhLDR3iQ6YWDc5hGDSAP+7E0rj/5N8=;
+        b=x4WKpvzft3TMUXELqamnHhZiYr1HgnOZTfwYhMz7WQC+2fKxhpyVzGvlIweg0sARmL
+         vy6CxEuit/NoFCbfZeMXnD7s4MaoerzOwc9cdW3qaxvMfKU4wC0ntD/HiZyVL+n//0WK
+         x6gCOlMY+h64ufuQA9cc4E/zsxfBSd6moKA4Cap9j7HG0EXFfRYBZViEFSBnFIP3bCJH
+         zrsmtXjO5eD42SHkvMa7zjArowuJ27T3fn66EMdCG6WEGYIHFYbEeRBYWUCMALhI3CAe
+         Kfjqj3ORej5bhmxIGML8bgfIizX0X4FetWiKnyy7TFUcUVww3Db1tzYdN3kn4/GniWCc
+         c3Xg==
+X-Gm-Message-State: ACrzQf0PAhEh2IQsJy6xnlkAJzoDuE9BDZQZmh/Glr7OyQry7A5fZGBM
+        0o8o2HWqXQop5JT3pEuJ6f813VeVGmEmN9Vm
+X-Google-Smtp-Source: AMsMyM5CKs6mrkR2wwd00sYgLN2MOkIZ9Ty0D+Ida0bIjuVVO8GnQCnrVyplRFrObh5jT45RMhFNSQ==
+X-Received: by 2002:a05:600c:418b:b0:3cf:4733:e0b6 with SMTP id p11-20020a05600c418b00b003cf4733e0b6mr7377502wmh.186.1666903483761;
+        Thu, 27 Oct 2022 13:44:43 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.39
+        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 13:44:40 -0700 (PDT)
+        Thu, 27 Oct 2022 13:44:43 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -72,9 +72,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 30/36] selftest/tcp-ao: Add test for TCP-AO add setsockopt() command
-Date:   Thu, 27 Oct 2022 21:43:41 +0100
-Message-Id: <20221027204347.529913-31-dima@arista.com>
+Subject: [PATCH v3 32/36] selftests/aolib: Add test/benchmark for removing MKTs
+Date:   Thu, 27 Oct 2022 21:43:43 +0100
+Message-Id: <20221027204347.529913-33-dima@arista.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221027204347.529913-1-dima@arista.com>
 References: <20221027204347.529913-1-dima@arista.com>
@@ -84,243 +84,485 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Verify corner-cases for UAPI.
 Sample output:
-> # ./setsockopt-closed_ipv6
-> 1..16
-> # 9508[lib/setup.c:173] rand seed 1643819055
+> 1..36
+> # 1106[lib/setup.c:207] rand seed 1660754406
 > TAP version 13
-> ok 1 minimum size
-> ok 2 extended size
-> ok 3 bad algo
-> ok 4 bad ao flags
-> ok 5 empty prefix
-> ok 6 prefix, any addr
-> ok 7 no prefix, any addr
-> ok 8 too short prefix
-> ok 9 too big prefix
-> ok 10 too big maclen
-> ok 11 bad key flags
-> ok 12 too big keylen
-> not ok 13 duplicate: full copy: setsockopt() was expected to fail with 17
-> ok 14 duplicate: any addr key on the socket
-> ok 15 duplicate: add any addr key
-> not ok 16 duplicate: add any addr for the same subnet: setsockopt() was expected to fail with 17
+> ok 1   Worst case connect       512 keys: min=0ms max=1ms mean=0.583329ms stddev=0.076376
+> ok 2 Connect random-search      512 keys: min=0ms max=1ms mean=0.53412ms stddev=0.0516779
+> ok 3    Worst case delete       512 keys: min=2ms max=11ms mean=6.04139ms stddev=0.245792
+> ok 4        Add a new key       512 keys: min=0ms max=13ms mean=0.673415ms stddev=0.0820618
+> ok 5 Remove random-search       512 keys: min=5ms max=9ms mean=6.65969ms stddev=0.258064
+> ok 6         Remove async       512 keys: min=0ms max=0ms mean=0.041825ms stddev=0.0204512
+> ok 7   Worst case connect       1024 keys: min=0ms max=2ms mean=0.520357ms stddev=0.0721358
+> ok 8 Connect random-search      1024 keys: min=0ms max=2ms mean=0.535312ms stddev=0.0517355
+> ok 9    Worst case delete       1024 keys: min=5ms max=9ms mean=8.27219ms stddev=0.287614
+> ok 10        Add a new key      1024 keys: min=0ms max=1ms mean=0.688121ms stddev=0.0829531
+> ok 11 Remove random-search      1024 keys: min=5ms max=9ms mean=8.37649ms stddev=0.289422
+> ok 12         Remove async      1024 keys: min=0ms max=0ms mean=0.0457096ms stddev=0.0213798
+> ok 13   Worst case connect      2048 keys: min=0ms max=2ms mean=0.748804ms stddev=0.0865335
+> ok 14 Connect random-search     2048 keys: min=0ms max=2ms mean=0.782993ms stddev=0.0625697
+> ok 15    Worst case delete      2048 keys: min=5ms max=10ms mean=8.23106ms stddev=0.286898
+> ok 16        Add a new key      2048 keys: min=0ms max=1ms mean=0.812988ms stddev=0.0901658
+> ok 17 Remove random-search      2048 keys: min=8ms max=9ms mean=8.84949ms stddev=0.297481
+> ok 18         Remove async      2048 keys: min=0ms max=0ms mean=0.0297223ms stddev=0.0172402
+> ok 19   Worst case connect      4096 keys: min=1ms max=5ms mean=1.53352ms stddev=0.123836
+> ok 20 Connect random-search     4096 keys: min=1ms max=5ms mean=1.52226ms stddev=0.0872429
+> ok 21    Worst case delete      4096 keys: min=5ms max=9ms mean=8.25874ms stddev=0.28738
+> ok 22        Add a new key      4096 keys: min=0ms max=3ms mean=1.67382ms stddev=0.129376
+> ok 23 Remove random-search      4096 keys: min=5ms max=10ms mean=8.26178ms stddev=0.287433
+> ok 24         Remove async      4096 keys: min=0ms max=0ms mean=0.0340009ms stddev=0.0184393
+> ok 25   Worst case connect      8192 keys: min=2ms max=4ms mean=2.86208ms stddev=0.169177
+> ok 26 Connect random-search     8192 keys: min=2ms max=4ms mean=2.87592ms stddev=0.119915
+> ok 27    Worst case delete      8192 keys: min=6ms max=11ms mean=7.55291ms stddev=0.274826
+> ok 28        Add a new key      8192 keys: min=1ms max=5ms mean=2.56797ms stddev=0.160249
+> ok 29 Remove random-search      8192 keys: min=5ms max=10ms mean=7.14002ms stddev=0.267208
+> ok 30         Remove async      8192 keys: min=0ms max=0ms mean=0.0320066ms stddev=0.0178904
+> ok 31   Worst case connect      16384 keys: min=5ms max=6ms mean=5.55334ms stddev=0.235655
+> ok 32 Connect random-search     16384 keys: min=5ms max=6ms mean=5.52614ms stddev=0.166225
+> ok 33    Worst case delete      16384 keys: min=5ms max=11ms mean=7.39109ms stddev=0.271866
+> ok 34        Add a new key      16384 keys: min=2ms max=4ms mean=3.35799ms stddev=0.183248
+> ok 35 Remove random-search      16384 keys: min=5ms max=8ms mean=6.86078ms stddev=0.261931
+> ok 36         Remove async      16384 keys: min=0ms max=0ms mean=0.0302384ms stddev=0.0173892
+> # Totals: pass:36 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+From it it's visible that the current simplified approach with
+linked-list of MKTs scales quite fine even for thousands of keys.
+And that also means that the majority of the time for delete is eaten by
+synchronize_rcu() [which I can confirm separately by tracing].
 
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- tools/testing/selftests/net/tcp_ao/Makefile   |   3 +-
- .../selftests/net/tcp_ao/setsockopt-closed.c  | 191 ++++++++++++++++++
- 2 files changed, 193 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+ tools/testing/selftests/net/tcp_ao/Makefile   |   4 +-
+ .../selftests/net/tcp_ao/bench-lookups.c      | 403 ++++++++++++++++++
+ 2 files changed, 406 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/bench-lookups.c
 
 diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 5064e34ebe38..a001dc2aed4e 100644
+index da44966f3687..a4af7d4da169 100644
 --- a/tools/testing/selftests/net/tcp_ao/Makefile
 +++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -1,5 +1,6 @@
+@@ -1,6 +1,6 @@
  # SPDX-License-Identifier: GPL-2.0
--TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny
-+TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
-+		setsockopt-closed
+ TEST_BOTH_AF := connect icmps-discard icmps-accept connect-deny \
+-		setsockopt-closed unsigned-md5
++		setsockopt-closed unsigned-md5 bench-lookups
  
  TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
  TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
-diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+@@ -46,3 +46,5 @@ $(OUTPUT)/%_ipv6: %.c
+ 
+ $(OUTPUT)/icmps-accept_ipv4: CFLAGS+= -DTEST_ICMPS_ACCEPT
+ $(OUTPUT)/icmps-accept_ipv6: CFLAGS+= -DTEST_ICMPS_ACCEPT
++$(OUTPUT)/bench-lookups_ipv4: LDFLAGS+= -lm
++$(OUTPUT)/bench-lookups_ipv6: LDFLAGS+= -lm
+diff --git a/tools/testing/selftests/net/tcp_ao/bench-lookups.c b/tools/testing/selftests/net/tcp_ao/bench-lookups.c
 new file mode 100644
-index 000000000000..be2cbc407f60
+index 000000000000..41456d85e06a
 --- /dev/null
-+++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
-@@ -0,0 +1,191 @@
++++ b/tools/testing/selftests/net/tcp_ao/bench-lookups.c
+@@ -0,0 +1,403 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Author: Dmitry Safonov <dima@arista.com> */
++#include <arpa/inet.h>
 +#include <inttypes.h>
++#include <math.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <time.h>
++
++#include "../../../../include/linux/bits.h"
 +#include "../../../../include/linux/kernel.h"
 +#include "aolib.h"
 +
-+static void clean_ao(int sk, struct tcp_ao *ao)
++#define AO_KEY_SZ	300 /* ~= sizeof(struct tcp_ao_key) */
++#define NR_ITERS	100 /* number of times to run gathering statistics */
++
++#ifdef IPV6_TEST
++typedef struct in6_addr ipaddr_t;
++static ipaddr_t get_ipaddr_t(ipaddr_t net, size_t n)
 +{
-+	struct tcp_ao_del ao_del = {};
++	ipaddr_t ret = net;
 +
-+	ao_del.tcpa_sndid = ao->tcpa_sndid;
-+	ao_del.tcpa_rcvid = ao->tcpa_rcvid;
-+	ao_del.tcpa_prefix = ao->tcpa_prefix;
-+	memcpy(&ao_del.tcpa_addr, &ao->tcpa_addr, sizeof(ao->tcpa_addr));
++	ret.s6_addr32[3] = htonl(n & (BIT(32) - 1));
++	ret.s6_addr32[2] = htonl((n >> 32) & (BIT(32) - 1));
 +
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, &ao_del, sizeof(ao_del)))
-+		test_error("setsockopt(TCP_AO_DEL) failed to clean");
-+	close(sk);
++	return ret;
 +}
-+
-+static void setsockopt_checked(int sk, int optname, struct tcp_ao *ao,
-+			       int err, const char *tst)
++#else
++typedef struct in_addr ipaddr_t;
++static ipaddr_t get_ipaddr_t(ipaddr_t net, size_t n)
 +{
-+	int ret;
++	ipaddr_t ret;
 +
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, optname, ao, sizeof(*ao));
-+	if (ret == -1) {
-+		if (errno == err) {
-+			test_ok("%s", tst);
-+			return;
-+		}
-+		test_fail("%s: setsockopt() returned %d", tst, err);
++	ret.s_addr = htonl(ntohl(net.s_addr) + n);
++	return ret;
++}
++#endif
++
++static void gen_test_ips(ipaddr_t *ips, size_t ips_nr, bool use_rand)
++{
++	ipaddr_t net;
++	size_t i, j;
++
++	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &net) != 1)
++		test_error("Can't convert ip address %s", TEST_NETWORK);
++
++	if (!use_rand) {
++		for (i = 0; i < ips_nr; i++)
++			ips[i] = get_ipaddr_t(net, 2 * i + 1);
 +		return;
 +	}
++	for (i = 0; i < ips_nr; i++) {
++		size_t r = (size_t)random() | 0x1;
 +
-+	if (err) {
-+		test_fail("%s: setsockopt() was expected to fail with %d", tst, err);
-+	} else {
-+		test_ok("%s", tst);
-+		test_verify_socket_ao(sk, ao);
-+	}
-+	clean_ao(sk, ao);
-+}
++		ips[i] = get_ipaddr_t(net, r);
 +
-+static int prepare_defs(struct tcp_ao *ao)
-+{
-+	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
-+
-+	if (sk < 0)
-+		test_error("socket()");
-+
-+	if (test_prepare_def_ao(ao, "password", 0, this_ip_dest, -1, 100, 100))
-+		test_error("prepare default tcp_ao");
-+
-+	return sk;
-+}
-+
-+static void test_extend(void)
-+{
-+	struct tcp_ao ao;
-+	struct {
-+		struct tcp_ao ao;
-+		char *extend[100];
-+	} ao_big = {};
-+	int ret, sk;
-+
-+	sk = prepare_defs(&ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO,
-+			&ao, offsetof(struct tcp_ao, tcpa_key));
-+	if (!ret) {
-+		test_fail("minminum size: accepted invalid size");
-+		clean_ao(sk, &ao);
-+	} else if (errno != EINVAL) {
-+		test_fail("minminum size: failed with %d", errno);
-+	} else {
-+		test_ok("minimum size");
-+	}
-+
-+	sk = prepare_defs(&ao_big.ao);
-+	errno = 0;
-+	ret = setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao_big.ao, sizeof(ao_big));
-+	if (ret) {
-+		test_fail("extended size: returned %d", ret);
-+	} else {
-+		test_ok("extended size");
-+		clean_ao(sk, &ao_big.ao);
++		for (j = i - 1; j > 0 && i > 0; j--) {
++			if (!memcmp(&ips[i], &ips[j], sizeof(ipaddr_t))) {
++				i--; /* collision */
++				break;
++			}
++		}
 +	}
 +}
 +
-+static void einval_tests(void)
++static void test_add_routes(ipaddr_t *ips, size_t ips_nr)
 +{
-+	struct tcp_ao ao;
-+	int sk;
++	size_t i;
 +
-+	sk = prepare_defs(&ao);
-+	strcpy(ao.tcpa_alg_name, "imaginary hash algo");
-+	setsockopt_checked(sk, TCP_AO, &ao, ENOENT, "bad algo");
++	for (i = 0; i < ips_nr; i++) {
++		union tcp_addr *p = (union tcp_addr *)&ips[i];
 +
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_flags = (uint16_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad ao flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "empty prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 32;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 0;
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	setsockopt_checked(sk, TCP_AO, &ao, 0, "no prefix, any addr");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 2;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too short prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_prefix = 129;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big prefix");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_maclen = 100;
-+	setsockopt_checked(sk, TCP_AO, &ao, EMSGSIZE, "too big maclen");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keyflags = (uint8_t)(-1);
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "bad key flags");
-+
-+	sk = prepare_defs(&ao);
-+	ao.tcpa_keylen = TCP_AO_MAXKEYLEN + 1;
-+	setsockopt_checked(sk, TCP_AO, &ao, EINVAL, "too big keylen");
++		if (ip_route_add(veth_name, TEST_FAMILY, this_ip_addr, *p))
++			test_error("Failed to add route");
++	}
 +}
 +
-+static void duplicate_tests(void)
++static void server_apply_keys(int lsk, ipaddr_t *ips, size_t ips_nr)
 +{
-+	union tcp_addr network_dup;
-+	struct tcp_ao ao, ao2;
-+	int sk;
++	size_t i;
 +
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: full copy");
++	for (i = 0; i < ips_nr; i++) {
++		union tcp_addr *p = (union tcp_addr *)&ips[i];
 +
-+	sk = prepare_defs(&ao);
-+	ao2 = ao;
-+	memcpy(&ao2.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao2.tcpa_prefix = 0;
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao2, sizeof(ao)))
-+		test_error("setsockopt()");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: any addr key on the socket");
-+
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	memcpy(&ao.tcpa_addr, &SOCKADDR_ANY, sizeof(SOCKADDR_ANY));
-+	ao.tcpa_prefix = 0;
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr key");
-+
-+
-+	if (inet_pton(TEST_FAMILY, TEST_NETWORK, &network_dup) != 1)
-+		test_error("Can't convert ip address %s", TEST_NETWORK);
-+	sk = prepare_defs(&ao);
-+	if (setsockopt(sk, IPPROTO_TCP, TCP_AO, &ao, sizeof(ao)))
-+		test_error("setsockopt()");
-+	if (test_prepare_def_ao(&ao, "password", 0, network_dup, 16, 100, 100))
-+		test_error("prepare default tcp_ao");
-+	setsockopt_checked(sk, TCP_AO, &ao, EEXIST, "duplicate: add any addr for the same subnet");
++		if (test_set_ao(lsk, "password", 0, *p, -1, 100, 100))
++			test_error("setsockopt(TCP_AO)");
++	}
 +}
 +
++static const size_t nr_keys[] = { 512, 1024, 2048, 4096, 8192, 16384 };
++static ipaddr_t *test_ips;
++
++struct bench_stats {
++	uint64_t min;
++	uint64_t max;
++	uint64_t nr;
++	double mean;
++	double s2;
++};
++
++static struct bench_tests {
++	struct bench_stats delete_last_key;
++	struct bench_stats add_key;
++	struct bench_stats delete_rand_key;
++	struct bench_stats connect_last_key;
++	struct bench_stats connect_rand_key;
++	struct bench_stats delete_async;
++} bench_results[ARRAY_SIZE(nr_keys)];
++
++#define NSEC_PER_SEC 1000000000ULL
++
++static void measure_call(struct bench_stats *st,
++			 void (*f)(int, void *), int sk, void *arg)
++{
++	struct timespec start = {}, end = {};
++	double delta;
++	uint64_t nsec;
++
++	if (clock_gettime(CLOCK_MONOTONIC, &start))
++		test_error("clock_gettime()");
++
++	f(sk, arg);
++
++	if (clock_gettime(CLOCK_MONOTONIC, &end))
++		test_error("clock_gettime()");
++
++	nsec = (end.tv_sec - start.tv_sec) * NSEC_PER_SEC;
++	if (end.tv_nsec >= start.tv_nsec)
++		nsec += end.tv_nsec - start.tv_nsec;
++	else
++		nsec -= start.tv_nsec - end.tv_nsec;
++
++	if (st->nr == 0) {
++		st->min = st->max = nsec;
++	} else {
++		if (st->min > nsec)
++			st->min = nsec;
++		if (st->max < nsec)
++			st->max = nsec;
++	}
++
++	/* Welford-Knuth algorithm */
++	st->nr++;
++	delta = (double)nsec - st->mean;
++	st->mean += delta / st->nr;
++	st->s2 += delta * ((double)nsec - st->mean);
++}
++
++static void delete_mkt(int sk, void *arg)
++{
++	struct tcp_ao_del *ao = arg;
++
++	if (setsockopt(sk, IPPROTO_TCP, TCP_AO_DEL, ao, sizeof(*ao)))
++		test_error("setsockopt(TCP_AO_DEL)");
++}
++
++static void add_back_mkt(int sk, void *arg)
++{
++	union tcp_addr *p = arg;
++
++	if (test_set_ao(sk, "password", 0, *p, -1, 100, 100))
++		test_error("setsockopt(TCP_AO)");
++}
++
++static void memcpy_sockaddr(void *dest, union tcp_addr *in_addr)
++{
++#ifdef IPV6_TEST
++	struct sockaddr_in6 addr = {
++		.sin6_family	= AF_INET6,
++		.sin6_port	= 0,
++		.sin6_addr	= in_addr->a6,
++	};
++#else
++	struct sockaddr_in addr = {
++		.sin_family	= AF_INET,
++		.sin_port	= 0,
++		.sin_addr	= in_addr->a4,
++	};
++#endif
++
++	memcpy(dest, &addr, sizeof(addr));
++}
++
++static void bench_delete(int lsk, struct bench_stats *add,
++			 struct bench_stats *del,
++			 ipaddr_t *ips, size_t ips_nr,
++			 bool rand_order, bool async)
++{
++	struct tcp_ao_del ao_del = {};
++	union tcp_addr *p;
++	size_t i;
++
++	ao_del.tcpa_sndid = 100;
++	ao_del.tcpa_rcvid = 100;
++	if (async)
++		ao_del.tcpa_flags = TCP_AO_CMDF_DEL_ASYNC;
++	ao_del.tcpa_prefix = DEFAULT_TEST_PREFIX;
++
++	/* Remove the first added */
++	p = (union tcp_addr *)&ips[0];
++	memcpy_sockaddr(&ao_del.tcpa_addr, p);
++
++	for (i = 0; i < NR_ITERS; i++) {
++		measure_call(del, delete_mkt, lsk, (void *)&ao_del);
++
++		/* Restore it back */
++		measure_call(add, add_back_mkt, lsk, (void *)p);
++
++		/*
++		 * Slowest for FILO-linked-list:
++		 * on (i) iteration removing ips[i] element. When it gets
++		 * added to the list back - it becomes first to fetch, so
++		 * on (i + 1) iteration go to ips[i + 1] element.
++		 */
++		if (rand_order)
++			p = (union tcp_addr *)&ips[rand() % ips_nr];
++		else
++			p = (union tcp_addr *)&ips[i % ips_nr];
++		memcpy_sockaddr(&ao_del.tcpa_addr, p);
++	}
++}
++
++static void bench_connect_srv(int lsk, ipaddr_t *ips, size_t ips_nr)
++{
++	size_t i;
++
++	for (i = 0; i < NR_ITERS; i++) {
++		int err, sk;
++
++		synchronize_threads();
++
++		err = test_wait_fd(lsk, TEST_TIMEOUT_SEC, 0);
++		if (!err)
++			test_error("timeouted for accept()");
++		else if (err < 0)
++			test_error("test_wait_fd()");
++
++		sk = accept(lsk, NULL, NULL);
++		if (sk < 0)
++			test_error("accept()");
++
++		close(sk);
++	}
++}
++
++static void test_print_stats(const char *desc, size_t nr, struct bench_stats *bs)
++{
++	test_ok("%20s\t%zu keys: min=%" PRIu64 "ms max=%" PRIu64 "ms mean=%gms stddev=%g",
++		desc, nr, bs->min / 1000000, bs->max / 1000000,
++		bs->mean / 1000000, sqrt((bs->mean / 1000000) / bs->nr));
++}
++
++static void *server_fn(void *arg)
++{
++	size_t i;
++
++	for (i = 0; i < ARRAY_SIZE(nr_keys); i++) {
++		struct bench_tests *bt = &bench_results[i];
++		int lsk;
++
++		test_ips = malloc(nr_keys[i] * sizeof(ipaddr_t));
++		if (!test_ips)
++			test_error("malloc()");
++
++		lsk = test_listen_socket(this_ip_addr, test_server_port + i, 1);
++
++		gen_test_ips(test_ips, nr_keys[i], false);
++		test_add_routes(test_ips, nr_keys[i]);
++		test_set_optmem(AO_KEY_SZ * nr_keys[i]);
++		server_apply_keys(lsk, test_ips, nr_keys[i]);
++
++		synchronize_threads();
++		bench_connect_srv(lsk, test_ips, nr_keys[i]);
++		bench_connect_srv(lsk, test_ips, nr_keys[i]);
++
++		/* The worst case for FILO-list */
++		bench_delete(lsk, &bt->add_key, &bt->delete_last_key,
++			     test_ips, nr_keys[i], false, false);
++		test_print_stats("Worst case delete",
++				nr_keys[i], &bt->delete_last_key);
++		test_print_stats("Add a new key",
++				nr_keys[i], &bt->add_key);
++
++		bench_delete(lsk, &bt->add_key, &bt->delete_rand_key,
++			     test_ips, nr_keys[i], true, false);
++		test_print_stats("Remove random-search",
++				nr_keys[i], &bt->delete_rand_key);
++
++		bench_delete(lsk, &bt->add_key, &bt->delete_async,
++			     test_ips, nr_keys[i], false, true);
++		test_print_stats("Remove async", nr_keys[i], &bt->delete_async);
++
++		free(test_ips);
++		close(lsk);
++	}
++
++	return NULL;
++}
++
++static void connect_client(int sk, void *arg)
++{
++	size_t *p = arg;
++
++	if (test_connect_socket(sk, this_ip_dest, test_server_port + *p) <= 0)
++		test_error("failed to connect()");
++}
++
++static void client_addr_setup(int sk, union tcp_addr taddr)
++{
++#ifdef IPV6_TEST
++	struct sockaddr_in6 addr = {
++		.sin6_family	= AF_INET6,
++		.sin6_port	= 0,
++		.sin6_addr	= taddr.a6,
++	};
++#else
++	struct sockaddr_in addr = {
++		.sin_family	= AF_INET,
++		.sin_port	= 0,
++		.sin_addr	= taddr.a4,
++	};
++#endif
++	int ret;
++
++	ret = ip_addr_add(veth_name, TEST_FAMILY, taddr, TEST_PREFIX);
++	if (ret && ret != -EEXIST)
++		test_error("Failed to add ip address");
++	ret = ip_route_add(veth_name, TEST_FAMILY, taddr, this_ip_dest);
++	if (ret && ret != -EEXIST)
++		test_error("Failed to add route");
++
++	if (bind(sk, &addr, sizeof(addr)))
++		test_error("bind()");
++}
++
++static void bench_connect_client(size_t port_off, struct bench_tests *bt,
++		ipaddr_t *ips, size_t ips_nr, bool rand_order)
++{
++	struct bench_stats *con;
++	union tcp_addr *p;
++	size_t i;
++
++	if (rand_order)
++		con = &bt->connect_rand_key;
++	else
++		con = &bt->connect_last_key;
++
++	p = (union tcp_addr *)&ips[0];
++
++	for (i = 0; i < NR_ITERS; i++) {
++		int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
++
++		if (sk < 0)
++			test_error("socket()");
++
++		client_addr_setup(sk, *p);
++		if (test_set_ao(sk, "password", 0, this_ip_dest, -1, 100, 100))
++			test_error("setsockopt(TCP_AO)");
++
++		synchronize_threads();
++
++		measure_call(con, connect_client, sk, (void *)&port_off);
++
++		close(sk);
++
++		/*
++		 * Slowest for FILO-linked-list:
++		 * on (i) iteration removing ips[i] element. When it gets
++		 * added to the list back - it becomes first to fetch, so
++		 * on (i + 1) iteration go to ips[i + 1] element.
++		 */
++		if (rand_order)
++			p = (union tcp_addr *)&ips[rand() % ips_nr];
++		else
++			p = (union tcp_addr *)&ips[i % ips_nr];
++	}
++}
 +
 +static void *client_fn(void *arg)
 +{
-+	test_extend();
-+	einval_tests();
-+	duplicate_tests();
++	size_t i;
 +
++	for (i = 0; i < ARRAY_SIZE(nr_keys); i++) {
++		struct bench_tests *bt = &bench_results[i];
++
++		synchronize_threads();
++		bench_connect_client(i, bt, test_ips, nr_keys[i], false);
++		test_print_stats("Worst case connect",
++				nr_keys[i], &bt->connect_last_key);
++
++		bench_connect_client(i, bt, test_ips, nr_keys[i], false);
++		test_print_stats("Connect random-search",
++				nr_keys[i], &bt->connect_last_key);
++	}
++	synchronize_threads();
 +	return NULL;
 +}
 +
 +int main(int argc, char *argv[])
 +{
-+	test_init(16, client_fn, NULL);
++	test_init(36, server_fn, client_fn);
 +	return 0;
 +}
 -- 
