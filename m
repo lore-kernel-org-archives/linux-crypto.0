@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE74ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 608A1ECAAA1
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Oct 2022 20:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237094AbiJ0Utc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Oct 2022 16:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
+        id S235121AbiJ0Utu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Oct 2022 16:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236535AbiJ0Ura (ORCPT
+        with ESMTP id S237121AbiJ0UsO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:47:30 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B986DFB
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:30 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id bp11so4151706wrb.9
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:30 -0700 (PDT)
+        Thu, 27 Oct 2022 16:48:14 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A363DCA
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:38 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id bs21so4168227wrb.4
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Oct 2022 13:44:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=arista.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6VUyfsSLg6lAD6Q4sT0EE4CVv2owqStEeQ0Ke6FGmkM=;
-        b=LivEWePsBpdEbnRrI85OptieqNJfD1OvVHU1egwKLYHUrL1uJIg95KqRrhA5LnRowP
-         LeGMgTvu1r0+gHVpw7e2urZCNpRt9hHuD2nB8f41evDT8CQ2X6xYbgjIyNwz/zNPLKlD
-         xsv/fooPRr1dgugEBi2McR/YpZieP/scsyyvy9yQdrRS4wQ0PmyEofqo8WghY9/AhHl6
-         10OYeDWBS/IoYlZwkPTDQ84oD5kFoACbv3t5/uChX+2WGPNRq++m5WTVYJ7J+y7BwWOP
-         7Di6011TMdzDIcEtq2CLrJ6FPuHSwLypmm78EpTxYmeAbZP6wtFrWHbopomeigHvmuK1
-         wP7g==
+        bh=kP+SAh+F64ZkLFr52URQ+wzrGshBfXjUpIMRDp+w/YQ=;
+        b=cjMFkXCN4OjefEPDADI83YvwiOmM1qytWHgGNelAN009vdYvGIkY/Q7uaAdtyFEzE8
+         paYJTrR5gn0aUFKNDEsNIy1KbtVTChRSbBHjTOeXWj+IpauZaycnbpOJCwPuf9+wUxZm
+         4NCYOREUuXnpfaOQX+letnek2oWN4OUe8Oq3uOhM7HE+m41ri79jqVH+JP/E1BtUkC/9
+         H52jpASiiO4tr7hNkSVdD+AIl3AKLW0JkY7anJ7C6kT2AbDyUeX2cmMhHr9OIO9K1N+/
+         vjsHW0ebaiPJa90XBql9eGGp0iVpEMGL94eO3d+xKkk+fn9mB7LBpji+Ex5hF4WBt6q5
+         B1cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6VUyfsSLg6lAD6Q4sT0EE4CVv2owqStEeQ0Ke6FGmkM=;
-        b=Sl3Bq7BnUtuhWMfB5izlm9TOuG9kPmU6H4iNt8z9/pmBtCvggAFGTKudI1L47/SOYF
-         u7oUTj3S05MRJtuL/sYC0OowC/cZttN1I9zwzX6dvv78y9ShYrzMo7XfZ3CEe80dcQw8
-         +m77BlWHI5Xa1dPfVjEmaBQqVm2WLPQkApQ5bymBNPqaiDSAJ9/YNj9wAfRvPp08i0BM
-         0dDN70onBeK6CpWuQRo/ZExurWUKnzGxcH+XH6QP7qW/kQjhhOUOH0KGBMJB/TRgZG8u
-         cjnnSLaoBthRExXHxu5VESfWzaMqpEmLNHLLtKqbeXKTkkqTpRr2kC4mNJliS7Esm2fl
-         5OFA==
-X-Gm-Message-State: ACrzQf37X+A/TgqFuiOi4uP96n7seiBXqOGjyOyOSWmAp9ZBA5AT1WOv
-        71t+v4D9UEs/iiArhCnru+aaCg==
-X-Google-Smtp-Source: AMsMyM4zBPTcftyrKOxqW/i8CUlJILhqjLqbRgtU/2esL8kmjghk1jnCtMhHVRqxZhe4HZo54vPoyg==
-X-Received: by 2002:adf:e609:0:b0:235:f4e6:c7c1 with SMTP id p9-20020adfe609000000b00235f4e6c7c1mr26802106wrm.217.1666903470117;
-        Thu, 27 Oct 2022 13:44:30 -0700 (PDT)
+        bh=kP+SAh+F64ZkLFr52URQ+wzrGshBfXjUpIMRDp+w/YQ=;
+        b=c+ke6Gu1FyPd0hoUk9ANSg/N+v5iTewDwlLl0Rcf3ggRhQZxCPgnqyj8wEbe/11cwu
+         I62GflglUnBlvs7YvBKXMvoIoeNpb5ykz44ZTgfAQ9lY34V2DNtyClHBLjTh5urripuz
+         kd9EfUc3677asbkSMBwpJkXKMOVt2E/uFV4E3iNjKYIhIHIz2D6Pz6Wt9g4kKdO0SbLN
+         nKzF8/AzOvuzY2fnZXoWRAYBkBibqiGpqE40rptQcefkVp6gGeQ6XyLwcO6T+gnvRBF9
+         oUxlrWYRPd+YbYlmQDFO2bDlPEsL83F9oqPYuz/x0A78ZH8ggFgoKE1Aip4Ntcy7sFXq
+         c/UQ==
+X-Gm-Message-State: ACrzQf1J6Vl914j7VA68H2QraeoRkOgPHgNvA4koQot1vCv/AINvKb2f
+        pc9hUVHLU9jc5XWJrUdr+pPq9w==
+X-Google-Smtp-Source: AMsMyM5vCqk71RZPJ/r8tzBefdkb+G+uw3UohC97chYG1D+N0POj8bODmJ3NxPNdNtv2JPvA2He2eg==
+X-Received: by 2002:a5d:590d:0:b0:236:4ddd:1869 with SMTP id v13-20020a5d590d000000b002364ddd1869mr23913510wrd.709.1666903477662;
+        Thu, 27 Oct 2022 13:44:37 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.28
+        by smtp.gmail.com with ESMTPSA id n3-20020a5d6b83000000b00236644228besm1968739wrx.40.2022.10.27.13.44.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 13:44:29 -0700 (PDT)
+        Thu, 27 Oct 2022 13:44:37 -0700 (PDT)
 From:   Dmitry Safonov <dima@arista.com>
 To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>
@@ -72,9 +72,9 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Salam Noureddine <noureddine@arista.com>,
         Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 23/36] net/tcp: Add getsockopt(TCP_AO_GET)
-Date:   Thu, 27 Oct 2022 21:43:34 +0100
-Message-Id: <20221027204347.529913-24-dima@arista.com>
+Subject: [PATCH v3 28/36] selftest/net: Add TCP-AO ICMPs accept test
+Date:   Thu, 27 Oct 2022 21:43:39 +0100
+Message-Id: <20221027204347.529913-29-dima@arista.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221027204347.529913-1-dima@arista.com>
 References: <20221027204347.529913-1-dima@arista.com>
@@ -84,341 +84,137 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Introduce getsockopt() that let user get TCP-AO keys and their
-properties from a socket. A user can provide a filter to match
-a specific key to be dumped or TCP_AO_GET_ALL flag may be used to dump
-all keys in one syscall.
+Reverse to icmps-discard test: the server accepts ICMPs, using
+TCP_AO_CMDF_ACCEPT_ICMP and it is expected to fail under ICMP
+flood from client. Test that the default pre-TCP-AO behaviour functions
+when TCP_AO_CMDF_ACCEPT_ICMP is set.
 
-Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-Co-developed-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Salam Noureddine <noureddine@arista.com>
+Expected output for ipv4 version (in case it receives ICMP_PROT_UNREACH):
+> # ./icmps-accept_ipv4
+> 1..3
+> # 3209[lib/setup.c:166] rand seed 1642623870
+> TAP version 13
+> # 3209[lib/proc.c:207]    Snmp6             Ip6InReceives: 0 => 1
+> # 3209[lib/proc.c:207]    Snmp6             Ip6InNoRoutes: 0 => 1
+> # 3209[lib/proc.c:207]    Snmp6               Ip6InOctets: 0 => 76
+> # 3209[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 0 => 1
+> # 3209[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
+> # 3209[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
+> # 3209[lib/proc.c:207]  IcmpMsg                   InType3: 0 => 4
+> # 3209[lib/proc.c:207]     Icmp                    InMsgs: 0 => 4
+> # 3209[lib/proc.c:207]     Icmp            InDestUnreachs: 0 => 4
+> # 3209[lib/proc.c:207]       Ip                InReceives: 3 => 27
+> # 3209[lib/proc.c:207]       Ip                InDelivers: 3 => 27
+> # 3209[lib/proc.c:207]       Ip               OutRequests: 2 => 22
+> # 3209[lib/proc.c:207]    IpExt                  InOctets: 288 => 3420
+> # 3209[lib/proc.c:207]    IpExt                 OutOctets: 124 => 3244
+> # 3209[lib/proc.c:207]    IpExt               InNoECTPkts: 3 => 25
+> # 3209[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> # 3209[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
+> # 3209[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
+> # 3209[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
+> ok 1 InDestUnreachs delivered 4
+> ok 2 server failed with -92: Protocol not available
+> ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
+> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Expected output for ipv6 version (in case it receives ADM_PROHIBITED):
+> # ./icmps-accept_ipv6
+> 1..3
+> # 3277[lib/setup.c:166] rand seed 1642624035
+> TAP version 13
+> # 3277[lib/proc.c:207]    Snmp6             Ip6InReceives: 6 => 31
+> # 3277[lib/proc.c:207]    Snmp6             Ip6InDelivers: 4 => 29
+> # 3277[lib/proc.c:207]    Snmp6            Ip6OutRequests: 4 => 24
+> # 3277[lib/proc.c:207]    Snmp6               Ip6InOctets: 592 => 4492
+> # 3277[lib/proc.c:207]    Snmp6              Ip6OutOctets: 332 => 3852
+> # 3277[lib/proc.c:207]    Snmp6            Ip6InNoECTPkts: 6 => 31
+> # 3277[lib/proc.c:207]    Snmp6               Icmp6InMsgs: 1 => 6
+> # 3277[lib/proc.c:207]    Snmp6       Icmp6InDestUnreachs: 0 => 5
+> # 3277[lib/proc.c:207]    Snmp6              Icmp6InType1: 0 => 5
+> # 3277[lib/proc.c:207]      Tcp                    InSegs: 3 => 23
+> # 3277[lib/proc.c:207]      Tcp                   OutSegs: 2 => 22
+> # 3277[lib/proc.c:207]   TcpExt               TCPPureAcks: 1 => 2
+> # 3277[lib/proc.c:207]   TcpExt           TCPOrigDataSent: 0 => 20
+> # 3277[lib/proc.c:207]   TcpExt              TCPDelivered: 0 => 19
+> # 3277[lib/proc.c:207]   TcpExt                 TCPAOGood: 3 => 23
+> ok 1 Icmp6InDestUnreachs delivered 5
+> ok 2 server failed with -13: Permission denied
+> ok 3 TCPAODroppedIcmps counter didn't change: 0 >= 0
+> # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+With some luck the server may fail with ECONNREFUSED (depending on what
+icmp packet was delivered firstly).
+For the kernel error handlers see: tab_unreach[] and icmp_err_convert[].
+
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- include/net/tcp_ao.h     |   1 +
- include/uapi/linux/tcp.h |  19 ++++
- net/ipv4/tcp.c           |  11 ++
- net/ipv4/tcp_ao.c        | 225 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 256 insertions(+)
+ tools/testing/selftests/net/tcp_ao/Makefile     |  4 +++-
+ .../testing/selftests/net/tcp_ao/icmps-accept.c |  1 +
+ .../selftests/net/tcp_ao/icmps-discard.c        | 17 +++++++++++++++--
+ 3 files changed, 19 insertions(+), 3 deletions(-)
+ create mode 120000 tools/testing/selftests/net/tcp_ao/icmps-accept.c
 
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index 6e87d36fc1c3..67f5273396ec 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -171,6 +171,7 @@ void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp);
- int tcp_ao_cache_traffic_keys(const struct sock *sk, struct tcp_ao_info *ao,
- 			      struct tcp_ao_key *ao_key);
- bool tcp_ao_ignore_icmp(struct sock *sk, int type, int code);
-+int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen);
- enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
- 			const struct sk_buff *skb, unsigned short int family,
- 			const struct request_sock *req,
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index b60933ee2a27..453187d21da8 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -132,6 +132,7 @@ enum {
- #define TCP_AO			38	/* (Add/Set MKT) */
- #define TCP_AO_DEL		39	/* (Delete MKT) */
- #define TCP_AO_MOD		40	/* (Modify MKT) */
-+#define TCP_AO_GET		41	/* (Get MKTs) */
+diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+index 9acfd782c20f..a178bde0af08 100644
+--- a/tools/testing/selftests/net/tcp_ao/Makefile
++++ b/tools/testing/selftests/net/tcp_ao/Makefile
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+-TEST_BOTH_AF := connect icmps-discard
++TEST_BOTH_AF := connect icmps-discard icmps-accept
  
- #define TCP_REPAIR_ON		1
- #define TCP_REPAIR_OFF		0
-@@ -353,6 +354,10 @@ struct tcp_diag_md5sig {
- #define TCP_AO_CMDF_NEXT	(1 << 1)	/* Only checks field rcvid */
- #define TCP_AO_CMDF_ACCEPT_ICMP	(1 << 2)	/* Accept incoming ICMPs */
+ TEST_IPV4_PROGS := $(TEST_BOTH_AF:%=%_ipv4)
+ TEST_IPV6_PROGS := $(TEST_BOTH_AF:%=%_ipv6)
+@@ -43,3 +43,5 @@ $(OUTPUT)/%_ipv4: %.c
+ $(OUTPUT)/%_ipv6: %.c
+ 	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
  
-+#define TCP_AO_GET_CURR		TCP_AO_CMDF_CURR
-+#define TCP_AO_GET_NEXT		TCP_AO_CMDF_NEXT
-+#define TCP_AO_GET_ALL		(1 << 2)
-+
- struct tcp_ao { /* setsockopt(TCP_AO) */
- 	struct __kernel_sockaddr_storage tcpa_addr;
- 	char	tcpa_alg_name[64];
-@@ -382,6 +387,20 @@ struct tcp_ao_mod { /* setsockopt(TCP_AO_MOD) */
- 	__u8	tcpa_rnext;
- } __attribute__((aligned(8)));
- 
-+struct tcp_ao_getsockopt { /* getsockopt(TCP_AO_GET) */
-+	struct __kernel_sockaddr_storage addr;
-+	__u8	sndid;
-+	__u8	rcvid;
-+	__u32	nkeys;
-+	char	alg_name[64];
-+	__u16	flags;
-+	__u8	prefix;
-+	__u8	maclen;
-+	__u8	keyflags;
-+	__u8	keylen;
-+	__u8	key[TCP_AO_MAXKEYLEN];
-+} __attribute__((aligned(8)));
-+
- /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
- 
- #define TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT 0x1
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8d64bdec3af8..b8c7104cf0c0 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4386,6 +4386,17 @@ int do_tcp_getsockopt(struct sock *sk, int level,
- 			err = -EFAULT;
- 		return err;
- 	}
-+#endif
-+#ifdef CONFIG_TCP_AO
-+	case TCP_AO_GET: {
-+		int err;
-+
-+		sockopt_lock_sock(sk);
-+		err = tcp_ao_get_mkts(sk, optval, optlen);
-+		sockopt_release_sock(sk);
-+
-+		return err;
-+	}
++$(OUTPUT)/icmps-accept_ipv4: CFLAGS+= -DTEST_ICMPS_ACCEPT
++$(OUTPUT)/icmps-accept_ipv6: CFLAGS+= -DTEST_ICMPS_ACCEPT
+diff --git a/tools/testing/selftests/net/tcp_ao/icmps-accept.c b/tools/testing/selftests/net/tcp_ao/icmps-accept.c
+new file mode 120000
+index 000000000000..0a5bb85eb260
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/icmps-accept.c
+@@ -0,0 +1 @@
++icmps-discard.c
+\ No newline at end of file
+diff --git a/tools/testing/selftests/net/tcp_ao/icmps-discard.c b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
+index 07eba1308b4e..d90017dfc20d 100644
+--- a/tools/testing/selftests/net/tcp_ao/icmps-discard.c
++++ b/tools/testing/selftests/net/tcp_ao/icmps-discard.c
+@@ -43,8 +43,17 @@ const int sk_ip_level	= SOL_IP;
+ const int sk_recverr	= IP_RECVERR;
  #endif
- 	default:
- 		return -ENOPROTOOPT;
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 90b864d4ee7d..a29c5bb8586b 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -1504,6 +1504,8 @@ static inline bool tcp_ao_mkt_overlap_v6(struct tcp_ao *cmd,
- 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT | TCP_AO_CMDF_ACCEPT_ICMP)
- #define TCP_AO_CMDF_DEL_VALID						\
- 	(TCP_AO_CMDF_CURR | TCP_AO_CMDF_NEXT)
-+#define TCP_AO_GETF_VALID						\
-+	(TCP_AO_GET_ALL | TCP_AO_GET_CURR | TCP_AO_GET_NEXT)
  
- static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
- 			  sockptr_t optval, int optlen)
-@@ -1781,3 +1783,226 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen)
- 	return tcp_parse_ao(sk, cmd, AF_INET, optval, optlen);
- }
- 
-+/* tcp_ao_copy_mkts_to_user(ao_info, optval, optlen)
-+ *
-+ * @ao_info:	struct tcp_ao_info on the socket that
-+ *		socket getsockopt(TCP_AO_GET) is executed on
-+ * @optval:	pointer to array of tcp_ao_getsockopt structures in user space.
-+ *		Must be != NULL.
-+ * @optlen:	pointer to size of tcp_ao_getsockopt structure.
-+ *		Must be != NULL.
-+ *
-+ * Return value: 0 on success, a negative error number otherwise.
-+ *
-+ * optval points to an array of tcp_ao_getsockopt structures in user space.
-+ * optval[0] is used as both input and output to getsockopt. It determines
-+ * which keys are returned by the kernel.
-+ * optval[0].nkeys is the size of the array in user space. On return it contains
-+ * the number of keys matching the search criteria.
-+ * If TCP_AO_GET_ALL is set in "flags", then all keys in the socket are
-+ * returned, otherwise only keys matching <addr, prefix, sndid, rcvid>
-+ * in optval[0] are returned.
-+ * optlen is also used as both input and output. The user provides the size
-+ * of struct tcp_ao_getsockopt in user space, and the kernel returns the size
-+ * of the structure in kernel space.
-+ * The size of struct tcp_ao_getsockopt may differ between user and kernel.
-+ * There are three cases to consider:
-+ *  * If usize == ksize, then keys are copied verbatim.
-+ *  * If usize < ksize, then the userspace has passed an old struct to a
-+ *    newer kernel. The rest of the trailing bytes in optval[0]
-+ *    (ksize - usize) are interpreted as 0 by the kernel.
-+ *  * If usize > ksize, then the userspace has passed a new struct to an
-+ *    older kernel. The trailing bytes unknown to the kernel (usize - ksize)
-+ *    are checked to ensure they are zeroed, otherwise -E2BIG is returned.
-+ * On return the kernel fills in min(usize, ksize) in each entry of the array.
-+ * The layout of the fields in the user and kernel structures is expected to
-+ * be the same (including in the 32bit vs 64bit case).
+-#define test_icmps_fail test_fail
+-#define test_icmps_ok test_ok
++/*
++ * Server is expected to fail with hard error if
++ * TCP_AO_CMDF_ACCEPT_ICMP is set
 + */
-+static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
-+				    sockptr_t optval, sockptr_t optlen)
-+{
-+	struct tcp_ao_getsockopt opt_in;
-+	struct tcp_ao_getsockopt opt_out;
-+	int user_len;
-+	unsigned int max_keys;	/* maximum number of keys to copy to user */
-+	u32 copied_keys;	/* keys copied to user so far */
-+	int matched_keys;	/* keys from ao_info matched so far */
-+	int bytes_to_write;	/* number of bytes to write to user level */
-+	struct tcp_ao_key *key;
-+	struct sockaddr_in *sin;   /* (struct sockaddr_in *)&opt_in.addr */
-+	struct sockaddr_in6 *sin6; /* (struct sockaddr_in6 *)&opt_in.addr */
-+	struct in6_addr *addr6;    /* &sin6->sin6_addr */
-+	__kernel_sa_family_t ss_family;
-+	union tcp_ao_addr *addr;
-+	size_t out_offset = 0;
-+	int optlen_out;
-+	u8 prefix_in;
-+	u16 port = 0;
-+	bool copy_all, copy_current, copy_next;
-+	int err;
++#ifdef TEST_ICMPS_ACCEPT
++# define test_icmps_fail test_ok
++# define test_icmps_ok test_fail
++#else
++# define test_icmps_fail test_fail
++# define test_icmps_ok test_ok
++#endif
+ 
+ static void serve_interfered(int sk)
+ {
+@@ -98,6 +107,10 @@ static void *server_fn(void *arg)
+ 
+ 	lsk = test_listen_socket(this_ip_addr, test_server_port, 1);
+ 
++#ifdef TEST_ICMPS_ACCEPT
++	flags = TCP_AO_CMDF_ACCEPT_ICMP;
++#endif
 +
-+	if (copy_from_sockptr(&user_len, optlen, sizeof(int)))
-+		return -EFAULT;
-+
-+	if (user_len <= 0)
-+		return -EINVAL;
-+
-+	memset(&opt_in, 0, sizeof(struct tcp_ao_getsockopt));
-+	err = copy_struct_from_sockptr(&opt_in, sizeof(opt_in),
-+				       optval, user_len);
-+	if (err < 0)
-+		return err;
-+
-+	ss_family = opt_in.addr.ss_family;
-+
-+	BUILD_BUG_ON(TCP_AO_GET_ALL & (TCP_AO_GET_CURR | TCP_AO_GET_NEXT));
-+	if (opt_in.flags & ~TCP_AO_GETF_VALID)
-+		return -EINVAL;
-+
-+	max_keys = opt_in.nkeys;
-+	copy_all = !!(opt_in.flags & TCP_AO_GET_ALL);
-+	copy_current = !!(opt_in.flags & TCP_AO_GET_CURR);
-+	copy_next = !!(opt_in.flags & TCP_AO_GET_NEXT);
-+
-+	if (!(copy_all || copy_current || copy_next)) {
-+		prefix_in = opt_in.prefix;
-+
-+		switch (ss_family) {
-+		case AF_INET: {
-+			sin = (struct sockaddr_in *)&opt_in.addr;
-+			port = sin->sin_port;
-+			addr = (union tcp_ao_addr *)&sin->sin_addr;
-+
-+			if (prefix_in > 32)
-+				return -EINVAL;
-+
-+			if (sin->sin_addr.s_addr == INADDR_ANY &&
-+			    prefix_in != 0)
-+				return -EINVAL;
-+
-+			break;
-+		}
-+		case AF_INET6: {
-+			sin6 = (struct sockaddr_in6 *)&opt_in.addr;
-+			addr = (union tcp_ao_addr *)&sin6->sin6_addr;
-+			addr6 = &sin6->sin6_addr;
-+			port = sin6->sin6_port;
-+
-+			if (prefix_in != 0) {
-+				if (ipv6_addr_v4mapped(addr6)) {
-+					__be32 addr4 = addr6->s6_addr32[3];
-+
-+					if (prefix_in > 32 ||
-+					    addr4 == INADDR_ANY)
-+						return -EINVAL;
-+				} else {
-+					if (ipv6_addr_any(addr6) ||
-+					    prefix_in > 128)
-+						return -EINVAL;
-+				}
-+			} else if (!ipv6_addr_any(addr6)) {
-+				return -EINVAL;
-+			}
-+
-+			break;
-+		}
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	bytes_to_write = min(user_len, (int)sizeof(struct tcp_ao_getsockopt));
-+	copied_keys = 0;
-+	matched_keys = 0;
-+
-+	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
-+		if (copy_all)
-+			goto match;
-+
-+		if (copy_current || copy_next) {
-+			if (copy_current && key == ao_info->current_key)
-+				goto match;
-+			if (copy_next && key == ao_info->rnext_key)
-+				goto match;
-+			continue;
-+		}
-+
-+		if (tcp_ao_key_cmp(key, addr, opt_in.prefix,
-+				   opt_in.addr.ss_family,
-+				   opt_in.sndid, opt_in.rcvid, port) != 0)
-+			continue;
-+match:
-+		matched_keys++;
-+		if (copied_keys >= max_keys)
-+			continue;
-+
-+		memset(&opt_out, 0, sizeof(struct tcp_ao_getsockopt));
-+
-+		if (key->family == AF_INET) {
-+			struct sockaddr_in *sin_out = (struct sockaddr_in *)&opt_out.addr;
-+
-+			sin_out->sin_family = key->family;
-+			sin_out->sin_port = ntohs(key->port);
-+			memcpy(&sin_out->sin_addr, &key->addr, sizeof(struct in_addr));
-+		} else {
-+			struct sockaddr_in6 *sin6_out = (struct sockaddr_in6 *)&opt_out.addr;
-+
-+			sin6_out->sin6_family = key->family;
-+			sin6_out->sin6_port = ntohs(key->port);
-+			memcpy(&sin6_out->sin6_addr, &key->addr, sizeof(struct in6_addr));
-+		}
-+		opt_out.sndid = key->sndid;
-+		opt_out.rcvid = key->rcvid;
-+		opt_out.prefix = key->prefixlen;
-+		opt_out.keyflags = key->keyflags;
-+		opt_out.flags = 0;
-+		if (key == ao_info->current_key)
-+			opt_out.flags |= TCP_AO_GET_CURR;
-+		if (key == ao_info->rnext_key)
-+			opt_out.flags |= TCP_AO_GET_NEXT;
-+		opt_out.nkeys = 0;
-+		opt_out.maclen = key->maclen;
-+		opt_out.keylen = key->keylen;
-+		memcpy(&opt_out.key, key->key, key->keylen);
-+		crypto_pool_algo(key->crypto_pool_id, opt_out.alg_name, 64);
-+
-+		/* Copy key to user */
-+		if (copy_to_sockptr_offset(optval, out_offset,
-+					   &opt_out, bytes_to_write))
-+			return -EFAULT;
-+		out_offset += user_len;
-+		copied_keys++;
-+	}
-+
-+	optlen_out = (int)sizeof(struct tcp_ao_getsockopt);
-+	if (copy_to_sockptr(optlen, &optlen_out, sizeof(int)))
-+		return -EFAULT;
-+
-+	out_offset = offsetof(struct tcp_ao_getsockopt, nkeys);
-+	if (copy_to_sockptr_offset(optval, out_offset,
-+				   &matched_keys, sizeof(u32)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen)
-+{
-+	struct tcp_ao_info *ao_info;
-+	u32 state;
-+
-+	/* Check socket state */
-+	state = (1 << sk->sk_state) &
-+		(TCPF_CLOSE | TCPF_ESTABLISHED | TCPF_LISTEN);
-+	if (!state)
-+		return -ESOCKTNOSUPPORT;
-+
-+	/* Check ao_info */
-+	ao_info = rcu_dereference_protected(tcp_sk(sk)->ao_info,
-+					    lockdep_sock_is_held(sk));
-+	if (!ao_info)
-+		return -ENOENT;
-+
-+	return tcp_ao_copy_mkts_to_user(ao_info, optval, optlen);
-+}
-+
+ 	if (test_set_ao(lsk, "password", flags, this_ip_dest, -1, 100, 100))
+ 		test_error("setsockopt(TCP_AO)");
+ 	synchronize_threads();
 -- 
 2.38.1
 
