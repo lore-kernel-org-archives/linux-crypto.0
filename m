@@ -2,301 +2,202 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C757ECAAA1
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Oct 2022 16:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83C7FA3746
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Oct 2022 16:16:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbiJ1QGA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Oct 2022 12:06:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35184 "EHLO
+        id S230520AbiJ1QQB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Oct 2022 12:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbiJ1QFa (ORCPT
+        with ESMTP id S231138AbiJ1QPj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Oct 2022 12:05:30 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C6F66171E;
-        Fri, 28 Oct 2022 09:04:20 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29SEnJPb030897;
-        Fri, 28 Oct 2022 16:04:10 GMT
+        Fri, 28 Oct 2022 12:15:39 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCCC5073D;
+        Fri, 28 Oct 2022 09:14:16 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29SEiEkK030134;
+        Fri, 28 Oct 2022 16:14:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : references : content-type : in-reply-to :
  mime-version; s=corp-2022-7-12;
- bh=KtCjfjqxNzs/1GooijZHFWRg+utlU586RLPJM6ZZOIc=;
- b=la7RlO0W1Zr8DP2SK+4KUflCzvDVhNo2NYciX1gB7Eg9e+33qWkldjt84T3cY/hsOrgJ
- RSkTAmdAW1zAJqn3t0lHaBccZ2uOUvECAJdEiWlH7PrE8YbWh0F25DSK8NZXsX8exDC6
- E5iAhUdEeeWZLx++C2xRx1vTQne5x3cN1cG64RqUGQfW6A1FdOHUS3O6zTilfNEJfLZs
- EELO5AfjdKZnyoV6ockEb+SuEPPGf+Vw1QpfuLgtQNEziTUC1uagngqCFShqb2aA5zp6
- iU8wJMW0tJi9KHvE9hp3scg9ZoKGI3FZaXNp9jQvr1ULaU85CNzYQgDZADJvO3YpmH2F uw== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kfays5k2r-1
+ bh=vc6iaFN+/ril4Gi8tLqCKU1iEVAcxVCYY+gh7l8Z/ZY=;
+ b=OJwqMRnBicjFHZBvHwoGldsoZb1T8XuUhT4rIWUXOWOSkvvyhH+Aap+eIf8nl9cZm6Tk
+ VVpckIgfSP+Xd8rhUe2EYj7EO+MZvgbhiiXLZ1VLClCs9urUtSrCnMpWyNdFFuNJht67
+ RLQXYOkmNAHC+8eCPlbhTRL0zsPtGWQriP2BjIDLmE67nP/8xGhd69ydXKUQJnnKBstj
+ IhvCGyk951F13zrvrxniCiWl3HYlfaR5HzUfUdJJrlJKeIuwyAkl0AfFaa4KuqXNDG7r
+ FfPDbCkomGv8OZR0i727+pKdtEopzPHRA9eIi/rZRvQ1/fSEkibl1tySUa9j46K6Gg+h 7w== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kfawrwgtf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Oct 2022 16:04:09 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 29SDiZoq011595;
-        Fri, 28 Oct 2022 16:04:07 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2049.outbound.protection.outlook.com [104.47.57.49])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3kfags7q9f-1
+        Fri, 28 Oct 2022 16:14:08 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 29SE7NvP017461;
+        Fri, 28 Oct 2022 16:14:07 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2174.outbound.protection.outlook.com [104.47.57.174])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3kfaghqf26-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Oct 2022 16:04:07 +0000
+        Fri, 28 Oct 2022 16:14:07 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nsT/SC0YaqWLRYLoUjB53q0yXMgwpbpCHoPIFzC8K/9foBrCmdImLcjbd++az9KozfhERcpOesijESDgV9frwe+QRiG3X9edl2Sdnf/52cPYA4lRJFZ/n02nHV/cUPEB9gu+4nS8iw274Ngq5gijEJ2eP29A7/d/uyFp3BVaG55KLL2ap6BOMONAAlvYfGVMyg30kgLNJMFzAZMAEwVIatbrDkUi/1W/wssMUDa+bzxuyiX17ZJlfy2c2uTWkhouGhydIyBLBl1saMerkWcYqMt7o8gUDbSaDWVaV9+gSyk+VuPH2wT5ZczMIEA9xfczxYyLKjDETdmFlrp3JroSUg==
+ b=Ma03i/AezyH3musHz4aGSckvahdW4vz3I4GPAkrFgCV2xM/SIqtOFu0Sf8kRGPGXIfQy3nNJhWRU3Pv8xo2HqIvAufeo299AmojG5CwWaszVpqSj87TpnIiGZ7AajipzyrejgW2BS60DBFoXKXwQD4cziIM8HxJf2c0ol3d2+xjEpdg6mzivBsd/48YNrXPZ91IOOkpLdVPSudBeKH46ens/mRoCe8zy0+LJAGGD7K519N47MTYy0JOdG63zM2evIt2N0Rw2tldVtCZkiRjFBzBz3yRCseEwjYyITR1S5XRx9VNHFKPTc6gVHXsyHt2cTsYoF4NVV8RNfaKbzj+Zfg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KtCjfjqxNzs/1GooijZHFWRg+utlU586RLPJM6ZZOIc=;
- b=D2gNc7+NCTU2Go9aaSws+td/LaWFSHT6P22k6hb0PV8H3T8vo66PGdlQBzJmv/XaE7sF+HndUBe+4EfzOn5zohFSOVS7UAgA3zrnS9TNbnW/H5oXHLkplAEDMBNu5TnWh4quyXloTBXMbYGFBcwlnLzlXSReffnneIiZv0NFAAbihaSWNozZL+byQjunCzy2rVyhdy0e/d5spsAVEGp6qeoZFfRNC7Y64GjcwvG+HY4g3pVdimAnXbK4w/Mj1xklzAiwl7YSlzXB06V8qP0jOgd293AOtfLDqZx82xvMzhDuGbEpp9R9Xgv3m0qgOg5VgRWLrRIix7vmYIU6Uv23mg==
+ bh=vc6iaFN+/ril4Gi8tLqCKU1iEVAcxVCYY+gh7l8Z/ZY=;
+ b=ZvpST5T9TV7rTMDNwrRF1wLQsLQ9LS1BZLaGrAvmAaa487iagVpiVVibLHkQmZ2i14RajypXTMODyTXyAmpMHAMcpPUS1d+oShcqSw3OZy8HpofnI+IW5NK5uI2PtgjY1jWBvOnA2H7LRFRkQWPEZT9ydTr1Ps8+K1LcpdjJzMeLN6S2yu1LPw+SuzXWWL5mGgTZOMmlrtuPWKGLihlSG8cf3LyOhce5F2tpIQtAH1+UtBAJfNEHtgPL271Tn+4b4tWD9tg9BCdt8BOfA3ELRPwNStpOSfd09hkrCXlbYclKFOlEvsyOEjm9z2wt1CybPZZ8miZIx+tLktu0Vv3YKw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KtCjfjqxNzs/1GooijZHFWRg+utlU586RLPJM6ZZOIc=;
- b=HTfL0AbmzXxvnuWHi7nSF8A6Xb0lerLNpgtadRhxnWZiIpk5WtomLz0UbcM6cP68Ybe9JaQerporW52VBDTH+OhZPB8jUJEQKfyH+B9SYH9l8oisNuErvCYY5ByCuvEn0xHHsL4w4MY4hqfNmDMmwPnWlnGzjMYTuJcb4ee6pX8=
+ bh=vc6iaFN+/ril4Gi8tLqCKU1iEVAcxVCYY+gh7l8Z/ZY=;
+ b=u4CF1h2mtVIJsE4edcxBB24n+nkNPRgyi8wL9MmL5sE9gP1JRoJWD52XMTD8lkN8Z88gOPm7gcqwQ4zu0C/GRUR1lfdmazcsxEGRDKXa1I3JQ7urTICZU/wg7+8ebWoptAIzsfYrVHQYQ+OFE2BmvqXS462D7hN5sUApXXt6tKo=
 Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by CY5PR10MB6216.namprd10.prod.outlook.com (2603:10b6:930:43::12) with
+ by SJ0PR10MB4813.namprd10.prod.outlook.com (2603:10b6:a03:2d2::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.15; Fri, 28 Oct
- 2022 16:04:05 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.25; Fri, 28 Oct
+ 2022 16:14:05 +0000
 Received: from SA1PR10MB5711.namprd10.prod.outlook.com
  ([fe80::780c:bae6:7248:d67e]) by SA1PR10MB5711.namprd10.prod.outlook.com
  ([fe80::780c:bae6:7248:d67e%9]) with mapi id 15.20.5746.021; Fri, 28 Oct 2022
- 16:04:05 +0000
-Date:   Fri, 28 Oct 2022 12:04:01 -0400
+ 16:14:05 +0000
+Date:   Fri, 28 Oct 2022 12:14:02 -0400
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Nicolai Stange <nstange@suse.de>
 Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Martin Doucha <mdoucha@suse.cz>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] padata: grab parallel_data refcnt for reorder
-Message-ID: <20221028160401.cccypv4euxikusiq@parnassus.localdomain>
+Subject: Re: [PATCH 5/5] padata: avoid potential UAFs to the padata_shell
+ from padata_reorder()
+Message-ID: <20221028161402.rh2p6feok2kjbjuq@parnassus.localdomain>
 References: <20221019083708.27138-1-nstange@suse.de>
- <20221019083708.27138-4-nstange@suse.de>
+ <20221019083708.27138-6-nstange@suse.de>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221019083708.27138-4-nstange@suse.de>
-X-ClientProxiedBy: BL0PR01CA0005.prod.exchangelabs.com (2603:10b6:208:71::18)
- To SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
+In-Reply-To: <20221019083708.27138-6-nstange@suse.de>
+X-ClientProxiedBy: BL1P223CA0019.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c4::24) To SA1PR10MB5711.namprd10.prod.outlook.com
+ (2603:10b6:806:23e::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|CY5PR10MB6216:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c7f9ab2-2a97-4bf1-91ff-08dab8fe09a2
+X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|SJ0PR10MB4813:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d5250c7-ef25-4cc2-0781-08dab8ff6f75
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dlnffYBJw8yzHh5eHdt+pu1lekcCoN+iub29WTdXrg0oNbgRwne83sxuBKh+ffZVJbTSvguxApp97e2lYlY2zEatjsEUn+tVA0ASdOjTGw2kqIDmbeBlarToVl+k0YAI2MMAPTbktYRFePTJBA6g7cjoGPxHAOl/ZTBDtgeHuHCS2UkumQgNBE4DLWnA6vTouP5uAqywYZ1436JHsPPUzQnUJumFK8rDvGz1iGDHVqnkk2u90vkGnZTr/WQGIQU8FbUYrLffnpn1oTeXsQiT6YrKSmnOe9NfaH168BQFXeZVFdWqJYyvkAF5xUZxHieWJaTfkNc9a1kLLC7fEkspgp2HgS5ovw+o61MI76M2w4foigGrnqPI2vUjNoJDqwd73GmDpRomTKKGt9ZQ0Xm9roSNQhPJDk2LyKn0uXn07ibgBTWlaxvdhX3x8OIVRBBtIb4873aXquX59oq5BU/pCktXqBKfhj75wkGESErht63ob2VXRr9Qza4glOXmpzjOwVDOeJuuijU0L/M+YsHTWD6hbQzo3CPjNE38EcQpk++zwYy68u4LGrnG3Xj4gNPyka5LFpSRbi2arWocWA+Uof2a/iqY0aVYZho4QP1oZIHRrVlBN0zgUbOb1jQ7tp9sPSXQDzuFaz4Be2wl7XNynUXkypop68reZFR/9VA2EvEGrYpkc2Dgup/m+pB42QV+KY8GhmQ2BgbsKP2ROs0bOA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(39860400002)(136003)(346002)(366004)(376002)(451199015)(38100700002)(6486002)(316002)(83380400001)(6666004)(5660300002)(6916009)(54906003)(6512007)(9686003)(26005)(41300700001)(66946007)(66556008)(66476007)(8936002)(86362001)(6506007)(4326008)(8676002)(2906002)(66899015)(186003)(1076003)(478600001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 6XV4b+MBa7HozxEz8hcsBGNpMklQtv+GCoWdquonVkYhB/M3fN3T2zc5U8I1Mm82+KdWEhyDrDHZOK+BHZjaGlaXuQUvo+TvsaP+Te+A3SeHgmYXk+6Q4YggwO5QHgI3sEotIJNbk5RY100noAS9nuAA1LyV/haOFAluTcdEjNG6JBIWLP11Nl7dhctmydXXWpWim9M5nLjVYkwhy+UU1DvLjQIlAZAKohoaSUw1rrf/6fxBW1ipTB92k2EOVyADXFR9CVgqQ9OVKdp0K/vhcC/hrlDstms1cDZQZCoUpMX9nDN++D536Ccvc9syTQgez1D5pqfEfl9iNK/eJ1/A+h/38XLA+yM5ws/1iKxR8KZD+FIfmNnYctA6pdJzQCkzvBgjFLnSkM3hPHSa4on3YnHcNjlaUuuI+DndogGUzvzxepeGsugVyLTaq2PxlF5FrjZ8CHWh0fyDiUQHLlKpgszsaODK/ko0Z5pJzAlFpkSolXHF0iDv+rEDxI8/emQsgAs/mae55AoVEcZps54ONEMbqMx8VX1WLuvynxIVuu3vql+5zy4fOJzghPda22lnUCy4LgQr91mFmj1LU6BI5ou0kxtsMlpQxxaRJjSQG8HAwufPbCivLKaanQiZC++IhULDvKVomkLTb+WRUmch22VprlcNz+k8Otscdnz853hW1in811QFEl3g2TpiGJldWsK4dvwVWuLCjyWfZz8ttQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(136003)(396003)(346002)(376002)(39860400002)(451199015)(26005)(2906002)(9686003)(1076003)(5660300002)(186003)(41300700001)(8936002)(38100700002)(6512007)(86362001)(83380400001)(54906003)(6916009)(316002)(478600001)(6486002)(6666004)(8676002)(6506007)(66476007)(66556008)(66946007)(4326008);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?e73W3ArENt8LCCunAAArWqzytDVz0VPwmrKfpctM8/2+7PUH2GojnPuDoBf4?=
- =?us-ascii?Q?MDLqKoLZiIqIWyYae/4+2R1mC0KVSDtLF73gRf8Ji0SeX97KQVNHu2/SMAD7?=
- =?us-ascii?Q?stHOfPswof0o22Tv2dUPQFN7tYaKgLKw5fDYvrRR0bT8U3CrFbwyaJmCI32O?=
- =?us-ascii?Q?iuHYNlDjil7T7nQD40QcW8rBtBjgrvWkQEz3bzm7Cs3H4TR4JlGN0vJZ0KOy?=
- =?us-ascii?Q?zBAqPM/1tituMrEZoXTNE4WWwxOWXdk/FBFJA6xJk3jUpcX2B2Hi+4Dmo/0H?=
- =?us-ascii?Q?3LljQ/m9Smmp8kcaDc1In4NRk8JjMTAWQFWfvc60F9TiomXIaJcEcht1VoOp?=
- =?us-ascii?Q?nPNMAf/2wbu3hAW0ZsjqZPn/E8Phwp0qJcaz+gH+J6b38/rjLj8K5+ZK3awn?=
- =?us-ascii?Q?15ZMpB8BYb9jeRrdiwNeyxcSnLKmrB1Kp5AV8fZ1/RVdggjW1VfWaAfgGYyl?=
- =?us-ascii?Q?AuEtVtkN9CTdphblSZI1IzI8w2xA4ajeCpH3z0aMAg74ZuGBcuZxwKm1qtJ9?=
- =?us-ascii?Q?DklkmAP8YRzayDK4ubRQc4rUPwobE1L5bFMQJOFo4M0pqwVK+Q8VrDpCESTZ?=
- =?us-ascii?Q?HftK1CejvjLowLVVKOLPCzJeRRy7977hrTgAPuGyhgPwUfOEq0UQuPTCIJsQ?=
- =?us-ascii?Q?Ha3q4p0AVQx1w+H2qsnsZ79hSJBlt/j/MgTuQ6T2MZwX52/Q3FTvXcw41Jda?=
- =?us-ascii?Q?Fit/qVhPdk8VWJg+4a4OT/Ig0RI3u9K0gF6CCaPT6jXIrjThP0Fpd3cTTOMy?=
- =?us-ascii?Q?H/HMU8Y5nuV4mH2ncwe5JKBpVRN3mJgiKUUTla0TFihJJG0pHijvszzPzEUQ?=
- =?us-ascii?Q?VJmq7IUAoFoEDgkHKTUCBGW27ONSPO+7+EHzO5+a5PPzidqVPxkek86ZWK0r?=
- =?us-ascii?Q?dPFLRTZRc7+8w9eU/zyMaOGrhZesoFmFioQ7UL1hRzcW8gMeRBG0cbQ+/sHE?=
- =?us-ascii?Q?K+VADzN3P4deREttS4krKQ4nPr/DsrWYHaHxw6wAMyohi9TcDUCUl+d9BigF?=
- =?us-ascii?Q?I9qnyUasfM8EStI/Cg76mWKGpGR1sBtjJa9Wk5IOG9moEsB+J5zEi9CZe1Mj?=
- =?us-ascii?Q?vKdu7MfC8vkIFy5FyRJB8WJN54NmCfqtIevNdNyMR/Gp/5oZKUcUGtez6a5h?=
- =?us-ascii?Q?MW9GUkVlu//oPWQzq30ML8WghNUZZir40xSJ1zMbBQt8URaicj1QabSxXFfj?=
- =?us-ascii?Q?678NetZWY1Ze5kc8SB0WczNv8dXLl/daUOjAfezN6ud/mprR/qi6Mn69PHuR?=
- =?us-ascii?Q?hdiEuZ+bFu2RXhgxq1mJ0Qdgksd9EZbRWUirt+xVPKW70SF+KS1GuKE5SbTI?=
- =?us-ascii?Q?Oklw+SSLuO9e0lMlzwPPjsf4iRPjznxafwgWsceJPDwF/375iFN5ERvNhhNN?=
- =?us-ascii?Q?wHXkx55DeycO3shJIRlRwxrmHt0RW8Kzf8bxH7C9emAQ3OKsmvReuMqDhTZf?=
- =?us-ascii?Q?ctCBtSTrbZAZfugjFKa7gEfxfXaQTMAQ/fcpBjT96MtIQnRCKydCTycdKXE4?=
- =?us-ascii?Q?tZhOd5Gg+7UAUnNnqC1GvnvhXTJvbG6RjSKZs42EvJzyV3x7bc6PUuKNKqxL?=
- =?us-ascii?Q?1f/ZrXVKvsPDdLWDOzRhsSRsoqnmI1Eb5uC6GZVGgroo6sXPqC4w2xizILIL?=
- =?us-ascii?Q?iw=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kzJx5fWJVDTboQXWTKE1xef5hd6XYo/uxfOBEeSzqkjQ4kKO9g5qHA5DKoqG?=
+ =?us-ascii?Q?Wue6Qbqg+VTMBbHlzv6FqkD0DRqjqBfFbv46yNRA+TskmZzW1PRLqrjDKXYo?=
+ =?us-ascii?Q?6g5aQFFEQ9eLyyrVxNfULSqzBt7/xp23FUYo2TtDmYzkS3WCU8t8aEHIE5SD?=
+ =?us-ascii?Q?L0ZodkZ+0zb4ehIUnxZB8odeV4+1fcfZlkQyi4yrhfDXxU9i8PFQJM9QFhWH?=
+ =?us-ascii?Q?/B/Z9bFKcY9JDEwxUGxukQXmJuGRaIDKZkTisw5yygaXPZ3SzPD5a0iyBrhN?=
+ =?us-ascii?Q?BR8NGpWq8G5fu1xbkV0/3F2KK/FYez5SDePpJg4l4Ewadcbh6E/3bsI4LCfd?=
+ =?us-ascii?Q?elmkIF4lGL/jRwhJnU0ThUWpNAg+qcLA0Fe7+26Otr838N4DleIq1llnagbC?=
+ =?us-ascii?Q?VEzifiKcLMT68h6ulU811aK1W5iLQPzIVcaNT2ElnJiuLVUMTQJ+p989SOHl?=
+ =?us-ascii?Q?LNmIsf+NMLlMgfZn+xDcgdliFw8b56y2wQKLx17tZdFqo0nMTgcIQdfoqlyC?=
+ =?us-ascii?Q?XFNKRR3H2uORDeNH8IiBYNSo3BGMji5kZxBdII/fnpRCw2PggJg6NMryzMzk?=
+ =?us-ascii?Q?1c7gyggt8tPSsW9KGTzXZb7MDoi9DTRlXEwPAOW+L5dlVluGwM/P0ap62giY?=
+ =?us-ascii?Q?9/xMPCHM05NHWOrZ8CbTo2sPu0e2aDY1GWhuM/pBb3weGFPJFmjjUH0Gfi8H?=
+ =?us-ascii?Q?mKLvqqQeY2PE3PSN4yxTKZNmlcl3bXea6h3qLzXm3bThEhlrRtA6XmRDFgMz?=
+ =?us-ascii?Q?EYV86OSe7opfUmjxhHOyoz4RlKdGx9LVbDxuaXicoBw0AsatvdiPJwvN8lpH?=
+ =?us-ascii?Q?dTJcJcZcGRMuSzc8V4iwFOVaCxngpnEksVMl1OCRgLj5zhCfmWnxqYgARkJn?=
+ =?us-ascii?Q?zKZSws+Cvc/dO4J3VDX29lNFRjZwvF3kQAzK9tE9ohWReBPMmXpgFYYx8EWY?=
+ =?us-ascii?Q?36NWQoauOMP5TZtvsivhP0GU67piij/eayAKkCpeC3KTGhMcZOcEi9b8ngmO?=
+ =?us-ascii?Q?OQdsVTquFJpQqc/7mC/wytjUPfv53NyoHVweBlFuAaQJQh4IKhHaFdKRsBiM?=
+ =?us-ascii?Q?t50nZhiOPGUK+A0owAZJFt2GAJqn6KY5ySD7i5L7shCY9xEqeBzMVuivgM/S?=
+ =?us-ascii?Q?GiPip6nX+zzfQiBI+PKT7D2ITQ6hCuYK2pjaykntLJ4guEUsMTUWFc2C4gCr?=
+ =?us-ascii?Q?S9xzjfosx4PVuchGlUDbVPQPMjOKeeBApiaEv4zIopcOoV1xoYb3xp+2yYlM?=
+ =?us-ascii?Q?6yNIXIjnlFmGcjnGgMKSYE8IDNcO13F5Oy3v6CviCwdU2d3YAEdOPY7B6NSx?=
+ =?us-ascii?Q?ZKNbQZ5+Sz3er7lKf7D0OLdn68t2tksOIHA9HvnctzVWjvQM6fUpKUL4o9D4?=
+ =?us-ascii?Q?lIcAYHUZG7yZcNYHFQMeBMQgbGKdXzKByXVrSWAl6wgC+1CWB8aLITua/Pnw?=
+ =?us-ascii?Q?rlAj4g8B/LAD2hGoYYKlAE+zCAXWIuj1ZdG20/8f+EMjJZ/+t4LrdkB7c5g0?=
+ =?us-ascii?Q?L6cKKrQVYjHsVQ5/44EHjRyvYt7Si7kHiJOQiIy8s76XH9XNqsbuYKM6s5OR?=
+ =?us-ascii?Q?u+wfsHfrolR+F5a3ey7qjINUQJo+E2lfl/od59B+C4yFbRfDzSMmiSaK8eI+?=
+ =?us-ascii?Q?uQ=3D=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c7f9ab2-2a97-4bf1-91ff-08dab8fe09a2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d5250c7-ef25-4cc2-0781-08dab8ff6f75
 X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2022 16:04:05.4042
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2022 16:14:05.4801
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BaUJ6NUi+QFmZq8+GKwnBN9rcvR0VZvbPw4+n+Doolvyp1IvhOZBlxLJKTk8ihiZTZ0bLPeXvTc2OE6uS1XniwxuWa+5MDvAM3Q0F5oAXKA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB6216
+X-MS-Exchange-CrossTenant-UserPrincipalName: e5b6CMp7P9eFxOsUgq7t/jlL7OQm/II9oomlWHc0LxsdtKVhlJ0jtWJz3rI3DxRVp2hhgguD1C2f+UB4FDcu5mJdGZ1OD3Xx0HDeYEIrnUk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4813
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-28_07,2022-10-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- adultscore=0 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2210280101
-X-Proofpoint-ORIG-GUID: t-2vi2I4abawqWpuR0_SuBhlgFNolXUs
-X-Proofpoint-GUID: t-2vi2I4abawqWpuR0_SuBhlgFNolXUs
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=916 mlxscore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2210280102
+X-Proofpoint-ORIG-GUID: kDuGoqMioKb_t5G9FUyUEWTVQbnBo-b8
+X-Proofpoint-GUID: kDuGoqMioKb_t5G9FUyUEWTVQbnBo-b8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 10:37:06AM +0200, Nicolai Stange wrote:
-> On entry of padata_do_serial(), the in-flight padata_priv owns a reference
-> to the associated parallel_data instance.
-> 
-> However, as soon as the padata_priv got enqueued on the reorder list, it
-> can be completed from a different context, causing the reference to get
-> released in the course.
-> 
-> This would potentially cause UAFs from the subsequent padata_reorder()
-> operations invoked from the enqueueing padata_do_serial() or from the
-> reorder work.
-> 
-> Note that this is a purely theroretical concern, the problem has never been
-> actually observed -- it would require multiple pcrypt request submissions
-> racing against each other, ultimately a pcrypt instance destruction
-> (DELALG) short after request completions as well as unfortunate timing.
-> 
-> However, for the sake of correctness, it is still worth fixing.
-> 
-> Make padata_do_serial() grab a reference count on the parallel_data for
-> the subsequent reorder operation(s). As long as the padata_priv has not
-> been enqueued, this is safe, because as mentioned above, in-flight
-> pdata_privs own a reference already.
-> 
-> Note that padata_reorder() might schedule another padata_reorder() work
-> and thus, care must be taken to not prematurely release that "reorder
-> refcount" from padata_do_serial() again in case that has happened.
-> Make padata_reorder() return a bool for indicating whether or not a
-> reorder work has been scheduled. Let padata_do_serial() drop its refcount
-> only if this is not the case. Accordingly, make the reorder work handler,
-> invoke_padata_reorder(), drop it then as appropriate.
-> 
-> A remark on the commit chosen for the Fixes tag reference below: before
-> commit bbefa1dd6a6d ("crypto: pcrypt - Avoid deadlock by using per-instance
-> padata queues"), the padata_parallel lifetime had been tied to the
-> padata_instance. The padata_free() resp. padata_stop() issued a
-> synchronize_rcu() before padata_free_pd() from the instance destruction
-> path, rendering UAFs from the padata_do_serial()=>padata_reorder()
-> invocations with BHs disabled impossible AFAICS. With that, the
-> padata_reorder() work remains to be considered. Before
-> commit b128a3040935 ("padata: allocate workqueue internally"), the
-> workqueue got destroyed (from pcrypt), hence drained, before the padata
-> instance destruction, but this change moved that to after the
-> padata_free_pd() invocation from __padata_free(). So, while the Fixes
-> reference from below is most likely technically correct, I would still like
-> to reiterate that this problem is probably hard to trigger in practice,
-> even more so before commit bbefa1dd6a6d ("crypto: pcrypt - Avoid deadlock
-> by using per-instance padata queues").
-> 
-> Fixes: b128a3040935 ("padata: allocate workqueue internally")
-> Signed-off-by: Nicolai Stange <nstange@suse.de>
-> ---
->  kernel/padata.c | 26 +++++++++++++++++++++-----
->  1 file changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 0bf8c80dad5a..b79226727ef7 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -275,7 +275,7 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
->  	return padata;
->  }
->  
-> -static void padata_reorder(struct parallel_data *pd)
-> +static bool padata_reorder(struct parallel_data *pd)
->  {
->  	struct padata_instance *pinst = pd->ps->pinst;
->  	int cb_cpu;
-> @@ -294,7 +294,7 @@ static void padata_reorder(struct parallel_data *pd)
->  	 * care for all the objects enqueued during the holdtime of the lock.
->  	 */
->  	if (!spin_trylock_bh(&pd->lock))
-> -		return;
-> +		return false;
->  
->  	while (1) {
->  		padata = padata_find_next(pd, true);
-> @@ -331,17 +331,23 @@ static void padata_reorder(struct parallel_data *pd)
->  
->  	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
->  	if (!list_empty(&reorder->list) && padata_find_next(pd, false))
-> -		queue_work(pinst->serial_wq, &pd->reorder_work);
-> +		return queue_work(pinst->serial_wq, &pd->reorder_work);
-> +
-> +	return false;
->  }
->  
->  static void invoke_padata_reorder(struct work_struct *work)
->  {
->  	struct parallel_data *pd;
-> +	bool keep_refcnt;
->  
->  	local_bh_disable();
->  	pd = container_of(work, struct parallel_data, reorder_work);
-> -	padata_reorder(pd);
-> +	keep_refcnt = padata_reorder(pd);
->  	local_bh_enable();
-> +
-> +	if (!keep_refcnt)
-> +		padata_put_pd(pd);
->  }
->  
->  static void padata_serial_worker(struct work_struct *serial_work)
-> @@ -392,6 +398,15 @@ void padata_do_serial(struct padata_priv *padata)
->  	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
->  	struct padata_priv *cur;
->  
-> +	/*
-> +	 * The in-flight padata owns a reference on pd. However, as
-> +	 * soon as it's been enqueued on the reorder list, another
-> +	 * task can dequeue and complete it, thereby dropping the
-> +	 * reference. Grab another reference here, it will eventually
-> +	 * be released from a reorder work, if any, or below.
-> +	 */
-> +	padata_get_pd(pd);
-> +
->  	spin_lock(&reorder->lock);
->  	/* Sort in ascending order of sequence number. */
->  	list_for_each_entry_reverse(cur, &reorder->list, list)
-> @@ -407,7 +422,8 @@ void padata_do_serial(struct padata_priv *padata)
->  	 */
->  	smp_mb();
->  
-> -	padata_reorder(pd);
-> +	if (!padata_reorder(pd))
-> +		padata_put_pd(pd);
+On Wed, Oct 19, 2022 at 10:37:08AM +0200, Nicolai Stange wrote:
+> Even though the parallel_data "pd" instance passed to padata_reorder() is
+> guaranteed to exist as per the reference held by its callers, the same is
+> not true for the associated padata_shell, pd->ps. More specifically, once
+> the last padata_priv request has been completed, either at entry from
+> padata_reorder() or concurrently to it, the padata API users are well
+> within their right to free the padata_shell instance.
 
-do_serial is supposed to be called with BHs disabled and will be in
-every case after a fix for a separate issue that I plan to send this
-cycle.  Given that it (will soon...) always happen under RCU protection,
-part of this issue could be addressed like this, which puts the expense
-of dealing with this rare problem in the slow path:
+The synchronize_rcu change seems to make padata_reorder safe from freed
+ps's with the exception of a straggler reorder_work.  For that, I think
+something like this hybrid of your code and mine is enough to plug the
+hole.  It's on top of 1-2 and my hunk from 3.  It has to take an extra
+ref on pd, but only in the rare case where the reorder work is used.
+Thoughts?
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 0bf8c80dad5a..cd6740ae6629 100644
+index cd6740ae6629..f14c256a0ee3 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -1110,6 +1110,12 @@ void padata_free_shell(struct padata_shell *ps)
- 	if (!ps)
- 		return;
+@@ -277,7 +277,7 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
  
-+	/*
-+	 * Wait for all _do_serial calls to finish to avoid touching freed pd's
-+	 * and ps's.
-+	 */
-+	synchronize_rcu();
-+
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	padata_put_pd(rcu_dereference_protected(ps->pd, 1));
+ static void padata_reorder(struct parallel_data *pd)
+ {
+-	struct padata_instance *pinst = pd->ps->pinst;
++	struct padata_instance *pinst;
+ 	int cb_cpu;
+ 	struct padata_priv *padata;
+ 	struct padata_serial_queue *squeue;
+@@ -314,7 +314,7 @@ static void padata_reorder(struct parallel_data *pd)
+ 		list_add_tail(&padata->list, &squeue->serial.list);
+ 		spin_unlock(&squeue->serial.lock);
+ 
+-		queue_work_on(cb_cpu, pinst->serial_wq, &squeue->work);
++		queue_work_on(cb_cpu, pd->ps->pinst->serial_wq, &squeue->work);
+ 	}
+ 
+ 	spin_unlock_bh(&pd->lock);
+@@ -330,8 +330,10 @@ static void padata_reorder(struct parallel_data *pd)
+ 	smp_mb();
+ 
+ 	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
+-	if (!list_empty(&reorder->list) && padata_find_next(pd, false))
+-		queue_work(pinst->serial_wq, &pd->reorder_work);
++	if (!list_empty(&reorder->list) && padata_find_next(pd, false)) {
++		if (queue_work(pd->ps->pinst->serial_wq, &pd->reorder_work))
++			padata_get_pd(pd);
++	}
+ }
+ 
+ static void invoke_padata_reorder(struct work_struct *work)
+@@ -342,6 +344,7 @@ static void invoke_padata_reorder(struct work_struct *work)
+ 	pd = container_of(work, struct parallel_data, reorder_work);
+ 	padata_reorder(pd);
+ 	local_bh_enable();
++	padata_put_pd(pd);
+ }
+ 
+ static void padata_serial_worker(struct work_struct *serial_work)
 
-pcrypt calls padata_free_shell() when all outstanding transforms (and
-thus requests, I think) have been freed/completed, so no new task can
-come into padata_reorder.  synchronize_rcu() then flushes out any
-remaining _reorder calls.
-
-This doesn't deal with pending reorder_work items, but we can fix it
-later in the series.
-
-What do you think?
