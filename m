@@ -2,67 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6758FA3741
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 02:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC04FA3740
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 02:22:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbiKACSS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Oct 2022 22:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
+        id S229730AbiKACWt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Oct 2022 22:22:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229867AbiKACSI (ORCPT
+        with ESMTP id S229452AbiKACWs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Oct 2022 22:18:08 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A511788A;
-        Mon, 31 Oct 2022 19:17:55 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VTaUC86_1667269072;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VTaUC86_1667269072)
-          by smtp.aliyun-inc.com;
-          Tue, 01 Nov 2022 10:17:53 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     clabbe@baylibre.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net, heiko@sntech.de,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] crypto: Remove surplus dev_err() when using platform_get_irq()
-Date:   Tue,  1 Nov 2022 10:17:51 +0800
-Message-Id: <20221101021751.89362-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Mon, 31 Oct 2022 22:22:48 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951F3E5B;
+        Mon, 31 Oct 2022 19:22:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 38201B81A5E;
+        Tue,  1 Nov 2022 02:22:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA9E8C433D6;
+        Tue,  1 Nov 2022 02:22:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667269364;
+        bh=iXkoHfA0E8gCJGSPDExlBGC7wVy3zs193btcw19ae4U=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Y197eQae4Xg+JY+k03j4a6S2vWBlxlVeMS9acol6LDSZfj4mgDQ0IbouzcJLrX8xl
+         AqrGRQ4wIE+bI88OVIwIZk7ryFHpA54+anJxRTGMieVd+19ce5H4OkzOCgxSdEw/CN
+         TFz/JTzrxNADHz3GKfpn7chlIvwWR/jHXLR+oSgtO95qNndwZrxBmZ74d0Yr8aNbDb
+         DasDtmY0kyC55aPxTR0f9oIXyyklu/MnGiqD2oKgPeXYwaiG8cCcEE8HRb51O83Tl3
+         Zqv6e59M12bc4KjNIkvRGEGPdnVtGqCyg3jEe/idty/sBHn7JorxSVQFybCaocMwHD
+         Cr98iZrknPXNw==
+Message-ID: <c0b6c5f1-9b4f-2d3d-69fd-533daa023e09@kernel.org>
+Date:   Mon, 31 Oct 2022 20:22:41 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v3 00/36] net/tcp: Add TCP-AO support
+Content-Language: en-US
+To:     Dmitry Safonov <dima@arista.com>, linux-kernel@vger.kernel.org,
+        Eric Dumazet <edumazet@google.com>
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ivan Delalande <colona@arista.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20221027204347.529913-1-dima@arista.com>
+From:   David Ahern <dsahern@kernel.org>
+In-Reply-To: <20221027204347.529913-1-dima@arista.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no need to call the dev_err() function directly to print a
-custom message when handling an error from either the platform_get_irq()
-or platform_get_irq_byname() functions as both are going to display an
-appropriate error message in case of a failure.
+Thinking about how to move the TCP-AO intent forward: clearly a 36-patch
+set is a bit much. The first 6 patches are prep work, and we know there
+is a use case for those.
 
-./drivers/crypto/rockchip/rk3288_crypto.c:351:2-9: line 351 is
-redundant because platform_get_irq() already prints an error
+We could handle patches 3 and 4 as a stand alone set first.
 
-Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=2677
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- drivers/crypto/rockchip/rk3288_crypto.c | 1 -
- 1 file changed, 1 deletion(-)
+Once merged, deal with the crypto API and users until those maintainers
+are good. That would be patches 1, 2, 5 and 6.
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 6217e73ba4c4..9f6ba770a90a 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -348,7 +348,6 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 
- 	crypto_info->irq = platform_get_irq(pdev, 0);
- 	if (crypto_info->irq < 0) {
--		dev_err(&pdev->dev, "control Interrupt is not available.\n");
- 		err = crypto_info->irq;
- 		goto err_crypto;
- 	}
--- 
-2.20.1.7.g153144c
+Once those are merged it drops down to just networking patches with
+selftests. Those can be split into AO (19) and selftests (11) making it
+4 total sets of manageable size.
 
+The AO patches can be reviewed until convergence on a good starting point.
+
+Sound reasonable?
