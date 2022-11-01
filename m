@@ -2,84 +2,199 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AB8C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 16:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5A5C43217
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 16:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbiKAQBl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Nov 2022 12:01:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
+        id S231205AbiKAQcu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Nov 2022 12:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbiKAQBk (ORCPT
+        with ESMTP id S230437AbiKAQbx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2022 12:01:40 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0260CCE07;
-        Tue,  1 Nov 2022 09:01:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
-        t=1667318489; bh=wqEmykY8sq7ZS7zFRbw1eAhxJ6Z9ajXFcFiMuF7++7Q=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-        b=a+fuhTaTKHTJPsX+48nmwJGwnYeLWUNuKECJ5TZPbTftoSf/r7oRFP6VwBeR+nRYA
-         /hjF9NzDuwu02Im13NlDTNLCrUcn3ACTDl3lxqc1Vz1qTR/fftXlmqjTt7IRD4QcJI
-         bToVG4LLSGI41+wp+LAYzHoRuMb5aT+7nqRGa8+F0Dn8TtVV/my1jgm4CPGNK1r4GE
-         xqnSMIJPwGeTgfIeyTutFTQW3UN7aFveXrY3CRnhFtAWX+0PJJ2hGqoVfhG/vZM0tu
-         OIRPU3CDYjIvAtPOvX5hQkphHnM/ZcG/lPwDmrj4zWrcyZAjh2S2O+YzPRM0GVsAVx
-         HaY93pRPy9caw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from probook ([78.34.126.36]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mk0JM-1pIfx30rv6-00kLNT; Tue, 01
- Nov 2022 17:01:29 +0100
-From:   =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
-To:     linux-doc@vger.kernel.org
-Cc:     =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] docs: admin-guide: hw_random: Make document title more generic and concise
-Date:   Tue,  1 Nov 2022 17:01:18 +0100
-Message-Id: <20221101160119.955997-1-j.neuschaefer@gmx.net>
-X-Mailer: git-send-email 2.35.1
+        Tue, 1 Nov 2022 12:31:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7A21CFC9
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Nov 2022 09:30:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667320249;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=11t7t2M5S9FVtreaeqc7IEi/JpUAAyL70GwctMIr/Uo=;
+        b=QNeFOtjIKWlatRfVCo1VjmHWAJN9/uB36sp8Ffclx7qI55YshgfD9epp7I5Ua7QNM3eRJU
+        o6lHAHVJSgAzRIl50n8Xhmi/52GuRhEhOqsTUMnKe3up4iPmEuPzPG+ur6ZwTyAUOVgh0f
+        zJyMrWSpS39bURPxwm7GWEAs5Yrqg6w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-156-UXHRu4KIP5SSs1TCerXLMw-1; Tue, 01 Nov 2022 12:30:46 -0400
+X-MC-Unique: UXHRu4KIP5SSs1TCerXLMw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E801E811E81;
+        Tue,  1 Nov 2022 16:30:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD9AC4EA49;
+        Tue,  1 Nov 2022 16:30:42 +0000 (UTC)
+Subject: [RFC PATCH 00/12] smb3: Add iter helpers and use iov_iters down to
+ the network transport
+From:   David Howells <dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-cachefs@redhat.com, John Hubbard <jhubbard@nvidia.com>,
+        linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Jeff Layton <jlayton@kernel.org>, linux-mm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, dhowells@redhat.com,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 01 Nov 2022 16:30:41 +0000
+Message-ID: <166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-X-Provags-ID: V03:K1:BniFoQ8fY4g953kMOLmdVbJHsLH9tOMFkdJNSMpesAWwoYkSQQO
- YdA9rRclCh6xyd9/El8dXiyv9mJyfydG4R+R+c2oEjCWKRY8z+txssTftoWjBYAgWv61IVR
- eIlsaswD8EvpBb98LaFvMxLlRD7nihn8JPmQkF2vGb6t+AFb2W6TMIPCU/1gAkH9lzhwyVD
- cxX3kuLDk6km56ylrO1AA==
-UI-OutboundReport: notjunk:1;M01:P0:V2IQ3ftWzZE=;sEjlYKeoJsw5hc0wJqcSSpOWC2b
- tPhg9IUSBXM6JHt2Kq1tnq06OS/n3GHZGbrLEyOZEl8u7HZAyRntkSdN7EJj36bn2eKj5umMY
- GHiNbDZmLz3ogYqRVDJidiv7fU/ok+T9nsV63O3gowCFwBXejfAL8WzfjRCLU0xZUcomeS6J7
- eaPT3ChmKMozKP1rgx7nj7r0ZwqUMf/AaHzjsALUcWoc5SUrMt8hUBcgNkGko0A6f4NngtTuV
- iqlL87xXx8be4l16j7e07VzL8L+WO8hRD+xFuxVE8N+/ZBzslALnWCwfpWlQH67qU93j+dqHj
- qaxFlwes3BL8VfHF5HS0aYmD83BpqseYRPKJ9J5W+kJ+KWl3qDK3uDGeIdX38C2JFx/w+n5Bz
- NA4g2+USiCSHWslMuvX3afzEGj+Hrwz78cP3gT5qke9iRoBpto6u0y38PBNOvqzfd00xzRA7V
- nqBXcYC3wEhpy9RldwyVUKx68lH+K2OZC6yfc4il2uEvOVtAosvtSm5Sj4KWnDxRCrNSIOxAg
- EWpNzn73XaAJBryG9nXog+gdcyBXELLxyYXVjJqXIqJAND5tLA8Pa1u61JsWRHbYbGa/O0XEl
- QM0PGoF/nek+J6tskuuVFq/MNufV+6xbu0dTRafEqNToNBrx9dEBCbuh7QlkD+Pt3MxOMwpnh
- 92WVAIo6QWcXqRUBtka0D4eihKZG1p61ayqSlp+t04lig4SMY2QojRSEMA9PYUBeNAHJXsNVB
- bcS4UJ6UyXkYytJf3FIOxWBloaYU+GSxBHVzQ2RhhN81i0GaojbqxVbiCfrvaaE64IjDC8f8M
- i9DEYb1o8E4ruqSglX47CtRzH4WKclNIdVGwkgqnYQ0J+LvLoYo5D3jZa4e/dpFVhF25p7Yf3
- RvHrWT6JOyA3Gc0ob+Vtq4X7Mofv0nqH7T1tdrQuDUv/NZrgBWTBqTgg6Zt5FKi60lPlU2Vdx
- nfxcyw==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-VGhlIGh3X3JhbmRvbSBzdWJzeXN0ZW0gbm8gbG9uZ2VyIHdvcmtzIG9ubHkgb24gc3BlY2lmaWMg
-SW50ZWwgY2hpcHNldHM7DQptYWtlIHRoZSB0aXRsZSBvZiBod19yYW5kb20ucnN0IHJlZmxlY3Qg
-dGhpcyBmYWN0Lg0KDQpXaGlsZSB3ZSdyZSBhdCBpdCwgYWxzbyByZW1vdmUgdGhlIHdvcmRzICJM
-aW51eCBzdXBwb3J0IGZvciIsIHNpbmNlIGl0J3MNCmNsZWFyIGZyb20gY29udGV4dCB0aGF0IHRo
-aXMgaXMgYSBkb2N1bWVudCBhYm91dCBMaW51eC4NCg0KU2lnbmVkLW9mZi1ieTogSm9uYXRoYW4g
-TmV1c2Now6RmZXIgPGoubmV1c2NoYWVmZXJAZ214Lm5ldD4NCi0tLQ0KIERvY3VtZW50YXRpb24v
-YWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdCB8IDYgKysrLS0tDQogMSBmaWxlIGNoYW5nZWQsIDMg
-aW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRp
-b24vYWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdCBiL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUv
-aHdfcmFuZG9tLnJzdA0KaW5kZXggMTIxZGU5NmUzOTVlMi4uZDQ5NDYwMTcxN2YxZiAxMDA2NDQN
-Ci0tLSBhL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdA0KKysrIGIvRG9j
-dW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9od19yYW5kb20ucnN0DQpAQCAtMSw2ICsxLDYgQEANCi09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-DQotTGludXggc3VwcG9ydCBmb3IgcmFuZG9tIG51bWJlciBnZW5lcmF0b3IgaW4gaTh4eCBjaGlw
-c2V0cw0KLT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT0NCis9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCitIYXJkd2FyZSBy
-YW5kb20gbnVtYmVyIGdlbmVyYXRvcnMNCis9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT0NCiANCiBJbnRyb2R1Y3Rpb24NCiA9PT09PT09PT09PT0NCi0tIA0KMi4zNS4xDQoNCg==
+
+Hi Steve, Al, Christoph,
+
+Here's an updated version of a subset of my branch to make the cifs/smb3
+driver pass iov_iters down to the lowest layers where they can be passed to
+the network transport.
+
+The first couple of patches provide iov_iter general stuff:
+
+ (1) Move the FOLL_* flags to linux/mm_types.h so that linux/uio.h can make
+     use of them.
+
+ (2) Add a function to extract/get/pin pages from an iterator as a future
+     replacement for iov_iter_get_pages*().  It also adds a function by
+     which the caller can determine which of "extract/get/pin" the
+     extraction function will actually do to aid in cleaning up.
+
+Then there are a couple of patches that add stuff to netfslib that I want
+to use there as well as in cifs:
+
+ (3) Add a netfslib function to use (2) to extract pages from an ITER_IOBUF
+     or ITER_UBUF iterator into an ITER_BVEC iterator.
+
+ (4) Add a netfslib function to use (2) to extract pages from an iterator
+     that's of type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a
+     scatterlist.  The function in (2) is used for a UBUF and IOVEC
+     iterators, so those need cleaning up afterwards; BVEC and XARRAY
+     iterators can be rendered into elements that span multiple pages.
+
+Then there are some cifs helpers that work with iterators:
+
+ (5) Implement cifs_splice_read() to use an ITER_BVEC rather than an
+     ITER_PIPE, bulk-allocating the pages, attaching them to the bvec,
+     doing the I/O and then pushing the pages into the pipe.  This avoids
+     the problem with cifs wanting to split the pipe iterator in a later
+     patch.
+
+ (6) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+     add elements to an RDMA SGE list.  Only the DMA addresses are stored,
+     and an element may span multiple pages (say if an xarray contains a
+     multipage folio).
+
+ (7) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+     pass the contents into a shash function.
+
+ (8) Add functions to walk through an ITER_XARRAY iterator and perform
+     various sorts of cleanup on the folios held therein, to be used on I/o
+     completion.
+
+ (9) Add a function to read from the transport TCP socket directly into an
+     iterator.
+
+Then come the patches that actually do the work of iteratorising cifs:
+
+(10) The main patch.  Replace page lists with iterators.  It extracts the
+     pages from ITER_UBUF and ITER_IOVEC iterators to an ITER_BVEC
+     iterator, pinning or getting refs on them, before passing them down as
+     the I/O may be done from a worker thread.
+
+     The iterator is extracted into a scatterlist in order to talk to the
+     crypto interface or to do RDMA.
+
+(11) In the cifs RDMA code, extract the iterator into an RDMA SGE[] list,
+     removing the scatterlist intermediate - at least for smbd_send().
+     There appear to be other ways for cifs to talk to the RDMA layer that
+     don't go through that that I haven't managed to work out.
+
+(12) Remove a chunk of now-unused code.
+
+Note also that I haven't managed to test all the combinations of transport.
+Samba doesn't support RDMA and ksmbd doesn't support encryption.  I can
+test them separately, but not together.  That said, rdma, sign, seal and
+sign+seal seem to work.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-for-viro
+
+Note that this is based on a merge of Al's work.iov_iter branch with
+v6.1-rc2.
+
+David
+
+Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
+---
+David Howells (12):
+      mm: Move FOLL_* defs to mm_types.h
+      iov_iter: Add a function to extract a page list from an iterator
+      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+      netfs: Add a function to extract an iterator into a scatterlist
+      cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
+      cifs: Add a function to build an RDMA SGE list from an iterator
+      cifs: Add a function to Hash the contents of an iterator
+      cifs: Add some helper functions
+      cifs: Add a function to read into an iter from a socket
+      cifs: Change the I/O paths to use an iterator rather than a page list
+      cifs: Build the RDMA SGE list directly from an iterator
+      cifs: Remove unused code
+
+
+ fs/cifs/Kconfig          |    1 +
+ fs/cifs/cifsencrypt.c    |  172 +++-
+ fs/cifs/cifsfs.c         |   12 +-
+ fs/cifs/cifsfs.h         |    6 +
+ fs/cifs/cifsglob.h       |   31 +-
+ fs/cifs/cifsproto.h      |   11 +-
+ fs/cifs/cifssmb.c        |   13 +-
+ fs/cifs/connect.c        |   16 +
+ fs/cifs/file.c           | 1793 ++++++++++++++++++--------------------
+ fs/cifs/fscache.c        |   22 +-
+ fs/cifs/fscache.h        |   10 +-
+ fs/cifs/misc.c           |  127 +--
+ fs/cifs/smb2ops.c        |  378 ++++----
+ fs/cifs/smb2pdu.c        |   45 +-
+ fs/cifs/smbdirect.c      |  503 +++++++----
+ fs/cifs/smbdirect.h      |    4 +-
+ fs/cifs/transport.c      |   57 +-
+ fs/netfs/Makefile        |    1 +
+ fs/netfs/iterator.c      |  346 ++++++++
+ include/linux/mm.h       |   74 --
+ include/linux/mm_types.h |   73 ++
+ include/linux/netfs.h    |    5 +
+ include/linux/uio.h      |   29 +
+ lib/iov_iter.c           |  333 +++++++
+ 24 files changed, 2390 insertions(+), 1672 deletions(-)
+ create mode 100644 fs/netfs/iterator.c
+
+
