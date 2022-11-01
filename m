@@ -2,106 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7F9FA3743
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 11:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AB8C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 16:01:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbiKALiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Nov 2022 07:38:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49360 "EHLO
+        id S229936AbiKAQBl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Nov 2022 12:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231394AbiKALhb (ORCPT
+        with ESMTP id S229553AbiKAQBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2022 07:37:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDE61DA52;
-        Tue,  1 Nov 2022 04:32:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B3C25615F0;
-        Tue,  1 Nov 2022 11:31:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4911C433C1;
-        Tue,  1 Nov 2022 11:31:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667302290;
-        bh=M/wlWrMuFWFlNr4cnsXihNBkIiZ9hHBkCDu2Fk/tOZw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UOBW37F2q1EM/m3W/6nvvTT2d9oIhOeBe2/OLzWEvH9jnqxpm+KWVR02FRmF2tqI1
-         olMtrsmY/sCgDD9adXPFSPPMgNMzQ3ZH5FIBNScF5U/pEFevxWDnWR6k5XxCtIVFqn
-         EqIV4u37hlAxAxhFkVZyPh4GQK1VESL7otz0ZgfVQjIxvzP27fyzQMWOu0dt33msfg
-         375tm+9EP8zhqmkeWC4ZGzhD3BC5FdS4mhDiWzuSOgWbx6/ZRrIOUBAJp6rpWZtBu0
-         5D86plw6WowrUxWkEinDaK3I+hcXAAmJ/pmIEXfSM2gc28u2Wx3PONNwsJ2t8Q3BrD
-         L5oT/8vdBNI5Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
+        Tue, 1 Nov 2022 12:01:40 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0260CCE07;
+        Tue,  1 Nov 2022 09:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
+        t=1667318489; bh=wqEmykY8sq7ZS7zFRbw1eAhxJ6Z9ajXFcFiMuF7++7Q=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=a+fuhTaTKHTJPsX+48nmwJGwnYeLWUNuKECJ5TZPbTftoSf/r7oRFP6VwBeR+nRYA
+         /hjF9NzDuwu02Im13NlDTNLCrUcn3ACTDl3lxqc1Vz1qTR/fftXlmqjTt7IRD4QcJI
+         bToVG4LLSGI41+wp+LAYzHoRuMb5aT+7nqRGa8+F0Dn8TtVV/my1jgm4CPGNK1r4GE
+         xqnSMIJPwGeTgfIeyTutFTQW3UN7aFveXrY3CRnhFtAWX+0PJJ2hGqoVfhG/vZM0tu
+         OIRPU3CDYjIvAtPOvX5hQkphHnM/ZcG/lPwDmrj4zWrcyZAjh2S2O+YzPRM0GVsAVx
+         HaY93pRPy9caw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from probook ([78.34.126.36]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mk0JM-1pIfx30rv6-00kLNT; Tue, 01
+ Nov 2022 17:01:29 +0100
+From:   =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+To:     linux-doc@vger.kernel.org
+Cc:     =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, olivia@selenic.com,
-        rjui@broadcom.com, sbranden@broadcom.com,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 4.19 4/6] hwrng: bcm2835 - use hwrng_msleep() instead of cpu_relax()
-Date:   Tue,  1 Nov 2022 07:31:14 -0400
-Message-Id: <20221101113118.800889-4-sashal@kernel.org>
+        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] docs: admin-guide: hw_random: Make document title more generic and concise
+Date:   Tue,  1 Nov 2022 17:01:18 +0100
+Message-Id: <20221101160119.955997-1-j.neuschaefer@gmx.net>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221101113118.800889-1-sashal@kernel.org>
-References: <20221101113118.800889-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Provags-ID: V03:K1:BniFoQ8fY4g953kMOLmdVbJHsLH9tOMFkdJNSMpesAWwoYkSQQO
+ YdA9rRclCh6xyd9/El8dXiyv9mJyfydG4R+R+c2oEjCWKRY8z+txssTftoWjBYAgWv61IVR
+ eIlsaswD8EvpBb98LaFvMxLlRD7nihn8JPmQkF2vGb6t+AFb2W6TMIPCU/1gAkH9lzhwyVD
+ cxX3kuLDk6km56ylrO1AA==
+UI-OutboundReport: notjunk:1;M01:P0:V2IQ3ftWzZE=;sEjlYKeoJsw5hc0wJqcSSpOWC2b
+ tPhg9IUSBXM6JHt2Kq1tnq06OS/n3GHZGbrLEyOZEl8u7HZAyRntkSdN7EJj36bn2eKj5umMY
+ GHiNbDZmLz3ogYqRVDJidiv7fU/ok+T9nsV63O3gowCFwBXejfAL8WzfjRCLU0xZUcomeS6J7
+ eaPT3ChmKMozKP1rgx7nj7r0ZwqUMf/AaHzjsALUcWoc5SUrMt8hUBcgNkGko0A6f4NngtTuV
+ iqlL87xXx8be4l16j7e07VzL8L+WO8hRD+xFuxVE8N+/ZBzslALnWCwfpWlQH67qU93j+dqHj
+ qaxFlwes3BL8VfHF5HS0aYmD83BpqseYRPKJ9J5W+kJ+KWl3qDK3uDGeIdX38C2JFx/w+n5Bz
+ NA4g2+USiCSHWslMuvX3afzEGj+Hrwz78cP3gT5qke9iRoBpto6u0y38PBNOvqzfd00xzRA7V
+ nqBXcYC3wEhpy9RldwyVUKx68lH+K2OZC6yfc4il2uEvOVtAosvtSm5Sj4KWnDxRCrNSIOxAg
+ EWpNzn73XaAJBryG9nXog+gdcyBXELLxyYXVjJqXIqJAND5tLA8Pa1u61JsWRHbYbGa/O0XEl
+ QM0PGoF/nek+J6tskuuVFq/MNufV+6xbu0dTRafEqNToNBrx9dEBCbuh7QlkD+Pt3MxOMwpnh
+ 92WVAIo6QWcXqRUBtka0D4eihKZG1p61ayqSlp+t04lig4SMY2QojRSEMA9PYUBeNAHJXsNVB
+ bcS4UJ6UyXkYytJf3FIOxWBloaYU+GSxBHVzQ2RhhN81i0GaojbqxVbiCfrvaaE64IjDC8f8M
+ i9DEYb1o8E4ruqSglX47CtRzH4WKclNIdVGwkgqnYQ0J+LvLoYo5D3jZa4e/dpFVhF25p7Yf3
+ RvHrWT6JOyA3Gc0ob+Vtq4X7Mofv0nqH7T1tdrQuDUv/NZrgBWTBqTgg6Zt5FKi60lPlU2Vdx
+ nfxcyw==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-
-[ Upstream commit 96cb9d0554457086664d3bd10630b11193d863f1 ]
-
-Rather than busy looping, yield back to the scheduler and sleep for a
-bit in the event that there's no data. This should hopefully prevent the
-stalls that Mark reported:
-
-<6>[    3.362859] Freeing initrd memory: 16196K
-<3>[   23.160131] rcu: INFO: rcu_sched self-detected stall on CPU
-<3>[   23.166057] rcu:  0-....: (2099 ticks this GP) idle=03b4/1/0x40000002 softirq=28/28 fqs=1050
-<4>[   23.174895]       (t=2101 jiffies g=-1147 q=2353 ncpus=4)
-<4>[   23.180203] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
-<4>[   23.186125] Hardware name: BCM2835
-<4>[   23.189837] PC is at bcm2835_rng_read+0x30/0x6c
-<4>[   23.194709] LR is at hwrng_fillfn+0x71/0xf4
-<4>[   23.199218] pc : [<c07ccdc8>]    lr : [<c07cb841>]    psr: 40000033
-<4>[   23.205840] sp : f093df70  ip : 00000000  fp : 00000000
-<4>[   23.211404] r10: c3c7e800  r9 : 00000000  r8 : c17e6b20
-<4>[   23.216968] r7 : c17e6b64  r6 : c18b0a74  r5 : c07ccd99  r4 : c3f171c0
-<4>[   23.223855] r3 : 000fffff  r2 : 00000040  r1 : c3c7e800  r0 : c3f171c0
-<4>[   23.230743] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA Thumb  Segment none
-<4>[   23.238426] Control: 50c5387d  Table: 0020406a  DAC: 00000051
-<4>[   23.244519] CPU: 0 PID: 49 Comm: hwrng Not tainted 6.0.0 #1
-
-Link: https://lore.kernel.org/all/Y0QJLauamRnCDUef@sirena.org.uk/
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/char/hw_random/bcm2835-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
-index 19bde680aee1..56c38edf9fac 100644
---- a/drivers/char/hw_random/bcm2835-rng.c
-+++ b/drivers/char/hw_random/bcm2835-rng.c
-@@ -72,7 +72,7 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf, size_t max,
- 	while ((rng_readl(priv, RNG_STATUS) >> 24) == 0) {
- 		if (!wait)
- 			return 0;
--		cpu_relax();
-+		hwrng_msleep(rng, 1000);
- 	}
- 
- 	num_words = rng_readl(priv, RNG_STATUS) >> 24;
--- 
-2.35.1
-
+VGhlIGh3X3JhbmRvbSBzdWJzeXN0ZW0gbm8gbG9uZ2VyIHdvcmtzIG9ubHkgb24gc3BlY2lmaWMg
+SW50ZWwgY2hpcHNldHM7DQptYWtlIHRoZSB0aXRsZSBvZiBod19yYW5kb20ucnN0IHJlZmxlY3Qg
+dGhpcyBmYWN0Lg0KDQpXaGlsZSB3ZSdyZSBhdCBpdCwgYWxzbyByZW1vdmUgdGhlIHdvcmRzICJM
+aW51eCBzdXBwb3J0IGZvciIsIHNpbmNlIGl0J3MNCmNsZWFyIGZyb20gY29udGV4dCB0aGF0IHRo
+aXMgaXMgYSBkb2N1bWVudCBhYm91dCBMaW51eC4NCg0KU2lnbmVkLW9mZi1ieTogSm9uYXRoYW4g
+TmV1c2Now6RmZXIgPGoubmV1c2NoYWVmZXJAZ214Lm5ldD4NCi0tLQ0KIERvY3VtZW50YXRpb24v
+YWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdCB8IDYgKysrLS0tDQogMSBmaWxlIGNoYW5nZWQsIDMg
+aW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRp
+b24vYWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdCBiL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUv
+aHdfcmFuZG9tLnJzdA0KaW5kZXggMTIxZGU5NmUzOTVlMi4uZDQ5NDYwMTcxN2YxZiAxMDA2NDQN
+Ci0tLSBhL0RvY3VtZW50YXRpb24vYWRtaW4tZ3VpZGUvaHdfcmFuZG9tLnJzdA0KKysrIGIvRG9j
+dW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9od19yYW5kb20ucnN0DQpAQCAtMSw2ICsxLDYgQEANCi09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+DQotTGludXggc3VwcG9ydCBmb3IgcmFuZG9tIG51bWJlciBnZW5lcmF0b3IgaW4gaTh4eCBjaGlw
+c2V0cw0KLT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT0NCis9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCitIYXJkd2FyZSBy
+YW5kb20gbnVtYmVyIGdlbmVyYXRvcnMNCis9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT0NCiANCiBJbnRyb2R1Y3Rpb24NCiA9PT09PT09PT09PT0NCi0tIA0KMi4zNS4xDQoNCg==
