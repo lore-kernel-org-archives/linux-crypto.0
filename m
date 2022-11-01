@@ -2,199 +2,251 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5A5C43217
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 16:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDD9C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Nov 2022 16:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbiKAQcu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Nov 2022 12:32:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34554 "EHLO
+        id S231194AbiKAQdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Nov 2022 12:33:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbiKAQbx (ORCPT
+        with ESMTP id S230300AbiKAQcn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Nov 2022 12:31:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7A21CFC9
-        for <linux-crypto@vger.kernel.org>; Tue,  1 Nov 2022 09:30:50 -0700 (PDT)
+        Tue, 1 Nov 2022 12:32:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF321CFDE
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Nov 2022 09:31:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667320249;
+        s=mimecast20190719; t=1667320302;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=11t7t2M5S9FVtreaeqc7IEi/JpUAAyL70GwctMIr/Uo=;
-        b=QNeFOtjIKWlatRfVCo1VjmHWAJN9/uB36sp8Ffclx7qI55YshgfD9epp7I5Ua7QNM3eRJU
-        o6lHAHVJSgAzRIl50n8Xhmi/52GuRhEhOqsTUMnKe3up4iPmEuPzPG+ur6ZwTyAUOVgh0f
-        zJyMrWSpS39bURPxwm7GWEAs5Yrqg6w=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ng8ILVUMdCKIH/vQAjOe8FpOT3WVNk38SBEF7YSnJcw=;
+        b=CC9VbOJe9dy8WF6PWdO4EslS9GPY+2zYN5s21oZ9YSeRjaWP4LvbO9dATLvhnIDmcD6FVZ
+        Fx0PtDLTPqirkxf4TUubEhnS/hzcyhIMQraGM1YPUSTZSP0SDdsPaanChJiu5igPnvkh2h
+        mZ1ydKH8/RTHxw7CAYRH38LCJ6QxeWY=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-156-UXHRu4KIP5SSs1TCerXLMw-1; Tue, 01 Nov 2022 12:30:46 -0400
-X-MC-Unique: UXHRu4KIP5SSs1TCerXLMw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-377-NdxP9CzJNyGgl4sFkepdiA-1; Tue, 01 Nov 2022 12:31:38 -0400
+X-MC-Unique: NdxP9CzJNyGgl4sFkepdiA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E801E811E81;
-        Tue,  1 Nov 2022 16:30:44 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F33CC833A0D;
+        Tue,  1 Nov 2022 16:31:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD9AC4EA49;
-        Tue,  1 Nov 2022 16:30:42 +0000 (UTC)
-Subject: [RFC PATCH 00/12] smb3: Add iter helpers and use iov_iters down to
- the network transport
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5DBAA492B18;
+        Tue,  1 Nov 2022 16:31:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [RFC PATCH 07/12] cifs: Add a function to Hash the contents of an
+ iterator
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>,
         Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-cachefs@redhat.com, John Hubbard <jhubbard@nvidia.com>,
-        linux-cifs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Jeff Layton <jlayton@kernel.org>, linux-mm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Steve French <sfrench@samba.org>,
+Cc:     Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-crypto@vger.kernel.org,
         Rohith Surabattula <rohiths.msft@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, dhowells@redhat.com,
-        Shyam Prasad N <nspmangalore@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Tom Talpey <tom@talpey.com>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 01 Nov 2022 16:30:41 +0000
-Message-ID: <166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk>
+Date:   Tue, 01 Nov 2022 16:31:35 +0000
+Message-ID: <166732029577.3186319.17162612653237909961.stgit@warthog.procyon.org.uk>
+In-Reply-To: <166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk>
+References: <166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
+iterator into a symmetric hash algorithm.
 
-Hi Steve, Al, Christoph,
+UBUF- and IOBUF-type iterators are not supported on the assumption that
+either we're doing buffered I/O, in which case we won't see them, or we're
+doing direct I/O, in which case the iterator will have been extracted into
+a BVEC-type iterator higher up.
 
-Here's an updated version of a subset of my branch to make the cifs/smb3
-driver pass iov_iters down to the lowest layers where they can be passed to
-the network transport.
-
-The first couple of patches provide iov_iter general stuff:
-
- (1) Move the FOLL_* flags to linux/mm_types.h so that linux/uio.h can make
-     use of them.
-
- (2) Add a function to extract/get/pin pages from an iterator as a future
-     replacement for iov_iter_get_pages*().  It also adds a function by
-     which the caller can determine which of "extract/get/pin" the
-     extraction function will actually do to aid in cleaning up.
-
-Then there are a couple of patches that add stuff to netfslib that I want
-to use there as well as in cifs:
-
- (3) Add a netfslib function to use (2) to extract pages from an ITER_IOBUF
-     or ITER_UBUF iterator into an ITER_BVEC iterator.
-
- (4) Add a netfslib function to use (2) to extract pages from an iterator
-     that's of type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a
-     scatterlist.  The function in (2) is used for a UBUF and IOVEC
-     iterators, so those need cleaning up afterwards; BVEC and XARRAY
-     iterators can be rendered into elements that span multiple pages.
-
-Then there are some cifs helpers that work with iterators:
-
- (5) Implement cifs_splice_read() to use an ITER_BVEC rather than an
-     ITER_PIPE, bulk-allocating the pages, attaching them to the bvec,
-     doing the I/O and then pushing the pages into the pipe.  This avoids
-     the problem with cifs wanting to split the pipe iterator in a later
-     patch.
-
- (6) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
-     add elements to an RDMA SGE list.  Only the DMA addresses are stored,
-     and an element may span multiple pages (say if an xarray contains a
-     multipage folio).
-
- (7) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
-     pass the contents into a shash function.
-
- (8) Add functions to walk through an ITER_XARRAY iterator and perform
-     various sorts of cleanup on the folios held therein, to be used on I/o
-     completion.
-
- (9) Add a function to read from the transport TCP socket directly into an
-     iterator.
-
-Then come the patches that actually do the work of iteratorising cifs:
-
-(10) The main patch.  Replace page lists with iterators.  It extracts the
-     pages from ITER_UBUF and ITER_IOVEC iterators to an ITER_BVEC
-     iterator, pinning or getting refs on them, before passing them down as
-     the I/O may be done from a worker thread.
-
-     The iterator is extracted into a scatterlist in order to talk to the
-     crypto interface or to do RDMA.
-
-(11) In the cifs RDMA code, extract the iterator into an RDMA SGE[] list,
-     removing the scatterlist intermediate - at least for smbd_send().
-     There appear to be other ways for cifs to talk to the RDMA layer that
-     don't go through that that I haven't managed to work out.
-
-(12) Remove a chunk of now-unused code.
-
-Note also that I haven't managed to test all the combinations of transport.
-Samba doesn't support RDMA and ksmbd doesn't support encryption.  I can
-test them separately, but not together.  That said, rdma, sign, seal and
-sign+seal seem to work.
-
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-for-viro
-
-Note that this is based on a merge of Al's work.iov_iter branch with
-v6.1-rc2.
-
-David
-
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
 ---
-David Howells (12):
-      mm: Move FOLL_* defs to mm_types.h
-      iov_iter: Add a function to extract a page list from an iterator
-      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-      netfs: Add a function to extract an iterator into a scatterlist
-      cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
-      cifs: Add a function to build an RDMA SGE list from an iterator
-      cifs: Add a function to Hash the contents of an iterator
-      cifs: Add some helper functions
-      cifs: Add a function to read into an iter from a socket
-      cifs: Change the I/O paths to use an iterator rather than a page list
-      cifs: Build the RDMA SGE list directly from an iterator
-      cifs: Remove unused code
 
+ fs/cifs/cifsencrypt.c |  144 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 144 insertions(+)
 
- fs/cifs/Kconfig          |    1 +
- fs/cifs/cifsencrypt.c    |  172 +++-
- fs/cifs/cifsfs.c         |   12 +-
- fs/cifs/cifsfs.h         |    6 +
- fs/cifs/cifsglob.h       |   31 +-
- fs/cifs/cifsproto.h      |   11 +-
- fs/cifs/cifssmb.c        |   13 +-
- fs/cifs/connect.c        |   16 +
- fs/cifs/file.c           | 1793 ++++++++++++++++++--------------------
- fs/cifs/fscache.c        |   22 +-
- fs/cifs/fscache.h        |   10 +-
- fs/cifs/misc.c           |  127 +--
- fs/cifs/smb2ops.c        |  378 ++++----
- fs/cifs/smb2pdu.c        |   45 +-
- fs/cifs/smbdirect.c      |  503 +++++++----
- fs/cifs/smbdirect.h      |    4 +-
- fs/cifs/transport.c      |   57 +-
- fs/netfs/Makefile        |    1 +
- fs/netfs/iterator.c      |  346 ++++++++
- include/linux/mm.h       |   74 --
- include/linux/mm_types.h |   73 ++
- include/linux/netfs.h    |    5 +
- include/linux/uio.h      |   29 +
- lib/iov_iter.c           |  333 +++++++
- 24 files changed, 2390 insertions(+), 1672 deletions(-)
- create mode 100644 fs/netfs/iterator.c
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 5db73c0f792a..e13f26371540 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -24,6 +24,150 @@
+ #include "../smbfs_common/arc4.h"
+ #include <crypto/aead.h>
+ 
++/*
++ * Hash data from a BVEC-type iterator.
++ */
++static int cifs_shash_bvec(const struct iov_iter *iter, ssize_t maxsize,
++			   struct shash_desc *shash)
++{
++	const struct bio_vec *bv = iter->bvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	void *p;
++	int ret;
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t off, len;
++
++		len = bv[i].bv_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
++
++		len = min_t(size_t, maxsize, len - start);
++		off = bv[i].bv_offset + start;
++
++		p = kmap_local_page(bv[i].bv_page);
++		ret = crypto_shash_update(shash, p + off, len);
++		kunmap_local(p);
++		if (ret < 0)
++			return ret;
++
++		maxsize -= len;
++		if (maxsize <= 0)
++			break;
++		start = 0;
++	}
++
++	return 0;
++}
++
++/*
++ * Hash data from a KVEC-type iterator.
++ */
++static int cifs_shash_kvec(const struct iov_iter *iter, ssize_t maxsize,
++			   struct shash_desc *shash)
++{
++	const struct kvec *kv = iter->kvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	int ret;
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t len;
++
++		len = kv[i].iov_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
++
++		len = min_t(size_t, maxsize, len - start);
++		ret = crypto_shash_update(shash, kv[i].iov_base + start, len);
++		if (ret < 0)
++			return ret;
++		maxsize -= len;
++
++		if (maxsize <= 0)
++			break;
++		start = 0;
++	}
++
++	return 0;
++}
++
++/*
++ * Hash data from an XARRAY-type iterator.
++ */
++static ssize_t cifs_shash_xarray(const struct iov_iter *iter, ssize_t maxsize,
++				 struct shash_desc *shash)
++{
++	struct folio *folios[16], *folio;
++	unsigned int nr, i, j, npages;
++	loff_t start = iter->xarray_start + iter->iov_offset;
++	pgoff_t last, index = start / PAGE_SIZE;
++	ssize_t ret = 0;
++	size_t len, offset, foffset;
++	void *p;
++
++	if (maxsize == 0)
++		return 0;
++
++	last = (start + maxsize - 1) / PAGE_SIZE;
++	do {
++		nr = xa_extract(iter->xarray, (void **)folios, index, last,
++				ARRAY_SIZE(folios), XA_PRESENT);
++		if (nr == 0)
++			return -EIO;
++
++		for (i = 0; i < nr; i++) {
++			folio = folios[i];
++			npages = folio_nr_pages(folio);
++			foffset = start - folio_pos(folio);
++			offset = foffset % PAGE_SIZE;
++			for (j = foffset / PAGE_SIZE; j < npages; j++) {
++				len = min_t(size_t, maxsize, PAGE_SIZE - offset);
++				p = kmap_local_page(folio_page(folio, j));
++				ret = crypto_shash_update(shash, p, len);
++				kunmap_local(p);
++				if (ret < 0)
++					return ret;
++				maxsize -= len;
++				if (maxsize <= 0)
++					return 0;
++				start += len;
++				offset = 0;
++				index++;
++			}
++		}
++	} while (nr == ARRAY_SIZE(folios));
++	return 0;
++}
++
++/*
++ * Pass the data from an iterator into a hash.
++ */
++static int cifs_shash_iter(const struct iov_iter *iter, size_t maxsize,
++			   struct shash_desc *shash)
++{
++	if (maxsize == 0)
++		return 0;
++
++	switch (iov_iter_type(iter)) {
++	case ITER_BVEC:
++		return cifs_shash_bvec(iter, maxsize, shash);
++	case ITER_KVEC:
++		return cifs_shash_kvec(iter, maxsize, shash);
++	case ITER_XARRAY:
++		return cifs_shash_xarray(iter, maxsize, shash);
++	default:
++		pr_err("cifs_shash_iter(%u) unsupported\n", iov_iter_type(iter));
++		WARN_ON_ONCE(1);
++		return -EIO;
++	}
++}
++
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+ 			struct TCP_Server_Info *server, char *signature,
+ 			struct shash_desc *shash)
 
 
