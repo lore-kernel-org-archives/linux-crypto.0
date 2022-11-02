@@ -2,66 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2ECBC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Nov 2022 09:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88ABC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Nov 2022 11:22:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiKBJtP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Nov 2022 05:49:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58734 "EHLO
+        id S229853AbiKBLWj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Nov 2022 07:22:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiKBJtO (ORCPT
+        with ESMTP id S230499AbiKBLWe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Nov 2022 05:49:14 -0400
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D06D01F2D9;
-        Wed,  2 Nov 2022 02:49:11 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oqAMF-009C47-Fu; Wed, 02 Nov 2022 17:49:05 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Nov 2022 17:49:03 +0800
-Date:   Wed, 2 Nov 2022 17:49:03 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [GIT PULL] Crypto Fixes for 6.1
-Message-ID: <Y2I9D3WI6g/MonEk@gondor.apana.org.au>
-References: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <CAHk-=wjtC_Z5_xU1q3HTvvLKhjeq--EmSEtkJdfzuFtJs8uQfA@mail.gmail.com>
+        Wed, 2 Nov 2022 07:22:34 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4ED13FA6;
+        Wed,  2 Nov 2022 04:22:28 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e741329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e741:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D08081EC0567;
+        Wed,  2 Nov 2022 12:22:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1667388146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=stsEyPM3yshEwkVJFTjMEf1n3jksEvxwTfKS4NKFQ3M=;
+        b=bicSDEWqpmnYKra+kbGFh+j8MDU2fk8a81eXZBfoDvBd+piFoqJo7Zv/4XE6hgDQX1Kmi9
+        v7PXwWK8cAJrg2sSoRzHUsSxDumVASpNo323yy/TwAmtZGL7Zojtyj57cLIicAfpzlK84g
+        53QASmyBfQKtIAUiHL83CfI0vJvHUfk=
+Date:   Wed, 2 Nov 2022 12:22:22 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     vbabka@suse.cz, x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        "Kaplan, David" <David.Kaplan@amd.com>
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Message-ID: <Y2JS7kn8Q9P4rXso@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic>
+ <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <Y1e5oC9QyDlKpxZ9@zn.tnic>
+ <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
+ <Y2A6/ZwvKhpNBTMP@zn.tnic>
+ <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wjtC_Z5_xU1q3HTvvLKhjeq--EmSEtkJdfzuFtJs8uQfA@mail.gmail.com>
+In-Reply-To: <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 10:00:34AM -0700, Linus Torvalds wrote:
-> 
-> I'm surprised that there isn't a cra_ctxalignment field. Instead there
-> is crypto_tfm_ctx_alignment(), but that is just an odd way to write
-> CRYPTO_MINALIGN.
+On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
+>      if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+>             do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+>             return RMP_PF_RETRY;
 
-It's a micro-optimisation to elide the align operaton because
-most algorithms don't need it.
+Does this issue some halfway understandable error message why the
+process got killed?
 
-I've been meaning to add a helper for it though:
+> Will look at adding our own recovery function for the same, but that will
+> again mark the pages as poisoned, right ?
 
-https://lore.kernel.org/all/E1noNhu-00BzV4-4N@fornost.hmeau.com/
+Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
+Semantically, it'll be handled the same way, ofc.
 
-But I got side tracked by the vacillating DMA discussion.
+> Still waiting for some/more feedback from mm folks on the same.
 
-Cheers,
+Just send the patch and they'll give it.
+
+Thx.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
