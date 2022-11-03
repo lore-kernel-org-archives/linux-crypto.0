@@ -2,147 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F82C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 04:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C7FC433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 06:23:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbiKCEe3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Nov 2022 00:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
+        id S229699AbiKCGXP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Nov 2022 02:23:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbiKCEe2 (ORCPT
+        with ESMTP id S229531AbiKCGXP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Nov 2022 00:34:28 -0400
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9293AF584;
-        Wed,  2 Nov 2022 21:34:27 -0700 (PDT)
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3421BR024546;
-        Thu, 3 Nov 2022 04:33:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pps0720;
- bh=tECIyFvsPJywhFXUSQexirS6np6YIq2VopMOItdY5RU=;
- b=YQR9oc6CQ6SrCcwODtsWIijGOX2Fs/uznXdwwMH84PhNn1nwq4/Ts1oZB4DQwxwOz5ev
- A2hb5ehewwI4o9ZB1dR0MgFjt+hPG6BF6WkTDhb+H5cLEEhpt++/BMbvcTfkC1c/eUny
- 99pvtBnzK3yGSLTGVsbt3mpVp4/Mhp/ovWRZ/XmYrAW7uJVyQeApNqGtAsoxZ06Pbjvm
- z51bkl2rEmhVtcB4fJynrd1rl2lAj/6E/ZX1lrP4EKAPbCeG6D9LmIODJgb/609pcvjq
- +xw1o/jSeWrXeFLY4OKmvOCjpMeRtmyBxabFuwQ3JT4RFjq3OoHQS3kWXNupIkuApR0L 5Q== 
-Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kkstj5yyf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Nov 2022 04:33:17 +0000
-Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 60D3BD254;
-        Thu,  3 Nov 2022 04:28:16 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id D7CC8801ADB;
-        Thu,  3 Nov 2022 04:28:15 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
-        Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v3 09/17] crypto: x86/ghash - limit FPU preemption
-Date:   Wed,  2 Nov 2022 23:27:32 -0500
-Message-Id: <20221103042740.6556-10-elliott@hpe.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221103042740.6556-1-elliott@hpe.com>
-References: <20221012215931.3896-1-elliott@hpe.com>
- <20221103042740.6556-1-elliott@hpe.com>
+        Thu, 3 Nov 2022 02:23:15 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D78BC31;
+        Wed,  2 Nov 2022 23:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=wWklh3V04M7tRN5I4El4kisW58/wtA96fy+VCrOUxBg=; b=BWCQyjGl9in3cyS9TZ/MJrSuc3
+        3BvAw0RvXXckw2UNM2jkZr7cupD+lmvsDdE7Wf6lgez5WQ+DDzUuaVKP/8jE93/kD4zN68pzCLKFh
+        XZoIoh53y7Sr4+DdyN8mtPkTMNZAdl/4o1kqIQAyz2wYjqmsP04LbHxmwiD1WohnxF8pQYVu/Xbah
+        ZGMlFV7wUVuAnbbKiAry0pBUSpNsxBhV7Hpm7j6CuFq7Akb941E6BYwjfwQeW5YOeMVjYxLJcyOYi
+        04qd1bHuwot5iBGcL0yt7X4sBB8tHDTVkpUKxhOF0mI/itU8qUMvsAZ/V7p99ZQBUpboAJKlmXaQz
+        GeJBZ59Q==;
+Received: from [2601:1c2:d80:3110:e65e:37ff:febd:ee53]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oqTdA-00GHXh-L0; Thu, 03 Nov 2022 06:23:12 +0000
+Message-ID: <ccefc0b7-528d-32a5-328c-e166b4821f76@infradead.org>
+Date:   Wed, 2 Nov 2022 23:23:10 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: kITOWZe31j6M8F9WiQefL_ZTAWSd0oNg
-X-Proofpoint-GUID: kITOWZe31j6M8F9WiQefL_ZTAWSd0oNg
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-02_15,2022-11-02_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211030031
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] virt: sev-guest: fix kconfig warnings
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>, stable@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Paul Gazzillo <paul@pgazz.com>,
+        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-crypto@vger.kernel.org
+References: <20220828195234.6604-1-rdunlap@infradead.org>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20220828195234.6604-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Limit the number of bytes processed between kernel_fpu_begin() and
-kernel_fpu_end() calls.
+ping. I have verified (on linux-next-20221103) that this
+patch is still needed.
+Thanks.
 
-Those functions call preempt_disable() and preempt_enable(), so
-the CPU core is unavailable for scheduling while running, leading to:
-    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: ...
+On 8/28/22 12:52, Randy Dunlap wrote:
+> Fix the SEV_GUEST Kconfig block to eliminate kconfig unmet
+> dependency warnings:
+> 
+> WARNING: unmet direct dependencies detected for CRYPTO_GCM
+>   Depends on [n]: CRYPTO [=n]
+>   Selected by [y]:
+>   - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
+> 
+> WARNING: unmet direct dependencies detected for CRYPTO_AEAD2
+>   Depends on [n]: CRYPTO [=n]
+>   Selected by [y]:
+>   - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
+> 
+> Fixes: fce96cf04430 ("virt: Add SEV-SNP guest driver")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: stable@vger.kernel.org
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Paul Gazzillo <paul@pgazz.com>
+> Cc: Necip Fazil Yildiran <fazilyildiran@gmail.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: linux-crypto@vger.kernel.org
+> ---
+>  drivers/virt/coco/sev-guest/Kconfig |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> --- a/drivers/virt/coco/sev-guest/Kconfig
+> +++ b/drivers/virt/coco/sev-guest/Kconfig
+> @@ -2,6 +2,7 @@ config SEV_GUEST
+>  	tristate "AMD SEV Guest driver"
+>  	default m
+>  	depends on AMD_MEM_ENCRYPT
+> +	select CRYPTO
+>  	select CRYPTO_AEAD2
+>  	select CRYPTO_GCM
+>  	help
 
-Fixes: 0e1227d356e9 ("crypto: ghash - Add PCLMULQDQ accelerated implementation")
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Robert Elliott <elliott@hpe.com>
-
----
-v3 change to static int, simplify while loop
----
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 28 +++++++++++++++-------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 22367e363d72..0f24c3b23fd2 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -20,8 +20,11 @@
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
- 
--#define GHASH_BLOCK_SIZE	16
--#define GHASH_DIGEST_SIZE	16
-+#define GHASH_BLOCK_SIZE	16U
-+#define GHASH_DIGEST_SIZE	16U
-+
-+/* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+static const unsigned int bytes_per_fpu = 50 * 1024;
- 
- void clmul_ghash_mul(u8 *dst, const u128 *shash);
- 
-@@ -80,9 +83,11 @@ static int ghash_update(struct shash_desc *desc,
- 	struct ghash_ctx *ctx = crypto_shash_ctx(desc->tfm);
- 	u8 *dst = dctx->buffer;
- 
-+	BUILD_BUG_ON(bytes_per_fpu < GHASH_BLOCK_SIZE);
-+
- 	if (dctx->bytes) {
- 		int n = min(srclen, dctx->bytes);
--		u8 *pos = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
-+		u8 *pos = dst + GHASH_BLOCK_SIZE - dctx->bytes;
- 
- 		dctx->bytes -= n;
- 		srclen -= n;
-@@ -97,13 +102,18 @@ static int ghash_update(struct shash_desc *desc,
- 		}
- 	}
- 
--	kernel_fpu_begin();
--	clmul_ghash_update(dst, src, srclen, &ctx->shash);
--	kernel_fpu_end();
-+	while (srclen >= GHASH_BLOCK_SIZE) {
-+		unsigned int chunk = min(srclen, bytes_per_fpu);
-+
-+		kernel_fpu_begin();
-+		clmul_ghash_update(dst, src, chunk, &ctx->shash);
-+		kernel_fpu_end();
-+
-+		src += chunk & ~(GHASH_BLOCK_SIZE - 1);
-+		srclen -= chunk & ~(GHASH_BLOCK_SIZE - 1);
-+	}
- 
--	if (srclen & 0xf) {
--		src += srclen - (srclen & 0xf);
--		srclen &= 0xf;
-+	if (srclen) {
- 		dctx->bytes = GHASH_BLOCK_SIZE - srclen;
- 		while (srclen--)
- 			*dst++ ^= *src++;
 -- 
-2.37.3
-
+~Randy
