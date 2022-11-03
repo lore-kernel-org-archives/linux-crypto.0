@@ -2,98 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C7FC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 06:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE5AC433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 07:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbiKCGXP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Nov 2022 02:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
+        id S230320AbiKCHku (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Nov 2022 03:40:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiKCGXP (ORCPT
+        with ESMTP id S230013AbiKCHkt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Nov 2022 02:23:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D78BC31;
-        Wed,  2 Nov 2022 23:23:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=wWklh3V04M7tRN5I4El4kisW58/wtA96fy+VCrOUxBg=; b=BWCQyjGl9in3cyS9TZ/MJrSuc3
-        3BvAw0RvXXckw2UNM2jkZr7cupD+lmvsDdE7Wf6lgez5WQ+DDzUuaVKP/8jE93/kD4zN68pzCLKFh
-        XZoIoh53y7Sr4+DdyN8mtPkTMNZAdl/4o1kqIQAyz2wYjqmsP04LbHxmwiD1WohnxF8pQYVu/Xbah
-        ZGMlFV7wUVuAnbbKiAry0pBUSpNsxBhV7Hpm7j6CuFq7Akb941E6BYwjfwQeW5YOeMVjYxLJcyOYi
-        04qd1bHuwot5iBGcL0yt7X4sBB8tHDTVkpUKxhOF0mI/itU8qUMvsAZ/V7p99ZQBUpboAJKlmXaQz
-        GeJBZ59Q==;
-Received: from [2601:1c2:d80:3110:e65e:37ff:febd:ee53]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oqTdA-00GHXh-L0; Thu, 03 Nov 2022 06:23:12 +0000
-Message-ID: <ccefc0b7-528d-32a5-328c-e166b4821f76@infradead.org>
-Date:   Wed, 2 Nov 2022 23:23:10 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH] virt: sev-guest: fix kconfig warnings
-Content-Language: en-US
-To:     linux-kernel@vger.kernel.org
-Cc:     kernel test robot <lkp@intel.com>, stable@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Paul Gazzillo <paul@pgazz.com>,
-        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-        Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-References: <20220828195234.6604-1-rdunlap@infradead.org>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20220828195234.6604-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Thu, 3 Nov 2022 03:40:49 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF5D10A2;
+        Thu,  3 Nov 2022 00:40:47 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guanjun@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VTrcGFd_1667461243;
+Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0VTrcGFd_1667461243)
+          by smtp.aliyun-inc.com;
+          Thu, 03 Nov 2022 15:40:45 +0800
+From:   'Guanjun' <guanjun@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, elliott@hpe.com
+Cc:     zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
+        guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
+Subject: [PATCH v3 RESEND 0/9] Drivers for Alibaba YCC (Yitian Cryptography Complex) cryptographic accelerator
+Date:   Thu,  3 Nov 2022 15:40:34 +0800
+Message-Id: <1667461243-48652-1-git-send-email-guanjun@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ping. I have verified (on linux-next-20221103) that this
-patch is still needed.
-Thanks.
+From: Guanjun <guanjun@linux.alibaba.com>
 
-On 8/28/22 12:52, Randy Dunlap wrote:
-> Fix the SEV_GUEST Kconfig block to eliminate kconfig unmet
-> dependency warnings:
-> 
-> WARNING: unmet direct dependencies detected for CRYPTO_GCM
->   Depends on [n]: CRYPTO [=n]
->   Selected by [y]:
->   - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
-> 
-> WARNING: unmet direct dependencies detected for CRYPTO_AEAD2
->   Depends on [n]: CRYPTO [=n]
->   Selected by [y]:
->   - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
-> 
-> Fixes: fce96cf04430 ("virt: Add SEV-SNP guest driver")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: stable@vger.kernel.org
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Paul Gazzillo <paul@pgazz.com>
-> Cc: Necip Fazil Yildiran <fazilyildiran@gmail.com>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: linux-crypto@vger.kernel.org
-> ---
->  drivers/virt/coco/sev-guest/Kconfig |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> --- a/drivers/virt/coco/sev-guest/Kconfig
-> +++ b/drivers/virt/coco/sev-guest/Kconfig
-> @@ -2,6 +2,7 @@ config SEV_GUEST
->  	tristate "AMD SEV Guest driver"
->  	default m
->  	depends on AMD_MEM_ENCRYPT
-> +	select CRYPTO
->  	select CRYPTO_AEAD2
->  	select CRYPTO_GCM
->  	help
+Hi,
+
+This patch series aims to add drivers for Alibaba YCC (Yitian Cryptography Complex)
+cryptographic accelerator. Enables the on-chip cryptographic accelerator of
+Alibaba Yitian SoCs which is based on ARMv9 architecture.
+
+It includes PCIe enabling, skcipher, aead, rsa, sm2 support.
+
+Please help to review.
+
+Thanks,
+Guanjun.
+
+Change log:
+v3 -> v3 RESEND:
+ - [*/09] Fix compile warnings when sparse turned on
+
+v2 -> v3:
+ - [01/09] Fix the lost "$" in Makefile
+ - [08/09] Fix compile warnings when both CONFIG_CRYPTO_SM2 and CONFIG_CRYPTO_DEV_YCC are enabled
+
+v1 RESEND -> v2:
+ - [01/09] Remove char device that is not used now.
+
+v1 -> v1 RESEND:
+  - [01/09] Adjust the Kconfig entry in alphabetical order
+  - [05/09][07/09][08/09] Adjust the format of algorithm names
+
+v2: https://lore.kernel.org/all/1664350687-47330-1-git-send-email-guanjun@linux.alibaba.com/
+v1: https://lore.kernel.org/all/1661334621-44413-1-git-send-email-guanjun@linux.alibaba.com/
+v1 RESEND: https://lore.kernel.org/all/1662435353-114812-1-git-send-email-guanjun@linux.alibaba.com/
+
+Guanjun (3):
+  crypto/ycc: Add skcipher algorithm support
+  crypto/ycc: Add aead algorithm support
+  crypto/ycc: Add rsa algorithm support
+
+Xuchun Shang (1):
+  crypto/ycc: Add sm2 algorithm support
+
+Zelin Deng (5):
+  crypto/ycc: Add YCC (Yitian Cryptography Complex) accelerator driver
+  crypto/ycc: Add ycc ring configuration
+  crypto/ycc: Add irq support for ycc kernel rings
+  crypto/ycc: Add device error handling support for ycc hw errors
+  MAINTAINERS: Add Yitian Cryptography Complex (YCC) driver maintainer
+    entry
+
+ MAINTAINERS                            |   8 +
+ drivers/crypto/Kconfig                 |   2 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/ycc/Kconfig             |  18 +
+ drivers/crypto/ycc/Makefile            |   7 +
+ drivers/crypto/ycc/sm2signature_asn1.c |  38 ++
+ drivers/crypto/ycc/sm2signature_asn1.h |  13 +
+ drivers/crypto/ycc/ycc_aead.c          | 646 ++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_algs.h          | 176 ++++++
+ drivers/crypto/ycc/ycc_dev.h           | 157 ++++++
+ drivers/crypto/ycc/ycc_drv.c           | 567 ++++++++++++++++++++
+ drivers/crypto/ycc/ycc_isr.c           | 276 ++++++++++
+ drivers/crypto/ycc/ycc_isr.h           |  13 +
+ drivers/crypto/ycc/ycc_pke.c           | 946 +++++++++++++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.c          | 649 ++++++++++++++++++++++
+ drivers/crypto/ycc/ycc_ring.h          | 170 ++++++
+ drivers/crypto/ycc/ycc_ske.c           | 925 ++++++++++++++++++++++++++++++++
+ 17 files changed, 4612 insertions(+)
+ create mode 100644 drivers/crypto/ycc/Kconfig
+ create mode 100644 drivers/crypto/ycc/Makefile
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.c
+ create mode 100644 drivers/crypto/ycc/sm2signature_asn1.h
+ create mode 100644 drivers/crypto/ycc/ycc_aead.c
+ create mode 100644 drivers/crypto/ycc/ycc_algs.h
+ create mode 100644 drivers/crypto/ycc/ycc_dev.h
+ create mode 100644 drivers/crypto/ycc/ycc_drv.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.c
+ create mode 100644 drivers/crypto/ycc/ycc_isr.h
+ create mode 100644 drivers/crypto/ycc/ycc_pke.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.c
+ create mode 100644 drivers/crypto/ycc/ycc_ring.h
+ create mode 100644 drivers/crypto/ycc/ycc_ske.c
 
 -- 
-~Randy
+1.8.3.1
+
