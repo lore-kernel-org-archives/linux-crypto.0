@@ -2,66 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104F7C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 04:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C27C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Nov 2022 04:29:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbiKCE3Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Nov 2022 00:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55252 "EHLO
+        id S231130AbiKCE3c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Nov 2022 00:29:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230171AbiKCE2o (ORCPT
+        with ESMTP id S230271AbiKCE3C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Nov 2022 00:28:44 -0400
+        Thu, 3 Nov 2022 00:29:02 -0400
 Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450DA175B1;
-        Wed,  2 Nov 2022 21:28:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B1F17892;
+        Wed,  2 Nov 2022 21:28:32 -0700 (PDT)
 Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A335dTU004804;
-        Thu, 3 Nov 2022 04:28:24 GMT
+        by mx0b-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A2IbpgP003176;
+        Thu, 3 Nov 2022 04:28:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=SQNfvnoONXJ54nVg/eI+GcD+ZbHMamNWL/sC3a0pwlQ=;
- b=omn7kUrZ9TxlDyHGEUkHcCBt6R1vpwh9r/xIV9XkiBMph8xGsEI68BELZLJbLyHHnhUo
- Ehhrfe6sumB1xvLPXw/UBFkNDe4MgxKkXBcXelt6c9Hm10UTD0QBTNrAfvn5BCJfaMKj
- xbkAP+vBuD2ycDmkibIxYAAhxK8W6mgh7w0LA21HzR6hjeJOIGcx+Xvci5Rj9cadjeyx
- MF10piclwGZQWEynLlbsy/bgXrBoN4dmDvoe4/shq9nlQEaCK8wB/WcGGe3xVEQ7Te4/
- 9kULAJi+EvWnllFFM7DXFReOSbRZd3ticvBY9khuZZINAVPoU4pC3TSD7HfVIGwFN+M1 3w== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kksmrwmth-1
+ bh=0VtZpM3sw0WQAP/42QlXXg/Ajq3gvlmtNRK3M9uOdwI=;
+ b=VMXvlTDiDdbUwdiNbuutK2cOzwUihsKShnZp+oPa3OWXEA27pXoKKGa06JfF6T/o3M0i
+ MR9mMnAWls/WR6rpS8W4I/Z9DJb5dBaXohKHHguStKARZUkaWi8NbuFTFKyusg1PCLOe
+ lnHJvnhYSkacLjnNn2i0/a2s24awGGbvVZAU+QOR2uzUnRNnqR+/KD/jNXswR7MV4xLP
+ U3oWuo7FzP24RvuYNtc+HPhp+c3P8TH9D0R7NoS25mE886N3gB5zJeVcUbVmrVaWAlZT
+ /2EzgkEm8Fa6ycsd2ZsFMaAup8Iw+b0750KtqOBopww+ox/ryoKqXLqkCvLlgk7Hy/7e EQ== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kksmrwmug-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 03 Nov 2022 04:28:24 +0000
+        Thu, 03 Nov 2022 04:28:25 +0000
 Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id BA55E8040F4;
-        Thu,  3 Nov 2022 04:28:13 +0000 (UTC)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id D271CD25B;
+        Thu,  3 Nov 2022 04:28:24 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 41F3B802B9C;
-        Thu,  3 Nov 2022 04:28:13 +0000 (UTC)
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 53984808EB4;
+        Thu,  3 Nov 2022 04:28:24 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v3 07/17] crypto: x86/ghash - use u8 rather than char
-Date:   Wed,  2 Nov 2022 23:27:30 -0500
-Message-Id: <20221103042740.6556-8-elliott@hpe.com>
+Subject: [PATCH v3 15/17] crypto: x86/sm3 - load based on CPU features
+Date:   Wed,  2 Nov 2022 23:27:38 -0500
+Message-Id: <20221103042740.6556-16-elliott@hpe.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221103042740.6556-1-elliott@hpe.com>
 References: <20221012215931.3896-1-elliott@hpe.com>
  <20221103042740.6556-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: JrmBZWePH2iFNYs0lAOfbKsUZpMD4qDk
-X-Proofpoint-ORIG-GUID: JrmBZWePH2iFNYs0lAOfbKsUZpMD4qDk
+X-Proofpoint-GUID: RW3ZDgvQIWwSwfAR1Rb_rXBOKDDhFYV4
+X-Proofpoint-ORIG-GUID: RW3ZDgvQIWwSwfAR1Rb_rXBOKDDhFYV4
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-02_15,2022-11-02_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=985
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
  lowpriorityscore=0 clxscore=1015 mlxscore=0 suspectscore=0 impostorscore=0
  spamscore=0 phishscore=0 malwarescore=0 priorityscore=1501 adultscore=0
  bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -70,53 +70,49 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use more consistent unambivalent types for the source and destination
-buffer pointer arguments.
+Like commit aa031b8f702e ("crypto: x86/sha512 - load based on CPU
+features"), add module aliases for x86-optimized crypto modules:
+        sm3
+based on CPU feature bits so udev gets a chance to load them later in
+the boot process when the filesystems are all running.
 
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/x86/crypto/ghash-clmulni-intel_asm.S  | 4 ++--
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/crypto/sm3_avx_glue.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-index 2bf871899920..c7b8542facee 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-+++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-@@ -88,7 +88,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
- 	RET
- SYM_FUNC_END(__clmul_gf128mul_ble)
+diff --git a/arch/x86/crypto/sm3_avx_glue.c b/arch/x86/crypto/sm3_avx_glue.c
+index 483aaed996ba..26256cc0cbb6 100644
+--- a/arch/x86/crypto/sm3_avx_glue.c
++++ b/arch/x86/crypto/sm3_avx_glue.c
+@@ -15,6 +15,7 @@
+ #include <linux/types.h>
+ #include <crypto/sm3.h>
+ #include <crypto/sm3_base.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
  
--/* void clmul_ghash_mul(char *dst, const u128 *shash) */
-+/* void clmul_ghash_mul(u8 *dst, const u128 *shash) */
- SYM_FUNC_START(clmul_ghash_mul)
- 	FRAME_BEGIN
- 	movups (%rdi), DATA
-@@ -103,7 +103,7 @@ SYM_FUNC_START(clmul_ghash_mul)
- SYM_FUNC_END(clmul_ghash_mul)
+ /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
+@@ -119,10 +120,19 @@ static struct shash_alg sm3_avx_alg = {
+ 	}
+ };
  
- /*
-- * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
-+ * void clmul_ghash_update(u8 *dst, const u8 *src, unsigned int srclen,
-  *			   const u128 *shash);
-  */
- SYM_FUNC_START(clmul_ghash_update)
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 1f1a95f3dd0c..e996627c6583 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -23,9 +23,9 @@
- #define GHASH_BLOCK_SIZE	16
- #define GHASH_DIGEST_SIZE	16
++static const struct x86_cpu_id module_cpu_ids[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
++
+ static int __init sm3_avx_mod_init(void)
+ {
+ 	const char *feature_name;
  
--void clmul_ghash_mul(char *dst, const u128 *shash);
-+void clmul_ghash_mul(u8 *dst, const u128 *shash);
- 
--void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
-+void clmul_ghash_update(u8 *dst, const u8 *src, unsigned int srclen,
- 			const u128 *shash);
- 
- struct ghash_async_ctx {
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
++
+ 	if (!boot_cpu_has(X86_FEATURE_AVX)) {
+ 		pr_info("AVX instruction are not detected.\n");
+ 		return -ENODEV;
 -- 
 2.37.3
 
