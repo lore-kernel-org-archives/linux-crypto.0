@@ -2,108 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E12ADC43217
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Nov 2022 13:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62990C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Nov 2022 13:22:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbiKDNJm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Nov 2022 09:09:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
+        id S231761AbiKDNV7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Nov 2022 09:21:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231627AbiKDNJh (ORCPT
+        with ESMTP id S231607AbiKDNVx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Nov 2022 09:09:37 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237A12CDDA
-        for <linux-crypto@vger.kernel.org>; Fri,  4 Nov 2022 06:09:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667567377; x=1699103377;
-  h=from:to:cc:subject:date:message-id;
-  bh=5KGbNjip6CSoJ7dX3Dg8Rm3VZdIfQ5hkyDOD7r6NK2k=;
-  b=lKPUOQNZ4AB1hUACjjVnoHMYbmrNMpjtEwEqZ7mj6vv7rkAtXyCesGTZ
-   zuGIp3rzDilQdBRRMTgCmK2fLOKq+e4vTbGWlpcbFfo8cAewMfuty9UeI
-   Dk7MhhqiZNQ3CuX8mAzjSS3rC1DwMwXze4F/ovyJTgvJZ318tokyBs+1G
-   tLYSMhFtaU3+KpR7dJgJyomSM0alcmejozk/UC/AgioYi7LnC1Oq7EMiV
-   0oR2A/z+ltOtIX/V0X3B9iwc80SIglBjMz6OIKmmVeAE574o7M+YfKinC
-   +AJsXD0SAXXaadsrJ20zrysxFDbKkk78zZ+QTgQq5Y307JAAut0DDcuF6
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="311702477"
-X-IronPort-AV: E=Sophos;i="5.96,137,1665471600"; 
-   d="scan'208";a="311702477"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2022 06:09:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="760323132"
-X-IronPort-AV: E=Sophos;i="5.96,137,1665471600"; 
-   d="scan'208";a="760323132"
-Received: from linux-gr8q.igk.intel.com ([10.102.16.18])
-  by orsmga004.jf.intel.com with ESMTP; 04 Nov 2022 06:07:55 -0700
-From:   Shashank Gupta <shashank.gupta@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Shashank Gupta <shashank.gupta@intel.com>
-Subject: [PATCH] crypto: qat - remove ADF_STATUS_PF_RUNNING flag from probe
-Date:   Fri,  4 Nov 2022 13:21:07 -0400
-Message-Id: <20221104172107.27599-1-shashank.gupta@intel.com>
-X-Mailer: git-send-email 2.16.4
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+        Fri, 4 Nov 2022 09:21:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE70327CCD
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Nov 2022 06:20:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667568058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to; bh=4z+uaTyHS1euo8ITS5ujuXPAETlqQ178964oXSUna1g=;
+        b=hGd8pylCeh0mGbZZWCiLN4JbsVkueKhNa7k1o67opB0XAJ9C6s3vZDzLRojj3ufxKf7UXE
+        lW3kevGaxfDKSPzUr8tSsRhx30Ushk/hYVs7NGLEAEKnsYpQ6g6CLGUSuNA4dbjwwrYUfT
+        P1dgEvzYsPHj/KohGztIxfqr2fuh2+k=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-103-azmzIxivMAuf-tphlkitKw-1; Fri, 04 Nov 2022 09:20:57 -0400
+X-MC-Unique: azmzIxivMAuf-tphlkitKw-1
+Received: by mail-pl1-f200.google.com with SMTP id b2-20020a170902d50200b001871a3c51afso3554730plg.8
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Nov 2022 06:20:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4z+uaTyHS1euo8ITS5ujuXPAETlqQ178964oXSUna1g=;
+        b=Qmj0hZgPF1SmkngtCOZL0NUizm1I2wrtkQXgyGUcLhMh2NEYJS7ybSLO1q0oESGZ7T
+         yBb+wRvUg4c3wWTUGYXutFS232TdjUaBh+/gU6X7tEep/3eNRGEbz8hRocoO+zIoQasy
+         glCwt8aKM+j0El4H9uqX2P70tjtrO7obvurke0YyqeSHOeYtkQDNNbYMgoiUMushPQM9
+         POPAg1+vCP99lB/ZoRW7uvibz1OSSpL8FoD9hGNWIVi5CzhcLhZ0OFACvl/cWbMK9NHS
+         Mj1Q6Pn4MbRPMnNwU93ATxhDC26uS6Dz2gH7hblpc+PZWlxKBllHIWehoTAVeXhFFA7c
+         LXAA==
+X-Gm-Message-State: ACrzQf2mNZBi9ujGuJbKzpqeVEHan8aNEYCMT60LRH4btHFZSdRITcXl
+        z84yvvU29HSc5fa0ss4V63AcLRWQjxLDbw3apxhDs52IO+IAePfdoc+QGIOjuBe/QZY6higRu/N
+        Xqz5r9C7Vccobpbx59wf87Z+G
+X-Received: by 2002:a17:902:e8d4:b0:177:e4c7:e8b7 with SMTP id v20-20020a170902e8d400b00177e4c7e8b7mr329607plg.118.1667568056600;
+        Fri, 04 Nov 2022 06:20:56 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6XbTeqtZliMwzZ7MGO3ejsjE4fdEnYbMsIkDBmckaWvRU+DhCnC80HUipTcPjnE/pSnZOacw==
+X-Received: by 2002:a17:902:e8d4:b0:177:e4c7:e8b7 with SMTP id v20-20020a170902e8d400b00177e4c7e8b7mr329594plg.118.1667568056353;
+        Fri, 04 Nov 2022 06:20:56 -0700 (PDT)
+Received: from localhost ([240e:479:210:84fd:b8ac:1631:3300:5ef])
+        by smtp.gmail.com with ESMTPSA id iw17-20020a170903045100b001780e4e6b65sm2597596plb.114.2022.11.04.06.20.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 06:20:55 -0700 (PDT)
+Date:   Fri, 4 Nov 2022 21:20:35 +0800
+From:   Coiby Xu <coxu@redhat.com>
+To:     eric.snowberg@oracle.com
+Cc:     davem@davemloft.net, dhowells@redhat.com,
+        dmitry.kasatkin@gmail.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, jarkko@kernel.org, jmorris@namei.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, nramas@linux.microsoft.com,
+        pvorel@suse.cz, roberto.sassu@huawei.com, serge@hallyn.com,
+        tiwai@suse.de, zohar@linux.ibm.com
+Subject: Re: [PATCH 0/7] Add CA enforcement keyring restrictions
+Message-ID: <20221104132035.rmavewmeo6ceyjou@Rk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220406015337.4000739-1-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The ADF_STATUS_PF_RUNNING bit is set after the successful initialization
-of the communication between VF to PF in adf_vf2pf_notify_init().
-So, it is not required to be set after the execution of the function
-adf_dev_init().
+Hi Eric,
 
-Signed-off-by: Shashank Gupta <shashank.gupta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
----
- drivers/crypto/qat/qat_c3xxxvf/adf_drv.c    | 2 --
- drivers/crypto/qat/qat_c62xvf/adf_drv.c     | 2 --
- drivers/crypto/qat/qat_dh895xccvf/adf_drv.c | 2 --
- 3 files changed, 6 deletions(-)
+I wonder if there is any update on this work? I would be glad to do
+anything that may be helpful including testing a new version of code.
 
-diff --git a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-index fa18d8009f53..cf4ef83e186f 100644
---- a/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c3xxxvf/adf_drv.c
-@@ -177,8 +177,6 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (ret)
- 		goto out_err_dev_shutdown;
- 
--	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
--
- 	ret = adf_dev_start(accel_dev);
- 	if (ret)
- 		goto out_err_dev_stop;
-diff --git a/drivers/crypto/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-index 686ec752d0e9..0e642c94b929 100644
---- a/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_c62xvf/adf_drv.c
-@@ -177,8 +177,6 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (ret)
- 		goto out_err_dev_shutdown;
- 
--	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
--
- 	ret = adf_dev_start(accel_dev);
- 	if (ret)
- 		goto out_err_dev_stop;
-diff --git a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-index 18756b2e1c91..c1485e702b3e 100644
---- a/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xccvf/adf_drv.c
-@@ -177,8 +177,6 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (ret)
- 		goto out_err_dev_shutdown;
- 
--	set_bit(ADF_STATUS_PF_RUNNING, &accel_dev->status);
--
- 	ret = adf_dev_start(accel_dev);
- 	if (ret)
- 		goto out_err_dev_stop;
 -- 
-2.16.4
+Best regards,
+Coiby
 
