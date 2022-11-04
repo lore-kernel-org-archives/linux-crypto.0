@@ -2,48 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2E3C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Nov 2022 09:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 264DCC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Nov 2022 10:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230471AbiKDJj7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Nov 2022 05:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55076 "EHLO
+        id S230341AbiKDKHS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Nov 2022 06:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231244AbiKDJjz (ORCPT
+        with ESMTP id S231626AbiKDKHM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Nov 2022 05:39:55 -0400
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96282A73F
-        for <linux-crypto@vger.kernel.org>; Fri,  4 Nov 2022 02:39:53 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oqtAQ-00A2Bn-L0; Fri, 04 Nov 2022 17:39:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Nov 2022 17:39:51 +0800
-Date:   Fri, 4 Nov 2022 17:39:51 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ralph Siemsen <ralph.siemsen@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, ralph.siemsen@linaro.org
-Subject: Re: [PATCH] crypto: devel-algos.rst: use correct function name
-Message-ID: <Y2Td55sILlOxFJrX@gondor.apana.org.au>
+        Fri, 4 Nov 2022 06:07:12 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6D52A426;
+        Fri,  4 Nov 2022 03:07:08 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N3brg1lVfzmVft;
+        Fri,  4 Nov 2022 18:06:59 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 4 Nov 2022 18:07:05 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 4 Nov 2022 18:07:05 +0800
+Subject: Re: [PATCH 1/3] crypto: hisilicon/qm - modify the process of regs dfx
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20221029094801.43843-1-yekai13@huawei.com>
+ <20221029094801.43843-2-yekai13@huawei.com>
+ <Y2TV6Cz7XPYj4SZO@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+From:   "yekai (A)" <yekai13@huawei.com>
+Message-ID: <851c1b30-ee30-145b-c77c-17166cd6e426@huawei.com>
+Date:   Fri, 4 Nov 2022 18:07:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221027193544.68632-1-ralph.siemsen@linaro.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <Y2TV6Cz7XPYj4SZO@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ralph Siemsen <ralph.siemsen@linaro.org> wrote:
-> The hashing API does not have a function called .finish()
-> 
-> Signed-off-by: Ralph Siemsen <ralph.siemsen@linaro.org>
-> ---
-> Documentation/crypto/devel-algos.rst | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+On 2022/11/4 17:05, Herbert Xu wrote:
+> On Sat, Oct 29, 2022 at 09:47:59AM +0000, Kai Ye wrote:
+>> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+>> index 363a02810a16..832cfd9a7728 100644
+>> --- a/drivers/crypto/hisilicon/qm.c
+>> +++ b/drivers/crypto/hisilicon/qm.c
+>> @@ -1722,8 +1722,22 @@ static int qm_regs_show(struct seq_file *s, void *unused)
+>>  
+>>  DEFINE_SHOW_ATTRIBUTE(qm_regs);
+>>  
+>> +static void dfx_regs_uninit(struct hisi_qm *qm,
+>> +		struct dfx_diff_registers *dregs, int reg_len)
+>> +{
+>> +	int i;
+>> +
+>> +	/* Setting the pointer is NULL to prevent double free */
+>> +	for (i = 0; i < reg_len; i++) {
+>> +		kfree(dregs[i].regs);
+>> +		dregs[i].regs = NULL;
+>> +	}
+>> +	kfree(dregs);
+>> +	dregs = NULL;
+> What's the point of this last NULL assignment?
+>
+> Cheers,
+
+To prevent pointer reuse and reduce register data security risks. So the original code setting the pointer is NULL.
+ 
+Thanks
+Kai
