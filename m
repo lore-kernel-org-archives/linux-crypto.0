@@ -2,86 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D354C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Nov 2022 17:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4C5C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Nov 2022 20:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbiKERbl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Nov 2022 13:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
+        id S229517AbiKEUoZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Nov 2022 16:44:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiKERbk (ORCPT
+        with ESMTP id S229479AbiKEUoZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Nov 2022 13:31:40 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A821E140E8
-        for <linux-crypto@vger.kernel.org>; Sat,  5 Nov 2022 10:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667669499; x=1699205499;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=MmeMSDfkrXBfCIwHDssJuZYjNJh55XLRtuGA0r9cT1c=;
-  b=aKF6sVCTSOfXSrpPX48aNPQYdeopmAP4ULgKHli45H2JOVTVihhxNmDi
-   f1uQ1qj1kXWncmb7/GBdL81IZWU4+1Przx5nHqnmXAVTUc0zdL7lv+Kj6
-   uTDjYNgkMAzc3a2c5ZsxW2DTv9hBpFDdi+ymNBnO4Y3vpwrWNPuvd9A+w
-   2NvcOrCyTp5iAc3QS6UIH7xx9MLvhVtIzaZl/pA5EmGzYgiK7uGGCwtXi
-   RjXxd5pa05+Mif+EISQM/scryYLhq1x8hc1hkpQr9xnjwXB7Zl1QLlX62
-   ac6SFIe97xZ7HXffKJ7NmgjWTtagHZmYSzbfw3X/n41Eq24KLjjB+GfO0
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10522"; a="293530364"
-X-IronPort-AV: E=Sophos;i="5.96,140,1665471600"; 
-   d="scan'208";a="293530364"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2022 10:31:39 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10522"; a="668703156"
-X-IronPort-AV: E=Sophos;i="5.96,140,1665471600"; 
-   d="scan'208";a="668703156"
-Received: from hanhn2-mobl1.amr.corp.intel.com (HELO [10.212.197.172]) ([10.212.197.172])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2022 10:31:38 -0700
-Message-ID: <d438e0d8-7469-7584-405b-76006372c2d4@intel.com>
-Date:   Sat, 5 Nov 2022 10:31:41 -0700
+        Sat, 5 Nov 2022 16:44:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D13E0F2
+        for <linux-crypto@vger.kernel.org>; Sat,  5 Nov 2022 13:44:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E35F460B97
+        for <linux-crypto@vger.kernel.org>; Sat,  5 Nov 2022 20:44:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB346C433D6;
+        Sat,  5 Nov 2022 20:44:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="F0RKbDv0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1667681060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=znuX4ysjKgHs+5ugNojvf7s4WgKzUG5UmonkOsznGCw=;
+        b=F0RKbDv0TU77lzWJdb7DejrFTgXswFouZ7MNaRK0c9rqOD+hukgY1Qsi48sUTfZR8BKY/B
+        a1OSMAEmrAZNf7TvmlC+XSHnk0J/kSJlt1yjdkscnrcOmaIIFeGZsyMpNuD90MPmYgX3f/
+        dY0NLbtrNkYIozI979581Gl55yHoZ+E=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2e7be018 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sat, 5 Nov 2022 20:44:19 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] hw_random: use add_hwgenerator_randomness() for early entropy
+Date:   Sat,  5 Nov 2022 21:44:17 +0100
+Message-Id: <20221105204417.137001-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v2 3/3] crypto: aria: implement aria-avx512
-Content-Language: en-US
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
-        Taehee Yoo <ap420073@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, "x86@kernel.org" <x86@kernel.org>,
-        "jussi.kivilinna@iki.fi" <jussi.kivilinna@iki.fi>
-References: <20221105082021.17997-1-ap420073@gmail.com>
- <20221105082021.17997-4-ap420073@gmail.com>
- <MW5PR84MB1842E11FD1CF7B44703A42B0AB3A9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <MW5PR84MB1842E11FD1CF7B44703A42B0AB3A9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/5/22 09:20, Elliott, Robert (Servers) wrote:
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -288,6 +288,10 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
->         struct crypto_aes_ctx *ctx = aes_ctx(raw_ctx);
->         int err;
-> 
-> +       BUILD_BUG_ON(offsetof(struct crypto_aes_ctx, key_enc) != 0);
-> +       BUILD_BUG_ON(offsetof(struct crypto_aes_ctx, key_dec) != 240);
-> +       BUILD_BUG_ON(offsetof(struct crypto_aes_ctx, key_length) != 480);
+Rather than calling add_device_randomness(), the add_early_randomness()
+function should use add_hwgenerator_randomness(), so that the early
+entropy can be potentially credited, which allows for the RNG to
+initialize earlier without having to wait for the kthread to come up.
 
-We have a nice fancy way of doing these.  See things like
-CPU_ENTRY_AREA_entry_stack or TSS_sp0.  It's all put together from
-arch/x86/kernel/asm-offsets.c and gets plopped in
-include/generated/asm-offsets.h.
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/hw_random/core.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-This is vastly preferred to hard-coded magic number offsets, even if
-they do have a BUILD_BUG_ON() somewhere.
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index cc002b0c2f0c..8c0819ce2781 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -69,8 +69,10 @@ static void add_early_randomness(struct hwrng *rng)
+ 	mutex_lock(&reading_mutex);
+ 	bytes_read = rng_get_data(rng, rng_fillbuf, 32, 0);
+ 	mutex_unlock(&reading_mutex);
+-	if (bytes_read > 0)
+-		add_device_randomness(rng_fillbuf, bytes_read);
++	if (bytes_read > 0) {
++		size_t entropy = bytes_read * 8 * rng->quality / 1024;
++		add_hwgenerator_randomness(rng_fillbuf, bytes_read, entropy);
++	}
+ }
+ 
+ static inline void cleanup_rng(struct kref *kref)
+-- 
+2.38.1
+
