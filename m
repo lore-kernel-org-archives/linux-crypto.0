@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2985FC4332F
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Nov 2022 14:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFE0C4332F
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Nov 2022 14:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbiKFOhq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 6 Nov 2022 09:37:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
+        id S229804AbiKFOhy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 6 Nov 2022 09:37:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiKFOhp (ORCPT
+        with ESMTP id S229963AbiKFOht (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Nov 2022 09:37:45 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2102DEBB
-        for <linux-crypto@vger.kernel.org>; Sun,  6 Nov 2022 06:37:43 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id m6so8500158pfb.0
-        for <linux-crypto@vger.kernel.org>; Sun, 06 Nov 2022 06:37:43 -0800 (PST)
+        Sun, 6 Nov 2022 09:37:49 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69B4DEB8
+        for <linux-crypto@vger.kernel.org>; Sun,  6 Nov 2022 06:37:47 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id u6so8919372plq.12
+        for <linux-crypto@vger.kernel.org>; Sun, 06 Nov 2022 06:37:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=SYVgbzZfW20HOg79dWMdDLTVaQ7M0D6QCYU5eEmy2dU=;
-        b=nyfIpzRa1eEtqKxnJOCLUT66yHljeAVx8NG3ROd5ZGt/yju4PjX+Yzz/ryc58Aqkm4
-         WtRwnAKVtdqkNoaLCO2Ai16//agKbeqAbz+EVt3SD8/nC2lHA5WJyfGgwMWCkGYqDPx1
-         z3MM2YLH8IXyOsMFMG3Yt4APk8nqY1O7taULjK5LjMuYmahDPBHGL80sRk8PsaEcXMzB
-         liTpBGXv91J/jg6D3RCXGuHLlTryVZXdEP6ulDk0xJOVyssvH+ABzhNOJAlqqigk4LN6
-         HeUrEPPWBYubzoiK609s7hC9BhtkosVlSaCJA68e5+KZchzGJ3q/1PD9zdkLB5RiTNZx
-         3TqQ==
+        bh=hD6uAvy9J7vwxqLchDyF0qqglXabp73+7LquhHbZf4s=;
+        b=MhzHmvLfGyjCkqfD5GFpymXzXGLchi28u57te9p67zpzFy0t1Fdaz2/BCQxS+3OkiX
+         TutrnptQYt/BIgPvHv0ejmfeBHRhn+ebFomuEndhf4hXiCGVh3fUrYnKZ2FrEw7nnsfm
+         rVRq7oASaqzfmC/OqCk0oqGdFaMCwMM0RNnVEPL8u6gWSX4tEGFuowhZ16u8LXuOTgBq
+         yU5UCdRhTxVHOBGjTM1QxB07836peKVyfo23boioeFqcQxpRY6zl0Y1HGCsk09Z1NcC1
+         Sije2VPx4RQ5J7UKo6mhJhHVfc68q+ON3UgYvZNZbDM4Ce1bTeGyRfQd430xChbebsyo
+         X/9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SYVgbzZfW20HOg79dWMdDLTVaQ7M0D6QCYU5eEmy2dU=;
-        b=w2UcL/FMlXCkcsXWUY4VdLZQFAHmol9vcMEimn4VuwjXzDJBp1TdBdfnpDtVRE0epO
-         T1Lw0xSKHZlZ91L//TgYd95Lhcb/ovM3Y/qfQ2tlqAzOiSD9UxGTLTnPsU/tdUf+9Ctn
-         y8xPXzt0+e8LpiNTV1E5kTdIcq/8aqQl9yD74+nAHWhnmXSOWk9TADgjrJQgbSE9znhG
-         6daA4JnVxf9gdN4uLJWJ1V1q6PiGG4y79PrNqG0CeBf2DSoxywsizN+6Rteb5jhP4QQx
-         HGqNkgVycaU93TT0toG5v4vzJc3mWaaGFKN6HcZQtxu7sLpEjsQtXZRrCCckbbVqSK4R
-         D/iA==
-X-Gm-Message-State: ACrzQf37F2AUut0+pv0c5Rj1pTzjpR4JDMJp0XPq8B1pJ/z7nPaNuLC9
-        QFPOlYXko5hXwclbRv90fuYyGqVhWI6R8fCp
-X-Google-Smtp-Source: AMsMyM4qyBt12rcuttDhEv6VzzCBj04ePzyKCwyMg2Ez6D9um6HJ0TTK/VY0zYw9gl6qB4dniA1uEQ==
-X-Received: by 2002:a05:6a00:1f06:b0:56c:ee8a:29f7 with SMTP id be6-20020a056a001f0600b0056cee8a29f7mr45840655pfb.44.1667745463076;
-        Sun, 06 Nov 2022 06:37:43 -0800 (PST)
+        bh=hD6uAvy9J7vwxqLchDyF0qqglXabp73+7LquhHbZf4s=;
+        b=opGn+jNxkbsppYTuA/vxI5aZ5nkkbUETjZOvmeiKLhG25SBaRQnJDcMwCi3GUDjWme
+         sNDU/eJ8eQEJBiSO1QSBz7ZQKbagD/67ctX5+Ii715Y26ygJdTaX4U0/0c78GPfDKc4I
+         gkUUREJ1hN0NBThvid+VPemgmMZ0PRshmrtpa7gNVPXD6NgXtEtGllajqX5Gwbzyp6zW
+         6FSUeiE+HYWwl2q8D6KxDLVlfzUwQq0VrVwLmK9a1jf4cDSPpxwk0LItlolm6dXAJuEW
+         NNicG7uk7pAALW/bvuF8jtrQFPt2LdLuoGmtvVEtqVAdoZumSx9K+G+O0pCQXUBtXAQb
+         URHA==
+X-Gm-Message-State: ANoB5plHXjYJgydNgWXvoyZvRNneVL5QW8TSL7PjF1E1wNNX1HjneLAy
+        KAhNG0j8jtKt1ZMqSLLIZz1b2f/2pD8ofw==
+X-Google-Smtp-Source: AA0mqf5ElSG9if6Yc3fybKIIGG3zIA4B04nxJ3ERufrj0yHeoPL0tQb64zW8foLYTVzEj9mzRQFq+g==
+X-Received: by 2002:a17:902:8304:b0:188:6863:d334 with SMTP id bd4-20020a170902830400b001886863d334mr12198653plb.9.1667745467259;
+        Sun, 06 Nov 2022 06:37:47 -0800 (PST)
 Received: from localhost.localdomain ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id k26-20020aa7973a000000b0056da2ad6503sm2696580pfg.39.2022.11.06.06.37.39
+        by smtp.gmail.com with ESMTPSA id k26-20020aa7973a000000b0056da2ad6503sm2696580pfg.39.2022.11.06.06.37.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Nov 2022 06:37:42 -0800 (PST)
+        Sun, 06 Nov 2022 06:37:46 -0800 (PST)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
@@ -57,9 +57,9 @@ To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
         elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
 Cc:     ap420073@gmail.com
-Subject: [PATCH v3 1/4] crypto: aria: add keystream array into struct aria_ctx
-Date:   Sun,  6 Nov 2022 14:36:24 +0000
-Message-Id: <20221106143627.30920-2-ap420073@gmail.com>
+Subject: [PATCH v3 2/4] crypto: aria: do not use magic number offsets of aria_ctx
+Date:   Sun,  6 Nov 2022 14:36:25 +0000
+Message-Id: <20221106143627.30920-3-ap420073@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20221106143627.30920-1-ap420073@gmail.com>
 References: <20221106143627.30920-1-ap420073@gmail.com>
@@ -67,120 +67,163 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-avx accelerated aria module used local keystream array.
-But, keystream array size is too big.
-So, it puts the keystream array into struct aria_ctx.
+aria-avx assembly code accesses members of aria_ctx with magic number
+offset. If the shape of struct aria_ctx is changed carelessly,
+aria-avx will not work.
+So, we need to ensure accessing members of aria_ctx with correct
+offset values, not with magic numbers.
+
+It adds ARIA_CTX_enc_key, ARIA_CTX_dec_key, and ARIA_CTX_rounds in the
+asm-offsets.c So, correct offset definitions will be generated.
+aria-avx assembly code can access members of aria_ctx safely with
+these definitions.
 
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v3:
- - No changes.
-
-v2:
  - Patch introduced.
 
- arch/x86/crypto/aria-avx.h            |  3 ---
- arch/x86/crypto/aria_aesni_avx_glue.c | 24 +++++++++++-------------
- include/crypto/aria.h                 | 11 +++++++++++
- 3 files changed, 22 insertions(+), 16 deletions(-)
+ arch/x86/crypto/aria-aesni-avx-asm_64.S | 26 +++++++++++--------------
+ arch/x86/kernel/asm-offsets.c           | 11 +++++++++++
+ 2 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/crypto/aria-avx.h b/arch/x86/crypto/aria-avx.h
-index 01e9a01dc157..afd37af95e58 100644
---- a/arch/x86/crypto/aria-avx.h
-+++ b/arch/x86/crypto/aria-avx.h
-@@ -4,9 +4,6 @@
+diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+index c75fd7d015ed..e47e7e54e08f 100644
+--- a/arch/x86/crypto/aria-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+@@ -8,11 +8,7 @@
  
- #include <linux/types.h>
- 
--#define ARIA_AESNI_PARALLEL_BLOCKS 16
--#define ARIA_AESNI_PARALLEL_BLOCK_SIZE  (ARIA_BLOCK_SIZE * 16)
+ #include <linux/linkage.h>
+ #include <asm/frame.h>
 -
- struct aria_avx_ops {
- 	void (*aria_encrypt_16way)(const void *ctx, u8 *dst, const u8 *src);
- 	void (*aria_decrypt_16way)(const void *ctx, u8 *dst, const u8 *src);
-diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
-index c561ea4fefa5..b122482d0c9d 100644
---- a/arch/x86/crypto/aria_aesni_avx_glue.c
-+++ b/arch/x86/crypto/aria_aesni_avx_glue.c
-@@ -86,10 +86,9 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
- 		u8 *dst = walk.dst.virt.addr;
+-/* struct aria_ctx: */
+-#define enc_key 0
+-#define dec_key 272
+-#define rounds 544
++#include <asm/asm-offsets.h>
  
- 		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
--			u8 keystream[ARIA_AESNI_PARALLEL_BLOCK_SIZE];
--
- 			kernel_fpu_begin();
--			aria_ops.aria_ctr_crypt_16way(ctx, dst, src, keystream,
-+			aria_ops.aria_ctr_crypt_16way(ctx, dst, src,
-+						      &ctx->keystream[0],
- 						      walk.iv);
- 			kernel_fpu_end();
- 			dst += ARIA_AESNI_PARALLEL_BLOCK_SIZE;
-@@ -98,28 +97,27 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
- 		}
+ /* register macros */
+ #define CTX %rdi
+@@ -873,7 +869,7 @@ SYM_FUNC_START_LOCAL(__aria_aesni_avx_crypt_16way)
+ 	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
+ 		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		%rax, %r9, 10);
+-	cmpl $12, rounds(CTX);
++	cmpl $12, ARIA_CTX_rounds(CTX);
+ 	jne .Laria_192;
+ 	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -886,7 +882,7 @@ SYM_FUNC_START_LOCAL(__aria_aesni_avx_crypt_16way)
+ 	aria_fo(%xmm9, %xmm8, %xmm11, %xmm10, %xmm12, %xmm13, %xmm14, %xmm15,
+ 		%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		%rax, %r9, 12);
+-	cmpl $14, rounds(CTX);
++	cmpl $14, ARIA_CTX_rounds(CTX);
+ 	jne .Laria_256;
+ 	aria_ff(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -922,7 +918,7 @@ SYM_FUNC_START(aria_aesni_avx_encrypt_16way)
  
- 		while (nbytes >= ARIA_BLOCK_SIZE) {
--			u8 keystream[ARIA_BLOCK_SIZE];
--
--			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
-+			memcpy(&ctx->keystream[0], walk.iv, ARIA_BLOCK_SIZE);
- 			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
+ 	FRAME_BEGIN
  
--			aria_encrypt(ctx, keystream, keystream);
-+			aria_encrypt(ctx, &ctx->keystream[0],
-+				     &ctx->keystream[0]);
+-	leaq enc_key(CTX), %r9;
++	leaq ARIA_CTX_enc_key(CTX), %r9;
  
--			crypto_xor_cpy(dst, src, keystream, ARIA_BLOCK_SIZE);
-+			crypto_xor_cpy(dst, src, &ctx->keystream[0],
-+				       ARIA_BLOCK_SIZE);
- 			dst += ARIA_BLOCK_SIZE;
- 			src += ARIA_BLOCK_SIZE;
- 			nbytes -= ARIA_BLOCK_SIZE;
- 		}
+ 	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -947,7 +943,7 @@ SYM_FUNC_START(aria_aesni_avx_decrypt_16way)
  
- 		if (walk.nbytes == walk.total && nbytes > 0) {
--			u8 keystream[ARIA_BLOCK_SIZE];
--
--			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
-+			memcpy(&ctx->keystream[0], walk.iv, ARIA_BLOCK_SIZE);
- 			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
+ 	FRAME_BEGIN
  
--			aria_encrypt(ctx, keystream, keystream);
-+			aria_encrypt(ctx, &ctx->keystream[0],
-+				     &ctx->keystream[0]);
+-	leaq dec_key(CTX), %r9;
++	leaq ARIA_CTX_dec_key(CTX), %r9;
  
--			crypto_xor_cpy(dst, src, keystream, nbytes);
-+			crypto_xor_cpy(dst, src, &ctx->keystream[0], nbytes);
- 			dst += nbytes;
- 			src += nbytes;
- 			nbytes = 0;
-diff --git a/include/crypto/aria.h b/include/crypto/aria.h
-index 254da46cc385..f5c7a87378cd 100644
---- a/include/crypto/aria.h
-+++ b/include/crypto/aria.h
-@@ -31,11 +31,22 @@
- #define ARIA_MAX_RD_KEYS	17
- #define ARIA_RD_KEY_WORDS	(ARIA_BLOCK_SIZE / sizeof(u32))
+ 	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -1055,7 +1051,7 @@ SYM_FUNC_START(aria_aesni_avx_ctr_crypt_16way)
+ 	leaq (%rdx), %r11;
+ 	leaq (%rcx), %rsi;
+ 	leaq (%rcx), %rdx;
+-	leaq enc_key(CTX), %r9;
++	leaq ARIA_CTX_enc_key(CTX), %r9;
  
-+#define ARIA_AESNI_PARALLEL_BLOCKS 16
-+#define ARIA_AESNI_PARALLEL_BLOCK_SIZE  (ARIA_BLOCK_SIZE * 16)
-+#if defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) ||	\
+ 	call __aria_aesni_avx_crypt_16way;
+ 
+@@ -1156,7 +1152,7 @@ SYM_FUNC_START_LOCAL(__aria_aesni_avx_gfni_crypt_16way)
+ 		     %xmm0, %xmm1, %xmm2, %xmm3,
+ 		     %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %rax, %r9, 10);
+-	cmpl $12, rounds(CTX);
++	cmpl $12, ARIA_CTX_rounds(CTX);
+ 	jne .Laria_gfni_192;
+ 	aria_ff_gfni(%xmm1, %xmm0, %xmm3, %xmm2, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		%xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -1173,7 +1169,7 @@ SYM_FUNC_START_LOCAL(__aria_aesni_avx_gfni_crypt_16way)
+ 		     %xmm0, %xmm1, %xmm2, %xmm3,
+ 		     %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %rax, %r9, 12);
+-	cmpl $14, rounds(CTX);
++	cmpl $14, ARIA_CTX_rounds(CTX);
+ 	jne .Laria_gfni_256;
+ 	aria_ff_gfni(%xmm1, %xmm0, %xmm3, %xmm2,
+ 		     %xmm4, %xmm5, %xmm6, %xmm7,
+@@ -1217,7 +1213,7 @@ SYM_FUNC_START(aria_aesni_avx_gfni_encrypt_16way)
+ 
+ 	FRAME_BEGIN
+ 
+-	leaq enc_key(CTX), %r9;
++	leaq ARIA_CTX_enc_key(CTX), %r9;
+ 
+ 	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -1242,7 +1238,7 @@ SYM_FUNC_START(aria_aesni_avx_gfni_decrypt_16way)
+ 
+ 	FRAME_BEGIN
+ 
+-	leaq dec_key(CTX), %r9;
++	leaq ARIA_CTX_dec_key(CTX), %r9;
+ 
+ 	inpack16_pre(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		     %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14,
+@@ -1274,7 +1270,7 @@ SYM_FUNC_START(aria_aesni_avx_gfni_ctr_crypt_16way)
+ 	leaq (%rdx), %r11;
+ 	leaq (%rcx), %rsi;
+ 	leaq (%rcx), %rdx;
+-	leaq enc_key(CTX), %r9;
++	leaq ARIA_CTX_enc_key(CTX), %r9;
+ 
+ 	call __aria_aesni_avx_gfni_crypt_16way;
+ 
+diff --git a/arch/x86/kernel/asm-offsets.c b/arch/x86/kernel/asm-offsets.c
+index cb50589a7102..32192a91c65b 100644
+--- a/arch/x86/kernel/asm-offsets.c
++++ b/arch/x86/kernel/asm-offsets.c
+@@ -7,6 +7,7 @@
+ #define COMPILE_OFFSETS
+ 
+ #include <linux/crypto.h>
++#include <crypto/aria.h>
+ #include <linux/sched.h>
+ #include <linux/stddef.h>
+ #include <linux/hardirq.h>
+@@ -109,6 +110,16 @@ static void __used common(void)
+ 	OFFSET(TSS_sp1, tss_struct, x86_tss.sp1);
+ 	OFFSET(TSS_sp2, tss_struct, x86_tss.sp2);
+ 
++#if defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) ||  \
 +	defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64_MODULE)
-+#define ARIA_KEYSTREAM_SIZE ARIA_AESNI_PARALLEL_BLOCK_SIZE
++
++	/* Offset for fields in aria_ctx */
++	BLANK();
++	OFFSET(ARIA_CTX_enc_key, aria_ctx, enc_key);
++	OFFSET(ARIA_CTX_dec_key, aria_ctx, dec_key);
++	OFFSET(ARIA_CTX_rounds, aria_ctx, rounds);
 +#endif
 +
- struct aria_ctx {
- 	u32 enc_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
- 	u32 dec_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
- 	int rounds;
- 	int key_length;
-+#if defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) ||	\
-+	defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64_MODULE)
-+	u8 keystream[ARIA_KEYSTREAM_SIZE];
-+#endif
- };
- 
- static const u32 s1[256] = {
+ 	if (IS_ENABLED(CONFIG_KVM_INTEL)) {
+ 		BLANK();
+ 		OFFSET(VMX_spec_ctrl, vcpu_vmx, spec_ctrl);
 -- 
 2.17.1
 
