@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAEEC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 07:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D82C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 08:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbiKGHut (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 02:50:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
+        id S231538AbiKGIBp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 03:01:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230480AbiKGHus (ORCPT
+        with ESMTP id S231539AbiKGIBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 02:50:48 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6C663D8;
-        Sun,  6 Nov 2022 23:50:47 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id ja4-20020a05600c556400b003cf6e77f89cso7863500wmb.0;
-        Sun, 06 Nov 2022 23:50:47 -0800 (PST)
+        Mon, 7 Nov 2022 03:01:40 -0500
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC3313F2A;
+        Mon,  7 Nov 2022 00:01:39 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id k8so14955783wrh.1;
+        Mon, 07 Nov 2022 00:01:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xn1piaXxc21W8WIXCvaPByn+C5mJyUz3dv2gAqZymug=;
-        b=Jdd40BIHbir1vpkDqGuu45WPRNXRhjkMSSndFd7uA/NemHVnSYCy7FMm8SgVWagKGo
-         zOGDtO61jet2Hzhh4gG/4mmZkcT1R7IW+mscOjRVaiztllIa+eZn5B0F6vzWKmdygOg8
-         ZZ10l365Tyla9Vs+TejOOdmScVsHQlgodivyPnLq3A9hTIADHVnLefI300zKpAIVKhvv
-         InOMuMQGk+0IZtvTHW45u7fGsL9mjinyaSiS8BoSG+p9tH5zLAoMYuHGlT0I87WY+rAS
-         ia/ErsT770AQ7ABjbLQr+AXqE1FUk6mf8xBpYYgoWntLMpXajjwpNIdo4BXN3ruWJGbr
-         BV6A==
+        bh=Ch+LE7gstKBIpXh5IG3QGfhZroQjP8LDQYrbKVWPxqM=;
+        b=oyEMtbJtCLFX5lMBDr/DgCQ/ltvexBJSZjdn0g3qYi5319dOvFreFV3dHnxGAg8bW+
+         uZAeLfEYIs6fWT9zNCyvoBBEu6nrxxb8GbFpjxjfJn8WiPx2wfq7V80N/HA7PnQW6PR3
+         Mil5xtnJf4mIbF59o/llgBpcmn8VJY7efi4vKk+1kX2Yidfk4rPFLJc2AlYQ1WU4T/sy
+         G5uf4kMltYDwpL4bcu9mGcENjyCF6hk7XQtq6/0am5Mh/oDJ7PhgjX+7p8wWLwtW1vLq
+         oBjvtUyHOzub+gsehYfE/7S01gQgYS/dABK0pisBF6cGCbE3tH8qTKN9QZXYyNpUTiyR
+         dLzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Xn1piaXxc21W8WIXCvaPByn+C5mJyUz3dv2gAqZymug=;
-        b=NRDBPT195BRhpV/8oLmSvWraWZ68bBbj/sCwIiY6FeEjbo46ev9YUqtMSPHYABn+Fh
-         mYKdAMfAabkNZsN+m2Af2KGLeL9rThev7Rf7hNj7NQ6+6l+AXUbQ5H3WcDHBkXIrjSpb
-         /mPqc0Jmb0IQmtaJYJOpxZLwNM9CIBpS6ffgGY5emeAyON49v5GJ3a3YZa5UtGnayw0i
-         KTzuVL9Sf4/Qk4BwgCliz0ZipNRaXr4a8l7g6CNJoYVOqdq0uwyj0DtAN6mvy0uPyfvS
-         AQjyDr7IFuVC622C9XzuPO2Uff3OrH+GHUClfnWkfYWXr6fkuyZ3LQj4QzbDEjt5ppNq
-         ZgEA==
-X-Gm-Message-State: ACrzQf1Yi1h04F8gfko5hC8lYmPl1s/kmGR7TGJJrpljy3xKCu7kLrk1
-        Iglevh81ZN05sZH/zDIOey4=
-X-Google-Smtp-Source: AMsMyM5Y0xS9zKpwtO3S/J2nFpEkEf4LKkL2xR9sTBwwc4rJmFzmVbCISYRZ3sj48GXkSOTGubkEDg==
-X-Received: by 2002:a1c:a107:0:b0:3cf:a25f:eef2 with SMTP id k7-20020a1ca107000000b003cfa25feef2mr6468699wme.195.1667807445967;
-        Sun, 06 Nov 2022 23:50:45 -0800 (PST)
+        bh=Ch+LE7gstKBIpXh5IG3QGfhZroQjP8LDQYrbKVWPxqM=;
+        b=zIpWHlDNSth0ccuCPNlF4OzVP3FBNldrsHCjT4QiEeJiXvBQ4Vb6sLATv34SHZSZfk
+         TTq6Mpx1UNsD8TE+BzNIcMur53s6wsMD42qEg3/YNykPvWxrYvh8ZsrufqOF/lQ0ImqD
+         r+emiL8cw+O+Nqm6BfRVj41vVYfs6uaKFM1UWLCYApgsY8exfG5IarmwRW4MaMYOl3uJ
+         jBPZIdhfVKqDOuWEvqtk/4PQpkSL93JjVvvCbFb2TnVec2eN0KAOnCfc4bujtfpQCyyN
+         FDIlZnKPe9C3+onF7n0jNQDMXOCgJM8dBZaFREJMRjBH1BqjCODMk9V5dQrgDy24GMC2
+         3Rig==
+X-Gm-Message-State: ACrzQf0ibjdbWp57+x2mm+l/8xMLEDod9nxe6MV2nNBGsTjC796Gq4sT
+        /3om7VrLxoLGO7EB3B3O4Ew=
+X-Google-Smtp-Source: AMsMyM7HG+n2Rpteeu6Z33tXXS6tw3mSI72ThMGxOBanegLmm+tIcl/KHFv9O36f7Bg3pUzuSgDZzg==
+X-Received: by 2002:adf:ee4a:0:b0:236:77fe:5a5a with SMTP id w10-20020adfee4a000000b0023677fe5a5amr548922wro.117.1667808097798;
+        Mon, 07 Nov 2022 00:01:37 -0800 (PST)
 Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id m21-20020a7bca55000000b003c6c182bef9sm12584534wml.36.2022.11.06.23.50.44
+        by smtp.gmail.com with ESMTPSA id k8-20020a05600c168800b003cf47fdead5sm7290060wmn.30.2022.11.07.00.01.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Nov 2022 23:50:45 -0800 (PST)
-Date:   Mon, 7 Nov 2022 10:50:37 +0300
+        Mon, 07 Nov 2022 00:01:37 -0800 (PST)
+Date:   Mon, 7 Nov 2022 11:01:30 +0300
 From:   Dan Carpenter <error27@gmail.com>
 To:     oe-kbuild@lists.linux.dev, 'Guanjun' <guanjun@linux.alibaba.com>,
         herbert@gondor.apana.org.au, elliott@hpe.com
@@ -57,13 +57,12 @@ Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
         zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
         guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
-Subject: Re: [PATCH v3 RESEND 3/9] crypto/ycc: Add irq support for ycc kernel
- rings
-Message-ID: <202211060128.TZF4P1Ko-lkp@intel.com>
+Subject: Re: [PATCH v3 RESEND 8/9] crypto/ycc: Add sm2 algorithm support
+Message-ID: <202211060420.IwtCMD76-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1667461243-48652-4-git-send-email-guanjun@linux.alibaba.com>
+In-Reply-To: <1667461243-48652-9-git-send-email-guanjun@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -74,8 +73,8 @@ https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221103-154448
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/1667461243-48652-4-git-send-email-guanjun%40linux.alibaba.com
-patch subject: [PATCH v3 RESEND 3/9] crypto/ycc: Add irq support for ycc kernel rings
+patch link:    https://lore.kernel.org/r/1667461243-48652-9-git-send-email-guanjun%40linux.alibaba.com
+patch subject: [PATCH v3 RESEND 8/9] crypto/ycc: Add sm2 algorithm support
 config: ia64-randconfig-m031-20221104
 compiler: ia64-linux-gcc (GCC) 12.1.0
 
@@ -84,76 +83,29 @@ If you fix the issue, kindly add following tag where applicable
 | Reported-by: Dan Carpenter <error27@gmail.com>
 
 smatch warnings:
-drivers/crypto/ycc/ycc_isr.c:124 ycc_alloc_irqs() warn: missing error code 'ret'
+drivers/crypto/ycc/ycc_pke.c:880 ycc_sm2_exit() warn: variable dereferenced before check 'ctx->ring' (see line 878)
 
-vim +/ret +124 drivers/crypto/ycc/ycc_isr.c
+vim +880 drivers/crypto/ycc/ycc_pke.c
 
-99da43fc5ee114 Zelin Deng 2022-11-03   98  
-99da43fc5ee114 Zelin Deng 2022-11-03   99  int ycc_alloc_irqs(struct ycc_dev *ydev)
-99da43fc5ee114 Zelin Deng 2022-11-03  100  {
-99da43fc5ee114 Zelin Deng 2022-11-03  101  	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
-99da43fc5ee114 Zelin Deng 2022-11-03  102  	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  103  	int cpu, cpus = num_online_cpus();
-3c2d80e20cfe81 Zelin Deng 2022-11-03  104  	int ret, i, j;
-99da43fc5ee114 Zelin Deng 2022-11-03  105  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  106  	/* The 0 - (YCC_RINGPAIR_NUM-1) are rings irqs, the last one is dev error irq */
-99da43fc5ee114 Zelin Deng 2022-11-03  107  	sprintf(ydev->err_irq_name, "ycc_dev_%d_global_err", ydev->id);
-99da43fc5ee114 Zelin Deng 2022-11-03  108  	ret = request_irq(pci_irq_vector(rcec_pdev, num),
-99da43fc5ee114 Zelin Deng 2022-11-03  109  			  ycc_g_err_isr, 0, ydev->err_irq_name, ydev);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  110  	if (ret) {
-99da43fc5ee114 Zelin Deng 2022-11-03  111  		pr_err("Failed to alloc global irq interrupt for dev: %d\n", ydev->id);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  112  		goto out;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  113  	}
-3c2d80e20cfe81 Zelin Deng 2022-11-03  114  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  115  	if (ydev->is_polling)
-3c2d80e20cfe81 Zelin Deng 2022-11-03  116  		goto out;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  117  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  118  	for (i = 0; i < num; i++) {
-3c2d80e20cfe81 Zelin Deng 2022-11-03  119  		if (ydev->rings[i].type != KERN_RING)
-3c2d80e20cfe81 Zelin Deng 2022-11-03  120  			continue;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  121  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  122  		ydev->msi_name[i] = kzalloc(16, GFP_KERNEL);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  123  		if (!ydev->msi_name[i])
-3c2d80e20cfe81 Zelin Deng 2022-11-03 @124  			goto free_irq;
+eb2973011f26b6 Xuchun Shang 2022-11-03  875  static void ycc_sm2_exit(struct crypto_akcipher *tfm)
+eb2973011f26b6 Xuchun Shang 2022-11-03  876  {
+eb2973011f26b6 Xuchun Shang 2022-11-03  877  	struct ycc_pke_ctx *ctx = akcipher_tfm_ctx(tfm);
+eb2973011f26b6 Xuchun Shang 2022-11-03 @878  	struct device *dev = YCC_DEV(ctx);
 
-ret = -ENOMEM;
+ctx->ring dereferenced inside YCC_DEV() (says the checker).
 
-3c2d80e20cfe81 Zelin Deng 2022-11-03  125  		snprintf(ydev->msi_name[i], 16, "ycc_ring_%d", i);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  126  		ret = request_irq(pci_irq_vector(rcec_pdev, i), ycc_resp_isr,
-3c2d80e20cfe81 Zelin Deng 2022-11-03  127  				  0, ydev->msi_name[i], &ydev->rings[i]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  128  		if (ret) {
-3c2d80e20cfe81 Zelin Deng 2022-11-03  129  			kfree(ydev->msi_name[i]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  130  			goto free_irq;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  131  		}
-3c2d80e20cfe81 Zelin Deng 2022-11-03  132  		if (!ydev->is_vf)
-3c2d80e20cfe81 Zelin Deng 2022-11-03  133  			cpu = (i % YCC_RINGPAIR_NUM) % cpus;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  134  		else
-3c2d80e20cfe81 Zelin Deng 2022-11-03  135  			cpu = smp_processor_id() % cpus;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  136  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  137  		ret = irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i),
-3c2d80e20cfe81 Zelin Deng 2022-11-03  138  					    get_cpu_mask(cpu));
-3c2d80e20cfe81 Zelin Deng 2022-11-03  139  		if (ret) {
-3c2d80e20cfe81 Zelin Deng 2022-11-03  140  			free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  141  			kfree(ydev->msi_name[i]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  142  			goto free_irq;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  143  		}
-3c2d80e20cfe81 Zelin Deng 2022-11-03  144  	}
-3c2d80e20cfe81 Zelin Deng 2022-11-03  145  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  146  	return 0;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  147  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  148  free_irq:
-3c2d80e20cfe81 Zelin Deng 2022-11-03  149  	for (j = 0; j < i; j++) {
-3c2d80e20cfe81 Zelin Deng 2022-11-03  150  		if (ydev->rings[i].type != KERN_RING)
-3c2d80e20cfe81 Zelin Deng 2022-11-03  151  			continue;
-3c2d80e20cfe81 Zelin Deng 2022-11-03  152  
-3c2d80e20cfe81 Zelin Deng 2022-11-03  153  		free_irq(pci_irq_vector(rcec_pdev, j), &ydev->rings[j]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  154  		kfree(ydev->msi_name[j]);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  155  	}
-3c2d80e20cfe81 Zelin Deng 2022-11-03  156  	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
-3c2d80e20cfe81 Zelin Deng 2022-11-03  157  out:
-99da43fc5ee114 Zelin Deng 2022-11-03  158  
-99da43fc5ee114 Zelin Deng 2022-11-03  159  	return ret;
-99da43fc5ee114 Zelin Deng 2022-11-03  160  }
+eb2973011f26b6 Xuchun Shang 2022-11-03  879  
+eb2973011f26b6 Xuchun Shang 2022-11-03 @880  	if (ctx->ring)
+                                                    ^^^^^^^^^
+Checked too late.
+
+eb2973011f26b6 Xuchun Shang 2022-11-03  881  		ycc_crypto_free_ring(ctx->ring);
+eb2973011f26b6 Xuchun Shang 2022-11-03  882  
+eb2973011f26b6 Xuchun Shang 2022-11-03  883  	if (ctx->pub_key_vaddr)
+eb2973011f26b6 Xuchun Shang 2022-11-03  884  		dma_free_coherent(dev, 64, ctx->pub_key_vaddr, ctx->pub_key_paddr);
+eb2973011f26b6 Xuchun Shang 2022-11-03  885  
+eb2973011f26b6 Xuchun Shang 2022-11-03  886  	crypto_free_akcipher(ctx->soft_tfm);
+eb2973011f26b6 Xuchun Shang 2022-11-03  887  }
 
 -- 
 0-DAY CI Kernel Test Service
