@@ -2,100 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B28CC43217
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 07:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC38C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 07:45:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbiKGHjc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 02:39:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46792 "EHLO
+        id S231149AbiKGHpG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 02:45:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231152AbiKGHjb (ORCPT
+        with ESMTP id S231460AbiKGHpF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 02:39:31 -0500
-Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9417CFF
-        for <linux-crypto@vger.kernel.org>; Sun,  6 Nov 2022 23:39:30 -0800 (PST)
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id D3B212014B3;
-        Mon,  7 Nov 2022 07:39:28 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 6542D806D2; Mon,  7 Nov 2022 08:35:02 +0100 (CET)
-Date:   Mon, 7 Nov 2022 08:35:02 +0100
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] hw_random: treat default_quality as a maximum and
- default to 1024
-Message-ID: <Y2i1JgQJQot6W1PD@owl.dominikbrodowski.net>
-References: <20221104154230.52836-1-Jason@zx2c4.com>
- <Y2dctc4A0ccl3Hwp@owl.dominikbrodowski.net>
- <Y2fHbAxGY/VKLzbC@zx2c4.com>
+        Mon, 7 Nov 2022 02:45:05 -0500
+Received: from mail.steuer-voss.de (mail.steuer-voss.de [85.183.69.95])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF49120BB;
+        Sun,  6 Nov 2022 23:45:00 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at mail.steuer-voss.de
+Received: by mail.steuer-voss.de (Postfix, from userid 1000)
+        id 16C5416C1; Mon,  7 Nov 2022 08:44:55 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.steuer-voss.de (Postfix) with ESMTP id 141F4ADA;
+        Mon,  7 Nov 2022 08:44:55 +0100 (CET)
+Date:   Mon, 7 Nov 2022 08:44:55 +0100 (CET)
+From:   Nikolaus Voss <nv@vosn.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+cc:     =?ISO-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Subject: Re: [PATCH] crypto: caam: blob_gen.c: warn if key is insecure
+In-Reply-To: <Y2TSRSlefTj6bvYK@gondor.apana.org.au>
+Message-ID: <d1b8787c-7c69-43e2-5078-d8affcdd8bd4@vosn.de>
+References: <20221019134706.E52E71D10@mail.steuer-voss.de> <Y2TSRSlefTj6bvYK@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2fHbAxGY/VKLzbC@zx2c4.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+On Fri, 4 Nov 2022, Herbert Xu wrote:
+> On Wed, Oct 19, 2022 at 02:44:56PM +0200, Nikolaus Voss wrote:
+>>
+>> @@ -62,11 +63,13 @@ int caam_process_blob(struct caam_blob_priv *priv,
+>>  		      struct caam_blob_info *info, bool encap)
+>>  {
+>>  	struct caam_blob_job_result testres;
+>> +	const struct caam_drv_private *ctrlpriv;
+>
+> Please keep the declarations sorted by length in reverse.
 
-Am Sun, Nov 06, 2022 at 03:40:44PM +0100 schrieb Jason A. Donenfeld:
-> On Sun, Nov 06, 2022 at 08:05:25AM +0100, Dominik Brodowski wrote:
-> > Am Fri, Nov 04, 2022 at 04:42:30PM +0100 schrieb Jason A. Donenfeld:
-> > > Most hw_random devices return entropy which is assumed to be of full
-> > > quality, but driver authors don't bother setting the quality knob. Some
-> > > hw_random devices return less than full quality entropy, and then driver
-> > > authors set the quality knob. Therefore, the entropy crediting should be
-> > > opt-out rather than opt-in per-driver, to reflect the actual reality on
-> > > the ground.
-> > > 
-> > > For example, the two Raspberry Pi RNG drivers produce full entropy
-> > > randomness, and both EDK2 and U-Boot's drivers for these treat them as
-> > > such. The result is that EFI then uses these numbers and passes the to
-> > > Linux, and Linux credits them as boot, thereby initializing the RNG.
-> > > Yet, in Linux, the quality knob was never set to anything, and so on the
-> > > chance that Linux is booted without EFI, nothing is ever credited.
-> > > That's annoying.
-> > > 
-> > > The same pattern appears to repeat itself throughout various drivers. In
-> > > fact, very very few drivers have bothered setting quality=1024.
-> > > 
-> > > So let's invert this logic. A hw_random struct's quality knob now
-> > > controls the maximum quality a driver can produce, or 0 to specify 1024.
-> > > Then, the module-wide switch called "default_quality" is changed to
-> > > represent the maximum quality of any driver. By default it's 1024, and
-> > > the quality of any particular driver is then given by:
-> > > 
-> > >     min(default_quality, rng->quality ?: 1024);
-> > > 
-> > > This way, the user can still turn this off for weird reasons, yet we get
-> > > proper crediting for relevant RNGs.
-> > 
-> > Hm. Wouldn't we need to verify that 1024 is appropriate for all drivers
-> > where the quality currently is not set?
-> 
-> No, certainly not, and I think this sort of thought belies a really
-> backwards attitude. Hardware RNGs are assumed to produce good
-> randomness. Some manufacturers provide a caveat, "actually, we're giving
-> raw entropy with only N bits quality", but for the ones who don't, the
-> overarching assumption is that the bits are fully entropic.
+ok!
 
-My point is not about the 1024 as an exact value, it's more about "do the
-driver and the hardware really provide _something_ sensible or not". In the
-past, the default mode as to feed the output of hw_rng devies to some
-userspace daemon, which then tried to verify that the device works as
-expected, and then feeded the data back to the crng core. This userspace
-indirection is largely removed already (in particular by a patch of mine
-which starts up the hwrng kernel thread also for devices with quality==0)
-once the crng is fully initialized, on the rationale that even bad quality
-data will do no harm. Yet, we may need to be a tad more careful whether or
-not to trust devices for the initial seeding of the crng.
+>
+>> @@ -100,6 +103,11 @@ int caam_process_blob(struct caam_blob_priv *priv,
+>>  		goto out_unmap_in;
+>>  	}
+>>
+>> +	ctrlpriv = dev_get_drvdata(jrdev->parent);
+>> +	moo = FIELD_GET(CSTA_MOO, ctrlpriv->ctrl->perfmon.status);
+>> +	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
+>> +		dev_warn(jrdev, "using insecure test key!\n");
+>
+> Who is the audience of this warning? Is it possible for this warning
+> to be too frequent?
 
-Thanks,
-	Dominik
+The warning is issued every time the non-volatile hardware test key is 
+used to seal/unseal data. This way, the association to the operation is 
+strong and is less likely to be ignored by mistake. Further, the system 
+security monitor can transition to a non-secure state any time, so one 
+warning during boot-up doesn't suffice. IMO, on a typical system, the 
+warning occurs with very low frequency, only a few times during 
+e.g. authenication or mounting of encrypted volumes.
+
+The audience is the developer who forgets to enable secure boot (HAB) or 
+even doesn't know she has to enable HAB to employ the device's unique 
+hardware key instead of the test key.
+
+Niko
+
