@@ -2,107 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F27CEC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 11:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CA1C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 12:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbiKGLkF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 06:40:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51042 "EHLO
+        id S231264AbiKGMEm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 07:04:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231313AbiKGLkE (ORCPT
+        with ESMTP id S231588AbiKGMEl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 06:40:04 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6478317073
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 03:40:03 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so10030270pjk.1
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Nov 2022 03:40:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2w2norf17FHwkqF7uqmpvKvXIkvCoKcqrRCYZXHr4d4=;
-        b=O4EfGTzX7ut98ALxy/2jm29ZGFMdN3GIpwvfKU/SUAK7Iw/evSI9Rd56ZuCe6D9RE/
-         /wsrGMAodIwmqqMs/HUDmtjtXwizFv5aGexNBgDbFpFlCVlrGt8KiLSzSiguuec/dtzk
-         hhYAtXftMWt2fnOfJAIc00yoMqI4roX4k+zto5yRdXnDcp/V3h+J+uyuWUUxO77NIwAG
-         ADpqhFg3WIOZWkU4sYnfWYV0D2tcI6JYmH+B+CQPBVb5JS1HMdQVmkFXKC5FSYnHdfhX
-         jmntC/fAtLDmYcIDmZ2USDW+5As2ujUhSosa48fn3Nt/AZyzAfImcYA7Q/GKqgWi7EnD
-         IyoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2w2norf17FHwkqF7uqmpvKvXIkvCoKcqrRCYZXHr4d4=;
-        b=SiNEiLc8bURdALJ0L8+3ubAjeMP2rWq/3g3dyns0XuC0raEanhQ0oJE8TyEVOZ3G6n
-         OoBS3m7pqANBsfWOZ9DzeKx5wcb/HN93TfD5RxojpCwNaS0tKg2NdH5ikwI0/ydqujXk
-         l4dTXneEQg1yOe2tDddq7Z+Sr3pfKLOqW45XqlLeGZKiWYV3emm9PTdj8mRvmJG0ga3m
-         FBLYsaXqtgks62U+oCQf/jtx6v/FE2TapzUmzZoRqkVs9lxv4wPgZbgXtsOJepfn9cO2
-         GBAOqGIGM6wyuwGfSLcH6KGi6Bn8APRpvjl+8asjrDnfpQHzZ6f/KC3y2Yv7+c4aXmkf
-         JJRA==
-X-Gm-Message-State: ACrzQf1xIBB4ddjbcadzi2j7UeIHnQpQ0XlAcJI0K0ajUI952QUNdvMq
-        K4WhlAdFFw+LIN6CqxHnkGY=
-X-Google-Smtp-Source: AMsMyM5ESu95zcXN7NtzS7uyXZbjoK4jjsBqcBVDJ+vEVQuwQ9aYvfWBHMDDezjvCniSWvV9HoTzUg==
-X-Received: by 2002:a17:902:7294:b0:187:146c:316f with SMTP id d20-20020a170902729400b00187146c316fmr44440521pll.149.1667821202864;
-        Mon, 07 Nov 2022 03:40:02 -0800 (PST)
-Received: from ?IPV6:2606:4700:110:8d19:ef92:9207:5a0d:60e7? ([2a09:bac1:3f60:98::16:12e])
-        by smtp.gmail.com with ESMTPSA id l5-20020a622505000000b0056be1581126sm4442633pfl.143.2022.11.07.03.39.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Nov 2022 03:40:02 -0800 (PST)
-Message-ID: <99dcdd19-6954-d040-455b-c04f158d17c7@gmail.com>
-Date:   Mon, 7 Nov 2022 20:39:56 +0900
+        Mon, 7 Nov 2022 07:04:41 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06240186F9
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 04:04:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 983A860ED6
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 12:04:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A523BC433D6
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 12:04:39 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aONdDrYw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1667822676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x/VlGM4HifwgG8vPARHtC+BrT1VT/CRtK8URHaPVNx4=;
+        b=aONdDrYwPITCp6LE+/g4P2esBXQzlmXsV+VMEbCrVN2MidVW4aGdCyOfbDiKkevV8DXbLH
+        hZ5E7oA8Ji1qS2NJrbwp+ktNyTBMZnOb6CDw+tfa7rY77zrePTdm5S5okYCTs/OZfkgGxu
+        Nq0Sndl1Ycc9k1gWEtMgB/C4CLve8RU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3352f2c9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 7 Nov 2022 12:04:36 +0000 (UTC)
+Received: by mail-vs1-f49.google.com with SMTP id 3so10328835vsh.5
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Nov 2022 04:04:36 -0800 (PST)
+X-Gm-Message-State: ACrzQf0EpPHZOrW9Djr2wy5fF/uMC0cqZaH8vIuDMsOhtZCi0tMut9Pd
+        pubwQBkXBuu9PA0Y2R1fNVVSX2oXrIG078mGXUg=
+X-Google-Smtp-Source: AMsMyM6z8BlExV2Kt4vIkKLCiTa+bRM/ADDNeTJialuiHTV5Wo4rH1M5/YYaHivvExu+d8CQYckf8uumiTChQFZTFY0=
+X-Received: by 2002:a05:6102:f9a:b0:3aa:1a11:2702 with SMTP id
+ e26-20020a0561020f9a00b003aa1a112702mr25586304vsv.73.1667822674669; Mon, 07
+ Nov 2022 04:04:34 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v3 1/4] crypto: aria: add keystream array into struct
- aria_ctx
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com,
-        kirill.shutemov@linux.intel.com, richard@nod.at,
-        viro@zeniv.linux.org.uk,
-        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
-        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
-References: <20221106143627.30920-1-ap420073@gmail.com>
- <20221106143627.30920-2-ap420073@gmail.com>
- <Y2jGTvgHnu4QZV+D@gondor.apana.org.au>
-Content-Language: en-US
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <Y2jGTvgHnu4QZV+D@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20221104154230.52836-1-Jason@zx2c4.com> <Y2dctc4A0ccl3Hwp@owl.dominikbrodowski.net>
+ <Y2fHbAxGY/VKLzbC@zx2c4.com> <Y2i1JgQJQot6W1PD@owl.dominikbrodowski.net> <Y2jodSK9o0HvnpQ8@zx2c4.com>
+In-Reply-To: <Y2jodSK9o0HvnpQ8@zx2c4.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 7 Nov 2022 13:04:23 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pjWNGaF+4+ubFuu1AXhRkEbU7mxT-RtOhWVYkAgxXiDg@mail.gmail.com>
+Message-ID: <CAHmME9pjWNGaF+4+ubFuu1AXhRkEbU7mxT-RtOhWVYkAgxXiDg@mail.gmail.com>
+Subject: Re: [PATCH] hw_random: treat default_quality as a maximum and default
+ to 1024
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
-Thank you so much for your review!
+On Mon, Nov 7, 2022 at 12:14 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Hi Dominik,
+>
+> On Mon, Nov 07, 2022 at 08:35:02AM +0100, Dominik Brodowski wrote:
+> > Hi Jason,
+> >
+> > Am Sun, Nov 06, 2022 at 03:40:44PM +0100 schrieb Jason A. Donenfeld:
+> > > On Sun, Nov 06, 2022 at 08:05:25AM +0100, Dominik Brodowski wrote:
+> > > > Am Fri, Nov 04, 2022 at 04:42:30PM +0100 schrieb Jason A. Donenfeld:
+> > > > > Most hw_random devices return entropy which is assumed to be of full
+> > > > > quality, but driver authors don't bother setting the quality knob. Some
+> > > > > hw_random devices return less than full quality entropy, and then driver
+> > > > > authors set the quality knob. Therefore, the entropy crediting should be
+> > > > > opt-out rather than opt-in per-driver, to reflect the actual reality on
+> > > > > the ground.
+> > > > >
+> > > > > For example, the two Raspberry Pi RNG drivers produce full entropy
+> > > > > randomness, and both EDK2 and U-Boot's drivers for these treat them as
+> > > > > such. The result is that EFI then uses these numbers and passes the to
+> > > > > Linux, and Linux credits them as boot, thereby initializing the RNG.
+> > > > > Yet, in Linux, the quality knob was never set to anything, and so on the
+> > > > > chance that Linux is booted without EFI, nothing is ever credited.
+> > > > > That's annoying.
+> > > > >
+> > > > > The same pattern appears to repeat itself throughout various drivers. In
+> > > > > fact, very very few drivers have bothered setting quality=1024.
+> > > > >
+> > > > > So let's invert this logic. A hw_random struct's quality knob now
+> > > > > controls the maximum quality a driver can produce, or 0 to specify 1024.
+> > > > > Then, the module-wide switch called "default_quality" is changed to
+> > > > > represent the maximum quality of any driver. By default it's 1024, and
+> > > > > the quality of any particular driver is then given by:
+> > > > >
+> > > > >     min(default_quality, rng->quality ?: 1024);
+> > > > >
+> > > > > This way, the user can still turn this off for weird reasons, yet we get
+> > > > > proper crediting for relevant RNGs.
+> > > >
+> > > > Hm. Wouldn't we need to verify that 1024 is appropriate for all drivers
+> > > > where the quality currently is not set?
+> > >
+> > > No, certainly not, and I think this sort of thought belies a really
+> > > backwards attitude. Hardware RNGs are assumed to produce good
+> > > randomness. Some manufacturers provide a caveat, "actually, we're giving
+> > > raw entropy with only N bits quality", but for the ones who don't, the
+> > > overarching assumption is that the bits are fully entropic.
+> >
+> > My point is not about the 1024 as an exact value, it's more about "do the
+> > driver and the hardware really provide _something_ sensible or not". In the
+> > past, the default mode as to feed the output of hw_rng devies to some
+> > userspace daemon, which then tried to verify that the device works as
+> > expected, and then feeded the data back to the crng core. This userspace
+> > indirection is largely removed already (in particular by a patch of mine
+> > which starts up the hwrng kernel thread also for devices with quality==0)
+> > once the crng is fully initialized, on the rationale that even bad quality
+> > data will do no harm. Yet, we may need to be a tad more careful whether or
+> > not to trust devices for the initial seeding of the crng.
+>
+> I got your point, and I still think it's a bad one, for the reasons
+> already explained to you. If it's a hardware RNG, then it's sensible to
+> assume it provides hardware random bits, unless we have documentation
+> that says it provides something less than perfect.
+>
+> Now you've moved on to talking again about entropy estimation. Stop with
+> this nonsense. Entropy estimation is an impossible proposition that
+> actually results in an infoleak. With that said, a self-test to make
+> sure the hardware isn't completely borked would be a nice thing, but
+> this applies for any device no matter what assumptions are made. So if
+> you want to work on that, go ahead, but it's completely orthogonal to
+> this change here.
 
-On 11/7/22 17:48, Herbert Xu wrote:
- > On Sun, Nov 06, 2022 at 02:36:24PM +0000, Taehee Yoo wrote:
- >>
- >>   struct aria_ctx {
- >>   	u32 enc_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
- >>   	u32 dec_key[ARIA_MAX_RD_KEYS][ARIA_RD_KEY_WORDS];
- >>   	int rounds;
- >>   	int key_length;
- >> +#if defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) ||	\
- >> +	defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64_MODULE)
- >> +	u8 keystream[ARIA_KEYSTREAM_SIZE];
- >> +#endif
- >>   };
- >
- > The tfm ctx is shared between all users of the tfm.  You need
- > something that is private to the request so this needs to be
- > moved into the reqctx.
- >
- > Cheers,
+Based on IRC discussion, following up with a v2 with a better commit message.
 
-Sorry, I think I hadn't understood the point of your previous review 
-correctly.
-I will move keystream into reqctx instead of the tfm.
-
-Thanks a lot!
-Taehee Yoo
+Jason
