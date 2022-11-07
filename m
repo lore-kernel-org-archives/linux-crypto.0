@@ -2,58 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54D0C43219
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 09:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7C8C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 10:46:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231461AbiKGJr1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 04:47:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41398 "EHLO
+        id S231600AbiKGKql (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 05:46:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231810AbiKGJrX (ORCPT
+        with ESMTP id S231592AbiKGKqj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 04:47:23 -0500
-X-Greylist: delayed 1800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Nov 2022 01:47:23 PST
-Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CB61836B
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 01:47:23 -0800 (PST)
-Received: by mail.lokoho.com (Postfix, from userid 1001)
-        id EA731824C5; Mon,  7 Nov 2022 09:10:44 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
-        t=1667812244; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
-        h=Date:From:To:Subject:From;
-        b=FZ9g5MxrIuL5CEAfiVQ3bMhk7+LvAh5LpKK2MyrjMcE3y5Fku0hX2fqR5UK8jgtBD
-         hGRJd8l1UEfJ4UxgI+shM920hExnW5W7pJTd9Nfqx5XWmNSmSdkCWDcCN3+JVJlxbP
-         S6Cwdl48L8Peavw9I5hRGSxnYP3lPSA4lPDhiGtk70XTLph6WJlIQ6MHe4oaTmnwQz
-         6ZrBxSzzhRPCS2T5y2BgNPMLymuzkC/2Eq5b5Kuc4iZMIGbvih7JQtKILkJMxTrn44
-         99PeTN/Nkwn4sZJ1UTd5pQoNeE3j/c6xGhzw9mAANnPKA2XnsjkDfvg3SR07L7kOno
-         ijUy7j9q6Anyg==
-Received: by mail.lokoho.com for <linux-crypto@vger.kernel.org>; Mon,  7 Nov 2022 09:10:44 GMT
-Message-ID: <20221107074500-0.1.23.5lk2.0.8gpo5ee9ih@lokoho.com>
-Date:   Mon,  7 Nov 2022 09:10:44 GMT
-From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
-X-Mailer: mail.lokoho.com
+        Mon, 7 Nov 2022 05:46:39 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EA4F17E30;
+        Mon,  7 Nov 2022 02:46:38 -0800 (PST)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4N5SZq1VCPz15MQ3;
+        Mon,  7 Nov 2022 18:46:27 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 7 Nov 2022 18:46:36 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 7 Nov 2022 18:46:36 +0800
+Subject: Re: [PATCH v2 1/4] crypto: hisilicon/qm - modify the process of regs
+ dfx
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20221105095357.21199-1-yekai13@huawei.com>
+ <20221105095357.21199-2-yekai13@huawei.com>
+ <Y2Y4hWc+cUJ4VZgy@gondor.apana.org.au>
+ <45cf9fba-fae6-8279-bfac-f70110df42dc@huawei.com>
+ <Y2jGGuewePunGPtl@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>
+From:   "yekai (A)" <yekai13@huawei.com>
+Message-ID: <a8bc45c1-4fb1-b99a-fcac-adc9f14f400f@huawei.com>
+Date:   Mon, 7 Nov 2022 18:46:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Y2jGGuewePunGPtl@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
-
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
-
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
-
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
 
-Pozdrawiam
-Adam Charachuta
+On 2022/11/7 16:47, Herbert Xu wrote:
+> On Mon, Nov 07, 2022 at 02:53:28PM +0800, yekai (A) wrote:
+>>
+>> On 2022/11/5 18:18, Herbert Xu wrote:
+>>> On Sat, Nov 05, 2022 at 09:53:54AM +0000, Kai Ye wrote:
+>>>> +static void dfx_regs_uninit(struct hisi_qm *qm,
+>>>> +		struct dfx_diff_registers *dregs, int reg_len)
+>>>> +{
+>>>> +	int i;
+>>>> +
+>>>> +	/* Setting the pointer is NULL to prevent double free */
+>>>> +	for (i = 0; i < reg_len; i++) {
+>>>> +		kfree(dregs[i].regs);
+>>>> +		dregs[i].regs = NULL;
+>>>> +	}
+>>>> +	kfree(dregs);
+>>>> +	dregs = NULL;
+>>>> +}
+>>> The line that I complained about is still here.
+>>>
+>>> Cheers,
+>> ok
+> Just to be clear, it's the last line "dregs = NULL" that I was
+> referring to.  It makes no sense to zero a variable that is on
+> the stack.
+>
+> Cheers,
+
+I got it. I will fix it and resend the patch set in the next version.
+
+Thanks
+Kai
