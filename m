@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC82FC4167D
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 19:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9790EC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 21:58:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232151AbiKGTLI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 14:11:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46830 "EHLO
+        id S233051AbiKGV6T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 16:58:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiKGTKt (ORCPT
+        with ESMTP id S233181AbiKGV6J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 14:10:49 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4DF629C82;
-        Mon,  7 Nov 2022 11:10:48 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e71f329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e71f:329c:23ff:fea6:a903])
+        Mon, 7 Nov 2022 16:58:09 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C127128E16;
+        Mon,  7 Nov 2022 13:58:03 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e764329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e764:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5052F1EC0567;
-        Mon,  7 Nov 2022 20:10:47 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D3D41EC071E;
+        Mon,  7 Nov 2022 22:58:02 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1667848247;
+        t=1667858282;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=zgafXme/YlkPVTuatr/YKPrpFzsJCUOJ17VfQBIvcIA=;
-        b=YJ2hJxTGDz78MWs+NfxNQAyMXBGKrEZmSid4LJPUTmJhcqkjulwoXe2CRpAhwfWGGNZKQ6
-        6JPQWgbT+W8ye6miqzwlNMJ9vi0JFMbpNL4rbENdJMpKUORXbbOn5W6v74Kv+p7xWGIUiR
-        Qu2rcfVifxdsrSfF/1L0UBDJJRgfyW0=
-Date:   Mon, 7 Nov 2022 20:10:42 +0100
+        bh=uQcKspdlDKpk49zfyausr9OngCMvETATkpBKm+sBLhk=;
+        b=Qwtyu/SGJvknZmcPnQ2RVX7AM+OQGNt7XRtmeoNiddst/4dyq3Twq5mY7V+q5GRPPX8JBv
+        oL90uqH946ccxeIPpTbSO4VMjvvJ1iOX4FrOWLBvAhr71mqYWcJDb7cztQmoChrcj7ydpF
+        EHzowFWLanlPhgD4che2ALb0pw2wqYw=
+Date:   Mon, 7 Nov 2022 22:57:58 +0100
 From:   Borislav Petkov <bp@alien8.de>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -59,68 +59,26 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
 Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
  setup_clear_cpu_cap()/clear_cpu_cap()
-Message-ID: <Y2lYMqLVP+00Rpu5@zn.tnic>
+Message-ID: <Y2l/ZibeaD3P8lBp@zn.tnic>
 References: <20220718141123.136106-1-mlevitsk@redhat.com>
  <20220718141123.136106-3-mlevitsk@redhat.com>
  <Y1LGkTXCksqAYLHD@zn.tnic>
+ <Y2lYMqLVP+00Rpu5@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y1LGkTXCksqAYLHD@zn.tnic>
+In-Reply-To: <Y2lYMqLVP+00Rpu5@zn.tnic>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 06:19:29PM +0200, Borislav Petkov wrote:
-> On Mon, Jul 18, 2022 at 05:11:20PM +0300, Maxim Levitsky wrote:
-> > Currently setup_clear_cpu_cap passes NULL 'struct cpuinfo_x86*'
-> > to clear_cpu_cap to indicate that capability should be cleared from boot_cpu_data.
-> > 
-> > Later that is used in clear_feature to do recursive call to
-> > clear_cpu_cap together with clearing the feature bit from 'cpu_caps_cleared'
-> > 
-> > Remove that code and just call the do_clear_cpu_cap on boot_cpu_data directly
-> > from the setup_clear_cpu_cap.
-> > 
-> > The only functional change this introduces is that now calling clear_cpu_cap
-> > explicitly on boot_cpu_data also sets the bits in cpu_caps_cleared,
-> > which is the only thing that makes sense anyway.
-> > 
-> > All callers of both functions were checked for this and fixed.
-> 
-> Change looks ok. What I can't grok is this sentence: what was checked
-> and fixed where?
+On Mon, Nov 07, 2022 at 08:10:42PM +0100, Borislav Petkov wrote:
+> Lemme document it so that it is at least clear. Who knows, we might end
+> up improving it in the process.
 
-Ok, I think I know what you mean. That:
+IOW, something like this. It's a start at least...
 
-git grep -E "clear_cpu_cap.*boot"
-arch/x86/events/intel/lbr.c:1599:       clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
-arch/x86/kernel/alternative.c:746:              clear_cpu_cap(&boot_cpu_data, X86_FEATURE_UP);
-
-Right, so here's the difference:
-
-When you call setup_clear_cpu_cap(), it basically means, to disable the
-cap on *every* CPU. This is done with cpu_caps_cleared which gets ANDed
-in in apply_forced_caps().
-
-clear_cpu_cap() clears the bit *only* in the first parameter supplied.
-
-Now, that first parameter can be boot_cpu_data too but then, strictly
-speaking, clear_cpu_cap() would really do what you want it to do - to
-clear it only in its first param.
-
-If you really want to enforce that bit cleared everywhere, you need to
-use the setup_* variant.
-
-So this patch is actually incorrect but I admit, the CPU caps handling
-are kinda subtle and probably need cleaning.
-
-Lemme document it so that it is at least clear. Who knows, we might end
-up improving it in the process.
-
-:-)
-
-Thx.
+https://lore.kernel.org/r/20221107211505.8572-1-bp@alien8.de
 
 -- 
 Regards/Gruss,
