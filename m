@@ -2,132 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE3CC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 07:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAEEC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 07:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231458AbiKGHq6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 02:46:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50294 "EHLO
+        id S231145AbiKGHut (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Nov 2022 02:50:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231451AbiKGHq5 (ORCPT
+        with ESMTP id S230480AbiKGHus (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 02:46:57 -0500
-Received: from mail.steuer-voss.de (mail.steuer-voss.de [85.183.69.95])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BD113E1B;
-        Sun,  6 Nov 2022 23:46:56 -0800 (PST)
-X-Virus-Scanned: Debian amavisd-new at mail.steuer-voss.de
-Received: by mail.steuer-voss.de (Postfix, from userid 1000)
-        id 044CC1AD9; Mon,  7 Nov 2022 08:46:52 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.steuer-voss.de (Postfix) with ESMTP id F25BA8DA;
-        Mon,  7 Nov 2022 08:46:52 +0100 (CET)
-Date:   Mon, 7 Nov 2022 08:46:52 +0100 (CET)
-From:   Nikolaus Voss <nv@vosn.de>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Gstir <david@sigma-star.at>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: caam: blob_gen.c: warn if key is insecure
-In-Reply-To: <b1d90113-c69a-108c-7142-6a47db001a96@pengutronix.de>
-Message-ID: <c4e399c0-ac28-767d-e0ee-f95c573c3fa7@vosn.de>
-References: <20221019144108.48E1B1B0E@mail.steuer-voss.de> <b1d90113-c69a-108c-7142-6a47db001a96@pengutronix.de>
+        Mon, 7 Nov 2022 02:50:48 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6C663D8;
+        Sun,  6 Nov 2022 23:50:47 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id ja4-20020a05600c556400b003cf6e77f89cso7863500wmb.0;
+        Sun, 06 Nov 2022 23:50:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xn1piaXxc21W8WIXCvaPByn+C5mJyUz3dv2gAqZymug=;
+        b=Jdd40BIHbir1vpkDqGuu45WPRNXRhjkMSSndFd7uA/NemHVnSYCy7FMm8SgVWagKGo
+         zOGDtO61jet2Hzhh4gG/4mmZkcT1R7IW+mscOjRVaiztllIa+eZn5B0F6vzWKmdygOg8
+         ZZ10l365Tyla9Vs+TejOOdmScVsHQlgodivyPnLq3A9hTIADHVnLefI300zKpAIVKhvv
+         InOMuMQGk+0IZtvTHW45u7fGsL9mjinyaSiS8BoSG+p9tH5zLAoMYuHGlT0I87WY+rAS
+         ia/ErsT770AQ7ABjbLQr+AXqE1FUk6mf8xBpYYgoWntLMpXajjwpNIdo4BXN3ruWJGbr
+         BV6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xn1piaXxc21W8WIXCvaPByn+C5mJyUz3dv2gAqZymug=;
+        b=NRDBPT195BRhpV/8oLmSvWraWZ68bBbj/sCwIiY6FeEjbo46ev9YUqtMSPHYABn+Fh
+         mYKdAMfAabkNZsN+m2Af2KGLeL9rThev7Rf7hNj7NQ6+6l+AXUbQ5H3WcDHBkXIrjSpb
+         /mPqc0Jmb0IQmtaJYJOpxZLwNM9CIBpS6ffgGY5emeAyON49v5GJ3a3YZa5UtGnayw0i
+         KTzuVL9Sf4/Qk4BwgCliz0ZipNRaXr4a8l7g6CNJoYVOqdq0uwyj0DtAN6mvy0uPyfvS
+         AQjyDr7IFuVC622C9XzuPO2Uff3OrH+GHUClfnWkfYWXr6fkuyZ3LQj4QzbDEjt5ppNq
+         ZgEA==
+X-Gm-Message-State: ACrzQf1Yi1h04F8gfko5hC8lYmPl1s/kmGR7TGJJrpljy3xKCu7kLrk1
+        Iglevh81ZN05sZH/zDIOey4=
+X-Google-Smtp-Source: AMsMyM5Y0xS9zKpwtO3S/J2nFpEkEf4LKkL2xR9sTBwwc4rJmFzmVbCISYRZ3sj48GXkSOTGubkEDg==
+X-Received: by 2002:a1c:a107:0:b0:3cf:a25f:eef2 with SMTP id k7-20020a1ca107000000b003cfa25feef2mr6468699wme.195.1667807445967;
+        Sun, 06 Nov 2022 23:50:45 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id m21-20020a7bca55000000b003c6c182bef9sm12584534wml.36.2022.11.06.23.50.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Nov 2022 23:50:45 -0800 (PST)
+Date:   Mon, 7 Nov 2022 10:50:37 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     oe-kbuild@lists.linux.dev, 'Guanjun' <guanjun@linux.alibaba.com>,
+        herbert@gondor.apana.org.au, elliott@hpe.com
+Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+        zelin.deng@linux.alibaba.com, artie.ding@linux.alibaba.com,
+        guanjun@linux.alibaba.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xuchun.shang@linux.alibaba.com
+Subject: Re: [PATCH v3 RESEND 3/9] crypto/ycc: Add irq support for ycc kernel
+ rings
+Message-ID: <202211060128.TZF4P1Ko-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1667461243-48652-4-git-send-email-guanjun@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 4 Nov 2022, Ahmad Fatoum wrote:
+Hi 'Guanjun',
 
-> Hello Nikolaus,
->
-> On 19.10.22 14:44, Nikolaus Voss wrote:
->> If CAAM is not in "trusted" or "secure" state, a fixed non-volatile key
->> is used instead of the unique device key. This is the default mode of
->> operation without secure boot (HAB). In this scenario, CAAM encrypted
->> blobs should be used only for testing but not in a production
->> environment, so issue a warning.
->
-> Thanks for your patch.
->
->> Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
->> ---
->>  drivers/crypto/caam/blob_gen.c | 8 ++++++++
->>  drivers/crypto/caam/regs.h     | 3 +++
->>  2 files changed, 11 insertions(+)
->>
->> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
->> index 6345c7269eb0..f3e741393f65 100644
->> --- a/drivers/crypto/caam/blob_gen.c
->> +++ b/drivers/crypto/caam/blob_gen.c
->> @@ -6,6 +6,7 @@
->>
->>  #define pr_fmt(fmt) "caam blob_gen: " fmt
->>
->> +#include <linux/bitfield.h>
->>  #include <linux/device.h>
->>  #include <soc/fsl/caam-blob.h>
->>
->> @@ -62,11 +63,13 @@ int caam_process_blob(struct caam_blob_priv *priv,
->>  		      struct caam_blob_info *info, bool encap)
->
-> I agree with Herbert that this may not be the best place. I think
-> a single warning during caam_blob_gen_init() would suffice.
->
->>  {
->>  	struct caam_blob_job_result testres;
->> +	const struct caam_drv_private *ctrlpriv;
->>  	struct device *jrdev = &priv->jrdev;
->>  	dma_addr_t dma_in, dma_out;
->>  	int op = OP_PCLID_BLOB;
->>  	size_t output_len;
->>  	u32 *desc;
->> +	u32 moo;
->>  	int ret;
->>
->>  	if (info->key_mod_len > CAAM_BLOB_KEYMOD_LENGTH)
->> @@ -100,6 +103,11 @@ int caam_process_blob(struct caam_blob_priv *priv,
->>  		goto out_unmap_in;
->>  	}
->>
->> +	ctrlpriv = dev_get_drvdata(jrdev->parent);
->> +	moo = FIELD_GET(CSTA_MOO, ctrlpriv->ctrl->perfmon.status);
->> +	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
->> +		dev_warn(jrdev, "using insecure test key!\n");
->
-> I'd make the warning a bit more verbose, e.g.
->
->  "device not configured for trusted/secure mode: using insecure test key!"
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I agree.
+url:    https://github.com/intel-lab-lkp/linux/commits/Guanjun/Drivers-for-Alibaba-YCC-Yitian-Cryptography-Complex-cryptographic-accelerator/20221103-154448
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/1667461243-48652-4-git-send-email-guanjun%40linux.alibaba.com
+patch subject: [PATCH v3 RESEND 3/9] crypto/ycc: Add irq support for ycc kernel rings
+config: ia64-randconfig-m031-20221104
+compiler: ia64-linux-gcc (GCC) 12.1.0
 
->
->> +
->>  	/*
->>  	 * A data blob is encrypted using a blob key (BK); a random number.
->>  	 * The BK is used as an AES-CCM key. The initial block (B0) and the
->> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
->> index 66d6dad841bb..b7de5fb5e056 100644
->> --- a/drivers/crypto/caam/regs.h
->> +++ b/drivers/crypto/caam/regs.h
->> @@ -426,6 +426,9 @@ struct caam_perfmon {
->>  	u32 rsvd2;
->>  #define CSTA_PLEND		BIT(10)
->>  #define CSTA_ALT_PLEND		BIT(18)
->> +#define CSTA_MOO		GENMASK(9, 8)
->> +#define CSTA_MOO_SECURE	1
->> +#define CSTA_MOO_TRUSTED	3
->
-> I just checked the i.MX6 and LS1046 security reference manuals and both
-> have Trusted as 2 (10b). 3 is fail. Does you SoC differ? Either way, please
-> note what SoC you were testing on in the commit message.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <error27@gmail.com>
 
-You're right, I will correct that.
+smatch warnings:
+drivers/crypto/ycc/ycc_isr.c:124 ycc_alloc_irqs() warn: missing error code 'ret'
 
-Niko
+vim +/ret +124 drivers/crypto/ycc/ycc_isr.c
+
+99da43fc5ee114 Zelin Deng 2022-11-03   98  
+99da43fc5ee114 Zelin Deng 2022-11-03   99  int ycc_alloc_irqs(struct ycc_dev *ydev)
+99da43fc5ee114 Zelin Deng 2022-11-03  100  {
+99da43fc5ee114 Zelin Deng 2022-11-03  101  	struct pci_dev *rcec_pdev = ydev->assoc_dev->pdev;
+99da43fc5ee114 Zelin Deng 2022-11-03  102  	int num = ydev->is_vf ? 1 : YCC_RINGPAIR_NUM;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  103  	int cpu, cpus = num_online_cpus();
+3c2d80e20cfe81 Zelin Deng 2022-11-03  104  	int ret, i, j;
+99da43fc5ee114 Zelin Deng 2022-11-03  105  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  106  	/* The 0 - (YCC_RINGPAIR_NUM-1) are rings irqs, the last one is dev error irq */
+99da43fc5ee114 Zelin Deng 2022-11-03  107  	sprintf(ydev->err_irq_name, "ycc_dev_%d_global_err", ydev->id);
+99da43fc5ee114 Zelin Deng 2022-11-03  108  	ret = request_irq(pci_irq_vector(rcec_pdev, num),
+99da43fc5ee114 Zelin Deng 2022-11-03  109  			  ycc_g_err_isr, 0, ydev->err_irq_name, ydev);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  110  	if (ret) {
+99da43fc5ee114 Zelin Deng 2022-11-03  111  		pr_err("Failed to alloc global irq interrupt for dev: %d\n", ydev->id);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  112  		goto out;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  113  	}
+3c2d80e20cfe81 Zelin Deng 2022-11-03  114  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  115  	if (ydev->is_polling)
+3c2d80e20cfe81 Zelin Deng 2022-11-03  116  		goto out;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  117  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  118  	for (i = 0; i < num; i++) {
+3c2d80e20cfe81 Zelin Deng 2022-11-03  119  		if (ydev->rings[i].type != KERN_RING)
+3c2d80e20cfe81 Zelin Deng 2022-11-03  120  			continue;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  121  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  122  		ydev->msi_name[i] = kzalloc(16, GFP_KERNEL);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  123  		if (!ydev->msi_name[i])
+3c2d80e20cfe81 Zelin Deng 2022-11-03 @124  			goto free_irq;
+
+ret = -ENOMEM;
+
+3c2d80e20cfe81 Zelin Deng 2022-11-03  125  		snprintf(ydev->msi_name[i], 16, "ycc_ring_%d", i);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  126  		ret = request_irq(pci_irq_vector(rcec_pdev, i), ycc_resp_isr,
+3c2d80e20cfe81 Zelin Deng 2022-11-03  127  				  0, ydev->msi_name[i], &ydev->rings[i]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  128  		if (ret) {
+3c2d80e20cfe81 Zelin Deng 2022-11-03  129  			kfree(ydev->msi_name[i]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  130  			goto free_irq;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  131  		}
+3c2d80e20cfe81 Zelin Deng 2022-11-03  132  		if (!ydev->is_vf)
+3c2d80e20cfe81 Zelin Deng 2022-11-03  133  			cpu = (i % YCC_RINGPAIR_NUM) % cpus;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  134  		else
+3c2d80e20cfe81 Zelin Deng 2022-11-03  135  			cpu = smp_processor_id() % cpus;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  136  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  137  		ret = irq_set_affinity_hint(pci_irq_vector(rcec_pdev, i),
+3c2d80e20cfe81 Zelin Deng 2022-11-03  138  					    get_cpu_mask(cpu));
+3c2d80e20cfe81 Zelin Deng 2022-11-03  139  		if (ret) {
+3c2d80e20cfe81 Zelin Deng 2022-11-03  140  			free_irq(pci_irq_vector(rcec_pdev, i), &ydev->rings[i]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  141  			kfree(ydev->msi_name[i]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  142  			goto free_irq;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  143  		}
+3c2d80e20cfe81 Zelin Deng 2022-11-03  144  	}
+3c2d80e20cfe81 Zelin Deng 2022-11-03  145  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  146  	return 0;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  147  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  148  free_irq:
+3c2d80e20cfe81 Zelin Deng 2022-11-03  149  	for (j = 0; j < i; j++) {
+3c2d80e20cfe81 Zelin Deng 2022-11-03  150  		if (ydev->rings[i].type != KERN_RING)
+3c2d80e20cfe81 Zelin Deng 2022-11-03  151  			continue;
+3c2d80e20cfe81 Zelin Deng 2022-11-03  152  
+3c2d80e20cfe81 Zelin Deng 2022-11-03  153  		free_irq(pci_irq_vector(rcec_pdev, j), &ydev->rings[j]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  154  		kfree(ydev->msi_name[j]);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  155  	}
+3c2d80e20cfe81 Zelin Deng 2022-11-03  156  	free_irq(pci_irq_vector(rcec_pdev, num), ydev);
+3c2d80e20cfe81 Zelin Deng 2022-11-03  157  out:
+99da43fc5ee114 Zelin Deng 2022-11-03  158  
+99da43fc5ee114 Zelin Deng 2022-11-03  159  	return ret;
+99da43fc5ee114 Zelin Deng 2022-11-03  160  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
 
