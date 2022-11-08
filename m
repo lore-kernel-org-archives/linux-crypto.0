@@ -2,211 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E187C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 20:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A222BC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 22:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiKHUfD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 15:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
+        id S229545AbiKHWFe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 17:05:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbiKHUfC (ORCPT
+        with ESMTP id S229518AbiKHWFd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 15:35:02 -0500
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C6E5EFBD;
-        Tue,  8 Nov 2022 12:35:00 -0800 (PST)
-Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
-        by mx0a-002e3701.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A8JPW1X002692;
-        Tue, 8 Nov 2022 20:34:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pps0720;
- bh=f/7GBB2/K3K39TY5imV1840t9I4fsSrnUZTmiwKTCw8=;
- b=n3S8meHjJrN774EEBHBizFAmhQalpeUcqzq0Y9DAXHLT6prF4tjeByOnNMwRVaV/BU3q
- qb0jpdTDv6RJA9e+DmSwDjTKq6F+HRoQsPABlFUOgr5YqI3QgByzLpqRgWlHQRdFQEHB
- fpCl/yonJQjIrFbpsKbMlt5CunZEgfXN+4PP4vk7hCsHItQyspet0Oob+FfQHfbJ8udz
- +MVV7lCH5E8ZGASTWH3gapdPcWB7vm+jIomhWzys1zWk7QhUtb9+WbkgzymnTb8kP9aJ
- PSwEbX6J7o+OsKa9jOzmKiJ6NHhoHjpNHlE2DnHo9qI3VFHyvuzEWVsoRceYy329ty7Y RA== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3kqw8r0j0h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 08 Nov 2022 20:34:32 +0000
-Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id DFA44806B55;
-        Tue,  8 Nov 2022 20:34:31 +0000 (UTC)
-Received: from p1wg14928.americas.hpqcorp.net (10.119.18.116) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Tue, 8 Nov 2022 08:34:14 -1200
-Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
- p1wg14928.americas.hpqcorp.net (10.119.18.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Tue, 8 Nov 2022 08:34:13 -1200
-Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
- via Frontend Transport; Tue, 8 Nov 2022 08:34:13 -1200
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Tue, 8 Nov 2022 08:34:11 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AhKCBBez8AxzksqFp6/iEF/tGO+u6vm5Pk+fkggUwSo3O+81jsF2X38XvD03GCRP9a2IxuViYdK/ntEeBW1X9txDEv7lKXel26gP6B6QRpATxODu3r7796ACmz4ElbXBD4PEyqcOX8NQHt5d9Xq34OdYGSusbIQpizcwHm0VNkCgQBecfMksaaWxtfXwyBuJSDxD7CcXOvNcf3VLYISW3mmDAG8DMAWoBRXOA9t3HMyqj6cq6wlbQTY2KKIaSqVsXg3rduR482DI1GpBziACHHpzswJcs5cFkB4DLddlIn9KqiKkZl/61AGwtT5gzgPsnF4jZAjer6q4lARGoFswmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f/7GBB2/K3K39TY5imV1840t9I4fsSrnUZTmiwKTCw8=;
- b=oIruVdP+JnD0zmQULPSQpHFZaUvZX9e11nOI1xxY9X+SJddGhxeajoFhXStIAslzJLzrCCGenT4qQIbHKSgpG47FUa0nL6Ny6uHg+6eP2d8HEctWeLLb2freppkLnPmeeihwiBlk2tUEJHKOO72bl6RMjgKNQyLmhObGrnL6BoTEf/vtBDQ93U4S3PrS3FCaHhmkuDcx/G2p2gbUnDUCu9mk0dasRjIV+6tvUlPlj6haffd5WyUCazRK830dTIKADECy12x2ZI8t4vcWO1NM3NKRAYDDNa56lvoNFRq8u+aJVvngh7VlcL1J2C/k5nLVaSAIIgCuUnx+SllDkqR4FA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
- by PH0PR84MB1429.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:170::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.27; Tue, 8 Nov
- 2022 20:34:10 +0000
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::e739:d90:9fca:8e22]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::e739:d90:9fca:8e22%7]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 20:34:10 +0000
-From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     Vladis Dronov <vdronov@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 1/4] crypto: xts - restrict key lengths to approved values
- in FIPS mode
-Thread-Topic: [PATCH 1/4] crypto: xts - restrict key lengths to approved
- values in FIPS mode
-Thread-Index: AQHY831ixjJdferq10idPflaF1LnHq41ep+g
-Date:   Tue, 8 Nov 2022 20:34:10 +0000
-Message-ID: <MW5PR84MB1842EEC44A8CB6594D4D0CD0AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20221108142025.13461-1-nstange@suse.de>
- <20221108142025.13461-2-nstange@suse.de>
-In-Reply-To: <20221108142025.13461-2-nstange@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|PH0PR84MB1429:EE_
-x-ms-office365-filtering-correlation-id: 240deed6-6d11-487a-b4d3-08dac1c89789
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OD/S2+Cq47VAjWaR3keSqZr8F9pTuAFZmO6qOuVmmUds5FLpet/jKhFeKqzsj76LYATTvXtExMMHhxe3kknV/jpihA/E3zgMxNh15GNBRRjOt4bPC16j/YH3ZFaJMBc0aqLw/rQGIbXhfqo4qY4IpST/D5NJLdPzJs5+Itms98Sb0OzOKZkBYaRgNa5tDMskEeEXY4xb8NqxytjAjdEIfmIJGZhXO0xmAJjs1xNwrNuwtu3uevXlYSxVaos9Hm3E35rnVh5s4db351ZCznbT3Dv2VzmeDJnXEeLNsEKwqbeSMUcTwxgCLq1pn1OPWACG3m7qwPwviy6m0YX9kOJUuUJhc7MSztkOQcMaRUJqd+0wNFBUT86T/bfmwiHIC+Et9kEGYpKkry+NIac8Pso4y84sEPNHiU/TlONQoiz6SUYJ3mlSgs/OhPC+L7oRDH1kOhC+8aKkkwYFUPgYHTGI7GICVqvwLIUlZZFdalFWLHqU3W6KZS7bAMDrUmZSGhuVWSebPJ3aiwDyR8QVRJtSAJY3eAGR+zMhH3yUyVP31P+ObcD9jxA2Dt2ZC1igIYpq0RERHtrWAbyACNNXTw/naIzF+PtE14TmlhGlDuZdkXciTce9eVbnB98DsKsJp98lQQLia+zSKCEEVw8xm9bjDyNXf+e8uDN5AwbxCbpVfAzSM9Px72a+bjKz+3iiQRWAQdz1vBwLk899OpWA6hfMIteA4DTIFObZq4Ptc3TqIP5DxQhnLEu0L+0Z0yx4CXorZidXhwYv5dsZpbxXFfPsWw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(396003)(39860400002)(346002)(376002)(451199015)(86362001)(55016003)(66446008)(66476007)(64756008)(316002)(66946007)(76116006)(66556008)(54906003)(110136005)(8936002)(52536014)(41300700001)(5660300002)(33656002)(71200400001)(186003)(2906002)(478600001)(9686003)(38100700002)(6506007)(38070700005)(26005)(122000001)(4326008)(8676002)(7696005)(83380400001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7hr+beydPqAnGdZOEGsQScOq29Y0E8kCCQCnw+5+hZePrLaDwofHz72is293?=
- =?us-ascii?Q?JfhIMw4PXbZTWLkSK4W7hjBHhyYZF7FMYiQPHCwAV0uLPu7Jg0/6TwcH33lS?=
- =?us-ascii?Q?yqVyfn7mYN9tt4zAbBzxhrmImKpq/xSWTVKndxflLIq9bJ2Qq1WgwtoSpz76?=
- =?us-ascii?Q?v05Tqg8P2vyIOewJ9IN4fmW/c6IMwLKisTg7JG0ZLihkUz+7MJpjZyHOPhGQ?=
- =?us-ascii?Q?WVF39neVnVNYAv3UUjCiV45ItIfFZ9ZCPAAG9kolAFKvyqSTz/JQCspH8T5A?=
- =?us-ascii?Q?2fYpjQbu6lI9wgTh9Kz5DmXSvsZHc+IzOPEcYotTCxf001pvfTBqjQXFcBAY?=
- =?us-ascii?Q?nTBaVSBL2awKKfBlx52O5/mt9GlI3F+bgSgZ/NbkI92YQlQ4tdj1YKO1TL7r?=
- =?us-ascii?Q?TkF+oaNbXl/cawwZqu7n+2EYnluEGsPqlElAVbkgkQTZaMEpJiXTA0KTy8o9?=
- =?us-ascii?Q?5FINOBgFZf1/JZ5Woo5IJYqmbHomXjwDhle/SLc6KU15CEod5ooqMgq6aglL?=
- =?us-ascii?Q?HzJRwVHGOSuiioCy4hQyzMVkY1+ErOe44x+xSw+UN1UceTUbBizejMV34pIR?=
- =?us-ascii?Q?qsKWobT9j7y4LTukSPZCnGWZ81aXM1C3egF/GbBXigp5iuitZ/T7ZQG7Busq?=
- =?us-ascii?Q?TY+X6GWdfBNmhjnjo2VUFpZvh9AJ0SHOwtXwBZqmnBau2T2zYP21fqJOBmYD?=
- =?us-ascii?Q?lO4Ew/YHJutRapD06asmpmxZBOqTJOcxUuyejIHn40sSqRR5cwwKuR4GtqmJ?=
- =?us-ascii?Q?MdrOUfSxl6SzwDIhegfxGRsrhOqLm1F5nX/hw3oenNk/I8oTYJmli+/9umu2?=
- =?us-ascii?Q?+bdHZER2gFPjxMkQA2LpzZqmnOkX7KrZ7siAAVfC3MnuVeANiBLijIaLGnoY?=
- =?us-ascii?Q?8ZGgUu6lF54dyUgkcK/HDkU0Ize1YoM8ZeoxoIPbLN1b82XGj/vHWj1AcBot?=
- =?us-ascii?Q?rWgjji/rfVYqfKUlfwRMc0xgSxJjHHCxjhORsE5PGqBY6xh3RYHDVIFgtPv9?=
- =?us-ascii?Q?SAWU3cM2jMTv4w1TqOBaJvEaioPzsahBbA8SXUy/VPH9AP8ZodhjzXiio4RI?=
- =?us-ascii?Q?bW0Avawdvphs2PH+6+fcz1hnfZoqrVph/Pbq2Fqd+u3+GW8QKJZx8cAdeCjQ?=
- =?us-ascii?Q?RO/TnVaSEbLvj3NaakBwzsfrLwm3CZSgqSmXmprK+ALbLdcGR3d2zh56bOlR?=
- =?us-ascii?Q?hloDQEOd5QDUj5YQffS7RCB6/+RnQnkhja7SjtPkkqtZNRpJKpinRo4TQdOG?=
- =?us-ascii?Q?KI70sHfWLhaJj85VV51tuh8UGe4q8Tk5rGXDMLQcUtYarswT9totA0/OgCRA?=
- =?us-ascii?Q?La5QPY5ua7tyJ9M8CLqQopkMNLGBsbudi24tq/TkStF0INI0b8zFNvgNmM66?=
- =?us-ascii?Q?clv+B30F4/MckqcImAIhhB910/IuAGZ9gYaa7JAdlEeOLaC2GQFWED5s18xi?=
- =?us-ascii?Q?48mRFhpvzzJTPN0o1BWG28dfbnV6TBddLA2DFTZPUy8aUB9Nr3qQKVVq+jOn?=
- =?us-ascii?Q?PQcuwvz7nA8ROu5uq/RIEK3HeEVjevkNqd7Npi5C/tuf/W4yH3yxTuruHvv0?=
- =?us-ascii?Q?gnSu+IJLKR4YS22dWUU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 8 Nov 2022 17:05:33 -0500
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE111EEF2
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 14:05:31 -0800 (PST)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20221108220529euoutp024ec985b4d9085eb9f77014a46548ae2b~lu0ImulWK1950819508euoutp02e
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 22:05:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20221108220529euoutp024ec985b4d9085eb9f77014a46548ae2b~lu0ImulWK1950819508euoutp02e
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1667945129;
+        bh=zgfBTVSsOB3lBvcdFekwuhYytB28N8PDh5Agtj7NqKM=;
+        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+        b=aYfKb7zhscRHvVD0b8HR9ouWTYOXirgFpMjZAzV6ZasmgyyNKD4E3Jv2/1tB6yJBZ
+         RB3cGGWftrc6LHUnWtcaj7mBaLMsWzwyarTnNLsZEODLuNR+UZh4flhNW9NWlIHr6A
+         wav+3z7QSXBlLkEMQu5BZXaUdbFbD8dAxDwNNruA=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20221108220529eucas1p1d00b305b354f96d3655efc70d421cd87~lu0IKqOyw0223402234eucas1p11;
+        Tue,  8 Nov 2022 22:05:29 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 26.5F.10112.9A2DA636; Tue,  8
+        Nov 2022 22:05:29 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20221108220529eucas1p215c0154f12de5f83b5b5072be3e51cf6~lu0H8P-iu3124331243eucas1p2j;
+        Tue,  8 Nov 2022 22:05:29 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20221108220529eusmtrp2aa5474c8dd1715c6fc22856355114d6f~lu0H7uiXT1241112411eusmtrp23;
+        Tue,  8 Nov 2022 22:05:29 +0000 (GMT)
+X-AuditID: cbfec7f4-cf3ff70000002780-12-636ad2a954ad
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 47.EE.08916.8A2DA636; Tue,  8
+        Nov 2022 22:05:28 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20221108220528eusmtip11ad068dc543c23350266f166c59ca682~lu0HhIH_v2864728647eusmtip1Y;
+        Tue,  8 Nov 2022 22:05:28 +0000 (GMT)
+Message-ID: <5fbe28fd-b14d-6622-93e7-780e2f01fb6a@samsung.com>
+Date:   Tue, 8 Nov 2022 23:05:28 +0100
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 240deed6-6d11-487a-b4d3-08dac1c89789
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 20:34:10.5882
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gd5uSgdi0FDYNPnzJZ5sDxuXofZKaWrFlkLolALfhFJCRxEqy3C89lUu1VdaHWDp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR84MB1429
-X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: FhFnDzrQpfRWoYBkQqtr2KfwJ2HoQanI
-X-Proofpoint-ORIG-GUID: FhFnDzrQpfRWoYBkQqtr2KfwJ2HoQanI
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_11,2022-11-08_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- suspectscore=0 impostorscore=0 mlxlogscore=877 bulkscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211080131
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0)
+        Gecko/20100101 Thunderbird/102.4.1
+Subject: Re: [PATCH v4] hw_random: use add_hwgenerator_randomness() for
+ early entropy
+Content-Language: en-US
+To:     AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <76971346-73bf-f9b8-3434-f06ef991f328@collabora.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAKsWRmVeSWpSXmKPExsWy7djP87orL2UlG0xpELS4tFLCovuVjMWD
+        q1IW9+/9ZLJY0PKB1YHVY8fdJYweF3Zye2w7oOrxeZOcx+S/T5kDWKO4bFJSczLLUov07RK4
+        Mj6c6WUp6OKq+LHjNHsD426OLkZODgkBE4mTndNZuhi5OIQEVjBK/Gh8xgbhfGGUWPDvCzuE
+        85lRYsarI4wwLa3TvjJCJJYzSsw5/J0VwvnIKPF5/0mwKl4BO4m+z/fYQGwWARWJSe2LWCHi
+        ghInZz5hAbFFBVIkdndvA7OFBcIlFi2HqGEWEJe49WQ+E8hQEYH1jBKb1lxhh0gYSfz9towZ
+        xGYTMJToetsFtoBTwFHixb23UM3yEtvfzmGGOPUMh8Sdk5oQtovExpUtLBC2sMSr41vYIWwZ
+        if87IZZJCLQDPf37PpQzgVGi4fktqKetJe6c+wW0jQNog6bE+l36EGFHiRmTV7OChCUE+CRu
+        vBWEuIFPYtK26cwQYV6JjjYhiGo1iVnH18GtPXjhEvMERqVZSMEyC8n7s5B8Mwth7wJGllWM
+        4qmlxbnpqcVGeanlesWJucWleel6yfm5mxiBieb0v+NfdjAuf/VR7xAjEwfjIUYJDmYlEd41
+        67KShXhTEiurUovy44tKc1KLDzFKc7AoifOyzdBKFhJITyxJzU5NLUgtgskycXBKNTBZbz42
+        k83lWW+q6hfPbVZJP+dMnRz7lSvt/Jv/ZhEpSW/143dMFlj8bD+3RUzwioVu4oc63/y+0/Ri
+        f/NZlku9mtrJXh2Xt8yY/KLuZvj02zzO/zJiHUK2/guZeCXqyhS+31PqKn9+zzrBVLNg+WN7
+        sbsPTp0Xv7hMZq2K5T5XbfG0FKPm7dHu8otevfne/X36Z01rzrxpy7/bGSh7pKYePu30KU9e
+        cMrNwDvbZjLlRezY12LPbBo9xyNVYcqLm7wT7qSVlkXfuFIcv5JNzkJCf//dHd9ZXD6rfJrd
+        Vjm7iWXS6bN11Q+XJWbr1zrOYhN1O/YuNV1+4Q31wrgXL+v/LI23/LHYUHh5hCRPoRuPEktx
+        RqKhFnNRcSIAntyPJaMDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEIsWRmVeSWpSXmKPExsVy+t/xu7orLmUlGxyeZWVxaaWERfcrGYsH
+        V6Us7t/7yWSxoOUDqwOrx467Sxg9Luzk9th2QNXj8yY5j8l/nzIHsEbp2RTll5akKmTkF5fY
+        KkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk5mSWpRbp2yXoZXw408tS0MVV8WPHafYGxt0c
+        XYycHBICJhKt074ydjFycQgJLGWUeDhnOiNEQkbi5LQGVghbWOLPtS42iKL3jBKr1m0GK+IV
+        sJPo+3yPDcRmEVCRmNS+iBUiLihxcuYTli5GDg5RgRSJb+fqQMLCAuESb77MYgexmQXEJW49
+        mc8EMlNEYD2jxJaObkaIhJHE32/LmCGWdTNKHP59iQkkwSZgKNH1tgtsGaeAo8SLe29ZIRrM
+        JLq2dkE1y0tsfzuHeQKj0Cwkd8xCsnAWkpZZSFoWMLKsYhRJLS3OTc8tNtQrTswtLs1L10vO
+        z93ECIysbcd+bt7BOO/VR71DjEwcjIcYJTiYlUR416zLShbiTUmsrEotyo8vKs1JLT7EaAoM
+        jInMUqLJ+cDYziuJNzQzMDU0MbM0MLU0M1YS5/Us6EgUEkhPLEnNTk0tSC2C6WPi4JRqYBIw
+        y8h6W+ydOYX/62PZA5G5z/+yTazI1Y6aFP7v6+W9+0oX3l8tHqacF/z5VNyb1+WlKy4d/n/8
+        Z3hAqcd31knTr/RXnLuzazvrji0TD1Zc3vFi5ses54tXLeT7MKfl3eGkzafmP2k105h9JSt7
+        h3/QM6He3W7NHv+T137f5clSKvVH1dxT5O2Rg9dcnMPNF2ye8n5XVOO1t1Ubln7a9+am80Or
+        hNkmZ1TfHax5P79pio61xbeZHWauEwt//n9Zr7NnlrAV+2Ih7gCT6UVnd7Vfzj/19ul9ox4/
+        3ufuG92mPdP5em3tNU3fbZ6t0YnSbC87ZNp1rtu8Si1QdWcOcnj26+D1WLnCqKj1AqHvzJxD
+        lFiKMxINtZiLihMBX5Ks/jUDAAA=
+X-CMS-MailID: 20221108220529eucas1p215c0154f12de5f83b5b5072be3e51cf6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20221108220529eucas1p215c0154f12de5f83b5b5072be3e51cf6
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20221108220529eucas1p215c0154f12de5f83b5b5072be3e51cf6
+References: <Y2o22ODqUZNO4NsR@zx2c4.com>
+        <20221108112413.199669-1-Jason@zx2c4.com>
+        <76971346-73bf-f9b8-3434-f06ef991f328@collabora.com>
+        <CGME20221108220529eucas1p215c0154f12de5f83b5b5072be3e51cf6@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> diff --git a/include/crypto/xts.h b/include/crypto/xts.h
-...
-> @@ -35,6 +35,13 @@ static inline int xts_verify_key(struct crypto_skciphe=
-r
-> *tfm,
->  	if (keylen % 2)
->  		return -EINVAL;
->=20
-> +	/*
-> +	 * In FIPS mode only a combined key length of either 256 or
-> +	 * 512 bits is allowed, c.f. FIPS 140-3 IG C.I.
-> +	 */
-> +	if (fips_enabled && keylen !=3D 32 && keylen !=3D 64)
-> +		return -EINVAL;
-> +
->  	/* ensure that the AES and tweak key are not identical */
->  	if ((fips_enabled || (crypto_skcipher_get_flags(tfm) &
->  			      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) &&
-> --
-> 2.38.0
+On 08.11.2022 12:44, AngeloGioacchino Del Regno wrote:
+> Il 08/11/22 12:24, Jason A. Donenfeld ha scritto:
+>> Rather than calling add_device_randomness(), the add_early_randomness()
+>> function should use add_hwgenerator_randomness(), so that the early
+>> entropy can be potentially credited, which allows for the RNG to
+>> initialize earlier without having to wait for the kthread to come up.
+>>
+>> This requires some minor API refactoring, by adding a `sleep_after`
+>> parameter to add_hwgenerator_randomness(), so that we don't hit a
+>> blocking sleep from add_early_randomness().
+>>
+>> Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+>> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+>
+> Reviewed-by: AngeloGioacchino Del Regno 
+> <angelogioacchino.delregno@collabora.com>
+>
+> On MT8192 Asurada, MT8195 Tomato Chromebooks:
+> Tested-by: AngeloGioacchino Del Regno 
+> <angelogioacchino.delregno@collabora.com>
+>
+> Thanks for the fast fix!
 
-There's another function in the same file called xts_check_key()=20
-that is used by some of the hardware drivers:
+I also confirm that this version fixed the boot issue observed on most 
+of my test systems with Linux next-20221108.
 
-arch/s390/crypto/paes_s390.c:    * xts_check_key verifies the key length is=
- not odd and makes
- [that references it in the comment but actually calls xts_verify_key in th=
-e code]
-drivers/crypto/axis/artpec6_crypto.c:   ret =3D xts_check_key(&cipher->base=
-, key, keylen);
-drivers/crypto/cavium/cpt/cptvf_algs.c: err =3D xts_check_key(tfm, key, key=
-len);
-drivers/crypto/cavium/nitrox/nitrox_skcipher.c: ret =3D xts_check_key(tfm, =
-key, keylen);
-drivers/crypto/ccree/cc_cipher.c:           xts_check_key(tfm, key, keylen)=
-) {
-drivers/crypto/marvell/octeontx/otx_cptvf_algs.c:       ret =3D xts_check_k=
-ey(crypto_skcipher_tfm(tfm), key, keylen);
-drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c:     ret =3D xts_check_k=
-ey(crypto_skcipher_tfm(tfm), key, keylen);
-drivers/crypto/atmel-aes.c:     err =3D xts_check_key(crypto_skcipher_tfm(t=
-fm), key, keylen);
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
 
-It already has one check qualified by fips_enabled:
-
-        /* ensure that the AES and tweak key are not identical */
-        if (fips_enabled && !crypto_memneq(key, key + (keylen / 2), keylen =
-/ 2))
-                return -EINVAL;
-
-Should that implement the same key length restrictions?
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
