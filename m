@@ -2,80 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D162FC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 06:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F57C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 08:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233483AbiKHGnI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 01:43:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46962 "EHLO
+        id S233410AbiKHI3X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 03:29:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233499AbiKHGnF (ORCPT
+        with ESMTP id S233529AbiKHI3R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 01:43:05 -0500
-Received: from smtp.cesky-hosting.cz (smtp.cesky-hosting.cz [IPv6:2a00:1ed0:2:0:1:5bef:c8ee:1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C3A27CED;
-        Mon,  7 Nov 2022 22:42:56 -0800 (PST)
-X-Virus-Scanned: Debian amavisd-new at smtp.cesky-hosting.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=elrest.cz;
-        s=rampa2-202208; t=1667889774;
-        bh=V9/jJPJ9a+5GSM47PiAdHLQKBlIKHvofJMorNo6oRy0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=vqNnAkr6B/J3zlhwmAFZMQz1PCVkrCGqIn/7icCoiGTrjKwWpJ1Sna3UGkFrRJdFQ
-         Eg42cjIgpqbnRiYebkdn9z/ADFOa1RNXWIusvZRo0Rg1yAIfPrgrmhztrL/kOj1nmn
-         6e+i17SjVA7tGeNSu3vpqz7CS5ldXeoqo2aNWez4qfCi5Rq9TO/a1YHMsvs7nP9R5z
-         5hzD0WRJIj7+gVBUG2tAwx555r/JXWuf88bff9QV8hZqem0Jfe/BOz6APXHQkEkt6l
-         hFbcF7MGlfKXHfPKLDEms75Kg9T0kH8PhGprNaoM5oOhKoJxi7onw2T28ObzbkxxO2
-         wASwghYQgo5qA==
-Received: from localhost.localdomain (unknown [5.181.92.50])
-        (Authenticated sender: tomas.marek@elrest.cz)
-        by smtp.cesky-hosting.cz (Postfix) with ESMTPSA id 2882078B;
-        Tue,  8 Nov 2022 07:42:50 +0100 (CET)
-From:   Tomas Marek <tomas.marek@elrest.cz>
-To:     mpm@selenic.com, herbert@gondor.apana.org.au
-Cc:     mcoquelin.stm32@gmail.com, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        alexandre.torgue@foss.st.com
-Subject: [PATCH] hwrng: stm32 - rename readl return value
-Date:   Tue,  8 Nov 2022 07:42:40 +0100
-Message-Id: <20221108064240.30878-1-tomas.marek@elrest.cz>
+        Tue, 8 Nov 2022 03:29:17 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F729BC85
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 00:29:15 -0800 (PST)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N61Tn6TSgzmVj8;
+        Tue,  8 Nov 2022 16:29:01 +0800 (CST)
+Received: from cgs.huawei.com (10.244.148.83) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 8 Nov 2022 16:29:13 +0800
+From:   Gaosheng Cui <cuigaosheng1@huawei.com>
+To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <cuigaosheng1@huawei.com>
+CC:     <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: ccree - Remove debugfs when platform_driver_register failed
+Date:   Tue, 8 Nov 2022 16:29:12 +0800
+Message-ID: <20221108082912.1818219-1-cuigaosheng1@huawei.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.244.148.83]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use a more meaningful name for the readl return value variable.
+When platform_driver_register failed, we need to remove debugfs,
+which will caused a resource leak, fix it.
 
-Link: https://lore.kernel.org/all/Y1J3QwynPFIlfrIv@loth.rohan.me.apana.org.au/
+Failed logs as follows:
+[   32.606488] debugfs: Directory 'ccree' with parent '/' already present!
 
-Signed-off-by: Tomas Marek <tomas.marek@elrest.cz>
+Fixes: 4c3f97276e15 ("crypto: ccree - introduce CryptoCell driver")
+Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
 ---
- drivers/char/hw_random/stm32-rng.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/ccree/cc_driver.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 366edda4848b..a6731cf0627a 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -49,13 +49,13 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 		/* Manage timeout which is based on timer and take */
- 		/* care of initial delay time when enabling rng	*/
- 		if (!sr && wait) {
--			int ret;
-+			int err;
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index cadead18b59e..d489c6f80892 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -651,9 +651,17 @@ static struct platform_driver ccree_driver = {
  
--			ret = readl_relaxed_poll_timeout_atomic(priv->base
-+			err = readl_relaxed_poll_timeout_atomic(priv->base
- 								   + RNG_SR,
- 								   sr, sr,
- 								   10, 50000);
--			if (ret)
-+			if (err)
- 				dev_err((struct device *)priv->rng.priv,
- 					"%s: timeout %x!\n", __func__, sr);
- 		}
+ static int __init ccree_init(void)
+ {
++	int rc;
++
+ 	cc_debugfs_global_init();
+ 
+-	return platform_driver_register(&ccree_driver);
++	rc = platform_driver_register(&ccree_driver);
++	if (rc) {
++		cc_debugfs_global_fini();
++		return rc;
++	}
++
++	return 0;
+ }
+ module_init(ccree_init);
+ 
 -- 
 2.25.1
 
