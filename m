@@ -2,80 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F57C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 08:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 326A1C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 08:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233410AbiKHI3X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 03:29:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
+        id S232125AbiKHIcY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 03:32:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233529AbiKHI3R (ORCPT
+        with ESMTP id S232901AbiKHIcW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 03:29:17 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F729BC85
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 00:29:15 -0800 (PST)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N61Tn6TSgzmVj8;
-        Tue,  8 Nov 2022 16:29:01 +0800 (CST)
-Received: from cgs.huawei.com (10.244.148.83) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 8 Nov 2022 16:29:13 +0800
-From:   Gaosheng Cui <cuigaosheng1@huawei.com>
-To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <cuigaosheng1@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: ccree - Remove debugfs when platform_driver_register failed
-Date:   Tue, 8 Nov 2022 16:29:12 +0800
-Message-ID: <20221108082912.1818219-1-cuigaosheng1@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 8 Nov 2022 03:32:22 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D98B22791E;
+        Tue,  8 Nov 2022 00:32:21 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1667896339;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8pfGe51aDCtJLfkDBJjFWz87K+4Z00C3/Nyvbv/ZufU=;
+        b=JpkRroxIuiKYwNNwCR62L0nUkId0vv0KShqlTvtcbwIFOCXmEK1Ijp6DbOoS9YGEfgOhdb
+        qnCIz2Nhq1+3lkOIFVb5j9Qp2FmgjRS+mfOJAKaf5MssGCyTWvQONI/GE3aTnnuKCHB0rj
+        o2sk6/YTdTcWd1YoGwb6D/ET7RTIML9F9woehAWA7HzZdSZY6YIi9Q3sZnNV31FtGmT9HM
+        Q/lONxT1dfgO4ZFvDOY6jGLKlmzeYD1sCXHXAoCY0tjw0ITRqqDoQy4XWh7dWlhCbUMn3b
+        QR2+HcSrNam0G4NS1AqsQujDnUNnGXeEaK5d4FO2bFCzPf5YU9ABn3vhGl1U+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1667896339;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8pfGe51aDCtJLfkDBJjFWz87K+4Z00C3/Nyvbv/ZufU=;
+        b=JNbl06FFH9Wdisu/eOljA6OMgxZlx7ILLDSAmU8yGh65tKdxBzI/f2QG9iJ6oUj+orRUMr
+        TTNDfr64odE2a/BQ==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>
+Subject: Re: [PATCH RFC v3] random: implement getrandom() in vDSO
+In-Reply-To: <20220916125916.652546-1-Jason@zx2c4.com>
+References: <20220916125916.652546-1-Jason@zx2c4.com>
+Date:   Tue, 08 Nov 2022 09:32:19 +0100
+Message-ID: <87v8np978s.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.244.148.83]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When platform_driver_register failed, we need to remove debugfs,
-which will caused a resource leak, fix it.
+On Fri, Sep 16 2022 at 13:59, Jason A. Donenfeld wrote:
+> ---
+>  MAINTAINERS                            |   2 +
+>  arch/x86/entry/syscalls/syscall_32.tbl |   1 +
+>  arch/x86/entry/syscalls/syscall_64.tbl |   1 +
+>  arch/x86/entry/vdso/Makefile           |   3 +-
+>  arch/x86/entry/vdso/vdso.lds.S         |   2 +
+>  arch/x86/entry/vdso/vgetrandom.c       |  16 ++++
+>  arch/x86/include/asm/vdso/getrandom.h  |  37 ++++++++
+>  arch/x86/include/asm/vvar.h            |  16 ++++
+>  drivers/char/random.c                  |  64 ++++++++++++++
+>  include/vdso/datapage.h                |   6 ++
+>  lib/crypto/chacha.c                    |   4 +
+>  lib/vdso/getrandom.c                   | 117 +++++++++++++++++++++++++
+>  lib/vdso/getrandom.h                   |  25 ++++++
+>  13 files changed, 293 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/x86/entry/vdso/vgetrandom.c
+>  create mode 100644 arch/x86/include/asm/vdso/getrandom.h
+>  create mode 100644 lib/vdso/getrandom.c
+>  create mode 100644 lib/vdso/getrandom.h
 
-Failed logs as follows:
-[   32.606488] debugfs: Directory 'ccree' with parent '/' already present!
+This is not how it works. Please split this apart into reviewable bits
+and pieces:
 
-Fixes: 4c3f97276e15 ("crypto: ccree - introduce CryptoCell driver")
-Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
----
- drivers/crypto/ccree/cc_driver.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+1) Add the new syscall
+2) Add the vdso infrastructure
+3) Wire it up on x86
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index cadead18b59e..d489c6f80892 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -651,9 +651,17 @@ static struct platform_driver ccree_driver = {
- 
- static int __init ccree_init(void)
- {
-+	int rc;
-+
- 	cc_debugfs_global_init();
- 
--	return platform_driver_register(&ccree_driver);
-+	rc = platform_driver_register(&ccree_driver);
-+	if (rc) {
-+		cc_debugfs_global_fini();
-+		return rc;
-+	}
-+
-+	return 0;
- }
- module_init(ccree_init);
- 
--- 
-2.25.1
+Thanks,
 
+        tglx
