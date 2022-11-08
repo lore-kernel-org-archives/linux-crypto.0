@@ -2,95 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A97BC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 11:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDF8C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 11:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233748AbiKHLkl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 06:40:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45914 "EHLO
+        id S233603AbiKHLor (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 06:44:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233910AbiKHLki (ORCPT
+        with ESMTP id S233591AbiKHLoq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 06:40:38 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F422F4C27C;
-        Tue,  8 Nov 2022 03:40:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 8 Nov 2022 06:44:46 -0500
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3611145C
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 03:44:44 -0800 (PST)
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AAB72B81912;
-        Tue,  8 Nov 2022 11:40:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08E81C433C1;
-        Tue,  8 Nov 2022 11:40:33 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OV+k2FSW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1667907631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/QRzaz/OenfJp+r6yaKiscfmlDS/YWjOXCyB1m+YgKk=;
-        b=OV+k2FSWl23wVW/XgY+M0THCyXgIwWOOnscqiT0kTaFqt9OM2LXZ+a3NYSlhhTW0Q1YeXM
-        fz+EPyXERDas5CJJOIKcbhxi25MdszTwTplARLxBbg4aVTRVWAMWDVchmDFe1oF1UBaNVP
-        2KCv55EBic/9ijDa0c4ls+WGF8Kt15I=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1e063cfe (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 8 Nov 2022 11:40:31 +0000 (UTC)
-Received: by mail-vs1-f41.google.com with SMTP id k67so13388010vsk.2;
-        Tue, 08 Nov 2022 03:40:31 -0800 (PST)
-X-Gm-Message-State: ACrzQf2eO2lnR83ykqYxVdiByM9QyjsUqgXP7uw/FI+3WNIqVoSDYUXg
-        +NVlLF7Ow/kYKOk2Kp5BNYA0pZeH8yCIJHyjJTA=
-X-Google-Smtp-Source: AMsMyM50Z8EdMSF4Ux8Jn4LmQ/p9eMK0jvqLMOYwcTuPxMbrsmVN1aRm9IETX8R9DxWX+G5QltJwcWJ4knbF5FB/Zfg=
-X-Received: by 2002:a67:c297:0:b0:3aa:3cac:97b6 with SMTP id
- k23-20020a67c297000000b003aa3cac97b6mr29936878vsj.76.1667907630270; Tue, 08
- Nov 2022 03:40:30 -0800 (PST)
+        (Authenticated sender: kholk11)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 578A5660299E;
+        Tue,  8 Nov 2022 11:44:43 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1667907883;
+        bh=W27GwajM1JOShA2bOAOvEhFw/+XjuzI+X/RVt0CnqzY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=n1+RTtOCaHOyHADCOxI3mJaDsIhGvgt5X32xwxWvHvQiLc4T/Huqy5l/kRl5S+c11
+         TKf4oSL3UgXwRpkz1vCFOKttdu6wkdGQsPLhgsLMYacT7igXVNfuv1h7kN0FmVh1De
+         JG5zMfw0Vd5yzO/usIgomJY0jOX33Eid0V5CGnaKHA8Adeu0OcfGwl4DBlmJculsLz
+         5SOoMwkEKjHF/aQBq/jOqPBgZXfSfSaAGzuXS4kyn6mW+08vBPh56GvRInBA3pjNsA
+         4l287eay8BsEPPjGg/6lP1gZxykyj52CkVV/LRgBK1wT6Ba1H4ECcoWqEKVWbNh9KP
+         W+bkJyrdaox6w==
+Message-ID: <76971346-73bf-f9b8-3434-f06ef991f328@collabora.com>
+Date:   Tue, 8 Nov 2022 12:44:41 +0100
 MIME-Version: 1.0
-References: <20220916125916.652546-1-Jason@zx2c4.com> <87v8np978s.ffs@tglx>
-In-Reply-To: <87v8np978s.ffs@tglx>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 8 Nov 2022 12:40:19 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rye4sqKNbpu=oOvLjgMY=Whi13Qz8L0xyZR=Ty27pHfw@mail.gmail.com>
-Message-ID: <CAHmME9rye4sqKNbpu=oOvLjgMY=Whi13Qz8L0xyZR=Ty27pHfw@mail.gmail.com>
-Subject: Re: [PATCH RFC v3] random: implement getrandom() in vDSO
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [PATCH v4] hw_random: use add_hwgenerator_randomness() for early
+ entropy
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>
+References: <Y2o22ODqUZNO4NsR@zx2c4.com>
+ <20221108112413.199669-1-Jason@zx2c4.com>
+From:   AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20221108112413.199669-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 8, 2022 at 9:32 AM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Fri, Sep 16 2022 at 13:59, Jason A. Donenfeld wrote:
-> > ---
-> >  MAINTAINERS                            |   2 +
-> >  arch/x86/entry/syscalls/syscall_32.tbl |   1 +
-> >  arch/x86/entry/syscalls/syscall_64.tbl |   1 +
-> >  arch/x86/entry/vdso/Makefile           |   3 +-
-> >  arch/x86/entry/vdso/vdso.lds.S         |   2 +
-> >  arch/x86/entry/vdso/vgetrandom.c       |  16 ++++
-> >  arch/x86/include/asm/vdso/getrandom.h  |  37 ++++++++
-> >  arch/x86/include/asm/vvar.h            |  16 ++++
-> >  drivers/char/random.c                  |  64 ++++++++++++++
-> >  include/vdso/datapage.h                |   6 ++
-> >  lib/crypto/chacha.c                    |   4 +
-> >  lib/vdso/getrandom.c                   | 117 +++++++++++++++++++++++++
-> >  lib/vdso/getrandom.h                   |  25 ++++++
-> >  13 files changed, 293 insertions(+), 1 deletion(-)
-> >  create mode 100644 arch/x86/entry/vdso/vgetrandom.c
-> >  create mode 100644 arch/x86/include/asm/vdso/getrandom.h
-> >  create mode 100644 lib/vdso/getrandom.c
-> >  create mode 100644 lib/vdso/getrandom.h
->
-> This is not how it works. Please split this apart into reviewable bits
-> and pieces:
->
-> 1) Add the new syscall
-> 2) Add the vdso infrastructure
-> 3) Wire it up on x86
+Il 08/11/22 12:24, Jason A. Donenfeld ha scritto:
+> Rather than calling add_device_randomness(), the add_early_randomness()
+> function should use add_hwgenerator_randomness(), so that the early
+> entropy can be potentially credited, which allows for the RNG to
+> initialize earlier without having to wait for the kthread to come up.
+> 
+> This requires some minor API refactoring, by adding a `sleep_after`
+> parameter to add_hwgenerator_randomness(), so that we don't hit a
+> blocking sleep from add_early_randomness().
+> 
+> Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-No problem, will do.
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-Jason
+On MT8192 Asurada, MT8195 Tomato Chromebooks:
+Tested-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+
+Thanks for the fast fix!
+
+Regards,
+Angelo
