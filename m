@@ -2,86 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9790EC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Nov 2022 21:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D162FC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 06:43:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233051AbiKGV6T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Nov 2022 16:58:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
+        id S233483AbiKHGnI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 01:43:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233181AbiKGV6J (ORCPT
+        with ESMTP id S233499AbiKHGnF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Nov 2022 16:58:09 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C127128E16;
-        Mon,  7 Nov 2022 13:58:03 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e764329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e764:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4D3D41EC071E;
-        Mon,  7 Nov 2022 22:58:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1667858282;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uQcKspdlDKpk49zfyausr9OngCMvETATkpBKm+sBLhk=;
-        b=Qwtyu/SGJvknZmcPnQ2RVX7AM+OQGNt7XRtmeoNiddst/4dyq3Twq5mY7V+q5GRPPX8JBv
-        oL90uqH946ccxeIPpTbSO4VMjvvJ1iOX4FrOWLBvAhr71mqYWcJDb7cztQmoChrcj7ydpF
-        EHzowFWLanlPhgD4che2ALb0pw2wqYw=
-Date:   Mon, 7 Nov 2022 22:57:58 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-perf-users@vger.kernel.org,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
- setup_clear_cpu_cap()/clear_cpu_cap()
-Message-ID: <Y2l/ZibeaD3P8lBp@zn.tnic>
-References: <20220718141123.136106-1-mlevitsk@redhat.com>
- <20220718141123.136106-3-mlevitsk@redhat.com>
- <Y1LGkTXCksqAYLHD@zn.tnic>
- <Y2lYMqLVP+00Rpu5@zn.tnic>
+        Tue, 8 Nov 2022 01:43:05 -0500
+Received: from smtp.cesky-hosting.cz (smtp.cesky-hosting.cz [IPv6:2a00:1ed0:2:0:1:5bef:c8ee:1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C3A27CED;
+        Mon,  7 Nov 2022 22:42:56 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at smtp.cesky-hosting.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=elrest.cz;
+        s=rampa2-202208; t=1667889774;
+        bh=V9/jJPJ9a+5GSM47PiAdHLQKBlIKHvofJMorNo6oRy0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=vqNnAkr6B/J3zlhwmAFZMQz1PCVkrCGqIn/7icCoiGTrjKwWpJ1Sna3UGkFrRJdFQ
+         Eg42cjIgpqbnRiYebkdn9z/ADFOa1RNXWIusvZRo0Rg1yAIfPrgrmhztrL/kOj1nmn
+         6e+i17SjVA7tGeNSu3vpqz7CS5ldXeoqo2aNWez4qfCi5Rq9TO/a1YHMsvs7nP9R5z
+         5hzD0WRJIj7+gVBUG2tAwx555r/JXWuf88bff9QV8hZqem0Jfe/BOz6APXHQkEkt6l
+         hFbcF7MGlfKXHfPKLDEms75Kg9T0kH8PhGprNaoM5oOhKoJxi7onw2T28ObzbkxxO2
+         wASwghYQgo5qA==
+Received: from localhost.localdomain (unknown [5.181.92.50])
+        (Authenticated sender: tomas.marek@elrest.cz)
+        by smtp.cesky-hosting.cz (Postfix) with ESMTPSA id 2882078B;
+        Tue,  8 Nov 2022 07:42:50 +0100 (CET)
+From:   Tomas Marek <tomas.marek@elrest.cz>
+To:     mpm@selenic.com, herbert@gondor.apana.org.au
+Cc:     mcoquelin.stm32@gmail.com, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        alexandre.torgue@foss.st.com
+Subject: [PATCH] hwrng: stm32 - rename readl return value
+Date:   Tue,  8 Nov 2022 07:42:40 +0100
+Message-Id: <20221108064240.30878-1-tomas.marek@elrest.cz>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y2lYMqLVP+00Rpu5@zn.tnic>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 08:10:42PM +0100, Borislav Petkov wrote:
-> Lemme document it so that it is at least clear. Who knows, we might end
-> up improving it in the process.
+Use a more meaningful name for the readl return value variable.
 
-IOW, something like this. It's a start at least...
+Link: https://lore.kernel.org/all/Y1J3QwynPFIlfrIv@loth.rohan.me.apana.org.au/
 
-https://lore.kernel.org/r/20221107211505.8572-1-bp@alien8.de
+Signed-off-by: Tomas Marek <tomas.marek@elrest.cz>
+---
+ drivers/char/hw_random/stm32-rng.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 366edda4848b..a6731cf0627a 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -49,13 +49,13 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 		/* Manage timeout which is based on timer and take */
+ 		/* care of initial delay time when enabling rng	*/
+ 		if (!sr && wait) {
+-			int ret;
++			int err;
+ 
+-			ret = readl_relaxed_poll_timeout_atomic(priv->base
++			err = readl_relaxed_poll_timeout_atomic(priv->base
+ 								   + RNG_SR,
+ 								   sr, sr,
+ 								   10, 50000);
+-			if (ret)
++			if (err)
+ 				dev_err((struct device *)priv->rng.priv,
+ 					"%s: timeout %x!\n", __func__, sr);
+ 		}
 -- 
-Regards/Gruss,
-    Boris.
+2.25.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
