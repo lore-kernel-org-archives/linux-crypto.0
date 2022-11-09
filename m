@@ -2,78 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD01C43217
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Nov 2022 23:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BE4C43219
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 01:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbiKHXvM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 18:51:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47684 "EHLO
+        id S230028AbiKIBYR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 20:24:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiKHXvL (ORCPT
+        with ESMTP id S229973AbiKIBYO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 18:51:11 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A395D682;
-        Tue,  8 Nov 2022 15:51:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C97A7B81C57;
-        Tue,  8 Nov 2022 23:51:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766F6C433C1;
-        Tue,  8 Nov 2022 23:51:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pucrpXY4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1667951464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BIpTayP8e5DLYAF1ks9yHQeZPVCugHfqM/0zG2fIuMQ=;
-        b=pucrpXY4vgk4NY2HPL1tlwaFtaPg3Ft3rGhF69CyJ17IfMpoQbbarGBVy5MH0t5J8JWdkm
-        0Bj2Fhow3fL5R34r1JqGZp8Q5aGgx8kUVe+WBqrjw/V1b+boMzViwM3TUN9c+rVzoJeqrf
-        +DzYZBRS00mFW0Db8EwjM6hPQzEx6OU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1a050be7 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 8 Nov 2022 23:51:04 +0000 (UTC)
-Date:   Wed, 9 Nov 2022 00:51:03 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+25aae26fb74bd5909706@syzkaller.appspotmail.com>,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-        linux@dominikbrodowski.net, olivia@selenic.com,
-        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] linux-next boot error: WARNING in kthread_should_stop
-Message-ID: <Y2rrZ8lIIMrKkb2Z@zx2c4.com>
-References: <000000000000e915eb05ecf9dc4d@google.com>
- <Y2qjerZigLiO8YVw@zx2c4.com>
- <CACT4Y+a3bJmMf8JNm=SZYOKtgSVnOpY4+bgdT4ugLLhVV-NCEA@mail.gmail.com>
+        Tue, 8 Nov 2022 20:24:14 -0500
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B0460376;
+        Tue,  8 Nov 2022 17:24:11 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id h21so9696731qtu.2;
+        Tue, 08 Nov 2022 17:24:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S3bArshq2eyg3hLMepiT1bgGKeZeMxvntrLUq44wF0Y=;
+        b=CTX/cYJBdS03SBZmJa1BZmatkKUgloDzEz81wgxZuFYk7QTdCDZiALT2SFN8kMQZQv
+         NP/ogMs+va3hc67H7wov5KOm1QdOvcSMmyOeWEPZmFs0z1EE/hJE4HSWQzeafjKEtfcz
+         5GLt6Z0vG6YUelx9DZZnIzyS59PTm+WRpLHJrL5EQlikL2Iy1WdRt3AmonyPKoKGYqYI
+         EBmn4cmhZyq1CCNqWTBWnIe/F7l1fDrSegnr68O6OSBG/+BXjT5+Jayz5roUSEKZ3A4z
+         4C7AErUdJ9ZPs38hRw+zygss8LAcyj6Jn2IiXOW2hbtBODsywrSP1jXw0IN2rJPEIMD4
+         Remg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S3bArshq2eyg3hLMepiT1bgGKeZeMxvntrLUq44wF0Y=;
+        b=sSYO7n8vn4omFEktwLaw5OwHsx6uzEIpXxphpyVNf3LNz2I2r2QXuBJYvzpJpfcQc3
+         nw1BBSKo4eO3PugzBOS0GUKI1jhDan6Nv7RbBIzcaV65cteBjx8vKfOTGYfwGsMbrISr
+         fJwKcpWfUNcbBaWTDfgiJFTgkhdRwOvqUAZK/oP3uEsbxdQqKbq1GjZhRr06Yoyacoml
+         ImUm+PUH76QN59MCRxDlz2RuvtuwzMC90nfQjlEIR30DeRm6D8anvEvDWCRkr4NCNe+l
+         X3CN3AQqMHZf8uAxHWgZ5H1XADUCnQZ2d6XeXxYGl7q/MxtknSlMAoNx5jqwDJ0P1N6+
+         MNnQ==
+X-Gm-Message-State: ACrzQf0Oh5k8QuZH7OAAIqa2/JVdcBERlBuNE3lgp5eg8hnxNWbY43P7
+        3HGURvc6WFCIpZz5HCjpsg8=
+X-Google-Smtp-Source: AMsMyM4/pwPWwiLUI5cR0ax3Di1wr+MJtrxOcKP6v6JXvZerf1yzWyN93OY9xiRWwaU/ETpL9UZD3g==
+X-Received: by 2002:ac8:48d0:0:b0:3a5:1ed8:4a46 with SMTP id l16-20020ac848d0000000b003a51ed84a46mr41423317qtr.407.1667957051016;
+        Tue, 08 Nov 2022 17:24:11 -0800 (PST)
+Received: from [192.168.86.38] (c-75-69-97-7.hsd1.nh.comcast.net. [75.69.97.7])
+        by smtp.gmail.com with ESMTPSA id s3-20020a05620a29c300b006fa4ac86bfbsm10377337qkp.55.2022.11.08.17.24.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Nov 2022 17:24:10 -0800 (PST)
+Message-ID: <faa10c58-268f-ddc8-b86c-02c903e29f8a@gmail.com>
+Date:   Tue, 8 Nov 2022 20:24:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+a3bJmMf8JNm=SZYOKtgSVnOpY4+bgdT4ugLLhVV-NCEA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.1
+Subject: Re: [PATCH 0/7] Add CA enforcement keyring restrictions
+Content-Language: en-US
+To:     Coiby Xu <coxu@redhat.com>, eric.snowberg@oracle.com
+Cc:     davem@davemloft.net, dhowells@redhat.com,
+        dmitry.kasatkin@gmail.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, jarkko@kernel.org, jmorris@namei.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, nramas@linux.microsoft.com,
+        pvorel@suse.cz, roberto.sassu@huawei.com, serge@hallyn.com,
+        tiwai@suse.de, zohar@linux.ibm.com, erpalmer@linux.ibm.com
+References: <20221104132035.rmavewmeo6ceyjou@Rk>
+From:   Elaine Palmer <erpalmerny@gmail.com>
+In-Reply-To: <20221104132035.rmavewmeo6ceyjou@Rk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 02:39:22PM -0800, Dmitry Vyukov wrote:
-> On Tue, 8 Nov 2022 at 10:44, 'Jason A. Donenfeld' via syzkaller-bugs
-> <syzkaller-bugs@googlegroups.com> wrote:
-> >
-> > Already fixed in the tree.
-> 
-> Hi Jason,
-> 
-> The latest commit touching this code in linux-next is this one. Is it
-> the fixing commit?
-> 
-> commit e0a37003ff0beed62e85a00e313b21764c5f1d4f
-> Author:     Jason A. Donenfeld <Jason@zx2c4.com>
-> CommitDate: Mon Nov 7 12:47:57 2022 +0100
->     hw_random: use add_hwgenerator_randomness() for early entropy
 
-It's this one: https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/commit/?id=9807175c5515cea94f8ac6c157f20cc48c40465b
 
-Couple hours more and there'll be a new linux-next with the fix.
+On 2022/11/04 9:20 AM, Coiby Xu wrote:
+> Hi Eric,
+>
+> I wonder if there is any update on this work? I would be glad to do
+> anything that may be helpful including testing a new version of code.
+>
+Hi Coiby,
 
-Jason
+Yes, this discussion got stuck when we couldn't agree on one of the
+following options:
+
+(A) Filter which keys from MOK (or a management system) are loaded
+    onto the .machine keyring. Specifically, load only keys with
+    CA+keyCertSign attributes.
+
+(B) Load all keys from MOK (or a management system) onto the
+    .machine keyring. Then, subsequently filter those to restrict
+    which ones can be loaded onto the .ima keyring specifically.
+
+The objection to (A) was that distros would have to go through
+two steps instead of one to load keys. The one-step method of
+loading keys was supported by an out-of-tree patch and then by
+the addition of the .machine keyring.
+
+The objection to (B) was that, because the .machine keyring is now
+linked to the .secondary keyring, it expands the scope of what the
+kernel has trusted in the past. The effect is that keys in MOK
+have the same broad scope as keys previously restricted to
+.builtin and .secondary. It doesn't affect just IMA, but the rest
+of the kernel as well.
+
+I would suggest that we can get unstuck by considering:
+
+(C) Defining a systemd (or dracut module) to load keys onto the
+    .secondary keyring
+
+(D) Using a configuration option to specify what types of
+    .machine keys should be allowed to pass through to the
+    .secondary keyring.
+   
+    The distro could choose (A) by allowing only
+    CA+keyCertSign keys.
+
+    The distro could choose (B) by allowing any kind
+    of key.
+
+We all seemed to agree that enforcing key usage should be
+implemented and that a useful future effort is to add policies
+to keys and keyrings, like, "This key can only be used for
+verifying kernel modules."
+
+I hope we can come to an agreement so work can proceed and IMA
+can be re-enabled.
+
+-Elaine Palmer
