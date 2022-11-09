@@ -2,91 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984D4C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 11:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E22EEC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 13:02:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230304AbiKILEq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Nov 2022 06:04:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50394 "EHLO
+        id S229955AbiKINCl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 08:02:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbiKILEm (ORCPT
+        with ESMTP id S229633AbiKINCk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2022 06:04:42 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A2717E10;
-        Wed,  9 Nov 2022 03:04:39 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A9AgNKL004644;
-        Wed, 9 Nov 2022 11:04:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=zLuZjvEOZ0iv+LoeP2qRTIHYW8Xd/g5Pa30KvZWZBSk=;
- b=Hp0brgLWM/ZtD6kgipUwTbkClv2V0fJ4TEkbJI3OxC/Dulnjso9k6S/EpnaVS9G6kmzK
- 6/thMPO1F+QuuXTJBSlERdr9Jw/piCEYV4vGDwnJs42pvVZarTi28OzuT90XjkVEKE/C
- nfPelpwxcIBSsDqrhm06trvTps+v36B69xrr7Qtun1hHTsmSNfn1sBmm/IZryovr5nu8
- Yvml1G5EhGw4wXoDGJ0B66+k9nweKP1W3XkJ3IcPRQXswGUPgKuc36veGjGBuThRsjOx
- xdQ7VxnV071iYyrNNcQVZAcEd+wYMGm8TbP7+UaTZZXzsrUMxQiHZ7RgYRs/dTKCfVu6 jw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krapk0h1f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Nov 2022 11:04:36 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A9B2mI9002396;
-        Wed, 9 Nov 2022 11:04:33 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3kngqgdjja-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Nov 2022 11:04:33 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A9B4V2g36110820
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Nov 2022 11:04:31 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 803B511C04C;
-        Wed,  9 Nov 2022 11:04:31 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 767A511C052;
-        Wed,  9 Nov 2022 11:04:30 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.43.28.188])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  9 Nov 2022 11:04:30 +0000 (GMT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
-Subject: Re: [6.1.0-rc4-next-20221108] Boot failure on powerpc
-From:   Sachin Sant <sachinp@linux.ibm.com>
-In-Reply-To: <Y2t4/sELkmB4pn2p@zx2c4.com>
-Date:   Wed, 9 Nov 2022 16:34:19 +0530
-Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-crypto@vger.kernel.org, linux-next@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <B8006950-2F4B-46C2-B27B-12ACD30C92C0@linux.ibm.com>
-References: <E051ACF6-5282-49D1-9C60-BB2450569268@linux.ibm.com>
- <Y2t4/sELkmB4pn2p@zx2c4.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-X-Mailer: Apple Mail (2.3731.200.110.1.12)
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zg_vEDRm1ime808mXlSyyUDCEQtvkyxE
-X-Proofpoint-GUID: zg_vEDRm1ime808mXlSyyUDCEQtvkyxE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-09_04,2022-11-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 suspectscore=0 phishscore=0
- mlxlogscore=933 priorityscore=1501 impostorscore=0 bulkscore=0
- clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211090084
+        Wed, 9 Nov 2022 08:02:40 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CB12CE3A;
+        Wed,  9 Nov 2022 05:02:39 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 16C6522794;
+        Wed,  9 Nov 2022 13:02:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1667998958; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hjfNn8jWIDsAR7kj9048Nl6m/l0f5ueCW8Gr2KNsOhw=;
+        b=GXHgKSoxVW2YHlobbVQ8ol4lr6y1L+R1WkwXWcywXSnO9u1Mw6EsJhKMeli8wxNFnlUIKC
+        9W/xzN3bTiQE3YyvMnKqzOTeNSbjgA7Hie45fMgjudI4RTWsfUHFHo2Sn/kKH+0zgjVXT0
+        OLoATfsROR/5PiDKsctW0VIxLonqrcs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1667998958;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hjfNn8jWIDsAR7kj9048Nl6m/l0f5ueCW8Gr2KNsOhw=;
+        b=B+iYC70KKeLhRoB50dbtvb61T+WftFbN2iOATMC86HAbdpyATElGU6dJpnEfvX0g3a6GmK
+        /yshg0SqwH5Qk/BA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D5EBA139F1;
+        Wed,  9 Nov 2022 13:02:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id K9/kMu2ka2OndQAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 09 Nov 2022 13:02:37 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Nicolai Stange <nstange@suse.de>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Martin Doucha <mdoucha@suse.cz>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/5] padata: make padata_free_shell() to respect pd's
+ ->refcnt
+References: <20221019083708.27138-1-nstange@suse.de>
+        <20221019083708.27138-3-nstange@suse.de>
+        <20221028143546.3xc6rnfkfcml373c@parnassus.localdomain>
+Date:   Wed, 09 Nov 2022 14:02:37 +0100
+In-Reply-To: <20221028143546.3xc6rnfkfcml373c@parnassus.localdomain> (Daniel
+        Jordan's message of "Fri, 28 Oct 2022 10:35:46 -0400")
+Message-ID: <87educb7rm.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Daniel Jordan <daniel.m.jordan@oracle.com> writes:
 
+> On Wed, Oct 19, 2022 at 10:37:05AM +0200, Nicolai Stange wrote:
+>>=20
+>> Fixes: 07928d9bfc81 ("padata: Remove broken queue flushing")
+>
+> It looks like this issue goes back to the first padata commit.  For
+> instance, pd->refcnt goes to zero after the last _priv is serialized,
+> padata_free is called in another task, and a particularly sluggish
+> padata_reorder call touches pd after.
+>
+> So wouldn't it be
+>
+> Fixes: 16295bec6398 ("padata: Generic parallelization/serialization inter=
+face")
 
-> On 09-Nov-2022, at 3:25 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> 
-> Should be fixed already in today's next.
+I chose 07928d9bfc81 ("padata: Remove broken queue flushing"), because
+that one reads like it fixed a couple of much more severe padata
+lifetime issues, it only missed the relatively minor one addressed here,
+in a sense.
 
-Yup, thanks. next-20221109 boots successfully.
+Or to put it the other way around: if one were to backport this patch
+here, 07928d9bfc81 should probably get picked first, I think.
 
-- Sachin 
+But I'd be fine with any Fixes tag, of course, I don't have a strong
+opinion on this matter.
+
+Thanks!
+
+Nicolai
+
+>
+> ?
+>
+> Otherwise,
+>
+> Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+>
+>> Signed-off-by: Nicolai Stange <nstange@suse.de>
+>> ---
+
+--=20
+SUSE Software Solutions Germany GmbH, Frankenstra=C3=9Fe 146, 90461 N=C3=BC=
+rnberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+(HRB 36809, AG N=C3=BCrnberg)
