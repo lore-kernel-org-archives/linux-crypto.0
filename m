@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBDE4C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 10:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54F3C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 10:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbiKIKGV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Nov 2022 05:06:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35474 "EHLO
+        id S229952AbiKIKjX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 05:39:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiKIKGU (ORCPT
+        with ESMTP id S229938AbiKIKjW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2022 05:06:20 -0500
+        Wed, 9 Nov 2022 05:39:22 -0500
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37989F009;
-        Wed,  9 Nov 2022 02:06:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7EC1CB04;
+        Wed,  9 Nov 2022 02:39:21 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E0DD41F8D2;
-        Wed,  9 Nov 2022 10:06:17 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5A49F1F85D;
+        Wed,  9 Nov 2022 10:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1667988377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1667990360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zNpDpEZXLt94VEJ8mUzOzUj6ooYgifJ9t78nlAa0rog=;
-        b=etxxpe6FqF/j1vzd/lvzJ6Hsq0hwVYYUklGqfdCvtrvng6XG7R8yfkcNZtDQR1AKKt3lDB
-        nxwDguxGGvYuKA4Y9ZP705Ml2FoHswF6TPZe7+8BiP/rdcYhfYHCPgVluhYArPuhQr0aT7
-        bI8y457jeCA+gALsosKPteiAQK/XZZw=
+        bh=wDh4D/lowW+cKoGphNyyhhicP75Q+8FcnZtIV8Bc6j8=;
+        b=F8hZZ8Rb4zWaiKKol9lmsSSJsVmstxOU9rbJ331eqhxbz0svps7X7JJz6a2MDii5xvH6c2
+        YXgKrY0Gu37vTB2Je5Sli7jDUwGgLNufl76+uEp4spOefPT9h+vYWvoP3W8ApFNqgwvl0w
+        RQmzgTK5PgALPSjlFV180CKcGDnR3yY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1667988377;
+        s=susede2_ed25519; t=1667990360;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zNpDpEZXLt94VEJ8mUzOzUj6ooYgifJ9t78nlAa0rog=;
-        b=9teakqvrfc+HSn0KfqtDHaSb0+pT2QqHscpp/YmFg+20zJsTYucsDpi6bYjdKxQ6gAFsAk
-        4i1I1T5BaBIQ+SAg==
+        bh=wDh4D/lowW+cKoGphNyyhhicP75Q+8FcnZtIV8Bc6j8=;
+        b=tpjkIUz+w55Ap5sAbastYjECyHmW359FhWBJ4QwYqQu+6kzFc1sZAsONQlBwilbhHMHH5H
+        Vzk3k4EL8pseM0Dw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5C35139F1;
-        Wed,  9 Nov 2022 10:06:17 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1E784139F1;
+        Wed,  9 Nov 2022 10:39:20 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id iykzJ5l7a2OjCwAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 09 Nov 2022 10:06:17 +0000
+        id 2AUhBliDa2MKHgAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 09 Nov 2022 10:39:20 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
 Cc:     Nicolai Stange <nstange@suse.de>,
@@ -62,11 +62,11 @@ Subject: Re: [PATCH 1/4] crypto: xts - restrict key lengths to approved
  values in FIPS mode
 References: <20221108142025.13461-1-nstange@suse.de>
         <20221108142025.13461-2-nstange@suse.de>
-        <MW5PR84MB1842EEC44A8CB6594D4D0CD0AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Date:   Wed, 09 Nov 2022 11:06:17 +0100
-In-Reply-To: <MW5PR84MB1842EEC44A8CB6594D4D0CD0AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-        (Robert Elliott's message of "Tue, 8 Nov 2022 20:34:10 +0000")
-Message-ID: <8735asfnmu.fsf@suse.de>
+        <MW5PR84MB1842A19B7BDA70A7C81AFB98AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Date:   Wed, 09 Nov 2022 11:39:19 +0100
+In-Reply-To: <MW5PR84MB1842A19B7BDA70A7C81AFB98AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+        (Robert Elliott's message of "Tue, 8 Nov 2022 17:12:21 +0000")
+Message-ID: <87h6z8e7jc.fsf@suse.de>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -98,57 +98,42 @@ er
 >> --
 >> 2.38.0
 >
-> There's another function in the same file called xts_check_key()=20
-> that is used by some of the hardware drivers:
-
-Right, thanks for spotting.
-
-AFAICT, xts_check_key() is the older of the two variants,
-xts_verify_key() had been introduced with commit f1c131b45410 ("crypto:
-xts - Convert to skcipher"). There had initially only been a single
-call from generic crypto/xts.c and the main difference to
-xts_check_key() had been that it took a crypto_skcipher for its tfm
-argument rather than a plain crypto_tfm as xts_check_key() did.
-
-It seems that over time, xts crypto drivers adopted the newer
-xts_verify_key() variant then.
-
+> arch/s390/crypto/aes_s390.c has similar lines:
 >
-> arch/s390/crypto/paes_s390.c:    * xts_check_key verifies the key length =
-is not odd and makes
->  [that references it in the comment but actually calls xts_verify_key in =
-the code]
-> drivers/crypto/axis/artpec6_crypto.c:   ret =3D xts_check_key(&cipher->ba=
-se, key, keylen);
-> drivers/crypto/cavium/cpt/cptvf_algs.c: err =3D xts_check_key(tfm, key, k=
-eylen);
-> drivers/crypto/cavium/nitrox/nitrox_skcipher.c: ret =3D xts_check_key(tfm=
-, key, keylen);
-> drivers/crypto/ccree/cc_cipher.c:           xts_check_key(tfm, key, keyle=
-n)) {
-> drivers/crypto/marvell/octeontx/otx_cptvf_algs.c:       ret =3D xts_check=
-_key(crypto_skcipher_tfm(tfm), key, keylen);
-> drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c:     ret =3D xts_check=
-_key(crypto_skcipher_tfm(tfm), key, keylen);
-> drivers/crypto/atmel-aes.c:     err =3D xts_check_key(crypto_skcipher_tfm=
-(tfm), key, keylen);
+> static int xts_aes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
+>                            unsigned int key_len)
+> {
+>         struct s390_xts_ctx *xts_ctx =3D crypto_skcipher_ctx(tfm);
+>         unsigned long fc;
+>         int err;
 >
-> It already has one check qualified by fips_enabled:
+>         err =3D xts_fallback_setkey(tfm, in_key, key_len);
+>         if (err)
+>                 return err;
 >
->         /* ensure that the AES and tweak key are not identical */
->         if (fips_enabled && !crypto_memneq(key, key + (keylen / 2), keyle=
-n / 2))
+>         /* In fips mode only 128 bit or 256 bit keys are valid */
+>         if (fips_enabled && key_len !=3D 32 && key_len !=3D 64)
 >                 return -EINVAL;
 >
-> Should that implement the same key length restrictions?
+>
+> xts_fallback_setkey will now enforce that rule when setting up the
+> fallback algorithm keys, which makes the xts_aes_set_key check
+> unreachable.
 
-From a quick glance, all of the above drivers merely convert some
-crypto_skcipher to a crypto_tfm before passing it to xts_check_key().
+Good finding!
 
-So I think these should all be made to call xts_verify_key() directly
-instead, the former xts_check_key() could then get dropped. But that's
-more of a cleanup IMO and would probably deserve a separate patch series
-on its own.
+>
+> If that fallback setup were not present, then a call to xts_verify_key
+> might be preferable to enforce any other rules like the WEAK_KEYS
+> rule.
+>
+
+So if this patch here would get accepted, I'd propose to remove the then
+dead code from aes_s390 afterwards and make an explicit call to
+xts_verify_key() instead.
+
+Or shall I split out the XTS patch from this series here and post these
+two changes separately then? Herbert, any preferences?
 
 Thanks!
 
