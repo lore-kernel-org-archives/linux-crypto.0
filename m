@@ -2,58 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E2EC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 09:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDE9C43217
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 09:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbiKIJSz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Nov 2022 04:18:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55042 "EHLO
+        id S230408AbiKIJzX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 04:55:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiKIJSy (ORCPT
+        with ESMTP id S229488AbiKIJzU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2022 04:18:54 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1080E13E95;
-        Wed,  9 Nov 2022 01:18:47 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oshDc-00BxsQ-By; Wed, 09 Nov 2022 17:18:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Nov 2022 17:18:36 +0800
-Date:   Wed, 9 Nov 2022 17:18:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     liulongfang <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto/hisilicon: Add null judgment to the callback
- interface
-Message-ID: <Y2twbHyQkTMoTz+O@gondor.apana.org.au>
-References: <20220930024320.29922-1-liulongfang@huawei.com>
- <YzZZTsIHLSkuufeb@gondor.apana.org.au>
- <717adf23-3080-5041-14ed-6ab5dcaddbf9@huawei.com>
- <Y1tTLAEi7ukUCCmB@gondor.apana.org.au>
- <a1229856-fbe4-9ae7-5789-332ed0af87eb@huawei.com>
- <Y2TWpyynYMyStKRX@gondor.apana.org.au>
- <d914a099-06ef-acfe-f394-f4790a821598@huawei.com>
- <Y2oodE+5us++mbSl@gondor.apana.org.au>
- <df561fbe-12eb-25b0-2173-a7ffb3bfd53a@huawei.com>
+        Wed, 9 Nov 2022 04:55:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0441CFD8;
+        Wed,  9 Nov 2022 01:55:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2D7FDB81CFA;
+        Wed,  9 Nov 2022 09:55:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35C7FC433C1;
+        Wed,  9 Nov 2022 09:55:16 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mpRP0hXj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1667987713;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oZshSE8V0gK3sPlp+UQXRzu6fn4sgo2cyoEtjL7uI+k=;
+        b=mpRP0hXjQXAWhxawj9mk9joW0tM7oRwy8d0r7vw/cpKCXIgPU0w1jmgtoLJUkrE9A8PiMU
+        VV7uxy2+bxJmh+IVrI6SqB9Dm2zsvodi9hNwLpR0ebEIdsNeK3/s2pr+7+zZNVIipbyapF
+        qL6l2PkNlXxfUH9z5Ppk9XvnmAW8rNE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 75292193 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 9 Nov 2022 09:55:13 +0000 (UTC)
+Date:   Wed, 9 Nov 2022 10:55:10 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Sachin Sant <sachinp@linux.ibm.com>
+Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-crypto@vger.kernel.org, linux-next@vger.kernel.org
+Subject: Re: [6.1.0-rc4-next-20221108] Boot failure on powerpc
+Message-ID: <Y2t4/sELkmB4pn2p@zx2c4.com>
+References: <E051ACF6-5282-49D1-9C60-BB2450569268@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <df561fbe-12eb-25b0-2173-a7ffb3bfd53a@huawei.com>
+In-Reply-To: <E051ACF6-5282-49D1-9C60-BB2450569268@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 02:21:11PM +0800, liulongfang wrote:
->
-> The trigger method is to not call the function skcipher_request_set_callback()
-> when using the skcipher interface for encryption and decryption services.
-
-Yes but which function exactly? Please give the exact call path
-leading to this crash.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Should be fixed already in today's next.
