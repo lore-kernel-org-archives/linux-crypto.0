@@ -2,133 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BE4C43219
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 01:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7C8C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 03:52:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbiKIBYR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 20:24:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57988 "EHLO
+        id S229624AbiKIDwZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Nov 2022 22:52:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbiKIBYO (ORCPT
+        with ESMTP id S229553AbiKIDwY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 20:24:14 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B0460376;
-        Tue,  8 Nov 2022 17:24:11 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id h21so9696731qtu.2;
-        Tue, 08 Nov 2022 17:24:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S3bArshq2eyg3hLMepiT1bgGKeZeMxvntrLUq44wF0Y=;
-        b=CTX/cYJBdS03SBZmJa1BZmatkKUgloDzEz81wgxZuFYk7QTdCDZiALT2SFN8kMQZQv
-         NP/ogMs+va3hc67H7wov5KOm1QdOvcSMmyOeWEPZmFs0z1EE/hJE4HSWQzeafjKEtfcz
-         5GLt6Z0vG6YUelx9DZZnIzyS59PTm+WRpLHJrL5EQlikL2Iy1WdRt3AmonyPKoKGYqYI
-         EBmn4cmhZyq1CCNqWTBWnIe/F7l1fDrSegnr68O6OSBG/+BXjT5+Jayz5roUSEKZ3A4z
-         4C7AErUdJ9ZPs38hRw+zygss8LAcyj6Jn2IiXOW2hbtBODsywrSP1jXw0IN2rJPEIMD4
-         Remg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3bArshq2eyg3hLMepiT1bgGKeZeMxvntrLUq44wF0Y=;
-        b=sSYO7n8vn4omFEktwLaw5OwHsx6uzEIpXxphpyVNf3LNz2I2r2QXuBJYvzpJpfcQc3
-         nw1BBSKo4eO3PugzBOS0GUKI1jhDan6Nv7RbBIzcaV65cteBjx8vKfOTGYfwGsMbrISr
-         fJwKcpWfUNcbBaWTDfgiJFTgkhdRwOvqUAZK/oP3uEsbxdQqKbq1GjZhRr06Yoyacoml
-         ImUm+PUH76QN59MCRxDlz2RuvtuwzMC90nfQjlEIR30DeRm6D8anvEvDWCRkr4NCNe+l
-         X3CN3AQqMHZf8uAxHWgZ5H1XADUCnQZ2d6XeXxYGl7q/MxtknSlMAoNx5jqwDJ0P1N6+
-         MNnQ==
-X-Gm-Message-State: ACrzQf0Oh5k8QuZH7OAAIqa2/JVdcBERlBuNE3lgp5eg8hnxNWbY43P7
-        3HGURvc6WFCIpZz5HCjpsg8=
-X-Google-Smtp-Source: AMsMyM4/pwPWwiLUI5cR0ax3Di1wr+MJtrxOcKP6v6JXvZerf1yzWyN93OY9xiRWwaU/ETpL9UZD3g==
-X-Received: by 2002:ac8:48d0:0:b0:3a5:1ed8:4a46 with SMTP id l16-20020ac848d0000000b003a51ed84a46mr41423317qtr.407.1667957051016;
-        Tue, 08 Nov 2022 17:24:11 -0800 (PST)
-Received: from [192.168.86.38] (c-75-69-97-7.hsd1.nh.comcast.net. [75.69.97.7])
-        by smtp.gmail.com with ESMTPSA id s3-20020a05620a29c300b006fa4ac86bfbsm10377337qkp.55.2022.11.08.17.24.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Nov 2022 17:24:10 -0800 (PST)
-Message-ID: <faa10c58-268f-ddc8-b86c-02c903e29f8a@gmail.com>
-Date:   Tue, 8 Nov 2022 20:24:08 -0500
+        Tue, 8 Nov 2022 22:52:24 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326A2165AE
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 19:52:22 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1osc7q-00BoUK-Va; Wed, 09 Nov 2022 11:52:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Nov 2022 11:52:19 +0800
+Date:   Wed, 9 Nov 2022 11:52:19 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ben Greear <greearb@candelatech.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
+Message-ID: <Y2sj84u/w/nOgKwx@gondor.apana.org.au>
+References: <20201210024342.GA26428@gondor.apana.org.au>
+ <e02fe07e-8cb6-f889-3228-60e4fabf4e40@candelatech.com>
+ <CAMj1kXF05XZtyakdpLixpP9Lroy0D3_gEcY2SFbSshD8ERUU7w@mail.gmail.com>
+ <20201210111427.GA28014@gondor.apana.org.au>
+ <CAMj1kXG39GgsTeNBbX7_oaK+f-awPyL8NxJ7R+fyOBjL4c5xMw@mail.gmail.com>
+ <20201210121627.GB28441@gondor.apana.org.au>
+ <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
+ <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
+ <20201215091902.GA21455@gondor.apana.org.au>
+ <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.2.1
-Subject: Re: [PATCH 0/7] Add CA enforcement keyring restrictions
-Content-Language: en-US
-To:     Coiby Xu <coxu@redhat.com>, eric.snowberg@oracle.com
-Cc:     davem@davemloft.net, dhowells@redhat.com,
-        dmitry.kasatkin@gmail.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, jarkko@kernel.org, jmorris@namei.org,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, nramas@linux.microsoft.com,
-        pvorel@suse.cz, roberto.sassu@huawei.com, serge@hallyn.com,
-        tiwai@suse.de, zohar@linux.ibm.com, erpalmer@linux.ibm.com
-References: <20221104132035.rmavewmeo6ceyjou@Rk>
-From:   Elaine Palmer <erpalmerny@gmail.com>
-In-Reply-To: <20221104132035.rmavewmeo6ceyjou@Rk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 2022/11/04 9:20 AM, Coiby Xu wrote:
-> Hi Eric,
+On Tue, Nov 08, 2022 at 10:50:48AM -0800, Ben Greear wrote:
 >
-> I wonder if there is any update on this work? I would be glad to do
-> anything that may be helpful including testing a new version of code.
->
-Hi Coiby,
+> While rebasing my patches onto 6.1-rc4, I noticed my aesni for ccm(aes) patch didn't apply cleanly,
+> and I found this patch described below is applied now.  Does this upstream patch mean that aesni is already
+> supported upstream now?  Or is it specific to whatever xctr is?  If so,
+> any chance the patch is wanted upstream now?
 
-Yes, this discussion got stuck when we couldn't agree on one of the
-following options:
+AFAICS the xctr patch has nothing to do with what you were trying
+to achieve with wireless.  My objection still stands with regards
+to wireless, we should patch wireless to use the async crypto
+interface and not hack around it in the Crypto API.
 
-(A) Filter which keys from MOK (or a management system) are loaded
-    onto the .machine keyring. Specifically, load only keys with
-    CA+keyCertSign attributes.
-
-(B) Load all keys from MOK (or a management system) onto the
-    .machine keyring. Then, subsequently filter those to restrict
-    which ones can be loaded onto the .ima keyring specifically.
-
-The objection to (A) was that distros would have to go through
-two steps instead of one to load keys. The one-step method of
-loading keys was supported by an out-of-tree patch and then by
-the addition of the .machine keyring.
-
-The objection to (B) was that, because the .machine keyring is now
-linked to the .secondary keyring, it expands the scope of what the
-kernel has trusted in the past. The effect is that keys in MOK
-have the same broad scope as keys previously restricted to
-.builtin and .secondary. It doesn't affect just IMA, but the rest
-of the kernel as well.
-
-I would suggest that we can get unstuck by considering:
-
-(C) Defining a systemd (or dracut module) to load keys onto the
-    .secondary keyring
-
-(D) Using a configuration option to specify what types of
-    .machine keys should be allowed to pass through to the
-    .secondary keyring.
-   
-    The distro could choose (A) by allowing only
-    CA+keyCertSign keys.
-
-    The distro could choose (B) by allowing any kind
-    of key.
-
-We all seemed to agree that enforcing key usage should be
-implemented and that a useful future effort is to add policies
-to keys and keyrings, like, "This key can only be used for
-verifying kernel modules."
-
-I hope we can come to an agreement so work can proceed and IMA
-can be re-enabled.
-
--Elaine Palmer
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
