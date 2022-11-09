@@ -2,145 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E54F3C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 10:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 984D4C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 11:04:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbiKIKjX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Nov 2022 05:39:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
+        id S230304AbiKILEq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 06:04:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbiKIKjW (ORCPT
+        with ESMTP id S230239AbiKILEm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2022 05:39:22 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7EC1CB04;
-        Wed,  9 Nov 2022 02:39:21 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5A49F1F85D;
-        Wed,  9 Nov 2022 10:39:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1667990360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wDh4D/lowW+cKoGphNyyhhicP75Q+8FcnZtIV8Bc6j8=;
-        b=F8hZZ8Rb4zWaiKKol9lmsSSJsVmstxOU9rbJ331eqhxbz0svps7X7JJz6a2MDii5xvH6c2
-        YXgKrY0Gu37vTB2Je5Sli7jDUwGgLNufl76+uEp4spOefPT9h+vYWvoP3W8ApFNqgwvl0w
-        RQmzgTK5PgALPSjlFV180CKcGDnR3yY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1667990360;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wDh4D/lowW+cKoGphNyyhhicP75Q+8FcnZtIV8Bc6j8=;
-        b=tpjkIUz+w55Ap5sAbastYjECyHmW359FhWBJ4QwYqQu+6kzFc1sZAsONQlBwilbhHMHH5H
-        Vzk3k4EL8pseM0Dw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1E784139F1;
-        Wed,  9 Nov 2022 10:39:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2AUhBliDa2MKHgAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 09 Nov 2022 10:39:20 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc:     Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/4] crypto: xts - restrict key lengths to approved
- values in FIPS mode
-References: <20221108142025.13461-1-nstange@suse.de>
-        <20221108142025.13461-2-nstange@suse.de>
-        <MW5PR84MB1842A19B7BDA70A7C81AFB98AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Date:   Wed, 09 Nov 2022 11:39:19 +0100
-In-Reply-To: <MW5PR84MB1842A19B7BDA70A7C81AFB98AB3F9@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-        (Robert Elliott's message of "Tue, 8 Nov 2022 17:12:21 +0000")
-Message-ID: <87h6z8e7jc.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        Wed, 9 Nov 2022 06:04:42 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A2717E10;
+        Wed,  9 Nov 2022 03:04:39 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A9AgNKL004644;
+        Wed, 9 Nov 2022 11:04:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=pp1;
+ bh=zLuZjvEOZ0iv+LoeP2qRTIHYW8Xd/g5Pa30KvZWZBSk=;
+ b=Hp0brgLWM/ZtD6kgipUwTbkClv2V0fJ4TEkbJI3OxC/Dulnjso9k6S/EpnaVS9G6kmzK
+ 6/thMPO1F+QuuXTJBSlERdr9Jw/piCEYV4vGDwnJs42pvVZarTi28OzuT90XjkVEKE/C
+ nfPelpwxcIBSsDqrhm06trvTps+v36B69xrr7Qtun1hHTsmSNfn1sBmm/IZryovr5nu8
+ Yvml1G5EhGw4wXoDGJ0B66+k9nweKP1W3XkJ3IcPRQXswGUPgKuc36veGjGBuThRsjOx
+ xdQ7VxnV071iYyrNNcQVZAcEd+wYMGm8TbP7+UaTZZXzsrUMxQiHZ7RgYRs/dTKCfVu6 jw== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3krapk0h1f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Nov 2022 11:04:36 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A9B2mI9002396;
+        Wed, 9 Nov 2022 11:04:33 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kngqgdjja-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Nov 2022 11:04:33 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A9B4V2g36110820
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 9 Nov 2022 11:04:31 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 803B511C04C;
+        Wed,  9 Nov 2022 11:04:31 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 767A511C052;
+        Wed,  9 Nov 2022 11:04:30 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.28.188])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  9 Nov 2022 11:04:30 +0000 (GMT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
+Subject: Re: [6.1.0-rc4-next-20221108] Boot failure on powerpc
+From:   Sachin Sant <sachinp@linux.ibm.com>
+In-Reply-To: <Y2t4/sELkmB4pn2p@zx2c4.com>
+Date:   Wed, 9 Nov 2022 16:34:19 +0530
+Cc:     linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-crypto@vger.kernel.org, linux-next@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <B8006950-2F4B-46C2-B27B-12ACD30C92C0@linux.ibm.com>
+References: <E051ACF6-5282-49D1-9C60-BB2450569268@linux.ibm.com>
+ <Y2t4/sELkmB4pn2p@zx2c4.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+X-Mailer: Apple Mail (2.3731.200.110.1.12)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zg_vEDRm1ime808mXlSyyUDCEQtvkyxE
+X-Proofpoint-GUID: zg_vEDRm1ime808mXlSyyUDCEQtvkyxE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-09_04,2022-11-09_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 suspectscore=0 phishscore=0
+ mlxlogscore=933 priorityscore=1501 impostorscore=0 bulkscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211090084
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-"Elliott, Robert (Servers)" <elliott@hpe.com> writes:
 
->> diff --git a/include/crypto/xts.h b/include/crypto/xts.h
-> ...
->> @@ -35,6 +35,13 @@ static inline int xts_verify_key(struct crypto_skciph=
-er
->> *tfm,
->>  	if (keylen % 2)
->>  		return -EINVAL;
->>=20
->> +	/*
->> +	 * In FIPS mode only a combined key length of either 256 or
->> +	 * 512 bits is allowed, c.f. FIPS 140-3 IG C.I.
->> +	 */
->> +	if (fips_enabled && keylen !=3D 32 && keylen !=3D 64)
->> +		return -EINVAL;
->> +
->>  	/* ensure that the AES and tweak key are not identical */
->>  	if ((fips_enabled || (crypto_skcipher_get_flags(tfm) &
->>  			      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) &&
->> --
->> 2.38.0
->
-> arch/s390/crypto/aes_s390.c has similar lines:
->
-> static int xts_aes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
->                            unsigned int key_len)
-> {
->         struct s390_xts_ctx *xts_ctx =3D crypto_skcipher_ctx(tfm);
->         unsigned long fc;
->         int err;
->
->         err =3D xts_fallback_setkey(tfm, in_key, key_len);
->         if (err)
->                 return err;
->
->         /* In fips mode only 128 bit or 256 bit keys are valid */
->         if (fips_enabled && key_len !=3D 32 && key_len !=3D 64)
->                 return -EINVAL;
->
->
-> xts_fallback_setkey will now enforce that rule when setting up the
-> fallback algorithm keys, which makes the xts_aes_set_key check
-> unreachable.
 
-Good finding!
+> On 09-Nov-2022, at 3:25 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> 
+> Should be fixed already in today's next.
 
->
-> If that fallback setup were not present, then a call to xts_verify_key
-> might be preferable to enforce any other rules like the WEAK_KEYS
-> rule.
->
+Yup, thanks. next-20221109 boots successfully.
 
-So if this patch here would get accepted, I'd propose to remove the then
-dead code from aes_s390 afterwards and make an explicit call to
-xts_verify_key() instead.
-
-Or shall I split out the XTS patch from this series here and post these
-two changes separately then? Herbert, any preferences?
-
-Thanks!
-
-Nicolai
-
---=20
-SUSE Software Solutions Germany GmbH, Frankenstra=C3=9Fe 146, 90461 N=C3=BC=
-rnberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-(HRB 36809, AG N=C3=BCrnberg)
+- Sachin 
