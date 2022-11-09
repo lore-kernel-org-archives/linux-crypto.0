@@ -2,63 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7C8C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 03:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9FDC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Nov 2022 06:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiKIDwZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Nov 2022 22:52:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37064 "EHLO
+        id S229557AbiKIGV2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 01:21:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbiKIDwY (ORCPT
+        with ESMTP id S229639AbiKIGVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Nov 2022 22:52:24 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326A2165AE
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Nov 2022 19:52:22 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1osc7q-00BoUK-Va; Wed, 09 Nov 2022 11:52:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Nov 2022 11:52:19 +0800
-Date:   Wed, 9 Nov 2022 11:52:19 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ben Greear <greearb@candelatech.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
-Message-ID: <Y2sj84u/w/nOgKwx@gondor.apana.org.au>
-References: <20201210024342.GA26428@gondor.apana.org.au>
- <e02fe07e-8cb6-f889-3228-60e4fabf4e40@candelatech.com>
- <CAMj1kXF05XZtyakdpLixpP9Lroy0D3_gEcY2SFbSshD8ERUU7w@mail.gmail.com>
- <20201210111427.GA28014@gondor.apana.org.au>
- <CAMj1kXG39GgsTeNBbX7_oaK+f-awPyL8NxJ7R+fyOBjL4c5xMw@mail.gmail.com>
- <20201210121627.GB28441@gondor.apana.org.au>
- <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
- <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
- <20201215091902.GA21455@gondor.apana.org.au>
- <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
+        Wed, 9 Nov 2022 01:21:15 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8979919C11;
+        Tue,  8 Nov 2022 22:21:14 -0800 (PST)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N6ZWc1B52zpWKS;
+        Wed,  9 Nov 2022 14:17:32 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 14:21:12 +0800
+Received: from [10.67.103.158] (10.67.103.158) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 9 Nov 2022 14:21:11 +0800
+Subject: Re: [PATCH] crypto/hisilicon: Add null judgment to the callback
+ interface
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20220930024320.29922-1-liulongfang@huawei.com>
+ <YzZZTsIHLSkuufeb@gondor.apana.org.au>
+ <717adf23-3080-5041-14ed-6ab5dcaddbf9@huawei.com>
+ <Y1tTLAEi7ukUCCmB@gondor.apana.org.au>
+ <a1229856-fbe4-9ae7-5789-332ed0af87eb@huawei.com>
+ <Y2TWpyynYMyStKRX@gondor.apana.org.au>
+ <d914a099-06ef-acfe-f394-f4790a821598@huawei.com>
+ <Y2oodE+5us++mbSl@gondor.apana.org.au>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <df561fbe-12eb-25b0-2173-a7ffb3bfd53a@huawei.com>
+Date:   Wed, 9 Nov 2022 14:21:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
+In-Reply-To: <Y2oodE+5us++mbSl@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.158]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 08, 2022 at 10:50:48AM -0800, Ben Greear wrote:
->
-> While rebasing my patches onto 6.1-rc4, I noticed my aesni for ccm(aes) patch didn't apply cleanly,
-> and I found this patch described below is applied now.  Does this upstream patch mean that aesni is already
-> supported upstream now?  Or is it specific to whatever xctr is?  If so,
-> any chance the patch is wanted upstream now?
+On 2022/11/8 17:59, Herbert Xu wrote:
+> On Mon, Nov 07, 2022 at 09:22:22PM +0800, liulongfang wrote:
+> .
+>> What do you need is the log of this call trace?
+> 
+> I mean the functions in the call trace starting from the one that
+> sets the callback to NULL.
+> 
 
-AFAICS the xctr patch has nothing to do with what you were trying
-to achieve with wireless.  My objection still stands with regards
-to wireless, we should patch wireless to use the async crypto
-interface and not hack around it in the Crypto API.
+The trigger method is to not call the function skcipher_request_set_callback()
+when using the skcipher interface for encryption and decryption services.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Cheers
+> 
+Thanks,
+Longfang.
