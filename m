@@ -2,115 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8534C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 15:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C30C2C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 19:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbiKJPcb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Nov 2022 10:32:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
+        id S229932AbiKJTmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Nov 2022 14:42:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231706AbiKJPcO (ORCPT
+        with ESMTP id S229688AbiKJTmT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Nov 2022 10:32:14 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1122D42F50;
-        Thu, 10 Nov 2022 07:30:34 -0800 (PST)
+        Thu, 10 Nov 2022 14:42:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012AC45EFF
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Nov 2022 11:42:18 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A1502619B2;
-        Thu, 10 Nov 2022 15:30:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117F5C4314A;
-        Thu, 10 Nov 2022 15:30:33 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8ED7C61E17
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Nov 2022 19:42:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE34AC433C1
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Nov 2022 19:42:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668094233;
-        bh=LxPoey/Txw9eEAsjMi8I7lrIBlKYQ+GUi78jSLCLmsw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=X/8MmAQ4jzybDO0FM4EnvciY0o909vg7RORFRkthrlYFTQH/hYSUJP5KQ1UHS/aAh
-         5IjLCETD67uMhtSRZPFAWhe6aHAyo5cCjvFNv1P2q0PHs2Q7d6S9iAAdpDrsUdcsqg
-         6GE4uuSR3MxU07c0Oom2uDFZnxIvRDhEWaudlGfodGtTvdoXJC5xtPi+eTiquIgsVz
-         ja9QmMQiB7KHHw+psH3Je1bjKqnjze0b/XA4JsOTYT5U2blBIdMcQuxIS/yPN9K1bM
-         mzlQYs4u7edJlck0qSDrGzy+L18yAqVVPredbYqD0kSvVnSQe+qXksx3hdrExzeDRH
-         xdDUVZCZzAwdw==
-Received: by mail-lf1-f48.google.com with SMTP id c1so3934549lfi.7;
-        Thu, 10 Nov 2022 07:30:32 -0800 (PST)
-X-Gm-Message-State: ACrzQf15eZ9rnkAcSCeYQTGlyG8npzDDZyZJb+lSOYbqBlj5f3NrEpaz
-        wVYETrxgBQ5neAvZ1OmSU69H4IEEtJnQVAyHE8I=
-X-Google-Smtp-Source: AMsMyM4zvAX5sAETC9CI+cDlc2ACByQOg0lFOlzCPS65eEG++tMrkP/vj9NOXHY5hJrb5BSfltNUuM/SQvrZljQqoJc=
-X-Received: by 2002:ac2:4c47:0:b0:4a2:c07b:4b62 with SMTP id
- o7-20020ac24c47000000b004a2c07b4b62mr20875682lfk.426.1668094230829; Thu, 10
- Nov 2022 07:30:30 -0800 (PST)
+        s=k20201202; t=1668109337;
+        bh=WjjGOkHaIEna0ZmvXYEagYqgp3HSVjzUdeW/KDT2wRE=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=ZUIxHmDyyUA9YxTzc8hfD2HN52lBbwjMuSM6Z4sWrZg/Rbr+Muy67ohW8JWHc6q7t
+         VmUPSuTjs6LMcRuvfJh7hZ+5TTtC1M0hoVgf8xYjGUZ1MFEAEY0ir9R9N90KEUuIcI
+         Bo8G1XchrnIMsNjtPiT3MkI8pUl2Ke/1E4NPimJt1/7qsrXOMgc0qUYXrjeIv5/vjz
+         WSUdwLi1L/QX6cz6GOfplVyvytRp1psGhojx9o4XfYtyakiK9zPVRRq2DE4vfq0OR4
+         7q83aA+/6AWDeNJKJEVDaUyvpJ5dwDlKkVEfGfplaiGvtqwX+xyilYJplwSJCCcXQt
+         4okKbZS+PSsxg==
+Date:   Thu, 10 Nov 2022 19:42:16 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/6] crypto: optimize algorithm registration when
+ self-tests disabled
+Message-ID: <Y21UGAZMnytRfdmR@gmail.com>
+References: <20221110081346.336046-1-ebiggers@kernel.org>
+ <20221110081346.336046-2-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <20211124044124.998170-1-eric.snowberg@oracle.com>
- <20211124044124.998170-17-eric.snowberg@oracle.com> <20221110000129.kl6pjy5mafpuptbk@framework>
- <4A479B96-4B41-4323-9920-5A909423F998@oracle.com> <20221110150607.h4iaymkgc4f7kuue@framework>
- <47ae05f8d3a67ee5e1607ab8e718cc4b3e95cebb.camel@HansenPartnership.com>
-In-Reply-To: <47ae05f8d3a67ee5e1607ab8e718cc4b3e95cebb.camel@HansenPartnership.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 10 Nov 2022 16:30:19 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEv3raFtwMmA4gYX=Z5YBfJ5f9GP0L0Zo4FBabwTfhn8Q@mail.gmail.com>
-Message-ID: <CAMj1kXEv3raFtwMmA4gYX=Z5YBfJ5f9GP0L0Zo4FBabwTfhn8Q@mail.gmail.com>
-Subject: Re: [PATCH v8 16/17] integrity: Trust MOK keys if MokListTrustedRT found
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Morten Linderud <morten@linderud.pw>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-        "weiyongjun1@huawei.com" <weiyongjun1@huawei.com>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        "lszubowi@redhat.com" <lszubowi@redhat.com>,
-        "jason@zx2c4.com" <jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "pjones@redhat.com" <pjones@redhat.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221110081346.336046-2-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 10 Nov 2022 at 16:27, James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
->
-> On Thu, 2022-11-10 at 16:06 +0100, Morten Linderud wrote:
-> > I'm not really sure what Peter means with "much more reliable"
-> > though.
->
-> It's that in-head knowledge you referred to.  You can't see the true
-> MoK variables because they're BootServices, meaning they're not visible
-> in the RunTime, which is why the shadow RT variables exist (this is a
-> security property: BS only variables can only be altered by trusted,
-> signed entities).  However lots of things can create RT variables so
-> you have to run through a sequence of checks on the RT shadows to try
-> to defeat clever attackers (like verifying the variable attributes),
-> because the chain of custody from BS to RT is not guaranteed.  If you
-> use a configuration table instead, that is BS only, the kernel (which
-> is also a trusted entity) has to pick it out before ExitBootServices,
-> so if the kernel has the table, you have a reliable chain of custody
-> for the entries.
->
+On Thu, Nov 10, 2022 at 12:13:41AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Currently, registering an algorithm with the crypto API always causes a
+> notification to be posted to the "cryptomgr", which then creates a
+> kthread to self-test the algorithm.  However, if self-tests are disabled
+> in the kconfig (as is the default option), then this kthread just
+> notifies waiters that the algorithm has been tested, then exits.
+> 
+> This causes a significant amount of overhead, especially in the kthread
+> creation and destruction, which is not necessary at all.  For example,
+> in a quick test I found that booting a "minimum" x86_64 kernel with all
+> the crypto options enabled (except for the self-tests) takes about 400ms
+> until PID 1 can start.  Of that, a full 13ms is spent just doing this
+> pointless dance, involving a kthread being created, run, and destroyed
+> over 200 times.  That's over 3% of the entire kernel start time.
+> 
+> Fix this by just skipping the creation of the test larval and the
+> posting of the registration notification entirely, when self-tests are
+> disabled.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  crypto/algapi.c | 151 ++++++++++++++++++++++++++----------------------
+>  1 file changed, 82 insertions(+), 69 deletions(-)
 
-No config table are always accessible, also at runtime under the OS.
+FYI, I realized that this patch breaks CRYPTO_MSG_ALG_LOADED (it isn't always
+sent now).  So I'll have to send a new version at least for that.
 
-But they are volatile so they can only have been created since the
-last reset of the system, so in that sense they are similar to the
-volatile RT variables aliases.
-
-The reason for preferring config tables is that you can access them
-much earlier, and without mapping the EFI runtime memory regions etc
-etc
+- Eric
