@@ -2,130 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C25C43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 02:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67857C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 03:19:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232187AbiKJCkK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Nov 2022 21:40:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47612 "EHLO
+        id S232282AbiKJDTS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Nov 2022 22:19:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232335AbiKJCj6 (ORCPT
+        with ESMTP id S230120AbiKJDTS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Nov 2022 21:39:58 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9218827145;
-        Wed,  9 Nov 2022 18:39:54 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D9A7A61D3A;
-        Thu, 10 Nov 2022 02:39:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 326A4C433D6;
-        Thu, 10 Nov 2022 02:39:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668047993;
-        bh=71fdnYwHkC15btlmZ17sMh39sslSdjdNKrbVDGaRcaE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=edXxWPVHm1/Ei7W8SBg4W7fMtqk1Jrn1mkqUEuJSaqIreUkPgfM4B+9En748+5YQq
-         Mk80Jz5b+hmcBxSb7UY/I0HpCSg3+EhEj1UOALRSZDjgpHnBQ5ShOSZDIKO4Sl2dlt
-         KJfKNppPekOAMUblWWie0duNKEqYUJnNgg/8aHuJ8QH8c/pDEDyiJ520wRDfPdi5f5
-         Zv/Se8sHe53/el55+Oh5418BG+kXjjQWv6ms6m57nJsDa0cmGn2l8+eSJghf7I47pc
-         M0VDaBzP+CwBIp4+9OVFcRddgkjRCPrWS6e0U2YQLFsnVKkY0M46ondo6K6+UCP4Jx
-         YPFQLzUzQRPzg==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: [PATCH] crypto: avoid unnecessary work when self-tests are disabled
-Date:   Wed,  9 Nov 2022 18:37:38 -0800
-Message-Id: <20221110023738.147128-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.38.1
+        Wed, 9 Nov 2022 22:19:18 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 077B8286E4
+        for <linux-crypto@vger.kernel.org>; Wed,  9 Nov 2022 19:19:14 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1osy5G-00CP95-UH; Thu, 10 Nov 2022 11:19:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Nov 2022 11:19:07 +0800
+Date:   Thu, 10 Nov 2022 11:19:07 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com,
+        kirill.shutemov@linux.intel.com, richard@nod.at,
+        viro@zeniv.linux.org.uk,
+        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
+        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
+Subject: Re: [PATCH v3 1/4] crypto: aria: add keystream array into struct
+ aria_ctx
+Message-ID: <Y2xtqyk72p5ylzAG@gondor.apana.org.au>
+References: <20221106143627.30920-1-ap420073@gmail.com>
+ <20221106143627.30920-2-ap420073@gmail.com>
+ <Y2jGTvgHnu4QZV+D@gondor.apana.org.au>
+ <51ed3735-24f0-eef0-0ca6-908c4581d143@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51ed3735-24f0-eef0-0ca6-908c4581d143@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, Nov 09, 2022 at 10:16:58PM +0900, Taehee Yoo wrote:
+.
+> I have encountered kernel panic(stack-out-of-bounds) while using the reqctx
+> instead of the tfm.
+> 
+> cryptd is used when simd drivers are used.
+> cryptd_skcipher_encrypt() internally doesn't allocate a request ctx of a
+> child, instead, it uses stack memory with SYNC_SKCIPHER_REQUEST_ON_STACK.
+> It retains only 384 bytes for child request ctx even if a child set a large
+> reqsize value with crypto_skcipher_set_reqsize().
+> aria-avx2 needs 512 bytes and aria-avx512 needs 1024 bytes.
+> So, stack-out-of-bounds occurs.
 
-Currently, registering an algorithm with the crypto API always causes a
-notification to be posted to the "cryptomgr", which then creates a
-kthread to self-test the algorithm.  However, if self-tests are disabled
-in the kconfig (as is the default option), then this kthread just
-notifies waiters that the algorithm has been tested, then exits.
+That's not good.  Let me look into this.
 
-This causes a significant amount of overhead, especially in the kthread
-creation and destruction, which is not necessary at all.  For example,
-in a quick test I found that booting a "minimum" x86_64 kernel with all
-the crypto options enabled (except for the self-tests) takes about 400ms
-until PID 1 can start.  Of that, a full 13ms is spent just doing this
-pointless dance, involving a kthread being created, run, and destroyed
-over 200 times.  That's over 3% of the entire kernel start time.
-
-Fix this by just skipping the creation of the test larval and the
-posting of the registration notification entirely, when self-tests are
-disabled.  Also compile out the unnecessary code in algboss.c.
-
-While this patch is an optimization and not a "fix" per se, I've marked
-it as for stable, due to the large improvement it can make to boot time.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/algapi.c  |  3 ++-
- crypto/algboss.c | 11 +++++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 5c69ff8e8fa5c..018935cb8417d 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -226,7 +226,8 @@ static struct crypto_larval *crypto_alloc_test_larval(struct crypto_alg *alg)
- {
- 	struct crypto_larval *larval;
- 
--	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER))
-+	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER) ||
-+	    IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
- 		return NULL;
- 
- 	larval = crypto_larval_alloc(alg->cra_name,
-diff --git a/crypto/algboss.c b/crypto/algboss.c
-index eb5fe84efb83e..e6f0443d08048 100644
---- a/crypto/algboss.c
-+++ b/crypto/algboss.c
-@@ -171,16 +171,18 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
- 	return NOTIFY_OK;
- }
- 
-+#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-+static int cryptomgr_schedule_test(struct crypto_alg *alg)
-+{
-+	return 0;
-+}
-+#else
- static int cryptomgr_test(void *data)
- {
- 	struct crypto_test_param *param = data;
- 	u32 type = param->type;
- 	int err = 0;
- 
--#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
--	goto skiptest;
--#endif
--
- 	if (type & CRYPTO_ALG_TESTED)
- 		goto skiptest;
- 
-@@ -229,6 +231,7 @@ static int cryptomgr_schedule_test(struct crypto_alg *alg)
- err:
- 	return NOTIFY_OK;
- }
-+#endif /* !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
- 
- static int cryptomgr_notify(struct notifier_block *this, unsigned long msg,
- 			    void *data)
-
-base-commit: f67dd6ce0723ad013395f20a3f79d8a437d3f455
+Thanks,
 -- 
-2.38.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
