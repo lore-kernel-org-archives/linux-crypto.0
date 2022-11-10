@@ -2,73 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F64C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 08:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4096AC433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Nov 2022 10:42:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231923AbiKJIx3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Nov 2022 03:53:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58094 "EHLO
+        id S229746AbiKJKmS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Nov 2022 05:42:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232724AbiKJIxZ (ORCPT
+        with ESMTP id S229968AbiKJKmL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Nov 2022 03:53:25 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4BCA2EF17;
-        Thu, 10 Nov 2022 00:53:20 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ot3J3-00CUP3-Vh; Thu, 10 Nov 2022 16:53:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Nov 2022 16:53:05 +0800
-Date:   Thu, 10 Nov 2022 16:53:05 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     liulongfang <liulongfang@huawei.com>
-Cc:     wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
+        Thu, 10 Nov 2022 05:42:11 -0500
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB9E1BF66;
+        Thu, 10 Nov 2022 02:42:09 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VUSnXkt_1668076925;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VUSnXkt_1668076925)
+          by smtp.aliyun-inc.com;
+          Thu, 10 Nov 2022 18:42:07 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto/hisilicon: Add null judgment to the callback
- interface
-Message-ID: <Y2y78USk4bXRrRun@gondor.apana.org.au>
-References: <Y1tTLAEi7ukUCCmB@gondor.apana.org.au>
- <a1229856-fbe4-9ae7-5789-332ed0af87eb@huawei.com>
- <Y2TWpyynYMyStKRX@gondor.apana.org.au>
- <d914a099-06ef-acfe-f394-f4790a821598@huawei.com>
- <Y2oodE+5us++mbSl@gondor.apana.org.au>
- <df561fbe-12eb-25b0-2173-a7ffb3bfd53a@huawei.com>
- <Y2twbHyQkTMoTz+O@gondor.apana.org.au>
- <32686c5b-04b2-7103-bf2e-113db2315ef4@huawei.com>
- <Y2xt7/6WGN+uthpL@gondor.apana.org.au>
- <40a0e7aa-362a-0de7-76c0-77381c07f254@huawei.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: arm64 - Fix unused variable compilation warnings of cpu_feature
+Date:   Thu, 10 Nov 2022 18:42:04 +0800
+Message-Id: <20221110104204.85493-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40a0e7aa-362a-0de7-76c0-77381c07f254@huawei.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 12:11:15PM +0800, liulongfang wrote:
->
-> When using crypto's skcipher series interfaces for encryption and decryption
-> services, User can use synchronous mode(by adjusting some skcipher interfaces,
-> here is to remove skcipher_request_set_callback()) or asynchronous mode,
-> but when using synchronous mode and the current asynchronous mode is loaded
-> it will cause a calltrace.
-> 
-> The current problem is that the interface of skcipher does not restrict users
-> to call functions in this way for encryption services.
-> 
-> If the current driver doesn't handle this, there is a possibility that some users
-> deliberately create this kind of problem to cause the kernel to crash.
+The cpu feature defined by MODULE_DEVICE_TABLE is only referenced when
+compiling as a module, and the warning of unused variable will be
+encountered when compiling with intree. The warning can be removed by
+adding the __maybe_unused flag.
 
-It sounds like your code is misusing the skcipher API.  By default
-skcipher is always async.  You must always set a callback.
+Fixes: 03c9a333fef1 ("crypto: arm64/ghash - add NEON accelerated fallback for 64-bit PMULL")
+Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ arch/arm64/crypto/ghash-ce-glue.c   | 2 +-
+ arch/arm64/crypto/sm4-ce-gcm-glue.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-The only way to legally use skcipher without setting a callback
-is by allocating it with crypto_alloc_sync_skcipher.  In which case
-unless your driver incorrectly declares itself as sync instead of
-async, then it will never be used by such a user.
-
-Cheers,
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 15794fe21a0b..e5e9adc1fcf4 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -508,7 +508,7 @@ static void __exit ghash_ce_mod_exit(void)
+ 		crypto_unregister_shash(&ghash_alg);
+ }
+ 
+-static const struct cpu_feature ghash_cpu_feature[] = {
++static const struct cpu_feature __maybe_unused ghash_cpu_feature[] = {
+ 	{ cpu_feature(PMULL) }, { }
+ };
+ MODULE_DEVICE_TABLE(cpu, ghash_cpu_feature);
+diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
+index e90ea0f17beb..c450a2025ca9 100644
+--- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
++++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
+@@ -271,7 +271,7 @@ static void __exit sm4_ce_gcm_exit(void)
+ 	crypto_unregister_aead(&sm4_gcm_alg);
+ }
+ 
+-static const struct cpu_feature sm4_ce_gcm_cpu_feature[] = {
++static const struct cpu_feature __maybe_unused sm4_ce_gcm_cpu_feature[] = {
+ 	{ cpu_feature(PMULL) },
+ 	{}
+ };
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.24.3 (Apple Git-128)
+
