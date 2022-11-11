@@ -2,117 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7844BC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Nov 2022 18:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3BBC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Nov 2022 21:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234085AbiKKSO7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Nov 2022 13:14:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56492 "EHLO
+        id S233096AbiKKVGJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Nov 2022 16:06:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232949AbiKKSO6 (ORCPT
+        with ESMTP id S230303AbiKKVGI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Nov 2022 13:14:58 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57555682AB;
-        Fri, 11 Nov 2022 10:14:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668190496; x=1699726496;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rLc5Ixga1hS37ddV0n0/E/iWK+ZYtrwFO7ML+W9DUPo=;
-  b=d1zxWujy/UzRUkKilJL4qgSxC4wQj7E3ZAmJoRqf/pWhi3L0CgvZhy0V
-   bYgcjzlj1mCFvE2OZQrDVqrxTT8NCl3w+XdrXf/QMquEPUcWDD5aT3cTY
-   gVfkWhefLmAh8UvM77DWWrAhMcKdx5c+yKFopqCct1UXefEA2X5uVcJV7
-   hGG0jadyH9kXllyPRH1UyTY5F0j0iRLVHgxRkO08Fnaz1rRPzIHLX320x
-   bbL8jRDjGGE5sa5PZGGur9Tr5HUr3MXFkeHqN78NJTHp2GY7bjGQiBbW5
-   O1IZGcCkSr5Ih7zB7gCRwHl86fVZsckUmTqedcmUnD8XcJgiOlz2rtCng
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10528"; a="312792388"
-X-IronPort-AV: E=Sophos;i="5.96,157,1665471600"; 
-   d="scan'208";a="312792388"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2022 10:14:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10528"; a="812512249"
-X-IronPort-AV: E=Sophos;i="5.96,157,1665471600"; 
-   d="scan'208";a="812512249"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga005.jf.intel.com with ESMTP; 11 Nov 2022 10:14:48 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1otYY8-00Aq5e-35;
-        Fri, 11 Nov 2022 20:14:44 +0200
-Date:   Fri, 11 Nov 2022 20:14:44 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Barry Song <baohua@kernel.org>,
-        Ben Segall <bsegall@google.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Gal Pressman <gal@nvidia.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Tariq Toukan <ttoukan.linux@gmail.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 3/4] sched: add sched_numa_find_nth_cpu()
-Message-ID: <Y26RFIt33n7khJZp@smile.fi.intel.com>
-References: <20221111040027.621646-1-yury.norov@gmail.com>
- <20221111040027.621646-4-yury.norov@gmail.com>
- <Y241Jd+27r/ZIiji@smile.fi.intel.com>
- <Y26BQ92l9xWKaz2z@yury-laptop>
+        Fri, 11 Nov 2022 16:06:08 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F5C583BA8;
+        Fri, 11 Nov 2022 13:06:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=+vynhbCwRkbGMhiHBv11R6jjJpnHaAbZwLIQxZZtLpk=; b=ORz9IqPvlnqc0RVi+bJGkXiPXL
+        HFUJhtslRgybimCcPnzbKmH31gCSyGqIaZEvsap++X5C6uzUB7M0jUq4KFZInoOqZc9yB+aJeaUIY
+        QXYeiOB/2s6aipfYg7ObQQVNHiISPu96jVgOo64CVU5cJoVBksadVXk2BfQq3nfy/1/nslsQZRdeD
+        xZL2awHuYnkAO5NGrCJoR0VYm6bEaOaHUaVezNTSknHIGRc3c442SLyyhQXGV8WhWoM+uDbZDtDTd
+        OLRRizjjO/7eqoqlEIP5RPIbnTJCGZopJ5fCD/Tb4hxbdRtoQxe2lslVhhH8cp1kZ9s3+lGApUab9
+        /JF4KckA==;
+Received: from [2601:1c2:d80:3110::a2e7]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1otbDX-0017Ce-77; Fri, 11 Nov 2022 21:05:39 +0000
+Message-ID: <eea50fc5-8520-760a-7d41-0f362a6efe0c@infradead.org>
+Date:   Fri, 11 Nov 2022 13:05:38 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y26BQ92l9xWKaz2z@yury-laptop>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH] async_tx: Fix some kernel-doc warnings
+Content-Language: en-US
+To:     Bo Liu <liubo03@inspur.com>, dan.j.williams@intel.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221111064441.2926-1-liubo03@inspur.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20221111064441.2926-1-liubo03@inspur.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 11, 2022 at 09:07:15AM -0800, Yury Norov wrote:
-> On Fri, Nov 11, 2022 at 01:42:29PM +0200, Andy Shevchenko wrote:
-> > On Thu, Nov 10, 2022 at 08:00:26PM -0800, Yury Norov wrote:
+Hi--
 
-...
-
-> > > +out:
-> > 
-> > out_unlock: ?
+On 11/10/22 22:44, Bo Liu wrote:
+> Fixes the following W=1 kernel build warning(s):
+>   crypto/async_tx/async_tx.c:136: warning: cannot understand function prototype: 'enum submit_disposition '
+>   crypto/async_tx/async_tx.c:264: warning: Function parameter or member 'tx' not described in 'async_tx_quiesce'
 > 
-> Do you think it's better?
+> Signed-off-by: Bo Liu <liubo03@inspur.com>
+> ---
+>  crypto/async_tx/async_tx.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/crypto/async_tx/async_tx.c b/crypto/async_tx/async_tx.c
+> index 9256934312d7..8840731cefbb 100644
+> --- a/crypto/async_tx/async_tx.c
+> +++ b/crypto/async_tx/async_tx.c
+> @@ -33,7 +33,7 @@ static void __exit async_tx_exit(void)
+>  module_init(async_tx_init);
+>  module_exit(async_tx_exit);
+>  
+> -/**
+> +/*
 
-Yes. It shows what will happen at goto.
+This change is not described and is not needed.
 
-So when one reads the "goto out;" it's something like "return ret;".
-But "goto out_unlock;" immediately pictures "unlock; return ret;".
+>   * __async_tx_find_channel - find a channel to carry out the operation or let
+>   *	the transaction execute synchronously
+>   * @submit: transaction dependency and submission modifiers
+> @@ -55,7 +55,7 @@ EXPORT_SYMBOL_GPL(__async_tx_find_channel);
+>  #endif
+>  
+>  
+> -/**
+> +/*
+>   * async_tx_channel_switch - queue an interrupt descriptor with a dependency
+>   * 	pre-attached.
 
-P.S. That's basically the way how we name labels.
+Same as above.
 
-> > > +	rcu_read_unlock();
-> > > +	return ret;
+>   * @depend_tx: the operation that must finish before the new operation runs
+> @@ -123,7 +123,7 @@ async_tx_channel_switch(struct dma_async_tx_descriptor *depend_tx,
+>  }
+>  
+>  
+> -/**
+> +/*
+>   * submit_disposition - flags for routing an incoming operation
+
+Just change to
+ * enum submit_disposition - flags for routing an incoming operation
+
+i.e. insert 'enum.
+
+
+>   * @ASYNC_TX_SUBMITTED: we were able to append the new operation under the lock
+>   * @ASYNC_TX_CHANNEL_SWITCH: when the lock is dropped schedule a channel switch
+> @@ -209,7 +209,7 @@ async_tx_submit(struct dma_chan *chan, struct dma_async_tx_descriptor *tx,
+>  }
+>  EXPORT_SYMBOL_GPL(async_tx_submit);
+>  
+> -/**
+> +/*
+
+Not described, not needed.
+
+>   * async_trigger_callback - schedules the callback function to be run
+>   * @submit: submission and completion parameters
+>   *
+> @@ -256,9 +256,9 @@ async_trigger_callback(struct async_submit_ctl *submit)
+>  }
+>  EXPORT_SYMBOL_GPL(async_trigger_callback);
+>  
+> -/**
+> +/*
+>   * async_tx_quiesce - ensure tx is complete and freeable upon return
+> - * @tx - transaction to quiesce
+> + * @*tx - transaction to quiesce
+
+Just change to
+ * @tx: transaction to quiesce
+
+i.e. s/ -/:/
+
+>   */
+>  void async_tx_quiesce(struct dma_async_tx_descriptor **tx)
+>  {
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+~Randy
