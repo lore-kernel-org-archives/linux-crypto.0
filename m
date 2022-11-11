@@ -2,184 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145C2C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Nov 2022 04:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1685C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Nov 2022 04:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231974AbiKKEMD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Nov 2022 23:12:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56112 "EHLO
+        id S229536AbiKKEPS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Nov 2022 23:15:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231895AbiKKELk (ORCPT
+        with ESMTP id S231625AbiKKEPD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Nov 2022 23:11:40 -0500
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2653222AD;
-        Thu, 10 Nov 2022 20:11:37 -0800 (PST)
-Received: by mail-oi1-x235.google.com with SMTP id m204so3918527oib.6;
-        Thu, 10 Nov 2022 20:11:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2kdIP1WeRYup9WYrN50JXtVx97BRTIEhufBzxLjkpYA=;
-        b=ca+da0sURkVvT/w+o9IghO9odiWy7U2rEiwocTnlWe8gRPKeY6vA/M3PsJV+6s4GvU
-         WfYZKSQU//3TI0w9UwCZ/DVJ1Har1ltjs8l6DnqK1nfLcti12ge1yXp0hbHK08walcTb
-         2TfDFld7p8zKluEDkBLpoac2orSne4kZQbn134+liUFuDZI8SVIOcAQzSASduZcqfxDr
-         JSIdr2NxzWe9wvHvEKahSEsHFdubdsbCHf9SL16y/WELxf/ugXp1tYdJ/q2yLyUH4UrZ
-         JQs8fb8MzBaiqfmwCv8rNYzlzupSidep31WWSr3zhIUsJ8uB4EfEChazB7e9e7zR4Axh
-         aHww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2kdIP1WeRYup9WYrN50JXtVx97BRTIEhufBzxLjkpYA=;
-        b=jMLWnvCntSNzazcvCBDfTmzWdqGQDC5wpqBRR7Uq5JlJ03kz3EEhPEdPG9fOC0zy/p
-         dth4dGtaGvcXMOAwJfVpnvybAvPRn0ft5agF5aFZha8eulT7m901F7FWN+XDRTuxXc0F
-         F1XOIGLZ76+qNg0uW3A5FIZhOoZkqd7/ckTFDjZ2JNw8ny8EK/81sszOj2nhVPFwGeoZ
-         M2oHuYJFnp1PfEZpG54i4b42BGO851FJhYUJfJgryu2LzL915IgFIbKmjqs0jVXvVVkO
-         lG6VdxfDW0MYQWGU8RrnikP4MG3Bt8ZFC2JjoOgDHQaNX8Ji4apfbQhQQ8mwJRBPto6e
-         iDYg==
-X-Gm-Message-State: ACrzQf12wI8kuhL0GAJ1/9LrtjP9Hh0+ZCYhIdktZnz4kD43lozZw0UU
-        0d6owRPVKhR4Q9LVW/KwsWbkAkNKvx0=
-X-Google-Smtp-Source: AMsMyM6RqfzUJQRUyyuyGav+7kCftcXcYL/D6/Myr/JgItXlXdrZ/Tw2jdm/GbNRqBDj8tfCZcsGWA==
-X-Received: by 2002:a05:6808:170c:b0:345:20f7:b5df with SMTP id bc12-20020a056808170c00b0034520f7b5dfmr2742007oib.46.1668139896789;
-        Thu, 10 Nov 2022 20:11:36 -0800 (PST)
-Received: from localhost ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id u24-20020a056870f29800b0013c50b812a2sm746209oap.36.2022.11.10.20.11.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 20:11:36 -0800 (PST)
-Date:   Thu, 10 Nov 2022 20:11:35 -0800
-From:   Yury Norov <yury.norov@gmail.com>
-To:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Barry Song <baohua@kernel.org>,
-        Ben Segall <bsegall@google.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Gal Pressman <gal@nvidia.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Tariq Toukan <ttoukan.linux@gmail.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 3/4] sched: add sched_numa_find_nth_cpu()
-Message-ID: <Y23Ld7fDVO8Z8Oqu@yury-laptop>
-References: <20221111040027.621646-1-yury.norov@gmail.com>
- <20221111040027.621646-4-yury.norov@gmail.com>
+        Thu, 10 Nov 2022 23:15:03 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB7D67131
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Nov 2022 20:15:01 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1otLRT-00Cq7H-4Z; Fri, 11 Nov 2022 12:15:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Nov 2022 12:14:59 +0800
+Date:   Fri, 11 Nov 2022 12:14:59 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 6/6] crypto: compile out test-related algboss code
+ when tests disabled
+Message-ID: <Y23MQzy9biQUF6ZJ@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221111040027.621646-4-yury.norov@gmail.com>
+In-Reply-To: <20221110081346.336046-7-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 10, 2022 at 08:00:26PM -0800, Yury Norov wrote:
-> The function finds Nth set CPU in a given cpumask starting from a given
-> node.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> @@ -171,15 +171,17 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+>        return NOTIFY_OK;
+> }
 > 
-> Leveraging the fact that each hop in sched_domains_numa_masks includes the
-> same or greater number of CPUs than the previous one, we can use binary
-> search on hops instead of linear walk, which makes the overall complexity
-> of O(log n) in terms of number of cpumask_weight() calls.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> ---
->  include/linux/topology.h |  8 ++++++++
->  kernel/sched/topology.c  | 42 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
-> 
-> diff --git a/include/linux/topology.h b/include/linux/topology.h
-> index 4564faafd0e1..63048ac3207c 100644
-> --- a/include/linux/topology.h
-> +++ b/include/linux/topology.h
-> @@ -245,5 +245,13 @@ static inline const struct cpumask *cpu_cpu_mask(int cpu)
->  	return cpumask_of_node(cpu_to_node(cpu));
->  }
->  
-> +#ifdef CONFIG_NUMA
-> +int sched_numa_find_nth_cpu(const struct cpumask *cpus, int cpu, int node);
+> +#ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+> +static int cryptomgr_schedule_test(struct crypto_alg *alg)
+> +{
+> +       return NOTIFY_DONE;
+> +}
 > +#else
-> +int sched_numa_find_nth_cpu(const struct cpumask *cpus, int cpu, int node)
 
-Ah, this should be static of course.
+Could you please do this inline with an if statement rather than
+as #ifdefs? That is,
 
-> +{
-> +	return cpumask_nth(cpu, cpus);
-> +}
-> +#endif	/* CONFIG_NUMA */
->  
->  #endif /* _LINUX_TOPOLOGY_H */
-> diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-> index 8739c2a5a54e..c8f56287de46 100644
-> --- a/kernel/sched/topology.c
-> +++ b/kernel/sched/topology.c
-> @@ -2067,6 +2067,48 @@ int sched_numa_find_closest(const struct cpumask *cpus, int cpu)
->  	return found;
->  }
->  
-> +/*
-> + * sched_numa_find_nth_cpu() - given the NUMA topology, find the Nth next cpu
-> + *                             closest to @cpu from @cpumask.
-> + * cpumask: cpumask to find a cpu from
-> + * cpu: Nth cpu to find
-> + *
-> + * returns: cpu, or >= nr_cpu_ids when nothing found.
-> + */
-> +int sched_numa_find_nth_cpu(const struct cpumask *cpus, int cpu, int node)
-> +{
-> +	unsigned int first = 0, mid, last = sched_domains_numa_levels;
-> +	struct cpumask ***masks;
-> +	int w, ret = nr_cpu_ids;
-> +
-> +	rcu_read_lock();
-> +	masks = rcu_dereference(sched_domains_numa_masks);
-> +	if (!masks)
-> +		goto out;
-> +
-> +	while (last >= first) {
-> +		mid = (last + first) / 2;
-> +
-> +		if (cpumask_weight_and(cpus, masks[mid][node]) <= cpu) {
-> +			first = mid + 1;
-> +			continue;
-> +		}
-> +
-> +		w = (mid == 0) ? 0 : cpumask_weight_and(cpus, masks[mid - 1][node]);
-> +		if (w <= cpu)
-> +			break;
-> +
-> +		last = mid - 1;
-> +	}
-> +
-> +	ret = (mid == 0) ?
-> +		cpumask_nth_and(cpu - w, cpus, masks[mid][node]) :
-> +		cpumask_nth_and_andnot(cpu - w, cpus, masks[mid][node], masks[mid - 1][node]);
-> +out:
-> +	rcu_read_unlock();
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(sched_numa_find_nth_cpu);
->  #endif /* CONFIG_NUMA */
->  
->  static int __sdt_alloc(const struct cpumask *cpu_map)
-> -- 
-> 2.34.1
+static int cryptomgr_schedule_test(struct crypto_alg *alg)
+{
+	struct task_struct *thread;
+	struct crypto_test_param *param;
+	u32 type;
+
+	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
+		return NOTIFY_DONE;
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
