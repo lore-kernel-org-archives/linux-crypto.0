@@ -2,378 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C83B9C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Nov 2022 14:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5D0C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Nov 2022 15:00:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234861AbiKLOLo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Nov 2022 09:11:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
+        id S234005AbiKLPAM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 12 Nov 2022 10:00:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231252AbiKLOLl (ORCPT
+        with ESMTP id S231377AbiKLPAL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Nov 2022 09:11:41 -0500
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9250711172;
-        Sat, 12 Nov 2022 06:11:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Content-Type:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=/EKve0DJdgDbbBVAUw8fSy/lR7NDWzZ+hyVbdKDOzAI=; b=CmaXke3mU8LGLlCnXP8rymG3zY
-        qa8Y5wwgpZ8/H6ltTuWsT8534VR44QVfmtlMPyv7GMn4Jbl7SYpi1b++Ew4QzD9O8ra9++CJlpNtr
-        SwGT9bIdr+I2gbGFixYoPKTMWrouA3P67gcQRWjPsntzjrnTzoFEyz3U+zHUHKMaYiIjcDS9OeBek
-        gfoFC6oa1MaIbIK+yFmTVmOepOvEaYhyAmyOAJQKpRBFGGeyu8AGnH9zjqZ1C6kv9qmW4PkUcZ7pF
-        1TtwVguu/qU3Pi8uK2vThWADuPTTrwJ4nic+OaspC4g1hcmHw7qDv+vyodhgc7P2zFMWjKFH0zziz
-        Jc9B4X3g==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1otrE5-00AbR0-Iy; Sat, 12 Nov 2022 15:11:17 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1otrE4-00FxDk-2V;
-        Sat, 12 Nov 2022 15:11:16 +0100
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>
-Cc:     linux-crypto@vger.kernel.org (open list:HARDWARE RANDOM NUMBER
-        GENERATOR CORE),
-        devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED
-        DEVICE TREE BINDINGS),
-        linux-arm-kernel@lists.infradead.org (moderated list:ARM/Rockchip SoC
-        support),
-        linux-rockchip@lists.infradead.org (open list:ARM/Rockchip SoC support),
-        linux-kernel@vger.kernel.org (open list),
-        Aurelien Jarno <aurelien@aurel32.net>
-Subject: [PATCH v1 2/3] hwrng: add Rockchip SoC hwrng driver
-Date:   Sat, 12 Nov 2022 15:10:58 +0100
-Message-Id: <20221112141059.3802506-3-aurelien@aurel32.net>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221112141059.3802506-1-aurelien@aurel32.net>
-References: <20221112141059.3802506-1-aurelien@aurel32.net>
+        Sat, 12 Nov 2022 10:00:11 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8789D85
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Nov 2022 07:00:09 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5815AB80937
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Nov 2022 15:00:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF3E9C433D7
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Nov 2022 15:00:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668265206;
+        bh=NWz/jQZUJJPvDahD/g7+rxLhPhTnTwb/EaNjaU+YyI4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=imQeOftfBGcVWEu6WLs8cLPjS+eA3hwALlldy8Nt2t5gAQh2hTp9lt5MaxqTEaCvs
+         37yjDMLA37pTJrSQfedYTtgWr73m5Ne3rioS4MzCZjJ0EXP0Zi8e9Vapp9BVaUI8A+
+         0UfA9OJOocMmr5b3yzzMB9vrwjBCMgPp0GXvvy8Si5RehsqfkWOfJ9qyUWRWmc5mbd
+         QYZrqOT6L7a5Cr2PWEN+F3RNuW6euaII72PlVhxejqUHFwuriaeedKnmklygWYWFwF
+         8Podct5iLZ3cWjsmS1p2H561mXjuhrVOBdRbcbfbmDjA7p0yFQ4Mmt+46IvwUtF2va
+         /nvOs0F1oX2Qw==
+Received: by mail-lf1-f46.google.com with SMTP id f37so12449970lfv.8
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Nov 2022 07:00:06 -0800 (PST)
+X-Gm-Message-State: ANoB5pnJcXD7cBxQBFz5w76PGKIoQmJppTIpZR1wjNRBcognDivREjDs
+        NOcTYlwxfOwVZEbnZu8VessJMVwBXVr21GDTOBU=
+X-Google-Smtp-Source: AA0mqf7GYWpe8W04J5VIQs4NMAYiJpSpDPNLoIoD4l511sk7+Z+zDAD7B7SLUQBNh9nYWRhZevjF4WkGypJQngLKW6s=
+X-Received: by 2002:a05:6512:138f:b0:4ab:534b:1b2c with SMTP id
+ p15-20020a056512138f00b004ab534b1b2cmr2016483lfa.426.1668265204749; Sat, 12
+ Nov 2022 07:00:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201210024342.GA26428@gondor.apana.org.au> <e02fe07e-8cb6-f889-3228-60e4fabf4e40@candelatech.com>
+ <CAMj1kXF05XZtyakdpLixpP9Lroy0D3_gEcY2SFbSshD8ERUU7w@mail.gmail.com>
+ <20201210111427.GA28014@gondor.apana.org.au> <CAMj1kXG39GgsTeNBbX7_oaK+f-awPyL8NxJ7R+fyOBjL4c5xMw@mail.gmail.com>
+ <20201210121627.GB28441@gondor.apana.org.au> <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
+ <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
+ <20201215091902.GA21455@gondor.apana.org.au> <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
+ <Y2sj84u/w/nOgKwx@gondor.apana.org.au> <CAMj1kXG3id6ABX=5D4H0XLmVnijHCY6whp09U5pLQr0Ftf5Gzw@mail.gmail.com>
+ <6e20b593-393c-9fa1-76aa-b78951b1f2f3@candelatech.com>
+In-Reply-To: <6e20b593-393c-9fa1-76aa-b78951b1f2f3@candelatech.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 12 Nov 2022 15:59:53 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEqcPvb-uLvGLhue=6eME-6WhuPgoG+HgLH0EoZLE9aZA@mail.gmail.com>
+Message-ID: <CAMj1kXEqcPvb-uLvGLhue=6eME-6WhuPgoG+HgLH0EoZLE9aZA@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
+To:     Ben Greear <greearb@candelatech.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rockchip SoCs used to have a random number generator as part of their
-crypto device, and support for it has to be added to the corresponding
-driver. However newer Rockchip SoCs like the RK356x have an independent
-True Random Number Generator device. This patch adds a driver for it,
-greatly inspired from the downstream driver.
+On Fri, 11 Nov 2022 at 23:29, Ben Greear <greearb@candelatech.com> wrote:
+>
+> On 11/9/22 2:05 AM, Ard Biesheuvel wrote:
+> > On Wed, 9 Nov 2022 at 04:52, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >>
+> >> On Tue, Nov 08, 2022 at 10:50:48AM -0800, Ben Greear wrote:
+> >>>
+> >>> While rebasing my patches onto 6.1-rc4, I noticed my aesni for ccm(aes) patch didn't apply cleanly,
+> >>> and I found this patch described below is applied now.  Does this upstream patch mean that aesni is already
+> >>> supported upstream now?  Or is it specific to whatever xctr is?  If so,
+> >>> any chance the patch is wanted upstream now?
+> >>
+> >> AFAICS the xctr patch has nothing to do with what you were trying
+> >> to achieve with wireless.  My objection still stands with regards
+> >> to wireless, we should patch wireless to use the async crypto
+> >> interface and not hack around it in the Crypto API.
+> >>
+> >
+> > Indeed. Those are just add/add conflicts because both patches
+> > introduce new code into the same set of files. The resolution is
+> > generally to keep both sides.
+> >
+> > As for Herbert's objection: I will note here that in the meantime,
+> > arm64 now has gotten rid of the scalar fallbacks entirely in AEAD and
+> > skipcher implementations, because those are only callable in task or
+> > softirq context, and the arm64 SIMD wrappers now disable softirq
+> > processing. This means that the condition that results in the fallback
+> > being needed can no longer occur, making the SIMD helper dead code on
+> > arm64.
+> >
+> > I suppose we might do the same thing on x86, but since the kernel mode
+> > SIMD handling is highly arch specific, you'd really need to raise this
+> > with the x86 maintainers.
+> >
+>
+> Hello Ard,
+>
+> Could you please review the attached patch to make sure I merged it properly?  My concern
+> is the cleanup section and/or some problems I might have introduced related to the similarly
+> named code that was added upstream.
+>
 
-The TRNG device does not seem to have a signal conditionner and the FIPS
-140-2 test returns a lot of failures. They can be reduced by increasing
-RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
-has been adjusted to get ~90% of successes and the quality value has
-been set accordingly.
+I don't think the logic is quite right, although it rarely matter.
 
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
----
- drivers/char/hw_random/Kconfig        |  14 ++
- drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/rockchip-rng.c | 251 ++++++++++++++++++++++++++
- 3 files changed, 266 insertions(+)
- create mode 100644 drivers/char/hw_random/rockchip-rng.c
+I've pushed my version here - it invokes the static call for CTR so it
+will use the faster AVX version if the CPU supports it.
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 3da8e85f8aae..8e5c88504f72 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -549,6 +549,20 @@ config HW_RANDOM_CN10K
- 	 To compile this driver as a module, choose M here.
- 	 The module will be called cn10k_rng. If unsure, say Y.
- 
-+config HW_RANDOM_ROCKCHIP
-+        tristate "Rockchip True Random Number Generator"
-+        depends on HW_RANDOM && (ARCH_ROCKCHIP || COMPILE_TEST)
-+        depends on HAS_IOMEM
-+        default HW_RANDOM
-+        help
-+          This driver provides kernel-side support for the True Random Number
-+          Generator hardware found on some Rockchip SoC like RK3566 or RK3568.
-+
-+          To compile this driver as a module, choose M here: the
-+          module will be called rockchip-rng.
-+
-+          If unsure, say Y.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 3e948cf04476..b7e989535fd6 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
- obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
- obj-$(CONFIG_HW_RANDOM_CN10K) += cn10k-rng.o
- obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) += mpfs-rng.o
-+obj-$(CONFIG_HW_RANDOM_ROCKCHIP) += rockchip-rng.o
-diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
-new file mode 100644
-index 000000000000..ac7a840c1ac5
---- /dev/null
-+++ b/drivers/char/hw_random/rockchip-rng.c
-@@ -0,0 +1,251 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * rockchip-rng.c True Random Number Generator driver for Rockchip SoCs
-+ *
-+ * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
-+ * Copyright (c) 2022, Aurelien Jarno
-+ * Authors:
-+ *  Lin Jinhan <troy.lin@rock-chips.com>
-+ *  Aurelien Jarno <aurelien@aurel32.net>
-+ */
-+#include <linux/clk.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of_platform.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/reset.h>
-+#include <linux/slab.h>
-+
-+#define RK_RNG_AUTOSUSPEND_DELAY	100
-+#define RK_RNG_MAX_BYTE			32
-+#define RK_RNG_POLL_PERIOD_US		100
-+#define RK_RNG_POLL_TIMEOUT_US		10000
-+
-+/*
-+ * TRNG collects osc ring output bit every RK_RNG_SAMPLE_CNT time. The value is
-+ * a tradeoff between speed and quality and has been adjusted to get a quality
-+ * of ~900 (~90% of FIPS 140-2 successes).
-+ */
-+#define RK_RNG_SAMPLE_CNT		1000
-+
-+/* TRNG registers from RK3568 TRM-Part2, section 5.4.1 */
-+#define TRNG_RST_CTL			0x0004
-+#define TRNG_RNG_CTL			0x0400
-+#define TRNG_RNG_CTL_LEN_64_BIT		(0x00 << 4)
-+#define TRNG_RNG_CTL_LEN_128_BIT	(0x01 << 4)
-+#define TRNG_RNG_CTL_LEN_192_BIT	(0x02 << 4)
-+#define TRNG_RNG_CTL_LEN_256_BIT	(0x03 << 4)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_0	(0x00 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_1	(0x01 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_2	(0x02 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_3	(0x03 << 2)
-+#define TRNG_RNG_CTL_ENABLE		BIT(1)
-+#define TRNG_RNG_CTL_START		BIT(0)
-+#define TRNG_RNG_SAMPLE_CNT		0x0404
-+#define TRNG_RNG_DOUT_0			0x0410
-+#define TRNG_RNG_DOUT_1			0x0414
-+#define TRNG_RNG_DOUT_2			0x0418
-+#define TRNG_RNG_DOUT_3			0x041c
-+#define TRNG_RNG_DOUT_4			0x0420
-+#define TRNG_RNG_DOUT_5			0x0424
-+#define TRNG_RNG_DOUT_6			0x0428
-+#define TRNG_RNG_DOUT_7			0x042c
-+
-+struct rk_rng {
-+	struct hwrng rng;
-+	void __iomem *base;
-+	struct reset_control *rst;
-+	int clk_num;
-+	struct clk_bulk_data *clk_bulks;
-+};
-+
-+/* The mask determine the bits that are updated */
-+static void rk_rng_write_ctl(struct rk_rng *rng, u32 val, u32 mask)
-+{
-+	writel_relaxed((mask << 16) | val, rng->base + TRNG_RNG_CTL);
-+}
-+
-+static int rk_rng_init(struct hwrng *rng)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+	int ret;
-+
-+	/* start clocks */
-+	ret = clk_bulk_prepare_enable(rk_rng->clk_num, rk_rng->clk_bulks);
-+	if (ret < 0) {
-+		dev_err((struct device *) rk_rng->rng.priv,
-+			"Failed to enable clks %d\n", ret);
-+		return ret;
-+	}
-+
-+	/* set the sample period */
-+	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
-+
-+	/* set osc ring speed and enable it */
-+	reg = TRNG_RNG_CTL_LEN_256_BIT |
-+		   TRNG_RNG_CTL_OSC_RING_SPEED_0 |
-+		   TRNG_RNG_CTL_ENABLE;
-+	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-+
-+	return 0;
-+}
-+
-+static void rk_rng_cleanup(struct hwrng *rng)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+
-+	/* stop TRNG */
-+	reg = 0;
-+	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-+
-+	/* stop clocks */
-+	clk_bulk_disable_unprepare(rk_rng->clk_num, rk_rng->clk_bulks);
-+}
-+
-+static int rk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+	int ret = 0;
-+	int i;
-+
-+	pm_runtime_get_sync((struct device *) rk_rng->rng.priv);
-+
-+	/* Start collecting random data */
-+	reg = TRNG_RNG_CTL_START;
-+	rk_rng_write_ctl(rk_rng, reg, reg);
-+
-+	ret = readl_poll_timeout(rk_rng->base + TRNG_RNG_CTL, reg,
-+				 !(reg & TRNG_RNG_CTL_START),
-+				 RK_RNG_POLL_PERIOD_US,
-+				 RK_RNG_POLL_TIMEOUT_US);
-+	if (ret < 0)
-+		goto out;
-+
-+	/* Read random data stored in big endian in the registers */
-+	ret = min_t(size_t, max, RK_RNG_MAX_BYTE);
-+	for (i = 0; i < ret; i += 4) {
-+		reg = readl_relaxed(rk_rng->base + TRNG_RNG_DOUT_0 + i);
-+		*(u32 *)(buf + i) = be32_to_cpu(reg);
-+	}
-+
-+out:
-+	pm_runtime_mark_last_busy((struct device *) rk_rng->rng.priv);
-+	pm_runtime_put_sync_autosuspend((struct device *) rk_rng->rng.priv);
-+
-+	return ret;
-+}
-+
-+static int rk_rng_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct rk_rng *rk_rng;
-+	int ret;
-+
-+	rk_rng = devm_kzalloc(dev, sizeof(struct rk_rng), GFP_KERNEL);
-+	if (!rk_rng)
-+		return -ENOMEM;
-+
-+	rk_rng->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(rk_rng->base))
-+		return PTR_ERR(rk_rng->base);
-+
-+	rk_rng->clk_num = devm_clk_bulk_get_all(dev, &rk_rng->clk_bulks);
-+	if (rk_rng->clk_num < 0)
-+		return dev_err_probe(dev, rk_rng->clk_num,
-+				     "Failed to get clks property\n");
-+
-+	rk_rng->rst = devm_reset_control_array_get(&pdev->dev, false, false);
-+	if (IS_ERR(rk_rng->rst))
-+		return dev_err_probe(dev, PTR_ERR(rk_rng->rst),
-+				     "Failed to get reset property\n");
-+
-+	reset_control_assert(rk_rng->rst);
-+	udelay(2);
-+	reset_control_deassert(rk_rng->rst);
-+
-+	platform_set_drvdata(pdev, rk_rng);
-+
-+	rk_rng->rng.name = dev_driver_string(dev);
-+#ifndef CONFIG_PM
-+	rk_rng->rng.init = rk_rng_init;
-+	rk_rng->rng.cleanup = rk_rng_cleanup;
-+#endif
-+	rk_rng->rng.read = rk_rng_read;
-+	rk_rng->rng.priv = (unsigned long) dev;
-+	rk_rng->rng.quality = 900;
-+
-+	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(dev);
-+	pm_runtime_enable(dev);
-+
-+	ret = devm_hwrng_register(dev, &rk_rng->rng);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register Rockchip hwrng\n");
-+
-+	dev_info(&pdev->dev, "Registered Rockchip hwrng\n");
-+
-+	return 0;
-+}
-+
-+static int rk_rng_remove(struct platform_device *pdev)
-+{
-+	pm_runtime_disable(&pdev->dev);
-+
-+	return 0;
-+}
-+
-+#ifdef CONFIG_PM
-+static int rk_rng_runtime_suspend(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	rk_rng_cleanup(&rk_rng->rng);
-+
-+	return 0;
-+}
-+
-+static int rk_rng_runtime_resume(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	return rk_rng_init(&rk_rng->rng);
-+}
-+#endif
-+
-+static const struct dev_pm_ops rk_rng_pm_ops = {
-+	SET_RUNTIME_PM_OPS(rk_rng_runtime_suspend,
-+				rk_rng_runtime_resume, NULL)
-+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-+				pm_runtime_force_resume)
-+};
-+
-+static const struct of_device_id rk_rng_dt_match[] = {
-+	{
-+		.compatible = "rockchip,rk3568-rng",
-+	},
-+	{},
-+};
-+
-+MODULE_DEVICE_TABLE(of, rk_rng_dt_match);
-+
-+static struct platform_driver rk_rng_driver = {
-+	.driver	= {
-+		.name	= "rockchip-rng",
-+		.pm	= &rk_rng_pm_ops,
-+		.of_match_table = rk_rng_dt_match,
-+	},
-+	.probe	= rk_rng_probe,
-+	.remove = rk_rng_remove,
-+};
-+
-+module_platform_driver(rk_rng_driver);
-+
-+MODULE_DESCRIPTION("Rockchip True Random Number Generator driver");
-+MODULE_AUTHOR("Lin Jinhan <troy.lin@rock-chips.com>, Aurelien Jarno <aurelien@aurel32.net>");
-+MODULE_LICENSE("GPL v2");
--- 
-2.35.1
-
+https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=aesni-ccm-v6.1
