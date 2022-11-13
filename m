@@ -2,106 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273B9C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Nov 2022 09:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B316AC433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Nov 2022 12:29:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235153AbiKMJdV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Nov 2022 04:33:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56386 "EHLO
+        id S235014AbiKMM3x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Nov 2022 07:29:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbiKMJdV (ORCPT
+        with ESMTP id S232884AbiKMM3w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Nov 2022 04:33:21 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868C012A8C
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Nov 2022 01:33:20 -0800 (PST)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N96gM3bpnzRp1W;
-        Sun, 13 Nov 2022 17:33:03 +0800 (CST)
-Received: from huawei.com (10.175.112.208) by dggpeml500024.china.huawei.com
- (7.185.36.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Sun, 13 Nov
- 2022 17:33:18 +0800
-From:   Yuan Can <yuancan@huawei.com>
-To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-CC:     <yuancan@huawei.com>
-Subject: [PATCH] crypto: ccree - Fix error handling in ccree_init()
-Date:   Sun, 13 Nov 2022 09:31:37 +0000
-Message-ID: <20221113093137.20178-1-yuancan@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Sun, 13 Nov 2022 07:29:52 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97995EE29;
+        Sun, 13 Nov 2022 04:29:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668342591; x=1699878591;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3aDUPNbZhT7y8PFBk3x2fesIcWdCkiQc/eyvtcMv5A4=;
+  b=D5MdBdM5z+pBFnsbceA26OF4AtlI2zWEnXEJgUuB48gb/hF7AUUDB6Jr
+   q+nPEFlAPnitTafLZogjV7nJaAkTp8dqMb4Pe/cHnnzvVF03QLZl3jv8v
+   PNvrk1uyDkEwtccuczZqHYRBc7WgIjBW4PaQkr9Zn8wkUa+b66loRfyix
+   YUX2gP84loi4p/zc5Ux0yq1xNKUHotDdTOkWsQ/quvbtr68rYCdw3QM/J
+   Dz37FJQ0gIdvN+JF7IFqQRKtnw3g6WPe1uPoPRNQZt7HZovqD8iTx+JKI
+   gJXg1rtRGyoWavV42tawUUr8e1pUyC2z/zlmORar9A1lbGsyFA8RH/MF4
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10529"; a="376072774"
+X-IronPort-AV: E=Sophos;i="5.96,161,1665471600"; 
+   d="scan'208";a="376072774"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2022 04:29:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10529"; a="638111594"
+X-IronPort-AV: E=Sophos;i="5.96,161,1665471600"; 
+   d="scan'208";a="638111594"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga002.jf.intel.com with ESMTP; 13 Nov 2022 04:29:44 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1ouC7I-00Bfs8-35;
+        Sun, 13 Nov 2022 14:29:40 +0200
+Date:   Sun, 13 Nov 2022 14:29:40 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Tariq Toukan <ttoukan.linux@gmail.com>
+Cc:     Yury Norov <yury.norov@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+        "open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH 0/4] cpumask: improve on cpumask_local_spread() locality
+Message-ID: <Y3DjNJNtiZGNLeGi@smile.fi.intel.com>
+References: <20221111040027.621646-1-yury.norov@gmail.com>
+ <20221111082551.7e71fbf4@kernel.org>
+ <CAAH8bW9jG5US0Ymn1wax9tNK3MgZpcWfQsYgu-Km_E+WZw3yiA@mail.gmail.com>
+ <a8c52fa8-f976-92a0-2948-843476a81efb@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.112.208]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500024.china.huawei.com (7.185.36.10)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8c52fa8-f976-92a0-2948-843476a81efb@gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A problem about ccree create debugfs failed is triggered with the
-following log given:
+On Sun, Nov 13, 2022 at 09:37:59AM +0200, Tariq Toukan wrote:
+> On 11/11/2022 6:47 PM, Yury Norov wrote:
+> > On Fri, Nov 11, 2022, 10:25 AM Jakub Kicinski <kuba@kernel.org
+> > <mailto:kuba@kernel.org>> wrote:
+> >     On Thu, 10 Nov 2022 20:00:23 -0800 Yury Norov wrote:
 
- [  398.049333] debugfs: Directory 'ccree' with parent '/' already present!
+..
 
-The reason is that ccree_init() returns platform_driver_register()
-directly without checking its return value, if platform_driver_register()
-failed, it returns without remove debugfs of ccree, resulting the
-debugfs of ccree can never be created later.
-A simple call graph is shown as below:
+> > Sure. Tariq and Valentine please send your tags as appropriate.
+> 
+> I wonder what fits best here?
+> 
+> As the contribution is based upon previous work that I developed, then
+> probably:
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
- ccree_init()
-   cc_debugfs_global_init() # create debugfs ccree
-   platform_driver_register()
-     driver_register()
-       bus_add_driver()
-         dev = kzalloc(...) # OOM happened
-   # return without destroy debugfs ccree
+Then it probably means that one of you (Yury or you) should also have a
+Co-developed-by.
 
-Fix by removing debugfs when platform_driver_register() returns error.
-
-Fixes: 4c3f97276e15 ("crypto: ccree - introduce CryptoCell driver")
-Signed-off-by: Yuan Can <yuancan@huawei.com>
----
- drivers/crypto/ccree/cc_debugfs.c | 2 +-
- drivers/crypto/ccree/cc_driver.c  | 8 +++++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/ccree/cc_debugfs.c b/drivers/crypto/ccree/cc_debugfs.c
-index 7083767602fc..8f008f024f8f 100644
---- a/drivers/crypto/ccree/cc_debugfs.c
-+++ b/drivers/crypto/ccree/cc_debugfs.c
-@@ -55,7 +55,7 @@ void __init cc_debugfs_global_init(void)
- 	cc_debugfs_dir = debugfs_create_dir("ccree", NULL);
- }
- 
--void __exit cc_debugfs_global_fini(void)
-+void cc_debugfs_global_fini(void)
- {
- 	debugfs_remove(cc_debugfs_dir);
- }
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index cadead18b59e..1969d1e6df40 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -651,9 +651,15 @@ static struct platform_driver ccree_driver = {
- 
- static int __init ccree_init(void)
- {
-+	int ret;
-+
- 	cc_debugfs_global_init();
- 
--	return platform_driver_register(&ccree_driver);
-+	ret = platform_driver_register(&ccree_driver);
-+	if (ret)
-+		cc_debugfs_global_fini();
-+
-+	return ret;
- }
- module_init(ccree_init);
- 
 -- 
-2.17.1
+With Best Regards,
+Andy Shevchenko
+
 
