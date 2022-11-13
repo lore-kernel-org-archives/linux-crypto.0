@@ -2,67 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90521C3A589
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Nov 2022 19:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DD4C43219
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Nov 2022 07:38:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235107AbiKLTKA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Nov 2022 14:10:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52902 "EHLO
+        id S235179AbiKMHiH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Nov 2022 02:38:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235082AbiKLTJz (ORCPT
+        with ESMTP id S229753AbiKMHiG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Nov 2022 14:09:55 -0500
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E8D17E30;
-        Sat, 12 Nov 2022 11:09:55 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id j6so5516358qvn.12;
-        Sat, 12 Nov 2022 11:09:55 -0800 (PST)
+        Sun, 13 Nov 2022 02:38:06 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A482613DC6;
+        Sat, 12 Nov 2022 23:38:05 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id z14so11894734wrn.7;
+        Sat, 12 Nov 2022 23:38:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d0/IgShbjb7qZAYWczuxoDmDyDdccuNPQ9P2AVi15HY=;
-        b=J0b0MU4lkGEXnXmOdosQFkNAakaHFGH3KxRmUtgL1P2al7Bklhj93oiCUKf2JCUCj5
-         oRbpR/1t7PQLl6/UvRLUOTIuyUdncAL5/yE5RvRusGwe3OTAV4bzbqzSIycPc3wgrc7Z
-         xXohwCCcy8x686DW6W1DdRdUjMuplkiqSIfgzSohbZUIWCFAFgdMzg2Fu0bwH19bQLQC
-         v0Y0RjN2jWDdGlL4XMldpgVLcZnYRtgFTimcVd7fM/3BXXK4SBHfy0G57g8tj+lFZQsy
-         WcihYikQiL7hFjGwoCCFyqEVdzC9ha12z8CvTrg44hsq3cE0bPW0IWtS1VHzafkdHlKW
-         zv1w==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xz5LWSGZs7Pr5mRciViejjBBpWRscqvYm2vCmgGQa5w=;
+        b=WVYRDcra48rl03/kRbdf7tXsccX4U9ciLXcNM6Uy1nnT3ga4+p7WE3P6bBy002XKf+
+         RpFPVP8zmYFadFl1vklvOVmK/fBVSpi7ekkET011bHdwbxUpZZ3bDOTaQ04cpCgZmBoF
+         +4q7T8/H8lpUMfowiOamOYfNFhUpOedXhoi0bMIM27zgd9vHLPA5gTSxWzIvVpVf4OrI
+         tzi60ropbaI0tIBKjKr2Mg85YXWBj4o5vrTCuHSpPlQ9/xm0xDTZn4JR6ALOpuX+8RTD
+         SqQzX/FM0c3uK0VL/YNAMdjd1p2SstFYOA0HtCOPUuhQjPzT7Y7ZX961fVwUIar77OAc
+         cWWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d0/IgShbjb7qZAYWczuxoDmDyDdccuNPQ9P2AVi15HY=;
-        b=0PDBiMK61JszYBdPZ3HBlmY+KWXSmsD4xDk3/H1eEFossjr4yLBlSqxVnOCyx+esON
-         Srj/EiCkSBjzW9nNHcac3g9sy4SVvVxfG+VhIIZQKJ1EwMFv1xU/jU3v/eFbOenifbVn
-         eDaf5So4XJUfT2NxKjj7Rkep2AI27De7oR8fy/FPk+9Dwv5NMrJdfZ9jRAIQN63MCr/q
-         +dMSSO2964kGoB+Iq1CYb+l3hRispKhCvU3w+9YAvIaA7ttr0OqVfaBt88MmwZF7Lajd
-         EVYsii7xXfOm2dhtjoeym/gwjbpu+9C3XjYlhXLGb7OyKdN6UWW4aQTUWkyElgt+F9s7
-         jbwQ==
-X-Gm-Message-State: ANoB5pkQIsesAllBoUddeUCbMk1Pz9HjsH6OQqp8VF8lcIKEME2THs82
-        b5R4rVrDGbZ1uruWYxny0IgsmYbdt80=
-X-Google-Smtp-Source: AA0mqf6105pixBNLmobZKxKFU+O3f3FIJRVWP8gdRjg3LLp/ywJgV6u55Uu/uUndEkpCeXzVhu4ktQ==
-X-Received: by 2002:a05:6214:102a:b0:4bb:8ef1:b544 with SMTP id k10-20020a056214102a00b004bb8ef1b544mr6871877qvr.99.1668280193936;
-        Sat, 12 Nov 2022 11:09:53 -0800 (PST)
-Received: from localhost (user-24-236-74-177.knology.net. [24.236.74.177])
-        by smtp.gmail.com with ESMTPSA id bp44-20020a05620a45ac00b006f956766f76sm3577980qkb.1.2022.11.12.11.09.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Nov 2022 11:09:53 -0800 (PST)
-From:   Yury Norov <yury.norov@gmail.com>
-To:     linux-kernel@vger.kernel.org,
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xz5LWSGZs7Pr5mRciViejjBBpWRscqvYm2vCmgGQa5w=;
+        b=4inxroNMAaP2fSRecEtY0hTN92YlqfhijNwaofCQfq6d3cBc7ZrSp+cYC2G9r+wmyk
+         rTtyLR5IRejMOYWmcjLHyYoPy8LzOwLe5D9taqveUcLDVep3tDi917a1NVaHk9RW49RN
+         49688w4LpuDjax3h+lBWicN5fO+kg/6iEaNjXvxEpJstlJY5cfrjd7TW9T9bfhwd66M5
+         TwQOLaVEzp8WaGDoCgn4840XZL0MUpsHxbDmWSXaTaf03cgPmDKkqeFAva9lhDXJOh7g
+         HIVAa10JrVzgbPGApI50icc0L3QhvEueHFiIESog21pACbAB19+Ki2d8BDWU6ZY+1gtb
+         s07A==
+X-Gm-Message-State: ANoB5plB0DLcD/t36wzPaqQ5SngxNmRxrDGF1BpIwkRfNCDTpPklwf4a
+        HF3/wzsRGTyZEQJ22xyI8x0=
+X-Google-Smtp-Source: AA0mqf54m5FkZs9heZuMngNiDvjHoXHJ1enGSCsU6bs6nbOX79GghVHTWOsVizbFkkI3irpIhrgktQ==
+X-Received: by 2002:a5d:58d4:0:b0:230:7452:53cb with SMTP id o20-20020a5d58d4000000b00230745253cbmr4574223wrf.120.1668325084145;
+        Sat, 12 Nov 2022 23:38:04 -0800 (PST)
+Received: from [192.168.0.105] ([77.126.19.155])
+        by smtp.gmail.com with ESMTPSA id d16-20020a5d6450000000b0022cc0a2cbecsm6268600wrw.15.2022.11.12.23.38.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 12 Nov 2022 23:38:03 -0800 (PST)
+Message-ID: <a8c52fa8-f976-92a0-2948-843476a81efb@gmail.com>
+Date:   Sun, 13 Nov 2022 09:37:59 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH 0/4] cpumask: improve on cpumask_local_spread() locality
+Content-Language: en-US
+To:     Yury Norov <yury.norov@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Barry Song <baohua@kernel.org>,
         Ben Segall <bsegall@google.com>,
-        haniel Bristot de Oliveira <bristot@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
         Dietmar Eggemann <dietmar.eggemann@arm.com>,
         Gal Pressman <gal@nvidia.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Heiko Carstens <hca@linux.ibm.com>,
         Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Jesse Brandeburg <jesse.brandeburg@intel.com>,
         Jonathan Cameron <Jonathan.Cameron@huawei.com>,
@@ -74,92 +80,84 @@ To:     linux-kernel@vger.kernel.org,
         Saeed Mahameed <saeedm@nvidia.com>,
         Steven Rostedt <rostedt@goodmis.org>,
         Tariq Toukan <tariqt@nvidia.com>,
-        Tariq Toukan <ttoukan.linux@gmail.com>,
         Tony Luck <tony.luck@intel.com>,
         Valentin Schneider <vschneid@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Cc:     Yury Norov <yury.norov@gmail.com>, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: [PATCH v2 4/4] cpumask: improve on cpumask_local_spread() locality
-Date:   Sat, 12 Nov 2022 11:09:46 -0800
-Message-Id: <20221112190946.728270-5-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221112190946.728270-1-yury.norov@gmail.com>
-References: <20221112190946.728270-1-yury.norov@gmail.com>
-MIME-Version: 1.0
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+        "open list:HFI1 DRIVER" <linux-rdma@vger.kernel.org>
+References: <20221111040027.621646-1-yury.norov@gmail.com>
+ <20221111082551.7e71fbf4@kernel.org>
+ <CAAH8bW9jG5US0Ymn1wax9tNK3MgZpcWfQsYgu-Km_E+WZw3yiA@mail.gmail.com>
+From:   Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <CAAH8bW9jG5US0Ymn1wax9tNK3MgZpcWfQsYgu-Km_E+WZw3yiA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Switch cpumask_local_spread() to use newly added sched_numa_find_nth_cpu(),
-which takes into account distances to each node in the system.
 
-For the following NUMA configuration:
 
-root@debian:~# numactl -H
-available: 4 nodes (0-3)
-node 0 cpus: 0 1 2 3
-node 0 size: 3869 MB
-node 0 free: 3740 MB
-node 1 cpus: 4 5
-node 1 size: 1969 MB
-node 1 free: 1937 MB
-node 2 cpus: 6 7
-node 2 size: 1967 MB
-node 2 free: 1873 MB
-node 3 cpus: 8 9 10 11 12 13 14 15
-node 3 size: 7842 MB
-node 3 free: 7723 MB
-node distances:
-node   0   1   2   3
-  0:  10  50  30  70
-  1:  50  10  70  30
-  2:  30  70  10  50
-  3:  70  30  50  10
+On 11/11/2022 6:47 PM, Yury Norov wrote:
+> 
+> 
+> On Fri, Nov 11, 2022, 10:25 AM Jakub Kicinski <kuba@kernel.org 
+> <mailto:kuba@kernel.org>> wrote:
+> 
+>     On Thu, 10 Nov 2022 20:00:23 -0800 Yury Norov wrote:
+>      > cpumask_local_spread() currently checks local node for presence
+>     of i'th
+>      > CPU, and then if it finds nothing makes a flat search among all
+>     non-local
+>      > CPUs. We can do it better by checking CPUs per NUMA hops.
+> 
+>     Nice.
+> 
 
-The new cpumask_local_spread() traverses cpus for each node like this:
+Thanks for your series.
+This improves them all, with no changes required to the network device 
+drivers.
 
-node 0:   0   1   2   3   6   7   4   5   8   9  10  11  12  13  14  15
-node 1:   4   5   8   9  10  11  12  13  14  15   0   1   2   3   6   7
-node 2:   6   7   0   1   2   3   8   9  10  11  12  13  14  15   4   5
-node 3:   8   9  10  11  12  13  14  15   4   5   6   7   0   1   2   3
+>      > This series is inspired by Valentin Schneider's "net/mlx5e:
+>     Improve remote
+>      > NUMA preferences used for the IRQ affinity hints"
+>      >
+>      >
+>     https://patchwork.kernel.org/project/netdevbpf/patch/20220728191203.4055-3-tariqt@nvidia.com/ <https://patchwork.kernel.org/project/netdevbpf/patch/20220728191203.4055-3-tariqt@nvidia.com/>
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- lib/cpumask.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/lib/cpumask.c b/lib/cpumask.c
-index c7c392514fd3..255974cd6734 100644
---- a/lib/cpumask.c
-+++ b/lib/cpumask.c
-@@ -110,7 +110,7 @@ void __init free_bootmem_cpumask_var(cpumask_var_t mask)
- #endif
- 
- /**
-- * cpumask_local_spread - select the i'th cpu with local numa cpu's first
-+ * cpumask_local_spread - select the i'th cpu based on NUMA distances
-  * @i: index number
-  * @node: local numa_node
-  *
-@@ -132,15 +132,7 @@ unsigned int cpumask_local_spread(unsigned int i, int node)
- 		if (cpu < nr_cpu_ids)
- 			return cpu;
- 	} else {
--		/* NUMA first. */
--		cpu = cpumask_nth_and(i, cpu_online_mask, cpumask_of_node(node));
--		if (cpu < nr_cpu_ids)
--			return cpu;
--
--		i -= cpumask_weight_and(cpu_online_mask, cpumask_of_node(node));
--
--		/* Skip NUMA nodes, done above. */
--		cpu = cpumask_nth_andnot(i, cpu_online_mask, cpumask_of_node(node));
-+		cpu = sched_numa_find_nth_cpu(cpu_online_mask, i, node);
- 		if (cpu < nr_cpu_ids)
- 			return cpu;
- 	}
--- 
-2.34.1
+Find my very first version here, including the perf testing results:
+https://patchwork.kernel.org/project/netdevbpf/list/?series=660413&state=*
 
+
+>      >
+>      > According to Valentin's measurements, for mlx5e:
+>      >
+>      >       Bottleneck in RX side is released, reached linerate (~1.8x
+>     speedup).
+>      >       ~30% less cpu util on TX.
+>      >
+>      > This patch makes cpumask_local_spread() traversing CPUs based on NUMA
+>      > distance, just as well, and I expect comparabale improvement for its
+>      > users, as in Valentin's case.
+>      >
+
+Right.
+
+>      > I tested it on my VM with the following NUMA configuration:
+> 
+>     nit: the authorship is a bit more complicated, it'd be good to mention
+>     Tariq. Both for the code and attribution of the testing / measurements.
+> 
+> 
+> Sure. Tariq and Valentine please send your tags as appropriate.
+> 
+
+I wonder what fits best here?
+
+As the contribution is based upon previous work that I developed, then 
+probably:
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+
+Thanks,
+Tariq
