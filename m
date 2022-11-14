@@ -2,111 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F9AC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Nov 2022 18:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A39C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Nov 2022 18:38:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238193AbiKNSFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Nov 2022 13:05:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58264 "EHLO
+        id S235995AbiKNSit (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Nov 2022 13:38:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237427AbiKNSEl (ORCPT
+        with ESMTP id S235782AbiKNSig (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2022 13:04:41 -0500
-Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [IPv6:2a01:e0c:1:1599::11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473742C111;
-        Mon, 14 Nov 2022 10:04:22 -0800 (PST)
-Received: from [IPV6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb] (unknown [IPv6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb])
-        by smtp2-g21.free.fr (Postfix) with ESMTPS id EC9A52003D0;
-        Mon, 14 Nov 2022 19:04:13 +0100 (CET)
-Message-ID: <60574e8f-20ff-0996-5558-e9bd35e42681@opteya.com>
-Date:   Mon, 14 Nov 2022 19:04:13 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-From:   Yann Droneaud <ydroneaud@opteya.com>
-Subject: Re: [PATCH v1 3/5] random: add helpers for random numbers with given
- floor or range
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Mon, 14 Nov 2022 13:38:36 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15C610A1;
+        Mon, 14 Nov 2022 10:38:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id F0E4ECE125E;
+        Mon, 14 Nov 2022 18:38:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64680C433C1;
+        Mon, 14 Nov 2022 18:38:29 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hWgqPtZi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1668451107;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uKUJi9cbk9TdF0FmuLuGLjhTZmnTZ6dC4XWfVqw8Lws=;
+        b=hWgqPtZiUEhZyt77/C1ccAVG7AIRCO0qyMkSGT6GXzYETYqyBz45dMxCaE1jy50qU85XlP
+        jxLhj+LIL+iOAN11uBWJsvQ6A+Sh+pEjoqC6CMnG/cM6wZ/YtxMC5J77NNG/8lnMthdOXC
+        2akCyIEFMlGhHMqw5fXGAGGIT1mu9yA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2cc5e0b3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 14 Nov 2022 18:38:26 +0000 (UTC)
+Date:   Mon, 14 Nov 2022 19:38:23 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Yann Droneaud <ydroneaud@opteya.com>
 Cc:     Kees Cook <keescook@chromium.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/5] random: add helpers for random numbers with given
+ floor or range
+Message-ID: <Y3KLH4FqFbJ7bfY0@zx2c4.com>
 References: <20221022014403.3881893-1-Jason@zx2c4.com>
  <20221022014403.3881893-4-Jason@zx2c4.com>
-Content-Language: fr-FR
-Organization: OPTEYA
-In-Reply-To: <20221022014403.3881893-4-Jason@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ <60574e8f-20ff-0996-5558-e9bd35e42681@opteya.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <60574e8f-20ff-0996-5558-e9bd35e42681@opteya.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[resent in text only]
+On Mon, Nov 14, 2022 at 07:04:13PM +0100, Yann Droneaud wrote:
+> I have a bad feeling about this one, and can't help but thinking it's going
+> to bite someone: when asked to pick a number *between* 0 and 10,
+> I usually think I'm allowed to pick 10 (even if I'm going to answer 7 as it should).
 
-Hi,
+This is one of those bikeshed things you see all over the place, like
+whether slices in a language should be [start index, end index] or
+[start index, length], or whether arrays should be 0-based or 1-based.
+We'll never settle this variety of dispute here.
 
+But in this case, there are some particular reasons why it must be this
+way. Firstly, usage of it this way matches most of the ways the function
+is actually used in the kernel, and fits existing semantics. This alone
+I find compelling. But also, having all of these functions use half-open
+intervals means that each function can take care of its entire range,
+without having to resort to using 64-bit arithmetic, and no function is
+a complete subset of any other function. So doing it this way makes
+these maximally useful too.
 
-Le 22/10/2022 à 03:44, Jason A. Donenfeld a écrit :
-> Now that we have get_random_u32_below(), it's trivial to make inline
-> helpers to compute get_random_u32_above() and get_random_u32_between(),
-> which will help clean up open coded loops and manual computations
-> throughout the tree.
->
-> Signed-off-by: Jason A. Donenfeld<Jason@zx2c4.com>
-> ---
->   include/linux/random.h | 24 ++++++++++++++++++++++++
->   1 file changed, 24 insertions(+)
->
-> diff --git a/include/linux/random.h b/include/linux/random.h
-> index 3a82c0a8bc46..92188a74e50e 100644
-> --- a/include/linux/random.h
-> +++ b/include/linux/random.h
-> @@ -91,6 +91,30 @@ static inline u32 get_random_u32_below(u32 ceil)
->   	}
->   }
->   
-> +/*
-> + * Returns a random integer in the interval (floor, U32_MAX], with uniform
-> + * distribution, suitable for all uses. Fastest when floor is a constant, but
-> + * still fast for variable floor as well.
-> + */
-> +static inline u32 get_random_u32_above(u32 floor)
-> +{
-> +	BUILD_BUG_ON_MSG(__builtin_constant_p(floor) && floor == U32_MAX,
-> +			 "get_random_u32_above() must take floor < U32_MAX");
-> +	return floor + 1 + get_random_u32_below(U32_MAX - floor);
-> +}
-> +
-> +/*
-> + * Returns a random integer in the interval [floor, ceil), with uniform
-> + * distribution, suitable for all uses. Fastest when floor and ceil are
-> + * constant, but still fast for variable floor and ceil as well.
-> + */
-> +static inline u32 get_random_u32_between(u32 floor, u32 ceil)
-> +{
-> +	BUILD_BUG_ON_MSG(__builtin_constant_p(floor) && __builtin_constant_p(ceil) &&
-> +			 floor >= ceil, "get_random_u32_above() must take floor < ceil");
-> +	return floor + get_random_u32_below(ceil - floor);
-> +}
+So anyway I think the function has to be defined like this. If you'd
+like to bikeshed over a different name than "between", though, be my
+guest. Maybe you'd like "from" better. But probably "between" is fine,
+and with enough good examples (as my conversion patch does) and the
+clear succinct documentation comment, we should be good.
 
-I have a bad feeling about this one, and can't help but thinking it's going
-to bite someone: when asked to pick a number *between* 0 and 10,
-I usually think I'm allowed to pick 10 (even if I'm going to answer 7 as it should).
-
-Also, regardinghttps://lore.kernel.org/lkml/20221114164558.1180362-4-Jason@zx2c4.com/
-where there's a lot of such changes:
-
-- seqno = get_random_u32_below(data->fc.chain_length) + 1; + seqno = 
-get_random_u32_between(1, data->fc.chain_length + 1); IMHO, having the 
-function returning a value in range [floor, ceil] would simplify the 
-patch: - seqno = get_random_u32_below(data->fc.chain_length) + 1; + 
-seqno = get_random_u32_between(1, data->fc.chain_length);
-
-Regards.
-
--- 
-Yann Droneaud
-OPTEYA
-
+Jason
