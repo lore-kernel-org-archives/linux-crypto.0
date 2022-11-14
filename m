@@ -2,107 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AFFC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Nov 2022 17:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F9AC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Nov 2022 18:05:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237537AbiKNRfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Nov 2022 12:35:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38534 "EHLO
+        id S238193AbiKNSFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Nov 2022 13:05:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237512AbiKNRfe (ORCPT
+        with ESMTP id S237427AbiKNSEl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Nov 2022 12:35:34 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8848623391;
-        Mon, 14 Nov 2022 09:35:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=K1bEu6LvWTU2ExAGlkv+LV4LZM5aPMQ8wzVf8rbOjcY=; b=i/hOOg8D9g633GAnWcZtSrQbCD
-        ZGWVQmc1Wc+hxYX2PDDnuNQSEizqo8zi055fxH/VY4HKiiPtDKCFQuk1iFFEauBh1uvEeYzHLzYHF
-        Lyj5pg+1V1S955h2UtF95/2O9J5D1sO9pfEKtugYpAP1SRqiy4urZt2eagjPIVBAbXPzvl60DgI2S
-        qxUuoF8INS6JQyho+V9EwtEMuVeIIuTcN4g3U32FwSKD+YJoGwkF/BFiipcwZfBsJUYN1qx7+KHDS
-        U60lsRNz53P6RH8pDGpmMeDFOlpORSjYW6kfKJ26FG/2zZHPNRieo47Tb6J6lJQ8q1iiXlGkdNr0o
-        JKqY/exw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35274)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1oudMg-0001BQ-DP; Mon, 14 Nov 2022 17:35:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1oudMW-0003zM-JW; Mon, 14 Nov 2022 17:35:12 +0000
-Date:   Mon, 14 Nov 2022 17:35:12 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Kees Cook <keescook@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] treewide: use get_random_u32_below() instead of
- deprecated function
-Message-ID: <Y3J8UMzytEySbXwt@shell.armlinux.org.uk>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-2-Jason@zx2c4.com>
+        Mon, 14 Nov 2022 13:04:41 -0500
+Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [IPv6:2a01:e0c:1:1599::11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473742C111;
+        Mon, 14 Nov 2022 10:04:22 -0800 (PST)
+Received: from [IPV6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb] (unknown [IPv6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb])
+        by smtp2-g21.free.fr (Postfix) with ESMTPS id EC9A52003D0;
+        Mon, 14 Nov 2022 19:04:13 +0100 (CET)
+Message-ID: <60574e8f-20ff-0996-5558-e9bd35e42681@opteya.com>
+Date:   Mon, 14 Nov 2022 19:04:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221114164558.1180362-2-Jason@zx2c4.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+From:   Yann Droneaud <ydroneaud@opteya.com>
+Subject: Re: [PATCH v1 3/5] random: add helpers for random numbers with given
+ floor or range
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221022014403.3881893-1-Jason@zx2c4.com>
+ <20221022014403.3881893-4-Jason@zx2c4.com>
+Content-Language: fr-FR
+Organization: OPTEYA
+In-Reply-To: <20221022014403.3881893-4-Jason@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 05:45:56PM +0100, Jason A. Donenfeld wrote:
-> This is a simple mechanical transformation done by:
-> 
-> @@
-> expression E;
-> @@
-> - prandom_u32_max
-> + get_random_u32_below
->   (E)
-> 
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Acked-by: Darrick J. Wong <djwong@kernel.org> # for xfs
-> Reviewed-by: SeongJae Park <sj@kernel.org> # for damon
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com> # for infiniband
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+[resent in text only]
+
+Hi,
+
+
+Le 22/10/2022 à 03:44, Jason A. Donenfeld a écrit :
+> Now that we have get_random_u32_below(), it's trivial to make inline
+> helpers to compute get_random_u32_above() and get_random_u32_between(),
+> which will help clean up open coded loops and manual computations
+> throughout the tree.
+>
+> Signed-off-by: Jason A. Donenfeld<Jason@zx2c4.com>
 > ---
->  arch/arm/kernel/process.c                     |  2 +-
+>   include/linux/random.h | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
+>
+> diff --git a/include/linux/random.h b/include/linux/random.h
+> index 3a82c0a8bc46..92188a74e50e 100644
+> --- a/include/linux/random.h
+> +++ b/include/linux/random.h
+> @@ -91,6 +91,30 @@ static inline u32 get_random_u32_below(u32 ceil)
+>   	}
+>   }
+>   
+> +/*
+> + * Returns a random integer in the interval (floor, U32_MAX], with uniform
+> + * distribution, suitable for all uses. Fastest when floor is a constant, but
+> + * still fast for variable floor as well.
+> + */
+> +static inline u32 get_random_u32_above(u32 floor)
+> +{
+> +	BUILD_BUG_ON_MSG(__builtin_constant_p(floor) && floor == U32_MAX,
+> +			 "get_random_u32_above() must take floor < U32_MAX");
+> +	return floor + 1 + get_random_u32_below(U32_MAX - floor);
+> +}
+> +
+> +/*
+> + * Returns a random integer in the interval [floor, ceil), with uniform
+> + * distribution, suitable for all uses. Fastest when floor and ceil are
+> + * constant, but still fast for variable floor and ceil as well.
+> + */
+> +static inline u32 get_random_u32_between(u32 floor, u32 ceil)
+> +{
+> +	BUILD_BUG_ON_MSG(__builtin_constant_p(floor) && __builtin_constant_p(ceil) &&
+> +			 floor >= ceil, "get_random_u32_above() must take floor < ceil");
+> +	return floor + get_random_u32_below(ceil - floor);
+> +}
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk> # for arm
+I have a bad feeling about this one, and can't help but thinking it's going
+to bite someone: when asked to pick a number *between* 0 and 10,
+I usually think I'm allowed to pick 10 (even if I'm going to answer 7 as it should).
 
-Thanks.
+Also, regardinghttps://lore.kernel.org/lkml/20221114164558.1180362-4-Jason@zx2c4.com/
+where there's a lot of such changes:
+
+- seqno = get_random_u32_below(data->fc.chain_length) + 1; + seqno = 
+get_random_u32_between(1, data->fc.chain_length + 1); IMHO, having the 
+function returning a value in range [floor, ceil] would simplify the 
+patch: - seqno = get_random_u32_below(data->fc.chain_length) + 1; + 
+seqno = get_random_u32_between(1, data->fc.chain_length);
+
+Regards.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Yann Droneaud
+OPTEYA
+
