@@ -2,98 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B8EC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Nov 2022 08:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB69C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Nov 2022 09:36:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232786AbiKOImj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 03:42:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51210 "EHLO
+        id S229937AbiKOJg3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Nov 2022 04:36:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbiKOImi (ORCPT
+        with ESMTP id S229644AbiKOJg2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 03:42:38 -0500
-Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [IPv6:2a01:e0c:1:1599::11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41605582;
-        Tue, 15 Nov 2022 00:42:35 -0800 (PST)
-Received: from [IPV6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb] (unknown [IPv6:2a01:e35:39f2:1220:da6c:81de:7fd7:e3eb])
-        by smtp2-g21.free.fr (Postfix) with ESMTPS id 29A2120042C;
-        Tue, 15 Nov 2022 09:42:25 +0100 (CET)
-Message-ID: <9ffb34a9-3cbc-bd0e-7a92-76851a77b9ef@opteya.com>
-Date:   Tue, 15 Nov 2022 09:42:25 +0100
+        Tue, 15 Nov 2022 04:36:28 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186D313DCF;
+        Tue, 15 Nov 2022 01:36:28 -0800 (PST)
+Received: from canpemm500009.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBLdx3c0JzmVwj;
+        Tue, 15 Nov 2022 17:36:05 +0800 (CST)
+Received: from huawei.com (10.67.174.191) by canpemm500009.china.huawei.com
+ (7.192.105.203) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 15 Nov
+ 2022 17:36:26 +0800
+From:   Li Hua <hucool.lihua@huawei.com>
+To:     <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <David.Woodhouse@intel.com>
+CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <weiyongjun1@huawei.com>,
+        <yusongping@huawei.com>, <hucool.lihua@huawei.com>
+Subject: [PATCH] KEYS: asymmetric: Fix build errors as symbol undefined
+Date:   Tue, 15 Nov 2022 18:05:12 +0800
+Message-ID: <20221115100512.20147-1-hucool.lihua@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-From:   Yann Droneaud <ydroneaud@opteya.com>
-Subject: Re: [PATCH v1 3/5] random: add helpers for random numbers with given
- floor or range
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221022014403.3881893-1-Jason@zx2c4.com>
- <20221022014403.3881893-4-Jason@zx2c4.com>
- <60574e8f-20ff-0996-5558-e9bd35e42681@opteya.com>
- <Y3KLH4FqFbJ7bfY0@zx2c4.com>
-Content-Language: fr-FR, en-US
-Organization: OPTEYA
-In-Reply-To: <Y3KLH4FqFbJ7bfY0@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.174.191]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500009.china.huawei.com (7.192.105.203)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+pkcs7_supply_detached_data is called by x509_key_parser module, but not exported:
+    ERROR: modpost: "pkcs7_supply_detached_data" [crypto/asymmetric_keys/x509_key_parser.ko] undefined!
 
-Le 14/11/2022 à 19:38, Jason A. Donenfeld a écrit :
-> On Mon, Nov 14, 2022 at 07:04:13PM +0100, Yann Droneaud wrote:
->> I have a bad feeling about this one, and can't help but thinking it's going
->> to bite someone: when asked to pick a number *between* 0 and 10,
->> I usually think I'm allowed to pick 10 (even if I'm going to answer 7 as it should).
-> This is one of those bikeshed things you see all over the place, like
-> whether slices in a language should be [start index, end index] or
-> [start index, length], or whether arrays should be 0-based or 1-based.
-> We'll never settle this variety of dispute here.
->
-> But in this case, there are some particular reasons why it must be this
-> way. Firstly, usage of it this way matches most of the ways the function
-> is actually used in the kernel, and fits existing semantics. This alone
-> I find compelling. But also, having all of these functions use half-open
-> intervals means that each function can take care of its entire range,
-> without having to resort to using 64-bit arithmetic, and no function is
-> a complete subset of any other function. So doing it this way makes
-> these maximally useful too.
+Fixes: cfc411e7fff3 ("Move certificate handling to its own directory")
+Signed-off-by: Li Hua <hucool.lihua@huawei.com>
+---
+ crypto/asymmetric_keys/pkcs7_verify.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-For get_random_below(), which replaces a modulo, <bikeshedding> and could
-have been called get_random_mod()</bikeshedding>, having an open upper
-range seems fine. It's already what can be achieved by the % operator.
-
-But I believe it's unfortunate get_random_between() cannot be called to
-get a number up to UINT32_MAX, as get_random_between(0, UINT32_MAX) would
-be capped to UINT32_MAX - 1.
-
-When not a constant, one could hope the function can cope with a maximum
-that would grow up to and including UINT32_MAX.
-
-
-> So anyway I think the function has to be defined like this. If you'd
-> like to bikeshed over a different name than "between", though, be my
-> guest. Maybe you'd like "from" better. But probably "between" is fine,
-> and with enough good examples (as my conversion patch does) and the
-> clear succinct documentation comment, we should be good.
-
-That the conversion patch [1] that triggered my comment: I find replacing
-the following rather unpleasing, somewhat uncanny:
-
--get_random_u32_below(1024) + 1 + get_random_u32_between(1, 1024 + 1) I 
-would prefer
-- get_random_u32_below(1024) + 1 + get_random_u32_between(1, 1024) [1]https://lore.kernel.org/lkml/20221114164558.1180362-4-Jason@zx2c4.com/
-
-Regards.
-
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index f6321c785714..4fa769c4bcdb 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -485,3 +485,4 @@ int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
+ 	pkcs7->data_len = datalen;
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(pkcs7_supply_detached_data);
 -- 
-Yann Droneaud
-OPTEYA
+2.17.1
 
