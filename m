@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E964AC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Nov 2022 15:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10224C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Nov 2022 16:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbiKOPWl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 10:22:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55196 "EHLO
+        id S238656AbiKOQ1Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Nov 2022 11:27:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231210AbiKOPWk (ORCPT
+        with ESMTP id S238655AbiKOQ1S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 10:22:40 -0500
+        Tue, 15 Nov 2022 11:27:18 -0500
 Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D90F18374;
-        Tue, 15 Nov 2022 07:22:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D94228E1C;
+        Tue, 15 Nov 2022 08:27:17 -0800 (PST)
 Received: from zn.tnic (p200300ea9733e7da329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e7da:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AFEEB1EC02F2;
-        Tue, 15 Nov 2022 16:22:37 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0DB91EC02AD;
+        Tue, 15 Nov 2022 17:27:15 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1668525757;
+        t=1668529636;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=B64mdOFdT9uTOfYjl9ll3tHMRZvvBJ1CeVd454LiI/w=;
-        b=pFcmHugbADL2DSRItZt5Vs6GYiAwP5C4H7GwzbzykfoflNfCHtY31ltt1srrkXZ8fdm5CM
-        qCtoY3uier2iX7TxnpLGBJO3tX/QDKE70/Wc34RhyUpm6UC0WfS6wgMW5ahFVGVMMa+DnH
-        NpK0pB/JVpKsAKoozrLB9VdwGTq4fEU=
-Date:   Tue, 15 Nov 2022 16:22:37 +0100
+        bh=rqKIUpJn3nuSltSmzhMF2AZfwfkeGnGGGviR3ix9tLg=;
+        b=mejjCFr9kN4KR9WGJSUq/Be8o4tEwH/lc5S4fwqi2vbY822ufKa0pQR5vK6vWnDWoXFJEg
+        uw11kiWVcBoHglbEPF8K6WOiFUS2d8AorPN5Nys5XjJuAAy0CRlcecCpx++70Jjg96KZQX
+        V2sGDC+J4ua9VYHLBcwPcohp3KOjn/Y=
+Date:   Tue, 15 Nov 2022 17:27:12 +0100
 From:   Borislav Petkov <bp@alien8.de>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     "Kalra, Ashish" <ashish.kalra@amd.com>, x86@kernel.org,
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     Vlastimil Babka <vbabka@suse.cz>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
@@ -52,9 +52,8 @@ Cc:     "Kalra, Ashish" <ashish.kalra@amd.com>, x86@kernel.org,
         Oscar Salvador <osalvador@suse.de>
 Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
  allocation when SNP is enabled
-Message-ID: <Y3OuvXCjttfFh++w@zn.tnic>
-References: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
+Message-ID: <Y3O94GPUECo+Gg6T@zn.tnic>
+References: <Y0grhk1sq2tf/tUl@zn.tnic>
  <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
  <Y1e5oC9QyDlKpxZ9@zn.tnic>
  <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
@@ -63,24 +62,26 @@ References: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalr
  <Y2JS7kn8Q9P4rXso@zn.tnic>
  <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
  <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
+ <Y3OuvXCjttfFh++w@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
+In-Reply-To: <Y3OuvXCjttfFh++w@zn.tnic>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 04:14:42PM +0100, Vlastimil Babka wrote:
->  but maybe we could just put the pages on some leaked lists without
-> special page? The only thing that should matter is not to free the
-> pages to the page allocator so they would be reused by something else.
+And,
 
-As said on IRC, I like this a *lot*. This perfectly represents what
-those leaked pages are: leaked, cannot be used and lost. Certainly not
-hwpoisoned.
+as dhansen connected the dots, this should be the exact same protection
+scenario as UPM:
 
-Yeah, that's much better.
+https://lore.kernel.org/all/20221025151344.3784230-1-chao.p.peng@linux.intel.com
+
+so you should be able to mark them inaccessible the same way and you
+won't need any poisoning dance.
+
+And Michael has patches so you probably should talk to him...
 
 Thx.
 
