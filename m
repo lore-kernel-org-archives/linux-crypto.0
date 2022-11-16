@@ -2,191 +2,193 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B022C43217
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E234C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbiKPEOW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 23:14:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54068 "EHLO
+        id S231657AbiKPEOY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Nov 2022 23:14:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231231AbiKPEOR (ORCPT
+        with ESMTP id S231812AbiKPEOT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 23:14:17 -0500
+        Tue, 15 Nov 2022 23:14:19 -0500
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875551E3D2;
-        Tue, 15 Nov 2022 20:14:15 -0800 (PST)
-Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3NI1w017091;
-        Wed, 16 Nov 2022 04:13:58 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C49A2CDCC;
+        Tue, 15 Nov 2022 20:14:17 -0800 (PST)
+Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3Ncm8026856;
+        Wed, 16 Nov 2022 04:14:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=3j25tB+SFVCOvqm6qX5iPWKXOvcRNIYcxNjwjiDX4a8=;
- b=LRUZs/0SaEY+kayj+DDxTXlbmF3wIv/oFNc2q24RoGuzdRHS1niYQLueLGhgvG1In5V9
- CWuBQnfObsWSPGMJxBydQa1drUh93qIUO3bgwk5uxKJhveDFg0LiDgZ+QxJMz+pYMnxC
- ccmKmchjru+PtYb/9RgSuqgTAJ+eu3jtGhG76VXTqEcc8doCzg03H3a7UIMScdIrGnau
- TkRfYiSFyqjvWFdXCCSHBvaShTeCJRnZ9nT1A87Mg/21FzVl8cinnpo0tgsvOZLAH5B0
- wqscSZm2siUvCYkiERapmzWrpPPAWLPgUBvF5pl5hBH/0YzwZ+f31djMfz97f90MJvSP qA== 
+ bh=cTTNWZf0gsaOChSSwVwJsJGsUpzhNtRL8Yvh4fEQViw=;
+ b=oCuOJ54erZ91/ohmsoPTEJnfhsBH1vjmh1haz6V7DtH9adN81WnwEZ9Bp+lnpyziuKTr
+ 76WR0CsARrKK6EjpLsNa+IilhpmXSvAzfDdL9puh45aSwhSpogkAs7M/MB70t5wYX1wj
+ VscpfEGI5LwWWXoW9bgT7wEzFA7VwV74/9w7Wbhb/dlbO3KM11ltNMQvu55xKrpilzuE
+ OEWTH1C3FMwrFKK7EQuiiFWxXfZhYx8YKlCviIwyQont3q9oo+H/O73LAUgtgkxZfBC0
+ DHWX+sHlU2OVRdACoTBKKRufgjwfv0ueaVkb2Wt3H69ilTNiOle2yhb0KVcV3Afkb/k0 5g== 
 Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvqwa0ahg-1
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvqwqgabd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 04:13:57 +0000
+        Wed, 16 Nov 2022 04:14:07 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 18781295AF;
-        Wed, 16 Nov 2022 04:13:57 +0000 (UTC)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 1BFFF4B5DC;
+        Wed, 16 Nov 2022 04:14:06 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 9AF4E8065DB;
-        Wed, 16 Nov 2022 04:13:56 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id A22BE808BA7;
+        Wed, 16 Nov 2022 04:14:05 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v4 03/24] crypto: tcrypt - reschedule during cycles speed tests
-Date:   Tue, 15 Nov 2022 22:13:21 -0600
-Message-Id: <20221116041342.3841-4-elliott@hpe.com>
+Subject: [PATCH v4 11/24] crypto: x86/aegis - limit FPU preemption
+Date:   Tue, 15 Nov 2022 22:13:29 -0600
+Message-Id: <20221116041342.3841-12-elliott@hpe.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221116041342.3841-1-elliott@hpe.com>
 References: <20221103042740.6556-1-elliott@hpe.com>
  <20221116041342.3841-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: w3xWmJxEGL3OmJ9_6so6C6l3Ufati3Qh
-X-Proofpoint-ORIG-GUID: w3xWmJxEGL3OmJ9_6so6C6l3Ufati3Qh
+X-Proofpoint-ORIG-GUID: _Ez51FyL3s9E__eU_HvQXPq7PEMUgsSQ
+X-Proofpoint-GUID: _Ez51FyL3s9E__eU_HvQXPq7PEMUgsSQ
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-15_08,2022-11-15_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- phishscore=0 suspectscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
- mlxlogscore=999 spamscore=0 lowpriorityscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211160029
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ impostorscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211160029
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-commit 2af632996b89 ("crypto: tcrypt - reschedule during speed tests")
-added cond_resched() calls to "Avoid RCU stalls in the case of
-non-preemptible kernel and lengthy speed tests by rescheduling when
-advancing from one block size to another."
+Make kernel_fpu_begin() and kernel_fpu_end() calls around each
+assembly language function that uses FPU context, rather than
+around the entire set (init, ad, crypt, final).
 
-It only makes those calls if the sec module parameter is used
-(run the speed test for a certain number of seconds), not the
-default "cycles" mode.
+Limit the processing of bulk data based on a module parameter,
+so multiple blocks are processed within one FPU context
+(associated data is not limited).
 
-Expand those to also run in "cycles" mode to reduce the rate
-of rcu stall warnings:
-  rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks:
+Allow the skcipher_walk functions to sleep again, since they are
+is no longer called inside FPU context.
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Tested-by: Taehee Yoo <ap420073@gmail.com>
+Motivation: calling crypto_aead_encrypt() with a single scatter-gather
+list entry pointing to a 1 MiB plaintext buffer caused the aesni_encrypt
+function to receive a length of 1048576 bytes and consume 306348 cycles
+within FPU context to process that data.
+
+Fixes: 1d373d4e8e15 ("crypto: x86 - Add optimized AEGIS implementations")
+Fixes: ba6771c0a0bc ("crypto: x86/aegis - fix handling chunked inputs and MAY_SLEEP")
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- crypto/tcrypt.c | 44 ++++++++++++++++++--------------------------
- 1 file changed, 18 insertions(+), 26 deletions(-)
+ arch/x86/crypto/aegis128-aesni-glue.c | 39 ++++++++++++++++++++-------
+ 1 file changed, 29 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 7a6a56751043..c025ba26b663 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -408,14 +408,13 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
+index 4623189000d8..6e96bdda2811 100644
+--- a/arch/x86/crypto/aegis128-aesni-glue.c
++++ b/arch/x86/crypto/aegis128-aesni-glue.c
+@@ -23,6 +23,9 @@
+ #define AEGIS128_MIN_AUTH_SIZE 8
+ #define AEGIS128_MAX_AUTH_SIZE 16
  
++/* avoid kernel_fpu_begin/end scheduler/rcu stalls */
++static const unsigned int bytes_per_fpu = 4 * 1024;
++
+ asmlinkage void crypto_aegis128_aesni_init(void *state, void *key, void *iv);
+ 
+ asmlinkage void crypto_aegis128_aesni_ad(
+@@ -85,15 +88,19 @@ static void crypto_aegis128_aesni_process_ad(
+ 			if (pos > 0) {
+ 				unsigned int fill = AEGIS128_BLOCK_SIZE - pos;
+ 				memcpy(buf.bytes + pos, src, fill);
+-				crypto_aegis128_aesni_ad(state,
++				kernel_fpu_begin();
++				crypto_aegis128_aesni_ad(state->blocks,
+ 							 AEGIS128_BLOCK_SIZE,
+ 							 buf.bytes);
++				kernel_fpu_end();
+ 				pos = 0;
+ 				left -= fill;
+ 				src += fill;
  			}
  
--			if (secs) {
-+			if (secs)
- 				ret = test_mb_aead_jiffies(data, enc, bs,
- 							   secs, num_mb);
--				cond_resched();
--			} else {
-+			else
- 				ret = test_mb_aead_cycles(data, enc, bs,
- 							  num_mb);
--			}
-+			cond_resched();
+-			crypto_aegis128_aesni_ad(state, left, src);
++			kernel_fpu_begin();
++			crypto_aegis128_aesni_ad(state->blocks, left, src);
++			kernel_fpu_end();
  
- 			if (ret) {
- 				pr_err("%s() failed return code=%d\n", e, ret);
-@@ -661,13 +660,11 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 					       bs + (enc ? 0 : authsize),
- 					       iv);
+ 			src += left & ~(AEGIS128_BLOCK_SIZE - 1);
+ 			left &= AEGIS128_BLOCK_SIZE - 1;
+@@ -110,7 +117,9 @@ static void crypto_aegis128_aesni_process_ad(
  
--			if (secs) {
--				ret = test_aead_jiffies(req, enc, bs,
--							secs);
--				cond_resched();
--			} else {
-+			if (secs)
-+				ret = test_aead_jiffies(req, enc, bs, secs);
-+			else
- 				ret = test_aead_cycles(req, enc, bs);
--			}
-+			cond_resched();
+ 	if (pos > 0) {
+ 		memset(buf.bytes + pos, 0, AEGIS128_BLOCK_SIZE - pos);
+-		crypto_aegis128_aesni_ad(state, AEGIS128_BLOCK_SIZE, buf.bytes);
++		kernel_fpu_begin();
++		crypto_aegis128_aesni_ad(state->blocks, AEGIS128_BLOCK_SIZE, buf.bytes);
++		kernel_fpu_end();
+ 	}
+ }
  
- 			if (ret) {
- 				pr_err("%s() failed return code=%d\n", e, ret);
-@@ -917,14 +914,13 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
+@@ -119,15 +128,23 @@ static void crypto_aegis128_aesni_process_crypt(
+ 		const struct aegis_crypt_ops *ops)
+ {
+ 	while (walk->nbytes >= AEGIS128_BLOCK_SIZE) {
+-		ops->crypt_blocks(state,
+-				  round_down(walk->nbytes, AEGIS128_BLOCK_SIZE),
++		unsigned int chunk = min(walk->nbytes, bytes_per_fpu);
++
++		chunk = round_down(chunk, AEGIS128_BLOCK_SIZE);
++
++		kernel_fpu_begin();
++		ops->crypt_blocks(state->blocks, chunk,
+ 				  walk->src.virt.addr, walk->dst.virt.addr);
+-		skcipher_walk_done(walk, walk->nbytes % AEGIS128_BLOCK_SIZE);
++		kernel_fpu_end();
++
++		skcipher_walk_done(walk, walk->nbytes - chunk);
+ 	}
  
- 		ahash_request_set_crypt(req, sg, output, speed[i].plen);
+ 	if (walk->nbytes) {
+-		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
++		kernel_fpu_begin();
++		ops->crypt_tail(state->blocks, walk->nbytes, walk->src.virt.addr,
+ 				walk->dst.virt.addr);
++		kernel_fpu_end();
+ 		skcipher_walk_done(walk, 0);
+ 	}
+ }
+@@ -172,15 +189,17 @@ static void crypto_aegis128_aesni_crypt(struct aead_request *req,
+ 	struct skcipher_walk walk;
+ 	struct aegis_state state;
  
--		if (secs) {
-+		if (secs)
- 			ret = test_ahash_jiffies(req, speed[i].blen,
- 						 speed[i].plen, output, secs);
--			cond_resched();
--		} else {
-+		else
- 			ret = test_ahash_cycles(req, speed[i].blen,
- 						speed[i].plen, output);
--		}
-+		cond_resched();
+-	ops->skcipher_walk_init(&walk, req, true);
++	ops->skcipher_walk_init(&walk, req, false);
  
- 		if (ret) {
- 			pr_err("hashing failed ret=%d\n", ret);
-@@ -1184,15 +1180,14 @@ static void test_mb_skcipher_speed(const char *algo, int enc, int secs,
- 							   cur->sg, bs, iv);
- 			}
+ 	kernel_fpu_begin();
++	crypto_aegis128_aesni_init(&state.blocks, ctx->key.bytes, req->iv);
++	kernel_fpu_end();
  
--			if (secs) {
-+			if (secs)
- 				ret = test_mb_acipher_jiffies(data, enc,
- 							      bs, secs,
- 							      num_mb);
--				cond_resched();
--			} else {
-+			else
- 				ret = test_mb_acipher_cycles(data, enc,
- 							     bs, num_mb);
--			}
-+			cond_resched();
+-	crypto_aegis128_aesni_init(&state, ctx->key.bytes, req->iv);
+ 	crypto_aegis128_aesni_process_ad(&state, req->src, req->assoclen);
+ 	crypto_aegis128_aesni_process_crypt(&state, &walk, ops);
+-	crypto_aegis128_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
  
- 			if (ret) {
- 				pr_err("%s() failed flags=%x\n", e,
-@@ -1401,14 +1396,11 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
++	kernel_fpu_begin();
++	crypto_aegis128_aesni_final(&state.blocks, tag_xor, req->assoclen, cryptlen);
+ 	kernel_fpu_end();
+ }
  
- 			skcipher_request_set_crypt(req, sg, sg, bs, iv);
- 
--			if (secs) {
--				ret = test_acipher_jiffies(req, enc,
--							   bs, secs);
--				cond_resched();
--			} else {
--				ret = test_acipher_cycles(req, enc,
--							  bs);
--			}
-+			if (secs)
-+				ret = test_acipher_jiffies(req, enc, bs, secs);
-+			else
-+				ret = test_acipher_cycles(req, enc, bs);
-+			cond_resched();
- 
- 			if (ret) {
- 				pr_err("%s() failed flags=%x\n", e,
 -- 
 2.38.1
 
