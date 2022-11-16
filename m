@@ -2,71 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9690FC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 11:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF985C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 11:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230442AbiKPLbV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 06:31:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51168 "EHLO
+        id S233312AbiKPLhl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 06:37:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237931AbiKPLar (ORCPT
+        with ESMTP id S239163AbiKPLg7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 06:30:47 -0500
+        Wed, 16 Nov 2022 06:36:59 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C8D31033;
-        Wed, 16 Nov 2022 03:19:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B7951C2E;
+        Wed, 16 Nov 2022 03:26:07 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7EF161CCB;
-        Wed, 16 Nov 2022 11:19:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1722C433D6;
-        Wed, 16 Nov 2022 11:19:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2055361CFF;
+        Wed, 16 Nov 2022 11:26:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53730C433C1;
+        Wed, 16 Nov 2022 11:26:05 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RYhLS4HY"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mcP6Fk7r"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668597580;
+        t=1668597963;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6aTacRSOW2cWRX+axKPWZgBes5QK7CSYjTPlhqVOCO8=;
-        b=RYhLS4HYaHxihQYVM1R+CzqlOPL90sTaI7vmGV3QtXlWibp1bi8awrU+FuAA2eQdgS6KFl
-        XZ9rv7hWQ63Z3YQqQyY944TJgpvfbO6hddteDl+zJt34IPDprA4zN0NcVZ2ANML7h5MBRK
-        l9HZAKt7noEUSk0XtSj1eGNRy1C4/Gs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 412042da (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 16 Nov 2022 11:19:40 +0000 (UTC)
-Date:   Wed, 16 Nov 2022 12:19:38 +0100
+        bh=NHhqvFQ5r0anWMx+9slZK6tVQP3dyCKSR+RxTtYRrmg=;
+        b=mcP6Fk7r7H+2tdZmTuha/S5We8nfoRWo6qc7lCiulf31/juAQ86eiiZN3t4ns8nSP+vWbq
+        hmM261s8VwnS0ryyccthoS5RS59GGEsTmzisU+Fj8d1qGIzJOITdTNqmBQa1gul3dd/lG1
+        XH75Anwak5x40AeeLnJ1lk49p+Lefmk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ccbc54fa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 16 Nov 2022 11:26:02 +0000 (UTC)
+Date:   Wed, 16 Nov 2022 12:26:00 +0100
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Robert Elliott <elliott@hpe.com>
 Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         David.Laight@ACULAB.COM, ebiggers@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 17/24] crypto: x86/poly - load based on CPU features
-Message-ID: <Y3THSmvuZlq2+hky@zx2c4.com>
+Subject: Re: [PATCH v4 21/24] crypto: x86 - report used CPU features via
+ module parameters
+Message-ID: <Y3TIyAjV5i02W9z5@zx2c4.com>
 References: <20221103042740.6556-1-elliott@hpe.com>
  <20221116041342.3841-1-elliott@hpe.com>
- <20221116041342.3841-18-elliott@hpe.com>
+ <20221116041342.3841-22-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221116041342.3841-18-elliott@hpe.com>
+In-Reply-To: <20221116041342.3841-22-elliott@hpe.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 10:13:35PM -0600, Robert Elliott wrote:
-> +static const struct x86_cpu_id module_cpu_ids[] = {
-> +	X86_MATCH_FEATURE(X86_FEATURE_ANY, NULL),
-> +	{}
-> +};
-> +MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
-> +
->  static int __init poly1305_simd_mod_init(void)
->  {
-> +	if (!x86_match_cpu(module_cpu_ids))
-> +		return -ENODEV;
+On Tue, Nov 15, 2022 at 10:13:39PM -0600, Robert Elliott wrote:
+> For modules that have multiple choices, add read-only module parameters
+> reporting which CPU features a module is using.
+> 
+> The parameters show up as follows for modules that modify the behavior
+> of their registered drivers or register additional drivers for
+> each choice:
+>     /sys/module/aesni_intel/parameters/using_x86_avx:1
+>     /sys/module/aesni_intel/parameters/using_x86_avx2:1
+>     /sys/module/aria_aesni_avx_x86_64/parameters/using_x86_gfni:0
+>     /sys/module/chacha_x86_64/parameters/using_x86_avx2:1
+>     /sys/module/chacha_x86_64/parameters/using_x86_avx512:1
+>     /sys/module/crc32c_intel/parameters/using_x86_pclmulqdq:1
+>     /sys/module/curve25519_x86_64/parameters/using_x86_adx:1
+>     /sys/module/libblake2s_x86_64/parameters/using_x86_avx512:1
+>     /sys/module/libblake2s_x86_64/parameters/using_x86_ssse3:1
+>     /sys/module/poly1305_x86_64/parameters/using_x86_avx:1
+>     /sys/module/poly1305_x86_64/parameters/using_x86_avx2:1
+>     /sys/module/poly1305_x86_64/parameters/using_x86_avx512:0
+>     /sys/module/sha1_ssse3/parameters/using_x86_avx:1
+>     /sys/module/sha1_ssse3/parameters/using_x86_avx2:1
+>     /sys/module/sha1_ssse3/parameters/using_x86_shani:0
+>     /sys/module/sha1_ssse3/parameters/using_x86_ssse3:1
+>     /sys/module/sha256_ssse3/parameters/using_x86_avx:1
+>     /sys/module/sha256_ssse3/parameters/using_x86_avx2:1
+>     /sys/module/sha256_ssse3/parameters/using_x86_shani:0
+>     /sys/module/sha256_ssse3/parameters/using_x86_ssse3:1
+>     /sys/module/sha512_ssse3/parameters/using_x86_avx:1
+>     /sys/module/sha512_ssse3/parameters/using_x86_avx2:1
+>     /sys/module/sha512_ssse3/parameters/using_x86_ssse3:1
 
-What exactly does this accomplish? Isn't this just a no-op?
+Isn't chacha missing?
 
-Jason
+However, what's the point of any of this? Who benefits from this info?
+If something seems slow, I'll generally look at perf top, which provides
+this same thing.
+
+Also, "using" isn't quite correct. Some AVX2 machines will never use any
+ssse3 instructions, despite the code being executable.
+
+> 
+> Delete the aesni_intel prints reporting those selections:
+>     pr_info("AVX2 version of gcm_enc/dec engaged.\n");
+
+This part I like.
+
+> +module_param_named(using_x86_adx, curve25519_use_bmi2_adx.key.enabled.counter, int, 0444);
+> +MODULE_PARM_DESC(using_x86_adx, "Using x86 instruction set extensions: ADX");
+
+And BMI2, not just ADX.
