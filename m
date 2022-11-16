@@ -2,73 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3792C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 20:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD47C43217
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 22:43:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232341AbiKPUIc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 15:08:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
+        id S234393AbiKPWnj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 17:43:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232557AbiKPUIb (ORCPT
+        with ESMTP id S234460AbiKPWn2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 15:08:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78672BF0;
-        Wed, 16 Nov 2022 12:08:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A171EB81D83;
-        Wed, 16 Nov 2022 20:08:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E42EAC433D6;
-        Wed, 16 Nov 2022 20:08:25 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gi1c1/+Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668629302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L+lac/9Nxb5wUqkltEH21OF/Yf9EDeqLnEARlz2sdDc=;
-        b=gi1c1/+YTN6caDPSNaF4jbxVz1ku9QzNsV+SE4KyBXhEWC1kYzzbiSa9uqBm5u3OC4sCYn
-        vLTn9E3EZNIek1knqMNs7ffLz3a2N4soKS6vWIfWQ9PndXWJvhvGeBW9HeTYZzYn4abA2G
-        q111OWcr1tKaBAr9X52t7BstgyVujaM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5465c683 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 16 Nov 2022 20:08:22 +0000 (UTC)
-Received: by mail-vk1-f181.google.com with SMTP id b81so8862979vkf.1;
-        Wed, 16 Nov 2022 12:08:22 -0800 (PST)
-X-Gm-Message-State: ANoB5pmQ6JwVFVqIzfpKwJQsYBHlQxVYbnC/OVAXEoLrAdjXrT6B6UhT
-        2LbLXOuelXpOzowxcSWqHopxsdwlVDFcs2mnawc=
-X-Google-Smtp-Source: AA0mqf7dAEsP77ebcrTPJrzxfnhbd/CrgIqF4+nvPipC3MN0yy0SWr3tJsJhyxTSvQVUB65cCeWO+il4UaJXLljsGss=
-X-Received: by 2002:a05:6122:1883:b0:376:5afd:d30c with SMTP id
- bi3-20020a056122188300b003765afdd30cmr13534613vkb.13.1668629302032; Wed, 16
- Nov 2022 12:08:22 -0800 (PST)
+        Wed, 16 Nov 2022 17:43:28 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198556BDD6
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 14:43:15 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id b11so14374pjp.2
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 14:43:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wf2gFJO0eZI55pjXm8OYjMYkGLte7QuRao7+IuvSaqE=;
+        b=D2amVl9V9KQfzLW2zaIS23IBouuPji7hB+OAx+ZhW9BBCDB5OKBikMdNxb0VPTDxJj
+         csClJ0YRCWBC/mBx5CM8cmRfxBeg4UGIi36VQSyP9C8PzSygpHTtXYMcx806fNdiiKsi
+         DAssScFkYAwJ1pFNUcIn3ZWqN1hBHz6LpWnys=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wf2gFJO0eZI55pjXm8OYjMYkGLte7QuRao7+IuvSaqE=;
+        b=7vGzCZS7c2EMPWx8NprOLgvlfg9hAfpx2GlOlAcJ3op+TFrKYmOxFfTs2DQQ9Go7S5
+         Yv2VARKHEw5heRti3s3VKyXpY094/eL33/xjpcg9YU57d11lYqhhSqw9UaxawbLe9pq6
+         oq1NSCL2MlYLvXiIIA2cWxXSdJ9Pb17+q3n+xNHxLzZq04yryWN/6rcf4l+s/OGoYGFC
+         L3qGKM591TxRsmpgAGcoJhmYRDMKwPlwM8vwQL3OnU8BlWGx5iiM3/wJKFRrDI1xhce4
+         9ZSCK5ZscxdS/ZnSt5AIFNxbclPLIHPP6r9qHG0fktZTboaXs6wrl29QDJl5Bts5FyMX
+         oPEw==
+X-Gm-Message-State: ANoB5pl65hSx8g/4P2vi8LMWYU750QUodPXcurbxFaj28QYHWBsrQF3/
+        hrVw9KFG38ubP5bv1tuf9fKPIg==
+X-Google-Smtp-Source: AA0mqf5VxV4Cbn3MvfOzCKh9TKzLZskissYVmNmiO/kVOhEqnlwi5i8J4bomSjPXRjnnkIIEn4wz5w==
+X-Received: by 2002:a17:90b:3c42:b0:213:1ce7:d962 with SMTP id pm2-20020a17090b3c4200b002131ce7d962mr6007688pjb.63.1668638594628;
+        Wed, 16 Nov 2022 14:43:14 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id a9-20020a170902710900b00183c6784704sm12680746pll.291.2022.11.16.14.43.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 14:43:14 -0800 (PST)
+Date:   Wed, 16 Nov 2022 14:43:13 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
+ possible
+Message-ID: <202211161436.A45AD719A@keescook>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221114164558.1180362-4-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <20221116161642.1670235-1-Jason@zx2c4.com> <20221116161642.1670235-6-Jason@zx2c4.com>
- <CAMj1kXHZ60DCz6zgOqfQ-jBEuhc3XwvhieNbJUCY40hdEWt9CQ@mail.gmail.com> <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
-In-Reply-To: <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 16 Nov 2022 21:08:10 +0100
-X-Gmail-Original-Message-ID: <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
-Message-ID: <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 5/6] efi: efivarfs: prohibit reading random seed variables
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-efi@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114164558.1180362-4-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 16, 2022 at 8:42 PM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
-> It would be nice if they could be boot services only ... then they
-> disappear naturally, but that would mean the rng would have to
-> initialize and save in the EFI stub before ExitBootServices, which
-> doesn't seem practical.
+On Mon, Nov 14, 2022 at 05:45:58PM +0100, Jason A. Donenfeld wrote:
+> -				(get_random_u32_below(1024) + 1) * PAGE_SIZE;
+> +				get_random_u32_between(1, 1024 + 1) * PAGE_SIZE;
 
-That would be nice, but the whole idea is it gets updated by Linux's
-RNG, so that won't work. `boot|runtime` it is, then.
+I really don't like "between". Can't this be named "inclusive" (and
+avoid adding 1 everywhere, which seems ugly), or at least named
+something less ambiguous?
 
-Jason
+> -		n = get_random_u32_below(100) + 1;
+> +		n = get_random_u32_between(1, 101);
+
+Because I find this much less readable. "Below 100" is clear: 0-99
+inclusive, plus 1, so 1-100 inclusive. "Between 1 and 101" is not obvious
+to me to mean: 1-100 inclusive.
+
+These seem so much nicer:
+	get_random_u32_inclusive(1, 1024)
+	get_random_u32_inclusive(1, 100)
+
+-- 
+Kees Cook
