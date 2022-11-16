@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 452F2C4167B
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 11:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95DDC43219
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 12:00:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbiKPL5s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 06:57:48 -0500
+        id S233116AbiKPMA1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 07:00:27 -0500
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239275AbiKPL5Y (ORCPT
+        with ESMTP id S235900AbiKPMAC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 06:57:24 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F1BA2CE35
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 03:49:33 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id t10so21529793ljj.0
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 03:49:33 -0800 (PST)
+        Wed, 16 Nov 2022 07:00:02 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E1C528A0
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 03:52:09 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id u11so21440582ljk.6
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Nov 2022 03:52:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=D4yQuD++gHc/GHIwBktSITQt5Jig/BfC/opKH/PnkSM=;
-        b=BX2kZt1rlLhnmA9uX9tCVWARUnGOnsUT/L56si9opqSB0mmmkQ+Rgd0KfWXSOMl0zO
-         vZW57IhT79BFGGV0yfoKw7Cra9dYPt6soKnGIA+D+HA9OvXSxm+c7TE4o6bs5kGVtA0L
-         5dJavtQwH+jaPJdV8X74Gbb5OwAYFQxf7cTnbQ1oLGKaZuJivFaSt37yjZ8y3RW8jMdh
-         10hVfO+993wwv6bJ3K6L4zmbL2nXwOTPtXHDGJgjWjmjRT7pDRWFPaw3sImKXAkAReOd
-         U6Na5K2H7pXhWAXb9XWnPGk/aQDy1ctat+OCF5Tu2GwbWV/MovuiaPLqlacF0AQ0QOat
-         fKvQ==
+        bh=9l4mQv9bpo9LzKh5UykNs3/PvBpNgjAZ8H6ymHxaNGo=;
+        b=qJGuaKdHbo2gV1Gg1Uu5x7IHAm1tLva5UrbbDI5QDEjpDJYvJHijTlpFVbK1gEkx/Y
+         DEFQ6wW6A+vms0D3V1CU3c7sF10nXfSNZU25BKvbRbZSU8fOnBGu7gutvlqYG5S0qWdU
+         iPoNYwJ7rtkPoLsB5NCV9BbJcoZAbRxt39pTOC0hNjktdM2edzn/JXrpiK7nsBcLqNnL
+         T7Ci7ZLV3l48QSTP1/24oWiGROfwbh+8Mp2JPDUYHvalzjVRFDqmR0o44EmCeT/qStE8
+         q2+6An13wpGskmpS3lsmuKE2IodXou4oQRCI0OtUEEoFw27OrdIdbardCIU7ne6Ii0zo
+         OUZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D4yQuD++gHc/GHIwBktSITQt5Jig/BfC/opKH/PnkSM=;
-        b=doHefJb/8k2b7tA+Q9BrQM9hQE0BRcPepqP3MSYSDHL08oSwYOv9dDQLQoh3VJ78Yg
-         HmR5bxhDGoap9tvkPlFsJrAyLS1izWcAdy+LuqVXoMa9kTgUyzd+1lP8S7XTgs9M3NQh
-         nNs+6HDp0xCut0wkXi7ad6epeVC6mmxPIFqzYqxBXSZgPeozayIf/qJ8mMuuWUqU/181
-         xD2ugwFy9U1jSQLysKbr27/kSB4E65Q2J80werTXsi6BSyjgWVu/rTiPWEiVrbGd8Ufw
-         racRRENR6ffGUC67sWlxxeAjUW1Me/9Yp3/czMxCLChGsHqmZSjrtsaTirtRrqWwNkoi
-         2cVw==
-X-Gm-Message-State: ANoB5pnUZnDbAfyY1Q3bS5cAjVilrVzxMuaPJ1Jnuej9ZSCSjRzs7Wzf
-        zdlnG8bblydtqaP+QQYkCwjgBg==
-X-Google-Smtp-Source: AA0mqf76HRCov0FT6yjAI+NG83nlIDMQsyrRZ3GksITd7qJmgy2BlU2UzFWnoblRuWHCEm/1/NrGVg==
-X-Received: by 2002:a05:651c:1308:b0:277:70fb:8576 with SMTP id u8-20020a05651c130800b0027770fb8576mr7038093lja.106.1668599371557;
-        Wed, 16 Nov 2022 03:49:31 -0800 (PST)
+        bh=9l4mQv9bpo9LzKh5UykNs3/PvBpNgjAZ8H6ymHxaNGo=;
+        b=UIksiX75VcZtUBbBtCxbiZzjRf/fVg+pNkO9WdO9FKJY0I+ph95RyADUTNXh9GB/zp
+         LBOjZww0LTYU7N5zS+deCMBRf8xzgOjn2US840CHtd/BIr2eFvSPvTIrr/eg0OLKb0R3
+         004S3tSGAvdU3REN9wNorWoWLdy9rRx55+Kp5E8juhOhtclo/OeVm3I/mfJNlzl5JyZb
+         nAR0CVRciOeDSSgYZ37id5o5GIP+ACTT4yLEG6qhs4GSQloh1RPqASKKUxuCe6Nejwc1
+         dpimmDuckhTtMYd3IPrzSj2SO80a9j6VzWF7wTG4w/JAgrbXXmrz2oCvgjdTwqd4JtpK
+         rUrw==
+X-Gm-Message-State: ANoB5pmOEIX5e8VAQo94rUBEoDdSSk/C0Rw2nJDnqGFP4S2gVHpuE1Da
+        56UPRpoj+6u980msNJNN/WsvsA==
+X-Google-Smtp-Source: AA0mqf40ymbSD4mZc17qz9uvVeqDU4zca4rDxD4azyNRwWW2p6AjRfYwkg5vNSqxHP173tFCRMK7Og==
+X-Received: by 2002:a05:651c:14d:b0:277:6c39:e543 with SMTP id c13-20020a05651c014d00b002776c39e543mr8173866ljd.513.1668599527466;
+        Wed, 16 Nov 2022 03:52:07 -0800 (PST)
 Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id 24-20020ac24838000000b004a2550db9ddsm2543692lft.245.2022.11.16.03.49.30
+        by smtp.gmail.com with ESMTPSA id o9-20020ac25e29000000b004b3b2a9f506sm2542947lfg.4.2022.11.16.03.52.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Nov 2022 03:49:31 -0800 (PST)
-Message-ID: <97cd880f-c51c-67f5-eb33-4c211e862e73@linaro.org>
-Date:   Wed, 16 Nov 2022 12:49:29 +0100
+        Wed, 16 Nov 2022 03:52:07 -0800 (PST)
+Message-ID: <9c787dcf-f294-a93e-b357-2c04177b15ba@linaro.org>
+Date:   Wed, 16 Nov 2022 12:52:05 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.2
-Subject: Re: [PATCH 1/4] dt-bindings: dma: qcom,bam-dma: Add 'interconnects'
- and 'interconnect-names'
+Subject: Re: [PATCH 2/4] dt-bindings: qcom-qce: document clocks and
+ clock-names as optional
 Content-Language: en-US
 To:     Neil Armstrong <neil.armstrong@linaro.org>,
         Vinod Koul <vkoul@kernel.org>, Andy Gross <agross@kernel.org>,
@@ -72,9 +72,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
         Abel Vesa <abel.vesa@linaro.org>, linux-arm-msm@vger.kernel.org
 References: <20221114-narmstrong-sm8550-upstream-qce-v1-0-31b489d5690a@linaro.org>
- <20221114-narmstrong-sm8550-upstream-qce-v1-1-31b489d5690a@linaro.org>
+ <20221114-narmstrong-sm8550-upstream-qce-v1-2-31b489d5690a@linaro.org>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20221114-narmstrong-sm8550-upstream-qce-v1-1-31b489d5690a@linaro.org>
+In-Reply-To: <20221114-narmstrong-sm8550-upstream-qce-v1-2-31b489d5690a@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -82,27 +82,14 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 16/11/2022 11:23, Neil Armstrong wrote:
-> From: Abel Vesa <abel.vesa@linaro.org>
+> On certain Snapdragon processors, the crypto engine clocks are enabled by
 
-Subject is precious, so after prefixes (these are good) just "Add
-interconnects".
+If by "enabled" you mean "controlled", then looks fine. Otherwise
+without exclusive control by firmware, clock enabled e.g. by firmware or
+bootloader might still be disabled by SoC. Which case is here?
 
-> 
-> Add 'interconnects' and 'interconnect-names' as optional properties
-> to the device-tree binding documentation for BAM DMA IP.
-> 
-> These properties describe the interconnect path between BAM and main
-> memory and the interconnect type respectively.
+Probably we should have dedicated compatibles for that.
 
-Where is the type described? What is an "interconnect type"?
-
-> 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
->  Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
 Best regards,
 Krzysztof
 
