@@ -2,103 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95B0C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 19:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3792C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 20:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbiKPTmR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 14:42:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51470 "EHLO
+        id S232341AbiKPUIc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 15:08:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbiKPTmP (ORCPT
+        with ESMTP id S232557AbiKPUIb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 14:42:15 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5CB1183B8;
-        Wed, 16 Nov 2022 11:42:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1668627734;
-        bh=Zbt4bXsEqR2aVAoTn7u+yGScVtBmIodkQzBGeRdnpVM=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=V3cGyN4K0AiD6bOxqkjUqJNUhK1L8GMZGyqs4PCMK0Mj4snSszY06U8CT75PluqEf
-         0O+pGiv4D8Es4UlEPxrm1UijaaRZMR6mYwAgL/HqY5YIsyZheuusZUvGeTB45JACqV
-         0y4JG8rVBJQNtpiSRqtrkVToqzwG5aAJNFOy5pBc=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2D5421285D4F;
-        Wed, 16 Nov 2022 14:42:14 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id JDKSsTIXis9k; Wed, 16 Nov 2022 14:42:14 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1668627733;
-        bh=Zbt4bXsEqR2aVAoTn7u+yGScVtBmIodkQzBGeRdnpVM=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=Nh3qVTLayYjtlgQk09cclwsItcUBhWDU0GPrd8VvtmiKN5JtGhB61zB93RSkxa10Q
-         Iq7A/cXM7FNwb+mQDe60Uqw6RLbVSQh0dWfqEnv/OvggoeQ4OP6sfJwP1OVToOL/S+
-         7/p1xC533cLxyAgwLElMLeVqz76CXNPIUZk3qcoI=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 73ADD12813D0;
-        Wed, 16 Nov 2022 14:42:13 -0500 (EST)
-Message-ID: <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
-Subject: Re: [PATCH RFC v1 5/6] efi: efivarfs: prohibit reading random seed
- variables
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-efi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>
-Date:   Wed, 16 Nov 2022 14:42:11 -0500
-In-Reply-To: <CAMj1kXHZ60DCz6zgOqfQ-jBEuhc3XwvhieNbJUCY40hdEWt9CQ@mail.gmail.com>
-References: <20221116161642.1670235-1-Jason@zx2c4.com>
-         <20221116161642.1670235-6-Jason@zx2c4.com>
-         <CAMj1kXHZ60DCz6zgOqfQ-jBEuhc3XwvhieNbJUCY40hdEWt9CQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+        Wed, 16 Nov 2022 15:08:31 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78672BF0;
+        Wed, 16 Nov 2022 12:08:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A171EB81D83;
+        Wed, 16 Nov 2022 20:08:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E42EAC433D6;
+        Wed, 16 Nov 2022 20:08:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gi1c1/+Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1668629302;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L+lac/9Nxb5wUqkltEH21OF/Yf9EDeqLnEARlz2sdDc=;
+        b=gi1c1/+YTN6caDPSNaF4jbxVz1ku9QzNsV+SE4KyBXhEWC1kYzzbiSa9uqBm5u3OC4sCYn
+        vLTn9E3EZNIek1knqMNs7ffLz3a2N4soKS6vWIfWQ9PndXWJvhvGeBW9HeTYZzYn4abA2G
+        q111OWcr1tKaBAr9X52t7BstgyVujaM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5465c683 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 16 Nov 2022 20:08:22 +0000 (UTC)
+Received: by mail-vk1-f181.google.com with SMTP id b81so8862979vkf.1;
+        Wed, 16 Nov 2022 12:08:22 -0800 (PST)
+X-Gm-Message-State: ANoB5pmQ6JwVFVqIzfpKwJQsYBHlQxVYbnC/OVAXEoLrAdjXrT6B6UhT
+        2LbLXOuelXpOzowxcSWqHopxsdwlVDFcs2mnawc=
+X-Google-Smtp-Source: AA0mqf7dAEsP77ebcrTPJrzxfnhbd/CrgIqF4+nvPipC3MN0yy0SWr3tJsJhyxTSvQVUB65cCeWO+il4UaJXLljsGss=
+X-Received: by 2002:a05:6122:1883:b0:376:5afd:d30c with SMTP id
+ bi3-20020a056122188300b003765afdd30cmr13534613vkb.13.1668629302032; Wed, 16
+ Nov 2022 12:08:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221116161642.1670235-1-Jason@zx2c4.com> <20221116161642.1670235-6-Jason@zx2c4.com>
+ <CAMj1kXHZ60DCz6zgOqfQ-jBEuhc3XwvhieNbJUCY40hdEWt9CQ@mail.gmail.com> <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
+In-Reply-To: <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 16 Nov 2022 21:08:10 +0100
+X-Gmail-Original-Message-ID: <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
+Message-ID: <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 5/6] efi: efivarfs: prohibit reading random seed variables
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-efi@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2022-11-16 at 18:04 +0100, Ard Biesheuvel wrote:
-> On Wed, 16 Nov 2022 at 17:17, Jason A. Donenfeld <Jason@zx2c4.com>
-> wrote:
-> > 
-> > Variables in the random seed GUID must remain secret, so deny all
-> > reads
-> > to them.
-> > 
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > ---
-> >  fs/efivarfs/file.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/fs/efivarfs/file.c b/fs/efivarfs/file.c
-> > index d57ee15874f9..08996ba3a373 100644
-> > --- a/fs/efivarfs/file.c
-> > +++ b/fs/efivarfs/file.c
-> > @@ -76,6 +76,9 @@ static ssize_t efivarfs_file_read(struct file
-> > *file, char __user *userbuf,
-> >         while (!__ratelimit(&file->f_cred->user->ratelimit))
-> >                 msleep(50);
-> > 
-> > +       if (guid_equal(&var->var.VendorGuid,
-> > &LINUX_EFI_RANDOM_SEED_TABLE_GUID))
-> > +               return -EPERM;
-> > +
-> >         err = efivar_entry_size(var, &datasize);
-> > 
-> >         /*
-> 
-> I'd prefer it if we could just disregard them entirely, i.e., never
-> enumerate them so that they don't appear in the file system.
+On Wed, Nov 16, 2022 at 8:42 PM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+> It would be nice if they could be boot services only ... then they
+> disappear naturally, but that would mean the rng would have to
+> initialize and save in the EFI stub before ExitBootServices, which
+> doesn't seem practical.
 
-It would be nice if they could be boot services only ... then they
-disappear naturally, but that would mean the rng would have to
-initialize and save in the EFI stub before ExitBootServices, which
-doesn't seem practical.
+That would be nice, but the whole idea is it gets updated by Linux's
+RNG, so that won't work. `boot|runtime` it is, then.
 
-James
-
+Jason
