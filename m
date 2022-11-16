@@ -2,229 +2,217 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C22C43217
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 10:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC563C4167B
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 10:34:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233263AbiKPK3o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 05:29:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37326 "EHLO
+        id S232906AbiKPKef (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 05:34:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233360AbiKPK3F (ORCPT
+        with ESMTP id S238581AbiKPKce (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 05:29:05 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF552DAB6;
-        Wed, 16 Nov 2022 02:25:44 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9144F2253F;
-        Wed, 16 Nov 2022 10:25:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1668594343; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D1atUjbIyUaMaYihjlkpcyaP3lEClWkvRyG7NKN3Z3Q=;
-        b=RNpR/Sx+Jg2uaRc88v7vhpfYpIqNjdv1Mn4X8/DF+sBZ3w8MDNxuji4tt62S3dQsV/tGZn
-        m1BmTx12r9FVx7x9a3zAPONfWMmMzZWG4gxavxV7GHa0ZTQ8fpA5lH0iX5qOILYxKMnPnP
-        03hojEgd4zE1lLbQQRWoUye7fFOYKWY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1668594343;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D1atUjbIyUaMaYihjlkpcyaP3lEClWkvRyG7NKN3Z3Q=;
-        b=ZvysxcSQhynBE1JO3p1uCaVafwuMj8wiR9T+Tu2wzUpu0cPDOaB1WDlT1DbWxTmlcuuDGD
-        U6CxtA2uOiA1FRBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F338913480;
-        Wed, 16 Nov 2022 10:25:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id exqhOqa6dGP6TgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Wed, 16 Nov 2022 10:25:42 +0000
-Message-ID: <41b8c83e-2a1a-1dda-945e-99329ca8e7e9@suse.cz>
-Date:   Wed, 16 Nov 2022 11:25:42 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
+        Wed, 16 Nov 2022 05:32:34 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83CA3FB8D;
+        Wed, 16 Nov 2022 02:28:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hV9eRr+tMgYI+Zg2FMov3XI+9C2rixjGMnah/voO6YzDAQRUpjfnDYvgVXN7NxJje2fORyMEJonz+UMyoTLXD0//L9n3dC4/nKRXau9Za2LzU3XnHUXUPlJGJz0WJMZ0vU7zO5m8xR2heHk8PVigwCZdw21qzCjSCjQq9MYRj05yYwzeZZy+l4+Cw5rkZ5ynyrls70tUD3EEoDaHzUx61M9/OjR9LqTLxXVGWUjWGGoRY3Jwb2vAcV6IQpJN5ZCZUH49pYJsRZBSCW9NeweSMFiD1PwIbu82yHNah/wqqXtUcArfVy/aHVp4sxbYPSg6baDWUTyMXMXa1L24fKtOJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CLmzPGdRp3Ba7Qv6cXtUtq47Hmy0aDVTWu8cjCazDH4=;
+ b=aV8yKhbNoLPV4VVNr13/95VDSePER8vlf1QyAc7PUnPmmjb78/DdJ+phRaQF+biE6r7H6MCHJLZMrpEDVgXaadVIKRUxHTp3KQcm2BVcNkWooUnBlKXi3cZiCbHdH9ton9F6rNRXrfKj9BTEdfhj1qn5fDdB9PfasKMzeMFNWxgL+EIhIHoJv6F+mSP+8Xb9IFOD9ffFKfzB9KaNi5IZhZMVcKIoMYcISpwmzYhNqaQjx/x+o9Cy+o6aJn/JpAjj17T6sRsz/tQo0da3R5lAGj2Wd36nc0IB52OjQpDyu3xW6JmWFPW48rv27bhPq131fmvhvTFwjwT4TIWI+qhDRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CLmzPGdRp3Ba7Qv6cXtUtq47Hmy0aDVTWu8cjCazDH4=;
+ b=RbYm+cObxVeWbNDONwiqmydqRtk+d+K0NbITG9jYEA/li5VMwLlkaR2cIBQxJHqTUSSjCBrAUl18f1/UJkcr0IGDuOl1wX9W4QJPd4juy+NAMhKqtn64/XRitJ5rGxHgS670RCu+x3LSgNSKHtfFMmBluoWBcZdTjuWIU+aXzVo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by PH8PR12MB6796.namprd12.prod.outlook.com (2603:10b6:510:1c7::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.19; Wed, 16 Nov
+ 2022 10:28:18 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::395:21e6:abfd:7894%6]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
+ 10:28:18 +0000
+Message-ID: <db100e84-4adb-d661-fe1b-f6bb34247fa2@amd.com>
+Date:   Wed, 16 Nov 2022 04:28:11 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
 Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
  allocation when SNP is enabled
 Content-Language: en-US
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>,
-        Borislav Petkov <bp@alien8.de>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org,
+To:     =?UTF-8?B?SE9SSUdVQ0hJIE5BT1lBKOWggOWPoyDnm7TkuZ8p?= 
+        <naoya.horiguchi@nec.com>, Vlastimil Babka <vbabka@suse.cz>
+Cc:     Borislav Petkov <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
         "Kaplan, David" <David.Kaplan@amd.com>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
         Miaohe Lin <linmiaohe@huawei.com>,
         Oscar Salvador <osalvador@suse.de>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+References: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
  <Y0grhk1sq2tf/tUl@zn.tnic> <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
  <Y1e5oC9QyDlKpxZ9@zn.tnic> <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
  <Y2A6/ZwvKhpNBTMP@zn.tnic> <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
  <Y2JS7kn8Q9P4rXso@zn.tnic> <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
  <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
- <5b27a05e-09ad-9139-67b1-77b90731419f@amd.com>
- <9d9f1afe-c981-4df9-f012-89c4cb783cc3@amd.com>
- <973c6f79-38ad-aa30-bfec-c2a1c7db5d70@suse.cz>
- <8692e736-7518-d6d2-ae83-720e42e7a059@amd.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <8692e736-7518-d6d2-ae83-720e42e7a059@amd.com>
-Content-Type: text/plain; charset=UTF-8
+ <20221116051920.GA821796@hori.linux.bs1.fc.nec.co.jp>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <20221116051920.GA821796@hori.linux.bs1.fc.nec.co.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BL1P222CA0005.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::10) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|PH8PR12MB6796:EE_
+X-MS-Office365-Filtering-Correlation-Id: e16c5cd5-58c0-4241-c14c-08dac7bd4725
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b3RK196h/Z+YNhTYU6kUpiD6OhsUrpwVN6+4YYqjDJgl1C0MASBI98mqHw4l1w4yStAAdhykBKc13dJAfsMLvWMOdmFJ4ndlks/X5EnWRj12Sckbu40GFNU0toq1qkZT0oPd/IbQExGZVUGGuz+er/gUzQgIiW3UicQKg2mBpdPF53OdHQrfvbtgXj1YI6iIvAi/lPWxYEHh71W2EW0YTDg5+n6l8XStCLTHsqIvIWYlz64NrBsRxkyxSG4cOrfyaYyBEQkCFMt1tRV2WCV/vigLP1M9vBPbzs5JQbBna8bSHJmhowWqiDjOC5mzoT/28oma2lynJUi/YCvxSBhR/8qjQa4y5kynBKawP+uJPUjWCPUOA/Xepy3BoNOk+rAe7rGQEB7dchSO9pvjr2lMkC7c7IBILoLwyOmdvQ4ls+Gyw2CHX5LAyIBG4dDEhGAcUSvM4EVEgssuI79C+fKyr4vzUQfrp94b0SOcowJj/2S3SwOYdKlE1ktoYorG9/up7KLKC/5TlbT4bD2YztCFbsTGw99t5BIpLXJ/aW6GgzkIqGETvqm+dV7VfgRaJkPOGiw0J+Em+UfyCu2hHplErfdwcSeHIScJ4Nd45pAD5fEMEbcQZB4R0DNqudDhhem2BFKqVMHza3BmBrbfMwlEI103S6d4G5SV83SFgG+UAL7j34US2S+X0onRyDbC/RnocD5lxXv6VPepAhcrAJFzRgSpHoQvktDbrdqJMexYDyTS03TrEeyzNO222dMHAatVvEYEwE/9On7/h1p/w36hTk3uma8wNZqqLwKEYrwe5qJUVqVvq3laZ/pim29lXHI0CZ+/RZ/hNfDSnWdrZw2AsA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(366004)(376002)(136003)(346002)(39860400002)(451199015)(31696002)(86362001)(36756003)(41300700001)(2616005)(66476007)(66556008)(66946007)(8676002)(4326008)(110136005)(38100700002)(186003)(7406005)(7416002)(5660300002)(6666004)(45080400002)(8936002)(478600001)(966005)(6486002)(6512007)(316002)(26005)(54906003)(6506007)(53546011)(2906002)(31686004)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Skx5U1N4M0ZiVVpiNTEyZVZLdmVjOE5PcERjTVRieTdrVzZFLzhzT1lDWEds?=
+ =?utf-8?B?QUVvcmk5ZkNwc1VYaVdVWW4yQWVNT2htUXl2eksyZXVyb3NINTNZd2tFanYv?=
+ =?utf-8?B?N2lHL29WQ1dhcW9HblFvcUtoeU9DU1Z6Wkx3cTE3b3BBTmxseHViZG1RUTZv?=
+ =?utf-8?B?Y014SU92Qzd2eXpGNWFFVUlBajZjTWpwa2VkamI1YkJrbVRaRlgweEZGb2lK?=
+ =?utf-8?B?dEhCbENiTS9oODNtZ2dveUtyWWNuVXhVUWlyTFpmQVN6SjY3RVZ2WnhtdFRz?=
+ =?utf-8?B?em9jdFRDVFp2N3Bzb01JcnNTUmY2OFpnVXRjUWdQQUQ2b1VsZHhPcUg1Qzcy?=
+ =?utf-8?B?aW9NcnpmeStjbFU2UU01RXRNNVJKY1ZqRmluVVpvUUdxSjBTcXY5M0krYUla?=
+ =?utf-8?B?RENlZndIVEk1LzUyZ21McWo0ZXgwVmZDWlpFWTdmVjZtZkJxYUd5UFdqaDYr?=
+ =?utf-8?B?RDlFN05TOWRHS1ptUGFVSXZqNzhqZElua2JuSVRyV0FuNXdlSkxNUU5RRnVX?=
+ =?utf-8?B?TzFZNVdaazRaZkc1TExYeU1NQ3RzczlrbHFRaUN2VVVrZ2F6TnJaOURIdy80?=
+ =?utf-8?B?WUxOUnVMa2hpQnhNVW5POXpMeEw0RmdWc1Ixd2Q5NHJrVTEvWlZuSUMxY3pt?=
+ =?utf-8?B?ZFk3T0luZ0pFNWNmR2xWQlpZZ0tndjNBb1ZmWTc2WWlkOUo4clZhdUE1S1Zi?=
+ =?utf-8?B?QldWYnhPWkQzNXhoQnQ0T3pJOUhaVjNLaWdQbHFsMmtINmhUT2ticGNjQTVq?=
+ =?utf-8?B?RE9hOUdvczdVbzk4QXIzM1RQck9tTTVMUUZzckFqakIrdmp3Ri94c1VVdHZr?=
+ =?utf-8?B?M1UzcDRpRTZuTzJJNFRxblQyczE2K2ljcTBxdmE1bGdJZG1nL0ZMRHd6d2Jr?=
+ =?utf-8?B?M2lTU3ZleEVqd1FQdkdGRHhWMkxyQkw3a1BQMmNzanFRNkhLd3hQMTh4OUYr?=
+ =?utf-8?B?dG53eDhGT3dVcmRmYWR4djdVa3h3MEYxTjJlaUdHUm90Tmw4ekJtemthNUhp?=
+ =?utf-8?B?UVBFa1hzdmRQMFNNUlAxbUZ1aW9GSzBzZW5yeFg4Y0xNR0xFWURDNUZQTGky?=
+ =?utf-8?B?cjZLNVdaN0NiL0NmYUVQa2xSOUlBMjM4QkhySDJFZ1lMV2YrMzRGbytBdENk?=
+ =?utf-8?B?bFJtTnJCdUk4QUNIRGppT1d3Wm5rS1hsNzFrYThSb01zODBPbVByRFBRZFdl?=
+ =?utf-8?B?VmxVUDBPQkhOcHZITzF2eDF0SWZjZ25Xb3hHNDgyanFXazEyMExnV3pqV3dh?=
+ =?utf-8?B?UU1veW5ab1Z4L2lyLzNjQXk2QThOdzJNRCtNOVFzMG5sQUJwTmdnRkJUclBZ?=
+ =?utf-8?B?TnpqaWd3VlpZMmFoM0VyR29uM0pjMTV4UDZONE5ZV0pkTld3WGZQRWRDZXdi?=
+ =?utf-8?B?S2RkekUrL1BQdmlWcTltendHRExmMHZRSlU5UWFIVW9SSG9hdWpUK0NXZitk?=
+ =?utf-8?B?eUU0RUFiTFJPdzRMQWxOcjVTeGxnUTZwT1BidXVaZlJ4eHNjcE1zMHRIZ1oz?=
+ =?utf-8?B?aHY1MnhNSEpYQm5udWdnV0ZnRjhnTU5hOElMbkFhRWZpUk5Tdnp5WmtYOGJL?=
+ =?utf-8?B?ZzJFMFZFUXZuRHhwTGVtQU0ydTR6TjhHNlhWV2ZvT2Qxc2x0NERCZGVMVHV0?=
+ =?utf-8?B?T2w4Vi9qZjI3VzZNWVIxMFlGbGxRLzBONGp5ZjluRGZYOTlCWmUzb2dTYktP?=
+ =?utf-8?B?c3Q5RnM5MklsOUhnQjJFN1ZzMHJHTzJOUVpTa3lmaWEvTmpxdXNzQkVRaFhv?=
+ =?utf-8?B?QUNQaDN1UU9Ob3lyU3JnOWN0WVY1LzI0eTJxQ2VBU05FMlY4N2ZFZEtCeDRt?=
+ =?utf-8?B?QkZhNXBmaDJQaVplNkdWcERqWGNoYU9Jbmc4VisxQy9zTFJ2Zk42cGxtY0Ft?=
+ =?utf-8?B?dGdIdmQzWjB2UGlvMVVGRTVld0ZCZkpkUW42YktKSE9OS1JCZ3NxSjJIL0xv?=
+ =?utf-8?B?WWxBZmhWamlyTE1aeUpKQnptYVhzbmNYSTJ2bkY2a1hCZkE4WjhaVjdaeUpS?=
+ =?utf-8?B?L2pjN2tTcjBsaTFON0NmK2lSZGVqUmd0aUZBcXMxTmFZZWo2eWd4MkJablA2?=
+ =?utf-8?B?cVRBWmt3NlBscWJ5MGg3SmUwM2szV1hwQmFENWZ3WUNxcUdXcGVxemlMK1Nn?=
+ =?utf-8?Q?2ugehehtB6Tvz7Y5BClsaELCr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e16c5cd5-58c0-4241-c14c-08dac7bd4725
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 10:28:18.4311
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UtNcQTxXS7ucImvATba9jR+lpAD8fzlCMqf4Be7+JkyJ2SE4oD+jBbK998+Tj8lrrVXtIJkQDC+oMpTRwVx0CA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6796
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/16/22 11:19, Kalra, Ashish wrote:
-> On 11/16/2022 3:08 AM, Vlastimil Babka wrote:
->> On 11/15/22 19:15, Kalra, Ashish wrote:
->>>
->>> On 11/15/2022 11:24 AM, Kalra, Ashish wrote:
->>>> Hello Vlastimil,
->>>>
->>>> On 11/15/2022 9:14 AM, Vlastimil Babka wrote:
->>>>> Cc'ing memory failure folks, the beinning of this subthread is here:
->>>>>
->>>>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra%40amd.com%2F&amp;data=05%7C01%7Cashish.kalra%40amd.com%7C38f8b76238014c67049308dac7b213a5%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638041865033588985%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=DDm7tZhUJLy%2BMzS1SXUnsBmBQnAI5dqR6tWZhCKRMEI%3D&amp;reserved=0
->>>>>
->>>>> On 11/15/22 00:36, Kalra, Ashish wrote:
->>>>>> Hello Boris,
->>>>>>
->>>>>> On 11/2/2022 6:22 AM, Borislav Petkov wrote:
->>>>>>> On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
->>>>>>>>         if (snp_lookup_rmpentry(pfn, &rmp_level)) {
->>>>>>>>                do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
->>>>>>>>                return RMP_PF_RETRY;
->>>>>>>
->>>>>>> Does this issue some halfway understandable error message why the
->>>>>>> process got killed?
->>>>>>>
->>>>>>>> Will look at adding our own recovery function for the same, but that
->>>>>>>> will
->>>>>>>> again mark the pages as poisoned, right ?
->>>>>>>
->>>>>>> Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
->>>>>>> Semantically, it'll be handled the same way, ofc.
->>>>>>
->>>>>> Added a new PG_offlimits flag and a simple corresponding handler for it.
->>>>>
->>>>> One thing is, there's not enough page flags to be adding more (except
->>>>> aliases for existing) for cases that can avoid it, but as Boris says, if
->>>>> using alias to PG_hwpoison it depends what will become confused with the
->>>>> actual hwpoison.
->>>>>
->>>>>> But there is still added complexity of handling hugepages as part of
->>>>>> reclamation failures (both HugeTLB and transparent hugepages) and that
->>>>>> means calling more static functions in mm/memory_failure.c
->>>>>>
->>>>>> There is probably a more appropriate handler in mm/memory-failure.c:
->>>>>>
->>>>>> soft_offline_page() - this will mark the page as HWPoisoned and also has
->>>>>> handling for hugepages. And we can avoid adding a new page flag too.
->>>>>>
->>>>>> soft_offline_page - Soft offline a page.
->>>>>> Soft offline a page, by migration or invalidation, without killing
->>>>>> anything.
->>>>>>
->>>>>> So, this looks like a good option to call
->>>>>> soft_offline_page() instead of memory_failure() in case of
->>>>>> failure to transition the page back to HV/shared state via
->>>>>> SNP_RECLAIM_CMD
->>>>>> and/or RMPUPDATE instruction.
->>>>>
->>>>> So it's a bit unclear to me what exact situation we are handling here. The
->>>>> original patch here seems to me to be just leaking back pages that are
->>>>> unsafe for further use. soft_offline_page() seems to fit that scenario
->>>>> of a
->>>>> graceful leak before something is irrepairably corrupt and we page fault
->>>>> on it.
->>>>> But then in the thread you discus PF handling and killing. So what is the
->>>>> case here? If we detect this need to call snp_leak_pages() does it mean:
->>>>>
->>>>> a) nobody that could page fault at them (the guest?) is running
->>>>> anymore, we
->>>>> are tearing it down, we just can't reuse the pages further on the host
->>>>
->>>> The host can page fault on them, if anything on the host tries to write to
->>>> these pages. Host reads will return garbage data.
->>>>
->>>>> - seem like soft_offline_page() could work, but maybe we could just put
->>>>> the
->>>>> pages on some leaked lists without special page? The only thing that
->>>>> should
->>>>> matter is not to free the pages to the page allocator so they would be
->>>>> reused by something else.
->>>>>
->>>>> b) something can stil page fault at them (what?) - AFAIU can't be resolved
->>>>> without killing something, memory_failure() might limit the damage
->>>>
->>>> As i mentioned above, host writes will cause RMP violation page fault.
->>>>
->>>
->>> And to add here, if its a guest private page, then the above fault cannot be
->>> resolved, so the faulting process is terminated.
+On 11/15/2022 11:19 PM, HORIGUCHI NAOYA(堀口 直也) wrote:
+> On Tue, Nov 15, 2022 at 04:14:42PM +0100, Vlastimil Babka wrote:
+>> Cc'ing memory failure folks, the beinning of this subthread is here:
 >>
->> BTW would this not be mostly resolved as part of rebasing to UPM?
->> - host will not have these pages mapped in the first place (both kernel
->> directmap and qemu userspace)
->> - guest will have them mapped, but I assume that the conversion from private
->> to shared (that might fail?) can only happen after guest's mappings are
->> invalidated in the first place?
+>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra%40amd.com%2F&amp;data=05%7C01%7Cashish.kalra%40amd.com%7C7b2d39d6e2504a8f923608dac792224b%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638041727879125176%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=KBJLKhPQP23vmvY%2FNnbjZs8wTJs%2FrF%2BiU54Sdc4Ldx4%3D&amp;reserved=0
 >>
+>> On 11/15/22 00:36, Kalra, Ashish wrote:
+>>> Hello Boris,
+>>>
+>>> On 11/2/2022 6:22 AM, Borislav Petkov wrote:
+>>>> On Mon, Oct 31, 2022 at 04:58:38PM -0500, Kalra, Ashish wrote:
+>>>>>        if (snp_lookup_rmpentry(pfn, &rmp_level)) {
+>>>>>               do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
+>>>>>               return RMP_PF_RETRY;
+>>>>
+>>>> Does this issue some halfway understandable error message why the
+>>>> process got killed?
+>>>>
+>>>>> Will look at adding our own recovery function for the same, but that will
+>>>>> again mark the pages as poisoned, right ?
+>>>>
+>>>> Well, not poisoned but PG_offlimits or whatever the mm folks agree upon.
+>>>> Semantically, it'll be handled the same way, ofc.
+>>>
+>>> Added a new PG_offlimits flag and a simple corresponding handler for it.
+>>
+>> One thing is, there's not enough page flags to be adding more (except
+>> aliases for existing) for cases that can avoid it, but as Boris says, if
+>> using alias to PG_hwpoison it depends what will become confused with the
+>> actual hwpoison.
 > 
-> Yes, that will be true for guest private pages. But then there are host
-> allocated pages for firmware use which will remain in firmware page state or
-> reclaim state if they can't be transitioned back to HV/shared state once the
-> firmware releases them back to the host and accessing them at this point can
-> potentially cause RMP violation #PF.
+> I agree with this. Just defining PG_offlimits as an alias of PG_hwpoison
+> could break current hwpoison workload.  So if you finally decide to go
+> forward in this direction, you may as well have some indicator to
+> distinguish the new kind of leaked pages from hwpoisoned pages.
 > 
-> Again i don't think this is going to happen regularly or frequently so it
-> will be a rare error case where the page reclamation, i.e., the transition
-> back to HV/shared state fails and now these pages are no longer safe to be
-> used.
-> 
-> Referring back to your thoughts about putting these pages on some leaked
-> pages list, do any such leaked pages list exist currently ?
+> I don't remember exact thread, but I've read someone writing about similar
+> kind of suggestion of using memory_failure() to make pages inaccessible in
+> non-memory error usecase.  I feel that it could be possible to generalize
+> memory_failure() as general-purpose page offlining (by renaming it with
 
-Not AFAIK, you could just create a list_head somewhere appropriate (some snp
-state structure?) and put the pages there, maybe with a counter exposed in
-debugs. The point would be mostly that if something goes so wrong it would
-be leaking substantial amounts of memory, we can at least recognize the
-cause (but I suppose the dmesg will be also full of messages) and e.g. find
-the pages in a crash dump.
+But, doesn't memory_failure() also mark the pages as PG_hwpoison, and 
+then using it for these leaked pages will again cause confusion with 
+actual hwpoison ?
 
+Thanks,
+Ashish
+
+> hard_offline_page() and making memory_failure() one of the user of it).
+> 
 > Thanks,
-> Ashish
+> Naoya Horiguchi
 > 
->>>>
->>>>>>
->>>>>>>
->>>>>>>> Still waiting for some/more feedback from mm folks on the same.
->>>>>>>
->>>>>>> Just send the patch and they'll give it.
->>>>>>>
->>>>>>> Thx.
->>>>>>>
->>>>>
->>
-
