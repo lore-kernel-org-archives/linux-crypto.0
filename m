@@ -2,662 +2,204 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B503C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E457C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 05:19:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232197AbiKPERI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 23:17:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54562 "EHLO
+        id S229495AbiKPFTa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Nov 2022 00:19:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232237AbiKPEPE (ORCPT
+        with ESMTP id S229489AbiKPFT2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 23:15:04 -0500
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F089326E0;
-        Tue, 15 Nov 2022 20:14:32 -0800 (PST)
-Received: from pps.filterd (m0150242.ppops.net [127.0.0.1])
-        by mx0a-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3d5HG008268;
-        Wed, 16 Nov 2022 04:14:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pps0720;
- bh=UQxbDx6IIdceogmBqO1UQxXhra12osc0rpf/5otoIoo=;
- b=JuiV6+repaWTvE6Oc8gih82ztv7a+wPeUX/MiERlVvA+4kV+U3fJHxmA3i3FxNKdIroy
- DNSuZsxdmHVH21Fd+o3GS6qDHEFwA7C8Gx7InIGxja+WvU7f6UPCiRlujuXuNNR4RBQl
- OlAq3mepHuMzpANMhnIsXjsgakfNYLe2tmueFk5yNHhX9ogdhE29UMTaqZZKqCGDoqoc
- kuAWWEvfb4F2rOOom9V9fkHUUqOV5RzCIzdlmiRbvpa565myotqi0iFwJsErIUabtxcP
- K9+FaJdEX3ShOj8ir0vIExTTocTkXtic3t2EddrgezxdReHW39sqcn2PIiJFgoA15woO cQ== 
-Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3kvr5486ub-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 04:14:23 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id A4C00295AF;
-        Wed, 16 Nov 2022 04:14:22 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 340848058DE;
-        Wed, 16 Nov 2022 04:14:22 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
-        Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v4 24/24] crypto: x86 - standarize module descriptions
-Date:   Tue, 15 Nov 2022 22:13:42 -0600
-Message-Id: <20221116041342.3841-25-elliott@hpe.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221116041342.3841-1-elliott@hpe.com>
-References: <20221103042740.6556-1-elliott@hpe.com>
- <20221116041342.3841-1-elliott@hpe.com>
+        Wed, 16 Nov 2022 00:19:28 -0500
+Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01on2047.outbound.protection.outlook.com [40.107.113.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FF12F394;
+        Tue, 15 Nov 2022 21:19:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H9RngyUNk45cdtwfPjc7kUTv0eVmq/sDo0w12Lnml5ZFn19ziq7aE4HZcS0wMWW7gogp+PIBbby3EyhXaH5e/odmDDe6D4spIYn5OGkIIn3UKMVs3ChkRxZT9lWRFjsh4cgQZHXZeWMJK8YotaQFfrozCvDrmMG/DnsCPxpNKJf9UizXJRcPLL+jLMo8Q8kNrCUgFYlnxC+2Yzecu4xv0bOPQS5ZWAJoSmwRESK6NOa22YlL3TstgrX21FCNyDWn+oKiEm6FzPvGVMPnixzWb/JVmrh8uw/dQJh3Wv+Xd6CNyyrNZx+3iPCOIQPZsIm+owX9+juT3IVQVxaNfckLzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HTD/sgtgdd5mM+EbSm0O+GAEvaG6PtSZqpPNNqyhr3M=;
+ b=bEGFl/kerhAMh1fiGGZoF5yJVXTihaan/32l73up9Kjc/m1TZ5X2FPJOTeNpwNgwg0mAgEQJsax5FkoqkG8BETACjQv73qm9SnNY+SzbH18fGvGiMeXl6swtUM+ftdeDhHoKyLBYJsjtAVEfh6dpT4s2kEgK9oN/W3NZ+zVeDCS29vQ+9JTbWbuJnk1Io5MOmlTouOpLjAbdc1v9BKU0E/3xc7gcxR/FMv+j307M16qFluB5pLy7ketiLzInlClPVcO9iKFz5xIlYTRRdNDsX+W64T+85m78cCdkEeWL6TdBEdvqdGOdEtYixmTat9Sig0walXXPUIdvcyUYbEt6iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nec.com; dmarc=pass action=none header.from=nec.com; dkim=pass
+ header.d=nec.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nec.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HTD/sgtgdd5mM+EbSm0O+GAEvaG6PtSZqpPNNqyhr3M=;
+ b=aoKwHJBJlHAtn9Oqz4iqlJUljQF38RwnDRhwtyfC/DB+a098qRq8bT6XK3lxaqD3KswbrybpMR3X+mF87L/g8jlQrRjRvqkZZjBs4YcKg/OGl+jp1PKhrO78d61BvMgscTRdF9aIO49Vzl0j/iQwzFbWh3wJKbSjXikxq8rEkNU=
+Received: from TYWPR01MB8591.jpnprd01.prod.outlook.com (2603:1096:400:13c::10)
+ by TYAPR01MB5466.jpnprd01.prod.outlook.com (2603:1096:404:803b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.18; Wed, 16 Nov
+ 2022 05:19:25 +0000
+Received: from TYWPR01MB8591.jpnprd01.prod.outlook.com
+ ([fe80::9f34:8082:cd2f:589c]) by TYWPR01MB8591.jpnprd01.prod.outlook.com
+ ([fe80::9f34:8082:cd2f:589c%8]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
+ 05:19:24 +0000
+From:   =?utf-8?B?SE9SSUdVQ0hJIE5BT1lBKOWggOWPo+OAgOebtOS5nyk=?= 
+        <naoya.horiguchi@nec.com>
+To:     Vlastimil Babka <vbabka@suse.cz>
+CC:     "Kalra, Ashish" <ashish.kalra@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "Kaplan, David" <David.Kaplan@amd.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Oscar Salvador <osalvador@suse.de>
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Thread-Topic: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Thread-Index: AQHY+QUKixDhQnL6BEGWafa4FSvWmK5BA+sA
+Date:   Wed, 16 Nov 2022 05:19:24 +0000
+Message-ID: <20221116051920.GA821796@hori.linux.bs1.fc.nec.co.jp>
+References: <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <Y0grhk1sq2tf/tUl@zn.tnic> <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+ <Y1e5oC9QyDlKpxZ9@zn.tnic> <6511c122-d5cc-3f8d-9651-7c2cd67dc5af@amd.com>
+ <Y2A6/ZwvKhpNBTMP@zn.tnic> <dc89b2f4-1053-91ac-aeac-bb3b25f9ebc7@amd.com>
+ <Y2JS7kn8Q9P4rXso@zn.tnic> <c2ce6317-aa51-2a2b-2d75-ad1fd269f3fa@amd.com>
+ <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
+In-Reply-To: <7882353e-2b13-d35a-b462-cef35ee56f51@suse.cz>
+Accept-Language: ja-JP, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nec.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYWPR01MB8591:EE_|TYAPR01MB5466:EE_
+x-ms-office365-filtering-correlation-id: e0f2ca86-8425-468b-40d9-08dac792206e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: WePBDjPklTOjhAtW9ZiO61uRvqdNYX/scbnHIoOBa+1SfMe2zKm9JuRZEOUIwnRijWz6/3UdpcEDBpmAB5+gW6gJTYBeaaqQDy3oGmCZORuR1KcmAEyaF6BQznqSitzzOJaslIbMcnyBIWmlLBlZuzIjHikSlCJ2bYL+0lKSXnf8YXRe1XoQSOo+5ESzQobBE2qp6YhrtVieBBLNTpQ0tp3mzMCaeWc8Jplc9Hn0YQet3iuQxufJT6EZ6CASTyWE69/NLbgPLxKi3PicvXqJGIcMjwzQOVBGyEbpZ3Ehwcr56K5oJKvVZPG4JzuLWbAcbl7QTFgBo99EqYdQlWkvfsu1U0pIiVdZvbMwjpoBLqrP+FlbE3hAM0NfeXXKZin8+/LBopywyrH5T/k8tbaIKfQNLJFYntPNlmVjMasfIu+vh66MOhgGhwZmgmsLy0nNDSKUyHbesJkkRXRa0FreJUjJdD5VeQEvojt6zYAaPzZRm6aEGeZDQRFHn2vkTcAWpzOsEdh9BXCl1P5s6wJtNJz8NCCfIcvNXEhrLaXEPpYsb7LUYToRWKwWNPzjFqhlpd2A3irNbDGjO/icopLfY7xeuOn3DjHLr2LBZ3Mm5Kbq6uxbMd3/H4UhCBs34M+S/PE/6xwLUdju+dTS4c2BwGCIYHy+5erN2RVBvuc2P78vDksupxOxq6rZ26auGptTSeEDwPI7Hhyv0mHIvbFdQqz8cE0ArbW0eY7r0XuFEzz36epC7wDWrozYwvE+/LSZ9+WXU9vM9lnY6TR3IfxKi+TJh4AbX9Scvk5zi5UHLOs=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYWPR01MB8591.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(396003)(39860400002)(136003)(376002)(451199015)(86362001)(83380400001)(33656002)(8936002)(85182001)(66476007)(66446008)(66556008)(76116006)(41300700001)(66946007)(64756008)(186003)(8676002)(4326008)(5660300002)(26005)(966005)(1076003)(7416002)(7406005)(6512007)(316002)(9686003)(71200400001)(478600001)(6486002)(6916009)(53546011)(54906003)(38100700002)(82960400001)(6506007)(38070700005)(122000001)(2906002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S3BPSm5EYllETTB4QUFYcWUvYklWemxTc0RwN2tyKzlxejhrUUlNWjROaWRF?=
+ =?utf-8?B?VEZFaXpVdDVsQ0U3NkhyUGdrdE1uM2d4T1pKcVFRcnFUTHFNemJSVU1pNjEr?=
+ =?utf-8?B?YkVVajA3cDV6aVlxcmdSWmJISFdnUWJvVEoybk9RMGsxbS84Y2d6YjBYM3VB?=
+ =?utf-8?B?TGxWbFNaMkkyWjdUMGNLUCtyQVIvK2lya1N5RFVSVWlDdUV5OW4zcWUrdGpp?=
+ =?utf-8?B?RHpqcVJieGNlQ2FZSlJTRzFxY0FLeFRVeXE2TThUNVpGUUw3QktBM2lVaXNk?=
+ =?utf-8?B?bWh1eXJVcnk3eXpsbzZQVU5uVGorbERicElYZGJFU0JFRWNnZUg0M2E4REln?=
+ =?utf-8?B?L056S2xzNTJ0K0JWT3dkeG1PYkxDY3grbCt6WDN1bEhVQWs4UmxERlpydjNP?=
+ =?utf-8?B?UFRCWm1RNEJuWmZPZmkyeG9QcTRoRVRSUnQ2aUpPRkNoakdJTkxyQ3hvSER2?=
+ =?utf-8?B?akpNd1l0bkZscUxtUHJWYXgwdVZESmtYNlVVV0hpcG5TOHV2SVQwSWx5bitR?=
+ =?utf-8?B?bXhHYng2LzZvdFYramhVMnV2b0M2cks4YUpDWHgzSTE4Qk94R3RlR0g0TFd1?=
+ =?utf-8?B?N3N5aHpXOUNjUjV6cUliOTRZOVlFdlc0bTU2Y0ZGVUt5REp0TWY0bkJSc0M5?=
+ =?utf-8?B?bmhKR1ArUU0vcStSODNZMG1Pcmh5dmNDUW5qRTNJWWJhNExYdm9JNlhOU0N3?=
+ =?utf-8?B?b3VOYlEvU0VoRFhNOWxIbEowanZ2K0Y3MStxdEUvVjAzMUY3d0FqKzFPcDZy?=
+ =?utf-8?B?Kzk3LzZOUFZHZGViR0hyYU9EOXBESTNZN1NkR2xvMERuTW5CZ05vU00zMG1i?=
+ =?utf-8?B?NSt4ZUhDMlNQQk9nMTkrWFdnaGZHZ3FnaGNueU5iY2FYK2tMK0VNUmdnejNm?=
+ =?utf-8?B?cFJnWGd6K2hFWDU2ZU0wbjhxRG5WV1c3Qm5MQytpdCtmWlBoOFBqZ3Z0QXBm?=
+ =?utf-8?B?S2l3dlYxSG5lOGlzcTlBaHJ0c0pIYXYvSkp5a2RmQzR2UDVXZWYrcDFXY3Ir?=
+ =?utf-8?B?RS8rYW9TRXYrVTFIRmZwNko2Sk9IM1l0QUhGRENjY3ArWnJ0UmRJc1h6ZlR5?=
+ =?utf-8?B?NkduQnpKNTI4Njd0RVczRnRPZUFCZS9UbUN6bCtsRlNKb2lHWXI2angwSFdm?=
+ =?utf-8?B?cTd2aUxKRWI3dXI1ZE90NTIzZFRucXZOcmZtVWZpZ2NXZVB1YnBjZTJZMnJo?=
+ =?utf-8?B?Z1VoaXlGZGhjQkJqd3I5OXB0K3R5S2twWCtZa1huTEMwd3ZvcmNXb1V1M3px?=
+ =?utf-8?B?Q3Z0ZjRFV09yZ0M5ZFlFZmJUWE5MUWtjd0tTeDNFc2RqbU1VTzl0V1lZcGtn?=
+ =?utf-8?B?aU5pY2FWMGUzSmhIT3l1RVdOdkhvS1J6OThiM25nL1V0RzFBaTVPYlZJMzln?=
+ =?utf-8?B?NmxXYnF5M01uaDhqWGRKdGlIWWg2SXV5YTE1ODVxUXkvRG1xdG5rRjZjN1NZ?=
+ =?utf-8?B?eDB2TEYrMXhaNVJtVGV0QkZpTTZUZGlpMFl1QllhNkgvS1VlSzdSN0xRWi9G?=
+ =?utf-8?B?K3VDUDFpODJady9hMHVIOFRJTlIvNFRpYmZBRkJYeHo2d0lSQjl6VGRLZnpR?=
+ =?utf-8?B?ckZXRDZ1TGg0QjJJM2JtQmNYTmNHUmFrM1NqcHZSUEFHZDlHbmEwejdMVVlG?=
+ =?utf-8?B?VGRrUTNHMEFtNVhPTC84b3pFclJCV3VQMlNVb3ZVdFNlalNhN3dRUS9yMTJm?=
+ =?utf-8?B?Y1hKa3AvRGtHaHUwazhXUDNYMnBXSlFTeFJnUktlOWs3NkZxcUdId0k4aUx5?=
+ =?utf-8?B?a3J3OVBMNllFZFJPMmNpTjRmbUtCUWl3Q2JBUnNscGdIbGl6YjZxQVBnNTE0?=
+ =?utf-8?B?UkFVdDF4bHNVdUV5VUhrMjVlSW1FVmtvUU5aT3NPamZyaWlpRVRJQlZGMHpB?=
+ =?utf-8?B?RmRrNDJWQjVCQjRVNG9mL2EwOUZxWkU2aGZZOCtDcE1Pd2dPVVc1dithaDhx?=
+ =?utf-8?B?cXdoSnhTZ0xoWURxaG5xQ3VqQjFJTVVXWFRUbHRBdnlMSkJ2THFPVzE3cnZt?=
+ =?utf-8?B?UkZ3RTVyRjJYN2xsWGVZTW1WZlJrMkFUbG1mVmxiZG5nMjE0V1RRUHo1WDB6?=
+ =?utf-8?B?TUg0RjQzWWpLRlBMZFJ4dlFNN2x3TExQN3doZVJBbTdjTERESUhOUTVBSmtR?=
+ =?utf-8?B?RGh3N2NKTmp3TmRiU2I3VkVwWkFqbGJWM1Q2OFFiV0pNTjVEdjVCVytiKzN0?=
+ =?utf-8?B?Z0E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D1A23C77B138174DA0754F11C16E0B4C@jpnprd01.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: wMrNsQqPPYHlmk88iOocarT2UTYp9ERN
-X-Proofpoint-GUID: wMrNsQqPPYHlmk88iOocarT2UTYp9ERN
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-15_08,2022-11-15_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 bulkscore=0
- mlxlogscore=999 phishscore=0 impostorscore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211160029
+X-OriginatorOrg: nec.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TYWPR01MB8591.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0f2ca86-8425-468b-40d9-08dac792206e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2022 05:19:24.9126
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e67df547-9d0d-4f4d-9161-51c6ed1f7d11
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 724NT/PLWbvZSHPKN9rfyrfi09JI76q/WgisynY45LhxwsXZhpMeDddK4eEHeJ1SLE92O5ZNFNZTt5fHYGkzVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYAPR01MB5466
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make the module descriptions for the x86 optimized crypto modules match
-the descriptions of the generic modules and the names in Kconfig.
-
-End each description with "with <feature name>" listing the features
-used for module matching.
-    "-- accelerated for x86 with AVX2"
-
-Mention any other required CPU features:
-    "(also required: AES-NI)"
-
-Mention any CPU features that are not required but enable additional
-acceleration:
-    "(optional: GF-NI)"
-
-Signed-off-by: Robert Elliott <elliott@hpe.com>
----
- arch/x86/crypto/aegis128-aesni-glue.c      | 2 +-
- arch/x86/crypto/aesni-intel_glue.c         | 2 +-
- arch/x86/crypto/aria_aesni_avx_glue.c      | 2 +-
- arch/x86/crypto/blake2s-glue.c             | 1 +
- arch/x86/crypto/blowfish_glue.c            | 2 +-
- arch/x86/crypto/camellia_aesni_avx2_glue.c | 2 +-
- arch/x86/crypto/camellia_aesni_avx_glue.c  | 2 +-
- arch/x86/crypto/camellia_glue.c            | 2 +-
- arch/x86/crypto/cast5_avx_glue.c           | 2 +-
- arch/x86/crypto/cast6_avx_glue.c           | 2 +-
- arch/x86/crypto/chacha_glue.c              | 2 +-
- arch/x86/crypto/crc32-pclmul_glue.c        | 2 +-
- arch/x86/crypto/crc32c-intel_glue.c        | 2 +-
- arch/x86/crypto/crct10dif-pclmul_glue.c    | 2 +-
- arch/x86/crypto/curve25519-x86_64.c        | 1 +
- arch/x86/crypto/des3_ede_glue.c            | 2 +-
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 2 +-
- arch/x86/crypto/nhpoly1305-avx2-glue.c     | 2 +-
- arch/x86/crypto/nhpoly1305-sse2-glue.c     | 2 +-
- arch/x86/crypto/poly1305_glue.c            | 2 +-
- arch/x86/crypto/polyval-clmulni_glue.c     | 2 +-
- arch/x86/crypto/serpent_avx2_glue.c        | 2 +-
- arch/x86/crypto/serpent_avx_glue.c         | 2 +-
- arch/x86/crypto/serpent_sse2_glue.c        | 2 +-
- arch/x86/crypto/sha1_ssse3_glue.c          | 2 +-
- arch/x86/crypto/sha256_ssse3_glue.c        | 2 +-
- arch/x86/crypto/sha512_ssse3_glue.c        | 2 +-
- arch/x86/crypto/sm3_avx_glue.c             | 2 +-
- arch/x86/crypto/sm4_aesni_avx2_glue.c      | 2 +-
- arch/x86/crypto/sm4_aesni_avx_glue.c       | 2 +-
- arch/x86/crypto/twofish_avx_glue.c         | 2 +-
- arch/x86/crypto/twofish_glue.c             | 2 +-
- arch/x86/crypto/twofish_glue_3way.c        | 2 +-
- crypto/aes_ti.c                            | 2 +-
- crypto/blake2b_generic.c                   | 2 +-
- crypto/blowfish_common.c                   | 2 +-
- crypto/crct10dif_generic.c                 | 2 +-
- crypto/curve25519-generic.c                | 1 +
- crypto/sha256_generic.c                    | 2 +-
- crypto/sha512_generic.c                    | 2 +-
- crypto/sm3.c                               | 2 +-
- crypto/sm4.c                               | 2 +-
- crypto/twofish_common.c                    | 2 +-
- crypto/twofish_generic.c                   | 2 +-
- 44 files changed, 44 insertions(+), 41 deletions(-)
-
-diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
-index e0312ecf34a8..e72ae7ba5f12 100644
---- a/arch/x86/crypto/aegis128-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128-aesni-glue.c
-@@ -322,6 +322,6 @@ module_exit(crypto_aegis128_aesni_module_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
--MODULE_DESCRIPTION("AEGIS-128 AEAD algorithm -- AESNI+SSE2 implementation");
-+MODULE_DESCRIPTION("AEGIS-128 AEAD algorithm -- accelerated for x86 with AES-NI (also required: SEE2)");
- MODULE_ALIAS_CRYPTO("aegis128");
- MODULE_ALIAS_CRYPTO("aegis128-aesni");
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 80dbf98c53fd..3d8508598e76 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1311,6 +1311,6 @@ static void __exit aesni_exit(void)
- late_initcall(aesni_init);
- module_exit(aesni_exit);
- 
--MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, Intel AES-NI instructions optimized");
-+MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm -- accelerated for x86 with AES-NI (optional: AVX, AVX2)");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("aes");
-diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
-index ebb9760967b5..1d23c7ef7aef 100644
---- a/arch/x86/crypto/aria_aesni_avx_glue.c
-+++ b/arch/x86/crypto/aria_aesni_avx_glue.c
-@@ -227,6 +227,6 @@ module_exit(aria_avx_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
--MODULE_DESCRIPTION("ARIA Cipher Algorithm, AVX/AES-NI/GFNI optimized");
-+MODULE_DESCRIPTION("ARIA Cipher Algorithm -- accelerated for x86 with AVX (also required: AES-NI, OSXSAVE)(optional: GF-NI)");
- MODULE_ALIAS_CRYPTO("aria");
- MODULE_ALIAS_CRYPTO("aria-aesni-avx");
-diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
-index 781cf9471cb6..0618f0d31fae 100644
---- a/arch/x86/crypto/blake2s-glue.c
-+++ b/arch/x86/crypto/blake2s-glue.c
-@@ -90,3 +90,4 @@ static int __init blake2s_mod_init(void)
- module_init(blake2s_mod_init);
- 
- MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("BLAKE2s hash algorithm -- accelerated for x86 with SSSE3 or AVX-512VL");
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index 8e4de7859e34..67f7562d2d02 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -353,6 +353,6 @@ module_init(blowfish_init);
- module_exit(blowfish_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Blowfish Cipher Algorithm, asm optimized");
-+MODULE_DESCRIPTION("Blowfish Cipher Algorithm -- accelerated for x86");
- MODULE_ALIAS_CRYPTO("blowfish");
- MODULE_ALIAS_CRYPTO("blowfish-asm");
-diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-index e8ae1e1a801d..da89fef184d2 100644
---- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-@@ -147,6 +147,6 @@ module_init(camellia_aesni_init);
- module_exit(camellia_aesni_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Camellia Cipher Algorithm, AES-NI/AVX2 optimized");
-+MODULE_DESCRIPTION("Camellia Cipher Algorithm -- accelerated for x86 with AVX2 (also required: AES-NI, AVX, OSXSAVE)");
- MODULE_ALIAS_CRYPTO("camellia");
- MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
-index 6784d631575c..0eebb56bc440 100644
---- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-@@ -146,6 +146,6 @@ module_init(camellia_aesni_init);
- module_exit(camellia_aesni_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Camellia Cipher Algorithm, AES-NI/AVX optimized");
-+MODULE_DESCRIPTION("Camellia Cipher Algorithm -- accelerated for x86 with AVX (also required: AES-NI, OSXSAVE)");
- MODULE_ALIAS_CRYPTO("camellia");
- MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
-index 2cb9b24d9437..b8cad1655c66 100644
---- a/arch/x86/crypto/camellia_glue.c
-+++ b/arch/x86/crypto/camellia_glue.c
-@@ -1427,6 +1427,6 @@ module_init(camellia_init);
- module_exit(camellia_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Camellia Cipher Algorithm, asm optimized");
-+MODULE_DESCRIPTION("Camellia Cipher Algorithm -- accelerated for x86");
- MODULE_ALIAS_CRYPTO("camellia");
- MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
-index 34ef032bb8d0..4a11d3ea9838 100644
---- a/arch/x86/crypto/cast5_avx_glue.c
-+++ b/arch/x86/crypto/cast5_avx_glue.c
-@@ -133,6 +133,6 @@ static void __exit cast5_exit(void)
- module_init(cast5_init);
- module_exit(cast5_exit);
- 
--MODULE_DESCRIPTION("Cast5 Cipher Algorithm, AVX optimized");
-+MODULE_DESCRIPTION("Cast5 Cipher Algorithm -- accelerated for x86 with AVX");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("cast5");
-diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
-index 71559fd3ea87..53a92999a234 100644
---- a/arch/x86/crypto/cast6_avx_glue.c
-+++ b/arch/x86/crypto/cast6_avx_glue.c
-@@ -133,6 +133,6 @@ static void __exit cast6_exit(void)
- module_init(cast6_init);
- module_exit(cast6_exit);
- 
--MODULE_DESCRIPTION("Cast6 Cipher Algorithm, AVX optimized");
-+MODULE_DESCRIPTION("Cast6 Cipher Algorithm -- accelerated for x86 with AVX");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("cast6");
-diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-index ec7461412c5e..563546d0bc2a 100644
---- a/arch/x86/crypto/chacha_glue.c
-+++ b/arch/x86/crypto/chacha_glue.c
-@@ -320,7 +320,7 @@ module_exit(chacha_simd_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
--MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers (x64 SIMD accelerated)");
-+MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers -- accelerated for x86 with SSSE3 (optional: AVX, AVX2, AVX-512VL and AVX-512BW)");
- MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-simd");
- MODULE_ALIAS_CRYPTO("xchacha20");
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-index d5e889c24bea..1c297fae5d39 100644
---- a/arch/x86/crypto/crc32-pclmul_glue.c
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -207,6 +207,6 @@ module_exit(crc32_pclmul_mod_fini);
- 
- MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
- MODULE_LICENSE("GPL");
--
-+MODULE_DESCRIPTION("CRC32 -- accelerated for x86 with PCLMULQDQ");
- MODULE_ALIAS_CRYPTO("crc32");
- MODULE_ALIAS_CRYPTO("crc32-pclmul");
-diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-index 3c2bf7032667..ba7899d04bb1 100644
---- a/arch/x86/crypto/crc32c-intel_glue.c
-+++ b/arch/x86/crypto/crc32c-intel_glue.c
-@@ -275,7 +275,7 @@ module_init(crc32c_intel_mod_init);
- module_exit(crc32c_intel_mod_fini);
- 
- MODULE_AUTHOR("Austin Zhang <austin.zhang@intel.com>, Kent Liu <kent.liu@intel.com>");
--MODULE_DESCRIPTION("CRC32c (Castagnoli) optimization using Intel Hardware.");
-+MODULE_DESCRIPTION("CRC32c (Castagnoli) -- accelerated for x86 with SSE4.2 (optional: PCLMULQDQ)");
- MODULE_LICENSE("GPL");
- 
- MODULE_ALIAS_CRYPTO("crc32c");
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index a26dbd27da96..df9f81ee97a3 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -162,7 +162,7 @@ module_init(crct10dif_intel_mod_init);
- module_exit(crct10dif_intel_mod_fini);
- 
- MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
--MODULE_DESCRIPTION("T10 DIF CRC calculation accelerated with PCLMULQDQ.");
-+MODULE_DESCRIPTION("T10 DIF CRC -- accelerated for x86 with PCLMULQDQ");
- MODULE_LICENSE("GPL");
- 
- MODULE_ALIAS_CRYPTO("crct10dif");
-diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
-index 74672351e534..078508f53ff0 100644
---- a/arch/x86/crypto/curve25519-x86_64.c
-+++ b/arch/x86/crypto/curve25519-x86_64.c
-@@ -1742,3 +1742,4 @@ MODULE_ALIAS_CRYPTO("curve25519");
- MODULE_ALIAS_CRYPTO("curve25519-x86");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
-+MODULE_DESCRIPTION("Curve25519 algorithm -- accelerated for x86 with ADX (also requires BMI2)");
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index a4cac5129148..fc90c0a076e3 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -404,7 +404,7 @@ module_init(des3_ede_x86_init);
- module_exit(des3_ede_x86_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Triple DES EDE Cipher Algorithm, asm optimized");
-+MODULE_DESCRIPTION("Triple DES EDE Cipher Algorithm -- accelerated for x86");
- MODULE_ALIAS_CRYPTO("des3_ede");
- MODULE_ALIAS_CRYPTO("des3_ede-asm");
- MODULE_AUTHOR("Jussi Kivilinna <jussi.kivilinna@iki.fi>");
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index d19a8e9b34a6..30f4966df4de 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -363,5 +363,5 @@ module_init(ghash_pclmulqdqni_mod_init);
- module_exit(ghash_pclmulqdqni_mod_exit);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("GHASH hash function, accelerated by PCLMULQDQ-NI");
-+MODULE_DESCRIPTION("GHASH hash function -- accelerated for x86 with PCLMULQDQ");
- MODULE_ALIAS_CRYPTO("ghash");
-diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-index 2e63947bc9fa..ed6209f027e7 100644
---- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
-+++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-@@ -94,7 +94,7 @@ static void __exit nhpoly1305_mod_exit(void)
- module_init(nhpoly1305_mod_init);
- module_exit(nhpoly1305_mod_exit);
- 
--MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function (AVX2-accelerated)");
-+MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function -- accelerated for x86 with AVX2 (also required: OSXSAVE)");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
- MODULE_ALIAS_CRYPTO("nhpoly1305");
-diff --git a/arch/x86/crypto/nhpoly1305-sse2-glue.c b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-index c47765e46236..d09156e702dd 100644
---- a/arch/x86/crypto/nhpoly1305-sse2-glue.c
-+++ b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-@@ -83,7 +83,7 @@ static void __exit nhpoly1305_mod_exit(void)
- module_init(nhpoly1305_mod_init);
- module_exit(nhpoly1305_mod_exit);
- 
--MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function (SSE2-accelerated)");
-+MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function -- accelerated for x86 with SSE2");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
- MODULE_ALIAS_CRYPTO("nhpoly1305");
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index d3c0d5b335ea..78f88be4a22a 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -313,6 +313,6 @@ module_exit(poly1305_simd_mod_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
--MODULE_DESCRIPTION("Poly1305 authenticator");
-+MODULE_DESCRIPTION("Poly1305 authenticator -- accelerated for x86 (optional: AVX, AVX2, AVX-512F)");
- MODULE_ALIAS_CRYPTO("poly1305");
- MODULE_ALIAS_CRYPTO("poly1305-simd");
-diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
-index 20d4a68ec1d7..447f0f219759 100644
---- a/arch/x86/crypto/polyval-clmulni_glue.c
-+++ b/arch/x86/crypto/polyval-clmulni_glue.c
-@@ -211,6 +211,6 @@ module_init(polyval_clmulni_mod_init);
- module_exit(polyval_clmulni_mod_exit);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("POLYVAL hash function accelerated by PCLMULQDQ-NI");
-+MODULE_DESCRIPTION("POLYVAL hash function - accelerated for x86 with PCLMULQDQ (also required: AVX)");
- MODULE_ALIAS_CRYPTO("polyval");
- MODULE_ALIAS_CRYPTO("polyval-clmulni");
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index 2aa62c93a16f..0a57779a7559 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -139,6 +139,6 @@ module_init(serpent_avx2_init);
- module_exit(serpent_avx2_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX2 optimized");
-+MODULE_DESCRIPTION("Serpent Cipher Algorithm -- accelerated for x86 with AVX2 (also required: OSXSAVE)");
- MODULE_ALIAS_CRYPTO("serpent");
- MODULE_ALIAS_CRYPTO("serpent-asm");
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 28ee9717df49..9d03fb25537f 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -141,6 +141,6 @@ static void __exit serpent_exit(void)
- module_init(serpent_init);
- module_exit(serpent_exit);
- 
--MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX optimized");
-+MODULE_DESCRIPTION("Serpent Cipher Algorithm -- accelerated for x86 with AVX");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("serpent");
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 74f0c89f55ef..287b19527105 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -131,6 +131,6 @@ static void __exit serpent_sse2_exit(void)
- module_init(serpent_sse2_init);
- module_exit(serpent_sse2_exit);
- 
--MODULE_DESCRIPTION("Serpent Cipher Algorithm, SSE2 optimized");
-+MODULE_DESCRIPTION("Serpent Cipher Algorithm -- accelerated for x86 with SSE2");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("serpent");
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 405af5e14b67..113756544d4e 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -433,7 +433,7 @@ module_init(sha1_ssse3_mod_init);
- module_exit(sha1_ssse3_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, Supplemental SSE3 accelerated");
-+MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm -- accelerated for x86 with SSSE3, AVX, AVX2, or SHA-NI");
- 
- MODULE_ALIAS_CRYPTO("sha1");
- MODULE_ALIAS_CRYPTO("sha1-ssse3");
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 293cf7085dd3..78fa25d2e4ba 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -498,7 +498,7 @@ module_init(sha256_ssse3_mod_init);
- module_exit(sha256_ssse3_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, Supplemental SSE3 accelerated");
-+MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithms -- accelerated for x86 with SSSE3, AVX, AVX2, or SHA-NI");
- 
- MODULE_ALIAS_CRYPTO("sha256");
- MODULE_ALIAS_CRYPTO("sha256-ssse3");
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 9f13baf7dda9..2fa951069604 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -396,7 +396,7 @@ module_init(sha512_ssse3_mod_init);
- module_exit(sha512_ssse3_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, Supplemental SSE3 accelerated");
-+MODULE_DESCRIPTION("SHA-384 and SHA-512 Secure Hash Algorithms -- accelerated for x86 with SSSE3, AVX, or AVX2");
- 
- MODULE_ALIAS_CRYPTO("sha512");
- MODULE_ALIAS_CRYPTO("sha512-ssse3");
-diff --git a/arch/x86/crypto/sm3_avx_glue.c b/arch/x86/crypto/sm3_avx_glue.c
-index 169ba6a2c806..9e1177fbf032 100644
---- a/arch/x86/crypto/sm3_avx_glue.c
-+++ b/arch/x86/crypto/sm3_avx_glue.c
-@@ -161,6 +161,6 @@ module_exit(sm3_avx_mod_exit);
- 
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Tianjia Zhang <tianjia.zhang@linux.alibaba.com>");
--MODULE_DESCRIPTION("SM3 Secure Hash Algorithm, AVX assembler accelerated");
-+MODULE_DESCRIPTION("SM3 Secure Hash Algorithm -- accelerated for x86 with AVX (also required: BMI2)");
- MODULE_ALIAS_CRYPTO("sm3");
- MODULE_ALIAS_CRYPTO("sm3-avx");
-diff --git a/arch/x86/crypto/sm4_aesni_avx2_glue.c b/arch/x86/crypto/sm4_aesni_avx2_glue.c
-index 6bcf78231888..b497a6006c8d 100644
---- a/arch/x86/crypto/sm4_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/sm4_aesni_avx2_glue.c
-@@ -177,6 +177,6 @@ module_exit(sm4_exit);
- 
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Tianjia Zhang <tianjia.zhang@linux.alibaba.com>");
--MODULE_DESCRIPTION("SM4 Cipher Algorithm, AES-NI/AVX2 optimized");
-+MODULE_DESCRIPTION("SM4 Cipher Algorithm -- accelerated for x86 with AVX2 (also required: AES-NI, AVX, OSXSAVE)");
- MODULE_ALIAS_CRYPTO("sm4");
- MODULE_ALIAS_CRYPTO("sm4-aesni-avx2");
-diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
-index 03775b1079dc..e583ee0948af 100644
---- a/arch/x86/crypto/sm4_aesni_avx_glue.c
-+++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
-@@ -495,6 +495,6 @@ module_exit(sm4_exit);
- 
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Tianjia Zhang <tianjia.zhang@linux.alibaba.com>");
--MODULE_DESCRIPTION("SM4 Cipher Algorithm, AES-NI/AVX optimized");
-+MODULE_DESCRIPTION("SM4 Cipher Algorithm -- accelerated for x86 with AVX (also required: AES-NI, OSXSAVE)");
- MODULE_ALIAS_CRYPTO("sm4");
- MODULE_ALIAS_CRYPTO("sm4-aesni-avx");
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index ae3cc4ad6f4f..7b405c66d5fa 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -143,6 +143,6 @@ static void __exit twofish_exit(void)
- module_init(twofish_init);
- module_exit(twofish_exit);
- 
--MODULE_DESCRIPTION("Twofish Cipher Algorithm, AVX optimized");
-+MODULE_DESCRIPTION("Twofish Cipher Algorithm -- accelerated for x86 with AVX");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("twofish");
-diff --git a/arch/x86/crypto/twofish_glue.c b/arch/x86/crypto/twofish_glue.c
-index ade98aef3402..10729675e79c 100644
---- a/arch/x86/crypto/twofish_glue.c
-+++ b/arch/x86/crypto/twofish_glue.c
-@@ -105,6 +105,6 @@ module_init(twofish_glue_init);
- module_exit(twofish_glue_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION ("Twofish Cipher Algorithm, asm optimized");
-+MODULE_DESCRIPTION("Twofish Cipher Algorithm -- accelerated for x86");
- MODULE_ALIAS_CRYPTO("twofish");
- MODULE_ALIAS_CRYPTO("twofish-asm");
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index 8db2f23b3056..43f428b59684 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -177,6 +177,6 @@ module_init(twofish_3way_init);
- module_exit(twofish_3way_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Twofish Cipher Algorithm, 3-way parallel asm optimized");
-+MODULE_DESCRIPTION("Twofish Cipher Algorithm -- accelerated for x86 (3-way parallel)");
- MODULE_ALIAS_CRYPTO("twofish");
- MODULE_ALIAS_CRYPTO("twofish-asm");
-diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
-index 205c2c257d49..3cff553495ad 100644
---- a/crypto/aes_ti.c
-+++ b/crypto/aes_ti.c
-@@ -78,6 +78,6 @@ static void __exit aes_fini(void)
- module_init(aes_init);
- module_exit(aes_fini);
- 
--MODULE_DESCRIPTION("Generic fixed time AES");
-+MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm -- generic fixed time");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-index 6704c0355889..ee53f25ff254 100644
---- a/crypto/blake2b_generic.c
-+++ b/crypto/blake2b_generic.c
-@@ -175,7 +175,7 @@ subsys_initcall(blake2b_mod_init);
- module_exit(blake2b_mod_fini);
- 
- MODULE_AUTHOR("David Sterba <kdave@kernel.org>");
--MODULE_DESCRIPTION("BLAKE2b generic implementation");
-+MODULE_DESCRIPTION("BLAKE2b hash algorithm");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("blake2b-160");
- MODULE_ALIAS_CRYPTO("blake2b-160-generic");
-diff --git a/crypto/blowfish_common.c b/crypto/blowfish_common.c
-index 1c072012baff..8c75fdfcd09c 100644
---- a/crypto/blowfish_common.c
-+++ b/crypto/blowfish_common.c
-@@ -394,4 +394,4 @@ int blowfish_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
- EXPORT_SYMBOL_GPL(blowfish_setkey);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Blowfish Cipher common functions");
-+MODULE_DESCRIPTION("Blowfish Cipher Algorithm common functions");
-diff --git a/crypto/crct10dif_generic.c b/crypto/crct10dif_generic.c
-index e843982073bb..81c131c8ccd0 100644
---- a/crypto/crct10dif_generic.c
-+++ b/crypto/crct10dif_generic.c
-@@ -116,7 +116,7 @@ subsys_initcall(crct10dif_mod_init);
- module_exit(crct10dif_mod_fini);
- 
- MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
--MODULE_DESCRIPTION("T10 DIF CRC calculation.");
-+MODULE_DESCRIPTION("T10 DIF CRC calculation");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("crct10dif");
- MODULE_ALIAS_CRYPTO("crct10dif-generic");
-diff --git a/crypto/curve25519-generic.c b/crypto/curve25519-generic.c
-index d055b0784c77..4f96583b31dd 100644
---- a/crypto/curve25519-generic.c
-+++ b/crypto/curve25519-generic.c
-@@ -88,3 +88,4 @@ module_exit(curve25519_exit);
- MODULE_ALIAS_CRYPTO("curve25519");
- MODULE_ALIAS_CRYPTO("curve25519-generic");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Curve25519 algorithm");
-diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-index bf147b01e313..141430c25e15 100644
---- a/crypto/sha256_generic.c
-+++ b/crypto/sha256_generic.c
-@@ -102,7 +102,7 @@ subsys_initcall(sha256_generic_mod_init);
- module_exit(sha256_generic_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm");
-+MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithms");
- 
- MODULE_ALIAS_CRYPTO("sha224");
- MODULE_ALIAS_CRYPTO("sha224-generic");
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index be70e76d6d86..63c5616ec770 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -219,7 +219,7 @@ subsys_initcall(sha512_generic_mod_init);
- module_exit(sha512_generic_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("SHA-512 and SHA-384 Secure Hash Algorithms");
-+MODULE_DESCRIPTION("SHA-384 and SHA-512 Secure Hash Algorithms");
- 
- MODULE_ALIAS_CRYPTO("sha384");
- MODULE_ALIAS_CRYPTO("sha384-generic");
-diff --git a/crypto/sm3.c b/crypto/sm3.c
-index d473e358a873..2a400eb69e66 100644
---- a/crypto/sm3.c
-+++ b/crypto/sm3.c
-@@ -242,5 +242,5 @@ void sm3_final(struct sm3_state *sctx, u8 *out)
- }
- EXPORT_SYMBOL_GPL(sm3_final);
- 
--MODULE_DESCRIPTION("Generic SM3 library");
-+MODULE_DESCRIPTION("SM3 Secure Hash Algorithm generic library");
- MODULE_LICENSE("GPL v2");
-diff --git a/crypto/sm4.c b/crypto/sm4.c
-index 2c44193bc27e..d46b598b41cd 100644
---- a/crypto/sm4.c
-+++ b/crypto/sm4.c
-@@ -180,5 +180,5 @@ void sm4_crypt_block(const u32 *rk, u8 *out, const u8 *in)
- }
- EXPORT_SYMBOL_GPL(sm4_crypt_block);
- 
--MODULE_DESCRIPTION("Generic SM4 library");
-+MODULE_DESCRIPTION("SM4 Cipher Algorithm generic library");
- MODULE_LICENSE("GPL v2");
-diff --git a/crypto/twofish_common.c b/crypto/twofish_common.c
-index f921f30334f4..daa28045069d 100644
---- a/crypto/twofish_common.c
-+++ b/crypto/twofish_common.c
-@@ -690,4 +690,4 @@ int twofish_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key_len)
- EXPORT_SYMBOL_GPL(twofish_setkey);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Twofish cipher common functions");
-+MODULE_DESCRIPTION("Twofish Cipher Algorithm common functions");
-diff --git a/crypto/twofish_generic.c b/crypto/twofish_generic.c
-index 86b2f067a416..4fe42b4ac82d 100644
---- a/crypto/twofish_generic.c
-+++ b/crypto/twofish_generic.c
-@@ -191,6 +191,6 @@ subsys_initcall(twofish_mod_init);
- module_exit(twofish_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION ("Twofish Cipher Algorithm");
-+MODULE_DESCRIPTION("Twofish Cipher Algorithm");
- MODULE_ALIAS_CRYPTO("twofish");
- MODULE_ALIAS_CRYPTO("twofish-generic");
--- 
-2.38.1
-
+T24gVHVlLCBOb3YgMTUsIDIwMjIgYXQgMDQ6MTQ6NDJQTSArMDEwMCwgVmxhc3RpbWlsIEJhYmth
+IHdyb3RlOg0KPiBDYydpbmcgbWVtb3J5IGZhaWx1cmUgZm9sa3MsIHRoZSBiZWlubmluZyBvZiB0
+aGlzIHN1YnRocmVhZCBpcyBoZXJlOg0KPiANCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxs
+LzNhNTE4NDBmNmE4MGM4N2IzOTYzMmRjNzI4ZGJkOWI1ZGQ0NDRjZDcuMTY1NTc2MTYyNy5naXQu
+YXNoaXNoLmthbHJhQGFtZC5jb20vDQo+IA0KPiBPbiAxMS8xNS8yMiAwMDozNiwgS2FscmEsIEFz
+aGlzaCB3cm90ZToNCj4gPiBIZWxsbyBCb3JpcywNCj4gPiANCj4gPiBPbiAxMS8yLzIwMjIgNjoy
+MiBBTSwgQm9yaXNsYXYgUGV0a292IHdyb3RlOg0KPiA+PiBPbiBNb24sIE9jdCAzMSwgMjAyMiBh
+dCAwNDo1ODozOFBNIC0wNTAwLCBLYWxyYSwgQXNoaXNoIHdyb3RlOg0KPiA+Pj4gwqDCoMKgwqDC
+oCBpZiAoc25wX2xvb2t1cF9ybXBlbnRyeShwZm4sICZybXBfbGV2ZWwpKSB7DQo+ID4+PiDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgZG9fc2lnYnVzKHJlZ3MsIGVycm9yX2NvZGUsIGFkZHJlc3Ms
+IFZNX0ZBVUxUX1NJR0JVUyk7DQo+ID4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJu
+IFJNUF9QRl9SRVRSWTsNCj4gPj4NCj4gPj4gRG9lcyB0aGlzIGlzc3VlIHNvbWUgaGFsZndheSB1
+bmRlcnN0YW5kYWJsZSBlcnJvciBtZXNzYWdlIHdoeSB0aGUNCj4gPj4gcHJvY2VzcyBnb3Qga2ls
+bGVkPw0KPiA+Pg0KPiA+Pj4gV2lsbCBsb29rIGF0IGFkZGluZyBvdXIgb3duIHJlY292ZXJ5IGZ1
+bmN0aW9uIGZvciB0aGUgc2FtZSwgYnV0IHRoYXQgd2lsbA0KPiA+Pj4gYWdhaW4gbWFyayB0aGUg
+cGFnZXMgYXMgcG9pc29uZWQsIHJpZ2h0ID8NCj4gPj4NCj4gPj4gV2VsbCwgbm90IHBvaXNvbmVk
+IGJ1dCBQR19vZmZsaW1pdHMgb3Igd2hhdGV2ZXIgdGhlIG1tIGZvbGtzIGFncmVlIHVwb24uDQo+
+ID4+IFNlbWFudGljYWxseSwgaXQnbGwgYmUgaGFuZGxlZCB0aGUgc2FtZSB3YXksIG9mYy4NCj4g
+PiANCj4gPiBBZGRlZCBhIG5ldyBQR19vZmZsaW1pdHMgZmxhZyBhbmQgYSBzaW1wbGUgY29ycmVz
+cG9uZGluZyBoYW5kbGVyIGZvciBpdC4NCj4gDQo+IE9uZSB0aGluZyBpcywgdGhlcmUncyBub3Qg
+ZW5vdWdoIHBhZ2UgZmxhZ3MgdG8gYmUgYWRkaW5nIG1vcmUgKGV4Y2VwdA0KPiBhbGlhc2VzIGZv
+ciBleGlzdGluZykgZm9yIGNhc2VzIHRoYXQgY2FuIGF2b2lkIGl0LCBidXQgYXMgQm9yaXMgc2F5
+cywgaWYNCj4gdXNpbmcgYWxpYXMgdG8gUEdfaHdwb2lzb24gaXQgZGVwZW5kcyB3aGF0IHdpbGwg
+YmVjb21lIGNvbmZ1c2VkIHdpdGggdGhlDQo+IGFjdHVhbCBod3BvaXNvbi4NCg0KSSBhZ3JlZSB3
+aXRoIHRoaXMuIEp1c3QgZGVmaW5pbmcgUEdfb2ZmbGltaXRzIGFzIGFuIGFsaWFzIG9mIFBHX2h3
+cG9pc29uDQpjb3VsZCBicmVhayBjdXJyZW50IGh3cG9pc29uIHdvcmtsb2FkLiAgU28gaWYgeW91
+IGZpbmFsbHkgZGVjaWRlIHRvIGdvDQpmb3J3YXJkIGluIHRoaXMgZGlyZWN0aW9uLCB5b3UgbWF5
+IGFzIHdlbGwgaGF2ZSBzb21lIGluZGljYXRvciB0bw0KZGlzdGluZ3Vpc2ggdGhlIG5ldyBraW5k
+IG9mIGxlYWtlZCBwYWdlcyBmcm9tIGh3cG9pc29uZWQgcGFnZXMuDQoNCkkgZG9uJ3QgcmVtZW1i
+ZXIgZXhhY3QgdGhyZWFkLCBidXQgSSd2ZSByZWFkIHNvbWVvbmUgd3JpdGluZyBhYm91dCBzaW1p
+bGFyDQpraW5kIG9mIHN1Z2dlc3Rpb24gb2YgdXNpbmcgbWVtb3J5X2ZhaWx1cmUoKSB0byBtYWtl
+IHBhZ2VzIGluYWNjZXNzaWJsZSBpbg0Kbm9uLW1lbW9yeSBlcnJvciB1c2VjYXNlLiAgSSBmZWVs
+IHRoYXQgaXQgY291bGQgYmUgcG9zc2libGUgdG8gZ2VuZXJhbGl6ZQ0KbWVtb3J5X2ZhaWx1cmUo
+KSBhcyBnZW5lcmFsLXB1cnBvc2UgcGFnZSBvZmZsaW5pbmcgKGJ5IHJlbmFtaW5nIGl0IHdpdGgN
+CmhhcmRfb2ZmbGluZV9wYWdlKCkgYW5kIG1ha2luZyBtZW1vcnlfZmFpbHVyZSgpIG9uZSBvZiB0
+aGUgdXNlciBvZiBpdCkuDQoNClRoYW5rcywNCk5hb3lhIEhvcmlndWNoaQ==
