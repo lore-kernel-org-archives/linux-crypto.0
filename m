@@ -2,193 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E234C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFC0C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231657AbiKPEOY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 23:14:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54182 "EHLO
+        id S231918AbiKPEO0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Nov 2022 23:14:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231812AbiKPEOT (ORCPT
+        with ESMTP id S231848AbiKPEOU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 23:14:19 -0500
+        Tue, 15 Nov 2022 23:14:20 -0500
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C49A2CDCC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF25D31EEE;
         Tue, 15 Nov 2022 20:14:17 -0800 (PST)
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3Ncm8026856;
-        Wed, 16 Nov 2022 04:14:07 GMT
+Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG4DcFj023372;
+        Wed, 16 Nov 2022 04:14:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=cTTNWZf0gsaOChSSwVwJsJGsUpzhNtRL8Yvh4fEQViw=;
- b=oCuOJ54erZ91/ohmsoPTEJnfhsBH1vjmh1haz6V7DtH9adN81WnwEZ9Bp+lnpyziuKTr
- 76WR0CsARrKK6EjpLsNa+IilhpmXSvAzfDdL9puh45aSwhSpogkAs7M/MB70t5wYX1wj
- VscpfEGI5LwWWXoW9bgT7wEzFA7VwV74/9w7Wbhb/dlbO3KM11ltNMQvu55xKrpilzuE
- OEWTH1C3FMwrFKK7EQuiiFWxXfZhYx8YKlCviIwyQont3q9oo+H/O73LAUgtgkxZfBC0
- DHWX+sHlU2OVRdACoTBKKRufgjwfv0ueaVkb2Wt3H69ilTNiOle2yhb0KVcV3Afkb/k0 5g== 
-Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvqwqgabd-1
+ bh=ukwY7JIs/U1Bbbab6Ibms4gk638cl7c9kt9xB3XTx+A=;
+ b=kxttb0P+LQ79UvpnOJTgvoNBaX+a399Fm4RabsyfNJgL/DQ1hu3D53f8gFqmawaX/CW5
+ /0uhDA/QWWIyEChrsiqXX9gQuBX6ei89re5gpt5kz6B46PBBZ408seJ2rMykvjZ1/zoK
+ UQCHlW09ObeR3uWq5/9313MGb9erqRf6TsAWILfWPttfai/DYFkw8sTp/A5OWe2470D9
+ VWQgWSvPUmZasNsDSPB0P6j2TsDytFuAT/d7e2KbJtOH6SQ4hN6LeeAubnF5MRLJPAPB
+ QrLhezUGNR7WmZiypRfwpmKl6p6ecDUDRN/fkyTtjPSuzhGjRCVUeyVMwjV2FFPgZL4h IA== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvrmng06w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 04:14:07 +0000
+        Wed, 16 Nov 2022 04:14:02 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 1BFFF4B5DC;
-        Wed, 16 Nov 2022 04:14:06 +0000 (UTC)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id B62102EEE8;
+        Wed, 16 Nov 2022 04:14:01 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id A22BE808BA7;
-        Wed, 16 Nov 2022 04:14:05 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 46F70808B9A;
+        Wed, 16 Nov 2022 04:14:01 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v4 11/24] crypto: x86/aegis - limit FPU preemption
-Date:   Tue, 15 Nov 2022 22:13:29 -0600
-Message-Id: <20221116041342.3841-12-elliott@hpe.com>
+Subject: [PATCH v4 07/24] crypto: x86/ghash - use u8 rather than char
+Date:   Tue, 15 Nov 2022 22:13:25 -0600
+Message-Id: <20221116041342.3841-8-elliott@hpe.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221116041342.3841-1-elliott@hpe.com>
 References: <20221103042740.6556-1-elliott@hpe.com>
  <20221116041342.3841-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: _Ez51FyL3s9E__eU_HvQXPq7PEMUgsSQ
-X-Proofpoint-GUID: _Ez51FyL3s9E__eU_HvQXPq7PEMUgsSQ
+X-Proofpoint-GUID: OztRO2yPCF9wMos6GXUqpT1CCWFMUx0i
+X-Proofpoint-ORIG-GUID: OztRO2yPCF9wMos6GXUqpT1CCWFMUx0i
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-15_08,2022-11-15_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- impostorscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211160029
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=986
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
+ phishscore=0 spamscore=0 adultscore=0 impostorscore=0 malwarescore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211160029
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make kernel_fpu_begin() and kernel_fpu_end() calls around each
-assembly language function that uses FPU context, rather than
-around the entire set (init, ad, crypt, final).
+Use more consistent unambivalent types for the source and destination
+buffer pointer arguments.
 
-Limit the processing of bulk data based on a module parameter,
-so multiple blocks are processed within one FPU context
-(associated data is not limited).
-
-Allow the skcipher_walk functions to sleep again, since they are
-is no longer called inside FPU context.
-
-Motivation: calling crypto_aead_encrypt() with a single scatter-gather
-list entry pointing to a 1 MiB plaintext buffer caused the aesni_encrypt
-function to receive a length of 1048576 bytes and consume 306348 cycles
-within FPU context to process that data.
-
-Fixes: 1d373d4e8e15 ("crypto: x86 - Add optimized AEGIS implementations")
-Fixes: ba6771c0a0bc ("crypto: x86/aegis - fix handling chunked inputs and MAY_SLEEP")
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- arch/x86/crypto/aegis128-aesni-glue.c | 39 ++++++++++++++++++++-------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  | 4 ++--
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
-index 4623189000d8..6e96bdda2811 100644
---- a/arch/x86/crypto/aegis128-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128-aesni-glue.c
-@@ -23,6 +23,9 @@
- #define AEGIS128_MIN_AUTH_SIZE 8
- #define AEGIS128_MAX_AUTH_SIZE 16
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 2bf871899920..c7b8542facee 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -88,7 +88,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
+ 	RET
+ SYM_FUNC_END(__clmul_gf128mul_ble)
  
-+/* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+static const unsigned int bytes_per_fpu = 4 * 1024;
-+
- asmlinkage void crypto_aegis128_aesni_init(void *state, void *key, void *iv);
+-/* void clmul_ghash_mul(char *dst, const u128 *shash) */
++/* void clmul_ghash_mul(u8 *dst, const u128 *shash) */
+ SYM_FUNC_START(clmul_ghash_mul)
+ 	FRAME_BEGIN
+ 	movups (%rdi), DATA
+@@ -103,7 +103,7 @@ SYM_FUNC_START(clmul_ghash_mul)
+ SYM_FUNC_END(clmul_ghash_mul)
  
- asmlinkage void crypto_aegis128_aesni_ad(
-@@ -85,15 +88,19 @@ static void crypto_aegis128_aesni_process_ad(
- 			if (pos > 0) {
- 				unsigned int fill = AEGIS128_BLOCK_SIZE - pos;
- 				memcpy(buf.bytes + pos, src, fill);
--				crypto_aegis128_aesni_ad(state,
-+				kernel_fpu_begin();
-+				crypto_aegis128_aesni_ad(state->blocks,
- 							 AEGIS128_BLOCK_SIZE,
- 							 buf.bytes);
-+				kernel_fpu_end();
- 				pos = 0;
- 				left -= fill;
- 				src += fill;
- 			}
+ /*
+- * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
++ * void clmul_ghash_update(u8 *dst, const u8 *src, unsigned int srclen,
+  *			   const u128 *shash);
+  */
+ SYM_FUNC_START(clmul_ghash_update)
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 1f1a95f3dd0c..e996627c6583 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -23,9 +23,9 @@
+ #define GHASH_BLOCK_SIZE	16
+ #define GHASH_DIGEST_SIZE	16
  
--			crypto_aegis128_aesni_ad(state, left, src);
-+			kernel_fpu_begin();
-+			crypto_aegis128_aesni_ad(state->blocks, left, src);
-+			kernel_fpu_end();
+-void clmul_ghash_mul(char *dst, const u128 *shash);
++void clmul_ghash_mul(u8 *dst, const u128 *shash);
  
- 			src += left & ~(AEGIS128_BLOCK_SIZE - 1);
- 			left &= AEGIS128_BLOCK_SIZE - 1;
-@@ -110,7 +117,9 @@ static void crypto_aegis128_aesni_process_ad(
+-void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
++void clmul_ghash_update(u8 *dst, const u8 *src, unsigned int srclen,
+ 			const u128 *shash);
  
- 	if (pos > 0) {
- 		memset(buf.bytes + pos, 0, AEGIS128_BLOCK_SIZE - pos);
--		crypto_aegis128_aesni_ad(state, AEGIS128_BLOCK_SIZE, buf.bytes);
-+		kernel_fpu_begin();
-+		crypto_aegis128_aesni_ad(state->blocks, AEGIS128_BLOCK_SIZE, buf.bytes);
-+		kernel_fpu_end();
- 	}
- }
- 
-@@ -119,15 +128,23 @@ static void crypto_aegis128_aesni_process_crypt(
- 		const struct aegis_crypt_ops *ops)
- {
- 	while (walk->nbytes >= AEGIS128_BLOCK_SIZE) {
--		ops->crypt_blocks(state,
--				  round_down(walk->nbytes, AEGIS128_BLOCK_SIZE),
-+		unsigned int chunk = min(walk->nbytes, bytes_per_fpu);
-+
-+		chunk = round_down(chunk, AEGIS128_BLOCK_SIZE);
-+
-+		kernel_fpu_begin();
-+		ops->crypt_blocks(state->blocks, chunk,
- 				  walk->src.virt.addr, walk->dst.virt.addr);
--		skcipher_walk_done(walk, walk->nbytes % AEGIS128_BLOCK_SIZE);
-+		kernel_fpu_end();
-+
-+		skcipher_walk_done(walk, walk->nbytes - chunk);
- 	}
- 
- 	if (walk->nbytes) {
--		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
-+		kernel_fpu_begin();
-+		ops->crypt_tail(state->blocks, walk->nbytes, walk->src.virt.addr,
- 				walk->dst.virt.addr);
-+		kernel_fpu_end();
- 		skcipher_walk_done(walk, 0);
- 	}
- }
-@@ -172,15 +189,17 @@ static void crypto_aegis128_aesni_crypt(struct aead_request *req,
- 	struct skcipher_walk walk;
- 	struct aegis_state state;
- 
--	ops->skcipher_walk_init(&walk, req, true);
-+	ops->skcipher_walk_init(&walk, req, false);
- 
- 	kernel_fpu_begin();
-+	crypto_aegis128_aesni_init(&state.blocks, ctx->key.bytes, req->iv);
-+	kernel_fpu_end();
- 
--	crypto_aegis128_aesni_init(&state, ctx->key.bytes, req->iv);
- 	crypto_aegis128_aesni_process_ad(&state, req->src, req->assoclen);
- 	crypto_aegis128_aesni_process_crypt(&state, &walk, ops);
--	crypto_aegis128_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
- 
-+	kernel_fpu_begin();
-+	crypto_aegis128_aesni_final(&state.blocks, tag_xor, req->assoclen, cryptlen);
- 	kernel_fpu_end();
- }
- 
+ struct ghash_async_ctx {
 -- 
 2.38.1
 
