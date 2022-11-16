@@ -2,167 +2,167 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CBE5C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6B7C43217
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Nov 2022 04:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiKPEOd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Nov 2022 23:14:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54218 "EHLO
+        id S231811AbiKPEOc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Nov 2022 23:14:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231866AbiKPEOV (ORCPT
+        with ESMTP id S231868AbiKPEOY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Nov 2022 23:14:21 -0500
+        Tue, 15 Nov 2022 23:14:24 -0500
 Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC9CD31EF2;
-        Tue, 15 Nov 2022 20:14:18 -0800 (PST)
-Received: from pps.filterd (m0134423.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3Ncm7026856;
-        Wed, 16 Nov 2022 04:14:01 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58F2F31F84;
+        Tue, 15 Nov 2022 20:14:19 -0800 (PST)
+Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AG3MWSf016081;
+        Wed, 16 Nov 2022 04:14:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=DZaqRBDQdjwv0XB4GveGfUUF/gpHvXgfa3E0Wxb3Tbk=;
- b=cyCS6uANQ22abyg9phMfFgKUTy3CpaXUj5VAcgX3cTEZbsoCBDPfNjrec2g6WRlzqf2G
- 8N3M1lz/M7X87H82kSx19icCEFOq0U8HX5C/xPt7JEp2dvIcy80O12TezdTfduFO/FIP
- fiNaGEGs5lQym+u5hYjoYM7QJmMiurOHODMIPrJ7LLjXfChIKfSTcxN1iZcYQp/RlX/n
- HUjDBgpy9ZYSM7nJd+4w+xvi7EXait7UQJrmRpPZUkpmrSWYb20Hh9hT6gLbM8lK1vQv
- PVGLo/VSxjk+CRMSR2jY3SlRPRGDJogtl3lqNazF3QkzcT8+HhfYUmUv31fhLT4Jl4Wt 6Q== 
-Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvqwqgaaw-1
+ bh=8ESuWlIrale+sXyV4fNctyjVH7uHSmRimCDCqLPwhog=;
+ b=RBF1t4oGDoPGC+0xeLQ1EWG+ZHfJKiSOxXAophg7F+UmWGEzThZ7WftkUbuFNvyeoNr1
+ vB7AWaFoO+SdHX7c3pQ6vmRi87PPNYxwVzMC62JTidoa/IilwzZCgwuNMMlslroN3POR
+ jzK+SVaksSzCTfgnJ5oMViD8BwHp8NudD9zVuis4r4g7Gy/vzcaWV3Mc4K7p+XhT7znx
+ Jeq0V/djvbuDpSU0AxX9yLKj5oSi0nA3kXJNXcA7K879XrDG0J7Bc2WQ5vaxRJgnMzMO
+ LChW/PmGJWwJv5pz9zJOmuEWxwHPrb+/k9UNCwueJNNMH5mzhdw/1AZRp8AcJbzDroXJ Cg== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3kvqwa0ajs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Nov 2022 04:14:01 +0000
+        Wed, 16 Nov 2022 04:14:10 +0000
 Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 9DE474B5CE;
-        Wed, 16 Nov 2022 04:14:00 +0000 (UTC)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id 908C32EEF6;
+        Wed, 16 Nov 2022 04:14:09 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 273A38065DB;
-        Wed, 16 Nov 2022 04:14:00 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 1E29880FE88;
+        Wed, 16 Nov 2022 04:14:09 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
         Jason@zx2c4.com, David.Laight@ACULAB.COM, ebiggers@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v4 06/24] crypto: x86/sm3 - limit FPU preemption
-Date:   Tue, 15 Nov 2022 22:13:24 -0600
-Message-Id: <20221116041342.3841-7-elliott@hpe.com>
+Subject: [PATCH v4 14/24] crypto: x86/sha - load based on CPU features
+Date:   Tue, 15 Nov 2022 22:13:32 -0600
+Message-Id: <20221116041342.3841-15-elliott@hpe.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221116041342.3841-1-elliott@hpe.com>
 References: <20221103042740.6556-1-elliott@hpe.com>
  <20221116041342.3841-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: d93n2GK0Nadv8dJmFx5k8lFZAwdQ3ekB
-X-Proofpoint-GUID: d93n2GK0Nadv8dJmFx5k8lFZAwdQ3ekB
+X-Proofpoint-GUID: 54hW-XXOxZ2aQxfGxRBb41DPGlIROLF3
+X-Proofpoint-ORIG-GUID: 54hW-XXOxZ2aQxfGxRBb41DPGlIROLF3
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-15_08,2022-11-15_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- impostorscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211160029
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ phishscore=0 suspectscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211160029
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Limit the number of bytes processed between kernel_fpu_begin() and
-kernel_fpu_end() calls.
+Like commit aa031b8f702e ("crypto: x86/sha512 - load based on CPU
+features"), add module aliases for x86-optimized crypto modules:
+        sha1, sha256
+based on CPU feature bits so udev gets a chance to load them later in
+the boot process when the filesystems are all running.
 
-Those functions call preempt_disable() and preempt_enable(), so
-the CPU core is unavailable for scheduling while running, causing:
-    rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: ...
-
-Fixes: 930ab34d906d ("crypto: x86/sm3 - add AVX assembly implementation")
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 
 ---
-v3 use while loop, static int
+v3 put device table SHA_NI entries inside CONFIG_SHAn_NI ifdefs,
+ensure builds properly with arch/x86/Kconfig.assembler changed
+to not set CONFIG_AS_SHA*_NI
 ---
- arch/x86/crypto/sm3_avx_glue.c | 35 ++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
+ arch/x86/crypto/sha1_ssse3_glue.c   | 15 +++++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c | 15 +++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/arch/x86/crypto/sm3_avx_glue.c b/arch/x86/crypto/sm3_avx_glue.c
-index 661b6f22ffcd..483aaed996ba 100644
---- a/arch/x86/crypto/sm3_avx_glue.c
-+++ b/arch/x86/crypto/sm3_avx_glue.c
-@@ -17,6 +17,9 @@
- #include <crypto/sm3_base.h>
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 32f3310e19e2..806463f57b6d 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -24,6 +24,7 @@
+ #include <linux/types.h>
+ #include <crypto/sha1.h>
+ #include <crypto/sha1_base.h>
++#include <asm/cpu_device_id.h>
  #include <asm/simd.h>
  
-+/* avoid kernel_fpu_begin/end scheduler/rcu stalls */
-+static const unsigned int bytes_per_fpu = 11 * 1024;
-+
- asmlinkage void sm3_transform_avx(struct sm3_state *state,
- 			const u8 *data, int nblocks);
+ /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
+@@ -328,11 +329,25 @@ static void unregister_sha1_ni(void)
+ static inline void unregister_sha1_ni(void) { }
+ #endif
  
-@@ -25,8 +28,10 @@ static int sm3_avx_update(struct shash_desc *desc, const u8 *data,
++static const struct x86_cpu_id module_cpu_ids[] = {
++#ifdef CONFIG_AS_SHA1_NI
++	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
++#endif
++	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
++
+ static int __init sha1_ssse3_mod_init(void)
  {
- 	struct sm3_state *sctx = shash_desc_ctx(desc);
+ 	const char *feature_name;
+ 	int ret;
  
-+	BUILD_BUG_ON(bytes_per_fpu == 0);
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
 +
- 	if (!crypto_simd_usable() ||
--			(sctx->count % SM3_BLOCK_SIZE) + len < SM3_BLOCK_SIZE) {
-+	    (sctx->count % SM3_BLOCK_SIZE) + len < SM3_BLOCK_SIZE) {
- 		sm3_update(sctx, data, len);
- 		return 0;
- 	}
-@@ -37,9 +42,16 @@ static int sm3_avx_update(struct shash_desc *desc, const u8 *data,
- 	 */
- 	BUILD_BUG_ON(offsetof(struct sm3_state, state) != 0);
+ #ifdef CONFIG_AS_SHA1_NI
+ 	/* SHA-NI */
+ 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 839da1b36273..30c8c50c1123 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -38,6 +38,7 @@
+ #include <crypto/sha2.h>
+ #include <crypto/sha256_base.h>
+ #include <linux/string.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
  
--	kernel_fpu_begin();
--	sm3_base_do_update(desc, data, len, sm3_transform_avx);
--	kernel_fpu_end();
-+	while (len) {
-+		unsigned int chunk = min(len, bytes_per_fpu);
-+
-+		kernel_fpu_begin();
-+		sm3_base_do_update(desc, data, chunk, sm3_transform_avx);
-+		kernel_fpu_end();
-+
-+		len -= chunk;
-+		data += chunk;
-+	}
+ /* avoid kernel_fpu_begin/end scheduler/rcu stalls */
+@@ -399,11 +400,25 @@ static void unregister_sha256_ni(void)
+ static inline void unregister_sha256_ni(void) { }
+ #endif
  
- 	return 0;
- }
-@@ -47,6 +59,8 @@ static int sm3_avx_update(struct shash_desc *desc, const u8 *data,
- static int sm3_avx_finup(struct shash_desc *desc, const u8 *data,
- 		      unsigned int len, u8 *out)
++static const struct x86_cpu_id module_cpu_ids[] = {
++#ifdef CONFIG_AS_SHA256_NI
++	X86_MATCH_FEATURE(X86_FEATURE_SHA_NI, NULL),
++#endif
++	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
++
+ static int __init sha256_ssse3_mod_init(void)
  {
-+	BUILD_BUG_ON(bytes_per_fpu == 0);
-+
- 	if (!crypto_simd_usable()) {
- 		struct sm3_state *sctx = shash_desc_ctx(desc);
+ 	const char *feature_name;
+ 	int ret;
  
-@@ -57,9 +71,18 @@ static int sm3_avx_finup(struct shash_desc *desc, const u8 *data,
- 		return 0;
- 	}
- 
-+	while (len) {
-+		unsigned int chunk = min(len, bytes_per_fpu);
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
 +
-+		kernel_fpu_begin();
-+		sm3_base_do_update(desc, data, chunk, sm3_transform_avx);
-+		kernel_fpu_end();
-+
-+		len -= chunk;
-+		data += chunk;
-+	}
-+
- 	kernel_fpu_begin();
--	if (len)
--		sm3_base_do_update(desc, data, len, sm3_transform_avx);
- 	sm3_base_do_finalize(desc, sm3_transform_avx);
- 	kernel_fpu_end();
- 
+ #ifdef CONFIG_AS_SHA256_NI
+ 	/* SHA-NI */
+ 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
 -- 
 2.38.1
 
