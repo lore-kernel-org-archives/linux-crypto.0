@@ -2,64 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96489C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 03:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F21C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 09:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233477AbiKQD7H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Nov 2022 22:59:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33260 "EHLO
+        id S239381AbiKQJKh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 04:10:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234045AbiKQD7G (ORCPT
+        with ESMTP id S239726AbiKQJKg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Nov 2022 22:59:06 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635A21403D;
-        Wed, 16 Nov 2022 19:59:02 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ovW30-00F4UP-Dk; Thu, 17 Nov 2022 11:58:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Nov 2022 11:58:42 +0800
-Date:   Thu, 17 Nov 2022 11:58:42 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Robert Elliott <elliott@hpe.com>
-Cc:     davem@davemloft.net, tim.c.chen@linux.intel.com,
-        ap420073@gmail.com, ardb@kernel.org, Jason@zx2c4.com,
-        David.Laight@aculab.com, ebiggers@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 00/24] crypto: fix RCU stalls
-Message-ID: <Y3WxcrjHD4MRWHcS@gondor.apana.org.au>
-References: <20221103042740.6556-1-elliott@hpe.com>
- <20221116041342.3841-1-elliott@hpe.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221116041342.3841-1-elliott@hpe.com>
+        Thu, 17 Nov 2022 04:10:36 -0500
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7F15ADC4;
+        Thu, 17 Nov 2022 01:10:34 -0800 (PST)
+Received: from mxct.zte.com.cn (unknown [192.168.251.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NCYzY192gz4xVnZ;
+        Thu, 17 Nov 2022 17:10:33 +0800 (CST)
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NCYzW127rz4y0vK;
+        Thu, 17 Nov 2022 17:10:31 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.40.50])
+        by mse-fl2.zte.com.cn with SMTP id 2AH9AC7j037132;
+        Thu, 17 Nov 2022 17:10:13 +0800 (+08)
+        (envelope-from ye.xingchen@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+        by mapi (Zmail) with MAPI id mid31;
+        Thu, 17 Nov 2022 17:10:15 +0800 (CST)
+Date:   Thu, 17 Nov 2022 17:10:15 +0800 (CST)
+X-Zmail-TransId: 2af96375fa77ffffffffcae92ea1
+X-Mailer: Zmail v1.0
+Message-ID: <202211171710153200734@zte.com.cn>
+Mime-Version: 1.0
+From:   <ye.xingchen@zte.com.cn>
+To:     <herbert@gondor.apana.org.au>
+Cc:     <olivia@selenic.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGh3cm5nOiBuMi1kcnYgLSBVc2UgZGV2aWNlX2dldF9tYXRjaF9kYXRhKCkgdG8gc2ltcGxpZnkgdGhlCgogY29kZQ==?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl2.zte.com.cn 2AH9AC7j037132
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 6375FA89.001 by FangMail milter!
+X-FangMail-Envelope: 1668676233/4NCYzY192gz4xVnZ/6375FA89.001/192.168.251.13/[192.168.251.13]/mxct.zte.com.cn/<ye.xingchen@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6375FA89.001/4NCYzY192gz4xVnZ
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 10:13:18PM -0600, Robert Elliott wrote:
-> This series fixes the RCU stalls triggered by the x86 crypto
-> modules discussed in
-> https://lore.kernel.org/all/MW5PR84MB18426EBBA3303770A8BC0BDFAB759@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM/
-> 
-> Two root causes were:
-> - too much data processed between kernel_fpu_begin and
->   kernel_fpu_end calls (which are heavily used by the x86
->   optimized drivers)
-> - tcrypt not calling cond_resched during speed test loops
-> 
-> These problems have always been lurking, but improving the
-> loading of the x86/sha512 module led to it happening a lot
-> during boot when using SHA-512 for module signature checking.
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-Can we split this series up please? The fixes to the stalls should
-stand separately from the changes to how modules are loaded.  The
-latter is more of an improvement while the former should be applied
-ASAP.
+Directly get the match data with device_get_match_data().
 
-Thanks,
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ drivers/char/hw_random/n2-drv.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+index 73e408146420..2f784addb717 100644
+--- a/drivers/char/hw_random/n2-drv.c
++++ b/drivers/char/hw_random/n2-drv.c
+@@ -695,20 +695,15 @@ static void n2rng_driver_version(void)
+ static const struct of_device_id n2rng_match[];
+ static int n2rng_probe(struct platform_device *op)
+ {
+-	const struct of_device_id *match;
+ 	int err = -ENOMEM;
+ 	struct n2rng *np;
+
+-	match = of_match_device(n2rng_match, &op->dev);
+-	if (!match)
+-		return -EINVAL;
+-
+ 	n2rng_driver_version();
+ 	np = devm_kzalloc(&op->dev, sizeof(*np), GFP_KERNEL);
+ 	if (!np)
+ 		goto out;
+ 	np->op = op;
+-	np->data = (struct n2rng_template *)match->data;
++	np->data = (struct n2rng_template *) device_get_match_data(&op->dev);
+
+ 	INIT_DELAYED_WORK(&np->work, n2rng_work);
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
