@@ -2,232 +2,306 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC93C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 19:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A94CC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 20:19:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240364AbiKQTQ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 14:16:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
+        id S234811AbiKQUTR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 15:19:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240547AbiKQTQy (ORCPT
+        with ESMTP id S234510AbiKQUTQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 14:16:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44AA7EC9D;
-        Thu, 17 Nov 2022 11:16:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6BBAE62227;
-        Thu, 17 Nov 2022 19:16:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE291C433C1;
-        Thu, 17 Nov 2022 19:16:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="j3kl+t6Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668712609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=I0gafmthYzLnOBvnICA6dCBwdNQe0eJ+3AfKufxJT4Q=;
-        b=j3kl+t6QwEvEzaLFM4ONtkYPyKuftFV+inU7lGfAWvNi7syvRs1LL7XESlt0MCRLO92aAA
-        kApGl1lIYo/Cc4XTOwqaVpC8QkvWAGqSTzUwPR/AM/1UWh+lsa0vdXVnLpUue/i1qUpsM6
-        3pfgyHAQ1Vo/siCdrl7o52b6a4YDTxI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dbfb5ef9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 17 Nov 2022 19:16:48 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Juergen Christ <jchrist@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Tejun Heo <tj@kernel.org>
-Subject: [PATCH] random: reseed in delayed work rather than on-demand
-Date:   Thu, 17 Nov 2022 20:16:43 +0100
-Message-Id: <20221117191643.2303366-1-Jason@zx2c4.com>
+        Thu, 17 Nov 2022 15:19:16 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1446427B0A
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 12:19:11 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id j16so4663662lfe.12
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 12:19:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gkna0fGiQVgsVnWMqH15LxACPZ+dyslkPZRcyoaRi8M=;
+        b=OzToyQ5Dh8TZrMYBHIsP3Q/47IMkrNFnTJJXVrqS+RlMasplhLwlVH83ktgHJrFOAq
+         qAbOJTVvCppju6/uRrI1aJnJCHRE/Lq2SOaXB8xIeRl4GHv2yWb4+nV9Spk9hD31S9yk
+         Oao0kzxD5wiVF1In1F70HeHQozb4wyHDkj1mqicZL9a/5RJtktYIK2Ijwi2h/XxNpzLx
+         dd3aLEc8lEKOzTD37V8gAz2KqKjC4aXrh4SJg7g3UaZ6NHP5o7zBoliiF9uOsG7Fmng4
+         Cd4o94Za5ocA8zz8UzCwHqYvXtp95mAnDQP15wdk/IbiMG/uUrnFwpq8RzRhdiUOFWXT
+         oUYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gkna0fGiQVgsVnWMqH15LxACPZ+dyslkPZRcyoaRi8M=;
+        b=BGVxxUYsqxJpd+lxNw51MRIwG8HJpQBTHa9hDgS2VIqb5sI3Thug2QxCsxY1n2kbBf
+         UmwJVtqg+I9c+Y2BuTuo4ZeaS65aGm/4nAbIDSo/zQ3DDSfFNvAr6/zR8SDLrhaOYBlC
+         E5D89mYEJ4uvpDO1EiajWwfwd0OWGyY7CbYFoBkGtHYkuhQREsN6i/HO7ssfXGRaBLUT
+         ZI32OiSTB21Ztzb5CWjCzO4xrmEaqC2dh7kBbL5VchL6xKKyjAUe7ifuVGg5jZUYE736
+         75wNLGE2jKAyFUKZjesItWOneXTT2xmYFsPhIXkgf5qvf4FbaQXWlqR3HMc+v704FEu+
+         yUXA==
+X-Gm-Message-State: ANoB5pmvlnQn3dZD/1I5Mb++KiWWh8rFd8t8xho1DXn5nIz2aXVpg2/o
+        Usym+xJQsNbUbUhPJroVWjiLnJfpLi+KZBplutlOZA==
+X-Google-Smtp-Source: AA0mqf71072s2CdC2GkbpswjF86mN2Xp1QB6r5agNd51lGwb4YhkKKwMKcc7+oVhqUKdODhNaMXBEKq1K0ihbeC+l84=
+X-Received: by 2002:a05:6512:281b:b0:4b3:e086:87d8 with SMTP id
+ cf27-20020a056512281b00b004b3e08687d8mr1373158lfb.259.1668716348908; Thu, 17
+ Nov 2022 12:19:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1655761627.git.ashish.kalra@amd.com> <34246866043db7bab34a92fe22f359667ab155a0.1655761627.git.ashish.kalra@amd.com>
+ <CABpDEukAEGwb9w12enO=fhSbHbchypsOdO2dkR4Jei3wDW6NWg@mail.gmail.com>
+In-Reply-To: <CABpDEukAEGwb9w12enO=fhSbHbchypsOdO2dkR4Jei3wDW6NWg@mail.gmail.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 17 Nov 2022 13:18:57 -0700
+Message-ID: <CAMkAt6oOB5xG7OnKn58Z-oLNBd091yAajZhrWDtXyu3UCiJNfA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 39/49] KVM: SVM: Introduce ops for the post gfn
+ map and unmap
+To:     Alper Gun <alpergun@google.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, dgilbert@redhat.com,
+        jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, we reseed when random bytes are requested, if the current
-seed is too old. Since random bytes can be requested from all contexts,
-including hard IRQ, this means sometimes we wind up adding a bit of
-latency to hard IRQ. This was so much of a problem on s390x that now
-s390x just doesn't provide its architectural RNG from hard IRQ context,
-so we miss out in that case.
+On Wed, Aug 17, 2022 at 9:47 PM Alper Gun <alpergun@google.com> wrote:
+>
+> On Mon, Jun 20, 2022 at 4:12 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> >
+> > When SEV-SNP is enabled in the guest VM, the guest memory pages can
+> > either be a private or shared. A write from the hypervisor goes through
+> > the RMP checks. If hardware sees that hypervisor is attempting to write
+> > to a guest private page, then it triggers an RMP violation #PF.
+> >
+> > To avoid the RMP violation with GHCB pages, added new post_{map,unmap}_gfn
+> > functions to verify if its safe to map GHCB pages.  Uses a spinlock to
+> > protect against the page state change for existing mapped pages.
+> >
+> > Need to add generic post_{map,unmap}_gfn() ops that can be used to verify
+> > that its safe to map a given guest page in the hypervisor.
+> >
+> > This patch will need to be revisited later after consensus is reached on
+> > how to manage guest private memory as probably UPM private memslots will
+> > be able to handle this page state change more gracefully.
+> >
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
+> > ---
+> >  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> >  arch/x86/include/asm/kvm_host.h    |  3 ++
+> >  arch/x86/kvm/svm/sev.c             | 48 ++++++++++++++++++++++++++++--
+> >  arch/x86/kvm/svm/svm.c             |  3 ++
+> >  arch/x86/kvm/svm/svm.h             | 11 +++++++
+> >  5 files changed, 64 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index e0068e702692..2dd2bc0cf4c3 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -130,6 +130,7 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
+> >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> >  KVM_X86_OP(alloc_apic_backing_page)
+> >  KVM_X86_OP_OPTIONAL(rmp_page_level_adjust)
+> > +KVM_X86_OP(update_protected_guest_state)
+> >
+> >  #undef KVM_X86_OP
+> >  #undef KVM_X86_OP_OPTIONAL
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 49b217dc8d7e..8abc0e724f5c 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1522,7 +1522,10 @@ struct kvm_x86_ops {
+> >         unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+> >
+> >         void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+> > +
+> >         void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
+> > +
+> > +       int (*update_protected_guest_state)(struct kvm_vcpu *vcpu);
+> >  };
+> >
+> >  struct kvm_x86_nested_ops {
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index cb2d1bbb862b..4ed90331bca0 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -341,6 +341,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >                 if (ret)
+> >                         goto e_free;
+> >
+> > +               spin_lock_init(&sev->psc_lock);
+> >                 ret = sev_snp_init(&argp->error);
+> >         } else {
+> >                 ret = sev_platform_init(&argp->error);
+> > @@ -2828,19 +2829,28 @@ static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> >  {
+> >         struct vmcb_control_area *control = &svm->vmcb->control;
+> >         u64 gfn = gpa_to_gfn(control->ghcb_gpa);
+> > +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> >
+> > -       if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
+> > +       if (kvm_vcpu_map(vcpu, gfn, map)) {
+> >                 /* Unable to map GHCB from guest */
+> >                 pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+> >                 return -EFAULT;
+> >         }
+> >
+> > +       if (sev_post_map_gfn(vcpu->kvm, map->gfn, map->pfn)) {
+> > +               kvm_vcpu_unmap(vcpu, map, false);
+> > +               return -EBUSY;
+> > +       }
+> > +
+> >         return 0;
+> >  }
+> >
+> >  static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> >  {
+> > -       kvm_vcpu_unmap(&svm->vcpu, map, true);
+> > +       struct kvm_vcpu *vcpu = &svm->vcpu;
+> > +
+> > +       kvm_vcpu_unmap(vcpu, map, true);
+> > +       sev_post_unmap_gfn(vcpu->kvm, map->gfn, map->pfn);
+> >  }
+> >
+> >  static void dump_ghcb(struct vcpu_svm *svm)
+> > @@ -3383,6 +3393,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+> >                                 return PSC_UNDEF_ERR;
+> >                 }
+> >
+> > +               spin_lock(&sev->psc_lock);
+> > +
+> >                 write_lock(&kvm->mmu_lock);
+> >
+> >                 rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+> > @@ -3417,6 +3429,8 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+> >
+> >                 write_unlock(&kvm->mmu_lock);
+> >
+> > +               spin_unlock(&sev->psc_lock);
+>
+> There is a corner case where the psc_lock is not released. If
+> kvm_mmu_get_tdp_walk fails, the lock will be kept and will cause soft
+> lockup.
+>
+> > +
+> >                 if (rc) {
+> >                         pr_err_ratelimited("Error op %d gpa %llx pfn %llx level %d rc %d\n",
+> >                                            op, gpa, pfn, level, rc);
+> > @@ -3965,3 +3979,33 @@ void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level)
+> >         /* Adjust the level to keep the NPT and RMP in sync */
+> >         *level = min_t(size_t, *level, rmp_level);
+> >  }
+> > +
+> > +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> > +{
+> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > +       int level;
+> > +
+> > +       if (!sev_snp_guest(kvm))
+> > +               return 0;
+> > +
+> > +       spin_lock(&sev->psc_lock);
+> > +
+> > +       /* If pfn is not added as private then fail */
+> > +       if (snp_lookup_rmpentry(pfn, &level) == 1) {
+> > +               spin_unlock(&sev->psc_lock);
+> > +               pr_err_ratelimited("failed to map private gfn 0x%llx pfn 0x%llx\n", gfn, pfn);
+> > +               return -EBUSY;
+> > +       }
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> > +{
+> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > +
+> > +       if (!sev_snp_guest(kvm))
+> > +               return;
+> > +
+> > +       spin_unlock(&sev->psc_lock);
+> > +}
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index b24e0171cbf2..1c8e035ba011 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -4734,7 +4734,10 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >         .vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+> >
+> >         .alloc_apic_backing_page = svm_alloc_apic_backing_page,
+> > +
+> >         .rmp_page_level_adjust = sev_rmp_page_level_adjust,
+> > +
+> > +       .update_protected_guest_state = sev_snp_update_protected_guest_state,
+> >  };
 
-Instead, let's just schedule a persistent delayed work, so that the
-reseeding and potentially expensive operations will always happen from
-process context, reducing unexpected latencies from hard IRQ.
+I don't see this function sev_snp_update_protected_guest_state() being
+defined anywhere in this series.
 
-This also has the nice effect of accumulating a transcript of random
-inputs over time, since it means that we amass more input values. And it
-should make future vDSO integration a bit easier.
+Then this line is removed in 'KVM: SVM: Support SEV-SNP AP Creation
+NAE event'. Should this line just be removed from this patch in the
+first place?
 
-Cc: Harald Freudenberger <freude@linux.ibm.com>
-Cc: Juergen Christ <jchrist@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Tejun Heo <tj@kernel.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 66 ++++++++++++++++++++-----------------------
- 1 file changed, 31 insertions(+), 35 deletions(-)
+> >
+> >  /*
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index 54ff56cb6125..3fd95193ed8d 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -79,19 +79,25 @@ struct kvm_sev_info {
+> >         bool active;            /* SEV enabled guest */
+> >         bool es_active;         /* SEV-ES enabled guest */
+> >         bool snp_active;        /* SEV-SNP enabled guest */
+> > +
+> >         unsigned int asid;      /* ASID used for this guest */
+> >         unsigned int handle;    /* SEV firmware handle */
+> >         int fd;                 /* SEV device fd */
+> > +
+> >         unsigned long pages_locked; /* Number of pages locked */
+> >         struct list_head regions_list;  /* List of registered regions */
+> > +
+> >         u64 ap_jump_table;      /* SEV-ES AP Jump Table address */
+> > +
+> >         struct kvm *enc_context_owner; /* Owner of copied encryption context */
+> >         struct list_head mirror_vms; /* List of VMs mirroring */
+> >         struct list_head mirror_entry; /* Use as a list entry of mirrors */
+> >         struct misc_cg *misc_cg; /* For misc cgroup accounting */
+> >         atomic_t migration_in_progress;
+> > +
+> >         u64 snp_init_flags;
+> >         void *snp_context;      /* SNP guest context page */
+> > +       spinlock_t psc_lock;
+> >  };
+> >
+> >  struct kvm_svm {
+> > @@ -702,6 +708,11 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+> >  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> >  struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+> >  void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
+> > +int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
+> > +void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
+> > +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+> > +void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+> > +int sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu);
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index c901d99c3246..a8127530f88d 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -182,7 +182,6 @@ enum {
- 
- static struct {
- 	u8 key[CHACHA_KEY_SIZE] __aligned(__alignof__(long));
--	unsigned long birth;
- 	unsigned long generation;
- 	spinlock_t lock;
- } base_crng = {
-@@ -200,16 +199,41 @@ static DEFINE_PER_CPU(struct crng, crngs) = {
- 	.lock = INIT_LOCAL_LOCK(crngs.lock),
- };
- 
-+/*
-+ * Return the interval until the next reseeding, which is normally
-+ * CRNG_RESEED_INTERVAL, but during early boot, it is at an interval
-+ * proportional to the uptime.
-+ */
-+static unsigned int crng_reseed_interval(void)
-+{
-+	static bool early_boot = true;
-+
-+	if (unlikely(READ_ONCE(early_boot))) {
-+		time64_t uptime = ktime_get_seconds();
-+		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
-+			WRITE_ONCE(early_boot, false);
-+		else
-+			return max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
-+				     (unsigned int)uptime / 2 * HZ);
-+	}
-+	return CRNG_RESEED_INTERVAL;
-+}
-+
- /* Used by crng_reseed() and crng_make_state() to extract a new seed from the input pool. */
- static void extract_entropy(void *buf, size_t len);
- 
- /* This extracts a new crng key from the input pool. */
--static void crng_reseed(void)
-+static void crng_reseed(struct work_struct *work)
- {
-+	static DECLARE_DELAYED_WORK(next_reseed, crng_reseed);
- 	unsigned long flags;
- 	unsigned long next_gen;
- 	u8 key[CHACHA_KEY_SIZE];
- 
-+	/* Immediately schedule the next reseeding, so that it fires sooner rather than later. */
-+	if (likely(system_unbound_wq))
-+		queue_delayed_work(system_unbound_wq, &next_reseed, crng_reseed_interval());
-+
- 	extract_entropy(key, sizeof(key));
- 
- 	/*
-@@ -224,7 +248,6 @@ static void crng_reseed(void)
- 	if (next_gen == ULONG_MAX)
- 		++next_gen;
- 	WRITE_ONCE(base_crng.generation, next_gen);
--	WRITE_ONCE(base_crng.birth, jiffies);
- 	if (!static_branch_likely(&crng_is_ready))
- 		crng_init = CRNG_READY;
- 	spin_unlock_irqrestore(&base_crng.lock, flags);
-@@ -263,26 +286,6 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
- 	memzero_explicit(first_block, sizeof(first_block));
- }
- 
--/*
-- * Return the interval until the next reseeding, which is normally
-- * CRNG_RESEED_INTERVAL, but during early boot, it is at an interval
-- * proportional to the uptime.
-- */
--static unsigned int crng_reseed_interval(void)
--{
--	static bool early_boot = true;
--
--	if (unlikely(READ_ONCE(early_boot))) {
--		time64_t uptime = ktime_get_seconds();
--		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
--			WRITE_ONCE(early_boot, false);
--		else
--			return max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
--				     (unsigned int)uptime / 2 * HZ);
--	}
--	return CRNG_RESEED_INTERVAL;
--}
--
- /*
-  * This function returns a ChaCha state that you may use for generating
-  * random data. It also returns up to 32 bytes on its own of random data
-@@ -318,13 +321,6 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
- 			return;
- 	}
- 
--	/*
--	 * If the base_crng is old enough, we reseed, which in turn bumps the
--	 * generation counter that we check below.
--	 */
--	if (unlikely(time_is_before_jiffies(READ_ONCE(base_crng.birth) + crng_reseed_interval())))
--		crng_reseed();
--
- 	local_lock_irqsave(&crngs.lock, flags);
- 	crng = raw_cpu_ptr(&crngs);
- 
-@@ -697,7 +693,7 @@ static void __cold _credit_init_bits(size_t bits)
- 	} while (!try_cmpxchg(&input_pool.init_bits, &orig, new));
- 
- 	if (orig < POOL_READY_BITS && new >= POOL_READY_BITS) {
--		crng_reseed(); /* Sets crng_init to CRNG_READY under base_crng.lock. */
-+		crng_reseed(NULL); /* Sets crng_init to CRNG_READY under base_crng.lock. */
- 		if (static_key_initialized)
- 			execute_in_process_context(crng_set_ready, &set_ready);
- 		wake_up_interruptible(&crng_init_wait);
-@@ -805,7 +801,7 @@ static int random_pm_notification(struct notifier_block *nb, unsigned long actio
- 	if (crng_ready() && (action == PM_RESTORE_PREPARE ||
- 	    (action == PM_POST_SUSPEND && !IS_ENABLED(CONFIG_PM_AUTOSLEEP) &&
- 	     !IS_ENABLED(CONFIG_PM_USERSPACE_AUTOSLEEP)))) {
--		crng_reseed();
-+		crng_reseed(NULL);
- 		pr_notice("crng reseeded on system resumption\n");
- 	}
- 	return 0;
-@@ -849,7 +845,7 @@ void __init random_init_early(const char *command_line)
- 
- 	/* Reseed if already seeded by earlier phases. */
- 	if (crng_ready())
--		crng_reseed();
-+		crng_reseed(NULL);
- 	else if (trust_cpu)
- 		_credit_init_bits(arch_bits);
- }
-@@ -877,7 +873,7 @@ void __init random_init(void)
- 
- 	/* Reseed if already seeded by earlier phases. */
- 	if (crng_ready())
--		crng_reseed();
-+		crng_reseed(NULL);
- 
- 	WARN_ON(register_pm_notifier(&pm_notifier));
- 
-@@ -1469,7 +1465,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
- 			return -EPERM;
- 		if (!crng_ready())
- 			return -ENODATA;
--		crng_reseed();
-+		crng_reseed(NULL);
- 		return 0;
- 	default:
- 		return -EINVAL;
--- 
-2.38.1
+Ditto should this be removed?
 
+> >
+> >  /* vmenter.S */
+> >
+> > --
+> > 2.25.1
+> >
