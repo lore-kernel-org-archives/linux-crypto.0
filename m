@@ -2,92 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F21C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 09:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65032C4321E
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 09:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239381AbiKQJKh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 04:10:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38078 "EHLO
+        id S233096AbiKQJmx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 04:42:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239726AbiKQJKg (ORCPT
+        with ESMTP id S239273AbiKQJmu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 04:10:36 -0500
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7F15ADC4;
-        Thu, 17 Nov 2022 01:10:34 -0800 (PST)
-Received: from mxct.zte.com.cn (unknown [192.168.251.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NCYzY192gz4xVnZ;
-        Thu, 17 Nov 2022 17:10:33 +0800 (CST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mxct.zte.com.cn (FangMail) with ESMTPS id 4NCYzW127rz4y0vK;
-        Thu, 17 Nov 2022 17:10:31 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.40.50])
-        by mse-fl2.zte.com.cn with SMTP id 2AH9AC7j037132;
-        Thu, 17 Nov 2022 17:10:13 +0800 (+08)
-        (envelope-from ye.xingchen@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-        by mapi (Zmail) with MAPI id mid31;
-        Thu, 17 Nov 2022 17:10:15 +0800 (CST)
-Date:   Thu, 17 Nov 2022 17:10:15 +0800 (CST)
-X-Zmail-TransId: 2af96375fa77ffffffffcae92ea1
-X-Mailer: Zmail v1.0
-Message-ID: <202211171710153200734@zte.com.cn>
-Mime-Version: 1.0
-From:   <ye.xingchen@zte.com.cn>
-To:     <herbert@gondor.apana.org.au>
-Cc:     <olivia@selenic.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGh3cm5nOiBuMi1kcnYgLSBVc2UgZGV2aWNlX2dldF9tYXRjaF9kYXRhKCkgdG8gc2ltcGxpZnkgdGhlCgogY29kZQ==?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl2.zte.com.cn 2AH9AC7j037132
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 6375FA89.001 by FangMail milter!
-X-FangMail-Envelope: 1668676233/4NCYzY192gz4xVnZ/6375FA89.001/192.168.251.13/[192.168.251.13]/mxct.zte.com.cn/<ye.xingchen@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6375FA89.001/4NCYzY192gz4xVnZ
+        Thu, 17 Nov 2022 04:42:50 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D66E2B1B7
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 01:42:49 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id v1so2754577wrt.11
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 01:42:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:from:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RDiUNyLGINz4bNu2tXJbnzRCWz4xt6nCkosMidGCTP8=;
+        b=cz6WIWe+HoeDjkfbCmslmgKChcNsPwENznXpyNBg1TtWpVKg8olK7v/JN34IYRuNgJ
+         OvNEz3xnWoOVX6cQ1KwosDCfA3rAgcq6FSvn7zZWD6gttC75OryysFw3nkoekBrWOMw6
+         ZU/LI7wMiAek3JORckRPy+72qvQcbXIf6KdlhQXupsNNEeOHDpAaP37tKLiHiQKKRFo+
+         rBx1Aclv5Ru2RhSAInr5AcxD0RiuWVwbwA7wv/sJzv889bjha/WH6lE0xTbb5K+22rjJ
+         Z54gFbCot5qgxUGtcyfUVGcd57AVFm4vI0EvU4FwQ59KeZI87VBKX5dZ3eYwTsNeKJCQ
+         q3PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:from:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RDiUNyLGINz4bNu2tXJbnzRCWz4xt6nCkosMidGCTP8=;
+        b=hPQNW4vpBs0aYbjUwtZodR9bxFWbhR8+pzjh2qsKyRQZUDPBsYT8aDMOoJFq0Kf78a
+         5bexiTYoAPSddpMOWPeaZe2NzGzQlIyqED1iFG14EPrQH7u0oLFF5wuUV2my87gxRlO5
+         +X1Gh7g/flmhk9mTEMD6EzVYNt/MT5bAehIPKmEn6vq81cAPiB5oUt90sqWh2chjpLKy
+         TROI1+h6JDK2MlCW4WONvf2PaEjtEjeahzjY/MFCx7/fByE8hPQXAX67St13hf8BTKS5
+         Oagrk/UWVztoXYyF8Mo0dyRpWLtREBsQJVZAISu4tiCwQGqBia9H0BnAmlu4MsBiUf3i
+         fJ6Q==
+X-Gm-Message-State: ANoB5pm0pCwrgugsrJFdK3WcYYXDjjOXlkyjLVtK/Xptrha5kPTgFPKW
+        LYmRPM+pt4x0ByjjMYRuLdjgYQ==
+X-Google-Smtp-Source: AA0mqf5jf9a9rEXaGNrcCFERlvcfuQMmTx6Hk/1vl5s7IQ1reFpApijantaTxFMBZcTfVkwmFZx4Tw==
+X-Received: by 2002:a5d:4ccb:0:b0:236:d611:4fcf with SMTP id c11-20020a5d4ccb000000b00236d6114fcfmr943748wrt.192.1668678168139;
+        Thu, 17 Nov 2022 01:42:48 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:982:cbb0:aad5:8d14:a22f:2e8b? ([2a01:e0a:982:cbb0:aad5:8d14:a22f:2e8b])
+        by smtp.gmail.com with ESMTPSA id u12-20020adfdb8c000000b002367ad808a9sm471058wri.30.2022.11.17.01.42.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Nov 2022 01:42:47 -0800 (PST)
+Message-ID: <8edb4848-105a-26a1-63e7-137526445d18@linaro.org>
+Date:   Thu, 17 Nov 2022 10:42:46 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 3/4] dt-bindings: qcom-qce: document sm8550 compatible
+Content-Language: en-US
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Vinod Koul <vkoul@kernel.org>, Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Konrad Dybcio <konrad.dybcio@somainline.org>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
+        Abel Vesa <abel.vesa@linaro.org>, linux-arm-msm@vger.kernel.org
+References: <20221114-narmstrong-sm8550-upstream-qce-v1-0-31b489d5690a@linaro.org>
+ <20221114-narmstrong-sm8550-upstream-qce-v1-3-31b489d5690a@linaro.org>
+ <51f5ee2c-bf25-71ab-594d-2da18a44d3b6@linaro.org>
+Organization: Linaro Developer Services
+In-Reply-To: <51f5ee2c-bf25-71ab-594d-2da18a44d3b6@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+On 16/11/2022 12:54, Krzysztof Kozlowski wrote:
+> On 16/11/2022 11:23, Neil Armstrong wrote:
+>> This documents the compatible used for QCE on SM8550.
+>>
+> 
+> So we have a dedicated compatible... This should be squashed with
+> previous one, added allOf:if:then making clocks optional only for this
+> platform (assuming that my understanding of "enable=exclusive control"
+> is correct).
 
-Directly get the match data with device_get_match_data().
+I'll wait until the dependent patchset is refreshed and a fallback plan decided.
 
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
----
- drivers/char/hw_random/n2-drv.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+Neil
 
-diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
-index 73e408146420..2f784addb717 100644
---- a/drivers/char/hw_random/n2-drv.c
-+++ b/drivers/char/hw_random/n2-drv.c
-@@ -695,20 +695,15 @@ static void n2rng_driver_version(void)
- static const struct of_device_id n2rng_match[];
- static int n2rng_probe(struct platform_device *op)
- {
--	const struct of_device_id *match;
- 	int err = -ENOMEM;
- 	struct n2rng *np;
+> 
+> Best regards,
+> Krzysztof
+> 
 
--	match = of_match_device(n2rng_match, &op->dev);
--	if (!match)
--		return -EINVAL;
--
- 	n2rng_driver_version();
- 	np = devm_kzalloc(&op->dev, sizeof(*np), GFP_KERNEL);
- 	if (!np)
- 		goto out;
- 	np->op = op;
--	np->data = (struct n2rng_template *)match->data;
-+	np->data = (struct n2rng_template *) device_get_match_data(&op->dev);
-
- 	INIT_DELAYED_WORK(&np->work, n2rng_work);
-
--- 
-2.25.1
