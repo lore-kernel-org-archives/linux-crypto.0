@@ -2,104 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65032C4321E
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 09:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9974C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 10:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233096AbiKQJmx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 04:42:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
+        id S234768AbiKQKdF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 05:33:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239273AbiKQJmu (ORCPT
+        with ESMTP id S229931AbiKQKdE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 04:42:50 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D66E2B1B7
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 01:42:49 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id v1so2754577wrt.11
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 01:42:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDiUNyLGINz4bNu2tXJbnzRCWz4xt6nCkosMidGCTP8=;
-        b=cz6WIWe+HoeDjkfbCmslmgKChcNsPwENznXpyNBg1TtWpVKg8olK7v/JN34IYRuNgJ
-         OvNEz3xnWoOVX6cQ1KwosDCfA3rAgcq6FSvn7zZWD6gttC75OryysFw3nkoekBrWOMw6
-         ZU/LI7wMiAek3JORckRPy+72qvQcbXIf6KdlhQXupsNNEeOHDpAaP37tKLiHiQKKRFo+
-         rBx1Aclv5Ru2RhSAInr5AcxD0RiuWVwbwA7wv/sJzv889bjha/WH6lE0xTbb5K+22rjJ
-         Z54gFbCot5qgxUGtcyfUVGcd57AVFm4vI0EvU4FwQ59KeZI87VBKX5dZ3eYwTsNeKJCQ
-         q3PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RDiUNyLGINz4bNu2tXJbnzRCWz4xt6nCkosMidGCTP8=;
-        b=hPQNW4vpBs0aYbjUwtZodR9bxFWbhR8+pzjh2qsKyRQZUDPBsYT8aDMOoJFq0Kf78a
-         5bexiTYoAPSddpMOWPeaZe2NzGzQlIyqED1iFG14EPrQH7u0oLFF5wuUV2my87gxRlO5
-         +X1Gh7g/flmhk9mTEMD6EzVYNt/MT5bAehIPKmEn6vq81cAPiB5oUt90sqWh2chjpLKy
-         TROI1+h6JDK2MlCW4WONvf2PaEjtEjeahzjY/MFCx7/fByE8hPQXAX67St13hf8BTKS5
-         Oagrk/UWVztoXYyF8Mo0dyRpWLtREBsQJVZAISu4tiCwQGqBia9H0BnAmlu4MsBiUf3i
-         fJ6Q==
-X-Gm-Message-State: ANoB5pm0pCwrgugsrJFdK3WcYYXDjjOXlkyjLVtK/Xptrha5kPTgFPKW
-        LYmRPM+pt4x0ByjjMYRuLdjgYQ==
-X-Google-Smtp-Source: AA0mqf5jf9a9rEXaGNrcCFERlvcfuQMmTx6Hk/1vl5s7IQ1reFpApijantaTxFMBZcTfVkwmFZx4Tw==
-X-Received: by 2002:a5d:4ccb:0:b0:236:d611:4fcf with SMTP id c11-20020a5d4ccb000000b00236d6114fcfmr943748wrt.192.1668678168139;
-        Thu, 17 Nov 2022 01:42:48 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:aad5:8d14:a22f:2e8b? ([2a01:e0a:982:cbb0:aad5:8d14:a22f:2e8b])
-        by smtp.gmail.com with ESMTPSA id u12-20020adfdb8c000000b002367ad808a9sm471058wri.30.2022.11.17.01.42.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Nov 2022 01:42:47 -0800 (PST)
-Message-ID: <8edb4848-105a-26a1-63e7-137526445d18@linaro.org>
-Date:   Thu, 17 Nov 2022 10:42:46 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-From:   Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 3/4] dt-bindings: qcom-qce: document sm8550 compatible
-Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Vinod Koul <vkoul@kernel.org>, Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Thu, 17 Nov 2022 05:33:04 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C6259841;
+        Thu, 17 Nov 2022 02:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=2BgNwLdh+HBA4xrzyykRGd8e3nHfE6jHoZjPyIO7tQ8=; b=vf0GDy8lKzIs95KZT9hTDN9bLB
+        KkkakBOovK/EhU72ZwXcJFd6ZXnYeh5hWZFAO+QwAUy+Iil38BRQKWQA/ovqtD2R3k/zIRWUVleNY
+        mI6EufB0EHT9QlEKH1MxQI8dlYgzNxWxQ/KJJ0HUSUpP7NgTBBgzbRiK7voh4pixtxFai3XdS+4CH
+        KUkR3sQ10UY1J1DLrBw2+xk4ToBWEQq3GT1Ou599VPaU5ywBw9TAIVKjU75NdNZTSPprpMUx5CQP1
+        Y51nu+1iINv9JXk8aPYDqbEhMoPEahldPraSq7QM6Racs8sRYiTunUTXpT5cPjddHYjb4UQdEZEgF
+        MxQo2C5A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35306)
+        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1ovcCQ-0004Iz-Pt; Thu, 17 Nov 2022 10:32:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1ovcCG-0006jE-Em; Thu, 17 Nov 2022 10:32:40 +0000
+Date:   Thu, 17 Nov 2022 10:32:40 +0000
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
+        patches@lists.linux.dev,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Konrad Dybcio <konrad.dybcio@somainline.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
-        Abel Vesa <abel.vesa@linaro.org>, linux-arm-msm@vger.kernel.org
-References: <20221114-narmstrong-sm8550-upstream-qce-v1-0-31b489d5690a@linaro.org>
- <20221114-narmstrong-sm8550-upstream-qce-v1-3-31b489d5690a@linaro.org>
- <51f5ee2c-bf25-71ab-594d-2da18a44d3b6@linaro.org>
-Organization: Linaro Developer Services
-In-Reply-To: <51f5ee2c-bf25-71ab-594d-2da18a44d3b6@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        ydroneaud@opteya.com
+Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
+ possible
+Message-ID: <Y3YNyJ8oeixYuvdI@shell.armlinux.org.uk>
+References: <20221114164558.1180362-1-Jason@zx2c4.com>
+ <20221114164558.1180362-4-Jason@zx2c4.com>
+ <202211161436.A45AD719A@keescook>
+ <Y3V4g8eorwiU++Y3@zx2c4.com>
+ <Y3WW2lOgoYLKQeve@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3WW2lOgoYLKQeve@zx2c4.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 16/11/2022 12:54, Krzysztof Kozlowski wrote:
-> On 16/11/2022 11:23, Neil Armstrong wrote:
->> This documents the compatible used for QCE on SM8550.
->>
+On Thu, Nov 17, 2022 at 03:05:14AM +0100, Jason A. Donenfeld wrote:
+> On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
+> > 1) How/whether to make f(0, UR2_MAX) safe,
+> >    - without additional 64-bit arithmetic,
+> >    - minimizing the number of branches.
+> >    I have a few ideas I'll code golf for a bit.
+> > I think I can make progress with (1) alone by fiddling around with
+> > godbolt enough, like usual.
 > 
-> So we have a dedicated compatible... This should be squashed with
-> previous one, added allOf:if:then making clocks optional only for this
-> platform (assuming that my understanding of "enable=exclusive control"
-> is correct).
-
-I'll wait until the dependent patchset is refreshed and a fallback plan decided.
-
-Neil
-
+> The code gen is definitely worse.
 > 
-> Best regards,
-> Krzysztof
+> Original half-open interval:
 > 
+>     return floor + get_random_u32_below(ceil - floor);
+> 
+> Suggested fully closed interval:
+> 	
+>     ceil = ceil - floor + 1;
+>     return likely(ceil) ? floor + get_random_u32_below(ceil) : get_random_u32();
 
+How many of these uses are going to have ceil and floor as a variable?
+If they're constants (e.g. due to being in an inline function with
+constant arguments) then the compiler will optimise all of the above
+and the assembly code will just be either:
+
+1. a call to get_random_u32()
+2. a call to get_random_u32_below() and an addition.
+
+If one passes ceil or floor as a variable, then yes, the code gen is
+going to be as complicated as you suggest above.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
