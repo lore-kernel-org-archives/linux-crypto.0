@@ -2,120 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9974C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 10:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC921C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 12:24:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234768AbiKQKdF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 05:33:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60482 "EHLO
+        id S239684AbiKQMYs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 07:24:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbiKQKdE (ORCPT
+        with ESMTP id S230327AbiKQMYr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 05:33:04 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C6259841;
-        Thu, 17 Nov 2022 02:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=2BgNwLdh+HBA4xrzyykRGd8e3nHfE6jHoZjPyIO7tQ8=; b=vf0GDy8lKzIs95KZT9hTDN9bLB
-        KkkakBOovK/EhU72ZwXcJFd6ZXnYeh5hWZFAO+QwAUy+Iil38BRQKWQA/ovqtD2R3k/zIRWUVleNY
-        mI6EufB0EHT9QlEKH1MxQI8dlYgzNxWxQ/KJJ0HUSUpP7NgTBBgzbRiK7voh4pixtxFai3XdS+4CH
-        KUkR3sQ10UY1J1DLrBw2+xk4ToBWEQq3GT1Ou599VPaU5ywBw9TAIVKjU75NdNZTSPprpMUx5CQP1
-        Y51nu+1iINv9JXk8aPYDqbEhMoPEahldPraSq7QM6Racs8sRYiTunUTXpT5cPjddHYjb4UQdEZEgF
-        MxQo2C5A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35306)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1ovcCQ-0004Iz-Pt; Thu, 17 Nov 2022 10:32:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1ovcCG-0006jE-Em; Thu, 17 Nov 2022 10:32:40 +0000
-Date:   Thu, 17 Nov 2022 10:32:40 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev,
+        Thu, 17 Nov 2022 07:24:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C43A92229E
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 04:23:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668687832;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5jdvVC382FTzq1UHx+dqms0RlcCWrWtt69iT+pMSrhc=;
+        b=Zcn30s6mzHo2TA2845EVihGK7vA5Dp9MKdZXfGilcuB6FGDDuYtLgWGz1WFZcjTGZKklnD
+        2jkG9Ap4TgoS+EGcsBnkoQC/og7AmoHvNrEnGMOM9wPmqoqqJ7EDLOFGx/n5PK9xejdqoH
+        5BiyJ+NDBxVVP4oQBxAnxSkqEhTMCaQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-132-0MEx8mbYOfK_S1VtoN_Zmw-1; Thu, 17 Nov 2022 07:23:51 -0500
+X-MC-Unique: 0MEx8mbYOfK_S1VtoN_Zmw-1
+Received: by mail-wm1-f69.google.com with SMTP id 84-20020a1c0257000000b003cfe9e8e3f9so589767wmc.0
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 04:23:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5jdvVC382FTzq1UHx+dqms0RlcCWrWtt69iT+pMSrhc=;
+        b=Et5hd/OJ5zKL2IDoiYI2zfTQ5H382oyyXe4X4XSvE4bE6YcWu3WwtrQiLJnLpaJRK9
+         AX+/m02Mr5XFQT7OWxF+YOFYtNPq04r/Zqe1ovCAJEkR4mqxkzD0XnMh9wvc4wKcn0rZ
+         Ytg1M6gw10vr1uG3IaDRbqSL9vUg4ao8/znO+BCDF/PgKjWxygzYKnHzZ4T0c1fPMnju
+         rjLqohQNW/47Qpr2IiE3lEpyklZnmpSmEUcvvb9f6ozLUBdqeJFmZ5tMd3fWQ+xfTY7W
+         vPS+o1Egu9HDDUOO99aivY3/L/i3y1kNGiXRdT3TzzCzPQeunlmyMtO2dk1HONSmeLzU
+         5maA==
+X-Gm-Message-State: ANoB5pm63fHjNbOU6p3/UmKEAvR9GdhUhMOD2TcGguC63w+k3/64s9v9
+        cu0IzPWQbcbg9o0M/xHg0qilfpaYnZ26A6TbwxFN4wnIZs4Lb+9Lobp0jG69wtUzHVBt8ghzy/c
+        0ohKlVqikZUG3kY6B76PU0mJn
+X-Received: by 2002:a5d:4ace:0:b0:236:7988:b282 with SMTP id y14-20020a5d4ace000000b002367988b282mr1368751wrs.341.1668687830287;
+        Thu, 17 Nov 2022 04:23:50 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6CQ2UnPStDreGkKJNcXcxnxWYWv26PNS2guHgtGUV1HlDKjg+B2zZNBBQjpHdL/U5XI5rkiQ==
+X-Received: by 2002:a5d:4ace:0:b0:236:7988:b282 with SMTP id y14-20020a5d4ace000000b002367988b282mr1368719wrs.341.1668687830120;
+        Thu, 17 Nov 2022 04:23:50 -0800 (PST)
+Received: from vschneid.remote.csb ([154.57.232.159])
+        by smtp.gmail.com with ESMTPSA id r4-20020a05600c35c400b003c6b874a0dfsm1315337wmq.14.2022.11.17.04.23.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 04:23:49 -0800 (PST)
+From:   Valentin Schneider <vschneid@redhat.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        haniel Bristot de Oliveira <bristot@redhat.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3YNyJ8oeixYuvdI@shell.armlinux.org.uk>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
- <Y3WW2lOgoYLKQeve@zx2c4.com>
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tariq Toukan <ttoukan.linux@gmail.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] cpumask: improve on cpumask_local_spread() locality
+In-Reply-To: <Y3PXw8Hqn+RCMg2J@yury-laptop>
+References: <20221112190946.728270-1-yury.norov@gmail.com>
+ <xhsmh7czwyvtj.mognet@vschneid.remote.csb> <Y3PXw8Hqn+RCMg2J@yury-laptop>
+Date:   Thu, 17 Nov 2022 12:23:45 +0000
+Message-ID: <xhsmho7t5ydke.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3WW2lOgoYLKQeve@zx2c4.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 03:05:14AM +0100, Jason A. Donenfeld wrote:
-> On Thu, Nov 17, 2022 at 12:55:47AM +0100, Jason A. Donenfeld wrote:
-> > 1) How/whether to make f(0, UR2_MAX) safe,
-> >    - without additional 64-bit arithmetic,
-> >    - minimizing the number of branches.
-> >    I have a few ideas I'll code golf for a bit.
-> > I think I can make progress with (1) alone by fiddling around with
-> > godbolt enough, like usual.
-> 
-> The code gen is definitely worse.
-> 
-> Original half-open interval:
-> 
->     return floor + get_random_u32_below(ceil - floor);
-> 
-> Suggested fully closed interval:
-> 	
->     ceil = ceil - floor + 1;
->     return likely(ceil) ? floor + get_random_u32_below(ceil) : get_random_u32();
+On 15/11/22 10:32, Yury Norov wrote:
+> On Tue, Nov 15, 2022 at 05:24:56PM +0000, Valentin Schneider wrote:
+>>
+>> Is this meant as a replacement for [1]?
+>
+> No. Your series adds an iterator, and in my experience the code that
+> uses iterators of that sort is almost always better and easier to
+> understand than cpumask_nth() or cpumask_next()-like users.
+>
+> My series has the only advantage that it allows keep existing codebase
+> untouched.
+>
 
-How many of these uses are going to have ceil and floor as a variable?
-If they're constants (e.g. due to being in an inline function with
-constant arguments) then the compiler will optimise all of the above
-and the assembly code will just be either:
+Right
 
-1. a call to get_random_u32()
-2. a call to get_random_u32_below() and an addition.
+>> I like that this is changing an existing interface so that all current
+>> users directly benefit from the change. Now, about half of the users of
+>> cpumask_local_spread() use it in a loop with incremental @i parameter,
+>> which makes the repeated bsearch a bit of a shame, but then I'm tempted to
+>> say the first point makes it worth it.
+>>
+>> [1]: https://lore.kernel.org/all/20221028164959.1367250-1-vschneid@redhat.com/
+>
+> In terms of very common case of sequential invocation of local_spread()
+> for cpus from 0 to nr_cpu_ids, the complexity of my approach is n * log n,
+> and your approach is amortized O(n), which is better. Not a big deal _now_,
+> as you mentioned in the other email. But we never know how things will
+> evolve, right?
+>
+> So, I would take both and maybe in comment to cpumask_local_spread()
+> mention that there's a better alternative for those who call the
+> function for all CPUs incrementally.
+>
 
-If one passes ceil or floor as a variable, then yes, the code gen is
-going to be as complicated as you suggest above.
+Ack, sounds good.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+> Thanks,
+> Yury
+
