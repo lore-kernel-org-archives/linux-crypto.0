@@ -2,123 +2,232 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0F3C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 16:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC93C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 19:16:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240452AbiKQQUm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 11:20:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56790 "EHLO
+        id S240364AbiKQTQ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 14:16:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240382AbiKQQUg (ORCPT
+        with ESMTP id S240547AbiKQTQy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 11:20:36 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2F878D7F;
-        Thu, 17 Nov 2022 08:20:14 -0800 (PST)
+        Thu, 17 Nov 2022 14:16:54 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44AA7EC9D;
+        Thu, 17 Nov 2022 11:16:53 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B58EEB820F9;
-        Thu, 17 Nov 2022 16:20:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A59CEC433B5;
-        Thu, 17 Nov 2022 16:20:07 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6BBAE62227;
+        Thu, 17 Nov 2022 19:16:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE291C433C1;
+        Thu, 17 Nov 2022 19:16:51 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ShJChEFk"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="j3kl+t6Q"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668702005;
+        t=1668712609;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yXReeGYWAkNsw4+UICMYAUFCUliJi8syMU+jrBjtN+I=;
-        b=ShJChEFkS/WoLTYTfqnIoulaJEVDjPgHlBF73vJKzecwUuNaBWaxad+1izxyXu6Exw/TaA
-        5irR4sihjVzoDK1KiXvBd2OBPvvMwotSdLzvfkIJeE7XNMY72JeeG28zUlT5pyaHmBsZk0
-        JQ9ybm2sWtI6GOjvOwFIenKMBQ/9L7c=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d3e36533 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 17 Nov 2022 16:20:04 +0000 (UTC)
-Date:   Thu, 17 Nov 2022 17:19:52 +0100
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=I0gafmthYzLnOBvnICA6dCBwdNQe0eJ+3AfKufxJT4Q=;
+        b=j3kl+t6QwEvEzaLFM4ONtkYPyKuftFV+inU7lGfAWvNi7syvRs1LL7XESlt0MCRLO92aAA
+        kApGl1lIYo/Cc4XTOwqaVpC8QkvWAGqSTzUwPR/AM/1UWh+lsa0vdXVnLpUue/i1qUpsM6
+        3pfgyHAQ1Vo/siCdrl7o52b6a4YDTxI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id dbfb5ef9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 17 Nov 2022 19:16:48 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Kees Cook <kees@kernel.org>, Kees Cook <keescook@chromium.org>,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
-        ydroneaud@opteya.com
-Subject: Re: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Message-ID: <Y3ZfKHTHWUkdZIMt@zx2c4.com>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com>
- <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com>
- <Y3V6QtYMayODVDOk@zx2c4.com>
- <202211161628.164F47F@keescook>
- <Y3WDyl8ArQgeEoUU@zx2c4.com>
- <0EE39896-C7B6-4CB6-87D5-22AA787740A9@kernel.org>
- <Y3ZWbcoGOdFjlPhS@mit.edu>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Juergen Christ <jchrist@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Tejun Heo <tj@kernel.org>
+Subject: [PATCH] random: reseed in delayed work rather than on-demand
+Date:   Thu, 17 Nov 2022 20:16:43 +0100
+Message-Id: <20221117191643.2303366-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y3ZWbcoGOdFjlPhS@mit.edu>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 10:42:37AM -0500, Theodore Ts'o wrote:
-> On Wed, Nov 16, 2022 at 04:47:27PM -0800, Kees Cook wrote:
-> > >> > - between
-> > >> > - ranged
-> > >> > - spanning
-> > >> > 
-> > >> > https://www.thefreedictionary.com/List-of-prepositions.htm
-> > >> > - amid
-> > >> > 
-> > >> > Sigh, names.
-> > >> 
-> > >> I think "inclusive" is best.
-> > >
-> > >I find it not very descriptive of what the function does. Is there one
-> > >you like second best? Or are you convinced they're all much much much
-> > >worse than "inclusive" that they shouldn't be considered?
-> > 
-> > Right, I don't think any are sufficiently descriptive. "Incluisve"
-> > with two arguments seems unambiguous and complete to me. :)
-> 
-> The problem with "between", "ranged", "spanning" is that they don't
-> tell the reader whether we're dealing with an "open interval" or a
-> "closed interval".  They are just different ways of saying that it's a
-> range between, say, 0 and 20.  But it doesn't tell you whether it
-> includes 0 or 20 or not.
-> 
-> The only way I can see for making it ambiguous is either to use the
-> terminology "closed interval" or "inclusive".  And "open" and "closed"
-> can have other meanings, so get_random_u32_inclusive() is going to be
-> less confusing than get_random_u32_closed().
+Currently, we reseed when random bytes are requested, if the current
+seed is too old. Since random bytes can be requested from all contexts,
+including hard IRQ, this means sometimes we wind up adding a bit of
+latency to hard IRQ. This was so much of a problem on s390x that now
+s390x just doesn't provide its architectural RNG from hard IRQ context,
+so we miss out in that case.
 
-Alright, that about settles it then. I'll re-roll.
+Instead, let's just schedule a persistent delayed work, so that the
+reseeding and potentially expensive operations will always happen from
+process context, reducing unexpected latencies from hard IRQ.
 
-Jason
+This also has the nice effect of accumulating a transcript of random
+inputs over time, since it means that we amass more input values. And it
+should make future vDSO integration a bit easier.
+
+Cc: Harald Freudenberger <freude@linux.ibm.com>
+Cc: Juergen Christ <jchrist@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tejun Heo <tj@kernel.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 66 ++++++++++++++++++++-----------------------
+ 1 file changed, 31 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index c901d99c3246..a8127530f88d 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -182,7 +182,6 @@ enum {
+ 
+ static struct {
+ 	u8 key[CHACHA_KEY_SIZE] __aligned(__alignof__(long));
+-	unsigned long birth;
+ 	unsigned long generation;
+ 	spinlock_t lock;
+ } base_crng = {
+@@ -200,16 +199,41 @@ static DEFINE_PER_CPU(struct crng, crngs) = {
+ 	.lock = INIT_LOCAL_LOCK(crngs.lock),
+ };
+ 
++/*
++ * Return the interval until the next reseeding, which is normally
++ * CRNG_RESEED_INTERVAL, but during early boot, it is at an interval
++ * proportional to the uptime.
++ */
++static unsigned int crng_reseed_interval(void)
++{
++	static bool early_boot = true;
++
++	if (unlikely(READ_ONCE(early_boot))) {
++		time64_t uptime = ktime_get_seconds();
++		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
++			WRITE_ONCE(early_boot, false);
++		else
++			return max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
++				     (unsigned int)uptime / 2 * HZ);
++	}
++	return CRNG_RESEED_INTERVAL;
++}
++
+ /* Used by crng_reseed() and crng_make_state() to extract a new seed from the input pool. */
+ static void extract_entropy(void *buf, size_t len);
+ 
+ /* This extracts a new crng key from the input pool. */
+-static void crng_reseed(void)
++static void crng_reseed(struct work_struct *work)
+ {
++	static DECLARE_DELAYED_WORK(next_reseed, crng_reseed);
+ 	unsigned long flags;
+ 	unsigned long next_gen;
+ 	u8 key[CHACHA_KEY_SIZE];
+ 
++	/* Immediately schedule the next reseeding, so that it fires sooner rather than later. */
++	if (likely(system_unbound_wq))
++		queue_delayed_work(system_unbound_wq, &next_reseed, crng_reseed_interval());
++
+ 	extract_entropy(key, sizeof(key));
+ 
+ 	/*
+@@ -224,7 +248,6 @@ static void crng_reseed(void)
+ 	if (next_gen == ULONG_MAX)
+ 		++next_gen;
+ 	WRITE_ONCE(base_crng.generation, next_gen);
+-	WRITE_ONCE(base_crng.birth, jiffies);
+ 	if (!static_branch_likely(&crng_is_ready))
+ 		crng_init = CRNG_READY;
+ 	spin_unlock_irqrestore(&base_crng.lock, flags);
+@@ -263,26 +286,6 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
+ 	memzero_explicit(first_block, sizeof(first_block));
+ }
+ 
+-/*
+- * Return the interval until the next reseeding, which is normally
+- * CRNG_RESEED_INTERVAL, but during early boot, it is at an interval
+- * proportional to the uptime.
+- */
+-static unsigned int crng_reseed_interval(void)
+-{
+-	static bool early_boot = true;
+-
+-	if (unlikely(READ_ONCE(early_boot))) {
+-		time64_t uptime = ktime_get_seconds();
+-		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
+-			WRITE_ONCE(early_boot, false);
+-		else
+-			return max_t(unsigned int, CRNG_RESEED_START_INTERVAL,
+-				     (unsigned int)uptime / 2 * HZ);
+-	}
+-	return CRNG_RESEED_INTERVAL;
+-}
+-
+ /*
+  * This function returns a ChaCha state that you may use for generating
+  * random data. It also returns up to 32 bytes on its own of random data
+@@ -318,13 +321,6 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
+ 			return;
+ 	}
+ 
+-	/*
+-	 * If the base_crng is old enough, we reseed, which in turn bumps the
+-	 * generation counter that we check below.
+-	 */
+-	if (unlikely(time_is_before_jiffies(READ_ONCE(base_crng.birth) + crng_reseed_interval())))
+-		crng_reseed();
+-
+ 	local_lock_irqsave(&crngs.lock, flags);
+ 	crng = raw_cpu_ptr(&crngs);
+ 
+@@ -697,7 +693,7 @@ static void __cold _credit_init_bits(size_t bits)
+ 	} while (!try_cmpxchg(&input_pool.init_bits, &orig, new));
+ 
+ 	if (orig < POOL_READY_BITS && new >= POOL_READY_BITS) {
+-		crng_reseed(); /* Sets crng_init to CRNG_READY under base_crng.lock. */
++		crng_reseed(NULL); /* Sets crng_init to CRNG_READY under base_crng.lock. */
+ 		if (static_key_initialized)
+ 			execute_in_process_context(crng_set_ready, &set_ready);
+ 		wake_up_interruptible(&crng_init_wait);
+@@ -805,7 +801,7 @@ static int random_pm_notification(struct notifier_block *nb, unsigned long actio
+ 	if (crng_ready() && (action == PM_RESTORE_PREPARE ||
+ 	    (action == PM_POST_SUSPEND && !IS_ENABLED(CONFIG_PM_AUTOSLEEP) &&
+ 	     !IS_ENABLED(CONFIG_PM_USERSPACE_AUTOSLEEP)))) {
+-		crng_reseed();
++		crng_reseed(NULL);
+ 		pr_notice("crng reseeded on system resumption\n");
+ 	}
+ 	return 0;
+@@ -849,7 +845,7 @@ void __init random_init_early(const char *command_line)
+ 
+ 	/* Reseed if already seeded by earlier phases. */
+ 	if (crng_ready())
+-		crng_reseed();
++		crng_reseed(NULL);
+ 	else if (trust_cpu)
+ 		_credit_init_bits(arch_bits);
+ }
+@@ -877,7 +873,7 @@ void __init random_init(void)
+ 
+ 	/* Reseed if already seeded by earlier phases. */
+ 	if (crng_ready())
+-		crng_reseed();
++		crng_reseed(NULL);
+ 
+ 	WARN_ON(register_pm_notifier(&pm_notifier));
+ 
+@@ -1469,7 +1465,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+ 			return -EPERM;
+ 		if (!crng_ready())
+ 			return -ENODATA;
+-		crng_reseed();
++		crng_reseed(NULL);
+ 		return 0;
+ 	default:
+ 		return -EINVAL;
+-- 
+2.38.1
+
