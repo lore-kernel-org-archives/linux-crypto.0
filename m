@@ -2,329 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFC1C43219
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 17:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C44FC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 18:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241996AbiKRRcQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 12:32:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
+        id S235500AbiKRStj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 13:49:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242396AbiKRRcE (ORCPT
+        with ESMTP id S235374AbiKRSti (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Nov 2022 12:32:04 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280108B13D;
-        Fri, 18 Nov 2022 09:32:03 -0800 (PST)
+        Fri, 18 Nov 2022 13:49:38 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAE56A684
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 10:49:37 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A59A46268B;
-        Fri, 18 Nov 2022 17:32:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 267DBC433D7;
-        Fri, 18 Nov 2022 17:32:01 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CA4UvkNZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668792720;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9p1UIdcHRziM7m9qcPYp6vWPtjBY0MybeVn0TVZVSIU=;
-        b=CA4UvkNZOFiaNqpDzRS53bJWuvypQSw1i9RuqmYM4MNPUbZy5P0j0bfJZxeE9eSLg4IaZM
-        /62QGDuhxJy+hPb0XOCQ6zLTo6xgvYw+pY1OBrKOVzavS1vVDVkK1D7At0IlZmtWxL+82D
-        SN5HA8YTwsOblwTRcmy4jgr8rZjWmlA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7ec53f12 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 18 Nov 2022 17:31:59 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-Subject: [PATCH v4 2/3] random: introduce generic vDSO getrandom() implementation
-Date:   Fri, 18 Nov 2022 18:28:38 +0100
-Message-Id: <20221118172839.2653829-3-Jason@zx2c4.com>
-In-Reply-To: <20221118172839.2653829-1-Jason@zx2c4.com>
-References: <20221118172839.2653829-1-Jason@zx2c4.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9672EB824F8
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 18:49:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D46BC433D6;
+        Fri, 18 Nov 2022 18:49:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668797374;
+        bh=Q96OIlQHZc6beG3N9u+m/eFfBbPlUi1pB02JIeAD/dI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Oafyf24NKJ43CU+tXfOrvCLNSwWbfipVIkoTIZFwuegSdVr5tiZZCtutZYpbuaM4W
+         ucmJB75jqHW80dfc58NH4haoK7VVvm9BE9qEkeNjoMxQb7htVQQ/LpPukJSW2Y0XSg
+         PPtCNWUzTtlzdJFgtP4eiEkzR+yxb0hEU1uBBNBsbV95EmrYU4ONEydT+2zYQ9Othq
+         YqMX0N8TzA3+mgA2i49cW+X72DMUzzCpGdDiQOKDx/rN+3eVRSwRTTF1swztwRXeYv
+         9dS7F0YMUIbg2el/OtSC+DXX3tcMUnaL0CnuG8tQwXmepdnxbmbIsf+Kvio0r5uq2y
+         1APAWfJpUFuhQ==
+Date:   Fri, 18 Nov 2022 10:49:32 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH 0/11] crypto: CFI fixes
+Message-ID: <Y3fTvOKW1txyDOJE@sol.localdomain>
+References: <20221118090220.398819-1-ebiggers@kernel.org>
+ <MW5PR84MB18424C160896BF9081E8CFCAAB099@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MW5PR84MB18424C160896BF9081E8CFCAAB099@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Provide a generic C vDSO getrandom() implementation, which operates on
-an opaque state returned by vgetrandom_alloc() and produces random bytes
-the same way as getrandom(). This has a the API signature:
+On Fri, Nov 18, 2022 at 03:43:55PM +0000, Elliott, Robert (Servers) wrote:
+> 
+> > -----Original Message-----
+> > From: Eric Biggers <ebiggers@kernel.org>
+> > Sent: Friday, November 18, 2022 3:02 AM
+> > To: linux-crypto@vger.kernel.org
+> > Cc: x86@kernel.org; linux-arm-kernel@lists.infradead.org; Sami Tolvanen
+> > <samitolvanen@google.com>
+> > Subject: [PATCH 0/11] crypto: CFI fixes
+> > 
+> > This series fixes some crashes when CONFIG_CFI_CLANG (Control Flow
+> > Integrity) is enabled, with the new CFI implementation that was merged
+> > in 6.1 and is supported on x86.  Some of them were unconditional
+> > crashes, while others depended on whether the compiler optimized out the
+> > indirect calls or not.  This series also simplifies some code that was
+> > intended to work around limitations of the old CFI implementation and is
+> > unnecessary for the new CFI implementation.
+> 
+> Some of the x86 modules EXPORT their asm functions. Does that leave them
+> at risk of being called indirectly?
+> 
+> arch/x86/crypto/camellia-aesni-avx-asm_64.S:SYM_FUNC_START(camellia_ecb_dec_16way)
+> arch/x86/crypto/camellia-aesni-avx-asm_64.S:SYM_FUNC_START(camellia_ecb_enc_16way)
+> arch/x86/crypto/camellia-aesni-avx-asm_64.S:SYM_FUNC_START(camellia_cbc_dec_16way)
+> arch/x86/crypto/camellia_aesni_avx_glue.c:asmlinkage void camellia_ecb_enc_16way(const void *ctx, u8 *dst, const u8 *src);
+> arch/x86/crypto/camellia_aesni_avx_glue.c:EXPORT_SYMBOL_GPL(camellia_ecb_enc_16way);
+> arch/x86/crypto/camellia_aesni_avx_glue.c:asmlinkage void camellia_ecb_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+> arch/x86/crypto/camellia_aesni_avx_glue.c:EXPORT_SYMBOL_GPL(camellia_ecb_dec_16way);
+> arch/x86/crypto/camellia_aesni_avx_glue.c:asmlinkage void camellia_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+> arch/x86/crypto/camellia_aesni_avx_glue.c:EXPORT_SYMBOL_GPL(camellia_cbc_dec_16way);
+> 
+> arch/x86/crypto/twofish-x86_64-asm_64-3way.S:SYM_FUNC_START(__twofish_enc_blk_3way)
+> arch/x86/crypto/twofish.h:asmlinkage void __twofish_enc_blk_3way(const void *ctx, u8 *dst, const u8 *src,
+> arch/x86/crypto/twofish_glue_3way.c:EXPORT_SYMBOL_GPL(__twofish_enc_blk_3way);
 
-  ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
+No, that doesn't matter at all.  Whether a symbol is exported or not just has to
+do with how the code is divided into modules.  It doesn't have anything to do
+with indirect calls.
 
-The return value and the first 3 arguments are the same as ordinary
-getrandom(), while the last argument is a pointer to the opaque
-allocated state. Were all four arguments passed to the getrandom()
-syscall, nothing different would happen, and the functions would have
-the exact same behavior.
+> A few of the x86 asm functions used by C code are not referenced with
+> asmlinkage like all the others. They're not EXPORTed, though, so whether
+> they're indirectly used can be determined.
+> 
+> u32 crc32_pclmul_le_16(unsigned char const *buffer, size_t len, u32 crc32);
+> 
+> void clmul_ghash_mul(char *dst, const u128 *shash);
+> 
+> void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+>                         const u128 *shash);
 
-The actual vDSO RNG algorithm implemented is the same one implemented by
-drivers/char/random.c, using the same fast-erasure techniques as that.
-Should the in-kernel implementation change, so too will the vDSO one.
+No, the above functions are only called directly.
 
-Initially, the state is keyless, and so the first call makes a
-getrandom() syscall to generate that key, and then uses it for
-subsequent calls. By keeping track of a generation counter, it knows
-when its key is invalidated and it should fetch a new one using the
-syscall. Later, more than just a generation counter might be used.
+I did do another search and found that some of the sm4 functions are called
+indirectly, though, so I'll send out an updated patchset that fixes those too.
 
-Since MADV_WIPEONFORK is set on the opaque state, the key and related
-state is wiped during a fork(), so secrets don't roll over into new
-processes, and the same state doesn't accidentally generate the same
-random stream. The generation counter, as well, is always >0, so that
-the 0 counter is a useful indication of a fork() or otherwise
-uninitialized state.
-
-If the kernel RNG is not yet initialized, then the vDSO always calls the
-syscall, because that behavior cannot be emulated in userspace, but
-fortunately that state is short lived and only during early boot. If it
-has been initialized, then there is no need to inspect the `flags`
-argument, because the behavior does not change post-initialization
-regardless of the `flags` value.
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- MAINTAINERS             |   1 +
- drivers/char/random.c   |   5 ++
- include/vdso/datapage.h |   6 +++
- lib/crypto/chacha.c     |   4 ++
- lib/vdso/Kconfig        |   5 ++
- lib/vdso/getrandom.c    | 109 ++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 130 insertions(+)
- create mode 100644 lib/vdso/getrandom.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 843dd6a49538..e0aa33f54c57 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17287,6 +17287,7 @@ T:	git https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git
- S:	Maintained
- F:	drivers/char/random.c
- F:	drivers/virt/vmgenid.c
-+F:	lib/vdso/getrandom.c
- F:	lib/vdso/getrandom.h
- 
- RAPIDIO SUBSYSTEM
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index b83481eb00a9..a62255d852f9 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -61,6 +61,7 @@
- #include <asm/irq.h>
- #include <asm/irq_regs.h>
- #include <asm/io.h>
-+#include <vdso/datapage.h>
- #include "../../lib/vdso/getrandom.h"
- 
- /*********************************************************************
-@@ -305,6 +306,8 @@ static void crng_reseed(struct work_struct *work)
- 	if (next_gen == ULONG_MAX)
- 		++next_gen;
- 	WRITE_ONCE(base_crng.generation, next_gen);
-+	if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
-+		smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
- 	if (!static_branch_likely(&crng_is_ready))
- 		crng_init = CRNG_READY;
- 	spin_unlock_irqrestore(&base_crng.lock, flags);
-@@ -754,6 +757,8 @@ static void __cold _credit_init_bits(size_t bits)
- 		crng_reseed(NULL); /* Sets crng_init to CRNG_READY under base_crng.lock. */
- 		if (static_key_initialized)
- 			execute_in_process_context(crng_set_ready, &set_ready);
-+		if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
-+			smp_store_release(&_vdso_rng_data.is_ready, true);
- 		wake_up_interruptible(&crng_init_wait);
- 		kill_fasync(&fasync, SIGIO, POLL_IN);
- 		pr_notice("crng init done\n");
-diff --git a/include/vdso/datapage.h b/include/vdso/datapage.h
-index 73eb622e7663..cbacfd923a5c 100644
---- a/include/vdso/datapage.h
-+++ b/include/vdso/datapage.h
-@@ -109,6 +109,11 @@ struct vdso_data {
- 	struct arch_vdso_data	arch_data;
- };
- 
-+struct vdso_rng_data {
-+	unsigned long generation;
-+	bool is_ready;
-+};
-+
- /*
-  * We use the hidden visibility to prevent the compiler from generating a GOT
-  * relocation. Not only is going through a GOT useless (the entry couldn't and
-@@ -120,6 +125,7 @@ struct vdso_data {
-  */
- extern struct vdso_data _vdso_data[CS_BASES] __attribute__((visibility("hidden")));
- extern struct vdso_data _timens_data[CS_BASES] __attribute__((visibility("hidden")));
-+extern struct vdso_rng_data _vdso_rng_data __attribute__((visibility("hidden")));
- 
- /*
-  * The generic vDSO implementation requires that gettimeofday.h
-diff --git a/lib/crypto/chacha.c b/lib/crypto/chacha.c
-index b748fd3d256e..944991bb36c7 100644
---- a/lib/crypto/chacha.c
-+++ b/lib/crypto/chacha.c
-@@ -17,8 +17,10 @@ static void chacha_permute(u32 *x, int nrounds)
- {
- 	int i;
- 
-+#ifndef CHACHA_FOR_VDSO_INCLUDE
- 	/* whitelist the allowed round counts */
- 	WARN_ON_ONCE(nrounds != 20 && nrounds != 12);
-+#endif
- 
- 	for (i = 0; i < nrounds; i += 2) {
- 		x[0]  += x[4];    x[12] = rol32(x[12] ^ x[0],  16);
-@@ -87,6 +89,7 @@ void chacha_block_generic(u32 *state, u8 *stream, int nrounds)
- 
- 	state[12]++;
- }
-+#ifndef CHACHA_FOR_VDSO_INCLUDE
- EXPORT_SYMBOL(chacha_block_generic);
- 
- /**
-@@ -112,3 +115,4 @@ void hchacha_block_generic(const u32 *state, u32 *stream, int nrounds)
- 	memcpy(&stream[4], &x[12], 16);
- }
- EXPORT_SYMBOL(hchacha_block_generic);
-+#endif
-diff --git a/lib/vdso/Kconfig b/lib/vdso/Kconfig
-index d883ac299508..c35fac664574 100644
---- a/lib/vdso/Kconfig
-+++ b/lib/vdso/Kconfig
-@@ -30,4 +30,9 @@ config GENERIC_VDSO_TIME_NS
- 	  Selected by architectures which support time namespaces in the
- 	  VDSO
- 
-+config HAVE_VDSO_GETRANDOM
-+	bool
-+	help
-+	  Selected by architectures that support vDSO getrandom().
-+
- endif
-diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
-new file mode 100644
-index 000000000000..b253e9247706
---- /dev/null
-+++ b/lib/vdso/getrandom.c
-@@ -0,0 +1,109 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/atomic.h>
-+#include <linux/fs.h>
-+#include <vdso/datapage.h>
-+#include <asm/vdso/getrandom.h>
-+#include <asm/vdso/vsyscall.h>
-+#include "getrandom.h"
-+
-+#undef memcpy
-+#define memcpy(d,s,l) __builtin_memcpy(d,s,l)
-+#undef memset
-+#define memset(d,c,l) __builtin_memset(d,c,l)
-+
-+#define CHACHA_FOR_VDSO_INCLUDE
-+#include "../crypto/chacha.c"
-+
-+static void memcpy_and_zero(void *dst, void *src, size_t len)
-+{
-+#define CASCADE(type) \
-+	while (len >= sizeof(type)) { \
-+		*(type *)dst = *(type *)src; \
-+		*(type *)src = 0; \
-+		dst += sizeof(type); \
-+		src += sizeof(type); \
-+		len -= sizeof(type); \
-+	}
-+#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-+#if BITS_PER_LONG == 64
-+	CASCADE(u64);
-+#endif
-+	CASCADE(u32);
-+	CASCADE(u16);
-+#endif
-+	CASCADE(u8);
-+#undef CASCADE
-+}
-+
-+static __always_inline ssize_t
-+__cvdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state)
-+{
-+	struct vgetrandom_state *state = opaque_state;
-+	const struct vdso_rng_data *rng_info = __arch_get_vdso_rng_data();
-+	u32 chacha_state[CHACHA_STATE_WORDS];
-+	ssize_t ret = min_t(size_t, MAX_RW_COUNT, len);
-+	unsigned long current_generation;
-+	size_t batch_len;
-+
-+	if (unlikely(!rng_info->is_ready))
-+		return getrandom_syscall(buffer, len, flags);
-+
-+	if (unlikely(!len))
-+		return 0;
-+
-+	if (unlikely(!READ_ONCE(state->not_forked)))
-+		state->not_forked = true;
-+
-+retry_generation:
-+	current_generation = READ_ONCE(rng_info->generation);
-+	if (unlikely(state->generation != current_generation)) {
-+		if (getrandom_syscall(state->key, sizeof(state->key), 0) != sizeof(state->key))
-+			return getrandom_syscall(buffer, len, flags);
-+		state->generation = current_generation;
-+		state->pos = sizeof(state->batch);
-+	}
-+
-+	len = ret;
-+more_batch:
-+	batch_len = min_t(size_t, sizeof(state->batch) - state->pos, len);
-+	if (batch_len) {
-+		memcpy_and_zero(buffer, state->batch + state->pos, batch_len);
-+		state->pos += batch_len;
-+		buffer += batch_len;
-+		len -= batch_len;
-+	}
-+	if (!len) {
-+		if (unlikely(current_generation != READ_ONCE(rng_info->generation)))
-+			goto retry_generation;
-+		if (unlikely(!READ_ONCE(state->not_forked))) {
-+			state->not_forked = true;
-+			goto retry_generation;
-+		}
-+		return ret;
-+	}
-+
-+	chacha_init_consts(chacha_state);
-+	memcpy(&chacha_state[4], state->key, CHACHA_KEY_SIZE);
-+	memset(&chacha_state[12], 0, sizeof(u32) * 4);
-+
-+	while (len >= CHACHA_BLOCK_SIZE) {
-+		chacha20_block(chacha_state, buffer);
-+		if (unlikely(chacha_state[12] == 0))
-+			++chacha_state[13];
-+		buffer += CHACHA_BLOCK_SIZE;
-+		len -= CHACHA_BLOCK_SIZE;
-+	}
-+
-+	chacha20_block(chacha_state, state->key_batch);
-+	if (unlikely(chacha_state[12] == 0))
-+		++chacha_state[13];
-+	chacha20_block(chacha_state, state->key_batch + CHACHA_BLOCK_SIZE);
-+	state->pos = 0;
-+	memzero_explicit(chacha_state, sizeof(chacha_state));
-+	goto more_batch;
-+}
--- 
-2.38.1
-
+- Eric
