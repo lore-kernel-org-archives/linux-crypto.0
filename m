@@ -2,124 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E23C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Nov 2022 22:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C355DC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 04:59:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235002AbiKQWPw convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Nov 2022 17:15:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53578 "EHLO
+        id S235140AbiKRE7n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Nov 2022 23:59:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240397AbiKQWPr (ORCPT
+        with ESMTP id S235098AbiKRE7n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Nov 2022 17:15:47 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302C47AF52
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 14:15:41 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-135-r8pLcNsHMNSPwdstNZNmIw-1; Thu, 17 Nov 2022 22:15:38 +0000
-X-MC-Unique: r8pLcNsHMNSPwdstNZNmIw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 17 Nov
- 2022 22:15:36 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Thu, 17 Nov 2022 22:15:36 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Theodore Ts'o' <tytso@mit.edu>, Kees Cook <kees@kernel.org>
-CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Kees Cook <keescook@chromium.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "patches@lists.linux.dev" <patches@lists.linux.dev>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?iso-8859-1?Q?Christoph_B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "ydroneaud@opteya.com" <ydroneaud@opteya.com>
-Subject: RE: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Thread-Topic: [PATCH v2 3/3] treewide: use get_random_u32_between() when
- possible
-Thread-Index: AQHY+pt8WAMBAHgXDk6lkwvXqmmyGK5DraKg
-Date:   Thu, 17 Nov 2022 22:15:36 +0000
-Message-ID: <5b2afac148e24181a206e540768e465b@AcuMS.aculab.com>
-References: <20221114164558.1180362-1-Jason@zx2c4.com>
- <20221114164558.1180362-4-Jason@zx2c4.com> <202211161436.A45AD719A@keescook>
- <Y3V4g8eorwiU++Y3@zx2c4.com> <Y3V6QtYMayODVDOk@zx2c4.com>
- <202211161628.164F47F@keescook> <Y3WDyl8ArQgeEoUU@zx2c4.com>
- <0EE39896-C7B6-4CB6-87D5-22AA787740A9@kernel.org> <Y3ZWbcoGOdFjlPhS@mit.edu>
-In-Reply-To: <Y3ZWbcoGOdFjlPhS@mit.edu>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 17 Nov 2022 23:59:43 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C107A5BD4E
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Nov 2022 20:59:40 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1ovtTS-00FUKq-0x; Fri, 18 Nov 2022 12:59:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Nov 2022 12:59:34 +0800
+Date:   Fri, 18 Nov 2022 12:59:34 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com,
+        kirill.shutemov@linux.intel.com, richard@nod.at,
+        viro@zeniv.linux.org.uk,
+        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
+        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
+Subject: Re: [PATCH v4 1/4] crypto: aria: add keystream array into request ctx
+Message-ID: <Y3cRNuYd92QUthDC@gondor.apana.org.au>
+References: <20221113165645.4652-1-ap420073@gmail.com>
+ <20221113165645.4652-2-ap420073@gmail.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221113165645.4652-2-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Theodore Ts'o
-> Sent: 17 November 2022 15:43
-...
-> The problem with "between", "ranged", "spanning" is that they don't
-> tell the reader whether we're dealing with an "open interval" or a
-> "closed interval".  They are just different ways of saying that it's a
-> range between, say, 0 and 20.  But it doesn't tell you whether it
-> includes 0 or 20 or not.
-> 
-> The only way I can see for making it ambiguous is either to use the
-> terminology "closed interval" or "inclusive".  And "open" and "closed"
-> can have other meanings, so get_random_u32_inclusive() is going to be
-> less confusing than get_random_u32_closed().
+On Sun, Nov 13, 2022 at 04:56:42PM +0000, Taehee Yoo wrote:
+>
+> @@ -130,6 +135,13 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+>  	return err;
+>  }
+>  
+> +static int aria_avx_init_tfm(struct crypto_skcipher *tfm)
+> +{
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct aria_avx_request_ctx));
+> +
+> +	return 0;
+> +}
+> +
+>  static struct skcipher_alg aria_algs[] = {
+>  	{
+>  		.base.cra_name		= "__ecb(aria)",
+> @@ -160,6 +172,7 @@ static struct skcipher_alg aria_algs[] = {
+>  		.setkey			= aria_avx_set_key,
+>  		.encrypt		= aria_avx_ctr_encrypt,
+>  		.decrypt		= aria_avx_ctr_encrypt,
+> +		.init			= aria_avx_init_tfm,
+>  	}
+>  };
 
-It has to be said that removing the extra function and requiring
-the callers use 'base + get_random_below(high [+1] - base)' is
-likely to be the only way to succinctly make the code readable
-and understandable.
+You need to set the new flag CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE
+or else users of sync_skcipher may pick up this algorithm and
+barf.
 
-Otherwise readers either have to look up another function to see
-what it does or waste variable brain cells on more trivia.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
