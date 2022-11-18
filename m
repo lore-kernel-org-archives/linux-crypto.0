@@ -2,63 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00D3C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 09:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51892C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 09:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241700AbiKRJGD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 04:06:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55096 "EHLO
+        id S241718AbiKRJKK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 04:10:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231534AbiKRJGC (ORCPT
+        with ESMTP id S240700AbiKRJKJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Nov 2022 04:06:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EC313D4F
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 01:06:01 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 52DE9623B2
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 09:06:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA63C433C1;
-        Fri, 18 Nov 2022 09:06:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668762360;
-        bh=AmskJwnFjVeOdt9cZPfGQ0GR5lO8GyHsCR8+zJUUzik=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FSx3eVetBK2yfWCWPAEzS369Scr3LHzew8d3Yqvn+m25lfub2EMW/CEAt3kAyCJgp
-         QUZUSmElrpjBJuHQ25uneJjwRUU8AHksBUxPiypR/+2c9duOe13KCip3KZpvKqWtNY
-         Xu9b5dd3Qgh9rrPCbdWIIEOsEjC2vUTcFQg7ppVU/kvVKkEJGXmVp8+Kpu73Tgs4rE
-         W6P9UGrg26co1ifjrrTVcjv5+YMG9OaRB8vpiobRl36kqLaN5NilTn0sjZncUqvQyH
-         6tMwZQ1ho096WXL3ksHzoPnV07yK5FRPx9wopZCrzxp9kfBQGVCNbg3TyuTlbcXmvw
-         X0Nzd3DZJ4zTA==
-Date:   Fri, 18 Nov 2022 01:05:58 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        kirill.shutemov@linux.intel.com, richard@nod.at,
-        viro@zeniv.linux.org.uk,
-        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
-        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
-Subject: Re: [PATCH v5 3/4] crypto: aria: implement aria-avx2
-Message-ID: <Y3dK9hHXZSgpVdV1@sol.localdomain>
-References: <20221118072252.10770-1-ap420073@gmail.com>
- <20221118072252.10770-4-ap420073@gmail.com>
+        Fri, 18 Nov 2022 04:10:09 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8776F35C
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 01:10:07 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1ovxNq-00FYN7-RO; Fri, 18 Nov 2022 17:10:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Nov 2022 17:10:02 +0800
+Date:   Fri, 18 Nov 2022 17:10:02 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v2] hw_random: treat default_quality as a maximum and
+ default to 1024
+Message-ID: <Y3dL6huTdU/vqD7H@gondor.apana.org.au>
+References: <CAHmME9pjWNGaF+4+ubFuu1AXhRkEbU7mxT-RtOhWVYkAgxXiDg@mail.gmail.com>
+ <20221107122455.6169-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221118072252.10770-4-ap420073@gmail.com>
+In-Reply-To: <20221107122455.6169-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 07:22:51AM +0000, Taehee Yoo wrote:
-> +SYM_FUNC_START(aria_aesni_avx2_encrypt_32way)
+On Mon, Nov 07, 2022 at 01:24:55PM +0100, Jason A. Donenfeld wrote:
+> Most hw_random devices return entropy which is assumed to be of full
+> quality, but driver authors don't bother setting the quality knob. Some
+> hw_random devices return less than full quality entropy, and then driver
+> authors set the quality knob. Therefore, the entropy crediting should be
+> opt-out rather than opt-in per-driver, to reflect the actual reality on
+> the ground.
+> 
+> For example, the two Raspberry Pi RNG drivers produce full entropy
+> randomness, and both EDK2 and U-Boot's drivers for these treat them as
+> such. The result is that EFI then uses these numbers and passes the to
+> Linux, and Linux credits them as boot, thereby initializing the RNG.
+> Yet, in Linux, the quality knob was never set to anything, and so on the
+> chance that Linux is booted without EFI, nothing is ever credited.
+> That's annoying.
+> 
+> The same pattern appears to repeat itself throughout various drivers. In
+> fact, very very few drivers have bothered setting quality=1024.
+> 
+> Looking at the git history of existing drivers and corresponding mailing
+> list discussion, this conclusion tracks. There's been a decent amount of
+> discussion about drivers that set quality < 1024 -- somebody read and
+> interepreted a datasheet, or made some back of the envelope calculation
+> somehow. But there's been very little, if any, discussion about most
+> drivers where the quality is just set to 1024 or unset (or set to 1000
+> when the authors misunderstood the API and assumed it was base-10 rather
+> than base-2); in both cases the intent was fairly clear of, "this is a
+> hardware random device; it's fine."
+> 
+> So let's invert this logic. A hw_random struct's quality knob now
+> controls the maximum quality a driver can produce, or 0 to specify 1024.
+> Then, the module-wide switch called "default_quality" is changed to
+> represent the maximum quality of any driver. By default it's 1024, and
+> the quality of any particular driver is then given by:
+> 
+>     min(default_quality, rng->quality ?: 1024);
+> 
+> This way, the user can still turn this off for weird reasons (and we can
+> replace whatever driver-specific disabling hacks existed in the past),
+> yet we get proper crediting for relevant RNGs.
+> 
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v1->v2:
+> - Expand commit message a bit.
+> - Account for erroneous quality=1000 and quirky devices too.
+> 
+>  arch/um/drivers/random.c                          | 1 -
+>  drivers/char/hw_random/cavium-rng-vf.c            | 1 -
+>  drivers/char/hw_random/cn10k-rng.c                | 1 -
+>  drivers/char/hw_random/core.c                     | 9 +++------
+>  drivers/char/hw_random/mpfs-rng.c                 | 1 -
+>  drivers/char/hw_random/npcm-rng.c                 | 1 -
+>  drivers/char/hw_random/s390-trng.c                | 1 -
+>  drivers/char/hw_random/timeriomem-rng.c           | 2 --
+>  drivers/char/hw_random/virtio-rng.c               | 1 -
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 1 -
+>  drivers/crypto/atmel-sha204a.c                    | 1 -
+>  drivers/crypto/caam/caamrng.c                     | 1 -
+>  drivers/firmware/turris-mox-rwtm.c                | 1 -
+>  drivers/s390/crypto/zcrypt_api.c                  | 6 ------
+>  drivers/usb/misc/chaoskey.c                       | 1 -
+>  include/linux/hw_random.h                         | 2 +-
+>  16 files changed, 4 insertions(+), 27 deletions(-)
 
-Please use SYM_TYPED_FUNC_START (and include <linux/cfi_types.h>) for all
-assembly functions that are called via indirect function calls.  Otherwise the
-code will crash when built with CONFIG_CFI_CLANG=y.
-
-- Eric
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
