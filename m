@@ -2,107 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C5CC43217
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD3BC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235364AbiKRTqa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:46:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
+        id S235446AbiKRTqb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 14:46:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235446AbiKRTq2 (ORCPT
+        with ESMTP id S235350AbiKRTq3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Nov 2022 14:46:28 -0500
+        Fri, 18 Nov 2022 14:46:29 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8DC88CFF9
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 11:46:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B708CF37
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 11:46:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8515862762
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC4AAC433C1;
-        Fri, 18 Nov 2022 19:46:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A99506276A
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5721AC43147;
+        Fri, 18 Nov 2022 19:46:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668800783;
-        bh=pRruGOUsFyZsKb+BNIESqnaa7mp7RB+efAYZD68W7hA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=X1SQLTidNZJv2ERVwOZ8JKwakO4kxNgRU71p2Fe2+P3djxyakCkM/Wi4HaXbXoHER
-         sxveURIIPxqJ0E+Eujq9mnedZ05QweQuUwdH0H2CUfi/Xry9yu+ycXq7xv5yLe+8af
-         7Yga+eDdR/P8Hjq7wkEKRn23XPgK/+EZuDFDeIHsDexPXTEfwugR2qTZLaQrMYeXPo
-         jfXUwuACTlzY2WgubcjUpgYjVXMKgXgpHz+mhl9em4S0I44np3QvwP0Msvh2UG3TkN
-         v/azqurLBkhMD3LTugIf42yuaxOFHztwu9BugZBTmhovZ7W9OmzY4IkjY+bAlyMszA
-         gL2pCJIoeisuw==
+        s=k20201202; t=1668800785;
+        bh=qDEd6yjezAEKyeXhBgJqixcDjy7TkZZTMaumiYQZh3k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DBEPBR4DRSkF+Kb1ECCcGEn1Ubxv/dV/G+6aLXG4NvyXwplXEooeAdrG7XPZwaYKc
+         j87GJp+ZztUXH6b6/DMu4YSbJ8g+K59EA+CgWzOtZmwy2FOtkx48JOpq4AP0jXjfQN
+         UtvJ/BBhly38i9XphhacRGk0DiblV3Z0LH8hjnUfHIfI0Gh263SU4JMObQi6CM+hIq
+         ZG7DoKNkPXOe+xxFWl5yy0iWYViMKuFKVcq1fPmKEXFbpHUEKCkDUHBQzOweqZDsnC
+         nf14oYLw5fn3Szd9kQAPbtzdNC0zvehuAIhFTpydcbjgt8DcoAJB2GsZ2xvGZVieRa
+         QjlqG1okzjFWA==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: [PATCH v2 00/12] crypto: CFI fixes
-Date:   Fri, 18 Nov 2022 11:44:09 -0800
-Message-Id: <20221118194421.160414-1-ebiggers@kernel.org>
+        Sami Tolvanen <samitolvanen@google.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>
+Subject: [PATCH v2 05/12] crypto: x86/sha256 - fix possible crash with CFI enabled
+Date:   Fri, 18 Nov 2022 11:44:14 -0800
+Message-Id: <20221118194421.160414-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221118194421.160414-1-ebiggers@kernel.org>
+References: <20221118194421.160414-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series fixes some crashes when CONFIG_CFI_CLANG (Control Flow
-Integrity) is enabled, with the new CFI implementation that was merged
-in 6.1 and is supported on x86.  Some of them were unconditional
-crashes, while others depended on whether the compiler optimized out the
-indirect calls or not.  This series also simplifies some code that was
-intended to work around limitations of the old CFI implementation and is
-unnecessary for the new CFI implementation.
+From: Eric Biggers <ebiggers@google.com>
 
-Changed in v2:
-  - Added patch "crypto: x86/sm4 - fix crash with CFI enabled"
-  - Restored accidentally-deleted include of <asm/assembler.h>
-  - Tweaked some commit messages and added Reviewed-by and Acked-by tags
+sha256_transform_ssse3(), sha256_transform_avx(),
+sha256_transform_rorx(), and sha256_ni_transform() are called via
+indirect function calls.  Therefore they need to use
+SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause their type
+hashes to be emitted when the kernel is built with CONFIG_CFI_CLANG=y.
+Otherwise, the code crashes with a CFI failure (if the compiler didn't
+happen to optimize out the indirect calls).
 
-Eric Biggers (12):
-  crypto: x86/aegis128 - fix possible crash with CFI enabled
-  crypto: x86/aria - fix crash with CFI enabled
-  crypto: x86/nhpoly1305 - eliminate unnecessary CFI wrappers
-  crypto: x86/sha1 - fix possible crash with CFI enabled
-  crypto: x86/sha256 - fix possible crash with CFI enabled
-  crypto: x86/sha512 - fix possible crash with CFI enabled
-  crypto: x86/sm3 - fix possible crash with CFI enabled
-  crypto: x86/sm4 - fix crash with CFI enabled
-  crypto: arm64/nhpoly1305 - eliminate unnecessary CFI wrapper
-  crypto: arm64/sm3 - fix possible crash with CFI enabled
-  crypto: arm/nhpoly1305 - eliminate unnecessary CFI wrapper
-  Revert "crypto: shash - avoid comparing pointers to exported functions
-    under CFI"
+Fixes: ccace936eec7 ("x86: Add types to indirectly called assembly functions")
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/sha256-avx-asm.S   | 3 ++-
+ arch/x86/crypto/sha256-avx2-asm.S  | 3 ++-
+ arch/x86/crypto/sha256-ssse3-asm.S | 3 ++-
+ arch/x86/crypto/sha256_ni_asm.S    | 3 ++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
 
- arch/arm/crypto/nh-neon-core.S           |  2 +-
- arch/arm/crypto/nhpoly1305-neon-glue.c   | 11 ++---------
- arch/arm64/crypto/nh-neon-core.S         |  5 +++--
- arch/arm64/crypto/nhpoly1305-neon-glue.c | 11 ++---------
- arch/arm64/crypto/sm3-neon-core.S        |  3 ++-
- arch/x86/crypto/aegis128-aesni-asm.S     |  9 +++++----
- arch/x86/crypto/aria-aesni-avx-asm_64.S  | 13 +++++++------
- arch/x86/crypto/nh-avx2-x86_64.S         |  5 +++--
- arch/x86/crypto/nh-sse2-x86_64.S         |  5 +++--
- arch/x86/crypto/nhpoly1305-avx2-glue.c   | 11 ++---------
- arch/x86/crypto/nhpoly1305-sse2-glue.c   | 11 ++---------
- arch/x86/crypto/sha1_ni_asm.S            |  3 ++-
- arch/x86/crypto/sha1_ssse3_asm.S         |  3 ++-
- arch/x86/crypto/sha256-avx-asm.S         |  3 ++-
- arch/x86/crypto/sha256-avx2-asm.S        |  3 ++-
- arch/x86/crypto/sha256-ssse3-asm.S       |  3 ++-
- arch/x86/crypto/sha256_ni_asm.S          |  3 ++-
- arch/x86/crypto/sha512-avx-asm.S         |  3 ++-
- arch/x86/crypto/sha512-avx2-asm.S        |  3 ++-
- arch/x86/crypto/sha512-ssse3-asm.S       |  3 ++-
- arch/x86/crypto/sm3-avx-asm_64.S         |  3 ++-
- arch/x86/crypto/sm4-aesni-avx-asm_64.S   |  7 ++++---
- arch/x86/crypto/sm4-aesni-avx2-asm_64.S  |  7 ++++---
- crypto/shash.c                           | 18 +++---------------
- include/crypto/internal/hash.h           |  8 +++++++-
- 25 files changed, 70 insertions(+), 86 deletions(-)
-
-
-base-commit: 75df46b598b5b46b0857ee7d2410deaf215e23d1
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index 3baa1ec390974..06ea30c20828d 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -48,6 +48,7 @@
+ ########################################################################
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ 
+ ## assume buffers not aligned
+ #define    VMOVDQ vmovdqu
+@@ -346,7 +347,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-SYM_FUNC_START(sha256_transform_avx)
++SYM_TYPED_FUNC_START(sha256_transform_avx)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
+index 9bcdbc47b8b4b..2d2be531a11ed 100644
+--- a/arch/x86/crypto/sha256-avx2-asm.S
++++ b/arch/x86/crypto/sha256-avx2-asm.S
+@@ -49,6 +49,7 @@
+ ########################################################################
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ 
+ ## assume buffers not aligned
+ #define	VMOVDQ vmovdqu
+@@ -523,7 +524,7 @@ STACK_SIZE	= _CTX      + _CTX_SIZE
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-SYM_FUNC_START(sha256_transform_rorx)
++SYM_TYPED_FUNC_START(sha256_transform_rorx)
+ .align 32
+ 	pushq	%rbx
+ 	pushq	%r12
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index c4a5db612c327..7db28839108dd 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -47,6 +47,7 @@
+ ########################################################################
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ 
+ ## assume buffers not aligned
+ #define    MOVDQ movdqu
+@@ -355,7 +356,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-SYM_FUNC_START(sha256_transform_ssse3)
++SYM_TYPED_FUNC_START(sha256_transform_ssse3)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+diff --git a/arch/x86/crypto/sha256_ni_asm.S b/arch/x86/crypto/sha256_ni_asm.S
+index 94d50dd27cb53..47f93937f798a 100644
+--- a/arch/x86/crypto/sha256_ni_asm.S
++++ b/arch/x86/crypto/sha256_ni_asm.S
+@@ -54,6 +54,7 @@
+  */
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ 
+ #define DIGEST_PTR	%rdi	/* 1st arg */
+ #define DATA_PTR	%rsi	/* 2nd arg */
+@@ -97,7 +98,7 @@
+ 
+ .text
+ .align 32
+-SYM_FUNC_START(sha256_ni_transform)
++SYM_TYPED_FUNC_START(sha256_ni_transform)
+ 
+ 	shl		$6, NUM_BLKS		/*  convert to bytes */
+ 	jz		.Ldone_hash
 -- 
 2.38.1
 
