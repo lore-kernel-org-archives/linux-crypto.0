@@ -2,82 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DD4C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 09:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BF1C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 10:46:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235217AbiKRJwF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 04:52:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33088 "EHLO
+        id S241698AbiKRKqG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 05:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232902AbiKRJwE (ORCPT
+        with ESMTP id S241812AbiKRKpp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Nov 2022 04:52:04 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7315F2D7
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 01:52:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+8jFeHfK53thFHUSFDBWh9hINMWFzglzAMyQx5Fn604=; b=UiAa1e2z+A7Oht8yNnwtAZDVxB
-        tgU1GB2uJeLMog/5VKd5aEKsSyZ9cXRDofLwZwAxFIE7jOGi8LCVT8xFq8FV4noTJOBXCGGIa1qpd
-        V9WwBIfIp4H3VwpV1WbGwdvbC2/HdSgAaPhOc7cwXg57lOELX85d8HUI2cVdcFzeNCBXcMKe9cLy5
-        91pH4YzH6Z6k8wotndDLNPPwJO4uFFsDFilIBz/0vDjoPeUAA/GwZ3SX8H/8bosgrfn3lugRx7V9A
-        VHvgjkcIZmGL0bQue53v0YMYWunvYLO7bmbFD3Tk2jyLs3n8b3XFb6P+3MxyBAPxojPmUOLFU91B1
-        5nwakhqg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ovy2Q-001wM9-Ru; Fri, 18 Nov 2022 09:51:59 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6DFF5300244;
-        Fri, 18 Nov 2022 10:51:58 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 4FDE8201A1023; Fri, 18 Nov 2022 10:51:58 +0100 (CET)
-Date:   Fri, 18 Nov 2022 10:51:58 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCH 0/11] crypto: CFI fixes
-Message-ID: <Y3dVvnLybvx3KUTf@hirez.programming.kicks-ass.net>
-References: <20221118090220.398819-1-ebiggers@kernel.org>
+        Fri, 18 Nov 2022 05:45:45 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530959BA07
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 02:45:19 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id k15so4531120pfg.2
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 02:45:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bkRROqYBHfdXHhbIQX0z29ugEbUbH1hutwc3+eDOaA4=;
+        b=Fe+KHbsdlUB88GM1O9rdOu3VEVh6cyiH09LhRZN1pEFqXzBiwxeJNEGddoCzfdLgxO
+         od5ZW9EKsAXS5vDIx1nBO4FSCMlYsXbvfAcTwMm7HWsKXvnYZIjpP8UHFm4wY6eLEmDJ
+         ug4ulN7+tcPZNMLZi2LxHjuwxOllw59dXnwxw4+67NYs7aRNlW5Wm6EElTCDJwCYkPB2
+         pjQPZXv9JbCIMUBACsOubHfSLutGBo93xD7LgRqngFClyT7GHH5HOc+I5hXJriTyeoZ/
+         9izUW9pYfXIQIcoBjMYAzZBI7Em7QYruixR+77SYskgC0sQ1PAoiZOge6cr804wmbdsP
+         PfKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkRROqYBHfdXHhbIQX0z29ugEbUbH1hutwc3+eDOaA4=;
+        b=QZwipcZBfFA0PwnoieizUK5BsheUQk4K9tkepUigU4m0Veet5hRackEPxqKtjQ0m8S
+         MRMjQxZOWeN0k50PnC8RJ+2o3gbz+iJjtfzOdXwcCNkUAuHRynRnbwaxhg3LZ3i250ev
+         L6uyk6+2qrYcxEDCNP8apVRCPT5p0EmuXp1rquJdKOVkOmXrCbZJg6WyRgjSKby+z/bP
+         qSUyC8h1wLXsXijvajVRZJZg1Ir4Zdrx0eQrjKdd+7xNwcat9/hh4gVc2m3nPf/zNg2d
+         vUv02XxGOVVe6CXNyT/KlClwZZuIUihCizkeSRYIuUwchjArczL30x+XKJXE1b5memmZ
+         Uhug==
+X-Gm-Message-State: ANoB5plwEoli4y4QMdLywazxFXpbXDom2xeSbZ/QDVioG9NowYNfjlf+
+        ziq37auBTLfXJLp44h0qsvM=
+X-Google-Smtp-Source: AA0mqf4WL/qx3kpl74YRFv5XYYtH7mjP//dyEQJfX0H6xGSotkRgsZgnY26jmfkS7YD9+qjGaITIZg==
+X-Received: by 2002:a62:5e41:0:b0:56b:db09:a235 with SMTP id s62-20020a625e41000000b0056bdb09a235mr7199154pfb.20.1668768319277;
+        Fri, 18 Nov 2022 02:45:19 -0800 (PST)
+Received: from ?IPV6:2606:4700:110:8d19:ef92:9207:5a0d:60e7? ([2a09:bac1:3f40:98::16:12e])
+        by smtp.gmail.com with ESMTPSA id z24-20020a62d118000000b0056cd54ac8a0sm2773256pfg.197.2022.11.18.02.45.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Nov 2022 02:45:18 -0800 (PST)
+Message-ID: <07f353fd-1f36-2f58-63da-b15d3473ab40@gmail.com>
+Date:   Fri, 18 Nov 2022 19:45:13 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221118090220.398819-1-ebiggers@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v5 3/4] crypto: aria: implement aria-avx2
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kirill.shutemov@linux.intel.com, richard@nod.at,
+        viro@zeniv.linux.org.uk,
+        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
+        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi
+References: <20221118072252.10770-1-ap420073@gmail.com>
+ <20221118072252.10770-4-ap420073@gmail.com>
+ <Y3dK9hHXZSgpVdV1@sol.localdomain>
+From:   Taehee Yoo <ap420073@gmail.com>
+In-Reply-To: <Y3dK9hHXZSgpVdV1@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 01:02:09AM -0800, Eric Biggers wrote:
-> This series fixes some crashes when CONFIG_CFI_CLANG (Control Flow
-> Integrity) is enabled, with the new CFI implementation that was merged
-> in 6.1 and is supported on x86.  Some of them were unconditional
-> crashes, while others depended on whether the compiler optimized out the
-> indirect calls or not.  This series also simplifies some code that was
-> intended to work around limitations of the old CFI implementation and is
-> unnecessary for the new CFI implementation.
-> 
-> Eric Biggers (11):
->   crypto: x86/aegis128 - fix crash with CFI enabled
->   crypto: x86/aria - fix crash with CFI enabled
->   crypto: x86/nhpoly1305 - eliminate unnecessary CFI wrappers
->   crypto: x86/sha1 - fix possible crash with CFI enabled
->   crypto: x86/sha256 - fix possible crash with CFI enabled
->   crypto: x86/sha512 - fix possible crash with CFI enabled
->   crypto: x86/sm3 - fix possible crash with CFI enabled
->   crypto: arm64/nhpoly1305 - eliminate unnecessary CFI wrapper
->   crypto: arm64/sm3 - fix possible crash with CFI enabled
->   crypto: arm/nhpoly1305 - eliminate unnecessary CFI wrapper
->   Revert "crypto: shash - avoid comparing pointers to exported functions
->     under CFI"
+Hi Eric,
+Thank you so much for your review!
 
-These all look good. They will hoever conflict with the alignment
-cleanups/changes we've got in tip/x86/core, but there's no helping that
-I support.
+On 11/18/22 18:05, Eric Biggers wrote:
+ > On Fri, Nov 18, 2022 at 07:22:51AM +0000, Taehee Yoo wrote:
+ >> +SYM_FUNC_START(aria_aesni_avx2_encrypt_32way)
+ >
+ > Please use SYM_TYPED_FUNC_START (and include <linux/cfi_types.h>) for all
+ > assembly functions that are called via indirect function calls. 
+Otherwise the
+ > code will crash when built with CONFIG_CFI_CLANG=y.
+ >
+ > - Eric
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Okay, I will use SYM_TYPED_FUNC_START for avx2 and avx512 in the v6 
+patchset.
+
+Thanks a lot!
+Taehee Yoo
