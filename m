@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB271C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 572D1C43219
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240445AbiKRTqd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:46:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58360 "EHLO
+        id S235483AbiKRTqe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 14:46:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235483AbiKRTq3 (ORCPT
+        with ESMTP id S235465AbiKRTq3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 18 Nov 2022 14:46:29 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54AD8D482
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CAC8CFCC
         for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 11:46:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7824AB824F8
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14DC5C433D6;
-        Fri, 18 Nov 2022 19:46:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0220C62779
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A245FC43146;
+        Fri, 18 Nov 2022 19:46:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668800784;
-        bh=pld3XDt3BvGRUOAeWpGABORV9PhFrHCg0jaaS0wG4JY=;
+        s=k20201202; t=1668800785;
+        bh=HdiSoWnZUTCZpmQjT2Un6tm8QTRonixjlwqY064EQSg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ctclds9W9ZQRSH26nNSD/4Ztv5PPT1NqhIwr7+W5kWizkj4yfFlpOdLRj/psyZVSt
-         k+EdrCpXYDx6ZsoGWYiZJJPYkPTNlE8vpZnWLQNDKu9N4cYokXEmJpJYqIhQBthvpp
-         a1qZb2p+czXkPd4h+pRTXsJ1nwPkPFoR5NTZngEaM0IfsQho2kDdlLWgFUO8OegUFo
-         NAg6JV8PTfqFhiqQS7xMNHdoPfrl7OG/PZle6XjzX6pNk1vEL5a7QaxnwJa71XrrEn
-         709qI+aFBuclXf9C3g/x11nAaBanv8tiJU5QQh+mWfWSmNJKqzNhqJNbFS1KBS0VQ4
-         S5N9IJkjWE/BA==
+        b=nFUVKDQu84QOhgaSio7dWBuVl7bRghkrifp3HXo62eW9ILO3xqm2T04vi0Z4xxAJ7
+         n6eojRyj2Kk68HPINIAorrqNaF+5kyNJXdXq5zWcK/cVfG3q8EeGiqARm3T+RGqSXW
+         hOCeOmqUXt+q0H2UwCwDwK2UdriOXz8O3Kfae56ZkzjoiC84Hufd/jpwvuGCmhdjD7
+         rXfWtNsg8XXpyo6wg+EWQs1otRvV5cN3WJw1fQxhIxmj5KcJPRIAD/+S6hhnRGPdZE
+         CW2MCG72y4aDWei6QXJTrQ9rpq+Z9Jx5R67rz7LByV3Ttuq0i5YfVccY2x73D16fhx
+         mQZgIX+FDE7MA==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
         Sami Tolvanen <samitolvanen@google.com>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>
-Subject: [PATCH v2 01/12] crypto: x86/aegis128 - fix possible crash with CFI enabled
-Date:   Fri, 18 Nov 2022 11:44:10 -0800
-Message-Id: <20221118194421.160414-2-ebiggers@kernel.org>
+Subject: [PATCH v2 06/12] crypto: x86/sha512 - fix possible crash with CFI enabled
+Date:   Fri, 18 Nov 2022 11:44:15 -0800
+Message-Id: <20221118194421.160414-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221118194421.160414-1-ebiggers@kernel.org>
 References: <20221118194421.160414-1-ebiggers@kernel.org>
@@ -51,70 +51,87 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-crypto_aegis128_aesni_enc(), crypto_aegis128_aesni_enc_tail(),
-crypto_aegis128_aesni_dec(), and crypto_aegis128_aesni_dec_tail() are
-called via indirect function calls.  Therefore they need to use
-SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause their type
-hashes to be emitted when the kernel is built with CONFIG_CFI_CLANG=y.
-Otherwise, the code crashes with a CFI failure (if the compiler didn't
-happen to optimize out the indirect calls).
+sha512_transform_ssse3(), sha512_transform_avx(), and
+sha512_transform_rorx() are called via indirect function calls.
+Therefore they need to use SYM_TYPED_FUNC_START instead of
+SYM_FUNC_START to cause their type hashes to be emitted when the kernel
+is built with CONFIG_CFI_CLANG=y.  Otherwise, the code crashes with a
+CFI failure (if the compiler didn't happen to optimize out the indirect
+calls).
 
 Fixes: ccace936eec7 ("x86: Add types to indirectly called assembly functions")
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aegis128-aesni-asm.S | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ arch/x86/crypto/sha512-avx-asm.S   | 3 ++-
+ arch/x86/crypto/sha512-avx2-asm.S  | 3 ++-
+ arch/x86/crypto/sha512-ssse3-asm.S | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
-index b48ddebb47489..cdf3215ec272c 100644
---- a/arch/x86/crypto/aegis128-aesni-asm.S
-+++ b/arch/x86/crypto/aegis128-aesni-asm.S
-@@ -7,6 +7,7 @@
-  */
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 1fefe6dd3a9e2..b0984f19fdb40 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -48,6 +48,7 @@
+ ########################################################################
  
  #include <linux/linkage.h>
 +#include <linux/cfi_types.h>
- #include <asm/frame.h>
  
- #define STATE0	%xmm0
-@@ -402,7 +403,7 @@ SYM_FUNC_END(crypto_aegis128_aesni_ad)
-  * void crypto_aegis128_aesni_enc(void *state, unsigned int length,
-  *                                const void *src, void *dst);
-  */
--SYM_FUNC_START(crypto_aegis128_aesni_enc)
-+SYM_TYPED_FUNC_START(crypto_aegis128_aesni_enc)
- 	FRAME_BEGIN
+ .text
  
- 	cmp $0x10, LEN
-@@ -499,7 +500,7 @@ SYM_FUNC_END(crypto_aegis128_aesni_enc)
-  * void crypto_aegis128_aesni_enc_tail(void *state, unsigned int length,
-  *                                     const void *src, void *dst);
-  */
--SYM_FUNC_START(crypto_aegis128_aesni_enc_tail)
-+SYM_TYPED_FUNC_START(crypto_aegis128_aesni_enc_tail)
- 	FRAME_BEGIN
+@@ -273,7 +274,7 @@ frame_size = frame_WK + WK_SIZE
+ # of SHA512 message blocks.
+ # "blocks" is the message length in SHA512 blocks
+ ########################################################################
+-SYM_FUNC_START(sha512_transform_avx)
++SYM_TYPED_FUNC_START(sha512_transform_avx)
+ 	test msglen, msglen
+ 	je nowork
  
- 	/* load the state: */
-@@ -556,7 +557,7 @@ SYM_FUNC_END(crypto_aegis128_aesni_enc_tail)
-  * void crypto_aegis128_aesni_dec(void *state, unsigned int length,
-  *                                const void *src, void *dst);
-  */
--SYM_FUNC_START(crypto_aegis128_aesni_dec)
-+SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec)
- 	FRAME_BEGIN
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index 5cdaab7d69015..b1ca99055ef99 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -50,6 +50,7 @@
+ ########################################################################
  
- 	cmp $0x10, LEN
-@@ -653,7 +654,7 @@ SYM_FUNC_END(crypto_aegis128_aesni_dec)
-  * void crypto_aegis128_aesni_dec_tail(void *state, unsigned int length,
-  *                                     const void *src, void *dst);
-  */
--SYM_FUNC_START(crypto_aegis128_aesni_dec_tail)
-+SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec_tail)
- 	FRAME_BEGIN
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
  
- 	/* load the state: */
+ .text
+ 
+@@ -565,7 +566,7 @@ frame_size = frame_CTX + CTX_SIZE
+ # of SHA512 message blocks.
+ # "blocks" is the message length in SHA512 blocks
+ ########################################################################
+-SYM_FUNC_START(sha512_transform_rorx)
++SYM_TYPED_FUNC_START(sha512_transform_rorx)
+ 	# Save GPRs
+ 	push	%rbx
+ 	push	%r12
+diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
+index b84c22e06c5f7..c06afb5270e5f 100644
+--- a/arch/x86/crypto/sha512-ssse3-asm.S
++++ b/arch/x86/crypto/sha512-ssse3-asm.S
+@@ -48,6 +48,7 @@
+ ########################################################################
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ 
+ .text
+ 
+@@ -274,7 +275,7 @@ frame_size = frame_WK + WK_SIZE
+ # of SHA512 message blocks.
+ # "blocks" is the message length in SHA512 blocks.
+ ########################################################################
+-SYM_FUNC_START(sha512_transform_ssse3)
++SYM_TYPED_FUNC_START(sha512_transform_ssse3)
+ 
+ 	test msglen, msglen
+ 	je nowork
 -- 
 2.38.1
 
