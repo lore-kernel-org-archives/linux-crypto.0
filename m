@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3AFC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2860EC43217
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Nov 2022 19:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235220AbiKRTqo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Nov 2022 14:46:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
+        id S239864AbiKRTqp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Nov 2022 14:46:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235594AbiKRTqb (ORCPT
+        with ESMTP id S235463AbiKRTqb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 18 Nov 2022 14:46:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1F08CFDE
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCDC7818F
         for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 11:46:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 50C1CB824C8
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D64BCC433B5;
-        Fri, 18 Nov 2022 19:46:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CBBD662792
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Nov 2022 19:46:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79032C43140;
+        Fri, 18 Nov 2022 19:46:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1668800787;
-        bh=502XtfzzJCvn41Ye4mf8jH8Z9XzhNMTzAZtoz+ow1Mk=;
+        bh=kEiHXZili2H4efP5Zbt6QZIEDbUdz7NL5DjoHnDhWac=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SvwBQUsI23XQ04sTI+nMVJ/WdNE5SRFV0xg5sQjzZmEWJ1B+c7rFPuO1rZ6ZiApwe
-         oN0DQyrJnBsRXkaoO9X8r3laLNge0EW+fgfc6La6YGGQKvYuLZobjj3n8AkCMhC8mf
-         gOpZJOhwNEVzfBoL7N5xSXxS6HEVgx6G/y5WmkR3LGvn79IeLRXprShuZwm2R4cnRB
-         G8PqvC13bsWK+9I4PZkHV/TLQhlxmBxO7JVrraQ7AwrR5n2+PHMp5YwEAsTxy55WQw
-         VT6e73YReQNO5UW1oa5/5CTixIuDmDQIHWoGgQiiMGWEe7EVzdvKrUIl6Kw8W45yry
-         I5s/S5nTK7/1g==
+        b=ErSsA5S03M6uPJgYtoNYzpyGRsncDw5v9YTnjC2g1yf8Gtq/ce6QqMvNPysmNpyuo
+         bYGdjDIE6a9BnUfpjq+NZRkN3g3HvNK9pXmR3dOf+OfKjs6qRu3O8UdW0Qu5ehCCHk
+         ZLkprHysfZPvjQciMmGKDcwBqIeAyDMP0dBd+STirNqJjmpwjP39X1Mh+m/vvc+lYC
+         NYU/FGL53zTFGOHqK/q7sxgZBkT80W3rnKbQ2ZTt0Kch3xciVjXRj5q2iPBMMJ6Muv
+         RlkYp4IMfdIwuH2h5eNrdWftJWHyPRJDn2d+8xl6VxgpnLC1yB3C5xE209TQwl5ghF
+         1kjnVVuXiMbzw==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     x86@kernel.org, linux-arm-kernel@lists.infradead.org,
         Sami Tolvanen <samitolvanen@google.com>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>
-Subject: [PATCH v2 10/12] crypto: arm64/sm3 - fix possible crash with CFI enabled
-Date:   Fri, 18 Nov 2022 11:44:19 -0800
-Message-Id: <20221118194421.160414-11-ebiggers@kernel.org>
+Subject: [PATCH v2 12/12] Revert "crypto: shash - avoid comparing pointers to exported functions under CFI"
+Date:   Fri, 18 Nov 2022 11:44:21 -0800
+Message-Id: <20221118194421.160414-13-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221118194421.160414-1-ebiggers@kernel.org>
 References: <20221118194421.160414-1-ebiggers@kernel.org>
@@ -51,41 +51,72 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-sm3_neon_transform() is called via indirect function calls.  Therefore
-it needs to use SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause
-its type hash to be emitted when the kernel is built with
-CONFIG_CFI_CLANG=y.  Otherwise, the code crashes with a CFI failure (if
-the compiler didn't happen to optimize out the indirect call).
+This reverts commit 22ca9f4aaf431a9413dcc115dd590123307f274f because CFI
+no longer breaks cross-module function address equality, so
+crypto_shash_alg_has_setkey() can now be an inline function like before.
 
-Fixes: c50d32859e70 ("arm64: Add types to indirect called assembly functions")
+This commit should not be backported to kernels that don't have the new
+CFI implementation.
+
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm64/crypto/sm3-neon-core.S | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/shash.c                 | 18 +++---------------
+ include/crypto/internal/hash.h |  8 +++++++-
+ 2 files changed, 10 insertions(+), 16 deletions(-)
 
-diff --git a/arch/arm64/crypto/sm3-neon-core.S b/arch/arm64/crypto/sm3-neon-core.S
-index 3e3b4e5c736fc..4357e0e51be38 100644
---- a/arch/arm64/crypto/sm3-neon-core.S
-+++ b/arch/arm64/crypto/sm3-neon-core.S
-@@ -9,6 +9,7 @@
-  */
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 4c88e63b3350f..0f85431588267 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -20,24 +20,12 @@
  
- #include <linux/linkage.h>
-+#include <linux/cfi_types.h>
- #include <asm/assembler.h>
+ static const struct crypto_type crypto_shash_type;
  
- /* Context structure */
-@@ -351,7 +352,7 @@
- 	 */
- 	.text
- .align 3
--SYM_FUNC_START(sm3_neon_transform)
-+SYM_TYPED_FUNC_START(sm3_neon_transform)
- 	ldp		ra, rb, [RSTATE, #0]
- 	ldp		rc, rd, [RSTATE, #8]
- 	ldp		re, rf, [RSTATE, #16]
+-static int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+-			   unsigned int keylen)
++int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
++		    unsigned int keylen)
+ {
+ 	return -ENOSYS;
+ }
+-
+-/*
+- * Check whether an shash algorithm has a setkey function.
+- *
+- * For CFI compatibility, this must not be an inline function.  This is because
+- * when CFI is enabled, modules won't get the same address for shash_no_setkey
+- * (if it were exported, which inlining would require) as the core kernel will.
+- */
+-bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
+-{
+-	return alg->setkey != shash_no_setkey;
+-}
+-EXPORT_SYMBOL_GPL(crypto_shash_alg_has_setkey);
++EXPORT_SYMBOL_GPL(shash_no_setkey);
+ 
+ static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
+ 				  unsigned int keylen)
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 25806141db591..0a288dddcf5be 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -75,7 +75,13 @@ void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
+ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst);
+ 
+-bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
++int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
++		    unsigned int keylen);
++
++static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
++{
++	return alg->setkey != shash_no_setkey;
++}
+ 
+ static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
+ {
 -- 
 2.38.1
 
