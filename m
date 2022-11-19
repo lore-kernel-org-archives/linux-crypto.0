@@ -2,124 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21BFBC4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 13:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C14C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 20:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231445AbiKSNnQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 08:43:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46822 "EHLO
+        id S234955AbiKSUjr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 15:39:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiKSNnP (ORCPT
+        with ESMTP id S233485AbiKSUja (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 08:43:15 -0500
+        Sat, 19 Nov 2022 15:39:30 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC72B83EBB
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 05:43:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773DB12D1D;
+        Sat, 19 Nov 2022 12:39:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6EF2C60A6E
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 13:43:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2D05C433C1;
-        Sat, 19 Nov 2022 13:43:12 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L8WRt3rP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668865390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=sNjUH9YYxs+T2CdAZKiMZPcLV7XYZEO0+q+grRvvYi4=;
-        b=L8WRt3rP4VI0qjaFz/qNoRuPGBNx2gAsLFnfX3DnrIESuFcJRwcsCZ9WhrJQMa1HDwnL/Z
-        LiAGpAKRj8xNXHR1gdhjgUE7xJzVcS30+RIfvxU44ADRT2mjluJDleUEioHQpdqggTPiZ9
-        H5QG88aPU81HyRr2ExLRq8KnvIrSSio=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8e760f35 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sat, 19 Nov 2022 13:43:10 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andrej Shadura <andrew.shadura@collabora.co.uk>,
-        Jiri Kosina <jkosina@suse.cz>
-Subject: [PATCH] hwrng: u2fzero - account for high quality RNG
-Date:   Sat, 19 Nov 2022 14:42:59 +0100
-Message-Id: <20221119134259.2969204-1-Jason@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E03D060BBA;
+        Sat, 19 Nov 2022 20:39:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00685C433C1;
+        Sat, 19 Nov 2022 20:39:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668890368;
+        bh=+YFG65zK+ig5GsbiwocxVDqflXqp3NTQLYHgrK//RV8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=uI4+VOv5qj+YubiO/jBt2kpkGPiwzDuZXWyX1lVzq5T2ysdrmunWaK02PLLSWIgRG
+         M47WLr0UdxMFYuXmyDwngVF+Phrm/0ZdX3dg41OetTY7MItuKSsQtPmm6Cz9IWE8oT
+         MoiUrwYCfmAID9ZDP0Th8pSfbDLelCTy3o3Da8H8xut8FadG0eSgNIx4W7EjnkOZNv
+         Gnev27yrn4U/QBmY5ZkFHBHVT5xHFjL0fJD0sFY9662vC4VJT6x6dr0rIc1l1filVK
+         1oTat6Hu/bG4ifVPxw+MUsZrQZGiKxXLXty1xoC8cKql0V22PnrqKaCyvdkM2H7asG
+         CAcUrFa/7TvQA==
+Date:   Sat, 19 Nov 2022 12:39:26 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>
+Subject: Re: [PATCH v5 1/3] random: add vgetrandom_alloc() syscall
+Message-ID: <Y3k+/hSL5rIIkBhK@sol.localdomain>
+References: <20221119120929.2963813-1-Jason@zx2c4.com>
+ <20221119120929.2963813-2-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221119120929.2963813-2-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The U2F zero apparently has a real TRNG in it with maximum quality, not
-one with quality of "1", which was likely a misinterpretation of the
-field as a boolean. So remove the assignment entirely, so that we get
-the default quality setting.
+On Sat, Nov 19, 2022 at 01:09:27PM +0100, Jason A. Donenfeld wrote:
+> +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned long __user *, num,
+> +		unsigned long __user *, size_per_each, unsigned int, flags)
+> +{
+> +	unsigned long alloc_size;
+> +	unsigned long num_states;
+> +	unsigned long pages_addr;
+> +	int ret;
+> +
+> +	if (flags)
+> +		return -EINVAL;
+> +
+> +	if (get_user(num_states, num))
+> +		return -EFAULT;
+> +
+> +	alloc_size = size_mul(num_states, sizeof(struct vgetrandom_state));
+> +	if (alloc_size == SIZE_MAX)
+> +		return -EOVERFLOW;
+> +	alloc_size = roundup(alloc_size, PAGE_SIZE);
 
-In the u2f-zero firmware, the 0x21 RNG command used by this driver is
-handled as such [1]:
+Small detail: the roundup to PAGE_SIZE can make alloc_size overflow to 0.
 
-  case U2F_CUSTOM_GET_RNG:
-    if (atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,ATECC_RNG_P2,
-      NULL, 0,
-      appdata.tmp,
-      sizeof(appdata.tmp), &res) == 0 )
-    {
-      memmove(msg->pkt.init.payload, res.buf, 32);
-      U2FHID_SET_LEN(msg, 32);
-      usb_write((uint8_t*)msg, 64);
-    }
-    else
-    {
-      U2FHID_SET_LEN(msg, 0);
-      usb_write((uint8_t*)msg, 64);
-    }
+Also, 'roundup(alloc_size, PAGE_SIZE)' could be 'PAGE_ALIGN(alloc_size)'.
 
-This same call to `atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,
-ATECC_RNG_P2,...)` is then also used in the token's cryptographically
-critical "u2f_new_keypair" function, as its rather straightforward
-source of random bytes [2]:
+> +	pages_addr = vm_mmap(NULL, 0, alloc_size, PROT_READ | PROT_WRITE,
+> +			     MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED, 0);
+> +	if (IS_ERR_VALUE(pages_addr))
+> +		return pages_addr;
 
-  int8_t u2f_new_keypair(uint8_t * handle, uint8_t * appid, uint8_t * pubkey)
-  {
-    struct atecc_response res;
-    uint8_t private_key[36];
-    int i;
+This will only succeed if the userspace process has permission to mlock pages,
+i.e. if there is space available in RLIMIT_MEMLOCK or if process has
+CAP_IPC_LOCK.  I suppose this is working as intended, as this syscall can be
+used to try to allocate and mlock arbitrary amounts of memory.
 
-    watchdog();
+I wonder if this permission check will cause problems.  Maybe there could be a
+way to relax it for just one page per task?  I don't know how that would work,
+though, especially when the planned usage involves userspace allocating a single
+pool of these contexts per process that get handed out to threads.
 
-    if (atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,ATECC_RNG_P2,
-      NULL, 0,
-      appdata.tmp,
-      sizeof(appdata.tmp), &res) != 0 )
-    {
-      return -1;
-    }
-
-So it seems rather plain that the ATECC RNG is considered to provide
-good random numbers.
-
-[1] https://github.com/conorpp/u2f-zero/blob/master/firmware/src/custom.c
-[2] https://github.com/conorpp/u2f-zero/blob/master/firmware/src/u2f_atecc.c
-
-Cc: Andrej Shadura <andrew.shadura@collabora.co.uk>
-Cc: Jiri Kosina <jkosina@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/hid/hid-u2fzero.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/hid/hid-u2fzero.c b/drivers/hid/hid-u2fzero.c
-index ad489caf53ad..744a91e6e78c 100644
---- a/drivers/hid/hid-u2fzero.c
-+++ b/drivers/hid/hid-u2fzero.c
-@@ -261,7 +261,6 @@ static int u2fzero_init_hwrng(struct u2fzero_device *dev,
- 
- 	dev->hwrng.name = dev->rng_name;
- 	dev->hwrng.read = u2fzero_rng_read;
--	dev->hwrng.quality = 1;
- 
- 	return devm_hwrng_register(&dev->hdev->dev, &dev->hwrng);
- }
--- 
-2.38.1
-
+- Eric
