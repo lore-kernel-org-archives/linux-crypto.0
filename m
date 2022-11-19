@@ -2,69 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92698C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 05:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAA8C4321E
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 06:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231831AbiKSFU1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 00:20:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46494 "EHLO
+        id S232173AbiKSGuX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 01:50:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiKSFUZ (ORCPT
+        with ESMTP id S229606AbiKSGuU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 00:20:25 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C11C8DA78;
-        Fri, 18 Nov 2022 21:20:25 -0800 (PST)
-Received: from canpemm500009.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NDhjM6ZM4zFqPy;
-        Sat, 19 Nov 2022 13:17:11 +0800 (CST)
-Received: from [10.67.109.51] (10.67.109.51) by canpemm500009.china.huawei.com
- (7.192.105.203) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Sat, 19 Nov
- 2022 13:20:23 +0800
-Message-ID: <225f716c-83af-2534-0c58-20b6d28acdc1@huawei.com>
-Date:   Sat, 19 Nov 2022 13:20:23 +0800
+        Sat, 19 Nov 2022 01:50:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6A91704F;
+        Fri, 18 Nov 2022 22:50:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E0B52B80D1E;
+        Sat, 19 Nov 2022 06:50:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5944BC433D6;
+        Sat, 19 Nov 2022 06:50:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668840616;
+        bh=ak6M5fgrTHQ1MM2vf+n5AubLq+AMYqmK/RRzz3/3gig=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=seXipkg9CAyFA9/DRpiD01V8ITXAB4g0Feuk+M72plAUXo40561rs1dMVurztjC0R
+         UGqXlOdf3JC5VrI2IWVezRWqsbHRKhLTyD3mEBicEAh2WBWvOY+SAmQ5aoJgjdz1Vk
+         5aq4YUvgNncdPRSw5IsP6xY0s8PudX8SdTsR/EyWyOmZxNi+pkZtOu70losD9BrvnB
+         Du21LerJzoVvVs4d9eSLNMvDcUU7T0jOw29zyRduMgSnRBWCRcfu03u6uXJN2UHbLy
+         DMpzJwBt86Z35Odc5hTd6y/3r7eqH4zheZmOWuKtOuYVHcjUBHn5l00sWabdAIfdsG
+         FRNiHf2EtKUDg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37F78E29F44;
+        Sat, 19 Nov 2022 06:50:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH] KEYS: asymmetric: Fix build errors as symbol undefined
-To:     <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <David.Woodhouse@intel.com>
-CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <weiyongjun1@huawei.com>,
-        <yusongping@huawei.com>
-References: <20221115100512.20147-1-hucool.lihua@huawei.com>
-From:   "Lihua (lihua, ran)" <hucool.lihua@huawei.com>
-In-Reply-To: <20221115100512.20147-1-hucool.lihua@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.109.51]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500009.china.huawei.com (7.192.105.203)
-X-CFilter-Loop: Reflected
+Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
+From:   patchwork-bot+chrome-platform@kernel.org
+Message-Id: <166884061622.19423.870710096225259467.git-patchwork-notify@kernel.org>
+Date:   Sat, 19 Nov 2022 06:50:16 +0000
+References: <20221118224540.619276-1-uwe@kleine-koenig.org>
+In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
+To:     =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cuwe=40kleine-koenig=2Eorg=3E?=@ci.codeaurora.org
+Cc:     ang.iglesiasg@gmail.com, lee.jones@linaro.org,
+        grant.likely@linaro.org, wsa@kernel.org, linux-i2c@vger.kernel.org,
+        kernel@pengutronix.de, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-rpi-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-media@vger.kernel.org, patches@opensource.cirrus.com,
+        linux-actions@lists.infradead.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-omap@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-pm@vger.kernel.org, kernel@puri.sm,
+        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ping
+Hello:
 
-在 2022/11/15 18:05, Li Hua 写道:
-> pkcs7_supply_detached_data is called by x509_key_parser module, but not exported:
->      ERROR: modpost: "pkcs7_supply_detached_data" [crypto/asymmetric_keys/x509_key_parser.ko] undefined!
+This patch was applied to chrome-platform/linux.git (for-kernelci)
+by Tzung-Bi Shih <tzungbi@kernel.org>:
+
+On Fri, 18 Nov 2022 23:35:34 +0100 you wrote:
+> Hello,
 > 
-> Fixes: cfc411e7fff3 ("Move certificate handling to its own directory")
-> Signed-off-by: Li Hua <hucool.lihua@huawei.com>
-> ---
->   crypto/asymmetric_keys/pkcs7_verify.c | 1 +
->   1 file changed, 1 insertion(+)
+> since commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
+> call-back type") from 2016 there is a "temporary" alternative probe
+> callback for i2c drivers.
 > 
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-> index f6321c785714..4fa769c4bcdb 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -485,3 +485,4 @@ int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
->   	pkcs7->data_len = datalen;
->   	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(pkcs7_supply_detached_data);
+> This series completes all drivers to this new callback (unless I missed
+> something). It's based on current next/master.
+> A part of the patches depend on commit 662233731d66 ("i2c: core:
+> Introduce i2c_client_get_device_id helper function"), there is a branch that
+> you can pull into your tree to get it:
 > 
+> [...]
+
+Here is the summary with links:
+  - [512/606] platform/chrome: cros_ec: Convert to i2c's .probe_new()
+    https://git.kernel.org/chrome-platform/c/f9e510dc92df
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
