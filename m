@@ -2,53 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BDFC433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 22:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CB0C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 22:12:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232895AbiKSWMm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 17:12:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44808 "EHLO
+        id S233576AbiKSWMo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 17:12:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232799AbiKSWMl (ORCPT
+        with ESMTP id S230471AbiKSWMn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 17:12:41 -0500
+        Sat, 19 Nov 2022 17:12:43 -0500
 Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04E815806
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 14:12:39 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id j16so13568836lfe.12
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 14:12:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426A115805
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 14:12:42 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id j16so13568948lfe.12
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Nov 2022 14:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D5VOb5boGkdAYN6wKDObbKOcC5cfqGCj4Tcvp7hhPw0=;
-        b=F5DfA8zjOi7beeJdVQtVgCup1BtOIitT3erlErg9wAmPCv42ZXpSQnLI84+iykBhXw
-         0MQFsyMUhsDEv+vO8W+4DxirGQcVpNaUzgk6qsb7rS8f+xBUoUdMptcQRzSxVEBYtY9v
-         chwetUJsG8oIFJ8aypQpc3Vt7cvSiy5/efvCAQzhsVTeT1iW8CeiU05lIyTHnCNqHcmr
-         Mwak19tK12UGG0bd30rKm2qhWmu13CVFFOLibvZ0j8MChzbcbU9FLKgZkQAkZtxY1qIi
-         NAakEpbDLAwXSRXeo44aD5v6IPQzOr6qScdTEbjrI40shdUglBhRYRb0FQeiGJXkKoyB
-         86vg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jZkwUGyeGgLpD7/abMkmVR6RIxjNUyy5XUkE4m7mSEI=;
+        b=TQG76VVzCrE6jw2YN1c8BaP66oklivB3/nG6CKm4jPuxtNLKSc7+NVm6kvve9rhyCa
+         wey7z33kLAsDP0UpYXzwbPXrmtEhM8cmaGGTTL/1ekcuWU+LcZX3i2RTsBbXg17r4fZd
+         oFHvQE9nOsWywrJejrCNTsxLOkl6YdkjRTATH2HwJOSEYajPhmAL16rgC/FPqfTYXfRE
+         OCfHrhp9H6wjxe5aqiQlgh/1PB7j/6TmQ0q8uP4AStAukwrbFUFzN1NFSMqUlGsb+ttT
+         mcr1YGtAuO0F70hMi1vJcFliKgJr8eC+SmxRvxsP6NRpAMgrX8txjB7HB86l81Lo78Nu
+         IIlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D5VOb5boGkdAYN6wKDObbKOcC5cfqGCj4Tcvp7hhPw0=;
-        b=1RlxOcBSuQlPWBjSfSKa5EBhy4uzDTIhD/O6rzcHE4u5/eA37FO0jOYpuyDgY3A2Eo
-         yRFaNtKa6kgeuAZw1d0gpoV5TRMMIIqAI72K+IUXIuotWzmBRSV7khsYj8zEDNBz4Wz8
-         6gledisychi2/lcf/cnL11MUwu54bxVV3E6SEbiLpoAV55LW9/6E8awmdRJ6+fAHEXmP
-         VQhg1cIZ4KYQxzBOT6Gvwaux7NN2HpIbiTt+EmnZvfhKuJV22ngNN7mhmyunj7nPsRyS
-         0BnBvBAzzXsHwh7/qmMOY0nffm8fSKgbVTlK1sGK7U7JOQhhjtIMiqJ+jfkLEA5iJUSq
-         /WiA==
-X-Gm-Message-State: ANoB5pn80MZxHS9OXRxzMdasTJYK0pYbGjf0/b6xxYN3X0lLgBkDJwYl
-        iJ4CjsKcCxAr1mAsBvTqZ4pCzPDFUdo9Ng==
-X-Google-Smtp-Source: AA0mqf7MgVPBg/OSTJADJi77bKgVTVEQO6743G5WYfPmcPFNiVsL3ispQYTXT6QXRgKlin6dTwjzcQ==
-X-Received: by 2002:a05:6512:b9a:b0:4ae:611c:6549 with SMTP id b26-20020a0565120b9a00b004ae611c6549mr4843424lfv.231.1668895957890;
-        Sat, 19 Nov 2022 14:12:37 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jZkwUGyeGgLpD7/abMkmVR6RIxjNUyy5XUkE4m7mSEI=;
+        b=tH4Q/GAMo0UbU7DuSVVgFuBuu8u9X7xzsi0JQl8BrTVTX5zQGSJpr9KDffxVDYgzqb
+         6bbLBidlWiKHyGjASpsok9jpEVjluF+wZBUWrcPgrh7Fc4KdMpJ1edtV5UrbfGjSADYz
+         GMHhIlCEhNHO2fq1K8n58X1+LsCv5X00w6KvRqhBbJWWBqWCKvbF3i5/YwEBRTGNZWjN
+         LNoZ6y1u3XWDgfPX4rQjKvakiRNlUXWnkBVFla7jMuu68DK/wLM7e20raUtz7BGUXKAp
+         hyFVMhcwoQVqWfu1YBUkLIRbO2Qq+VpEBrvh+6HmNgiQV/WmrHdG9IgtgYsSOMuw6nIK
+         Wvnw==
+X-Gm-Message-State: ANoB5pnIFsKwrPdRqnP5TVdJhPnyD3yEyiiIKB8WqOC5ad4geprSZsOy
+        OzCFsqiya9TfCqZMOf/BDuu6axWKqoWKug==
+X-Google-Smtp-Source: AA0mqf7UUr17t+1zuZd9i2FLTtICOAQdWTqbSE9qMiIErIqFrFCMkU0cgT7OAWvb88tu8sYtVn6nXQ==
+X-Received: by 2002:ac2:47fc:0:b0:4a2:2f31:12bf with SMTP id b28-20020ac247fc000000b004a22f3112bfmr4400296lfp.550.1668895961509;
+        Sat, 19 Nov 2022 14:12:41 -0800 (PST)
 Received: from Fecusia.lan (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
-        by smtp.gmail.com with ESMTPSA id u3-20020a05651220c300b00496d3e6b131sm1234254lfr.234.2022.11.19.14.12.36
+        by smtp.gmail.com with ESMTPSA id u3-20020a05651220c300b00496d3e6b131sm1234254lfr.234.2022.11.19.14.12.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Nov 2022 14:12:36 -0800 (PST)
+        Sat, 19 Nov 2022 14:12:40 -0800 (PST)
 From:   Linus Walleij <linus.walleij@linaro.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -57,75 +58,111 @@ Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
         Lionel Debieve <lionel.debieve@foss.st.com>,
         Maxime Coquelin <mcoquelin.stm32@gmail.com>,
         Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH v1 0/4] crypto: stm32 - reuse for Ux500
-Date:   Sat, 19 Nov 2022 23:12:15 +0100
-Message-Id: <20221119221219.1232541-1-linus.walleij@linaro.org>
+        Linus Walleij <linus.walleij@linaro.org>,
+        devicetree@vger.kernel.org
+Subject: [PATCH v1 1/4] dt-bindings: crypto: Let STM32 define Ux500 CRYP
+Date:   Sat, 19 Nov 2022 23:12:16 +0100
+Message-Id: <20221119221219.1232541-2-linus.walleij@linaro.org>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221119221219.1232541-1-linus.walleij@linaro.org>
+References: <20221119221219.1232541-1-linus.walleij@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Experimenting by taking some small portions of the Ux500
-CRYP driver and adding to the STM32 driver, it turns out
-we can support both platforms with the more modern STM32
-driver.
+This adds device tree bindings for the Ux500 CRYP block
+as a compatible in the STM32 CRYP bindings.
 
-Upsides:
+The Ux500 CRYP binding has been used for ages in the kernel
+device tree for Ux500 but was never documented, so fill in
+the gap by making it a sibling of the STM32 CRYP block,
+which is what it is.
 
-- We delete ~2400 lines of code and 8 files with intact
-  crypto support for Ux500 and not properly maintained
-  and supported.
+The relationship to the existing STM32 CRYP block is pretty
+obvious when looking at the register map, and I have written
+patches to reuse the STM32 CRYP driver on the Ux500.
 
-- The STM32 driver is more modern and compact thanks to
-  using things like the crypto engine.
+The two properties added are DMA channels and power domain.
+Power domains are a generic SoC feature and the STM32 variant
+also has DMA channels.
 
-Caveats:
+Cc: devicetree@vger.kernel.org
+Cc: Lionel Debieve <lionel.debieve@foss.st.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+This was previously sent out as an open question but
+nothing happened, now I send it as part of the STM32
+bindings, in a series making the Linux STM32 driver
+use the STM32 driver.
+---
+ .../bindings/crypto/st,stm32-cryp.yaml        | 32 +++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-- The STM32 driver does not support DMA. On the U8500
-  this only works with AES (DES support is broken with
-  DMA). If this is desired to be kept I can migrate
-  it to the STM32 driver as well.
-
-I have looked at doing the same for the Ux500 hash, which
-is related but I am reluctant about this one, because
-the Ux500 hardware has no interrupt and only supports
-polling. I have a series of modernizations for that
-driver that I have worked on and will think about how
-to move forward.
-
-Linus Walleij (4):
-  dt-bindings: crypto: Let STM32 define Ux500 CRYP
-  crypto: stm32 - enable drivers to be used on Ux500
-  crypto: stm32/cryp - enable for use with Ux500
-  crypto: ux500/cryp - delete driver
-
- .../bindings/crypto/st,stm32-cryp.yaml        |   32 +
- drivers/crypto/Makefile                       |    2 +-
- drivers/crypto/stm32/Kconfig                  |    4 +-
- drivers/crypto/stm32/stm32-cryp.c             |  334 +++-
- drivers/crypto/ux500/Kconfig                  |   10 -
- drivers/crypto/ux500/Makefile                 |    1 -
- drivers/crypto/ux500/cryp/Makefile            |   10 -
- drivers/crypto/ux500/cryp/cryp.c              |  394 ----
- drivers/crypto/ux500/cryp/cryp.h              |  315 ----
- drivers/crypto/ux500/cryp/cryp_core.c         | 1600 -----------------
- drivers/crypto/ux500/cryp/cryp_irq.c          |   45 -
- drivers/crypto/ux500/cryp/cryp_irq.h          |   31 -
- drivers/crypto/ux500/cryp/cryp_irqp.h         |  125 --
- drivers/crypto/ux500/cryp/cryp_p.h            |  122 --
- 14 files changed, 315 insertions(+), 2710 deletions(-)
- delete mode 100644 drivers/crypto/ux500/cryp/Makefile
- delete mode 100644 drivers/crypto/ux500/cryp/cryp.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
-
+diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+index ed23bf94a8e0..69614ab51f81 100644
+--- a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
++++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+@@ -6,12 +6,18 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: STMicroelectronics STM32 CRYP bindings
+ 
++description: The STM32 CRYP block is built on the CRYP block found in
++  the STn8820 SoC introduced in 2007, and subsequently used in the U8500
++  SoC in 2010.
++
+ maintainers:
+   - Lionel Debieve <lionel.debieve@foss.st.com>
+ 
+ properties:
+   compatible:
+     enum:
++      - st,stn8820-cryp
++      - stericsson,ux500-cryp
+       - st,stm32f756-cryp
+       - st,stm32mp1-cryp
+ 
+@@ -27,6 +33,19 @@ properties:
+   resets:
+     maxItems: 1
+ 
++  dmas:
++    items:
++      - description: mem2cryp DMA channel
++      - description: cryp2mem DMA channel
++
++  dma-names:
++    items:
++      - const: mem2cryp
++      - const: cryp2mem
++
++  power-domains:
++    maxItems: 1
++
+ required:
+   - compatible
+   - reg
+@@ -48,4 +67,17 @@ examples:
+       resets = <&rcc CRYP1_R>;
+     };
+ 
++  - |
++    #include <dt-bindings/interrupt-controller/irq.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/reset/stericsson,db8500-prcc-reset.h>
++    #include <dt-bindings/arm/ux500_pm_domains.h>
++    cryp@a03cb000 {
++      compatible = "stericsson,ux500-cryp";
++      reg = <0xa03cb000 0x1000>;
++      interrupts = <GIC_SPI 15 IRQ_TYPE_LEVEL_HIGH>;
++      clocks = <&prcc_pclk 6 2>;
++      power-domains = <&pm_domains DOMAIN_VAPE>;
++    };
++
+ ...
 -- 
 2.38.1
 
