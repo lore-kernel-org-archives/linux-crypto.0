@@ -2,169 +2,192 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1877C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 07:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B46EC433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 07:54:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232177AbiKSHv0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 02:51:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49702 "EHLO
+        id S231963AbiKSHyc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 02:54:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiKSHvZ (ORCPT
+        with ESMTP id S229500AbiKSHyb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 02:51:25 -0500
-Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-eopbgr120075.outbound.protection.outlook.com [40.107.12.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6069980992;
-        Fri, 18 Nov 2022 23:51:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hvsAgv/LE5QmWAaNF8evvUxu1RhjvIGz4hojyhLRzf32SHl+7DrssPiiocOsxJDrL/yLSYB5mSFxbvbeqXFPNrvn767GpyRAnvz/a6eGiBQn4lrn2VDq2PRDBdSGuLuGC44hQRu893xJacJDACXK23mm4z3O/DrHTeqBYhESeoDalOLOa90o7oZTKEHnTjMciRWm3MMNL927yKlFdeJWG+WWTXK2KB/4tRBOSMNBxlzYV8Fo+KjBFKrvC8K+0SMKVn2nvBYh+qSQjhpGSZ2ypxXTqyRLBnYI9RXs2jjBFpubwrrktAhH54E5HKAYKFtYzBzILp3fZfvRuBdL2D+f4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eMP35sRiesSvJVKLekcYnfhebN1vD1uCh7kNyk/UtxI=;
- b=ZLJ5HM/m6f1PqCMSaMAhkVtj7EyNveJrljtW7I15DYW7WlQxlN09D7J9pne8ufiYXarhj7oITBclVvJDB0V6b/SU75O9Tl+8VHJm2w4rph1Jy2wNBFpgbiKjHrHWtyjwfCB38xvab9crIwfLMdpeBf+85PLdLCjLOBaxEYrE2j7Qponpfe5j2/7Aa7BdcQnqZR3kLvRIDtV/axyix0jkiHQZVs9Xve4tCkkrrF6ZrelHvXQutxnHUvbj6yeiQyva5v0XuJJVxXe3MV20iwrzs8bqhVD6RM9bw/9sUXRKzwEqrLFXvU+bFkCHZmpmFqKnRPykNRP+4lehL728DIcYJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
- dkim=pass header.d=csgroup.eu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eMP35sRiesSvJVKLekcYnfhebN1vD1uCh7kNyk/UtxI=;
- b=r2Sv8OlippliaJELKLVAb8MOzN3OkiwOVJaNN/s1GnGAJL+8RQsUY3rul17eTuY49QViMPP1ThWCBjdQJHTThCaXY735o3yyyyaH3Csnz9eLZfTSaVXocIHhUhn7IddCFNkx/c2oJt30IYLc89OlmKSgCu9wPKZ3SuejgVOWmp/c4s1338YdeupVkvPgYZBEua1V36MdAAeaDuVjd4+KzAMjABoVNJ/eS/bUo5m70udVredjhy2hXZdteuv9qI5KQQdBUSU92rFS7ruHCvwXBm+n/KVcR1orgGFc1mwYQrYS0KO/9h9dY6+toJPNbF9ZEuVEy/5b99HmlL3aEwUmew==
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
- by MRZP264MB1877.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.9; Sat, 19 Nov
- 2022 07:51:21 +0000
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::a85b:a9b6:cb36:fa6]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::a85b:a9b6:cb36:fa6%9]) with mapi id 15.20.5834.009; Sat, 19 Nov 2022
- 07:51:21 +0000
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "patches@lists.linux.dev" <patches@lists.linux.dev>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [PATCH v4 2/3] random: introduce generic vDSO getrandom()
- implementation
-Thread-Topic: [PATCH v4 2/3] random: introduce generic vDSO getrandom()
- implementation
-Thread-Index: AQHY+3O4zDHynjEiUE6xFq7Mo++rLa5FEqEAgABI0ACAAAKrgIAAgmsA
-Date:   Sat, 19 Nov 2022 07:51:21 +0000
-Message-ID: <2571f72a-3420-977f-7b08-8f6216bba6a8@csgroup.eu>
-References: <20221118172839.2653829-1-Jason@zx2c4.com>
- <20221118172839.2653829-3-Jason@zx2c4.com>
- <ecfd265b-49e7-79b2-1818-e08a2c652db0@csgroup.eu>
- <Y3gbVorxZyb4SBJa@zx2c4.com> <Y3gdkxq4FjXcmAwA@zx2c4.com>
-In-Reply-To: <Y3gdkxq4FjXcmAwA@zx2c4.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=csgroup.eu;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MRZP264MB2988:EE_|MRZP264MB1877:EE_
-x-ms-office365-filtering-correlation-id: df81e593-984b-45d7-8cd8-08daca02d9b0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8zPsBRPNcu/O3sLgRCqW4Vo6ZnoF64GLrXd7OEfYbQt7uRlo+itNsfLPoh1R2yEuVy4tFOAcw7Gy8Xr2zR88gX/FACKwrWkRCqRFhVfJlfnrSaoFaExt8Hp25yAxnxpNTE6y4Q6DxLjdKhaLUjcPVfPUWa8Ch8uHjB3Y5iTpGJKj9yyrktHZShIUC7UaMueBVxYOUzM+ChjCvJG5w5yK+yCSSsmp4nJ5RbfLGXUqO8vdzhlCw6T55HSGDLL2YReduuVLKKCe5S02IgzMfDRyUVqzyCiNdG6pIyTJeSJEB76nlowfiQh4f7KU6krCF/axJIpoASPFgLo5K0JoU6wsGa2dtrbcizqbCsMfDzAKUOHjv2qXIJmn3CBdG63kFG+VDXfDgbBuin9fcr8UgA6p1xWYNh9rSmPw+S4p99u6iDJA1U04FuXtuWpH7jnE/SNU9sSdCIwizSr+KO5VjMdhH4kH0Y1heUa6RqzMK0QsaPl7da2jPfe3RcCPYL2wp2nqtBJEWTNt5tqm7cokv2c75wEyF1VOemG1MtBt8+MKs6Ed4GgXeHnuizBxUE+9LlqEPzheXalErLhNGk2w/xUTcawgOIA4uvmR+yla8dEqHzpwvExts7E4IFlgma+zbQmfh3CQDXD8g8k769zWM1fncvXchFU8mN2QT8Zmky7xPiOANrK81Ygvj1gW96Jn4QDUiXJonoNMgm4iHaeqbtA5cQZPiwEybiiAbYPGCF5aX5KDqEdScXjz1g+3ItcjSu1s+AXLOe2hJVTy5vtrzJZcZ00MbyfSLVGowCIJA4ucTtA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(39850400004)(396003)(136003)(451199015)(6506007)(316002)(6486002)(4326008)(54906003)(6916009)(66946007)(6512007)(91956017)(64756008)(66476007)(66556008)(26005)(76116006)(8676002)(66446008)(478600001)(71200400001)(31686004)(5660300002)(44832011)(8936002)(186003)(31696002)(41300700001)(36756003)(2616005)(2906002)(38100700002)(86362001)(38070700005)(122000001)(41533002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?N2EzNnNMYWE4OWhkeVZ2UWdOT0Y3VVhCNlFmRUZUc3VEZS9tVVNyRlZDd2Zk?=
- =?utf-8?B?cnRMWjk5MERKZEk3dENFZEpNdWRaSTVWTmcyYUpqNFNpM0FReUVqOG5qampz?=
- =?utf-8?B?a3VRM2xoMndCR056S1VqQTlhTlJIV0dOemkzT1RrcVl0Nzk4Y0hNVk1TZ1RI?=
- =?utf-8?B?ejJtYVN3enF2allLOHRiZjZqa3NjYjRuUGRNY2pQQ2tUMU1GS0FnUmM4ckx5?=
- =?utf-8?B?SDJJRTU2bkZ4bk03Ny9abGlZL0s3Um5PdUpqTWJDNG81b0FBT1JXVWNYei9U?=
- =?utf-8?B?bktqZGk3MnJqYXhyVzlQYWUydDg5ZW8wNTZLVlJSREMxcFBBQll3UWVCcjdN?=
- =?utf-8?B?WHNyT0NJaTJTbXlQWDdEU1lia1dPTjRLd0IwaE5NTlpQaFFYbmI2MVdnYW43?=
- =?utf-8?B?TGxHLy9oK3Bla3llZUo0dFVLcDhZSis5a0dHVkJ5VHdLVlJaVmJTK05QU2Ew?=
- =?utf-8?B?N0xqZ29GdUNicjc1Yy9OeGo2M2loNnZGUFQvKzdhSXNWZEx5b25jM1hZeXdV?=
- =?utf-8?B?WXJkell4MGZpWHNxRDR3d1h5K2IzNDBTY2VxSnFoQ25VTUloR2hCZHUyRkEr?=
- =?utf-8?B?ckdNdXErREtFY3hQdWRsbWFrRDI0bmdJelcrUGtBOFdJM3kzQ1d2QmdlUnhi?=
- =?utf-8?B?QktCMnk2aHVqMGg1dy83eXRUVmJqRmdzVVgyT1I5RUVpU2V5R2hIeExFRGJt?=
- =?utf-8?B?amljaGxoTmFQd0s3eldqK1o1MkRtbnpLUlBZUkJiNUtjR0E2d2ZyNXhoMTlR?=
- =?utf-8?B?TzFFbWk0L1MwWHpJRzFKbDRmRXQ0NlVNK2tlcFdjY3NOeDBYTmpWclppN29l?=
- =?utf-8?B?YW9kTUcyWnlLTVFQT204VWFLenVJNzhVaWt5MEx5U0VYc1pQQ2tHN0N2SDFU?=
- =?utf-8?B?cisyUDRQMVhHN1ZJNko4ZmVXQXRkYkZ0bWEwWE5HSnArR0F0bzZpKzRoQXJo?=
- =?utf-8?B?cEtoWmI3UERYSDVVdFJ2ZXI3UnVESXRDbnZjTCtNRTVqb1gvOS85cGtMY3Rl?=
- =?utf-8?B?TGRvTmZwdnJGQWIyRlNzbXRndjZuTnFKdTE1N2cwNkhreThyWVZ4ZzFvVWZX?=
- =?utf-8?B?Q2NFTDU1M0paTGcweFZibFUySkVVS3Q5MUk5RHhpQTdBTUFBL25MTXM2R2JW?=
- =?utf-8?B?cDRYYnpNQ3FrY3krWTZndk1Ucm5wQ0QyK0FxdDVZNHZKdnZLa0xPS2FvZlZL?=
- =?utf-8?B?NHpEWi8wdjVEblhQNVJhQ2lyM0Rrbzlxc3lMcDJxaFc0RzJkbXF0VzBSMEhJ?=
- =?utf-8?B?aUhUaTR5d3QvUmw1Q2hvY3hKV20xY0hPSktzblg2VGlUUzY4Rnpjc01wWXJl?=
- =?utf-8?B?MjB0NC9rRHlTYTRRV3IybE1xTERIbEt3bVhvSDJiZTF5RUNpYndyWjJOZUor?=
- =?utf-8?B?RnFianhpZWVzNVBWRGI5anU4aXlKaGJxZUwyOTNwSFpMbW53SEx6Z0N4SDRz?=
- =?utf-8?B?ZTBGakNEaldBalhtNjVqVUFTQVRhNnFwVUtFZWljcW9lMHZjUjBpdmFDVmpO?=
- =?utf-8?B?UFJ6QUNnbVFJR2VlNGlyWXlBK0tYdm56aUZGSjBhSGNMQnM2OGF0YUNMTHR5?=
- =?utf-8?B?elpCLzZPYVEyUFBpWDJzN0wwTWNKckZHS0ovajNHMGR5K0pWQ2hKczNyQnZa?=
- =?utf-8?B?VUxwdWliVjkwUTFGZkQxNmpOcXZRUWI4THNnUHc1SytQUmJ5MHI2RHV2U0lE?=
- =?utf-8?B?WWIraDRQVWJtdkpicEdmc3ZVbnRqaG5seERxYTJzTndGZ21Udk16bk5XUnNZ?=
- =?utf-8?B?WmZDczltV3hqRW1pYkx1QnppZ3lQV0pFV01oZjJtczFVNVBHS0ZzejFzdXlX?=
- =?utf-8?B?N2tqZHh5NDVsbDFPUXFVQ2JSK21Db0UvVWpiYitDVFk0cTlXTlhpZm9VRk5a?=
- =?utf-8?B?WEgrdzNtbk91amNPcUtVZ3dET05mcEJPckxCR3VBOHk1Tnp3OWVJVXFWcFNv?=
- =?utf-8?B?bW9zbWc3a0gzcTh5UmdOM2k5cys0UlRHeFpGajlWM2V0UzNBbnFvS20wOURp?=
- =?utf-8?B?RjRsQTlEby9McWNadjd0Nm5DV0szaEJXT1JDSnErdHJiaWVmSjVmakpCMm5T?=
- =?utf-8?B?aE1MUjYxVXRHelh5dkhhRTE5UFJtYksySjBGQzFrTE1oa0FCbklCczFaSWZu?=
- =?utf-8?B?Zk9lT3p3bTd6OWkxeUpxSTlROUVXSlFBTFdidTVoZm12MXZzWVpBcStpeTBJ?=
- =?utf-8?B?REE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D9AE67101A4B6747A33AA08FD32330CF@FRAP264.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+        Sat, 19 Nov 2022 02:54:31 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFB6167E6;
+        Fri, 18 Nov 2022 23:54:29 -0800 (PST)
+Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NDmBN0jxxzRpBC;
+        Sat, 19 Nov 2022 15:54:04 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Sat, 19 Nov 2022 15:54:27 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Sat, 19 Nov
+ 2022 15:54:27 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
+        <yekai13@huawei.com>
+Subject: [PATCH v10 1/3] uacce: supports device isolation feature
+Date:   Sat, 19 Nov 2022 07:48:15 +0000
+Message-ID: <20221119074817.12063-2-yekai13@huawei.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20221119074817.12063-1-yekai13@huawei.com>
+References: <20221119074817.12063-1-yekai13@huawei.com>
 MIME-Version: 1.0
-X-OriginatorOrg: csgroup.eu
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: df81e593-984b-45d7-8cd8-08daca02d9b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2022 07:51:21.6849
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XRbzvInFvQwQA2Am4s8zcUjz67SE0v0NJeutrj16royMYrLhv67BqUop+0pt5J5tPkqEvZHbnpnboDKg3IYW+shYqVYRfzLzykNPIft5jwg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MRZP264MB1877
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCkxlIDE5LzExLzIwMjIgw6AgMDE6MDQsIEphc29uIEEuIERvbmVuZmVsZCBhIMOpY3JpdMKg
-Og0KPiBPbiBTYXQsIE5vdiAxOSwgMjAyMiBhdCAxMjo1NTowMkFNICswMTAwLCBKYXNvbiBBLiBE
-b25lbmZlbGQgd3JvdGU6DQo+PiBTb3JyeSBpZiBJJ20gYSBiaXQgc2xvdyBoZXJlIHRvIGdyb2sg
-d2hhdCdzIHVwLg0KDQpNYXliZSBJIHNob3VsZCBhbHNvIGhhdmUgbWVudGlvbm5lZCBjb21taXQg
-Y2U3ZDgwNTZlMzhiICgicG93ZXJwYy92ZHNvOiANClByZXBhcmUgZm9yIHN3aXRjaGluZyBWRFNP
-IHRvIGdlbmVyaWMgQyBpbXBsZW1lbnRhdGlvbi4iKSBmb3IgeW91IHRvIA0KaGF2ZSBhIGNvbXBs
-ZXRlIHBpY3R1cmUuDQoNCj4gDQo+IE9rYXksIEkgdGhpbmsgSSBzZWUgaXQgbm93LiBUaGF0J3Mg
-YSBjb21wbGljYXRlZCBwYXRjaCBmb3IgYSBzaW1wbGUgaWRlYQ0KPiBiZWNhdXNlIGdldHRpbWUg
-aXMgbW9yZSBjb21wbGljYXRlZCB0aGFuIGdldHJhbmRvbS4gSSBzdXNwZWN0IHdoYXQgeW91DQo+
-IHdhbnQgaXMgc29tZXRoaW5nIGxpa2UgdGhlIGJlbG93LCBjb3JyZWN0PyBTZWVtcyBlYXN5IGVu
-b3VnaC4NCg0KWWVzIGl0IGlzIGV4YWN0bHkgdGhhdCwgcG93ZXJwYyB3aWxsIHRoZW4gY2FsbCBf
-X2N2ZHNvX2dldHJhbmRvbV9kYXRhKCkgDQpkaXJlY3RseSBhbmQgcGFzcyBybmdfaW5mbyBwb2lu
-dGVyLg0KDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbGliL3Zkc28vZ2V0cmFuZG9tLmMgYi9saWIvdmRz
-by9nZXRyYW5kb20uYw0KPiBpbmRleCBiMjUzZTkyNDc3MDYuLmIzMjgyZDdjZmI1MyAxMDA2NDQN
-Cj4gLS0tIGEvbGliL3Zkc28vZ2V0cmFuZG9tLmMNCj4gKysrIGIvbGliL3Zkc28vZ2V0cmFuZG9t
-LmMNCj4gQEAgLTQxLDEwICs0MSwxMCBAQCBzdGF0aWMgdm9pZCBtZW1jcHlfYW5kX3plcm8odm9p
-ZCAqZHN0LCB2b2lkICpzcmMsIHNpemVfdCBsZW4pDQo+ICAgfQ0KPiANCj4gICBzdGF0aWMgX19h
-bHdheXNfaW5saW5lIHNzaXplX3QNCj4gLV9fY3Zkc29fZ2V0cmFuZG9tKHZvaWQgKmJ1ZmZlciwg
-c2l6ZV90IGxlbiwgdW5zaWduZWQgaW50IGZsYWdzLCB2b2lkICpvcGFxdWVfc3RhdGUpDQo+ICtf
-X2N2ZHNvX2dldHJhbmRvbV9kYXRhKGNvbnN0IHN0cnVjdCB2ZHNvX3JuZ19kYXRhICpybmdfaW5m
-bywgdm9pZCAqYnVmZmVyLCBzaXplX3QgbGVuLA0KPiArCQkgICAgICAgdW5zaWduZWQgaW50IGZs
-YWdzLCB2b2lkICpvcGFxdWVfc3RhdGUpDQo+ICAgew0KPiAgIAlzdHJ1Y3QgdmdldHJhbmRvbV9z
-dGF0ZSAqc3RhdGUgPSBvcGFxdWVfc3RhdGU7DQo+IC0JY29uc3Qgc3RydWN0IHZkc29fcm5nX2Rh
-dGEgKnJuZ19pbmZvID0gX19hcmNoX2dldF92ZHNvX3JuZ19kYXRhKCk7DQo+ICAgCXUzMiBjaGFj
-aGFfc3RhdGVbQ0hBQ0hBX1NUQVRFX1dPUkRTXTsNCj4gICAJc3NpemVfdCByZXQgPSBtaW5fdChz
-aXplX3QsIE1BWF9SV19DT1VOVCwgbGVuKTsNCj4gICAJdW5zaWduZWQgbG9uZyBjdXJyZW50X2dl
-bmVyYXRpb247DQo+IEBAIC0xMDcsMyArMTA3LDkgQEAgX19jdmRzb19nZXRyYW5kb20odm9pZCAq
-YnVmZmVyLCBzaXplX3QgbGVuLCB1bnNpZ25lZCBpbnQgZmxhZ3MsIHZvaWQgKm9wYXF1ZV9zdGEN
-Cj4gICAJbWVtemVyb19leHBsaWNpdChjaGFjaGFfc3RhdGUsIHNpemVvZihjaGFjaGFfc3RhdGUp
-KTsNCj4gICAJZ290byBtb3JlX2JhdGNoOw0KPiAgIH0NCj4gKw0KPiArc3RhdGljIF9fYWx3YXlz
-X2lubGluZSBzc2l6ZV90DQo+ICtfX2N2ZHNvX2dldHJhbmRvbSh2b2lkICpidWZmZXIsIHNpemVf
-dCBsZW4sIHVuc2lnbmVkIGludCBmbGFncywgdm9pZCAqb3BhcXVlX3N0YXRlKQ0KPiArew0KPiAr
-CXJldHVybiBfX2N2ZHNvX2dldHJhbmRvbV9kYXRhKF9fYXJjaF9nZXRfdmRzb19ybmdfZGF0YSgp
-LCBidWZmZXIsIGxlbiwgZmxhZ3MsIG9wYXF1ZV9zdGF0ZSk7DQo+ICt9DQo+IA0K
+UACCE adds the hardware error isolation feature. To improve service
+reliability, some uacce devices that frequently encounter hardware
+errors are isolated. Therefore, this feature is added.
+
+Users can configure the hardware error threshold by 'isolate_strategy'
+sysfs node. The user space can get the device isolated state by 'isolate'
+sysfs node. If the number of device errors exceeds the configured error
+threshold, the device will be isolated. It means the uacce device is
+unavailable.
+
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/misc/uacce/uacce.c | 50 ++++++++++++++++++++++++++++++++++++++
+ include/linux/uacce.h      | 12 +++++++++
+ 2 files changed, 62 insertions(+)
+
+diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+index b70a013139c7..946f7e4b364f 100644
+--- a/drivers/misc/uacce/uacce.c
++++ b/drivers/misc/uacce/uacce.c
+@@ -363,12 +363,52 @@ static ssize_t region_dus_size_show(struct device *dev,
+ 		       uacce->qf_pg_num[UACCE_QFRT_DUS] << PAGE_SHIFT);
+ }
+ 
++static ssize_t isolate_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct uacce_device *uacce = to_uacce_device(dev);
++
++	return sysfs_emit(buf, "%d\n", uacce->ops->get_isolate_state(uacce));
++}
++
++static ssize_t isolate_strategy_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct uacce_device *uacce = to_uacce_device(dev);
++	u32 val;
++
++	val = uacce->ops->isolate_err_threshold_read(uacce);
++
++	return sysfs_emit(buf, "%u\n", val);
++}
++
++static ssize_t isolate_strategy_store(struct device *dev, struct device_attribute *attr,
++				   const char *buf, size_t count)
++{
++	struct uacce_device *uacce = to_uacce_device(dev);
++	unsigned long val;
++	int ret;
++
++	if (kstrtoul(buf, 0, &val) < 0)
++		return -EINVAL;
++
++	if (val > UACCE_MAX_ERR_THRESHOLD)
++		return -EINVAL;
++
++	ret = uacce->ops->isolate_err_threshold_write(uacce, val);
++	if (ret)
++		return ret;
++
++	return count;
++}
++
+ static DEVICE_ATTR_RO(api);
+ static DEVICE_ATTR_RO(flags);
+ static DEVICE_ATTR_RO(available_instances);
+ static DEVICE_ATTR_RO(algorithms);
+ static DEVICE_ATTR_RO(region_mmio_size);
+ static DEVICE_ATTR_RO(region_dus_size);
++static DEVICE_ATTR_RO(isolate);
++static DEVICE_ATTR_RW(isolate_strategy);
+ 
+ static struct attribute *uacce_dev_attrs[] = {
+ 	&dev_attr_api.attr,
+@@ -377,6 +417,8 @@ static struct attribute *uacce_dev_attrs[] = {
+ 	&dev_attr_algorithms.attr,
+ 	&dev_attr_region_mmio_size.attr,
+ 	&dev_attr_region_dus_size.attr,
++	&dev_attr_isolate.attr,
++	&dev_attr_isolate_strategy.attr,
+ 	NULL,
+ };
+ 
+@@ -392,6 +434,14 @@ static umode_t uacce_dev_is_visible(struct kobject *kobj,
+ 	    (!uacce->qf_pg_num[UACCE_QFRT_DUS])))
+ 		return 0;
+ 
++	if (attr == &dev_attr_isolate_strategy.attr &&
++	    (!uacce->ops->isolate_err_threshold_read &&
++	     !uacce->ops->isolate_err_threshold_write))
++		return 0;
++
++	if (attr == &dev_attr_isolate.attr && !uacce->ops->get_isolate_state)
++		return 0;
++
+ 	return attr->mode;
+ }
+ 
+diff --git a/include/linux/uacce.h b/include/linux/uacce.h
+index 9ce88c28b0a8..0a81c3dfd26c 100644
+--- a/include/linux/uacce.h
++++ b/include/linux/uacce.h
+@@ -8,6 +8,7 @@
+ #define UACCE_NAME		"uacce"
+ #define UACCE_MAX_REGION	2
+ #define UACCE_MAX_NAME_SIZE	64
++#define UACCE_MAX_ERR_THRESHOLD	65535
+ 
+ struct uacce_queue;
+ struct uacce_device;
+@@ -30,6 +31,9 @@ struct uacce_qfile_region {
+  * @is_q_updated: check whether the task is finished
+  * @mmap: mmap addresses of queue to user space
+  * @ioctl: ioctl for user space users of the queue
++ * @get_isolate_state: get the device state after set the isolate strategy
++ * @isolate_err_threshold_write: stored the isolate error threshold to the device
++ * @isolate_err_threshold_read: read the isolate error threshold value from the device
+  */
+ struct uacce_ops {
+ 	int (*get_available_instances)(struct uacce_device *uacce);
+@@ -43,6 +47,9 @@ struct uacce_ops {
+ 		    struct uacce_qfile_region *qfr);
+ 	long (*ioctl)(struct uacce_queue *q, unsigned int cmd,
+ 		      unsigned long arg);
++	enum uacce_dev_state (*get_isolate_state)(struct uacce_device *uacce);
++	int (*isolate_err_threshold_write)(struct uacce_device *uacce, u32 num);
++	u32 (*isolate_err_threshold_read)(struct uacce_device *uacce);
+ };
+ 
+ /**
+@@ -57,6 +64,11 @@ struct uacce_interface {
+ 	const struct uacce_ops *ops;
+ };
+ 
++enum uacce_dev_state {
++	UACCE_DEV_NORMAL,
++	UACCE_DEV_ISOLATE,
++};
++
+ enum uacce_q_state {
+ 	UACCE_Q_ZOMBIE = 0,
+ 	UACCE_Q_INIT,
+-- 
+2.17.1
+
