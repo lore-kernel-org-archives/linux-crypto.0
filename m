@@ -2,97 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A5AC4321E
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 07:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E43C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 09:48:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbiKSHye (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 02:54:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51988 "EHLO
+        id S232754AbiKSJsf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 04:48:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233106AbiKSHyd (ORCPT
+        with ESMTP id S233069AbiKSJsd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 02:54:33 -0500
+        Sat, 19 Nov 2022 04:48:33 -0500
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61ACC24F36;
-        Fri, 18 Nov 2022 23:54:31 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NDmBK5NhRzmV5w;
-        Sat, 19 Nov 2022 15:54:01 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319A61004E;
+        Sat, 19 Nov 2022 01:48:31 -0800 (PST)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NDpdy2ykgzqSWc;
+        Sat, 19 Nov 2022 17:44:38 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 19 Nov 2022 15:54:27 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Sat, 19 Nov
- 2022 15:54:27 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ 15.1.2375.31; Sat, 19 Nov 2022 17:48:29 +0800
+Received: from localhost.localdomain (10.69.192.56) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Sat, 19 Nov 2022 17:48:28 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
-        <yekai13@huawei.com>
-Subject: [PATCH v10 0/3] crypto: hisilicon - supports device isolation feature
-Date:   Sat, 19 Nov 2022 07:48:14 +0000
-Message-ID: <20221119074817.12063-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Weili Qian <qianweili@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - fix 'QM_XEQ_DEPTH_CAP' mask value
+Date:   Sat, 19 Nov 2022 17:48:43 +0800
+Message-ID: <20221119094843.10707-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100012.china.huawei.com (7.185.36.121)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1、Add the uacce hardware error isolation interface. Hardware error 
-   thresholds can be configured by sysfs node. User can get the hardware
-   isolated state by sysfs node.
-2、Defining the isolation strategy for uacce device by uacce sysfs node. 
-   If the number of hardware errors exceeds the configured value, the 
-   uacce device will not be available in user space.
-3、The ACC VF device use the PF device isolation strategy.
-   
-changes v1->v2:
-	- deleted dev_to_uacce api.
-	- add vfs node doc. 
-	- move uacce->ref to driver.
-changes v2->v3:
-	- deleted some redundant code.
-	- use qm state instead of reference count.
-	- add null pointer check.
-	- isolate_strategy_read() instead of a copy.
-changes v3->v4:
-	- modify a comment
-changes v4->v5:
-	- use bool instead of atomic.
-	- isolation frequency instead of isolation command.
-changes v5->v6:
-	- add is_visible in uacce.
-	- add the description of the isolation strategy file node.
-changes v6->v7
-	- add an example for isolate_strategy in Documentation.
-changes v7->v8
-	- update the correct date.
-changes v8->v9
-    - move isolation strategy from qm to uacce.
-changes v9->v10
-	- Go back to the v8 version of the solution.
-	- Modify some code according to suggestions.
+'QM_XEQ_DEPTH_CAP' mask value is GENMASK(31, 0) instead of GENMASK(15, 0).
+If the mask value is incorrect, will cause abnormal events cannot be
+handled. So fix it.
 
-Kai Ye (3):
-  uacce: supports device isolation feature
-  Documentation: add the device isolation feature sysfs nodes for uacce
-  crypto: hisilicon/qm - define the device isolation strategy
+Fixes: 129a9f340172 ("crypto: hisilicon/qm - get qp num and depth from hardware registers")
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- Documentation/ABI/testing/sysfs-driver-uacce |  18 ++
- drivers/crypto/hisilicon/qm.c                | 169 +++++++++++++++++--
- drivers/misc/uacce/uacce.c                   |  50 ++++++
- include/linux/hisi_acc_qm.h                  |  15 ++
- include/linux/uacce.h                        |  12 ++
- 5 files changed, 249 insertions(+), 15 deletions(-)
-
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 36d70b9f6117..9072bee7336f 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -336,7 +336,7 @@ static const struct hisi_qm_cap_info qm_cap_info_vf[] = {
+ static const struct hisi_qm_cap_info qm_basic_info[] = {
+ 	{QM_TOTAL_QP_NUM_CAP,   0x100158, 0,  GENMASK(10, 0), 0x1000,    0x400,     0x400},
+ 	{QM_FUNC_MAX_QP_CAP,    0x100158, 11, GENMASK(10, 0), 0x1000,    0x400,     0x400},
+-	{QM_XEQ_DEPTH_CAP,      0x3104,   0,  GENMASK(15, 0), 0x800,     0x4000800, 0x4000800},
++	{QM_XEQ_DEPTH_CAP,      0x3104,   0,  GENMASK(31, 0), 0x800,     0x4000800, 0x4000800},
+ 	{QM_QP_DEPTH_CAP,       0x3108,   0,  GENMASK(31, 0), 0x4000400, 0x4000400, 0x4000400},
+ 	{QM_EQ_IRQ_TYPE_CAP,    0x310c,   0,  GENMASK(31, 0), 0x10000,   0x10000,   0x10000},
+ 	{QM_AEQ_IRQ_TYPE_CAP,   0x3110,   0,  GENMASK(31, 0), 0x0,       0x10001,   0x10001},
 -- 
-2.17.1
+2.33.0
 
