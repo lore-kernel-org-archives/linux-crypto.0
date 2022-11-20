@@ -2,147 +2,171 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBC4C4332F
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Nov 2022 01:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3739AC43219
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Nov 2022 19:43:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229454AbiKTBvI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 20:51:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39258 "EHLO
+        id S229676AbiKTTnu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Nov 2022 14:43:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiKTBvH (ORCPT
+        with ESMTP id S229449AbiKTTns (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 20:51:07 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38CFB8FAD;
-        Sat, 19 Nov 2022 17:51:06 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Sun, 20 Nov 2022 14:43:48 -0500
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703BD1EC46;
+        Sun, 20 Nov 2022 11:43:47 -0800 (PST)
+Received: from mercury (unknown [185.209.196.162])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5C6F8B801BA;
-        Sun, 20 Nov 2022 01:51:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CA0C433D6;
-        Sun, 20 Nov 2022 01:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668909063;
-        bh=El15VWDdgksRCN/WPGVj5AEcvb7V7Y1dygEuy92nPcU=;
+        (Authenticated sender: sre)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 981D16602381;
+        Sun, 20 Nov 2022 19:43:45 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1668973425;
+        bh=T3nU7r4TDRBfUE21qBPtx6/vbbqNd5aTZrUhEKVEpe8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=buOop9cfhLH6l9zCdRG66qwWw2Kzuf9uGT+iez3n57OnbkfwLgV2jc/fH++Xuxqj9
-         1BKpI8Y1N4nlLq2i3xVxW5vpZKJWdw9U5fZQoy6ZgNjlWdGcUUSmHN1j94Ftgo7V55
-         DEXt+eIYjkIZcWUFgSmFLvIfDGfT4L7WWC+Y6fb0ceLEiFdewiwOmElzlLdlheDAsw
-         OYmgnFTbOwsg7jFTuiTiXR8ADYgzcEOQYuWcHsp686leUKGMV1Jmyi3APulxhOZupc
-         +Ox1AZMEjw6kuTBJM/YWAfcQiYCYb1Je/bH1n7fZAOdOxuOGmfiJdGZ3Aim3AAjPYB
-         8eF8rXVlnMExg==
-Date:   Sat, 19 Nov 2022 17:51:01 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [PATCH v5 2/3] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y3mIBTzgqTv/ArDG@sol.localdomain>
-References: <20221119120929.2963813-1-Jason@zx2c4.com>
- <20221119120929.2963813-3-Jason@zx2c4.com>
- <Y3liVEdYByF2gZZU@sol.localdomain>
- <Y3l6ocn1dTN0+1GK@zx2c4.com>
+        b=eTDOl2wCVRsu/tyZH+YPJZtqzX+lTk+zyDWIOt7B5OERtVQXV05JqgkECzvZaxhvq
+         GWHynwzbAdTGjQc4EiizPb4JzuNJErOOA6MGMcIE1OOBJsR2nJxdyKqik4rZXW8I8S
+         YL9hLYJH9B0qYNlv0ofE25pkedfO3Zr0ukRr6nTWoiYIF0ElBn0uG1ehB/KKpnJkB6
+         LmHZCe95IKsjPugXIHsbUyR3TPbe/Uz/FTgEe5YV5fHfIiRZ+dwYB8lU4/MgAmu4vM
+         BZjO4bgM9A0wAKu6Ub+wy7zE/lgrgtzyeA/1iFwakjmg/vd8UL0auYvToqpQCZqsxv
+         +Bmg67/Ow+Rwg==
+Received: by mercury (Postfix, from userid 1000)
+        id 1C1D2106F223; Sun, 20 Nov 2022 20:43:43 +0100 (CET)
+Date:   Sun, 20 Nov 2022 20:43:43 +0100
+From:   Sebastian Reichel <sebastian.reichel@collabora.com>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
+Cc:     Angel Iglesias <ang.iglesiasg@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Grant Likely <grant.likely@linaro.org>,
+        Wolfram Sang <wsa@kernel.org>, linux-i2c@vger.kernel.org,
+        kernel@pengutronix.de, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        linux-rpi-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-media@vger.kernel.org, patches@opensource.cirrus.com,
+        linux-actions@lists.infradead.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-omap@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-pm@vger.kernel.org, Purism Kernel Team <kernel@puri.sm>,
+        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net
+Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
+Message-ID: <20221120194343.nnpzhgjapep7iwqk@mercury.elektranox.org>
+References: <20221118224540.619276-1-uwe@kleine-koenig.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="wvm2z6appxwdd5fa"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y3l6ocn1dTN0+1GK@zx2c4.com>
+In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Nov 20, 2022 at 01:53:53AM +0100, Jason A. Donenfeld wrote:
-> Hi Eric,
-> 
-> On Sat, Nov 19, 2022 at 03:10:12PM -0800, Eric Biggers wrote:
-> > > +	if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
-> > > +		smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
-> > 
-> > Is the purpose of the smp_store_release() here to order the writes of
-> > base_crng.generation and _vdso_rng_data.generation?  It could use a comment.
-> > 
-> > > +		if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
-> > > +			smp_store_release(&_vdso_rng_data.is_ready, true);
-> > 
-> > Similarly, is the purpose of this smp_store_release() to order the writes to the
-> > the generation counters and is_ready?  It could use a comment.
-> 
-> Yes, I guess so. Actually this comes from an unexplored IRC comment from
-> Andy back in July:
-> 
-> 2022-07-29 21:21:56 <amluto> zx2c4: WRITE_ONCE(_vdso_rng_data.generation, next_gen + 1);
-> 2022-07-29 21:22:23 <amluto> For x86 it shouldn’t matter much. For portability, smp_store_release
-> 
-> Though maybe that doesn't actually matter much? When the userspace CPU
-> learns about a change to vdso_rng_data, it's only course of action is
-> make a syscall to getrandom(), anyway, and those paths should be
-> consistent with themselves, thanks to the same locking and
-> synchronization there's always been there. So maybe I actually should
-> move back to WRITE_ONCE() here? Hm?
 
-Well, sys_getrandom() will just do:
+--wvm2z6appxwdd5fa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	if (unlikely(crng->generation != READ_ONCE(base_crng.generation)))
+Hi,
 
-So I think you do need ordering between base_crng.generation and
-_vdso_rng_data.generation.  If _vdso_rng_data.generation is changed, the change
-in base_crng.generation needs to be visible too.
+On Fri, Nov 18, 2022 at 11:35:34PM +0100, Uwe Kleine-K=F6nig wrote:
+> Hello,
+>=20
+> since commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
+> call-back type") from 2016 there is a "temporary" alternative probe
+> callback for i2c drivers.
+>=20
+> This series completes all drivers to this new callback (unless I missed
+> something). It's based on current next/master.
+> A part of the patches depend on commit 662233731d66 ("i2c: core:
+> Introduce i2c_client_get_device_id helper function"), there is a branch t=
+hat
+> you can pull into your tree to get it:
+>=20
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git i2c/client=
+_device_id_helper-immutable
+>=20
+> I don't think it's feasable to apply this series in one go, so I ask the
+> maintainers of the changed files to apply via their tree. I guess it
+> will take a few kernel release iterations until all patch are in, but I
+> think a single tree creates too much conflicts.
+>=20
+> The last patch changes i2c_driver::probe, all non-converted drivers will
+> fail to compile then. So I hope the build bots will tell me about any
+> driver I missed to convert. This patch is obviously not for application
+> now.
+>=20
+> I dropped most individuals from the recipents of this mail to not
+> challenge the mail servers and mailing list filters too much. Sorry if
+> you had extra efforts to find this mail.
+>=20
+> Best regards
+> Uwe
 
-> > One question I have is about forking.  So, when a thread calls fork(), in the
-> > child the kernel automatically replaces all vgetrandom_state pages with zeroed
-> > pages (due to MADV_WIPEONFORK).  If the child calls __cvdso_getrandom_data()
-> > afterwards, it sees the zeroed state.  But that's indistinguishable from the
-> > state at the very beginning, after sys_vgetrandom_alloc() was just called,
-> > right?  So as long as this code handles initializing the state at the beginning,
-> > then I'd think it would naturally handle fork() as well.
-> 
-> Right, for this simple fork() case, it works fine. There are other cases
-> though that are trickier...
-> 
-> > However, it seems you have something a bit more subtle in mind, where the thread
-> > calls fork() *while* it's in the middle of __cvdso_getrandom_data().  I guess
-> > you are thinking of the case where a signal is sent to the thread while it's
-> > executing __cvdso_getrandom_data(), and then the signal handler calls fork()?
-> > Note that it doesn't matter if a different thread in the *process* calls fork().
-> > 
-> > If it's possible for the thread to fork() (and hence for the vgetrandom_state to
-> > be zeroed) at absolutely any time, it probably would be a good idea to mark that
-> > whole struct as volatile.
-> 
-> Actually, this isn't something that matters, I don't think. If
-> state->key_batch is zeroed, the result will be wrong, but the function
-> logic will be fine. If state->pos is zeroed, it'll write to the
-> beginning of the batch, which might be wrong, but the function logic
-> will still be fine. That is, in both of these cases, even if the
-> calculation is wrong, there's no memory corruption or anything. So then,
-> the remaining member is state->generation. If this is zeroed, then it's
-> actually something we detect with that READ_ONCE()! And in this case,
-> it's a sign that something is off -- we forked -- and so we should start
-> over from the beginning. So I don't think there's a reason to mark the
-> whole struct as volatile. The one we care about is state->generation,
-> and for that we READ_ONCE() it at the place that matters.
+=2E..
 
-It's undefined behavior for C code to be working on values that can be mutated
-underneath it, though, unless they are volatile.  Granted, people still do this
-all the time, but I'd hope we can be a bit more careful here...
+>   power: supply: adp5061: Convert to i2c's .probe_new()
+>   power: supply: bq2415x: Convert to i2c's .probe_new()
+>   power: supply: bq24190: Convert to i2c's .probe_new()
+>   power: supply: bq24257: Convert to i2c's .probe_new()
+>   power: supply: bq24735: Convert to i2c's .probe_new()
+>   power: supply: bq2515x: Convert to i2c's .probe_new()
+>   power: supply: bq256xx: Convert to i2c's .probe_new()
+>   power: supply: bq25890: Convert to i2c's .probe_new()
+>   power: supply: bq25980: Convert to i2c's .probe_new()
+>   power: supply: bq27xxx: Convert to i2c's .probe_new()
+>   power: supply: ds2782: Convert to i2c's .probe_new()
+>   power: supply: lp8727: Convert to i2c's .probe_new()
+>   power: supply: ltc2941: Convert to i2c's .probe_new()
+>   power: supply: ltc4162-l: Convert to i2c's .probe_new()
+>   power: supply: max14656: Convert to i2c's .probe_new()
+>   power: supply: max17040: Convert to i2c's .probe_new()
+>   power: supply: max17042_battery: Convert to i2c's .probe_new()
+>   power: supply: rt5033_battery: Convert to i2c's .probe_new()
+>   power: supply: rt9455: Convert to i2c's .probe_new()
+>   power: supply: sbs: Convert to i2c's .probe_new()
+>   power: supply: sbs-manager: Convert to i2c's .probe_new()
+>   power: supply: smb347: Convert to i2c's .probe_new()
+>   power: supply: ucs1002: Convert to i2c's .probe_new()
+>   power: supply: z2_battery: Convert to i2c's .probe_new()
+>   [...]
 
-> There's actually a different scenario, though, that I'm concerned about,
-> and this is the case in which a multithreaded program forks in the
-> middle of one of its threads running this. Indeed, only the calling
-> thread will carry forward into the child process, but all the memory is
-> still left around from any concurrent threads in the middle of
-> vgetrandom(). And if they're in the middle of a vgetrandom() call, that
-> means they haven't yet done erasure and cleaned up the stack to prevent
-> their state from leaking, and so forward secrecy is potentially lost,
-> since the child process now has some state from the parent.
+Thanks, I queued patches 513-536 to the power-supply subsystem.
 
-That is a separate problem though, right?  It does *not* mean that the
-vgetrandom_state can be zeroed out from underneath __cvdso_getrandom_data().
+-- Sebastian
 
-- Eric
+--wvm2z6appxwdd5fa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmN6g2YACgkQ2O7X88g7
++pocPA/+MG7rp45xJuAH0zlIFTM8ovBviXnLvra0hpvK+vMB8SVdh4K8vRCAoeoT
+lxML9oRVfhraHzo/3X6+7V87cw+QzEx3GZbYsIasGqic46MoFYkbA2i3Q8s8hS5y
+qpAcKn/efXJaBtdIxWQnOc0xU0YCiteiIik8Idb9MjHFupUspLxtIjCzTAmvKQ0k
+hJ5u5cqv3d/MP6VpsOCUYPDet9nS9ByPeg8Kr9Ux1a0WEldPYUO+dU0ObqRdhliZ
+agftaEtCvFYkfO9k8ubBL/x00gTn002xOB7gp+5s0V0D3wKfT5EPVYOoUZbeYMIu
+QOZaLHkNkBtV85kGm18h7IFdQZQY9ahcaGTYZplyz/YzHlK/AlfjA2umKS1+rs5m
+A+DDqnAkuWw9fLg0MJ4dLSPwOSPX3VfgmVS3By3Do2gotQkCqXsRdhrG1cIoE1aL
+AZYpSwLTn2rAYF59poL3rgSqx/MhgrLwmKQOH3fjwZ3R7PIAWFhYP1We2UtKdCEM
+Gjpr7QfAUiOuXDKi5OrBbWr4m2eX26A4uifwR62OyldwH8pUWAq3umgkw3rotQAA
+hdwOOPM+cHTyLbtP8kaP1XSR6u0ybuTbw8OQE/XPDNVceoMqR4XxUSYbs0Q0UzY6
+fwljGfbakuGbaNlb7s2LBsy0ESZuiz64Za/0gfJhI5rP1eNRR1U=
+=Dh+o
+-----END PGP SIGNATURE-----
+
+--wvm2z6appxwdd5fa--
