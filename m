@@ -2,94 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EDDC433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Nov 2022 01:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1557BC433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Nov 2022 01:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbiKTBE6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 20:04:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58178 "EHLO
+        id S229520AbiKTBkJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 20:40:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiKTBE5 (ORCPT
+        with ESMTP id S229499AbiKTBkI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 20:04:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F0DB6B34;
-        Sat, 19 Nov 2022 17:04:56 -0800 (PST)
+        Sat, 19 Nov 2022 20:40:08 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AFB0B94AD;
+        Sat, 19 Nov 2022 17:40:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9663EB8085E;
-        Sun, 20 Nov 2022 01:04:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C67EC433D6;
-        Sun, 20 Nov 2022 01:04:53 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QlCx2dJr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668906291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PwCgR4GrIDa93Xj810+SeDsgFfSgAHtSL3WBPnVichA=;
-        b=QlCx2dJrMPKdb8FOUiyeKgxCV8ijGOybdybyPkdf3VdyyapD+FmDwtoVG1S1GfYKre1Y6q
-        0GMjrNNxDHhDtKQLfzg03rZciD5A/GO+u0aALfbvi92PKrsR8+KBdAbQ2cVIdv801iJXGr
-        gUISb3oVtbe8F64xf5oNH7mo24Bgm0M=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 08b48af9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sun, 20 Nov 2022 01:04:51 +0000 (UTC)
-Date:   Sun, 20 Nov 2022 02:04:49 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A402060BCB;
+        Sun, 20 Nov 2022 01:40:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F92EC433D6;
+        Sun, 20 Nov 2022 01:40:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668908406;
+        bh=mB2/5SFy2jr4OJagL4mr8wczTaB3RfCbSmiQnv5noa4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=G5nq+us05sEucQ4RJRBz5n6pXnWIBxZo6AvKSt7WtLvvmxC2q8kgGEci49G0FEKMT
+         R0cptdirpgBxNX303fr0yMWEkWQw4j1e42S21cywB1YXa9hGiDHaS65lvGeJX6KjMs
+         Jyq30v5N2jWc2hmdwGXwQnoIiFRX9YR8dY8OyiGoMIg1Xm0QI32iXwilgwpTvLFGP3
+         tnmHb+371mqvMfXx0zl9lDXExjGT7NV9sorUk3JCI1ISrRMggtGpY22Dsu7t0VeaCl
+         vVOdQTp5OmwjeP1qjPYYIbl7HnMJT89KpssX5Q7Z8du7uEPNmvxbjwIl9jzh7weVMf
+         sstirvDV/4+1w==
+Date:   Sat, 19 Nov 2022 17:40:04 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
         Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [PATCH v5 2/3] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y3l9MXCO02/rOpFx@zx2c4.com>
+Subject: Re: [PATCH v5 1/3] random: add vgetrandom_alloc() syscall
+Message-ID: <Y3mFdMVowWj+VaXx@sol.localdomain>
 References: <20221119120929.2963813-1-Jason@zx2c4.com>
- <20221119120929.2963813-3-Jason@zx2c4.com>
- <Y3liVEdYByF2gZZU@sol.localdomain>
- <Y3l6ocn1dTN0+1GK@zx2c4.com>
+ <20221119120929.2963813-2-Jason@zx2c4.com>
+ <Y3k+/hSL5rIIkBhK@sol.localdomain>
+ <Y3ltyzxIPwniRNW5@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3l6ocn1dTN0+1GK@zx2c4.com>
+In-Reply-To: <Y3ltyzxIPwniRNW5@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Nov 20, 2022 at 01:53:53AM +0100, Jason A. Donenfeld wrote:
-> I'm not quite sure what the best approach here is. One idea would be to
-> just note that libcs should wait until vgetrandom() has returned
-> everywhere before forking, using its atfork functionality. 
+On Sun, Nov 20, 2022 at 12:59:07AM +0100, Jason A. Donenfeld wrote:
+> Hi Eric,
+> 
+> On Sat, Nov 19, 2022 at 12:39:26PM -0800, Eric Biggers wrote:
+> > On Sat, Nov 19, 2022 at 01:09:27PM +0100, Jason A. Donenfeld wrote:
+> > > +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned long __user *, num,
+> > > +		unsigned long __user *, size_per_each, unsigned int, flags)
+> > > +{
+> > > +	unsigned long alloc_size;
+> > > +	unsigned long num_states;
+> > > +	unsigned long pages_addr;
+> > > +	int ret;
+> > > +
+> > > +	if (flags)
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (get_user(num_states, num))
+> > > +		return -EFAULT;
+> > > +
+> > > +	alloc_size = size_mul(num_states, sizeof(struct vgetrandom_state));
+> > > +	if (alloc_size == SIZE_MAX)
+> > > +		return -EOVERFLOW;
+> > > +	alloc_size = roundup(alloc_size, PAGE_SIZE);
+> > 
+> > Small detail: the roundup to PAGE_SIZE can make alloc_size overflow to 0.
+> > 
+> > Also, 'roundup(alloc_size, PAGE_SIZE)' could be 'PAGE_ALIGN(alloc_size)'.
+> 
+> Good catch, thanks. So perhaps this?
+> 
+>         alloc_size = size_mul(num_states, sizeof(struct vgetrandom_state));
+>         if (alloc_size > SIZE_MAX - PAGE_SIZE + 1)
+>                 return -EOVERFLOW;
+>         alloc_size = PAGE_ALIGN(alloc_size);
+> 
+> Does that look right?
 
-To elaborate on this idea a bit, the way this looks is:
+Yes.  Maybe use 'SIZE_MAX & PAGE_MASK'?
 
-  rwlock_t l;
-  pid_t fork(void)
-  {
-    pid_t pid;
-    write_lock(&l);
-    pid = syscall_fork();
-    write_unlock(&l);
-    return pid;
-  }
-  ssize_t getrandom(...)
-  {
-    ssize_t ret;
-    ...
-    if (!read_try_lock(&l))
-    	return syscall_getrandom(...);
-    ret = vdso_getrandom(...);
-    read_unlock(&l);
-    return ret;
-  }
+Another alternative is the following:
 
-So maybe that doesn't seem that bad, especially considering libc already
-has the kind of infrastructure in place to do that somewhat easily.
-Maybe there's a priority locking thing to get right here -- the writer
-should immediately starve out all future readers, so it's not unbound --
-but that seems par for the course.
+	if (num_states >
+	    (SIZE_MAX & PAGE_MASK) / sizeof(struct vgetrandom_state))
+		return -EOVERFLOW;
+	alloc_size = PAGE_ALIGN(num_states * sizeof(struct vgetrandom_state));
 
-Jason
+- Eric
