@@ -2,40 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3ACC433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Nov 2022 23:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6139C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Nov 2022 00:54:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbiKSX7R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Nov 2022 18:59:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
+        id S229455AbiKTAyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Nov 2022 19:54:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiKSX7R (ORCPT
+        with ESMTP id S229437AbiKTAyG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Nov 2022 18:59:17 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3FE14D32;
-        Sat, 19 Nov 2022 15:59:15 -0800 (PST)
+        Sat, 19 Nov 2022 19:54:06 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794D0B10ED;
+        Sat, 19 Nov 2022 16:54:02 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2D89F60BFA;
-        Sat, 19 Nov 2022 23:59:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B85CC433C1;
-        Sat, 19 Nov 2022 23:59:13 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2572CB80A3A;
+        Sun, 20 Nov 2022 00:54:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CAD1C433D6;
+        Sun, 20 Nov 2022 00:53:58 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gQCJ1S+O"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pvoHQHqV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1668902350;
+        t=1668905636;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pF5hygQOZimknkE9dVS3ToHPgi15Fs/0Dk7gv5XPx2I=;
-        b=gQCJ1S+OriuBT7to95epQyIA2rapjpQ/C5zZiKyFZeQnVxr41IehVybTQz1bYZ23k99xST
-        cAbM5WFiac4vkg2pXEsah7omTBW1qQjex1gv7LaKbB4tHeC9XG9+JmfOguXy2mXHQ5a2W8
-        6FU171U7Q+37zlYEkJiztmMtxU3E0PU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 01fc7d27 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sat, 19 Nov 2022 23:59:10 +0000 (UTC)
-Date:   Sun, 20 Nov 2022 00:59:07 +0100
+        bh=FULu1Q/R0+VeycCL68dPfbDP/Ga3miiXDWri1BQ6mXA=;
+        b=pvoHQHqV36ye0LiiuIq8hjj8mpZn7fHMacpZSb+LT50mP6qaDpeVxij5gR2hs0Kh7RNFHJ
+        WDc5GchA3f9donHrYRZLx6RkUOs+KIVLb9lv2g/pZIuRCu2RQ09Zn1EdZEcPglV8JbC0VT
+        VL1C3Xpk868v/xDnvgAnebMb+pTMvuE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ac7f67a7 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sun, 20 Nov 2022 00:53:55 +0000 (UTC)
+Date:   Sun, 20 Nov 2022 01:53:53 +0100
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
@@ -44,73 +45,133 @@ Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
         Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [PATCH v5 1/3] random: add vgetrandom_alloc() syscall
-Message-ID: <Y3ltyzxIPwniRNW5@zx2c4.com>
+Subject: Re: [PATCH v5 2/3] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <Y3l6ocn1dTN0+1GK@zx2c4.com>
 References: <20221119120929.2963813-1-Jason@zx2c4.com>
- <20221119120929.2963813-2-Jason@zx2c4.com>
- <Y3k+/hSL5rIIkBhK@sol.localdomain>
+ <20221119120929.2963813-3-Jason@zx2c4.com>
+ <Y3liVEdYByF2gZZU@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y3k+/hSL5rIIkBhK@sol.localdomain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y3liVEdYByF2gZZU@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi Eric,
 
-On Sat, Nov 19, 2022 at 12:39:26PM -0800, Eric Biggers wrote:
-> On Sat, Nov 19, 2022 at 01:09:27PM +0100, Jason A. Donenfeld wrote:
-> > +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned long __user *, num,
-> > +		unsigned long __user *, size_per_each, unsigned int, flags)
+On Sat, Nov 19, 2022 at 03:10:12PM -0800, Eric Biggers wrote:
+> > +	if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
+> > +		smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
+> 
+> Is the purpose of the smp_store_release() here to order the writes of
+> base_crng.generation and _vdso_rng_data.generation?  It could use a comment.
+> 
+> > +		if (IS_ENABLED(CONFIG_HAVE_VDSO_GETRANDOM))
+> > +			smp_store_release(&_vdso_rng_data.is_ready, true);
+> 
+> Similarly, is the purpose of this smp_store_release() to order the writes to the
+> the generation counters and is_ready?  It could use a comment.
+
+Yes, I guess so. Actually this comes from an unexplored IRC comment from
+Andy back in July:
+
+2022-07-29 21:21:56 <amluto> zx2c4: WRITE_ONCE(_vdso_rng_data.generation, next_gen + 1);
+2022-07-29 21:22:23 <amluto> For x86 it shouldn’t matter much. For portability, smp_store_release
+
+Though maybe that doesn't actually matter much? When the userspace CPU
+learns about a change to vdso_rng_data, it's only course of action is
+make a syscall to getrandom(), anyway, and those paths should be
+consistent with themselves, thanks to the same locking and
+synchronization there's always been there. So maybe I actually should
+move back to WRITE_ONCE() here? Hm?
+
+> > +static void memcpy_and_zero(void *dst, void *src, size_t len)
 > > +{
-> > +	unsigned long alloc_size;
-> > +	unsigned long num_states;
-> > +	unsigned long pages_addr;
-> > +	int ret;
-> > +
-> > +	if (flags)
-> > +		return -EINVAL;
-> > +
-> > +	if (get_user(num_states, num))
-> > +		return -EFAULT;
-> > +
-> > +	alloc_size = size_mul(num_states, sizeof(struct vgetrandom_state));
-> > +	if (alloc_size == SIZE_MAX)
-> > +		return -EOVERFLOW;
-> > +	alloc_size = roundup(alloc_size, PAGE_SIZE);
+> > +#define CASCADE(type) \
+> > +	while (len >= sizeof(type)) { \
+> > +		*(type *)dst = *(type *)src; \
+> > +		*(type *)src = 0; \
+> > +		dst += sizeof(type); \
+> > +		src += sizeof(type); \
+> > +		len -= sizeof(type); \
+> > +	}
+> > +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> > +#if BITS_PER_LONG == 64
+> > +	CASCADE(u64);
+> > +#endif
+> > +	CASCADE(u32);
+> > +	CASCADE(u16);
+> > +#endif
+> > +	CASCADE(u8);
+> > +#undef CASCADE
+> > +}
 > 
-> Small detail: the roundup to PAGE_SIZE can make alloc_size overflow to 0.
+> CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS doesn't mean that dereferencing
+> misaligned pointers is okay.  You still need to use get_unaligned() and
+> put_unaligned().  Take a look at crypto_xor(), for example.
+
+Right, thanks. Will do.
+
+> There's a lot of subtle stuff going on here.  Adding some more comments would be
+> helpful.  Maybe bring in some of the explanation that's currently only in the
+> commit message.
+
+Good idea.
+
+> One question I have is about forking.  So, when a thread calls fork(), in the
+> child the kernel automatically replaces all vgetrandom_state pages with zeroed
+> pages (due to MADV_WIPEONFORK).  If the child calls __cvdso_getrandom_data()
+> afterwards, it sees the zeroed state.  But that's indistinguishable from the
+> state at the very beginning, after sys_vgetrandom_alloc() was just called,
+> right?  So as long as this code handles initializing the state at the beginning,
+> then I'd think it would naturally handle fork() as well.
+
+Right, for this simple fork() case, it works fine. There are other cases
+though that are trickier...
+
+> However, it seems you have something a bit more subtle in mind, where the thread
+> calls fork() *while* it's in the middle of __cvdso_getrandom_data().  I guess
+> you are thinking of the case where a signal is sent to the thread while it's
+> executing __cvdso_getrandom_data(), and then the signal handler calls fork()?
+> Note that it doesn't matter if a different thread in the *process* calls fork().
 > 
-> Also, 'roundup(alloc_size, PAGE_SIZE)' could be 'PAGE_ALIGN(alloc_size)'.
+> If it's possible for the thread to fork() (and hence for the vgetrandom_state to
+> be zeroed) at absolutely any time, it probably would be a good idea to mark that
+> whole struct as volatile.
 
-Good catch, thanks. So perhaps this?
+Actually, this isn't something that matters, I don't think. If
+state->key_batch is zeroed, the result will be wrong, but the function
+logic will be fine. If state->pos is zeroed, it'll write to the
+beginning of the batch, which might be wrong, but the function logic
+will still be fine. That is, in both of these cases, even if the
+calculation is wrong, there's no memory corruption or anything. So then,
+the remaining member is state->generation. If this is zeroed, then it's
+actually something we detect with that READ_ONCE()! And in this case,
+it's a sign that something is off -- we forked -- and so we should start
+over from the beginning. So I don't think there's a reason to mark the
+whole struct as volatile. The one we care about is state->generation,
+and for that we READ_ONCE() it at the place that matters.
 
-        alloc_size = size_mul(num_states, sizeof(struct vgetrandom_state));
-        if (alloc_size > SIZE_MAX - PAGE_SIZE + 1)
-                return -EOVERFLOW;
-        alloc_size = PAGE_ALIGN(alloc_size);
+There's actually a different scenario, though, that I'm concerned about,
+and this is the case in which a multithreaded program forks in the
+middle of one of its threads running this. Indeed, only the calling
+thread will carry forward into the child process, but all the memory is
+still left around from any concurrent threads in the middle of
+vgetrandom(). And if they're in the middle of a vgetrandom() call, that
+means they haven't yet done erasure and cleaned up the stack to prevent
+their state from leaking, and so forward secrecy is potentially lost,
+since the child process now has some state from the parent.
 
-Does that look right?
-
-> > +	pages_addr = vm_mmap(NULL, 0, alloc_size, PROT_READ | PROT_WRITE,
-> > +			     MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED, 0);
-> > +	if (IS_ERR_VALUE(pages_addr))
-> > +		return pages_addr;
-> 
-> This will only succeed if the userspace process has permission to mlock pages,
-> i.e. if there is space available in RLIMIT_MEMLOCK or if process has
-> CAP_IPC_LOCK.  I suppose this is working as intended, as this syscall can be
-> used to try to allocate and mlock arbitrary amounts of memory.
-> 
-> I wonder if this permission check will cause problems.  Maybe there could be a
-> way to relax it for just one page per task?  I don't know how that would work,
-> though, especially when the planned usage involves userspace allocating a single
-> pool of these contexts per process that get handed out to threads.
-
-Probably though, we don't want to create a mlock backdoor, right? I
-suppose if a user is above RLIMIT_MEMLOCK, it'll just fallback to the
-slowpath, which still works. That seems like an okay enough
-circumstance.
+I'm not quite sure what the best approach here is. One idea would be to
+just note that libcs should wait until vgetrandom() has returned
+everywhere before forking, using its atfork functionality. Another
+approach would be to say that multithreaded programs using this
+shouldn't fork or something, but that seems disappointing. Or more state
+could be allocated in the zeroing region, to hold a chacha state, so
+another 64 bytes, which would be sort of unfortunate. Or something else?
+I'd be interested to hear your impression of this quandary.
 
 Jason
