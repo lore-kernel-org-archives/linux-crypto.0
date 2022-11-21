@@ -2,200 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC276C43219
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 09:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA45C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 11:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230489AbiKUJyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Nov 2022 04:54:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
+        id S229999AbiKULMQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Nov 2022 06:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbiKUJxj (ORCPT
+        with ESMTP id S230492AbiKULLn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Nov 2022 04:53:39 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E226FA1B4;
-        Mon, 21 Nov 2022 01:53:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 44AFD60F9B;
-        Mon, 21 Nov 2022 09:53:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F83C433C1;
-        Mon, 21 Nov 2022 09:53:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669024397;
-        bh=m9yZHwnTEqGasYZNomMe1mRJHVzf8B7M3LDSNHYcXeA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Opj/itLbJtFE0syJxd+qkemdvm+GfbfZ1pccF1SGR++3DJnkeyD3YQtGhN+blIjub
-         US8fX8iushvScwunkPr7LKirCchaNKKAU/twl0oVnqHEwdHsHxi0M0d/wgtlpEZqG7
-         k4ovt/Znm0DICj47Y+N6I+Yw47E1MyyiN0e/92S2h9qHrb149jszKe3FalK/2rVJQ+
-         ZppAyMp4v8rjq+XBX9JSBl1ysXWpcIvX0EVYeK13kfbg9IEzo070nVbf9UiCPP9DpS
-         bXABnzNPLB0lPKqHS3KQR0EQyUsQW7BynY23b8Z2+QTbLFxJQgHRN0fjhkCpVJB9+z
-         k93zjyweI0uEQ==
-Date:   Mon, 21 Nov 2022 09:53:05 +0000
-From:   Lee Jones <lee@kernel.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
-Cc:     Angel Iglesias <ang.iglesiasg@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Grant Likely <grant.likely@linaro.org>,
-        Wolfram Sang <wsa@kernel.org>, linux-i2c@vger.kernel.org,
-        kernel@pengutronix.de, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
-        Broadcom internal kernel review list 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        linux-rpi-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
-        linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-leds@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-media@vger.kernel.org, patches@opensource.cirrus.com,
-        linux-actions@lists.infradead.org,
-        linux-renesas-soc@vger.kernel.org,
-        linux-amlogic@lists.infradead.org, alsa-devel@alsa-project.org,
-        linux-omap@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, chrome-platform@lists.linux.dev,
-        linux-pm@vger.kernel.org, Purism Kernel Team <kernel@puri.sm>,
-        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net
-Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
-Message-ID: <Y3tKgXPJP7S48i3j@google.com>
-References: <20221118224540.619276-1-uwe@kleine-koenig.org>
+        Mon, 21 Nov 2022 06:11:43 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846CEB7393;
+        Mon, 21 Nov 2022 03:07:51 -0800 (PST)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NG4N03g6BzRpQk;
+        Mon, 21 Nov 2022 19:06:56 +0800 (CST)
+Received: from localhost.localdomain (10.175.112.70) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 21 Nov 2022 19:07:23 +0800
+From:   Wang Yufen <wangyufen@huawei.com>
+To:     <giovanni.cabiddu@intel.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <marco.chiappero@intel.com>
+CC:     <tomaszx.kowalik@intel.com>, <qat-linux@intel.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Wang Yufen <wangyufen@huawei.com>
+Subject: [PATCH] crypto: qat - fix error return code in adf_probe
+Date:   Mon, 21 Nov 2022 19:27:34 +0800
+Message-ID: <1669030054-9605-1-git-send-email-wangyufen@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
+Content-Type: text/plain
+X-Originating-IP: [10.175.112.70]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 18 Nov 2022, Uwe Kleine-König wrote:
+Fix to return a negative error code -EINVAL instead of 0.
 
-> Hello,
-> 
-> since commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
-> call-back type") from 2016 there is a "temporary" alternative probe
-> callback for i2c drivers.
+Fixes: 0cec19c761e5 ("crypto: qat - add support for compression for 4xxx")
+Signed-off-by: Wang Yufen <wangyufen@huawei.com>
+---
+ drivers/crypto/qat/qat_4xxx/adf_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Oh yeah, this!  Thanks for picking this up Uwe, I guess I've been
-distracted for the past 6 years or so. :)
-
-> This series completes all drivers to this new callback (unless I missed
-> something). It's based on current next/master.
-> A part of the patches depend on commit 662233731d66 ("i2c: core:
-> Introduce i2c_client_get_device_id helper function"), there is a branch that
-> you can pull into your tree to get it:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git i2c/client_device_id_helper-immutable
-> 
-> I don't think it's feasable to apply this series in one go, so I ask the
-> maintainers of the changed files to apply via their tree. I guess it
-> will take a few kernel release iterations until all patch are in, but I
-> think a single tree creates too much conflicts.
-> 
-> The last patch changes i2c_driver::probe, all non-converted drivers will
-> fail to compile then. So I hope the build bots will tell me about any
-> driver I missed to convert. This patch is obviously not for application
-> now.
-> 
-> I dropped most individuals from the recipents of this mail to not
-> challenge the mail servers and mailing list filters too much. Sorry if
-> you had extra efforts to find this mail.
-
-[...]
-
->  drivers/mfd/88pm800.c                            |  5 ++---
->  drivers/mfd/88pm805.c                            |  5 ++---
->  drivers/mfd/aat2870-core.c                       |  5 ++---
->  drivers/mfd/act8945a.c                           |  5 ++---
->  drivers/mfd/adp5520.c                            |  6 +++---
->  drivers/mfd/arizona-i2c.c                        |  6 +++---
->  drivers/mfd/as3711.c                             |  5 ++---
->  drivers/mfd/as3722.c                             |  5 ++---
->  drivers/mfd/atc260x-i2c.c                        |  5 ++---
->  drivers/mfd/axp20x-i2c.c                         |  5 ++---
->  drivers/mfd/bcm590xx.c                           |  5 ++---
->  drivers/mfd/bd9571mwv.c                          |  5 ++---
->  drivers/mfd/da903x.c                             |  6 +++---
->  drivers/mfd/da9052-i2c.c                         |  6 +++---
->  drivers/mfd/da9055-i2c.c                         |  5 ++---
->  drivers/mfd/da9062-core.c                        |  6 +++---
->  drivers/mfd/da9063-i2c.c                         |  6 +++---
->  drivers/mfd/da9150-core.c                        |  5 ++---
->  drivers/mfd/khadas-mcu.c                         |  5 ++---
->  drivers/mfd/lm3533-core.c                        |  5 ++---
->  drivers/mfd/lp3943.c                             |  4 ++--
->  drivers/mfd/lp873x.c                             |  5 ++---
->  drivers/mfd/lp87565.c                            |  5 ++---
->  drivers/mfd/lp8788.c                             |  4 ++--
->  drivers/mfd/madera-i2c.c                         |  6 +++---
->  drivers/mfd/max14577.c                           |  6 +++---
->  drivers/mfd/max77620.c                           |  6 +++---
->  drivers/mfd/max77693.c                           |  6 +++---
->  drivers/mfd/max77843.c                           |  6 +++---
->  drivers/mfd/max8907.c                            |  5 ++---
->  drivers/mfd/max8925-i2c.c                        |  5 ++---
->  drivers/mfd/max8997.c                            |  6 +++---
->  drivers/mfd/max8998.c                            |  6 +++---
->  drivers/mfd/mc13xxx-i2c.c                        |  6 +++---
->  drivers/mfd/menelaus.c                           |  5 ++---
->  drivers/mfd/menf21bmc.c                          |  4 ++--
->  drivers/mfd/palmas.c                             |  5 ++---
->  drivers/mfd/pcf50633-core.c                      |  5 ++---
->  drivers/mfd/rc5t583.c                            |  5 ++---
->  drivers/mfd/retu-mfd.c                           |  4 ++--
->  drivers/mfd/rk808.c                              |  5 ++---
->  drivers/mfd/rohm-bd718x7.c                       |  5 ++---
->  drivers/mfd/rsmu_i2c.c                           |  6 +++---
->  drivers/mfd/rt5033.c                             |  5 ++---
->  drivers/mfd/sec-core.c                           |  5 ++---
->  drivers/mfd/si476x-i2c.c                         |  6 +++---
->  drivers/mfd/sky81452.c                           |  5 ++---
->  drivers/mfd/stmfx.c                              |  5 ++---
->  drivers/mfd/stmpe-i2c.c                          |  5 +++--
->  drivers/mfd/stpmic1.c                            |  5 ++---
->  drivers/mfd/stw481x.c                            |  5 ++---
->  drivers/mfd/tc3589x.c                            |  6 +++---
->  drivers/mfd/ti-lmu.c                             |  5 +++--
->  drivers/mfd/tps6105x.c                           |  5 ++---
->  drivers/mfd/tps65010.c                           |  6 +++---
->  drivers/mfd/tps6507x.c                           |  5 ++---
->  drivers/mfd/tps65086.c                           |  5 ++---
->  drivers/mfd/tps65090.c                           |  5 ++---
->  drivers/mfd/tps65218.c                           |  5 ++---
->  drivers/mfd/tps6586x.c                           |  5 ++---
->  drivers/mfd/tps65910.c                           |  6 +++---
->  drivers/mfd/tps65912-i2c.c                       |  5 ++---
->  drivers/mfd/twl-core.c                           |  5 +++--
->  drivers/mfd/twl6040.c                            |  5 ++---
->  drivers/mfd/wl1273-core.c                        |  5 ++---
->  drivers/mfd/wm831x-i2c.c                         |  6 +++---
->  drivers/mfd/wm8350-i2c.c                         |  5 ++---
->  drivers/mfd/wm8400-core.c                        |  5 ++---
->  drivers/mfd/wm8994-core.c                        |  6 +++---
-
-For my own reference (apply this as-is to your sign-off block):
-
-  Acked-for-MFD-by: Lee Jones <lee@kernel.org>
-
->  drivers/video/backlight/adp8860_bl.c             |  6 +++---
->  drivers/video/backlight/adp8870_bl.c             |  6 +++---
->  drivers/video/backlight/arcxcnn_bl.c             |  4 ++--
->  drivers/video/backlight/bd6107.c                 |  5 ++---
->  drivers/video/backlight/lm3630a_bl.c             |  5 ++---
->  drivers/video/backlight/lm3639_bl.c              |  5 ++---
->  drivers/video/backlight/lp855x_bl.c              |  5 +++--
->  drivers/video/backlight/lv5207lp.c               |  5 ++---
->  drivers/video/backlight/tosa_bl.c                |  5 ++---
->  drivers/video/fbdev/matrox/matroxfb_maven.c      |  5 ++---
-
-For my own reference (apply this as-is to your sign-off block):
-
-  Acked-for-Backlight-by: Lee Jones <lee@kernel.org>
-
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index 2f21256..670a58b2 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -261,6 +261,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	hw_data->accel_capabilities_mask = hw_data->get_accel_cap(accel_dev);
+ 	if (!hw_data->accel_capabilities_mask) {
+ 		dev_err(&pdev->dev, "Failed to get capabilities mask.\n");
++		ret = -EINVAL;
+ 		goto out_err;
+ 	}
+ 
 -- 
-Lee Jones [李琼斯]
+1.8.3.1
+
