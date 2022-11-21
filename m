@@ -2,84 +2,200 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D1CC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 09:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC276C43219
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 09:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbiKUJsQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Nov 2022 04:48:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
+        id S230489AbiKUJyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Nov 2022 04:54:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230457AbiKUJrj (ORCPT
+        with ESMTP id S230493AbiKUJxj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Nov 2022 04:47:39 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E8B1573D
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 01:47:31 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e725329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e725:329c:23ff:fea6:a903])
+        Mon, 21 Nov 2022 04:53:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E226FA1B4;
+        Mon, 21 Nov 2022 01:53:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2D38B1EC0391;
-        Mon, 21 Nov 2022 10:47:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669024050;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Lvhf8ao6LFUPvplxDliDywV57iaqgHfLdAusJuf054Q=;
-        b=NYXtMHwee+uzXyCasBc7hF4kUv+XP3etJTMtSNDhC3UW54PpTQoS4s/8ihw9mGnCG0f9Yz
-        n8G6Ol0JzLaFwiSFyQ0zkbbk+HvOb5KWWXUWa4ifEjOS+GoQeqm0aQ/X9AnYeHewADZx0F
-        HwLp2G1vipOvTHL2P/gZNZQEcak1KD4=
-Date:   Mon, 21 Nov 2022 10:47:26 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, hpa@zytor.com,
-        kirill.shutemov@linux.intel.com, richard@nod.at,
-        viro@zeniv.linux.org.uk,
-        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
-        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi,
-        ebiggers@kernel.org
-Subject: Re: [PATCH v6 0/4] crypto: aria: implement aria-avx2 and aria-avx512
-Message-ID: <Y3tJLp3UlXGmK7HB@zn.tnic>
-References: <20221121003955.2214462-1-ap420073@gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 44AFD60F9B;
+        Mon, 21 Nov 2022 09:53:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F83C433C1;
+        Mon, 21 Nov 2022 09:53:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669024397;
+        bh=m9yZHwnTEqGasYZNomMe1mRJHVzf8B7M3LDSNHYcXeA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Opj/itLbJtFE0syJxd+qkemdvm+GfbfZ1pccF1SGR++3DJnkeyD3YQtGhN+blIjub
+         US8fX8iushvScwunkPr7LKirCchaNKKAU/twl0oVnqHEwdHsHxi0M0d/wgtlpEZqG7
+         k4ovt/Znm0DICj47Y+N6I+Yw47E1MyyiN0e/92S2h9qHrb149jszKe3FalK/2rVJQ+
+         ZppAyMp4v8rjq+XBX9JSBl1ysXWpcIvX0EVYeK13kfbg9IEzo070nVbf9UiCPP9DpS
+         bXABnzNPLB0lPKqHS3KQR0EQyUsQW7BynY23b8Z2+QTbLFxJQgHRN0fjhkCpVJB9+z
+         k93zjyweI0uEQ==
+Date:   Mon, 21 Nov 2022 09:53:05 +0000
+From:   Lee Jones <lee@kernel.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
+Cc:     Angel Iglesias <ang.iglesiasg@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Grant Likely <grant.likely@linaro.org>,
+        Wolfram Sang <wsa@kernel.org>, linux-i2c@vger.kernel.org,
+        kernel@pengutronix.de, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        linux-rpi-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-media@vger.kernel.org, patches@opensource.cirrus.com,
+        linux-actions@lists.infradead.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-omap@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-pm@vger.kernel.org, Purism Kernel Team <kernel@puri.sm>,
+        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net
+Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
+Message-ID: <Y3tKgXPJP7S48i3j@google.com>
+References: <20221118224540.619276-1-uwe@kleine-koenig.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221121003955.2214462-1-ap420073@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 12:39:51AM +0000, Taehee Yoo wrote:
-> This patchset is to implement aria-avx2 and aria-avx512.
-> There are some differences between aria-avx, aria-avx2, and aria-avx512,
-> but they are not core logic(s-box, diffusion layer).
+On Fri, 18 Nov 2022, Uwe Kleine-König wrote:
 
-From: Documentation/process/submitting-patches.rst
+> Hello,
+> 
+> since commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
+> call-back type") from 2016 there is a "temporary" alternative probe
+> callback for i2c drivers.
 
-"Don't get discouraged - or impatient
-------------------------------------
+Oh yeah, this!  Thanks for picking this up Uwe, I guess I've been
+distracted for the past 6 years or so. :)
 
-After you have submitted your change, be patient and wait.  Reviewers are
-busy people and may not get to your patch right away.
+> This series completes all drivers to this new callback (unless I missed
+> something). It's based on current next/master.
+> A part of the patches depend on commit 662233731d66 ("i2c: core:
+> Introduce i2c_client_get_device_id helper function"), there is a branch that
+> you can pull into your tree to get it:
+> 
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git i2c/client_device_id_helper-immutable
+> 
+> I don't think it's feasable to apply this series in one go, so I ask the
+> maintainers of the changed files to apply via their tree. I guess it
+> will take a few kernel release iterations until all patch are in, but I
+> think a single tree creates too much conflicts.
+> 
+> The last patch changes i2c_driver::probe, all non-converted drivers will
+> fail to compile then. So I hope the build bots will tell me about any
+> driver I missed to convert. This patch is obviously not for application
+> now.
+> 
+> I dropped most individuals from the recipents of this mail to not
+> challenge the mail servers and mailing list filters too much. Sorry if
+> you had extra efforts to find this mail.
 
-Once upon a time, patches used to disappear into the void without comment,
-but the development process works more smoothly than that now.  You should
-receive comments within a week or so; if that does not happen, make sure
-that you have sent your patches to the right place.  Wait for a minimum of
-						     ^^^^^^^^^^^^^^^^^^^^^
-one week before resubmitting or pinging reviewers - possibly longer during
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[...]
 
-busy times like merge windows."
+>  drivers/mfd/88pm800.c                            |  5 ++---
+>  drivers/mfd/88pm805.c                            |  5 ++---
+>  drivers/mfd/aat2870-core.c                       |  5 ++---
+>  drivers/mfd/act8945a.c                           |  5 ++---
+>  drivers/mfd/adp5520.c                            |  6 +++---
+>  drivers/mfd/arizona-i2c.c                        |  6 +++---
+>  drivers/mfd/as3711.c                             |  5 ++---
+>  drivers/mfd/as3722.c                             |  5 ++---
+>  drivers/mfd/atc260x-i2c.c                        |  5 ++---
+>  drivers/mfd/axp20x-i2c.c                         |  5 ++---
+>  drivers/mfd/bcm590xx.c                           |  5 ++---
+>  drivers/mfd/bd9571mwv.c                          |  5 ++---
+>  drivers/mfd/da903x.c                             |  6 +++---
+>  drivers/mfd/da9052-i2c.c                         |  6 +++---
+>  drivers/mfd/da9055-i2c.c                         |  5 ++---
+>  drivers/mfd/da9062-core.c                        |  6 +++---
+>  drivers/mfd/da9063-i2c.c                         |  6 +++---
+>  drivers/mfd/da9150-core.c                        |  5 ++---
+>  drivers/mfd/khadas-mcu.c                         |  5 ++---
+>  drivers/mfd/lm3533-core.c                        |  5 ++---
+>  drivers/mfd/lp3943.c                             |  4 ++--
+>  drivers/mfd/lp873x.c                             |  5 ++---
+>  drivers/mfd/lp87565.c                            |  5 ++---
+>  drivers/mfd/lp8788.c                             |  4 ++--
+>  drivers/mfd/madera-i2c.c                         |  6 +++---
+>  drivers/mfd/max14577.c                           |  6 +++---
+>  drivers/mfd/max77620.c                           |  6 +++---
+>  drivers/mfd/max77693.c                           |  6 +++---
+>  drivers/mfd/max77843.c                           |  6 +++---
+>  drivers/mfd/max8907.c                            |  5 ++---
+>  drivers/mfd/max8925-i2c.c                        |  5 ++---
+>  drivers/mfd/max8997.c                            |  6 +++---
+>  drivers/mfd/max8998.c                            |  6 +++---
+>  drivers/mfd/mc13xxx-i2c.c                        |  6 +++---
+>  drivers/mfd/menelaus.c                           |  5 ++---
+>  drivers/mfd/menf21bmc.c                          |  4 ++--
+>  drivers/mfd/palmas.c                             |  5 ++---
+>  drivers/mfd/pcf50633-core.c                      |  5 ++---
+>  drivers/mfd/rc5t583.c                            |  5 ++---
+>  drivers/mfd/retu-mfd.c                           |  4 ++--
+>  drivers/mfd/rk808.c                              |  5 ++---
+>  drivers/mfd/rohm-bd718x7.c                       |  5 ++---
+>  drivers/mfd/rsmu_i2c.c                           |  6 +++---
+>  drivers/mfd/rt5033.c                             |  5 ++---
+>  drivers/mfd/sec-core.c                           |  5 ++---
+>  drivers/mfd/si476x-i2c.c                         |  6 +++---
+>  drivers/mfd/sky81452.c                           |  5 ++---
+>  drivers/mfd/stmfx.c                              |  5 ++---
+>  drivers/mfd/stmpe-i2c.c                          |  5 +++--
+>  drivers/mfd/stpmic1.c                            |  5 ++---
+>  drivers/mfd/stw481x.c                            |  5 ++---
+>  drivers/mfd/tc3589x.c                            |  6 +++---
+>  drivers/mfd/ti-lmu.c                             |  5 +++--
+>  drivers/mfd/tps6105x.c                           |  5 ++---
+>  drivers/mfd/tps65010.c                           |  6 +++---
+>  drivers/mfd/tps6507x.c                           |  5 ++---
+>  drivers/mfd/tps65086.c                           |  5 ++---
+>  drivers/mfd/tps65090.c                           |  5 ++---
+>  drivers/mfd/tps65218.c                           |  5 ++---
+>  drivers/mfd/tps6586x.c                           |  5 ++---
+>  drivers/mfd/tps65910.c                           |  6 +++---
+>  drivers/mfd/tps65912-i2c.c                       |  5 ++---
+>  drivers/mfd/twl-core.c                           |  5 +++--
+>  drivers/mfd/twl6040.c                            |  5 ++---
+>  drivers/mfd/wl1273-core.c                        |  5 ++---
+>  drivers/mfd/wm831x-i2c.c                         |  6 +++---
+>  drivers/mfd/wm8350-i2c.c                         |  5 ++---
+>  drivers/mfd/wm8400-core.c                        |  5 ++---
+>  drivers/mfd/wm8994-core.c                        |  6 +++---
 
-IOW, pls stop spamming with your patchset.
+For my own reference (apply this as-is to your sign-off block):
 
-Thx.
+  Acked-for-MFD-by: Lee Jones <lee@kernel.org>
+
+>  drivers/video/backlight/adp8860_bl.c             |  6 +++---
+>  drivers/video/backlight/adp8870_bl.c             |  6 +++---
+>  drivers/video/backlight/arcxcnn_bl.c             |  4 ++--
+>  drivers/video/backlight/bd6107.c                 |  5 ++---
+>  drivers/video/backlight/lm3630a_bl.c             |  5 ++---
+>  drivers/video/backlight/lm3639_bl.c              |  5 ++---
+>  drivers/video/backlight/lp855x_bl.c              |  5 +++--
+>  drivers/video/backlight/lv5207lp.c               |  5 ++---
+>  drivers/video/backlight/tosa_bl.c                |  5 ++---
+>  drivers/video/fbdev/matrox/matroxfb_maven.c      |  5 ++---
+
+For my own reference (apply this as-is to your sign-off block):
+
+  Acked-for-Backlight-by: Lee Jones <lee@kernel.org>
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Lee Jones [李琼斯]
