@@ -2,84 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D4C4C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 14:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69DDC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 14:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229758AbiKUOLR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Nov 2022 09:11:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49448 "EHLO
+        id S229519AbiKUOTj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Nov 2022 09:19:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbiKUOK4 (ORCPT
+        with ESMTP id S229542AbiKUOTj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Nov 2022 09:10:56 -0500
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF74A11163
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 06:07:54 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id z192so13723552yba.0
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 06:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IWOZXSWadpIbDXCwQsI8zutVdTS+C5TkqaxcBi/y1dg=;
-        b=m/1O1bJEHXsx6J9Mujw+gsd9g+z98hk92EVKBqEk3sHE1ScqSQZbnSxhZ11v8OOIZU
-         PPDQFLV15YEBsPnWtkgUZVnvGEgAO1xxYCfl22clmWNiU2eq8oA0b/UqU0pHHzVNGp3O
-         psvzrwPrnBYsgk0l2wlkayXynDsrKHwJVGJnVntPqWM+tqaB5b9FDGUYVJhlO5CvPv8e
-         c4ydE43cgaxgsQYKYO78fh4oT4EG1zfkhtUFei4WahCRErL8kQN2Pmt0OYDnw4fVEl7Y
-         /eLV1C51AOk5lnV6tOLSB5WoU9QQFFyF9x0ecZyEkIk2JrEVsSMDJsWzsyjuJ/2PET65
-         50ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IWOZXSWadpIbDXCwQsI8zutVdTS+C5TkqaxcBi/y1dg=;
-        b=MFI+Dd5dQz349xkU45WU37Y0ArHjfCrNZzqV4Kx1YepjLqn1YdostCEBUPtJ70ZNru
-         DFK4UGIe5olUA88Uk+lxJwTlpDLpJzFDjDMb9sq/T0JRUvh6Y1CF/AWN4UUG6UM4K0Hy
-         d943Mxi7C0dtlqn9jc3cfxFCMvAgNbczNwPNTL2D4nOD7lBkC8RfM4a7q35e791ee/Qe
-         CrQqTTCSGg4VFZ2HmNgkA/PkLtTaiAUThpPtYvRzpVmsFLkLnyIf7F4iNImGH35hz5Y6
-         45MHU79okE6wgMXwxxqAX7Fm3RWNShG87C/ecsHU/8MS35GEuVGtySh4iexOukesgXMP
-         goBQ==
-X-Gm-Message-State: ANoB5pl6X5zt1S4WC6ATAQsaYHZ/fDaY55LOv08NfDzMYTSdyTN+mOYy
-        GVeGvYf79QPvw7rf4CsKFfrPZbMT9PVcZOK7HjocdA==
-X-Google-Smtp-Source: AA0mqf6koKfrv1sUPz1RuyfPFqXMHWeOJkaz2tBv+fn82k4M8T9LPB0xozZUrsBaMW+2AebPNH4ZVg0MAPxHY0/NBjY=
-X-Received: by 2002:a25:734a:0:b0:6dc:324a:7561 with SMTP id
- o71-20020a25734a000000b006dc324a7561mr17155400ybc.52.1669039673956; Mon, 21
- Nov 2022 06:07:53 -0800 (PST)
-MIME-Version: 1.0
-References: <20221119221219.1232541-1-linus.walleij@linaro.org>
- <20221119221219.1232541-4-linus.walleij@linaro.org> <8f55596e-12e3-8968-ebe5-e90be38ca5cb@foss.st.com>
-In-Reply-To: <8f55596e-12e3-8968-ebe5-e90be38ca5cb@foss.st.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Mon, 21 Nov 2022 15:07:42 +0100
-Message-ID: <CACRpkdYr3RKidNUjJQG88wEua0OvMYRTHe_48W7N35C5MSsSKQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/4] crypto: stm32/cryp - enable for use with Ux500
-To:     Lionel DEBIEVE <lionel.debieve@foss.st.com>
-Cc:     linux-crypto@vger.kernel.org,
+        Mon, 21 Nov 2022 09:19:39 -0500
+Received: from mail.steuer-voss.de (mail.steuer-voss.de [85.183.69.95])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B281126;
+        Mon, 21 Nov 2022 06:19:36 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at mail.steuer-voss.de
+Received: by mail.steuer-voss.de (Postfix, from userid 1000)
+        id 2E36427E9; Mon, 21 Nov 2022 15:19:29 +0100 (CET)
+From:   Nikolaus Voss <nikolaus.voss@haag-streit.com>
+To:     "Horia Geanta" <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Nikolaus Voss <nv@vosn.de>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 21 Nov 2022 15:12:41 +0100
+Subject: [PATCH v3] crypto: caam: blob_gen.c: warn if key is insecure
+Message-Id: <20221121141929.2E36427E9@mail.steuer-voss.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 2:35 PM Lionel DEBIEVE
-<lionel.debieve@foss.st.com> wrote:
+If CAAM is not in "trusted" or "secure" state, a fixed non-volatile key
+is used instead of the unique device key. This is the default mode of
+operation without secure boot (HAB). In this scenario, CAAM encrypted
+blobs should be used only for testing but not in a production
+environment, so issue a warning.
 
-> + writel_relaxed(readl_relaxed(cryp->regs + CRYP_CR) | CR_KEYRDEN, cryp->regs + CRYP_CR);
->
-> Why are you still using CRYP_CR here, would it be better to use cryp->caps->cr to keep compatibility?
+Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
 
-I noticed that the first two registers were not moved in the memory map so
-I just kept CR and SR as hard defines.
+---
+CHANGES
+=======
+v2: make warning more verbose, correct register, style fixes
+v3: fix sparse warning "dereference of noderef expression"
+    by using ioread32() to dereference iomem pointer
 
-It could be argued that the code will be containing one less memory reference
-and addition so it is more efficient, but it's so little so I am fine
-to change it
-to an offset in the caps if you prefer it to be uniform.
+ drivers/crypto/caam/blob_gen.c | 9 +++++++++
+ drivers/crypto/caam/regs.h     | 3 +++
+ 2 files changed, 12 insertions(+)
 
-Yours,
-Linus Walleij
+diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+index 6345c7269eb03..1f65df4898478 100644
+--- a/drivers/crypto/caam/blob_gen.c
++++ b/drivers/crypto/caam/blob_gen.c
+@@ -6,6 +6,7 @@
+ 
+ #define pr_fmt(fmt) "caam blob_gen: " fmt
+ 
++#include <linux/bitfield.h>
+ #include <linux/device.h>
+ #include <soc/fsl/caam-blob.h>
+ 
+@@ -61,12 +62,14 @@ static void caam_blob_job_done(struct device *dev, u32 *desc, u32 err, void *con
+ int caam_process_blob(struct caam_blob_priv *priv,
+ 		      struct caam_blob_info *info, bool encap)
+ {
++	const struct caam_drv_private *ctrlpriv;
+ 	struct caam_blob_job_result testres;
+ 	struct device *jrdev = &priv->jrdev;
+ 	dma_addr_t dma_in, dma_out;
+ 	int op = OP_PCLID_BLOB;
+ 	size_t output_len;
+ 	u32 *desc;
++	u32 moo;
+ 	int ret;
+ 
+ 	if (info->key_mod_len > CAAM_BLOB_KEYMOD_LENGTH)
+@@ -100,6 +103,12 @@ int caam_process_blob(struct caam_blob_priv *priv,
+ 		goto out_unmap_in;
+ 	}
+ 
++	ctrlpriv = dev_get_drvdata(jrdev->parent);
++	moo = FIELD_GET(CSTA_MOO, ioread32(&ctrlpriv->ctrl->perfmon.status));
++	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
++		dev_warn(jrdev,
++			 "using insecure test key, enable HAB to use unique device key!\n");
++
+ 	/*
+ 	 * A data blob is encrypted using a blob key (BK); a random number.
+ 	 * The BK is used as an AES-CCM key. The initial block (B0) and the
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 66d6dad841bb2..66928f8a0c4b1 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -426,6 +426,9 @@ struct caam_perfmon {
+ 	u32 rsvd2;
+ #define CSTA_PLEND		BIT(10)
+ #define CSTA_ALT_PLEND		BIT(18)
++#define CSTA_MOO		GENMASK(9, 8)
++#define CSTA_MOO_SECURE	1
++#define CSTA_MOO_TRUSTED	2
+ 	u32 status;		/* CSTA - CAAM Status */
+ 	u64 rsvd3;
+ 
+-- 
+2.34.1
+
