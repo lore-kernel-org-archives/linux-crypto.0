@@ -2,87 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C44A5C43217
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 01:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA144C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 03:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbiKUBwV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Nov 2022 20:52:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33744 "EHLO
+        id S229760AbiKUDXD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Nov 2022 22:23:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiKUBwV (ORCPT
+        with ESMTP id S229498AbiKUDXC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Nov 2022 20:52:21 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9992A725;
-        Sun, 20 Nov 2022 17:52:19 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        Sun, 20 Nov 2022 22:23:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B1D1409D;
+        Sun, 20 Nov 2022 19:23:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NFr420ShCz4xFy;
-        Mon, 21 Nov 2022 12:52:17 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1668995538;
-        bh=rqbZuHNONpUMkRr9YcA+Az41+7a0NcwDwPHtWcIDBQo=;
-        h=Date:From:To:Cc:Subject:From;
-        b=hzYNfbHMyaJdk/EAPWw5KqPR9KZ5xryg/T+osXo5zSBxMRg1qImfBatF0aaJGj1qT
-         zFagySnmafUAdTbmSvRw2wv9p+u/qixRcWDdsK7POp8MVFIx7+Xs+Ump4biS8s/DrU
-         Qj7XFt7bmBqZjIKjt71CiabI297x+wpgSgNz6B1kcLDRxMHX1elerUMyMILJ6w1ul9
-         zqYz8LuvNe4Oc4ErPV5SAxkJZudCXSLtjvktel10+d7SIQ5/cBilgmNLQzc77do5EV
-         P8pwAZmwNfW/bHwNSmCW1lD0UdD8NXplTNCqKRJJffpr3kXTIZvPftogCnniRpO7u1
-         Pnkr3xfBsuBVA==
-Date:   Mon, 21 Nov 2022 12:52:16 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Gaosheng Cui <cuigaosheng1@huawei.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the crypto tree
-Message-ID: <20221121125216.5b94243f@canb.auug.org.au>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 684D760E9E;
+        Mon, 21 Nov 2022 03:23:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DD15C433D6;
+        Mon, 21 Nov 2022 03:22:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="UTJ7/TuL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669000977;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DAa5Mzb5unqukMrdaJuHIYWbZgREOXZOVUCauEOi2ps=;
+        b=UTJ7/TuLDD1B+OoUcpwgmLVZFvlUFpMC4gBltI6OxPZ78kzxh84N1P6i4IgYHl0PE4sSYD
+        jPUX0NYXAF5uitLAOsAzthyR438A8ATpqZtkPg6Tk1STEcMJzJSDJWZINZsSPjfmWncLIn
+        stONI7x5GrBtA2+CGCWBLk6Dnh4vnvo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ca013759 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 21 Nov 2022 03:22:57 +0000 (UTC)
+Date:   Mon, 21 Nov 2022 04:22:54 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>
+Subject: Re: [PATCH v5 2/3] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <Y3rvDg9H8lTL8ecU@zx2c4.com>
+References: <20221119120929.2963813-1-Jason@zx2c4.com>
+ <20221119120929.2963813-3-Jason@zx2c4.com>
+ <Y3liVEdYByF2gZZU@sol.localdomain>
+ <Y3l6ocn1dTN0+1GK@zx2c4.com>
+ <Y3mGQyqPBTcoyPpS@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/kN=+YqAcf3V.InuKPPsh7Co";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y3mGQyqPBTcoyPpS@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/kN=+YqAcf3V.InuKPPsh7Co
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Sun, Nov 20, 2022 at 02:43:31AM +0100, Jason A. Donenfeld wrote:
+> On Sun, Nov 20, 2022 at 01:53:53AM +0100, Jason A. Donenfeld wrote:
+> > shouldn't fork or something, but that seems disappointing. Or more state
+> > could be allocated in the zeroing region, to hold a chacha state, so
+> > another 64 bytes, which would be sort of unfortunate. Or something else?
+> > I'd be interested to hear your impression of this quandary.
+> 
+> Another 128 bytes, actually. And the current chacha in there isn't
+> cleaning up its stack as one might hope. So maybe the cleanest solution
+> would be to just bite the bullet and allocate another 128 bytes per
+> state and make a mini chacha that operates over that? (And I guess hope
+> it doesn't need to spill and such...)
 
-Hi all,
+I've got it implemented without using any stack now. Wasn't so bad. So
+all of the additional concerns I added will be addressed in v+1.
 
-After merging the crypto tree, today's linux-next build (x86_64
-allmodconfig) produced this warning:
-
-WARNING: modpost: drivers/crypto/ccree/ccree.o: section mismatch in referen=
-ce: init_module (section: .init.text) -> cc_debugfs_global_fini (section: .=
-exit.text)
-
-Introduced by commit
-
-  4f1c596df706 ("crypto: ccree - Remove debugfs when platform_driver_regist=
-er failed")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/kN=+YqAcf3V.InuKPPsh7Co
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmN62dAACgkQAVBC80lX
-0Gy3qggAjDQIW23JTnvGZV8kgrjf6HB5QNnl7s6XYyBCneEK0s7x9thZQIb9AQ1t
-jkiNbV8jnsYJcGvcT7XOHSF+o83/zaImRtyYqRyOBHZWTl/7U9uHlbmayX4uu83k
-BTmi22Fkg4Mlo1XyfQQgLBUkAxR3cQey1RiZg1bV/wKMIDTTO0IqjeI2oKpCORKg
-yVQeGI4UIeCcvrrdpGAIPMSkI+ybqG39/1LAWDXEMANYRbxt/KO1f5bpvN6WqZHy
-KeDMCVdoOwok1UDKvuPtUlEMJUnmKegS38Xxnx9zogVlRyck/hie2S8mhNYQ6pjy
-Qh/4ozxkE78i+evlbRozHOvzCi/86Q==
-=LfSK
------END PGP SIGNATURE-----
-
---Sig_/kN=+YqAcf3V.InuKPPsh7Co--
+Jason
