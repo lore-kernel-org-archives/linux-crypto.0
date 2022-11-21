@@ -2,99 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7C1C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 03:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D1CC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Nov 2022 09:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbiKUDX2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Nov 2022 22:23:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
+        id S230453AbiKUJsQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Nov 2022 04:48:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiKUDX1 (ORCPT
+        with ESMTP id S230457AbiKUJrj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Nov 2022 22:23:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A7618B10;
-        Sun, 20 Nov 2022 19:23:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Mon, 21 Nov 2022 04:47:39 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E8B1573D
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 01:47:31 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e725329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e725:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5157A60E9F;
-        Mon, 21 Nov 2022 03:23:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA7D0C433C1;
-        Mon, 21 Nov 2022 03:23:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FGcmyMnA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669001003;
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2D38B1EC0391;
+        Mon, 21 Nov 2022 10:47:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1669024050;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iHEmdgq+IRGtyRkvMHcpeJyVrJYV+YY+BtviBpbtKkE=;
-        b=FGcmyMnAD11Sh+J4t9G3VpYMKj7qX+ijuot6gl1P6jUUjOl0wT6U3g43oAe6fszlrs6kBx
-        CtJekQ6F9NjrzynOGtu7yfJ7JIVyT2tu+QbpXIMaZ/rrVuuMkaq1nlhrRFTgAHJp55Srgv
-        RPRdrjHlUn754oDRoamnEDWZ5Wp6WSI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 73f9b883 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 21 Nov 2022 03:23:22 +0000 (UTC)
-Date:   Mon, 21 Nov 2022 04:23:20 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [PATCH v5 2/3] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y3rvKEeSAq6548Sz@zx2c4.com>
-References: <20221119120929.2963813-1-Jason@zx2c4.com>
- <20221119120929.2963813-3-Jason@zx2c4.com>
- <Y3liVEdYByF2gZZU@sol.localdomain>
- <Y3l6ocn1dTN0+1GK@zx2c4.com>
- <Y3l9MXCO02/rOpFx@zx2c4.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Lvhf8ao6LFUPvplxDliDywV57iaqgHfLdAusJuf054Q=;
+        b=NYXtMHwee+uzXyCasBc7hF4kUv+XP3etJTMtSNDhC3UW54PpTQoS4s/8ihw9mGnCG0f9Yz
+        n8G6Ol0JzLaFwiSFyQ0zkbbk+HvOb5KWWXUWa4ifEjOS+GoQeqm0aQ/X9AnYeHewADZx0F
+        HwLp2G1vipOvTHL2P/gZNZQEcak1KD4=
+Date:   Mon, 21 Nov 2022 10:47:26 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        dave.hansen@linux.intel.com, hpa@zytor.com,
+        kirill.shutemov@linux.intel.com, richard@nod.at,
+        viro@zeniv.linux.org.uk,
+        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
+        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi,
+        ebiggers@kernel.org
+Subject: Re: [PATCH v6 0/4] crypto: aria: implement aria-avx2 and aria-avx512
+Message-ID: <Y3tJLp3UlXGmK7HB@zn.tnic>
+References: <20221121003955.2214462-1-ap420073@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y3l9MXCO02/rOpFx@zx2c4.com>
+In-Reply-To: <20221121003955.2214462-1-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Nov 20, 2022 at 02:04:49AM +0100, Jason A. Donenfeld wrote:
-> On Sun, Nov 20, 2022 at 01:53:53AM +0100, Jason A. Donenfeld wrote:
-> > I'm not quite sure what the best approach here is. One idea would be to
-> > just note that libcs should wait until vgetrandom() has returned
-> > everywhere before forking, using its atfork functionality. 
-> 
-> To elaborate on this idea a bit, the way this looks is:
-> 
->   rwlock_t l;
->   pid_t fork(void)
->   {
->     pid_t pid;
->     write_lock(&l);
->     pid = syscall_fork();
->     write_unlock(&l);
->     return pid;
->   }
->   ssize_t getrandom(...)
->   {
->     ssize_t ret;
->     ...
->     if (!read_try_lock(&l))
->     	return syscall_getrandom(...);
->     ret = vdso_getrandom(...);
->     read_unlock(&l);
->     return ret;
->   }
-> 
-> So maybe that doesn't seem that bad, especially considering libc already
-> has the kind of infrastructure in place to do that somewhat easily.
-> Maybe there's a priority locking thing to get right here -- the writer
-> should immediately starve out all future readers, so it's not unbound --
-> but that seems par for the course.
+On Mon, Nov 21, 2022 at 12:39:51AM +0000, Taehee Yoo wrote:
+> This patchset is to implement aria-avx2 and aria-avx512.
+> There are some differences between aria-avx, aria-avx2, and aria-avx512,
+> but they are not core logic(s-box, diffusion layer).
 
-Fortunately none of this was necessary, and I've got things implemented
-without needing to resort to that, for v+1.
+From: Documentation/process/submitting-patches.rst
 
-Jason
+"Don't get discouraged - or impatient
+------------------------------------
+
+After you have submitted your change, be patient and wait.  Reviewers are
+busy people and may not get to your patch right away.
+
+Once upon a time, patches used to disappear into the void without comment,
+but the development process works more smoothly than that now.  You should
+receive comments within a week or so; if that does not happen, make sure
+that you have sent your patches to the right place.  Wait for a minimum of
+						     ^^^^^^^^^^^^^^^^^^^^^
+one week before resubmitting or pinging reviewers - possibly longer during
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+busy times like merge windows."
+
+IOW, pls stop spamming with your patchset.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
