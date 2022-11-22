@@ -2,96 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F46CC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 10:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B990C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 10:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233134AbiKVKSR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 05:18:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43572 "EHLO
+        id S233609AbiKVKZZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 05:25:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233092AbiKVKRf (ORCPT
+        with ESMTP id S233208AbiKVKY4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 05:17:35 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C21E03B;
-        Tue, 22 Nov 2022 02:17:33 -0800 (PST)
-Received: from zn.tnic (p200300ea9733e79b329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e79b:329c:23ff:fea6:a903])
+        Tue, 22 Nov 2022 05:24:56 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF37912AE8
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 02:22:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BD30A1EC05B0;
-        Tue, 22 Nov 2022 11:17:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1669112251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=XW4KmeE1lzqUbSDQgw0OBkM1KYWQdDzwu91w2ZjF5TE=;
-        b=DuntGKBHRGyMI+yzTr/TwqOwnXXDvqJwm7SvqoGXUYJE2lj3j59lFGw4qmF1O/GolhkxaD
-        znTMJZE0D+1CNoNoXmaS8NoRZqyVqGPCi+dEqhpgxF1zpSS8HjfKxbF+sGYlPJQ0JAISRH
-        NfC5xXH13XU7o0cbQWyhEwSOCcWVIZ4=
-Date:   Tue, 22 Nov 2022 11:17:26 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y3yhthJTIWqjjAPK@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
- <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
- <b712bc81-4446-9be4-fd59-d08981d13475@amd.com>
- <Y3qdTuZQoDZxUgbw@zn.tnic>
- <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1E29BB819D6
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 10:22:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C0EC433D6;
+        Tue, 22 Nov 2022 10:22:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669112558;
+        bh=H/s0YY6Nqh5hcAyWsUutldDo2QE+Z110LD9Bv0I4A5A=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=dgcHhF+ZT9j21//JZ0WGKvg8fTRyvO267NhE8dWNlTeUqbWahnXgUG+PT0XWuzutg
+         HXo0Qq5l1INo4GqKdMukjdXTvh1/81IFOoS5IOLToNs2+dbbstbJDfNUumuSXejEYC
+         ByaEvmmokYC/7585o7t1W8Kk8uh9OAzUR07awgm8eb5jPJ8QZLdbwGD4KOeVU0n/1x
+         cjZ0q6GWP3NYfo6mfVCkwkgFIimxDNRwPzP4UIRKDQcpKvxjx2PnHi38rmpKSM/HZy
+         hES1X/IxYsfgMq2Gwgxe1Drx4hzbm6aBdcx7N9Aao4eBsYFRAV0uOF6ZZ85rMtR3Jp
+         ehPHbRK7CQV6Q==
+Date:   Tue, 22 Nov 2022 11:22:37 +0100 (CET)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        Andrej Shadura <andrew.shadura@collabora.co.uk>
+Subject: Re: [PATCH] hwrng: u2fzero - account for high quality RNG
+In-Reply-To: <20221119134259.2969204-1-Jason@zx2c4.com>
+Message-ID: <nycvar.YFH.7.76.2211221122220.6045@cbobk.fhfr.pm>
+References: <20221119134259.2969204-1-Jason@zx2c4.com>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cffed3c2-55a9-bdd3-3b8a-82b2050a64af@amd.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 06:37:18PM -0600, Kalra, Ashish wrote:
-> I agree, but these pages are not in the right state to be released back to
+On Sat, 19 Nov 2022, Jason A. Donenfeld wrote:
 
-Which pages exactly?
+> The U2F zero apparently has a real TRNG in it with maximum quality, not
+> one with quality of "1", which was likely a misinterpretation of the
+> field as a boolean. So remove the assignment entirely, so that we get
+> the default quality setting.
+> 
+> In the u2f-zero firmware, the 0x21 RNG command used by this driver is
+> handled as such [1]:
+> 
+>   case U2F_CUSTOM_GET_RNG:
+>     if (atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,ATECC_RNG_P2,
+>       NULL, 0,
+>       appdata.tmp,
+>       sizeof(appdata.tmp), &res) == 0 )
+>     {
+>       memmove(msg->pkt.init.payload, res.buf, 32);
+>       U2FHID_SET_LEN(msg, 32);
+>       usb_write((uint8_t*)msg, 64);
+>     }
+>     else
+>     {
+>       U2FHID_SET_LEN(msg, 0);
+>       usb_write((uint8_t*)msg, 64);
+>     }
+> 
+> This same call to `atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,
+> ATECC_RNG_P2,...)` is then also used in the token's cryptographically
+> critical "u2f_new_keypair" function, as its rather straightforward
+> source of random bytes [2]:
+> 
+>   int8_t u2f_new_keypair(uint8_t * handle, uint8_t * appid, uint8_t * pubkey)
+>   {
+>     struct atecc_response res;
+>     uint8_t private_key[36];
+>     int i;
+> 
+>     watchdog();
+> 
+>     if (atecc_send_recv(ATECC_CMD_RNG,ATECC_RNG_P1,ATECC_RNG_P2,
+>       NULL, 0,
+>       appdata.tmp,
+>       sizeof(appdata.tmp), &res) != 0 )
+>     {
+>       return -1;
+>     }
+> 
+> So it seems rather plain that the ATECC RNG is considered to provide
+> good random numbers.
+> 
+> [1] https://github.com/conorpp/u2f-zero/blob/master/firmware/src/custom.c
+> [2] https://github.com/conorpp/u2f-zero/blob/master/firmware/src/u2f_atecc.c
 
-Some pages' state has really changed underneath or you've given the
-wrong range?
-
-> It might be a user/sev-guest error, but these pages are now unsafe to use.
-> So is a kernel panic justified here, instead of not releasing the pages back
-> to host and logging errors for the same.
-
-Ok, there are two cases:
-
-* kernel error: I guess a big fat warning is the least we can issue
-here. Not sure about panic considering this should almost never happen
-and a warning would allow for people to catch dumps and debug the issue.
-
-* firmware error: I don't think you can know that that is really
-the case on a production system without additional fw debugging
-capabilities. Dumping a warning would be the least we can do here too,
-to signal that something's out of the ordinary and so people can look
-into it further.
-
-So yeah, a big fat warning is a good start. And then you don't need any
-memory poisoning etc gunk.
+Good catch, thanks Jason. Applied.
 
 -- 
-Regards/Gruss,
-    Boris.
+Jiri Kosina
+SUSE Labs
 
-https://people.kernel.org/tglx/notes-about-netiquette
