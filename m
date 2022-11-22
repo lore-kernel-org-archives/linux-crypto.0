@@ -2,92 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F402C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 22:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040E3C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 22:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234919AbiKVWgn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 17:36:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39722 "EHLO
+        id S234981AbiKVWzk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 17:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234552AbiKVWgl (ORCPT
+        with ESMTP id S235307AbiKVWzP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 17:36:41 -0500
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C5BC900F
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 14:36:40 -0800 (PST)
-Received: from [192.168.1.18] ([86.243.100.34])
-        by smtp.orange.fr with ESMTPA
-        id xbsaozAnSpJKlxbsaorx22; Tue, 22 Nov 2022 23:36:38 +0100
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 22 Nov 2022 23:36:38 +0100
-X-ME-IP: 86.243.100.34
-Message-ID: <a83e5419-c19f-764f-9860-08385d7dd757@wanadoo.fr>
-Date:   Tue, 22 Nov 2022 23:36:35 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH] crypto: amlogic - Save a few bytes of memory
-Content-Language: fr, en-US
-To:     Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc:     Corentin Labbe <clabbe@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 22 Nov 2022 17:55:15 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED241244
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 14:54:55 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id q98-20020a17090a1b6b00b00218c081f92bso2982666pjq.8
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 14:54:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CPjzMg27nsggyssWlNTVqAdofNU6F96gO6p2IIRQk5M=;
+        b=SGVC0BD1YliTiWMIJWZXNMQlsIXRWnLU/5veN8ZD5UKOWOyjuM7aLFNgGBiAbylFp2
+         9mChjb2FfHD+O5dctg1wpnQo3WYZjL3KTkA/8zz2mfvkQHjQARf5v5XpYemA+e/SkNpD
+         UisNmhrXN1j40KoZ0rNhD/FNprmaAXBrf2URzOJhZCqVZmoJ8c7J/JpBh6WLoupZgd3n
+         X41sQDiTK6defUGTdcoOcjhnQ6vAN5AYkhE53vi8+m9qwmjD2r0OWqwN59peD96l/97d
+         MWyxzkhYLtTpuBKUSmnM7iFJZVDIu3iqxD7molmaEdDyFu44ulprv+qY5X8l0IT53VoS
+         mmQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CPjzMg27nsggyssWlNTVqAdofNU6F96gO6p2IIRQk5M=;
+        b=wSlm+cJF/ErarCmiJIxNGTBXO2CQcUrxRbcBS5eyvX0P+iNBcP0KmB7wMhhXi581xR
+         vtBb1p8l3X0eAmyCw3VGjqt83S16CnQPR4GA+cQ5b6dmDmoGFAFGoUNjXrerHZ3TElDG
+         2gn89pbc9efjbz11QXG1A09ySdOlwmPaRrdidTQoSJLRJF28nPk/wCPMZrXpYRQHAh9c
+         DNRLKUnYDOq30jhNOqns4wJMuqj6+6r1wGCgviPVD3NfxTDVdE33ECWozhJU+K5at098
+         QUJVfzHXqWNAgyX3LfjpTKTHghy0XIQYD7szUPrtdUP5BGxz47sVEYGodSGnpHaJyv1p
+         29sQ==
+X-Gm-Message-State: ANoB5pkoNHV59cbtbF0g/TBqUTtHw0hPfL1NpM0EdCz8NanUMKWsrNf8
+        N782kir2bX6LfdulD3NccFvyncfPun4T6Ac=
+X-Google-Smtp-Source: AA0mqf6dt/I3YMYEPf//iDeyEt8ma9uMDG8TKQr0w1uAP4PK1B8ZTSUxRuz7gesc9hX5Jp6Mgo01SqoODZHFnQA9
+X-Received: from joefradley-custom-96.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:831])
+ (user=joefradley job=sendgmr) by 2002:a17:902:6505:b0:172:7a15:9a61 with SMTP
+ id b5-20020a170902650500b001727a159a61mr9143392plk.71.1669157695439; Tue, 22
+ Nov 2022 14:54:55 -0800 (PST)
+Date:   Tue, 22 Nov 2022 14:54:49 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
+Message-ID: <20221122225450.789234-1-joefradley@google.com>
+Subject: [PATCH] crypto: x86/curve25519 - disable gcov
+From:   Joe Fradley <joefradley@google.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org
-References: <c797dc5e9248498918916a6eeedaa25de2196e8c.1669154149.git.christophe.jaillet@wanadoo.fr>
- <CAFBinCAEwYaEvmGjen_LPO52BcyUFD2EKtzzzfZ1rMuVuihEqA@mail.gmail.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <CAFBinCAEwYaEvmGjen_LPO52BcyUFD2EKtzzzfZ1rMuVuihEqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Cc:     kernel-team@android.com, Joe Fradley <joefradley@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 22/11/2022 à 23:02, Martin Blumenstingl a écrit :
-> On Tue, Nov 22, 2022 at 10:57 PM Christophe JAILLET
-> <christophe.jaillet@wanadoo.fr> wrote:
->>
->> There is no real point in allocating dedicated memory for the irqs array.
->> MAXFLOW is only 2, so it is easier to allocated the needed space
->> directly within the 'meson_dev' structure.
->>
->> This saves some memory allocation and avoids an indirection when using the
->> irqs array.
-> ..and it even fixes a missing devm_kcalloc error check
-> 
-> Personally I prefer this approach over a patch that was sent earlier today: [0]
-> Corentin, Christophe, what do you think?
-> 
-> 
-> Best regards,
-> Martin
-> 
-> 
-> [0] https://lore.kernel.org/linux-crypto/0df30bbf-3b7e-ed20-e316-41192bf3cc2b@linaro.org/T/#m6a45b44206c282f106d379b01d19027823c5d79b
-> 
+curve25519-x86_64.c fails to build when CONFIG_GCOV_KERNEL is enabled.
+The error is "inline assembly requires more registers than available"
+thrown from the `fsqr()` function. Therefore, excluding this file from
+GCOV profiling until this issue is resolved. Thereby allowing
+CONFIG_GCOV_PROFILE_ALL to be enabled for x86.
 
-Unrelated, but I think that meson_irq_handler() needs a small ajustement 
-to avoid printing a spurious message if readl() returns 0.
+Signed-off-by: Joe Fradley <joefradley@google.com>
+---
+ arch/x86/crypto/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Maybe something like that?:
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 3b1d701a4f6c..3e7a329235bd 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -107,3 +107,6 @@ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $< > $@
+ $(obj)/%.S: $(src)/%.pl FORCE
+ 	$(call if_changed,perlasm)
++
++# Disable GCOV in odd or sensitive code
++GCOV_PROFILE_curve25519-x86_64.o := n
+-- 
+2.38.1.584.g0f3c55d4c2-goog
 
-
-@@ -33,9 +33,10 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
-  				writel_relaxed(0xF, mc->base + ((0x4 + flow) << 2));
-  				mc->chanlist[flow].status = 1;
-  				complete(&mc->chanlist[flow].complete);
--				return IRQ_HANDLED;
-+			} else {
-+				dev_err(mc->dev, "%s %d Got irq for flow %d but ctrl is empty\n", 
-__func__, irq, flow);
-  			}
--			dev_err(mc->dev, "%s %d Got irq for flow %d but ctrl is empty\n", 
-__func__, irq, flow);
-+			return IRQ_HANDLED;
-  		}
-  	}
-
-
-CJ
