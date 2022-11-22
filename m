@@ -2,103 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FD4C43217
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 02:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EAFC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 03:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232521AbiKVCEn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Nov 2022 21:04:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
+        id S230086AbiKVDI0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Nov 2022 22:08:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232475AbiKVCEc (ORCPT
+        with ESMTP id S231512AbiKVDIZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Nov 2022 21:04:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06318E1BE9;
-        Mon, 21 Nov 2022 18:04:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C33F61535;
-        Tue, 22 Nov 2022 02:04:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30579C433C1;
-        Tue, 22 Nov 2022 02:04:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BGNj21rW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669082663;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vkeduciqhe1mqitAhHmTJDsUwtd6lypQ7E4Gmk8k5k4=;
-        b=BGNj21rWuQtsUCbGvvnhXgwq2HWXDcnzpwDd4fUPBlUMqG8qhfAjalEo5ae+zAN37ik/Sl
-        VnRNqqcyzOUczsejvgUpKz1RAqmLm6CC1C/EUVnYwPTMTalv6soYIRwhHI4OTdm82EIFLA
-        EC0ITg2PRjiAeozm43gVEkGCTGuy3sg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0de690a5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 22 Nov 2022 02:04:23 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-efi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-        ardb@kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v3 5/5] efi: random: refresh non-volatile random seed when RNG is initialized
-Date:   Tue, 22 Nov 2022 03:04:04 +0100
-Message-Id: <20221122020404.3476063-6-Jason@zx2c4.com>
-In-Reply-To: <20221122020404.3476063-1-Jason@zx2c4.com>
-References: <20221122020404.3476063-1-Jason@zx2c4.com>
+        Mon, 21 Nov 2022 22:08:25 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7294E17422;
+        Mon, 21 Nov 2022 19:08:24 -0800 (PST)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NGThn6Kgsz15MpV;
+        Tue, 22 Nov 2022 11:07:53 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 22 Nov
+ 2022 11:08:22 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <yuehaibing@huawei.com>,
+        <cuigaosheng1@huawei.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] crypto: ccree - Fix section mismatch due to cc_debugfs_global_fini()
+Date:   Tue, 22 Nov 2022 11:05:55 +0800
+Message-ID: <20221122030555.26612-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-EFI has a rather unique benefit that it has access to some limited
-non-volatile storage, where the kernel can store a random seed. Register
-a notification for when the RNG is initialized, and at that point, store
-a new random seed.
+cc_debugfs_global_fini() is marked with __exit now, however it is used
+in __init ccree_init() for cleanup. Remove the __exit annotation to fix
+build warning:
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+WARNING: modpost: drivers/crypto/ccree/ccree.o: section mismatch in reference: init_module (section: .init.text) -> cc_debugfs_global_fini (section: .exit.text)
+
+Fixes: 4f1c596df706 ("crypto: ccree - Remove debugfs when platform_driver_register failed")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/firmware/efi/efi.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/crypto/ccree/cc_debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/efi/efi.c b/drivers/firmware/efi/efi.c
-index f12cc29bd4b8..b23ec97d68ea 100644
---- a/drivers/firmware/efi/efi.c
-+++ b/drivers/firmware/efi/efi.c
-@@ -337,6 +337,24 @@ static void __init efi_debugfs_init(void)
- static inline void efi_debugfs_init(void) {}
- #endif
+diff --git a/drivers/crypto/ccree/cc_debugfs.c b/drivers/crypto/ccree/cc_debugfs.c
+index 7083767602fc..8f008f024f8f 100644
+--- a/drivers/crypto/ccree/cc_debugfs.c
++++ b/drivers/crypto/ccree/cc_debugfs.c
+@@ -55,7 +55,7 @@ void __init cc_debugfs_global_init(void)
+ 	cc_debugfs_dir = debugfs_create_dir("ccree", NULL);
+ }
  
-+static void refresh_nv_rng_seed(struct work_struct *work)
-+{
-+	u8 seed[EFI_RANDOM_SEED_SIZE];
-+
-+	get_random_bytes(seed, sizeof(seed));
-+	efi.set_variable(L"RandomSeed", &LINUX_EFI_RANDOM_SEED_TABLE_GUID,
-+			 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS |
-+			 EFI_VARIABLE_RUNTIME_ACCESS, sizeof(seed), seed);
-+	memzero_explicit(seed, sizeof(seed));
-+}
-+static int refresh_nv_rng_seed_notification(struct notifier_block *nb, unsigned long action, void *data)
-+{
-+	static DECLARE_WORK(work, refresh_nv_rng_seed);
-+	schedule_work(&work);
-+	return NOTIFY_DONE;
-+}
-+static struct notifier_block refresh_nv_rng_seed_nb = { .notifier_call = refresh_nv_rng_seed_notification };
-+
- /*
-  * We register the efi subsystem with the firmware subsystem and the
-  * efivars subsystem with the efi subsystem, if the system was booted with
-@@ -413,6 +431,7 @@ static int __init efisubsys_init(void)
- 		platform_device_register_simple("efi_secret", 0, NULL, 0);
- #endif
- 
-+	execute_with_initialized_rng(&refresh_nv_rng_seed_nb);
- 	return 0;
- 
- err_remove_group:
+-void __exit cc_debugfs_global_fini(void)
++void cc_debugfs_global_fini(void)
+ {
+ 	debugfs_remove(cc_debugfs_dir);
+ }
 -- 
-2.38.1
+2.17.1
 
