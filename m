@@ -2,91 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84803C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 07:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863DDC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 09:08:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231998AbiKVHtS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 02:49:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
+        id S233103AbiKVJIE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 04:08:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232552AbiKVHtP (ORCPT
+        with ESMTP id S233100AbiKVJH4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 02:49:15 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78FE9326E3;
-        Mon, 21 Nov 2022 23:49:15 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id q1so13368095pgl.11;
-        Mon, 21 Nov 2022 23:49:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSSoozAZzRH9A1wAx3O1UtGKYxpTu5VxtCoRrtwK2vs=;
-        b=B/dBYyTTnKT7UAez0oRgLP+5AYwNFEkcu8aKlEgvqpvRqqb4fueqo2RyXLOpy6ZhCY
-         UYdSzoMPTd7EEtiwosfh2XIhTLqQXLyY2rRdbIXYIFHecdA/0rXnFJq9NkM5xiJ2sDGb
-         njNRp9Jt4CAUic8/SCiSTsKXCV191YK5Mp1H4od3csFZByMS0OLUU6OJLu5U5A+4HUQN
-         ddUFN1yyptOldI5pc88s7DbGRvStFtHKiOH2mK9ZeVu25xruId53Sdipgk43gJeqwjbe
-         p2JtNKs5R/pJ3XhrezhQ6TeVffl0OkIs+MyIpl46/DlLD+V7jvqn5KimqkNv55CVbVIi
-         E8Xg==
+        Tue, 22 Nov 2022 04:07:56 -0500
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB5213E3C;
+        Tue, 22 Nov 2022 01:07:55 -0800 (PST)
+Received: by mail-qt1-f179.google.com with SMTP id fz10so8885740qtb.3;
+        Tue, 22 Nov 2022 01:07:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MSSoozAZzRH9A1wAx3O1UtGKYxpTu5VxtCoRrtwK2vs=;
-        b=xDYRF1GMxOqbChmn7O4fIyKRBfV36rV0a2UvXS3lh6AtGo/lt72Qh5bZGZtIM7FyE9
-         deB25d+ZOZH6fXi6EC+elE+N6cmKYu+kl7+rSClD7FlHZZr8XkzSHHJhJl5dvCvy7AXx
-         Cm3+ad77a5JsUePqpxlOCK7gcIKTJ9A4/A6j89NwnNWI+5BO/dlmlRJbZ87EZhI60i09
-         LMvAdX+ltqHLcu6GDECh/PGpzDR1v9tr7rgcFWqk5i650+B4TlWwo0DYU/kgPQkniK/i
-         HZ0sepgVfMtaXjBpHVIYLtOvLsqkR2E+HzWPpLSzNA8L8obZUxVBoBd0G0SAoeGrz02e
-         Jmbw==
-X-Gm-Message-State: ANoB5pkRIdLGeQ7apPC7P4XCNJJwxDJ032f/s1lrciipfp/dnsMnuFf0
-        89tWiUtK31eqQcv15aEn0A4=
-X-Google-Smtp-Source: AA0mqf7yNMD10vwqp/eRaFaidwpSoecHkLL8zdMZ858lpRpHirXrNA19mcKEfOLKeXUrwgGvM6Edzg==
-X-Received: by 2002:aa7:9635:0:b0:56b:6936:ddf6 with SMTP id r21-20020aa79635000000b0056b6936ddf6mr2588811pfg.84.1669103354867;
-        Mon, 21 Nov 2022 23:49:14 -0800 (PST)
-Received: from localhost.localdomain ([43.132.141.3])
-        by smtp.gmail.com with ESMTPSA id mv13-20020a17090b198d00b0021896fa945asm5951141pjb.15.2022.11.21.23.49.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 23:49:14 -0800 (PST)
-From:   zys.zljxml@gmail.com
-To:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH] crypto: marvell/octeontx - remove redundant NULL check
-Date:   Tue, 22 Nov 2022 15:49:00 +0800
-Message-Id: <20221122074900.3660531-1-zys.zljxml@gmail.com>
-X-Mailer: git-send-email 2.27.0
+        bh=+me+gK92AeljrWBvAVG/MPMCTgxhzzYX45cfGkqB9FI=;
+        b=P8uJvE6M453q/yaKyiUoqkYAq38q7RROsYrI8WSGSahQ+P9lP8q+8LttjtzI0DXy4B
+         DWZ/5q30+0mfwEbfOPYxYDx6b9xEFjxQSM0fWaPijhuVVw4xL4C6nys1/M1CnUZdROV+
+         JfgT0pLoFZXtqNDbRQrHUZu8eidDnAHEJF7sIheQQKIbmtdktzr2lmEB6P7xrjNB7Z6m
+         3vMQC5H5ZOM9MKhoYAVYE11WKywZu/gAHEJaQeCCnYZaHClW7+s0UrEqLV25v5IcRQQK
+         Su5cTB7MCwIlRv+ZKJkNLaBB540cRI/WE6u1pp6LeOyar2xFebZ5HEFDbZkYMgG8fQfb
+         Sa3Q==
+X-Gm-Message-State: ANoB5pm0XkHEdsnH0lHSV2H+QxWy4LGyGGiRRCeTvqMa7RJ77MHSz8Pn
+        KcSW/RwB1N5zJpZe7o+ezsy/aAEKw61b2Q==
+X-Google-Smtp-Source: AA0mqf6AL1ZlFa3kiRXsCQnyXAu3JFQ2OdTNRM52D6hFwZUWTf3EfEQo5NWRT2xotyBNK/iQMZmUTw==
+X-Received: by 2002:a05:622a:5a15:b0:3a5:3388:4089 with SMTP id fy21-20020a05622a5a1500b003a533884089mr20598633qtb.601.1669108073884;
+        Tue, 22 Nov 2022 01:07:53 -0800 (PST)
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com. [209.85.128.182])
+        by smtp.gmail.com with ESMTPSA id de13-20020a05620a370d00b006e99290e83fsm9936515qkb.107.2022.11.22.01.07.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Nov 2022 01:07:53 -0800 (PST)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-3691e040abaso137949847b3.9;
+        Tue, 22 Nov 2022 01:07:52 -0800 (PST)
+X-Received: by 2002:a05:690c:b81:b0:37e:6806:a5f9 with SMTP id
+ ck1-20020a05690c0b8100b0037e6806a5f9mr5473386ywb.47.1669108072643; Tue, 22
+ Nov 2022 01:07:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221122030555.26612-1-yuehaibing@huawei.com>
+In-Reply-To: <20221122030555.26612-1-yuehaibing@huawei.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 22 Nov 2022 10:07:41 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVjzL5PSBYKfE05xcCVMX+LTwCDNq0iWk-z2WAFyDZ4mw@mail.gmail.com>
+Message-ID: <CAMuHMdVjzL5PSBYKfE05xcCVMX+LTwCDNq0iWk-z2WAFyDZ4mw@mail.gmail.com>
+Subject: Re: [PATCH -next] crypto: ccree - Fix section mismatch due to cc_debugfs_global_fini()
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     gilad@benyossef.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, cuigaosheng1@huawei.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Yushan Zhou <katrinzhou@tencent.com>
+On Tue, Nov 22, 2022 at 4:12 AM YueHaibing <yuehaibing@huawei.com> wrote:
+> cc_debugfs_global_fini() is marked with __exit now, however it is used
+> in __init ccree_init() for cleanup. Remove the __exit annotation to fix
+> build warning:
+>
+> WARNING: modpost: drivers/crypto/ccree/ccree.o: section mismatch in reference: init_module (section: .init.text) -> cc_debugfs_global_fini (section: .exit.text)
+>
+> Fixes: 4f1c596df706 ("crypto: ccree - Remove debugfs when platform_driver_register failed")
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 
-release_firmware() checks whether firmware pointer is NULL. Remove the redundant NULL check in release_tar_archive().
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
----
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Gr{oetje,eeting}s,
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-index df9c2b8747e6..c4250e5fcf8f 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-@@ -345,8 +345,7 @@ static void release_tar_archive(struct tar_arch_info_t *tar_arch)
- 		kfree(curr);
- 	}
- 
--	if (tar_arch->fw)
--		release_firmware(tar_arch->fw);
-+	release_firmware(tar_arch->fw);
- 	kfree(tar_arch);
- }
- 
--- 
-2.27.0
+                        Geert
 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
