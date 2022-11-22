@@ -2,141 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B384C4321E
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 20:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E518AC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 22:02:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234775AbiKVUSV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 15:18:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58430 "EHLO
+        id S234233AbiKVWCa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 17:02:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234477AbiKVUSO (ORCPT
+        with ESMTP id S233551AbiKVWC2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 15:18:14 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F46E13D12
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 12:18:13 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oxZhX-0006Qx-Bo; Tue, 22 Nov 2022 21:17:03 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oxZhR-005v1B-UM; Tue, 22 Nov 2022 21:16:58 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oxZhS-000s7U-3N; Tue, 22 Nov 2022 21:16:58 +0100
-Date:   Tue, 22 Nov 2022 21:16:54 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Jonathan Cameron <jic23@kernel.org>
-Cc:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        alsa-devel@alsa-project.org, linux-staging@lists.linux.dev,
-        linux-pwm@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
-        Lee Jones <lee.jones@linaro.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-leds@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-pm@vger.kernel.org,
-        Broadcom internal kernel review list 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
-        Grant Likely <grant.likely@linaro.org>,
-        linux-media@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, chrome-platform@lists.linux.dev,
-        linux-actions@lists.infradead.org, linux-gpio@vger.kernel.org,
-        Angel Iglesias <ang.iglesiasg@gmail.com>,
-        gregkh@linuxfoundation.org, linux-rpi-kernel@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Purism Kernel Team <kernel@puri.sm>,
-        patches@opensource.cirrus.com, linux-usb@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
-        Wolfram Sang <wsa@kernel.org>, linux-crypto@vger.kernel.org,
-        kernel@pengutronix.de, netdev@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
-Message-ID: <20221122201654.5rdaisqho33buibj@pengutronix.de>
-References: <20221118224540.619276-1-uwe@kleine-koenig.org>
- <20221122185818.3740200d@jic23-huawei>
+        Tue, 22 Nov 2022 17:02:28 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54740E4A;
+        Tue, 22 Nov 2022 14:02:27 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id f7so22517431edc.6;
+        Tue, 22 Nov 2022 14:02:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kotx7AX+mwT6i3vVwmp53VI7mNBUsRUlYdaX0ddPLx4=;
+        b=csJ/w3Z/BVCLiUCwgR+l0WjPTQ/6GzS+9Q2LmSS5lJUpp+EPqRZbkNHc3L3yHLoLvc
+         PJ5Ox5jzhrlEWblaHV95o5322ojh06DK/41lht5fxhT535BzULuYEHTI4IHZpHUrbRpy
+         LiPIUvAQ4XuS/Qu46TMwoXnyg3SATPM6bxy+3VF1t1tnehCp9EcIGPNHKam5Nfi/IJW6
+         Z03ur3QObKCpMYnlagjKgebK18iOLw7hgD9Gqw+yDQekIwWmPnsNDJArvozTkr8+mxb8
+         s2h679vzFZjyxUfa7sAcpFm+EesfZBpszAG/qryFwIpZR/dZaN2spDDeG/m1eyWnzTOv
+         RKbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kotx7AX+mwT6i3vVwmp53VI7mNBUsRUlYdaX0ddPLx4=;
+        b=JKilmViSzVKB5mEcfEskY5E6VLCablSVsd2EpKzyQRqlqxAsioYZ3F2IIK4NMu1qcC
+         DlXyQDCeoK98iZK25JFupecgVkMGl3CqoIomQmZkGw7HNDIc6YRSGd5HqoPtONMlcD6z
+         riNPV/zJJdhLuAdeBu4RfklVNkSf+lpR0Hzmjra0TA1nz1g0yx/7fEUl7m1J3XfofiO0
+         uAMiyf5Vz4Z/+JMhat/zM/yf1ONIBa02wJYktynNefS2ycSAmly1CNK/1LBirZlliYwD
+         QOMQP6DU591EfKUlBfpDPm2/UAAGI+Bj3yoX/kRPA2hjiHV60m3IhrsHW4v7JgcmN7hD
+         ZirQ==
+X-Gm-Message-State: ANoB5pn7+SwPEMXtQETosziONwa/CnkzqsymJaENmMv0WiUa7mijFr+B
+        4uY0m6XX9lXKj25oHBhi+VzRxNp+k8DrvggajmtY7BKk8tw=
+X-Google-Smtp-Source: AA0mqf5MwCypCpSb5xvKaM+6KzLx3LYUZLVsA79BUKoD+pz0QKKYqS7eFmzlTpVcUJrhCmW/bK7blIP9Bn3ueMmFP04=
+X-Received: by 2002:a05:6402:b84:b0:461:a89:8654 with SMTP id
+ cf4-20020a0564020b8400b004610a898654mr23079847edb.212.1669154545695; Tue, 22
+ Nov 2022 14:02:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="t3mjk627u66tfbb3"
-Content-Disposition: inline
-In-Reply-To: <20221122185818.3740200d@jic23-huawei>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <c797dc5e9248498918916a6eeedaa25de2196e8c.1669154149.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <c797dc5e9248498918916a6eeedaa25de2196e8c.1669154149.git.christophe.jaillet@wanadoo.fr>
+From:   Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Tue, 22 Nov 2022 23:02:14 +0100
+Message-ID: <CAFBinCAEwYaEvmGjen_LPO52BcyUFD2EKtzzzfZ1rMuVuihEqA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: amlogic - Save a few bytes of memory
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     Corentin Labbe <clabbe@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Nov 22, 2022 at 10:57 PM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> There is no real point in allocating dedicated memory for the irqs array.
+> MAXFLOW is only 2, so it is easier to allocated the needed space
+> directly within the 'meson_dev' structure.
+>
+> This saves some memory allocation and avoids an indirection when using the
+> irqs array.
+..and it even fixes a missing devm_kcalloc error check
 
---t3mjk627u66tfbb3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Personally I prefer this approach over a patch that was sent earlier today: [0]
+Corentin, Christophe, what do you think?
 
-On Tue, Nov 22, 2022 at 06:58:18PM +0000, Jonathan Cameron wrote:
->=20
-> Queued all of the below:
-> with one tweaked as per your suggestion and the highlighted one dropped o=
-n basis
-> I was already carrying the equivalent - as you pointed out.
->=20
-> I was already carrying the required dependency.
->=20
-> Includes the IIO ones in staging.
->=20
-> Thanks,
->=20
-> Jonathan
->=20
-> p.s. I perhaps foolishly did this in a highly manual way so as to
-> also pick up Andy's RB.  So might have dropped one...
 
-You could have done:
+Best regards,
+Martin
 
-	H=3D$(git rev-parse @)
-	b4 am -P 49-190 20221118224540.619276-1-uwe@kleine-koenig.org
-	git am ...
-	git filter-branch -f --msg-filter "grep -v 'Signed-off-by: Jonathan'; echo=
- 'Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>'; echo '=
-Signed-off-by: Jonathan Cameron <jic23@kernel.org>'" $H..
 
-(untested, but you get the idea).
-
-> Definitely would have been better as one patch per subsystem with
-> a cover letter suitable for replies like Andy's to be picked up
-> by b4.
-
-Next time I will go for one series per subsystem which I like better
-than one patch per subsystem.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---t3mjk627u66tfbb3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmN9LjMACgkQwfwUeK3K
-7An96wf/RMtsCSXVJy8BDrXiXMhey9OEm8p08ulRn0lKYlG54KR8nU/s77uuMjGS
-99aUfUU56Abxk02DuBv6N5Bax8nlFyIlUgkfaYPP9iN1TkF5XiucQ0Se4/haYL4A
-q11UqWIcKBS+5BL3K6Bl1Cqv4dPYpRvs99X3jlU6JmhFqJPPhPgAu0p74arSvLie
-kN6wgOGVdCjZTRD+Z7FxfIQPZqvVo7anPAynyk7XfgTXMSAK80JPR2UeMfvQ7yr2
-W28htsacTaJSnPOb1VIrhN8OytpxASYa120EJ8augNmBXC0IzvjosWI0LZnNljAU
-izPd/d6lzDCP0Mz/LU9QCBYUR1jxuQ==
-=KmMu
------END PGP SIGNATURE-----
-
---t3mjk627u66tfbb3--
+[0] https://lore.kernel.org/linux-crypto/0df30bbf-3b7e-ed20-e316-41192bf3cc2b@linaro.org/T/#m6a45b44206c282f106d379b01d19027823c5d79b
