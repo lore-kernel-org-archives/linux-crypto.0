@@ -2,103 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAF9C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 07:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84803C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 07:49:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232455AbiKVHms (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 02:42:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
+        id S231998AbiKVHtS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 02:49:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232448AbiKVHmq (ORCPT
+        with ESMTP id S232552AbiKVHtP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 02:42:46 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65AE1173
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 23:42:44 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id p13-20020a05600c468d00b003cf8859ed1bso10676851wmo.1
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Nov 2022 23:42:44 -0800 (PST)
+        Tue, 22 Nov 2022 02:49:15 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78FE9326E3;
+        Mon, 21 Nov 2022 23:49:15 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id q1so13368095pgl.11;
+        Mon, 21 Nov 2022 23:49:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QA8MIxpIapkC8rEFteuXA52vQ4uYeexAZXXoL3SYQDg=;
-        b=j9/erFQZhyBUbV56VTTVREPvqvvwUBRXSGqaVS/BckbFM00YyHGVlZJjQHBu66+Uhy
-         Nc8eyOJol/nhlpYY8ymw08M8wg8i/cPXaTrRdBvavolILqnQwLrveHQY61RbDm16JSP4
-         fCdjDGqu1vkVWbxNYrZl6mK0q0TGsNQRTl+mOVJ/XcqiCK2xS55uH58l54jhxwQpr7wa
-         z1vOHW4O9HVhinBazEUBY7ZIpq5pNTZiSbwPsAox4k82nVSithVEZl06lkHTOCu8mNvg
-         +yfMERxrxxgKPC5Uy/zQlAaw9yPyX1oqTIyRDq+AJsmGz24j7cEHHSqc889e51NvKmVf
-         9VJA==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSSoozAZzRH9A1wAx3O1UtGKYxpTu5VxtCoRrtwK2vs=;
+        b=B/dBYyTTnKT7UAez0oRgLP+5AYwNFEkcu8aKlEgvqpvRqqb4fueqo2RyXLOpy6ZhCY
+         UYdSzoMPTd7EEtiwosfh2XIhTLqQXLyY2rRdbIXYIFHecdA/0rXnFJq9NkM5xiJ2sDGb
+         njNRp9Jt4CAUic8/SCiSTsKXCV191YK5Mp1H4od3csFZByMS0OLUU6OJLu5U5A+4HUQN
+         ddUFN1yyptOldI5pc88s7DbGRvStFtHKiOH2mK9ZeVu25xruId53Sdipgk43gJeqwjbe
+         p2JtNKs5R/pJ3XhrezhQ6TeVffl0OkIs+MyIpl46/DlLD+V7jvqn5KimqkNv55CVbVIi
+         E8Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QA8MIxpIapkC8rEFteuXA52vQ4uYeexAZXXoL3SYQDg=;
-        b=HQ7r4CroRTbJvAQm+yaEIKlkmfHZDBcBCzy3L2qrUkX0GY9EOCB2uv2g3C4d9NLGkv
-         AsEYs4/xxfQxQN6isZdocR4Ef1mAhfSlAMVwVHEAKE9C7cxtiM9dDQA11Wyy6ywNi0Mg
-         fX4l4UU3NBw5bcLMS1VEUm9ebIwyV1aOYmPOxmuXNQnDvcMaAp/IlwEXDtwLDufDfMr9
-         mfqEOtMrkOJc4en2C1AAvun9f0sl88LmwdmGcTO5rvDds1cpHaV1Y1jfiQQBGLwl3flx
-         jzkobMN+spNaD8aiL2dgkkffKBbgxKaxbexHoGyDKKLt/i/kY2Qw4tTfAn8EkSKQWBJh
-         eaNg==
-X-Gm-Message-State: ANoB5pm3AkeoueeOeI3dwqsF/vyUiN8gQfumg+SMsrvI1Pyj+qDozj5Q
-        Yh1XZKC6tOwKcmZ4qr6uyniDYw==
-X-Google-Smtp-Source: AA0mqf4Ei//KY2A6ZGaG99iMhX8fGi7uYrNGLNXKBpd4mjqaLK9ggmNUXVO9NMVN9iSmOxMHvtie8g==
-X-Received: by 2002:a1c:f006:0:b0:3cf:7b68:631 with SMTP id a6-20020a1cf006000000b003cf7b680631mr19316735wmb.55.1669102963360;
-        Mon, 21 Nov 2022 23:42:43 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:6969:11a1:a2af:e8c0? ([2a01:e0a:982:cbb0:6969:11a1:a2af:e8c0])
-        by smtp.gmail.com with ESMTPSA id f8-20020a5d4dc8000000b002366c3eefccsm13187908wru.109.2022.11.21.23.42.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Nov 2022 23:42:42 -0800 (PST)
-Message-ID: <0df30bbf-3b7e-ed20-e316-41192bf3cc2b@linaro.org>
-Date:   Tue, 22 Nov 2022 08:42:40 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH] crypto: amlogic - Add check for devm_kcalloc
-To:     Jiasheng Jiang <jiasheng@iscas.ac.cn>, clabbe@baylibre.com,
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MSSoozAZzRH9A1wAx3O1UtGKYxpTu5VxtCoRrtwK2vs=;
+        b=xDYRF1GMxOqbChmn7O4fIyKRBfV36rV0a2UvXS3lh6AtGo/lt72Qh5bZGZtIM7FyE9
+         deB25d+ZOZH6fXi6EC+elE+N6cmKYu+kl7+rSClD7FlHZZr8XkzSHHJhJl5dvCvy7AXx
+         Cm3+ad77a5JsUePqpxlOCK7gcIKTJ9A4/A6j89NwnNWI+5BO/dlmlRJbZ87EZhI60i09
+         LMvAdX+ltqHLcu6GDECh/PGpzDR1v9tr7rgcFWqk5i650+B4TlWwo0DYU/kgPQkniK/i
+         HZ0sepgVfMtaXjBpHVIYLtOvLsqkR2E+HzWPpLSzNA8L8obZUxVBoBd0G0SAoeGrz02e
+         Jmbw==
+X-Gm-Message-State: ANoB5pkRIdLGeQ7apPC7P4XCNJJwxDJ032f/s1lrciipfp/dnsMnuFf0
+        89tWiUtK31eqQcv15aEn0A4=
+X-Google-Smtp-Source: AA0mqf7yNMD10vwqp/eRaFaidwpSoecHkLL8zdMZ858lpRpHirXrNA19mcKEfOLKeXUrwgGvM6Edzg==
+X-Received: by 2002:aa7:9635:0:b0:56b:6936:ddf6 with SMTP id r21-20020aa79635000000b0056b6936ddf6mr2588811pfg.84.1669103354867;
+        Mon, 21 Nov 2022 23:49:14 -0800 (PST)
+Received: from localhost.localdomain ([43.132.141.3])
+        by smtp.gmail.com with ESMTPSA id mv13-20020a17090b198d00b0021896fa945asm5951141pjb.15.2022.11.21.23.49.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Nov 2022 23:49:14 -0800 (PST)
+From:   zys.zljxml@gmail.com
+To:     bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
         herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20221122062230.22024-1-jiasheng@iscas.ac.cn>
-Content-Language: en-US
-From:   Neil Armstrong <neil.armstrong@linaro.org>
-Organization: Linaro Developer Services
-In-Reply-To: <20221122062230.22024-1-jiasheng@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yushan Zhou <katrinzhou@tencent.com>
+Subject: [PATCH] crypto: marvell/octeontx - remove redundant NULL check
+Date:   Tue, 22 Nov 2022 15:49:00 +0800
+Message-Id: <20221122074900.3660531-1-zys.zljxml@gmail.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/11/2022 07:22, Jiasheng Jiang wrote:
-> As the devm_kcalloc may return NULL pointer,
-> it should be better to add check for the return
-> value, as same as the others.
-> 
-> Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
-> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
-> ---
->   drivers/crypto/amlogic/amlogic-gxl-core.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> index 6e7ae896717c..b243d6382664 100644
-> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -238,6 +238,9 @@ static int meson_crypto_probe(struct platform_device *pdev)
->   	}
->   
->   	mc->irqs = devm_kcalloc(mc->dev, MAXFLOW, sizeof(int), GFP_KERNEL);
-> +	if (!mc->irqs)
-> +		return -ENOMEM;
-> +
->   	for (i = 0; i < MAXFLOW; i++) {
->   		mc->irqs[i] = platform_get_irq(pdev, i);
->   		if (mc->irqs[i] < 0)
+From: Yushan Zhou <katrinzhou@tencent.com>
 
+release_firmware() checks whether firmware pointer is NULL. Remove the redundant NULL check in release_tar_archive().
 
-Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
+---
+ drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+index df9c2b8747e6..c4250e5fcf8f 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+@@ -345,8 +345,7 @@ static void release_tar_archive(struct tar_arch_info_t *tar_arch)
+ 		kfree(curr);
+ 	}
+ 
+-	if (tar_arch->fw)
+-		release_firmware(tar_arch->fw);
++	release_firmware(tar_arch->fw);
+ 	kfree(tar_arch);
+ }
+ 
+-- 
+2.27.0
+
