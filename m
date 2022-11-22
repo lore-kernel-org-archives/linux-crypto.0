@@ -2,159 +2,245 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD71C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 15:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF1DC43219
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 18:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233032AbiKVPFk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 10:05:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
+        id S234264AbiKVSp4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 13:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233478AbiKVPFk (ORCPT
+        with ESMTP id S233356AbiKVSpy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 10:05:40 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5140CD8;
-        Tue, 22 Nov 2022 07:05:38 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id c1so23971666lfi.7;
-        Tue, 22 Nov 2022 07:05:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=joRULvf1dWJkA5gWRTFhFCk8AeaMUxC+7TLKjnw2DLE=;
-        b=ER2Fw8emECT/rQge+eiBNkkviWG3kjbWsZCbV4x/Kgaljhp2rzXGAQygNJar3+6u44
-         QevH09MxTl6kJbQ0qPaESjwxa4GjqJr5YoXGhhnbrnofLSwud68+an31l+2EwkoR/nKs
-         Jg/cq7+qg2c1ILnIHDzqchGtMVrSKVGnJqH2FWFWAtbSvYbvhMwEa8bHPst5szIVBUuz
-         E85pH8kn9kRscODxb12XOnTFG+LM/br7nINFu+sS95yQ+OAwa+nmSbUSpQRV2lK1igRp
-         pQYKCnvgr/K31pf+OvF/dh9Xe0hZmw9rDcyEPaxUi6by+xYUymVne6HaWNeGLjtJRNg8
-         JEXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=joRULvf1dWJkA5gWRTFhFCk8AeaMUxC+7TLKjnw2DLE=;
-        b=UP1bQPiizPVTUBdOK/rc5VVxB5SaBYHppTcGii8JM1vSZP3bEorzwpojRmZquDI74J
-         umTHlAsKQjV4OO6ToIWai6AH2I9K43teIImDJoU8cRw1iPlMWzE4TJ/9Ngp26paa7g1L
-         M84p6+IWIZVG49md4XFQQ2gVUszQDq+oz0zmy1i27T3mUMS3dx+ovPDb3Wwtxd+19wCl
-         ko9X1Fhpo4ncAUG8quGYbyCI/bnxTSAiRkEssJRnUsbQFRpJKKEx7Qc5dGImfZEp62kk
-         pD5AXRzrIeBBW0AbOyipG7jIYdH3v3om0FESBo3Y7huR4JVEjBVYb+yzedAaxzy0QEF7
-         laNg==
-X-Gm-Message-State: ANoB5plbH5FD0Qwp1pgvwZEYLxzJQ6vv7V4JD79BbzmH4yz7fLSh43sw
-        IJydtlyRyJ9uG7yHHrEgR1w=
-X-Google-Smtp-Source: AA0mqf5OHYaGctuWCwcgr2ujiVoDrGqiB2RNftQYRObwVAsJZmt9XYndfhnGYv2vqwN8PdQGXddxvA==
-X-Received: by 2002:ac2:4a6a:0:b0:4b1:753b:e66f with SMTP id q10-20020ac24a6a000000b004b1753be66fmr2180872lfp.276.1669129536433;
-        Tue, 22 Nov 2022 07:05:36 -0800 (PST)
-Received: from razdolb (95-31-185-17.broadband.corbina.ru. [95.31.185.17])
-        by smtp.gmail.com with ESMTPSA id o6-20020a05651205c600b0049478cc4eb9sm2499071lfo.230.2022.11.22.07.05.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 07:05:35 -0800 (PST)
-References: <20220919210025.2376254-1-Jason@zx2c4.com>
- <32f8797a-4b65-69df-ee8e-7891a6b4f1af@arm.com>
- <YzMm4d3sZBHpitm9@aurel32.net> <YzNTB+RQK6yITi7/@Red>
- <YzNthZ0MtfwjIqdH@aurel32.net> <YzVNBcF7TCDldPwF@Red>
- <87y1sasrf2.fsf@gmail.com> <Y3zOn5IO1ziJXKUT@Red>
-User-agent: mu4e 1.9.0; emacs 28.2
-From:   Mikhail Rudenko <mike.rudenko@gmail.com>
-To:     Corentin LABBE <clabbe@baylibre.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lin Jinhan <troy.lin@rock-chips.com>, wevsty <ty@wevs.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lin Huang <hl@rock-chips.com>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH] hw_random: rockchip: import driver from vendor tree
-Date:   Tue, 22 Nov 2022 18:04:00 +0300
-In-reply-to: <Y3zOn5IO1ziJXKUT@Red>
-Message-ID: <877cznni69.fsf@gmail.com>
+        Tue, 22 Nov 2022 13:45:54 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940377FF22;
+        Tue, 22 Nov 2022 10:45:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CFCD6184A;
+        Tue, 22 Nov 2022 18:45:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B47C433C1;
+        Tue, 22 Nov 2022 18:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669142752;
+        bh=fqxt6my1VSa4mXhEYdIoCfXvdzW45n/iFIvfCGSEDwo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hhEERrBRIpsc+q9yO9csAlWHVhCaviR/WcBNWNuioF+tk6pV0ZhL7NiG1rd0mCAxq
+         1szidsMiWWaFcDgeW9EGShTYklszbBWjIUflN4ZPlaCK62nJuyzjDBPZTppOU3jv4N
+         8/hxDxIBUqAHSPgEChU749Xv+EuNTWQcC+6zplPAHN/Izkl+hvR/NDoy/ucWGRSQdw
+         6okmEtteWfpDi+EH50bg96/6ZjPlAMMe5gMT1Fl+eoDaKbHg0REnL4BteXHVhuIHEj
+         P64Js1Mq3YXxz372bDZyRlFZt9w4L3EsyIeqfNpZZSqs+lnqo+Nmvd9aWM/UsJjBvO
+         sa1pYfX2CaTsw==
+Date:   Tue, 22 Nov 2022 18:58:18 +0000
+From:   Jonathan Cameron <jic23@kernel.org>
+To:     Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <uwe@kleine-koenig.org>
+Cc:     Angel Iglesias <ang.iglesiasg@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Grant Likely <grant.likely@linaro.org>,
+        Wolfram Sang <wsa@kernel.org>, linux-i2c@vger.kernel.org,
+        kernel@pengutronix.de, linux-integrity@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        linux-rpi-kernel@lists.infradead.org, linux-iio@vger.kernel.org,
+        linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-media@vger.kernel.org, patches@opensource.cirrus.com,
+        linux-actions@lists.infradead.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, alsa-devel@alsa-project.org,
+        linux-omap@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-pm@vger.kernel.org, Purism Kernel Team <kernel@puri.sm>,
+        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        gregkh@linuxfoundation.org
+Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
+Message-ID: <20221122185818.3740200d@jic23-huawei>
+In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
+References: <20221118224540.619276-1-uwe@kleine-koenig.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On 2022-11-22 at 14:29 +01, Corentin LABBE <clabbe@baylibre.com> wrote:
+Queued all of the below:
+with one tweaked as per your suggestion and the highlighted one dropped on basis
+I was already carrying the equivalent - as you pointed out.
 
-> Le Wed, Nov 16, 2022 at 09:04:07PM +0300, Mikhail Rudenko a =C3=A9crit :
->>
->> On 2022-09-29 at 09:45 +02, LABBE Corentin <clabbe@baylibre.com> wrote:
->> > Le Tue, Sep 27, 2022 at 11:39:17PM +0200, Aurelien Jarno a =C3=A9crit :
->> >> On 2022-09-27 21:46, LABBE Corentin wrote:
->> >> > Le Tue, Sep 27, 2022 at 06:37:53PM +0200, Aurelien Jarno a =C3=A9cr=
-it :
->> >> > > On 2022-09-20 10:35, Robin Murphy wrote:
->> >> > > > On 2022-09-19 22:00, Jason A. Donenfeld wrote:
->> >> > > > > The Rockchip driver has long existed out of tree, but not ups=
-tream.
->> >> > > > > There is support for it upstream in u-boot, but not in Linux =
-proper.
->> >> > > > > This commit imports the GPLv2 driver written by Lin Jinhan, t=
-ogether
->> >> > > > > with the DTS and config blobs from Wevsty.
->> >> > > >
->> >> > > > Note that Corentin has a series enabling the full crypto driver=
- for
->> >> > > > RK3328 and RK3399[1], so it would seem more sensible to add TRN=
-G support
->> >> > > > to that. Having confliciting compatibles for the same hardware =
-that
->> >> > > > force the user to change their DT to choose one functionality o=
-r the
->> >> > > > other isn't good (plus there's also no binding for this one).
->> >> > >
->> >> > > It might make sense for the cryptov1-rng driver (I haven't checke=
-d). For
->> >> > > the cryptov2-rng driver, I looked at the RK3568 TRM (I can't find=
- the
->> >> > > RK3588 one), and from what I understand crypto and TRNG are two
->> >> > > different devices, using different address spaces, clock, reset a=
-nd
->> >> > > interrupts. The vendor kernel uses two different drivers.
->> >> > >
->> >> >
->> >> > I confirm that TRNG is not on the same IP on rk3568, something I di=
-dnt remark when doing my V2 driver. (I need to remove rng clock from rk3568=
- dt).
->> >> > But the rk3588 crypto IP and the TRNG are in the same device.
->> >>
->> >> Ok, thanks for confirming about the rk3568. It seems the only one in =
-the
->> >> family with separate devices for TRNG and crypto. Does it means we ne=
-ed
->> >> a separate TRNG driver only for it? Or could we handle it the same way
->> >> than for instance rk3588 anyway?
->> >
->> > I just got now the part 1 of rk3588 TRM which I has missing and it sho=
-w some conflicting information.
->> > rk3588 seems to have both a dedicated TRNG (TRNG_NS/TRNG_S) with dedic=
-ated address space and a TRNG inside the crypto IP.
->> > But for the moment, the TRNG inside crypto IP seems defective.
->>
->> So what's the ultimate decision? Does anyone work on merging this into
->> the existing crypto driver? I have a use case with an rk3399-based board,
->> where having hardware rng enhances boot times dramatically (at least for
->> some userspaces; see also [1]).
->>
->> [1] https://bugzilla.kernel.org/show_bug.cgi?id=3D216502
->>
->
-> Hello
->
-> I started to work on adding RNG to rk3288_crypto.
-> I need to publish the work on my github and take time to send it for revi=
-ew.
+I was already carrying the required dependency.
 
-Glad to hear you are working on this. Please cc me when posting patches :)
+Includes the IIO ones in staging.
 
->
-> Regards
+Thanks,
 
---
-Best regards,
-Mikhail Rudenko
+Jonathan
+
+p.s. I perhaps foolishly did this in a highly manual way so as to
+also pick up Andy's RB.  So might have dropped one...
+
+Definitely would have been better as one patch per subsystem with
+a cover letter suitable for replies like Andy's to be picked up
+by b4.
+
+
+>   iio: accel: adxl372_i2c: Convert to i2c's .probe_new()
+>   iio: accel: bma180: Convert to i2c's .probe_new()
+>   iio: accel: bma400: Convert to i2c's .probe_new()
+>   iio: accel: bmc150: Convert to i2c's .probe_new()
+>   iio: accel: da280: Convert to i2c's .probe_new()
+>   iio: accel: kxcjk-1013: Convert to i2c's .probe_new()
+>   iio: accel: mma7455_i2c: Convert to i2c's .probe_new()
+>   iio: accel: mma8452: Convert to i2c's .probe_new()
+>   iio: accel: mma9551: Convert to i2c's .probe_new()
+>   iio: accel: mma9553: Convert to i2c's .probe_new()
+>   iio: adc: ad7091r5: Convert to i2c's .probe_new()
+>   iio: adc: ad7291: Convert to i2c's .probe_new()
+>   iio: adc: ad799x: Convert to i2c's .probe_new()
+>   iio: adc: ina2xx-adc: Convert to i2c's .probe_new()
+>   iio: adc: ltc2471: Convert to i2c's .probe_new()
+>   iio: adc: ltc2485: Convert to i2c's .probe_new()
+>   iio: adc: ltc2497: Convert to i2c's .probe_new()
+>   iio: adc: max1363: Convert to i2c's .probe_new()
+>   iio: adc: max9611: Convert to i2c's .probe_new()
+>   iio: adc: mcp3422: Convert to i2c's .probe_new()
+>   iio: adc: ti-adc081c: Convert to i2c's .probe_new()
+>   iio: adc: ti-ads1015: Convert to i2c's .probe_new()
+>   iio: cdc: ad7150: Convert to i2c's .probe_new()
+>   iio: cdc: ad7746: Convert to i2c's .probe_new()
+>   iio: chemical: ams-iaq-core: Convert to i2c's .probe_new()
+>   iio: chemical: atlas-ezo-sensor: Convert to i2c's .probe_new()
+>   iio: chemical: atlas-sensor: Convert to i2c's .probe_new()
+>   iio: chemical: bme680_i2c: Convert to i2c's .probe_new()
+>   iio: chemical: ccs811: Convert to i2c's .probe_new()
+>   iio: chemical: scd4x: Convert to i2c's .probe_new()
+>   iio: chemical: sgp30: Convert to i2c's .probe_new()
+>   iio: chemical: sgp40: Convert to i2c's .probe_new()
+>   iio: chemical: vz89x: Convert to i2c's .probe_new()
+>   iio: dac: ad5064: Convert to i2c's .probe_new()
+>   iio: dac: ad5380: Convert to i2c's .probe_new()
+>   iio: dac: ad5446: Convert to i2c's .probe_new()
+>   iio: dac: ad5593r: Convert to i2c's .probe_new()
+>   iio: dac: ad5696-i2c: Convert to i2c's .probe_new()
+>   iio: dac: ds4424: Convert to i2c's .probe_new()
+>   iio: dac: m62332: Convert to i2c's .probe_new()
+>   iio: dac: max517: Convert to i2c's .probe_new()
+>   iio: dac: max5821: Convert to i2c's .probe_new()
+>   iio: dac: mcp4725: Convert to i2c's .probe_new()
+>   iio: dac: ti-dac5571: Convert to i2c's .probe_new()
+>   iio: gyro: bmg160_i2c: Convert to i2c's .probe_new()
+>   iio: gyro: itg3200_core: Convert to i2c's .probe_new()
+>   iio: gyro: mpu3050-i2c: Convert to i2c's .probe_new()
+>   iio: gyro: st_gyro_i2c: Convert to i2c's .probe_new()
+>   iio: health: afe4404: Convert to i2c's .probe_new()
+>   iio: health: max30100: Convert to i2c's .probe_new()
+>   iio: health: max30102: Convert to i2c's .probe_new()
+>   iio: humidity: am2315: Convert to i2c's .probe_new()
+>   iio: humidity: hdc100x: Convert to i2c's .probe_new()
+>   iio: humidity: hdc2010: Convert to i2c's .probe_new()
+>   iio: humidity: hts221_i2c: Convert to i2c's .probe_new()
+>   iio: humidity: htu21: Convert to i2c's .probe_new()
+>   iio: humidity: si7005: Convert to i2c's .probe_new()
+>   iio: humidity: si7020: Convert to i2c's .probe_new()
+>   iio: imu: bmi160/bmi160_i2c: Convert to i2c's .probe_new()
+>   iio: imu: fxos8700_i2c: Convert to i2c's .probe_new()
+>   iio: imu: inv_mpu6050: Convert to i2c's .probe_new()
+>   iio: imu: kmx61: Convert to i2c's .probe_new()
+>   iio: imu: st_lsm6dsx: Convert to i2c's .probe_new()
+>   iio: light: adjd_s311: Convert to i2c's .probe_new()
+>   iio: light: adux1020: Convert to i2c's .probe_new()
+>   iio: light: al3010: Convert to i2c's .probe_new()
+>   iio: light: al3320a: Convert to i2c's .probe_new()
+>   iio: light: apds9300: Convert to i2c's .probe_new()
+>   iio: light: apds9960: Convert to i2c's .probe_new()
+>   iio: light: bh1750: Convert to i2c's .probe_new()
+>   iio: light: bh1780: Convert to i2c's .probe_new()
+>   iio: light: cm3232: Convert to i2c's .probe_new()
+>   iio: light: cm3323: Convert to i2c's .probe_new()
+>   iio: light: cm36651: Convert to i2c's .probe_new()
+>   iio: light: gp2ap002: Convert to i2c's .probe_new()
+>   iio: light: gp2ap020a00f: Convert to i2c's .probe_new()
+>   iio: light: isl29018: Convert to i2c's .probe_new()
+>   iio: light: isl29028: Convert to i2c's .probe_new()
+>   iio: light: isl29125: Convert to i2c's .probe_new()
+>   iio: light: jsa1212: Convert to i2c's .probe_new()
+>   iio: light: ltr501: Convert to i2c's .probe_new()
+>   iio: light: lv0104cs: Convert to i2c's .probe_new()
+>   iio: light: max44000: Convert to i2c's .probe_new()
+>   iio: light: max44009: Convert to i2c's .probe_new()
+>   iio: light: noa1305: Convert to i2c's .probe_new()
+>   iio: light: opt3001: Convert to i2c's .probe_new()
+>   iio: light: pa12203001: Convert to i2c's .probe_new()
+>   iio: light: rpr0521: Convert to i2c's .probe_new()
+>   iio: light: si1133: Convert to i2c's .probe_new()
+>   iio: light: si1145: Convert to i2c's .probe_new()
+>   iio: light: st_uvis25_i2c: Convert to i2c's .probe_new()
+>   iio: light: stk3310: Convert to i2c's .probe_new()
+>   iio: light: tcs3414: Convert to i2c's .probe_new()
+>   iio: light: tcs3472: Convert to i2c's .probe_new()
+>   iio: light: tsl2563: Convert to i2c's .probe_new()
+>   iio: light: tsl2583: Convert to i2c's .probe_new()
+>   iio: light: tsl2772: Convert to i2c's .probe_new()
+>   iio: light: tsl4531: Convert to i2c's .probe_new()
+>   iio: light: us5182d: Convert to i2c's .probe_new()
+>   iio: light: vcnl4000: Convert to i2c's .probe_new()
+>   iio: light: vcnl4035: Convert to i2c's .probe_new()
+>   iio: light: veml6030: Convert to i2c's .probe_new()
+>   iio: light: veml6070: Convert to i2c's .probe_new()
+>   iio: light: zopt2201: Convert to i2c's .probe_new()
+>   iio: magnetometer: ak8974: Convert to i2c's .probe_new()
+>   iio: magnetometer: ak8975: Convert to i2c's .probe_new()
+>   iio: magnetometer: bmc150_magn_i2c: Convert to i2c's .probe_new()
+>   iio: magnetometer: hmc5843: Convert to i2c's .probe_new()
+>   iio: magnetometer: mag3110: Convert to i2c's .probe_new()
+>   iio: magnetometer: mmc35240: Convert to i2c's .probe_new()
+>   iio: magnetometer: yamaha-yas530: Convert to i2c's .probe_new()
+>   iio: potentiometer: ad5272: Convert to i2c's .probe_new()
+>   iio: potentiometer: ds1803: Convert to i2c's .probe_new()
+>   iio: potentiometer: max5432: Convert to i2c's .probe_new()
+>   iio: potentiometer: tpl0102: Convert to i2c's .probe_new()
+>   iio: potentiostat: lmp91000: Convert to i2c's .probe_new()
+>   iio: pressure: abp060mg: Convert to i2c's .probe_new()
+Not this one > iio: pressure: bmp280-i2c: Convert to i2c's .probe_new()
+>   iio: pressure: dlhl60d: Convert to i2c's .probe_new()
+>   iio: pressure: dps310: Convert to i2c's .probe_new()
+>   iio: pressure: hp03: Convert to i2c's .probe_new()
+>   iio: pressure: hp206c: Convert to i2c's .probe_new()
+>   iio: pressure: icp10100: Convert to i2c's .probe_new()
+>   iio: pressure: mpl115_i2c: Convert to i2c's .probe_new()
+>   iio: pressure: mpl3115: Convert to i2c's .probe_new()
+>   iio: pressure: ms5611_i2c: Convert to i2c's .probe_new()
+>   iio: pressure: ms5637: Convert to i2c's .probe_new()
+>   iio: pressure: st_pressure_i2c: Convert to i2c's .probe_new()
+>   iio: pressure: t5403: Convert to i2c's .probe_new()
+>   iio: pressure: zpa2326_i2c: Convert to i2c's .probe_new()
+>   iio: proximity: isl29501: Convert to i2c's .probe_new()
+>   iio: proximity: mb1232: Convert to i2c's .probe_new()
+>   iio: proximity: pulsedlight-lidar-lite-v2: Convert to i2c's
+>     .probe_new()
+>   iio: proximity: rfd77402: Convert to i2c's .probe_new()
+>   iio: proximity: srf08: Convert to i2c's .probe_new()
+>   iio: proximity: sx9500: Convert to i2c's .probe_new()
+>   iio: temperature: mlx90614: Convert to i2c's .probe_new()
+>   iio: temperature: mlx90632: Convert to i2c's .probe_new()
+>   iio: temperature: tmp006: Convert to i2c's .probe_new()
+>   iio: temperature: tmp007: Convert to i2c's .probe_new()
+>   iio: temperature: tsys01: Convert to i2c's .probe_new()
+>   iio: temperature: tsys02d: Convert to i2c's .probe_new()
+...
+
+>   staging: iio: adt7316: Convert to i2c's .probe_new()
+>   staging: iio: ad5933: Convert to i2c's .probe_new()
+>   staging: iio: ade7854: Convert to i2c's .probe_new()
+ 
