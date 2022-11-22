@@ -2,88 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9DCC43219
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 13:24:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE95C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Nov 2022 13:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233761AbiKVNYF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Nov 2022 08:24:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53190 "EHLO
+        id S233428AbiKVN3Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Nov 2022 08:29:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233175AbiKVNX7 (ORCPT
+        with ESMTP id S233251AbiKVN3L (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Nov 2022 08:23:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC66F2B18F;
-        Tue, 22 Nov 2022 05:23:55 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0E07FB81B34;
-        Tue, 22 Nov 2022 13:23:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CABF6C433C1;
-        Tue, 22 Nov 2022 13:23:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669123432;
-        bh=TrGdsxnKmIHui2RRQxMhxRK2ImgyiQwSaHZqW+YNmIQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MvtBuuIhZ9MXhAtyelT3qJeVn0jV6ooN4SV3AMj6P8SlruA5ifGJDiWcAITsU09gD
-         neeH8ueUlV6ZkhM68xuzfizub6xLat+h1RUNo93+6auouYEa2IonTaa7GmvE+Y+Enn
-         C3QTLV1JwmCBoSLlYKWDszPK+ARaaqt5Hy7RWcXPjOkUs0mek/z9G6OtoFTqdwPHb1
-         aXmtvVAHyScVdRa2L2z8f8/EWQ9bmmmwd2Sp6UfwUCZIdTAmFQ742eyyk9fo6b1FeM
-         hIFrK4iovn4SxlEMDtt+rB3FoOAcOcKkvPK+jSzkWH9tAiPTuZloTqDNFHfoXT8MHE
-         T5OCMrBgL1S4w==
-Date:   Tue, 22 Nov 2022 13:23:42 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     robh+dt@kernel.org, akpm@linux-foundation.org,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        claudiu.beznea@microchip.com, qyousef@layalina.io, arnd@arndb.de,
-        atishp@atishpatra.org, anup@brainfault.org, tkhai@ya.ru,
-        quic_abhinavk@quicinc.com, vasily.averin@linux.dev,
-        baolin.wang@linux.alibaba.com, colin.i.king@gmail.com,
+        Tue, 22 Nov 2022 08:29:11 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EA9E64A3A
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 05:29:09 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id n3so8154125wrp.5
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Nov 2022 05:29:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wEZwlBsaNUHpzzIaIKYU5AHosPkhDJnwQiQeyEIzxao=;
+        b=hR4YQdlV1EkXRHumuFyTMUphoGnSOoi+kBYKhoZwncrNATTRb4Aq+D8dU84gikCAjg
+         NJH5I3o17DN36Fu5o0sd5qptScMWUHOddYlLHDb4o3o9tnkrBSxmC8N7hMJRdogxkQ5C
+         NtzV5tAPHOweNoXQbGVy2H49TkRp5XyA/jXXP1y4gmbC3BMzkUBtqkPj9DLPoBDdUuq/
+         tqgPfK1483mmQEIe6eJUmW6XeJ/OlQCgcFO3Sd8361s1aNDohJL+x1lrI/rivrqWawxj
+         0bOjWe9JX0T06VXEqDzilosZb0nr9FUQgQ49TzmVGRRO7XwDBJm/1wBnwobvB496NVYp
+         877Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEZwlBsaNUHpzzIaIKYU5AHosPkhDJnwQiQeyEIzxao=;
+        b=5dhjpHsmVaPHqgJY70GmvAqRgNcZEjBAoj7F3QU5mMugsvxE/q4TgnSUXaJ2kKMVjA
+         mhNVfBZMghao/wHyy7lJeRGVYg/LsuwpHc17p0pF2Z8hh2ie9z0QJKYMwvahJgNjoJLF
+         5rrC024f1fuHJftp8A6EtJn7n0EMm8hUwbquL1tItN0xE20c61QwNMQ6/H1w7pp6+rE8
+         16pNCOs49A0Lhn+1S95LPmE/IbBYEITrlm6uCWRfLSSlWPPxJYrILnkpJqMIP9OBY4p+
+         CgxlQBWn+rktNj16kMgfXlJuz1A/DkND1WvXToLgu0QmUuTFfB2eYXdTINDvAdQbyvOE
+         zOcw==
+X-Gm-Message-State: ANoB5pmgKoDdUeqUeCECuhAU6W7rv3pr7doD7Gf7otFK19GmlnB4/QJF
+        cTzc14J9RTpd2xQjGucK0zhWbw==
+X-Google-Smtp-Source: AA0mqf6TJNdia6Nf3lWNpAMXvciXnOpBoF68QQGih3K11l7S5CRfE3Qn1emQkxJlMHXKWTmqnaMjpg==
+X-Received: by 2002:adf:f50d:0:b0:23a:cdf5:3676 with SMTP id q13-20020adff50d000000b0023acdf53676mr15105069wro.336.1669123748006;
+        Tue, 22 Nov 2022 05:29:08 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id o2-20020a05600c510200b003cf5ec79bf9sm19435110wms.40.2022.11.22.05.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Nov 2022 05:29:07 -0800 (PST)
+Date:   Tue, 22 Nov 2022 14:29:03 +0100
+From:   Corentin LABBE <clabbe@baylibre.com>
+To:     Mikhail Rudenko <mike.rudenko@gmail.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org,
-        pratyush@kernel.org, michael@walle.cc, miquel.raynal@bootlin.com,
-        richard@nod.at
-Subject: Re: [PATCH] MAINTAINERS: Update email of Tudor Ambarus
-Message-ID: <Y3zNXjoraLeugNzS@sirena.org.uk>
-References: <20221122125244.175295-1-tudor.ambarus@microchip.com>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Lin Jinhan <troy.lin@rock-chips.com>, wevsty <ty@wevs.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Lin Huang <hl@rock-chips.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH] hw_random: rockchip: import driver from vendor tree
+Message-ID: <Y3zOn5IO1ziJXKUT@Red>
+References: <20220919210025.2376254-1-Jason@zx2c4.com>
+ <32f8797a-4b65-69df-ee8e-7891a6b4f1af@arm.com>
+ <YzMm4d3sZBHpitm9@aurel32.net>
+ <YzNTB+RQK6yITi7/@Red>
+ <YzNthZ0MtfwjIqdH@aurel32.net>
+ <YzVNBcF7TCDldPwF@Red>
+ <87y1sasrf2.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="8Vur0n2Nqa/eczlq"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20221122125244.175295-1-tudor.ambarus@microchip.com>
-X-Cookie: That's what she said.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87y1sasrf2.fsf@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Le Wed, Nov 16, 2022 at 09:04:07PM +0300, Mikhail Rudenko a écrit :
+> 
+> On 2022-09-29 at 09:45 +02, LABBE Corentin <clabbe@baylibre.com> wrote:
+> > Le Tue, Sep 27, 2022 at 11:39:17PM +0200, Aurelien Jarno a écrit :
+> >> On 2022-09-27 21:46, LABBE Corentin wrote:
+> >> > Le Tue, Sep 27, 2022 at 06:37:53PM +0200, Aurelien Jarno a écrit :
+> >> > > On 2022-09-20 10:35, Robin Murphy wrote:
+> >> > > > On 2022-09-19 22:00, Jason A. Donenfeld wrote:
+> >> > > > > The Rockchip driver has long existed out of tree, but not upstream.
+> >> > > > > There is support for it upstream in u-boot, but not in Linux proper.
+> >> > > > > This commit imports the GPLv2 driver written by Lin Jinhan, together
+> >> > > > > with the DTS and config blobs from Wevsty.
+> >> > > >
+> >> > > > Note that Corentin has a series enabling the full crypto driver for
+> >> > > > RK3328 and RK3399[1], so it would seem more sensible to add TRNG support
+> >> > > > to that. Having confliciting compatibles for the same hardware that
+> >> > > > force the user to change their DT to choose one functionality or the
+> >> > > > other isn't good (plus there's also no binding for this one).
+> >> > >
+> >> > > It might make sense for the cryptov1-rng driver (I haven't checked). For
+> >> > > the cryptov2-rng driver, I looked at the RK3568 TRM (I can't find the
+> >> > > RK3588 one), and from what I understand crypto and TRNG are two
+> >> > > different devices, using different address spaces, clock, reset and
+> >> > > interrupts. The vendor kernel uses two different drivers.
+> >> > >
+> >> >
+> >> > I confirm that TRNG is not on the same IP on rk3568, something I didnt remark when doing my V2 driver. (I need to remove rng clock from rk3568 dt).
+> >> > But the rk3588 crypto IP and the TRNG are in the same device.
+> >>
+> >> Ok, thanks for confirming about the rk3568. It seems the only one in the
+> >> family with separate devices for TRNG and crypto. Does it means we need
+> >> a separate TRNG driver only for it? Or could we handle it the same way
+> >> than for instance rk3588 anyway?
+> >
+> > I just got now the part 1 of rk3588 TRM which I has missing and it show some conflicting information.
+> > rk3588 seems to have both a dedicated TRNG (TRNG_NS/TRNG_S) with dedicated address space and a TRNG inside the crypto IP.
+> > But for the moment, the TRNG inside crypto IP seems defective.
+> 
+> So what's the ultimate decision? Does anyone work on merging this into
+> the existing crypto driver? I have a use case with an rk3399-based board,
+> where having hardware rng enhances boot times dramatically (at least for
+> some userspaces; see also [1]).
+> 
+> [1] https://bugzilla.kernel.org/show_bug.cgi?id=216502
+> 
 
---8Vur0n2Nqa/eczlq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hello
 
-On Tue, Nov 22, 2022 at 02:52:44PM +0200, Tudor Ambarus wrote:
-> My professional email will change and the microchip one will bounce after
-> mid-november of 2022.
+I started to work on adding RNG to rk3288_crypto.
+I need to publish the work on my github and take time to send it for review.
 
-Acked-by: Mark Brown <broonie@kernel.org>
-
---8Vur0n2Nqa/eczlq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmN8zV0ACgkQJNaLcl1U
-h9ClDAgAgIY214kn4I7zM3+oaKJO2vk03Oi6WrlTHYaDO3jmE1HH3SUPdPeio9u+
-QaaYSZYfnuJqGiq8CN8DygTvB6kOObFY4hYGD+dL6i9kjurhSTNW5NB1Km5FTTvS
-Vs3fS7GOmvkzrOKBPSV6AJoEKB8sNJbtPYS/xC1s5d2ydhVtA2bOjzfGTBL2FZfs
-TzFjy68JLcB3avXPCJrZ4IB07/TdOj4V3DRHx4G1kbJ+HQO3eREYGClg5e9RHzY8
-GIyfRoPiC+PHAQADviznqrgypRL/RM5NZrv3miQTINs58zH6hMvYqZRJelXlyWXb
-BzBf4yMOpCU/P2IKnPOppRYXIhK8Dw==
-=QKj9
------END PGP SIGNATURE-----
-
---8Vur0n2Nqa/eczlq--
+Regards
