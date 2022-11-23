@@ -2,51 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB5AC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Nov 2022 12:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82523C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Nov 2022 12:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237301AbiKWMLa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Nov 2022 07:11:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
+        id S236250AbiKWML3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Nov 2022 07:11:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237502AbiKWMLF (ORCPT
+        with ESMTP id S237426AbiKWMLF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 23 Nov 2022 07:11:05 -0500
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3B85BD43
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2022 04:11:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73438657CA
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2022 04:11:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669205464; x=1700741464;
+  t=1669205462; x=1700741462;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xhNdjLftLA1OcEZL2FVL05RB0fcE4wTxnyZ4E6mviM0=;
-  b=dspTtio7dfBjnMfofT1aLKppXYe78hsk8G8TfHiX90xwd6G3iu/Nvnnm
-   8cXN2r0g41OeIPAOfUPxZ0WvG2g7HOehpYsDt6Lg8w8xV7n5NuiVgdVbb
-   fG+22TsljIy3m5ghJOLSRqd3kYjljCownId1D3zVskRgmlwGvl5IWsIyD
-   FSScBzrOKIgyWpb0VWDEa83P3Tj7wPghwDa7Ex2ELCMVtajRGM2kywCrM
-   yHPAxmu1xCUK0uiG+X47je7ih+sA7G1MrSVT0eNmUqqpb/FOyfUpPaUOi
-   7nfyoLZSM7g/v7jPD9GV+G0I+VC3OSYTEgsbPAewlSV9RvQ268wlHcGq6
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="312752530"
+  bh=jUzbhrnLAeg6HsYkEu1QJk2m8yjqhFXzG8N2773qtKA=;
+  b=Hw4ii7HlE5Mf+IKRE0d8KEgmdQDWF2iXr4TvUuIsUa7YxBIEExcenc8/
+   1gVray4nu/28XMRXMunG5YWHdmH8X1E2PxjEmOjkJVhLviNGzezOuXF7B
+   JODK/8UsdkfDk1OweY09M6lQkDlJlMxue3wrw64VlKmnN3KFrvIRdFKaS
+   FpgiLGJ6Sy3uAh+CtBgixRqyaKCmxMkzOlTMcUVlP2DNws4mXyF7Xwk54
+   NQ6YW2GbKYqzyD/auPAeBgvzcg/KpS4ERHw4wurWGx+xZb8nqNW0vfqdw
+   iJ1H8Qf1HH1kS13eMSn4ofEyJQ6IiZ8GroUK9CQmhAkYE72h0slR2de8n
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="312752525"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="312752530"
+   d="scan'208";a="312752525"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 04:11:04 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2022 04:11:02 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="784227542"
+X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="784227533"
 X-IronPort-AV: E=Sophos;i="5.96,187,1665471600"; 
-   d="scan'208";a="784227542"
+   d="scan'208";a="784227533"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Nov 2022 04:11:02 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 23 Nov 2022 04:10:59 -0800
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Vlad Dronov <vdronov@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 11/11] crypto: qat - add resubmit logic for decompression
-Date:   Wed, 23 Nov 2022 12:10:32 +0000
-Message-Id: <20221123121032.71991-12-giovanni.cabiddu@intel.com>
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Adam Guerin <adam.guerin@intel.com>
+Subject: [PATCH v2 10/11] crypto: qat - enable deflate for QAT GEN4
+Date:   Wed, 23 Nov 2022 12:10:31 +0000
+Message-Id: <20221123121032.71991-11-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221123121032.71991-1-giovanni.cabiddu@intel.com>
 References: <20221123121032.71991-1-giovanni.cabiddu@intel.com>
@@ -57,437 +59,854 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The acomp API allows to send requests with a NULL destination buffer. In
-this case, the algorithm implementation needs to allocate the
-destination
-scatter list, perform the operation and return the buffer to the user.
-For decompression, data is likely to expand and be bigger than the
-allocated buffer.
+Enable deflate for QAT GEN4 devices.
 
-This implements a re-submission mechanism for decompression requests
-that is triggered if the destination buffer, allocated by the driver,
-is not sufficiently big to store the output from decompression.
+This adds
+  (1) logic to create configuration entries at probe time for the
+  compression instances for QAT GEN4 devices;
+  (2) the implementation of QAT GEN4 specific compression operations,
+  required since the creation of the compression request template is
+  different between GEN2 and GEN4; and
+  (3) updates to the firmware API related to compression for GEN4.
 
-If an overflow is detected when processing the callback for a
-decompression request with a NULL destination buffer, a workqueue is
-scheduled. This allocates a new scatter list of the size of the
-previously allocated destination buffer, combines it with that, creates
-a new firmware scatter list and resubmits the job to the hardware
-accelerator.
-If the number of retries exceeds 5, an error is returned to the user.
+The implementation configures the device to produce data compressed
+dynamically, optimized for throughput over compression ratio.
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+Reviewed-by: Adam Guerin <adam.guerin@intel.com>
 ---
- drivers/crypto/qat/qat_common/qat_bl.c        | 227 ++++++++++++++++++
- drivers/crypto/qat/qat_common/qat_bl.h        |   6 +
- drivers/crypto/qat/qat_common/qat_comp_algs.c |  76 ++++++
- drivers/crypto/qat/qat_common/qat_comp_req.h  |  10 +
- 4 files changed, 319 insertions(+)
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |   4 +-
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    |   2 +-
+ drivers/crypto/qat/qat_4xxx/adf_drv.c         | 139 +++++++-
+ drivers/crypto/qat/qat_common/Makefile        |   1 +
+ drivers/crypto/qat/qat_common/adf_gen4_dc.c   |  83 +++++
+ drivers/crypto/qat/qat_common/adf_gen4_dc.h   |  10 +
+ .../qat/qat_common/icp_qat_hw_20_comp.h       | 164 ++++++++++
+ .../qat/qat_common/icp_qat_hw_20_comp_defs.h  | 300 ++++++++++++++++++
+ 8 files changed, 689 insertions(+), 14 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_dc.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_dc.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw_20_comp.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw_20_comp_defs.h
 
-diff --git a/drivers/crypto/qat/qat_common/qat_bl.c b/drivers/crypto/qat/qat_common/qat_bl.c
-index 221a4eb610a3..517938b2e211 100644
---- a/drivers/crypto/qat/qat_common/qat_bl.c
-+++ b/drivers/crypto/qat/qat_common/qat_bl.c
-@@ -222,3 +222,230 @@ int qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
- 				    extra_dst_buff, sz_extra_dst_buff,
- 				    flags);
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+index fda5f699ff57..834a705180c0 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -4,6 +4,7 @@
+ #include <adf_accel_devices.h>
+ #include <adf_cfg.h>
+ #include <adf_common_drv.h>
++#include <adf_gen4_dc.h>
+ #include <adf_gen4_hw_data.h>
+ #include <adf_gen4_pfvf.h>
+ #include <adf_gen4_pm.h>
+@@ -357,10 +358,11 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
+ 	hw_data->enable_pm = adf_gen4_enable_pm;
+ 	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
+-	hw_data->dev_config = adf_crypto_dev_config;
++	hw_data->dev_config = adf_gen4_dev_config;
+ 
+ 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
+ 	adf_gen4_init_pf_pfvf_ops(&hw_data->pfvf_ops);
++	adf_gen4_init_dc_ops(&hw_data->dc_ops);
  }
+ 
+ void adf_clean_hw_data_4xxx(struct adf_hw_device_data *hw_data)
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
+index 9d49248931f6..e98428ba78e2 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
++++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
+@@ -70,6 +70,6 @@ enum icp_qat_4xxx_slice_mask {
+ 
+ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data);
+ void adf_clean_hw_data_4xxx(struct adf_hw_device_data *hw_data);
+-int adf_crypto_dev_config(struct adf_accel_dev *accel_dev);
++int adf_gen4_dev_config(struct adf_accel_dev *accel_dev);
+ 
+ #endif
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index ea9dac047a5f..509dbb939caf 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -9,6 +9,7 @@
+ #include <adf_common_drv.h>
+ 
+ #include "adf_4xxx_hw_data.h"
++#include "qat_compression.h"
+ #include "qat_crypto.h"
+ #include "adf_transport_access_macros.h"
+ 
+@@ -19,6 +20,16 @@ static const struct pci_device_id adf_pci_tbl[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
+ 
++enum configs {
++	DEV_CFG_CY = 0,
++	DEV_CFG_DC,
++};
 +
-+static void qat_bl_sgl_unmap(struct adf_accel_dev *accel_dev,
-+			     struct qat_alg_buf_list *bl)
-+{
-+	struct device *dev = &GET_DEV(accel_dev);
-+	int n = bl->num_bufs;
-+	int i;
++static const char * const services_operations[] = {
++	ADF_CFG_CY,
++	ADF_CFG_DC,
++};
 +
-+	for (i = 0; i < n; i++)
-+		if (!dma_mapping_error(dev, bl->bufers[i].addr))
-+			dma_unmap_single(dev, bl->bufers[i].addr,
-+					 bl->bufers[i].len, DMA_FROM_DEVICE);
-+
-+	kfree(bl);
-+}
-+
-+static int qat_bl_sgl_map(struct adf_accel_dev *accel_dev,
-+			  struct scatterlist *sgl,
-+			  struct qat_alg_buf_list **bl)
-+{
-+	struct device *dev = &GET_DEV(accel_dev);
-+	struct qat_alg_buf_list *bufl;
-+	int node = dev_to_node(dev);
-+	struct scatterlist *sg;
-+	int n, i, sg_nctr;
-+	size_t sz;
-+
-+	n = sg_nents(sgl);
-+	sz = struct_size(bufl, bufers, n);
-+	bufl = kzalloc_node(sz, GFP_KERNEL, node);
-+	if (unlikely(!bufl))
-+		return -ENOMEM;
-+
-+	for (i = 0; i < n; i++)
-+		bufl->bufers[i].addr = DMA_MAPPING_ERROR;
-+
-+	sg_nctr = 0;
-+	for_each_sg(sgl, sg, n, i) {
-+		int y = sg_nctr;
-+
-+		if (!sg->length)
-+			continue;
-+
-+		bufl->bufers[y].addr = dma_map_single(dev, sg_virt(sg),
-+						      sg->length,
-+						      DMA_FROM_DEVICE);
-+		bufl->bufers[y].len = sg->length;
-+		if (unlikely(dma_mapping_error(dev, bufl->bufers[y].addr)))
-+			goto err_map;
-+		sg_nctr++;
-+	}
-+	bufl->num_bufs = sg_nctr;
-+	bufl->num_mapped_bufs = sg_nctr;
-+
-+	*bl = bufl;
-+
-+	return 0;
-+
-+err_map:
-+	for (i = 0; i < n; i++)
-+		if (!dma_mapping_error(dev, bufl->bufers[i].addr))
-+			dma_unmap_single(dev, bufl->bufers[i].addr,
-+					 bufl->bufers[i].len,
-+					 DMA_FROM_DEVICE);
-+	kfree(bufl);
-+	*bl = NULL;
-+
-+	return -ENOMEM;
-+}
-+
-+static void qat_bl_sgl_free_unmap(struct adf_accel_dev *accel_dev,
-+				  struct scatterlist *sgl,
-+				  struct qat_alg_buf_list *bl)
-+{
-+	if (bl)
-+		qat_bl_sgl_unmap(accel_dev, bl);
-+	if (sgl)
-+		sgl_free(sgl);
-+}
-+
-+static int qat_bl_sgl_alloc_map(struct adf_accel_dev *accel_dev,
-+				struct scatterlist **sgl,
-+				struct qat_alg_buf_list **bl,
-+				unsigned int dlen,
-+				gfp_t gfp)
-+{
-+	struct scatterlist *dst;
-+	int ret;
-+
-+	dst = sgl_alloc(dlen, gfp, NULL);
-+	if (!dst) {
-+		dev_err(&GET_DEV(accel_dev), "sg_alloc failed\n");
-+		return -ENOMEM;
-+	}
-+
-+	ret = qat_bl_sgl_map(accel_dev, dst, bl);
-+	if (ret)
-+		goto err;
-+
-+	*sgl = dst;
-+
-+	return 0;
-+
-+err:
-+	sgl_free(dst);
-+	*sgl = NULL;
+ static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
+ {
+ 	if (accel_dev->hw_device) {
+@@ -53,7 +64,7 @@ static int adf_cfg_dev_init(struct adf_accel_dev *accel_dev)
+ 	return 0;
+ }
+ 
+-int adf_crypto_dev_config(struct adf_accel_dev *accel_dev)
++static int adf_crypto_dev_config(struct adf_accel_dev *accel_dev)
+ {
+ 	char key[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
+ 	int banks = GET_MAX_BANKS(accel_dev);
+@@ -68,14 +79,6 @@ int adf_crypto_dev_config(struct adf_accel_dev *accel_dev)
+ 	else
+ 		instances = 0;
+ 
+-	ret = adf_cfg_section_add(accel_dev, ADF_KERNEL_SEC);
+-	if (ret)
+-		goto err;
+-
+-	ret = adf_cfg_section_add(accel_dev, "Accelerator0");
+-	if (ret)
+-		goto err;
+-
+ 	for (i = 0; i < instances; i++) {
+ 		val = i;
+ 		bank = i * 2;
+@@ -161,10 +164,122 @@ int adf_crypto_dev_config(struct adf_accel_dev *accel_dev)
+ 	if (ret)
+ 		goto err;
+ 
+-	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
+ 	return 0;
+ err:
+-	dev_err(&GET_DEV(accel_dev), "Failed to start QAT accel dev\n");
++	dev_err(&GET_DEV(accel_dev), "Failed to add configuration for crypto\n");
 +	return ret;
 +}
 +
-+static void qat_bl_merge_fw_sgl(struct qat_alg_buf_list *out,
-+				struct qat_alg_buf_list *in_one,
-+				struct qat_alg_buf_list *in_two)
++static int adf_comp_dev_config(struct adf_accel_dev *accel_dev)
 +{
-+	size_t cpy_sz;
-+	void *s, *d;
++	char key[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
++	int banks = GET_MAX_BANKS(accel_dev);
++	int cpus = num_online_cpus();
++	unsigned long val;
++	int instances;
++	int ret;
++	int i;
 +
-+	cpy_sz = in_one->num_bufs * sizeof(struct qat_alg_buf);
-+	s = in_one->bufers;
-+	d = out->bufers;
-+	memcpy(d, s, cpy_sz);
++	if (adf_hw_dev_has_compression(accel_dev))
++		instances = min(cpus, banks);
++	else
++		instances = 0;
 +
-+	s = in_two->bufers;
-+	d += cpy_sz;
-+	cpy_sz = in_two->num_bufs * sizeof(struct qat_alg_buf);
-+	memcpy(d, s, cpy_sz);
++	for (i = 0; i < instances; i++) {
++		val = i;
++		snprintf(key, sizeof(key), ADF_DC "%d" ADF_RING_DC_BANK_NUM, i);
++		ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++						  key, &val, ADF_DEC);
++		if (ret)
++			goto err;
 +
-+	out->num_bufs = in_one->num_bufs + in_two->num_bufs;
-+	out->num_mapped_bufs = in_one->num_mapped_bufs + in_two->num_mapped_bufs;
-+}
++		val = 512;
++		snprintf(key, sizeof(key), ADF_DC "%d" ADF_RING_DC_SIZE, i);
++		ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++						  key, &val, ADF_DEC);
++		if (ret)
++			goto err;
 +
-+static void qat_bl_merge_scatterlists(struct scatterlist *out,
-+				      struct scatterlist *in_one,
-+				      struct scatterlist *in_two)
-+{
-+	struct scatterlist *dst = out;
-+	int i, nents_one, nents_two;
-+	struct scatterlist *sg;
++		val = 0;
++		snprintf(key, sizeof(key), ADF_DC "%d" ADF_RING_DC_TX, i);
++		ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++						  key, &val, ADF_DEC);
++		if (ret)
++			goto err;
 +
-+	nents_one = sg_nents(in_one);
-+	nents_two = sg_nents(in_two);
++		val = 1;
++		snprintf(key, sizeof(key), ADF_DC "%d" ADF_RING_DC_RX, i);
++		ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
++						  key, &val, ADF_DEC);
++		if (ret)
++			goto err;
 +
-+	sg_init_table(dst, nents_one + nents_two);
-+
-+	for_each_sg(in_one, sg, nents_one, i) {
-+		sg_set_page(dst, sg_page(sg), sg->length, 0);
-+		dst = sg_next(dst);
-+	}
-+
-+	for_each_sg(in_two, sg, nents_two, i) {
-+		sg_set_page(dst, sg_page(sg), sg->length, 0);
-+		dst = sg_next(dst);
-+	}
-+}
-+
-+int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
-+			       struct scatterlist **sg,
-+			       unsigned int *dlen,
-+			       struct qat_request_buffs *qat_bufs,
-+			       gfp_t gfp)
-+{
-+	struct qat_alg_buf_list *tmp_bl, *dst_bl, *old_bl;
-+	struct device *dev = &GET_DEV(accel_dev);
-+	dma_addr_t dst_blp = DMA_MAPPING_ERROR;
-+	struct scatterlist *dst = NULL;
-+	struct scatterlist *tmp_dst;
-+	int node = dev_to_node(dev);
-+	size_t dst_bl_size;
-+	int ret, nents;
-+
-+	ret = qat_bl_sgl_alloc_map(accel_dev, &tmp_dst, &tmp_bl, *dlen, gfp);
-+	if (ret)
-+		return ret;
-+
-+	old_bl = qat_bufs->blout;
-+	nents = tmp_bl->num_bufs + old_bl->num_bufs;
-+	dst_bl_size = struct_size(dst_bl, bufers, nents);
-+
-+	/* Allocate new FW SGL descriptor */
-+	dst_bl = kzalloc_node(dst_bl_size, gfp, node);
-+	if (!dst_bl)
-+		goto err;
-+
-+	dst_blp = dma_map_single(dev, dst_bl, dst_bl_size, DMA_TO_DEVICE);
-+	if (unlikely(dma_mapping_error(dev, dst_blp)))
-+		goto err;
-+
-+	/* Allocate new scatter list */
-+	dst = kmalloc_array(nents, sizeof(struct scatterlist), gfp);
-+	if (!dst)
-+		goto err;
-+
-+	/* Create new FW SGL and scatterlist as composition of the old one
-+	 * and the newly allocated one
-+	 */
-+	qat_bl_merge_fw_sgl(dst_bl, tmp_bl, old_bl);
-+	qat_bl_merge_scatterlists(dst, tmp_dst, *sg);
-+
-+	/* Unmap old firmware SGL descriptor */
-+	dma_unmap_single(dev, qat_bufs->bloutp, qat_bufs->sz_out, DMA_TO_DEVICE);
-+
-+	/* Free temporary FW sgl descriptor */
-+	kfree(tmp_bl);
-+
-+	if (!qat_bufs->sgl_dst_valid)
-+		kfree(qat_bufs->blout);
-+	qat_bufs->sgl_dst_valid = false;
-+	qat_bufs->blout = dst_bl;
-+	qat_bufs->bloutp = dst_blp;
-+	qat_bufs->sz_out = dst_bl_size;
-+
-+	/* Free old scatterlist and return newly created one */
-+	kfree(*sg);
-+	*sg = dst;
-+
-+	*dlen *= 2;
-+
-+	return 0;
-+err:
-+	qat_bl_sgl_free_unmap(accel_dev, tmp_dst, tmp_bl);
-+	kfree(dst_bl);
-+	kfree(dst);
-+
-+	if (!dma_mapping_error(dev, dst_blp))
-+		dma_unmap_single(dev, dst_blp, dst_bl_size, DMA_TO_DEVICE);
-+
-+	return -ENOMEM;
-+}
-diff --git a/drivers/crypto/qat/qat_common/qat_bl.h b/drivers/crypto/qat/qat_common/qat_bl.h
-index 5f2ea8f352f7..bfe9ed62b174 100644
---- a/drivers/crypto/qat/qat_common/qat_bl.h
-+++ b/drivers/crypto/qat/qat_common/qat_bl.h
-@@ -58,4 +58,10 @@ static inline gfp_t qat_algs_alloc_flags(struct crypto_async_request *req)
- 	return req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
- }
- 
-+int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
-+			       struct scatterlist **newd,
-+			       unsigned int *dlen,
-+			       struct qat_request_buffs *qat_bufs,
-+			       gfp_t gfp);
-+
- #endif
-diff --git a/drivers/crypto/qat/qat_common/qat_comp_algs.c b/drivers/crypto/qat/qat_common/qat_comp_algs.c
-index bdc5107b359b..9099d6c3f74b 100644
---- a/drivers/crypto/qat/qat_common/qat_comp_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_comp_algs.c
-@@ -5,6 +5,7 @@
- #include <crypto/internal/acompress.h>
- #include <crypto/scatterwalk.h>
- #include <linux/dma-mapping.h>
-+#include <linux/workqueue.h>
- #include "adf_accel_devices.h"
- #include "adf_common_drv.h"
- #include "qat_bl.h"
-@@ -25,6 +26,14 @@ struct qat_compression_ctx {
- 	struct qat_compression_instance *inst;
- };
- 
-+#define MAX_NULL_DST_RETRIES 5
-+
-+struct qat_dst {
-+	bool is_null;
-+	int retries;
-+	unsigned int total_dlen;
-+};
-+
- struct qat_compression_req {
- 	u8 req[QAT_COMP_REQ_SIZE];
- 	struct qat_compression_ctx *qat_compression_ctx;
-@@ -33,6 +42,8 @@ struct qat_compression_req {
- 	enum direction dir;
- 	int actual_dlen;
- 	struct qat_alg_req alg_req;
-+	struct work_struct resubmit;
-+	struct qat_dst dst;
- };
- 
- static int qat_alg_send_dc_message(struct qat_compression_req *qat_req,
-@@ -49,6 +60,55 @@ static int qat_alg_send_dc_message(struct qat_compression_req *qat_req,
- 	return qat_alg_send_message(alg_req);
- }
- 
-+static void qat_comp_resubmit(struct work_struct *work)
-+{
-+	struct qat_compression_req *qat_req =
-+		container_of(work, struct qat_compression_req, resubmit);
-+	struct qat_compression_ctx *ctx = qat_req->qat_compression_ctx;
-+	struct adf_accel_dev *accel_dev = ctx->inst->accel_dev;
-+	struct qat_request_buffs *qat_bufs = &qat_req->buf;
-+	struct qat_compression_instance *inst = ctx->inst;
-+	struct acomp_req *areq = qat_req->acompress_req;
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(areq);
-+	unsigned int dlen = qat_req->dst.total_dlen;
-+	int retries = ++qat_req->dst.retries;
-+	u8 *req = qat_req->req;
-+	int ret = -EINVAL;
-+	dma_addr_t dfbuf;
-+
-+	dev_dbg(&GET_DEV(accel_dev), "[%s][%s] retry NULL dst request - retries = %d dlen = %d\n",
-+		crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm)),
-+		qat_req->dir == COMPRESSION ? "comp" : "decomp", retries,
-+		dlen * 2);
-+
-+	if (retries > MAX_NULL_DST_RETRIES) {
-+		dev_dbg(&GET_DEV(accel_dev),
-+			"[%s] exceeded max number of retries for NULL dst %s request\n",
-+			crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm)),
-+			qat_req->dir == COMPRESSION ? "comp" : "decomp");
-+			ret = -EOVERFLOW;
++		val = ADF_COALESCING_DEF_TIME;
++		snprintf(key, sizeof(key), ADF_ETRMGR_COALESCE_TIMER_FORMAT, i);
++		ret = adf_cfg_add_key_value_param(accel_dev, "Accelerator0",
++						  key, &val, ADF_DEC);
++		if (ret)
 +			goto err;
 +	}
 +
-+	ret = qat_bl_realloc_map_new_dst(accel_dev, &areq->dst, &dlen, qat_bufs,
-+					 qat_algs_alloc_flags(&areq->base));
++	val = i;
++	ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, ADF_NUM_DC,
++					  &val, ADF_DEC);
 +	if (ret)
 +		goto err;
 +
-+	qat_req->dst.total_dlen = dlen;
++	val = 0;
++	ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, ADF_NUM_CY,
++					  &val, ADF_DEC);
++	if (ret)
++		goto err;
 +
-+	dfbuf = qat_req->buf.bloutp;
-+	qat_comp_override_dst(req, dfbuf, dlen);
-+
-+	ret = qat_alg_send_dc_message(qat_req, inst, &areq->base);
-+	if (ret != -ENOSPC)
-+		return;
-+
++	return 0;
 +err:
-+	qat_bl_free_bufl(accel_dev, qat_bufs);
-+	areq->base.complete(&areq->base, ret);
++	dev_err(&GET_DEV(accel_dev), "Failed to add configuration for compression\n");
++	return ret;
 +}
 +
- static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 				      void *resp)
- {
-@@ -79,6 +139,14 @@ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 		status ? "ERR" : "OK ",
- 		consumed, produced, cmp_err, xlt_err);
- 
-+	if (qat_req->dir == DECOMPRESSION && qat_req->dst.is_null) {
-+		if (cmp_err == ERR_CODE_OVERFLOW_ERROR) {
-+			INIT_WORK(&qat_req->resubmit, qat_comp_resubmit);
-+			adf_misc_wq_queue_work(&qat_req->resubmit);
-+			return;
-+		}
++int adf_gen4_dev_config(struct adf_accel_dev *accel_dev)
++{
++	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
++	int ret;
++
++	ret = adf_cfg_section_add(accel_dev, ADF_KERNEL_SEC);
++	if (ret)
++		goto err;
++
++	ret = adf_cfg_section_add(accel_dev, "Accelerator0");
++	if (ret)
++		goto err;
++
++	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
++				      ADF_SERVICES_ENABLED, services);
++	if (ret)
++		goto err;
++
++	ret = sysfs_match_string(services_operations, services);
++	if (ret < 0)
++		goto err;
++
++	switch (ret) {
++	case DEV_CFG_CY:
++		ret = adf_crypto_dev_config(accel_dev);
++		break;
++	case DEV_CFG_DC:
++		ret = adf_comp_dev_config(accel_dev);
++		break;
 +	}
 +
- 	if (unlikely(status != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
- 		goto end;
- 
-@@ -175,16 +243,24 @@ static int qat_comp_alg_compress_decompress(struct acomp_req *areq,
- 	if (areq->dst && !dlen)
- 		return -EINVAL;
- 
-+	qat_req->dst.is_null = false;
++	if (ret)
++		goto err;
 +
- 	/* Handle acomp requests that require the allocation of a destination
- 	 * buffer. The size of the destination buffer is double the source
- 	 * buffer (rounded up to the size of a page) to fit the decompressed
- 	 * output or an expansion on the data for compression.
- 	 */
- 	if (!areq->dst) {
-+		qat_req->dst.is_null = true;
++	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
 +
- 		dlen = round_up(2 * slen, PAGE_SIZE);
- 		areq->dst = sgl_alloc(dlen, f, NULL);
- 		if (!areq->dst)
- 			return -ENOMEM;
++	return ret;
 +
-+		areq->dlen = dlen;
-+		qat_req->dst.retries = 0;
-+		qat_req->dst.total_dlen = dlen;
- 	}
- 
- 	if (dir == COMPRESSION) {
-diff --git a/drivers/crypto/qat/qat_common/qat_comp_req.h b/drivers/crypto/qat/qat_common/qat_comp_req.h
-index 18a1f33a6db9..404e32c5e778 100644
---- a/drivers/crypto/qat/qat_common/qat_comp_req.h
-+++ b/drivers/crypto/qat/qat_common/qat_comp_req.h
-@@ -25,6 +25,16 @@ static inline void qat_comp_create_req(void *ctx, void *req, u64 src, u32 slen,
- 	req_pars->out_buffer_sz = dlen;
++err:
++	dev_err(&GET_DEV(accel_dev), "Failed to configure QAT driver\n");
+ 	return ret;
  }
  
-+static inline void qat_comp_override_dst(void *req, u64 dst, u32 dlen)
-+{
-+	struct icp_qat_fw_comp_req *fw_req = req;
-+	struct icp_qat_fw_comp_req_params *req_pars = &fw_req->comp_pars;
+@@ -299,7 +414,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (ret)
+ 		goto out_err_disable_aer;
+ 
+-	ret = adf_crypto_dev_config(accel_dev);
++	ret = hw_data->dev_config(accel_dev);
+ 	if (ret)
+ 		goto out_err_disable_aer;
+ 
+diff --git a/drivers/crypto/qat/qat_common/Makefile b/drivers/crypto/qat/qat_common/Makefile
+index e3db4786738f..1fb8d50f509f 100644
+--- a/drivers/crypto/qat/qat_common/Makefile
++++ b/drivers/crypto/qat/qat_common/Makefile
+@@ -16,6 +16,7 @@ intel_qat-objs := adf_cfg.o \
+ 	adf_gen4_hw_data.o \
+ 	adf_gen4_pm.o \
+ 	adf_gen2_dc.o \
++	adf_gen4_dc.o \
+ 	qat_crypto.o \
+ 	qat_compression.o \
+ 	qat_comp_algs.o \
+diff --git a/drivers/crypto/qat/qat_common/adf_gen4_dc.c b/drivers/crypto/qat/qat_common/adf_gen4_dc.c
+new file mode 100644
+index 000000000000..5859238e37de
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/adf_gen4_dc.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2022 Intel Corporation */
++#include "adf_accel_devices.h"
++#include "icp_qat_fw_comp.h"
++#include "icp_qat_hw_20_comp.h"
++#include "adf_gen4_dc.h"
 +
-+	fw_req->comn_mid.dest_data_addr = dst;
-+	fw_req->comn_mid.dst_length = dlen;
-+	req_pars->out_buffer_sz = dlen;
++static void qat_comp_build_deflate(void *ctx)
++{
++	struct icp_qat_fw_comp_req *req_tmpl =
++				(struct icp_qat_fw_comp_req *)ctx;
++	struct icp_qat_fw_comn_req_hdr *header = &req_tmpl->comn_hdr;
++	struct icp_qat_fw_comp_req_hdr_cd_pars *cd_pars = &req_tmpl->cd_pars;
++	struct icp_qat_fw_comp_req_params *req_pars = &req_tmpl->comp_pars;
++	struct icp_qat_hw_comp_20_config_csr_upper hw_comp_upper_csr = {0};
++	struct icp_qat_hw_comp_20_config_csr_lower hw_comp_lower_csr = {0};
++	struct icp_qat_hw_decomp_20_config_csr_lower hw_decomp_lower_csr = {0};
++	u32 upper_val;
++	u32 lower_val;
++
++	memset(req_tmpl, 0, sizeof(*req_tmpl));
++	header->hdr_flags =
++		ICP_QAT_FW_COMN_HDR_FLAGS_BUILD(ICP_QAT_FW_COMN_REQ_FLAG_SET);
++	header->service_type = ICP_QAT_FW_COMN_REQ_CPM_FW_COMP;
++	header->service_cmd_id = ICP_QAT_FW_COMP_CMD_STATIC;
++	header->comn_req_flags =
++		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_CD_FLD_TYPE_16BYTE_DATA,
++					    QAT_COMN_PTR_TYPE_SGL);
++	header->serv_specif_flags =
++		ICP_QAT_FW_COMP_FLAGS_BUILD(ICP_QAT_FW_COMP_STATELESS_SESSION,
++					    ICP_QAT_FW_COMP_AUTO_SELECT_BEST,
++					    ICP_QAT_FW_COMP_NOT_ENH_AUTO_SELECT_BEST,
++					    ICP_QAT_FW_COMP_NOT_DISABLE_TYPE0_ENH_AUTO_SELECT_BEST,
++					    ICP_QAT_FW_COMP_ENABLE_SECURE_RAM_USED_AS_INTMD_BUF);
++	hw_comp_lower_csr.skip_ctrl = ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_LITERAL;
++	hw_comp_lower_csr.algo = ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_ILZ77;
++	hw_comp_lower_csr.lllbd = ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_ENABLED;
++	hw_comp_lower_csr.sd = ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_1;
++	hw_comp_lower_csr.hash_update = ICP_QAT_HW_COMP_20_SKIP_HASH_UPDATE_DONT_ALLOW;
++	hw_comp_lower_csr.edmm = ICP_QAT_HW_COMP_20_EXTENDED_DELAY_MATCH_MODE_EDMM_ENABLED;
++	hw_comp_upper_csr.nice = ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_DEFAULT_VAL;
++	hw_comp_upper_csr.lazy = ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_DEFAULT_VAL;
++
++	upper_val = ICP_QAT_FW_COMP_20_BUILD_CONFIG_UPPER(hw_comp_upper_csr);
++	lower_val = ICP_QAT_FW_COMP_20_BUILD_CONFIG_LOWER(hw_comp_lower_csr);
++
++	cd_pars->u.sl.comp_slice_cfg_word[0] = lower_val;
++	cd_pars->u.sl.comp_slice_cfg_word[1] = upper_val;
++
++	req_pars->crc.legacy.initial_adler = COMP_CPR_INITIAL_ADLER;
++	req_pars->crc.legacy.initial_crc32 = COMP_CPR_INITIAL_CRC;
++	req_pars->req_par_flags =
++		ICP_QAT_FW_COMP_REQ_PARAM_FLAGS_BUILD(ICP_QAT_FW_COMP_SOP,
++						      ICP_QAT_FW_COMP_EOP,
++						      ICP_QAT_FW_COMP_BFINAL,
++						      ICP_QAT_FW_COMP_CNV,
++						      ICP_QAT_FW_COMP_CNV_RECOVERY,
++						      ICP_QAT_FW_COMP_NO_CNV_DFX,
++						      ICP_QAT_FW_COMP_CRC_MODE_LEGACY,
++						      ICP_QAT_FW_COMP_NO_XXHASH_ACC,
++						      ICP_QAT_FW_COMP_CNV_ERROR_NONE,
++						      ICP_QAT_FW_COMP_NO_APPEND_CRC,
++						      ICP_QAT_FW_COMP_NO_DROP_DATA);
++
++	/* Fill second half of the template for decompression */
++	memcpy(req_tmpl + 1, req_tmpl, sizeof(*req_tmpl));
++	req_tmpl++;
++	header = &req_tmpl->comn_hdr;
++	header->service_cmd_id = ICP_QAT_FW_COMP_CMD_DECOMPRESS;
++	cd_pars = &req_tmpl->cd_pars;
++
++	hw_decomp_lower_csr.algo = ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_DEFLATE;
++	lower_val = ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_LOWER(hw_decomp_lower_csr);
++
++	cd_pars->u.sl.comp_slice_cfg_word[0] = lower_val;
++	cd_pars->u.sl.comp_slice_cfg_word[1] = 0;
 +}
 +
- static inline void qat_comp_create_compression_req(void *ctx, void *req,
- 						   u64 src, u32 slen,
- 						   u64 dst, u32 dlen,
++void adf_gen4_init_dc_ops(struct adf_dc_ops *dc_ops)
++{
++	dc_ops->build_deflate_ctx = qat_comp_build_deflate;
++}
++EXPORT_SYMBOL_GPL(adf_gen4_init_dc_ops);
+diff --git a/drivers/crypto/qat/qat_common/adf_gen4_dc.h b/drivers/crypto/qat/qat_common/adf_gen4_dc.h
+new file mode 100644
+index 000000000000..0b1a6774412e
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/adf_gen4_dc.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2022 Intel Corporation */
++#ifndef ADF_GEN4_DC_H
++#define ADF_GEN4_DC_H
++
++#include "adf_accel_devices.h"
++
++void adf_gen4_init_dc_ops(struct adf_dc_ops *dc_ops);
++
++#endif /* ADF_GEN4_DC_H */
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp.h b/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp.h
+new file mode 100644
+index 000000000000..7ea8962272f2
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp.h
+@@ -0,0 +1,164 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2022 Intel Corporation */
++#ifndef _ICP_QAT_HW_20_COMP_H_
++#define _ICP_QAT_HW_20_COMP_H_
++
++#include "icp_qat_hw_20_comp_defs.h"
++#include "icp_qat_fw.h"
++
++struct icp_qat_hw_comp_20_config_csr_lower {
++	enum icp_qat_hw_comp_20_extended_delay_match_mode edmm;
++	enum icp_qat_hw_comp_20_hw_comp_format algo;
++	enum icp_qat_hw_comp_20_search_depth sd;
++	enum icp_qat_hw_comp_20_hbs_control hbs;
++	enum icp_qat_hw_comp_20_abd abd;
++	enum icp_qat_hw_comp_20_lllbd_ctrl lllbd;
++	enum icp_qat_hw_comp_20_min_match_control mmctrl;
++	enum icp_qat_hw_comp_20_skip_hash_collision hash_col;
++	enum icp_qat_hw_comp_20_skip_hash_update hash_update;
++	enum icp_qat_hw_comp_20_byte_skip skip_ctrl;
++};
++
++static inline __u32
++ICP_QAT_FW_COMP_20_BUILD_CONFIG_LOWER(struct icp_qat_hw_comp_20_config_csr_lower csr)
++{
++	u32 val32 = 0;
++
++	QAT_FIELD_SET(val32, csr.algo,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_HW_COMP_FORMAT_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_HW_COMP_FORMAT_MASK);
++	QAT_FIELD_SET(val32, csr.sd,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SEARCH_DEPTH_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SEARCH_DEPTH_MASK);
++	QAT_FIELD_SET(val32, csr.edmm,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_EXTENDED_DELAY_MATCH_MODE_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_EXTENDED_DELAY_MATCH_MODE_MASK);
++	QAT_FIELD_SET(val32, csr.hbs,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_HBS_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_HBS_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.lllbd,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LLLBD_CTRL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LLLBD_CTRL_MASK);
++	QAT_FIELD_SET(val32, csr.mmctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.hash_col,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_COLLISION_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_COLLISION_MASK);
++	QAT_FIELD_SET(val32, csr.hash_update,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_UPDATE_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_UPDATE_MASK);
++	QAT_FIELD_SET(val32, csr.skip_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_BYTE_SKIP_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_BYTE_SKIP_MASK);
++	QAT_FIELD_SET(val32, csr.abd, ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_MASK);
++
++	return __builtin_bswap32(val32);
++}
++
++struct icp_qat_hw_comp_20_config_csr_upper {
++	enum icp_qat_hw_comp_20_scb_control scb_ctrl;
++	enum icp_qat_hw_comp_20_rmb_control rmb_ctrl;
++	enum icp_qat_hw_comp_20_som_control som_ctrl;
++	enum icp_qat_hw_comp_20_skip_hash_rd_control skip_hash_ctrl;
++	enum icp_qat_hw_comp_20_scb_unload_control scb_unload_ctrl;
++	enum icp_qat_hw_comp_20_disable_token_fusion_control disable_token_fusion_ctrl;
++	enum icp_qat_hw_comp_20_lbms lbms;
++	enum icp_qat_hw_comp_20_scb_mode_reset_mask scb_mode_reset;
++	__u16 lazy;
++	__u16 nice;
++};
++
++static inline __u32
++ICP_QAT_FW_COMP_20_BUILD_CONFIG_UPPER(struct icp_qat_hw_comp_20_config_csr_upper csr)
++{
++	u32 val32 = 0;
++
++	QAT_FIELD_SET(val32, csr.scb_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.rmb_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_RMB_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_RMB_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.som_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SOM_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SOM_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.skip_hash_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_RD_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_RD_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.scb_unload_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_UNLOAD_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_UNLOAD_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.disable_token_fusion_ctrl,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_DISABLE_TOKEN_FUSION_CONTROL_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_DISABLE_TOKEN_FUSION_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.lbms,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LBMS_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LBMS_MASK);
++	QAT_FIELD_SET(val32, csr.scb_mode_reset,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_MODE_RESET_MASK_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_MODE_RESET_MASK_MASK);
++	QAT_FIELD_SET(val32, csr.lazy,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_MASK);
++	QAT_FIELD_SET(val32, csr.nice,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_BITPOS,
++		      ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_MASK);
++
++	return __builtin_bswap32(val32);
++}
++
++struct icp_qat_hw_decomp_20_config_csr_lower {
++	enum icp_qat_hw_decomp_20_hbs_control hbs;
++	enum icp_qat_hw_decomp_20_lbms lbms;
++	enum icp_qat_hw_decomp_20_hw_comp_format algo;
++	enum icp_qat_hw_decomp_20_min_match_control mmctrl;
++	enum icp_qat_hw_decomp_20_lz4_block_checksum_present lbc;
++};
++
++static inline __u32
++ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_LOWER(struct icp_qat_hw_decomp_20_config_csr_lower csr)
++{
++	u32 val32 = 0;
++
++	QAT_FIELD_SET(val32, csr.hbs,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HBS_CONTROL_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HBS_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.lbms,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LBMS_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LBMS_MASK);
++	QAT_FIELD_SET(val32, csr.algo,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HW_DECOMP_FORMAT_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HW_DECOMP_FORMAT_MASK);
++	QAT_FIELD_SET(val32, csr.mmctrl,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.lbc,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_MASK);
++
++	return __builtin_bswap32(val32);
++}
++
++struct icp_qat_hw_decomp_20_config_csr_upper {
++	enum icp_qat_hw_decomp_20_speculative_decoder_control sdc;
++	enum icp_qat_hw_decomp_20_mini_cam_control mcc;
++};
++
++static inline __u32
++ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_UPPER(struct icp_qat_hw_decomp_20_config_csr_upper csr)
++{
++	u32 val32 = 0;
++
++	QAT_FIELD_SET(val32, csr.sdc,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_SPECULATIVE_DECODER_CONTROL_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_SPECULATIVE_DECODER_CONTROL_MASK);
++	QAT_FIELD_SET(val32, csr.mcc,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_BITPOS,
++		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_MASK);
++
++	return __builtin_bswap32(val32);
++}
++
++#endif
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp_defs.h b/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp_defs.h
+new file mode 100644
+index 000000000000..208d4554283b
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/icp_qat_hw_20_comp_defs.h
+@@ -0,0 +1,300 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2022 Intel Corporation */
++#ifndef _ICP_QAT_HW_20_COMP_DEFS_H
++#define _ICP_QAT_HW_20_COMP_DEFS_H
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_CONTROL_BITPOS 31
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_scb_control {
++	ICP_QAT_HW_COMP_20_SCB_CONTROL_ENABLE = 0x0,
++	ICP_QAT_HW_COMP_20_SCB_CONTROL_DISABLE = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SCB_CONTROL_DISABLE
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_RMB_CONTROL_BITPOS 30
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_RMB_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_rmb_control {
++	ICP_QAT_HW_COMP_20_RMB_CONTROL_RESET_ALL = 0x0,
++	ICP_QAT_HW_COMP_20_RMB_CONTROL_RESET_FC_ONLY = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_RMB_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_RMB_CONTROL_RESET_ALL
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SOM_CONTROL_BITPOS 28
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SOM_CONTROL_MASK 0x3
++
++enum icp_qat_hw_comp_20_som_control {
++	ICP_QAT_HW_COMP_20_SOM_CONTROL_NORMAL_MODE = 0x0,
++	ICP_QAT_HW_COMP_20_SOM_CONTROL_REPLAY_MODE = 0x1,
++	ICP_QAT_HW_COMP_20_SOM_CONTROL_INPUT_CRC = 0x2,
++	ICP_QAT_HW_COMP_20_SOM_CONTROL_RESERVED_MODE = 0x3,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SOM_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SOM_CONTROL_NORMAL_MODE
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_RD_CONTROL_BITPOS 27
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_RD_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_skip_hash_rd_control {
++	ICP_QAT_HW_COMP_20_SKIP_HASH_RD_CONTROL_NO_SKIP = 0x0,
++	ICP_QAT_HW_COMP_20_SKIP_HASH_RD_CONTROL_SKIP_HASH_READS = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_RD_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SKIP_HASH_RD_CONTROL_NO_SKIP
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_UNLOAD_CONTROL_BITPOS 26
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_UNLOAD_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_scb_unload_control {
++	ICP_QAT_HW_COMP_20_SCB_UNLOAD_CONTROL_UNLOAD = 0x0,
++	ICP_QAT_HW_COMP_20_SCB_UNLOAD_CONTROL_NO_UNLOAD = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_UNLOAD_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SCB_UNLOAD_CONTROL_UNLOAD
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_DISABLE_TOKEN_FUSION_CONTROL_BITPOS 21
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_DISABLE_TOKEN_FUSION_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_disable_token_fusion_control {
++	ICP_QAT_HW_COMP_20_DISABLE_TOKEN_FUSION_CONTROL_ENABLE = 0x0,
++	ICP_QAT_HW_COMP_20_DISABLE_TOKEN_FUSION_CONTROL_DISABLE = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_DISABLE_TOKEN_FUSION_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_DISABLE_TOKEN_FUSION_CONTROL_ENABLE
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LBMS_BITPOS 19
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LBMS_MASK 0x3
++
++enum icp_qat_hw_comp_20_lbms {
++	ICP_QAT_HW_COMP_20_LBMS_LBMS_64KB = 0x0,
++	ICP_QAT_HW_COMP_20_LBMS_LBMS_256KB = 0x1,
++	ICP_QAT_HW_COMP_20_LBMS_LBMS_1MB = 0x2,
++	ICP_QAT_HW_COMP_20_LBMS_LBMS_4MB = 0x3,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LBMS_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_LBMS_LBMS_64KB
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_MODE_RESET_MASK_BITPOS 18
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_MODE_RESET_MASK_MASK 0x1
++
++enum icp_qat_hw_comp_20_scb_mode_reset_mask {
++	ICP_QAT_HW_COMP_20_SCB_MODE_RESET_MASK_RESET_COUNTERS = 0x0,
++	ICP_QAT_HW_COMP_20_SCB_MODE_RESET_MASK_RESET_COUNTERS_AND_HISTORY = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SCB_MODE_RESET_MASK_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SCB_MODE_RESET_MASK_RESET_COUNTERS
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_BITPOS 9
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_MASK 0x1ff
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LAZY_PARAM_DEFAULT_VAL 258
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_BITPOS 0
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_MASK 0x1ff
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_DEFAULT_VAL 259
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HBS_CONTROL_BITPOS 14
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HBS_CONTROL_MASK 0x7
++
++enum icp_qat_hw_comp_20_hbs_control {
++	ICP_QAT_HW_COMP_20_HBS_CONTROL_HBS_IS_32KB = 0x0,
++	ICP_QAT_HW_COMP_23_HBS_CONTROL_HBS_IS_64KB = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HBS_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_HBS_CONTROL_HBS_IS_32KB
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_BITPOS 13
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_MASK 0x1
++
++enum icp_qat_hw_comp_20_abd {
++	ICP_QAT_HW_COMP_20_ABD_ABD_ENABLED = 0x0,
++	ICP_QAT_HW_COMP_20_ABD_ABD_DISABLED = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_ABD_ABD_ENABLED
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LLLBD_CTRL_BITPOS 12
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LLLBD_CTRL_MASK 0x1
++
++enum icp_qat_hw_comp_20_lllbd_ctrl {
++	ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_ENABLED = 0x0,
++	ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_DISABLED = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_LLLBD_CTRL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_ENABLED
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SEARCH_DEPTH_BITPOS 8
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SEARCH_DEPTH_MASK 0xf
++
++enum icp_qat_hw_comp_20_search_depth {
++	ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_1 = 0x1,
++	ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_6 = 0x3,
++	ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_9 = 0x4,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SEARCH_DEPTH_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_1
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HW_COMP_FORMAT_BITPOS 5
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HW_COMP_FORMAT_MASK 0x7
++
++enum icp_qat_hw_comp_20_hw_comp_format {
++	ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_ILZ77 = 0x0,
++	ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_DEFLATE = 0x1,
++	ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_LZ4 = 0x2,
++	ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_LZ4S = 0x3,
++	ICP_QAT_HW_COMP_23_HW_COMP_FORMAT_ZSTD = 0x4,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_HW_COMP_FORMAT_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_DEFLATE
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_BITPOS 4
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_MASK 0x1
++
++enum icp_qat_hw_comp_20_min_match_control {
++	ICP_QAT_HW_COMP_20_MIN_MATCH_CONTROL_MATCH_3B = 0x0,
++	ICP_QAT_HW_COMP_20_MIN_MATCH_CONTROL_MATCH_4B = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_MIN_MATCH_CONTROL_MATCH_3B
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_COLLISION_BITPOS 3
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_COLLISION_MASK 0x1
++
++enum icp_qat_hw_comp_20_skip_hash_collision {
++	ICP_QAT_HW_COMP_20_SKIP_HASH_COLLISION_ALLOW = 0x0,
++	ICP_QAT_HW_COMP_20_SKIP_HASH_COLLISION_DONT_ALLOW = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_COLLISION_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SKIP_HASH_COLLISION_ALLOW
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_UPDATE_BITPOS 2
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_UPDATE_MASK 0x1
++
++enum icp_qat_hw_comp_20_skip_hash_update {
++	ICP_QAT_HW_COMP_20_SKIP_HASH_UPDATE_ALLOW = 0x0,
++	ICP_QAT_HW_COMP_20_SKIP_HASH_UPDATE_DONT_ALLOW = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_SKIP_HASH_UPDATE_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_SKIP_HASH_UPDATE_ALLOW
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_BYTE_SKIP_BITPOS 1
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_BYTE_SKIP_MASK 0x1
++
++enum icp_qat_hw_comp_20_byte_skip {
++	ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_TOKEN = 0x0,
++	ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_LITERAL = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_BYTE_SKIP_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_TOKEN
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_EXTENDED_DELAY_MATCH_MODE_BITPOS 0
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_EXTENDED_DELAY_MATCH_MODE_MASK 0x1
++
++enum icp_qat_hw_comp_20_extended_delay_match_mode {
++	ICP_QAT_HW_COMP_20_EXTENDED_DELAY_MATCH_MODE_EDMM_DISABLED = 0x0,
++	ICP_QAT_HW_COMP_20_EXTENDED_DELAY_MATCH_MODE_EDMM_ENABLED = 0x1,
++};
++
++#define ICP_QAT_HW_COMP_20_CONFIG_CSR_EXTENDED_DELAY_MATCH_MODE_DEFAULT_VAL \
++	ICP_QAT_HW_COMP_20_EXTENDED_DELAY_MATCH_MODE_EDMM_DISABLED
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_SPECULATIVE_DECODER_CONTROL_BITPOS 31
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_SPECULATIVE_DECODER_CONTROL_MASK 0x1
++
++enum icp_qat_hw_decomp_20_speculative_decoder_control {
++	ICP_QAT_HW_DECOMP_20_SPECULATIVE_DECODER_CONTROL_ENABLE = 0x0,
++	ICP_QAT_HW_DECOMP_20_SPECULATIVE_DECODER_CONTROL_DISABLE = 0x1,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_SPECULATIVE_DECODER_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_SPECULATIVE_DECODER_CONTROL_ENABLE
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_BITPOS 30
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_MASK 0x1
++
++enum icp_qat_hw_decomp_20_mini_cam_control {
++	ICP_QAT_HW_DECOMP_20_MINI_CAM_CONTROL_ENABLE = 0x0,
++	ICP_QAT_HW_DECOMP_20_MINI_CAM_CONTROL_DISABLE = 0x1,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_MINI_CAM_CONTROL_ENABLE
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HBS_CONTROL_BITPOS 14
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HBS_CONTROL_MASK 0x7
++
++enum icp_qat_hw_decomp_20_hbs_control {
++	ICP_QAT_HW_DECOMP_20_HBS_CONTROL_HBS_IS_32KB = 0x0,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HBS_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_HBS_CONTROL_HBS_IS_32KB
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LBMS_BITPOS 8
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LBMS_MASK 0x3
++
++enum icp_qat_hw_decomp_20_lbms {
++	ICP_QAT_HW_DECOMP_20_LBMS_LBMS_64KB = 0x0,
++	ICP_QAT_HW_DECOMP_20_LBMS_LBMS_256KB = 0x1,
++	ICP_QAT_HW_DECOMP_20_LBMS_LBMS_1MB = 0x2,
++	ICP_QAT_HW_DECOMP_20_LBMS_LBMS_4MB = 0x3,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LBMS_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_LBMS_LBMS_64KB
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HW_DECOMP_FORMAT_BITPOS 5
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HW_DECOMP_FORMAT_MASK 0x7
++
++enum icp_qat_hw_decomp_20_hw_comp_format {
++	ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_DEFLATE = 0x1,
++	ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_LZ4 = 0x2,
++	ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_LZ4S = 0x3,
++	ICP_QAT_HW_DECOMP_23_HW_DECOMP_FORMAT_ZSTD = 0x4,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_HW_DECOMP_FORMAT_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_DEFLATE
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_BITPOS 4
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_MASK 0x1
++
++enum icp_qat_hw_decomp_20_min_match_control {
++	ICP_QAT_HW_DECOMP_20_MIN_MATCH_CONTROL_MATCH_3B = 0x0,
++	ICP_QAT_HW_DECOMP_20_MIN_MATCH_CONTROL_MATCH_4B = 0x1,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MIN_MATCH_CONTROL_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_MIN_MATCH_CONTROL_MATCH_3B
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_BITPOS 3
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_MASK 0x1
++
++enum icp_qat_hw_decomp_20_lz4_block_checksum_present {
++	ICP_QAT_HW_DECOMP_20_LZ4_BLOCK_CHKSUM_ABSENT = 0x0,
++	ICP_QAT_HW_DECOMP_20_LZ4_BLOCK_CHKSUM_PRESENT = 0x1,
++};
++
++#define ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_DEFAULT_VAL \
++	ICP_QAT_HW_DECOMP_20_LZ4_BLOCK_CHKSUM_ABSENT
++
++#endif
 -- 
 2.38.1
 
