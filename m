@@ -2,90 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D0DC43217
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 14:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC9BC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 16:30:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230008AbiKXOBV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Nov 2022 09:01:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
+        id S229535AbiKXQan (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 11:30:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbiKXOAl (ORCPT
+        with ESMTP id S229526AbiKXQal (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Nov 2022 09:00:41 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F0614E6C0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 05:58:38 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id g12so2567883wrs.10
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 05:58:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eK2HhZFuYKBw9Q1i1G+ZYdrg12Uwlkokjhvoi/Q+HPY=;
-        b=D38n3pCWpXzjlzIFepFNOLyjuVk4JHdwHucQrpGgyIhDtSuhyieBCotwNYGLKhcsLH
-         WxDDyNkTx2URYWVCTOtt4E1mJGwMhjgeBkw6SpOjbmPg6AN5/NLb2LFYBM47AnH6o6ED
-         30mkG80aQOc2DLEBNgXILz/pS5ZcIa8CS5Pvk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eK2HhZFuYKBw9Q1i1G+ZYdrg12Uwlkokjhvoi/Q+HPY=;
-        b=GdraRaBpsvETUOd1WnZdYbKHZFYEWQYQuEIkkzeAghT625M5FntYtsEA3Iq00TD0Q2
-         fmbfZL5hDhOJRIJry80+//YvySBeEwWVffUO9TNBFBpZT1IJlqE7gCFOdZ79GJOw9Uws
-         tw3geu0t5vF4KqPqPJw+hMTJC0IOEkBKnyzNsyTEgbhmg63Yvk2m6P+fYZd2TA/rYmef
-         oSIeaFC0/IbKwO4kth20nf3S3aIQmu7NteKdmLapjufh+Ocw/9h8xF9XqhSb6pKtAz9B
-         k5omGNy+xx1Fce4glkZCaTCJyvwCKG6iFV4IjugJzgXXXBNlV71by1mNl+vi3ZJZuB7f
-         72Kw==
-X-Gm-Message-State: ANoB5pl9b/X5II5/DHQrtj2pyehYa3ZL5BXGTvjr13Vb5fduff1gw2ig
-        WQr66d7cDlbh7r2Bbn8eLfEdMQ==
-X-Google-Smtp-Source: AA0mqf5sc5D8WHrub5ZtPIWUF7UHcLatkb1hu6n9mgvJRIQQ9In22C2OQPul1kbFM8wIG+G3AZNcNA==
-X-Received: by 2002:adf:e5c4:0:b0:236:9701:97d2 with SMTP id a4-20020adfe5c4000000b00236970197d2mr13893227wrn.185.1669298316053;
-        Thu, 24 Nov 2022 05:58:36 -0800 (PST)
-Received: from localhost.localdomain ([2a09:bac1:28c0:140::15:1b6])
-        by smtp.gmail.com with ESMTPSA id n14-20020a5d660e000000b00241bee11825sm1371440wru.103.2022.11.24.05.58.35
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 24 Nov 2022 05:58:35 -0800 (PST)
-From:   Ignat Korchagin <ignat@cloudflare.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        keyrings@vger.kernel.org
-Cc:     kernel-team@cloudflare.com, lei he <helei.sig11@bytedance.com>
-Subject: [RESEND PATCH v2 4/4] crypto: remove unused field in pkcs8_parse_context
-Date:   Thu, 24 Nov 2022 13:58:12 +0000
-Message-Id: <20221124135812.26999-5-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
-In-Reply-To: <20221124135812.26999-1-ignat@cloudflare.com>
-References: <20221124135812.26999-1-ignat@cloudflare.com>
+        Thu, 24 Nov 2022 11:30:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EDE216FB29;
+        Thu, 24 Nov 2022 08:30:40 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D3DFFB8287B;
+        Thu, 24 Nov 2022 16:30:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45C35C433C1;
+        Thu, 24 Nov 2022 16:30:36 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GLM0uBfm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669307434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EzDoEvNDhRphmuoSNKNVxLbek8oLLix/b9dbHW5QtLs=;
+        b=GLM0uBfmyJutlyfrCPqlI3ap4XE52yP7cYHnWXQLh83VEssdyMGcsqspkq6b8Tu9mdbQIO
+        NwcVzP3GcuZ128HU52dJhFTjUij1LmkBMFTeSyk0FIaPs6JJA1lzBDbaLwpFa/R/9M/rxK
+        FH6gc0vEUWPKCBVX2XMy5Q1IkLY5vo4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4fe9579 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 24 Nov 2022 16:30:33 +0000 (UTC)
+Date:   Thu, 24 Nov 2022 17:30:28 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>, linux-api@vger.kernel.org
+Subject: Re: [PATCH v6 1/3] random: add vgetrandom_alloc() syscall
+Message-ID: <Y3+cJLBas5hRh7GU@zx2c4.com>
+References: <20221121152909.3414096-1-Jason@zx2c4.com>
+ <20221121152909.3414096-2-Jason@zx2c4.com>
+ <87v8n6lzh9.fsf@oldenburg.str.redhat.com>
+ <Y37DDX5RtiGsV6MO@zx2c4.com>
+ <87a64g7wks.fsf@oldenburg.str.redhat.com>
+ <Y39djiBSmgXfgWJv@zx2c4.com>
+ <87cz9c5z1f.fsf@oldenburg.str.redhat.com>
+ <Y39iisTmUO2AaKNs@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y39iisTmUO2AaKNs@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: lei he <helei.sig11@bytedance.com>
+On Thu, Nov 24, 2022 at 01:24:42PM +0100, Jason A. Donenfeld wrote:
+> Hi Florian,
+> 
+> On Thu, Nov 24, 2022 at 01:15:24PM +0100, Florian Weimer wrote:
+> > * Jason A. Donenfeld:
+> > 
+> > > Hi Florian,
+> > >
+> > > On Thu, Nov 24, 2022 at 06:25:39AM +0100, Florian Weimer wrote:
+> > >> * Jason A. Donenfeld:
+> > >> 
+> > >> > Hi Florian,
+> > >> >
+> > >> > On Wed, Nov 23, 2022 at 11:46:58AM +0100, Florian Weimer wrote:
+> > >> >> * Jason A. Donenfeld:
+> > >> >> 
+> > >> >> > + * The vgetrandom() function in userspace requires an opaque state, which this
+> > >> >> > + * function provides to userspace, by mapping a certain number of special pages
+> > >> >> > + * into the calling process. It takes a hint as to the number of opaque states
+> > >> >> > + * desired, and returns the number of opaque states actually allocated, the
+> > >> >> > + * size of each one in bytes, and the address of the first state.
+> > >> >> > + */
+> > >> >> > +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned long __user *, num,
+> > >> >> > +		unsigned long __user *, size_per_each, unsigned int, flags)
+> > >> >> 
+> > >> >> I think you should make this __u64, so that you get a consistent
+> > >> >> userspace interface on all architectures, without the need for compat
+> > >> >> system calls.
+> > >> >
+> > >> > That would be quite unconventional. Most syscalls that take lengths do
+> > >> > so with the native register size (`unsigned long`, `size_t`), rather
+> > >> > than u64. If you can point to a recent trend away from this by
+> > >> > indicating some commits that added new syscalls with u64, I'd be happy
+> > >> > to be shown otherwise. But AFAIK, that's not the way it's done.
+> > >> 
+> > >> See clone3 and struct clone_args.
+> > >
+> > > The struct is one thing. But actually, clone3 takes a `size_t`:
+> > >
+> > >     SYSCALL_DEFINE2(clone3, struct clone_args __user *, uargs, size_t, size)
+> > >
+> > > I take from this that I too should use `size_t` rather than `unsigned
+> > > long.` And it doesn't seem like there's any compat clone3.
+> > 
+> > But vgetrandom_alloc does not use unsigned long, but unsigned long *.
+> > You need to look at the contents for struct clone_args for comparison.
+> 
+> The other direction would be making this a u32
 
-remove unused field 'algo_oid' in pkcs8_parse_context
+I think `unsigned int` is actually a sensible size for what these values
+should be. That eliminates the problem and potential bikeshed too. So
+I'll go with that for v+1.
 
-Signed-off-by: lei he <helei.sig11@bytedance.com>
----
- crypto/asymmetric_keys/pkcs8_parser.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_keys/pkcs8_parser.c
-index e507c635ead5..f81317234331 100644
---- a/crypto/asymmetric_keys/pkcs8_parser.c
-+++ b/crypto/asymmetric_keys/pkcs8_parser.c
-@@ -21,7 +21,6 @@ struct pkcs8_parse_context {
- 	struct public_key *pub;
- 	unsigned long	data;			/* Start of data */
- 	enum OID	last_oid;		/* Last OID encountered */
--	enum OID	algo_oid;		/* Algorithm OID */
- 	u32		key_size;
- 	const void	*key;
- 	const void	*algo_param;
--- 
-2.30.2
-
+Jason
