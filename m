@@ -2,115 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABE4C4321E
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 13:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB8CC43217
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 14:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbiKXNSb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Nov 2022 08:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
+        id S230413AbiKXOAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 09:00:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbiKXNS2 (ORCPT
+        with ESMTP id S230252AbiKXOAf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Nov 2022 08:18:28 -0500
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51CFD654EA;
-        Thu, 24 Nov 2022 05:18:27 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.west.internal (Postfix) with ESMTP id 2DE6F32009C6;
-        Thu, 24 Nov 2022 08:18:24 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute3.internal (MEProxy); Thu, 24 Nov 2022 08:18:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; t=1669295903; x=1669382303; bh=4sKDJSN01P
-        eIAiXQHaFqrZQX8gqaur58q7xvYuCCrEw=; b=DY52+Je6rlB55h4gnvNU+KhxnG
-        +fF14yFdZ9YMTXe5RWTtb96nPdiXE9b7ZuQdIIAIjm6lYLqDt9kPoRLIOehaNBSo
-        uhqHJSd6MZkq3jxyzQe5d0cY8EgbXyc3ANDEmkwGlILJIdVXhjKEILq9eue1QYr+
-        SmrZEjlJMQt2div+xHqZ1xkJsUafpE5v/PkUxFF5mkPVw9rdk53Yfjgg7GaptpdQ
-        tDw0ppZyl7Sp6dcw0hrWsLHhWLcUSc4mg8Y55NLkUgmeY9aomx8hsYnS20YAcPus
-        NrJ0NIdALlEANOQ6t11fJppwBnfPmhQboDsSVbSjSnyI4jNOX36rh9HmbVXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1669295903; x=1669382303; bh=4sKDJSN01PeIAiXQHaFqrZQX8gqa
-        ur58q7xvYuCCrEw=; b=cHUsDg9USKksVIE/uaaxz8YGUoQJXPIPFXFBdKtr+8UR
-        F/M6SjrokoS65iGn6reMTGQxDxGUR0EuTTT8r+xwNZWpdXSGb27fy3FIfuJKhq1b
-        nIacplD12qe56DgdU0LqprZz22yJlLhjnuLw+0RQbZ6LGbGFD4oco+aIVAj1ujDF
-        KZGgYQsDcXVYdR83TXItpaY7vN5eh3UWLbAjZgv6CVUhUP6uC5HMwnfMJyZolwJ6
-        KpqKODvNXLYJ0F0rYpnyVz8Uy+jFUzOhM+/hK4eagtjChnMaUwjgW5kv2KW0QBfU
-        bdxfn2ii6N2So5jluJ3V9u4NXMGFZLCOeLcSjQNq+w==
-X-ME-Sender: <xms:H29_Y0Qq5JD6yf7CFoVYBOkq4svdhXxXMheSgqdh9Kh2pHUcmw7n_A>
-    <xme:H29_YxwzxeXEvIyaFxHj2_TaD74MHm40xVdSoHcCrlDTfeDAuq4zU-5b24e6j3aDx
-    9u6lbOzo-JZcW5M9E8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrieefgdehudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeevhfffledtgeehfeffhfdtgedvheejtdfgkeeuvefgudffteettdekkeeufeeh
-    udenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:H29_Yx1DEl7KyReL2IQVQu5LvTUalRSn0otglnXihmI5wpkk7WVLgg>
-    <xmx:H29_Y4ANsr_zanA5MrUDVh5-lLct3tt5kaUB-3CShYkujPQwbZTuVw>
-    <xmx:H29_Y9iDNEUwoPSIyQ_DDFkOQha36lWb9DsYpFFkERE6Vv1Kny0rUQ>
-    <xmx:H29_Y-Us_IcDqiJyWRqnUuTp1dXhECKWovVznjJfYrYntzt8ZzEM0A>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 6A8E8B60086; Thu, 24 Nov 2022 08:18:23 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-1115-g8b801eadce-fm-20221102.001-g8b801ead
-Mime-Version: 1.0
-Message-Id: <7928bec7-4659-4b32-aad7-2300409ea670@app.fastmail.com>
-In-Reply-To: <Y39oBtR8t+XNPS0d@zx2c4.com>
-References: <20221121152909.3414096-1-Jason@zx2c4.com>
- <20221121152909.3414096-2-Jason@zx2c4.com>
- <87v8n6lzh9.fsf@oldenburg.str.redhat.com> <Y37DDX5RtiGsV6MO@zx2c4.com>
- <87a64g7wks.fsf@oldenburg.str.redhat.com> <Y39djiBSmgXfgWJv@zx2c4.com>
- <87cz9c5z1f.fsf@oldenburg.str.redhat.com> <Y39iisTmUO2AaKNs@zx2c4.com>
- <Y39oBtR8t+XNPS0d@zx2c4.com>
-Date:   Thu, 24 Nov 2022 14:18:03 +0100
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        "Florian Weimer" <fweimer@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        "Adhemerval Zanella Netto" <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>, linux-api@vger.kernel.org
-Subject: Re: [PATCH v6 1/3] random: add vgetrandom_alloc() syscall
-Content-Type: text/plain
+        Thu, 24 Nov 2022 09:00:35 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA5D13F484
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 05:58:33 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id a11-20020a05600c2d4b00b003cf6f5fd9f1so1312874wmg.2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 05:58:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FLYGIY1cjSaO8iMr+6IveYVeTtbbWK2zYM30V3Bwty4=;
+        b=fUMAZbkFZkyQCLNk7f66kU61yfocH/0UqmdSp0zdUHTGOZ79YhOTbvqMNBl3qGhN91
+         5kjEnU8oWNbqaBNlok68y7eHenJUWKDR0noHJJ85VfBpN0Y+Dt6sVhUpkWei1ZLensFO
+         UQJKjDgLInKe1XEXKarXu8sQTV4rmW7n/Yb60=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FLYGIY1cjSaO8iMr+6IveYVeTtbbWK2zYM30V3Bwty4=;
+        b=OHqWAVvYdYbrwGESFEtp9stP7HioGY0MNpK/XfQGsA9wL6HfZ3U6GQlmWY935MXeHY
+         JAyBQkkb4p8sbK4DAcRygsCi+JxkhPCGz3EAl9PnJkiu+PupaqKB6qgbU22KlODgJZJK
+         z3ja5rA7X3C8ZcoCKxYa3jdlZorBGZZ6c7JB/oNyzuQm9Ki2cvcJ9sNz26o9nwXWoB2O
+         qr8WAGGP2qtV01T3Sxwe9CSvMY0cARy0EtlvAwmO9DQny2hintYaUagip43vz4fo6hgw
+         5Sp5Cn5v5i1xgJiiSX9o5kAGoWtbQPvJUX2O2VmRa6eaqPO0/t9A5vjITNOEXRyw4mCb
+         pd6Q==
+X-Gm-Message-State: ANoB5pnHuWna6kyPYwa+x92si7C1Th/mXPbp8FSJV+MJSMtr8f4Dtp03
+        XPtDa7LSSxwjGwwV+xt6PO3mcQ==
+X-Google-Smtp-Source: AA0mqf4/QBhLyxEoDVdGqBp609ooHToWLVOwDE/1LbsJTnLrEg3y4oxHdGyVwSH6CRxaRz0UtmWzIg==
+X-Received: by 2002:a05:600c:1d09:b0:3cf:6ab3:4a0b with SMTP id l9-20020a05600c1d0900b003cf6ab34a0bmr26840189wms.91.1669298311983;
+        Thu, 24 Nov 2022 05:58:31 -0800 (PST)
+Received: from localhost.localdomain ([2a09:bac1:28c0:140::15:1b6])
+        by smtp.gmail.com with ESMTPSA id n14-20020a5d660e000000b00241bee11825sm1371440wru.103.2022.11.24.05.58.30
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 24 Nov 2022 05:58:31 -0800 (PST)
+From:   Ignat Korchagin <ignat@cloudflare.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        keyrings@vger.kernel.org
+Cc:     kernel-team@cloudflare.com, Ignat Korchagin <ignat@cloudflare.com>
+Subject: [RESEND PATCH v2 0/4] crypto, keys: add ECDSA signature support to key retention service
+Date:   Thu, 24 Nov 2022 13:58:08 +0000
+Message-Id: <20221124135812.26999-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 24, 2022, at 13:48, Jason A. Donenfeld wrote:
-> On Thu, Nov 24, 2022 at 01:24:42PM +0100, Jason A. Donenfeld wrote:
+Changes from v1:
+  * fixed code format
 
-> Looks like set_mempolicy, get_mempoliy, and migrate_pages pass an
-> unsigned long pointer and I don't see any compat stuff around it:
->
->     SYSCALL_DEFINE3(set_mempolicy, int, mode, const unsigned long 
-> __user *, nmask,
->                     unsigned long, maxnode)
->    
->     SYSCALL_DEFINE5(get_mempolicy, int __user *, policy,
->                     unsigned long __user *, nmask, unsigned long, maxnode,
->                     unsigned long, addr, unsigned long, flags)
->
->     SYSCALL_DEFINE4(migrate_pages, pid_t, pid, unsigned long, maxnode,
->                     const unsigned long __user *, old_nodes,
->                     const unsigned long __user *, new_nodes)
+Kernel Key Retention Service[1] is a useful building block to build secure
+production key management systems. One of its interesting features is
+support for asymmetric keys: we can allow a process to use a certain key
+(decrypt or sign data) without actually allowing the process to read the
+cryptographic key material. By doing so we protect our code from certain
+type of attacks, where a process memory memory leak actually leaks a
+potentially highly sensitive cryptographic material.
 
-Compat handling for these is done all the way down in the
-pointer access:
+But unfortunately only RSA algorithm was supported until now, because
+in-kernel ECDSA implementation supported signature verifications only.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/mm/mempolicy.c#n1368
+This patchset implements in-kernel ECDSA signature generation and adds
+support for ECDSA signing in the key retention service. The key retention
+service support was taken out of a previous unmerged patchset from Lei He[2]
 
-This works here because it's a special bitmap but is not the
-best approach if you just have a pointer to a single value.
+[1]: https://www.kernel.org/doc/html/latest/security/keys/core.html
+[2]: https://patchwork.kernel.org/project/linux-crypto/list/?series=653034&state=*
 
-       Arnd
+Original posting: https://patchwork.kernel.org/project/keyrings/cover/20221014100737.94742-1-ignat@cloudflare.com/
+
+Ignat Korchagin (2):
+  crypto: add ECDSA signature generation support
+  crypto: add ECDSA test vectors from RFC 6979
+
+lei he (2):
+  crypto: pkcs8 parser support ECDSA private keys
+  crypto: remove unused field in pkcs8_parse_context
+
+ crypto/Kconfig                        |   3 +-
+ crypto/Makefile                       |   4 +-
+ crypto/asymmetric_keys/pkcs8.asn1     |   2 +-
+ crypto/asymmetric_keys/pkcs8_parser.c |  46 +++-
+ crypto/ecc.c                          |  19 +-
+ crypto/ecdsa.c                        | 373 +++++++++++++++++++++++++-
+ crypto/ecprivkey.asn1                 |   6 +
+ crypto/testmgr.c                      |  18 ++
+ crypto/testmgr.h                      | 333 +++++++++++++++++++++++
+ include/crypto/internal/ecc.h         |  10 +
+ 10 files changed, 792 insertions(+), 22 deletions(-)
+ create mode 100644 crypto/ecprivkey.asn1
+
+-- 
+2.30.2
+
