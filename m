@@ -2,119 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00D2C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 01:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A378C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 05:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbiKXBSg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Nov 2022 20:18:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51156 "EHLO
+        id S229525AbiKXF0v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 00:26:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiKXBS3 (ORCPT
+        with ESMTP id S229450AbiKXF0t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Nov 2022 20:18:29 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDC49C780;
-        Wed, 23 Nov 2022 17:18:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AB25CB825F3;
-        Thu, 24 Nov 2022 01:18:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36F17C433C1;
-        Thu, 24 Nov 2022 01:18:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Rkjvbp4O"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669252702;
+        Thu, 24 Nov 2022 00:26:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED634BF81D
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Nov 2022 21:25:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669267547;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gHcu1Df+WYlCMCGuI6BqIh8yeKwpZ9M+Wp3aq3lKwHE=;
-        b=Rkjvbp4OfknxrLRcWSuU2xsVtBe8MKafVdnOuXwJmh2md+Mi08LlKnSIRnn9aeJwmERQH4
-        AFPVmUQvhTwlfyAPSrUi9xLksdXy5cS26M7wvTCOe2gkVMOGIIRigfYqR8OHqea1Ppq7th
-        BtppJZ7TwGD8BnGV6IwUuDZOeE0J5YM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 99f0ec89 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 24 Nov 2022 01:18:22 +0000 (UTC)
-Date:   Thu, 24 Nov 2022 02:18:20 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
+        bh=1BJTv1yw1TZn6Ej/2m7IJg8ynAjrSeGYMGPtsYN1BeU=;
+        b=S24APCycTb0IaBoDPls6z9C/YkVUX1UgCIWyd/2yvjbXhBoA01y3MdrfxvPJDT45h1BbUX
+        6PaHDuyJfOl/9m7NKS6JOANmtfMu6tuvIVlVasYUaSZ3W+mWxm6cLiTh5O1arBtW9ZRjpt
+        jl3ZuQr+D1WF/GUYHXA6vM/8DWusP5Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-152-EWPiQi1WPDiKMhuQin-LmQ-1; Thu, 24 Nov 2022 00:25:45 -0500
+X-MC-Unique: EWPiQi1WPDiKMhuQin-LmQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76EA6101A52A;
+        Thu, 24 Nov 2022 05:25:45 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.2.16.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9086FC15BA5;
+        Thu, 24 Nov 2022 05:25:43 +0000 (UTC)
+From:   Florian Weimer <fweimer@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
         tglx@linutronix.de, linux-crypto@vger.kernel.org, x86@kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Linux API <linux-api@vger.kernel.org>
-Subject: Re: [PATCH v6 2/3] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y37GXIQVvUvRac6D@zx2c4.com>
+        Carlos O'Donell <carlos@redhat.com>
+Subject: Re: [PATCH v6 1/3] random: add vgetrandom_alloc() syscall
 References: <20221121152909.3414096-1-Jason@zx2c4.com>
- <20221121152909.3414096-3-Jason@zx2c4.com>
- <842fd97b-c958-7b0d-2c77-6927c7ab4d72@rasmusvillemoes.dk>
+        <20221121152909.3414096-2-Jason@zx2c4.com>
+        <87v8n6lzh9.fsf@oldenburg.str.redhat.com> <Y37DDX5RtiGsV6MO@zx2c4.com>
+Date:   Thu, 24 Nov 2022 06:25:39 +0100
+In-Reply-To: <Y37DDX5RtiGsV6MO@zx2c4.com> (Jason A. Donenfeld's message of
+        "Thu, 24 Nov 2022 02:04:13 +0100")
+Message-ID: <87a64g7wks.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <842fd97b-c958-7b0d-2c77-6927c7ab4d72@rasmusvillemoes.dk>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rasmus,
+* Jason A. Donenfeld:
 
-On Wed, Nov 23, 2022 at 09:51:04AM +0100, Rasmus Villemoes wrote:
-> On 21/11/2022 16.29, Jason A. Donenfeld wrote:
-> 
-> Cc += linux-api
-> 
-> > 
-> >       if (!new_block)
-> >         goto out;
-> >       new_cap = grnd_allocator.cap + num;
-> >       new_states = reallocarray(grnd_allocator.states, new_cap, sizeof(*grnd_allocator.states));
-> >       if (!new_states) {
-> >         munmap(new_block, num * size_per_each);
-> 
-> Hm. This does leak an implementation detail of vgetrandom_alloc(),
-> namely that it is based on mmap() of that size rounded up to page size.
-> Do we want to commit to this being the proper way of disposing of a
-> succesful vgetrandom_alloc(), or should there also be a
-> vgetrandom_free(void *states, long num, long size_per_each)?
+> Hi Florian,
+>
+> On Wed, Nov 23, 2022 at 11:46:58AM +0100, Florian Weimer wrote:
+>> * Jason A. Donenfeld:
+>> 
+>> > + * The vgetrandom() function in userspace requires an opaque state, which this
+>> > + * function provides to userspace, by mapping a certain number of special pages
+>> > + * into the calling process. It takes a hint as to the number of opaque states
+>> > + * desired, and returns the number of opaque states actually allocated, the
+>> > + * size of each one in bytes, and the address of the first state.
+>> > + */
+>> > +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned long __user *, num,
+>> > +		unsigned long __user *, size_per_each, unsigned int, flags)
+>> 
+>> I think you should make this __u64, so that you get a consistent
+>> userspace interface on all architectures, without the need for compat
+>> system calls.
+>
+> That would be quite unconventional. Most syscalls that take lengths do
+> so with the native register size (`unsigned long`, `size_t`), rather
+> than u64. If you can point to a recent trend away from this by
+> indicating some commits that added new syscalls with u64, I'd be happy
+> to be shown otherwise. But AFAIK, that's not the way it's done.
 
-Yes, this is intentional, and this is exactly what I wanted to do. There
-are various wrappers of vm_mmap() throughout, mmap being one of them,
-and they typically then resort to munmap to unmap it. This is how
-userspace handles memory - maps, always maps. So I think doing that is
-fine and consistent.
+See clone3 and struct clone_args.  It's more common with pointers, which
+are now 64 bits unconditionally: struct futex_waitv, struct rseq_cs and
+struct rseq.
 
-However, your point about it relying on it being a rounded up size isn't
-correct. `munmap` will unmap the whole page if the size you pass lies
-within a page. So `num * size_of_each` will always do the right thing,
-without needing to have userspace code round anything up. (From the man
-page: "The  address addr must be a multiple of the page size (but length
-need not be). All pages containing a part of the indicated range are
-unmapped.") And as you can see in my example code, nothing is rounded
-up. So I don't know why you made that comment.
+If the length or pointer is a system call argument, widening it to 64
+bits is not necessary because zero-extension to the full register
+eliminates the need for a compat system call.  But if you pass the
+address to a size or pointer, you'll need compat syscalls if you don't
+make the passed data __u64.
 
-> And if so, what color should the bikeshed really have. I.e.,
+Thanks,
+Florian
 
-No color, thanks.
-
-> Also, should vgetrandom_alloc() take a void *hint argument that
-> would/could be passed through to mmap() to give userspace some control
-> over where the memory is located - possibly only in the future, i.e.
-> insist on it being NULL for now, but it could open the possibility for
-> adding e.g. VGRND_MAP_FIXED[_NOREPLACE] that would translate to the
-> corresponding MAP_ flags.
-
-I think adding more control is exactly what this is trying to avoid.
-It's very intentionally *not* a general allocator function, but
-something specific for vDSO getrandom(). However, it does already, in
-this very patchset here, take a (currently unused) flags argument, in
-case we have the need for later extension.
-
-In the meantime, however, I'm not very interested in complicating this
-interface into oblivion. Firstly, it ensures nothing will get done. But
-moreover, this interface needs to be somewhat future-proof, yes, but it
-does not need to be a general syscall; rather, it's a specific syscall
-for a specific task.
-
-Jason
