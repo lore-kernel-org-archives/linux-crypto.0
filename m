@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB28C47089
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC2BC47088
 	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 10:57:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229472AbiKXK52 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Nov 2022 05:57:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47738 "EHLO
+        id S229698AbiKXK50 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 05:57:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiKXK5T (ORCPT
+        with ESMTP id S229679AbiKXK5T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 24 Nov 2022 05:57:19 -0500
 Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C0C48413;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD69D48428;
         Thu, 24 Nov 2022 02:57:17 -0800 (PST)
 Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 2AOAVTP2039626;
-        Thu, 24 Nov 2022 18:31:29 +0800 (GMT-8)
+        by twspam01.aspeedtech.com with ESMTP id 2AOAVUR3039627;
+        Thu, 24 Nov 2022 18:31:30 +0800 (GMT-8)
         (envelope-from neal_liu@aspeedtech.com)
 Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
  (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 24 Nov
@@ -34,9 +34,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 CC:     <linux-crypto@vger.kernel.org>, <linux-aspeed@lists.ozlabs.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 2/4] ARM: dts: aspeed: Add ACRY/AHBC device controller node
-Date:   Thu, 24 Nov 2022 18:55:50 +0800
-Message-ID: <20221124105552.1006549-3-neal_liu@aspeedtech.com>
+Subject: [PATCH v3 4/4] dt-bindings: bus: add documentation for Aspeed AHBC
+Date:   Thu, 24 Nov 2022 18:55:52 +0800
+Message-ID: <20221124105552.1006549-5-neal_liu@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221124105552.1006549-1-neal_liu@aspeedtech.com>
 References: <20221124105552.1006549-1-neal_liu@aspeedtech.com>
@@ -47,49 +47,63 @@ X-Originating-IP: [192.168.10.10]
 X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
  (192.168.0.24)
 X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 2AOAVTP2039626
+X-MAIL: twspam01.aspeedtech.com 2AOAVUR3039627
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add acry & ahbc node to device tree for AST2600.
+Add device tree binding documentation for the Aspeed
+Advanced High-Performance Bus (AHB) Controller.
 
 Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
 ---
- arch/arm/boot/dts/aspeed-g6.dtsi | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ .../bindings/bus/aspeed,ast2600-ahbc.yaml     | 37 +++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
 
-diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
-index 095cf8d03616..ad177799db0b 100644
---- a/arch/arm/boot/dts/aspeed-g6.dtsi
-+++ b/arch/arm/boot/dts/aspeed-g6.dtsi
-@@ -94,6 +94,11 @@ gic: interrupt-controller@40461000 {
- 			    <0x40466000 0x2000>;
- 			};
- 
-+		ahbc: bus@1e600000 {
-+			compatible = "aspeed,ast2600-ahbc", "syscon";
-+			reg = <0x1e600000 0x100>;
-+		};
+diff --git a/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+new file mode 100644
+index 000000000000..cf9740f2a0c7
+--- /dev/null
++++ b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+@@ -0,0 +1,37 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/bus/aspeed,ast2600-ahbc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- 		fmc: spi@1e620000 {
- 			reg = <0x1e620000 0xc4>, <0x20000000 0x10000000>;
- 			#address-cells = <1>;
-@@ -427,6 +432,14 @@ sbc: secure-boot-controller@1e6f2000 {
- 				reg = <0x1e6f2000 0x1000>;
- 			};
- 
-+			acry: crypto@1e6fa000 {
-+				compatible = "aspeed,ast2600-acry";
-+				reg = <0x1e6fa000 0x400>, <0x1e710000 0x1800>;
-+				interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&syscon ASPEED_CLK_GATE_RSACLK>;
-+				aspeed,ahbc = <&ahbc>;
-+			};
++title: ASPEED Advanced High-Performance Bus Controller (AHBC) Device Tree Bindings
 +
- 			video: video@1e700000 {
- 				compatible = "aspeed,ast2600-video-engine";
- 				reg = <0x1e700000 0x1000>;
++maintainers:
++  - Neal Liu <neal_liu@aspeedtech.com>
++  - Chia-Wei Wang <chiawei_wang@aspeedtech.com>
++
++description: |
++  Advanced High-performance Bus Controller (AHBC) supports plenty of mechanisms
++  including a priority arbiter, an address decoder and a data multiplexer
++  to control the overall operations of Advanced High-performance Bus (AHB).
++
++properties:
++  compatible:
++    enum:
++      - aspeed,ast2600-ahbc
++
++  reg:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    ahbc@1e600000 {
++        compatible = "aspeed,ast2600-ahbc";
++        reg = <0x1e600000 0x100>;
++    };
 -- 
 2.25.1
 
