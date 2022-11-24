@@ -2,83 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B91C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 10:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D53F8C43219
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Nov 2022 10:57:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbiKXKaZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Nov 2022 05:30:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49738 "EHLO
+        id S229652AbiKXK5Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 05:57:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiKXKaE (ORCPT
+        with ESMTP id S229680AbiKXK5T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Nov 2022 05:30:04 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A30014E6FE
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 02:30:01 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 205so1353659ybf.6
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Nov 2022 02:30:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jDR5GJzkrlvJD9yzrOlJ5GKkSJVuJ19hWIOf5v5G1Xs=;
-        b=LYM4pUwf23JLOP2V2OZ/RWMDi150FSYYyA+9UgSRGxIxTQig+tUBqDEu+XQ448IIj9
-         RoK7MSA87V+DgOaO1Asco/X7DRXQbEdXdZGUySxHiZCpYMSM1n9ew+Qjam+jkdDoqKhf
-         r2vhIqTlPP+sEpRKNSzjLLhzaPZBj09M/OLFmDJ8gBnj0WbjmZW+7Bj9GA2zvCkwGytn
-         fpQsR5N+Q/48fOLBwQ7TwIlLl7TspzpFjXWoj2pfMRNJJ/+DmVKKrFYdqoSgFgBPngpf
-         fA9xSbwYlCo8hrFIrki128ZHrB3UVwHtyZ8MiJUbupA8m8S3JYOZtDMeWV7/YPZoZ942
-         1SBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jDR5GJzkrlvJD9yzrOlJ5GKkSJVuJ19hWIOf5v5G1Xs=;
-        b=sMNPiU79VWKesZtAAVANxLlsnn0PZ9hkrnx2zblr6X/1LgznX6dvttZUXA9BzlMEEO
-         BH/dA2SCI/LhJ6/pELn3XnknkfFPJokYJWZhhdar/1c1+MqmHj7661V88xYoZNxpCIOD
-         TMC9P2ehVoIAo6y9cmH32rzwBls+hWsokldYT9Ouzycw3cw9OpaqMoNkF1SMZk8R0bFV
-         BFSNRWd12VlwauRZT4PDTw4TcRBghDeVUaIgDvOfQuxUJLjA+KjIeKj00+qDevpfBZoO
-         2juRlvsYWtobAaAxHZN4IbRIAdE2iFIpXq7SRDyzKYgTk0w6r6hZB+anPeZA6z7I5uLz
-         rA6Q==
-X-Gm-Message-State: ANoB5pmRBKltwdFF8wbRyEeNyBOSNnFp7CZolYghve+5TnYqLLyw3Wzk
-        BxS5b92w4B5laRiTzxYUFH1i70L0HShV1Lc3YUEJvg==
-X-Google-Smtp-Source: AA0mqf74tPMpGfik0vFG+53g1ZLEgmMjeL8riBiFr5hh/nRi1D9lpJvY/uduLLM0RUm1jdXXrlUx+QgqqjWEZuUgbqk=
-X-Received: by 2002:a25:1843:0:b0:6dc:b9ec:7c87 with SMTP id
- 64-20020a251843000000b006dcb9ec7c87mr13626761yby.322.1669285800899; Thu, 24
- Nov 2022 02:30:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20221119221219.1232541-1-linus.walleij@linaro.org>
- <20221119221219.1232541-2-linus.walleij@linaro.org> <73df18a2-b0d6-72de-37bb-17ba84b54b82@kernel.org>
- <CACRpkdZsxk2MH0AEHE=kpHuikdP35d3_q6wrr3+Yrs2QpZy62A@mail.gmail.com> <7b11aca1-c984-d8f4-6d99-13833270ee16@kernel.org>
-In-Reply-To: <7b11aca1-c984-d8f4-6d99-13833270ee16@kernel.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 24 Nov 2022 11:29:48 +0100
-Message-ID: <CACRpkday99jcpruX_viWiz7M66UC-k_kmsqFWpJiLMp0AEAh9w@mail.gmail.com>
-Subject: Re: [PATCH v1 1/4] dt-bindings: crypto: Let STM32 define Ux500 CRYP
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thu, 24 Nov 2022 05:57:19 -0500
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E4048423;
+        Thu, 24 Nov 2022 02:57:17 -0800 (PST)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 2AOAVUR2039627;
+        Thu, 24 Nov 2022 18:31:30 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 24 Nov
+ 2022 18:55:56 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        "Chia-Wei Wang --cc=linux-kernel @ vger . kernel . org" 
+        <chiawei_wang@aspeedtech.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-aspeed@lists.ozlabs.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh@kernel.org>
+Subject: [PATCH v3 3/4] dt-bindings: crypto: add documentation for Aspeed ACRY
+Date:   Thu, 24 Nov 2022 18:55:51 +0800
+Message-ID: <20221124105552.1006549-4-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221124105552.1006549-1-neal_liu@aspeedtech.com>
+References: <20221124105552.1006549-1-neal_liu@aspeedtech.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 2AOAVUR2039627
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 10:22 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+Add device tree binding documentation for the Aspeed
+ECDSA/RSA ACRY Engines Controller.
 
-> I am referring to the mail header, not to "CC" lines above. You missed
-> to Cc Devicetree maintainers (maybe more folks, I did not check all
-> addresses).
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
+---
+ .../bindings/crypto/aspeed,ast2600-acry.yaml  | 49 +++++++++++++++++++
+ MAINTAINERS                                   |  2 +-
+ 2 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
 
-Aha yeah that by default I just add Cc devicetree@vger.kernel.org
-for bindings, I guess because of the old ambition of separating device
-tree work from kernel work, which I think we have now given up
-on so yeah I should know better :/
+diff --git a/Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml b/Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
+new file mode 100644
+index 000000000000..b18f178aac06
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
+@@ -0,0 +1,49 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/aspeed,ast2600-acry.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: ASPEED ACRY ECDSA/RSA Hardware Accelerator Engines
++
++maintainers:
++  - Neal Liu <neal_liu@aspeedtech.com>
++
++description:
++  The ACRY ECDSA/RSA engines is designed to accelerate the throughput
++  of ECDSA/RSA signature and verification. Basically, ACRY can be
++  divided into two independent engines - ECC Engine and RSA Engine.
++
++properties:
++  compatible:
++    enum:
++      - aspeed,ast2600-acry
++
++  reg:
++    items:
++      - description: acry base address & size
++      - description: acry sram base address & size
++
++  clocks:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/ast2600-clock.h>
++    acry: crypto@1e6fa000 {
++        compatible = "aspeed,ast2600-acry";
++        reg = <0x1e6fa000 0x400>, <0x1e710000 0x1800>;
++        interrupts = <160>;
++        clocks = <&syscon ASPEED_CLK_GATE_RSACLK>;
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 164f67e59e5f..e6157d18d804 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3214,7 +3214,7 @@ ASPEED CRYPTO DRIVER
+ M:	Neal Liu <neal_liu@aspeedtech.com>
+ L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
+ S:	Maintained
+-F:	Documentation/devicetree/bindings/crypto/aspeed,ast2500-hace.yaml
++F:	Documentation/devicetree/bindings/crypto/aspeed,*
+ F:	drivers/crypto/aspeed/
+ 
+ ASUS NOTEBOOKS AND EEEPC ACPI/WMI EXTRAS DRIVERS
+-- 
+2.25.1
 
-Thanks!
-Linus Walleij
