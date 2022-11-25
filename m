@@ -2,196 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87EB8C4167D
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 20:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F312C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 22:32:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiKYUph (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 15:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38568 "EHLO
+        id S230105AbiKYWc4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 17:32:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiKYUpg (ORCPT
+        with ESMTP id S230120AbiKYWcn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 15:45:36 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3789355CB2;
-        Fri, 25 Nov 2022 12:45:35 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669409132;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Nx7J1ZYr7PRDjr0HjbjLwEuOmEiqovGUiWQQwnfrbYQ=;
-        b=AdCx8VPE/lzRBFp7vbqM3AWVW89sObDyt43L3+MHIoDr1ZzaVYwNcdPk1SFmEv+x41P4rg
-        jmmVPNEhH0Dt6Ar4z6lI4svK79bAj6/nzBllkMSCGFBgGz+NNHxjR9kz1BgSvDqfDhHkHR
-        MdA7+TniTH4Llx5g5AYETV37fiBxXc0Vbn59hmZ3ryGKfeHR8B/zRYu1zsWl4cUYrhKcgO
-        bngTt11EPv4BYrkv4hOhJsRQC/tIjIVL8XIPhC12VfRbcqVzQN4knhwAm+HOknvZd3JclX
-        vO+Ic1zJts7unrwo2HsRzwS9cVglJ4Jy8zdFxXCORI9f72omzt0DZijsgKzZLQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669409132;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Nx7J1ZYr7PRDjr0HjbjLwEuOmEiqovGUiWQQwnfrbYQ=;
-        b=HFsIpAcT6mMdpz79iidHhND9Aa/Q6QqVc7oqC6hX0dK3g5hv7aHto9ob0Xt4sKULt+jUCy
-        SN3mGKCZx+oHUaAQ==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v7 1/3] random: add vgetrandom_alloc() syscall
-In-Reply-To: <20221124165536.1631325-2-Jason@zx2c4.com>
-References: <20221124165536.1631325-1-Jason@zx2c4.com>
- <20221124165536.1631325-2-Jason@zx2c4.com>
-Date:   Fri, 25 Nov 2022 21:45:31 +0100
-Message-ID: <87bkouyd90.ffs@tglx>
+        Fri, 25 Nov 2022 17:32:43 -0500
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2BD059876
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 14:32:23 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id a7so6584337ljq.12
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 14:32:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2N3COCpsoABwn+0bsskzOLotnro9CebmxNoSqNVqZPE=;
+        b=fl3K9tvQ4SEH6fEipSAaBvQ8wajVtqxaXy7aojBVolAegYr6yc6RNZcAGvppMUdqVV
+         BiLBdsZKw3Jw5YO/IR5L0UZhl/8ZDoNVrqLJdHbHumuxYgDCF9KoirGrmCx3tGEb5EmH
+         SjXs2PCC16XatxYPXLD14Tax/SIkhIwyeRv5Lfq/1jjHxYD2wQCkpcBeDuqEvV9VWT9+
+         vg3ipdDtgaKfkeVUmdnX0VaaobeXN4QpYnYG7sOvpIADPGVsjFTd61EOFMjr6tZaQz6S
+         qUeKz7lhT/bpEJ7mmeYElwjUjnuatQGfiG0iosJrqdt4JvVSEI8kXis2C4BdUJkPTV5R
+         gRIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2N3COCpsoABwn+0bsskzOLotnro9CebmxNoSqNVqZPE=;
+        b=zWyQERCsd3XzrbfMsj115Qx221gDIw7tET/Tj+TdeO7NhDBHndAo6e7D7u3tjY7T8d
+         iaLUduCgckz6nXClVSKoaKLJhg0/NlLufwW7zKRfWWFjMBF+WHr3KikX4bPAaGI9q4Zi
+         jQpyyPNgpyUuViMJWkRZ+LiF4ED9wODmIBgGvAxP2fwwG6LoKL+6PaQ7IJ3KQMTE0KYU
+         tKdbucSbeBNJE1N9hxmLeQMqnJAXNKtN6d3DvCuuambQpJKVdpjZc7nNTHXxNOxHsGGs
+         igUrbZtuD+hY4XP6BeibK+ilNOtEIHrkDvVw4dGDntvOBNPjWz7lz3dd+xPDW8+H08lE
+         KIew==
+X-Gm-Message-State: ANoB5pm3+9UQYH7DbCpJpvXnX1nKYptlMn+JU6NfbfFgMXhHK4il09IG
+        KY/vRhyUZh0IfL8R2BpSZigH+7LYoWItnw==
+X-Google-Smtp-Source: AA0mqf4GkR6cTDrgVrJouDjRD9NT3IT7eVNiXT0oSpQ6x8xKMDyGxOXl2TCeXN1a1GDyuKDELaJ4EQ==
+X-Received: by 2002:a05:651c:12ca:b0:277:a9d:9355 with SMTP id 10-20020a05651c12ca00b002770a9d9355mr6571291lje.102.1669415541711;
+        Fri, 25 Nov 2022 14:32:21 -0800 (PST)
+Received: from Fecusia.lan (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
+        by smtp.gmail.com with ESMTPSA id f7-20020a05651201c700b004b4e9580b1asm676582lfp.66.2022.11.25.14.32.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Nov 2022 14:32:21 -0800 (PST)
+From:   Linus Walleij <linus.walleij@linaro.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH v2 0/4] crypto: stm32 - reuse for Ux500
+Date:   Fri, 25 Nov 2022 23:32:13 +0100
+Message-Id: <20221125223217.2409659-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 24 2022 at 17:55, Jason A. Donenfeld wrote:
-> ---
->  MAINTAINERS                             |  1 +
->  arch/x86/Kconfig                        |  1 +
->  arch/x86/entry/syscalls/syscall_64.tbl  |  1 +
->  arch/x86/include/asm/unistd.h           |  1 +
->  drivers/char/random.c                   | 59 +++++++++++++++++++++++++
->  include/uapi/asm-generic/unistd.h       |  7 ++-
->  kernel/sys_ni.c                         |  3 ++
->  lib/vdso/getrandom.h                    | 23 ++++++++++
->  scripts/checksyscalls.sh                |  4 ++
->  tools/include/uapi/asm-generic/unistd.h |  7 ++-
->  10 files changed, 105 insertions(+), 2 deletions(-)
->  create mode 100644 lib/vdso/getrandom.h
+xperimenting by taking some small portions of the Ux500
+CRYP driver and adding to the STM32 driver, it turns out
+we can support both platforms with the more modern STM32
+driver.
 
-I think I asked for this before:
+ChangeLog v1->v2:
+- Minor changes to the base patches, see per-patch
+  ChangeLog.
 
-Please split these things properly up. Provide the syscall and then wire
-it up.
+Upsides:
 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 67745ceab0db..331e21ba961a 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -59,6 +59,7 @@ config X86
->  	#
->  	select ACPI_LEGACY_TABLES_LOOKUP	if ACPI
->  	select ACPI_SYSTEM_POWER_STATES_SUPPORT	if ACPI
-> +	select ADVISE_SYSCALLS			if X86_64
+- We delete ~2400 lines of code and 8 files with intact
+  crypto support for Ux500 and not properly maintained
+  and supported.
 
-Why is this x86_64 specific?
+- The STM32 driver is more modern and compact thanks to
+  using things like the crypto engine.
 
-> --- a/arch/x86/include/asm/unistd.h
-> +++ b/arch/x86/include/asm/unistd.h
-> @@ -27,6 +27,7 @@
->  #  define __ARCH_WANT_COMPAT_SYS_PWRITEV64
->  #  define __ARCH_WANT_COMPAT_SYS_PREADV64V2
->  #  define __ARCH_WANT_COMPAT_SYS_PWRITEV64V2
-> +#  define __ARCH_WANT_VGETRANDOM_ALLOC
+Caveats:
 
-So instead of this define, why can't you do:
+- The STM32 driver does not support DMA. On the U8500
+  this only works with AES (DES support is broken with
+  DMA). If this is desired to be kept I can migrate
+  it to the STM32 driver as well.
 
-config VGETRADOM_ALLOC
-       bool
-       select ADVISE_SYSCALLS
+I have looked at doing the same for the Ux500 hash, which
+is related but I am reluctant about this one, because
+the Ux500 hardware has no interrupt and only supports
+polling. I have a series of modernizations for that
+driver that I have worked on and will think about how
+to move forward.
 
-and then have
+Linus Walleij (4):
+  dt-bindings: crypto: Let STM32 define Ux500 CRYP
+  crypto: stm32 - enable drivers to be used on Ux500
+  crypto: stm32/cryp - enable for use with Ux500
+  crypto: ux500/cryp - delete driver
 
-config GENERIC_VDSO_RANDOM_WHATEVER
-       bool
-       select VGETRANDOM_ALLOC
+ .../bindings/crypto/st,stm32-cryp.yaml        |   19 +
+ drivers/crypto/Makefile                       |    2 +-
+ drivers/crypto/stm32/Kconfig                  |    4 +-
+ drivers/crypto/stm32/stm32-cryp.c             |  413 ++++-
+ drivers/crypto/ux500/Kconfig                  |   10 -
+ drivers/crypto/ux500/Makefile                 |    1 -
+ drivers/crypto/ux500/cryp/Makefile            |   10 -
+ drivers/crypto/ux500/cryp/cryp.c              |  394 ----
+ drivers/crypto/ux500/cryp/cryp.h              |  315 ----
+ drivers/crypto/ux500/cryp/cryp_core.c         | 1600 -----------------
+ drivers/crypto/ux500/cryp/cryp_irq.c          |   45 -
+ drivers/crypto/ux500/cryp/cryp_irq.h          |   31 -
+ drivers/crypto/ux500/cryp/cryp_irqp.h         |  125 --
+ drivers/crypto/ux500/cryp/cryp_p.h            |  122 --
+ 14 files changed, 344 insertions(+), 2747 deletions(-)
+ delete mode 100644 drivers/crypto/ux500/cryp/Makefile
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
 
-This gives a clear Kconfig dependency instead of the random
-ADVISE_SYSCALLS select.
+-- 
+2.38.1
 
->--- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-
-> +#include "../../lib/vdso/getrandom.h"
-
-Seriously?
-
-include/vdso/ exists for a reason.
-
-> +#ifdef __ARCH_WANT_VGETRANDOM_ALLOC
-> +/*
-> + * The vgetrandom() function in userspace requires an opaque state, which this
-> + * function provides to userspace, by mapping a certain number of special pages
-> + * into the calling process. It takes a hint as to the number of opaque states
-> + * desired, and returns the number of opaque states actually allocated, the
-> + * size of each one in bytes, and the address of the first state.
-
-As this is a syscall which can be invoked outside of the VDSO, can you
-please provide proper kernel-doc which explains the arguments, the
-functionality and the return value?
-
-> + */
-> +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned int __user *, num,
-> +		unsigned int __user *, size_per_each, unsigned int, flags)
-> +{
-> +	size_t alloc_size, num_states;
-> +	unsigned long pages_addr;
-> +	unsigned int num_hint;
-> +	int ret;
-> +
-> +	if (flags)
-> +		return -EINVAL;
-> +
-> +	if (get_user(num_hint, num))
-> +		return -EFAULT;
-> +
-> +	num_states = clamp_t(size_t, num_hint, 1, (SIZE_MAX & PAGE_MASK) / sizeof(struct vgetrandom_state));
-> +	alloc_size = PAGE_ALIGN(num_states * sizeof(struct vgetrandom_state));
-> +
-> +	if (put_user(alloc_size / sizeof(struct vgetrandom_state), num) ||
-> +	    put_user(sizeof(struct vgetrandom_state), size_per_each))
-> +		return -EFAULT;
-
-That's a total of four sizeof(struct vgetrandom_state) usage sites.
-
-       size_t state_size = sizeof(struct vgetrandom_state);
-
-perhaps?
-
-> diff --git a/lib/vdso/getrandom.h b/lib/vdso/getrandom.h
-> new file mode 100644
-> index 000000000000..c7f727db2aaa
-> --- /dev/null
-> +++ b/lib/vdso/getrandom.h
-
-Wrong place. See above.
-
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + */
-> +
-> +#ifndef _VDSO_LIB_GETRANDOM_H
-> +#define _VDSO_LIB_GETRANDOM_H
-> +
-> +#include <crypto/chacha.h>
-> +
-> +struct vgetrandom_state {
-> +	union {
-> +		struct {
-> +			u8 batch[CHACHA_BLOCK_SIZE * 3 / 2];
-> +			u32 key[CHACHA_KEY_SIZE / sizeof(u32)];
-> +		};
-> +		u8 batch_key[CHACHA_BLOCK_SIZE * 2];
-> +	};
-> +	unsigned long generation;
-> +	u8 pos;
-> +};
-
-Thanks,
-
-        tglx
