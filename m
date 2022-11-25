@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92F4C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 04:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ED4C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 04:37:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbiKYEh1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Nov 2022 23:37:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
+        id S229772AbiKYEhs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Nov 2022 23:37:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbiKYEhB (ORCPT
+        with ESMTP id S229716AbiKYEhB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 24 Nov 2022 23:37:01 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DF6E27934;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1760927B00;
         Thu, 24 Nov 2022 20:36:56 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oyQS5-000djv-CO; Fri, 25 Nov 2022 12:36:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 12:36:37 +0800
+        id 1oyQSB-000dkk-LW; Fri, 25 Nov 2022 12:36:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 12:36:43 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Fri, 25 Nov 2022 12:36:37 +0800
-Subject: [v2 PATCH 5/9] crypto: skcipher - Add ctx helpers with DMA alignment
+Date:   Fri, 25 Nov 2022 12:36:43 +0800
+Subject: [v2 PATCH 8/9] crypto: kpp - Add ctx helpers with DMA alignment
 References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
 To:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
         Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
@@ -33,62 +33,60 @@ To:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1oyQS5-000djv-CO@formenos.hmeau.com>
+Message-Id: <E1oyQSB-000dkk-LW@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds helpers to access the skcipher context structure and
+This patch adds helpers to access the kpp context structure and
 request context structure with an added alignment for DMA access.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/crypto/internal/skcipher.h |   22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ include/crypto/internal/kpp.h |   24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index a2339f80a615..a05a55af5b2c 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -122,6 +122,13 @@ static inline void crypto_skcipher_set_reqsize(
- 	skcipher->reqsize = reqsize;
- }
- 
-+static inline void crypto_skcipher_set_reqsize_dma(
-+	struct crypto_skcipher *skcipher, unsigned int reqsize)
-+{
-+	reqsize += crypto_dma_align() & ~(crypto_tfm_ctx_alignment() - 1);
-+	skcipher->reqsize = reqsize;
-+}
-+
- int crypto_register_skcipher(struct skcipher_alg *alg);
- void crypto_unregister_skcipher(struct skcipher_alg *alg);
- int crypto_register_skciphers(struct skcipher_alg *algs, int count);
-@@ -151,11 +158,26 @@ static inline void *crypto_skcipher_ctx(struct crypto_skcipher *tfm)
- 	return crypto_tfm_ctx(&tfm->base);
- }
- 
-+static inline void *crypto_skcipher_ctx_dma(struct crypto_skcipher *tfm)
-+{
-+	return crypto_tfm_ctx_dma(&tfm->base);
-+}
-+
- static inline void *skcipher_request_ctx(struct skcipher_request *req)
- {
+diff --git a/include/crypto/internal/kpp.h b/include/crypto/internal/kpp.h
+index 167662407e36..3c9726e89f53 100644
+--- a/include/crypto/internal/kpp.h
++++ b/include/crypto/internal/kpp.h
+@@ -50,15 +50,37 @@ static inline void *kpp_request_ctx(struct kpp_request *req)
  	return req->__ctx;
  }
  
-+static inline void *skcipher_request_ctx_dma(struct skcipher_request *req)
++static inline void *kpp_request_ctx_dma(struct kpp_request *req)
 +{
 +	unsigned int align = crypto_dma_align();
 +
 +	if (align <= crypto_tfm_ctx_alignment())
 +		align = 1;
 +
-+	return PTR_ALIGN(skcipher_request_ctx(req), align);
++	return PTR_ALIGN(kpp_request_ctx(req), align);
 +}
 +
- static inline u32 skcipher_request_flags(struct skcipher_request *req)
+ static inline void kpp_set_reqsize(struct crypto_kpp *kpp,
+ 				   unsigned int reqsize)
  {
- 	return req->base.flags;
+ 	kpp->reqsize = reqsize;
+ }
+ 
++static inline void kpp_set_reqsize_dma(struct crypto_kpp *kpp,
++				       unsigned int reqsize)
++{
++	reqsize += crypto_dma_align() & ~(crypto_tfm_ctx_alignment() - 1);
++	kpp->reqsize = reqsize;
++}
++
+ static inline void *kpp_tfm_ctx(struct crypto_kpp *tfm)
+ {
+-	return tfm->base.__crt_ctx;
++	return crypto_tfm_ctx(&tfm->base);
++}
++
++static inline void *kpp_tfm_ctx_dma(struct crypto_kpp *tfm)
++{
++	return crypto_tfm_ctx_dma(&tfm->base);
+ }
+ 
+ static inline void kpp_request_complete(struct kpp_request *req, int err)
