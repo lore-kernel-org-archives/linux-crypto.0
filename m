@@ -2,144 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 177BEC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 08:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93935C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 08:41:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbiKYICg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 03:02:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53792 "EHLO
+        id S229489AbiKYIlM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 03:41:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229718AbiKYICf (ORCPT
+        with ESMTP id S229477AbiKYIlL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 03:02:35 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4570B5F61
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 00:02:33 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id l11so5338112edb.4
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 00:02:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r47lxpAlmEVI5SZmOnV7ojQvY12OH1FcHXRnZ5IZQpg=;
-        b=FflgkK1IFiX6gJG48jUUG6HQ6UBNUIBr0KpQ0GUhFdGrrdAjteke3CjWbe0S8lQZ9s
-         8VMcLsaOcq55oo6sHEMXtV6g/RP/zZyFw+DLFPFM/qcZkM647nM4zwyVX4wPgKv9bm+2
-         9JDN83itAS2CbQ1fVYQDsC6G6+LSxRweHAlf0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r47lxpAlmEVI5SZmOnV7ojQvY12OH1FcHXRnZ5IZQpg=;
-        b=6z9XQwV78HeQdjHvkoVlyh3tIOxTEU0qDgHrsWXt5ntiIo5N6eqEPRiE8tYYrGdOqi
-         W9c/gaeZq2RRmo86BrLRlduzfm0kMnIHc9Y1NL4r9hZP0xsoGu5CZunSmmnN1f77LMXQ
-         82SbxElU1Ma03XCbzAR1HzRzRJmUPDhrxdh+Wv6weHhZ3rS/upXAy+QYO0eTZBiSBI0g
-         b5x2OjPLvtwPvk7PwbwMXQopalanqifeHTvvQs1yIi0ozyPOd7eUN5Tzwzw+geeKCMM5
-         n/ZCxtBs6xcqV497SKg6QM7b2K+sPYpIp6lLaOxzC2V1ZeQqI54WFJxpzuBttqOCgDKz
-         ACiQ==
-X-Gm-Message-State: ANoB5pkabAL6CBQhCjK0byf6it55SlgJZUHnans1rQ6A8Px73oYpjbuB
-        3tC4GI3ueRDqMKZr8TP+/aVJIw==
-X-Google-Smtp-Source: AA0mqf5JN7k4JtsVSIurwKWsi38PwPudjjN/uj4c43SHFAYXYjnFk48jhsUZHvboHR1bLdw44Ozczw==
-X-Received: by 2002:aa7:d998:0:b0:463:a4a7:d3f1 with SMTP id u24-20020aa7d998000000b00463a4a7d3f1mr25798323eds.299.1669363351490;
-        Fri, 25 Nov 2022 00:02:31 -0800 (PST)
-Received: from [172.16.11.74] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id f15-20020a50fc8f000000b00462e1d8e914sm1466467edq.68.2022.11.25.00.02.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Nov 2022 00:02:30 -0800 (PST)
-Message-ID: <5d7ff259-819e-df9f-1db3-271c263be9cd@rasmusvillemoes.dk>
-Date:   Fri, 25 Nov 2022 09:02:29 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v6 2/3] random: introduce generic vDSO getrandom()
- implementation
-Content-Language: en-US, da
+        Fri, 25 Nov 2022 03:41:11 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F1F23E88;
+        Fri, 25 Nov 2022 00:41:10 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oyUGQ-000gkp-AU; Fri, 25 Nov 2022 16:40:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 16:40:50 +0800
+Date:   Fri, 25 Nov 2022 16:40:50 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Linux API <linux-api@vger.kernel.org>
-References: <20221121152909.3414096-1-Jason@zx2c4.com>
- <20221121152909.3414096-3-Jason@zx2c4.com>
- <842fd97b-c958-7b0d-2c77-6927c7ab4d72@rasmusvillemoes.dk>
- <Y37GXIQVvUvRac6D@zx2c4.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-In-Reply-To: <Y37GXIQVvUvRac6D@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
+        tim.c.chen@linux.intel.com, ap420073@gmail.com, ardb@kernel.org,
+        David.Laight@aculab.com, ebiggers@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Message-ID: <Y4B/kjS0lgzdUJHG@gondor.apana.org.au>
+References: <20221103042740.6556-1-elliott@hpe.com>
+ <20221116041342.3841-1-elliott@hpe.com>
+ <20221116041342.3841-11-elliott@hpe.com>
+ <Y3TF7/+DejcnN0eV@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3TF7/+DejcnN0eV@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 24/11/2022 02.18, Jason A. Donenfeld wrote:
-> Hi Rasmus,
+On Wed, Nov 16, 2022 at 12:13:51PM +0100, Jason A. Donenfeld wrote:
+> On Tue, Nov 15, 2022 at 10:13:28PM -0600, Robert Elliott wrote:
+> > +/* avoid kernel_fpu_begin/end scheduler/rcu stalls */
+> > +static const unsigned int bytes_per_fpu = 337 * 1024;
+> > +
 > 
-> On Wed, Nov 23, 2022 at 09:51:04AM +0100, Rasmus Villemoes wrote:
->> On 21/11/2022 16.29, Jason A. Donenfeld wrote:
->>
->> Cc += linux-api
->>
->>>
->>>       if (!new_block)
->>>         goto out;
->>>       new_cap = grnd_allocator.cap + num;
->>>       new_states = reallocarray(grnd_allocator.states, new_cap, sizeof(*grnd_allocator.states));
->>>       if (!new_states) {
->>>         munmap(new_block, num * size_per_each);
->>
->> Hm. This does leak an implementation detail of vgetrandom_alloc(),
->> namely that it is based on mmap() of that size rounded up to page size.
->> Do we want to commit to this being the proper way of disposing of a
->> succesful vgetrandom_alloc(), or should there also be a
->> vgetrandom_free(void *states, long num, long size_per_each)?
+> Use an enum for constants like this:
 > 
-> Yes, this is intentional, and this is exactly what I wanted to do. There
-> are various wrappers of vm_mmap() throughout, mmap being one of them,
-> and they typically then resort to munmap to unmap it. This is how
-> userspace handles memory - maps, always maps. So I think doing that is
-> fine and consistent.
+>     enum { BYTES_PER_FPU = ... };
+> 
+> You can even make it function-local, so it's near the code that uses it,
+> which will better justify its existence.
+> 
+> Also, where did you get this number? Seems kind of weird.
 
-OK. Perhaps for the benefit of future libc implementors drop a comment
-somewhere as to how to dealloc the blob.
+These numbers are highly dependent on hardware and I think having
+them hard-coded is wrong.
 
-> However, your point about it relying on it being a rounded up size isn't
-> correct. `munmap` will unmap the whole page if the size you pass lies
-> within a page. So `num * size_of_each` will always do the right thing,
-> without needing to have userspace code round anything up. (From the man
-> page: "The  address addr must be a multiple of the page size (but length
-> need not be). 
+Perhaps we should try a different approach.  How about just limiting
+the size to 4K, and then depending on need_resched we break out of
+the loop? Something like:
 
-I know, and I never said userspace needed to round anything up.
+	if (!len)
+		return 0;
 
-All pages containing a part of the indicated range are
-> unmapped.") And as you can see in my example code, nothing is rounded
-> up. So I don't know why you made that comment.
+	kernel_fpu_begin();
+	for (;;) {
+		unsigned int chunk = min(len, 4096);
 
-I made that comment because it's clear from what this does that you get
-something back that is _at least_ num*size_per_each in size, but what is
-not clear is that the actual allocation is exactly and will always be
-that size rounded up to a page size (and no more), so that
-munmap(num*size_per_each), with its well-known and documented semantics,
-will DTRT.
+		sha1_base_do_update(desc, data, chunk, sha1_xform);
 
-> I think adding more control is exactly what this is trying to avoid.
-> It's very intentionally *not* a general allocator function, but
-> something specific for vDSO getrandom(). However, it does already, in
-> this very patchset here, take a (currently unused) flags argument, in
-> case we have the need for later extension.
+		len -= chunk;
+		data += chunk;
 
-OK.
+		if (!len)
+			break;
 
-Perhaps you can spend a few more words on why this allocation _needs_ to
-be MAP_LOCKED? That seems somewhat of a policy thing imposed by the
-kernel, something that would be better left to the libc or distro or
-whatnot to request via a flag. I could imagine applications that
-currently run at the mlock limit start failing after a libc upgrade -
-which could of course be considered a libc problem, and perhaps it's too
-unlikely to worry about.
+		if (need_resched()) {
+			kernel_fpu_end();
+			cond_resched();
+			kernel_fpu_begin();
+		}
+	}
+	kernel_fpu_end();
 
-Rasmus
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
