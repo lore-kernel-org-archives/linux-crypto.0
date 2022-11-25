@@ -2,70 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 440EDC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 12:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EFDC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 15:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbiKYMZE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 07:25:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
+        id S229740AbiKYPEs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 10:04:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229743AbiKYMYt (ORCPT
+        with ESMTP id S229555AbiKYPEr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:24:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDF74C273;
-        Fri, 25 Nov 2022 04:24:37 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2911C62371;
-        Fri, 25 Nov 2022 12:24:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C99C433C1;
-        Fri, 25 Nov 2022 12:24:34 +0000 (UTC)
-Date:   Fri, 25 Nov 2022 12:24:31 +0000
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v2 PATCH 3/9] crypto: aead - Add ctx helpers with DMA alignment
-Message-ID: <Y4Cz/xJKYbdOyjiB@arm.com>
-References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
- <E1oyQS1-000djS-65@formenos.hmeau.com>
+        Fri, 25 Nov 2022 10:04:47 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438131A235
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 07:04:46 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-149-pJJNRtCWOniSHKEqYW45oQ-1; Fri, 25 Nov 2022 15:04:43 +0000
+X-MC-Unique: pJJNRtCWOniSHKEqYW45oQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 25 Nov
+ 2022 15:04:41 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Fri, 25 Nov 2022 15:04:41 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Sandy Harris' <sandyinchina@gmail.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH] random: add 8-bit and 16-bit batches
+Thread-Topic: [PATCH] random: add 8-bit and 16-bit batches
+Thread-Index: AQHZAIP4o7HbqUXjoUGVncfvVGWCWq5PvPcw
+Date:   Fri, 25 Nov 2022 15:04:41 +0000
+Message-ID: <a171166422a545a99ac815541018d44f@AcuMS.aculab.com>
+References: <20220928165018.73496-1-Jason@zx2c4.com>
+ <CACXcFmkyoNu5fU=pAxPNY-bwGyJ5bd2LkmVkxHGOubZmbbzT_Q@mail.gmail.com>
+In-Reply-To: <CACXcFmkyoNu5fU=pAxPNY-bwGyJ5bd2LkmVkxHGOubZmbbzT_Q@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1oyQS1-000djS-65@formenos.hmeau.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 12:36:33PM +0800, Herbert Xu wrote:
-> diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
-> index d482017f3e20..cd8cb1e921b7 100644
-> --- a/include/crypto/internal/aead.h
-> +++ b/include/crypto/internal/aead.h
-> @@ -39,6 +39,11 @@ static inline void *crypto_aead_ctx(struct crypto_aead *tfm)
->  	return crypto_tfm_ctx(&tfm->base);
->  }
->  
-> +static inline void *crypto_aead_ctx_dma(struct crypto_aead *tfm)
-> +{
-> +	return crypto_tfm_ctx_dma(&tfm->base);
-> +}
+RnJvbTogU2FuZHkgSGFycmlzDQo+IFNlbnQ6IDI1IE5vdmVtYmVyIDIwMjIgMDQ6MTENCj4gDQo+
+IE9uIFRodSwgU2VwIDI5LCAyMDIyIGF0IDE6MzMgQU0gSmFzb24gQS4gRG9uZW5mZWxkIDxKYXNv
+bkB6eDJjNC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gVGhlcmUgYXJlIG51bWVyb3VzIHBsYWNlcyBp
+biB0aGUga2VybmVsIHRoYXQgd291bGQgYmUgc3BlZCB1cCBieSBoYXZpbmcNCj4gPiBzbWFsbGVy
+IGJhdGNoZXMuIC4uLg0KPiANCj4gPiAgdm9pZCBnZXRfcmFuZG9tX2J5dGVzKHZvaWQgKmJ1Ziwg
+c2l6ZV90IGxlbik7DQo+ID4gK3U4IGdldF9yYW5kb21fdTgodm9pZCk7DQo+ID4gK3UxNiBnZXRf
+cmFuZG9tX3UxNih2b2lkKTsNCj4gPiAgdTMyIGdldF9yYW5kb21fdTMyKHZvaWQpOw0KPiA+ICB1
+NjQgZ2V0X3JhbmRvbV91NjQodm9pZCk7DQo+ID4gIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgaW50
+IGdldF9yYW5kb21faW50KHZvaWQpDQo+IA0KPiBUbyBtZSwgdGhlIDMyLWJpdCAmIDY0LWJpdCBm
+dW5jdGlvbnMgbG9vayBsaWtlIGFuDQo+IG9idmlvdXNseSBnb29kIGlkZWEuIEhvd2V2ZXIsIEkg
+Y2Fubm90IHNlZQ0KPiB0aGF0IHRoZSA4LWJpdCBvciAxNi1iaXQgZnVuY3Rpb25zIGFyZSBuZWVk
+ZWQuDQo+IA0KPiBFdmVuIGxpYnJhcnkgZnVuY3Rpb25zIGxpa2UgZ2V0Y2hhcigpIHJldHVybiBh
+bg0KPiBpbnQgJiB3aGF0ZXZlciB5b3UgcmV0dXJuLCBpdCBpcyBnb2luZyB0byBiZQ0KPiBoYW5k
+bGVkIGFzIGFuIGludC1zaXplZCBpdGVtIGlmIGl0IGdvZXMgaW4gYQ0KPiByZWdpc3Rlciwgc28g
+d2hhdCdzIHRoZSBwb2ludD8NCg0KVGhleSBhdm9pZCAndXNpbmcgdXAnIHJhbmRvbSB2YWx1ZXMg
+dGhlIGNhbGxlcnMgd29udCB1c2UuDQpUaGlzIGNhbiBzYXZlIGV4cGVuc2l2ZSByZS1oYXNoaW5n
+IChldGMpLg0KDQpPVE9IIHRoZSByZXR1cm4gdHlwZXMgc2hvdWxkIHByb2JhYmx5IGJlIHUzMiBl
+dmVuIHRob3VnaCB0aGUNCmRvbWFpbiBpcyBzbWFsbGVyLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0
+ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBL
+ZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
-I wonder, if drivers end up calling this, isn't it easier to do the
-alignment in crypto_aead_ctx() directly? There are over 300 callers (not
-sure about the padding though, it may need still driver changes unless
-we can add it to something like crypto_tfm_alg_alignmask()). Or is the
-expectation that not all drivers need a DMA alignment?
-
--- 
-Catalin
