@@ -2,106 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08312C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 08:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0D5C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 08:56:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbiKYIti (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 03:49:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34038 "EHLO
+        id S229586AbiKYI4e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 03:56:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiKYIti (ORCPT
+        with ESMTP id S229581AbiKYI4e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 03:49:38 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0765B275DB;
-        Fri, 25 Nov 2022 00:49:36 -0800 (PST)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NJT716Bvhz15Mtp;
-        Fri, 25 Nov 2022 16:49:01 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 25 Nov 2022 16:49:35 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 25 Nov 2022 16:49:34 +0800
-Subject: Re: [PATCH v10 0/3] crypto: hisilicon - supports device isolation
- feature
-To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-References: <20221119074817.12063-1-yekai13@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-From:   "yekai (A)" <yekai13@huawei.com>
-Message-ID: <9b934709-2f74-7392-aab6-eb506ddcf708@huawei.com>
-Date:   Fri, 25 Nov 2022 16:49:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Fri, 25 Nov 2022 03:56:34 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E02129809;
+        Fri, 25 Nov 2022 00:56:33 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oyUVT-000h4L-9x; Fri, 25 Nov 2022 16:56:24 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 16:56:23 +0800
+Date:   Fri, 25 Nov 2022 16:56:23 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     ye.xingchen@zte.com.cn
+Cc:     olivia@selenic.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH linux-next] hwrng: n2-drv - Use device_get_match_data()
+ to simplify the?? code
+Message-ID: <Y4CDN4eWfXtAKAdN@gondor.apana.org.au>
+References: <202211171710153200734@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <20221119074817.12063-1-yekai13@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202211171710153200734@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Thu, Nov 17, 2022 at 05:10:15PM +0800, ye.xingchen@zte.com.cn wrote:
+> From: ye xingchen <ye.xingchen@zte.com.cn>
+> 
+> Directly get the match data with device_get_match_data().
+> 
+> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+> ---
+>  drivers/char/hw_random/n2-drv.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+> index 73e408146420..2f784addb717 100644
+> --- a/drivers/char/hw_random/n2-drv.c
+> +++ b/drivers/char/hw_random/n2-drv.c
+> @@ -695,20 +695,15 @@ static void n2rng_driver_version(void)
+>  static const struct of_device_id n2rng_match[];
+>  static int n2rng_probe(struct platform_device *op)
+>  {
+> -	const struct of_device_id *match;
+>  	int err = -ENOMEM;
+>  	struct n2rng *np;
+> 
+> -	match = of_match_device(n2rng_match, &op->dev);
+> -	if (!match)
+> -		return -EINVAL;
+> -
+>  	n2rng_driver_version();
+>  	np = devm_kzalloc(&op->dev, sizeof(*np), GFP_KERNEL);
+>  	if (!np)
+>  		goto out;
+>  	np->op = op;
+> -	np->data = (struct n2rng_template *)match->data;
+> +	np->data = (struct n2rng_template *) device_get_match_data(&op->dev);
 
+Please explain why changing the error case is OK.
 
-On 2022/11/19 15:48, Kai Ye wrote:
-> 1、Add the uacce hardware error isolation interface. Hardware error 
->    thresholds can be configured by sysfs node. User can get the hardware
->    isolated state by sysfs node.
-> 2、Defining the isolation strategy for uacce device by uacce sysfs node. 
->    If the number of hardware errors exceeds the configured value, the 
->    uacce device will not be available in user space.
-> 3、The ACC VF device use the PF device isolation strategy.
->    
-> changes v1->v2:
-> 	- deleted dev_to_uacce api.
-> 	- add vfs node doc. 
-> 	- move uacce->ref to driver.
-> changes v2->v3:
-> 	- deleted some redundant code.
-> 	- use qm state instead of reference count.
-> 	- add null pointer check.
-> 	- isolate_strategy_read() instead of a copy.
-> changes v3->v4:
-> 	- modify a comment
-> changes v4->v5:
-> 	- use bool instead of atomic.
-> 	- isolation frequency instead of isolation command.
-> changes v5->v6:
-> 	- add is_visible in uacce.
-> 	- add the description of the isolation strategy file node.
-> changes v6->v7
-> 	- add an example for isolate_strategy in Documentation.
-> changes v7->v8
-> 	- update the correct date.
-> changes v8->v9
->     - move isolation strategy from qm to uacce.
-> changes v9->v10
-> 	- Go back to the v8 version of the solution.
-> 	- Modify some code according to suggestions.
->
-> Kai Ye (3):
->   uacce: supports device isolation feature
->   Documentation: add the device isolation feature sysfs nodes for uacce
->   crypto: hisilicon/qm - define the device isolation strategy
->
->  Documentation/ABI/testing/sysfs-driver-uacce |  18 ++
->  drivers/crypto/hisilicon/qm.c                | 169 +++++++++++++++++--
->  drivers/misc/uacce/uacce.c                   |  50 ++++++
->  include/linux/hisi_acc_qm.h                  |  15 ++
->  include/linux/uacce.h                        |  12 ++
->  5 files changed, 249 insertions(+), 15 deletions(-)
->
-Hi Grek
-
-Just a friendly ping.
-
-Thanks
-Kai
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
