@@ -2,2827 +2,387 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7783AC46467
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 22:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD0BEC4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 22:39:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbiKYWdQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 17:33:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
+        id S229722AbiKYWjW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 17:39:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230166AbiKYWcs (ORCPT
+        with ESMTP id S229454AbiKYWjU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 17:32:48 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14493EE1D
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 14:32:31 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id d3so6633979ljl.1
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Nov 2022 14:32:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tc1ak5ho5HEcvX2TFR105mbkG7bTn3+01Qf+CqV+uyQ=;
-        b=O1t70vXlydoOLZ112XY5XqUGGCX5F16XFV68cPt6rG311zGB+6bbikfkcg2He+6Q/e
-         7Fy0sy6uJiq0PsAsmXVnYmO2djlF4WQiDAJGDn5eXsUnjNa2vUVZ28lBgglvZvpg8iZF
-         01I1A15yJI3S8yo/l1ZbIt24mAjnlt+R1eyhsnc8gNra/5uKJ/Wbip/CcmdltI3QdYPO
-         nSOyr5EPgjp9n/LOlSuLKXrCdKT4BLIRbMcp3ooGUXpMfbg5aGzE4A9cKheQ6u49ttRm
-         wTW75xWO9w8GVbuypRfJVuIMVZQ3GW8zbncqJ9pDBXIRbHEKVInHSZ0eYPkDhrOU9LGH
-         eutg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tc1ak5ho5HEcvX2TFR105mbkG7bTn3+01Qf+CqV+uyQ=;
-        b=CNzKaOeMtiKU+GOqQZcakw1h0nhDhNnqr3KtuW1Rc5ciKqh4JZ9X1fL4oVU7mdbrGa
-         FEM97P4AcvYBFtzFZbPXlNK+vQtYTIi21UuPMa2I0IRbHCx/9NRCUJabxjbZ321i3WCP
-         HqdgnwvmpefJlTzyJ7yW8mCozpo9m0Jqd4pNZTvu2S15jAvG5jSfG+nWkK31dyX/KjQg
-         /fT6vsi5pIdbm6Bjp+Qs7zsNqD+o2OJeBEvVD1hBap//+cqKjPyck+V6/qk4r0USPIyA
-         K4zpsw8ckl51xSuAijDsQjJkI8ZR+f4ZxPhFs1WaexuDNh3RvsDSKO5JvMrBojT2AZzD
-         zupQ==
-X-Gm-Message-State: ANoB5pkeg0ujRb6oqmmRM95UptcsA/5BLaXaoSOvp4SaQMFm8VFtxpvp
-        fD2Od7PRNXgAvKA8DH2dag3OJwIfZ4roMg==
-X-Google-Smtp-Source: AA0mqf79MJbTWCxdjkiY0JNhE09qacoQCXK4P7OOuzQ7Uv2Vz+k93rnUY7p37tA1aYB/UlwHD+OFmg==
-X-Received: by 2002:a2e:2285:0:b0:26f:c670:4d97 with SMTP id i127-20020a2e2285000000b0026fc6704d97mr12644961lji.262.1669415549668;
-        Fri, 25 Nov 2022 14:32:29 -0800 (PST)
-Received: from Fecusia.lan (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
-        by smtp.gmail.com with ESMTPSA id f7-20020a05651201c700b004b4e9580b1asm676582lfp.66.2022.11.25.14.32.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Nov 2022 14:32:29 -0800 (PST)
-From:   Linus Walleij <linus.walleij@linaro.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH v2 4/4] crypto: ux500/cryp - delete driver
-Date:   Fri, 25 Nov 2022 23:32:17 +0100
-Message-Id: <20221125223217.2409659-5-linus.walleij@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221125223217.2409659-1-linus.walleij@linaro.org>
-References: <20221125223217.2409659-1-linus.walleij@linaro.org>
+        Fri, 25 Nov 2022 17:39:20 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ABFB51C30;
+        Fri, 25 Nov 2022 14:39:18 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669415956;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N8+MS/xFsgevLrLJv9Sy6tR+lN5BKLIuEXQTXYZ/FII=;
+        b=HmyeBrruBj2LHimdQornAPgaRXBHOCEjbEp1Hwz+G9hf07xKu1LRhzesmjO+Sp/fX+kWwY
+        RB6NXwfWl+InHA1OvT9xgGOD4epvWf/tqv/dP8/NjFLqfGOKPLleE8AmQCkGxodv0jA7rs
+        R6vzddSQ3WP3eg4MRo4IjXWk8rwyfskTdjRaOWKbG0J/1vDjUfHFEaA6a5b/lYR0koFi4F
+        +ez58MmituKZ7ITq2U/F/lsr469yw4yk4iYWkupqx6JkpGFCb1mkj1HgMxgTt2KihMH7j1
+        +nbb8jPOVzC9/qxJ/AKSpOkoXpnH4Z31jkJVb9okcBsaESvq+YZx4VccqR0r+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669415956;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N8+MS/xFsgevLrLJv9Sy6tR+lN5BKLIuEXQTXYZ/FII=;
+        b=c8mfDVsSYQNsAOYGPckwOJrHRQws8B5SmkVHaVpODY4E8OC95lTWfvPZPi7eakGt/VZ7hC
+        kiIWQLznsjdyOYAw==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, patches@lists.linux.dev
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v7 2/3] random: introduce generic vDSO getrandom()
+ implementation
+In-Reply-To: <20221124165536.1631325-3-Jason@zx2c4.com>
+References: <20221124165536.1631325-1-Jason@zx2c4.com>
+ <20221124165536.1631325-3-Jason@zx2c4.com>
+Date:   Fri, 25 Nov 2022 23:39:15 +0100
+Message-ID: <877cziy7zg.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-It turns out we can just modify the newer STM32 CRYP driver
-to be used with Ux500 and now that we have done that, delete
-the old and sparsely maintained Ux500 CRYP driver.
+Jason!
 
-Cc: Lionel Debieve <lionel.debieve@foss.st.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
-ChangeLog v1->v2:
-- No changes, just resending with the rest.
----
- drivers/crypto/ux500/Kconfig          |   10 -
- drivers/crypto/ux500/Makefile         |    1 -
- drivers/crypto/ux500/cryp/Makefile    |   10 -
- drivers/crypto/ux500/cryp/cryp.c      |  394 ------
- drivers/crypto/ux500/cryp/cryp.h      |  315 -----
- drivers/crypto/ux500/cryp/cryp_core.c | 1600 -------------------------
- drivers/crypto/ux500/cryp/cryp_irq.c  |   45 -
- drivers/crypto/ux500/cryp/cryp_irq.h  |   31 -
- drivers/crypto/ux500/cryp/cryp_irqp.h |  125 --
- drivers/crypto/ux500/cryp/cryp_p.h    |  122 --
- 10 files changed, 2653 deletions(-)
- delete mode 100644 drivers/crypto/ux500/cryp/Makefile
- delete mode 100644 drivers/crypto/ux500/cryp/cryp.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
- delete mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
+On Thu, Nov 24 2022 at 17:55, Jason A. Donenfeld wrote:
+>
+> Together with the previous commit that introduces vgetrandom_alloc(),
 
-diff --git a/drivers/crypto/ux500/Kconfig b/drivers/crypto/ux500/Kconfig
-index f56d65c56ccf..dcbd7404768f 100644
---- a/drivers/crypto/ux500/Kconfig
-+++ b/drivers/crypto/ux500/Kconfig
-@@ -4,16 +4,6 @@
- # Author: Shujuan Chen (shujuan.chen@stericsson.com)
- #
- 
--config CRYPTO_DEV_UX500_CRYP
--	tristate "UX500 crypto driver for CRYP block"
--	depends on CRYPTO_DEV_UX500
--	select CRYPTO_ALGAPI
--	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_DES
--	help
--	This selects the crypto driver for the UX500_CRYP hardware. It supports
--	AES-ECB, CBC and CTR with keys sizes of 128, 192 and 256 bit sizes.
--
- config CRYPTO_DEV_UX500_HASH
- 	tristate "UX500 crypto driver for HASH block"
- 	depends on CRYPTO_DEV_UX500
-diff --git a/drivers/crypto/ux500/Makefile b/drivers/crypto/ux500/Makefile
-index f014eb01710a..f1aa4edf66f4 100644
---- a/drivers/crypto/ux500/Makefile
-+++ b/drivers/crypto/ux500/Makefile
-@@ -5,4 +5,3 @@
- #
- 
- obj-$(CONFIG_CRYPTO_DEV_UX500_HASH) += hash/
--obj-$(CONFIG_CRYPTO_DEV_UX500_CRYP) += cryp/
-diff --git a/drivers/crypto/ux500/cryp/Makefile b/drivers/crypto/ux500/cryp/Makefile
-deleted file mode 100644
-index 3e67531f484c..000000000000
---- a/drivers/crypto/ux500/cryp/Makefile
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--#/*
--# * Copyright (C) ST-Ericsson SA 2010
--# * Author: shujuan.chen@stericsson.com for ST-Ericsson.
--# */
--
--ccflags-$(CONFIG_CRYPTO_DEV_UX500_DEBUG) += -DDEBUG
--
--obj-$(CONFIG_CRYPTO_DEV_UX500_CRYP) += ux500_cryp.o
--ux500_cryp-objs :=  cryp.o cryp_irq.o cryp_core.o
-diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
-deleted file mode 100644
-index 759d0d9786fd..000000000000
---- a/drivers/crypto/ux500/cryp/cryp.c
-+++ /dev/null
-@@ -1,394 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- */
--
--#include <linux/errno.h>
--#include <linux/kernel.h>
--#include <linux/types.h>
--
--#include "cryp_p.h"
--#include "cryp.h"
--
--/*
-- * cryp_wait_until_done - wait until the device logic is not busy
-- */
--void cryp_wait_until_done(struct cryp_device_data *device_data)
--{
--	while (cryp_is_logic_busy(device_data))
--		cpu_relax();
--}
--
--/**
-- * cryp_check - This routine checks Peripheral and PCell Id
-- * @device_data: Pointer to the device data struct for base address.
-- */
--int cryp_check(struct cryp_device_data *device_data)
--{
--	int peripheralid2 = 0;
--
--	if (NULL == device_data)
--		return -EINVAL;
--
--	peripheralid2 = readl_relaxed(&device_data->base->periphId2);
--
--	if (peripheralid2 != CRYP_PERIPHERAL_ID2_DB8500)
--		return -EPERM;
--
--	/* Check Peripheral and Pcell Id Register for CRYP */
--	if ((CRYP_PERIPHERAL_ID0 ==
--		readl_relaxed(&device_data->base->periphId0))
--	    && (CRYP_PERIPHERAL_ID1 ==
--		    readl_relaxed(&device_data->base->periphId1))
--	    && (CRYP_PERIPHERAL_ID3 ==
--		    readl_relaxed(&device_data->base->periphId3))
--	    && (CRYP_PCELL_ID0 ==
--		    readl_relaxed(&device_data->base->pcellId0))
--	    && (CRYP_PCELL_ID1 ==
--		    readl_relaxed(&device_data->base->pcellId1))
--	    && (CRYP_PCELL_ID2 ==
--		    readl_relaxed(&device_data->base->pcellId2))
--	    && (CRYP_PCELL_ID3 ==
--		    readl_relaxed(&device_data->base->pcellId3))) {
--		return 0;
--	}
--
--	return -EPERM;
--}
--
--/**
-- * cryp_activity - This routine enables/disable the cryptography function.
-- * @device_data: Pointer to the device data struct for base address.
-- * @cryp_crypen: Enable/Disable functionality
-- */
--void cryp_activity(struct cryp_device_data *device_data,
--		   enum cryp_crypen cryp_crypen)
--{
--	CRYP_PUT_BITS(&device_data->base->cr,
--		      cryp_crypen,
--		      CRYP_CR_CRYPEN_POS,
--		      CRYP_CR_CRYPEN_MASK);
--}
--
--/**
-- * cryp_flush_inoutfifo - Resets both the input and the output FIFOs
-- * @device_data: Pointer to the device data struct for base address.
-- */
--void cryp_flush_inoutfifo(struct cryp_device_data *device_data)
--{
--	/*
--	 * We always need to disable the hardware before trying to flush the
--	 * FIFO. This is something that isn't written in the design
--	 * specification, but we have been informed by the hardware designers
--	 * that this must be done.
--	 */
--	cryp_activity(device_data, CRYP_CRYPEN_DISABLE);
--	cryp_wait_until_done(device_data);
--
--	CRYP_SET_BITS(&device_data->base->cr, CRYP_CR_FFLUSH_MASK);
--	/*
--	 * CRYP_SR_INFIFO_READY_MASK is the expected value on the status
--	 * register when starting a new calculation, which means Input FIFO is
--	 * not full and input FIFO is empty.
--	 */
--	while (readl_relaxed(&device_data->base->sr) !=
--	       CRYP_SR_INFIFO_READY_MASK)
--		cpu_relax();
--}
--
--/**
-- * cryp_set_configuration - This routine set the cr CRYP IP
-- * @device_data: Pointer to the device data struct for base address.
-- * @cryp_config: Pointer to the configuration parameter
-- * @control_register: The control register to be written later on.
-- */
--int cryp_set_configuration(struct cryp_device_data *device_data,
--			   struct cryp_config *cryp_config,
--			   u32 *control_register)
--{
--	u32 cr_for_kse;
--
--	if (NULL == device_data || NULL == cryp_config)
--		return -EINVAL;
--
--	*control_register |= (cryp_config->keysize << CRYP_CR_KEYSIZE_POS);
--
--	/* Prepare key for decryption in AES_ECB and AES_CBC mode. */
--	if ((CRYP_ALGORITHM_DECRYPT == cryp_config->algodir) &&
--	    ((CRYP_ALGO_AES_ECB == cryp_config->algomode) ||
--	     (CRYP_ALGO_AES_CBC == cryp_config->algomode))) {
--		cr_for_kse = *control_register;
--		/*
--		 * This seems a bit odd, but it is indeed needed to set this to
--		 * encrypt even though it is a decryption that we are doing. It
--		 * also mentioned in the design spec that you need to do this.
--		 * After the keyprepartion for decrypting is done you should set
--		 * algodir back to decryption, which is done outside this if
--		 * statement.
--		 *
--		 * According to design specification we should set mode ECB
--		 * during key preparation even though we might be running CBC
--		 * when enter this function.
--		 *
--		 * Writing to KSE_ENABLED will drop CRYPEN when key preparation
--		 * is done. Therefore we need to set CRYPEN again outside this
--		 * if statement when running decryption.
--		 */
--		cr_for_kse |= ((CRYP_ALGORITHM_ENCRYPT << CRYP_CR_ALGODIR_POS) |
--			       (CRYP_ALGO_AES_ECB << CRYP_CR_ALGOMODE_POS) |
--			       (CRYP_CRYPEN_ENABLE << CRYP_CR_CRYPEN_POS) |
--			       (KSE_ENABLED << CRYP_CR_KSE_POS));
--
--		writel_relaxed(cr_for_kse, &device_data->base->cr);
--		cryp_wait_until_done(device_data);
--	}
--
--	*control_register |=
--		((cryp_config->algomode << CRYP_CR_ALGOMODE_POS) |
--		 (cryp_config->algodir << CRYP_CR_ALGODIR_POS));
--
--	return 0;
--}
--
--/**
-- * cryp_configure_protection - set the protection bits in the CRYP logic.
-- * @device_data: Pointer to the device data struct for base address.
-- * @p_protect_config:	Pointer to the protection mode and
-- *			secure mode configuration
-- */
--int cryp_configure_protection(struct cryp_device_data *device_data,
--			      struct cryp_protection_config *p_protect_config)
--{
--	if (NULL == p_protect_config)
--		return -EINVAL;
--
--	CRYP_WRITE_BIT(&device_data->base->cr,
--		       (u32) p_protect_config->secure_access,
--		       CRYP_CR_SECURE_MASK);
--	CRYP_PUT_BITS(&device_data->base->cr,
--		      p_protect_config->privilege_access,
--		      CRYP_CR_PRLG_POS,
--		      CRYP_CR_PRLG_MASK);
--
--	return 0;
--}
--
--/**
-- * cryp_is_logic_busy - returns the busy status of the CRYP logic
-- * @device_data: Pointer to the device data struct for base address.
-- */
--int cryp_is_logic_busy(struct cryp_device_data *device_data)
--{
--	return CRYP_TEST_BITS(&device_data->base->sr,
--			      CRYP_SR_BUSY_MASK);
--}
--
--/**
-- * cryp_configure_for_dma - configures the CRYP IP for DMA operation
-- * @device_data: Pointer to the device data struct for base address.
-- * @dma_req: Specifies the DMA request type value.
-- */
--void cryp_configure_for_dma(struct cryp_device_data *device_data,
--			    enum cryp_dma_req_type dma_req)
--{
--	CRYP_SET_BITS(&device_data->base->dmacr,
--		      (u32) dma_req);
--}
--
--/**
-- * cryp_configure_key_values - configures the key values for CRYP operations
-- * @device_data: Pointer to the device data struct for base address.
-- * @key_reg_index: Key value index register
-- * @key_value: The key value struct
-- */
--int cryp_configure_key_values(struct cryp_device_data *device_data,
--			      enum cryp_key_reg_index key_reg_index,
--			      struct cryp_key_value key_value)
--{
--	while (cryp_is_logic_busy(device_data))
--		cpu_relax();
--
--	switch (key_reg_index) {
--	case CRYP_KEY_REG_1:
--		writel_relaxed(key_value.key_value_left,
--				&device_data->base->key_1_l);
--		writel_relaxed(key_value.key_value_right,
--				&device_data->base->key_1_r);
--		break;
--	case CRYP_KEY_REG_2:
--		writel_relaxed(key_value.key_value_left,
--				&device_data->base->key_2_l);
--		writel_relaxed(key_value.key_value_right,
--				&device_data->base->key_2_r);
--		break;
--	case CRYP_KEY_REG_3:
--		writel_relaxed(key_value.key_value_left,
--				&device_data->base->key_3_l);
--		writel_relaxed(key_value.key_value_right,
--				&device_data->base->key_3_r);
--		break;
--	case CRYP_KEY_REG_4:
--		writel_relaxed(key_value.key_value_left,
--				&device_data->base->key_4_l);
--		writel_relaxed(key_value.key_value_right,
--				&device_data->base->key_4_r);
--		break;
--	default:
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--/**
-- * cryp_configure_init_vector - configures the initialization vector register
-- * @device_data: Pointer to the device data struct for base address.
-- * @init_vector_index: Specifies the index of the init vector.
-- * @init_vector_value: Specifies the value for the init vector.
-- */
--int cryp_configure_init_vector(struct cryp_device_data *device_data,
--			       enum cryp_init_vector_index
--			       init_vector_index,
--			       struct cryp_init_vector_value
--			       init_vector_value)
--{
--	while (cryp_is_logic_busy(device_data))
--		cpu_relax();
--
--	switch (init_vector_index) {
--	case CRYP_INIT_VECTOR_INDEX_0:
--		writel_relaxed(init_vector_value.init_value_left,
--		       &device_data->base->init_vect_0_l);
--		writel_relaxed(init_vector_value.init_value_right,
--		       &device_data->base->init_vect_0_r);
--		break;
--	case CRYP_INIT_VECTOR_INDEX_1:
--		writel_relaxed(init_vector_value.init_value_left,
--		       &device_data->base->init_vect_1_l);
--		writel_relaxed(init_vector_value.init_value_right,
--		       &device_data->base->init_vect_1_r);
--		break;
--	default:
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--/**
-- * cryp_save_device_context -	Store hardware registers and
-- *				other device context parameter
-- * @device_data: Pointer to the device data struct for base address.
-- * @ctx: Crypto device context
-- * @cryp_mode: Mode: Polling, Interrupt or DMA
-- */
--void cryp_save_device_context(struct cryp_device_data *device_data,
--			      struct cryp_device_context *ctx,
--			      int cryp_mode)
--{
--	enum cryp_algo_mode algomode;
--	struct cryp_register __iomem *src_reg = device_data->base;
--	struct cryp_config *config =
--		(struct cryp_config *)device_data->current_ctx;
--
--	/*
--	 * Always start by disable the hardware and wait for it to finish the
--	 * ongoing calculations before trying to reprogram it.
--	 */
--	cryp_activity(device_data, CRYP_CRYPEN_DISABLE);
--	cryp_wait_until_done(device_data);
--
--	if (cryp_mode == CRYP_MODE_DMA)
--		cryp_configure_for_dma(device_data, CRYP_DMA_DISABLE_BOTH);
--
--	if (CRYP_TEST_BITS(&src_reg->sr, CRYP_SR_IFEM_MASK) == 0)
--		ctx->din = readl_relaxed(&src_reg->din);
--
--	ctx->cr = readl_relaxed(&src_reg->cr) & CRYP_CR_CONTEXT_SAVE_MASK;
--
--	switch (config->keysize) {
--	case CRYP_KEY_SIZE_256:
--		ctx->key_4_l = readl_relaxed(&src_reg->key_4_l);
--		ctx->key_4_r = readl_relaxed(&src_reg->key_4_r);
--		fallthrough;
--
--	case CRYP_KEY_SIZE_192:
--		ctx->key_3_l = readl_relaxed(&src_reg->key_3_l);
--		ctx->key_3_r = readl_relaxed(&src_reg->key_3_r);
--		fallthrough;
--
--	case CRYP_KEY_SIZE_128:
--		ctx->key_2_l = readl_relaxed(&src_reg->key_2_l);
--		ctx->key_2_r = readl_relaxed(&src_reg->key_2_r);
--		fallthrough;
--
--	default:
--		ctx->key_1_l = readl_relaxed(&src_reg->key_1_l);
--		ctx->key_1_r = readl_relaxed(&src_reg->key_1_r);
--	}
--
--	/* Save IV for CBC mode for both AES and DES. */
--	algomode = ((ctx->cr & CRYP_CR_ALGOMODE_MASK) >> CRYP_CR_ALGOMODE_POS);
--	if (algomode == CRYP_ALGO_TDES_CBC ||
--	    algomode == CRYP_ALGO_DES_CBC ||
--	    algomode == CRYP_ALGO_AES_CBC) {
--		ctx->init_vect_0_l = readl_relaxed(&src_reg->init_vect_0_l);
--		ctx->init_vect_0_r = readl_relaxed(&src_reg->init_vect_0_r);
--		ctx->init_vect_1_l = readl_relaxed(&src_reg->init_vect_1_l);
--		ctx->init_vect_1_r = readl_relaxed(&src_reg->init_vect_1_r);
--	}
--}
--
--/**
-- * cryp_restore_device_context -	Restore hardware registers and
-- *					other device context parameter
-- * @device_data: Pointer to the device data struct for base address.
-- * @ctx: Crypto device context
-- */
--void cryp_restore_device_context(struct cryp_device_data *device_data,
--				 struct cryp_device_context *ctx)
--{
--	struct cryp_register __iomem *reg = device_data->base;
--	struct cryp_config *config =
--		(struct cryp_config *)device_data->current_ctx;
--
--	/*
--	 * Fall through for all items in switch statement. DES is captured in
--	 * the default.
--	 */
--	switch (config->keysize) {
--	case CRYP_KEY_SIZE_256:
--		writel_relaxed(ctx->key_4_l, &reg->key_4_l);
--		writel_relaxed(ctx->key_4_r, &reg->key_4_r);
--		fallthrough;
--
--	case CRYP_KEY_SIZE_192:
--		writel_relaxed(ctx->key_3_l, &reg->key_3_l);
--		writel_relaxed(ctx->key_3_r, &reg->key_3_r);
--		fallthrough;
--
--	case CRYP_KEY_SIZE_128:
--		writel_relaxed(ctx->key_2_l, &reg->key_2_l);
--		writel_relaxed(ctx->key_2_r, &reg->key_2_r);
--		fallthrough;
--
--	default:
--		writel_relaxed(ctx->key_1_l, &reg->key_1_l);
--		writel_relaxed(ctx->key_1_r, &reg->key_1_r);
--	}
--
--	/* Restore IV for CBC mode for AES and DES. */
--	if (config->algomode == CRYP_ALGO_TDES_CBC ||
--	    config->algomode == CRYP_ALGO_DES_CBC ||
--	    config->algomode == CRYP_ALGO_AES_CBC) {
--		writel_relaxed(ctx->init_vect_0_l, &reg->init_vect_0_l);
--		writel_relaxed(ctx->init_vect_0_r, &reg->init_vect_0_r);
--		writel_relaxed(ctx->init_vect_1_l, &reg->init_vect_1_l);
--		writel_relaxed(ctx->init_vect_1_r, &reg->init_vect_1_r);
--	}
--}
-diff --git a/drivers/crypto/ux500/cryp/cryp.h b/drivers/crypto/ux500/cryp/cryp.h
-deleted file mode 100644
-index 59e1557a620a..000000000000
---- a/drivers/crypto/ux500/cryp/cryp.h
-+++ /dev/null
-@@ -1,315 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- */
--
--#ifndef _CRYP_H_
--#define _CRYP_H_
--
--#include <linux/completion.h>
--#include <linux/dmaengine.h>
--#include <linux/klist.h>
--#include <linux/mutex.h>
--
--#define DEV_DBG_NAME "crypX crypX:"
--
--/* CRYP enable/disable */
--enum cryp_crypen {
--	CRYP_CRYPEN_DISABLE = 0,
--	CRYP_CRYPEN_ENABLE = 1
--};
--
--/* CRYP Start Computation enable/disable */
--enum cryp_start {
--	CRYP_START_DISABLE = 0,
--	CRYP_START_ENABLE = 1
--};
--
--/* CRYP Init Signal enable/disable */
--enum cryp_init {
--	CRYP_INIT_DISABLE = 0,
--	CRYP_INIT_ENABLE = 1
--};
--
--/* Cryp State enable/disable */
--enum cryp_state {
--	CRYP_STATE_DISABLE = 0,
--	CRYP_STATE_ENABLE = 1
--};
--
--/* Key preparation bit enable */
--enum cryp_key_prep {
--	KSE_DISABLED = 0,
--	KSE_ENABLED = 1
--};
--
--/* Key size for AES */
--#define	CRYP_KEY_SIZE_128 (0)
--#define	CRYP_KEY_SIZE_192 (1)
--#define	CRYP_KEY_SIZE_256 (2)
--
--/* AES modes */
--enum cryp_algo_mode {
--	CRYP_ALGO_TDES_ECB,
--	CRYP_ALGO_TDES_CBC,
--	CRYP_ALGO_DES_ECB,
--	CRYP_ALGO_DES_CBC,
--	CRYP_ALGO_AES_ECB,
--	CRYP_ALGO_AES_CBC,
--	CRYP_ALGO_AES_CTR,
--	CRYP_ALGO_AES_XTS
--};
--
--/* Cryp Encryption or Decryption */
--enum cryp_algorithm_dir {
--	CRYP_ALGORITHM_ENCRYPT,
--	CRYP_ALGORITHM_DECRYPT
--};
--
--/* Hardware access method */
--enum cryp_mode {
--	CRYP_MODE_POLLING,
--	CRYP_MODE_INTERRUPT,
--	CRYP_MODE_DMA
--};
--
--/**
-- * struct cryp_config -
-- * @keysize: Key size for AES
-- * @algomode: AES modes
-- * @algodir: Cryp Encryption or Decryption
-- *
-- * CRYP configuration structure to be passed to set configuration
-- */
--struct cryp_config {
--	int keysize;
--	enum cryp_algo_mode algomode;
--	enum cryp_algorithm_dir algodir;
--};
--
--/**
-- * struct cryp_protection_config -
-- * @privilege_access: Privileged cryp state enable/disable
-- * @secure_access: Secure cryp state enable/disable
-- *
-- * Protection configuration structure for setting privilage access
-- */
--struct cryp_protection_config {
--	enum cryp_state privilege_access;
--	enum cryp_state secure_access;
--};
--
--/* Cryp status */
--enum cryp_status_id {
--	CRYP_STATUS_BUSY = 0x10,
--	CRYP_STATUS_OUTPUT_FIFO_FULL = 0x08,
--	CRYP_STATUS_OUTPUT_FIFO_NOT_EMPTY = 0x04,
--	CRYP_STATUS_INPUT_FIFO_NOT_FULL = 0x02,
--	CRYP_STATUS_INPUT_FIFO_EMPTY = 0x01
--};
--
--/* Cryp DMA interface */
--#define CRYP_DMA_TX_FIFO	0x08
--#define CRYP_DMA_RX_FIFO	0x10
--
--enum cryp_dma_req_type {
--	CRYP_DMA_DISABLE_BOTH,
--	CRYP_DMA_ENABLE_IN_DATA,
--	CRYP_DMA_ENABLE_OUT_DATA,
--	CRYP_DMA_ENABLE_BOTH_DIRECTIONS
--};
--
--enum cryp_dma_channel {
--	CRYP_DMA_RX = 0,
--	CRYP_DMA_TX
--};
--
--/* Key registers */
--enum cryp_key_reg_index {
--	CRYP_KEY_REG_1,
--	CRYP_KEY_REG_2,
--	CRYP_KEY_REG_3,
--	CRYP_KEY_REG_4
--};
--
--/* Key register left and right */
--struct cryp_key_value {
--	u32 key_value_left;
--	u32 key_value_right;
--};
--
--/* Cryp Initialization structure */
--enum cryp_init_vector_index {
--	CRYP_INIT_VECTOR_INDEX_0,
--	CRYP_INIT_VECTOR_INDEX_1
--};
--
--/* struct cryp_init_vector_value -
-- * @init_value_left
-- * @init_value_right
-- * */
--struct cryp_init_vector_value {
--	u32 init_value_left;
--	u32 init_value_right;
--};
--
--/**
-- * struct cryp_device_context - structure for a cryp context.
-- * @cr: control register
-- * @dmacr: DMA control register
-- * @imsc: Interrupt mask set/clear register
-- * @key_1_l: Key 1l register
-- * @key_1_r: Key 1r register
-- * @key_2_l: Key 2l register
-- * @key_2_r: Key 2r register
-- * @key_3_l: Key 3l register
-- * @key_3_r: Key 3r register
-- * @key_4_l: Key 4l register
-- * @key_4_r: Key 4r register
-- * @init_vect_0_l: Initialization vector 0l register
-- * @init_vect_0_r: Initialization vector 0r register
-- * @init_vect_1_l: Initialization vector 1l register
-- * @init_vect_1_r: Initialization vector 0r register
-- * @din: Data in register
-- * @dout: Data out register
-- *
-- * CRYP power management specifc structure.
-- */
--struct cryp_device_context {
--	u32 cr;
--	u32 dmacr;
--	u32 imsc;
--
--	u32 key_1_l;
--	u32 key_1_r;
--	u32 key_2_l;
--	u32 key_2_r;
--	u32 key_3_l;
--	u32 key_3_r;
--	u32 key_4_l;
--	u32 key_4_r;
--
--	u32 init_vect_0_l;
--	u32 init_vect_0_r;
--	u32 init_vect_1_l;
--	u32 init_vect_1_r;
--
--	u32 din;
--	u32 dout;
--};
--
--struct cryp_dma {
--	dma_cap_mask_t mask;
--	struct completion cryp_dma_complete;
--	struct dma_chan *chan_cryp2mem;
--	struct dma_chan *chan_mem2cryp;
--	struct stedma40_chan_cfg *cfg_cryp2mem;
--	struct stedma40_chan_cfg *cfg_mem2cryp;
--	int sg_src_len;
--	int sg_dst_len;
--	struct scatterlist *sg_src;
--	struct scatterlist *sg_dst;
--	int nents_src;
--	int nents_dst;
--};
--
--/**
-- * struct cryp_device_data - structure for a cryp device.
-- * @base: Pointer to virtual base address of the cryp device.
-- * @phybase: Pointer to physical memory location of the cryp device.
-- * @dev: Pointer to the devices dev structure.
-- * @clk: Pointer to the device's clock control.
-- * @irq: IRQ number
-- * @pwr_regulator: Pointer to the device's power control.
-- * @power_status: Current status of the power.
-- * @ctx_lock: Lock for current_ctx.
-- * @current_ctx: Pointer to the currently allocated context.
-- * @list_node: For inclusion into a klist.
-- * @dma: The dma structure holding channel configuration.
-- * @power_state: TRUE = power state on, FALSE = power state off.
-- * @power_state_spinlock: Spinlock for power_state.
-- * @restore_dev_ctx: TRUE = saved ctx, FALSE = no saved ctx.
-- */
--struct cryp_device_data {
--	struct cryp_register __iomem *base;
--	phys_addr_t phybase;
--	struct device *dev;
--	struct clk *clk;
--	int irq;
--	struct regulator *pwr_regulator;
--	int power_status;
--	spinlock_t ctx_lock;
--	struct cryp_ctx *current_ctx;
--	struct klist_node list_node;
--	struct cryp_dma dma;
--	bool power_state;
--	spinlock_t power_state_spinlock;
--	bool restore_dev_ctx;
--};
--
--void cryp_wait_until_done(struct cryp_device_data *device_data);
--
--/* Initialization functions */
--
--int cryp_check(struct cryp_device_data *device_data);
--
--void cryp_activity(struct cryp_device_data *device_data,
--		   enum cryp_crypen cryp_crypen);
--
--void cryp_flush_inoutfifo(struct cryp_device_data *device_data);
--
--int cryp_set_configuration(struct cryp_device_data *device_data,
--			   struct cryp_config *cryp_config,
--			   u32 *control_register);
--
--void cryp_configure_for_dma(struct cryp_device_data *device_data,
--			    enum cryp_dma_req_type dma_req);
--
--int cryp_configure_key_values(struct cryp_device_data *device_data,
--			      enum cryp_key_reg_index key_reg_index,
--			      struct cryp_key_value key_value);
--
--int cryp_configure_init_vector(struct cryp_device_data *device_data,
--			       enum cryp_init_vector_index
--			       init_vector_index,
--			       struct cryp_init_vector_value
--			       init_vector_value);
--
--int cryp_configure_protection(struct cryp_device_data *device_data,
--			      struct cryp_protection_config *p_protect_config);
--
--/* Power management funtions */
--void cryp_save_device_context(struct cryp_device_data *device_data,
--			      struct cryp_device_context *ctx,
--			      int cryp_mode);
--
--void cryp_restore_device_context(struct cryp_device_data *device_data,
--				 struct cryp_device_context *ctx);
--
--/* Data transfer and status bits. */
--int cryp_is_logic_busy(struct cryp_device_data *device_data);
--
--int cryp_get_status(struct cryp_device_data *device_data);
--
--/**
-- * cryp_write_indata - This routine writes 32 bit data into the data input
-- *		       register of the cryptography IP.
-- * @device_data: Pointer to the device data struct for base address.
-- * @write_data: Data to write.
-- */
--int cryp_write_indata(struct cryp_device_data *device_data, u32 write_data);
--
--/**
-- * cryp_read_outdata - This routine reads the data from the data output
-- *		       register of the CRYP logic
-- * @device_data: Pointer to the device data struct for base address.
-- * @read_data: Read the data from the output FIFO.
-- */
--int cryp_read_outdata(struct cryp_device_data *device_data, u32 *read_data);
--
--#endif /* _CRYP_H_ */
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-deleted file mode 100644
-index 5a57c9afd8c8..000000000000
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ /dev/null
-@@ -1,1600 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Andreas Westin <andreas.westin@stericsson.com> for ST-Ericsson.
-- */
--
--#include <linux/clk.h>
--#include <linux/completion.h>
--#include <linux/device.h>
--#include <linux/dma-mapping.h>
--#include <linux/dmaengine.h>
--#include <linux/err.h>
--#include <linux/errno.h>
--#include <linux/interrupt.h>
--#include <linux/io.h>
--#include <linux/irqreturn.h>
--#include <linux/kernel.h>
--#include <linux/klist.h>
--#include <linux/module.h>
--#include <linux/mod_devicetable.h>
--#include <linux/platform_device.h>
--#include <linux/regulator/consumer.h>
--#include <linux/semaphore.h>
--#include <linux/platform_data/dma-ste-dma40.h>
--
--#include <crypto/aes.h>
--#include <crypto/ctr.h>
--#include <crypto/internal/des.h>
--#include <crypto/internal/skcipher.h>
--#include <crypto/scatterwalk.h>
--
--#include <linux/platform_data/crypto-ux500.h>
--
--#include "cryp_p.h"
--#include "cryp.h"
--
--#define CRYP_MAX_KEY_SIZE	32
--#define BYTES_PER_WORD		4
--
--static int cryp_mode;
--static atomic_t session_id;
--
--static struct stedma40_chan_cfg *mem_to_engine;
--static struct stedma40_chan_cfg *engine_to_mem;
--
--/**
-- * struct cryp_driver_data - data specific to the driver.
-- *
-- * @device_list: A list of registered devices to choose from.
-- * @device_allocation: A semaphore initialized with number of devices.
-- */
--struct cryp_driver_data {
--	struct klist device_list;
--	struct semaphore device_allocation;
--};
--
--/**
-- * struct cryp_ctx - Crypto context
-- * @config: Crypto mode.
-- * @key: Key array.
-- * @keylen: Length of key.
-- * @iv: Pointer to initialization vector.
-- * @indata: Pointer to indata.
-- * @outdata: Pointer to outdata.
-- * @datalen: Length of indata.
-- * @outlen: Length of outdata.
-- * @blocksize: Size of blocks.
-- * @updated: Updated flag.
-- * @dev_ctx: Device dependent context.
-- * @device: Pointer to the device.
-- * @session_id: Atomic session ID.
-- */
--struct cryp_ctx {
--	struct cryp_config config;
--	u8 key[CRYP_MAX_KEY_SIZE];
--	u32 keylen;
--	u8 *iv;
--	const u8 *indata;
--	u8 *outdata;
--	u32 datalen;
--	u32 outlen;
--	u32 blocksize;
--	u8 updated;
--	struct cryp_device_context dev_ctx;
--	struct cryp_device_data *device;
--	u32 session_id;
--};
--
--static struct cryp_driver_data driver_data;
--
--/**
-- * swap_bits_in_byte - mirror the bits in a byte
-- * @b: the byte to be mirrored
-- *
-- * The bits are swapped the following way:
-- *  Byte b include bits 0-7, nibble 1 (n1) include bits 0-3 and
-- *  nibble 2 (n2) bits 4-7.
-- *
-- *  Nibble 1 (n1):
-- *  (The "old" (moved) bit is replaced with a zero)
-- *  1. Move bit 6 and 7, 4 positions to the left.
-- *  2. Move bit 3 and 5, 2 positions to the left.
-- *  3. Move bit 1-4, 1 position to the left.
-- *
-- *  Nibble 2 (n2):
-- *  1. Move bit 0 and 1, 4 positions to the right.
-- *  2. Move bit 2 and 4, 2 positions to the right.
-- *  3. Move bit 3-6, 1 position to the right.
-- *
-- *  Combine the two nibbles to a complete and swapped byte.
-- */
--
--static inline u8 swap_bits_in_byte(u8 b)
--{
--#define R_SHIFT_4_MASK  0xc0 /* Bits 6 and 7, right shift 4 */
--#define R_SHIFT_2_MASK  0x28 /* (After right shift 4) Bits 3 and 5,
--				  right shift 2 */
--#define R_SHIFT_1_MASK  0x1e /* (After right shift 2) Bits 1-4,
--				  right shift 1 */
--#define L_SHIFT_4_MASK  0x03 /* Bits 0 and 1, left shift 4 */
--#define L_SHIFT_2_MASK  0x14 /* (After left shift 4) Bits 2 and 4,
--				  left shift 2 */
--#define L_SHIFT_1_MASK  0x78 /* (After left shift 1) Bits 3-6,
--				  left shift 1 */
--
--	u8 n1;
--	u8 n2;
--
--	/* Swap most significant nibble */
--	/* Right shift 4, bits 6 and 7 */
--	n1 = ((b  & R_SHIFT_4_MASK) >> 4) | (b  & ~(R_SHIFT_4_MASK >> 4));
--	/* Right shift 2, bits 3 and 5 */
--	n1 = ((n1 & R_SHIFT_2_MASK) >> 2) | (n1 & ~(R_SHIFT_2_MASK >> 2));
--	/* Right shift 1, bits 1-4 */
--	n1 = (n1  & R_SHIFT_1_MASK) >> 1;
--
--	/* Swap least significant nibble */
--	/* Left shift 4, bits 0 and 1 */
--	n2 = ((b  & L_SHIFT_4_MASK) << 4) | (b  & ~(L_SHIFT_4_MASK << 4));
--	/* Left shift 2, bits 2 and 4 */
--	n2 = ((n2 & L_SHIFT_2_MASK) << 2) | (n2 & ~(L_SHIFT_2_MASK << 2));
--	/* Left shift 1, bits 3-6 */
--	n2 = (n2  & L_SHIFT_1_MASK) << 1;
--
--	return n1 | n2;
--}
--
--static inline void swap_words_in_key_and_bits_in_byte(const u8 *in,
--						      u8 *out, u32 len)
--{
--	unsigned int i = 0;
--	int j;
--	int index = 0;
--
--	j = len - BYTES_PER_WORD;
--	while (j >= 0) {
--		for (i = 0; i < BYTES_PER_WORD; i++) {
--			index = len - j - BYTES_PER_WORD + i;
--			out[j + i] =
--				swap_bits_in_byte(in[index]);
--		}
--		j -= BYTES_PER_WORD;
--	}
--}
--
--static void add_session_id(struct cryp_ctx *ctx)
--{
--	/*
--	 * We never want 0 to be a valid value, since this is the default value
--	 * for the software context.
--	 */
--	if (unlikely(atomic_inc_and_test(&session_id)))
--		atomic_inc(&session_id);
--
--	ctx->session_id = atomic_read(&session_id);
--}
--
--static irqreturn_t cryp_interrupt_handler(int irq, void *param)
--{
--	struct cryp_ctx *ctx;
--	int count;
--	struct cryp_device_data *device_data;
--
--	if (param == NULL) {
--		BUG_ON(!param);
--		return IRQ_HANDLED;
--	}
--
--	/* The device is coming from the one found in hw_crypt_noxts. */
--	device_data = (struct cryp_device_data *)param;
--
--	ctx = device_data->current_ctx;
--
--	if (ctx == NULL) {
--		BUG_ON(!ctx);
--		return IRQ_HANDLED;
--	}
--
--	dev_dbg(ctx->device->dev, "[%s] (len: %d) %s, ", __func__, ctx->outlen,
--		cryp_pending_irq_src(device_data, CRYP_IRQ_SRC_OUTPUT_FIFO) ?
--		"out" : "in");
--
--	if (cryp_pending_irq_src(device_data,
--				 CRYP_IRQ_SRC_OUTPUT_FIFO)) {
--		if (ctx->outlen / ctx->blocksize > 0) {
--			count = ctx->blocksize / 4;
--
--			readsl(&device_data->base->dout, ctx->outdata, count);
--			ctx->outdata += count;
--			ctx->outlen -= count;
--
--			if (ctx->outlen == 0) {
--				cryp_disable_irq_src(device_data,
--						     CRYP_IRQ_SRC_OUTPUT_FIFO);
--			}
--		}
--	} else if (cryp_pending_irq_src(device_data,
--					CRYP_IRQ_SRC_INPUT_FIFO)) {
--		if (ctx->datalen / ctx->blocksize > 0) {
--			count = ctx->blocksize / 4;
--
--			writesl(&device_data->base->din, ctx->indata, count);
--
--			ctx->indata += count;
--			ctx->datalen -= count;
--
--			if (ctx->datalen == 0)
--				cryp_disable_irq_src(device_data,
--						   CRYP_IRQ_SRC_INPUT_FIFO);
--
--			if (ctx->config.algomode == CRYP_ALGO_AES_XTS) {
--				CRYP_PUT_BITS(&device_data->base->cr,
--					      CRYP_START_ENABLE,
--					      CRYP_CR_START_POS,
--					      CRYP_CR_START_MASK);
--
--				cryp_wait_until_done(device_data);
--			}
--		}
--	}
--
--	return IRQ_HANDLED;
--}
--
--static int mode_is_aes(enum cryp_algo_mode mode)
--{
--	return	CRYP_ALGO_AES_ECB == mode ||
--		CRYP_ALGO_AES_CBC == mode ||
--		CRYP_ALGO_AES_CTR == mode ||
--		CRYP_ALGO_AES_XTS == mode;
--}
--
--static int cfg_iv(struct cryp_device_data *device_data, u32 left, u32 right,
--		  enum cryp_init_vector_index index)
--{
--	struct cryp_init_vector_value vector_value;
--
--	dev_dbg(device_data->dev, "[%s]", __func__);
--
--	vector_value.init_value_left = left;
--	vector_value.init_value_right = right;
--
--	return cryp_configure_init_vector(device_data,
--					  index,
--					  vector_value);
--}
--
--static int cfg_ivs(struct cryp_device_data *device_data, struct cryp_ctx *ctx)
--{
--	int i;
--	int status = 0;
--	int num_of_regs = ctx->blocksize / 8;
--	__be32 *civ = (__be32 *)ctx->iv;
--	u32 iv[AES_BLOCK_SIZE / 4];
--
--	dev_dbg(device_data->dev, "[%s]", __func__);
--
--	/*
--	 * Since we loop on num_of_regs we need to have a check in case
--	 * someone provides an incorrect blocksize which would force calling
--	 * cfg_iv with i greater than 2 which is an error.
--	 */
--	if (num_of_regs > 2) {
--		dev_err(device_data->dev, "[%s] Incorrect blocksize %d",
--			__func__, ctx->blocksize);
--		return -EINVAL;
--	}
--
--	for (i = 0; i < ctx->blocksize / 4; i++)
--		iv[i] = be32_to_cpup(civ + i);
--
--	for (i = 0; i < num_of_regs; i++) {
--		status = cfg_iv(device_data, iv[i*2], iv[i*2+1],
--				(enum cryp_init_vector_index) i);
--		if (status != 0)
--			return status;
--	}
--	return status;
--}
--
--static int set_key(struct cryp_device_data *device_data,
--		   u32 left_key,
--		   u32 right_key,
--		   enum cryp_key_reg_index index)
--{
--	struct cryp_key_value key_value;
--	int cryp_error;
--
--	dev_dbg(device_data->dev, "[%s]", __func__);
--
--	key_value.key_value_left = left_key;
--	key_value.key_value_right = right_key;
--
--	cryp_error = cryp_configure_key_values(device_data,
--					       index,
--					       key_value);
--	if (cryp_error != 0)
--		dev_err(device_data->dev, "[%s]: "
--			"cryp_configure_key_values() failed!", __func__);
--
--	return cryp_error;
--}
--
--static int cfg_keys(struct cryp_ctx *ctx)
--{
--	int i;
--	int num_of_regs = ctx->keylen / 8;
--	u32 swapped_key[CRYP_MAX_KEY_SIZE / 4];
--	__be32 *ckey = (__be32 *)ctx->key;
--	int cryp_error = 0;
--
--	dev_dbg(ctx->device->dev, "[%s]", __func__);
--
--	if (mode_is_aes(ctx->config.algomode)) {
--		swap_words_in_key_and_bits_in_byte((u8 *)ckey,
--						   (u8 *)swapped_key,
--						   ctx->keylen);
--	} else {
--		for (i = 0; i < ctx->keylen / 4; i++)
--			swapped_key[i] = be32_to_cpup(ckey + i);
--	}
--
--	for (i = 0; i < num_of_regs; i++) {
--		cryp_error = set_key(ctx->device,
--				     swapped_key[i * 2],
--				     swapped_key[i * 2 + 1],
--				     (enum cryp_key_reg_index) i);
--
--		if (cryp_error != 0) {
--			dev_err(ctx->device->dev, "[%s]: set_key() failed!",
--					__func__);
--			return cryp_error;
--		}
--	}
--	return cryp_error;
--}
--
--static int cryp_setup_context(struct cryp_ctx *ctx,
--			      struct cryp_device_data *device_data)
--{
--	u32 control_register = CRYP_CR_DEFAULT;
--
--	switch (cryp_mode) {
--	case CRYP_MODE_INTERRUPT:
--		writel_relaxed(CRYP_IMSC_DEFAULT, &device_data->base->imsc);
--		break;
--
--	case CRYP_MODE_DMA:
--		writel_relaxed(CRYP_DMACR_DEFAULT, &device_data->base->dmacr);
--		break;
--
--	default:
--		break;
--	}
--
--	if (ctx->updated == 0) {
--		cryp_flush_inoutfifo(device_data);
--		if (cfg_keys(ctx) != 0) {
--			dev_err(ctx->device->dev, "[%s]: cfg_keys failed!",
--				__func__);
--			return -EINVAL;
--		}
--
--		if (ctx->iv &&
--		    CRYP_ALGO_AES_ECB != ctx->config.algomode &&
--		    CRYP_ALGO_DES_ECB != ctx->config.algomode &&
--		    CRYP_ALGO_TDES_ECB != ctx->config.algomode) {
--			if (cfg_ivs(device_data, ctx) != 0)
--				return -EPERM;
--		}
--
--		cryp_set_configuration(device_data, &ctx->config,
--				       &control_register);
--		add_session_id(ctx);
--	} else if (ctx->updated == 1 &&
--		   ctx->session_id != atomic_read(&session_id)) {
--		cryp_flush_inoutfifo(device_data);
--		cryp_restore_device_context(device_data, &ctx->dev_ctx);
--
--		add_session_id(ctx);
--		control_register = ctx->dev_ctx.cr;
--	} else
--		control_register = ctx->dev_ctx.cr;
--
--	writel(control_register |
--	       (CRYP_CRYPEN_ENABLE << CRYP_CR_CRYPEN_POS),
--	       &device_data->base->cr);
--
--	return 0;
--}
--
--static int cryp_get_device_data(struct cryp_ctx *ctx,
--				struct cryp_device_data **device_data)
--{
--	int ret;
--	struct klist_iter device_iterator;
--	struct klist_node *device_node;
--	struct cryp_device_data *local_device_data = NULL;
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	/* Wait until a device is available */
--	ret = down_interruptible(&driver_data.device_allocation);
--	if (ret)
--		return ret;  /* Interrupted */
--
--	/* Select a device */
--	klist_iter_init(&driver_data.device_list, &device_iterator);
--
--	device_node = klist_next(&device_iterator);
--	while (device_node) {
--		local_device_data = container_of(device_node,
--					   struct cryp_device_data, list_node);
--		spin_lock(&local_device_data->ctx_lock);
--		/* current_ctx allocates a device, NULL = unallocated */
--		if (local_device_data->current_ctx) {
--			device_node = klist_next(&device_iterator);
--		} else {
--			local_device_data->current_ctx = ctx;
--			ctx->device = local_device_data;
--			spin_unlock(&local_device_data->ctx_lock);
--			break;
--		}
--		spin_unlock(&local_device_data->ctx_lock);
--	}
--	klist_iter_exit(&device_iterator);
--
--	if (!device_node) {
--		/**
--		 * No free device found.
--		 * Since we allocated a device with down_interruptible, this
--		 * should not be able to happen.
--		 * Number of available devices, which are contained in
--		 * device_allocation, is therefore decremented by not doing
--		 * an up(device_allocation).
--		 */
--		return -EBUSY;
--	}
--
--	*device_data = local_device_data;
--
--	return 0;
--}
--
--static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
--				   struct device *dev)
--{
--	struct dma_slave_config mem2cryp = {
--		.direction = DMA_MEM_TO_DEV,
--		.dst_addr = device_data->phybase + CRYP_DMA_TX_FIFO,
--		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
--		.dst_maxburst = 4,
--	};
--	struct dma_slave_config cryp2mem = {
--		.direction = DMA_DEV_TO_MEM,
--		.src_addr = device_data->phybase + CRYP_DMA_RX_FIFO,
--		.src_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
--		.src_maxburst = 4,
--	};
--
--	dma_cap_zero(device_data->dma.mask);
--	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
--
--	device_data->dma.cfg_mem2cryp = mem_to_engine;
--	device_data->dma.chan_mem2cryp =
--		dma_request_channel(device_data->dma.mask,
--				    stedma40_filter,
--				    device_data->dma.cfg_mem2cryp);
--
--	device_data->dma.cfg_cryp2mem = engine_to_mem;
--	device_data->dma.chan_cryp2mem =
--		dma_request_channel(device_data->dma.mask,
--				    stedma40_filter,
--				    device_data->dma.cfg_cryp2mem);
--
--	dmaengine_slave_config(device_data->dma.chan_mem2cryp, &mem2cryp);
--	dmaengine_slave_config(device_data->dma.chan_cryp2mem, &cryp2mem);
--
--	init_completion(&device_data->dma.cryp_dma_complete);
--}
--
--static void cryp_dma_out_callback(void *data)
--{
--	struct cryp_ctx *ctx = (struct cryp_ctx *) data;
--	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
--
--	complete(&ctx->device->dma.cryp_dma_complete);
--}
--
--static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
--				 struct scatterlist *sg,
--				 int len,
--				 enum dma_data_direction direction)
--{
--	struct dma_async_tx_descriptor *desc;
--	struct dma_chan *channel = NULL;
--	dma_cookie_t cookie;
--
--	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
--
--	if (unlikely(!IS_ALIGNED((unsigned long)sg, 4))) {
--		dev_err(ctx->device->dev, "[%s]: Data in sg list isn't "
--			"aligned! Addr: 0x%08lx", __func__, (unsigned long)sg);
--		return -EFAULT;
--	}
--
--	switch (direction) {
--	case DMA_TO_DEVICE:
--		channel = ctx->device->dma.chan_mem2cryp;
--		ctx->device->dma.sg_src = sg;
--		ctx->device->dma.sg_src_len = dma_map_sg(channel->device->dev,
--						 ctx->device->dma.sg_src,
--						 ctx->device->dma.nents_src,
--						 direction);
--
--		if (!ctx->device->dma.sg_src_len) {
--			dev_dbg(ctx->device->dev,
--				"[%s]: Could not map the sg list (TO_DEVICE)",
--				__func__);
--			return -EFAULT;
--		}
--
--		dev_dbg(ctx->device->dev, "[%s]: Setting up DMA for buffer "
--			"(TO_DEVICE)", __func__);
--
--		desc = dmaengine_prep_slave_sg(channel,
--				ctx->device->dma.sg_src,
--				ctx->device->dma.sg_src_len,
--				DMA_MEM_TO_DEV, DMA_CTRL_ACK);
--		break;
--
--	case DMA_FROM_DEVICE:
--		channel = ctx->device->dma.chan_cryp2mem;
--		ctx->device->dma.sg_dst = sg;
--		ctx->device->dma.sg_dst_len = dma_map_sg(channel->device->dev,
--						 ctx->device->dma.sg_dst,
--						 ctx->device->dma.nents_dst,
--						 direction);
--
--		if (!ctx->device->dma.sg_dst_len) {
--			dev_dbg(ctx->device->dev,
--				"[%s]: Could not map the sg list (FROM_DEVICE)",
--				__func__);
--			return -EFAULT;
--		}
--
--		dev_dbg(ctx->device->dev, "[%s]: Setting up DMA for buffer "
--			"(FROM_DEVICE)", __func__);
--
--		desc = dmaengine_prep_slave_sg(channel,
--				ctx->device->dma.sg_dst,
--				ctx->device->dma.sg_dst_len,
--				DMA_DEV_TO_MEM,
--				DMA_CTRL_ACK |
--				DMA_PREP_INTERRUPT);
--
--		desc->callback = cryp_dma_out_callback;
--		desc->callback_param = ctx;
--		break;
--
--	default:
--		dev_dbg(ctx->device->dev, "[%s]: Invalid DMA direction",
--			__func__);
--		return -EFAULT;
--	}
--
--	cookie = dmaengine_submit(desc);
--	if (dma_submit_error(cookie)) {
--		dev_dbg(ctx->device->dev, "[%s]: DMA submission failed\n",
--			__func__);
--		return cookie;
--	}
--
--	dma_async_issue_pending(channel);
--
--	return 0;
--}
--
--static void cryp_dma_done(struct cryp_ctx *ctx)
--{
--	struct dma_chan *chan;
--
--	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
--
--	chan = ctx->device->dma.chan_mem2cryp;
--	dmaengine_terminate_all(chan);
--	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
--		     ctx->device->dma.nents_src, DMA_TO_DEVICE);
--
--	chan = ctx->device->dma.chan_cryp2mem;
--	dmaengine_terminate_all(chan);
--	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
--		     ctx->device->dma.nents_dst, DMA_FROM_DEVICE);
--}
--
--static int cryp_dma_write(struct cryp_ctx *ctx, struct scatterlist *sg,
--			  int len)
--{
--	int error = cryp_set_dma_transfer(ctx, sg, len, DMA_TO_DEVICE);
--	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
--
--	if (error) {
--		dev_dbg(ctx->device->dev, "[%s]: cryp_set_dma_transfer() "
--			"failed", __func__);
--		return error;
--	}
--
--	return len;
--}
--
--static int cryp_dma_read(struct cryp_ctx *ctx, struct scatterlist *sg, int len)
--{
--	int error = cryp_set_dma_transfer(ctx, sg, len, DMA_FROM_DEVICE);
--	if (error) {
--		dev_dbg(ctx->device->dev, "[%s]: cryp_set_dma_transfer() "
--			"failed", __func__);
--		return error;
--	}
--
--	return len;
--}
--
--static void cryp_polling_mode(struct cryp_ctx *ctx,
--			      struct cryp_device_data *device_data)
--{
--	int len = ctx->blocksize / BYTES_PER_WORD;
--	int remaining_length = ctx->datalen;
--	u32 *indata = (u32 *)ctx->indata;
--	u32 *outdata = (u32 *)ctx->outdata;
--
--	while (remaining_length > 0) {
--		writesl(&device_data->base->din, indata, len);
--		indata += len;
--		remaining_length -= (len * BYTES_PER_WORD);
--		cryp_wait_until_done(device_data);
--
--		readsl(&device_data->base->dout, outdata, len);
--		outdata += len;
--		cryp_wait_until_done(device_data);
--	}
--}
--
--static int cryp_disable_power(struct device *dev,
--			      struct cryp_device_data *device_data,
--			      bool save_device_context)
--{
--	int ret = 0;
--
--	dev_dbg(dev, "[%s]", __func__);
--
--	spin_lock(&device_data->power_state_spinlock);
--	if (!device_data->power_state)
--		goto out;
--
--	spin_lock(&device_data->ctx_lock);
--	if (save_device_context && device_data->current_ctx) {
--		cryp_save_device_context(device_data,
--				&device_data->current_ctx->dev_ctx,
--				cryp_mode);
--		device_data->restore_dev_ctx = true;
--	}
--	spin_unlock(&device_data->ctx_lock);
--
--	clk_disable(device_data->clk);
--	ret = regulator_disable(device_data->pwr_regulator);
--	if (ret)
--		dev_err(dev, "[%s]: "
--				"regulator_disable() failed!",
--				__func__);
--
--	device_data->power_state = false;
--
--out:
--	spin_unlock(&device_data->power_state_spinlock);
--
--	return ret;
--}
--
--static int cryp_enable_power(
--		struct device *dev,
--		struct cryp_device_data *device_data,
--		bool restore_device_context)
--{
--	int ret = 0;
--
--	dev_dbg(dev, "[%s]", __func__);
--
--	spin_lock(&device_data->power_state_spinlock);
--	if (!device_data->power_state) {
--		ret = regulator_enable(device_data->pwr_regulator);
--		if (ret) {
--			dev_err(dev, "[%s]: regulator_enable() failed!",
--					__func__);
--			goto out;
--		}
--
--		ret = clk_enable(device_data->clk);
--		if (ret) {
--			dev_err(dev, "[%s]: clk_enable() failed!",
--					__func__);
--			regulator_disable(device_data->pwr_regulator);
--			goto out;
--		}
--		device_data->power_state = true;
--	}
--
--	if (device_data->restore_dev_ctx) {
--		spin_lock(&device_data->ctx_lock);
--		if (restore_device_context && device_data->current_ctx) {
--			device_data->restore_dev_ctx = false;
--			cryp_restore_device_context(device_data,
--					&device_data->current_ctx->dev_ctx);
--		}
--		spin_unlock(&device_data->ctx_lock);
--	}
--out:
--	spin_unlock(&device_data->power_state_spinlock);
--
--	return ret;
--}
--
--static int hw_crypt_noxts(struct cryp_ctx *ctx,
--			  struct cryp_device_data *device_data)
--{
--	int ret = 0;
--
--	const u8 *indata = ctx->indata;
--	u8 *outdata = ctx->outdata;
--	u32 datalen = ctx->datalen;
--	u32 outlen = datalen;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	ctx->outlen = ctx->datalen;
--
--	if (unlikely(!IS_ALIGNED((unsigned long)indata, 4))) {
--		pr_debug(DEV_DBG_NAME " [%s]: Data isn't aligned! Addr: "
--			 "0x%08lx", __func__, (unsigned long)indata);
--		return -EINVAL;
--	}
--
--	ret = cryp_setup_context(ctx, device_data);
--
--	if (ret)
--		goto out;
--
--	if (cryp_mode == CRYP_MODE_INTERRUPT) {
--		cryp_enable_irq_src(device_data, CRYP_IRQ_SRC_INPUT_FIFO |
--				    CRYP_IRQ_SRC_OUTPUT_FIFO);
--
--		/*
--		 * ctx->outlen is decremented in the cryp_interrupt_handler
--		 * function. We had to add cpu_relax() (barrier) to make sure
--		 * that gcc didn't optimze away this variable.
--		 */
--		while (ctx->outlen > 0)
--			cpu_relax();
--	} else if (cryp_mode == CRYP_MODE_POLLING ||
--		   cryp_mode == CRYP_MODE_DMA) {
--		/*
--		 * The reason for having DMA in this if case is that if we are
--		 * running cryp_mode = 2, then we separate DMA routines for
--		 * handling cipher/plaintext > blocksize, except when
--		 * running the normal CRYPTO_ALG_TYPE_CIPHER, then we still use
--		 * the polling mode. Overhead of doing DMA setup eats up the
--		 * benefits using it.
--		 */
--		cryp_polling_mode(ctx, device_data);
--	} else {
--		dev_err(ctx->device->dev, "[%s]: Invalid operation mode!",
--			__func__);
--		ret = -EPERM;
--		goto out;
--	}
--
--	cryp_save_device_context(device_data, &ctx->dev_ctx, cryp_mode);
--	ctx->updated = 1;
--
--out:
--	ctx->indata = indata;
--	ctx->outdata = outdata;
--	ctx->datalen = datalen;
--	ctx->outlen = outlen;
--
--	return ret;
--}
--
--static int get_nents(struct scatterlist *sg, int nbytes)
--{
--	int nents = 0;
--
--	while (nbytes > 0) {
--		nbytes -= sg->length;
--		sg = sg_next(sg);
--		nents++;
--	}
--
--	return nents;
--}
--
--static int ablk_dma_crypt(struct skcipher_request *areq)
--{
--	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--	struct cryp_device_data *device_data;
--
--	int bytes_written = 0;
--	int bytes_read = 0;
--	int ret;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	ctx->datalen = areq->cryptlen;
--	ctx->outlen = areq->cryptlen;
--
--	ret = cryp_get_device_data(ctx, &device_data);
--	if (ret)
--		return ret;
--
--	ret = cryp_setup_context(ctx, device_data);
--	if (ret)
--		goto out;
--
--	/* We have the device now, so store the nents in the dma struct. */
--	ctx->device->dma.nents_src = get_nents(areq->src, ctx->datalen);
--	ctx->device->dma.nents_dst = get_nents(areq->dst, ctx->outlen);
--
--	/* Enable DMA in- and output. */
--	cryp_configure_for_dma(device_data, CRYP_DMA_ENABLE_BOTH_DIRECTIONS);
--
--	bytes_written = cryp_dma_write(ctx, areq->src, ctx->datalen);
--	bytes_read = cryp_dma_read(ctx, areq->dst, bytes_written);
--
--	wait_for_completion(&ctx->device->dma.cryp_dma_complete);
--	cryp_dma_done(ctx);
--
--	cryp_save_device_context(device_data, &ctx->dev_ctx, cryp_mode);
--	ctx->updated = 1;
--
--out:
--	spin_lock(&device_data->ctx_lock);
--	device_data->current_ctx = NULL;
--	ctx->device = NULL;
--	spin_unlock(&device_data->ctx_lock);
--
--	/*
--	 * The down_interruptible part for this semaphore is called in
--	 * cryp_get_device_data.
--	 */
--	up(&driver_data.device_allocation);
--
--	if (unlikely(bytes_written != bytes_read))
--		return -EPERM;
--
--	return 0;
--}
--
--static int ablk_crypt(struct skcipher_request *areq)
--{
--	struct skcipher_walk walk;
--	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--	struct cryp_device_data *device_data;
--	unsigned long src_paddr;
--	unsigned long dst_paddr;
--	int ret;
--	int nbytes;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	ret = cryp_get_device_data(ctx, &device_data);
--	if (ret)
--		goto out;
--
--	ret = skcipher_walk_async(&walk, areq);
--
--	if (ret) {
--		pr_err(DEV_DBG_NAME "[%s]: skcipher_walk_async() failed!",
--			__func__);
--		goto out;
--	}
--
--	while ((nbytes = walk.nbytes) > 0) {
--		ctx->iv = walk.iv;
--		src_paddr = (page_to_phys(walk.src.phys.page) + walk.src.phys.offset);
--		ctx->indata = phys_to_virt(src_paddr);
--
--		dst_paddr = (page_to_phys(walk.dst.phys.page) + walk.dst.phys.offset);
--		ctx->outdata = phys_to_virt(dst_paddr);
--
--		ctx->datalen = nbytes - (nbytes % ctx->blocksize);
--
--		ret = hw_crypt_noxts(ctx, device_data);
--		if (ret)
--			goto out;
--
--		nbytes -= ctx->datalen;
--		ret = skcipher_walk_done(&walk, nbytes);
--		if (ret)
--			goto out;
--	}
--
--out:
--	/* Release the device */
--	spin_lock(&device_data->ctx_lock);
--	device_data->current_ctx = NULL;
--	ctx->device = NULL;
--	spin_unlock(&device_data->ctx_lock);
--
--	/*
--	 * The down_interruptible part for this semaphore is called in
--	 * cryp_get_device_data.
--	 */
--	up(&driver_data.device_allocation);
--
--	return ret;
--}
--
--static int aes_skcipher_setkey(struct crypto_skcipher *cipher,
--				 const u8 *key, unsigned int keylen)
--{
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	switch (keylen) {
--	case AES_KEYSIZE_128:
--		ctx->config.keysize = CRYP_KEY_SIZE_128;
--		break;
--
--	case AES_KEYSIZE_192:
--		ctx->config.keysize = CRYP_KEY_SIZE_192;
--		break;
--
--	case AES_KEYSIZE_256:
--		ctx->config.keysize = CRYP_KEY_SIZE_256;
--		break;
--
--	default:
--		pr_err(DEV_DBG_NAME "[%s]: Unknown keylen!", __func__);
--		return -EINVAL;
--	}
--
--	memcpy(ctx->key, key, keylen);
--	ctx->keylen = keylen;
--
--	ctx->updated = 0;
--
--	return 0;
--}
--
--static int des_skcipher_setkey(struct crypto_skcipher *cipher,
--				 const u8 *key, unsigned int keylen)
--{
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--	int err;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	err = verify_skcipher_des_key(cipher, key);
--	if (err)
--		return err;
--
--	memcpy(ctx->key, key, keylen);
--	ctx->keylen = keylen;
--
--	ctx->updated = 0;
--	return 0;
--}
--
--static int des3_skcipher_setkey(struct crypto_skcipher *cipher,
--				  const u8 *key, unsigned int keylen)
--{
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--	int err;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	err = verify_skcipher_des3_key(cipher, key);
--	if (err)
--		return err;
--
--	memcpy(ctx->key, key, keylen);
--	ctx->keylen = keylen;
--
--	ctx->updated = 0;
--	return 0;
--}
--
--static int cryp_blk_encrypt(struct skcipher_request *areq)
--{
--	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	ctx->config.algodir = CRYP_ALGORITHM_ENCRYPT;
--
--	/*
--	 * DMA does not work for DES due to a hw bug */
--	if (cryp_mode == CRYP_MODE_DMA && mode_is_aes(ctx->config.algomode))
--		return ablk_dma_crypt(areq);
--
--	/* For everything except DMA, we run the non DMA version. */
--	return ablk_crypt(areq);
--}
--
--static int cryp_blk_decrypt(struct skcipher_request *areq)
--{
--	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	ctx->config.algodir = CRYP_ALGORITHM_DECRYPT;
--
--	/* DMA does not work for DES due to a hw bug */
--	if (cryp_mode == CRYP_MODE_DMA && mode_is_aes(ctx->config.algomode))
--		return ablk_dma_crypt(areq);
--
--	/* For everything except DMA, we run the non DMA version. */
--	return ablk_crypt(areq);
--}
--
--struct cryp_algo_template {
--	enum cryp_algo_mode algomode;
--	struct skcipher_alg skcipher;
--};
--
--static int cryp_init_tfm(struct crypto_skcipher *tfm)
--{
--	struct cryp_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
--	struct cryp_algo_template *cryp_alg = container_of(alg,
--			struct cryp_algo_template,
--			skcipher);
--
--	ctx->config.algomode = cryp_alg->algomode;
--	ctx->blocksize = crypto_skcipher_blocksize(tfm);
--
--	return 0;
--}
--
--static struct cryp_algo_template cryp_algs[] = {
--	{
--		.algomode = CRYP_ALGO_AES_ECB,
--		.skcipher = {
--			.base.cra_name		= "ecb(aes)",
--			.base.cra_driver_name	= "ecb-aes-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= AES_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= AES_MIN_KEY_SIZE,
--			.max_keysize		= AES_MAX_KEY_SIZE,
--			.setkey			= aes_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.init			= cryp_init_tfm,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_AES_CBC,
--		.skcipher = {
--			.base.cra_name		= "cbc(aes)",
--			.base.cra_driver_name	= "cbc-aes-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= AES_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= AES_MIN_KEY_SIZE,
--			.max_keysize		= AES_MAX_KEY_SIZE,
--			.setkey			= aes_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.init			= cryp_init_tfm,
--			.ivsize			= AES_BLOCK_SIZE,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_AES_CTR,
--		.skcipher = {
--			.base.cra_name		= "ctr(aes)",
--			.base.cra_driver_name	= "ctr-aes-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= 1,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= AES_MIN_KEY_SIZE,
--			.max_keysize		= AES_MAX_KEY_SIZE,
--			.setkey			= aes_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.init			= cryp_init_tfm,
--			.ivsize			= AES_BLOCK_SIZE,
--			.chunksize		= AES_BLOCK_SIZE,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_DES_ECB,
--		.skcipher = {
--			.base.cra_name		= "ecb(des)",
--			.base.cra_driver_name	= "ecb-des-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= DES_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= DES_KEY_SIZE,
--			.max_keysize		= DES_KEY_SIZE,
--			.setkey			= des_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.init			= cryp_init_tfm,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_TDES_ECB,
--		.skcipher = {
--			.base.cra_name		= "ecb(des3_ede)",
--			.base.cra_driver_name	= "ecb-des3_ede-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= DES3_EDE_KEY_SIZE,
--			.max_keysize		= DES3_EDE_KEY_SIZE,
--			.setkey			= des3_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.init			= cryp_init_tfm,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_DES_CBC,
--		.skcipher = {
--			.base.cra_name		= "cbc(des)",
--			.base.cra_driver_name	= "cbc-des-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= DES_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= DES_KEY_SIZE,
--			.max_keysize		= DES_KEY_SIZE,
--			.setkey			= des_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.ivsize			= DES_BLOCK_SIZE,
--			.init			= cryp_init_tfm,
--		}
--	},
--	{
--		.algomode = CRYP_ALGO_TDES_CBC,
--		.skcipher = {
--			.base.cra_name		= "cbc(des3_ede)",
--			.base.cra_driver_name	= "cbc-des3_ede-ux500",
--			.base.cra_priority	= 300,
--			.base.cra_flags		= CRYPTO_ALG_ASYNC,
--			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
--			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
--			.base.cra_alignmask	= 3,
--			.base.cra_module	= THIS_MODULE,
--
--			.min_keysize		= DES3_EDE_KEY_SIZE,
--			.max_keysize		= DES3_EDE_KEY_SIZE,
--			.setkey			= des3_skcipher_setkey,
--			.encrypt		= cryp_blk_encrypt,
--			.decrypt		= cryp_blk_decrypt,
--			.ivsize			= DES3_EDE_BLOCK_SIZE,
--			.init			= cryp_init_tfm,
--		}
--	}
--};
--
--/**
-- * cryp_algs_register_all -
-- */
--static int cryp_algs_register_all(void)
--{
--	int ret;
--	int i;
--	int count;
--
--	pr_debug("[%s]", __func__);
--
--	for (i = 0; i < ARRAY_SIZE(cryp_algs); i++) {
--		ret = crypto_register_skcipher(&cryp_algs[i].skcipher);
--		if (ret) {
--			count = i;
--			pr_err("[%s] alg registration failed",
--					cryp_algs[i].skcipher.base.cra_driver_name);
--			goto unreg;
--		}
--	}
--	return 0;
--unreg:
--	for (i = 0; i < count; i++)
--		crypto_unregister_skcipher(&cryp_algs[i].skcipher);
--	return ret;
--}
--
--/**
-- * cryp_algs_unregister_all -
-- */
--static void cryp_algs_unregister_all(void)
--{
--	int i;
--
--	pr_debug(DEV_DBG_NAME " [%s]", __func__);
--
--	for (i = 0; i < ARRAY_SIZE(cryp_algs); i++)
--		crypto_unregister_skcipher(&cryp_algs[i].skcipher);
--}
--
--static int ux500_cryp_probe(struct platform_device *pdev)
--{
--	int ret;
--	struct resource *res;
--	struct cryp_device_data *device_data;
--	struct cryp_protection_config prot = {
--		.privilege_access = CRYP_STATE_ENABLE
--	};
--	struct device *dev = &pdev->dev;
--
--	dev_dbg(dev, "[%s]", __func__);
--	device_data = devm_kzalloc(dev, sizeof(*device_data), GFP_KERNEL);
--	if (!device_data) {
--		ret = -ENOMEM;
--		goto out;
--	}
--
--	device_data->dev = dev;
--	device_data->current_ctx = NULL;
--
--	/* Grab the DMA configuration from platform data. */
--	mem_to_engine = &((struct cryp_platform_data *)
--			 dev->platform_data)->mem_to_engine;
--	engine_to_mem = &((struct cryp_platform_data *)
--			 dev->platform_data)->engine_to_mem;
--
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res) {
--		dev_err(dev, "[%s]: platform_get_resource() failed",
--				__func__);
--		ret = -ENODEV;
--		goto out;
--	}
--
--	device_data->phybase = res->start;
--	device_data->base = devm_ioremap_resource(dev, res);
--	if (IS_ERR(device_data->base)) {
--		ret = PTR_ERR(device_data->base);
--		goto out;
--	}
--
--	spin_lock_init(&device_data->ctx_lock);
--	spin_lock_init(&device_data->power_state_spinlock);
--
--	/* Enable power for CRYP hardware block */
--	device_data->pwr_regulator = regulator_get(&pdev->dev, "v-ape");
--	if (IS_ERR(device_data->pwr_regulator)) {
--		dev_err(dev, "[%s]: could not get cryp regulator", __func__);
--		ret = PTR_ERR(device_data->pwr_regulator);
--		device_data->pwr_regulator = NULL;
--		goto out;
--	}
--
--	/* Enable the clk for CRYP hardware block */
--	device_data->clk = devm_clk_get(&pdev->dev, NULL);
--	if (IS_ERR(device_data->clk)) {
--		dev_err(dev, "[%s]: clk_get() failed!", __func__);
--		ret = PTR_ERR(device_data->clk);
--		goto out_regulator;
--	}
--
--	ret = clk_prepare(device_data->clk);
--	if (ret) {
--		dev_err(dev, "[%s]: clk_prepare() failed!", __func__);
--		goto out_regulator;
--	}
--
--	/* Enable device power (and clock) */
--	ret = cryp_enable_power(device_data->dev, device_data, false);
--	if (ret) {
--		dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
--		goto out_clk_unprepare;
--	}
--
--	if (cryp_check(device_data)) {
--		dev_err(dev, "[%s]: cryp_check() failed!", __func__);
--		ret = -EINVAL;
--		goto out_power;
--	}
--
--	if (cryp_configure_protection(device_data, &prot)) {
--		dev_err(dev, "[%s]: cryp_configure_protection() failed!",
--			__func__);
--		ret = -EINVAL;
--		goto out_power;
--	}
--
--	device_data->irq = platform_get_irq(pdev, 0);
--	if (device_data->irq <= 0) {
--		ret = device_data->irq ? device_data->irq : -ENXIO;
--		goto out_power;
--	}
--
--	ret = devm_request_irq(&pdev->dev, device_data->irq,
--			       cryp_interrupt_handler, 0, "cryp1", device_data);
--	if (ret) {
--		dev_err(dev, "[%s]: Unable to request IRQ", __func__);
--		goto out_power;
--	}
--
--	if (cryp_mode == CRYP_MODE_DMA)
--		cryp_dma_setup_channel(device_data, dev);
--
--	platform_set_drvdata(pdev, device_data);
--
--	/* Put the new device into the device list... */
--	klist_add_tail(&device_data->list_node, &driver_data.device_list);
--
--	/* ... and signal that a new device is available. */
--	up(&driver_data.device_allocation);
--
--	atomic_set(&session_id, 1);
--
--	ret = cryp_algs_register_all();
--	if (ret) {
--		dev_err(dev, "[%s]: cryp_algs_register_all() failed!",
--			__func__);
--		goto out_power;
--	}
--
--	dev_info(dev, "successfully registered\n");
--
--	return 0;
--
--out_power:
--	cryp_disable_power(device_data->dev, device_data, false);
--
--out_clk_unprepare:
--	clk_unprepare(device_data->clk);
--
--out_regulator:
--	regulator_put(device_data->pwr_regulator);
--
--out:
--	return ret;
--}
--
--static int ux500_cryp_remove(struct platform_device *pdev)
--{
--	struct cryp_device_data *device_data;
--
--	dev_dbg(&pdev->dev, "[%s]", __func__);
--	device_data = platform_get_drvdata(pdev);
--	if (!device_data) {
--		dev_err(&pdev->dev, "[%s]: platform_get_drvdata() failed!",
--			__func__);
--		return -ENOMEM;
--	}
--
--	/* Try to decrease the number of available devices. */
--	if (down_trylock(&driver_data.device_allocation))
--		return -EBUSY;
--
--	/* Check that the device is free */
--	spin_lock(&device_data->ctx_lock);
--	/* current_ctx allocates a device, NULL = unallocated */
--	if (device_data->current_ctx) {
--		/* The device is busy */
--		spin_unlock(&device_data->ctx_lock);
--		/* Return the device to the pool. */
--		up(&driver_data.device_allocation);
--		return -EBUSY;
--	}
--
--	spin_unlock(&device_data->ctx_lock);
--
--	/* Remove the device from the list */
--	if (klist_node_attached(&device_data->list_node))
--		klist_remove(&device_data->list_node);
--
--	/* If this was the last device, remove the services */
--	if (list_empty(&driver_data.device_list.k_list))
--		cryp_algs_unregister_all();
--
--	if (cryp_disable_power(&pdev->dev, device_data, false))
--		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
--			__func__);
--
--	clk_unprepare(device_data->clk);
--	regulator_put(device_data->pwr_regulator);
--
--	return 0;
--}
--
--static void ux500_cryp_shutdown(struct platform_device *pdev)
--{
--	struct cryp_device_data *device_data;
--
--	dev_dbg(&pdev->dev, "[%s]", __func__);
--
--	device_data = platform_get_drvdata(pdev);
--	if (!device_data) {
--		dev_err(&pdev->dev, "[%s]: platform_get_drvdata() failed!",
--			__func__);
--		return;
--	}
--
--	/* Check that the device is free */
--	spin_lock(&device_data->ctx_lock);
--	/* current_ctx allocates a device, NULL = unallocated */
--	if (!device_data->current_ctx) {
--		if (down_trylock(&driver_data.device_allocation))
--			dev_dbg(&pdev->dev, "[%s]: Cryp still in use!"
--				"Shutting down anyway...", __func__);
--		/**
--		 * (Allocate the device)
--		 * Need to set this to non-null (dummy) value,
--		 * to avoid usage if context switching.
--		 */
--		device_data->current_ctx++;
--	}
--	spin_unlock(&device_data->ctx_lock);
--
--	/* Remove the device from the list */
--	if (klist_node_attached(&device_data->list_node))
--		klist_remove(&device_data->list_node);
--
--	/* If this was the last device, remove the services */
--	if (list_empty(&driver_data.device_list.k_list))
--		cryp_algs_unregister_all();
--
--	if (cryp_disable_power(&pdev->dev, device_data, false))
--		dev_err(&pdev->dev, "[%s]: cryp_disable_power() failed",
--			__func__);
--
--}
--
--#ifdef CONFIG_PM_SLEEP
--static int ux500_cryp_suspend(struct device *dev)
--{
--	int ret;
--	struct platform_device *pdev = to_platform_device(dev);
--	struct cryp_device_data *device_data;
--	struct cryp_ctx *temp_ctx = NULL;
--
--	dev_dbg(dev, "[%s]", __func__);
--
--	/* Handle state? */
--	device_data = platform_get_drvdata(pdev);
--	if (!device_data) {
--		dev_err(dev, "[%s]: platform_get_drvdata() failed!", __func__);
--		return -ENOMEM;
--	}
--
--	disable_irq(device_data->irq);
--
--	spin_lock(&device_data->ctx_lock);
--	if (!device_data->current_ctx)
--		device_data->current_ctx++;
--	spin_unlock(&device_data->ctx_lock);
--
--	if (device_data->current_ctx == ++temp_ctx) {
--		if (down_interruptible(&driver_data.device_allocation))
--			dev_dbg(dev, "[%s]: down_interruptible() failed",
--				__func__);
--		ret = cryp_disable_power(dev, device_data, false);
--
--	} else
--		ret = cryp_disable_power(dev, device_data, true);
--
--	if (ret)
--		dev_err(dev, "[%s]: cryp_disable_power()", __func__);
--
--	return ret;
--}
--
--static int ux500_cryp_resume(struct device *dev)
--{
--	int ret = 0;
--	struct platform_device *pdev = to_platform_device(dev);
--	struct cryp_device_data *device_data;
--	struct cryp_ctx *temp_ctx = NULL;
--
--	dev_dbg(dev, "[%s]", __func__);
--
--	device_data = platform_get_drvdata(pdev);
--	if (!device_data) {
--		dev_err(dev, "[%s]: platform_get_drvdata() failed!", __func__);
--		return -ENOMEM;
--	}
--
--	spin_lock(&device_data->ctx_lock);
--	if (device_data->current_ctx == ++temp_ctx)
--		device_data->current_ctx = NULL;
--	spin_unlock(&device_data->ctx_lock);
--
--
--	if (!device_data->current_ctx)
--		up(&driver_data.device_allocation);
--	else
--		ret = cryp_enable_power(dev, device_data, true);
--
--	if (ret)
--		dev_err(dev, "[%s]: cryp_enable_power() failed!", __func__);
--	else
--		enable_irq(device_data->irq);
--
--	return ret;
--}
--#endif
--
--static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
--
--static const struct of_device_id ux500_cryp_match[] = {
--	{ .compatible = "stericsson,ux500-cryp" },
--	{ },
--};
--MODULE_DEVICE_TABLE(of, ux500_cryp_match);
--
--static struct platform_driver cryp_driver = {
--	.probe  = ux500_cryp_probe,
--	.remove = ux500_cryp_remove,
--	.shutdown = ux500_cryp_shutdown,
--	.driver = {
--		.name  = "cryp1",
--		.of_match_table = ux500_cryp_match,
--		.pm    = &ux500_cryp_pm,
--	}
--};
--
--static int __init ux500_cryp_mod_init(void)
--{
--	pr_debug("[%s] is called!", __func__);
--	klist_init(&driver_data.device_list, NULL, NULL);
--	/* Initialize the semaphore to 0 devices (locked state) */
--	sema_init(&driver_data.device_allocation, 0);
--	return platform_driver_register(&cryp_driver);
--}
--
--static void __exit ux500_cryp_mod_fini(void)
--{
--	pr_debug("[%s] is called!", __func__);
--	platform_driver_unregister(&cryp_driver);
--}
--
--module_init(ux500_cryp_mod_init);
--module_exit(ux500_cryp_mod_fini);
--
--module_param(cryp_mode, int, 0);
--
--MODULE_DESCRIPTION("Driver for ST-Ericsson UX500 CRYP crypto engine.");
--MODULE_ALIAS_CRYPTO("aes-all");
--MODULE_ALIAS_CRYPTO("des-all");
--
--MODULE_LICENSE("GPL");
-diff --git a/drivers/crypto/ux500/cryp/cryp_irq.c b/drivers/crypto/ux500/cryp/cryp_irq.c
-deleted file mode 100644
-index 6d2f07bec98a..000000000000
---- a/drivers/crypto/ux500/cryp/cryp_irq.c
-+++ /dev/null
-@@ -1,45 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- */
--
--#include <linux/kernel.h>
--#include <linux/bitmap.h>
--#include <linux/device.h>
--
--#include "cryp.h"
--#include "cryp_p.h"
--#include "cryp_irq.h"
--#include "cryp_irqp.h"
--
--void cryp_enable_irq_src(struct cryp_device_data *device_data, u32 irq_src)
--{
--	u32 i;
--
--	dev_dbg(device_data->dev, "[%s]", __func__);
--
--	i = readl_relaxed(&device_data->base->imsc);
--	i = i | irq_src;
--	writel_relaxed(i, &device_data->base->imsc);
--}
--
--void cryp_disable_irq_src(struct cryp_device_data *device_data, u32 irq_src)
--{
--	u32 i;
--
--	dev_dbg(device_data->dev, "[%s]", __func__);
--
--	i = readl_relaxed(&device_data->base->imsc);
--	i = i & ~irq_src;
--	writel_relaxed(i, &device_data->base->imsc);
--}
--
--bool cryp_pending_irq_src(struct cryp_device_data *device_data, u32 irq_src)
--{
--	return (readl_relaxed(&device_data->base->mis) & irq_src) > 0;
--}
-diff --git a/drivers/crypto/ux500/cryp/cryp_irq.h b/drivers/crypto/ux500/cryp/cryp_irq.h
-deleted file mode 100644
-index da90029ea141..000000000000
---- a/drivers/crypto/ux500/cryp/cryp_irq.h
-+++ /dev/null
-@@ -1,31 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- */
--
--#ifndef _CRYP_IRQ_H_
--#define _CRYP_IRQ_H_
--
--#include "cryp.h"
--
--enum cryp_irq_src_id {
--	CRYP_IRQ_SRC_INPUT_FIFO = 0x1,
--	CRYP_IRQ_SRC_OUTPUT_FIFO = 0x2,
--	CRYP_IRQ_SRC_ALL = 0x3
--};
--
--/*
-- * M0 Funtions
-- */
--void cryp_enable_irq_src(struct cryp_device_data *device_data, u32 irq_src);
--
--void cryp_disable_irq_src(struct cryp_device_data *device_data, u32 irq_src);
--
--bool cryp_pending_irq_src(struct cryp_device_data *device_data, u32 irq_src);
--
--#endif				/* _CRYP_IRQ_H_ */
-diff --git a/drivers/crypto/ux500/cryp/cryp_irqp.h b/drivers/crypto/ux500/cryp/cryp_irqp.h
-deleted file mode 100644
-index 4981a3f461e5..000000000000
---- a/drivers/crypto/ux500/cryp/cryp_irqp.h
-+++ /dev/null
-@@ -1,125 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- */
--
--#ifndef __CRYP_IRQP_H_
--#define __CRYP_IRQP_H_
--
--#include "cryp_irq.h"
--
--/*
-- *
-- * CRYP Registers - Offset mapping
-- *     +-----------------+
-- * 00h | CRYP_CR         |  Configuration register
-- *     +-----------------+
-- * 04h | CRYP_SR         |  Status register
-- *     +-----------------+
-- * 08h | CRYP_DIN        |  Data In register
-- *     +-----------------+
-- * 0ch | CRYP_DOUT       |  Data out register
-- *     +-----------------+
-- * 10h | CRYP_DMACR      |  DMA control register
-- *     +-----------------+
-- * 14h | CRYP_IMSC       |  IMSC
-- *     +-----------------+
-- * 18h | CRYP_RIS        |  Raw interrupt status
-- *     +-----------------+
-- * 1ch | CRYP_MIS        |  Masked interrupt status.
-- *     +-----------------+
-- *       Key registers
-- *       IVR registers
-- *       Peripheral
-- *       Cell IDs
-- *
-- *       Refer data structure for other register map
-- */
--
--/**
-- * struct cryp_register
-- * @cr			- Configuration register
-- * @status		- Status register
-- * @din			- Data input register
-- * @din_size		- Data input size register
-- * @dout		- Data output register
-- * @dout_size		- Data output size register
-- * @dmacr		- Dma control register
-- * @imsc		- Interrupt mask set/clear register
-- * @ris			- Raw interrupt status
-- * @mis			- Masked interrupt statu register
-- * @key_1_l		- Key register 1 L
-- * @key_1_r		- Key register 1 R
-- * @key_2_l		- Key register 2 L
-- * @key_2_r		- Key register 2 R
-- * @key_3_l		- Key register 3 L
-- * @key_3_r		- Key register 3 R
-- * @key_4_l		- Key register 4 L
-- * @key_4_r		- Key register 4 R
-- * @init_vect_0_l	- init vector 0 L
-- * @init_vect_0_r	- init vector 0 R
-- * @init_vect_1_l	- init vector 1 L
-- * @init_vect_1_r	- init vector 1 R
-- * @cryp_unused1	- unused registers
-- * @itcr		- Integration test control register
-- * @itip		- Integration test input register
-- * @itop		- Integration test output register
-- * @cryp_unused2	- unused registers
-- * @periphId0		- FE0 CRYP Peripheral Identication Register
-- * @periphId1		- FE4
-- * @periphId2		- FE8
-- * @periphId3		- FEC
-- * @pcellId0		- FF0  CRYP PCell Identication Register
-- * @pcellId1		- FF4
-- * @pcellId2		- FF8
-- * @pcellId3		- FFC
-- */
--struct cryp_register {
--	u32 cr;			/* Configuration register   */
--	u32 sr;			/* Status register          */
--	u32 din;		/* Data input register      */
--	u32 din_size;		/* Data input size register */
--	u32 dout;		/* Data output register     */
--	u32 dout_size;		/* Data output size register */
--	u32 dmacr;		/* Dma control register     */
--	u32 imsc;		/* Interrupt mask set/clear register */
--	u32 ris;		/* Raw interrupt status             */
--	u32 mis;		/* Masked interrupt statu register  */
--
--	u32 key_1_l;		/*Key register 1 L */
--	u32 key_1_r;		/*Key register 1 R */
--	u32 key_2_l;		/*Key register 2 L */
--	u32 key_2_r;		/*Key register 2 R */
--	u32 key_3_l;		/*Key register 3 L */
--	u32 key_3_r;		/*Key register 3 R */
--	u32 key_4_l;		/*Key register 4 L */
--	u32 key_4_r;		/*Key register 4 R */
--
--	u32 init_vect_0_l;	/*init vector 0 L */
--	u32 init_vect_0_r;	/*init vector 0 R */
--	u32 init_vect_1_l;	/*init vector 1 L */
--	u32 init_vect_1_r;	/*init vector 1 R */
--
--	u32 cryp_unused1[(0x80 - 0x58) / sizeof(u32)];	/* unused registers */
--	u32 itcr;		/*Integration test control register */
--	u32 itip;		/*Integration test input register */
--	u32 itop;		/*Integration test output register */
--	u32 cryp_unused2[(0xFE0 - 0x8C) / sizeof(u32)];	/* unused registers */
--
--	u32 periphId0;		/* FE0  CRYP Peripheral Identication Register */
--	u32 periphId1;		/* FE4 */
--	u32 periphId2;		/* FE8 */
--	u32 periphId3;		/* FEC */
--
--	u32 pcellId0;		/* FF0  CRYP PCell Identication Register */
--	u32 pcellId1;		/* FF4 */
--	u32 pcellId2;		/* FF8 */
--	u32 pcellId3;		/* FFC */
--};
--
--#endif
-diff --git a/drivers/crypto/ux500/cryp/cryp_p.h b/drivers/crypto/ux500/cryp/cryp_p.h
-deleted file mode 100644
-index 60b47fe4de35..000000000000
---- a/drivers/crypto/ux500/cryp/cryp_p.h
-+++ /dev/null
-@@ -1,122 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) ST-Ericsson SA 2010
-- * Author: Shujuan Chen <shujuan.chen@stericsson.com> for ST-Ericsson.
-- * Author: Jonas Linde <jonas.linde@stericsson.com> for ST-Ericsson.
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson.
-- * Author: Berne Hebark <berne.herbark@stericsson.com> for ST-Ericsson.
-- * Author: Niklas Hernaeus <niklas.hernaeus@stericsson.com> for ST-Ericsson.
-- */
--
--#ifndef _CRYP_P_H_
--#define _CRYP_P_H_
--
--#include <linux/io.h>
--#include <linux/bitops.h>
--
--#include "cryp.h"
--#include "cryp_irqp.h"
--
--/*
-- * Generic Macros
-- */
--#define CRYP_SET_BITS(reg_name, mask) \
--	writel_relaxed((readl_relaxed(reg_name) | mask), reg_name)
--
--#define CRYP_WRITE_BIT(reg_name, val, mask) \
--	writel_relaxed(((readl_relaxed(reg_name) & ~(mask)) |\
--			((val) & (mask))), reg_name)
--
--#define CRYP_TEST_BITS(reg_name, val) \
--	(readl_relaxed(reg_name) & (val))
--
--#define CRYP_PUT_BITS(reg, val, shift, mask) \
--	writel_relaxed(((readl_relaxed(reg) & ~(mask)) | \
--		(((u32)val << shift) & (mask))), reg)
--
--/*
-- * CRYP specific Macros
-- */
--#define CRYP_PERIPHERAL_ID0		0xE3
--#define CRYP_PERIPHERAL_ID1		0x05
--
--#define CRYP_PERIPHERAL_ID2_DB8500	0x28
--#define CRYP_PERIPHERAL_ID3		0x00
--
--#define CRYP_PCELL_ID0			0x0D
--#define CRYP_PCELL_ID1			0xF0
--#define CRYP_PCELL_ID2			0x05
--#define CRYP_PCELL_ID3			0xB1
--
--/*
-- * CRYP register default values
-- */
--#define MAX_DEVICE_SUPPORT		2
--
--/* Priv set, keyrden set and datatype 8bits swapped set as default. */
--#define CRYP_CR_DEFAULT			0x0482
--#define CRYP_DMACR_DEFAULT		0x0
--#define CRYP_IMSC_DEFAULT		0x0
--#define CRYP_DIN_DEFAULT		0x0
--#define CRYP_DOUT_DEFAULT		0x0
--#define CRYP_KEY_DEFAULT		0x0
--#define CRYP_INIT_VECT_DEFAULT		0x0
--
--/*
-- * CRYP Control register specific mask
-- */
--#define CRYP_CR_SECURE_MASK		BIT(0)
--#define CRYP_CR_PRLG_MASK		BIT(1)
--#define CRYP_CR_ALGODIR_MASK		BIT(2)
--#define CRYP_CR_ALGOMODE_MASK		(BIT(5) | BIT(4) | BIT(3))
--#define CRYP_CR_DATATYPE_MASK		(BIT(7) | BIT(6))
--#define CRYP_CR_KEYSIZE_MASK		(BIT(9) | BIT(8))
--#define CRYP_CR_KEYRDEN_MASK		BIT(10)
--#define CRYP_CR_KSE_MASK		BIT(11)
--#define CRYP_CR_START_MASK		BIT(12)
--#define CRYP_CR_INIT_MASK		BIT(13)
--#define CRYP_CR_FFLUSH_MASK		BIT(14)
--#define CRYP_CR_CRYPEN_MASK		BIT(15)
--#define CRYP_CR_CONTEXT_SAVE_MASK	(CRYP_CR_SECURE_MASK |\
--					 CRYP_CR_PRLG_MASK |\
--					 CRYP_CR_ALGODIR_MASK |\
--					 CRYP_CR_ALGOMODE_MASK |\
--					 CRYP_CR_KEYSIZE_MASK |\
--					 CRYP_CR_KEYRDEN_MASK |\
--					 CRYP_CR_DATATYPE_MASK)
--
--
--#define CRYP_SR_INFIFO_READY_MASK	(BIT(0) | BIT(1))
--#define CRYP_SR_IFEM_MASK		BIT(0)
--#define CRYP_SR_BUSY_MASK		BIT(4)
--
--/*
-- * Bit position used while setting bits in register
-- */
--#define CRYP_CR_PRLG_POS		1
--#define CRYP_CR_ALGODIR_POS		2
--#define CRYP_CR_ALGOMODE_POS		3
--#define CRYP_CR_DATATYPE_POS		6
--#define CRYP_CR_KEYSIZE_POS		8
--#define CRYP_CR_KEYRDEN_POS		10
--#define CRYP_CR_KSE_POS			11
--#define CRYP_CR_START_POS		12
--#define CRYP_CR_INIT_POS		13
--#define CRYP_CR_CRYPEN_POS		15
--
--#define CRYP_SR_BUSY_POS		4
--
--/*
-- * CRYP PCRs------PC_NAND control register
-- * BIT_MASK
-- */
--#define CRYP_DMA_REQ_MASK		(BIT(1) | BIT(0))
--#define CRYP_DMA_REQ_MASK_POS		0
--
--
--struct cryp_system_context {
--	/* CRYP Register structure */
--	struct cryp_register *p_cryp_reg[MAX_DEVICE_SUPPORT];
--};
--
--#endif
--- 
-2.38.1
+Together with the previous commit is just a complete useless
+information. 
 
+> this functionality is intended to be integrated into libc's thread
+> management.
+
+vdso_getrandom() and sys_vgetrandom_alloc() provide ..... which is
+intended to be integrated ....
+
+> diff --git a/include/vdso/datapage.h b/include/vdso/datapage.h
+> index 73eb622e7663..cbacfd923a5c 100644
+> --- a/include/vdso/datapage.h
+> +++ b/include/vdso/datapage.h
+> @@ -109,6 +109,11 @@ struct vdso_data {
+>  	struct arch_vdso_data	arch_data;
+>  };
+>  
+> +struct vdso_rng_data {
+> +	unsigned long generation;
+> +	bool is_ready;
+> +};
+
+Please follow the coding style in this header:
+
+       - make the struct definition tabular aligned
+       - provide kernel doc which explains the struct members
+
+> +config HAVE_VDSO_GETRANDOM
+> +	bool
+> +	help
+> +	  Selected by architectures that support vDSO getrandom().
+
+See ?
+
+>  endif
+> diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
+> new file mode 100644
+> index 000000000000..2c4ef5ef212c
+> --- /dev/null
+> +++ b/lib/vdso/getrandom.c
+> @@ -0,0 +1,114 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/atomic.h>
+> +#include <linux/fs.h>
+
+No. This is VDSO and builds a userspace library. You cannot include
+random kernel headers, which in turn include the world and some more. It
+might build today, but any legitimate change to fs.h or one of the
+headers included by it will make it explode.
+
+I just fixed up some other instance which included world and I have zero
+interest to get more of this "works by chance" things.
+
+If you really need anything from fs.h then please isolate it out into a
+separate header file which is included by fs.h and here.
+
+> +#include <vdso/datapage.h>
+> +#include <asm/vdso/getrandom.h>
+> +#include <asm/vdso/vsyscall.h>
+> +#include "getrandom.h"
+> +
+> +static void memcpy_and_zero(void *dst, void *src, size_t len)
+> +{
+> +#define CASCADE(type) \
+> +	while (len >= sizeof(type)) { \
+> +		__put_unaligned_t(type, __get_unaligned_t(type, src), dst); \
+> +		__put_unaligned_t(type, 0, src); \
+> +		dst += sizeof(type); \
+> +		src += sizeof(type); \
+> +		len -= sizeof(type); \
+> +	}
+
+No. Defines inside of functions are a horrible habit. This is not the
+obfuscated C-code contest.
+
+> +#if IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
+> +#if BITS_PER_LONG == 64
+> +	CASCADE(u64);
+> +#endif
+> +	CASCADE(u32);
+> +	CASCADE(u16);
+> +#endif
+> +	CASCADE(u8);
+> +#undef CASCADE
+
+This is equaly unreadable. I had to reread it 4 times to grok it.
+
+#define MEMCPY_AND_ZERO_SRC(type, dst, src, len)				\
+	while (len >= sizeof(type)) {                                           \
+		__put_unaligned_t(type, __get_unaligned_t(type, src), dst);     \
+		__put_unaligned_t(type, 0, src);                                \
+		dst += sizeof(type);                                            \
+		src += sizeof(type);                                            \
+		len -= sizeof(type);                                            \
+	}
+
+static void memcpy_and_zero_src(void *dst, void *src, size_t len)
+{
+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
+        	if (IS_ENABLED(CONFIG_64BIT))
+                	MEMCPY_AND_ZERO_SRC(u64, dst, src, len);
+
+		MEMCPY_AND_ZERO_SRC(u32, dst, src, len);
+		MEMCPY_AND_ZERO_SRC(u16, dst, src, len);
+        }
+	MEMCPY_AND_ZERO_SRC(u8, dst, src, len);
+}
+
+Can you spot the difference in readability and formatting?
+
+> +
+> +static __always_inline ssize_t
+> +__cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_t len,
+> +		       unsigned int flags, void *opaque_state)
+
+Lacks kernel-doc explaining the arguments and the functionality.
+
+> +{
+> +	ssize_t ret = min_t(size_t, MAX_RW_COUNT, len);
+> +	struct vgetrandom_state *state = opaque_state;
+> +	size_t batch_len, nblocks, orig_len = len;
+> +	unsigned long current_generation;
+> +	void *orig_buffer = buffer;
+> +	u32 counter[2] = { 0 };
+> +
+> +	/*
+> +	 * If the kernel isn't yet initialized, then the various flags might have some effect
+> +	 * that we can't emulate in userspace, so use the syscall.  Otherwise, the flags have
+> +	 * no effect, and can continue.
+
+Sorry, this is word salad which raises a -ENOPARSE here.
+
+@rng_info is a user supplied pointer, but there is zero information how
+rng_info->is_ready is set to true because obviously getrandom_syscall()
+does not know about it.
+
+I know you described it in the changelog with an example to some extent,
+but that does not help the casual reader of this code at all.
+
+> +	 */
+> +	if (unlikely(!rng_info->is_ready))
+> +		return getrandom_syscall(orig_buffer, orig_len, flags);
+
+What's the point of using orig_buffer and orig_len at this place? I can
+understand it below, but here it does not make sense.
+
+> +
+> +	if (unlikely(!len))
+> +		return 0;
+
+Why go into the kernel above when len == 0?
+
+> +
+> +retry_generation:
+> +	current_generation = READ_ONCE(rng_info->generation);
+
+READ_ONCE() and WRITE_ONCE() require comments explaining why they are
+used and what the actual counterpart of each operation is.
+
+> +	if (unlikely(state->generation != current_generation)) {
+> +		/* Write the generation before filling the key, in case there's a fork before. */
+> +		WRITE_ONCE(state->generation, current_generation);
+> +		/* If the generation is wrong, the kernel has reseeded, so we should too. */
+> +		if (getrandom_syscall(state->key, sizeof(state->key), 0) != sizeof(state->key))
+> +			return getrandom_syscall(orig_buffer, orig_len, flags);
+> +		/* Set state->pos so that the batch is considered emptied. */
+> +		state->pos = sizeof(state->batch);
+
+Can you please add newlines into this so the various steps are visually
+seperated?
+
+	if (unlikely(state->generation != current_generation)) {
+		/* Write the generation before filling the key, in case there's a fork before. */
+		WRITE_ONCE(state->generation, current_generation);
+
+		/* If the generation is wrong, the kernel has reseeded, so we should too. */
+		if (getrandom_syscall(state->key, sizeof(state->key), 0) != sizeof(state->key))
+			return getrandom_syscall(orig_buffer, orig_len, flags);
+
+		/* Set state->pos so that the batch is considered emptied. */
+		state->pos = sizeof(state->batch);
+	}
+
+Again: Can you spot the difference? Please fix that up all over the place.
+
+Now let me comment on the content of this:
+
+> +	if (unlikely(state->generation != current_generation)) {
+> +		/* Write the generation before filling the key, in case there's a fork before. */
+
+There is no space restriction which requires to write comments in a way
+that they need crystal balls to decode.
+
+                /*
+                 * Update @state->generation before invoking the syscall, 
+                 * which fills the key, to protect against a fork FOR
+                 * WHATEVER EXPLICIT REASON
+                 */
+
+This might be completely obvious to you today, but it's not obvious to
+me or anyone else and I'm sure that you would curse these comments six
+month down the road yourself.
+
+> +		WRITE_ONCE(state->generation, current_generation);
+> +		/* If the generation is wrong, the kernel has reseeded, so we should too. */
+
+Which generation is wrong? Your's or mine? Please spell things
+out. There is enough space to do so.
+
+Also please refrain from 'we should ...'. 'We' has no place here.
+
+I know it is a common habit to impersonate code and code execution, but
+it's a horrible habit. Aside of being non-factual there are people from
+other cultures who really have a hard time to understand this.
+
+Neither is 'should' a proper term here. 'should' is not mandatory.
+
+  "If there is a state generation mismatch, which means the kernel has
+   reseeded the random generator, then it is _required_ to reseed the
+   vdso buffers too."
+
+Sorry, I really fail to understand this sloppy wording coming from
+someone who educates everyone else about the importance of correctness.
+
+If you can't be bothered to express yourself in correct terms
+consistently then why do you expect that anyone else understands
+randomness or cryptography correctly?
+
+I really appreciate your efforts to make all of this more accessible to
+the average user, but please get your act together.
+
+> +		if (getrandom_syscall(state->key, sizeof(state->key), 0) != sizeof(state->key))
+> +			return getrandom_syscall(orig_buffer, orig_len, flags);
+
+This lacks an explanation why this might invoke the syscall twice.
+
+> +		/* Set state->pos so that the batch is considered emptied. */
+
+Considered? There is nothing to consider here, right?
+
+                /*
+                 * Advance state->pos beyond the end of the batch buffer to
+                 * signal that the batch needs to be refilled.
+                 */
+
+Hmm?
+
+> +		state->pos = sizeof(state->batch);
+
+> +	}
+> +
+> +	len = ret;
+> +more_batch:
+> +	/* First use whatever is left from the last call. */
+
+Last call of what?
+
+> +	batch_len = min_t(size_t, sizeof(state->batch) - state->pos, len);
+
+Where is the sanity check for state->pos <= sizeof(state->batch)?
+
+> +	if (batch_len) {
+> +		/* Zero out bytes as they're copied out, to preserve forward secrecy. */
+
+Please name the function so it is self explaining and add an
+comprehensive comment to it so you can spare the comment here.
+
+> +		memcpy_and_zero(buffer, state->batch + state->pos, batch_len);
+> +		state->pos += batch_len;
+> +		buffer += batch_len;
+> +		len -= batch_len;
+
+buffer and state->pos could be updated by that non-fail copy function to
+aid the compiler, but I might be wrong about the ability of compilers to
+optimize code like that.
+
+> +	}
+> +	if (!len) {
+> +		/*
+> +		 * Since rng_info->generation will never be 0, we re-read state->generation,
+
+s/we// ....
+
+> +		 * rather than using the local current_generation variable, to learn whether
+> +		 * we forked. Primarily, though, this indicates whether the rng itself has
+> +		 * reseeded, in which case we should generate a new key and start over.
+> +		 */
+> +		if (unlikely(READ_ONCE(state->generation) != READ_ONCE(rng_info->generation))) {
+> +			buffer = orig_buffer;
+> +			goto retry_generation;
+> +		}
+> +		return ret;
+> +	}
+> +
+> +	/* Generate blocks of rng output directly into the buffer while there's enough left. */
+> +	nblocks = len / CHACHA_BLOCK_SIZE;
+> +	if (nblocks) {
+> +		__arch_chacha20_blocks_nostack(buffer, state->key, counter, nblocks);
+> +		buffer += nblocks * CHACHA_BLOCK_SIZE;
+> +		len -= nblocks * CHACHA_BLOCK_SIZE;
+> +	}
+> +
+> +	/* Refill the batch and then overwrite the key, in order to preserve forward secrecy. */
+> +	BUILD_BUG_ON(sizeof(state->batch_key) % CHACHA_BLOCK_SIZE != 0);
+
+Does this build bug really need to be glued in between the comment
+explaining the function call and the function call itself?
+
+> +	__arch_chacha20_blocks_nostack(state->batch_key, state->key, counter,
+> +				       sizeof(state->batch_key) / CHACHA_BLOCK_SIZE);
+> +	state->pos = 0;
+
+This reset of state->pos also lacks a comment for the casual reader...
+
+Thanks,
+
+        tglx
