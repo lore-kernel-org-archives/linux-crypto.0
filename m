@@ -2,31 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 247CAC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 11:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AC6C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 12:18:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbiKYLcE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 06:32:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59354 "EHLO
+        id S229671AbiKYMSK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 07:18:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiKYLcD (ORCPT
+        with ESMTP id S229553AbiKYMSK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 06:32:03 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147761902F;
-        Fri, 25 Nov 2022 03:32:03 -0800 (PST)
+        Fri, 25 Nov 2022 07:18:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9660217419;
+        Fri, 25 Nov 2022 04:18:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AED4F623A5;
-        Fri, 25 Nov 2022 11:32:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7B1DC433D6;
-        Fri, 25 Nov 2022 11:31:59 +0000 (UTC)
-Date:   Fri, 25 Nov 2022 11:31:56 +0000
-From:   Catalin Marinas <catalin.marinas@arm.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3262A623BC;
+        Fri, 25 Nov 2022 12:18:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB08C43470;
+        Fri, 25 Nov 2022 12:18:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669378688;
+        bh=2QQ3gkT8M4ne/f/6SMJfPCcoYNo2dNjFDj4PF9DSWIc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=HurY4q/yF+peulV7cvOO7tegNpqJMAftwxJ/HfA90kCJRh5gKLHbacaMXDqq4TBBF
+         UnZJqEzFBWuFNipA/KgLMK7QPG1SIOaKjAU1NW5bQ/rB87Hwbz0LDOXjl81jbkaOR7
+         xq4peTK2aiu/PiYMyds1P5XvlAZNzJhc4K7/xPDpdmU2e82pfQCBhYel2eSN0JfJLC
+         3Ue3BuPUJWq11QwyzHluDrzKqvVgYUFHJn3jgZLozJOQKSxWtkW37sh3rZj1zbYdrt
+         sjSkueGKaQ5qeJYk1l7CC+09XMVJM2576vH2pHzGbL+NI+ySnJSEtHauEdXTG+HVr1
+         6PMqs4Dr3V1Og==
+Received: by mail-lj1-f175.google.com with SMTP id a15so4975647ljb.7;
+        Fri, 25 Nov 2022 04:18:08 -0800 (PST)
+X-Gm-Message-State: ANoB5pmy8xs7+GWuk5H/kPP14SMilP3GYuE7XwzbbZcLoV3/SrkM5Xor
+        5toyO4KeoObPC3j3VsC80aFtqJy5jGhrP0HLuAM=
+X-Google-Smtp-Source: AA0mqf6CxETx94Nasnco4cIEVleHJVePOuucHyZEljEzF94SI+7etB5m2ezhOcBypmHyucIqtfdrsFWGOcllieCaWAo=
+X-Received: by 2002:a2e:95d2:0:b0:277:96a:5c32 with SMTP id
+ y18-20020a2e95d2000000b00277096a5c32mr11115105ljh.415.1669378686498; Fri, 25
+ Nov 2022 04:18:06 -0800 (PST)
+MIME-Version: 1.0
+References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
+In-Reply-To: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 25 Nov 2022 13:17:55 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFAN2xDt+tKzOJt8zbhXA64U4qi28rzmrSSRoQDbsRHmA@mail.gmail.com>
+Message-ID: <CAMj1kXFAN2xDt+tKzOJt8zbhXA64U4qi28rzmrSSRoQDbsRHmA@mail.gmail.com>
+Subject: Re: [v2 PATCH 0/9] crypto: Add helpers for allocating with DMA alignment
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -35,113 +60,40 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v2 PATCH 2/9] crypto: api - Add crypto_tfm_ctx_dma
-Message-ID: <Y4CnrGmT5o7zcLJr@arm.com>
-References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
- <E1oyQRz-000djH-3a@formenos.hmeau.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1oyQRz-000djH-3a@formenos.hmeau.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, 25 Nov 2022 at 05:35, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> This patch series adds helpers to allow drivers to explicitly
+> request ARCH_DMA_MINALIGN when allocating memory through the
+> Crypto API.
+>
+> Note that I've only converted one file in one driver as this
+> is only meant to show how it's done and find out what else we
+> may need.
+>
+> Other drivers will be added later.
+>
+
 Hi Herbert,
 
-Thanks for putting this together. I'll try to go through the series but
-my crypto knowledge is fairly limited.
+This approach seems conceptually similar to what I proposed a while ago:
+https://lore.kernel.org/all/20220406142715.2270256-1-ardb@kernel.org/
 
-On Fri, Nov 25, 2022 at 12:36:31PM +0800, Herbert Xu wrote:
-> diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-> index f50c5d1725da..4c99eb66e654 100644
-> --- a/include/crypto/algapi.h
-> +++ b/include/crypto/algapi.h
-> @@ -7,6 +7,7 @@
->  #ifndef _CRYPTO_ALGAPI_H
->  #define _CRYPTO_ALGAPI_H
->  
-> +#include <asm/cache.h>
->  #include <linux/align.h>
->  #include <linux/crypto.h>
->  #include <linux/kconfig.h>
-> @@ -25,6 +26,14 @@
->  #define MAX_CIPHER_BLOCKSIZE		16
->  #define MAX_CIPHER_ALIGNMASK		15
->  
-> +#ifdef ARCH_DMA_MINALIGN
-> +#define CRYPTO_DMA_ALIGN ARCH_DMA_MINALIGN
-> +#else
-> +#define CRYPTO_DMA_ALIGN CRYPTO_MINALIGN
-> +#endif
-> +
-> +#define CRYPTO_DMA_PADDING ((CRYPTO_DMA_ALIGN - 1) & ~(CRYPTO_MINALIGN - 1))
+If we agree that creating a distinction between ordinary allocations
+and ones that are rounded up to DMA alignment is ok, I wonder if we
+could minimize the churn by simply choosing between one or the other
+by taking the CRYPTO_ALG_ASYNC flag into account. On x86 and other
+arches that don't care about the distinction, none of this has any
+effect anyway. And on arm64, only hardware implementations use the
+CRYPTO_ALG_ASYNC flag, which makes its presence a reasonable heuristic
+to decide whether an algo implementation is backed by hardware that
+relies on DMA (the penalty for getting it wrong would be to use DMA
+ailgnment unnecessarily, which we already do today anyway)
 
-Is the CRYPTO_DMA_PADDING used anywhere? I couldn't find it in this
-series and I'd rather drop it, together with CRYPTO_DMA_ALIGN (see
-below).
-
-> +
->  struct crypto_aead;
->  struct crypto_instance;
->  struct module;
-> @@ -189,10 +198,38 @@ static inline void crypto_xor_cpy(u8 *dst, const u8 *src1, const u8 *src2,
->  	}
->  }
->  
-> +static inline void *crypto_tfm_ctx(struct crypto_tfm *tfm)
-> +{
-> +	return tfm->__crt_ctx;
-> +}
-> +
-> +static inline void *crypto_tfm_ctx_align(struct crypto_tfm *tfm,
-> +					 unsigned int align)
-> +{
-> +	if (align <= crypto_tfm_ctx_alignment())
-> +		align = 1;
-> +
-> +	return PTR_ALIGN(crypto_tfm_ctx(tfm), align);
-> +}
-> +
->  static inline void *crypto_tfm_ctx_aligned(struct crypto_tfm *tfm)
->  {
-> -	return PTR_ALIGN(crypto_tfm_ctx(tfm),
-> -			 crypto_tfm_alg_alignmask(tfm) + 1);
-> +	return crypto_tfm_ctx_align(tfm, crypto_tfm_alg_alignmask(tfm) + 1);
->+}
-
-I had an attempt to make crypto_tfm_alg_alignmask() the larger of the
-cra_alignmask and ARCH_DMA_MINALIGN but for some reason the kernel
-started to panic, so I gave up.
-
-> +
-> +static inline unsigned int crypto_dma_align(void)
-> +{
-> +	return CRYPTO_DMA_ALIGN;
-> +}
-
-We have a generic dma_get_cache_alignment() function which currently is
-either 1 or ARCH_DMA_MINALIGN, if the latter is defined. My plan is to
-make eventually make this dynamic based on the actual cache line size
-(on most arm64 systems it would be 64 rather than 128). So could you use
-this instead of defining a CRYPTO_DMA_ALIGN? The only difference would
-be that dma_get_cache_alignment() returns 1 rather than
-ARCH_KMALLOC_MINALIGN if ARCH_DMA_MINALIGN is not defined, but I don't
-think that's an issue.
-
-> +
-> +static inline unsigned int crypto_dma_padding(void)
-> +{
-> +	return (crypto_dma_align() - 1) & ~(crypto_tfm_ctx_alignment() - 1);
-> +}
-> +
-> +static inline void *crypto_tfm_ctx_dma(struct crypto_tfm *tfm)
-> +{
-> +	return crypto_tfm_ctx_align(tfm, crypto_dma_align());
->  }
-
-These would need to cope with crypto_dma_align() < ARCH_KMALLOC_MINALIGN.
-I think that's fine, the padding will be 0 if crypto_dma_align() is 1.
-
--- 
-Catalin
+We'd still need changes in the generic crypto layer to distinguish the
+two cases, but we wouldn't need any changes to the drivers, which
+seems like a huge benefit to me
