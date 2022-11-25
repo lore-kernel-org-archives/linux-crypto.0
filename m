@@ -2,62 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D44C4167D
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 09:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79449C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 09:49:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbiKYJtm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 04:49:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59734 "EHLO
+        id S230139AbiKYJts (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 04:49:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229915AbiKYJsQ (ORCPT
+        with ESMTP id S229916AbiKYJsQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 25 Nov 2022 04:48:16 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5D03F042;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD093F04A;
         Fri, 25 Nov 2022 01:46:36 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oyVHe-000hyz-0F; Fri, 25 Nov 2022 17:46:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 17:46:10 +0800
-Date:   Fri, 25 Nov 2022 17:46:09 +0800
+        id 1oyVI1-000hzl-IU; Fri, 25 Nov 2022 17:46:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Nov 2022 17:46:33 +0800
+Date:   Fri, 25 Nov 2022 17:46:33 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
-Cc:     Angel Iglesias <ang.iglesiasg@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Grant Likely <grant.likely@linaro.org>,
-        Wolfram Sang <wsa@kernel.org>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-i2c@vger.kernel.org, kernel@pengutronix.de,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 006/606] crypto: atmel-ecc - Convert to i2c's .probe_new()
-Message-ID: <Y4CO4c1vA6UZGnpU@gondor.apana.org.au>
-References: <20221118224540.619276-1-uwe@kleine-koenig.org>
- <20221118224540.619276-7-uwe@kleine-koenig.org>
+To:     Weili Qian <qianweili@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        wangzhou1@hisilicon.com, liulongfang@huawei.com
+Subject: Re: [PATCH] crypto: hisilicon/qm - fix 'QM_XEQ_DEPTH_CAP' mask value
+Message-ID: <Y4CO+U9ETwfpkeic@gondor.apana.org.au>
+References: <20221119094843.10707-1-qianweili@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221118224540.619276-7-uwe@kleine-koenig.org>
+In-Reply-To: <20221119094843.10707-1-qianweili@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 18, 2022 at 11:35:40PM +0100, Uwe Kleine-König wrote:
-> From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+On Sat, Nov 19, 2022 at 05:48:43PM +0800, Weili Qian wrote:
+> 'QM_XEQ_DEPTH_CAP' mask value is GENMASK(31, 0) instead of GENMASK(15, 0).
+> If the mask value is incorrect, will cause abnormal events cannot be
+> handled. So fix it.
 > 
-> .probe_new() doesn't get the i2c_device_id * parameter, so determine
-> that explicitly in the probe function.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> Fixes: 129a9f340172 ("crypto: hisilicon/qm - get qp num and depth from hardware registers")
+> Signed-off-by: Weili Qian <qianweili@huawei.com>
 > ---
->  drivers/crypto/atmel-ecc.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  drivers/crypto/hisilicon/qm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
