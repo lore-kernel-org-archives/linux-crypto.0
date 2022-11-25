@@ -2,86 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C46EEC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 12:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440EDC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 12:25:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiKYMSX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 07:18:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42560 "EHLO
+        id S230134AbiKYMZE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Nov 2022 07:25:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiKYMSV (ORCPT
+        with ESMTP id S229743AbiKYMYt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 07:18:21 -0500
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44883192A8;
-        Fri, 25 Nov 2022 04:18:20 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VVfPnZI_1669378695;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VVfPnZI_1669378695)
-          by smtp.aliyun-inc.com;
-          Fri, 25 Nov 2022 20:18:16 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Fri, 25 Nov 2022 07:24:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDF74C273;
+        Fri, 25 Nov 2022 04:24:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2911C62371;
+        Fri, 25 Nov 2022 12:24:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C99C433C1;
+        Fri, 25 Nov 2022 12:24:34 +0000 (UTC)
+Date:   Fri, 25 Nov 2022 12:24:31 +0000
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] crypto: ccree,hisilicon - Fix dependencies to correct algorithm
-Date:   Fri, 25 Nov 2022 20:18:11 +0800
-Message-Id: <20221125121811.88031-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH 3/9] crypto: aead - Add ctx helpers with DMA alignment
+Message-ID: <Y4Cz/xJKYbdOyjiB@arm.com>
+References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
+ <E1oyQS1-000djS-65@formenos.hmeau.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1oyQS1-000djS-65@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit d2825fa9365d ("crypto: sm3,sm4 - move into crypto directory") moves
-the SM3 and SM4 stand-alone library and the algorithm implementation for
-the Crypto API into the same directory, and the corresponding relationship
-of Kconfig is modified, CONFIG_CRYPTO_SM3/4 corresponds to the stand-alone
-library of SM3/4, and CONFIG_CRYPTO_SM3/4_GENERIC corresponds to the
-algorithm implementation for the Crypto API. Therefore, it is necessary
-for this module to depend on the correct algorithm.
+On Fri, Nov 25, 2022 at 12:36:33PM +0800, Herbert Xu wrote:
+> diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
+> index d482017f3e20..cd8cb1e921b7 100644
+> --- a/include/crypto/internal/aead.h
+> +++ b/include/crypto/internal/aead.h
+> @@ -39,6 +39,11 @@ static inline void *crypto_aead_ctx(struct crypto_aead *tfm)
+>  	return crypto_tfm_ctx(&tfm->base);
+>  }
+>  
+> +static inline void *crypto_aead_ctx_dma(struct crypto_aead *tfm)
+> +{
+> +	return crypto_tfm_ctx_dma(&tfm->base);
+> +}
 
-Fixes: d2825fa9365d ("crypto: sm3,sm4 - move into crypto directory")
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: stable@vger.kernel.org # v5.19+
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- drivers/crypto/Kconfig           | 4 ++--
- drivers/crypto/hisilicon/Kconfig | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+I wonder, if drivers end up calling this, isn't it easier to do the
+alignment in crypto_aead_ctx() directly? There are over 300 callers (not
+sure about the padding though, it may need still driver changes unless
+we can add it to something like crypto_tfm_alg_alignmask()). Or is the
+expectation that not all drivers need a DMA alignment?
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 2947888d3b82..dfb103f81a64 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -800,8 +800,8 @@ config CRYPTO_DEV_CCREE
- 	select CRYPTO_ECB
- 	select CRYPTO_CTR
- 	select CRYPTO_XTS
--	select CRYPTO_SM4
--	select CRYPTO_SM3
-+	select CRYPTO_SM4_GENERIC
-+	select CRYPTO_SM3_GENERIC
- 	help
- 	  Say 'Y' to enable a driver for the REE interface of the Arm
- 	  TrustZone CryptoCell family of processors. Currently the
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 27e1fa912063..743ce4fc3158 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -26,7 +26,7 @@ config CRYPTO_DEV_HISI_SEC2
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
--	select CRYPTO_SM4
-+	select CRYPTO_SM4_GENERIC
- 	depends on PCI && PCI_MSI
- 	depends on UACCE || UACCE=n
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
 -- 
-2.24.3 (Apple Git-128)
-
+Catalin
