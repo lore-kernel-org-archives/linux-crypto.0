@@ -2,183 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AA8C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Nov 2022 23:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22337C4708A
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Nov 2022 15:44:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiKYXIp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Nov 2022 18:08:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
+        id S229673AbiKZPoI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 26 Nov 2022 10:44:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbiKYXIp (ORCPT
+        with ESMTP id S229521AbiKZPoI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Nov 2022 18:08:45 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0FE27B0E;
-        Fri, 25 Nov 2022 15:08:44 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669417722;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6hxW2N4kxmUbACxVJ2sLC2tD7nS+hLHLjTZx7sixZYM=;
-        b=twx8rF2lsPE6PBtsHMA++brIpc3uCQi+qb0wdSHkIvs7AfFXtCPsY1x4O0PwGnK7QYl3xk
-        YEKB4yBS4owCWRqCu6HHA3uQipm3zAOwBuxDGtLOUy62I+YAfSJ2s0QGVER1uhnz53QaRx
-        cIYqn6gVZRRxAL0cE210J66VCvKCc07xUfjesKnwcgTAW40UYdKANSpfX2Sa765hgXAqzg
-        bLE/eEPyETCs7B2E+0alr7dtdZAKXsHNUDTFUdUlhAiyBU7aCnldKqARjlCUHugS7Ex/Dv
-        sYnIfVSCOkXl4dKQoFyQWUPyBgvugFnN/FLcP6RIvDNeJBNIKkXCX1a5Y5aIjA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669417722;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6hxW2N4kxmUbACxVJ2sLC2tD7nS+hLHLjTZx7sixZYM=;
-        b=/L7yn3LQCqK3rKZ4qZRQwSYbwQP7NCTdySqDRR88jr6gFkN+qbUuQYHxLVPWAw4Wh6/QJC
-        2lFUsr+kgdfqOZBQ==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v7 3/3] x86: vdso: Wire up getrandom() vDSO implementation
-In-Reply-To: <20221124165536.1631325-4-Jason@zx2c4.com>
-References: <20221124165536.1631325-1-Jason@zx2c4.com>
- <20221124165536.1631325-4-Jason@zx2c4.com>
-Date:   Sat, 26 Nov 2022 00:08:41 +0100
-Message-ID: <874jumy6me.ffs@tglx>
+        Sat, 26 Nov 2022 10:44:08 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E0EF7A;
+        Sat, 26 Nov 2022 07:44:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669477447; x=1701013447;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=TYZva1qhZaDDzx7ssD6565IlpCg24ayIFbcaC7tY8Tc=;
+  b=afaV5wieNPUjxu0caJC6JdakAXQOqaG+mJP11E9sBOfdvxW/FCdDmoSq
+   uszGkpjb5nf3De548PRwyr8tA0gjYkdzZijT5eCkTI9MaUL7wuDEK5FNd
+   DHxxEedinEuG50v1wryTy8tuS2GfxLpPE0gycyCpJAkwIvhrwC+gn8YZP
+   vqGEDAZKZz5uKM+4zWczaOB+RJUrHWVl1v9DiPG/G1MsaoSG/5NPhScuG
+   JcNKVf2MOUenZM/iTJdfierEPIRgcSWgA7CVeokYeMdRvPe3t3BpDN/xD
+   57LDEQ+dPBOukc9S9pF7aZDWoHCdzdL+VmK/32YN6VaBwDrOJGpoZ9vaZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10543"; a="376747252"
+X-IronPort-AV: E=Sophos;i="5.96,196,1665471600"; 
+   d="scan'208";a="376747252"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2022 07:44:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10543"; a="620587303"
+X-IronPort-AV: E=Sophos;i="5.96,196,1665471600"; 
+   d="scan'208";a="620587303"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga006.jf.intel.com with ESMTP; 26 Nov 2022 07:43:54 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@intel.com>)
+        id 1oyxLL-000Bco-1n;
+        Sat, 26 Nov 2022 17:43:51 +0200
+Date:   Sat, 26 Nov 2022 17:43:51 +0200
+From:   Andy Shevchenko <andriy.shevchenko@intel.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Jonathan Cameron <jic23@kernel.org>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
+        alsa-devel@alsa-project.org, linux-staging@lists.linux.dev,
+        linux-pwm@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
+        Lee Jones <lee.jones@linaro.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-pm@vger.kernel.org,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Grant Likely <grant.likely@linaro.org>,
+        linux-media@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-actions@lists.infradead.org, linux-gpio@vger.kernel.org,
+        Angel Iglesias <ang.iglesiasg@gmail.com>,
+        gregkh@linuxfoundation.org, linux-rpi-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Purism Kernel Team <kernel@puri.sm>,
+        patches@opensource.cirrus.com, linux-usb@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+        Wolfram Sang <wsa@kernel.org>, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de, netdev@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
+Message-ID: <Y4I0N3KpU/LSJYpd@smile.fi.intel.com>
+References: <20221118224540.619276-1-uwe@kleine-koenig.org>
+ <20221122185818.3740200d@jic23-huawei>
+ <20221122201654.5rdaisqho33buibj@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221122201654.5rdaisqho33buibj@pengutronix.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason!
+On Tue, Nov 22, 2022 at 09:16:54PM +0100, Uwe Kleine-König wrote:
+> On Tue, Nov 22, 2022 at 06:58:18PM +0000, Jonathan Cameron wrote:
 
-On Thu, Nov 24 2022 at 17:55, Jason A. Donenfeld wrote:
-> +++ b/arch/x86/entry/vdso/vgetrandom-chacha.S
-> +/*
-> + * Very basic SSE2 implementation of ChaCha20. Produces a given positive number
-> + * of blocks of output with a nonce of 0, taking an input key and 8-byte
-> + * counter. Importantly does not spill to the stack. Its arguments are:
+> > Queued all of the below:
+> > with one tweaked as per your suggestion and the highlighted one dropped on basis
+> > I was already carrying the equivalent - as you pointed out.
+> > 
+> > I was already carrying the required dependency.
+> > 
+> > Includes the IIO ones in staging.
+> > 
 
-Basic or not. This needs a Reviewed-by from someone who understands SSE2
-and ChaCha20 before this can go anywhere near the x86 tree.
+> > p.s. I perhaps foolishly did this in a highly manual way so as to
+> > also pick up Andy's RB.  So might have dropped one...
+> 
+> You could have done:
+> 
+> 	H=$(git rev-parse @)
+> 	b4 am -P 49-190 20221118224540.619276-1-uwe@kleine-koenig.org
+> 	git am ...
+> 	git filter-branch -f --msg-filter "grep -v 'Signed-off-by: Jonathan'; echo 'Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>'; echo 'Signed-off-by: Jonathan Cameron <jic23@kernel.org>'" $H..
+> 
+> (untested, but you get the idea).
 
-> +++ b/arch/x86/entry/vdso/vgetrandom.c
-> @@ -0,0 +1,18 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + */
-> +#include <linux/kernel.h>
+That's, for example (just last from the history as is), how I usually do it
+(tested):
 
-Why do you need kernel.h here?
+ git filter-branch --msg-filter 'sed -e "/Signed-off-by: Andy Shevchenko/ a Tested-by: Daniel Scally <dan.scally@ideasonboard.com>"' -f HEAD~4..HEAD
 
-> +#include <linux/types.h>
-> +
-> +#include "../../../../lib/vdso/getrandom.c"
-> +
-> +ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state);
-> +
-> +ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *state)
-> +{
-> +	return __cvdso_getrandom(buffer, len, flags, state);
-> +}
-> +
-> +ssize_t getrandom(void *, size_t, unsigned int, void *)
-> +	__attribute__((weak, alias("__vdso_getrandom")));
-> diff --git a/arch/x86/include/asm/vdso/getrandom.h b/arch/x86/include/asm/vdso/getrandom.h
-> new file mode 100644
-> index 000000000000..099aca58ef20
-> --- /dev/null
-> +++ b/arch/x86/include/asm/vdso/getrandom.h
-> @@ -0,0 +1,49 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + */
-> +#ifndef __ASM_VDSO_GETRANDOM_H
-> +#define __ASM_VDSO_GETRANDOM_H
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#include <asm/unistd.h>
-> +#include <asm/vvar.h>
-> +
-> +static __always_inline ssize_t
-> +getrandom_syscall(void *buffer, size_t len, unsigned int flags)
 
-static __always_inline ssize_t getrandom_syscall(void *buffer, size_t len, unsigned int flags)
+-- 
+With Best Regards,
+Andy Shevchenko
 
-please. We expanded to 100 quite some time ago.
 
-Some kernel-doc compliant comment for this would be appreciated as well.
-
-> +{
-> +	long ret;
-> +
-> +	asm ("syscall" : "=a" (ret) :
-> +	     "0" (__NR_getrandom), "D" (buffer), "S" (len), "d" (flags) :
-> +	     "rcx", "r11", "memory");
-> +
-> +	return ret;
-> +}
-> +
-> +#define __vdso_rng_data (VVAR(_vdso_rng_data))
-> +
-> +static __always_inline const struct vdso_rng_data *__arch_get_vdso_rng_data(void)
-> +{
-> +	if (__vdso_data->clock_mode == VDSO_CLOCKMODE_TIMENS)
-> +		return (void *)&__vdso_rng_data +
-> +		       ((void *)&__timens_vdso_data - (void *)&__vdso_data);
-> +	return &__vdso_rng_data;
-
-So either bite the bullet and  write it:
-
-	if (__vdso_data->clock_mode == VDSO_CLOCKMODE_TIMENS)
-		return (void *)&__vdso_rng_data + ((void *)&__timens_vdso_data - (void *)&__vdso_data);
-
-        return &__vdso_rng_data;
-
-or comply to the well documented rules of the tip tree:
-
-   https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#bracket-rules
-
-> +/*
-> + * Generates a given positive number of block of ChaCha20 output with nonce=0,
-> + * and does not write to any stack or memory outside of the parameters passed
-> + * to it. This way, we don't need to worry about stack data leaking into forked
-> + * child processes.
-
-Please use proper kernel-doc
-
-> + */
-> +static __always_inline void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks)
-> +{
-> +	extern void chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
-> +	return chacha20_blocks_nostack(dst_bytes, key, counter, nblocks);
-
-You surely have an issue with your newline key...
-
-The above aside, can you please explain the value of this __arch_()
-wrapper?
-
-It's just voodoo for no value because it hands through the arguments
-1:1. So where are you expecting that that __arch...() version of this is
-any different than invoking the architecture specific version of
-chacha20_blocks_nostack().
-
-Can you spot the irony of your naming choices?
-
-    __arch_chacha20_blocks_nostack() {
-      	return chacha20_blocks_nostack()
-    };
-
-Thanks,
-
-        tglx
