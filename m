@@ -2,89 +2,213 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B23C46467
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 21:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24065C46467
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 21:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiK0Vgc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 16:36:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37766 "EHLO
+        id S229644AbiK0VxE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Nov 2022 16:53:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiK0Vgc (ORCPT
+        with ESMTP id S229653AbiK0VxD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 16:36:32 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E048BF4B;
-        Sun, 27 Nov 2022 13:36:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1669584990;
-        bh=a9NhAStjD7FLJTivyWouVNmZblRBEYvdKaS6vE5iZdc=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=m1PkZ8tXfACO7QzCEdxlVcZZyQBU2RF/DZDfL/7QR4BhJ/m8UJId2WJSW6tRFaD6X
-         OLUbH58hIgn5D41kMbWhAcNfhDRLVWzuEbR6UP8C1GCP3Dn0xZfjxuTNTKL5D2r296
-         nJtwT4KXztFZLyU/Jgoe0ndn+a9pbFDqBjBdQQq4=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 5486D128056E;
-        Sun, 27 Nov 2022 16:36:30 -0500 (EST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id UOYNxvcUsjU4; Sun, 27 Nov 2022 16:36:30 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1669584989;
-        bh=a9NhAStjD7FLJTivyWouVNmZblRBEYvdKaS6vE5iZdc=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=QXO+AdNUbqf79fXTbSko41JBJobKp2dbpA8q01c5iOMgh2GDnJK2iYTSYwGXHupld
-         jv7DY+aVvqC/0AGb+MVk+yUtbPa7mIstmaBGDMtksI8MWdiRtJRrPOXKvRliWRpUFN
-         oa1P7iKl/3vNbMt7f1ZVT7HbUPxM1c4vVZnf5QE8=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::c14])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 601091280520;
-        Sun, 27 Nov 2022 16:36:29 -0500 (EST)
-Message-ID: <cf70394e2d49393da370e7c7b2bf662c671b3f5e.camel@HansenPartnership.com>
-Subject: Re: [PATCH RFC v1 5/6] efi: efivarfs: prohibit reading random seed
- variables
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-efi@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>
-Date:   Sun, 27 Nov 2022 16:36:27 -0500
-In-Reply-To: <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
-References: <20221116161642.1670235-1-Jason@zx2c4.com>
-         <20221116161642.1670235-6-Jason@zx2c4.com>
-         <CAMj1kXHZ60DCz6zgOqfQ-jBEuhc3XwvhieNbJUCY40hdEWt9CQ@mail.gmail.com>
-         <7837b12a39b1d6721387ca95554c79003bd16c4e.camel@HansenPartnership.com>
-         <CAHmME9obGun7zEMKQ1Td4u+rnzi3MexaUAj30W5UMYvJ62mw3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+        Sun, 27 Nov 2022 16:53:03 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB8563D3;
+        Sun, 27 Nov 2022 13:53:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5B111B80B77;
+        Sun, 27 Nov 2022 21:53:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AB1C433C1;
+        Sun, 27 Nov 2022 21:52:57 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Mua/GiX8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669585975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GipSCw0c5SilGhSAEbKV6kdq9Cs5CMW1q5zEQv1Mc1g=;
+        b=Mua/GiX8b50SJzJq0j1kT6vnmM1fGOVsYSflL8gcy7amvnp2ESprc0dCZ2gBeNvORuXlPq
+        tBnk4N5+ZMTgQp901w6orMWd7CfE4lcd/BM6Bui99JbvrKVpvZFgRvPMw8Iw64T/jkUO7I
+        WzDOO47FLb5LiilnnRTkIQUQXlXJ2jw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6b150d2b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sun, 27 Nov 2022 21:52:54 +0000 (UTC)
+Date:   Sun, 27 Nov 2022 22:52:46 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v7 2/3] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <Y4PcLi8c010MEfTA@zx2c4.com>
+References: <20221124165536.1631325-1-Jason@zx2c4.com>
+ <20221124165536.1631325-3-Jason@zx2c4.com>
+ <877cziy7zg.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <877cziy7zg.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2022-11-16 at 21:08 +0100, Jason A. Donenfeld wrote:
-> On Wed, Nov 16, 2022 at 8:42 PM James Bottomley
-> <James.Bottomley@hansenpartnership.com> wrote:
-> > It would be nice if they could be boot services only ... then they
-> > disappear naturally, but that would mean the rng would have to
-> > initialize and save in the EFI stub before ExitBootServices, which
-> > doesn't seem practical.
+> Jason!
+Thomas!
+
+On Fri, Nov 25, 2022 at 11:39:15PM +0100, Thomas Gleixner wrote:
+> > +struct vdso_rng_data {
+> > +	unsigned long generation;
+> > +	bool is_ready;
+> > +};
 > 
-> That would be nice, but the whole idea is it gets updated by Linux's
-> RNG, so that won't work. `boot|runtime` it is, then.
+> Please follow the coding style in this header:
+> 
+>        - make the struct definition tabular aligned
+>        - provide kernel doc which explains the struct members
 
-But then you can't use the only security mechanism we have in EFI
-(keeping sensitive information in BS only variables which can only be
-accessed by EFI signed entities).  If you can't take advantage of that
-then there's no security point in placing the seed in EFI and you might
-as well simply write it to a file.
+Will do.
 
-Artificially trying to hide the variables from efivarfs has no real
-security value either, as I think you can appreciate if you try the
-thought experiment of trying to get a VFS modification to hide the
-random seed file past Al ... I'll get the thought experiment popcorn.
+> > +
+> > +#include <linux/kernel.h>
+> > +#include <linux/atomic.h>
+> > +#include <linux/fs.h>
+> 
+> No. This is VDSO and builds a userspace library. You cannot include
+> random kernel headers, which in turn include the world and some more. It
+> might build today, but any legitimate change to fs.h or one of the
+> headers included by it will make it explode.
+> 
+> I just fixed up some other instance which included world and I have zero
+> interest to get more of this "works by chance" things.
+> 
+> If you really need anything from fs.h then please isolate it out into a
+> separate header file which is included by fs.h and here.
 
-James
+Hm. I need MAX_RW_COUNT from linux/fs.h. I could just hardcode `(INT_MAX
+& PAGE_MASK)`, though, if you'd prefer, and leave a comment. I'll do
+that. Or I could move MAX_RW_COUNT into linux/kernel.h? But maybe that's
+undesirable.
 
+So:
+
+    ssize_t ret = min_t(size_t, INT_MAX & PAGE_MASK /* = MAX_RW_COUNT */, len);
+
+I'll do that, if it's okay with you. Or tell me if you want me to
+instead move MAX_RW_COUNT into linux/kernel.h.
+
+Also, if I remove linux/fs.h, I need to include linux/time.h in its
+place, because vdso/datapage.h implicitly depends on it. Alternatively,
+I could add linux/time.h to vdso/datapage.h, but I don't want to touch
+too many files uninvited.
+
+
+> 	MEMCPY_AND_ZERO_SRC(u8, dst, src, len);
+> }
+> 
+> Can you spot the difference in readability and formatting?
+
+Nice suggestion, will do.
+
+> > +
+> > +static __always_inline ssize_t
+> > +__cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_t len,
+> > +		       unsigned int flags, void *opaque_state)
+> 
+> Lacks kernel-doc explaining the arguments and the functionality.
+
+I'll add one.
+
+> > +
+> > +	if (unlikely(!len))
+> > +		return 0;
+> 
+> Why go into the kernel above when len == 0?
+
+If the kernel's RNG isn't ready, then the behavior here can't easily be
+emulated by userspace alone. For the len == 0 case, if flags == 0, then
+the syscall will block until it's ready, for example, and that blocking
+behavior is something we want to retain.
+
+However, I recognize that the fact you had to ask this question is
+simply indicative of the fact that this function is under-documented or
+otherwise incomprehensible, per your other comments, so I'll try to make
+this more clear for v8.
+
+> Sorry, this is word salad which raises a -ENOPARSE here.
+> Sorry, I really fail to understand this sloppy wording coming from
+> someone who educates everyone else about the importance of correctness.
+> If you can't be bothered to express yourself in correct terms
+> consistently then why do you expect that anyone else understands
+> randomness or cryptography correctly?
+> I really appreciate your efforts to make all of this more accessible to
+> the average user, but please get your act together.
+
+Your individual specific points as well as the overarching one are well
+taken, and I'll overhaul all of the documentation for v8, in hopes of
+making this function a lot more clear.
+
+> > +	batch_len = min_t(size_t, sizeof(state->batch) - state->pos, len);
+> 
+> Where is the sanity check for state->pos <= sizeof(state->batch)?
+
+That condition cannot happen. "Does the compiler or some other checker
+prove that as part of the development cycle?" No, unfortunately. So what
+would you like to do here? Per Linus' email on an unrelated topic [1],
+"We don't test for things that can't happen." And there's no
+WARN_ON/BUG_ON primitive that'd be wise to use here -- nobody wants to
+emit a ud2 into vDSO code I assume. So what would you like? For me to
+add that check and bail out of the function if it's wrong, even if that
+should normally never happen? Or adhere to the [1] more strictly and do
+nothing, as is the case now? I'll do what you want here.
+
+And please don't tell me, "if you even have to ask what to do, you
+shouldn't be anywhere near... bla bla bla", because I *am* cognisant of
+defense coding, yet at the same time I'm trying to respect kernel norms,
+and balancing the two tends to be more subjective than, say, the results
+of a verifier. So, anyway, let me know what behavior you want here --
+the sanity check-->fallback path, or doing nothing, or something else.
+
+[1] https://lore.kernel.org/all/CAHk-=wheoU5mkht1xk_4Tyw78oa-8iGvGE9nBdUmGqCykgo1xw@mail.gmail.com/
+
+> 
+> > +	if (batch_len) {
+> > +		/* Zero out bytes as they're copied out, to preserve forward secrecy. */
+> 
+> Please name the function so it is self explaining and add an
+> comprehensive comment to it so you can spare the comment here.
+
+I'll take your memcpy_and_zero_*src* suggestion from earlier.
+
+> > +		memcpy_and_zero(buffer, state->batch + state->pos, batch_len);
+> > +		state->pos += batch_len;
+> > +		buffer += batch_len;
+> > +		len -= batch_len;
+> 
+> buffer and state->pos could be updated by that non-fail copy function to
+> aid the compiler, but I might be wrong about the ability of compilers to
+> optimize code like that.
+
+memcpy_and_zero(_src) is inlined, and the codegen looks okay enough I
+think.
+
+> > +	/* Refill the batch and then overwrite the key, in order to preserve forward secrecy. */
+> > +	BUILD_BUG_ON(sizeof(state->batch_key) % CHACHA_BLOCK_SIZE != 0);
+> 
+> Does this build bug really need to be glued in between the comment
+> explaining the function call and the function call itself?
+
+I thought of these two lines as sort of one thing together. But I'll
+reverse the order of the comment and the BUILD_BUG_ON, per your
+suggestion.
+
+Thanks again for the extremely thorough review.
+
+Jason
