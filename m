@@ -2,66 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39621C4321E
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 20:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B9D8C4332F
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 21:08:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbiK0Uny (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 15:43:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46680 "EHLO
+        id S229637AbiK0VIt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Nov 2022 16:08:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiK0Unx (ORCPT
+        with ESMTP id S229513AbiK0VIq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 15:43:53 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF90B307
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 12:43:52 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id u27so3539634lfc.9
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 12:43:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:mime-version:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=biw1utCmNyI+ef9futimPqL2qrgw3YwY9eWMD1oBQZg=;
-        b=E9AKpSQ5gIyS3A82Hv4r5AtoMs3npCzoh4F6aymcgsvkEvSkHN+eFPBHQ/neQXJ4vA
-         RbT1sBGEzbmqU58WS9UtSjbcIfkDh9ieFIC902scLHgja3POPTS/hZFDwC4htNpPusjh
-         jV5n0xFnyov6LAqneJtmvcIo9RJJ9l4wKv+i4CT/qwoEUvdjDBtvO5hb5qaact824Bnb
-         bWMgHcferecAOjGO1ProqFIgcfkUDfKmwaKuQ5J8yhElhcGNaOV0KpL9iRQAdKWYZk4D
-         OQ5oActwWT2qcHInGAafITL1BPs3LV9H660NsJk568E4pDRyv3qc8RZXAXMchS63UorR
-         K6nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:mime-version:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=biw1utCmNyI+ef9futimPqL2qrgw3YwY9eWMD1oBQZg=;
-        b=T1z3MfFu/H+n39WzJ/xAqyFe/auoJi6eQITN774cV2MFIGCpTkuu3FBPJwuoum0EmC
-         tVG9lWIt/nTDjItqZ1hMZIQS7fScm/qr1Gwj+NnTLrGI70aTteD/Y0/rmVq2sfvu0tuP
-         aSS26Z27k5EHB9B/LMBs49qywnFTzS5jK3hNFgZuJOoRTQ/ZBgy2kxSUqBXCNj2EjTUL
-         zX4VV8KFSTSokS4mLUxTsF8/heOZPskJtx+SOEoBRARByW/j1BlLRHTeuNzE0BmHFtmT
-         fqHWgM3kf5/0oR+uhtb/u/Z6nNDRAnj1llsjmSBQn86Vc0PE/Zyf8nfDtJURxpMoTyHc
-         pAQA==
-X-Gm-Message-State: ANoB5pmQ5DOaDMwsYAE1lnKxhqhU2pWrLzCGhwBM5YrqGxdpjnJL+jDN
-        ydlrO7amg5uP63B+h2+OzrJzSDJnTh7o0CFJyv7ADUrRJfJv8A==
-X-Google-Smtp-Source: AA0mqf4AzFW8RTncWn3WXOjglxnv4C/sJZBhLAvUrAFrX4Yq86jwamOHClYze9rqllKa0E2/rRkS2/Ek32kWISzu490=
-X-Received: by 2002:ac2:5486:0:b0:4a2:34d5:9929 with SMTP id
- t6-20020ac25486000000b004a234d59929mr17880178lfk.31.1669581830867; Sun, 27
- Nov 2022 12:43:50 -0800 (PST)
-Received: from 332509754669 named unknown by gmailapi.google.com with
- HTTPREST; Sun, 27 Nov 2022 12:43:50 -0800
-From:   RICHARD EDWARD <richardeddward@gmail.com>
-Mime-Version: 1.0
-Date:   Sun, 27 Nov 2022 12:43:50 -0800
-Message-ID: <CAGpQqir7wMcD4me37xd47ncTTRUPr+Sq8Ey+xpw71AJFa_dOiA@mail.gmail.com>
-Subject: HARD HAT
-To:     linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 27 Nov 2022 16:08:46 -0500
+X-Greylist: delayed 479 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 27 Nov 2022 13:08:41 PST
+Received: from cavan.codon.org.uk (cavan.codon.org.uk [176.126.240.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2656B853
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 13:08:41 -0800 (PST)
+Received: by cavan.codon.org.uk (Postfix, from userid 1000)
+        id 00784424A4; Sun, 27 Nov 2022 21:00:40 +0000 (GMT)
+Date:   Sun, 27 Nov 2022 21:00:40 +0000
+From:   Matthew Garrett <mjg59@srcf.ucam.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-efi@vger.kernel.org, linux-crypto@vger.kernel.org,
+        patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+        ardb@kernel.org
+Subject: Re: [PATCH v3 1/5] efi: vars: prohibit reading random seed variables
+Message-ID: <20221127210040.GA32253@srcf.ucam.org>
+References: <20221122020404.3476063-1-Jason@zx2c4.com>
+ <20221122020404.3476063-2-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221122020404.3476063-2-Jason@zx2c4.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-To whom it may concern,
-I would like to order HARD HAT . I would be glad if you could email me
-back with the types and pricing you carry at the moment .
+On Tue, Nov 22, 2022 at 03:04:00AM +0100, Jason A. Donenfeld wrote:
+> In anticipation of putting random seeds in EFI variables, it's important
+> that the random GUID namespace of variables remains hidden from
+> userspace. We accomplish this by not populating efivarfs with entries
+> from that GUID, as well as denying the creation of new ones in that
+> GUID.
 
-Regards ,
-Mr HAROLD COOPER
-PH: 813 750 7707
+What's the concern here? Booting an older kernel would allow a malicious 
+actor to either read the seed variable or set it to a value under their 
+control, so we can't guarantee that the information is secret.
