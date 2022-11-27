@@ -2,156 +2,200 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E377C4708B
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 12:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C577C4321E
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 13:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbiK0Mo1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 07:44:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37720 "EHLO
+        id S229609AbiK0NJw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Nov 2022 08:09:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiK0Mo0 (ORCPT
+        with ESMTP id S229436AbiK0NJv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 07:44:26 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D226D13F
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 04:44:24 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id r12so13549664lfp.1
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 04:44:24 -0800 (PST)
+        Sun, 27 Nov 2022 08:09:51 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC701026;
+        Sun, 27 Nov 2022 05:09:49 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso11580283pjt.0;
+        Sun, 27 Nov 2022 05:09:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B0wTjTX8oc9gsfhtWKd9yy7AK5Y3/IIhH17ZCu5fZx4=;
-        b=T/PL1EZcdBp8VeEM1MTO7c2sNbEGNsfFvC9mNUOM5rg1dhvuw49Aw7AGDlZSYcT6T3
-         jFHpNBuykUv9RlbpWubxI86pJNYVdnCrZ0/MerOYOcjk0Hkb0tqC2//5aAsDFqTLbdJo
-         mz/8WeBpO73qlZ6UwPE/3u9wEYgoxvsP5M6knVNKmL7bH0EgZNu6LiMsiY8YcINwbqbL
-         OjIeQ1i+tDaaKpq+DBRU7bIk/0T5OUDXIOQ3XPGz15fhoOXgvMHnwWVr24vOwx9eMwKa
-         WBijznVtw8MqvbmeCgoyF1iwH0U1Kq/BvmZLJAmQCiOw/agPQruZ5LTMlZI7nlSjAbKl
-         SYTg==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X/nDh8TpKOaetZNm9H4kb5l3sJZ9fC/4skJvrnTVrPc=;
+        b=A8rJC78DONtVFCjU8YfRzhf/A8tTYx/cYxKJfHXanN+ASW+iocYY9tOWjvpvel5RhW
+         3jaaIhkLhABrzSdU7E5HbzW7UBKWAdKF7IIt/9Tnx+1E9D10jAxxLm6Gai74ho8jaaXy
+         GQctii9VVE6lnI81Re32iQwHAmQbE2RBWEYLg0WA4YtbtGFDCuiFcDbcdKGrbMpU49I8
+         cGq3VeOTvV/WzhcBpIrNhEq7Ubm2CgZ4EXa63sp2VL5+0hRvLSnzrC8PFLvlzfvLQPj9
+         d3NFvD3/bpMOm84VwowrqAGhp+8qGy36vlM6vANwOHdS55la639OnFUJlYE0igne4Oqe
+         nLbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0wTjTX8oc9gsfhtWKd9yy7AK5Y3/IIhH17ZCu5fZx4=;
-        b=w5jLAbkmxRxD7tKZIK3RGRUx5EggSwMngycrgo/muMSLokGoXyWZE2eAQzHl9dQtTn
-         2vK0NyY/ZaMyl51vcDqg/mpcz8dPJMaY7EtFxwj5B3rs8+iV8qFWDGUVc26L65MUS0pO
-         gSvEtw5jgyIjBaggHFY01M1vG6Cs/GzW1RpRcpneGt9EbWg9L+yWcOnSME3hFviKqpct
-         8gx7uhnIf4Y1f4ri+T9R/vEXZQ16cH8U9VpCwEaqDeS4DSknU3LqJNq4lQ0FWRjN7dJJ
-         X++zmSxJVvaU1HoxNv9GVffL09WpcIlqUt5Q+Eqp9/Dz23Nv3ys1VXU+9twlaODEhlwu
-         JOJg==
-X-Gm-Message-State: ANoB5plDgS6yViE3dbgP6rYZwdgV8FeAcu62x5e+8oZo8yQiSiCLyy2V
-        GoH0kWwCizxv1HWMCnNHhwlTUw==
-X-Google-Smtp-Source: AA0mqf49suwCpWlASIE/0UTr+rlkpTx39rlWSFK+oskELfLcmKeB0DbRwxLGwAPoErfjqYD77rZcOA==
-X-Received: by 2002:a05:6512:258b:b0:4b5:c8f:2b59 with SMTP id bf11-20020a056512258b00b004b50c8f2b59mr1812375lfb.536.1669553062933;
-        Sun, 27 Nov 2022 04:44:22 -0800 (PST)
-Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id m9-20020a056512358900b0049468f9e697sm1273347lfr.236.2022.11.27.04.44.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Nov 2022 04:44:22 -0800 (PST)
-Message-ID: <a4ea3bd0-b716-5bda-c6c7-cad06e964fa1@linaro.org>
-Date:   Sun, 27 Nov 2022 13:44:20 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v2 1/4] dt-bindings: crypto: Let STM32 define Ux500 CRYP
-To:     Linus Walleij <linus.walleij@linaro.org>,
-        linux-crypto@vger.kernel.org,
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=X/nDh8TpKOaetZNm9H4kb5l3sJZ9fC/4skJvrnTVrPc=;
+        b=gIex8LvPPhy93oWXINIw06wrG+Zqepe0GykPBedENsoPjJ6vRp2TU/txH3C8XUJgbK
+         htLuqNLz2KjpohRCDpMbYLYMFvPBWJh2+jR4ZWmsnYzGoQ65hM7vaJoqZGCQkgRhf5Va
+         4uMC9velzoHYE8DvIHOKxJgvo2HnlFn4ZBZsxQecUhTBT+UQT3qrgm7m3MIKNp0r0Wsf
+         5V6UuicisVsSSKn38w4Juk+gfS7jEkI9tk0Puqac2lzUXaIVXqV07hgCb3YjpcNKxT8e
+         ceXsiHrCIvbokoNFRO51x7L96DbvIueOCB/INo3/weh/HVKYXa7quJAAPxATl33E2y8f
+         bfnA==
+X-Gm-Message-State: ANoB5pnDxdP+2+BFJR9gCjrLmzsCaooeT36gmWYFRHQN8dVEFCXNjK+c
+        mPGZ+oEXG7S0IRGsD9zGYmFB33szZyWlyw==
+X-Google-Smtp-Source: AA0mqf5LGLBzcqBZLh3aW85dV52JRwMwpCZdcwvop4vED2pFz+/wO3soofsqEh6DgkBBe9WvJRHdeQ==
+X-Received: by 2002:a17:902:e886:b0:188:fb19:5f39 with SMTP id w6-20020a170902e88600b00188fb195f39mr30684526plg.21.1669554588631;
+        Sun, 27 Nov 2022 05:09:48 -0800 (PST)
+Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
+        by smtp.gmail.com with ESMTPSA id q17-20020a170902eb9100b00188a908cbddsm6710225plg.302.2022.11.27.05.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Nov 2022 05:09:48 -0800 (PST)
+Sender: Vincent Mailhol <vincent.mailhol@gmail.com>
+From:   Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+To:     Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Kurt Kanzenbach <kurt@linutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Michael Chan <michael.chan@broadcom.com>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Dimitris Michailidis <dmichail@fungible.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Jerin Jacob <jerinj@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Petr Machata <petrm@nvidia.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Shannon Nelson <snelson@pensando.io>, drivers@pensando.io,
+        Ariel Elior <aelior@marvell.com>,
+        Manish Chopra <manishc@marvell.com>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Vadim Fedorenko <vadfed@fb.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Vadim Pasternak <vadimp@mellanox.com>,
+        Shalom Toledo <shalomt@mellanox.com>,
+        linux-crypto@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-rdma@vger.kernel.org, oss-drivers@corigine.com,
+        Jiri Pirko <jiri@mellanox.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-References: <20221125223217.2409659-1-linus.walleij@linaro.org>
- <20221125223217.2409659-2-linus.walleij@linaro.org>
-Content-Language: en-US
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20221125223217.2409659-2-linus.walleij@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Hao Chen <chenhao288@hisilicon.com>,
+        Guangbin Huang <huangguangbin2@huawei.com>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Shijith Thotton <sthotton@marvell.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Subject: [PATCH net-next v3 0/5] net: devlink: return the driver name in devlink_nl_info_fill
+Date:   Sun, 27 Nov 2022 22:09:14 +0900
+Message-Id: <20221127130919.638324-1-mailhol.vincent@wanadoo.fr>
+X-Mailer: git-send-email 2.37.4
+In-Reply-To: <20221122154934.13937-1-mailhol.vincent@wanadoo.fr>
+References: <20221122154934.13937-1-mailhol.vincent@wanadoo.fr>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 25/11/2022 23:32, Linus Walleij wrote:
-> This adds device tree bindings for the Ux500 CRYP block
-> as a compatible in the STM32 CRYP bindings.
-> 
-> The Ux500 CRYP binding has been used for ages in the kernel
-> device tree for Ux500 but was never documented, so fill in
-> the gap by making it a sibling of the STM32 CRYP block,
-> which is what it is.
-> 
-> The relationship to the existing STM32 CRYP block is pretty
-> obvious when looking at the register map, and I have written
-> patches to reuse the STM32 CRYP driver on the Ux500.
-> 
-> The two properties added are DMA channels and power domain.
-> Power domains are a generic SoC feature and the STM32 variant
-> also has DMA channels.
-> 
-> Cc: devicetree@vger.kernel.org
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-> Cc: Lionel Debieve <lionel.debieve@foss.st.com>
-> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
-> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> ChangeLog v1->v2:
-> - Drop the second (new) example.
-> ---
->  .../bindings/crypto/st,stm32-cryp.yaml        | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
-> index ed23bf94a8e0..6759c5bf3e57 100644
-> --- a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
-> @@ -6,12 +6,18 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
->  title: STMicroelectronics STM32 CRYP bindings
->  
-> +description: The STM32 CRYP block is built on the CRYP block found in
-> +  the STn8820 SoC introduced in 2007, and subsequently used in the U8500
-> +  SoC in 2010.
-> +
->  maintainers:
->    - Lionel Debieve <lionel.debieve@foss.st.com>
->  
->  properties:
->    compatible:
->      enum:
-> +      - st,stn8820-cryp
-> +      - stericsson,ux500-cryp
->        - st,stm32f756-cryp
->        - st,stm32mp1-cryp
->  
-> @@ -27,6 +33,19 @@ properties:
->    resets:
->      maxItems: 1
->  
-> +  dmas:
-> +    items:
-> +      - description: mem2cryp DMA channel
-> +      - description: cryp2mem DMA channel
-> +
-> +  dma-names:
-> +    items:
-> +      - const: mem2cryp
-> +      - const: cryp2mem
+The driver name is available in device_driver::name. Right now,
+drivers still have to report this piece of information themselves in
+their devlink_ops::info_get callback function.
 
-Usually these are called rx/tx, but I understand you are documenting
-existing usage from DTS or driver? In such case:
+The goal of this series is to have the devlink core to report this
+information instead of the drivers.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+The first two patches clean up the mlxsw driver for both the ethtool
+and the devlink (both are supposed to return the same information so
+the ethtool got included as well). This is split in two patches
+because of the different Fixes tag.
 
+The third patch fulfills the actual goal of this series: modify
+devlink core to report the driver name and clean-up all drivers. Both
+as to be done in an atomic change to avoid attribute duplication.
 
+The fourth patch removes the devlink_info_driver_name_put() function
+to prevent future drivers from reporting the driver name themselves.
 
-Best regards,
-Krzysztof
+Finally, the fifth and last patch allows the core to call
+devlink_nl_info_fill() even if the devlink_ops::info_get() callback is
+NULL. This allows to do further more clean up in the drivers.
+---
+* Changelog *
+
+v2 -> v3
+
+  * [PATCH 3/5] remove the call to devlink_info_driver_name_put() in
+    mlxsw driver as well (this was missing in v2, making the build
+    fail... sorry for the noise).
+
+  * add additional people in CC as pointed by netdev patchwork CI:
+    https://patchwork.kernel.org/project/netdevbpf/list/?series=699451
+
+  * Use the "Link:" prefix before URL to silence checkpatch's line
+    length warning.
+
+RFC v1 -> v2
+
+  * drop the RFC tag
+
+  * big rework following the discussion on RFC:
+    https://lore.kernel.org/netdev/20221122154934.13937-1-mailhol.vincent@wanadoo.fr/
+    Went from one patch to a series of five patches:
+
+  * drop the idea to report the USB serial number following Greg's
+    comment:
+    https://lore.kernel.org/linux-usb/Y3+VfNdt%2FK7UtRcw@kroah.com/
+
+Vincent Mailhol (5):
+  mlxsw: minimal: fix mlxsw_m_module_get_drvinfo() to correctly report
+    driver name
+  mlxsw: core: fix mlxsw_devlink_info_get() to correctly report driver
+    name
+  net: devlink: let the core report the driver name instead of the
+    drivers
+  net: devlink: remove devlink_info_driver_name_put()
+  net: devlink: make the devlink_ops::info_get() callback optional
+
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |  4 ---
+ drivers/net/dsa/hirschmann/hellcreek.c        |  5 ---
+ drivers/net/dsa/mv88e6xxx/devlink.c           |  5 ---
+ drivers/net/dsa/sja1105/sja1105_devlink.c     | 12 ++-----
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  4 ---
+ .../freescale/dpaa2/dpaa2-eth-devlink.c       | 11 +-----
+ .../ethernet/fungible/funeth/funeth_devlink.c |  7 ----
+ .../hisilicon/hns3/hns3pf/hclge_devlink.c     |  5 ---
+ .../hisilicon/hns3/hns3vf/hclgevf_devlink.c   |  5 ---
+ drivers/net/ethernet/intel/ice/ice_devlink.c  |  6 ----
+ .../marvell/octeontx2/af/rvu_devlink.c        |  7 ----
+ .../marvell/octeontx2/nic/otx2_devlink.c      | 15 --------
+ .../marvell/prestera/prestera_devlink.c       |  5 ---
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |  4 ---
+ drivers/net/ethernet/mellanox/mlxsw/core.c    |  5 ---
+ drivers/net/ethernet/mellanox/mlxsw/minimal.c |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_devlink.c  |  4 ---
+ .../ethernet/pensando/ionic/ionic_devlink.c   |  4 ---
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |  4 ---
+ drivers/net/netdevsim/dev.c                   |  3 --
+ drivers/ptp/ptp_ocp.c                         |  4 ---
+ include/net/devlink.h                         |  2 --
+ net/core/devlink.c                            | 35 ++++++++++++-------
+ 23 files changed, 27 insertions(+), 131 deletions(-)
+
+-- 
+2.37.4
 
