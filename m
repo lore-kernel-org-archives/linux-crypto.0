@@ -2,92 +2,153 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E465CC46467
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 18:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA4FC47088
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Nov 2022 20:13:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbiK0SZy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 13:25:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37132 "EHLO
+        id S229610AbiK0UNs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Nov 2022 15:13:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiK0SZy (ORCPT
+        with ESMTP id S229514AbiK0UNr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 13:25:54 -0500
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4815F60;
-        Sun, 27 Nov 2022 10:25:53 -0800 (PST)
-Received: by mail-io1-f51.google.com with SMTP id r81so6228088iod.2;
-        Sun, 27 Nov 2022 10:25:53 -0800 (PST)
+        Sun, 27 Nov 2022 15:13:47 -0500
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BDECBC20
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 12:13:46 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-3b56782b3f6so86963167b3.13
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Nov 2022 12:13:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4BsW9fXXbads+WS5bi3bLc7tk6sMWKRmXy9gWw9jX90=;
+        b=rqIBNsWYh9TDSn+szrrH7hFK5cywiDuBssu7dqeevJYpiqdca3AFFZBhveqTB3j+Dk
+         FwfO6uBJuR8MWy7Jp0pOGlMcVtn8cg8rSrzv36OOVeMAkCr3rl75xH11dNtpjBjtmh40
+         /b16DdLr6BhqbHa7dURA7bArGwDHKv5cGlKhp49XcjLZb98Of+W2jRYEJ8i2g9RhVew8
+         0l5upPm98Bh7BIAmm4QVPfarXGNtz4tlverV9QN8Go2GZcG0SLK9oaOrrFbDubiJcv1o
+         ee8qDqqdOy5R9sQXiZlNh8WKKC+qpvdwcTiypMpTTfT2SOLY1afo39RvYaw3oRkcQ4l6
+         Kacw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S8bsHlpNOFcbCNV3S3KNbgx5jtrGlxhIxfZQJSXdiI8=;
-        b=hpLrifZ6EtIfiPVqwH3jd8D9yE/AwbtlPGmiV7fhWKKlFHw3yhPOXdJi5esHl+vUhm
-         CGNdBkE9bIejRhow/ExYpUQoVU1DB23Qfrip9hlGxjRHgUOr5tWwEZrZW3zHbtlctYb4
-         5qqFNWbrIGmn1Odw24RcByQj+2C6pl4VyuWuWIfyNBmM0zHUWSlgF5Zfo/ds7dEVhOCL
-         YuC9IzT//ixkk/0bKt5zuO6lh2kbJfd1X71UmLZLxQWojGv/jYRoZu9osRWL/FqFZA9w
-         u1juFQl/J8ksYx1ajd5mNpojTfbhJFTcGRb3ax7r9VZSQnCEpozT15/3RO9/Wdr7wwwZ
-         tPtw==
-X-Gm-Message-State: ANoB5pluX5icoytYkIhN/uR2PAExqsNRfLaRNjqLxosOcDSsC1UG0EEK
-        xdplp5ASLJgbmtwR5LDZgw==
-X-Google-Smtp-Source: AA0mqf4/UTMwRwnIlC+je7s+xyLV5H6yWYNsPoNaMuJssYdZ1JVl/+l7lHnKDkheQefibulNpQHtFg==
-X-Received: by 2002:a05:6638:ca4:b0:389:dbc8:c058 with SMTP id x4-20020a0566380ca400b00389dbc8c058mr1463216jad.10.1669573552742;
-        Sun, 27 Nov 2022 10:25:52 -0800 (PST)
-Received: from robh_at_kernel.org ([2605:ef80:80c1:3b80:81db:640f:ef27:c9e2])
-        by smtp.gmail.com with ESMTPSA id e10-20020a92690a000000b00302e4c93a54sm3113081ilc.79.2022.11.27.10.25.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Nov 2022 10:25:52 -0800 (PST)
-Received: (nullmailer pid 148616 invoked by uid 1000);
-        Sun, 27 Nov 2022 18:25:52 -0000
-Date:   Sun, 27 Nov 2022 12:25:52 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     qyousef@layalina.io, atishp@atishpatra.org,
-        akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-        pratyush@kernel.org, robh+dt@kernel.org,
-        linux-mtd@lists.infradead.org, anup@brainfault.org, richard@nod.at,
-        linux-crypto@vger.kernel.org, miquel.raynal@bootlin.com,
-        nicolas.ferre@microchip.com, devicetree@vger.kernel.org,
-        michael@walle.cc, herbert@gondor.apana.org.au, tkhai@ya.ru,
-        baolin.wang@linux.alibaba.com, alexandre.belloni@bootlin.com,
-        claudiu.beznea@microchip.com, linux-arm-kernel@lists.infradead.org,
-        krzysztof.kozlowski+dt@linaro.org, broonie@kernel.org,
-        arnd@arndb.de, linux-spi@vger.kernel.org,
-        quic_abhinavk@quicinc.com, vasily.averin@linux.dev,
-        colin.i.king@gmail.com
-Subject: Re: [PATCH] MAINTAINERS: Update email of Tudor Ambarus
-Message-ID: <166957354583.148471.5381866020763010078.robh@kernel.org>
-References: <20221122125244.175295-1-tudor.ambarus@microchip.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4BsW9fXXbads+WS5bi3bLc7tk6sMWKRmXy9gWw9jX90=;
+        b=YTTSma4u8P+KdCLYumU63Hx2BplKZeH2w5J4+n6Ynb0Gcn2R/g40I/zVTeFTtVliCu
+         HtfsvetZ1+Sz4LFP0ti/y7MSWp7JhFZY9G9FOLkB8EMuRoFKNzup7KHs6jLMQLi2jxjl
+         6ZnvifmJv+VcBH/4U3wMgUxM7e9Uoqy7Dy5sKl2iLamzKVcj1lImkn2Tdyt1KFXabQzm
+         4CaUowC97O7GjXD1Sqnv9l2QLCsViF2cHl69zkLUk7vJs13QZsi2qs98RkOw6IUQv/AF
+         FzkRvQ98biaSn/YR3cvlyouaNfz4VVwqZFyQRkbI8HAnD3blNmpTwF4YCee7SZ1wrCOV
+         yQKQ==
+X-Gm-Message-State: ANoB5plBJtD27ONAaybqM9ask5MIpiRCxaf6Dxw7VkJjAkrONGGrsbbN
+        P9WUY0FUqbnnLW9el05GRzzIdL044xiI/43fi5+hOA==
+X-Google-Smtp-Source: AA0mqf46J1rXJ7aX/aiH//oD2+ojh2fJ969CivbeZNxzdJWyjrl+njLK6ztw38uVdPTvZ9IG2j2EqT7yBe6Q59JeRH4=
+X-Received: by 2002:a0d:d711:0:b0:3c3:dc9f:d24f with SMTP id
+ z17-20020a0dd711000000b003c3dc9fd24fmr4114185ywd.343.1669580025359; Sun, 27
+ Nov 2022 12:13:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221122125244.175295-1-tudor.ambarus@microchip.com>
+References: <20221125223217.2409659-1-linus.walleij@linaro.org>
+ <20221125223217.2409659-2-linus.walleij@linaro.org> <a4ea3bd0-b716-5bda-c6c7-cad06e964fa1@linaro.org>
+In-Reply-To: <a4ea3bd0-b716-5bda-c6c7-cad06e964fa1@linaro.org>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Sun, 27 Nov 2022 21:13:33 +0100
+Message-ID: <CACRpkdZ0rk8pCgmvB9190hmYLBUjQ+-Qe-ecS8aMNcO+=HH8wA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] dt-bindings: crypto: Let STM32 define Ux500 CRYP
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sun, Nov 27, 2022 at 1:44 PM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+> On 25/11/2022 23:32, Linus Walleij wrote:
+> > This adds device tree bindings for the Ux500 CRYP block
+> > as a compatible in the STM32 CRYP bindings.
+> >
+> > The Ux500 CRYP binding has been used for ages in the kernel
+> > device tree for Ux500 but was never documented, so fill in
+> > the gap by making it a sibling of the STM32 CRYP block,
+> > which is what it is.
+> >
+> > The relationship to the existing STM32 CRYP block is pretty
+> > obvious when looking at the register map, and I have written
+> > patches to reuse the STM32 CRYP driver on the Ux500.
+> >
+> > The two properties added are DMA channels and power domain.
+> > Power domains are a generic SoC feature and the STM32 variant
+> > also has DMA channels.
+> >
+> > Cc: devicetree@vger.kernel.org
+> > Cc: Rob Herring <robh+dt@kernel.org>
+> > Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+> > Cc: Lionel Debieve <lionel.debieve@foss.st.com>
+> > Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+> > Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > ---
+> > ChangeLog v1->v2:
+> > - Drop the second (new) example.
+> > ---
+> >  .../bindings/crypto/st,stm32-cryp.yaml        | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> > index ed23bf94a8e0..6759c5bf3e57 100644
+> > --- a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> > +++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> > @@ -6,12 +6,18 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+> >
+> >  title: STMicroelectronics STM32 CRYP bindings
+> >
+> > +description: The STM32 CRYP block is built on the CRYP block found in
+> > +  the STn8820 SoC introduced in 2007, and subsequently used in the U8500
+> > +  SoC in 2010.
+> > +
+> >  maintainers:
+> >    - Lionel Debieve <lionel.debieve@foss.st.com>
+> >
+> >  properties:
+> >    compatible:
+> >      enum:
+> > +      - st,stn8820-cryp
+> > +      - stericsson,ux500-cryp
+> >        - st,stm32f756-cryp
+> >        - st,stm32mp1-cryp
+> >
+> > @@ -27,6 +33,19 @@ properties:
+> >    resets:
+> >      maxItems: 1
+> >
+> > +  dmas:
+> > +    items:
+> > +      - description: mem2cryp DMA channel
+> > +      - description: cryp2mem DMA channel
+> > +
+> > +  dma-names:
+> > +    items:
+> > +      - const: mem2cryp
+> > +      - const: cryp2mem
+>
+> Usually these are called rx/tx, but I understand you are documenting
+> existing usage from DTS or driver? In such case:
 
-On Tue, 22 Nov 2022 14:52:44 +0200, Tudor Ambarus wrote:
-> My professional email will change and the microchip one will bounce after
-> mid-november of 2022.
-> 
-> Update the MAINTAINERS file, the YAML bindings, MODULE_AUTHOR entries and
-> author mentions, and add an entry in the .mailmap file.
-> 
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-> ---
->  .mailmap                                               |  1 +
->  .../bindings/crypto/atmel,at91sam9g46-aes.yaml         |  2 +-
->  .../bindings/crypto/atmel,at91sam9g46-sha.yaml         |  2 +-
->  .../bindings/crypto/atmel,at91sam9g46-tdes.yaml        |  2 +-
->  .../devicetree/bindings/spi/atmel,at91rm9200-spi.yaml  |  2 +-
->  .../devicetree/bindings/spi/atmel,quadspi.yaml         |  2 +-
->  MAINTAINERS                                            | 10 +++++-----
->  drivers/crypto/atmel-ecc.c                             |  4 ++--
->  drivers/crypto/atmel-i2c.c                             |  4 ++--
->  drivers/crypto/atmel-i2c.h                             |  2 +-
->  10 files changed, 16 insertions(+), 15 deletions(-)
-> 
+It's in the driver. Dunno how to do it for the future, we could
+deprecate these and add rx/tx as preferred in a separate
+patch.
 
-Acked-by: Rob Herring <robh@kernel.org>
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Thanks!
+
+Yours,
+Linus Walleij
