@@ -2,377 +2,188 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE73C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 18:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B202AC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 18:50:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232526AbiK1SsB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Nov 2022 13:48:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52728 "EHLO
+        id S232823AbiK1SuI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 13:50:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232514AbiK1Sru (ORCPT
+        with ESMTP id S233023AbiK1Stj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2022 13:47:50 -0500
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED2E514080;
-        Mon, 28 Nov 2022 10:47:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Content-Type:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=o+wfmjgwpLygw6FMdf7t1qVwAF7dGrNBrWiv+F+6N3A=; b=thIS/tGDClZYUL+M1ZxA5S/GnG
-        A6SYPdHA9YeztPUS6zQkGFZowo+GaKwuZX50PkJIhFw+ssjFWs1vI9qXDCSwaO6daNNvIz0ZDqbNu
-        jcHitxpH2QF2d6EGOHJ+yys3fHal8E0RMrwEyEskJjuWBml3HISaxMdLEELO3ZyuhFPO/oJidER+a
-        Ri1KgUg7hingJlDo6L4ppAi/fhk7YjozmTeQ1lLNLyKq8+PL2SWtqUQTGk/FnnqN3XsWs2kiYx7ov
-        pROhXt/wQtVyIuPwcEagweiIJzY81navukhC11ykcciX+nwEHwULkHlZHTKK9YFsJDFNw800mRf2z
-        HXvl7TlA==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1ozjA2-006BV9-J5; Mon, 28 Nov 2022 19:47:22 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1ozjA1-008Elr-23;
-        Mon, 28 Nov 2022 19:47:21 +0100
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>
-Cc:     linux-crypto@vger.kernel.org (open list:HARDWARE RANDOM NUMBER
-        GENERATOR CORE),
-        devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED
-        DEVICE TREE BINDINGS),
-        linux-arm-kernel@lists.infradead.org (moderated list:ARM/Rockchip SoC
-        support),
-        linux-rockchip@lists.infradead.org (open list:ARM/Rockchip SoC support),
-        linux-kernel@vger.kernel.org (open list),
-        Aurelien Jarno <aurelien@aurel32.net>
-Subject: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
-Date:   Mon, 28 Nov 2022 19:47:17 +0100
-Message-Id: <20221128184718.1963353-3-aurelien@aurel32.net>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221128184718.1963353-1-aurelien@aurel32.net>
-References: <20221128184718.1963353-1-aurelien@aurel32.net>
+        Mon, 28 Nov 2022 13:49:39 -0500
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A895121E2F;
+        Mon, 28 Nov 2022 10:49:07 -0800 (PST)
+Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ASHHb4R028043;
+        Mon, 28 Nov 2022 18:48:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pps0720;
+ bh=5T8G2Oa4+MbGVdBq/+qTbfsHUsc2skPJ3iIb5a6Nm1g=;
+ b=fB8/J3NesjRpUOa9ovdvepvEFywXcTHwMqnmZMY3Zt0ZLQYmqht7Y9/ONHRewrDiNIFU
+ gV8m2INPptj977j5QOjGe+Bs7/htNoKSh4OOnaGqtXJGH57taGmP8UwrmqErTs7ilaer
+ hXpDlemChPUC0Bw1CnMB5gGWQcqHptmUj9ok79eau70oDZGVn+YtKPkxNmWCjv6W/Vqs
+ LBIbxiJVy2l5FclxmLYVFfUFOUhZqt6PjVHIqWSqA1TTOpxpWfS2OyaF3+brZiXUzt5G
+ 1AZhi+d6J0gYIX3b6XpW3ABK3xK0DkNC2AcREAeluW7jaiHR6Z6l18NZw0otOAX2Uqle Yw== 
+Received: from p1lg14878.it.hpe.com (p1lg14878.it.hpe.com [16.230.97.204])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3m518pgnnd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 18:48:55 +0000
+Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id B631B2EEE6;
+        Mon, 28 Nov 2022 18:48:52 +0000 (UTC)
+Received: from p1wg14925.americas.hpqcorp.net (10.119.18.114) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Mon, 28 Nov 2022 06:48:52 -1200
+Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
+ via Frontend Transport; Mon, 28 Nov 2022 06:48:52 -1200
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Mon, 28 Nov 2022 06:48:51 -1200
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZEnyoKe+2MU/2M5CMEyImHT/YYnJvr3rboXR9JsNswiibdU3xWBI2Cu0X0vyLYLunWd18x5aIowJte7cBV5rOfo2rBs98QXj55y0TYWffYyYm3wU3FLQ/HAZNQlQVIeA8n7VvOynaO5JIFBP07I3X+yI3FMBXXXonbnMAANlZ5Q8f8EiYt1/rRqISf14PbakJZhepM7m2I1CP71fKK1SVv5vGMyR7YesA1eww1qwiNNUIYOmygeZC626RYwYKwIvskF3qA2HohlfBLjY6NZMlqrqpEM2lMQgwySlXG1dpRQfeit7rKUT+FywzsoBYJpmFhoac3rs9M75+HxsNkNSCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5T8G2Oa4+MbGVdBq/+qTbfsHUsc2skPJ3iIb5a6Nm1g=;
+ b=JXR92JfuHjTg9YfTC7i1Ncm7QEQ7Jg5kDjb3F79GpQw8Y1XM2UGghJY5hux1L4c5rg7lIqjlUqqq1USNc1KGaSGLCgF4djmegwwuJGSVy0kB8KrCSOXAPYMsaPIzBSSS3uYLop14pduX3UqW9Z3xtFWTCNELSrpztiCYscUiAx91pwlKH/1NqPHv34I2pkdGBuuVPPibmD6hlridGMdOe7AurQGEvKiqMahi6Q7Vy2sPm84BtoUp1xEdtwdSM0BnEuD+CNGyVvbSFyJXrXx95+s6T+/F4xr4Qckou54+mjiTCZ7/DCb0MvO2x/3AYwQ9pyO7BnwDPIlj/oyLox6BUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
+ by SJ0PR84MB1578.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:a03:430::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Mon, 28 Nov
+ 2022 18:48:50 +0000
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::5511:bd85:6961:816]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::5511:bd85:6961:816%9]) with mapi id 15.20.5857.023; Mon, 28 Nov 2022
+ 18:48:50 +0000
+From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>
+CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "ap420073@gmail.com" <ap420073@gmail.com>,
+        "David.Laight@aculab.com" <David.Laight@aculab.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Topic: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Index: AQHY+XHqfLLvXNGxcESumjNg7U4Mn65BZh+AgA36OwCAAAUngIAAAQwAgADfYdmABHgXgA==
+Date:   Mon, 28 Nov 2022 18:48:50 +0000
+Message-ID: <MW5PR84MB1842A5CB8CFECFC90FDA1B65AB139@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20221103042740.6556-1-elliott@hpe.com>
+ <20221116041342.3841-1-elliott@hpe.com>
+ <20221116041342.3841-11-elliott@hpe.com> <Y3TF7/+DejcnN0eV@zx2c4.com>
+ <Y4B/kjS0lgzdUJHG@gondor.apana.org.au>
+ <CAMj1kXHHm+L=qE5opDXhjoWZt+1eKXFeGVS=OdvyF0VNFZivCA@mail.gmail.com>
+ <Y4CExnFX46mk4/1+@gondor.apana.org.au>
+ <MW5PR84MB1842E182C47F77FE8C8E755BAB139@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <MW5PR84MB1842E182C47F77FE8C8E755BAB139@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|SJ0PR84MB1578:EE_
+x-ms-office365-filtering-correlation-id: 4f11b449-a4f0-4070-2249-08dad1713077
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5Bzgnlkvq3PU40ZPzc9GzFM9Rp36KCe4cEgPSNW0OZe/lWqFVNHMmJYw7yNIhExmmBygWf0j9aafAu/Rl1+T78EGSkJkgc6hBMweMPYs3kiW6ZoqIE8x3pA3kikjTYpMmKhZk0Gwf8DhyWsEL7WGL0WlwjCRtloJsDXAE//BaSEaVH4NIXpKGGyGogyhwFW3M/HrG7TnBQ623iEkkkWATd5VAbbtMYz8c0J6yUUElChImVUZFJpPNyntuMNU3QNiMm019Zbr5CJ+6RwczGIpU+sfFNqEFQl0AUlicZFDrpSYwpo4FuoBHtqA/vQW5O82+xCS7Ofx0YYl9+8sbRv1R3gAmuQnxj0/dFJQoPg16Cvrvwjbq1LG3MfM7CBCbJeV+cbT/dHr+55ftbCXIqZ5WwBK0FIwbqnlxDwl+FcIj/oY4rbhSjSRCimGshBqfLpCAtpw+MLl4yQZMGsfm3eT8P/2kMv6ITtWwXL+BbrwGvTDICPw0zLWw76YxQif5oxK27/SqBsGlp6aSGxId70OE9OEPzE4pCnQtQZ/OlUgAFuZzAcJCGMcnL3NSwMgj3GQ6Zqw0ADMebR5+lGn70qCPy+8pO8JdwMTrxNUvZUJ6SkEEDdx//vLfyZ+Ky5GtTArXGS8KwjkSD786FavKN2sTpG7PcBd9B+A/qHoW5Jbhg99JtgASbfjTHwu1idHVLORFa72D51HUaw3HQofVqZX9g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(136003)(376002)(346002)(39860400002)(451199015)(6506007)(7696005)(86362001)(2940100002)(38070700005)(478600001)(26005)(2906002)(9686003)(71200400001)(82960400001)(55016003)(186003)(122000001)(38100700002)(33656002)(8936002)(5660300002)(76116006)(52536014)(316002)(7416002)(66946007)(54906003)(110136005)(66446008)(4326008)(8676002)(64756008)(66476007)(66556008)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MAw2lUsQ7DnPl+2rf9VFDtZivo0j3vC5ec6itKf53vpggAviYNdTkYm/WqTq?=
+ =?us-ascii?Q?7Pn74LKVoRMMHj3QDQ7YXEy8khCmcWuVulnssWUHhNhsfC+0sufRFRgkd/cG?=
+ =?us-ascii?Q?RLvug3/dCTJNKBlhbq/GbfauH45VqaVGgjP77CxrrbIcswFlE/Fa+jKJi0VL?=
+ =?us-ascii?Q?bUgMpAM7bJiCr/QTx3QZj1nz1O8WvCkTBy7pS9uvtX5CpuvYY3YPO8HckzCJ?=
+ =?us-ascii?Q?Imb+s9jAgIq376aDb+BAHyTJuq2VKFgHgR9hJ9n5iuXgJt1+r8SGE/8cv1y5?=
+ =?us-ascii?Q?5/CHi4qlG066f/H98knEufpi6rvQNPDeBd3B+szG43gQzUOiMRhS4i6hf05t?=
+ =?us-ascii?Q?6ur9f+5AUpdkPKRH14R4BURavBSoIa4IUPg7A1SDsZ1ZlOegSk+PJv/1ehI7?=
+ =?us-ascii?Q?caJfUCuX7IxvUUSluLEs/03Q3P80jSntUigmy9ILZW2UkCdlfVDBuibUK46J?=
+ =?us-ascii?Q?VnFzdPYI4sCbnGEMj2kKf7HeuBkLT09ieOQEJ+X+6sS1A7Odhqr33NxE6Key?=
+ =?us-ascii?Q?coblhBfXevbltecqUk/57wsMlWHC2JCuPCU1KO/8cRkanx9vQEuUzer2kcfO?=
+ =?us-ascii?Q?pTir4Xnv7UmAn64Vx4RdOXIeMs2VdWrQIm8ovLOLZjyjXyWGFDejXQr6iITT?=
+ =?us-ascii?Q?zQduc+kiUfgUDsDIqMN/aYSvGsMbyuRlh9ZEsJSKso6uduAS68sxI8RHoaTY?=
+ =?us-ascii?Q?FhCkD66odHC0GHMaKE7/4ByXcIA74SbKB7kBWHACEZKYpjKA5cVB7m9+vn30?=
+ =?us-ascii?Q?jjQkG2opstpjAFtDvsadOFjUGysftl6eFFM98BQJJ8lVHwXHIoHOSoPuKXwe?=
+ =?us-ascii?Q?bevIruel0t16zKyWmepR76vVYWj2QI7o02r1cngfiidAE0Hwa+AhNIiMQVfs?=
+ =?us-ascii?Q?+11twl1mt5r0K8Fe5cwQWn7sGNgmb8zvy35IRy7Sue/qt5eNHU3vFBlP6KQ8?=
+ =?us-ascii?Q?3TLI6LzMxMAOV7PcJy7BUXyrCbl5k5qa6GLSfCXD7bCPYMDoGU/bnRTY9ZZU?=
+ =?us-ascii?Q?dNdTQ7z3JEdWpp0+gcbQs4QUdXiM9OhQPA8XV9WzZuOYC+XR3ICeKhafwIoN?=
+ =?us-ascii?Q?uAeX3V+X8KL3IZweqLPBOz0NqeyoatX4YSmANPPXCH3twJ4XVM5iti8PjeMK?=
+ =?us-ascii?Q?XTm7agaxoRyDNucWIOptuqAOjIl3GrS14fosfQAakohCpFRAmX9bcDAdnPSD?=
+ =?us-ascii?Q?/1TnPvXmwxCIPhvFYY6kfmp8SOxceGxy6E1ttr3kEoZO/wyzerQBeWpfCbA1?=
+ =?us-ascii?Q?dXQObbvrwG8wgMxbJOAAH2J5cBmVUCENdf4OpPwzjyLq8HtxMFk/O7k+33Ni?=
+ =?us-ascii?Q?4CCha8SqXKNd5J/ibtbb1UhASO76PHhqbezxWWtbuJq9x5fjE9e6MuxZEX2N?=
+ =?us-ascii?Q?vdyPvWACHLx88NgfrYw/z+5QWT9AcQ7YF0UOHfzRYEyrs7PxuIjjGPNruBDx?=
+ =?us-ascii?Q?1f1275ntsD8Jdls08BVNU9hwkUXaKJ8wPjykpaQslP5GDs8j7AENrsjKIoI6?=
+ =?us-ascii?Q?oTMhDf4zi4Mzyqw6OtZHiihrrEqKKF8ScoFufRuNIMwiZJcswhWJx1L8IcHS?=
+ =?us-ascii?Q?xRVrgLxE2vd/HIDAvVI=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f11b449-a4f0-4070-2249-08dad1713077
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2022 18:48:50.0501
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7oWB20hEikuhPnce8hLANLmKz6efhOsBokqtvnpj7xcp7qm2hpveosKyLN2l51mN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR84MB1578
+X-OriginatorOrg: hpe.com
+X-Proofpoint-ORIG-GUID: Yqxb2IqZsYjv72NVa-EjXMaS0IFEBYcq
+X-Proofpoint-GUID: Yqxb2IqZsYjv72NVa-EjXMaS0IFEBYcq
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-28_16,2022-11-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 priorityscore=1501 suspectscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211280137
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rockchip SoCs used to have a random number generator as part of their
-crypto device, and support for it has to be added to the corresponding
-driver. However newer Rockchip SoCs like the RK356x have an independent
-True Random Number Generator device. This patch adds a driver for it,
-greatly inspired from the downstream driver.
 
-The TRNG device does not seem to have a signal conditionner and the FIPS
-140-2 test returns a lot of failures. They can be reduced by increasing
-RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
-has been adjusted to get ~90% of successes and the quality value has
-been set accordingly.
 
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
----
- drivers/char/hw_random/Kconfig        |  14 ++
- drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/rockchip-rng.c | 250 ++++++++++++++++++++++++++
- 3 files changed, 265 insertions(+)
- create mode 100644 drivers/char/hw_random/rockchip-rng.c
+> On Fri, Nov 25, 2022 at 09:59:17AM +0100, Ard Biesheuvel wrote:
+> > Note that it is only used in shash implementations, given that they
+> > are the only ones that may receive unbounded inputs.
+>=20
+> Although typical usage probably doesn't stress this, the length of the
+> additional associated data presented to aead implementations is
+> unconstrained as well. At least in x86, they can end up processing
+> multiple megabytes in one chunk like the hash functions (if the
+> associated data is a big buffer described by a sg list created
+> with sg_init_one()).
+>=20
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 3da8e85f8aae..8e5c88504f72 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -549,6 +549,20 @@ config HW_RANDOM_CN10K
- 	 To compile this driver as a module, choose M here.
- 	 The module will be called cn10k_rng. If unsure, say Y.
- 
-+config HW_RANDOM_ROCKCHIP
-+        tristate "Rockchip True Random Number Generator"
-+        depends on HW_RANDOM && (ARCH_ROCKCHIP || COMPILE_TEST)
-+        depends on HAS_IOMEM
-+        default HW_RANDOM
-+        help
-+          This driver provides kernel-side support for the True Random Number
-+          Generator hardware found on some Rockchip SoC like RK3566 or RK3568.
-+
-+          To compile this driver as a module, choose M here: the
-+          module will be called rockchip-rng.
-+
-+          If unsure, say Y.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 3e948cf04476..b7e989535fd6 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
- obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
- obj-$(CONFIG_HW_RANDOM_CN10K) += cn10k-rng.o
- obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) += mpfs-rng.o
-+obj-$(CONFIG_HW_RANDOM_ROCKCHIP) += rockchip-rng.o
-diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
-new file mode 100644
-index 000000000000..18cdd91ad8c3
---- /dev/null
-+++ b/drivers/char/hw_random/rockchip-rng.c
-@@ -0,0 +1,250 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * rockchip-rng.c True Random Number Generator driver for Rockchip SoCs
-+ *
-+ * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
-+ * Copyright (c) 2022, Aurelien Jarno
-+ * Authors:
-+ *  Lin Jinhan <troy.lin@rock-chips.com>
-+ *  Aurelien Jarno <aurelien@aurel32.net>
-+ */
-+#include <linux/clk.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of_platform.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/reset.h>
-+#include <linux/slab.h>
-+
-+#define RK_RNG_AUTOSUSPEND_DELAY	100
-+#define RK_RNG_MAX_BYTE			32
-+#define RK_RNG_POLL_PERIOD_US		100
-+#define RK_RNG_POLL_TIMEOUT_US		10000
-+
-+/*
-+ * TRNG collects osc ring output bit every RK_RNG_SAMPLE_CNT time. The value is
-+ * a tradeoff between speed and quality and has been adjusted to get a quality
-+ * of ~900 (~90% of FIPS 140-2 successes).
-+ */
-+#define RK_RNG_SAMPLE_CNT		1000
-+
-+/* TRNG registers from RK3568 TRM-Part2, section 5.4.1 */
-+#define TRNG_RST_CTL			0x0004
-+#define TRNG_RNG_CTL			0x0400
-+#define TRNG_RNG_CTL_LEN_64_BIT		(0x00 << 4)
-+#define TRNG_RNG_CTL_LEN_128_BIT	(0x01 << 4)
-+#define TRNG_RNG_CTL_LEN_192_BIT	(0x02 << 4)
-+#define TRNG_RNG_CTL_LEN_256_BIT	(0x03 << 4)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_0	(0x00 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_1	(0x01 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_2	(0x02 << 2)
-+#define TRNG_RNG_CTL_OSC_RING_SPEED_3	(0x03 << 2)
-+#define TRNG_RNG_CTL_ENABLE		BIT(1)
-+#define TRNG_RNG_CTL_START		BIT(0)
-+#define TRNG_RNG_SAMPLE_CNT		0x0404
-+#define TRNG_RNG_DOUT_0			0x0410
-+#define TRNG_RNG_DOUT_1			0x0414
-+#define TRNG_RNG_DOUT_2			0x0418
-+#define TRNG_RNG_DOUT_3			0x041c
-+#define TRNG_RNG_DOUT_4			0x0420
-+#define TRNG_RNG_DOUT_5			0x0424
-+#define TRNG_RNG_DOUT_6			0x0428
-+#define TRNG_RNG_DOUT_7			0x042c
-+
-+struct rk_rng {
-+	struct hwrng rng;
-+	void __iomem *base;
-+	struct reset_control *rst;
-+	int clk_num;
-+	struct clk_bulk_data *clk_bulks;
-+};
-+
-+/* The mask determine the bits that are updated */
-+static void rk_rng_write_ctl(struct rk_rng *rng, u32 val, u32 mask)
-+{
-+	writel_relaxed((mask << 16) | val, rng->base + TRNG_RNG_CTL);
-+}
-+
-+static int rk_rng_init(struct hwrng *rng)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+	int ret;
-+
-+	/* start clocks */
-+	ret = clk_bulk_prepare_enable(rk_rng->clk_num, rk_rng->clk_bulks);
-+	if (ret < 0) {
-+		dev_err((struct device *) rk_rng->rng.priv,
-+			"Failed to enable clks %d\n", ret);
-+		return ret;
-+	}
-+
-+	/* set the sample period */
-+	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
-+
-+	/* set osc ring speed and enable it */
-+	reg = TRNG_RNG_CTL_LEN_256_BIT |
-+		   TRNG_RNG_CTL_OSC_RING_SPEED_0 |
-+		   TRNG_RNG_CTL_ENABLE;
-+	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-+
-+	return 0;
-+}
-+
-+static void rk_rng_cleanup(struct hwrng *rng)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+
-+	/* stop TRNG */
-+	reg = 0;
-+	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-+
-+	/* stop clocks */
-+	clk_bulk_disable_unprepare(rk_rng->clk_num, rk_rng->clk_bulks);
-+}
-+
-+static int rk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-+	u32 reg;
-+	int ret = 0;
-+	int i;
-+
-+	pm_runtime_get_sync((struct device *) rk_rng->rng.priv);
-+
-+	/* Start collecting random data */
-+	reg = TRNG_RNG_CTL_START;
-+	rk_rng_write_ctl(rk_rng, reg, reg);
-+
-+	ret = readl_poll_timeout(rk_rng->base + TRNG_RNG_CTL, reg,
-+				 !(reg & TRNG_RNG_CTL_START),
-+				 RK_RNG_POLL_PERIOD_US,
-+				 RK_RNG_POLL_TIMEOUT_US);
-+	if (ret < 0)
-+		goto out;
-+
-+	/* Read random data stored in the registers */
-+	ret = min_t(size_t, max, RK_RNG_MAX_BYTE);
-+	for (i = 0; i < ret; i += 4) {
-+		*(u32 *)(buf + i) = readl_relaxed(rk_rng->base + TRNG_RNG_DOUT_0 + i);
-+	}
-+
-+out:
-+	pm_runtime_mark_last_busy((struct device *) rk_rng->rng.priv);
-+	pm_runtime_put_sync_autosuspend((struct device *) rk_rng->rng.priv);
-+
-+	return ret;
-+}
-+
-+static int rk_rng_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct rk_rng *rk_rng;
-+	int ret;
-+
-+	rk_rng = devm_kzalloc(dev, sizeof(struct rk_rng), GFP_KERNEL);
-+	if (!rk_rng)
-+		return -ENOMEM;
-+
-+	rk_rng->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(rk_rng->base))
-+		return PTR_ERR(rk_rng->base);
-+
-+	rk_rng->clk_num = devm_clk_bulk_get_all(dev, &rk_rng->clk_bulks);
-+	if (rk_rng->clk_num < 0)
-+		return dev_err_probe(dev, rk_rng->clk_num,
-+				     "Failed to get clks property\n");
-+
-+	rk_rng->rst = devm_reset_control_array_get(&pdev->dev, false, false);
-+	if (IS_ERR(rk_rng->rst))
-+		return dev_err_probe(dev, PTR_ERR(rk_rng->rst),
-+				     "Failed to get reset property\n");
-+
-+	reset_control_assert(rk_rng->rst);
-+	udelay(2);
-+	reset_control_deassert(rk_rng->rst);
-+
-+	platform_set_drvdata(pdev, rk_rng);
-+
-+	rk_rng->rng.name = dev_driver_string(dev);
-+#ifndef CONFIG_PM
-+	rk_rng->rng.init = rk_rng_init;
-+	rk_rng->rng.cleanup = rk_rng_cleanup;
-+#endif
-+	rk_rng->rng.read = rk_rng_read;
-+	rk_rng->rng.priv = (unsigned long) dev;
-+	rk_rng->rng.quality = 900;
-+
-+	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
-+	pm_runtime_use_autosuspend(dev);
-+	pm_runtime_enable(dev);
-+
-+	ret = devm_hwrng_register(dev, &rk_rng->rng);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register Rockchip hwrng\n");
-+
-+	dev_info(&pdev->dev, "Registered Rockchip hwrng\n");
-+
-+	return 0;
-+}
-+
-+static int rk_rng_remove(struct platform_device *pdev)
-+{
-+	pm_runtime_disable(&pdev->dev);
-+
-+	return 0;
-+}
-+
-+#ifdef CONFIG_PM
-+static int rk_rng_runtime_suspend(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	rk_rng_cleanup(&rk_rng->rng);
-+
-+	return 0;
-+}
-+
-+static int rk_rng_runtime_resume(struct device *dev)
-+{
-+	struct rk_rng *rk_rng = dev_get_drvdata(dev);
-+
-+	return rk_rng_init(&rk_rng->rng);
-+}
-+#endif
-+
-+static const struct dev_pm_ops rk_rng_pm_ops = {
-+	SET_RUNTIME_PM_OPS(rk_rng_runtime_suspend,
-+				rk_rng_runtime_resume, NULL)
-+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-+				pm_runtime_force_resume)
-+};
-+
-+static const struct of_device_id rk_rng_dt_match[] = {
-+	{
-+		.compatible = "rockchip,rk3568-rng",
-+	},
-+	{},
-+};
-+
-+MODULE_DEVICE_TABLE(of, rk_rng_dt_match);
-+
-+static struct platform_driver rk_rng_driver = {
-+	.driver	= {
-+		.name	= "rockchip-rng",
-+		.pm	= &rk_rng_pm_ops,
-+		.of_match_table = rk_rng_dt_match,
-+	},
-+	.probe	= rk_rng_probe,
-+	.remove = rk_rng_remove,
-+};
-+
-+module_platform_driver(rk_rng_driver);
-+
-+MODULE_DESCRIPTION("Rockchip True Random Number Generator driver");
-+MODULE_AUTHOR("Lin Jinhan <troy.lin@rock-chips.com>, Aurelien Jarno <aurelien@aurel32.net>");
-+MODULE_LICENSE("GPL v2");
--- 
-2.35.1
+Reviewing the two arm64 aead drivers, aes-ce-ccm-glue.c solves that by
+including this in the do/while loop in ccm_calculate_auth_mac():
+                n =3D min_t(u32, n, SZ_4K); /* yield NEON at least every 4k=
+ */
+
+That was added by 36a916af641 ("crypto: arm64/aes-ccm - yield NEON
+when processing auth-only data") in 2021, also relying on
+41691c44606b ("crypto: arm64/aes-ccm - reduce NEON begin/end calls
+for common case").
+
+ghash-ce-glue.c seems to be missing that in its similar function named
+gcm_calculate_auth_mac().
 
