@@ -2,396 +2,188 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81756C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 14:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E92C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 16:58:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232353AbiK1OHo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Nov 2022 09:07:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34344 "EHLO
+        id S232351AbiK1Q61 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 11:58:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232357AbiK1OHR (ORCPT
+        with ESMTP id S231925AbiK1Q6J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2022 09:07:17 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3F621880;
-        Mon, 28 Nov 2022 06:07:01 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id z92so5104818ede.1;
-        Mon, 28 Nov 2022 06:07:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XPZ1yEYU+LcQuFKSfm/DvZBF++ncKeX+yPp3Nyjodac=;
-        b=W/G2U7QDAYEQqo5ASUuXL1K7xXq11C2mpJqjXntBZ/lVDqxNyNXm6QIFB0kBkrnh0Y
-         THJ7hV16LFZZTecJc/glAARr1O9a3Z82X5QQWnK6quxiS3Gq1/soYSOIpTwmhy1KnXrn
-         IJAWL0T026U0A8l4u7K3OHDNURF1LPav62kX2/VVZUXCzaaawjA2ztwnbBX7eAVr7pGY
-         dKldZ68vCsdRIdTkXvozFiqwisVQX5ukEJyfx5ZrY15sEA7pl3NP0qhyPxXgssWwjaTv
-         2PvP6FkMptInplGIaiGTAh9cF3ISS7aG7kvUaccjWDTkl6DBuo57bgH+LiVWXogX60z2
-         sTLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPZ1yEYU+LcQuFKSfm/DvZBF++ncKeX+yPp3Nyjodac=;
-        b=mYXpIJVhZj+/dQfatP88Cq5iJxfz9Cbxyz5W2dMJrjds2ua70sdTpotxTHUM9sJVUE
-         hIXCpj/InLjmWAMBKau8j6ztstFF1TgQE9BOzs9YSSl15KaaAR12Cfr5aYrs7nItN0K3
-         bG7XXVRaG9PsH1cmMXjPV5FZHK0aeyJpLoHOUKtVqJbJz1TMaxS9xNkwr6rFZCoHakIz
-         JnVOBsewl+yOIzt7jnNiGQH1EEbuJsxWxEZFAKfk/wxA83dwxlMf52i4NWwXEBXXAfhj
-         QoJ8j83B4CmLoYiD5yVSJYEJmereS8aMoHNL+HJydhPn5SoiLcRZkXabQX2JBu0SkTwO
-         YWPQ==
-X-Gm-Message-State: ANoB5pmhhfhZrf5XMoY7KASor2H1U0QPOGmPXOb7rHf+0fetcfGO4VAN
-        a+1zD30XtHXmoQLzM1sjv/U=
-X-Google-Smtp-Source: AA0mqf5Us/FCVkHVWVt2eQM2DDH17wgN8KA2NZ9LEEnWTsrqQzt9sGX/sSKGU4K2bF8URsZvv9anWg==
-X-Received: by 2002:a05:6402:5c7:b0:469:6e8f:74c1 with SMTP id n7-20020a05640205c700b004696e8f74c1mr29979452edx.334.1669644420057;
-        Mon, 28 Nov 2022 06:07:00 -0800 (PST)
-Received: from ?IPV6:2a04:241e:502:a080:dd7d:f55:c470:bcc1? ([2a04:241e:502:a080:dd7d:f55:c470:bcc1])
-        by smtp.gmail.com with ESMTPSA id hh1-20020a170906a94100b007bdc2de90e6sm3062569ejb.42.2022.11.28.06.06.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Nov 2022 06:06:57 -0800 (PST)
-Message-ID: <45959f08-9d77-6585-2f21-41bfceeaabd6@gmail.com>
-Date:   Mon, 28 Nov 2022 16:06:54 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v8 00/26] tcp: Initial support for RFC5925 auth option
+        Mon, 28 Nov 2022 11:58:09 -0500
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD0012AF7;
+        Mon, 28 Nov 2022 08:58:00 -0800 (PST)
+Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ASGbpE4027841;
+        Mon, 28 Nov 2022 16:57:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pps0720;
+ bh=FObPKKabfnw+zUHRRuyWjF7/0t66BQmgmBJeN0pJ+AI=;
+ b=cGhf3Nvf3XswMcNhD4HcSekVzb7sq/wIHQli1cJYDNTlmKPcd1MZYcXFmn+/ULuRXDtW
+ Z+dA1nKmPG3Uu5hHhr3ENfYx4BpQygzJ2AlV2mTucjGDt4HiWlLQQhyK4zIjqUuUXIjY
+ jAy4JE1uaE0SqkR+o/br2DWCbsehnaw7OS8Y7kuO7x4NbVUMe8PmUUz3Fzm8FyJetwlB
+ RgTtpZ9doCOUDRmOQDt6clnJNBKgaH7R2MwH9o8W1jtSA2/to9o/MmtRouxkZNQ2sHCA
+ rrhOvJaHJGfln0mrTp59sfp9oybZ9hO0Jjq7nJHY2V3s4w9gH9PM4gmpI05N9a1exyH3 dQ== 
+Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3m50nur4xs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Nov 2022 16:57:42 +0000
+Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id A8EA32FCE7;
+        Mon, 28 Nov 2022 16:57:40 +0000 (UTC)
+Received: from p1wg14923.americas.hpqcorp.net (10.119.18.111) by
+ p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Mon, 28 Nov 2022 04:57:26 -1200
+Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
+ via Frontend Transport; Mon, 28 Nov 2022 04:57:26 -1200
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.15; Mon, 28 Nov 2022 16:57:25 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SDSus599kLoswdxKIZdGiIat7OHwh+c++3B28ozO5w3v75QFaBrURReKyUTaUS3m+PtTTPOhJO//2nKg3Un/1NAOp3lq/pFQis82b7ZrP5oyYKAe4FqTJQULov88WHa/b2BiSXLaB9xiqZsGkd0LKfxnMvtGrQ17UnrggCY+cPe98xF8W8yAKayggI1xuY7yUx8nNobDH2vuj94TUU9KBkO1i2rYJRsIQa0mAojEgeJZszrXd5IGviUG5+cJNdSujBj/7JgVjOYrTt1YR9cQBOMn2ZKEFQYTD3tKFcSUCg1VkIIvwosLyn825XuMd0+hsyoAPQDEBgc1k8t7qoxp0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FObPKKabfnw+zUHRRuyWjF7/0t66BQmgmBJeN0pJ+AI=;
+ b=VYC5hI/KthIXTM0lM1L3pu5lu8+Wnnl6ebpzsUi7tP0F8HJlXg/25j74AYT9AWx/RNqTHMhzZoLCsaIoZflAi9geHydtk3Gk8uBp49qi0OUoDFkzaqcB8AKxeP2G4YLoTWqEnoWliuaQDCI7ncYdYy1OH8OSOIfWUyH5yeGPjNVl/2ZW+0qMtK/qBWPo1Tq6uqz59tTL4+LTkstV2ItpNKraJSPkezPQHMWgDWweX5IAz/2iUZKEANx4eECbZhE7MD89IAPxvgcivCnqlmX0pYSIUZ0d5P1Iub8Es1gfbaLNF175C8oKvEtjABetCKWlAlXhs3NN78maMfm4E99szg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
+ by PH0PR84MB1810.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:161::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.21; Mon, 28 Nov
+ 2022 16:57:19 +0000
+Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::5511:bd85:6961:816]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::5511:bd85:6961:816%9]) with mapi id 15.20.5857.023; Mon, 28 Nov 2022
+ 16:57:19 +0000
+From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>
+CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "ap420073@gmail.com" <ap420073@gmail.com>,
+        "David.Laight@aculab.com" <David.Laight@aculab.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Topic: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Index: AQHY+XHqfLLvXNGxcESumjNg7U4Mn65BZh+AgA36OwCAAAUngIAAAQwAgADfYdk=
+Date:   Mon, 28 Nov 2022 16:57:19 +0000
+Message-ID: <MW5PR84MB1842E182C47F77FE8C8E755BAB139@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20221103042740.6556-1-elliott@hpe.com>
+ <20221116041342.3841-1-elliott@hpe.com>
+ <20221116041342.3841-11-elliott@hpe.com> <Y3TF7/+DejcnN0eV@zx2c4.com>
+ <Y4B/kjS0lgzdUJHG@gondor.apana.org.au>
+ <CAMj1kXHHm+L=qE5opDXhjoWZt+1eKXFeGVS=OdvyF0VNFZivCA@mail.gmail.com>
+ <Y4CExnFX46mk4/1+@gondor.apana.org.au>
+In-Reply-To: <Y4CExnFX46mk4/1+@gondor.apana.org.au>
+Accept-Language: en-US
 Content-Language: en-US
-From:   Leonard Crestez <cdleonard@gmail.com>
-To:     David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Yonatan Link <ylinik@drivenets.com>
-Cc:     Francesco Ruggeri <fruggeri@arista.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        Philip Paeps <philip@trouble.is>,
-        Shuah Khan <shuah@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Caowangbao <caowangbao@huawei.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Florin Popescu <fpopescu@drivenets.com>
-References: <cover.1662361354.git.cdleonard@gmail.com>
-In-Reply-To: <cover.1662361354.git.cdleonard@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|PH0PR84MB1810:EE_
+x-ms-office365-filtering-correlation-id: d96abbb4-9d86-4be3-ed7d-08dad1619c5f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UYCoF06RWs5Y+HU0ovuZVzEudWZ64ejivXGiyRZw3as95rLwJUIK+4PbE68JwQGpKUasizCZ0RGrG55cTDCCg87GXIfQBDuFKQcr6OlMNPtH4KPhf586Zfw6+dQLtAOWcUB/jtYlCG1h3eX0BUYthLpCGVqjB6fz2HBUBQuPg7nhO3yYOprsrqOHByenor87ImneZZR7l7dzgWlbZRWDA2fDrs2uQgI4Am91TTUnjF0arWzAMGAeoRJ3iaUM3Xqx94reXs+xFJqOYdGYs2RgzVn9QH9QnDapEyaN3uYiy1a35ZwvlGwVLNo4BKPRAzQg31h9gIK6URm0zRjVRz9P0IdaO7+cE2TS9/uoiupDGJpcEhIgJ0rUqkBpOMWhGBtIpYO3FB+H1DfikKKtDyqpcgj4tmBMSz1BAeeGUSIjDSvJNbvz8e5RmdjZBaZBqObBKrlHlzhoXKnThx1JfrWhYc6ZOhHhm0x8bvAJPaEPLRI2tPv1BECqfo6bvShvuXtWdY7YW3gFPRaLlHIivyd7Layf+qoDAtfH+7GddY4QWjeheYGO3tHFI8n7X++K3BXwSzUpq7QiL1V8YJjb47Q/5N/cE9sD4v6VWsAcGY0uALoBChUI2t9a9f4i0lWAFKi48OAEWMpaKViMVhYX1W7CWbGQYyegU4Xov2CXSlh7gnnb03f9+fA5QbJ3MsiGwuY8KSQfOmRhNdYIwUOkAUrh2g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(376002)(396003)(366004)(39860400002)(136003)(346002)(451199015)(2906002)(83380400001)(41300700001)(5660300002)(8936002)(7416002)(52536014)(186003)(33656002)(86362001)(55016003)(122000001)(38100700002)(38070700005)(82960400001)(478600001)(54906003)(316002)(26005)(110136005)(9686003)(7696005)(6506007)(71200400001)(8676002)(66946007)(64756008)(76116006)(66446008)(4326008)(66476007)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LrwP+9P/4ZyeogOf5Eha8cYZ15QU+w25rw/lI6DK787Z2QtLxSD83+R3ruAF?=
+ =?us-ascii?Q?eXdJ5Z+FCf7EhKZtXqyvaBKC66tB75P+w7PVmvTR4tETuI48jRi8Moy68f4j?=
+ =?us-ascii?Q?STqNSbw6wnlIgTGVLthRq2mpIRnh9nNJRhYzOJ3RsiiFGTRcxnZBaQ4aIByb?=
+ =?us-ascii?Q?SuZSLMsHzsyitFEK7z7gT0/rN/hyR3BKFWpR4qkxlH8sEEFGLwvbUbqrjt/2?=
+ =?us-ascii?Q?JUieicdj5zopuFW/D9h8Y6iGfYkbG7voZU2prHhfrdwAFu7P3IgX3/1Ot0d/?=
+ =?us-ascii?Q?tbJW4qVg21H/jO7clWiDpbrt3JIXLfCjrGELLq7BfUTe4prLjKq4fXbJca6p?=
+ =?us-ascii?Q?NGaEeze3DZYWZIpGIyk9/dfHgWQIAa3us9BLsbhThPu1HvOYoPVetnXE0AU4?=
+ =?us-ascii?Q?A7p2H+DJ/7F7dslQi9N/yyhurZlYXutq+/C/EEftrXAu9ltVMikHg6wm7zU/?=
+ =?us-ascii?Q?lSy7F2fMMlxys24cW1qopAVQsAKgKnNxa9gzuLziq3D/DrK5S/0Uwg+/jgQ4?=
+ =?us-ascii?Q?p42gxWqeTTZI8ZUjU0gqYlrR0Lo50ZvVKW9gGLyAmsOsMF5wdjIGsVLZS6TL?=
+ =?us-ascii?Q?a4LlZ/ZKENujzZqc5cWkJ9COrNMbuiPmC0JBc2bE/y0hT5ZpC1xWPbEZ+wk0?=
+ =?us-ascii?Q?IstuQ3OmyaV/MGQxPMgoy4J0eZjf4rRXbf91i3QjUv5VechztB/zGVbkg3z9?=
+ =?us-ascii?Q?A8So0+Bx30q3ttj6iKLEhxSb3NbfmDh6/nSGS6MrEfh71Jb7fqUC8cSb7aNU?=
+ =?us-ascii?Q?Jsc3LfdT/frZJ7LYRoBfT6IISHZyhkfQ9ERoiroYS0cGzqLP/Vit3LsRZwQ6?=
+ =?us-ascii?Q?4BpxYzohjeWedo8/U3hRH4NyRoZlhSHTIxUG3uQkO5o9TN5cNdqd158z5BCC?=
+ =?us-ascii?Q?vi9I+CcDntduPfkm/QdeMtDziSXmuaKf3YpYlTpAxXUUaLzycu+LLq9TWyY4?=
+ =?us-ascii?Q?x+OW2TbsPn66kKdgOGWW70UvbRu9o64MCXHGUW7NybJ3LMg15zKcj6aY3cmx?=
+ =?us-ascii?Q?Bngg/tL43qZg7rR9o/jrgUIcrLHWc28VStEfvUZcvszGnBldc7yBuCO00o8G?=
+ =?us-ascii?Q?KxugP4r1UmeK86CJS3XEF/H2NtKwM7R1jB68MhyyqLasr+6L24N43NLsoajw?=
+ =?us-ascii?Q?YvUx+Na9Is3mSGkpHn/6J07cu0GDzyra+ucDs4UzvnRpvj/dEJHVZtPkmUtc?=
+ =?us-ascii?Q?BpgkhxC2biEmY8yrpq8SxZphpXtb13FDJMlWYTj3S5fyijf9PeondKZG++W1?=
+ =?us-ascii?Q?T8Q8g2tT4U/1exZpMJbQ+6aVQAFX5FeLrWtdBX/YgRX2BD/OCfXCMDBdUTHV?=
+ =?us-ascii?Q?eC5hKJi+MOwaqV7WOgFahv8MrRZv6UH82VIjQRNo/IwQ8QvpSV/h0LraPDQo?=
+ =?us-ascii?Q?vZ+EpyctSbvasXO82UGL/7/rRSRnuciENi+JJNwD0q2Tvc/DmokB7kK9JOfF?=
+ =?us-ascii?Q?zYJQPrUkpWD9RJLqT0M59DBM2MHdga7da4orW6UTEbBogoJ0wQfIR62KoIgJ?=
+ =?us-ascii?Q?Fc8CsfBASG76zlsQEAhXyFyx2itth9/YNuoJOBWxDYOdJM8fpPOdBTu8ACka?=
+ =?us-ascii?Q?5Ainskbp+RqwjZn6sEw=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: d96abbb4-9d86-4be3-ed7d-08dad1619c5f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2022 16:57:19.1599
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kapwlUOMdFvgV37uxn07wGrDnhWo/S4bjDt8MGfaeBPaMwt4nN+KuTgi288HJIuw
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR84MB1810
+X-OriginatorOrg: hpe.com
+X-Proofpoint-ORIG-GUID: eSFy8vhXeCa6zYoqejnMm7vEz4uodLIq
+X-Proofpoint-GUID: eSFy8vhXeCa6zYoqejnMm7vEz4uodLIq
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-28_15,2022-11-28_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 mlxscore=0 phishscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211280125
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
 
-I need to inform you that I have given up on pushing this series 
-upstream. This work might be continued by Yonatan Linik 
-<ylinik@drivenets.com> who works for the same employer (I will stop 
-working there).
+On Fri, Nov 25, 2022 at 09:59:17AM +0100, Ard Biesheuvel wrote:
+> On arm64, this is implemented in an assembler macro 'cond_yield' so we
+> don't need to preserve/restore the SIMD state state at all if the
+> yield is not going to result in a call to schedule(). For example, the
+> SHA3 code keeps 400 bytes of state in registers, which we don't want
+> to save and reload unless needed. (5f6cb2e617681 'crypto:
+> arm64/sha512-ce - simplify NEON yield')
 
-The main reason for abandoning this is that engaging in zero-sum 
-competition in upstream is the last thing I ever want to do.
+That sounds like the optimal approach. There is a cost to unnecessary
+kernel_fpu_begin()/end() calls - increasing their usage in the x86
+sha512 driver added 929 us during one boot. The cond_yield check is
+just a few memory reads and conditional branches.
 
---
-Bye,
-Leonard
+I see that is built on the asm-offsets.c technique mentioned by
+Dave Hansen in the x86 aria driver thread.
 
-On 9/5/22 10:05, Leonard Crestez wrote:
-> This is similar to TCP-MD5 in functionality but it's sufficiently
-> different that packet formats and interfaces are incompatible.
-> Compared to TCP-MD5 more algorithms are supported and multiple keys
-> can be used on the same connection but there is still no negotiation
-> mechanism.
-> 
-> Expected use-case is protecting long-duration BGP/LDP connections
-> between routers using pre-shared keys. The goal of this series is to
-> allow routers using the Linux TCP stack to interoperate with vendors
-> such as Cisco and Juniper. An fully-featured userspace implementation
-> using this patchset exists but it is not open.
-> 
-> 
-> A completely unrelated series that implements the same features was posted
-> recently: https://lore.kernel.org/netdev/20220818170005.747015-1-dima@arista.com/
-> 
-> The biggest difference is that this series puts TCP-AO key on a global
-> instead of per-socket list and that it attempts to make kernel-mode
-> key selection decisions instead of very strictly requiring userspace
-> to make all decisions.
-> 
-> I believe my approach greatly simplifies userspace implementation.
-> The biggest difference in this iteration of the patch series is adding
-> per-key lifetime values based on RFC8177 in order to implement
-> kernel-mode key rollover.
-> 
-> Older versions still required userspace to tweak the NOSEND/NORECV flags
-> and always pick rnextkeyid explicitly, but now no active "key management"
-> should be required on established socket - Just set correct flags and
-> expiration dates and the kernel can perform key rollover itself. You can
-> see a (simple) test of that behavior here:
-> 
-> https://github.com/cdleonard/tcp-authopt-test/blob/main/tcp_authopt_test/test_lifetime.py
-> 
-> The main implementation of this behavior is patch 17.
-> 
-> 
-> Very very old versions of this series had per-socket keys but that
-> approach was prone to an issue when key change made on a listen socket
-> between "synack" and "accept" did not affect the new socket.
-> 
-> My solution was to make keys global, the Arista solution is to require
-> userspace to query the key list on accepted sockets and update them.
-> This offloads responsibility for an ABI race to userspace.
-> It can be made to work.
-> 
-> 
-> Here are some known flaws and limitations:
-> 
-> * Crypto API is used with buffers on the stack and inside struct sock,
-> this might not work on all arches. I'm currently only testing x64 VMs
-> * Interaction with FASTOPEN not tested.
-> * Traffic key is not cached (reducing performance).
-> * All lookups examine all keys, ignoring optimization opportunities
-> * Overlaping MKTs can be configured despite what RFC5925 says. This is
-> considered "misconfiguration by userspace" and it would make sense for
-> the kernel to be more aggressive here.
-> 
-> Some testing support is included in nettest and fcnal-test.sh, similar
-> to the current level of tcp-md5 testing.
-> 
-> A more elaborate test suite using pytest and scapy is available out of
-> tree: https://github.com/cdleonard/tcp-authopt-test
-> There is an automatic system that runs that test suite in vagrant in
-> gitlab-ci: https://gitlab.com/cdleonard/vagrantcpao
-> That test suite fully covers the ABI of this patchset.
-> 
-> Changes for frr (obsolete): https://github.com/FRRouting/frr/pull/9442
-> That PR was made early for ABI feedback, it has many issues.
-> 
-> Changes for yabgp (obsolete): https://github.com/cdleonard/yabgp/commits/tcp_authopt
-> This was used for interoperability testing with cisco.
-> Would need updates for global keys to avoid leaks.
-> 
-> 
-> Changes since PATCH v7:
-> * Add lifetime fields to struct tcp_authopt_key
-> * Fix not checking MD5 after unexpected AO.
-> Link to v7: https://lore.kernel.org/netdev/cover.1660852705.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v6:
-> * Squash "remove unused noops" patch (forgot to do this before v5 send).
-> * Make TCP_REPAIR_AUTHOPT fail if (!tp->repair)
-> * Add {snd,rcv}_seq to struct tcp_repair_authopt next to {snd,rcv}_sne.
-> The fact that internally snd_sne is maintained as a 64-bit extension of
-> sne_nxt is a problem for TCP_REPAIR implementation in userspace which might
-> not have access to snd_nxt during live traffic. By exposing a full 64-bit
-> “recent sequence number” to userspace it's possible to ignore which exact
-> SEQ number the SNE value is an extension of.
-> * Fix ipv6_addr_is_prefix helper; it was incorrect and dependant on
-> uninitialized stack memory. This was caught by test suite after many rebases.
-> * Implement ipv4-mapped-ipv6 support, request by Eric Dumazet
-> Link: https://lore.kernel.org/netdev/cover.1658815925.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v5:
-> * Rebased on recent net-next, including recent changes refactoring md5
-> * Use to skb_drop_reason
-> * Fix using sock_kmalloc for key alloc but regular kfree for free. Use kmalloc
-> because keys are global
-> * Fix mentioning non-existent copy_from_sockopt in doc for _copy_from_sockptr_tolerant
-> * If no valid keys are available for a destination then report a socket error
-> instead of sending unsigned traffic
-> * Remove several noop implementations which are always called from ifdef
-> * Fix build issues in all scenarios, including -Werror at every point.
-> * Split "tcp: Refactor tcp_inbound_md5_hash into tcp_inbound_sig_hash" into a separate commit.
-> * Add TCP_AUTHOPT_FLAG_ACTIVE to distinguish between "keys configured for socket"
-> and "connection authenticated". A listen socket with authentication enabled will return
-> other sockets with authentication enabled on accept() but if no key is configured for the
-> peer then authentication will be inactive.
-> * Add support for TCP_REPAIR_AUTHOPT new sockopts which loads/saves the AO-specific
-> information.
-> Link: https://lore.kernel.org/netdev/cover.1643026076.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v4:
-> * Move the traffic_key context_bytes header to stack. If it's a constant
-> string then ahash can fail unexpectedly.
-> * Fix allowing unsigned traffic if all keys are marked norecv.
-> * Fix crashing in __tcp_authopt_alg_init on failure.
-> * Try to respect the rnextkeyid from SYN on SYNACK (new patch)
-> * Fix incorrect check for TCP_AUTHOPT_KEY_DEL in __tcp_authopt_select_key
-> * Improve docs on __tcp_authopt_select_key
-> * Fix build with CONFIG_PROC_FS=n (kernel build robot)
-> * Fix build with CONFIG_IPV6=n (kernel build robot)
-> Link: https://lore.kernel.org/netdev/cover.1640273966.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v3:
-> * Made keys global (per-netns rather than per-sock).
-> * Add /proc/net/tcp_authopt with a table of keys (not sockets).
-> * Fix part of the shash/ahash conversion having slipped from patch 3 to patch 5
-> * Fix tcp_parse_sig_options assigning NULL incorrectly when both MD5 and AO
-> are disabled (kernel build robot)
-> * Fix sparse endianness warnings in prefix match (kernel build robot)
-> * Fix several incorrect RCU annotations reported by sparse (kernel build robot)
-> Link: https://lore.kernel.org/netdev/cover.1638962992.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v2:
-> * Protect tcp_authopt_alg_get/put_tfm with local_bh_disable instead of
-> preempt_disable. This caused signature corruption when send path executing
-> with BH enabled was interrupted by recv.
-> * Fix accepted keyids not configured locally as "unexpected". If any key
-> is configured that matches the peer then traffic MUST be signed.
-> * Fix issues related to sne rollover during handshake itself. (Francesco)
-> * Implement and test prefixlen (David)
-> * Replace shash with ahash and reuse some of the MD5 code (Dmitry)
-> * Parse md5+ao options only once in the same function (Dmitry)
-> * Pass tcp_authopt_info into inbound check path, this avoids second rcu
-> dereference for same packet.
-> * Pass tcp_request_socket into inbound check path instead of just listen
-> socket. This is required for SNE rollover during handshake and clearifies
-> ISN handling.
-> * Do not allow disabling via sysctl after enabling once, this is difficult
-> to support well (David)
-> * Verbose check for sysctl_tcp_authopt (Dmitry)
-> * Use netif_index_is_l3_master (David)
-> * Cleanup ipvx_addr_match (David)
-> * Add a #define tcp_authopt_needed to wrap static key usage because it looks
-> nicer.
-> * Replace rcu_read_lock with rcu_dereference_protected in SNE updates (Eric)
-> * Remove test suite
-> Link: https://lore.kernel.org/netdev/cover.1635784253.git.cdleonard@gmail.com/
-> 
-> Changes since PATCH v1:
-> * Implement Sequence Number Extension
-> * Implement l3index for vrf: TCP_AUTHOPT_KEY_IFINDEX as equivalent of
-> TCP_MD5SIG_FLAG_IFINDEX
-> * Expand TCP-AO tests in fcnal-test.sh to near-parity with md5.
-> * Show addr/port on failure similar to md5
-> * Remove tox dependency from test suite (create venv directly)
-> * Switch default pytest output format to TAP (kselftest standard)
-> * Fix _copy_from_sockptr_tolerant stack corruption on short sockopts.
-> This was covered in test but error was invisible without STACKPROTECTOR=y
-> * Fix sysctl_tcp_authopt check in tcp_get_authopt_val before memset. This
-> was harmless because error code is checked in getsockopt anyway.
-> * Fix dropping md5 packets on all sockets with AO enabled
-> * Fix checking (key->recv_id & TCP_AUTHOPT_KEY_ADDR_BIND) instead of
-> key->flags in tcp_authopt_key_match_exact
-> * Fix PATCH 1/19 not compiling due to missing "int err" declaration
-> * Add ratelimited message for AO and MD5 both present
-> * Export all symbols required by CONFIG_IPV6=m (again)
-> * Fix compilation with CONFIG_TCP_AUTHOPT=y CONFIG_TCP_MD5SIG=n
-> * Fix checkpatch issues
-> * Pass -rrequirements.txt to tox to avoid dependency variation.
-> Link: https://lore.kernel.org/netdev/cover.1632240523.git.cdleonard@gmail.com/
-> 
-> Changes since RFCv3:
-> * Implement TCP_AUTHOPT handling for timewait and reset replies. Write
-> tests to execute these paths by injecting packets with scapy
-> * Handle combining md5 and authopt: if both are configured use authopt.
-> * Fix locking issues around send_key, introduced in on of the later patches.
-> * Handle IPv4-mapped-IPv6 addresses: it used to be that an ipv4 SYN sent
-> to an ipv6 socket with TCP-AO triggered WARN
-> * Implement un-namespaced sysctl disabled this feature by default
-> * Allocate new key before removing any old one in setsockopt (Dmitry)
-> * Remove tcp_authopt_key_info.local_id because it's no longer used (Dmitry)
-> * Propagate errors from TCP_AUTHOPT getsockopt (Dmitry)
-> * Fix no-longer-correct TCP_AUTHOPT_KEY_DEL docs (Dmitry)
-> * Simplify crypto allocation (Eric)
-> * Use kzmalloc instead of __GFP_ZERO (Eric)
-> * Add static_key_false tcp_authopt_needed (Eric)
-> * Clear authopt_info copied from oldsk in __tcp_authopt_openreq (Eric)
-> * Replace memcmp in ipv4 and ipv6 addr comparisons (Eric)
-> * Export symbols for CONFIG_IPV6=m (kernel test robot)
-> * Mark more functions static (kernel test robot)
-> * Fix build with CONFIG_PROVE_RCU_LIST=y (kernel test robot)
-> Link: https://lore.kernel.org/netdev/cover.1629840814.git.cdleonard@gmail.com/
-> 
-> Changes since RFCv2:
-> * Removed local_id from ABI and match on send_id/recv_id/addr
-> * Add all relevant out-of-tree tests to tools/testing/selftests
-> * Return an error instead of ignoring unknown flags, hopefully this makes
-> it easier to extend.
-> * Check sk_family before __tcp_authopt_info_get_or_create in tcp_set_authopt_key
-> * Use sock_owned_by_me instead of WARN_ON(!lockdep_sock_is_held(sk))
-> * Fix some intermediate build failures reported by kbuild robot
-> * Improve documentation
-> Link: https://lore.kernel.org/netdev/cover.1628544649.git.cdleonard@gmail.com/
-> 
-> Changes since RFC:
-> * Split into per-topic commits for ease of review. The intermediate
-> commits compile with a few "unused function" warnings and don't do
-> anything useful by themselves.
-> * Add ABI documention including kernel-doc on uapi
-> * Fix lockdep warnings from crypto by creating pools with one shash for
-> each cpu
-> * Accept short options to setsockopt by padding with zeros; this
-> approach allows increasing the size of the structs in the future.
-> * Support for aes-128-cmac-96
-> * Support for binding addresses to keys in a way similar to old tcp_md5
-> * Add support for retrieving received keyid/rnextkeyid and controling
-> the keyid/rnextkeyid being sent.
-> Link: https://lore.kernel.org/netdev/01383a8751e97ef826ef2adf93bfde3a08195a43.1626693859.git.cdleonard@gmail.com/tmp/nTkFmWKVCK/0000-cover-letter.patch
-> 
-> Leonard Crestez (26):
->    tcp: authopt: Initial support and key management
->    docs: Add user documentation for tcp_authopt
->    tcp: authopt: Add crypto initialization
->    tcp: Refactor tcp_sig_hash_skb_data for AO
->    tcp: authopt: Compute packet signatures
->    tcp: Refactor tcp_inbound_md5_hash into tcp_inbound_sig_hash
->    tcp: authopt: Hook into tcp core
->    tcp: authopt: Disable via sysctl by default
->    tcp: authopt: Implement Sequence Number Extension
->    tcp: ipv6: Add AO signing for tcp_v6_send_response
->    tcp: authopt: Add support for signing skb-less replies
->    tcp: ipv4: Add AO signing for skb-less replies
->    tcp: authopt: Add NOSEND/NORECV flags
->    tcp: authopt: Add initial l3index support
->    tcp: authopt: Add prefixlen support
->    tcp: authopt: Add send/recv lifetime support
->    tcp: authopt: Add key selection controls
->    tcp: authopt: Add v4mapped ipv6 address support
->    tcp: authopt: Add /proc/net/tcp_authopt listing all keys
->    tcp: authopt: If no keys are valid for send report an error
->    tcp: authopt: Try to respect rnextkeyid from SYN on SYNACK
->    tcp: authopt: Initial support for TCP_AUTHOPT_FLAG_ACTIVE
->    tcp: authopt: Initial implementation of TCP_REPAIR_AUTHOPT
->    selftests: nettest: Rename md5_prefix to key_addr_prefix
->    selftests: nettest: Initial tcp_authopt support
->    selftests: net/fcnal: Initial tcp_authopt support
-> 
->   Documentation/networking/index.rst        |    1 +
->   Documentation/networking/ip-sysctl.rst    |    6 +
->   Documentation/networking/tcp_authopt.rst  |   95 +
->   include/linux/tcp.h                       |   15 +
->   include/net/dropreason.h                  |   16 +
->   include/net/net_namespace.h               |    4 +
->   include/net/netns/tcp_authopt.h           |   12 +
->   include/net/tcp.h                         |   55 +-
->   include/net/tcp_authopt.h                 |  269 +++
->   include/uapi/linux/snmp.h                 |    1 +
->   include/uapi/linux/tcp.h                  |  188 ++
->   net/ipv4/Kconfig                          |   14 +
->   net/ipv4/Makefile                         |    1 +
->   net/ipv4/proc.c                           |    1 +
->   net/ipv4/sysctl_net_ipv4.c                |   39 +
->   net/ipv4/tcp.c                            |  126 +-
->   net/ipv4/tcp_authopt.c                    | 2044 +++++++++++++++++++++
->   net/ipv4/tcp_input.c                      |   55 +-
->   net/ipv4/tcp_ipv4.c                       |  100 +-
->   net/ipv4/tcp_minisocks.c                  |   12 +
->   net/ipv4/tcp_output.c                     |  106 +-
->   net/ipv6/tcp_ipv6.c                       |   70 +-
->   tools/testing/selftests/net/fcnal-test.sh |  329 +++-
->   tools/testing/selftests/net/nettest.c     |  204 +-
->   24 files changed, 3675 insertions(+), 88 deletions(-)
->   create mode 100644 Documentation/networking/tcp_authopt.rst
->   create mode 100644 include/net/netns/tcp_authopt.h
->   create mode 100644 include/net/tcp_authopt.h
->   create mode 100644 net/ipv4/tcp_authopt.c
-> 
-> --
-> 2.25.1
+> Note that it is only used in shash implementations, given that they
+> are the only ones that may receive unbounded inputs.
+
+Although typical usage probably doesn't stress this, the length of the
+additional associated data presented to aead implementations is
+unconstrained as well. At least in x86, they can end up processing
+multiple megabytes in one chunk like the hash functions (if the
+associated data is a big buffer described by a sg list created
+with sg_init_one()).
+
+
