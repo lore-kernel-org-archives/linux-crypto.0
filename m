@@ -2,112 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C30C4321E
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 20:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978BBC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 21:13:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233401AbiK1Ulv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Nov 2022 15:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50992 "EHLO
+        id S234498AbiK1VNO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 16:13:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233310AbiK1Ulu (ORCPT
+        with ESMTP id S234471AbiK1VNH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2022 15:41:50 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DBA614B;
-        Mon, 28 Nov 2022 12:41:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DD679B80FEE;
-        Mon, 28 Nov 2022 20:41:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 175C2C43141;
-        Mon, 28 Nov 2022 20:41:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SJg8wj4K"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669668103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=D8JvkqslPVbF1sVkadwrc/dHj4sGZrwzWhDSPyXC0iA=;
-        b=SJg8wj4KRRLy9GYEMoYu0SdEW67lBhfEBgSjbS7Y5Ldh+fS6U2U9/FkdNSsNEOwiNHtkz+
-        sVISLnKzyPz/JOQ+9fHS8ReK3FKr3zPBD/cTq3WYi1UWFnMobHQe+BUx9qRz4Cv/NjcOul
-        ZCjbDNFsDLsLQ7hio4Yg3cZ3atcl/4I=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f03cb47a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 28 Nov 2022 20:41:42 +0000 (UTC)
-Received: by mail-ua1-f54.google.com with SMTP id x24so4315413uaf.4;
-        Mon, 28 Nov 2022 12:41:42 -0800 (PST)
-X-Gm-Message-State: ANoB5pkUysLhsiBhfMXLfR92/8EKPj75epFR6fn8EymTLZrEJqx9sjFs
-        0QvNudn1Psf2JwSyBrPwc9mtopLX4SKGpTdjQtY=
-X-Google-Smtp-Source: AA0mqf4UPjPrqMrKRlHIidUmjattarRbkI2y9HG3LAX9xwp/oLJ1brY9IeiJRTI7OlH2L1h0PSE8XR88ROmV6anlyfQ=
-X-Received: by 2002:ab0:3899:0:b0:419:1b4a:360b with SMTP id
- z25-20020ab03899000000b004191b4a360bmr5012971uav.102.1669668101214; Mon, 28
- Nov 2022 12:41:41 -0800 (PST)
-MIME-Version: 1.0
-References: <20221128111829.2477505-1-Jason@zx2c4.com> <20221128111829.2477505-4-Jason@zx2c4.com>
- <8f9326ba-f879-4b9e-9e5d-b65cad7cd726@app.fastmail.com> <Y4UKpP7/NOwPIkYe@zx2c4.com>
- <cd01e0b4-579f-48fc-995f-6e1acebd02af@app.fastmail.com> <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
+        Mon, 28 Nov 2022 16:13:07 -0500
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248CEFDB;
+        Mon, 28 Nov 2022 13:13:07 -0800 (PST)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id 8D22B5C008E;
+        Mon, 28 Nov 2022 16:13:06 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute3.internal (MEProxy); Mon, 28 Nov 2022 16:13:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; t=1669669986; x=1669756386; bh=saJdYblUQM
+        ubkBKneHxz9xq/v51yMrwW6TpKBNrxMUc=; b=VNuOzTuWUe4xzXZd1+bVz+AXpG
+        isIWoZxNVSarVwznQVEUr1DB8YcCV8l91Nl+ZYLvHzty2SkT8U+kj0/hKp7O9v4X
+        5XfHiQWDKf0QSPSqsI1R9QsF30O8FdTMwQ4pk0C1oIkJ8jsg8S+Perp9fnrUXDUu
+        J7rhWFbbp4VDCWPrnTRVSIiNRga5HmtksExV75LqtQGIIjkvmY6z9bflKq668RHK
+        OEfiUwzPn+bCUEe0Cyf6/SziB/clx98nHOip/M0bocISbsR8LEOrH5/TWO4Y6iSo
+        cJpd3rghYnHyZ80DCsFjzDGMa0aC2RPQjPyeIiUOCl2ZpsuQYjVOzscMehBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1669669986; x=1669756386; bh=saJdYblUQMubkBKneHxz9xq/v51y
+        MrwW6TpKBNrxMUc=; b=dg4mdK3ypwpaf/P+1QvaxO1OOdXhg/7PvTl1klu5UC4D
+        dgYclGaLJqXuaWZg+bWxxPcZGsbv8PA82hx/LaajCzrwP7qrGprohi2Tljmm22Iu
+        8NLSH5EePfdqgtWt3kziPeOEIRQOH9wkLzJrt4ATB2uLqqBLGIW7XbcdEXSCpiia
+        rxW8XUsgwPBH+gsf+YPkiL2AKgsd13jrgwZOZqj8cWOjSexi4fIjfS2+n+3oSIMS
+        Jb7DuKtuuyhofj9bXWOINcTP3CGA9v6x5G7veJu5AaPbDyhw7NilH/3nCX7msSe4
+        vD8rIyvgSFmnltjr3Ax/TUMJMDQ7oCcwgoKOELicmQ==
+X-ME-Sender: <xms:YiSFYycuprpWWHuR5rUIurZNGq984gCwmPwPdOibr966lxxE6HhKnA>
+    <xme:YiSFY8PMImz5UCV5NMoGY9VR8UI2VSAj3cCCvnCx189FmlhcaryDjnvN-ShjQUcNh
+    bItd1HFZ967tsd_ntk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrjedvgddugeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:YiSFYzi57CPnWDMf2ru1BURcvDRsDQmcL5EGeICDF8aNTMzAuh-_uw>
+    <xmx:YiSFY_-Yto5zpTMKO5bIPpL9KlRKDa4AWZ0TYAEh6XR35Vhz2kewfg>
+    <xmx:YiSFY-sCjDr5rOjb0YxI_1mYCa0Rj77H1-7Zy3sOdZZR-aZLV58cng>
+    <xmx:YiSFY_kldfgFsLHciyaYrp_XVR28m-BClyR9D9ZBTQKkXX8yo2j7uQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 02039B60086; Mon, 28 Nov 2022 16:13:05 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1115-g8b801eadce-fm-20221102.001-g8b801ead
+Mime-Version: 1.0
+Message-Id: <2cb4b4a7-1d39-4f63-aee0-b4fc43efa68d@app.fastmail.com>
 In-Reply-To: <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 28 Nov 2022 21:41:30 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oP4whduVJD7LYpjFaS76yhxd3r1YXRfNhpRBw4QCQe3g@mail.gmail.com>
-Message-ID: <CAHmME9oP4whduVJD7LYpjFaS76yhxd3r1YXRfNhpRBw4QCQe3g@mail.gmail.com>
-Subject: Re: [PATCH v8 3/3] x86: vdso: Wire up getrandom() vDSO implementation
-To:     Arnd Bergmann <arnd@arndb.de>
+References: <20221128111829.2477505-1-Jason@zx2c4.com>
+ <20221128111829.2477505-4-Jason@zx2c4.com>
+ <8f9326ba-f879-4b9e-9e5d-b65cad7cd726@app.fastmail.com>
+ <Y4UKpP7/NOwPIkYe@zx2c4.com>
+ <cd01e0b4-579f-48fc-995f-6e1acebd02af@app.fastmail.com>
+ <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
+Date:   Mon, 28 Nov 2022 22:12:45 +0100
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Jason A . Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Thomas Gleixner <tglx@linutronix.de>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
         linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        x86@kernel.org, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Adhemerval Zanella Netto" <adhemerval.zanella@linaro.org>,
         "Carlos O'Donell" <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>
-Content-Type: text/plain; charset="UTF-8"
+        "Florian Weimer" <fweimer@redhat.com>,
+        "Christian Brauner" <brauner@kernel.org>,
+        "Samuel Neves" <sneves@dei.uc.pt>
+Subject: Re: [PATCH v8 3/3] x86: vdso: Wire up getrandom() vDSO implementation
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey again,
-
-On Mon, Nov 28, 2022 at 9:02 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi Arnd,
->
+On Mon, Nov 28, 2022, at 21:02, Jason A. Donenfeld wrote:
 > On Mon, Nov 28, 2022 at 8:57 PM Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> > On Mon, Nov 28, 2022, at 20:23, Jason A. Donenfeld wrote:
-> > > On Mon, Nov 28, 2022 at 08:18:12PM +0100, Arnd Bergmann wrote:
-> > >> On Mon, Nov 28, 2022, at 12:18, Jason A. Donenfeld wrote:
-> > >
-> > > That's more or less how v7 was, but Thomas thought the x86 stuff should
-> > > be separate. So for v8, the organization is:
-> > >
-> > > 1) generic syscall
-> > > 2) generic vdso
-> > > 3) x86 wiring
-> > >
-> > > The primary advantage is that future archs wanting to add this now can
-> > > just look at commit (3) only, and make a similar commit for that new
-> > > arch.
-> > >
-> > > If you think a different organization outweighs that advantage, can you
-> > > spell out what division of patches you want, and I'll do that for v9?
-> > > Or maybe this v8 is okay?
-> >
-> > My interest is that at the end of the series, all architectures
-> > are hooked up with the same syscall number, which avoids confusion
-> > and merge conflicts when we add the next syscall to all tables.
-> >
-> > How about one patch to add all the syscall table entries, and then
-> > have the x86 specific change just turn on the Kconfig symbol that
-> > actually enables the syscall?
->
+
 > Okay, I can split it that way. If I gather your meaning correctly:
 >
 > 1) generic syscall C code
 > 2) #define __NR_... in asm-generic/unistd.h x86/.../unistd.h,
 > x86/.../syscall_64.tbl
+
+I mean all syscall*.tbl files, not just x86. There are currently
+eight architectures using asm-generic/unistd.h, the rest use
+syscall.tbl.
+
 > 3) generic vdso C code
 > 4) hook up x86 vdso, and select the right Kconfig symbol to start
 > compiling the code
@@ -115,8 +109,6 @@ On Mon, Nov 28, 2022 at 9:02 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 > Is that what you have in mind? If so, I'll name (2) "arch: wire up
 > vgetrandom_alloc() syscall number".
 
-Well, I just did this, and it seems clean enough. The result is in:
-https://git.zx2c4.com/linux-rng/log/?h=vdso
-if you're curious to poke at it ahead of v9.
+That sounds good, yes.
 
-Jason
+      Arnd
