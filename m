@@ -2,120 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49310C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 19:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DEFFC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 20:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233873AbiK1T6I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Nov 2022 14:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48308 "EHLO
+        id S233929AbiK1UDL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 15:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233872AbiK1T6A (ORCPT
+        with ESMTP id S232966AbiK1UDL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2022 14:58:00 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15D0B27;
-        Mon, 28 Nov 2022 11:57:58 -0800 (PST)
+        Mon, 28 Nov 2022 15:03:11 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B145C62DB;
+        Mon, 28 Nov 2022 12:03:06 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 5BF85CE1054;
-        Mon, 28 Nov 2022 19:57:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D639DC433D7;
-        Mon, 28 Nov 2022 19:57:53 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 03D76CE102D;
+        Mon, 28 Nov 2022 20:03:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A21C4347C;
+        Mon, 28 Nov 2022 20:03:02 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="o7HB8omO"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ANgoiN5/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669665472;
+        t=1669665779;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=m+iodXvVaGO3w4QAQvXUTnn8uFbQvqV8cvcIq17x8pk=;
-        b=o7HB8omOA47EFDy7hMWwqFoQfP8SzKI7Hiwr2zSXBF18xLG1dXIrU794PbLD82ro2flwU3
-        GjkuPKeUnKW52xqpxZdEmBK/RYtXZ+1o51MRD+t7AVl+vfpg28dep1gm5ya7cM+WDyTWza
-        SzfxbOW6IE9DGbhExXaD2cjPRnuYB3I=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id adff6e4d (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 28 Nov 2022 19:57:52 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Vlastimil Babka <vbabka@suse.cz>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        =?UTF-8?q?Jan=20D=C4=85bro=C5=9B?= <jsd@semihalf.com>,
-        linux-integrity@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
-        timvp@google.com, apronin@google.com, mw@semihalf.com,
-        upstream@semihalf.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
-Subject: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
-Date:   Mon, 28 Nov 2022 20:56:51 +0100
-Message-Id: <20221128195651.322822-1-Jason@zx2c4.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3abNITP0dzAb4S+Ys/N4ktn79tvtLrAVp0KnndQQeQg=;
+        b=ANgoiN5/DzPsE7NInUnHVXjdtzboZOf/VjIBRG+BW3kDUneiTj7LQLt58UD7stOajqEl5g
+        CZ2WpjAd0YSOzB7rw/CAuMEAy8F2QnmOwvsj2h7Q8zDvkg15tVw2HUvK3+nCJ4Ey1DsAzG
+        2YDBQ+ItutUQCay0oOWJuPvUMg7C6dc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 22aa6657 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 28 Nov 2022 20:02:59 +0000 (UTC)
+Received: by mail-vs1-f53.google.com with SMTP id i2so11784410vsc.1;
+        Mon, 28 Nov 2022 12:02:59 -0800 (PST)
+X-Gm-Message-State: ANoB5pmHMKENNlaOq8NbSpmrJuznVdxVGA8bLnFpUVc90U568J4RqGm0
+        g39Eip5Z9ScVWuoNwlQgdAJTOeH0z6nZZkEMOCA=
+X-Google-Smtp-Source: AA0mqf5cX87+Dzqv5dsvQPzXX+ACSAgn3+NnHk6t8bD7/9VXA7phYasi8Xi6M8nM7bGSqgRv5Mh405sAFnNKGR0AFK0=
+X-Received: by 2002:a67:f54e:0:b0:3b0:4e31:10f7 with SMTP id
+ z14-20020a67f54e000000b003b04e3110f7mr19050387vsn.73.1669665778586; Mon, 28
+ Nov 2022 12:02:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221128111829.2477505-1-Jason@zx2c4.com> <20221128111829.2477505-4-Jason@zx2c4.com>
+ <8f9326ba-f879-4b9e-9e5d-b65cad7cd726@app.fastmail.com> <Y4UKpP7/NOwPIkYe@zx2c4.com>
+ <cd01e0b4-579f-48fc-995f-6e1acebd02af@app.fastmail.com>
+In-Reply-To: <cd01e0b4-579f-48fc-995f-6e1acebd02af@app.fastmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 28 Nov 2022 21:02:47 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
+Message-ID: <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
+Subject: Re: [PATCH v8 3/3] x86: vdso: Wire up getrandom() vDSO implementation
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Samuel Neves <sneves@dei.uc.pt>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jan Dabros <jsd@semihalf.com>
+Hi Arnd,
 
-Currently tpm transactions are executed unconditionally in
-tpm_pm_suspend() function, which may lead to races with other tpm
-accessors in the system. Specifically, the hw_random tpm driver makes
-use of tpm_get_random(), and this function is called in a loop from a
-kthread, which means it's not frozen alongside userspace, and so can
-race with the work done during system suspend:
+On Mon, Nov 28, 2022 at 8:57 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Mon, Nov 28, 2022, at 20:23, Jason A. Donenfeld wrote:
+> > On Mon, Nov 28, 2022 at 08:18:12PM +0100, Arnd Bergmann wrote:
+> >> On Mon, Nov 28, 2022, at 12:18, Jason A. Donenfeld wrote:
+> >
+> > That's more or less how v7 was, but Thomas thought the x86 stuff should
+> > be separate. So for v8, the organization is:
+> >
+> > 1) generic syscall
+> > 2) generic vdso
+> > 3) x86 wiring
+> >
+> > The primary advantage is that future archs wanting to add this now can
+> > just look at commit (3) only, and make a similar commit for that new
+> > arch.
+> >
+> > If you think a different organization outweighs that advantage, can you
+> > spell out what division of patches you want, and I'll do that for v9?
+> > Or maybe this v8 is okay?
+>
+> My interest is that at the end of the series, all architectures
+> are hooked up with the same syscall number, which avoids confusion
+> and merge conflicts when we add the next syscall to all tables.
+>
+> How about one patch to add all the syscall table entries, and then
+> have the x86 specific change just turn on the Kconfig symbol that
+> actually enables the syscall?
 
-[    3.277834] tpm tpm0: tpm_transmit: tpm_recv: error -52
-[    3.278437] tpm tpm0: invalid TPM_STS.x 0xff, dumping stack for forensics
-[    3.278445] CPU: 0 PID: 1 Comm: init Not tainted 6.1.0-rc5+ #135
-[    3.278450] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-20220807_005459-localhost 04/01/2014
-[    3.278453] Call Trace:
-[    3.278458]  <TASK>
-[    3.278460]  dump_stack_lvl+0x34/0x44
-[    3.278471]  tpm_tis_status.cold+0x19/0x20
-[    3.278479]  tpm_transmit+0x13b/0x390
-[    3.278489]  tpm_transmit_cmd+0x20/0x80
-[    3.278496]  tpm1_pm_suspend+0xa6/0x110
-[    3.278503]  tpm_pm_suspend+0x53/0x80
-[    3.278510]  __pnp_bus_suspend+0x35/0xe0
-[    3.278515]  ? pnp_bus_freeze+0x10/0x10
-[    3.278519]  __device_suspend+0x10f/0x350
+Okay, I can split it that way. If I gather your meaning correctly:
 
-Fix this by calling tpm_try_get_ops(), which itself is a wrapper around
-tpm_chip_start(), but takes the appropriate mutex.
+1) generic syscall C code
+2) #define __NR_... in asm-generic/unistd.h x86/.../unistd.h,
+x86/.../syscall_64.tbl
+3) generic vdso C code
+4) hook up x86 vdso, and select the right Kconfig symbol to start
+compiling the code
 
-Signed-off-by: Jan Dabros <jsd@semihalf.com>
-Reported-by: Vlastimil Babka <vbabka@suse.cz>
-Tested-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Tested-by: Vlastimil Babka <vbabka@suse.cz>
-Link: https://lore.kernel.org/all/c5ba47ef-393f-1fba-30bd-1230d1b4b592@suse.cz/
-Cc: stable@vger.kernel.org
-Fixes: e891db1a18bf ("tpm: turn on TPM on suspend for TPM 1.x")
-[Jason: reworked commit message, added metadata]
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/tpm/tpm-interface.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Is that what you have in mind? If so, I'll name (2) "arch: wire up
+vgetrandom_alloc() syscall number".
 
-diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
-index 1621ce818705..d69905233aff 100644
---- a/drivers/char/tpm/tpm-interface.c
-+++ b/drivers/char/tpm/tpm-interface.c
-@@ -401,13 +401,14 @@ int tpm_pm_suspend(struct device *dev)
- 	    !pm_suspend_via_firmware())
- 		goto suspended;
- 
--	if (!tpm_chip_start(chip)) {
-+	rc = tpm_try_get_ops(chip);
-+	if (!rc) {
- 		if (chip->flags & TPM_CHIP_FLAG_TPM2)
- 			tpm2_shutdown(chip, TPM2_SU_STATE);
- 		else
- 			rc = tpm1_pm_suspend(chip, tpm_suspend_pcr);
- 
--		tpm_chip_stop(chip);
-+		tpm_put_ops(chip);
- 	}
- 
- suspended:
--- 
-2.38.1
-
+Jason
