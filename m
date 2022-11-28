@@ -2,29 +2,28 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7F2C4321E
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 04:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0B6C4321E
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 04:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbiK1EGK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 23:06:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49910 "EHLO
+        id S229793AbiK1EHS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Nov 2022 23:07:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbiK1EF7 (ORCPT
+        with ESMTP id S229682AbiK1EGs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 23:05:59 -0500
+        Sun, 27 Nov 2022 23:06:48 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B836421;
-        Sun, 27 Nov 2022 20:05:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA671097;
+        Sun, 27 Nov 2022 20:06:46 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ozVOm-001Oie-L9; Mon, 28 Nov 2022 12:05:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Nov 2022 12:05:40 +0800
-Date:   Mon, 28 Nov 2022 12:05:40 +0800
+        id 1ozVPc-001OkT-0q; Mon, 28 Nov 2022 12:06:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Nov 2022 12:06:32 +0800
+Date:   Mon, 28 Nov 2022 12:06:32 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -33,36 +32,29 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v2 PATCH 0/9] crypto: Add helpers for allocating with DMA
- alignment
-Message-ID: <Y4QzlGHWmSDFlqFc@gondor.apana.org.au>
+Subject: Re: [v2 PATCH 3/9] crypto: aead - Add ctx helpers with DMA alignment
+Message-ID: <Y4QzyPgDPt11iHlM@gondor.apana.org.au>
 References: <Y4BGC2BPesy3qsEm@gondor.apana.org.au>
- <CAMj1kXFAN2xDt+tKzOJt8zbhXA64U4qi28rzmrSSRoQDbsRHmA@mail.gmail.com>
+ <E1oyQS1-000djS-65@formenos.hmeau.com>
+ <Y4Cz/xJKYbdOyjiB@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXFAN2xDt+tKzOJt8zbhXA64U4qi28rzmrSSRoQDbsRHmA@mail.gmail.com>
+In-Reply-To: <Y4Cz/xJKYbdOyjiB@arm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 01:17:55PM +0100, Ard Biesheuvel wrote:
+On Fri, Nov 25, 2022 at 12:24:31PM +0000, Catalin Marinas wrote:
 >
-> We'd still need changes in the generic crypto layer to distinguish the
-> two cases, but we wouldn't need any changes to the drivers, which
-> seems like a huge benefit to me
+> I wonder, if drivers end up calling this, isn't it easier to do the
+> alignment in crypto_aead_ctx() directly? There are over 300 callers (not
+> sure about the padding though, it may need still driver changes unless
+> we can add it to something like crypto_tfm_alg_alignmask()). Or is the
+> expectation that not all drivers need a DMA alignment?
 
-I think we should go through the drivers anyway.  Because it isn't
-just allocations from the Crypto API that'll bite us.
-
-When I'm working through the drivers, I'm actually looking at what
-they're mapping for DMA and where it's coming from.  Only when the
-driver stores DMA-mapped data in the ctx structures am I changing
-the drivers to add the extra padding.
-
-Some of the drviers are doing small allocations for things like the
-IV or keys with the GFP_DMA flag and hoping that it gives the correct
-alignment.
+I'm only changing the specific drivers that map things from the ctx
+structures for DMA.  So it's not as bad as a simple grep would suggest.
 
 Cheers,
 -- 
