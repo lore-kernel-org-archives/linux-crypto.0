@@ -2,238 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5005C4321E
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 04:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2CFC4321E
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 06:39:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229744AbiK1ESC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Nov 2022 23:18:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
+        id S229675AbiK1Gjd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 01:39:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiK1ERj (ORCPT
+        with ESMTP id S229555AbiK1Gjc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Nov 2022 23:17:39 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701B413E0B;
-        Sun, 27 Nov 2022 20:16:29 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id r18so8851107pgr.12;
-        Sun, 27 Nov 2022 20:16:29 -0800 (PST)
+        Mon, 28 Nov 2022 01:39:32 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C60765A;
+        Sun, 27 Nov 2022 22:39:31 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id v7so7740591wmn.0;
+        Sun, 27 Nov 2022 22:39:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JjAI8qVVGO07FKShcXF7iZ9qNBkTNGT0At3i/50Q48k=;
-        b=JLZgMTR9BOAPybvjm50I3AQUB33vas5DdKuy0k9v2P748nXZxKLk0c63OAjrXjNHFx
-         PGkVNuTr4X1bF3iUcO12xiHsgM5OoM+xLcfULaNLSRg+MuWg/s3p+heUIkxzQLvBOhik
-         TYDto1Y7G6fGT2xiLSxhysa9T3M8lkyEfOpfJZqwr/3GuUnOpeYgBJF7j0bKgx3sYqlx
-         GoKK4MDF/COx22I2qk7BQ/r4x7FxloGX3PUCJvhK0I4nxh1bkKepI8q+4mpurser7IOU
-         bK4Tjm70sR8YG1tSBz9j/fgLomd0NzmCZGI/u0shfnk3DJFK2djaGbZNozTQFPF70P3/
-         LbYA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ZP1ylYuB931He9kk8GqfGKGVdTe0/xxKDzeNsx5WHg=;
+        b=Q/0zk6OrJTK2ohpu3j6XjbFlf56MyfSIa4Z1tm0DKAGmqkFWRvjqh/pogN33JUh6+d
+         KcbID+lSrRK4GNRottCJzP7EBO+sU6WddqLplEqaSHC4sjo8wSbcRtHW5USoXjTbFgJU
+         qYSsqLujMUh7qw/GKeoohEqFqcwtI90SZwICoIra9rDvQjhcn29W8IYJyd+CPbncPCVy
+         tNu0nactn1Oduszo2rLGpfUGXdaxgrkyXJmGPVOrOVRQkIGzL6FQfRxocNwvnTyJWcdK
+         fj+buJi5gqe+3XsiJGQNNgBzoOEhs2WEq5hzaUPKOcfhx26NG9EqzHQ8VbiO06LQmVMI
+         2yZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JjAI8qVVGO07FKShcXF7iZ9qNBkTNGT0At3i/50Q48k=;
-        b=FAsCv5DtPL86kZPD44JQHxsff1k36z3ovJF7pDWnCc9XnOD+RlZfjlY9MxWUIoMvxw
-         cKmEYu3bpmoPTeOZ/Md5SPuYY5l3hcQMHlA+ab2Rielh8rGeduYCklxN3K6JPl65ntNF
-         JfTU9xvaBJeKCQU/AFlUzfNkBN7+RFAe2Ij/DK6i/+XRP0Lw5D1PaflEeeRVAv/xJTg3
-         GW28wQj9cY/vmzr0XWkHXh8TiUCuf0bkdvXTIYw6I8F1uKUP/UgAbdrmMQdDIIH7QOH3
-         1OYAfiKyWxSMfYW4R/kn8McoKA2QCcSwMCCYqeU+0IkXf21Bt2XxcVjEQ5KSB9n0xVEb
-         M6Hg==
-X-Gm-Message-State: ANoB5pk605GwSXY9pgSWPyQOrvD7XEgr6wRyWzpiQQLoQdOw0Ekdo8bn
-        iyToQICaE8uGTffMylLB2wk=
-X-Google-Smtp-Source: AA0mqf4CCt+n+QAsQM8eiB3dp3akEkIzsrNN80n0dkmFQEmRSn8uwWg9qVBG5WFbtZAmX21TV6aNpQ==
-X-Received: by 2002:a63:1563:0:b0:477:8fed:811f with SMTP id 35-20020a631563000000b004778fed811fmr26480617pgv.343.1669608989152;
-        Sun, 27 Nov 2022 20:16:29 -0800 (PST)
-Received: from XH22050090-L.ad.ts.tri-ad.global ([103.175.111.222])
-        by smtp.gmail.com with ESMTPSA id z5-20020aa79f85000000b0056bbebbcafbsm6927107pfr.100.2022.11.27.20.16.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Nov 2022 20:16:28 -0800 (PST)
-Sender: Vincent Mailhol <vincent.mailhol@gmail.com>
-From:   Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To:     Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Kurt Kanzenbach <kurt@linutronix.de>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Michael Chan <michael.chan@broadcom.com>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        Dimitris Michailidis <dmichail@fungible.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>,
-        hariprasad <hkelam@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        Taras Chornyi <tchornyi@marvell.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Ido Schimmel <idosch@nvidia.com>,
-        Petr Machata <petrm@nvidia.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        Shannon Nelson <snelson@pensando.io>, drivers@pensando.io,
-        Ariel Elior <aelior@marvell.com>,
-        Manish Chopra <manishc@marvell.com>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        Vadim Fedorenko <vadfed@fb.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Vadim Pasternak <vadimp@mellanox.com>,
-        Shalom Toledo <shalomt@mellanox.com>,
-        linux-crypto@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-rdma@vger.kernel.org, oss-drivers@corigine.com,
-        Jiri Pirko <jiri@mellanox.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hao Chen <chenhao288@hisilicon.com>,
-        Guangbin Huang <huangguangbin2@huawei.com>,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        Shijith Thotton <sthotton@marvell.com>,
-        Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH net-next v4 3/3] net: devlink: make the devlink_ops::info_get() callback optional
-Date:   Mon, 28 Nov 2022 13:15:45 +0900
-Message-Id: <20221128041545.3170897-4-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221128041545.3170897-1-mailhol.vincent@wanadoo.fr>
-References: <20221122154934.13937-1-mailhol.vincent@wanadoo.fr>
- <20221128041545.3170897-1-mailhol.vincent@wanadoo.fr>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ZP1ylYuB931He9kk8GqfGKGVdTe0/xxKDzeNsx5WHg=;
+        b=nT3py2LOvjfLkXWJZQMvnCapCS+3T1QnkdY7SHETNCHYHO5g2KvFtlMGqEI1B9NzeZ
+         vcq+OD42PwNyJqd8uEGgrmJaQ1iaARxmbniDCJJbWERSaMuQBq7nHiy1PnbD4pVZb2c8
+         H9uw7V9dd5cxWs+ctVyxkug+OuSU17VteRiLkYXRL6lsPAhL7fGr2OPregWTOeoStb3R
+         ikQrpnOdTJqBuWXxk6RR5vG99oYDR65jJsazC0iFn7V20Slv08B/KGdQTe4RuNTbuQIU
+         7GSwVuiDXa17zBOCDe64oh1oQ5pCGw/PV8kydzvDVrx8u/kxuKfEvZ17NpmYEuXtj6OE
+         s9gw==
+X-Gm-Message-State: ANoB5plApdCmdvvQRW5KQTCOnmrJmgX0kQG7LyBLNdJ4T9mTxK6i9Wr6
+        2mGntbPf4F/xTXJisYqscaE=
+X-Google-Smtp-Source: AA0mqf5XTQo0xaTTj5q8Jf6pcNIjrZpz56YG4bKZ069nB2tce5CRwaDJZSBu5wGRkmmSkR+aTuXGqQ==
+X-Received: by 2002:a05:600c:19d1:b0:3cf:cf89:90f with SMTP id u17-20020a05600c19d100b003cfcf89090fmr26492753wmq.186.1669617569525;
+        Sun, 27 Nov 2022 22:39:29 -0800 (PST)
+Received: from [192.168.0.105] ([77.126.19.155])
+        by smtp.gmail.com with ESMTPSA id u2-20020a056000038200b00241cfe6e286sm9757300wrf.98.2022.11.27.22.39.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Nov 2022 22:39:28 -0800 (PST)
+Message-ID: <665b6081-be55-de9a-1f7f-70a143df329d@gmail.com>
+Date:   Mon, 28 Nov 2022 08:39:24 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v2 0/4] cpumask: improve on cpumask_local_spread()
+ locality
+Content-Language: en-US
+To:     Valentin Schneider <vschneid@redhat.com>,
+        Yury Norov <yury.norov@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        haniel Bristot de Oliveira <bristot@redhat.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+References: <20221112190946.728270-1-yury.norov@gmail.com>
+ <xhsmh7czwyvtj.mognet@vschneid.remote.csb> <Y3PXw8Hqn+RCMg2J@yury-laptop>
+ <xhsmho7t5ydke.mognet@vschneid.remote.csb>
+From:   Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <xhsmho7t5ydke.mognet@vschneid.remote.csb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some drivers only reported the driver name in their
-devlink_ops::info_get() callback. Now that the core provides this
-information, the callback became empty. For such drivers, just
-removing the callback would prevent the core from executing
-devlink_nl_info_fill() meaning that "devlink dev info" would not
-return anything.
 
-Make the callback function optional by executing
-devlink_nl_info_fill() even if devlink_ops::info_get() is NULL.
 
-Remove all the empty devlink_ops::info_get() functions from the
-drivers.
+On 11/17/2022 2:23 PM, Valentin Schneider wrote:
+> On 15/11/22 10:32, Yury Norov wrote:
+>> On Tue, Nov 15, 2022 at 05:24:56PM +0000, Valentin Schneider wrote:
+>>>
+>>> Is this meant as a replacement for [1]?
+>>
+>> No. Your series adds an iterator, and in my experience the code that
+>> uses iterators of that sort is almost always better and easier to
+>> understand than cpumask_nth() or cpumask_next()-like users.
+>>
+>> My series has the only advantage that it allows keep existing codebase
+>> untouched.
+>>
+> 
+> Right
+> 
+>>> I like that this is changing an existing interface so that all current
+>>> users directly benefit from the change. Now, about half of the users of
+>>> cpumask_local_spread() use it in a loop with incremental @i parameter,
+>>> which makes the repeated bsearch a bit of a shame, but then I'm tempted to
+>>> say the first point makes it worth it.
+>>>
+>>> [1]: https://lore.kernel.org/all/20221028164959.1367250-1-vschneid@redhat.com/
+>>
+>> In terms of very common case of sequential invocation of local_spread()
+>> for cpus from 0 to nr_cpu_ids, the complexity of my approach is n * log n,
+>> and your approach is amortized O(n), which is better. Not a big deal _now_,
+>> as you mentioned in the other email. But we never know how things will
+>> evolve, right?
+>>
+>> So, I would take both and maybe in comment to cpumask_local_spread()
+>> mention that there's a better alternative for those who call the
+>> function for all CPUs incrementally.
+>>
+> 
+> Ack, sounds good.
+> 
 
-N.B.: the drivers with devlink support which previously did not
-implement devlink_ops::info_get() will now also be able to report
-the driver name.
-
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
----
- .../net/ethernet/fungible/funeth/funeth_devlink.c   |  7 -------
- .../net/ethernet/marvell/octeontx2/af/rvu_devlink.c |  7 -------
- .../ethernet/marvell/octeontx2/nic/otx2_devlink.c   |  8 --------
- net/core/devlink.c                                  | 13 ++++++-------
- 4 files changed, 6 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/net/ethernet/fungible/funeth/funeth_devlink.c b/drivers/net/ethernet/fungible/funeth/funeth_devlink.c
-index 6668375edff6..4fbeb3fd71a8 100644
---- a/drivers/net/ethernet/fungible/funeth/funeth_devlink.c
-+++ b/drivers/net/ethernet/fungible/funeth/funeth_devlink.c
-@@ -3,14 +3,7 @@
- #include "funeth.h"
- #include "funeth_devlink.h"
- 
--static int fun_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
--			   struct netlink_ext_ack *extack)
--{
--	return 0;
--}
--
- static const struct devlink_ops fun_dl_ops = {
--	.info_get = fun_dl_info_get,
- };
- 
- struct devlink *fun_devlink_alloc(struct device *dev)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-index f15439d26d21..bda1a6fa2ec4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-@@ -1547,14 +1547,7 @@ static int rvu_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	return 0;
- }
- 
--static int rvu_devlink_info_get(struct devlink *devlink, struct devlink_info_req *req,
--				struct netlink_ext_ack *extack)
--{
--	return 0;
--}
--
- static const struct devlink_ops rvu_devlink_ops = {
--	.info_get = rvu_devlink_info_get,
- 	.eswitch_mode_get = rvu_devlink_eswitch_mode_get,
- 	.eswitch_mode_set = rvu_devlink_eswitch_mode_set,
- };
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-index 5cc6416cf1a6..63ef7c41d18d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
-@@ -77,15 +77,7 @@ static const struct devlink_param otx2_dl_params[] = {
- 			     otx2_dl_mcam_count_validate),
- };
- 
--static int otx2_devlink_info_get(struct devlink *devlink,
--				 struct devlink_info_req *req,
--				 struct netlink_ext_ack *extack)
--{
--	return 0;
--}
--
- static const struct devlink_ops otx2_devlink_ops = {
--	.info_get = otx2_devlink_info_get,
- };
- 
- int otx2_register_dl(struct otx2_nic *pfvf)
-diff --git a/net/core/devlink.c b/net/core/devlink.c
-index 3babc16eeb6b..817d978bb729 100644
---- a/net/core/devlink.c
-+++ b/net/core/devlink.c
-@@ -6773,9 +6773,11 @@ devlink_nl_info_fill(struct sk_buff *msg, struct devlink *devlink,
- 		goto err_cancel_msg;
- 
- 	req.msg = msg;
--	err = devlink->ops->info_get(devlink, &req, extack);
--	if (err)
--		goto err_cancel_msg;
-+	if (devlink->ops->info_get) {
-+		err = devlink->ops->info_get(devlink, &req, extack);
-+		if (err)
-+			goto err_cancel_msg;
-+	}
- 
- 	err = devlink_nl_driver_info_get(dev->driver, &req);
- 	if (err)
-@@ -6796,9 +6798,6 @@ static int devlink_nl_cmd_info_get_doit(struct sk_buff *skb,
- 	struct sk_buff *msg;
- 	int err;
- 
--	if (!devlink->ops->info_get)
--		return -EOPNOTSUPP;
--
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
- 	if (!msg)
- 		return -ENOMEM;
-@@ -6824,7 +6823,7 @@ static int devlink_nl_cmd_info_get_dumpit(struct sk_buff *msg,
- 	int err = 0;
- 
- 	devlinks_xa_for_each_registered_get(sock_net(msg->sk), index, devlink) {
--		if (idx < start || !devlink->ops->info_get)
-+		if (idx < start)
- 			goto inc;
- 
- 		devl_lock(devlink);
--- 
-2.25.1
-
+Good.
+Is a respin needed, to add the comment mentioned above?
