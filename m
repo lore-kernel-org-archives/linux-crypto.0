@@ -2,114 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0EEC4321E
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 21:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774A5C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Nov 2022 21:29:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232651AbiK1V3g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Nov 2022 16:29:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59792 "EHLO
+        id S232457AbiK1V3r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Nov 2022 16:29:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232648AbiK1V3f (ORCPT
+        with ESMTP id S232648AbiK1V3q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Nov 2022 16:29:35 -0500
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 122CF29822
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Nov 2022 13:29:33 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 74C535C01B5;
-        Mon, 28 Nov 2022 16:29:30 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 28 Nov 2022 16:29:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=animalcreek.com;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1669670970; x=1669757370; bh=jw
-        NH50kkyPaHL4wdl476Ksi+oVtPfBSWQRMUzQmSc/s=; b=B0eEIygB0gB2LIjliq
-        tuJF0OIq02okW8U3OGWnb2Rm+EFwhXG5xov+5QpfDrThSINPKrF8kNgjTYrGj8XC
-        8OibXGQUG22MzYt5J6X+Qai3pvJgLO/lonEzNAtGCEOujZ/7vbkfyPl/TXke3kPU
-        kY0fjjPkoAsPgRxo5ucUQ/uh/C+lJuVGLhGpspZRDWv1SUn2tiqVurs5ZWt1Ym70
-        bPdUTWiQ07D/m7SyK9UscSP7s9GF92P+RiWOPGVqcvBi9MoW44hmsME4Gddh16cr
-        EJvF9HusXEOdG/jN+wfxjE9nZX8XtJKF8wMk+GZuEyc9YUv3kkj69J3Gaka2Imik
-        i2kA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1669670970; x=1669757370; bh=jwNH50kkyPaHL4wdl476Ksi+oVtP
-        fBSWQRMUzQmSc/s=; b=Rn6fspLVOQrGOCru2s+OyqqRTTa+cuPudgbxOsitHwC7
-        v9Vwl2YEEtQhuWF3vGyZ6uVsnuGlSII/Vm6+dZ4LuZGielNqxJum45vqKcXXYari
-        hOLR6/Bg19C9mw+sdMmV0IH84mwnaTPgattI+nBDSI0R3IEw7sj0xU9lHOdt0Ewn
-        geUF/+qpchDRndTLbWO1VS9vQHlzgoyPfiqhMt7XDk2R36gmoClXVIZ2W8Hysp89
-        hifO7f4xAmP5g8lQhuSUdjS9pW4v/byADDVCuujNK7u6Urm6D5XHtKb8CoClVsiX
-        /tcu3WPZcp6EW+R7lUvmIIiFdvLV+dsdPexjBIp6Gw==
-X-ME-Sender: <xms:OCiFY3qfpttVKWfSnzpb51mSuyfVsFSw1N40fgzaHL42EojhRRdESw>
-    <xme:OCiFYxqfp1HJM_XqUDVU6wCJuubgCHSrVziSSR6uxcugvPyHxe5xDPnwehzEwQe5X
-    _s2GrFPJkHmbfhsOQ>
-X-ME-Received: <xmr:OCiFY0NyqIwPMBEIP4E-ST2yW4p4rpohMSnE9_R5eEjOfvq9gvNf8ffk2cud5rDWbmNhyZTn06AvO2CFvqYcmOC4okRQZXZA5lLPTqsBfw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrjedvgdduheefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujghosehttdertddttddvnecuhfhrohhmpeforghr
-    khcuifhrvggvrhcuoehmghhrvggvrhesrghnihhmrghltghrvggvkhdrtghomheqnecugg
-    ftrfgrthhtvghrnhepuefgjeetgfetgeeiffejjeettdevfeevffefgeekhfdthedtgfef
-    veekgeevvdegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homhepmhhgrhgvvghrsegrnhhimhgrlhgtrhgvvghkrdgtohhm
-X-ME-Proxy: <xmx:OCiFY65ECO9AArtUzDnpSt87Bjd49VVLnqafOeoKCF_9VSi6TZuyqQ>
-    <xmx:OCiFY25W5aQgRu_wv9ZLMXJ_WSlw0hB_27PYr88LEz7hflkIAzbV4w>
-    <xmx:OCiFYyg9m9P41ixxT17q9qcwpVlNcXs0qxIYOxIJ4Epall-Ya_1f2g>
-    <xmx:OiiFY8kfb0YMjQxrKdRaFhJ70fDK-qQQRlsiqVB9lJzHKNcYZpZtXw>
-Feedback-ID: i9cc843c7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Nov 2022 16:29:28 -0500 (EST)
-Received: by blue.animalcreek.com (Postfix, from userid 1000)
-        id 49B6B1360146; Mon, 28 Nov 2022 14:29:27 -0700 (MST)
-Date:   Mon, 28 Nov 2022 14:29:27 -0700
-From:   Mark Greer <mgreer@animalcreek.com>
-To:     Shang XiaoJing <shangxiaojing@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        mgreer@animalcreek.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: omap-sham - Use pm_runtime_resume_and_get() in
- omap_sham_probe()
-Message-ID: <20221128212927.GA60395@animalcreek.com>
-References: <20221124064940.19845-1-shangxiaojing@huawei.com>
+        Mon, 28 Nov 2022 16:29:46 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C0C29375;
+        Mon, 28 Nov 2022 13:29:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 822426147D;
+        Mon, 28 Nov 2022 21:29:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9735BC433D7;
+        Mon, 28 Nov 2022 21:29:44 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O8+J0w7n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669670982;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FDwebM2uChEaCsi7MjosOH4+1tmg5eYzvcVHA1vHqwc=;
+        b=O8+J0w7nm1u1C2pniytxA8ewP3/rfWk30E/nTkJpDltBj9Z9JT4504xRuwSXOjDSImv8hY
+        rDH4eOoF9kMaUA5YyZ8Vs6m3tWGIUwHo8jcZCDvRhHrXFdbjFOHLKgeGL/PAfhj+qDtPX5
+        qX31szZE1/vZ/ohSQngxnuu9hdBjMxA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4355c8cb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 28 Nov 2022 21:29:41 +0000 (UTC)
+Received: by mail-vk1-f173.google.com with SMTP id bi15so5940313vkb.11;
+        Mon, 28 Nov 2022 13:29:41 -0800 (PST)
+X-Gm-Message-State: ANoB5pkIwe65uyEK8U1cBKF76F/GYQpJaioUyaBNWtRrCI+IyT+v6FSq
+        0qjFXr7+Dj1XCq9HyghgQCvOhfo9/I+xszQH8Lg=
+X-Google-Smtp-Source: AA0mqf6jEGtcBl+CWgyFJVs2ZeS81nOnWmoaLX1ReySbgTep0RXOEgf8bO6Lcga/AMkFmEat1SFfN9/9OHr2MrzzgUY=
+X-Received: by 2002:ac5:cdc7:0:b0:3bb:ddbe:899d with SMTP id
+ u7-20020ac5cdc7000000b003bbddbe899dmr22572652vkn.41.1669670980428; Mon, 28
+ Nov 2022 13:29:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221124064940.19845-1-shangxiaojing@huawei.com>
-Organization: Animal Creek Technologies, Inc.
+References: <20221128111829.2477505-1-Jason@zx2c4.com> <20221128111829.2477505-4-Jason@zx2c4.com>
+ <8f9326ba-f879-4b9e-9e5d-b65cad7cd726@app.fastmail.com> <Y4UKpP7/NOwPIkYe@zx2c4.com>
+ <cd01e0b4-579f-48fc-995f-6e1acebd02af@app.fastmail.com> <CAHmME9rp+Nx_S8OgABzadc1+j_FrSRbUvGu2r9W_svrr+HMjSg@mail.gmail.com>
+ <2cb4b4a7-1d39-4f63-aee0-b4fc43efa68d@app.fastmail.com>
+In-Reply-To: <2cb4b4a7-1d39-4f63-aee0-b4fc43efa68d@app.fastmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 28 Nov 2022 22:29:29 +0100
+X-Gmail-Original-Message-ID: <CAHmME9r6Hqy3KTJoNpXzJ4weUyFs=5xEPQEe94x4hO6QZWo-5g@mail.gmail.com>
+Message-ID: <CAHmME9r6Hqy3KTJoNpXzJ4weUyFs=5xEPQEe94x4hO6QZWo-5g@mail.gmail.com>
+Subject: Re: [PATCH v8 3/3] x86: vdso: Wire up getrandom() vDSO implementation
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Samuel Neves <sneves@dei.uc.pt>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 02:49:40PM +0800, Shang XiaoJing wrote:
-> omap_sham_probe() calls pm_runtime_get_sync() and calls
-> pm_runtime_put_sync() latter to put usage_counter. However,
-> pm_runtime_get_sync() will increment usage_counter even it failed. Fix
-> it by replacing it with pm_runtime_resume_and_get() to keep usage
-> counter balanced.
-> 
-> Fixes: b359f034c8bf ("crypto: omap-sham - Convert to use pm_runtime API")
-> Signed-off-by: Shang XiaoJing <shangxiaojing@huawei.com>
-> ---
->  drivers/crypto/omap-sham.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-> index 655a7f5a406a..cbeda59c6b19 100644
-> --- a/drivers/crypto/omap-sham.c
-> +++ b/drivers/crypto/omap-sham.c
-> @@ -2114,7 +2114,7 @@ static int omap_sham_probe(struct platform_device *pdev)
->  
->  	pm_runtime_enable(dev);
->  
-> -	err = pm_runtime_get_sync(dev);
-> +	err = pm_runtime_resume_and_get(dev);
->  	if (err < 0) {
->  		dev_err(dev, "failed to get sync: %d\n", err);
->  		goto err_pm;
+On Mon, Nov 28, 2022 at 10:13 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Mon, Nov 28, 2022, at 21:02, Jason A. Donenfeld wrote:
+> > On Mon, Nov 28, 2022 at 8:57 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> > Okay, I can split it that way. If I gather your meaning correctly:
+> >
+> > 1) generic syscall C code
+> > 2) #define __NR_... in asm-generic/unistd.h x86/.../unistd.h,
+> > x86/.../syscall_64.tbl
+>
+> I mean all syscall*.tbl files, not just x86. There are currently
+> eight architectures using asm-generic/unistd.h, the rest use
+> syscall.tbl.
 
-I do not have the hardware to test this anymore but to the best of my
-knowledge, this is a good change.  Thanks Shang.
+Oh okay, I'll add this to all of the *.tbl files.
 
-Acked-by: Mark Greer <mgreer@animalcreek.com>
+Jason
