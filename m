@@ -2,168 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABEAC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 16:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABA1C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 16:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiK2QIf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 11:08:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
+        id S235827AbiK2QXf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 11:23:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232415AbiK2QIb (ORCPT
+        with ESMTP id S232155AbiK2QXf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 11:08:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCEABC9A;
-        Tue, 29 Nov 2022 08:08:28 -0800 (PST)
+        Tue, 29 Nov 2022 11:23:35 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E3B2936D;
+        Tue, 29 Nov 2022 08:23:33 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 96185B8169F;
-        Tue, 29 Nov 2022 16:08:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 790EBC433D6;
-        Tue, 29 Nov 2022 16:08:25 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jSW4sRjQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669738103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7LUjTHm6kEMXqhLx7VxQfNEptYV9vMbIIcB198xn198=;
-        b=jSW4sRjQKLRgBYxtBmNTe2eH1ItnygDF0l+PYQ8E6KhFhRpD7R6L+QpZ7M+mx4iNF3V/q3
-        8wF6y/3IV8ZFU9hmadJROI0OJj/6J8CRT3HmcQkMid6EYNPdgM6AZIKblEOcswHm92+PXx
-        IRTiGPROC791fB84DA/G+hX+B28pRSI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c9d54766 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 29 Nov 2022 16:08:22 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2] random: spread out jitter callback to different CPUs
-Date:   Tue, 29 Nov 2022 17:08:11 +0100
-Message-Id: <20221129160811.563011-1-Jason@zx2c4.com>
-In-Reply-To: <CAHmME9rhtZrwns_d7gQc8vrhWHKZqv6PkWi=JSQXsQOvvRr8UA@mail.gmail.com>
-References: <CAHmME9rhtZrwns_d7gQc8vrhWHKZqv6PkWi=JSQXsQOvvRr8UA@mail.gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 56E5C617F1;
+        Tue, 29 Nov 2022 16:23:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84196C433B5;
+        Tue, 29 Nov 2022 16:23:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669739012;
+        bh=cGjM50Wf3CjbI5CufedpeRJgmUVOB+oAD7sMhicvcvc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iGGqHvYp3sWtlvL3jCszoyk0Brtf4U7s5IZ36y4/y1m554vmFunVA5ClffSXnH849
+         yt1hdu1rUqoJE7r7VOV3tfT0J2smr71P3tQMbjnIRA8cMt+170myHsgSoVSucd0bYi
+         OjMhYsiSqUsyk/SVaonvZnGvOho+Y94h9/yNkGZzPui9wIXrQpviLgKo+/UFhWOxIA
+         M/mUJkkdbPaXcqsEf4mq/p9pO0g7uKimEwyyDHDcE4ff7z24vz0ap1DzqqCQyFv6Rh
+         zI07kmFsHNsqft+khjFYFwCqfphkmhqIOyLb20egHw818U8HUNGAANKuqd6ofsW2wo
+         F6ISh741HsxKg==
+Date:   Tue, 29 Nov 2022 08:23:29 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Cc:     Jiri Pirko <jiri@resnulli.us>, Jiri Pirko <jiri@nvidia.com>,
+        netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Kurt Kanzenbach <kurt@linutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Michael Chan <michael.chan@broadcom.com>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Dimitris Michailidis <dmichail@fungible.com>,
+        Yisen Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Jerin Jacob <jerinj@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Taras Chornyi <tchornyi@marvell.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Ido Schimmel <idosch@nvidia.com>,
+        Petr Machata <petrm@nvidia.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Shannon Nelson <snelson@pensando.io>, drivers@pensando.io,
+        Ariel Elior <aelior@marvell.com>,
+        Manish Chopra <manishc@marvell.com>,
+        Jonathan Lemon <jonathan.lemon@gmail.com>,
+        Vadim Fedorenko <vadfed@fb.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Vadim Pasternak <vadimp@mellanox.com>,
+        Shalom Toledo <shalomt@mellanox.com>,
+        linux-crypto@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-rdma@vger.kernel.org, oss-drivers@corigine.com,
+        Jiri Pirko <jiri@mellanox.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hao Chen <chenhao288@hisilicon.com>,
+        Guangbin Huang <huangguangbin2@huawei.com>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Shijith Thotton <sthotton@marvell.com>
+Subject: Re: [PATCH net-next v5 2/4] net: devlink: remove
+ devlink_info_driver_name_put()
+Message-ID: <20221129082329.2a97d67a@kernel.org>
+In-Reply-To: <CAMZ6RqJnxkDmMtXSvUF2aondZ_8BGYq4XL35Cg7Vxy9qqsfAeg@mail.gmail.com>
+References: <20221129000550.3833570-1-mailhol.vincent@wanadoo.fr>
+        <20221129000550.3833570-3-mailhol.vincent@wanadoo.fr>
+        <Y4XCCl6F+N2w+ngn@nanopsycho>
+        <CAMZ6RqJnxkDmMtXSvUF2aondZ_8BGYq4XL35Cg7Vxy9qqsfAeg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rather than merely hoping that the callback gets called on another CPU,
-arrange for that to actually happen, by round robining which CPU the
-timer fires on. This way, on multiprocessor machines, we exacerbate
-jitter by touching the same memory from multiple different cores.
+On Tue, 29 Nov 2022 18:37:41 +0900 Vincent MAILHOL wrote:
+> > I agree with Jacob that this could be easily squashed to the previous
+> > patch. One way or another:  
+> 
+> OK. Let's have the majority decide: I will squash patches 1 and 2 and send a v6.
 
-There's a little bit of tricky bookkeeping involved here, because using
-timer_setup_on_stack() + add_timer_on() + del_timer_sync() is a recipe
-for disaster. See this sample code: <https://xn--4db.cc/xBdEiIKO/c>.
-
-Mitigating this by calling del_timer_sync() (or try_to_del_timer_sync())
-before each add_timer_on() also isn't satisfactory, because that halts
-the main entropy collecting loop while it waits, trying to acquire the
-timer base spinlock.
-
-So instead, poll a boolean inside of the main loop to indicate when the
-timer callback has finished executing. This serializes the callbacks
-while still ensuring the main loop continues.
-
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 7b71cea6a6ab..40d0395ea566 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1232,7 +1232,9 @@ void __cold rand_initialize_disk(struct gendisk *disk)
- struct entropy_timer_state {
- 	unsigned long entropy;
- 	struct timer_list timer;
--	unsigned int samples, samples_per_bit;
-+	atomic_t samples;
-+	unsigned int samples_per_bit;
-+	bool is_running;
- };
- 
- /*
-@@ -1250,10 +1252,9 @@ static void __cold entropy_timer(struct timer_list *timer)
- {
- 	struct entropy_timer_state *state = container_of(timer, struct entropy_timer_state, timer);
- 
--	if (++state->samples == state->samples_per_bit) {
-+	if (atomic_inc_return(&state->samples) % state->samples_per_bit == 0)
- 		credit_init_bits(1);
--		state->samples = 0;
--	}
-+	smp_store_release(&state->is_running, false);
- }
- 
- /*
-@@ -1263,9 +1264,10 @@ static void __cold entropy_timer(struct timer_list *timer)
- static void __cold try_to_generate_entropy(void)
- {
- 	enum { NUM_TRIAL_SAMPLES = 8192, MAX_SAMPLES_PER_BIT = HZ / 15 };
--	struct entropy_timer_state stack;
-+	struct entropy_timer_state stack = { 0 };
- 	unsigned int i, num_different = 0;
- 	unsigned long last = random_get_entropy();
-+	int cpu = -1;
- 
- 	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
- 		stack.entropy = random_get_entropy();
-@@ -1277,19 +1279,38 @@ static void __cold try_to_generate_entropy(void)
- 	if (stack.samples_per_bit > MAX_SAMPLES_PER_BIT)
- 		return;
- 
--	stack.samples = 0;
- 	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
- 	while (!crng_ready() && !signal_pending(current)) {
--		if (!timer_pending(&stack.timer))
--			mod_timer(&stack.timer, jiffies);
-+		/*
-+		 * Check both !timer_pending() and state->is_running to ensure that any previous
-+		 * callback has finished executing, before queueing the next one.
-+		 */
-+		if (!timer_pending(&stack.timer) && !smp_load_acquire(&stack.is_running)) {
-+			preempt_disable();
-+
-+			/* Basic CPU round-robin, which avoids the current CPU. */
-+			do {
-+				cpu = cpumask_next(cpu, cpu_online_mask);
-+				if (cpu == nr_cpumask_bits)
-+					cpu = cpumask_first(cpu_online_mask);
-+			} while (cpu == smp_processor_id() && cpumask_weight(cpu_online_mask) > 1);
-+
-+			/* Expiring the timer at `jiffies` means it's the next tick. */
-+			stack.timer.expires = jiffies;
-+
-+			smp_store_release(&stack.is_running, true);
-+			add_timer_on(&stack.timer, cpu);
-+
-+			preempt_enable();
-+		}
- 		mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- 		schedule();
- 		stack.entropy = random_get_entropy();
- 	}
-+	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- 
- 	del_timer_sync(&stack.timer);
- 	destroy_timer_on_stack(&stack.timer);
--	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- }
- 
- 
--- 
-2.38.1
-
+FTR I prefer v5, much easier to review the code when driver changes are
+separated from core changes. But doesn't matter.
