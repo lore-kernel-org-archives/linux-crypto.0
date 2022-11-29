@@ -2,156 +2,168 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18979C4321E
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 14:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABEAC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 16:08:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235684AbiK2Oov (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:44:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51262 "EHLO
+        id S229818AbiK2QIf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 11:08:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230391AbiK2Oou (ORCPT
+        with ESMTP id S232415AbiK2QIb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 09:44:50 -0500
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2028.outbound.protection.outlook.com [40.92.74.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E6D50D7C
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2022 06:44:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PyIRnz3SWUsMmdm4cjnk6jpMw80L3xRoLW1W+jr6wNdPjJtvFTYwOXpy2hG/XS28caIPtJnKoyldJ3xmAD6youZ0BUWv+at1rat8UfKgHhDteinXj/KdE5EKuoW+YCNrHshuFROqzHaqj1CAOP/qKHRk9xtWhoBgikwYLVM7IaVxgFCUexPzgxgdW+9Prfxk0vxVi74iqZVkqzUQcZ7G0dFFg8rFXqLtZ80FBwLRbr4sMzVy/ZMv8ZAXrn4DicruBMnf3OHKBE5XTEL/RpZtLMJ3o2XcpQKr6hm0BJu0AmW+aPI34BJHltHSEzVj1d1dKnoC3XSZp1hMZqFw5b63JA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y/kCvToU8nsFM7Lr6623yTPnxd4u3RwRyznZzZFCZR4=;
- b=J5jy0wPyYTGDDpKx1HjOQ/Hg+HRqdABTHsieGnp1UWcrroXP2EcUZZMXeFIE8LQpZak0HzRm8jtu7pGV/1Cv1AnVZRceM1/ut7nVnVSl5jA3ixC+kPcxJ8jegt2N/H76NXMbGFal0zfCjd/8tbP/H7EjOHuX2BglW0Uukd/GMpo+yCcFYF7kRl2Mn/cOWkpw/zZp78BNw4/UcPKGewRYb0X9p/nJ1ZEkqNAbeMx570JRq1XnTJb0S5whbTcbRTAkfkGBWKH1r/2gGSgrhuRQRLYSZYn5vzjGiVP2K3WlmvC8UcLMmgMsfMtgeFxDF0tlGBJ8pQRFcFcaGqkw/EAvjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y/kCvToU8nsFM7Lr6623yTPnxd4u3RwRyznZzZFCZR4=;
- b=sg/S57ZGjMM56m5f/Z9MZebJxXUQJfVxQGUsrjvfBEG3f/8ouaOTxcYlxjR2H7BcRgM1lILbUY0cTaqye8FAf0rRB6t/cbDYR3LlEwkixFgUMvrwlJObyQfy8kfMyvT3NEigHa88NxwBclVmdBucciake5fnbLDcK0/RtE41EGrPaX2izkywUrpmSEPTW0kAyBNqN8f/A4ebaJY2bJcHlIa1kX+g90vQ0imQslDASpJAASzNJ4IsaNc74/4DZFVRcbbk101FDgEcB+sC2DK/Qt3vKprEC2LT3BEe4W+OKNPYH3iVDy52qb/bCOn9zJmVLpcJjjP8UmYoMcEPAi8RSA==
-Received: from DU2P193MB2114.EURP193.PROD.OUTLOOK.COM (2603:10a6:10:2ff::14)
- by VI1P193MB0637.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:152::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Tue, 29 Nov
- 2022 14:44:47 +0000
-Received: from DU2P193MB2114.EURP193.PROD.OUTLOOK.COM
- ([fe80::a05e:c8c2:6878:88eb]) by DU2P193MB2114.EURP193.PROD.OUTLOOK.COM
- ([fe80::a05e:c8c2:6878:88eb%5]) with mapi id 15.20.5857.023; Tue, 29 Nov 2022
- 14:44:47 +0000
-From:   Susan Lewis <susanlewis51@outlook.com>
-To:     linux-crypto@vger.kernel.org
-Subject: Re: Blockchain solutions
-Message-ID: <DU2P193MB2114A538748766C1D9BB3C22C6129@DU2P193MB2114.EURP193.PROD.OUTLOOK.COM>
-Date:   Tue, 29 Nov 2022 20:14:47 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-TMN:  [NM6+nPyWa3jzquE7pf/TKN5R/CiDItzK]
-X-ClientProxiedBy: PN2PR01CA0227.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:eb::14) To DU2P193MB2114.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:10:2ff::14)
-X-Microsoft-Original-Message-ID: <22b05bc2-7e64-625b-0929-708bd0af5ea0@outlook.com>
+        Tue, 29 Nov 2022 11:08:31 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCEABC9A;
+        Tue, 29 Nov 2022 08:08:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 96185B8169F;
+        Tue, 29 Nov 2022 16:08:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 790EBC433D6;
+        Tue, 29 Nov 2022 16:08:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jSW4sRjQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669738103;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7LUjTHm6kEMXqhLx7VxQfNEptYV9vMbIIcB198xn198=;
+        b=jSW4sRjQKLRgBYxtBmNTe2eH1ItnygDF0l+PYQ8E6KhFhRpD7R6L+QpZ7M+mx4iNF3V/q3
+        8wF6y/3IV8ZFU9hmadJROI0OJj/6J8CRT3HmcQkMid6EYNPdgM6AZIKblEOcswHm92+PXx
+        IRTiGPROC791fB84DA/G+hX+B28pRSI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c9d54766 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 29 Nov 2022 16:08:22 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH v2] random: spread out jitter callback to different CPUs
+Date:   Tue, 29 Nov 2022 17:08:11 +0100
+Message-Id: <20221129160811.563011-1-Jason@zx2c4.com>
+In-Reply-To: <CAHmME9rhtZrwns_d7gQc8vrhWHKZqv6PkWi=JSQXsQOvvRr8UA@mail.gmail.com>
+References: <CAHmME9rhtZrwns_d7gQc8vrhWHKZqv6PkWi=JSQXsQOvvRr8UA@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2P193MB2114:EE_|VI1P193MB0637:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3aba2000-2fa0-4171-2916-08dad218430a
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: e1j/of35GHvBMliLzNg/PpBifMhTDhQv/nh+dtx7ftEUvwUIReqyWD5dHVqzuhwxeNC4fT77EcWeoUl003koXyJWfUH/bisHLuP8+rfwQVce8B5kNQf2J+Kwy7Vn8GrK7TI60tJSeCAro6Wti77MOvDzz6NhPufsXTrFqjUGlKNukzm+UCm+smrwcXMCwl/AW/4mLSevc9AlW93yyJSGhgg2p0Ghzh6SDeTVVIzGRfgvr/ywJ8l3kmT3UiexiUPz7rKZ88phsEmh4n1Czc/g/tU7G5Pp7iq+IG3+wBlS6XNbLd47yJCBNKt3x6aHbgdC2KkP4nwBQtDNiol3NfQDvM4B0SuzB90AIfqiVKU51gd1Vc7Oh3vyMZaDcHKnKz6yTjq9TR845kUZy/eXbN4L2PP6z3Iv/C1A72LAXFcTnmdxRpFZ7dDEfFF3l50tYmJfzNsy5I7ppwypQwF5u+ZIiYq+EmA/Zh2tc/BH7BrfeHmVGbosdElYP1applDfxPPACblkstSqp/gmTT4B/urzJDCEW2OT+FfiBwo5DU6aZ8L9+a97JgeFtt+1r83jdefp/FXta/RmQ+40Pek4Xqk6vyLLMmkWH6/GT8XeQLX4hg1GayYZmPviE2rogRNUHmTz4a4clplfzLoxW0J9aRR8OQ==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dTQ5ZUdLbnVZRitqS0dWQW5tU29YVVk1ck1JTm51ZlRiL25ib0hrMWJVWTJR?=
- =?utf-8?B?b0hPZnlEQ3o0eGdQcm9iK1hHOGNGVlpEMWgzbExoTGgvME1iY1BKaW9VSzM2?=
- =?utf-8?B?K3hZTXVEN0lVeHpDR0F6WEQ4dTJUdnhHeFdpdlVVUFlXalRudTV6RlE4NlRR?=
- =?utf-8?B?Z1FBZlgvVWc4aWQ1bzN5V2R0WEwxQm1PaWRic2tIeG0rWTJ2SHhnR1o5d0NQ?=
- =?utf-8?B?Mk54QlNXVUpJbElZT1kyQmxWRUJEbk82ckJRQ2ZrellUUEFhVXhsQTlEMzRI?=
- =?utf-8?B?OEorU3pGOUJwSGJ5U3Y1UEJYZ014aDFkVG9nT1FFUUlZUFRuaFQvZlpCemJm?=
- =?utf-8?B?d1hvQ0c4RlNjMHdKUmhwM3B2MWJ2dW16blQ1QUYyY2JXeGd1STZhVzZaaVVs?=
- =?utf-8?B?amNOMjkxYkZSTzV5MzNscm9VemRiWG9zRDd4SEtrbWhxKzA1TzJqQ3JRRGJR?=
- =?utf-8?B?RTNPZXpvRVBFUjV4Z2VoZWxycmpxcDFmaUNnRUpUVndEZ3JwYmpqK0V2dTRn?=
- =?utf-8?B?UXcwY09yQmxZL3REbzNrZEQrWmgzZWxTbjBpM0dUdlN4aUlGTjNrUndQUXpH?=
- =?utf-8?B?eWIvWWMrSjU2cDlxSUtFQWxsYWY4U3M4QU5SSXlEOTBOUjZjVDB5WXdlRnQ5?=
- =?utf-8?B?ckx2VnpBaFZMVFhEeDlqdXNZL2xiZnQ4akFDbkFSQnlwQTkxamkxdHpsU1pk?=
- =?utf-8?B?Y09odWZvZ2RvUHhPaE1xVWthTEJxS01PbGoyRU5QNkFZZ0hqaVFhZjlpTC9m?=
- =?utf-8?B?RE1IVVlQOGV2ZVNlS3VoVDI2MmltZXJ3ZC9nUDBFTGQxaUlJVEZhS3ZwOUJO?=
- =?utf-8?B?Nk15Q0U2aXRJMEpCM3JDODh3RjhpSjJ5ME53MEdYTTVsZE9ZNDFnSC9BaFFp?=
- =?utf-8?B?bFBWcjRwMUJwVlNGUGNkdGx2eWZ1TlUrSWRqL2p1VUpsOG4xcTdqTUVvRmxB?=
- =?utf-8?B?NW1xUHQ0RnpENndUSTBTdTRHTEVBZnVqN0tJd0Faa0NhczU4dzRvVE9vMHpx?=
- =?utf-8?B?ckVRM1N4MDQybGsxMWhHbWk2blRxT0k0QlZiNzkxNnVWMGoxYm1hNnJOK3Vx?=
- =?utf-8?B?VVRGeWltSkVTUkVKNTRUWWJCcTB0a3U5ei9HYTlpWHhnOWxNNGtrNitTMkhK?=
- =?utf-8?B?S1BBY2pRYWZRbEw3TVErRWcwY0VzNmtCQzAvbG9sUkQ0QWZoMENnVFpwLzli?=
- =?utf-8?B?U1BPVWMxRE02RmRwVU5xcDR2NjVCMEVUTHdBT3d3SDlkcTZHTEM4OFpvMXhx?=
- =?utf-8?B?QnJFdHlyL0g5VktGbmFJTlkyd24xdW8vNWMyVDhnWnhoZEQ3Y25qaUtKekM3?=
- =?utf-8?B?MmE4VUV4UjBVRklycmowdU14UjBtdWdNVkdmajljRzRYT2Q3TFhLcWZxZStE?=
- =?utf-8?B?eDRFbjBDbjBGUFp2aDB3MWZ5NE0xeUQrQU5PZFYrVUo3NHh0T3hZck9uUnQv?=
- =?utf-8?B?cFlPU0luYlNPNkRZNjZzd0dGYm1kVXBpT0k1Y2xhVU1SQUY5aUhvQUNhSlEy?=
- =?utf-8?B?YTl1T0svdWtjdlF6S0cvd05EQ25ZZXFhTlVBL0xqTnhSVGMrR3QwUFhSa095?=
- =?utf-8?B?d09FM3Z2d1hKd0VkY09wOFJoemFYdG9YTGxNam9rdUgrUW92dS94bEFVU3dU?=
- =?utf-8?B?SlZpVWRGb0hoN1dTMnB1dnlJQTNUdTFmUHVUMTlGOG1QdWZZS29KVjdHa1Jt?=
- =?utf-8?B?YXlsTjhQdDJZRGsrcU5lcis1T0orV2FhMk4ycHNiamo0S2J3WWJXbW1nPT0=?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3aba2000-2fa0-4171-2916-08dad218430a
-X-MS-Exchange-CrossTenant-AuthSource: DU2P193MB2114.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2022 14:44:47.4008
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1P193MB0637
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Rather than merely hoping that the callback gets called on another CPU,
+arrange for that to actually happen, by round robining which CPU the
+timer fires on. This way, on multiprocessor machines, we exacerbate
+jitter by touching the same memory from multiple different cores.
 
-Hello,
+There's a little bit of tricky bookkeeping involved here, because using
+timer_setup_on_stack() + add_timer_on() + del_timer_sync() is a recipe
+for disaster. See this sample code: <https://xn--4db.cc/xBdEiIKO/c>.
 
-I am writing to follow up on my email.
+Mitigating this by calling del_timer_sync() (or try_to_del_timer_sync())
+before each add_timer_on() also isn't satisfactory, because that halts
+the main entropy collecting loop while it waits, trying to acquire the
+timer base spinlock.
 
-Can we get on a call on Thursday (1st November) or Friday (2nd November) 
-so we can discuss this further?
+So instead, poll a boolean inside of the main loop to indicate when the
+timer callback has finished executing. This serializes the callbacks
+while still ensuring the main loop continues.
 
-Please suggest a day and time to connect and also share the best number 
-to reach you.
+Cc: Sultan Alsawaf <sultan@kerneltoast.com>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
-Thank you
-Susan Lewis
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 7b71cea6a6ab..40d0395ea566 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1232,7 +1232,9 @@ void __cold rand_initialize_disk(struct gendisk *disk)
+ struct entropy_timer_state {
+ 	unsigned long entropy;
+ 	struct timer_list timer;
+-	unsigned int samples, samples_per_bit;
++	atomic_t samples;
++	unsigned int samples_per_bit;
++	bool is_running;
+ };
+ 
+ /*
+@@ -1250,10 +1252,9 @@ static void __cold entropy_timer(struct timer_list *timer)
+ {
+ 	struct entropy_timer_state *state = container_of(timer, struct entropy_timer_state, timer);
+ 
+-	if (++state->samples == state->samples_per_bit) {
++	if (atomic_inc_return(&state->samples) % state->samples_per_bit == 0)
+ 		credit_init_bits(1);
+-		state->samples = 0;
+-	}
++	smp_store_release(&state->is_running, false);
+ }
+ 
+ /*
+@@ -1263,9 +1264,10 @@ static void __cold entropy_timer(struct timer_list *timer)
+ static void __cold try_to_generate_entropy(void)
+ {
+ 	enum { NUM_TRIAL_SAMPLES = 8192, MAX_SAMPLES_PER_BIT = HZ / 15 };
+-	struct entropy_timer_state stack;
++	struct entropy_timer_state stack = { 0 };
+ 	unsigned int i, num_different = 0;
+ 	unsigned long last = random_get_entropy();
++	int cpu = -1;
+ 
+ 	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
+ 		stack.entropy = random_get_entropy();
+@@ -1277,19 +1279,38 @@ static void __cold try_to_generate_entropy(void)
+ 	if (stack.samples_per_bit > MAX_SAMPLES_PER_BIT)
+ 		return;
+ 
+-	stack.samples = 0;
+ 	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
+ 	while (!crng_ready() && !signal_pending(current)) {
+-		if (!timer_pending(&stack.timer))
+-			mod_timer(&stack.timer, jiffies);
++		/*
++		 * Check both !timer_pending() and state->is_running to ensure that any previous
++		 * callback has finished executing, before queueing the next one.
++		 */
++		if (!timer_pending(&stack.timer) && !smp_load_acquire(&stack.is_running)) {
++			preempt_disable();
++
++			/* Basic CPU round-robin, which avoids the current CPU. */
++			do {
++				cpu = cpumask_next(cpu, cpu_online_mask);
++				if (cpu == nr_cpumask_bits)
++					cpu = cpumask_first(cpu_online_mask);
++			} while (cpu == smp_processor_id() && cpumask_weight(cpu_online_mask) > 1);
++
++			/* Expiring the timer at `jiffies` means it's the next tick. */
++			stack.timer.expires = jiffies;
++
++			smp_store_release(&stack.is_running, true);
++			add_timer_on(&stack.timer, cpu);
++
++			preempt_enable();
++		}
+ 		mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
+ 		schedule();
+ 		stack.entropy = random_get_entropy();
+ 	}
++	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
+ 
+ 	del_timer_sync(&stack.timer);
+ 	destroy_timer_on_stack(&stack.timer);
+-	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
+ }
+ 
+ 
+-- 
+2.38.1
 
-On 8/8/2022 2:27 PM, Susan Lewis wrote:
-
-Hello - Greetings,
-
-We are a Software/IT development company. We build Digital Solutions 
-using emerging technologies for Startups and Enterprises.
-
-We can help you to become a game changer in your business segment, we 
-deliver enterprise blockchain solutions that go beyond optimization of 
-workflow and resources. Get a resilient ecosystem to privately 
-communicate, accelerate critical processes, and continuously innovate.
-
-What can you expect from blockchain?
-
-     Automation
-     Eliminates duplication of data
-     Enhance data security
-     Reduce risk
-
-Solution we offer:
-
-     Blockchain Smart contract development
-     NFT Token and Marketplace development
-     Crypto Wallet development
-     Defi
-     Crowdfunding
-     File storage
-     Protection of intellectual property
-     Cryptocurrency Exchange Software and more
-
-Can we have a free consultation call – we'll tell you how to revamp your 
-existing system or hit the market with a new solution?
-
-Please suggest a day/time and share the best number to reach you.
-
-Thank you
-Susan Lewis
