@@ -2,137 +2,434 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37313C4167B
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 11:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2D2C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 11:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbiK2Lyq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 06:54:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55220 "EHLO
+        id S232490AbiK2Lzk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 06:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231768AbiK2Lyp (ORCPT
+        with ESMTP id S233089AbiK2Lza (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 06:54:45 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3D554B3B;
-        Tue, 29 Nov 2022 03:54:44 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATBIOht022888;
-        Tue, 29 Nov 2022 11:53:32 GMT
+        Tue, 29 Nov 2022 06:55:30 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0A755CB5;
+        Tue, 29 Nov 2022 03:55:28 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2ATB8Bqq003984;
+        Tue, 29 Nov 2022 11:54:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : mime-version : content-type; s=pp1;
- bh=DDN8rVl+bpX39wsMmtBu4zAD3/8mE0dKx+jGxLGVP0k=;
- b=PBAlmsi/4t7//jurN6Y3sIGU+iNFiS2anqgZIQMDndU+Mz+aIrrdzaSHdF7O1YWdSxZe
- 7JeDu08Kn2eMIeOGjXnfjdPM+IoZg6sZy3cfZs4WXqpHRnERvXx98lR9fU7rNXaPdH0e
- GPQEI4b55iW0or9GwIJ1/MF6QriiQM4vouX9g8AIyDR+13v3KN/wMzlvVXwd9cx0sLrw
- 7Qsd3WdIdeDJmNJwAU7kZRcikd5vk5fmbuarB4OvExZDQb5ocEl+b4oattho2cg2+7zY
- PNhSMRLF+4vJcDPw5oAv3QGj4uRDUye/HJTc9TlNmAzEJBgboL5egEaCQ8N/7NrhifQW 8w== 
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5h3f0qep-1
+ bh=4eMSML9eJqmELQj7u+vVcLwLkRvqQ9eO7+Dm5wmJh7I=;
+ b=CEbQgPQzvwe8uQ3C/fDDT8ZI1dAPxahP22QiPa+VZ85kMRRC61wJWgX8rJ+WeXcyAkMK
+ OEOHJOXUr3AeJnvn+leLCBZSvtlm7uLgMGrzf9iWpK9CDiij2w/iCzpc1WltLWiiT24I
+ UQFPA3rhQ1HqSoliVWEXD76iq1bLfRxPdJ78n/5cyjL5fAK7IpTHOnjmDUPO0tbd2BFY
+ BMUH05UJ46zg90cTNf0VxUN6YN2OwqEm56LYbAN90GI3DJxJuSGozTrnU1rM0YRMIT56
+ FpYqxO4FJwD1mHbVGcKZPakT0FPG3pt4ZYd7xgNOu8LVnIKRaHfwEGVaPNYy9adGyyQ7 fw== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5gxds1ws-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 11:53:31 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATBpfEr028674;
-        Tue, 29 Nov 2022 11:53:31 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma03wdc.us.ibm.com with ESMTP id 3m3ae9c9yq-1
+        Tue, 29 Nov 2022 11:54:18 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATBnwD9014717;
+        Tue, 29 Nov 2022 11:54:18 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma02dal.us.ibm.com with ESMTP id 3m3ae9h7nx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 11:53:31 +0000
+        Tue, 29 Nov 2022 11:54:17 +0000
 Received: from smtpav01.dal12v.mail.ibm.com ([9.208.128.133])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATBrUY633161624
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATBsEUi53608904
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Nov 2022 11:53:30 GMT
+        Tue, 29 Nov 2022 11:54:15 GMT
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EEFF25805D;
-        Tue, 29 Nov 2022 11:53:29 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 270FF58058;
+        Tue, 29 Nov 2022 11:54:16 +0000 (GMT)
 Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A85B58057;
-        Tue, 29 Nov 2022 11:53:27 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id CA36258063;
+        Tue, 29 Nov 2022 11:54:13 +0000 (GMT)
 Received: from Dannys-MacBook-Pro.local (unknown [9.211.123.96])
         by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 29 Nov 2022 11:53:27 +0000 (GMT)
-Date:   Tue, 29 Nov 2022 19:53:19 +0800
+        Tue, 29 Nov 2022 11:54:13 +0000 (GMT)
+Date:   Tue, 29 Nov 2022 19:54:10 +0800
 From:   Danny Tsen <dtsen@linux.ibm.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
         nayna@linux.ibm.com, appro@cryptogams.org,
         linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
         dtsen@linux.ibm.com
-Subject: [PATCH 1/6] crypto: Update Kconfig and Makefile.
-Message-ID: <Y4XyrwXxv225exkb@Dannys-MacBook-Pro.local>
+Subject: [PATCH 2/6] crypto: Glue code for AES/GCM stitched implementation.
+Message-ID: <Y4Xy4m2F3k8scfM3@Dannys-MacBook-Pro.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PcO-8zCP8g_Y0bkd7N4fwmzjIA0492yK
-X-Proofpoint-ORIG-GUID: PcO-8zCP8g_Y0bkd7N4fwmzjIA0492yK
+X-Proofpoint-ORIG-GUID: mLZZxTxd13DYnyrA7bZnGOQHXWCulzvT
+X-Proofpoint-GUID: mLZZxTxd13DYnyrA7bZnGOQHXWCulzvT
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-29_07,2022-11-29_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- impostorscore=0 phishscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0
- mlxscore=0 spamscore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2211290069
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
+ phishscore=0 suspectscore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211290069
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Defined CRYPTO_P10_AES_GCM in Kconfig to support AES/GCM
-stitched implementation for Power10+ CPU.
-
-Added a new module driver p10-aes-gcm-crypto.
-
 Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 ---
- arch/powerpc/crypto/Kconfig  | 11 +++++++++++
- arch/powerpc/crypto/Makefile | 10 ++++++++++
- 2 files changed, 21 insertions(+)
+ arch/powerpc/crypto/p10-aes-gcm-glue.c | 341 +++++++++++++++++++++++++
+ 1 file changed, 341 insertions(+)
+ create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
 
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index c1b964447401..db7d99383993 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -94,4 +94,15 @@ config CRYPTO_AES_PPC_SPE
- 	  architecture specific assembler implementations that work on 1KB
- 	  tables or 256 bytes S-boxes.
- 
-+config CRYPTO_P10_AES_GCM
-+	tristate "Stitched AES/GCM acceleration support on P10+ CPU (PPC)"
-+	depends on PPC64
-+	select CRYPTO_LIB_AES
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_AEAD
-+	default m
-+	help
-+	  Support for cryptographic acceleration instructions on Power10+ CPU.
-+	    This module supports stitched acceleration for AES/GCM in hardware.
+diff --git a/arch/powerpc/crypto/p10-aes-gcm-glue.c b/arch/powerpc/crypto/p10-aes-gcm-glue.c
+new file mode 100644
+index 000000000000..5d3b52787828
+--- /dev/null
++++ b/arch/powerpc/crypto/p10-aes-gcm-glue.c
+@@ -0,0 +1,341 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Glue code for accelerated AES-GCM stitched implementation for ppc64le.
++ *
++ * Copyright 2022- IBM Inc. All rights reserved
++ */
 +
- endmenu
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index 4808d97fede5..5b8252013abd 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
- obj-$(CONFIG_CRYPTO_CRC32C_VPMSUM) += crc32c-vpmsum.o
- obj-$(CONFIG_CRYPTO_CRCT10DIF_VPMSUM) += crct10dif-vpmsum.o
- obj-$(CONFIG_CRYPTO_VPMSUM_TESTER) += crc-vpmsum_test.o
-+obj-$(CONFIG_CRYPTO_P10_AES_GCM) += p10-aes-gcm-crypto.o
- 
- aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes-spe-glue.o
- md5-ppc-y := md5-asm.o md5-glue.o
-@@ -21,3 +22,12 @@ sha1-ppc-spe-y := sha1-spe-asm.o sha1-spe-glue.o
- sha256-ppc-spe-y := sha256-spe-asm.o sha256-spe-glue.o
- crc32c-vpmsum-y := crc32c-vpmsum_asm.o crc32c-vpmsum_glue.o
- crct10dif-vpmsum-y := crct10dif-vpmsum_asm.o crct10dif-vpmsum_glue.o
-+p10-aes-gcm-crypto-y := p10-aes-gcm-glue.o p10_aes_gcm.o ghashp8-ppc.o aesp8-ppc.o
++#include <asm/unaligned.h>
++#include <asm/simd.h>
++#include <asm/switch_to.h>
++#include <crypto/algapi.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <crypto/b128ops.h>
++#include <crypto/gf128mul.h>
++#include <crypto/internal/simd.h>
++#include <crypto/internal/aead.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++#include <linux/types.h>
 +
-+quiet_cmd_perl = PERL    $@
-+      cmd_perl = $(PERL) $< $(if $(CONFIG_CPU_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
++#define PPC_MODULE_FEATURE_P10	(32 + ilog2(PPC_FEATURE2_ARCH_3_1))
++#define	PPC_ALIGN		16
++#define GCM_IV_SIZE		12
 +
-+targets += aesp8-ppc.S ghashp8-ppc.S
++MODULE_DESCRIPTION("PPC64le AES-GCM with Stitched implementation");
++MODULE_AUTHOR("Danny Tsen <dtsen@linux.ibm.com");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("aes");
 +
-+$(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
-+	$(call if_changed,perl)
++asmlinkage int aes_p8_set_encrypt_key(const u8 *userKey, const int bits,
++				      void *key);
++asmlinkage void aes_p8_encrypt(const u8 *in, u8 *out, const void *key);
++asmlinkage void aes_p10_gcm_encrypt(u8 *in, u8 *out, size_t len,
++				    void *rkey, u8 *iv, void *Xi);
++asmlinkage void aes_p10_gcm_decrypt(u8 *in, u8 *out, size_t len,
++				    void *rkey, u8 *iv, void *Xi);
++asmlinkage void gcm_init_htable(unsigned char htable[256], unsigned char Xi[16]);
++asmlinkage void gcm_ghash_p8(unsigned char *Xi, unsigned char *Htable,
++		unsigned char *aad, unsigned int alen);
++
++struct aes_key {
++	u8 key[AES_MAX_KEYLENGTH];
++	u64 rounds;
++};
++
++struct gcm_ctx {
++	u8 iv[16];
++	u8 ivtag[16];
++	u8 aad_hash[16];
++	u64 aadLen;
++	u64 Plen;	/* offset 56 - used in aes_p10_gcm_{en/de}crypt */
++};
++struct Hash_ctx {
++	u8 H[16];	/* subkey */
++	u8 Htable[256];	/* Xi, Hash table(offset 32) */
++};
++
++struct p10_aes_gcm_ctx {
++	struct aes_key enc_key;
++};
++
++static void vsx_begin(void)
++{
++	preempt_disable();
++	enable_kernel_vsx();
++}
++
++static void vsx_end(void)
++{
++	disable_kernel_vsx();
++	preempt_enable();
++}
++
++static void set_subkey(unsigned char *hash)
++{
++	*(u64 *)&hash[0] = be64_to_cpup((__be64 *)&hash[0]);
++	*(u64 *)&hash[8] = be64_to_cpup((__be64 *)&hash[8]);
++}
++
++/*
++ * Compute aad if any.
++ *   - Hash aad and copy to Xi.
++ */
++static void set_aad(struct gcm_ctx *gctx, struct Hash_ctx *hash,
++		    unsigned char *aad, int alen)
++{
++	int i;
++	u8 nXi[16] = {0, };
++
++	gctx->aadLen = alen;
++	i = alen & ~0xf;
++	if (i) {
++		gcm_ghash_p8(nXi, hash->Htable+32, aad, i);
++		aad += i;
++		alen -= 16;
++	}
++	if (alen) {
++		for (i = 0; i < alen; i++)
++			nXi[i] ^= aad[i];
++	}
++	memset(gctx->aad_hash, 0, 16);
++	gcm_ghash_p8(gctx->aad_hash, hash->Htable+32, nXi, 16);
++	memcpy(hash->Htable, gctx->aad_hash, 16);
++}
++
++static void gcmp10_init(struct gcm_ctx *gctx, u8 *iv, unsigned char *rdkey,
++			struct Hash_ctx *hash, u8 *assoc, unsigned int assoclen)
++{
++	__be32 counter = cpu_to_be32(1);
++
++	aes_p8_encrypt(hash->H, hash->H, rdkey);
++	set_subkey(hash->H);
++	gcm_init_htable(hash->Htable+32, hash->H);
++
++	*((__be32 *)(iv+12)) = counter;
++
++	gctx->Plen = 0;
++
++	/*
++	 * Encrypt counter vector as iv tag and increment counter.
++	 */
++	aes_p8_encrypt(iv, gctx->ivtag, rdkey);
++
++	counter = cpu_to_be32(2);
++	*((__be32 *)(iv+12)) = counter;
++	memcpy(gctx->iv, iv, 16);
++
++	gctx->aadLen = assoclen;
++	memset(gctx->aad_hash, 0, 16);
++	if (assoclen)
++		set_aad(gctx, hash, assoc, assoclen);
++}
++
++static void finish_tag(struct gcm_ctx *gctx, struct Hash_ctx *hash, int len)
++{
++	int i;
++	unsigned char len_ac[16 + PPC_ALIGN];
++	unsigned char *aclen = PTR_ALIGN((void *)len_ac, PPC_ALIGN);
++	__be64 clen = cpu_to_be64(len << 3);
++	__be64 alen = cpu_to_be64(gctx->aadLen << 3);
++
++	if (len == 0) {
++		memcpy(hash->Htable, gctx->ivtag, 16);
++		return;
++	}
++
++	/*
++	 * Len is in bits.
++	 */
++	*((__be64 *)(aclen)) = alen;
++	*((__be64 *)(aclen+8)) = clen;
++
++	/*
++	 * hash (AAD len and len)
++	 */
++	gcm_ghash_p8(hash->Htable, hash->Htable+32, aclen, 16);
++
++	for (i = 0; i < 16; i++)
++		hash->Htable[i] ^= gctx->ivtag[i];
++}
++
++static int set_authsize(struct crypto_aead *tfm, unsigned int authsize)
++{
++	switch (authsize) {
++	case 4:
++	case 8:
++	case 12:
++	case 13:
++	case 14:
++	case 15:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int p10_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
++			     unsigned int keylen)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
++	int ret;
++
++	vsx_begin();
++	ret = aes_p8_set_encrypt_key(key, keylen * 8, &ctx->enc_key);
++	vsx_end();
++
++	return ret ? -EINVAL : 0;
++}
++
++static int p10_aes_gcm_crypt(struct aead_request *req, int enc)
++{
++	struct crypto_tfm *tfm = req->base.tfm;
++	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
++	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
++	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
++	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
++	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
++	struct scatter_walk assoc_sg_walk;
++	struct skcipher_walk walk;
++	u8 *assocmem = NULL;
++	u8 *assoc;
++	unsigned int assoclen = req->assoclen;
++	unsigned int cryptlen = req->cryptlen;
++	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
++	unsigned char *iv = PTR_ALIGN((void *)ivbuf, PPC_ALIGN);
++	int ret;
++	unsigned long auth_tag_len = crypto_aead_authsize(__crypto_aead_cast(tfm));
++	u8 otag[16];
++	int total_processed = 0;
++
++	memset(databuf, 0, sizeof(databuf));
++	memset(hashbuf, 0, sizeof(hashbuf));
++	memset(ivbuf, 0, sizeof(ivbuf));
++	memcpy(iv, req->iv, GCM_IV_SIZE);
++
++	/* Linearize assoc, if not already linear */
++	if (req->src->length >= assoclen && req->src->length) {
++		scatterwalk_start(&assoc_sg_walk, req->src);
++		assoc = scatterwalk_map(&assoc_sg_walk);
++	} else {
++		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++			      GFP_KERNEL : GFP_ATOMIC;
++
++		/* assoc can be any length, so must be on heap */
++		assocmem = kmalloc(assoclen, flags);
++		if (unlikely(!assocmem))
++			return -ENOMEM;
++		assoc = assocmem;
++
++		scatterwalk_map_and_copy(assoc, req->src, 0, assoclen, 0);
++	}
++
++	vsx_begin();
++	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
++	vsx_end();
++
++	if (!assocmem)
++		scatterwalk_unmap(assoc);
++	else
++		kfree(assocmem);
++
++	if (enc)
++		ret = skcipher_walk_aead_encrypt(&walk, req, false);
++	else
++		ret = skcipher_walk_aead_decrypt(&walk, req, false);
++	if (ret)
++		return ret;
++
++	while (walk.nbytes > 0 && ret == 0) {
++
++		vsx_begin();
++		if (enc)
++			aes_p10_gcm_encrypt(walk.src.virt.addr,
++					    walk.dst.virt.addr,
++					    walk.nbytes,
++					    &ctx->enc_key, gctx->iv, hash->Htable);
++		else
++			aes_p10_gcm_decrypt(walk.src.virt.addr,
++					    walk.dst.virt.addr,
++					    walk.nbytes,
++					    &ctx->enc_key, gctx->iv, hash->Htable);
++		vsx_end();
++
++		total_processed += walk.nbytes;
++		ret = skcipher_walk_done(&walk, 0);
++	}
++
++	if (ret)
++		return ret;
++
++	/* Finalize hash */
++	vsx_begin();
++	finish_tag(gctx, hash, total_processed);
++	vsx_end();
++
++	/* copy Xi to end of dst */
++	if (enc)
++		scatterwalk_map_and_copy(hash->Htable, req->dst, req->assoclen + cryptlen,
++					 auth_tag_len, 1);
++	else {
++		scatterwalk_map_and_copy(otag, req->src,
++					 req->assoclen + cryptlen - auth_tag_len,
++					 auth_tag_len, 0);
++
++		if (crypto_memneq(otag, hash->Htable, auth_tag_len)) {
++			memzero_explicit(hash->Htable, 16);
++			return -EBADMSG;
++		}
++	}
++
++	return 0;
++}
++
++static int p10_aes_gcm_encrypt(struct aead_request *req)
++{
++	return p10_aes_gcm_crypt(req, 1);
++}
++
++static int p10_aes_gcm_decrypt(struct aead_request *req)
++{
++	return p10_aes_gcm_crypt(req, 0);
++}
++
++static struct aead_alg gcm_aes_alg = {
++	.ivsize			= GCM_IV_SIZE,
++	.maxauthsize		= 16,
++
++	.setauthsize		= set_authsize,
++	.setkey			= p10_aes_gcm_setkey,
++	.encrypt		= p10_aes_gcm_encrypt,
++	.decrypt		= p10_aes_gcm_decrypt,
++
++	.base.cra_name		= "gcm(aes)",
++	.base.cra_driver_name	= "p10_aes_gcm",
++	.base.cra_priority	= 2100,
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct p10_aes_gcm_ctx),
++	.base.cra_module	= THIS_MODULE,
++};
++
++static int __init p10_init(void)
++{
++	return crypto_register_aead(&gcm_aes_alg);
++}
++
++static void __exit p10_exit(void)
++{
++	crypto_unregister_aead(&gcm_aes_alg);
++}
++
++module_cpu_feature_match(PPC_MODULE_FEATURE_P10, p10_init);
++module_exit(p10_exit);
 -- 
 2.31.1
 
