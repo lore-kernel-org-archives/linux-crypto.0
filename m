@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4574DC46467
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 08:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A67C46467
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 08:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbiK2I0l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 03:26:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37888 "EHLO
+        id S230256AbiK2I1a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 03:27:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbiK2I0k (ORCPT
+        with ESMTP id S230247AbiK2I13 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 03:26:40 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F5B56EF1
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2022 00:26:38 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id z20so18710197edc.13
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2022 00:26:38 -0800 (PST)
+        Tue, 29 Nov 2022 03:27:29 -0500
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252895656B
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2022 00:27:28 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id ho10so31945402ejc.1
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Nov 2022 00:27:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=resnulli-us.20210112.gappssmtp.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pgrzkkklPcAQYmyQMmCpEE1o3a9ohgeq3WVDc+0vm08=;
-        b=XiAjLYS5j4RwLKJGZxfsDINusHr9CRwW/Y3flS/dZFlY4O60OTBiKSUQjxvGIX+3Rg
-         dWAJ1ca2t+K0d+bi0hYAhKvXStoidmphxQ0TDLO6BSnIL0/DN3PnlJFDIMFRt3mXIa4g
-         ZMPEl75jJykR9z7KbG5TQ2wepgiS9FlevG8+O0tg70kUd7KYg2ugRDQg84wgWnAptk9T
-         NHGqa/dI8nJ2hDhtgvRxfieYv/2wyABK91GuDzW2R+fCWgqEG0yJvCUyqY3kdcbZmt0P
-         gS7yCTuTDX6ORTNxuGB1qv1ErmB0M7sxgSP6i5oaQm/rCTvkHAkTwlvZFSa7282d1MRL
-         RrTA==
+        bh=4v7Xp4UFwcIIZYZ0RgIN5pAk6f0FzEGlZBS1d7BjE8M=;
+        b=tRgxpeUumhzLWsC9NVTgDCLb6XS0lv/rpMqGNhMDpPr2Rq/mAUvJvDgqyVE9rVTHr3
+         PLUKB44JXwQ7XIg0oDXwmJ2BDHkmwhB4pzfCWYwM3SrWaYo8wgndawp+QpWpQviZ5Z7+
+         T+q8PhrZYvCH84GnWsBe3i67Jv+D/wyYe9rBax2Wl1B80SP5M0CIIfbzBPPKG/EBm2pf
+         eiEqZ+FEiD7eaqNOT/0oL2A0jJsp39JaFVijnYra2HosHEXTsYyW6Fz9IOeCc5AmZinv
+         rKdJDpSTIqIETiN/h9e/7lmGL6x18E2SIG2b0qPdnsH0pML71bpStt2ATvHcno7vkt8r
+         t9RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pgrzkkklPcAQYmyQMmCpEE1o3a9ohgeq3WVDc+0vm08=;
-        b=RndZXmRSNiaM/VgTmLVFdVIFEMVcvOxjYl6njpG4ewUg7+tw5Lsd+b8oBELoEINwgx
-         qUZCclhhRvjGIM7X8X4NJI807/dehylMxxn5pGxfLaMZUqIbu5MZsLmJo3hR7TnGMGGA
-         N9Oh+PScqlrnnuAMeYmGwSqzxtcjr6El2R5W0yOcfyxSu08gz+vWBH+qCYOnO6+I/mfs
-         uzqYShmuOq7E3Oy/9siij92wW/rCmyGW3vf4YbtfiUVgyNgS6fOq+fmgDEjUy7cdJbtY
-         kxDuo7CApE+ATtVnaJeyOHv0rIlRW/ZEgB+jxmA1iceAycnREsJTrP2n8djk1XNWkioP
-         9Qvw==
-X-Gm-Message-State: ANoB5pmJP5/hYitU/SznXt60zXUKhTfHmTs6Iz31lSEL5pBFRhqT0d9/
-        lXzENlO/d34cOyVpWJ+2v6bFBg==
-X-Google-Smtp-Source: AA0mqf6AhCTZUtOfuGYDhXfqaKP0HI3CcryljG1Et3fvW7wqzGVxjYaxttb++c6crBKvAOdrZVKVcw==
-X-Received: by 2002:a05:6402:1f14:b0:461:c7ef:b09e with SMTP id b20-20020a0564021f1400b00461c7efb09emr37432404edb.58.1669710397245;
-        Tue, 29 Nov 2022 00:26:37 -0800 (PST)
+        bh=4v7Xp4UFwcIIZYZ0RgIN5pAk6f0FzEGlZBS1d7BjE8M=;
+        b=jY/0IMfeVHnFlfPj832/mOCZMbvihw+ZLklBaSx07L4Swh5Cfn3088BubB+eWO7Qry
+         V2rWzBvBLd/o/Tj4LKRav02sedg6nBmHQqELrM6Q+2PnwjkID+aY8tXA0J4mvXDmY2TY
+         9TgOYuQde6lmQDVPcKBegCuchwAU4hOCg53RT+gLP3L/m3O+PUI6qoadKtReWCeui6yK
+         KOTk0AWyZtx8QDqFo19n3mzNq59e8VypFyMv5YoqWyDKljrDggkf0l31RePbEzg2S8Xe
+         s9wd2TRFyhmyrUgaU0IlZFaEeW+RZmN1rX6jL7I8cVvd40U7Pj//4JmkZVE1ZA+79x1o
+         mjJw==
+X-Gm-Message-State: ANoB5pn+d79hAjH2RZRuI93KE936as59waForpuXEckn+EjlIea/WYwD
+        2W669e4iMFeL1ArgUxHkpW/Tbg==
+X-Google-Smtp-Source: AA0mqf4klzozGLk8G6ChytpzpBsUMkgVkxU4/gqOvr33nL+FktypM4IdS/dR44D+c0D+dCGAFz/q1A==
+X-Received: by 2002:a17:906:5a84:b0:7ae:65e4:7204 with SMTP id l4-20020a1709065a8400b007ae65e47204mr45496813ejq.579.1669710445675;
+        Tue, 29 Nov 2022 00:27:25 -0800 (PST)
 Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id r9-20020a50aac9000000b00461c6e8453dsm6017247edc.23.2022.11.29.00.26.36
+        by smtp.gmail.com with ESMTPSA id kz1-20020a17090777c100b0078de26f66b9sm5851248ejc.114.2022.11.29.00.27.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 00:26:36 -0800 (PST)
-Date:   Tue, 29 Nov 2022 09:26:35 +0100
+        Tue, 29 Nov 2022 00:27:25 -0800 (PST)
+Date:   Tue, 29 Nov 2022 09:27:24 +0100
 From:   Jiri Pirko <jiri@resnulli.us>
 To:     Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 Cc:     Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org,
@@ -99,33 +99,25 @@ Cc:     Jiri Pirko <jiri@nvidia.com>, netdev@vger.kernel.org,
         Guangbin Huang <huangguangbin2@huawei.com>,
         Minghao Chi <chi.minghao@zte.com.cn>,
         Shijith Thotton <sthotton@marvell.com>
-Subject: Re: [PATCH net-next v5 3/4] net: devlink: make the
- devlink_ops::info_get() callback optional
-Message-ID: <Y4XCO21nYeJZKUh5@nanopsycho>
+Subject: Re: [PATCH net-next v5 4/4] net: devlink: clean-up empty
+ devlink_ops::info_get()
+Message-ID: <Y4XCbMooeWxsovHT@nanopsycho>
 References: <20221129000550.3833570-1-mailhol.vincent@wanadoo.fr>
- <20221129000550.3833570-4-mailhol.vincent@wanadoo.fr>
+ <20221129000550.3833570-5-mailhol.vincent@wanadoo.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221129000550.3833570-4-mailhol.vincent@wanadoo.fr>
+In-Reply-To: <20221129000550.3833570-5-mailhol.vincent@wanadoo.fr>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Tue, Nov 29, 2022 at 01:05:49AM CET, mailhol.vincent@wanadoo.fr wrote:
->Some drivers only reported the driver name in their
->devlink_ops::info_get() callback. Now that the core provides this
->information, the callback became empty. For such drivers, just
->removing the callback would prevent the core from executing
->devlink_nl_info_fill() meaning that "devlink dev info" would not
->return anything.
+Tue, Nov 29, 2022 at 01:05:50AM CET, mailhol.vincent@wanadoo.fr wrote:
+>devlink_ops::info_get() is now optional and devlink will continue to
+>report information even if that callback gets removed.
 >
->Make the callback function optional by executing
->devlink_nl_info_fill() even if devlink_ops::info_get() is NULL.
->
->N.B.: the drivers with devlink support which previously did not
->implement devlink_ops::info_get() will now also be able to report
->the driver name.
+>Remove all the empty devlink_ops::info_get() callbacks from the
+>drivers.
 >
 >Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
