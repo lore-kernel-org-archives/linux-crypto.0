@@ -2,113 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF95C4321E
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 11:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D02CAC4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 11:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbiK2LyD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 06:54:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54602 "EHLO
+        id S232816AbiK2Lyo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 06:54:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231826AbiK2LyC (ORCPT
+        with ESMTP id S229603AbiK2Lyo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 06:54:02 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3203454B3B;
-        Tue, 29 Nov 2022 03:54:02 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AT9kFa4006636;
-        Tue, 29 Nov 2022 11:52:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : mime-version : content-type; s=pp1;
- bh=jI8jJEOJ6YN347QD8GxvxY855mlZXtRWwg9j7N6zesM=;
- b=th3qjFSSl1mpo+QQtYQTJrPlGZNUfNJK2avdIsdnprJaa6yIN5jyNWcsZn4EJ6yh1GTr
- G+2XIdRGAqNSrqGBaNunSoIv5Wnrq3T1AIWh5rNTCMgnzf2iijaSRV47i8CyuMcaHqWq
- 90nOesfwYybG7Vlarcf6g8/I+IGn3IdK9PkP0xChUbKxwidL0p/VORRPxxas7gv6cZtB
- GUN7G0H6NiHNUJhA8Jh4f3Q5yh1/5yeip6idIIK8EFMs/iZ/o+flcinMTrzy8fzJbjah
- zG0l7mAJ1gO1TtaVy6OgK3zYUPHXb3XauFKXsj8qOWikqWahwqUGVSThbG+hzJKBDdBy vw== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m5djwpegf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 11:52:45 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2ATBpE7q023615;
-        Tue, 29 Nov 2022 11:52:44 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04wdc.us.ibm.com with ESMTP id 3m3ae9m8v2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Nov 2022 11:52:44 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com ([9.208.128.115])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2ATBqg5k20251160
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Nov 2022 11:52:43 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C92EC58056;
-        Tue, 29 Nov 2022 11:52:42 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4809C5805A;
-        Tue, 29 Nov 2022 11:52:40 +0000 (GMT)
-Received: from Dannys-MacBook-Pro.local (unknown [9.211.123.96])
-        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 29 Nov 2022 11:52:40 +0000 (GMT)
-Date:   Tue, 29 Nov 2022 19:52:30 +0800
-From:   Danny Tsen <dtsen@linux.ibm.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
-        dtsen@linux.ibm.com
-Subject: [PATCH 0/6] crypto: Accelerated AES/GCM stitched implementation
-Message-ID: <Y4Xyflca/hkvR0eR@Dannys-MacBook-Pro.local>
+        Tue, 29 Nov 2022 06:54:44 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C11054B3B;
+        Tue, 29 Nov 2022 03:54:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1170E616E3;
+        Tue, 29 Nov 2022 11:54:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3A2CC433C1;
+        Tue, 29 Nov 2022 11:54:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669722882;
+        bh=B358EqJzHqfHpVOoVQSjd9p9tjUfi8PFDuOsY9VvxPA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=V6eqmIXK18Ikxo0VVZTQfqu8URAT72PYmw1ka2tAjj0v65afbAjuu6S6P+nZLpKJr
+         rMDKhgjld9Q+zpQoNind9nqQ/DYr/XdcS8tTzrAxMTckFAqHn+xSs5XhDAvG8/LL1a
+         Ekalo/xJ2HTUz0lLYBwArSwqKpJlYFSBgtbgKbIXrGWkSS8lOLUE6HzOol9YXJkAqb
+         tAMUfiRhUKfb2uNqCa4Tg6pmbF0qG9N85XCIF6MKJ73D4ZkXYnjKseCsIpUM862AXr
+         zrmhqJClU3zMQ6WRaoSDrgx13+ZgWXerhu3AH0Op9HMjrXA7U/H58Jc5glcZN9yfan
+         EYTdRFs1+MzGw==
+Date:   Tue, 29 Nov 2022 12:54:39 +0100
+From:   Frederic Weisbecker <frederic@kernel.org>
+To:     Leonardo Bras <leobras@redhat.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Phil Auld <pauld@redhat.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Wang Yufen <wangyufen@huawei.com>, mtosatti@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] sched/isolation: Improve documentation
+Message-ID: <20221129115439.GA1715045@lothringen>
+References: <20221013184028.129486-1-leobras@redhat.com>
+ <20221013184028.129486-3-leobras@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3RLrEUFhQJBWWfqdSGvj3-GKjF0xkr7A
-X-Proofpoint-GUID: 3RLrEUFhQJBWWfqdSGvj3-GKjF0xkr7A
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-29_07,2022-11-28_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=595 spamscore=0
- clxscore=1011 lowpriorityscore=0 phishscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211290069
+In-Reply-To: <20221013184028.129486-3-leobras@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch series enable an accelerated AES/GCM stitched implementation for
-Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
-implementation provides 3.5X+ better performance than the baseline.
+On Thu, Oct 13, 2022 at 03:40:27PM -0300, Leonardo Bras wrote:
+> Improve documentation on housekeeping types and what to expect from
+> housekeeping functions.
+> 
+> Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> ---
+>  include/linux/sched/isolation.h | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index 762701f295d1c..9333c28153a7a 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -7,18 +7,25 @@
+>  #include <linux/tick.h>
+>  
+>  enum hk_type {
+> -	HK_TYPE_TIMER,
+> -	HK_TYPE_RCU,
+> -	HK_TYPE_MISC,
+> -	HK_TYPE_SCHED,
+> -	HK_TYPE_TICK,
+> -	HK_TYPE_DOMAIN,
+> -	HK_TYPE_WQ,
+> -	HK_TYPE_MANAGED_IRQ,
+> -	HK_TYPE_KTHREAD,
+> +	HK_TYPE_TIMER,		/* Timer interrupt, watchdogs */
 
-This patch has been tested with the kernel crypto module tcrypt.ko and has
-passed the selftest.
+More precisely:
 
-Danny Tsen (7):
-  powerpc/crypto: Define new module in Kconfig.
-  powerpc/crypto: Create new module driver.
-  powerpc/crypto: Functions to set round keys and encrypt data.
-  powerpc/crypto: Functions for creating hash table and generate hash.
-  powerpc/crypto: Glue code to create AEAD algorithm module.
-  powerpc/crypto: Added new stitched AES/GCM implementation.
-  powerpc/crypto: Perl script to process PowerPC asember source.
+     /* Unbound timer callbacks */
 
+> +	HK_TYPE_RCU,		/* RCU callbacks */
 
- arch/powerpc/crypto/Kconfig  | 11 +++++++++++
- arch/powerpc/crypto/Makefile | 10 ++++++++++
- arch/powerpc/crypto/p10-aes-gcm-glue.c | 341 +++++++++++++++++++++++++
- arch/powerpc/crypto/p10_aes_gcm.S | 1519 +++++++++++++++++++++++++++++
- arch/powerpc/crypto/aesp8-ppc.pl | 3846 ++++++++++++++++++++++++++++++
- arch/powerpc/crypto/ghashp8-ppc.pl | 370 +++++++++++++++++++++++++++++
- arch/powerpc/crypto/ppc-xlate.pl | 229 +++++++++++++++++++++++++++++++
- 7 file changed, 6026 insertions(+)
- create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
- create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
- create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
- create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
- create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
--- 
-2.31.1
+More generally, because it's more than just about callbacks:
+
+     /* Unbound RCU work */
+
+> +	HK_TYPE_MISC,		/* Minor housekeeping categories */
+> +	HK_TYPE_SCHED,		/* Scheduling and idle load balancing */
+> +	HK_TYPE_TICK,		/* See isolcpus=nohz boot parameter */
+
+Yes or nohz_full=
+
+> +	HK_TYPE_DOMAIN,		/* See isolcpus=domain boot parameter*/
+> +	HK_TYPE_WQ,		/* Work Queues*/
+
+  /* Unbound workqueues */
+
+> +	HK_TYPE_MANAGED_IRQ,	/* See isolcpus=managed_irq boot parameter */
+> +	HK_TYPE_KTHREAD,	/* kernel threads */
+
+  /* Unbound kernel threads */
 
 
+>  	HK_TYPE_MAX
+>  };
+>  
+> +/* Kernel parameters like nohz_full and isolcpus allow passing cpu numbers
+> + * for disabling housekeeping types.
+> + *
+> + * The functions bellow work the opposite way, by referencing which cpus
+> + * are able to perform the housekeeping type in parameter.
+> + */
 
+*below
+
+Thanks!
+
+> +
+>  #ifdef CONFIG_CPU_ISOLATION
+>  DECLARE_STATIC_KEY_FALSE(housekeeping_overridden);
+>  int housekeeping_any_cpu(enum hk_type type);
+> -- 
+> 2.38.0
+> 
