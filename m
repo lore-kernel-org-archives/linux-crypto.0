@@ -2,159 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E959CC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 18:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 477E3C4708A
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Nov 2022 19:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235228AbiK2S2y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Nov 2022 13:28:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44104 "EHLO
+        id S236330AbiK2TCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Nov 2022 14:02:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232491AbiK2S2v (ORCPT
+        with ESMTP id S236395AbiK2TCU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Nov 2022 13:28:51 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA7527FE6;
-        Tue, 29 Nov 2022 10:28:50 -0800 (PST)
+        Tue, 29 Nov 2022 14:02:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6AE32612;
+        Tue, 29 Nov 2022 11:02:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id AD73BCE13D7;
-        Tue, 29 Nov 2022 18:28:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07DBEC433D6;
-        Tue, 29 Nov 2022 18:28:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PvzCMQo9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669746523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=40jd/O/f0+35LfGoNsCPN2/bS9KqtfSE7wnr2o/Obt8=;
-        b=PvzCMQo9yw03vDCVlLFBsktpgaTCQ8ltSTevEB/+27lVll5gYQwrfeJphskaTHaRMSYziz
-        UD+erupyHceNtbN0kjdvJE0849JAToBjtVZGC/IF2NzM40AUdmUONOe313MHR/QFuQzSO+
-        fLqZjbsZrhduNt3x8m7GUAaYXH2vV8Q=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2aea5919 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 29 Nov 2022 18:28:43 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v3] random: spread out jitter callback to different CPUs
-Date:   Tue, 29 Nov 2022 19:27:52 +0100
-Message-Id: <20221129182751.610558-1-Jason@zx2c4.com>
-In-Reply-To: <20221129160811.563011-1-Jason@zx2c4.com>
-References: <20221129160811.563011-1-Jason@zx2c4.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 53173B818BA;
+        Tue, 29 Nov 2022 19:02:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48EFCC433D7;
+        Tue, 29 Nov 2022 19:02:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669748528;
+        bh=zcH9Mx4yhhHCBaRFX7gIslk77gGtyEOFhzA1cK2yiwk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=b8E7E715gwiGVSu4+jlPan7GuwyRNtd5NEcmg4zeSs7Ek4RScBsaqVOnMKNCi261t
+         bLOXQt10knqyrBcbgNES9dGvdleL8kciII2JgDy9fG/VQUtNhnLK4ZDPv7NAW1yEIj
+         wc3BqzPAXJDTahjjTxa4rv7aKgvKK/Dpfw09W7z1OUHcoUjBVdhDx+kQxjl29JWj78
+         GCr6YgQ53UI9JUN4EIJZQisd9HE/6zgF2qxSG/iMMODXH0VOBTHWXyA3eWtipSoxjn
+         4ZZwlFtEVW450TYkaQ6X1K/Q2JBDPK7OEhk/0Q8QVHNEvCd8Zcio1F0LBG3vaIvX/5
+         CdyTq6Rp4XdAQ==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 1/2] padata: Do not mark padata_mt_helper() as __init
+Date:   Tue, 29 Nov 2022 12:01:22 -0700
+Message-Id: <20221129190123.872394-2-nathan@kernel.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20221129190123.872394-1-nathan@kernel.org>
+References: <20221129190123.872394-1-nathan@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rather than merely hoping that the callback gets called on another CPU,
-arrange for that to actually happen, by round robining which CPU the
-timer fires on. This way, on multiprocessor machines, we exacerbate
-jitter by touching the same memory from multiple different cores.
+When building arm64 allmodconfig + ThinLTO with clang and a proposed
+modpost update to account for -ffuncton-sections, the following warning
+appears:
 
-It's necessary to call [try_to_]del_timer_sync() before calling
-add_timer_on(), so that the final call to del_timer_sync() at the end of
-the function actually succeeds at making sure no handlers are running.
+  WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+  WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
 
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+In both cases, an __init function calls padata_work_init(), which is not
+marked __init, with padata_mt_helper(), another __init function, as a
+work function argument.
+
+padata_work_init() is called from non-init paths, otherwise it could be
+marked __init to resolve the warning. Instead, remove __init from
+padata_mt_helper() to resolve the warning.
+
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
-Changes v2->v3:
-- Thomas convinced me try_to_del_timer_sync() was fine.
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ kernel/padata.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- drivers/char/random.c | 36 +++++++++++++++++++++++++++---------
- 1 file changed, 27 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 7b71cea6a6ab..4cb1d606a492 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1232,7 +1232,8 @@ void __cold rand_initialize_disk(struct gendisk *disk)
- struct entropy_timer_state {
- 	unsigned long entropy;
- 	struct timer_list timer;
--	unsigned int samples, samples_per_bit;
-+	atomic_t samples;
-+	unsigned int samples_per_bit;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index e5819bb8bd1d..c2271d7e446d 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -45,7 +45,7 @@ struct padata_mt_job_state {
  };
  
- /*
-@@ -1250,10 +1251,8 @@ static void __cold entropy_timer(struct timer_list *timer)
- {
- 	struct entropy_timer_state *state = container_of(timer, struct entropy_timer_state, timer);
+ static void padata_free_pd(struct parallel_data *pd);
+-static void __init padata_mt_helper(struct work_struct *work);
++static void padata_mt_helper(struct work_struct *work);
  
--	if (++state->samples == state->samples_per_bit) {
-+	if (atomic_inc_return(&state->samples) % state->samples_per_bit == 0)
- 		credit_init_bits(1);
--		state->samples = 0;
--	}
+ static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
+ {
+@@ -425,7 +425,7 @@ static int padata_setup_cpumasks(struct padata_instance *pinst)
+ 	return err;
  }
  
- /*
-@@ -1263,9 +1262,10 @@ static void __cold entropy_timer(struct timer_list *timer)
- static void __cold try_to_generate_entropy(void)
+-static void __init padata_mt_helper(struct work_struct *w)
++static void padata_mt_helper(struct work_struct *w)
  {
- 	enum { NUM_TRIAL_SAMPLES = 8192, MAX_SAMPLES_PER_BIT = HZ / 15 };
--	struct entropy_timer_state stack;
-+	struct entropy_timer_state stack = { 0 };
- 	unsigned int i, num_different = 0;
- 	unsigned long last = random_get_entropy();
-+	int cpu = -1;
- 
- 	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
- 		stack.entropy = random_get_entropy();
-@@ -1277,19 +1277,37 @@ static void __cold try_to_generate_entropy(void)
- 	if (stack.samples_per_bit > MAX_SAMPLES_PER_BIT)
- 		return;
- 
--	stack.samples = 0;
- 	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
- 	while (!crng_ready() && !signal_pending(current)) {
--		if (!timer_pending(&stack.timer))
--			mod_timer(&stack.timer, jiffies);
-+		/*
-+		 * Check !timer_pending() and then ensure that any previous callback has finished
-+		 * executing by checking try_to_del_timer_sync(), before queueing the next one.
-+		 */
-+		if (!timer_pending(&stack.timer) && try_to_del_timer_sync(&stack.timer) >= 0) {
-+			preempt_disable();
-+
-+			/* Basic CPU round-robin, which avoids the current CPU. */
-+			do {
-+				cpu = cpumask_next(cpu, cpu_online_mask);
-+				if (cpu == nr_cpumask_bits)
-+					cpu = cpumask_first(cpu_online_mask);
-+			} while (cpu == smp_processor_id() && cpumask_weight(cpu_online_mask) > 1);
-+
-+			/* Expiring the timer at `jiffies` means it's the next tick. */
-+			stack.timer.expires = jiffies;
-+
-+			add_timer_on(&stack.timer, cpu);
-+
-+			preempt_enable();
-+		}
- 		mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- 		schedule();
- 		stack.entropy = random_get_entropy();
- 	}
-+	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- 
- 	del_timer_sync(&stack.timer);
- 	destroy_timer_on_stack(&stack.timer);
--	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- }
- 
- 
+ 	struct padata_work *pw = container_of(w, struct padata_work, pw_work);
+ 	struct padata_mt_job_state *ps = pw->pw_data;
 -- 
 2.38.1
 
