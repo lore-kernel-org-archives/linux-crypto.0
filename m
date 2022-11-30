@@ -2,106 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4441DC352A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 13:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56EEAC352A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 14:53:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbiK3Nri (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Nov 2022 08:47:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49660 "EHLO
+        id S229615AbiK3Oxa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Nov 2022 09:53:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbiK3Nrh (ORCPT
+        with ESMTP id S229532AbiK3Ox3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Nov 2022 08:47:37 -0500
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C43AEF1C;
-        Wed, 30 Nov 2022 05:47:36 -0800 (PST)
-Received: by mail-ot1-f44.google.com with SMTP id w26-20020a056830061a00b0066c320f5b49so11213922oti.5;
-        Wed, 30 Nov 2022 05:47:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pwsp0BCLF4G1JEdG9NKeOCGZGdSktiRv5CDdT5GJHns=;
-        b=fz+VpeeTY3xMaD9ucvIdEKcZlmoTMWDzsH5k6+nUXPpXKt+B/Tq83cL3SCcP6MF8lR
-         YdbRBra23IqNUHmSm+OeMv9hMZK50Aw+isqZnszeIFWZJLMBQ45A507MYM1VbJJclk13
-         9ph+fWnxn+H0kSgPuBTpZpBLdCvQOqDYVl4wmDi75f0MHxjm4B3YdSZUy+NoUXLtAehc
-         POtbeNGjivq9jRPpYEln66G0Bluow3ufxsfogvJEI/d1poHE39BtAXX8ML1fIQlYUyZq
-         8B0jQ4aslE6eMrRioWUp2JbG2bDnNc+HjkKdrimb0gNgz2YF3NGGiFkUF/7TjgGmrWOJ
-         NLjg==
-X-Gm-Message-State: ANoB5plNKwW4K/uQhhH6bGHAelcor2WF5FAjdDP053T/MV6VbXgjv+M0
-        khqPqHakqEUEdQQvuMdXt37/f/5dJQ==
-X-Google-Smtp-Source: AA0mqf4Iea2320DugkNny8LrmH5N7sAE+JXLN+W1/nvbJiY+HXtFU/iorCneJYuX2wvnDbjwB21NAA==
-X-Received: by 2002:a05:6830:1048:b0:661:b7d1:e4dc with SMTP id b8-20020a056830104800b00661b7d1e4dcmr24091673otp.80.1669816055951;
-        Wed, 30 Nov 2022 05:47:35 -0800 (PST)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id b19-20020a056870391300b00142fa439ee5sm1164346oap.39.2022.11.30.05.47.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 05:47:35 -0800 (PST)
-Received: (nullmailer pid 1848608 invoked by uid 1000);
-        Wed, 30 Nov 2022 13:47:34 -0000
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+        Wed, 30 Nov 2022 09:53:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FAC830F75;
+        Wed, 30 Nov 2022 06:53:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CC572B81B41;
+        Wed, 30 Nov 2022 14:53:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E44C433D6;
+        Wed, 30 Nov 2022 14:53:23 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pMK/A5E6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669820001;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I0ES5jk4GEQeOlHUC9yT1zBbx4b4UMHigHQ+Fl9nJ/4=;
+        b=pMK/A5E6Lbyumh8idS2QVJbpD8XvaIuhI8pqx4ZGR8ta71bIZ04E9+/bu4Tr/zJflYz3oF
+        XIwLpaPqMuiCiqm1Wa5oCl/hd167z6kGHeSuk0ZvKikvGUZdf+UdyTv6A0cZMJJf9B98zd
+        Sl5+ALPxQoCy5XFP+i++BXrzOhEB0lM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8e91d6ae (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 30 Nov 2022 14:53:20 +0000 (UTC)
+Date:   Wed, 30 Nov 2022 15:51:01 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org,
+        linux-api@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v10 3/4] random: introduce generic vDSO getrandom()
+ implementation
+Message-ID: <Y4dt1dLZMmogRlKa@zx2c4.com>
+References: <20221129210639.42233-1-Jason@zx2c4.com>
+ <20221129210639.42233-4-Jason@zx2c4.com>
+ <878rjs7mcx.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
-From:   Rob Herring <robh@kernel.org>
-To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc:     linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>
-In-Reply-To: <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
-References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
-Message-Id: <166981596611.1846501.537832446745968339.robh@kernel.org>
-Subject: Re: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto driver
-Date:   Wed, 30 Nov 2022 07:47:34 -0600
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <878rjs7mcx.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Florian,
 
-On Wed, 30 Nov 2022 13:52:13 +0800, Jia Jie Ho wrote:
-> Add documentation to describe Starfive crypto
-> driver bindings.
+On Wed, Nov 30, 2022 at 11:44:30AM +0100, Florian Weimer wrote:
+> * Jason A. Donenfeld:
 > 
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
-> ---
->  .../bindings/crypto/starfive-crypto.yaml      | 109 ++++++++++++++++++
->  1 file changed, 109 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/starfive-crypto.yaml
+> > diff --git a/include/vdso/datapage.h b/include/vdso/datapage.h
+> > index 73eb622e7663..9ae4d76b36c7 100644
+> > --- a/include/vdso/datapage.h
+> > +++ b/include/vdso/datapage.h
+> > @@ -109,6 +109,16 @@ struct vdso_data {
+> >  	struct arch_vdso_data	arch_data;
+> >  };
+> >  
+> > +/**
+> > + * struct vdso_rng_data - vdso RNG state information
+> > + * @generation:	a counter representing the number of RNG reseeds
+> > + * @is_ready:	whether the RNG is initialized
+> > + */
+> > +struct vdso_rng_data {
+> > +	unsigned long	generation;
+> > +	bool		is_ready;
+> > +};
+> > +
 > 
+> I don't think you can use a type like long here.  The header says this:
+> 
+>  * vdso_data will be accessed by 64 bit and compat code at the same time
+>  * so we should be careful before modifying this structure.
+> 
+> So the ABI must be same for 32-bit and 64-bit mode, and long isn't.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Excellent point. The size of the type needs to be explicit. Will fix.
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/crypto/starfive-crypto.example.dts:21:18: fatal error: dt-bindings/clock/starfive-jh7110.h: No such file or directory
-   21 |         #include <dt-bindings/clock/starfive-jh7110.h>
-      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make[1]: *** [scripts/Makefile.lib:406: Documentation/devicetree/bindings/crypto/starfive-crypto.example.dtb] Error 1
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:1492: dt_binding_check] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20221130055214.2416888-6-jiajie.ho@starfivetech.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Jason
