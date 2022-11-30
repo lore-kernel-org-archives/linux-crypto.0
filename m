@@ -2,168 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FFBC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 10:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E22BC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 11:10:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232720AbiK3KxH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Nov 2022 05:53:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
+        id S233850AbiK3LJ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Nov 2022 06:09:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232641AbiK3KxG (ORCPT
+        with ESMTP id S233820AbiK3LJ4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Nov 2022 05:53:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8320473BBE
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2022 02:52:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669805530;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pvh0cCJDgAci2aX0Jdydv7b4QnzuovzLy7wn9SQOJdE=;
-        b=g/eq1IF6iODDPOq7QElvZ5ZFWuQpygKgzpvJ2yv22vg1QmVb7otSt2wmLJnmyYUC+wKtLt
-        eHfAzXQ/sNH5YdTXIBUAxMzFljh2InHWD3G5wwCqd1JCfVYdf8aZUfZbgBgnay89r1BeA1
-        Au8gYBOVJsr8wu0ajsIzVh66tjnrfII=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-474-CWBn_NusP6CRRW80MXlqxw-1; Wed, 30 Nov 2022 05:52:06 -0500
-X-MC-Unique: CWBn_NusP6CRRW80MXlqxw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E88E185A588;
-        Wed, 30 Nov 2022 10:52:05 +0000 (UTC)
-Received: from oldenburg.str.redhat.com (unknown [10.2.16.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 411362024CBE;
-        Wed, 30 Nov 2022 10:52:03 +0000 (UTC)
-From:   Florian Weimer <fweimer@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v10 1/4] random: add vgetrandom_alloc() syscall
-References: <20221129210639.42233-1-Jason@zx2c4.com>
-        <20221129210639.42233-2-Jason@zx2c4.com>
-Date:   Wed, 30 Nov 2022 11:51:59 +0100
-In-Reply-To: <20221129210639.42233-2-Jason@zx2c4.com> (Jason A. Donenfeld's
-        message of "Tue, 29 Nov 2022 22:06:36 +0100")
-Message-ID: <877czc7m0g.fsf@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Wed, 30 Nov 2022 06:09:56 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25DDB74AAC;
+        Wed, 30 Nov 2022 03:09:54 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2AUAoqVU010405;
+        Wed, 30 Nov 2022 11:08:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PqFTuAxFajv1oFRjQ0A1wChP8j4GC2h2t6wyrjks6VY=;
+ b=fmtnChfhvoYKIM/4QiPWJv7jmdY6KO3yNp0rjXE/FwobppHRAOR7GdcEV/rCdPezGJ+r
+ aloSZhyDG0N1BKVFPe8UGy9k7MGuHAhQIr4IlorK3hEpCYmLFEPQuTgvzpNvBJO9AaUX
+ unjbh88ln23Rn6YRbtV+o4YWNmysX4jkNebG6SSOhIjS2X8G7s5Q3eJZzjYERSPeWQMP
+ bbYo/AWNH1hqlyWu7HUFkJAoWFf2a14fTSypb+VNutiUoWDX1nHJcO8wjsUJm4FTgfuT
+ gZOnsS5jJq+LkcfKJSimQyc9k25UvqcpvN5bsj9fiBnlUUp/eiygpjXzaAmk81tq4uU4 GQ== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m63sakd8q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 11:08:41 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2AUB5qCr016650;
+        Wed, 30 Nov 2022 11:08:41 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 3m3ae9t73x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 30 Nov 2022 11:08:41 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com ([9.208.128.117])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2AUB8dWp65011992
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Nov 2022 11:08:40 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5B8B58327;
+        Wed, 30 Nov 2022 11:08:39 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 95C6A5832A;
+        Wed, 30 Nov 2022 11:08:37 +0000 (GMT)
+Received: from [9.163.59.72] (unknown [9.163.59.72])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Nov 2022 11:08:37 +0000 (GMT)
+Message-ID: <5e7f44c5-6141-a2d0-238b-6c18978b8d70@linux.ibm.com>
+Date:   Wed, 30 Nov 2022 19:08:36 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.0
+Subject: Re: [PATCH 0/6] crypto: Accelerated AES/GCM stitched implementation
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        leitao@debian.org, nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
+References: <Y4Xyflca/hkvR0eR@Dannys-MacBook-Pro.local>
+ <Y4blj2RZB4PI7ZYZ@sol.localdomain>
+From:   Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <Y4blj2RZB4PI7ZYZ@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: TnXhTQPKDNTtbZNdt7Be2ibS9ezh1Xzv
+X-Proofpoint-GUID: TnXhTQPKDNTtbZNdt7Be2ibS9ezh1Xzv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-30_04,2022-11-30_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=852 bulkscore=0
+ spamscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1011 suspectscore=0 impostorscore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211300080
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Jason A. Donenfeld:
+Hi Eric,
 
-> +#ifdef CONFIG_VGETRANDOM_ALLOC_SYSCALL
-> +/**
-> + * vgetrandom_alloc - allocate opaque states for use with vDSO getrandom().
-> + *
-> + * @num: on input, a pointer to a suggested hint of how many states to
-> + * allocate, and on output the number of states actually allocated.
+I will test with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and provide 
+updates.  Please ignore my resend patch that I just sent so it is 
+threaded under patch 0.
 
-Should userspace call this system call again if it needs more states?
-The interface description doesn't make this clear.
+Thanks.
 
-> + * @size_per_each: the size of each state allocated, so that the caller can
-> + * split up the returned allocation into individual states.
-> + *
-> + * @flags: currently always zero.
-> + *
-> + * The getrandom() vDSO function in userspace requires an opaque state, which
-> + * this function allocates by mapping a certain number of special pages into
-> + * the calling process. It takes a hint as to the number of opaque states
-> + * desired, and provides the caller with the number of opaque states actually
-> + * allocated, the size of each one in bytes, and the address of the first
-> + * state.
-> +
-> + * Returns a pointer to the first state in the allocation.
-> + *
-> + */
+-Danny
 
-How do we deallocate this memory?  Must it remain permanently allocated?
-
-Can userspace use the memory for something else if it's not passed to
-getrandom?  The separate system call strongly suggests that the
-allocation is completely owned by the kernel, but there isn't
-documentation here how the allocation life-cycle is supposed to look
-like.  In particular, it is not clear if vgetrandom_alloc or getrandom
-could retain a reference to the allocation in a future implementation of
-these interfaces.
-
-Some users might want to zap the memory for extra hardening after use,
-and it's not clear if that's allowed, either.
-
-> +SYSCALL_DEFINE3(vgetrandom_alloc, unsigned int __user *, num,
-> +		unsigned int __user *, size_per_each, unsigned int, flags)
-> +{
-
-ABI-wise, that should work.
-
-> +	const size_t state_size = sizeof(struct vgetrandom_state);
-> +	size_t alloc_size, num_states;
-> +	unsigned long pages_addr;
-> +	unsigned int num_hint;
-> +	int ret;
-> +
-> +	if (flags)
-> +		return -EINVAL;
-> +
-> +	if (get_user(num_hint, num))
-> +		return -EFAULT;
-> +
-> +	num_states = clamp_t(size_t, num_hint, 1, (SIZE_MAX & PAGE_MASK) / state_size);
-> +	alloc_size = PAGE_ALIGN(num_states * state_size);
-
-Doesn't this waste space for one state if state_size happens to be a
-power of 2?  Why do this SIZE_MAX & PAGE_MASK thing at all?  Shouldn't
-it be PAGE_SIZE / state_size?
-
-> +	if (put_user(alloc_size / state_size, num) || put_user(state_size, size_per_each))
-> +		return -EFAULT;
-> +
-> +	pages_addr = vm_mmap(NULL, 0, alloc_size, PROT_READ | PROT_WRITE,
-> +			     MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED, 0);
-
-I think Rasmus has already raised questions about MAP_LOCKED.
-
-I think the kernel cannot rely on it because userspace could call
-munlock on the allocation.
-
-> +	if (IS_ERR_VALUE(pages_addr))
-> +		return pages_addr;
-> +
-> +	ret = do_madvise(current->mm, pages_addr, alloc_size, MADV_WIPEONFORK);
-> +	if (ret < 0)
-> +		goto err_unmap;
-> +
-> +	return pages_addr;
-> +
-> +err_unmap:
-> +	vm_munmap(pages_addr, alloc_size);
-> +	return ret;
-> +}
-> +#endif
-
-If there's no registration of the allocation, it's not clear why we need
-a separate system call for this.  From a documentation perspective, it
-may be easier to describe proper use of the getrandom vDSO call if
-ownership resides with userspace.  But it will constrain future
-evolution of the implementation because you can't add registration
-(retaining a reference to the passed-in area in getrandom) after the
-fact.  But I'm not sure if this is possible with the current interface,
-either.  Userspace has to make some assumptions about the life-cycle to
-avoid a memory leak on thread exit.
-
-Thanks,
-Florian
-
+On 11/30/22 1:09 PM, Eric Biggers wrote:
+> On Tue, Nov 29, 2022 at 07:52:30PM +0800, Danny Tsen wrote:
+>> This patch has been tested with the kernel crypto module tcrypt.ko and has
+>> passed the selftest.
+> Please make sure you've tested it with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
+>
+> - Eric
