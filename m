@@ -2,96 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 582E5C47089
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 21:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC24DC4321E
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 22:26:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbiK3VbB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Nov 2022 16:31:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
+        id S229521AbiK3W04 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Nov 2022 17:26:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiK3VbA (ORCPT
+        with ESMTP id S229497AbiK3W0z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Nov 2022 16:31:00 -0500
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9CA900D6;
-        Wed, 30 Nov 2022 13:30:59 -0800 (PST)
-Received: by mail-ot1-f48.google.com with SMTP id p8-20020a056830130800b0066bb73cf3bcso12080180otq.11;
-        Wed, 30 Nov 2022 13:30:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mc6V9+sDoG9Mki15v8P5KKA7NfsAq4SE0l5Qimb/jYw=;
-        b=Hr6Tyebvi7CjgUcUnY3TaOuf8HGIPSMODvO5A9+JZxg/S1iCQGQVbwJ8WmvSomjrCm
-         uEFFpAhL796uM9L1JxGyyaPCuJ0cwuH4aoNLdF4OPJdFEoCjGLMIp9P5KR8RDjk6r47P
-         6lZvcR2F2chuN5cKaUo9QH0gt/wLQ97VqkTX4CUBRAGm9fJwcy7MWHuYYIKVxbkN6T4y
-         bVZ+5LZrHnNmf/4pbfcx5DgNndifq+cAIuxSn/GeZ3i57UfnLYTQYiYeZ1zCl46iZroy
-         /pBO55ifq3P184+OSiQyH75eiOGuI8OyOghGceLq55tPGyKI1aZn15dg6J1py1+c4GKL
-         o4Ng==
-X-Gm-Message-State: ANoB5pnGKRk8w8vXwMWJwn5yUF6GwtCF5c4HNXDWAQu87IM8T3cjxpTo
-        vYNX3h3bNgLsMMvwXzz47g==
-X-Google-Smtp-Source: AA0mqf4vUPSR7ovZbOCRKRqMQN2EeuGVgLzCTx74Sseob1+HjZJNxvL9pC0HARrpgxgB7hYUbhdb3Q==
-X-Received: by 2002:a05:6830:1688:b0:66c:42d7:7d70 with SMTP id k8-20020a056830168800b0066c42d77d70mr21118469otr.98.1669843858446;
-        Wed, 30 Nov 2022 13:30:58 -0800 (PST)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id u9-20020a056870f28900b0011bde9f5745sm1781162oap.23.2022.11.30.13.30.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Nov 2022 13:30:57 -0800 (PST)
-Received: (nullmailer pid 2960995 invoked by uid 1000);
-        Wed, 30 Nov 2022 21:30:57 -0000
-Date:   Wed, 30 Nov 2022 15:30:57 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        "Chia-Wei Wang --cc=linux-kernel @ vger . kernel . org" 
-        <chiawei_wang@aspeedtech.com>, linux-crypto@vger.kernel.org,
-        linux-aspeed@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] dt-bindings: bus: add documentation for Aspeed
- AHBC
-Message-ID: <20221130213057.GA2960216-robh@kernel.org>
-References: <20221124105552.1006549-1-neal_liu@aspeedtech.com>
- <20221124105552.1006549-5-neal_liu@aspeedtech.com>
+        Wed, 30 Nov 2022 17:26:55 -0500
+X-Greylist: delayed 193 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Nov 2022 14:26:54 PST
+Received: from condef-04.nifty.com (condef-04.nifty.com [202.248.20.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C485963D59
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Nov 2022 14:26:54 -0800 (PST)
+Received: from conssluserg-02.nifty.com ([10.126.8.81])by condef-04.nifty.com with ESMTP id 2AUMLqOd026581;
+        Thu, 1 Dec 2022 07:21:52 +0900
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id 2AUMLOOd009632;
+        Thu, 1 Dec 2022 07:21:24 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 2AUMLOOd009632
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1669846885;
+        bh=k5TnRkjFmB+0wMVTITyaBsYH4EkERxs/m8UlcytiUqA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=wezRxcPL57rNZmvQDUfqHkvrnpWW6KcJuM5zkvY4DWlVXSwmILOWeW7EnKHIcGxzC
+         Agu37VlemU6SjxxPDu2gzZkCd6+lmu4SGVFvnj/6TuP1qTJ6Ixxx1LWcc1BuEYdaDS
+         AWh6/yLOw1gJak/wKaB4+oSl7NWcw14iYftsWMV0Q2gsBJRHKZkFPu0EophkAljJux
+         mINa+xUJRAZT9gqXFGcF3C61zUb4LCrL7l53DdX6btf1Y1sslZci2kZUBNkhRxNurc
+         1dAItGSzvagxjhaNwL+7czO78HV9CtUYzRXVUIKQ4xOX7Zp1+hNUplWXoin6hsBYvQ
+         hAnxvKLakmEVA==
+X-Nifty-SrcIP: [209.85.167.181]
+Received: by mail-oi1-f181.google.com with SMTP id e205so107913oif.11;
+        Wed, 30 Nov 2022 14:21:24 -0800 (PST)
+X-Gm-Message-State: ANoB5pmfhMnS5kaptKTFtrTkWpHb3y8hVikpXz0fOpkll9gFD56Z/q0P
+        v992ooR41laL9M+wMNBfSSFfOtvtQsIKhenqEBI=
+X-Google-Smtp-Source: AA0mqf6or5JAcRyjvHHEkc7ygsMt2uCHycUgQSriEZZOcXQJpheBCozq7ScqXqGnuUQJLwC7n8y7iHcjChYlkCgNDz8=
+X-Received: by 2002:aca:1c06:0:b0:354:28ae:23b3 with SMTP id
+ c6-20020aca1c06000000b0035428ae23b3mr21855293oic.287.1669846883543; Wed, 30
+ Nov 2022 14:21:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221124105552.1006549-5-neal_liu@aspeedtech.com>
+References: <20221129190123.872394-1-nathan@kernel.org> <20221129190123.872394-2-nathan@kernel.org>
+In-Reply-To: <20221129190123.872394-2-nathan@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 1 Dec 2022 07:20:47 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATMtRu00GYwJW_VvTSTcY6eqnx=4EEj8PFC5adrnHunSw@mail.gmail.com>
+Message-ID: <CAK7LNATMtRu00GYwJW_VvTSTcY6eqnx=4EEj8PFC5adrnHunSw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] padata: Do not mark padata_mt_helper() as __init
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 24, 2022 at 06:55:52PM +0800, Neal Liu wrote:
-> Add device tree binding documentation for the Aspeed
-> Advanced High-Performance Bus (AHB) Controller.
-> 
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+On Wed, Nov 30, 2022 at 4:02 AM Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> When building arm64 allmodconfig + ThinLTO with clang and a proposed
+> modpost update to account for -ffuncton-sections, the following warning
+> appears:
+
+
+
+How to enable -ffuncton-sections for ARCH=arm64 ?
+(in other words, how to set CONFIG_LD_DEAD_CODE_DATA_ELIMINATION ?)
+
+In upstream, it is only possible for mips and powerpc.
+
+./arch/mips/Kconfig:82: select HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+./arch/powerpc/Kconfig:237: select HAVE_LD_DEAD_CODE_DATA_ELIMINATION
+
+
+
+Is there another proposal to add it for arm64,
+or is this about a downstream kernel?
+
+
+
+
+
+>
+>   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+>   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+>
+> In both cases, an __init function calls padata_work_init(), which is not
+> marked __init, with padata_mt_helper(), another __init function, as a
+> work function argument.
+>
+> padata_work_init() is called from non-init paths, otherwise it could be
+> marked __init to resolve the warning. Instead, remove __init from
+> padata_mt_helper() to resolve the warning.
+>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 > ---
->  .../bindings/bus/aspeed,ast2600-ahbc.yaml     | 37 +++++++++++++++++++
->  1 file changed, 37 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
-> new file mode 100644
-> index 000000000000..cf9740f2a0c7
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
-> @@ -0,0 +1,37 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/bus/aspeed,ast2600-ahbc.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: ASPEED Advanced High-Performance Bus Controller (AHBC) Device Tree Bindings
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: linux-crypto@vger.kernel.org
+> ---
+>  kernel/padata.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index e5819bb8bd1d..c2271d7e446d 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -45,7 +45,7 @@ struct padata_mt_job_state {
+>  };
+>
+>  static void padata_free_pd(struct parallel_data *pd);
+> -static void __init padata_mt_helper(struct work_struct *work);
+> +static void padata_mt_helper(struct work_struct *work);
+>
+>  static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
+>  {
+> @@ -425,7 +425,7 @@ static int padata_setup_cpumasks(struct padata_instance *pinst)
+>         return err;
+>  }
+>
+> -static void __init padata_mt_helper(struct work_struct *w)
+> +static void padata_mt_helper(struct work_struct *w)
+>  {
+>         struct padata_work *pw = container_of(w, struct padata_work, pw_work);
+>         struct padata_mt_job_state *ps = pw->pw_data;
+> --
+> 2.38.1
+>
 
-Drop " Device Tree Bindings"
 
-With that,
-
-Reviewed-by: Rob Herring <robh@kernel.org>
+-- 
+Best Regards
+Masahiro Yamada
