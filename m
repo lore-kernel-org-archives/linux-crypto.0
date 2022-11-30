@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C9BC4708A
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 05:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6BEC352A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Nov 2022 05:55:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbiK3Fz3 convert rfc822-to-8bit (ORCPT
+        id S233679AbiK3Fzb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Nov 2022 00:55:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53452 "EHLO
+        Wed, 30 Nov 2022 00:55:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233039AbiK3Fz2 (ORCPT
+        with ESMTP id S233609AbiK3Fz2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 30 Nov 2022 00:55:28 -0500
 Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93AF9654D6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9601C654FD;
         Tue, 29 Nov 2022 21:55:27 -0800 (PST)
 Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
         (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
         (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 1CEE524E0AC;
-        Wed, 30 Nov 2022 13:52:21 +0800 (CST)
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 1925A24E31C;
+        Wed, 30 Nov 2022 13:52:46 +0800 (CST)
 Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX165.cuchost.com
  (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 30 Nov
- 2022 13:52:21 +0800
+ 2022 13:52:46 +0800
 Received: from ubuntu.localdomain (202.188.176.82) by EXMBX068.cuchost.com
  (172.16.6.68) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 30 Nov
- 2022 13:52:17 +0800
+ 2022 13:52:42 +0800
 From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -35,10 +35,12 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
         Jia Jie Ho <jiajie.ho@starfivetech.com>
-Subject: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
-Date:   Wed, 30 Nov 2022 13:52:08 +0800
-Message-ID: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+Subject: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
+Date:   Wed, 30 Nov 2022 13:52:14 +0800
+Message-ID: <20221130055214.2416888-7-jiajie.ho@starfivetech.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [202.188.176.82]
@@ -50,53 +52,78 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch series adds kernel driver support for Starfive crypto engine.
-The engine supports hardware acceleration for HMAC/hash functions,
-AES block cipher operations and RSA. The first patch adds basic driver
-for device probe and DMA init. The subsequent patches adds supported
-crypto primitives to the driver which include hash functions, AES and
-RSA. Patch 5 adds documentation to describe device tree bindings and the
-last patch adds device node to VisionFive 2 dts.
+Adding StarFive crypto IP and DMA controller node
+to VisionFive 2 SoC.
 
-The driver has been tested with crypto selftest and additional test.
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+---
+ .../jh7110-starfive-visionfive-v2.dts         |  8 +++++
+ arch/riscv/boot/dts/starfive/jh7110.dtsi      | 36 +++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-This patch series depends on the following patches:
-https://patchwork.kernel.org/project/linux-riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
-https://patchwork.kernel.org/project/linux-riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
-
-Jia Jie Ho (6):
-  crypto: starfive - Add StarFive crypto engine support
-  crypto: starfive - Add hash and HMAC support
-  crypto: starfive - Add AES skcipher and aead support
-  crypto: starfive - Add Public Key algo support
-  dt-bindings: crypto: Add bindings for Starfive crypto driver
-  riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
-
- .../bindings/crypto/starfive-crypto.yaml      |  109 ++
- MAINTAINERS                                   |    7 +
- .../jh7110-starfive-visionfive-v2.dts         |    8 +
- arch/riscv/boot/dts/starfive/jh7110.dtsi      |   36 +
- drivers/crypto/Kconfig                        |    1 +
- drivers/crypto/Makefile                       |    1 +
- drivers/crypto/starfive/Kconfig               |   20 +
- drivers/crypto/starfive/Makefile              |    4 +
- drivers/crypto/starfive/starfive-aes.c        | 1723 +++++++++++++++++
- drivers/crypto/starfive/starfive-cryp.c       |  324 ++++
- drivers/crypto/starfive/starfive-hash.c       | 1152 +++++++++++
- drivers/crypto/starfive/starfive-pka.c        |  683 +++++++
- drivers/crypto/starfive/starfive-regs.h       |  200 ++
- drivers/crypto/starfive/starfive-str.h        |  194 ++
- 14 files changed, 4462 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/starfive-crypto.yaml
- create mode 100644 drivers/crypto/starfive/Kconfig
- create mode 100644 drivers/crypto/starfive/Makefile
- create mode 100644 drivers/crypto/starfive/starfive-aes.c
- create mode 100644 drivers/crypto/starfive/starfive-cryp.c
- create mode 100644 drivers/crypto/starfive/starfive-hash.c
- create mode 100644 drivers/crypto/starfive/starfive-pka.c
- create mode 100644 drivers/crypto/starfive/starfive-regs.h
- create mode 100644 drivers/crypto/starfive/starfive-str.h
-
+diff --git a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+index 450e920236a5..da2aa4d597f3 100644
+--- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
++++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+@@ -115,3 +115,11 @@ &tdm_ext {
+ &mclk_ext {
+ 	clock-frequency = <49152000>;
+ };
++
++&sec_dma {
++	status = "okay";
++};
++
++&crypto {
++	status = "okay";
++};
+diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+index 4ac159d79d66..745a5650882c 100644
+--- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
++++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+@@ -455,5 +455,41 @@ uart5: serial@12020000 {
+ 			reg-shift = <2>;
+ 			status = "disabled";
+ 		};
++
++		sec_dma: sec_dma@16008000 {
++			compatible = "arm,pl080", "arm,primecell";
++			arm,primecell-periphid = <0x00041080>;
++			reg = <0x0 0x16008000 0x0 0x4000>;
++			reg-names = "sec_dma";
++			interrupts = <29>;
++			clocks = <&stgcrg JH7110_STGCLK_SEC_HCLK>,
++				 <&stgcrg JH7110_STGCLK_SEC_MISCAHB>;
++			clock-names = "sec_hclk","apb_pclk";
++			resets = <&stgcrg JH7110_STGRST_SEC_TOP_HRESETN>;
++			reset-names = "sec_hre";
++			lli-bus-interface-ahb1;
++			mem-bus-interface-ahb1;
++			memcpy-burst-size = <256>;
++			memcpy-bus-width = <32>;
++			#dma-cells = <2>;
++			status = "disabled";
++		};
++
++		crypto: crypto@16000000 {
++			compatible = "starfive,jh7110-crypto";
++			reg = <0x0 0x16000000 0x0 0x4000>;
++			reg-names = "secreg";
++			clocks = <&stgcrg JH7110_STGCLK_SEC_HCLK>,
++				 <&stgcrg JH7110_STGCLK_SEC_MISCAHB>;
++			clock-names = "sec_hclk","sec_ahb";
++			resets = <&stgcrg JH7110_STGRST_SEC_TOP_HRESETN>;
++			reset-names = "sec_hre";
++			enable-side-channel-mitigation;
++			enable-dma;
++			dmas = <&sec_dma 1 2>,
++			       <&sec_dma 0 2>;
++			dma-names = "sec_m","sec_p";
++			status = "disabled";
++		};
+ 	};
+ };
 -- 
 2.25.1
 
