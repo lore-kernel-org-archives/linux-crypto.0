@@ -2,110 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B774C47088
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Dec 2022 07:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D4EC4321E
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Dec 2022 08:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiLAH0A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Dec 2022 02:26:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42640 "EHLO
+        id S229586AbiLAITW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Dec 2022 03:19:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiLAHZ7 (ORCPT
+        with ESMTP id S229649AbiLAITR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2022 02:25:59 -0500
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8F93AC07;
-        Wed, 30 Nov 2022 23:25:57 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 0767C24E37C;
-        Thu,  1 Dec 2022 15:25:56 +0800 (CST)
-Received: from EXMBX161.cuchost.com (172.16.6.71) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 1 Dec
- 2022 15:25:55 +0800
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX161.cuchost.com
- (172.16.6.71) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 1 Dec
- 2022 15:25:55 +0800
-Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
- EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
- 15.00.1497.044; Thu, 1 Dec 2022 15:25:56 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
- VisionFive 2
-Thread-Topic: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
- VisionFive 2
-Thread-Index: AQHZBH/4vZHP2U3n+EalaiuTkXOjPK5W7jsAgAGzxIA=
-Date:   Thu, 1 Dec 2022 07:25:56 +0000
-Message-ID: <37089b7591f74034aad58c7d29021c3d@EXMBX068.cuchost.com>
-References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-7-jiajie.ho@starfivetech.com>
- <6de013d9-f2ab-a2d8-1022-2474c037c737@linaro.org>
-In-Reply-To: <6de013d9-f2ab-a2d8-1022-2474c037c737@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.188.176.82]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Thu, 1 Dec 2022 03:19:17 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E21B5BD6E
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Dec 2022 00:19:07 -0800 (PST)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1p0ema-00031o-H9; Thu, 01 Dec 2022 09:19:00 +0100
+Message-ID: <d08447fd-cac5-3082-9eb7-22e32a9dbea5@pengutronix.de>
+Date:   Thu, 1 Dec 2022 09:18:55 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v3] crypto: caam: blob_gen.c: warn if key is insecure
+Content-Language: en-US
+To:     Nikolaus Voss <nikolaus.voss@haag-streit.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Nikolaus Voss <nv@vosn.de>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pengutronix Kernel Team <kernel@pengutronix.de>
+References: <20221121141929.2E36427E9@mail.steuer-voss.de>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20221121141929.2E36427E9@mail.steuer-voss.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBXZWRuZXNkYXks
-IE5vdmVtYmVyIDMwLCAyMDIyIDk6MjIgUE0NCj4gVG86IEppYUppZSBIbyA8amlhamllLmhvQHN0
-YXJmaXZldGVjaC5jb20+OyBIZXJiZXJ0IFh1DQo+IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcu
-YXU+OyBEYXZpZCBTIC4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsNCj4gUm9iIEhlcnJp
-bmcgPHJvYmgrZHRAa2VybmVsLm9yZz47IEtyenlzenRvZiBLb3psb3dza2kNCj4gPGtyenlzenRv
-Zi5rb3psb3dza2krZHRAbGluYXJvLm9yZz4NCj4gQ2M6IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5l
-bC5vcmc7IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4ga2VybmVsQHZnZXIu
-a2VybmVsLm9yZzsgbGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPiBTdWJqZWN0OiBS
-ZTogW1BBVENIIDYvNl0gcmlzY3Y6IGR0czogc3RhcmZpdmU6IEFkZCBjcnlwdG8gYW5kIERNQSBu
-b2RlIGZvcg0KPiBWaXNpb25GaXZlIDINCj4gDQo+IE9uIDMwLzExLzIwMjIgMDY6NTIsIEppYSBK
-aWUgSG8gd3JvdGU6DQo+ID4gQWRkaW5nIFN0YXJGaXZlIGNyeXB0byBJUCBhbmQgRE1BIGNvbnRy
-b2xsZXIgbm9kZSB0byBWaXNpb25GaXZlIDIgU29DLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
-SmlhIEppZSBIbyA8amlhamllLmhvQHN0YXJmaXZldGVjaC5jb20+DQo+ID4gU2lnbmVkLW9mZi1i
-eTogSHVhbiBGZW5nIDxodWFuLmZlbmdAc3RhcmZpdmV0ZWNoLmNvbT4NCj4gPiAtLS0NCj4gPiAg
-Li4uL2poNzExMC1zdGFyZml2ZS12aXNpb25maXZlLXYyLmR0cyAgICAgICAgIHwgIDggKysrKysN
-Cj4gPiAgYXJjaC9yaXNjdi9ib290L2R0cy9zdGFyZml2ZS9qaDcxMTAuZHRzaSAgICAgIHwgMzYg
-KysrKysrKysrKysrKysrKysrKw0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMo
-KykNCj4gPg0KPiA+IGRpZmYgLS1naXQNCj4gPiBhL2FyY2gvcmlzY3YvYm9vdC9kdHMvc3RhcmZp
-dmUvamg3MTEwLXN0YXJmaXZlLXZpc2lvbmZpdmUtdjIuZHRzDQo+ID4gYi9hcmNoL3Jpc2N2L2Jv
-b3QvZHRzL3N0YXJmaXZlL2poNzExMC1zdGFyZml2ZS12aXNpb25maXZlLXYyLmR0cw0KPiA+IGlu
-ZGV4IDQ1MGU5MjAyMzZhNS4uZGEyYWE0ZDU5N2YzIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvcmlz
-Y3YvYm9vdC9kdHMvc3RhcmZpdmUvamg3MTEwLXN0YXJmaXZlLXZpc2lvbmZpdmUtdjIuZHRzDQo+
-ID4gKysrIGIvYXJjaC9yaXNjdi9ib290L2R0cy9zdGFyZml2ZS9qaDcxMTAtc3RhcmZpdmUtdmlz
-aW9uZml2ZS12Mi5kdHMNCj4gPiBAQCAtMTE1LDMgKzExNSwxMSBAQCAmdGRtX2V4dCB7DQo+ID4g
-ICZtY2xrX2V4dCB7DQo+ID4gIAljbG9jay1mcmVxdWVuY3kgPSA8NDkxNTIwMDA+Ow0KPiA+ICB9
-Ow0KPiA+ICsNCj4gPiArJnNlY19kbWEgew0KPiA+ICsJc3RhdHVzID0gIm9rYXkiOw0KPiA+ICt9
-Ow0KPiA+ICsNCj4gPiArJmNyeXB0byB7DQo+ID4gKwlzdGF0dXMgPSAib2theSI7DQo+ID4gK307
-DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvcmlzY3YvYm9vdC9kdHMvc3RhcmZpdmUvamg3MTEwLmR0
-c2kNCj4gPiBiL2FyY2gvcmlzY3YvYm9vdC9kdHMvc3RhcmZpdmUvamg3MTEwLmR0c2kNCj4gPiBp
-bmRleCA0YWMxNTlkNzlkNjYuLjc0NWE1NjUwODgyYyAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3Jp
-c2N2L2Jvb3QvZHRzL3N0YXJmaXZlL2poNzExMC5kdHNpDQo+ID4gKysrIGIvYXJjaC9yaXNjdi9i
-b290L2R0cy9zdGFyZml2ZS9qaDcxMTAuZHRzaQ0KPiA+IEBAIC00NTUsNSArNDU1LDQxIEBAIHVh
-cnQ1OiBzZXJpYWxAMTIwMjAwMDAgew0KPiA+ICAJCQlyZWctc2hpZnQgPSA8Mj47DQo+ID4gIAkJ
-CXN0YXR1cyA9ICJkaXNhYmxlZCI7DQo+ID4gIAkJfTsNCj4gPiArDQo+ID4gKwkJc2VjX2RtYTog
-c2VjX2RtYUAxNjAwODAwMCB7DQo+IA0KPiBOb2RlIG5hbWVzIHNob3VsZCBiZSBnZW5lcmljLg0K
-PiBodHRwczovL2RldmljZXRyZWUtc3BlY2lmaWNhdGlvbi5yZWFkdGhlZG9jcy5pby9lbi9sYXRl
-c3QvY2hhcHRlcjItDQo+IGRldmljZXRyZWUtYmFzaWNzLmh0bWwjZ2VuZXJpYy1uYW1lcy1yZWNv
-bW1lbmRhdGlvbg0KPiANCj4gTm8gdW5kZXJzY29yZXMgaW4gbm9kZSBuYW1lcy4NCj4gDQo+IERv
-ZXMgbm90IGxvb2sgbGlrZSB5b3UgdGVzdGVkIHRoZSBEVFMgYWdhaW5zdCBiaW5kaW5ncy4gUGxl
-YXNlIHJ1biBgbWFrZQ0KPiBkdGJzX2NoZWNrYCAoc2VlIERvY3VtZW50YXRpb24vZGV2aWNldHJl
-ZS9iaW5kaW5ncy93cml0aW5nLXNjaGVtYS5yc3QNCj4gZm9yIGluc3RydWN0aW9ucykuDQoNCkkn
-bGwgZml4IHRoZSBub2RlIG5hbWUgYW5kIHJ1biBkdGJzX2NoZWNrIGZvciB0aGUgcmV2aXNlZCBz
-ZXJpZXMuDQpSZWFsbHkgYXBwcmVjaWF0ZSB5b3VyIHRpbWUgYW5kIGVmZm9ydCByZXZpZXdpbmcg
-dGhpcyBwYXRjaC4NCg0KVGhhbmtzLA0KSmlhIEppZQ0K
+On 21.11.22 15:12, Nikolaus Voss wrote:
+> If CAAM is not in "trusted" or "secure" state, a fixed non-volatile key
+> is used instead of the unique device key. This is the default mode of
+> operation without secure boot (HAB). In this scenario, CAAM encrypted
+> blobs should be used only for testing but not in a production
+> environment, so issue a warning.
+> 
+> Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
+
+Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+
+> 
+> ---
+> CHANGES
+> =======
+> v2: make warning more verbose, correct register, style fixes
+> v3: fix sparse warning "dereference of noderef expression"
+>     by using ioread32() to dereference iomem pointer
+> 
+>  drivers/crypto/caam/blob_gen.c | 9 +++++++++
+>  drivers/crypto/caam/regs.h     | 3 +++
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+> index 6345c7269eb03..1f65df4898478 100644
+> --- a/drivers/crypto/caam/blob_gen.c
+> +++ b/drivers/crypto/caam/blob_gen.c
+> @@ -6,6 +6,7 @@
+>  
+>  #define pr_fmt(fmt) "caam blob_gen: " fmt
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/device.h>
+>  #include <soc/fsl/caam-blob.h>
+>  
+> @@ -61,12 +62,14 @@ static void caam_blob_job_done(struct device *dev, u32 *desc, u32 err, void *con
+>  int caam_process_blob(struct caam_blob_priv *priv,
+>  		      struct caam_blob_info *info, bool encap)
+>  {
+> +	const struct caam_drv_private *ctrlpriv;
+>  	struct caam_blob_job_result testres;
+>  	struct device *jrdev = &priv->jrdev;
+>  	dma_addr_t dma_in, dma_out;
+>  	int op = OP_PCLID_BLOB;
+>  	size_t output_len;
+>  	u32 *desc;
+> +	u32 moo;
+>  	int ret;
+>  
+>  	if (info->key_mod_len > CAAM_BLOB_KEYMOD_LENGTH)
+> @@ -100,6 +103,12 @@ int caam_process_blob(struct caam_blob_priv *priv,
+>  		goto out_unmap_in;
+>  	}
+>  
+> +	ctrlpriv = dev_get_drvdata(jrdev->parent);
+> +	moo = FIELD_GET(CSTA_MOO, ioread32(&ctrlpriv->ctrl->perfmon.status));
+> +	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
+> +		dev_warn(jrdev,
+> +			 "using insecure test key, enable HAB to use unique device key!\n");
+> +
+>  	/*
+>  	 * A data blob is encrypted using a blob key (BK); a random number.
+>  	 * The BK is used as an AES-CCM key. The initial block (B0) and the
+> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+> index 66d6dad841bb2..66928f8a0c4b1 100644
+> --- a/drivers/crypto/caam/regs.h
+> +++ b/drivers/crypto/caam/regs.h
+> @@ -426,6 +426,9 @@ struct caam_perfmon {
+>  	u32 rsvd2;
+>  #define CSTA_PLEND		BIT(10)
+>  #define CSTA_ALT_PLEND		BIT(18)
+> +#define CSTA_MOO		GENMASK(9, 8)
+> +#define CSTA_MOO_SECURE	1
+> +#define CSTA_MOO_TRUSTED	2
+>  	u32 status;		/* CSTA - CAAM Status */
+>  	u64 rsvd3;
+>  
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
