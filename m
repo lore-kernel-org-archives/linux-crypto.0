@@ -2,57 +2,149 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EFBC47088
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Dec 2022 12:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C5FC43217
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Dec 2022 18:04:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231272AbiLAMKY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Dec 2022 07:10:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
+        id S229890AbiLASEL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Dec 2022 13:04:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbiLAMKX (ORCPT
+        with ESMTP id S229939AbiLASEL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2022 07:10:23 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78B294568;
-        Thu,  1 Dec 2022 04:10:20 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p0iOF-002pZT-AB; Thu, 01 Dec 2022 20:10:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 Dec 2022 20:10:07 +0800
-Date:   Thu, 1 Dec 2022 20:10:07 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Anders Roxell <anders.roxell@linaro.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Message-ID: <Y4iZn9jC3VqBHEtU@gondor.apana.org.au>
-References: <20221028210527.never.934-kees@kernel.org>
- <Y2TVXDfQUwlYFv9S@gondor.apana.org.au>
- <20221201115244.GC69385@mutt>
+        Thu, 1 Dec 2022 13:04:11 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E933B5DB1;
+        Thu,  1 Dec 2022 10:04:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ACF50620A3;
+        Thu,  1 Dec 2022 18:04:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5CB5C433D6;
+        Thu,  1 Dec 2022 18:04:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669917849;
+        bh=WZatvnz+QOr1Ir2g+HfL56qhA6VFEJRpPV2/ZJbog/I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=t1GcIvhsLwG8OflIApxBP0BGhBjbKkxusBOBYU+eUci5BagGExkIaqsOJqYVlqbjW
+         hMZmt/iuKfySH6DWl4Fxv1HmAW3OPZD0xp0wSUvRX91a5HMxzO/cca+oHFA+bt4BS/
+         jtZRslsgJHsLIDVChwFIthKxhyVdIam8a/qYl9kt9ysUTYlVG+PuXb0k8pk+dbjYHn
+         vsZ/5sXusz+2b6ERv8t76MbqIn/88cQPHYOOzAKk101TvcvYU44QDy++9mT+4pVpk+
+         GF7Kmo1fBfNtsMh5BJ9haY8U6FOaQtGip58H9iMjVHBfZvgEXop0w+xG44IyLXOgVW
+         JYq07JRXWF59g==
+Date:   Thu, 1 Dec 2022 18:04:04 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     JiaJie Ho <jiajie.ho@starfivetech.com>
+Cc:     "Conor.Dooley@microchip.com" <Conor.Dooley@microchip.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@esmil.dk" <kernel@esmil.dk>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>
+Subject: Re: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
+ VisionFive 2
+Message-ID: <Y4jslJfTVtQ9cIGm@spud>
+References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+ <20221130055214.2416888-7-jiajie.ho@starfivetech.com>
+ <1673ef8b-179e-3b03-b3f8-8d347c70d8c3@microchip.com>
+ <4ddddceba3dc437daca27374dd2f6fd7@EXMBX068.cuchost.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221201115244.GC69385@mutt>
+In-Reply-To: <4ddddceba3dc437daca27374dd2f6fd7@EXMBX068.cuchost.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 01, 2022 at 12:52:44PM +0100, Anders Roxell wrote:
-.
-> I think that was fixed in sparse release v0.5.1 [1]. The workaround 'if
-> (len)' was introduced back in 2011, and the sparse release v0.5.1 was
-> done in 2017. So it should probably be safe to remove the 'if (len)'  or
-> what do you think?
+On Thu, Dec 01, 2022 at 06:17:26AM +0000, JiaJie Ho wrote:
+> > -----Original Message-----
+> > From: Conor.Dooley@microchip.com <Conor.Dooley@microchip.com>
 
-Could you please send a patch? :)
+> > Hey Jia Jie Ho,
+> > 
+> > On 30/11/2022 05:52, Jia Jie Ho wrote:
+> > > [You don't often get email from jiajie.ho@starfivetech.com. Learn why
+> > > this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> > >
+> > > EXTERNAL EMAIL: Do not click links or open attachments unless you know
+> > > the content is safe
+> > >
+> > > Adding StarFive crypto IP and DMA controller node to VisionFive 2 SoC.
+> > >
+> > > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> > > Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+> > 
+> > Out of curiosity, what was Huan Feng's contribution to this patch?
+> > Did they co-develop it, or is there some other reason?
+> > 
+> Hi Conor, 
+> Yes, Huan Feng co-developed this driver.
+
+In that case, the SoB block should look like:
+
+Co-developed-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+
+Similarly for any other patches they may have co-developed :)
+
+> > >
+> > > diff --git
+> > > a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+> > > b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+> > > index 450e920236a5..da2aa4d597f3 100644
+> > > --- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+> > > +++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-v2.dts
+> > > @@ -115,3 +115,11 @@ &tdm_ext {
+> > >   &mclk_ext {
+> > >          clock-frequency = <49152000>;
+> > >   };
+> > > +
+> > > +&sec_dma {
+> > > +       status = "okay";
+> > > +};
+> > > +
+> > > +&crypto {
+> > > +       status = "okay";
+> > > +};
+> > 
+> > In what scenario would you not want to have these enabled?
+
+> These drivers are always enabled.
+> Is everything ok with the dts node entries?
+
+If the hardware is always present, why not drop the "disabled" in
+jh7110.dtsi & these two entries marking them as "okay" in the .dts?
+
+> > > diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi
+> > > b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+> > > index 4ac159d79d66..745a5650882c 100644
+> > > --- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
+> > > +++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+> > > @@ -455,5 +455,41 @@ uart5: serial@12020000 {
+> > >                          reg-shift = <2>;
+> > >                          status = "disabled";
+> > >                  };
+> > > +
+> > > +               sec_dma: sec_dma@16008000 {
+
+> > > +                       status = "disabled";
+
+> > > +               };
+> > > +
+> > > +               crypto: crypto@16000000 {
+
+> > > +                       status = "disabled";
+
+> > > +               };
+> > >          };
+> > >   };
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Conor.
+
