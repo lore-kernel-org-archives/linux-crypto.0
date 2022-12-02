@@ -2,114 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2825C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 18:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3111BC47088
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 18:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234545AbiLBSyb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 13:54:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42110 "EHLO
+        id S233794AbiLBS6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 13:58:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234339AbiLBSyP (ORCPT
+        with ESMTP id S229450AbiLBS6N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 13:54:15 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFF3E347E
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 10:54:07 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id x66so5726219pfx.3
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 10:54:07 -0800 (PST)
+        Fri, 2 Dec 2022 13:58:13 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12BFE92A14
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 10:58:13 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id v3so5103412pgh.4
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 10:58:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6iMOnyAeQsAPxih1P0qQQ/qb4Uyj+szfK6Khgj7UVBM=;
-        b=gaQZ/2L0TZuF0vlG6F8FXYeQZ1QCiQ4oPOli05DX+LfBfEE/JCeOzeHyX4Rb4cAwh+
-         k/u4J+C9Mk52XWfLFmd75lNLMXGn7Dx0sqmr8dAuRkfhivo330YgFt/EmYYp+wtltMgH
-         uMFEkb6J4hTL10CrJZ9fffzLbBIQhIHL9CBLE=
+        bh=hPdGcOCEsG7lUmArEzStFj43mzNWvKg2+Ebw16M3TCY=;
+        b=PU3gDK3JBsY8Izq24LkRkMa24eKn0Mu0dmVHTCV4yTEpqX6bxxHxWKaBIDHx0HnqeJ
+         jhExXB/Ex03vAiF69WJEpsCl4UWQ9Tovfwyo9wxw+NkZDdH0KfetQa679Ugg8duke325
+         KxFZeqdCU9j9zaf0rQ4JEC0LZDDu0WcfjaHss=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6iMOnyAeQsAPxih1P0qQQ/qb4Uyj+szfK6Khgj7UVBM=;
-        b=LSyXaNaYImmRPBc5spbBHNu2xwA7KEi9tBnBfCt7tN2EQntaWtTxK+7FAyjBj1KFDc
-         sHn63WBi7QJUvrEUCrIzCADmfwGMcjHA/HUJVf5IskU/0J+UXHBdCdABsmOawIx+g57j
-         V7Vh4+GdLOawP0tu5xdwPup56X8HhLFo6n20uavAIn1hg8QgCos8DtKFGJPQmqBY7foS
-         SpV0PeexN4hG8JIwDTYOWLxiuwlAcK+s7MHMDD/7D/E8qUEb9jc++JKis/A2j9SQbwKm
-         OuI+vHVVQvTQcvvIFaGaWRgp2j6snrSa+2kN7l15zzzZDoVvhxX2umyedCXoW7HvRv0I
-         nm+g==
-X-Gm-Message-State: ANoB5pm8I19RPHmIRQD/fGaWfBqE4JeEQOu6q+eItb6QA55H9T9I/7i6
-        Zq+iQ9cvms85+Dq5+FZm9t7UlA==
-X-Google-Smtp-Source: AA0mqf4oA/ZhqGNXZKsEB/aIA5GakcxaJJXeeAgFZIxsVTNBPLoZ+SknjDWJAkfMNj9dEspJpOKx4Q==
-X-Received: by 2002:a63:cd10:0:b0:476:c36a:42b9 with SMTP id i16-20020a63cd10000000b00476c36a42b9mr48440644pgg.235.1670007246921;
-        Fri, 02 Dec 2022 10:54:06 -0800 (PST)
+        bh=hPdGcOCEsG7lUmArEzStFj43mzNWvKg2+Ebw16M3TCY=;
+        b=hErljYberRG6lpMZG1tfZOjKZ/DJoZgwAFWcN6hIWcg+p3u8QgNacPkr4DM0durdQT
+         jVi9koOwzC5E4xc8unZQuSigTzjGfhXGxyIEI2g7vzCRosjfGaWbUXxnxWs2q5Cg5MTH
+         esczqWdGfj7MIwy2zJRxPOit/DR/z6RlXadibrTY4sN0jbBx+T75wq0RgNhpeokhOFdA
+         3F9lu5SHEHkq9gWo9FCNjTt/mmPwRONDEQa4/QfY4IZmOPTM2REApiBkO/7VQfk2Ij0s
+         abl7NWcJIMuXfxbkUR4c+cvwlKNqkcqHEQYeCAyrXIpZWQtv5jDNnhwXilzgdxGSBQFS
+         7h1w==
+X-Gm-Message-State: ANoB5pnph4oMkp4SG1z9xrj+9LCEKCfd1f4xbEr+TxD6wUxGH6esuxgU
+        qQLu35p4LYdeBkpWtnE6cUuJIQ==
+X-Google-Smtp-Source: AA0mqf48V3uHLmY0yySTaOoB/FYAXZPXo2e4ikb3ZgTnAR9y+ke4PQBq1FnMqulyBpKVV19bLfFIbA==
+X-Received: by 2002:a62:65c3:0:b0:562:ce80:1417 with SMTP id z186-20020a6265c3000000b00562ce801417mr53353551pfb.19.1670007492560;
+        Fri, 02 Dec 2022 10:58:12 -0800 (PST)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id s20-20020a170902a51400b001894dc5fdf2sm5859890plq.296.2022.12.02.10.54.06
+        by smtp.gmail.com with ESMTPSA id d12-20020a170903230c00b0016c9e5f291bsm5948660plh.111.2022.12.02.10.58.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 10:54:06 -0800 (PST)
-Date:   Fri, 2 Dec 2022 10:54:05 -0800
+        Fri, 02 Dec 2022 10:58:11 -0800 (PST)
+Date:   Fri, 2 Dec 2022 10:58:11 -0800
 From:   Kees Cook <keescook@chromium.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'Anders Roxell' <anders.roxell@linaro.org>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
         Pankaj Gupta <pankaj.gupta@nxp.com>,
         Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2] crypto/caam: Avoid GCC constprop bug warning
-Message-ID: <202212021049.16C438A@keescook>
-References: <20221202010410.gonna.444-kees@kernel.org>
- <Y4loCFGhxecG6Ta0@gondor.apana.org.au>
- <202212011928.97A43D01@keescook>
- <Y4mHjKXnF/4Pfw5I@gondor.apana.org.au>
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
+Subject: Re: [PATCH] crypto/caam: Avoid GCC constprop bug warning
+Message-ID: <202212021057.B1B1BDE380@keescook>
+References: <20221028210527.never.934-kees@kernel.org>
+ <20221202005814.GD69385@mutt>
+ <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y4mHjKXnF/4Pfw5I@gondor.apana.org.au>
+In-Reply-To: <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 02, 2022 at 01:05:16PM +0800, Herbert Xu wrote:
-> On Thu, Dec 01, 2022 at 07:30:22PM -0800, Kees Cook wrote:
-> >
-> > Getting rid of the if doesn't solve the warning. I can switch it to just
-> > "if (data)", though. That keeps GCC happy.
+On Fri, Dec 02, 2022 at 10:01:50AM +0000, David Laight wrote:
+> From: Anders Roxell
+> > Sent: 02 December 2022 00:58
+> > 
+> > On 2022-10-28 14:05, Kees Cook wrote:
+> > > GCC 12 appears to perform constant propagation incompletely(?) and can
+> > > no longer notice that "len" is always 0 when "data" is NULL. Expand the
+> > > check to avoid warnings about memcpy() having a NULL argument:
+> > >
+> > >    ...
+> > >                     from drivers/crypto/caam/key_gen.c:8:
+> > >    drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
+> > >    include/linux/fortify-string.h:48:33: warning: argument 2 null where non-null expected [-
+> > Wnonnull]
+> > >       48 | #define __underlying_memcpy     __builtin_memcpy
+> > >          |                                 ^
+> > >    include/linux/fortify-string.h:438:9: note: in expansion of macro '__underlying_memcpy'
+> > >      438 |         __underlying_##op(p, q, __fortify_size);                        \
+> > >          |         ^~~~~~~~~~~~~
+> ...
 > 
-> OK I misread the thread.
+> Is this really a bug in the fortify-string wrappers?
+> IIRC the call is memcpy(NULL, ptr, 0) (or maybe memcpy(ptr, NULL, 0).
+> In either case call can be removed at compile time.
 > 
-> Anyhow, it appears that this warning only occurs due to a debug
-> printk in caam.  So how about something like this?
-
-What? I don't think that's true? I think
-CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG only controls "PRINT_POS", which is
-unrelated?
-
-The call path is:
-
-drivers/crypto/caam/key_gen.c: gen_split_key()
-	append_fifo_load_as_imm(..., NULL, ...) <- literal NULL
-		append_cmd_data(..., data, ...)
-			memcpy(..., data, ...)
-
-and doesn't seem affected at all by CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG.
-
--Kees
-
+> I'd bet that the constant propagation of 'len' fails because
+> of all the intermediate variables that get used in order to
+> avoid multiple evaluation.
 > 
-> diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-> index 62ce6421bb3f..b49c995e1cc6 100644
-> --- a/drivers/crypto/caam/desc_constr.h
-> +++ b/drivers/crypto/caam/desc_constr.h
-> @@ -163,7 +163,7 @@ static inline void append_data(u32 * const desc, const void *data, int len)
->  {
->  	u32 *offset = desc_end(desc);
->  
-> -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
-> +	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
->  		memcpy(offset, data, len);
->  
->  	(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) +
+> The some 'tricks' that are used in min() (see minmax.h) to
+> generate a constant output for constant input could be
+> use to detect a compile-time zero length.
+> 
+> Something like:
+> #define memcpy(dst, src, len) \
+> 	(__is_constzero(len) ? (dst) : memcpy_check(dst, src, len))
+> 
+> With:
+> #define __is_constzero(x) sizeof(*(1 ? (void *)(x) : (int *)0) != 1)
+> Which could go into const.h and used in the definition of __is_constexpr().
+
+While it could be possible to strip the nonnull attribute, I think it's
+not an unreasonable check to have. This is literally the only case in
+the entire kernel that is tripped, for example.
 
 -- 
 Kees Cook
