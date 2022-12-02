@@ -2,65 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E39BC47088
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 09:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1E0C47088
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 09:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232596AbiLBJqs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 04:46:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47936 "EHLO
+        id S231449AbiLBJt2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 04:49:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232453AbiLBJqq (ORCPT
+        with ESMTP id S232815AbiLBJt0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 04:46:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECAC3638A;
-        Fri,  2 Dec 2022 01:46:45 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A78FFB8211C;
-        Fri,  2 Dec 2022 09:46:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813F5C433D7;
-        Fri,  2 Dec 2022 09:46:41 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AKWtqlKF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1669974398;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EheHaU/FjdrXBCarNx5tWWY2eAZs79C/tTj4LU4xU5w=;
-        b=AKWtqlKFT2IKm3ggdrW0xeG3dYA5RzisUH8cTfExlY/ATlZbFBJb22AJXbtdIdpPFfyTdC
-        PtSeUuLC2EhHVqbjWFgRElm+CIsdht234RShbPpYLYbBKV1xoh+ufwrEzohNwt9cvaejcL
-        3JmwvrlY+d4H6SDuLzBnsM3dTzefmQQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d87882d7 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 2 Dec 2022 09:46:38 +0000 (UTC)
-Date:   Fri, 2 Dec 2022 10:46:35 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, peterhuewe@gmx.de,
-        stable@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
-        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
-        linux-integrity@vger.kernel.org, jgg@ziepe.ca,
-        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
-        timvp@google.com, apronin@google.com, mw@semihalf.com,
-        upstream@semihalf.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
-Message-ID: <Y4nJe+XMoNwTVjlh@zx2c4.com>
-References: <20221128195651.322822-1-Jason@zx2c4.com>
- <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
+        Fri, 2 Dec 2022 04:49:26 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DADC868A;
+        Fri,  2 Dec 2022 01:49:25 -0800 (PST)
+Received: from kwepemm600005.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NNp6Z66jfzJqHw;
+        Fri,  2 Dec 2022 17:48:38 +0800 (CST)
+Received: from [10.67.103.158] (10.67.103.158) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 2 Dec 2022 17:49:22 +0800
+Subject: Re: [PATCH 0/10] crypto: Driver conversions for DMA alignment
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Catalin Marinas <catalin.marinas@arm.com>
+CC:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        <LinuxKernelMailingList@gondor.apana.org.au>,
+        <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <846e2400-1a51-70c0-3b9c-8df6a6b54984@huawei.com>
+Date:   Fri, 2 Dec 2022 17:49:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
+In-Reply-To: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.158]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for handling this, Thorsten. I had poked Jarkko about this
-earlier this week, but he didn't respond. So I'm glad you're on the case
-now getting this in somewhere. Probably this should make it to rc8, so
-there's still one week left of testing it.
+On 2022/12/2 17:19, Herbert Xu wrote:
+> These are the rest of the driver conversions in order for arm64
+> to safely lower the kmalloc alignment below that required for DMA.
+> 
+> My criteria for inclusion are:
+> 
+> 1) the driver can be built on arm64.
+> 2) the driver may perform DMA on the context structure.
+> 
+> I have worked through all the drivers in crypto but if you think
+> I've missed something please let me know.
+> 
 
-Jason
+Hi, Herbert:
+There are also skcipher_request_ctx and aead_request_ctx in the hisilicon/sec2 driver
+that need to be updated.
+
+Thanks,
+Longfang.
+> Thanks,
+> 
