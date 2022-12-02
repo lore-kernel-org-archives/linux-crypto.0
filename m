@@ -2,126 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A05C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 22:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C2FC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 23:35:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234461AbiLBWJB convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 17:09:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57176 "EHLO
+        id S234306AbiLBXfw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 18:35:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233637AbiLBWJA (ORCPT
+        with ESMTP id S233720AbiLBXfs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 17:09:00 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328D1E8E18
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 14:08:58 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-251-qOdtnuOcMPyNnrWdwCRZpQ-1; Fri, 02 Dec 2022 22:08:55 +0000
-X-MC-Unique: qOdtnuOcMPyNnrWdwCRZpQ-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Dec
- 2022 22:08:54 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Fri, 2 Dec 2022 22:08:54 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Kees Cook' <keescook@chromium.org>
-CC:     'Anders Roxell' <anders.roxell@linaro.org>,
-        =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>,
+        Fri, 2 Dec 2022 18:35:48 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D3DCDBF7D;
+        Fri,  2 Dec 2022 15:35:46 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p1FZ1-003RB0-SA; Sat, 03 Dec 2022 07:35:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 03 Dec 2022 07:35:27 +0800
+Date:   Sat, 3 Dec 2022 07:35:27 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Nikolaus Voss <nv@vosn.de>
+Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Nikolaus Voss <nikolaus.voss@haag-streit.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
         Pankaj Gupta <pankaj.gupta@nxp.com>,
         Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel test robot" <lkp@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
-Subject: RE: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Thread-Topic: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Thread-Index: AQHZBekth9IOKPP1MEG2CcwZTmA4Xa5aWPsAgACbPoCAADOrgA==
-Date:   Fri, 2 Dec 2022 22:08:54 +0000
-Message-ID: <188246d459d14c93a9b71352fdc4698e@AcuMS.aculab.com>
-References: <20221028210527.never.934-kees@kernel.org>
- <20221202005814.GD69385@mutt>
- <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
- <202212021057.B1B1BDE380@keescook>
-In-Reply-To: <202212021057.B1B1BDE380@keescook>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] crypto: caam: blob_gen.c: warn if key is insecure
+Message-ID: <Y4qLv/dmDPmGzgnk@gondor.apana.org.au>
+References: <20221121141929.2E36427E9@mail.steuer-voss.de>
+ <94f5f20b-f7c9-b9b5-1b49-3c4366b47370@pengutronix.de>
+ <46085da-4dd4-f02e-1e1d-442cfceeeb15@vosn.de>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46085da-4dd4-f02e-1e1d-442cfceeeb15@vosn.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kees Cook
-> Sent: 02 December 2022 18:58
-> 
-> On Fri, Dec 02, 2022 at 10:01:50AM +0000, David Laight wrote:
-> > From: Anders Roxell
-> > > Sent: 02 December 2022 00:58
-> > >
-> > > On 2022-10-28 14:05, Kees Cook wrote:
-> > > > GCC 12 appears to perform constant propagation incompletely(?) and can
-> > > > no longer notice that "len" is always 0 when "data" is NULL. Expand the
-> > > > check to avoid warnings about memcpy() having a NULL argument:
-> > > >
-> > > >    ...
-> > > >                     from drivers/crypto/caam/key_gen.c:8:
-> > > >    drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
-> > > >    include/linux/fortify-string.h:48:33: warning: argument 2 null where non-null expected [-
-> > > Wnonnull]
-> > > >       48 | #define __underlying_memcpy     __builtin_memcpy
-> > > >          |                                 ^
-> > > >    include/linux/fortify-string.h:438:9: note: in expansion of macro '__underlying_memcpy'
-> > > >      438 |         __underlying_##op(p, q, __fortify_size);                        \
-> > > >          |         ^~~~~~~~~~~~~
-> > ...
-> >
-> > Is this really a bug in the fortify-string wrappers?
-> > IIRC the call is memcpy(NULL, ptr, 0) (or maybe memcpy(ptr, NULL, 0).
-> > In either case call can be removed at compile time.
-> >
-> > I'd bet that the constant propagation of 'len' fails because
-> > of all the intermediate variables that get used in order to
-> > avoid multiple evaluation.
-> >
-> > The some 'tricks' that are used in min() (see minmax.h) to
-> > generate a constant output for constant input could be
-> > use to detect a compile-time zero length.
-> >
-> > Something like:
-> > #define memcpy(dst, src, len) \
-> > 	(__is_constzero(len) ? (dst) : memcpy_check(dst, src, len))
-> >
-> > With:
-> > #define __is_constzero(x) sizeof(*(1 ? (void *)(x) : (int *)0) != 1)
-> > Which could go into const.h and used in the definition of __is_constexpr().
-> 
-> While it could be possible to strip the nonnull attribute, I think it's
-> not an unreasonable check to have. This is literally the only case in
-> the entire kernel that is tripped, for example.
+On Fri, Dec 02, 2022 at 03:43:29PM +0100, Nikolaus Voss wrote:
+>
+> Herbert, shall I spin v3 of the patch or patch against v2?
 
-It is probably the only place that calls memcpy() with compile-time
-NULL and zero length.
-IIRC the memcpy() call comes from a #define expansion where some
-expansions don't need anything copied.
-A simple 'builtin_constant' check and then one for zero in the
-#define itself would probably suffice - and avoid the call
-being compiled in at all.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Please do it as a follow-up.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
