@@ -2,120 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3111BC47088
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 18:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC622C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 19:21:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233794AbiLBS6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 13:58:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50062 "EHLO
+        id S234454AbiLBTVb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 14:21:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiLBS6N (ORCPT
+        with ESMTP id S234378AbiLBTVY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 13:58:13 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12BFE92A14
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 10:58:13 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id v3so5103412pgh.4
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 10:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hPdGcOCEsG7lUmArEzStFj43mzNWvKg2+Ebw16M3TCY=;
-        b=PU3gDK3JBsY8Izq24LkRkMa24eKn0Mu0dmVHTCV4yTEpqX6bxxHxWKaBIDHx0HnqeJ
-         jhExXB/Ex03vAiF69WJEpsCl4UWQ9Tovfwyo9wxw+NkZDdH0KfetQa679Ugg8duke325
-         KxFZeqdCU9j9zaf0rQ4JEC0LZDDu0WcfjaHss=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hPdGcOCEsG7lUmArEzStFj43mzNWvKg2+Ebw16M3TCY=;
-        b=hErljYberRG6lpMZG1tfZOjKZ/DJoZgwAFWcN6hIWcg+p3u8QgNacPkr4DM0durdQT
-         jVi9koOwzC5E4xc8unZQuSigTzjGfhXGxyIEI2g7vzCRosjfGaWbUXxnxWs2q5Cg5MTH
-         esczqWdGfj7MIwy2zJRxPOit/DR/z6RlXadibrTY4sN0jbBx+T75wq0RgNhpeokhOFdA
-         3F9lu5SHEHkq9gWo9FCNjTt/mmPwRONDEQa4/QfY4IZmOPTM2REApiBkO/7VQfk2Ij0s
-         abl7NWcJIMuXfxbkUR4c+cvwlKNqkcqHEQYeCAyrXIpZWQtv5jDNnhwXilzgdxGSBQFS
-         7h1w==
-X-Gm-Message-State: ANoB5pnph4oMkp4SG1z9xrj+9LCEKCfd1f4xbEr+TxD6wUxGH6esuxgU
-        qQLu35p4LYdeBkpWtnE6cUuJIQ==
-X-Google-Smtp-Source: AA0mqf48V3uHLmY0yySTaOoB/FYAXZPXo2e4ikb3ZgTnAR9y+ke4PQBq1FnMqulyBpKVV19bLfFIbA==
-X-Received: by 2002:a62:65c3:0:b0:562:ce80:1417 with SMTP id z186-20020a6265c3000000b00562ce801417mr53353551pfb.19.1670007492560;
-        Fri, 02 Dec 2022 10:58:12 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id d12-20020a170903230c00b0016c9e5f291bsm5948660plh.111.2022.12.02.10.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 10:58:11 -0800 (PST)
-Date:   Fri, 2 Dec 2022 10:58:11 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     'Anders Roxell' <anders.roxell@linaro.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
+        Fri, 2 Dec 2022 14:21:24 -0500
+Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADF6EF8B3;
+        Fri,  2 Dec 2022 11:21:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
+        ; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
+        Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
+        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
+        bh=0NUu4ctHIlOxLau4TIcj+Sj7pIi/v+JOenF17DqHjZQ=; b=iSRBv/TWo0zdYt2Uko8NDseLAg
+        jPbzfbBU9FPjf4MmG+1kiEz4Eu4gFoxlMNgt6e80tdC0woxsEJLWb72ZLr0Iicss49YjgqrvGzt65
+        6GbXFVfCQQOPeZSRJT1bI7AENvEJbka+icCHmED7OvyAYBOOHCHbRo70f11BbRNBd7kVf/bw6rIGc
+        sX0Xdb3M6T2Cnw3nEvdVs0kU89A2D43/LTj81k4zrxr8Enn1PgETTx4O+fS91odU1aN3V7cWEBtb5
+        jvq9gNbHS+FWD1VG+mgWQ6AJfq3brAO6oBhmvjEiLoIwsOOgTiC2wqmx/BzRv+dQSEbghWKZ+Tx6P
+        gLedwFjg==;
+Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
+        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1p1Bak-0098Qj-Hm; Fri, 02 Dec 2022 20:20:58 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1p1Baj-00Ex9e-3A;
+        Fri, 02 Dec 2022 20:20:57 +0100
+Date:   Fri, 2 Dec 2022 20:20:57 +0100
+From:   Aurelien Jarno <aurelien@aurel32.net>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        kernel test robot <lkp@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Message-ID: <202212021057.B1B1BDE380@keescook>
-References: <20221028210527.never.934-kees@kernel.org>
- <20221202005814.GD69385@mutt>
- <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Lin Jinhan <troy.lin@rock-chips.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "moderated list:ARM/Rockchip SoC support" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "open list:ARM/Rockchip SoC support" 
+        <linux-rockchip@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] dt-bindings: RNG: Add Rockchip RNG bindings
+Message-ID: <Y4pQGRMzILrkRP/2@aurel32.net>
+Mail-Followup-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Lin Jinhan <troy.lin@rock-chips.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+        "moderated list:ARM/Rockchip SoC support" <linux-arm-kernel@lists.infradead.org>,
+        "open list:ARM/Rockchip SoC support" <linux-rockchip@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20221128184718.1963353-1-aurelien@aurel32.net>
+ <20221128184718.1963353-2-aurelien@aurel32.net>
+ <89b16ec5-f9a5-f836-f51a-8325448e4775@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
+In-Reply-To: <89b16ec5-f9a5-f836-f51a-8325448e4775@linaro.org>
+User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 02, 2022 at 10:01:50AM +0000, David Laight wrote:
-> From: Anders Roxell
-> > Sent: 02 December 2022 00:58
-> > 
-> > On 2022-10-28 14:05, Kees Cook wrote:
-> > > GCC 12 appears to perform constant propagation incompletely(?) and can
-> > > no longer notice that "len" is always 0 when "data" is NULL. Expand the
-> > > check to avoid warnings about memcpy() having a NULL argument:
-> > >
-> > >    ...
-> > >                     from drivers/crypto/caam/key_gen.c:8:
-> > >    drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
-> > >    include/linux/fortify-string.h:48:33: warning: argument 2 null where non-null expected [-
-> > Wnonnull]
-> > >       48 | #define __underlying_memcpy     __builtin_memcpy
-> > >          |                                 ^
-> > >    include/linux/fortify-string.h:438:9: note: in expansion of macro '__underlying_memcpy'
-> > >      438 |         __underlying_##op(p, q, __fortify_size);                        \
-> > >          |         ^~~~~~~~~~~~~
-> ...
-> 
-> Is this really a bug in the fortify-string wrappers?
-> IIRC the call is memcpy(NULL, ptr, 0) (or maybe memcpy(ptr, NULL, 0).
-> In either case call can be removed at compile time.
-> 
-> I'd bet that the constant propagation of 'len' fails because
-> of all the intermediate variables that get used in order to
-> avoid multiple evaluation.
-> 
-> The some 'tricks' that are used in min() (see minmax.h) to
-> generate a constant output for constant input could be
-> use to detect a compile-time zero length.
-> 
-> Something like:
-> #define memcpy(dst, src, len) \
-> 	(__is_constzero(len) ? (dst) : memcpy_check(dst, src, len))
-> 
-> With:
-> #define __is_constzero(x) sizeof(*(1 ? (void *)(x) : (int *)0) != 1)
-> Which could go into const.h and used in the definition of __is_constexpr().
+Hi,
 
-While it could be possible to strip the nonnull attribute, I think it's
-not an unreasonable check to have. This is literally the only case in
-the entire kernel that is tripped, for example.
+Thanks for your feedback.
+
+On 2022-11-29 10:24, Krzysztof Kozlowski wrote:
+> On 28/11/2022 19:47, Aurelien Jarno wrote:
+> > Add the RNG bindings for the RK3568 SoC from Rockchip
+> 
+> Use subject prefixes matching the subsystem (git log --oneline -- ...),
+> so it is rng, not RNG. Also, you are not adding all-Rockhip RNG but a
+> specific device.
+> 
+> Subject: drop second, redundant "bindings".
+> 
+> > 
+> > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> > ---
+> >  .../bindings/rng/rockchip,rk3568-rng.yaml     | 60 +++++++++++++++++++
+> >  1 file changed, 60 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> > new file mode 100644
+> > index 000000000000..c2f5ef69cf07
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> > @@ -0,0 +1,60 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/rng/rockchip,rk3568-rng.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Rockchip TRNG
+> > +
+> > +description: True Random Number Generator for some Rockchip SoCs
+> 
+> s/for some Rockchip SoCs/on Rokchip RK3568 SoC/
+
+My point there is that this driver should also work for other Rockchip
+SoCs like the RK3588, but 1) it support for this SoC is being added and
+not yet available in the Linux kernel 2) it hasn't been tested.
+
+Should we mark it as RK3568 specific (or rather RK356x) and change that
+once a compatible entry is added for the RK3588?
+
+> > +
+> > +maintainers:
+> > +  - Aurelien Jarno <aurelien@aurel32.net>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - rockchip,rk3568-rng
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    items:
+> > +      - description: TRNG clock
+> > +      - description: TRNG AHB clock
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: trng_clk
+> > +      - const: trng_hclk
+> 
+> These are too vague names. Everything is a clk in clock-names, so no
+> need usually to add it as name suffix. Give them some descriptive names,
+> e.g. core and ahb.
+
+Those names are based on <include/dt-bindings/clock/rk3568-cru.h> and
+other drivers seems to have used those for the names. But I understand
+that broken things could have been merged, so I am fine changing that to
+core and ahb.
+
+> > +
+> > +  resets:
+> > +    maxItems: 1
+> > +
+
+Regards
+Aurelien
 
 -- 
-Kees Cook
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
