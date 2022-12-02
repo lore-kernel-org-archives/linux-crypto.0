@@ -2,52 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EAAC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 09:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E39BC47088
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 09:46:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232442AbiLBJnv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 04:43:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46822 "EHLO
+        id S232596AbiLBJqs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 04:46:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231833AbiLBJnu (ORCPT
+        with ESMTP id S232453AbiLBJqq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 04:43:50 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00BDEBE101
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 01:43:49 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p12a9-003BPf-6L; Fri, 02 Dec 2022 17:43:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Dec 2022 17:43:45 +0800
-Date:   Fri, 2 Dec 2022 17:43:45 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Cc:     olivia@selenic.com, mpm@selenic.com, mb@bu3sch.de,
-        linux-crypto@vger.kernel.org, yangyingliang@huawei.com
-Subject: Re: [PATCH] hwrng: amd - Fix PCI device refcount leak
-Message-ID: <Y4nI0X0u01uiTCV0@gondor.apana.org.au>
-References: <20221123093949.115579-1-wangxiongfeng2@huawei.com>
+        Fri, 2 Dec 2022 04:46:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECAC3638A;
+        Fri,  2 Dec 2022 01:46:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A78FFB8211C;
+        Fri,  2 Dec 2022 09:46:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813F5C433D7;
+        Fri,  2 Dec 2022 09:46:41 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AKWtqlKF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1669974398;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EheHaU/FjdrXBCarNx5tWWY2eAZs79C/tTj4LU4xU5w=;
+        b=AKWtqlKFT2IKm3ggdrW0xeG3dYA5RzisUH8cTfExlY/ATlZbFBJb22AJXbtdIdpPFfyTdC
+        PtSeUuLC2EhHVqbjWFgRElm+CIsdht234RShbPpYLYbBKV1xoh+ufwrEzohNwt9cvaejcL
+        3JmwvrlY+d4H6SDuLzBnsM3dTzefmQQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d87882d7 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Fri, 2 Dec 2022 09:46:38 +0000 (UTC)
+Date:   Fri, 2 Dec 2022 10:46:35 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>, peterhuewe@gmx.de,
+        stable@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
+        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
+        linux-integrity@vger.kernel.org, jgg@ziepe.ca,
+        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
+        timvp@google.com, apronin@google.com, mw@semihalf.com,
+        upstream@semihalf.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
+Message-ID: <Y4nJe+XMoNwTVjlh@zx2c4.com>
+References: <20221128195651.322822-1-Jason@zx2c4.com>
+ <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221123093949.115579-1-wangxiongfeng2@huawei.com>
+In-Reply-To: <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 05:39:49PM +0800, Xiongfeng Wang wrote:
->
-> @@ -201,6 +207,8 @@ static void __exit amd_rng_mod_exit(void)
->  	release_region(priv->pmbase + PMBASE_OFFSET, PMBASE_SIZE);
->  
->  	kfree(priv);
-> +
-> +	pci_dev_put(priv->pcidev);
+Thanks for handling this, Thorsten. I had poked Jarkko about this
+earlier this week, but he didn't respond. So I'm glad you're on the case
+now getting this in somewhere. Probably this should make it to rc8, so
+there's still one week left of testing it.
 
-Oops, this doesn't look right.  Please fix and resubmit.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jason
