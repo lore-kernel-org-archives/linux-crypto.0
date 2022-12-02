@@ -2,140 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B47C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 01:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A4BC3A5A7
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 02:51:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232025AbiLBBET (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Dec 2022 20:04:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
+        id S232069AbiLBCvH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Dec 2022 21:51:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230073AbiLBBES (ORCPT
+        with ESMTP id S230170AbiLBCvG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Dec 2022 20:04:18 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C273DC5102
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Dec 2022 17:04:17 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so6883430pjp.1
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Dec 2022 17:04:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mgD8FhgaFk9oCftVcbd5rE8c85Ck+hk9NaPIDPM9D7Y=;
-        b=aXrpwNbgm5OLZXe+psbrCgfJS4wj+DxUnSQ11xpRLZp40aoUthPqou72FOg4Nk2znH
-         WQrtt3K6jfLcVlpWIHtisgX0R7aWBFh2i7PfSELXEFP/a6bue3UTlFtiw48XuH4WDtc0
-         F8Xh1TTkIXfh1heg7JV6bZrQ7+BE0SvwOoZaQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mgD8FhgaFk9oCftVcbd5rE8c85Ck+hk9NaPIDPM9D7Y=;
-        b=mwprWlY524o3sc6JSZEc62Zd3ZQDMVoIIZ1xxK2uHUvwqN2lK2GBBhzOPMqOrSw/9l
-         Aumr9QfNVZGCCPzNO3kh4IXdww4yqVV1/6pO08DAPYHKjl3+ERHQUSFiqU47jxch7I90
-         UTMRapH2oiSMfFFrF5KF7IYHcFpTpb6+ls3GJyPhzAUjJbjcAUOA6KRi1LdzDWjPejLX
-         tJcGdLRmc0WuQ/kl22/VpPHxWQ+lCbRjH1474FjheGSg8WSYG9Cy7ZxPG67VOchTRidw
-         1ftecf78KQuGd/0ggtvS5cf5Pd2L4EnVF6qh2S7YZxs1toaOejaNRhC3EuzhHEx/eSo7
-         W1TA==
-X-Gm-Message-State: ANoB5pnfQU4nm/z8apTK0m9F9kKRkGEQgdsaQ0cJK0+NMvOXHuowUfio
-        rhgqUsWFPS9VtiKtTFZbtdwzsg==
-X-Google-Smtp-Source: AA0mqf5o3BeIFoW83AbmXDjzB9oWBsGdeQwe595mOIjOvfykNr4VKujP0z1ZS/WKspE1J6UFVJIEgA==
-X-Received: by 2002:a17:902:bd04:b0:189:38a1:30fe with SMTP id p4-20020a170902bd0400b0018938a130femr47006070pls.47.1669943057301;
-        Thu, 01 Dec 2022 17:04:17 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id w81-20020a627b54000000b0057255b7c8easm3839384pfc.33.2022.12.01.17.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 17:04:16 -0800 (PST)
-From:   Kees Cook <keescook@chromium.org>
-To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Kees Cook <keescook@chromium.org>,
+        Thu, 1 Dec 2022 21:51:06 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667DED67B3;
+        Thu,  1 Dec 2022 18:51:02 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p0w8W-0035DJ-SR; Fri, 02 Dec 2022 10:50:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Dec 2022 10:50:48 +0800
+Date:   Fri, 2 Dec 2022 10:50:48 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
         Pankaj Gupta <pankaj.gupta@nxp.com>,
         Gaurav Jain <gaurav.jain@nxp.com>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
         Anders Roxell <anders.roxell@linaro.org>,
         linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: [PATCH v2] crypto/caam: Avoid GCC constprop bug warning
-Date:   Thu,  1 Dec 2022 17:04:14 -0800
-Message-Id: <20221202010410.gonna.444-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+Subject: Re: [PATCH v2] crypto/caam: Avoid GCC constprop bug warning
+Message-ID: <Y4loCFGhxecG6Ta0@gondor.apana.org.au>
+References: <20221202010410.gonna.444-kees@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2834; h=from:subject:message-id; bh=xh4MxFL84Wy20TxfRpoAzNdIE896T/TUz2F6Ru6YtCM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBjiU8Nv8CsDf2sTBuvc9KYWF5qFW721OEsR46gpWiR MEbbVnOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCY4lPDQAKCRCJcvTf3G3AJlVYD/ 9v+qIE/EyYegIvaxfV8obcYEMuN3x9SF+CAa68Qd6JGjXbCipnKim4YNCrlIhsmVwE/tO06p+LJk2S kHXAL6vsoN8TZnp6ByyH6NeLmuftpptVBT6wu4lxkXmBjJQzuYtlgAkRDOgOq9Wm0D+ly2MlMJW9h2 bKGxJY8YkYWTDT9OzSKuQLpU6y5kVkfDiGDP7QKRkpk7buT2aQa0xHRZTZY7MFutfNstcw+XeL8e5C 5DFuHMKzZQtXsN9p9O5QsBFqsphVli3xl34t3YDd9c4uyhL8mdl6ahVQeOYmu8tr+6a+OShw+WEi1b nGhekoLQM5CB6XTAfmvV2XIMVgfpb0c2zR16DGGCqgKDZKfe2ZgCyywnkt7MN6aVc9+Y66GkgZ1kEV 7pSNjP3T+YYOiWVM/52S6yQna03IBCV9ls5bEO32XUxOniZWb1JxXCyjQ+w6DfISBx8Rl5zjNq1Fz0 KRlV6zqUf0PO65GGn1POuty8nOLxPQ6hbt6PylPrXDbBGkRq7Cjcc6K70xyNWWxCeHgm+f7uVqmdoX 7RdOXI8r5s+3uFH+cSuH2dawHfH/sLmip+qlNnjFG83BrSygx0nb1kYoWmEXcdc4ZR4iFVaD8GZshx JBcSKCu2FceYBBugRUkJC/L2PFrEceTaJS/hTlK+dX1X8pnHU6o06gAjfBVQ==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221202010410.gonna.444-kees@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-GCC 12 appears to perform constant propagation incompletely(?) and can
-no longer notice that "len" is always 0 when "data" is NULL. Expand the
-check to avoid warnings about memcpy() having a NULL argument:
+On Thu, Dec 01, 2022 at 05:04:14PM -0800, Kees Cook wrote:
+>
+> diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+> index 62ce6421bb3f..d9da4173af9d 100644
+> --- a/drivers/crypto/caam/desc_constr.h
+> +++ b/drivers/crypto/caam/desc_constr.h
+> @@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, const void *data, int len)
+>  {
+>  	u32 *offset = desc_end(desc);
+>  
+> -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
+> +	/* Avoid GCC warning: memcpy with NULL dest (but byte count of 0). */
+> +	if (data && len)
+>  		memcpy(offset, data, len);
 
-   ...
-                    from drivers/crypto/caam/key_gen.c:8:
-   drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
-   include/linux/fortify-string.h:48:33: warning: argument 2 null where non-null expected [-Wnonnull]
-      48 | #define __underlying_memcpy     __builtin_memcpy
-         |                                 ^
-   include/linux/fortify-string.h:438:9: note: in expansion of macro '__underlying_memcpy'
-     438 |         __underlying_##op(p, q, __fortify_size);                        \
-         |         ^~~~~~~~~~~~~
+This makes no sense.  The if clause was added to silence sparse.
+That then in turn caused gcc to barf.  However, sparse has since
+been fixed so that it doesn't warn without the if clause.
 
-The NULL was being propagated from:
+The solution is not to keep adding crap to the if clause, but to
+get rid of it once and for all.
 
-        append_fifo_load_as_imm(desc, NULL, 0, LDST_CLASS_2_CCB |
-                                FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST2);
-...
-static inline void append_##cmd##_as_imm(u32 * const desc, const void *data, \
-                                         unsigned int len, u32 options) \
-{ \
-        PRINT_POS; \
-        append_cmd_data(desc, data, len, CMD_##op | options); \
-}
-...
-APPEND_CMD_PTR_TO_IMM(fifo_load, FIFO_LOAD);
-...
-static inline void append_cmd_data(u32 * const desc, const void *data, int len,
-                                   u32 command)
-{
-        append_cmd(desc, command | IMMEDIATE | len);
-        append_data(desc, data, len);
-}
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc: Gaurav Jain <gaurav.jain@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
-Tested-by: Anders Roxell <anders.roxell@linaro.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
-v1: https://lore.kernel.org/lkml/20221028210527.never.934-kees@kernel.org/
-v2: update comment (anders)
-Note that this is about GCC, not sparse (any more).
----
- drivers/crypto/caam/desc_constr.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 62ce6421bb3f..d9da4173af9d 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, const void *data, int len)
- {
- 	u32 *offset = desc_end(desc);
- 
--	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
-+	/* Avoid GCC warning: memcpy with NULL dest (but byte count of 0). */
-+	if (data && len)
- 		memcpy(offset, data, len);
- 
- 	(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) +
+Thanks,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
