@@ -2,62 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88087C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 09:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68A9C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 10:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232647AbiLBJxk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 04:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
+        id S232529AbiLBKB7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 05:01:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233000AbiLBJxj (ORCPT
+        with ESMTP id S233190AbiLBKB5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 04:53:39 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C958067214;
-        Fri,  2 Dec 2022 01:53:37 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p12jK-003Bdy-AU; Fri, 02 Dec 2022 17:53:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Dec 2022 17:53:14 +0800
-Date:   Fri, 2 Dec 2022 17:53:14 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     liulongfang <liulongfang@huawei.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        LinuxKernelMailingList@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org,
+        Fri, 2 Dec 2022 05:01:57 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B702DCB21E
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 02:01:55 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-259-gU3wSqt4NfGibvtvFXD_wg-1; Fri, 02 Dec 2022 10:01:52 +0000
+X-MC-Unique: gU3wSqt4NfGibvtvFXD_wg-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Dec
+ 2022 10:01:50 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Fri, 2 Dec 2022 10:01:50 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Anders Roxell' <anders.roxell@linaro.org>,
+        Kees Cook <keescook@chromium.org>
+CC:     =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 0/10] crypto: Driver conversions for DMA alignment
-Message-ID: <Y4nLClJJdLMu3Hdp@gondor.apana.org.au>
-References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
- <846e2400-1a51-70c0-3b9c-8df6a6b54984@huawei.com>
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel test robot" <lkp@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
+Subject: RE: [PATCH] crypto/caam: Avoid GCC constprop bug warning
+Thread-Topic: [PATCH] crypto/caam: Avoid GCC constprop bug warning
+Thread-Index: AQHZBekth9IOKPP1MEG2CcwZTmA4Xa5aWPsA
+Date:   Fri, 2 Dec 2022 10:01:50 +0000
+Message-ID: <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
+References: <20221028210527.never.934-kees@kernel.org>
+ <20221202005814.GD69385@mutt>
+In-Reply-To: <20221202005814.GD69385@mutt>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <846e2400-1a51-70c0-3b9c-8df6a6b54984@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 02, 2022 at 05:49:21PM +0800, liulongfang wrote:
-. 
-> Hi, Herbert:
-> There are also skcipher_request_ctx and aead_request_ctx in the hisilicon/sec2 driver
-> that need to be updated.
+RnJvbTogQW5kZXJzIFJveGVsbA0KPiBTZW50OiAwMiBEZWNlbWJlciAyMDIyIDAwOjU4DQo+IA0K
+PiBPbiAyMDIyLTEwLTI4IDE0OjA1LCBLZWVzIENvb2sgd3JvdGU6DQo+ID4gR0NDIDEyIGFwcGVh
+cnMgdG8gcGVyZm9ybSBjb25zdGFudCBwcm9wYWdhdGlvbiBpbmNvbXBsZXRlbHkoPykgYW5kIGNh
+bg0KPiA+IG5vIGxvbmdlciBub3RpY2UgdGhhdCAibGVuIiBpcyBhbHdheXMgMCB3aGVuICJkYXRh
+IiBpcyBOVUxMLiBFeHBhbmQgdGhlDQo+ID4gY2hlY2sgdG8gYXZvaWQgd2FybmluZ3MgYWJvdXQg
+bWVtY3B5KCkgaGF2aW5nIGEgTlVMTCBhcmd1bWVudDoNCj4gPg0KPiA+ICAgIC4uLg0KPiA+ICAg
+ICAgICAgICAgICAgICAgICAgZnJvbSBkcml2ZXJzL2NyeXB0by9jYWFtL2tleV9nZW4uYzo4Og0K
+PiA+ICAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vZGVzY19jb25zdHIuaDogSW4gZnVuY3Rpb24gJ2Fw
+cGVuZF9kYXRhLmNvbnN0cHJvcCc6DQo+ID4gICAgaW5jbHVkZS9saW51eC9mb3J0aWZ5LXN0cmlu
+Zy5oOjQ4OjMzOiB3YXJuaW5nOiBhcmd1bWVudCAyIG51bGwgd2hlcmUgbm9uLW51bGwgZXhwZWN0
+ZWQgWy0NCj4gV25vbm51bGxdDQo+ID4gICAgICAgNDggfCAjZGVmaW5lIF9fdW5kZXJseWluZ19t
+ZW1jcHkgICAgIF9fYnVpbHRpbl9tZW1jcHkNCj4gPiAgICAgICAgICB8ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXg0KPiA+ICAgIGluY2x1ZGUvbGludXgvZm9ydGlmeS1zdHJpbmcu
+aDo0Mzg6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdfX3VuZGVybHlpbmdfbWVtY3B5
+Jw0KPiA+ICAgICAgNDM4IHwgICAgICAgICBfX3VuZGVybHlpbmdfIyNvcChwLCBxLCBfX2ZvcnRp
+Znlfc2l6ZSk7ICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+ICAgICAgICAgIHwgICAgICAg
+ICBefn5+fn5+fn5+fn5+DQouLi4NCg0KSXMgdGhpcyByZWFsbHkgYSBidWcgaW4gdGhlIGZvcnRp
+Znktc3RyaW5nIHdyYXBwZXJzPw0KSUlSQyB0aGUgY2FsbCBpcyBtZW1jcHkoTlVMTCwgcHRyLCAw
+KSAob3IgbWF5YmUgbWVtY3B5KHB0ciwgTlVMTCwgMCkuDQpJbiBlaXRoZXIgY2FzZSBjYWxsIGNh
+biBiZSByZW1vdmVkIGF0IGNvbXBpbGUgdGltZS4NCg0KSSdkIGJldCB0aGF0IHRoZSBjb25zdGFu
+dCBwcm9wYWdhdGlvbiBvZiAnbGVuJyBmYWlscyBiZWNhdXNlDQpvZiBhbGwgdGhlIGludGVybWVk
+aWF0ZSB2YXJpYWJsZXMgdGhhdCBnZXQgdXNlZCBpbiBvcmRlciB0bw0KYXZvaWQgbXVsdGlwbGUg
+ZXZhbHVhdGlvbi4NCg0KVGhlIHNvbWUgJ3RyaWNrcycgdGhhdCBhcmUgdXNlZCBpbiBtaW4oKSAo
+c2VlIG1pbm1heC5oKSB0bw0KZ2VuZXJhdGUgYSBjb25zdGFudCBvdXRwdXQgZm9yIGNvbnN0YW50
+IGlucHV0IGNvdWxkIGJlDQp1c2UgdG8gZGV0ZWN0IGEgY29tcGlsZS10aW1lIHplcm8gbGVuZ3Ro
+Lg0KDQpTb21ldGhpbmcgbGlrZToNCiNkZWZpbmUgbWVtY3B5KGRzdCwgc3JjLCBsZW4pIFwNCgko
+X19pc19jb25zdHplcm8obGVuKSA/IChkc3QpIDogbWVtY3B5X2NoZWNrKGRzdCwgc3JjLCBsZW4p
+KQ0KDQpXaXRoOg0KI2RlZmluZSBfX2lzX2NvbnN0emVybyh4KSBzaXplb2YoKigxID8gKHZvaWQg
+KikoeCkgOiAoaW50ICopMCkgIT0gMSkNCldoaWNoIGNvdWxkIGdvIGludG8gY29uc3QuaCBhbmQg
+dXNlZCBpbiB0aGUgZGVmaW5pdGlvbiBvZiBfX2lzX2NvbnN0ZXhwcigpLg0KDQoJRGF2aWQNCg0K
+LQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0s
+IE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdh
+bGVzKQ0K
 
-Please show me where they do DMA directly on the context structure.
-I wasn't able to find such a place.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
