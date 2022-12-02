@@ -2,39 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC622C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 19:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9980FC47088
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 19:30:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234454AbiLBTVb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 14:21:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46634 "EHLO
+        id S234159AbiLBTaT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 14:30:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234378AbiLBTVY (ORCPT
+        with ESMTP id S233679AbiLBTaT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:21:24 -0500
+        Fri, 2 Dec 2022 14:30:19 -0500
 Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EADF6EF8B3;
-        Fri,  2 Dec 2022 11:21:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044B4EC80E;
+        Fri,  2 Dec 2022 11:30:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
         ; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
         Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
         Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=0NUu4ctHIlOxLau4TIcj+Sj7pIi/v+JOenF17DqHjZQ=; b=iSRBv/TWo0zdYt2Uko8NDseLAg
-        jPbzfbBU9FPjf4MmG+1kiEz4Eu4gFoxlMNgt6e80tdC0woxsEJLWb72ZLr0Iicss49YjgqrvGzt65
-        6GbXFVfCQQOPeZSRJT1bI7AENvEJbka+icCHmED7OvyAYBOOHCHbRo70f11BbRNBd7kVf/bw6rIGc
-        sX0Xdb3M6T2Cnw3nEvdVs0kU89A2D43/LTj81k4zrxr8Enn1PgETTx4O+fS91odU1aN3V7cWEBtb5
-        jvq9gNbHS+FWD1VG+mgWQ6AJfq3brAO6oBhmvjEiLoIwsOOgTiC2wqmx/BzRv+dQSEbghWKZ+Tx6P
-        gLedwFjg==;
+        bh=QeityKeWX9SH19NfeKIppN2I0iFKaIHoIc1Zkqq/E6k=; b=nOXshjpnQjf5mZxj6cFVHdAk9h
+        mLpBsfcpsow8dQYvO9/n9gm9O2xfktkDZJKMivAnd/LFuSFifh0wgQPFW9A7Qkk58fafdAkQG0zRI
+        hy9hov2mll82bo3A465yPE/vpjH0x7fq3VBzHw9/UIDgZU6GVhey83YDczWtYtIAcj2sop3e2n9Ke
+        YsWbaVmg7FAOYXlKDU0Rxy5VCHxKpIy2ll/rabony7mUTO4o3ySDgqto7PVzA5kMI9YldodwGlmyM
+        5l6Dl6b9XpjgNN6ayskbZf8yioFtpLsZ16JM7xoxeW2e9DtA+eHxolMZbV8Vuv/cL47R78SJPkNf1
+        ip5A3ZoQ==;
 Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
         by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <aurelien@aurel32.net>)
-        id 1p1Bak-0098Qj-Hm; Fri, 02 Dec 2022 20:20:58 +0100
+        id 1p1Bjb-0098bq-Hu; Fri, 02 Dec 2022 20:30:07 +0100
 Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
         (envelope-from <aurelien@aurel32.net>)
-        id 1p1Baj-00Ex9e-3A;
-        Fri, 02 Dec 2022 20:20:57 +0100
-Date:   Fri, 2 Dec 2022 20:20:57 +0100
+        id 1p1Bja-00ExHt-30;
+        Fri, 02 Dec 2022 20:30:06 +0100
+Date:   Fri, 2 Dec 2022 20:30:06 +0100
 From:   Aurelien Jarno <aurelien@aurel32.net>
 To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Cc:     Olivia Mackall <olivia@selenic.com>,
@@ -53,8 +53,8 @@ Cc:     Olivia Mackall <olivia@selenic.com>,
         "open list:ARM/Rockchip SoC support" 
         <linux-rockchip@lists.infradead.org>,
         open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] dt-bindings: RNG: Add Rockchip RNG bindings
-Message-ID: <Y4pQGRMzILrkRP/2@aurel32.net>
+Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
+Message-ID: <Y4pSPrIHPL8yH6cq@aurel32.net>
 Mail-Followup-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
         Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -69,12 +69,12 @@ Mail-Followup-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
         "open list:ARM/Rockchip SoC support" <linux-rockchip@lists.infradead.org>,
         open list <linux-kernel@vger.kernel.org>
 References: <20221128184718.1963353-1-aurelien@aurel32.net>
- <20221128184718.1963353-2-aurelien@aurel32.net>
- <89b16ec5-f9a5-f836-f51a-8325448e4775@linaro.org>
+ <20221128184718.1963353-3-aurelien@aurel32.net>
+ <76091207-d81c-e737-34a2-884153251925@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <89b16ec5-f9a5-f836-f51a-8325448e4775@linaro.org>
+In-Reply-To: <76091207-d81c-e737-34a2-884153251925@linaro.org>
 User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -84,86 +84,204 @@ Hi,
 
 Thanks for your feedback.
 
-On 2022-11-29 10:24, Krzysztof Kozlowski wrote:
+On 2022-11-29 10:33, Krzysztof Kozlowski wrote:
 > On 28/11/2022 19:47, Aurelien Jarno wrote:
-> > Add the RNG bindings for the RK3568 SoC from Rockchip
-> 
-> Use subject prefixes matching the subsystem (git log --oneline -- ...),
-> so it is rng, not RNG. Also, you are not adding all-Rockhip RNG but a
-> specific device.
-> 
-> Subject: drop second, redundant "bindings".
-> 
-> > 
-> > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-> > ---
-> >  .../bindings/rng/rockchip,rk3568-rng.yaml     | 60 +++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> > diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
 > > new file mode 100644
-> > index 000000000000..c2f5ef69cf07
+> > index 000000000000..18cdd91ad8c3
 > > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
-> > @@ -0,0 +1,60 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/rng/rockchip,rk3568-rng.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +++ b/drivers/char/hw_random/rockchip-rng.c
+> > @@ -0,0 +1,250 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * rockchip-rng.c True Random Number Generator driver for Rockchip SoCs
+> > + *
+> > + * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
+> > + * Copyright (c) 2022, Aurelien Jarno
+> > + * Authors:
+> > + *  Lin Jinhan <troy.lin@rock-chips.com>
+> > + *  Aurelien Jarno <aurelien@aurel32.net>
+> > + */
+> > +#include <linux/clk.h>
+> > +#include <linux/hw_random.h>
+> > +#include <linux/io.h>
+> > +#include <linux/iopoll.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/of_platform.h>
+> > +#include <linux/pm_runtime.h>
+> > +#include <linux/reset.h>
+> > +#include <linux/slab.h>
 > > +
-> > +title: Rockchip TRNG
+> > +#define RK_RNG_AUTOSUSPEND_DELAY	100
+> > +#define RK_RNG_MAX_BYTE			32
+> > +#define RK_RNG_POLL_PERIOD_US		100
+> > +#define RK_RNG_POLL_TIMEOUT_US		10000
 > > +
-> > +description: True Random Number Generator for some Rockchip SoCs
+> > +/*
+> > + * TRNG collects osc ring output bit every RK_RNG_SAMPLE_CNT time. The value is
+> > + * a tradeoff between speed and quality and has been adjusted to get a quality
+> > + * of ~900 (~90% of FIPS 140-2 successes).
+> > + */
+> > +#define RK_RNG_SAMPLE_CNT		1000
+> > +
+> > +/* TRNG registers from RK3568 TRM-Part2, section 5.4.1 */
+> > +#define TRNG_RST_CTL			0x0004
+> > +#define TRNG_RNG_CTL			0x0400
+> > +#define TRNG_RNG_CTL_LEN_64_BIT		(0x00 << 4)
+> > +#define TRNG_RNG_CTL_LEN_128_BIT	(0x01 << 4)
+> > +#define TRNG_RNG_CTL_LEN_192_BIT	(0x02 << 4)
+> > +#define TRNG_RNG_CTL_LEN_256_BIT	(0x03 << 4)
+> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_0	(0x00 << 2)
+> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_1	(0x01 << 2)
+> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_2	(0x02 << 2)
+> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_3	(0x03 << 2)
+> > +#define TRNG_RNG_CTL_ENABLE		BIT(1)
+> > +#define TRNG_RNG_CTL_START		BIT(0)
+> > +#define TRNG_RNG_SAMPLE_CNT		0x0404
+> > +#define TRNG_RNG_DOUT_0			0x0410
+> > +#define TRNG_RNG_DOUT_1			0x0414
+> > +#define TRNG_RNG_DOUT_2			0x0418
+> > +#define TRNG_RNG_DOUT_3			0x041c
+> > +#define TRNG_RNG_DOUT_4			0x0420
+> > +#define TRNG_RNG_DOUT_5			0x0424
+> > +#define TRNG_RNG_DOUT_6			0x0428
+> > +#define TRNG_RNG_DOUT_7			0x042c
+> > +
+> > +struct rk_rng {
+> > +	struct hwrng rng;
+> > +	void __iomem *base;
+> > +	struct reset_control *rst;
+> > +	int clk_num;
+> > +	struct clk_bulk_data *clk_bulks;
+> > +};
+> > +
+> > +/* The mask determine the bits that are updated */
+> > +static void rk_rng_write_ctl(struct rk_rng *rng, u32 val, u32 mask)
+> > +{
+> > +	writel_relaxed((mask << 16) | val, rng->base + TRNG_RNG_CTL);
+> > +}
+> > +
+> > +static int rk_rng_init(struct hwrng *rng)
+> > +{
+> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
+> > +	u32 reg;
+> > +	int ret;
+> > +
+> > +	/* start clocks */
+> > +	ret = clk_bulk_prepare_enable(rk_rng->clk_num, rk_rng->clk_bulks);
+> > +	if (ret < 0) {
+> > +		dev_err((struct device *) rk_rng->rng.priv,
+> > +			"Failed to enable clks %d\n", ret);
+> > +		return ret;
+> > +	}
+> > +
+> > +	/* set the sample period */
+> > +	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
+> > +
+> > +	/* set osc ring speed and enable it */
+> > +	reg = TRNG_RNG_CTL_LEN_256_BIT |
 > 
-> s/for some Rockchip SoCs/on Rokchip RK3568 SoC/
+> It's not reg. It's val.
 
-My point there is that this driver should also work for other Rockchip
-SoCs like the RK3588, but 1) it support for this SoC is being added and
-not yet available in the Linux kernel 2) it hasn't been tested.
+Ok, I'll fix that.
 
-Should we mark it as RK3568 specific (or rather RK356x) and change that
-once a compatible entry is added for the RK3588?
-
+> > +		   TRNG_RNG_CTL_OSC_RING_SPEED_0 |
+> > +		   TRNG_RNG_CTL_ENABLE;
+> > +	rk_rng_write_ctl(rk_rng, reg, 0xffff);
 > > +
-> > +maintainers:
-> > +  - Aurelien Jarno <aurelien@aurel32.net>
+> > +	return 0;
+> > +}
 > > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - rockchip,rk3568-rng
+> > +static void rk_rng_cleanup(struct hwrng *rng)
+> > +{
+> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
+> > +	u32 reg;
 > > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: TRNG clock
-> > +      - description: TRNG AHB clock
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: trng_clk
-> > +      - const: trng_hclk
+> > +	/* stop TRNG */
+> > +	reg = 0;
 > 
-> These are too vague names. Everything is a clk in clock-names, so no
-> need usually to add it as name suffix. Give them some descriptive names,
-> e.g. core and ahb.
+> It's not reg. It's val.
 
-Those names are based on <include/dt-bindings/clock/rk3568-cru.h> and
-other drivers seems to have used those for the names. But I understand
-that broken things could have been merged, so I am fine changing that to
-core and ahb.
+I'll also fix that one.
+
+> > +	rk_rng_write_ctl(rk_rng, reg, 0xffff);
+> > +
+> > +	/* stop clocks */
+> > +	clk_bulk_disable_unprepare(rk_rng->clk_num, rk_rng->clk_bulks);
+> > +}
+> > +
+> > +static int rk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> > +{
+> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
+> > +	u32 reg;
+> > +	int ret = 0;
+> > +	int i;
+> > +
+> > +	pm_runtime_get_sync((struct device *) rk_rng->rng.priv);
+> 
+> Missing error handling.
+
+I'll fix that.
+ 
+> > +
+> > +	/* Start collecting random data */
+> > +	reg = TRNG_RNG_CTL_START;
+> 
+> This is not usefull. Just use it directly in write call. Actually this
+> is heavy confusing, as reg suggests address. This would be val instead...
+
+This was to avoid passing the value twice, as it is used for both the
+mask and the value. But I can pass it directly if it's better.
+
+> > +	rk_rng_write_ctl(rk_rng, reg, reg);
+> > +
+> > +	ret = readl_poll_timeout(rk_rng->base + TRNG_RNG_CTL, reg,
+> > +				 !(reg & TRNG_RNG_CTL_START),
+> > +				 RK_RNG_POLL_PERIOD_US,
+> > +				 RK_RNG_POLL_TIMEOUT_US);
+> > +	if (ret < 0)
+> > +		goto out;
+> > +
+> > +	/* Read random data stored in the registers */
+> > +	ret = min_t(size_t, max, RK_RNG_MAX_BYTE);
+> > +	for (i = 0; i < ret; i += 4) {
+> > +		*(u32 *)(buf + i) = readl_relaxed(rk_rng->base + TRNG_RNG_DOUT_0 + i);
+> > +	}
+> 
+> This cannot be just memcpy_fromio?
+
+According to the TRM, we should ensure 32-bit accesses, so I am not sure
+memcpy_fromio will work. However it seems __ioread32_copy could be a
+good replacement.
 
 > > +
-> > +  resets:
-> > +    maxItems: 1
+> > +out:
+> > +	pm_runtime_mark_last_busy((struct device *) rk_rng->rng.priv);
+> > +	pm_runtime_put_sync_autosuspend((struct device *) rk_rng->rng.priv);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static int rk_rng_probe(struct platform_device *pdev)
+> > +{
+> > +	struct device *dev = &pdev->dev;
+> > +	struct rk_rng *rk_rng;
+> > +	int ret;
+> > +
+> > +	rk_rng = devm_kzalloc(dev, sizeof(struct rk_rng), GFP_KERNEL);
+> 
+> sizeof(*rk_rng)
+
+I'll fix that.
+
+> > +	if (!rk_rng)
+> > +		return -ENOMEM;
 > > +
 
 Regards
 Aurelien
+
 
 -- 
 Aurelien Jarno                          GPG: 4096R/1DDD8C9B
