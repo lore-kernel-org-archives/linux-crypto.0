@@ -2,287 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9980FC47088
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 19:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A05C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 22:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234159AbiLBTaT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 14:30:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58214 "EHLO
+        id S234461AbiLBWJB convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 17:09:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233679AbiLBTaT (ORCPT
+        with ESMTP id S233637AbiLBWJA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 14:30:19 -0500
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044B4EC80E;
-        Fri,  2 Dec 2022 11:30:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
-        Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=QeityKeWX9SH19NfeKIppN2I0iFKaIHoIc1Zkqq/E6k=; b=nOXshjpnQjf5mZxj6cFVHdAk9h
-        mLpBsfcpsow8dQYvO9/n9gm9O2xfktkDZJKMivAnd/LFuSFifh0wgQPFW9A7Qkk58fafdAkQG0zRI
-        hy9hov2mll82bo3A465yPE/vpjH0x7fq3VBzHw9/UIDgZU6GVhey83YDczWtYtIAcj2sop3e2n9Ke
-        YsWbaVmg7FAOYXlKDU0Rxy5VCHxKpIy2ll/rabony7mUTO4o3ySDgqto7PVzA5kMI9YldodwGlmyM
-        5l6Dl6b9XpjgNN6ayskbZf8yioFtpLsZ16JM7xoxeW2e9DtA+eHxolMZbV8Vuv/cL47R78SJPkNf1
-        ip5A3ZoQ==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1p1Bjb-0098bq-Hu; Fri, 02 Dec 2022 20:30:07 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1p1Bja-00ExHt-30;
-        Fri, 02 Dec 2022 20:30:06 +0100
-Date:   Fri, 2 Dec 2022 20:30:06 +0100
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Olivia Mackall <olivia@selenic.com>,
+        Fri, 2 Dec 2022 17:09:00 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328D1E8E18
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 14:08:58 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-251-qOdtnuOcMPyNnrWdwCRZpQ-1; Fri, 02 Dec 2022 22:08:55 +0000
+X-MC-Unique: qOdtnuOcMPyNnrWdwCRZpQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Dec
+ 2022 22:08:54 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Fri, 2 Dec 2022 22:08:54 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Kees Cook' <keescook@chromium.org>
+CC:     'Anders Roxell' <anders.roxell@linaro.org>,
+        =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "moderated list:ARM/Rockchip SoC support" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:ARM/Rockchip SoC support" 
-        <linux-rockchip@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
-Message-ID: <Y4pSPrIHPL8yH6cq@aurel32.net>
-Mail-Followup-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-        "moderated list:ARM/Rockchip SoC support" <linux-arm-kernel@lists.infradead.org>,
-        "open list:ARM/Rockchip SoC support" <linux-rockchip@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20221128184718.1963353-1-aurelien@aurel32.net>
- <20221128184718.1963353-3-aurelien@aurel32.net>
- <76091207-d81c-e737-34a2-884153251925@linaro.org>
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel test robot" <lkp@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
+Subject: RE: [PATCH] crypto/caam: Avoid GCC constprop bug warning
+Thread-Topic: [PATCH] crypto/caam: Avoid GCC constprop bug warning
+Thread-Index: AQHZBekth9IOKPP1MEG2CcwZTmA4Xa5aWPsAgACbPoCAADOrgA==
+Date:   Fri, 2 Dec 2022 22:08:54 +0000
+Message-ID: <188246d459d14c93a9b71352fdc4698e@AcuMS.aculab.com>
+References: <20221028210527.never.934-kees@kernel.org>
+ <20221202005814.GD69385@mutt>
+ <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
+ <202212021057.B1B1BDE380@keescook>
+In-Reply-To: <202212021057.B1B1BDE380@keescook>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76091207-d81c-e737-34a2-884153251925@linaro.org>
-User-Agent: Mutt/2.2.7 (2022-08-07)
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-Thanks for your feedback.
-
-On 2022-11-29 10:33, Krzysztof Kozlowski wrote:
-> On 28/11/2022 19:47, Aurelien Jarno wrote:
-> > diff --git a/drivers/char/hw_random/rockchip-rng.c b/drivers/char/hw_random/rockchip-rng.c
-> > new file mode 100644
-> > index 000000000000..18cdd91ad8c3
-> > --- /dev/null
-> > +++ b/drivers/char/hw_random/rockchip-rng.c
-> > @@ -0,0 +1,250 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * rockchip-rng.c True Random Number Generator driver for Rockchip SoCs
-> > + *
-> > + * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
-> > + * Copyright (c) 2022, Aurelien Jarno
-> > + * Authors:
-> > + *  Lin Jinhan <troy.lin@rock-chips.com>
-> > + *  Aurelien Jarno <aurelien@aurel32.net>
-> > + */
-> > +#include <linux/clk.h>
-> > +#include <linux/hw_random.h>
-> > +#include <linux/io.h>
-> > +#include <linux/iopoll.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/of_platform.h>
-> > +#include <linux/pm_runtime.h>
-> > +#include <linux/reset.h>
-> > +#include <linux/slab.h>
-> > +
-> > +#define RK_RNG_AUTOSUSPEND_DELAY	100
-> > +#define RK_RNG_MAX_BYTE			32
-> > +#define RK_RNG_POLL_PERIOD_US		100
-> > +#define RK_RNG_POLL_TIMEOUT_US		10000
-> > +
-> > +/*
-> > + * TRNG collects osc ring output bit every RK_RNG_SAMPLE_CNT time. The value is
-> > + * a tradeoff between speed and quality and has been adjusted to get a quality
-> > + * of ~900 (~90% of FIPS 140-2 successes).
-> > + */
-> > +#define RK_RNG_SAMPLE_CNT		1000
-> > +
-> > +/* TRNG registers from RK3568 TRM-Part2, section 5.4.1 */
-> > +#define TRNG_RST_CTL			0x0004
-> > +#define TRNG_RNG_CTL			0x0400
-> > +#define TRNG_RNG_CTL_LEN_64_BIT		(0x00 << 4)
-> > +#define TRNG_RNG_CTL_LEN_128_BIT	(0x01 << 4)
-> > +#define TRNG_RNG_CTL_LEN_192_BIT	(0x02 << 4)
-> > +#define TRNG_RNG_CTL_LEN_256_BIT	(0x03 << 4)
-> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_0	(0x00 << 2)
-> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_1	(0x01 << 2)
-> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_2	(0x02 << 2)
-> > +#define TRNG_RNG_CTL_OSC_RING_SPEED_3	(0x03 << 2)
-> > +#define TRNG_RNG_CTL_ENABLE		BIT(1)
-> > +#define TRNG_RNG_CTL_START		BIT(0)
-> > +#define TRNG_RNG_SAMPLE_CNT		0x0404
-> > +#define TRNG_RNG_DOUT_0			0x0410
-> > +#define TRNG_RNG_DOUT_1			0x0414
-> > +#define TRNG_RNG_DOUT_2			0x0418
-> > +#define TRNG_RNG_DOUT_3			0x041c
-> > +#define TRNG_RNG_DOUT_4			0x0420
-> > +#define TRNG_RNG_DOUT_5			0x0424
-> > +#define TRNG_RNG_DOUT_6			0x0428
-> > +#define TRNG_RNG_DOUT_7			0x042c
-> > +
-> > +struct rk_rng {
-> > +	struct hwrng rng;
-> > +	void __iomem *base;
-> > +	struct reset_control *rst;
-> > +	int clk_num;
-> > +	struct clk_bulk_data *clk_bulks;
-> > +};
-> > +
-> > +/* The mask determine the bits that are updated */
-> > +static void rk_rng_write_ctl(struct rk_rng *rng, u32 val, u32 mask)
-> > +{
-> > +	writel_relaxed((mask << 16) | val, rng->base + TRNG_RNG_CTL);
-> > +}
-> > +
-> > +static int rk_rng_init(struct hwrng *rng)
-> > +{
-> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-> > +	u32 reg;
-> > +	int ret;
-> > +
-> > +	/* start clocks */
-> > +	ret = clk_bulk_prepare_enable(rk_rng->clk_num, rk_rng->clk_bulks);
-> > +	if (ret < 0) {
-> > +		dev_err((struct device *) rk_rng->rng.priv,
-> > +			"Failed to enable clks %d\n", ret);
-> > +		return ret;
-> > +	}
-> > +
-> > +	/* set the sample period */
-> > +	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
-> > +
-> > +	/* set osc ring speed and enable it */
-> > +	reg = TRNG_RNG_CTL_LEN_256_BIT |
+From: Kees Cook
+> Sent: 02 December 2022 18:58
 > 
-> It's not reg. It's val.
-
-Ok, I'll fix that.
-
-> > +		   TRNG_RNG_CTL_OSC_RING_SPEED_0 |
-> > +		   TRNG_RNG_CTL_ENABLE;
-> > +	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void rk_rng_cleanup(struct hwrng *rng)
-> > +{
-> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-> > +	u32 reg;
-> > +
-> > +	/* stop TRNG */
-> > +	reg = 0;
+> On Fri, Dec 02, 2022 at 10:01:50AM +0000, David Laight wrote:
+> > From: Anders Roxell
+> > > Sent: 02 December 2022 00:58
+> > >
+> > > On 2022-10-28 14:05, Kees Cook wrote:
+> > > > GCC 12 appears to perform constant propagation incompletely(?) and can
+> > > > no longer notice that "len" is always 0 when "data" is NULL. Expand the
+> > > > check to avoid warnings about memcpy() having a NULL argument:
+> > > >
+> > > >    ...
+> > > >                     from drivers/crypto/caam/key_gen.c:8:
+> > > >    drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
+> > > >    include/linux/fortify-string.h:48:33: warning: argument 2 null where non-null expected [-
+> > > Wnonnull]
+> > > >       48 | #define __underlying_memcpy     __builtin_memcpy
+> > > >          |                                 ^
+> > > >    include/linux/fortify-string.h:438:9: note: in expansion of macro '__underlying_memcpy'
+> > > >      438 |         __underlying_##op(p, q, __fortify_size);                        \
+> > > >          |         ^~~~~~~~~~~~~
+> > ...
+> >
+> > Is this really a bug in the fortify-string wrappers?
+> > IIRC the call is memcpy(NULL, ptr, 0) (or maybe memcpy(ptr, NULL, 0).
+> > In either case call can be removed at compile time.
+> >
+> > I'd bet that the constant propagation of 'len' fails because
+> > of all the intermediate variables that get used in order to
+> > avoid multiple evaluation.
+> >
+> > The some 'tricks' that are used in min() (see minmax.h) to
+> > generate a constant output for constant input could be
+> > use to detect a compile-time zero length.
+> >
+> > Something like:
+> > #define memcpy(dst, src, len) \
+> > 	(__is_constzero(len) ? (dst) : memcpy_check(dst, src, len))
+> >
+> > With:
+> > #define __is_constzero(x) sizeof(*(1 ? (void *)(x) : (int *)0) != 1)
+> > Which could go into const.h and used in the definition of __is_constexpr().
 > 
-> It's not reg. It's val.
+> While it could be possible to strip the nonnull attribute, I think it's
+> not an unreasonable check to have. This is literally the only case in
+> the entire kernel that is tripped, for example.
 
-I'll also fix that one.
+It is probably the only place that calls memcpy() with compile-time
+NULL and zero length.
+IIRC the memcpy() call comes from a #define expansion where some
+expansions don't need anything copied.
+A simple 'builtin_constant' check and then one for zero in the
+#define itself would probably suffice - and avoid the call
+being compiled in at all.
 
-> > +	rk_rng_write_ctl(rk_rng, reg, 0xffff);
-> > +
-> > +	/* stop clocks */
-> > +	clk_bulk_disable_unprepare(rk_rng->clk_num, rk_rng->clk_bulks);
-> > +}
-> > +
-> > +static int rk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> > +{
-> > +	struct rk_rng *rk_rng = container_of(rng, struct rk_rng, rng);
-> > +	u32 reg;
-> > +	int ret = 0;
-> > +	int i;
-> > +
-> > +	pm_runtime_get_sync((struct device *) rk_rng->rng.priv);
-> 
-> Missing error handling.
+	David
 
-I'll fix that.
- 
-> > +
-> > +	/* Start collecting random data */
-> > +	reg = TRNG_RNG_CTL_START;
-> 
-> This is not usefull. Just use it directly in write call. Actually this
-> is heavy confusing, as reg suggests address. This would be val instead...
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-This was to avoid passing the value twice, as it is used for both the
-mask and the value. But I can pass it directly if it's better.
-
-> > +	rk_rng_write_ctl(rk_rng, reg, reg);
-> > +
-> > +	ret = readl_poll_timeout(rk_rng->base + TRNG_RNG_CTL, reg,
-> > +				 !(reg & TRNG_RNG_CTL_START),
-> > +				 RK_RNG_POLL_PERIOD_US,
-> > +				 RK_RNG_POLL_TIMEOUT_US);
-> > +	if (ret < 0)
-> > +		goto out;
-> > +
-> > +	/* Read random data stored in the registers */
-> > +	ret = min_t(size_t, max, RK_RNG_MAX_BYTE);
-> > +	for (i = 0; i < ret; i += 4) {
-> > +		*(u32 *)(buf + i) = readl_relaxed(rk_rng->base + TRNG_RNG_DOUT_0 + i);
-> > +	}
-> 
-> This cannot be just memcpy_fromio?
-
-According to the TRM, we should ensure 32-bit accesses, so I am not sure
-memcpy_fromio will work. However it seems __ioread32_copy could be a
-good replacement.
-
-> > +
-> > +out:
-> > +	pm_runtime_mark_last_busy((struct device *) rk_rng->rng.priv);
-> > +	pm_runtime_put_sync_autosuspend((struct device *) rk_rng->rng.priv);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int rk_rng_probe(struct platform_device *pdev)
-> > +{
-> > +	struct device *dev = &pdev->dev;
-> > +	struct rk_rng *rk_rng;
-> > +	int ret;
-> > +
-> > +	rk_rng = devm_kzalloc(dev, sizeof(struct rk_rng), GFP_KERNEL);
-> 
-> sizeof(*rk_rng)
-
-I'll fix that.
-
-> > +	if (!rk_rng)
-> > +		return -ENOMEM;
-> > +
-
-Regards
-Aurelien
-
-
--- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
