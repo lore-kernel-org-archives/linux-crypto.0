@@ -2,95 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D68A9C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 10:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D23C47088
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 10:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232529AbiLBKB7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 05:01:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37734 "EHLO
+        id S232287AbiLBKKr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 05:10:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233190AbiLBKB5 (ORCPT
+        with ESMTP id S233365AbiLBKJu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 05:01:57 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B702DCB21E
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 02:01:55 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-259-gU3wSqt4NfGibvtvFXD_wg-1; Fri, 02 Dec 2022 10:01:52 +0000
-X-MC-Unique: gU3wSqt4NfGibvtvFXD_wg-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Dec
- 2022 10:01:50 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Fri, 2 Dec 2022 10:01:50 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Anders Roxell' <anders.roxell@linaro.org>,
-        Kees Cook <keescook@chromium.org>
-CC:     =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel test robot" <lkp@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
-Subject: RE: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Thread-Topic: [PATCH] crypto/caam: Avoid GCC constprop bug warning
-Thread-Index: AQHZBekth9IOKPP1MEG2CcwZTmA4Xa5aWPsA
-Date:   Fri, 2 Dec 2022 10:01:50 +0000
-Message-ID: <4f7ffdd948a84013a0e84876b3e3944b@AcuMS.aculab.com>
-References: <20221028210527.never.934-kees@kernel.org>
- <20221202005814.GD69385@mutt>
-In-Reply-To: <20221202005814.GD69385@mutt>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 2 Dec 2022 05:09:50 -0500
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEBCCCFD3
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 02:09:49 -0800 (PST)
+Received: by mail-yb1-xb2b.google.com with SMTP id z192so5496321yba.0
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 02:09:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=semihalf.com; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uE3RHUY4qDJsuTo1Mm2gm/Dk1gjThhPaW9LXX2ZWWSs=;
+        b=EPaBrLkZ4fkUP8uopzdMzRKYOxEwG5iHDTNXIJo6PgmsZRA1iyJoLIYSxqm2silPbP
+         newFWO815fXH4pW6+LlOBAbMLwouTSaU0vTKvV/sJOBzWqo/1G8v/STzmF56u1Exm+AH
+         aZ4UVCOu7TgFAM2r+hlUrtQOfkRp1XnEYX7eup1XBXJBTTRKaVdrH3DhCWsat7R90TGX
+         iwR7K7HI4vZO6bkWLbtvGlTxlexPWlM93Y+wuXspHHmMw1IM85Zj/OOx98p+NHHZkzw2
+         1oPbxzYORPuHQ4AWyG0tLc20X8uOiDPg6uo8c+9OHrdpOdfYyxVhyJEWAFRcgMWL4ETz
+         D8xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uE3RHUY4qDJsuTo1Mm2gm/Dk1gjThhPaW9LXX2ZWWSs=;
+        b=nDaNF8rY10ikBJeygn0acUq97DE6A2rJzBKwh+/9oQKYiDu8e6v0PlTs8u4BwfIq5g
+         pIBBJFzgom+YCAr29BIuBNvXckXQ/LXPbstc1xt5RnzFpORIREJFOTjgdzxHSBw+fAC0
+         FaC0eqtIw1/zIiSYRvQSkG4/wzv1lKf6MQ5bOS2G1Q9biFoTyvgQlCmqtpcFrTTpag61
+         /U4B7WSIjr0GoNc9zutB1kd6crujbt7UfkbM0qHeD1qXNp/D8MZa7GMHtnkWidMVmxpR
+         su/BcaL2GwgOyebuosg+uM+olDYEv/HZ0wKPy1tKDeT8/0s3BujeqAtCzY5n2hZRh88Q
+         u8Xw==
+X-Gm-Message-State: ANoB5pkejXanxoy46RFpIIxf5+Ykmd6ZtqinVxkHMSXiIFAMi7yd+1Hk
+        TzAl8aagolrMGQzolCUzFXoCfuOZMgrGV2wSYNORlw==
+X-Google-Smtp-Source: AA0mqf4qrHnBmItNuN2Sb8T6ME/Nzligux3z6GGs7/pyfkazZNenMyaJVS5oU7yFwrZZj6rTT6rkfz5IGFlDRxsKREA=
+X-Received: by 2002:a5b:505:0:b0:6e6:6f6e:95ff with SMTP id
+ o5-20020a5b0505000000b006e66f6e95ffmr47433566ybp.582.1669975789182; Fri, 02
+ Dec 2022 02:09:49 -0800 (PST)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+References: <20221128195651.322822-1-Jason@zx2c4.com> <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
+ <Y4nJe+XMoNwTVjlh@zx2c4.com>
+In-Reply-To: <Y4nJe+XMoNwTVjlh@zx2c4.com>
+From:   =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>
+Date:   Fri, 2 Dec 2022 11:09:38 +0100
+Message-ID: <CAOtMz3P0e=8bR2RsxPB0EfsbW0CrvtasHOPgCRb2xQrr+m9yYw@mail.gmail.com>
+Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Thorsten Leemhuis <regressions@leemhuis.info>,
+        Jarkko Sakkinen <jarkko@kernel.org>, peterhuewe@gmx.de,
+        stable@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
+        linux-integrity@vger.kernel.org, jgg@ziepe.ca,
+        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
+        timvp@google.com, apronin@google.com, mw@semihalf.com,
+        upstream@semihalf.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogQW5kZXJzIFJveGVsbA0KPiBTZW50OiAwMiBEZWNlbWJlciAyMDIyIDAwOjU4DQo+IA0K
-PiBPbiAyMDIyLTEwLTI4IDE0OjA1LCBLZWVzIENvb2sgd3JvdGU6DQo+ID4gR0NDIDEyIGFwcGVh
-cnMgdG8gcGVyZm9ybSBjb25zdGFudCBwcm9wYWdhdGlvbiBpbmNvbXBsZXRlbHkoPykgYW5kIGNh
-bg0KPiA+IG5vIGxvbmdlciBub3RpY2UgdGhhdCAibGVuIiBpcyBhbHdheXMgMCB3aGVuICJkYXRh
-IiBpcyBOVUxMLiBFeHBhbmQgdGhlDQo+ID4gY2hlY2sgdG8gYXZvaWQgd2FybmluZ3MgYWJvdXQg
-bWVtY3B5KCkgaGF2aW5nIGEgTlVMTCBhcmd1bWVudDoNCj4gPg0KPiA+ICAgIC4uLg0KPiA+ICAg
-ICAgICAgICAgICAgICAgICAgZnJvbSBkcml2ZXJzL2NyeXB0by9jYWFtL2tleV9nZW4uYzo4Og0K
-PiA+ICAgIGRyaXZlcnMvY3J5cHRvL2NhYW0vZGVzY19jb25zdHIuaDogSW4gZnVuY3Rpb24gJ2Fw
-cGVuZF9kYXRhLmNvbnN0cHJvcCc6DQo+ID4gICAgaW5jbHVkZS9saW51eC9mb3J0aWZ5LXN0cmlu
-Zy5oOjQ4OjMzOiB3YXJuaW5nOiBhcmd1bWVudCAyIG51bGwgd2hlcmUgbm9uLW51bGwgZXhwZWN0
-ZWQgWy0NCj4gV25vbm51bGxdDQo+ID4gICAgICAgNDggfCAjZGVmaW5lIF9fdW5kZXJseWluZ19t
-ZW1jcHkgICAgIF9fYnVpbHRpbl9tZW1jcHkNCj4gPiAgICAgICAgICB8ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXg0KPiA+ICAgIGluY2x1ZGUvbGludXgvZm9ydGlmeS1zdHJpbmcu
-aDo0Mzg6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvICdfX3VuZGVybHlpbmdfbWVtY3B5
-Jw0KPiA+ICAgICAgNDM4IHwgICAgICAgICBfX3VuZGVybHlpbmdfIyNvcChwLCBxLCBfX2ZvcnRp
-Znlfc2l6ZSk7ICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+ICAgICAgICAgIHwgICAgICAg
-ICBefn5+fn5+fn5+fn5+DQouLi4NCg0KSXMgdGhpcyByZWFsbHkgYSBidWcgaW4gdGhlIGZvcnRp
-Znktc3RyaW5nIHdyYXBwZXJzPw0KSUlSQyB0aGUgY2FsbCBpcyBtZW1jcHkoTlVMTCwgcHRyLCAw
-KSAob3IgbWF5YmUgbWVtY3B5KHB0ciwgTlVMTCwgMCkuDQpJbiBlaXRoZXIgY2FzZSBjYWxsIGNh
-biBiZSByZW1vdmVkIGF0IGNvbXBpbGUgdGltZS4NCg0KSSdkIGJldCB0aGF0IHRoZSBjb25zdGFu
-dCBwcm9wYWdhdGlvbiBvZiAnbGVuJyBmYWlscyBiZWNhdXNlDQpvZiBhbGwgdGhlIGludGVybWVk
-aWF0ZSB2YXJpYWJsZXMgdGhhdCBnZXQgdXNlZCBpbiBvcmRlciB0bw0KYXZvaWQgbXVsdGlwbGUg
-ZXZhbHVhdGlvbi4NCg0KVGhlIHNvbWUgJ3RyaWNrcycgdGhhdCBhcmUgdXNlZCBpbiBtaW4oKSAo
-c2VlIG1pbm1heC5oKSB0bw0KZ2VuZXJhdGUgYSBjb25zdGFudCBvdXRwdXQgZm9yIGNvbnN0YW50
-IGlucHV0IGNvdWxkIGJlDQp1c2UgdG8gZGV0ZWN0IGEgY29tcGlsZS10aW1lIHplcm8gbGVuZ3Ro
-Lg0KDQpTb21ldGhpbmcgbGlrZToNCiNkZWZpbmUgbWVtY3B5KGRzdCwgc3JjLCBsZW4pIFwNCgko
-X19pc19jb25zdHplcm8obGVuKSA/IChkc3QpIDogbWVtY3B5X2NoZWNrKGRzdCwgc3JjLCBsZW4p
-KQ0KDQpXaXRoOg0KI2RlZmluZSBfX2lzX2NvbnN0emVybyh4KSBzaXplb2YoKigxID8gKHZvaWQg
-KikoeCkgOiAoaW50ICopMCkgIT0gMSkNCldoaWNoIGNvdWxkIGdvIGludG8gY29uc3QuaCBhbmQg
-dXNlZCBpbiB0aGUgZGVmaW5pdGlvbiBvZiBfX2lzX2NvbnN0ZXhwcigpLg0KDQoJRGF2aWQNCg0K
-LQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0s
-IE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdh
-bGVzKQ0K
+Hi Jason,
 
+Thanks for taking care of this!
+
+Re 2/3 and 3/3 as you mentioned earlier, will get back to this when I
+have some bandwidth and send it separately.
+
+Best Regards,
+Jan
+
+
+pt., 2 gru 2022 o 10:46 Jason A. Donenfeld <Jason@zx2c4.com> napisa=C5=82(a=
+):
+>
+> Thanks for handling this, Thorsten. I had poked Jarkko about this
+> earlier this week, but he didn't respond. So I'm glad you're on the case
+> now getting this in somewhere. Probably this should make it to rc8, so
+> there's still one week left of testing it.
+>
+> Jason
