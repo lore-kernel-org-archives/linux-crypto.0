@@ -2,159 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FC8C4321E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 18:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2825C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Dec 2022 18:54:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233691AbiLBS34 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Dec 2022 13:29:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35086 "EHLO
+        id S234545AbiLBSyb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Dec 2022 13:54:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234447AbiLBS3y (ORCPT
+        with ESMTP id S234339AbiLBSyP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Dec 2022 13:29:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825B8E5AB3;
-        Fri,  2 Dec 2022 10:29:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D67262395;
-        Fri,  2 Dec 2022 18:29:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F8DC433D7;
-        Fri,  2 Dec 2022 18:29:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aAusH9Za"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1670005788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2zFy2zlqTBHP8UTky3opDng5ciA04KXTN+qAlc7bu/M=;
-        b=aAusH9ZacdgKy2qK0SH8ug67jkatGLBOTc7F74Xxylrt4bXR5wzZClmPueE/z6CWp0UA9Z
-        /wnfule5isjMZWf3ctoOFpugNh1ROH4GJQOGZj5uGriDmZYnUd/xUTioSPJc2Kooy2ZSD2
-        tjYYfV83PtsDq939fvf8wGgmDf/InmQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e7c3024 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 2 Dec 2022 18:29:47 +0000 (UTC)
-Date:   Fri, 2 Dec 2022 19:29:39 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Florian Weimer <fweimer@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v10 1/4] random: add vgetrandom_alloc() syscall
-Message-ID: <Y4pEEy43LYlV35bh@zx2c4.com>
-References: <20221129210639.42233-1-Jason@zx2c4.com>
- <20221129210639.42233-2-Jason@zx2c4.com>
- <877czc7m0g.fsf@oldenburg.str.redhat.com>
- <Y4d5SyU3akA9ZBaJ@zx2c4.com>
- <87v8mtpvxe.fsf@oldenburg.str.redhat.com>
+        Fri, 2 Dec 2022 13:54:15 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFF3E347E
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 10:54:07 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id x66so5726219pfx.3
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 10:54:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6iMOnyAeQsAPxih1P0qQQ/qb4Uyj+szfK6Khgj7UVBM=;
+        b=gaQZ/2L0TZuF0vlG6F8FXYeQZ1QCiQ4oPOli05DX+LfBfEE/JCeOzeHyX4Rb4cAwh+
+         k/u4J+C9Mk52XWfLFmd75lNLMXGn7Dx0sqmr8dAuRkfhivo330YgFt/EmYYp+wtltMgH
+         uMFEkb6J4hTL10CrJZ9fffzLbBIQhIHL9CBLE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6iMOnyAeQsAPxih1P0qQQ/qb4Uyj+szfK6Khgj7UVBM=;
+        b=LSyXaNaYImmRPBc5spbBHNu2xwA7KEi9tBnBfCt7tN2EQntaWtTxK+7FAyjBj1KFDc
+         sHn63WBi7QJUvrEUCrIzCADmfwGMcjHA/HUJVf5IskU/0J+UXHBdCdABsmOawIx+g57j
+         V7Vh4+GdLOawP0tu5xdwPup56X8HhLFo6n20uavAIn1hg8QgCos8DtKFGJPQmqBY7foS
+         SpV0PeexN4hG8JIwDTYOWLxiuwlAcK+s7MHMDD/7D/E8qUEb9jc++JKis/A2j9SQbwKm
+         OuI+vHVVQvTQcvvIFaGaWRgp2j6snrSa+2kN7l15zzzZDoVvhxX2umyedCXoW7HvRv0I
+         nm+g==
+X-Gm-Message-State: ANoB5pm8I19RPHmIRQD/fGaWfBqE4JeEQOu6q+eItb6QA55H9T9I/7i6
+        Zq+iQ9cvms85+Dq5+FZm9t7UlA==
+X-Google-Smtp-Source: AA0mqf4oA/ZhqGNXZKsEB/aIA5GakcxaJJXeeAgFZIxsVTNBPLoZ+SknjDWJAkfMNj9dEspJpOKx4Q==
+X-Received: by 2002:a63:cd10:0:b0:476:c36a:42b9 with SMTP id i16-20020a63cd10000000b00476c36a42b9mr48440644pgg.235.1670007246921;
+        Fri, 02 Dec 2022 10:54:06 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id s20-20020a170902a51400b001894dc5fdf2sm5859890plq.296.2022.12.02.10.54.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Dec 2022 10:54:06 -0800 (PST)
+Date:   Fri, 2 Dec 2022 10:54:05 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2] crypto/caam: Avoid GCC constprop bug warning
+Message-ID: <202212021049.16C438A@keescook>
+References: <20221202010410.gonna.444-kees@kernel.org>
+ <Y4loCFGhxecG6Ta0@gondor.apana.org.au>
+ <202212011928.97A43D01@keescook>
+ <Y4mHjKXnF/4Pfw5I@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87v8mtpvxe.fsf@oldenburg.str.redhat.com>
+In-Reply-To: <Y4mHjKXnF/4Pfw5I@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Florian,
-
-On Fri, Dec 02, 2022 at 06:17:17PM +0100, Florian Weimer wrote:
-> * Jason A. Donenfeld:
-> 
-> > I don't think zapping that memory is supported, or even a sensible thing
-> > to do. In the first place, I don't think we should suggest that the user
-> > can dereference that pointer, at all. In that sense, maybe it's best to
-> > call it a "handle" or something similar (a "HANDLE"! a "HWND"? a "HRNG"?
-> 
-> Surely the caller has to carve up the allocation, so the returned
-> pointer is not opaque at all.  From Adhemerval's glibc patch:
-> 
->       grnd_allocator.cap = new_cap;
->       grnd_allocator.states = new_states;
-> 
->       for (size_t i = 0; i < num; ++i)
-> 	{
-> 	  grnd_allocator.states[i] = new_block;
-> 	  new_block += size_per_each;
-> 	}
->       grnd_allocator.len = num;
->     }
-> 
-> That's the opposite of a handle, really.
-
-Right. (And the same code is in the commit message example too.)
-
-> 
-> >> But it will constrain future
-> >> evolution of the implementation because you can't add registration
-> >> (retaining a reference to the passed-in area in getrandom) after the
-> >> fact.  But I'm not sure if this is possible with the current interface,
-> >> either.  Userspace has to make some assumptions about the life-cycle to
-> >> avoid a memory leak on thread exit.
+On Fri, Dec 02, 2022 at 01:05:16PM +0800, Herbert Xu wrote:
+> On Thu, Dec 01, 2022 at 07:30:22PM -0800, Kees Cook wrote:
 > >
-> > It sounds like this is sort of a different angle on Rasmus' earlier
-> > comment about how munmap leaks implementation details. Maybe there's
-> > something to that after all? Or not? I see two approaches:
-> >
-> > 1) Keep munmap as the allocation function. If later on we do fancy
-> >    registration and in-kernel state tracking, or add fancy protection
-> >    flags, or whatever else, munmap should be able to identify these
-> >    pages and carry out whatever special treatment is necessary.
+> > Getting rid of the if doesn't solve the warning. I can switch it to just
+> > "if (data)", though. That keeps GCC happy.
 > 
-> munmap is fine, but the interface needs to say how to use it, and what
-> length to pass.
-
-Glad we're on the same page. Indeed I've now documented this for my
-in-progress v11. A blurb like:
-
-+ * sys_vgetrandom_alloc - Allocate opaque states for use with vDSO getrandom().
-+ *
-+ * @num:          On input, a pointer to a suggested hint of how many states to
-+ *                allocate, and on return the number of states actually allocated.
-+ *
-+ * @size_per_each: On input, must be zero. On return, the size of each state allocated,
-+ *                so that the caller can split up the returned allocation into
-+ *                individual states.
-+ *
-+ * @addr:         Reserved, must be zero.
-+ *
-+ * @flags:        Reserved, must be zero.
-+ *
-+ * The getrandom() vDSO function in userspace requires an opaque state, which
-+ * this function allocates by mapping a certain number of special pages into
-+ * the calling process. It takes a hint as to the number of opaque states
-+ * desired, and provides the caller with the number of opaque states actually
-+ * allocated, the size of each one in bytes, and the address of the first
-+ * state, which may be split up into @num states of @size_per_each bytes each,
-+ * by adding @size_per_each to the returned first state @num times.
-+ *
-+ * Returns the address of the first state in the allocation on success, or a
-+ * negative error value on failure.
-+ *
-+ * The returned address of the first state may be passed to munmap(2) with a
-+ * length of `(size_t)num * (size_t)size_per_each`, in order to deallocate the
-+ * memory, after which it is invalid to pass it to vDSO getrandom().
-
-What do you think of that text?
-
-> > Then they're caught holding the bag? This doesn't seem much different
-> > from userspace shooting themselves in general, like writing garbage into
-> > the allocated states and then trying to use them. If this is something
-> > you really, really are concerned about, then maybe my cheesy dumb xor
-> > thing mentioned above would be a low effort mitigation here.
+> OK I misread the thread.
 > 
-> So the MAP_LOCKED is just there to prevent leakage to swap?
+> Anyhow, it appears that this warning only occurs due to a debug
+> printk in caam.  So how about something like this?
 
-Right. I can combine that with MLOCK_ONFAULT and NORESERVED to avoid
-having to commit the memory immediately. I've got this in my tree for
-v11.
+What? I don't think that's true? I think
+CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG only controls "PRINT_POS", which is
+unrelated?
 
-In case you're curious to see the WIP, it's in here:
-https://git.zx2c4.com/linux-rng/log/?h=vdso
+The call path is:
 
-Jason
+drivers/crypto/caam/key_gen.c: gen_split_key()
+	append_fifo_load_as_imm(..., NULL, ...) <- literal NULL
+		append_cmd_data(..., data, ...)
+			memcpy(..., data, ...)
+
+and doesn't seem affected at all by CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG.
+
+-Kees
+
+> 
+> diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+> index 62ce6421bb3f..b49c995e1cc6 100644
+> --- a/drivers/crypto/caam/desc_constr.h
+> +++ b/drivers/crypto/caam/desc_constr.h
+> @@ -163,7 +163,7 @@ static inline void append_data(u32 * const desc, const void *data, int len)
+>  {
+>  	u32 *offset = desc_end(desc);
+>  
+> -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
+> +	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
+>  		memcpy(offset, data, len);
+>  
+>  	(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) +
+
+-- 
+Kees Cook
