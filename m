@@ -2,109 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB119C352A1
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Dec 2022 05:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E467DC352A1
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Dec 2022 09:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbiLCFCE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Dec 2022 00:02:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35178 "EHLO
+        id S231580AbiLCJP2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Dec 2022 04:15:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbiLCFCD (ORCPT
+        with ESMTP id S231152AbiLCJP2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Dec 2022 00:02:03 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08D7C6E64
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Dec 2022 21:02:01 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id g10so6406240plo.11
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Dec 2022 21:02:01 -0800 (PST)
+        Sat, 3 Dec 2022 04:15:28 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68D45AE31
+        for <linux-crypto@vger.kernel.org>; Sat,  3 Dec 2022 01:15:25 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id d3so7938875ljl.1
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Dec 2022 01:15:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fsMt6TH30q3TTUgESUrPDGgSHVBC3Ps2oKwCQ/HpVIc=;
-        b=H0Y+G+vYQYiGzpJPy/agslFt/YnmMfYu8Z2r2Iwdg8gPvAmYdQpgdRb4qG1nXCmXf/
-         5Eom5iu6Ly72znl+JlGDGKRXv4p+j0vVwMSmVlB7cK+DdRQP4T9MOodL1re3YqOTPA4v
-         WWrXwXrou8BVmYReFPGE3MMjKn4Exn86rackkGVMyQZggTDaAxS6e8bF31xyZxkgeKnD
-         HYKXwCD8W9fs4L+vp1ZnZyQNBm7RUXZaFWShPmK4ywFJ5nyxAOK7bo5rDNvz0+0rXc52
-         OhcZeTOMUfI3DqyKWqwAehtGBGn/V4rRfaxLo5/bt95NazR0ANKOr+qrAyfwf2RCmfPm
-         zTpA==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YuE7G0Zuy+PD6cWtPenlDgVRxm7weRAeqkpn2x6Okns=;
+        b=qcqSWJs+QhUdRNk416qswmQSd0DEVPaIZ8o89Fr0ha5DUab5ikm4bdY1aycjMvqV6+
+         57mKiHt8r7ldO840a5S0HPEuWrG961nI75ojMzKoVfgAfhMPph5zcDd501JaccVzQ5eT
+         FTZYPUXFyv9H9OktBTlY9WEhnWNLCSheDXBppVRyUzAFPBq675yxBfdhlEelDueMV+S9
+         zkU0kisE0hLlOzxnceWLj4ZyfncoZYNQgVv1GNTzqm3xAw6a2VPAW4EyO7O8uFUCq/1n
+         5TYAmQDfUwCYtjsY25ajiMjHRhXYrVmXyZkzxyhSFbYxmaH6OZl3He2DHRA05UH9PlMb
+         aGKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fsMt6TH30q3TTUgESUrPDGgSHVBC3Ps2oKwCQ/HpVIc=;
-        b=kV3E9tLWbLV7Hh31rMNKGZJIInRV7ZKs6YOGlHmb+Qcu3lf0HeyljtuWZfEXWJRkYv
-         Hh2CdjrIOD4jEifW7E2agBzcPBCEtl1GkSLbvw2RAr4XGYqN5Cyx21RlRfSglVY3FTju
-         qOVb0ivqeqbo9HLvNiBTCam3xBjUJBh9n+kLqtoD15n2FnV8wgtFEWwHlwHrXVd0rCLz
-         vZ+wjFa21oxGQTVGMU2dHkiZnz+smpJjAHwZB8QNEjbz1YLB6RiG+P+41yPj0+74Asve
-         2yesBeZLQZKvqWS/2PUfBnLJGobVeAAFxEwfF0tT39kHNaUVzLbwlEQ8e7/EAwCrpq++
-         vmVA==
-X-Gm-Message-State: ANoB5pl4jH53+9maeycxq/ZbLeYBy0tNey2dpa/ejieUbYxJ2oZXFlv1
-        mMwyvwrRrbdvsRFnz8oCQGI=
-X-Google-Smtp-Source: AA0mqf7WvaYHCUyDkTXyjmyhiyRec+KLbwWtmLFvZyg+HvCnZV2fxFAqNlioEfLNeuQ10LOQJMBGTQ==
-X-Received: by 2002:a17:902:74c6:b0:189:73df:aca2 with SMTP id f6-20020a17090274c600b0018973dfaca2mr35777418plt.58.1670043721325;
-        Fri, 02 Dec 2022 21:02:01 -0800 (PST)
-Received: from ?IPV6:2606:4700:110:8d19:ef92:9207:5a0d:60e7? ([2a09:bac1:3f40:98::16:1aa])
-        by smtp.gmail.com with ESMTPSA id 188-20020a6218c5000000b00574c54423d3sm6068787pfy.145.2022.12.02.21.01.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Dec 2022 21:02:00 -0800 (PST)
-Message-ID: <e0c38961-44cc-943b-8739-420867fdc5ce@gmail.com>
-Date:   Sat, 3 Dec 2022 14:01:54 +0900
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YuE7G0Zuy+PD6cWtPenlDgVRxm7weRAeqkpn2x6Okns=;
+        b=K679UzPl8zEHY/AFCiEtortcnUhD+kZtGwssfeVyvkPGAL5tlsGi3xwHuCnkYL1Jhz
+         nhvjYanp0AJ1ikK11Az2ZdFNBOFS0E3lKILlWpoHq2iMexWfYJgWSS/l0nvrT5VuaU6C
+         soFKaS2BuYy4y3XSBvD5xtLoO5w2nLNEbKsfeIWMKUSVqKS2nCHzklPNT0BojrITTYjY
+         6Y+Z5YC2HxiGN80Hh56IBZFqPazQDQPNVKAfqbHgugZrPhyLU17LRYOYRcXIyZ3yJa3p
+         BDddtLPbX999/9hWcvvWswca5k3KYLL1szDRbWcnaHelq+Ixkp5sq9eHWDqDioOXxw5k
+         MllA==
+X-Gm-Message-State: ANoB5pmV+soDRBli8nw9CxLmA6q4srOVD+5xeCrMD0EpmH3hMDnLAIz4
+        244LIks4NTO05AebVSxm3U34EDyn1U9PnYjH
+X-Google-Smtp-Source: AA0mqf7zz1jLQJg5imib3q6HD0zLM8oYjK1JmfBTTUMrobcuqFN9hWrfobjmUGIN49FDVr9wR1fxlQ==
+X-Received: by 2002:a05:651c:200c:b0:278:eef5:8d18 with SMTP id s12-20020a05651c200c00b00278eef58d18mr25114878ljo.240.1670058923708;
+        Sat, 03 Dec 2022 01:15:23 -0800 (PST)
+Received: from Fecusia.lan (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
+        by smtp.gmail.com with ESMTPSA id v4-20020a2ea604000000b0026dce0a5ca9sm800132ljp.70.2022.12.03.01.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Dec 2022 01:15:22 -0800 (PST)
+From:   Linus Walleij <linus.walleij@linaro.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH v3 0/4] crypto: stm32 - reuse for Ux500
+Date:   Sat,  3 Dec 2022 10:15:14 +0100
+Message-Id: <20221203091518.3235950-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v6 2/4] crypto: aria: do not use magic number offsets of
- aria_ctx
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com,
-        kirill.shutemov@linux.intel.com, richard@nod.at,
-        viro@zeniv.linux.org.uk,
-        sathyanarayanan.kuppuswamy@linux.intel.com, jpoimboe@kernel.org,
-        elliott@hpe.com, x86@kernel.org, jussi.kivilinna@iki.fi,
-        ebiggers@kernel.org
-References: <20221121003955.2214462-1-ap420073@gmail.com>
- <20221121003955.2214462-3-ap420073@gmail.com>
- <Y4nPbMHNQl++bItU@gondor.apana.org.au>
-Content-Language: en-US
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <Y4nPbMHNQl++bItU@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
-Thank you so much for your review!
+Experimenting by taking some small portions of the Ux500
+CRYP driver and adding to the STM32 driver, it turns out
+we can support both platforms with the more modern STM32
+driver.
 
-On 12/2/22 19:11, Herbert Xu wrote:
- > On Mon, Nov 21, 2022 at 12:39:53AM +0000, Taehee Yoo wrote:
- >>
- >> +#if defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) ||  \
- >> +	defined(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64_MODULE)
- >
- > Why isn't this IS_ENABLED like the hunk below?
- >
- >> +
- >> +	/* Offset for fields in aria_ctx */
- >> +	BLANK();
- >> +	OFFSET(ARIA_CTX_enc_key, aria_ctx, enc_key);
- >> +	OFFSET(ARIA_CTX_dec_key, aria_ctx, dec_key);
- >> +	OFFSET(ARIA_CTX_rounds, aria_ctx, rounds);
- >> +#endif
- >> +
- >>   	if (IS_ENABLED(CONFIG_KVM_INTEL)) {
- >>   		BLANK();
- >>   		OFFSET(VMX_spec_ctrl, vcpu_vmx, spec_ctrl);
- >
- > Thanks,
+ChanegLog v2->v3:
+- Fix a kerneldoc warning.
+- Collect ACKs.
+ChangeLog v1->v2:
+- Minor changes to the base patches, see per-patch
+  ChangeLog.
 
-I missed cleaning it up.
-I will use IS_ENABLED() instead of defined() in the v7.
+Upsides:
 
-Thanks a lot!
-Taehee Yoo
+- We delete ~2400 lines of code and 8 files with intact
+  crypto support for Ux500 and not properly maintained
+  and supported.
+
+- The STM32 driver is more modern and compact thanks to
+  using things like the crypto engine.
+
+Caveats:
+
+- The STM32 driver does not support DMA. On the U8500
+  this only works with AES (DES support is broken with
+  DMA). If this is desired to be kept I can migrate
+  it to the STM32 driver as well.
+
+I have looked at doing the same for the Ux500 hash, which
+is related but I am reluctant about this one, because
+the Ux500 hardware has no interrupt and only supports
+polling. I have a series of modernizations for that
+driver that I have worked on and will think about how
+to move forward.
+
+
+Linus Walleij (4):
+  dt-bindings: crypto: Let STM32 define Ux500 CRYP
+  crypto: stm32 - enable drivers to be used on Ux500
+  crypto: stm32/cryp - enable for use with Ux500
+  crypto: ux500/cryp - delete driver
+
+ .../bindings/crypto/st,stm32-cryp.yaml        |   19 +
+ drivers/crypto/Makefile                       |    2 +-
+ drivers/crypto/stm32/Kconfig                  |    4 +-
+ drivers/crypto/stm32/stm32-cryp.c             |  413 ++++-
+ drivers/crypto/ux500/Kconfig                  |   10 -
+ drivers/crypto/ux500/Makefile                 |    1 -
+ drivers/crypto/ux500/cryp/Makefile            |   10 -
+ drivers/crypto/ux500/cryp/cryp.c              |  394 ----
+ drivers/crypto/ux500/cryp/cryp.h              |  315 ----
+ drivers/crypto/ux500/cryp/cryp_core.c         | 1600 -----------------
+ drivers/crypto/ux500/cryp/cryp_irq.c          |   45 -
+ drivers/crypto/ux500/cryp/cryp_irq.h          |   31 -
+ drivers/crypto/ux500/cryp/cryp_irqp.h         |  125 --
+ drivers/crypto/ux500/cryp/cryp_p.h            |  122 --
+ 14 files changed, 344 insertions(+), 2747 deletions(-)
+ delete mode 100644 drivers/crypto/ux500/cryp/Makefile
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_core.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.c
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irq.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_irqp.h
+ delete mode 100644 drivers/crypto/ux500/cryp/cryp_p.h
+
+-- 
+2.38.1
+
