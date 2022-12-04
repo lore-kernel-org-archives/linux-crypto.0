@@ -2,105 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC89AC4708D
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Dec 2022 10:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C87C4708D
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Dec 2022 09:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbiLCKZQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Dec 2022 05:25:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
+        id S229845AbiLDJc2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Dec 2022 04:32:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiLCKZP (ORCPT
+        with ESMTP id S229691AbiLDJc1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Dec 2022 05:25:15 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8825E4A05A;
-        Sat,  3 Dec 2022 02:25:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 28C76B802BE;
-        Sat,  3 Dec 2022 10:25:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93045C433C1;
-        Sat,  3 Dec 2022 10:25:09 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OE1z0XMB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1670063106;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B99/rGGxOgBt2SCG0ilJmP42Uqhic94NePrcyql2Y30=;
-        b=OE1z0XMB2PBjouhlOhHQ1424GlPkFJvMb4D+3b+9O03547ABcw8eq7lOWNL27O9hAAzN8E
-        e/THcxh1t18VPT9Uzst/p2p5xJ+MpjH2Km7wJtEjXNVf6QMvuPJvCop2WIM76zxmER/cBa
-        MLrdEdSPaW+11jEn7cc8GHuhP/j+e4Q=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6d6b524c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sat, 3 Dec 2022 10:25:06 +0000 (UTC)
-Date:   Sat, 3 Dec 2022 11:25:02 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        torvalds@linux-foundation.org
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, peterhuewe@gmx.de,
-        stable@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>,
-        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
-        linux-integrity@vger.kernel.org, jgg@ziepe.ca,
-        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
-        timvp@google.com, apronin@google.com, mw@semihalf.com,
-        upstream@semihalf.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
-Message-ID: <Y4sj/knxLqqF2Tqr@zx2c4.com>
-References: <20221128195651.322822-1-Jason@zx2c4.com>
- <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
+        Sun, 4 Dec 2022 04:32:27 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA9F12D24;
+        Sun,  4 Dec 2022 01:32:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/WO5b3+XRveRvUH+vYohmYPHmCE9UPS08lsr4eFm8KE=; b=wbL9zB6OKLcBZ0DlexYe2IbjQM
+        bDCHu/PrzX7C3xGd2hOlpAd+7iWtuKy8UM+zDrHcAAxUZbpFv22JGyvS4ppxY/HgnTtF6zY8ZHUb5
+        PXknbF/B7hoJ0+hq1z3dz9B5J8uNg09zVmQe7/HG+tAx66lRy6Mj2YBy1DCpPJNnRPUxBV/qQ/0S3
+        AmgVpO06rCr8sR3j1ZYKyRH+diDG4hyJw9VYnOjFNwOvRn+uaCEgule9sRaNuP5NHvjOf9s3SoKch
+        kYozVjd8Iglapx8VbbKfAEhzC+R9761isZR00tY0dxedNnwq2ZPhRQWkWuJnu14HXW2xDCHg9xEVU
+        0VsoetAQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p1lM0-007BeU-5b; Sun, 04 Dec 2022 09:32:08 +0000
+Date:   Sun, 4 Dec 2022 01:32:08 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LinuxKernelMailingList@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 0/10] crypto: Driver conversions for DMA alignment
+Message-ID: <Y4xpGNNsfbucyUlt@infradead.org>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9793c74f-2dd0-d510-d8b6-b475e34f3587@leemhuis.info>
+In-Reply-To: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thorsten / Linus,
+On Fri, Dec 02, 2022 at 05:19:43PM +0800, Herbert Xu wrote:
+> These are the rest of the driver conversions in order for arm64
+> to safely lower the kmalloc alignment below that required for DMA.
 
-On Fri, Dec 02, 2022 at 10:32:31AM +0100, Thorsten Leemhuis wrote:
-> Hi, this is your Linux kernel regression tracker.
-> 
-> On 28.11.22 20:56, Jason A. Donenfeld wrote:
-> 
-> BTW, many thx for taking care of this Jason!
-> 
-> > From: Jan Dabros <jsd@semihalf.com>
-> > 
-> > Currently tpm transactions are executed unconditionally in
-> > tpm_pm_suspend() function, which may lead to races with other tpm
-> > accessors in the system. Specifically, the hw_random tpm driver makes
-> > use of tpm_get_random(), and this function is called in a loop from a
-> > kthread, which means it's not frozen alongside userspace, and so can
-> > race with the work done during system suspend:
-> 
-> Peter, Jarkko, did you look at this patch or even applied it already to
-> send it to Linus soon? Doesn't look like it from here, but maybe I
-> missed something.
-> 
-> Thing is: the linked regression afaics is overdue fixing (for details
-> see "Prioritize work on fixing regressions" in
-> https://www.kernel.org/doc/html/latest/process/handling-regressions.html
-> ). Hence if this doesn't make any progress I'll likely have to point
-> Linus to this patch and suggest to apply it directly if it looks okay
-> from his perspective.
-
-I'm very concerned about this. Jan posted the original fix a month ago,
-and then it fizzled out. Then I got word of the bug last week and
-revived the fix [1], while also figuring out how to reproduce it
-together with the reporter. I emailed the tpm maintainers offlist to
-poke them, and nobody woke up. And tomorrow is rc8 day. Given that this
-patch is pretty simple, has been tested to fix an annoying regression,
-and that neither of the three maintainers has popped up this week to get
-things rolling, I think we should just commit this now anyway, to make
-sure it gets in for rc8. This way there's still a solid week of testing.
-I'm in general not a big fan of the "nuclear option" of not waiting for
-out to lunch maintainers, but given that it is now December 3, it seems
-like the right decision.
-
-[1] https://lore.kernel.org/all/20221128195651.322822-1-Jason@zx2c4.com/ 
-
-Jason
+Btw, drivers/crypto/ has a lot of weird and most likely uses of
+GFP_DMA.  Can someone look into those while we're doing DMA audits
+of the cryto drivers?
