@@ -2,124 +2,139 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5722C47089
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 20:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F18EEC47088
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 21:35:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbiLEUHO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 15:07:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48120 "EHLO
+        id S233161AbiLEVfX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Dec 2022 16:35:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiLEUHM (ORCPT
+        with ESMTP id S230254AbiLEVfW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 15:07:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51F1313DCD
-        for <linux-crypto@vger.kernel.org>; Mon,  5 Dec 2022 12:06:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670270776;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J5OTqoTXPXM33Uzjd4PZuIqIzOIq6qcNx83qgoRc9Nk=;
-        b=O1J2H4jSUKpEACxc9T45Cv8RRaNTscB7jWsgRyP6zPgATLBcEg6vsld0Nv2Ojh5Yj23FrH
-        2TOQO05lN+nEhgqy9hNr0fQK89bZf+egx67g6AOOXr+V4lAd32V2O8ZIFPW+FW5hHPGSd7
-        5y21npCahoaH8QJvLyNPVD+Qme99JAA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-v7mHkac9NfG-LNeQV8n2hg-1; Mon, 05 Dec 2022 15:06:13 -0500
-X-MC-Unique: v7mHkac9NfG-LNeQV8n2hg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DEAF23810784;
-        Mon,  5 Dec 2022 20:06:12 +0000 (UTC)
-Received: from oldenburg.str.redhat.com (unknown [10.2.16.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93A6D112132D;
-        Mon,  5 Dec 2022 20:06:10 +0000 (UTC)
-From:   Florian Weimer <fweimer@redhat.com>
+        Mon, 5 Dec 2022 16:35:22 -0500
+Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36DA02CC80;
+        Mon,  5 Dec 2022 13:35:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
+        ; s=202004.hall; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:Reply-To:
+        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
+        bh=RAu47D9qhSPeqGH6WidK6jmmj65HEM0DSNp12TyKSG0=; b=HZcoEtIlLfMXONr9DyEAs9FQGJ
+        N84DVRwyt515vU6/4KRZVhPFYXo1ymWy0iln/LngK/DPsAdk044Vk6VKmhJhd7PT/OGGQ+QrJ/tA9
+        jQnzMs6Io0kNHx3nN2MmnYIl6dG6Ukh02Qmu73N3yEQZsWh2Bs3bMhC7qfXm07L6R9djWP48nSUFJ
+        xWD5uVLujymazwk9/QgVuVw9bGTiaebvYfbrgrDCG7xn6CI9xkN/huQZks6zlDyvsWHdxxOIp87Qt
+        58piDtyB2EZNkgN/Ze1FuBEGebD6Qoa7/v/UoApuUmGw8L2ec0feCrqylDNALOPZGuLxCvgvBGt5G
+        A4KdSbQw==;
+Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
+        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1p2J73-00BKxr-Kw; Mon, 05 Dec 2022 22:34:57 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1p2J70-00GGBC-2X;
+        Mon, 05 Dec 2022 22:34:54 +0100
+Date:   Mon, 5 Dec 2022 22:34:54 +0100
+From:   Aurelien Jarno <aurelien@aurel32.net>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Jann Horn <jannh@google.com>, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev, tglx@linutronix.de,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v11 1/4] random: add vgetrandom_alloc() syscall
-References: <20221205020046.1876356-1-Jason@zx2c4.com>
-        <20221205020046.1876356-2-Jason@zx2c4.com>
-        <CAG48ez2R=Ov2Z9zn_W9+C3gHqOkPdQKAY=4SMWDUG=NfP=3eJw@mail.gmail.com>
-        <Y45OWhyN+U975vIN@zx2c4.com>
-Date:   Mon, 05 Dec 2022 21:06:06 +0100
-In-Reply-To: <Y45OWhyN+U975vIN@zx2c4.com> (Jason A. Donenfeld's message of
-        "Mon, 5 Dec 2022 21:02:34 +0100")
-Message-ID: <87bkohpqdt.fsf@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+Cc:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Lin Jinhan <troy.lin@rock-chips.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "moderated list:ARM/Rockchip SoC support" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "open list:ARM/Rockchip SoC support" 
+        <linux-rockchip@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
+Message-ID: <Y45j/hd2MnnXzcAo@aurel32.net>
+Mail-Followup-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Lin Jinhan <troy.lin@rock-chips.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+        "moderated list:ARM/Rockchip SoC support" <linux-arm-kernel@lists.infradead.org>,
+        "open list:ARM/Rockchip SoC support" <linux-rockchip@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20221128184718.1963353-1-aurelien@aurel32.net>
+ <20221128184718.1963353-3-aurelien@aurel32.net>
+ <Y43uiVo41vljLsZM@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Y43uiVo41vljLsZM@zx2c4.com>
+User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Jason A. Donenfeld:
+Hi,
 
-> Hi Jann,
->
-> On Mon, Dec 05, 2022 at 08:13:36PM +0100, Jann Horn wrote:
->> On Mon, Dec 5, 2022 at 3:01 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->> > +       mm->def_flags |=
->> > +               /*
->> > +                * Don't allow state to be written to swap, to preserve forward secrecy.
->> > +                * This works in conjunction with MAP_LOCKED in do_mmap(), below, which
->> > +                * actually does the locking (and associated permission check and accounting).
->> > +                * Here, VM_LOCKONFAULT together with VM_NORESERVE simply make the mlocking
->> > +                * happen the first time it's actually used, the same as when calling
->> > +                * mlock2(MLOCK_ONFAULT) from userspace.
->> > +                */
->> > +               VM_LOCKONFAULT | VM_NORESERVE |
->> 
->> Have you checked the interaction with this line in dup_mmap()?
->> "tmp->vm_flags &= ~(VM_LOCKED | VM_LOCKONFAULT);"
->> 
->> As the mlock.2 manpage says, "Memory locks are not inherited by a
->> child created via fork(2)". I think the intention here is that the VMA
->> should stay unswappable after fork(), right?
->> 
->> Of course, trying to reserve more mlocked memory in fork() would also
->> be problematic...
->
-> Thanks for pointing that out! Indeed that seems problematic.
-> Fortunately, the use of WIPEONFORK at the same time as LOCKONFAULT means
-> that memory doesn't actually need to be reserved in fork() itself. So
-> something like the below seems correct and doable.
->
-> Jason
->
-> diff --git a/kernel/fork.c b/kernel/fork.c
-> index ec57cae58ff1..cd53ffff615d 100644
-> --- a/kernel/fork.c
-> +++ b/kernel/fork.c
-> @@ -656,7 +656,9 @@ static __latent_entropy int dup_mmap(struct mm_struct *mm,
->  			tmp->anon_vma = NULL;
->  		} else if (anon_vma_fork(tmp, mpnt))
->  			goto fail_nomem_anon_vma_fork;
-> -		tmp->vm_flags &= ~(VM_LOCKED | VM_LOCKONFAULT);
-> +		if ((tmp->vm_flags & (VM_LOCKONFAULT | VM_WIPEONFORK)) !=
-> +		    (VM_LOCKONFAULT | VM_WIPEONFORK))
-> +			tmp->vm_flags &= ~(VM_LOCKED | VM_LOCKONFAULT);
->  		file = tmp->vm_file;
->  		if (file) {
->  			struct address_space *mapping = file->f_mapping;
+On 2022-12-05 14:13, Jason A. Donenfeld wrote:
+> On Mon, Nov 28, 2022 at 07:47:17PM +0100, Aurelien Jarno wrote:
+> > The TRNG device does not seem to have a signal conditionner and the FIPS
+> > 140-2 test returns a lot of failures. They can be reduced by increasing
+> > RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
+> > has been adjusted to get ~90% of successes and the quality value has
+> > been set accordingly.
+>=20
+> Can't you reduce it even more to get 100%? All we need is 32 bytes every
+> once in a while.
 
-Still it's a bit concerning that calling getrandom (the libc function)
-now apparently can kill the process if the system is under severe memory
-pressure.  In many cases, that's okay, but we wouldn't want that for
-PID 1, for example.  vm.overcommit_memory=2 mode is supposed to prevent
-such crashes, and I think NORESERVE (not shown here) sidesteps that.
+=46rom what I understood, we get the raw stream of the TRNG, there is no
+conditionner and the TRNG is not FIPS compliant. So even with the
+slowest speed, you don't reach 100% and you only get a very small
+increase in the quality while it's way more slower.
 
-Thanks,
-Florian
+> > +	rk_rng->rng.quality =3D 900;
+>=20
+> If your intention is "90%", this should be 921 or 922, because the
+> quality knob is out of 1024, not 1000.
 
+Well I am not sure it really matters. 90% is actually conservative, it's
+the worst case I have seen, rounded down. However I often get much
+better quality, see for instance the following run:
+
+| Copyright (c) 2004 by Henrique de Moraes Holschuh
+| This is free software; see the source for copying conditions.  There is N=
+O warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+|=20
+| rngtest: starting FIPS tests...
+| rngtest: entropy source drained
+| rngtest: bits received from input: 16777216
+| rngtest: FIPS 140-2 successes: 819
+| rngtest: FIPS 140-2 failures: 19
+| rngtest: FIPS 140-2(2001-10-10) Monobit: 17
+| rngtest: FIPS 140-2(2001-10-10) Poker: 0
+| rngtest: FIPS 140-2(2001-10-10) Runs: 2
+| rngtest: FIPS 140-2(2001-10-10) Long run: 2
+| rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+| rngtest: input channel speed: (min=3D132.138; avg=3D137.848; max=3D147.30=
+8)Kibits/s
+| rngtest: FIPS tests speed: (min=3D16.924; avg=3D20.272; max=3D20.823)Mibi=
+ts/s
+| rngtest: Program run time: 119647459 microseconds
+
+Does the exact value has an importance there? I thought it was just
+important to not overestimate the quality.
+
+Regards
+Aurelien
+
+--=20
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
