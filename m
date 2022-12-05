@@ -2,102 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0365C4708C
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 13:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7D6C47089
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 18:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232299AbiLENa0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 08:30:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55108 "EHLO
+        id S231965AbiLESlH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Dec 2022 13:41:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232248AbiLENaZ (ORCPT
+        with ESMTP id S231994AbiLESkf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 08:30:25 -0500
+        Mon, 5 Dec 2022 13:40:35 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44331CB10;
-        Mon,  5 Dec 2022 05:30:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2FC209B0;
+        Mon,  5 Dec 2022 10:38:23 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3058961087;
-        Mon,  5 Dec 2022 13:30:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A809C433C1;
-        Mon,  5 Dec 2022 13:30:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4E9EE60025;
+        Mon,  5 Dec 2022 18:38:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F52C433C1;
+        Mon,  5 Dec 2022 18:38:21 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZHV2azxK"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i/q4yG4T"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1670247018;
+        t=1670265498;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=77miVuUVU22opWZzTtZsOCj5BnnAupU555MsmQ4hl2o=;
-        b=ZHV2azxKBleZixdMsY3L6P7O6rjWGg/LZL3gSZLqZGPG5YIwdQKHZWN7dR36amXBb5CEHm
-        Vt0EYxfpl8P+3ki5UFRU3RBGw0U7lNkkhW7xbBznehCiIVl/Lh8eTsGiW/u07+ZiLTqUIF
-        zv3kThwvJt/l/BZyuHsKPi3OhdKVJ5g=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5dae6f5e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 5 Dec 2022 13:30:18 +0000 (UTC)
-Date:   Mon, 5 Dec 2022 14:30:17 +0100
+        bh=+uBKJVNJYw3pTg89I4Wru5rBtHkt0SHV5a0kfWhJUMs=;
+        b=i/q4yG4TRgcAfsp7bhNnqZhFDbgcrF2khLVdsny531uYWtiAIhVlrF0tPkXFrjyvCvWcFp
+        RHvI2Qg7ASdNESHkEkaGsMx8gD9/hevhpNpAtWT2ChagkR35gDzAMEPdaeGR36DoJLiKeU
+        RVcP4QY26axwZe0XMMLJEUYhhAzf1Ho=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bb930d2a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 5 Dec 2022 18:38:18 +0000 (UTC)
+Date:   Mon, 5 Dec 2022 19:38:16 +0100
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Aurelien Jarno <aurelien@aurel32.net>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "moderated list:ARM/Rockchip SoC support" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:ARM/Rockchip SoC support" 
-        <linux-rockchip@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
-Message-ID: <Y43yaS1ybCCG6szm@zx2c4.com>
-References: <20221128184718.1963353-1-aurelien@aurel32.net>
- <20221128184718.1963353-3-aurelien@aurel32.net>
- <Y43uiVo41vljLsZM@zx2c4.com>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org,
+        linux-api@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v11 1/4] random: add vgetrandom_alloc() syscall
+Message-ID: <Y446mGVCvJX+5mGd@zx2c4.com>
+References: <20221205020046.1876356-1-Jason@zx2c4.com>
+ <20221205020046.1876356-2-Jason@zx2c4.com>
+ <87cz8xr96o.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y43uiVo41vljLsZM@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87cz8xr96o.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 02:13:45PM +0100, Jason A. Donenfeld wrote:
-> If your intention is "90%", this should be 921 or 922, because the
-> quality knob is out of 1024, not 1000.
+On Mon, Dec 05, 2022 at 07:34:39PM +0100, Florian Weimer wrote:
+> > + *   - Passing the first state to munmap(2), as described above.
+> > + * All other uses are undefined behavior, which is subject to change or removal
 > 
-> Herbert - this seems like a fairly common pitfall I've seen all over the
-> place. It might be worth making a mental memo to reject or ask questions
-> about numbers that seem "too round", when you look at these sorts of
-> patches.
+> Suggest: “Passing the first state *and total length* to munmap(2)”
 
-Or alternatively we could introduce a cheesy macro like:
+Will do.
 
-   #define HWRNG_PERCENTAGE(p) ((p) * 1024 / 100)
+> Rest of the documentation looks good to me.  It addresses my concerns
+> about future evolution of this interface.
 
-and then enforce that everyone use that. But that's a bit wacky too, in
-the sense of - why is anybody using a non-obvious percentage in the first
-place. Like if you see "512" (or better, "1024 / 2"), okay fine, it's a
-device that guarantees 50%, which seems like a common enough physical
-thing. But if we see "HWRNG_PERCENTAGE(90)", the first question is why?
-What causes that?  Seems very weird. And it's probably wrong.
-
-But if it *is* right, that deserves a big comment with explanation,
-where the calculation for that "921" literal can be explained in full,
-or, better, evaluated as a constant expression in terms of hardware
-constants -- something like
-HW_CLOCKRATE/FROBNICATOR_INTENSITY*1024/TURBOENCABULATION_MODE_WEIGHT,
-and then it all makes sense.
-
-So maybe rather than a macro or accepting barebones "921" values, if the
-value isn't 1024 (0), then it needs a comment + an expression computing
-the value.
-
-Seem reasonable?
+Great! So hopefully the api is more or less settled now, and we can turn
+attention to the glibc part.
 
 Jason
