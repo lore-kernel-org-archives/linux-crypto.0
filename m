@@ -2,74 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B85FC3A5A7
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 00:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 608A8C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 00:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231178AbiLEAf3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Dec 2022 19:35:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53916 "EHLO
+        id S230307AbiLEAgf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 4 Dec 2022 19:36:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231152AbiLEAfX (ORCPT
+        with ESMTP id S230353AbiLEAgd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Dec 2022 19:35:23 -0500
+        Sun, 4 Dec 2022 19:36:33 -0500
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D311ED116;
-        Sun,  4 Dec 2022 16:35:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00644D2C4;
+        Sun,  4 Dec 2022 16:36:30 -0800 (PST)
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B4M4Hg6022935;
-        Mon, 5 Dec 2022 00:35:15 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B4L8VOT022968;
+        Mon, 5 Dec 2022 00:36:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=pPQmZ+MnXMziJ3QxiE21sR7a/wt+oWELJc1+OmZPBD0=;
- b=HllNdIE0Chn8Y16Nlug+P47gvWIh3OJrXYprcMbLOgU9rjLsVJtk06GCgUg3jxbshhoJ
- h6Y4ha4mpLDScopJ2yxEnRg4LXdu4nU5cwPD6FQA9QjEhjz6n2KljUQl5GqSh3BK2kH1
- AVlvlQPSxvesQ8+x1Y/Y9aEA+RCQN+Jui/xt/XCs1ZObUPLdtjhwYLfcCN2alzzmsy5T
- eUyJ60Cxtc/Zdhxp78cOixui2OaqwabFUJeMMaq5ltWKr6jSvVHjvSbgGJv9Gsx8lzot
- zfKdB0iGAB/CAa9tJS1C+4Ph0zvCQ1mjgAch7Ks6SGyFJ0kT0ALI89QT07GclNzmnHkt rw== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=zZ5fd0La7Q+NS9/8wqAMynTwt4c6xjruqAkhHG9gIl0=;
+ b=awHivFP3ZHzmrlXH23044z9SEbjdACCkhAhzl7yC7g5rLLpM7hFgCVY6YulNlNSbh7PL
+ dhwS5ynsEIyA62wobC5DCvmYPdDsKz4L/WHGBWbwpyeOTUJZwQT0V00d3YJhLWUe/i+H
+ FCHwnqcAcSmX1tOJ1YhcSpkeGQsUdFAHdbx1S8dz0UxzqYeX8b9duHUuDQcP8sFvjUOk
+ 4QkTK6yo7feniwKgTNSNJoFCP8d54YSzJfOogHGs26DW6kPNFwVIOQpKM0rvx19XDWj7
+ iw8AIt4VIqAg0OlAhnp6tKpl3joqhbmgvRQuByycC/Pvyh0T1A9bklF9xp/5iVL9ipaA Bw== 
 Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g4j3krd-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3m8g4j3mbe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Dec 2022 00:35:15 +0000
+        Mon, 05 Dec 2022 00:36:23 +0000
 Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B50Lmsa009574;
-        Mon, 5 Dec 2022 00:35:14 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma01dal.us.ibm.com with ESMTP id 3m7x3a87gd-1
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2B50Zm1O025075;
+        Mon, 5 Dec 2022 00:36:22 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
+        by ppma01dal.us.ibm.com with ESMTP id 3m7x3a87ns-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Dec 2022 00:35:14 +0000
+        Mon, 05 Dec 2022 00:36:22 +0000
 Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B50ZCgm32834050
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B50Z60V18350356
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Dec 2022 00:35:12 GMT
+        Mon, 5 Dec 2022 00:35:07 GMT
 Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C74C5804E;
-        Mon,  5 Dec 2022 00:35:12 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 89DD258054;
+        Mon,  5 Dec 2022 00:35:06 +0000 (GMT)
 Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F222F5803F;
-        Mon,  5 Dec 2022 00:35:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 1B6305804E;
+        Mon,  5 Dec 2022 00:35:06 +0000 (GMT)
 Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
         by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Dec 2022 00:35:11 +0000 (GMT)
+        Mon,  5 Dec 2022 00:35:06 +0000 (GMT)
 From:   Danny Tsen <dtsen@linux.ibm.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
         nayna@linux.ibm.com, appro@cryptogams.org,
         linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
         dtsen@linux.ibm.com
-Subject: [PATCH v2 5/6] Supporting functions for ghash.
-Date:   Sun,  4 Dec 2022 19:34:57 -0500
-Message-Id: <20221205003458.4182-6-dtsen@linux.ibm.com>
+Subject: [PATCH v2 2/6] Glue code for AES/GCM stitched implementation.
+Date:   Sun,  4 Dec 2022 19:34:54 -0500
+Message-Id: <20221205003458.4182-3-dtsen@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221205003458.4182-1-dtsen@linux.ibm.com>
 References: <20221205003458.4182-1-dtsen@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fJagkwA8mk8wsZ-pnAKsetGvHWWArYfc
-X-Proofpoint-ORIG-GUID: fJagkwA8mk8wsZ-pnAKsetGvHWWArYfc
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5hklchDQaJjopHI2eJDflLJtCGKQXiI0
+X-Proofpoint-ORIG-GUID: 5hklchDQaJjopHI2eJDflLJtCGKQXiI0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-04_16,2022-12-01_01,2022-06-22_01
@@ -82,392 +80,363 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This perl code is taken from the OpenSSL project and added gcm_init_htable function
-used in the p10-aes-gcm-glue.c code to initialize hash table.  gcm_hash_p8 is used
-to hash encrypted data blocks.
-
 Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 ---
- arch/powerpc/crypto/ghashp8-ppc.pl | 370 +++++++++++++++++++++++++++++
- 1 file changed, 370 insertions(+)
- create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
+ arch/powerpc/crypto/p10-aes-gcm-glue.c | 345 +++++++++++++++++++++++++
+ 1 file changed, 345 insertions(+)
+ create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
 
-diff --git a/arch/powerpc/crypto/ghashp8-ppc.pl b/arch/powerpc/crypto/ghashp8-ppc.pl
+diff --git a/arch/powerpc/crypto/p10-aes-gcm-glue.c b/arch/powerpc/crypto/p10-aes-gcm-glue.c
 new file mode 100644
-index 000000000000..b56603b4a893
+index 000000000000..777e6b5254da
 --- /dev/null
-+++ b/arch/powerpc/crypto/ghashp8-ppc.pl
-@@ -0,0 +1,370 @@
-+#!/usr/bin/env perl
-+# SPDX-License-Identifier: GPL-2.0
++++ b/arch/powerpc/crypto/p10-aes-gcm-glue.c
+@@ -0,0 +1,345 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Glue code for accelerated AES-GCM stitched implementation for ppc64le.
++ *
++ * Copyright 2022- IBM Inc. All rights reserved
++ */
 +
-+# This code is taken from the OpenSSL project but the author (Andy Polyakov)
-+# has relicensed it under the GPLv2. Therefore this program is free software;
-+# you can redistribute it and/or modify it under the terms of the GNU General
-+# Public License version 2 as published by the Free Software Foundation.
-+#
-+# The original headers, including the original license headers, are
-+# included below for completeness.
++#include <asm/unaligned.h>
++#include <asm/simd.h>
++#include <asm/switch_to.h>
++#include <crypto/algapi.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <crypto/b128ops.h>
++#include <crypto/gf128mul.h>
++#include <crypto/internal/simd.h>
++#include <crypto/internal/aead.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++#include <linux/types.h>
 +
-+# ====================================================================
-+# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-+# project. The module is, however, dual licensed under OpenSSL and
-+# CRYPTOGAMS licenses depending on where you obtain it. For further
-+# details see https://www.openssl.org/~appro/cryptogams/.
-+# ====================================================================
-+#
-+# GHASH for PowerISA v2.07.
-+#
-+# July 2014
-+#
-+# Accurate performance measurements are problematic, because it's
-+# always virtualized setup with possibly throttled processor.
-+# Relative comparison is therefore more informative. This initial
-+# version is ~2.1x slower than hardware-assisted AES-128-CTR, ~12x
-+# faster than "4-bit" integer-only compiler-generated 64-bit code.
-+# "Initial version" means that there is room for futher improvement.
++#define PPC_MODULE_FEATURE_P10	(32 + ilog2(PPC_FEATURE2_ARCH_3_1))
++#define	PPC_ALIGN		16
++#define GCM_IV_SIZE		12
 +
-+$flavour=shift;
-+$output =shift;
++MODULE_DESCRIPTION("PPC64le AES-GCM with Stitched implementation");
++MODULE_AUTHOR("Danny Tsen <dtsen@linux.ibm.com");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("aes");
 +
-+if ($flavour =~ /64/) {
-+	$SIZE_T=8;
-+	$LRSAVE=2*$SIZE_T;
-+	$STU="stdu";
-+	$POP="ld";
-+	$PUSH="std";
-+} elsif ($flavour =~ /32/) {
-+	$SIZE_T=4;
-+	$LRSAVE=$SIZE_T;
-+	$STU="stwu";
-+	$POP="lwz";
-+	$PUSH="stw";
-+} else { die "nonsense $flavour"; }
++asmlinkage int aes_p8_set_encrypt_key(const u8 *userKey, const int bits,
++				      void *key);
++asmlinkage void aes_p8_encrypt(const u8 *in, u8 *out, const void *key);
++asmlinkage void aes_p10_gcm_encrypt(u8 *in, u8 *out, size_t len,
++				    void *rkey, u8 *iv, void *Xi);
++asmlinkage void aes_p10_gcm_decrypt(u8 *in, u8 *out, size_t len,
++				    void *rkey, u8 *iv, void *Xi);
++asmlinkage void gcm_init_htable(unsigned char htable[256], unsigned char Xi[16]);
++asmlinkage void gcm_ghash_p8(unsigned char *Xi, unsigned char *Htable,
++		unsigned char *aad, unsigned int alen);
 +
-+$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+( $xlate="${dir}ppc-xlate.pl" and -f $xlate ) or
-+( $xlate="${dir}../../perlasm/ppc-xlate.pl" and -f $xlate) or
-+die "can't locate ppc-xlate.pl";
++struct aes_key {
++	u8 key[AES_MAX_KEYLENGTH];
++	u64 rounds;
++};
 +
-+open STDOUT,"| $^X $xlate $flavour $output" || die "can't call $xlate: $!";
++struct gcm_ctx {
++	u8 iv[16];
++	u8 ivtag[16];
++	u8 aad_hash[16];
++	u64 aadLen;
++	u64 Plen;	/* offset 56 - used in aes_p10_gcm_{en/de}crypt */
++};
++struct Hash_ctx {
++	u8 H[16];	/* subkey */
++	u8 Htable[256];	/* Xi, Hash table(offset 32) */
++};
 +
-+my ($Xip,$Htbl,$inp,$len)=map("r$_",(3..6));	# argument block
++struct p10_aes_gcm_ctx {
++	struct aes_key enc_key;
++};
 +
-+my ($Xl,$Xm,$Xh,$IN)=map("v$_",(0..3));
-+my ($zero,$t0,$t1,$t2,$xC2,$H,$Hh,$Hl,$lemask)=map("v$_",(4..12));
-+my ($Xl1,$Xm1,$Xh1,$IN1,$H2,$H2h,$H2l)=map("v$_",(13..19));
-+my $vrsave="r12";
-+my ($t4,$t5,$t6) = ($Hl,$H,$Hh);
-+
-+$code=<<___;
-+.machine	"any"
-+
-+.text
-+
-+.globl	.gcm_init_p8
-+	lis		r0,0xfff0
-+	li		r8,0x10
-+	mfspr		$vrsave,256
-+	li		r9,0x20
-+	mtspr		256,r0
-+	li		r10,0x30
-+	lvx_u		$H,0,r4			# load H
-+	le?xor		r7,r7,r7
-+	le?addi		r7,r7,0x8		# need a vperm start with 08
-+	le?lvsr		5,0,r7
-+	le?vspltisb	6,0x0f
-+	le?vxor		5,5,6			# set a b-endian mask
-+	le?vperm	$H,$H,$H,5
-+
-+	vspltisb	$xC2,-16		# 0xf0
-+	vspltisb	$t0,1			# one
-+	vaddubm		$xC2,$xC2,$xC2		# 0xe0
-+	vxor		$zero,$zero,$zero
-+	vor		$xC2,$xC2,$t0		# 0xe1
-+	vsldoi		$xC2,$xC2,$zero,15	# 0xe1...
-+	vsldoi		$t1,$zero,$t0,1		# ...1
-+	vaddubm		$xC2,$xC2,$xC2		# 0xc2...
-+	vspltisb	$t2,7
-+	vor		$xC2,$xC2,$t1		# 0xc2....01
-+	vspltb		$t1,$H,0		# most significant byte
-+	vsl		$H,$H,$t0		# H<<=1
-+	vsrab		$t1,$t1,$t2		# broadcast carry bit
-+	vand		$t1,$t1,$xC2
-+	vxor		$H,$H,$t1		# twisted H
-+
-+	vsldoi		$H,$H,$H,8		# twist even more ...
-+	vsldoi		$xC2,$zero,$xC2,8	# 0xc2.0
-+	vsldoi		$Hl,$zero,$H,8		# ... and split
-+	vsldoi		$Hh,$H,$zero,8
-+
-+	stvx_u		$xC2,0,r3		# save pre-computed table
-+	stvx_u		$Hl,r8,r3
-+	stvx_u		$H, r9,r3
-+	stvx_u		$Hh,r10,r3
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,2,0
-+	.long		0
-+.size	.gcm_init_p8,.-.gcm_init_p8
-+
-+.globl	.gcm_init_htable
-+	lis		r0,0xfff0
-+	li		r8,0x10
-+	mfspr		$vrsave,256
-+	li		r9,0x20
-+	mtspr		256,r0
-+	li		r10,0x30
-+	lvx_u		$H,0,r4			# load H
-+
-+	vspltisb	$xC2,-16		# 0xf0
-+	vspltisb	$t0,1			# one
-+	vaddubm		$xC2,$xC2,$xC2		# 0xe0
-+	vxor		$zero,$zero,$zero
-+	vor		$xC2,$xC2,$t0		# 0xe1
-+	vsldoi		$xC2,$xC2,$zero,15	# 0xe1...
-+	vsldoi		$t1,$zero,$t0,1		# ...1
-+	vaddubm		$xC2,$xC2,$xC2		# 0xc2...
-+	vspltisb	$t2,7
-+	vor		$xC2,$xC2,$t1		# 0xc2....01
-+	vspltb		$t1,$H,0		# most significant byte
-+	vsl		$H,$H,$t0		# H<<=1
-+	vsrab		$t1,$t1,$t2		# broadcast carry bit
-+	vand		$t1,$t1,$xC2
-+	vxor		$IN,$H,$t1		# twisted H
-+
-+	vsldoi		$H,$IN,$IN,8		# twist even more ...
-+	vsldoi		$xC2,$zero,$xC2,8	# 0xc2.0
-+	vsldoi		$Hl,$zero,$H,8		# ... and split
-+	vsldoi		$Hh,$H,$zero,8
-+
-+	stvx_u		$xC2,0,r3		# save pre-computed table
-+	stvx_u		$Hl,r8,r3
-+	li		r8,0x40
-+	stvx_u		$H, r9,r3
-+	li		r9,0x50
-+	stvx_u		$Hh,r10,r3
-+	li		r10,0x60
-+
-+	vpmsumd		$Xl,$IN,$Hl		# H.lo·H.lo
-+	vpmsumd		$Xm,$IN,$H		# H.hi·H.lo+H.lo·H.hi
-+	vpmsumd		$Xh,$IN,$Hh		# H.hi·H.hi
-+
-+	vpmsumd		$t2,$Xl,$xC2		# 1st reduction phase
-+
-+	vsldoi		$t0,$Xm,$zero,8
-+	vsldoi		$t1,$zero,$Xm,8
-+	vxor		$Xl,$Xl,$t0
-+	vxor		$Xh,$Xh,$t1
-+
-+	vsldoi		$Xl,$Xl,$Xl,8
-+	vxor		$Xl,$Xl,$t2
-+
-+	vsldoi		$t1,$Xl,$Xl,8		# 2nd reduction phase
-+	vpmsumd		$Xl,$Xl,$xC2
-+	vxor		$t1,$t1,$Xh
-+	vxor		$IN1,$Xl,$t1
-+
-+	vsldoi		$H2,$IN1,$IN1,8
-+	vsldoi		$H2l,$zero,$H2,8
-+	vsldoi		$H2h,$H2,$zero,8
-+
-+	stvx_u		$H2l,r8,r3		# save H^2
-+	li		r8,0x70
-+	stvx_u		$H2,r9,r3
-+	li		r9,0x80
-+	stvx_u		$H2h,r10,r3
-+	li		r10,0x90
-+
-+	vpmsumd		$Xl,$IN,$H2l		# H.lo·H^2.lo
-+	 vpmsumd	$Xl1,$IN1,$H2l		# H^2.lo·H^2.lo
-+	vpmsumd		$Xm,$IN,$H2		# H.hi·H^2.lo+H.lo·H^2.hi
-+	 vpmsumd	$Xm1,$IN1,$H2		# H^2.hi·H^2.lo+H^2.lo·H^2.hi
-+	vpmsumd		$Xh,$IN,$H2h		# H.hi·H^2.hi
-+	 vpmsumd	$Xh1,$IN1,$H2h		# H^2.hi·H^2.hi
-+
-+	vpmsumd		$t2,$Xl,$xC2		# 1st reduction phase
-+	 vpmsumd	$t6,$Xl1,$xC2		# 1st reduction phase
-+
-+	vsldoi		$t0,$Xm,$zero,8
-+	vsldoi		$t1,$zero,$Xm,8
-+	 vsldoi		$t4,$Xm1,$zero,8
-+	 vsldoi		$t5,$zero,$Xm1,8
-+	vxor		$Xl,$Xl,$t0
-+	vxor		$Xh,$Xh,$t1
-+	 vxor		$Xl1,$Xl1,$t4
-+	 vxor		$Xh1,$Xh1,$t5
-+
-+	vsldoi		$Xl,$Xl,$Xl,8
-+	 vsldoi		$Xl1,$Xl1,$Xl1,8
-+	vxor		$Xl,$Xl,$t2
-+	 vxor		$Xl1,$Xl1,$t6
-+
-+	vsldoi		$t1,$Xl,$Xl,8		# 2nd reduction phase
-+	 vsldoi		$t5,$Xl1,$Xl1,8		# 2nd reduction phase
-+	vpmsumd		$Xl,$Xl,$xC2
-+	 vpmsumd	$Xl1,$Xl1,$xC2
-+	vxor		$t1,$t1,$Xh
-+	 vxor		$t5,$t5,$Xh1
-+	vxor		$Xl,$Xl,$t1
-+	 vxor		$Xl1,$Xl1,$t5
-+
-+	vsldoi		$H,$Xl,$Xl,8
-+	 vsldoi		$H2,$Xl1,$Xl1,8
-+	vsldoi		$Hl,$zero,$H,8
-+	vsldoi		$Hh,$H,$zero,8
-+	 vsldoi		$H2l,$zero,$H2,8
-+	 vsldoi		$H2h,$H2,$zero,8
-+
-+	stvx_u		$Hl,r8,r3		# save H^3
-+	li		r8,0xa0
-+	stvx_u		$H,r9,r3
-+	li		r9,0xb0
-+	stvx_u		$Hh,r10,r3
-+	li		r10,0xc0
-+	 stvx_u		$H2l,r8,r3		# save H^4
-+	 stvx_u		$H2,r9,r3
-+	 stvx_u		$H2h,r10,r3
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,2,0
-+	.long		0
-+.size	.gcm_init_htable,.-.gcm_init_htable
-+
-+.globl	.gcm_gmult_p8
-+	lis		r0,0xfff8
-+	li		r8,0x10
-+	mfspr		$vrsave,256
-+	li		r9,0x20
-+	mtspr		256,r0
-+	li		r10,0x30
-+	lvx_u		$IN,0,$Xip		# load Xi
-+
-+	lvx_u		$Hl,r8,$Htbl		# load pre-computed table
-+	 le?lvsl	$lemask,r0,r0
-+	lvx_u		$H, r9,$Htbl
-+	 le?vspltisb	$t0,0x07
-+	lvx_u		$Hh,r10,$Htbl
-+	 le?vxor	$lemask,$lemask,$t0
-+	lvx_u		$xC2,0,$Htbl
-+	 le?vperm	$IN,$IN,$IN,$lemask
-+	vxor		$zero,$zero,$zero
-+
-+	vpmsumd		$Xl,$IN,$Hl		# H.lo·Xi.lo
-+	vpmsumd		$Xm,$IN,$H		# H.hi·Xi.lo+H.lo·Xi.hi
-+	vpmsumd		$Xh,$IN,$Hh		# H.hi·Xi.hi
-+
-+	vpmsumd		$t2,$Xl,$xC2		# 1st phase
-+
-+	vsldoi		$t0,$Xm,$zero,8
-+	vsldoi		$t1,$zero,$Xm,8
-+	vxor		$Xl,$Xl,$t0
-+	vxor		$Xh,$Xh,$t1
-+
-+	vsldoi		$Xl,$Xl,$Xl,8
-+	vxor		$Xl,$Xl,$t2
-+
-+	vsldoi		$t1,$Xl,$Xl,8		# 2nd phase
-+	vpmsumd		$Xl,$Xl,$xC2
-+	vxor		$t1,$t1,$Xh
-+	vxor		$Xl,$Xl,$t1
-+
-+	le?vperm	$Xl,$Xl,$Xl,$lemask
-+	stvx_u		$Xl,0,$Xip		# write out Xi
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,2,0
-+	.long		0
-+.size	.gcm_gmult_p8,.-.gcm_gmult_p8
-+
-+.globl	.gcm_ghash_p8
-+	lis		r0,0xfff8
-+	li		r8,0x10
-+	mfspr		$vrsave,256
-+	li		r9,0x20
-+	mtspr		256,r0
-+	li		r10,0x30
-+	lvx_u		$Xl,0,$Xip		# load Xi
-+
-+	lvx_u		$Hl,r8,$Htbl		# load pre-computed table
-+	 le?lvsl	$lemask,r0,r0
-+	lvx_u		$H, r9,$Htbl
-+	 le?vspltisb	$t0,0x07
-+	lvx_u		$Hh,r10,$Htbl
-+	 le?vxor	$lemask,$lemask,$t0
-+	lvx_u		$xC2,0,$Htbl
-+	 le?vperm	$Xl,$Xl,$Xl,$lemask
-+	vxor		$zero,$zero,$zero
-+
-+	lvx_u		$IN,0,$inp
-+	addi		$inp,$inp,16
-+	subi		$len,$len,16
-+	 le?vperm	$IN,$IN,$IN,$lemask
-+	vxor		$IN,$IN,$Xl
-+	b		Loop
-+
-+.align	5
-+Loop:
-+	 subic		$len,$len,16
-+	vpmsumd		$Xl,$IN,$Hl		# H.lo·Xi.lo
-+	 subfe.		r0,r0,r0		# borrow?-1:0
-+	vpmsumd		$Xm,$IN,$H		# H.hi·Xi.lo+H.lo·Xi.hi
-+	 and		r0,r0,$len
-+	vpmsumd		$Xh,$IN,$Hh		# H.hi·Xi.hi
-+	 add		$inp,$inp,r0
-+
-+	vpmsumd		$t2,$Xl,$xC2		# 1st phase
-+
-+	vsldoi		$t0,$Xm,$zero,8
-+	vsldoi		$t1,$zero,$Xm,8
-+	vxor		$Xl,$Xl,$t0
-+	vxor		$Xh,$Xh,$t1
-+
-+	vsldoi		$Xl,$Xl,$Xl,8
-+	vxor		$Xl,$Xl,$t2
-+	 lvx_u		$IN,0,$inp
-+	 addi		$inp,$inp,16
-+
-+	vsldoi		$t1,$Xl,$Xl,8		# 2nd phase
-+	vpmsumd		$Xl,$Xl,$xC2
-+	 le?vperm	$IN,$IN,$IN,$lemask
-+	vxor		$t1,$t1,$Xh
-+	vxor		$IN,$IN,$t1
-+	vxor		$IN,$IN,$Xl
-+	beq		Loop			# did $len-=16 borrow?
-+
-+	vxor		$Xl,$Xl,$t1
-+	le?vperm	$Xl,$Xl,$Xl,$lemask
-+	stvx_u		$Xl,0,$Xip		# write out Xi
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,4,0
-+	.long		0
-+.size	.gcm_ghash_p8,.-.gcm_ghash_p8
-+
-+.asciz  "GHASH for PowerISA 2.07, CRYPTOGAMS by <appro\@openssl.org>"
-+.align  2
-+___
-+
-+foreach (split("\n",$code)) {
-+	if ($flavour =~ /le$/o) {	# little-endian
-+	    s/le\?//o		or
-+	    s/be\?/#be#/o;
-+	} else {
-+	    s/le\?/#le#/o	or
-+	    s/be\?//o;
-+	}
-+	print $_,"\n";
++static void vsx_begin(void)
++{
++	preempt_disable();
++	enable_kernel_vsx();
 +}
 +
-+close STDOUT; # enforce flush
++static void vsx_end(void)
++{
++	disable_kernel_vsx();
++	preempt_enable();
++}
++
++static void set_subkey(unsigned char *hash)
++{
++	*(u64 *)&hash[0] = be64_to_cpup((__be64 *)&hash[0]);
++	*(u64 *)&hash[8] = be64_to_cpup((__be64 *)&hash[8]);
++}
++
++/*
++ * Compute aad if any.
++ *   - Hash aad and copy to Xi.
++ */
++static void set_aad(struct gcm_ctx *gctx, struct Hash_ctx *hash,
++		    unsigned char *aad, int alen)
++{
++	int i;
++	u8 nXi[16] = {0, };
++
++	gctx->aadLen = alen;
++	i = alen & ~0xf;
++	if (i) {
++		gcm_ghash_p8(nXi, hash->Htable+32, aad, i);
++		aad += i;
++		alen -= i;
++	}
++	if (alen) {
++		for (i = 0; i < alen; i++)
++			nXi[i] ^= aad[i];
++
++		memset(gctx->aad_hash, 0, 16);
++		gcm_ghash_p8(gctx->aad_hash, hash->Htable+32, nXi, 16);
++	} else {
++		memcpy(gctx->aad_hash, nXi, 16);
++	}
++
++	memcpy(hash->Htable, gctx->aad_hash, 16);
++}
++
++static void gcmp10_init(struct gcm_ctx *gctx, u8 *iv, unsigned char *rdkey,
++			struct Hash_ctx *hash, u8 *assoc, unsigned int assoclen)
++{
++	__be32 counter = cpu_to_be32(1);
++
++	aes_p8_encrypt(hash->H, hash->H, rdkey);
++	set_subkey(hash->H);
++	gcm_init_htable(hash->Htable+32, hash->H);
++
++	*((__be32 *)(iv+12)) = counter;
++
++	gctx->Plen = 0;
++
++	/*
++	 * Encrypt counter vector as iv tag and increment counter.
++	 */
++	aes_p8_encrypt(iv, gctx->ivtag, rdkey);
++
++	counter = cpu_to_be32(2);
++	*((__be32 *)(iv+12)) = counter;
++	memcpy(gctx->iv, iv, 16);
++
++	gctx->aadLen = assoclen;
++	memset(gctx->aad_hash, 0, 16);
++	if (assoclen)
++		set_aad(gctx, hash, assoc, assoclen);
++}
++
++static void finish_tag(struct gcm_ctx *gctx, struct Hash_ctx *hash, int len)
++{
++	int i;
++	unsigned char len_ac[16 + PPC_ALIGN];
++	unsigned char *aclen = PTR_ALIGN((void *)len_ac, PPC_ALIGN);
++	__be64 clen = cpu_to_be64(len << 3);
++	__be64 alen = cpu_to_be64(gctx->aadLen << 3);
++
++	if (len == 0 && gctx->aadLen == 0) {
++		memcpy(hash->Htable, gctx->ivtag, 16);
++		return;
++	}
++
++	/*
++	 * Len is in bits.
++	 */
++	*((__be64 *)(aclen)) = alen;
++	*((__be64 *)(aclen+8)) = clen;
++
++	/*
++	 * hash (AAD len and len)
++	 */
++	gcm_ghash_p8(hash->Htable, hash->Htable+32, aclen, 16);
++
++	for (i = 0; i < 16; i++)
++		hash->Htable[i] ^= gctx->ivtag[i];
++}
++
++static int set_authsize(struct crypto_aead *tfm, unsigned int authsize)
++{
++	switch (authsize) {
++	case 4:
++	case 8:
++	case 12:
++	case 13:
++	case 14:
++	case 15:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int p10_aes_gcm_setkey(struct crypto_aead *aead, const u8 *key,
++			     unsigned int keylen)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
++	int ret;
++
++	vsx_begin();
++	ret = aes_p8_set_encrypt_key(key, keylen * 8, &ctx->enc_key);
++	vsx_end();
++
++	return ret ? -EINVAL : 0;
++}
++
++static int p10_aes_gcm_crypt(struct aead_request *req, int enc)
++{
++	struct crypto_tfm *tfm = req->base.tfm;
++	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
++	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
++	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
++	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
++	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
++	struct scatter_walk assoc_sg_walk;
++	struct skcipher_walk walk;
++	u8 *assocmem = NULL;
++	u8 *assoc;
++	unsigned int assoclen = req->assoclen;
++	unsigned int cryptlen = req->cryptlen;
++	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
++	unsigned char *iv = PTR_ALIGN((void *)ivbuf, PPC_ALIGN);
++	int ret;
++	unsigned long auth_tag_len = crypto_aead_authsize(__crypto_aead_cast(tfm));
++	u8 otag[16];
++	int total_processed = 0;
++
++	memset(databuf, 0, sizeof(databuf));
++	memset(hashbuf, 0, sizeof(hashbuf));
++	memset(ivbuf, 0, sizeof(ivbuf));
++	memcpy(iv, req->iv, GCM_IV_SIZE);
++
++	/* Linearize assoc, if not already linear */
++	if (req->src->length >= assoclen && req->src->length) {
++		scatterwalk_start(&assoc_sg_walk, req->src);
++		assoc = scatterwalk_map(&assoc_sg_walk);
++	} else {
++		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++			      GFP_KERNEL : GFP_ATOMIC;
++
++		/* assoc can be any length, so must be on heap */
++		assocmem = kmalloc(assoclen, flags);
++		if (unlikely(!assocmem))
++			return -ENOMEM;
++		assoc = assocmem;
++
++		scatterwalk_map_and_copy(assoc, req->src, 0, assoclen, 0);
++	}
++
++	vsx_begin();
++	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
++	vsx_end();
++
++	if (!assocmem)
++		scatterwalk_unmap(assoc);
++	else
++		kfree(assocmem);
++
++	if (enc)
++		ret = skcipher_walk_aead_encrypt(&walk, req, false);
++	else
++		ret = skcipher_walk_aead_decrypt(&walk, req, false);
++	if (ret)
++		return ret;
++
++	while (walk.nbytes > 0 && ret == 0) {
++
++		vsx_begin();
++		if (enc)
++			aes_p10_gcm_encrypt(walk.src.virt.addr,
++					    walk.dst.virt.addr,
++					    walk.nbytes,
++					    &ctx->enc_key, gctx->iv, hash->Htable);
++		else
++			aes_p10_gcm_decrypt(walk.src.virt.addr,
++					    walk.dst.virt.addr,
++					    walk.nbytes,
++					    &ctx->enc_key, gctx->iv, hash->Htable);
++		vsx_end();
++
++		total_processed += walk.nbytes;
++		ret = skcipher_walk_done(&walk, 0);
++	}
++
++	if (ret)
++		return ret;
++
++	/* Finalize hash */
++	vsx_begin();
++	finish_tag(gctx, hash, total_processed);
++	vsx_end();
++
++	/* copy Xi to end of dst */
++	if (enc)
++		scatterwalk_map_and_copy(hash->Htable, req->dst, req->assoclen + cryptlen,
++					 auth_tag_len, 1);
++	else {
++		scatterwalk_map_and_copy(otag, req->src,
++					 req->assoclen + cryptlen - auth_tag_len,
++					 auth_tag_len, 0);
++
++		if (crypto_memneq(otag, hash->Htable, auth_tag_len)) {
++			memzero_explicit(hash->Htable, 16);
++			return -EBADMSG;
++		}
++	}
++
++	return 0;
++}
++
++static int p10_aes_gcm_encrypt(struct aead_request *req)
++{
++	return p10_aes_gcm_crypt(req, 1);
++}
++
++static int p10_aes_gcm_decrypt(struct aead_request *req)
++{
++	return p10_aes_gcm_crypt(req, 0);
++}
++
++static struct aead_alg gcm_aes_alg = {
++	.ivsize			= GCM_IV_SIZE,
++	.maxauthsize		= 16,
++
++	.setauthsize		= set_authsize,
++	.setkey			= p10_aes_gcm_setkey,
++	.encrypt		= p10_aes_gcm_encrypt,
++	.decrypt		= p10_aes_gcm_decrypt,
++
++	.base.cra_name		= "gcm(aes)",
++	.base.cra_driver_name	= "p10_aes_gcm",
++	.base.cra_priority	= 2100,
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct p10_aes_gcm_ctx),
++	.base.cra_module	= THIS_MODULE,
++};
++
++static int __init p10_init(void)
++{
++	return crypto_register_aead(&gcm_aes_alg);
++}
++
++static void __exit p10_exit(void)
++{
++	crypto_unregister_aead(&gcm_aes_alg);
++}
++
++module_cpu_feature_match(PPC_MODULE_FEATURE_P10, p10_init);
++module_exit(p10_exit);
 -- 
 2.31.1
 
