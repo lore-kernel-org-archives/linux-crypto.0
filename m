@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F18EEC47088
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 21:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D42C47088
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 21:41:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233161AbiLEVfX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 16:35:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
+        id S233396AbiLEVlb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Dec 2022 16:41:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbiLEVfW (ORCPT
+        with ESMTP id S230289AbiLEVlb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 16:35:22 -0500
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36DA02CC80;
-        Mon,  5 Dec 2022 13:35:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-        ; s=202004.hall; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:Reply-To:
-        Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-        bh=RAu47D9qhSPeqGH6WidK6jmmj65HEM0DSNp12TyKSG0=; b=HZcoEtIlLfMXONr9DyEAs9FQGJ
-        N84DVRwyt515vU6/4KRZVhPFYXo1ymWy0iln/LngK/DPsAdk044Vk6VKmhJhd7PT/OGGQ+QrJ/tA9
-        jQnzMs6Io0kNHx3nN2MmnYIl6dG6Ukh02Qmu73N3yEQZsWh2Bs3bMhC7qfXm07L6R9djWP48nSUFJ
-        xWD5uVLujymazwk9/QgVuVw9bGTiaebvYfbrgrDCG7xn6CI9xkN/huQZks6zlDyvsWHdxxOIp87Qt
-        58piDtyB2EZNkgN/Ze1FuBEGebD6Qoa7/v/UoApuUmGw8L2ec0feCrqylDNALOPZGuLxCvgvBGt5G
-        A4KdSbQw==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1p2J73-00BKxr-Kw; Mon, 05 Dec 2022 22:34:57 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1p2J70-00GGBC-2X;
-        Mon, 05 Dec 2022 22:34:54 +0100
-Date:   Mon, 5 Dec 2022 22:34:54 +0100
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Olivia Mackall <olivia@selenic.com>,
+        Mon, 5 Dec 2022 16:41:31 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3816B27171;
+        Mon,  5 Dec 2022 13:41:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 99B9D6146E;
+        Mon,  5 Dec 2022 21:41:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87684C433C1;
+        Mon,  5 Dec 2022 21:41:27 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="UcX63CxV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1670276485;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Cd+XRNCKmMHT7hFR6etWaPdNaLOAGBor4KfIYpxPTiU=;
+        b=UcX63CxVLud3xJ7yYliyJ2IPekJGw8CsCg51VN7p+kv/6TMbQQMqBvjp8wY1lFXz77JzbG
+        wj4Tt4uzLPi3/F2UV8+PDDSsDKUQ+23n6PVQt+bYvBivST7DuFFlmeClAkyoZ9zEoddIDf
+        tL5RJVSkldP8/nY7JBdBKQE+J7nR3no=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0357b102 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 5 Dec 2022 21:41:25 +0000 (UTC)
+Date:   Mon, 5 Dec 2022 22:41:22 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -54,87 +54,49 @@ Cc:     Olivia Mackall <olivia@selenic.com>,
         <linux-rockchip@lists.infradead.org>,
         open list <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
-Message-ID: <Y45j/hd2MnnXzcAo@aurel32.net>
-Mail-Followup-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-        "moderated list:ARM/Rockchip SoC support" <linux-arm-kernel@lists.infradead.org>,
-        "open list:ARM/Rockchip SoC support" <linux-rockchip@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
+Message-ID: <Y45lguC4ZiniiWS/@zx2c4.com>
 References: <20221128184718.1963353-1-aurelien@aurel32.net>
  <20221128184718.1963353-3-aurelien@aurel32.net>
  <Y43uiVo41vljLsZM@zx2c4.com>
+ <Y45j/hd2MnnXzcAo@aurel32.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Y43uiVo41vljLsZM@zx2c4.com>
-User-Agent: Mutt/2.2.7 (2022-08-07)
+In-Reply-To: <Y45j/hd2MnnXzcAo@aurel32.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Hi Aurelien,
 
-On 2022-12-05 14:13, Jason A. Donenfeld wrote:
-> On Mon, Nov 28, 2022 at 07:47:17PM +0100, Aurelien Jarno wrote:
-> > The TRNG device does not seem to have a signal conditionner and the FIPS
-> > 140-2 test returns a lot of failures. They can be reduced by increasing
-> > RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
-> > has been adjusted to get ~90% of successes and the quality value has
-> > been set accordingly.
->=20
-> Can't you reduce it even more to get 100%? All we need is 32 bytes every
-> once in a while.
+On Mon, Dec 05, 2022 at 10:34:54PM +0100, Aurelien Jarno wrote:
+> Well I am not sure it really matters. 90% is actually conservative, it's
+> the worst case I have seen, rounded down. However I often get much
+> better quality, see for instance the following run:
+> 
+> | Copyright (c) 2004 by Henrique de Moraes Holschuh
+> | This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+> | 
+> | rngtest: starting FIPS tests...
+> | rngtest: entropy source drained
+> | rngtest: bits received from input: 16777216
+> | rngtest: FIPS 140-2 successes: 819
+> | rngtest: FIPS 140-2 failures: 19
+> | rngtest: FIPS 140-2(2001-10-10) Monobit: 17
+> | rngtest: FIPS 140-2(2001-10-10) Poker: 0
+> | rngtest: FIPS 140-2(2001-10-10) Runs: 2
+> | rngtest: FIPS 140-2(2001-10-10) Long run: 2
+> | rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+> | rngtest: input channel speed: (min=132.138; avg=137.848; max=147.308)Kibits/s
+> | rngtest: FIPS tests speed: (min=16.924; avg=20.272; max=20.823)Mibits/s
+> | rngtest: Program run time: 119647459 microseconds
+> 
+> Does the exact value has an importance there? I thought it was just
+> important to not overestimate the quality.
 
-=46rom what I understood, we get the raw stream of the TRNG, there is no
-conditionner and the TRNG is not FIPS compliant. So even with the
-slowest speed, you don't reach 100% and you only get a very small
-increase in the quality while it's way more slower.
+That's the right principle. I just worry about estimating it like that
+from looking at the output, rather than being derived from some
+knowledge about the hardware. Maybe 50% (quality=512) is more
+reasonable, so that it collects two bits for every one?
 
-> > +	rk_rng->rng.quality =3D 900;
->=20
-> If your intention is "90%", this should be 921 or 922, because the
-> quality knob is out of 1024, not 1000.
-
-Well I am not sure it really matters. 90% is actually conservative, it's
-the worst case I have seen, rounded down. However I often get much
-better quality, see for instance the following run:
-
-| Copyright (c) 2004 by Henrique de Moraes Holschuh
-| This is free software; see the source for copying conditions.  There is N=
-O warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-|=20
-| rngtest: starting FIPS tests...
-| rngtest: entropy source drained
-| rngtest: bits received from input: 16777216
-| rngtest: FIPS 140-2 successes: 819
-| rngtest: FIPS 140-2 failures: 19
-| rngtest: FIPS 140-2(2001-10-10) Monobit: 17
-| rngtest: FIPS 140-2(2001-10-10) Poker: 0
-| rngtest: FIPS 140-2(2001-10-10) Runs: 2
-| rngtest: FIPS 140-2(2001-10-10) Long run: 2
-| rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-| rngtest: input channel speed: (min=3D132.138; avg=3D137.848; max=3D147.30=
-8)Kibits/s
-| rngtest: FIPS tests speed: (min=3D16.924; avg=3D20.272; max=3D20.823)Mibi=
-ts/s
-| rngtest: Program run time: 119647459 microseconds
-
-Does the exact value has an importance there? I thought it was just
-important to not overestimate the quality.
-
-Regards
-Aurelien
-
---=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Jason
