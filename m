@@ -2,52 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9372C4708C
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 03:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49035C47090
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 03:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231990AbiLFDtD convert rfc822-to-8bit (ORCPT
+        id S233633AbiLFDzg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 22:49:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53196 "EHLO
+        Mon, 5 Dec 2022 22:55:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbiLFDtC (ORCPT
+        with ESMTP id S230348AbiLFDzg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 22:49:02 -0500
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D651ADBF;
-        Mon,  5 Dec 2022 19:49:00 -0800 (PST)
+        Mon, 5 Dec 2022 22:55:36 -0500
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BB715807;
+        Mon,  5 Dec 2022 19:55:34 -0800 (PST)
 Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
         (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
         (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id B4A9A24DBE9;
-        Tue,  6 Dec 2022 11:48:52 +0800 (CST)
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX165.cuchost.com
+        by ex01.ufhost.com (Postfix) with ESMTP id 9655F24DFC2;
+        Tue,  6 Dec 2022 11:55:27 +0800 (CST)
+Received: from EXMBX065.cuchost.com (172.16.6.65) by EXMBX165.cuchost.com
  (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 11:48:52 +0800
+ 2022 11:55:27 +0800
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX065.cuchost.com
+ (172.16.6.65) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
+ 2022 11:55:27 +0800
 Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
  EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
- 15.00.1497.044; Tue, 6 Dec 2022 11:48:52 +0800
+ 15.00.1497.044; Tue, 6 Dec 2022 11:55:27 +0800
 From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Rob Herring <robh@kernel.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To:     Conor Dooley <conor@kernel.org>
+CC:     "Conor.Dooley@microchip.com" <Conor.Dooley@microchip.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@esmil.dk" <kernel@esmil.dk>,
+        "davem@davemloft.net" <davem@davemloft.net>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: RE: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
- driver
-Thread-Topic: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive
- crypto driver
-Thread-Index: AQHZBH/2P5dLP9b8iUC7OZp9LCFzsa5W9X0AgAlLclA=
-Date:   Tue, 6 Dec 2022 03:48:52 +0000
-Message-ID: <14a3facb1fe642cba0048f2f2d0eb2e9@EXMBX068.cuchost.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>
+Subject: RE: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
+ VisionFive 2
+Thread-Topic: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
+ VisionFive 2
+Thread-Index: AQHZBH/4vZHP2U3n+EalaiuTkXOjPK5WreUAgAHaqdCAAEbuAIAHdAQg
+Date:   Tue, 6 Dec 2022 03:55:27 +0000
+Message-ID: <39ac3ec838e94154b232617433910352@EXMBX068.cuchost.com>
 References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
- <166981596611.1846501.537832446745968339.robh@kernel.org>
-In-Reply-To: <166981596611.1846501.537832446745968339.robh@kernel.org>
+ <20221130055214.2416888-7-jiajie.ho@starfivetech.com>
+ <1673ef8b-179e-3b03-b3f8-8d347c70d8c3@microchip.com>
+ <4ddddceba3dc437daca27374dd2f6fd7@EXMBX068.cuchost.com>
+ <Y4jslJfTVtQ9cIGm@spud>
+In-Reply-To: <Y4jslJfTVtQ9cIGm@spud>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -65,65 +73,38 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 > -----Original Message-----
-> From: Rob Herring <robh@kernel.org>
-> Sent: Wednesday, November 30, 2022 9:48 PM
+> From: Conor Dooley <conor@kernel.org>
+> Sent: Friday, December 2, 2022 2:04 AM
 > To: JiaJie Ho <jiajie.ho@starfivetech.com>
-> Cc: linux-crypto@vger.kernel.org; linux-riscv@lists.infradead.org; Rob
-> Herring <robh+dt@kernel.org>; Herbert Xu
-> <herbert@gondor.apana.org.au>; Krzysztof Kozlowski
-> <krzysztof.kozlowski+dt@linaro.org>; linux-kernel@vger.kernel.org;
-> devicetree@vger.kernel.org; David S . Miller <davem@davemloft.net>
-> Subject: Re: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
-> driver
+> Cc: Conor.Dooley@microchip.com; robh+dt@kernel.org;
+> herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org;
+> kernel@esmil.dk; davem@davemloft.net; devicetree@vger.kernel.org;
+> linux-kernel@vger.kernel.org; linux-riscv@lists.infradead.org;
+> krzysztof.kozlowski+dt@linaro.org
+> Subject: Re: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
+> VisionFive 2
 > 
+> On Thu, Dec 01, 2022 at 06:17:26AM +0000, JiaJie Ho wrote:
+> > > -----Original Message-----
+> > > From: Conor.Dooley@microchip.com <Conor.Dooley@microchip.com>
 > 
-> On Wed, 30 Nov 2022 13:52:13 +0800, Jia Jie Ho wrote:
-> > Add documentation to describe Starfive crypto driver bindings.
-> >
-> > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> > Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
-> > ---
-> >  .../bindings/crypto/starfive-crypto.yaml      | 109 ++++++++++++++++++
-> >  1 file changed, 109 insertions(+)
-> >  create mode 100644
-> > Documentation/devicetree/bindings/crypto/starfive-crypto.yaml
-> >
+> In that case, the SoB block should look like:
 > 
-> My bot found errors running 'make DT_CHECKER_FLAGS=-m
-> dt_binding_check'
-> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> Co-developed-by: Huan Feng <huan.feng@starfivetech.com>
+> Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
 > 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> Documentation/devicetree/bindings/crypto/starfive-
-> crypto.example.dts:21:18: fatal error: dt-bindings/clock/starfive-jh7110.h: No
-> such file or directory
->    21 |         #include <dt-bindings/clock/starfive-jh7110.h>
->       |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> compilation terminated.
-> make[1]: *** [scripts/Makefile.lib:406:
-> Documentation/devicetree/bindings/crypto/starfive-crypto.example.dtb]
-> Error 1
-> make[1]: *** Waiting for unfinished jobs....
-> make: *** [Makefile:1492: dt_binding_check] Error 2
-> 
-> doc reference errors (make refcheckdocs):
-> 
-> See https://patchwork.ozlabs.org/project/devicetree-
-> bindings/patch/20221130055214.2416888-6-jiajie.ho@starfivetech.com
-> 
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
+> Similarly for any other patches they may have co-developed :)
 > 
 
-Hi Rob Herring,
+I'll add these in the v2.
 
-The #include in example have dependencies on the following patches:
-https://patchwork.kernel.org/project/linux-riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
-https://patchwork.kernel.org/project/linux-riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
-I've noted them in the cover letter.
-How do I add them in this patch?
+> If the hardware is always present, why not drop the "disabled" in jh7110.dtsi
+> & these two entries marking them as "okay" in the .dts?
+> 
 
-Thanks,
+Okay, I'll update these too. 
+Thanks again for the suggestions.
+
+Best regards,
 Jia Jie
