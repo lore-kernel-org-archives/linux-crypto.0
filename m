@@ -2,109 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49035C47090
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 03:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48045C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 04:10:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbiLFDzg convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 22:55:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55534 "EHLO
+        id S231497AbiLFEK5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Dec 2022 23:10:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbiLFDzg (ORCPT
+        with ESMTP id S230232AbiLFEKy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 22:55:36 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BB715807;
-        Mon,  5 Dec 2022 19:55:34 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 9655F24DFC2;
-        Tue,  6 Dec 2022 11:55:27 +0800 (CST)
-Received: from EXMBX065.cuchost.com (172.16.6.65) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 11:55:27 +0800
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX065.cuchost.com
- (172.16.6.65) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 11:55:27 +0800
-Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
- EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
- 15.00.1497.044; Tue, 6 Dec 2022 11:55:27 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Conor Dooley <conor@kernel.org>
-CC:     "Conor.Dooley@microchip.com" <Conor.Dooley@microchip.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@esmil.dk" <kernel@esmil.dk>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>
-Subject: RE: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
- VisionFive 2
-Thread-Topic: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
- VisionFive 2
-Thread-Index: AQHZBH/4vZHP2U3n+EalaiuTkXOjPK5WreUAgAHaqdCAAEbuAIAHdAQg
-Date:   Tue, 6 Dec 2022 03:55:27 +0000
-Message-ID: <39ac3ec838e94154b232617433910352@EXMBX068.cuchost.com>
-References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-7-jiajie.ho@starfivetech.com>
- <1673ef8b-179e-3b03-b3f8-8d347c70d8c3@microchip.com>
- <4ddddceba3dc437daca27374dd2f6fd7@EXMBX068.cuchost.com>
- <Y4jslJfTVtQ9cIGm@spud>
-In-Reply-To: <Y4jslJfTVtQ9cIGm@spud>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.188.176.82]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Mon, 5 Dec 2022 23:10:54 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A6C186D8
+        for <linux-crypto@vger.kernel.org>; Mon,  5 Dec 2022 20:10:52 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p2PI9-004LBT-9L; Tue, 06 Dec 2022 12:10:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Dec 2022 12:10:49 +0800
+Date:   Tue, 6 Dec 2022 12:10:49 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/6] crypto/realtek: add new driver
+Message-ID: <Y47AycWFkn48EvL5@gondor.apana.org.au>
+References: <20221013184026.63826-1-markus.stockhausen@gmx.de>
+ <fe7800282ff11f7822778eb9109864f1f3b144f2.camel@gmx.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe7800282ff11f7822778eb9109864f1f3b144f2.camel@gmx.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Dec 05, 2022 at 07:47:59PM +0100, Markus Stockhausen wrote:
+>
+> as I got neither positive nor negative feedback after your last
+> question I just want to ask if there is any work for me to do on this
+> series?
 
+Sorry about that.
 
-> -----Original Message-----
-> From: Conor Dooley <conor@kernel.org>
-> Sent: Friday, December 2, 2022 2:04 AM
-> To: JiaJie Ho <jiajie.ho@starfivetech.com>
-> Cc: Conor.Dooley@microchip.com; robh+dt@kernel.org;
-> herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org;
-> kernel@esmil.dk; davem@davemloft.net; devicetree@vger.kernel.org;
-> linux-kernel@vger.kernel.org; linux-riscv@lists.infradead.org;
-> krzysztof.kozlowski+dt@linaro.org
-> Subject: Re: [PATCH 6/6] riscv: dts: starfive: Add crypto and DMA node for
-> VisionFive 2
-> 
-> On Thu, Dec 01, 2022 at 06:17:26AM +0000, JiaJie Ho wrote:
-> > > -----Original Message-----
-> > > From: Conor.Dooley@microchip.com <Conor.Dooley@microchip.com>
-> 
-> In that case, the SoB block should look like:
-> 
-> Co-developed-by: Huan Feng <huan.feng@starfivetech.com>
-> Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> 
-> Similarly for any other patches they may have co-developed :)
-> 
+There is still an issue with your import function.  You dereference
+the imported state directly.  That is not allowed because there is
+no guarantee that the imported state is aligned for a direct CPU
+load.
 
-I'll add these in the v2.
+So you'll either need to copy it somewhere first or use an unaligned
+load to access hexp->state.
 
-> If the hardware is always present, why not drop the "disabled" in jh7110.dtsi
-> & these two entries marking them as "okay" in the .dts?
-> 
-
-Okay, I'll update these too. 
-Thanks again for the suggestions.
-
-Best regards,
-Jia Jie
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
