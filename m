@@ -2,101 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D42C47088
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Dec 2022 21:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9372C4708C
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 03:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233396AbiLEVlb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 16:41:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40728 "EHLO
+        id S231990AbiLFDtD convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Dec 2022 22:49:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230289AbiLEVlb (ORCPT
+        with ESMTP id S230036AbiLFDtC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 16:41:31 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3816B27171;
-        Mon,  5 Dec 2022 13:41:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 99B9D6146E;
-        Mon,  5 Dec 2022 21:41:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87684C433C1;
-        Mon,  5 Dec 2022 21:41:27 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="UcX63CxV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1670276485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cd+XRNCKmMHT7hFR6etWaPdNaLOAGBor4KfIYpxPTiU=;
-        b=UcX63CxVLud3xJ7yYliyJ2IPekJGw8CsCg51VN7p+kv/6TMbQQMqBvjp8wY1lFXz77JzbG
-        wj4Tt4uzLPi3/F2UV8+PDDSsDKUQ+23n6PVQt+bYvBivST7DuFFlmeClAkyoZ9zEoddIDf
-        tL5RJVSkldP8/nY7JBdBKQE+J7nR3no=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0357b102 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Mon, 5 Dec 2022 21:41:25 +0000 (UTC)
-Date:   Mon, 5 Dec 2022 22:41:22 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Olivia Mackall <olivia@selenic.com>,
+        Mon, 5 Dec 2022 22:49:02 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D651ADBF;
+        Mon,  5 Dec 2022 19:49:00 -0800 (PST)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id B4A9A24DBE9;
+        Tue,  6 Dec 2022 11:48:52 +0800 (CST)
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
+ 2022 11:48:52 +0800
+Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
+ EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
+ 15.00.1497.044; Tue, 6 Dec 2022 11:48:52 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+To:     Rob Herring <robh@kernel.org>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "Rob Herring" <robh+dt@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Lin Jinhan <troy.lin@rock-chips.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "moderated list:ARM/Rockchip SoC support" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:ARM/Rockchip SoC support" 
-        <linux-rockchip@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/3] hwrng: add Rockchip SoC hwrng driver
-Message-ID: <Y45lguC4ZiniiWS/@zx2c4.com>
-References: <20221128184718.1963353-1-aurelien@aurel32.net>
- <20221128184718.1963353-3-aurelien@aurel32.net>
- <Y43uiVo41vljLsZM@zx2c4.com>
- <Y45j/hd2MnnXzcAo@aurel32.net>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>
+Subject: RE: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
+ driver
+Thread-Topic: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive
+ crypto driver
+Thread-Index: AQHZBH/2P5dLP9b8iUC7OZp9LCFzsa5W9X0AgAlLclA=
+Date:   Tue, 6 Dec 2022 03:48:52 +0000
+Message-ID: <14a3facb1fe642cba0048f2f2d0eb2e9@EXMBX068.cuchost.com>
+References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+ <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
+ <166981596611.1846501.537832446745968339.robh@kernel.org>
+In-Reply-To: <166981596611.1846501.537832446745968339.robh@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [202.188.176.82]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y45j/hd2MnnXzcAo@aurel32.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Aurelien,
 
-On Mon, Dec 05, 2022 at 10:34:54PM +0100, Aurelien Jarno wrote:
-> Well I am not sure it really matters. 90% is actually conservative, it's
-> the worst case I have seen, rounded down. However I often get much
-> better quality, see for instance the following run:
+
+> -----Original Message-----
+> From: Rob Herring <robh@kernel.org>
+> Sent: Wednesday, November 30, 2022 9:48 PM
+> To: JiaJie Ho <jiajie.ho@starfivetech.com>
+> Cc: linux-crypto@vger.kernel.org; linux-riscv@lists.infradead.org; Rob
+> Herring <robh+dt@kernel.org>; Herbert Xu
+> <herbert@gondor.apana.org.au>; Krzysztof Kozlowski
+> <krzysztof.kozlowski+dt@linaro.org>; linux-kernel@vger.kernel.org;
+> devicetree@vger.kernel.org; David S . Miller <davem@davemloft.net>
+> Subject: Re: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
+> driver
 > 
-> | Copyright (c) 2004 by Henrique de Moraes Holschuh
-> | This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-> | 
-> | rngtest: starting FIPS tests...
-> | rngtest: entropy source drained
-> | rngtest: bits received from input: 16777216
-> | rngtest: FIPS 140-2 successes: 819
-> | rngtest: FIPS 140-2 failures: 19
-> | rngtest: FIPS 140-2(2001-10-10) Monobit: 17
-> | rngtest: FIPS 140-2(2001-10-10) Poker: 0
-> | rngtest: FIPS 140-2(2001-10-10) Runs: 2
-> | rngtest: FIPS 140-2(2001-10-10) Long run: 2
-> | rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> | rngtest: input channel speed: (min=132.138; avg=137.848; max=147.308)Kibits/s
-> | rngtest: FIPS tests speed: (min=16.924; avg=20.272; max=20.823)Mibits/s
-> | rngtest: Program run time: 119647459 microseconds
 > 
-> Does the exact value has an importance there? I thought it was just
-> important to not overestimate the quality.
+> On Wed, 30 Nov 2022 13:52:13 +0800, Jia Jie Ho wrote:
+> > Add documentation to describe Starfive crypto driver bindings.
+> >
+> > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> > Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+> > ---
+> >  .../bindings/crypto/starfive-crypto.yaml      | 109 ++++++++++++++++++
+> >  1 file changed, 109 insertions(+)
+> >  create mode 100644
+> > Documentation/devicetree/bindings/crypto/starfive-crypto.yaml
+> >
+> 
+> My bot found errors running 'make DT_CHECKER_FLAGS=-m
+> dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> 
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> Documentation/devicetree/bindings/crypto/starfive-
+> crypto.example.dts:21:18: fatal error: dt-bindings/clock/starfive-jh7110.h: No
+> such file or directory
+>    21 |         #include <dt-bindings/clock/starfive-jh7110.h>
+>       |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> make[1]: *** [scripts/Makefile.lib:406:
+> Documentation/devicetree/bindings/crypto/starfive-crypto.example.dtb]
+> Error 1
+> make[1]: *** Waiting for unfinished jobs....
+> make: *** [Makefile:1492: dt_binding_check] Error 2
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.ozlabs.org/project/devicetree-
+> bindings/patch/20221130055214.2416888-6-jiajie.ho@starfivetech.com
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
 
-That's the right principle. I just worry about estimating it like that
-from looking at the output, rather than being derived from some
-knowledge about the hardware. Maybe 50% (quality=512) is more
-reasonable, so that it collects two bits for every one?
+Hi Rob Herring,
 
-Jason
+The #include in example have dependencies on the following patches:
+https://patchwork.kernel.org/project/linux-riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
+https://patchwork.kernel.org/project/linux-riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
+I've noted them in the cover letter.
+How do I add them in this patch?
+
+Thanks,
+Jia Jie
