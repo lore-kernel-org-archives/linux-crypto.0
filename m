@@ -2,94 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2262C636F9
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 08:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10BF4C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 09:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234229AbiLFIgC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Dec 2022 03:36:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32884 "EHLO
+        id S234450AbiLFI77 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Dec 2022 03:59:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234299AbiLFIfe (ORCPT
+        with ESMTP id S234451AbiLFI76 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Dec 2022 03:35:34 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A757A17A84;
-        Tue,  6 Dec 2022 00:35:11 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 1B97B24E277;
-        Tue,  6 Dec 2022 16:35:09 +0800 (CST)
-Received: from EXMBX067.cuchost.com (172.16.6.67) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 16:35:09 +0800
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX067.cuchost.com
- (172.16.6.67) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 16:35:09 +0800
-Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
- EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
- 15.00.1497.044; Tue, 6 Dec 2022 16:35:09 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
- driver
-Thread-Topic: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive
- crypto driver
-Thread-Index: AQHZBH/2P5dLP9b8iUC7OZp9LCFzsa5W7gcAgAHFddD//4unAIAIUqbQ
-Date:   Tue, 6 Dec 2022 08:35:09 +0000
-Message-ID: <e732d81f8d86499eb5e8fa9febc8cb68@EXMBX068.cuchost.com>
-References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
- <8a8f502e-e0ed-d638-0b56-74edcbca2134@linaro.org>
- <aa388c8c99b74436ad556aeb47a5c60a@EXMBX068.cuchost.com>
- <2886dd64-435d-1cdb-168d-5851c37dc538@linaro.org>
-In-Reply-To: <2886dd64-435d-1cdb-168d-5851c37dc538@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.188.176.82]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 6 Dec 2022 03:59:58 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4801D0F0
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Dec 2022 00:59:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+        t=1670317190; bh=5XPl1ihXN6xQ6b3jFPXWFdMdjAEy0aAHItOv+OfgLrg=;
+        h=X-UI-Sender-Class:Subject:From:To:Cc:Date:In-Reply-To:References;
+        b=K3ZhFwB/ahesFHIDHngsmim6+dfxNDjpkUEXzJKRRJuvwey8EpCfDzmMAwOtQZ/wA
+         EOXR+QK0wgWmheyjqDKduOe24FTw3NzlA6iRJjVJzH5VbIFFV6+hwHRC7XR3FSRvtV
+         TxCrtSsHwzt2ZWDrUuOQzLzw66Y+AWzj8PuF0pmQqwclDXejUIGICe/gbtwIoIKpAJ
+         mw64E6tu77/44u+1A5PKP4+PNu9C59vnIKNW/RvY1720naxhbxVPo9zqz+hJ1ZUNq1
+         1yX7TCCxgnYVLn4shMnUWoCK/4BP3K+4rzWJB6Q6+mb/uvK5YA2xQ1EIn6kW2aSEQG
+         16sxEiHFo1pRw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [10.0.2.15] ([94.31.87.22]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MYvY2-1pXOli1beq-00UpVv; Tue, 06
+ Dec 2022 09:59:50 +0100
+Message-ID: <c5fcd63053fb117582fc8788e276fa5d6ffd3e78.camel@gmx.de>
+Subject: Re: [PATCH 0/6] crypto/realtek: add new driver
+From:   Markus Stockhausen <markus.stockhausen@gmx.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org
+Date:   Tue, 06 Dec 2022 09:59:49 +0100
+In-Reply-To: <Y47AycWFkn48EvL5@gondor.apana.org.au>
+References: <20221013184026.63826-1-markus.stockhausen@gmx.de>
+         <fe7800282ff11f7822778eb9109864f1f3b144f2.camel@gmx.de>
+         <Y47AycWFkn48EvL5@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
 MIME-Version: 1.0
+X-Provags-ID: V03:K1:MjvBCBZBtVUjBCRC/DwyKqh3747SNjuFNCOq1gpAPgc00JCB/4e
+ UpK+GshqDIHmEGj8rzjfdoJnJJTT/oUMJWGhE0XUyPfmZK2ZsiuGqWgP0+HGks0GWBANA72
+ my40B1j9Ip7mskoCaNCgFVPm2Naaa8YPOF28qNlC6ZFbfAcAshEcVV8xYoue2cTWnzweuqv
+ zUXxgODALFJccsJxVarmg==
+UI-OutboundReport: notjunk:1;M01:P0:6dYnmstFxE8=;EO2BHFZCqvBhjyNFAjL+9OKLzTR
+ vBgma9wVqdfMswR9pYxJhScl4+7+VVxInddbzh+n1hTjjTvzLDOFRXOcZztES5bSPxNn9NkzB
+ pFybsFiIoBWu9f0oX5UCx62h0CInnB+PSNW9HLm25OlTN9MckLC8dk+uzphtO3Wy0Y4sboufW
+ v5SMKm55aRDD1kfqG+n6W3g8FQiWlm6CGRRw1P3R+FYJ+GTIZq4hFv85gpXXAI9AO5IB4Hg4W
+ X/uaNJFjWh1sHd9MDnbEFEFq8+BNXmiJfo6CwIq8D2krMtjQy4yc7k+Nz5VDWMoFItPcOv4ww
+ g4VHdtthPXjmsww1+SliCmFZBMyvvJRYYbqdQk7clmP5Q86rD8f/39PDEHPrZLPfADR6tqoLO
+ GGDQLBB3gdNmh8Jbel/GjOusU06N6oM4PjEr9b8DPKqaIo7vu7g87yetkI7mbtJcb+OS6A8Ig
+ 82Km5l5DTakayWRHKyeWrzIKmDYCNHaD/FQXLKBQOgwCAF1+4VIczVtkC6J4DaV1yPZGhOyet
+ ewTYSj1UV5wQlI6gSHr9JeidKv+3tyaiSgxcDEnwPYwu4Z+TBpk05xzgDBSvtX8lAxOqosF+T
+ A/EP1msI4X4GJjONUDFW/j+YFI8OrVglgecHAaDbf5bM+n/b3imWNZ7VGvlzfLq44leEwOcR0
+ i4mvgRMLYI31PFz7j3jYMCz7LFcwu9E4hGhHkTbT3fX4M4nsE6PhLx3et+Ow2mNXTCegcK7br
+ k+ose5+cmSS4UztBBsQ/muZYEumx2VE+iGYekvvnHC2xphpMdv94LLC5yFb/tA3ePyu8AGk1q
+ 0Iz5p9P4qp0+5YuULq8J1vH+3wzrDDCFVnmvRY42BZluwpBgzJUPR94ihXRLhC2eJ/WUgjqaJ
+ d+aSnEHBmWyyASQENJsrYBDkuDeniMg0JPXdHCjf0GG+4IcKMDInsb8+tqWpX7x51zL90F+3p
+ v3Izzw==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBUaHVyc2RheSwg
-RGVjZW1iZXIgMSwgMjAyMiA1OjI3IFBNDQo+IFRvOiBKaWFKaWUgSG8gPGppYWppZS5ob0BzdGFy
-Zml2ZXRlY2guY29tPjsgSGVyYmVydCBYdQ0KPiA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
-PjsgRGF2aWQgUyAuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47DQo+IFJvYiBIZXJyaW5n
-IDxyb2JoK2R0QGtlcm5lbC5vcmc+OyBLcnp5c3p0b2YgS296bG93c2tpDQo+IDxrcnp5c3p0b2Yu
-a296bG93c2tpK2R0QGxpbmFyby5vcmc+DQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwu
-b3JnOyBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmc7IGxpbnV4LXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmcNCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCA1LzZdIGR0LWJpbmRpbmdzOiBjcnlwdG86IEFkZCBiaW5kaW5ncyBmb3IgU3RhcmZp
-dmUgY3J5cHRvDQo+IGRyaXZlcg0KPiANCj4gT24gMDEvMTIvMjAyMiAxMDowMSwgSmlhSmllIEhv
-IHdyb3RlOg0KPiANCj4gPj4+ICsNCj4gPj4+ICsgIGVuYWJsZS1zaWRlLWNoYW5uZWwtbWl0aWdh
-dGlvbjoNCj4gPj4+ICsgICAgZGVzY3JpcHRpb246IEVuYWJsZSBzaWRlLWNoYW5uZWwtbWl0aWdh
-dGlvbiBmZWF0dXJlIGZvciBBRVMgbW9kdWxlLg0KPiA+Pj4gKyAgICAgICAgRW5hYmxpbmcgdGhp
-cyBmZWF0dXJlIHdpbGwgYWZmZWN0IHRoZSBzcGVlZCBwZXJmb3JtYW5jZSBvZg0KPiA+Pj4gKyAg
-ICAgICAgY3J5cHRvIGVuZ2luZS4NCj4gPj4+ICsgICAgdHlwZTogYm9vbGVhbg0KPiA+Pg0KPiA+
-PiBXaHkgZXhhY3RseSB0aGlzIGlzIGEgaGFyZHdhcmUgKERUKSBwcm9wZXJ0eSwgbm90IHJ1bnRp
-bWU/DQo+ID4+DQo+ID4NCj4gPiBUaGlzIGlzIGEgaGFyZHdhcmUgc2V0dGluZyBwcm92aWRlZCBp
-biBTdGFyRml2ZSBjcnlwdG8gZW5naW5lIG9ubHkuDQo+ID4gVGhlIGNyeXB0byBBUEkgZG9lc24n
-dCBjb250cm9sIHRoaXMgc2V0dGluZyBkdXJpbmcgcnVudGltZSBhbmQgbGVhdmluZyB0aGlzDQo+
-IGFsd2F5cyBvbiB3aWxsIGltcGFjdCBzcGVlZCBwZXJmb3JtYW5jZS4NCj4gPiBTbywgSSBhZGRl
-ZCB0aGlzIHByb3BlcnR5IHRvIGFsbG93IHVzZXIgdG8gY29udHJvbCB0aGlzIGluIGR0Yi4NCj4g
-DQo+IERldmljZXRyZWUgc2hvdWxkIG5vdCBkZXNjcmliZSBwb2xpY2llcywgc28gd2l0aG91dCBq
-dXN0aWZpY2F0aW9uIGl0IGRvZXMgbm90DQo+IGxvb2sgbGlrZSBoYXJkd2FyZSBwcm9wZXJ0eS4g
-RHJvcC4NCj4gDQpJJ2xsIHJlbW92ZSB0aGlzIGluIHYyIGFuZCBzZXQgdGhlIHZhbHVlIHVzaW5n
-IG1vZHVsZSBwYXJhbSBpbnN0ZWFkLg0KVGhhbmtzLg0KDQpCZXN0IHJlZ2FyZHMsDQpKaWEgSmll
-DQo=
+Am Dienstag, dem 06.12.2022 um 12:10 +0800 schrieb Herbert Xu:
+> On Mon, Dec 05, 2022 at 07:47:59PM +0100, Markus Stockhausen wrote:
+> >=20
+> > as I got neither positive nor negative feedback after your last
+> > question I just want to ask if there is any work for me to do on
+> > this
+> > series?
+>=20
+> Sorry about that.
+>=20
+> There is still an issue with your import function.=C2=A0 You dereference
+> the imported state directly.=C2=A0 That is not allowed because there is
+> no guarantee that the imported state is aligned for a direct CPU
+> load.
+>=20
+> So you'll either need to copy it somewhere first or use an unaligned
+> load to access hexp->state.
+>=20
+> Cheers,
+
+No problem,
+
+this is something I can work with. Nevertheless I'm unsure about your
+guidance. If I get it right, the state assignment is not ok.
+
+	...
+	const struct rtcr_ahash_req *hexp =3D in;
+
+	hreq->state =3D hexp->state; << *** maybe unaligned? ***
+	if (hreq->state & RTCR_REQ_FB_ACT)
+		hreq->state |=3D RTCR_REQ_FB_RDY;
+
+	if (rtcr_check_fallback(areq))
+		return crypto_ahash_import(freq, fexp);
+
+	memcpy(hreq, hexp, sizeof(struct rtcr_ahash_req));
+	...
+
+Comparing this to safeexcel_ahash_import() where I got my ideas from
+one sees a similar coding:
+
+	...
+	const struct safexcel_ahash_export_state *export =3D in;
+	int ret;
+
+	ret =3D crypto_ahash_init(areq);
+	if (ret)
+		return ret;
+
+	req->len =3D export->len; << *** same here ***
+	req->processed =3D export->processed;
+
+	req->digest =3D export->digest;
+
+	memcpy(req->cache, export->cache, HASH_CACHE_SIZE);
+	memcpy(req->state, export->state, req->state_sz);
+	...
+
+Thanks in advance for your help.
+
