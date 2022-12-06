@@ -2,87 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042B2C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 04:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9051EC352A1
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 06:28:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230348AbiLFE1W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Dec 2022 23:27:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38000 "EHLO
+        id S233536AbiLFG2a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Dec 2022 01:28:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiLFE1W (ORCPT
+        with ESMTP id S229936AbiLFG21 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Dec 2022 23:27:22 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897421A3B5;
-        Mon,  5 Dec 2022 20:27:19 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p2PXr-004LJG-Ep; Tue, 06 Dec 2022 12:27:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Dec 2022 12:27:03 +0800
-Date:   Tue, 6 Dec 2022 12:27:03 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        "ap420073@gmail.com" <ap420073@gmail.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
-Message-ID: <Y47El6TRitHm7Xz9@gondor.apana.org.au>
-References: <20221103042740.6556-1-elliott@hpe.com>
- <20221116041342.3841-1-elliott@hpe.com>
- <20221116041342.3841-11-elliott@hpe.com>
- <Y3TF7/+DejcnN0eV@zx2c4.com>
- <Y4B/kjS0lgzdUJHG@gondor.apana.org.au>
- <MW5PR84MB1842C2D1EA00D5EF65784E25AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
- <Y4nEcV4w3eOEFYze@gondor.apana.org.au>
- <MW5PR84MB184215302DC8E824812D6B13AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+        Tue, 6 Dec 2022 01:28:27 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84F92715C;
+        Mon,  5 Dec 2022 22:28:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zvJHRg8epOGP7B5mR8RnlBGi9TRfSPxBhBQXSLBakps=; b=DOU8MPSo4/6Yazfa2uAn8wzXSS
+        eFsmLNzVCEYxo5MoDVzwF2EepzbtjgG3Uj8csdjHne35+YBCYYXFH6WOnvTzHKZQNf25x06nyWsz5
+        Hy5306ZvwyeXOSQ8GjrtnL/G/5wvYtKutyu17uvfXmKTF5cOCKuv51k2F7qyYJ8CLHj1fWvaDTHkP
+        LN9nyRPZCXa2+qv688B642E7P97BNxw7Jl+rktMfTWym9G8fOII5Y/FoR1mn474mGflPHSrPyKKEw
+        XWsgUkFvndIeYNrKBxJ5bMGsIWXZJOWztZscwkmNzxDeIs+EMZebJsdRko/nTwfiNulIRVsaWOYjE
+        b66gqmfg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p2RQs-0026iT-33; Tue, 06 Dec 2022 06:27:58 +0000
+Date:   Mon, 5 Dec 2022 22:27:58 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LinuxKernelMailingList@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 0/10] crypto: Driver conversions for DMA alignment
+Message-ID: <Y47g7qO8dsRdxCgf@infradead.org>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+ <Y4xpGNNsfbucyUlt@infradead.org>
+ <Y47BgCuZsYLX61A9@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MW5PR84MB184215302DC8E824812D6B13AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <Y47BgCuZsYLX61A9@gondor.apana.org.au>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 02, 2022 at 04:15:23PM +0000, Elliott, Robert (Servers) wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > Sent: Friday, December 2, 2022 3:25 AM
-> > To: Elliott, Robert (Servers) <elliott@hpe.com>
-> > Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
-> > 
-> > On Fri, Dec 02, 2022 at 06:21:02AM +0000, Elliott, Robert (Servers) wrote:
-> ...
-> > BTW, just a minor nit but you can delete the cond_resched() call
-> > because kernel_fpu_end()/preempt_enable() will do it anyway.
-> 
-> That happens under
-> 	CONFIG_PREEMPTION=y
-> (from include/Linux/preempt.h and arch/x86/include/asm/preempt.h)
-> 
-> Is calling cond_resched() still helpful if that is not the configuration?
+On Tue, Dec 06, 2022 at 12:13:52PM +0800, Herbert Xu wrote:
+> Yes they're clearly bogus.  Basically they are saying they want
+> memory that is aligned sufficiently for DMA.  So if Catalin's
+> patch-set will break this assumption, then all the GFP_DMA allocations
+> in drivers/crypto will need to be enlarged to take this into
+> account.
 
-Perhaps, but then again perhaps if preemption is off, maybe we
-shouldn't even bother with the 4K split.  Were the initial
-warnings with or without preemption?
-
-Personally I don't really care since I always use preemption.
-
-The PREEMPT Kconfigs do provide a bit of nuance with the split
-between PREEMPT_NONE vs. PREEMPT_VOLUNTARY.  But perhaps that is
-just overkill for our situation.
-
-I'll leave it to you to decide :)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+But GFP_DMA never did do anything at all about alignment.  It picks
+allocations from ZONE_DMA (which on x86 is the first 16MB only).
