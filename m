@@ -2,96 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDFCC4708E
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 14:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2E5C352A1
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 14:44:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231866AbiLFODx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Dec 2022 09:03:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53502 "EHLO
+        id S234618AbiLFOoZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Dec 2022 09:44:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231668AbiLFODv (ORCPT
+        with ESMTP id S234139AbiLFOoY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Dec 2022 09:03:51 -0500
-Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C372A26D
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Dec 2022 06:03:48 -0800 (PST)
-Date:   Tue, 06 Dec 2022 14:03:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-        s=protonmail; t=1670335425; x=1670594625;
-        bh=iI12qbM8aQ4mHnBTuYsibQkXVSzIxzzhq3+3w/j4qMk=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=1H7Cdv/ZMoq+ZpuB0+ArGn7ucqhPLWzCLL1VMb55DszsJ+VjInCVu/eB+B5MY3gGm
-         CQD8wLteOV71sAEEPaevLcn5iKU6R6WJ454c8Ox0LfLHj7oI91xr3x8yUbL99KtbHp
-         JSrf4Qy6fboVs2C0A1qjqBoJrXw+O+H8jXnaaImEoJOyCVKOhSs4m01k5c9eI3Lywy
-         r/+WVCes2BaiuI/Ylue9YDvkRN6qyYSvnkK31dsvd5SH25sr//oNHHcSrwiwXQzqsj
-         yz0WQwn05KKCr9onduxV1HAGOiw0+H8PZDEqkmaS6QCYa/u92JGYgVmWP5id/YKBjR
-         EXEZvDft0B25w==
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-From:   Peter Lafreniere <peter@n8pjl.ca>
-Cc:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        Tue, 6 Dec 2022 09:44:24 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5351C23399
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Dec 2022 06:44:21 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-281-LsLMPZAZOU6vU66casKxsQ-1; Tue, 06 Dec 2022 14:44:18 +0000
+X-MC-Unique: LsLMPZAZOU6vU66casKxsQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
+ 2022 14:44:17 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Tue, 6 Dec 2022 14:44:17 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Peter Lafreniere' <peter@n8pjl.ca>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
         "ap420073@gmail.com" <ap420073@gmail.com>,
         "ardb@kernel.org" <ardb@kernel.org>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
         "ebiggers@kernel.org" <ebiggers@kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
-Message-ID: <5TnEjVPNm7Eyw-GH7C0LeJJvgRSpOLb2NUshnG407s3TGTXL1lq4RpsoAMTpVGKWk7tVxDI5f2G9aH6lDbATR6QqXXkE7q54o7TUzO91ibI=@n8pjl.ca>
-In-Reply-To: <Y47El6TRitHm7Xz9@gondor.apana.org.au>
-References: <20221103042740.6556-1-elliott@hpe.com> <20221116041342.3841-1-elliott@hpe.com> <20221116041342.3841-11-elliott@hpe.com> <Y3TF7/+DejcnN0eV@zx2c4.com> <Y4B/kjS0lgzdUJHG@gondor.apana.org.au> <MW5PR84MB1842C2D1EA00D5EF65784E25AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM> <Y4nEcV4w3eOEFYze@gondor.apana.org.au> <MW5PR84MB184215302DC8E824812D6B13AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM> <Y47El6TRitHm7Xz9@gondor.apana.org.au>
-Feedback-ID: 53133685:user:proton
+Subject: RE: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Topic: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
+Thread-Index: AQHZCXuUthnlIbrum024abYi187HBa5g7Jiw
+Date:   Tue, 6 Dec 2022 14:44:17 +0000
+Message-ID: <4f72e36f960347b29d1d6b3e59cdb8a2@AcuMS.aculab.com>
+References: <20221103042740.6556-1-elliott@hpe.com>
+ <20221116041342.3841-1-elliott@hpe.com>
+ <20221116041342.3841-11-elliott@hpe.com> <Y3TF7/+DejcnN0eV@zx2c4.com>
+ <Y4B/kjS0lgzdUJHG@gondor.apana.org.au>
+ <MW5PR84MB1842C2D1EA00D5EF65784E25AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+ <Y4nEcV4w3eOEFYze@gondor.apana.org.au>
+ <MW5PR84MB184215302DC8E824812D6B13AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+ <Y47El6TRitHm7Xz9@gondor.apana.org.au>
+ <5TnEjVPNm7Eyw-GH7C0LeJJvgRSpOLb2NUshnG407s3TGTXL1lq4RpsoAMTpVGKWk7tVxDI5f2G9aH6lDbATR6QqXXkE7q54o7TUzO91ibI=@n8pjl.ca>
+In-Reply-To: <5TnEjVPNm7Eyw-GH7C0LeJJvgRSpOLb2NUshnG407s3TGTXL1lq4RpsoAMTpVGKWk7tVxDI5f2G9aH6lDbATR6QqXXkE7q54o7TUzO91ibI=@n8pjl.ca>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > > BTW, just a minor nit but you can delete the cond_resched() call
-> > > because kernel_fpu_end()/preempt_enable() will do it anyway.
-> >=20
-> > That happens under
-> > CONFIG_PREEMPTION=3Dy
-> > (from include/Linux/preempt.h and arch/x86/include/asm/preempt.h)
-> >=20
-> > Is calling cond_resched() still helpful if that is not the configuratio=
-n?
->=20
->=20
-> Perhaps, but then again perhaps if preemption is off, maybe we
-> shouldn't even bother with the 4K split. Were the initial
-> warnings with or without preemption?
->=20
-> Personally I don't really care since I always use preemption.
->=20
-> The PREEMPT Kconfigs do provide a bit of nuance with the split
-> between PREEMPT_NONE vs. PREEMPT_VOLUNTARY. But perhaps that is
-> just overkill for our situation.
-
-I was thinking about this a few days ago, and my 2=C2=A2 is that it's=20
-probably best to not preempt the kernel in the middle of a crypto=20
-operation under PREEMPT_VOLUNTARY. We're already not preempting during=20
-these operations, and there haven't been complaints of excessive latency=20
-because of these crypto operations.
-
-If we skip the kernel_fpu_{begin,end} pair when not under=20
-CONFIG_PREEMPT, we'll save a significant cycle count that is wasted=20
-currently. See Elliot Robert's numbers on conditional begin/end in sha=20
-to see the benefits of not saving/restoring unnecessarily: "10% of the=20
-CPU cycles spent making the [kernel_fpu_{begin,end}] calls".
-
-> I'll leave it to you to decide :)
-
-One extra thought: commit 827ee47: "crypto: x86 - add some helper macros=20
-for ECB and CBC modes" makes a mention of fpu save/restore being done=20
-lazily. I don't know the details, so would that change this discussion?
-
-Thanks for listening,
-
-Peter Lafreniere <peter@n8pjl.ca>
+RnJvbTogUGV0ZXIgTGFmcmVuaWVyZQ0KPiBTZW50OiAwNiBEZWNlbWJlciAyMDIyIDE0OjA0DQo+
+DQo+ID4gPiA+IEJUVywganVzdCBhIG1pbm9yIG5pdCBidXQgeW91IGNhbiBkZWxldGUgdGhlIGNv
+bmRfcmVzY2hlZCgpIGNhbGwNCj4gPiA+ID4gYmVjYXVzZSBrZXJuZWxfZnB1X2VuZCgpL3ByZWVt
+cHRfZW5hYmxlKCkgd2lsbCBkbyBpdCBhbnl3YXkuDQo+ID4gPg0KPiA+ID4gVGhhdCBoYXBwZW5z
+IHVuZGVyDQo+ID4gPiBDT05GSUdfUFJFRU1QVElPTj15DQo+ID4gPiAoZnJvbSBpbmNsdWRlL0xp
+bnV4L3ByZWVtcHQuaCBhbmQgYXJjaC94ODYvaW5jbHVkZS9hc20vcHJlZW1wdC5oKQ0KPiA+ID4N
+Cj4gPiA+IElzIGNhbGxpbmcgY29uZF9yZXNjaGVkKCkgc3RpbGwgaGVscGZ1bCBpZiB0aGF0IGlz
+IG5vdCB0aGUgY29uZmlndXJhdGlvbj8NCj4gPg0KPiA+DQo+ID4gUGVyaGFwcywgYnV0IHRoZW4g
+YWdhaW4gcGVyaGFwcyBpZiBwcmVlbXB0aW9uIGlzIG9mZiwgbWF5YmUgd2UNCj4gPiBzaG91bGRu
+J3QgZXZlbiBib3RoZXIgd2l0aCB0aGUgNEsgc3BsaXQuIFdlcmUgdGhlIGluaXRpYWwNCj4gPiB3
+YXJuaW5ncyB3aXRoIG9yIHdpdGhvdXQgcHJlZW1wdGlvbj8NCj4gPg0KPiA+IFBlcnNvbmFsbHkg
+SSBkb24ndCByZWFsbHkgY2FyZSBzaW5jZSBJIGFsd2F5cyB1c2UgcHJlZW1wdGlvbi4NCj4gPg0K
+PiA+IFRoZSBQUkVFTVBUIEtjb25maWdzIGRvIHByb3ZpZGUgYSBiaXQgb2YgbnVhbmNlIHdpdGgg
+dGhlIHNwbGl0DQo+ID4gYmV0d2VlbiBQUkVFTVBUX05PTkUgdnMuIFBSRUVNUFRfVk9MVU5UQVJZ
+LiBCdXQgcGVyaGFwcyB0aGF0IGlzDQo+ID4ganVzdCBvdmVya2lsbCBmb3Igb3VyIHNpdHVhdGlv
+bi4NCj4gDQo+IEkgd2FzIHRoaW5raW5nIGFib3V0IHRoaXMgYSBmZXcgZGF5cyBhZ28sIGFuZCBt
+eSAywqIgaXMgdGhhdCBpdCdzDQo+IHByb2JhYmx5IGJlc3QgdG8gbm90IHByZWVtcHQgdGhlIGtl
+cm5lbCBpbiB0aGUgbWlkZGxlIG9mIGEgY3J5cHRvDQo+IG9wZXJhdGlvbiB1bmRlciBQUkVFTVBU
+X1ZPTFVOVEFSWS4gV2UncmUgYWxyZWFkeSBub3QgcHJlZW1wdGluZyBkdXJpbmcNCj4gdGhlc2Ug
+b3BlcmF0aW9ucywgYW5kIHRoZXJlIGhhdmVuJ3QgYmVlbiBjb21wbGFpbnRzIG9mIGV4Y2Vzc2l2
+ZSBsYXRlbmN5DQo+IGJlY2F1c2Ugb2YgdGhlc2UgY3J5cHRvIG9wZXJhdGlvbnMuDQouLi4NCg0K
+UHJvYmFibHkgYmVjYXVzZSB0aGUgcGVvcGxlIHdobyBoYXZlIGJlZW4gc3VmZmVyaW5nIGZyb20g
+KGFuZA0KbG9va2luZyBmb3IpIGxhdGVuY3kgaXNzdWVzIGFyZW4ndCBydW5uaW5nIGNyeXB0byB0
+ZXN0cy4NCg0KSSd2ZSBmb3VuZCBzb21lIHRlcnJpYmxlIHByZS1lbXB0aW9uIGxhdGVuY3kgaXNz
+dWVzIHRyeWluZw0KdG8gZ2V0IFJUIHByb2Nlc3NlcyBzY2hlZHVsZWQgaW4gYSBzZW5zaWJsZSB0
+aW1lZnJhbWUuDQpJIHdvdWxkbid0IHdvcnJ5IGFib3V0IDEwMHVzIC0gSSdtIGRvaW5nIGF1ZGlv
+IHByb2Nlc3NpbmcNCmV2ZXJ5IDEwbXMsIGJ1dCBhbnl0aGluZyBtdWNoIGxvbmdlciBjYXVzZXMg
+cHJvYmxlbXMgd2hlbg0KdHJ5aW5nIHRvIHVzZSA5MCslIG9mIHRoZSBjcHUgdGltZSBmb3IgbG90
+cyBvZiBhdWRpbyBjaGFubmVscy4NCg0KSSBkaWRuJ3QgdHJ5IGEgQ09ORklHX1JUIGtlcm5lbCwg
+dGhlIGFwcGxpY2F0aW9uIG5lZWRzIHRvIHJ1bg0Kb24gYSBzdGFuZGFyZCAnZGlzdHJvJyBrZXJu
+ZWwuIEluIGFueSBjYXNlIEkgc3VzcGVjdCBhbGwgdGhlDQpleHRyYSBwcm9jZXNzZXMgc3dpdGNo
+ZXMgKGV0YykgdGhlIFJUIGtlcm5lbCBhZGRzIHdpbGwgY29tcGxldGVseQ0Ka2lsbCBwZXJmb3Jt
+YW5jZS4NCg0KSSB3b25kZXIgaG93IG11Y2ggaXQgd291bGQgY29zdCB0byBtZWFzdXJlIHRoZSB0
+aW1lIHNwZW50IHdpdGgNCnByZS1lbXB0IGRpc2FibGVkIChhbmQgbm90IGNoZWNrZWQpIGFuZCB0
+byB0cmFjZSBsb25nIGludGVydmFscy4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVz
+cyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEg
+MVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
