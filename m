@@ -2,124 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D094CC3A5A7
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 19:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2C9C63704
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 19:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbiLFTUs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Dec 2022 14:20:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54940 "EHLO
+        id S229701AbiLFTUu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Dec 2022 14:20:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229701AbiLFTUp (ORCPT
+        with ESMTP id S229702AbiLFTUp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 6 Dec 2022 14:20:45 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3853641990
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F00940902
         for <linux-crypto@vger.kernel.org>; Tue,  6 Dec 2022 11:20:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-        t=1670354441; bh=f9WWL0ZIKMD+NKnDzl903S+l3tToc5izqiOcKL+3HcU=;
+        t=1670354441; bh=qhP4xagevY2rvdNlq0yus5MslI8QTd0WduUXHJHOFhE=;
         h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=LwV1T7u6KVoUhDAgLSfGZ19lnpLo3Wh6Es3czVCO2RHN8/yv/VybdsJsy8WAu9t70
-         ERcoOInRD3cXNHqlsoknqmAEVhsFmh80w/s1tRClTXFBbXdu1GKIb/ZDBlU9fJRbgR
-         hjP+XvZsa52KT+czX1WYFZIsWWk6jn3M7huLR3PSq2S+jXP03Xn6JhNyNRKkHrqQGz
-         vaEhckGAAbKihGYSZbOKQXR4bAR6/nkWPn4CFdSo0PMkPpUNKZ6AVqadU6bHXYz4AH
-         oTwH/dHW4ek+yMzgK7jBbiOKdn5v5sek9+knhuI29C5dF7bjMiE0MPRZ7ildUh+5Ox
-         ew3N3N94pSY/Q==
+        b=d9HPfjA6z7darC+JVcKrCwfpR1Ut9J2dMSFD3WWpfjEHMlNLxpbQWMGRkiN7CuPNm
+         iJjoalBOHaEJ4APYzsKPgNbMI02K+4oRPqIQdfCs6usdMarMBLi7NiXs2/x+pSeDZ3
+         JZDMrMFUVsZJWhGByvF3AZVsr8ErI0dZAT3pFHILz3Xb/FVWsPDmmYuQ/QnyHsij6v
+         m5ULOJf0AT5Bx4imjwHrCXV5qbJSt+lkqaOgSOZv6/MX19h2Dyo0zYttkqDN0VW2vH
+         3OE+IS3zxNibRBuWdNfdFA804NQ6lM7x5YPNCyxOhJYd1gafiSe/2t4kKWpRnV6yyw
+         cEwkdo/t8oPcw==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from fedora.willemsstb.de ([94.31.87.22]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MhU9Z-1oWrFa1kzT-00ed5y; Tue, 06
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1N3bWr-1osydu2Hyd-010bwE; Tue, 06
  Dec 2022 20:20:41 +0100
 From:   Markus Stockhausen <markus.stockhausen@gmx.de>
 To:     linux-crypto@vger.kernel.org
 Cc:     Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH v2 5/6] crypto/realtek: enable module
-Date:   Tue,  6 Dec 2022 20:20:36 +0100
-Message-Id: <20221206192037.608808-6-markus.stockhausen@gmx.de>
+Subject: [PATCH v2 6/6] crypto/realtek: add devicetree documentation
+Date:   Tue,  6 Dec 2022 20:20:37 +0100
+Message-Id: <20221206192037.608808-7-markus.stockhausen@gmx.de>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221206192037.608808-1-markus.stockhausen@gmx.de>
 References: <20221206192037.608808-1-markus.stockhausen@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:o4VE5jya59gO1oVlc7LTFfX3/1dQFWYti3MZ09wjp1NjDy8YMgp
- qTBYBAPYWSzxESVWtlgIPDpdHXDDsUchjdflDcDJeY5zlnaI0kH51PHWsSBd7CLkUrm6EBN
- 5eYRDENteV/sHaRUdElkyYsuFuxg4v3P1gv5KKadDiUjxUBo+12yMNqXf8rochQNi67XiPX
- 03HKmEh1o99jI4JTgAvRw==
-UI-OutboundReport: notjunk:1;M01:P0:wkg6hHHot/Y=;bx26l6Ur3oA8p7+EVzCua9qBEsl
- ePnyex1x/X4iMbBOo3stXYMPLkGa4I1Q7A07IUQMurHLU5PmJfyfesFCbCz7dUkuiMU/aflu+
- KbJ3s/C1G2BR+bfXacn6yMtxOhq2WZQUeQeMJEQ6O3bTDRPIT9xHLlO0mqMbPEiGSTbntdVOF
- U3JbdYTzf/90hNj+DHui2o9v8IoKrTnGqiN/FvYyvPUTnH4QYen/NKB8AAcdn4tZ8XsK0TTfT
- NTHVzZ1WRUagOrfypoN6yxMBZx9iuA74W7l2+LN7fUdfALJOxCNpesZ27k/fv4NNRpf3PocHb
- eJ8of9rH1zSVX7pz4Wj0QAcDfsPR+oaF6hlEmXywyBwBtGKeTaZot3mRsnzblEswo/ZiPZZL8
- jF+KyTxMEHa+DsvX7/UObZXSUGg78BuLvUTYvNSOqLAnrq9FbaDKuPetJPYgmSFR2O5i0GKTU
- 8N09YA1QmLKJsj2eLpjYOifJzSsIV9pu3x8mYgErwXTPxcBrz46TDvnDjsrshe7+c9tz+RSEl
- VmJGi5PwZ+coU2ab9Aoz/CVVOwpBkOrOnNv0TnUX2Dqy+5X03nFY9SMC7ooALiYDnV9CJIYTT
- pmfwa0+esxiHnHaiVa9wZXml4Ya46eQdzY+ASmrXE8wBedUR/6stCbac9MZcI5Gi8LxI5R3SL
- fFQFFTH1gaLiNPDADtxXAFI7bN81yHCeWsawZEirf79hYIS5W/vPDEglS5QDqdgWuhEugDjtM
- k4QmlSXJf9XRQeE44S8WU+yKHul+MgibP5bkL//X/1iMu2o/eV4MfriMawrHj3+HE57j9Rzs/
- MdENYp3LPuxwrspYUkYQOlsKuSrtolMj0ciVjqbv5jprBmE8FoNMcQGA7irFN4+R1ztoxComU
- +te3VGqsCJWtYUYMMV+LWnLusqgv2n/O7Imh7gl1vvz4iubcKv7h9BcV6rKUUcBw7e3vh4C9s
- BwDU5a+Lj2Lp2YdtzqbPOryTFT0=
+X-Provags-ID: V03:K1:4ydH6bfS5gSYDeu1BxjlbMefgyBp7SJJZArYGejjm8UFrUnwCPb
+ H+eyhFNjynGRi0sSK3DAIiH8+yNN6HgZ7mYpsbxPOSIpJtvWswxnLb++xSOzjc4BHYK0u09
+ 4H3tHAdgo62cuZC/w/T3eAKXBvLyE0aCzEeHTWoLQQHDgd/iTM/H8KV6Z0NTkhVFmOW77mN
+ KqWCwyNWJNjccm3RuNDGg==
+UI-OutboundReport: notjunk:1;M01:P0:IaAgWUHpmeg=;O43+V+5trkJZwHoNKFoHkild/XK
+ 1bPaUlfjCMf5tzOiLlRnCYcyEgZzLUvvpmm9Z0gTaAF3Xr46olcBUZH/Ih0X8xKjJ2UMLZhsx
+ iV7CybLBmEuYYZ6pUbfKmSPEBNCr+6pRwrV9WvidHT0q6XFYTboCnD1+udJjkqymFzvYfFqS6
+ OZwmaH8uAmaJcqwYcTygK+NAjLFeusi3D177dlVpl/RUig7lnojZ4x+RD+4d8cw3eTge2ySjv
+ hfEC0JwXk/iIDEmIwkhoX7fokoAmfdW5IRzkMJ0XVx+Ym3lWLqH3+cuOAwh2qsByozibLtLP/
+ m8ctZYv0OBdi0DkSBPdEnAkaw9MzuKucV+9MnFiM1FRIA1jvmeSZ6vVmQpF2qQQt2WNyEG/Lb
+ G0JqDT2rHRAu2NhPxilOw63q/SMxfHOU7gJhplcsbRHHWJiKBW7f18zbvVcyj9xBbK+/4t49V
+ +9F6KuCmoXocl5dSGmSQzT093DpnaNdnHC8GMu0arF3t+oJ29ysqErGyJ4QzTzbHjj7ABjjYQ
+ MLM3Qt/ExkMF+ez2Qq+/KwmFZQWFXxDrPNjtEXu4RJnhlCgrJ6SsCFYSy4HTUIZ+UfMZ6hdts
+ UzzvZ9RYgh+uGUpb+jlMvjb96Cj8TfR3hmoNOGNUz5AUMPCCOvE+vt1AOeISPv/RXZ1B7nrQe
+ EQ80Cay2ABvUxYqwjU1swFc/d15wq7Jz7hDdjqzTZ+wM0ZS4wWGm1IOVbgilPfyAmPZp7K9xm
+ ek6Zla4aQqAF7u3nbVaEPsJPeBR2n7pzDfcEt8KdmKDS49pU6MlfG2bbonUeQzXDMn/CNz/nE
+ zkyonrLp3Kn1uuxmV9h6VH5MMlth0j/9MSCgshyiTmBbqULHYYZFEIMklYgkPiuS9LD25rxVi
+ Nx1oRZjLQV36fg2MY827Cv5TwFUUHHNZpg9fIqg4OAFrdqBShZGSbXZ7D12gZ/X0lBifuFN3y
+ k22hEw==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add new Realtek crypto device to the kernel configuration.
+Add devicetree documentation of new Realtek crypto device.
 
 Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 =2D--
- drivers/crypto/Kconfig          | 13 +++++++++++++
- drivers/crypto/Makefile         |  1 +
- drivers/crypto/realtek/Makefile |  5 +++++
- 3 files changed, 19 insertions(+)
- create mode 100644 drivers/crypto/realtek/Makefile
+ .../crypto/realtek,realtek-crypto.yaml        | 51 +++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/realtek,realt=
+ek-crypto.yaml
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 55e75fbb658e..990a74f7ad97 100644
-=2D-- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -666,6 +666,19 @@ config CRYPTO_DEV_IMGTEC_HASH
- 	  hardware hash accelerator. Supporting MD5/SHA1/SHA224/SHA256
- 	  hashing algorithms.
-
-+config CRYPTO_DEV_REALTEK
-+	tristate "Realtek's Cryptographic Engine driver"
-+	depends on OF && MIPS && CPU_BIG_ENDIAN
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA1
-+	select CRYPTO_AES
-+	help
-+	  This driver adds support for the Realtek crypto engine. It provides
-+	  hardware accelerated AES, SHA1 & MD5 algorithms. It is included in
-+	  SoCs of the RTL838x series, such as RTL8380, RTL8381, RTL8382, as
-+	  well as SoCs from the RTL930x series, such as RTL9301, RTL9302 and
-+	  RTL9303.
-+
- config CRYPTO_DEV_ROCKCHIP
- 	tristate "Rockchip's Cryptographic Engine driver"
- 	depends on OF && ARCH_ROCKCHIP
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 116de173a66c..df4b4b7d7302 100644
-=2D-- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -36,6 +36,7 @@ obj-$(CONFIG_CRYPTO_DEV_PPC4XX) +=3D amcc/
- obj-$(CONFIG_CRYPTO_DEV_QAT) +=3D qat/
- obj-$(CONFIG_CRYPTO_DEV_QCE) +=3D qce/
- obj-$(CONFIG_CRYPTO_DEV_QCOM_RNG) +=3D qcom-rng.o
-+obj-$(CONFIG_CRYPTO_DEV_REALTEK) +=3D realtek/
- obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) +=3D rockchip/
- obj-$(CONFIG_CRYPTO_DEV_S5P) +=3D s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_SA2UL) +=3D sa2ul.o
-diff --git a/drivers/crypto/realtek/Makefile b/drivers/crypto/realtek/Make=
-file
+diff --git a/Documentation/devicetree/bindings/crypto/realtek,realtek-cryp=
+to.yaml b/Documentation/devicetree/bindings/crypto/realtek,realtek-crypto.=
+yaml
 new file mode 100644
-index 000000000000..8d973bf1d520
+index 000000000000..443195e2d850
 =2D-- /dev/null
-+++ b/drivers/crypto/realtek/Makefile
-@@ -0,0 +1,5 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_REALTEK) +=3D rtl_crypto.o
-+rtl_crypto-objs :=3D realtek_crypto.o \
-+		  realtek_crypto_skcipher.o \
-+		  realtek_crypto_ahash.o
++++ b/Documentation/devicetree/bindings/crypto/realtek,realtek-crypto.yaml
+@@ -0,0 +1,51 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/realtek,realtek-crypto.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Realtek crypto engine bindings
++
++maintainers:
++  - Markus Stockhausen <markus.stockhausen@gmx.de>
++
++description: |
++  The Realtek crypto engine provides hardware accelerated AES, SHA1 & MD5
++  algorithms. It is included in SoCs of the RTL838x series, such as RTL83=
+80,
++  RTL8381, RTL8382, as well as SoCs from the RTL930x series, such as RTL9=
+301,
++  RTL9302 and RTL9303.
++
++properties:
++  compatible:
++    const: realtek,realtek-crypto
++
++  reg:
++    minItems: 1
++    maxItems: 1
++
++  interrupt-parent:
++    minItems: 1
++    maxItems: 1
++
++  interrupts:
++    minItems: 1
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupt-parent
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    crypto0: crypto@c000 {
++      compatible =3D "realtek,realtek-crypto";
++      reg =3D <0xc000 0x10>;
++      interrupt-parent =3D <&intc>;
++      interrupts =3D <22 3>;
++    };
++
++...
 =2D-
 2.38.1
 
