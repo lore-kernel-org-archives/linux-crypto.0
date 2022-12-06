@@ -2,94 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3504CC47090
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 08:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FB9C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 08:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234207AbiLFIdA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Dec 2022 03:33:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59802 "EHLO
+        id S234245AbiLFIfP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Dec 2022 03:35:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234001AbiLFIcm (ORCPT
+        with ESMTP id S233724AbiLFIex (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Dec 2022 03:32:42 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0252DC2;
-        Tue,  6 Dec 2022 00:32:40 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 3CCF724E277;
-        Tue,  6 Dec 2022 16:32:39 +0800 (CST)
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 6 Dec
- 2022 16:32:39 +0800
-Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
- EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
- 15.00.1497.044; Tue, 6 Dec 2022 16:32:39 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Rob Herring <robh@kernel.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: RE: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive crypto
- driver
-Thread-Topic: [PATCH 5/6] dt-bindings: crypto: Add bindings for Starfive
- crypto driver
-Thread-Index: AQHZBH/2P5dLP9b8iUC7OZp9LCFzsa5W9X0AgAlLclD//8izgIAAh0AA
-Date:   Tue, 6 Dec 2022 08:32:38 +0000
-Message-ID: <15fcb91a5214438fb69535bcf2df576e@EXMBX068.cuchost.com>
-References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
- <20221130055214.2416888-6-jiajie.ho@starfivetech.com>
- <166981596611.1846501.537832446745968339.robh@kernel.org>
- <14a3facb1fe642cba0048f2f2d0eb2e9@EXMBX068.cuchost.com>
- <0a2056f9-0126-4dd7-55fa-930ce61e2e81@linaro.org>
-In-Reply-To: <0a2056f9-0126-4dd7-55fa-930ce61e2e81@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.188.176.82]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 6 Dec 2022 03:34:53 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1010D6448;
+        Tue,  6 Dec 2022 00:34:37 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p2TP1-004OOs-Rt; Tue, 06 Dec 2022 16:34:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Dec 2022 16:34:11 +0800
+Date:   Tue, 6 Dec 2022 16:34:11 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LinuxKernelMailingList@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 0/10] crypto: Driver conversions for DMA alignment
+Message-ID: <Y47+gxbdKR03EYCj@gondor.apana.org.au>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+ <Y4xpGNNsfbucyUlt@infradead.org>
+ <Y47BgCuZsYLX61A9@gondor.apana.org.au>
+ <Y47g7qO8dsRdxCgf@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y47g7qO8dsRdxCgf@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBUdWVzZGF5LCBE
-ZWNlbWJlciA2LCAyMDIyIDQ6MjYgUE0NCj4gVG86IEppYUppZSBIbyA8amlhamllLmhvQHN0YXJm
-aXZldGVjaC5jb20+OyBSb2IgSGVycmluZyA8cm9iaEBrZXJuZWwub3JnPg0KPiBDYzogbGludXgt
-Y3J5cHRvQHZnZXIua2VybmVsLm9yZzsgbGludXgtcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZzsg
-Um9iDQo+IEhlcnJpbmcgPHJvYmgrZHRAa2VybmVsLm9yZz47IEhlcmJlcnQgWHUNCj4gPGhlcmJl
-cnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IEtyenlzenRvZiBLb3psb3dza2kNCj4gPGtyenlzenRv
-Zi5rb3psb3dza2krZHRAbGluYXJvLm9yZz47IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7
-DQo+IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBEYXZpZCBTIC4gTWlsbGVyIDxkYXZlbUBk
-YXZlbWxvZnQubmV0Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDUvNl0gZHQtYmluZGluZ3M6IGNy
-eXB0bzogQWRkIGJpbmRpbmdzIGZvciBTdGFyZml2ZSBjcnlwdG8NCj4gZHJpdmVyDQo+IA0KPiBP
-biAwNi8xMi8yMDIyIDA0OjQ4LCBKaWFKaWUgSG8gd3JvdGU6DQo+ID4NCj4gPg0KPiA+IFRoZSAj
-aW5jbHVkZSBpbiBleGFtcGxlIGhhdmUgZGVwZW5kZW5jaWVzIG9uIHRoZSBmb2xsb3dpbmcgcGF0
-Y2hlczoNCj4gPiBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbGludXgtcmlz
-Y3YvY292ZXIvMjAyMjExMTgwMTA2MjcuDQo+ID4gNzA1NzYtMS1oYWwuZmVuZ0BzdGFyZml2ZXRl
-Y2guY29tLw0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC1y
-aXNjdi9jb3Zlci8yMDIyMTExODAxMTcxNC4NCj4gPiA3MDg3Ny0xLWhhbC5mZW5nQHN0YXJmaXZl
-dGVjaC5jb20vDQo+ID4gSSd2ZSBub3RlZCB0aGVtIGluIHRoZSBjb3ZlciBsZXR0ZXIuDQo+ID4g
-SG93IGRvIEkgYWRkIHRoZW0gaW4gdGhpcyBwYXRjaD8NCj4gDQo+IFlvdSBjYW5ub3QuIFRlc3Rp
-bmcgYm90IGRvZXMgbm90IHRha2UgZGVwZW5kZW5jaWVzLCBzbyBpdCBkaWQgbm90IGhhdmUNCj4g
-YWJvdmUgY2xvY2sgSURzLiBUaGlzIGFsc28gc2hvdWxkIHBvaW50IHlvdXIgYXR0ZW50aW9uIHRo
-YXQgaWYgY3J5cHRvDQo+IG1haW50YWluZXJzIHBpY2sgdXAgdGhpcyBwYXRjaCwgdGhleSBhbHNv
-IHdvbid0IGhhdmUgdGhlIGNsb2NrIElEcyBzbyB0aGVpciB0cmVlDQo+IHdpbGwgaGF2ZSBzdWNo
-IGZhaWx1cmUgYXMgd2VsbC4NCj4gDQo+IFlvdSBjYW4gd2FpdCB3aXRoIHlvdXIgcGF0Y2ggdGls
-bCBkZXBlbmRlbmN5IGhpdHMgbWFpbmxpbmUgb3IgeW91IGNhbiBqdXN0DQo+IHJlcGxhY2UgY2xv
-Y2sgSURzIHdpdGggbnVtYmVycyBhbmQgZHJvcCB0aGUgaGVhZGVyIChhbmQgbGF0ZXIgeW91IGNh
-bg0KPiBjb3JyZWN0IHRoZSBleGFtcGxlIGlmIG5lZWRlZC4uLiBvciBsZWF2ZSBpdCBhcyBpcyku
-DQo+IA0KSSdsbCByZXBsYWNlIHRoZSBJRHMgYW5kIGRyb3AgdGhlIGhlYWRlciB0aGVuLg0KVGhh
-bmtzLg0KDQpSZWdhcmRzLA0KSmlhIEppZQ0K
+On Mon, Dec 05, 2022 at 10:27:58PM -0800, Christoph Hellwig wrote:
+.
+> But GFP_DMA never did do anything at all about alignment.  It picks
+> allocations from ZONE_DMA (which on x86 is the first 16MB only).
+
+Right.  I'm not arguing that they are correct or anything.  I'm
+just saying that they are currently working on arm64 because of
+the large minimum kmalloc alignment, and they will all be broken
+afterwards.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
