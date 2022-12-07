@@ -2,168 +2,197 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E287C4708E
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 13:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF25C352A1
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 13:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbiLGN70 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Dec 2022 08:59:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54750 "EHLO
+        id S229867AbiLGN71 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Dec 2022 08:59:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbiLGN7L (ORCPT
+        with ESMTP id S230157AbiLGN7P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2022 08:59:11 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129B25BD59
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 05:59:11 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id 4so17132059pli.0
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Dec 2022 05:59:11 -0800 (PST)
+        Wed, 7 Dec 2022 08:59:15 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0605C0E6
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 05:59:14 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id k88-20020a17090a4ce100b00219d0b857bcso1713071pjh.1
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Dec 2022 05:59:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YhThQPI2xFsZTnoYoCoKaXaVzJoWxSp/zyEv67TkbDA=;
-        b=dBOI0xQ22reKS/ZVPk7RXkCMBYCu/YuWGv9EF8Dbe4A70YQKBpKPshuuBmZkjWYjBn
-         RD18SDM5Dkl+Kb5HhbowrrUWSr0Djj3olv4LNVezYbBHPvwy4Z36W8mmwAm6RDztvOI4
-         IEuyYMNRqCJA4v3871AMzQGKwf0jmMSbHKid7c2+gVlrLHKOqMmVDOHtgpRnI3PmniLM
-         y8JkXXfJcNXWoKuqswvp+1hhfvyp121ljLrtN7aOSQuHjmoPrAy4vczGGa9L3/GiUBSm
-         IzlGxDfVhSZfK+wkNQ2h9oJ1EHJEdBkq8oa2lfspvffdAily0nDnhEZ83RiSBf/mDVUq
-         MEHQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qc9BjCuL8Y9jsd9KB/2MCymvXzgk7q3hryqmU37kquc=;
+        b=bqpqWtnub1u5fPao//HWxPuIw8CUr2slN8/CKMQznG9qgyi3cYv9vWGZdXp8SLSjwu
+         aCFGRHriRR0l/gwl5IU9JbJG6EFNo1vdtLG/bY08ezoYXyPcWQ5npl+Ssm0N9NkGYCh8
+         dDTp+kYlvt/ah29845NW1yV/yJ7ITtgdlpEyj6lIgnEqFdEvGfrjciwFG2zOWWcIc5Qx
+         0GcdIXC6fvqvxULBrGy0k/BcqG+XWkK3SQ8umy8Q3lbzn2hM7Y1NGBS788xzSpPx11zr
+         bJ4aMZsRO1JKoEjMI+dB4uADeb0adq34LsFwVc2qzcJXK6ou8m05n1XcAK/Pl7Tc4MZp
+         OuWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YhThQPI2xFsZTnoYoCoKaXaVzJoWxSp/zyEv67TkbDA=;
-        b=pJFj/1i4o4hJtrmQI09pgcCSWr4UedjsfKCYLlz+rpxwQv3M+sCAU+cGZmPFSXaLYI
-         nXTzcnx3knSeoXxf77Yiyw55NRybCywp7HI7VPbIZZTZnnCo+ToOoq8F7zAPBmIRHJHK
-         Fcf58Orz/Ghhu/9e4qDL7lXma627eV8/4tJrPDycC8HSUR+U9QOHTsqZwFluBqkgydhF
-         u4Z/JuwjNYrF1/uWOWaEoVw4xQefmjF9vPAez55dXtlvdFvpNL4KM2Y4wBO28fCYNIrJ
-         SDrG1fCLb55vAIOx86/UpSV1OKFtfZgLGHe+vBCJfVxB7ns8Hs0zRMC5uCnRM5AnnXYF
-         04tg==
-X-Gm-Message-State: ANoB5plbm2RWQre7qIGUOGMqDi+IEbRp31DA2Yy2zJOLDMu8SD/K7gpR
-        yFihCw5OltjaFB1xMNUlPhPfqVUsnyERuQ==
-X-Google-Smtp-Source: AA0mqf61ceznxcTzeMeDu4TiHzvJLcf/uaq0sn0FZ05tIa9mK2hnjVHf3oOyDPB28d2EZkY2zjfaFw==
-X-Received: by 2002:a17:902:b414:b0:186:7a6b:dcdb with SMTP id x20-20020a170902b41400b001867a6bdcdbmr634011plr.40.1670421549725;
-        Wed, 07 Dec 2022 05:59:09 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qc9BjCuL8Y9jsd9KB/2MCymvXzgk7q3hryqmU37kquc=;
+        b=64lobHN76FIvcV9cRPDNO//cngCr6zSGfVQyPRBNXmhkTmH4v03IUdzdSX4CMJtIV5
+         g1VLDc314VGqZQNZO4+UxQR0F7piR0fiI1k+PKFztRGNgY8QrCHCWwNRFCAUm3rCClPk
+         mTQguFXUMMCdcM1Tke8Rzg813fvSPRMVjH2mxG0OzKs/feky5Mu9T/88LReRHJ5OgwXP
+         PXk5AwlyWYjOYymwzXnnGOQKbvfexKMr4vTOXQSQLK9IWmu/QSgFU8EFgiFLd8uaoTAZ
+         EzsIsqtx2kG0D+vX2N9ig/XttWAz73wp/21zaLBr24EgdoqADmO0d8+Hr0fdDNTizG3c
+         k0hw==
+X-Gm-Message-State: ANoB5pnCQO4BF4wRgd50ugBVSd5BEUNJFnC+VLvDMrYwl7Yv7mlquohJ
+        PX/qQWjB70UzT1mwjqN6FwlU5KlKvWq+CA==
+X-Google-Smtp-Source: AA0mqf6fT3TUlCo+cqBzdrHepAal7jdBcKCBVHSXmY+VgJ/6hxRRfYBO/XtoeKCXFeqAx+3jXEvuAw==
+X-Received: by 2002:a05:6a20:8410:b0:a8:61bd:d9af with SMTP id c16-20020a056a20841000b000a861bdd9afmr1654417pzd.40.1670421553160;
+        Wed, 07 Dec 2022 05:59:13 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id x22-20020a170902821600b001885041d7b8sm14554619pln.293.2022.12.07.05.59.06
+        by smtp.gmail.com with ESMTPSA id x22-20020a170902821600b001885041d7b8sm14554619pln.293.2022.12.07.05.59.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Dec 2022 05:59:08 -0800 (PST)
+        Wed, 07 Dec 2022 05:59:12 -0800 (PST)
 From:   Taehee Yoo <ap420073@gmail.com>
 To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, x86@kernel.org
 Cc:     elliott@hpe.com, jussi.kivilinna@iki.fi, ebiggers@kernel.org,
         ap420073@gmail.com
-Subject: [PATCH v7 0/4] crypto: aria: implement aria-avx2 and aria-avx512
-Date:   Wed,  7 Dec 2022 13:58:51 +0000
-Message-Id: <20221207135855.459181-1-ap420073@gmail.com>
+Subject: [PATCH v7 1/4] crypto: aria: add keystream array into request ctx
+Date:   Wed,  7 Dec 2022 13:58:52 +0000
+Message-Id: <20221207135855.459181-2-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221207135855.459181-1-ap420073@gmail.com>
+References: <20221207135855.459181-1-ap420073@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patchset is to implement aria-avx2 and aria-avx512.
-There are some differences between aria-avx, aria-avx2, and aria-avx512,
-but they are not core logic(s-box, diffusion layer).
+avx accelerated aria module used local keystream array.
+But, keystream array size is too big.
+So, it puts the keystream array into request ctx.
 
-ARIA-AVX2
-It supports 32way parallel processing using 256bit registers.
-Like ARIA-AVX, it supports both AES-NI based s-box layer algorithm and
-GFNI based s-box layer algorithm.
-These algorithms are the same as ARIA-AVX except that AES-NI doesn't
-support 256bit registers, so it is used twice.
-
-ARIA-AVX512
-It supports 64way parallel processing using 512bit registers.
-It supports only GFNI based s-box layer algorithm.
-
-Benchmarks with i3-12100
-commands: modprobe tcrypt mode=610 num_mb=8192
-
-ARIA-AVX512(128bit and 256bit)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx512) encryption
-tcrypt: 1 operation in 1504 cycles (1024 bytes)
-tcrypt: 1 operation in 4595 cycles (4096 bytes)
-tcrypt: 1 operation in 1763 cycles (1024 bytes)
-tcrypt: 1 operation in 5540 cycles (4096 bytes)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx512) decryption
-tcrypt: 1 operation in 1502 cycles (1024 bytes)
-tcrypt: 1 operation in 4615 cycles (4096 bytes)
-tcrypt: 1 operation in 1759 cycles (1024 bytes)
-tcrypt: 1 operation in 5554 cycles (4096 bytes)
-
-ARIA-AVX2 with GFNI(128bit and 256bit)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx2) encryption
-tcrypt: 1 operation in 2003 cycles (1024 bytes)
-tcrypt: 1 operation in 5867 cycles (4096 bytes)
-tcrypt: 1 operation in 2358 cycles (1024 bytes)
-tcrypt: 1 operation in 7295 cycles (4096 bytes)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx2) decryption
-tcrypt: 1 operation in 2004 cycles (1024 bytes)
-tcrypt: 1 operation in 5956 cycles (4096 bytes)
-tcrypt: 1 operation in 2409 cycles (1024 bytes)
-tcrypt: 1 operation in 7564 cycles (4096 bytes)
-
-ARIA-AVX with GFNI(128bit and 256bit)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx) encryption
-tcrypt: 1 operation in 2761 cycles (1024 bytes)
-tcrypt: 1 operation in 9390 cycles (4096 bytes)
-tcrypt: 1 operation in 3401 cycles (1024 bytes)
-tcrypt: 1 operation in 11876 cycles (4096 bytes)
-    testing speed of multibuffer ecb(aria) (ecb-aria-avx) decryption
-tcrypt: 1 operation in 2735 cycles (1024 bytes)
-tcrypt: 1 operation in 9424 cycles (4096 bytes)
-tcrypt: 1 operation in 3369 cycles (1024 bytes)
-tcrypt: 1 operation in 11954 cycles (4096 bytes)
-
-This patchset will not successfully be merged before applying CFI fixes
-because of conflict.
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
 
 v7:
- - Use IS_ENABLED() instead of defined()
+ - No changes.
 
 v6:
- - Rebase for "CFI fixes" patchset.
- - Use SYM_TYPED_FUNC_START instead of SYM_FUNC_START.
+ - No changes.
 
 v5:
- - Set CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE flag to avx2, and avx512.
+ - No changes.
 
 v4:
- - Use keystream array in the request ctx.
+ - Add aria_avx_request ctx for keystream array
 
 v3:
- - Use ARIA_CTX_enc_key, ARIA_CTX_dec_key, and ARIA_CTX_rounds defines.
+ - No changes.
 
 v2:
- - Add new "add keystream array into struct aria_ctx" patch.
- - Use keystream array in the aria_ctx instead of stack memory
+ - Patch introduced.
 
-Taehee Yoo (4):
-  crypto: aria: add keystream array into request ctx
-  crypto: aria: do not use magic number offsets of aria_ctx
-  crypto: aria: implement aria-avx2
-  crypto: aria: implement aria-avx512
+ arch/x86/crypto/aria_aesni_avx_glue.c | 39 ++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
- arch/x86/crypto/Kconfig                   |   38 +
- arch/x86/crypto/Makefile                  |    6 +
- arch/x86/crypto/aria-aesni-avx-asm_64.S   |   26 +-
- arch/x86/crypto/aria-aesni-avx2-asm_64.S  | 1433 +++++++++++++++++++++
- arch/x86/crypto/aria-avx.h                |   46 +
- arch/x86/crypto/aria-gfni-avx512-asm_64.S | 1020 +++++++++++++++
- arch/x86/crypto/aria_aesni_avx2_glue.c    |  252 ++++
- arch/x86/crypto/aria_aesni_avx_glue.c     |   45 +-
- arch/x86/crypto/aria_gfni_avx512_glue.c   |  250 ++++
- arch/x86/kernel/asm-offsets.c             |    9 +
- crypto/aria_generic.c                     |    4 +
- 11 files changed, 3101 insertions(+), 28 deletions(-)
- create mode 100644 arch/x86/crypto/aria-aesni-avx2-asm_64.S
- create mode 100644 arch/x86/crypto/aria-gfni-avx512-asm_64.S
- create mode 100644 arch/x86/crypto/aria_aesni_avx2_glue.c
- create mode 100644 arch/x86/crypto/aria_gfni_avx512_glue.c
-
+diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
+index c561ea4fefa5..5f97e442349f 100644
+--- a/arch/x86/crypto/aria_aesni_avx_glue.c
++++ b/arch/x86/crypto/aria_aesni_avx_glue.c
+@@ -33,6 +33,10 @@ asmlinkage void aria_aesni_avx_gfni_ctr_crypt_16way(const void *ctx, u8 *dst,
+ 
+ static struct aria_avx_ops aria_ops;
+ 
++struct aria_avx_request_ctx {
++	u8 keystream[ARIA_AESNI_PARALLEL_BLOCK_SIZE];
++};
++
+ static int ecb_do_encrypt(struct skcipher_request *req, const u32 *rkey)
+ {
+ 	ECB_WALK_START(req, ARIA_BLOCK_SIZE, ARIA_AESNI_PARALLEL_BLOCKS);
+@@ -73,6 +77,7 @@ static int aria_avx_set_key(struct crypto_skcipher *tfm, const u8 *key,
+ 
+ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+ {
++	struct aria_avx_request_ctx *req_ctx = skcipher_request_ctx(req);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct aria_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct skcipher_walk walk;
+@@ -86,10 +91,9 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+ 		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
+-			u8 keystream[ARIA_AESNI_PARALLEL_BLOCK_SIZE];
+-
+ 			kernel_fpu_begin();
+-			aria_ops.aria_ctr_crypt_16way(ctx, dst, src, keystream,
++			aria_ops.aria_ctr_crypt_16way(ctx, dst, src,
++						      &req_ctx->keystream[0],
+ 						      walk.iv);
+ 			kernel_fpu_end();
+ 			dst += ARIA_AESNI_PARALLEL_BLOCK_SIZE;
+@@ -98,28 +102,29 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+ 		}
+ 
+ 		while (nbytes >= ARIA_BLOCK_SIZE) {
+-			u8 keystream[ARIA_BLOCK_SIZE];
+-
+-			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
++			memcpy(&req_ctx->keystream[0], walk.iv, ARIA_BLOCK_SIZE);
+ 			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
+ 
+-			aria_encrypt(ctx, keystream, keystream);
++			aria_encrypt(ctx, &req_ctx->keystream[0],
++				     &req_ctx->keystream[0]);
+ 
+-			crypto_xor_cpy(dst, src, keystream, ARIA_BLOCK_SIZE);
++			crypto_xor_cpy(dst, src, &req_ctx->keystream[0],
++				       ARIA_BLOCK_SIZE);
+ 			dst += ARIA_BLOCK_SIZE;
+ 			src += ARIA_BLOCK_SIZE;
+ 			nbytes -= ARIA_BLOCK_SIZE;
+ 		}
+ 
+ 		if (walk.nbytes == walk.total && nbytes > 0) {
+-			u8 keystream[ARIA_BLOCK_SIZE];
+-
+-			memcpy(keystream, walk.iv, ARIA_BLOCK_SIZE);
++			memcpy(&req_ctx->keystream[0], walk.iv,
++			       ARIA_BLOCK_SIZE);
+ 			crypto_inc(walk.iv, ARIA_BLOCK_SIZE);
+ 
+-			aria_encrypt(ctx, keystream, keystream);
++			aria_encrypt(ctx, &req_ctx->keystream[0],
++				     &req_ctx->keystream[0]);
+ 
+-			crypto_xor_cpy(dst, src, keystream, nbytes);
++			crypto_xor_cpy(dst, src, &req_ctx->keystream[0],
++				       nbytes);
+ 			dst += nbytes;
+ 			src += nbytes;
+ 			nbytes = 0;
+@@ -130,6 +135,13 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+ 	return err;
+ }
+ 
++static int aria_avx_init_tfm(struct crypto_skcipher *tfm)
++{
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct aria_avx_request_ctx));
++
++	return 0;
++}
++
+ static struct skcipher_alg aria_algs[] = {
+ 	{
+ 		.base.cra_name		= "__ecb(aria)",
+@@ -160,6 +172,7 @@ static struct skcipher_alg aria_algs[] = {
+ 		.setkey			= aria_avx_set_key,
+ 		.encrypt		= aria_avx_ctr_encrypt,
+ 		.decrypt		= aria_avx_ctr_encrypt,
++		.init			= aria_avx_init_tfm,
+ 	}
+ };
+ 
 -- 
 2.34.1
 
