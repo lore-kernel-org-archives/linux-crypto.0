@@ -2,82 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7B4C47089
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 17:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77CA9C47089
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 18:58:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiLGRw1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Dec 2022 12:52:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
+        id S229501AbiLGS6z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Dec 2022 13:58:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbiLGRwZ (ORCPT
+        with ESMTP id S229486AbiLGS6x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2022 12:52:25 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC746C712;
-        Wed,  7 Dec 2022 09:52:24 -0800 (PST)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 7 Dec 2022 13:58:53 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEA93AC0B;
+        Wed,  7 Dec 2022 10:58:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D3AA220099;
-        Wed,  7 Dec 2022 17:52:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1670435542;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LcfuBKfj+SmUIFdtyNgyT98NAvKhCAYytID8/EBoQ/U=;
-        b=KPHrmKNlSvwAMKEy5/oCDTJDDj9tnp2KM4WxHfv3K2DZK79bT/YhSYbzfjWLoZhHwEc+0+
-        +2/UIxhXFOKbgcAQmcmjox35FERvw2qP1T0UTPJyGTny0+7VQn3cmVjaIGlSxWaFfTjeqd
-        fW4ApU91TBSMaIxiwQjtpOOJVtbw9F8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1670435542;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LcfuBKfj+SmUIFdtyNgyT98NAvKhCAYytID8/EBoQ/U=;
-        b=3/auTOd5wlaYfGrTs/x54fkoMS4u1h3rIMygpHuiZa0c/LZCOOue8glGAtJea+w2S2+it9
-        Zq7p5PWwfkza/oDA==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 9F8E0136B4;
-        Wed,  7 Dec 2022 17:52:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id ebiZI9XSkGOMewAAGKfGzw
-        (envelope-from <pvorel@suse.cz>); Wed, 07 Dec 2022 17:52:21 +0000
-Date:   Wed, 7 Dec 2022 18:52:19 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     jarkko@kernel.org, zohar@linux.ibm.com, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        noodles@fb.com, tiwai@suse.de, bp@suse.de,
-        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
-        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] KEYS: Create static version of
- public_key_verify_signature
-Message-ID: <Y5DS00rCs9+BOQSd@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20221207171238.2945307-1-eric.snowberg@oracle.com>
- <20221207171238.2945307-2-eric.snowberg@oracle.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 606B061BC2;
+        Wed,  7 Dec 2022 18:58:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01996C433D6;
+        Wed,  7 Dec 2022 18:58:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670439531;
+        bh=tileNfIVVSzSkC6hGTUe9h984/Ujy2+taCQu+sbD3EM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZTOQvX+ZEFGW9ZgdU02BHVvgAgQ5IXPrg8Ro2U9dF/A7aynlgp91rKsVEfkZJCa3p
+         WsK/udxDrqaHgQ0KH18sjNrXrT5pv5oMCGdcEtsHSXfOR11RzbA8NyWcDTcWF48I7x
+         Dm6W5Kh/B6XSaJa/w7qjPYBTL8fPhfQdETdR/xNL/4ItIl2jfjk6r0WlxJU4xNJNil
+         bUu6fNdZFVF9sv7z8zImG4Pm8IlpCixieuJm1DxwmBoQFAwdWmm6tuSnG0nPaJz01f
+         rXy2cQ0Uw4ocHw7vZLmWikzqfeRjsAMk2efTWAubfz/oFNfCLBYf8sr/KZIwaQAc20
+         /7YJqlEQJ5E1w==
+Date:   Wed, 7 Dec 2022 11:58:49 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] padata: Do not mark padata_mt_helper() as __init
+Message-ID: <Y5DiaT8+eQDLfJcW@dev-arch.thelio-3990X>
+References: <20221129190123.872394-1-nathan@kernel.org>
+ <20221129190123.872394-2-nathan@kernel.org>
+ <CAK7LNASdOhcTqbnRibPumMH1o+78dxBjLuzLK+JS+AiHyTiY6A@mail.gmail.com>
+ <20221206201526.al3tpbdvd244cvl5@parnassus.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221207171238.2945307-2-eric.snowberg@oracle.com>
+In-Reply-To: <20221206201526.al3tpbdvd244cvl5@parnassus.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Tue, Dec 06, 2022 at 03:15:26PM -0500, Daniel Jordan wrote:
+> On Thu, Dec 01, 2022 at 07:35:59AM +0900, Masahiro Yamada wrote:
+> > On Wed, Nov 30, 2022 at 4:02 AM Nathan Chancellor <nathan@kernel.org> wrote:
+> > >
+> > > When building arm64 allmodconfig + ThinLTO with clang and a proposed
+> > > modpost update to account for -ffuncton-sections, the following warning
+> > > appears:
+> > >
+> > >   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+> > >   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+> > >
+> > > In both cases, an __init function calls padata_work_init(), which is not
+> > > marked __init, with padata_mt_helper(), another __init function, as a
+> > > work function argument.
+> > >
+> > > padata_work_init() is called from non-init paths, otherwise it could be
+> > > marked __init to resolve the warning. Instead, remove __init from
+> > > padata_mt_helper() to resolve the warning.
+> > >
+> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > > ---
+> > > Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> > > Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> > > Cc: linux-crypto@vger.kernel.org
+> > > ---
+> > >  kernel/padata.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/kernel/padata.c b/kernel/padata.c
+> > > index e5819bb8bd1d..c2271d7e446d 100644
+> > > --- a/kernel/padata.c
+> > > +++ b/kernel/padata.c
+> > > @@ -45,7 +45,7 @@ struct padata_mt_job_state {
+> > >  };
+> > >
+> > >  static void padata_free_pd(struct parallel_data *pd);
+> > > -static void __init padata_mt_helper(struct work_struct *work);
+> > > +static void padata_mt_helper(struct work_struct *work);
+> > >
+> > >  static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
+> > >  {
+> > > @@ -425,7 +425,7 @@ static int padata_setup_cpumasks(struct padata_instance *pinst)
+> > >         return err;
+> > >  }
+> > >
+> > > -static void __init padata_mt_helper(struct work_struct *w)
+> > > +static void padata_mt_helper(struct work_struct *w)
+> > >  {
+> > >         struct padata_work *pw = container_of(w, struct padata_work, pw_work);
+> > >         struct padata_mt_job_state *ps = pw->pw_data;
+> > > --
+> > > 2.38.1
+> > >
+> > 
+> > This patch seems wrong.
+> > 
+> > padata_work_init() does not reference to padata_mt_helper()
+> > 
+> > 
+> > padata_work_alloc_mt() and padata_do_multithreaded() do.
+> 
+> I see LLVM optimizing padata_work_init by embedding padata_mt_helper's
+> address in its text, which runs afoul of modpost.
+> 
+> I agree with Masahiro, the warning is a false positive since only __init
+> functions ever cause the embedded address to be used.
+> 
+> We have __ref for situations like this.  That way, padata_mt_helper can
+> stay properly __init.
 
-Reviewed-by: Petr Vorel <pvorel@suse.cz>
+Ah, thank you for pointing out __ref, that seems to be exactly what we
+want here. I will send a v2 marking padata_work_init() as __ref shortly.
 
-Kind regards,
-Petr
+Cheers,
+Nathan
