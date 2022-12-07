@@ -2,96 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D692AC352A1
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 10:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2084EC4708D
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 10:39:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229462AbiLGKjv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Dec 2022 05:39:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36878 "EHLO
+        id S229486AbiLGKj5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Dec 2022 05:39:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiLGKju (ORCPT
+        with ESMTP id S229611AbiLGKjz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2022 05:39:50 -0500
+        Wed, 7 Dec 2022 05:39:55 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255B61C7
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 02:39:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E7EB96
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 02:39:54 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AA91E612ED
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 10:39:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5384C433D6;
-        Wed,  7 Dec 2022 10:39:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 25C5A612B7
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 10:39:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39E7AC433D7;
+        Wed,  7 Dec 2022 10:39:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670409588;
-        bh=UaU51mjjvEqzffoeoi31IzUxoHXD53qz+ANzmxo0Rkk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=q9qZC5cCEfgWfyU2bXpus+XThf+wva3nXr9aW5sxQ/LpjLwCA+tO0fObw4niyDzEO
-         0Wh/zwSUCiLyzeZ2NeWuG5Zg++i6NHQOnMx9IoXjIGCe9Li4opUBZ4aNWYZcM228+f
-         VBK3BMQ2oJ0/QiCnEZzcq3amn3w8WLJt6EnEgQFVItemdeQ3AUkNYbZ9hyN3/rl5h/
-         xfRh8qxoAGlu0xsOXqKrUo3N9x9L0Z96+7Uv1lNYNuDfLXtK4BuCkPt9n86iINTj+u
-         aCzLzObBYzqHyjQnG7VucaAXA2r8htr8fBLpCR5WwVkuYBWk+yrt3JZfSxLtrF8pA6
-         5PMlWhqvdEEyQ==
+        s=k20201202; t=1670409593;
+        bh=36YqQnOtNbUcTuWjMaDed0znfLGCdnAv3m9xyuWbSXQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=CpOntchcb/BjKuYFzbkI72PcqkLOWGTs7yWmlHb9uwAyP5eAuhImrbOILLECobrnf
+         kmAaRTu0MPFpgM81RRY4onOsdSOVYph+clKOcWO1giiRWif17+6TMGUukd07+5ag/6
+         Zeg1an9p1WXRLlscvhS1a8X7CLgFX2xeWpV+KN7Dy0ysW0pYkT6Gi1CE+jbKUczirk
+         8xWGhn93hGxziAGpKT4ggR9FTIAktPKG+is4liHzCe2eE/PLlUSTB79iOX0nEeNWOg
+         Ik7/bigwdF4IvVc8Ho7PRz2A6/5mgvkVbAUgLYtrRckNh2F0Y4ZPZFbNVlE4b1Gp/z
+         Caq8pnfQnfW9A==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk
 Cc:     linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
         Linus Walleij <linus.walleij@linaro.org>,
         Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 0/2] ARM: allow kernel mode NEON in softirq context
-Date:   Wed,  7 Dec 2022 11:39:34 +0100
-Message-Id: <20221207103936.2198407-1-ardb@kernel.org>
+Subject: [PATCH v2 2/2] ARM: permit non-nested kernel mode NEON in softirq context
+Date:   Wed,  7 Dec 2022 11:39:36 +0100
+Message-Id: <20221207103936.2198407-3-ardb@kernel.org>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221207103936.2198407-1-ardb@kernel.org>
+References: <20221207103936.2198407-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1946; i=ardb@kernel.org; h=from:subject; bh=UaU51mjjvEqzffoeoi31IzUxoHXD53qz+ANzmxo0Rkk=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBjkG1k4gIk5BPXrKBYWIwEOYpVmyzuoJKtLUfjurOF GJASu7OJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCY5BtZAAKCRDDTyI5ktmPJCVKDA CKv21UzwKXgkO/ZU9h4lfHB83WFeFw5gnytRKzYsoPzYddKyNiW9CstQUD3j7zpfCIQ/EK/zIQoOg4 XOZC/Y/SXyhzdrGrFL4n8SPxP2BCDyz4dm2UWAOEJvKx3Xr89FNB2qKnOjVALFAZG4sSG/AtsfTRfs yYkammk2Bc2NCzkqmPShUvevqzoHPPRRSGMVdOibE1smM25C/gvCZA6VXHyFGDTVewLjoYk380C0h5 H1iGw++5PhbuFH7FV/bThtarczx2USpHb4Aj/M98I5iZ0eIV47JSOW7tfALby2d0bhYogCXK78GFRK FsAkD/Si1NVF9h7wAaytWCpMHNmRYVncIZm/tTtrKRhJVZv2wsrB/3/orPD5VLEodjAVdNhWeCGGaW jGZo/uobU5mzVrwmNyz1HnAhNSovJBa05Y2be6xfMgBtk0vFEu6k+qic7qGGr0e7jhpPAFXtaXjpBy xOAQ8IxLVP9EUo+k4SGZ3p9wsHMIMqKnCdc2EgHCHWx30=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2672; i=ardb@kernel.org; h=from:subject; bh=36YqQnOtNbUcTuWjMaDed0znfLGCdnAv3m9xyuWbSXQ=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBjkG1nbMBKGcpxvDP1xaATdLbbvNcgx0uP63Vp8/Kd oyMBLy+JAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCY5BtZwAKCRDDTyI5ktmPJFr7C/ 4zG0d1Qfu4iWKy50r3Mru2HgU59zvrANrytytJUxsNJGc3Y7Cuc17Qd++YkZRhLSRWJrDAw4MBjty4 w/yZeVXQc6FB042MvUV4+n5MZQdeLH2KUqOZmNbhQdmGz18gma779rpMkeTaPOmBB4EYtiab6tuL0T VUbR2GAWQoS+WEnE5vgoa5ERpuVqo4U2DmDVwzFH0aZDtD7cuNoQc7wDdGgkhZdIn4C4UHfzlx8Ml2 sBvGdpbfMo3h46cHDbIqAcybT1TiL4FSkDFgU0ILnATv09/5MVyDAcd46BxQCj6kJshIAFBE9af8v/ h2JuUPqF+pVOSDTHh98E7IJMCC2lriAKAnWoUETboNJfltSSIuU3e+X07Dxl9bl6qpE18NcQFt7v1W 4bHaigetdBQ6YqElgqx7PI2r8qB+d6pbgJKCqDs535Eh0YNH/I1QtnWXGLAAFQMG1W/vD0V2BWSIKm 84CXN0WRxWxqB4lWgV2+Tw4IZA78xHUguyiFrl9pJCjl8=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently on ARM, we only permit kernel mode NEON in task context, and
-NEON based processing triggered from softirq context is queued for
-asynchronous completion via the crypto API's cryptd layer.
+We currently only permit kernel mode NEON in process context, to avoid
+the need to preserve/restore the NEON register file when taking an
+exception while running in the kernel.
 
-For IPsec packet encryption involving highly performant crypto
-implementations, this results in a substantial performance hit, and so
-it would be desirable to permit those crypto operations to complete
-synchronously even when invoked from softirq context.
+Like we did on arm64, we can relax this restriction substantially, by
+permitting kernel mode NEON from softirq context, while ensuring that
+softirq processing is disabled when the NEON is being used in task
+context. This guarantees that only NEON context belonging to user space
+needs to be preserved and restored, which is already taken care of.
 
-For example, on a 1 GHz Cortex-A53 machine (SynQuacer), AES-256-GCM
-executes in 7.2 cycles per byte, putting an upper bound of ~140 MB/s
-on the achievable throughput of a single CPU.
+This is especially relevant for network encryption, where incoming
+frames are typically handled in softirq context, and deferring software
+decryption to a kernel thread or falling back to C code are both
+undesirable from a performance PoV.
 
-Without these changes, an IPsec tunnel from a 32-bit VM to the 64-bit
-host can achieve a throughput of 9.5 MB/s TX and 11.9 MB/s RX.
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm/include/asm/simd.h |  8 ++++++++
+ arch/arm/vfp/vfpmodule.c    | 13 ++++++-------
+ 2 files changed, 14 insertions(+), 7 deletions(-)
 
-When the crypto algorithm is permitted to execute in softirq context,
-the throughput increases to 16.5 MB/s TX and 41 MB/s RX.
-
-(This is measured using debian's iperf3 3.11 with the default options)
-
-So let's reorganize the VFP state handling so that it its critical
-handling of the FPU registers runs with softirqs disabled. Then, update
-the kernel_neon_begin()/end() logic to keep softirq processing disabled
-as long as the NEON is being used in kernel mode.
-
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Russell King <linux@armlinux.org.uk>
-
-Ard Biesheuvel (2):
-  ARM: vfp: Manipulate VFP state with softirqs disabled
-  ARM: permit non-nested kernel mode NEON in softirq context
-
- arch/arm/include/asm/assembler.h | 19 ++++++++++++-------
- arch/arm/include/asm/simd.h      |  8 ++++++++
- arch/arm/kernel/asm-offsets.c    |  1 +
- arch/arm/vfp/entry.S             |  4 ++--
- arch/arm/vfp/vfphw.S             |  4 ++--
- arch/arm/vfp/vfpmodule.c         | 19 ++++++++++++-------
- 6 files changed, 37 insertions(+), 18 deletions(-)
- create mode 100644 arch/arm/include/asm/simd.h
-
+diff --git a/arch/arm/include/asm/simd.h b/arch/arm/include/asm/simd.h
+new file mode 100644
+index 0000000000000000..82191dbd7e78a036
+--- /dev/null
++++ b/arch/arm/include/asm/simd.h
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#include <linux/hardirq.h>
++
++static __must_check inline bool may_use_simd(void)
++{
++	return IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && !in_hardirq();
++}
+diff --git a/arch/arm/vfp/vfpmodule.c b/arch/arm/vfp/vfpmodule.c
+index 8f5bc672b4aac04a..4e1a786df76df157 100644
+--- a/arch/arm/vfp/vfpmodule.c
++++ b/arch/arm/vfp/vfpmodule.c
+@@ -723,12 +723,12 @@ void kernel_neon_begin(void)
+ 	local_bh_disable();
+ 
+ 	/*
+-	 * Kernel mode NEON is only allowed outside of interrupt context
+-	 * with preemption disabled. This will make sure that the kernel
+-	 * mode NEON register contents never need to be preserved.
++	 * Kernel mode NEON is only allowed outside of hardirq context with
++	 * preemption and softirq processing disabled. This will make sure that
++	 * the kernel mode NEON register contents never need to be preserved.
+ 	 */
+-	BUG_ON(in_interrupt());
+-	cpu = get_cpu();
++	BUG_ON(in_hardirq());
++	cpu = __smp_processor_id();
+ 
+ 	fpexc = fmrx(FPEXC) | FPEXC_EN;
+ 	fmxr(FPEXC, fpexc);
+@@ -744,7 +744,6 @@ void kernel_neon_begin(void)
+ 		vfp_save_state(vfp_current_hw_state[cpu], fpexc);
+ #endif
+ 	vfp_current_hw_state[cpu] = NULL;
+-	local_bh_enable();
+ }
+ EXPORT_SYMBOL(kernel_neon_begin);
+ 
+@@ -752,7 +751,7 @@ void kernel_neon_end(void)
+ {
+ 	/* Disable the NEON/VFP unit. */
+ 	fmxr(FPEXC, fmrx(FPEXC) & ~FPEXC_EN);
+-	put_cpu();
++	local_bh_enable();
+ }
+ EXPORT_SYMBOL(kernel_neon_end);
+ 
 -- 
 2.35.1
 
