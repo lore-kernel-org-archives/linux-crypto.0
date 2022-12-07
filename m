@@ -2,66 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 603E5C63718
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 17:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C10B6C47089
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 17:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbiLGRNl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Dec 2022 12:13:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52358 "EHLO
+        id S229888AbiLGRNq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Dec 2022 12:13:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiLGRNg (ORCPT
+        with ESMTP id S229796AbiLGRNm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2022 12:13:36 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9402C45A1E;
-        Wed,  7 Dec 2022 09:13:35 -0800 (PST)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7HAZpa003903;
-        Wed, 7 Dec 2022 17:12:57 GMT
+        Wed, 7 Dec 2022 12:13:42 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A51654DE;
+        Wed,  7 Dec 2022 09:13:40 -0800 (PST)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B7GGlS0021894;
+        Wed, 7 Dec 2022 17:13:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
- bh=pP4Surn+7FPONQ6L3YWLkQIdsqC6Al/UKkJByFHU0SI=;
- b=wYKLPL1L/3kLBgFR63K9k2Hydx7Ufbc6bUtmemkYFr6FFaLOyGYTsNlEXbTDnkkCWUNH
- EOB6r6RBnmZiXqaPW/9FQ47JzzBjjNLby+kkN/gxpKAsqO5h8xVwHauHHxPoyve38Wfk
- b2afPcRQOQBzQM7ntzKbgWx/+4XIOoADC4YRTWK+Nk5OVxipvICYSRnUrjRT+xAP2M7T
- Pbg0QNTPcyIp//POFYN3rj6b5bW1zQOHlO/5WTTNin+xAw4T6DVgXzUYnHB/BSMLdI7c
- Jum4ZLGbwGIP3rY8QzD/mVLXX08EB9LtHGt4F/Hmo9Dvkmj4E32DVk7GqFEoqZWyxCgn 7w== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mawj6r0br-1
+ bh=BwjU6HLISIcurPWwMgKVLqa4mU1kc4uoYuJlz7APYHM=;
+ b=e6wJWEHctxftKPRlCGskX1ikgDVrPCoLSHxMEBVlAz3Sp2T/NVqchQ/qko+9T2PGIU78
+ KKONBeLj8LCspiWyQfGdBMZyWhHrgkevEw17OXoXNKXYoo/p6u+hRSr5LjyoixrvtAiY
+ wyg4oDrg0NClFmaMk/srzVTNv3QoQICNdfXJJa8fSCwq7su3hKlx28FrAz0xykN+NAWZ
+ bmmQbyYVx6dZBNKe2zjGJdAsQAr5Cp8un8sV5j7VWKOwE51p2xh1B3+Su2UOJrxnXLkF
+ nbQFi0ErbRWW6s4zU9/+c2daWYPUNlN0yxjlcpy6x3YtlhbUbrL65+ooUfoBf0TVYmqT sA== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3maubagw0r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 17:12:57 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B7FwbQr009733;
-        Wed, 7 Dec 2022 17:12:56 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2105.outbound.protection.outlook.com [104.47.55.105])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3maa69a430-3
+        Wed, 07 Dec 2022 17:13:10 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B7FwPH8002304;
+        Wed, 7 Dec 2022 17:13:09 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3maa7chkjm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 07 Dec 2022 17:12:56 +0000
+        Wed, 07 Dec 2022 17:13:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=arG6M6vlFRsjBDq4A9uFSdLD/eXw6C+wNdXBRqmvoOgMLQt+b7hSKt1Dcaf/1YJz4DjOGZDkHhIqUjoZ1ypl9gVye87kT8ccIIgIrBeClEB5xpJ+Y2l18A7+7NRNmwvKqx/61AvPdBjyHqkeuot9qXQjFkfkMwyUi9BlIDiW7xiZvo/0sWcx/zR/y2fpnzIWbBPEKkkA6YJBka7zAcnaOUUaHtK4HcsKA3sqxPRgr7F6BMw3QHyuGAEWH04/jwVgEiUmwyiZWUvPvryVrx+CA1bVojqE2s8Mw8/RoA6r/x9aa3E+PBU5FLM8HIHM0VB9guTHYd9/RA9SELdi9EN9Cg==
+ b=nee7/UrWKz4KvdvAhEWQJFsq24E33FdgIUPvarXlZxrSgQnOTKtS4QUk0Sn/gfs7hIhFfmLTNYzyjCdrQ9RmPpQ07bpn7x50XlpGxHlrJ4jov7TBATotle0ZyLemCxnuHNl7qNEdyjf9ZMtoXxR2wANGcTxKZW+eSBN2P/m2GYtACevzqI4hkRLXZarYT/eqMq5fnTwe1+nCEwok1d86RVo3PlBxhRnRO3Bf92cXkmr+Z0Ylsi40xHJiS/S5+paDo3kMbW7JOoIGOZMkok7N/Umt1fClzDywdZUrrYDQxC4ooY1LdFbv7Pda9vctvlTmDzdAIdnd1SyzKLkHb1Uk1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pP4Surn+7FPONQ6L3YWLkQIdsqC6Al/UKkJByFHU0SI=;
- b=VLdXmWrCm5K0XpGS+dg5Pq5p8OyvloE1rgAVURd2KFzlpu3PxmRfBgWbMqHkagKyGcqbMBNC5Ygalk9eV7ltmkoGAuyHVipEpqjZc7sG0IJt4ldmcuG4DWWq5kXruaNLPrl5SKyKjX3OZbNmgmYYISlN8FlS/RIhbFs4VkAmRNDiY5WLi1sBqiYHONS2ZG654XbL3rT0NumZ58NDYcUzwdJZ5EU8uKcxjUyDice8O22oFND73FD7Ss+LQXyQXmemwyJurSQ0eqm56wWLHRS+94kOe7H3xJk7XqfqmeKnaLZjVGl6RvzOGXIazbuodks2xHraZl+xyOQVZ8J7WfQS8g==
+ bh=BwjU6HLISIcurPWwMgKVLqa4mU1kc4uoYuJlz7APYHM=;
+ b=Q2yrySjvy64nYmQiUGE8+KODcPYotnj28T4+Q83TpkjureXcMWAMbOWtDvNLrJOtRiIDDvZ0ZTawyvSshdRWLdzH4xd2V4nagsEBTeW38zF3sX6lnWjquzA2cwk9B87ykC2MecxHxzPL+Ab2qj24L9TZRbk5Yi9J9S7pHlJqKiwziklq+P74rdW88f4PbjTgeIeVuMEy8X7oe407eU1FtX25+V+dkkjhMLPBalpj/x+wtoYzzW/cnrL/E25yLFG5mQyp0CKZPA5zz3xu9hZ9qFJTlZ46jNZdt3iEDQwKwDUn1t5sPLHaNBqXZdZ7o3VTp0vTHMag4AcoqL3IEtEXgA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pP4Surn+7FPONQ6L3YWLkQIdsqC6Al/UKkJByFHU0SI=;
- b=v0k42LRUf7JKSSP/KCseHZHRZA+bxM0Wpt4qxWoqlvfFNegsebf+KdIbp7aJ46G2eADEcqmQ/ksvzgWiMiF/NuQ7bmRLXoln/lJMdIhBiQ+K6zfw9feMWPdiWZVX5ecq77MJfzuAzzRKD1ydmRiW3FVzqlvj69PwHAU0U89BCXQ=
+ bh=BwjU6HLISIcurPWwMgKVLqa4mU1kc4uoYuJlz7APYHM=;
+ b=yKPL+YYHM9c7rIajDYxWbA57zSeYlvuipRg/m8T/JcLEV94QpHsDGABhNzKRroCnLK0KzF8fsGAOb+S7nQRTKzlcRF3g8zfU9G5HGyUgDxGmYTxjWIivDNeQdxGD+WM8N/ni84NAYmJKOsug92WjGpvhCvZ3ISVXkIVET5DchfI=
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by DS7PR10MB5293.namprd10.prod.outlook.com (2603:10b6:5:3a3::16) with
+ by SJ0PR10MB4685.namprd10.prod.outlook.com (2603:10b6:a03:2df::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Wed, 7 Dec
- 2022 17:12:49 +0000
+ 2022 17:13:06 +0000
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::f006:f411:9056:63a4]) by CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::f006:f411:9056:63a4%4]) with mapi id 15.20.5880.014; Wed, 7 Dec 2022
- 17:12:49 +0000
+ 17:13:05 +0000
 From:   Eric Snowberg <eric.snowberg@oracle.com>
 To:     jarkko@kernel.org, zohar@linux.ibm.com
 Cc:     dhowells@redhat.com, dwmw2@infradead.org,
@@ -74,150 +74,136 @@ Cc:     dhowells@redhat.com, dwmw2@infradead.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-integrity@vger.kernel.org,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v2 04/10] KEYS: X.509: Parse Key Usage
-Date:   Wed,  7 Dec 2022 12:12:32 -0500
-Message-Id: <20221207171238.2945307-5-eric.snowberg@oracle.com>
+Subject: [PATCH v2 10/10] integrity: restrict INTEGRITY_KEYRING_MACHINE to restrict_link_by_ca
+Date:   Wed,  7 Dec 2022 12:12:38 -0500
+Message-Id: <20221207171238.2945307-11-eric.snowberg@oracle.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20221207171238.2945307-1-eric.snowberg@oracle.com>
 References: <20221207171238.2945307-1-eric.snowberg@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0080.namprd03.prod.outlook.com
- (2603:10b6:a03:331::25) To CH2PR10MB4150.namprd10.prod.outlook.com
+X-ClientProxiedBy: SJ0PR13CA0138.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::23) To CH2PR10MB4150.namprd10.prod.outlook.com
  (2603:10b6:610:ac::13)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|DS7PR10MB5293:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8dcd3458-1e11-4516-98a8-08dad8764457
+X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|SJ0PR10MB4685:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c609ca5-9f40-435e-8004-08dad8764ddc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: moWBXtvRk7i9GRDikCjnj9n4Z+MJgDNV9Cs6EKACUefIq7rT6ORelo3g21IWB+tfhWP79Zqe7wmtzhW/YpYQFF0YNe3T3WvRQtztScQx7EdtIt64t/K5Byp1z738Rjdv+D5YSHLNc793dJSlVK0F1h7oQLeZyBMP4nmudkfXJ+b46RieLHgQ+Nn9SVVTE1Vv6rleS2vEj7x6kfm/N4aE3JDf5uvBLn8wlxQ9ib/uWCDdVkvScmOYK9uVwL6eFcCrBbx9tO/pFSQHO8KMC+MiUzwrdISU5/1fGF5PihLRwlu4uVh7ffk5zS+etLgJcmMyPXNeXjGzEiKg8aPakG4SFBOsaTGo6+AEIJd0S/0HeFBxIRYFa68HtKsLj4Qn/2i1xXE7S7wJJJeuqiorjmigoW5JrYeOqqw1gN/0Nu0ag7zlGe4aFqaKBFTB8MN8H5m60LAGAbKicEldhltZwfRcEwwxo8Fi4Nq5OtMXhRuyq5A2kconRisnSzqhVObRb5vSOn5oThuu8wPTBFUUreorPijwaE6/bLGoWUTb1Z1qffwD8TnN8d1P7i0FzTb91Pc72JtvUtWsZ81D5yuI/78g9FG+JHiTxRPZAZyzC05OFV4mlbOaKn3XcFq3V986BlMNYmbbBpQ9aVsbMGaCn9MCrg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(396003)(39860400002)(346002)(376002)(451199015)(86362001)(186003)(2616005)(1076003)(8676002)(5660300002)(66476007)(4326008)(66556008)(36756003)(41300700001)(83380400001)(478600001)(6486002)(6512007)(6666004)(6506007)(316002)(66946007)(2906002)(7416002)(38100700002)(44832011)(8936002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ABK83vBcC44/pXYq6olY9k/klNAKzC4m11Z72R08fVClZDBHpeecl2fCAytBperz6Mq08jzRqimwTUQ0QjH3dNuzxMCqq62QVMr0uGHwH6oVysafxc0oE26wcXu8k78Qq9k3j46AZ3G14QKDlOG1KBuNS6w9d9i66yLWRA3HJz4Nk9eph5jT6GkBaGp2Kk87Q3Rmbz3uQSiGUvmAf/lzpbKQSwpY2+SovKrCD2O5cZERHXgiy46IH56XnToCUKmvB5bJEO1/HF8jKJNexDYMvtmJlC4JbtF9qqNyKj0rBzekrpR/OqPA5kvKnhXXOAC1QSCwf8vrfvm0daW2AWZ1RjZioAa5L8g3fl3xxNPUpAB1ZCVi3iYOumeVUc00qXM7oX4h/f+G34nnSyJ7Z29yuNGkbnO+AwlILMa85gDczKlhRDfuvuskIbNZ9od6wzkKKC8v4ycLqnR+gWZ5fpdGvcqrNL9DPJmjU26XYdNoD6CTUqUV3/sQ2j02fuZ4epYzFxMaiNzClOdlBzbVoEmQ02Zf87JXabI6+0qmB/3MLOWhabucP+UWY8ghjdzEEMDgtomfkgHTT4dS+o+IY9ZyPAzJ539As66ja31gTt6Y+uVYsdMELh8GhgkwNoZv5KA+txyF8Uc8cgF6eCzagLi97g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(39860400002)(396003)(136003)(366004)(376002)(451199015)(5660300002)(1076003)(36756003)(41300700001)(2616005)(7416002)(83380400001)(38100700002)(8936002)(2906002)(44832011)(478600001)(6486002)(6666004)(6512007)(316002)(66556008)(4326008)(8676002)(66476007)(6506007)(86362001)(66946007)(186003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hGdPgk9Ay+YwYuXnl5ySCdsEjZREpYaMdzhyKkbUURzmVFLUfhCrxhxRopZz?=
- =?us-ascii?Q?WC0JmlPAT+Ccall2z8bjIo082x9aIfUS6iXuh0mgbe9Pal/dwBhUheBg7WWy?=
- =?us-ascii?Q?3TY+Aq9nA7NVcyp97plRolNIEECwI9eo3ZL2xu8mYXkDsXOWZBGzu+1xTeOL?=
- =?us-ascii?Q?M7lDBTLIpuCiE+ZHmAtgXDEdYCmld5pFeL9X79/FK+kJvt14B3BKK0Fd5bWL?=
- =?us-ascii?Q?9UryBq5PGWvm4Xhb1JBC1D4+BJuSSgvB9qo6Lz3yzbUqpapUTOsNQoToOj8j?=
- =?us-ascii?Q?wgGFd/38lbFloodFW915HQD95/2s0o7bCEL0gRPCJnSgZe0GebALTBXOutDs?=
- =?us-ascii?Q?HxA8+EoLrzPsDwveFw9bHN+HtRBlwUwJP1G3DSyGElF0w52Fgu/I3ffNL2p1?=
- =?us-ascii?Q?AG9KK2j3Z/6HqUsHqCkXQJ8CJfXx7eFCq3oS1H9qrlxR9BwgKoUo1xSClbJN?=
- =?us-ascii?Q?h9PF6aisrs8rd71OD1xnQf5Dm25awfcUzJ70PAdvylD2mHvr5Gov7FRw/dha?=
- =?us-ascii?Q?ESvrSK8U6rsmYoshloSdRFoD+f28EK5dkgzwYfjCkkJlsEfTaiYqOyKEyGeO?=
- =?us-ascii?Q?dQh+PC1tkDvN40iOYkt8EYrd5dDqh6P7OXWdSFAlJcDwd4cOw3Arcbwat0PS?=
- =?us-ascii?Q?uyTxeWqxtCbnuq7d6veY/o418pifvcx3TslepuaRy1FvWYS356z8JntSNnta?=
- =?us-ascii?Q?yHawTdV3IGInw/IPFzT74hTMIriXuiBCiBfiN8I6tE1R9XUoXQsiW+5LwDVf?=
- =?us-ascii?Q?pvphbgnmuHPVYdM1EuIuMujsCm4tXiXKwCaasXE0tT+pXGDxWzTRkCSBgeIC?=
- =?us-ascii?Q?QuolcZfqpGyBOeB7PwjWBHsW56zy7AWjAXai+OPgfOkkXFXfEtX8IvhzJhz0?=
- =?us-ascii?Q?Nr5KtZ6Oi7M7TCk4tPrGuq00ObJMaVnzh3pu9yATAWAw0i9r7FoH/VCGPiTE?=
- =?us-ascii?Q?nnBhnod5Wr6juQIvA4KX0D7cHsoah83i1/b5elxYfwT059e2Hvt+ZGwrg1Vb?=
- =?us-ascii?Q?1MtWrD/pbdZHho2yQVlxjtB02V00AZAFYfZvynYTTQBfmH8pLkbcD1ijliRb?=
- =?us-ascii?Q?tOshO5OCUlvGDS0yu3weDABe85PX8cMVWtKz37q2EiVZiCtqp+sxiQVU4dku?=
- =?us-ascii?Q?VkVlSt4eXXB5BK7C5RR+4O0O0MX67bOUxV0g4UzuBz3PXPhn1V4MbDxPAR37?=
- =?us-ascii?Q?IQKqyI3cII+IVSjMCJhe75/Xwwx0646GOiTuf9LxjHid+wpT1Op8KDAeOLRI?=
- =?us-ascii?Q?UGio9Tw+RGi1qXSf7wLk6zx5KZ0fyUcAULauAB7LEowSpYOb0XNhC9WjbkN9?=
- =?us-ascii?Q?nJEpj7OwcJsv1GCalo7UnzlyjUy3Alw1Ghn8FkgjkFPJsBjw4aVNEIhX2r0E?=
- =?us-ascii?Q?O9Gcyt+Obx1dLbf05DrO1kNWSZis2gmnvOJKs9AvmCeCvG0gdAtep4OwwTHx?=
- =?us-ascii?Q?5NfIAN7imiXmjqtWHIRgcDtplgL6SEUmxe/G8nXKrxHvI+xPq1YaVJ1KTsf6?=
- =?us-ascii?Q?l2UE+1BGJAhl8iY4AGTmI9GztLjkmVHWTigOiUIaVrBqW5HeXQW6P5bnXFnE?=
- =?us-ascii?Q?QxoI8ZBtBV9jydmOj2PIUHp54domzAbqbtjBOKdS97n+41CFmfqReLlYc6jo?=
- =?us-ascii?Q?KMrifVZ4xvClGmxN0Vyq7P4=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GRgudxubvAa7diJ9hTyRvd5pOwZcUCQYPAyqP2VFiFAN5eEY1LLO8avtbZ/J?=
+ =?us-ascii?Q?ZIxKa5t4rS+oFsObq6548ovp1xAyDgWvx/Q7hvH243kz5vgJCJprB+AYAp1u?=
+ =?us-ascii?Q?SMYP/Sv2RpnS+0loq1aOBL9+ojkSG7QGBayz0xLJ1NQaSuVbJ4YOn1dq8J4L?=
+ =?us-ascii?Q?eewlE3k288v1L2K00wKUNW0y1aqBhovmSOQIRzqZ9quQXo3yxhnvwVoEbmsD?=
+ =?us-ascii?Q?A7Qdww10yDhjYz4AzdX08OlNfH3hjHoKQNtJ4S5SDszRqseZ7V5TqiJh1XX/?=
+ =?us-ascii?Q?66s1Mw98zs9kGh777aB/DjL75i2sgKZ1VwbkbCbCQR2qD9jj41vDXLtTZ6fC?=
+ =?us-ascii?Q?jfRnNd5fsHd84kZUDBlBYcvqDp17kRVHcK9KUEJMt8rCMr59nU9cwLECBXpH?=
+ =?us-ascii?Q?CnqzeJZGwYNBFIvNMWeYwyE5oVfAw/2Ev8AWCvgw4+yUtT2vKxAmOjigMLB7?=
+ =?us-ascii?Q?4e973WdYAuJ58NvEdPnlqKIKoA4b96M5O61HQFN4h2DBAnFenS+QvVDWCmMq?=
+ =?us-ascii?Q?nCNDk4F30DYNZJCp++NgG8HE1EYXYzS2AxcI8BqI/e9+2CRKIx9ieKOwo8Qx?=
+ =?us-ascii?Q?BFrI/RX49TMjTSza/vBwtR+BXQRcun+5pHcwXcgmp4vorKECmKMA+wYdDXhQ?=
+ =?us-ascii?Q?Hth53nB7flaxFjdSZALq+nJjYgfYHDVC1gLDP57vw0Q1c8tecENoMCl8kfva?=
+ =?us-ascii?Q?OQjyhS8EPr1hv4oGBXH5Y7Hszd37vBRmP45dSTVdmZhe9nEtr81tEzB1amAy?=
+ =?us-ascii?Q?Cv/3iUtCgMoDtF6h+nhggTLd5R9hEC0PXHkBou9JNnaZDoz4wHG3v0UnsW6s?=
+ =?us-ascii?Q?+OHxWxkY3HmQmYcBErE28jakjEqSykw9q5M9FgefDMKZALI+By0sgbycp6yK?=
+ =?us-ascii?Q?WBFAzFg0WKj17VgkGQLUq2Qju5lN+7B8t6cKq7Cxr/KxB6llSo9PWYMtUjI7?=
+ =?us-ascii?Q?NiTUcpvqN3G9ARzNXbvWHZRe+LF+0xV29Kt1Krrh28glQevPq1k4iRJYWY9K?=
+ =?us-ascii?Q?UsqUy5ILHMsHMq/fcmOZnzZDdSedKov8sHP5sSoE6grhkuOGtecVQq1IbZVX?=
+ =?us-ascii?Q?kqsz1cg2UzKtICZdJ8WxxfS0/BYiRRHTsA4nXsznd+HQvuXVvbjBq3yV8UBo?=
+ =?us-ascii?Q?aedGKi9yTbR1gKaVHCygYQRocOvJ7oP8/Iww3XFVeR0bNTox97gxg2eyTjwh?=
+ =?us-ascii?Q?+kAKK4qxVJ3LJYNasNSiFG2urjj2C2c98kEImTl3QYnpbf1vZMPBdByTUNgV?=
+ =?us-ascii?Q?9H86IeoX/p6af9I9stpeYBTNkIuQKjy0sU3T2Achgarc1Bz0OX8SdsptUkLx?=
+ =?us-ascii?Q?u3zxohh8FAXXYxoNW6qsKv1bPoY50HgCtIDDs9keCMT6Ii8ArusiYTPRkqFA?=
+ =?us-ascii?Q?RlIDH95AbMFpD1SfxW35Yft2yr3wU1IlFBBlV3eUVebuW+Op4d8aglU7DH/w?=
+ =?us-ascii?Q?lOsd8FqmowzPZ3bQMEBXhlY6pDqrPDRGaMNHcVrYAURoYeNxV61FHdQKuGLQ?=
+ =?us-ascii?Q?RIQvzMCr7eYiMofY6vKTOEk+n9g9HGZNAQ0TRD0Jq9owkUN1imQyj6s8QhWn?=
+ =?us-ascii?Q?eV/yqjJyT3c5gNXvH9Xo/ynhfcRhhmUfui/q2gbcqJpAHgMQMgjLGc0Z4tve?=
+ =?us-ascii?Q?fu6QDwyyS/gXQo2pgsYre6w=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8dcd3458-1e11-4516-98a8-08dad8764457
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c609ca5-9f40-435e-8004-08dad8764ddc
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 17:12:49.2240
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2022 17:13:05.5070
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dy1lZl96TAEjT8I57doAlm45cff8Og/cyclWSj93pKkcjuAvx1iwhsoMdn08uvrL6bOi4gUz5fNpqn+0zSff1MnapcTn81ihCPU4/imEuGY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5293
+X-MS-Exchange-CrossTenant-UserPrincipalName: ke+1EeCNrw1sslgpKKN/QN8SOZc9mx/iS+2R5ZMO3VJLT2GuATsOHGVAb063cv9BJ9M91X+lpghWSwfFZu657CWLCfoCrGvB7zs2/Im+QMU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4685
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-07_08,2022-12-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2212070150
-X-Proofpoint-GUID: rkLOYZGQAMvLc9HUAf4quPYhdDgHgpJu
-X-Proofpoint-ORIG-GUID: rkLOYZGQAMvLc9HUAf4quPYhdDgHgpJu
+X-Proofpoint-GUID: l5z464-Eg8dgu_oy_ZzjWhrYKftNDtwC
+X-Proofpoint-ORIG-GUID: l5z464-Eg8dgu_oy_ZzjWhrYKftNDtwC
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Parse the X.509 Key Usage.  The key usage extension defines the purpose of
-the key contained in the certificate.
-
-   id-ce-keyUsage OBJECT IDENTIFIER ::=  { id-ce 15 }
-
-      KeyUsage ::= BIT STRING {
-           digitalSignature        (0),
-           contentCommitment       (1),
-           keyEncipherment         (2),
-           dataEncipherment        (3),
-           keyAgreement            (4),
-           keyCertSign             (5),
-           cRLSign                 (6),
-           encipherOnly            (7),
-           decipherOnly            (8) }
-
-If the keyCertSign is set, store it in the x509_certificate structure.
-This will be used in a follow on patch that requires knowing the
-certificate key usage type.
+Set the restriction check for INTEGRITY_KEYRING_MACHINE keys to
+restrict_link_by_ca.  This will only allow CA keys into the machine
+keyring.
 
 Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 22 ++++++++++++++++++++++
- crypto/asymmetric_keys/x509_parser.h      |  1 +
- 2 files changed, 23 insertions(+)
+ security/integrity/Kconfig  | 10 ++++++++++
+ security/integrity/digsig.c |  8 ++++++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index b4443e507153..edb22cf04eed 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -579,6 +579,28 @@ int x509_process_extension(void *context, size_t hdrlen,
- 		return 0;
- 	}
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index 14cc3c767270..3357883fa5a8 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -74,6 +74,16 @@ config INTEGRITY_MACHINE_KEYRING
+ 	 in the platform keyring, keys contained in the .machine keyring will
+ 	 be trusted within the kernel.
  
-+	if (ctx->last_oid == OID_keyUsage) {
-+		/*
-+		 * Get hold of the keyUsage bit string to validate keyCertSign
-+		 * v[1] is the encoding size
-+		 *       (Expect either 0x02 or 0x03, making it 1 or 2 bytes)
-+		 * v[2] is the number of unused bits in the bit string
-+		 *       (If >= 3 keyCertSign is missing)
-+		 * v[3] and possibly v[4] contain the bit string
-+		 * 0x04 is where KeyCertSign lands in this bit string (from
-+		 *      RFC 5280 4.2.1.3)
-+		 */
-+		if (v[0] != ASN1_BTS)
-+			return -EBADMSG;
-+		if (vlen < 4)
-+			return -EBADMSG;
-+		if (v[1] == 0x02 && v[2] <= 2 && (v[3] & 0x04))
-+			ctx->cert->kcs_set = true;
-+		else if (vlen > 4 && v[1] == 0x03 && (v[3] & 0x04))
-+			ctx->cert->kcs_set = true;
-+		return 0;
-+	}
++config INTEGRITY_CA_MACHINE_KEYRING
++	bool "Only allow CA keys into the Machine Keyring"
++	depends on INTEGRITY_MACHINE_KEYRING
++	help
++	 If set, only Machine Owner Keys (MOK) that are Certificate
++	 Authority (CA) keys will be added to the .machine keyring. All
++	 other MOK keys will be added to the .platform keyring.  After
++	 booting, any other key signed by the CA key can be added to the
++	 secondary_trusted_keys keyring.
 +
- 	if (ctx->last_oid == OID_authorityKeyIdentifier) {
- 		/* Get hold of the CA key fingerprint */
- 		ctx->raw_akid = v;
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index 7c5c0ad1c22e..74a9f929e400 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -39,6 +39,7 @@ struct x509_certificate {
- 	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
- 	bool		blacklisted;
- 	bool		root_ca;		/* T if basic constraints CA is set */
-+	bool		kcs_set;		/* T if keyCertSign is set */
- };
+ config LOAD_UEFI_KEYS
+        depends on INTEGRITY_PLATFORM_KEYRING
+        depends on EFI
+diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
+index 1fe8d1ed6e0b..b0ec615745e3 100644
+--- a/security/integrity/digsig.c
++++ b/security/integrity/digsig.c
+@@ -131,7 +131,8 @@ int __init integrity_init_keyring(const unsigned int id)
+ 		| KEY_USR_READ | KEY_USR_SEARCH;
  
- /*
+ 	if (id == INTEGRITY_KEYRING_PLATFORM ||
+-	    id == INTEGRITY_KEYRING_MACHINE) {
++	    (id == INTEGRITY_KEYRING_MACHINE &&
++	    !IS_ENABLED(CONFIG_INTEGRITY_CA_MACHINE_KEYRING))) {
+ 		restriction = NULL;
+ 		goto out;
+ 	}
+@@ -143,7 +144,10 @@ int __init integrity_init_keyring(const unsigned int id)
+ 	if (!restriction)
+ 		return -ENOMEM;
+ 
+-	restriction->check = restrict_link_to_ima;
++	if (id == INTEGRITY_KEYRING_MACHINE)
++		restriction->check = restrict_link_by_ca;
++	else
++		restriction->check = restrict_link_to_ima;
+ 
+ 	/*
+ 	 * MOK keys can only be added through a read-only runtime services
 -- 
 2.27.0
 
