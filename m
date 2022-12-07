@@ -2,142 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D95C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Dec 2022 23:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D692AC352A1
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Dec 2022 10:39:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229452AbiLFXGn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Dec 2022 18:06:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
+        id S229462AbiLGKjv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Dec 2022 05:39:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiLFXGm (ORCPT
+        with ESMTP id S229486AbiLGKju (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Dec 2022 18:06:42 -0500
-Received: from mail-4323.proton.ch (mail-4323.proton.ch [185.70.43.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE872E8;
-        Tue,  6 Dec 2022 15:06:40 -0800 (PST)
-Date:   Tue, 06 Dec 2022 23:06:27 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-        s=protonmail; t=1670367998; x=1670627198;
-        bh=xMloqDP4QENMlZA1ePPi3XtFSzSh2ooBvz2MYzvN9lw=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=O6eaIPKNcsdaaOXYA3d6lyh/+Kzu7SI84OgeVgpWffL/Y7n2vy1hJz9+ZnQY1hFii
-         Unh+adwHtVd0u6KmO0GTSpFn4asXutMC7jfnvqJ1tVIUvCOSl0WOzJIOcROuIb/NnE
-         T1a1mXyAWar+i/BUJMtgqS9mg+Ydpr0HuJGgvDDInPJuggG+nIUxRX0SF2YNO2k9eG
-         LsWhSUGS8Yzea8ftbuvg4ralBn/7gqxNz6m7I8HDEaf8avirAfzU3j4m8awE7f3yW2
-         2PDfrQyEkKOS59sY/IVg/BAL7XsJJGejKaPwGT5DUkEZki5734CBM1/sRksdMFL5W4
-         LUr5vMoNNAXWg==
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-From:   Peter Lafreniere <peter@n8pjl.ca>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        "ap420073@gmail.com" <ap420073@gmail.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
-Message-ID: <FuRP6eq1TdvRdmbeIUM2jGr9qmB2CptLqZsWq_hVq3Bqur-pL9HX3xBLPC3iC1F6F4FT1Moi9GhPssy8MGEKO7LUKH6sA34TbV0S8K3Gn8Q=@n8pjl.ca>
-In-Reply-To: <MW5PR84MB1842C2D1EA00D5EF65784E25AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20221103042740.6556-1-elliott@hpe.com> <20221116041342.3841-1-elliott@hpe.com> <20221116041342.3841-11-elliott@hpe.com> <Y3TF7/+DejcnN0eV@zx2c4.com> <Y4B/kjS0lgzdUJHG@gondor.apana.org.au> <MW5PR84MB1842C2D1EA00D5EF65784E25AB179@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Feedback-ID: 53133685:user:proton
+        Wed, 7 Dec 2022 05:39:50 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255B61C7
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 02:39:49 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA91E612ED
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Dec 2022 10:39:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5384C433D6;
+        Wed,  7 Dec 2022 10:39:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670409588;
+        bh=UaU51mjjvEqzffoeoi31IzUxoHXD53qz+ANzmxo0Rkk=;
+        h=From:To:Cc:Subject:Date:From;
+        b=q9qZC5cCEfgWfyU2bXpus+XThf+wva3nXr9aW5sxQ/LpjLwCA+tO0fObw4niyDzEO
+         0Wh/zwSUCiLyzeZ2NeWuG5Zg++i6NHQOnMx9IoXjIGCe9Li4opUBZ4aNWYZcM228+f
+         VBK3BMQ2oJ0/QiCnEZzcq3amn3w8WLJt6EnEgQFVItemdeQ3AUkNYbZ9hyN3/rl5h/
+         xfRh8qxoAGlu0xsOXqKrUo3N9x9L0Z96+7Uv1lNYNuDfLXtK4BuCkPt9n86iINTj+u
+         aCzLzObBYzqHyjQnG7VucaAXA2r8htr8fBLpCR5WwVkuYBWk+yrt3JZfSxLtrF8pA6
+         5PMlWhqvdEEyQ==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk
+Cc:     linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2 0/2] ARM: allow kernel mode NEON in softirq context
+Date:   Wed,  7 Dec 2022 11:39:34 +0100
+Message-Id: <20221207103936.2198407-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1946; i=ardb@kernel.org; h=from:subject; bh=UaU51mjjvEqzffoeoi31IzUxoHXD53qz+ANzmxo0Rkk=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBjkG1k4gIk5BPXrKBYWIwEOYpVmyzuoJKtLUfjurOF GJASu7OJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCY5BtZAAKCRDDTyI5ktmPJCVKDA CKv21UzwKXgkO/ZU9h4lfHB83WFeFw5gnytRKzYsoPzYddKyNiW9CstQUD3j7zpfCIQ/EK/zIQoOg4 XOZC/Y/SXyhzdrGrFL4n8SPxP2BCDyz4dm2UWAOEJvKx3Xr89FNB2qKnOjVALFAZG4sSG/AtsfTRfs yYkammk2Bc2NCzkqmPShUvevqzoHPPRRSGMVdOibE1smM25C/gvCZA6VXHyFGDTVewLjoYk380C0h5 H1iGw++5PhbuFH7FV/bThtarczx2USpHb4Aj/M98I5iZ0eIV47JSOW7tfALby2d0bhYogCXK78GFRK FsAkD/Si1NVF9h7wAaytWCpMHNmRYVncIZm/tTtrKRhJVZv2wsrB/3/orPD5VLEodjAVdNhWeCGGaW jGZo/uobU5mzVrwmNyz1HnAhNSovJBa05Y2be6xfMgBtk0vFEu6k+qic7qGGr0e7jhpPAFXtaXjpBy xOAQ8IxLVP9EUo+k4SGZ3p9wsHMIMqKnCdc2EgHCHWx30=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > Subject: Re: [PATCH v4 10/24] crypto: x86/poly - limit FPU preemption
-> > Perhaps we should try a different approach. How about just limiting
-> > the size to 4K, and then depending on need_resched we break out of
-> > the loop? Something like:
-> >=20
-> > if (!len)
-> > return 0;
-> >=20
-> > kernel_fpu_begin();
-> > for (;;) {
-> > unsigned int chunk =3D min(len, 4096);
-> >=20
-> > sha1_base_do_update(desc, data, chunk, sha1_xform);
-> >=20
-> > len -=3D chunk;
-> > data +=3D chunk;
-> >=20
-> > if (!len)
-> > break;
-> >=20
-> > if (need_resched()) {
-> > kernel_fpu_end();
-> > cond_resched();
-> > kernel_fpu_begin();
-> > }
-> > }
-> > kernel_fpu_end();
->=20
->=20
-> I implemented that conditional approach in the sha algorithms.
->=20
-> The results of a boot (using sha512 for module signatures, with
-> crypto extra tests enabled, comparing to sha512 with a 20 KiB
-> fixed limit) are:
->=20
-> sha1 cond: 14479 calls; 784256 cycles doing begin/end; longest FPU contex=
-t 35828 cycles
-> sha256 cond: 26763 calls; 1273570 cycles doing begin/end; longest FPU con=
-text 118612 cycles
-> sha512 cond: 26957 calls; 1680046 cycles doing begin/end; longest FPU con=
-text 169140982 cycles
-> sha512 20KiB: 161011 calls; 16232280 cycles doing begin/end; longest FPU =
-context 4049644 cycles
->=20
-> NOTE: I didn't have a patch in place to isolate the counts for each varia=
-tion
-> (ssse3 vs. avx vs. avx2) and
-> - for sha512: sha512 vs. sha384
-> - for sha256: sha256 vs. sha224
-> so the numbers include sha256 and sha512 running twice as many tests
-> as sha1.
->=20
-> This approach looks very good:
-> - 16% of the number of begin/end calls
-> - 10% of the CPU cycles spent making the calls
-> - the FPU context is held for a long time (77 ms) but only while
-> it's not needed.
->=20
-> That's much more efficient than releasing it every 30 us just in case.
+Currently on ARM, we only permit kernel mode NEON in task context, and
+NEON based processing triggered from softirq context is queued for
+asynchronous completion via the crypto API's cryptd layer.
 
-How recently did you make this change? I implemented this conditional=20
-approach for ecb_cbc_helpers.h, but saw no changes at all to performance=20
-on serpent-avx2 and twofish-avx.
+For IPsec packet encryption involving highly performant crypto
+implementations, this results in a substantial performance hit, and so
+it would be desirable to permit those crypto operations to complete
+synchronously even when invoked from softirq context.
 
-kernel_fpu_{begin,end} (after the first call to begin) don't do anything=20
-more than enable/disable preemption and make a few writes to the mxcsr.=20
-It's likely that the above approach has the tiniest bit less overhead,=20
-and it will preempt on non CONFIG_PREEMPT kernels, but nothing suggests=20
-a performance uplift.
+For example, on a 1 GHz Cortex-A53 machine (SynQuacer), AES-256-GCM
+executes in 7.2 cycles per byte, putting an upper bound of ~140 MB/s
+on the achievable throughput of a single CPU.
 
-This brings us back to this question: should crypto routines be=20
-preempted under PREEMPT_VOLUNTARY or not?
+Without these changes, an IPsec tunnel from a 32-bit VM to the 64-bit
+host can achieve a throughput of 9.5 MB/s TX and 11.9 MB/s RX.
 
-> I'll keep testing this to make sure RCU stalls stay away, and apply
-> the approach to the other algorithms.
+When the crypto algorithm is permitted to execute in softirq context,
+the throughput increases to 16.5 MB/s TX and 41 MB/s RX.
 
-I missed the earlier discussions. Have you seen issues with RCU=20
-stalls/latency spikes because of crypto routines? If so, what preemption=20
-model were you running?
-=20
-> In x86, need_resched() has to deal with a PER_CPU variable, so I'm
-> not sure it's worth the hassle to figure out how to do that from
-> assembly code.
+(This is measured using debian's iperf3 3.11 with the default options)
 
-Leave it in c. It'll be more maintainable that way.
+So let's reorganize the VFP state handling so that it its critical
+handling of the FPU registers runs with softirqs disabled. Then, update
+the kernel_neon_begin()/end() logic to keep softirq processing disabled
+as long as the NEON is being used in kernel mode.
 
-Cheers,
-Peter Lafreniere <peter@n8pjl.ca>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Russell King <linux@armlinux.org.uk>
+
+Ard Biesheuvel (2):
+  ARM: vfp: Manipulate VFP state with softirqs disabled
+  ARM: permit non-nested kernel mode NEON in softirq context
+
+ arch/arm/include/asm/assembler.h | 19 ++++++++++++-------
+ arch/arm/include/asm/simd.h      |  8 ++++++++
+ arch/arm/kernel/asm-offsets.c    |  1 +
+ arch/arm/vfp/entry.S             |  4 ++--
+ arch/arm/vfp/vfphw.S             |  4 ++--
+ arch/arm/vfp/vfpmodule.c         | 19 ++++++++++++-------
+ 6 files changed, 37 insertions(+), 18 deletions(-)
+ create mode 100644 arch/arm/include/asm/simd.h
+
+-- 
+2.35.1
 
