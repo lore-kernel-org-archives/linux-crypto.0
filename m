@@ -2,112 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A3EC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 11:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6819AC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 15:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbiLHLBj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 06:01:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
+        id S229947AbiLHP2c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 10:28:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiLHLAd (ORCPT
+        with ESMTP id S229501AbiLHP2b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 06:00:33 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5215B178A4;
-        Thu,  8 Dec 2022 02:56:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1670497011; x=1702033011;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jZm84mXS2zwnbUgC6cdFKWsTsw/xZ4TYuKZBkJwd2Z0=;
-  b=mlvzL3y59l46+fAkQ5canADCvNLUJ8GypjTY9IP5JAWzN5ScMCFn8Qe9
-   JUObTLkU8dY/0nJ1WdG+3LwoOTPXDzWT5bZ6A/B0zU7LNx5W52L7FbkbD
-   xxLctQCI7Lm63bLXZVK+RdM7ddqAAUeTVVx/dkeVXk/tMniq+0hnFymKU
-   0CCTZ+X9S8NF4UJQG4OwQLI56QXipz3mTxd2/LnVNpC1zRzr2SU2O3jVh
-   d39LsnvAePMeEby7QJfBpY39LgIwmhlM+tLi32NwH0d2WlQiy8sqgOP9p
-   UJzRghiZwckfDrrMsv02hsk/AO/8FICUA5tfUmAS8s274jo52TAjhAnN9
-   w==;
-X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
-   d="scan'208";a="192209365"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Dec 2022 03:56:50 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.12; Thu, 8 Dec 2022 03:56:50 -0700
-Received: from [10.12.72.78] (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.12 via Frontend
- Transport; Thu, 8 Dec 2022 03:56:48 -0700
-Message-ID: <64c9bdaf-a138-a9bb-17dd-63ad96d2292b@microchip.com>
-Date:   Thu, 8 Dec 2022 11:56:47 +0100
+        Thu, 8 Dec 2022 10:28:31 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD0A11A02
+        for <linux-crypto@vger.kernel.org>; Thu,  8 Dec 2022 07:28:29 -0800 (PST)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1p3Iov-0000UU-7x; Thu, 08 Dec 2022 16:28:21 +0100
+Message-ID: <d8c38871-27a9-0501-88e4-8df07ee901cf@pengutronix.de>
+Date:   Thu, 8 Dec 2022 16:27:51 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH] crypto: atmel: Add capability case for the 0x600 SHA and
- AES IP versions
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] crypto: caam: blob_gen.c: fix CAAM io mem access
 Content-Language: en-US
-To:     Sergiu Moga <sergiu.moga@microchip.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <alexandre.belloni@bootlin.com>, <claudiu.beznea@microchip.com>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20221207135953.136557-1-sergiu.moga@microchip.com>
-From:   Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <20221207135953.136557-1-sergiu.moga@microchip.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     Nikolaus Voss <nikolaus.voss@haag-streit.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Nikolaus Voss <nv@vosn.de>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221205075839.050FF27BD@mail.steuer-voss.de>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20221205075839.050FF27BD@mail.steuer-voss.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 07/12/2022 at 14:59, Sergiu Moga wrote:
-> In order for the driver to be made aware of the capabilities of the SHA
-> and AES IP versions 0x600 , such as those present on the SAM9X60 SoC's,
-> add a corresponding switch case to the capability method of the respective
-> drivers. Without this, besides the capabilities not being correctly set,
-> the self tests may hang since the driver is endlessly waiting for a
-> completion to be set by a never occurring DMA interrupt handler.
+On 05.12.22 08:58, Nikolaus Voss wrote:
+> IO memory access has to be done with accessors defined in caam/regs.h
+> as there are little-endian architectures with a big-endian CAAM unit.
 > 
-> Signed-off-by: Sergiu Moga <sergiu.moga@microchip.com>
+> Fixes ("crypto: caam: blob_gen.c: warn if key is insecure")
 
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+@Herbert, is there a stable commit revision Nikolaus could reference here?
 
-Thanks Sergiu, best regards,
-   Nicolas
+> Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
+
+LGTM.
+
+Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
 
 > ---
->   drivers/crypto/atmel-aes.c | 1 +
->   drivers/crypto/atmel-sha.c | 1 +
->   2 files changed, 2 insertions(+)
+>  drivers/crypto/caam/blob_gen.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> index 886bf258544c..063394cfa874 100644
-> --- a/drivers/crypto/atmel-aes.c
-> +++ b/drivers/crypto/atmel-aes.c
-> @@ -2510,6 +2510,7 @@ static void atmel_aes_get_cap(struct atmel_aes_dev *dd)
->   	/* keep only major version number */
->   	switch (dd->hw_version & 0xff0) {
->   	case 0x700:
-> +	case 0x600:
->   	case 0x500:
->   		dd->caps.has_dualbuff = 1;
->   		dd->caps.has_cfb64 = 1;
-> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-> index ca4b01926d1b..00be792e605c 100644
-> --- a/drivers/crypto/atmel-sha.c
-> +++ b/drivers/crypto/atmel-sha.c
-> @@ -2509,6 +2509,7 @@ static void atmel_sha_get_cap(struct atmel_sha_dev *dd)
->   	/* keep only major version number */
->   	switch (dd->hw_version & 0xff0) {
->   	case 0x700:
-> +	case 0x600:
->   	case 0x510:
->   		dd->caps.has_dma = 1;
->   		dd->caps.has_dualbuff = 1;
+> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+> index 1f65df489847..f46b161d2cda 100644
+> --- a/drivers/crypto/caam/blob_gen.c
+> +++ b/drivers/crypto/caam/blob_gen.c
+> @@ -104,7 +104,7 @@ int caam_process_blob(struct caam_blob_priv *priv,
+>  	}
+>  
+>  	ctrlpriv = dev_get_drvdata(jrdev->parent);
+> -	moo = FIELD_GET(CSTA_MOO, ioread32(&ctrlpriv->ctrl->perfmon.status));
+> +	moo = FIELD_GET(CSTA_MOO, rd_reg32(&ctrlpriv->ctrl->perfmon.status));
+>  	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
+>  		dev_warn(jrdev,
+>  			 "using insecure test key, enable HAB to use unique device key!\n");
 
 -- 
-Nicolas Ferre
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
