@@ -2,138 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3499C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 09:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 137C4C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 09:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiLHJXL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 04:23:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54310 "EHLO
+        id S229897AbiLHJ20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 04:28:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbiLHJXJ (ORCPT
+        with ESMTP id S230161AbiLHJ2R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 04:23:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC1458BF8;
-        Thu,  8 Dec 2022 01:23:08 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B8DAE61E04;
-        Thu,  8 Dec 2022 09:23:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91A1C433C1;
-        Thu,  8 Dec 2022 09:23:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670491387;
-        bh=Pyvsh6dNxc4HyaxTZC50pJ+mJJTEHkJ0yEeOFq7Ogtg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lM0mxqNbjFKVZaNSAF2Q5ScBfU3ZH4tDZo69w55WIKrcund6O1FP1G6l6We9svoNA
-         3JNiDHPn6h5Fx6TY0CZnUxf01ApSvRurtC39cHYouBmnjwCo06eX7Sjy1O/X7NVxXN
-         fOxhB6gj8sTLHUMLH6VVKFW7iJBWxBe0xC3MhLpQaZHRG34tPaZgNOMQtWNMPY2I55
-         AIBQvF2V0RFrOQiXZJQ0LWtM2inYP3kcTVwGb8LyzSSYdm6X6nEQ009UCSnPzQ0m1p
-         gwKhpc4a6EkDJ92mtU8vNHY3eoFTxHkwCPWaYegdYF+nq8WMvJjEUpWHBhVa5iheg9
-         gYFIXksKNL+pg==
-Date:   Thu, 8 Dec 2022 09:23:02 +0000
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Vlastimil Babka <vbabka@suse.cz>,
-        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
-        linux-integrity@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
-        timvp@google.com, apronin@google.com, mw@semihalf.com,
-        upstream@semihalf.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
-Message-ID: <Y5Gs9jaSIGTNdRbV@kernel.org>
-References: <20221128195651.322822-1-Jason@zx2c4.com>
- <Y4zTnhgunXuwVXHe@kernel.org>
- <Y4zUotH0UeHlRBGP@kernel.org>
- <Y4zxly0XABDg1OhU@zx2c4.com>
+        Thu, 8 Dec 2022 04:28:17 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8813E286C4
+        for <linux-crypto@vger.kernel.org>; Thu,  8 Dec 2022 01:28:10 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id b3so1159523lfv.2
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Dec 2022 01:28:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jvonNZ8hzOsUtXfMS5jsK8oAXaTdy0VRFUTiOadKcQc=;
+        b=h0SV4jEnf3LUyPMrtB7fSs0oyXBjNYnC+wPkJTrEpAUXeX5sXQrly2h9pmV/BaIy6R
+         wtqelKyna1vNSa6KpgOzVcTBveTYzc2S67lbmsqmihry8Rub1uAALhMl94mCc+8wYSRJ
+         TGMPDgtWtHtj+W7XZmvrbtxNjfh3A6iZ3Js7OJm47H9nJGn70bbwRnzdForlH+YFf6vZ
+         uMGjvfiNmEKFuHLplsEo4aYd310onrCycBoGJB2C0dzRwqMPSWFQOLNyKPxj3A/tnnJa
+         bwBNmh/BRjTXp6nA+hctAfSA6i37FFHqmeT1ZdXh+9ukwlTZwr1T+PdKCqQfXNMV9fF1
+         uCTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jvonNZ8hzOsUtXfMS5jsK8oAXaTdy0VRFUTiOadKcQc=;
+        b=jv+upHFMc93sMPRLMnmZxqe+vUeh7gQZsM3vXQ4WRlNp3Q3lLWZxfIrCgMKeqtSQey
+         zqn/o2d1wWyRfVH/8dKfXne1LRlCqj1lcyGxp6LvpB5Aiuzo1qHB5PIjgVUfy/4z+g0l
+         jlQl25m7OlRflcscDHA2SnGYmZt/qop2Hp++cma9mGkv/xHtnbPQi3CARTKJ8MMcFwmr
+         PQnmbH+UBKCHmTNTe/Gw5sd8Q0ZS3xEAH/6m1N88logUFjfcZ6URhhVnRyTSF9Az9yuw
+         EUKCnMWNhkcps0gLjtUiVL3yXyobz5X5KwVdQ1utHrMS1DnotGD+sv2flaO0tVrOCT2g
+         0ctg==
+X-Gm-Message-State: ANoB5pl7cLrSQUmcphclBAqm/dhizss1/7uynkstSs2r52eSC+kl5FAt
+        AK5uzCJufiY69a2B8PQV88B+Rg==
+X-Google-Smtp-Source: AA0mqf7TNvjfjrF7HrYj9ZQKhyCHR8PdEUqzTgbholw8jlR+OE7FkmeYXQJ4FF00PhAzDPAROjzt2Q==
+X-Received: by 2002:a19:760b:0:b0:4b5:67d8:e3c2 with SMTP id c11-20020a19760b000000b004b567d8e3c2mr6935849lff.166.1670491688911;
+        Thu, 08 Dec 2022 01:28:08 -0800 (PST)
+Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
+        by smtp.gmail.com with ESMTPSA id b24-20020ac25638000000b004b57bbaef87sm532100lff.224.2022.12.08.01.28.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Dec 2022 01:28:08 -0800 (PST)
+Message-ID: <9c7066e4-fa3f-3dda-b939-04dfdaf73242@linaro.org>
+Date:   Thu, 8 Dec 2022 10:28:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y4zxly0XABDg1OhU@zx2c4.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
+Content-Language: en-US
+To:     JiaJie Ho <jiajie.ho@starfivetech.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+ <e1e9f1d19982493b89ae63f51e00a3bb@EXMBX068.cuchost.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <e1e9f1d19982493b89ae63f51e00a3bb@EXMBX068.cuchost.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Dec 04, 2022 at 08:14:31PM +0100, Jason A. Donenfeld wrote:
-> On Sun, Dec 04, 2022 at 05:10:58PM +0000, Jarkko Sakkinen wrote:
-> > On Sun, Dec 04, 2022 at 05:06:41PM +0000, Jarkko Sakkinen wrote:
-> > > On Mon, Nov 28, 2022 at 08:56:51PM +0100, Jason A. Donenfeld wrote:
-> > > > From: Jan Dabros <jsd@semihalf.com>
-> > > > 
-> > > > Currently tpm transactions are executed unconditionally in
-> > > > tpm_pm_suspend() function, which may lead to races with other tpm
-> > > > accessors in the system. Specifically, the hw_random tpm driver makes
-> > > > use of tpm_get_random(), and this function is called in a loop from a
-> > > > kthread, which means it's not frozen alongside userspace, and so can
-> > > > race with the work done during system suspend:
-> > > > 
-> > > > [    3.277834] tpm tpm0: tpm_transmit: tpm_recv: error -52
-> > > > [    3.278437] tpm tpm0: invalid TPM_STS.x 0xff, dumping stack for forensics
-> > > > [    3.278445] CPU: 0 PID: 1 Comm: init Not tainted 6.1.0-rc5+ #135
-> > > > [    3.278450] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-20220807_005459-localhost 04/01/2014
-> > > > [    3.278453] Call Trace:
-> > > > [    3.278458]  <TASK>
-> > > > [    3.278460]  dump_stack_lvl+0x34/0x44
-> > > > [    3.278471]  tpm_tis_status.cold+0x19/0x20
-> > > > [    3.278479]  tpm_transmit+0x13b/0x390
-> > > > [    3.278489]  tpm_transmit_cmd+0x20/0x80
-> > > > [    3.278496]  tpm1_pm_suspend+0xa6/0x110
-> > > > [    3.278503]  tpm_pm_suspend+0x53/0x80
-> > > > [    3.278510]  __pnp_bus_suspend+0x35/0xe0
-> > > > [    3.278515]  ? pnp_bus_freeze+0x10/0x10
-> > > > [    3.278519]  __device_suspend+0x10f/0x350
-> > > > 
-> > > > Fix this by calling tpm_try_get_ops(), which itself is a wrapper around
-> > > > tpm_chip_start(), but takes the appropriate mutex.
-> > > > 
-> > > > Signed-off-by: Jan Dabros <jsd@semihalf.com>
-> > > > Reported-by: Vlastimil Babka <vbabka@suse.cz>
-> > > > Tested-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > > > Tested-by: Vlastimil Babka <vbabka@suse.cz>
-> > > > Link: https://lore.kernel.org/all/c5ba47ef-393f-1fba-30bd-1230d1b4b592@suse.cz/
-> > > > Cc: stable@vger.kernel.org
-> > > > Fixes: e891db1a18bf ("tpm: turn on TPM on suspend for TPM 1.x")
-> > > > [Jason: reworked commit message, added metadata]
-> > > > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > > > ---
-> > > >  drivers/char/tpm/tpm-interface.c | 5 +++--
-> > > >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
-> > > > index 1621ce818705..d69905233aff 100644
-> > > > --- a/drivers/char/tpm/tpm-interface.c
-> > > > +++ b/drivers/char/tpm/tpm-interface.c
-> > > > @@ -401,13 +401,14 @@ int tpm_pm_suspend(struct device *dev)
-> > > >  	    !pm_suspend_via_firmware())
-> > > >  		goto suspended;
-> > > >  
-> > > > -	if (!tpm_chip_start(chip)) {
-> > > > +	rc = tpm_try_get_ops(chip);
-> > > > +	if (!rc) {
-> > > >  		if (chip->flags & TPM_CHIP_FLAG_TPM2)
-> > > >  			tpm2_shutdown(chip, TPM2_SU_STATE);
-> > > >  		else
-> > > >  			rc = tpm1_pm_suspend(chip, tpm_suspend_pcr);
-> > > >  
-> > > > -		tpm_chip_stop(chip);
-> > > > +		tpm_put_ops(chip);
-> > > >  	}
-> > > >  
-> > > >  suspended:
-> > > > -- 
-> > > > 2.38.1
-> > > > 
-> > > 
-> > > Hi, sorry for the latency.
-> > > 
-> > > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > 
-> > Applied to  git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
+On 08/12/2022 10:09, JiaJie Ho wrote:
+>>
+>> The driver has been tested with crypto selftest and additional test.
+>>
+>> This patch series depends on the following patches:
+>> https://patchwork.kernel.org/project/linux-
+>> riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
+>> https://patchwork.kernel.org/project/linux-
+>> riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
+>>
+>> Jia Jie Ho (6):
+>>   crypto: starfive - Add StarFive crypto engine support
+>>   crypto: starfive - Add hash and HMAC support
+>>   crypto: starfive - Add AES skcipher and aead support
+>>   crypto: starfive - Add Public Key algo support
+>>   dt-bindings: crypto: Add bindings for Starfive crypto driver
+>>   riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
+>>
 > 
-> Oh thank goodness. You'll send this in for rc8 today?
+> Hi Herbert/David,
+> 
+> Could you please help to review and provide comments on this patch series?
+> Thank you in advance.
 
-for 6.2-rc1
+You received some comments so the expectation is to send a v2.
 
-BR, Jarkko
+Best regards,
+Krzysztof
+
