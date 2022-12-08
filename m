@@ -2,90 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E601AC3A5A7
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 10:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A3EC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 11:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbiLHK7l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 05:59:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35566 "EHLO
+        id S229619AbiLHLBj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 06:01:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiLHK7S (ORCPT
+        with ESMTP id S230245AbiLHLAd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 05:59:18 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59ED192A03;
-        Thu,  8 Dec 2022 02:51:25 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8B055208AD;
-        Thu,  8 Dec 2022 10:51:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1670496684; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BSaHkEqadKz6Lj4LX693awEbtIj1UyMwaIh3AiAJ7l0=;
-        b=TCQfldZoLzBcalU+ldxeRz8jICL2nDry/ntYAUdvGgipsJwBVmVfbBmzZeHdK5oDK/dODv
-        BPKpva7x9xgZh4H46H1+j9Nkb8cbuZkPB/Jy67GHIsiQHnnnxGlz9dA/jO+wJ46gf5++AW
-        zWu8AsBqavIBKrjYXie/adLrOf5t1a0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1670496684;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BSaHkEqadKz6Lj4LX693awEbtIj1UyMwaIh3AiAJ7l0=;
-        b=Pw8tmZ6Jl716sFYtiV8lkZcndzW3ky7Ka09wMIX04atMtcSl8XXxV+CcsVYN1xBkPslmXq
-        q5y89az6rMVvO2BA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5163513416;
-        Thu,  8 Dec 2022 10:51:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 14wnE6zBkWP6GAAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Thu, 08 Dec 2022 10:51:24 +0000
-Message-ID: <6d13f2ba-7598-4522-e0e6-32f1577a2655@suse.cz>
-Date:   Thu, 8 Dec 2022 11:51:24 +0100
+        Thu, 8 Dec 2022 06:00:33 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5215B178A4;
+        Thu,  8 Dec 2022 02:56:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1670497011; x=1702033011;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jZm84mXS2zwnbUgC6cdFKWsTsw/xZ4TYuKZBkJwd2Z0=;
+  b=mlvzL3y59l46+fAkQ5canADCvNLUJ8GypjTY9IP5JAWzN5ScMCFn8Qe9
+   JUObTLkU8dY/0nJ1WdG+3LwoOTPXDzWT5bZ6A/B0zU7LNx5W52L7FbkbD
+   xxLctQCI7Lm63bLXZVK+RdM7ddqAAUeTVVx/dkeVXk/tMniq+0hnFymKU
+   0CCTZ+X9S8NF4UJQG4OwQLI56QXipz3mTxd2/LnVNpC1zRzr2SU2O3jVh
+   d39LsnvAePMeEby7QJfBpY39LgIwmhlM+tLi32NwH0d2WlQiy8sqgOP9p
+   UJzRghiZwckfDrrMsv02hsk/AO/8FICUA5tfUmAS8s274jo52TAjhAnN9
+   w==;
+X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
+   d="scan'208";a="192209365"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Dec 2022 03:56:50 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.12; Thu, 8 Dec 2022 03:56:50 -0700
+Received: from [10.12.72.78] (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.12 via Frontend
+ Transport; Thu, 8 Dec 2022 03:56:48 -0700
+Message-ID: <64c9bdaf-a138-a9bb-17dd-63ad96d2292b@microchip.com>
+Date:   Thu, 8 Dec 2022 11:56:47 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v3] char: tpm: Protect tpm_pm_suspend with locks
+ Thunderbird/102.4.2
+Subject: Re: [PATCH] crypto: atmel: Add capability case for the 0x600 SHA and
+ AES IP versions
 Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>,
-        linux-integrity@vger.kernel.org, peterhuewe@gmx.de, jgg@ziepe.ca,
-        gregkh@linuxfoundation.org, arnd@arndb.de, rrangel@chromium.org,
-        timvp@google.com, apronin@google.com, mw@semihalf.com,
-        upstream@semihalf.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-References: <20221128195651.322822-1-Jason@zx2c4.com>
- <Y4zTnhgunXuwVXHe@kernel.org> <Y4zUotH0UeHlRBGP@kernel.org>
- <Y4zxly0XABDg1OhU@zx2c4.com> <Y5Gs9jaSIGTNdRbV@kernel.org>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <Y5Gs9jaSIGTNdRbV@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Sergiu Moga <sergiu.moga@microchip.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <alexandre.belloni@bootlin.com>, <claudiu.beznea@microchip.com>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20221207135953.136557-1-sergiu.moga@microchip.com>
+From:   Nicolas Ferre <nicolas.ferre@microchip.com>
+Organization: microchip
+In-Reply-To: <20221207135953.136557-1-sergiu.moga@microchip.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/8/22 10:23, Jarkko Sakkinen wrote:
-> On Sun, Dec 04, 2022 at 08:14:31PM +0100, Jason A. Donenfeld wrote:
->> > 
->> > Applied to  git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
->> 
->> Oh thank goodness. You'll send this in for rc8 today?
+On 07/12/2022 at 14:59, Sergiu Moga wrote:
+> In order for the driver to be made aware of the capabilities of the SHA
+> and AES IP versions 0x600 , such as those present on the SAM9X60 SoC's,
+> add a corresponding switch case to the capability method of the respective
+> drivers. Without this, besides the capabilities not being correctly set,
+> the self tests may hang since the driver is endlessly waiting for a
+> completion to be set by a never occurring DMA interrupt handler.
 > 
-> for 6.2-rc1
+> Signed-off-by: Sergiu Moga <sergiu.moga@microchip.com>
 
-Linus took it directly to rc8, so it would conflict now.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v6.1-rc8&id=23393c6461422df5bf8084a086ada9a7e17dc2ba
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 
-> BR, Jarkko
+Thanks Sergiu, best regards,
+   Nicolas
+
+> ---
+>   drivers/crypto/atmel-aes.c | 1 +
+>   drivers/crypto/atmel-sha.c | 1 +
+>   2 files changed, 2 insertions(+)
+> 
+> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+> index 886bf258544c..063394cfa874 100644
+> --- a/drivers/crypto/atmel-aes.c
+> +++ b/drivers/crypto/atmel-aes.c
+> @@ -2510,6 +2510,7 @@ static void atmel_aes_get_cap(struct atmel_aes_dev *dd)
+>   	/* keep only major version number */
+>   	switch (dd->hw_version & 0xff0) {
+>   	case 0x700:
+> +	case 0x600:
+>   	case 0x500:
+>   		dd->caps.has_dualbuff = 1;
+>   		dd->caps.has_cfb64 = 1;
+> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+> index ca4b01926d1b..00be792e605c 100644
+> --- a/drivers/crypto/atmel-sha.c
+> +++ b/drivers/crypto/atmel-sha.c
+> @@ -2509,6 +2509,7 @@ static void atmel_sha_get_cap(struct atmel_sha_dev *dd)
+>   	/* keep only major version number */
+>   	switch (dd->hw_version & 0xff0) {
+>   	case 0x700:
+> +	case 0x600:
+>   	case 0x510:
+>   		dd->caps.has_dma = 1;
+>   		dd->caps.has_dualbuff = 1;
+
+-- 
+Nicolas Ferre
 
