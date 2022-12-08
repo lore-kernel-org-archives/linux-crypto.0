@@ -2,113 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 217FCC001B2
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 20:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77683C001B2
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 23:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230039AbiLHU6G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 15:58:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49984 "EHLO
+        id S229712AbiLHXSF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 18:18:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbiLHU5i (ORCPT
+        with ESMTP id S229656AbiLHXSE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 15:57:38 -0500
-Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DDBE1167
-        for <linux-crypto@vger.kernel.org>; Thu,  8 Dec 2022 12:57:33 -0800 (PST)
-Date:   Thu, 08 Dec 2022 20:57:26 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-        s=protonmail; t=1670533050; x=1670792250;
-        bh=hiaxku4ECTjcW+ViXhS5y1VGBf4iN9SgQmqH7d1kyhg=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=ALdD6BUkF8H4ruV1Xbkf6pVWLASu45arsqZf/Hs1yj+Tk4fA+GTfcqjFNGA76RpjF
-         wYOQyQlIC+aeDeROr5fpPbLcH2yLaFieVaNVXEyPP9Gy7EngIcOhxR0wHrkAQKAAaQ
-         Qg09qRacM/v9pwWjTLTIsLV6ZbHdEQqCWvLtGcp+0WxJds0aWLEcH9vq0f4f/9R1WK
-         Y2ZKyexYY2hPO20R+MlImihMxQEq3bglUdUCKVRWc7+KRJTk5+Ff1l3q7JhKBOtsda
-         ZmhYh5T75Ooao1I9+aaD5VrDyjbyZPDaFOKNathPvad+Jc5VzTRdsaCXEzLLBj0iwZ
-         n03z6rvxRo3HA==
-To:     Yury Norov <yury.norov@gmail.com>
-From:   Peter Lafreniere <peter@n8pjl.ca>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Barry Song <baohua@kernel.org>,
-        Ben Segall <bsegall@google.com>,
-        haniel Bristot de Oliveira <bristot@redhat.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Gal Pressman <gal@nvidia.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Tariq Toukan <ttoukan.linux@gmail.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] lib/cpumask: reorganize cpumask_local_spread() logic
-Message-ID: <tWPflu4f2FG07nbY54Gbs5fkI1u8Fjc0dLg60fY6deUx8p4jpZmOpOLr_ffvJz_EYWZDNiVLFHlzwMwMMFqWlF8NwXa0XZqlUWbgXE7zgFQ=@n8pjl.ca>
-In-Reply-To: <Y5JL/YqlxoC/4j4A@yury-laptop>
-References: <20221208183101.1162006-1-yury.norov@gmail.com> <20221208183101.1162006-6-yury.norov@gmail.com> <KQCC2QYXZ6BtFjiUQO-XQNUO5Ub3kGfpKzjfIeUfCQEvMUEMKiZ7ofEMqoZElMYxYFtuRqW6v3UzCpDzDR-QYZk-tpMDVLl_HSl8BEi1hZk=@n8pjl.ca> <Y5JL/YqlxoC/4j4A@yury-laptop>
-Feedback-ID: 53133685:user:proton
+        Thu, 8 Dec 2022 18:18:04 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D6579C93;
+        Thu,  8 Dec 2022 15:18:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9CD65620B3;
+        Thu,  8 Dec 2022 23:18:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 875B3C433EF;
+        Thu,  8 Dec 2022 23:17:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670541480;
+        bh=rd79PBsqcgAsOpiLcHMxEP/sk2UK4Dh/a8VVAA6SQ/k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Vp1HXQUb5QfqqnrUWIs78XUnzr8cBvRwQ5ycZ50tmQqCKltrtum4u7Oqrc6zGSbYq
+         SPD4//EXmEFrt0mEuLUNh4mjFoEiSnuqReSIfjUsJ0u5h0nQi2L9/yohC2SCcHN2zF
+         D9gP16Km5VXBDyI8NnNlzFIqWxRvvQPJlO0+Z6xgyt/aPZeC6Xw3Kmq1xHe1lomjn8
+         mTdx5szDs2CccXckuLKnsbO1Mj6RJo7xvAi3Qx92Kb1LCUqGmCkEwyGorBGQstq0Xo
+         qegdmvVWVEfMFpbkeDPco4FZph5m2hahdb69Cbpy5vAzpvfnFoVGfTjitjOjGFu9jd
+         lW/Ltxb8gp0fA==
+Date:   Thu, 8 Dec 2022 15:17:57 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KEYS: asymmetric: Make a copy of sig and digest in
+ vmalloced stack
+Message-ID: <Y5JwpdGF50oFKw0z@sol.localdomain>
+References: <20221208164610.867747-1-roberto.sassu@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221208164610.867747-1-roberto.sassu@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> On Thu, Dec 08, 2022 at 08:17:22PM +0000, Peter Lafreniere wrote:
-> > > Now after moving all NUMA logic into sched_numa_find_nth_cpu(),
-> > > else-branch of cpumask_local_spread() is just a function call, and
-> > > we can simplify logic by using ternary operator.
-> > >
-> > > While here, replace BUG() with WARN().
-> > Why make this change? It's still as bad to hit the WARN_ON as it was be=
-fore.
->
-> For example, because of this:
->
->  > Greg, please don't do this
->  >
->  > > ChangeSet@1.614, 2002-09-05 08:33:20-07:00, greg@kroah.com
->  > >   USB: storage driver: replace show_trace() with BUG()
->  >
->  > that BUG() thing is _way_ out of line, and has killed a few of my mach=
-ines
->  > several times for no good reason. It actively hurts debuggability, bec=
-ause
->  > the machine is totally dead after it, and the whole and ONLY point of
->  > BUG() messages is to help debugging and make it clear that we can't ha=
-ndle
->  > something.
->  >
->  > In this case, we _can_ handle it, and we're much better off with a mac=
-hine
->  > that works and that you can look up the messages with than killing it.
->  >
->  > Rule of thumb: BUG() is only good for something that never happens and
->  > that we really have no other option for (ie state is so corrupt that
->  > continuing is deadly).
->  >
->  >            Linus
+On Thu, Dec 08, 2022 at 05:46:10PM +0100, Roberto Sassu wrote:
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 2f8352e88860..307799ffbc3e 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -363,7 +363,8 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  	struct scatterlist src_sg[2];
+>  	char alg_name[CRYPTO_MAX_ALG_NAME];
+>  	char *key, *ptr;
+> -	int ret;
+> +	char *sig_s, *digest;
+> +	int ret, verif_bundle_len;
+>  
+>  	pr_devel("==>%s()\n", __func__);
+>  
+> @@ -400,8 +401,21 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  	if (!req)
+>  		goto error_free_tfm;
+>  
+> -	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
+> -		      GFP_KERNEL);
+> +	verif_bundle_len = pkey->keylen + sizeof(u32) * 2 + pkey->paramlen;
+> +
+> +	sig_s = sig->s;
+> +	digest = sig->digest;
+> +
+> +	if (IS_ENABLED(CONFIG_VMAP_STACK)) {
+> +		if (!virt_addr_valid(sig_s))
+> +			verif_bundle_len += sig->s_size;
+> +
+> +		if (!virt_addr_valid(digest))
+> +			verif_bundle_len += sig->digest_size;
+> +	}
+> +
+> +	/* key points to a buffer which could contain the sig and digest too. */
+> +	key = kmalloc(verif_bundle_len, GFP_KERNEL);
+>  	if (!key)
+>  		goto error_free_req;
+>  
+> @@ -424,9 +438,24 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  			goto error_free_key;
+>  	}
+>  
+> +	if (IS_ENABLED(CONFIG_VMAP_STACK)) {
+> +		ptr += pkey->paramlen;
+> +
+> +		if (!virt_addr_valid(sig_s)) {
+> +			sig_s = ptr;
+> +			memcpy(sig_s, sig->s, sig->s_size);
+> +			ptr += sig->s_size;
+> +		}
+> +
+> +		if (!virt_addr_valid(digest)) {
+> +			digest = ptr;
+> +			memcpy(digest, sig->digest, sig->digest_size);
+> +		}
+> +	}
+> +
+>  	sg_init_table(src_sg, 2);
+> -	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
+> -	sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
+> +	sg_set_buf(&src_sg[0], sig_s, sig->s_size);
+> +	sg_set_buf(&src_sg[1], digest, sig->digest_size);
+>  	akcipher_request_set_crypt(req, src_sg, NULL, sig->s_size,
+>  				   sig->digest_size);
+>  	crypto_init_wait(&cwait);
 
-Fair enough. It's not like it'll be hit anyway. My concern was for if
-any of the 23 callers get an invalid result. I guess that if that causes
-a crash, then so be it. We have the warning to track down the cause.
+We should try to avoid adding error-prone special cases.  How about just doing
+the copy of the signature and digest unconditionally?  That would be much
+simpler.  It would even mean that the scatterlist would only need one element.
 
-Thanks for the explanation,
-Peter Lafreniere <peter@n8pjl.ca>
+Also, the size of buffer needed is only
+
+	max(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
+	    sig->s_size + sig->digest_size)
+
+... since the signature and digest aren't needed until the key was already used.
+
+- Eric
