@@ -2,141 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6A3C63708
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 05:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 200B0C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 06:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbiLHFY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 00:24:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56772 "EHLO
+        id S229680AbiLHGiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 01:38:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiLHFYA (ORCPT
+        with ESMTP id S229901AbiLHGh6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 00:24:00 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B19A13EE;
-        Wed,  7 Dec 2022 21:22:10 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A76A622BB0;
-        Thu,  8 Dec 2022 05:22:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1670476926;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ACV4rT4gBkGjhfs+VCatmrCp7ZnekU2Vc70HRnY/zuM=;
-        b=QPqvb/DpJi4JdY0ueKrbo4U+osPUnwv923TMjuzc5/SBMKsgYXO6z7hzG6qXl8xNmCCYoe
-        SpcC5xDWfOKsuDjrzMZzhz/nGOMG65eOB6OdNSm25QdE+xnqtDyL79xyjRLJHO4V1xObLP
-        e45h8hBsbKjqKUxshiCCUB1Fo98YfXk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1670476926;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ACV4rT4gBkGjhfs+VCatmrCp7ZnekU2Vc70HRnY/zuM=;
-        b=9EUifSzgee1fhYYRgFFhXzVDIy33OVwWogjvHi3jkvinZxR/u5/dXjUaljBdqaI2rKTIT7
-        /8sp1dCLLlYQFPDQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 05BA013254;
-        Thu,  8 Dec 2022 05:22:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id agBPAH50kWOLXwAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Thu, 08 Dec 2022 05:22:06 +0000
-Date:   Thu, 8 Dec 2022 06:22:04 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     jarkko@kernel.org, zohar@linux.ibm.com, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        noodles@fb.com, tiwai@suse.de, bp@suse.de,
-        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
-        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 02/10] KEYS: Add missing function documentation
-Message-ID: <Y5F0fP0MH+LUod4f@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20221207171238.2945307-1-eric.snowberg@oracle.com>
- <20221207171238.2945307-3-eric.snowberg@oracle.com>
+        Thu, 8 Dec 2022 01:37:58 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EC01A226;
+        Wed,  7 Dec 2022 22:37:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670481477; x=1702017477;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=ShT+ZD6fVU/pCoOfY8/3F97mt4AfaTyb9fhvY7J7pvU=;
+  b=ZS5Nkz3Kz5Hd7inLAs651smHn8TrXbso07gnA+pG0trhfmepbfWivnVt
+   GQv40vPsJ/eXIXCYIW0gDM/VtkWSxcgpaBGu1q0ybukyaVfWSj/CF4jmO
+   PCGkQTNxBn9ebku8ULncRPCflEyWNPaNWJ6Q0WZrjhzMPV4fBs2XcL3yU
+   F2NWo/0e03rk/s5rL4PQgWBcuSjTX8gLozOwM1dktapm1NeHpgVsdw5nY
+   hmE6OvwhJCdXK+qQn6LnqEAo6HNCmDDgNX7c+b630/lDud7HggdvaDwtK
+   Txh3I7QlalwdfIvZuKka06AcC7Pg+4rK8xXrPLOgJkNxLv/XGtqGkMAhc
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="318942206"
+X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
+   d="scan'208";a="318942206"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 22:37:49 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="753428003"
+X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
+   d="scan'208";a="753428003"
+Received: from rongch2-mobl.ccr.corp.intel.com (HELO [10.254.215.59]) ([10.254.215.59])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 22:37:47 -0800
+Subject: Re: lib/crypto/blake2s-selftest.c:632:1: warning: the frame size of
+ 1120 bytes is larger than 1024 bytes
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        kernel test robot <lkp@intel.com>
+Cc:     "Jason A. Donenfeld" <zx2c4@kernel.org>,
+        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <202211072109.qvrnjNKo-lkp@intel.com>
+ <Y5Flnb8jadyDebx3@gondor.apana.org.au>
+From:   "Chen, Rong A" <rong.a.chen@intel.com>
+Message-ID: <d25ac395-4335-be88-9dc5-364f5715554f@intel.com>
+Date:   Thu, 8 Dec 2022 14:37:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221207171238.2945307-3-eric.snowberg@oracle.com>
+In-Reply-To: <Y5Flnb8jadyDebx3@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
 
-> Compiling with 'W=1' results in warnings that 'Function parameter or member
-> not described'
 
-> Add the missing parameters for
-> restrict_link_by_builtin_and_secondary_trusted and
-> restrict_link_to_builtin_trusted.
+On 12/8/2022 12:18 PM, Herbert Xu wrote:
+> On Mon, Nov 07, 2022 at 09:18:05PM +0800, kernel test robot wrote:
+>> Hi Jason,
+>>
+>> FYI, the error/warning still remains.
+>>
+>> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+>> head:   f0c4d9fc9cc9462659728d168387191387e903cc
+>> commit: 2d16803c562ecc644803d42ba98a8e0aef9c014e crypto: blake2s - remove shash module
+>> date:   5 months ago
+>> config: i386-buildonly-randconfig-r006-20221107
+>> compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+>> reproduce (this is a W=1 build):
+>>          # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d16803c562ecc644803d42ba98a8e0aef9c014e
+>>          git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>>          git fetch --no-tags linus master
+>>          git checkout 2d16803c562ecc644803d42ba98a8e0aef9c014e
+> 
+> This was fixed months ago with
+> 
+> commit d6c14da474bf260d73953fbf7992c98d9112aec7
+> Author: Jason A. Donenfeld <Jason@zx2c4.com>
+> Date:   Mon Jun 20 09:52:43 2022 +0200
+> 
+>      crypto: lib/blake2s - reduce stack frame usage in self test
+> 
+> Why is LKP still testing the old commit?
 
-> Use /* instead of /** for get_builtin_and_secondary_restriction, since
-> it is a static function.
+Hi Herbert,
 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> ---
->  certs/system_keyring.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+Thanks for the information, I checked the result of the fix commit,
+it reduced the stack frame but the warning still exists:
 
-> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-> index 5042cc54fa5e..250148298690 100644
-> --- a/certs/system_keyring.c
-> +++ b/certs/system_keyring.c
-> @@ -33,7 +33,11 @@ extern __initconst const unsigned long system_certificate_list_size;
->  extern __initconst const unsigned long module_cert_size;
+lib/crypto/blake2s-selftest.c:632:1: warning: the frame size of 1056 
+bytes is larger than 1024 bytes [-Wframe-larger-than=]
 
->  /**
-> - * restrict_link_to_builtin_trusted - Restrict keyring addition by built in CA
-> + * restrict_link_by_builtin_trusted - Restrict keyring addition by built in CA
-Hm, wrong function name restrict_link_to_builtin_trusted brought by:
-d3bfe84129f6 ("certs: Add a secondary system keyring that can be added to dynamically")
+We'll ignore commit 2d16803c56 to avoid reporting it again.
 
-> + * @dest_keyring: Keyring being linked to.
-> + * @type: The type of key being added.
-> + * @payload: The payload of the new key.
-> + * @restriction_key: A ring of keys that can be used to vouch for the new cert.
->   *
->   * Restrict the addition of keys into a keyring based on the key-to-be-added
->   * being vouched for by a key in the built in system keyring.
-> @@ -51,6 +55,10 @@ int restrict_link_by_builtin_trusted(struct key *dest_keyring,
->  /**
->   * restrict_link_by_builtin_and_secondary_trusted - Restrict keyring
->   *   addition by both builtin and secondary keyrings
-nit: missing dot at the end of the sentence (maybe can be fixed before merge).
+Best Regards,
+Rong Chen
 
-Obviously correct.
 
-Reviewed-by: Petr Vorel <pvorel@suse.cz>
-
-Kind regards,
-Petr
-
-> + * @dest_keyring: Keyring being linked to.
-> + * @type: The type of key being added.
-> + * @payload: The payload of the new key.
-> + * @restrict_key: A ring of keys that can be used to vouch for the new cert.
->   *
->   * Restrict the addition of keys into a keyring based on the key-to-be-added
->   * being vouched for by a key in either the built-in or the secondary system
-> @@ -75,7 +83,7 @@ int restrict_link_by_builtin_and_secondary_trusted(
->  					  secondary_trusted_keys);
->  }
-
-> -/**
-> +/*
->   * Allocate a struct key_restriction for the "builtin and secondary trust"
->   * keyring. Only for use in system_trusted_keyring_init().
->   */
+> 
+> Cheers,
+> 
