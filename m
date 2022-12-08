@@ -2,88 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6819AC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 15:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E350C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 15:35:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229947AbiLHP2c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 10:28:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
+        id S229835AbiLHPfJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 10:35:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiLHP2b (ORCPT
+        with ESMTP id S230219AbiLHPeg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 10:28:31 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD0A11A02
-        for <linux-crypto@vger.kernel.org>; Thu,  8 Dec 2022 07:28:29 -0800 (PST)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1p3Iov-0000UU-7x; Thu, 08 Dec 2022 16:28:21 +0100
-Message-ID: <d8c38871-27a9-0501-88e4-8df07ee901cf@pengutronix.de>
-Date:   Thu, 8 Dec 2022 16:27:51 +0100
+        Thu, 8 Dec 2022 10:34:36 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A550F1F2EE;
+        Thu,  8 Dec 2022 07:32:56 -0800 (PST)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1p3It3-0000za-DD; Thu, 08 Dec 2022 16:32:37 +0100
+Message-ID: <8bcbbce3-13ce-9b5e-38c2-235a93bd18e2@leemhuis.info>
+Date:   Thu, 8 Dec 2022 16:32:37 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] crypto: caam: blob_gen.c: fix CAAM io mem access
-Content-Language: en-US
-To:     Nikolaus Voss <nikolaus.voss@haag-streit.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Gstir <david@sigma-star.at>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Nikolaus Voss <nv@vosn.de>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221205075839.050FF27BD@mail.steuer-voss.de>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20221205075839.050FF27BD@mail.steuer-voss.de>
+ Thunderbird/102.5.1
+Subject: Re: [REGESSION] Bug 216502 - slow crng initialization on Rockchip
+ 3399 (Friendyarm NanoPi M4) #forregzbot
+Content-Language: en-US, de-DE
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+References: <4deaa04b-f103-9cc4-7946-9ea69afd94d0@leemhuis.info>
+In-Reply-To: <4deaa04b-f103-9cc4-7946-9ea69afd94d0@leemhuis.info>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1670513578;1afddac2;
+X-HE-SMSGID: 1p3It3-0000za-DD
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 05.12.22 08:58, Nikolaus Voss wrote:
-> IO memory access has to be done with accessors defined in caam/regs.h
-> as there are little-endian architectures with a big-endian CAAM unit.
+[Note: this mail contains only information for Linux kernel regression
+tracking. Mails like these contain '#forregzbot' in the subject to make
+then easy to spot and filter out. The author also tried to remove most
+or all individuals from the list of recipients to spare them the hassle.]
+
+On 18.09.22 14:17, Thorsten Leemhuis wrote:
+> Hi, this is your Linux kernel regression tracker speaking.
 > 
-> Fixes ("crypto: caam: blob_gen.c: warn if key is insecure")
-
-@Herbert, is there a stable commit revision Nikolaus could reference here?
-
-> Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
-
-LGTM.
-
-Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-
-> ---
->  drivers/crypto/caam/blob_gen.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> I noticed a regression report in bugzilla.kernel.org. As many (most?)
+> kernel developer don't keep an eye on it, I decided to forward it my
+> mail. Quoting from https://bugzilla.kernel.org/show_bug.cgi?id=216502 :
 > 
-> diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
-> index 1f65df489847..f46b161d2cda 100644
-> --- a/drivers/crypto/caam/blob_gen.c
-> +++ b/drivers/crypto/caam/blob_gen.c
-> @@ -104,7 +104,7 @@ int caam_process_blob(struct caam_blob_priv *priv,
->  	}
->  
->  	ctrlpriv = dev_get_drvdata(jrdev->parent);
-> -	moo = FIELD_GET(CSTA_MOO, ioread32(&ctrlpriv->ctrl->perfmon.status));
-> +	moo = FIELD_GET(CSTA_MOO, rd_reg32(&ctrlpriv->ctrl->perfmon.status));
->  	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
->  		dev_warn(jrdev,
->  			 "using insecure test key, enable HAB to use unique device key!\n");
+>> Crng initialization time has significantly increased on Rockchip
+>> 3399-based Friendyarm NanoPi M4 in v6.0.0-rc5 compared to v5.18.0 (from
+>> 2.36s since rootfs mounted to 8.55s since rootfs mounted). Bisection
+>> points at 78c768e619fb ("random: vary jitter iterations based on cycle
+>> counter speed"). Manually reverting that commit on top of v6.0.0-rc5
+>> fixes the issue. Attached dmesg logs correspond to vanilla v6.0.0-rc5
+>> ("bad") and v6.0.0-rc5 with 78c768e619fb reverted ("good").
+> See the ticket for more details. Apologies if I forwarded it to the
+> wrong folks, I cover a lot of ground and thus sometimes get things
+> wrong. :-/
+> 
+> BTW, I'd also like to add the report to the list of tracked regressions
+> to ensure it's doesn't fall through the cracks in the end:
+> 
+> #regzbot introduced: 78c768e619fb
+> https://bugzilla.kernel.org/show_bug.cgi?id=216502
+> #regzbot ignore-activity
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-
+#regzbot inconclusive: a proper RNG driver for the soc afaics should fix
+this, which apparently satisfies the reporter
