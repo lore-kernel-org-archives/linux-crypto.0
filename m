@@ -2,71 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40887C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 04:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6A3C63708
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 05:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiLHE7A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Dec 2022 23:59:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49208 "EHLO
+        id S229680AbiLHFY1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 00:24:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbiLHE67 (ORCPT
+        with ESMTP id S229911AbiLHFYA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Dec 2022 23:58:59 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483A77DA7C;
-        Wed,  7 Dec 2022 20:58:57 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p38zi-005EOm-IS; Thu, 08 Dec 2022 12:58:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Dec 2022 12:58:50 +0800
-Date:   Thu, 8 Dec 2022 12:58:50 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
-        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: arch/arm/crypto/sha1_glue.c:34:8: warning: cast from 'void
- (*)(u32 *, const unsigned char *, unsigned int)' (aka 'void (*)(unsigned int
- *, const unsigned char *, unsigned int)') to 'sha1_block_fn *' (aka 'void
- (*)(struct sha1_state *, const unsigned char ...
-Message-ID: <Y5FvChDBD/+uaFy8@gondor.apana.org.au>
-References: <202211041904.f9S5gAGL-lkp@intel.com>
+        Thu, 8 Dec 2022 00:24:00 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B19A13EE;
+        Wed,  7 Dec 2022 21:22:10 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A76A622BB0;
+        Thu,  8 Dec 2022 05:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1670476926;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ACV4rT4gBkGjhfs+VCatmrCp7ZnekU2Vc70HRnY/zuM=;
+        b=QPqvb/DpJi4JdY0ueKrbo4U+osPUnwv923TMjuzc5/SBMKsgYXO6z7hzG6qXl8xNmCCYoe
+        SpcC5xDWfOKsuDjrzMZzhz/nGOMG65eOB6OdNSm25QdE+xnqtDyL79xyjRLJHO4V1xObLP
+        e45h8hBsbKjqKUxshiCCUB1Fo98YfXk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1670476926;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ACV4rT4gBkGjhfs+VCatmrCp7ZnekU2Vc70HRnY/zuM=;
+        b=9EUifSzgee1fhYYRgFFhXzVDIy33OVwWogjvHi3jkvinZxR/u5/dXjUaljBdqaI2rKTIT7
+        /8sp1dCLLlYQFPDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 05BA013254;
+        Thu,  8 Dec 2022 05:22:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id agBPAH50kWOLXwAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Thu, 08 Dec 2022 05:22:06 +0000
+Date:   Thu, 8 Dec 2022 06:22:04 +0100
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     jarkko@kernel.org, zohar@linux.ibm.com, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        noodles@fb.com, tiwai@suse.de, bp@suse.de,
+        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
+        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v2 02/10] KEYS: Add missing function documentation
+Message-ID: <Y5F0fP0MH+LUod4f@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20221207171238.2945307-1-eric.snowberg@oracle.com>
+ <20221207171238.2945307-3-eric.snowberg@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202211041904.f9S5gAGL-lkp@intel.com>
+In-Reply-To: <20221207171238.2945307-3-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 07:33:43PM +0800, kernel test robot wrote:
->
-> vim +34 arch/arm/crypto/sha1_glue.c
-> 
-> f0be44f4fb1fae David McCullough 2012-09-07  23  
-> 1f8673d31a999e Jussi Kivilinna  2014-07-29  24  asmlinkage void sha1_block_data_order(u32 *digest,
-> f0be44f4fb1fae David McCullough 2012-09-07  25  		const unsigned char *data, unsigned int rounds);
-> f0be44f4fb1fae David McCullough 2012-09-07  26  
-> 604682551aa511 Jussi Kivilinna  2014-07-29  27  int sha1_update_arm(struct shash_desc *desc, const u8 *data,
-> f0be44f4fb1fae David McCullough 2012-09-07  28  		    unsigned int len)
-> f0be44f4fb1fae David McCullough 2012-09-07  29  {
-> 90451d6bdb787e Ard Biesheuvel   2015-04-09  30  	/* make sure casting to sha1_block_fn() is safe */
-> 90451d6bdb787e Ard Biesheuvel   2015-04-09  31  	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
-> f0be44f4fb1fae David McCullough 2012-09-07  32  
-> 90451d6bdb787e Ard Biesheuvel   2015-04-09  33  	return sha1_base_do_update(desc, data, len,
-> 90451d6bdb787e Ard Biesheuvel   2015-04-09 @34  				   (sha1_block_fn *)sha1_block_data_order);
-> f0be44f4fb1fae David McCullough 2012-09-07  35  }
-> 604682551aa511 Jussi Kivilinna  2014-07-29  36  EXPORT_SYMBOL_GPL(sha1_update_arm);
-> f0be44f4fb1fae David McCullough 2012-09-07  37  
+Hi Eric,
 
-So clan doesn't like the cast on the assembly function.
+> Compiling with 'W=1' results in warnings that 'Function parameter or member
+> not described'
 
-Ard, why can't we just change the signature of the assembly
-function instead of casting?
+> Add the missing parameters for
+> restrict_link_by_builtin_and_secondary_trusted and
+> restrict_link_to_builtin_trusted.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Use /* instead of /** for get_builtin_and_secondary_restriction, since
+> it is a static function.
+
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> ---
+>  certs/system_keyring.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+
+> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+> index 5042cc54fa5e..250148298690 100644
+> --- a/certs/system_keyring.c
+> +++ b/certs/system_keyring.c
+> @@ -33,7 +33,11 @@ extern __initconst const unsigned long system_certificate_list_size;
+>  extern __initconst const unsigned long module_cert_size;
+
+>  /**
+> - * restrict_link_to_builtin_trusted - Restrict keyring addition by built in CA
+> + * restrict_link_by_builtin_trusted - Restrict keyring addition by built in CA
+Hm, wrong function name restrict_link_to_builtin_trusted brought by:
+d3bfe84129f6 ("certs: Add a secondary system keyring that can be added to dynamically")
+
+> + * @dest_keyring: Keyring being linked to.
+> + * @type: The type of key being added.
+> + * @payload: The payload of the new key.
+> + * @restriction_key: A ring of keys that can be used to vouch for the new cert.
+>   *
+>   * Restrict the addition of keys into a keyring based on the key-to-be-added
+>   * being vouched for by a key in the built in system keyring.
+> @@ -51,6 +55,10 @@ int restrict_link_by_builtin_trusted(struct key *dest_keyring,
+>  /**
+>   * restrict_link_by_builtin_and_secondary_trusted - Restrict keyring
+>   *   addition by both builtin and secondary keyrings
+nit: missing dot at the end of the sentence (maybe can be fixed before merge).
+
+Obviously correct.
+
+Reviewed-by: Petr Vorel <pvorel@suse.cz>
+
+Kind regards,
+Petr
+
+> + * @dest_keyring: Keyring being linked to.
+> + * @type: The type of key being added.
+> + * @payload: The payload of the new key.
+> + * @restrict_key: A ring of keys that can be used to vouch for the new cert.
+>   *
+>   * Restrict the addition of keys into a keyring based on the key-to-be-added
+>   * being vouched for by a key in either the built-in or the secondary system
+> @@ -75,7 +83,7 @@ int restrict_link_by_builtin_and_secondary_trusted(
+>  					  secondary_trusted_keys);
+>  }
+
+> -/**
+> +/*
+>   * Allocate a struct key_restriction for the "builtin and secondary trust"
+>   * keyring. Only for use in system_trusted_keyring_init().
+>   */
