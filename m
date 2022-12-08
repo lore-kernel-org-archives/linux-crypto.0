@@ -2,106 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 137C4C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 09:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3D5C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 09:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbiLHJ20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 04:28:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57786 "EHLO
+        id S229809AbiLHJfQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 04:35:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbiLHJ2R (ORCPT
+        with ESMTP id S229478AbiLHJfQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 04:28:17 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8813E286C4
-        for <linux-crypto@vger.kernel.org>; Thu,  8 Dec 2022 01:28:10 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id b3so1159523lfv.2
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Dec 2022 01:28:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jvonNZ8hzOsUtXfMS5jsK8oAXaTdy0VRFUTiOadKcQc=;
-        b=h0SV4jEnf3LUyPMrtB7fSs0oyXBjNYnC+wPkJTrEpAUXeX5sXQrly2h9pmV/BaIy6R
-         wtqelKyna1vNSa6KpgOzVcTBveTYzc2S67lbmsqmihry8Rub1uAALhMl94mCc+8wYSRJ
-         TGMPDgtWtHtj+W7XZmvrbtxNjfh3A6iZ3Js7OJm47H9nJGn70bbwRnzdForlH+YFf6vZ
-         uMGjvfiNmEKFuHLplsEo4aYd310onrCycBoGJB2C0dzRwqMPSWFQOLNyKPxj3A/tnnJa
-         bwBNmh/BRjTXp6nA+hctAfSA6i37FFHqmeT1ZdXh+9ukwlTZwr1T+PdKCqQfXNMV9fF1
-         uCTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvonNZ8hzOsUtXfMS5jsK8oAXaTdy0VRFUTiOadKcQc=;
-        b=jv+upHFMc93sMPRLMnmZxqe+vUeh7gQZsM3vXQ4WRlNp3Q3lLWZxfIrCgMKeqtSQey
-         zqn/o2d1wWyRfVH/8dKfXne1LRlCqj1lcyGxp6LvpB5Aiuzo1qHB5PIjgVUfy/4z+g0l
-         jlQl25m7OlRflcscDHA2SnGYmZt/qop2Hp++cma9mGkv/xHtnbPQi3CARTKJ8MMcFwmr
-         PQnmbH+UBKCHmTNTe/Gw5sd8Q0ZS3xEAH/6m1N88logUFjfcZ6URhhVnRyTSF9Az9yuw
-         EUKCnMWNhkcps0gLjtUiVL3yXyobz5X5KwVdQ1utHrMS1DnotGD+sv2flaO0tVrOCT2g
-         0ctg==
-X-Gm-Message-State: ANoB5pl7cLrSQUmcphclBAqm/dhizss1/7uynkstSs2r52eSC+kl5FAt
-        AK5uzCJufiY69a2B8PQV88B+Rg==
-X-Google-Smtp-Source: AA0mqf7TNvjfjrF7HrYj9ZQKhyCHR8PdEUqzTgbholw8jlR+OE7FkmeYXQJ4FF00PhAzDPAROjzt2Q==
-X-Received: by 2002:a19:760b:0:b0:4b5:67d8:e3c2 with SMTP id c11-20020a19760b000000b004b567d8e3c2mr6935849lff.166.1670491688911;
-        Thu, 08 Dec 2022 01:28:08 -0800 (PST)
-Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id b24-20020ac25638000000b004b57bbaef87sm532100lff.224.2022.12.08.01.28.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Dec 2022 01:28:08 -0800 (PST)
-Message-ID: <9c7066e4-fa3f-3dda-b939-04dfdaf73242@linaro.org>
-Date:   Thu, 8 Dec 2022 10:28:07 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
-Content-Language: en-US
-To:     JiaJie Ho <jiajie.ho@starfivetech.com>,
+        Thu, 8 Dec 2022 04:35:16 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B6C5B84E;
+        Thu,  8 Dec 2022 01:35:13 -0800 (PST)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 67B0E24DD6E;
+        Thu,  8 Dec 2022 17:35:11 +0800 (CST)
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 8 Dec
+ 2022 17:35:11 +0800
+Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
+ EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
+ 15.00.1497.044; Thu, 8 Dec 2022 17:35:10 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
+        "Rob Herring" <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: RE: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
+Thread-Topic: [PATCH 0/6] crypto: starfive: Add driver for cryptographic
+ engine
+Thread-Index: AQHZBH/pPWRKQfsetk2izJkM4PGjPq5jvsYw//+A4ICAAIfRMA==
+Date:   Thu, 8 Dec 2022 09:35:10 +0000
+Message-ID: <a0bd9060bab348eba1044cd911653bd7@EXMBX068.cuchost.com>
 References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
  <e1e9f1d19982493b89ae63f51e00a3bb@EXMBX068.cuchost.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <e1e9f1d19982493b89ae63f51e00a3bb@EXMBX068.cuchost.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <9c7066e4-fa3f-3dda-b939-04dfdaf73242@linaro.org>
+In-Reply-To: <9c7066e4-fa3f-3dda-b939-04dfdaf73242@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [161.142.158.8]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/12/2022 10:09, JiaJie Ho wrote:
->>
->> The driver has been tested with crypto selftest and additional test.
->>
->> This patch series depends on the following patches:
->> https://patchwork.kernel.org/project/linux-
->> riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
->> https://patchwork.kernel.org/project/linux-
->> riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
->>
->> Jia Jie Ho (6):
->>   crypto: starfive - Add StarFive crypto engine support
->>   crypto: starfive - Add hash and HMAC support
->>   crypto: starfive - Add AES skcipher and aead support
->>   crypto: starfive - Add Public Key algo support
->>   dt-bindings: crypto: Add bindings for Starfive crypto driver
->>   riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
->>
-> 
-> Hi Herbert/David,
-> 
-> Could you please help to review and provide comments on this patch series?
-> Thank you in advance.
-
-You received some comments so the expectation is to send a v2.
-
-Best regards,
-Krzysztof
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
+d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBUaHVyc2RheSwg
+RGVjZW1iZXIgOCwgMjAyMiA1OjI4IFBNDQo+IFRvOiBKaWFKaWUgSG8gPGppYWppZS5ob0BzdGFy
+Zml2ZXRlY2guY29tPjsgSGVyYmVydCBYdQ0KPiA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
+PjsgRGF2aWQgUyAuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47DQo+IFJvYiBIZXJyaW5n
+IDxyb2JoK2R0QGtlcm5lbC5vcmc+OyBLcnp5c3p0b2YgS296bG93c2tpDQo+IDxrcnp5c3p0b2Yu
+a296bG93c2tpK2R0QGxpbmFyby5vcmc+DQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwu
+b3JnOyBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtl
+cm5lbC5vcmc7IGxpbnV4LXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmcNCj4gU3ViamVjdDogUmU6
+IFtQQVRDSCAwLzZdIGNyeXB0bzogc3RhcmZpdmU6IEFkZCBkcml2ZXIgZm9yIGNyeXB0b2dyYXBo
+aWMgZW5naW5lDQo+IA0KPiBPbiAwOC8xMi8yMDIyIDEwOjA5LCBKaWFKaWUgSG8gd3JvdGU6DQo+
+ID4NCj4gPiBIaSBIZXJiZXJ0L0RhdmlkLA0KPiA+DQo+ID4gQ291bGQgeW91IHBsZWFzZSBoZWxw
+IHRvIHJldmlldyBhbmQgcHJvdmlkZSBjb21tZW50cyBvbiB0aGlzIHBhdGNoIHNlcmllcz8NCj4g
+PiBUaGFuayB5b3UgaW4gYWR2YW5jZS4NCj4gDQo+IFlvdSByZWNlaXZlZCBzb21lIGNvbW1lbnRz
+IHNvIHRoZSBleHBlY3RhdGlvbiBpcyB0byBzZW5kIGEgdjIuDQo+IA0KDQpTdXJlLCBJJ2xsIGRv
+IHRoYXQgdGhlbi4NCg0KVGhhbmtzDQpKaWEgSmllDQo=
