@@ -2,109 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 200B0C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 06:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D503C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 09:10:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbiLHGiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 01:38:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43642 "EHLO
+        id S230243AbiLHJKj convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 04:10:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbiLHGh6 (ORCPT
+        with ESMTP id S230234AbiLHJKT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 01:37:58 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EC01A226;
-        Wed,  7 Dec 2022 22:37:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670481477; x=1702017477;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=ShT+ZD6fVU/pCoOfY8/3F97mt4AfaTyb9fhvY7J7pvU=;
-  b=ZS5Nkz3Kz5Hd7inLAs651smHn8TrXbso07gnA+pG0trhfmepbfWivnVt
-   GQv40vPsJ/eXIXCYIW0gDM/VtkWSxcgpaBGu1q0ybukyaVfWSj/CF4jmO
-   PCGkQTNxBn9ebku8ULncRPCflEyWNPaNWJ6Q0WZrjhzMPV4fBs2XcL3yU
-   F2NWo/0e03rk/s5rL4PQgWBcuSjTX8gLozOwM1dktapm1NeHpgVsdw5nY
-   hmE6OvwhJCdXK+qQn6LnqEAo6HNCmDDgNX7c+b630/lDud7HggdvaDwtK
-   Txh3I7QlalwdfIvZuKka06AcC7Pg+4rK8xXrPLOgJkNxLv/XGtqGkMAhc
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="318942206"
-X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
-   d="scan'208";a="318942206"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 22:37:49 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10554"; a="753428003"
-X-IronPort-AV: E=Sophos;i="5.96,227,1665471600"; 
-   d="scan'208";a="753428003"
-Received: from rongch2-mobl.ccr.corp.intel.com (HELO [10.254.215.59]) ([10.254.215.59])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2022 22:37:47 -0800
-Subject: Re: lib/crypto/blake2s-selftest.c:632:1: warning: the frame size of
- 1120 bytes is larger than 1024 bytes
+        Thu, 8 Dec 2022 04:10:19 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F88473F4C;
+        Thu,  8 Dec 2022 01:09:48 -0800 (PST)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 0CB9A24DFD7;
+        Thu,  8 Dec 2022 17:09:47 +0800 (CST)
+Received: from EXMBX062.cuchost.com (172.16.6.62) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 8 Dec
+ 2022 17:09:47 +0800
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX062.cuchost.com
+ (172.16.6.62) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 8 Dec
+ 2022 17:09:46 +0800
+Received: from EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e]) by
+ EXMBX068.cuchost.com ([fe80::c4da:cbc4:bb39:ca7e%16]) with mapi id
+ 15.00.1497.044; Thu, 8 Dec 2022 17:09:46 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        kernel test robot <lkp@intel.com>
-Cc:     "Jason A. Donenfeld" <zx2c4@kernel.org>,
-        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <202211072109.qvrnjNKo-lkp@intel.com>
- <Y5Flnb8jadyDebx3@gondor.apana.org.au>
-From:   "Chen, Rong A" <rong.a.chen@intel.com>
-Message-ID: <d25ac395-4335-be88-9dc5-364f5715554f@intel.com>
-Date:   Thu, 8 Dec 2022 14:37:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
-MIME-Version: 1.0
-In-Reply-To: <Y5Flnb8jadyDebx3@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: RE: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
+Thread-Topic: [PATCH 0/6] crypto: starfive: Add driver for cryptographic
+ engine
+Thread-Index: AQHZBH/pPWRKQfsetk2izJkM4PGjPq5jvsYw
+Date:   Thu, 8 Dec 2022 09:09:46 +0000
+Message-ID: <e1e9f1d19982493b89ae63f51e00a3bb@EXMBX068.cuchost.com>
+References: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+In-Reply-To: <20221130055214.2416888-1-jiajie.ho@starfivetech.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [202.188.176.82]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 12/8/2022 12:18 PM, Herbert Xu wrote:
-> On Mon, Nov 07, 2022 at 09:18:05PM +0800, kernel test robot wrote:
->> Hi Jason,
->>
->> FYI, the error/warning still remains.
->>
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
->> head:   f0c4d9fc9cc9462659728d168387191387e903cc
->> commit: 2d16803c562ecc644803d42ba98a8e0aef9c014e crypto: blake2s - remove shash module
->> date:   5 months ago
->> config: i386-buildonly-randconfig-r006-20221107
->> compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
->> reproduce (this is a W=1 build):
->>          # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d16803c562ecc644803d42ba98a8e0aef9c014e
->>          git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->>          git fetch --no-tags linus master
->>          git checkout 2d16803c562ecc644803d42ba98a8e0aef9c014e
+> -----Original Message-----
+> From: JiaJie Ho <jiajie.ho@starfivetech.com>
+> Sent: Wednesday, November 30, 2022 1:52 PM
+> To: Herbert Xu <herbert@gondor.apana.org.au>; David S . Miller
+> <davem@davemloft.net>; Rob Herring <robh+dt@kernel.org>; Krzysztof
+> Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+> Cc: linux-crypto@vger.kernel.org; devicetree@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-riscv@lists.infradead.org; JiaJie Ho
+> <jiajie.ho@starfivetech.com>
+> Subject: [PATCH 0/6] crypto: starfive: Add driver for cryptographic engine
 > 
-> This was fixed months ago with
+> This patch series adds kernel driver support for Starfive crypto engine.
+> The engine supports hardware acceleration for HMAC/hash functions, AES
+> block cipher operations and RSA. The first patch adds basic driver for device
+> probe and DMA init. The subsequent patches adds supported crypto
+> primitives to the driver which include hash functions, AES and RSA. Patch 5
+> adds documentation to describe device tree bindings and the last patch adds
+> device node to VisionFive 2 dts.
 > 
-> commit d6c14da474bf260d73953fbf7992c98d9112aec7
-> Author: Jason A. Donenfeld <Jason@zx2c4.com>
-> Date:   Mon Jun 20 09:52:43 2022 +0200
+> The driver has been tested with crypto selftest and additional test.
 > 
->      crypto: lib/blake2s - reduce stack frame usage in self test
+> This patch series depends on the following patches:
+> https://patchwork.kernel.org/project/linux-
+> riscv/cover/20221118010627.70576-1-hal.feng@starfivetech.com/
+> https://patchwork.kernel.org/project/linux-
+> riscv/cover/20221118011714.70877-1-hal.feng@starfivetech.com/
 > 
-> Why is LKP still testing the old commit?
-
-Hi Herbert,
-
-Thanks for the information, I checked the result of the fix commit,
-it reduced the stack frame but the warning still exists:
-
-lib/crypto/blake2s-selftest.c:632:1: warning: the frame size of 1056 
-bytes is larger than 1024 bytes [-Wframe-larger-than=]
-
-We'll ignore commit 2d16803c56 to avoid reporting it again.
-
-Best Regards,
-Rong Chen
-
-
+> Jia Jie Ho (6):
+>   crypto: starfive - Add StarFive crypto engine support
+>   crypto: starfive - Add hash and HMAC support
+>   crypto: starfive - Add AES skcipher and aead support
+>   crypto: starfive - Add Public Key algo support
+>   dt-bindings: crypto: Add bindings for Starfive crypto driver
+>   riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
 > 
-> Cheers,
-> 
+
+Hi Herbert/David,
+
+Could you please help to review and provide comments on this patch series?
+Thank you in advance.
+
+Best regards,
+Jia Jie 
+
+
