@@ -2,92 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C31CC4167B
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 18:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41109C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Dec 2022 18:31:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229479AbiLHSGC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Dec 2022 13:06:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33544 "EHLO
+        id S229658AbiLHSbH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Dec 2022 13:31:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbiLHSGB (ORCPT
+        with ESMTP id S229568AbiLHSbG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Dec 2022 13:06:01 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 946A22FBC7;
-        Thu,  8 Dec 2022 10:05:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 31E9E6200D;
-        Thu,  8 Dec 2022 18:05:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F83C433D2;
-        Thu,  8 Dec 2022 18:05:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670522758;
-        bh=LcUc6vIGzM7qLxwzZfCmF429Ev9PHuS1tGR3YI4qEdI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=QWr+6i9XmeU8jFODBTFCkwViF5GsmDG8AOQIsUGUq2V7cb9UFcj9j2Ik0YIPsiCtS
-         Q0QkHQcAUjWR/9QJ02zYNJ0GrUEXY2c3++SWl0p7mTDuFmAKEoMIjWKQ1G1+xAGkQA
-         Q56mlppzFwE0l91532vHILGqMG/p/lJLGvzSxYHRc/nTb9iTRyN2s8L2us/BYcv8pn
-         aHgDBoa+9USYL7mZj6U58fw8fpzZuPXcNtVMiiEjls8W1wrFmEQsO1hyrZOWhh20gG
-         KWwyWIlTmPZc7wPeQ++Q01oSL1RsX3TfkH5WLig1owaN2nM+WlUuZNCkQ8ARAUXpTc
-         zrpAe1utJBFjQ==
-Received: by mail-lf1-f44.google.com with SMTP id c1so3239854lfi.7;
-        Thu, 08 Dec 2022 10:05:58 -0800 (PST)
-X-Gm-Message-State: ANoB5pljB5rW6rV7Z+RvtGvrJV0MDs95IoFaSB4KxI0LFq3eutzm51PK
-        rvOotpogSsxJYEIyuvV3amCJ48lIYhHoZtyGsPQ=
-X-Google-Smtp-Source: AA0mqf7iF6zAnK2GD/yJ+MVH25N0dT0eelPZbqVPPbatxILofsLbcbgIzB4qlMmW63iOzBEA57tkGHLYX5W1TavqjdU=
-X-Received: by 2002:a05:6512:3082:b0:4b5:964d:49a4 with SMTP id
- z2-20020a056512308200b004b5964d49a4mr1861580lfd.637.1670522756618; Thu, 08
- Dec 2022 10:05:56 -0800 (PST)
+        Thu, 8 Dec 2022 13:31:06 -0500
+Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AD7D85D22;
+        Thu,  8 Dec 2022 10:31:05 -0800 (PST)
+Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-144bd860fdbso2851355fac.0;
+        Thu, 08 Dec 2022 10:31:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XF7XmsI3z9Pewm9QLWRYHW1AFn4kiQyrTYitGbyYOV0=;
+        b=X7yZQIpnNAhUiqJmYPIzNNFCNYaxiM7TSwgUizzX6q5+3xdIGn8EDYfOM5mh9JvgZm
+         jau4dmjTy/lJ3MtqBD78OTglbxR7hkmpdWvHLaGkPZf4n/Ra9wxwDTKJKra0Ruc24HU+
+         IcPOPf2abIOtNRv74pFNGsNE7wCIo5Cz6RljxYJA4Kegwr4zv6g1IAHnAwT0PBPMM1ri
+         7wjhtnF58lTf/WfnpS5YiG2xCB9WE6SzLRkJrpn0rn+dMEAVZuyxb+TnWJRsfaI9CIWf
+         9s98bhjevgrcvTinBLHRrMx1w0x5nkTm5mez6BQLOvvcYkGetKouGqqHwd5U8CyAi/Dp
+         1nEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XF7XmsI3z9Pewm9QLWRYHW1AFn4kiQyrTYitGbyYOV0=;
+        b=v6s2c2qwyazigahKn8SX9LpK737o65HOIzejwt+49GbZK4+LP45vQdsGl6sdjjn2Z3
+         KcP8OYaeEdCBHe8zVGmGFSm8UpCfe3DFgO1lfStO949BZdZZoHpUyjcWDhTWsoZjIy6U
+         aCtysKDDUMLWxtJP3zB2L0qks/srJswcHSVSrt4NGsChGinC9DYj4cdn6kuZ+sJTl2ZH
+         lQYDperSKjF/Qt6hlj9rzB5r48uiy+JsS2T5PFRC0Ae/IEchx7OTZvKPZYfzUnjpFuQJ
+         KwNfnniRvSVdFsqGpdlMAK7C7x56QqVOOWYx3jyAvQta9ohI+SAn5JHsWqNwaYUHOwTu
+         Leiw==
+X-Gm-Message-State: ANoB5pmrcHCUdieyN1tv+DmGHKCe1BeRPQt1D1VaT4RS/6Solt7qYeuF
+        dsvzAsqyFOCE/E8qSBgiT0eqmN/ph9s=
+X-Google-Smtp-Source: AA0mqf6IgUrN864xAfLN0JG81zylBxprTCpDGfMjzGswc9Ykw20KFVxsaXlw/9FyrZMqbfHUTsJ8TA==
+X-Received: by 2002:a05:6870:b9ca:b0:13b:d910:5001 with SMTP id iv10-20020a056870b9ca00b0013bd9105001mr1391780oab.1.1670524264577;
+        Thu, 08 Dec 2022 10:31:04 -0800 (PST)
+Received: from localhost ([12.97.180.36])
+        by smtp.gmail.com with ESMTPSA id k14-20020a0568080e8e00b0034d8abf42f1sm10910446oil.23.2022.12.08.10.31.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 10:31:03 -0800 (PST)
+From:   Yury Norov <yury.norov@gmail.com>
+To:     linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        haniel Bristot de Oliveira <bristot@redhat.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tariq Toukan <ttoukan.linux@gmail.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>
+Cc:     Yury Norov <yury.norov@gmail.com>, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: [PATCH v3 0/5] cpumask: improve on cpumask_local_spread() locality
+Date:   Thu,  8 Dec 2022 10:30:56 -0800
+Message-Id: <20221208183101.1162006-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <202211041904.f9S5gAGL-lkp@intel.com> <Y5FvChDBD/+uaFy8@gondor.apana.org.au>
-In-Reply-To: <Y5FvChDBD/+uaFy8@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 8 Dec 2022 19:05:45 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGkdp_cwOWeX_49Y5xTCH8Y7X-LnM8pJufCH3yw7anBWQ@mail.gmail.com>
-Message-ID: <CAMj1kXGkdp_cwOWeX_49Y5xTCH8Y7X-LnM8pJufCH3yw7anBWQ@mail.gmail.com>
-Subject: Re: arch/arm/crypto/sha1_glue.c:34:8: warning: cast from 'void
- (*)(u32 *, const unsigned char *, unsigned int)' (aka 'void (*)(unsigned int
- *, const unsigned char *, unsigned int)') to 'sha1_block_fn *' (aka 'void
- (*)(struct sha1_state *, const unsigned char ...
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     kernel test robot <lkp@intel.com>,
-        Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
-        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 8 Dec 2022 at 05:59, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Fri, Nov 04, 2022 at 07:33:43PM +0800, kernel test robot wrote:
-> >
-> > vim +34 arch/arm/crypto/sha1_glue.c
-> >
-> > f0be44f4fb1fae David McCullough 2012-09-07  23
-> > 1f8673d31a999e Jussi Kivilinna  2014-07-29  24  asmlinkage void sha1_block_data_order(u32 *digest,
-> > f0be44f4fb1fae David McCullough 2012-09-07  25                const unsigned char *data, unsigned int rounds);
-> > f0be44f4fb1fae David McCullough 2012-09-07  26
-> > 604682551aa511 Jussi Kivilinna  2014-07-29  27  int sha1_update_arm(struct shash_desc *desc, const u8 *data,
-> > f0be44f4fb1fae David McCullough 2012-09-07  28                    unsigned int len)
-> > f0be44f4fb1fae David McCullough 2012-09-07  29  {
-> > 90451d6bdb787e Ard Biesheuvel   2015-04-09  30        /* make sure casting to sha1_block_fn() is safe */
-> > 90451d6bdb787e Ard Biesheuvel   2015-04-09  31        BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
-> > f0be44f4fb1fae David McCullough 2012-09-07  32
-> > 90451d6bdb787e Ard Biesheuvel   2015-04-09  33        return sha1_base_do_update(desc, data, len,
-> > 90451d6bdb787e Ard Biesheuvel   2015-04-09 @34                                   (sha1_block_fn *)sha1_block_data_order);
-> > f0be44f4fb1fae David McCullough 2012-09-07  35  }
-> > 604682551aa511 Jussi Kivilinna  2014-07-29  36  EXPORT_SYMBOL_GPL(sha1_update_arm);
-> > f0be44f4fb1fae David McCullough 2012-09-07  37
->
-> So clan doesn't like the cast on the assembly function.
->
-> Ard, why can't we just change the signature of the assembly
-> function instead of casting?
->
+cpumask_local_spread() currently checks local node for presence of i'th
+CPU, and then if it finds nothing makes a flat search among all non-local
+CPUs. We can do it better by checking CPUs per NUMA hops.
 
-We can, as the BUILD_BUG() will catch it if struct sha1_state gets
-modified in an incompatible way.
+This series is inspired by Tariq Toukan and Valentin Schneider's
+"net/mlx5e: Improve remote NUMA preferences used for the IRQ affinity
+hints"
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20220728191203.4055-3-tariqt@nvidia.com/
+
+According to their measurements, for mlx5e:
+
+        Bottleneck in RX side is released, reached linerate (~1.8x speedup).
+        ~30% less cpu util on TX.
+
+This patch makes cpumask_local_spread() traversing CPUs based on NUMA
+distance, just as well, and I expect comparable improvement for its
+users, as in case of mlx5e.
+
+I tested new behavior on my VM with the following NUMA configuration:
+
+root@debian:~# numactl -H
+available: 4 nodes (0-3)
+node 0 cpus: 0 1 2 3
+node 0 size: 3869 MB
+node 0 free: 3740 MB
+node 1 cpus: 4 5
+node 1 size: 1969 MB
+node 1 free: 1937 MB
+node 2 cpus: 6 7
+node 2 size: 1967 MB
+node 2 free: 1873 MB
+node 3 cpus: 8 9 10 11 12 13 14 15
+node 3 size: 7842 MB
+node 3 free: 7723 MB
+node distances:
+node   0   1   2   3
+  0:  10  50  30  70
+  1:  50  10  70  30
+  2:  30  70  10  50
+  3:  70  30  50  10
+
+And the cpumask_local_spread() for each node and offset traversing looks
+like this:
+
+node 0:   0   1   2   3   6   7   4   5   8   9  10  11  12  13  14  15
+node 1:   4   5   8   9  10  11  12  13  14  15   0   1   2   3   6   7
+node 2:   6   7   0   1   2   3   8   9  10  11  12  13  14  15   4   5
+node 3:   8   9  10  11  12  13  14  15   4   5   6   7   0   1   2   3
+
+v1: https://lore.kernel.org/lkml/20221111040027.621646-5-yury.norov@gmail.com/T/
+v2: https://lore.kernel.org/all/20221112190946.728270-3-yury.norov@gmail.com/T/
+v3:
+ - fix typo in find_nth_and_andnot_bit();
+ - add 5th patch that simplifies cpumask_local_spread();
+ - address various coding style nits.
+
+Yury Norov (5):
+  lib/find: introduce find_nth_and_andnot_bit
+  cpumask: introduce cpumask_nth_and_andnot
+  sched: add sched_numa_find_nth_cpu()
+  cpumask: improve on cpumask_local_spread() locality
+  lib/cpumask: reorganize cpumask_local_spread() logic
+
+ include/linux/cpumask.h  | 20 ++++++++++++++
+ include/linux/find.h     | 33 +++++++++++++++++++++++
+ include/linux/topology.h |  8 ++++++
+ kernel/sched/topology.c  | 57 ++++++++++++++++++++++++++++++++++++++++
+ lib/cpumask.c            | 26 +++++-------------
+ lib/find_bit.c           |  9 +++++++
+ 6 files changed, 134 insertions(+), 19 deletions(-)
+
+-- 
+2.34.1
+
