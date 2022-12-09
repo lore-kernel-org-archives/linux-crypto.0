@@ -2,132 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 531A2C10F1E
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Dec 2022 15:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB98EC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Dec 2022 15:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbiLIPHZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Dec 2022 10:07:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56784 "EHLO
+        id S229521AbiLIPcU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Dec 2022 10:32:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230149AbiLIPHP (ORCPT
+        with ESMTP id S231158AbiLIPcM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Dec 2022 10:07:15 -0500
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB94E31DC3;
-        Fri,  9 Dec 2022 07:07:13 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.229])
-        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4NTDj50wv1z9v7cV;
-        Fri,  9 Dec 2022 23:00:25 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.204.63.22])
-        by APP2 (Coremail) with SMTP id GxC2BwC37PgAT5NjmZfRAA--.1505S2;
-        Fri, 09 Dec 2022 16:06:48 +0100 (CET)
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com
-Cc:     linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        stable@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2] KEYS: asymmetric: Copy sig and digest in public_key_verify_signature()
-Date:   Fri,  9 Dec 2022 16:06:33 +0100
-Message-Id: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 9 Dec 2022 10:32:12 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773DA20F56;
+        Fri,  9 Dec 2022 07:32:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B8DEAB82884;
+        Fri,  9 Dec 2022 15:32:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18C5AC433F1;
+        Fri,  9 Dec 2022 15:32:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1670599928;
+        bh=qGtcBXEEZBuPDSehAEqy32jhuEWo98NeXnITy4+odyE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tNm/pSZ2rMybzF5yBMMvfhkmc2oHVEIxLi0pfYkF5htPVnGNiFxUQtRTVL26XP4sM
+         s5GrP+Aa4XXRYHe6xQQ1F9Ux3Ez0CgON0N9QZkQfnOPJzd0ngo7o2+LgBjf5pPwQPR
+         A0gGUgJDF+BYVKIT1cjuggNix4evuNRckz/cSEnA=
+Date:   Fri, 9 Dec 2022 16:32:06 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "yekai (A)" <yekai13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com,
+        liulongfang@huawei.com
+Subject: Re: [PATCH v10 0/3] crypto: hisilicon - supports device isolation
+ feature
+Message-ID: <Y5NU9vLyEjekoWfj@kroah.com>
+References: <20221119074817.12063-1-yekai13@huawei.com>
+ <9b934709-2f74-7392-aab6-eb506ddcf708@huawei.com>
+ <75ca78c7-1ca3-3e62-1175-5207ed9f5cf8@huawei.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: GxC2BwC37PgAT5NjmZfRAA--.1505S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF4xCry8tF47try5uF1UAwb_yoW5Wrykpa
-        n5WrW5tFyUGr1Skry3Aw4Ik34rAw4kJFW2gw4Iyws5uwn8XrZ3C3yIvF43WFyxJrykWryf
-        trWkWw4UuF1UXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-        n4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
-        0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8
-        ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
-        CY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyT
-        uYvjxUxo7KDUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgABBF1jj4J50AACsf
-X-CFilter-Loop: Reflected
+In-Reply-To: <75ca78c7-1ca3-3e62-1175-5207ed9f5cf8@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Roberto Sassu <roberto.sassu@huawei.com>
+On Fri, Dec 09, 2022 at 02:15:07PM +0800, yekai (A) wrote:
+> 
+> 
+> On 2022/11/25 16:49, yekai (A) wrote:
+> >
+> > On 2022/11/19 15:48, Kai Ye wrote:
+> >> 1、Add the uacce hardware error isolation interface. Hardware error 
+> >>    thresholds can be configured by sysfs node. User can get the hardware
+> >>    isolated state by sysfs node.
+> >> 2、Defining the isolation strategy for uacce device by uacce sysfs node. 
+> >>    If the number of hardware errors exceeds the configured value, the 
+> >>    uacce device will not be available in user space.
+> >> 3、The ACC VF device use the PF device isolation strategy.
+> >>    
+> >> changes v1->v2:
+> >> 	- deleted dev_to_uacce api.
+> >> 	- add vfs node doc. 
+> >> 	- move uacce->ref to driver.
+> >> changes v2->v3:
+> >> 	- deleted some redundant code.
+> >> 	- use qm state instead of reference count.
+> >> 	- add null pointer check.
+> >> 	- isolate_strategy_read() instead of a copy.
+> >> changes v3->v4:
+> >> 	- modify a comment
+> >> changes v4->v5:
+> >> 	- use bool instead of atomic.
+> >> 	- isolation frequency instead of isolation command.
+> >> changes v5->v6:
+> >> 	- add is_visible in uacce.
+> >> 	- add the description of the isolation strategy file node.
+> >> changes v6->v7
+> >> 	- add an example for isolate_strategy in Documentation.
+> >> changes v7->v8
+> >> 	- update the correct date.
+> >> changes v8->v9
+> >>     - move isolation strategy from qm to uacce.
+> >> changes v9->v10
+> >> 	- Go back to the v8 version of the solution.
+> >> 	- Modify some code according to suggestions.
+> >>
+> >> Kai Ye (3):
+> >>   uacce: supports device isolation feature
+> >>   Documentation: add the device isolation feature sysfs nodes for uacce
+> >>   crypto: hisilicon/qm - define the device isolation strategy
+> >>
+> >>  Documentation/ABI/testing/sysfs-driver-uacce |  18 ++
+> >>  drivers/crypto/hisilicon/qm.c                | 169 +++++++++++++++++--
+> >>  drivers/misc/uacce/uacce.c                   |  50 ++++++
+> >>  include/linux/hisi_acc_qm.h                  |  15 ++
+> >>  include/linux/uacce.h                        |  12 ++
+> >>  5 files changed, 249 insertions(+), 15 deletions(-)
+> >>
+> > Hi Grek
+> >
+> > Just a friendly ping.
+> >
+> > Thanks
+> > Kai
+> 
+> Hi Greg KH
+> 
+> Could you help me to apply this patchset v10?
 
-Commit ac4e97abce9b8 ("scatterlist: sg_set_buf() argument must be in linear
-mapping") checks that both the signature and the digest reside in the
-linear mapping area.
+Sorry, it needs review from the crypto maintainers before I can take it.
 
-However, more recently commit ba14a194a434c ("fork: Add generic vmalloced
-stack support"), made it possible to move the stack in the vmalloc area,
-which is not contiguous, and thus not suitable for sg_set_buf() which needs
-adjacent pages.
+Also, it looks to be too late for 6.2-rc1 at this point in time.
 
-Always make a copy of the signature and digest in the same buffer used to
-store the key and its parameters, and pass them to sg_set_buf(). Prefer it
-to conditionally doing the copy if necessary, to keep the code simple. The
-buffer allocated with kmalloc() is in the linear mapping area.
+thanks,
 
-Cc: stable@vger.kernel.org # 4.9.x
-Fixes: ba14a194a434 ("fork: Add generic vmalloced stack support")
-Link: https://lore.kernel.org/linux-integrity/Y4pIpxbjBdajymBJ@sol.localdomain/
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
----
- crypto/asymmetric_keys/public_key.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 2f8352e88860..ccc091119972 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -363,6 +363,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	struct scatterlist src_sg[2];
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
- 	char *key, *ptr;
-+	u32 key_max_len;
- 	int ret;
- 
- 	pr_devel("==>%s()\n", __func__);
-@@ -400,8 +401,12 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (!req)
- 		goto error_free_tfm;
- 
--	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
--		      GFP_KERNEL);
-+	key_max_len = max_t(u32,
-+			    pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
-+			    sig->s_size + sig->digest_size);
-+
-+	/* key is used to store the sig and digest too. */
-+	key = kmalloc(key_max_len, GFP_KERNEL);
- 	if (!key)
- 		goto error_free_req;
- 
-@@ -424,9 +429,13 @@ int public_key_verify_signature(const struct public_key *pkey,
- 			goto error_free_key;
- 	}
- 
-+	memcpy(key, sig->s, sig->s_size);
-+	memcpy(key + sig->s_size, sig->digest, sig->digest_size);
-+
- 	sg_init_table(src_sg, 2);
--	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
--	sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
-+	/* Cannot use one scatterlist. The first needs to be s->s_size long. */
-+	sg_set_buf(&src_sg[0], key, sig->s_size);
-+	sg_set_buf(&src_sg[1], key + sig->s_size, sig->digest_size);
- 	akcipher_request_set_crypt(req, src_sg, NULL, sig->s_size,
- 				   sig->digest_size);
- 	crypto_init_wait(&cwait);
--- 
-2.25.1
-
+greg k-h
