@@ -2,123 +2,176 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C48BC10F1D
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 16:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9B7C10F1D
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 17:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232580AbiLLQjG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Dec 2022 11:39:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41356 "EHLO
+        id S232864AbiLLRFY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Dec 2022 12:05:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232599AbiLLQic (ORCPT
+        with ESMTP id S232252AbiLLRFG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2022 11:38:32 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB9E14096
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 08:37:02 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id c17so13623550edj.13
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 08:37:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lvYON1Uq6UT3Qph7OPPr0NH47G6rUYR8O1BO9MFwJow=;
-        b=lIFXcScE+1mmzH1SBNLfPzmU2yyZ22FDa7zo6/O0Bw9aIOxDeXxYkEVfus52JWuhda
-         4ouELocZnEhmnwFppolEYq4c3c7RHYAqD4pax4M3unQDLONiM/9+ejXSM9E2FE+Z0v02
-         plxbNMhSLCExfq6g58BwEJLatQLzpt/xLWOhKWfMwSgaHbhPuPfGnoShEU2Q/8V0GhBe
-         I8mO/6POKEHTvHhiQrSmT3i/DlcfyH1o4pAMtSuNXvNoHj+mOy3GKKCsRTSQGVPFd3Z7
-         AQYI0FN6wamo3RnZf0VXDCwVvMRjPWjYDkKYXDeP5o/vQIFIn9FanCQzU/XNFNQHrfWF
-         2geA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lvYON1Uq6UT3Qph7OPPr0NH47G6rUYR8O1BO9MFwJow=;
-        b=st4t7LgLc9hSQkESNlnvAmSWeTl9IDL/lUzwG/oYSXbyZydiCAbsvW/Y714ZqOlhEl
-         nBjdFSilvnInhyTAlhB/ehkN6S83pb0nuPZvgC1cHTW0TLlcvRT0Or7dLMENrVHl7/r7
-         gQQBT3GVerab9rHarFfCZqVMu0dF9CUAt3sd6dBbggE86ndhSviM0oQeIj0DwjPtQO+p
-         tApO8jP8eCVblcMWgSToQi1hWm3JO+h6M39CE4dlmq5dh0WeNkSJs5Tm13OxdhRUsXMd
-         XogNgYtk+4SJ4QCdG92O6XB2/XlFwedtez6ILqPNOqTmjbuZ3BSG4iUDG+RZSUI0XOrH
-         8Cpg==
-X-Gm-Message-State: ANoB5pnCYxsiHdtvodTIQDTNKwnPHuok1rni7bn5tSR1MeQuiXra6G3P
-        8wsX3blHj04OsY4oUHXernazuA==
-X-Google-Smtp-Source: AA0mqf5ppTTyM6N0bPOAfBX//eKXVRPakyRimeYdkY/8NocUbAvjnOSiYLmQOcD2W7tmhBu2XO410g==
-X-Received: by 2002:a05:6402:702:b0:46f:68d0:76 with SMTP id w2-20020a056402070200b0046f68d00076mr10093614edx.34.1670863020790;
-        Mon, 12 Dec 2022 08:37:00 -0800 (PST)
-Received: from prec5560.. ([2001:bf7:830:a7a8:ff97:7d8d:1f2e:ffaa])
-        by smtp.gmail.com with ESMTPSA id m15-20020a50930f000000b00463597d2c25sm4051979eda.74.2022.12.12.08.36.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 08:37:00 -0800 (PST)
-From:   Robert Foss <robert.foss@linaro.org>
-To:     Lee Jones <lee.jones@linaro.org>,
-        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        Angel Iglesias <ang.iglesiasg@gmail.com>,
-        Wolfram Sang <wsa@kernel.org>,
-        Grant Likely <grant.likely@linaro.org>
-Cc:     Robert Foss <robert.foss@linaro.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-actions@lists.infradead.org,
-        linux-spi@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-media@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-crypto@vger.kernel.org, chrome-platform@lists.linux.dev,
-        Broadcom internal kernel review list 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        linux-input@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-integrity@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-serial@vger.kernel.org, Purism Kernel Team <kernel@puri.sm>,
-        linux-staging@lists.linux.dev, alsa-devel@alsa-project.org,
-        linux-watchdog@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-rtc@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-pm@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, patches@opensource.cirrus.com,
-        linux-mtd@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
-        linux-amlogic@lists.infradead.org, linux-pwm@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-i2c@vger.kernel.org,
-        kernel@pengutronix.de, netdev@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-fbdev@vger.kernel.org
-Subject: Re: (subset) [PATCH 000/606] i2c: Complete conversion to i2c_probe_new
-Date:   Mon, 12 Dec 2022 17:36:51 +0100
-Message-Id: <167086288411.3041259.17824406556561546642.b4-ty@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221118224540.619276-1-uwe@kleine-koenig.org>
-References: <20221118224540.619276-1-uwe@kleine-koenig.org>
+        Mon, 12 Dec 2022 12:05:06 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A9510DD;
+        Mon, 12 Dec 2022 09:05:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 67D136115C;
+        Mon, 12 Dec 2022 17:05:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28B21C433F0;
+        Mon, 12 Dec 2022 17:05:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670864704;
+        bh=KmG4ro7h+VdOXjEslNq+8iBWKBTQ/RA7zskQtxL+RXw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Aj6vrtB3Y2skOx8SKPJd7krfhSKJ/utA+bWT4xTHarHMUD3/lISCtlvJqPHL60pzb
+         gBefVSEqHgMTU2td3vxDOudSSqtIFyGEE3fjACq1ImpoFS6AbTSU4gyoNzKLtYmaUk
+         8HFKc5bYSKCl0NPKxs5dwH01VjTI/AU8U1qEI6cnPh7ywjBflGg9Adm5tMcwnxVY3Q
+         IzeAVMFpIdKeFQBwv3sUlGm3hpuFpURSm4Di7el+3ELuoTPiN3B+mdwleD0ujL+D77
+         U47NENYSq9mwaTnfNquImIqO6NV+79DE502FuufTe2OhE4tXY8SzjLVoqYzGx34tUW
+         xOp0Is+zD4lrA==
+Date:   Mon, 12 Dec 2022 10:05:02 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] padata: Mark padata_work_init() as __ref
+Message-ID: <Y5dfPgNF8E2EpNCM@dev-arch.thelio-3990X>
+References: <20221207191657.2852229-1-nathan@kernel.org>
+ <20221207191657.2852229-2-nathan@kernel.org>
+ <CAK7LNARoxqSzjpM0twcssMkf9X_PppzqtUo_opq=CX+zixma8g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNARoxqSzjpM0twcssMkf9X_PppzqtUo_opq=CX+zixma8g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 18 Nov 2022 23:35:34 +0100, Uwe Kleine-König wrote:
-> since commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
-> call-back type") from 2016 there is a "temporary" alternative probe
-> callback for i2c drivers.
+On Mon, Dec 12, 2022 at 10:07:24PM +0900, Masahiro Yamada wrote:
+> On Thu, Dec 8, 2022 at 4:17 AM Nathan Chancellor <nathan@kernel.org> wrote:
+> >
+> > When building arm64 allmodconfig + ThinLTO with clang and a proposed
+> > modpost update to account for -ffuncton-sections, the following warning
+> > appears:
+> >
+> >   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+> >   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+> >
+> > LLVM has optimized padata_work_init() to include the address of
+> > padata_mt_helper() directly, which causes modpost to complain since
+> > padata_work_init() is not __init, whereas padata_mt_helper() is. In
+> > reality, padata_work_init() is only called with padata_mt_helper() as
+> > the work_fn argument in code that is __init, so this warning will not
+> > result in any problems. Silence it with __ref, which makes it clear to
+> > modpost that padata_work_init() can only use padata_mt_helper() in
+> > __init code.
+> >
+> > Suggested-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > ---
+> > Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> > Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> > Cc: linux-crypto@vger.kernel.org
+> > ---
+> >  kernel/padata.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/kernel/padata.c b/kernel/padata.c
+> > index e5819bb8bd1d..4c3137fe8449 100644
+> > --- a/kernel/padata.c
+> > +++ b/kernel/padata.c
+> > @@ -83,8 +83,8 @@ static struct padata_work *padata_work_alloc(void)
+> >         return pw;
+> >  }
+> >
+> > -static void padata_work_init(struct padata_work *pw, work_func_t work_fn,
+> > -                            void *data, int flags)
+> > +static __ref void padata_work_init(struct padata_work *pw, work_func_t work_fn,
+> > +                                  void *data, int flags)
+> >  {
+> >         if (flags & PADATA_WORK_ONSTACK)
+> >                 INIT_WORK_ONSTACK(&pw->pw_work, work_fn);
+> >
+> > base-commit: 76dcd734eca23168cb008912c0f69ff408905235
+> > --
+> > 2.38.1
+> >
 > 
-> This series completes all drivers to this new callback (unless I missed
-> something). It's based on current next/master.
-> A part of the patches depend on commit 662233731d66 ("i2c: core:
-> Introduce i2c_client_get_device_id helper function"), there is a branch that
-> you can pull into your tree to get it:
+> It took me a while to understand why LTO can embed
+> padata_mt_helper's address into padata_work_init().
+
+Sorry about that, I can try to expand on this in both the commit message
+and in-code comment if I end up adding it.
+
+> There are 3 call-sites to padata_work_init().
 > 
-> [...]
+> (1)  __init padata_work_alloc_mt()
+>          -->  padata_work_init(..., padata_mt_helper, ...)
+> 
+> (2) padata_do_parallel()
+>          -->  padata_work_init(..., padata_parallel_worker, ...)
+> 
+> (3) __init padata_do_multithreaded()
+>         --> padata_work_init(..., padata_mt_helper, ...)
+> 
+> 
+> The function call (2) is squashed away.
+> 
+> 
+> With only (1) and (3) remaining, the 2nd parameter to
+> padata_work_init() is always padata_mt_helper,
+> therefore LLVM embeds padata_mt_hlper's address
+> directly into padata_work_init().
+> 
+> I am not sure if the compiler should do this level of optimization
+> because kernel/padata.c does not seem to be a special case.
+> Perhaps, we might be hit with more cases that need __ref annotation,
+> which is only required by LTO.
 
-Applied, thanks!
+That's possible. I did only see this once instance in all my builds but
+allmodconfig + ThinLTO might not be too interesting of a case,
+since the sanitizers will be enabled, which makes optimization more
+difficult. I could try to enable ThinLTO with some distribution
+configurations to see if there are any more instances that crop up.
 
-Repo: https://cgit.freedesktop.org/drm/drm-misc/
+> One note is that, we could discard padata_work_init()
+> because (1) and (3) are both annotated as __init.
+> So, another way of fixing is
+>    static __always_inline void padata_work_init(...)
+> because the compiler would determine padata_work_init()
+> would be small enough if the caller and callee belonged to
+> the same section.
+> 
+> I do not have a strong opinion.
+> Honestly, I do not know what the best approach would be to fix this.
 
+Agreed to both points, it is really up to the padata maintainers.
 
-[014/606] drm/bridge: adv7511: Convert to i2c's .probe_new()
-          commit: 1c546894ff82f8b7c070998c03f9b15a3499f326
-[028/606] drm/bridge: parade-ps8622: Convert to i2c's .probe_new()
-          commit: d6b522e9bbb0cca1aeae4ef6188800534794836f
-[035/606] drm/bridge: ti-sn65dsi83: Convert to i2c's .probe_new()
-          commit: 0f6548807fa77e87bbc37964c6b1ed9ba6e1155d
+> If we go with the __ref annotation, I can pick this, but
+> at least can you add some comments?
+> 
+> 
+> include/linux/init.h says:
+> "optimally document why the __ref is needed and why it's OK"
+> 
+> 
+> I think this is the case that needs some comments
+> because LTO optimization looks too tricky to me.
 
+Sure thing, I will send a v3 either Tuesday or Wednesday with an updated
+commit message and code comment if we end up going this route.
 
+Thank you for the review!
 
-rob
-
+Cheers,
+Nathan
