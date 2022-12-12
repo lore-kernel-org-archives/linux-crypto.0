@@ -2,115 +2,172 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FC8C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 12:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD726C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 13:08:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231716AbiLLMoY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Dec 2022 07:44:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52746 "EHLO
+        id S232112AbiLLNIi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Dec 2022 08:08:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231637AbiLLMoW (ORCPT
+        with ESMTP id S232552AbiLLNIT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2022 07:44:22 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B002B11A2F
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 04:44:18 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id ay40so5186220wmb.2
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 04:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=n7ey5OE4WbD1JahXkqzMDy7rEZ6qWxzQ6t8f0HPSRNs=;
-        b=qUTeXZxuhuYycyobAALAsMsiPtMXWTK0cbENHii/uMQzfin6RsG6UXWghBAnEMZbX9
-         pLTDHrCfmf+gaM4wx+Z3w+++qqLWsUHw2TiVPC+gX5u0WCqV/oBny6cbQDTjmibNQ/0L
-         J2VSja4ME/RDtxUoM2MrSDnRXuqGITyuxog8Nc5kp+WrslUqLFD/0EizAilSrVAt9Nwr
-         b+E6Ts0aE7K07sTpFRlyxkwNHxj3RTOJy3YVPY4whhl14QrkZsIUps3ML6uX2g/LmheS
-         5gUiQg5x478OLPYtDTZ2U6RAJIKX7zrCS+HVXoTsDXHsfhgMWlVt3V4rxxTdZHsLYC36
-         qM2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n7ey5OE4WbD1JahXkqzMDy7rEZ6qWxzQ6t8f0HPSRNs=;
-        b=IkzgYZaJMeBkZ6j64SsBwFt2KgvUmyl0/FWkYDyDcmulX78bTwl/TxP3ImLwrcnaPq
-         /iGxzNaJfxSt6CYzpxdlZvJUbONVWg0tZbI3gmThRg5OE7fIGqD/ChSOdL3795feU9t4
-         kVfjKdlUv4JYXSig4IOYesOUgVQNKYFI1FGWXE7VXTHmtFk/8c3ly0HSvMyQqeGnD+h3
-         POzIM149GvG/of4QdHKR3/R3TKMfyoGNhRfuWKoUAxCwPv4fYvFlymmB7aXk3QTEz7AT
-         Z0dWalmYIqXr9GM+9V3iq7PxQt7djHKH7KuX3W1ZEltZXWI861/c6BR2XKaDtz1grEhw
-         e4aA==
-X-Gm-Message-State: ANoB5pnkOLrebSeaF3CCrupOzZW4k/6RwoKSX5K2dfc6h7RNnA+aqD/T
-        JGzb60kxrr3kQH+L8cyiD2n3jg==
-X-Google-Smtp-Source: AA0mqf5LTY9uPSvi1G6cqxJF3CcL4A+t/hPjYQhFazq21Aj9/MjvP9uQfiQ6LD0UD5sXSAcK4yzQGw==
-X-Received: by 2002:a05:600c:4691:b0:3d0:5254:8a43 with SMTP id p17-20020a05600c469100b003d052548a43mr15351923wmo.38.1670849057277;
-        Mon, 12 Dec 2022 04:44:17 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id c1-20020a05600c0a4100b003d1e3b1624dsm10251490wmq.2.2022.12.12.04.44.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 04:44:16 -0800 (PST)
-Date:   Mon, 12 Dec 2022 13:44:13 +0100
-From:   Corentin LABBE <clabbe@baylibre.com>
-To:     Rob Herring <robh+dt@kernel.org>
-Cc:     heiko@sntech.de, ardb@kernel.org, davem@davemloft.net,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        mturquette@baylibre.com, sboyd@kernel.org,
-        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v10 28/33] arm64: dts: rockchip: rk3399: add crypto node
-Message-ID: <Y5ciHdLeB5rpnPqj@Red>
-References: <20220927075511.3147847-1-clabbe@baylibre.com>
- <20220927075511.3147847-29-clabbe@baylibre.com>
- <CAL_JsqJkHR+iccEf=5SU40Qq+cQpGZRq26TLzec-_Nr-Buu2KQ@mail.gmail.com>
+        Mon, 12 Dec 2022 08:08:19 -0500
+Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573F411151;
+        Mon, 12 Dec 2022 05:08:16 -0800 (PST)
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43]) (authenticated)
+        by conssluserg-03.nifty.com with ESMTP id 2BCD807b015352;
+        Mon, 12 Dec 2022 22:08:01 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 2BCD807b015352
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1670850481;
+        bh=60Bgpu0atlDkoRoUv+KHKiAoEPhzrlitVEuwVEjISH8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=S1R8EygUdT0sePVuwyu0xVcBa/332qFMxveWrw988yuTPqcdlCYpH0J01FRF9GqRq
+         6NAYUO6z6X8AWUmIj4fKF2AsETdOJnH2x89E7eB80ZHY5t1lXgDObzGiQByt6BSatZ
+         KNnqsSHvAJMiTDsx9J6TKEOCW6VDImfE83tpC8QPwfSU3zxx3ls3Azb9z7nQAI4HJu
+         1rTFJ1wbdy5xctyM2sikSwR28raiGgVdZzX9mmr1GfpspGtDprHH9OzkyWMmA/J+8+
+         ZCYMyEdTf8XWhY9XkhnpVMOWF4S7nHPg5O8U9EDN7y99Xp+jWcY2fepFinQBSYL/Ak
+         NEpGscyytV1lQ==
+X-Nifty-SrcIP: [209.85.160.43]
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-14455716674so8249231fac.7;
+        Mon, 12 Dec 2022 05:08:01 -0800 (PST)
+X-Gm-Message-State: ANoB5pnGXeV3M2meTJvl04Bxv3Kh2TJXXPyFfuO3ReGGaNz3bf/BMlrx
+        /nOIPnDc6owATRfwbo/diMK2GhuU9PMeKSUXrm8=
+X-Google-Smtp-Source: AA0mqf7M4QfjT3R/GEAqDtO/Cby83qpELei3PVXnETZgJx/Q5WFbXGO/tMYP5+mZ+gL2OQ5qEKbSaAk/zOFU3ItDe8k=
+X-Received: by 2002:a05:6870:c7b4:b0:144:d060:72e with SMTP id
+ dy52-20020a056870c7b400b00144d060072emr5970097oab.287.1670850480174; Mon, 12
+ Dec 2022 05:08:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqJkHR+iccEf=5SU40Qq+cQpGZRq26TLzec-_Nr-Buu2KQ@mail.gmail.com>
+References: <20221207191657.2852229-1-nathan@kernel.org> <20221207191657.2852229-2-nathan@kernel.org>
+In-Reply-To: <20221207191657.2852229-2-nathan@kernel.org>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 12 Dec 2022 22:07:24 +0900
+X-Gmail-Original-Message-ID: <CAK7LNARoxqSzjpM0twcssMkf9X_PppzqtUo_opq=CX+zixma8g@mail.gmail.com>
+Message-ID: <CAK7LNARoxqSzjpM0twcssMkf9X_PppzqtUo_opq=CX+zixma8g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] padata: Mark padata_work_init() as __ref
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Sun, Dec 11, 2022 at 09:51:42AM -0600, Rob Herring a écrit :
-> On Tue, Sep 27, 2022 at 2:56 AM Corentin Labbe <clabbe@baylibre.com> wrote:
-> >
-> > The rk3399 has a crypto IP handled by the rk3288 crypto driver so adds a
-> > node for it.
-> >
-> > Tested-by Diederik de Haas <didi.debian@cknow.org>
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  arch/arm64/boot/dts/rockchip/rk3399.dtsi | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> >
-> > diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > index 92c2207e686c..4391aea25984 100644
-> > --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > @@ -582,6 +582,26 @@ saradc: saradc@ff100000 {
-> >                 status = "disabled";
-> >         };
-> >
-> > +       crypto0: crypto@ff8b0000 {
-> > +               compatible = "rockchip,rk3399-crypto";
-> > +               reg = <0x0 0xff8b0000 0x0 0x4000>;
-> > +               interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>;
-> > +               clocks = <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>, <&cru SCLK_CRYPTO0>;
-> > +               clock-names = "hclk_master", "hclk_slave", "sclk";
-> > +               resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>;
-> > +               reset-names = "master", "lave", "crypto";
-> 
-> This doesn't match the binding:
-> 
-> crypto@ff8b8000: reset-names:2: 'crypto-rst' was expected
-> crypto@ff8b0000: reset-names:2: 'crypto-rst' was expected
-> crypto@ff8b0000: reset-names:1: 'slave' was expected
-> 
+On Thu, Dec 8, 2022 at 4:17 AM Nathan Chancellor <nathan@kernel.org> wrote:
+>
+> When building arm64 allmodconfig + ThinLTO with clang and a proposed
+> modpost update to account for -ffuncton-sections, the following warning
+> appears:
+>
+>   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+>   WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+>
+> LLVM has optimized padata_work_init() to include the address of
+> padata_mt_helper() directly, which causes modpost to complain since
+> padata_work_init() is not __init, whereas padata_mt_helper() is. In
+> reality, padata_work_init() is only called with padata_mt_helper() as
+> the work_fn argument in code that is __init, so this warning will not
+> result in any problems. Silence it with __ref, which makes it clear to
+> modpost that padata_work_init() can only use padata_mt_helper() in
+> __init code.
+>
+> Suggested-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: linux-crypto@vger.kernel.org
+> ---
+>  kernel/padata.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index e5819bb8bd1d..4c3137fe8449 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -83,8 +83,8 @@ static struct padata_work *padata_work_alloc(void)
+>         return pw;
+>  }
+>
+> -static void padata_work_init(struct padata_work *pw, work_func_t work_fn,
+> -                            void *data, int flags)
+> +static __ref void padata_work_init(struct padata_work *pw, work_func_t work_fn,
+> +                                  void *data, int flags)
+>  {
+>         if (flags & PADATA_WORK_ONSTACK)
+>                 INIT_WORK_ONSTACK(&pw->pw_work, work_fn);
+>
+> base-commit: 76dcd734eca23168cb008912c0f69ff408905235
+> --
+> 2.38.1
+>
 
-Hello
+It took me a while to understand why LTO can embed
+padata_mt_helper's address into padata_work_init().
 
-I will send a patch to fix that
 
-Regards
+There are 3 call-sites to padata_work_init().
+
+(1)  __init padata_work_alloc_mt()
+         -->  padata_work_init(..., padata_mt_helper, ...)
+
+(2) padata_do_parallel()
+         -->  padata_work_init(..., padata_parallel_worker, ...)
+
+(3) __init padata_do_multithreaded()
+        --> padata_work_init(..., padata_mt_helper, ...)
+
+
+The function call (2) is squashed away.
+
+
+With only (1) and (3) remaining, the 2nd parameter to
+padata_work_init() is always padata_mt_helper,
+therefore LLVM embeds padata_mt_hlper's address
+directly into padata_work_init().
+
+I am not sure if the compiler should do this level of optimization
+because kernel/padata.c does not seem to be a special case.
+Perhaps, we might be hit with more cases that need __ref annotation,
+which is only required by LTO.
+
+One note is that, we could discard padata_work_init()
+because (1) and (3) are both annotated as __init.
+So, another way of fixing is
+   static __always_inline void padata_work_init(...)
+because the compiler would determine padata_work_init()
+would be small enough if the caller and callee belonged to
+the same section.
+
+I do not have a strong opinion.
+Honestly, I do not know what the best approach would be to fix this.
+
+
+If we go with the __ref annotation, I can pick this, but
+at least can you add some comments?
+
+
+include/linux/init.h says:
+"optimally document why the __ref is needed and why it's OK"
+
+
+I think this is the case that needs some comments
+because LTO optimization looks too tricky to me.
+
+
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
