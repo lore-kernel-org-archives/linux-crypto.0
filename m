@@ -2,968 +2,360 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0883C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 18:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3973C00145
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Dec 2022 18:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233361AbiLLSj7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Dec 2022 13:39:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60238 "EHLO
+        id S233300AbiLLSyv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Dec 2022 13:54:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233533AbiLLSj2 (ORCPT
+        with ESMTP id S232699AbiLLSyR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Dec 2022 13:39:28 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4016D1758A
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 10:38:13 -0800 (PST)
+        Mon, 12 Dec 2022 13:54:17 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925AD9FDE;
+        Mon, 12 Dec 2022 10:54:12 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D2156611D5
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Dec 2022 18:38:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1543CC433D2;
-        Mon, 12 Dec 2022 18:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670870288;
-        bh=nhr19mh+afkqUAwiOaVfXMz2wkeJHYCTBevEN4it3FQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ujUhVt88s6KnGQTMR2lrLxfyBXlpH/SxzZNyhmUqDAMyE24LRC/zgJ8YbJSKt0M7f
-         ctSXasK7JnlbrR6WIApMh6avSG1iywjTVptRR3fivqpbgnzCfCR3TN82qFWaegTqSE
-         SRE7O++f8CqV8HvIPmK3h2JkP8zuNF83KZlTe3kOOQuxudZjZxdNIqcoNEgqobQ0nT
-         KEtxosFYNGitb2JDeXCYKCHkSZz7qIz2k/RBM836ceGK5ns3tk1NSD+VvDW8gqcUju
-         jLhInSnoUJZYoZ/pBlci9tJ9cl47waqOwbWviYq+vDTsZXpJbrpBbPQvExzTv/auAX
-         oDdXyJIJt1UYw==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: arm/ghash - implement fused AES/GHASH implementation of GCM
-Date:   Mon, 12 Dec 2022 19:37:58 +0100
-Message-Id: <20221212183758.1079283-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.35.1
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F2EA611C6;
+        Mon, 12 Dec 2022 18:54:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A68C433D2;
+        Mon, 12 Dec 2022 18:54:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HKtenSIe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1670871247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qD0Hs8pByXLAD+Vrx/iVCPHPbIi3QMfqTULRc3J8r7M=;
+        b=HKtenSIeKY/0Wiy/oOPQ1C5DToK7e9inCQzUM4KwO2r0oDCXuhSgLg/qvAlHtLK1a7ow6+
+        vPVbTWxp7qmq748xs2FvIDDatbdcdyO6ZY44l6ufAIdB0WEIl85mMMeaX3Zwj21cB7VN86
+        qWB0YR5zgy8Rv7sD1XYpjv7juqYsKps=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 59390ef3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 12 Dec 2022 18:54:06 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v12 0/6] implement getrandom() in vDSO
+Date:   Mon, 12 Dec 2022 11:53:41 -0700
+Message-Id: <20221212185347.1286824-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=21966; i=ardb@kernel.org; h=from:subject; bh=nhr19mh+afkqUAwiOaVfXMz2wkeJHYCTBevEN4it3FQ=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBjl3UFPgOgAa823Pdh3gjlxarxwI5I9/wXXoxfSXgo 5PUA9ueJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCY5d1BQAKCRDDTyI5ktmPJG5hC/ 9Hm0cPpjyayOBf/vXinSraPkk+JOfnDMu2pt/KcaD4VqGSzY5xLBHmrWGXvGD+5PhCrjpYFSrg4ugc M30keMji6Dmz/Fcb6TQjmRBfrFDlgLb24rMtEKUWFnHgBBz03rIKEB2nlnhEhUhJdx3IimRFmKQ7YA bR525k3CAeluwQgj8Rle6nvBYdbSleTjHde8kzJUcnt0Rpwestmxdcd7BfiCtfj+a1abwX19yQydjp piDGt4grCIqPp5M6l8P2ffqZ/v50ArkI/R2qhX7Zqf2IAUIlPUSlxYyPH/avDT0ogNDn80HSdzien5 C/bdzb9WaCjRcrWTvf+mf+J18snDhwaxP7+lU/KiDWccrQVGee2xlMzy0AMW0Aye26sTokdysVN2ew RUAmFSEioJfyrkABnnrJ1YI/iPWCIziXunPpVeOhSSNj9CwhzzX8s49NbpyCXO9ICZD5oOc1gCLc03 qZP2YvilBh1RdGH3Fz2JQdNJ5BDlYiNYsyJpX2owmYeG4=
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 32-bit ARM, AES in GCM mode takes full advantage of the ARMv8 Crypto
-Extensions when available, resulting in a performance of 6-7 cycles per
-byte for typical IPsec frames on cores such as Cortex-A53, using the
-generic GCM template encapsulating the accelerated AES-CTR and GHASH
-implementations.
+Changes v11->v12:
+----------------
+- In order to avoid mlock()ing pages, and the related rlimit and fork
+  inheritance issues there, Introduce VM_DROPPABLE to prevent swapping
+  while meeting the cache-like requirements of vDSO getrandom().
 
-At such high rates, any time spent copying data or doing other poorly
-optimized work in the generic layer hurts disproportionately, and we can
-get a significant performance improvement by combining the optimized
-AES-CTR and GHASH implementations into a single one.
+  This has some tenticles in mm/ and arch/x86/ code, so I've marked the
+  two patches for that as still RFC, while the rest of the series is not
+  RFC.
 
-On Cortex-A53, this results in a performance improvement of around 70%,
-or 4.2 cycles per byte for AES-256-GCM-128 with RFC4106 encapsulation.
-The fastest mode on this core is bare AES-128-GCM using 8k blocks, which
-manages 2.66 cycles per byte.
+- Mandate that opaque state blobs don't straddle page boundaries, so
+  that VM_DROPPABLE can work on page-level granularity rather than
+  allocation-level granularity.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
-Note: this patch depends on the softirq context patches for kernel mode
-NEON I sent last week. More specifically, this implements a sync AEAD
-that does not implement a !simd fallback, as AEADs are not callable in
-IRQ context anyway.
+- Add compiler barriers to vDSO getrandom() to prevent theoretical
+  reordering potential.
 
- arch/arm/crypto/Kconfig         |   2 +
- arch/arm/crypto/ghash-ce-core.S | 381 +++++++++++++++++++-
- arch/arm/crypto/ghash-ce-glue.c | 350 +++++++++++++++++-
- 3 files changed, 718 insertions(+), 15 deletions(-)
+- Initialize the trials loop counter in the chacha test.
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 3858c4d4cb98854d..c693a4fdf3771e63 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -16,9 +16,11 @@ config CRYPTO_CURVE25519_NEON
- config CRYPTO_GHASH_ARM_CE
- 	tristate "Hash functions: GHASH (PMULL/NEON/ARMv8 Crypto Extensions)"
- 	depends on KERNEL_MODE_NEON
-+	select CRYPTO_AEAD
- 	select CRYPTO_HASH
- 	select CRYPTO_CRYPTD
- 	select CRYPTO_GF128MUL
-+	select CRYPTO_LIB_AES
- 	help
- 	  GCM GHASH function (NIST SP800-38D)
- 
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-index 9f51e3fa45268de9..e0a4dc20a3a96832 100644
---- a/arch/arm/crypto/ghash-ce-core.S
-+++ b/arch/arm/crypto/ghash-ce-core.S
-@@ -44,7 +44,7 @@
- 	t2q		.req	q7
- 	t3q		.req	q8
- 	t4q		.req	q9
--	T2		.req	q9
-+	XH2		.req	q9
- 
- 	s1l		.req	d20
- 	s1h		.req	d21
-@@ -80,7 +80,7 @@
- 
- 	XL2		.req	q5
- 	XM2		.req	q6
--	XH2		.req	q7
-+	T2		.req	q7
- 	T3		.req	q8
- 
- 	XL2_L		.req	d10
-@@ -192,23 +192,42 @@
- 	vshr.u64	XL, XL, #1
- 	.endm
- 
--	.macro		ghash_update, pn
-+	.macro		ghash_update, pn, enc, aggregate=1, head=1
- 	vld1.64		{XL}, [r1]
- 
-+	.if		\head
- 	/* do the head block first, if supplied */
--	ldr		ip, [sp]
- 	teq		ip, #0
- 	beq		0f
- 	vld1.64		{T1}, [ip]
- 	teq		r0, #0
- 	b		3f
-+	.endif
- 
- 0:	.ifc		\pn, p64
-+	.if		\aggregate
- 	tst		r0, #3			// skip until #blocks is a
- 	bne		2f			// round multiple of 4
- 
- 	vld1.8		{XL2-XM2}, [r2]!
--1:	vld1.8		{T3-T2}, [r2]!
-+1:	vld1.8		{T2-T3}, [r2]!
-+
-+	.ifnb		\enc
-+	\enc\()_4x	XL2, XM2, T2, T3
-+
-+	add		ip, r3, #16
-+	vld1.64		{HH}, [ip, :128]!
-+	vld1.64		{HH3-HH4}, [ip, :128]
-+
-+	veor		SHASH2_p64, SHASH_L, SHASH_H
-+	veor		SHASH2_H, HH_L, HH_H
-+	veor		HH34_L, HH3_L, HH3_H
-+	veor		HH34_H, HH4_L, HH4_H
-+
-+	vmov.i8		MASK, #0xe1
-+	vshl.u64	MASK, MASK, #57
-+	.endif
-+
- 	vrev64.8	XL2, XL2
- 	vrev64.8	XM2, XM2
- 
-@@ -218,8 +237,8 @@
- 	veor		XL2_H, XL2_H, XL_L
- 	veor		XL, XL, T1
- 
--	vrev64.8	T3, T3
--	vrev64.8	T1, T2
-+	vrev64.8	T1, T3
-+	vrev64.8	T3, T2
- 
- 	vmull.p64	XH, HH4_H, XL_H			// a1 * b1
- 	veor		XL2_H, XL2_H, XL_H
-@@ -267,14 +286,22 @@
- 
- 	b		1b
- 	.endif
-+	.endif
-+
-+2:	vld1.8		{T1}, [r2]!
-+
-+	.ifnb		\enc
-+	\enc\()_1x	T1
-+	veor		SHASH2_p64, SHASH_L, SHASH_H
-+	vmov.i8		MASK, #0xe1
-+	vshl.u64	MASK, MASK, #57
-+	.endif
- 
--2:	vld1.64		{T1}, [r2]!
- 	subs		r0, r0, #1
- 
- 3:	/* multiply XL by SHASH in GF(2^128) */
--#ifndef CONFIG_CPU_BIG_ENDIAN
- 	vrev64.8	T1, T1
--#endif
-+
- 	vext.8		IN1, T1, T1, #8
- 	veor		T1_L, T1_L, XL_H
- 	veor		XL, XL, IN1
-@@ -293,9 +320,6 @@
- 	veor		XL, XL, T1
- 
- 	bne		0b
--
--	vst1.64		{XL}, [r1]
--	bx		lr
- 	.endm
- 
- 	/*
-@@ -315,7 +339,11 @@ ENTRY(pmull_ghash_update_p64)
- 	vmov.i8		MASK, #0xe1
- 	vshl.u64	MASK, MASK, #57
- 
-+	ldr		ip, [sp]
- 	ghash_update	p64
-+	vst1.64		{XL}, [r1]
-+
-+	bx		lr
- ENDPROC(pmull_ghash_update_p64)
- 
- ENTRY(pmull_ghash_update_p8)
-@@ -335,5 +363,332 @@ ENTRY(pmull_ghash_update_p8)
- 	vmov.i64	k32, #0xffffffff
- 	vmov.i64	k48, #0xffffffffffff
- 
-+	ldr		ip, [sp]
- 	ghash_update	p8
-+	vst1.64		{XL}, [r1]
-+
-+	bx		lr
- ENDPROC(pmull_ghash_update_p8)
-+
-+	e0		.req	q9
-+	e1		.req	q10
-+	e2		.req	q11
-+	e3		.req	q12
-+	e0l		.req	d18
-+	e0h		.req	d19
-+	e2l		.req	d22
-+	e2h		.req	d23
-+	e3l		.req	d24
-+	e3h		.req	d25
-+	ctr		.req	q13
-+	ctr0		.req	d26
-+	ctr1		.req	d27
-+
-+	ek0		.req	q14
-+	ek1		.req	q15
-+
-+	.macro		round, rk:req, regs:vararg
-+	.irp		r, \regs
-+	aese.8		\r, \rk
-+	aesmc.8		\r, \r
-+	.endr
-+	.endm
-+
-+	.macro		aes_encrypt, rkp, rounds, regs:vararg
-+	vld1.8		{ek0-ek1}, [\rkp, :128]!
-+	cmp		\rounds, #12
-+	blt		.L\@_1			// AES-128
-+	beq		.L\@_0			// AES-192
-+
-+	round		ek0, \regs
-+	vld1.8		{ek0}, [\rkp, :128]!
-+	round		ek1, \regs
-+	vld1.8		{ek1}, [\rkp, :128]!
-+
-+.L\@_0:	round		ek0, \regs
-+	vld1.8		{ek0}, [\rkp, :128]!
-+	round		ek1, \regs
-+	vld1.8		{ek1}, [\rkp, :128]!
-+
-+.L\@_1: .rept		4
-+	round		ek0, \regs
-+	vld1.8		{ek0}, [\rkp, :128]!
-+	round		ek1, \regs
-+	vld1.8		{ek1}, [\rkp, :128]!
-+	.endr
-+
-+	round		ek0, \regs
-+	vld1.8		{ek0}, [\rkp, :128]
-+
-+	.irp		r, \regs
-+	aese.8		\r, ek1
-+	.endr
-+	.irp		r, \regs
-+	veor		\r, \r, ek0
-+	.endr
-+	.endm
-+
-+pmull_aes_encrypt:
-+	add		ip, r5, #4
-+	vld1.8		{ctr0}, [r5]		// load 12 byte IV
-+	vld1.8		{ctr1}, [ip]
-+	rev		r8, r7
-+	vext.8		ctr1, ctr1, ctr1, #4
-+	add		r7, r7, #1
-+	vmov.32		ctr1[1], r8
-+	vmov		e0, ctr
-+
-+	add		ip, r3, #64
-+	aes_encrypt	ip, r6, e0
-+	bx		lr
-+ENDPROC(pmull_aes_encrypt)
-+
-+pmull_aes_encrypt_4x:
-+	add		ip, r5, #4
-+	vld1.8		{ctr0}, [r5]
-+	vld1.8		{ctr1}, [ip]
-+	rev		r8, r7
-+	vext.8		ctr1, ctr1, ctr1, #4
-+	add		r7, r7, #1
-+	vmov.32		ctr1[1], r8
-+	rev		ip, r7
-+	vmov		e0, ctr
-+	add		r7, r7, #1
-+	vmov.32		ctr1[1], ip
-+	rev		r8, r7
-+	vmov		e1, ctr
-+	add		r7, r7, #1
-+	vmov.32		ctr1[1], r8
-+	rev		ip, r7
-+	vmov		e2, ctr
-+	add		r7, r7, #1
-+	vmov.32		ctr1[1], ip
-+	vmov		e3, ctr
-+
-+	add		ip, r3, #64
-+	aes_encrypt	ip, r6, e0, e1, e2, e3
-+	bx		lr
-+ENDPROC(pmull_aes_encrypt_4x)
-+
-+pmull_aes_encrypt_final:
-+	add		ip, r5, #4
-+	vld1.8		{ctr0}, [r5]
-+	vld1.8		{ctr1}, [ip]
-+	rev		r8, r7
-+	vext.8		ctr1, ctr1, ctr1, #4
-+	mov		r7, #1 << 24		// BE #1 for the tag
-+	vmov.32		ctr1[1], r8
-+	vmov		e0, ctr
-+	vmov.32		ctr1[1], r7
-+	vmov		e1, ctr
-+
-+	add		ip, r3, #64
-+	aes_encrypt	ip, r6, e0, e1
-+	bx		lr
-+ENDPROC(pmull_aes_encrypt_final)
-+
-+	.macro		enc_1x, in0
-+	bl		pmull_aes_encrypt
-+	veor		\in0, \in0, e0
-+	vst1.8		{\in0}, [r4]!
-+	.endm
-+
-+	.macro		dec_1x, in0
-+	bl		pmull_aes_encrypt
-+	veor		e0, e0, \in0
-+	vst1.8		{e0}, [r4]!
-+	.endm
-+
-+	.macro		enc_4x, in0, in1, in2, in3
-+	bl		pmull_aes_encrypt_4x
-+
-+	veor		\in0, \in0, e0
-+	veor		\in1, \in1, e1
-+	veor		\in2, \in2, e2
-+	veor		\in3, \in3, e3
-+
-+	vst1.8		{\in0-\in1}, [r4]!
-+	vst1.8		{\in2-\in3}, [r4]!
-+	.endm
-+
-+	.macro		dec_4x, in0, in1, in2, in3
-+	bl		pmull_aes_encrypt_4x
-+
-+	veor		e0, e0, \in0
-+	veor		e1, e1, \in1
-+	veor		e2, e2, \in2
-+	veor		e3, e3, \in3
-+
-+	vst1.8		{e0-e1}, [r4]!
-+	vst1.8		{e2-e3}, [r4]!
-+	.endm
-+
-+	/*
-+	 * void pmull_gcm_encrypt(int blocks, u64 dg[], const char *src,
-+	 *			  struct gcm_key const *k, char *dst,
-+	 *			  char *iv, int rounds, u32 counter)
-+	 */
-+ENTRY(pmull_gcm_encrypt)
-+	mov		ip, sp
-+	push		{r4-r8, lr}
-+	ldm		ip, {r4-r7}
-+
-+	vld1.64		{SHASH}, [r3]
-+
-+	ghash_update	p64, enc, head=0
-+	vst1.64		{XL}, [r1]
-+
-+	pop		{r4-r8, pc}
-+ENDPROC(pmull_gcm_encrypt)
-+
-+	/*
-+	 * void pmull_gcm_decrypt(int blocks, u64 dg[], const char *src,
-+	 *			  struct gcm_key const *k, char *dst,
-+	 *			  char *iv, int rounds, u32 counter)
-+	 */
-+ENTRY(pmull_gcm_decrypt)
-+	mov		ip, sp
-+	push		{r4-r8, lr}
-+	ldm		ip, {r4-r7}
-+
-+	vld1.64		{SHASH}, [r3]
-+
-+	ghash_update	p64, dec, head=0
-+	vst1.64		{XL}, [r1]
-+
-+	pop		{r4-r8, pc}
-+ENDPROC(pmull_gcm_decrypt)
-+
-+	/*
-+	 * void pmull_gcm_enc_final(int bytes, u64 dg[], char *tag,
-+	 *			    struct gcm_key const *k, char *head,
-+	 *			    char *iv, int rounds, u32 counter)
-+	 */
-+ENTRY(pmull_gcm_enc_final)
-+	mov		ip, sp
-+	push		{r4-r8, lr}
-+	ldm		ip, {r4-r7}
-+
-+	bl		pmull_aes_encrypt_final
-+
-+	cmp		r0, #0
-+	beq		.Lenc_final
-+
-+	adr_l		ip, .Lpermute
-+	sub		r4, r4, #16
-+	add		r8, ip, r0
-+	add		ip, ip, #32
-+	add		r4, r4, r0
-+	sub		ip, ip, r0
-+
-+	vld1.8		{e3}, [r8]		// permute vector for key stream
-+	vld1.8		{e2}, [ip]		// permute vector for ghash input
-+
-+	vtbl.8		e3l, {e0}, e3l
-+	vtbl.8		e3h, {e0}, e3h
-+
-+	vld1.8		{e0}, [r4]		// encrypt tail block
-+	veor		e0, e0, e3
-+	vst1.8		{e0}, [r4]
-+
-+	vtbl.8		T1_L, {e0}, e2l
-+	vtbl.8		T1_H, {e0}, e2h
-+
-+	vld1.64		{XL}, [r1]
-+.Lenc_final:
-+	vld1.64		{SHASH}, [r3, :128]
-+	vmov.i8		MASK, #0xe1
-+	veor		SHASH2_p64, SHASH_L, SHASH_H
-+	vshl.u64	MASK, MASK, #57
-+	mov		r0, #1
-+	bne		3f			// process head block first
-+	ghash_update	p64, aggregate=0, head=0
-+
-+	vrev64.8	XL, XL
-+	vext.8		XL, XL, XL, #8
-+	veor		XL, XL, e1
-+
-+	sub		r2, r2, #16		// rewind src pointer
-+	vst1.8		{XL}, [r2]		// store tag
-+
-+	pop		{r4-r8, pc}
-+ENDPROC(pmull_gcm_enc_final)
-+
-+	/*
-+	 * int pmull_gcm_dec_final(int bytes, u64 dg[], char *tag,
-+	 *			   struct gcm_key const *k, char *head,
-+	 *			   char *iv, int rounds, u32 counter,
-+	 *			   const char *otag, int authsize)
-+	 */
-+ENTRY(pmull_gcm_dec_final)
-+	mov		ip, sp
-+	push		{r4-r8, lr}
-+	ldm		ip, {r4-r7}
-+
-+	bl		pmull_aes_encrypt_final
-+
-+	cmp		r0, #0
-+	beq		.Ldec_final
-+
-+	adr_l		ip, .Lpermute
-+	sub		r4, r4, #16
-+	add		r8, ip, r0
-+	add		ip, ip, #32
-+	add		r4, r4, r0
-+	sub		ip, ip, r0
-+
-+	vld1.8		{e3}, [r8]		// permute vector for key stream
-+	vld1.8		{e2}, [ip]		// permute vector for ghash input
-+
-+	vtbl.8		e3l, {e0}, e3l
-+	vtbl.8		e3h, {e0}, e3h
-+
-+	vld1.8		{e0}, [r4]
-+
-+	vtbl.8		T1_L, {e0}, e2l
-+	vtbl.8		T1_H, {e0}, e2h
-+
-+	veor		e0, e0, e3
-+	vst1.8		{e0}, [r4]
-+
-+	vld1.64		{XL}, [r1]
-+.Ldec_final:
-+	vld1.64		{SHASH}, [r3]
-+	vmov.i8		MASK, #0xe1
-+	veor		SHASH2_p64, SHASH_L, SHASH_H
-+	vshl.u64	MASK, MASK, #57
-+	mov		r0, #1
-+	bne		3f			// process head block first
-+	ghash_update	p64, aggregate=0, head=0
-+
-+	vrev64.8	XL, XL
-+	vext.8		XL, XL, XL, #8
-+	veor		XL, XL, e1
-+
-+	adr_l		ip, .Lpermute
-+	ldrd		r2, r3, [sp, #40]	// otag and authsize
-+	vld1.8		{T1}, [r2]
-+	add		ip, ip, r3
-+	vceq.i8		T1, T1, XL		// compare tags
-+	vmvn		T1, T1			// 0 for eq, -1 for ne
-+
-+	vld1.8		{e0}, [ip]
-+	vtbl.8		XL_L, {T1}, e0l		// keep authsize bytes only
-+	vtbl.8		XL_H, {T1}, e0h
-+
-+	vpmin.s8	XL_L, XL_L, XL_H	// take the minimum s8 across the vector
-+	vpmin.s8	XL_L, XL_L, XL_L
-+	vmov		r0, XL_L[0]		// fail if != 0x0
-+
-+	pop		{r4-r8, pc}
-+ENDPROC(pmull_gcm_dec_final)
-+
-+	.section	".rodata", "a", %progbits
-+	.align		5
-+.Lpermute:
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
-+	.byte		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
-index 3e598284498865cf..f234c6fdc0472791 100644
---- a/arch/arm/crypto/ghash-ce-glue.c
-+++ b/arch/arm/crypto/ghash-ce-glue.c
-@@ -9,10 +9,16 @@
- #include <asm/neon.h>
- #include <asm/simd.h>
- #include <asm/unaligned.h>
-+#include <crypto/aes.h>
-+#include <crypto/gcm.h>
-+#include <crypto/b128ops.h>
- #include <crypto/cryptd.h>
-+#include <crypto/internal/aead.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/simd.h>
-+#include <crypto/internal/skcipher.h>
- #include <crypto/gf128mul.h>
-+#include <crypto/scatterwalk.h>
- #include <linux/cpufeature.h>
- #include <linux/crypto.h>
- #include <linux/jump_label.h>
-@@ -25,12 +31,19 @@ MODULE_ALIAS_CRYPTO("ghash");
- 
- #define GHASH_BLOCK_SIZE	16
- #define GHASH_DIGEST_SIZE	16
-+#define GCM_IV_SIZE		12
- 
- struct ghash_key {
- 	u64	h0[2];
- 	u64	h[][2];
- };
- 
-+struct gcm_key {
-+	u64	h[4][2];
-+	u32	rk[AES_MAX_KEYLENGTH_U32];
-+	int	rounds;
-+};
-+
- struct ghash_desc_ctx {
- 	u64 digest[GHASH_DIGEST_SIZE/sizeof(u64)];
- 	u8 buf[GHASH_BLOCK_SIZE];
-@@ -324,6 +337,332 @@ static struct ahash_alg ghash_async_alg = {
- 	},
- };
- 
-+
-+void pmull_gcm_encrypt(int blocks, u64 dg[], const char *src,
-+		       struct gcm_key const *k, char *dst,
-+		       char *iv, int rounds, u32 counter);
-+
-+void pmull_gcm_enc_final(int blocks, u64 dg[], char *tag,
-+			 struct gcm_key const *k, char *head,
-+			 char *iv, int rounds, u32 counter);
-+
-+void pmull_gcm_decrypt(int bytes, u64 dg[], const char *src,
-+		       struct gcm_key const *k, char *dst,
-+		       char *iv, int rounds, u32 counter);
-+
-+int pmull_gcm_dec_final(int bytes, u64 dg[], char *tag,
-+			struct gcm_key const *k, char *head,
-+			char *iv, int rounds, u32 counter,
-+			const char *otag, int authsize);
-+
-+static int gcm_setkey(struct crypto_aead *tfm, const u8 *inkey,
-+		      unsigned int keylen)
-+{
-+	struct gcm_key *ctx = crypto_aead_ctx(tfm);
-+	struct crypto_aes_ctx aes_ctx;
-+	be128 h, k;
-+	int ret;
-+
-+	ret = aes_expandkey(&aes_ctx, inkey, keylen);
-+	if (ret)
-+		return -EINVAL;
-+
-+	aes_encrypt(&aes_ctx, (u8 *)&k, (u8[AES_BLOCK_SIZE]){});
-+
-+	memcpy(ctx->rk, aes_ctx.key_enc, sizeof(ctx->rk));
-+	ctx->rounds = 6 + keylen / 4;
-+
-+	memzero_explicit(&aes_ctx, sizeof(aes_ctx));
-+
-+	ghash_reflect(ctx->h[0], &k);
-+
-+	h = k;
-+	gf128mul_lle(&h, &k);
-+	ghash_reflect(ctx->h[1], &h);
-+
-+	gf128mul_lle(&h, &k);
-+	ghash_reflect(ctx->h[2], &h);
-+
-+	gf128mul_lle(&h, &k);
-+	ghash_reflect(ctx->h[3], &h);
-+
-+	return 0;
-+}
-+
-+static int gcm_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
-+{
-+	switch (authsize) {
-+	case 4:
-+	case 8:
-+	case 12 ... 16:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
-+static void gcm_update_mac(u64 dg[], const u8 *src, int count, u8 buf[],
-+			   int *buf_count, struct gcm_key *ctx)
-+{
-+	if (*buf_count > 0) {
-+		int buf_added = min(count, GHASH_BLOCK_SIZE - *buf_count);
-+
-+		memcpy(&buf[*buf_count], src, buf_added);
-+
-+		*buf_count += buf_added;
-+		src += buf_added;
-+		count -= buf_added;
-+	}
-+
-+	if (count >= GHASH_BLOCK_SIZE || *buf_count == GHASH_BLOCK_SIZE) {
-+		int blocks = count / GHASH_BLOCK_SIZE;
-+
-+		pmull_ghash_update_p64(blocks, dg, src, ctx->h,
-+				       *buf_count ? buf : NULL);
-+
-+		src += blocks * GHASH_BLOCK_SIZE;
-+		count %= GHASH_BLOCK_SIZE;
-+		*buf_count = 0;
-+	}
-+
-+	if (count > 0) {
-+		memcpy(buf, src, count);
-+		*buf_count = count;
-+	}
-+}
-+
-+static void gcm_calculate_auth_mac(struct aead_request *req, u64 dg[])
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct gcm_key *ctx = crypto_aead_ctx(aead);
-+	u8 buf[GHASH_BLOCK_SIZE];
-+	struct scatter_walk walk;
-+	u32 len = req->assoclen;
-+	int buf_count = 0;
-+
-+	scatterwalk_start(&walk, req->src);
-+
-+	do {
-+		u32 n = scatterwalk_clamp(&walk, len);
-+		u8 *p;
-+
-+		if (!n) {
-+			scatterwalk_start(&walk, sg_next(walk.sg));
-+			n = scatterwalk_clamp(&walk, len);
-+		}
-+		p = scatterwalk_map(&walk);
-+
-+		gcm_update_mac(dg, p, n, buf, &buf_count, ctx);
-+
-+		scatterwalk_unmap(p);
-+
-+		if (unlikely(len / SZ_4K > (len - n) / SZ_4K)) {
-+                        kernel_neon_end();
-+                        kernel_neon_begin();
-+                }
-+
-+		len -= n;
-+		scatterwalk_advance(&walk, n);
-+		scatterwalk_done(&walk, 0, len);
-+	} while (len);
-+
-+	if (buf_count) {
-+		memset(&buf[buf_count], 0, GHASH_BLOCK_SIZE - buf_count);
-+		pmull_ghash_update_p64(1, dg, buf, ctx->h, NULL);
-+	}
-+}
-+
-+static int gcm_encrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct gcm_key *ctx = crypto_aead_ctx(aead);
-+	struct skcipher_walk walk;
-+	u8 buf[AES_BLOCK_SIZE];
-+	u32 counter = 2;
-+	u64 dg[2] = {};
-+	be128 lengths;
-+	const u8 *src;
-+	u8 *tag, *dst;
-+	int tail, err;
-+
-+	if (WARN_ON_ONCE(!may_use_simd()))
-+		return -EBUSY;
-+
-+	err = skcipher_walk_aead_encrypt(&walk, req, false);
-+
-+	kernel_neon_begin();
-+
-+	if (req->assoclen)
-+		gcm_calculate_auth_mac(req, dg);
-+
-+	src = walk.src.virt.addr;
-+	dst = walk.dst.virt.addr;
-+
-+	while (walk.nbytes >= AES_BLOCK_SIZE) {
-+		int nblocks = walk.nbytes / AES_BLOCK_SIZE;
-+
-+		pmull_gcm_encrypt(nblocks, dg, src, ctx, dst, req->iv,
-+				  ctx->rounds, counter);
-+		counter += nblocks;
-+
-+		if (walk.nbytes == walk.total && walk.nbytes % AES_BLOCK_SIZE) {
-+			src += nblocks * AES_BLOCK_SIZE;
-+			dst += nblocks * AES_BLOCK_SIZE;
-+			break;
-+		}
-+
-+		kernel_neon_end();
-+
-+		err = skcipher_walk_done(&walk,
-+					 walk.nbytes % AES_BLOCK_SIZE);
-+		if (err)
-+			return err;
-+
-+		src = walk.src.virt.addr;
-+		dst = walk.dst.virt.addr;
-+
-+		kernel_neon_begin();
-+	}
-+
-+
-+	lengths.a = cpu_to_be64(req->assoclen * 8);
-+	lengths.b = cpu_to_be64(req->cryptlen * 8);
-+
-+	tag = (u8 *)&lengths;
-+	tail = walk.nbytes % AES_BLOCK_SIZE;
-+
-+	/*
-+	 * Bounce via a buffer unless we are encrypting in place and src/dst
-+	 * are not pointing to the start of the walk buffer. In that case, we
-+	 * can do a NEON load/xor/store sequence in place as long as we move
-+	 * the plain/ciphertext and keystream to the start of the register. If
-+	 * not, do a memcpy() to the end of the buffer so we can reuse the same
-+	 * logic.
-+	 */
-+	if (unlikely(tail && (tail == walk.nbytes || src != dst)))
-+		src = memcpy(buf + sizeof(buf) - tail, src, tail);
-+
-+	pmull_gcm_enc_final(tail, dg, tag, ctx, (u8 *)src, req->iv,
-+			    ctx->rounds, counter);
-+	kernel_neon_end();
-+
-+	if (unlikely(tail && src != dst))
-+		memcpy(dst, src, tail);
-+
-+	if (walk.nbytes) {
-+		err = skcipher_walk_done(&walk, 0);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* copy authtag to end of dst */
-+	scatterwalk_map_and_copy(tag, req->dst, req->assoclen + req->cryptlen,
-+				 crypto_aead_authsize(aead), 1);
-+
-+	return 0;
-+}
-+
-+static int gcm_decrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct gcm_key *ctx = crypto_aead_ctx(aead);
-+	int authsize = crypto_aead_authsize(aead);
-+	struct skcipher_walk walk;
-+	u8 otag[AES_BLOCK_SIZE];
-+	u8 buf[AES_BLOCK_SIZE];
-+	u32 counter = 2;
-+	u64 dg[2] = {};
-+	be128 lengths;
-+	const u8 *src;
-+	u8 *tag, *dst;
-+	int tail, err, ret;
-+
-+	if (WARN_ON_ONCE(!may_use_simd()))
-+		return -EBUSY;
-+
-+	scatterwalk_map_and_copy(otag, req->src,
-+				 req->assoclen + req->cryptlen - authsize,
-+				 authsize, 0);
-+
-+	err = skcipher_walk_aead_decrypt(&walk, req, false);
-+
-+	kernel_neon_begin();
-+
-+	if (req->assoclen)
-+		gcm_calculate_auth_mac(req, dg);
-+
-+	src = walk.src.virt.addr;
-+	dst = walk.dst.virt.addr;
-+
-+	while (walk.nbytes >= AES_BLOCK_SIZE) {
-+		int nblocks = walk.nbytes / AES_BLOCK_SIZE;
-+
-+		pmull_gcm_decrypt(nblocks, dg, src, ctx, dst, req->iv,
-+				  ctx->rounds, counter);
-+		counter += nblocks;
-+
-+		if (walk.nbytes == walk.total && walk.nbytes % AES_BLOCK_SIZE) {
-+			src += nblocks * AES_BLOCK_SIZE;
-+			dst += nblocks * AES_BLOCK_SIZE;
-+			break;
-+		}
-+
-+		kernel_neon_end();
-+
-+		err = skcipher_walk_done(&walk,
-+					 walk.nbytes % AES_BLOCK_SIZE);
-+		if (err)
-+			return err;
-+
-+		src = walk.src.virt.addr;
-+		dst = walk.dst.virt.addr;
-+
-+		kernel_neon_begin();
-+	}
-+
-+	lengths.a = cpu_to_be64(req->assoclen * 8);
-+	lengths.b = cpu_to_be64((req->cryptlen - authsize) * 8);
-+
-+	tag = (u8 *)&lengths;
-+	tail = walk.nbytes % AES_BLOCK_SIZE;
-+
-+	if (unlikely(tail && (tail == walk.nbytes || src != dst)))
-+		src = memcpy(buf + sizeof(buf) - tail, src, tail);
-+
-+	ret = pmull_gcm_dec_final(tail, dg, tag, ctx, (u8 *)src, req->iv,
-+				  ctx->rounds, counter, otag, authsize);
-+	kernel_neon_end();
-+
-+	if (unlikely(tail && src != dst))
-+		memcpy(dst, src, tail);
-+
-+	if (walk.nbytes) {
-+		err = skcipher_walk_done(&walk, 0);
-+		if (err)
-+			return err;
-+	}
-+
-+	return ret ? -EBADMSG : 0;
-+}
-+
-+static struct aead_alg gcm_aes_alg = {
-+	.ivsize			= GCM_IV_SIZE,
-+	.chunksize		= AES_BLOCK_SIZE,
-+	.maxauthsize		= AES_BLOCK_SIZE,
-+	.setkey			= gcm_setkey,
-+	.setauthsize		= gcm_setauthsize,
-+	.encrypt		= gcm_encrypt,
-+	.decrypt		= gcm_decrypt,
-+
-+	.base.cra_name		= "gcm(aes)",
-+	.base.cra_driver_name	= "gcm-aes-ce",
-+	.base.cra_priority	= 400,
-+	.base.cra_blocksize	= 1,
-+	.base.cra_ctxsize	= sizeof(struct gcm_key),
-+	.base.cra_module	= THIS_MODULE,
-+};
-+
- static int __init ghash_ce_mod_init(void)
- {
- 	int err;
-@@ -332,21 +671,26 @@ static int __init ghash_ce_mod_init(void)
- 		return -ENODEV;
- 
- 	if (elf_hwcap2 & HWCAP2_PMULL) {
-+		err = crypto_register_aead(&gcm_aes_alg);
-+		if (err)
-+			return err;
- 		ghash_alg.base.cra_ctxsize += 3 * sizeof(u64[2]);
- 		static_branch_enable(&use_p64);
- 	}
- 
- 	err = crypto_register_shash(&ghash_alg);
- 	if (err)
--		return err;
-+		goto err_aead;
- 	err = crypto_register_ahash(&ghash_async_alg);
- 	if (err)
- 		goto err_shash;
- 
- 	return 0;
--
- err_shash:
- 	crypto_unregister_shash(&ghash_alg);
-+err_aead:
-+	if (elf_hwcap2 & HWCAP2_PMULL)
-+		crypto_unregister_aead(&gcm_aes_alg);
- 	return err;
- }
- 
-@@ -354,6 +698,8 @@ static void __exit ghash_ce_mod_exit(void)
- {
- 	crypto_unregister_ahash(&ghash_async_alg);
- 	crypto_unregister_shash(&ghash_alg);
-+	if (elf_hwcap2 & HWCAP2_PMULL)
-+		crypto_unregister_aead(&gcm_aes_alg);
- }
- 
- module_init(ghash_ce_mod_init);
+Changes v10->v11:
+-----------------
+- Adhemerval's latest glibc patch currently lives here:
+  https://github.com/zatrazz/glibc/commits/azanella/getrandom-vdso
+  It's still in flux (he hasn't posted it to glibc-alpha yet), but that
+  should still give some idea.
+
+- Substantially increase documentation detail throughout.
+
+- Numerous fixes to style and clarity.
+
+- Add two kselftests - one for the chacha20 assembly implementation, which
+  compares its output to that of libsodium, and one for the actual vDSO
+  function and vgetrandom_alloc() syscall, which also has some built-in quick &
+  dirty benchmarking functionality.
+
+- Add reserved `unsigned long addr` argument to syscall, for future use.
+
+- Enforce that `flags`, `addr`, and `*size_per_each` are all zero on input, so
+  that they can actually be used in the future.
+
+- Use VM_LOCKONFAULT|VM_NORESERVE so that memory isn't wasted until it's used.
+
+- Set VM_DONTDUMP to prevent state from being written out to core dumps.
+
+- Do mapping and flag setting all in one operation, so that it's not racy, and
+  so that dropping the mm lock between operations isn't required.
+
+- Due to the above, there's no longer any purpose in selecting
+  VGETRANDOM_ALLOC_SYSCALL, so remove that.
+
+- Don't update *num or *size_per_each until the mapping has succeeded.
+
+- Introduce vdso_kernel_ulong type for representing the long type that
+  the kernel uses, even when in 32-bit compat code on a 64-bit kernel.
+
+- Don't use 'bool' type in the vDSO page, in case of compiler quirks resulting
+  in a different interpretation of the type in different compilation contexts.
+
+--------------
+
+Two statements:
+
+  1) Userspace wants faster cryptographically secure random numbers of
+     arbitrary size, big or small.
+
+  2) Userspace is currently unable to safely roll its own RNG with the
+     same security profile as getrandom().
+
+Statement (1) has been debated for years, with arguments ranging from
+"we need faster cryptographically secure card shuffling!" to "the only
+things that actually need good randomness are keys, which are few and
+far between" to "actually, TLS CBC nonces are frequent" and so on. I
+don't intend to wade into that debate substantially, except to note that
+recently glibc added arc4random(), whose goal is to return a
+cryptographically secure uint32_t, and there are real user reports of it
+being too slow. So here we are.
+
+Statement (2) is more interesting. The kernel is the nexus of all
+entropic inputs that influence the RNG. It is in the best position, and
+probably the only position, to decide anything at all about the current
+state of the RNG and of its entropy. One of the things it uniquely knows
+about is when reseeding is necessary.
+
+For example, when a virtual machine is forked, restored, or duplicated,
+it's imparative that the RNG doesn't generate the same outputs. For this
+reason, there's a small protocol between hypervisors and the kernel that
+indicates this has happened, alongside some ID, which the RNG uses to
+immediately reseed, so as not to return the same numbers. Were userspace
+to expand a getrandom() seed from time T1 for the next hour, and at some
+point T2 < hour, the virtual machine forked, userspace would continue to
+provide the same numbers to two (or more) different virtual machines,
+resulting in potential cryptographic catastrophe. Something similar
+happens on resuming from hibernation (or even suspend), with various
+compromise scenarios there in mind.
+
+There's a more general reason why userspace rolling its own RNG from a
+getrandom() seed is fraught. There's a lot of attention paid to this
+particular Linuxism we have of the RNG being initialized and thus
+non-blocking or uninitialized and thus blocking until it is initialized.
+These are our Two Big States that many hold to be the holy
+differentiating factor between safe and not safe, between
+cryptographically secure and garbage. The fact is, however, that the
+distinction between these two states is a hand-wavy wishy-washy inexact
+approximation. Outside of a few exceptional cases (e.g. a HW RNG is
+available), we actually don't really ever know with any rigor at all
+when the RNG is safe and ready (nor when it's compromised). We do the
+best we can to "estimate" it, but entropy estimation is fundamentally
+impossible in the general case. So really, we're just doing guess work,
+and hoping it's good and conservative enough. Let's then assume that
+there's always some potential error involved in this differentiator.
+
+In fact, under the surface, the RNG is engineered around a different
+principal, and that is trying to *use* new entropic inputs regularly and
+at the right specific moments in time. For example, close to boot time,
+the RNG reseeds itself more often than later. At certain events, like VM
+fork, the RNG reseeds itself immediately. The various heuristics for
+when the RNG will use new entropy and how often is really a core aspect
+of what the RNG has some potential to do decently enough (and something
+that will probably continue to improve in the future from random.c's
+present set of algorithms). So in your mind, put away the metal
+attachment to the Two Big States, which represent an approximation with
+a potential margin of error. Instead keep in mind that the RNG's primary
+operating heuristic is how often and exactly when it's going to reseed.
+
+So, if userspace takes a seed from getrandom() at point T1, and uses it
+for the next hour (or N megabytes or some other meaningless metric),
+during that time, potential errors in the Two Big States approximation
+are amplified. During that time potential reseeds are being lost,
+forgotten, not reflected in the output stream. That's not good.
+
+The simplest statement you could make is that userspace RNGs that expand
+a getrandom() seed at some point T1 are nearly always *worse*, in some
+way, than just calling getrandom() every time a random number is
+desired.
+
+For those reasons, after some discussion on libc-alpha, glibc's
+arc4random() now just calls getrandom() on each invocation. That's
+trivially safe, and gives us latitude to then make the safe thing faster
+without becoming unsafe at our leasure. Card shuffling isn't
+particularly fast, however.
+
+How do we rectify this? By putting a safe implementation of getrandom()
+in the vDSO, which has access to whatever information a
+particular iteration of random.c is using to make its decisions. I use
+that careful language of "particular iteration of random.c", because the
+set of things that a vDSO getrandom() implementation might need for making
+decisions as good as the kernel's will likely change over time. This
+isn't just a matter of exporting certain *data* to userspace. We're not
+going to commit to a "data API" where the various heuristics used are
+exposed, locking in how the kernel works for decades to come, and then
+leave it to various userspaces to roll something on top and shoot
+themselves in the foot and have all sorts of complexity disasters.
+Rather, vDSO getrandom() is supposed to be the *same exact algorithm*
+that runs in the kernel, except it's been hoisted into userspace as
+much as possible. And so vDSO getrandom() and kernel getrandom() will
+always mirror each other hermetically.
+
+API-wise, the vDSO gains this function:
+
+  ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
+
+The return value and the first 3 arguments are the same as ordinary
+getrandom(), while the last argument is a pointer to some state
+allocated with vgetrandom_alloc(), explained below. Were all four
+arguments passed to the getrandom syscall, nothing different would
+happen, and the functions would have the exact same behavior.
+
+Then, we introduce a new syscall:
+
+  void *vgetrandom_alloc(unsigned int *num, unsigned int *size_per_each,
+                         unsigned long addr, unsigned int flags);
+
+This takes a hinted number of opaque states in `num`, and returns a
+pointer to an array of opaque states, the number actually allocated back
+in `num`, and the size in bytes of each one in `size_per_each`, enabling
+a libc to slice up the returned array into a state per each thread. (The
+`flags` and `addr` arguments, as well as the `*size_per_each` input
+value, are reserved for the future and are forced to be zero for now.)
+
+Libc is expected to allocate a chunk of these on first use, and then
+dole them out to threads as they're created, allocating more when
+needed. The returned address of the first state may be passed to
+munmap(2) with a length of `num * size_per_each`, in order to deallocate
+the memory.
+
+We very intentionally do *not* leave state allocation up to the caller
+of vgetrandom, but provide vgetrandom_alloc for that allocation. There
+are too many weird things that can go wrong, and it's important that
+vDSO does not provide too generic of a mechanism. It's not going to
+store its state in just any old memory address. It'll do it only in ones
+it allocates.
+
+Right now this means it uses a new mm flag called VM_DROPPABLE, along
+with VM_WIPEONFORK. In the future maybe there will be other interesting
+page flags or anti-heartbleed measures, or other platform-specific
+kernel-specific things that can be set from the syscall. Again, it's
+important that the kernel has a say in how this works rather than
+agreeing to operate on any old address; memory isn't neutral.
+
+The interesting meat of the implementation is in lib/vdso/getrandom.c,
+as generic C code, and it aims to mainly follow random.c's buffered fast
+key erasure logic. Before the RNG is initialized, it falls back to the
+syscall. Right now it uses a simple generation counter to make its decisions
+on reseeding (though this could be made more extensive over time).
+
+The actual place that has the most work to do is in all of the other
+files. Most of the vDSO shared page infrastructure is centered around
+gettimeofday, and so the main structs are all in arrays for different
+timestamp types, and attached to time namespaces, and so forth. I've
+done the best I could to add onto this in an unintrusive way.
+
+In my test results, performance is pretty stellar (around 15x for uint32_t
+generation), and it seems to be working. There's an extended example in the
+second commit of this series, showing how the syscall and the vDSO function
+are meant to be used together.
+
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-api@vger.kernel.org
+Cc: x86@kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
+Cc: Carlos O'Donell <carlos@redhat.com>
+Cc: Florian Weimer <fweimer@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Jann Horn <jannh@google.com>
+Cc: Christian Brauner <brauner@kernel.org>  
+
+Jason A. Donenfeld (6):
+  mm: add VM_DROPPABLE for designating always lazily freeable mappings
+  x86: mm: Skip faulting instruction for VM_DROPPABLE faults
+  random: add vgetrandom_alloc() syscall
+  arch: allocate vgetrandom_alloc() syscall number
+  random: introduce generic vDSO getrandom() implementation
+  x86: vdso: Wire up getrandom() vDSO implementation
+
+ MAINTAINERS                                   |   2 +
+ arch/alpha/kernel/syscalls/syscall.tbl        |   1 +
+ arch/arm/tools/syscall.tbl                    |   1 +
+ arch/arm64/include/asm/unistd.h               |   2 +-
+ arch/arm64/include/asm/unistd32.h             |   2 +
+ arch/ia64/kernel/syscalls/syscall.tbl         |   1 +
+ arch/m68k/kernel/syscalls/syscall.tbl         |   1 +
+ arch/microblaze/kernel/syscalls/syscall.tbl   |   1 +
+ arch/mips/kernel/syscalls/syscall_n32.tbl     |   1 +
+ arch/mips/kernel/syscalls/syscall_n64.tbl     |   1 +
+ arch/mips/kernel/syscalls/syscall_o32.tbl     |   1 +
+ arch/parisc/kernel/syscalls/syscall.tbl       |   1 +
+ arch/powerpc/kernel/syscalls/syscall.tbl      |   1 +
+ arch/s390/kernel/syscalls/syscall.tbl         |   1 +
+ arch/sh/kernel/syscalls/syscall.tbl           |   1 +
+ arch/sparc/kernel/syscalls/syscall.tbl        |   1 +
+ arch/x86/Kconfig                              |   1 +
+ arch/x86/entry/syscalls/syscall_32.tbl        |   1 +
+ arch/x86/entry/syscalls/syscall_64.tbl        |   1 +
+ arch/x86/entry/vdso/Makefile                  |   3 +-
+ arch/x86/entry/vdso/vdso.lds.S                |   2 +
+ arch/x86/entry/vdso/vgetrandom-chacha.S       | 177 +++++++++++
+ arch/x86/entry/vdso/vgetrandom.c              |  17 ++
+ arch/x86/include/asm/vdso/getrandom.h         |  55 ++++
+ arch/x86/include/asm/vdso/vsyscall.h          |   2 +
+ arch/x86/include/asm/vvar.h                   |  16 +
+ arch/x86/mm/fault.c                           |  19 ++
+ arch/xtensa/kernel/syscalls/syscall.tbl       |   1 +
+ drivers/char/random.c                         | 143 +++++++++
+ fs/proc/task_mmu.c                            |   3 +
+ include/linux/mm.h                            |   8 +
+ include/linux/mm_types.h                      |   5 +-
+ include/linux/syscalls.h                      |   3 +
+ include/trace/events/mmflags.h                |   9 +-
+ include/uapi/asm-generic/unistd.h             |   5 +-
+ include/vdso/datapage.h                       |  12 +
+ include/vdso/getrandom.h                      |  44 +++
+ include/vdso/types.h                          |  35 +++
+ kernel/sys_ni.c                               |   3 +
+ lib/vdso/Kconfig                              |   6 +
+ lib/vdso/getrandom.c                          | 224 ++++++++++++++
+ mm/Kconfig                                    |   3 +
+ mm/memory.c                                   |   6 +
+ mm/mempolicy.c                                |   3 +
+ mm/mprotect.c                                 |   2 +-
+ mm/rmap.c                                     |   5 +-
+ tools/include/uapi/asm-generic/unistd.h       |   5 +-
+ .../arch/mips/entry/syscalls/syscall_n64.tbl  |   1 +
+ .../arch/powerpc/entry/syscalls/syscall.tbl   |   1 +
+ .../perf/arch/s390/entry/syscalls/syscall.tbl |   1 +
+ .../arch/x86/entry/syscalls/syscall_64.tbl    |   1 +
+ tools/testing/selftests/vDSO/.gitignore       |   2 +
+ tools/testing/selftests/vDSO/Makefile         |  11 +
+ .../testing/selftests/vDSO/vdso_test_chacha.c |  43 +++
+ .../selftests/vDSO/vdso_test_getrandom.c      | 283 ++++++++++++++++++
+ 55 files changed, 1172 insertions(+), 9 deletions(-)
+ create mode 100644 arch/x86/entry/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/x86/entry/vdso/vgetrandom.c
+ create mode 100644 arch/x86/include/asm/vdso/getrandom.h
+ create mode 100644 include/vdso/getrandom.h
+ create mode 100644 include/vdso/types.h
+ create mode 100644 lib/vdso/getrandom.c
+ create mode 100644 tools/testing/selftests/vDSO/vdso_test_chacha.c
+ create mode 100644 tools/testing/selftests/vDSO/vdso_test_getrandom.c
+
 -- 
-2.35.1
+2.38.1
 
