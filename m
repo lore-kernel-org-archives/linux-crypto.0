@@ -2,133 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 899A6C10F1B
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 16:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D9AC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 16:59:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236196AbiLMQsh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Dec 2022 11:48:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51438 "EHLO
+        id S236124AbiLMQ7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Dec 2022 11:59:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbiLMQsc (ORCPT
+        with ESMTP id S235932AbiLMQ65 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2022 11:48:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692E51055F;
-        Tue, 13 Dec 2022 08:48:31 -0800 (PST)
+        Tue, 13 Dec 2022 11:58:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F054F24F00
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 08:56:39 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F27B161634;
-        Tue, 13 Dec 2022 16:48:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D48CC433F1;
-        Tue, 13 Dec 2022 16:48:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 78FD9B812A2
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 16:56:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2511AC433D2
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 16:56:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670950110;
-        bh=yRTgXuAMf26YmeJ6GO3YhLpQZxVOXCpEwtAqrvv29/Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TjJjkY2YGVnR6LqCjfdS2D5LCCcg32+s0afUDrOaRpM/ncCK37FdmyIV1/dTkE0ql
-         UZnWh7jCfzA5wHltyK5OOJS4rMBVGmpZAHH9hqAqhbfESZaYw4U/f74UtJMFwKAIXT
-         kwAADgB9JD2JGch4D2ztgHOYXyOIJOjF8qkvXjfzNSNba5/mDxkI0x1lDgpVcSZkmr
-         9iVRyQkDMUh0J9fxo01bnzF4L2Qt4kRROA82yLskaVbAdrHQX42k5cvPjbYRJ0hArc
-         JvuSEezW7XvZiwfhq4Lk+4gMFnxdo9nvuDU+wlLJgBn0fl6MjUfXZhrkNfwRahVRWv
-         dEEOWGkKsaP6Q==
-Date:   Tue, 13 Dec 2022 09:48:27 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] padata: Mark padata_work_init() as __ref
-Message-ID: <Y5is20DXQxtqyJLs@dev-arch.thelio-3990X>
-References: <20221207191657.2852229-1-nathan@kernel.org>
- <20221207191657.2852229-2-nathan@kernel.org>
- <CAK7LNARoxqSzjpM0twcssMkf9X_PppzqtUo_opq=CX+zixma8g@mail.gmail.com>
- <Y5dfPgNF8E2EpNCM@dev-arch.thelio-3990X>
- <20221212192157.plxiyyinfhieyzbt@parnassus.localdomain>
- <Y5eJuBWoCJ+q++IM@dev-arch.thelio-3990X>
+        s=k20201202; t=1670950575;
+        bh=nRTsgt2s0CXqejPQIsJcMbCKeu5AtyGMg3jBOd2tFQ0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=RB2g5tPftDhnakeRd7e01+EqJkVsB7TTumkWWvldZuQys47lIpFIKlREUyplt97RH
+         3TAry7FJuNmsvX80Ga7xdNKuaw2mM5+4jo/b2E6ZCz7D0V8qrlPeAAcSCNgNeXGsYE
+         dNw5+T9QK3a4OaRxFMLnRZipLCIRZ2WjUkguI50qDqiXv5lbhIr+jMgEgkR02Nf8yU
+         7ZwWJAKAwQanRtsFhNyyyHPTrvKLTnCZwIe+habFRX7Q+TSz7SUzzF2K0NABW1iyNN
+         NhdW7u4Z093nl/m7K5FhQQ0LTDmC+HS01GG6pIhT/WluJI/ZwmwDxpk6Hr2ld/4Koi
+         7DIdNnj8DDLgg==
+Received: by mail-lj1-f175.google.com with SMTP id f16so3903583ljc.8
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 08:56:15 -0800 (PST)
+X-Gm-Message-State: ANoB5plKawPvQzgOvxV2XW9wV3MIMBv8MbdkCavqLczfwpgGdU0b6w7h
+        XHMBUqwINV64ZwEBiD6BD4hOLxtvr5rfQSJ97BY=
+X-Google-Smtp-Source: AA0mqf7LCKgHF1y1CieLYeW/XxfzO0Q9GMS7KulnVgRKusjeO6WyjxOKBJ+3j8VXUEsXTc3DXTejt/tvDfhSnw55s78=
+X-Received: by 2002:a05:651c:1603:b0:26d:d603:8df2 with SMTP id
+ f3-20020a05651c160300b0026dd6038df2mr28154018ljq.189.1670950573159; Tue, 13
+ Dec 2022 08:56:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5eJuBWoCJ+q++IM@dev-arch.thelio-3990X>
+References: <20221207103936.2198407-1-ardb@kernel.org> <60937acc8b143e552aa41a689c03febb1fd3729a.camel@strongswan.org>
+In-Reply-To: <60937acc8b143e552aa41a689c03febb1fd3729a.camel@strongswan.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 13 Dec 2022 17:56:02 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHad8wRd9_P7A1Oo8Ucw0H=+19ffO4mss7eouivNwy1vg@mail.gmail.com>
+Message-ID: <CAMj1kXHad8wRd9_P7A1Oo8Ucw0H=+19ffO4mss7eouivNwy1vg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] ARM: allow kernel mode NEON in softirq context
+To:     Martin Willi <martin@strongswan.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk,
+        linux-crypto@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 01:06:16PM -0700, Nathan Chancellor wrote:
-> On Mon, Dec 12, 2022 at 02:21:57PM -0500, Daniel Jordan wrote:
-> > On Mon, Dec 12, 2022 at 10:05:02AM -0700, Nathan Chancellor wrote:
-> > > On Mon, Dec 12, 2022 at 10:07:24PM +0900, Masahiro Yamada wrote:
-> > > > I am not sure if the compiler should do this level of optimization
-> > > > because kernel/padata.c does not seem to be a special case.
-> > > > Perhaps, we might be hit with more cases that need __ref annotation,
-> > > > which is only required by LTO.
-> > > 
-> > > That's possible. I did only see this once instance in all my builds but
-> > > allmodconfig + ThinLTO might not be too interesting of a case,
-> > > since the sanitizers will be enabled, which makes optimization more
-> > > difficult. I could try to enable ThinLTO with some distribution
-> > > configurations to see if there are any more instances that crop up.
-> > 
-> > Yes, if there were many more instances of this problem it might be worth
-> > thinking about an LTO-specific solution to fix it closer to the source.
-> 
-> Ack, I will wire up some build tests to see if this optimization occurs
-> frequently enough to warrant a wider fix.
+On Mon, 12 Dec 2022 at 15:38, Martin Willi <martin@strongswan.org> wrote:
+>
+> Hi Ard,
+>
+> > Currently on ARM, we only permit kernel mode NEON in task context [...]
+> > For IPsec packet encryption involving highly performant crypto
+> > implementations, this results in a substantial performance hit [...]
+>
+> Thanks for your continued work on this.
+>
+> > Without these changes, an IPsec tunnel from a 32-bit VM to the 64-bit
+> > host can achieve a throughput of 9.5 MB/s TX and 11.9 MB/s RX.
+> >
+> > When the crypto algorithm is permitted to execute in softirq context,
+> > the throughput increases to 16.5 MB/s TX and 41 MB/s RX.
+>
+> In my tests on an Armada 385, I could increase IPsec throughput with
+> ChaCha20/Poly1305 on RX from ~230 to ~260 MBit/s when using the NEON
+> code path. So you may add my:
+>
+> Tested-by: Martin Willi <martin@strongswan.org>
+>
 
-Turns out this does not appear to happen often. I built several
-distribution configurations for arm64 and x86_64 with
-CONFIG_LTO_CLANG_THIN=y and saw no modpost warnings. So I think this is
-sufficiently odd to keep the fix local to this one instance. I will send
-a v3 later today.
-
-> > > > One note is that, we could discard padata_work_init()
-> > > > because (1) and (3) are both annotated as __init.
-> > > > So, another way of fixing is
-> > > >    static __always_inline void padata_work_init(...)
-> > > > because the compiler would determine padata_work_init()
-> > > > would be small enough if the caller and callee belonged to
-> > > > the same section.
-> > > > 
-> > > > I do not have a strong opinion.
-> > 
-> > I'm right there with you.  :-)
-> > 
-> > > > Honestly, I do not know what the best approach would be to fix this.
-> > 
-> > Either approach works, either can include an explanatory comment.
-> > __ref seems more targeted to the problem at hand.
-> 
-> Right, I suspect __ref is the right way to go for this particular issue.
-> I will add a comment regardless.
-> 
-> > > > If we go with the __ref annotation, I can pick this, but
-> > > > at least can you add some comments?
-> > > > 
-> > > > 
-> > > > include/linux/init.h says:
-> > > > "optimally document why the __ref is needed and why it's OK"
-> > > > 
-> > > > 
-> > > > I think this is the case that needs some comments
-> > > > because LTO optimization looks too tricky to me.
-> > > 
-> > > Sure thing, I will send a v3 either Tuesday or Wednesday with an updated
-> > > commit message and code comment if we end up going this route.
-> > 
-> > A nitpick, but as long as you're respinning, if we stay with this
-> > approach, could you put __ref just before the function name?  init.h
-> > says "The markers follow same syntax rules as __init / __initdata" and
-> > for those it says "You should add __init immediately before the function
-> > name" though there are plenty of places in the tree that don't do this.
-> 
-> Sure thing!
-> 
-> Cheers,
-> Nathan
-> 
+Thanks!
