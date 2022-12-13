@@ -2,83 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D9AC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 16:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A1EC10F1B
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 18:36:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236124AbiLMQ7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Dec 2022 11:59:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56842 "EHLO
+        id S236610AbiLMSgK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Dec 2022 13:36:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235932AbiLMQ65 (ORCPT
+        with ESMTP id S236622AbiLMSft (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2022 11:58:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F054F24F00
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 08:56:39 -0800 (PST)
+        Tue, 13 Dec 2022 13:35:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4802528A;
+        Tue, 13 Dec 2022 10:35:49 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 78FD9B812A2
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 16:56:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2511AC433D2
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 16:56:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A7556616D9;
+        Tue, 13 Dec 2022 18:35:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E8CC433EF;
+        Tue, 13 Dec 2022 18:35:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670950575;
-        bh=nRTsgt2s0CXqejPQIsJcMbCKeu5AtyGMg3jBOd2tFQ0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=RB2g5tPftDhnakeRd7e01+EqJkVsB7TTumkWWvldZuQys47lIpFIKlREUyplt97RH
-         3TAry7FJuNmsvX80Ga7xdNKuaw2mM5+4jo/b2E6ZCz7D0V8qrlPeAAcSCNgNeXGsYE
-         dNw5+T9QK3a4OaRxFMLnRZipLCIRZ2WjUkguI50qDqiXv5lbhIr+jMgEgkR02Nf8yU
-         7ZwWJAKAwQanRtsFhNyyyHPTrvKLTnCZwIe+habFRX7Q+TSz7SUzzF2K0NABW1iyNN
-         NhdW7u4Z093nl/m7K5FhQQ0LTDmC+HS01GG6pIhT/WluJI/ZwmwDxpk6Hr2ld/4Koi
-         7DIdNnj8DDLgg==
-Received: by mail-lj1-f175.google.com with SMTP id f16so3903583ljc.8
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 08:56:15 -0800 (PST)
-X-Gm-Message-State: ANoB5plKawPvQzgOvxV2XW9wV3MIMBv8MbdkCavqLczfwpgGdU0b6w7h
-        XHMBUqwINV64ZwEBiD6BD4hOLxtvr5rfQSJ97BY=
-X-Google-Smtp-Source: AA0mqf7LCKgHF1y1CieLYeW/XxfzO0Q9GMS7KulnVgRKusjeO6WyjxOKBJ+3j8VXUEsXTc3DXTejt/tvDfhSnw55s78=
-X-Received: by 2002:a05:651c:1603:b0:26d:d603:8df2 with SMTP id
- f3-20020a05651c160300b0026dd6038df2mr28154018ljq.189.1670950573159; Tue, 13
- Dec 2022 08:56:13 -0800 (PST)
+        s=k20201202; t=1670956548;
+        bh=RwcV3yZ+zQ6XKY/GbgFiJKf5T1kYYz04kemOgRUA7uU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=jvuhGbNITwreRiZ6mCd8ZfwFCEd3fpRlqFTzUWuRSggeVUUy1Orke/XEnuiI7x7Bb
+         SrYk/T4ta/dKNEBDyThYCbgfAeeIfVCjOeuVaZJ1D0aRa+gpPvK0p2AnzqkghlIioT
+         2Y+cRX+tm2izZVigmexK+TytaJrRbgQ5OBjTcD/s4Ot4vpw5RRTWtPZGNZNBs8UCJb
+         dwfoR1DnFxBsPv3/FBgLWGajV9l9TKGuR07bfDPEbJ3boPmPZGjuwz7UqXfGk6BgXm
+         JjylM3Xbe9FWUwzrGczbKKsyWM7yQHQb8T5KMcw1ZBnHM0QLO6LwYEYlHWQDliUOhD
+         b7jXvkj3/YJ+A==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v3 0/2] Fix lack of section mismatch warnings with LTO
+Date:   Tue, 13 Dec 2022 11:35:27 -0700
+Message-Id: <20221213183529.766630-1-nathan@kernel.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-References: <20221207103936.2198407-1-ardb@kernel.org> <60937acc8b143e552aa41a689c03febb1fd3729a.camel@strongswan.org>
-In-Reply-To: <60937acc8b143e552aa41a689c03febb1fd3729a.camel@strongswan.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 13 Dec 2022 17:56:02 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHad8wRd9_P7A1Oo8Ucw0H=+19ffO4mss7eouivNwy1vg@mail.gmail.com>
-Message-ID: <CAMj1kXHad8wRd9_P7A1Oo8Ucw0H=+19ffO4mss7eouivNwy1vg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] ARM: allow kernel mode NEON in softirq context
-To:     Martin Willi <martin@strongswan.org>
-Cc:     linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk,
-        linux-crypto@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 12 Dec 2022 at 15:38, Martin Willi <martin@strongswan.org> wrote:
->
-> Hi Ard,
->
-> > Currently on ARM, we only permit kernel mode NEON in task context [...]
-> > For IPsec packet encryption involving highly performant crypto
-> > implementations, this results in a substantial performance hit [...]
->
-> Thanks for your continued work on this.
->
-> > Without these changes, an IPsec tunnel from a 32-bit VM to the 64-bit
-> > host can achieve a throughput of 9.5 MB/s TX and 11.9 MB/s RX.
-> >
-> > When the crypto algorithm is permitted to execute in softirq context,
-> > the throughput increases to 16.5 MB/s TX and 41 MB/s RX.
->
-> In my tests on an Armada 385, I could increase IPsec throughput with
-> ChaCha20/Poly1305 on RX from ~230 to ~260 MBit/s when using the NEON
-> code path. So you may add my:
->
-> Tested-by: Martin Willi <martin@strongswan.org>
->
+Hi all,
 
-Thanks!
+Vincent recently reported an issue with lack of section mismatch
+warnings with LTO. This is due to commit 6c730bfc894f ("modpost: handle
+-ffunction-sections"), which ignores all function sections for modpost.
+
+I believe this is incorrect, as these function sections may still refer
+to symbols in other sections and they will ultimately be coalesced into
+.text by vmlinux.lds anyways.
+
+The first patch fixes a warning that I see with allmodconfig + ThinLTO
+builds after applying the second patch. The second patch moves ".text.*"
+into TEXT_SECTIONS so that modpost audits them for mismatches.
+
+I expect this to go via the kbuild tree with an ack from the padata
+maintainers.
+
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+
+v3:
+  - Stick a comment above padata_work_init() to explain presence of
+    __ref (Masahiro, Daniel).
+  - Expand on problem in first patch's commit message (Masahiro).
+  - Adjust location of __ref within function definition (Daniel)
+  - Fix typo in commit message of second patch (Masahiro).
+v2: https://lore.kernel.org/20221207191657.2852229-1-nathan@kernel.org/
+v1: https://lore.kernel.org/20221129190123.872394-1-nathan@kernel.org/
+
+Nathan Chancellor (2):
+  padata: Mark padata_work_init() as __ref
+  modpost: Include '.text.*' in TEXT_SECTIONS
+
+ kernel/padata.c       | 12 ++++++++++--
+ scripts/mod/modpost.c |  4 ++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+
+base-commit: 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
+-- 
+2.39.0
+
