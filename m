@@ -2,112 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AB9C4167B
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 18:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB271C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Dec 2022 19:45:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236614AbiLMSgL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Dec 2022 13:36:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34692 "EHLO
+        id S235551AbiLMTp1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Dec 2022 14:45:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236626AbiLMSfv (ORCPT
+        with ESMTP id S236715AbiLMTp0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Dec 2022 13:35:51 -0500
+        Tue, 13 Dec 2022 14:45:26 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F26425289;
-        Tue, 13 Dec 2022 10:35:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21EE0DFF6;
+        Tue, 13 Dec 2022 11:45:26 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 88B4F616D1;
-        Tue, 13 Dec 2022 18:35:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34509C433F1;
-        Tue, 13 Dec 2022 18:35:49 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B29836171D;
+        Tue, 13 Dec 2022 19:45:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C8EC433D2;
+        Tue, 13 Dec 2022 19:45:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670956550;
-        bh=iyMWYw8QwA65vOGqJNqBD5pQyIoP0C216Ve7ERqMbKs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZIw+ieQH9eUqCDx7a1A0RVho7mXVxIo8vFgNcKm7CnBOORxhuWpTWR9X/jQZhvOq7
-         ZOrNQfJDtYODAEwbxMsXi6X+oEGXYUw94sc59zvn5qPg/fHOSS0Psa12wAcpfzlnDG
-         9Gzqw+DDcKJIuT9SukGEFtJtDQuwO+I4Uf75onM1Pt22Lukw67l+QYw92d6k+9IiTz
-         wIgDbNtVQn3TSPywWnziFudu4t8zh21521aqykMgOG+Bp6rDF/pgIyEde37GbEktV6
-         9y3JUMV1I0pBqA2OzuzeQizcOz7ckQIBfwv9ngrrla3lxq7MDHOEd5K33r3jNFlI5l
-         alCZcyTHvGUYA==
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v3 1/2] padata: Mark padata_work_init() as __ref
-Date:   Tue, 13 Dec 2022 11:35:28 -0700
-Message-Id: <20221213183529.766630-2-nathan@kernel.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20221213183529.766630-1-nathan@kernel.org>
-References: <20221213183529.766630-1-nathan@kernel.org>
+        s=k20201202; t=1670960725;
+        bh=Rus8LKt6JC2vTsynj6VmjIXsVmtuWiGAxvSB33tcGtU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FtnCt7NDom2YFBeiaXE07DgnEvo+e0z+9S42m7CDIRcmHqKGrsUyMH/yUuOQN7gCa
+         bu/M4IALLygYoc+Tx2ovEk1nkkghHLG+S5k9RIZI71lx0nv11s9RawHc5Iv3gjDJML
+         16uLLLO1WjeKBjCV1Gd+19LTqKZQNxvyN6iEIyoEOU6OdF495BwK9SRVT8dE5jzbOo
+         HpvX014WRDFHwMbcFuMulVlQDT5rdoBZ8UcfWFjks3bohla5hDciiuK6y+Y3DBcrvm
+         xjFvDppW4y0Dj19fs3ma16blEXCBDQtGqJ9ctpaxidhH3g964Mwksi16aSDeZL3IUE
+         vFAhq+T+mO6Ww==
+Date:   Tue, 13 Dec 2022 11:45:23 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
+        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: arm/sha1 - Fix clang function cast warnings
+Message-ID: <Y5jWUytRsZatKmCk@sol.localdomain>
+References: <202211041904.f9S5gAGL-lkp@intel.com>
+ <Y5FvChDBD/+uaFy8@gondor.apana.org.au>
+ <CAMj1kXGkdp_cwOWeX_49Y5xTCH8Y7X-LnM8pJufCH3yw7anBWQ@mail.gmail.com>
+ <Y5hXUlvSmHrP8PTN@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5hXUlvSmHrP8PTN@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When building arm64 allmodconfig + ThinLTO with clang and a proposed
-modpost update to account for -ffuncton-sections, the following warning
-appears:
+On Tue, Dec 13, 2022 at 06:43:30PM +0800, Herbert Xu wrote:
+> -asmlinkage void sha1_block_data_order(u32 *digest,
+> -		const unsigned char *data, unsigned int rounds);
+> +asmlinkage void sha1_block_data_order(struct sha1_state *digest,
+> +		const u8 *data, int rounds);
 
-  WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
-  WARNING: modpost: vmlinux.o: section mismatch in reference: padata_work_init (section: .text.padata_work_init) -> padata_mt_helper (section: .init.text)
+The last parameter should be called 'blocks', not 'rounds'.
 
-LLVM has optimized padata_work_init() to include the address of
-padata_mt_helper() directly because it inlined the other call to
-padata_work_init() with padata_parallel_worker(), meaning the remaining
-uses of padata_work_init() use padata_mt_helper() as the work_fn
-argument. This optimization causes modpost to complain since
-padata_work_init() is not __init, whereas padata_mt_helper() is.
+>  int sha1_update_arm(struct shash_desc *desc, const u8 *data,
+>  		    unsigned int len)
+>  {
+> -	/* make sure casting to sha1_block_fn() is safe */
+> +	/* make sure signature matches sha1_block_fn() */
+>  	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
 
-Since padata_work_init() is only called from __init code when
-padata_mt_helper() is passed as the work_fn argument, mark
-padata_work_init() as __ref, which makes it clear to modpost that this
-scenario is okay.
+The above comment doesn't really make sense, since making sure function
+signatures match is the responsibility of the compiler.
 
-Suggested-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: linux-crypto@vger.kernel.org
----
- kernel/padata.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+A better comment would be:
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index e5819bb8bd1d..d175cc000453 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -83,8 +83,16 @@ static struct padata_work *padata_work_alloc(void)
- 	return pw;
- }
- 
--static void padata_work_init(struct padata_work *pw, work_func_t work_fn,
--			     void *data, int flags)
-+/*
-+ * This function is marked __ref because this function may be optimized in such
-+ * a way that it directly refers to work_fn's address, which causes modpost to
-+ * complain when work_fn is marked __init. This scenario was observed with clang
-+ * LTO, where padata_work_init() was optimized to refer directly to
-+ * padata_mt_helper() because the calls to padata_work_init() with other work_fn
-+ * values were eliminated or inlined.
-+ */
-+static void __ref padata_work_init(struct padata_work *pw, work_func_t work_fn,
-+				   void *data, int flags)
- {
- 	if (flags & PADATA_WORK_ONSTACK)
- 		INIT_WORK_ONSTACK(&pw->pw_work, work_fn);
--- 
-2.39.0
+	/* sha1_block_data_order() expects the actual state at the beginning. */
 
+It would also be helpful to add a comment to the definition of struct
+sha1_state, analogous to the comment in struct blake2s_state:
+
+struct sha1_state {
+	/* 'state' is used by assembly code, so keep it as-is. */
+	u32 state[SHA1_DIGEST_SIZE / 4];
+
+- Eric
