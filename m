@@ -2,121 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7F9C001B2
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 06:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AADDC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 07:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237432AbiLNGxC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 01:53:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40050 "EHLO
+        id S237499AbiLNHBy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Dec 2022 02:01:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiLNGxA (ORCPT
+        with ESMTP id S237500AbiLNHBc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 01:53:00 -0500
-Received: from conssluserg-05.nifty.com (conssluserg-05.nifty.com [210.131.2.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C434A3897;
-        Tue, 13 Dec 2022 22:52:58 -0800 (PST)
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id 2BE6qgeX000412;
-        Wed, 14 Dec 2022 15:52:43 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 2BE6qgeX000412
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1671000763;
-        bh=kUp70rP8+WE375gZo6RwGVSoC7tN1va3x0gcuXXmVAc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=fWj4uAFnhzIPVRwYJ4AcO3K43yxwwVige5gzPnptks2Dc9KHP0gdXw9ZgqA7lVN/l
-         tBYwl+YsZkBxWNB6vDEkAPbxh+LGu0R8VVXeBNF/q9nkYNMYlt80QOkhs5MKWZLikb
-         4PtdUJLwxzTDWDgGmc4daFosAMPfFbyWowixaKgfddq67sxqKUJo4z/Phn13gitaOo
-         1D6D4U25eKwdG0sxEmLzfJPnw93R5vNJh9rGwzFvRBld/t5o65vDgOWr/byh9tc6U4
-         Hr4F4MOPTsrLu4ux++vp+Dz3LZ7GEgyPxg2Jv94UDbgNnzvr2cunvmVVwmEvgZavlo
-         tF8MkaknFwwOg==
-X-Nifty-SrcIP: [209.85.210.51]
-Received: by mail-ot1-f51.google.com with SMTP id x25-20020a056830115900b00670932eff32so1244238otq.3;
-        Tue, 13 Dec 2022 22:52:43 -0800 (PST)
-X-Gm-Message-State: ANoB5pnaFpu9knjPXF18CWtwdt1uiMu46BvaX5wVKNtZp6cDwV4cv0pR
-        UysForg8Qth7nMfLYIhwv3ZLUbYKvxBxWOAyZQo=
-X-Google-Smtp-Source: AA0mqf4hyLaZPZqPEZgMASVAcc5qkFLGibxEUKGsAwT9Hi2h9o8TOTn1hbIUpkclYCt2W71rUBR6CM5VPiXHvUbYKqI=
-X-Received: by 2002:a9d:282:0:b0:66c:794e:f8c6 with SMTP id
- 2-20020a9d0282000000b0066c794ef8c6mr49412729otl.343.1671000762325; Tue, 13
- Dec 2022 22:52:42 -0800 (PST)
+        Wed, 14 Dec 2022 02:01:32 -0500
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420EF1F9D5
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Dec 2022 23:01:29 -0800 (PST)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 2BE6qVhh081808;
+        Wed, 14 Dec 2022 14:52:31 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 14 Dec
+ 2022 15:01:19 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        "Andrew Jeffery" <andrew@aj.id.au>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Chia-Wei Wang <chiawei_wang@aspeedtech.com>
+CC:     <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+Subject: [PATCH v4 2/4] ARM: dts: aspeed: Add ACRY/AHBC device controller node
+Date:   Wed, 14 Dec 2022 15:01:12 +0800
+Message-ID: <20221214070114.3966155-3-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221214070114.3966155-1-neal_liu@aspeedtech.com>
+References: <20221214070114.3966155-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
-References: <20221213183529.766630-1-nathan@kernel.org>
-In-Reply-To: <20221213183529.766630-1-nathan@kernel.org>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 14 Dec 2022 15:52:06 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAR6aPQEM3e_yuq4jgCAAiJ+cr6xGvG1N4uZfw70xk_YSg@mail.gmail.com>
-Message-ID: <CAK7LNAR6aPQEM3e_yuq4jgCAAiJ+cr6xGvG1N4uZfw70xk_YSg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] Fix lack of section mismatch warnings with LTO
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Nicolas Schier <nicolas@fjasle.eu>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, patches@lists.linux.dev,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 2BE6qVhh081808
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 3:35 AM Nathan Chancellor <nathan@kernel.org> wrote:
->
-> Hi all,
->
-> Vincent recently reported an issue with lack of section mismatch
-> warnings with LTO. This is due to commit 6c730bfc894f ("modpost: handle
-> -ffunction-sections"), which ignores all function sections for modpost.
->
-> I believe this is incorrect, as these function sections may still refer
-> to symbols in other sections and they will ultimately be coalesced into
-> .text by vmlinux.lds anyways.
->
-> The first patch fixes a warning that I see with allmodconfig + ThinLTO
-> builds after applying the second patch. The second patch moves ".text.*"
-> into TEXT_SECTIONS so that modpost audits them for mismatches.
->
-> I expect this to go via the kbuild tree with an ack from the padata
-> maintainers.
+Add acry & ahbc node to device tree for AST2600.
 
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+---
+ arch/arm/boot/dts/aspeed-g6.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Daniel Acked v2.
-
-Applied to kbuild with his Acked-by.
-
-Thanks.
-
-
->
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Cc: linux-crypto@vger.kernel.org
->
-> v3:
->   - Stick a comment above padata_work_init() to explain presence of
->     __ref (Masahiro, Daniel).
->   - Expand on problem in first patch's commit message (Masahiro).
->   - Adjust location of __ref within function definition (Daniel)
->   - Fix typo in commit message of second patch (Masahiro).
-> v2: https://lore.kernel.org/20221207191657.2852229-1-nathan@kernel.org/
-> v1: https://lore.kernel.org/20221129190123.872394-1-nathan@kernel.org/
->
-> Nathan Chancellor (2):
->   padata: Mark padata_work_init() as __ref
->   modpost: Include '.text.*' in TEXT_SECTIONS
->
->  kernel/padata.c       | 12 ++++++++++--
->  scripts/mod/modpost.c |  4 ++--
->  2 files changed, 12 insertions(+), 4 deletions(-)
->
->
-> base-commit: 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
-> --
-> 2.39.0
->
-
-
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 095cf8d03616..ad177799db0b 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -94,6 +94,11 @@ gic: interrupt-controller@40461000 {
+ 			    <0x40466000 0x2000>;
+ 			};
+ 
++		ahbc: bus@1e600000 {
++			compatible = "aspeed,ast2600-ahbc", "syscon";
++			reg = <0x1e600000 0x100>;
++		};
++
+ 		fmc: spi@1e620000 {
+ 			reg = <0x1e620000 0xc4>, <0x20000000 0x10000000>;
+ 			#address-cells = <1>;
+@@ -427,6 +432,14 @@ sbc: secure-boot-controller@1e6f2000 {
+ 				reg = <0x1e6f2000 0x1000>;
+ 			};
+ 
++			acry: crypto@1e6fa000 {
++				compatible = "aspeed,ast2600-acry";
++				reg = <0x1e6fa000 0x400>, <0x1e710000 0x1800>;
++				interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&syscon ASPEED_CLK_GATE_RSACLK>;
++				aspeed,ahbc = <&ahbc>;
++			};
++
+ 			video: video@1e700000 {
+ 				compatible = "aspeed,ast2600-video-engine";
+ 				reg = <0x1e700000 0x1000>;
 -- 
-Best Regards
-Masahiro Yamada
+2.25.1
+
