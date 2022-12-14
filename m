@@ -2,161 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E46C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 20:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA02EC4167B
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 20:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbiLNUVb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 15:21:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
+        id S230197AbiLNUcw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Dec 2022 15:32:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbiLNUUj (ORCPT
+        with ESMTP id S230191AbiLNUcd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:20:39 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061f.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::61f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D9FBE16;
-        Wed, 14 Dec 2022 12:09:17 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k3Rel/P9Z7OJE5kuAliew2w7FhMk+r8EKcRnU8EL43mhB33HiGwL4d5x5QQlEAnyPM/Sbjim7h427JWmha45fsFJzRAjCAWLrbrMWRS3nc2jCZOzlTueNoWKe2C5tgO4i80z+pKpTysClweyFgwnluf6dsf+KITDF/zMGiL1Sw5cMM6+LKKQaVhk3mucDloQT6hcsCTaWiW+7q21tMKZj/VFPoiHUHVEuMS48RJAkIoC3hpO/decTb8lxsjn6jzugMXpkn4OAJ4z21gaUmMdV9fx8OG6twQ4UpyaImGMJ8IT7txvRCAf9mxRu7T+P5TbQQjXuvcQ91iqxYcKZgHV1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UoTE+fiW10Y+o7IhpGUW/8psStYG4PWgFyeDWrTWepE=;
- b=EjXpi+4MgfZPBrGGgDPg6xKlV16lmK71ax7vF6jPh4K+/YMCPgN2KDeOEedEfmUoz35ZH/b5kDLa5lu5D9QhAs+s9yntugnusN7X8tPeJ63CXE1TCzvJI3u56eLsQ13F+PdEG1VjrYfIl5N9uONT9qqPj/QnFh0XYG5Vphxnp3hClswLAts19KMRV85A/k70HAa9UBL0gIZi5NeHVlJO1CL14eTB+C7B3VPCray3x9XUjnT7xovZKJh/BMxjNVBHaRAhsK6orR13Np8Xb8IO7iQMk7Gd1YCsF2TovZ9urTup3vAaUcqoissfifh6xsvI3WlHSvSIZ/1CCqlXJh6ZaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UoTE+fiW10Y+o7IhpGUW/8psStYG4PWgFyeDWrTWepE=;
- b=e2JrRsKdrZ+X4ETw96wMApa/EFuSQ6W9rmfP3g0vSfbTIZ3mdYj1gwIN3I11d75Zg6WCS3GVIdo8wtk8Z8NXlHKC99CsMHEEv3LwM297kYt64AMqXQpJfD3WHMY4IIv/xaUq12MF/D0AOi2nm+2oclgr+uRNsv4XwKzzcGF3UPU=
-Received: from MW4PR03CA0303.namprd03.prod.outlook.com (2603:10b6:303:dd::8)
- by PH7PR12MB7236.namprd12.prod.outlook.com (2603:10b6:510:207::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Wed, 14 Dec
- 2022 20:09:13 +0000
-Received: from CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:dd:cafe::67) by MW4PR03CA0303.outlook.office365.com
- (2603:10b6:303:dd::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
- Transport; Wed, 14 Dec 2022 20:09:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT061.mail.protection.outlook.com (10.13.175.200) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5924.11 via Frontend Transport; Wed, 14 Dec 2022 20:09:13 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
- 2022 14:09:08 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
-Subject: [PATCH RFC v7 08/64] KVM: Move kvm_for_each_memslot_in_hva_range() to be used in SVM
-Date:   Wed, 14 Dec 2022 13:40:00 -0600
-Message-ID: <20221214194056.161492-9-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT061:EE_|PH7PR12MB7236:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e62d8c1-447c-4880-10a6-08dade0f11da
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lg3YP3RpLL5TvffTChCRCg1QLEheUULM+s3Z6rqU1KnzhHb4mXNifSg74d6JT94BoJTVWQAQrmA3GaxcKkIq+w5xfZW0Hhe+obxXUYIUtzvBvymat+biqLpAeb/t4huem+uUfkhx1Fn9t1y2lj67Pr7OrUt8IctrWQhzq/INworfkf7EGmDH5WHo/IqpRo0fKYbzlRYo6Bw0jQbPK0FY5j8RbcyPDUDYA3jpSwgKFliq2aOzprMfX2Z5BAyw3qfaeoX5HK5qnPAkclGD1ZqPYuGaea6ECqtZrl47rlyN4D++E4BXQOjVNjojYilLGHwpMYPiN8sbU9S4D1abPr8KH08r3hl9lSAu3UJ26wvox5rEpEFLsaNwYuESHSHM3hXx6mFfalb001VdGqB8VbceKtHYsgTWTCk/hzXsqYdjDpl+nIuOnLvPRJ1f3je9GD13sXUU6Uzj1hUzJD3Gv1azLKVTdztGlg7Kk7NCdgC20/rCtEMZZ7aNXIarWx/zglNiI7FGzif6JncStwCiOJYBhlEG3X/FcXx2XkzIBjRIPPj0uTvKGV9Jhp8Gt0VEieWFJeuu92BDRfInjt8qSizFJxgEC5NU0asRbPQjq+821ADS68lxM/+Lp638+uauEZazAsNMeB2qktvpGNLslfrgfO+aQ04QYPw63W1IiAw5gk6RpkdXW2hCe22WoDbS1pipaoBdn8FzldenPm0qmYR7GcQ9K0CSkalDshWQr+SWGAU=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(346002)(136003)(396003)(451199015)(36840700001)(46966006)(40470700004)(70586007)(6916009)(70206006)(82740400003)(8676002)(316002)(4326008)(5660300002)(44832011)(356005)(81166007)(7416002)(54906003)(7406005)(8936002)(40480700001)(186003)(1076003)(83380400001)(82310400005)(16526019)(2616005)(36756003)(41300700001)(36860700001)(2906002)(40460700003)(47076005)(426003)(86362001)(336012)(26005)(6666004)(478600001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 20:09:13.0319
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e62d8c1-447c-4880-10a6-08dade0f11da
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7236
+        Wed, 14 Dec 2022 15:32:33 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA175436F
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 12:21:03 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3ceb4c331faso11179917b3.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 12:21:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=L22LQH7KmOjrT8G6djNy9I40Y6DACrH51I/z1yt47rc=;
+        b=UXt16BrghWlfjJ3XF28huqJShfounRuXVxB3uz3pPGPcotNdlL2dNrrOF5OwG3WvTt
+         7fgw/t0HRdPYJAl48IqtiQ3QRWCzeJZozMRHvgzy97kLH8vWOkBNK6Hd+2UeQzPo/kLZ
+         Xq+FAPFw8iWaFFifDrqEwYCRDMwY8Xsgd4b3FPUqP0MPS9FsW/vVNeeZ9IyLQ63P8XRM
+         Jw7Pwrx7WNqbEbmY2mO0Nm4MdgutDRFg/T4crCr2s/m8G1BP3+0ISXdsrYdlxo69VWy8
+         e174P5Io5tr8AuA8LO/U9kGHNroBuh0mvPHmAbW/eJtHybSPiucqDw0huwjzo60NqAm9
+         0o7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L22LQH7KmOjrT8G6djNy9I40Y6DACrH51I/z1yt47rc=;
+        b=dNT4Ci1pFOtEsYMiff7B1ROXr4yjngknCtki6phh9531Q/IWJ/AlGuww3zLguD2sRt
+         SLLsmUjCmsH5HjJ70hq5yi/vBuGLvUH8hMAVh/gKVRSEwu2PCWWQDfF3ASI2mzmTnzHG
+         j0LEf2foDalo8YrHqwH17joCA7IVLkhEkW5qB/ACLWZQqmzdV4j25uS93BfnqWE0p6D4
+         OYaFfbA+PZcgwGkrzSuHbp29QDpPUs2ZVsZhGWR/DsAWhPGw3DQQBnP3yM6xzCBTmYs+
+         aJv2fUCQ8qQxp+283m+M4DueBZ+oRDOovFMDOOpHn8/m09lpNG5A0Ocs5rdiG3cXhh0x
+         AZoA==
+X-Gm-Message-State: ANoB5plU0ufHM/dTd6F7Z1XIBEIo9PPkKCLut5iH4FuSmmxBuJ5ngz6z
+        tEgKvu9vKZI8j+AWHQfQnDusYrMJey4=
+X-Google-Smtp-Source: AA0mqf5er0t0Z6NzSbBwHoupkBE/aAiAby9eU++DWgEG66GmPY5p0RGLfP+wTFkJgGI5Yje4G0waeky+4Wo=
+X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:19c4:743c:e0e0:b558])
+ (user=pgonda job=sendgmr) by 2002:a25:8743:0:b0:6f0:c9e7:68bf with SMTP id
+ e3-20020a258743000000b006f0c9e768bfmr68411640ybn.78.1671049262522; Wed, 14
+ Dec 2022 12:21:02 -0800 (PST)
+Date:   Wed, 14 Dec 2022 12:20:46 -0800
+Message-Id: <20221214202046.719598-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
+Subject: [PATCH] crypto: ccp - Limit memory allocation in SEV_GET_ID2 ioctl
+From:   Peter Gonda <pgonda@google.com>
+To:     herbert@gondor.apana.org.au
+Cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
+        David Rientjes <rientjes@google.com>, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        John Allen <john.allen@amd.com>,
+        "Thomas . Lendacky" <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nikunj A Dadhania <nikunj@amd.com>
+Currently userspace can ask for any uint32 size allocation for the
+SEV_GET_ID2. Limit this allocation size to the max physically
+contiguously allocation: MAX_ORDER.
 
-Move the macro to kvm_host.h and make if visible for SVM to use.
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: stable@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: John Allen <john.allen@amd.com>
+Cc: Thomas.Lendacky <thomas.lendacky@amd.com>
 
-No functional change intended.
-
-Suggested-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/kvm_host.h | 6 ++++++
- virt/kvm/kvm_main.c      | 6 ------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f72a2e0b8699..43b5c5aa8e80 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1116,6 +1116,12 @@ static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter, gfn_
- 	     kvm_memslot_iter_is_valid(iter, end);			\
- 	     kvm_memslot_iter_next(iter))
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 06fc7156c04f..5c16c4406764 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -878,6 +878,10 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
  
-+/* Iterate over each memslot intersecting [start, last] (inclusive) range */
-+#define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
-+	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-+	     node;							     \
-+	     node = interval_tree_iter_next(node, start, last))
++	/* Max length that can be allocated physically contiguously */
++	if (get_order(input.length) >= MAX_ORDER)
++		return -ENOMEM;
 +
- /*
-  * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-  * - create a new memory slot
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 73bf0bdedb59..a2306ccf9ab1 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -623,12 +623,6 @@ static void kvm_null_fn(void)
- }
- #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
+ 	input_address = (void __user *)input.address;
  
--/* Iterate over each memslot intersecting [start, last] (inclusive) range */
--#define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
--	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
--	     node;							     \
--	     node = interval_tree_iter_next(node, start, last))	     \
--
- static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 						  const struct kvm_hva_range *range)
- {
+ 	if (input.address && input.length) {
 -- 
-2.25.1
+2.39.0.rc1.256.g54fd8350bd-goog
 
