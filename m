@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DACC001B2
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 20:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2914C46467
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 20:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbiLNUO6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 15:14:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46868 "EHLO
+        id S230071AbiLNUO7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Dec 2022 15:14:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbiLNUMy (ORCPT
+        with ESMTP id S230072AbiLNUOT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:12:54 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F05343865;
-        Wed, 14 Dec 2022 12:04:38 -0800 (PST)
+        Wed, 14 Dec 2022 15:14:19 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB9F43875;
+        Wed, 14 Dec 2022 12:05:21 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V4hdvMacOIAnfET+zFtZl15GOC+atFcvXM6MNpv2q4DAM7tC+RN/49X6tliHJCsdfk9gyb9GcNvtH+ekd6bTXwKv5rCU462nN3C/jiS98PoXLGKg5JdVemJ57yoj0Zk0w3yQl3d5s+4+AypEXrw8PHU5eR7RnUCaMyWvRoGmeQRODseg6MXcq7VcfSI33agqi+JO8veFx2iECc0NeT6PNvMwL58gE41aAcGNaVPBRoD62+AHwY6JaLCF8bhmlFiuziPGs8kp0LT+eHpFGl7q7acfzLiniYZk0vryOnYulE3qq813rIuVZ9id/Ry7P62TVahhIthAiAMcJwE4VC9b8g==
+ b=Gigt4+OIWss4F3sckjVWigrt72JQJotc74gOljeW0gQqoP/hLGdGdqKPm/rrU0TaHEerlL1Z58Xq9BrUqu5RnyvgXTc5dNFix0CdLx4CRZuXpO4i382qYPudoa8OokSUOKSspzDNHuO4SS9TYOVEjs/lQXcDdGNn7Gc13qQ3CGJeVEMgY/RdK+IMZhhfrWb/JvtVWbG9aQj+ddSvQEMNlSTaos5GVhpORhR7CFgzBrNgat+dkDOVWzt19N+wy9dnVwKcvJuCm7goGk52C7hG3UGshKct/u5Py4oTsjgw4iG0WPlzkDyVdZWbZ97OWM7cNh5O5DpiqtX37oMLMzFXcQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1Jd4sSlG45whTkhGTHWXjOr2AQ4CCq8eVlab5mMdIrw=;
- b=RmNNC3rGnbpE1qrBUz4UG4RDQPH0Gc/ejw7sdxXlGUd/oSPX5lCcWSzmp3vzI26ptmIrBvrpmz3q9HmML39g4o3UQU0pZ6z8QVYB/uPFnGTgNs60t5MW50QMsv1Et+e3tPfVNcnebVeQ2EB8yW6Ce1MT9PMr1h+ndCq9Ox31icoIvvMcdf3JjpRi86jO78VJ83FM0/rSRVDt4fgOBOIFjSSUTZ/Trt+qthwofsA62bYzWtw52LD/JHcGd3XTztscsnPg59l2eETC1XdW5ya62T+D3wj0jQ4bByyCKLXz+SbtdYUZq1kTre9231Nkpe8gE6SSxpPj0bpRTfKL2nhB3A==
+ bh=/OzKsfTHOxu0vZX+JKMUe8Rr1JlYN051/tKqUBDz3IY=;
+ b=NGGL5/JQwESKhM2HneSqME7bmqQE3CkV1Xx6XRKhgavrM5GMofC09RGToOQMQQ6gqyXF4Cstgi0RhkPAA8JpSca9ZHzH4A/t8Gd6pm8lQkz7XXbrmdu3/W5+qNacEjXtmaVGG4gpcVSMK5563k0XWAuIRMQcwb3qGyyJZYhDawkroIzbmvszphgBKYfDeWCYiIVRYLeCWXMtn87pcSUtW53H6JeWp5FsR5UaiwiG14JezjSZfDBCcGkBMf+HnXwBpdOAPsbUJKPigegCTyoxkEbsu8bqTuxr7ZIubTQTYLnzdWbf1LMh4bRox3wTZO1UXxrSL5P1baYZYxcaXMiR8w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Jd4sSlG45whTkhGTHWXjOr2AQ4CCq8eVlab5mMdIrw=;
- b=q189s+WaF2JnBMQqBmakZs8ZQZVa6gHkQTTjq82ABox97xEODVRjsmy57rGSvO6MqLdiIiGznj9/3ysV/vjg2j4EvK5pbEH91xQrbTb9IJdEq5dbinwPl3GWw9hxDnAA3VcWcnm/zRjQViH0WUdwU0B2mcbnNpGDbT03j/ucVcw=
-Received: from MW3PR05CA0022.namprd05.prod.outlook.com (2603:10b6:303:2b::27)
- by DM6PR12MB4122.namprd12.prod.outlook.com (2603:10b6:5:214::17) with
+ bh=/OzKsfTHOxu0vZX+JKMUe8Rr1JlYN051/tKqUBDz3IY=;
+ b=zy7KyVxWzEu86uKX/u6TQ0jcyLO2kfojrlVWBMOod2JBV226AQ0ITemRBgFRUYE8F2WFq8rEOw5d2/KIsnbVT5+QYIBXceLM2G5YQjfCFslF/zpNNvlD6hEc1Xns8nx4z96Xpm03415vaIi1IShIkcR6RBQ05fCW4nZ1IPgAMuI=
+Received: from MW4PR03CA0113.namprd03.prod.outlook.com (2603:10b6:303:b7::28)
+ by MN0PR12MB5810.namprd12.prod.outlook.com (2603:10b6:208:376::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11; Wed, 14 Dec
- 2022 20:04:36 +0000
-Received: from CO1NAM11FT073.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:2b:cafe::a8) by MW3PR05CA0022.outlook.office365.com
- (2603:10b6:303:2b::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.7 via Frontend
- Transport; Wed, 14 Dec 2022 20:04:35 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Wed, 14 Dec
+ 2022 20:05:18 +0000
+Received: from CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b7:cafe::99) by MW4PR03CA0113.outlook.office365.com
+ (2603:10b6:303:b7::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
+ Transport; Wed, 14 Dec 2022 20:05:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT073.mail.protection.outlook.com (10.13.174.196) with Microsoft SMTP
+ CO1NAM11FT061.mail.protection.outlook.com (10.13.175.200) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5924.11 via Frontend Transport; Wed, 14 Dec 2022 20:04:35 +0000
+ 15.20.5924.11 via Frontend Transport; Wed, 14 Dec 2022 20:05:17 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
- 2022 14:04:34 -0600
+ 2022 14:05:16 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -72,9 +72,9 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <harald@profian.com>
-Subject: [PATCH RFC v7 55/64] KVM: SVM: Add SNP-specific handling for memory attribute updates
-Date:   Wed, 14 Dec 2022 13:40:47 -0600
-Message-ID: <20221214194056.161492-56-michael.roth@amd.com>
+Subject: [PATCH RFC v7 57/64] KVM: SEV: Handle restricted memory invalidations for SNP
+Date:   Wed, 14 Dec 2022 13:40:49 -0600
+Message-ID: <20221214194056.161492-58-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
@@ -86,200 +86,131 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT073:EE_|DM6PR12MB4122:EE_
-X-MS-Office365-Filtering-Correlation-Id: 10020b2e-3b6f-44e4-9419-08dade0e6c81
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT061:EE_|MN0PR12MB5810:EE_
+X-MS-Office365-Filtering-Correlation-Id: cf9aa6fd-dbca-4888-59ac-08dade0e85a4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z3a4lW/+Qg1wUTpH0t53K0b3eeXn9mBf0LapCpB2B0Br8warerGU9ogIDW2eVVzVNaBnfCHWnvemo7qY5vPx7LbOL6sByUM3z2g6PMYovZgfXAvvldeyQGtEggbx2Fjq4WqFzVdrLjvMRtuI97GHIY35/vG+E3b8dC1IkRP8LSKYO12aVXUQNsiKJf26qLpitJJDXdcWYy8b1vuw6QYoAItooXBic6fryufNVxb8+uiuO6L7SUPx+2S2/ehO2afagmitvSLtYaJGOP+XEziZHLdBTWZjZr537TWQ2k+IkEcOv0vGRXVmEroyJJX4YZjNBxQJsiT/LsZBzjp0qwMK+jjEtVvW8bWoPsue0qkAA1CS/q9bVL+05VtkE1miXGqNlL+cZDF3dvBS6ioftZLWhXzO2dNwGbIB8Th9dHY72O9S62UHWJIw38EhOCapn8/Qx695qs/mY9zFC8D/A2R9G4KsK0NoLn+neomyaURzbJxygsoQUCe+GbYqW4Pupcjk4h2JDjcyMEyRBuXjk652DIIvy8wobJiqE9RRQAac4waw5xDA/4R4Q7TPPSZ3BauTPs5nTyyhdeurYJd3cX8+n5138C5gq+IVYkwhCD7BAsSOgel+UabaQ8e2s/Fq65o/UPvnKFc2QbPcBRyx+zUl4LQHvUpeWYgATkqQFAooXC4aUcdDmAG1pIghQixyRFMb7V8FpS9LRvHJVpvP1a8B4Wq3sEiTLgeKAqmB4Q62LOM=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(39860400002)(376002)(396003)(451199015)(36840700001)(40470700004)(46966006)(86362001)(40480700001)(40460700003)(26005)(186003)(70206006)(8676002)(336012)(41300700001)(70586007)(1076003)(4326008)(2616005)(478600001)(16526019)(54906003)(44832011)(7406005)(6916009)(316002)(6666004)(36860700001)(356005)(81166007)(82740400003)(2906002)(426003)(8936002)(47076005)(83380400001)(15650500001)(5660300002)(7416002)(66899015)(82310400005)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: lSuHogvfbQhYnoZB0cs2NqUtiSUv8xndLHEOwrbfFJMuPdA700rGJsuWEVb/2n89tEdYoxpVHbepcF2HFXd6EGJ11/3MSsW6XSMcROjGZlCv80uJTz4AoGZBw7TUpnPBXylGruXNE/piQa1SAFyRV2iNbB2pkl9IIxpYBEBbcoQvc8GA1NtRPR/Xp+4FklAhKF3/h+HaOdh4SFQL7CVjlDY4b+j12JfxCmV2QVyxx3NZgX7UiPeiJ188mEHDJp3Tq43SpxmebIRErYzFGjejd+pXQCxLZSvZ9VUlBxf5Mkw97IV8Wcaw4TmzSoVsBclSPdeqAmLGx6Y8G4yetI1ztALDGxTxmZkelifFD128J/KWZbV9g5l12nTUwp2KjhejgFzf1Wul4p1ZUolw6X+IHprLMv0IelrwzXZIRWrqFMj6r+/11EBp4a2R0R1Ty5EqBSoRXFcYDfIXBQDf/DtT0wtQElkqazF5wRla7OcwGhvQWDs+bV9MVnXXtCvRx+hxSH/ZjGt7w/PPFN19Vj68oPNiz8v3E440zweh+5GtDEE3SMWRWPwneJ/tZDj0YG990YNC+Dm3fD0CgzyZ2ayW9lm3A1xE5YNRzDS5KQd792sYnXNCL3kOZ6Pmf+4uBjsc7n0HataOO/1kT2jbeFwkY0/S/YhWaI4NvkrM+hEwOIy/mpi3sn+4PTUs59TILHHHGQa0NMb9en6PBJcZFYdt4qo9iR/gyl7ktRc/9LDQfRw=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(346002)(136003)(39860400002)(451199015)(46966006)(40470700004)(36840700001)(36756003)(6666004)(40460700003)(6916009)(54906003)(316002)(81166007)(8936002)(478600001)(82740400003)(82310400005)(356005)(1076003)(336012)(186003)(2616005)(26005)(40480700001)(16526019)(83380400001)(5660300002)(70586007)(86362001)(44832011)(7406005)(70206006)(4326008)(2906002)(426003)(7416002)(8676002)(47076005)(36860700001)(41300700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 20:04:35.6123
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 20:05:17.7989
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10020b2e-3b6f-44e4-9419-08dade0e6c81
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf9aa6fd-dbca-4888-59ac-08dade0e85a4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT073.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4122
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5810
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This will handle RMP table updates and direct map changes needed for
-page state conversions requested by userspace.
+Implement a platform hook to do the work of restoring the direct map
+entries and cleaning up RMP table entries for restricted memory that is
+being freed back to the host.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 126 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c |   1 +
- arch/x86/kvm/svm/svm.h |   2 +
- 3 files changed, 129 insertions(+)
+ arch/x86/kvm/svm/sev.c | 64 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c |  1 +
+ arch/x86/kvm/svm/svm.h |  1 +
+ 3 files changed, 66 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 2f4c9f2bcf76..885a3f1da910 100644
+index 0dd3d9debe48..8783b64557e5 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3395,6 +3395,31 @@ static int snp_rmptable_psmash(struct kvm *kvm, kvm_pfn_t pfn)
- 	return psmash(pfn);
- }
+@@ -4557,3 +4557,67 @@ int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
  
-+static int snp_make_page_shared(struct kvm *kvm, gpa_t gpa, kvm_pfn_t pfn, int level)
-+{
-+	int rc, rmp_level;
-+
-+	rc = snp_lookup_rmpentry(pfn, &rmp_level);
-+	if (rc < 0)
-+		return -EINVAL;
-+
-+	/* If page is not assigned then do nothing */
-+	if (!rc)
-+		return 0;
-+
-+	/*
-+	 * Is the page part of an existing 2MB RMP entry ? Split the 2MB into
-+	 * multiple of 4K-page before making the memory shared.
-+	 */
-+	if (level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M) {
-+		rc = snp_rmptable_psmash(kvm, pfn);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return rmp_make_shared(pfn, level);
-+}
-+
- /*
-  * TODO: need to get the value set by userspace in vcpu->run->vmgexit.ghcb_msr
-  * and process that here accordingly.
-@@ -4428,3 +4453,104 @@ int sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *priva
- out_unhandled:
  	return 0;
  }
 +
-+static inline u8 order_to_level(int order)
++void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
 +{
-+	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-+
-+	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-+		return PG_LEVEL_1G;
-+
-+	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-+		return PG_LEVEL_2M;
-+
-+	return PG_LEVEL_4K;
-+}
-+
-+int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
-+			gfn_t start, gfn_t end)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(slot->kvm)->sev_info;
-+	enum psc_op op = (attr & KVM_MEMORY_ATTRIBUTE_PRIVATE) ? SNP_PAGE_STATE_PRIVATE
-+							       : SNP_PAGE_STATE_SHARED;
 +	gfn_t gfn = start;
 +
-+	pr_debug("%s: GFN 0x%llx - 0x%llx, op: %d\n", __func__, start, end, op);
-+
 +	if (!sev_snp_guest(slot->kvm))
-+		return 0;
++		return;
 +
 +	if (!kvm_slot_can_be_private(slot)) {
-+		pr_err_ratelimited("%s: memslot for gfn: 0x%llx is not private.\n",
-+				   __func__, gfn);
-+		return -EPERM;
++		pr_warn_ratelimited("SEV: Memslot for GFN: 0x%llx is not private.\n",
++				    gfn);
++		return;
 +	}
 +
 +	while (gfn < end) {
-+		kvm_pfn_t pfn;
-+		int level = PG_LEVEL_4K; /* TODO: take actual order into account */
 +		gpa_t gpa = gfn_to_gpa(gfn);
-+		int npages = 1;
-+		int order;
-+		int rc;
++		int level = PG_LEVEL_4K;
++		int order, rc;
++		kvm_pfn_t pfn;
 +
-+		/*
-+		 * No work to do if there was never a page allocated from private
-+		 * memory. If there was a page that was deallocated previously,
-+		 * the invalidation notifier should have restored the page to
-+		 * shared.
-+		 */
-+		rc = kvm_restricted_mem_get_pfn(slot, gfn, &pfn, &order);
-+		if (rc) {
-+			pr_warn_ratelimited("%s: failed to retrieve gfn 0x%llx from private FD\n",
-+					    __func__, gfn);
++		if (!kvm_mem_is_private(slot->kvm, gfn)) {
 +			gfn++;
 +			continue;
 +		}
 +
-+		/*
-+		 * TODO: The RMP entry's hugepage bit is ignored for
-+		 * shared/unassigned pages. Either handle looping through each
-+		 * sub-page as part of snp_make_page_shared(), or remove the
-+		 * level argument.
-+		 */
-+		if (op == SNP_PAGE_STATE_PRIVATE && order &&
-+		    IS_ALIGNED(gfn, 1 << order) && (gfn + (1 << order)) <= end) {
-+			level = order_to_level(order);
-+			npages = 1 << order;
-+		}
-+
-+		/*
-+		 * Grab the PFN from private memslot and update the RMP entry.
-+		 * It may be worthwhile to go ahead and map it into the TDP at
-+		 * this point if the guest is doing lazy acceptance, but for
-+		 * up-front bulk shared->private conversions it's not likely
-+		 * the guest will try to access the PFN any time soon, so for
-+		 * now just take the let KVM MMU handle faulting it on the next
-+		 * access.
-+		 */
-+		switch (op) {
-+		case SNP_PAGE_STATE_SHARED:
-+			rc = snp_make_page_shared(slot->kvm, gpa, pfn, level);
-+			break;
-+		case SNP_PAGE_STATE_PRIVATE:
-+			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
-+			break;
-+		default:
-+			rc = PSC_INVALID_ENTRY;
-+			break;
-+		}
-+
-+		put_page(pfn_to_page(pfn));
-+
++		rc = kvm_restricted_mem_get_pfn(slot, gfn, &pfn, &order);
 +		if (rc) {
-+			pr_err_ratelimited("%s: failed op %d gpa %llx pfn %llx level %d rc %d\n",
-+					   __func__, op, gpa, pfn, level, rc);
-+			return -EINVAL;
++			pr_warn_ratelimited("SEV: Failed to retrieve restricted PFN for GFN 0x%llx, rc: %d\n",
++					    gfn, rc);
++			gfn++;
++			continue;
 +		}
 +
-+		gfn += npages;
-+	}
++		if (order) {
++			int rmp_level;
 +
-+	return 0;
++			if (IS_ALIGNED(gpa, page_level_size(PG_LEVEL_2M)) &&
++			    gpa + page_level_size(PG_LEVEL_2M) <= gfn_to_gpa(end))
++				level = PG_LEVEL_2M;
++			else
++				pr_debug("%s: GPA 0x%llx is not aligned to 2M, skipping 2M directmap restoration\n",
++					 __func__, gpa);
++
++			/* TODO: It may still be possible to restore 2M mapping here, but keep it simple for now. */
++			if (level == PG_LEVEL_2M &&
++			    (!snp_lookup_rmpentry(pfn, &rmp_level) || rmp_level == PG_LEVEL_4K)) {
++				pr_debug("%s: PFN 0x%llx is not mapped as 2M private range, skipping 2M directmap restoration\n",
++					 __func__, pfn);
++				level = PG_LEVEL_4K;
++			}
++		}
++
++		pr_debug("%s: GPA %llx PFN %llx order %d level %d\n",
++			 __func__, gpa, pfn, order, level);
++		rc = snp_make_page_shared(slot->kvm, gpa, pfn, level);
++		if (rc)
++			pr_err("SEV: Failed to restore page to shared, GPA: 0x%llx PFN: 0x%llx order: %d rc: %d\n",
++			       gpa, pfn, order, rc);
++
++		gfn += page_level_size(level) >> PAGE_SHIFT;
++		put_page(pfn_to_page(pfn));
++		cond_resched();
++	}
 +}
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7f8c480dfa5e..6cf5b73f74c1 100644
+index 6cf5b73f74c1..543261c87eb3 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4872,6 +4872,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.fault_is_private = sev_fault_is_private,
+@@ -4873,6 +4873,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
  
  	.rmp_page_level_adjust = sev_rmp_page_level_adjust,
-+	.update_mem_attr = sev_update_mem_attr,
+ 	.update_mem_attr = sev_update_mem_attr,
++	.invalidate_restricted_mem = sev_invalidate_private_range,
  };
  
  /*
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 5e7cb0260dc3..5f315225ae4d 100644
+index 5f315225ae4d..277f53c903c2 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -741,6 +741,8 @@ int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
- void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn);
- void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+@@ -743,6 +743,7 @@ void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
  void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
-+int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
-+			gfn_t start, gfn_t end);
+ int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
+ 			gfn_t start, gfn_t end);
++void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end);
  
  int sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
  
