@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7CAC001B2
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 19:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D01CC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 19:54:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239231AbiLNTxv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 14:53:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53616 "EHLO
+        id S239138AbiLNTyG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Dec 2022 14:54:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239182AbiLNTxK (ORCPT
+        with ESMTP id S239145AbiLNTxd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 14:53:10 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98382CE17;
-        Wed, 14 Dec 2022 11:51:19 -0800 (PST)
+        Wed, 14 Dec 2022 14:53:33 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2067.outbound.protection.outlook.com [40.107.94.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45EA22C105;
+        Wed, 14 Dec 2022 11:51:40 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GTwXfETNoFwoz1+ZXziugdKfKKpQNYrcj9jUGIaNnQf5jPCC0gk78tp0X4SZAOSj8pD/KUtaJpmILBZulmZOKvlODqck4h8MDf0iGrPpoXcviZkGOMUJjn8KejkXSE1dpYPSMZCp/1pOUbd93rO5KDb2Ojv3FDdSSuZi4nO9nbFlg5Io5CNt3q038jjYq54/CPhJJvGUaG+POG1ZsmzADhVcezh3NPThfk8eP6tJ39OkFSF8Fav7mDDwkH7d+lpcjEor5SL4STGTSddUvjgwlNmQrPMU+jAtkdk/IeUAeAwO3DvLKQ8jKHvpN3D+YOGM9C1yv7+KPdgrPbZaMYSMbg==
+ b=UchcarU+H9/ZmcAR7+LfGzKny1oSjj9QUSWLi1NUtx1zvF1yeklFEfBS7M8yR4cMFZJg4Xsi1JYAuSK9jD57bAMYVOjRsh2/xLEtGqrE+57ChXKNaK0hEdR0Js79x1b9fccjMHg+FeRGiElcXF7zBrqcwPo0y+ap/bXz4SU8I1Zba2YHIy7qte304S/U2djgwyajEASxwNDBZc8l2zgyY7SRe0Ya0k15nnJ8S18BCqMQ4d/qp0iqZgTbLYJ/YPo40xsw7Jd2JemkROjag6WtRkrS8sxTMf4hqGb2nFWQyEXbe9sz3GrD+pv5ijQjrfiktgJkU22TRbwhyQ8Nz2AQDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PoL7U9aX/ZvjtfMqXC9xO2mIT6ugo3HADJUjSNzOi8M=;
- b=GvSaNkIPHydlqEE6TPkPQF5+B1JP+WuNrkmwZVkTkLWh0UQTa4MkCsK0MSWXku3pQisECHhig16pOeB3zmjEL5gpdKTYUNcNpn/H2pDQz5s/aHRjQZFJzGcYsPBLyAIUFAGKhJHKRz+BaSV6DTUP2nQ0XBupMKbs6xM6N4FAcu1vmVby02DiVxFrA9sjIOXjNVJqTn3M6AqHsNQ5hRcqCUGr8yGi6kq5Lcib1MzzJyrfLB737yPUiDXzcMuWQuqD4NgA6IXx9JLr86CoFAYRIFeAxUL9zL1nG1+7N1l3TJVnqc3lruC64EO70z0w25x8xkmf+TwK6UvNreUBMiKe1Q==
+ bh=bwGNNhr0BV8XU5gNur70iQYprV9zVRyFOKALIClyqYk=;
+ b=GqDHuGh/jhffD0ZveL0Q9gXFuARcIh8GmJLg3AQIJFJCvOxifOOg6it6Ksc6HIG9HLKOB/ChPLC8TjeVGaSeTg2+bM87CjyeCDNyFm5b9NFatOFLBxM96JgbHSPDBV5nkZeO8X6xUEgIBp9wMwBvAxXtAKmhKzDr43cOChejZnVutbzd7MSdmXaRJ2sU41cA9coWq74mSLUXvJE6n6a8v7dQ9LILggs0QyVNwOXLVOss58J1Xeh/xIaHoJYdMWE6OpklGN9XumEYAJF3QvyC04qaZk0JyC1HdKojQ/EeiH9HMd/FsqSUibkkhSkYhEOmljsCdewQhXdd+M7SUMw/OQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PoL7U9aX/ZvjtfMqXC9xO2mIT6ugo3HADJUjSNzOi8M=;
- b=zYTEtxrR3cZvihAXnCr8tT9Ec+nQUB8WQWQW1GTwLqTZrKiWTcwma6jTKgrgpF7QzMgJ3zP1W/1sRsTasEMEmwqqKN0MKsr4WaSqWCeJ7cu9Fi59tcu9C1HKcZBwe9Mt15rHDxxIJinUnc6xwY6dmr9jOSNvCE/UdKAN17SvvmY=
-Received: from CY5P221CA0084.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:9::14) by
- DS7PR12MB5840.namprd12.prod.outlook.com (2603:10b6:8:7b::10) with Microsoft
+ bh=bwGNNhr0BV8XU5gNur70iQYprV9zVRyFOKALIClyqYk=;
+ b=AbT63HwZtpfHA/VWHqJswLGecO43bGaBgxCZroLGMFmAgy18tDD2LUqVt1HsKrdHIH97ewUv6HNZe9nr5fKMUKQZaBHUeFFupdDJEaG3bQviij3AxYaMU8mR//b0iVYk5swkqJm5teeRCIrE2UBouR78Pa2YYTK93DKVrBltKA0=
+Received: from CY5P221CA0004.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:b::12) by
+ DM4PR12MB5056.namprd12.prod.outlook.com (2603:10b6:5:38b::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5924.11; Wed, 14 Dec 2022 19:51:17 +0000
-Received: from CY4PEPF0000C97B.namprd02.prod.outlook.com
- (2603:10b6:930:9:cafe::32) by CY5P221CA0084.outlook.office365.com
- (2603:10b6:930:9::14) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.5880.19; Wed, 14 Dec 2022 19:51:38 +0000
+Received: from CY4PEPF0000C978.namprd02.prod.outlook.com
+ (2603:10b6:930:b:cafe::4f) by CY5P221CA0004.outlook.office365.com
+ (2603:10b6:930:b::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
- Transport; Wed, 14 Dec 2022 19:51:17 +0000
+ Transport; Wed, 14 Dec 2022 19:51:38 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000C97B.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ CY4PEPF0000C978.mail.protection.outlook.com (10.167.241.139) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5924.9 via Frontend Transport; Wed, 14 Dec 2022 19:51:17 +0000
+ 15.20.5924.10 via Frontend Transport; Wed, 14 Dec 2022 19:51:38 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
- 2022 13:51:16 -0600
+ 2022 13:51:37 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,10 +71,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>
-Subject: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for large page
-Date:   Wed, 14 Dec 2022 13:39:53 -0600
-Message-ID: <20221214194056.161492-2-michael.roth@amd.com>
+        Hugh Dickins <hughd@google.com>
+Subject: [PATCH RFC v7 21/64] x86/fault: fix handle_split_page_fault() to work with memfd backed pages
+Date:   Wed, 14 Dec 2022 13:40:13 -0600
+Message-ID: <20221214194056.161492-22-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
@@ -86,51 +86,58 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000C97B:EE_|DS7PR12MB5840:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4a6e300-a89e-4609-a3c4-08dade0c90a4
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000C978:EE_|DM4PR12MB5056:EE_
+X-MS-Office365-Filtering-Correlation-Id: a4bde643-db12-4646-ca78-08dade0c9d2b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wwr/Osxya313jUmgCuc3sqjBWHW8EXeDnY7cdpayxzFLy1+VeZA/pCb5+Fsw+MsxrYsuhPLyeIibDIDJ374pgFCsAVvPS8twEp57yWCt8NG2eSuawP/nyYWIkbUFs0KZ4rMXhJpivO7pI02UH42m6jriJK99qxIxO3VSR/FFpEN0UuJVufXiqMWrFYnXeLKAVLM3IdOlZdlnJuMCl23EWeK6+sqAakZ0oi0323njRf0Rj0cfzhqv9ipBteuXHiSyB4Yt8Jthuq3Ht3DqTGg92a2CNPrxTzd7p7uCph1QRmvNsYXJcjpE0lnJIdKNr3UawzCP1lwPOL0VtM6v8vXk+pKUFe6v44Br4yEROFPgfCs3TBP7xAVGGMRQo0DhyA4/F+4sIZqyOxk0qvpiVPPaU36B8Fk8cQLVJARFCodY4fwTGYCU34wOjy4tX9LQ9DbTmFTjyQ0U+x5Umkm4X8H/0B6fwJTWMmPnMsHHLzjT7A7Ai8OdTDggcCNmn1rN+7UJvqlBjRZQTvNm4Tf918tX4JYBVBtvcKLXgkC0tNB15WNhVuF6nM7djAcanRDm+f/ZEl2oGQVSr4DjBEV07fHHgtwdn2OsdgTodg3BPjeeoG1jboNWWzRqlFKzYGhw9k/joynyspwWovUVIWR2ry37YV1HsbBM+nZ1uoMxPaVwQ4dmi4LkxZ0QXB9yLvbyYQeoj4OEXcAA5RIcLuzgnR3WhaIowRdhiWR1EWfDugamr1Y=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(39860400002)(136003)(396003)(451199015)(36840700001)(46966006)(40470700004)(83380400001)(336012)(2616005)(86362001)(47076005)(81166007)(82740400003)(8936002)(36860700001)(7416002)(356005)(426003)(41300700001)(44832011)(5660300002)(1076003)(4744005)(7406005)(40460700003)(40480700001)(26005)(82310400005)(16526019)(478600001)(6666004)(4326008)(70586007)(70206006)(8676002)(186003)(6916009)(316002)(54906003)(2906002)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: mFaTg346g8lcyFMW1cwlnoV+jQvmzSLRzmnUOb12LkhCFmmFRY9JlREPKL+VtpbgS7hvHwfechiK87qJMGnQHvGOvIM3vn+XIW+zztu8OHkm7eqgucuv3d3RdmY0Mag3WueRkWw2FAH0UrrlNDF47GsL52WI3AuQc6b5U9eSOFmMw4QtY62c2AbIZfeKzJPu3PFevA4+vK+H8IZDXqxLRcAnVuNrYBJFEcPISA1FYcmnfw4hCgzfY38ErWwh2ipsrDwqE+CNTNYJEHTgDMDslv2PayJmhZuLhVHMOKqViu5oIYXo6w4ekXuD/CpIyKItBpV4u7vNALAUMapHth5Jg/+5mmltYO3SFbmRs7fqfh8axDHGH5O5UnmE2KyjL79RCz4h+3qIT+HiCi2uW23VXayxBC6bfRouM9aHFLSL1FtSYaN0IM2coJYIJieriSk7vce99+xAvN+5gTr+/Pj3cQFmAedbJxuCZjWbNRpF6oe1g1vjqH3FUn/fCjpJsiR/xhIGa/tdgDfLGyWAiAV8FrJK1kcCRX7jDNG6fp4NzfaXt0P5vK39sN/O8sl8hUTX7sljQKR+RlQn4Kd91CWWGgijk+mVJXjg8+znJwQ+o5RB2P1lkoyqudulVSxw0fpKlKZejD4OTT6qO3/odlK6+3dD4oYkCIK/bJD/ZJsIEJJxZxPQX3wTYBEhp9OX/JT6BTnGtpzOExmrgqtlzbHH7e9VYsB43XG0RFVtnumqnV8=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(396003)(376002)(136003)(451199015)(40470700004)(36840700001)(46966006)(7406005)(8936002)(41300700001)(4326008)(5660300002)(70586007)(44832011)(70206006)(8676002)(7416002)(36756003)(16526019)(1076003)(478600001)(54906003)(6916009)(2906002)(316002)(40460700003)(186003)(336012)(86362001)(2616005)(6666004)(426003)(26005)(40480700001)(83380400001)(82740400003)(81166007)(47076005)(356005)(82310400005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 19:51:17.2466
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 19:51:38.2806
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4a6e300-a89e-4609-a3c4-08dade0c90a4
+X-MS-Exchange-CrossTenant-Network-Message-Id: a4bde643-db12-4646-ca78-08dade0c9d2b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C97B.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C978.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5840
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5056
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nikunj A Dadhania <nikunj@amd.com>
+From: Hugh Dickins <hughd@google.com>
 
-Aligned end boundary causes a kvm crash, handle the case.
+When the address is backed by a memfd, the code to split the page does
+nothing more than remove the PMD from the page tables. So immediately
+install a PTE to ensure that any other pages in that 2MB region are
+brought back as in 4K pages.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+Signed-off-by: Hugh Dickins <hughd@google.com>
+Cc: Hugh Dickins <hughd@google.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+ mm/memory.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b1953ebc012e..b3ffc61c668c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7159,6 +7159,9 @@ static void kvm_update_lpage_private_shared_mixed(struct kvm *kvm,
- 		for (gfn = first + pages; gfn < last; gfn += pages)
- 			linfo_set_mixed(gfn, slot, level, false);
+diff --git a/mm/memory.c b/mm/memory.c
+index e68da7e403c6..33c9020ba1f8 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4999,6 +4999,11 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+ static int handle_split_page_fault(struct vm_fault *vmf)
+ {
+ 	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
++	/*
++	 * Install a PTE immediately to ensure that any other pages in
++	 * this 2MB region are brought back in as 4K pages.
++	 */
++	__pte_alloc(vmf->vma->vm_mm, vmf->pmd);
+ 	return 0;
+ }
  
-+		if (gfn == last)
-+			goto out;
-+
- 		gfn = last;
- 		gfn_end = min(last + pages, slot->base_gfn + slot->npages);
- 		mixed = mem_attrs_mixed(kvm, slot, level, attrs, gfn, gfn_end);
 -- 
 2.25.1
 
