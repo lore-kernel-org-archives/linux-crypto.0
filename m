@@ -2,100 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA02EC4167B
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 20:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD61C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Dec 2022 22:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbiLNUcw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 15:32:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36558 "EHLO
+        id S229827AbiLNWZb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Dec 2022 17:25:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230191AbiLNUcd (ORCPT
+        with ESMTP id S229865AbiLNWZQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:32:33 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA175436F
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 12:21:03 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3ceb4c331faso11179917b3.2
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 12:21:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=L22LQH7KmOjrT8G6djNy9I40Y6DACrH51I/z1yt47rc=;
-        b=UXt16BrghWlfjJ3XF28huqJShfounRuXVxB3uz3pPGPcotNdlL2dNrrOF5OwG3WvTt
-         7fgw/t0HRdPYJAl48IqtiQ3QRWCzeJZozMRHvgzy97kLH8vWOkBNK6Hd+2UeQzPo/kLZ
-         Xq+FAPFw8iWaFFifDrqEwYCRDMwY8Xsgd4b3FPUqP0MPS9FsW/vVNeeZ9IyLQ63P8XRM
-         Jw7Pwrx7WNqbEbmY2mO0Nm4MdgutDRFg/T4crCr2s/m8G1BP3+0ISXdsrYdlxo69VWy8
-         e174P5Io5tr8AuA8LO/U9kGHNroBuh0mvPHmAbW/eJtHybSPiucqDw0huwjzo60NqAm9
-         0o7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L22LQH7KmOjrT8G6djNy9I40Y6DACrH51I/z1yt47rc=;
-        b=dNT4Ci1pFOtEsYMiff7B1ROXr4yjngknCtki6phh9531Q/IWJ/AlGuww3zLguD2sRt
-         SLLsmUjCmsH5HjJ70hq5yi/vBuGLvUH8hMAVh/gKVRSEwu2PCWWQDfF3ASI2mzmTnzHG
-         j0LEf2foDalo8YrHqwH17joCA7IVLkhEkW5qB/ACLWZQqmzdV4j25uS93BfnqWE0p6D4
-         OYaFfbA+PZcgwGkrzSuHbp29QDpPUs2ZVsZhGWR/DsAWhPGw3DQQBnP3yM6xzCBTmYs+
-         aJv2fUCQ8qQxp+283m+M4DueBZ+oRDOovFMDOOpHn8/m09lpNG5A0Ocs5rdiG3cXhh0x
-         AZoA==
-X-Gm-Message-State: ANoB5plU0ufHM/dTd6F7Z1XIBEIo9PPkKCLut5iH4FuSmmxBuJ5ngz6z
-        tEgKvu9vKZI8j+AWHQfQnDusYrMJey4=
-X-Google-Smtp-Source: AA0mqf5er0t0Z6NzSbBwHoupkBE/aAiAby9eU++DWgEG66GmPY5p0RGLfP+wTFkJgGI5Yje4G0waeky+4Wo=
-X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:19c4:743c:e0e0:b558])
- (user=pgonda job=sendgmr) by 2002:a25:8743:0:b0:6f0:c9e7:68bf with SMTP id
- e3-20020a258743000000b006f0c9e768bfmr68411640ybn.78.1671049262522; Wed, 14
- Dec 2022 12:21:02 -0800 (PST)
-Date:   Wed, 14 Dec 2022 12:20:46 -0800
-Message-Id: <20221214202046.719598-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Subject: [PATCH] crypto: ccp - Limit memory allocation in SEV_GET_ID2 ioctl
-From:   Peter Gonda <pgonda@google.com>
-To:     herbert@gondor.apana.org.au
-Cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
-        David Rientjes <rientjes@google.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        John Allen <john.allen@amd.com>,
-        "Thomas . Lendacky" <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 14 Dec 2022 17:25:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB691248FB;
+        Wed, 14 Dec 2022 14:25:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 65DCBB81A1A;
+        Wed, 14 Dec 2022 22:25:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FF06C433EF;
+        Wed, 14 Dec 2022 22:25:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671056712;
+        bh=2kg920/gBGTt/bw9KziIxPJX8dOcX6PLVZjDKCaNy0k=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=GV7oo3tqu4nzIHDarnj08XLvEQ5ax3htAYK82aAqfNi8cnskYcp8spn6bfVbkaZCU
+         NAJWO+MicQgnPcBWaKDEzhebNlQlGmCW1x9Hd8k1j9YcGH0S5LWNOxV60h3ewiYvr7
+         oZA4EErfg6U8xFk4W7iLwvz3J8KCPKcdpbs3nmbB8ziN/KASMp42H9HNmrWcz1OIQP
+         y5GLvMJEoDZoqzfYdQQiX55vt1Ixly6rTQ32BA2iezlzXpY8Ev1nBEStV/bsBXoey6
+         1qQK5urNcLw++JOkcLSqq7ykrtEOAaECH1O8+saeAZb6xp5qDQZcYE6vTRhzdV1+Ft
+         9gXc3MbG09Dlw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0D1F1C41612;
+        Wed, 14 Dec 2022 22:25:12 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 6.2
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+References: <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au> <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.2-p1
+X-PR-Tracked-Commit-Id: 453de3eb08c4b7e31b3019a4b0cc3ebce51a6219
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 64e7003c6b85626a533a67c1ba938b75a3db24e6
+Message-Id: <167105671204.22509.7163108624117806005.pr-tracker-bot@kernel.org>
+Date:   Wed, 14 Dec 2022 22:25:12 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently userspace can ask for any uint32 size allocation for the
-SEV_GET_ID2. Limit this allocation size to the max physically
-contiguously allocation: MAX_ORDER.
+The pull request you sent on Wed, 14 Dec 2022 16:15:22 +0800:
 
-Reported-by: Andy Nguyen <theflow@google.com>
-Suggested-by: David Rientjes <rientjes@google.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: stable@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: John Allen <john.allen@amd.com>
-Cc: Thomas.Lendacky <thomas.lendacky@amd.com>
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.2-p1
 
----
- drivers/crypto/ccp/sev-dev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/64e7003c6b85626a533a67c1ba938b75a3db24e6
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 06fc7156c04f..5c16c4406764 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -878,6 +878,10 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
- 
-+	/* Max length that can be allocated physically contiguously */
-+	if (get_order(input.length) >= MAX_ORDER)
-+		return -ENOMEM;
-+
- 	input_address = (void __user *)input.address;
- 
- 	if (input.address && input.length) {
+Thank you!
+
 -- 
-2.39.0.rc1.256.g54fd8350bd-goog
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
