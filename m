@@ -2,182 +2,198 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E968BC3DA6E
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 11:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC17C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 11:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbiLOLZ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Dec 2022 06:25:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42980 "EHLO
+        id S229611AbiLOLsh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Dec 2022 06:48:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbiLOLZ4 (ORCPT
+        with ESMTP id S229637AbiLOLsg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2022 06:25:56 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEDC2A95A;
-        Thu, 15 Dec 2022 03:25:55 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFBKUPV032337;
-        Thu, 15 Dec 2022 11:25:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=z7xOxeP/BmvlbavOrsl3suBVa3QPrzmm4oon1sLgOmw=;
- b=N4QyD7EwXjl/JhDDCMeqSKuPUz2VI+dVnbzjPmz3DVLeJXwC6qBs2e57JzBs8gExwUnb
- uAS7HmatZphU7niRTxcjSBjqI+IMuqGYabA1re9nX8MXsJLhhGPBHTSYxK+kDVdJO8lB
- ro9AY2p+w7KdEQY49XTaVOQslEbbcI+BnbWDtMe0+5TYlwhO68Tr2BX96ZFjp6dC1Zf9
- N+woK5beSE5Qw0DuoDKHhtJHy0H9qD5sWUD2cmzRyL9EnJ7d6NknjV+ycG7JNh2hxtXW
- /jLBwrMlDkdkxnSUe9mZrtaf6llQgfnD/UPS1AEHug8zyJSQ7p7zTLebXdry+okawLtA dQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg2meg2cc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Dec 2022 11:25:29 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BFBKlje000961;
-        Thu, 15 Dec 2022 11:25:28 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg2meg2bv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Dec 2022 11:25:28 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFAgVAL011783;
-        Thu, 15 Dec 2022 11:25:27 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3meyyhwc8v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Dec 2022 11:25:27 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BFBPQeD7930554
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Dec 2022 11:25:26 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09A1F58060;
-        Thu, 15 Dec 2022 11:25:26 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E71F5805E;
-        Thu, 15 Dec 2022 11:25:24 +0000 (GMT)
-Received: from sig-9-65-242-118.ibm.com (unknown [9.65.242.118])
-        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Dec 2022 11:25:24 +0000 (GMT)
-Message-ID: <26bb48845023a4e6515e1d4f6e1f38eb7e96e16d.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 04/10] KEYS: X.509: Parse Key Usage
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, jarkko@kernel.org
-Cc:     dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, pvorel@suse.cz, noodles@fb.com, tiwai@suse.de,
-        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
-        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Thu, 15 Dec 2022 06:25:24 -0500
-In-Reply-To: <20221214003401.4086781-5-eric.snowberg@oracle.com>
-References: <20221214003401.4086781-1-eric.snowberg@oracle.com>
-         <20221214003401.4086781-5-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ve0kohc5bjUKS47Woj99Hr9fxVMuq-dS
-X-Proofpoint-ORIG-GUID: Y-cu894W-yZrl_eyoCdOUDvzzh0O-NTr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-15_05,2022-12-15_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 suspectscore=0 clxscore=1015 phishscore=0 bulkscore=0
- impostorscore=0 adultscore=0 priorityscore=1501 mlxscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2212150086
+        Thu, 15 Dec 2022 06:48:36 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E80A29CB0
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Dec 2022 03:48:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 11184B819DC
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Dec 2022 11:48:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDAECC433EF
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Dec 2022 11:48:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671104912;
+        bh=Gg8q2ym69rZ0M+aNFiSyUTelYKwAoQUA/qdd1iu4xBQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=rfh17U1e0RABXnOVbgW1VQaK8TTjlueSEOpHAjOCd+vRAckMdLhIDrYe8ruhvfzoD
+         NSlyS3bi47yliCj3AfdhNRXBetZKwZDWnUAor9aAdb0rSLfFPi09lkomYhOmK4BsP0
+         ANCXuPQyq5cSWKODSWJej5EGBuI/Hdqh2/wrsMUGvmejD73mOwQISk1q9lLX3VMKDz
+         td90AROjNAemhM1GdaxStYahdviXlK5c5XgtF3GEep2zmCF8L/oz5S7YyPIML1C6ho
+         I9BV3OFh3icmFJR0dCOhovl8oce3w+pKr8ZGHxBeUHUUk5bB0F6MN1T0hGlnp9g+dG
+         T7HlAY8uHNqjw==
+Received: by mail-lj1-f179.google.com with SMTP id s10so9679677ljg.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Dec 2022 03:48:32 -0800 (PST)
+X-Gm-Message-State: ANoB5pm3z+pmXpJTU/DByKcxK5UsaDCk34x/SaDtkjS6m57eYXc+dtxi
+        yw3pXsLgRph2x2M57uO3jAkP+im6Ew0IlVEwQHU=
+X-Google-Smtp-Source: AA0mqf4h6bGdUmBHz1JLajQ8Fws9v5htujGyw+HDR7Evcsv/ec4il/zSHBiNYpvdsAXSeM+WVBEKC1M2nDik3eMC3tY=
+X-Received: by 2002:a05:651c:b14:b0:277:7eef:1d97 with SMTP id
+ b20-20020a05651c0b1400b002777eef1d97mr27225042ljr.516.1671104910835; Thu, 15
+ Dec 2022 03:48:30 -0800 (PST)
+MIME-Version: 1.0
+References: <20221207103936.2198407-1-ardb@kernel.org> <20221207103936.2198407-3-ardb@kernel.org>
+ <CACRpkdYiHQQtw2=iPKos3sXEkeErTNxR7T0FPBrCqhQxtxhCkA@mail.gmail.com>
+ <CAMj1kXFPDXp4OfjKYzM0namfbAijbuCfiEaDC9+jAhd1GFY6FA@mail.gmail.com> <Y5r8OrCrjfil0LWs@shell.armlinux.org.uk>
+In-Reply-To: <Y5r8OrCrjfil0LWs@shell.armlinux.org.uk>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 15 Dec 2022 12:48:19 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXH9KXo=YipRGw9LS3KjZ0d+xh3dvAUt4AuMRpHqV-b5Gw@mail.gmail.com>
+Message-ID: <CAMj1kXH9KXo=YipRGw9LS3KjZ0d+xh3dvAUt4AuMRpHqV-b5Gw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] ARM: permit non-nested kernel mode NEON in softirq context
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     Linus Walleij <linus.walleij@linaro.org>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2022-12-13 at 19:33 -0500, Eric Snowberg wrote:
-> Parse the X.509 Key Usage.  The key usage extension defines the purpose of
-> the key contained in the certificate.
-> 
->    id-ce-keyUsage OBJECT IDENTIFIER ::=  { id-ce 15 }
-> 
->       KeyUsage ::= BIT STRING {
->            digitalSignature        (0),
->            contentCommitment       (1),
->            keyEncipherment         (2),
->            dataEncipherment        (3),
->            keyAgreement            (4),
->            keyCertSign             (5),
->            cRLSign                 (6),
->            encipherOnly            (7),
->            decipherOnly            (8) }
-> 
-> If the keyCertSign is set, store it in the x509_certificate structure.
-> This will be used in a follow on patch that requires knowing the
-> certificate key usage type.
+On Thu, 15 Dec 2022 at 11:51, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Thu, Dec 15, 2022 at 11:43:22AM +0100, Ard Biesheuvel wrote:
+> > On Thu, 15 Dec 2022 at 11:27, Linus Walleij <linus.walleij@linaro.org> wrote:
+> > >
+> > > On Wed, Dec 7, 2022 at 11:39 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> > >
+> > > > We currently only permit kernel mode NEON in process context, to avoid
+> > > > the need to preserve/restore the NEON register file when taking an
+> > > > exception while running in the kernel.
+> > > >
+> > > > Like we did on arm64, we can relax this restriction substantially, by
+> > > > permitting kernel mode NEON from softirq context, while ensuring that
+> > > > softirq processing is disabled when the NEON is being used in task
+> > > > context. This guarantees that only NEON context belonging to user space
+> > > > needs to be preserved and restored, which is already taken care of.
+> > > >
+> > > > This is especially relevant for network encryption, where incoming
+> > > > frames are typically handled in softirq context, and deferring software
+> > > > decryption to a kernel thread or falling back to C code are both
+> > > > undesirable from a performance PoV.
+> > > >
+> > > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > >
+> > > So boosting WireGuard as primary SW network encryption user?
+> >
+> > Essentially, although the use case that inspired this work is related
+> > to IPsec not WireGuard, and the crypto algorithm in that case (GCM) is
+> > ~3x faster than WG's chacha20poly1305, which makes the performance
+> > overhead of asynchronous completion even more significant. (Note that
+> > GCM needs the AES and PMULL instructions which are usually only
+> > available when running the 32-bit kernel on a 64-bit core, whereas
+> > chacha20poly1305 uses ordinary NEON instructions.)
+> >
+> > But Martin responded with a Tested-by regarding chacha20poly1305 on
+> > IPsec (not WG) where there is also a noticeable speedup, so WG on
+> > ARM32 should definitely benefit from this as well.
+>
+> It'll be interesting to see whether there is any noticable difference
+> with my WG VPN.
+>
 
-Either in this patch or separately, the "digitalSignature" key usage
-flag needs to be saved.
+Using WireGuard with the same 32-bit KVM guest communicating with its
+64-bit host using virtio-net, I get a 44% speedup in the host->guest
+direction. The other direction performs exactly the same, which is
+unsurprising as it doesn't involve NEON crypto in softirq context at
+all.
 
-> 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 22 ++++++++++++++++++++++
->  crypto/asymmetric_keys/x509_parser.h      |  1 +
->  2 files changed, 23 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index b4443e507153..edb22cf04eed 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -579,6 +579,28 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
->  
-> +	if (ctx->last_oid == OID_keyUsage) {
-> +		/*
-> +		 * Get hold of the keyUsage bit string to validate keyCertSign
-> +		 * v[1] is the encoding size
-> +		 *       (Expect either 0x02 or 0x03, making it 1 or 2 bytes)
-> +		 * v[2] is the number of unused bits in the bit string
-> +		 *       (If >= 3 keyCertSign is missing)
-> +		 * v[3] and possibly v[4] contain the bit string
-> +		 * 0x04 is where KeyCertSign lands in this bit string (from
-> +		 *      RFC 5280 4.2.1.3)
-> +		 */
-> +		if (v[0] != ASN1_BTS)
-> +			return -EBADMSG;
-> +		if (vlen < 4)
-> +			return -EBADMSG;
-> +		if (v[1] == 0x02 && v[2] <= 2 && (v[3] & 0x04))
-> +			ctx->cert->kcs_set = true;
-> +		else if (vlen > 4 && v[1] == 0x03 && (v[3] & 0x04))
-> +			ctx->cert->kcs_set = true;
-> +		return 0;
-> +	}
-> +
->  	if (ctx->last_oid == OID_authorityKeyIdentifier) {
->  		/* Get hold of the CA key fingerprint */
->  		ctx->raw_akid = v;
-> diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-> index 7c5c0ad1c22e..74a9f929e400 100644
-> --- a/crypto/asymmetric_keys/x509_parser.h
-> +++ b/crypto/asymmetric_keys/x509_parser.h
-> @@ -39,6 +39,7 @@ struct x509_certificate {
->  	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
->  	bool		blacklisted;
->  	bool		root_ca;		/* T if basic constraints CA is set */
-> +	bool		kcs_set;		/* T if keyCertSign is set */
+BEFORE
+======
 
-Using acronyms as variable names makes reviewing code more difficult. 
-Perhaps rename "kcs_set" to either "key_cert_sign" or "keycertsign".
-
->  };
->  
->  /*
-
--- 
-thanks,
-
-Mimi
+ardb@vm32:~$ iperf3 -c 192.168.11.2
+Connecting to host 192.168.11.2, port 5201
+[  5] local 192.168.11.1 port 40144 connected to 192.168.11.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  25.8 MBytes   216 Mbits/sec    0    397 KBytes
+[  5]   1.00-2.00   sec  25.9 MBytes   217 Mbits/sec    0    397 KBytes
+[  5]   2.00-3.00   sec  27.0 MBytes   226 Mbits/sec    0    397 KBytes
+[  5]   3.00-4.00   sec  26.5 MBytes   222 Mbits/sec    0    397 KBytes
+[  5]   4.00-5.00   sec  26.2 MBytes   220 Mbits/sec    0    397 KBytes
+[  5]   5.00-6.00   sec  26.1 MBytes   219 Mbits/sec    0    436 KBytes
+[  5]   6.00-7.00   sec  26.2 MBytes   220 Mbits/sec    0    458 KBytes
+[  5]   7.00-8.00   sec  26.2 MBytes   220 Mbits/sec    0    458 KBytes
+[  5]   8.00-9.00   sec  26.5 MBytes   222 Mbits/sec    0    480 KBytes
+[  5]   9.00-10.00  sec  26.9 MBytes   225 Mbits/sec    0    480 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   263 MBytes   221 Mbits/sec    0             sender
+[  5]   0.00-10.00  sec   262 MBytes   220 Mbits/sec                  receiver
 
 
+ardb@sudo:~$ iperf3 -c 192.168.11.1
+Connecting to host 192.168.11.1, port 5201
+[  5] local 192.168.11.2 port 46340 connected to 192.168.11.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  47.5 MBytes   398 Mbits/sec    0   1.75 MBytes
+[  5]   1.00-2.00   sec  45.0 MBytes   377 Mbits/sec   18   1.35 MBytes
+[  5]   2.00-3.00   sec  43.8 MBytes   367 Mbits/sec    0   1.47 MBytes
+[  5]   3.00-4.00   sec  45.0 MBytes   377 Mbits/sec    0   1.56 MBytes
+[  5]   4.00-5.00   sec  45.0 MBytes   377 Mbits/sec    0   1.63 MBytes
+[  5]   5.00-6.00   sec  42.5 MBytes   357 Mbits/sec    0   1.68 MBytes
+[  5]   6.00-7.00   sec  43.8 MBytes   367 Mbits/sec    0   1.71 MBytes
+[  5]   7.00-8.00   sec  43.8 MBytes   367 Mbits/sec    0   1.73 MBytes
+[  5]   8.00-9.00   sec  45.0 MBytes   377 Mbits/sec    0   1.74 MBytes
+[  5]   9.00-10.00  sec  43.8 MBytes   367 Mbits/sec    0   1.75 MBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   445 MBytes   373 Mbits/sec   18             sender
+[  5]   0.00-10.04  sec   444 MBytes   371 Mbits/sec                  receiver
+
+iperf Done.
+
+
+AFTER
+=====
+
+ardb@vm32:~$ iperf3 -c 192.168.11.2
+Connecting to host 192.168.11.2, port 5201
+[  5] local 192.168.11.1 port 44004 connected to 192.168.11.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  26.2 MBytes   220 Mbits/sec    0    399 KBytes
+[  5]   1.00-2.00   sec  25.9 MBytes   217 Mbits/sec    0    399 KBytes
+[  5]   2.00-3.00   sec  26.0 MBytes   218 Mbits/sec    0    444 KBytes
+[  5]   3.00-4.00   sec  26.8 MBytes   225 Mbits/sec    0    485 KBytes
+[  5]   4.00-5.00   sec  26.4 MBytes   222 Mbits/sec    0    542 KBytes
+[  5]   5.00-6.00   sec  26.6 MBytes   223 Mbits/sec    0    568 KBytes
+[  5]   6.00-7.00   sec  25.4 MBytes   213 Mbits/sec    0    568 KBytes
+[  5]   7.00-8.00   sec  25.9 MBytes   217 Mbits/sec    0    568 KBytes
+[  5]   8.00-9.00   sec  26.7 MBytes   224 Mbits/sec    0    568 KBytes
+[  5]   9.00-10.00  sec  25.9 MBytes   217 Mbits/sec    0    568 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   262 MBytes   220 Mbits/sec    0             sender
+[  5]   0.00-9.99   sec   261 MBytes   219 Mbits/sec                  receiver
+
+iperf Done.
+
+ardb@sudo:~$ iperf3 -c 192.168.11.1
+Connecting to host 192.168.11.1, port 5201
+[  5] local 192.168.11.2 port 49838 connected to 192.168.11.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  61.2 MBytes   514 Mbits/sec    0   1.59 MBytes
+[  5]   1.00-2.00   sec  66.2 MBytes   555 Mbits/sec    0   1.67 MBytes
+[  5]   2.00-3.00   sec  65.0 MBytes   545 Mbits/sec   79   1.24 MBytes
+[  5]   3.00-4.00   sec  63.8 MBytes   535 Mbits/sec    0   1.36 MBytes
+[  5]   4.00-5.00   sec  63.8 MBytes   535 Mbits/sec    0   1.46 MBytes
+[  5]   5.00-6.00   sec  63.8 MBytes   535 Mbits/sec    0   1.53 MBytes
+[  5]   6.00-7.00   sec  62.5 MBytes   524 Mbits/sec    0   1.59 MBytes
+[  5]   7.00-8.00   sec  65.0 MBytes   545 Mbits/sec   99   1.18 MBytes
+[  5]   8.00-9.00   sec  65.0 MBytes   545 Mbits/sec    0   1.25 MBytes
+[  5]   9.00-10.00  sec  65.0 MBytes   545 Mbits/sec    0   1.30 MBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec   641 MBytes   538 Mbits/sec  178             sender
+[  5]   0.00-10.02  sec   638 MBytes   535 Mbits/sec                  receiver
+
+iperf Done.
