@@ -2,100 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615BAC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 10:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA35C3DA6E
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 11:10:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229448AbiLOKvw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Dec 2022 05:51:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53722 "EHLO
+        id S230011AbiLOLKb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Dec 2022 06:10:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbiLOKvs (ORCPT
+        with ESMTP id S229603AbiLOLKa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2022 05:51:48 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33565F66
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Dec 2022 02:51:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=k8z9NPwjR/1WjDLafqFssLJg9DyvbaDVrEj71me8s10=; b=FqN/U+FpVhHgwuSC0KHPwZ7IOl
-        AP1BieXhX0Fq2O01OJNw6WTgryTAF1ZXW+l2yug8M6gafkp1whJgQcUW6XdOPWtTnDmOn4MsCAy3G
-        x6Xkhl+gUH1E37i5LhfMKOBY+iae1t+dGijFsP47jRrDxTYu+aMm7hrWdYwr//01fPLBAa157/2W1
-        OvCJ7StosCbcLfDes7Y/TZSyrVNgY+RECLJmTyOkk4w8z753UWZgxHEjC//1VJP20CHsEFxibN/9G
-        pgmcE3YxDyVtfMRXGTg0y7iGqUDTT8cmk3LDzJS/g06///Rmpe5iexuOzI44kRl+UuvI+PHzGd4Wm
-        YRTAXDnA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35714)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1p5lq0-0002kH-CX; Thu, 15 Dec 2022 10:51:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1p5lpy-0008II-Qi; Thu, 15 Dec 2022 10:51:38 +0000
-Date:   Thu, 15 Dec 2022 10:51:38 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 2/2] ARM: permit non-nested kernel mode NEON in
- softirq context
-Message-ID: <Y5r8OrCrjfil0LWs@shell.armlinux.org.uk>
-References: <20221207103936.2198407-1-ardb@kernel.org>
- <20221207103936.2198407-3-ardb@kernel.org>
- <CACRpkdYiHQQtw2=iPKos3sXEkeErTNxR7T0FPBrCqhQxtxhCkA@mail.gmail.com>
- <CAMj1kXFPDXp4OfjKYzM0namfbAijbuCfiEaDC9+jAhd1GFY6FA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXFPDXp4OfjKYzM0namfbAijbuCfiEaDC9+jAhd1GFY6FA@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+        Thu, 15 Dec 2022 06:10:30 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FD123E84;
+        Thu, 15 Dec 2022 03:10:29 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFB1E47008360;
+        Thu, 15 Dec 2022 11:10:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=rUYLvmFOgFDqDQdDN12wI1WE4ZOCsYwtI8WfEJp0Fvo=;
+ b=YEScXS8FUo6JWnAJrvXZcb2SHKVXpimUP6tpakgNBI6zeOXxC9widnbXE1LWmU2M3h8U
+ wJZkyp8zEA3nlrLlN9+v3D8DmTvZF/IzUiaHJzJF5wJMymqKov4TIH+sK2vujfbTVwZK
+ OYnxz4HTK6EoEXaU77UFpmmODpjraO7G0Tsk4yIW8zQJzPtTUBbOA14j/8ud/aQVIlAF
+ ADxqTtQ7ptVp+7Cb6einjqScSfX1pmLirDN/EJzOir8tEbQVPQWnR1A4aVRpgxRoP6Yb
+ 1zC+ux90a1duY5pIyjaVki1a2cznvlAJ9Hq0gG5jw0HrWi+9Dk6hnT8/em6fk/zrPkob 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg2bcg7pc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 11:10:11 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BFB2aOr018669;
+        Thu, 15 Dec 2022 11:10:10 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg2bcg7n4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 11:10:10 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BF8kKHk019328;
+        Thu, 15 Dec 2022 11:10:09 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3mf03ad5ax-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 11:10:09 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BFBA7WS38994298
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Dec 2022 11:10:08 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9AC2158064;
+        Thu, 15 Dec 2022 11:10:07 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 683415805E;
+        Thu, 15 Dec 2022 11:10:05 +0000 (GMT)
+Received: from sig-9-65-242-118.ibm.com (unknown [9.65.242.118])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Dec 2022 11:10:05 +0000 (GMT)
+Message-ID: <b0f29738b919e2705d770017f2f1eb0542c2fad4.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 03/10] KEYS: X.509: Parse Basic Constraints for CA
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, jarkko@kernel.org
+Cc:     dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, pvorel@suse.cz, noodles@fb.com, tiwai@suse.de,
+        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
+        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Date:   Thu, 15 Dec 2022 06:10:04 -0500
+In-Reply-To: <20221214003401.4086781-4-eric.snowberg@oracle.com>
+References: <20221214003401.4086781-1-eric.snowberg@oracle.com>
+         <20221214003401.4086781-4-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7hrEsgPkc-5WyJ_M4FHbjv-cUSKcs8f0
+X-Proofpoint-ORIG-GUID: 85H4ZOaWVoU9OVfFfNcY9xwzHIR2SHYr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-15_05,2022-12-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ adultscore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1015 mlxscore=0
+ bulkscore=0 suspectscore=0 priorityscore=1501 spamscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2212150086
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 15, 2022 at 11:43:22AM +0100, Ard Biesheuvel wrote:
-> On Thu, 15 Dec 2022 at 11:27, Linus Walleij <linus.walleij@linaro.org> wrote:
-> >
-> > On Wed, Dec 7, 2022 at 11:39 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> >
-> > > We currently only permit kernel mode NEON in process context, to avoid
-> > > the need to preserve/restore the NEON register file when taking an
-> > > exception while running in the kernel.
-> > >
-> > > Like we did on arm64, we can relax this restriction substantially, by
-> > > permitting kernel mode NEON from softirq context, while ensuring that
-> > > softirq processing is disabled when the NEON is being used in task
-> > > context. This guarantees that only NEON context belonging to user space
-> > > needs to be preserved and restored, which is already taken care of.
-> > >
-> > > This is especially relevant for network encryption, where incoming
-> > > frames are typically handled in softirq context, and deferring software
-> > > decryption to a kernel thread or falling back to C code are both
-> > > undesirable from a performance PoV.
-> > >
-> > > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> >
-> > So boosting WireGuard as primary SW network encryption user?
-> 
-> Essentially, although the use case that inspired this work is related
-> to IPsec not WireGuard, and the crypto algorithm in that case (GCM) is
-> ~3x faster than WG's chacha20poly1305, which makes the performance
-> overhead of asynchronous completion even more significant. (Note that
-> GCM needs the AES and PMULL instructions which are usually only
-> available when running the 32-bit kernel on a 64-bit core, whereas
-> chacha20poly1305 uses ordinary NEON instructions.)
-> 
-> But Martin responded with a Tested-by regarding chacha20poly1305 on
-> IPsec (not WG) where there is also a noticeable speedup, so WG on
-> ARM32 should definitely benefit from this as well.
+> diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
+> index a299c9c56f40..7c5c0ad1c22e 100644
+> --- a/crypto/asymmetric_keys/x509_parser.h
+> +++ b/crypto/asymmetric_keys/x509_parser.h
+> @@ -38,6 +38,7 @@ struct x509_certificate {
+>  	bool		self_signed;		/* T if self-signed (check unsupported_sig too) */
+>  	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
+>  	bool		blacklisted;
+> +	bool		root_ca;		/* T if basic constraints CA is set */
+>  }; 
 
-It'll be interesting to see whether there is any noticable difference
-with my WG VPN.
+The variable "root_ca" should probably be renamed to just "ca", right?
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+
+thanks,
+
+Mimi
+
