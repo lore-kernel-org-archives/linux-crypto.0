@@ -2,44 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D31C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 16:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 894D8C4167B
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 17:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbiLOQaj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Dec 2022 11:30:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55012 "EHLO
+        id S230495AbiLORFQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Dec 2022 12:05:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbiLOQaO (ORCPT
+        with ESMTP id S230510AbiLOREj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Dec 2022 11:30:14 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7775137FB8;
-        Thu, 15 Dec 2022 08:30:04 -0800 (PST)
+        Thu, 15 Dec 2022 12:04:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD73947318;
+        Thu, 15 Dec 2022 09:03:23 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 275B7B81BA1;
-        Thu, 15 Dec 2022 16:30:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8157DC433EF;
-        Thu, 15 Dec 2022 16:30:00 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DDF6061E60;
+        Thu, 15 Dec 2022 17:03:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2ED6C433F0;
+        Thu, 15 Dec 2022 17:03:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671121801;
-        bh=nYCUcHgLM7p2KgVDr3zhrywdX+DOccT78qCBgHQVm00=;
+        s=k20201202; t=1671123784;
+        bh=+j5/PKCDX4da27Gaivbi0EyxiiyB/ME/Rriq9u2O0TY=;
         h=From:To:Cc:Subject:Date:From;
-        b=MX6DCk3LHv3wfFD6gfqiZtpQ/htBYO9Us/Znb0DSNtdX8y+UDA+8BkUvlVsKi0P0v
-         /XweUW3LAGRTSs9UHlfU4ztuYAusujhT/U7UiMo+TlJ7exHjtnpJZFu+5jJZO97qKG
-         dMzPF54/8CCi0or2l1vyw+vQb6ocmwqTzX82yFRYYrbpGoiSdGUiRCVbs4Dq+Jp233
-         k83AEgNkzM/yOhzRYd3/3eoNHfh7l0JK4v2BpzpC/iVrZMmjs60u34NTkg1NL7bQyD
-         ipizUHZnjtnI5It+mV+x9LbYZF7jOlLT70N7z6r7rJN+A5LU0wSRFtfVZqPfVmbdPi
-         CDkV+liHgHn6w==
+        b=Rdhphr6zRApiRnlYm2ku5gSx7V/yGOq92PaGnKYjhZPPUVQdH59PWSgjC0XCU6Q5N
+         YeHalqiRnE/nHreZTmbvVyhEnNzkyRuhPFhGuH3ZkzOGUHsfwRHyXoek+iMr070KGh
+         Ym9FLBs2zeY7chwGn6vkid5iuAu6MMiL7AfWiQKM1l/8Y0IWV+eYSkVVZz+2XIMPqN
+         pJj2gYM/PKhx8cYvWI1L7IxAo6Vr3itYmj9SGLgm8CUX9z59X2Ys3jRsDa6kcXw3xC
+         RILQmpNwwPj0FPZanru6qWAOG4BNYGLu3xUBOUEWVJ0Be1aT6nban6HUVz3GLK/WbJ
+         bIuoYHVAcItWg==
 From:   Arnd Bergmann <arnd@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: wp512: disable kmsan checks in wp512_process_buffer()
-Date:   Thu, 15 Dec 2022 17:29:38 +0100
-Message-Id: <20221215162956.4037570-1-arnd@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Jarkko Sakkinen <jarkko@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Vitaly Chikunov <vt@altlinux.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: certs: fix FIPS selftest depenency
+Date:   Thu, 15 Dec 2022 18:02:52 +0100
+Message-Id: <20221215170259.2553400-1-arnd@kernel.org>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -49,31 +53,48 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The memory sanitizer causes excessive register spills in this function:
+The selftest code is built into the x509_key_parser module, and depends
+on the pkcs7_message_parser module, which in turn has a dependency on
+the key parser, creating a dependency loop and a resulting link
+failure when the pkcs7 code is a loadable module:
 
-crypto/wp512.c:782:13: error: stack frame size (2104) exceeds limit (2048) in 'wp512_process_buffer' [-Werror,-Wframe-larger-than]
+ld: crypto/asymmetric_keys/selftest.o: in function `fips_signature_selftest':
+crypto/asymmetric_keys/selftest.c:205: undefined reference to `pkcs7_parse_message'
+ld: crypto/asymmetric_keys/selftest.c:209: undefined reference to `pkcs7_supply_detached_data'
+ld: crypto/asymmetric_keys/selftest.c:211: undefined reference to `pkcs7_verify'
+ld: crypto/asymmetric_keys/selftest.c:215: undefined reference to `pkcs7_validate_trust'
+ld: crypto/asymmetric_keys/selftest.c:219: undefined reference to `pkcs7_free_message'
 
-Assume that this one is safe, and mark it as needing no checks to
-get the stack usage back down to the normal level.
+Avoid this by only allowing the selftest to be enabled when either
+both parts are loadable modules, or both are built-in.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- crypto/wp512.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/asymmetric_keys/Kconfig        | 2 +-
+ crypto/asymmetric_keys/pkcs7_verify.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index 5e820afa3c78..07994e5ebf4e 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -779,7 +779,7 @@ static const u64 rc[WHIRLPOOL_ROUNDS] = {
-  * The core Whirlpool transform.
-  */
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 3df3fe4ed95f..1ef3b46d6f6e 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -83,6 +83,6 @@ config FIPS_SIGNATURE_SELFTEST
+ 	  for FIPS.
+ 	depends on KEYS
+ 	depends on ASYMMETRIC_KEY_TYPE
+-	depends on PKCS7_MESSAGE_PARSER
++	depends on PKCS7_MESSAGE_PARSER=X509_CERTIFICATE_PARSER
  
--static void wp512_process_buffer(struct wp512_ctx *wctx) {
-+static __no_kmsan_checks void wp512_process_buffer(struct wp512_ctx *wctx) {
- 	int i, r;
- 	u64 K[8];        /* the round key */
- 	u64 block[8];    /* mu(buffer) */
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index f6321c785714..4fa769c4bcdb 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -485,3 +485,4 @@ int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
+ 	pkcs7->data_len = datalen;
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(pkcs7_supply_detached_data);
 -- 
 2.35.1
 
