@@ -2,140 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE26C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 01:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EC0C00145
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Dec 2022 06:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbiLOBBd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Dec 2022 20:01:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57924 "EHLO
+        id S229484AbiLOGjf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Dec 2022 01:39:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiLOBBa (ORCPT
+        with ESMTP id S229448AbiLOGje (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Dec 2022 20:01:30 -0500
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96F746655
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 17:01:26 -0800 (PST)
-Received: by mail-oi1-x22c.google.com with SMTP id l127so4105984oia.8
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Dec 2022 17:01:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+AXpgMmuL3NSvfn8iBTUkD9z8GYz9GV/xJMhFU7McSc=;
-        b=Hj80HcFk1+wGgWdM0qYtfoEP118g7pnbDZ1iaONKLRyq7ALD/XEV7vVSxyeyG5C332
-         DuC73/7jKGMCEB1dULH+KLHOKSeumpkwpUW+GG68qvMmQss4v6sir0gMkHngJ4x1PdNs
-         8vdv6ESeeyQvXXjiXz48kEds4m3Lm1jtvmFWcha7pPVkxpn+OyzTG9/53OGVegS45kva
-         5BafxskuHY7iVDaqjM/QPv26NHNdJ8WRDt4flC21tJbgAsNeqEiTNTWmog0Muzakrg+B
-         VTXrP+16m5YsUQA7uxS09XE7vABC6lHuib020amhH4dBXy3QWuaWt/Jwty6r6MYSoUQT
-         6e1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+AXpgMmuL3NSvfn8iBTUkD9z8GYz9GV/xJMhFU7McSc=;
-        b=w/yBXvjXQOuL3J/YckVusYQ/xQfKZgJ8POobLnjPgjjRRYeKh3+eRs/snCPR5pJn0V
-         FjjBQkcUQ9Nkd4DLt8J3huO6bH/S4t23q/jm9DUvx00RVnara5Y40FteWAUFljtLPIvT
-         hQxFmMPrXzofh0kxWY0RCCVlmaoxrRAxeABxLttd7Nib8PRHtARrFNnejLHdUyK2gUS+
-         DJRBU6be1KDgXxnlaqjzafAXRx01SLZDtm5kvi72V/EdLNvGlGoiwhI6zX6ArAh1QsX+
-         YPHChIRo4JRed1B+mEMvWMzkDopkBMZxJiUHf2/vMcYvJgl/BWKB61SRwUYIaqj0Z86s
-         TBuQ==
-X-Gm-Message-State: ANoB5pk0u09ICyLgEpbN3jjxulw37RaOAebpp1Za54sfsWSyqumPofjX
-        5MEoH0b1R3Q2lr+b0yXfMCCEog==
-X-Google-Smtp-Source: AA0mqf7KxsTUFtO5GJXQhQPOFp5+C1dzmEUY6YPXNbXSdYOeKDPdD1PHkb69Ov9jtK9L5BUY7Y7G2Q==
-X-Received: by 2002:a05:6808:2387:b0:35e:9bb3:b8fa with SMTP id bp7-20020a056808238700b0035e9bb3b8famr7121698oib.51.1671066085845;
-        Wed, 14 Dec 2022 17:01:25 -0800 (PST)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id i8-20020a05620a404800b006feea093006sm11137891qko.124.2022.12.14.17.01.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 17:01:24 -0800 (PST)
-Date:   Wed, 14 Dec 2022 17:01:13 -0800 (PST)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Michael Roth <michael.roth@amd.com>
-cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Hugh Dickins <hughd@google.com>
-Subject: Re: [PATCH RFC v7 21/64] x86/fault: fix handle_split_page_fault()
- to work with memfd backed pages
-In-Reply-To: <20221214194056.161492-22-michael.roth@amd.com>
-Message-ID: <7f2228c4-1586-2934-7b92-1a9d23b6046@google.com>
-References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-22-michael.roth@amd.com>
+        Thu, 15 Dec 2022 01:39:34 -0500
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72FB04666F;
+        Wed, 14 Dec 2022 22:39:33 -0800 (PST)
+Received: from pps.filterd (m0148664.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BF4NmK2019951;
+        Thu, 15 Dec 2022 06:39:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pps0720;
+ bh=bMZz3ogq7xp78XE+RPxado7j16RTnLC9xdcSvwwG144=;
+ b=gOCXf/3UFNf/s7VHiU3ThM76RagyGVuKwd3BGiTild05d1GX239rWDIaZhSFah6rYdL6
+ Dg8XHTDMQwAQea4r7J+Fh1mQ7DL6N3HzZYNMUYLBEw5hMPHdLrmuJkgSWXo46I5c7FpL
+ a3IoPWCuZizYE5CYQnKf8OY6/P/mOyPpCTgPMqpDH56YzEGTuaenskX/nD51JLNvagNI
+ 2erHonQP2pmXT6zPKYPqPAsZgNVL8JsNgt6+jJ4exsQwwgXl1Tr2WPDMDwPxWmsC+bmg
+ 8E2NgxnmK2fq05+O1xkXCj7+OJmerRid9UoGKEXi1wvYdK1WaVk8QtA7EhALsUZLQobs nA== 
+Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3mfvgj0smp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 06:39:26 +0000
+Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 3F393807130;
+        Thu, 15 Dec 2022 06:39:26 +0000 (UTC)
+Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
+        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id 9680880BE0E;
+        Thu, 15 Dec 2022 06:39:24 +0000 (UTC)
+From:   Robert Elliott <elliott@hpe.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Robert Elliott <elliott@hpe.com>
+Subject: [PATCH 0/8] crypto: kernel-doc for assembly language
+Date:   Thu, 15 Dec 2022 00:38:49 -0600
+Message-Id: <20221215063857.161665-1-elliott@hpe.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: 6LDG-wbVDkSAbm-1bHmkrSWym1RedlMG
+X-Proofpoint-GUID: 6LDG-wbVDkSAbm-1bHmkrSWym1RedlMG
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-15_02,2022-12-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ spamscore=0 malwarescore=0 impostorscore=0 bulkscore=0 clxscore=1015
+ mlxlogscore=999 adultscore=0 phishscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212150050
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 14 Dec 2022, Michael Roth wrote:
-> From: Hugh Dickins <hughd@google.com>
-> 
-> When the address is backed by a memfd, the code to split the page does
-> nothing more than remove the PMD from the page tables. So immediately
-> install a PTE to ensure that any other pages in that 2MB region are
-> brought back as in 4K pages.
-> 
-> Signed-off-by: Hugh Dickins <hughd@google.com>
-> Cc: Hugh Dickins <hughd@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+Clean up the existing kernel-doc headers in the crypto subsystem,
+then add support for kernel-doc headers in assembly language files
+for functions called from C code.
 
-Hah, it's good to see this again, but it was "Suggested-by" me, not
-"Signed-off-by" me.  And was a neat pragmatic one-liner workaround
-for the immediate problem we had, but came with caveats.
+This provides a place to document the assumptions made by the
+assembly language functions about their arguments (e.g., how
+they handle length values of 0, less than some value, not
+multiples of some value, etc.).
 
-The problem is that we have one wind blowing in the split direction,
-and another wind (khugepaged) blowing in the collapse direction, and
-who wins for how long depends on factors I've not fully got to grips
-with (and is liable to differ between kernel releases).
+Not all the assembly language files are tackled yet - just some
+of the x86 files pending changes related to kernel_fpu_begin/end.
 
-Good and bad timing to see it.  I was just yesterday reviewing a patch
-to the collapsing wind, which reminded me of an improvement yet to be
-made there, thinking I'd like to try it sometime; but recallng that
-someone somewhere relies on the splitting wind, and doesn't want the
-collapsing wind to blow any harder - now you remind me who!
+Example man page formatted output for one of them:
+---
+$ nroff -man /tmp/man/sha1_transform_avx2.9
+sha1_transform_avx2(9)      Kernel Hacker's Manual      sha1_transform_avx2(9)
 
-Bad timing in that I don't have any quick answer on the right thing
-to do instead, and can't give it the thought it needs at the moment -
-perhaps others can chime in more usefully.
 
-Hugh
 
-p.s. I don't know where "handle_split_page_fault" comes in, but
-"x86/fault" in the subject looks wrong, since this appears to be
-in generic code; and "memfd" seems inappropriate too, but perhaps you
-have a situation where only memfds can reach handle_split_page_fault().
+NAME
+       sha1_transform_avx2  -  Calculate  SHA1 hash using the x86 AVX2 feature
+       set
 
-> ---
->  mm/memory.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index e68da7e403c6..33c9020ba1f8 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -4999,6 +4999,11 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->  static int handle_split_page_fault(struct vm_fault *vmf)
->  {
->  	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-> +	/*
-> +	 * Install a PTE immediately to ensure that any other pages in
-> +	 * this 2MB region are brought back in as 4K pages.
-> +	 */
-> +	__pte_alloc(vmf->vma->vm_mm, vmf->pmd);
->  	return 0;
->  }
->  
-> -- 
-> 2.25.1
+SYNOPSIS
+       void sha1_transform_avx2 (u32 *digest , const u8 *data , int blocks );
+
+ARGUMENTS
+       digest      address of current 20-byte hash value (rdi, CTX macro)
+
+       data        address of data (rsi, BUF macro); data size must be a mul‐
+                   tiple of 64 bytes
+
+       blocks      number of 64-byte blocks (rdx, CNT macro)
+
+DESCRIPTION
+       This function supports 64-bit CPUs.
+
+RETURN
+       none
+
+PROTOTYPE
+       asmlinkage  void  sha1_transform_avx2(u32  *digest, const u8 *data, int
+       blocks)
+
+
+
+December 2022                 sha1_transform_avx2 sha1_transform_avx2(9)
+
+
+
+Robert Elliott (8):
+  crypto: clean up kernel-doc headers
+  doc: support kernel-doc for asm functions
+  crypto: x86/sha - add kernel-doc comments to assembly
+  crypto: x86/crc - add kernel-doc comments to assembly
+  crypto: x86/sm3 - add kernel-doc comments to assembly
+  crypto: x86/ghash - add kernel-doc comments to assembly
+  crypto: x86/blake2s - add kernel-doc comments to assembly
+  crypto: x86/chacha - add kernel-doc comments to assembly
+
+ .../mips/cavium-octeon/crypto/octeon-crypto.c | 19 ++--
+ arch/x86/crypto/blake2s-core.S                | 26 +++++
+ arch/x86/crypto/chacha-avx2-x86_64.S          | 90 ++++++++++++------
+ arch/x86/crypto/chacha-avx512vl-x86_64.S      | 94 ++++++++++++-------
+ arch/x86/crypto/chacha-ssse3-x86_64.S         | 75 ++++++++++-----
+ arch/x86/crypto/crc32-pclmul_asm.S            | 24 ++---
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S     | 29 +++---
+ arch/x86/crypto/crct10dif-pcl-asm_64.S        | 24 +++--
+ arch/x86/crypto/ghash-clmulni-intel_asm.S     | 27 +++++-
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S        | 32 +++----
+ arch/x86/crypto/sha1_ni_asm.S                 | 22 +++--
+ arch/x86/crypto/sha1_ssse3_asm.S              | 33 ++++---
+ arch/x86/crypto/sha256-avx-asm.S              | 24 +++--
+ arch/x86/crypto/sha256-avx2-asm.S             | 25 +++--
+ arch/x86/crypto/sha256-ssse3-asm.S            | 26 ++---
+ arch/x86/crypto/sha256_ni_asm.S               | 25 ++---
+ arch/x86/crypto/sha512-avx-asm.S              | 33 +++----
+ arch/x86/crypto/sha512-avx2-asm.S             | 34 +++----
+ arch/x86/crypto/sha512-ssse3-asm.S            | 36 ++++---
+ arch/x86/crypto/sm3-avx-asm_64.S              | 18 ++--
+ crypto/asymmetric_keys/verify_pefile.c        |  2 +-
+ crypto/async_tx/async_pq.c                    | 11 +--
+ crypto/async_tx/async_tx.c                    |  4 +-
+ crypto/crypto_engine.c                        |  2 +-
+ include/crypto/acompress.h                    |  2 +-
+ include/crypto/des.h                          |  4 +-
+ include/crypto/if_alg.h                       | 26 ++---
+ include/crypto/internal/ecc.h                 |  8 +-
+ include/crypto/internal/rsa.h                 |  2 +-
+ include/crypto/kdf_sp800108.h                 | 39 ++++----
+ scripts/kernel-doc                            | 48 +++++++++-
+ 31 files changed, 545 insertions(+), 319 deletions(-)
+
+-- 
+2.38.1
+
