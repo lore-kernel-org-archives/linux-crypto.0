@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD42C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB44C10F1B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232723AbiLSPqE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 10:46:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58896 "EHLO
+        id S232750AbiLSPqH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 10:46:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbiLSPpc (ORCPT
+        with ESMTP id S232326AbiLSPpc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 19 Dec 2022 10:45:32 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E163213DD2;
-        Mon, 19 Dec 2022 07:44:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85C513F40;
+        Mon, 19 Dec 2022 07:44:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=VyG6+KQHCAeEAEZCgwKflnVjYNYIFWnZVnfAizA2/bE=; b=NqSBQbzryBnwzMj3labGO28WSb
-        quzx6A9NfDQvDGTMNaYKgoRnyRUPk/0ZV0HRzLNgd0QaUSHHdy9ExheW59YszMfkZx2eJzA0Jw7IE
-        KJ8WTQlyNLQ7fegq1TKrzmKFARPbUxxzfEwlpKbXKnfFGgb5HQqA7OcVdOlW8i0cS1t52gCWWWqLq
-        vjQv/pV3D7/lEoWP1dlDrTXGviFlBsD9SdchGgkPkK22C30RrLQ+KtHO5B/vDLjERdNHN/pQxx5bh
-        55vB5bLPYMlwd0IhuA3ktroYepp0Vs2J0cA+Eq1Qa5T2hrta8CvnaPvG0Rm050p9k9MdD6UqiVmqh
-        /SrKYdrA==;
+        bh=ezxvAyohFkyD0fBAJIL+qTrFeT/MhmgYOqNL8/CaLLo=; b=EpCbp6SSB82FBRpRL3WLFqa1er
+        fuzx4lpjiwMDgI2wDkjoqisa1rFP2utGhxIaOhxTrHCo7GVehas62q8lOrxKyUExkTPgH5qrJlgmD
+        mdLMP53s/UdjA6xFdacYlLwfmWKVGgN3FDnUJc+YE6QaSFx2faUMB9M6ycuS9i+QXaYo1GZ45IuFJ
+        MLKh2Lk5mUsf7UiRdYtCL6rq+w1NEEnIXm7NyWF8oPWx10GLQhHJOxBvnuKwjkt4yuS47GJYU3R22
+        p58A2Hq1aQJaVBZxqTlizmhlk3cfNJT7v4y+MhwyWx8cFLoCzjcwo0zOIMO0tcf6r9L03dJVuMEwy
+        eDeSbfPQ==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7IIT-000qwo-KD; Mon, 19 Dec 2022 15:43:21 +0000
+        id 1p7IIS-000qwb-OL; Mon, 19 Dec 2022 15:43:21 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0DD1B30328D;
-        Mon, 19 Dec 2022 16:43:10 +0100 (CET)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9FE0F300642;
+        Mon, 19 Dec 2022 16:43:06 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 7A18920B0F89D; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
-Message-ID: <20221219154119.220928704@infradead.org>
+        id 64DEF20B0F898; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
+Message-ID: <20221219154118.889543494@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 19 Dec 2022 16:35:31 +0100
+Date:   Mon, 19 Dec 2022 16:35:26 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -59,7 +59,7 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
         linux-arch@vger.kernel.org
-Subject: [RFC][PATCH 06/12] instrumentation: Wire up cmpxchg128()
+Subject: [RFC][PATCH 01/12] crypto: Remove u128 usage
 References: <20221219153525.632521981@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -67,272 +67,363 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Wire up the cmpxchg128 familty in the atomic wrappery scripts.
+As seems to be the common (majority) usage in crypto, use __uint128_t
+instead of u128.
 
-These provide the generic cmpxchg128 family of functions from the
-arch_ prefixed version, adding explicit instrumentation where needed.
+This frees up u128 for definition in linux/types.h.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- include/linux/atomic/atomic-arch-fallback.h |   95 +++++++++++++++++++++++++++-
- include/linux/atomic/atomic-instrumented.h  |   77 ++++++++++++++++++++++
- scripts/atomic/gen-atomic-fallback.sh       |    4 -
- scripts/atomic/gen-atomic-instrumented.sh   |    4 -
- 4 files changed, 174 insertions(+), 6 deletions(-)
+ lib/crypto/curve25519-hacl64.c |  142 ++++++++++++++++++++---------------------
+ lib/crypto/poly1305-donna64.c  |   22 ++----
+ 2 files changed, 80 insertions(+), 84 deletions(-)
 
---- a/include/linux/atomic/atomic-arch-fallback.h
-+++ b/include/linux/atomic/atomic-arch-fallback.h
-@@ -77,6 +77,29 @@
+--- a/lib/crypto/curve25519-hacl64.c
++++ b/lib/crypto/curve25519-hacl64.c
+@@ -14,8 +14,6 @@
+ #include <crypto/curve25519.h>
+ #include <linux/string.h>
  
- #endif /* arch_cmpxchg64_relaxed */
+-typedef __uint128_t u128;
+-
+ static __always_inline u64 u64_eq_mask(u64 a, u64 b)
+ {
+ 	u64 x = a ^ b;
+@@ -50,77 +48,77 @@ static __always_inline void modulo_carry
+ 	b[0] = b0_;
+ }
  
-+#ifndef arch_cmpxchg128_relaxed
-+#define arch_cmpxchg128_acquire arch_cmpxchg128
-+#define arch_cmpxchg128_release arch_cmpxchg128
-+#define arch_cmpxchg128_relaxed arch_cmpxchg128
-+#else /* arch_cmpxchg128_relaxed */
-+
-+#ifndef arch_cmpxchg128_acquire
-+#define arch_cmpxchg128_acquire(...) \
-+	__atomic_op_acquire(arch_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#ifndef arch_cmpxchg128_release
-+#define arch_cmpxchg128_release(...) \
-+	__atomic_op_release(arch_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#ifndef arch_cmpxchg128
-+#define arch_cmpxchg128(...) \
-+	__atomic_op_fence(arch_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#endif /* arch_cmpxchg128_relaxed */
-+
- #ifndef arch_try_cmpxchg_relaxed
- #ifdef arch_try_cmpxchg
- #define arch_try_cmpxchg_acquire arch_try_cmpxchg
-@@ -217,6 +240,76 @@
+-static __always_inline void fproduct_copy_from_wide_(u64 *output, u128 *input)
++static __always_inline void fproduct_copy_from_wide_(u64 *output, __uint128_t *input)
+ {
+ 	{
+-		u128 xi = input[0];
++		__uint128_t xi = input[0];
+ 		output[0] = ((u64)(xi));
+ 	}
+ 	{
+-		u128 xi = input[1];
++		__uint128_t xi = input[1];
+ 		output[1] = ((u64)(xi));
+ 	}
+ 	{
+-		u128 xi = input[2];
++		__uint128_t xi = input[2];
+ 		output[2] = ((u64)(xi));
+ 	}
+ 	{
+-		u128 xi = input[3];
++		__uint128_t xi = input[3];
+ 		output[3] = ((u64)(xi));
+ 	}
+ 	{
+-		u128 xi = input[4];
++		__uint128_t xi = input[4];
+ 		output[4] = ((u64)(xi));
+ 	}
+ }
  
- #endif /* arch_try_cmpxchg64_relaxed */
+ static __always_inline void
+-fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
++fproduct_sum_scalar_multiplication_(__uint128_t *output, u64 *input, u64 s)
+ {
+-	output[0] += (u128)input[0] * s;
+-	output[1] += (u128)input[1] * s;
+-	output[2] += (u128)input[2] * s;
+-	output[3] += (u128)input[3] * s;
+-	output[4] += (u128)input[4] * s;
++	output[0] += (__uint128_t)input[0] * s;
++	output[1] += (__uint128_t)input[1] * s;
++	output[2] += (__uint128_t)input[2] * s;
++	output[3] += (__uint128_t)input[3] * s;
++	output[4] += (__uint128_t)input[4] * s;
+ }
  
-+#ifndef arch_try_cmpxchg128_relaxed
-+#ifdef arch_try_cmpxchg128
-+#define arch_try_cmpxchg128_acquire arch_try_cmpxchg128
-+#define arch_try_cmpxchg128_release arch_try_cmpxchg128
-+#define arch_try_cmpxchg128_relaxed arch_try_cmpxchg128
-+#endif /* arch_try_cmpxchg128 */
-+
-+#ifndef arch_try_cmpxchg128
-+#define arch_try_cmpxchg128(_ptr, _oldp, _new) \
-+({ \
-+	typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
-+	___r = arch_cmpxchg128((_ptr), ___o, (_new)); \
-+	if (unlikely(___r != ___o)) \
-+		*___op = ___r; \
-+	likely(___r == ___o); \
-+})
-+#endif /* arch_try_cmpxchg128 */
-+
-+#ifndef arch_try_cmpxchg128_acquire
-+#define arch_try_cmpxchg128_acquire(_ptr, _oldp, _new) \
-+({ \
-+	typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
-+	___r = arch_cmpxchg128_acquire((_ptr), ___o, (_new)); \
-+	if (unlikely(___r != ___o)) \
-+		*___op = ___r; \
-+	likely(___r == ___o); \
-+})
-+#endif /* arch_try_cmpxchg128_acquire */
-+
-+#ifndef arch_try_cmpxchg128_release
-+#define arch_try_cmpxchg128_release(_ptr, _oldp, _new) \
-+({ \
-+	typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
-+	___r = arch_cmpxchg128_release((_ptr), ___o, (_new)); \
-+	if (unlikely(___r != ___o)) \
-+		*___op = ___r; \
-+	likely(___r == ___o); \
-+})
-+#endif /* arch_try_cmpxchg128_release */
-+
-+#ifndef arch_try_cmpxchg128_relaxed
-+#define arch_try_cmpxchg128_relaxed(_ptr, _oldp, _new) \
-+({ \
-+	typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
-+	___r = arch_cmpxchg128_relaxed((_ptr), ___o, (_new)); \
-+	if (unlikely(___r != ___o)) \
-+		*___op = ___r; \
-+	likely(___r == ___o); \
-+})
-+#endif /* arch_try_cmpxchg128_relaxed */
-+
-+#else /* arch_try_cmpxchg128_relaxed */
-+
-+#ifndef arch_try_cmpxchg128_acquire
-+#define arch_try_cmpxchg128_acquire(...) \
-+	__atomic_op_acquire(arch_try_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#ifndef arch_try_cmpxchg128_release
-+#define arch_try_cmpxchg128_release(...) \
-+	__atomic_op_release(arch_try_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#ifndef arch_try_cmpxchg128
-+#define arch_try_cmpxchg128(...) \
-+	__atomic_op_fence(arch_try_cmpxchg128, __VA_ARGS__)
-+#endif
-+
-+#endif /* arch_try_cmpxchg128_relaxed */
-+
- #ifndef arch_atomic_read_acquire
- static __always_inline int
- arch_atomic_read_acquire(const atomic_t *v)
-@@ -2456,4 +2549,4 @@ arch_atomic64_dec_if_positive(atomic64_t
- #endif
+-static __always_inline void fproduct_carry_wide_(u128 *tmp)
++static __always_inline void fproduct_carry_wide_(__uint128_t *tmp)
+ {
+ 	{
+ 		u32 ctr = 0;
+-		u128 tctr = tmp[ctr];
+-		u128 tctrp1 = tmp[ctr + 1];
++		__uint128_t tctr = tmp[ctr];
++		__uint128_t tctrp1 = tmp[ctr + 1];
+ 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
+-		u128 c = ((tctr) >> (51));
+-		tmp[ctr] = ((u128)(r0));
++		__uint128_t c = ((tctr) >> (51));
++		tmp[ctr] = ((__uint128_t)(r0));
+ 		tmp[ctr + 1] = ((tctrp1) + (c));
+ 	}
+ 	{
+ 		u32 ctr = 1;
+-		u128 tctr = tmp[ctr];
+-		u128 tctrp1 = tmp[ctr + 1];
++		__uint128_t tctr = tmp[ctr];
++		__uint128_t tctrp1 = tmp[ctr + 1];
+ 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
+-		u128 c = ((tctr) >> (51));
+-		tmp[ctr] = ((u128)(r0));
++		__uint128_t c = ((tctr) >> (51));
++		tmp[ctr] = ((__uint128_t)(r0));
+ 		tmp[ctr + 1] = ((tctrp1) + (c));
+ 	}
  
- #endif /* _LINUX_ATOMIC_FALLBACK_H */
--// b5e87bdd5ede61470c29f7a7e4de781af3770f09
-+// 46357a526de89c762d30fb238f35a7d5950a670b
---- a/include/linux/atomic/atomic-instrumented.h
-+++ b/include/linux/atomic/atomic-instrumented.h
-@@ -1968,6 +1968,36 @@ atomic_long_dec_if_positive(atomic_long_
- 	arch_cmpxchg64_relaxed(__ai_ptr, __VA_ARGS__); \
- })
+ 	{
+ 		u32 ctr = 2;
+-		u128 tctr = tmp[ctr];
+-		u128 tctrp1 = tmp[ctr + 1];
++		__uint128_t tctr = tmp[ctr];
++		__uint128_t tctrp1 = tmp[ctr + 1];
+ 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
+-		u128 c = ((tctr) >> (51));
+-		tmp[ctr] = ((u128)(r0));
++		__uint128_t c = ((tctr) >> (51));
++		tmp[ctr] = ((__uint128_t)(r0));
+ 		tmp[ctr + 1] = ((tctrp1) + (c));
+ 	}
+ 	{
+ 		u32 ctr = 3;
+-		u128 tctr = tmp[ctr];
+-		u128 tctrp1 = tmp[ctr + 1];
++		__uint128_t tctr = tmp[ctr];
++		__uint128_t tctrp1 = tmp[ctr + 1];
+ 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
+-		u128 c = ((tctr) >> (51));
+-		tmp[ctr] = ((u128)(r0));
++		__uint128_t c = ((tctr) >> (51));
++		tmp[ctr] = ((__uint128_t)(r0));
+ 		tmp[ctr + 1] = ((tctrp1) + (c));
+ 	}
+ }
+@@ -154,7 +152,7 @@ static __always_inline void fmul_shift_r
+ 	output[0] = 19 * b0;
+ }
  
-+#define cmpxchg128(ptr, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	kcsan_mb(); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	arch_cmpxchg128(__ai_ptr, __VA_ARGS__); \
-+})
-+
-+#define cmpxchg128_acquire(ptr, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	arch_cmpxchg128_acquire(__ai_ptr, __VA_ARGS__); \
-+})
-+
-+#define cmpxchg128_release(ptr, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	kcsan_release(); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	arch_cmpxchg128_release(__ai_ptr, __VA_ARGS__); \
-+})
-+
-+#define cmpxchg128_relaxed(ptr, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	arch_cmpxchg128_relaxed(__ai_ptr, __VA_ARGS__); \
-+})
-+
- #define try_cmpxchg(ptr, oldp, ...) \
- ({ \
- 	typeof(ptr) __ai_ptr = (ptr); \
-@@ -2044,6 +2074,44 @@ atomic_long_dec_if_positive(atomic_long_
- 	arch_try_cmpxchg64_relaxed(__ai_ptr, __ai_oldp, __VA_ARGS__); \
- })
+-static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input,
++static __always_inline void fmul_mul_shift_reduce_(__uint128_t *output, u64 *input,
+ 						   u64 *input21)
+ {
+ 	u32 i;
+@@ -188,21 +186,21 @@ static __always_inline void fmul_fmul(u6
+ {
+ 	u64 tmp[5] = { input[0], input[1], input[2], input[3], input[4] };
+ 	{
+-		u128 b4;
+-		u128 b0;
+-		u128 b4_;
+-		u128 b0_;
++		__uint128_t b4;
++		__uint128_t b0;
++		__uint128_t b4_;
++		__uint128_t b0_;
+ 		u64 i0;
+ 		u64 i1;
+ 		u64 i0_;
+ 		u64 i1_;
+-		u128 t[5] = { 0 };
++		__uint128_t t[5] = { 0 };
+ 		fmul_mul_shift_reduce_(t, tmp, input21);
+ 		fproduct_carry_wide_(t);
+ 		b4 = t[4];
+ 		b0 = t[0];
+-		b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
+-		b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++		b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
++		b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
+ 		t[4] = b4_;
+ 		t[0] = b0_;
+ 		fproduct_copy_from_wide_(output, t);
+@@ -215,7 +213,7 @@ static __always_inline void fmul_fmul(u6
+ 	}
+ }
  
-+#define try_cmpxchg128(ptr, oldp, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	typeof(oldp) __ai_oldp = (oldp); \
-+	kcsan_mb(); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	instrument_atomic_write(__ai_oldp, sizeof(*__ai_oldp)); \
-+	arch_try_cmpxchg128(__ai_ptr, __ai_oldp, __VA_ARGS__); \
-+})
-+
-+#define try_cmpxchg128_acquire(ptr, oldp, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	typeof(oldp) __ai_oldp = (oldp); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	instrument_atomic_write(__ai_oldp, sizeof(*__ai_oldp)); \
-+	arch_try_cmpxchg128_acquire(__ai_ptr, __ai_oldp, __VA_ARGS__); \
-+})
-+
-+#define try_cmpxchg128_release(ptr, oldp, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	typeof(oldp) __ai_oldp = (oldp); \
-+	kcsan_release(); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	instrument_atomic_write(__ai_oldp, sizeof(*__ai_oldp)); \
-+	arch_try_cmpxchg128_release(__ai_ptr, __ai_oldp, __VA_ARGS__); \
-+})
-+
-+#define try_cmpxchg128_relaxed(ptr, oldp, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	typeof(oldp) __ai_oldp = (oldp); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	instrument_atomic_write(__ai_oldp, sizeof(*__ai_oldp)); \
-+	arch_try_cmpxchg128_relaxed(__ai_ptr, __ai_oldp, __VA_ARGS__); \
-+})
-+
- #define cmpxchg_local(ptr, ...) \
- ({ \
- 	typeof(ptr) __ai_ptr = (ptr); \
-@@ -2058,6 +2126,13 @@ atomic_long_dec_if_positive(atomic_long_
- 	arch_cmpxchg64_local(__ai_ptr, __VA_ARGS__); \
- })
+-static __always_inline void fsquare_fsquare__(u128 *tmp, u64 *output)
++static __always_inline void fsquare_fsquare__(__uint128_t *tmp, u64 *output)
+ {
+ 	u64 r0 = output[0];
+ 	u64 r1 = output[1];
+@@ -227,16 +225,16 @@ static __always_inline void fsquare_fsqu
+ 	u64 d2 = r2 * 2 * 19;
+ 	u64 d419 = r4 * 19;
+ 	u64 d4 = d419 * 2;
+-	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) +
+-		   (((u128)(d2) * (r3))));
+-	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) +
+-		   (((u128)(r3 * 19) * (r3))));
+-	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) +
+-		   (((u128)(d4) * (r3))));
+-	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) +
+-		   (((u128)(r4) * (d419))));
+-	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) +
+-		   (((u128)(r2) * (r2))));
++	__uint128_t s0 = ((((((__uint128_t)(r0) * (r0))) + (((__uint128_t)(d4) * (r1))))) +
++		   (((__uint128_t)(d2) * (r3))));
++	__uint128_t s1 = ((((((__uint128_t)(d0) * (r1))) + (((__uint128_t)(d4) * (r2))))) +
++		   (((__uint128_t)(r3 * 19) * (r3))));
++	__uint128_t s2 = ((((((__uint128_t)(d0) * (r2))) + (((__uint128_t)(r1) * (r1))))) +
++		   (((__uint128_t)(d4) * (r3))));
++	__uint128_t s3 = ((((((__uint128_t)(d0) * (r3))) + (((__uint128_t)(d1) * (r2))))) +
++		   (((__uint128_t)(r4) * (d419))));
++	__uint128_t s4 = ((((((__uint128_t)(d0) * (r4))) + (((__uint128_t)(d1) * (r3))))) +
++		   (((__uint128_t)(r2) * (r2))));
+ 	tmp[0] = s0;
+ 	tmp[1] = s1;
+ 	tmp[2] = s2;
+@@ -244,12 +242,12 @@ static __always_inline void fsquare_fsqu
+ 	tmp[4] = s4;
+ }
  
-+#define cmpxchg128_local(ptr, ...) \
-+({ \
-+	typeof(ptr) __ai_ptr = (ptr); \
-+	instrument_atomic_write(__ai_ptr, sizeof(*__ai_ptr)); \
-+	arch_cmpxchg128_local(__ai_ptr, __VA_ARGS__); \
-+})
-+
- #define sync_cmpxchg(ptr, ...) \
- ({ \
- 	typeof(ptr) __ai_ptr = (ptr); \
-@@ -2083,4 +2158,4 @@ atomic_long_dec_if_positive(atomic_long_
- })
+-static __always_inline void fsquare_fsquare_(u128 *tmp, u64 *output)
++static __always_inline void fsquare_fsquare_(__uint128_t *tmp, u64 *output)
+ {
+-	u128 b4;
+-	u128 b0;
+-	u128 b4_;
+-	u128 b0_;
++	__uint128_t b4;
++	__uint128_t b0;
++	__uint128_t b4_;
++	__uint128_t b0_;
+ 	u64 i0;
+ 	u64 i1;
+ 	u64 i0_;
+@@ -258,8 +256,8 @@ static __always_inline void fsquare_fsqu
+ 	fproduct_carry_wide_(tmp);
+ 	b4 = tmp[4];
+ 	b0 = tmp[0];
+-	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
+-	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++	b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
++	b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
+ 	tmp[4] = b4_;
+ 	tmp[0] = b0_;
+ 	fproduct_copy_from_wide_(output, tmp);
+@@ -271,7 +269,7 @@ static __always_inline void fsquare_fsqu
+ 	output[1] = i1_;
+ }
  
- #endif /* _LINUX_ATOMIC_INSTRUMENTED_H */
--// 764f741eb77a7ad565dc8d99ce2837d5542e8aee
-+// 27320c1ec2bf2878ecb9df3ea4816a7bc0c57a52
---- a/scripts/atomic/gen-atomic-fallback.sh
-+++ b/scripts/atomic/gen-atomic-fallback.sh
-@@ -217,11 +217,11 @@ cat << EOF
+-static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp,
++static __always_inline void fsquare_fsquare_times_(u64 *output, __uint128_t *tmp,
+ 						   u32 count1)
+ {
+ 	u32 i;
+@@ -283,7 +281,7 @@ static __always_inline void fsquare_fsqu
+ static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input,
+ 						  u32 count1)
+ {
+-	u128 t[5];
++	__uint128_t t[5];
+ 	memcpy(output, input, 5 * sizeof(*input));
+ 	fsquare_fsquare_times_(output, t, count1);
+ }
+@@ -291,7 +289,7 @@ static __always_inline void fsquare_fsqu
+ static __always_inline void fsquare_fsquare_times_inplace(u64 *output,
+ 							  u32 count1)
+ {
+-	u128 t[5];
++	__uint128_t t[5];
+ 	fsquare_fsquare_times_(output, t, count1);
+ }
  
- EOF
+@@ -396,36 +394,36 @@ static __always_inline void fdifference(
  
--for xchg in "arch_xchg" "arch_cmpxchg" "arch_cmpxchg64"; do
-+for xchg in "arch_xchg" "arch_cmpxchg" "arch_cmpxchg64" "arch_cmpxchg128"; do
- 	gen_xchg_fallbacks "${xchg}"
- done
+ static __always_inline void fscalar(u64 *output, u64 *b, u64 s)
+ {
+-	u128 tmp[5];
+-	u128 b4;
+-	u128 b0;
+-	u128 b4_;
+-	u128 b0_;
++	__uint128_t tmp[5];
++	__uint128_t b4;
++	__uint128_t b0;
++	__uint128_t b4_;
++	__uint128_t b0_;
+ 	{
+ 		u64 xi = b[0];
+-		tmp[0] = ((u128)(xi) * (s));
++		tmp[0] = ((__uint128_t)(xi) * (s));
+ 	}
+ 	{
+ 		u64 xi = b[1];
+-		tmp[1] = ((u128)(xi) * (s));
++		tmp[1] = ((__uint128_t)(xi) * (s));
+ 	}
+ 	{
+ 		u64 xi = b[2];
+-		tmp[2] = ((u128)(xi) * (s));
++		tmp[2] = ((__uint128_t)(xi) * (s));
+ 	}
+ 	{
+ 		u64 xi = b[3];
+-		tmp[3] = ((u128)(xi) * (s));
++		tmp[3] = ((__uint128_t)(xi) * (s));
+ 	}
+ 	{
+ 		u64 xi = b[4];
+-		tmp[4] = ((u128)(xi) * (s));
++		tmp[4] = ((__uint128_t)(xi) * (s));
+ 	}
+ 	fproduct_carry_wide_(tmp);
+ 	b4 = tmp[4];
+ 	b0 = tmp[0];
+-	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
+-	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++	b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
++	b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
+ 	tmp[4] = b4_;
+ 	tmp[0] = b0_;
+ 	fproduct_copy_from_wide_(output, tmp);
+--- a/lib/crypto/poly1305-donna64.c
++++ b/lib/crypto/poly1305-donna64.c
+@@ -10,8 +10,6 @@
+ #include <asm/unaligned.h>
+ #include <crypto/internal/poly1305.h>
  
--for cmpxchg in "cmpxchg" "cmpxchg64"; do
-+for cmpxchg in "cmpxchg" "cmpxchg64" "cmpxchg128"; do
- 	gen_try_cmpxchg_fallbacks "${cmpxchg}"
- done
+-typedef __uint128_t u128;
+-
+ void poly1305_core_setkey(struct poly1305_core_key *key,
+ 			  const u8 raw_key[POLY1305_BLOCK_SIZE])
+ {
+@@ -41,7 +39,7 @@ void poly1305_core_blocks(struct poly130
+ 	u64 s1, s2;
+ 	u64 h0, h1, h2;
+ 	u64 c;
+-	u128 d0, d1, d2, d;
++	__uint128_t d0, d1, d2, d;
  
---- a/scripts/atomic/gen-atomic-instrumented.sh
-+++ b/scripts/atomic/gen-atomic-instrumented.sh
-@@ -166,14 +166,14 @@ grep '^[a-z]' "$1" | while read name met
- done
+ 	if (!nblocks)
+ 		return;
+@@ -71,20 +69,20 @@ void poly1305_core_blocks(struct poly130
+ 		h2 += (((t1 >> 24)) & 0x3ffffffffffULL) | hibit64;
  
+ 		/* h *= r */
+-		d0 = (u128)h0 * r0;
+-		d = (u128)h1 * s2;
++		d0 = (__uint128_t)h0 * r0;
++		d = (__uint128_t)h1 * s2;
+ 		d0 += d;
+-		d = (u128)h2 * s1;
++		d = (__uint128_t)h2 * s1;
+ 		d0 += d;
+-		d1 = (u128)h0 * r1;
+-		d = (u128)h1 * r0;
++		d1 = (__uint128_t)h0 * r1;
++		d = (__uint128_t)h1 * r0;
+ 		d1 += d;
+-		d = (u128)h2 * s2;
++		d = (__uint128_t)h2 * s2;
+ 		d1 += d;
+-		d2 = (u128)h0 * r2;
+-		d = (u128)h1 * r1;
++		d2 = (__uint128_t)h0 * r2;
++		d = (__uint128_t)h1 * r1;
+ 		d2 += d;
+-		d = (u128)h2 * r0;
++		d = (__uint128_t)h2 * r0;
+ 		d2 += d;
  
--for xchg in "xchg" "cmpxchg" "cmpxchg64" "try_cmpxchg" "try_cmpxchg64"; do
-+for xchg in "xchg" "cmpxchg" "cmpxchg64" "cmpxchg128" "try_cmpxchg" "try_cmpxchg64" "try_cmpxchg128"; do
- 	for order in "" "_acquire" "_release" "_relaxed"; do
- 		gen_xchg "${xchg}" "${order}" ""
- 		printf "\n"
- 	done
- done
- 
--for xchg in "cmpxchg_local" "cmpxchg64_local" "sync_cmpxchg"; do
-+for xchg in "cmpxchg_local" "cmpxchg64_local" "cmpxchg128_local" "sync_cmpxchg"; do
- 	gen_xchg "${xchg}" "" ""
- 	printf "\n"
- done
+ 		/* (partial) h %= p */
 
 
