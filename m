@@ -2,433 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABC9C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 18:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0FFC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 20:07:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232701AbiLSS47 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 13:56:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58406 "EHLO
+        id S232512AbiLSUHy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 15:07:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232577AbiLSS4W (ORCPT
+        with ESMTP id S231860AbiLSUHx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 13:56:22 -0500
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9058264D;
-        Mon, 19 Dec 2022 10:56:17 -0800 (PST)
-Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJH3eE0014442;
-        Mon, 19 Dec 2022 18:56:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pps0720;
- bh=IJh7WEYxyt2LrgouyYo+ovdw+Y2aJpHTxe4DsSblkuA=;
- b=ku3eZm2llxIgEmCXQ88zUqgbZb7seweRnPVTJUBDolLhvz6sWBiOCIP4hRhhFdRgp6wS
- e4FXhEE5Va2mU2Ns1GBi3B4Tf1vL1lJ7N9qKpYZpJlUbQEZ3UAwt4bNhXw1m3fzd4ffT
- gEFNTNihIviVpQ74Z2R0Bpn3v3zn9Zob1rZANjg5OiQSRxqwlXYExWMg46bRVzKvfcQw
- EE0eTcdneUG26QKkpMsTqEbi2V224chXA3dy0tcfwjMyDV7FMH4mKLRqcv2h84pZjvSt
- qPtb1e9/rIlsam4oy7QQpdLfKB7qXJWU4gvzxoL2soH57NCepkrbNy7KoXnYpAM7Xb/b TQ== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3mjv170rvx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Dec 2022 18:56:15 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id BBDCF807122;
-        Mon, 19 Dec 2022 18:56:14 +0000 (UTC)
-Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 6AC358064AD;
-        Mon, 19 Dec 2022 18:56:14 +0000 (UTC)
-From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Robert Elliott <elliott@hpe.com>
-Subject: [PATCH v2 8/8] crypto: x86/chacha - add kernel-doc comments to assembly
-Date:   Mon, 19 Dec 2022 12:55:55 -0600
-Message-Id: <20221219185555.433233-9-elliott@hpe.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221219185555.433233-1-elliott@hpe.com>
-References: <20221215063857.161665-1-elliott@hpe.com>
- <20221219185555.433233-1-elliott@hpe.com>
+        Mon, 19 Dec 2022 15:07:53 -0500
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A951401D;
+        Mon, 19 Dec 2022 12:07:47 -0800 (PST)
+Received: by mail-vs1-xe2d.google.com with SMTP id d185so9899363vsd.0;
+        Mon, 19 Dec 2022 12:07:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aYnmq6YUKA20HwARN8JDq4iYCZXHUrcLPE+3+zJtSe8=;
+        b=i7/Vm7xSYqsqXh54mibJCti0pLzVoIhTVNddh7lRN0PaJyiiHTO4Z7mude3UV0x7sH
+         o9qJhBr1EMi3JrKMpCs8dfVw1tDc8LEX5bz5p4JfoIu+Ubfgmh2KLFsiyDsdN9LK5h9S
+         aOXB8UnDWohgvlcqIRFBfBQRnsKw2VLOyjNl8v1FOkym3DleDRlleC7/ecr0ObQkq0/d
+         bX+25KX8LYxq8C5hEy9LaOcjKyOoSGx0GHzfLt5aim0Q4EAjFbBFvrr2SGp/9bk59SVq
+         y5UjOIAs6LYPpNHdRv8bg+UukznF+pTPetGwYEAkB5Zy/z1/A4C87gLx8VgzW2iGo+wI
+         rU4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aYnmq6YUKA20HwARN8JDq4iYCZXHUrcLPE+3+zJtSe8=;
+        b=JnueslVNmEQgvLo2CY3Jp2HyptB7HD+BYfFtQOs+8QXkUnpQHHAzwLwpCuvzVWl7W8
+         is18xxZLhtGpmEKncuI7neSjk/se9NP9enePHx0UmdJ+7OUDRK8TVqbqP780lnP21loS
+         vyGJbRljZ61aj+cefsWC3nPlSKLYCgv8lgxAP6PAGW3GUnpno17ay29G0XigoTlmr7zI
+         haL/cFAwJ5WId7IriOHwegV6DZ/Ijttf04nER9bJODcVYG8WD2HoP+3P2e4KngdnabYJ
+         Zh8/yEDg7DBSGRHSparA72NA11mYPMH2WRJDqMK3u8KpglOMGOkCYMoRx+XrEkGXl3hg
+         H3IA==
+X-Gm-Message-State: AFqh2kotILl18my3PCpdXMDuvFABhI0du86GYf9gel0FnNOByc8xXI66
+        OkJiui55AA4YVHevrcLEnpI=
+X-Google-Smtp-Source: AMrXdXsDzqfCRNTjjkXS9BQJxwqeAJtBOMlBh19EFdlQeLXBnuR5h323MBGGcxoDg51DibTTYx3UBQ==
+X-Received: by 2002:a67:ce0f:0:b0:3b1:2b40:5213 with SMTP id s15-20020a67ce0f000000b003b12b405213mr3344235vsl.18.1671480466748;
+        Mon, 19 Dec 2022 12:07:46 -0800 (PST)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id f19-20020a05620a15b300b006ce9e880c6fsm7411568qkk.111.2022.12.19.12.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Dec 2022 12:07:45 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 03F3527C0054;
+        Mon, 19 Dec 2022 15:07:44 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Mon, 19 Dec 2022 15:07:45 -0500
+X-ME-Sender: <xms:jsSgY0ojvLm7TIu-u2TE2uN8iclnqUtfCMI_16BTaJMdWGvfFYTZ7A>
+    <xme:jsSgY6qe_Ri5glkk5NoXAIucmMxftcKH1ppeLs9jyapeQdmxFjBdIAjGRcSu7JaD_
+    MecFZeM1QcC8TxNzQ>
+X-ME-Received: <xmr:jsSgY5OioSgk_BcF-aXVqU4BSBJo2Avgay0Xy9QY1Y5H7kg3RJq7gDnz7Xo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeefgddutdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
+    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
+    htthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleeivedtgeeuhfegueeviedu
+    ffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
+    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
+    igmhgvrdhnrghmvg
+X-ME-Proxy: <xmx:jsSgY762SSN7v6Pzv-VGd87-2abzx7dDKC9XIdbQqzAY2xxHqZuKMQ>
+    <xmx:jsSgYz5H_be3042jrN2GTBQ1QHozCQlIecQ4gj_N6JUpRt_6oHxloA>
+    <xmx:jsSgY7il59bocHi9-VrNS7BZ7WlKqYJ17MAffEn8q2HktZgl_uFmog>
+    <xmx:kMSgY54Eevnn0AieiuJIS2E7QOAoD7TTwJ-HVt0MktSpliy60jajy7YwtGc>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 19 Dec 2022 15:07:41 -0500 (EST)
+Date:   Mon, 19 Dec 2022 12:07:25 -0800
+From:   Boqun Feng <boqun.feng@gmail.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        mark.rutland@arm.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 05/12] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y6DEfQXymYVgL3oJ@boqun-archlinux>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.154045458@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 3a4WsJCDQ_jYkFaBiyCNr1VA5FUx6oIm
-X-Proofpoint-GUID: 3a4WsJCDQ_jYkFaBiyCNr1VA5FUx6oIm
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-19_01,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- impostorscore=0 adultscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=999 priorityscore=1501 phishscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212190168
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221219154119.154045458@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add kernel-doc comments for assembly language functions exported to
-C glue code.
+On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
+> For all architectures that currently support cmpxchg_double()
+> implement the cmpxchg128() family of functions that is basically the
+> same but with a saner interface.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
+>  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
+>  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+>  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
+>  arch/x86/include/asm/cmpxchg_32.h     |    3 +
+>  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+>  6 files changed, 185 insertions(+), 3 deletions(-)
+> 
+> --- a/arch/arm64/include/asm/atomic_ll_sc.h
+> +++ b/arch/arm64/include/asm/atomic_ll_sc.h
+> @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+>  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
+>  
+>  #undef __CMPXCHG_DBL
+> +
+> +union __u128_halves {
+> +	u128 full;
+> +	struct {
+> +		u64 low, high;
+> +	};
+> +};
+> +
+> +#define __CMPXCHG128(name, mb, rel, cl)					\
+> +static __always_inline u128						\
+> +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
+> +{									\
+> +	union __u128_halves r, o = { .full = (old) },			\
+> +			       n = { .full = (new) };			\
+> +									\
+> +	asm volatile("// __cmpxchg128" #name "\n"			\
+> +	"	prfm	pstl1strm, %2\n"				\
+> +	"1:	ldxp	%0, %1, %2\n"					\
+> +	"	eor	%3, %0, %3\n"					\
+> +	"	eor	%4, %1, %4\n"					\
+> +	"	orr	%3, %4, %3\n"					\
+> +	"	cbnz	%3, 2f\n"					\
+> +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
+> +	"	cbnz	%w3, 1b\n"					\
+> +	"	" #mb "\n"						\
+> +	"2:"								\
+> +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
 
-Signed-off-by: Robert Elliott <elliott@hpe.com>
----
- arch/x86/crypto/chacha-avx2-x86_64.S     | 90 +++++++++++++++--------
- arch/x86/crypto/chacha-avx512vl-x86_64.S | 94 +++++++++++++++---------
- arch/x86/crypto/chacha-ssse3-x86_64.S    | 75 ++++++++++++-------
- 3 files changed, 170 insertions(+), 89 deletions(-)
+I wonder whether we should use "(*(u128 *)ptr)" instead of "(*(unsigned
+long *) ptr)"? Because compilers may think only 64bit value pointed by
+"ptr" gets modified, and they are allowed to do "useful" optimization.
 
-diff --git a/arch/x86/crypto/chacha-avx2-x86_64.S b/arch/x86/crypto/chacha-avx2-x86_64.S
-index f3d8fc018249..5ebced6f32c3 100644
---- a/arch/x86/crypto/chacha-avx2-x86_64.S
-+++ b/arch/x86/crypto/chacha-avx2-x86_64.S
-@@ -34,18 +34,26 @@ CTR4BL:	.octa 0x00000000000000000000000000000002
- 
- .text
- 
-+/**
-+ * chacha_2block_xor_avx2 - Encrypt 2 blocks using the x86 AVX2 feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 2 data blocks output, o (%rsi)
-+ * @src:	address of up to 2 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts two ChaCha blocks by loading the state
-+ * matrix twice across four AVX registers. It performs matrix operations
-+ * on four words in each matrix in parallel, but requires shuffling to
-+ * rearrange the words after each round.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
-+ *						       unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_2block_xor_avx2)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 2 data blocks output, o
--	# %rdx: up to 2 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts two ChaCha blocks by loading the state
--	# matrix twice across four AVX registers. It performs matrix operations
--	# on four words in each matrix in parallel, but requires shuffling to
--	# rearrange the words after each round.
--
- 	vzeroupper
- 
- 	# x0..3[0-2] = s0..3
-@@ -226,20 +234,28 @@ SYM_FUNC_START(chacha_2block_xor_avx2)
- 
- SYM_FUNC_END(chacha_2block_xor_avx2)
- 
-+/**
-+ * chacha_4block_xor_avx2 - Encrypt 4 blocks using the x86 AVX2 feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 4 data blocks output, o (%rsi)
-+ * @src:	address of up to 4 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts four ChaCha blocks by loading the state
-+ * matrix four times across eight AVX registers. It performs matrix
-+ * operations on four words in two matrices in parallel, sequentially
-+ * to the operations on the four words of the other two matrices. The
-+ * required word shuffling has a rather high latency, we can do the
-+ * arithmetic on two matrix-pairs without much slowdown.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_4block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
-+ *						       unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_4block_xor_avx2)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 4 data blocks output, o
--	# %rdx: up to 4 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts four ChaCha blocks by loading the state
--	# matrix four times across eight AVX registers. It performs matrix
--	# operations on four words in two matrices in parallel, sequentially
--	# to the operations on the four words of the other two matrices. The
--	# required word shuffling has a rather high latency, we can do the
--	# arithmetic on two matrix-pairs without much slowdown.
--
- 	vzeroupper
- 
- 	# x0..3[0-4] = s0..3
-@@ -531,12 +547,28 @@ SYM_FUNC_START(chacha_4block_xor_avx2)
- 
- SYM_FUNC_END(chacha_4block_xor_avx2)
- 
-+/**
-+ * chacha_8block_xor_avx2 - Encrypt 8 blocks using the x86 AVX2 feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 8 data blocks output, o (%rsi)
-+ * @src:	address of up to 8 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts four ChaCha blocks by loading the state
-+ * matrix four times across eight AVX registers. It performs matrix
-+ * operations on four words in two matrices in parallel, sequentially
-+ * to the operations on the four words of the other two matrices. The
-+ * required word shuffling has a rather high latency, we can do the
-+ * arithmetic on two matrix-pairs without much slowdown.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
-+ *						       unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_8block_xor_avx2)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 8 data blocks output, o
--	# %rdx: up to 8 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
- 
- 	# This function encrypts eight consecutive ChaCha blocks by loading
- 	# the state matrix in AVX registers eight times. As we need some
-diff --git a/arch/x86/crypto/chacha-avx512vl-x86_64.S b/arch/x86/crypto/chacha-avx512vl-x86_64.S
-index 259383e1ad44..b4a85365e164 100644
---- a/arch/x86/crypto/chacha-avx512vl-x86_64.S
-+++ b/arch/x86/crypto/chacha-avx512vl-x86_64.S
-@@ -24,18 +24,26 @@ CTR8BL:	.octa 0x00000003000000020000000100000000
- 
- .text
- 
-+/**
-+ * chacha_2block_xor_avx512vl - Encrypt 2 blocks using the x86 AVX512VL feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 2 data blocks output, o (%rsi)
-+ * @src:	address of up to 2 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts two ChaCha blocks by loading the state
-+ * matrix twice across four AVX registers. It performs matrix operations
-+ * on four words in each matrix in parallel, but requires shuffling to
-+ * rearrange the words after each round.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_2block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
-+ *							   unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_2block_xor_avx512vl)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 2 data blocks output, o
--	# %rdx: up to 2 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts two ChaCha blocks by loading the state
--	# matrix twice across four AVX registers. It performs matrix operations
--	# on four words in each matrix in parallel, but requires shuffling to
--	# rearrange the words after each round.
--
- 	vzeroupper
- 
- 	# x0..3[0-2] = s0..3
-@@ -189,20 +197,28 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
- 
- SYM_FUNC_END(chacha_2block_xor_avx512vl)
- 
-+/**
-+ * chacha_4block_xor_avx512vl - Encrypt 4 blocks using the x86 AVX512VL feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 4 data blocks output, o (%rsi)
-+ * @src:	address of up to 4 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts four ChaCha blocks by loading the state
-+ * matrix four times across eight AVX registers. It performs matrix
-+ * operations on four words in two matrices in parallel, sequentially
-+ * to the operations on the four words of the other two matrices. The
-+ * required word shuffling has a rather high latency, we can do the
-+ * arithmetic on two matrix-pairs without much slowdown.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_4block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
-+ *							   unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_4block_xor_avx512vl)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 4 data blocks output, o
--	# %rdx: up to 4 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts four ChaCha blocks by loading the state
--	# matrix four times across eight AVX registers. It performs matrix
--	# operations on four words in two matrices in parallel, sequentially
--	# to the operations on the four words of the other two matrices. The
--	# required word shuffling has a rather high latency, we can do the
--	# arithmetic on two matrix-pairs without much slowdown.
--
- 	vzeroupper
- 
- 	# x0..3[0-4] = s0..3
-@@ -455,18 +471,26 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
- 
- SYM_FUNC_END(chacha_4block_xor_avx512vl)
- 
-+/**
-+ * chacha_8block_xor_avx512vl - Encrypt 8 blocks using the x86 AVX512VL feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 8 data blocks output, o (%rsi)
-+ * @src:	address of up to 8 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts eight consecutive ChaCha blocks by loading
-+ * the state matrix in AVX registers eight times. Compared to AVX2, this
-+ * mostly benefits from the new rotate instructions in VL and the
-+ * additional registers.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_8block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
-+ *							   unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_8block_xor_avx512vl)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 8 data blocks output, o
--	# %rdx: up to 8 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts eight consecutive ChaCha blocks by loading
--	# the state matrix in AVX registers eight times. Compared to AVX2, this
--	# mostly benefits from the new rotate instructions in VL and the
--	# additional registers.
--
- 	vzeroupper
- 
- 	# x0..15[0-7] = s[0..15]
-diff --git a/arch/x86/crypto/chacha-ssse3-x86_64.S b/arch/x86/crypto/chacha-ssse3-x86_64.S
-index 7111949cd5b9..6f5395ba54ab 100644
---- a/arch/x86/crypto/chacha-ssse3-x86_64.S
-+++ b/arch/x86/crypto/chacha-ssse3-x86_64.S
-@@ -34,7 +34,6 @@ CTRINC:	.octa 0x00000003000000020000000100000000
-  * Clobbers: %r8d, %xmm4-%xmm7
-  */
- SYM_FUNC_START_LOCAL(chacha_permute)
--
- 	movdqa		ROT8(%rip),%xmm4
- 	movdqa		ROT16(%rip),%xmm5
- 
-@@ -111,12 +110,21 @@ SYM_FUNC_START_LOCAL(chacha_permute)
- 	RET
- SYM_FUNC_END(chacha_permute)
- 
-+/**
-+ * chacha_block_xor_ssse3 - Encrypt 1 block using the x86 SSSE3 feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 1 data block output, o (%rsi)
-+ * @src:	address of up to 1 data block input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
-+ *						       unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_block_xor_ssse3)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 1 data block output, o
--	# %rdx: up to 1 data block input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
- 	FRAME_BEGIN
- 
- 	# x0..3 = s0..3
-@@ -199,10 +207,19 @@ SYM_FUNC_START(chacha_block_xor_ssse3)
- 
- SYM_FUNC_END(chacha_block_xor_ssse3)
- 
-+/**
-+ * hchacha_block_ssse3 - Encrypt 1 block using the x86 SSSE3 feature set
-+ * @state:	address of input state matrix, s (%rdu)
-+ * @out:	address of output (8 32-bit words)(%rsi)
-+ * @nrounds:	number of rounds (%edx);
-+ *		only uses lower 32 bits
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void hchacha_block_ssse3(const u32 *state, u32 *out, int nrounds);
-+ */
- SYM_FUNC_START(hchacha_block_ssse3)
--	# %rdi: Input state matrix, s
--	# %rsi: output (8 32-bit words)
--	# %edx: nrounds
- 	FRAME_BEGIN
- 
- 	movdqu		0x00(%rdi),%xmm0
-@@ -220,23 +237,31 @@ SYM_FUNC_START(hchacha_block_ssse3)
- 	RET
- SYM_FUNC_END(hchacha_block_ssse3)
- 
-+/**
-+ * chacha_4block_xor_ssse3 - Encrypt 4 blocks using the x86 SSSE3 feature set
-+ * @state:	address of input state matrix, s (%rdi)
-+ * @dst:	address of up to 4 data blocks output, o (%rsi)
-+ * @src:	address of up to 4 data blocks input, i (%rdx)
-+ * @len:	input/output length in bytes (%rcx)
-+ * @nrounds:	number of rounds (%r8d)
-+ *
-+ * This function supports 64-bit CPUs.
-+ *
-+ * This function encrypts four consecutive ChaCha blocks by loading the
-+ * state matrix in SSE registers four times. As we need some scratch
-+ * registers, we save the first four registers on the stack. The
-+ * algorithm performs each operation on the corresponding word of each
-+ * state matrix, hence requires no word shuffling. For final XORing step
-+ * we transpose the matrix by interleaving 32- and then 64-bit words,
-+ * which allows us to do XOR in SSE registers. 8/16-bit word rotation is
-+ * done with the slightly better performing SSSE3 byte shuffling,
-+ * 7/12-bit word rotation uses traditional shift+OR.
-+ *
-+ * Return:	none
-+ * Prototype:	asmlinkage void chacha_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
-+ *							unsigned int len, int nrounds);
-+ */
- SYM_FUNC_START(chacha_4block_xor_ssse3)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 4 data blocks output, o
--	# %rdx: up to 4 data blocks input, i
--	# %rcx: input/output length in bytes
--	# %r8d: nrounds
--
--	# This function encrypts four consecutive ChaCha blocks by loading the
--	# the state matrix in SSE registers four times. As we need some scratch
--	# registers, we save the first four registers on the stack. The
--	# algorithm performs each operation on the corresponding word of each
--	# state matrix, hence requires no word shuffling. For final XORing step
--	# we transpose the matrix by interleaving 32- and then 64-bit words,
--	# which allows us to do XOR in SSE registers. 8/16-bit word rotation is
--	# done with the slightly better performing SSSE3 byte shuffling,
--	# 7/12-bit word rotation uses traditional shift+OR.
--
- 	lea		8(%rsp),%r10
- 	sub		$0x80,%rsp
- 	and		$~63,%rsp
--- 
-2.38.1
+Same for lse and s390.
 
+Regards,
+Boqun
+
+> +	: "r" (o.low), "r" (o.high), "r" (n.low), "r" (n.high)		\
+> +	: cl);								\
+> +									\
+> +	return r.full;							\
+> +}
+> +
+> +__CMPXCHG128(   ,        ,  ,         )
+> +__CMPXCHG128(_mb, dmb ish, l, "memory")
+> +
+> +#undef __CMPXCHG128
+> +
+>  #undef K
+>  
+>  #endif	/* __ASM_ATOMIC_LL_SC_H */
