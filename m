@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB44C10F1B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30654C4708E
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232750AbiLSPqH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 10:46:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
+        id S232766AbiLSPqJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 10:46:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232326AbiLSPpc (ORCPT
+        with ESMTP id S232249AbiLSPpd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 10:45:32 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85C513F40;
-        Mon, 19 Dec 2022 07:44:08 -0800 (PST)
+        Mon, 19 Dec 2022 10:45:33 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BABF12AC3;
+        Mon, 19 Dec 2022 07:44:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=ezxvAyohFkyD0fBAJIL+qTrFeT/MhmgYOqNL8/CaLLo=; b=EpCbp6SSB82FBRpRL3WLFqa1er
-        fuzx4lpjiwMDgI2wDkjoqisa1rFP2utGhxIaOhxTrHCo7GVehas62q8lOrxKyUExkTPgH5qrJlgmD
-        mdLMP53s/UdjA6xFdacYlLwfmWKVGgN3FDnUJc+YE6QaSFx2faUMB9M6ycuS9i+QXaYo1GZ45IuFJ
-        MLKh2Lk5mUsf7UiRdYtCL6rq+w1NEEnIXm7NyWF8oPWx10GLQhHJOxBvnuKwjkt4yuS47GJYU3R22
-        p58A2Hq1aQJaVBZxqTlizmhlk3cfNJT7v4y+MhwyWx8cFLoCzjcwo0zOIMO0tcf6r9L03dJVuMEwy
-        eDeSbfPQ==;
+        bh=QJ923ExDj0XcuShmfE67Q3JbXhYYvsBZdme4aHvNZqo=; b=L1IW8vYeBrUO/INAKwHRRlhJVX
+        i/vG9qTUNs+oa6cLvr2/Xu8n10441UAqstaULlYbvtYtvBB8LKp5je0sNowRdtYNbuOsLa4LKS3CY
+        ehyeCPRWtvV4hGe0ZB3g6kR8E71kEvMsxxMtQrGDHXor+ViJ0P/iVOtCKziKJj7Si1SEXl6vlANmB
+        yYWIS8cHYYC4BX1p6xQ5JmaJ/1KWfoI/zkCuJdzbYjW06InrNLxk+2aKKyhk5GG61r78NF3XKBgq1
+        pHVhdDp4lqC8zzJrPRgm38RR7St7UYIkuWJmN6/KKJLCp+ZckgxoC6jHXr9M2Ub80pLF+e7+CCCy0
+        TLS8Y1ow==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7IIS-000qwb-OL; Mon, 19 Dec 2022 15:43:21 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1p7IIJ-00CeDr-0Z;
+        Mon, 19 Dec 2022 15:43:11 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9FE0F300642;
-        Mon, 19 Dec 2022 16:43:06 +0100 (CET)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0DCF930325C;
+        Mon, 19 Dec 2022 16:43:10 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 64DEF20B0F898; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
-Message-ID: <20221219154118.889543494@infradead.org>
+        id 7679B20B0F89C; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
+Message-ID: <20221219154119.154045458@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 19 Dec 2022 16:35:26 +0100
+Date:   Mon, 19 Dec 2022 16:35:30 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -59,7 +60,7 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
         linux-arch@vger.kernel.org
-Subject: [RFC][PATCH 01/12] crypto: Remove u128 usage
+Subject: [RFC][PATCH 05/12] arch: Introduce arch_{,try_}_cmpxchg128{,_local}()
 References: <20221219153525.632521981@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -67,363 +68,269 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As seems to be the common (majority) usage in crypto, use __uint128_t
-instead of u128.
-
-This frees up u128 for definition in linux/types.h.
+For all architectures that currently support cmpxchg_double()
+implement the cmpxchg128() family of functions that is basically the
+same but with a saner interface.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- lib/crypto/curve25519-hacl64.c |  142 ++++++++++++++++++++---------------------
- lib/crypto/poly1305-donna64.c  |   22 ++----
- 2 files changed, 80 insertions(+), 84 deletions(-)
+ arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
+ arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
+ arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+ arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
+ arch/x86/include/asm/cmpxchg_32.h     |    3 +
+ arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+ 6 files changed, 185 insertions(+), 3 deletions(-)
 
---- a/lib/crypto/curve25519-hacl64.c
-+++ b/lib/crypto/curve25519-hacl64.c
-@@ -14,8 +14,6 @@
- #include <crypto/curve25519.h>
- #include <linux/string.h>
+--- a/arch/arm64/include/asm/atomic_ll_sc.h
++++ b/arch/arm64/include/asm/atomic_ll_sc.h
+@@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+ __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
  
--typedef __uint128_t u128;
--
- static __always_inline u64 u64_eq_mask(u64 a, u64 b)
- {
- 	u64 x = a ^ b;
-@@ -50,77 +48,77 @@ static __always_inline void modulo_carry
- 	b[0] = b0_;
- }
+ #undef __CMPXCHG_DBL
++
++union __u128_halves {
++	u128 full;
++	struct {
++		u64 low, high;
++	};
++};
++
++#define __CMPXCHG128(name, mb, rel, cl)					\
++static __always_inline u128						\
++__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
++{									\
++	union __u128_halves r, o = { .full = (old) },			\
++			       n = { .full = (new) };			\
++									\
++	asm volatile("// __cmpxchg128" #name "\n"			\
++	"	prfm	pstl1strm, %2\n"				\
++	"1:	ldxp	%0, %1, %2\n"					\
++	"	eor	%3, %0, %3\n"					\
++	"	eor	%4, %1, %4\n"					\
++	"	orr	%3, %4, %3\n"					\
++	"	cbnz	%3, 2f\n"					\
++	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
++	"	cbnz	%w3, 1b\n"					\
++	"	" #mb "\n"						\
++	"2:"								\
++	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
++	: "r" (o.low), "r" (o.high), "r" (n.low), "r" (n.high)		\
++	: cl);								\
++									\
++	return r.full;							\
++}
++
++__CMPXCHG128(   ,        ,  ,         )
++__CMPXCHG128(_mb, dmb ish, l, "memory")
++
++#undef __CMPXCHG128
++
+ #undef K
  
--static __always_inline void fproduct_copy_from_wide_(u64 *output, u128 *input)
-+static __always_inline void fproduct_copy_from_wide_(u64 *output, __uint128_t *input)
- {
- 	{
--		u128 xi = input[0];
-+		__uint128_t xi = input[0];
- 		output[0] = ((u64)(xi));
- 	}
- 	{
--		u128 xi = input[1];
-+		__uint128_t xi = input[1];
- 		output[1] = ((u64)(xi));
- 	}
- 	{
--		u128 xi = input[2];
-+		__uint128_t xi = input[2];
- 		output[2] = ((u64)(xi));
- 	}
- 	{
--		u128 xi = input[3];
-+		__uint128_t xi = input[3];
- 		output[3] = ((u64)(xi));
- 	}
- 	{
--		u128 xi = input[4];
-+		__uint128_t xi = input[4];
- 		output[4] = ((u64)(xi));
- 	}
- }
+ #endif	/* __ASM_ATOMIC_LL_SC_H */
+--- a/arch/arm64/include/asm/atomic_lse.h
++++ b/arch/arm64/include/asm/atomic_lse.h
+@@ -151,7 +151,7 @@ __lse_atomic64_fetch_##op##name(s64 i, a
+ 	"	" #asm_op #mb "	%[i], %[old], %[v]"			\
+ 	: [v] "+Q" (v->counter),					\
+ 	  [old] "=r" (old)						\
+-	: [i] "r" (i) 							\
++	: [i] "r" (i)							\
+ 	: cl);								\
+ 									\
+ 	return old;							\
+@@ -324,4 +324,35 @@ __CMPXCHG_DBL(_mb, al, "memory")
  
- static __always_inline void
--fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
-+fproduct_sum_scalar_multiplication_(__uint128_t *output, u64 *input, u64 s)
- {
--	output[0] += (u128)input[0] * s;
--	output[1] += (u128)input[1] * s;
--	output[2] += (u128)input[2] * s;
--	output[3] += (u128)input[3] * s;
--	output[4] += (u128)input[4] * s;
-+	output[0] += (__uint128_t)input[0] * s;
-+	output[1] += (__uint128_t)input[1] * s;
-+	output[2] += (__uint128_t)input[2] * s;
-+	output[3] += (__uint128_t)input[3] * s;
-+	output[4] += (__uint128_t)input[4] * s;
- }
+ #undef __CMPXCHG_DBL
  
--static __always_inline void fproduct_carry_wide_(u128 *tmp)
-+static __always_inline void fproduct_carry_wide_(__uint128_t *tmp)
- {
- 	{
- 		u32 ctr = 0;
--		u128 tctr = tmp[ctr];
--		u128 tctrp1 = tmp[ctr + 1];
-+		__uint128_t tctr = tmp[ctr];
-+		__uint128_t tctrp1 = tmp[ctr + 1];
- 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
--		u128 c = ((tctr) >> (51));
--		tmp[ctr] = ((u128)(r0));
-+		__uint128_t c = ((tctr) >> (51));
-+		tmp[ctr] = ((__uint128_t)(r0));
- 		tmp[ctr + 1] = ((tctrp1) + (c));
- 	}
- 	{
- 		u32 ctr = 1;
--		u128 tctr = tmp[ctr];
--		u128 tctrp1 = tmp[ctr + 1];
-+		__uint128_t tctr = tmp[ctr];
-+		__uint128_t tctrp1 = tmp[ctr + 1];
- 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
--		u128 c = ((tctr) >> (51));
--		tmp[ctr] = ((u128)(r0));
-+		__uint128_t c = ((tctr) >> (51));
-+		tmp[ctr] = ((__uint128_t)(r0));
- 		tmp[ctr + 1] = ((tctrp1) + (c));
- 	}
++#define __CMPXCHG128(name, mb, cl...)					\
++static __always_inline u128						\
++__lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)		\
++{									\
++	union __u128_halves r, o = { .full = (old) },			\
++			       n = { .full = (new) };			\
++	register unsigned long x0 asm ("x0") = o.low;			\
++	register unsigned long x1 asm ("x1") = o.high;			\
++	register unsigned long x2 asm ("x2") = n.low;			\
++	register unsigned long x3 asm ("x3") = n.high;			\
++	register unsigned long x4 asm ("x4") = (unsigned long)ptr;	\
++									\
++	asm volatile(							\
++	__LSE_PREAMBLE							\
++	"	casp" #mb "\t%[old1], %[old2], %[new1], %[new2], %[v]\n"\
++	: [old1] "+&r" (x0), [old2] "+&r" (x1),				\
++	  [v] "+Q" (*(unsigned long *)ptr)				\
++	: [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),		\
++	  [oldval1] "r" (r.low), [oldval2] "r" (r.high)			\
++	: cl);								\
++									\
++	r.low = x0; r.high = x1;					\
++									\
++	return r.full;							\
++}
++
++__CMPXCHG128(   ,   )
++__CMPXCHG128(_mb, al, "memory")
++
++#undef __CMPXCHG128
++
+ #endif	/* __ASM_ATOMIC_LSE_H */
+--- a/arch/arm64/include/asm/cmpxchg.h
++++ b/arch/arm64/include/asm/cmpxchg.h
+@@ -147,6 +147,19 @@ __CMPXCHG_DBL(_mb)
  
- 	{
- 		u32 ctr = 2;
--		u128 tctr = tmp[ctr];
--		u128 tctrp1 = tmp[ctr + 1];
-+		__uint128_t tctr = tmp[ctr];
-+		__uint128_t tctrp1 = tmp[ctr + 1];
- 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
--		u128 c = ((tctr) >> (51));
--		tmp[ctr] = ((u128)(r0));
-+		__uint128_t c = ((tctr) >> (51));
-+		tmp[ctr] = ((__uint128_t)(r0));
- 		tmp[ctr + 1] = ((tctrp1) + (c));
- 	}
- 	{
- 		u32 ctr = 3;
--		u128 tctr = tmp[ctr];
--		u128 tctrp1 = tmp[ctr + 1];
-+		__uint128_t tctr = tmp[ctr];
-+		__uint128_t tctrp1 = tmp[ctr + 1];
- 		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
--		u128 c = ((tctr) >> (51));
--		tmp[ctr] = ((u128)(r0));
-+		__uint128_t c = ((tctr) >> (51));
-+		tmp[ctr] = ((__uint128_t)(r0));
- 		tmp[ctr + 1] = ((tctrp1) + (c));
- 	}
- }
-@@ -154,7 +152,7 @@ static __always_inline void fmul_shift_r
- 	output[0] = 19 * b0;
- }
+ #undef __CMPXCHG_DBL
  
--static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input,
-+static __always_inline void fmul_mul_shift_reduce_(__uint128_t *output, u64 *input,
- 						   u64 *input21)
- {
- 	u32 i;
-@@ -188,21 +186,21 @@ static __always_inline void fmul_fmul(u6
- {
- 	u64 tmp[5] = { input[0], input[1], input[2], input[3], input[4] };
- 	{
--		u128 b4;
--		u128 b0;
--		u128 b4_;
--		u128 b0_;
-+		__uint128_t b4;
-+		__uint128_t b0;
-+		__uint128_t b4_;
-+		__uint128_t b0_;
- 		u64 i0;
- 		u64 i1;
- 		u64 i0_;
- 		u64 i1_;
--		u128 t[5] = { 0 };
-+		__uint128_t t[5] = { 0 };
- 		fmul_mul_shift_reduce_(t, tmp, input21);
- 		fproduct_carry_wide_(t);
- 		b4 = t[4];
- 		b0 = t[0];
--		b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
--		b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+		b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
-+		b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
- 		t[4] = b4_;
- 		t[0] = b0_;
- 		fproduct_copy_from_wide_(output, t);
-@@ -215,7 +213,7 @@ static __always_inline void fmul_fmul(u6
- 	}
- }
++#define __CMPXCHG128(name)						\
++static inline long __cmpxchg128##name(volatile u128 *ptr,		\
++				      u128 old, u128 new)		\
++{									\
++	return __lse_ll_sc_body(_cmpxchg128##name,			\
++				ptr, old, new);				\
++}
++
++__CMPXCHG128(   )
++__CMPXCHG128(_mb)
++
++#undef __CMPXCHG128
++
+ #define __CMPXCHG_GEN(sfx)						\
+ static __always_inline unsigned long __cmpxchg##sfx(volatile void *ptr,	\
+ 					   unsigned long old,		\
+@@ -229,6 +242,19 @@ __CMPXCHG_GEN(_mb)
+ 	__ret;									\
+ })
  
--static __always_inline void fsquare_fsquare__(u128 *tmp, u64 *output)
-+static __always_inline void fsquare_fsquare__(__uint128_t *tmp, u64 *output)
- {
- 	u64 r0 = output[0];
- 	u64 r1 = output[1];
-@@ -227,16 +225,16 @@ static __always_inline void fsquare_fsqu
- 	u64 d2 = r2 * 2 * 19;
- 	u64 d419 = r4 * 19;
- 	u64 d4 = d419 * 2;
--	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) +
--		   (((u128)(d2) * (r3))));
--	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) +
--		   (((u128)(r3 * 19) * (r3))));
--	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) +
--		   (((u128)(d4) * (r3))));
--	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) +
--		   (((u128)(r4) * (d419))));
--	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) +
--		   (((u128)(r2) * (r2))));
-+	__uint128_t s0 = ((((((__uint128_t)(r0) * (r0))) + (((__uint128_t)(d4) * (r1))))) +
-+		   (((__uint128_t)(d2) * (r3))));
-+	__uint128_t s1 = ((((((__uint128_t)(d0) * (r1))) + (((__uint128_t)(d4) * (r2))))) +
-+		   (((__uint128_t)(r3 * 19) * (r3))));
-+	__uint128_t s2 = ((((((__uint128_t)(d0) * (r2))) + (((__uint128_t)(r1) * (r1))))) +
-+		   (((__uint128_t)(d4) * (r3))));
-+	__uint128_t s3 = ((((((__uint128_t)(d0) * (r3))) + (((__uint128_t)(d1) * (r2))))) +
-+		   (((__uint128_t)(r4) * (d419))));
-+	__uint128_t s4 = ((((((__uint128_t)(d0) * (r4))) + (((__uint128_t)(d1) * (r3))))) +
-+		   (((__uint128_t)(r2) * (r2))));
- 	tmp[0] = s0;
- 	tmp[1] = s1;
- 	tmp[2] = s2;
-@@ -244,12 +242,12 @@ static __always_inline void fsquare_fsqu
- 	tmp[4] = s4;
- }
++/* cmpxchg128 */
++#define system_has_cmpxchg128()		1
++
++#define arch_cmpxchg128(ptr, o, n)						\
++({										\
++	__cmpxchg128_mb((ptr), (o), (n));					\
++})
++
++#define arch_cmpxchg128_local(ptr, o, n)					\
++({										\
++	__cmpxchg128((ptr), (o), (n));						\
++})
++
+ #define __CMPWAIT_CASE(w, sfx, sz)					\
+ static inline void __cmpwait_case_##sz(volatile void *ptr,		\
+ 				       unsigned long val)		\
+--- a/arch/s390/include/asm/cmpxchg.h
++++ b/arch/s390/include/asm/cmpxchg.h
+@@ -201,4 +201,37 @@ static __always_inline int __cmpxchg_dou
+ 			 (unsigned long)(n1), (unsigned long)(n2));	\
+ })
  
--static __always_inline void fsquare_fsquare_(u128 *tmp, u64 *output)
-+static __always_inline void fsquare_fsquare_(__uint128_t *tmp, u64 *output)
- {
--	u128 b4;
--	u128 b0;
--	u128 b4_;
--	u128 b0_;
-+	__uint128_t b4;
-+	__uint128_t b0;
-+	__uint128_t b4_;
-+	__uint128_t b0_;
- 	u64 i0;
- 	u64 i1;
- 	u64 i0_;
-@@ -258,8 +256,8 @@ static __always_inline void fsquare_fsqu
- 	fproduct_carry_wide_(tmp);
- 	b4 = tmp[4];
- 	b0 = tmp[0];
--	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
--	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+	b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
-+	b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
- 	tmp[4] = b4_;
- 	tmp[0] = b0_;
- 	fproduct_copy_from_wide_(output, tmp);
-@@ -271,7 +269,7 @@ static __always_inline void fsquare_fsqu
- 	output[1] = i1_;
- }
++#define system_has_cmpxchg128()		1
++
++static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
++{
++	asm volatile(
++		"	cdsg	%[old],%[new],%[ptr]\n"
++		: [old] "+&d" (old)
++		: [new] "d" (new),
++		  [ptr] "QS" (*(unsigned long *)ptr)
++		: "memory", "cc");
++	return old;
++}
++
++static __always_inline bool arch_try_cmpxchg128(volatile u128 *ptr, u128 *oldp, u128 new)
++{
++	u128 old = *oldp;
++	int cc;
++
++	asm volatile(
++		"	cdsg	%[old],%[new],%[ptr]\n"
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28\n"
++		: [cc] "=&d" (cc), [old] "+&d" (old)
++		: [new] "d" (new),
++		  [ptr] "QS" (*(unsigned long *)ptr)
++		: "memory", "cc");
++
++	if (unlikely(!cc))
++		*oldp = old;
++
++	return likely(cc);
++}
++
+ #endif /* __ASM_CMPXCHG_H */
+--- a/arch/x86/include/asm/cmpxchg_32.h
++++ b/arch/x86/include/asm/cmpxchg_32.h
+@@ -103,6 +103,7 @@ static inline bool __try_cmpxchg64(volat
  
--static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp,
-+static __always_inline void fsquare_fsquare_times_(u64 *output, __uint128_t *tmp,
- 						   u32 count1)
- {
- 	u32 i;
-@@ -283,7 +281,7 @@ static __always_inline void fsquare_fsqu
- static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input,
- 						  u32 count1)
- {
--	u128 t[5];
-+	__uint128_t t[5];
- 	memcpy(output, input, 5 * sizeof(*input));
- 	fsquare_fsquare_times_(output, t, count1);
- }
-@@ -291,7 +289,7 @@ static __always_inline void fsquare_fsqu
- static __always_inline void fsquare_fsquare_times_inplace(u64 *output,
- 							  u32 count1)
- {
--	u128 t[5];
-+	__uint128_t t[5];
- 	fsquare_fsquare_times_(output, t, count1);
- }
+ #endif
  
-@@ -396,36 +394,36 @@ static __always_inline void fdifference(
+-#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX8)
++#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX8)
++#define system_has_cmpxchg64()		boot_cpu_has(X86_FEATURE_CX8)
  
- static __always_inline void fscalar(u64 *output, u64 *b, u64 s)
- {
--	u128 tmp[5];
--	u128 b4;
--	u128 b0;
--	u128 b4_;
--	u128 b0_;
-+	__uint128_t tmp[5];
-+	__uint128_t b4;
-+	__uint128_t b0;
-+	__uint128_t b4_;
-+	__uint128_t b0_;
- 	{
- 		u64 xi = b[0];
--		tmp[0] = ((u128)(xi) * (s));
-+		tmp[0] = ((__uint128_t)(xi) * (s));
- 	}
- 	{
- 		u64 xi = b[1];
--		tmp[1] = ((u128)(xi) * (s));
-+		tmp[1] = ((__uint128_t)(xi) * (s));
- 	}
- 	{
- 		u64 xi = b[2];
--		tmp[2] = ((u128)(xi) * (s));
-+		tmp[2] = ((__uint128_t)(xi) * (s));
- 	}
- 	{
- 		u64 xi = b[3];
--		tmp[3] = ((u128)(xi) * (s));
-+		tmp[3] = ((__uint128_t)(xi) * (s));
- 	}
- 	{
- 		u64 xi = b[4];
--		tmp[4] = ((u128)(xi) * (s));
-+		tmp[4] = ((__uint128_t)(xi) * (s));
- 	}
- 	fproduct_carry_wide_(tmp);
- 	b4 = tmp[4];
- 	b0 = tmp[0];
--	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
--	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+	b4_ = ((b4) & (((__uint128_t)(0x7ffffffffffffLLU))));
-+	b0_ = ((b0) + (((__uint128_t)(19) * (((u64)(((b4) >> (51))))))));
- 	tmp[4] = b4_;
- 	tmp[0] = b0_;
- 	fproduct_copy_from_wide_(output, tmp);
---- a/lib/crypto/poly1305-donna64.c
-+++ b/lib/crypto/poly1305-donna64.c
-@@ -10,8 +10,6 @@
- #include <asm/unaligned.h>
- #include <crypto/internal/poly1305.h>
+ #endif /* _ASM_X86_CMPXCHG_32_H */
+--- a/arch/x86/include/asm/cmpxchg_64.h
++++ b/arch/x86/include/asm/cmpxchg_64.h
+@@ -20,6 +20,59 @@
+ 	arch_try_cmpxchg((ptr), (po), (n));				\
+ })
  
--typedef __uint128_t u128;
--
- void poly1305_core_setkey(struct poly1305_core_key *key,
- 			  const u8 raw_key[POLY1305_BLOCK_SIZE])
- {
-@@ -41,7 +39,7 @@ void poly1305_core_blocks(struct poly130
- 	u64 s1, s2;
- 	u64 h0, h1, h2;
- 	u64 c;
--	u128 d0, d1, d2, d;
-+	__uint128_t d0, d1, d2, d;
+-#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX16)
++union __u128_halves {
++	u128 full;
++	struct {
++		u64 low, high;
++	};
++};
++
++static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
++{
++	union __u128_halves o = { .full = old, }, n = { .full = new, };
++
++	asm volatile(LOCK_PREFIX "cmpxchg16b %[ptr]"
++		     : [ptr] "+m" (*ptr),
++		       "+a" (o.low), "+d" (o.high)
++		     : "b" (n.low), "c" (n.high)
++		     : "memory");
++
++	return o.full;
++}
++
++static __always_inline u128 arch_cmpxchg128_local(volatile u128 *ptr, u128 old, u128 new)
++{
++	union __u128_halves o = { .full = old, }, n = { .full = new, };
++
++	asm volatile("cmpxchg16b %[ptr]"
++		     : [ptr] "+m" (*ptr),
++		       "+a" (o.low), "+d" (o.high)
++		     : "b" (n.low), "c" (n.high)
++		     : "memory");
++
++	return o.full;
++}
++
++static __always_inline bool arch_try_cmpxchg128(volatile u128 *ptr, u128 *old, u128 new)
++{
++	union __u128_halves o = { .full = *old, }, n = { .full = new, };
++	bool ret;
++
++	asm volatile(LOCK_PREFIX "cmpxchg16b %[ptr]"
++		     CC_SET(e)
++		     : CC_OUT(e) (ret),
++		       [ptr] "+m" (*ptr),
++		       "+a" (o.low), "+d" (o.high)
++		     : "b" (n.low), "c" (n.high)
++		     : "memory");
++
++	if (unlikely(!ret))
++		*old = o.full;
++
++	return likely(ret);
++}
++
++#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX16)
++#define system_has_cmpxchg128()		boot_cpu_has(X86_FEATURE_CX16)
  
- 	if (!nblocks)
- 		return;
-@@ -71,20 +69,20 @@ void poly1305_core_blocks(struct poly130
- 		h2 += (((t1 >> 24)) & 0x3ffffffffffULL) | hibit64;
- 
- 		/* h *= r */
--		d0 = (u128)h0 * r0;
--		d = (u128)h1 * s2;
-+		d0 = (__uint128_t)h0 * r0;
-+		d = (__uint128_t)h1 * s2;
- 		d0 += d;
--		d = (u128)h2 * s1;
-+		d = (__uint128_t)h2 * s1;
- 		d0 += d;
--		d1 = (u128)h0 * r1;
--		d = (u128)h1 * r0;
-+		d1 = (__uint128_t)h0 * r1;
-+		d = (__uint128_t)h1 * r0;
- 		d1 += d;
--		d = (u128)h2 * s2;
-+		d = (__uint128_t)h2 * s2;
- 		d1 += d;
--		d2 = (u128)h0 * r2;
--		d = (u128)h1 * r1;
-+		d2 = (__uint128_t)h0 * r2;
-+		d = (__uint128_t)h1 * r1;
- 		d2 += d;
--		d = (u128)h2 * r0;
-+		d = (__uint128_t)h2 * r0;
- 		d2 += d;
- 
- 		/* (partial) h %= p */
+ #endif /* _ASM_X86_CMPXCHG_64_H */
 
 
