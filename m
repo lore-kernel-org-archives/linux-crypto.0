@@ -2,94 +2,208 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D68C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 08:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F42C4167B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:01:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbiLSIvG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 03:51:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        id S232109AbiLSPBr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 10:01:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231387AbiLSIub (ORCPT
+        with ESMTP id S232107AbiLSPBm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 03:50:31 -0500
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5ECCCE02;
-        Mon, 19 Dec 2022 00:50:11 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.228])
-        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4NbCs63L1Mz9ttD8;
-        Mon, 19 Dec 2022 16:43:06 +0800 (CST)
-Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
-        by APP1 (Coremail) with SMTP id LxC2BwBHywagJaBjl6AmAA--.3254S2;
-        Mon, 19 Dec 2022 09:49:46 +0100 (CET)
-Message-ID: <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
-Subject: Re: [PATCH v2] KEYS: asymmetric: Copy sig and digest in
- public_key_verify_signature()
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>, dhowells@redhat.com,
-        davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        stable@vger.kernel.org
-Date:   Mon, 19 Dec 2022 09:49:29 +0100
-In-Reply-To: <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
-References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
-         <Y5OGr59A9wo86rYY@sol.localdomain>
-         <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
-         <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        Mon, 19 Dec 2022 10:01:42 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7312E2718;
+        Mon, 19 Dec 2022 07:01:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q6YVd4xMvUoIq2Wx9WV2h35FJy8uA4ZCtWgyaqaZYq2r7ihZ4DYTu7dseZ6rADG7wD484h+Jje14lhCyb44pUGrLfOdfRBWHP8CZrKw5ICx81UDiwKgGD7j1YyA3Arc+nNCSqAJLKWCVflk8rcbs/Zg1cJgAowLpMLdtYCBP03JgyuWCw4wGuXy+OUzGGc/t3xAOs/Jpp64UISLJXbT5jZ7scUZOL2eBIPo9kDTPTgfqFhUU36hfNEqf7iJ6cEc4auqhULjWr6hrvuOMx/3va4QLy87ll6AdtttDUYy+M7YzAKpyaGvEVUgp5bjHc64olvxLn6hRLzYtU8Jy2Ys2aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6ig2iSgdvV3uLbGe83tM3u1cZ6pMnlDn3IGSbdiQ7yY=;
+ b=Rbr1D5rEwP4+Hb9h/yjW2cIIz6mde+4y37GGaJ/w+or4wgtsi3bdYHIcko1BgyLf2flnkrIUxtxA4XjeDC/c3Ob9CkBnl7alPx/chD2W9BZp4spGgtLOe/KZtPPkd5/PNKK1tEVyZxCsBZR3aJSlnIf6Xs3AROaUuWyFYTSpqj1zflXdqQvHO9dY2qtCJTxdzziX20hsUq1GpOmXLi5NHDIkOzQbJJAeCENqSngpexnvbPTWWg2sbt9xx/RmO8e+i1BuqbqjsAfQbdnHiqBIOtd2y9jIUOWLsg7xH7i8MBrzz/XLIonCYcmGbfhLXTF6aOUXMzoz47cBb8KAoUlVbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6ig2iSgdvV3uLbGe83tM3u1cZ6pMnlDn3IGSbdiQ7yY=;
+ b=OhMjh3VXPYNz8RYoa7DRJzOj5aZjpvuhEdDDKeCr/PdBgUtg0J9ww+UTOCWemYi7BtCwfTYZxC1hJJYGBnykO53PE1lVwJJsDaUxuNohBxoZuV5pK1bBViv4EGY6Hcug1WV6Y2TIVoOSxNqCaMSOl+hcomjEmRRTu7aRddimFKc=
+Received: from MN2PR11CA0027.namprd11.prod.outlook.com (2603:10b6:208:23b::32)
+ by MN0PR12MB6344.namprd12.prod.outlook.com (2603:10b6:208:3d3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.21; Mon, 19 Dec
+ 2022 15:01:38 +0000
+Received: from BL02EPF00010209.namprd05.prod.outlook.com
+ (2603:10b6:208:23b:cafe::58) by MN2PR11CA0027.outlook.office365.com
+ (2603:10b6:208:23b::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.20 via Frontend
+ Transport; Mon, 19 Dec 2022 15:01:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF00010209.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5944.8 via Frontend Transport; Mon, 19 Dec 2022 15:00:44 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 19 Dec
+ 2022 09:00:43 -0600
+Date:   Mon, 19 Dec 2022 09:00:26 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Ashish Kalra <Ashish.Kalra@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+        <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Message-ID: <20221219150026.bltiyk72pmdc2ic3@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+ <YuFvbm/Zck9Tr5pq@zn.tnic>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: LxC2BwBHywagJaBjl6AmAA--.3254S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7JF43Gr1UCw18Gr47ZFWUJwb_yoWfuwbEgF
-        y3CF4kX34Fvr17tF4rtr4qqrs3GrWkAry7Xr4Ig3sxJ3s5Jws7WrsYkrs3Wr1xXr4rJF9F
-        gryrZ347X3W29jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb78YFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267
-        AKxVW8JVW8Jr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-        j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-        kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU13rcDUUUUU==
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQALBF1jj4bHxwAAs5
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <YuFvbm/Zck9Tr5pq@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00010209:EE_|MN0PR12MB6344:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a3d93a4-984a-447d-486b-08dae1d1ebad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Sn+iN0EOHrZbPtlTuU6uoHqSN7Wf81Q4S9116CuzH/V2P7pWEab1sSrnTqFnQGFP79aOHV+FVEbDOfaFglpFP6cJzNT3+OutSPPuNVD51zrNt0+qr5Ahr19cIImZTDRglJe82ydiUtqne61wUB6YjbD9v9ZNwWNgxlZq810GbO3magv7dV0YFzz+5oFhI9DhXgnoa17FoCEMSZNBQ9obTyZrYorhq8oD3y7gZ25A/5NSHH/cEgUZmeTLbwrnUfS0HH9BwBf6tuWbeaT2LsPV/zLr2Ss40tK1RR3e94KM9hk9d5yqBvFKPSOet5Nlfp3lcGwOO7B1LbN9yrt9ntjxwFBTY7CUR+pCyOFUyJeE/l7bAk0XztUV2xeUxo3cB2umNaeMMCQyqWditN8Nst9rjlmwX26j/rdOKNwp/c+Iq1sgcgv91uw18HqqNItg2kK7/c/Pa603WBjQwRD1acsLZrGtoBZoYLBpGlYcx7RDt0ar4bQlpSQWWz3m8CEJOSETAi7mz0yCWsHUFfaaVR/7irjh5XM9G50YLYWCtzvlWRZf/EdRXAG6NeCvyLw8M5QjETbpKs3j+D1xBdxYHNIwrGcLMS3Vg3WsZpBCvnF6qzXc8QUbz9s9lAF8YMvaWFp7LpBG9UnAK43AhaoGpUZcr0gnHkckQsFACNjnfhd7hXtK97aQm78BcICnUNWbnNTIEIiSiIL4DtmsnQ4tbDKKanpBXAYsU1kFHfWcSHXWzvsOHtJePILKrTqr7K16wcV8nMz17g+Hd66IkXlQYgFyvw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(346002)(396003)(376002)(451199015)(46966006)(40470700004)(36840700001)(2906002)(2616005)(16526019)(186003)(6916009)(36756003)(6666004)(40480700001)(26005)(4326008)(1076003)(8676002)(36860700001)(356005)(7406005)(70586007)(70206006)(7416002)(5660300002)(86362001)(41300700001)(47076005)(81166007)(82740400003)(336012)(426003)(54906003)(83380400001)(316002)(8936002)(40460700003)(82310400005)(478600001)(44832011)(966005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2022 15:00:44.8038
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a3d93a4-984a-447d-486b-08dae1d1ebad
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF00010209.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6344
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-12-12 at 17:15 +0800, Herbert Xu wrote:
-> On Mon, Dec 12, 2022 at 10:07:38AM +0100, Roberto Sassu wrote:
-> > The problem is a misalignment between req->src_len (set to sig->s_size
-> > by akcipher_request_set_crypt()) and the length of the scatterlist (if
-> > we set the latter to sig->s_size + sig->digest_size).
-> > 
-> > When rsa_enc() calls mpi_read_raw_from_sgl(), it passes req->src_len as
-> > argument, and the latter allocates the MPI according to that. However,
-> > it does parsing depending on the length of the scatterlist.
-> > 
-> > If there are two scatterlists, it is not a problem, there is no
-> > misalignment. mpi_read_raw_from_sgl() picks the first. If there is just
-> > one, mpi_read_raw_from_sgl() parses all data there.
+On Wed, Jul 27, 2022 at 07:01:34PM +0200, Borislav Petkov wrote:
+> On Mon, Jun 20, 2022 at 11:03:07PM +0000, Ashish Kalra wrote:
 > 
-> Thanks for the explanation.  That's definitely a bug which should
-> be fixed either in the RSA code or in MPI.
+> > Subject: x86/sev: Invalid pages from direct map when adding it to RMP table
 > 
-> I'll look into it.
+> "...: Invalidate pages from the direct map when adding them to the RMP table"
+> 
+> > +static int restore_direct_map(u64 pfn, int npages)
+> > +{
+> > +	int i, ret = 0;
+> > +
+> > +	for (i = 0; i < npages; i++) {
+> > +		ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
+> 
+> set_memory_p() ?
 
-Hi Herbert
+We implemented this approach for v7, but it causes a fairly significant
+performance regression, particularly for the case for npages > 1 which
+this change was meant to optimize.
 
-do you have any news on this bug?
+I still need to dig in a big but I'm guessing it's related to flushing
+behavior.
 
-Thanks
+It would however be nice to have a set_direct_map_default_noflush()
+variant that accepted a 'npages' argument, since it would be more
+performant here and also would potentially allow for restoring the 2M
+direct mapping in some cases. Will look into this more for v8.
 
-Roberto
+-Mike
 
+> 
+> > +		if (ret)
+> > +			goto cleanup;
+> > +	}
+> > +
+> > +cleanup:
+> > +	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i);
+> 
+> Warn for each pfn?!
+> 
+> That'll flood dmesg mightily.
+> 
+> > +	return ret;
+> > +}
+> > +
+> > +static int invalid_direct_map(unsigned long pfn, int npages)
+> > +{
+> > +	int i, ret = 0;
+> > +
+> > +	for (i = 0; i < npages; i++) {
+> > +		ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
+> 
+> As above, set_memory_np() doesn't work here instead of looping over each
+> page?
+> 
+> > @@ -2462,11 +2494,38 @@ static int rmpupdate(u64 pfn, struct rmpupdate *val)
+> >  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> >  		return -ENXIO;
+> >  
+> > +	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
+> > +	npages = page_level_size(level) / PAGE_SIZE;
+> > +
+> > +	/*
+> > +	 * If page is getting assigned in the RMP table then unmap it from the
+> > +	 * direct map.
+> > +	 */
+> > +	if (val->assigned) {
+> > +		if (invalid_direct_map(pfn, npages)) {
+> > +			pr_err("Failed to unmap pfn 0x%llx pages %d from direct_map\n",
+> 
+> "Failed to unmap %d pages at pfn 0x... from the direct map\n"
+> 
+> > +			       pfn, npages);
+> > +			return -EFAULT;
+> > +		}
+> > +	}
+> > +
+> >  	/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+> >  	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> >  		     : "=a"(ret)
+> >  		     : "a"(paddr), "c"((unsigned long)val)
+> >  		     : "memory", "cc");
+> > +
+> > +	/*
+> > +	 * Restore the direct map after the page is removed from the RMP table.
+> > +	 */
+> > +	if (!ret && !val->assigned) {
+> > +		if (restore_direct_map(pfn, npages)) {
+> > +			pr_err("Failed to map pfn 0x%llx pages %d in direct_map\n",
+> 
+> "Failed to map %d pages at pfn 0x... into the direct map\n"
+> 
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
