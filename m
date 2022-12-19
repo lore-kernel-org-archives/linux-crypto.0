@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FD2C4708E
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9CDC3DA7C
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 15:46:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232666AbiLSPp7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 10:45:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57906 "EHLO
+        id S232683AbiLSPqB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 10:46:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiLSPpa (ORCPT
+        with ESMTP id S232603AbiLSPpa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 19 Dec 2022 10:45:30 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D5313D61;
-        Mon, 19 Dec 2022 07:44:07 -0800 (PST)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7460813D3A;
+        Mon, 19 Dec 2022 07:44:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Subject:Cc:To:From:Date:Message-ID:
-        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=fH7vUY5IU4m1cKDzFBDt+eq6lohLTkHTMZiIE4ke4VY=; b=hmTPYkhC/7+cqNJUN5N9enIC/k
-        RI5NBONX3QLG7mKq+yLzWmmPG8HTz/NW05/q2t+NIC08Ns9r4JZ2UscvuMGis6p5aIV98rt+d5PYB
-        nAJujak0DMGsy0jBuXm6mns7IRswwY028uKylH5d6HEyxKa0v7TWHR4V7NhweEQZexadjXP2cENfB
-        PN0CBN/Z4zLKueR3qNhwICGa49xaayJGmuojh1b1Ti3KDYK/3ICqowGwv0pFcI9xUFdbcrZ+0iIxu
-        Ge/5HFB3a3AtlZL/G1E9c/b18BhPteeNkIwbOO3E2lBnqhM7d/CMFvm6DhrYuPEd5j261z2I8GL8m
-        +sBcpybw==;
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To;
+        bh=ltmheXPbH9IMNFHZ4P8NvOysWa92wKwMkpxaGeG832Q=; b=BNNdcWplbia7Tdo9e9JhzPu744
+        gXUhVeJe6clEEF36/xkbfr3un7XfcOJP5RsPH/+K3YTh4jfl8/W0cviflURH82EDqZNU17198QH36
+        WtXvDaQ8shWg9Et9rZ0rynw5UAUIMvXqis8/K09oIZJGjXakQ2lD7xEJXx8DLdeYSyAUKUsAqn+gq
+        wbwi6dU6OmKxe5dkQmHBEh1gsn+cqhS4KPU/uyspZ1uxqYCK58Od/ZX2TDOHMHLuybHLL61GBnq+1
+        2JKJPz5M+mHygNluwA1CvVZiz5OnHN0oZnOivqqc8Z5SwIEE2uc3zf2UtwWj74ZvPOIqz2jboZeLx
+        U+GXIYdA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7IIS-000qwa-OK; Mon, 19 Dec 2022 15:43:20 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1p7III-00CeDn-27;
+        Mon, 19 Dec 2022 15:43:11 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9B358300193;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A44BA302E0D;
         Mon, 19 Dec 2022 16:43:06 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 6037520A1AB9F; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
-Message-ID: <20221219153525.632521981@infradead.org>
+        id 6839D20114B73; Mon, 19 Dec 2022 16:43:06 +0100 (CET)
+Message-ID: <20221219154118.955831880@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 19 Dec 2022 16:35:25 +0100
+Date:   Mon, 19 Dec 2022 16:35:27 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -59,20 +60,68 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
         linux-arch@vger.kernel.org
-Subject: [RFC][PATCH 00/12] Introduce cmpxchg128() -- aka. the demise of cmpxchg_double()
+Subject: [RFC][PATCH 02/12] crypto/ghash-clmulni: Use (struct) be128
+References: <20221219153525.632521981@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Even though x86 is firmly little endian, use be128 because le128 is in
+fact the wrong way around :/ The actual code is already using be128 in
+ghash_setkey() so this shouldn't be more confusing.
 
-Since Linus hated on cmpxchg_double(), a few patches to get rid of it, as proposed here:
+This frees up the u128 name for a real u128 type.
 
-  https://lkml.kernel.org/r/Y2U3WdU61FvYlpUh@hirez.programming.kicks-ass.net
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  |    4 ++--
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |    6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-based on tip/master because Linus' tree is moving a wee bit fast at the moment.
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -88,7 +88,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_bl
+ 	RET
+ SYM_FUNC_END(__clmul_gf128mul_ble)
+ 
+-/* void clmul_ghash_mul(char *dst, const u128 *shash) */
++/* void clmul_ghash_mul(char *dst, const le128 *shash) */
+ SYM_FUNC_START(clmul_ghash_mul)
+ 	FRAME_BEGIN
+ 	movups (%rdi), DATA
+@@ -104,7 +104,7 @@ SYM_FUNC_END(clmul_ghash_mul)
+ 
+ /*
+  * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+- *			   const u128 *shash);
++ *			   const le128 *shash);
+  */
+ SYM_FUNC_START(clmul_ghash_update)
+ 	FRAME_BEGIN
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -23,17 +23,17 @@
+ #define GHASH_BLOCK_SIZE	16
+ #define GHASH_DIGEST_SIZE	16
+ 
+-void clmul_ghash_mul(char *dst, const u128 *shash);
++void clmul_ghash_mul(char *dst, const be128 *shash);
+ 
+ void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+-			const u128 *shash);
++			const be128 *shash);
+ 
+ struct ghash_async_ctx {
+ 	struct cryptd_ahash *cryptd_tfm;
+ };
+ 
+ struct ghash_ctx {
+-	u128 shash;
++	be128 shash;
+ };
+ 
+ struct ghash_desc_ctx {
 
-0day robot is all green for building, very limited testing on arm64/s390
-for obvious raisins -- I tried to get the asm right, but please, double
-check.
 
