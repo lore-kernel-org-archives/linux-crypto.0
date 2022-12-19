@@ -2,99 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E80C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 20:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC23C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Dec 2022 22:03:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232394AbiLSUhu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 15:37:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52826 "EHLO
+        id S229564AbiLSWDR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 17:03:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232524AbiLSUhs (ORCPT
+        with ESMTP id S231344AbiLSWDR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 15:37:48 -0500
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790CBD2E6;
-        Mon, 19 Dec 2022 12:37:47 -0800 (PST)
-Received: from pps.filterd (m0134425.ppops.net [127.0.0.1])
-        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJIMMT8023118;
-        Mon, 19 Dec 2022 20:37:44 GMT
+        Mon, 19 Dec 2022 17:03:17 -0500
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B59313F97;
+        Mon, 19 Dec 2022 14:03:16 -0800 (PST)
+Received: from pps.filterd (m0134421.ppops.net [127.0.0.1])
+        by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJKW3DT015099;
+        Mon, 19 Dec 2022 22:02:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pps0720;
- bh=2dYGUGoiYlGjuRM5PMmfeHA1r1xQ9XcKfQBofK1Sca0=;
- b=BAOJknJIXqnDhbu1T2hlzXUdF5Z27k1OfU8oKQ0IFbkS9kcnCOLxDWk1DxcsbMOkRRe2
- CJ+yYbgIrPuQnm2VHekNfEVCdRfrXJpOZs21I91WO9Qz14b8U+kqSOrlvHEKs60OE/6o
- PIOwOPsju6KnrB9bPd5uMhvpA6EV1iuoE3ur4sGJSQNZBsyCiRsWeqhqi8MhxJCu6xKj
- 2hLYu2oW0BETFDkivD0DS4Nxnl7uEsyZW3Cm+CGotUK+ujgcKdCYJ2g+Ewb/J5YBLOFl
- sm4Pd299WAkjgfZ9IUdl81Xefje8eAhHNivdMbSzrIOvnq47/B+qPOpRkdG1BB8oYMPi Iw== 
-Received: from p1lg14880.it.hpe.com (p1lg14880.it.hpe.com [16.230.97.201])
-        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3mjw610qpd-1
+ bh=hrnSS/acWGmvImUo/QDE8X3zDiPvrvWWK9oGzVt4i0M=;
+ b=STcXxQSXSo0nENAYhUcqOjh7Q66IsWXyNouDI9udlCce7apiUNr0jN4gvb1ifzxSXbGj
+ mgv5IJf3xa1RwT1cyWuAxn8NdS6pCGhv3ZorMrV6hy3edS/3L3hCiOmmn+gtjZny1hzp
+ NdTR9RDEkTh+/bDszmDh3aBpV9+DeCeE9Z2YaKZr7NDumVp4ANYMdX/vuxR4DNcaK1uJ
+ iCNPwbsPWegU6hKLVD4G0rttHtU4xMn7wgO+QG/cTAtd0bP5hgh6P2IRwREbkXdnlHiP
+ PQLcH4iff8aLlicxQnvGaEji9MuItOtS+AAPLKIfXvwUtzubn53EZk8DMDxgtzZVpkgG 2A== 
+Received: from p1lg14879.it.hpe.com (p1lg14879.it.hpe.com [16.230.97.200])
+        by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3mjv4222vs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Dec 2022 20:37:43 +0000
-Received: from p1lg14886.dc01.its.hpecorp.net (unknown [10.119.18.237])
+        Mon, 19 Dec 2022 22:02:57 +0000
+Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 3065D807131;
-        Mon, 19 Dec 2022 20:37:43 +0000 (UTC)
+        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 634A5310BD;
+        Mon, 19 Dec 2022 22:02:56 +0000 (UTC)
 Received: from adevxp033-sys.us.rdlabs.hpecorp.net (unknown [16.231.227.36])
-        by p1lg14886.dc01.its.hpecorp.net (Postfix) with ESMTP id D3E3D809224;
-        Mon, 19 Dec 2022 20:37:42 +0000 (UTC)
+        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id 913C0805634;
+        Mon, 19 Dec 2022 22:02:55 +0000 (UTC)
 From:   Robert Elliott <elliott@hpe.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Robert Elliott <elliott@hpe.com>
-Subject: [PATCH 3/3] crypto: tcrypt - yield at end of test
-Date:   Mon, 19 Dec 2022 14:37:33 -0600
-Message-Id: <20221219203733.3063192-4-elliott@hpe.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net, Jason@zx2c4.com,
+        ardb@kernel.org, ap420073@gmail.com, David.Laight@ACULAB.COM,
+        ebiggers@kernel.org, tim.c.chen@linux.intel.com, peter@n8pjl.ca,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com
+Cc:     linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Elliott <elliott@hpe.com>
+Subject: [PATCH 08/13] crypto: x86/ghash - yield FPU context during long loops
+Date:   Mon, 19 Dec 2022 16:02:18 -0600
+Message-Id: <20221219220223.3982176-9-elliott@hpe.com>
 X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221219203733.3063192-1-elliott@hpe.com>
-References: <20221219203733.3063192-1-elliott@hpe.com>
+In-Reply-To: <20221219220223.3982176-1-elliott@hpe.com>
+References: <20221219220223.3982176-1-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: SXAnjrNOQ-cAN-_GH4MGD5ESQQ-mfTh3
-X-Proofpoint-GUID: SXAnjrNOQ-cAN-_GH4MGD5ESQQ-mfTh3
+X-Proofpoint-ORIG-GUID: OTJy3vKEdfmzvoxGnRwruc0exfrYOwPG
+X-Proofpoint-GUID: OTJy3vKEdfmzvoxGnRwruc0exfrYOwPG
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-19_01,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- malwarescore=0 phishscore=0 clxscore=1015 mlxscore=0 bulkscore=0
- mlxlogscore=999 adultscore=0 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2212190181
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ phishscore=0 impostorscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212190193
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Call cond_resched() to let the scheduler reschedule the
-CPU at the end of each test pass.
+The x86 assembly language implementations using SIMD process data
+between kernel_fpu_begin() and kernel_fpu_end() calls. That
+disables scheduler preemption, so prevents the CPU core from being
+used by other threads.
 
-If the kernel is configured with CONFIG_PREEMPT_NONE=y (or
-preempt=none is used on the kernel command line), the only
-time the scheduler will intervene is when cond_resched()
-is called. So, repeated calls to
-	modprobe tcrypt mode=<something>
+The update() and finup() functions might be called to process
+large quantities of data, which can result in RCU stalls and
+soft lockups.
 
-hold the CPU for a long time.
+Periodically check if the kernel scheduler wants to run something
+else on the CPU. If so, yield the kernel FPU context and let the
+scheduler intervene.
 
+Fixes: 0e1227d356e9 ("crypto: ghash - Add PCLMULQDQ accelerated implementation")
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Robert Elliott <elliott@hpe.com>
 ---
- crypto/tcrypt.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 26 ++++++++++++++++------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 3e9e4adeef02..916bddbf4e75 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -3027,6 +3027,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 1bfde099de0f..cd44339abdbb 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -82,7 +82,7 @@ static int ghash_update(struct shash_desc *desc,
  
+ 	if (dctx->bytes) {
+ 		int n = min(srclen, dctx->bytes);
+-		u8 *pos = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
++		u8 *pos = dst + GHASH_BLOCK_SIZE - dctx->bytes;
+ 
+ 		dctx->bytes -= n;
+ 		srclen -= n;
+@@ -97,13 +97,25 @@ static int ghash_update(struct shash_desc *desc,
+ 		}
  	}
  
-+	cond_resched();
- 	return ret;
- }
+-	kernel_fpu_begin();
+-	clmul_ghash_update(dst, src, srclen, &ctx->shash);
+-	kernel_fpu_end();
++	if (srclen >= GHASH_BLOCK_SIZE) {
++		kernel_fpu_begin();
++		for (;;) {
++			const unsigned int chunk = min(srclen, 4096U);
++
++			clmul_ghash_update(dst, src, chunk, &ctx->shash);
++
++			srclen -= chunk & ~(GHASH_BLOCK_SIZE - 1);
++			src += chunk & ~(GHASH_BLOCK_SIZE - 1);
++
++			if (srclen < GHASH_BLOCK_SIZE)
++				break;
++
++			kernel_fpu_yield();
++		}
++		kernel_fpu_end();
++	}
  
+-	if (srclen & 0xf) {
+-		src += srclen - (srclen & 0xf);
+-		srclen &= 0xf;
++	if (srclen) {
+ 		dctx->bytes = GHASH_BLOCK_SIZE - srclen;
+ 		while (srclen--)
+ 			*dst++ ^= *src++;
 -- 
 2.38.1
 
