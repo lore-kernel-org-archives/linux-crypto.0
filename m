@@ -2,95 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 990C7C4167B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 08:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0F8C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 08:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbiLTIFw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 03:05:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        id S232442AbiLTISC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 03:18:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiLTIFv (ORCPT
+        with ESMTP id S229489AbiLTISB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 03:05:51 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595F7E03;
-        Tue, 20 Dec 2022 00:05:49 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id vv4so27377032ejc.2;
-        Tue, 20 Dec 2022 00:05:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7wlvFHSM2RP+PNNDHtW3ieuOTdii0G62X5MBvZ2V8pw=;
-        b=DzQpJy1YuDICiFFo5pvGUUvsMHbV1zXfHdwuQxVsi0lWUG4Tiwjzht2EtdLWrKjLaw
-         YO9FLwzoYGvVfnQlBpfM3r6WL8eCsodlqIXtg0gICKvAIzboSYoA2kHYpbCv+0b6vWdD
-         /LWA9cGRH3sbKAsSqLtI3k/wXluUeIAoHdjb82Q1mlXzVtA0gELb+QnjRjMrAWlG1gXm
-         ft/5cnl94ua/jvqh9e9Xk875pNJqi02ndMQm/Ayglf8qyLA2ZQcmh1fdFrgGwxqm7TnG
-         TvsAwlLJ/meo2C49I5lCdw+ycR+r4Wi1JGxgQkLaL7trrrcEsFzI0hOvCqSoP1gZ1dxT
-         HEyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7wlvFHSM2RP+PNNDHtW3ieuOTdii0G62X5MBvZ2V8pw=;
-        b=ozAlENPRhlAad62DMIpzfPhqQQhnUGFqDZF+HqqhNhu0bzu8Ur/Nd0LaOkLTuH1iu+
-         askMPIiK3SLuca9lXJAGiocKhBlJHMrnjX7O/vqPM+pVRk1+4WoMTyxBsBsY4/Wo1UEW
-         iV4vQOFvDJOj3o78RgXOPO2jjiBnB/FTES+FSiNAJZ/erT5lHWVFwYhRiClZtDH7D+DG
-         vbd6E3NcvFyxsr1mRDLzPETo0867tubHE57+wO+GNhSlkIY2mmSihXjb0fSWip4sC+wc
-         tr3UgpBjb7EwonCcb/cFV8ag+ORs2yN4wcj+ccFceJv4AqDpbOpSOexDDi0eerzuyOd5
-         T1Sw==
-X-Gm-Message-State: AFqh2krzFqoftgnhZ4xUv1M1+Fv1n1M6j8nCpLpt3z/SpGzI7SLwTZo1
-        /9UfrpvM3HZD7NOk2MLmxMY=
-X-Google-Smtp-Source: AMrXdXuaAZucjnEltzM0+MhP1yNON2tjJW5PR8pqNtPWWPcRzlFdJ+gpwKt8OL9HxtTjB1IXMjsupQ==
-X-Received: by 2002:a17:907:d093:b0:81e:8dd4:51c3 with SMTP id vc19-20020a170907d09300b0081e8dd451c3mr6315697ejc.76.1671523547595;
-        Tue, 20 Dec 2022 00:05:47 -0800 (PST)
-Received: from felia.fritz.box ([2a02:810d:2a40:1104:954c:45e:aaca:69b])
-        by smtp.gmail.com with ESMTPSA id jx14-20020a170906ca4e00b007b47749838asm5263634ejb.45.2022.12.20.00.05.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Dec 2022 00:05:47 -0800 (PST)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] crypto: ux500: update debug config after ux500 cryp driver removal
-Date:   Tue, 20 Dec 2022 09:05:36 +0100
-Message-Id: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Tue, 20 Dec 2022 03:18:01 -0500
+Received: from mail.steuer-voss.de (mail.steuer-voss.de [85.183.69.95])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3508F1658E;
+        Tue, 20 Dec 2022 00:17:57 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at mail.steuer-voss.de
+Received: by mail.steuer-voss.de (Postfix, from userid 1000)
+        id 2D0183BDB; Tue, 20 Dec 2022 09:17:50 +0100 (CET)
+From:   Nikolaus Voss <nikolaus.voss@haag-streit.com>
+To:     "Horia Geanta" <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Nikolaus Voss <nv@vosn.de>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: caam: blob_gen.c: fix CAAM io mem access
+Message-Id: <20221220081750.2D0183BDB@mail.steuer-voss.de>
+Date:   Tue, 20 Dec 2022 09:17:50 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit 453de3eb08c4 ("crypto: ux500/cryp - delete driver") removes the
-config CRYPTO_DEV_UX500_CRYP, but leaves an obsolete reference in the
-dependencies of config CRYPTO_DEV_UX500_DEBUG.
+IO memory access has to be done with accessors defined in caam/regs.h
+as there are little-endian architectures with a big-endian CAAM unit.
 
-Remove that obsolete reference, and adjust the description while at it.
+Fixes: 6a83830f649a ("crypto: caam - warn if blob_gen key is insecure")
+Signed-off-by: Nikolaus Voss <nikolaus.voss@haag-streit.com>
+Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
 
-Fixes: 453de3eb08c4 ("crypto: ux500/cryp - delete driver")
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 ---
- drivers/crypto/ux500/Kconfig | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+v2: added upstream commit ref and reviewed-by line
 
-diff --git a/drivers/crypto/ux500/Kconfig b/drivers/crypto/ux500/Kconfig
-index dcbd7404768f..ac89cd2de12a 100644
---- a/drivers/crypto/ux500/Kconfig
-+++ b/drivers/crypto/ux500/Kconfig
-@@ -15,8 +15,7 @@ config CRYPTO_DEV_UX500_HASH
- 	  Depends on UX500/STM DMA if running in DMA mode.
+ drivers/crypto/caam/blob_gen.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
+index 1f65df4898478..f46b161d2cda6 100644
+--- a/drivers/crypto/caam/blob_gen.c
++++ b/drivers/crypto/caam/blob_gen.c
+@@ -104,7 +104,7 @@ int caam_process_blob(struct caam_blob_priv *priv,
+ 	}
  
- config CRYPTO_DEV_UX500_DEBUG
--	bool "Activate ux500 platform debug-mode for crypto and hash block"
--	depends on CRYPTO_DEV_UX500_CRYP || CRYPTO_DEV_UX500_HASH
-+	bool "Activate debug-mode for UX500 crypto driver for HASH block"
-+	depends on CRYPTO_DEV_UX500_HASH
- 	help
--	  Say Y if you want to add debug prints to ux500_hash and
--	  ux500_cryp devices.
-+	  Say Y if you want to add debug prints to ux500_hash devices.
+ 	ctrlpriv = dev_get_drvdata(jrdev->parent);
+-	moo = FIELD_GET(CSTA_MOO, ioread32(&ctrlpriv->ctrl->perfmon.status));
++	moo = FIELD_GET(CSTA_MOO, rd_reg32(&ctrlpriv->ctrl->perfmon.status));
+ 	if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
+ 		dev_warn(jrdev,
+ 			 "using insecure test key, enable HAB to use unique device key!\n");
 -- 
-2.17.1
+2.34.1
 
