@@ -2,90 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF87C3DA79
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 07:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 990C7C4167B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 08:05:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233528AbiLTHZj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 02:25:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45420 "EHLO
+        id S229690AbiLTIFw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 03:05:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233557AbiLTHZT (ORCPT
+        with ESMTP id S229489AbiLTIFv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 02:25:19 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0755315F04;
-        Mon, 19 Dec 2022 23:25:12 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p7WzY-008mhE-TF; Tue, 20 Dec 2022 15:24:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Dec 2022 15:24:48 +0800
-Date:   Tue, 20 Dec 2022 15:24:48 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, dhowells@redhat.com,
-        davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] lib/mpi: Fix buffer overrun when SG is too long
-Message-ID: <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
-References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
- <Y5OGr59A9wo86rYY@sol.localdomain>
- <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
- <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
- <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
+        Tue, 20 Dec 2022 03:05:51 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595F7E03;
+        Tue, 20 Dec 2022 00:05:49 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id vv4so27377032ejc.2;
+        Tue, 20 Dec 2022 00:05:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7wlvFHSM2RP+PNNDHtW3ieuOTdii0G62X5MBvZ2V8pw=;
+        b=DzQpJy1YuDICiFFo5pvGUUvsMHbV1zXfHdwuQxVsi0lWUG4Tiwjzht2EtdLWrKjLaw
+         YO9FLwzoYGvVfnQlBpfM3r6WL8eCsodlqIXtg0gICKvAIzboSYoA2kHYpbCv+0b6vWdD
+         /LWA9cGRH3sbKAsSqLtI3k/wXluUeIAoHdjb82Q1mlXzVtA0gELb+QnjRjMrAWlG1gXm
+         ft/5cnl94ua/jvqh9e9Xk875pNJqi02ndMQm/Ayglf8qyLA2ZQcmh1fdFrgGwxqm7TnG
+         TvsAwlLJ/meo2C49I5lCdw+ycR+r4Wi1JGxgQkLaL7trrrcEsFzI0hOvCqSoP1gZ1dxT
+         HEyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7wlvFHSM2RP+PNNDHtW3ieuOTdii0G62X5MBvZ2V8pw=;
+        b=ozAlENPRhlAad62DMIpzfPhqQQhnUGFqDZF+HqqhNhu0bzu8Ur/Nd0LaOkLTuH1iu+
+         askMPIiK3SLuca9lXJAGiocKhBlJHMrnjX7O/vqPM+pVRk1+4WoMTyxBsBsY4/Wo1UEW
+         iV4vQOFvDJOj3o78RgXOPO2jjiBnB/FTES+FSiNAJZ/erT5lHWVFwYhRiClZtDH7D+DG
+         vbd6E3NcvFyxsr1mRDLzPETo0867tubHE57+wO+GNhSlkIY2mmSihXjb0fSWip4sC+wc
+         tr3UgpBjb7EwonCcb/cFV8ag+ORs2yN4wcj+ccFceJv4AqDpbOpSOexDDi0eerzuyOd5
+         T1Sw==
+X-Gm-Message-State: AFqh2krzFqoftgnhZ4xUv1M1+Fv1n1M6j8nCpLpt3z/SpGzI7SLwTZo1
+        /9UfrpvM3HZD7NOk2MLmxMY=
+X-Google-Smtp-Source: AMrXdXuaAZucjnEltzM0+MhP1yNON2tjJW5PR8pqNtPWWPcRzlFdJ+gpwKt8OL9HxtTjB1IXMjsupQ==
+X-Received: by 2002:a17:907:d093:b0:81e:8dd4:51c3 with SMTP id vc19-20020a170907d09300b0081e8dd451c3mr6315697ejc.76.1671523547595;
+        Tue, 20 Dec 2022 00:05:47 -0800 (PST)
+Received: from felia.fritz.box ([2a02:810d:2a40:1104:954c:45e:aaca:69b])
+        by smtp.gmail.com with ESMTPSA id jx14-20020a170906ca4e00b007b47749838asm5263634ejb.45.2022.12.20.00.05.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Dec 2022 00:05:47 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] crypto: ux500: update debug config after ux500 cryp driver removal
+Date:   Tue, 20 Dec 2022 09:05:36 +0100
+Message-Id: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 09:49:29AM +0100, Roberto Sassu wrote:
->
-> do you have any news on this bug?
+Commit 453de3eb08c4 ("crypto: ux500/cryp - delete driver") removes the
+config CRYPTO_DEV_UX500_CRYP, but leaves an obsolete reference in the
+dependencies of config CRYPTO_DEV_UX500_DEBUG.
 
-Thanks for the reminder.  Could you please try this patch?
+Remove that obsolete reference, and adjust the description while at it.
 
----8<---
-The helper mpi_read_raw_from_sgl ignores the second parameter
-nbytes when reading the SG list and may overrun its own buffer
-because it only allocates enough memory according to nbytes.
+Fixes: 453de3eb08c4 ("crypto: ux500/cryp - delete driver")
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ drivers/crypto/ux500/Kconfig | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
-Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 39c4c6731094..6bffc68c1a5a 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -494,17 +494,15 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
- 	val->sign = 0;
- 	val->nlimbs = nlimbs;
+diff --git a/drivers/crypto/ux500/Kconfig b/drivers/crypto/ux500/Kconfig
+index dcbd7404768f..ac89cd2de12a 100644
+--- a/drivers/crypto/ux500/Kconfig
++++ b/drivers/crypto/ux500/Kconfig
+@@ -15,8 +15,7 @@ config CRYPTO_DEV_UX500_HASH
+ 	  Depends on UX500/STM DMA if running in DMA mode.
  
--	if (nbytes == 0)
--		return val;
--
- 	j = nlimbs - 1;
- 	a = 0;
- 	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
- 	z %= BYTES_PER_MPI_LIMB;
- 
--	while (sg_miter_next(&miter)) {
-+	while (nbytes && sg_miter_next(&miter)) {
- 		buff = miter.addr;
--		len = miter.length;
-+		len = min_t(unsigned, miter.length, nbytes);
-+		nbytes -= len;
- 
- 		for (x = 0; x < len; x++) {
- 			a <<= 8;
+ config CRYPTO_DEV_UX500_DEBUG
+-	bool "Activate ux500 platform debug-mode for crypto and hash block"
+-	depends on CRYPTO_DEV_UX500_CRYP || CRYPTO_DEV_UX500_HASH
++	bool "Activate debug-mode for UX500 crypto driver for HASH block"
++	depends on CRYPTO_DEV_UX500_HASH
+ 	help
+-	  Say Y if you want to add debug prints to ux500_hash and
+-	  ux500_cryp devices.
++	  Say Y if you want to add debug prints to ux500_hash devices.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.17.1
+
