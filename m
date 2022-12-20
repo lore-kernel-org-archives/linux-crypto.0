@@ -2,95 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4304AC46467
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 01:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305E2C46467
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 03:52:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233013AbiLTBZV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 20:25:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
+        id S229746AbiLTDwL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 22:52:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232633AbiLTBXP (ORCPT
+        with ESMTP id S229500AbiLTDwK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 20:23:15 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBD5F023;
-        Mon, 19 Dec 2022 17:22:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 18056B80F9B;
-        Tue, 20 Dec 2022 01:22:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D84C433EF;
-        Tue, 20 Dec 2022 01:22:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671499321;
-        bh=2PV6rZ6kwN1VEo166SUCdr4uGIWFt0H3y7Ea7llfnzY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=FASoHPC2RsY55LJ+2ZE4YUI/KWKTe6e47a6l26M0pjnSmnOfYkbgGsrCmy0clU5SF
-         g+KM7J6YzkGqc7qvoyHnY0smzekMnZMZpz4xAc5OgV382VJwjGd8Waghp2ct48XqY+
-         SfTICReWng7V3Z+EDGYy4JpQSUTY88STqNk62TqOB5WJDNjF4DA2CXBChNJ+MO70GK
-         9RG+BdLxZsBknQS2BdotF/meeQlevQBE3S+LVtZVNurze7O8YnVV4wrE+iIfY0ftA5
-         oBw+ZEA5JsfDdczAvufFey651YZpa7Fo2b+HikZDgTXbkJQ9BpEBpoLDoVsbN2dAJq
-         bkT+8thiUpNIQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zhiqi Song <songzhiqi1@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, liulongfang@huawei.com,
-        davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 1/9] crypto: hisilicon/hpre - fix resource leak in remove process
-Date:   Mon, 19 Dec 2022 20:21:51 -0500
-Message-Id: <20221220012159.1222517-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
+        Mon, 19 Dec 2022 22:52:10 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543B312D1C;
+        Mon, 19 Dec 2022 19:52:08 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p7TeR-008kBl-SS; Tue, 20 Dec 2022 11:50:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Dec 2022 11:50:47 +0800
+Date:   Tue, 20 Dec 2022 11:50:47 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, davem@davemloft.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, joro@8bytes.org,
+        suravee.suthikulpanit@amd.com, robin.murphy@arm.com,
+        dwmw2@infradead.org, baolu.lu@linux.intel.com,
+        Arnd Bergmann <arnd@arndb.de>, penberg@kernel.org,
+        rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 01/12] crypto: Remove u128 usage
+Message-ID: <Y6ExF8mchgYiiRB0@gondor.apana.org.au>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154118.889543494@infradead.org>
+ <Y6CJsWBhcbKatZNg@zx2c4.com>
+ <Y6CYu4skFFMopU+g@hirez.programming.kicks-ass.net>
+ <CAHmME9oCBgNCfYFxirA-fdarGip5MvOG-iUxT=2HC=iSXRMH-Q@mail.gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9oCBgNCfYFxirA-fdarGip5MvOG-iUxT=2HC=iSXRMH-Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Zhiqi Song <songzhiqi1@huawei.com>
+On Mon, Dec 19, 2022 at 06:03:04PM +0100, Jason A. Donenfeld wrote:
+>
+> Is there a patch at the end of the series that adds it back in to use u128?
 
-[ Upstream commit 45e6319bd5f2154d8b8c9f1eaa4ac030ba0d330c ]
+Could we do some ifdef trickery to reduce the amount of code churn
+please? Changing everything away from u128 and then back to it seems
+silly.
 
-In hpre_remove(), when the disable operation of qm sriov failed,
-the following logic should continue to be executed to release the
-remaining resources that have been allocated, instead of returning
-directly, otherwise there will be resource leakage.
-
-Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 65a641396c07..edc61e4105f3 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -1143,18 +1143,12 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- static void hpre_remove(struct pci_dev *pdev)
- {
- 	struct hisi_qm *qm = pci_get_drvdata(pdev);
--	int ret;
- 
- 	hisi_qm_pm_uninit(qm);
- 	hisi_qm_wait_task_finish(qm, &hpre_devices);
- 	hisi_qm_alg_unregister(qm, &hpre_devices);
--	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
--		ret = hisi_qm_sriov_disable(pdev, true);
--		if (ret) {
--			pci_err(pdev, "Disable SRIOV fail!\n");
--			return;
--		}
--	}
-+	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
-+		hisi_qm_sriov_disable(pdev, true);
- 
- 	hpre_debugfs_exit(qm);
- 	hisi_qm_stop(qm, QM_NORMAL);
+Thanks,
 -- 
-2.35.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
