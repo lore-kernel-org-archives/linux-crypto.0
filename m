@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189C7C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 05:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31519C54E76
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 05:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbiLTFmC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 00:42:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52116 "EHLO
+        id S229647AbiLTFmD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 00:42:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbiLTFmB (ORCPT
+        with ESMTP id S232853AbiLTFmC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 00:42:01 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E5AA188;
-        Mon, 19 Dec 2022 21:42:00 -0800 (PST)
+        Tue, 20 Dec 2022 00:42:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701AA10B56;
+        Mon, 19 Dec 2022 21:42:01 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E1E7BB811A3;
-        Tue, 20 Dec 2022 05:41:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4F8C43398;
-        Tue, 20 Dec 2022 05:41:56 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 099F561284;
+        Tue, 20 Dec 2022 05:42:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3059AC433A0;
+        Tue, 20 Dec 2022 05:41:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671514917;
-        bh=3n9ADRO4nwA4vng1EWokN1HkHn+cKE/ZleCXkk6FZuU=;
+        s=k20201202; t=1671514920;
+        bh=dsBT80rMbHb7evBtDRzv5PT3ZA7g7MTpg/OO26ExzF0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IvUk8ADqzbVfp/roQjX87ypPf+5oAlzPl/WmfbZwTC7hJGifzKIvrISekXo1QbPwj
-         77veN4ECatl/Cp4R0djvSgbZtgQ55keX8ZIkZI6jwUwT7Rr+rlabmPl5waJUVMEYj6
-         XyAo0xmS282IUjrk6asDmm9DdzzAFQgTRU4HxJjUaPmxA1hb+Iu5q+ddQU8JBD6mm3
-         pmfhJ238h55NLqoCVkky8COjAQAbUY+kKd3+uo5qVrJratiTxIXlJhqeLW1lo+OA7M
-         9buDvhj1+x2uw3hIpNFy1RbrfxJv0tFYb3c95M8thLEx4T6NY9TZm8pqO+xvypQF+X
-         XOzOZKCnjxGzQ==
+        b=jYOojsuBCSLHGr8TW6ECUwgWw+LEvw+PHi3nql2vBWzBzEq7MyKtVOLJ/b2Kiu4gS
+         oMG/dlg3OnMmVJmrdSv2oL97DF/CUUglF7nDPoQjrR1EUjWMzPIKMXZdHUPv8l8Sjd
+         UXS+WUfMJ0NGEcylNFSYCWZt2yo1UQq4aV3vPbfVoQuD+Qp8TbeWtUxBsxReFPOxlA
+         zfs32JevZlz+K+Uv5duClJslwi2mYsu29ttlLiM4znIDXOp4GXmEIq6usK1oiCT/rX
+         LwdwbARx6KolYJUmb/r6mqXzDaBmbWq87tBtJKhhILBQJc9wo5CJtT/46YobC23TXN
+         w7YoOtqqwQbVA==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Peter Zijlstra <peterz@infradead.org>, corbet@lwn.net,
@@ -51,9 +51,9 @@ Cc:     Peter Zijlstra <peterz@infradead.org>, corbet@lwn.net,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         iommu@lists.linux.dev, linux-arch@vger.kernel.org
-Subject: [PATCH 1/3] crypto: x86/ghash - fix unaligned access in ghash_setkey()
-Date:   Mon, 19 Dec 2022 21:40:40 -0800
-Message-Id: <20221220054042.188537-2-ebiggers@kernel.org>
+Subject: [PATCH 3/3] crypto: x86/ghash - add comment and fix broken link
+Date:   Mon, 19 Dec 2022 21:40:42 -0800
+Message-Id: <20221220054042.188537-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20221220054042.188537-1-ebiggers@kernel.org>
 References: <20221220054042.188537-1-ebiggers@kernel.org>
@@ -65,44 +65,72 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The key can be unaligned, so use the unaligned memory access helpers.
+Add a comment that explains what ghash_setkey() is doing, as it's hard
+to understand otherwise.  Also fix a broken hyperlink.
 
-Fixes: 8ceee72808d1 ("crypto: ghash-clmulni-intel - use C implementation for setkey()")
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  |  2 +-
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 27 ++++++++++++++++++----
+ 2 files changed, 24 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 9dfeb4d31b92..257ed9446f3e 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -4,7 +4,7 @@
+  * instructions. This file contains accelerated part of ghash
+  * implementation. More information about PCLMULQDQ can be found at:
+  *
+- * http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
++ * https://www.intel.com/content/dam/develop/external/us/en/documents/clmul-wp-rev-2-02-2014-04-20.pdf
+  *
+  * Copyright (c) 2009 Intel Corp.
+  *   Author: Huang Ying <ying.huang@intel.com>
 diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 1f1a95f3dd0c..c0ab0ff4af65 100644
+index 9453b094bb3b..700ecaee9a08 100644
 --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
 +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -19,6 +19,7 @@
- #include <crypto/internal/simd.h>
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
-+#include <asm/unaligned.h>
- 
- #define GHASH_BLOCK_SIZE	16
- #define GHASH_DIGEST_SIZE	16
-@@ -54,15 +55,14 @@ static int ghash_setkey(struct crypto_shash *tfm,
- 			const u8 *key, unsigned int keylen)
- {
- 	struct ghash_ctx *ctx = crypto_shash_ctx(tfm);
--	be128 *x = (be128 *)key;
- 	u64 a, b;
- 
+@@ -60,16 +60,35 @@ static int ghash_setkey(struct crypto_shash *tfm,
  	if (keylen != GHASH_BLOCK_SIZE)
  		return -EINVAL;
  
- 	/* perform multiplication by 'x' in GF(2^128) */
--	a = be64_to_cpu(x->a);
--	b = be64_to_cpu(x->b);
-+	a = get_unaligned_be64(key);
-+	b = get_unaligned_be64(key + 8);
+-	/* perform multiplication by 'x' in GF(2^128) */
++	/*
++	 * GHASH maps bits to polynomial coefficients backwards, which makes it
++	 * hard to implement.  But it can be shown that the GHASH multiplication
++	 *
++	 *	D * K (mod x^128 + x^7 + x^2 + x + 1)
++	 *
++	 * (where D is a data block and K is the key) is equivalent to:
++	 *
++	 *	bitreflect(D) * bitreflect(K) * x^(-127)
++	 *		(mod x^128 + x^127 + x^126 + x^121 + 1)
++	 *
++	 * So, the code below precomputes:
++	 *
++	 *	bitreflect(K) * x^(-127) (mod x^128 + x^127 + x^126 + x^121 + 1)
++	 *
++	 * ... but in Montgomery form (so that Montgomery multiplication can be
++	 * used), i.e. with an extra x^128 factor, which means actually:
++	 *
++	 *	bitreflect(K) * x (mod x^128 + x^127 + x^126 + x^121 + 1)
++	 *
++	 * The within-a-byte part of bitreflect() cancels out GHASH's built-in
++	 * reflection, and thus bitreflect() is actually a byteswap.
++	 */
+ 	a = get_unaligned_be64(key);
+ 	b = get_unaligned_be64(key + 8);
+-
+ 	ctx->shash.a = cpu_to_le64((a << 1) | (b >> 63));
+ 	ctx->shash.b = cpu_to_le64((b << 1) | (a >> 63));
+-
+ 	if (a >> 63)
+ 		ctx->shash.a ^= cpu_to_le64((u64)0xc2 << 56);
+-
+ 	return 0;
+ }
  
- 	ctx->shash.a = (b << 1) | (a >> 63);
- 	ctx->shash.b = (a << 1) | (b >> 63);
 -- 
 2.39.0
 
