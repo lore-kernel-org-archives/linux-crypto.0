@@ -2,133 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C065BC4167B
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 10:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB923C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 10:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233421AbiLTKJt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 05:09:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37354 "EHLO
+        id S233610AbiLTKLh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 05:11:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233194AbiLTKJs (ORCPT
+        with ESMTP id S232836AbiLTKLg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 05:09:48 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA58B195;
-        Tue, 20 Dec 2022 02:09:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mQoXx7ooWzXAgLu3DbAl3UCLnz1vvc6S+1s5Rvnq/UI=; b=mifUTTsP8pp/47e91n+1G5oAGl
-        Sytj5m/XMsUymJR6hl/wNCZLxJsqkWKZXV+2zQ9MuvryuM7nKDKoAqAQ47XIXHOwTkmCnuAIWfLzy
-        kvCyAKW+BmJSyHpcIlgvM9T9OjzbLtAmUKFjsenj43QJM2fi5Xma65xF7N16RYVY+HIBbMM/xNj8m
-        NKKtjqtohqpqRmTU/UMIe6VUfhSD3zdYZD+48z3UOu2A8I28cV3h4WcSCrs4PMqs35w3gh9dWKGpE
-        lNnqsH4LvQIcWKg375a/JZouT1oGuIk24Gb0pp6Tk1QK1kw2Is+yw2SAYC4ayabXxOXP9bj1K0vvl
-        6nEPcutQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7ZYt-001gUJ-QB; Tue, 20 Dec 2022 10:09:27 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 237DC300023;
-        Tue, 20 Dec 2022 11:09:17 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id DF1E6200AB1CE; Tue, 20 Dec 2022 11:09:16 +0100 (CET)
-Date:   Tue, 20 Dec 2022 11:09:16 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, corbet@lwn.net, will@kernel.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org
-Subject: Re: [PATCH 3/3] crypto: x86/ghash - add comment and fix broken link
-Message-ID: <Y6GJzD9PLKj+Ocr2@hirez.programming.kicks-ass.net>
-References: <20221220054042.188537-1-ebiggers@kernel.org>
- <20221220054042.188537-4-ebiggers@kernel.org>
+        Tue, 20 Dec 2022 05:11:36 -0500
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07BD4F25
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Dec 2022 02:11:36 -0800 (PST)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1445ca00781so14887732fac.1
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Dec 2022 02:11:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=X6d3Z6dvdsIJ7mSON8osSHcFlqBJfVh3ygvs/0GnLUA=;
+        b=XOH19Nuw5AW71x4dMl+COJmb20aWkbQV4JS6o9ilHkOS3MiliNZZ0Ioo2gtmDPjSjC
+         j9QEyBPUmidYmnYsuyUIL/2K0FKnsiKZEI6M8LGhOR+FstULcvGlJFEc4UgYdHbCGK03
+         1IHK8DMp1qNglENfFSfhq6LvCcCamKLH3HouZRM9/VBhjz6axY02dY5dDu767L67aIOc
+         h2vYAYduY9NuPoYpHky3qZuclig8/4jJKMpPAxkIydkY/ese1mraC9/bPhGs8mU/bvMF
+         PHUNgc3NdO6inhdmyzu05WF3+k+YGuW3JOlEL3V9lRUb1HH386gqaBdQ8zgPjN83PlUn
+         cJ6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X6d3Z6dvdsIJ7mSON8osSHcFlqBJfVh3ygvs/0GnLUA=;
+        b=SBLauf7LxkuIcOKHSQRuQz++NHDmBgl0xklTBmUaQ2bRDCioNuL2DfhnPZW3TbOvkf
+         Yd4b8PmsDJTI5GL5hgaAUZCyY5BW1iYMWg9z+w9xPye9Ot7jPdelJyVfaRNJQZXgz4Mx
+         U5nN4TymOM3vJWvPVzvF0bAz7IMIjdVztYFpGwCrXeZKQypKPevVYZ7Q0/ZBKJjaSZr8
+         IQRs4n5FLMh9Ot2eQHcpblemogPnciLqi2YlpfDQ4N78/IkCj8rMt9v/a5UOkHSPNoKw
+         UGNrkBSdyAh7Mx5Po/Nb5y+5H3dwd2yBjZKEsaIwyrwUUhIIkVLiDbpiVvHVWlYZBuKn
+         RjGw==
+X-Gm-Message-State: AFqh2koj9pRzlGe0dEf9cbQ+Lgv9/1vgk6ifqE1ODTHELsjoSrS3SMgy
+        eRRofqPw+GcxHn/kydQs6qNQO/nUNZh+J3pu90KUAg==
+X-Google-Smtp-Source: AMrXdXu4MHoS5gKZBxPWbLf6IfGETzNFrfJ7rJVFxDXPSQ6OvduE8JP8iY32hcC0PljM8KzcQahIdGHMj25AGSs6J1M=
+X-Received: by 2002:a05:6870:a790:b0:13b:96fc:18c1 with SMTP id
+ x16-20020a056870a79000b0013b96fc18c1mr1602468oao.291.1671531094833; Tue, 20
+ Dec 2022 02:11:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221220054042.188537-4-ebiggers@kernel.org>
+References: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
+In-Reply-To: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Tue, 20 Dec 2022 11:11:20 +0100
+Message-ID: <CACRpkdahe6-ryRb+qO3+u6-XyhQY12++2eq_CZB-g40dj3Hd-Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ux500: update debug config after ux500 cryp
+ driver removal
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 09:40:42PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Add a comment that explains what ghash_setkey() is doing, as it's hard
-> to understand otherwise.  Also fix a broken hyperlink.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/x86/crypto/ghash-clmulni-intel_asm.S  |  2 +-
->  arch/x86/crypto/ghash-clmulni-intel_glue.c | 27 ++++++++++++++++++----
->  2 files changed, 24 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> index 9dfeb4d31b92..257ed9446f3e 100644
-> --- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> +++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> @@ -4,7 +4,7 @@
->   * instructions. This file contains accelerated part of ghash
->   * implementation. More information about PCLMULQDQ can be found at:
->   *
-> - * http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
-> + * https://www.intel.com/content/dam/develop/external/us/en/documents/clmul-wp-rev-2-02-2014-04-20.pdf
+On Tue, Dec 20, 2022 at 9:05 AM Lukas Bulwahn <lukas.bulwahn@gmail.com> wrote:
 
-Since these things have a habbit if changing, we tend to prefer to host
-a copy on kernel.org somewhere (used to be bugzilla, but perhaps there's
-a better places these days).
+> Commit 453de3eb08c4 ("crypto: ux500/cryp - delete driver") removes the
+> config CRYPTO_DEV_UX500_CRYP, but leaves an obsolete reference in the
+> dependencies of config CRYPTO_DEV_UX500_DEBUG.
+>
+> Remove that obsolete reference, and adjust the description while at it.
+>
+> Fixes: 453de3eb08c4 ("crypto: ux500/cryp - delete driver")
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 
->   *
->   * Copyright (c) 2009 Intel Corp.
->   *   Author: Huang Ying <ying.huang@intel.com>
-> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> index 9453b094bb3b..700ecaee9a08 100644
-> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> @@ -60,16 +60,35 @@ static int ghash_setkey(struct crypto_shash *tfm,
->  	if (keylen != GHASH_BLOCK_SIZE)
->  		return -EINVAL;
->  
-> -	/* perform multiplication by 'x' in GF(2^128) */
-> +	/*
-> +	 * GHASH maps bits to polynomial coefficients backwards, which makes it
-> +	 * hard to implement.  But it can be shown that the GHASH multiplication
-> +	 *
-> +	 *	D * K (mod x^128 + x^7 + x^2 + x + 1)
-> +	 *
-> +	 * (where D is a data block and K is the key) is equivalent to:
-> +	 *
-> +	 *	bitreflect(D) * bitreflect(K) * x^(-127)
-> +	 *		(mod x^128 + x^127 + x^126 + x^121 + 1)
-> +	 *
-> +	 * So, the code below precomputes:
-> +	 *
-> +	 *	bitreflect(K) * x^(-127) (mod x^128 + x^127 + x^126 + x^121 + 1)
-> +	 *
-> +	 * ... but in Montgomery form (so that Montgomery multiplication can be
-> +	 * used), i.e. with an extra x^128 factor, which means actually:
-> +	 *
-> +	 *	bitreflect(K) * x (mod x^128 + x^127 + x^126 + x^121 + 1)
-> +	 *
-> +	 * The within-a-byte part of bitreflect() cancels out GHASH's built-in
-> +	 * reflection, and thus bitreflect() is actually a byteswap.
-> +	 */
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-Whee, thanks, that was indeed entirely non-obvious.
+Yours,
+Linus Walleij
