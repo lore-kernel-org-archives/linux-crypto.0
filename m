@@ -2,95 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 771B5C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 20:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE44DC4167B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 20:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234186AbiLTUNT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 15:13:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49794 "EHLO
+        id S229906AbiLTUaX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 15:30:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234181AbiLTUNS (ORCPT
+        with ESMTP id S229543AbiLTUaW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 15:13:18 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 211011D64E;
-        Tue, 20 Dec 2022 12:13:17 -0800 (PST)
+        Tue, 20 Dec 2022 15:30:22 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08506BCBB;
+        Tue, 20 Dec 2022 12:30:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A78AA6159F;
-        Tue, 20 Dec 2022 20:13:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2276C433EF;
-        Tue, 20 Dec 2022 20:13:15 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B6FCCB8197A;
+        Tue, 20 Dec 2022 20:30:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B110C433D2;
+        Tue, 20 Dec 2022 20:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671567196;
-        bh=Gv7ILarnqG6VXDv1zDoq4dXMcpli2fdU3fYWtrhD7CU=;
+        s=k20201202; t=1671568218;
+        bh=sru7LQzWJgHhTjq6GGgq1igtkj+AD/SkpfcWXzTJ0tE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BNIgEyD2b/kwnXbaR5eP2QBP6UOPAvQD/zXFajZWt6RT74gXhm2s6OW4N4KlIDYfC
-         Wxj/cb6C47OFZnLUTyNjRVTrtsstBCz34eSTcFuSh8xOdIJfvtKJ0/S3YG8qtuZO+h
-         LVw/GM01Blb4idgGSfUfT/5N9ejTRXvuE5Mw1vrfiD3+t4k4Xbat5lWBMHcLkl/46L
-         MZPNmMJsegfvf0rTSEXW5sH0CokCzOrUgUPmh+IzXUqga3I07y9uao2n9w8QT5IQiS
-         MZzetOEpR2Sv47PnKm1OJ3NaodmMfXpe4ekWd75YuDtjccDI1UPYcXzuqMblveH5rR
-         DHTVp2kedMNHw==
-Date:   Tue, 20 Dec 2022 20:13:14 +0000
+        b=dc346weOE7CjZdtk6aJU8cIiWUvyMmIAz1qs8SsVmoOGwSibZi2W8kzYotUXZdMet
+         r4DxSdAYwFEQRnWz9P5axU3/iN/AZB+/OwfNtBVn5k/6UhkgkOLGX9r3foFlUl3Pv1
+         qvIyr8zoJgnWyVNmKCokwOqjkW4qIbnEtfFEvYKquv6wIbX5qzL9IKdzQPwdahl4Nk
+         9p+46oNa5XnMqkbit+txcwdAe0Hwaxoc6fJJn0RxJvXsp0m9Vw8P9b3w+BC0QeajCT
+         AEvkM4BPuj6dh/LyhDxyrXJABgJV9XMwzNdOgZ4RMkSYMdHQqFLcu+QFce0fhm3+v6
+         N3Xqgep6f2rCg==
+Date:   Tue, 20 Dec 2022 20:30:16 +0000
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "patches@lists.linux.dev" <patches@lists.linux.dev>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH v12 0/6] implement getrandom() in vDSO
-Message-ID: <Y6IXWltScF2CI1v3@gmail.com>
-References: <20221212185347.1286824-1-Jason@zx2c4.com>
- <86cfa465-2485-ff24-16f5-9014e25a0e98@csgroup.eu>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>, dhowells@redhat.com,
+        davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] lib/mpi: Fix buffer overrun when SG is too long
+Message-ID: <Y6IbWA5aZeBnn4n2@gmail.com>
+References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
+ <Y5OGr59A9wo86rYY@sol.localdomain>
+ <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
+ <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
+ <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
+ <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
+ <a04e6458-6814-97fc-f03a-617809e2e6ce@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86cfa465-2485-ff24-16f5-9014e25a0e98@csgroup.eu>
+In-Reply-To: <a04e6458-6814-97fc-f03a-617809e2e6ce@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 05:17:52PM +0000, Christophe Leroy wrote:
-> Hi Jason,
+On Tue, Dec 20, 2022 at 11:36:50AM +0100, Roberto Sassu wrote:
+> On 12/20/2022 8:24 AM, Herbert Xu wrote:
+> > On Mon, Dec 19, 2022 at 09:49:29AM +0100, Roberto Sassu wrote:
+> > > 
+> > > do you have any news on this bug?
+> > 
+> > Thanks for the reminder.  Could you please try this patch?
 > 
-> Le 12/12/2022 à 19:53, Jason A. Donenfeld a écrit :
-> > Changes v11->v12:
-> > ----------------
-> > - In order to avoid mlock()ing pages, and the related rlimit and fork
-> >    inheritance issues there, Introduce VM_DROPPABLE to prevent swapping
-> >    while meeting the cache-like requirements of vDSO getrandom().
-> > 
-> >    This has some tenticles in mm/ and arch/x86/ code, so I've marked the
-> >    two patches for that as still RFC, while the rest of the series is not
-> >    RFC.
-> > 
-> > - Mandate that opaque state blobs don't straddle page boundaries, so
-> >    that VM_DROPPABLE can work on page-level granularity rather than
-> >    allocation-level granularity.
-> > 
-> > - Add compiler barriers to vDSO getrandom() to prevent theoretical
-> >    reordering potential.
-> > 
-> > - Initialize the trials loop counter in the chacha test.
+> Tried, could not boot the UML kernel.
 > 
-> I would have liked to give it a try on powerpc, but the series 
-> conflicts. I tried both on v6.1 and on linus/master from now:
+> After looking, it seems we have to call sg_miter_stop(). Or alternatively,
+> we could let sg_miter_next() be called but not writing anything inside the
+> loop.
 > 
+> With either of those fixes, the tests pass (using one scatterlist).
+> 
+> Roberto
+> 
+> > ---8<---
+> > The helper mpi_read_raw_from_sgl ignores the second parameter
+> > nbytes when reading the SG list and may overrun its own buffer
+> > because it only allocates enough memory according to nbytes.
+> > 
+> > Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+> > Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
+> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > 
+> > diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+> > index 39c4c6731094..6bffc68c1a5a 100644
+> > --- a/lib/mpi/mpicoder.c
+> > +++ b/lib/mpi/mpicoder.c
+> > @@ -494,17 +494,15 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+> >   	val->sign = 0;
+> >   	val->nlimbs = nlimbs;
+> > -	if (nbytes == 0)
+> > -		return val;
+> > -
+> >   	j = nlimbs - 1;
+> >   	a = 0;
+> >   	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
+> >   	z %= BYTES_PER_MPI_LIMB;
+> > -	while (sg_miter_next(&miter)) {
+> > +	while (nbytes && sg_miter_next(&miter)) {
+> >   		buff = miter.addr;
+> > -		len = miter.length;
+> > +		len = min_t(unsigned, miter.length, nbytes);
+> > +		nbytes -= len;
+> >   		for (x = 0; x < len; x++) {
+> >   			a <<= 8;
 
-Same here, I can't figure out how to apply this series.
+I think it should look like:
 
-It would help if people always used the --base option to git format-patch...
+	while (nbytes) {
+		sg_miter_next(&miter);
+		...
+	}
+	sg_miter_stop(&miter);
 
 - Eric
