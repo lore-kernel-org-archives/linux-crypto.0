@@ -2,49 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B48BC46467
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 01:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4304AC46467
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 01:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232911AbiLTBXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Dec 2022 20:23:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52370 "EHLO
+        id S233013AbiLTBZV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Dec 2022 20:25:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232918AbiLTBWR (ORCPT
+        with ESMTP id S232633AbiLTBXP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Dec 2022 20:22:17 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9AA413E3B;
-        Mon, 19 Dec 2022 17:21:39 -0800 (PST)
+        Mon, 19 Dec 2022 20:23:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBD5F023;
+        Mon, 19 Dec 2022 17:22:04 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7A3BBB80F9B;
-        Tue, 20 Dec 2022 01:21:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 561D9C433D2;
-        Tue, 20 Dec 2022 01:21:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 18056B80F9B;
+        Tue, 20 Dec 2022 01:22:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D84C433EF;
+        Tue, 20 Dec 2022 01:22:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671499297;
-        bh=mYdgAR+ewJsm1ruwrLN/dfI/ve+thD8vum0i48+g6bE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=L/kzRY6SskwwQGshUBlYaERMrXkk0u7c43CvzP08MTr9z7cN1DTDRrry2i5Mk/hAO
-         Tdeed+VmFRFbqCkqMbPnUcXxKw0bytSwdCMzAtifEoy5co/rqrR2iOJ10JP/9dvlLK
-         YEIFoMj8zozmQCCcE17dvqe6YcUXXFoWEb/m6x67uBy5Av4khBBHZvgLtMf7R0mRUF
-         3UAuhNR0De2Dq9GB+8aFSGYG08O5aiY/Thskbgh+stwzYyStNuYmJ6E4iqNA9JeXC7
-         05FvWKxkYRnMdh2q9CQOSnD5Ln4/bavZklxU7XSZwiw47pAm32zZCGc1ODRii6OcNC
-         rSh1keAa0blXw==
+        s=k20201202; t=1671499321;
+        bh=2PV6rZ6kwN1VEo166SUCdr4uGIWFt0H3y7Ea7llfnzY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FASoHPC2RsY55LJ+2ZE4YUI/KWKTe6e47a6l26M0pjnSmnOfYkbgGsrCmy0clU5SF
+         g+KM7J6YzkGqc7qvoyHnY0smzekMnZMZpz4xAc5OgV382VJwjGd8Waghp2ct48XqY+
+         SfTICReWng7V3Z+EDGYy4JpQSUTY88STqNk62TqOB5WJDNjF4DA2CXBChNJ+MO70GK
+         9RG+BdLxZsBknQS2BdotF/meeQlevQBE3S+LVtZVNurze7O8YnVV4wrE+iIfY0ftA5
+         oBw+ZEA5JsfDdczAvufFey651YZpa7Fo2b+HikZDgTXbkJQ9BpEBpoLDoVsbN2dAJq
+         bkT+8thiUpNIQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai Ye <yekai13@huawei.com>,
+Cc:     Zhiqi Song <songzhiqi1@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, qianweili@huawei.com,
-        wangzhou1@hisilicon.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 04/16] crypto: hisilicon/qm - increase the memory of local variables
-Date:   Mon, 19 Dec 2022 20:21:14 -0500
-Message-Id: <20221220012127.1222311-4-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, liulongfang@huawei.com,
+        davem@davemloft.net, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 1/9] crypto: hisilicon/hpre - fix resource leak in remove process
+Date:   Mon, 19 Dec 2022 20:21:51 -0500
+Message-Id: <20221220012159.1222517-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221220012127.1222311-1-sashal@kernel.org>
-References: <20221220012127.1222311-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,43 +50,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+From: Zhiqi Song <songzhiqi1@huawei.com>
 
-[ Upstream commit 3efe90af4c0c46c58dba1b306de142827153d9c0 ]
+[ Upstream commit 45e6319bd5f2154d8b8c9f1eaa4ac030ba0d330c ]
 
-Increase the buffer to prevent stack overflow by fuzz test. The maximum
-length of the qos configuration buffer is 256 bytes. Currently, the value
-of the 'val buffer' is only 32 bytes. The sscanf does not check the dest
-memory length. So the 'val buffer' may stack overflow.
+In hpre_remove(), when the disable operation of qm sriov failed,
+the following logic should continue to be executed to release the
+remaining resources that have been allocated, instead of returning
+directly, otherwise there will be resource leakage.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Signed-off-by: Zhiqi Song <songzhiqi1@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/qm.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 9fa2efe60153..ed3185c4d33a 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -252,7 +252,6 @@
- #define QM_QOS_MIN_CIR_B		100
- #define QM_QOS_MAX_CIR_U		6
- #define QM_QOS_MAX_CIR_S		11
--#define QM_QOS_VAL_MAX_LEN		32
- #define QM_DFX_BASE		0x0100000
- #define QM_DFX_STATE1		0x0104000
- #define QM_DFX_STATE2		0x01040C8
-@@ -4583,7 +4582,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
- 			       unsigned int *fun_index)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 65a641396c07..edc61e4105f3 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -1143,18 +1143,12 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ static void hpre_remove(struct pci_dev *pdev)
  {
- 	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
--	char val_buf[QM_QOS_VAL_MAX_LEN] = {0};
-+	char val_buf[QM_DBG_READ_LEN] = {0};
- 	u32 tmp1, device, function;
- 	int ret, bus;
+ 	struct hisi_qm *qm = pci_get_drvdata(pdev);
+-	int ret;
  
+ 	hisi_qm_pm_uninit(qm);
+ 	hisi_qm_wait_task_finish(qm, &hpre_devices);
+ 	hisi_qm_alg_unregister(qm, &hpre_devices);
+-	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
+-		ret = hisi_qm_sriov_disable(pdev, true);
+-		if (ret) {
+-			pci_err(pdev, "Disable SRIOV fail!\n");
+-			return;
+-		}
+-	}
++	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
++		hisi_qm_sriov_disable(pdev, true);
+ 
+ 	hpre_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
 -- 
 2.35.1
 
