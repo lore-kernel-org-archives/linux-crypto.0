@@ -2,123 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2836FC10F1E
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 10:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A9DC4167B
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Dec 2022 11:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232288AbiLTKhi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Dec 2022 05:37:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51068 "EHLO
+        id S233119AbiLTLJW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Dec 2022 06:09:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiLTKhg (ORCPT
+        with ESMTP id S229812AbiLTLJV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Dec 2022 05:37:36 -0500
-Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B342BE3D;
-        Tue, 20 Dec 2022 02:37:34 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.227])
-        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4NbtB95WQzz9xqwx;
-        Tue, 20 Dec 2022 18:30:09 +0800 (CST)
-Received: from [10.45.156.176] (unknown [10.45.156.176])
-        by APP2 (Coremail) with SMTP id GxC2BwDXqWBMkKFj9NEqAA--.5576S2;
-        Tue, 20 Dec 2022 11:37:10 +0100 (CET)
-Message-ID: <a04e6458-6814-97fc-f03a-617809e2e6ce@huaweicloud.com>
-Date:   Tue, 20 Dec 2022 11:36:50 +0100
+        Tue, 20 Dec 2022 06:09:21 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425AB12766;
+        Tue, 20 Dec 2022 03:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WnDr2T6Lz6o8EGXfFOLVGTm1EwVLYgoHb8GLpQHXt1M=; b=IagLEV2UTnOH/1oiatZU2t3fd9
+        wIPIif+7ieQr0xntpK0GaWRRyiwDimnm1M6YG2G9sgsXB6FHTn576bYXZ2XsZQu0X8SVskwk0RdED
+        sUugD1rIZDNEonT+Wrqt9z6gKuYGTXksjAvjtBZde5JzbCpvKPzWPD1B3Cr1mg/gBpkJd++WwKlHn
+        CyrczxUMFGQp9teEMndrfFHW1fsEnOaw7HKW7iIuwSjcBQVnSoFpre5ReinrnsDbQ5HAqkui68Umh
+        mhCAarnFYTE260WL9Igxo03K9hMfZoyNoHum8h5NGIXp5g8yzrlrLDnscp3XKQ468GvNz5tPnXOvK
+        5BahRGCw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1p7aTs-00Cy6n-0d;
+        Tue, 20 Dec 2022 11:08:20 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E507F300023;
+        Tue, 20 Dec 2022 12:08:16 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 767AE201D1375; Tue, 20 Dec 2022 12:08:16 +0100 (CET)
+Date:   Tue, 20 Dec 2022 12:08:16 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        mark.rutland@arm.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 05/12] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.154045458@infradead.org>
+ <Y6DEfQXymYVgL3oJ@boqun-archlinux>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] lib/mpi: Fix buffer overrun when SG is too long
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>, dhowells@redhat.com,
-        davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Tadeusz Struk <tadeusz.struk@intel.com>
-References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
- <Y5OGr59A9wo86rYY@sol.localdomain>
- <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
- <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
- <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
- <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
-Content-Language: en-US
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-In-Reply-To: <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: GxC2BwDXqWBMkKFj9NEqAA--.5576S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tr4rXrW5Aw45ArW3Zw4fZrb_yoW8Xw17pF
-        4DXa1UGrWvg3yIy3ZrW3W8K345C3s8GF47Crs7tr1j9rZ3tw1FkrW0kw4F9347Wr4kXr4U
-        Ja4qva4fZrWkArUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_
-        WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
-        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-        7IU13rcDUUUUU==
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAMBF1jj4bWLQABsE
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y6DEfQXymYVgL3oJ@boqun-archlinux>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/20/2022 8:24 AM, Herbert Xu wrote:
-> On Mon, Dec 19, 2022 at 09:49:29AM +0100, Roberto Sassu wrote:
->>
->> do you have any news on this bug?
+On Mon, Dec 19, 2022 at 12:07:25PM -0800, Boqun Feng wrote:
+> On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
+> > For all architectures that currently support cmpxchg_double()
+> > implement the cmpxchg128() family of functions that is basically the
+> > same but with a saner interface.
+> > 
+> > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> > ---
+> >  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
+> >  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
+> >  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+> >  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
+> >  arch/x86/include/asm/cmpxchg_32.h     |    3 +
+> >  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+> >  6 files changed, 185 insertions(+), 3 deletions(-)
+> > 
+> > --- a/arch/arm64/include/asm/atomic_ll_sc.h
+> > +++ b/arch/arm64/include/asm/atomic_ll_sc.h
+> > @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+> >  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
+> >  
+> >  #undef __CMPXCHG_DBL
+> > +
+> > +union __u128_halves {
+> > +	u128 full;
+> > +	struct {
+> > +		u64 low, high;
+> > +	};
+> > +};
+> > +
+> > +#define __CMPXCHG128(name, mb, rel, cl)					\
+> > +static __always_inline u128						\
+> > +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
+> > +{									\
+> > +	union __u128_halves r, o = { .full = (old) },			\
+> > +			       n = { .full = (new) };			\
+> > +									\
+> > +	asm volatile("// __cmpxchg128" #name "\n"			\
+> > +	"	prfm	pstl1strm, %2\n"				\
+> > +	"1:	ldxp	%0, %1, %2\n"					\
+> > +	"	eor	%3, %0, %3\n"					\
+> > +	"	eor	%4, %1, %4\n"					\
+> > +	"	orr	%3, %4, %3\n"					\
+> > +	"	cbnz	%3, 2f\n"					\
+> > +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
+> > +	"	cbnz	%w3, 1b\n"					\
+> > +	"	" #mb "\n"						\
+> > +	"2:"								\
+> > +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
 > 
-> Thanks for the reminder.  Could you please try this patch?
+> I wonder whether we should use "(*(u128 *)ptr)" instead of "(*(unsigned
+> long *) ptr)"? Because compilers may think only 64bit value pointed by
+> "ptr" gets modified, and they are allowed to do "useful" optimization.
 
-Tried, could not boot the UML kernel.
-
-After looking, it seems we have to call sg_miter_stop(). Or 
-alternatively, we could let sg_miter_next() be called but not writing 
-anything inside the loop.
-
-With either of those fixes, the tests pass (using one scatterlist).
-
-Roberto
-
-> ---8<---
-> The helper mpi_read_raw_from_sgl ignores the second parameter
-> nbytes when reading the SG list and may overrun its own buffer
-> because it only allocates enough memory according to nbytes.
-> 
-> Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
-> Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-> index 39c4c6731094..6bffc68c1a5a 100644
-> --- a/lib/mpi/mpicoder.c
-> +++ b/lib/mpi/mpicoder.c
-> @@ -494,17 +494,15 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
->   	val->sign = 0;
->   	val->nlimbs = nlimbs;
->   
-> -	if (nbytes == 0)
-> -		return val;
-> -
->   	j = nlimbs - 1;
->   	a = 0;
->   	z = BYTES_PER_MPI_LIMB - nbytes % BYTES_PER_MPI_LIMB;
->   	z %= BYTES_PER_MPI_LIMB;
->   
-> -	while (sg_miter_next(&miter)) {
-> +	while (nbytes && sg_miter_next(&miter)) {
->   		buff = miter.addr;
-> -		len = miter.length;
-> +		len = min_t(unsigned, miter.length, nbytes);
-> +		nbytes -= len;
->   
->   		for (x = 0; x < len; x++) {
->   			a <<= 8;
-
+In this I've copied the existing cmpxchg_double() code; I'll have to let
+the arch folks speak here, I've no clue.
