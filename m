@@ -2,95 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8672C4167B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 22:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B84C4167B
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 22:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbiLUWXr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 17:23:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35822 "EHLO
+        id S235099AbiLUWmN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 17:42:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiLUWXq (ORCPT
+        with ESMTP id S234967AbiLUWmM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 17:23:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA062716F;
-        Wed, 21 Dec 2022 14:23:44 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 21 Dec 2022 17:42:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBBADE86
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Dec 2022 14:41:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671662485;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=bLYZMh2LR87CuiMLuCzUcuWCtKa8d3kE51+MQe3QUCA=;
+        b=ZhivPbmSUHORMBSJYENzQsavQ5rz2oBZnMqoRCdhMlEJNQqNkAduBH73UokXt6vXhY4Daz
+        H4N8l++asjM9e+dT5NK+tPDLqLm5I+gq4stwR8hqiaN5rkE9p636a5Ym7GYENdjqDeEmUt
+        Ue6INSZCqNoGntmAXF6t8PrdrjPua+k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-623-ETNqCoCEOIag41ARSFnPAA-1; Wed, 21 Dec 2022 17:41:24 -0500
+X-MC-Unique: ETNqCoCEOIag41ARSFnPAA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7B22CB81BA5;
-        Wed, 21 Dec 2022 22:23:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6167C433F0;
-        Wed, 21 Dec 2022 22:23:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671661422;
-        bh=a4YlhMKwpDx91P9/OqB5YgBJ3CZZKs0GBLO0nss4l5w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gW5FaHCafpN8ZHL5irBlgHeFWBBO/ENKqAJyXcOmUTD05EsGlo0F23Di+6Itkj35X
-         2JkRi9prJRsOH9MVAjKt07kLTzk9konccJ9E/1E/g/B4iE3Vv/pJ2jzhnBlgX56wVv
-         mz2RJjDDGpuzmPi9CCiFFnpWxlY2fEk5xmomRZjRfzATOugR/Cf42Z84mJIJsfg+U+
-         JtJLZZzN5vtKPy5MCC+yhO79taV+3t+yQV2/vu+Dlh51p/3/flMkLXhdvgQjPxiBMv
-         iYWG31s1SNjYaSYZRi/cXz0JqV986Bt6O8kPvsQPRUq9CNS8KXpoG5IJFUd7W/93bU
-         lzbkgNAYsMUNQ==
-Date:   Wed, 21 Dec 2022 14:23:39 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v13 6/7] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y6OHa196S8e1mImg@sol.localdomain>
-References: <20221221142327.126451-1-Jason@zx2c4.com>
- <20221221142327.126451-7-Jason@zx2c4.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20F638F6E81;
+        Wed, 21 Dec 2022 22:41:24 +0000 (UTC)
+Received: from rules.brq.redhat.com (ovpn-208-11.brq.redhat.com [10.40.208.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04A1240C2004;
+        Wed, 21 Dec 2022 22:41:21 +0000 (UTC)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     nstange@suse.de, elliott@hpe.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, smueller@chronox.de,
+        vdronov@redhat.com
+Subject: [PATCH 0/6] Trivial set of FIPS 140-3 related changes
+Date:   Wed, 21 Dec 2022 23:41:05 +0100
+Message-Id: <20221221224111.19254-1-vdronov@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221142327.126451-7-Jason@zx2c4.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 03:23:26PM +0100, Jason A. Donenfeld wrote:
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 6425f5f838e0..660cd15b6228 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -60,6 +60,7 @@
->  #include <crypto/blake2s.h>
->  #ifdef CONFIG_VDSO_GETRANDOM
->  #include <vdso/getrandom.h>
-> +#include <vdso/datapage.h>
->  #endif
->  #include <asm/archrandom.h>
->  #include <asm/processor.h>
-> @@ -407,6 +408,9 @@ static void crng_reseed(struct work_struct *work)
->	/*
->	 * We copy the new key into the base_crng, overwriting the old one,
->	 * and update the generation counter. We avoid hitting ULONG_MAX,
->	 * because the per-cpu crngs are initialized to ULONG_MAX, so this
->	 * forces new CPUs that come online to always initialize.
->	 */
->	spin_lock_irqsave(&base_crng.lock, flags);
->	memcpy(base_crng.key, key, sizeof(base_crng.key));
->	next_gen = base_crng.generation + 1;
->  	if (next_gen == ULONG_MAX)
->  		++next_gen;
->  	WRITE_ONCE(base_crng.generation, next_gen);
-> +#ifdef CONFIG_VDSO_GETRANDOM
-> +	smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
-> +#endif
+Hi,
 
-It's confusing that "uninitialized generation" is ULONG_MAX in the per-cpu
-crngs, but 0 in the vdso_rng_data.  That results in a weird off-by one thing,
-where the vdso_rng_data generation number has to be 1 higher.
+This patchset and cover letter was initially composed by Nicolai Stange
+and sent earlier as:
 
-Would it be possible to use 0 for both?
+https://lore.kernel.org/all/20221108142025.13461-1-nstange@suse.de/
+with a subject: [PATCH 0/4] Trivial set of FIPS 140-3 related changes
 
-- Eric
+I'm adding patches 2 and 3 which (I hope) resolve issues spotted by
+reviewers of previous version of the patchset. This new patchset should
+ease our future kernel work on the FIPS mode.
+
+I'm quoting Nicolai's cover letter here:
+
+> Hi all,
+> 
+> these four rather unrelated patches are basically a dump of some of the
+> more trivial changes required for working towards FIPS 140-3 conformance.
+> 
+> Please pick as you deem appropriate.
+> 
+> Thanks!
+> 
+> Nicolai
+
+Nicolai Stange (4):
+  crypto: xts - restrict key lengths to approved values in FIPS mode
+  crypto: testmgr - disallow plain cbcmac(aes) in FIPS mode
+  crypto: testmgr - disallow plain ghash in FIPS mode
+  crypto: testmgr - allow ecdsa-nist-p256 and -p384 in FIPS mode
+
+Vladis Dronov (2):
+  crypto: xts - drop xts_check_key()
+  crypto: xts - drop redundant xts key check
+
+ arch/s390/crypto/aes_s390.c                        |  4 ----
+ arch/s390/crypto/paes_s390.c                       |  2 +-
+ crypto/testmgr.c                                   |  4 ++--
+ drivers/crypto/atmel-aes.c                         |  2 +-
+ drivers/crypto/axis/artpec6_crypto.c               |  2 +-
+ drivers/crypto/cavium/cpt/cptvf_algs.c             |  8 +++-----
+ drivers/crypto/cavium/nitrox/nitrox_skcipher.c     |  8 +++-----
+ drivers/crypto/ccree/cc_cipher.c                   |  2 +-
+ drivers/crypto/marvell/octeontx/otx_cptvf_algs.c   |  2 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c |  2 +-
+ include/crypto/xts.h                               | 24 ++++++++----------------
+ 11 files changed, 22 insertions(+), 38 deletions(-)
+
+
