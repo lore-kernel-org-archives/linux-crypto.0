@@ -2,185 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B88DC10F1B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 23:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AB7C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 23:33:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234911AbiLUX1Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 18:27:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36484 "EHLO
+        id S230514AbiLUXdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 18:33:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbiLUX1J (ORCPT
+        with ESMTP id S229561AbiLUXdS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 18:27:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB6B1BE85;
-        Wed, 21 Dec 2022 15:27:08 -0800 (PST)
+        Wed, 21 Dec 2022 18:33:18 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC6B924BE9;
+        Wed, 21 Dec 2022 15:33:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7E9D06196F;
-        Wed, 21 Dec 2022 23:27:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64466C433EF;
-        Wed, 21 Dec 2022 23:27:06 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 76CD0B81C57;
+        Wed, 21 Dec 2022 23:33:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E971BC433EF;
+        Wed, 21 Dec 2022 23:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671665226;
-        bh=z/T5QRAMwI/aM2wSsvcjJlnhhFOn5MGclCR919Yyc9g=;
+        s=k20201202; t=1671665595;
+        bh=hW75uHYjkBGcArJykLAMMvyqPnKjnbwTvRuVZaZ3I0U=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CBJBAqiV8Y6Yn0s72mlVPq8NAGCYsJ2iv06chckorAsZ5hhjyx/uzq4Lm29vAxN0O
-         7DRljHogOCCn5utlXE7SwE77nd0MXxaARNjaoS69qIWH3sVOvh903lXm0CYwhiI2/z
-         VHY7BUWmJgT5iiI8sFnpc8KYrHij+Pg4AtH3CKQsJsZMPyto/DxYyVLHloauo7j0vu
-         BQPjeMGA6i2LiXH/0yGHme4NjpvQZ8AZvistVUBPmDs1QQjfu8cAovssywwzNtoMP2
-         tk1MER+XsHax/ErTIGc+eHak8dntLfFH4R3ltAzbQ+OIqGlXOIRzv/XbANpRrFWg5y
-         QqU2H7eBjYjcg==
-Date:   Wed, 21 Dec 2022 15:27:04 -0800
+        b=oES6z3NNR1B9i6Gjr3jFxQ4kj1uEHYqNeoyESPTRPm9ePZccspuyxf56cifNCjUz3
+         y9xY+i0QFbxTFxobYfpC/sy9w4EtCsQA39A39aTk7USe8sR5Ir21KMwebWwEbgGv2r
+         58Djqj4LmmWq4TceUr96P7je5yL0PfBYIrxBaOZ/5YVuhUXG+hT082kkBUjsfUI6eU
+         yfEAo8aqtKsvjg/kiVo5zKiQhA0IGNRMnXW+QsWWSV34tRVbgfmktq5GNQFIE4DAYO
+         7r4MwA/axqYvyTTZCQfR2oLmEQf31r+PX81o3zNz6aaBfgEfAR6ZgoR+ito8WFzPpv
+         C8ZGm362Gi7VA==
+Date:   Wed, 21 Dec 2022 15:33:13 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>
-Subject: Re: [PATCH v13 7/7] x86: vdso: Wire up getrandom() vDSO
- implementation
-Message-ID: <Y6OWSM18QL977nbC@sol.localdomain>
-References: <20221221142327.126451-1-Jason@zx2c4.com>
- <20221221142327.126451-8-Jason@zx2c4.com>
+To:     Vladis Dronov <vdronov@redhat.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net, nstange@suse.de,
+        elliott@hpe.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, smueller@chronox.de
+Subject: Re: [PATCH 2/6] crypto: xts - drop xts_check_key()
+Message-ID: <Y6OXuT95MlkNanSR@sol.localdomain>
+References: <20221221224111.19254-1-vdronov@redhat.com>
+ <20221221224111.19254-3-vdronov@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221221142327.126451-8-Jason@zx2c4.com>
+In-Reply-To: <20221221224111.19254-3-vdronov@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 03:23:27PM +0100, Jason A. Donenfeld wrote:
-> diff --git a/arch/x86/entry/vdso/vgetrandom-chacha.S b/arch/x86/entry/vdso/vgetrandom-chacha.S
-> new file mode 100644
-> index 000000000000..91fbb7ac7af4
-> --- /dev/null
-> +++ b/arch/x86/entry/vdso/vgetrandom-chacha.S
-> @@ -0,0 +1,177 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + */
-> +
-> +#include <linux/linkage.h>
-> +#include <asm/frame.h>
-> +
-> +.section	.rodata.cst16.CONSTANTS, "aM", @progbits, 16
-> +.align 16
-> +CONSTANTS:	.octa 0x6b20657479622d323320646e61707865
-> +.text
+On Wed, Dec 21, 2022 at 11:41:07PM +0100, Vladis Dronov wrote:
+> xts_check_key() is obsoleted by xts_verify_key(). Over time XTS crypto
+> drivers adopted the newer xts_verify_key() variant, but xts_check_key()
+> is still used by a number of drivers. Switch drivers to use the newer
+> xts_verify_key() and make a couple of cleanups. This allows us to drop
+> xts_check_key() completely and avoid redundancy.
+> 
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> ---
+>  arch/s390/crypto/paes_s390.c                  |  2 +-
+>  drivers/crypto/atmel-aes.c                    |  2 +-
+>  drivers/crypto/axis/artpec6_crypto.c          |  2 +-
+>  drivers/crypto/cavium/cpt/cptvf_algs.c        |  8 +++----
+>  .../crypto/cavium/nitrox/nitrox_skcipher.c    |  8 +++----
+>  drivers/crypto/ccree/cc_cipher.c              |  2 +-
+>  .../crypto/marvell/octeontx/otx_cptvf_algs.c  |  2 +-
+>  .../marvell/octeontx2/otx2_cptvf_algs.c       |  2 +-
+>  include/crypto/xts.h                          | 21 +++----------------
+>  9 files changed, 15 insertions(+), 34 deletions(-)
 
-For simplicity, maybe leave off the section mergeability stuff and just have
-plain ".section .rodata"?
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-> +/*
-> + * Very basic SSE2 implementation of ChaCha20. Produces a given positive number
-> + * of blocks of output with a nonce of 0, taking an input key and 8-byte
-> + * counter. Importantly does not spill to the stack. Its arguments are:
-> + *
-> + *	rdi: output bytes
-> + *	rsi: 32-byte key input
-> + *	rdx: 8-byte counter input/output
-> + *	rcx: number of 64-byte blocks to write to output
-> + */
-> +SYM_FUNC_START(__arch_chacha20_blocks_nostack)
-> +
-> +#define output  %rdi
-> +#define key     %rsi
-> +#define counter %rdx
-> +#define nblocks %rcx
-> +#define i       %al
-> +#define state0  %xmm0
-> +#define state1  %xmm1
-> +#define state2  %xmm2
-> +#define state3  %xmm3
-> +#define copy0   %xmm4
-> +#define copy1   %xmm5
-> +#define copy2   %xmm6
-> +#define copy3   %xmm7
-> +#define temp    %xmm8
-> +#define one     %xmm9
+but one comment below:
 
-It would be worth mentioning in the function comment that none of the xmm
-registers are callee-save.  That was not obvious to me.  I know that on arm64,
-*kernel* code doesn't need to save/restore NEON registers, so it's not something
-that arch/arm64/crypto/ does.  But, it *is* needed in arm64 userspace code.  So
-I was worried that something similar would apply to x86_64, but it seems not.
+>  static inline int xts_verify_key(struct crypto_skcipher *tfm,
+>  				 const u8 *key, unsigned int keylen)
+>  {
+> @@ -42,7 +25,9 @@ static inline int xts_verify_key(struct crypto_skcipher *tfm,
+>  	if (fips_enabled && keylen != 32 && keylen != 64)
+>  		return -EINVAL;
+>  
+> -	/* ensure that the AES and tweak key are not identical */
+> +	/* ensure that the AES and tweak key are not identical
+> +	 * when in FIPS mode or the FORBID_WEAK_KEYS flag is set.
+> +	 */
+>  	if ((fips_enabled || (crypto_skcipher_get_flags(tfm) &
+>  			      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) &&
+>  	    !crypto_memneq(key, key + (keylen / 2), keylen / 2))
 
-> +	/* state1[0,1,2,3] = state1[0,3,2,1] */
-> +	pshufd		$0x39,state1,state1
-> +	/* state2[0,1,2,3] = state2[1,0,3,2] */
-> +	pshufd		$0x4e,state2,state2
-> +	/* state3[0,1,2,3] = state3[2,1,0,3] */
-> +	pshufd		$0x93,state3,state3
+Please use the kernel style for block comments:
 
-The comments don't match the pshufd constants.  The code is correct but the
-comments are not.  They should be:
-
-	/* state1[0,1,2,3] = state1[1,2,3,0] */
-	pshufd		$0x39,state1,state1
-	/* state2[0,1,2,3] = state2[2,3,0,1] */
-	pshufd		$0x4e,state2,state2
-	/* state3[0,1,2,3] = state3[3,0,1,2] */
-	pshufd		$0x93,state3,state3
-
-> +	/* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
-> +	paddd		state1,state0
-> +	pxor		state0,state3
-> +	movdqa		state3,temp
-> +	pslld		$16,temp
-> +	psrld		$16,state3
-> +	por		temp,state3
-> +
-> +	/* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
-> +	paddd		state3,state2
-> +	pxor		state2,state1
-> +	movdqa		state1,temp
-> +	pslld		$12,temp
-> +	psrld		$20,state1
-> +	por		temp,state1
-> +
-> +	/* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
-> +	paddd		state1,state0
-> +	pxor		state0,state3
-> +	movdqa		state3,temp
-> +	pslld		$8,temp
-> +	psrld		$24,state3
-> +	por		temp,state3
-> +
-> +	/* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
-> +	paddd		state3,state2
-> +	pxor		state2,state1
-> +	movdqa		state1,temp
-> +	pslld		$7,temp
-> +	psrld		$25,state1
-> +	por		temp,state1
-
-The above sequence of 24 instructions is repeated twice, so maybe it should be a
-macro (".chacha_round"?).
-
-> +	/* state1[0,1,2,3] = state1[2,1,0,3] */
-> +	pshufd		$0x93,state1,state1
-> +	/* state2[0,1,2,3] = state2[1,0,3,2] */
-> +	pshufd		$0x4e,state2,state2
-> +	/* state3[0,1,2,3] = state3[0,3,2,1] */
-> +	pshufd		$0x39,state3,state3
-
-Similarly, the above comments are wrong.  They should be:
-
-	/* state1[0,1,2,3] = state1[3,0,1,2] */
-	pshufd		$0x93,state1,state1
-	/* state2[0,1,2,3] = state2[2,3,0,1] */
-	pshufd		$0x4e,state2,state2
-	/* state3[0,1,2,3] = state3[1,2,3,0] */
-	pshufd		$0x39,state3,state3
+	/*
+	 * Ensure that the AES and tweak key are not identical when in FIPS mode
+	 * or the FORBID_WEAK_KEYS flag is set.
+	 */
 
 - Eric
