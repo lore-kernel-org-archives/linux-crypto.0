@@ -2,114 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B453FC10F1B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 09:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D67C4167B
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 10:37:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234734AbiLUJx1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 04:53:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59990 "EHLO
+        id S234274AbiLUKh4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 05:37:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234738AbiLUJwn (ORCPT
+        with ESMTP id S234283AbiLUKhx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 04:52:43 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A649123392
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Dec 2022 01:49:25 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id g14so15046037ljh.10
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Dec 2022 01:49:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j4pOTa7XD14Zbi1zXxlhwo2uq1WAQLtH0H1dvVBr/wM=;
-        b=TatoTF6KDCty9jYvwLHt8LUJBG4EfDHIWY7OIX8gecMCtklkbUY83XvdqNexPWzVHh
-         7aHcj6cell6x9syMMMUvBbd8IhMjN1Ix2O2vsj7WocOoSuFZ648iIhqPZhcTYevUeYdq
-         6oxyrVV/PxZazRP/iKy3JHVjRKyCE5XANvaaI2OcyddGsO58OUrq7Z5T494E2mOB2uqA
-         F1ga1FNHs+RVzr2KiNpV9JxdgiuANgeWGzt978v2rBbuOVX9+jVyPWqwofW5nJEl0mFc
-         2/TqloOr9Aav3Y6Y0mHnlbIVWq9I0gPrYXhF+V/yZ9FLrz0NcxH3wTQIHdsKqLB1okOk
-         uYDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j4pOTa7XD14Zbi1zXxlhwo2uq1WAQLtH0H1dvVBr/wM=;
-        b=Dlx9MBYXeY0S1Pe9KiFG1loVE6Z8YwDI9vP5xuAiB85ZldVb5tenzfxbfUn+TzodAb
-         POvtB7nd3YAS8aOmxZrPqktuwfGVpu0YNEeMCtZ4n8Vx1yFXbj3KQcTrvqYwAOF+4/wQ
-         a/SuHJbi7ER8oYXa2EeV7OgsBrYScYaTWmiKit3HZPVogkIfpC6cGReFJoephJGqKfOn
-         LYUPoy+s7nsJWiVon7blTyy2S28loN+idT6bQyDFgYmqMRduNfXJMl4j4rrm0xqhIBjT
-         OHL0Msb2go5kIlVs3t1xqLGW8AVrqEiwPdT0IflhyaobV6PmbF7HvWmfZTx+2zsaIP/S
-         3nNQ==
-X-Gm-Message-State: AFqh2kqu4VkH6oJphBb4qgxUS4igwVXxBivJBHH+d2KlEBcwgT8Nypc2
-        JolTZ2LnTCsWU0+n3UiyU8IW9A==
-X-Google-Smtp-Source: AMrXdXssO9jKbgSHpDGsWvD2A8uvCkDgxTfqEYUdI6PAsmQUFbP3WJ19muNo/XTSwSkvzcwBi9mWuw==
-X-Received: by 2002:a2e:bc87:0:b0:27f:6978:583f with SMTP id h7-20020a2ebc87000000b0027f6978583fmr419058ljf.44.1671616164053;
-        Wed, 21 Dec 2022 01:49:24 -0800 (PST)
-Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id g5-20020a2eb5c5000000b00279a7266874sm1273754ljn.98.2022.12.21.01.49.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Dec 2022 01:49:23 -0800 (PST)
-Message-ID: <05aaa9f8-7a97-51c9-e18a-1c3753f2006b@linaro.org>
-Date:   Wed, 21 Dec 2022 10:49:22 +0100
+        Wed, 21 Dec 2022 05:37:53 -0500
+Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF568D;
+        Wed, 21 Dec 2022 02:37:51 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.18.147.227])
+        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4NcV813lgCz9xqnZ;
+        Wed, 21 Dec 2022 18:30:25 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.204.63.22])
+        by APP1 (Coremail) with SMTP id LxC2BwDHAQ3k4aJj76UvAA--.42155S2;
+        Wed, 21 Dec 2022 11:37:32 +0100 (CET)
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huaweicloud.com>
+Subject: [PATCH v3 1/2] lib/mpi: Fix buffer overrun when SG is too long
+Date:   Wed, 21 Dec 2022 11:37:09 +0100
+Message-Id: <20221221103710.2540276-1-roberto.sassu@huaweicloud.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Content-Language: en-US
-To:     Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc:     Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-References: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
- <20221221090819.1259443-3-jiajie.ho@starfivetech.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20221221090819.1259443-3-jiajie.ho@starfivetech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: LxC2BwDHAQ3k4aJj76UvAA--.42155S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gw4UGF4kGry5AF4rKrW3ZFb_yoWDWFc_C3
+        WDKr1UWrWj9F47Z3WFkFZYv34Ikr9ru3WrCF1UJrn3K3s0qrn3Zr4xJFZaqr13Gan8AasI
+        q3s7AFZ3Gw1IkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+        1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+        n2IY04v7MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1U
+        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+        VFxhVjvjDU0xZFpf9x0JUj4E_UUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQANBF1jj4bhEgACsO
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 21/12/2022 10:08, Jia Jie Ho wrote:
-> This adds driver support for the hardware random number generator in
-> Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
-> 
-> Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> ---
->  MAINTAINERS                            |   6 +
->  drivers/char/hw_random/Kconfig         |  11 +
->  drivers/char/hw_random/Makefile        |   1 +
->  drivers/char/hw_random/starfive-trng.c | 403 +++++++++++++++++++++++++
->  4 files changed, 421 insertions(+)
->  create mode 100644 drivers/char/hw_random/starfive-trng.c
-> 
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-(...)
+The helper mpi_read_raw_from_sgl sets the number of entries in
+the SG list according to nbytes.  However, if the last entry
+in the SG list contains more data than nbytes, then it may overrun
+the buffer because it only allocates enough memory for nbytes.
 
-> +static const struct of_device_id trng_dt_ids[] = {
-> +	{ .compatible = "starfive,jh7110-trng" },
-> +	{ }
-> +};
-> +MODULE_DEVICE_TABLE(of, trng_dt_ids);
-> +
-> +static struct platform_driver starfive_trng_driver = {
-> +	.probe	= starfive_trng_probe,
-> +	.driver	= {
-> +		.name		= "starfive-trng",
-> +		.pm		= &starfive_trng_pm_ops,
-> +		.of_match_table	= of_match_ptr(trng_dt_ids),
+Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ lib/mpi/mpicoder.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-of_match_ptr goes with __maybe_unused. You will have now warnings, so
-please test more your patches (W=1, sparse, smatch).
-
-Best regards,
-Krzysztof
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 39c4c6731094..3cb6bd148fa9 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -504,7 +504,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 
+ 	while (sg_miter_next(&miter)) {
+ 		buff = miter.addr;
+-		len = miter.length;
++		len = min_t(unsigned, miter.length, nbytes);
++		nbytes -= len;
+ 
+ 		for (x = 0; x < len; x++) {
+ 			a <<= 8;
+-- 
+2.25.1
 
