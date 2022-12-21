@@ -2,112 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8726C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 06:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB02C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 07:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiLUG6S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 01:58:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50824 "EHLO
+        id S229491AbiLUHck (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 02:32:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbiLUG6R (ORCPT
+        with ESMTP id S231712AbiLUHci (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 01:58:17 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673A31C92B;
-        Tue, 20 Dec 2022 22:58:16 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p7t3I-0098Bf-9y; Wed, 21 Dec 2022 14:58:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 Dec 2022 14:58:08 +0800
-Date:   Wed, 21 Dec 2022 14:58:08 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Chen, Rong A" <rong.a.chen@intel.com>,
-        kernel test robot <lkp@intel.com>,
-        "Jason A. Donenfeld" <zx2c4@kernel.org>,
-        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [v2 PATCH] crypto: lib/blake2s - Split up test function to halve
- stack usage
-Message-ID: <Y6KugNpLeAC00nvy@gondor.apana.org.au>
-References: <202211072109.qvrnjNKo-lkp@intel.com>
- <Y5Flnb8jadyDebx3@gondor.apana.org.au>
- <d25ac395-4335-be88-9dc5-364f5715554f@intel.com>
- <Y5V3JUL+r4k/XrL9@gondor.apana.org.au>
- <Y6IcSgmXpGwWP+xK@gmail.com>
+        Wed, 21 Dec 2022 02:32:38 -0500
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD7E380;
+        Tue, 20 Dec 2022 23:32:36 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VXoePt9_1671607952;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VXoePt9_1671607952)
+          by smtp.aliyun-inc.com;
+          Wed, 21 Dec 2022 15:32:33 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: arm64/sm4 - fix possible crash with CFI enabled
+Date:   Wed, 21 Dec 2022 15:32:32 +0800
+Message-Id: <20221221073232.15110-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6IcSgmXpGwWP+xK@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 08:34:18PM +0000, Eric Biggers wrote:
->
-> Shouldn't these functions have 'noinline_for_stack' added to them?
+The SM4 CCM/GCM assembly functions for encryption and decryption is
+called via indirect function calls.  Therefore they need to use
+SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause its type hash
+to be emitted when the kernel is built with CONFIG_CFI_CLANG=y.
+Otherwise, the code crashes with a CFI failure (if the compiler didn't
+happen to optimize out the indirect call).
 
-Indeed they should.  Thanks!
+Fixes: 67fa3a7fdf80 ("crypto: arm64/sm4 - add CE implementation for CCM mode")
+Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ arch/arm64/crypto/sm4-ce-ccm-core.S | 5 +++--
+ arch/arm64/crypto/sm4-ce-gcm-core.S | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
----8<---
-Reduce the stack usage further by splitting up the test function.
-
-Also squash blocks and unaligned_blocks into one array.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/lib/crypto/blake2s-selftest.c b/lib/crypto/blake2s-selftest.c
-index 7d77dea15587..d0634ed6a937 100644
---- a/lib/crypto/blake2s-selftest.c
-+++ b/lib/crypto/blake2s-selftest.c
-@@ -545,7 +545,7 @@ static const u8 blake2s_testvecs[][BLAKE2S_HASH_SIZE] __initconst = {
-     0xd6, 0x98, 0x6b, 0x07, 0x10, 0x65, 0x52, 0x65, },
- };
+diff --git a/arch/arm64/crypto/sm4-ce-ccm-core.S b/arch/arm64/crypto/sm4-ce-ccm-core.S
+index 028207c4afd0..fa85856f33ce 100644
+--- a/arch/arm64/crypto/sm4-ce-ccm-core.S
++++ b/arch/arm64/crypto/sm4-ce-ccm-core.S
+@@ -8,6 +8,7 @@
+  */
  
--bool __init blake2s_selftest(void)
-+static bool __init noinline_for_stack blake2s_digest_test(void)
- {
- 	u8 key[BLAKE2S_KEY_SIZE];
- 	u8 buf[ARRAY_SIZE(blake2s_testvecs)];
-@@ -589,11 +589,20 @@ bool __init blake2s_selftest(void)
- 		}
- 	}
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ #include <asm/assembler.h>
+ #include "sm4-ce-asm.h"
  
-+	return success;
-+}
-+
-+static bool __init noinline_for_stack blake2s_random_test(void)
-+{
-+	struct blake2s_state state;
-+	bool success = true;
-+	int i, l;
-+
- 	for (i = 0; i < 32; ++i) {
- 		enum { TEST_ALIGNMENT = 16 };
--		u8 unaligned_block[BLAKE2S_BLOCK_SIZE + TEST_ALIGNMENT - 1]
-+		u8 blocks[BLAKE2S_BLOCK_SIZE * 2 + TEST_ALIGNMENT - 1]
- 					__aligned(TEST_ALIGNMENT);
--		u8 blocks[BLAKE2S_BLOCK_SIZE * 2];
-+		u8 *unaligned_block = blocks + BLAKE2S_BLOCK_SIZE;
- 		struct blake2s_state state1, state2;
+@@ -104,7 +105,7 @@ SYM_FUNC_START(sm4_ce_ccm_final)
+ SYM_FUNC_END(sm4_ce_ccm_final)
  
- 		get_random_bytes(blocks, sizeof(blocks));
-@@ -630,3 +639,13 @@ bool __init blake2s_selftest(void)
+ .align 3
+-SYM_FUNC_START(sm4_ce_ccm_enc)
++SYM_TYPED_FUNC_START(sm4_ce_ccm_enc)
+ 	/* input:
+ 	 *   x0: round key array, CTX
+ 	 *   x1: dst
+@@ -216,7 +217,7 @@ SYM_FUNC_START(sm4_ce_ccm_enc)
+ SYM_FUNC_END(sm4_ce_ccm_enc)
  
- 	return success;
- }
-+
-+bool __init blake2s_selftest(void)
-+{
-+	bool success;
-+
-+	success = blake2s_digest_test();
-+	success &= blake2s_random_test();
-+
-+	return success;
-+}
+ .align 3
+-SYM_FUNC_START(sm4_ce_ccm_dec)
++SYM_TYPED_FUNC_START(sm4_ce_ccm_dec)
+ 	/* input:
+ 	 *   x0: round key array, CTX
+ 	 *   x1: dst
+diff --git a/arch/arm64/crypto/sm4-ce-gcm-core.S b/arch/arm64/crypto/sm4-ce-gcm-core.S
+index 7aa3ec18a289..347f25d75727 100644
+--- a/arch/arm64/crypto/sm4-ce-gcm-core.S
++++ b/arch/arm64/crypto/sm4-ce-gcm-core.S
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <linux/linkage.h>
++#include <linux/cfi_types.h>
+ #include <asm/assembler.h>
+ #include "sm4-ce-asm.h"
+ 
+@@ -370,7 +371,7 @@ SYM_FUNC_START(pmull_ghash_update)
+ SYM_FUNC_END(pmull_ghash_update)
+ 
+ .align 3
+-SYM_FUNC_START(sm4_ce_pmull_gcm_enc)
++SYM_TYPED_FUNC_START(sm4_ce_pmull_gcm_enc)
+ 	/* input:
+ 	 *   x0: round key array, CTX
+ 	 *   x1: dst
+@@ -581,7 +582,7 @@ SYM_FUNC_END(sm4_ce_pmull_gcm_enc)
+ #define	RH3	v20
+ 
+ .align 3
+-SYM_FUNC_START(sm4_ce_pmull_gcm_dec)
++SYM_TYPED_FUNC_START(sm4_ce_pmull_gcm_dec)
+ 	/* input:
+ 	 *   x0: round key array, CTX
+ 	 *   x1: dst
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.24.3 (Apple Git-128)
+
