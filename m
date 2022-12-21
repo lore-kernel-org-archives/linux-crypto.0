@@ -2,100 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E9FC4167B
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 06:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8726C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 06:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234352AbiLUGyd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 01:54:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49796 "EHLO
+        id S229917AbiLUG6S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 01:58:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234371AbiLUGy3 (ORCPT
+        with ESMTP id S229533AbiLUG6R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 01:54:29 -0500
+        Wed, 21 Dec 2022 01:58:17 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2C51F2F4;
-        Tue, 20 Dec 2022 22:54:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673A31C92B;
+        Tue, 20 Dec 2022 22:58:16 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1p7szG-00989G-S1; Wed, 21 Dec 2022 14:53:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 Dec 2022 14:53:58 +0800
-Date:   Wed, 21 Dec 2022 14:53:58 +0800
+        id 1p7t3I-0098Bf-9y; Wed, 21 Dec 2022 14:58:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 21 Dec 2022 14:58:08 +0800
+Date:   Wed, 21 Dec 2022 14:58:08 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Roberto Sassu <roberto.sassu@huaweicloud.com>, dhowells@redhat.com,
-        davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [v2 PATCH] lib/mpi: Fix buffer overrun when SG is too long
-Message-ID: <Y6Kthn+rIUnCEJWz@gondor.apana.org.au>
-References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
- <Y5OGr59A9wo86rYY@sol.localdomain>
- <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
- <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
- <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
- <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
- <a04e6458-6814-97fc-f03a-617809e2e6ce@huaweicloud.com>
- <Y6IbWA5aZeBnn4n2@gmail.com>
+Cc:     "Chen, Rong A" <rong.a.chen@intel.com>,
+        kernel test robot <lkp@intel.com>,
+        "Jason A. Donenfeld" <zx2c4@kernel.org>,
+        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [v2 PATCH] crypto: lib/blake2s - Split up test function to halve
+ stack usage
+Message-ID: <Y6KugNpLeAC00nvy@gondor.apana.org.au>
+References: <202211072109.qvrnjNKo-lkp@intel.com>
+ <Y5Flnb8jadyDebx3@gondor.apana.org.au>
+ <d25ac395-4335-be88-9dc5-364f5715554f@intel.com>
+ <Y5V3JUL+r4k/XrL9@gondor.apana.org.au>
+ <Y6IcSgmXpGwWP+xK@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y6IbWA5aZeBnn4n2@gmail.com>
+In-Reply-To: <Y6IcSgmXpGwWP+xK@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 08:30:16PM +0000, Eric Biggers wrote:
+On Tue, Dec 20, 2022 at 08:34:18PM +0000, Eric Biggers wrote:
 >
-> > Tried, could not boot the UML kernel.
-> > 
-> > After looking, it seems we have to call sg_miter_stop(). Or alternatively,
-> > we could let sg_miter_next() be called but not writing anything inside the
-> > loop.
-> > 
-> > With either of those fixes, the tests pass (using one scatterlist).
+> Shouldn't these functions have 'noinline_for_stack' added to them?
 
-Thanks for the quick feedback Roberto!
-
-> I think it should look like:
-> 
-> 	while (nbytes) {
-> 		sg_miter_next(&miter);
-> 		...
-> 	}
-> 	sg_miter_stop(&miter);
-
-You're right Eric.  However, we could also do it by simply not
-checking nbytes since we already set nents according to nbytes
-at the top of the function.
+Indeed they should.  Thanks!
 
 ---8<---
-The helper mpi_read_raw_from_sgl sets the number of entries in
-the SG list according to nbytes.  However, if the last entry
-in the SG list contains more data than nbytes, then it may overrun
-the buffer because it only allocates enough memory for nbytes.
+Reduce the stack usage further by splitting up the test function.
 
-Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
-Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Also squash blocks and unaligned_blocks into one array.
+
+Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 39c4c6731094..157ef532a6a2 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -504,7 +501,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+diff --git a/lib/crypto/blake2s-selftest.c b/lib/crypto/blake2s-selftest.c
+index 7d77dea15587..d0634ed6a937 100644
+--- a/lib/crypto/blake2s-selftest.c
++++ b/lib/crypto/blake2s-selftest.c
+@@ -545,7 +545,7 @@ static const u8 blake2s_testvecs[][BLAKE2S_HASH_SIZE] __initconst = {
+     0xd6, 0x98, 0x6b, 0x07, 0x10, 0x65, 0x52, 0x65, },
+ };
  
- 	while (sg_miter_next(&miter)) {
- 		buff = miter.addr;
--		len = miter.length;
-+		len = min_t(unsigned, miter.length, nbytes);
-+		nbytes -= len;
+-bool __init blake2s_selftest(void)
++static bool __init noinline_for_stack blake2s_digest_test(void)
+ {
+ 	u8 key[BLAKE2S_KEY_SIZE];
+ 	u8 buf[ARRAY_SIZE(blake2s_testvecs)];
+@@ -589,11 +589,20 @@ bool __init blake2s_selftest(void)
+ 		}
+ 	}
  
- 		for (x = 0; x < len; x++) {
- 			a <<= 8;
++	return success;
++}
++
++static bool __init noinline_for_stack blake2s_random_test(void)
++{
++	struct blake2s_state state;
++	bool success = true;
++	int i, l;
++
+ 	for (i = 0; i < 32; ++i) {
+ 		enum { TEST_ALIGNMENT = 16 };
+-		u8 unaligned_block[BLAKE2S_BLOCK_SIZE + TEST_ALIGNMENT - 1]
++		u8 blocks[BLAKE2S_BLOCK_SIZE * 2 + TEST_ALIGNMENT - 1]
+ 					__aligned(TEST_ALIGNMENT);
+-		u8 blocks[BLAKE2S_BLOCK_SIZE * 2];
++		u8 *unaligned_block = blocks + BLAKE2S_BLOCK_SIZE;
+ 		struct blake2s_state state1, state2;
+ 
+ 		get_random_bytes(blocks, sizeof(blocks));
+@@ -630,3 +639,13 @@ bool __init blake2s_selftest(void)
+ 
+ 	return success;
+ }
++
++bool __init blake2s_selftest(void)
++{
++	bool success;
++
++	success = blake2s_digest_test();
++	success &= blake2s_random_test();
++
++	return success;
++}
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
