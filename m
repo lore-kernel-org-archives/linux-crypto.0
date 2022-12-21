@@ -2,117 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB02C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 07:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38FD4C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Dec 2022 09:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiLUHck (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Dec 2022 02:32:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59834 "EHLO
+        id S234040AbiLUJIi convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Dec 2022 04:08:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231712AbiLUHci (ORCPT
+        with ESMTP id S229491AbiLUJIh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Dec 2022 02:32:38 -0500
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD7E380;
-        Tue, 20 Dec 2022 23:32:36 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VXoePt9_1671607952;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VXoePt9_1671607952)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Dec 2022 15:32:33 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] crypto: arm64/sm4 - fix possible crash with CFI enabled
-Date:   Wed, 21 Dec 2022 15:32:32 +0800
-Message-Id: <20221221073232.15110-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+        Wed, 21 Dec 2022 04:08:37 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BBF95BC;
+        Wed, 21 Dec 2022 01:08:34 -0800 (PST)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 79A9724E22F;
+        Wed, 21 Dec 2022 17:08:32 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 21 Dec
+ 2022 17:08:32 +0800
+Received: from ubuntu.localdomain (161.142.229.243) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 21 Dec
+ 2022 17:08:27 +0800
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>
+CC:     Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+Subject: [PATCH 1/3] dt-bindings: rng: Add StarFive TRNG module
+Date:   Wed, 21 Dec 2022 17:08:17 +0800
+Message-ID: <20221221090819.1259443-2-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
+References: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [161.142.229.243]
+X-ClientProxiedBy: EXCAS064.cuchost.com (172.16.6.24) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The SM4 CCM/GCM assembly functions for encryption and decryption is
-called via indirect function calls.  Therefore they need to use
-SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause its type hash
-to be emitted when the kernel is built with CONFIG_CFI_CLANG=y.
-Otherwise, the code crashes with a CFI failure (if the compiler didn't
-happen to optimize out the indirect call).
+Add documentation to describe Starfive true random number generator
+module.
 
-Fixes: 67fa3a7fdf80 ("crypto: arm64/sm4 - add CE implementation for CCM mode")
-Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
 ---
- arch/arm64/crypto/sm4-ce-ccm-core.S | 5 +++--
- arch/arm64/crypto/sm4-ce-gcm-core.S | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ .../bindings/rng/starfive,jh7110-trng.yaml    | 55 +++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
 
-diff --git a/arch/arm64/crypto/sm4-ce-ccm-core.S b/arch/arm64/crypto/sm4-ce-ccm-core.S
-index 028207c4afd0..fa85856f33ce 100644
---- a/arch/arm64/crypto/sm4-ce-ccm-core.S
-+++ b/arch/arm64/crypto/sm4-ce-ccm-core.S
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <linux/cfi_types.h>
- #include <asm/assembler.h>
- #include "sm4-ce-asm.h"
- 
-@@ -104,7 +105,7 @@ SYM_FUNC_START(sm4_ce_ccm_final)
- SYM_FUNC_END(sm4_ce_ccm_final)
- 
- .align 3
--SYM_FUNC_START(sm4_ce_ccm_enc)
-+SYM_TYPED_FUNC_START(sm4_ce_ccm_enc)
- 	/* input:
- 	 *   x0: round key array, CTX
- 	 *   x1: dst
-@@ -216,7 +217,7 @@ SYM_FUNC_START(sm4_ce_ccm_enc)
- SYM_FUNC_END(sm4_ce_ccm_enc)
- 
- .align 3
--SYM_FUNC_START(sm4_ce_ccm_dec)
-+SYM_TYPED_FUNC_START(sm4_ce_ccm_dec)
- 	/* input:
- 	 *   x0: round key array, CTX
- 	 *   x1: dst
-diff --git a/arch/arm64/crypto/sm4-ce-gcm-core.S b/arch/arm64/crypto/sm4-ce-gcm-core.S
-index 7aa3ec18a289..347f25d75727 100644
---- a/arch/arm64/crypto/sm4-ce-gcm-core.S
-+++ b/arch/arm64/crypto/sm4-ce-gcm-core.S
-@@ -9,6 +9,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <linux/cfi_types.h>
- #include <asm/assembler.h>
- #include "sm4-ce-asm.h"
- 
-@@ -370,7 +371,7 @@ SYM_FUNC_START(pmull_ghash_update)
- SYM_FUNC_END(pmull_ghash_update)
- 
- .align 3
--SYM_FUNC_START(sm4_ce_pmull_gcm_enc)
-+SYM_TYPED_FUNC_START(sm4_ce_pmull_gcm_enc)
- 	/* input:
- 	 *   x0: round key array, CTX
- 	 *   x1: dst
-@@ -581,7 +582,7 @@ SYM_FUNC_END(sm4_ce_pmull_gcm_enc)
- #define	RH3	v20
- 
- .align 3
--SYM_FUNC_START(sm4_ce_pmull_gcm_dec)
-+SYM_TYPED_FUNC_START(sm4_ce_pmull_gcm_dec)
- 	/* input:
- 	 *   x0: round key array, CTX
- 	 *   x1: dst
+diff --git a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
+new file mode 100644
+index 000000000000..2b76ce25acc4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
+@@ -0,0 +1,55 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/starfive,jh7110-trng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: StarFive SoC TRNG Module
++
++maintainers:
++  - Jia Jie Ho <jiajie.ho@starfivetech.com>
++
++properties:
++  compatible:
++    const: starfive,jh7110-trng
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: Hardware reference clock
++      - description: AHB reference clock
++
++  clock-names:
++    items:
++      - const: hclk
++      - const: ahb
++
++  resets:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - resets
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    rng: rng@1600C000 {
++        compatible = "starfive,jh7110-trng";
++        reg = <0x1600C000 0x4000>;
++        clocks = <&clk 15>, <&clk 16>;
++        clock-names = "hclk", "ahb";
++        resets = <&reset 3>;
++        interrupts = <30>;
++    };
++...
 -- 
-2.24.3 (Apple Git-128)
+2.25.1
 
