@@ -2,169 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF273C4167B
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 09:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882B6C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 10:29:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbiLVJoC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 04:44:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50816 "EHLO
+        id S235305AbiLVK3t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Dec 2022 05:29:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235260AbiLVJnk (ORCPT
+        with ESMTP id S235225AbiLVK3q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 04:43:40 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7341227B28
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 01:43:34 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id y25so1900041lfa.9
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 01:43:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YbnftUr0skysBxQQtBVmUp3dl+iPH1CkZ/Pevi319Z4=;
-        b=tu5TQQc2y5XhDDuW5z1bMNpX9zKfROA3s5jKB9G0KQjOJuNM2bcBSmMPCvwgakyl5O
-         uL6oS7md17Acf9ENu9PcB0kxW4Coynu1r1eUkQWdVgV1NSRIxpc8r+QvnR4n0GmhSPlz
-         NW+6+Un28/jlsP/TVjS202yZFoW38ETk9BCzr60pUDqT+pMNb/+kBEme71AG7oFnBEvB
-         tch9duUW2ZeBOftJyGZojAM7ZbJz//uWip1R8Qnald2rMy3Ip6hviGMJJAzxjZLLgMAZ
-         cylKCWrrFaG2G1VV7AtoiPrpLACzWpYQOAkWKtkXXDPlXeyJd70fqFc/3+I+7CwnseFK
-         ORvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YbnftUr0skysBxQQtBVmUp3dl+iPH1CkZ/Pevi319Z4=;
-        b=nPeut9GVIaPxISoGFstSfJUJPOqSgeQ8QaLUPwcH6oerbvHc0MCsaTlNUU+KSNm7m9
-         eQxD58eWcNlRFoQiyIuZb5pfBamOfg2o6RIe4rC1LKF8NZ2iX+ovPFQMXVMUcN+G5r9A
-         UUuJxRSD105da/noCjsUGauXcUmViWq2fY5PyZy8JcDJ482l99H6JKQfPFwkUhg6RuUp
-         9Jry9X1rtXvLAEPAJLYwa08W/pbClYoPMtV2XSf+w4X5z+OPySstJLXzC/anR24IhD7b
-         JUH9bB8CRDUPh2UrDlDiwe1MM0UESaWd0y43FpHnTUqgG4Sp484m4/s+LZme932BJzQP
-         di9A==
-X-Gm-Message-State: AFqh2koaciNLXJchhNqMlcO796pDmOiB7pxaf4Vfc2RKW5Ib9DfXA/Py
-        bygd8gbFEA8+VCZL7H1UCRmgEQ==
-X-Google-Smtp-Source: AMrXdXtIO/l/UEsk2MV0XgK6wMm0UkQrCvnZKcwe7Ug7pLVDdSRQxWA3YLc4a7ZfaL4xaMUG9Yifzg==
-X-Received: by 2002:ac2:4ecd:0:b0:4a4:68b9:6085 with SMTP id p13-20020ac24ecd000000b004a468b96085mr1334382lfr.16.1671702212876;
-        Thu, 22 Dec 2022 01:43:32 -0800 (PST)
-Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id z1-20020a0565120c0100b004b4b600c093sm15902lfu.92.2022.12.22.01.43.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Dec 2022 01:43:32 -0800 (PST)
-Message-ID: <27f1c084-60b4-daeb-0ffe-c0500aecbd49@linaro.org>
-Date:   Thu, 22 Dec 2022 10:43:31 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Content-Language: en-US
-To:     JiaJie Ho <jiajie.ho@starfivetech.com>,
+        Thu, 22 Dec 2022 05:29:46 -0500
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8577C1A214;
+        Thu, 22 Dec 2022 02:29:43 -0800 (PST)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by ex01.ufhost.com (Postfix) with ESMTP id 4C1D024E347;
+        Thu, 22 Dec 2022 18:29:42 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 22 Dec
+ 2022 18:29:42 +0800
+Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
+ EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
+ 15.00.1497.044; Thu, 22 Dec 2022 18:29:42 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
         Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc:     Emil Renner Berthing <kernel@esmil.dk>,
+CC:     Emil Renner Berthing <kernel@esmil.dk>,
         Conor Dooley <conor.dooley@microchip.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: RE: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Thread-Topic: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Thread-Index: AQHZFRwx15kE4gLKu0uxN2CW96B+Oa53kqwAgAIT3RD//3zVgIAAklKA
+Date:   Thu, 22 Dec 2022 10:29:41 +0000
+Message-ID: <2684abf708f145f4b49ec1680c1ddb87@EXMBX168.cuchost.com>
 References: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
  <20221221090819.1259443-3-jiajie.ho@starfivetech.com>
  <05aaa9f8-7a97-51c9-e18a-1c3753f2006b@linaro.org>
  <69dca1be673a40729d750c00d927b437@EXMBX168.cuchost.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <69dca1be673a40729d750c00d927b437@EXMBX168.cuchost.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <27f1c084-60b4-daeb-0ffe-c0500aecbd49@linaro.org>
+In-Reply-To: <27f1c084-60b4-daeb-0ffe-c0500aecbd49@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [161.142.229.243]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/12/2022 10:35, JiaJie Ho wrote:
-> 
-> 
->> -----Original Message-----
->> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> Sent: Wednesday, December 21, 2022 5:49 PM
->> To: JiaJie Ho <jiajie.ho@starfivetech.com>; Olivia Mackall
->> <olivia@selenic.com>; Herbert Xu <herbert@gondor.apana.org.au>; Rob
->> Herring <robh+dt@kernel.org>; Krzysztof Kozlowski
->> <krzysztof.kozlowski+dt@linaro.org>
->> Cc: Emil Renner Berthing <kernel@esmil.dk>; Conor Dooley
->> <conor.dooley@microchip.com>; linux-crypto@vger.kernel.org;
->> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
->> riscv@lists.infradead.org
->> Subject: Re: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
->>
->> On 21/12/2022 10:08, Jia Jie Ho wrote:
->>> This adds driver support for the hardware random number generator in
->>> Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
->>>
->>> Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
->>> Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
->>> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
->>> ---
->>>  MAINTAINERS                            |   6 +
->>>  drivers/char/hw_random/Kconfig         |  11 +
->>>  drivers/char/hw_random/Makefile        |   1 +
->>>  drivers/char/hw_random/starfive-trng.c | 403
->>> +++++++++++++++++++++++++
->>>  4 files changed, 421 insertions(+)
->>>  create mode 100644 drivers/char/hw_random/starfive-trng.c
->>>
->>
->> (...)
->>
->>> +static const struct of_device_id trng_dt_ids[] = {
->>> +	{ .compatible = "starfive,jh7110-trng" },
->>> +	{ }
->>> +};
->>> +MODULE_DEVICE_TABLE(of, trng_dt_ids);
->>> +
->>> +static struct platform_driver starfive_trng_driver = {
->>> +	.probe	= starfive_trng_probe,
->>> +	.driver	= {
->>> +		.name		= "starfive-trng",
->>> +		.pm		= &starfive_trng_pm_ops,
->>> +		.of_match_table	= of_match_ptr(trng_dt_ids),
->>
->> of_match_ptr goes with __maybe_unused. You will have now warnings, so
->> please test more your patches (W=1, sparse, smatch).
->>
-> 
-> Hi Krzysztof,
-> 
-> Thanks for reviewing this patch.
-> How do I properly handle __maybe_unused functions in this scenario?
-
-The same as in other files. Use `git grep`
-
-> Will it help if I add #define as follows:
-> 
-> #ifdef CONFIG_PM
-> #define STARFIVE_RNG_PM_OPS (&starfive_rng_pm_ops)
-> #else
-> #define STARFIVE_RNG_PM_OPS NULL
-> #endif
-
-I talked only about of_match_ptr(). This is not of_match_ptr and should
-have its own syntax (pm_sleep_ptr + static DEFINE_SIMPLE_DEV_PM_OPS)
-
-> 
-> static struct platform_driver starfive_trng_driver = {
->         .probe  = starfive_trng_probe,
->         .driver = {
->                 .name           = "starfive-trng",
->                 .pm             = STARFIVE_RNG_PM_OPS,
->                 .of_match_table = of_match_ptr(trng_dt_ids),
->         },
-> };
-> 
-> I did build the patches with the tools mentioned but did not get warnings.
-> Do I need a specific version, or have I done something wrong?
-
-You just need proper COMPILE_TEST config with OF disabled.
-
-Best regards,
-Krzysztof
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
+d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBUaHVyc2RheSwg
+RGVjZW1iZXIgMjIsIDIwMjIgNTo0NCBQTQ0KPiBUbzogSmlhSmllIEhvIDxqaWFqaWUuaG9Ac3Rh
+cmZpdmV0ZWNoLmNvbT47IE9saXZpYSBNYWNrYWxsDQo+IDxvbGl2aWFAc2VsZW5pYy5jb20+OyBI
+ZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+OyBSb2INCj4gSGVycmluZyA8
+cm9iaCtkdEBrZXJuZWwub3JnPjsgS3J6eXN6dG9mIEtvemxvd3NraQ0KPiA8a3J6eXN6dG9mLmtv
+emxvd3NraStkdEBsaW5hcm8ub3JnPg0KPiBDYzogRW1pbCBSZW5uZXIgQmVydGhpbmcgPGtlcm5l
+bEBlc21pbC5kaz47IENvbm9yIERvb2xleQ0KPiA8Y29ub3IuZG9vbGV5QG1pY3JvY2hpcC5jb20+
+OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOw0KPiBkZXZpY2V0cmVlQHZnZXIua2VybmVs
+Lm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IHJpc2N2QGxpc3Rz
+LmluZnJhZGVhZC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCAyLzNdIGh3cm5nOiBzdGFyZml2
+ZSAtIEFkZCBUUk5HIGRyaXZlciBmb3IgU3RhckZpdmUgU29DDQo+IA0KPiA+IEhvdyBkbyBJIHBy
+b3Blcmx5IGhhbmRsZSBfX21heWJlX3VudXNlZCBmdW5jdGlvbnMgaW4gdGhpcyBzY2VuYXJpbz8N
+Cj4gDQo+IFRoZSBzYW1lIGFzIGluIG90aGVyIGZpbGVzLiBVc2UgYGdpdCBncmVwYA0KPiANCj4g
+PiBXaWxsIGl0IGhlbHAgaWYgSSBhZGQgI2RlZmluZSBhcyBmb2xsb3dzOg0KPiA+DQo+ID4gI2lm
+ZGVmIENPTkZJR19QTQ0KPiA+ICNkZWZpbmUgU1RBUkZJVkVfUk5HX1BNX09QUyAoJnN0YXJmaXZl
+X3JuZ19wbV9vcHMpICNlbHNlICNkZWZpbmUNCj4gPiBTVEFSRklWRV9STkdfUE1fT1BTIE5VTEwg
+I2VuZGlmDQo+IA0KPiBJIHRhbGtlZCBvbmx5IGFib3V0IG9mX21hdGNoX3B0cigpLiBUaGlzIGlz
+IG5vdCBvZl9tYXRjaF9wdHIgYW5kIHNob3VsZCBoYXZlDQo+IGl0cyBvd24gc3ludGF4IChwbV9z
+bGVlcF9wdHIgKyBzdGF0aWMgREVGSU5FX1NJTVBMRV9ERVZfUE1fT1BTKQ0KPiANCj4gPg0KPiA+
+IHN0YXRpYyBzdHJ1Y3QgcGxhdGZvcm1fZHJpdmVyIHN0YXJmaXZlX3RybmdfZHJpdmVyID0gew0K
+PiA+ICAgICAgICAgLnByb2JlICA9IHN0YXJmaXZlX3RybmdfcHJvYmUsDQo+ID4gICAgICAgICAu
+ZHJpdmVyID0gew0KPiA+ICAgICAgICAgICAgICAgICAubmFtZSAgICAgICAgICAgPSAic3RhcmZp
+dmUtdHJuZyIsDQo+ID4gICAgICAgICAgICAgICAgIC5wbSAgICAgICAgICAgICA9IFNUQVJGSVZF
+X1JOR19QTV9PUFMsDQo+ID4gICAgICAgICAgICAgICAgIC5vZl9tYXRjaF90YWJsZSA9IG9mX21h
+dGNoX3B0cih0cm5nX2R0X2lkcyksDQo+ID4gICAgICAgICB9LA0KPiA+IH07DQo+ID4NCj4gPiBJ
+IGRpZCBidWlsZCB0aGUgcGF0Y2hlcyB3aXRoIHRoZSB0b29scyBtZW50aW9uZWQgYnV0IGRpZCBu
+b3QgZ2V0IHdhcm5pbmdzLg0KPiA+IERvIEkgbmVlZCBhIHNwZWNpZmljIHZlcnNpb24sIG9yIGhh
+dmUgSSBkb25lIHNvbWV0aGluZyB3cm9uZz8NCj4gDQo+IFlvdSBqdXN0IG5lZWQgcHJvcGVyIENP
+TVBJTEVfVEVTVCBjb25maWcgd2l0aCBPRiBkaXNhYmxlZC4NCj4gDQoNCkknbGwgdXBkYXRlIHRo
+ZSBwYXRjaCBhY2NvcmRpbmdseS4NClRoYW5rcyBhZ2FpbiBmb3IgdGhlIGNvbW1lbnRzIGFuZCBz
+dWdnZXN0aW9ucy4NCg0KUmVnYXJkcywNCkppYSBKaWUNCg==
