@@ -2,250 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A817CC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 18:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A90F6C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 19:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiLVSZv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 13:25:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52792 "EHLO
+        id S229843AbiLVTat (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Dec 2022 14:30:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbiLVSZn (ORCPT
+        with ESMTP id S229754AbiLVTas (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 13:25:43 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD09326;
-        Thu, 22 Dec 2022 10:25:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-        t=1671733456; bh=3C//pPReD1huiKwB+HIgGP+aYEUDdZN5HiRsK7t6BqE=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=FIbEaueLWxPWU2nVI81X+aZBJqb7pGiKZdoKgG+U+/42wzeWTFzf6iHOLbjwRHbKS
-         aMZzYGP8gHRMOKHvL1MBsPw9wQm7ScTzhLbqAW1IOwD6kJAt/sBzJJXkcro7xzTtFd
-         2IKPtO3ztNsG868yBfXLbm6JnrU3PAYcrgydeAVD8/kiq7SqwykGc7pn8Ku0Q1Mm80
-         0ko/EnwuL32ohUPiwG0c04Co75Liy1YpueJvj9rrltmRh0ZIwg/6S3bUW5rvzlD3mw
-         S+3O/RlnmWoqSD1a5e6mTdikoi28Qy0hxvDowJ2Oh8g3xC6T10Zy/wLSvR/GdoQeT8
-         ekEncX+m2UNyA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost ([62.143.90.77]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Ma20k-1pKZqG2wdg-00Vvny; Thu, 22
- Dec 2022 19:24:16 +0100
-Date:   Thu, 22 Dec 2022 19:24:02 +0100
-From:   erbse.13@gmx.de
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
- LAUNCH_UPDATE_DATA
-Message-ID: <Y6Sgwp/BofzCUrQe@notebook>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-12-michael.roth@amd.com>
+        Thu, 22 Dec 2022 14:30:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD5A219E;
+        Thu, 22 Dec 2022 11:30:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CF629B81F4E;
+        Thu, 22 Dec 2022 19:30:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA87C433D2;
+        Thu, 22 Dec 2022 19:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671737444;
+        bh=6kkxlHhCYsuVQi0lgCe1ViIca0Zbfm7PLnQZC4uoLKM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=rHAeS1B3V1a+eH1wM6+CBbGLM8XmTNn59y3KUtwEi7SagiW+JMvJ1HUIYitqZMnmO
+         VDY3sm66G+2Hf+XzuK6SYP6WWlLL8R7GwNAcFQO93HiDTQwGEDprL8pINQnU5PgEAa
+         I2iY840Hospv4amQtmo+L8w2Jk21n8euVqT7NDg1vb9bnHKpcKeJTeQN2wq9ods5vO
+         CGPI42v7aL6choZhJOiYAKWlqP5VBi7C+xbw/g6p428WbjGxxLLQPseOMFp0lq0BGr
+         qMpNxfQYyDX3NDP/PCoj2PaOcHmqzzjt9enhGIBPdymilHKDB476pyRVlgtt99KBMw
+         j0O6mmksqQfdA==
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Russell King <linux@armlinux.org.uk>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ardb@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        "kernelci.org bot" <bot@kernelci.org>
+Subject: [PATCH] ARM: Reduce __thumb2__ definition to crypto files that require it
+Date:   Thu, 22 Dec 2022 12:30:39 -0700
+Message-Id: <20221222193039.2267074-1-nathan@kernel.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-12-michael.roth@amd.com>
-X-Provags-ID: V03:K1:iVceB1ZaTzjhtQbFgMfH9Ymg2SVfhDV1qs8iVgziQpLZ9OiSFWI
- sN08JdZwg8iuA8yLBoaQVNwx8WhVzL/GntbJSgRtWdUJ+dV69YrUwD8vPGSvr+qBqI+rvM3
- 7IQ605ZNfMYdkWFdgTDF8nA3LA0A96qzMWZ7ICA/7cCXnt3WtZsxm/sU/LXGtPEQxcfSpuL
- q4SEojyNdmQn9qUyq7hWw==
-UI-OutboundReport: notjunk:1;M01:P0:mdELVBPtDLE=;IBvNb1Mqd/JKAyjgIXTx8Dll7mH
- ROU2y7XjKq0+oZ1bfY2w7dFcRtxeWQa8eVJ2+S0loCSdqt2xz8Hvg+ZagBUZLQg37Dt0Dc2ZD
- YF0+WtnJpmHVjBwzEd0AEULmciHzK5mHAvWPEBcUisv/SMfoPkzxQpq4TabH9ZbYJUgeHhr0F
- dzRTGl4HeUPmp9vWNwN1oDJMDdYEyqfffS/K0SaT68igm8SQdH7gjmL60nSab2fY8uxOTXklR
- 4m5HEuR1zhTSNHp3Ztf27Z8gVKDQYlCQMHM4ERCmPTcC0Wca5TYHg+iclVpS6V5EaB4nk/N8u
- WIZA2Eeft+8wzqXUW18TV6CiRkp7oocNjB1NN50akqy7kGJ33YZTMKhBJsYeVGsx9oPn4jagA
- YzXPsqlwrP2kPPSUomkmnV+O7jtHtVnXTIAihl934kbl40IRHsk6yMKBb9iDfI9Lnj0sPMCjN
- /Tx8FgwNxQuHQoWlNrk1JGDKjn4Yg1A7dDY9IsHF8ejlyBZXDJK3JcnKjBa/5kJ4PbX9E8Ngc
- W4gBgYrVfxd260LRebdhVupfZcmgUa2LlWHR7BGYXu2uSBNw7gbwye+l9zhdd/KGml/y7OzbJ
- roxc6AF378FfsfxnPQjf43niz7yHhqz1r4DSzdNiuU1PHfB1J7F4RRCIxyzjnyelcSuBQGEZe
- dtJiFXcsivaiT4mRDDptAqQJEqxibD+KAUrnFQxt9J4/g/AWFksHi/jFd9ypkOx6ziR0qDASL
- Djfb3x4uOG88TKmbb22g+FrU3FJntg3/h5xGX094wlMHv6Sy+APV+7nZVOjHeK6kfAfm4q9C3
- qFawT+WGJ1h856OcOLx5qNe1MCyAq7QOPigBPzWfo3ic2vbEqs/yLTC6vZPGkyN8gd6Liti22
- Tte+ZHHryGvKmvcJfFOCNXgQNahqzo0yWT6RhyS0zGY0okNfvraWBasF4gDZmXLn7FhvKj7oS
- LCIiDaYU51jEQPEcd8umLujuT40=
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
->
-> Pre-boot guest payload needs to be encrypted and VMM has copied it
-> over to the private-fd. Add support to get the pfn from the memfile fd
-> for encrypting the payload in-place.
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 79 ++++++++++++++++++++++++++++++++++--------
->  1 file changed, 64 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index a7e4e3005786..ae4920aeb281 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -107,6 +107,11 @@ static inline bool is_mirroring_enc_context(struct =
-kvm *kvm)
->  	return !!to_kvm_svm(kvm)->sev_info.enc_context_owner;
->  }
->
-> +static bool kvm_is_upm_enabled(struct kvm *kvm)
-> +{
-> +	return kvm->arch.upm_mode;
-> +}
-> +
->  /* Must be called with the sev_bitmap_lock held */
->  static bool __sev_recycle_asids(int min_asid, int max_asid)
->  {
-> @@ -382,6 +387,38 @@ static int sev_launch_start(struct kvm *kvm, struct=
- kvm_sev_cmd *argp)
->  	return ret;
->  }
->
-> +static int sev_get_memfile_pfn_handler(struct kvm *kvm, struct kvm_gfn_=
-range *range, void *data)
-> +{
-> +	struct kvm_memory_slot *memslot =3D range->slot;
-> +	struct page **pages =3D data;
-> +	int ret =3D 0, i =3D 0;
-> +	kvm_pfn_t pfn;
-> +	gfn_t gfn;
-> +
-> +	for (gfn =3D range->start; gfn < range->end; gfn++) {
-> +		int order;
-> +
-> +		ret =3D kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
-> +		if (ret)
-> +			return ret;
-> +
-> +		if (is_error_noslot_pfn(pfn))
-> +			return -EFAULT;
-> +
-> +		pages[i++] =3D pfn_to_page(pfn);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int sev_get_memfile_pfn(struct kvm *kvm, unsigned long addr,
-> +			       unsigned long size, unsigned long npages,
-> +			       struct page **pages)
-> +{
-> +	return kvm_vm_do_hva_range_op(kvm, addr, size,
-> +				      sev_get_memfile_pfn_handler, pages);
-> +}
+Commit 1d2e9b67b001 ("ARM: 9265/1: pass -march= only to compiler") added
+a __thumb2__ define to ASFLAGS to avoid build errors in the crypto code,
+which relies on __thumb2__ for preprocessing. Commit 59e2cf8d21e0 ("ARM:
+9275/1: Drop '-mthumb' from AFLAGS_ISA") followed up on this by removing
+-mthumb from AFLAGS so that __thumb2__ would not be defined when the
+default target was ARMv7 or newer.
 
-The third argument for the kvm_vm_do_hva_range_op call should be addr+size=
-; the
-function expects the end of the range not the size of the range.
+Unfortunately, the second commit's fix assumes that the toolchain
+defaults to -mno-thumb / -marm, which is not the case for Debian's
+arm-linux-gnueabihf target, which defaults to -mthumb:
 
-> +
->  static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uadd=
-r,
->  				    unsigned long ulen, unsigned long *n,
->  				    int write)
-> @@ -424,16 +461,25 @@ static struct page **sev_pin_memory(struct kvm *kv=
-m, unsigned long uaddr,
->  	if (!pages)
->  		return ERR_PTR(-ENOMEM);
->
-> -	/* Pin the user virtual address. */
-> -	npinned =3D pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0,=
- pages);
-> -	if (npinned !=3D npages) {
-> -		pr_err("SEV: Failure locking %lu pages.\n", npages);
-> -		ret =3D -ENOMEM;
-> -		goto err;
-> +	if (kvm_is_upm_enabled(kvm)) {
-> +		/* Get the PFN from memfile */
-> +		if (sev_get_memfile_pfn(kvm, uaddr, ulen, npages, pages)) {
-> +			pr_err("%s: ERROR: unable to find slot for uaddr %lx", __func__, uad=
-dr);
-> +			ret =3D -ENOMEM;
-> +			goto err;
-> +		}
+  $ echo | arm-linux-gnueabihf-gcc -dM -E - | grep __thumb
+  #define __thumb2__ 1
+  #define __thumb__ 1
 
-This branch doesn't initialize npinned. If sev_get_memfile_pfn fails, the =
-code following the err
-label passes the uninitialized value to unpin_user_pages.
+This target is used by several CI systems, which will still see
+redefined macro warnings, despite '-mthumb' not being present in the
+flags:
 
-> +	} else {
-> +		/* Pin the user virtual address. */
-> +		npinned =3D pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0=
-, pages);
-> +		if (npinned !=3D npages) {
-> +			pr_err("SEV: Failure locking %lu pages.\n", npages);
-> +			ret =3D -ENOMEM;
-> +			goto err;
-> +		}
-> +		sev->pages_locked =3D locked;
->  	}
->
->  	*n =3D npages;
-> -	sev->pages_locked =3D locked;
->
->  	return pages;
->
-> @@ -514,6 +560,7 @@ static int sev_launch_update_shared_gfn_handler(stru=
-ct kvm *kvm,
->
->  	size =3D (range->end - range->start) << PAGE_SHIFT;
->  	vaddr_end =3D vaddr + size;
-> +	WARN_ON(size < PAGE_SIZE);
->
->  	/* Lock the user memory. */
->  	inpages =3D sev_pin_memory(kvm, vaddr, size, &npages, 1);
-> @@ -554,13 +601,16 @@ static int sev_launch_update_shared_gfn_handler(st=
-ruct kvm *kvm,
->  	}
->
->  e_unpin:
-> -	/* content of memory is updated, mark pages dirty */
-> -	for (i =3D 0; i < npages; i++) {
-> -		set_page_dirty_lock(inpages[i]);
-> -		mark_page_accessed(inpages[i]);
-> +	if (!kvm_is_upm_enabled(kvm)) {
-> +		/* content of memory is updated, mark pages dirty */
-> +		for (i =3D 0; i < npages; i++) {
-> +			set_page_dirty_lock(inpages[i]);
-> +			mark_page_accessed(inpages[i]);
-> +		}
-> +		/* unlock the user pages */
-> +		sev_unpin_memory(kvm, inpages, npages);
->  	}
-> -	/* unlock the user pages */
-> -	sev_unpin_memory(kvm, inpages, npages);
-> +
->  	return ret;
->  }
->
-> @@ -609,9 +659,8 @@ static int sev_launch_update_priv_gfn_handler(struct=
- kvm *kvm,
->  			goto e_ret;
->  		kvm_release_pfn_clean(pfn);
->  	}
-> -	kvm_vm_set_region_attr(kvm, range->start, range->end,
-> -		true /* priv_attr */);
->
-> +	kvm_vm_set_region_attr(kvm, range->start, range->end, KVM_MEMORY_ATTRI=
-BUTE_PRIVATE);
->  e_ret:
->  	return ret;
->  }
-> --
-> 2.25.1
->
+  <command-line>: warning: "__thumb2__" redefined
+  <built-in>: note: this is the location of the previous definition
 
-Regards, Tom
+Remove the global AFLAGS __thumb2__ define and move it to the crypto
+folder where it is required by the imported OpenSSL algorithms; the rest
+of the kernel should use the internal CONFIG_THUMB2_KERNEL symbol to
+know whether or not Thumb2 is being used or not. Be sure that __thumb2__
+is undefined first so that there are no macro redefinition warnings.
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/1772
+Reported-by: "kernelci.org bot" <bot@kernelci.org>
+Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ arch/arm/Makefile        | 2 +-
+ arch/arm/crypto/Makefile | 7 ++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 4067f5169144..955b0362cdfb 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -132,7 +132,7 @@ AFLAGS_NOWARN	:=$(call as-option,-Wa$(comma)-mno-warn-deprecated,-Wa$(comma)-W)
+ 
+ ifeq ($(CONFIG_THUMB2_KERNEL),y)
+ CFLAGS_ISA	:=-Wa,-mimplicit-it=always $(AFLAGS_NOWARN)
+-AFLAGS_ISA	:=$(CFLAGS_ISA) -Wa$(comma)-mthumb -D__thumb2__=2
++AFLAGS_ISA	:=$(CFLAGS_ISA) -Wa$(comma)-mthumb
+ CFLAGS_ISA	+=-mthumb
+ else
+ CFLAGS_ISA	:=$(call cc-option,-marm,) $(AFLAGS_NOWARN)
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index 971e74546fb1..13e62c7c25dc 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -53,7 +53,12 @@ $(obj)/%-core.S: $(src)/%-armv4.pl
+ 
+ clean-files += poly1305-core.S sha256-core.S sha512-core.S
+ 
++aflags-thumb2-$(CONFIG_THUMB2_KERNEL)  := -U__thumb2__ -D__thumb2__=1
++
++AFLAGS_sha256-core.o += $(aflags-thumb2-y)
++AFLAGS_sha512-core.o += $(aflags-thumb2-y)
++
+ # massage the perlasm code a bit so we only get the NEON routine if we need it
+ poly1305-aflags-$(CONFIG_CPU_V7) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=5
+ poly1305-aflags-$(CONFIG_KERNEL_MODE_NEON) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=7
+-AFLAGS_poly1305-core.o += $(poly1305-aflags-y)
++AFLAGS_poly1305-core.o += $(poly1305-aflags-y) $(aflags-thumb2-y)
+
+base-commit: 71a7507afbc3f27c346898f13ab9bfd918613c34
+-- 
+2.39.0
+
