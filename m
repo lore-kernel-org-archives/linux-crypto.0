@@ -2,115 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A37EC46467
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 09:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF273C4167B
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 09:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiLVJf1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 04:35:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47412 "EHLO
+        id S235306AbiLVJoC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Dec 2022 04:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235074AbiLVJfZ (ORCPT
+        with ESMTP id S235260AbiLVJnk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 04:35:25 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CABD275DD;
-        Thu, 22 Dec 2022 01:35:21 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 33E1224E346;
-        Thu, 22 Dec 2022 17:35:09 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 22 Dec
- 2022 17:35:09 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Thu, 22 Dec 2022 17:35:09 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Thu, 22 Dec 2022 04:43:40 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7341227B28
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 01:43:34 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id y25so1900041lfa.9
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 01:43:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YbnftUr0skysBxQQtBVmUp3dl+iPH1CkZ/Pevi319Z4=;
+        b=tu5TQQc2y5XhDDuW5z1bMNpX9zKfROA3s5jKB9G0KQjOJuNM2bcBSmMPCvwgakyl5O
+         uL6oS7md17Acf9ENu9PcB0kxW4Coynu1r1eUkQWdVgV1NSRIxpc8r+QvnR4n0GmhSPlz
+         NW+6+Un28/jlsP/TVjS202yZFoW38ETk9BCzr60pUDqT+pMNb/+kBEme71AG7oFnBEvB
+         tch9duUW2ZeBOftJyGZojAM7ZbJz//uWip1R8Qnald2rMy3Ip6hviGMJJAzxjZLLgMAZ
+         cylKCWrrFaG2G1VV7AtoiPrpLACzWpYQOAkWKtkXXDPlXeyJd70fqFc/3+I+7CwnseFK
+         ORvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YbnftUr0skysBxQQtBVmUp3dl+iPH1CkZ/Pevi319Z4=;
+        b=nPeut9GVIaPxISoGFstSfJUJPOqSgeQ8QaLUPwcH6oerbvHc0MCsaTlNUU+KSNm7m9
+         eQxD58eWcNlRFoQiyIuZb5pfBamOfg2o6RIe4rC1LKF8NZ2iX+ovPFQMXVMUcN+G5r9A
+         UUuJxRSD105da/noCjsUGauXcUmViWq2fY5PyZy8JcDJ482l99H6JKQfPFwkUhg6RuUp
+         9Jry9X1rtXvLAEPAJLYwa08W/pbClYoPMtV2XSf+w4X5z+OPySstJLXzC/anR24IhD7b
+         JUH9bB8CRDUPh2UrDlDiwe1MM0UESaWd0y43FpHnTUqgG4Sp484m4/s+LZme932BJzQP
+         di9A==
+X-Gm-Message-State: AFqh2koaciNLXJchhNqMlcO796pDmOiB7pxaf4Vfc2RKW5Ib9DfXA/Py
+        bygd8gbFEA8+VCZL7H1UCRmgEQ==
+X-Google-Smtp-Source: AMrXdXtIO/l/UEsk2MV0XgK6wMm0UkQrCvnZKcwe7Ug7pLVDdSRQxWA3YLc4a7ZfaL4xaMUG9Yifzg==
+X-Received: by 2002:ac2:4ecd:0:b0:4a4:68b9:6085 with SMTP id p13-20020ac24ecd000000b004a468b96085mr1334382lfr.16.1671702212876;
+        Thu, 22 Dec 2022 01:43:32 -0800 (PST)
+Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
+        by smtp.gmail.com with ESMTPSA id z1-20020a0565120c0100b004b4b600c093sm15902lfu.92.2022.12.22.01.43.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Dec 2022 01:43:32 -0800 (PST)
+Message-ID: <27f1c084-60b4-daeb-0ffe-c0500aecbd49@linaro.org>
+Date:   Thu, 22 Dec 2022 10:43:31 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Content-Language: en-US
+To:     JiaJie Ho <jiajie.ho@starfivetech.com>,
         Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-CC:     Emil Renner Berthing <kernel@esmil.dk>,
+Cc:     Emil Renner Berthing <kernel@esmil.dk>,
         Conor Dooley <conor.dooley@microchip.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Thread-Topic: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Thread-Index: AQHZFRwx15kE4gLKu0uxN2CW96B+Oa53kqwAgAIT3RA=
-Date:   Thu, 22 Dec 2022 09:35:08 +0000
-Message-ID: <69dca1be673a40729d750c00d927b437@EXMBX168.cuchost.com>
 References: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
  <20221221090819.1259443-3-jiajie.ho@starfivetech.com>
  <05aaa9f8-7a97-51c9-e18a-1c3753f2006b@linaro.org>
-In-Reply-To: <05aaa9f8-7a97-51c9-e18a-1c3753f2006b@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [161.142.229.243]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <69dca1be673a40729d750c00d927b437@EXMBX168.cuchost.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <69dca1be673a40729d750c00d927b437@EXMBX168.cuchost.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBXZWRuZXNkYXks
-IERlY2VtYmVyIDIxLCAyMDIyIDU6NDkgUE0NCj4gVG86IEppYUppZSBIbyA8amlhamllLmhvQHN0
-YXJmaXZldGVjaC5jb20+OyBPbGl2aWEgTWFja2FsbA0KPiA8b2xpdmlhQHNlbGVuaWMuY29tPjsg
-SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgUm9iDQo+IEhlcnJpbmcg
-PHJvYmgrZHRAa2VybmVsLm9yZz47IEtyenlzenRvZiBLb3psb3dza2kNCj4gPGtyenlzenRvZi5r
-b3psb3dza2krZHRAbGluYXJvLm9yZz4NCj4gQ2M6IEVtaWwgUmVubmVyIEJlcnRoaW5nIDxrZXJu
-ZWxAZXNtaWwuZGs+OyBDb25vciBEb29sZXkNCj4gPGNvbm9yLmRvb2xleUBtaWNyb2NoaXAuY29t
-PjsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsNCj4gZGV2aWNldHJlZUB2Z2VyLmtlcm5l
-bC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiByaXNjdkBsaXN0
-cy5pbmZyYWRlYWQub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMi8zXSBod3JuZzogc3RhcmZp
-dmUgLSBBZGQgVFJORyBkcml2ZXIgZm9yIFN0YXJGaXZlIFNvQw0KPiANCj4gT24gMjEvMTIvMjAy
-MiAxMDowOCwgSmlhIEppZSBIbyB3cm90ZToNCj4gPiBUaGlzIGFkZHMgZHJpdmVyIHN1cHBvcnQg
-Zm9yIHRoZSBoYXJkd2FyZSByYW5kb20gbnVtYmVyIGdlbmVyYXRvciBpbg0KPiA+IFN0YXJmaXZl
-IFNvQ3MgYW5kIGFkZHMgU3RhckZpdmUgVFJORyBlbnRyeSB0byBNQUlOVEFJTkVSUy4NCj4gPg0K
-PiA+IENvLWRldmVsb3BlZC1ieTogSmVubnkgWmhhbmcgPGplbm55LnpoYW5nQHN0YXJmaXZldGVj
-aC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSmVubnkgWmhhbmcgPGplbm55LnpoYW5nQHN0YXJm
-aXZldGVjaC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSmlhIEppZSBIbyA8amlhamllLmhvQHN0
-YXJmaXZldGVjaC5jb20+DQo+ID4gLS0tDQo+ID4gIE1BSU5UQUlORVJTICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgICA2ICsNCj4gPiAgZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9LY29uZmln
-ICAgICAgICAgfCAgMTEgKw0KPiA+ICBkcml2ZXJzL2NoYXIvaHdfcmFuZG9tL01ha2VmaWxlICAg
-ICAgICB8ICAgMSArDQo+ID4gIGRyaXZlcnMvY2hhci9od19yYW5kb20vc3RhcmZpdmUtdHJuZy5j
-IHwgNDAzDQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICA0IGZpbGVzIGNoYW5n
-ZWQsIDQyMSBpbnNlcnRpb25zKCspDQo+ID4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2No
-YXIvaHdfcmFuZG9tL3N0YXJmaXZlLXRybmcuYw0KPiA+DQo+IA0KPiAoLi4uKQ0KPiANCj4gPiAr
-c3RhdGljIGNvbnN0IHN0cnVjdCBvZl9kZXZpY2VfaWQgdHJuZ19kdF9pZHNbXSA9IHsNCj4gPiAr
-CXsgLmNvbXBhdGlibGUgPSAic3RhcmZpdmUsamg3MTEwLXRybmciIH0sDQo+ID4gKwl7IH0NCj4g
-PiArfTsNCj4gPiArTU9EVUxFX0RFVklDRV9UQUJMRShvZiwgdHJuZ19kdF9pZHMpOw0KPiA+ICsN
-Cj4gPiArc3RhdGljIHN0cnVjdCBwbGF0Zm9ybV9kcml2ZXIgc3RhcmZpdmVfdHJuZ19kcml2ZXIg
-PSB7DQo+ID4gKwkucHJvYmUJPSBzdGFyZml2ZV90cm5nX3Byb2JlLA0KPiA+ICsJLmRyaXZlcgk9
-IHsNCj4gPiArCQkubmFtZQkJPSAic3RhcmZpdmUtdHJuZyIsDQo+ID4gKwkJLnBtCQk9ICZzdGFy
-Zml2ZV90cm5nX3BtX29wcywNCj4gPiArCQkub2ZfbWF0Y2hfdGFibGUJPSBvZl9tYXRjaF9wdHIo
-dHJuZ19kdF9pZHMpLA0KPiANCj4gb2ZfbWF0Y2hfcHRyIGdvZXMgd2l0aCBfX21heWJlX3VudXNl
-ZC4gWW91IHdpbGwgaGF2ZSBub3cgd2FybmluZ3MsIHNvDQo+IHBsZWFzZSB0ZXN0IG1vcmUgeW91
-ciBwYXRjaGVzIChXPTEsIHNwYXJzZSwgc21hdGNoKS4NCj4gDQoNCkhpIEtyenlzenRvZiwNCg0K
-VGhhbmtzIGZvciByZXZpZXdpbmcgdGhpcyBwYXRjaC4NCkhvdyBkbyBJIHByb3Blcmx5IGhhbmRs
-ZSBfX21heWJlX3VudXNlZCBmdW5jdGlvbnMgaW4gdGhpcyBzY2VuYXJpbz8NCldpbGwgaXQgaGVs
-cCBpZiBJIGFkZCAjZGVmaW5lIGFzIGZvbGxvd3M6DQoNCiNpZmRlZiBDT05GSUdfUE0NCiNkZWZp
-bmUgU1RBUkZJVkVfUk5HX1BNX09QUyAoJnN0YXJmaXZlX3JuZ19wbV9vcHMpDQojZWxzZQ0KI2Rl
-ZmluZSBTVEFSRklWRV9STkdfUE1fT1BTIE5VTEwNCiNlbmRpZg0KDQpzdGF0aWMgc3RydWN0IHBs
-YXRmb3JtX2RyaXZlciBzdGFyZml2ZV90cm5nX2RyaXZlciA9IHsNCiAgICAgICAgLnByb2JlICA9
-IHN0YXJmaXZlX3RybmdfcHJvYmUsDQogICAgICAgIC5kcml2ZXIgPSB7DQogICAgICAgICAgICAg
-ICAgLm5hbWUgICAgICAgICAgID0gInN0YXJmaXZlLXRybmciLA0KICAgICAgICAgICAgICAgIC5w
-bSAgICAgICAgICAgICA9IFNUQVJGSVZFX1JOR19QTV9PUFMsDQogICAgICAgICAgICAgICAgLm9m
-X21hdGNoX3RhYmxlID0gb2ZfbWF0Y2hfcHRyKHRybmdfZHRfaWRzKSwNCiAgICAgICAgfSwNCn07
-DQoNCkkgZGlkIGJ1aWxkIHRoZSBwYXRjaGVzIHdpdGggdGhlIHRvb2xzIG1lbnRpb25lZCBidXQg
-ZGlkIG5vdCBnZXQgd2FybmluZ3MuDQpEbyBJIG5lZWQgYSBzcGVjaWZpYyB2ZXJzaW9uLCBvciBo
-YXZlIEkgZG9uZSBzb21ldGhpbmcgd3Jvbmc/DQoNCm1ha2UgQz0yIGRyaXZlcnMvY2hhci9od19y
-YW5kb20vDQogIENIRUNLICAgc2NyaXB0cy9tb2QvZW1wdHkuYw0KICBDQUxMICAgIHNjcmlwdHMv
-Y2hlY2tzeXNjYWxscy5zaA0KICBDSEVDSyAgIGFyY2gvcmlzY3Yva2VybmVsL3Zkc28vdmdldHRp
-bWVvZmRheS5jDQogIENIRUNLICAgZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9jb3JlLmMNCiAgQ0hF
-Q0sgICBkcml2ZXJzL2NoYXIvaHdfcmFuZG9tL3N0YXJmaXZlLXRybmcuYw0KDQpSZWdhcmRzLA0K
-SmlhIEppZQ0K
+On 22/12/2022 10:35, JiaJie Ho wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> Sent: Wednesday, December 21, 2022 5:49 PM
+>> To: JiaJie Ho <jiajie.ho@starfivetech.com>; Olivia Mackall
+>> <olivia@selenic.com>; Herbert Xu <herbert@gondor.apana.org.au>; Rob
+>> Herring <robh+dt@kernel.org>; Krzysztof Kozlowski
+>> <krzysztof.kozlowski+dt@linaro.org>
+>> Cc: Emil Renner Berthing <kernel@esmil.dk>; Conor Dooley
+>> <conor.dooley@microchip.com>; linux-crypto@vger.kernel.org;
+>> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
+>> riscv@lists.infradead.org
+>> Subject: Re: [PATCH 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+>>
+>> On 21/12/2022 10:08, Jia Jie Ho wrote:
+>>> This adds driver support for the hardware random number generator in
+>>> Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
+>>>
+>>> Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+>>> Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+>>> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+>>> ---
+>>>  MAINTAINERS                            |   6 +
+>>>  drivers/char/hw_random/Kconfig         |  11 +
+>>>  drivers/char/hw_random/Makefile        |   1 +
+>>>  drivers/char/hw_random/starfive-trng.c | 403
+>>> +++++++++++++++++++++++++
+>>>  4 files changed, 421 insertions(+)
+>>>  create mode 100644 drivers/char/hw_random/starfive-trng.c
+>>>
+>>
+>> (...)
+>>
+>>> +static const struct of_device_id trng_dt_ids[] = {
+>>> +	{ .compatible = "starfive,jh7110-trng" },
+>>> +	{ }
+>>> +};
+>>> +MODULE_DEVICE_TABLE(of, trng_dt_ids);
+>>> +
+>>> +static struct platform_driver starfive_trng_driver = {
+>>> +	.probe	= starfive_trng_probe,
+>>> +	.driver	= {
+>>> +		.name		= "starfive-trng",
+>>> +		.pm		= &starfive_trng_pm_ops,
+>>> +		.of_match_table	= of_match_ptr(trng_dt_ids),
+>>
+>> of_match_ptr goes with __maybe_unused. You will have now warnings, so
+>> please test more your patches (W=1, sparse, smatch).
+>>
+> 
+> Hi Krzysztof,
+> 
+> Thanks for reviewing this patch.
+> How do I properly handle __maybe_unused functions in this scenario?
+
+The same as in other files. Use `git grep`
+
+> Will it help if I add #define as follows:
+> 
+> #ifdef CONFIG_PM
+> #define STARFIVE_RNG_PM_OPS (&starfive_rng_pm_ops)
+> #else
+> #define STARFIVE_RNG_PM_OPS NULL
+> #endif
+
+I talked only about of_match_ptr(). This is not of_match_ptr and should
+have its own syntax (pm_sleep_ptr + static DEFINE_SIMPLE_DEV_PM_OPS)
+
+> 
+> static struct platform_driver starfive_trng_driver = {
+>         .probe  = starfive_trng_probe,
+>         .driver = {
+>                 .name           = "starfive-trng",
+>                 .pm             = STARFIVE_RNG_PM_OPS,
+>                 .of_match_table = of_match_ptr(trng_dt_ids),
+>         },
+> };
+> 
+> I did build the patches with the tools mentioned but did not get warnings.
+> Do I need a specific version, or have I done something wrong?
+
+You just need proper COMPILE_TEST config with OF disabled.
+
+Best regards,
+Krzysztof
+
