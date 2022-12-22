@@ -2,87 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C191C001B2
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 08:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F35C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 09:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231892AbiLVIMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 03:12:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51222 "EHLO
+        id S235139AbiLVJKh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Dec 2022 04:10:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbiLVIMw (ORCPT
+        with ESMTP id S235029AbiLVJKg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 03:12:52 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44DD72229F;
-        Thu, 22 Dec 2022 00:12:51 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 9C3D324E342;
-        Thu, 22 Dec 2022 16:12:44 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 22 Dec
- 2022 16:12:44 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Thu, 22 Dec 2022 16:12:44 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-CC:     Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH 1/3] dt-bindings: rng: Add StarFive TRNG module
-Thread-Topic: [PATCH 1/3] dt-bindings: rng: Add StarFive TRNG module
-Thread-Index: AQHZFRxUoXQEQibksUW9iWQOWN1q6q53kkEAgAH9dkA=
-Date:   Thu, 22 Dec 2022 08:12:44 +0000
-Message-ID: <3fe5be6168b94f62b2c9ce078e5e954a@EXMBX168.cuchost.com>
-References: <20221221090819.1259443-1-jiajie.ho@starfivetech.com>
- <20221221090819.1259443-2-jiajie.ho@starfivetech.com>
- <3a26c733-6573-5954-f4e5-8a1f8abba140@linaro.org>
-In-Reply-To: <3a26c733-6573-5954-f4e5-8a1f8abba140@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [161.142.229.243]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Thu, 22 Dec 2022 04:10:36 -0500
+X-Greylist: delayed 577 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Dec 2022 01:10:34 PST
+Received: from mail.svorkabrattegg.com (mail.svorkabrattegg.com [51.38.115.213])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8B820372
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 01:10:34 -0800 (PST)
+Received: by mail.svorkabrattegg.com (Postfix, from userid 1002)
+        id 59AA0A381C; Thu, 22 Dec 2022 09:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=svorkabrattegg.com;
+        s=mail; t=1671699655;
+        bh=9HcAmZM8CdhTVzUTZhsW/Q7+graOYPdwGoAVqnU6Io8=;
+        h=Date:From:To:Subject:From;
+        b=m9ug75/XRgdukx7CXnuIDYjsxSlLJIHkgj5Xq7ummS/lMb+0+dcippIjuYhgDQATy
+         ZhmN7WQfnGS7venqNqKbgl7znME0TKsa8NaiUb9sqVzoFsDAOb6/Rzbj+MzckiDyzb
+         ROFklSs2XrEnjy8pLWU2FirFgV+o7qQNVz3WUTK0Um/6ZJfmk0Qc4thBar9OyEIqDT
+         xgJohnpryMyMgA8l4g3DUJX3UuueQgMMxxgWDHP7bsDvlwy7gL2cRvumAQx3ekCYuR
+         mdqe1YzP5K5/W8UDU+laKmH7YR8PNIdpVJvjHbPbT88kvCp9duhnUuX/ere3I4GF7P
+         0etgmU97MjDlg==
+Received: by mail.svorkabrattegg.com for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 09:00:49 GMT
+Message-ID: <20221222074500-0.1.7z.hhqa.0.i6td6035fp@svorkabrattegg.com>
+Date:   Thu, 22 Dec 2022 09:00:49 GMT
+From:   "Timeo Moreau" <timeo.moreau@svorkabrattegg.com>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Emballage
+X-Mailer: mail.svorkabrattegg.com
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS3J6eXN6dG9mIEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiBTZW50OiBXZWRuZXNkYXks
-IERlY2VtYmVyIDIxLCAyMDIyIDU6NDggUE0NCj4gVG86IEppYUppZSBIbyA8amlhamllLmhvQHN0
-YXJmaXZldGVjaC5jb20+OyBPbGl2aWEgTWFja2FsbA0KPiA8b2xpdmlhQHNlbGVuaWMuY29tPjsg
-SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgUm9iDQo+IEhlcnJpbmcg
-PHJvYmgrZHRAa2VybmVsLm9yZz47IEtyenlzenRvZiBLb3psb3dza2kNCj4gPGtyenlzenRvZi5r
-b3psb3dza2krZHRAbGluYXJvLm9yZz4NCj4gQ2M6IEVtaWwgUmVubmVyIEJlcnRoaW5nIDxrZXJu
-ZWxAZXNtaWwuZGs+OyBDb25vciBEb29sZXkNCj4gPGNvbm9yLmRvb2xleUBtaWNyb2NoaXAuY29t
-PjsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsNCj4gZGV2aWNldHJlZUB2Z2VyLmtlcm5l
-bC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiByaXNjdkBsaXN0
-cy5pbmZyYWRlYWQub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8zXSBkdC1iaW5kaW5nczog
-cm5nOiBBZGQgU3RhckZpdmUgVFJORyBtb2R1bGUNCj4gDQo+IE9uIDIxLzEyLzIwMjIgMTA6MDgs
-IEppYSBKaWUgSG8gd3JvdGU6DQo+ID4gQWRkIGRvY3VtZW50YXRpb24gdG8gZGVzY3JpYmUgU3Rh
-cmZpdmUgdHJ1ZSByYW5kb20gbnVtYmVyIGdlbmVyYXRvcg0KPiA+IG1vZHVsZS4NCj4gPg0KPiA+
-IENvLWRldmVsb3BlZC1ieTogSmVubnkgWmhhbmcgPGplbm55LnpoYW5nQHN0YXJmaXZldGVjaC5j
-b20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSmVubnkgWmhhbmcgPGplbm55LnpoYW5nQHN0YXJmaXZl
-dGVjaC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogSmlhIEppZSBIbyA8amlhamllLmhvQHN0YXJm
-aXZldGVjaC5jb20+DQo+ID4gLS0tDQo+ID4gIC4uLi9iaW5kaW5ncy9ybmcvc3RhcmZpdmUsamg3
-MTEwLXRybmcueWFtbCAgICB8IDU1ICsrKysrKysrKysrKysrKysrKysNCj4gPiAgMSBmaWxlIGNo
-YW5nZWQsIDU1IGluc2VydGlvbnMoKykNCj4gPiAgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+ID4gRG9j
-dW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL3JuZy9zdGFyZml2ZSxqaDcxMTAtdHJuZy55
-YW1sDQo+ID4NCj4gDQo+IA0KPiBSZXZpZXdlZC1ieTogS3J6eXN6dG9mIEtvemxvd3NraSA8a3J6
-eXN6dG9mLmtvemxvd3NraUBsaW5hcm8ub3JnPg0KPiANCkhpIEtyenlzenRvZiwNCg0KVGhhbmsg
-eW91IGZvciBzcGVuZGluZyB0aW1lIHJldmlld2luZyB0aGlzIHBhdGNoLg0KDQpCZXN0IHJlZ2Fy
-ZHMsDQpKaWEgSmllDQoNCg==
+Bonjour,
+
+Avez-vous besoin d'un emballage en aluminium?
+
+Nous fournissons des conditions comp=C3=A9titives de coop=C3=A9ration dan=
+s le domaine des livraisons rapides et stables d'emballages imprim=C3=A9s=
+ flexographiques et lamin=C3=A9s, d'emballages biod=C3=A9gradables et com=
+postables, ainsi que de vernis structuraux appliqu=C3=A9s ou de vernis am=
+=C3=A9liorant les propri=C3=A9t=C3=A9s du film.
+
+Nous fournissons =C3=A9galement des sacs et emballages Doypack avec fen=C3=
+=AAtre permettant de visualiser le produit.
+
+Si vous =C3=AAtes int=C3=A9ress=C3=A9 s'il vous pla=C3=AEt faites le moi =
+savoir.
+
+
+Timeo Moreau
