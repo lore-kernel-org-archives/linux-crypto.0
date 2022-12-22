@@ -2,86 +2,134 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B16C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 12:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93DCFC001B2
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 13:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234764AbiLVM0f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 07:26:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53136 "EHLO
+        id S235355AbiLVNR2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Dec 2022 08:17:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234727AbiLVM0e (ORCPT
+        with ESMTP id S235372AbiLVNR1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 07:26:34 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655E3E0B8;
-        Thu, 22 Dec 2022 04:26:33 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EF42D1EC0715;
-        Thu, 22 Dec 2022 13:26:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1671711992;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=77VLJhO0dwLBle+8mUKiXvGfN/pazGch3mXeBUAPVPY=;
-        b=lOSb1jh+bt4haey43HIMtwFGaW08ydiHmgjk3xxfbBWGiMNXQk23xbiaUrYp90mvplWzPC
-        2cHavs6VQEbZKGtynRweI+uHTVpXwFpzR2Lgv9R4Cva7Z+lS7RngC04mX3HhMe13k7ZmiS
-        JrnB9euVlgqs+68jIwsnpPYeoeI8Eik=
-Date:   Thu, 22 Dec 2022 13:26:25 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com
-Subject: Re: [PATCH RFC v7 02/64] KVM: x86: Add
- KVM_CAP_UNMAPPED_PRIVATE_MEMORY
-Message-ID: <Y6RM8RRryLgK8KiB@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-3-michael.roth@amd.com>
+        Thu, 22 Dec 2022 08:17:27 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CA72B247;
+        Thu, 22 Dec 2022 05:17:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2XcHZF1PZLR2wIWpbwHYxjPC+APViKRD8vA3VUxcIvg=; b=KCXj9vIla9OYqKdFn9cR8kvNM7
+        aFCQeC8riSg8V400TR89vezYQDYLiis4eNRLNs8TpTaXaw65hlSoAk1r6vPtZd+exgqLf0ix1mWk/
+        7mD3VAmxpBkRslmasRJRs+fKtYpKnU1ADefum9T6WSCkywkO5VAsLjiapOTmMfHm3hWA+ZnPwbN/x
+        w/QRGrx3Tff9U3N5qrWzRNVImBPIIWUH62fHNh4gOn/lh1uA85Bq4VekD+WTPjngLVS9jAhxdeZUl
+        IsMAPZLgwBX86nVypWOAboNnZASXp2L/Ju1gXccS53q3KAKJFdUiOmNk/uvedjpjQbE+kHWV+JJwu
+        O+7WKnuA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1p8LR1-00Dq0t-2q;
+        Thu, 22 Dec 2022 13:16:32 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D4E3C30006D;
+        Thu, 22 Dec 2022 14:16:28 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 5D8FC2CEAF0FB; Thu, 22 Dec 2022 14:16:28 +0100 (CET)
+Date:   Thu, 22 Dec 2022 14:16:28 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        mark.rutland@arm.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 05/12] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y6RYrHV3PK+FwW2p@hirez.programming.kicks-ass.net>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.154045458@infradead.org>
+ <Y6OyAL2epKPHj+tr@boqun-archlinux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-3-michael.roth@amd.com>
+In-Reply-To: <Y6OyAL2epKPHj+tr@boqun-archlinux>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:54PM -0600, Michael Roth wrote:
-> This mainly indicates to KVM that it should expect all private guest
-> memory to be backed by private memslots. Ideally this would work
-> similarly for others archs, give or take a few additional flags, but
-> for now it's a simple boolean indicator for x86.
+On Wed, Dec 21, 2022 at 05:25:20PM -0800, Boqun Feng wrote:
 
-...
+> > +#define __CMPXCHG128(name, mb, cl...)					\
+> > +static __always_inline u128						\
+> > +__lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)		\
+> > +{									\
+> > +	union __u128_halves r, o = { .full = (old) },			\
+> > +			       n = { .full = (new) };			\
+> > +	register unsigned long x0 asm ("x0") = o.low;			\
+> > +	register unsigned long x1 asm ("x1") = o.high;			\
+> > +	register unsigned long x2 asm ("x2") = n.low;			\
+> > +	register unsigned long x3 asm ("x3") = n.high;			\
+> > +	register unsigned long x4 asm ("x4") = (unsigned long)ptr;	\
+> > +									\
+> > +	asm volatile(							\
+> > +	__LSE_PREAMBLE							\
+> > +	"	casp" #mb "\t%[old1], %[old2], %[new1], %[new2], %[v]\n"\
+> > +	: [old1] "+&r" (x0), [old2] "+&r" (x1),				\
+> > +	  [v] "+Q" (*(unsigned long *)ptr)				\
+> > +	: [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),		\
+> 
+> Issue #1: the line below can be removed, otherwise..
+> 
+> > +	  [oldval1] "r" (r.low), [oldval2] "r" (r.high)			\
+> 
+> warning:
+> 
+> 	./arch/arm64/include/asm/atomic_lse.h: In function '__lse__cmpxchg128_mb':
+> 	./arch/arm64/include/asm/atomic_lse.h:309:27: warning: 'r.<U97b8>.low' is used uninitialized [-Wuninitialized]
+> 	  309 |           [oldval1] "r" (r.low), [oldval2] "r" (r.high)
+> 
+> 
+> > +	: cl);								\
+> > +									\
+> > +	r.low = x0; r.high = x1;					\
+> > +									\
+> > +	return r.full;							\
+> > +}
+> > +
+> > +__CMPXCHG128(   ,   )
+> > +__CMPXCHG128(_mb, al, "memory")
+> > +
+> > +#undef __CMPXCHG128
+> > +
+> >  #endif	/* __ASM_ATOMIC_LSE_H */
+> > --- a/arch/arm64/include/asm/cmpxchg.h
+> > +++ b/arch/arm64/include/asm/cmpxchg.h
+> > @@ -147,6 +147,19 @@ __CMPXCHG_DBL(_mb)
+> >  
+> >  #undef __CMPXCHG_DBL
+> >  
+> > +#define __CMPXCHG128(name)						\
+> > +static inline long __cmpxchg128##name(volatile u128 *ptr,		\
+> 
+> Issue #2: this should be
+> 
+> static inline u128 __cmpxchg128##name(..)
+> 
+> because cmpxchg* needs to return the old value.
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index c7e9d375a902..cc9424ccf9b2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1219,6 +1219,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->  #define KVM_CAP_MEMORY_ATTRIBUTES 225
-> +#define KVM_CAP_UNMAPPED_PRIVATE_MEM 240
-
-Isn't this new cap supposed to be documented somewhere in
-Documentation/virt/kvm/api.rst ?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Duh.. fixed both. Pushed out to queue/core/wip-u128. I'll probably
+continue all this in two weeks (yay xmas break!).
