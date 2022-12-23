@@ -2,141 +2,127 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB9DC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Dec 2022 16:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7520BC4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Dec 2022 17:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231523AbiLWQ5D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Dec 2022 11:57:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54974 "EHLO
+        id S230489AbiLWRrc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Dec 2022 12:47:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230527AbiLWQ5B (ORCPT
+        with ESMTP id S232313AbiLWRrc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Dec 2022 11:57:01 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE271D3;
-        Fri, 23 Dec 2022 08:56:58 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 62AA51EC0724;
-        Fri, 23 Dec 2022 17:56:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1671814616;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=eIrwyfehmxU3S8OfAsjHXXxAvKGYqWtRXnlHsmPvMIs=;
-        b=sQpLqtBZNyzt9lCkh02Tv1TArmXNvAYkccThgPqKToX+E4uRVMeRWpB6DQOtn0UgGq7QfH
-        xnfQYy4dQI8JTVvBFgPDRc1+UI8QVqekXcGosVLwwJkrENFYZi9w4fEUexsMn6EYHGTJQO
-        Vhfz7bb9sk0ICgmVHhqqvOh8tEjrjhY=
-Date:   Fri, 23 Dec 2022 17:56:50 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <Y6Xd0ruz3kMij/5F@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
+        Fri, 23 Dec 2022 12:47:32 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F21E1B9C0
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Dec 2022 09:47:31 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1p8m8k-00035B-P9; Fri, 23 Dec 2022 18:47:26 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1p8m8g-001Gn7-6C; Fri, 23 Dec 2022 18:47:22 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1p8m8f-007POs-GV; Fri, 23 Dec 2022 18:47:21 +0100
+Date:   Fri, 23 Dec 2022 18:47:19 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: caam - Prevent fortify error
+Message-ID: <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
+References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
+ <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="4voh3jrqjlnm7uvs"
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-4-michael.roth@amd.com>
+In-Reply-To: <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> +       bool (*private_mem_enabled)(struct kvm *kvm);
 
-This looks like a function returning boolean to me. IOW, you can
-simplify this to:
+--4voh3jrqjlnm7uvs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 82ba4a564e58..4449aeff0dff 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
- KVM_X86_OP(complete_emulated_msr)
- KVM_X86_OP(vcpu_deliver_sipi_vector)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-+KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
- 
- #undef KVM_X86_OP
- #undef KVM_X86_OP_OPTIONAL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1da0474edb2d..1b4b89ddeb55 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
- 
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
-+	bool (*private_mem_enabled)(struct kvm *kvm);
- 
- 	bool (*has_wbinvd_exit)(void);
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ce362e88a567..73b780fa4653 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
- 	return 0;
- }
- 
-+static bool svm_private_mem_enabled(struct kvm *kvm)
-+{
-+	if (sev_guest(kvm))
-+		return kvm->arch.upm_mode;
-+
-+	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-+}
-+
- static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.name = "kvm_amd",
- 
-@@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
- 
-+	.private_mem_enabled = svm_private_mem_enabled,
-+
- 	.has_wbinvd_exit = svm_has_wbinvd_exit,
- 
- 	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 823646d601db..9a1ca59d36a4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
- }
- EXPORT_SYMBOL_GPL(__x86_set_memory_region);
- 
-+bool kvm_arch_has_private_mem(struct kvm *kvm)
-+{
-+	return static_call(kvm_x86_private_mem_enabled)(kvm);
-+}
-+
- void kvm_arch_pre_destroy_vm(struct kvm *kvm)
- {
- 	kvm_mmu_pre_destroy_vm(kvm);
+On Fri, Dec 23, 2022 at 02:29:52PM +0800, Herbert Xu wrote:
+> On Thu, Dec 22, 2022 at 05:25:13PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+> > When compiling arm64 allmodconfig  with gcc 10.2.1 I get
+> >=20
+> > 	drivers/crypto/caam/desc_constr.h: In function =E2=80=98append_data.co=
+nstprop=E2=80=99:
+> > 	include/linux/fortify-string.h:57:29: error: argument 2 null where non=
+-null expected [-Werror=3Dnonnull]
+> >=20
+> > Fix this by skipping the memcpy if data is NULL and add a BUG_ON instead
+> > that triggers on a problematic call that is now prevented to trigger.
+> > After data =3D=3D NULL && len !=3D 0 is known to be false, logically
+> >=20
+> > 	if (len)
+> > 		memcpy(...)
+> >=20
+> > could be enough to know that memcpy is not called with dest=3DNULL, but
+> > gcc doesn't seem smart enough for that conclusion. gcc 12 doesn't have a
+> > problem with the original code.
+> >=20
+> > Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> > ---
+> >  drivers/crypto/caam/desc_constr.h | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+>=20
+> Does this patch fix your problem?
+>=20
+> https://lore.kernel.org/all/Y4mHjKXnF%2F4Pfw5I@gondor.apana.org.au/
 
--- 
-Regards/Gruss,
-    Boris.
+Using
 
-https://people.kernel.org/tglx/notes-about-netiquette
+	if (data && len)
+
+fixes it (that's the patch that b4 picks for the above message id :-\),
+
+	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) && len)
+
+makes the problem go away, too. But I wonder if the latter is correct.
+Shouldn't the memcpy happen even with that debugging symbol enabled?
+
+> If not please send me your kconfig file.
+
+(It's a plain arm64 allmodconfig)
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
+   |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--4voh3jrqjlnm7uvs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmOl6aQACgkQwfwUeK3K
+7AmihAf9H/w2F3oDM6uvf5HktZ+6qpmKs6xTCa0tnkKBTX2Fb2zi9rHZPo2r33Cg
+ZjT1+f5mFfKKN2N5kfV2ibY8m85nIdWvqbrVDEDzAhLU/pWrUCVYGVLl2Voy6LPU
+FjGDuCo3GGCL1st84GimKp1two6RQAuRNgBzTvOSI1mJ/fZ4vNXVSZ9n7UtuEDgX
+cOL2YWOXm/H5/yJ36QfIJ4MqPQYLkCs6RQsVWUoC11uCqJvea8WSqA9yXw5j4AaD
+g99Zrj79KFeSjygfOROf4/zKCU/IAQw/qqwmGeEZuA4O2/ncq0g7dk6c7PYKvcPm
+zvMV1sFbSFQZZJ+lP6XyedlKJ9BC1w==
+=pWt7
+-----END PGP SIGNATURE-----
+
+--4voh3jrqjlnm7uvs--
