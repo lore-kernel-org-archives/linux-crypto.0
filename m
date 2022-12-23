@@ -2,182 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA12C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Dec 2022 19:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB322C41535
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Dec 2022 06:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230479AbiLVTwm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Dec 2022 14:52:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40480 "EHLO
+        id S229996AbiLWGZp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Dec 2022 01:25:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiLVTwl (ORCPT
+        with ESMTP id S229483AbiLWGZo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Dec 2022 14:52:41 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549A117401
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 11:52:39 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id v3so1996449pgh.4
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Dec 2022 11:52:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BQ9n0kH0mbMHZf64/LlHldiSHJ2YosTB1WTP5AW4Lc=;
-        b=hbQD11e1hF4r0xWaBVvu/F1S8mQcnYHXN3WCkQUqrRecdfPVpmqEmcIdXeZ1Vcumv0
-         RgtJc4xnzZMdqdrDMqr2zjK1byRueshhIcwQKxLogZg/ENPE+ZR5xFk7OiSBRIm9CCs0
-         oPvYBSG1ecgPXamSUqbXaCTdoGEp9HtePiNoONh7geNYvnSMwh3qyKKJcC5J2KhSXnQY
-         krDpQEE2oeOd9kWdupcomaSxhFuxgqz+ORabvcf/xgX1HXCfECQuQyywqL61+qpdT+r8
-         pVRaclu4S//C4T64ixOvQ+63jc650o5gu6llKkzRkg1f3ZwQswrCwvME6hBeCqxxw/Up
-         YGGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/BQ9n0kH0mbMHZf64/LlHldiSHJ2YosTB1WTP5AW4Lc=;
-        b=E1ZKzU+Ra5CDjhmpEn9xLDa+5ARBEjC+p+zyRnynSkppgBI0t1rOyo3C2yiB5Ewa6H
-         f5pM7veZA2tslhrTzYeIurptaIj3BwpX7+53lOpKD3C4wQYIeRjE42KVesOv0nSgwI0/
-         uaGe5IQCHptRXSOElp51mGZo54YUwOAleb+rC2kTwO+cnODV7KaV++G3AmT/CtSCvtJC
-         DmFz14Mk28QCDPBg+x446A6gViCjEFRS5x1SlEJaCxjsoAZrywXSzdwpLmp1tmmHcCEG
-         psOFKLQcjbeecBgJUNbbEh35mLePMDdj7viZDOeWtbZrREsz7JU/V1sq+ot8KGFnADke
-         aa2A==
-X-Gm-Message-State: AFqh2krJxywTBunPqiI2i1AfTV80alc6hKfEd6llH8klQ7WUS1q68YLV
-        IawO4oIQTiYYUVaLTTegb6IcIyXnvYX+rnLF06ybRA==
-X-Google-Smtp-Source: AMrXdXsnPft8IYBEPo9Z+LHHRlHCuTrmoTUq3+LW1jhRDQYO1p5Z7/dvOq1phdCVwma3sjoBQpACsOaU2HoP+DA67L8=
-X-Received: by 2002:a63:c50:0:b0:494:7a78:4bb0 with SMTP id
- 16-20020a630c50000000b004947a784bb0mr278550pgm.427.1671738758528; Thu, 22 Dec
- 2022 11:52:38 -0800 (PST)
+        Fri, 23 Dec 2022 01:25:44 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA04E5;
+        Thu, 22 Dec 2022 22:25:41 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1p8bUa-009jLe-9h; Fri, 23 Dec 2022 14:25:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 23 Dec 2022 14:25:16 +0800
+Date:   Fri, 23 Dec 2022 14:25:16 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Roberto Sassu <roberto.sassu@huaweicloud.com>, dhowells@redhat.com,
+        davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        Tadeusz Struk <tadeusz.struk@intel.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [v2 PATCH] lib/mpi: Fix buffer overrun when SG is too long
+Message-ID: <Y6VJzBcN3LvY5j60@gondor.apana.org.au>
+References: <20221209150633.1033556-1-roberto.sassu@huaweicloud.com>
+ <Y5OGr59A9wo86rYY@sol.localdomain>
+ <fa8a307541735ec9258353d8ccb75c20bb22aafe.camel@huaweicloud.com>
+ <Y5bxJ5UZNPzxwtoy@gondor.apana.org.au>
+ <0f80852578436dbba7a0fce03d86c3fa2d38c571.camel@huaweicloud.com>
+ <Y6FjQPZiJYTEG1zI@gondor.apana.org.au>
+ <a04e6458-6814-97fc-f03a-617809e2e6ce@huaweicloud.com>
+ <Y6IbWA5aZeBnn4n2@gmail.com>
+ <Y6Kthn+rIUnCEJWz@gondor.apana.org.au>
+ <Y6NySck5p/DXhSUJ@sol.localdomain>
 MIME-Version: 1.0
-References: <20221222193039.2267074-1-nathan@kernel.org>
-In-Reply-To: <20221222193039.2267074-1-nathan@kernel.org>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 22 Dec 2022 11:52:27 -0800
-Message-ID: <CAKwvOd=WQ5cAL74z+gbGgxG9WrOcDJtrGXJWxEEcWnmyoypu0w@mail.gmail.com>
-Subject: Re: [PATCH] ARM: Reduce __thumb2__ definition to crypto files that
- require it
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Russell King <linux@armlinux.org.uk>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y6NySck5p/DXhSUJ@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 22, 2022 at 11:30 AM Nathan Chancellor <nathan@kernel.org> wrote:
+On Wed, Dec 21, 2022 at 12:53:29PM -0800, Eric Biggers wrote:
 >
-> Commit 1d2e9b67b001 ("ARM: 9265/1: pass -march= only to compiler") added
-> a __thumb2__ define to ASFLAGS to avoid build errors in the crypto code,
-> which relies on __thumb2__ for preprocessing. Commit 59e2cf8d21e0 ("ARM:
-> 9275/1: Drop '-mthumb' from AFLAGS_ISA") followed up on this by removing
-> -mthumb from AFLAGS so that __thumb2__ would not be defined when the
-> default target was ARMv7 or newer.
->
-> Unfortunately, the second commit's fix assumes that the toolchain
-> defaults to -mno-thumb / -marm, which is not the case for Debian's
-> arm-linux-gnueabihf target, which defaults to -mthumb:
->
->   $ echo | arm-linux-gnueabihf-gcc -dM -E - | grep __thumb
->   #define __thumb2__ 1
->   #define __thumb__ 1
+> That's fine, I guess.  One quirk of the above approach is that if the last
+> needed element of the scatterlist has a lot of extra pages, this will iterate
+> through all those extra pages, processing 0 bytes from each.  It could just stop
+> when done.  I suppose it's not worth worrying about that case, though.
 
-Interesting, that was hard to foresee in review of 1d2e9b67b001 and
-59e2cf8d21e0.
+Ideally this should be handled in the sg_miter interface, IOW,
+it should allow us to cap the SG list at a certain number of bytes
+as opposed to a certain number of entries.
 
-FWIW, their non-hf target does not.
-$ echo | arm-linux-gnueabi-gcc -dM -E - | grep __thumb
-$
-
->
-> This target is used by several CI systems, which will still see
-> redefined macro warnings, despite '-mthumb' not being present in the
-> flags:
->
->   <command-line>: warning: "__thumb2__" redefined
->   <built-in>: note: this is the location of the previous definition
->
-> Remove the global AFLAGS __thumb2__ define and move it to the crypto
-> folder where it is required by the imported OpenSSL algorithms; the rest
-> of the kernel should use the internal CONFIG_THUMB2_KERNEL symbol to
-> know whether or not Thumb2 is being used or not. Be sure that __thumb2__
-> is undefined first so that there are no macro redefinition warnings.
->
-> Link: https://github.com/ClangBuiltLinux/linux/issues/1772
-> Reported-by: "kernelci.org bot" <bot@kernelci.org>
-> Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-
-Thanks Nathan and Ard.
-
-I ran the following tests:
-
-1. build w/ llvm stock config CONFIG_THUMB2_KERNEL=y kernel.
-2. build w/ llvm+debian's OOT patch
-https://salsa.debian.org/pkg-llvm-team/llvm-toolchain/-/raw/622dbcbd40b316ed3905a2d25d9623544a06e6b1/debian/patches/930008-arm.diff
-CONFIG_THUMB2_KERNEL=y kernel.
-3. check that -U<foo> removes <foo> from being set by preprocessor for
-both debian's arm-linux-gnueabihf-gcc and clang -mthumb
-
-$ echo | arm-linux-gnueabihf-gcc -dM -E - | grep __thumb
-#define __thumb2__ 1
-#define __thumb__ 1
-$ echo | arm-linux-gnueabihf-gcc -dM -E - -U__thumb2__ | grep __thumb
-#define __thumb__ 1
-$ echo | clang --target=arm-linux-gnueabihf -mthumb -dM -E -
--mcpu=cortex-a7 | grep __thumb
-#define __thumb2__ 1
-#define __thumb__ 1
-$ echo | clang --target=arm-linux-gnueabihf -mthumb -dM -E -
--mcpu=cortex-a7 -U__thumb2__ | grep __thumb
-#define __thumb__ 1
-
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
-
-> ---
->  arch/arm/Makefile        | 2 +-
->  arch/arm/crypto/Makefile | 7 ++++++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-> index 4067f5169144..955b0362cdfb 100644
-> --- a/arch/arm/Makefile
-> +++ b/arch/arm/Makefile
-> @@ -132,7 +132,7 @@ AFLAGS_NOWARN       :=$(call as-option,-Wa$(comma)-mno-warn-deprecated,-Wa$(comma)-W)
->
->  ifeq ($(CONFIG_THUMB2_KERNEL),y)
->  CFLAGS_ISA     :=-Wa,-mimplicit-it=always $(AFLAGS_NOWARN)
-> -AFLAGS_ISA     :=$(CFLAGS_ISA) -Wa$(comma)-mthumb -D__thumb2__=2
-> +AFLAGS_ISA     :=$(CFLAGS_ISA) -Wa$(comma)-mthumb
->  CFLAGS_ISA     +=-mthumb
->  else
->  CFLAGS_ISA     :=$(call cc-option,-marm,) $(AFLAGS_NOWARN)
-> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-> index 971e74546fb1..13e62c7c25dc 100644
-> --- a/arch/arm/crypto/Makefile
-> +++ b/arch/arm/crypto/Makefile
-> @@ -53,7 +53,12 @@ $(obj)/%-core.S: $(src)/%-armv4.pl
->
->  clean-files += poly1305-core.S sha256-core.S sha512-core.S
->
-> +aflags-thumb2-$(CONFIG_THUMB2_KERNEL)  := -U__thumb2__ -D__thumb2__=1
-> +
-> +AFLAGS_sha256-core.o += $(aflags-thumb2-y)
-> +AFLAGS_sha512-core.o += $(aflags-thumb2-y)
-> +
->  # massage the perlasm code a bit so we only get the NEON routine if we need it
->  poly1305-aflags-$(CONFIG_CPU_V7) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=5
->  poly1305-aflags-$(CONFIG_KERNEL_MODE_NEON) := -U__LINUX_ARM_ARCH__ -D__LINUX_ARM_ARCH__=7
-> -AFLAGS_poly1305-core.o += $(poly1305-aflags-y)
-> +AFLAGS_poly1305-core.o += $(poly1305-aflags-y) $(aflags-thumb2-y)
->
-> base-commit: 71a7507afbc3f27c346898f13ab9bfd918613c34
-> --
-> 2.39.0
->
-
-
+Cheers,
 -- 
-Thanks,
-~Nick Desaulniers
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
