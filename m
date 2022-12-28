@@ -2,142 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55161C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 11:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98956C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 13:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbiL1Lau (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Dec 2022 06:30:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
+        id S230006AbiL1NTh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Dec 2022 08:19:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232747AbiL1Lat (ORCPT
+        with ESMTP id S229587AbiL1NTf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2022 06:30:49 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB4B2A5
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2022 03:30:47 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pAUds-0005GS-FN; Wed, 28 Dec 2022 12:30:40 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pAUdq-002GsG-AY; Wed, 28 Dec 2022 12:30:38 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pAUdp-008VoX-Hg; Wed, 28 Dec 2022 12:30:37 +0100
-Date:   Wed, 28 Dec 2022 12:30:35 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Anders Roxell <anders.roxell@linaro.org>,
-        Kees Cook <keescook@chromium.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Wed, 28 Dec 2022 08:19:35 -0500
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A531F1173;
+        Wed, 28 Dec 2022 05:19:34 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id E26E85C0178;
+        Wed, 28 Dec 2022 08:19:33 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Wed, 28 Dec 2022 08:19:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1672233573; x=1672319973; bh=hr
+        lNtNYlQa9wbjhSeAQelcswFDbd9QN60Imd0IatPMM=; b=SvZtkcO9mh8st6EnHZ
+        I5FPADnH8quRAPVT0A+swJYJau3ILdjVv3X/zCGVkMl/oaI07sCdkXDehBY9BpIN
+        vLMeVNwCiE8AXF4JyslOKQolyIQiFRdkvwryPYZQCNqHq/cWjbiAV3fcM3NZx9MY
+        YB2QUl5bz5Xn4a2fQZfYMAPPVtzoeb9QuwiYEKas/nXaIcPc4qBPqaoLGy/DEZOI
+        Lk08PE1OF2ql7zBQvq+k/YEx2/7/i3UkghsgkSs/AbZ5M/VbJg7nBl+HEoa1p3PM
+        A9htLNTBcYevJR9S4n8gvr/KKO3yUuNOqaFi9BgH5acWleQUCpZrt+poICiYmkjh
+        +ZfQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; t=1672233573; x=1672319973; bh=hrlNtNYlQa9wbjhSeAQelcswFDbd
+        9QN60Imd0IatPMM=; b=tj/rWfyjUkLK9U/aQ1AhrSgNzHgG0nKdJK0yukqe5FKL
+        0hFef2uWMyyG+C9JjkNcSERz9ydRxWsLSM4Tz+gUKtPy+wZyQ+rdHRhJBh3yuJfx
+        596Wz1/nhu7oQj7F0SPfiSQyF168ARz+W4oo0MkKpyaKlV3GZtflX+cinCWdT2qn
+        P5s3BOEphZKLzYGN9YY2IaLLfIlavNgEqzEJqVE3RLHVldpe9utomhkhtgnrRKT/
+        jwHuq7yHYmkTW884en6mpJJNTjoVJ4GibkzkT0UUVz3j57sERWpF92FEo3mxDTXJ
+        MIJZF56QP7+KcbfoqMVxk7wD3POH9/CwjIybmaMplw==
+X-ME-Sender: <xms:ZEKsY21oHIrxSKi_elKkITFbiuhL5nhFbUiL6hUBcfEuqrXg4_VuPQ>
+    <xme:ZEKsY5GAXGb8ya37X_9PHCEd9DosPN0uMHztqA3sO23xinQsU9omROyypuA3UWmEH
+    9lX5VHTR5fZtY17eyc>
+X-ME-Received: <xmr:ZEKsY-5b8euuirYICOp_iHMtX7mB2FMp00cT2J8iUe2R_K3EYWRs1BKpEwPgewAWHi-09rusJG5mCsNQjrOM_o306oZgEPsMfo9n>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedriedvgdehudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
+    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
+    gvrhhnpeffleegffevleekffekheeigfdtleeuvddtgffhtddvfefgjeehffduueevkedv
+    vdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvg
+    essggvnhgsohgvtghkvghlrdhnvght
+X-ME-Proxy: <xmx:ZEKsY31kp7aclg1o7KewjwBmEiM18hBQaymKgUYwD2631-QwnSHSlA>
+    <xmx:ZEKsY5HbDW_takI1CH1RRLX3mwM5uZvVix2gZ3q6fUZkz6_XqI46kw>
+    <xmx:ZEKsYw9fvWQZ0rdd8WT2rWdnl8GiDZuEFULpHdcp9J4SeBxDmIbQtw>
+    <xmx:ZUKsYx90VrzrLXMfTQyC50Q3S7azp6piZMAilbQg4yR7lhzovOc7UA>
+Feedback-ID: iffc1478b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 28 Dec 2022 08:19:32 -0500 (EST)
+Date:   Wed, 28 Dec 2022 08:19:30 -0500
+From:   Ben Boeckel <me@benboeckel.net>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Arnd Bergmann <arnd@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] crypto: caam - Avoid GCC memset bug warning
-Message-ID: <20221228113035.ups6echnsmo4flnz@pengutronix.de>
-References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
- <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
- <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
- <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
+        Arnd Bergmann <arnd@arndb.de>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Vitaly Chikunov <vt@altlinux.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: certs: fix FIPS selftest depenency
+Message-ID: <Y6xCYmZkggGzzzBM@farprobe>
+References: <20221215170259.2553400-1-arnd@kernel.org>
+ <Y6tF52G6/bnG+VfJ@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="gaxrg6dgi72ticld"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <Y6tF52G6/bnG+VfJ@kernel.org>
+User-Agent: Mutt/2.2.9 (2022-11-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Dec 27, 2022 at 19:22:38 +0000, Jarkko Sakkinen wrote:
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
---gaxrg6dgi72ticld
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Might want to fix this when picked:
 
-On Wed, Dec 28, 2022 at 04:46:39PM +0800, Herbert Xu wrote:
-> Certain versions of gcc don't like the memcpy with a NULL dst
-> (which only happens with a zero length).  This only happens
-> when debugging is enabled so add an if clause to work around
-> these warnings.
->=20
-> A similar warning used to be generated by sparse but that was
-> fixed years ago.
->=20
-> Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Kees Cook <keescook@chromium.org>
-> Reported-by: Uwe Kleine-K=EF=BF=BDnig <u.kleine-koenig@pengutronix.de>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->=20
-> diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc=
-_constr.h
-> index 62ce6421bb3f..824c94d44f94 100644
-> --- a/drivers/crypto/caam/desc_constr.h
-> +++ b/drivers/crypto/caam/desc_constr.h
-> @@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, cons=
-t void *data, int len)
->  {
->  	u32 *offset =3D desc_end(desc);
-> =20
-> -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
-> +	/* Avoid gcc warning: memcpy with data =3D=3D NULL */
-> +	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
+> Subject: Re: [PATCH] crypto: certs: fix FIPS selftest depenency
+                                             dependency ^^^^^^^^^
 
-I just tried: For me a plain
-
-	if (data)
-
-is also enough to make both gcc and sparse happy.
-
-(On a related note, sparse reports:
-
-  CHECK   drivers/crypto/caam/jr.c
-drivers/crypto/caam/jr.c: note: in included file (through arch/arm64/includ=
-e/asm/io.h, include/linux/io.h, include/linux/irq.h, ...):
-include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (dif=
-ferent base types)
-include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] =
-val
-include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
-include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (dif=
-ferent base types)
-include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] =
-val
-include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
-
-Didn't look into that though.)
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
-   |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---gaxrg6dgi72ticld
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmOsKNkACgkQwfwUeK3K
-7AmDTwf+IuUVfMjDYicgKbEIu+CX1FN2NZUUW5qaon/vZyXKji1o2grwEzVYRPwE
-m/pm8APNaT/2BlmiN8C0a4Ax/yXjfrzQnClMXxa96Tl5cMsf4AD5wEM6aFdxFUct
-td471SO3y13UtPvSl01Q9pcv4E2RLxyt1g4hlXEbM7hNnZhBYA1nFlqPIyqf8lB+
-H09vp5Ik6Vclv7PfDiprlMLWSwzh8NLWpYpYCDlNVgwjAizzVI17OyD1fWH/sYaj
-WOUoONKLJgsITZnZ2k7SWww+RuAbZCAmxKjO7vJVukgHg+P5JWjzEsxYl1MRqdoN
-+b/sP7duuBP57MFlQJQnGXft8SuSNw==
-=gV7e
------END PGP SIGNATURE-----
-
---gaxrg6dgi72ticld--
+--Ben
