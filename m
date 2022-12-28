@@ -2,27 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378ACC3DA7A
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 11:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55161C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 11:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232827AbiL1LEK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Dec 2022 06:04:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48672 "EHLO
+        id S232644AbiL1Lau (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Dec 2022 06:30:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232847AbiL1LDp (ORCPT
+        with ESMTP id S232747AbiL1Lat (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2022 06:03:45 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6153A137;
-        Wed, 28 Dec 2022 03:03:42 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pAUDc-00BYvN-Ek; Wed, 28 Dec 2022 19:03:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Dec 2022 19:03:32 +0800
-Date:   Wed, 28 Dec 2022 19:03:32 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
+        Wed, 28 Dec 2022 06:30:49 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB4B2A5
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2022 03:30:47 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pAUds-0005GS-FN; Wed, 28 Dec 2022 12:30:40 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pAUdq-002GsG-AY; Wed, 28 Dec 2022 12:30:38 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pAUdp-008VoX-Hg; Wed, 28 Dec 2022 12:30:37 +0100
+Date:   Wed, 28 Dec 2022 12:30:35 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Anders Roxell <anders.roxell@linaro.org>,
         Kees Cook <keescook@chromium.org>,
         Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
@@ -32,62 +39,105 @@ Cc:     Anders Roxell <anders.roxell@linaro.org>,
         linux-crypto@vger.kernel.org, kernel@pengutronix.de,
         "David S. Miller" <davem@davemloft.net>,
         kernel test robot <lkp@intel.com>
-Subject: [v2 PATCH] crypto: caam - Avoid GCC memset bug warning
-Message-ID: <Y6wihNIoOT4pYB5+@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: caam - Avoid GCC memset bug warning
+Message-ID: <20221228113035.ups6echnsmo4flnz@pengutronix.de>
 References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
  <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
  <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
  <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
- <20221228093917.zhkjpzc2ok5dc4ga@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="gaxrg6dgi72ticld"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221228093917.zhkjpzc2ok5dc4ga@pengutronix.de>
+In-Reply-To: <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 10:39:17AM +0100, Uwe Kleine-König wrote:
->
-> Huh, broken encoding in the mail. I'd appreciate someone to doublecheck
-> it's fine in the final commit.
-> 
-> Tested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-Sorry.  Let me try again:
+--gaxrg6dgi72ticld
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----8<---
-Certain versions of gcc don't like the memcpy with a NULL dst
-(which only happens with a zero length).  This only happens
-when debugging is enabled so add an if clause to work around
-these warnings.
+On Wed, Dec 28, 2022 at 04:46:39PM +0800, Herbert Xu wrote:
+> Certain versions of gcc don't like the memcpy with a NULL dst
+> (which only happens with a zero length).  This only happens
+> when debugging is enabled so add an if clause to work around
+> these warnings.
+>=20
+> A similar warning used to be generated by sparse but that was
+> fixed years ago.
+>=20
+> Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Kees Cook <keescook@chromium.org>
+> Reported-by: Uwe Kleine-K=EF=BF=BDnig <u.kleine-koenig@pengutronix.de>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>=20
+> diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc=
+_constr.h
+> index 62ce6421bb3f..824c94d44f94 100644
+> --- a/drivers/crypto/caam/desc_constr.h
+> +++ b/drivers/crypto/caam/desc_constr.h
+> @@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, cons=
+t void *data, int len)
+>  {
+>  	u32 *offset =3D desc_end(desc);
+> =20
+> -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
+> +	/* Avoid gcc warning: memcpy with data =3D=3D NULL */
+> +	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
 
-A similar warning used to be generated by sparse but that was
-fixed years ago.
+I just tried: For me a plain
 
-Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Kees Cook <keescook@chromium.org>
-Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Tested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+	if (data)
 
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 62ce6421bb3f..824c94d44f94 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, const void *data, int len)
- {
- 	u32 *offset = desc_end(desc);
- 
--	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
-+	/* Avoid gcc warning: memcpy with data == NULL */
-+	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
- 		memcpy(offset, data, len);
- 
- 	(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) +
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+is also enough to make both gcc and sparse happy.
+
+(On a related note, sparse reports:
+
+  CHECK   drivers/crypto/caam/jr.c
+drivers/crypto/caam/jr.c: note: in included file (through arch/arm64/includ=
+e/asm/io.h, include/linux/io.h, include/linux/irq.h, ...):
+include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (dif=
+ferent base types)
+include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] =
+val
+include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
+include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (dif=
+ferent base types)
+include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] =
+val
+include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
+
+Didn't look into that though.)
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
+   |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--gaxrg6dgi72ticld
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmOsKNkACgkQwfwUeK3K
+7AmDTwf+IuUVfMjDYicgKbEIu+CX1FN2NZUUW5qaon/vZyXKji1o2grwEzVYRPwE
+m/pm8APNaT/2BlmiN8C0a4Ax/yXjfrzQnClMXxa96Tl5cMsf4AD5wEM6aFdxFUct
+td471SO3y13UtPvSl01Q9pcv4E2RLxyt1g4hlXEbM7hNnZhBYA1nFlqPIyqf8lB+
+H09vp5Ik6Vclv7PfDiprlMLWSwzh8NLWpYpYCDlNVgwjAizzVI17OyD1fWH/sYaj
+WOUoONKLJgsITZnZ2k7SWww+RuAbZCAmxKjO7vJVukgHg+P5JWjzEsxYl1MRqdoN
++b/sP7duuBP57MFlQJQnGXft8SuSNw==
+=gV7e
+-----END PGP SIGNATURE-----
+
+--gaxrg6dgi72ticld--
