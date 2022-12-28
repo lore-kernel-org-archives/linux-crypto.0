@@ -2,97 +2,156 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98956C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 13:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF8BC4708D
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 16:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbiL1NTh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Dec 2022 08:19:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
+        id S234461AbiL1QRl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Dec 2022 11:17:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiL1NTf (ORCPT
+        with ESMTP id S234687AbiL1QRO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2022 08:19:35 -0500
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A531F1173;
-        Wed, 28 Dec 2022 05:19:34 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id E26E85C0178;
-        Wed, 28 Dec 2022 08:19:33 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Wed, 28 Dec 2022 08:19:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1672233573; x=1672319973; bh=hr
-        lNtNYlQa9wbjhSeAQelcswFDbd9QN60Imd0IatPMM=; b=SvZtkcO9mh8st6EnHZ
-        I5FPADnH8quRAPVT0A+swJYJau3ILdjVv3X/zCGVkMl/oaI07sCdkXDehBY9BpIN
-        vLMeVNwCiE8AXF4JyslOKQolyIQiFRdkvwryPYZQCNqHq/cWjbiAV3fcM3NZx9MY
-        YB2QUl5bz5Xn4a2fQZfYMAPPVtzoeb9QuwiYEKas/nXaIcPc4qBPqaoLGy/DEZOI
-        Lk08PE1OF2ql7zBQvq+k/YEx2/7/i3UkghsgkSs/AbZ5M/VbJg7nBl+HEoa1p3PM
-        A9htLNTBcYevJR9S4n8gvr/KKO3yUuNOqaFi9BgH5acWleQUCpZrt+poICiYmkjh
-        +ZfQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1672233573; x=1672319973; bh=hrlNtNYlQa9wbjhSeAQelcswFDbd
-        9QN60Imd0IatPMM=; b=tj/rWfyjUkLK9U/aQ1AhrSgNzHgG0nKdJK0yukqe5FKL
-        0hFef2uWMyyG+C9JjkNcSERz9ydRxWsLSM4Tz+gUKtPy+wZyQ+rdHRhJBh3yuJfx
-        596Wz1/nhu7oQj7F0SPfiSQyF168ARz+W4oo0MkKpyaKlV3GZtflX+cinCWdT2qn
-        P5s3BOEphZKLzYGN9YY2IaLLfIlavNgEqzEJqVE3RLHVldpe9utomhkhtgnrRKT/
-        jwHuq7yHYmkTW884en6mpJJNTjoVJ4GibkzkT0UUVz3j57sERWpF92FEo3mxDTXJ
-        MIJZF56QP7+KcbfoqMVxk7wD3POH9/CwjIybmaMplw==
-X-ME-Sender: <xms:ZEKsY21oHIrxSKi_elKkITFbiuhL5nhFbUiL6hUBcfEuqrXg4_VuPQ>
-    <xme:ZEKsY5GAXGb8ya37X_9PHCEd9DosPN0uMHztqA3sO23xinQsU9omROyypuA3UWmEH
-    9lX5VHTR5fZtY17eyc>
-X-ME-Received: <xmr:ZEKsY-5b8euuirYICOp_iHMtX7mB2FMp00cT2J8iUe2R_K3EYWRs1BKpEwPgewAWHi-09rusJG5mCsNQjrOM_o306oZgEPsMfo9n>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedriedvgdehudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjfgesthdtredttderjeenucfhrhhomhepuegvnhcu
-    uehovggtkhgvlhcuoehmvgessggvnhgsohgvtghkvghlrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeffleegffevleekffekheeigfdtleeuvddtgffhtddvfefgjeehffduueevkedv
-    vdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvg
-    essggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:ZEKsY31kp7aclg1o7KewjwBmEiM18hBQaymKgUYwD2631-QwnSHSlA>
-    <xmx:ZEKsY5HbDW_takI1CH1RRLX3mwM5uZvVix2gZ3q6fUZkz6_XqI46kw>
-    <xmx:ZEKsYw9fvWQZ0rdd8WT2rWdnl8GiDZuEFULpHdcp9J4SeBxDmIbQtw>
-    <xmx:ZUKsYx90VrzrLXMfTQyC50Q3S7azp6piZMAilbQg4yR7lhzovOc7UA>
-Feedback-ID: iffc1478b:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 28 Dec 2022 08:19:32 -0500 (EST)
-Date:   Wed, 28 Dec 2022 08:19:30 -0500
-From:   Ben Boeckel <me@benboeckel.net>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Arnd Bergmann <arnd@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Vitaly Chikunov <vt@altlinux.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: certs: fix FIPS selftest depenency
-Message-ID: <Y6xCYmZkggGzzzBM@farprobe>
-References: <20221215170259.2553400-1-arnd@kernel.org>
- <Y6tF52G6/bnG+VfJ@kernel.org>
+        Wed, 28 Dec 2022 11:17:14 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AD71AD85
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2022 08:15:22 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id x37so10050947ljq.1
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2022 08:15:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yDZvkBvSrq1P74c4ojvaQa9MsowatpZHUMPzWldA71g=;
+        b=PvScfYgvO3aKt+TMrMAphrHdT1QPEOwJ934NeEOIEm/AIH7IDlhU+biY4NyGOaTmHJ
+         RJ/7qRlSvn9OVXYjsO3PIkSSoU3MAY46ACg3CyyymURWTyKvuypz8YTPvsIll6C5lQO/
+         btXjEww9oaYKWMoiPJeYYwU8aKc3h+m6bdf3RrElHoOgH+0Udzhs+x6AwVoxm2B1WmaS
+         B7iXQdJ/S95Pfy3i2Qlsl9LNuGKspn+SS2w3OlYqXFD/aImEb2HQPaSz+jzwpVPw4hNP
+         2hCSMAYwi6dNaFHyKQp/2X001ibstnXadYYNFHTMMF2lVQWf8mtIOWWJiSisxlkqIyvE
+         jB8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yDZvkBvSrq1P74c4ojvaQa9MsowatpZHUMPzWldA71g=;
+        b=fponMwvVfqoBma4cZW+Huot//2DU4M1ZHGGVPA7H4VfQ5VWiZpgQauzPgG5aHyw3ic
+         +tNhGUL6tf4Hv1PjGJckWdsoJ2HMdWweZAZSlgAO15fEcAUau7Zq7RHQ9Sh+rRqnVaIE
+         WQMFOdmg3Di6svTnxrb7ZIPZfwYnlxG3VdPObmoKM5e0pQRTAO3XmuYwOfDAjZDlutbJ
+         SleK9kglka0w616ES4ho6bXOMvV+nVGpobE6k9Qf/jaNbn/R+8e1v05Th5Y55g7+ZR+9
+         e4q+bAgKEhEFyqMbvWTMDCw6+O8w99St0uNspF+6NlS5z38d2Bnt9TQfbUCYmCYEA2XW
+         ipZw==
+X-Gm-Message-State: AFqh2kqUjWpnpwKWjpKhTD8za4FRQlpwvihGT93SwWLiqIHyPyhyafdo
+        hMhBIqLSmzs12g0aJHParuKf9Q==
+X-Google-Smtp-Source: AMrXdXsbQOkbDqKHCQD2ADOuTnn+8YWAjm92yxG1SkLaJfYWlVgau/fn51IQ0uv+YLr0mjQ81EAHdA==
+X-Received: by 2002:a2e:8e2e:0:b0:27f:bcad:a770 with SMTP id r14-20020a2e8e2e000000b0027fbcada770mr3379097ljk.52.1672244120567;
+        Wed, 28 Dec 2022 08:15:20 -0800 (PST)
+Received: from ?IPV6:2001:14ba:a085:4d00::8a5? (dzccz6yyyyyyyyyyybcwt-3.rev.dnainternet.fi. [2001:14ba:a085:4d00::8a5])
+        by smtp.gmail.com with ESMTPSA id r18-20020a2e8e32000000b0027cf0ecab3fsm1995465ljk.138.2022.12.28.08.15.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Dec 2022 08:15:19 -0800 (PST)
+Message-ID: <7a145132-181b-cf52-18f4-4fd1b8a565d8@linaro.org>
+Date:   Wed, 28 Dec 2022 18:15:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y6tF52G6/bnG+VfJ@kernel.org>
-User-Agent: Mutt/2.2.9 (2022-11-12)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v7 1/1] dma: qcom: bam_dma: Add support to initialize
+ interconnect path
+Content-Language: en-GB
+To:     Vinod Koul <vkoul@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     dmaengine@vger.kernel.org, agross@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, thara.gopinath@gmail.com,
+        devicetree@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, Rob Herring <robh@kernel.org>
+References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
+ <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
+ <YyvKlWgaPVV3su8f@matsya>
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+In-Reply-To: <YyvKlWgaPVV3su8f@matsya>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 27, 2022 at 19:22:38 +0000, Jarkko Sakkinen wrote:
-> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+On 22/09/2022 05:38, Vinod Koul wrote:
+> On 21-09-22, 08:36, Bhupesh Sharma wrote:
+>> From: Thara Gopinath <thara.gopinath@gmail.com>
+>>
+>> BAM dma engine associated with certain hardware blocks could require
+>> relevant interconnect pieces be initialized prior to the dma engine
+>> initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
+>> is passed on to the bam dma driver from dt via the "interconnects"
+>> property. Add support in bam_dma driver to check whether the interconnect
+>> path is accessible/enabled prior to attempting driver intializations.
+>>
+>> If interconnects are not yet setup, defer the BAM DMA driver probe().
+>>
+>> Cc: Bjorn Andersson <andersson@kernel.org>
+>> Cc: Rob Herring <robh@kernel.org>
+>> Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
+>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>> [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
+>> ---
+>>   drivers/dma/qcom/bam_dma.c | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
+>>
+>> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+>> index 2ff787df513e..a5b0cf28ffb7 100644
+>> --- a/drivers/dma/qcom/bam_dma.c
+>> +++ b/drivers/dma/qcom/bam_dma.c
+>> @@ -26,6 +26,7 @@
+>>   #include <linux/kernel.h>
+>>   #include <linux/io.h>
+>>   #include <linux/init.h>
+>> +#include <linux/interconnect.h>
+>>   #include <linux/slab.h>
+>>   #include <linux/module.h>
+>>   #include <linux/interrupt.h>
+>> @@ -394,6 +395,7 @@ struct bam_device {
+>>   	const struct reg_offset_data *layout;
+>>   
+>>   	struct clk *bamclk;
+>> +	struct icc_path *mem_path;
+>>   	int irq;
+>>   
+>>   	/* dma start transaction tasklet */
+>> @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
+>>   	if (IS_ERR(bdev->bamclk))
+>>   		return PTR_ERR(bdev->bamclk);
+>>   
+>> +	/* Ensure that interconnects are initialized */
+>> +	bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
+>> +	if (IS_ERR(bdev->mem_path)) {
+>> +		ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
+>> +				    "failed to acquire icc path\n");
+>> +		return ret;
+>> +	}
+> 
+> So this makes us fail on older DT where icc path may not be present.
+> Should this not be an optional thing?
 
-Might want to fix this when picked:
+If "interconnects" property is not present, of_icc_get() returns NULL. 
+So the driver will not err out (correct). All ICC functions will treat 
+NULL path correctly (by doing nothing). So this patch is correct.
 
-> Subject: Re: [PATCH] crypto: certs: fix FIPS selftest depenency
-                                             dependency ^^^^^^^^^
+However we'd need v8 anyway, there needs to be a bindings update.
 
---Ben
+Bhupesh, this has been lingering for some time. We need this for several 
+platforms. Any chance for the v8?
+
+> 
+>> +
+>>   	ret = clk_prepare_enable(bdev->bamclk);
+>>   	if (ret) {
+>>   		dev_err(bdev->dev, "failed to prepare/enable clock\n");
+>> -- 
+>> 2.37.1
+> 
+
+-- 
+With best wishes
+Dmitry
+
