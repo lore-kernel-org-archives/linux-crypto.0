@@ -2,34 +2,27 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 351F3C5479D
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 09:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 378ACC3DA7A
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Dec 2022 11:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232729AbiL1Jji (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Dec 2022 04:39:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41772 "EHLO
+        id S232827AbiL1LEK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Dec 2022 06:04:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232723AbiL1Jjd (ORCPT
+        with ESMTP id S232847AbiL1LDp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2022 04:39:33 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05450DEBA
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Dec 2022 01:39:33 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pASuB-0001ha-Ht; Wed, 28 Dec 2022 10:39:23 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pASu9-002FoR-Ff; Wed, 28 Dec 2022 10:39:21 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pASu8-008UeD-OS; Wed, 28 Dec 2022 10:39:20 +0100
-Date:   Wed, 28 Dec 2022 10:39:17 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        Wed, 28 Dec 2022 06:03:45 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6153A137;
+        Wed, 28 Dec 2022 03:03:42 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pAUDc-00BYvN-Ek; Wed, 28 Dec 2022 19:03:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Dec 2022 19:03:32 +0800
+Date:   Wed, 28 Dec 2022 19:03:32 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
 Cc:     Anders Roxell <anders.roxell@linaro.org>,
         Kees Cook <keescook@chromium.org>,
         Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
@@ -39,71 +32,62 @@ Cc:     Anders Roxell <anders.roxell@linaro.org>,
         linux-crypto@vger.kernel.org, kernel@pengutronix.de,
         "David S. Miller" <davem@davemloft.net>,
         kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] crypto: caam - Avoid GCC memset bug warning
-Message-ID: <20221228093917.zhkjpzc2ok5dc4ga@pengutronix.de>
+Subject: [v2 PATCH] crypto: caam - Avoid GCC memset bug warning
+Message-ID: <Y6wihNIoOT4pYB5+@gondor.apana.org.au>
 References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
  <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
  <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
  <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
+ <20221228093917.zhkjpzc2ok5dc4ga@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="qnf3bpbfpijdzeif"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221228093917.zhkjpzc2ok5dc4ga@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Dec 28, 2022 at 10:39:17AM +0100, Uwe Kleine-König wrote:
+>
+> Huh, broken encoding in the mail. I'd appreciate someone to doublecheck
+> it's fine in the final commit.
+> 
+> Tested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
---qnf3bpbfpijdzeif
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry.  Let me try again:
 
-On Wed, Dec 28, 2022 at 04:46:39PM +0800, Herbert Xu wrote:
-> Certain versions of gcc don't like the memcpy with a NULL dst
-> (which only happens with a zero length).  This only happens
-> when debugging is enabled so add an if clause to work around
-> these warnings.
->=20
-> A similar warning used to be generated by sparse but that was
-> fixed years ago.
->=20
-> Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Kees Cook <keescook@chromium.org>
-> Reported-by: Uwe Kleine-K=EF=BF=BDnig <u.kleine-koenig@pengutronix.de>
+---8<---
+Certain versions of gcc don't like the memcpy with a NULL dst
+(which only happens with a zero length).  This only happens
+when debugging is enabled so add an if clause to work around
+these warnings.
 
-Huh, broken encoding in the mail. I'd appreciate someone to doublecheck
-it's fine in the final commit.
+A similar warning used to be generated by sparse but that was
+fixed years ago.
 
-Tested-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+Link: https://lore.kernel.org/lkml/202210290446.qBayTfzl-lkp@intel.com
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Kees Cook <keescook@chromium.org>
+Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Tested-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
-   |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---qnf3bpbfpijdzeif
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmOsDsIACgkQwfwUeK3K
-7An3lwf+MZwJiO2ZhsfkvCGjDydNXCQODvwqyI68kQ49+zDmgucnD8loJUn8Z0d4
-c5xD/7r5oC+skiYQ/f4LX5bbwzI3dCMLdfZlkSqSYZuhv6DOPJHYSc/nxOiwnAH7
-rf5VscWOXcIc20WiX1TlCDnNYR1FC43CxslIpd/dV5SpkXmSQHXfJP5gG+l3kMk6
-mROCZsAq5GxLLHn/LOjgDHUFAiCW+cNbjFOXjjHV+JCOAENIPDy6Y/kBRQtyY0MR
-8HESMWAWIzUOmeCFoqv5HyuwBoorU9MeKHnqX0Q8/yazFidkZtm06Aw263F2VUW8
-0kIgWBIi2SjOpS4K7rQjCU3JzEVoCQ==
-=LwdE
------END PGP SIGNATURE-----
-
---qnf3bpbfpijdzeif--
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 62ce6421bb3f..824c94d44f94 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -163,7 +163,8 @@ static inline void append_data(u32 * const desc, const void *data, int len)
+ {
+ 	u32 *offset = desc_end(desc);
+ 
+-	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
++	/* Avoid gcc warning: memcpy with data == NULL */
++	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
+ 		memcpy(offset, data, len);
+ 
+ 	(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) +
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
