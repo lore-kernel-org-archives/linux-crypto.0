@@ -2,85 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2AFC3DA7A
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 01:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA32C3DA79
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 08:30:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230435AbiL2Bsv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Dec 2022 20:48:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39942 "EHLO
+        id S233067AbiL2Iaz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Dec 2022 03:30:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbiL2Bsv (ORCPT
+        with ESMTP id S229535AbiL2Iay (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Dec 2022 20:48:51 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5666E12604;
-        Wed, 28 Dec 2022 17:48:48 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pAi28-00BrPk-4O; Thu, 29 Dec 2022 09:48:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 29 Dec 2022 09:48:36 +0800
-Date:   Thu, 29 Dec 2022 09:48:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Anders Roxell <anders.roxell@linaro.org>,
-        Kees Cook <keescook@chromium.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        "David S. Miller" <davem@davemloft.net>,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] crypto: caam - Avoid GCC memset bug warning
-Message-ID: <Y6zx9H7pZZ6VTzUd@gondor.apana.org.au>
-References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
- <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
- <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
- <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
- <20221228113035.ups6echnsmo4flnz@pengutronix.de>
+        Thu, 29 Dec 2022 03:30:54 -0500
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A2EBF2;
+        Thu, 29 Dec 2022 00:30:52 -0800 (PST)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 31BDD1C09F6; Thu, 29 Dec 2022 09:30:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
+        t=1672302650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GMDiP+si500La00phNcMqFDqIk07ZuaffuXl6TOuXZk=;
+        b=hreBY2Gq0qPdVV2AreCvib6znrR+veQn1XOcjer0BGSek7nBorfHy6PV3r6geAMyF4RJPR
+        GcW1vrsHK6cVVfsIysL8GTR+Gdakje/O8QKG/HSFjWyjMQU1LG3teBsW6NYHF7Bg8R10yH
+        RE/j7iwL7oq4Qo381iDimzr4wrPrCyY=
+Date:   Thu, 29 Dec 2022 09:30:49 +0100
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 04/12] types: Introduce [us]128
+Message-ID: <Y61QOe8XG5sUAXoc@duo.ucw.cz>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.087799661@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="fTFbN55brR9qMT+p"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221228113035.ups6echnsmo4flnz@pengutronix.de>
+In-Reply-To: <20221219154119.087799661@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 12:30:35PM +0100, Uwe Kleine-König wrote:
->
-> > -	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
-> > +	/* Avoid gcc warning: memcpy with data == NULL */
-> > +	if (!IS_ENABLED(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG) || data)
-> 
-> I just tried: For me a plain
-> 
-> 	if (data)
-> 
-> is also enough to make both gcc and sparse happy.
 
-Of course it is.  The point of the extra condition is to remove
-the unnecessary check on data unless we are in debugging mode
-(as it is only needed in debugging mode to work around the buggy
-compiler).
+--fTFbN55brR9qMT+p
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> (On a related note, sparse reports:
-> 
->   CHECK   drivers/crypto/caam/jr.c
-> drivers/crypto/caam/jr.c: note: in included file (through arch/arm64/include/asm/io.h, include/linux/io.h, include/linux/irq.h, ...):
-> include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (different base types)
-> include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] val
-> include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
-> include/asm-generic/io.h:290:22: warning: incorrect type in argument 1 (different base types)
-> include/asm-generic/io.h:290:22:    expected unsigned long long [usertype] val
-> include/asm-generic/io.h:290:22:    got restricted __le64 [usertype]
+Hi!
 
-That's a bug in include/asm-generic/io.h.  It feeds an __le64 to
-__raw_writeq which wants a u64.
+> Introduce [us]128 (when available). Unlike [us]64, ensure they are
+> always naturally aligned.
+>=20
+> This also enables 128bit wide atomics (which require natural
+> alignment) such as cmpxchg128().
+>=20
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> ---
+>  include/linux/types.h      |    5 +++++
+>  include/uapi/linux/types.h |    4 ++++
+>  2 files changed, 9 insertions(+)
+>=20
+> --- a/include/linux/types.h
+> +++ b/include/linux/types.h
+> @@ -10,6 +10,11 @@
+>  #define DECLARE_BITMAP(name,bits) \
+>  	unsigned long name[BITS_TO_LONGS(bits)]
+> =20
+> +#ifdef __SIZEOF_INT128__
+> +typedef __s128 s128;
+> +typedef __u128 u128;
+> +#endif
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Should this come as a note here?
+
+> Introduce [us]128 (when available). Unlike [us]64, ensure they are
+> always naturally aligned.
+
+BR,
+							Pavel
+--=20
+People of Russia, stop Putin before his war on Ukraine escalates.
+
+--fTFbN55brR9qMT+p
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY61QOQAKCRAw5/Bqldv6
+8vQtAJ9J9UDlQpqaRV7DVlgZctKi1W8mygCfRehrcFJV2fHBfVb6C4cplLPxxog=
+=Yely
+-----END PGP SIGNATURE-----
+
+--fTFbN55brR9qMT+p--
