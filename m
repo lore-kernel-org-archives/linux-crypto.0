@@ -2,88 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8235C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 21:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C34C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 21:18:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbiL2VRF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Dec 2022 16:17:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38794 "EHLO
+        id S234215AbiL2VS0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Dec 2022 16:18:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234212AbiL2VQs (ORCPT
+        with ESMTP id S234153AbiL2VSL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Dec 2022 16:16:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF65A1AE
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2022 13:16:02 -0800 (PST)
+        Thu, 29 Dec 2022 16:18:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D27A1AE
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2022 13:17:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672348561;
+        s=mimecast20190719; t=1672348641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RbbKKCG1Xyq1vtML62Lc3iWFrkbMdarR9zQ1HGXJi6w=;
-        b=D1omf6Wg6oCB/e4l2sFQnDt7MpNRI/uX/KFkfzgzpKiu7SXyGF8nr/fyTpBG6lVL7+5fE8
-        bpEVAxlxT+uPtqrK03vmlS7pyQSeNZfI0O4V/aHZ/JuL8552c7Co2t9WMElnyYEuTBFjqf
-        Iracx/3guQk6TdW92LtiJxw1GSCicjE=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-523-Fpszd3jwOBO1I-QcuVgNBg-1; Thu, 29 Dec 2022 16:15:55 -0500
-X-MC-Unique: Fpszd3jwOBO1I-QcuVgNBg-1
-Received: by mail-qv1-f72.google.com with SMTP id a15-20020ad441cf000000b004c79ef7689aso10535147qvq.14
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2022 13:15:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RbbKKCG1Xyq1vtML62Lc3iWFrkbMdarR9zQ1HGXJi6w=;
-        b=LCeBIBZl1S62OW7prKfi0ZBdggqulCmF8C2V06uQpd5vDZNqRmGP1h9+8e8qvEQ3Jp
-         rnUMb9/NgwM9G0D8scIQaS1EFpOpCGGj62/We9YPhWID+aU14xSuCq1527pUfNc42NZD
-         Fubzjjk4V+WAVXHrYbZYElNorlWSnpXinpbU25cackdKdNitEQEvVhZ5OQF+3Dy9ldOi
-         mb76talGKOYaTkjVwOp2UcRMGTIBVrmjnEW058Fw8D2NvQFxWGsUCMcStTNlXx909yWn
-         bjRBIudyby6XcrD2X0vQs3UqDsa5aPzM+nyrAD9Ma4WY8eUxlYFNvyZ13VqhGxELEEqp
-         7Gkg==
-X-Gm-Message-State: AFqh2kq+krVyjW12y0fHcxruina98ZaxXNZqRu2VJGiZK44H+mmsAVTV
-        Jdd/6j79Q1Br2NM5GMK8YG4O/6tI0HyfwuRZR7cHj9SX7r7Bi5hrJrEbUFLDjE5AnqLsJCWpne1
-        uMPG8MNeA5NBmGaY5mOamhtulrCBsIl5F4nazLA68
-X-Received: by 2002:a37:b843:0:b0:6ff:8aef:d886 with SMTP id i64-20020a37b843000000b006ff8aefd886mr896777qkf.453.1672348554322;
-        Thu, 29 Dec 2022 13:15:54 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXv8OGe/F/Uu4oZtGoWYTO/HtUS4b5b2xWQiR0GjbYnWvXuR5xLvbKvMlENNl+GbFlgA7XwHYM6lXA/RFAm87pk=
-X-Received: by 2002:a37:b843:0:b0:6ff:8aef:d886 with SMTP id
- i64-20020a37b843000000b006ff8aefd886mr896774qkf.453.1672348554067; Thu, 29
- Dec 2022 13:15:54 -0800 (PST)
-MIME-Version: 1.0
-References: <20221229203708.13628-1-vdronov@redhat.com> <20221229203708.13628-7-vdronov@redhat.com>
- <Y64AQg+W0SGsYUDY@sol.localdomain>
-In-Reply-To: <Y64AQg+W0SGsYUDY@sol.localdomain>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=tkUzY+hLJqmesjdPwUJqndx8IuEcY0lUlWUymOpNZXo=;
+        b=aiLr6aOhtYTdIOyA74fgpltmRgwKQon4Cj2N1yqm0frHSB9BpLAJuZR+xMVMkd3AaOSY8G
+        coN2O5b4CV8k6xVREPIQBSoTWBYlTB761aUrPXRSlp0FQG0eHtDKMr+K3TwcVf2eE5+VCK
+        Zgn79G5GVMqBngRV/jjH1qKIFojEfY0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-610-2LQ8xaXgMj-sJWZYxP5oHw-1; Thu, 29 Dec 2022 16:17:20 -0500
+X-MC-Unique: 2LQ8xaXgMj-sJWZYxP5oHw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED2108F6E80;
+        Thu, 29 Dec 2022 21:17:19 +0000 (UTC)
+Received: from rules.brq.redhat.com (ovpn-208-2.brq.redhat.com [10.40.208.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B7D12492B00;
+        Thu, 29 Dec 2022 21:17:17 +0000 (UTC)
 From:   Vladis Dronov <vdronov@redhat.com>
-Date:   Thu, 29 Dec 2022 22:15:43 +0100
-Message-ID: <CAMusb+RXTtfa5Ez+_vsYuDwyNc_U9pRRAQHcJycoiX1g=c3_GQ@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] crypto: testmgr - allow ecdsa-nist-p256 and -p384
- in FIPS mode
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Nicolai Stange <nstange@suse.de>,
-        Elliott Robert <elliott@hpe.com>,
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     Nicolai Stange <nstange@suse.de>, Elliott Robert <elliott@hpe.com>,
         Stephan Mueller <smueller@chronox.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vladis Dronov <vdronov@redhat.com>
+Subject: [PATCH v3 0/6] Trivial set of FIPS 140-3 related changes
+Date:   Thu, 29 Dec 2022 22:17:04 +0100
+Message-Id: <20221229211710.14912-1-vdronov@redhat.com>
+MIME-Version: 1.0
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 29, 2022 at 10:02 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> ... skip ...
-> Please don't add my Reviewed-by to patches I didn't review.  I only gave
-> Reviewed-by on "[PATCH 2/6] crypto: xts - drop xts_check_key()".  I didn't look
-> at the other patches in the series much, as I'm not very interested in them.
->
-> - Eric
+Hi,
 
-My bad. I'm sorry for misunderstanding and this traffic and mess. Let me send v3
-with your review tag for the patch 2/6 only.
+This patchset and cover letter was initially composed by Nicolai Stange
+and sent earlier as:
 
-Best regards,
-Vladis
+https://lore.kernel.org/r/20221108142025.13461-1-nstange@suse.de/
+with a subject: [PATCH 0/4] Trivial set of FIPS 140-3 related changes
+
+I'm adding patches 2 and 3 which (I hope) resolve issues spotted by
+reviewers of previous version of the patchset. This new patchset should
+ease our future kernel work on the FIPS mode.
+
+I'm quoting Nicolai's cover letter here:
+
+> Hi all,
+> 
+> these four rather unrelated patches are basically a dump of some of the
+> more trivial changes required for working towards FIPS 140-3 conformance.
+> 
+> Please pick as you deem appropriate.
+> 
+> Thanks!
+> 
+> Nicolai
+
+v2: fixed a block comment formatting
+
+v3: "Reviewed-by: Eric Biggers" was copied from the v1 thread:
+    https://lore.kernel.org/r/Y6OXuT95MlkNanSR@sol.localdomain/
+
+Nicolai Stange (4):
+  crypto: xts - restrict key lengths to approved values in FIPS mode
+  crypto: testmgr - disallow plain cbcmac(aes) in FIPS mode
+  crypto: testmgr - disallow plain ghash in FIPS mode
+  crypto: testmgr - allow ecdsa-nist-p256 and -p384 in FIPS mode
+
+Vladis Dronov (2):
+  crypto: xts - drop xts_check_key()
+  crypto: xts - drop redundant xts key check
+
+ arch/s390/crypto/aes_s390.c                   |  4 ---
+ arch/s390/crypto/paes_s390.c                  |  2 +-
+ crypto/testmgr.c                              |  4 +--
+ drivers/crypto/atmel-aes.c                    |  2 +-
+ drivers/crypto/axis/artpec6_crypto.c          |  2 +-
+ drivers/crypto/cavium/cpt/cptvf_algs.c        |  8 +++---
+ .../crypto/cavium/nitrox/nitrox_skcipher.c    |  8 +++---
+ drivers/crypto/ccree/cc_cipher.c              |  2 +-
+ .../crypto/marvell/octeontx/otx_cptvf_algs.c  |  2 +-
+ .../marvell/octeontx2/otx2_cptvf_algs.c       |  2 +-
+ include/crypto/xts.h                          | 25 +++++++------------
+ 11 files changed, 23 insertions(+), 38 deletions(-)
+
+base-commit: b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
+-- 
+2.38.1
+
 
