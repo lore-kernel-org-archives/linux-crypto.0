@@ -2,136 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA2AC4708E
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 13:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A06C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 16:14:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233575AbiL2Nkf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Dec 2022 08:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59836 "EHLO
+        id S233491AbiL2QOL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Dec 2022 11:14:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233578AbiL2NkI (ORCPT
+        with ESMTP id S231217AbiL2QOL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Dec 2022 08:40:08 -0500
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B73517073;
-        Thu, 29 Dec 2022 05:37:37 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.nyi.internal (Postfix) with ESMTP id D47B95818EC;
-        Thu, 29 Dec 2022 08:36:54 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Thu, 29 Dec 2022 08:36:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1672321014; x=1672328214; bh=lvF0202SLO
-        TzT8hbWZsF0xJL4uK7PlwT0Y7oJgXZa8M=; b=nLBnuo5MB8ib40z9s0xLWilN6X
-        /WXV1Zqm3SxWb/ruB/kuFnhd7wdVmFZDNY+gYekuqiDs/3zSKTYpDCWeSGomp00d
-        RPXAAm15lH7k/HckP7H41S1nTIssGFqnGEUCiAueXZhfqHbgvsgt2V/PjS5+24eK
-        AZrmaFdvUCvnyYqeGiXNjFNJi0Nt+kY19b5QAViPegESXxc5lkw5/x38rzXBkE3E
-        iMI/LuxJaJhu/PzxHG/w2bIL1OevR4DRQqXzZhgnnNrL6JlGZ2hfawrGtcjmfT5j
-        4NFrf2y4B2F4odzFC/4UEfyR9o8m6Tb2OX8h3xaP+cQbWCLPHyzz+PMCgWqQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1672321014; x=1672328214; bh=lvF0202SLOTzT8hbWZsF0xJL4uK7
-        PlwT0Y7oJgXZa8M=; b=Jr7RZJ443Rh8Qo+omI31KtzhJxzRr/gmnxzyHbaByHQ4
-        STqt+Vc4cv+k0j8Dn73jUOrcx91eQtuXMzjq9aHKcghW7M7CCsGYLd01CHiSCaAJ
-        imgUtF7DvNdZzdYbFAKU118qzhWZ45FFNkuq01JO3G44O8dNsNM026hoPloISUUK
-        uLAuPol2cYeE+H6rlz4SUHqOMhoDdaT6jlH1aTcg49YvTbDlhhD5kYpLI5s8bJxE
-        VEdpvdUeBr2HOtE5jiNe1JbI9qe+BqGW8ENvyet3ESOPsDs6y7wveuue+TeGQ6OF
-        63+RmCQO5AYjeEdbwbZySMWQsDDFqh1CfW/rw6fbgQ==
-X-ME-Sender: <xms:9JetY317jGDP8GU6R9s5P3feYX4b7JYnXuYW9oxrPtX4neZSlQhn_g>
-    <xme:9JetY2H-9Ndmta7egwtoh9Qd7iKWQAb1a1Gysv2bD9db8yknC1mA_eZz9GoINFs1O
-    mxmkGXxxIrZhDgI32M>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrieeggdehgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:9JetY37Np6b49AaL3STy0ZgjFyhCS7H5vsUZxB6VrMJPnKFk2gWG_Q>
-    <xmx:9JetY80eHbEBLheoSTsnWIIch3xp-KorU8P9-48XP3Ihye8VysyR4g>
-    <xmx:9JetY6EPUvpUXO4ud7kX_WBGQ-K_e16zVv9iLREEkWdF5C8vmD3ZiA>
-    <xmx:9petY6ndaNDL17h1d1VwhHZdsw1NSQgvJDADFPi05YBImlRtM5t8dA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 640B9B60086; Thu, 29 Dec 2022 08:36:52 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-1185-g841157300a-fm-20221208.002-g84115730
-Mime-Version: 1.0
-Message-Id: <1d88ba9f-5541-4b67-9cc8-a361eef36547@app.fastmail.com>
-In-Reply-To: <20221219154119.286760562@infradead.org>
-References: <20221219153525.632521981@infradead.org>
- <20221219154119.286760562@infradead.org>
-Date:   Thu, 29 Dec 2022 14:36:32 +0100
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Peter Zijlstra" <peterz@infradead.org>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>
-Cc:     "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Boqun Feng" <boqun.feng@gmail.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, joro@8bytes.org,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux.dev, Linux-Arch <linux-arch@vger.kernel.org>
-Subject: Re: [RFC][PATCH 07/12] percpu: Wire up cmpxchg128
-Content-Type: text/plain
+        Thu, 29 Dec 2022 11:14:11 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C31FF0;
+        Thu, 29 Dec 2022 08:14:10 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 88E171EC0622;
+        Thu, 29 Dec 2022 17:14:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1672330448;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=yiv7ygs+SuK0x+dgF6bq6lJbSdbknPxlHUob4CtNI7I=;
+        b=U+ywzFGfQlEWXXsPeZVWUBAI3CV4cBV33gK2O0narbJnFvVhbFNhPZQje1x01QqrasMH3V
+        MUpdr2/87oWoNpnkAbXLOCYjk2VEkAfyPdEdqPY8XKhnCBbs4HSaN2gv7OMPgCuhiN5TG2
+        WroaVxJLLGmzNIcOGkr0TzHey0VNpSQ=
+Date:   Thu, 29 Dec 2022 17:14:03 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com
+Subject: Re: [PATCH RFC v7 04/64] KVM: x86: Add 'fault_is_private' x86 op
+Message-ID: <Y628y6hQK38+IAev@zn.tnic>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-5-michael.roth@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-5-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022, at 16:35, Peter Zijlstra wrote:
-> In order to replace cmpxchg_double() with the newly minted
-> cmpxchg128() family of functions, wire it up in this_cpu_cmpxchg().
->
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+On Wed, Dec 14, 2022 at 01:39:56PM -0600, Michael Roth wrote:
+> This callback is used by the KVM MMU to check whether a #NPF was
+> or a private GPA or not.
 
-Does this work on x86 chips without X86_FEATURE_CX16?
+s/or //
 
-As far as I can tell, the new percpu_cmpxchg128_op uses
-the cmpxchg16b instruction unconditionally without checking
-for the feature bit first, and is now used by this_cpu_cmpxchg()
-unconditionally as well.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/mmu/mmu.c             |  3 +--
+>  arch/x86/kvm/mmu/mmu_internal.h    | 40 +++++++++++++++++++++++++++---
+>  4 files changed, 39 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index f530a550c092..efae987cdce0 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -132,6 +132,7 @@ KVM_X86_OP(complete_emulated_msr)
+>  KVM_X86_OP(vcpu_deliver_sipi_vector)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+>  KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
+> +KVM_X86_OP_OPTIONAL_RET0(fault_is_private);
+>  
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_OPTIONAL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 9317abffbf68..92539708f062 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1636,6 +1636,7 @@ struct kvm_x86_ops {
+>  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+>  			     int root_level);
+>  	int (*private_mem_enabled)(struct kvm *kvm);
+> +	int (*fault_is_private)(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
 
-This is fine for the moment if the only user is mm/slub.c
-and that retains the system_has_cmpxchg128() runtime check,
-but I think a better interface would be to guarantee that
-this_cpu_cmpxchg() always ends up either in a working
-inline asm or the generic fallback but not an invalid
-opcode.
+bool
 
-For consistency, I would also suggest this_cpu_cmpxchg() to
-take the same argument types as cmpxchg(): at most 'unsigned
-long' sized, with additional this_cpu_cmpxchg64() and
-this_cpu_cmpxchg128() macros that take fixed-size arguments.
-I have an older patch set that additionally converts all
-8-bit and 16-bit cmpxchg()/xchg() calls to cmpxchg_8()/
-xchg_8()/cmpxchg_16()/xchg_16() and and leaves only the
-fixed-32bit and variable typed 'unsigned long' sized
-callers for the weakly typed variant.
+and then you don't need the silly "== 1" at the call site.
 
-       Arnd
+>  
+>  	bool (*has_wbinvd_exit)(void);
+
+...
+
+> @@ -261,13 +293,13 @@ enum {
+>  };
+>  
+>  static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> -					u32 err, bool prefetch)
+> +					u64 err, bool prefetch)
+
+The u32 -> u64 change of err could use a sentence or two of
+clarification in the commit message...
+
+>  {
+>  	bool is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault);
+>  
+>  	struct kvm_page_fault fault = {
+>  		.addr = cr2_or_gpa,
+> -		.error_code = err,
+> +		.error_code = lower_32_bits(err),
+>  		.exec = err & PFERR_FETCH_MASK,
+>  		.write = err & PFERR_WRITE_MASK,
+>  		.present = err & PFERR_PRESENT_MASK,
+> @@ -281,8 +313,8 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
+>  		.req_level = PG_LEVEL_4K,
+>  		.goal_level = PG_LEVEL_4K,
+> -		.is_private = IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING) && is_tdp &&
+> -				kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
+> +		.is_private = is_tdp && kvm_mmu_fault_is_private(vcpu->kvm,
+> +								 cr2_or_gpa, err),
+>  	};
+>  	int r;
+>  
+> -- 
+> 2.25.1
+> 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
