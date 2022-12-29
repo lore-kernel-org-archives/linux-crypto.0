@@ -2,95 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1B7C3DA79
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 20:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26966C3DA79
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Dec 2022 21:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234101AbiL2Ujc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Dec 2022 15:39:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51746 "EHLO
+        id S229613AbiL2VCB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 29 Dec 2022 16:02:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234121AbiL2Uiw (ORCPT
+        with ESMTP id S229773AbiL2VB6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Dec 2022 15:38:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE2917051
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Dec 2022 12:38:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672346279;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M/O7ovWlD6rDqALxE5fmNq+xJQTo2e2KoATZ05+fVUM=;
-        b=i0mYWB8ZyU6WReOfsbQ2ZG9XEQeZEira0S6qdCVt7/Gvr46jKC5wDj5G2YSyrCv2qPfN+W
-        9tVAGVyp9AZs6P73DIWqzHC/m8c83mTn78Hy5fD/o8EMl/zgtrtMCZ9qxHGx3Rjfdqj+9H
-        4jCkB0iLxtkfg8Cp7LBYYq4OHxGNBzo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-MPEltkLTPYOClQJQrA3BGA-1; Thu, 29 Dec 2022 15:37:56 -0500
-X-MC-Unique: MPEltkLTPYOClQJQrA3BGA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 29 Dec 2022 16:01:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1735714085;
+        Thu, 29 Dec 2022 13:01:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C499929ABA00;
-        Thu, 29 Dec 2022 20:37:55 +0000 (UTC)
-Received: from rules.brq.redhat.com (ovpn-208-2.brq.redhat.com [10.40.208.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97DAF112132C;
-        Thu, 29 Dec 2022 20:37:53 +0000 (UTC)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     Nicolai Stange <nstange@suse.de>, Elliott Robert <elliott@hpe.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B19A96182E;
+        Thu, 29 Dec 2022 21:01:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFCDCC433EF;
+        Thu, 29 Dec 2022 21:01:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672347716;
+        bh=aBwFnT250YVU/jh6JU0/iuLAGehjoULmLrg4gYVFCg8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Be9OZMULOY03UyOCYTmjr/JfxPAKDMY4qE7rMCbB8pBvmA/KX8sGtxWQI1RBsW30J
+         oV/sSPfJcoG1cSDtwpYrDbz998RjvV/J3kxYirAzpcBZJHpT6fIadvCx++xaRZRg6b
+         qiXToTcL0+eo2qcz9zxqy8c6CFPVMT9QRGIcF5wRg9XOOS5pJywEmnRWrEbvVn2G3g
+         YyQUYgu/JhYTS+RlSHVzQBhz3NyxBJFz1gahbvjJnI+SMB4syoZL1zaUtPUh9xwAFr
+         uDaakvT7ORyh/LpxqcQcSVES6J0CiuunSXkp6gODvCi+Zv9OQ5D8ruLAP39wYYHCJC
+         BaNBAxe4onMpA==
+Date:   Thu, 29 Dec 2022 13:01:54 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Vladis Dronov <vdronov@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Nicolai Stange <nstange@suse.de>,
+        Elliott Robert <elliott@hpe.com>,
         Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vladis Dronov <vdronov@redhat.com>
-Subject: [PATCH v2 6/6] crypto: testmgr - allow ecdsa-nist-p256 and -p384 in FIPS mode
-Date:   Thu, 29 Dec 2022 21:37:08 +0100
-Message-Id: <20221229203708.13628-7-vdronov@redhat.com>
-In-Reply-To: <20221229203708.13628-1-vdronov@redhat.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/6] crypto: testmgr - allow ecdsa-nist-p256 and -p384
+ in FIPS mode
+Message-ID: <Y64AQg+W0SGsYUDY@sol.localdomain>
 References: <20221229203708.13628-1-vdronov@redhat.com>
+ <20221229203708.13628-7-vdronov@redhat.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221229203708.13628-7-vdronov@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nicolai Stange <nstange@suse.de>
+On Thu, Dec 29, 2022 at 09:37:08PM +0100, Vladis Dronov wrote:
+> From: Nicolai Stange <nstange@suse.de>
+> 
+> The kernel provides implementations of the NIST ECDSA signature
+> verification primitives. For key sizes of 256 and 384 bits respectively
+> they are approved and can be enabled in FIPS mode. Do so.
+> 
+> Signed-off-by: Nicolai Stange <nstange@suse.de>
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-The kernel provides implementations of the NIST ECDSA signature
-verification primitives. For key sizes of 256 and 384 bits respectively
-they are approved and can be enabled in FIPS mode. Do so.
+Please don't add my Reviewed-by to patches I didn't review.  I only gave
+Reviewed-by on "[PATCH 2/6] crypto: xts - drop xts_check_key()".  I didn't look
+at the other patches in the series much, as I'm not very interested in them.
 
-Signed-off-by: Nicolai Stange <nstange@suse.de>
-Signed-off-by: Vladis Dronov <vdronov@redhat.com>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
----
- crypto/testmgr.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a223cf5f3626..795c4858c741 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5034,12 +5034,14 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "ecdsa-nist-p256",
- 		.test = alg_test_akcipher,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.akcipher = __VECS(ecdsa_nist_p256_tv_template)
- 		}
- 	}, {
- 		.alg = "ecdsa-nist-p384",
- 		.test = alg_test_akcipher,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.akcipher = __VECS(ecdsa_nist_p384_tv_template)
- 		}
--- 
-2.38.1
-
+- Eric
