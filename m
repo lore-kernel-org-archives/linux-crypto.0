@@ -2,55 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11346C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 15:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF745C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 15:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235013AbiL3POj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 10:14:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41068 "EHLO
+        id S235120AbiL3PPb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 10:15:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbiL3POj (ORCPT
+        with ESMTP id S229527AbiL3PPa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 10:14:39 -0500
+        Fri, 30 Dec 2022 10:15:30 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA172633;
-        Fri, 30 Dec 2022 07:14:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9CDC2633;
+        Fri, 30 Dec 2022 07:15:28 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBH5b-00COuz-Ti; Fri, 30 Dec 2022 23:14:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 23:14:31 +0800
-Date:   Fri, 30 Dec 2022 23:14:31 +0800
+        id 1pBH6S-00COws-2N; Fri, 30 Dec 2022 23:15:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 23:15:24 +0800
+Date:   Fri, 30 Dec 2022 23:15:24 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: wp512: disable kmsan checks in
- wp512_process_buffer()
-Message-ID: <Y68AV8f2cyyYcrLe@gondor.apana.org.au>
-References: <20221215162956.4037570-1-arnd@kernel.org>
+Subject: Re: [PATCH] crypto: ux500: update debug config after ux500 cryp
+ driver removal
+Message-ID: <Y68AjE2R4TuCCHzb@gondor.apana.org.au>
+References: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221215162956.4037570-1-arnd@kernel.org>
+In-Reply-To: <20221220080536.30794-1-lukas.bulwahn@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 15, 2022 at 05:29:38PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue, Dec 20, 2022 at 09:05:36AM +0100, Lukas Bulwahn wrote:
+> Commit 453de3eb08c4 ("crypto: ux500/cryp - delete driver") removes the
+> config CRYPTO_DEV_UX500_CRYP, but leaves an obsolete reference in the
+> dependencies of config CRYPTO_DEV_UX500_DEBUG.
 > 
-> The memory sanitizer causes excessive register spills in this function:
+> Remove that obsolete reference, and adjust the description while at it.
 > 
-> crypto/wp512.c:782:13: error: stack frame size (2104) exceeds limit (2048) in 'wp512_process_buffer' [-Werror,-Wframe-larger-than]
-> 
-> Assume that this one is safe, and mark it as needing no checks to
-> get the stack usage back down to the normal level.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: 453de3eb08c4 ("crypto: ux500/cryp - delete driver")
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 > ---
->  crypto/wp512.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/ux500/Kconfig | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
