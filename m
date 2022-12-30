@@ -2,84 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27008C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 09:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04236C4708E
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 09:17:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbiL3JI0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 04:08:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
+        id S234757AbiL3JRH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 04:17:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiL3JIZ (ORCPT
+        with ESMTP id S234764AbiL3JRF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 04:08:25 -0500
+        Fri, 30 Dec 2022 04:17:05 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E694228D;
-        Fri, 30 Dec 2022 01:08:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94D612AD6;
+        Fri, 30 Dec 2022 01:17:03 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBBMu-00CI8h-TN; Fri, 30 Dec 2022 17:08:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 17:08:00 +0800
-Date:   Fri, 30 Dec 2022 17:08:00 +0800
+        id 1pBBUj-00CILa-7B; Fri, 30 Dec 2022 17:16:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 17:16:05 +0800
+Date:   Fri, 30 Dec 2022 17:16:05 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Robert Elliott <elliott@hpe.com>
-Cc:     davem@davemloft.net, Jason@zx2c4.com, ardb@kernel.org,
-        ap420073@gmail.com, David.Laight@aculab.com, ebiggers@kernel.org,
-        tim.c.chen@linux.intel.com, peter@n8pjl.ca, tglx@linutronix.de,
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+        corbet@lwn.net, will@kernel.org, boqun.feng@gmail.com,
+        mark.rutland@arm.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, davem@davemloft.net, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
- loops
-Message-ID: <Y66qcI/pweImS/1u@gondor.apana.org.au>
-References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-4-elliott@hpe.com>
+        x86@kernel.org, hpa@zytor.com, joro@8bytes.org,
+        suravee.suthikulpanit@amd.com, robin.murphy@arm.com,
+        dwmw2@infradead.org, baolu.lu@linux.intel.com,
+        Arnd Bergmann <arnd@arndb.de>, penberg@kernel.org,
+        rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org
+Subject: Re: [PATCH 3/3] crypto: x86/ghash - add comment and fix broken link
+Message-ID: <Y66sVbBVtYu8Jll5@gondor.apana.org.au>
+References: <20221220054042.188537-1-ebiggers@kernel.org>
+ <20221220054042.188537-4-ebiggers@kernel.org>
+ <Y6GJzD9PLKj+Ocr2@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221219220223.3982176-4-elliott@hpe.com>
+In-Reply-To: <Y6GJzD9PLKj+Ocr2@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 04:02:13PM -0600, Robert Elliott wrote:
+On Tue, Dec 20, 2022 at 11:09:16AM +0100, Peter Zijlstra wrote:
+> On Mon, Dec 19, 2022 at 09:40:42PM -0800, Eric Biggers wrote:
 >
-> diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-> index c3ee9334cb0f..df03fbb2c42c 100644
-> --- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-> +++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-> @@ -58,9 +58,9 @@
->  /*
->   * SHA-1 implementation with Intel(R) AVX2 instruction set extensions.
->   *
-> - *This implementation is based on the previous SSSE3 release:
-> - *Visit http://software.intel.com/en-us/articles/
-> - *and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
-> + * This implementation is based on the previous SSSE3 release:
-> + * Visit http://software.intel.com/en-us/articles/
-> + * and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
+> > - * http://software.intel.com/en-us/articles/carry-less-multiplication-and-its-usage-for-computing-the-gcm-mode/
+> > + * https://www.intel.com/content/dam/develop/external/us/en/documents/clmul-wp-rev-2-02-2014-04-20.pdf
+> 
+> Since these things have a habbit if changing, we tend to prefer to host
+> a copy on kernel.org somewhere (used to be bugzilla, but perhaps there's
+> a better places these days).
 
-Could you please leave out changes which are not related to the
-main purpose of this patch?
+Alternatively just save a copy at web.archive.org when you submit
+the patch and use that link.  In fact it seems that the original
+link is still available via web.archive.org (sans pictures).
 
-Put them into a separate patch if necessary.
-
-> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-> index 44340a1139e0..b269b455fbbe 100644
-> --- a/arch/x86/crypto/sha1_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-> @@ -41,9 +41,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
->  	 */
->  	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
->  
-> -	kernel_fpu_begin();
->  	sha1_base_do_update(desc, data, len, sha1_xform);
-> -	kernel_fpu_end();
-
-Moving kernel_fpu_begin/kernel_fpu_end down seems to be entirely
-unnecessary as you could already call kernel_fpu_yield deep down
-the stack with the current code.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
