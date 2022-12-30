@@ -2,74 +2,57 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8DAC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 15:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11346C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 15:14:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235127AbiL3PME (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 10:12:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40952 "EHLO
+        id S235013AbiL3POj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 10:14:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235073AbiL3PMA (ORCPT
+        with ESMTP id S229527AbiL3POj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 10:12:00 -0500
+        Fri, 30 Dec 2022 10:14:39 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198D92633
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 07:12:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA172633;
+        Fri, 30 Dec 2022 07:14:38 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBH37-00COqO-CA; Fri, 30 Dec 2022 23:11:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 23:11:57 +0800
-Date:   Fri, 30 Dec 2022 23:11:57 +0800
+        id 1pBH5b-00COuz-Ti; Fri, 30 Dec 2022 23:14:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 23:14:31 +0800
+Date:   Fri, 30 Dec 2022 23:14:31 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org
-Subject: Re: [PATCH] crypto: arm/ghash - implement fused AES/GHASH
- implementation of GCM
-Message-ID: <Y67/vVyF3pNCm8ri@gondor.apana.org.au>
-References: <20221212183758.1079283-1-ardb@kernel.org>
- <Y679z3SPiHn+y7Zt@gondor.apana.org.au>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: wp512: disable kmsan checks in
+ wp512_process_buffer()
+Message-ID: <Y68AV8f2cyyYcrLe@gondor.apana.org.au>
+References: <20221215162956.4037570-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y679z3SPiHn+y7Zt@gondor.apana.org.au>
+In-Reply-To: <20221215162956.4037570-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 30, 2022 at 11:03:43PM +0800, Herbert Xu wrote:
-> On Mon, Dec 12, 2022 at 07:37:58PM +0100, Ard Biesheuvel wrote:
-> > On 32-bit ARM, AES in GCM mode takes full advantage of the ARMv8 Crypto
-> > Extensions when available, resulting in a performance of 6-7 cycles per
-> > byte for typical IPsec frames on cores such as Cortex-A53, using the
-> > generic GCM template encapsulating the accelerated AES-CTR and GHASH
-> > implementations.
-> > 
-> > At such high rates, any time spent copying data or doing other poorly
-> > optimized work in the generic layer hurts disproportionately, and we can
-> > get a significant performance improvement by combining the optimized
-> > AES-CTR and GHASH implementations into a single one.
-> > 
-> > On Cortex-A53, this results in a performance improvement of around 70%,
-> > or 4.2 cycles per byte for AES-256-GCM-128 with RFC4106 encapsulation.
-> > The fastest mode on this core is bare AES-128-GCM using 8k blocks, which
-> > manages 2.66 cycles per byte.
-> > 
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> > Note: this patch depends on the softirq context patches for kernel mode
-> > NEON I sent last week. More specifically, this implements a sync AEAD
-> > that does not implement a !simd fallback, as AEADs are not callable in
-> > IRQ context anyway.
-> > 
-> >  arch/arm/crypto/Kconfig         |   2 +
-> >  arch/arm/crypto/ghash-ce-core.S | 381 +++++++++++++++++++-
-> >  arch/arm/crypto/ghash-ce-glue.c | 350 +++++++++++++++++-
-> >  3 files changed, 718 insertions(+), 15 deletions(-)
+On Thu, Dec 15, 2022 at 05:29:38PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Patch applied.  Thanks.
+> The memory sanitizer causes excessive register spills in this function:
+> 
+> crypto/wp512.c:782:13: error: stack frame size (2104) exceeds limit (2048) in 'wp512_process_buffer' [-Werror,-Wframe-larger-than]
+> 
+> Assume that this one is safe, and mark it as needing no checks to
+> get the stack usage back down to the normal level.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  crypto/wp512.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Oops, this email was an error.  This patch hasn't been applied
-as it was already superceded.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
