@@ -2,79 +2,69 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53043C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 14:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88673C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 15:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbiL3OzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 09:55:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37846 "EHLO
+        id S229464AbiL3PDr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 10:03:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiL3OzY (ORCPT
+        with ESMTP id S229456AbiL3PDq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 09:55:24 -0500
+        Fri, 30 Dec 2022 10:03:46 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74167DDC;
-        Fri, 30 Dec 2022 06:55:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23D8140DF
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 07:03:45 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBGmu-00COQq-M2; Fri, 30 Dec 2022 22:55:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 22:55:12 +0800
-Date:   Fri, 30 Dec 2022 22:55:12 +0800
+        id 1pBGv9-00COfN-2i; Fri, 30 Dec 2022 23:03:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 23:03:43 +0800
+Date:   Fri, 30 Dec 2022 23:03:43 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Danny Tsen <dtsen@linux.ibm.com>
-Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
-Subject: Re: [PATCH v2 0/6] crypto: Accelerated AES/GCM stitched
- implementation
-Message-ID: <Y6770EmD7VN3HCn7@gondor.apana.org.au>
-References: <20221205003458.4182-1-dtsen@linux.ibm.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org
+Subject: Re: [PATCH] crypto: arm/ghash - implement fused AES/GHASH
+ implementation of GCM
+Message-ID: <Y679z3SPiHn+y7Zt@gondor.apana.org.au>
+References: <20221212183758.1079283-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221205003458.4182-1-dtsen@linux.ibm.com>
+In-Reply-To: <20221212183758.1079283-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Dec 04, 2022 at 07:34:52PM -0500, Danny Tsen wrote:
-> This patch series enable an accelerated AES/GCM stitched implementation for
-> Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
-> implementation provides 3.5X+ better performance than the baseline.
+On Mon, Dec 12, 2022 at 07:37:58PM +0100, Ard Biesheuvel wrote:
+> On 32-bit ARM, AES in GCM mode takes full advantage of the ARMv8 Crypto
+> Extensions when available, resulting in a performance of 6-7 cycles per
+> byte for typical IPsec frames on cores such as Cortex-A53, using the
+> generic GCM template encapsulating the accelerated AES-CTR and GHASH
+> implementations.
 > 
-> This patch has been tested with the kernel crypto module tcrypt.ko and has
-> passed the selftest.  The patch is also tested with
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled
+> At such high rates, any time spent copying data or doing other poorly
+> optimized work in the generic layer hurts disproportionately, and we can
+> get a significant performance improvement by combining the optimized
+> AES-CTR and GHASH implementations into a single one.
 > 
-> Danny Tsen (6):
->   Patch1: Update Kconfig and Makefile.
->   Patch2: Glue code for AES/GCM stitched implementation.
->   Patch3: An accelerated AES/GCM stitched implementation.
->   Patch4: Supporting functions for AES.
->   Patch5: Supporting functions for ghash.
->   Patch6: A perl script to process PowerPC assembler source.
+> On Cortex-A53, this results in a performance improvement of around 70%,
+> or 4.2 cycles per byte for AES-256-GCM-128 with RFC4106 encapsulation.
+> The fastest mode on this core is bare AES-128-GCM using 8k blocks, which
+> manages 2.66 cycles per byte.
 > 
->  arch/powerpc/crypto/Kconfig            |   11 +
->  arch/powerpc/crypto/Makefile           |   10 +
->  arch/powerpc/crypto/aesp8-ppc.pl       | 3846 ++++++++++++++++++++++++
->  arch/powerpc/crypto/ghashp8-ppc.pl     |  370 +++
->  arch/powerpc/crypto/p10-aes-gcm-glue.c |  345 +++
->  arch/powerpc/crypto/p10_aes_gcm.S      | 1519 ++++++++++
->  arch/powerpc/crypto/ppc-xlate.pl       |  229 ++
->  7 files changed, 6330 insertions(+)
->  create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
->  create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
->  create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
->  create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
->  create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+> Note: this patch depends on the softirq context patches for kernel mode
+> NEON I sent last week. More specifically, this implements a sync AEAD
+> that does not implement a !simd fallback, as AEADs are not callable in
+> IRQ context anyway.
+> 
+>  arch/arm/crypto/Kconfig         |   2 +
+>  arch/arm/crypto/ghash-ce-core.S | 381 +++++++++++++++++++-
+>  arch/arm/crypto/ghash-ce-glue.c | 350 +++++++++++++++++-
+>  3 files changed, 718 insertions(+), 15 deletions(-)
 
-I can't build this, it fails with
-
-  LD [M]  arch/powerpc/crypto/p10-aes-gcm-crypto.o
-powerpc64le-linux-gnu-ld: arch/powerpc/crypto/p10_aes_gcm.o: ABI version 2 is not compatible with ABI version 1 output
-powerpc64le-linux-gnu-ld: failed to merge target specific data of file arch/powerpc/crypto/p10_aes_gcm.o
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
