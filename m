@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B44E9C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 09:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27008C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 09:08:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234427AbiL3JFY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 04:05:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53810 "EHLO
+        id S229663AbiL3JI0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 04:08:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiL3JFX (ORCPT
+        with ESMTP id S229519AbiL3JIZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 04:05:23 -0500
+        Fri, 30 Dec 2022 04:08:25 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF8712614;
-        Fri, 30 Dec 2022 01:05:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E694228D;
+        Fri, 30 Dec 2022 01:08:24 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBBJk-00CI0k-7E; Fri, 30 Dec 2022 17:04:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 17:04:44 +0800
-Date:   Fri, 30 Dec 2022 17:04:44 +0800
+        id 1pBBMu-00CI8h-TN; Fri, 30 Dec 2022 17:08:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 17:08:00 +0800
+Date:   Fri, 30 Dec 2022 17:08:00 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Robert Elliott <elliott@hpe.com>
 Cc:     davem@davemloft.net, Jason@zx2c4.com, ardb@kernel.org,
@@ -28,67 +28,58 @@ Cc:     davem@davemloft.net, Jason@zx2c4.com, ardb@kernel.org,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 07/13] crypto: x86/ghash - restructure FPU context saving
-Message-ID: <Y66prPh5Bvpkdxv2@gondor.apana.org.au>
+Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
+ loops
+Message-ID: <Y66qcI/pweImS/1u@gondor.apana.org.au>
 References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-8-elliott@hpe.com>
+ <20221219220223.3982176-4-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221219220223.3982176-8-elliott@hpe.com>
+In-Reply-To: <20221219220223.3982176-4-elliott@hpe.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 04:02:17PM -0600, Robert Elliott wrote:
-> Wrap each of the calls to clmul_hash_update and clmul_ghash__mul
-> in its own set of kernel_fpu_begin and kernel_fpu_end calls, preparing
-> to limit the amount of data processed by each _update call to avoid
-> RCU stalls.
-> 
-> This is more like how polyval-clmulni_glue is structured.
-> 
-> Fixes: 0e1227d356e9 ("crypto: ghash - Add PCLMULQDQ accelerated implementation")
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Robert Elliott <elliott@hpe.com>
-> ---
->  arch/x86/crypto/ghash-clmulni-intel_glue.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> index beac4b2eddf6..1bfde099de0f 100644
-> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> @@ -80,7 +80,6 @@ static int ghash_update(struct shash_desc *desc,
->  	struct ghash_ctx *ctx = crypto_shash_ctx(desc->tfm);
->  	u8 *dst = dctx->buffer;
+On Mon, Dec 19, 2022 at 04:02:13PM -0600, Robert Elliott wrote:
+>
+> diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+> index c3ee9334cb0f..df03fbb2c42c 100644
+> --- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+> +++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+> @@ -58,9 +58,9 @@
+>  /*
+>   * SHA-1 implementation with Intel(R) AVX2 instruction set extensions.
+>   *
+> - *This implementation is based on the previous SSSE3 release:
+> - *Visit http://software.intel.com/en-us/articles/
+> - *and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
+> + * This implementation is based on the previous SSSE3 release:
+> + * Visit http://software.intel.com/en-us/articles/
+> + * and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
+
+Could you please leave out changes which are not related to the
+main purpose of this patch?
+
+Put them into a separate patch if necessary.
+
+> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+> index 44340a1139e0..b269b455fbbe 100644
+> --- a/arch/x86/crypto/sha1_ssse3_glue.c
+> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
+> @@ -41,9 +41,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+>  	 */
+>  	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
 >  
 > -	kernel_fpu_begin();
->  	if (dctx->bytes) {
->  		int n = min(srclen, dctx->bytes);
->  		u8 *pos = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
-> @@ -91,10 +90,14 @@ static int ghash_update(struct shash_desc *desc,
->  		while (n--)
->  			*pos++ ^= *src++;
->  
-> -		if (!dctx->bytes)
-> +		if (!dctx->bytes) {
-> +			kernel_fpu_begin();
->  			clmul_ghash_mul(dst, &ctx->shash);
-> +			kernel_fpu_end();
-> +		}
->  	}
->  
-> +	kernel_fpu_begin();
->  	clmul_ghash_update(dst, src, srclen, &ctx->shash);
->  	kernel_fpu_end();
+>  	sha1_base_do_update(desc, data, len, sha1_xform);
+> -	kernel_fpu_end();
 
-Why is this necessary? Couldn't you just add the kernel_fpu_yield
-calls even without this patch?
+Moving kernel_fpu_begin/kernel_fpu_end down seems to be entirely
+unnecessary as you could already call kernel_fpu_yield deep down
+the stack with the current code.
 
-This just seems to be adding some unnecessary begin/end calls.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
