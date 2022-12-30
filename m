@@ -2,48 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A950C4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 08:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B44E9C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 09:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234703AbiL3Inv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 03:43:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50680 "EHLO
+        id S234427AbiL3JFY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 04:05:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230316AbiL3Int (ORCPT
+        with ESMTP id S229519AbiL3JFX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 03:43:49 -0500
+        Fri, 30 Dec 2022 04:05:23 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55C718E36
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 00:43:48 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF8712614;
+        Fri, 30 Dec 2022 01:05:21 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pBAzS-00CHXl-61; Fri, 30 Dec 2022 16:43:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 16:43:46 +0800
-Date:   Fri, 30 Dec 2022 16:43:46 +0800
+        id 1pBBJk-00CI0k-7E; Fri, 30 Dec 2022 17:04:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 17:04:44 +0800
+Date:   Fri, 30 Dec 2022 17:04:44 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 3/6] crypto/realtek: hash algorithms
-Message-ID: <Y66kwtiHnLmzzlCP@gondor.apana.org.au>
-References: <Y66ZgBx+hduj9S3K@gondor.apana.org.au>
- <b9931836dea5109a8a5aaa0a6e1abe558766d137.camel@gmx.de>
+To:     Robert Elliott <elliott@hpe.com>
+Cc:     davem@davemloft.net, Jason@zx2c4.com, ardb@kernel.org,
+        ap420073@gmail.com, David.Laight@aculab.com, ebiggers@kernel.org,
+        tim.c.chen@linux.intel.com, peter@n8pjl.ca, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 07/13] crypto: x86/ghash - restructure FPU context saving
+Message-ID: <Y66prPh5Bvpkdxv2@gondor.apana.org.au>
+References: <20221219220223.3982176-1-elliott@hpe.com>
+ <20221219220223.3982176-8-elliott@hpe.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b9931836dea5109a8a5aaa0a6e1abe558766d137.camel@gmx.de>
+In-Reply-To: <20221219220223.3982176-8-elliott@hpe.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 30, 2022 at 09:38:21AM +0100, Markus Stockhausen wrote:
->
-> Can I just replace the calls with dma_map_single() or do I need other
-> initialization or cleanup calls?
+On Mon, Dec 19, 2022 at 04:02:17PM -0600, Robert Elliott wrote:
+> Wrap each of the calls to clmul_hash_update and clmul_ghash__mul
+> in its own set of kernel_fpu_begin and kernel_fpu_end calls, preparing
+> to limit the amount of data processed by each _update call to avoid
+> RCU stalls.
+> 
+> This is more like how polyval-clmulni_glue is structured.
+> 
+> Fixes: 0e1227d356e9 ("crypto: ghash - Add PCLMULQDQ accelerated implementation")
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Robert Elliott <elliott@hpe.com>
+> ---
+>  arch/x86/crypto/ghash-clmulni-intel_glue.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+> index beac4b2eddf6..1bfde099de0f 100644
+> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
+> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+> @@ -80,7 +80,6 @@ static int ghash_update(struct shash_desc *desc,
+>  	struct ghash_ctx *ctx = crypto_shash_ctx(desc->tfm);
+>  	u8 *dst = dctx->buffer;
+>  
+> -	kernel_fpu_begin();
+>  	if (dctx->bytes) {
+>  		int n = min(srclen, dctx->bytes);
+>  		u8 *pos = dst + (GHASH_BLOCK_SIZE - dctx->bytes);
+> @@ -91,10 +90,14 @@ static int ghash_update(struct shash_desc *desc,
+>  		while (n--)
+>  			*pos++ ^= *src++;
+>  
+> -		if (!dctx->bytes)
+> +		if (!dctx->bytes) {
+> +			kernel_fpu_begin();
+>  			clmul_ghash_mul(dst, &ctx->shash);
+> +			kernel_fpu_end();
+> +		}
+>  	}
+>  
+> +	kernel_fpu_begin();
+>  	clmul_ghash_update(dst, src, srclen, &ctx->shash);
+>  	kernel_fpu_end();
 
-Pretty much.  Just don't forget to unmap them after the DMA has
-completed.
+Why is this necessary? Couldn't you just add the kernel_fpu_yield
+calls even without this patch?
 
-Thanks,
+This just seems to be adding some unnecessary begin/end calls.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
