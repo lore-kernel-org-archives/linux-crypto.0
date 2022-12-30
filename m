@@ -2,105 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EDCC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 11:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67513C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 13:35:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234383AbiL3Lxl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 06:53:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44808 "EHLO
+        id S235024AbiL3NfR convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 08:35:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229759AbiL3Lxk (ORCPT
+        with ESMTP id S231392AbiL3NfP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 06:53:40 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31DE18B19;
-        Fri, 30 Dec 2022 03:53:37 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 48FB11EC01CE;
-        Fri, 30 Dec 2022 12:53:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1672401216;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Laxh/C9ZxuZYfqJQTUOidfRa5K1UWorXoXDiSpqTcos=;
-        b=aZ/ZVHx2XblvvfDYa6I5gkaw9K45VXC1wGgMmR4Rt+0TxEdwHLGzcLwR7kAhCQg8FBQooo
-        27XdQk6Z6g84QV53TMX4/pmTCe+yXe20CXRFBG55EiRKgfOlFegblcNhjA4dqU8ll15E7A
-        bahtGtrJuBN+3vTzS5obIjnUDVeQgu0=
-Date:   Fri, 30 Dec 2022 12:53:31 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com
-Subject: Re: [PATCH RFC v7 06/64] KVM: x86: Add platform hooks for private
- memory invalidations
-Message-ID: <Y67RO+YnQYSX4mvN@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-7-michael.roth@amd.com>
+        Fri, 30 Dec 2022 08:35:15 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114181A834
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 05:35:12 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-314-HWfElW15Mq-_iaahh_74GQ-1; Fri, 30 Dec 2022 13:35:09 +0000
+X-MC-Unique: HWfElW15Mq-_iaahh_74GQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 30 Dec
+ 2022 13:35:07 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Fri, 30 Dec 2022 13:35:07 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Roberto Sassu' <roberto.sassu@huaweicloud.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
+        "paul@paul-moore.com" <paul@paul-moore.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>
+CC:     "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
+Thread-Topic: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
+Thread-Index: AQHZGf+Li10Ctze9/ky4tLizwqJmjK6Gb6hQ
+Date:   Fri, 30 Dec 2022 13:35:07 +0000
+Message-ID: <6949ced7c1014488b2d00ff26eba6b6b@AcuMS.aculab.com>
+References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
+ <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
+In-Reply-To: <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-7-michael.roth@amd.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:58PM -0600, Michael Roth wrote:
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a0c41d391547..2713632e5061 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7183,3 +7183,8 @@ void kvm_arch_set_memory_attributes(struct kvm *kvm,
->  		kvm_update_lpage_private_shared_mixed(kvm, slot, attrs,
->  						      start, end);
->  }
-> +
-> +void kvm_arch_invalidate_restricted_mem(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
-> +{
-> +	static_call_cond(kvm_x86_invalidate_restricted_mem)(slot, start, end);
+From: Roberto Sassu
+> Sent: 27 December 2022 14:28
+> 
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> The helper mpi_read_raw_from_sgl sets the number of entries in
+> the SG list according to nbytes.  However, if the last entry
+> in the SG list contains more data than nbytes, then it may overrun
+> the buffer because it only allocates enough memory for nbytes.
+> 
+> Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+> Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  lib/mpi/mpicoder.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+> index 39c4c6731094..3cb6bd148fa9 100644
+> --- a/lib/mpi/mpicoder.c
+> +++ b/lib/mpi/mpicoder.c
+> @@ -504,7 +504,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+> 
+>  	while (sg_miter_next(&miter)) {
+>  		buff = miter.addr;
+> -		len = miter.length;
+> +		len = min_t(unsigned, miter.length, nbytes);
 
-Why _cond?
+Technically that min_t() is incorrect.
+miter.length is size_t (unsigned long on 64bit) and nbytes unsigned int.
+Any cast needs to force the smaller type to the larger one.
+(Clearly here the domain of the values is probably than 4G - but that isn't
+the point. There must be some places where the sg length needs to
+be size_t because 32 bits isn't enough.)
 
-> @@ -258,6 +263,17 @@ void restrictedmem_unregister_notifier(struct file *file,
->  				       struct restrictedmem_notifier *notifier)
->  {
->  	struct restrictedmem_data *data = file->f_mapping->private_data;
-> +	struct inode *inode = file_inode(data->memfd);
-> +
-> +	/* TODO: this will issue notifications to all registered notifiers,
+In reality min() is being completely over-zealous in its checking and
+should allow comparisons where the signed-ness of the two values matches.
+Search for the patch I posted before xmas.
 
-First of all:
+	David
 
-verify_comment_style: WARNING: Multi-line comment needs to start text on the second line:
- [+     /* TODO: this will issue notifications to all registered notifiers,]
 
-Then, if you only want to run the callbacks for the one going away only,
-why don't you simply do:
+> +		nbytes -= len;
+> 
+>  		for (x = 0; x < len; x++) {
+>  			a <<= 8;
+> --
+> 2.25.1
 
-        mutex_lock(&data->lock);
-        notifier->ops->invalidate_start(notifier, 0, inode->i_size >> PAGE_SHIFT);
-        notifier->ops->invalidate_end(notifier, 0, inode->i_size >> PAGE_SHIFT);
-        list_del(&notifier->list);
-        mutex_unlock(&data->lock);
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-here?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
