@@ -2,121 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67513C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 13:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53043C4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 14:55:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235024AbiL3NfR convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 08:35:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39602 "EHLO
+        id S229527AbiL3OzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 09:55:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231392AbiL3NfP (ORCPT
+        with ESMTP id S229456AbiL3OzY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 08:35:15 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114181A834
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 05:35:12 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-314-HWfElW15Mq-_iaahh_74GQ-1; Fri, 30 Dec 2022 13:35:09 +0000
-X-MC-Unique: HWfElW15Mq-_iaahh_74GQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 30 Dec
- 2022 13:35:07 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Fri, 30 Dec 2022 13:35:07 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Roberto Sassu' <roberto.sassu@huaweicloud.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>
-CC:     "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
-Thread-Topic: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
-Thread-Index: AQHZGf+Li10Ctze9/ky4tLizwqJmjK6Gb6hQ
-Date:   Fri, 30 Dec 2022 13:35:07 +0000
-Message-ID: <6949ced7c1014488b2d00ff26eba6b6b@AcuMS.aculab.com>
-References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
- <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
-In-Reply-To: <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 30 Dec 2022 09:55:24 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74167DDC;
+        Fri, 30 Dec 2022 06:55:22 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pBGmu-00COQq-M2; Fri, 30 Dec 2022 22:55:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Dec 2022 22:55:12 +0800
+Date:   Fri, 30 Dec 2022 22:55:12 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Danny Tsen <dtsen@linux.ibm.com>
+Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
+Subject: Re: [PATCH v2 0/6] crypto: Accelerated AES/GCM stitched
+ implementation
+Message-ID: <Y6770EmD7VN3HCn7@gondor.apana.org.au>
+References: <20221205003458.4182-1-dtsen@linux.ibm.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221205003458.4182-1-dtsen@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Roberto Sassu
-> Sent: 27 December 2022 14:28
+On Sun, Dec 04, 2022 at 07:34:52PM -0500, Danny Tsen wrote:
+> This patch series enable an accelerated AES/GCM stitched implementation for
+> Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
+> implementation provides 3.5X+ better performance than the baseline.
 > 
-> From: Herbert Xu <herbert@gondor.apana.org.au>
+> This patch has been tested with the kernel crypto module tcrypt.ko and has
+> passed the selftest.  The patch is also tested with
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled
 > 
-> The helper mpi_read_raw_from_sgl sets the number of entries in
-> the SG list according to nbytes.  However, if the last entry
-> in the SG list contains more data than nbytes, then it may overrun
-> the buffer because it only allocates enough memory for nbytes.
+> Danny Tsen (6):
+>   Patch1: Update Kconfig and Makefile.
+>   Patch2: Glue code for AES/GCM stitched implementation.
+>   Patch3: An accelerated AES/GCM stitched implementation.
+>   Patch4: Supporting functions for AES.
+>   Patch5: Supporting functions for ghash.
+>   Patch6: A perl script to process PowerPC assembler source.
 > 
-> Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
-> Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  lib/mpi/mpicoder.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-> index 39c4c6731094..3cb6bd148fa9 100644
-> --- a/lib/mpi/mpicoder.c
-> +++ b/lib/mpi/mpicoder.c
-> @@ -504,7 +504,8 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
-> 
->  	while (sg_miter_next(&miter)) {
->  		buff = miter.addr;
-> -		len = miter.length;
-> +		len = min_t(unsigned, miter.length, nbytes);
+>  arch/powerpc/crypto/Kconfig            |   11 +
+>  arch/powerpc/crypto/Makefile           |   10 +
+>  arch/powerpc/crypto/aesp8-ppc.pl       | 3846 ++++++++++++++++++++++++
+>  arch/powerpc/crypto/ghashp8-ppc.pl     |  370 +++
+>  arch/powerpc/crypto/p10-aes-gcm-glue.c |  345 +++
+>  arch/powerpc/crypto/p10_aes_gcm.S      | 1519 ++++++++++
+>  arch/powerpc/crypto/ppc-xlate.pl       |  229 ++
+>  7 files changed, 6330 insertions(+)
+>  create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
+>  create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
+>  create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
+>  create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
+>  create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
 
-Technically that min_t() is incorrect.
-miter.length is size_t (unsigned long on 64bit) and nbytes unsigned int.
-Any cast needs to force the smaller type to the larger one.
-(Clearly here the domain of the values is probably than 4G - but that isn't
-the point. There must be some places where the sg length needs to
-be size_t because 32 bits isn't enough.)
+I can't build this, it fails with
 
-In reality min() is being completely over-zealous in its checking and
-should allow comparisons where the signed-ness of the two values matches.
-Search for the patch I posted before xmas.
+  LD [M]  arch/powerpc/crypto/p10-aes-gcm-crypto.o
+powerpc64le-linux-gnu-ld: arch/powerpc/crypto/p10_aes_gcm.o: ABI version 2 is not compatible with ABI version 1 output
+powerpc64le-linux-gnu-ld: failed to merge target specific data of file arch/powerpc/crypto/p10_aes_gcm.o
 
-	David
-
-
-> +		nbytes -= len;
-> 
->  		for (x = 0; x < len; x++) {
->  			a <<= 8;
-> --
-> 2.25.1
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
