@@ -2,99 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F02EC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 22:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA4EC10F1B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Dec 2022 22:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbiL3WBK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Dec 2022 17:01:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46356 "EHLO
+        id S235445AbiL3WSw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Dec 2022 17:18:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231174AbiL3WBI (ORCPT
+        with ESMTP id S229519AbiL3WSu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Dec 2022 17:01:08 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70BD19C37
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 14:01:06 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id fy4so23623891pjb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 14:01:06 -0800 (PST)
+        Fri, 30 Dec 2022 17:18:50 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A261D0D9
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 14:18:48 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id x26so8969124pfq.10
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Dec 2022 14:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DQYLGAH0uGXo3xlMz5nVls5ASt4VNqU9CWQhF48EYvw=;
-        b=jOFraJc2+le2FfTl9+hl81vOAbgJL9wX3Ldrv9YY+Gu/AxmtD+bQtclTHwnTGgH27A
-         BVgmvTTbPItZ5UYgTIKhy5tzqyLIBe5JtpltE5LFgZr8kwMR28Mj8I8kEcPJC/vvtnLb
-         ohnaHo1wEWqxF/beEMnmqoUoVT8oHOP73zM6s1VE/TUIYTqbG5k/Vn7cJIJC3jmdG5M+
-         IQP4ojENssjjADyCnE40YNMpAIZQVU+6IGsNiZVKUVyv3nOsgB+u3UUg7okJzREaaB6s
-         uYmVb5ffLAbJl/HtlLZj7TCY+kTUVU9+SEK+5gmpEznsAaSXXeA7hDJhlsEbSkbGVdD4
-         4xcQ==
+        bh=i2Eiv94gXUiZTv5jAScVh7PDfObsExkg3yzW4Xpf6ec=;
+        b=fNbGZ4QS1HISSASq84ExMqyKXBgayNGI3wh9FOogNgn/9U4PUJa6k3MDw4iJDpXDVw
+         g33v+aBkLjcDNP/0V7iywo0w0E47ArN7b3gQ/yic61BeaRtixcmGCjhk//+k+3KMaqQh
+         4/wwEkgdUgbmwoF9QKdQFSjS21IH00hHfftRf6FLMNqBOhhsEGlUIFrk1K2rFoPEDFh0
+         5Fi5ZvJmHMgM5y7KanqjryE2NtPrfMAn1zVI5ye17I9mj5mBBuzlOJai3YxoCtIKg4N1
+         kTe940rRMu4WeEvQ9vbYxbDd37jjZSp8mN+2Em0iy7ZjOV4VmRj8eyJA6k8BcBa0FRri
+         PoSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DQYLGAH0uGXo3xlMz5nVls5ASt4VNqU9CWQhF48EYvw=;
-        b=DkWTJoR/dc6CIHb6Vlh6hy02R+bOk60AaA313Tbv9bCjfs0ehAdPBAmNchGhZTipAv
-         9U6DCZS62EqRqH7PBnr1jWnGtaZAzwrvnCZdQ4cGvDzIpmfEBnKn5x7f2G3xhkZ/T9yW
-         PSFv9h1N2uIhpEBbGcm13Cfq1r9/tt4Wy+wql/hL2JPaOgJWJnWE92h8Dqg790jdwhCF
-         YFzpqeXq3PISQzR+YIG2y2kewvJ63smsDUK3eLdTnCuOTAsU0yDBsBP6M+p4o5M7S7Mm
-         WUgBvUAQNnTvVFv7QgnRfHm8+5PNM7BuFhCGglQDHVD1OHu7tsvJIZVtnP8nUwn8zcv+
-         tMOA==
-X-Gm-Message-State: AFqh2koAoXi9oOYhKh0A71m7ReYimnvorkOSV5CUA4cO9Sg++MkBEHTT
-        hsA4JWYVFfbFpNhLPsU3nQDpQg==
-X-Google-Smtp-Source: AMrXdXv4oXVZT5rM0N5imJkkR+zQ6Brwur97rGFFx35dL6Lhe4dDs6060zOcH2NrU1vXy9LrW/DdbQ==
-X-Received: by 2002:a17:902:d4d1:b0:189:3a04:4466 with SMTP id o17-20020a170902d4d100b001893a044466mr3420177plg.2.1672437666185;
-        Fri, 30 Dec 2022 14:01:06 -0800 (PST)
+        bh=i2Eiv94gXUiZTv5jAScVh7PDfObsExkg3yzW4Xpf6ec=;
+        b=Ig3JoVr8PeUi7Sp6uXlLTOmF3O/tW1HMpTcA6kn7emrh44mZMf05zw3w3l2qPapmOL
+         dSIKUbLYAzwxofcEIe41e/idyPAFt8+61h+DROZaVC7kKHhYUWrizpc0RyCoTeI4XV4/
+         fW3luBluigssnbQfs3AWtq8aXEMxuLjAlq+QcTcXfH0yjpQ4aiDXENLWJTJ4UejVBlyI
+         3I1RgxL5on/PhCL8Ik+q4xCWFIabT7zi4QKTQAUSQoZ9RODHyYTK5qlfReaFzIcxfPBR
+         vmwAucJHXYhlL3S2B1IAdmcb2cx4aEAaOCCX3zj00742yf+RchF99P3LDMWbBcxPOAaa
+         N+Uw==
+X-Gm-Message-State: AFqh2ko1fOeH5/de28s0mQEQQNxTh3xUzxn+fOLptqfXzB8HKtMx+h1P
+        QmlAcxlsTT58h4/qgxMWeZn0ug==
+X-Google-Smtp-Source: AMrXdXvtcuEKwIXXtSk8m7o7D45t2sYdbzWBSy8axpB+FNv1xERaZ/adkxA59s+qLBTh0RBwQhKK6Q==
+X-Received: by 2002:aa7:8084:0:b0:574:8995:c0d0 with SMTP id v4-20020aa78084000000b005748995c0d0mr2652914pff.1.1672438727649;
+        Fri, 30 Dec 2022 14:18:47 -0800 (PST)
 Received: from [2620:15c:29:203:8954:8b68:67ce:a964] ([2620:15c:29:203:8954:8b68:67ce:a964])
-        by smtp.gmail.com with ESMTPSA id g19-20020a635213000000b0044ed37dbca8sm9241470pgb.2.2022.12.30.14.01.05
+        by smtp.gmail.com with ESMTPSA id c21-20020a621c15000000b00581498190efsm8267889pfc.161.2022.12.30.14.18.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Dec 2022 14:01:05 -0800 (PST)
-Date:   Fri, 30 Dec 2022 14:01:04 -0800 (PST)
+        Fri, 30 Dec 2022 14:18:46 -0800 (PST)
+Date:   Fri, 30 Dec 2022 14:18:46 -0800 (PST)
 From:   David Rientjes <rientjes@google.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
-        stable@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>,
-        "Thomas . Lendacky" <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Limit memory allocation in SEV_GET_ID2
- ioctl
-In-Reply-To: <Y6wDJd3hfztLoCp1@gondor.apana.org.au>
-Message-ID: <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
-References: <20221214202046.719598-1-pgonda@google.com> <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au> <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com> <Y6wDJd3hfztLoCp1@gondor.apana.org.au>
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        John Allen <john.allen@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [patch] crypto: ccp - Avoid page allocation failure warning for
+ SEV_GET_ID2
+In-Reply-To: <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
+Message-ID: <833b4dd0-7f85-b336-0786-965f3f573f74@google.com>
+References: <20221214202046.719598-1-pgonda@google.com> <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au> <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com> <Y6wDJd3hfztLoCp1@gondor.apana.org.au> <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 28 Dec 2022, Herbert Xu wrote:
+For SEV_GET_ID2, the user provided length does not have a specified 
+limitation because the length of the ID may change in the future.  The 
+kernel memory allocation, however, is implicitly limited to 4MB on x86 by 
+the page allocator, otherwise the kzalloc() will fail.
 
-> On Tue, Dec 27, 2022 at 05:42:31PM -0800, David Rientjes wrote:
-> >
-> > The goal was to be more explicit about that, but setting __GFP_NOWARN 
-> > would result in the same functional behavior.  If we're to go that route, 
-> > it would likely be best to add a comment about the limitation.
-> > 
-> > That said, if AMD would prefer this to be an EINVAL instead of a ENOMEM by 
-> > introducing a more formal limitation on the length that can be used, that 
-> > would be preferred so that we don't need to rely on the page allocator's 
-> > max length to enforce this arbitrarily.
-> 
-> Ideally the limit should be set according to the object that
-> you're trying to allocate.  But if that is truly unlimited,
-> and you don't want to see a warning, then GFP_NOWARN seems to
-> fit the bill.
-> 
+When this happens, it is best not to spam the kernel log with the warning.  
+Simply fail the allocation and return ENOMEM to the user.
 
-AMD would be able to speak authoritatively on it, but I think the length 
-of the ID isn't to be assumed by software because it will likely change 
-later.
+Fixes: d6112ea0cb34 ("crypto: ccp - introduce SEV_GET_ID2 command")
+Reported-by: Andy Nguyen <theflow@google.com>
+Reported-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: David Rientjes <rientjes@google.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-I don't think there's an active vulnerability with the currnet code so we 
-can likely drop stable@vger.kernel.org for this.  The kzalloc() will fail 
-if you try to allocate over 2MB.  If you try to allocate >32KB, the page 
-allocator will attempt to reclaim but won't oom kill.  If you try to 
-allocate <=32KB, there's the potential for oom kill if nothing is 
-reclaimable, but if memory is that scarce I think we have bigger problems.
-
-So __GFP_NOWARN will work, but I also think it's subtle enough that it 
-warrants being coupled with a comment.
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -881,7 +881,14 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 	input_address = (void __user *)input.address;
+ 
+ 	if (input.address && input.length) {
+-		id_blob = kzalloc(input.length, GFP_KERNEL);
++		/*
++		 * The length of the ID shouldn't be assumed by software since
++		 * it may change in the future.  The allocation size is limited
++		 * to 1 << (PAGE_SHIFT + MAX_ORDER - 1) by the page allocator.
++		 * If the allocation fails, simply return ENOMEM rather than
++		 * warning in the kernel log.
++		 */
++		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
+ 		if (!id_blob)
+ 			return -ENOMEM;
+ 
