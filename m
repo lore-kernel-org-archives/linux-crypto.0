@@ -2,91 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7C3C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 16:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00665C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 22:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbiLaQov (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Dec 2022 11:44:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
+        id S235853AbiLaWCJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Dec 2022 17:02:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiLaQou (ORCPT
+        with ESMTP id S232169AbiLaWB5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Dec 2022 11:44:50 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354E165AC
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2022 08:44:49 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-7-Ol7Icuy6OlKckfPU2enxww-1; Sat, 31 Dec 2022 16:44:46 +0000
-X-MC-Unique: Ol7Icuy6OlKckfPU2enxww-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Sat, 31 Dec
- 2022 16:44:45 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Sat, 31 Dec 2022 16:44:45 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        =?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= 
-        <u.kleine-koenig@pengutronix.de>
-CC:     Anders Roxell <anders.roxell@linaro.org>,
-        Kees Cook <keescook@chromium.org>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        "kernel test robot" <lkp@intel.com>
-Subject: RE: [PATCH] crypto: caam - Avoid GCC memset bug warning
-Thread-Topic: [PATCH] crypto: caam - Avoid GCC memset bug warning
-Thread-Index: AQHZGye3tmYlgJJWpEm0756mILvCfK6INU/Q
-Date:   Sat, 31 Dec 2022 16:44:45 +0000
-Message-ID: <f3e9add2210a46af99cf0fc79121c7db@AcuMS.aculab.com>
-References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
- <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
- <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
- <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
- <20221228113035.ups6echnsmo4flnz@pengutronix.de>
- <Y6zx9H7pZZ6VTzUd@gondor.apana.org.au>
-In-Reply-To: <Y6zx9H7pZZ6VTzUd@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sat, 31 Dec 2022 17:01:57 -0500
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C7264C6;
+        Sat, 31 Dec 2022 14:01:53 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id 20D4F5C00AF;
+        Sat, 31 Dec 2022 17:01:52 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Sat, 31 Dec 2022 17:01:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
+        cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1672524112; x=1672610512; bh=Of
+        0xMXPiylA4jEfEw42JIYQDYz/9F74OJjr6iVQvau4=; b=ZtVwNinm/RpM0BF/8n
+        PJsJKk0KygymBCIAtE3iFPJgywtNXNjJHhXRmg2JPeUpEQUlHn2MGHyOYURQdEDz
+        qC7f20sSNOczGEi0szqVyko9sKEw8IXB7Da5HSJC2iCvBdbZzm2qobf/y8QM8Dge
+        8EVfYoqn28YJ8HkEtuIKvaPX7TXQBHcf9E+uY67NZk/4Dv4y3g5H+v0BKh8CyWJf
+        uDAwFpO+XTi+5rpxtoSv5ka7qg0VESI5FqLH/ljKqtdrtiQ0Dv/k2hPVRfQOUrD+
+        747ghfg/q89gUP5a0xKVxVjqL/CEdgd59goHus+aH7G8U6W2xhIDYoeq/+O3+h2T
+        MBDA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1672524112; x=1672610512; bh=Of0xMXPiylA4j
+        EfEw42JIYQDYz/9F74OJjr6iVQvau4=; b=OwHK5qO2/4aDZGB5DGZ/hUW7iIeNu
+        RtZV5v/8WuTM+DRux4vF1WzAs2Lsg2+dqHQXo3Egd8vlSicV6k8xE5dTTveBecY/
+        xAfGfWvG02dPvxhZ5+B5l59J+Cs7waj4GCYAFlvTAwekKnumOGd3b2Whn7EiOtNN
+        64HXNlvklQ+vvBr6QiPiGIPJUjeahO1G2wenG2JBhvkyfROXKWdyf/NG2HfWgHoE
+        KbLfubEzbHYBINk7cDcU9n8Qe2jy2n/nahB19neL5c+gmvf9XCVb6hamqjvimtm8
+        QuHvWcIP0P9ABaiQ46tumgR3jeYEG8zSZj5He7vLdyyZXN17mOCHgnq+g==
+X-ME-Sender: <xms:T7GwYzB1Rg8xL_sl_VbihINQ2TubtreQHmZ8My0MBoscDJUgZEcU0A>
+    <xme:T7GwY5ghf74rrxuSMHU7XqTTrWoYp_6PJbFUvt02MQNRzyFXWmwZ0SMc0UzvN6qHs
+    oRXGHS8IzSLTZE-eQ>
+X-ME-Received: <xmr:T7GwY-k10BMt7a-shmDDSnQvIyb4HVD5dCqbKcfvg3IfPR-PYWw84pIFJgWM9tKoU06AQ-ZybdQun4ZfKoFAcyjceuveQN7V8vGbvTpOQSwo6svZwfHQE3b900WScr4K2gRKqA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrieekgdduheehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrmhhu
+    vghlucfjohhllhgrnhguuceoshgrmhhuvghlsehshhholhhlrghnugdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepudekteeuudehtdelteevgfduvddvjefhfedulefgudevgeeghefg
+    udefiedtveetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homhepshgrmhhuvghlsehshhholhhlrghnugdrohhrgh
+X-ME-Proxy: <xmx:ULGwY1y2xYVyqhRfrpWaB8QXB6YMR0XVv2daCa8Um0xl2Tk6FnPb7A>
+    <xmx:ULGwY4QRGbj-wZhVYzaONRqkcdTwzMCV9QNZVdkl8HqbkJjCwva8kw>
+    <xmx:ULGwY4ap_waPZDn8ytvxG5Mf8NJIhA7tvAqy-E-VdH1apWdfFpkR7A>
+    <xmx:ULGwYxAamVEpoRXdVh6rpqbWNtg5Q8tQQD2DRrTCxwq0leGQQh7khg>
+Feedback-ID: i0ad843c9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 31 Dec 2022 17:01:51 -0500 (EST)
+From:   Samuel Holland <samuel@sholland.org>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     Samuel Holland <samuel@sholland.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
+Subject: [PATCH v2 2/3] crypto: sun8i-ce - Add TRNG clock to the D1 variant
+Date:   Sat, 31 Dec 2022 16:01:44 -0600
+Message-Id: <20221231220146.646-3-samuel@sholland.org>
+X-Mailer: git-send-email 2.37.4
+In-Reply-To: <20221231220146.646-1-samuel@sholland.org>
+References: <20221231220146.646-1-samuel@sholland.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogSGVyYmVydCBYdQ0KPiBTZW50OiAyOSBEZWNlbWJlciAyMDIyIDAxOjQ5DQo+IA0KPiBP
-biBXZWQsIERlYyAyOCwgMjAyMiBhdCAxMjozMDozNVBNICswMTAwLCBVd2UgS2xlaW5lLUvDg8K2
-bmlnIHdyb3RlOg0KPiA+DQo+ID4gPiAtCWlmIChsZW4pIC8qIGF2b2lkIHNwYXJzZSB3YXJuaW5n
-OiBtZW1jcHkgd2l0aCBieXRlIGNvdW50IG9mIDAgKi8NCj4gPiA+ICsJLyogQXZvaWQgZ2NjIHdh
-cm5pbmc6IG1lbWNweSB3aXRoIGRhdGEgPT0gTlVMTCAqLw0KPiA+ID4gKwlpZiAoIUlTX0VOQUJM
-RUQoQ09ORklHX0NSWVBUT19ERVZfRlNMX0NBQU1fREVCVUcpIHx8IGRhdGEpDQo+ID4NCj4gPiBJ
-IGp1c3QgdHJpZWQ6IEZvciBtZSBhIHBsYWluDQo+ID4NCj4gPiAJaWYgKGRhdGEpDQo+ID4NCj4g
-PiBpcyBhbHNvIGVub3VnaCB0byBtYWtlIGJvdGggZ2NjIGFuZCBzcGFyc2UgaGFwcHkuDQo+IA0K
-PiBPZiBjb3Vyc2UgaXQgaXMuICBUaGUgcG9pbnQgb2YgdGhlIGV4dHJhIGNvbmRpdGlvbiBpcyB0
-byByZW1vdmUNCj4gdGhlIHVubmVjZXNzYXJ5IGNoZWNrIG9uIGRhdGEgdW5sZXNzIHdlIGFyZSBp
-biBkZWJ1Z2dpbmcgbW9kZQ0KPiAoYXMgaXQgaXMgb25seSBuZWVkZWQgaW4gZGVidWdnaW5nIG1v
-ZGUgdG8gd29yayBhcm91bmQgdGhlIGJ1Z2d5DQo+IGNvbXBpbGVyKS4NCg0KSUlSQyB0aGUgJ3By
-b2JsZW1hdGljJyBjYXNlIGlzIG9uZSB3aGVyZSAnbGVuJyBhbmQgJ2RhdGEnDQphcmUgYWN0dWFs
-bHkgY29tcGlsZS10aW1lIHplcm9zIC0gaW4gd2hpY2ggY2FzZSB5b3UgZG9uJ3QNCndhbnQgdG8g
-Y2FsbCBtZW1jcHkoKSBhdCBhbGwuDQpJbiBhbGwgb3RoZXIgY2FzZXMgSSB0aGluayB0aGVyZSBp
-cyBzb21ldGhpbmcgdG8gY29weSBzbyB5b3UNCmRvbid0IHJlYWxseSB3YW50IHRoZSBjaGVjayAo
-b3IgdGhlIG9uZSBpbiBtZW1jcHkoKSB3aWxsIGRvKS4NCg0KV2hldGhlciAoYnVpbHRpbl9jb25z
-dGFudF9wKGRhdGEpICYmICFkYXRhKSBpcyBnb29kIGVub3VnaCBpcw0KYW5vdGhlciBtYXR0ZXIu
-DQpJdCBtaWdodCBuZWVkIHRoZSAoc2l6ZW9mICooMSA/ICh2b2lkICopKGRhdGEpIDogKGludCAq
-KTApID09IDEpDQp0ZXN0Lg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2Vz
-aWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVL
-DQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+At least the D1 variant requires a separate clock for the TRNG.
+Without this clock enabled, reading from /dev/hwrng reports:
+
+   sun8i-ce 3040000.crypto: DMA timeout for TRNG (tm=96) on flow 3
+
+Experimentation shows that the necessary clock is the SoC's internal
+RC oscillator. This makes sense, as noise from the oscillator can be
+used as a source of entropy.
+
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
+
+Changes in v2:
+ - New patch for v2
+
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 1 +
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 9f6594699835..a6865ff4d400 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -118,6 +118,7 @@ static const struct ce_variant ce_d1_variant = {
+ 		{ "bus", 0, 200000000 },
+ 		{ "mod", 300000000, 0 },
+ 		{ "ram", 0, 400000000 },
++		{ "trng", 0, 0 },
+ 		},
+ 	.esr = ESR_D1,
+ 	.prng = CE_ALG_PRNG,
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 8177aaba4434..27029fb77e29 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -105,7 +105,7 @@
+ 
+ #define MAX_SG 8
+ 
+-#define CE_MAX_CLOCKS 3
++#define CE_MAX_CLOCKS 4
+ 
+ #define MAXFLOW 4
+ 
+-- 
+2.37.4
 
