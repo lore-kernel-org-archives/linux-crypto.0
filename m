@@ -2,99 +2,199 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8142FC46467
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 13:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CD7C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 14:28:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235655AbiLaNXY convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Dec 2022 08:23:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50376 "EHLO
+        id S232113AbiLaO2A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Dec 2022 09:28:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbiLaNXX (ORCPT
+        with ESMTP id S235676AbiLaO17 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Dec 2022 08:23:23 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB5EBB4B6
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2022 05:23:21 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-54-12njZMflPrOHOWWm3UOPXQ-1; Sat, 31 Dec 2022 13:23:15 +0000
-X-MC-Unique: 12njZMflPrOHOWWm3UOPXQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Sat, 31 Dec
- 2022 13:23:14 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.044; Sat, 31 Dec 2022 13:23:14 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Herbert Xu' <herbert@gondor.apana.org.au>
-CC:     'Roberto Sassu' <roberto.sassu@huaweicloud.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
-Thread-Topic: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
-Thread-Index: AQHZGf+Li10Ctze9/ky4tLizwqJmjK6Gb6hQgAAmKQCAAWpJUA==
-Date:   Sat, 31 Dec 2022 13:23:14 +0000
-Message-ID: <0d5fda5b25b8467c860d625116dac1d2@AcuMS.aculab.com>
-References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
- <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
- <6949ced7c1014488b2d00ff26eba6b6b@AcuMS.aculab.com>
- <Y68GMsGKROsgDbcs@gondor.apana.org.au>
-In-Reply-To: <Y68GMsGKROsgDbcs@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sat, 31 Dec 2022 09:27:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A979BB865;
+        Sat, 31 Dec 2022 06:27:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A0CE660BF9;
+        Sat, 31 Dec 2022 14:27:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CDD8C433D2;
+        Sat, 31 Dec 2022 14:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672496877;
+        bh=jX7t/7pWcgT0+yoR/7ahq3q/+SsZWh0IKJ3T0K1gAaU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=npo5BGMbKb2iENgI/mq5/492rR3lvpwpX46SHkGAGkLCj2oo/g/g8koZBQElf5HUb
+         DM1T8IprgnU65huNHLN53qWQwpD8SYZa9sEsu+zrmecuaLxQhA4Crvxymr/QfB4c/y
+         jbsd8z33wq+/FJ+3+ttiWyZOvf5mZN8h9iz6/uWld8CMJDoEeN7SVDsK0EWbvVgFC5
+         cUyxpq+VOcxLQHhEBdauqxcji25RZpmYX3fQNqG77qY7MC0Bmm8Tq/wS4xqMKBMc3g
+         c98IZi5Z+arYBjHg7D1iNwSzqBQucVfUba3Gnpb1WtKIFSvqBsH5bshIuDV2JItIcW
+         T9f8LoNJMpeYQ==
+Date:   Sat, 31 Dec 2022 14:27:54 +0000
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Pavan Kumar Paluri <papaluri@amd.com>
+Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
+Message-ID: <Y7BG6pSuoZsBQYrx@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-38-michael.roth@amd.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/mixed; boundary="IsE/bX3OQifH/VY6"
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-38-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Herbert Xu
-> Sent: 30 December 2022 15:40
-> 
-> On Fri, Dec 30, 2022 at 01:35:07PM +0000, David Laight wrote:
-> >
-> > miter.length is size_t (unsigned long on 64bit) and nbytes unsigned int.
-> 
-> miter.length is bounded by sg->length which is unsigned int.
 
-I did say 'technically' :-)
+--IsE/bX3OQifH/VY6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Should there be a sg_miter_stop() before the return at the bottom?
-Care seems to have been taken to add one before an earlier error return.
-(The logic in that function is very strange...)
+On Wed, Dec 14, 2022 at 01:40:29PM -0600, Michael Roth wrote:
+>  static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -260,13 +279,23 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  		return ret;
+>  
+>  	sev->active = true;
+> -	sev->es_active = argp->id == KVM_SEV_ES_INIT;
+> +	sev->es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+> +	sev->snp_active = argp->id == KVM_SEV_SNP_INIT;
+>  	asid = sev_asid_new(sev);
+>  	if (asid < 0)
+>  		goto e_no_asid;
+>  	sev->asid = asid;
+>  
+> -	ret = sev_platform_init(&argp->error);
+> +	if (sev->snp_active) {
+> +		ret = verify_snp_init_flags(kvm, argp);
+> +		if (ret)
+> +			goto e_free;
+> +
+> +		ret = sev_snp_init(&argp->error, false);
+> +	} else {
+> +		ret = sev_platform_init(&argp->error);
+> +	}
 
-Indeed other parts of the file are equally strange.
-The big multi-line if-else in twocompl() is just:
-	p[i] = (p[1] ^ 0xff) + 1;
-or even:
-	p[i] = -p[i];
-That function could also return the 'zero status' to correct
-for -0 (rather than the extra check earlier in the caller).
+Couldn't sev_snp_init() and sev_platform_init() be called unconditionally
+in order?
 
-	David
+Since there is a hardware constraint that SNP init needs to always happen
+before platform init, shouldn't SNP init happen as part of
+__sev_platform_init_locked() instead?
 
+I found these call sites for __sev_platform_init_locked(), none of which
+follow the correct call order:
+
+* sev_guest_init()
+* sev_ioctl_do_pek_csr
+* sev_ioctl_do_pdh_export()
+* sev_ioctl_do_pek_import()
+* sev_ioctl_do_pek_pdh_gen()
+* sev_pci_init()
+
+For me it looks like a bit flakky API use to have sev_snp_init() as an API
+call.
+
+I would suggest to make SNP init internal to the ccp driver and take care
+of the correct orchestration over there.
+
+Also, how it currently works in this patch set, if the firmware did not
+load correctly, SNP init halts the whole system. The version check needs
+to be in all call paths.
+
+BR, Jarkko
+
+--IsE/bX3OQifH/VY6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-crypto-ccp-Prevent-a-spurious-SEV_CMD_SNP_INIT-trigg.patch"
+
+From c189db485a4162f401f351d2b1842c7f66f17ae6 Mon Sep 17 00:00:00 2001
+From: Jarkko Sakkinen <jarkko@profian.com>
+Date: Sun, 4 Dec 2022 06:17:07 +0000
+Subject: [PATCH] crypto: ccp: Prevent a spurious SEV_CMD_SNP_INIT triggered by
+ sev_guest_init()
+
+Move the firmware version check from sev_pci_init() to sev_snp_init().
+
+Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 6c4fdcaed72b..462c9aaa2e7e 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1381,6 +1381,12 @@ static int __sev_snp_init_locked(int *error)
+ 	if (sev->snp_initialized)
+ 		return 0;
+ 
++	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
++		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
++			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
++		return -ENODEV;
++	}
++
+ 	/*
+ 	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
+ 	 * across all cores.
+@@ -2313,25 +2319,19 @@ void sev_pci_init(void)
+ 		}
+ 	}
+ 
++	rc = sev_snp_init(&error, true);
++	if (rc != -ENODEV)
++		/*
++		 * Don't abort the probe if SNP INIT failed,
++		 * continue to initialize the legacy SEV firmware.
++		 */
++		dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
++
+ 	/*
+ 	 * If boot CPU supports SNP, then first attempt to initialize
+ 	 * the SNP firmware.
+ 	 */
+ 	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+-		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+-			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+-				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+-		} else {
+-			rc = sev_snp_init(&error, true);
+-			if (rc) {
+-				/*
+-				 * Don't abort the probe if SNP INIT failed,
+-				 * continue to initialize the legacy SEV firmware.
+-				 */
+-				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+-			}
+-		}
 -
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+ 		/*
+ 		 * Allocate the intermediate buffers used for the legacy command handling.
+ 		 */
+-- 
+2.38.1
 
+
+--IsE/bX3OQifH/VY6--
