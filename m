@@ -2,66 +2,66 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00665C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 22:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 948F1C53210
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 22:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235853AbiLaWCJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Dec 2022 17:02:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51924 "EHLO
+        id S232233AbiLaWCK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Dec 2022 17:02:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232169AbiLaWB5 (ORCPT
+        with ESMTP id S229823AbiLaWB5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 31 Dec 2022 17:01:57 -0500
 Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C7264C6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927B55F84;
         Sat, 31 Dec 2022 14:01:53 -0800 (PST)
 Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 20D4F5C00AF;
-        Sat, 31 Dec 2022 17:01:52 -0500 (EST)
+        by mailout.nyi.internal (Postfix) with ESMTP id 7B5BA5C00AB;
+        Sat, 31 Dec 2022 17:01:49 -0500 (EST)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Sat, 31 Dec 2022 17:01:52 -0500
+  by compute5.internal (MEProxy); Sat, 31 Dec 2022 17:01:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
         cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1672524112; x=1672610512; bh=Of
-        0xMXPiylA4jEfEw42JIYQDYz/9F74OJjr6iVQvau4=; b=ZtVwNinm/RpM0BF/8n
-        PJsJKk0KygymBCIAtE3iFPJgywtNXNjJHhXRmg2JPeUpEQUlHn2MGHyOYURQdEDz
-        qC7f20sSNOczGEi0szqVyko9sKEw8IXB7Da5HSJC2iCvBdbZzm2qobf/y8QM8Dge
-        8EVfYoqn28YJ8HkEtuIKvaPX7TXQBHcf9E+uY67NZk/4Dv4y3g5H+v0BKh8CyWJf
-        uDAwFpO+XTi+5rpxtoSv5ka7qg0VESI5FqLH/ljKqtdrtiQ0Dv/k2hPVRfQOUrD+
-        747ghfg/q89gUP5a0xKVxVjqL/CEdgd59goHus+aH7G8U6W2xhIDYoeq/+O3+h2T
-        MBDA==
+        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
+         s=fm3; t=1672524109; x=1672610509; bh=uEGwd78iouIBfqIK3t/RRS7S+
+        +4GQDRNvKIt4E61Pgc=; b=T7zIRNB7y343XX5YH2dmlezUMp+hc2shyHwqMfd6S
+        1lRhKykBUE5ynNXNfY5JEe56s6/drHw+pGSUWkE30nl/ZE7BjxuTi5voaPkt70CJ
+        ytfzZVNPmpj8xqNPeUrAjULzx5LYcCaT9cheOg9D9dRMRjb7aHF6rHFSxiVIJ4uO
+        PcRgBeEwpo4KeKwZyM1KWq7cRPAt5KxcPw8WkILDzgbEss7HBo++dng4FFxEgBiH
+        2UBozlU6oBiaCg0r4gk57NeugKJh39z5y2IOMZCF9saG6WRfLCLNpmCMorA5G4tj
+        re2w/xl9lN8pfGajmfyomJtp9GpbsWu3Ksqgr/vMKTCNQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1672524112; x=1672610512; bh=Of0xMXPiylA4j
-        EfEw42JIYQDYz/9F74OJjr6iVQvau4=; b=OwHK5qO2/4aDZGB5DGZ/hUW7iIeNu
-        RtZV5v/8WuTM+DRux4vF1WzAs2Lsg2+dqHQXo3Egd8vlSicV6k8xE5dTTveBecY/
-        xAfGfWvG02dPvxhZ5+B5l59J+Cs7waj4GCYAFlvTAwekKnumOGd3b2Whn7EiOtNN
-        64HXNlvklQ+vvBr6QiPiGIPJUjeahO1G2wenG2JBhvkyfROXKWdyf/NG2HfWgHoE
-        KbLfubEzbHYBINk7cDcU9n8Qe2jy2n/nahB19neL5c+gmvf9XCVb6hamqjvimtm8
-        QuHvWcIP0P9ABaiQ46tumgR3jeYEG8zSZj5He7vLdyyZXN17mOCHgnq+g==
-X-ME-Sender: <xms:T7GwYzB1Rg8xL_sl_VbihINQ2TubtreQHmZ8My0MBoscDJUgZEcU0A>
-    <xme:T7GwY5ghf74rrxuSMHU7XqTTrWoYp_6PJbFUvt02MQNRzyFXWmwZ0SMc0UzvN6qHs
-    oRXGHS8IzSLTZE-eQ>
-X-ME-Received: <xmr:T7GwY-k10BMt7a-shmDDSnQvIyb4HVD5dCqbKcfvg3IfPR-PYWw84pIFJgWM9tKoU06AQ-ZybdQun4ZfKoFAcyjceuveQN7V8vGbvTpOQSwo6svZwfHQE3b900WScr4K2gRKqA>
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+        1672524109; x=1672610509; bh=uEGwd78iouIBfqIK3t/RRS7S++4GQDRNvKI
+        t4E61Pgc=; b=G7lOHcQgKBoGMWpvwy6cOD6JEJzXzdc26/du93Hn6fwYmzDaDlr
+        QPjwWVFCfcp8vmAiEjaOzQzVEms/AVZKoHZMM9q4sTRBQ3LaFHgQBdj/9CumLqdK
+        uYkPcmFH1xVWJygQww7+4smC3sAohtXsoVjhj0HPo0G4G+ti88CXmWNV72OIq3bq
+        er2bcNVxlWhNbGiwvclg0eD/rZItnLeqlk0A5nQ4Lozr5apJjgzLaf94cKhbQuZZ
+        pLyKfNMHofkpryOUCxQt97KxY8wg8cmkvZr/X+RmhEJCrQQZIqILYFYDNzKOhRvb
+        fI/EUNWStiEPWV7unPNGqe/1ZbB1L6jALkg==
+X-ME-Sender: <xms:S7GwY6FQd6hZJEG4YIRcIq-0J7QcwvL0LZI70BYVYc3sxQ5CaG67yA>
+    <xme:S7GwY7UWoCcAeDdOarYJoHUhTzBufT8U8e9bojz6NlbeU6DrQDZ3kELA9yWsF_5sX
+    GXokwZPxn3ATtiNlw>
+X-ME-Received: <xmr:S7GwY0KhzI81Va4aLI6SCksAv4w2zCruZVNDjyS8wGmNIMaxrAtvTtE7KgRV9sLctzbxhNXDCDUtxg0Y3iGqdWyEwT5uH4I7CIPYKjetMZDxlmvcBf1_u_7pMwhDY75qamkWpA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrieekgdduheehucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrmhhu
-    vghlucfjohhllhgrnhguuceoshgrmhhuvghlsehshhholhhlrghnugdrohhrgheqnecugg
-    ftrfgrthhtvghrnhepudekteeuudehtdelteevgfduvddvjefhfedulefgudevgeeghefg
-    udefiedtveetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homhepshgrmhhuvghlsehshhholhhlrghnugdrohhrgh
-X-ME-Proxy: <xmx:ULGwY1y2xYVyqhRfrpWaB8QXB6YMR0XVv2daCa8Um0xl2Tk6FnPb7A>
-    <xmx:ULGwY4QRGbj-wZhVYzaONRqkcdTwzMCV9QNZVdkl8HqbkJjCwva8kw>
-    <xmx:ULGwY4ap_waPZDn8ytvxG5Mf8NJIhA7tvAqy-E-VdH1apWdfFpkR7A>
-    <xmx:ULGwYxAamVEpoRXdVh6rpqbWNtg5Q8tQQD2DRrTCxwq0leGQQh7khg>
+    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrmhhuvghl
+    ucfjohhllhgrnhguuceoshgrmhhuvghlsehshhholhhlrghnugdrohhrgheqnecuggftrf
+    grthhtvghrnhepkeehffethedtteffgfefteetjedvfeelueevudffgfeutdejvdehledv
+    vdffhfevnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsrghmuhgvlhesshhhohhllhgrnhgu
+    rdhorhhg
+X-ME-Proxy: <xmx:S7GwY0FhvTw1JxpLhzraacJm7Uby1ptVkwc_xqWU9fHGEpq9z-zbhw>
+    <xmx:S7GwYwWTMkRDvIzRhCJu-8q8ysKNwu74KYpBwJQrYIhJGIqbLazqiQ>
+    <xmx:S7GwY3OzIdkhZUpR--lWaCybgzz0u19jz3uHkb0XbYVgW8hzb72-mQ>
+    <xmx:TbGwY8mHggTyKBxh-0GO0wvPyIIv5VTAA1jdtcrZpLAzkGYZQShSQQ>
 Feedback-ID: i0ad843c9:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 31 Dec 2022 17:01:51 -0500 (EST)
+ 31 Dec 2022 17:01:46 -0500 (EST)
 From:   Samuel Holland <samuel@sholland.org>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -78,62 +78,39 @@ Cc:     Samuel Holland <samuel@sholland.org>,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
-Subject: [PATCH v2 2/3] crypto: sun8i-ce - Add TRNG clock to the D1 variant
-Date:   Sat, 31 Dec 2022 16:01:44 -0600
-Message-Id: <20221231220146.646-3-samuel@sholland.org>
+Subject: [PATCH v2 0/3] crypto: Allwinner D1 crypto support
+Date:   Sat, 31 Dec 2022 16:01:42 -0600
+Message-Id: <20221231220146.646-1-samuel@sholland.org>
 X-Mailer: git-send-email 2.37.4
-In-Reply-To: <20221231220146.646-1-samuel@sholland.org>
-References: <20221231220146.646-1-samuel@sholland.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-At least the D1 variant requires a separate clock for the TRNG.
-Without this clock enabled, reading from /dev/hwrng reports:
+This series finishes adding crypto support for the Allwinner D1 SoC. The
+driver patch from v1 was merged, but not the binding[1]. This turned out
+to be a good thing, because I later found that the TRNG needed another
+clock reference in the devicetree. That is fixed in v2. I include the DT
+update here too, since the SoC DT has been on the list for a while[2].
 
-   sun8i-ce 3040000.crypto: DMA timeout for TRNG (tm=96) on flow 3
-
-Experimentation shows that the necessary clock is the SoC's internal
-RC oscillator. This makes sense, as noise from the oscillator can be
-used as a source of entropy.
-
-Signed-off-by: Samuel Holland <samuel@sholland.org>
----
+[1]: https://lore.kernel.org/all/20211119051026.13049-1-samuel@sholland.org/T/
+[2]: https://lore.kernel.org/lkml/20221208090237.20572-1-samuel@sholland.org/
 
 Changes in v2:
- - New patch for v2
+ - Add TRNG clock
 
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 1 +
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Samuel Holland (3):
+  dt-bindings: crypto: sun8i-ce: Add compatible for D1
+  crypto: sun8i-ce - Add TRNG clock to the D1 variant
+  riscv: dts: allwinner: d1: Add crypto engine node
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 9f6594699835..a6865ff4d400 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -118,6 +118,7 @@ static const struct ce_variant ce_d1_variant = {
- 		{ "bus", 0, 200000000 },
- 		{ "mod", 300000000, 0 },
- 		{ "ram", 0, 400000000 },
-+		{ "trng", 0, 0 },
- 		},
- 	.esr = ESR_D1,
- 	.prng = CE_ALG_PRNG,
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 8177aaba4434..27029fb77e29 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -105,7 +105,7 @@
- 
- #define MAX_SG 8
- 
--#define CE_MAX_CLOCKS 3
-+#define CE_MAX_CLOCKS 4
- 
- #define MAXFLOW 4
- 
+ .../bindings/crypto/allwinner,sun8i-ce.yaml   | 33 ++++++++++++++-----
+ .../boot/dts/allwinner/sunxi-d1s-t113.dtsi    | 12 +++++++
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  1 +
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  2 +-
+ 4 files changed, 39 insertions(+), 9 deletions(-)
+
 -- 
 2.37.4
 
