@@ -2,136 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBA0C4167B
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 16:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7C3C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 16:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiLaQZi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Dec 2022 11:25:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54890 "EHLO
+        id S229684AbiLaQov (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 31 Dec 2022 11:44:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231585AbiLaQZf (ORCPT
+        with ESMTP id S229450AbiLaQou (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Dec 2022 11:25:35 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E255B631E
-        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2022 08:25:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-        t=1672503933; bh=qhP4xagevY2rvdNlq0yus5MslI8QTd0WduUXHJHOFhE=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=ktKgYRqDhg0SHr2W4iCxovReqh54Cotq/CnzD7LAhGGpdC8d6JEW5UTok6e3NgnBG
-         qIvEY8OHyHYU6gXaQ3hBm5MhHKychIpfOyr1Hd3hWvpP5XOTf1zRZ56WKubpFz5BBm
-         zt4AplJeB0LbcpjArHjoARfkNX71xrWCxCeeNdyRtJucq9+nf6DH02m1sJxItmt0To
-         4nyNOHRkB5nM9bgTLHHi5o8eASrrSNOjmMn/Bl9fmIJembg/gVtY7hIFEA23yACL6e
-         3qA11qdwvWENWK6S9ncCkI5easxl7GZzczmBU/yY6cLzd6sMmDjpBf+si2EXXAj+m9
-         XnuzyC0h2LIvQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from fedora.willemsstb.de ([94.31.82.22]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1N17YY-1oo30L0v4E-012VUb; Sat, 31
- Dec 2022 17:25:33 +0100
-From:   Markus Stockhausen <markus.stockhausen@gmx.de>
-To:     linux-crypto@vger.kernel.org
-Cc:     Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH v3 6/6] crypto/realtek: add devicetree documentation
-Date:   Sat, 31 Dec 2022 17:25:25 +0100
-Message-Id: <20221231162525.416709-7-markus.stockhausen@gmx.de>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221231162525.416709-1-markus.stockhausen@gmx.de>
-References: <20221231162525.416709-1-markus.stockhausen@gmx.de>
+        Sat, 31 Dec 2022 11:44:50 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354E165AC
+        for <linux-crypto@vger.kernel.org>; Sat, 31 Dec 2022 08:44:49 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-7-Ol7Icuy6OlKckfPU2enxww-1; Sat, 31 Dec 2022 16:44:46 +0000
+X-MC-Unique: Ol7Icuy6OlKckfPU2enxww-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Sat, 31 Dec
+ 2022 16:44:45 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.044; Sat, 31 Dec 2022 16:44:45 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        =?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= 
+        <u.kleine-koenig@pengutronix.de>
+CC:     Anders Roxell <anders.roxell@linaro.org>,
+        Kees Cook <keescook@chromium.org>,
+        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        "kernel test robot" <lkp@intel.com>
+Subject: RE: [PATCH] crypto: caam - Avoid GCC memset bug warning
+Thread-Topic: [PATCH] crypto: caam - Avoid GCC memset bug warning
+Thread-Index: AQHZGye3tmYlgJJWpEm0756mILvCfK6INU/Q
+Date:   Sat, 31 Dec 2022 16:44:45 +0000
+Message-ID: <f3e9add2210a46af99cf0fc79121c7db@AcuMS.aculab.com>
+References: <20221222162513.4021928-1-u.kleine-koenig@pengutronix.de>
+ <Y6VK4IJkHiawAbJz@gondor.apana.org.au>
+ <20221223174719.4n6pmwio4zycj2qm@pengutronix.de>
+ <Y6wCbyttJ+WVzmZX@gondor.apana.org.au>
+ <20221228113035.ups6echnsmo4flnz@pengutronix.de>
+ <Y6zx9H7pZZ6VTzUd@gondor.apana.org.au>
+In-Reply-To: <Y6zx9H7pZZ6VTzUd@gondor.apana.org.au>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ripQ/mr3RH131cOE+oDKcEk292k6IVc7I5tKt0s2AZo5cPuJkMO
- edWTGoUeFcfqelS3aF4FrQobkJ/VpOiqgdLy84uDrc7e2d1/J3StId0gd5LTZioWscnjKg9
- rpQ/D5iBs81eBCLTlEJLOEMI/9vQSamAqbAv+Vd98H1WRGSV9GpW1FSlZmFFsE9gimzYKl+
- N1vsukKsXZ0wgtnshdW4A==
-UI-OutboundReport: notjunk:1;M01:P0:U5b3XbdMwGI=;wRQXJQllBnCU2cS5ch94o15IXuU
- CschzKoauy6nR5lUJkdtmVzAo6EP0NNv9f0EzL4+HeN1z779hvfe3AHR/kOM3RTEljGo0aeog
- PF3jSnmaJ1B+swXvz1UQlvIIsWcmuQjTTESKKcXrB8gM6394zd3Wu2TZBjqaym/UM9IL5+XfZ
- sof6n6Wj6qRKTVzmOADWXwe08wkUy6NcbJHPCk8TejGAJoA6R+DXKQrXBYcNw1Kn4bZbKiZux
- P9hGHoZmfDyfCX9K0O54dPGlmmWtQIqFVWNC+UO83dnG3/CI58CcB7CNNbrb3iVMZSfLeIVM1
- EbaICCZsgX72Iq3N5Sr0RCunMFuzpkHa4O4IGNjtfWERQ9RYFqkZxr1XWarqK+vFqxPrinxgJ
- 2KVEWSsEE4gLsRf3zPmc7C3/1Cg7l8rvrBcVWZ/odlFWO9A8uEzRInOMwoP28IPAh7pJC2ur0
- dcM6lRwDMsfsRCdPEpYU0RHPBJXh4dKacZVnIERmzByfHNIeF8qrve7pKzKHkGmuzOM4RNIsO
- h/FgHlqI6DrTRD0Gc33LaVkB3aNJDS5tRGHb45XrIEQfTFVOLWSRMUBfTCoWIpCqGUys6LKwr
- 8kZAWv+SDkKCogR8CBp4+dc6ojnoQAK3FxOmLLUwucZzDRuv4IW5JZ5EG4e5XC3LcmyU6zO9A
- m3ivzMUj/MiiWTMiKeOjhYZKDBhesahYXdylfh+gXBfFM6BFmas4nMC99UqUFljwoWWLt7Po4
- I8+VZtERI5upp9ZRsLAYVoLaMgxPcB8JRjFeTWAAbIJO79t6RuTSMmQNNec2EapXSGGRCU8U+
- CjHYRenc2N5EkQePJbVT/gbzl3m1fwnjRXThrAV5MTsRP5XEMcBIA+a97ME2Y9GSnffqsBI0T
- f10GUSKTQOlu60hbDOsNJ41Ls8I/wufX446S40QFsQFI2P7770f3tiBKG6qdYGUV1hRZ2CuCe
- Su0YZA==
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add devicetree documentation of new Realtek crypto device.
-
-Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-=2D--
- .../crypto/realtek,realtek-crypto.yaml        | 51 +++++++++++++++++++
- 1 file changed, 51 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/realtek,realt=
-ek-crypto.yaml
-
-diff --git a/Documentation/devicetree/bindings/crypto/realtek,realtek-cryp=
-to.yaml b/Documentation/devicetree/bindings/crypto/realtek,realtek-crypto.=
-yaml
-new file mode 100644
-index 000000000000..443195e2d850
-=2D-- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/realtek,realtek-crypto.yaml
-@@ -0,0 +1,51 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/realtek,realtek-crypto.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Realtek crypto engine bindings
-+
-+maintainers:
-+  - Markus Stockhausen <markus.stockhausen@gmx.de>
-+
-+description: |
-+  The Realtek crypto engine provides hardware accelerated AES, SHA1 & MD5
-+  algorithms. It is included in SoCs of the RTL838x series, such as RTL83=
-80,
-+  RTL8381, RTL8382, as well as SoCs from the RTL930x series, such as RTL9=
-301,
-+  RTL9302 and RTL9303.
-+
-+properties:
-+  compatible:
-+    const: realtek,realtek-crypto
-+
-+  reg:
-+    minItems: 1
-+    maxItems: 1
-+
-+  interrupt-parent:
-+    minItems: 1
-+    maxItems: 1
-+
-+  interrupts:
-+    minItems: 1
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupt-parent
-+  - interrupts
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    crypto0: crypto@c000 {
-+      compatible =3D "realtek,realtek-crypto";
-+      reg =3D <0xc000 0x10>;
-+      interrupt-parent =3D <&intc>;
-+      interrupts =3D <22 3>;
-+    };
-+
-+...
-=2D-
-2.38.1
+RnJvbTogSGVyYmVydCBYdQ0KPiBTZW50OiAyOSBEZWNlbWJlciAyMDIyIDAxOjQ5DQo+IA0KPiBP
+biBXZWQsIERlYyAyOCwgMjAyMiBhdCAxMjozMDozNVBNICswMTAwLCBVd2UgS2xlaW5lLUvDg8K2
+bmlnIHdyb3RlOg0KPiA+DQo+ID4gPiAtCWlmIChsZW4pIC8qIGF2b2lkIHNwYXJzZSB3YXJuaW5n
+OiBtZW1jcHkgd2l0aCBieXRlIGNvdW50IG9mIDAgKi8NCj4gPiA+ICsJLyogQXZvaWQgZ2NjIHdh
+cm5pbmc6IG1lbWNweSB3aXRoIGRhdGEgPT0gTlVMTCAqLw0KPiA+ID4gKwlpZiAoIUlTX0VOQUJM
+RUQoQ09ORklHX0NSWVBUT19ERVZfRlNMX0NBQU1fREVCVUcpIHx8IGRhdGEpDQo+ID4NCj4gPiBJ
+IGp1c3QgdHJpZWQ6IEZvciBtZSBhIHBsYWluDQo+ID4NCj4gPiAJaWYgKGRhdGEpDQo+ID4NCj4g
+PiBpcyBhbHNvIGVub3VnaCB0byBtYWtlIGJvdGggZ2NjIGFuZCBzcGFyc2UgaGFwcHkuDQo+IA0K
+PiBPZiBjb3Vyc2UgaXQgaXMuICBUaGUgcG9pbnQgb2YgdGhlIGV4dHJhIGNvbmRpdGlvbiBpcyB0
+byByZW1vdmUNCj4gdGhlIHVubmVjZXNzYXJ5IGNoZWNrIG9uIGRhdGEgdW5sZXNzIHdlIGFyZSBp
+biBkZWJ1Z2dpbmcgbW9kZQ0KPiAoYXMgaXQgaXMgb25seSBuZWVkZWQgaW4gZGVidWdnaW5nIG1v
+ZGUgdG8gd29yayBhcm91bmQgdGhlIGJ1Z2d5DQo+IGNvbXBpbGVyKS4NCg0KSUlSQyB0aGUgJ3By
+b2JsZW1hdGljJyBjYXNlIGlzIG9uZSB3aGVyZSAnbGVuJyBhbmQgJ2RhdGEnDQphcmUgYWN0dWFs
+bHkgY29tcGlsZS10aW1lIHplcm9zIC0gaW4gd2hpY2ggY2FzZSB5b3UgZG9uJ3QNCndhbnQgdG8g
+Y2FsbCBtZW1jcHkoKSBhdCBhbGwuDQpJbiBhbGwgb3RoZXIgY2FzZXMgSSB0aGluayB0aGVyZSBp
+cyBzb21ldGhpbmcgdG8gY29weSBzbyB5b3UNCmRvbid0IHJlYWxseSB3YW50IHRoZSBjaGVjayAo
+b3IgdGhlIG9uZSBpbiBtZW1jcHkoKSB3aWxsIGRvKS4NCg0KV2hldGhlciAoYnVpbHRpbl9jb25z
+dGFudF9wKGRhdGEpICYmICFkYXRhKSBpcyBnb29kIGVub3VnaCBpcw0KYW5vdGhlciBtYXR0ZXIu
+DQpJdCBtaWdodCBuZWVkIHRoZSAoc2l6ZW9mICooMSA/ICh2b2lkICopKGRhdGEpIDogKGludCAq
+KTApID09IDEpDQp0ZXN0Lg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2Vz
+aWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVL
+DQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
