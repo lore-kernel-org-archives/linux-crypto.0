@@ -2,185 +2,170 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B770C53210
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Dec 2022 22:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFAF9C4167B
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Jan 2023 09:13:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235864AbiLaWCM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 31 Dec 2022 17:02:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51922 "EHLO
+        id S229558AbjAAJNI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 Jan 2023 04:13:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232131AbiLaWB5 (ORCPT
+        with ESMTP id S229476AbjAAJNH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 31 Dec 2022 17:01:57 -0500
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A4964C2;
-        Sat, 31 Dec 2022 14:01:53 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id D9B355C007F;
-        Sat, 31 Dec 2022 17:01:50 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Sat, 31 Dec 2022 17:01:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
-        cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1672524110; x=1672610510; bh=YD
-        1dCkE7VO7jGYHFV07b3XoPDh4wUwU4Z7xaUFzeNeU=; b=aqrB7VAWbjJJvLqgKn
-        L3f92W1zxrXMwyrcy1mjHTF1Je352X9rxEeZMDLBmK42qOGSSH8hWKenyrsrC5Eb
-        T3yZayisJBAKP3H4iTWSFvOCyOoGIJMu8oZXwxeafELygWwIMM7osWnP0gCxae4W
-        T4jUjvodpZSGmyOexh+KfiRvaz2wmr8krVZoznMU0bCHlkrb+sPYFuaA1GE7PvlJ
-        91kGgl2yvZaqmhHsDghMSxPMP4T1EHD593yqsFgjRqY2AMHA9wmw7vcrc9zCbHm6
-        jo2g/DeFznGpFGZK55kOXn8pprPsX4qEg7yi2RppoFpsUxDlRwkaDY0sFN+EhDo5
-        ogcA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1672524110; x=1672610510; bh=YD1dCkE7VO7jG
-        YHFV07b3XoPDh4wUwU4Z7xaUFzeNeU=; b=b8gJn1LGOHujgdAyncX5kI8yWh0x1
-        S9NRtqRTDHj1IpijzpiohRas4bXySk0eTtxX4TDOCtRAO2OwPOHRHstWLugLwAR4
-        P/+WoM3VCxLfr0BQQubry+c8/apjF93Gcw5fo03z2pRQzNzkkGuzw51QC6/A+69p
-        QNBmHSbSvMsD2vYyZx5u6XoYLPwCjNAHfO9LsxPuA8IieEU5Ei2UI5rRIZGs6dkj
-        WF7D/7Lc1BIQXr5qrfdMpK+lhbuevqn6X5mel2OhF2IaxomZHHOlnG1dycdA3yLI
-        c0V9iDtips2fyuP4dfRJs3CarrK1WjOdiKQrNB7Ec14cBIA5j32J0qC0A==
-X-ME-Sender: <xms:TrGwYxNQhTwq17POsIWNlUNKvGVSUt5wufEiFhKnqRiSFEymDKk5xw>
-    <xme:TrGwYz9GLh6ZOm49caoAVsJgFdSP90x9hTsXQErbkJAemtu8wDB4DFpOjnDN3xtxY
-    BnKwmOKpxot_3C9ow>
-X-ME-Received: <xmr:TrGwYwTbRMhSUVtxWerzHY4qaIF0APaZA69sSPZTNo8L75wwPy6b3-mzGBp28XQdSqdT9u4wnLLVmv5luiozCqEJIUddBpvhG5vnYqlLF8BHLHR12S8o4rsuZdMRq09oDsQv7w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrieekgdduheeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrmhhu
-    vghlucfjohhllhgrnhguuceoshgrmhhuvghlsehshhholhhlrghnugdrohhrgheqnecugg
-    ftrfgrthhtvghrnhepudekteeuudehtdelteevgfduvddvjefhfedulefgudevgeeghefg
-    udefiedtveetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homhepshgrmhhuvghlsehshhholhhlrghnugdrohhrgh
-X-ME-Proxy: <xmx:TrGwY9tEqsZKy2vYV1CHC_s3N8h0sby26R9jMXngPJ7jjQoUl0DZ-A>
-    <xmx:TrGwY5fXgzD3svpI0neyE9ZGvqMu_uUfP6M1_VCR4rA3nTy6nFEpwg>
-    <xmx:TrGwY50R700_3PQlxptAPCheyjaLexEGpN5KUyae8izDOS5dotzvAg>
-    <xmx:TrGwY0t877uvRH0-8T7BqfPdK0sGswPSFOJvDyF1MRwfClybxI5tyQ>
-Feedback-ID: i0ad843c9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 31 Dec 2022 17:01:49 -0500 (EST)
-From:   Samuel Holland <samuel@sholland.org>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>
-Cc:     Samuel Holland <samuel@sholland.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Conor Dooley <conor@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
-Subject: [PATCH v2 1/3] dt-bindings: crypto: sun8i-ce: Add compatible for D1
-Date:   Sat, 31 Dec 2022 16:01:43 -0600
-Message-Id: <20221231220146.646-2-samuel@sholland.org>
-X-Mailer: git-send-email 2.37.4
-In-Reply-To: <20221231220146.646-1-samuel@sholland.org>
-References: <20221231220146.646-1-samuel@sholland.org>
+        Sun, 1 Jan 2023 04:13:07 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1E15F7B
+        for <linux-crypto@vger.kernel.org>; Sun,  1 Jan 2023 01:13:06 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id 124so17032586pfy.0
+        for <linux-crypto@vger.kernel.org>; Sun, 01 Jan 2023 01:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Is4k+gx3KJfrIFoJwvzCiaGbFwIyqTDsgClxLrk5UJQ=;
+        b=NlFz9NcxV1wINEXt3iDPnKE/6hDLG0FDx/TtqC0Ms4cy7s+enWHjESCev76+j2a5GH
+         pmcW68VgTXRmsZYTgLF1S0uRSl6UQQQ9vXPOwPW8P0dvBt61a51BTZvXTV3mjP4GF9op
+         WtT7qHLZo9oas9v+45aMnLf8PMAM0ZigwAaQMlaUMjKGxtnFLKoAo+GBfUD+sCw9nR/F
+         08dje3tOMh0wwT8aMaXpe5XSkHeb5rhxY2JFXpTZ8vA6idOxjsJcbduX/x/9obpw037N
+         oFMlaRZRXr4YQiMHMtDaqiMAmwaZkxaKKdgsUQKf2s47rT1KYhkKWUEuWC9P9dj4Qaly
+         wB7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Is4k+gx3KJfrIFoJwvzCiaGbFwIyqTDsgClxLrk5UJQ=;
+        b=rAm1afFk37yUTcQPRI9O8qt/SvN0XWjMcBm5DcLafFbEW5WnvV+uBmVXO5tiwsc+lK
+         cUoYZkU8zzOBRTQfSSn/REKVo4KOc/zi/H3Z5B0CNDbX1gbsg2w4R6cn7MUoCNjUW/Rv
+         I5t2zaHMfTg5OVhBNU2M6dcY/r4gw4G/3WwD4UvjxIkjqs3ScqkdDHVJGvuVHwg9+fB7
+         Gb+oQVWfVry/LddZAws9hW3AjFjhV7bk5q6bpq33sgPHCVIaI3V0e9UVX46bVu1k7nti
+         NeTwE14JWK9MX24KQUEQe2QTgWANnCabwns1OHUXZD2BUGejlXTKnUJcMhooYNQ8RP9w
+         mcsA==
+X-Gm-Message-State: AFqh2ko2qKkFPOXynLcDe04nOY0ITs25YzNwbNyVgYJFJ7eFDgL+5348
+        sg0N+zzKwamZawf1RGocoTYyUvCOuUrFuA==
+X-Google-Smtp-Source: AMrXdXuRoiHgjg90iXYPtfdF9zeFr8V7j26sB9E99kGWWj7JXL9t7TcDjpsGoYuyLRCDS/kpi8P3xw==
+X-Received: by 2002:aa7:8a42:0:b0:582:34f2:20f1 with SMTP id n2-20020aa78a42000000b0058234f220f1mr4377436pfa.11.1672564384878;
+        Sun, 01 Jan 2023 01:13:04 -0800 (PST)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id k26-20020aa79d1a000000b0058130f1eca1sm10951327pfp.182.2023.01.01.01.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Jan 2023 01:13:03 -0800 (PST)
+From:   Taehee Yoo <ap420073@gmail.com>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, x86@kernel.org
+Cc:     elliott@hpe.com, jussi.kivilinna@iki.fi, ebiggers@kernel.org,
+        ap420073@gmail.com
+Subject: [PATCH v8 0/4] crypto: aria: implement aria-avx2 and aria-avx512
+Date:   Sun,  1 Jan 2023 09:12:48 +0000
+Message-Id: <20230101091252.700117-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-D1 has a crypto engine similar to the one in other Allwinner SoCs.
-Like H6, it has a separate MBUS clock gate.
+This patchset is to implement aria-avx2 and aria-avx512.
+There are some differences between aria-avx, aria-avx2, and aria-avx512,
+but they are not core logic(s-box, diffusion layer).
 
-It also requires the internal RC oscillator to be enabled for the TRNG
-to return data, presumably because noise from the oscillator is used as
-an entropy source. This is likely the case for earlier variants as well,
-but it really only matters for H616 and newer SoCs, as H6 provides no
-way to disable the internal oscillator.
+ARIA-AVX2
+It supports 32way parallel processing using 256bit registers.
+Like ARIA-AVX, it supports both AES-NI based s-box layer algorithm and
+GFNI based s-box layer algorithm.
+These algorithms are the same as ARIA-AVX except that AES-NI doesn't
+support 256bit registers, so it is used twice.
 
-Signed-off-by: Samuel Holland <samuel@sholland.org>
----
-I noticed that the vendor driver has code to explicitly enable IOSC when
-using the TRNG on A83T (search SS_TRNG_OSC_ADDR), but that is covered by
-a different binding/driver in mainline.
+ARIA-AVX512
+It supports 64way parallel processing using 512bit registers.
+It supports only GFNI based s-box layer algorithm.
 
-Changes in v2:
- - Add TRNG clock
+Benchmarks with i3-12100
+commands: modprobe tcrypt mode=610 num_mb=8192
 
- .../bindings/crypto/allwinner,sun8i-ce.yaml   | 33 ++++++++++++++-----
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ARIA-AVX512(128bit and 256bit)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx512) encryption
+tcrypt: 1 operation in 1504 cycles (1024 bytes)
+tcrypt: 1 operation in 4595 cycles (4096 bytes)
+tcrypt: 1 operation in 1763 cycles (1024 bytes)
+tcrypt: 1 operation in 5540 cycles (4096 bytes)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx512) decryption
+tcrypt: 1 operation in 1502 cycles (1024 bytes)
+tcrypt: 1 operation in 4615 cycles (4096 bytes)
+tcrypt: 1 operation in 1759 cycles (1024 bytes)
+tcrypt: 1 operation in 5554 cycles (4096 bytes)
 
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-index 026a9f9e1aeb..4287678aa79f 100644
---- a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-@@ -14,6 +14,7 @@ properties:
-     enum:
-       - allwinner,sun8i-h3-crypto
-       - allwinner,sun8i-r40-crypto
-+      - allwinner,sun20i-d1-crypto
-       - allwinner,sun50i-a64-crypto
-       - allwinner,sun50i-h5-crypto
-       - allwinner,sun50i-h6-crypto
-@@ -29,6 +30,7 @@ properties:
-       - description: Bus clock
-       - description: Module clock
-       - description: MBus clock
-+      - description: TRNG clock (RC oscillator)
-     minItems: 2
- 
-   clock-names:
-@@ -36,6 +38,7 @@ properties:
-       - const: bus
-       - const: mod
-       - const: ram
-+      - const: trng
-     minItems: 2
- 
-   resets:
-@@ -44,19 +47,33 @@ properties:
- if:
-   properties:
-     compatible:
--      const: allwinner,sun50i-h6-crypto
-+      enum:
-+        - allwinner,sun20i-d1-crypto
- then:
-   properties:
-     clocks:
--      minItems: 3
-+      minItems: 4
-     clock-names:
--      minItems: 3
-+      minItems: 4
- else:
--  properties:
--    clocks:
--      maxItems: 2
--    clock-names:
--      maxItems: 2
-+  if:
-+    properties:
-+      compatible:
-+        const: allwinner,sun50i-h6-crypto
-+  then:
-+    properties:
-+      clocks:
-+        minItems: 3
-+        maxItems: 3
-+      clock-names:
-+        minItems: 3
-+        maxItems: 3
-+  else:
-+    properties:
-+      clocks:
-+        maxItems: 2
-+      clock-names:
-+        maxItems: 2
- 
- required:
-   - compatible
+ARIA-AVX2 with GFNI(128bit and 256bit)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx2) encryption
+tcrypt: 1 operation in 2003 cycles (1024 bytes)
+tcrypt: 1 operation in 5867 cycles (4096 bytes)
+tcrypt: 1 operation in 2358 cycles (1024 bytes)
+tcrypt: 1 operation in 7295 cycles (4096 bytes)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx2) decryption
+tcrypt: 1 operation in 2004 cycles (1024 bytes)
+tcrypt: 1 operation in 5956 cycles (4096 bytes)
+tcrypt: 1 operation in 2409 cycles (1024 bytes)
+tcrypt: 1 operation in 7564 cycles (4096 bytes)
+
+ARIA-AVX with GFNI(128bit and 256bit)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx) encryption
+tcrypt: 1 operation in 2761 cycles (1024 bytes)
+tcrypt: 1 operation in 9390 cycles (4096 bytes)
+tcrypt: 1 operation in 3401 cycles (1024 bytes)
+tcrypt: 1 operation in 11876 cycles (4096 bytes)
+    testing speed of multibuffer ecb(aria) (ecb-aria-avx) decryption
+tcrypt: 1 operation in 2735 cycles (1024 bytes)
+tcrypt: 1 operation in 9424 cycles (4096 bytes)
+tcrypt: 1 operation in 3369 cycles (1024 bytes)
+tcrypt: 1 operation in 11954 cycles (4096 bytes)
+
+v8:
+ - Remove unnecessary code in aria-gfni-avx512-asm_64.S
+ - Do not use magic numbers in the aria-avx.h
+ - Rebase
+
+v7:
+ - Use IS_ENABLED() instead of defined()
+
+v6:
+ - Rebase for "CFI fixes" patchset.
+ - Use SYM_TYPED_FUNC_START instead of SYM_FUNC_START.
+
+v5:
+ - Set CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE flag to avx2, and avx512.
+
+v4:
+ - Use keystream array in the request ctx.
+
+v3:
+ - Use ARIA_CTX_enc_key, ARIA_CTX_dec_key, and ARIA_CTX_rounds defines.
+
+v2:
+ - Add new "add keystream array into struct aria_ctx" patch.
+ - Use keystream array in the aria_ctx instead of stack memory
+
+Taehee Yoo (4):
+  crypto: aria: add keystream array into request ctx
+  crypto: aria: do not use magic number offsets of aria_ctx
+  crypto: aria: implement aria-avx2
+  crypto: aria: implement aria-avx512
+
+ arch/x86/crypto/Kconfig                   |   38 +
+ arch/x86/crypto/Makefile                  |    6 +
+ arch/x86/crypto/aria-aesni-avx-asm_64.S   |   26 +-
+ arch/x86/crypto/aria-aesni-avx2-asm_64.S  | 1433 +++++++++++++++++++++
+ arch/x86/crypto/aria-avx.h                |   48 +-
+ arch/x86/crypto/aria-gfni-avx512-asm_64.S |  971 ++++++++++++++
+ arch/x86/crypto/aria_aesni_avx2_glue.c    |  252 ++++
+ arch/x86/crypto/aria_aesni_avx_glue.c     |   45 +-
+ arch/x86/crypto/aria_gfni_avx512_glue.c   |  250 ++++
+ arch/x86/kernel/asm-offsets.c             |    8 +
+ crypto/aria_generic.c                     |    4 +
+ 11 files changed, 3052 insertions(+), 29 deletions(-)
+ create mode 100644 arch/x86/crypto/aria-aesni-avx2-asm_64.S
+ create mode 100644 arch/x86/crypto/aria-gfni-avx512-asm_64.S
+ create mode 100644 arch/x86/crypto/aria_aesni_avx2_glue.c
+ create mode 100644 arch/x86/crypto/aria_gfni_avx512_glue.c
+
 -- 
-2.37.4
+2.34.1
 
