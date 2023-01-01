@@ -2,105 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BA8C4332F
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Jan 2023 15:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1846BC4332F
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Jan 2023 15:58:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231491AbjAAPxd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Jan 2023 10:53:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38680 "EHLO
+        id S231567AbjAAP6A (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 Jan 2023 10:58:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjAAPxc (ORCPT
+        with ESMTP id S229686AbjAAP57 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Jan 2023 10:53:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E14F7C;
-        Sun,  1 Jan 2023 07:53:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C27160DDD;
-        Sun,  1 Jan 2023 15:53:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C939C433D2;
-        Sun,  1 Jan 2023 15:53:29 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Q1YDlcfG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1672588406;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w7UU0k0+xf0ESl7F6PUtPt9RVh2TOoL9Y1ZzrlTOJWs=;
-        b=Q1YDlcfGuFuaizpFcR+VS2iOzsWuc2XGQ76b6FNCb2ve/qXwRXskQpzX6fe4dIo2VSXGvd
-        AdPTIU8dkipKeO4rB7O0ciD4YfWuRcp+GKIEgSeayokyTiP+/QQIQDuMuA7o8csFfoQsbY
-        qSSJWB4ppa4BwJ+XjwIaflxTe1okobo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7183c114 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Sun, 1 Jan 2023 15:53:26 +0000 (UTC)
-Date:   Sun, 1 Jan 2023 16:53:22 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v13 6/7] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <Y7GschU1qZPFZAhm@zx2c4.com>
-References: <20221221142327.126451-1-Jason@zx2c4.com>
- <20221221142327.126451-7-Jason@zx2c4.com>
- <Y6OHa196S8e1mImg@sol.localdomain>
+        Sun, 1 Jan 2023 10:57:59 -0500
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7E1DE1
+        for <linux-crypto@vger.kernel.org>; Sun,  1 Jan 2023 07:57:58 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id bf43so38433526lfb.6
+        for <linux-crypto@vger.kernel.org>; Sun, 01 Jan 2023 07:57:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nT/wNs755CbJKKo2LqAykZZrkcpLMwiTj6TNgle5VUo=;
+        b=eo2daS8tNzHeAfX1ggtEjRelM1E2AF/hZuQKDrbXvG1nlNzr7BJmfDltGHTHO0zhhA
+         pEwxywhyUViXLBBhaaJne7jZg4rbdon105hNzvzu1hDwdJ1FPuSnCUD99OjEwXnqu1xu
+         qd4fLi8h7SEG+geon3hCdA1oARaMljmezubuIdioM/6Hxbfih/IGvbaRb4jLzsJeRBIo
+         QJtULYJpdbgUz8q4AL2fOnfpO3f92H0Xb1W0bIKcmz4Kksztm0XFozAwUtafmUVViydn
+         79Gza9o6Jxy3UzLBA1F65XWVPsK3VDfRXMFwwWGaPwxoYOrXuWFwoMya2wCXReopzVSy
+         7+Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nT/wNs755CbJKKo2LqAykZZrkcpLMwiTj6TNgle5VUo=;
+        b=y9uVLHngUk9XYxp7KnlnSE4grQ7M0lRNWkfVj1JJ6QoAzFs1gvWLP9Qrs55yPRJDbc
+         Sv7voo6sG56AfSl4RMYBMiIdjaCLVg00WQBrNK/w+kUGYiGrYCnWAY43ktnwxN9s+Zlj
+         jpp+4rrQ4APKi3SxHQZJ6UDU+J50K3HX9qyEcfEoGZnNz8c2idFEvoPJzYH6VVZU9d0Q
+         xq6640OLXVU6s0aHNQQpAh2u+ZTISFRAJ8CmAULjMOe1DrwXjkwQIGbxGgS/yAfDWz3X
+         esg8Ox7poyKMJX9A9gZGfapN3v5ugN5HoZG6TlMuzuvbCOfcjtYWQD89nfGQKK/vEo6Z
+         Xu6Q==
+X-Gm-Message-State: AFqh2kpBlmvtZCVa4PuiJkOU/b4wPGOLIlpfx+VxptGSRWBYREAFxT2+
+        ZG1yU/uvIlKCVpdu6WWOo+5hsg==
+X-Google-Smtp-Source: AMrXdXvmDgwvA1xnXZ9dJ32ybmiv38vs5VFBCn8qj8MqbxNP93P9wdvJlMzbkINyTln+UR426UlIWw==
+X-Received: by 2002:ac2:58d4:0:b0:4b5:9e70:ca6e with SMTP id u20-20020ac258d4000000b004b59e70ca6emr10831226lfo.17.1672588676468;
+        Sun, 01 Jan 2023 07:57:56 -0800 (PST)
+Received: from [192.168.0.20] (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
+        by smtp.gmail.com with ESMTPSA id 7-20020ac25f47000000b0049482adb3basm4199109lfz.63.2023.01.01.07.57.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 01 Jan 2023 07:57:55 -0800 (PST)
+Message-ID: <ce838de7-4dfc-4631-8f87-1fb311dcc739@linaro.org>
+Date:   Sun, 1 Jan 2023 16:57:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y6OHa196S8e1mImg@sol.localdomain>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 1/3] dt-bindings: crypto: sun8i-ce: Add compatible for
+ D1
+Content-Language: en-US
+To:     Samuel Holland <samuel@sholland.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
+References: <20221231220146.646-1-samuel@sholland.org>
+ <20221231220146.646-2-samuel@sholland.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20221231220146.646-2-samuel@sholland.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 02:23:39PM -0800, Eric Biggers wrote:
-> On Wed, Dec 21, 2022 at 03:23:26PM +0100, Jason A. Donenfeld wrote:
-> > diff --git a/drivers/char/random.c b/drivers/char/random.c
-> > index 6425f5f838e0..660cd15b6228 100644
-> > --- a/drivers/char/random.c
-> > +++ b/drivers/char/random.c
-> > @@ -60,6 +60,7 @@
-> >  #include <crypto/blake2s.h>
-> >  #ifdef CONFIG_VDSO_GETRANDOM
-> >  #include <vdso/getrandom.h>
-> > +#include <vdso/datapage.h>
-> >  #endif
-> >  #include <asm/archrandom.h>
-> >  #include <asm/processor.h>
-> > @@ -407,6 +408,9 @@ static void crng_reseed(struct work_struct *work)
-> >	/*
-> >	 * We copy the new key into the base_crng, overwriting the old one,
-> >	 * and update the generation counter. We avoid hitting ULONG_MAX,
-> >	 * because the per-cpu crngs are initialized to ULONG_MAX, so this
-> >	 * forces new CPUs that come online to always initialize.
-> >	 */
-> >	spin_lock_irqsave(&base_crng.lock, flags);
-> >	memcpy(base_crng.key, key, sizeof(base_crng.key));
-> >	next_gen = base_crng.generation + 1;
-> >  	if (next_gen == ULONG_MAX)
-> >  		++next_gen;
-> >  	WRITE_ONCE(base_crng.generation, next_gen);
-> > +#ifdef CONFIG_VDSO_GETRANDOM
-> > +	smp_store_release(&_vdso_rng_data.generation, next_gen + 1);
-> > +#endif
+On 31/12/2022 23:01, Samuel Holland wrote:
+> D1 has a crypto engine similar to the one in other Allwinner SoCs.
+> Like H6, it has a separate MBUS clock gate.
 > 
-> It's confusing that "uninitialized generation" is ULONG_MAX in the per-cpu
-> crngs, but 0 in the vdso_rng_data.  That results in a weird off-by one thing,
-> where the vdso_rng_data generation number has to be 1 higher.
+> It also requires the internal RC oscillator to be enabled for the TRNG
+> to return data, presumably because noise from the oscillator is used as
+> an entropy source. This is likely the case for earlier variants as well,
+> but it really only matters for H616 and newer SoCs, as H6 provides no
+> way to disable the internal oscillator.
 > 
-> Would it be possible to use 0 for both?
+> Signed-off-by: Samuel Holland <samuel@sholland.org>
+> ---
 
-It might be, but this will involve some changes to how the batching
-works too, so I think I'd like to do that separately, if at all.
-However, I'll add a comment there noting what's happening so it's a bit
-less confusing.
 
-Jason
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
+
