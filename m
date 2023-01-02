@@ -2,157 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B414EC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Jan 2023 03:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6B0C4167B
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Jan 2023 07:30:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbjABDSg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Jan 2023 22:18:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57834 "EHLO
+        id S229978AbjABHac (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Jan 2023 02:30:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjABDSf (ORCPT
+        with ESMTP id S229447AbjABHab (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Jan 2023 22:18:35 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DA825C0
-        for <linux-crypto@vger.kernel.org>; Sun,  1 Jan 2023 19:18:33 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id v23so28841537pju.3
-        for <linux-crypto@vger.kernel.org>; Sun, 01 Jan 2023 19:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZvyGK6DxthGUsLi298pua96YvrjAlkyByXaysjEekY=;
-        b=cmP6xJtkIhwQCGVKmCN7/xe+AvuuQgBdohmEnkVX+CVpTHLSR8dTK+JQUhhcXtpLJU
-         AEn0zFdcJkcqb4sNjcnG8NibcBdmP8bO+j3hSaCZ4n1e2dkGVRabIqOK1vIG3mFXfey6
-         xEakNadOxxIXiFplCpYQgxzkCK7RFA02Bv2ycqBbRRGJeKH/OV0Mwg+K4VztgRj7rg0e
-         PbuEPtbNDqXpKbn8MZSNLoavsMXTqepweoq6QSd9evwACglxdbWRUG7hNy5XtY9KnZcE
-         F2wZdxnq/Pow9BDLjsBjKfg+sWl7lgRSpoOEOdGy1QpHDK2gcmE/mBifXtL/E/7WDZl4
-         om9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZvyGK6DxthGUsLi298pua96YvrjAlkyByXaysjEekY=;
-        b=QtJLTGBoGRbmZ1J8KIHv6EOAcOPgypzSH6O1tUj9yRst2B2K13poZxtFyMi1bbau88
-         JqVzRuH25+gyPvusZeBXSPFRf6+ij2Eg9BVhVj8Q5a2HU1SUN2+jo9tMJZP+9X1MyA5l
-         aVJQcb3/ScH7svIYVYwAoI97X6emEGpZ9Bmee5sRGg3VWxB7KOijSZ7YKOv9yw5Te9/I
-         5VdUbBMowH67D6n4LjzvXeYn+RTR75M88GUlkmYVkhqpJfgi3rjh+//fL646rIGedh8Z
-         3Kg22Fo/mtS1bnHUtG8sWGXyLsE2O/PuVV50UG7qkv4ZZ8ztCepX5KKyTcrGURWsXyNf
-         CaCw==
-X-Gm-Message-State: AFqh2koObLSb3DcMZj8VspWxQXNf1AnV7XDt1b2H+f01Ip21WCInAXVP
-        jdZ+392bwVR6js/MdXDVzBqq/g==
-X-Google-Smtp-Source: AMrXdXvPj8o6cK4T3w01Iw3SMa2JT66hdZ4VXWgIspXrvpNrRkrS7ttzQdxzW3nbzDECQOX/gYTa4A==
-X-Received: by 2002:a05:6a20:7f59:b0:ac:af5c:2970 with SMTP id e25-20020a056a207f5900b000acaf5c2970mr2514437pzk.3.1672629512652;
-        Sun, 01 Jan 2023 19:18:32 -0800 (PST)
-Received: from [2620:15c:29:203:20a4:1331:a6b6:c59b] ([2620:15c:29:203:20a4:1331:a6b6:c59b])
-        by smtp.gmail.com with ESMTPSA id 72-20020a63064b000000b00477602ff6a8sm15928374pgg.94.2023.01.01.19.18.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Jan 2023 19:18:31 -0800 (PST)
-Date:   Sun, 1 Jan 2023 19:18:30 -0800 (PST)
-From:   David Rientjes <rientjes@google.com>
-To:     Jarkko Sakkinen <jarkko@profian.com>
-cc:     linux-crypto@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
+        Mon, 2 Jan 2023 02:30:31 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7BD111B;
+        Sun,  1 Jan 2023 23:30:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=bLWETpLjeuylqYkvPIWNbfGdf7cs1oR5lWW9NWB/8PQ=; b=d4wyv1ytBKpwRGo0CvDxZ28J17
+        FeogQLlsYiP91AEnmE1VKJbO2gZRa6kp43Ek/fNS3Lzzgfa4/whJAeeTQw1XoQP5lJkV4AcpBzbWl
+        Eq/X56N2wi/koae7+AfMB2F1xYlJFl5zAt7DmmKO2BVy65tjwydsRnQ2rfk57wMvllHPDVc61hXk2
+        6PfbT31wHKr9TAafrGNLIEM/6DN4xf383GNka8LzISIVJgiekCiA07JgBjH3TadODStEUpT4C/jzI
+        YL+7K0ls1iABZei9+HOxPkuX4wwaevfcBl3jNvCNnVn1K/HAmmxKZ4A80P5G6brKf6HkLRouGO9Rm
+        pzx1uGSg==;
+Received: from [2601:1c2:d80:3110::a2e7] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pCFHA-009DSK-Ul; Mon, 02 Jan 2023 07:30:29 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccp: Improve sev_platform_init() error
- messages
-In-Reply-To: <20221231151106.143121-1-jarkko@profian.com>
-Message-ID: <6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com>
-References: <20221231151106.143121-1-jarkko@profian.com>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] async_tx: fix kernel-doc notation warnings
+Date:   Sun,  1 Jan 2023 23:30:28 -0800
+Message-Id: <20230102073028.28870-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 31 Dec 2022, Jarkko Sakkinen wrote:
+Fix W=1 kernel-doc warnings by adding "struct" keyword:
 
-> The following functions end up calling sev_platform_init() or
-> __sev_platform_init_locked():
-> 
-> * sev_guest_init()
-> * sev_ioctl_do_pek_csr
-> * sev_ioctl_do_pdh_export()
-> * sev_ioctl_do_pek_import()
-> * sev_ioctl_do_pek_pdh_gen()
-> * sev_pci_init()
-> 
-> However, only sev_pci_init() prints out the failed command error code, and
-> even there the error message does not specify, SEV which command failed.
-> 
-> Address this by printing out the SEV command errors inside
-> __sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
-> INIT_EX commands.
-> 
-> This extra information is particularly useful if firmware loading and/or
-> initialization is going to be made more robust, e.g. by allowing
-> firmware loading to be postponed.
-> 
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 5350eacaba3a..ac7385c12091 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -963,6 +963,7 @@ static int __sev_init_ex_locked(int *error)
->  
->  static int __sev_platform_init_locked(int *error)
->  {
-> +	const char *cmd = sev_init_ex_buffer ? "SEV_CMD_INIT_EX" : "SEV_CMD_INIT";
->  	struct psp_device *psp = psp_master;
->  	struct sev_device *sev;
->  	int rc = 0, psp_ret = -1;
+crypto/async_tx/async_tx.c:136: warning: cannot understand function prototype: 'enum submit_disposition '
+crypto/async_tx/async_pq.c:18: warning: cannot understand function prototype: 'struct page *pq_scribble_page; '
 
-I think this can just be handled directly in the dev_err() since it's only 
-used once.
+Also fix 2 function parameter descriptions.
 
-> @@ -1008,18 +1009,23 @@ static int __sev_platform_init_locked(int *error)
->  	if (error)
->  		*error = psp_ret;
->  
-> -	if (rc)
-> +	if (rc) {
-> +		dev_err(sev->dev, "SEV: %s failed error %#x", cmd, psp_ret);
->  		return rc;
-> +	}
->  
->  	sev->state = SEV_STATE_INIT;
->  
->  	/* Prepare for first SEV guest launch after INIT */
->  	wbinvd_on_all_cpus();
-> -	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
-> -	if (rc)
-> -		return rc;
-> +	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &psp_ret);
-> +	if (error)
-> +		*error = psp_ret;
->  
-> -	dev_dbg(sev->dev, "SEV firmware initialized\n");
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/async_tx/async_pq.c |    4 ++--
+ crypto/async_tx/async_tx.c |    4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Any reason to remove this dbg line?  I assume the following dev_info() 
-line is deemed sufficient?
-
-> +	if (rc) {
-> +		dev_err(sev->dev, "SEV: SEV_CMD_DF_FLUSH failed error %#x", psp_ret);
-> +		return rc;
-> +	}
->  
->  	dev_info(sev->dev, "SEV API:%d.%d build:%d\n", sev->api_major,
->  		 sev->api_minor, sev->build);
-> @@ -2354,8 +2360,7 @@ void sev_pci_init(void)
->  	/* Initialize the platform */
->  	rc = sev_platform_init(&error);
->  	if (rc)
-> -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
-> -			error, rc);
-> +		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
->  
->  skip_legacy:
->  	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
+diff -- a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
+--- a/crypto/async_tx/async_pq.c
++++ b/crypto/async_tx/async_pq.c
+@@ -12,7 +12,7 @@
+ #include <linux/gfp.h>
+ 
+ /**
+- * pq_scribble_page - space to hold throwaway P or Q buffer for
++ * struct pq_scribble_page - space to hold throwaway P or Q buffer for
+  * synchronous gen_syndrome
+  */
+ static struct page *pq_scribble_page;
+@@ -281,7 +281,7 @@ pq_val_chan(struct async_submit_ctl *sub
+ /**
+  * async_syndrome_val - asynchronously validate a raid6 syndrome
+  * @blocks: source blocks from idx 0..disks-3, P @ disks-2 and Q @ disks-1
+- * @offset: common offset into each block (src and dest) to start transaction
++ * @offsets: common offset into each block (src and dest) to start transaction
+  * @disks: number of blocks (including missing P or Q, see below)
+  * @len: length of operation in bytes
+  * @pqres: on val failure SUM_CHECK_P_RESULT and/or SUM_CHECK_Q_RESULT are set
+diff -- a/crypto/async_tx/async_tx.c b/crypto/async_tx/async_tx.c
+--- a/crypto/async_tx/async_tx.c
++++ b/crypto/async_tx/async_tx.c
+@@ -124,7 +124,7 @@ async_tx_channel_switch(struct dma_async
+ 
+ 
+ /**
+- * submit_disposition - flags for routing an incoming operation
++ * enum submit_disposition - flags for routing an incoming operation
+  * @ASYNC_TX_SUBMITTED: we were able to append the new operation under the lock
+  * @ASYNC_TX_CHANNEL_SWITCH: when the lock is dropped schedule a channel switch
+  * @ASYNC_TX_DIRECT_SUBMIT: when the lock is dropped submit directly
+@@ -258,7 +258,7 @@ EXPORT_SYMBOL_GPL(async_trigger_callback
+ 
+ /**
+  * async_tx_quiesce - ensure tx is complete and freeable upon return
+- * @tx - transaction to quiesce
++ * @tx: transaction to quiesce
+  */
+ void async_tx_quiesce(struct dma_async_tx_descriptor **tx)
+ {
