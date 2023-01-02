@@ -2,105 +2,114 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6B0C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Jan 2023 07:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5B9C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Jan 2023 10:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbjABHac (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Jan 2023 02:30:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36024 "EHLO
+        id S231949AbjABKS7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Jan 2023 05:18:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjABHab (ORCPT
+        with ESMTP id S231567AbjABKS6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Jan 2023 02:30:31 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7BD111B;
-        Sun,  1 Jan 2023 23:30:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=bLWETpLjeuylqYkvPIWNbfGdf7cs1oR5lWW9NWB/8PQ=; b=d4wyv1ytBKpwRGo0CvDxZ28J17
-        FeogQLlsYiP91AEnmE1VKJbO2gZRa6kp43Ek/fNS3Lzzgfa4/whJAeeTQw1XoQP5lJkV4AcpBzbWl
-        Eq/X56N2wi/koae7+AfMB2F1xYlJFl5zAt7DmmKO2BVy65tjwydsRnQ2rfk57wMvllHPDVc61hXk2
-        6PfbT31wHKr9TAafrGNLIEM/6DN4xf383GNka8LzISIVJgiekCiA07JgBjH3TadODStEUpT4C/jzI
-        YL+7K0ls1iABZei9+HOxPkuX4wwaevfcBl3jNvCNnVn1K/HAmmxKZ4A80P5G6brKf6HkLRouGO9Rm
-        pzx1uGSg==;
-Received: from [2601:1c2:d80:3110::a2e7] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pCFHA-009DSK-Ul; Mon, 02 Jan 2023 07:30:29 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] async_tx: fix kernel-doc notation warnings
-Date:   Sun,  1 Jan 2023 23:30:28 -0800
-Message-Id: <20230102073028.28870-1-rdunlap@infradead.org>
+        Mon, 2 Jan 2023 05:18:58 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22C9F2A0
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Jan 2023 02:18:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CA9A7B80CBB
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Jan 2023 10:18:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AC2C433F0;
+        Mon,  2 Jan 2023 10:18:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672654735;
+        bh=KdDWgEFVyzEa6v17Q5MNkjJFsOPzBC63N1mLtXppZdM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=QvsPZCOhyi+QdGcSpsIVkPWqhqETa09Bo3dbWCN68ov6ttTTZgwA2w/o0yH37+TId
+         3YnzT6V6H4kXRxnvMixwi/9vNJH0GsicnIeu0soL0Og2PGYYNi6t0Gphx/bNckG9kL
+         ZkVFNcOn8pHBu75WCziz5kxCD6sraeV0zyVuh1Q61DDMbjMa6iK/kc7yUSbWzdQs4I
+         nBROW3kTRk+D3ehDcfdWhhKUGEn1bmrMafZEa4R6yqJc2Swj7mGZOcKU+ZPclzTJmc
+         KIV5b8d6nh9k8qN6xlKVmncj4PPL6rQZT6t0kdGmJ1RAPfpYPQYf2uMIGuwd5URXt6
+         dYSijhQagIKcQ==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     ebiggers@kernel.org, herbert@gondor.apana.org.au,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: skcipher - Use scatterwalk (un)map interface for dst and src buffers
+Date:   Mon,  2 Jan 2023 11:18:46 +0100
+Message-Id: <20230102101846.116448-1-ardb@kernel.org>
 X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2128; i=ardb@kernel.org; h=from:subject; bh=KdDWgEFVyzEa6v17Q5MNkjJFsOPzBC63N1mLtXppZdM=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBjsq+F2apjR4sVoezUCg90l8iQp4Ol/foi90yyLyIN EX0Gdi6JAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCY7KvhQAKCRDDTyI5ktmPJFDlC/ 9E6l2u1jPdsD5SwKwwfXoWG0PjU4sTB8s4eip/vAXN3Nd/qzw1xtENFnnpdEwjud77xyWVicfBZ/T1 Q/idwAYMp9oJh8vw3BxuKokylBmHel+TUzXm2b3OwstBKojMuYm0IL3539TOTI/B6ne598ibtzC/pI UrCRLtbBkGdosIrZEVI06jJtiqfW1ewKcK6R3HrSydqk2D86azCW1Sp53mJCqXeDD7g3epgIRREclc hNkndXLzBs9ZLc+Ie14cj3cQzaMscubIVtAqYCl5lcTL+fUqq8YzHdqwiqGSeY+RX3Cnjcbra/hPjh l7JRMqMpo2IpuQXYv/q1P5xaTwqqsbWEblmSj2NsYsFzAMS8bM9FqLkqTijxpBccYn5FKxyVsrcsp3 8Omcb6v2nO/agx4BfLoZexo/FORASnJB42Zk+aXQG5hxkvH9Fs7hHYdnLZiaGODn6jxF0xCg98qMJj +Mkb8zcGLPKlGbaDu9DJ0Oqn0xaHNoCuKz2C4wlRjBxtU=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix W=1 kernel-doc warnings by adding "struct" keyword:
+The skcipher walk API implementation avoids scatterwalk_map() for
+mapping the source and destination buffers, and invokes kmap_atomic()
+directly if the buffer in question is not in low memory (which can only
+happen on 32-bit architectures). This avoids some overhead on 64-bit
+architectures, and most notably, permits the skcipher code to run with
+preemption enabled.
 
-crypto/async_tx/async_tx.c:136: warning: cannot understand function prototype: 'enum submit_disposition '
-crypto/async_tx/async_pq.c:18: warning: cannot understand function prototype: 'struct page *pq_scribble_page; '
+Now that scatterwalk_map() has been updated to use kmap_local(), none of
+this is needed, so we can simply use scatterwalk_map/unmap instead.
 
-Also fix 2 function parameter descriptions.
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/async_tx/async_pq.c |    4 ++--
- crypto/async_tx/async_tx.c |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ crypto/skcipher.c | 22 ++++------------------
+ 1 file changed, 4 insertions(+), 18 deletions(-)
 
-diff -- a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -12,7 +12,7 @@
- #include <linux/gfp.h>
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 0ecab31cfe79bfd8..7bf4871fec8006ac 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -42,38 +42,24 @@ struct skcipher_walk_buffer {
  
- /**
-- * pq_scribble_page - space to hold throwaway P or Q buffer for
-+ * struct pq_scribble_page - space to hold throwaway P or Q buffer for
-  * synchronous gen_syndrome
-  */
- static struct page *pq_scribble_page;
-@@ -281,7 +281,7 @@ pq_val_chan(struct async_submit_ctl *sub
- /**
-  * async_syndrome_val - asynchronously validate a raid6 syndrome
-  * @blocks: source blocks from idx 0..disks-3, P @ disks-2 and Q @ disks-1
-- * @offset: common offset into each block (src and dest) to start transaction
-+ * @offsets: common offset into each block (src and dest) to start transaction
-  * @disks: number of blocks (including missing P or Q, see below)
-  * @len: length of operation in bytes
-  * @pqres: on val failure SUM_CHECK_P_RESULT and/or SUM_CHECK_Q_RESULT are set
-diff -- a/crypto/async_tx/async_tx.c b/crypto/async_tx/async_tx.c
---- a/crypto/async_tx/async_tx.c
-+++ b/crypto/async_tx/async_tx.c
-@@ -124,7 +124,7 @@ async_tx_channel_switch(struct dma_async
+ static int skcipher_walk_next(struct skcipher_walk *walk);
  
- 
- /**
-- * submit_disposition - flags for routing an incoming operation
-+ * enum submit_disposition - flags for routing an incoming operation
-  * @ASYNC_TX_SUBMITTED: we were able to append the new operation under the lock
-  * @ASYNC_TX_CHANNEL_SWITCH: when the lock is dropped schedule a channel switch
-  * @ASYNC_TX_DIRECT_SUBMIT: when the lock is dropped submit directly
-@@ -258,7 +258,7 @@ EXPORT_SYMBOL_GPL(async_trigger_callback
- 
- /**
-  * async_tx_quiesce - ensure tx is complete and freeable upon return
-- * @tx - transaction to quiesce
-+ * @tx: transaction to quiesce
-  */
- void async_tx_quiesce(struct dma_async_tx_descriptor **tx)
+-static inline void skcipher_unmap(struct scatter_walk *walk, void *vaddr)
+-{
+-	if (PageHighMem(scatterwalk_page(walk)))
+-		kunmap_atomic(vaddr);
+-}
+-
+-static inline void *skcipher_map(struct scatter_walk *walk)
+-{
+-	struct page *page = scatterwalk_page(walk);
+-
+-	return (PageHighMem(page) ? kmap_atomic(page) : page_address(page)) +
+-	       offset_in_page(walk->offset);
+-}
+-
+ static inline void skcipher_map_src(struct skcipher_walk *walk)
  {
+-	walk->src.virt.addr = skcipher_map(&walk->in);
++	walk->src.virt.addr = scatterwalk_map(&walk->in);
+ }
+ 
+ static inline void skcipher_map_dst(struct skcipher_walk *walk)
+ {
+-	walk->dst.virt.addr = skcipher_map(&walk->out);
++	walk->dst.virt.addr = scatterwalk_map(&walk->out);
+ }
+ 
+ static inline void skcipher_unmap_src(struct skcipher_walk *walk)
+ {
+-	skcipher_unmap(&walk->in, walk->src.virt.addr);
++	scatterwalk_unmap(walk->src.virt.addr);
+ }
+ 
+ static inline void skcipher_unmap_dst(struct skcipher_walk *walk)
+ {
+-	skcipher_unmap(&walk->out, walk->dst.virt.addr);
++	scatterwalk_unmap(walk->dst.virt.addr);
+ }
+ 
+ static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
+-- 
+2.39.0
+
