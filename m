@@ -2,186 +2,166 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D992C4708D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 18:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49DE5C4708D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 18:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238075AbjACSgi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 13:36:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48422 "EHLO
+        id S238404AbjACSo7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 13:44:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238335AbjACSgU (ORCPT
+        with ESMTP id S238273AbjACSoh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:36:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC909EE03
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 10:36:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 29240B810A6
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 18:36:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1EABC43392
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 18:36:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672770975;
-        bh=qmyYVNpngCof8L0z9bRxBJGgthB1paphMx+6zOsfGUY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZceGyxLulP1Ffg0N9eFZITlz0PbWaHWU9wdl8KnetIpDUFk+9vwdsfYzkZv1CmqZ6
-         6vlFXiUdzOgnjfo3fjTSRVMlI+0Jezi5r+MFGk2lROx5qsmf6zrd9t2ghGIfG69oyS
-         PTGZ+8DSFyDtLaNWMWbPR9t+qsk6OXEw1871o+2ZwsXo9QH/7XzVggCFWfA0lguW7O
-         9pjlXnWGMCrkd+v50ka/cVfQ6jk4kA1NuyviIsGIkD0s3RCh5pAcm2SnEDrakU1Pto
-         BiOWIL23tPgixi669Buux3TBPy3+U8zY4TEac6GVi6d6pIGsBTe6Bn1UVLdPFuiKdW
-         t0zcQqdO9FwwA==
-Received: by mail-ed1-f52.google.com with SMTP id c17so45062540edj.13
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 10:36:15 -0800 (PST)
-X-Gm-Message-State: AFqh2kp4zARJgje1GHmxSBaxOdpCbsBUi98kGhkc+tYtWk+e5I96BisL
-        GgH6/r9eu9I2Q1ujhiYhZbPRN1WQUeWS8pIk6V452Q==
-X-Google-Smtp-Source: AMrXdXvSiNT+YujtDx1T+6ZLaxF3U2v/w4nEOY3CSip0uqIHfbU5yuT8L8QlBy/NoU6MZIaK9pJyN5cu3smxVpElQ/s=
-X-Received: by 2002:aa7:cb4f:0:b0:486:1c44:a6fa with SMTP id
- w15-20020aa7cb4f000000b004861c44a6famr3256292edt.372.1672770974013; Tue, 03
- Jan 2023 10:36:14 -0800 (PST)
+        Tue, 3 Jan 2023 13:44:37 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5C81401A
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 10:43:05 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id h16so30509275wrz.12
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 10:43:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ORcDlteljIofXFtgj0WqFlIjM+SxLCEMXAOiyOwdfWw=;
+        b=eRrKrzeH9JPmrdylEKetUwIDwtKQki35PdTSyQndAquat1galIBd6+8U+I1Q11mBPr
+         0l0YhzmfCzGTINPosuCM4Bwi7Z6qo/5D13ESpCQHGCZ66CY44UWTvlpX/SRg6at33CT/
+         7gkmq+860ZIfztZbbqykNIgsuzT2BUhj9CjpjjBNBqZBqSDvdfgWCom8uNfkYVUyjyg7
+         UMSdxzBmSw5G0zRjjkJq+qUkGCNZjZwd4aWz3wnXEyNjJZHc2BCEFvhZ9SbCTUg+GtOE
+         J5jd6g06TyTbA9GrzDVn8A1dXvludmeCxno0bt/S0c6YWncf2sUDr9jrJoxNPQfSpZme
+         M61A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ORcDlteljIofXFtgj0WqFlIjM+SxLCEMXAOiyOwdfWw=;
+        b=y69yLzn/qbypAXgoZjDT6Whl/knP/HKBXJy37wOuEiVdabFSoyQzFA9YCqWNV77WKy
+         ahzqFLVT/mvYfc2xkq3UhtOTkY4KPIeYmEvN9TQoH4Z36gc6cjkcOAvxqygonK6CAD7x
+         /W8pwtulam2ASS6xJAKUhJoBJVXh9C6JbgJGgmsPFTWy6c9gLKP3dyReuPrLPtQkVJYU
+         +5yI/5xSaRxiDTlyrcTp/k4Yg5FL91MQIn+T/d5AAHBiqGBD63inmQB8YecmapKVPAPc
+         Xqb6kL129iyawXs+Mtk+BGqD2bEGti6KthOyPq2kH9OUTaG8TdOdNnL2NPEmMQ6p3v2S
+         qaRQ==
+X-Gm-Message-State: AFqh2kqNrhs5PwbiHexIFqfVXMrsyQfddLv24BpxOQ+bfXQN6LrqJO1N
+        g1NnGF/qpDth+7wHgBst1U/1DA==
+X-Google-Smtp-Source: AMrXdXtl1Mxf0G5kKYCzSmvXwrHTspZj4lhYWCvqOK8+XThWANrA1FYjSc5qcpb+O56zDEuNhAxhCA==
+X-Received: by 2002:a5d:61c7:0:b0:269:7b65:f20a with SMTP id q7-20020a5d61c7000000b002697b65f20amr28525156wrv.71.1672771384442;
+        Tue, 03 Jan 2023 10:43:04 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id i18-20020a5d5232000000b0028e55b44a99sm13811578wra.17.2023.01.03.10.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 10:43:03 -0800 (PST)
+From:   Dmitry Safonov <dima@arista.com>
+To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Dmitry Safonov <dima@arista.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH v2 0/5] net/crypto: Introduce crypto_pool
+Date:   Tue,  3 Jan 2023 18:42:52 +0000
+Message-Id: <20230103184257.118069-1-dima@arista.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-References: <20230101162910.710293-1-Jason@zx2c4.com> <20230101162910.710293-3-Jason@zx2c4.com>
- <Y7QIg/hAIk7eZE42@gmail.com>
-In-Reply-To: <Y7QIg/hAIk7eZE42@gmail.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 3 Jan 2023 10:36:01 -0800
-X-Gmail-Original-Message-ID: <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
-Message-ID: <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
-Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 3, 2023 at 2:50 AM Ingo Molnar <mingo@kernel.org> wrote:
->
->
-> * Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> > The vDSO getrandom() implementation works with a buffer allocated with a
-> > new system call that has certain requirements:
-> >
-> > - It shouldn't be written to core dumps.
-> >   * Easy: VM_DONTDUMP.
-> > - It should be zeroed on fork.
-> >   * Easy: VM_WIPEONFORK.
+Changes since v1 [1]:
+- Patches went through 3 iterations inside bigger TCP-AO patch set [2],
+  now I'm splitting it apart and sending it once again as a stand-alone
+  patch set to help reviewing it and make it easier to merge.
+  It is second part of that big series, once it merges the next part
+  will be TCP changes to add Authentication Option support (RFC5925),
+  that use API provided by these patches.
+- Corrected kerneldoc-style comment near crypto_pool_reserve_scratch()
+  (Reported-By: kernel test robot <lkp@intel.com>)
+- Added short Documentation/ page for crypto_pool API
 
-I have a rather different suggestion: make a special mapping.  Jason,
-you're trying to shoehorn all kinds of bizarre behavior into the core
-mm, and none of that seems to me to belong to the core mm.  Instead,
-have an actual special mapping with callbacks that does the right
-thing.  No fancy VM flags.
+Add crypto_pool - an API for allocating per-CPU array of crypto requests
+on slow-path (in sleep'able contexts) and for using them on a fast-path,
+which is RX/TX for net/* users.
 
-Memory pressure: have it free and unmap it self.  Gets accessed again?
- ->fault can handle it.
+The design is based on the current implementations of md5sig_pool, which
+this patch set makes generic by separating it from TCP core, moving it
+to crypto/ and adding support for other hashing algorithms than MD5.
+It makes a generic implementation for a common net/ pattern.
 
-Want to mlock it?  No, don't do that -- that's absurd.  Just arrange
-so that, if it gets evicted, it's not written out anywhere.  And when
-it gets faulted back in it does the right thing -- see above.
+The initial motivation to have this API is TCP-AO, that's going to use
+the very same pattern as TCP-MD5, but for multiple hashing algorithms.
+Previously, I've suggested to add such API on TCP-AO patch submission [3],
+where Herbert kindly suggested to help with introducing new crypto API.
+See also discussion and motivation in crypto_pool-v1 [4].
 
-Zero on fork?  I'm sure that's manageable with a special mapping.  If
-not, you can add a new vm operation or similar to make it work.  (Kind
-of like how we extended special mappings to get mremap right a couple
-years go.)  But maybe you don't want to *zero* it on fork and you want
-to do something more intelligent.  Fine -- you control ->fault!
+The API will allow:
+- to reuse per-CPU ahash_request(s) for different users
+- to allocate only one per-CPU scratch buffer rather than a new one for
+  each user
+- to have a common API for net/ users that need ahash on RX/TX fast path
 
-> >
-> > - It shouldn't be written to swap.
-> >   * Uh-oh: mlock is rlimited.
-> >   * Uh-oh: mlock isn't inherited by forks.
+In this version I've wired up TCP-MD5 and IPv6-SR-HMAC as users.
+Potentially, xfrm_ipcomp and xfrm_ah can be converted as well.
+The initial reason for patches would be to have TCP-AO as a user, which
+would let it share per-CPU crypto_request for any supported hashing
+algorithm.
 
-No mlock, no problems.
+[1]: https://lore.kernel.org/all/20220726201600.1715505-1-dima@arista.com/ 
+[2]: https://lore.kernel.org/all/20221027204347.529913-1-dima@arista.com/T/#u
+[3]: http://lkml.kernel.org/r/20211106034334.GA18577@gondor.apana.org.au
+[4]: https://lore.kernel.org/all/26d5955b-3807-a015-d259-ccc262f665c2@arista.com/T/#u
 
-> >
-> > - It shouldn't reserve actual memory, but it also shouldn't crash when
-> >   page faulting in memory if none is available
-> >   * Uh-oh: MAP_NORESERVE respects vm.overcommit_memory=2.
-> >   * Uh-oh: VM_NORESERVE means segfaults.
+Cc: Andy Lutomirski <luto@amacapital.net>
+Cc: Bob Gilligan <gilligan@arista.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Leonard Crestez <cdleonard@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-->fault can do whatever you want.
+Dmitry Safonov (5):
+  crypto: Introduce crypto_pool
+  crypto/pool: Add crypto_pool_reserve_scratch()
+  crypto/net/tcp: Use crypto_pool for TCP-MD5
+  crypto/net/ipv6: sr: Switch to using crypto_pool
+  crypto/Documentation: Add crypto_pool kernel API
 
-And there is no shortage of user memory that *must* be made available
-on fault in order to resume the faulting process.  ->fault can handle
-this.
+ Documentation/crypto/crypto_pool.rst |  33 +++
+ crypto/Kconfig                       |  12 +
+ crypto/Makefile                      |   1 +
+ crypto/crypto_pool.c                 | 338 +++++++++++++++++++++++++++
+ include/crypto/pool.h                |  33 +++
+ include/net/seg6_hmac.h              |   7 -
+ include/net/tcp.h                    |  24 +-
+ net/ipv4/Kconfig                     |   2 +-
+ net/ipv4/tcp.c                       | 105 +++------
+ net/ipv4/tcp_ipv4.c                  |  92 +++++---
+ net/ipv4/tcp_minisocks.c             |  21 +-
+ net/ipv6/Kconfig                     |   2 +-
+ net/ipv6/seg6.c                      |   3 -
+ net/ipv6/seg6_hmac.c                 | 204 +++++++---------
+ net/ipv6/tcp_ipv6.c                  |  53 ++---
+ 15 files changed, 626 insertions(+), 304 deletions(-)
+ create mode 100644 Documentation/crypto/crypto_pool.rst
+ create mode 100644 crypto/crypto_pool.c
+ create mode 100644 include/crypto/pool.h
 
-> >
-> > It turns out that the vDSO getrandom() function has three really nice
-> > characteristics that we can exploit to solve this problem:
-> >
-> > 1) Due to being wiped during fork(), the vDSO code is already robust to
-> >    having the contents of the pages it reads zeroed out midway through
-> >    the function's execution.
-> >
-> > 2) In the absolute worst case of whatever contingency we're coding for,
-> >    we have the option to fallback to the getrandom() syscall, and
-> >    everything is fine.
-> >
-> > 3) The buffers the function uses are only ever useful for a maximum of
-> >    60 seconds -- a sort of cache, rather than a long term allocation.
-> >
-> > These characteristics mean that we can introduce VM_DROPPABLE, which
-> > has the following semantics:
 
-No need for another vm flag.
+base-commit: 69b41ac87e4a664de78a395ff97166f0b2943210
+-- 
+2.39.0
 
-> >
-> > a) It never is written out to swap.
-
-No need to complicate the swap logic for this.
-
-> > b) Under memory pressure, mm can just drop the pages (so that they're
-> >    zero when read back again).
-
-Or ->fault could even repopulate it without needing to ever read zeros.
-
-> > c) If there's not enough memory to service a page fault, it's not fatal,
-> >    and no signal is sent. Instead, writes are simply lost.
-
-This just seems massively overcomplicated to me.  If there isn't
-enough memory to fault in a page of code, we don't have some magic
-instruction emulator in the kernel.  We either OOM or we wait for
-memory to show up.
-
-> > d) It is inherited by fork.
-
-If you have a special mapping and you fork, it doesn't magically turn
-into normal memory.
-
-> > e) It doesn't count against the mlock budget, since nothing is locked.
-
-Special mapping -> no mlock.
-
-> >
-> > This is fairly simple to implement, with the one snag that we have to
-> > use 64-bit VM_* flags, but this shouldn't be a problem, since the only
-> > consumers will probably be 64-bit anyway.
-> >
-> > This way, allocations used by vDSO getrandom() can use:
-> >
-> >     VM_DROPPABLE | VM_DONTDUMP | VM_WIPEONFORK | VM_NORESERVE
-> >
-> > And there will be no problem with OOMing, crashing on overcommitment,
-> > using memory when not in use, not wiping on fork(), coredumps, or
-> > writing out to swap.
-> >
-> > At the moment, rather than skipping writes on OOM, the fault handler
-> > just returns to userspace, and the instruction is retried. This isn't
-> > terrible, but it's not quite what is intended. The actual instruction
-> > skipping has to be implemented arch-by-arch, but so does this whole
-> > vDSO series, so that's fine. The following commit addresses it for x86.
-
-I really dislike this.  I'm with Ingo.
