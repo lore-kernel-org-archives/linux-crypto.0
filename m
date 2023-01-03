@@ -2,161 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD2BC3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 20:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9923C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 23:18:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234064AbjACUw1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 15:52:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38744 "EHLO
+        id S233962AbjACXSf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 18:18:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233818AbjACUwW (ORCPT
+        with ESMTP id S230222AbjACXSe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 15:52:22 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA90711451
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 12:52:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 66F496150F
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 20:52:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1589C433D2
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 20:52:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672779140;
-        bh=xs5A+nMiaJ/Zy5xE1gzTZdyLZdx/SjaaBqXGHdvbWO4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=IViIz6XhLna+IMieFjX0kFayYqlTjoK4+UskVhEDdMhHOndGCCTRyqPaAieL8owHT
-         pQXfK+agxm0x3tTTeVx7yC+pwtxkji9bgIkV37m1k0+Ga6fXMCDxXcJtWbKSVOncSO
-         dYo1bfTvjn6nVQAxcu5xgNJ+b/aiBEzVsrnfffA4R19DIxLqWzoAE3SuKKm2gld83q
-         FqiFd9fplaWqc5DpIYzb0Y6uvms1SQ5FN9SKFpHLPdE3ZA9nNiZMXBdDGD2De9aLuu
-         2JwzNU83DTalxqv9ivLGHCDGxKNWIdW7DOp/VAZvcdtZmzadzDcvm9IP/0fE1zywnC
-         TkheMl1WauzXg==
-Received: by mail-ej1-f53.google.com with SMTP id x22so77039529ejs.11
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 12:52:20 -0800 (PST)
-X-Gm-Message-State: AFqh2kosvHa4x1MXMnUJCVG6WWMPTEsLRllU3aGotKDKoHKMms21e2Qy
-        0Gl0WpbdSXXiU8Zx2sNgS45zwlbjSNXQKv416PsAKQ==
-X-Google-Smtp-Source: AMrXdXtJn4wvVsf0Gv6tOxeEuC/2g3dPY5tqpzGUE+LHAvoe7SJkKjKb2Tii9tUOZsU2wwA8B5p3fjKCk0JZwPbcZjk=
-X-Received: by 2002:a17:906:9155:b0:81a:c468:4421 with SMTP id
- y21-20020a170906915500b0081ac4684421mr5049277ejw.149.1672779138998; Tue, 03
- Jan 2023 12:52:18 -0800 (PST)
+        Tue, 3 Jan 2023 18:18:34 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5122215FD0
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 15:18:33 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id 6so18938691pfz.4
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 15:18:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+SKNwK2NyJVXaeShNit/vbIhlTVvPRm29ctCwVFguc8=;
+        b=dKwcY+gyo70o9MnjanigW/qbwMZCHd1jZ/HZNSbTYA7uNNvtO5+1d3klhV3LBMg+Wz
+         C2f5ATp6q34nZdwFYSHxnjLN6cdjcQaZYK8In156L+mHFNKh+ncF5id1Xdogt5wKfYUP
+         Jfq+tUgmYLuZ+tsFX7/u5Ev8KhBwft2jYUV4FcrCcN7XOYrKU8lEy9cr4xdbEFAeeqOM
+         +mNiWE5zo51VEhO5XWTZPXdcAW+wBtXNeIn+UGKmYkP6QHi06nkmYHqNyDHWviMrOrpU
+         DOsV/Fm4EsBo2CqwNVgdmKbLjtd3H+h0QfLHQ/3g4IxCEdekFIWpWIAFgfLrqB5VWLuZ
+         UoIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+SKNwK2NyJVXaeShNit/vbIhlTVvPRm29ctCwVFguc8=;
+        b=AdL/F+xmluxl7l7VTPY7fmoYg0ye0E/Qsotw/ujUI2vRL5//LuKdowg48PIxO0NYag
+         u8F9jWm1enlAJTY9AcVJlWYQWKGdOcWkYolw+QJUiwXdvq6wqO+vy3BjbkK6fiJNEo3c
+         MJlyXeR+q+fGo84DaqvQRy6WyosCN7Onsv+JHpBKNpLGQrmcCLs5h5Rfv/ipOIlzH9Y/
+         ZJlAU6HE4i841fGeDV2NgFMuRSKMfufyKf9vHuRl70GRFCpl7LFmw2rHji5NlWs7J1V6
+         u+yylzq1nnP8e5O5bpI19luXz3tyTdxkAn3sp87OjOdDRATmGwNcd4U+MafS14LWXy+y
+         u4XQ==
+X-Gm-Message-State: AFqh2kq1ZjKY7D0EL3frysr4+IkXKyalETy+J0pJGMhL6FzGGwtm0HV2
+        HPg7jS/L+PI10QvkJeT57ZO5DQ==
+X-Google-Smtp-Source: AMrXdXsj9J+1dDyzj3rH6i+WIAk9RX4wTCh/a0OvdiDq7jKdG5ipnl0KUACxUzdUC3b8vzSnoPI8sQ==
+X-Received: by 2002:aa7:8084:0:b0:574:8995:c0d0 with SMTP id v4-20020aa78084000000b005748995c0d0mr3598502pff.1.1672787912621;
+        Tue, 03 Jan 2023 15:18:32 -0800 (PST)
+Received: from [2620:15c:29:203:3ac1:84a4:2f59:c43f] ([2620:15c:29:203:3ac1:84a4:2f59:c43f])
+        by smtp.gmail.com with ESMTPSA id w18-20020aa79a12000000b00581816425f3sm12920964pfj.112.2023.01.03.15.18.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 15:18:31 -0800 (PST)
+Date:   Tue, 3 Jan 2023 15:18:31 -0800 (PST)
+From:   David Rientjes <rientjes@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Peter Gonda <pgonda@google.com>,
+        Andy Nguyen <theflow@google.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>
+Subject: Re: [patch] crypto: ccp - Avoid page allocation failure warning for
+ SEV_GET_ID2
+In-Reply-To: <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com>
+Message-ID: <06de8454-2b29-f3b6-7cf2-c037c2735b6d@google.com>
+References: <20221214202046.719598-1-pgonda@google.com> <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au> <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com> <Y6wDJd3hfztLoCp1@gondor.apana.org.au> <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
+ <833b4dd0-7f85-b336-0786-965f3f573f74@google.com> <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com>
 MIME-Version: 1.0
-References: <20230101162910.710293-1-Jason@zx2c4.com> <20230101162910.710293-3-Jason@zx2c4.com>
- <Y7QIg/hAIk7eZE42@gmail.com> <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
- <Y7R8Zq6sIKAIprtr@zx2c4.com>
-In-Reply-To: <Y7R8Zq6sIKAIprtr@zx2c4.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 3 Jan 2023 12:52:07 -0800
-X-Gmail-Original-Message-ID: <CALCETrXaHPZMNx7g2NS9-5ShG3i74615W7gKQ2tmr4xpvgTBkA@mail.gmail.com>
-Message-ID: <CALCETrXaHPZMNx7g2NS9-5ShG3i74615W7gKQ2tmr4xpvgTBkA@mail.gmail.com>
-Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Andy Lutomirski <luto@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-        linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        tglx@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-api@vger.kernel.org, x86@kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 3, 2023 at 11:06 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi Andy,
->
-> Thanks for your constructive suggestions.
->
-> On Tue, Jan 03, 2023 at 10:36:01AM -0800, Andy Lutomirski wrote:
-> > > > c) If there's not enough memory to service a page fault, it's not fatal,
-> > > >    and no signal is sent. Instead, writes are simply lost.
-> >
-> > This just seems massively overcomplicated to me.  If there isn't
-> > enough memory to fault in a page of code, we don't have some magic
-> > instruction emulator in the kernel.  We either OOM or we wait for
-> > memory to show up.
->
-> Before addressing the other parts of your email, I thought I'd touch on
-> this. Quoting from the email I just wrote Ingo:
->
-> | *However* - if your big objection to this patch is that the instruction
-> | skipping is problematic, we could actually punt that part. The result
-> | will be that userspace just retries the memory write and the fault
-> | happens again, and eventually it succeeds. From a perspective of
-> | vgetrandom(), that's perhaps worse -- with this v14 patchset, it'll
-> | immediately fallback to the syscall under memory pressure -- but you
-> | could argue that nobody really cares about performance at that point
-> | anyway, and so just retrying the fault until it succeeds is a less
-> | complex behavior that would be just fine.
-> |
-> | Let me know if you think that'd be an acceptable compromise, and I'll
-> | roll it into v15. As a preview, it pretty much amounts to dropping 3/7
-> | and editing the commit message in this 2/7 patch.
->
-> IOW, I think the main ideas of the patch work just fine without "point
-> c" with the instruction skipping. Instead, waiting/retrying could
-> potentially work. So, okay, it seems like the two of you both hate the
-> instruction decoder stuff, so I'll plan on working that part in, in one
-> way or another, for v15.
->
-> > On Tue, Jan 3, 2023 at 2:50 AM Ingo Molnar <mingo@kernel.org> wrote:
-> > > > The vDSO getrandom() implementation works with a buffer allocated with a
-> > > > new system call that has certain requirements:
-> > > >
-> > > > - It shouldn't be written to core dumps.
-> > > >   * Easy: VM_DONTDUMP.
-> > > > - It should be zeroed on fork.
-> > > >   * Easy: VM_WIPEONFORK.
-> >
-> > I have a rather different suggestion: make a special mapping.  Jason,
-> > you're trying to shoehorn all kinds of bizarre behavior into the core
-> > mm, and none of that seems to me to belong to the core mm.  Instead,
-> > have an actual special mapping with callbacks that does the right
-> > thing.  No fancy VM flags.
->
-> Oooo! I like this. Avoiding adding VM_* flags would indeed be nice.
-> I had seen things that I thought looked in this direction with the shmem
-> API, but when I got into the details, it looked like this was meant for
-> something else and couldn't address most of what I wanted here.
->
-> If you say this is possible, I'll look again to see if I can figure it
-> out. Though, if you have some API name at the top of your head, you
-> might save me some code squinting time.
+On Tue, 3 Jan 2023, Tom Lendacky wrote:
 
-Look for _install_special_mapping().
+> On 12/30/22 16:18, David Rientjes wrote:
+> > For SEV_GET_ID2, the user provided length does not have a specified
+> > limitation because the length of the ID may change in the future.  The
+> > kernel memory allocation, however, is implicitly limited to 4MB on x86 by
+> > the page allocator, otherwise the kzalloc() will fail.
+> > 
+> > When this happens, it is best not to spam the kernel log with the warning.
+> > Simply fail the allocation and return ENOMEM to the user.
+> > 
+> > Fixes: d6112ea0cb34 ("crypto: ccp - introduce SEV_GET_ID2 command")
+> > Reported-by: Andy Nguyen <theflow@google.com>
+> > Reported-by: Peter Gonda <pgonda@google.com>
+> > Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > Signed-off-by: David Rientjes <rientjes@google.com>
+> > ---
+> >   drivers/crypto/ccp/sev-dev.c | 9 ++++++++-
+> >   1 file changed, 8 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > --- a/drivers/crypto/ccp/sev-dev.c
+> > +++ b/drivers/crypto/ccp/sev-dev.c
+> > @@ -881,7 +881,14 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd
+> > *argp)
+> >   	input_address = (void __user *)input.address;
+> >     	if (input.address && input.length) {
+> > -		id_blob = kzalloc(input.length, GFP_KERNEL);
+> > +		/*
+> > +		 * The length of the ID shouldn't be assumed by software since
+> > +		 * it may change in the future.  The allocation size is
+> > limited
+> > +		 * to 1 << (PAGE_SHIFT + MAX_ORDER - 1) by the page allocator.
+> > +		 * If the allocation fails, simply return ENOMEM rather than
+> > +		 * warning in the kernel log.
+> > +		 */
+> > +		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
+> 
+> We could do this or we could have the driver invoke the API with a zero length
+> to get the minimum buffer size needed for the call. The driver could then
+> perform some validation checks comparing the supplied input.length to the
+> returned length. If the driver can proceed, then if input.length is exactly 2x
+> the minimum length, then kzalloc the 2 * minimum length, otherwise kzalloc the
+> minimum length. This is a bit more complicated, though, compared to this fix.
+> 
 
---Andy
+Thanks Tom.  IIUC, this could be useful to identify situations where 
+input.length != min_length and input.length != min_length*2 and, in those 
+cases, return EINVAL?  Or are there situations where this is actually a 
+valid input.length?
 
-> > Want to mlock it?  No, don't do that -- that's absurd.  Just arrange
-> > so that, if it gets evicted, it's not written out anywhere.  And when
-> > it gets faulted back in it does the right thing -- see above.
->
-> Presumably mlock calls are redirected to some function pointer so I can
-> just return EINTR?
-
-Or just don't worry about it.  If someone mlocks() it, that's their
-problem.  The point is that no one needs to.
-
->
-> > Zero on fork?  I'm sure that's manageable with a special mapping.  If
-> > not, you can add a new vm operation or similar to make it work.  (Kind
-> > of like how we extended special mappings to get mremap right a couple
-> > years go.)  But maybe you don't want to *zero* it on fork and you want
-> > to do something more intelligent.  Fine -- you control ->fault!
->
-> Doing something more intelligent would be an interesting development, I
-> guess... But, before I think about that, all mapping have flags;
-> couldn't I *still* set VM_WIPEONFORK on the special mapping? Or does the
-> API you have in mind not work that way? (Side note: I also want
-> VM_DONTDUMP to work.)
-
-You really want unmap (the pages, not the vma) on fork, not wipe on
-fork.  It'll be VM_SHARED, and I'm not sure what VM_WIPEONFORK |
-VM_SHARED does.
+I was assuming that the user was always doing its own SEV_GET_ID2 first to 
+determine the length and then use it for input.length, but perhaps that's 
+not the case and they are passing a bogus value.
