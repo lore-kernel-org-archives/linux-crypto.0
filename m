@@ -2,142 +2,259 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D396BC3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 14:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7C3C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 14:04:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237391AbjACOCG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 09:02:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
+        id S237766AbjACOEJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 09:04:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236987AbjACOCF (ORCPT
+        with ESMTP id S236918AbjACOEF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 09:02:05 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB85FD2F3
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 06:02:03 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 66330B80ED7
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 14:02:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D60C433F1
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 14:02:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672754521;
-        bh=KwR+AP7Jj+KziTdD94+570fYpG8HYLialbGB47tPHII=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=i8glW/OpsEPIikQMPpQUDIxX9d2SmSoSSvnlhb5o0d82VZypJ0iDqM6kSUWMZ5lLq
-         f9x0fq90c0KjKfrZfMp1YHdtZ2TkdywOpx8BYagvv46PiPWunWuMj6gHfgSvR20ILo
-         +1zF4XALDYUHZe3Gyd2I7SAp6j2JAZOEWezS/9jPIljVSYyqzCSa6axLEGYTkI8w2E
-         wvjkn37ZSn8mMMs0BMsHsHTL9F1Y5dOSM61k/xEpPDdoAM23W8UL5shd5UFhOdtc0z
-         eBrPA8oLipR+CPVp2yJ6sB6yNfjh9kUi9mPRoebFVu3rlgfyVMw3tGLX465k4pQ2QD
-         ccusyp3H6U0bg==
-Received: by mail-lf1-f50.google.com with SMTP id j17so36285782lfr.3
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 06:02:01 -0800 (PST)
-X-Gm-Message-State: AFqh2kqk0VNvAryu+KhR6J1HWE2EkK2vQlhwYyYIVyATR/HghLJKWsC+
-        eEe4NSqZc7e/TiSZkE7YRcSBSVJQNaUoiyHoQbY=
-X-Google-Smtp-Source: AMrXdXvvUPTpuOQmiShGvU2ZCphvRuE1oYKbP2mg/TCbIjRh7zK8KT5uVmS9NFiY1/WWDcKE2GkrFlVYfXe+SpRXTs0=
-X-Received: by 2002:ac2:5d4e:0:b0:4b5:964d:49a4 with SMTP id
- w14-20020ac25d4e000000b004b5964d49a4mr3738999lfd.637.1672754519038; Tue, 03
- Jan 2023 06:01:59 -0800 (PST)
+        Tue, 3 Jan 2023 09:04:05 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3B3510B6C;
+        Tue,  3 Jan 2023 06:03:57 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B1831595;
+        Tue,  3 Jan 2023 06:04:39 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.37.13])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9306B3F587;
+        Tue,  3 Jan 2023 06:03:51 -0800 (PST)
+Date:   Tue, 3 Jan 2023 14:03:37 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Boqun Feng <boqun.feng@gmail.com>, torvalds@linux-foundation.org,
+        corbet@lwn.net, will@kernel.org, catalin.marinas@arm.com,
+        dennis@kernel.org, tj@kernel.org, cl@linux.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 05/12] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y7Q1uexv6DrxCASB@FVFF77S0Q05N>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.154045458@infradead.org>
+ <Y6DEfQXymYVgL3oJ@boqun-archlinux>
+ <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
+ <Y7QszyTEG2+WiI/C@FVFF77S0Q05N>
 MIME-Version: 1.0
-References: <CGME20230103111359eucas1p137cb823bdc80d790544de20c3835faf2@eucas1p1.samsung.com>
- <Y7NizHFsWfMW/cC2@sol.localdomain> <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
-In-Reply-To: <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 3 Jan 2023 15:01:47 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGY4zZovOKY5kD54pFEXeOoX=3JCuHVCDpQJf+Wo+oBiw@mail.gmail.com>
-Message-ID: <CAMj1kXGY4zZovOKY5kD54pFEXeOoX=3JCuHVCDpQJf+Wo+oBiw@mail.gmail.com>
-Subject: Re: xor_blocks() assumptions
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7QszyTEG2+WiI/C@FVFF77S0Q05N>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 3 Jan 2023 at 12:14, Lukasz Stelmach <l.stelmach@samsung.com> wrote:
->
-> It was <2023-01-02 pon 15:03>, when Eric Biggers wrote:
-> > On Mon, Jan 02, 2023 at 11:44:35PM +0100, Lukasz Stelmach wrote:
-> >> I am researching possibility to use xor_blocks() in crypto_xor() and
-> >> crypto_xor_cpy(). What I've found already is that different architecture
-> >> dependent xor functions work on different blocks between 16 and 512
-> >> (Intel AVX) bytes long. There is a hint in the comment for
-> >> async_xor_offs() that src_cnt (as passed to do_sync_xor_offs()) counts
-> >> pages. Thus, it is assumed, that the smallest chunk xor_blocks() gets is
-> >> a single page. Am I right?
-> >>
-> >> Do you think adding block_len field to struct xor_block_template (and
-> >> maybe some information about required alignment) and using it to call
-> >> do_2 from crypto_xor() may work? I am thinking especially about disk
-> >> encryption where sectors of 512~4096 are handled.
-> >>
-> >
-> > Taking a step back, it sounds like you think the word-at-a-time XOR in
-> > crypto_xor() is not performant enough, so you want to use a SIMD (e.g. NEON,
-> > SSE, or AVX) implementation instead.
->
-> Yes.
->
-> > Have you tested that this would actually give a benefit on the input
-> > sizes in question,
->
-> --8<---------------cut here---------------start------------->8---
-> [    0.938006] xor: measuring software checksum speed
-> [    0.947383]    crypto          :  1052 MB/sec
-> [    0.953299]    arm4regs        :  1689 MB/sec
-> [    0.960674]    8regs           :  1352 MB/sec
-> [    0.968033]    32regs          :  1352 MB/sec
-> [    0.972078]    neon            :  2448 MB/sec
-> --8<---------------cut here---------------end--------------->8---
->
+On Tue, Jan 03, 2023 at 01:25:35PM +0000, Mark Rutland wrote:
+> On Tue, Dec 20, 2022 at 12:08:16PM +0100, Peter Zijlstra wrote:
+> > On Mon, Dec 19, 2022 at 12:07:25PM -0800, Boqun Feng wrote:
+> > > On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
+> > > > For all architectures that currently support cmpxchg_double()
+> > > > implement the cmpxchg128() family of functions that is basically the
+> > > > same but with a saner interface.
+> > > > 
+> > > > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> > > > ---
+> > > >  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
+> > > >  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
+> > > >  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+> > > >  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
+> > > >  arch/x86/include/asm/cmpxchg_32.h     |    3 +
+> > > >  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+> > > >  6 files changed, 185 insertions(+), 3 deletions(-)
+> > > > 
+> > > > --- a/arch/arm64/include/asm/atomic_ll_sc.h
+> > > > +++ b/arch/arm64/include/asm/atomic_ll_sc.h
+> > > > @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+> > > >  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
+> > > >  
+> > > >  #undef __CMPXCHG_DBL
+> > > > +
+> > > > +union __u128_halves {
+> > > > +	u128 full;
+> > > > +	struct {
+> > > > +		u64 low, high;
+> > > > +	};
+> > > > +};
+> > > > +
+> > > > +#define __CMPXCHG128(name, mb, rel, cl)					\
+> > > > +static __always_inline u128						\
+> > > > +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
+> > > > +{									\
+> > > > +	union __u128_halves r, o = { .full = (old) },			\
+> > > > +			       n = { .full = (new) };			\
+> > > > +									\
+> > > > +	asm volatile("// __cmpxchg128" #name "\n"			\
+> > > > +	"	prfm	pstl1strm, %2\n"				\
+> > > > +	"1:	ldxp	%0, %1, %2\n"					\
+> > > > +	"	eor	%3, %0, %3\n"					\
+> > > > +	"	eor	%4, %1, %4\n"					\
+> > > > +	"	orr	%3, %4, %3\n"					\
+> > > > +	"	cbnz	%3, 2f\n"					\
+> > > > +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
+> > > > +	"	cbnz	%w3, 1b\n"					\
+> > > > +	"	" #mb "\n"						\
+> > > > +	"2:"								\
+> > > > +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
+> > > 
+> > > I wonder whether we should use "(*(u128 *)ptr)" instead of "(*(unsigned
+> > > long *) ptr)"? Because compilers may think only 64bit value pointed by
+> > > "ptr" gets modified, and they are allowed to do "useful" optimization.
+> > 
+> > In this I've copied the existing cmpxchg_double() code; I'll have to let
+> > the arch folks speak here, I've no clue.
+> 
+> We definitely need to ensure the compiler sees we poke the whole thing, or it
+> can get this horribly wrong, so that is a latent bug.
+> 
+> See commit:
+> 
+>   fee960bed5e857eb ("arm64: xchg: hazard against entire exchange variable")
+> 
+> ... for examples of GCC being clever, where I overlooked the *_double() cases.
 
-This doesn't really answer the question. This only tells us that NEON
-is faster on this core when XOR'ing the same cache-hot page multple
-times in succession.
+Ugh; with GCC 12.1.0, arm64 defconfig, and the following:
 
-So the question is really which crypto algorithm you intend to
-accelerate with this change, and the input sizes it operates on.
+| struct big {
+|         u64 lo, hi;
+| } __aligned(128);
+| 
+| unsigned long foo(struct big *b)
+| {
+|         u64 hi_old, hi_new;
+| 
+|         hi_old = b->hi;
+| 
+|         cmpxchg_double_local(&b->lo, &b->hi, 0x12, 0x34, 0x56, 0x78);
+| 
+|         hi_new = b->hi;
+| 
+|         return hi_old ^ hi_new;
+| }
 
-If the algo in question is the generic XTS template wrapped around a
-h/w accelerated implementation of ECB, I suspect that we would be
-better off wiring up xor_blocks() into xts.c, rather than modifying
-crypto_xor() and crypto_xor_cpy(). Many other calls to crypto_xor()
-operate on small buffers where this optimization is unlikely to help.
+GCC clearly figures out the high half isn't modified, and constant folds hi_old
+^ hi_new down to zero, regardless of whether we use LL/SC or LSE:
 
-So rephrase the question: which invocation of crypto_xor() is the
-bottleneck in the use case you are trying to optimize?
+<foo>:
+   0:   d503233f        paciasp
+   4:   aa0003e4        mov     x4, x0
+   8:   1400000e        b       40 <foo+0x40>
+   c:   d2800240        mov     x0, #0x12                       // #18
+  10:   d2800681        mov     x1, #0x34                       // #52
+  14:   aa0003e5        mov     x5, x0
+  18:   aa0103e6        mov     x6, x1
+  1c:   d2800ac2        mov     x2, #0x56                       // #86
+  20:   d2800f03        mov     x3, #0x78                       // #120
+  24:   48207c82        casp    x0, x1, x2, x3, [x4]
+  28:   ca050000        eor     x0, x0, x5
+  2c:   ca060021        eor     x1, x1, x6
+  30:   aa010000        orr     x0, x0, x1
+  34:   d2800000        mov     x0, #0x0                        // #0    <--- BANG
+  38:   d50323bf        autiasp
+  3c:   d65f03c0        ret
+  40:   d2800240        mov     x0, #0x12                       // #18
+  44:   d2800681        mov     x1, #0x34                       // #52
+  48:   d2800ac2        mov     x2, #0x56                       // #86
+  4c:   d2800f03        mov     x3, #0x78                       // #120
+  50:   f9800091        prfm    pstl1strm, [x4]
+  54:   c87f1885        ldxp    x5, x6, [x4]
+  58:   ca0000a5        eor     x5, x5, x0
+  5c:   ca0100c6        eor     x6, x6, x1
+  60:   aa0600a6        orr     x6, x5, x6
+  64:   b5000066        cbnz    x6, 70 <foo+0x70>
+  68:   c8250c82        stxp    w5, x2, x3, [x4]
+  6c:   35ffff45        cbnz    w5, 54 <foo+0x54>
+  70:   d2800000        mov     x0, #0x0                        // #0     <--- BANG
+  74:   d50323bf        autiasp
+  78:   d65f03c0        ret
+  7c:   d503201f        nop
 
+... so we *definitely* need to fix that.
 
-> (Linux 6.2.0-rc1 running on Odroid XU3 board with Arm Cortex-A15)
->
-> The patch below copies, adapts and plugs in __crypto_xor() as
-> xor_block_crypto.do_2. You can see its results labeled "crypto" above.
-> Disk encryption is comparable to RAID5 checksumming so the results above
-> should be adequate.
->
-> > especially considering that SIMD can only be used in the kernel if
-> > kernel_fpu_begin() is executed first?
->
-> That depends on architecture. As far as I can tell this applies to Intel
-> only.
->
+Using __uint128_t instead, e.g.
 
-On ARM, you must use kernel_neon_begin/_end() when using SIMD in
-kernel mode, which comes down to the same thing.
+diff --git a/arch/arm64/include/asm/atomic_ll_sc.h b/arch/arm64/include/asm/atomic_ll_sc.h
+index 0890e4f568fb7..cbb3d961123b1 100644
+--- a/arch/arm64/include/asm/atomic_ll_sc.h
++++ b/arch/arm64/include/asm/atomic_ll_sc.h
+@@ -315,7 +315,7 @@ __ll_sc__cmpxchg_double##name(unsigned long old1,                   \
+        "       cbnz    %w0, 1b\n"                                      \
+        "       " #mb "\n"                                              \
+        "2:"                                                            \
+-       : "=&r" (tmp), "=&r" (ret), "+Q" (*(unsigned long *)ptr)        \
++       : "=&r" (tmp), "=&r" (ret), "+Q" (*(__uint128_t *)ptr)          \
+        : "r" (old1), "r" (old2), "r" (new1), "r" (new2)                \
+        : cl);                                                          \
+                                                                        \
+diff --git a/arch/arm64/include/asm/atomic_lse.h b/arch/arm64/include/asm/atomic_lse.h
+index 52075e93de6c0..a94d6dacc0292 100644
+--- a/arch/arm64/include/asm/atomic_lse.h
++++ b/arch/arm64/include/asm/atomic_lse.h
+@@ -311,7 +311,7 @@ __lse__cmpxchg_double##name(unsigned long old1,                             \
+        "       eor     %[old2], %[old2], %[oldval2]\n"                 \
+        "       orr     %[old1], %[old1], %[old2]"                      \
+        : [old1] "+&r" (x0), [old2] "+&r" (x1),                         \
+-         [v] "+Q" (*(unsigned long *)ptr)                              \
++         [v] "+Q" (*(__uint128_t *)ptr)                                \
+        : [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),             \
+          [oldval1] "r" (oldval1), [oldval2] "r" (oldval2)              \
+        : cl);                                                          \
 
-> > It also would be worth considering just optimizing crypto_xor() by
-> > unrolling the word-at-a-time loop to 4x or so.
->
-> If I understand correctly the generic 8regs and 32regs implementations
-> in include/asm-generic/xor.h are what you mean. Using xor_blocks() in
-> crypto_xor() could enable them for free on architectures lacking SIMD or
-> vector instructions.
->
+... makes GCC much happier:
 
--- 
-Ard.
+<foo>:
+   0:   f9400407        ldr     x7, [x0, #8]
+   4:   d503233f        paciasp
+   8:   aa0003e4        mov     x4, x0
+   c:   1400000f        b       48 <foo+0x48>
+  10:   d2800240        mov     x0, #0x12                       // #18
+  14:   d2800681        mov     x1, #0x34                       // #52
+  18:   aa0003e5        mov     x5, x0
+  1c:   aa0103e6        mov     x6, x1
+  20:   d2800ac2        mov     x2, #0x56                       // #86
+  24:   d2800f03        mov     x3, #0x78                       // #120
+  28:   48207c82        casp    x0, x1, x2, x3, [x4]
+  2c:   ca050000        eor     x0, x0, x5
+  30:   ca060021        eor     x1, x1, x6
+  34:   aa010000        orr     x0, x0, x1
+  38:   f9400480        ldr     x0, [x4, #8]
+  3c:   d50323bf        autiasp
+  40:   ca0000e0        eor     x0, x7, x0
+  44:   d65f03c0        ret
+  48:   d2800240        mov     x0, #0x12                       // #18
+  4c:   d2800681        mov     x1, #0x34                       // #52
+  50:   d2800ac2        mov     x2, #0x56                       // #86
+  54:   d2800f03        mov     x3, #0x78                       // #120
+  58:   f9800091        prfm    pstl1strm, [x4]
+  5c:   c87f1885        ldxp    x5, x6, [x4]
+  60:   ca0000a5        eor     x5, x5, x0
+  64:   ca0100c6        eor     x6, x6, x1
+  68:   aa0600a6        orr     x6, x5, x6
+  6c:   b5000066        cbnz    x6, 78 <foo+0x78>
+  70:   c8250c82        stxp    w5, x2, x3, [x4]
+  74:   35ffff45        cbnz    w5, 5c <foo+0x5c>
+  78:   f9400480        ldr     x0, [x4, #8]
+  7c:   d50323bf        autiasp
+  80:   ca0000e0        eor     x0, x7, x0
+  84:   d65f03c0        ret
+  88:   d503201f        nop
+  8c:   d503201f        nop
+
+... I'll go check whether clang is happy with that, and how far back that can
+go, otherwise we'll need to blat the high half with a separate constaint that
+(ideally) doesn't end up allocating a pointless address register.
+
+Mark.
