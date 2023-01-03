@@ -2,139 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E90C53210
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 16:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF6DC53210
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 17:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238201AbjACQvJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 11:51:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34150 "EHLO
+        id S238119AbjACRCx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 12:02:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233711AbjACQu6 (ORCPT
+        with ESMTP id S238455AbjACRCO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 11:50:58 -0500
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87AAC12D28;
-        Tue,  3 Jan 2023 08:50:28 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.west.internal (Postfix) with ESMTP id 36F072B06721;
-        Tue,  3 Jan 2023 11:50:23 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Tue, 03 Jan 2023 11:50:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm2; t=1672764622; x=1672771822; bh=OAEx+kWOpU
-        s1ovkCOUPYt4BrguZtb4ZebjcqYHg4/yk=; b=SAmVbdnFaBzWfpnFGzV4NSDsrp
-        w/oJNVKvqGJxgxv+5cuJf5nW1Un9vV0Dp+Wz/8PRNAPQi9a6E9iB6P7fPKvjIxDc
-        sL4HDcHtwrl7pXHk7V3MgPQWqu05FxSbB9sUvpWN9KKGs4x8vL+qIY/u0O2fp32A
-        WAqTXa3KI/HWcNdqPcB+rYggrEcH15MpJ6Rkc4JPKXgau/UtLCWzNDxTa3kwfqeV
-        zzXlg1coYrCQvujOFEC7eWm3ZTrIXSENwnHXqfIt0HR4tRDATgdIYXJK/5Nklyc9
-        aK1RL7dvFw5nAF9DzxYqmKbi/kWMx9keHmBbHeA7s/EWyr+VxGNjwhtKapYA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1672764622; x=1672771822; bh=OAEx+kWOpUs1ovkCOUPYt4BrguZt
-        b4ZebjcqYHg4/yk=; b=Os1ym1lstngE1yum7vioqidaf0tpUcIIddLV9oaWSOfr
-        Bp/LOs8s1eDc1lv7yge46iL+oTo/wMkxx27m9Yc6N3aV2TFIrYSkjiZdPQ8Dixm+
-        MdtzUXOxkrF8n3jv67bTVLyIeEpdtwhZZbr6DRy6eSsxHEeLTvrwGMCkx5wOQru3
-        LcNlUNWCaMJK5m1qqNpuLPnUa66cfWOJJRIOlVox9K7/RRqPZ9SJl0dYQTo66EU5
-        cPPwriRMEe+ZdKHvf4o8MaE+JiGSbpGlrJv8+wqaIVkBvWZfTB6lLcEQvdFquzkx
-        fChHnH7XWHxMTXIIMydoHXwDKugKo6A7KVet7ij5Nw==
-X-ME-Sender: <xms:zVy0Y_OMAKlPmEOZgHU3a6aRFfK4FxfhdvwVIklHrp_YRo8o61lqRQ>
-    <xme:zVy0Y59x2GX8W2BoN-3zVKBdj25Ajq9AP-OrqTzquZvM2wI-7Ix0NtTzj27YrKddM
-    tZvWCMnOIl-fW65cx4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrjeeggdelfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpefhfeehgfejkedugeeutdffveehheeugfehgeelleefudeluedtgfejffeihffh
-    heenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdguvggsihgrnhdrohhrghenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghr
-    nhgusgdruggv
-X-ME-Proxy: <xmx:zVy0Y-SSMWtvnv9ZxmJhry6mi4BiUHZLH8otfjVaL1ZvtYqw_HgNxg>
-    <xmx:zVy0YzvPJ5VhbjYKcO9WXl04J_Mdvuydp68lACKnB0sC0DcdlpA9uw>
-    <xmx:zVy0Y3cCyrZtBDo3MJ4Hdt1EHAWboT_3ZNKcff2QNMqRJXhlhsucqg>
-    <xmx:zly0Y2fTU14izRdahtJutvIauGNC4i8YnSE3hUn7fbjaIA917RmO5fEWBSI>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 465BAB60086; Tue,  3 Jan 2023 11:50:21 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-1185-g841157300a-fm-20221208.002-g84115730
-Mime-Version: 1.0
-Message-Id: <8fea3494-1d1f-4f64-b525-279152cf430b@app.fastmail.com>
-In-Reply-To: <Y7RVkjDC3EjQUCzM@FVFF77S0Q05N>
-References: <20221219153525.632521981@infradead.org>
- <20221219154119.154045458@infradead.org> <Y6DEfQXymYVgL3oJ@boqun-archlinux>
- <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
- <Y7QszyTEG2+WiI/C@FVFF77S0Q05N> <Y7Q1uexv6DrxCASB@FVFF77S0Q05N>
- <Y7RVkjDC3EjQUCzM@FVFF77S0Q05N>
-Date:   Tue, 03 Jan 2023 17:50:00 +0100
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Mark Rutland" <mark.rutland@arm.com>,
-        "Peter Zijlstra" <peterz@infradead.org>
-Cc:     "Boqun Feng" <boqun.feng@gmail.com>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, joro@8bytes.org,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux.dev, Linux-Arch <linux-arch@vger.kernel.org>
-Subject: Re: [RFC][PATCH 05/12] arch: Introduce arch_{,try_}_cmpxchg128{,_local}()
-Content-Type: text/plain
+        Tue, 3 Jan 2023 12:02:14 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C2710A5;
+        Tue,  3 Jan 2023 09:00:54 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id z11so28861470ede.1;
+        Tue, 03 Jan 2023 09:00:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9XGF/oHYkE2lnb+e6AM2YoeOvVTcCohPHHsm6JMBYZU=;
+        b=JDnCpKyYZH9ch/oXO9ePdMr6nXo6+0cW9i508hhjlh5zT44nCdfAggvBsb9VuWsgF3
+         pm7qz9lvpzvNIDdnZ9rJHOeOwiYK7PcIkFW1Gwa8q/fwah8DGmsKuPGGCxvJgNGMF+3I
+         wkfn1AF+Oj0zsjmJnnjuFUlHdu5RDBopb6hQLhxL+uRnDZEmL8VvCEWWFhzSt6G94Kua
+         SLN8u2wr98j/CzArKxSPgzhT0xP9cKSG/qRfu0SVKiD/TyBjqjM/zB/Hz/0McDHCH1WS
+         Qpwo72f4apurBO+drAOl1SEAm40lNuCIXq2wji+g4uWYU4Lp3iAhY1y0KseaA7OzfDc2
+         SeWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9XGF/oHYkE2lnb+e6AM2YoeOvVTcCohPHHsm6JMBYZU=;
+        b=hHdo7pO7CV4fKLdCkoVqV6R7ir5h1qPiyj7sEDK1s/2QOnEfqJ5SkoHzlln7Ry+q66
+         GbRSAZ3zFaDmIXVifZ7QRX8HmA05FAi54z04bvDLbLX62KeYggGrVhwa+BZaUJmfl+Vn
+         o+EacIqU8/NBI21jaulGAC0TrK3QOTISIdDCychtLWsw+gV3pcV19ig3nGX8VZr3U+SM
+         5xKBA2PdbsKvrSN6KjWgQk7HZm0Yt9ez7FCw5veG5pTFiLeNaXEvyjmpFNzFcdehPcpb
+         iXIvGjXinvfvKh7WHswY2u8LtT2kkdKBwgHS++vTiJkvmzqsj9rZrI5c3Rl2xPTJ8h1H
+         iGJw==
+X-Gm-Message-State: AFqh2ko1q8gzobAmVq7VnukQBE/kmOO5oposgrLgS8MUUOMMmAuxeBDz
+        OzzWBJ0N4c0BG/O8tFb3qrQ=
+X-Google-Smtp-Source: AMrXdXtSYbu5hBJ16foCqcNUSZci2xbRQgMPpDknr2ME3NpvEQ7R5l7mS/T8utPIRP3G+YPQUXMw6Q==
+X-Received: by 2002:a05:6402:1f89:b0:47b:16c7:492c with SMTP id c9-20020a0564021f8900b0047b16c7492cmr43128963edc.25.1672765252973;
+        Tue, 03 Jan 2023 09:00:52 -0800 (PST)
+Received: from gmail.com (1F2EF380.nat.pool.telekom.hu. [31.46.243.128])
+        by smtp.gmail.com with ESMTPSA id da14-20020a056402176e00b0048b4e2aaba0sm5018870edb.34.2023.01.03.09.00.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 09:00:52 -0800 (PST)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date:   Tue, 3 Jan 2023 18:00:46 +0100
+From:   Ingo Molnar <mingo@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org,
+        linux-api@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v14 1/7] x86: lib: Separate instruction decoder MMIO type
+ from MMIO trace
+Message-ID: <Y7RfPnyK/25pxpKs@gmail.com>
+References: <20230101162910.710293-1-Jason@zx2c4.com>
+ <20230101162910.710293-2-Jason@zx2c4.com>
+ <Y7QELo9etPM8Tpx5@gmail.com>
+ <Y7RA3bmko0AjO8hQ@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7RA3bmko0AjO8hQ@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 3, 2023, at 17:19, Mark Rutland wrote:
-> On Tue, Jan 03, 2023 at 02:03:37PM +0000, Mark Rutland wrote:
->> On Tue, Jan 03, 2023 at 01:25:35PM +0000, Mark Rutland wrote:
->> > On Tue, Dec 20, 2022 at 12:08:16PM +0100, Peter Zijlstra wrote:
 
->> ... makes GCC much happier:
->
->> ... I'll go check whether clang is happy with that, and how far back that can
->> go, otherwise we'll need to blat the high half with a separate constaint that
->> (ideally) doesn't end up allocating a pointless address register.
->
-> Hmm... from the commit history it looks like GCC prior to 5.1 might not be
-> happy with that, but that *might* just be if we actually do arithmetic on the
-> value, and we might be ok just using it for memroy effects. I can't currently
-> get such an old GCC to run on my machines so I haven't been able to check.
+* Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-gcc-5.1 is the oldest (barely) supported compiler, the minimum was
-last raised from gcc-4.9 in linux-5.15. If only gcc-4.9 and older are
-affected, we're good on mainline but may still want a fix for stable
-kernels.
+> On Tue, Jan 03, 2023 at 11:32:14AM +0100, Ingo Molnar wrote:
+> > 
+> > * Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > 
+> > > Both mmiotrace.h and insn-eval.h define various MMIO_ enum constants.
+> > > Rename the insn ones to have a INSN_ prefix, so that the headers can be
+> > > used from the same source file.
+> > > 
+> > > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > > ---
+> > >  arch/x86/coco/tdx/tdx.c          | 26 +++++++++++++-------------
+> > >  arch/x86/include/asm/insn-eval.h | 18 +++++++++---------
+> > >  arch/x86/kernel/sev.c            | 18 +++++++++---------
+> > >  arch/x86/lib/insn-eval.c         | 20 ++++++++++----------
+> > >  4 files changed, 41 insertions(+), 41 deletions(-)
+> > 
+> > FYI, I've applied this fix to tip:x86/asm, as the fix for the namespace 
+> > clash makes sense independently of the vDSO getrandom feature.
+> 
+> I guess you missed the conversation with Borislav yesterday about that.
+> He mentioned that I'd just take it through random.git when this whole
+> series goes in.
 
-I checked that the cross-compiler binaries from [1] still work, but I noticed
-that this version is missing the native aarch64-to-aarch64 compiler (x86 to
-aarch64 and vice versa are there), and you need to install libmpfr4 [2]
-as a dependency. The newer compilers (6.5.0 and up) don't have these problems.
+Please base your tree off on tip:x86/asm then (or pull it in) - it only 
+includes this patch and another trivial patch at:
 
-     Arnd
+   a0e3aa8fe6cb ("x86/insn: Avoid namespace clash by separating instruction decoder MMIO type from MMIO trace type")
 
-[1] https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/arm64/5.5.0/
-[2] http://ftp.uk.debian.org/debian/pool/main/m/mpfr4/libmpfr4_3.1.5-1_arm64.deb
+We often modify these files - roughly ~4 commits to arch/x86/kernel/sev.c 
+alone per cycle on average - and it would be better to avoid conflicts 
+here.
+
+Thanks,
+
+	Ingo
