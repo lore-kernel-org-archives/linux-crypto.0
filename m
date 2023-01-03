@@ -2,450 +2,165 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9784EC54EF0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 18:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EDFC3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 18:52:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238097AbjACSp6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 13:45:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50010 "EHLO
+        id S230334AbjACSwN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 13:52:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238264AbjACSo7 (ORCPT
+        with ESMTP id S238705AbjACSvt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:44:59 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28A7E1580D
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 10:43:11 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id l26so21959612wme.5
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 10:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qq6zo5G5wGoRxe187RE2w0C2j5Mik32afh8fD5f/eMA=;
-        b=VXackr9pNKYDV+ViZR9LTX4VDXsRtuqBHlcn6pLvTK2CjxyBucFSeU5kO8xvL6g0nv
-         6/LT+EH0KbOsbYfC5YDeTSkKa92Tkxm+mlH7ZDGkay3Kx3T+m1yoDpRSDNON9ItPYVfR
-         oVcrC16Ce61g3HfVmykr4SSncCNkjPnfxJWEzpBk9aayyrBnwSFOIPmxYBct8KqorIHC
-         Pcqxvmi5aCJBlCfaPYfbemSz62OVGsKN1R9qtYoEdSOIdT05/OBUGfeBThVfPVKn724g
-         t0MrUEZIOQhXMQjMJrxrNQ8VOZhf4GZc7fM0ASOFni97oCAUCKJm3pZq8jVElMkpB13o
-         AXnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qq6zo5G5wGoRxe187RE2w0C2j5Mik32afh8fD5f/eMA=;
-        b=jHogE2tUTXffvB7TXjrRjPcjDFYxiqE4lcqesj1+m4y8UTIzawjLfABNILpTNCmGde
-         Zm06I+GwKPbG0fxLwuQCOgJTi8uCUjwHBISPhP4wICKSuoCqFyPk8hMAXM5SrkAL8dr2
-         UyN3CkSgPF8Ps07xBWCE0RSHs000KzglXxmE0MLW2LWhDp/+vHBOFN40HwcLQDlihzLJ
-         f1IogrhQRBG+CqFTgs+DaDRVDW1u26DkPbOagWKCgJt2kXxTVkBJVPLJQbPWGdylUeQx
-         QRIcVfe8GubPCLtiVRkSUJvrulMNY19RNsmvDL/m//fXiUkm4Eq5i6E+iAVIbGVnUlOu
-         YkOw==
-X-Gm-Message-State: AFqh2krxzpTD6Mrrf+3utZIVoYnE5xdGAU2waEf7vq6xJ19iMRLWP3y5
-        2Z4t9OqXytHHD6ACX6JoNfSPtQ==
-X-Google-Smtp-Source: AMrXdXv015nFkfR8EEXcC2TLDVJDsTqsYgHOvVObi8EUt8FvHqoagnw3i6ScX6Z/xy/VZWvQVuXWtg==
-X-Received: by 2002:a05:600c:4d24:b0:3c6:e63e:23d4 with SMTP id u36-20020a05600c4d2400b003c6e63e23d4mr33638070wmp.3.1672771389677;
-        Tue, 03 Jan 2023 10:43:09 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id i18-20020a5d5232000000b0028e55b44a99sm13811578wra.17.2023.01.03.10.43.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 10:43:09 -0800 (PST)
-From:   Dmitry Safonov <dima@arista.com>
-To:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Dmitry Safonov <dima@arista.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH v2 4/5] crypto/net/ipv6: sr: Switch to using crypto_pool
-Date:   Tue,  3 Jan 2023 18:42:56 +0000
-Message-Id: <20230103184257.118069-5-dima@arista.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230103184257.118069-1-dima@arista.com>
-References: <20230103184257.118069-1-dima@arista.com>
+        Tue, 3 Jan 2023 13:51:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E5512AB4;
+        Tue,  3 Jan 2023 10:51:48 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 441BF614D8;
+        Tue,  3 Jan 2023 18:51:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E000DC433EF;
+        Tue,  3 Jan 2023 18:51:45 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bHHodc0f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1672771903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yIp6kO5eIHdv4v3c2ecLfUgKivnf2+mEm8o0l2hkbzo=;
+        b=bHHodc0fH+H7OOTTkxPAWw94TxrIyjgw8ZAmtm3SM0EYAXHTAqUINBwNVpDp+Ep30VQN7N
+        ngeXJ0no/zVq7bgjckhK5fPEXBM3HxDC/3PeTN5YrBYhgdotA9NzKVzvi5PfzmDmYoEQJd
+        Ss6rEgGplCLChsIP0gx+7BeqKr6GAKg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ea8cdcd1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 3 Jan 2023 18:51:42 +0000 (UTC)
+Date:   Tue, 3 Jan 2023 19:51:38 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Ingo Molnar <mingo@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org,
+        linux-api@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <Y7R5OokY7P+H2vuD@zx2c4.com>
+References: <20230101162910.710293-1-Jason@zx2c4.com>
+ <20230101162910.710293-3-Jason@zx2c4.com>
+ <Y7QIg/hAIk7eZE42@gmail.com>
+ <Y7RDQLEvlLM0o4cp@zx2c4.com>
+ <Y7Rw1plb/pqPiWgg@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Y7Rw1plb/pqPiWgg@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The conversion to use crypto_pool has the following upsides:
-- now SR uses asynchronous API which may potentially free CPU cycles and
-  improve performance for of CPU crypto algorithm providers;
-- hash descriptors now don't have to be allocated on boot, but only at
-  the moment SR starts using HMAC and until the last HMAC secret is
-  deleted;
-- potentially reuse ahash_request(s) for different users
-- allocate only one per-CPU scratch buffer rather than a new one for
-  each user
-- have a common API for net/ users that need ahash on RX/TX fast path
+On Tue, Jan 03, 2023 at 07:15:50PM +0100, Ingo Molnar wrote:
+> Frankly, I don't appreciate your condescending discussion style that 
+> borders on the toxic, and to save time I'm nacking this technical approach 
+> until both the patch-set and your reaction to constructive review feedback 
+> improves:
+> 
+>     NAcked-by: Ingo Molnar <mingo@kernel.org>
 
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- include/net/seg6_hmac.h |   7 --
- net/ipv6/Kconfig        |   2 +-
- net/ipv6/seg6.c         |   3 -
- net/ipv6/seg6_hmac.c    | 204 ++++++++++++++++------------------------
- 4 files changed, 80 insertions(+), 136 deletions(-)
+Your initial email to me did not strike me as constructive at all. All I
+gotta say is that you really seem to live up to your reputation here...
 
-diff --git a/include/net/seg6_hmac.h b/include/net/seg6_hmac.h
-index 2b5d2ee5613e..d6b7820ecda2 100644
---- a/include/net/seg6_hmac.h
-+++ b/include/net/seg6_hmac.h
-@@ -32,13 +32,6 @@ struct seg6_hmac_info {
- 	u8 alg_id;
- };
- 
--struct seg6_hmac_algo {
--	u8 alg_id;
--	char name[64];
--	struct crypto_shash * __percpu *tfms;
--	struct shash_desc * __percpu *shashs;
--};
--
- extern int seg6_hmac_compute(struct seg6_hmac_info *hinfo,
- 			     struct ipv6_sr_hdr *hdr, struct in6_addr *saddr,
- 			     u8 *output);
-diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-index 658bfed1df8b..5be1dab0f178 100644
---- a/net/ipv6/Kconfig
-+++ b/net/ipv6/Kconfig
-@@ -304,7 +304,7 @@ config IPV6_SEG6_LWTUNNEL
- config IPV6_SEG6_HMAC
- 	bool "IPv6: Segment Routing HMAC support"
- 	depends on IPV6
--	select CRYPTO
-+	select CRYPTO_POOL
- 	select CRYPTO_HMAC
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
-diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-index 29346a6eec9f..3d66bf6d4c66 100644
---- a/net/ipv6/seg6.c
-+++ b/net/ipv6/seg6.c
-@@ -558,9 +558,6 @@ int __init seg6_init(void)
- 
- void seg6_exit(void)
- {
--#ifdef CONFIG_IPV6_SEG6_HMAC
--	seg6_hmac_exit();
--#endif
- #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
- 	seg6_iptunnel_exit();
- #endif
-diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-index d43c50a7310d..3732dd993925 100644
---- a/net/ipv6/seg6_hmac.c
-+++ b/net/ipv6/seg6_hmac.c
-@@ -35,6 +35,7 @@
- #include <net/xfrm.h>
- 
- #include <crypto/hash.h>
-+#include <crypto/pool.h>
- #include <net/seg6.h>
- #include <net/genetlink.h>
- #include <net/seg6_hmac.h>
-@@ -70,6 +71,12 @@ static const struct rhashtable_params rht_params = {
- 	.obj_cmpfn		= seg6_hmac_cmpfn,
- };
- 
-+struct seg6_hmac_algo {
-+	u8 alg_id;
-+	char name[64];
-+	int crypto_pool_id;
-+};
-+
- static struct seg6_hmac_algo hmac_algos[] = {
- 	{
- 		.alg_id = SEG6_HMAC_ALGO_SHA1,
-@@ -115,55 +122,17 @@ static struct seg6_hmac_algo *__hmac_get_algo(u8 alg_id)
- 	return NULL;
- }
- 
--static int __do_hmac(struct seg6_hmac_info *hinfo, const char *text, u8 psize,
--		     u8 *output, int outlen)
--{
--	struct seg6_hmac_algo *algo;
--	struct crypto_shash *tfm;
--	struct shash_desc *shash;
--	int ret, dgsize;
--
--	algo = __hmac_get_algo(hinfo->alg_id);
--	if (!algo)
--		return -ENOENT;
--
--	tfm = *this_cpu_ptr(algo->tfms);
--
--	dgsize = crypto_shash_digestsize(tfm);
--	if (dgsize > outlen) {
--		pr_debug("sr-ipv6: __do_hmac: digest size too big (%d / %d)\n",
--			 dgsize, outlen);
--		return -ENOMEM;
--	}
--
--	ret = crypto_shash_setkey(tfm, hinfo->secret, hinfo->slen);
--	if (ret < 0) {
--		pr_debug("sr-ipv6: crypto_shash_setkey failed: err %d\n", ret);
--		goto failed;
--	}
--
--	shash = *this_cpu_ptr(algo->shashs);
--	shash->tfm = tfm;
--
--	ret = crypto_shash_digest(shash, text, psize, output);
--	if (ret < 0) {
--		pr_debug("sr-ipv6: crypto_shash_digest failed: err %d\n", ret);
--		goto failed;
--	}
--
--	return dgsize;
--
--failed:
--	return ret;
--}
--
- int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
- 		      struct in6_addr *saddr, u8 *output)
- {
- 	__be32 hmackeyid = cpu_to_be32(hinfo->hmackeyid);
--	u8 tmp_out[SEG6_HMAC_MAX_DIGESTSIZE];
-+	struct crypto_pool_ahash hp;
-+	struct seg6_hmac_algo *algo;
- 	int plen, i, dgsize, wrsize;
-+	struct crypto_ahash *tfm;
-+	struct scatterlist sg;
- 	char *ring, *off;
-+	int err;
- 
- 	/* a 160-byte buffer for digest output allows to store highest known
- 	 * hash function (RadioGatun) with up to 1216 bits
-@@ -176,6 +145,10 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
- 	if (plen >= SEG6_HMAC_RING_SIZE)
- 		return -EMSGSIZE;
- 
-+	algo = __hmac_get_algo(hinfo->alg_id);
-+	if (!algo)
-+		return -ENOENT;
-+
- 	/* Let's build the HMAC text on the ring buffer. The text is composed
- 	 * as follows, in order:
- 	 *
-@@ -186,8 +159,36 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
- 	 * 5. All segments in the segments list (n * 128 bits)
- 	 */
- 
--	local_bh_disable();
-+	err = crypto_pool_get(algo->crypto_pool_id, (struct crypto_pool *)&hp);
-+	if (err)
-+		return err;
-+
- 	ring = this_cpu_ptr(hmac_ring);
-+
-+	sg_init_one(&sg, ring, plen);
-+
-+	tfm = crypto_ahash_reqtfm(hp.req);
-+	dgsize = crypto_ahash_digestsize(tfm);
-+	if (dgsize > SEG6_HMAC_MAX_DIGESTSIZE) {
-+		pr_debug("digest size too big (%d / %d)\n",
-+			 dgsize, SEG6_HMAC_MAX_DIGESTSIZE);
-+		err = -ENOMEM;
-+		goto err_put_pool;
-+	}
-+
-+	err = crypto_ahash_setkey(tfm, hinfo->secret, hinfo->slen);
-+	if (err) {
-+		pr_debug("crypto_ahash_setkey failed: err %d\n", err);
-+		goto err_put_pool;
-+	}
-+
-+	err = crypto_ahash_init(hp.req);
-+	if (err)
-+		goto err_put_pool;
-+
-+	ahash_request_set_crypt(hp.req, &sg,
-+				hp.base.scratch, SEG6_HMAC_MAX_DIGESTSIZE);
-+
- 	off = ring;
- 
- 	/* source address */
-@@ -210,21 +211,25 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
- 		off += 16;
- 	}
- 
--	dgsize = __do_hmac(hinfo, ring, plen, tmp_out,
--			   SEG6_HMAC_MAX_DIGESTSIZE);
--	local_bh_enable();
-+	err = crypto_ahash_update(hp.req);
-+	if (err)
-+		goto err_put_pool;
- 
--	if (dgsize < 0)
--		return dgsize;
-+	err = crypto_ahash_final(hp.req);
-+	if (err)
-+		goto err_put_pool;
- 
- 	wrsize = SEG6_HMAC_FIELD_LEN;
- 	if (wrsize > dgsize)
- 		wrsize = dgsize;
- 
- 	memset(output, 0, SEG6_HMAC_FIELD_LEN);
--	memcpy(output, tmp_out, wrsize);
-+	memcpy(output, hp.base.scratch, wrsize);
- 
--	return 0;
-+err_put_pool:
-+	crypto_pool_put();
-+
-+	return err;
- }
- EXPORT_SYMBOL(seg6_hmac_compute);
- 
-@@ -291,12 +296,24 @@ EXPORT_SYMBOL(seg6_hmac_info_lookup);
- int seg6_hmac_info_add(struct net *net, u32 key, struct seg6_hmac_info *hinfo)
- {
- 	struct seg6_pernet_data *sdata = seg6_pernet(net);
--	int err;
-+	struct seg6_hmac_algo *algo;
-+	int ret;
- 
--	err = rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo->node,
-+	algo = __hmac_get_algo(hinfo->alg_id);
-+	if (!algo)
-+		return -ENOENT;
-+
-+	ret = crypto_pool_alloc_ahash(algo->name);
-+	if (ret < 0)
-+		return ret;
-+	algo->crypto_pool_id = ret;
-+
-+	ret = rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo->node,
- 					    rht_params);
-+	if (ret)
-+		crypto_pool_release(algo->crypto_pool_id);
- 
--	return err;
-+	return ret;
- }
- EXPORT_SYMBOL(seg6_hmac_info_add);
- 
-@@ -304,6 +321,7 @@ int seg6_hmac_info_del(struct net *net, u32 key)
- {
- 	struct seg6_pernet_data *sdata = seg6_pernet(net);
- 	struct seg6_hmac_info *hinfo;
-+	struct seg6_hmac_algo *algo;
- 	int err = -ENOENT;
- 
- 	hinfo = rhashtable_lookup_fast(&sdata->hmac_infos, &key, rht_params);
-@@ -315,6 +333,12 @@ int seg6_hmac_info_del(struct net *net, u32 key)
- 	if (err)
- 		goto out;
- 
-+	algo = __hmac_get_algo(hinfo->alg_id);
-+	if (algo)
-+		crypto_pool_release(algo->crypto_pool_id);
-+	else
-+		WARN_ON_ONCE(1);
-+
- 	seg6_hinfo_release(hinfo);
- 
- out:
-@@ -348,56 +372,9 @@ int seg6_push_hmac(struct net *net, struct in6_addr *saddr,
- }
- EXPORT_SYMBOL(seg6_push_hmac);
- 
--static int seg6_hmac_init_algo(void)
--{
--	struct seg6_hmac_algo *algo;
--	struct crypto_shash *tfm;
--	struct shash_desc *shash;
--	int i, alg_count, cpu;
--
--	alg_count = ARRAY_SIZE(hmac_algos);
--
--	for (i = 0; i < alg_count; i++) {
--		struct crypto_shash **p_tfm;
--		int shsize;
--
--		algo = &hmac_algos[i];
--		algo->tfms = alloc_percpu(struct crypto_shash *);
--		if (!algo->tfms)
--			return -ENOMEM;
--
--		for_each_possible_cpu(cpu) {
--			tfm = crypto_alloc_shash(algo->name, 0, 0);
--			if (IS_ERR(tfm))
--				return PTR_ERR(tfm);
--			p_tfm = per_cpu_ptr(algo->tfms, cpu);
--			*p_tfm = tfm;
--		}
--
--		p_tfm = raw_cpu_ptr(algo->tfms);
--		tfm = *p_tfm;
--
--		shsize = sizeof(*shash) + crypto_shash_descsize(tfm);
--
--		algo->shashs = alloc_percpu(struct shash_desc *);
--		if (!algo->shashs)
--			return -ENOMEM;
--
--		for_each_possible_cpu(cpu) {
--			shash = kzalloc_node(shsize, GFP_KERNEL,
--					     cpu_to_node(cpu));
--			if (!shash)
--				return -ENOMEM;
--			*per_cpu_ptr(algo->shashs, cpu) = shash;
--		}
--	}
--
--	return 0;
--}
--
- int __init seg6_hmac_init(void)
- {
--	return seg6_hmac_init_algo();
-+	return crypto_pool_reserve_scratch(SEG6_HMAC_MAX_DIGESTSIZE);
- }
- 
- int __net_init seg6_hmac_net_init(struct net *net)
-@@ -407,29 +384,6 @@ int __net_init seg6_hmac_net_init(struct net *net)
- 	return rhashtable_init(&sdata->hmac_infos, &rht_params);
- }
- 
--void seg6_hmac_exit(void)
--{
--	struct seg6_hmac_algo *algo = NULL;
--	int i, alg_count, cpu;
--
--	alg_count = ARRAY_SIZE(hmac_algos);
--	for (i = 0; i < alg_count; i++) {
--		algo = &hmac_algos[i];
--		for_each_possible_cpu(cpu) {
--			struct crypto_shash *tfm;
--			struct shash_desc *shash;
--
--			shash = *per_cpu_ptr(algo->shashs, cpu);
--			kfree(shash);
--			tfm = *per_cpu_ptr(algo->tfms, cpu);
--			crypto_free_shash(tfm);
--		}
--		free_percpu(algo->tfms);
--		free_percpu(algo->shashs);
--	}
--}
--EXPORT_SYMBOL(seg6_hmac_exit);
--
- void __net_exit seg6_hmac_net_exit(struct net *net)
- {
- 	struct seg6_pernet_data *sdata = seg6_pernet(net);
--- 
-2.39.0
+But trying to steer things back to the technical realm:
 
+> For a single architecture: x86.
+> 
+> And it's only 19 lines because x86 already happens to have a bunch of 
+> complexity implemented, such as a safe instruction decoder that allows the 
+> skipping of an instruction - which relies on thousands of lines of 
+> complexity.
+> 
+> On an architecture where this isn't present, it would have to be 
+> implemented to support the instruction-skipping aspect of VM_DROPPABLE.
+
+My assumption is actually the opposite: that x86 (CISC) is basically the
+most complex, and that the RISC architectures will all be a good deal
+more trivial -- e.g. just adding 4 to IP on some. It looks like some
+architectures also already have mature decoders where required.
+
+> Even on x86, it's not common today for the software-decoder to be used in 
+> unprivileged code - primary use was debugging & instrumentation code. So 
+> your patches bring this piece of complexity to a much larger scope of 
+> untrusted user-space functionality.
+
+As far as I can tell, this decoder *is* used with userspace already.
+It's used by SEV and by UMIP, in a totally userspace accessible way. Am
+I misunderstanding its use there? It looks to me like that operates on
+untrusted code.
+
+*However* - if your big objection to this patch is that the instruction
+skipping is problematic, we could actually punt that part. The result
+will be that userspace just retries the memory write and the fault
+happens again, and eventually it succeeds. From a perspective of
+vgetrandom(), that's perhaps worse -- with this v14 patchset, it'll
+immediately fallback to the syscall under memory pressure -- but you
+could argue that nobody really cares about performance at that point
+anyway, and so just retrying the fault until it succeeds is a less
+complex behavior that would be just fine.
+
+Let me know if you think that'd be an acceptable compromise, and I'll
+roll it into v15. As a preview, it pretty much amounts to dropping 3/7
+and editing the commit message in this 2/7 patch.
+
+> I did not suggest to swap it: my suggestion is to just pin these vDSO data 
+> pages. The per thread memory overhead is infinitesimal on the vast majority 
+> of the target systems, and the complexity trade-off you are proposing is 
+> poorly reasoned IMO.
+> 
+> I think my core point that it would be much simpler to simply pin those 
+> pages and not introduce rarely-excercised 'discardable memory' semantics in 
+> Linux is a fair one - so it's straightforward to lift this NAK.
+
+Okay so this is where I think we're really not lined up and is a large
+part of why I wondered whether you'd read the commit messages before
+dismissing this. This VM_DROPPABLE mapping comes as a result of a
+vgetrandom_alloc() syscall, which (g)libc makes at some point, and then
+the result of that is passed to the vDSO getrandom() function. The
+memory in vgetrandom_alloc() is then carved up, one per thread, with
+(g)libc's various internal pthread creation/exit functions.
+
+So that means this isn't a thing that's trivially limited to just one
+per thread. Userspace can call vgetrandom_alloc() all it wants.
+
+Thus, I'm having a hard time seeing how relaxing rlimits here as you
+suggested doesn't amount to an rlimit backdoor. I'm also not seeing
+other fancy options for "pinning pages" as you mentioned in this email.
+Something about having the kernel allocate them on clone()? That seems
+terrible and complex. And if you do want this all to go through mlock(),
+somehow, there's still the fork() inheritabiity issue. (This was all
+discussed on the thread a few versions ago that surfaced these issues,
+by the way.)
+
+So I'm not really seeing any good alternatives, no matter how hard I
+squint at your suggestions. Maybe you can elaborate a bit?
+Alternatively, perhaps the compromise I suggested above where we ditch
+the instruction decoder stuff is actually fine with you?
+
+> rarely-excercised 'discardable memory' semantics in 
+> Linux is a fair one - so it's straightforward to lift this NAK.
+
+I still don't think calling this "rarely-exercised" is true. Desktop
+machines regularly OOM with lots of Chrome tabs, and this is
+functionality that'll be in glibc, so it'll be exercised quite often.
+Even on servers, many operators work with the philosophy that unused RAM
+is wasted RAM, and so servers are run pretty close to capacity. Not to
+mention Android, where lots of handsets have way too little RAM.
+Swapping and memory pressure and so forth is very real. So claiming that
+this is somehow obscure or rarely used or what have you isn't very
+accurate. These are code paths that will certainly get exercised.
+
+Jason
