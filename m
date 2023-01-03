@@ -2,57 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E04C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 06:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4F4C46467
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 07:27:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236794AbjACGva (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 01:51:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
+        id S236875AbjACH1I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 02:27:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236776AbjACGv3 (ORCPT
+        with ESMTP id S236902AbjACH0z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 01:51:29 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23270B68;
-        Mon,  2 Jan 2023 22:51:28 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id bi26-20020a05600c3d9a00b003d3404a89faso15892982wmb.1;
-        Mon, 02 Jan 2023 22:51:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zvm/NFAuK45vvysV5ROF8aqgqwjzu2CCXnvz1aWo4So=;
-        b=MLwvy/EyS1jKO51O6p0H8dZSyEeX16in2WqUDXhDxLFaQVpR4qARAuRzQSFB0vcSAi
-         MY22qMmS2+2hC7d5gnyH350MucyeiiIAT1YHTmmFNcY088g7JyChJIhptwb6ICB78TCx
-         /Lzc17SjQzZgjf+AkcfNpRq1emOnQb3tUdIk+lTsJaMwC0FjKecj028P6hytqleKF+fT
-         QB+r86Nw+F66IiPtQ80HRNINvwF27JOtx0e/jPbPcx2TMyxg/WsOg91mZEQ2aWkWO7nI
-         BSG4SL04EkTr9dVVj8dmL1nAwxBb27capie0GnD4wEFynlU93m/CuG3BB73hy/+RGQK/
-         hxvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zvm/NFAuK45vvysV5ROF8aqgqwjzu2CCXnvz1aWo4So=;
-        b=pAiYwOvlpO0rAh1eD+8vmf7BYSS2wZypSXtowpZGE4S6DBOQaKxsWUqjfcIolenN46
-         GnBK13LYazZNOH/mbrz5o/F+sD/LkFmZstz857TimU6sOdoWgeOXSK3qXXG3Wv+cc0EE
-         bSNX6zC0SQk+4HnNDwk0MpWbWN5t24UBUwjSiM7RoR3efxNo/8KYtY9h/U3eES8ROa9S
-         lwVdNXWsDbJSSzcHH7GnyApK1NDNSqB5QIquV7aZwF8GSNc1gRUwhLRBlI3USliLfKDn
-         1/S6owIUBjVPVzolVYEs22K43jovxardAzsdhtZBGPmMu0rpRGjleDcJNbZvarV+faMH
-         dLqw==
-X-Gm-Message-State: AFqh2krbc9lYVGFOMZhsU8gD8Q8Z4Mg6rP4woDMRO7cXd18iFdLW+Yz2
-        EseTeyX1XMAkHJ1HtQg6pEQbnxzMBDs=
-X-Google-Smtp-Source: AMrXdXvx8ij6viMFBgSN0O1G4ZhOQt8phXBwB4dVfRwoDkc3xvl4dwcv3D261EaKIC2u2TF6qrm3vQ==
-X-Received: by 2002:a05:600c:3acc:b0:3d9:a145:91a with SMTP id d12-20020a05600c3acc00b003d9a145091amr9407893wms.28.1672728686664;
-        Mon, 02 Jan 2023 22:51:26 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id v9-20020a05600c444900b003d997e5e679sm25805212wmn.14.2023.01.02.22.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jan 2023 22:51:26 -0800 (PST)
-Date:   Tue, 3 Jan 2023 07:51:24 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        Tue, 3 Jan 2023 02:26:55 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053091124;
+        Mon,  2 Jan 2023 23:26:52 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pCbgj-00DN68-DB; Tue, 03 Jan 2023 15:26:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Jan 2023 15:26:21 +0800
+Date:   Tue, 3 Jan 2023 15:26:21 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
 Cc:     Christoph Hellwig <hch@infradead.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Ard Biesheuvel <ardb@kernel.org>,
@@ -69,37 +38,41 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Subject: Re: [PATCH] crypto: sun8i-ss - Remove GFP_DMA and add DMA alignment
  padding
-Message-ID: <Y7PQbNrgs2EvkXMB@Red>
+Message-ID: <Y7PYnb+oQpo7CI+N@gondor.apana.org.au>
 References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
  <Y4xpGNNsfbucyUlt@infradead.org>
  <Y47BgCuZsYLX61A9@gondor.apana.org.au>
  <Y47g7qO8dsRdxCgf@infradead.org>
  <Y47+gxbdKR03EYCj@gondor.apana.org.au>
  <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
+ <Y7PQbNrgs2EvkXMB@Red>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
+In-Reply-To: <Y7PQbNrgs2EvkXMB@Red>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Thu, Dec 29, 2022 at 04:58:21PM +0800, Herbert Xu a écrit :
-> GFP_DMA does not guarantee that the returned memory is aligned
-> for DMA.  In fact for sun8i-ss it is superfluous and can be removed.
-> 
-> However, kmalloc may start returning DMA-unaligned memory in future
-> so fix this by adding the alignment by hand.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Tue, Jan 03, 2023 at 07:51:24AM +0100, Corentin Labbe wrote:
+.
+> Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Tested-on: sun8i-a83t-bananapi-m3
+> Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-Hello
+Thanks,
 
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-on: sun8i-a83t-bananapi-m3
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> This means that lot of other crypto driver (sun8i-ce, amlogic, etc...) I maintain need the same fix, right ?
 
-This means that lot of other crypto driver (sun8i-ce, amlogic, etc...) I maintain need the same fix, right ?
+I checked the other drivers and none of them seem to be broken.
+Only DMA from the device (DMA_FROM_DEVICE or DMA_BIDIRECTIONAL)
+need to be aligned appropriately.
 
-Regards
+However, please do remove any unnecessary uses of GFP_DMA in those
+drivers.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
