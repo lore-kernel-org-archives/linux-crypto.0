@@ -2,165 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A7BC53210
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 19:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 771EEC4708D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 19:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234075AbjACTFn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 14:05:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42080 "EHLO
+        id S233170AbjACTJG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 14:09:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238727AbjACTFV (ORCPT
+        with ESMTP id S238401AbjACTJA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 14:05:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9252313CF1;
-        Tue,  3 Jan 2023 11:05:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 39F85B80EC2;
-        Tue,  3 Jan 2023 19:05:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E56C433D2;
-        Tue,  3 Jan 2023 19:05:16 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="UdnPlTE1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1672772714;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5NpNAATWWkRP+91skuEFC6IGLeSW0ntw/LmFnvD5DJo=;
-        b=UdnPlTE1GPtqZiqmhGqOPzd6vGqyg6RTb0tEiIQb3JQvC+0sAK7ZpyfNLtyLmIrUtUf9K6
-        w7Kfep3+so7dS+IlkrWLwGAzluYN53gA4o+QhAuIxj4VDfXQ7+yIY1g4OGUVazEqAj/nV8
-        46Fjym8BynZrySEy5c5LuroAzBOGafw=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cfe7dd4e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 3 Jan 2023 19:05:14 +0000 (UTC)
-Date:   Tue, 3 Jan 2023 20:05:10 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev, tglx@linutronix.de,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-Message-ID: <Y7R8Zq6sIKAIprtr@zx2c4.com>
-References: <20230101162910.710293-1-Jason@zx2c4.com>
- <20230101162910.710293-3-Jason@zx2c4.com>
- <Y7QIg/hAIk7eZE42@gmail.com>
- <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
+        Tue, 3 Jan 2023 14:09:00 -0500
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E87113F34
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 11:08:59 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id z12so25304903qtv.5
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 11:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dfSqSd0mxRLyCP4JPwoGgPSv4V5DgFE+NWQibLY7nHY=;
+        b=LQt5OMztUt6H+6pe/VIHwx3Jz4d08J1ZZ7gv40yLS2RfQ9FYAN2BdqaHFaDSeqruh5
+         UdriUa0s5l2hHmuDgCVQyqdP1mZma/3SqbLGsgMr+3W5DNoGaGK3GwMdoJI3ZUgmswPc
+         hfRjTsp+o7b/O9CFRqovudaZXidsusavosKQY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dfSqSd0mxRLyCP4JPwoGgPSv4V5DgFE+NWQibLY7nHY=;
+        b=5x6t2BG2qtrD5f7XL/IveF4SGDGgbq0276Qyryfgu/jEwNjNyPEiMmR+h0/KHF+1dU
+         836/EcEp1LFCTEfqd8+x7Ya31uwryjB17msU0oiF+B4BB71osHq/pDSdYL9iCviyB0dI
+         B27CYRnGbIIqhbNlUzwBK3+B8cY1R2nqGQSbqOHCF6lYz/Yi8aMsSI2kZxQFL7czqZSN
+         jjRF5e72EJfetuLOCajABo8lsNwv8qRj7CnM56R7rwH3mfRTxsdwztVt5V79GDZDj8zr
+         HHkw5EiwZX/nwizOC6SbsCOHpEvl2puq1JWV/W/61oiIZ96QQrrLxDL6BPCN5IV54Thg
+         bX/Q==
+X-Gm-Message-State: AFqh2kr3gB6DTOWsml7aTfihUTGAJPomVDuJv3dCBvCE9VNRQzx+i7kM
+        lbmgsTjKtM1R3XO3FDJs606uB+ryGcCMIwfH
+X-Google-Smtp-Source: AMrXdXtlvojQ5Cuc21uFJ9kayplhnz9nIEDSfplzQiQflws21D2hXMGNBgpxlfXyvmL1yKvSXeZPww==
+X-Received: by 2002:ac8:7c99:0:b0:3a7:e727:a015 with SMTP id y25-20020ac87c99000000b003a7e727a015mr54166748qtv.20.1672772938375;
+        Tue, 03 Jan 2023 11:08:58 -0800 (PST)
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com. [209.85.160.181])
+        by smtp.gmail.com with ESMTPSA id h24-20020ac87458000000b003a7ef7a758dsm19191213qtr.59.2023.01.03.11.08.56
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jan 2023 11:08:57 -0800 (PST)
+Received: by mail-qt1-f181.google.com with SMTP id v14so22523718qtq.3
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 11:08:56 -0800 (PST)
+X-Received: by 2002:a05:620a:1379:b0:6fc:c48b:8eab with SMTP id
+ d25-20020a05620a137900b006fcc48b8eabmr1650146qkl.216.1672772925520; Tue, 03
+ Jan 2023 11:08:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
+References: <20221219153525.632521981@infradead.org> <20221219154119.550996611@infradead.org>
+ <Y7Ri+Uij1GFkI/LB@osiris>
+In-Reply-To: <Y7Ri+Uij1GFkI/LB@osiris>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 3 Jan 2023 11:08:29 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wj9nK825MyHXu7zkegc7Va+ZxcperdOtRMZBCLHqGrr=g@mail.gmail.com>
+Message-ID: <CAHk-=wj9nK825MyHXu7zkegc7Va+ZxcperdOtRMZBCLHqGrr=g@mail.gmail.com>
+Subject: Re: [RFC][PATCH 11/12] slub: Replace cmpxchg_double()
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>, corbet@lwn.net,
+        will@kernel.org, boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andy,
+On Tue, Jan 3, 2023 at 9:17 AM Heiko Carstens <hca@linux.ibm.com> wrote:
+>
+> On Mon, Dec 19, 2022 at 04:35:36PM +0100, Peter Zijlstra wrote:
+> >
+> > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> > ---
+> >  include/linux/slub_def.h |   12 ++-
+> >  mm/slab.h                |   41 +++++++++++--
+> >  mm/slub.c                |  146 ++++++++++++++++++++++++++++-------------------
+> >  3 files changed, 135 insertions(+), 64 deletions(-)
+>
+> Does this actually work? Just wondering since I end up with an instant
+> list corruption on s390. Might be endianness related, but I can't see
+> anything obvious at a first glance.
 
-Thanks for your constructive suggestions.
+I don't see anything that looks related to endianness, because while
+there is that 128-bit union member, it's always either used in full,
+or it's accessed as other union members.
 
-On Tue, Jan 03, 2023 at 10:36:01AM -0800, Andy Lutomirski wrote:
-> > > c) If there's not enough memory to service a page fault, it's not fatal,
-> > >    and no signal is sent. Instead, writes are simply lost.
-> 
-> This just seems massively overcomplicated to me.  If there isn't
-> enough memory to fault in a page of code, we don't have some magic
-> instruction emulator in the kernel.  We either OOM or we wait for
-> memory to show up.
+But I *do* note that this patch seems to be the only one that depends
+on the new this_cpu_cmpxchg() updates to make it just automatically do
+the right thing for a 128-bit value. And I have to admit that all
+those games with __pcpu_cast_128() make no sense to me. Why isn't it
+just using "u128" everywhere without any odd _Generic() games?
 
-Before addressing the other parts of your email, I thought I'd touch on
-this. Quoting from the email I just wrote Ingo:
+I could also easily see that if the asm constraints are wrong (like
+the "cast pointer to (unsigned long *) instead of keeping it pointing
+to a 128-bit type" thing discussed earlier), then code like this:
 
-| *However* - if your big objection to this patch is that the instruction
-| skipping is problematic, we could actually punt that part. The result
-| will be that userspace just retries the memory write and the fault
-| happens again, and eventually it succeeds. From a perspective of
-| vgetrandom(), that's perhaps worse -- with this v14 patchset, it'll
-| immediately fallback to the syscall under memory pressure -- but you
-| could argue that nobody really cares about performance at that point
-| anyway, and so just retrying the fault until it succeeds is a less
-| complex behavior that would be just fine.
-| 
-| Let me know if you think that'd be an acceptable compromise, and I'll
-| roll it into v15. As a preview, it pretty much amounts to dropping 3/7
-| and editing the commit message in this 2/7 patch.
++       freelist_aba_t old = { .freelist = freelist_old, .counter = tid };
++       freelist_aba_t new = { .freelist = freelist_new, .counter =
+next_tid(tid) };
++
++       return this_cpu_cmpxchg(s->cpu_slab->freelist_tid.full,
++                               old.full, new.full) == old.full;
 
-IOW, I think the main ideas of the patch work just fine without "point
-c" with the instruction skipping. Instead, waiting/retrying could
-potentially work. So, okay, it seems like the two of you both hate the
-instruction decoder stuff, so I'll plan on working that part in, in one
-way or another, for v15.
+would easily make the compiler go "the second word of 'old' is never
+used by the asm, so I won't initialize it".
 
-> On Tue, Jan 3, 2023 at 2:50 AM Ingo Molnar <mingo@kernel.org> wrote:
-> > > The vDSO getrandom() implementation works with a buffer allocated with a
-> > > new system call that has certain requirements:
-> > >
-> > > - It shouldn't be written to core dumps.
-> > >   * Easy: VM_DONTDUMP.
-> > > - It should be zeroed on fork.
-> > >   * Easy: VM_WIPEONFORK.
-> 
-> I have a rather different suggestion: make a special mapping.  Jason,
-> you're trying to shoehorn all kinds of bizarre behavior into the core
-> mm, and none of that seems to me to belong to the core mm.  Instead,
-> have an actual special mapping with callbacks that does the right
-> thing.  No fancy VM flags.
+But yeah, that patch is hard to read, so hard to say. Does everything
+leading up to it work fine?
 
-Oooo! I like this. Avoiding adding VM_* flags would indeed be nice.
-I had seen things that I thought looked in this direction with the shmem
-API, but when I got into the details, it looked like this was meant for
-something else and couldn't address most of what I wanted here.
-
-If you say this is possible, I'll look again to see if I can figure it
-out. Though, if you have some API name at the top of your head, you
-might save me some code squinting time.
-
-> Memory pressure: have it free and unmap it self.  Gets accessed again?
->  ->fault can handle it.
-
-Right.
-
-> Want to mlock it?  No, don't do that -- that's absurd.  Just arrange
-> so that, if it gets evicted, it's not written out anywhere.  And when
-> it gets faulted back in it does the right thing -- see above.
-
-Presumably mlock calls are redirected to some function pointer so I can
-just return EINTR?
-
-> Zero on fork?  I'm sure that's manageable with a special mapping.  If
-> not, you can add a new vm operation or similar to make it work.  (Kind
-> of like how we extended special mappings to get mremap right a couple
-> years go.)  But maybe you don't want to *zero* it on fork and you want
-> to do something more intelligent.  Fine -- you control ->fault!
-
-Doing something more intelligent would be an interesting development, I
-guess... But, before I think about that, all mapping have flags;
-couldn't I *still* set VM_WIPEONFORK on the special mapping? Or does the
-API you have in mind not work that way? (Side note: I also want
-VM_DONTDUMP to work.)
-
-> > > - It shouldn't reserve actual memory, but it also shouldn't crash when
-> > >   page faulting in memory if none is available
-> > >   * Uh-oh: MAP_NORESERVE respects vm.overcommit_memory=2.
-> > >   * Uh-oh: VM_NORESERVE means segfaults.
-> 
-> ->fault can do whatever you want.
-> 
-> And there is no shortage of user memory that *must* be made available
-> on fault in order to resume the faulting process.  ->fault can handle
-> this.
-
-I'll look to see how other things handle this...
-
-Anyway, thanks for the suggestion. That seems like a good future
-direction for this.
-
-Jason
+                 Linus
