@@ -2,129 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 752B7C46467
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 13:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D396BC3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 14:02:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237406AbjACNZu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 08:25:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33456 "EHLO
+        id S237391AbjACOCG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 09:02:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237372AbjACNZt (ORCPT
+        with ESMTP id S236987AbjACOCF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 08:25:49 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 047D6CD;
-        Tue,  3 Jan 2023 05:25:47 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4809B2F4;
-        Tue,  3 Jan 2023 05:26:28 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.37.13])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA5683F587;
-        Tue,  3 Jan 2023 05:25:40 -0800 (PST)
-Date:   Tue, 3 Jan 2023 13:25:35 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Boqun Feng <boqun.feng@gmail.com>, torvalds@linux-foundation.org,
-        corbet@lwn.net, will@kernel.org, catalin.marinas@arm.com,
-        dennis@kernel.org, tj@kernel.org, cl@linux.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC][PATCH 05/12] arch: Introduce
- arch_{,try_}_cmpxchg128{,_local}()
-Message-ID: <Y7QszyTEG2+WiI/C@FVFF77S0Q05N>
-References: <20221219153525.632521981@infradead.org>
- <20221219154119.154045458@infradead.org>
- <Y6DEfQXymYVgL3oJ@boqun-archlinux>
- <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
+        Tue, 3 Jan 2023 09:02:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB85FD2F3
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 06:02:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 66330B80ED7
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 14:02:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D60C433F1
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 14:02:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672754521;
+        bh=KwR+AP7Jj+KziTdD94+570fYpG8HYLialbGB47tPHII=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=i8glW/OpsEPIikQMPpQUDIxX9d2SmSoSSvnlhb5o0d82VZypJ0iDqM6kSUWMZ5lLq
+         f9x0fq90c0KjKfrZfMp1YHdtZ2TkdywOpx8BYagvv46PiPWunWuMj6gHfgSvR20ILo
+         +1zF4XALDYUHZe3Gyd2I7SAp6j2JAZOEWezS/9jPIljVSYyqzCSa6axLEGYTkI8w2E
+         wvjkn37ZSn8mMMs0BMsHsHTL9F1Y5dOSM61k/xEpPDdoAM23W8UL5shd5UFhOdtc0z
+         eBrPA8oLipR+CPVp2yJ6sB6yNfjh9kUi9mPRoebFVu3rlgfyVMw3tGLX465k4pQ2QD
+         ccusyp3H6U0bg==
+Received: by mail-lf1-f50.google.com with SMTP id j17so36285782lfr.3
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 06:02:01 -0800 (PST)
+X-Gm-Message-State: AFqh2kqk0VNvAryu+KhR6J1HWE2EkK2vQlhwYyYIVyATR/HghLJKWsC+
+        eEe4NSqZc7e/TiSZkE7YRcSBSVJQNaUoiyHoQbY=
+X-Google-Smtp-Source: AMrXdXvvUPTpuOQmiShGvU2ZCphvRuE1oYKbP2mg/TCbIjRh7zK8KT5uVmS9NFiY1/WWDcKE2GkrFlVYfXe+SpRXTs0=
+X-Received: by 2002:ac2:5d4e:0:b0:4b5:964d:49a4 with SMTP id
+ w14-20020ac25d4e000000b004b5964d49a4mr3738999lfd.637.1672754519038; Tue, 03
+ Jan 2023 06:01:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
+References: <CGME20230103111359eucas1p137cb823bdc80d790544de20c3835faf2@eucas1p1.samsung.com>
+ <Y7NizHFsWfMW/cC2@sol.localdomain> <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
+In-Reply-To: <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 3 Jan 2023 15:01:47 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGY4zZovOKY5kD54pFEXeOoX=3JCuHVCDpQJf+Wo+oBiw@mail.gmail.com>
+Message-ID: <CAMj1kXGY4zZovOKY5kD54pFEXeOoX=3JCuHVCDpQJf+Wo+oBiw@mail.gmail.com>
+Subject: Re: xor_blocks() assumptions
+To:     Lukasz Stelmach <l.stelmach@samsung.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 12:08:16PM +0100, Peter Zijlstra wrote:
-> On Mon, Dec 19, 2022 at 12:07:25PM -0800, Boqun Feng wrote:
-> > On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
-> > > For all architectures that currently support cmpxchg_double()
-> > > implement the cmpxchg128() family of functions that is basically the
-> > > same but with a saner interface.
-> > > 
-> > > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> > > ---
-> > >  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
-> > >  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
-> > >  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
-> > >  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
-> > >  arch/x86/include/asm/cmpxchg_32.h     |    3 +
-> > >  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
-> > >  6 files changed, 185 insertions(+), 3 deletions(-)
-> > > 
-> > > --- a/arch/arm64/include/asm/atomic_ll_sc.h
-> > > +++ b/arch/arm64/include/asm/atomic_ll_sc.h
-> > > @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
-> > >  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
-> > >  
-> > >  #undef __CMPXCHG_DBL
-> > > +
-> > > +union __u128_halves {
-> > > +	u128 full;
-> > > +	struct {
-> > > +		u64 low, high;
-> > > +	};
-> > > +};
-> > > +
-> > > +#define __CMPXCHG128(name, mb, rel, cl)					\
-> > > +static __always_inline u128						\
-> > > +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
-> > > +{									\
-> > > +	union __u128_halves r, o = { .full = (old) },			\
-> > > +			       n = { .full = (new) };			\
-> > > +									\
-> > > +	asm volatile("// __cmpxchg128" #name "\n"			\
-> > > +	"	prfm	pstl1strm, %2\n"				\
-> > > +	"1:	ldxp	%0, %1, %2\n"					\
-> > > +	"	eor	%3, %0, %3\n"					\
-> > > +	"	eor	%4, %1, %4\n"					\
-> > > +	"	orr	%3, %4, %3\n"					\
-> > > +	"	cbnz	%3, 2f\n"					\
-> > > +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
-> > > +	"	cbnz	%w3, 1b\n"					\
-> > > +	"	" #mb "\n"						\
-> > > +	"2:"								\
-> > > +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
-> > 
-> > I wonder whether we should use "(*(u128 *)ptr)" instead of "(*(unsigned
-> > long *) ptr)"? Because compilers may think only 64bit value pointed by
-> > "ptr" gets modified, and they are allowed to do "useful" optimization.
-> 
-> In this I've copied the existing cmpxchg_double() code; I'll have to let
-> the arch folks speak here, I've no clue.
+On Tue, 3 Jan 2023 at 12:14, Lukasz Stelmach <l.stelmach@samsung.com> wrote:
+>
+> It was <2023-01-02 pon 15:03>, when Eric Biggers wrote:
+> > On Mon, Jan 02, 2023 at 11:44:35PM +0100, Lukasz Stelmach wrote:
+> >> I am researching possibility to use xor_blocks() in crypto_xor() and
+> >> crypto_xor_cpy(). What I've found already is that different architecture
+> >> dependent xor functions work on different blocks between 16 and 512
+> >> (Intel AVX) bytes long. There is a hint in the comment for
+> >> async_xor_offs() that src_cnt (as passed to do_sync_xor_offs()) counts
+> >> pages. Thus, it is assumed, that the smallest chunk xor_blocks() gets is
+> >> a single page. Am I right?
+> >>
+> >> Do you think adding block_len field to struct xor_block_template (and
+> >> maybe some information about required alignment) and using it to call
+> >> do_2 from crypto_xor() may work? I am thinking especially about disk
+> >> encryption where sectors of 512~4096 are handled.
+> >>
+> >
+> > Taking a step back, it sounds like you think the word-at-a-time XOR in
+> > crypto_xor() is not performant enough, so you want to use a SIMD (e.g. NEON,
+> > SSE, or AVX) implementation instead.
+>
+> Yes.
+>
+> > Have you tested that this would actually give a benefit on the input
+> > sizes in question,
+>
+> --8<---------------cut here---------------start------------->8---
+> [    0.938006] xor: measuring software checksum speed
+> [    0.947383]    crypto          :  1052 MB/sec
+> [    0.953299]    arm4regs        :  1689 MB/sec
+> [    0.960674]    8regs           :  1352 MB/sec
+> [    0.968033]    32regs          :  1352 MB/sec
+> [    0.972078]    neon            :  2448 MB/sec
+> --8<---------------cut here---------------end--------------->8---
+>
 
-We definitely need to ensure the compiler sees we poke the whole thing, or it
-can get this horribly wrong, so that is a latent bug.
+This doesn't really answer the question. This only tells us that NEON
+is faster on this core when XOR'ing the same cache-hot page multple
+times in succession.
 
-See commit:
+So the question is really which crypto algorithm you intend to
+accelerate with this change, and the input sizes it operates on.
 
-  fee960bed5e857eb ("arm64: xchg: hazard against entire exchange variable")
+If the algo in question is the generic XTS template wrapped around a
+h/w accelerated implementation of ECB, I suspect that we would be
+better off wiring up xor_blocks() into xts.c, rather than modifying
+crypto_xor() and crypto_xor_cpy(). Many other calls to crypto_xor()
+operate on small buffers where this optimization is unlikely to help.
 
-... for examples of GCC being clever, where I overlooked the *_double() cases.
+So rephrase the question: which invocation of crypto_xor() is the
+bottleneck in the use case you are trying to optimize?
 
-I'll go spin a quick fix for that so that we can have something go to stable
-before we rejig the API.
 
-Mark.
+> (Linux 6.2.0-rc1 running on Odroid XU3 board with Arm Cortex-A15)
+>
+> The patch below copies, adapts and plugs in __crypto_xor() as
+> xor_block_crypto.do_2. You can see its results labeled "crypto" above.
+> Disk encryption is comparable to RAID5 checksumming so the results above
+> should be adequate.
+>
+> > especially considering that SIMD can only be used in the kernel if
+> > kernel_fpu_begin() is executed first?
+>
+> That depends on architecture. As far as I can tell this applies to Intel
+> only.
+>
+
+On ARM, you must use kernel_neon_begin/_end() when using SIMD in
+kernel mode, which comes down to the same thing.
+
+> > It also would be worth considering just optimizing crypto_xor() by
+> > unrolling the word-at-a-time loop to 4x or so.
+>
+> If I understand correctly the generic 8regs and 32regs implementations
+> in include/asm-generic/xor.h are what you mean. Using xor_blocks() in
+> crypto_xor() could enable them for free on architectures lacking SIMD or
+> vector instructions.
+>
+
+-- 
+Ard.
