@@ -2,153 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74B2C54EBC
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 03:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E04C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 06:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236694AbjACDiO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Jan 2023 22:38:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
+        id S236794AbjACGva (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 01:51:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236810AbjACDh7 (ORCPT
+        with ESMTP id S236776AbjACGv3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Jan 2023 22:37:59 -0500
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2138.outbound.protection.outlook.com [40.107.255.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA24D2C4;
-        Mon,  2 Jan 2023 19:37:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cr3EtS5+aMLDASFU2soxLC78JoT7PRjZKW0tOdWl7z7ByzFChi0Q0iCsrtr50Oh6u1P3BKPxkbqJ9rx/jfpbNyXyp9Z17h4CScoJFf6F6ID7SSOLwxenSf/kFC78ij/mJQL0zH5x2sR7FE6qDfLAKwqFjTZXAJmXdtcNTXIZ21o4PJHihpOLsWOVclwnK4L16iyfZt9mQSR7mgEUVZ0zwRP1U/vG8iqxByU7NCerDoQPeJdYkixyVhsa/Lo6QYbcl35mVWg/2f11rJkkuxdRI4XjLox/CF71pQTv+B/j02+W5Fy3T96PBT6NFJl/omsSqn4F2+JZl/Kp7sRqWHeuRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s+91SXb8PrY8K/2IWgJo9vDKxQSTSQz9Flc2s+Ap9R4=;
- b=JKFvCYNVUsShL4chdYlybIzlBeUQykpqXi9fZnDnNFSb9CuFW10x17jgwSNJIKeEjO2W07z6wFe3VFoEs0b/dIDn5+aoV8yZOw1EnUdfDzGALTYy6EN3Hn43bz8h1ugIW18o/5ZZxcvKiIu0+9NdGMMKL8g29mp8tsqjE9a7bKZYBn4S/dt7AROrMs8E4x3lJbmU86sgwppp7SFOHwDOtnUPBdGCE/TdYr3KesI5IFa9OGqnVEj0EmZ+v+1z/sRMroU0x3Zvj8kAruyqQ+8Jo1lj1l8CmLA/48BAbkfoE1AN2ShaJKOBIDZUab+3mhM1REhaR5wkBV5R75hMEPk7wA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s+91SXb8PrY8K/2IWgJo9vDKxQSTSQz9Flc2s+Ap9R4=;
- b=U1AC8OB+4TURjLbKb1hjqoOYDKQXTT1Sv/c7EY+LVMot7nHEZ0wTevDdMyX1QjbLyWd8GPEiI65SG+CaLCIM1vqttFto2JQCEepBB61hgstG2jX5Amji82xxE/TDmRyZPbkZw9ewFsYqoym5HNURJdw+J/tJV59FGcJP6xCnxCnG/8EPkHD5k+J/JKcOBiixXJHvc73+NXMl/aIGbqy4nIAG2gAde5/WpwxBRuRvmsCIaZ8ZPtXl/+tFddsgGderCXxTz0Yq3so1YPgbpoXpdV+l5ytYXTPeyP2XKq+c7FC83kPD+1vmHjC03zGWmWphG3AbtO6P3aL4abEby19gaw==
-Received: from TY2PR06MB3213.apcprd06.prod.outlook.com (2603:1096:404:97::16)
- by TYZPR06MB5782.apcprd06.prod.outlook.com (2603:1096:400:26a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
- 2023 03:37:48 +0000
-Received: from TY2PR06MB3213.apcprd06.prod.outlook.com
- ([fe80::abee:6367:ef03:e60b]) by TY2PR06MB3213.apcprd06.prod.outlook.com
- ([fe80::abee:6367:ef03:e60b%7]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
- 03:37:48 +0000
-From:   Neal Liu <neal_liu@aspeedtech.com>
+        Tue, 3 Jan 2023 01:51:29 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23270B68;
+        Mon,  2 Jan 2023 22:51:28 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id bi26-20020a05600c3d9a00b003d3404a89faso15892982wmb.1;
+        Mon, 02 Jan 2023 22:51:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zvm/NFAuK45vvysV5ROF8aqgqwjzu2CCXnvz1aWo4So=;
+        b=MLwvy/EyS1jKO51O6p0H8dZSyEeX16in2WqUDXhDxLFaQVpR4qARAuRzQSFB0vcSAi
+         MY22qMmS2+2hC7d5gnyH350MucyeiiIAT1YHTmmFNcY088g7JyChJIhptwb6ICB78TCx
+         /Lzc17SjQzZgjf+AkcfNpRq1emOnQb3tUdIk+lTsJaMwC0FjKecj028P6hytqleKF+fT
+         QB+r86Nw+F66IiPtQ80HRNINvwF27JOtx0e/jPbPcx2TMyxg/WsOg91mZEQ2aWkWO7nI
+         BSG4SL04EkTr9dVVj8dmL1nAwxBb27capie0GnD4wEFynlU93m/CuG3BB73hy/+RGQK/
+         hxvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zvm/NFAuK45vvysV5ROF8aqgqwjzu2CCXnvz1aWo4So=;
+        b=pAiYwOvlpO0rAh1eD+8vmf7BYSS2wZypSXtowpZGE4S6DBOQaKxsWUqjfcIolenN46
+         GnBK13LYazZNOH/mbrz5o/F+sD/LkFmZstz857TimU6sOdoWgeOXSK3qXXG3Wv+cc0EE
+         bSNX6zC0SQk+4HnNDwk0MpWbWN5t24UBUwjSiM7RoR3efxNo/8KYtY9h/U3eES8ROa9S
+         lwVdNXWsDbJSSzcHH7GnyApK1NDNSqB5QIquV7aZwF8GSNc1gRUwhLRBlI3USliLfKDn
+         1/S6owIUBjVPVzolVYEs22K43jovxardAzsdhtZBGPmMu0rpRGjleDcJNbZvarV+faMH
+         dLqw==
+X-Gm-Message-State: AFqh2krbc9lYVGFOMZhsU8gD8Q8Z4Mg6rP4woDMRO7cXd18iFdLW+Yz2
+        EseTeyX1XMAkHJ1HtQg6pEQbnxzMBDs=
+X-Google-Smtp-Source: AMrXdXvx8ij6viMFBgSN0O1G4ZhOQt8phXBwB4dVfRwoDkc3xvl4dwcv3D261EaKIC2u2TF6qrm3vQ==
+X-Received: by 2002:a05:600c:3acc:b0:3d9:a145:91a with SMTP id d12-20020a05600c3acc00b003d9a145091amr9407893wms.28.1672728686664;
+        Mon, 02 Jan 2023 22:51:26 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id v9-20020a05600c444900b003d997e5e679sm25805212wmn.14.2023.01.02.22.51.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jan 2023 22:51:26 -0800 (PST)
+Date:   Tue, 3 Jan 2023 07:51:24 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        ChiaWei Wang <chiawei_wang@aspeedtech.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: RE: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
-Thread-Topic: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
-Thread-Index: AQHZD4nhuBerx3rD8U+/oUEvaZ6riq6GMoiAgAX3k6A=
-Date:   Tue, 3 Jan 2023 03:37:48 +0000
-Message-ID: <TY2PR06MB321306D17A97FBEBFE969A8B80F49@TY2PR06MB3213.apcprd06.prod.outlook.com>
-References: <20221214070114.3966155-1-neal_liu@aspeedtech.com>
- <20221214070114.3966155-2-neal_liu@aspeedtech.com>
- <Y66hXZHl+kqIivOl@gondor.apana.org.au>
-In-Reply-To: <Y66hXZHl+kqIivOl@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: zh-TW
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY2PR06MB3213:EE_|TYZPR06MB5782:EE_
-x-ms-office365-filtering-correlation-id: cf9276da-77c0-4956-6b9b-08daed3be2a4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Zi2Oa2GCIH2gjTrk53ZuHmFelc94b4tKrHB1g9C5ClWt+VAgx3FV4Btp6n/f1MqSq8F1Qvw7y/Pi6J3AIb5QBMdVsLzfM9CuRRcJ0i92jSrEQwSOQsizkxQI3JGBXBOlsezFZe95Fzmg2aTh32O+QhO7fMF7+AqttNCGxZoP78/q3w/ntlJpzs9kgUCFjapppLRiMcBCSzD9VrFi0KEf1VZiRUx/cM+FKgJAHIMtWx3h9PPGj9ZU9jCPEJyRQ7oodqZ94FZf5DqH6aBPjS4ZjIqPeV9Jh1BzO301tiQXQzxHKFYy7prLafzRYPNzd+UaqzJw+u9XIzp7voxLg+QT39OjU7EmuJ8HE4cusd3iwDWYwiEX6y2K3HbIA1ARpugBlP8wu8zag/sRPtWOxnuOYUHMeu7RQJ6QibE76TYsZNCJQTfX5sHHPqH51XhKQNwiR8Tef/lVFRceQp65k4VxQNUtJHvFuIIa3gHmuuYSEpOWhyXcUAAylGlgAN4QK9alXFBZNa2gY/R8+y1rHezdh7vFqNMQQ0dJEmMSdVQeDnsYq4WuANOUNLcoD4khBuL+WLTOlpOxhsp9f8Zw1iAkxa2nIlhd8ulM+z3qCTgWjXT3mWIisKLrjIViVe91S+r7oFcnCv5AJYcg6FIQD9gQgZrbfl6jtkE9q0OsfqSlhokfda5bcKD4XWiXuBjygAg9qfGQcSipfXsf+5g4UqYDNaK0n9X20hgVHPQ7nVEYo9HwLJ5spcH9mmWCjBXGFwgq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3213.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(376002)(39830400003)(136003)(396003)(451199015)(52536014)(5660300002)(4744005)(76116006)(7416002)(316002)(41300700001)(54906003)(6916009)(2906002)(66556008)(66446008)(4326008)(66476007)(8676002)(64756008)(66946007)(8936002)(71200400001)(478600001)(53546011)(6506007)(26005)(33656002)(186003)(9686003)(83380400001)(7696005)(966005)(55016003)(86362001)(122000001)(38100700002)(38070700005)(22166006);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?V2LJcRbkxuESCOlwGE6P8fm6ijioCT31TTQ6qjtR7wSXgo/ZBjYFi6qwbAl/?=
- =?us-ascii?Q?LQElNRJVtiRB4eRRtdRTY/dQuMIdmhChjnTlNchELUaZwhEYLXUOgCYBGcZh?=
- =?us-ascii?Q?luZj29aAX9l9y0KlMlOs2UZxYLRSjBzeP81zlu5y44iaVcZHYQhmN2JdgBB2?=
- =?us-ascii?Q?sHzdynE7CLK2rDCIApJH9m9d2BDPeke3EY0+JcuyBdx5gcED1A7zcl9HI1zP?=
- =?us-ascii?Q?ZckbyrBSH8jc51QaL/ggDi4SLphX2WVXiHheLzPxdLNCE/uN8l4WS/ooTDEZ?=
- =?us-ascii?Q?/uo5m5j1ZGX7EL1VsiG557YgFcnjKK9CAUbtj1lzdWYhsXHkVuCFZIxzloNQ?=
- =?us-ascii?Q?EeogY1pQkpRBkw+M778YLvpG3W6yjfdtooGVJj1rDSOfMwaO1htxR/wQRAit?=
- =?us-ascii?Q?/+yS4htiVCTTFpz5koL1hzQf9OHh+1/ktkzEykBFGvv02jndemAVVKoYcRoS?=
- =?us-ascii?Q?Tb/O+OzuFVkNrfvRtnjkpDmJNX4ceES5M09oKTPmEGwDYlRLA8au+gGlUjZe?=
- =?us-ascii?Q?bkWBROVlcFLqjsyKYFhDXs5vamhW74jnsh0z49Fz2A+JSnuLy8ZTfAZ7YAju?=
- =?us-ascii?Q?I1bxX0RKdX5IbGSON6+0CMqH2c9zk1HzQm8KDqeCHa1AmhiCRd0t+u2OM9+W?=
- =?us-ascii?Q?XVFwe0NoBdSfRK5LC9D9I2/QhAg52SdM/81sA6Fd3iBFOGfRW3Dpg9sS0fsy?=
- =?us-ascii?Q?pqgDCe2O71SGsHvxl5+w3omVpn8uT8sIXQXqF5ISAIynnClEOF/6tfcFKvD7?=
- =?us-ascii?Q?A08KKt8XGfzI+ojC1rwdCyrsj6+qgMUrwqwohrst3/Dm8O2OQiZFxOCqw58r?=
- =?us-ascii?Q?b0XQpEEidb+G2JXV1rcwC9lBMMh1Npqsyqf7m4fz6gh1EelID1op0eOiP6qf?=
- =?us-ascii?Q?YsT9CuYsHLZwGT+MOFzkjubKlL0L8VN1nYt45v0A1kU/toOeGuyYRZxU0Xqq?=
- =?us-ascii?Q?Sckyt4hEUGf61pir5+Ae9xJ1fN1kGIohRVGmn/xdfdMoMnJQYmttCkGJUAlb?=
- =?us-ascii?Q?lUSikjkJGycZXSUPD9FA794CGFH4nyUIhFkb5/wL2cGnHZfSOlql8dhFpDvP?=
- =?us-ascii?Q?ykdz2hbfOjCFHHYwt4r3qz36rjd+p/Q7mUuYKlmy/gFrCeS0boBt7k0rYjdo?=
- =?us-ascii?Q?g6ihSWj2WC9/2CcsO0jVdMpWW2OYFez51O7IYowk8Ljw6783tEXp3yFVqJUg?=
- =?us-ascii?Q?g/vm9Z1Tam0LoU+OkMprBzmzfjlD4q069evBVnzUkbQZlgxPc2gyNe54PSgc?=
- =?us-ascii?Q?Zq1Euyd9SbtqM8AreX4DTYdv7UqbrVe50aEJdvsl9wskInWNSIJX6XV84b3b?=
- =?us-ascii?Q?5wHcNyaRa29rObuYoeX6brpQfCN8kwEUOiHqujNdVAGVnDCzUcFSAsbaQRCL?=
- =?us-ascii?Q?nyy5P4CNFufNowcEfbymOw9D+ujT1ZZKCpFgWyg3iGCCM7iumWzN0amW60hd?=
- =?us-ascii?Q?z7WV6qU471CdLof+9hjIEFdCQf3DzlgnOrQQjxZX8YFrWJuOxleqYmvvZ7Q5?=
- =?us-ascii?Q?6sNPnusMORe2glYDx31eTqk4i5c9moCaVTV6mRqd/IdvJaNOtw9XbSQu2sEg?=
- =?us-ascii?Q?N/wLvozqCIGFCAgh0iiwrIBdohGBYMhoPk5u78qw?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LinuxKernelMailingList@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: sun8i-ss - Remove GFP_DMA and add DMA alignment
+ padding
+Message-ID: <Y7PQbNrgs2EvkXMB@Red>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+ <Y4xpGNNsfbucyUlt@infradead.org>
+ <Y47BgCuZsYLX61A9@gondor.apana.org.au>
+ <Y47g7qO8dsRdxCgf@infradead.org>
+ <Y47+gxbdKR03EYCj@gondor.apana.org.au>
+ <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3213.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf9276da-77c0-4956-6b9b-08daed3be2a4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jan 2023 03:37:48.7313
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5/1snHlQmiE/eDcnWAyb72/2kmd9FjWvjShmYNCKv/51SsbM/18Aa3rogIAlPmFapM6Ml6STU5LyeCpbVKV+ZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5782
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Friday, December 30, 2022 4:29 PM
-> To: Neal Liu <neal_liu@aspeedtech.com>
-> Cc: Rob Herring <robh+dt@kernel.org>; Krzysztof Kozlowski
-> <krzysztof.kozlowski+dt@linaro.org>; Joel Stanley <joel@jms.id.au>; Andre=
-w
-> Jeffery <andrew@aj.id.au>; David S . Miller <davem@davemloft.net>;
-> ChiaWei Wang <chiawei_wang@aspeedtech.com>;
-> devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
-> linux-aspeed@lists.ozlabs.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; Christoph Hellwig <hch@infradead.org>
-> Subject: Re: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
->=20
-> On Wed, Dec 14, 2022 at 03:01:11PM +0800, Neal Liu wrote:
-> >
-> > +static u8 *aspeed_rsa_key_copy(u8 *src, size_t len) {
-> > +	return kmemdup(src, len, GFP_DMA | GFP_KERNEL);
->=20
-> Please explain why you are using GFP_DMA.
+Le Thu, Dec 29, 2022 at 04:58:21PM +0800, Herbert Xu a écrit :
+> GFP_DMA does not guarantee that the returned memory is aligned
+> for DMA.  In fact for sun8i-ss it is superfluous and can be removed.
+> 
+> However, kmalloc may start returning DMA-unaligned memory in future
+> so fix this by adding the alignment by hand.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Looks like it's unnecessary. I'll remove it.
-Thanks.
+Hello
 
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-on: sun8i-a83t-bananapi-m3
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+
+This means that lot of other crypto driver (sun8i-ce, amlogic, etc...) I maintain need the same fix, right ?
+
+Regards
