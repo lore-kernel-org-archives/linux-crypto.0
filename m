@@ -2,77 +2,127 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4F4C46467
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 07:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7332CC3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 08:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236875AbjACH1I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 02:27:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49180 "EHLO
+        id S236965AbjACIND (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 03:13:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236902AbjACH0z (ORCPT
+        with ESMTP id S236961AbjACINB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 02:26:55 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053091124;
-        Mon,  2 Jan 2023 23:26:52 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pCbgj-00DN68-DB; Tue, 03 Jan 2023 15:26:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Jan 2023 15:26:21 +0800
-Date:   Tue, 3 Jan 2023 15:26:21 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        LinuxKernelMailingList@gondor.apana.org.au,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: sun8i-ss - Remove GFP_DMA and add DMA alignment
- padding
-Message-ID: <Y7PYnb+oQpo7CI+N@gondor.apana.org.au>
-References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
- <Y4xpGNNsfbucyUlt@infradead.org>
- <Y47BgCuZsYLX61A9@gondor.apana.org.au>
- <Y47g7qO8dsRdxCgf@infradead.org>
- <Y47+gxbdKR03EYCj@gondor.apana.org.au>
- <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
- <Y7PQbNrgs2EvkXMB@Red>
+        Tue, 3 Jan 2023 03:13:01 -0500
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F35DF71;
+        Tue,  3 Jan 2023 00:12:59 -0800 (PST)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30379K9x010968;
+        Tue, 3 Jan 2023 09:12:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
+ references : in-reply-to : subject : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=f45oBMJc844ZCXMDbesSeS3x9ZTo6pQSGJmchQpW4CE=;
+ b=CntXIfyrB2Haka5FHYiT9KwrsvH98wf90+C87RvonfGhMc0tZ1iBuRqdAvEdeZAHZMXs
+ lgpkifQsLrLXPkbwoSL+zpmJ/UQK0ZKT8OPYLX+IBeNHFfsip+wqyNMKT+EMK8nnqRWH
+ 8DwWdn6rKKgPOpW38tNE7BbwKU6Zz4fIQfC11ExKxB6j6eHlbBoNih8BDek6CkcR/OfH
+ JRAfxn7eP/n98Wec+uoU9zW9FBSc7XHEBhBAeQpqglvvyxXftE9VNjU9P5Qn4CEw+3B6
+ 1AhOz+fEak/8hFUpYnYNvTSjU7wmCU8o8pcI0dgVfUVqQ97/BerPSyM9h0RkiiktfBwQ Gg== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3mtb3e3q3x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Jan 2023 09:12:33 +0100
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 340FD10002A;
+        Tue,  3 Jan 2023 09:12:31 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E8DEF2132EC;
+        Tue,  3 Jan 2023 09:12:31 +0100 (CET)
+Received: from LMECWL1288 (10.201.28.198) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.13; Tue, 3 Jan
+ 2023 09:12:30 +0100
+From:   <lionel.debieve@foss.st.com>
+To:     'Linus Walleij' <linus.walleij@linaro.org>,
+        'Herbert Xu' <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        'Rob Herring' <robh+dt@kernel.org>,
+        'Krzysztof Kozlowski' <krzysztof.kozlowski+dt@linaro.org>,
+        'Maxime Coquelin' <mcoquelin.stm32@gmail.com>,
+        'Alexandre Torgue' <alexandre.torgue@foss.st.com>
+CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20221227-ux500-stm32-hash-v1-0-b637ac4cda01@linaro.org> <20221227-ux500-stm32-hash-v1-2-b637ac4cda01@linaro.org>
+In-Reply-To: <20221227-ux500-stm32-hash-v1-2-b637ac4cda01@linaro.org>
+Subject: RE: [PATCH 2/7] crypto: stm32/hash: Simplify code
+Date:   Tue, 3 Jan 2023 09:12:24 +0100
+Message-ID: <000901d91f4b$20c2dcf0$624896d0$@foss.st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y7PQbNrgs2EvkXMB@Red>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: en-us
+Thread-Index: AQE9xJnjLNHmulQwHw6lCuUzVFT/vQHXDoT+r7RUDhA=
+msip_labels: MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_Enabled=true; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_SetDate=2023-01-03T08:12:24Z; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_Method=Standard; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_Name=23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_SiteId=75e027c9-20d5-47d5-b82f-77d7cd041e8f; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_ActionId=4898ab01-b61a-4506-99cb-8cb4532979e5; MSIP_Label_23add6c0-cfdb-4bb9-b90f-bf23b83aa6c0_ContentBits=2
+X-Originating-IP: [10.201.28.198]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-02_14,2022-12-30_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 07:51:24AM +0100, Corentin Labbe wrote:
-.
-> Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Tested-on: sun8i-a83t-bananapi-m3
-> Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Hi Linus
 
-Thanks,
+Acked-by: Lionel Debieve <lionel.debieve@foss.st.com>
 
-> This means that lot of other crypto driver (sun8i-ce, amlogic, etc...) I maintain need the same fix, right ?
 
-I checked the other drivers and none of them seem to be broken.
-Only DMA from the device (DMA_FROM_DEVICE or DMA_BIDIRECTIONAL)
-need to be aligned appropriately.
+ST Restricted
 
-However, please do remove any unnecessary uses of GFP_DMA in those
-drivers.
+-----Original Message-----
+From: Linus Walleij <linus.walleij@linaro.org>=20
+Sent: Wednesday, December 28, 2022 12:04 AM
+To: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller =
+<davem@davemloft.net>; Rob Herring <robh+dt@kernel.org>; Krzysztof =
+Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Maxime Coquelin =
+<mcoquelin.stm32@gmail.com>; Alexandre Torgue =
+<alexandre.torgue@foss.st.com>; Lionel Debieve =
+<lionel.debieve@foss.st.com>
+Cc: linux-crypto@vger.kernel.org; devicetree@vger.kernel.org; =
+linux-stm32@st-md-mailman.stormreply.com; =
+linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org; =
+Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 2/7] crypto: stm32/hash: Simplify code
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We are passing (rctx->flags & HASH_FLAGS_FINUP) as indicator for the =
+final request but we already know this to be true since we are in the =
+(final) arm of an if-statement set from the same flag. Just open-code it =
+as true.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/crypto/stm32/stm32-hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/stm32/stm32-hash.c =
+b/drivers/crypto/stm32/stm32-hash.c
+index d33006d43f76..0473ced7b4ea 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -399,8 +399,7 @@ static int stm32_hash_update_cpu(struct =
+stm32_hash_dev *hdev)
+ 	if (final) {
+ 		bufcnt =3D rctx->bufcnt;
+ 		rctx->bufcnt =3D 0;
+-		err =3D stm32_hash_xmit_cpu(hdev, rctx->buffer, bufcnt,
+-					  (rctx->flags & HASH_FLAGS_FINUP));
++		err =3D stm32_hash_xmit_cpu(hdev, rctx->buffer, bufcnt, 1);
+ 	}
+=20
+ 	return err;
+--
+2.38.1
+
