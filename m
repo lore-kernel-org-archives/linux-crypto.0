@@ -2,78 +2,153 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AAEC3DA7A
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Jan 2023 23:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D74B2C54EBC
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 03:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbjABXDp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Jan 2023 18:03:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
+        id S236694AbjACDiO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Jan 2023 22:38:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjABXDo (ORCPT
+        with ESMTP id S236810AbjACDh7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Jan 2023 18:03:44 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA9092ADB
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Jan 2023 15:03:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3221561133
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Jan 2023 23:03:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 687C8C433D2;
-        Mon,  2 Jan 2023 23:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672700622;
-        bh=rmpZSqBeydYPmOfYdtaHXGU6tk3QdqLm4wRRYorlwEQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HN1j2lr0Uj5Ctr2FeCQ8/Bwq8ez/QynvNXHcnOB8yt1NMuo4IlqiuI3tO/qb8v51x
-         1TTDuEnO6sff953TIK2nWXsUtPweL3rIKZ2CpRc0QIygLN9uyMdgfOhJUOaEz27MNR
-         q19qEGavSV8ubWUAO8VycW1MPFXDKkCIOc2/P6Kqk6uljuysQWP+IVrDDDV/3aVjxJ
-         LODWsHopBcnA8K6Ytysqi97Bu7JS5oEdpj3nuXxT+4ZaPOBEvHNaQoL7CbZ6zhfiRX
-         fKZxW6aOm4OFm5edASjU5n1dRXU7Sw3OnUZREpDgZ+r3jYOoJvmKhCDF71pS2NRvdZ
-         rt4KfQsL4JgZQ==
-Date:   Mon, 2 Jan 2023 15:03:40 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: xor_blocks() assumptions
-Message-ID: <Y7NizHFsWfMW/cC2@sol.localdomain>
-References: <CGME20230102224447eucas1p1dad1a2362030eee0d3890dd3546a1532@eucas1p1.samsung.com>
- <dleftjk024o8to.fsf%l.stelmach@samsung.com>
+        Mon, 2 Jan 2023 22:37:59 -0500
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2138.outbound.protection.outlook.com [40.107.255.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA24D2C4;
+        Mon,  2 Jan 2023 19:37:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cr3EtS5+aMLDASFU2soxLC78JoT7PRjZKW0tOdWl7z7ByzFChi0Q0iCsrtr50Oh6u1P3BKPxkbqJ9rx/jfpbNyXyp9Z17h4CScoJFf6F6ID7SSOLwxenSf/kFC78ij/mJQL0zH5x2sR7FE6qDfLAKwqFjTZXAJmXdtcNTXIZ21o4PJHihpOLsWOVclwnK4L16iyfZt9mQSR7mgEUVZ0zwRP1U/vG8iqxByU7NCerDoQPeJdYkixyVhsa/Lo6QYbcl35mVWg/2f11rJkkuxdRI4XjLox/CF71pQTv+B/j02+W5Fy3T96PBT6NFJl/omsSqn4F2+JZl/Kp7sRqWHeuRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s+91SXb8PrY8K/2IWgJo9vDKxQSTSQz9Flc2s+Ap9R4=;
+ b=JKFvCYNVUsShL4chdYlybIzlBeUQykpqXi9fZnDnNFSb9CuFW10x17jgwSNJIKeEjO2W07z6wFe3VFoEs0b/dIDn5+aoV8yZOw1EnUdfDzGALTYy6EN3Hn43bz8h1ugIW18o/5ZZxcvKiIu0+9NdGMMKL8g29mp8tsqjE9a7bKZYBn4S/dt7AROrMs8E4x3lJbmU86sgwppp7SFOHwDOtnUPBdGCE/TdYr3KesI5IFa9OGqnVEj0EmZ+v+1z/sRMroU0x3Zvj8kAruyqQ+8Jo1lj1l8CmLA/48BAbkfoE1AN2ShaJKOBIDZUab+3mhM1REhaR5wkBV5R75hMEPk7wA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s+91SXb8PrY8K/2IWgJo9vDKxQSTSQz9Flc2s+Ap9R4=;
+ b=U1AC8OB+4TURjLbKb1hjqoOYDKQXTT1Sv/c7EY+LVMot7nHEZ0wTevDdMyX1QjbLyWd8GPEiI65SG+CaLCIM1vqttFto2JQCEepBB61hgstG2jX5Amji82xxE/TDmRyZPbkZw9ewFsYqoym5HNURJdw+J/tJV59FGcJP6xCnxCnG/8EPkHD5k+J/JKcOBiixXJHvc73+NXMl/aIGbqy4nIAG2gAde5/WpwxBRuRvmsCIaZ8ZPtXl/+tFddsgGderCXxTz0Yq3so1YPgbpoXpdV+l5ytYXTPeyP2XKq+c7FC83kPD+1vmHjC03zGWmWphG3AbtO6P3aL4abEby19gaw==
+Received: from TY2PR06MB3213.apcprd06.prod.outlook.com (2603:1096:404:97::16)
+ by TYZPR06MB5782.apcprd06.prod.outlook.com (2603:1096:400:26a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
+ 2023 03:37:48 +0000
+Received: from TY2PR06MB3213.apcprd06.prod.outlook.com
+ ([fe80::abee:6367:ef03:e60b]) by TY2PR06MB3213.apcprd06.prod.outlook.com
+ ([fe80::abee:6367:ef03:e60b%7]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
+ 03:37:48 +0000
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        ChiaWei Wang <chiawei_wang@aspeedtech.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: RE: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
+Thread-Topic: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
+Thread-Index: AQHZD4nhuBerx3rD8U+/oUEvaZ6riq6GMoiAgAX3k6A=
+Date:   Tue, 3 Jan 2023 03:37:48 +0000
+Message-ID: <TY2PR06MB321306D17A97FBEBFE969A8B80F49@TY2PR06MB3213.apcprd06.prod.outlook.com>
+References: <20221214070114.3966155-1-neal_liu@aspeedtech.com>
+ <20221214070114.3966155-2-neal_liu@aspeedtech.com>
+ <Y66hXZHl+kqIivOl@gondor.apana.org.au>
+In-Reply-To: <Y66hXZHl+kqIivOl@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY2PR06MB3213:EE_|TYZPR06MB5782:EE_
+x-ms-office365-filtering-correlation-id: cf9276da-77c0-4956-6b9b-08daed3be2a4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Zi2Oa2GCIH2gjTrk53ZuHmFelc94b4tKrHB1g9C5ClWt+VAgx3FV4Btp6n/f1MqSq8F1Qvw7y/Pi6J3AIb5QBMdVsLzfM9CuRRcJ0i92jSrEQwSOQsizkxQI3JGBXBOlsezFZe95Fzmg2aTh32O+QhO7fMF7+AqttNCGxZoP78/q3w/ntlJpzs9kgUCFjapppLRiMcBCSzD9VrFi0KEf1VZiRUx/cM+FKgJAHIMtWx3h9PPGj9ZU9jCPEJyRQ7oodqZ94FZf5DqH6aBPjS4ZjIqPeV9Jh1BzO301tiQXQzxHKFYy7prLafzRYPNzd+UaqzJw+u9XIzp7voxLg+QT39OjU7EmuJ8HE4cusd3iwDWYwiEX6y2K3HbIA1ARpugBlP8wu8zag/sRPtWOxnuOYUHMeu7RQJ6QibE76TYsZNCJQTfX5sHHPqH51XhKQNwiR8Tef/lVFRceQp65k4VxQNUtJHvFuIIa3gHmuuYSEpOWhyXcUAAylGlgAN4QK9alXFBZNa2gY/R8+y1rHezdh7vFqNMQQ0dJEmMSdVQeDnsYq4WuANOUNLcoD4khBuL+WLTOlpOxhsp9f8Zw1iAkxa2nIlhd8ulM+z3qCTgWjXT3mWIisKLrjIViVe91S+r7oFcnCv5AJYcg6FIQD9gQgZrbfl6jtkE9q0OsfqSlhokfda5bcKD4XWiXuBjygAg9qfGQcSipfXsf+5g4UqYDNaK0n9X20hgVHPQ7nVEYo9HwLJ5spcH9mmWCjBXGFwgq
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3213.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(376002)(39830400003)(136003)(396003)(451199015)(52536014)(5660300002)(4744005)(76116006)(7416002)(316002)(41300700001)(54906003)(6916009)(2906002)(66556008)(66446008)(4326008)(66476007)(8676002)(64756008)(66946007)(8936002)(71200400001)(478600001)(53546011)(6506007)(26005)(33656002)(186003)(9686003)(83380400001)(7696005)(966005)(55016003)(86362001)(122000001)(38100700002)(38070700005)(22166006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?V2LJcRbkxuESCOlwGE6P8fm6ijioCT31TTQ6qjtR7wSXgo/ZBjYFi6qwbAl/?=
+ =?us-ascii?Q?LQElNRJVtiRB4eRRtdRTY/dQuMIdmhChjnTlNchELUaZwhEYLXUOgCYBGcZh?=
+ =?us-ascii?Q?luZj29aAX9l9y0KlMlOs2UZxYLRSjBzeP81zlu5y44iaVcZHYQhmN2JdgBB2?=
+ =?us-ascii?Q?sHzdynE7CLK2rDCIApJH9m9d2BDPeke3EY0+JcuyBdx5gcED1A7zcl9HI1zP?=
+ =?us-ascii?Q?ZckbyrBSH8jc51QaL/ggDi4SLphX2WVXiHheLzPxdLNCE/uN8l4WS/ooTDEZ?=
+ =?us-ascii?Q?/uo5m5j1ZGX7EL1VsiG557YgFcnjKK9CAUbtj1lzdWYhsXHkVuCFZIxzloNQ?=
+ =?us-ascii?Q?EeogY1pQkpRBkw+M778YLvpG3W6yjfdtooGVJj1rDSOfMwaO1htxR/wQRAit?=
+ =?us-ascii?Q?/+yS4htiVCTTFpz5koL1hzQf9OHh+1/ktkzEykBFGvv02jndemAVVKoYcRoS?=
+ =?us-ascii?Q?Tb/O+OzuFVkNrfvRtnjkpDmJNX4ceES5M09oKTPmEGwDYlRLA8au+gGlUjZe?=
+ =?us-ascii?Q?bkWBROVlcFLqjsyKYFhDXs5vamhW74jnsh0z49Fz2A+JSnuLy8ZTfAZ7YAju?=
+ =?us-ascii?Q?I1bxX0RKdX5IbGSON6+0CMqH2c9zk1HzQm8KDqeCHa1AmhiCRd0t+u2OM9+W?=
+ =?us-ascii?Q?XVFwe0NoBdSfRK5LC9D9I2/QhAg52SdM/81sA6Fd3iBFOGfRW3Dpg9sS0fsy?=
+ =?us-ascii?Q?pqgDCe2O71SGsHvxl5+w3omVpn8uT8sIXQXqF5ISAIynnClEOF/6tfcFKvD7?=
+ =?us-ascii?Q?A08KKt8XGfzI+ojC1rwdCyrsj6+qgMUrwqwohrst3/Dm8O2OQiZFxOCqw58r?=
+ =?us-ascii?Q?b0XQpEEidb+G2JXV1rcwC9lBMMh1Npqsyqf7m4fz6gh1EelID1op0eOiP6qf?=
+ =?us-ascii?Q?YsT9CuYsHLZwGT+MOFzkjubKlL0L8VN1nYt45v0A1kU/toOeGuyYRZxU0Xqq?=
+ =?us-ascii?Q?Sckyt4hEUGf61pir5+Ae9xJ1fN1kGIohRVGmn/xdfdMoMnJQYmttCkGJUAlb?=
+ =?us-ascii?Q?lUSikjkJGycZXSUPD9FA794CGFH4nyUIhFkb5/wL2cGnHZfSOlql8dhFpDvP?=
+ =?us-ascii?Q?ykdz2hbfOjCFHHYwt4r3qz36rjd+p/Q7mUuYKlmy/gFrCeS0boBt7k0rYjdo?=
+ =?us-ascii?Q?g6ihSWj2WC9/2CcsO0jVdMpWW2OYFez51O7IYowk8Ljw6783tEXp3yFVqJUg?=
+ =?us-ascii?Q?g/vm9Z1Tam0LoU+OkMprBzmzfjlD4q069evBVnzUkbQZlgxPc2gyNe54PSgc?=
+ =?us-ascii?Q?Zq1Euyd9SbtqM8AreX4DTYdv7UqbrVe50aEJdvsl9wskInWNSIJX6XV84b3b?=
+ =?us-ascii?Q?5wHcNyaRa29rObuYoeX6brpQfCN8kwEUOiHqujNdVAGVnDCzUcFSAsbaQRCL?=
+ =?us-ascii?Q?nyy5P4CNFufNowcEfbymOw9D+ujT1ZZKCpFgWyg3iGCCM7iumWzN0amW60hd?=
+ =?us-ascii?Q?z7WV6qU471CdLof+9hjIEFdCQf3DzlgnOrQQjxZX8YFrWJuOxleqYmvvZ7Q5?=
+ =?us-ascii?Q?6sNPnusMORe2glYDx31eTqk4i5c9moCaVTV6mRqd/IdvJaNOtw9XbSQu2sEg?=
+ =?us-ascii?Q?N/wLvozqCIGFCAgh0iiwrIBdohGBYMhoPk5u78qw?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dleftjk024o8to.fsf%l.stelmach@samsung.com>
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3213.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf9276da-77c0-4956-6b9b-08daed3be2a4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jan 2023 03:37:48.7313
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5/1snHlQmiE/eDcnWAyb72/2kmd9FjWvjShmYNCKv/51SsbM/18Aa3rogIAlPmFapM6Ml6STU5LyeCpbVKV+ZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5782
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 02, 2023 at 11:44:35PM +0100, Lukasz Stelmach wrote:
-> Hi,
-> 
-> I am researching possibility to use xor_blocks() in crypto_xor() and
-> crypto_xor_cpy(). What I've found already is that different architecture
-> dependent xor functions work on different blocks between 16 and 512
-> (Intel AVX) bytes long. There is a hint in the comment for
-> async_xor_offs() that src_cnt (as passed to do_sync_xor_offs()) counts
-> pages. Thus, it is assumed, that the smallest chunk xor_blocks() gets is
-> a single page. Am I right?
-> 
-> Do you think adding block_len field to struct xor_block_template (and
-> maybe some information about required alignment) and using it to call
-> do_2 from crypto_xor() may work? I am thinking especially about disk
-> encryption where sectors of 512~4096 are handled.
-> 
+> -----Original Message-----
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Friday, December 30, 2022 4:29 PM
+> To: Neal Liu <neal_liu@aspeedtech.com>
+> Cc: Rob Herring <robh+dt@kernel.org>; Krzysztof Kozlowski
+> <krzysztof.kozlowski+dt@linaro.org>; Joel Stanley <joel@jms.id.au>; Andre=
+w
+> Jeffery <andrew@aj.id.au>; David S . Miller <davem@davemloft.net>;
+> ChiaWei Wang <chiawei_wang@aspeedtech.com>;
+> devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+> linux-aspeed@lists.ozlabs.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; Christoph Hellwig <hch@infradead.org>
+> Subject: Re: [PATCH v4 1/4] crypto: aspeed: Add ACRY RSA driver
+>=20
+> On Wed, Dec 14, 2022 at 03:01:11PM +0800, Neal Liu wrote:
+> >
+> > +static u8 *aspeed_rsa_key_copy(u8 *src, size_t len) {
+> > +	return kmemdup(src, len, GFP_DMA | GFP_KERNEL);
+>=20
+> Please explain why you are using GFP_DMA.
 
-Taking a step back, it sounds like you think the word-at-a-time XOR in
-crypto_xor() is not performant enough, so you want to use a SIMD (e.g. NEON,
-SSE, or AVX) implementation instead.  Have you tested that this would actually
-give a benefit on the input sizes in question, especially considering that SIMD
-can only be used in the kernel if kernel_fpu_begin() is executed first?
+Looks like it's unnecessary. I'll remove it.
+Thanks.
 
-It also would be worth considering just optimizing crypto_xor() by unrolling the
-word-at-a-time loop to 4x or so.
-
-- Eric
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+> http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
