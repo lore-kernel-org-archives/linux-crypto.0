@@ -2,259 +2,179 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7C3C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 14:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF927C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 14:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237766AbjACOEJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 09:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53460 "EHLO
+        id S233108AbjACOkP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 09:40:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236918AbjACOEF (ORCPT
+        with ESMTP id S238001AbjACOj7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 09:04:05 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3B3510B6C;
-        Tue,  3 Jan 2023 06:03:57 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B1831595;
-        Tue,  3 Jan 2023 06:04:39 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.37.13])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9306B3F587;
-        Tue,  3 Jan 2023 06:03:51 -0800 (PST)
-Date:   Tue, 3 Jan 2023 14:03:37 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Boqun Feng <boqun.feng@gmail.com>, torvalds@linux-foundation.org,
-        corbet@lwn.net, will@kernel.org, catalin.marinas@arm.com,
-        dennis@kernel.org, tj@kernel.org, cl@linux.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC][PATCH 05/12] arch: Introduce
- arch_{,try_}_cmpxchg128{,_local}()
-Message-ID: <Y7Q1uexv6DrxCASB@FVFF77S0Q05N>
-References: <20221219153525.632521981@infradead.org>
- <20221219154119.154045458@infradead.org>
- <Y6DEfQXymYVgL3oJ@boqun-archlinux>
- <Y6GXoO4qmH9OIZ5Q@hirez.programming.kicks-ass.net>
- <Y7QszyTEG2+WiI/C@FVFF77S0Q05N>
+        Tue, 3 Jan 2023 09:39:59 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFA611A3B;
+        Tue,  3 Jan 2023 06:39:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iiCpuCPfm9yn/qefDvTJ2iYBFLQl24njYiAXXXDEZMmuWIEremaB8pkioZ/tMTsnL2IFxQocFOCbBFuLCx3DA//LKHxCpdMLOS7VFJEXnGAPd2NxgjCo+ufgniSJ1DiuRyEpZ66C7CvoXgghDyq2D53tC7/ReeirelkhcT9s3HpmnQJCimIYYW+BUOOo7qc7r1ADP8Ha4b7Qk357p3lTbRzu+8Z9PQ1oXkBMjzk+rqf6feebd9jznamfmZiR/zSSTv8R6rYghtcQXOxYnB6MSokpTBNe2/CBUEi/wyplmT+Y9RqpWHyCRVQyVSUARJjwVO8l5ydwFVaQeTpiTlT1NA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=30sEp4VsfIvn3O2uMjdbreACmrogLI1wNT61WewDRhY=;
+ b=Wlqo1lpb9twKf8efX8ufGf8WcIFTJc1Y5gqC2KUg8KqBRho6UkS1y5RKMNxHDVB4PDzSdiT/gccPjwhj3nna4eIDPaZ8Bfapl9cGmwSWOekeqzFCwxjz099u03MK9lB0qvkQMXsOfuLfL9rP9Weglg29pq4SJvSFcXRHrFFJP78889K7vEUU6z/DsYTqU6tBNk19h4zGDyZ2Vv0kYPO8NWAaMeQty1rijm18Lv0r61z/G4ot98aEjlLxOJS9EDkW6r5EyKlRYFUChE4kc3s3YKVcxiQ51x3zhUxpVBbLaTKXOyaoqPzR7ccU8www4QSzKPNMJ3QsGKtS/rQ/XHcyMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=30sEp4VsfIvn3O2uMjdbreACmrogLI1wNT61WewDRhY=;
+ b=nHtV8s0pChHKJ7jn4waNrWMEUn/bFi0T6j/QP9J46ZpR936Wfn7547/EVkbTdHiB+CJNg0JQhXsuhH2Kh/Fg4x7PKvBRxTROPaB7h+M0vwwmTuIUZ6aHDcISAnMFIWOxX35tFke1rP71CeYXOpFiLH9iz5QE86JcLYZymWKIFXQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CH3PR12MB8548.namprd12.prod.outlook.com (2603:10b6:610:165::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
+ 2023 14:39:47 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::8200:4042:8db4:63d7%3]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
+ 14:39:47 +0000
+Message-ID: <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com>
+Date:   Tue, 3 Jan 2023 08:39:45 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [patch] crypto: ccp - Avoid page allocation failure warning for
+ SEV_GET_ID2
+To:     David Rientjes <rientjes@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        John Allen <john.allen@amd.com>
+References: <20221214202046.719598-1-pgonda@google.com>
+ <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au>
+ <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com>
+ <Y6wDJd3hfztLoCp1@gondor.apana.org.au>
+ <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
+ <833b4dd0-7f85-b336-0786-965f3f573f74@google.com>
+Content-Language: en-US
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <833b4dd0-7f85-b336-0786-965f3f573f74@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR03CA0010.namprd03.prod.outlook.com
+ (2603:10b6:610:59::20) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y7QszyTEG2+WiI/C@FVFF77S0Q05N>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CH3PR12MB8548:EE_
+X-MS-Office365-Filtering-Correlation-Id: f05d3f17-db5f-4bf0-b272-08daed985c83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aFY7pfL5AzGP2hmeQ8jKzeOwgObXVzdEtfaOPA76eIzi9dVAfxxsfPAHV0rfTw4ywnvE8c11mK+UPAa70WJIaF9c+FxdqRal14Nnxnlf9CLMw6DnyemNsbTp6gL7qbNnzHUJGcwqAK8d8l+u3uDPgP8lSF766033/W1K7B6VIp20KkBU1MnkRW1VS8dDh8VD/b2K8SLGWMxLDYoF3+3pFJrPZLvTr0/qyuIXjrhAzk/TnPQqptw3fDWSHmVCJMEOd6pSveFYtQrFPcuB2L9j2OkogKgvV3Wdln5DkppnW+U2y1K6e+p+/iAXGFOxObmQ79yVYij18fcLf4ghA6YKMKOwThardU6J14ye0MtlopaTKVDrkp+afFjIX1ynRI4HKoza0ZfaedN2Gr+oXaZKaKYuMX/DXH8wBodRiJeKQ32YX/TWmZb+S2rbST8th4SEvsOxOwZTkuNSPMZGHWNjjsWrFdf3UfAa5Ai0kwv27r1P/Ieyf++4K4YL5kAckGzBmp2/XSk6Nl8ZVI8IKOQlcsGwB4LufUrkVBUHHYeIYIG/SU/cvTofyyQb1i4BbP4h+alxDvYbBER3wTErnZTIZO9hsoqKxDkaZ9NCAppJvCb2Lh6Yk8Y3Ex2fcxG6TBfI/izO9rjFAn2IzyAxNR2CcxOofW2DQ+6xcrml5LLzSPbGVkiRKggPTuV4cn2Gedqau42GS/lilXnl5EsiFnEUWs2xPj8UqCUGDa32/BNngocEusdFGuJxeyWtstCvQWmG
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(136003)(346002)(366004)(376002)(451199015)(4326008)(8676002)(66946007)(66556008)(66476007)(5660300002)(8936002)(316002)(31686004)(110136005)(2906002)(6506007)(6486002)(478600001)(54906003)(41300700001)(53546011)(186003)(6512007)(26005)(2616005)(83380400001)(38100700002)(36756003)(86362001)(31696002)(22166006)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T2FHUlcySnV6aEFrSkp1aytRRzcySXcvN0QxSFlxcWV2eFFibk5ZNENhSTNn?=
+ =?utf-8?B?dWpyNFhEVkpCaytsbURUWGlnM2lQTGJWb2NuU2FYRnJCMC9hNlFUa2hZSDVO?=
+ =?utf-8?B?ZXZ1S0xTejVUdUlWbGdNZnpCdXhBSjczZGdpOXdNZlNldjhUYkFnOVZqRDN1?=
+ =?utf-8?B?ckFRdW42T1loQzA4YU1aOHArdVB0Q3N5Q0twU0kwSkFZbFNRS081MUEzY2Qw?=
+ =?utf-8?B?cGpoRkN4Q2pCL0tSMytMN3ZWbkxoTzQxWjVFanhuMzhscDFCaGF6SjFHOTdQ?=
+ =?utf-8?B?eko1b000Z1htdXg1OHZIMlpGQ2dvYnlsVS9wY2p3VndFWm9wdmxmd25HMFJo?=
+ =?utf-8?B?RGRKaU5IWHNNY0hwNzBDNDZObDhnRkdzQ0dWWU5tc3lrbm5EZ01hT1QrZHBp?=
+ =?utf-8?B?R0NaOEViQXNXbSs4SUx5cXkwbkRLVk55SWJBc09ZQ3I4NnhvWUF2UThlYy9U?=
+ =?utf-8?B?b2U3K1VHK29UdGx6VzJOcXF0VXEwS29uOFlTUUpya3ZBaDlHbk92ZlZWVXB1?=
+ =?utf-8?B?aG9rT3F0aUlnME9OWUZZMVNmZTl4enlWODBtSEZzaEV0WWRlWU5PK1Zpa1k1?=
+ =?utf-8?B?bStoSTBzdDRsN1F3bllReE5OYUJlNlV1VVFaUmRqSThSeFc2dzlGSk84STJn?=
+ =?utf-8?B?ZkcyZXhQSW1JTkxoeGFoa2JXQTdLVTdTQndJMmhBNGJXOE11MDRhWEFKcFlC?=
+ =?utf-8?B?T1FRWWlOUjJiYWZNYmw5V3paVGFXV1lGVWduMktwSVZEZEErT2V5SUdjcllJ?=
+ =?utf-8?B?NlllOGJIcUMxdDFBOCszdnErSzRmZEh6emRHUXM2Si9YZVFHd1JYdm9mc2Jo?=
+ =?utf-8?B?aC9CV1JlV21pR0V1Y3pLWFkvclM2L2VKTlZMVXhrOU1ORExjbmgrV2VUVjBY?=
+ =?utf-8?B?Y2J3V0dKalFqbTRoY01EckQ1cEppUG4rdmVFVFM0S1BySDg4OWFzWnp3Vmkw?=
+ =?utf-8?B?aDRnbVhYbzdlRENZa2FlNTVoV01qNlpKeXE0R3RieEhielNYcG40MEg1czlo?=
+ =?utf-8?B?cndDbjJKMG11MVBCYVNjNHg0bks5SEJGc3g2bkFLUXB6SXVSTGRmSW4wY3ow?=
+ =?utf-8?B?MXdLaHhMZ2dab01XRTFzUUZONEs0aUV2M203Tzc2dkkveGE5R1F4NlErV0E5?=
+ =?utf-8?B?NXkvcUJUeGU2T091UWdvd01lVFJIYmVBYWdUTHkrcEtDaXBnNmhiRlBCdjJ5?=
+ =?utf-8?B?M1Y2WUtLNjBaQURQeXljNnBKM3UzYVZzcW5qN09PVGZvWGJPRUZ5Y2dXY3Vx?=
+ =?utf-8?B?U3owMVBMS0JRWExGSXA0bVV0czNRVkljc1NTWDR2NEg0VVJtRTNHTEJ3Tzhr?=
+ =?utf-8?B?ajY2Q3M0aVdEL1hSRUozODBqWjdQQU4wbkE3bUh0UmZIbGdiSENtQXdYeDkw?=
+ =?utf-8?B?S3VLbU0vU1pySXN4Zk5XR3FGVWdlelFKdUxJdE5WbjdQS2tCN1E0WWc0WEdo?=
+ =?utf-8?B?QWMvYXFKSUpVOHRDV0VqWTNNZkdyQ0FSOWc1bDBBSmRSblBZZDN1Vzd3SVRP?=
+ =?utf-8?B?UG1qQWJ4Y2MxUVFJUDFBMGxTdmFpckt6RFVBUGEwSTRVVzR1ZWE5TFVKWU9l?=
+ =?utf-8?B?WjFKaEtVVXhEdWgrclFPM2lzb3VaZFkra0p0Q0NYTWZYbDc3NzFZQUYyMmN3?=
+ =?utf-8?B?NWF1NWRicm9ZWDV3cFBDNFN6YXpSRWNXZnNhdFYvNm95ejlMS2lIR281TUt4?=
+ =?utf-8?B?cGx1ZXhlRTdpMTNlS0lMVXdYOGt6R0JwY0FYMmR4d3pPL0J0azRUUVFaaWQy?=
+ =?utf-8?B?TW5pQmZ6VlM3WHoyRjlVOTl5dDZkcE96MzZzU1lTZUh1Q0svN1l1UHk0S2Ra?=
+ =?utf-8?B?VlRrSFFvK1dqQ2ZFRndJUGJwdERYMUdWOUtyclJOaW5NazB3Yi9VbzJvNzQ1?=
+ =?utf-8?B?RzRZdE54bGw0UFpHVHpncHU5cEdXR0s2TEVTa1UxNGMvU2VoR1JkM2xBWjZV?=
+ =?utf-8?B?RlZwUzRUVHA0WjJ1ek8rMXkvVUlmV2NoYjlJSlUxS1BJdi81VTk5eVlPeE9l?=
+ =?utf-8?B?ZGFPNHNTZnlmeXV1WW53S3QyN1YwbmJLOWhsM0dKcGRDWlNPVUZHR0VBNXEw?=
+ =?utf-8?B?enVjRmZmdm5nTmZDWE1oM1E5RU04TjNDckVscCs4SFZYSWhNNStrV3pWRURa?=
+ =?utf-8?Q?Ow0gr7K2QkTnSeFW+cibo2Fcq?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f05d3f17-db5f-4bf0-b272-08daed985c83
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 14:39:47.2261
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l0qzF8UhP1WR/2DwiAv8ySaEzYAPAj5tTavRj5jnA5UQUXm21j7pNzDTf053oQisFNOoJbViEzRe8biTtEZa4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8548
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 01:25:35PM +0000, Mark Rutland wrote:
-> On Tue, Dec 20, 2022 at 12:08:16PM +0100, Peter Zijlstra wrote:
-> > On Mon, Dec 19, 2022 at 12:07:25PM -0800, Boqun Feng wrote:
-> > > On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
-> > > > For all architectures that currently support cmpxchg_double()
-> > > > implement the cmpxchg128() family of functions that is basically the
-> > > > same but with a saner interface.
-> > > > 
-> > > > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> > > > ---
-> > > >  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
-> > > >  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
-> > > >  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
-> > > >  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
-> > > >  arch/x86/include/asm/cmpxchg_32.h     |    3 +
-> > > >  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
-> > > >  6 files changed, 185 insertions(+), 3 deletions(-)
-> > > > 
-> > > > --- a/arch/arm64/include/asm/atomic_ll_sc.h
-> > > > +++ b/arch/arm64/include/asm/atomic_ll_sc.h
-> > > > @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
-> > > >  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
-> > > >  
-> > > >  #undef __CMPXCHG_DBL
-> > > > +
-> > > > +union __u128_halves {
-> > > > +	u128 full;
-> > > > +	struct {
-> > > > +		u64 low, high;
-> > > > +	};
-> > > > +};
-> > > > +
-> > > > +#define __CMPXCHG128(name, mb, rel, cl)					\
-> > > > +static __always_inline u128						\
-> > > > +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
-> > > > +{									\
-> > > > +	union __u128_halves r, o = { .full = (old) },			\
-> > > > +			       n = { .full = (new) };			\
-> > > > +									\
-> > > > +	asm volatile("// __cmpxchg128" #name "\n"			\
-> > > > +	"	prfm	pstl1strm, %2\n"				\
-> > > > +	"1:	ldxp	%0, %1, %2\n"					\
-> > > > +	"	eor	%3, %0, %3\n"					\
-> > > > +	"	eor	%4, %1, %4\n"					\
-> > > > +	"	orr	%3, %4, %3\n"					\
-> > > > +	"	cbnz	%3, 2f\n"					\
-> > > > +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
-> > > > +	"	cbnz	%w3, 1b\n"					\
-> > > > +	"	" #mb "\n"						\
-> > > > +	"2:"								\
-> > > > +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
-> > > 
-> > > I wonder whether we should use "(*(u128 *)ptr)" instead of "(*(unsigned
-> > > long *) ptr)"? Because compilers may think only 64bit value pointed by
-> > > "ptr" gets modified, and they are allowed to do "useful" optimization.
-> > 
-> > In this I've copied the existing cmpxchg_double() code; I'll have to let
-> > the arch folks speak here, I've no clue.
+On 12/30/22 16:18, David Rientjes wrote:
+> For SEV_GET_ID2, the user provided length does not have a specified
+> limitation because the length of the ID may change in the future.  The
+> kernel memory allocation, however, is implicitly limited to 4MB on x86 by
+> the page allocator, otherwise the kzalloc() will fail.
 > 
-> We definitely need to ensure the compiler sees we poke the whole thing, or it
-> can get this horribly wrong, so that is a latent bug.
+> When this happens, it is best not to spam the kernel log with the warning.
+> Simply fail the allocation and return ENOMEM to the user.
 > 
-> See commit:
+> Fixes: d6112ea0cb34 ("crypto: ccp - introduce SEV_GET_ID2 command")
+> Reported-by: Andy Nguyen <theflow@google.com>
+> Reported-by: Peter Gonda <pgonda@google.com>
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: David Rientjes <rientjes@google.com>
+> ---
+>   drivers/crypto/ccp/sev-dev.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
 > 
->   fee960bed5e857eb ("arm64: xchg: hazard against entire exchange variable")
-> 
-> ... for examples of GCC being clever, where I overlooked the *_double() cases.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -881,7 +881,14 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+>   	input_address = (void __user *)input.address;
+>   
+>   	if (input.address && input.length) {
+> -		id_blob = kzalloc(input.length, GFP_KERNEL);
+> +		/*
+> +		 * The length of the ID shouldn't be assumed by software since
+> +		 * it may change in the future.  The allocation size is limited
+> +		 * to 1 << (PAGE_SHIFT + MAX_ORDER - 1) by the page allocator.
+> +		 * If the allocation fails, simply return ENOMEM rather than
+> +		 * warning in the kernel log.
+> +		 */
+> +		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
 
-Ugh; with GCC 12.1.0, arm64 defconfig, and the following:
+We could do this or we could have the driver invoke the API with a zero 
+length to get the minimum buffer size needed for the call. The driver 
+could then perform some validation checks comparing the supplied 
+input.length to the returned length. If the driver can proceed, then if 
+input.length is exactly 2x the minimum length, then kzalloc the 2 * 
+minimum length, otherwise kzalloc the minimum length. This is a bit more 
+complicated, though, compared to this fix.
 
-| struct big {
-|         u64 lo, hi;
-| } __aligned(128);
-| 
-| unsigned long foo(struct big *b)
-| {
-|         u64 hi_old, hi_new;
-| 
-|         hi_old = b->hi;
-| 
-|         cmpxchg_double_local(&b->lo, &b->hi, 0x12, 0x34, 0x56, 0x78);
-| 
-|         hi_new = b->hi;
-| 
-|         return hi_old ^ hi_new;
-| }
+Either way, is fine with me. Thoughts?
 
-GCC clearly figures out the high half isn't modified, and constant folds hi_old
-^ hi_new down to zero, regardless of whether we use LL/SC or LSE:
+Thanks,
+Tom
 
-<foo>:
-   0:   d503233f        paciasp
-   4:   aa0003e4        mov     x4, x0
-   8:   1400000e        b       40 <foo+0x40>
-   c:   d2800240        mov     x0, #0x12                       // #18
-  10:   d2800681        mov     x1, #0x34                       // #52
-  14:   aa0003e5        mov     x5, x0
-  18:   aa0103e6        mov     x6, x1
-  1c:   d2800ac2        mov     x2, #0x56                       // #86
-  20:   d2800f03        mov     x3, #0x78                       // #120
-  24:   48207c82        casp    x0, x1, x2, x3, [x4]
-  28:   ca050000        eor     x0, x0, x5
-  2c:   ca060021        eor     x1, x1, x6
-  30:   aa010000        orr     x0, x0, x1
-  34:   d2800000        mov     x0, #0x0                        // #0    <--- BANG
-  38:   d50323bf        autiasp
-  3c:   d65f03c0        ret
-  40:   d2800240        mov     x0, #0x12                       // #18
-  44:   d2800681        mov     x1, #0x34                       // #52
-  48:   d2800ac2        mov     x2, #0x56                       // #86
-  4c:   d2800f03        mov     x3, #0x78                       // #120
-  50:   f9800091        prfm    pstl1strm, [x4]
-  54:   c87f1885        ldxp    x5, x6, [x4]
-  58:   ca0000a5        eor     x5, x5, x0
-  5c:   ca0100c6        eor     x6, x6, x1
-  60:   aa0600a6        orr     x6, x5, x6
-  64:   b5000066        cbnz    x6, 70 <foo+0x70>
-  68:   c8250c82        stxp    w5, x2, x3, [x4]
-  6c:   35ffff45        cbnz    w5, 54 <foo+0x54>
-  70:   d2800000        mov     x0, #0x0                        // #0     <--- BANG
-  74:   d50323bf        autiasp
-  78:   d65f03c0        ret
-  7c:   d503201f        nop
-
-... so we *definitely* need to fix that.
-
-Using __uint128_t instead, e.g.
-
-diff --git a/arch/arm64/include/asm/atomic_ll_sc.h b/arch/arm64/include/asm/atomic_ll_sc.h
-index 0890e4f568fb7..cbb3d961123b1 100644
---- a/arch/arm64/include/asm/atomic_ll_sc.h
-+++ b/arch/arm64/include/asm/atomic_ll_sc.h
-@@ -315,7 +315,7 @@ __ll_sc__cmpxchg_double##name(unsigned long old1,                   \
-        "       cbnz    %w0, 1b\n"                                      \
-        "       " #mb "\n"                                              \
-        "2:"                                                            \
--       : "=&r" (tmp), "=&r" (ret), "+Q" (*(unsigned long *)ptr)        \
-+       : "=&r" (tmp), "=&r" (ret), "+Q" (*(__uint128_t *)ptr)          \
-        : "r" (old1), "r" (old2), "r" (new1), "r" (new2)                \
-        : cl);                                                          \
-                                                                        \
-diff --git a/arch/arm64/include/asm/atomic_lse.h b/arch/arm64/include/asm/atomic_lse.h
-index 52075e93de6c0..a94d6dacc0292 100644
---- a/arch/arm64/include/asm/atomic_lse.h
-+++ b/arch/arm64/include/asm/atomic_lse.h
-@@ -311,7 +311,7 @@ __lse__cmpxchg_double##name(unsigned long old1,                             \
-        "       eor     %[old2], %[old2], %[oldval2]\n"                 \
-        "       orr     %[old1], %[old1], %[old2]"                      \
-        : [old1] "+&r" (x0), [old2] "+&r" (x1),                         \
--         [v] "+Q" (*(unsigned long *)ptr)                              \
-+         [v] "+Q" (*(__uint128_t *)ptr)                                \
-        : [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),             \
-          [oldval1] "r" (oldval1), [oldval2] "r" (oldval2)              \
-        : cl);                                                          \
-
-... makes GCC much happier:
-
-<foo>:
-   0:   f9400407        ldr     x7, [x0, #8]
-   4:   d503233f        paciasp
-   8:   aa0003e4        mov     x4, x0
-   c:   1400000f        b       48 <foo+0x48>
-  10:   d2800240        mov     x0, #0x12                       // #18
-  14:   d2800681        mov     x1, #0x34                       // #52
-  18:   aa0003e5        mov     x5, x0
-  1c:   aa0103e6        mov     x6, x1
-  20:   d2800ac2        mov     x2, #0x56                       // #86
-  24:   d2800f03        mov     x3, #0x78                       // #120
-  28:   48207c82        casp    x0, x1, x2, x3, [x4]
-  2c:   ca050000        eor     x0, x0, x5
-  30:   ca060021        eor     x1, x1, x6
-  34:   aa010000        orr     x0, x0, x1
-  38:   f9400480        ldr     x0, [x4, #8]
-  3c:   d50323bf        autiasp
-  40:   ca0000e0        eor     x0, x7, x0
-  44:   d65f03c0        ret
-  48:   d2800240        mov     x0, #0x12                       // #18
-  4c:   d2800681        mov     x1, #0x34                       // #52
-  50:   d2800ac2        mov     x2, #0x56                       // #86
-  54:   d2800f03        mov     x3, #0x78                       // #120
-  58:   f9800091        prfm    pstl1strm, [x4]
-  5c:   c87f1885        ldxp    x5, x6, [x4]
-  60:   ca0000a5        eor     x5, x5, x0
-  64:   ca0100c6        eor     x6, x6, x1
-  68:   aa0600a6        orr     x6, x5, x6
-  6c:   b5000066        cbnz    x6, 78 <foo+0x78>
-  70:   c8250c82        stxp    w5, x2, x3, [x4]
-  74:   35ffff45        cbnz    w5, 5c <foo+0x5c>
-  78:   f9400480        ldr     x0, [x4, #8]
-  7c:   d50323bf        autiasp
-  80:   ca0000e0        eor     x0, x7, x0
-  84:   d65f03c0        ret
-  88:   d503201f        nop
-  8c:   d503201f        nop
-
-... I'll go check whether clang is happy with that, and how far back that can
-go, otherwise we'll need to blat the high half with a separate constaint that
-(ideally) doesn't end up allocating a pointless address register.
-
-Mark.
+>   		if (!id_blob)
+>   			return -ENOMEM;
+>   
