@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DE4C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 01:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D98DC5479D
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 01:35:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238567AbjADBfB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 20:35:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
+        id S238646AbjADBfC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 20:35:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238758AbjADBex (ORCPT
+        with ESMTP id S238795AbjADBe5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 20:34:53 -0500
+        Tue, 3 Jan 2023 20:34:57 -0500
 Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0157B60EA
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 17:34:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D05DAA
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 17:34:56 -0800 (PST)
 Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 3041OcIf076237;
-        Wed, 4 Jan 2023 09:24:38 +0800 (GMT-8)
+        by twspam01.aspeedtech.com with ESMTP id 3041Oc2Z076238;
+        Wed, 4 Jan 2023 09:24:39 +0800 (GMT-8)
         (envelope-from neal_liu@aspeedtech.com)
 Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
  (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 4 Jan
@@ -35,10 +35,12 @@ CC:     <devicetree@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
-Subject: [PATCH v5 0/4] Add Aspeed ACRY driver for hardware acceleration
-Date:   Wed, 4 Jan 2023 09:34:32 +0800
-Message-ID: <20230104013436.203427-1-neal_liu@aspeedtech.com>
+Subject: [PATCH v5 2/4] ARM: dts: aspeed: Add ACRY/AHBC device controller node
+Date:   Wed, 4 Jan 2023 09:34:34 +0800
+Message-ID: <20230104013436.203427-3-neal_liu@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230104013436.203427-1-neal_liu@aspeedtech.com>
+References: <20230104013436.203427-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -46,58 +48,49 @@ X-Originating-IP: [192.168.10.10]
 X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
  (192.168.0.24)
 X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 3041OcIf076237
+X-MAIL: twspam01.aspeedtech.com 3041Oc2Z076238
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Aspeed ACRY engine is designed to accelerate the throughput of
-ECDSA/RSA signature and verification.
+Add acry & ahbc node to device tree for AST2600.
 
-These patches aim to add Aspeed ACRY RSA driver support.
-This driver also pass the run-time self tests that take place at
-algorithm registration on both big-endian/little-endian system
-in AST2600 evaluation board .
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+---
+ arch/arm/boot/dts/aspeed-g6.dtsi | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Tested-by below configs:
-- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-- CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-- CONFIG_DMA_API_DEBUG=y
-- CONFIG_DMA_API_DEBUG_SG=y
-- CONFIG_CPU_BIG_ENDIAN=y
-
-Change since v4:
-- Remove GFP_DMA flag since it's unnecessary.
-
-Change since v3:
-- Revise aspeed,ast2600-ahbc.yaml dt-bindings description.
-
-Change since v2:
-- Fix format and uninitialized warning.
-- Revise binding description.
-
-Change since v1:
-- Fix dt-bindings description.
-- Refine the Makefile which has been addressed.
-
-Neal Liu (4):
-  crypto: aspeed: Add ACRY RSA driver
-  ARM: dts: aspeed: Add ACRY/AHBC device controller node
-  dt-bindings: crypto: add documentation for Aspeed ACRY
-  dt-bindings: bus: add documentation for Aspeed AHBC
-
- .../bindings/bus/aspeed,ast2600-ahbc.yaml     |  37 +
- .../bindings/crypto/aspeed,ast2600-acry.yaml  |  49 ++
- MAINTAINERS                                   |   2 +-
- arch/arm/boot/dts/aspeed-g6.dtsi              |  13 +
- drivers/crypto/aspeed/Kconfig                 |  11 +
- drivers/crypto/aspeed/Makefile                |   2 +
- drivers/crypto/aspeed/aspeed-acry.c           | 828 ++++++++++++++++++
- 7 files changed, 941 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
- create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
- create mode 100644 drivers/crypto/aspeed/aspeed-acry.c
-
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 095cf8d03616..ad177799db0b 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -94,6 +94,11 @@ gic: interrupt-controller@40461000 {
+ 			    <0x40466000 0x2000>;
+ 			};
+ 
++		ahbc: bus@1e600000 {
++			compatible = "aspeed,ast2600-ahbc", "syscon";
++			reg = <0x1e600000 0x100>;
++		};
++
+ 		fmc: spi@1e620000 {
+ 			reg = <0x1e620000 0xc4>, <0x20000000 0x10000000>;
+ 			#address-cells = <1>;
+@@ -427,6 +432,14 @@ sbc: secure-boot-controller@1e6f2000 {
+ 				reg = <0x1e6f2000 0x1000>;
+ 			};
+ 
++			acry: crypto@1e6fa000 {
++				compatible = "aspeed,ast2600-acry";
++				reg = <0x1e6fa000 0x400>, <0x1e710000 0x1800>;
++				interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&syscon ASPEED_CLK_GATE_RSACLK>;
++				aspeed,ahbc = <&ahbc>;
++			};
++
+ 			video: video@1e700000 {
+ 				compatible = "aspeed,ast2600-video-engine";
+ 				reg = <0x1e700000 0x1000>;
 -- 
 2.25.1
 
