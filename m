@@ -2,92 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61532C5479D
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 11:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B76C4708E
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 12:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239161AbjADLzW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Jan 2023 06:55:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60446 "EHLO
+        id S230186AbjADMBQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 Jan 2023 07:01:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233892AbjADLyx (ORCPT
+        with ESMTP id S239170AbjADMBK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Jan 2023 06:54:53 -0500
+        Wed, 4 Jan 2023 07:01:10 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6852A1EC45;
-        Wed,  4 Jan 2023 03:54:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9511EEF0;
+        Wed,  4 Jan 2023 04:01:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E2DE8613E9;
-        Wed,  4 Jan 2023 11:54:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF661C433EF;
-        Wed,  4 Jan 2023 11:54:48 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2FA1561426;
+        Wed,  4 Jan 2023 12:01:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C3F7C433EF;
+        Wed,  4 Jan 2023 12:01:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672833289;
-        bh=2h492Ot3amT7yprfX9Jew+1cyS+yy617WjcWHESIjPk=;
+        s=k20201202; t=1672833668;
+        bh=AdBBHs+vk1+ihc9nifYgy4qWtVZl+0uaE+N5wIA1lqc=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EzEOndpCGhaX4IzFlcKlYEqBGOiXvlbMxiP5/5bS/88n68Qrez6S2JkDpx1Qkp9iX
-         aj9jcOcOZeiM12QXrh1H3tewVkey6754EnueMTsaYkB+KY7liqiPCVihVbQoH88Txq
-         W5RoQZ5QH3bnVJzmjL75JscQe6H4/dkxaFpv7TYgNyXKhFweTBhQjsMfY2CSsA1amb
-         hFj6q8Ty8oSSvxGFUdMY0HY83hZDcO0VhGKUus1CttVFTVZyFkhTmFTqwUKjxACbsI
-         LyxtpOQLvBww2zYDb4SkhkIThtSEnsDoZZ4dpPKxJbqMTGzJLUQeYiQn6x4GxCnq5V
-         6K3NsT+jEoluw==
-Date:   Wed, 4 Jan 2023 11:54:46 +0000
+        b=AkDX3AW3ufOyf1t0bKZaO2Gtqi7D7Wz54W2mFvnJH9m8ej+laXvXn9GSBlgHIICxm
+         w0U56pDRDj0LdPBkcOArbb+3lN+0IV/Sk3I/EXEPtlZqWN+7XIdrxcuFbQ/No61WEj
+         62FOq83Fp+bXKmRWVaSVIKFApzZdWcirAFHKVfLVTVK7eaL7Wk0BAtpBg3a3wgDG8t
+         O4Z4yfA9JIUGiWo5d77UocfLCSxCov/XUKloGPNhriB6Fkl/WmmJkbRNcslivZI2eg
+         UPHeUy+YcAAikJyhIDvoCVN7MDFvYG2xARtJwPEdQp3HylEuFaYbaswDsXg5DbcH6r
+         xydmzduMxp9GQ==
+Date:   Wed, 4 Jan 2023 12:01:05 +0000
 From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, pvorel@suse.cz, noodles@fb.com, tiwai@suse.de,
-        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
-        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v3 09/10] KEYS: CA link restriction
-Message-ID: <Y7VpBk9AfZ1Kx/8z@kernel.org>
-References: <20221214003401.4086781-1-eric.snowberg@oracle.com>
- <20221214003401.4086781-10-eric.snowberg@oracle.com>
- <Y7VoVTGtGi6NmA8O@kernel.org>
+To:     Michael Roth <michael.roth@amd.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com,
+        Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for
+ large page
+Message-ID: <Y7VqgbTE34/Sxupw@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-2-michael.roth@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7VoVTGtGi6NmA8O@kernel.org>
+In-Reply-To: <20221214194056.161492-2-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 11:51:52AM +0000, Jarkko Sakkinen wrote:
-> On Tue, Dec 13, 2022 at 07:34:00PM -0500, Eric Snowberg wrote:
-> > +/**
-> > + * restrict_link_by_ca - Restrict additions to a ring of CA keys
-> > + * @dest_keyring: Keyring being linked to.
-> > + * @type: The type of key being added.
-> > + * @payload: The payload of the new key.
-> > + * @trust_keyring: Unused.
-> > + *
-> > + * Check if the new certificate is a CA. If it is a CA, then mark the new
-> > + * certificate as being ok to link.
-> > + *
-> > + * Returns 0 if the new certificate was accepted, -ENOKEY if the
-> > + * certificate is not a CA. -ENOPKG if the signature uses unsupported
-> > + * crypto, or some other error if there is a matching certificate but
-> > + * the signature check cannot be performed.
-> > + */
-> > +int restrict_link_by_ca(struct key *dest_keyring,
-> > +			const struct key_type *type,
-> > +			const union key_payload *payload,
-> > +			struct key *trust_keyring)
+On Wed, Dec 14, 2022 at 01:39:53PM -0600, Michael Roth wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
 > 
-> Why you want to define trust_keyring, other than matching the parameter
-> list in restrict_link_by_signature()?
+> Aligned end boundary causes a kvm crash, handle the case.
 > 
-> Also if it is unused, it should be then just "struct key *)", right?
 
-Please ignore, I forgot how this worked, i.e. "restriction" is set to
-the correct function so this looks correct to me :-) So it's good.
-Sorry for the confusion.
+Link: https://lore.kernel.org/kvm/20221202061347.1070246-8-chao.p.peng@linux.intel.com/
+
+Chao, are you aware of this issue already?
+
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b1953ebc012e..b3ffc61c668c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -7159,6 +7159,9 @@ static void kvm_update_lpage_private_shared_mixed(struct kvm *kvm,
+>  		for (gfn = first + pages; gfn < last; gfn += pages)
+>  			linfo_set_mixed(gfn, slot, level, false);
+>  
+> +		if (gfn == last)
+> +			goto out;
+> +
+>  		gfn = last;
+>  		gfn_end = min(last + pages, slot->base_gfn + slot->npages);
+>  		mixed = mem_attrs_mixed(kvm, slot, level, attrs, gfn, gfn_end);
+> -- 
+> 2.25.1
+> 
+
 
 BR, Jarkko
-
-
