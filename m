@@ -2,103 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E7EC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 07:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9D2C54EBC
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 11:31:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233767AbjADHrF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Jan 2023 02:47:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
+        id S233916AbjADLbn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 Jan 2023 06:31:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233721AbjADHqt (ORCPT
+        with ESMTP id S233284AbjADLbm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Jan 2023 02:46:49 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F5CE36
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 23:46:48 -0800 (PST)
+        Wed, 4 Jan 2023 06:31:42 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D557AEAF;
+        Wed,  4 Jan 2023 03:31:40 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6CEEAB81203
-        for <linux-crypto@vger.kernel.org>; Wed,  4 Jan 2023 07:46:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 169F2C433D2;
-        Wed,  4 Jan 2023 07:46:46 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 97772B810FA;
+        Wed,  4 Jan 2023 11:31:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3661C433D2;
+        Wed,  4 Jan 2023 11:31:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672818406;
-        bh=eZ4F0Vs4hiX60OmPCpMb00jhDPIHpJ7/GIt2QNFF9nQ=;
+        s=k20201202; t=1672831898;
+        bh=VgAXciag9TzqrbcrI2xLeki43co0yEKZUHdTYmAlYPs=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BUXr8OEbEKq7c3348o7O/SgXTSn5m+j9xtbWZa059jYhiq/xl3AiGATLVCi77VRuO
-         028FVZwEbHRimvUih8PW/BS+optm0pOUIp+Yipskim9+ssENT42AoLEiVY/5rQbl3t
-         AuJ8L4z0s2AmeCnulYve/umAE37gbLd29NuwQGT3uxkrsMru6eRonAlLNVSVszdoia
-         162a54dgdrYbAejmgoJLhycGUK5wFTOKDN9IWKfvn96vIhpdf3AWRLTzxQjjEkuILV
-         AxhriNVud/4RAWCNdLZpNNR3qAGFG+9R3caQC33x4wt+ub0yRdJAAZ4W4ekd3F4pab
-         GTZGjZ+wfxGng==
-Date:   Tue, 3 Jan 2023 23:46:44 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Lukasz Stelmach <l.stelmach@samsung.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: xor_blocks() assumptions
-Message-ID: <Y7Uu5GkxfrejPJXL@sol.localdomain>
-References: <Y7NizHFsWfMW/cC2@sol.localdomain>
- <CGME20230103111359eucas1p137cb823bdc80d790544de20c3835faf2@eucas1p1.samsung.com>
- <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
+        b=HaCvyZ9SN5MjBzF491yLiUrG6aIlOgG3B3Sco4CrslbxmQHfPEYapIkZrbgm3j4Xt
+         /KuyeA9kQ5U0O+HGYfDe9zjZ9tK7yBaKZoZ2kxnwCwTx2rL3Ru+EDfFjQgFnOoAI1o
+         /evWjQ+OXk9HOp/0yWsvNO2b5PIUBp0eytuxjfQSuJF68SAeb+4ceyBPQoMMXHqVNt
+         DJnxAZzJ+BvCopT6QzdMhj429j2bI6o/vY96Q16IdPEtrLjP2RMkKbNtf9SCLh87Eq
+         4FiDQEDVbBiMpJqQovGuB1aZrq3geee0lRHbnrano1PslXM0jdGwOwlh8y+0IEhkYh
+         FZOXDVdk8D1gA==
+Date:   Wed, 4 Jan 2023 11:31:34 +0000
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, pvorel@suse.cz, noodles@fb.com, tiwai@suse.de,
+        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
+        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v3 01/10] KEYS: Create static version of
+ public_key_verify_signature
+Message-ID: <Y7Vjlof68d0WRKdc@kernel.org>
+References: <20221214003401.4086781-1-eric.snowberg@oracle.com>
+ <20221214003401.4086781-2-eric.snowberg@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dleftjbknfoopx.fsf%l.stelmach@samsung.com>
+In-Reply-To: <20221214003401.4086781-2-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 12:13:30PM +0100, Lukasz Stelmach wrote:
-> > It also would be worth considering just optimizing crypto_xor() by
-> > unrolling the word-at-a-time loop to 4x or so.
+On Tue, Dec 13, 2022 at 07:33:52PM -0500, Eric Snowberg wrote:
+> The kernel test robot reports undefined reference to
+> public_key_verify_signature when CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE is
+> not defined. Create a static version in this case and return -EINVAL.
 > 
-> If I understand correctly the generic 8regs and 32regs implementations
-> in include/asm-generic/xor.h are what you mean. Using xor_blocks() in
-> crypto_xor() could enable them for free on architectures lacking SIMD or
-> vector instructions.
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+> Reviewed-by: Petr Vorel <pvorel@suse.cz>
+> ---
+>  include/crypto/public_key.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+> index 68f7aa2a7e55..6d61695e1cde 100644
+> --- a/include/crypto/public_key.h
+> +++ b/include/crypto/public_key.h
+> @@ -80,7 +80,16 @@ extern int create_signature(struct kernel_pkey_params *, const void *, void *);
+>  extern int verify_signature(const struct key *,
+>  			    const struct public_key_signature *);
+>  
+> +#if IS_REACHABLE(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE)
+>  int public_key_verify_signature(const struct public_key *pkey,
+>  				const struct public_key_signature *sig);
+> +#else
+> +static inline
+> +int public_key_verify_signature(const struct public_key *pkey,
+> +				const struct public_key_signature *sig)
+> +{
+> +	return -EINVAL;
+> +}
+> +#endif
+>  
+>  #endif /* _LINUX_PUBLIC_KEY_H */
+> -- 
+> 2.27.0
+> 
 
-I actually meant exactly what I said -- unrolling the word-at-a-time loop in
-crypto_xor().  Not using xor_blocks().  Something like this:
+Should this have fixes tag?
 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 61b327206b557..c0b90f14cae18 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -167,7 +167,18 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
- 		unsigned long *s = (unsigned long *)src;
- 		unsigned long l;
- 
--		while (size > 0) {
-+		while (size >= 4 * sizeof(unsigned long)) {
-+			l = get_unaligned(d) ^ get_unaligned(s++);
-+			put_unaligned(l, d++);
-+			l = get_unaligned(d) ^ get_unaligned(s++);
-+			put_unaligned(l, d++);
-+			l = get_unaligned(d) ^ get_unaligned(s++);
-+			put_unaligned(l, d++);
-+			l = get_unaligned(d) ^ get_unaligned(s++);
-+			put_unaligned(l, d++);
-+			size -= 4 * sizeof(unsigned long);
-+		}
-+		if (size > 0) {
- 			l = get_unaligned(d) ^ get_unaligned(s++);
- 			put_unaligned(l, d++);
- 			size -= sizeof(unsigned long);
+BR, Jarkko
 
-Actually, the compiler might unroll the loop automatically anyway, so even the
-above change might not even be necessary.  The point is, I expect that a proper
-scalar implementation will perform well for pretty much anything other than
-large input sizes.
-
-It's only large input sizes where xor_blocks() might be worth it, considering
-the significant overhead of the indirect call in xor_blocks() as well as
-entering an SIMD code section.  (Note that indirect calls are very expensive
-these days, due to the speculative execution mitigations.)
-
-Of course, the real question is what real-world scenario are you actually trying
-to optimize for...
-
-- Eric
