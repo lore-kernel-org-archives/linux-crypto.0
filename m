@@ -2,123 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9923C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Jan 2023 23:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DE4C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 01:35:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233962AbjACXSf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Jan 2023 18:18:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42144 "EHLO
+        id S238567AbjADBfB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Jan 2023 20:35:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230222AbjACXSe (ORCPT
+        with ESMTP id S238758AbjADBex (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Jan 2023 18:18:34 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5122215FD0
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 15:18:33 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id 6so18938691pfz.4
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Jan 2023 15:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+SKNwK2NyJVXaeShNit/vbIhlTVvPRm29ctCwVFguc8=;
-        b=dKwcY+gyo70o9MnjanigW/qbwMZCHd1jZ/HZNSbTYA7uNNvtO5+1d3klhV3LBMg+Wz
-         C2f5ATp6q34nZdwFYSHxnjLN6cdjcQaZYK8In156L+mHFNKh+ncF5id1Xdogt5wKfYUP
-         Jfq+tUgmYLuZ+tsFX7/u5Ev8KhBwft2jYUV4FcrCcN7XOYrKU8lEy9cr4xdbEFAeeqOM
-         +mNiWE5zo51VEhO5XWTZPXdcAW+wBtXNeIn+UGKmYkP6QHi06nkmYHqNyDHWviMrOrpU
-         DOsV/Fm4EsBo2CqwNVgdmKbLjtd3H+h0QfLHQ/3g4IxCEdekFIWpWIAFgfLrqB5VWLuZ
-         UoIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+SKNwK2NyJVXaeShNit/vbIhlTVvPRm29ctCwVFguc8=;
-        b=AdL/F+xmluxl7l7VTPY7fmoYg0ye0E/Qsotw/ujUI2vRL5//LuKdowg48PIxO0NYag
-         u8F9jWm1enlAJTY9AcVJlWYQWKGdOcWkYolw+QJUiwXdvq6wqO+vy3BjbkK6fiJNEo3c
-         MJlyXeR+q+fGo84DaqvQRy6WyosCN7Onsv+JHpBKNpLGQrmcCLs5h5Rfv/ipOIlzH9Y/
-         ZJlAU6HE4i841fGeDV2NgFMuRSKMfufyKf9vHuRl70GRFCpl7LFmw2rHji5NlWs7J1V6
-         u+yylzq1nnP8e5O5bpI19luXz3tyTdxkAn3sp87OjOdDRATmGwNcd4U+MafS14LWXy+y
-         u4XQ==
-X-Gm-Message-State: AFqh2kq1ZjKY7D0EL3frysr4+IkXKyalETy+J0pJGMhL6FzGGwtm0HV2
-        HPg7jS/L+PI10QvkJeT57ZO5DQ==
-X-Google-Smtp-Source: AMrXdXsj9J+1dDyzj3rH6i+WIAk9RX4wTCh/a0OvdiDq7jKdG5ipnl0KUACxUzdUC3b8vzSnoPI8sQ==
-X-Received: by 2002:aa7:8084:0:b0:574:8995:c0d0 with SMTP id v4-20020aa78084000000b005748995c0d0mr3598502pff.1.1672787912621;
-        Tue, 03 Jan 2023 15:18:32 -0800 (PST)
-Received: from [2620:15c:29:203:3ac1:84a4:2f59:c43f] ([2620:15c:29:203:3ac1:84a4:2f59:c43f])
-        by smtp.gmail.com with ESMTPSA id w18-20020aa79a12000000b00581816425f3sm12920964pfj.112.2023.01.03.15.18.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 15:18:31 -0800 (PST)
-Date:   Tue, 3 Jan 2023 15:18:31 -0800 (PST)
-From:   David Rientjes <rientjes@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Peter Gonda <pgonda@google.com>,
-        Andy Nguyen <theflow@google.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>
-Subject: Re: [patch] crypto: ccp - Avoid page allocation failure warning for
- SEV_GET_ID2
-In-Reply-To: <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com>
-Message-ID: <06de8454-2b29-f3b6-7cf2-c037c2735b6d@google.com>
-References: <20221214202046.719598-1-pgonda@google.com> <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au> <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com> <Y6wDJd3hfztLoCp1@gondor.apana.org.au> <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
- <833b4dd0-7f85-b336-0786-965f3f573f74@google.com> <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com>
+        Tue, 3 Jan 2023 20:34:53 -0500
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0157B60EA
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Jan 2023 17:34:49 -0800 (PST)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 3041OcIf076237;
+        Wed, 4 Jan 2023 09:24:38 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 4 Jan
+ 2023 09:34:41 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        "Andrew Jeffery" <andrew@aj.id.au>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Chia-Wei Wang <chiawei_wang@aspeedtech.com>
+CC:     <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+Subject: [PATCH v5 0/4] Add Aspeed ACRY driver for hardware acceleration
+Date:   Wed, 4 Jan 2023 09:34:32 +0800
+Message-ID: <20230104013436.203427-1-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 3041OcIf076237
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 3 Jan 2023, Tom Lendacky wrote:
+Aspeed ACRY engine is designed to accelerate the throughput of
+ECDSA/RSA signature and verification.
 
-> On 12/30/22 16:18, David Rientjes wrote:
-> > For SEV_GET_ID2, the user provided length does not have a specified
-> > limitation because the length of the ID may change in the future.  The
-> > kernel memory allocation, however, is implicitly limited to 4MB on x86 by
-> > the page allocator, otherwise the kzalloc() will fail.
-> > 
-> > When this happens, it is best not to spam the kernel log with the warning.
-> > Simply fail the allocation and return ENOMEM to the user.
-> > 
-> > Fixes: d6112ea0cb34 ("crypto: ccp - introduce SEV_GET_ID2 command")
-> > Reported-by: Andy Nguyen <theflow@google.com>
-> > Reported-by: Peter Gonda <pgonda@google.com>
-> > Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > Signed-off-by: David Rientjes <rientjes@google.com>
-> > ---
-> >   drivers/crypto/ccp/sev-dev.c | 9 ++++++++-
-> >   1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > --- a/drivers/crypto/ccp/sev-dev.c
-> > +++ b/drivers/crypto/ccp/sev-dev.c
-> > @@ -881,7 +881,14 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd
-> > *argp)
-> >   	input_address = (void __user *)input.address;
-> >     	if (input.address && input.length) {
-> > -		id_blob = kzalloc(input.length, GFP_KERNEL);
-> > +		/*
-> > +		 * The length of the ID shouldn't be assumed by software since
-> > +		 * it may change in the future.  The allocation size is
-> > limited
-> > +		 * to 1 << (PAGE_SHIFT + MAX_ORDER - 1) by the page allocator.
-> > +		 * If the allocation fails, simply return ENOMEM rather than
-> > +		 * warning in the kernel log.
-> > +		 */
-> > +		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
-> 
-> We could do this or we could have the driver invoke the API with a zero length
-> to get the minimum buffer size needed for the call. The driver could then
-> perform some validation checks comparing the supplied input.length to the
-> returned length. If the driver can proceed, then if input.length is exactly 2x
-> the minimum length, then kzalloc the 2 * minimum length, otherwise kzalloc the
-> minimum length. This is a bit more complicated, though, compared to this fix.
-> 
+These patches aim to add Aspeed ACRY RSA driver support.
+This driver also pass the run-time self tests that take place at
+algorithm registration on both big-endian/little-endian system
+in AST2600 evaluation board .
 
-Thanks Tom.  IIUC, this could be useful to identify situations where 
-input.length != min_length and input.length != min_length*2 and, in those 
-cases, return EINVAL?  Or are there situations where this is actually a 
-valid input.length?
+Tested-by below configs:
+- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+- CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+- CONFIG_DMA_API_DEBUG=y
+- CONFIG_DMA_API_DEBUG_SG=y
+- CONFIG_CPU_BIG_ENDIAN=y
 
-I was assuming that the user was always doing its own SEV_GET_ID2 first to 
-determine the length and then use it for input.length, but perhaps that's 
-not the case and they are passing a bogus value.
+Change since v4:
+- Remove GFP_DMA flag since it's unnecessary.
+
+Change since v3:
+- Revise aspeed,ast2600-ahbc.yaml dt-bindings description.
+
+Change since v2:
+- Fix format and uninitialized warning.
+- Revise binding description.
+
+Change since v1:
+- Fix dt-bindings description.
+- Refine the Makefile which has been addressed.
+
+Neal Liu (4):
+  crypto: aspeed: Add ACRY RSA driver
+  ARM: dts: aspeed: Add ACRY/AHBC device controller node
+  dt-bindings: crypto: add documentation for Aspeed ACRY
+  dt-bindings: bus: add documentation for Aspeed AHBC
+
+ .../bindings/bus/aspeed,ast2600-ahbc.yaml     |  37 +
+ .../bindings/crypto/aspeed,ast2600-acry.yaml  |  49 ++
+ MAINTAINERS                                   |   2 +-
+ arch/arm/boot/dts/aspeed-g6.dtsi              |  13 +
+ drivers/crypto/aspeed/Kconfig                 |  11 +
+ drivers/crypto/aspeed/Makefile                |   2 +
+ drivers/crypto/aspeed/aspeed-acry.c           | 828 ++++++++++++++++++
+ 7 files changed, 941 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
+ create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
+ create mode 100644 drivers/crypto/aspeed/aspeed-acry.c
+
+-- 
+2.25.1
+
