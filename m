@@ -2,112 +2,220 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E568C4708E
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 22:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D992C54E76
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 23:37:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235882AbjAEW5s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 17:57:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44964 "EHLO
+        id S235878AbjAEXhe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 18:37:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236421AbjAEW5i (ORCPT
+        with ESMTP id S235943AbjAEXhc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 17:57:38 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910EC671A9;
-        Thu,  5 Jan 2023 14:57:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 60E1BB81C0D;
-        Thu,  5 Jan 2023 22:57:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2E39C433F0;
-        Thu,  5 Jan 2023 22:57:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d3U57LHD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1672959449;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=INhUx6/3Xhk2/xGcSTChC+f55M0MZlL+ygV3JkGy+qw=;
-        b=d3U57LHDK5/g5g3S5DBYHkQoCwcYk8ZV6a0oM3Z6SewXdvSOqXsdHHaQbe31rTK2/sDwM8
-        uMa3NJfzLzSkKnpUMBkGoQwKDNdqTWO6cQbSV8C+gyuenY/YH3A7RWhDB0eL4EaO20uqvQ
-        CziJ/xm7YuUGNCJojapunpRX30XKVzA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8daf678c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 5 Jan 2023 22:57:29 +0000 (UTC)
-Date:   Thu, 5 Jan 2023 23:57:26 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Yann Droneaud <ydroneaud@opteya.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
-        patches@lists.linux.dev, tglx@linutronix.de,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org
-Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
- lazily freeable mappings
-Message-ID: <Y7dV1lVUYjqs8fh0@zx2c4.com>
-References: <20230101162910.710293-3-Jason@zx2c4.com>
- <Y7QIg/hAIk7eZE42@gmail.com>
- <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
- <CAHk-=wg_6Uhkjy12Vq_hN6rQqGRP2nE15rkgiAo6Qay5aOeigg@mail.gmail.com>
- <Y7SDgtXayQCy6xT6@zx2c4.com>
- <CAHk-=whQdWFw+0eGttxsWBHZg1+uh=0MhxXYtvJGX4t9P1MgNw@mail.gmail.com>
- <Y7SJ+/axonTK0Fir@zx2c4.com>
- <CAHk-=wi4gshfKjbhEO_xZdVb9ztXf0iuv5kKhxtvAHf2HzTmng@mail.gmail.com>
- <Y7STv9+p248zr+0a@zx2c4.com>
- <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
+        Thu, 5 Jan 2023 18:37:32 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2065.outbound.protection.outlook.com [40.107.94.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8558113DF4;
+        Thu,  5 Jan 2023 15:37:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bqb8lwVIBhTTarGBTfszu9AvMMGqYQRHrydJSV/EQocCLUoBz7Ip09cM5sm3GukMYlNm9r8bf7OWTydHXJthSkpDxlM7WET2hRzc5EhFcJIyDIuqdbZK75Ir3I8bCZlZieQ7kV/rVNFlh4X2DR5BYg/1yqw6tH22QR1sLXEQE4fWuTPLv77juvE9YoJ+cJY9u+SRy8KbhFy89Xfg9OMKuJVgvPSoIS+gCEGtAXkF1azQiet6i4LkVRf6/bysZUlXkoFw8DGdN2OTRCMLC3UvrOPqp1kVjkSXkLKyj1WRRmzbcrdnZMfFOXwfVGiI3wJX9V2WqzLOxMQDTudk8w+kfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z1QMWYDo/8DtopMDdvSQ0n00WEaJe/JO3JW86UV+kkU=;
+ b=NYl8R9LKWr3/fLYA46+aQV62GxhEEH3HbRIUJu4z0OeOVfHJJG1gkOPosCl2lfjflZL7sD7o+wt7n0eIQyLWlRiU6y58ldB9DFBjUJu6eAknak/bk8uakSEHWQ4r4LXH917DIp76poe1LfHsHLZLgkHQuGlhkBTiE1nC96p9hKapmbmHDO9mDNYlAuUTKyVe2wWCxOsxFSMsQ1GePH/XvDgaGqT9WD5+PErfwE4hzhMMgYkIB3xUSis3zHQSKVrbFUcHl4yBWSs3lxlyN8WGEjH7degCU9xvxh8d0LP+CHIUN3/8aWtQ+wEroUMjx4zFWnWodfAwwGYqAvylyYvSxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z1QMWYDo/8DtopMDdvSQ0n00WEaJe/JO3JW86UV+kkU=;
+ b=kQ0RYe3MhdPXIGVmaJdx6zynNI8c/aTFDSqIhSxX8T6ErcAEsB5CWaboPOOLwGAjUFixNH7hXyCOvOkEbcXaAGHThpgJejUDv4GcVeKbpliOUDnGzbE5m8oXlfW2+mHAisFbi7CcWp/FJjg1PGOHnlyiAHGAm9qmDNwYdFvb//M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by DM4PR12MB5328.namprd12.prod.outlook.com (2603:10b6:5:39f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
+ 2023 23:37:28 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
+ 23:37:27 +0000
+Message-ID: <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
+Date:   Thu, 5 Jan 2023 17:37:20 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Pavan Kumar Paluri <papaluri@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-38-michael.roth@amd.com> <Y7BG6pSuoZsBQYrx@kernel.org>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Y7BG6pSuoZsBQYrx@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22)
+ To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|DM4PR12MB5328:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85267bdd-0bdf-4333-40fc-08daef75ce03
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oUD4KhbUt0nUkDXCZoPjTIZGcN5JqT+dM+frVG8nVZAxrkfXnl5+c37H8fWU0/ddJdbyuj23lVkacZ5FN9BJ2vXMt2SZtiKy0fSN4qW1lOsJa5v4Hdu2nwIVvWUeiWH29e/y0qlzNaqOPelwF88Qgt4gUVfD24SP5cp98niBZ/daxGsaNboQx9gu8ECWHwqELvnT8vp2Ct/T4gm1YpzQkqkEHedVOfz+5LAdOS/6xy41NqNfzLcSeprxIeMKxkBlgXvslcR8Ky7jwzIzgUePD7hKLHaH6bZ7yUvQZjid7+8o0cS/eBfXgIaTRp/kmVCMt2BjG0DDF/Wv1CZA82Dm38Kl3AgoFV6Ie7x1MzSyrF+siGGF7W5XF/LhHAwc6l1hM89OgHEMcwmZP/1syhWhJx790d5l4xIz967sCVEMVZhZslRU7thf8arURWExl6EdqRe/TbUb9yZyrPa0Z7ItMncAcD1zJt/5FHCjPZhzUtX/HtRzliNi36jhTcq6k6Oe7EB6yP4YG5aQ/u0Cn4eHDw0e9P6YmFnhd/HhEAfuMG39ivD9zJAh/lpifnYyEQDpcsir1Ki1zIb44wjVqp1NA0D4Bpy6eCEmzl1KXxHR4Aff/T8fO3dyDz6OJyZGbVvVNrZKJFxiPhi5f4fJXRhsolz8odCLahocqDW/0f6PVmgcs0ee90nzWlnupjXpQwnVS0F147wnZ6X3BMSeUkeOLZFO4nL1m6wpegoijHVgST0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(376002)(39860400002)(136003)(396003)(346002)(451199015)(6486002)(38100700002)(2906002)(31686004)(2616005)(6636002)(54906003)(316002)(53546011)(41300700001)(66556008)(6666004)(66946007)(5660300002)(4326008)(26005)(66476007)(8676002)(83380400001)(7406005)(7416002)(186003)(6512007)(6506007)(8936002)(110136005)(478600001)(31696002)(86362001)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OWkza25QdzJYWXA0UTJySUdyZDN2RTRSM01VdldxN28reW5oaGtFREdoQkpH?=
+ =?utf-8?B?ZjhKb2hhK3BscHR5d0lvT3EyMmU3b0lwbVd3YVVsSFAzTDNWVnhsbzdudy94?=
+ =?utf-8?B?OVNoQ2x6RUFmYXRBWUVoRWx5cWRad0g2OWlqY1dqZC9RR3QzeVpmc2RDQVNX?=
+ =?utf-8?B?eFNPS25ESFEzRXZYVjVMUTZ3S3FGMzA1OVl4ckQ3QXhXQi9yZzJ0VWRDd2Fm?=
+ =?utf-8?B?b1Vib2xWZjdxSVFqT3NjOE1ZUXpIOGZRY3dQemJmOVF1RmJCTVlnd1RHMURi?=
+ =?utf-8?B?aURSS2c3VGphVEYvcjZPekR2MWlDb2ZXSmY0eUc2UkhMd0MrOHA4WVQycjUz?=
+ =?utf-8?B?Z0VlalhnTE5TeXJVQjVONkhHYStXNTd6SFRrSVVLZUZ1QzB3NTQzWUhHbGZo?=
+ =?utf-8?B?NktmZDVzdXE5NThIMnFyU1N1VXM2N2MrKzgydjdGSmhod2xEY2VYZ2JvQUpO?=
+ =?utf-8?B?U1I0VkhONjVrd3N1QzExK0FHRUZRMUdTaWozT0Y0WCszMEFmTFhDclBSbUVG?=
+ =?utf-8?B?K0VqZFJzSkhOU2ZDTW9TRU1EWEJRcS90Q2RwM2NUZ0sxVEdBWXJlajNaL3Yx?=
+ =?utf-8?B?ZEptWU50NmFvY1R0WjJCL0FUc2U2ZHRubXFXVW8rR0pYa2FhdzVuVmtZa3lo?=
+ =?utf-8?B?QWQyQzZOdGtnc3B1RWZZMndkdVFzc3UvczFEKzBrZVRkV25NRjl2WG13eXFC?=
+ =?utf-8?B?OFhrUHI4NWtsdmZSOHpRQWZkSlUvR2tOeUNOK0p5VXpZS3U1YmMvMXRnSTY2?=
+ =?utf-8?B?aTlKYkNGQzAzeXZZSDljUzE4bjltdDBZeE5hdlZFUXEyS25zNzVCYXRJSUta?=
+ =?utf-8?B?eW5kdzQ3RHlvUzRSMXQvQ1pVbStBZFBQa3llMUJweWg1akN4RkdVY3ljaWFV?=
+ =?utf-8?B?NGxVVCt4TDRvbkREYnl1QUYwZ2loMTdlaFlvMmpkVXBmeGJJRXFXdXh2T3k3?=
+ =?utf-8?B?aDFXUUxDSUtVN3R1K1lyZFhJWU9xYlBkcTNSUjlseDVIejJDT2tiSVp5a21U?=
+ =?utf-8?B?WnJLeVdMOFVaNnV0Sy9sZTE0OWdTamhMalU5NDZwRVNCSnpXWDczSGRVR0NL?=
+ =?utf-8?B?c0tOb05OUXczdWRWL2piVUVibTZtTE5GMlowTE83RUN3dmxGL3ZlanUyYlZ4?=
+ =?utf-8?B?L3lFQnpKZGJCRlB2UnljQjJpS2w4eENlZmdtdmNuN3NYUEpEVHh1RU4vb05r?=
+ =?utf-8?B?UEpDL29IRERzK0xLQlUyL01MMGJUWGFFd1drMkwydS8rd1J6anlGNDZmYjFZ?=
+ =?utf-8?B?bklMQVRGK0c0OHVrT01JbURJQVhwVzFmZTgyWnJJdk5BUUxZZEtxTkowaHM0?=
+ =?utf-8?B?dE5sOUFOQVovTUZaQmlaaDdPamxJS0RVVk5WRWowcU4zTi83RkxFZmQvSXhM?=
+ =?utf-8?B?YWN2N0lDWWVtYWhyY0NFN1A1RXd2dnNXVUZYR0UwWHd3K0RGbklrdU1LOEZ5?=
+ =?utf-8?B?TWZSWldwSEl1L0VkTlRjM005ZW5OQUw5a1lhZmJIbWtLOE5aNGdCbTRRelpQ?=
+ =?utf-8?B?OE5ETytleTI0RFI5cE1hVFczdlVQdW1vcW1HUmlJWk12eHJBQlNsSndsRnpn?=
+ =?utf-8?B?VXFpRmd3d0o4QlRpRVVXbVBLYm1JdkR3Q2VJSXREWDdIUWwrU2hIR01UcTAr?=
+ =?utf-8?B?MHZRSTlILy9BQktLcFNGczhPL3NkbURIUlpGOFhzRTFRRFRqY2FGYkFmWkJj?=
+ =?utf-8?B?aFFWZWNSZkQ4SkdYN1Q5MDk4Z1MydkNWVDVreGlhd29HZjl4ajN5N2pRRnlW?=
+ =?utf-8?B?Zml4cmJDVCs2VmswYmpaNXNQcDgzeDlIaGZoUXZ6MGtyb0tSeFNlUDcxYXEy?=
+ =?utf-8?B?NmdDTitPTVNadkhlRExIM3BDUXdUSGlyeGU3aWxwbFAwNUUyc2wzOUF6VFVk?=
+ =?utf-8?B?ekFRNFR4eDdNL3BNT09zbjZyWUtMSHpLK3NnSi9nYldoMFREUTRtRWZlNGhh?=
+ =?utf-8?B?Zm0yZjhNYWRJSFVvcXdMWUJVMEpSZzFJbGxSOEpJMkJtVnE4NFJrRXBhQ2Zi?=
+ =?utf-8?B?d3QydVN3S09DSkZsZkZ3TjBLZ0RkWDVwbjlvMUcxRFZPYUQvOXlVcUFja0Vy?=
+ =?utf-8?B?OTBXTXhjM0Y4WmQ1b1p0bzdObGRvdnQ1aGZCaVZVZzQwZit5Z2lzUVRxMkp6?=
+ =?utf-8?Q?wNXKwkXVaUwAJE2TZrbjDcvIv?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85267bdd-0bdf-4333-40fc-08daef75ce03
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 23:37:27.4909
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DdbeNcS+0iUuIkkfJ1HpQ2Vpi5eQ9mKfnbAFAVCe8Ab9kef7yBm+/03OsfX4qjBQ78C5nn2eo8uV3BKO3kodRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5328
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 10:57:48PM +0100, Yann Droneaud wrote:
-> Hi,
-> 
-> Le 03/01/2023 à 21:44, Jason A. Donenfeld a écrit :
-> > On Tue, Jan 03, 2023 at 12:15:57PM -0800, Linus Torvalds wrote:
-> >> On Tue, Jan 3, 2023 at 12:03 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >>> That buffering cannot be done safely currently
-> >> .. again, this is "your semantics" (the (b) in my humbug list), not
-> >> necessarily reality for anybody else.
-> > Yea that's fair. Except, of course, I maintain that my semantics are
-> > important ones. :)
-> 
-> 
-> I concur.
-> 
-> To hold secret material, we need MADV_WIPEONFORK | MADV_DONTDUMP and the side effect of mlock() (pages' content never written to swap), inherited across fork().
-> And I want mlock() without paying the price.
-> 
-> Jason's proposed semantics, which I call MADV_WIPEONSWAP, provide a mean to hold /unlimited/ amount secrets in userspace memory (not limited by RLIMIT_MEMLOCK).
-> The only constraint for userspace is to handle the case pages are wiped, which is already the case of userspace arc4random()'s implementation.
+Hello Jarkko,
 
-If you're actually serious about wanting a generic mechanism for
-userspace, I think the moral of yesterday's poo-poo'ing all over this
-cool new idea is that the Linux innercircle doesn't really care for
-"security things" as a motivator and just takes the shortest and easiest
-route toward swatting it away like a gadfly, assuming that the concerns
-are unreal or niche or paranoid or whatever. This is obviously nothing
-new - it's an old complaint beaten to death for years, with people who
-are diehard it about eventually getting burnt out and leaving. So,
-practically speaking, if you want this to exist, I think you have to
-find some other cool use cases. Like, see if the database cache people
-would actually love this. Or if it could be used as an opportunistic
-renderer cache in Chrome that wouldn't result in OOMing with lots of
-tabs. Or if shared process compiler servers could benefit from it.
-"Droppable cache" is likely useful lots of places. So just find
-SOMETHING that doesn't mean having to convince folks of a new security
-model that justifies tickling mm/ innards in uncomfortable ways.
+On 12/31/2022 8:27 AM, Jarkko Sakkinen wrote:
+> On Wed, Dec 14, 2022 at 01:40:29PM -0600, Michael Roth wrote:
+>>   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   {
+>>   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>> @@ -260,13 +279,23 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   		return ret;
+>>   
+>>   	sev->active = true;
+>> -	sev->es_active = argp->id == KVM_SEV_ES_INIT;
+>> +	sev->es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+>> +	sev->snp_active = argp->id == KVM_SEV_SNP_INIT;
+>>   	asid = sev_asid_new(sev);
+>>   	if (asid < 0)
+>>   		goto e_no_asid;
+>>   	sev->asid = asid;
+>>   
+>> -	ret = sev_platform_init(&argp->error);
+>> +	if (sev->snp_active) {
+>> +		ret = verify_snp_init_flags(kvm, argp);
+>> +		if (ret)
+>> +			goto e_free;
+>> +
+>> +		ret = sev_snp_init(&argp->error, false);
+>> +	} else {
+>> +		ret = sev_platform_init(&argp->error);
+>> +	}
+> 
+> Couldn't sev_snp_init() and sev_platform_init() be called unconditionally
+> in order?
+> 
+> Since there is a hardware constraint that SNP init needs to always happen
+> before platform init, shouldn't SNP init happen as part of
+> __sev_platform_init_locked() instead?
+> 
 
-Jason
+On Genoa there is currently an issue that if we do an SNP_INIT before an 
+SEV_INIT and then attempt to launch a SEV guest that may fail, so we 
+need to keep SNP INIT and SEV INIT separate.
+
+We need to provide a way to run (existing) SEV guests on a system that 
+supports SNP without doing an SNP_INIT at all.
+
+This is done using psp_init_on_probe parameter of the CCP module to 
+avoid doing either SNP/SEV firmware initialization during module load 
+and then defer the firmware initialization till someone launches a guest 
+of one flavor or the other.
+
+And then sev_guest_init() does either SNP or SEV firmware init depending 
+on the type of the guest being launched.
+
+> I found these call sites for __sev_platform_init_locked(), none of which
+> follow the correct call order:
+> 
+> * sev_guest_init()
+
+As explained above, this call site is important for deferring the 
+firmware initialization to an actual guest launch.
+
+> * sev_ioctl_do_pek_csr
+> * sev_ioctl_do_pdh_export()
+> * sev_ioctl_do_pek_import()
+> * sev_ioctl_do_pek_pdh_gen()
+> * sev_pci_init()
+> 
+> For me it looks like a bit flakky API use to have sev_snp_init() as an API
+> call.
+> 
+> I would suggest to make SNP init internal to the ccp driver and take care
+> of the correct orchestration over there.
+>
+
+Due to Genoa issue, we may still need SNP init and SEV init to be 
+invoked separately outside the CCP driver.
+
+> Also, how it currently works in this patch set, if the firmware did not
+> load correctly, SNP init halts the whole system. The version check needs
+> to be in all call paths.
+> 
+
+Yes, i agree with that.
+
+Thanks,
+Ashish
