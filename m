@@ -2,204 +2,181 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C52F1C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 18:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C0EC54EBC
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 21:46:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234704AbjAESSF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 13:18:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47130 "EHLO
+        id S235932AbjAEVq0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 16:46:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbjAESSD (ORCPT
+        with ESMTP id S235925AbjAEVqZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 13:18:03 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E75A4FCCD;
-        Thu,  5 Jan 2023 10:18:01 -0800 (PST)
+        Thu, 5 Jan 2023 16:46:25 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2075.outbound.protection.outlook.com [40.107.95.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAF663D28;
+        Thu,  5 Jan 2023 13:46:22 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IQYoh3LeYO3eptDdQ9tdK+S+herCCWUZRNsYAzUTehvKEYXaIAdkaYEG7tuze3ff4PH6nZ04y4GJDsP/x/eNpb6UKHY9+8Kl1570WvCRn1ynBK6umbfTnSD0FsOrYo4lhbwAwLeR1hZDLY2ghjo0sRs+NvHd7rqizpuNGGvlRPUnDMAM7SwuKwq6HzVjpGjEhHTjYG1xI2MivAN1upcvxAKIKa3pPRCzP4KElovBO9aSlnEOxUb/EjKcZpnmuXuWu5CWGUMxOJVOW3/UYpgp7HUAGQRlUV99Pcvn+Me82oYEOE3TP8yxUAmxJJqY7NmOqKQFsQj0PPFYxHiGHYT/wQ==
+ b=SkJtITLQPq274TwugSXQ4p3etcxAyD69UYwEsS/Vthg8aYtCqLX/uMYPi2/6m+0+Ou5bAe2U0dTS7hjG1S7/kZKI2fs+RovULGPgAPjnj1e4G0I9WJcpFhUm3A+ehqFO0T8PskqBNJVnor7GD8ircQwXoCJfUDb1OJTOQrh29ryyodMrfhh1Ze31tp9gmDrjdc3ncQryD/BFQDowbLPD52z+XzzNcnEufp9U8XATKL3WTo3DQxLqKsDEN/P27PE9gpxHFJcIh6us/Tx5+zI6/iAySJgFFUGVEgdFUMhRwp1o9fkclmcLFLXC1M9awLppoGQQd/qs6IRYrlqICTetDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kKqnDT1gHrMhoV5q6lrtBAHL38nro7QLWKMTdZ9hoYQ=;
- b=PXNmlp8Ww2YUQapwqqabWQ3IQu98OifosvTlI9dEf/tPEU+Y+X9QsVziHzTSymBUGPBpkLJMO4y9gTi5T6REGy8o3tn2WaJayXF6tA7amayerWeB98MUPyVLzV2wVxdh662BY55Um5Bh2xITQDgmM7S76vHdRGjPWhN7Blh8dhqhfjvbhA3/U2Ad5tdze72XWn9kChc2neM8/jIFmKVp3seI3OAUO8UZcdISNZbsONUeQBDOi0AYQi2r6CesPOlfvkCIASY/Ctpq2/K+pRB2wPUMzL8QxbgzrJxKmqiYHcnrQbOlL2nA3TDJrY39h6CRlhcbSq/YxXAL7zGe5SvYZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
+ bh=fMbKZJ4SSB6zZqvnrTy73ZeHcgWUYxJ/CIBVBsyFD8s=;
+ b=Dfco4mpDQ0ufDK1wZ5kZE5qnLve5ajYOPoD3l34k2zXk2bDXsf19re/QHkNX7rqnEnimo/EKGLQG9rfMIDZbQJlRa2MSKGsDrS6RGTmZF5vrg6LFa+keprMJ7tV6LWSEYOwonTm3SMKiDYFeNQBVXBr/Z2PQwX9Of/4x5qXP4tfMs99hUf+0dCYyok2T1v+w9lr8izkMIlZMYfnB664yH8KTe6E0eUPwQ14qyrlhmJS1tfXAq4GwxKV/fqN91xSc9C6ipCTj4xZejDMaGX99QjuLCjL/F3VrvCOSLw+fJqwgxg5Pz2LDnvB5DY1brd3MswhBtk1axFbFfoqtYgSIHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kKqnDT1gHrMhoV5q6lrtBAHL38nro7QLWKMTdZ9hoYQ=;
- b=DRDmo1+IpdwyE3KsU5dEZIbvvcrbWR/5HgsY02qodx8vYng6y/HlEXC+KnBeiVoYvlTTQzTUJHxPFlTHxvvDbfcq3GimV1Fu2mFyuUw/aXf4QPUvhT2AomSLRAp5R+r1mpE6G0UAaQ176lBi2tmN0vKqwkgxbM0IakLphvFaV7s=
-Received: from BN9PR03CA0982.namprd03.prod.outlook.com (2603:10b6:408:109::27)
- by CH3PR12MB8257.namprd12.prod.outlook.com (2603:10b6:610:121::10) with
+ bh=fMbKZJ4SSB6zZqvnrTy73ZeHcgWUYxJ/CIBVBsyFD8s=;
+ b=s/ziD4s2PaF70r1yOOtka/FBbjZhvbqfwPLrmaW7kAfKxBK/Us5OqnntM2uvg2KpFnEG6tjtl3cy/JsYAaeK/3z+qt2jevq9LNvkLuWMmu3vr9eOFzqhJMhCmWRgLyIefvsB7HhddkuqTNSRGQts5KozCx2dzjuQMKskw5OaQ0Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SJ2PR12MB8036.namprd12.prod.outlook.com (2603:10b6:a03:4c1::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
- 2023 18:17:59 +0000
-Received: from BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:109:cafe::95) by BN9PR03CA0982.outlook.office365.com
- (2603:10b6:408:109::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.14 via Frontend
- Transport; Thu, 5 Jan 2023 18:17:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT052.mail.protection.outlook.com (10.13.177.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5944.17 via Frontend Transport; Thu, 5 Jan 2023 18:17:58 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 5 Jan
- 2023 12:17:57 -0600
-Date:   Thu, 5 Jan 2023 12:17:41 -0600
-From:   Michael Roth <michael.roth@amd.com>
+ 2023 21:46:20 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
+ 21:46:20 +0000
+Message-ID: <1c525bcd-fe77-276d-4697-ac2ec3e00182@amd.com>
+Date:   Thu, 5 Jan 2023 15:46:13 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Content-Language: en-US
 To:     Borislav Petkov <bp@alien8.de>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <20230105181741.q6mq37gvcjk5nbjg@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
- <Y7bnE5bTUb6fQiX/@zn.tnic>
+Cc:     Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+ <YuFvbm/Zck9Tr5pq@zn.tnic> <20221219150026.bltiyk72pmdc2ic3@amd.com>
+ <Y6DEv4QuvIfwWlCW@zn.tnic> <ab96e918-c8b7-67d5-1dfd-320264858cec@amd.com>
+ <Y63Jz01c7zLx03gQ@zn.tnic>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Y63Jz01c7zLx03gQ@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0P221CA0029.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11d::7) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y7bnE5bTUb6fQiX/@zn.tnic>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT052:EE_|CH3PR12MB8257:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a002a37-0734-4c71-d285-08daef492c8f
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ2PR12MB8036:EE_
+X-MS-Office365-Filtering-Correlation-Id: c985107f-2808-43aa-733e-08daef6647d1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: q9u2wmFlKKTJqDESjpZgeUQTS4lgiHAz6sA5e+Fr8kyy3kCfOYp1tlpqmkJgkLhfUlLsF7AUPobb5zG7aRiYEYXDlcFSSczEFVd3rZqv4/WPj3TSBsMJNDFh+dNQ8M7ID42e7SPswZu/OxvRreEbvmPps/jXkc40vjADWlIoY0C0KGKEA06sCbf1nw0Kh+t23oU6XpzPzwSSCUaWpEC/f9ADk/VVxlUajoHehDUH/2Wu7pwXGuV++Em8pNWog0if+yWK/YC7tlKYjhYipH6NWjd/O66FP3vMRVKLIMjQw+3yaq/bv3tZfWABl/PINfK4X5gjQxAJeLvwYbdWMOc/iBlDIQusIa4ggJL3UYW9DDAaH+0CXAL+Mv6TYgw8xOtOEHOlKQlbYyrNAemoQgKUtvBgdFhHUOFEpG/TJPsXXjvYNJZT7AkMxR/WF7BagsPwdMhDMROs9UxffWJbINeYXr+czaMkkFKAe9Lib/wY8GXtEqkm2A8wkGjHvYr6b3JkzvWKNbE86yy/fNtMVU4afqvuYJbrTAbHXU0N+vK7qy2mabkVClveYzPwy1wBTqHkklb+VeK16OOAXKkg9RIbx561nMmKTP1J/WbulI9OCsb8w50WQK2TjK8qgigkha0cV4yepq9x4zOH2GZSd3O5t0h6xdyCVKD/ehcu4wsbynocQAGkG4/yHjvCWlsG8NzFO+BXQQQerAYAiK+jaA10zZSyKliSmp1vA7gvMTSS2q6jAqfQXdsmwn+jhvBBX8ZJLm0KXt0JCmWgWcVuxZKifw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199015)(40470700004)(46966006)(36840700001)(7416002)(7406005)(41300700001)(5660300002)(70586007)(8676002)(70206006)(44832011)(2906002)(54906003)(6916009)(4326008)(8936002)(45080400002)(186003)(16526019)(478600001)(966005)(6666004)(26005)(426003)(40480700001)(336012)(47076005)(86362001)(36860700001)(2616005)(82740400003)(81166007)(36756003)(356005)(1076003)(316002)(82310400005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: J2muMyBVuJ5wwCEJDbSphgGDymg/aVZi/NsfVb1N8KH1p9276ynFNIID358iHrO7B/W8ZTg+VNyN7uR7lOp3kJM0JMac57ocWibEkjPmCN4or26KAj+so90eeZ8GBYWV39+iYtOLVxHdCqARr+wxxx3e6DzHoxKk9EuVlhoQgeljNGyJwkR8ZaJfEuArWTuYuMb6a7FG6EvDJ/VByE3rrMzAuBzsAAF7bt/S1iy9yVMnAX3f13xlhmgbzZj3Zf3yhdl8N3xHodtwqUlna4VejMQ9d/qYT1QaRcocg3toICOa/BDrH3rNMimGMN84THUbhkjYNSAkPVGXPJc82qagMIvPsofFAyXitPuVA/2jqRBBc32D6pgLo35vh0N1nMNrXljrQx3VZW7g+P6p1bZsUGmJ+8hlY9+YC5jAcIJ98DsLCSBvxXidC9XfRwZCMURpIeYsKm/HfBm44Ru9SgGsA7yRh7yzTa5jJv4EWl4Je/Z92aQKyrBycbObS97Jr6vVJ+kZh4M5AtD8i85W6nwXtHhxqFNzgm3sSfIEWFIt3tnoY4WrwjG7u/7jwmKwjBJRRMFWxvDiTO3o3SOAtvHxZT5TsdGqwJaRYQ5b24kLyEJUELQ66F97dSRgXK3EgjXOHbGzIi607XAEiHyLDH9rbIwntJFQhnzKsM8nyaqnPI2e9A50RbPnPdKRjttfX02ingRH2044KtDal3E1POXXSTqXJ1pM7k+Ur3Qe4dWKVO7qtbcaVmDvldOoXnm+4KdV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(346002)(396003)(136003)(366004)(451199015)(31686004)(7416002)(7406005)(5660300002)(66556008)(8676002)(316002)(6916009)(2906002)(41300700001)(4326008)(66476007)(8936002)(66946007)(478600001)(6666004)(36756003)(53546011)(6486002)(6506007)(186003)(6512007)(2616005)(26005)(86362001)(31696002)(38100700002)(43740500002)(45980500001)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1VGT05qSTU3eDk0QWdiM1RFNzdSaTljWjNqQXBpYVNRbzNXemxXeFZuWlRI?=
+ =?utf-8?B?cUVYL2JpdnpOVTc5TUdsRHN5LzF3akNWQzZmVzlKbG12Ujc5VUU3WFllZlEy?=
+ =?utf-8?B?YjVrcHFoaGVSRVpUb2kyQ2JuNExISnJEK2FkSEI3SXV6enlwWFFWZTNLQmVE?=
+ =?utf-8?B?T1hvWDFYRVkya202clJqd3BuMGsyN1JsTXY3ZWQ4WmNERzZkdUYyNUZBV1o1?=
+ =?utf-8?B?SERyYU00VUZ4MEtXUkd5WXgwZTZSR051MFBGaU0wRHJjOURpVFpmYzc2Q0lG?=
+ =?utf-8?B?ZmV6QWZERXliQmg1alU4dHliNGsvTGVGT1Jxa29wTkhFdXgwYzBnb0UyQVhy?=
+ =?utf-8?B?YlgvK24zb3UxU3Z2K0MyOHBxNlFYRjhLWnljdFJBcUVJRGQ2Yk1NRXVSR0Qr?=
+ =?utf-8?B?M2NvUDdicVQwMW83WnFsMHhGVXIxSFZRZkh6eHUxN2xBek9BU1BEM2lKcXpB?=
+ =?utf-8?B?aE1zTExJdU5zdHR3VWJ4WS9NS1hrVUhGTmVUWm9zbmRtb0FydExYYzQ5RDdW?=
+ =?utf-8?B?dzFJVjhlUTY0amZ3SEVLcWpaU0JLK003bHhXc01vdUdOYkJGWDYxaCsrNk1I?=
+ =?utf-8?B?bDNMZmRRaHpNWDFkbmUydFBnYTRCUE5FSDh5UnpINEM5U1BRd1F1Q2QwWFlZ?=
+ =?utf-8?B?eWZOTlJxUzduZHJoaHgySUpnVFdkbGxaSEI2Y2FUS1hVSmNKTW45VWlUb0JS?=
+ =?utf-8?B?c3ZHbkNaZzdRR3B3YmFtd2kwYnJkL3lKSHVwcnlLb3JobkFrUzZBZU5Ka2ZW?=
+ =?utf-8?B?WTB5MGdKV0FpRmtUL3lkeG5sVWo4NXhCbEw4cThzTVpBaG9USmRvT0pSUEcr?=
+ =?utf-8?B?aGFoL282c0h6WGU4RTBUbldoOFVHaWQ3OTVJNFJ3RkZFQlhoOFFvYmhwVXgx?=
+ =?utf-8?B?ZkFzM2tuR3I2VnJkVVZxSFNXcjU1cldkcERjU3FsTjgzT3poR0xMRCt4eWEv?=
+ =?utf-8?B?Rzl0eFJzTWljNUpDMnlCQ1lGb2c0TXJJbzZmQjVZTnZaYWYwbjlnZVdxQmp6?=
+ =?utf-8?B?UkFLNFVtN3ZyNXBCWGFtNXNpYytsUFhJMWVrYkptaFRSUmNCUldUMWxhcklR?=
+ =?utf-8?B?OW5iOVhNOTZISjB5QngxWncxOFBxSU02RTczZzBiQWUwaUpFZHVyNzhib3dP?=
+ =?utf-8?B?eDROYXhCNEtEL2dQQ1Bld0d3dzhBY1krWnBjcWF2SnpJZWJzVVRQcDIzQ3VH?=
+ =?utf-8?B?U1dod2hkSk5iWnJMVUNETzRnbEw0T1RsUldxd0dwa1p1cWsySWV4cjZNekdI?=
+ =?utf-8?B?eFhobW5ZeisrejJ2bmNvRmptb2xlNEVCUEp1eGJicGVlS1V2QVRJT2g4ZFIz?=
+ =?utf-8?B?Q0cyK0lNdGFiUFJwM250T1E0TUpoSXR4aGwwWmgrNmk1ZElMOFVaWkZ6Lytz?=
+ =?utf-8?B?aGh0MFhqbGJzSlJNWFNEMXVHbWoyZUw4LytvWGJoMWR1cXpaNkUrcWgrcEhE?=
+ =?utf-8?B?R2JmQnBYREtFZkJYd1duc1Z1dXlPWTRvZGxvKzdTVG9HbWVuRGNseG41MlMr?=
+ =?utf-8?B?VXBsa3NjYnJhb0VteVpnODNlekwrS3d2cjRZdXRPUnZYeDNiR3pPUnBKMTJp?=
+ =?utf-8?B?RUppTkxqc05xTHplUzBoclFPaktYcFYyRjlRTUJrb3RtRFp0RVBLTE5CSjY2?=
+ =?utf-8?B?bWVTS1JXMTh1RjV4ZG1IaytnV3Q1L1RLcVI0SU1uL21zL041STV4ek55b2Iw?=
+ =?utf-8?B?cjVrYWozU29Za3NETEMyZ003dkIyWVdmbWlhOWRoRHpMTGhxdGZTTk9aU2wx?=
+ =?utf-8?B?ZWRGc1h3dXZhT0xHUVFiVHlKYTIwd3BBVHRQTW1Ec1A5bUhhOGZGdE40L0Ns?=
+ =?utf-8?B?VVd0dDJlSWxiUUF4eW1HSFA4WHQweDBaMFZtdmRHa3NGS3ZuTjhXdm1ZdzYv?=
+ =?utf-8?B?NlUrKy9Nd0syeFQzM3NuK0tBbWFVL0o5N01CeGN6bG5xL2owK0VsNG8rcUhI?=
+ =?utf-8?B?dkQvbFdSOHlCbFMwa2xkeG1FTVZaTlBNSmZZak5oN2hLL0FkVW9JR25ER09j?=
+ =?utf-8?B?dXVBYWtpaHJXQTQ4a1gxaXkxZXVuVU1aYXRHNGEvUnc4QXVHMnRVdktSQlFs?=
+ =?utf-8?B?SmVSOXlFYzdIRHlxaFlyTE1zUkJWSHNGQUVVOHFPbW1kVVVSZ1ZzOC9qZUk0?=
+ =?utf-8?Q?O+zkBW18HzDkozkA+yKrGxHkS?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 18:17:58.4995
+X-MS-Exchange-CrossTenant-Network-Message-Id: c985107f-2808-43aa-733e-08daef6647d1
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 21:46:19.9145
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a002a37-0734-4c71-d285-08daef492c8f
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8257
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O0djPHJ6ZYbrnfARpiBeLP38ULaP4CrqNVXJ65rpMdJ9+qJuMcKgLe+nTuocZ3/3oIWe4A43quAKmrY4B4x6kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8036
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 04:04:51PM +0100, Borislav Petkov wrote:
-> On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> > Maybe that's not actually enforced, by it seems awkward to try to use a
-> > bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
-> 
-> I don't see there being a problem/restriction for bool functions, see
-> 
-> 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
-> 
-> and __static_call_return0() returns a long which, if you wanna interpret as
-> bool, works too as "false".
-> 
-> I still need to disassemble and single-step through a static_call to see what
-> all that magic does in detail, to be sure.
+Hello Boris,
 
-Hmm, yah, looking at that patch it seems pretty clear (at least at the
-time) that bool returns are expected to work fine and there are still
-existing cases that do things that way.
-
+On 12/29/2022 11:09 AM, Borislav Petkov wrote:
+> On Tue, Dec 27, 2022 at 03:49:39PM -0600, Kalra, Ashish wrote:
+>> Milan onward,
 > 
-> > However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> > use a function that returns bool, and then we just need to do:
-> > 
-> >   bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >   {
-> >           if (kvm_x86_ops.private_mem_enabled)
-> >                   return static_call(kvm_x86_private_mem_enabled)(kvm);
+> And before ML there's no SNP, right?
 > 
-> That would be defeating the whole purpose of static calls, AFAICT, as you're
-> testing the pointer. Might as well leave it be a normal function pointer then.
 
-That's true, we should just use the function pointer for those cases.
-But given the above maybe KVM_X86_OP_OPTIONAL_RET0() is fine after all
-so we can continue using static_call().
+Yes, that's correct.
 
+>> there is H/W support for coherency between mappings of the
+>> same physical page with different encryption keys, so AFAIK, there should be
+>> no need to flush during page state transitions, where we invoke these direct
+>> map interface functions for re-mapping/invalidating pages.
 > 
-> > On a separate topic though, at a high level, this hook is basically a way
-> > for platform-specific code to tell generic KVM code that private memslots
-> > are supported by overriding the kvm_arch_has_private_mem() weak
-> > reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> > flag to convey that, which is in turn set by the
-> > KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> > 
-> > But if, as I suggested in response to your PATCH 2 comments, we drop
-> > KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> > KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> > code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> > in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> > supported, whereas SEV/SNP code would be using what was set by
-> > KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> > kvm_arch_has_private_mem().
-> > 
-> > So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> > on something else. Maybe the logic can just be:
-> > 
-> >   bool svm_private_mem_enabled(struct kvm *kvm)
-> >   {
-> >     return sev_enabled(kvm) || sev_snp_enabled(kvm)
+> Yah, that rings a bell.
 > 
-> I haven't followed the whole discussion in detail but this means that SEV/SNP
-> *means* UPM. I.e., no SEV/SNP without UPM, correct? I guess that's the final
-> thing you guys decided to do ...
+> In any case, the fact that flushing is not needed should be stated
+> somewhere in text so that it is clear why.
+> 
+>> I don't know if there is any other reason to flush after modifying
+>> the direct map ?
+> 
+> There's
+> 
+>          /*
+>           * No need to flush, when we did not set any of the caching
+>           * attributes:
+>           */
+>          cache = !!pgprot2cachemode(mask_set);
+> 
+> 
+> Does the above HW cover this case too?
 
-It's more about reporting whether UPM is *possible*. In the case of
-this patchset there is support for using UPM in conjunction with SEV
-or SEV-SNP, and that's all the above check is conveying. This is
-basically what KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl will rely on to
-determine what attributes it reports to the guest as being supported,
-which is basically what tells userspace whether or not it can make use
-of UPM features.
+Actually, as both set_memory_p() and set_memory_np() are only 
+setting/clearing the _PAGE_PRESENT flag and not changing any of the page 
+caching attributes so this flush won't be required anyway.
 
-In the case of SEV, it would still be up to userspace whether or not it
-actually wants to make use of UPM functionality like KVM_SET_MEMORY_ATTRIBUTES
-and private memslots. Otherwise, to maintain backward-compatibility, 
-userspace can do things as it has always done and continue running SEV without
-relying on private memslots/KVM_SET_MEMORY_ATTRIBUTES or any of the new ioctls.
-
-For SNP however it is required that userspace uses/implements UPM
-functionality.
-
--Mike
+Thanks,
+Ashish
 
 > 
 > Thx.
 > 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C4bfcf0c3d1e54046703008daef2e35d4%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638085279100077750%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=oCjQx7LV1paTYdMA4JpFjIexf5UkiZEf2pYOWTvpkZ0%3D&reserved=0
