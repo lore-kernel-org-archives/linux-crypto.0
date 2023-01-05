@@ -2,180 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E931C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 22:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E568C4708E
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 22:58:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235835AbjAEWye (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 17:54:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
+        id S235882AbjAEW5s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 17:57:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235715AbjAEWyd (ORCPT
+        with ESMTP id S236421AbjAEW5i (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 17:54:33 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2043.outbound.protection.outlook.com [40.107.223.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C007C5C1EB;
-        Thu,  5 Jan 2023 14:54:31 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E1XxTRCFLkD7+KwMWHpf/vTU1Fx1U42maPaNv6jsmX4eIAWQuVCvqlKDRJFPdVg96PHIQyitk4BCiapejVrOABQXysRU9oMTeMQjAti1LrBmKuSJ8wVxe2yN7bPZQt/U/oBFxtPo4XT4Z6nmVXO99mu8HgB+H5Jhgt7kVvUYLVLhG3lvMPcBn/0reHDELLrmpAhdZ/VUkf7Z5J6422Q5s3kh42L5tohE5pXcsawyxlTIIBsMte/IehufoIHUevNJBfSHHotLfd9RqhmvYhfNRv6Z+IeI6pHaukImaUEFJthDIDGNixvSMtV9mkkHitE3cMxI/sQjNSf/i/dXKwelig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9ojJjWMGcdVIAkGAVcfY868civOChs1q1LlXQOOBr88=;
- b=D5YzM6ESSiE6lGurNyfk5ZhwmJ6bYSGIkHQ5PenGVDJMiQUPvtfu+aWzQ75rXFY/gQ8wYYrrCOU6UqVj6epDX18Z8/tFEw+amnHSEvrPF7TQ/eeG0tLPq8uE1fSYoJ1Ldb2ou/9bxxLv4f7D5CXOjOSFJ3MX8LlG2H23YIGp7BpCR9At6U202tQl1RsvZtTFkGkndmuCvc5Dd+zF90wGMOQPvMIsGjXlaVGgP7hBWis6OfbYf2z3hfafX0gua67n6WqH/jhpspkYi1nTxC7UffMGWB5VMSnjyIuMVJBs8zCaSll6pTbxQX5bvPWK8lpXzB9WxCKcMcusQaYDzjZ7WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9ojJjWMGcdVIAkGAVcfY868civOChs1q1LlXQOOBr88=;
- b=36f+BWP4Qdqpvi+10JQ/B1wbI1hO+wAF9xtIdtP2negmlQJQikYxeaprx6mJ6toavUVsnrZbH2uC2TuXihzBE/pMNczE9ahx9988Fk+NdynYB6n9AunHqEphJUaFaDMwUcoVIUhxOigF773wNuYu10ma73WB8l/3sU/EmWd5XfQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by PH8PR12MB7253.namprd12.prod.outlook.com (2603:10b6:510:226::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
- 2023 22:54:29 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
- 22:54:29 +0000
-Message-ID: <897b503e-48d1-bc4b-1e68-42792d589ddb@amd.com>
-Date:   Thu, 5 Jan 2023 16:54:23 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH RFC v7 25/64] crypto: ccp: Add support to initialize the
- AMD-SP for SEV-SNP
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-26-michael.roth@amd.com> <Y7VtOQa5Hd0oMdfh@kernel.org>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <Y7VtOQa5Hd0oMdfh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR17CA0016.namprd17.prod.outlook.com
- (2603:10b6:610:53::26) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        Thu, 5 Jan 2023 17:57:38 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910EC671A9;
+        Thu,  5 Jan 2023 14:57:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 60E1BB81C0D;
+        Thu,  5 Jan 2023 22:57:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2E39C433F0;
+        Thu,  5 Jan 2023 22:57:31 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d3U57LHD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1672959449;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=INhUx6/3Xhk2/xGcSTChC+f55M0MZlL+ygV3JkGy+qw=;
+        b=d3U57LHDK5/g5g3S5DBYHkQoCwcYk8ZV6a0oM3Z6SewXdvSOqXsdHHaQbe31rTK2/sDwM8
+        uMa3NJfzLzSkKnpUMBkGoQwKDNdqTWO6cQbSV8C+gyuenY/YH3A7RWhDB0eL4EaO20uqvQ
+        CziJ/xm7YuUGNCJojapunpRX30XKVzA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8daf678c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 5 Jan 2023 22:57:29 +0000 (UTC)
+Date:   Thu, 5 Jan 2023 23:57:26 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Yann Droneaud <ydroneaud@opteya.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
+        patches@lists.linux.dev, tglx@linutronix.de,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org
+Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <Y7dV1lVUYjqs8fh0@zx2c4.com>
+References: <20230101162910.710293-3-Jason@zx2c4.com>
+ <Y7QIg/hAIk7eZE42@gmail.com>
+ <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
+ <CAHk-=wg_6Uhkjy12Vq_hN6rQqGRP2nE15rkgiAo6Qay5aOeigg@mail.gmail.com>
+ <Y7SDgtXayQCy6xT6@zx2c4.com>
+ <CAHk-=whQdWFw+0eGttxsWBHZg1+uh=0MhxXYtvJGX4t9P1MgNw@mail.gmail.com>
+ <Y7SJ+/axonTK0Fir@zx2c4.com>
+ <CAHk-=wi4gshfKjbhEO_xZdVb9ztXf0iuv5kKhxtvAHf2HzTmng@mail.gmail.com>
+ <Y7STv9+p248zr+0a@zx2c4.com>
+ <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|PH8PR12MB7253:EE_
-X-MS-Office365-Filtering-Correlation-Id: dae056b2-858a-4b7a-4074-08daef6fcd4e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fWEho8sFeBy5bEyzL4mYiShKKLK+jgj2+AZKkTDv3CCQSar9/pLy5rwfZcZ7T42hjmrqO/YVJxDAa/FpRWE3gecvGyqqfDSZeM6N4FEohjL6ud12K8kdUnBhqjeWD6a+VuZey9+xU7wBi3yclaOUF8Kc+kAFBK6tEOJxbcVd2twm9ejUhvZvZB8CWKBLph926MAzNVlSuEzeU1YftVmc13Efiw984y8mfAzZdgZW+4+w5OyOV8H7eUYKpz1BcKpz5PtIz+VOqnjmKKUVFbI+C7WG0ZFgdtMhw0317lFNniASAxzgIwJuAcO3DjU5mA5/IX9kAszZbczVIr1qBGCrMG1FwIBpXxPDwao3Gsi39uumI5WOAzL9FuDsNO2ilb5D9y59qJtW0ycv5Dos6sbHUkJJuUuSyr5GwBM1FiOw6DmOJ+gKe7OVFVtUK2MBxXl9qDvDm3eyh1QSyQklg6u7eqweFuL/VOKPl3GOxex1KRBcOfEOJxBmCPINyhypzg4pBJ2veURfqZWjvRVEUeVsXfHlzClJuUT8jh+T/kygi/3mjTj+b0YwbIxXbpm2SPqgAn8BfkPgW/wId93E6O58tWHD1ILiCSvrs7qRRAseE5SQ3FyQ2FQ2HlbvaiwH7yS7HN3s25L0b6yCiWfo7+LMQMqoZOoeF00w29QxyMkl3w0sp/kW82O+87EJ7nN34D7GLAOeWR9OnVm5AAstAQ2Y4tIo3YPALOjeeu1hGL1ev4E=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(39860400002)(376002)(396003)(366004)(451199015)(6512007)(5660300002)(186003)(31686004)(26005)(6666004)(110136005)(2616005)(66476007)(66946007)(66556008)(316002)(6486002)(478600001)(8936002)(7406005)(41300700001)(7416002)(83380400001)(2906002)(4326008)(8676002)(38100700002)(86362001)(31696002)(6636002)(6506007)(53546011)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N1ErRTBBSGpxSE5NU2tudlpjaW9yQW4rOHRYVmlKekNCLzBIeDZJTjNUbHJr?=
- =?utf-8?B?ek9BaXoyckZZNjFITy9XOXRZcGIvUmdxNy9Xb1ZZbmx3dXQwSXdwbU9WS3Z1?=
- =?utf-8?B?NHRaekMwWkRxSUFPWGw2cXNvZGdhQ0Y2YzlKUjZHeVRyK00zdi8zcnRaQ0ZT?=
- =?utf-8?B?QjB3anZvR21VcEdpbHZZdUJFc0p6Z0dLTjRGeW9uaGJiUytTRjZQbXFUU1pp?=
- =?utf-8?B?dkI0Sk5WRS82d2daSk9ZVHZISkpJR1F1WVlxZ01WcVpJU0lSU1NDMVZzZHd1?=
- =?utf-8?B?STNUc0ozOFBFTnlHREVmdGhybm9pRit4ZmdrU1o4ckVFV3NiRDNhdWFBaHdX?=
- =?utf-8?B?L3dTU0ljRzZ0dC9ENExyNEZwWWgzK2lvNHpLNjZNTWJoODZFb0hhTUJ3dGo0?=
- =?utf-8?B?WE52MFZnN1pkeDV6M2JNblk5N3R1S05RWlJ6MDU3TFJmd0hJRytQVkpiZ1Mr?=
- =?utf-8?B?Zi9MZE1QVVdmY0JsdFRqQTlzNkZkK29PaEcxQlZtandhL1RuT0QyTGFUY3BQ?=
- =?utf-8?B?Z29oUzYrQ1dqYSs1TU5kWXI3UmZtSE1ZOWg4dmpjWUtQWlFwaWVxNHZIWnlw?=
- =?utf-8?B?Q2plS2lYU1IwUTlPMUVkTlg5ZmV6OXhTTXNGM0lBOXg2dWtTbHF0Vlk3ZTAv?=
- =?utf-8?B?cnZibTV6SG1uM05pUVNCaFlCeEQySlJpbGNOUkNuRUIyWnliMWVqU3RNOXli?=
- =?utf-8?B?K0ZoclRlM21XcWJ3R0FYY2EzRDQvVE9rd3VXeXBwWWhjVFpEMXFVdXhwckZx?=
- =?utf-8?B?QVBNWTRMaFN2UzI0VmtYaXZkRGRwOHJXcUtTRENKdWx5ZlFiRFFGc1NLR3Vo?=
- =?utf-8?B?SG9mMmZqK091NTlqWHluWE4yNGhxVmEwTHBaSGExbGQ2bUNOL1NpTVZ3QTV5?=
- =?utf-8?B?TndORFplWVNBdTdXK0M2ajEzMFBEa2g2akV5dk9QUFdjeFNOSkN6TWNKUlpl?=
- =?utf-8?B?VXRObmFyNEJtTUtiUVAvMFdKUG95azZiUUViVHVlY2hKVE5BcmlXSVowQmxs?=
- =?utf-8?B?aGZ2bkR1Z1B2ek9DSnNCU1UwVGtSaHVCU1JHZ2pjYW04ci8rUGx6dURlOVZz?=
- =?utf-8?B?TXVNb2JkUTV1UEJnOGh0VUFSM1YwU3UyK3R6T3BLRWxacHFWL2NqTjMxV2Jj?=
- =?utf-8?B?QnlzaWZrUGJRZHM4aU1QK0Z2eDA3UWc0aEFSdmxHQjd4UUxrZjdEdEZZU0VO?=
- =?utf-8?B?Y3crQk83dG9GRjVKQkIwdFZVeGlYb05ISU5pelRjUy9VSUh4MHBHN2dCSHQ1?=
- =?utf-8?B?TndBOGdRREdYd0g1K2EzUEMrZUdSelZlNXVXbHRiNE5oOUhWdVd0TnBwQ216?=
- =?utf-8?B?cW14V0F6MWd5U0RTSEVSK2ZrWWxxQ1I0cTlMdjBqYU93TlRtbHR2NzVyNkRj?=
- =?utf-8?B?M2REcDRIRXlLeGNkbmpnU1VldnhEd3p3dUMraWgxWnlpZ1pQc3Z3R05DY0xw?=
- =?utf-8?B?cHNWNGZlVU5BZnRZdTJTTnZWZHdOS29QdTFpSHpUL01qYlBQUzNYVlc5aExw?=
- =?utf-8?B?ZUxYVEd3MW5UK1NXbjhQbVlrZjFvSEMxcVFmbjZZNHRTVktMQldDZmliRVYw?=
- =?utf-8?B?ZTRCWHR6SWEyWXVZOXcrblFnK2tOaXNoeDRPbEkxQkxlVTZ3dkVJOG9yL3pv?=
- =?utf-8?B?dkNvZWE5L2E1Zy9vMWhtWFIwTkkrb1U0MzFQcnZnZjd5ZDZjb3hYU2k0OFNy?=
- =?utf-8?B?NG44RzZkL1FIS0RiWHNZMzVTa2k2U1VLbUxaMVBUWlVSUjJ5NDc2b0JiL3R2?=
- =?utf-8?B?aGpHRmpFanUza3B2Y0xxZkxBeStkTEtQVW1jVmtOUTR2czNJbjVNcUZmbHJG?=
- =?utf-8?B?RkdtMldqRjcrYkNOK2RSL01QZW9Vamd1WC9oVzREM09HUDJPSHRzQmg4SGIx?=
- =?utf-8?B?dmlBQ2V0RjN2OE82QjAzZEd6UXVjWGJrZ1pvTE4yNmsxR08vV1lHWEp3VHZn?=
- =?utf-8?B?amJnYjRWWURNVzhWNCtxQWpPMXBta2FlUGpUWkNyc0ZqNUFpUWcyVy9lQURk?=
- =?utf-8?B?ZGMwSS9EWVVKbDBnb3NKNlptWElMK1JCaUl5dFEzcXhmcUNKdERNdkhOeUtV?=
- =?utf-8?B?WG1yT1JaTzhXbmRSWmJxOE8vdjRWUGc3TDluRlZ6OGtlb09UVzNuNnVmUzBE?=
- =?utf-8?Q?VMTcBKL+PBIJEtY2ugXW/qkBj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dae056b2-858a-4b7a-4074-08daef6fcd4e
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 22:54:29.3243
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fEBSIKXTn4gyL+L/W2gplR7LClAeJ2jAwYwi9NlFl4TAlb0GASR/W25BumY4YvA/NPC9oB13OiQN93ZDxUegtQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7253
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Jarkko,
-
-On 1/4/2023 6:12 AM, Jarkko Sakkinen wrote:
-> On Wed, Dec 14, 2022 at 01:40:17PM -0600, Michael Roth wrote:
->> +	/*
->> +	 * If boot CPU supports SNP, then first attempt to initialize
->> +	 * the SNP firmware.
->> +	 */
->> +	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
->> +		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
->> +			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
->> +				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
->> +		} else {
->> +			rc = sev_snp_init(&error, true);
->> +			if (rc) {
->> +				/*
->> +				 * Don't abort the probe if SNP INIT failed,
->> +				 * continue to initialize the legacy SEV firmware.
->> +				 */
->> +				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
->> +			}
->> +		}
->> +	}
+On Thu, Jan 05, 2023 at 10:57:48PM +0100, Yann Droneaud wrote:
+> Hi,
 > 
-> I think this is not right as there is a dep between sev init and this,
-> and there is about a dozen of call sites already __sev_platform_init_locked().
+> Le 03/01/2023 à 21:44, Jason A. Donenfeld a écrit :
+> > On Tue, Jan 03, 2023 at 12:15:57PM -0800, Linus Torvalds wrote:
+> >> On Tue, Jan 3, 2023 at 12:03 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >>> That buffering cannot be done safely currently
+> >> .. again, this is "your semantics" (the (b) in my humbug list), not
+> >> necessarily reality for anybody else.
+> > Yea that's fair. Except, of course, I maintain that my semantics are
+> > important ones. :)
 > 
-
-sev_init ?
-
-As this is invoked during CCP module load/initialization, shouldn't this 
-get invoked before any other call sites invoking 
-__sev_platform_init_locked() ?
-
-Thanks,
-Ashish
-
-> Instead there should be __sev_snp_init_locked() that would be called as
-> part of __sev_platform_init_locked() flow.
 > 
-> Also TMR allocation should be moved inside __sev_platform_init_locked,
-> given that it needs to be marked into RMP after SNP init.
+> I concur.
 > 
-> BR, Jarkko
+> To hold secret material, we need MADV_WIPEONFORK | MADV_DONTDUMP and the side effect of mlock() (pages' content never written to swap), inherited across fork().
+> And I want mlock() without paying the price.
 > 
+> Jason's proposed semantics, which I call MADV_WIPEONSWAP, provide a mean to hold /unlimited/ amount secrets in userspace memory (not limited by RLIMIT_MEMLOCK).
+> The only constraint for userspace is to handle the case pages are wiped, which is already the case of userspace arc4random()'s implementation.
+
+If you're actually serious about wanting a generic mechanism for
+userspace, I think the moral of yesterday's poo-poo'ing all over this
+cool new idea is that the Linux innercircle doesn't really care for
+"security things" as a motivator and just takes the shortest and easiest
+route toward swatting it away like a gadfly, assuming that the concerns
+are unreal or niche or paranoid or whatever. This is obviously nothing
+new - it's an old complaint beaten to death for years, with people who
+are diehard it about eventually getting burnt out and leaving. So,
+practically speaking, if you want this to exist, I think you have to
+find some other cool use cases. Like, see if the database cache people
+would actually love this. Or if it could be used as an opportunistic
+renderer cache in Chrome that wouldn't result in OOMing with lots of
+tabs. Or if shared process compiler servers could benefit from it.
+"Droppable cache" is likely useful lots of places. So just find
+SOMETHING that doesn't mean having to convince folks of a new security
+model that justifies tickling mm/ innards in uncomfortable ways.
+
+Jason
