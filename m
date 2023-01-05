@@ -2,53 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F1C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 11:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB919C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 11:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230261AbjAELQq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 06:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53982 "EHLO
+        id S232592AbjAEL2g convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 06:28:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232936AbjAELQe (ORCPT
+        with ESMTP id S232997AbjAEL2H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 06:16:34 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 592DE1D0F0;
-        Thu,  5 Jan 2023 03:16:33 -0800 (PST)
+        Thu, 5 Jan 2023 06:28:07 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEABB4AD;
+        Thu,  5 Jan 2023 03:27:41 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A6E6023335;
-        Thu,  5 Jan 2023 11:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1672917391; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x7n2TLWZUeXlz4UUe5JOJfFdhwFDZQCcQTs4uHbEOxA=;
-        b=UbGQPfMUThQHZkdpxN1mAEKxlhi3GOxxTtP/vcWT2uu2loDTBIl4pTHLBMTt38Sy6jITHG
-        wCVgk955j2VElID8hRO7jx1fvvX/Y9muWIR8DWjItODFHdjRRTC26jKlBH7GMhiSOAZ347
-        qSVu1rRHoMew2tu5CQlk7Cqcoptk6fE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1672917391;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x7n2TLWZUeXlz4UUe5JOJfFdhwFDZQCcQTs4uHbEOxA=;
-        b=s6sLvnGN4C+Nv1uMX0QxXPm5h4Sir0ilHDpMS1ekLIsHnszX2sTCIj6Rr2VuKNU/J9CRmA
-        bJFBs/G+3995wgAQ==
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 70ECB23442;
+        Thu,  5 Jan 2023 11:27:35 +0000 (UTC)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63CD413338;
-        Thu,  5 Jan 2023 11:16:31 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 31CEE13338;
+        Thu,  5 Jan 2023 11:27:35 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id b7QVF4+xtmNJKgAAMHmgww
-        (envelope-from <nstange@suse.de>); Thu, 05 Jan 2023 11:16:31 +0000
+        id Ck/WCie0tmO8LwAAMHmgww
+        (envelope-from <nstange@suse.de>); Thu, 05 Jan 2023 11:27:35 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Vladis Dronov <vdronov@redhat.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -58,96 +41,114 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Stephan Mueller <smueller@chronox.de>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/6] crypto: xts - drop redundant xts key check
-In-Reply-To: <20221229211710.14912-4-vdronov@redhat.com> (Vladis Dronov's
-        message of "Thu, 29 Dec 2022 22:17:07 +0100")
+Subject: Re: [PATCH v3 2/6] crypto: xts - drop xts_check_key()
 References: <20221229211710.14912-1-vdronov@redhat.com>
-        <20221229211710.14912-4-vdronov@redhat.com>
+        <20221229211710.14912-3-vdronov@redhat.com>
+Date:   Thu, 05 Jan 2023 12:27:34 +0100
+In-Reply-To: <20221229211710.14912-3-vdronov@redhat.com> (Vladis Dronov's
+        message of "Thu, 29 Dec 2022 22:17:06 +0100")
+Message-ID: <87bkndb4rd.fsf@suse.de>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Date:   Thu, 05 Jan 2023 12:16:30 +0100
-Message-ID: <87pmbtb59t.fsf@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8BIT
+Authentication-Results: smtp-out2.suse.de;
+        none
+X-Spamd-Result: default: False [-0.10 / 50.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         RCPT_COUNT_SEVEN(0.00)[9];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         MIME_GOOD(-0.10)[text/plain];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_TLS_ALL(0.00)[];
+         MID_RHS_MATCH_FROM(0.00)[]
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi Vladis,
 
-the patch subject prefix is a bit misleading IMO, it kind of suggests
-that this patch would apply to the generic crypto/xts.c. How about using
-a format similar to e.g. the one from commit 7988fb2c03c8 ("crypto:
-s390/aes - convert to skcipher API"), i.e.
-
-  "crypto: s390/aes - drop redundant xts key check"
-
-?
-
 Vladis Dronov <vdronov@redhat.com> writes:
 
-> xts_fallback_setkey() in xts_aes_set_key() will now enforce key size
-> rule in FIPS mode when setting up the fallback algorithm keys,
+> xts_check_key() is obsoleted by xts_verify_key(). Over time XTS crypto
+> drivers adopted the newer xts_verify_key() variant, but xts_check_key()
+> is still used by a number of drivers. Switch drivers to use the newer
+> xts_verify_key() and make a couple of cleanups. This allows us to drop
+> xts_check_key() completely and avoid redundancy.
 
-I think it would be nice to make it more explicit why/how
-xts_fallback_setkey() happens to enforce the key size rules now.
+nice work, thanks a lot for doing it!
 
-Perhaps amend the above sentence by something like
+There are two (obviously correct) cleanups which seem unrelated to
+xts_verify_key(), namely in cvm_setkey() and
+nitrox_aes_ctr_rfc3686_setkey(), see below.
 
-  "xts_fallback_setkey() in xts_aes_set_key() will now implictly enforce
-   the key size rule in FIPS mode by means of invoking the generic xts
-   implementation with its key checks for setting up the fallback
-   algorithm,"
+But the commit message does say "and make a couple of cleanups" and
+these changes certainly qualify as such. I just wanted to have it
+mentioned.
 
-?
-
-> which makes the check in xts_aes_set_key() redundant or
-> unreachable. So just drop this check.
->
-> xts_fallback_setkey() now makes a key size check in xts_verify_key():
->
-> xts_fallback_setkey()
->   crypto_skcipher_setkey() [ skcipher_setkey_unaligned() ]
->     cipher->setkey() { .setkey =3D xts_setkey }
->       xts_setkey()
->         xts_verify_key()
->
-> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
-> ---
->  arch/s390/crypto/aes_s390.c | 4 ----
->  1 file changed, 4 deletions(-)
->
-> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-> index 526c3f40f6a2..c773820e4af9 100644
-> --- a/arch/s390/crypto/aes_s390.c
-> +++ b/arch/s390/crypto/aes_s390.c
-> @@ -398,10 +398,6 @@ static int xts_aes_set_key(struct crypto_skcipher *t=
-fm, const u8 *in_key,
->  	if (err)
->  		return err;
->=20=20
-> -	/* In fips mode only 128 bit or 256 bit keys are valid */
-> -	if (fips_enabled && key_len !=3D 32 && key_len !=3D 64)
-> -		return -EINVAL;
-> -
-
-The change itself looks good, but it might be worth adding a comment
-right at the invocation of xts_fallback_setkey() that this includes an
-implicit xts_verify_key() check? So that if anybody ever was about to
-remove the xts_fallback_setkey() for some reason in the future, it would
-give a clear indication that xts_verify_key() needs to get called
-directly instead?
+Reviewed-by: Nicolai Stange <nstange@suse.de>
 
 Thanks!
 
 Nicolai
 
->  	/* Pick the correct function code based on the key length */
->  	fc =3D (key_len =3D=3D 32) ? CPACF_KM_XTS_128 :
->  	     (key_len =3D=3D 64) ? CPACF_KM_XTS_256 : 0;
 
---=20
-SUSE Software Solutions Germany GmbH, Frankenstra=C3=9Fe 146, 90461 N=C3=BC=
-rnberg, Germany
+>
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> Reviewed-by: Eric Biggers <ebiggers@google.com>
+> ---
+
+<snip>
+
+> diff --git a/drivers/crypto/cavium/cpt/cptvf_algs.c b/drivers/crypto/cavium/cpt/cptvf_algs.c
+> index 9eca0c302186..0b38c2600b86 100644
+> --- a/drivers/crypto/cavium/cpt/cptvf_algs.c
+> +++ b/drivers/crypto/cavium/cpt/cptvf_algs.c
+
+<snip>
+
+> @@ -289,8 +288,7 @@ static int cvm_validate_keylen(struct cvm_enc_ctx *ctx, u32 keylen)
+>  static int cvm_setkey(struct crypto_skcipher *cipher, const u8 *key,
+>  		      u32 keylen, u8 cipher_type)
+>  {
+> -	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
+> -	struct cvm_enc_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct cvm_enc_ctx *ctx = crypto_skcipher_ctx(cipher);
+>  
+>  	ctx->cipher_type = cipher_type;
+>  	if (!cvm_validate_keylen(ctx, keylen)) {
+
+This change here and ...
+
+
+> diff --git a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+> index 248b4fff1c72..138261dcd032 100644
+> --- a/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+> +++ b/drivers/crypto/cavium/nitrox/nitrox_skcipher.c
+
+<snip>
+
+> @@ -362,8 +361,7 @@ static int nitrox_aes_xts_setkey(struct crypto_skcipher *cipher,
+>  static int nitrox_aes_ctr_rfc3686_setkey(struct crypto_skcipher *cipher,
+>  					 const u8 *key, unsigned int keylen)
+>  {
+> -	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
+> -	struct nitrox_crypto_ctx *nctx = crypto_tfm_ctx(tfm);
+> +	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(cipher);
+>  	struct flexi_crypto_context *fctx;
+>  	int aes_keylen;
+>
+
+this one are not strictly related to xts_verify_key() AFAICS, but it's
+fine to have them included nonetheless, IMO.
+
+
+-- 
+SUSE Software Solutions Germany GmbH, Frankenstraße 146, 90461 Nürnberg, Germany
 GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-(HRB 36809, AG N=C3=BCrnberg)
+(HRB 36809, AG Nürnberg)
