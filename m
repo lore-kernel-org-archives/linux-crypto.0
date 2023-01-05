@@ -2,144 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41427C54EBE
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Jan 2023 22:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC16C46467
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 01:49:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240609AbjADWis (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Jan 2023 17:38:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52418 "EHLO
+        id S229796AbjAEBtV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 Jan 2023 20:49:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235536AbjADWiq (ORCPT
+        with ESMTP id S229746AbjAEBtS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Jan 2023 17:38:46 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3FC1EC79;
-        Wed,  4 Jan 2023 14:38:45 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 304ME1CI018620;
-        Wed, 4 Jan 2023 22:38:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=dnzle0EcHMmwGRtnVfx0mWs2UVkVr780qRGnF49Zxbw=;
- b=PqUzd7tArfL9HGT34lPsW6zlrVMMIK535/wJOQoVQZ0gW1WTH0F34zg8wHIkJ0T+78zI
- 9SyDP/o+2ZSjXkXAwWoQm4LWk8v8NBwrycMasue3XpHOqx9HtkSfcE9Qv2iEj09hOeK5
- ZIG+dkVdQSWcxT0MMKKcPZ/lD4VaGFMdEskERUchWy1oyuzogVTUrXMvvyKx+0sLfvK5
- Lyozi++13HBffdqTXnsN4UG1Az1KEBfTh+bBtkC1a+5gwyTw/TK8Stih7oG/fuFEq5r/
- LZZsu2j9NXhehyg7bXZRWmK7dT2D7I3TZuQwtkvszafXOvb6uyHsp8HXBpLCWIz4ENGV Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwj2hgkfd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 22:38:16 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 304MZFBa004552;
-        Wed, 4 Jan 2023 22:38:15 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwj2hgker-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 22:38:15 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 304MW0JQ019440;
-        Wed, 4 Jan 2023 22:38:15 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([9.208.130.100])
-        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3mtcq7tgas-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 22:38:15 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 304McERA2622200
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Jan 2023 22:38:14 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5B3A58066;
-        Wed,  4 Jan 2023 22:38:13 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B763A58062;
-        Wed,  4 Jan 2023 22:38:11 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.160.185.16])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Jan 2023 22:38:11 +0000 (GMT)
-Message-ID: <1738bcddc690825f634bfe41ca1df778a1a50b0a.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 03/10] KEYS: X.509: Parse Basic Constraints for CA
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "pvorel@suse.cz" <pvorel@suse.cz>,
-        "noodles@fb.com" <noodles@fb.com>, "tiwai@suse.de" <tiwai@suse.de>,
-        Kanth Ghatraju <kanth.ghatraju@oracle.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>,
-        Elaine Palmer <erpalmer@linux.vnet.ibm.com>,
-        Coiby Xu <coxu@redhat.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Date:   Wed, 04 Jan 2023 17:38:07 -0500
-In-Reply-To: <5F14DD59-7139-427E-A263-D5DED6EB57F8@oracle.com>
-References: <20221214003401.4086781-1-eric.snowberg@oracle.com>
-         <20221214003401.4086781-4-eric.snowberg@oracle.com>
-         <b0f29738b919e2705d770017f2f1eb0542c2fad4.camel@linux.ibm.com>
-         <Y7VxDloaHyF8cX5j@kernel.org>
-         <5F14DD59-7139-427E-A263-D5DED6EB57F8@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qxLcN76R_0JpWidhJf1J_gZEXtL92O2g
-X-Proofpoint-GUID: shNbEMAaO2O3rlpd5WibO3G1L5cR6plP
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Wed, 4 Jan 2023 20:49:18 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7BC3F11E
+        for <linux-crypto@vger.kernel.org>; Wed,  4 Jan 2023 17:49:15 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so571249pjj.4
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Jan 2023 17:49:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sl4NZ25YSkL6ZQKbML8DmcTVFW9Y9x/5TYNGiByW+gg=;
+        b=YCfhkeRJ+T4ufGGNn5eQ0Ulghck4MzNbRoXe8djTLklyQNcIpOI1pgxQBWlkz9Dv1/
+         MrwBgG0sWHYlkQd0CoOraa71YigemicovsOwfuXKeZ6DhKoHn2/xedADoY2MJHLIi565
+         cTOfpVBj1VFCKV5V4ORQR2v8hJonLKhgEoRQmQidopwE/+7ufamQx6MTgv75lqAiM9yb
+         bbNXvO66NYhIr613KAfOR1GNgMJEnFtm8rrPL6SxAfFelasFbs3zslQ56NIFsGyfIoEG
+         gfl6YSbLLeLtrTZ4VrpZuOZWopScD9RcjxPAuDx3WaOCYyOUKbUZuLJc3t15YxfhNLlc
+         J7cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sl4NZ25YSkL6ZQKbML8DmcTVFW9Y9x/5TYNGiByW+gg=;
+        b=rnm6IgQVtaTMEqzljJ5hB4A/Yp8zc/8HhgLzLoDHSt1M/Mu4/NEmEsjMatnaGt4ZWZ
+         6rZZcKvZq9Ph1mnMUAXyrWPTkpHcFazOJSdJo8A0adNnmNiOhznQjyg9y1PzNJilgJ26
+         topKgOgTj2oH/XfeKwDtMlW8BvNC4K1nC2e22fBlwhFhVbyeuorqkqYyzAJpehWv8FzZ
+         jwhibO629kbaXo/AGn111DWmZT1XeEjUq3uMzGrmforKkN7yn8OswDBY55loZ2Qkeo2s
+         kquuC9mDgkKgiHHHlZ/cVO3XcPzKbHobYVyGGoukIVZFJth3vReL3DW78p5k9xiQgt8J
+         H9+w==
+X-Gm-Message-State: AFqh2kp6x5AIDNfZNsHdaV3V4Sik+KAM3wh5HMzM7Dtpz/CgSCKdb8Ac
+        0uh7v6SIRWAorRvRQpbR3ZJEbQ==
+X-Google-Smtp-Source: AMrXdXtLKjQwQsvoTb0MBo/2z5VbvmjnYaZ8a0jUdieJsoUc1pfXly+aIRtNUppsduXK5v+zF06Xwg==
+X-Received: by 2002:a17:902:f7d1:b0:192:8a1e:9bc7 with SMTP id h17-20020a170902f7d100b001928a1e9bc7mr67538plw.0.1672883354580;
+        Wed, 04 Jan 2023 17:49:14 -0800 (PST)
+Received: from [2620:15c:29:203:fc97:724c:15bb:25c7] ([2620:15c:29:203:fc97:724c:15bb:25c7])
+        by smtp.gmail.com with ESMTPSA id h11-20020a170902680b00b00192849d1209sm5397969plk.96.2023.01.04.17.49.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 17:49:13 -0800 (PST)
+Date:   Wed, 4 Jan 2023 17:49:13 -0800 (PST)
+From:   David Rientjes <rientjes@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Peter Gonda <pgonda@google.com>,
+        Andy Nguyen <theflow@google.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, John Allen <john.allen@amd.com>
+Subject: Re: [patch] crypto: ccp - Avoid page allocation failure warning for
+ SEV_GET_ID2
+In-Reply-To: <260364a5-f467-f83b-b180-583576ce70ee@amd.com>
+Message-ID: <271fc4e5-c4cb-a086-fb7f-8b9389570af4@google.com>
+References: <20221214202046.719598-1-pgonda@google.com> <Y5rxd6ZVBqFCBOUT@gondor.apana.org.au> <762d33dc-b5fd-d1ef-848c-7de3a6695557@google.com> <Y6wDJd3hfztLoCp1@gondor.apana.org.au> <826b3dda-5b48-2d42-96b8-c49ccebfdfed@google.com>
+ <833b4dd0-7f85-b336-0786-965f3f573f74@google.com> <1000d0c8-bd8c-8958-d54f-7e1924fd433d@amd.com> <06de8454-2b29-f3b6-7cf2-c037c2735b6d@google.com> <260364a5-f467-f83b-b180-583576ce70ee@amd.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-04_07,2023-01-04_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 clxscore=1015 malwarescore=0 phishscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301040183
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2023-01-04 at 20:14 +0000, Eric Snowberg wrote:
-> 
-> > On Jan 4, 2023, at 5:29 AM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+On Wed, 4 Jan 2023, Tom Lendacky wrote:
+
+> > > > For SEV_GET_ID2, the user provided length does not have a specified
+> > > > limitation because the length of the ID may change in the future.  The
+> > > > kernel memory allocation, however, is implicitly limited to 4MB on x86
+> > > > by
+> > > > the page allocator, otherwise the kzalloc() will fail.
+> > > > 
+> > > > When this happens, it is best not to spam the kernel log with the
+> > > > warning.
+> > > > Simply fail the allocation and return ENOMEM to the user.
+> > > > 
+> > > > Fixes: d6112ea0cb34 ("crypto: ccp - introduce SEV_GET_ID2 command")
+> > > > Reported-by: Andy Nguyen <theflow@google.com>
+> > > > Reported-by: Peter Gonda <pgonda@google.com>
+> > > > Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > > > Signed-off-by: David Rientjes <rientjes@google.com>
+> > > > ---
+> > > >    drivers/crypto/ccp/sev-dev.c | 9 ++++++++-
+> > > >    1 file changed, 8 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > > > --- a/drivers/crypto/ccp/sev-dev.c
+> > > > +++ b/drivers/crypto/ccp/sev-dev.c
+> > > > @@ -881,7 +881,14 @@ static int sev_ioctl_do_get_id2(struct
+> > > > sev_issue_cmd
+> > > > *argp)
+> > > >    	input_address = (void __user *)input.address;
+> > > >      	if (input.address && input.length) {
+> > > > -		id_blob = kzalloc(input.length, GFP_KERNEL);
+> > > > +		/*
+> > > > +		 * The length of the ID shouldn't be assumed by software since
+> > > > +		 * it may change in the future.  The allocation size is
+> > > > limited
+> > > > +		 * to 1 << (PAGE_SHIFT + MAX_ORDER - 1) by the page allocator.
+> > > > +		 * If the allocation fails, simply return ENOMEM rather than
+> > > > +		 * warning in the kernel log.
+> > > > +		 */
+> > > > +		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
+> > > 
+> > > We could do this or we could have the driver invoke the API with a zero
+> > > length
+> > > to get the minimum buffer size needed for the call. The driver could then
+> > > perform some validation checks comparing the supplied input.length to the
+> > > returned length. If the driver can proceed, then if input.length is
+> > > exactly 2x
+> > > the minimum length, then kzalloc the 2 * minimum length, otherwise kzalloc
+> > > the
+> > > minimum length. This is a bit more complicated, though, compared to this
+> > > fix.
+> > > 
 > > 
-> > On Thu, Dec 15, 2022 at 06:10:04AM -0500, Mimi Zohar wrote:
-> >>> diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-> >>> index a299c9c56f40..7c5c0ad1c22e 100644
-> >>> --- a/crypto/asymmetric_keys/x509_parser.h
-> >>> +++ b/crypto/asymmetric_keys/x509_parser.h
-> >>> @@ -38,6 +38,7 @@ struct x509_certificate {
-> >>> 	bool		self_signed;		/* T if self-signed (check unsupported_sig too) */
-> >>> 	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
-> >>> 	bool		blacklisted;
-> >>> +	bool		root_ca;		/* T if basic constraints CA is set */
-> >>> }; 
-> >> 
-> >> The variable "root_ca" should probably be renamed to just "ca", right?
+> > Thanks Tom.  IIUC, this could be useful to identify situations where
+> > input.length != min_length and input.length != min_length*2 and, in those
+> > cases, return EINVAL?  Or are there situations where this is actually a
+> > valid input.length?
 > > 
-> > Perhaps is_ca?
+> > I was assuming that the user was always doing its own SEV_GET_ID2 first to
+> > determine the length and then use it for input.length, but perhaps that's
+> > not the case and they are passing a bogus value.
 > 
-> I am open to renaming this, but need an agreement on whether the “is_” should be used or not:
+> Except that if the user was always doing that, then we wouldn't be worried
+> about this case then. But, I think my method is overkill and the simple
+> approach of this patch is the way to go.
 > 
-> https://lore.kernel.org/lkml/b28ea211d88e968a5487b20477236e9b507755f4.camel@linux.ibm.com/
 
-Examples of both functions and variables exist that are prefixed with
-"is_".   One is a question; the other a statement.   Naming the
-variable "is_ca" and using it like "if (cert->is_ca)" does make sense.
-
--- 
-thanks,
-
-Mimi
-
+Makes sense, thanks for the clarification.  Does that translate into an 
+acked-by? :)
