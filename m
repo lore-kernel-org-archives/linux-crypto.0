@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28589C46467
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 02:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40509C53210
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 02:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbjAEC6h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Jan 2023 21:58:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51082 "EHLO
+        id S229886AbjAEC7K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 Jan 2023 21:59:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbjAEC6a (ORCPT
+        with ESMTP id S229912AbjAEC7I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Jan 2023 21:58:30 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394029FFF;
-        Wed,  4 Jan 2023 18:58:30 -0800 (PST)
+        Wed, 4 Jan 2023 21:59:08 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A050479D8;
+        Wed,  4 Jan 2023 18:58:53 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nduR79k77Wpos/VAAYHoAvJ/+qLSQTuyGYledcPxkH2QyKTmkgQZVoALnh8O0BlG5+xTrKBQkWuJ25CIP0VPsxsRtnyqjKB/6y7xRTlpwvj9EZfiQnET9wTudrIIDCl3C8pv/P6kIkRZnJ+wdna6+sw2OH7dvhtS0GnOs3egTZcdbIo3hUu0aVHqSrHuen5byJpaHYb/7f7ygNbGkeOk6WoQ64lH9+cTsHrP2QfgH358uL6BqgYMvBGKSKwXZyZZtIIkOLs+M0mrP82alVfylwumMetF7EwOvYQ+LjD+RwTTN+sH7ghE4PiiIGrawoovNrgV/PXyOVJr04COzxG7eQ==
+ b=eqXHJCvYK0IWgEGW4Io9DESnUMtQcZAG65qZsplRBeZLZhCvMGcgrBkaDP4nI5vD17rI3yKRfq/XJyZi+O9ruhkqpRHEsp6PJNv8Tbq1UP+XhDEFIEog3NxfZMUFSWAlcnWwtwOZWiLeEg9t5IPTd3C5h8HLEEHnVvW3sdy4ByrcYvfxOJIkl4XDIF2EMaKjJgCS+CkrTJ76DMbABgMw4/ZZS7TJBO/+M4IxiNWZDbH1zPhGmrMGU6AYsZ9YwmPAm2lLnqX4eUIiUxuBepa5G8ISfFolHbm+IcA6yxBh8qCXBTjkfzzYBzdZm25CpKyyORSWWa/3n38iw8B/YpCYDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ugtSNyt+nUXlVfWzk5XZaVZAFZPpNa20m9RhqH2gMgE=;
- b=KVHpWV5jCb+NAWb/b723PycERWMb7PWYSkGOI1WCu9cuFVLsIQWgqmhIAXBK5RwoKiKlrORpFMBkjIkOG262eXFmXD+l5W1t4v07V/8okQ+Dx5xblCq10gZKvAY2EsS0n0KE/b9MC4z7ZqJcuBmL/ILm/9BtW+MrD2s/VRxM4TgKxj44tkgdGW8YkgUfSk7qUjEkLSrSKKvnB178mNi27l77llASP1yd/nkqmRImAfJmHS7Ak5cvqOD2onsCIpRKrKntsEnjZOamwN+pJ2NdatP4JEffjNIJSVOAquL8kdbzhmwYUFzlikt6ipIG8UM8O8XPTSPRRoexS+EGcuahOA==
+ bh=vzQWUHh4OMpPiGUZLEMyNhc3Ivspnwyi2XUfByRKCtI=;
+ b=LrM1cgu5i8d6iIoZc7r21hrS+3rn6MQWuH/WFjJLRR5fyhgCulxyW7rmt/r7CXFhh6zAtSoAYLEpHbd3sU5OonSsZgqvOwRVUwXiEqpAQqRMM1eJhYOPgPp+NZI7nw1M0/Vt21EYIJiIGC6wpHElOr9WCGSZR0j6p7HQfA0GM96OPNOvkUxPzTc/gXrWRkvoZ7BOVS5RXHBb50PaL+qgw1ldAJWxhfO9a47m/edNGGN51SE6A5+fefdiyD/NLlXS3abU6y6UBnzKfePpkskS96WIxv0h8tkRLeqqrZ5RuUU4bwFbZU8uJ04CGvwA3i4AssHtN1u13+ja+GmCahQkEA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ugtSNyt+nUXlVfWzk5XZaVZAFZPpNa20m9RhqH2gMgE=;
- b=lhD6g99oAuFo2hrNsUo4rB6taBUD6LgFEfH+tmWxbAaksdBy5YkwCiR/m8BP9lHIlpTgN+WBwHCFCruMscuJV1QnVTCOA4J32R+XHaLNFZQH0ZQsPT5NHQWLSrZ93U/BhpnNEHAXBdyH8EVCrxQl2YqASxRDVn03RbkdfjBDUHU=
-Received: from DM6PR21CA0008.namprd21.prod.outlook.com (2603:10b6:5:174::18)
- by DM4PR12MB5748.namprd12.prod.outlook.com (2603:10b6:8:5f::19) with
+ bh=vzQWUHh4OMpPiGUZLEMyNhc3Ivspnwyi2XUfByRKCtI=;
+ b=btsPE/tLHBymOZExD+HruuWk8ItQ7lyTI8/hkosmnoKTO3V+B5YjtR6lgxdGJFTVyP277g96I824ISJ56n8+2mviw2wNayukj/ax7p2XNqtZuZMW1192S6OOKXVWMjTfhhIMhytspzec9vr5/UO9pmN+P3GIS0i+m8igTRzyBJ8=
+Received: from DS7PR03CA0283.namprd03.prod.outlook.com (2603:10b6:5:3ad::18)
+ by PH7PR12MB6659.namprd12.prod.outlook.com (2603:10b6:510:210::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
- 2023 02:58:27 +0000
-Received: from DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:174:cafe::4a) by DM6PR21CA0008.outlook.office365.com
- (2603:10b6:5:174::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.6 via Frontend
- Transport; Thu, 5 Jan 2023 02:58:27 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Thu, 5 Jan
+ 2023 02:58:50 +0000
+Received: from DM6NAM11FT047.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3ad:cafe::55) by DS7PR03CA0283.outlook.office365.com
+ (2603:10b6:5:3ad::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.14 via Frontend
+ Transport; Thu, 5 Jan 2023 02:58:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,16 +47,16 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT054.mail.protection.outlook.com (10.13.173.95) with Microsoft SMTP
+ DM6NAM11FT047.mail.protection.outlook.com (10.13.172.139) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5966.17 via Frontend Transport; Thu, 5 Jan 2023 02:58:27 +0000
+ 15.20.5944.10 via Frontend Transport; Thu, 5 Jan 2023 02:58:48 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 4 Jan
- 2023 20:58:26 -0600
-Date:   Wed, 4 Jan 2023 11:56:32 -0600
+ 2023 20:58:47 -0600
+Date:   Wed, 4 Jan 2023 20:14:19 -0600
 From:   Michael Roth <michael.roth@amd.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
+To:     Borislav Petkov <bp@alien8.de>
 CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
         <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
         <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -67,138 +67,182 @@ CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
         <dave.hansen@linux.intel.com>, <slp@redhat.com>,
         <pgonda@google.com>, <peterz@infradead.org>,
         <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+        <kirill@shutemov.name>, <ak@linux.intel.com>,
         <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <harald@profian.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
         <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH RFC v7 02/64] KVM: x86: Add
- KVM_CAP_UNMAPPED_PRIVATE_MEMORY
-Message-ID: <20230104175632.mqmg4xybbe7vzies@amd.com>
+Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
+ to KVM
+Message-ID: <20230105021419.rs23nfq44rv64tsd@amd.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-3-michael.roth@amd.com>
- <Y7VrIDfNmhG+BVQ9@kernel.org>
+ <20221214194056.161492-4-michael.roth@amd.com>
+ <Y6Xd0ruz3kMij/5F@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Y7VrIDfNmhG+BVQ9@kernel.org>
+In-Reply-To: <Y6Xd0ruz3kMij/5F@zn.tnic>
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT054:EE_|DM4PR12MB5748:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34744ed2-4ee2-42f1-fdbc-08daeec8b7d6
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT047:EE_|PH7PR12MB6659:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e2bb015-12a1-4e11-80f6-08daeec8c4a1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uP94FJYLNcJRqz5NBffyRbBr9rBJ8sP1dEd4YohRg2C6ZG4h+PitSkFgpA4BvkIc2W9E1KK+qwuvcRNfZ7P5zi4hnwT5Acw8Sw3cYKsL5cGzNwDMBUS60z6OEZmUB3dmcgXtdUCQ7kg3wZrtRqjiszD3JyQC9fRoS/rGZH+J/iWoQp0JwV8acMmMYjpj6SvaUQNErr6/kItjyurXYzt1GmCFrw3jWqU7Gk5470AQTJ/Q8mOC7rz1S/o2jTeS7JztPFQ4KfO5U63JLyBLyszhK7EB2+q02AOVr2tq1mNbK8cqDeuZfpZ1ezbCph8wH30gw+Ylg8GCzUzEyFugvD4glZEafPWJ7N1IHWXzjzBLLqRRA8pG8RoJEdJYi5vijLOh17aeWcmtwnORDWpq2EadtvN8/M/rB9ZCHL+G0xW8Mo5dM9jEh+jNbRMFsc9vLFU8GDgPIavUYg2Vz0yOyIWZYIHCK6/RJR7AzeMpGBUPfgLEBxk9n+harhn29i4tLQpkrwSX1MbGOJFEMlVp0NxjLz3Y65eYXhaySwJtW5QTZcu7v5Obj+MH8rDioJUuQOp/1gLgbqSZAZyV8g/EO71Wc8yEdlZ/bUhdWZkeIX3nCoaNozcfBs3ZObX93fisrA+zE1VUlKHcGUtMQi6EQOzol8lKSvE7h+tdSWja0bFKJh3KuCJXbCfRPy5RVSqNpDHFogDJOfAO2m+BRw9aD5gjgUQMvqm1ftXCO4++NDTm6Q8=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(346002)(396003)(376002)(451199015)(46966006)(36840700001)(40470700004)(426003)(47076005)(16526019)(26005)(82310400005)(1076003)(2616005)(83380400001)(336012)(186003)(6666004)(40480700001)(40460700003)(36860700001)(86362001)(36756003)(356005)(82740400003)(81166007)(4326008)(8676002)(8936002)(41300700001)(66899015)(2906002)(5660300002)(7406005)(7416002)(44832011)(478600001)(70586007)(316002)(70206006)(6916009)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: K0q9mepyHcg3Sa9ZpgDZAicgPI799VHeqjwWIzlqSdOpdCttPhcUQcHavoOMH+cqhNtGm8MZmNHRyBP8YMdBfe3JcQYsI9V/f5uc9Lwi3p8OrV6eo6ce+qROIJjhS+rRZOf7Lw8l+CnlCwlCpPa3jK5mDSjChQCSEQc1lV4erW8EaM3eK5ehvTj2E+MpDfHmj83WAPQ3XPJXWYE7lZ1qZslXwwOYRCXI5ymT5cxMaXX3u0Dxph0O7tNyBO2yPHL1DO55rLMachlpCSbhWLnBbS2MbbQWT4bBQoViahH+WSOMCVYd8rcsJAF2mgmSE8upRZT8MnreRmKuG2p4uyhdR/V0liwtu9YvbsjfBcTRTQJd/QVMtetCnz5TfdfO94Jf8By77W+B8Eks1hBfRwAl/oYm4lTwhI5D7x5x0GNMI538hZ9MfShjHbVQrBISBRG3VHhdkX0ovcv75Ge4z9ZgVduWIdRejRxTFDxggWsRtOaHv7z70acNgLJDHOYm+xh2lNG2z2HGEPHxN0y5fwXalb2i12/6CRtI4izggpk8vkvbT4YTul5jw1fgHBkh+5+ILPdGemwIJbeAnDAwF1Qzhugjb6cZVE+fLzQfAz+IZiH3ccQoywi9IdnmS1KZQXYthWN8mr9WtvNgGC7SiFLGsYb45s/0zUgLBl3B/dCz+VXbW0WDhQZ3QphQig/EP2tf49G1zOaJx05/cUB8dpW18dQRzTxOXzWS+TUvHMUhlklB6+SexDFnBu98EaDNGbZGRTZ+70JT1ru8+ftFcBBiMg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(346002)(39860400002)(376002)(451199015)(40470700004)(46966006)(36840700001)(40480700001)(41300700001)(316002)(82740400003)(8936002)(70206006)(70586007)(356005)(5660300002)(7406005)(4326008)(86362001)(81166007)(6916009)(54906003)(7416002)(44832011)(8676002)(2906002)(2616005)(26005)(40460700003)(47076005)(16526019)(1076003)(336012)(45080400002)(426003)(36756003)(186003)(36860700001)(966005)(82310400005)(478600001)(6666004)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 02:58:27.0755
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 02:58:48.5353
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34744ed2-4ee2-42f1-fdbc-08daeec8b7d6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e2bb015-12a1-4e11-80f6-08daeec8c4a1
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT047.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5748
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6659
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 12:03:44PM +0000, Jarkko Sakkinen wrote:
-> On Wed, Dec 14, 2022 at 01:39:54PM -0600, Michael Roth wrote:
-> > This mainly indicates to KVM that it should expect all private guest
-> > memory to be backed by private memslots. Ideally this would work
-> > similarly for others archs, give or take a few additional flags, but
-> > for now it's a simple boolean indicator for x86.
-> > 
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  3 +++
-> >  arch/x86/kvm/x86.c              | 10 ++++++++++
-> >  include/uapi/linux/kvm.h        |  1 +
-> >  3 files changed, 14 insertions(+)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 27ef31133352..2b6244525107 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1438,6 +1438,9 @@ struct kvm_arch {
-> >  	 */
-> >  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
-> >  	struct kvm_mmu_memory_cache split_desc_cache;
-> > +
-> > +	/* Use/enforce unmapped private memory. */
-> > +	bool upm_mode;
-> >  };
-> >  
-> >  struct kvm_vm_stat {
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index c67e22f3e2ee..99ecf99bc4d2 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4421,6 +4421,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_EXIT_HYPERCALL:
-> >  		r = KVM_EXIT_HYPERCALL_VALID_MASK;
-> >  		break;
-> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
-> > +	case KVM_CAP_UNMAPPED_PRIVATE_MEM:
-> > +		r = 1;
-> > +		break;
-> > +#endif
-> >  	case KVM_CAP_SET_GUEST_DEBUG2:
-> >  		return KVM_GUESTDBG_VALID_MASK;
-> >  #ifdef CONFIG_KVM_XEN
-> > @@ -6382,6 +6387,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >  		}
-> >  		mutex_unlock(&kvm->lock);
-> >  		break;
-> > +	case KVM_CAP_UNMAPPED_PRIVATE_MEM:
-> > +		kvm->arch.upm_mode = true;
-> > +		r = 0;
-> > +		break;
-> >  	default:
-> >  		r = -EINVAL;
-> >  		break;
-> > @@ -12128,6 +12137,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >  	kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
-> >  	kvm->arch.guest_can_read_msr_platform_info = true;
-> >  	kvm->arch.enable_pmu = enable_pmu;
-> > +	kvm->arch.upm_mode = false;
-> >  
-> >  #if IS_ENABLED(CONFIG_HYPERV)
-> >  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index c7e9d375a902..cc9424ccf9b2 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1219,6 +1219,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-> >  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
-> >  #define KVM_CAP_MEMORY_ATTRIBUTES 225
-> > +#define KVM_CAP_UNMAPPED_PRIVATE_MEM 240
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > -- 
-> > 2.25.1
-> > 
+On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
+> On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
+> > +       bool (*private_mem_enabled)(struct kvm *kvm);
 > 
-> Why we want to carry non-UPM support still?
+> This looks like a function returning boolean to me. IOW, you can
+> simplify this to:
 
-For SNP, non-UPM support is no longer included in this patchset.
+The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
+impression it needed to return an integer value, since by default if a
+platform doesn't implement the op it would "return 0", and so could
+still be called unconditionally.
 
-However, this patchset also adds support for UPM-based SEV (for lazy-pinning
-support). So we still need a way to let userspace switch between those 2
-modes.
+Maybe that's not actually enforced, by it seems awkward to try to use a
+bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
+
+However, we could just use KVM_X86_OP() to declare it so we can cleanly
+use a function that returns bool, and then we just need to do:
+
+  bool kvm_arch_has_private_mem(struct kvm *kvm)
+  {
+          if (kvm_x86_ops.private_mem_enabled)
+                  return static_call(kvm_x86_private_mem_enabled)(kvm);
+  }
+    
+instead of relying on default return value. So I'll take that approach
+and adopt your other suggested changes.
+
+...
+
+On a separate topic though, at a high level, this hook is basically a way
+for platform-specific code to tell generic KVM code that private memslots
+are supported by overriding the kvm_arch_has_private_mem() weak
+reference. In this case the AMD platform is using using kvm->arch.upm_mode
+flag to convey that, which is in turn set by the
+KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
+
+But if, as I suggested in response to your PATCH 2 comments, we drop
+KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
+KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
+code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
+in-part relies on kvm_arch_has_private_mem() to determine what flags are
+supported, whereas SEV/SNP code would be using what was set by
+KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
+kvm_arch_has_private_mem().
+
+So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
+on something else. Maybe the logic can just be:
+
+  bool svm_private_mem_enabled(struct kvm *kvm)
+  {
+    return sev_enabled(kvm) || sev_snp_enabled(kvm)
+  }
+
+(at least in the context of this patchset where UPM support is added for
+both SEV and SNP).
+
+So I'll plan to make that change as well.
 
 -Mike
 
 > 
-> BR, Jarkko
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 82ba4a564e58..4449aeff0dff 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
+>  KVM_X86_OP(complete_emulated_msr)
+>  KVM_X86_OP(vcpu_deliver_sipi_vector)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
+>  
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_OPTIONAL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 1da0474edb2d..1b4b89ddeb55 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
+>  
+>  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+>  			     int root_level);
+> +	bool (*private_mem_enabled)(struct kvm *kvm);
+>  
+>  	bool (*has_wbinvd_exit)(void);
+>  
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index ce362e88a567..73b780fa4653 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> +static bool svm_private_mem_enabled(struct kvm *kvm)
+> +{
+> +	if (sev_guest(kvm))
+> +		return kvm->arch.upm_mode;
+> +
+> +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.name = "kvm_amd",
+>  
+> @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  
+>  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+>  
+> +	.private_mem_enabled = svm_private_mem_enabled,
+> +
+>  	.has_wbinvd_exit = svm_has_wbinvd_exit,
+>  
+>  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 823646d601db..9a1ca59d36a4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+>  }
+>  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
+>  
+> +bool kvm_arch_has_private_mem(struct kvm *kvm)
+> +{
+> +	return static_call(kvm_x86_private_mem_enabled)(kvm);
+> +}
+> +
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+>  {
+>  	kvm_mmu_pre_destroy_vm(kvm);
 > 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
