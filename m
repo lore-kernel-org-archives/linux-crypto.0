@@ -2,163 +2,204 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC18C4708E
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 17:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52F1C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 18:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235164AbjAERrn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 12:47:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56892 "EHLO
+        id S234704AbjAESSF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 13:18:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235231AbjAERrm (ORCPT
+        with ESMTP id S229842AbjAESSD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 12:47:42 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC96450154;
-        Thu,  5 Jan 2023 09:47:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 891F3B81B82;
-        Thu,  5 Jan 2023 17:47:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155DAC433EF;
-        Thu,  5 Jan 2023 17:47:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672940858;
-        bh=0ek3u6JPtigZWyhKVlnAoa2roxxs/vxahhwlpDqMoac=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=Sb58kJM4WtCHudLHRRrKMTgW7/1ff6HTBiefJxhznptyAMJqOKk6Bp3gYv6FMVzty
-         ptmSrwBKfMLRV86YpCoPQPvy1zMWejFuIXLxdbPZL+IPu9weY5ckN9iEKbgg4tcmnj
-         gnfALMV/mAMrsoaxj/hPcwzy11N1AUMn3t2lN4kVW0h5py1VR93PDsHdeVRBcyJDxb
-         4z6kdGYoO3JLpaRy7fCFrorUTX9/O4MAOAeK9dfONNFhJB4vWhvzU6X3AeIx26vsNs
-         yB7kb7JZzDwOztkvRMCN1X9Adk1U6jKG2Q9d9kOFUrh/BcFkqL0vGZN6busY4CGW/E
-         GjcrJ9XMrvAgA==
-Date:   Thu, 5 Jan 2023 11:47:36 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Koba Ko <koba.ko@canonical.com>
-Cc:     vsd@suremail.info, Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        regressions@lists.linux.dev
-Subject: Re: [Bug 216888] New: "sysfs: cannot create duplicate filename
- /dma/dma0chan0" with 68dbe80f ("crypto: ccp - Release dma channels before
- dmaengine unrgister")
-Message-ID: <20230105174736.GA1154719@bhelgaas>
+        Thu, 5 Jan 2023 13:18:03 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E75A4FCCD;
+        Thu,  5 Jan 2023 10:18:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IQYoh3LeYO3eptDdQ9tdK+S+herCCWUZRNsYAzUTehvKEYXaIAdkaYEG7tuze3ff4PH6nZ04y4GJDsP/x/eNpb6UKHY9+8Kl1570WvCRn1ynBK6umbfTnSD0FsOrYo4lhbwAwLeR1hZDLY2ghjo0sRs+NvHd7rqizpuNGGvlRPUnDMAM7SwuKwq6HzVjpGjEhHTjYG1xI2MivAN1upcvxAKIKa3pPRCzP4KElovBO9aSlnEOxUb/EjKcZpnmuXuWu5CWGUMxOJVOW3/UYpgp7HUAGQRlUV99Pcvn+Me82oYEOE3TP8yxUAmxJJqY7NmOqKQFsQj0PPFYxHiGHYT/wQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kKqnDT1gHrMhoV5q6lrtBAHL38nro7QLWKMTdZ9hoYQ=;
+ b=PXNmlp8Ww2YUQapwqqabWQ3IQu98OifosvTlI9dEf/tPEU+Y+X9QsVziHzTSymBUGPBpkLJMO4y9gTi5T6REGy8o3tn2WaJayXF6tA7amayerWeB98MUPyVLzV2wVxdh662BY55Um5Bh2xITQDgmM7S76vHdRGjPWhN7Blh8dhqhfjvbhA3/U2Ad5tdze72XWn9kChc2neM8/jIFmKVp3seI3OAUO8UZcdISNZbsONUeQBDOi0AYQi2r6CesPOlfvkCIASY/Ctpq2/K+pRB2wPUMzL8QxbgzrJxKmqiYHcnrQbOlL2nA3TDJrY39h6CRlhcbSq/YxXAL7zGe5SvYZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kKqnDT1gHrMhoV5q6lrtBAHL38nro7QLWKMTdZ9hoYQ=;
+ b=DRDmo1+IpdwyE3KsU5dEZIbvvcrbWR/5HgsY02qodx8vYng6y/HlEXC+KnBeiVoYvlTTQzTUJHxPFlTHxvvDbfcq3GimV1Fu2mFyuUw/aXf4QPUvhT2AomSLRAp5R+r1mpE6G0UAaQ176lBi2tmN0vKqwkgxbM0IakLphvFaV7s=
+Received: from BN9PR03CA0982.namprd03.prod.outlook.com (2603:10b6:408:109::27)
+ by CH3PR12MB8257.namprd12.prod.outlook.com (2603:10b6:610:121::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
+ 2023 18:17:59 +0000
+Received: from BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:109:cafe::95) by BN9PR03CA0982.outlook.office365.com
+ (2603:10b6:408:109::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.14 via Frontend
+ Transport; Thu, 5 Jan 2023 18:17:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT052.mail.protection.outlook.com (10.13.177.210) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5944.17 via Frontend Transport; Thu, 5 Jan 2023 18:17:58 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 5 Jan
+ 2023 12:17:57 -0600
+Date:   Thu, 5 Jan 2023 12:17:41 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+        <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <harald@profian.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        <chao.p.peng@linux.intel.com>
+Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
+ to KVM
+Message-ID: <20230105181741.q6mq37gvcjk5nbjg@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-4-michael.roth@amd.com>
+ <Y6Xd0ruz3kMij/5F@zn.tnic>
+ <20230105021419.rs23nfq44rv64tsd@amd.com>
+ <Y7bnE5bTUb6fQiX/@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <bug-216888-41252@https.bugzilla.kernel.org/>
+In-Reply-To: <Y7bnE5bTUb6fQiX/@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT052:EE_|CH3PR12MB8257:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a002a37-0734-4c71-d285-08daef492c8f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q9u2wmFlKKTJqDESjpZgeUQTS4lgiHAz6sA5e+Fr8kyy3kCfOYp1tlpqmkJgkLhfUlLsF7AUPobb5zG7aRiYEYXDlcFSSczEFVd3rZqv4/WPj3TSBsMJNDFh+dNQ8M7ID42e7SPswZu/OxvRreEbvmPps/jXkc40vjADWlIoY0C0KGKEA06sCbf1nw0Kh+t23oU6XpzPzwSSCUaWpEC/f9ADk/VVxlUajoHehDUH/2Wu7pwXGuV++Em8pNWog0if+yWK/YC7tlKYjhYipH6NWjd/O66FP3vMRVKLIMjQw+3yaq/bv3tZfWABl/PINfK4X5gjQxAJeLvwYbdWMOc/iBlDIQusIa4ggJL3UYW9DDAaH+0CXAL+Mv6TYgw8xOtOEHOlKQlbYyrNAemoQgKUtvBgdFhHUOFEpG/TJPsXXjvYNJZT7AkMxR/WF7BagsPwdMhDMROs9UxffWJbINeYXr+czaMkkFKAe9Lib/wY8GXtEqkm2A8wkGjHvYr6b3JkzvWKNbE86yy/fNtMVU4afqvuYJbrTAbHXU0N+vK7qy2mabkVClveYzPwy1wBTqHkklb+VeK16OOAXKkg9RIbx561nMmKTP1J/WbulI9OCsb8w50WQK2TjK8qgigkha0cV4yepq9x4zOH2GZSd3O5t0h6xdyCVKD/ehcu4wsbynocQAGkG4/yHjvCWlsG8NzFO+BXQQQerAYAiK+jaA10zZSyKliSmp1vA7gvMTSS2q6jAqfQXdsmwn+jhvBBX8ZJLm0KXt0JCmWgWcVuxZKifw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199015)(40470700004)(46966006)(36840700001)(7416002)(7406005)(41300700001)(5660300002)(70586007)(8676002)(70206006)(44832011)(2906002)(54906003)(6916009)(4326008)(8936002)(45080400002)(186003)(16526019)(478600001)(966005)(6666004)(26005)(426003)(40480700001)(336012)(47076005)(86362001)(36860700001)(2616005)(82740400003)(81166007)(36756003)(356005)(1076003)(316002)(82310400005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 18:17:58.4995
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a002a37-0734-4c71-d285-08daef492c8f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT052.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8257
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Per the report, this is a regression and reverting 68dbe80f5b51
-("crypto: ccp - Release dma channels before dmaengine unrgister"),
-which appeared in v6.1, avoids the problem.
+On Thu, Jan 05, 2023 at 04:04:51PM +0100, Borislav Petkov wrote:
+> On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
+> > Maybe that's not actually enforced, by it seems awkward to try to use a
+> > bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
+> 
+> I don't see there being a problem/restriction for bool functions, see
+> 
+> 5be2226f417d ("KVM: x86: allow defining return-0 static calls")
+> 
+> and __static_call_return0() returns a long which, if you wanna interpret as
+> bool, works too as "false".
+> 
+> I still need to disassemble and single-step through a static_call to see what
+> all that magic does in detail, to be sure.
 
-The bugzilla is assigned to PCI, and I know PCI does have similar
-sysfs duplicate filename issues, but I don't know whether this
-instance is related to 68dbe80f5b51 or to the PCI core.
+Hmm, yah, looking at that patch it seems pretty clear (at least at the
+time) that bool returns are expected to work fine and there are still
+existing cases that do things that way.
 
-On Thu, Jan 05, 2023 at 03:12:26PM +0000, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=216888
->            Summary: "sysfs: cannot create duplicate filename
->                     /dma/dma0chan0" with 68dbe80f ("crypto: ccp - Release
->                     dma channels before dmaengine unrgister")
 > 
-> An issue was found in the CCP driver (drivers/crypto/ccp/) that
-> the patch 68dbe80f ("crypto: ccp - Release dma channels before
-> dmaengine unrgister") causes the following errors/warnings with
-> just unloading and loading the CCP driver. I'm not sure if this
-> can be reproduced without the CCP hardware:
+> > However, we could just use KVM_X86_OP() to declare it so we can cleanly
+> > use a function that returns bool, and then we just need to do:
+> > 
+> >   bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >   {
+> >           if (kvm_x86_ops.private_mem_enabled)
+> >                   return static_call(kvm_x86_private_mem_enabled)(kvm);
 > 
-> # uname -r
-> 6.2.0-0.rc2.18.eln124.x86_64
+> That would be defeating the whole purpose of static calls, AFAICT, as you're
+> testing the pointer. Might as well leave it be a normal function pointer then.
+
+That's true, we should just use the function pointer for those cases.
+But given the above maybe KVM_X86_OP_OPTIONAL_RET0() is fine after all
+so we can continue using static_call().
+
 > 
-> # lspci | grep 'Encryption controller'
-> 02:00.1 Encryption controller: Advanced Micro Devices, Inc. [AMD]
-> Zeppelin Cryptographic Coprocessor NTBCCP  ### PCIID: 1022:1468
-> Subsystem: 1022:1468
-> 03:00.2 Encryption controller: Advanced Micro Devices, Inc. [AMD]
-> Family 17h (Models 00h-0fh) Platform Security Processor ### PCIID:
-> 1022:1456 Subsystem: 1022:1456
+> > On a separate topic though, at a high level, this hook is basically a way
+> > for platform-specific code to tell generic KVM code that private memslots
+> > are supported by overriding the kvm_arch_has_private_mem() weak
+> > reference. In this case the AMD platform is using using kvm->arch.upm_mode
+> > flag to convey that, which is in turn set by the
+> > KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
+> > 
+> > But if, as I suggested in response to your PATCH 2 comments, we drop
+> > KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
+> > KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
+> > code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
+> > in-part relies on kvm_arch_has_private_mem() to determine what flags are
+> > supported, whereas SEV/SNP code would be using what was set by
+> > KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
+> > kvm_arch_has_private_mem().
+> > 
+> > So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
+> > on something else. Maybe the logic can just be:
+> > 
+> >   bool svm_private_mem_enabled(struct kvm *kvm)
+> >   {
+> >     return sev_enabled(kvm) || sev_snp_enabled(kvm)
 > 
-> # rmmod kvm_amd ccp ; modprobe ccp
-> [  140.965403] sysfs: cannot create duplicate filename
-> '/devices/pci0000:00/0000:00:07.1/0000:03:00.2/dma/dma0chan0'
-> [  140.975736] CPU: 0 PID: 388 Comm: kworker/0:2 Kdump: loaded Not
-> tainted 6.2.0-0.rc2.18.eln124.x86_64 #1
-> [  140.985185] Hardware name: HPE ProLiant DL325 Gen10/ProLiant DL325
-> Gen10, BIOS A41 07/17/2020
-> [  140.993761] Workqueue: events work_for_cpu_fn
-> [  140.998151] Call Trace:
-> [  141.000613]  <TASK>
-> [  141.002726]  dump_stack_lvl+0x33/0x46
-> [  141.006415]  sysfs_warn_dup.cold+0x17/0x23
-> [  141.010542]  sysfs_create_dir_ns+0xba/0xd0
-> [  141.014670]  kobject_add_internal+0xba/0x260
-> [  141.018970]  kobject_add+0x81/0xb0
-> [  141.022395]  device_add+0xdc/0x7e0
-> [  141.025822]  ? complete_all+0x20/0x90
-> [  141.029510]  __dma_async_device_channel_register+0xc9/0x130
-> [  141.035119]  dma_async_device_register+0x19e/0x3b0
-> [  141.039943]  ccp_dmaengine_register+0x334/0x3f0 [ccp]
-> [  141.045042]  ccp5_init+0x662/0x6a0 [ccp]
-> [  141.049000]  ? devm_kmalloc+0x40/0xd0
-> [  141.052688]  ccp_dev_init+0xbb/0xf0 [ccp]
-> [  141.056732]  ? __pci_set_master+0x56/0xd0
-> [  141.060768]  sp_init+0x70/0x90 [ccp]
-> [  141.064377]  sp_pci_probe+0x186/0x1b0 [ccp]
-> [  141.068596]  local_pci_probe+0x41/0x80
-> [  141.072374]  work_for_cpu_fn+0x16/0x20
-> [  141.076145]  process_one_work+0x1c8/0x380
-> [  141.080181]  worker_thread+0x1ab/0x380
-> [  141.083953]  ? __pfx_worker_thread+0x10/0x10
-> [  141.088250]  kthread+0xda/0x100
-> [  141.091413]  ? __pfx_kthread+0x10/0x10
-> [  141.095185]  ret_from_fork+0x2c/0x50
-> [  141.098788]  </TASK>
-> [  141.100996] kobject_add_internal failed for dma0chan0 with -EEXIST,
-> don't try to register things with the same name in the same directory.
-> [  141.113703] ccp 0000:03:00.2: ccp initialization failed
-> [  141.118983] ccp 0000:03:00.2: SEV: memory encryption not enabled by BIOS
-> [  141.125728] ccp 0000:03:00.2: psp enabled
-> [  141.130020] ccp 0000:02:00.1: could not enable MSI-X (-22), trying MSI
-> [  141.136939] sysfs: cannot create duplicate filename '/class/dma/dma0chan0'
-> [  141.143863] CPU: 0 PID: 388 Comm: kworker/0:2 Kdump: loaded Not
-> tainted 6.2.0-0.rc2.18.eln124.x86_64 #1
-> [  141.153313] Hardware name: HPE ProLiant DL325 Gen10/ProLiant DL325
-> Gen10, BIOS A41 07/17/2020
-> [  141.161889] Workqueue: events work_for_cpu_fn
-> [  141.166274] Call Trace:
-> [  141.168733]  <TASK>
-> [  141.170845]  dump_stack_lvl+0x33/0x46
-> [  141.174531]  sysfs_warn_dup.cold+0x17/0x23
-> [  141.178652]  sysfs_do_create_link_sd+0xcf/0xe0
-> [  141.183124]  device_add+0x28a/0x7e0
-> [  141.186634]  ? complete_all+0x20/0x90
-> [  141.190318]  __dma_async_device_channel_register+0xc9/0x130
-> [  141.195925]  dma_async_device_register+0x19e/0x3b0
-> [  141.200745]  ccp_dmaengine_register+0x334/0x3f0 [ccp]
-> [  141.205838]  ccp5_init+0x662/0x6a0 [ccp]
-> [  141.209795]  ? devm_kmalloc+0x40/0xd0
-> [  141.213479]  ccp_dev_init+0xbb/0xf0 [ccp]
-> [  141.217524]  ? __pci_set_master+0x56/0xd0
-> [  141.221559]  sp_init+0x70/0x90 [ccp]
-> [  141.225166]  sp_pci_probe+0x186/0x1b0 [ccp]
-> [  141.229385]  local_pci_probe+0x41/0x80
-> [  141.233159]  work_for_cpu_fn+0x16/0x20
-> [  141.236933]  process_one_work+0x1c8/0x380
-> [  141.240966]  worker_thread+0x1ab/0x380
-> [  141.244737]  ? __pfx_worker_thread+0x10/0x10
-> [  141.249032]  kthread+0xda/0x100
-> [  141.252192]  ? __pfx_kthread+0x10/0x10
-> [  141.255964]  ret_from_fork+0x2c/0x50
-> [  141.259563]  </TASK>
-> [  141.261902] ccp 0000:02:00.1: ccp initialization failed
+> I haven't followed the whole discussion in detail but this means that SEV/SNP
+> *means* UPM. I.e., no SEV/SNP without UPM, correct? I guess that's the final
+> thing you guys decided to do ...
+
+It's more about reporting whether UPM is *possible*. In the case of
+this patchset there is support for using UPM in conjunction with SEV
+or SEV-SNP, and that's all the above check is conveying. This is
+basically what KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl will rely on to
+determine what attributes it reports to the guest as being supported,
+which is basically what tells userspace whether or not it can make use
+of UPM features.
+
+In the case of SEV, it would still be up to userspace whether or not it
+actually wants to make use of UPM functionality like KVM_SET_MEMORY_ATTRIBUTES
+and private memslots. Otherwise, to maintain backward-compatibility, 
+userspace can do things as it has always done and continue running SEV without
+relying on private memslots/KVM_SET_MEMORY_ATTRIBUTES or any of the new ioctls.
+
+For SNP however it is required that userspace uses/implements UPM
+functionality.
+
+-Mike
+
 > 
-> This is reproducible with the latest upstream v6.2-rc2 code,
-> "6.2.0-0.rc2.18.eln124.x86_64" is just the v6.2-rc2 code built
-> with Fedora/ELN kernel configs. I'm talking about the commit
-> 68dbe80f because just reverting it makes the above errors/warnings
-> disappear.
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C4bfcf0c3d1e54046703008daef2e35d4%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638085279100077750%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=oCjQx7LV1paTYdMA4JpFjIexf5UkiZEf2pYOWTvpkZ0%3D&reserved=0
