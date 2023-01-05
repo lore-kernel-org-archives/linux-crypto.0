@@ -2,136 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B899C3DA7D
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 08:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F1C3DA7D
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 11:16:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbjAEIWS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 03:22:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
+        id S230261AbjAELQq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 06:16:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231663AbjAEIVn (ORCPT
+        with ESMTP id S232936AbjAELQe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 03:21:43 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520F94D4BD;
-        Thu,  5 Jan 2023 00:19:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672906774; x=1704442774;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=tC9MfXbbP5iSwnqmC95iyTsovDGJETn82JLa7mFYxG4=;
-  b=jG1DJy8tYR/kzOlWYs+Iy43Q34IjeHasVX+dBFDnKm7OlFFSGCjI3hzq
-   yD8u/aDv0Ss0EzAsvPP4x6IGt1D7d5zjNF8gulthsxD+CNmHDeWvHJkRE
-   hxGAj0Z2UxszmOnDgtBe2TyR2xezYu3PGGpNiEdGxCe1GfOpsuPLDTwLd
-   j2hULJRjx+q3wZ/kroatt6NCcVuEhHIPP/6GmcwchlVw4Gj8bVGR5+/N4
-   +ytADuEGH3sk/uQEJKtmpVi7FJQvaHuTh21mXb6B1V+JXQpHZVGnjw6h5
-   0hYnD9NFK8pkYqQ0nkD5F7cZ7aGqYZvpK3HBr6MUvE3Ct7rFBAySnPhNC
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="320856195"
-X-IronPort-AV: E=Sophos;i="5.96,302,1665471600"; 
-   d="scan'208";a="320856195"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2023 00:18:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="605458382"
-X-IronPort-AV: E=Sophos;i="5.96,302,1665471600"; 
-   d="scan'208";a="605458382"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga003.jf.intel.com with ESMTP; 05 Jan 2023 00:18:16 -0800
-Date:   Thu, 5 Jan 2023 16:14:04 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com
-Subject: Re: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for
- large page
-Message-ID: <20230105081404.GA2257863@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-2-michael.roth@amd.com>
- <Y7VqgbTE34/Sxupw@kernel.org>
- <20230105033451.GA2251521@chaop.bj.intel.com>
- <2ebc9510-d7bf-a46d-6e78-f9e528b79501@amd.com>
+        Thu, 5 Jan 2023 06:16:34 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 592DE1D0F0;
+        Thu,  5 Jan 2023 03:16:33 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A6E6023335;
+        Thu,  5 Jan 2023 11:16:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1672917391; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x7n2TLWZUeXlz4UUe5JOJfFdhwFDZQCcQTs4uHbEOxA=;
+        b=UbGQPfMUThQHZkdpxN1mAEKxlhi3GOxxTtP/vcWT2uu2loDTBIl4pTHLBMTt38Sy6jITHG
+        wCVgk955j2VElID8hRO7jx1fvvX/Y9muWIR8DWjItODFHdjRRTC26jKlBH7GMhiSOAZ347
+        qSVu1rRHoMew2tu5CQlk7Cqcoptk6fE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1672917391;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x7n2TLWZUeXlz4UUe5JOJfFdhwFDZQCcQTs4uHbEOxA=;
+        b=s6sLvnGN4C+Nv1uMX0QxXPm5h4Sir0ilHDpMS1ekLIsHnszX2sTCIj6Rr2VuKNU/J9CRmA
+        bJFBs/G+3995wgAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63CD413338;
+        Thu,  5 Jan 2023 11:16:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id b7QVF4+xtmNJKgAAMHmgww
+        (envelope-from <nstange@suse.de>); Thu, 05 Jan 2023 11:16:31 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Vladis Dronov <vdronov@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Nicolai Stange <nstange@suse.de>,
+        Elliott Robert <elliott@hpe.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/6] crypto: xts - drop redundant xts key check
+In-Reply-To: <20221229211710.14912-4-vdronov@redhat.com> (Vladis Dronov's
+        message of "Thu, 29 Dec 2022 22:17:07 +0100")
+References: <20221229211710.14912-1-vdronov@redhat.com>
+        <20221229211710.14912-4-vdronov@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Date:   Thu, 05 Jan 2023 12:16:30 +0100
+Message-ID: <87pmbtb59t.fsf@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ebc9510-d7bf-a46d-6e78-f9e528b79501@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 09:38:59AM +0530, Nikunj A. Dadhania wrote:
-> 
-> 
-> On 05/01/23 09:04, Chao Peng wrote:
-> > On Wed, Jan 04, 2023 at 12:01:05PM +0000, Jarkko Sakkinen wrote:
-> >> On Wed, Dec 14, 2022 at 01:39:53PM -0600, Michael Roth wrote:
-> >>> From: Nikunj A Dadhania <nikunj@amd.com>
-> >>>
-> >>> Aligned end boundary causes a kvm crash, handle the case.
-> >>>
-> >>
-> >> Link: https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fkvm%2F20221202061347.1070246-8-chao.p.peng%40linux.intel.com%2F&data=05%7C01%7Cnikunj.dadhania%40amd.com%7C7a95933fac1b433e339c08daeece6c2c%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638084867591405299%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=vDEu9Uxs0QRdzbUkJbE2LsJnMHJJHBdQijkePbE2woc%3D&reserved=0
-> >>
-> >> Chao, are you aware of this issue already?
-> > 
-> > Thanks Jarkko adding me. I'm not aware of there is a fix.
-> 
-> It was discussed here: https://lore.kernel.org/all/e234d307-0b05-6548-5882-c24fc32c8e77@amd.com/
-> 
-> I was hitting this with one of the selftests case.
+Hi Vladis,
 
-Yeah, I remember that discussion. With the new UPM code, this bug
-should be fixed. If you still hit the issue please let me know.
+the patch subject prefix is a bit misleading IMO, it kind of suggests
+that this patch would apply to the generic crypto/xts.c. How about using
+a format similar to e.g. the one from commit 7988fb2c03c8 ("crypto:
+s390/aes - convert to skcipher API"), i.e.
 
-Thanks,
-Chao
-> 
-> > 
-> >>
-> >>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> >>> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> >>> ---
-> >>>  arch/x86/kvm/mmu/mmu.c | 3 +++
-> >>>  1 file changed, 3 insertions(+)
-> >>>
-> >>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >>> index b1953ebc012e..b3ffc61c668c 100644
-> >>> --- a/arch/x86/kvm/mmu/mmu.c
-> >>> +++ b/arch/x86/kvm/mmu/mmu.c
-> >>> @@ -7159,6 +7159,9 @@ static void kvm_update_lpage_private_shared_mixed(struct kvm *kvm,
-> >>>  		for (gfn = first + pages; gfn < last; gfn += pages)
-> >>>  			linfo_set_mixed(gfn, slot, level, false);
-> >>>  
-> >>> +		if (gfn == last)
-> >>> +			goto out;
-> >>> +
-> > 
-> > Nikunj or Michael, could you help me understand in which case it causes
-> > a KVM crash? To me, even the end is aligned to huge page boundary, but:
-> >     last = (end - 1) & mask;
-> > so 'last' is the base address for the last effective huage page. Even
-> > when gfn == last, it should still a valid page and needs to be updated
-> > for mem_attrs, correct?
-> 
-> Yes, that is correct with: last = (end - 1) & mask;
-> 
-> We can drop this patch from SNP series.
-> 
-> Regards
-> Nikunj
+  "crypto: s390/aes - drop redundant xts key check"
+
+?
+
+Vladis Dronov <vdronov@redhat.com> writes:
+
+> xts_fallback_setkey() in xts_aes_set_key() will now enforce key size
+> rule in FIPS mode when setting up the fallback algorithm keys,
+
+I think it would be nice to make it more explicit why/how
+xts_fallback_setkey() happens to enforce the key size rules now.
+
+Perhaps amend the above sentence by something like
+
+  "xts_fallback_setkey() in xts_aes_set_key() will now implictly enforce
+   the key size rule in FIPS mode by means of invoking the generic xts
+   implementation with its key checks for setting up the fallback
+   algorithm,"
+
+?
+
+> which makes the check in xts_aes_set_key() redundant or
+> unreachable. So just drop this check.
+>
+> xts_fallback_setkey() now makes a key size check in xts_verify_key():
+>
+> xts_fallback_setkey()
+>   crypto_skcipher_setkey() [ skcipher_setkey_unaligned() ]
+>     cipher->setkey() { .setkey =3D xts_setkey }
+>       xts_setkey()
+>         xts_verify_key()
+>
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> ---
+>  arch/s390/crypto/aes_s390.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+> index 526c3f40f6a2..c773820e4af9 100644
+> --- a/arch/s390/crypto/aes_s390.c
+> +++ b/arch/s390/crypto/aes_s390.c
+> @@ -398,10 +398,6 @@ static int xts_aes_set_key(struct crypto_skcipher *t=
+fm, const u8 *in_key,
+>  	if (err)
+>  		return err;
+>=20=20
+> -	/* In fips mode only 128 bit or 256 bit keys are valid */
+> -	if (fips_enabled && key_len !=3D 32 && key_len !=3D 64)
+> -		return -EINVAL;
+> -
+
+The change itself looks good, but it might be worth adding a comment
+right at the invocation of xts_fallback_setkey() that this includes an
+implicit xts_verify_key() check? So that if anybody ever was about to
+remove the xts_fallback_setkey() for some reason in the future, it would
+give a clear indication that xts_verify_key() needs to get called
+directly instead?
+
+Thanks!
+
+Nicolai
+
+>  	/* Pick the correct function code based on the key length */
+>  	fc =3D (key_len =3D=3D 32) ? CPACF_KM_XTS_128 :
+>  	     (key_len =3D=3D 64) ? CPACF_KM_XTS_256 : 0;
+
+--=20
+SUSE Software Solutions Germany GmbH, Frankenstra=C3=9Fe 146, 90461 N=C3=BC=
+rnberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+(HRB 36809, AG N=C3=BCrnberg)
