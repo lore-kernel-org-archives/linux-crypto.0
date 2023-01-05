@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C79E3C3DA7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 16:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43806C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Jan 2023 16:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231978AbjAEQ3m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Jan 2023 11:29:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S232947AbjAEQar (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Jan 2023 11:30:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232319AbjAEQ3i (ORCPT
+        with ESMTP id S234121AbjAEQaS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Jan 2023 11:29:38 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9849058304;
-        Thu,  5 Jan 2023 08:29:37 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id co23so36692027wrb.4;
-        Thu, 05 Jan 2023 08:29:37 -0800 (PST)
+        Thu, 5 Jan 2023 11:30:18 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C4558304;
+        Thu,  5 Jan 2023 08:30:14 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id co23so36693724wrb.4;
+        Thu, 05 Jan 2023 08:30:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j0EVCr8niOrDqjzMLygmK437Bl2kIDtpevcurJg/sh4=;
-        b=jDIVtUpClcQ+UxG9qVupCt0iQQGwHM+d6T7wEusmr+qK30mUCcYc9GUyuqoMxRGc6F
-         yLsE6pp9oKTyZKpGEPno5HWa/Jp/mb4Kc0geXzmf2qw2NY8NBd1Jgf0FriM5Za1PQKZV
-         1Hyyngu7+VstGQViUN36nBx25MrximOkklcdi8G+oTCIwZ5tMwFmvn7FmIPpIrrqe5ND
-         a0Hw5QjJ2BBPZUTn0xztv694WU6bZ6DQTF6gBJKr+sAaDlG3r3jof4uouVUvKsnD8OcK
-         nDlc91mOj0bGL3XTt6c2pFBHr8WyBJRHyB4jI5T2BeUBBlZDszPy4LltDjv3zPP19r3G
-         Qxdw==
+        bh=y3EejsfMRPYJ8twdYT45Z3uPua4+S1LNtd+Q+9tbauc=;
+        b=M17tidvmkWkYuFrf1Lwzlgp3oUKnmbk9v/FsptibpHce4ZAqpmIKX+7+UW6AAVTjks
+         wRgopWPda293hciGNXg+8XT/sDP3ZgOuBT/PW5758mCviTDFDzxNKspr6lwpDvotggrJ
+         9M5hg6/2Jgwf/JwvkipKBdIVdeT26Am3kAQSP4W1Q1fAyu8xOsyvWjC0OgLejsjghfI1
+         vHOJdXdJE2vAXeo5CK4lPNmHhtGNU/X+DS6RTLNSke5C/CebnaLmUaRuMAhsIe+rSI5S
+         pENvk5AB6SJAzxX7T8monl32sXTL+JYWbAVRIBc/DEFTpkqdCVmPl+sNV32PXh8DunrE
+         VusQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j0EVCr8niOrDqjzMLygmK437Bl2kIDtpevcurJg/sh4=;
-        b=5D3OY810mBCiyYJUihkl4+atzm1sVT+Kh3aRVSDfE7zF9yn2i/UkgjoW/9gMhgefzS
-         ObXXNouw8I0lnSk36931FmfF19RyMh6UxABLKhqei0g5XCphtMfTqZn5oH3QdgzI63Fv
-         6XRb9nkwGAQyi6vl2o1fo67N/AuPgCIx/tZHMhqAmxjMusVSMW9uEiHRpG3h3tNUlq0Q
-         d7T9vsu/sZ5FUKFZoE8wVx/tJrW1Dni7zNqoOpR1Y800cpOFd6uoFLVouU8gsnSwIfKV
-         Hy9urDoB+HWrpA8IxssWQpwIi6C/RVKw15J5RBXUllrMKip/nWhPYL21+d5RONbXhS/P
-         lxyA==
-X-Gm-Message-State: AFqh2koZWAAxNaKOzHhtBBLnPPfaZjMl6Ft0dFxyZduoxVXPvlMAzBeh
-        Y3rwu+NCY40SeqR0oan25K8=
-X-Google-Smtp-Source: AMrXdXtdx1ljPkWlugJYyqxedcQLP7LIr489mbO58wIq4UPlhosgyNRl41DeetoAC5tBRLPKPwtTzw==
-X-Received: by 2002:a5d:6844:0:b0:2a2:5a2:cc10 with SMTP id o4-20020a5d6844000000b002a205a2cc10mr5139614wrw.36.1672936176128;
-        Thu, 05 Jan 2023 08:29:36 -0800 (PST)
+        bh=y3EejsfMRPYJ8twdYT45Z3uPua4+S1LNtd+Q+9tbauc=;
+        b=7I3MsvhSPevoKOYjWZL3nAifZbcp8z4/r3jgYE//egjiCYLClJsHgheJxH+o8hr0m5
+         mupL54jhDa0QWQWNAzJsO0F6chSonjHTfccE2ryD4N93zTubpXo4uv1nsYwo1G2C0sLo
+         mVe92ZGp6UM04mtMbUBye3zco2ZyihBmP99stLA9T1oOkiZLO8PyaWSq1jCz26VKo24+
+         MLxd89tK/wWULYuZEZBhznQ2dbAiYhD6P5BDzavR11rX7MdPM2av7aHExQ04olX8nOkJ
+         re68W+mSWwwL7ibrnJFDt7KQ8BdbWW9YoMv0OLc2GlyETHDxKers0rDWxxgNrdpFlysp
+         mOjw==
+X-Gm-Message-State: AFqh2koIEkAImkheK9ifEPGl7DIjzvy21vaAmLX80mlBFj8PFtwDT+nh
+        FDH3jcfx0faB4X1G9H2OX+w=
+X-Google-Smtp-Source: AMrXdXszLZ9BZFqJxfINjbGbG4pDRYZ8kDGOk2JHXjZcf5Xgus/zLO7jwULs6trog6IRkMTs0W2P3w==
+X-Received: by 2002:adf:f183:0:b0:255:96ed:950b with SMTP id h3-20020adff183000000b0025596ed950bmr30694484wro.60.1672936212723;
+        Thu, 05 Jan 2023 08:30:12 -0800 (PST)
 Received: from jernej-laptop.localnet (82-149-19-102.dynamic.telemach.net. [82.149.19.102])
-        by smtp.gmail.com with ESMTPSA id z1-20020adfdf81000000b00268aae5fb5bsm36862776wrl.3.2023.01.05.08.29.34
+        by smtp.gmail.com with ESMTPSA id w17-20020a5d5451000000b0023662d97130sm37280824wrv.20.2023.01.05.08.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 08:29:35 -0800 (PST)
+        Thu, 05 Jan 2023 08:30:12 -0800 (PST)
 From:   Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -66,12 +66,12 @@ Cc:     Samuel Holland <samuel@sholland.org>,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH v2 2/3] crypto: sun8i-ce - Add TRNG clock to the D1 variant
-Date:   Thu, 05 Jan 2023 17:29:34 +0100
-Message-ID: <3212177.44csPzL39Z@jernej-laptop>
-In-Reply-To: <20221231220146.646-3-samuel@sholland.org>
+Subject: Re: [PATCH v2 3/3] riscv: dts: allwinner: d1: Add crypto engine node
+Date:   Thu, 05 Jan 2023 17:30:10 +0100
+Message-ID: <10201998.nUPlyArG6x@jernej-laptop>
+In-Reply-To: <20221231220146.646-4-samuel@sholland.org>
 References: <20221231220146.646-1-samuel@sholland.org>
- <20221231220146.646-3-samuel@sholland.org>
+ <20221231220146.646-4-samuel@sholland.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -79,19 +79,12 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dne sobota, 31. december 2022 ob 23:01:44 CET je Samuel Holland napisal(a):
-> At least the D1 variant requires a separate clock for the TRNG.
-> Without this clock enabled, reading from /dev/hwrng reports:
-> 
->    sun8i-ce 3040000.crypto: DMA timeout for TRNG (tm=96) on flow 3
-> 
-> Experimentation shows that the necessary clock is the SoC's internal
-> RC oscillator. This makes sense, as noise from the oscillator can be
-> used as a source of entropy.
+Dne sobota, 31. december 2022 ob 23:01:45 CET je Samuel Holland napisal(a):
+> D1 contains a crypto engine which is supported by the sun8i-ce driver.
 > 
 > Signed-off-by: Samuel Holland <samuel@sholland.org>
 
-Reviewed-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 
 Best regards,
 Jernej
