@@ -2,100 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF8CC3DA7A
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 16:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFEFC63797
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 20:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjAFQR0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 11:17:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43854 "EHLO
+        id S235939AbjAFUyU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 15:54:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231469AbjAFQRX (ORCPT
+        with ESMTP id S236029AbjAFUyH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 11:17:23 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BD46145F
-        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 08:17:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-        t=1673021838; bh=72geejCa80v8OCzI1HX38P8XbglLIU9WAhNhqmivrBs=;
-        h=X-UI-Sender-Class:Subject:From:To:Cc:Date:In-Reply-To:References;
-        b=eye9I6B1lMj/8wpYtHAs/ezoPkaGViZHdXf/l5Tss4bOIqRicQVA4EoZYkRy+7oy4
-         MlJCWUbnmccfc2E5Qa6u5CX0Ldg6p1fw8FuyvlCbZbl/vXwLOPJoOqqGc7JPraiI+W
-         vfiG3MLa0b9FyU0J+OokNOUEMCm57nmWJRNAeRZ/z1dozvTZKwbNd0NNDhnsH9MZNG
-         s0tca/8eTYQdaGz8Vl/owuim0jkTJYQ6oEbtvi/oE/0/fsGhvqd9BXbWSM6X9Qi0kL
-         wIGO9qaXTBrK5Ks3ZkJLBO1ANRz6/thpF9ED1o8dMAPtHNv93/rDMJ6cunyHsTTDZh
-         oCDsuLCn6wZMw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.2.15] ([94.31.82.22]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MvbFs-1oxxDH3uvm-00sajB; Fri, 06
- Jan 2023 17:17:17 +0100
-Message-ID: <000f04f6ed4aef9bb4a67ae00fc259922f88090c.camel@gmx.de>
-Subject: Re: [PATCH v3 2/6] crypto/realtek: core functions
-From:   Markus Stockhausen <markus.stockhausen@gmx.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org
-Date:   Fri, 06 Jan 2023 17:17:16 +0100
-In-Reply-To: <Y7fjvoc28CUza3qf@gondor.apana.org.au>
-References: <Y7fjvoc28CUza3qf@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
-MIME-Version: 1.0
-X-Provags-ID: V03:K1:wyseWTcQqhlFmiQOVmNddbwp3Aa+lGTVbD4Ar3kBpvfeAwWZdcq
- cAL+jrxBEbQ+6qJdF0aor6nbcqqzDh182A4KmvZ3XuQ+W+1j5MjbhZ0SC3pED9qXUNNFjol
- wDE3G+hLmQQzb6UeqqVAJC6ElW+kUESoDQVu3DIxCLmdrMVHGSXYvBl3YVxw66UZZc1rLha
- moXE0qF5pun+hlMyckHMQ==
-UI-OutboundReport: notjunk:1;M01:P0:j94u61MAPZ0=;0l2Ucm73aWy8o4fwYJyclUJOBdM
- YJ/B/bYI08QW5KLNUNXq9DmvMmJXIdIvY+4eglGwe/PS1A5jt6sVKpN33RCvuwGFO71/c6nVz
- ww9W5Iw0MK+5G20dqHA287AOh8Jm49Crnr5y9Z/gDcLuTkMQQqMdkdCh3X3AHJJdFVi4ot5ZX
- lzbVtYLOiF+XSb/Ghvi4Z++eNX3ona4YcQyCc8Nb+WQ9WtMxg9DT3L0vkxj4iA1KD5sPwBCO0
- ztyBYM8D0TrVEYaIndkxOJNKvkwe5wuXi6vbBtjLfsNVa72SI3PjP6zbgZQNI5kJs18ybZu+t
- cXEUdF2CzStcAS/aTkzsE0TZrNQrE8SSmpQ5RrVuRX2iUH9d9FVXR621AmNnkkVSPvU1XjpxR
- QS9itUBEFx7t4sdLYdjtdDpue3G5rLnv+CvyMBslTt4Xfpqj59Hyi0Xb1bv6cDdr88w1yf38E
- AMicb3e5sMesdLqP0RntG5aToaCToUEUQJJ34qN5wE/B3kyiesIY1dQSDp/qV9XYb5xSUe+TW
- NWnHuDJD5ifTqs9fHWyoG9Mxb0hgo/FtZLiWKN4sCXfkxP8jl7xUcliE9DNaoGpttd7fuVz1p
- rvALUDJ8D0Z7ieoY2TlHxVmPHN8HQDGUuDGWeicM8w03LrvNprq9DpZRiQLAzcSudcOWcOL14
- V8JYmcIXrbbxvEzM0Tr4gKyyC//Omi/C05iLOnsUBKRrlgR22fw1qSo2/g76z7SqBbQ6+gejV
- e71EiUn2w83y1sCa7pAu+dg3L5swivDGIAnzr8iIEL7MqAsOrcWAAZ2SsX7p9Oo0IOkeqbi9G
- 1Yu5/9hQfbMQyn3hai1CxWiGEvi5VBX1btWPqGEDY4zJUTnE1yZkcsrdiooxlfE8naPHdd1ZE
- j6nbXCtQae+UTudBXkqoY2jhDt8h7bClAba758BwtabH1SHW/Uvoq8kjm0I2GmaHd3PymztiY
- z/sVGBHEFnP4o0pxYXmLnAR0pEA=
+        Fri, 6 Jan 2023 15:54:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7063E849
+        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 12:54:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6690DB81EBA
+        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 20:54:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 907E7C433EF;
+        Fri,  6 Jan 2023 20:54:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673038444;
+        bh=2XFVyFO90sv15IXbHfuoR96vEeg0uVA9f6scATbkw5I=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=mHfJQe+ghzVdgZxSVelgm1jSG5vA5KgBsk91CsnOdE6+vYEnKP07FXxBqc+wIWjNc
+         /ney0ntA5oVoXHpljLmbG/ptlT/69CqOGDRiBfs67lVR/GpQtfA4SFKxt6Hqv2BrBx
+         /Zil7U7xTEbnwogsadNwFzIvOXp6M8oDMMmGpSRt/t2pBweXijPjNQBXjJ4Hz0fpTX
+         qSPyHb2Bu6mdIo6QJC/HJCYTeL5tzoccdmge+vm1oc6K4rSnBht9HhRe3PbU0FE3ZW
+         aP0OkfFtzOACThVhMDHKsjFKc34/bLpq9aJjwF+moBB4D8aQh33Cwmke0C/NvktWH2
+         FqeZFd7BC2/Uw==
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 798D327C0054;
+        Fri,  6 Jan 2023 15:54:02 -0500 (EST)
+Received: from imap48 ([10.202.2.98])
+  by compute3.internal (MEProxy); Fri, 06 Jan 2023 15:54:02 -0500
+X-ME-Sender: <xms:aYq4Y-HpRJ9B9KVZyG6iVEM6s8NDCETv5X-KrsUs5WE5OYU3DXhsxw>
+    <xme:aYq4Y_XW2bsYUXDLlsowJxX4un9TnJD8ALkVdygkeHk166HmYyfqqNhrlDRbmSbZ8
+    fRUS-pwOvmyKPYVEqw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrkedtgddugedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehn
+    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepvdfhuedvtdfhudffhfekkefftefghfeltdelgeffteehueegjeff
+    udehgfetiefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homheprghnugihodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduudeiudek
+    heeifedvqddvieefudeiiedtkedqlhhuthhopeepkhgvrhhnvghlrdhorhhgsehlihhnuh
+    igrdhluhhtohdruhhs
+X-ME-Proxy: <xmx:aYq4Y4L8HErcX2HRlQKr0dw1B7SrsvMkRW9QTjnonJuhU-hAl0LKqw>
+    <xmx:aYq4Y4G772EnhzgLQ69UtH1UMRr7vy4DshAEEJ42s6kcmdGFJQp3YQ>
+    <xmx:aYq4Y0WAuAq2TWSCMZ7Wx8xq4jkY6HXE77C4c58bGSdFK0VwRwDZKw>
+    <xmx:aoq4Y5VRPXbo6ksg6EpyLzGFFIiWUfS8hsisPDiECVffoznwvBoMwg>
+Feedback-ID: ieff94742:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id AC89E31A03FD; Fri,  6 Jan 2023 15:54:01 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1185-g841157300a-fm-20221208.002-g84115730
+Mime-Version: 1.0
+Message-Id: <f36f19ee-5bff-4cd0-b9a9-0fe987cf6d38@app.fastmail.com>
+In-Reply-To: <CAHk-=wiO4rp8oVmj6i6vvC97gNePLN-SxhSK=UozA88G6nxBGQ@mail.gmail.com>
+References: <20230101162910.710293-3-Jason@zx2c4.com>
+ <Y7QIg/hAIk7eZE42@gmail.com>
+ <CALCETrWdw5kxrtr4M7AkKYDOJEE1cU1wENWgmgOxn0rEJz4y3w@mail.gmail.com>
+ <CAHk-=wg_6Uhkjy12Vq_hN6rQqGRP2nE15rkgiAo6Qay5aOeigg@mail.gmail.com>
+ <Y7SDgtXayQCy6xT6@zx2c4.com>
+ <CAHk-=whQdWFw+0eGttxsWBHZg1+uh=0MhxXYtvJGX4t9P1MgNw@mail.gmail.com>
+ <Y7SJ+/axonTK0Fir@zx2c4.com>
+ <CAHk-=wi4gshfKjbhEO_xZdVb9ztXf0iuv5kKhxtvAHf2HzTmng@mail.gmail.com>
+ <Y7STv9+p248zr+0a@zx2c4.com>
+ <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
+ <Y7dV1lVUYjqs8fh0@zx2c4.com>
+ <CAHk-=wijEC_oDzfUajhmp=ZVnzMTXgjxHEcxAfaHiNQm4iAcqA@mail.gmail.com>
+ <CAHk-=wiO4rp8oVmj6i6vvC97gNePLN-SxhSK=UozA88G6nxBGQ@mail.gmail.com>
+Date:   Fri, 06 Jan 2023 12:53:41 -0800
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Linus Torvalds" <torvalds@linux-foundation.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "Yann Droneaud" <ydroneaud@opteya.com>,
+        "Ingo Molnar" <mingo@kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        patches@lists.linux.dev, "Thomas Gleixner" <tglx@linutronix.de>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        "Linux API" <linux-api@vger.kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Adhemerval Zanella Netto" <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>,
+        "Florian Weimer" <fweimer@redhat.com>,
+        "Arnd Bergmann" <arnd@arndb.de>, "Jann Horn" <jannh@google.com>,
+        "Christian Brauner" <brauner@kernel.org>, linux-mm@kvack.org
+Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always lazily
+ freeable mappings
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, dem 06.01.2023 um 17:02 +0800 schrieb Herbert Xu:
-> Markus Stockhausen <markus.stockhausen@gmx.de> wrote:
-> >=20
-> > +void rtcr_add_src_to_ring(struct rtcr_crypto_dev *cdev, int idx,
-> > void *vaddr,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- int blocklen, int totallen)
-> > +{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dma_addr_t dma =3D cdev->src_dma =
-+ idx * RTCR_SRC_DESC_SIZE;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rtcr_src_desc *src =3D &cd=
-ev->src_ring[idx];
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src->len =3D totallen;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src->paddr =3D virt_to_phys(vaddr=
-);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 src->opmode =3D RTCR_SRC_OP_OWN_A=
-SIC |
-> > RTCR_SRC_OP_CALC_EOR(idx) | blocklen;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dma_sync_single_for_device(cdev->=
-dev, dma,
-> > RTCR_SRC_DESC_SIZE, DMA_BIDIRECTIONAL);
->=20
-> Why aren't there any calls to dma_sync_single_for_cpu if this is
-> truly bidirectional?
->=20
-> Cheers,
 
-Thanks, I need to check this again. CPU sets ownership bit in that
-descriptor to OWNED_BY_ASIC and after processing we expect that engine
-has set it back to OWNED_BY_CPU. So bidirectional operation is somehow
-needed.
 
-Markus
+On Thu, Jan 5, 2023, at 6:08 PM, Linus Torvalds wrote:
+> On Thu, Jan 5, 2023 at 5:02 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> None of what you ask for is for any kind of real security, it's all
+>> just crazy "but I want to feel the warm and fuzzies and take shortcuts
+>> elsewhere, and push my pain onto other people".
+>
+> Actually, let me maybe soften that a bit and say that it's
+> "convenience features". It might make some things more _convenient_ to
+> do, exactly because it might allow other parts to do short-cuts.
+>
+> But because it's a convenience-feature, it had also better either be
+> (a) really easy and clear to do in the kernel and (b) have
+> sufficiently *wide* convenience so that it doesn't end up being one of
+> those "corner case things we have to maintain forever and nobody
+> uses".
+>
+> And I think VM_DROPPABLE matches (a), and would be fine if it had some
+> other non-made-up use (although honestly, we should solve the 32-bit
+> problem first - ignoring it isn't fine for anything that is supposed
+> to be widely useful).
+>
+> We *have* talked about features kind of like it before, for people
+> doing basically caches in user space that they can re-create on demand
+> and are ok with just going away under memory pressure.
+>
+> But those people almost invariably want dropped pages to cause a
+> SIGSEGV or SIGBUS, not to come back as zeroes.
+>
+> So you were insulting when you said kernel people don't care about
+> security issues.  And I'm just telling you that's not true, but it
+> *is* 100% true that kernel people are often really fed up with
+> security people who have their blinders on, focus on some small thing,
+> and think nothing else ever matters.
+>
+> So yes, the way to get something like VM_DROPPABLE accepted is to
+> remove the blinders, and have it be something more widely useful, and
+> not be a "for made up bad code".
+
+I'm going to suggest a very very different approach: fix secret storage in memory for real.  That is, don't lock "super secret sensitive stuff" into memory, and don't wipe it either.  *Encrypt* it.
+
+This boils down to implementing proper encrypted swap support, which is not conceptually that difficult.  The kernel already has identifiers (mapping, offset, etc) for every page in swap and already stores some metadata.  Using that as part of a cryptographic operation seems conceptually fairly straightforward.
+
+And a nice implementation of this could be on by default, and the kernel could even tell userspace that it's on, and then userspace could just stop worrying about this particular issue.
