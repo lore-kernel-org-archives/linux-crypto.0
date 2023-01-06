@@ -2,147 +2,303 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00627C5479D
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 15:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1D7C3DA7A
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 15:45:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233560AbjAFPUD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 10:20:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36310 "EHLO
+        id S231191AbjAFPp1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 10:45:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233898AbjAFPTc (ORCPT
+        with ESMTP id S230082AbjAFPp0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 10:19:32 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5D98B742
-        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 07:19:31 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pDoVE-00Ec0v-2S; Fri, 06 Jan 2023 23:19:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Jan 2023 23:19:28 +0800
-Date:   Fri, 6 Jan 2023 23:19:28 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net, x86@kernel.org,
-        elliott@hpe.com, jussi.kivilinna@iki.fi, ebiggers@kernel.org
-Subject: Re: [PATCH v8 0/4] crypto: aria: implement aria-avx2 and aria-avx512
-Message-ID: <Y7g8AAlMGXGjoYCR@gondor.apana.org.au>
-References: <20230101091252.700117-1-ap420073@gmail.com>
+        Fri, 6 Jan 2023 10:45:26 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962B46DBB3
+        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 07:45:24 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id s5so2692930edc.12
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Jan 2023 07:45:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VoWsHDbgF7d4naag7KiOSwAw6taeTKQG9cbHgJ97+VU=;
+        b=W45pN3AFGnH+GXrfyyQM0fnd1RpOlcJ+g6li4CKTUiWRt2b9Yt6k7IL50GCJ1d19oN
+         pq5q4ZLSOGn8JTvSo1M4Mhs09VPFQ68byJewuMl2unhcyrXKqocIo7fH8oipP/OaXenh
+         RDSMJXwOtBWa7wBy0Qdi5sjO5ejac1Rb/bZIRFAj7Vsr0odAOO5ztAi55+2+K3+E9Slz
+         LXll49+aI7Q6Uk2bi1D4Ax5TTBKymY4CqNY8EhiFM087mSQC93lBHY+YT0BG+hWRtEvH
+         nXru+g05DajsMS0rrqv16AMHRgCkVOoEPqPjjh+aXrep06ItzNZTmiW2j74mT14E9Lhj
+         XtRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VoWsHDbgF7d4naag7KiOSwAw6taeTKQG9cbHgJ97+VU=;
+        b=yipSarpwXqd5u9iT1YGGWKRGChC6QOprSH8lm2zkGIBIc8bnTzBu1clgQUnvlaZ6Q9
+         hME6S/snRLbW04TwHP5QmNR1j5XprQ7qTn9D1ejuTk400ChOjKYlYHOXl2o+V5W2taQk
+         Gu+Z4xLPWDNAUs74CFzqDAL1zGDUBkpSFFYkiafMc82jGmwYmQE8KTq9RuW5XPW8WhGl
+         suPDV40EYA5jeOaAcaN0KfjTBFzK8PonU8To7pXvVqQ7KcMwYVDgkKrFvGn1lbnD4PF9
+         uQy3KlBb1WvTqg4SiwKalKkstfG1YtS1Ohf5jAP/Zw9KUL/q+4iPNSuMb6Oq+14s/W8j
+         BCdQ==
+X-Gm-Message-State: AFqh2ko9uNBbVrp+ePOJvRjwf/9qeggm5UnkG5tq0yt1hx0psQ1M5Yqw
+        W0zm/q9/dyoJMfhsE0AqgyBcPg==
+X-Google-Smtp-Source: AMrXdXugbB26ZkfaH0NsOnnZ+txgk0mUgVPZ2wwx5sr3bbCUi2ohYcwQRrugp9DHu/RnIHx8DgUu5g==
+X-Received: by 2002:aa7:cb4b:0:b0:491:3a5c:6e2 with SMTP id w11-20020aa7cb4b000000b004913a5c06e2mr7535330edt.5.1673019923096;
+        Fri, 06 Jan 2023 07:45:23 -0800 (PST)
+Received: from [192.168.0.104] ([82.77.81.242])
+        by smtp.gmail.com with ESMTPSA id b15-20020aa7c90f000000b004615f7495e0sm607442edt.8.2023.01.06.07.45.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jan 2023 07:45:22 -0800 (PST)
+Message-ID: <678ad800-7a3b-e2bf-6428-f06d696d8edb@linaro.org>
+Date:   Fri, 6 Jan 2023 17:45:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230101091252.700117-1-ap420073@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v2] MAINTAINERS: Update email of Tudor Ambarus
+Content-Language: en-US
+From:   Tudor Ambarus <tudor.ambarus@linaro.org>
+To:     arnd@arndb.de, richard@nod.at, miquel.raynal@bootlin.com
+Cc:     krzysztof.kozlowski+dt@linaro.org, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, akpm@linux-foundation.org,
+        nicolas.ferre@microchip.com, claudiu.beznea@microchip.com,
+        broonie@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-spi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, pratyush@kernel.org,
+        michael@walle.cc, Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20221226144043.367706-1-tudor.ambarus@linaro.org>
+ <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
+In-Reply-To: <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jan 01, 2023 at 09:12:48AM +0000, Taehee Yoo wrote:
-> This patchset is to implement aria-avx2 and aria-avx512.
-> There are some differences between aria-avx, aria-avx2, and aria-avx512,
-> but they are not core logic(s-box, diffusion layer).
-> 
-> ARIA-AVX2
-> It supports 32way parallel processing using 256bit registers.
-> Like ARIA-AVX, it supports both AES-NI based s-box layer algorithm and
-> GFNI based s-box layer algorithm.
-> These algorithms are the same as ARIA-AVX except that AES-NI doesn't
-> support 256bit registers, so it is used twice.
-> 
-> ARIA-AVX512
-> It supports 64way parallel processing using 512bit registers.
-> It supports only GFNI based s-box layer algorithm.
-> 
-> Benchmarks with i3-12100
-> commands: modprobe tcrypt mode=610 num_mb=8192
-> 
-> ARIA-AVX512(128bit and 256bit)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx512) encryption
-> tcrypt: 1 operation in 1504 cycles (1024 bytes)
-> tcrypt: 1 operation in 4595 cycles (4096 bytes)
-> tcrypt: 1 operation in 1763 cycles (1024 bytes)
-> tcrypt: 1 operation in 5540 cycles (4096 bytes)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx512) decryption
-> tcrypt: 1 operation in 1502 cycles (1024 bytes)
-> tcrypt: 1 operation in 4615 cycles (4096 bytes)
-> tcrypt: 1 operation in 1759 cycles (1024 bytes)
-> tcrypt: 1 operation in 5554 cycles (4096 bytes)
-> 
-> ARIA-AVX2 with GFNI(128bit and 256bit)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx2) encryption
-> tcrypt: 1 operation in 2003 cycles (1024 bytes)
-> tcrypt: 1 operation in 5867 cycles (4096 bytes)
-> tcrypt: 1 operation in 2358 cycles (1024 bytes)
-> tcrypt: 1 operation in 7295 cycles (4096 bytes)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx2) decryption
-> tcrypt: 1 operation in 2004 cycles (1024 bytes)
-> tcrypt: 1 operation in 5956 cycles (4096 bytes)
-> tcrypt: 1 operation in 2409 cycles (1024 bytes)
-> tcrypt: 1 operation in 7564 cycles (4096 bytes)
-> 
-> ARIA-AVX with GFNI(128bit and 256bit)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx) encryption
-> tcrypt: 1 operation in 2761 cycles (1024 bytes)
-> tcrypt: 1 operation in 9390 cycles (4096 bytes)
-> tcrypt: 1 operation in 3401 cycles (1024 bytes)
-> tcrypt: 1 operation in 11876 cycles (4096 bytes)
->     testing speed of multibuffer ecb(aria) (ecb-aria-avx) decryption
-> tcrypt: 1 operation in 2735 cycles (1024 bytes)
-> tcrypt: 1 operation in 9424 cycles (4096 bytes)
-> tcrypt: 1 operation in 3369 cycles (1024 bytes)
-> tcrypt: 1 operation in 11954 cycles (4096 bytes)
-> 
-> v8:
->  - Remove unnecessary code in aria-gfni-avx512-asm_64.S
->  - Do not use magic numbers in the aria-avx.h
->  - Rebase
-> 
-> v7:
->  - Use IS_ENABLED() instead of defined()
-> 
-> v6:
->  - Rebase for "CFI fixes" patchset.
->  - Use SYM_TYPED_FUNC_START instead of SYM_FUNC_START.
-> 
-> v5:
->  - Set CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE flag to avx2, and avx512.
-> 
-> v4:
->  - Use keystream array in the request ctx.
-> 
-> v3:
->  - Use ARIA_CTX_enc_key, ARIA_CTX_dec_key, and ARIA_CTX_rounds defines.
-> 
-> v2:
->  - Add new "add keystream array into struct aria_ctx" patch.
->  - Use keystream array in the aria_ctx instead of stack memory
-> 
-> Taehee Yoo (4):
->   crypto: aria: add keystream array into request ctx
->   crypto: aria: do not use magic number offsets of aria_ctx
->   crypto: aria: implement aria-avx2
->   crypto: aria: implement aria-avx512
-> 
->  arch/x86/crypto/Kconfig                   |   38 +
->  arch/x86/crypto/Makefile                  |    6 +
->  arch/x86/crypto/aria-aesni-avx-asm_64.S   |   26 +-
->  arch/x86/crypto/aria-aesni-avx2-asm_64.S  | 1433 +++++++++++++++++++++
->  arch/x86/crypto/aria-avx.h                |   48 +-
->  arch/x86/crypto/aria-gfni-avx512-asm_64.S |  971 ++++++++++++++
->  arch/x86/crypto/aria_aesni_avx2_glue.c    |  252 ++++
->  arch/x86/crypto/aria_aesni_avx_glue.c     |   45 +-
->  arch/x86/crypto/aria_gfni_avx512_glue.c   |  250 ++++
->  arch/x86/kernel/asm-offsets.c             |    8 +
->  crypto/aria_generic.c                     |    4 +
->  11 files changed, 3052 insertions(+), 29 deletions(-)
->  create mode 100644 arch/x86/crypto/aria-aesni-avx2-asm_64.S
->  create mode 100644 arch/x86/crypto/aria-gfni-avx512-asm_64.S
->  create mode 100644 arch/x86/crypto/aria_aesni_avx2_glue.c
->  create mode 100644 arch/x86/crypto/aria_gfni_avx512_glue.c
-> 
-> -- 
-> 2.34.1
+Miquel,
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Since we don't have an answer from Arnd, would you please queue this to
+mtd/fixes?
+
+Thanks,
+ta
+
+On 26.12.2022 16:49, Tudor Ambarus wrote:
+> Hi, Arnd,
+> 
+> We have all the required Acked-by tags to queue this patch. Do you still
+> plan to take it throught the SoC fixes branch? The alternative is to
+> queue it to mtd/fixes.
+> 
+> Thanks,
+> ta
+> 
+> On 26.12.2022 16:40, Tudor Ambarus wrote:
+>> From: Tudor Ambarus <tudor.ambarus@microchip.com>
+>>
+>> My professional email will change and the microchip one will bounce after
+>> mid-november of 2022.
+>>
+>> Update the MAINTAINERS file, the YAML bindings, MODULE_AUTHOR entries and
+>> author mentions, and add an entry in the .mailmap file.
+>>
+>> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+>> Acked-by: Rob Herring <robh@kernel.org>
+>> Acked-by: Pratyush Yadav <pratyush@kernel.org>
+>> Acked-by: Mark Brown <broonie@kernel.org>
+>> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+>> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> ---
+>> v2: rebase on top of v6.2-rc1, collect Acked-by tags.
+>>
+>>   .mailmap                                               |  1 +
+>>   .../bindings/crypto/atmel,at91sam9g46-aes.yaml         |  2 +-
+>>   .../bindings/crypto/atmel,at91sam9g46-sha.yaml         |  2 +-
+>>   .../bindings/crypto/atmel,at91sam9g46-tdes.yaml        |  2 +-
+>>   .../devicetree/bindings/spi/atmel,at91rm9200-spi.yaml  |  2 +-
+>>   .../devicetree/bindings/spi/atmel,quadspi.yaml         |  2 +-
+>>   MAINTAINERS                                            | 10 +++++-----
+>>   drivers/crypto/atmel-ecc.c                             |  4 ++--
+>>   drivers/crypto/atmel-i2c.c                             |  4 ++--
+>>   drivers/crypto/atmel-i2c.h                             |  2 +-
+>>   10 files changed, 16 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/.mailmap b/.mailmap
+>> index ccba4cf0d893..562f70d3b6a5 100644
+>> --- a/.mailmap
+>> +++ b/.mailmap
+>> @@ -422,6 +422,7 @@ Tony Luck <tony.luck@intel.com>
+>>   TripleX Chung <xxx.phy@gmail.com> <triplex@zh-kernel.org>
+>>   TripleX Chung <xxx.phy@gmail.com> <zhongyu@18mail.cn>
+>>   Tsuneo Yoshioka <Tsuneo.Yoshioka@f-secure.com>
+>> +Tudor Ambarus <tudor.ambarus@linaro.org> <tudor.ambarus@microchip.com>
+>>   Tycho Andersen <tycho@tycho.pizza> <tycho@tycho.ws>
+>>   Tzung-Bi Shih <tzungbi@kernel.org> <tzungbi@google.com>
+>>   Uwe Kleine-König <ukleinek@informatik.uni-freiburg.de>
+>> diff --git 
+>> a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml 
+>> b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+>> index 0ccaab16dc61..0b7383b3106b 100644
+>> --- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+>> @@ -8,7 +8,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   title: Atmel Advanced Encryption Standard (AES) HW cryptographic 
+>> accelerator
+>>   maintainers:
+>> -  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +  - Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   properties:
+>>     compatible:
+>> diff --git 
+>> a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml 
+>> b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
+>> index 5163c51b4547..ee2ffb034325 100644
+>> --- a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
+>> @@ -8,7 +8,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   title: Atmel Secure Hash Algorithm (SHA) HW cryptographic accelerator
+>>   maintainers:
+>> -  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +  - Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   properties:
+>>     compatible:
+>> diff --git 
+>> a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml 
+>> b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
+>> index fcc5adf03cad..3d6ed24b1b00 100644
+>> --- 
+>> a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
+>> +++ 
+>> b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
+>> @@ -8,7 +8,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   title: Atmel Triple Data Encryption Standard (TDES) HW cryptographic 
+>> accelerator
+>>   maintainers:
+>> -  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +  - Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   properties:
+>>     compatible:
+>> diff --git 
+>> a/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml 
+>> b/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
+>> index 4dd973e341e6..6c57dd6c3a36 100644
+>> --- a/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
+>> +++ b/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
+>> @@ -8,7 +8,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   title: Atmel SPI device
+>>   maintainers:
+>> -  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +  - Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   allOf:
+>>     - $ref: spi-controller.yaml#
+>> diff --git a/Documentation/devicetree/bindings/spi/atmel,quadspi.yaml 
+>> b/Documentation/devicetree/bindings/spi/atmel,quadspi.yaml
+>> index 1d493add4053..b0d99bc10535 100644
+>> --- a/Documentation/devicetree/bindings/spi/atmel,quadspi.yaml
+>> +++ b/Documentation/devicetree/bindings/spi/atmel,quadspi.yaml
+>> @@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   title: Atmel Quad Serial Peripheral Interface (QSPI)
+>>   maintainers:
+>> -  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +  - Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   allOf:
+>>     - $ref: spi-controller.yaml#
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index f61eb221415b..8fa9386559f8 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -13620,7 +13620,7 @@ F:    arch/microblaze/
+>>   MICROCHIP AT91 DMA DRIVERS
+>>   M:    Ludovic Desroches <ludovic.desroches@microchip.com>
+>> -M:    Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +M:    Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   L:    linux-arm-kernel@lists.infradead.org (moderated for 
+>> non-subscribers)
+>>   L:    dmaengine@vger.kernel.org
+>>   S:    Supported
+>> @@ -13665,7 +13665,7 @@ F:    
+>> Documentation/devicetree/bindings/media/microchip,csi2dc.yaml
+>>   F:    drivers/media/platform/microchip/microchip-csi2dc.c
+>>   MICROCHIP ECC DRIVER
+>> -M:    Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +M:    Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   L:    linux-crypto@vger.kernel.org
+>>   S:    Maintained
+>>   F:    drivers/crypto/atmel-ecc.*
+>> @@ -13762,7 +13762,7 @@ S:    Maintained
+>>   F:    drivers/mmc/host/atmel-mci.c
+>>   MICROCHIP NAND DRIVER
+>> -M:    Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +M:    Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   L:    linux-mtd@lists.infradead.org
+>>   S:    Supported
+>>   F:    Documentation/devicetree/bindings/mtd/atmel-nand.txt
+>> @@ -13814,7 +13814,7 @@ S:    Supported
+>>   F:    drivers/power/reset/at91-sama5d2_shdwc.c
+>>   MICROCHIP SPI DRIVER
+>> -M:    Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +M:    Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   S:    Supported
+>>   F:    drivers/spi/spi-atmel.*
+>> @@ -19664,7 +19664,7 @@ F:    drivers/clk/spear/
+>>   F:    drivers/pinctrl/spear/
+>>   SPI NOR SUBSYSTEM
+>> -M:    Tudor Ambarus <tudor.ambarus@microchip.com>
+>> +M:    Tudor Ambarus <tudor.ambarus@linaro.org>
+>>   M:    Pratyush Yadav <pratyush@kernel.org>
+>>   R:    Michael Walle <michael@walle.cc>
+>>   L:    linux-mtd@lists.infradead.org
+>> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+>> index 53100fb9b07b..12205e2b53b4 100644
+>> --- a/drivers/crypto/atmel-ecc.c
+>> +++ b/drivers/crypto/atmel-ecc.c
+>> @@ -3,7 +3,7 @@
+>>    * Microchip / Atmel ECC (I2C) driver.
+>>    *
+>>    * Copyright (c) 2017, Microchip Technology Inc.
+>> - * Author: Tudor Ambarus <tudor.ambarus@microchip.com>
+>> + * Author: Tudor Ambarus
+>>    */
+>>   #include <linux/delay.h>
+>> @@ -411,6 +411,6 @@ static void __exit atmel_ecc_exit(void)
+>>   module_init(atmel_ecc_init);
+>>   module_exit(atmel_ecc_exit);
+>> -MODULE_AUTHOR("Tudor Ambarus <tudor.ambarus@microchip.com>");
+>> +MODULE_AUTHOR("Tudor Ambarus");
+>>   MODULE_DESCRIPTION("Microchip / Atmel ECC (I2C) driver");
+>>   MODULE_LICENSE("GPL v2");
+>> diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+>> index 81ce09bedda8..55bff1e13142 100644
+>> --- a/drivers/crypto/atmel-i2c.c
+>> +++ b/drivers/crypto/atmel-i2c.c
+>> @@ -3,7 +3,7 @@
+>>    * Microchip / Atmel ECC (I2C) driver.
+>>    *
+>>    * Copyright (c) 2017, Microchip Technology Inc.
+>> - * Author: Tudor Ambarus <tudor.ambarus@microchip.com>
+>> + * Author: Tudor Ambarus
+>>    */
+>>   #include <linux/bitrev.h>
+>> @@ -390,6 +390,6 @@ static void __exit atmel_i2c_exit(void)
+>>   module_init(atmel_i2c_init);
+>>   module_exit(atmel_i2c_exit);
+>> -MODULE_AUTHOR("Tudor Ambarus <tudor.ambarus@microchip.com>");
+>> +MODULE_AUTHOR("Tudor Ambarus");
+>>   MODULE_DESCRIPTION("Microchip / Atmel ECC (I2C) driver");
+>>   MODULE_LICENSE("GPL v2");
+>> diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+>> index 48929efe2a5b..35f7857a7f7c 100644
+>> --- a/drivers/crypto/atmel-i2c.h
+>> +++ b/drivers/crypto/atmel-i2c.h
+>> @@ -1,7 +1,7 @@
+>>   /* SPDX-License-Identifier: GPL-2.0 */
+>>   /*
+>>    * Copyright (c) 2017, Microchip Technology Inc.
+>> - * Author: Tudor Ambarus <tudor.ambarus@microchip.com>
+>> + * Author: Tudor Ambarus
+>>    */
+>>   #ifndef __ATMEL_I2C_H__
