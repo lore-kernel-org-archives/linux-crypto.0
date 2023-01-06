@@ -2,79 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D70C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 21:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A906C54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 21:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236097AbjAFVTS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 16:19:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55236 "EHLO
+        id S235960AbjAFVgq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 16:36:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236426AbjAFVTH (ORCPT
+        with ESMTP id S235862AbjAFVgq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 16:19:07 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559F081D4E;
-        Fri,  6 Jan 2023 13:19:03 -0800 (PST)
+        Fri, 6 Jan 2023 16:36:46 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D50823AB27;
+        Fri,  6 Jan 2023 13:36:44 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 08162B81ECB;
-        Fri,  6 Jan 2023 21:19:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A4EE7C433F0;
-        Fri,  6 Jan 2023 21:19:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673039940;
-        bh=DQVWB0K5khEPAM6N0U6SCCfFquRHQV2sZN5Ca/Nyuvc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=gKLzh0OaJzRx4d5cQ8+Zl9InDG0giXEFHGWj0IdXeC9wf10ZdK76wBdlVEMFeSFHi
-         u6ZWTa6bdMyu0zmW/1GEvrSuACej1ioy4wZxDQnpMPTeHH9n++so2qEGW07IBPGVxJ
-         8Zm3QVMkIJD7hF3Bj+QAPauhFyF8nPOUWYF+uANEEHC3hj6IK9yfHQ8x271lSWXW3O
-         vnsm+xbVe6cbBJE331Mfe8grLceb1/8PGtJF91d0z/qHiVMsoT8sHCif1u8dwIt7aC
-         LPo1epsDawNQLwS1ETKRXcNTVQ3E6RpJl/aBJqHDA2IoknoMu4zE8aTGIMgn/K2Jog
-         vZGAgOnTvLQWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90E60E5724D;
-        Fri,  6 Jan 2023 21:19:00 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
-References: <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au> <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.2-p2
-X-PR-Tracked-Commit-Id: 736f88689c6912f05d0116917910603a7ba97de7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 90bc52c525fdac4ed8cbf13c08c813ec2a4fc856
-Message-Id: <167303994058.10294.10697135724767945601.pr-tracker-bot@kernel.org>
-Date:   Fri, 06 Jan 2023 21:19:00 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6F19A61F6F;
+        Fri,  6 Jan 2023 21:36:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53A2C433EF;
+        Fri,  6 Jan 2023 21:36:41 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Lw5J2oJG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1673040999;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iBuV3hmE9MTswDExTCjyj/E1AIJfosMyykKtbV7OQBQ=;
+        b=Lw5J2oJGEsVjlubs6QISg3WV7V7HRaEytxm4hiXK2JwyachDcJi7HU4HWIJVPwyz+rwzLE
+        apbuJrPc6ZEHzDw5h3SQ0zATwxJawcJaypUv8oDWcu7Ooryx5hMzkzRAEAM2pLSi2iV3tH
+        zZ7rD+4WJHGrP4AqYGzfhQPhxwKrw5U=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1d0af2f9 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Fri, 6 Jan 2023 21:36:39 +0000 (UTC)
+Date:   Fri, 6 Jan 2023 22:36:38 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Andy Lutomirski <luto@kernel.org>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        Yann Droneaud <ydroneaud@opteya.com>,
+        Ingo Molnar <mingo@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        patches@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org
+Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <Y7iUZmbXOIuBKtIh@zx2c4.com>
+References: <Y7SDgtXayQCy6xT6@zx2c4.com>
+ <CAHk-=whQdWFw+0eGttxsWBHZg1+uh=0MhxXYtvJGX4t9P1MgNw@mail.gmail.com>
+ <Y7SJ+/axonTK0Fir@zx2c4.com>
+ <CAHk-=wi4gshfKjbhEO_xZdVb9ztXf0iuv5kKhxtvAHf2HzTmng@mail.gmail.com>
+ <Y7STv9+p248zr+0a@zx2c4.com>
+ <10302240-51ec-0854-2c86-16752d67a9be@opteya.com>
+ <Y7dV1lVUYjqs8fh0@zx2c4.com>
+ <CAHk-=wijEC_oDzfUajhmp=ZVnzMTXgjxHEcxAfaHiNQm4iAcqA@mail.gmail.com>
+ <CAHk-=wiO4rp8oVmj6i6vvC97gNePLN-SxhSK=UozA88G6nxBGQ@mail.gmail.com>
+ <f36f19ee-5bff-4cd0-b9a9-0fe987cf6d38@app.fastmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f36f19ee-5bff-4cd0-b9a9-0fe987cf6d38@app.fastmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 6 Jan 2023 17:15:32 +0800:
+On Fri, Jan 06, 2023 at 12:53:41PM -0800, Andy Lutomirski wrote:
+> 
+> 
+> On Thu, Jan 5, 2023, at 6:08 PM, Linus Torvalds wrote:
+> > On Thu, Jan 5, 2023 at 5:02 PM Linus Torvalds
+> > <torvalds@linux-foundation.org> wrote:
+> >>
+> >> None of what you ask for is for any kind of real security, it's all
+> >> just crazy "but I want to feel the warm and fuzzies and take shortcuts
+> >> elsewhere, and push my pain onto other people".
+> >
+> > Actually, let me maybe soften that a bit and say that it's
+> > "convenience features". It might make some things more _convenient_ to
+> > do, exactly because it might allow other parts to do short-cuts.
+> >
+> > But because it's a convenience-feature, it had also better either be
+> > (a) really easy and clear to do in the kernel and (b) have
+> > sufficiently *wide* convenience so that it doesn't end up being one of
+> > those "corner case things we have to maintain forever and nobody
+> > uses".
+> >
+> > And I think VM_DROPPABLE matches (a), and would be fine if it had some
+> > other non-made-up use (although honestly, we should solve the 32-bit
+> > problem first - ignoring it isn't fine for anything that is supposed
+> > to be widely useful).
+> >
+> > We *have* talked about features kind of like it before, for people
+> > doing basically caches in user space that they can re-create on demand
+> > and are ok with just going away under memory pressure.
+> >
+> > But those people almost invariably want dropped pages to cause a
+> > SIGSEGV or SIGBUS, not to come back as zeroes.
+> >
+> > So you were insulting when you said kernel people don't care about
+> > security issues.  And I'm just telling you that's not true, but it
+> > *is* 100% true that kernel people are often really fed up with
+> > security people who have their blinders on, focus on some small thing,
+> > and think nothing else ever matters.
+> >
+> > So yes, the way to get something like VM_DROPPABLE accepted is to
+> > remove the blinders, and have it be something more widely useful, and
+> > not be a "for made up bad code".
+> 
+> I'm going to suggest a very very different approach: fix secret storage in memory for real.  That is, don't lock "super secret sensitive stuff" into memory, and don't wipe it either.  *Encrypt* it.
+> 
+> This boils down to implementing proper encrypted swap support, which is not conceptually that difficult.  The kernel already has identifiers (mapping, offset, etc) for every page in swap and already stores some metadata.  Using that as part of a cryptographic operation seems conceptually fairly straightforward.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.2-p2
+Not sure this solves the right problem, which is primarily related to
+forward secrecy, which means the important property is timely secret
+erasure. Writing things out to disk complicates that, and encrypted swap
+means moving the problem into key lifetime, which sounds like a can of
+worms to synchronize. So this doesn't sound so appealing to me as a
+solution.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/90bc52c525fdac4ed8cbf13c08c813ec2a4fc856
+It does sound like a potentially nice thing for other uses, though.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jason
