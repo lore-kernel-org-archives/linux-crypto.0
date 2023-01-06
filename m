@@ -2,101 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81257C5479D
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 16:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED984C4708D
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 16:07:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232580AbjAFQAX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 11:00:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60644 "EHLO
+        id S232580AbjAFQHq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 11:07:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232920AbjAFQAH (ORCPT
+        with ESMTP id S234908AbjAFQHi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 11:00:07 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F37D6086D;
-        Fri,  6 Jan 2023 08:00:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1673020806; x=1704556806;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Gr0ThjkBH4hqu7cX0DnaFFxx29/OpLOv7ZxaLh7iykA=;
-  b=nBQCaQfpIu1WVkQ76CekdAqtHIs5brxCb4aeIrUgV9nNxGASMlXYXq9H
-   kwDrkq6OcodV6w/wCBZQkhKThRqIw1lcrAJkDVs5E9pMsfDWRCcLJVgpg
-   bK0+oz8vMJLnTI81U11QfV+AkzL5JRLYRjehiPJhTpI3hmAqz+HYLGf3A
-   +4jvjke5x4t3ZsjcdJrUIgTl+JkiLtvR3Z6EQR1eKvK8+qHZaRrQVNaYy
-   lmufyyExwXhtVjzHQIJdiWIfygEAOraVooNHbBcGa7zavRda3ppnNTNbX
-   0SvhsxDIw3Vz88nRIPWMzOi10O3iuBzUqKT3D1WFleZQfSi8J0KLxcjtk
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,305,1665471600"; 
-   d="scan'208";a="194620230"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 06 Jan 2023 09:00:05 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 6 Jan 2023 08:59:57 -0700
-Received: from [10.159.245.112] (10.10.115.15) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.16 via Frontend
- Transport; Fri, 6 Jan 2023 08:59:54 -0700
-Message-ID: <f653b23f-cf25-61ec-60d4-91dd7823edd2@microchip.com>
-Date:   Fri, 6 Jan 2023 16:59:52 +0100
+        Fri, 6 Jan 2023 11:07:38 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4773C398;
+        Fri,  6 Jan 2023 08:07:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ECEB0B81CDC;
+        Fri,  6 Jan 2023 16:07:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B1C4C433EF;
+        Fri,  6 Jan 2023 16:07:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673021255;
+        bh=fErnzGHXYp7EafkqUofZ+/wlGIMUeDfiUn5oFwF8PJE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rf5RCh3GLjZ44a5+pgObN4yfEQfuca85fWyqwY9CZgECrt2KCA95nL3BPxHrgxUDb
+         +pvfRs8IjM839H91auovz6a/NnMZrvb5vAD+DKt9FJmUSlpznRfBaT1sEccgEjIBEM
+         ZgW078wbxJSJMD9Tg2QBTWP7b46qFeWULbEb4GQRenp5jUCj6qYgdnF1E8Ze0l29ih
+         X8QNZdNZmqep4Jvplq9Wumr2HR+zq+V7ibhRdJdOm1RGbvxYw3UJXqj1XF4VGELt51
+         HFVjRATppE+eGlYmy5X5D3qJt2KyhOakr39U2a7Q8edvaazsYp3/sB5Q4zvd6/DcDh
+         XfWEI0sSzSYPA==
+Date:   Fri, 6 Jan 2023 09:07:33 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] crypto: hisilicon: Wipe entire pool on error
+Message-ID: <Y7hHRYUk6NypdZxT@dev-arch.thelio-3990X>
+References: <20230106041945.never.831-kees@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v2] MAINTAINERS: Update email of Tudor Ambarus
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Tudor Ambarus <tudor.ambarus@linaro.org>
-CC:     <arnd@arndb.de>, <richard@nod.at>,
-        <krzysztof.kozlowski+dt@linaro.org>, <herbert@gondor.apana.org.au>,
-        <robh+dt@kernel.org>, <akpm@linux-foundation.org>,
-        <claudiu.beznea@microchip.com>, <broonie@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-spi@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <pratyush@kernel.org>, <michael@walle.cc>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20221226144043.367706-1-tudor.ambarus@linaro.org>
- <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
- <678ad800-7a3b-e2bf-6428-f06d696d8edb@linaro.org>
- <20230106165506.0a34fa78@xps-13>
-Content-Language: en-US
-From:   Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <20230106165506.0a34fa78@xps-13>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230106041945.never.831-kees@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 06/01/2023 at 16:55, Miquel Raynal wrote:
-> Hey Tudor, hello all,
+On Thu, Jan 05, 2023 at 08:19:48PM -0800, Kees Cook wrote:
+> To work around a Clang __builtin_object_size bug that shows up under
+> CONFIG_FORTIFY_SOURCE and UBSAN_BOUNDS, move the per-loop-iteration
+> mem_block wipe into a single wipe of the entire pool structure after
+> the loop.
 > 
-> tudor.ambarus@linaro.org wrote on Fri, 6 Jan 2023 17:45:20 +0200:
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1780
+> Cc: Weili Qian <qianweili@huawei.com>
+> Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+
+Thanks for the patch!
+
+Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+
+> ---
+>  drivers/crypto/hisilicon/sgl.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
->> Miquel,
->>
->> Since we don't have an answer from Arnd, would you please queue this to
->> mtd/fixes?
+> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+> index 2b6f2281cfd6..0974b0041405 100644
+> --- a/drivers/crypto/hisilicon/sgl.c
+> +++ b/drivers/crypto/hisilicon/sgl.c
+> @@ -124,9 +124,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+>  	for (j = 0; j < i; j++) {
+>  		dma_free_coherent(dev, block_size, block[j].sgl,
+>  				  block[j].sgl_dma);
+> -		memset(block + j, 0, sizeof(*block));
+>  	}
+> -	kfree(pool);
+> +	kfree_sensitive(pool);
+>  	return ERR_PTR(-ENOMEM);
+>  }
+>  EXPORT_SYMBOL_GPL(hisi_acc_create_sgl_pool);
+> -- 
+> 2.34.1
 > 
-> Are MAINTAINERS changes accepted through fixes PR? I see a number of
-> experienced people in Cc:, I would like to hear from you folks, because
-> I never had to do that before. If yes, then I'll do it right away,
-> otherwise I'll apply to mtd/next. I'm all ears :)
-
-I remember a conversation that stated that MAINTAINERS changes must land 
-in Linus' tree the quickest, because it'll just avoid confusion and 
-bouncing emails.
-
-My $0.2...
-
-Regards,
-   Nicolas
-
--- 
-Nicolas Ferre
-
