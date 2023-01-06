@@ -2,96 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205C7C5479D
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 08:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A20BC3DA7A
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 09:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230344AbjAFIkI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 03:40:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53346 "EHLO
+        id S231289AbjAFJBz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 04:01:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjAFIjv (ORCPT
+        with ESMTP id S229709AbjAFJBx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 03:39:51 -0500
+        Fri, 6 Jan 2023 04:01:53 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054F7F30;
-        Fri,  6 Jan 2023 00:39:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577AE625F1
+        for <linux-crypto@vger.kernel.org>; Fri,  6 Jan 2023 01:01:52 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pDiG4-00EV7i-2e; Fri, 06 Jan 2023 16:39:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Jan 2023 16:39:24 +0800
-Date:   Fri, 6 Jan 2023 16:39:24 +0800
+        id 1pDibl-00EVUN-1M; Fri, 06 Jan 2023 17:01:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Jan 2023 17:01:49 +0800
+Date:   Fri, 6 Jan 2023 17:01:49 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Message-ID: <Y7fePDme5E3yhPhQ@gondor.apana.org.au>
-References: <20221228071103.91797-1-jiajie.ho@starfivetech.com>
- <20221228071103.91797-3-jiajie.ho@starfivetech.com>
+To:     Markus Stockhausen <markus.stockhausen@gmx.de>
+Cc:     linux-crypto@vger.kernel.org, markus.stockhausen@gmx.de
+Subject: Re: [PATCH v3 3/6] crypto/realtek: hash algorithms
+Message-ID: <Y7fjfYCQdbP+2MU8@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221228071103.91797-3-jiajie.ho@starfivetech.com>
+In-Reply-To: <20221231162525.416709-4-markus.stockhausen@gmx.de>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 03:11:02PM +0800, Jia Jie Ho wrote:
+Markus Stockhausen <markus.stockhausen@gmx.de> wrote:
 >
-> +static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd)
-> +{
-> +	int ret;
+> +       while (datalen) {
+> +               len = min(sg_dma_len(sg), datalen);
 > +
-> +	ret = starfive_trng_wait_idle(trng);
-> +	if (ret)
-> +		return -ETIMEDOUT;
+> +               idx = rtcr_inc_src_idx(idx, 1);
+> +               rtcr_add_src_to_ring(cdev, idx, sg_virt(sg), len, reqlen);
+
+You cannot use sg_virt because the SG might not even be mapped
+into kernel address space.  Since the code then simply converts
+it to physical you should simply pass along the DMA address you
+obtained from the DMA API.
+
 > +
-> +	switch (cmd) {
-> +	case STARFIVE_CTRL_EXEC_NOP:
-> +		writel(cmd, trng->base + STARFIVE_CTRL);
-> +		break;
-> +	case STARFIVE_CTRL_GENE_RANDNUM:
-> +		reinit_completion(&trng->random_done);
-> +		writel(cmd, trng->base + STARFIVE_CTRL);
-> +		ret = wait_for_completion_timeout(&trng->random_done, 3000);
-
-Please don't use a constant jiffies value, because it may vary
-in length.  Instead use a constant millisecond value and convert
-it to jiffies.
-
-> +static irqreturn_t starfive_trng_irq(int irq, void *priv)
-> +{
-> +	u32 status;
-> +	struct starfive_trng *trng = (struct starfive_trng *)priv;
+> +               datalen -= len;
+> +               if (datalen)
+> +                       sg = sg_next(sg);
+> +       }
 > +
-> +	status = readl(trng->base + STARFIVE_ISTAT);
-> +	if (status & STARFIVE_ISTAT_RAND_RDY) {
-> +		writel(STARFIVE_ISTAT_RAND_RDY, trng->base + STARFIVE_ISTAT);
-> +		complete(&trng->random_done);
-> +	}
+> +       if (padlen) {
+> +               idx = rtcr_inc_src_idx(idx, 1);
+> +               rtcr_add_src_to_ring(cdev, idx, ppad, padlen, reqlen);
+> +       }
 > +
-> +	if (status & STARFIVE_ISTAT_SEED_DONE) {
-> +		writel(STARFIVE_ISTAT_SEED_DONE, trng->base + STARFIVE_ISTAT);
-> +		complete(&trng->reseed_done);
-> +	}
+> +       rtcr_add_src_pad_to_ring(cdev, idx, reqlen);
+> +       rtcr_add_src_ahash_to_ring(cdev, srcidx, hctx->opmode, reqlen);
 > +
-> +	if (status & STARFIVE_ISTAT_LFSR_LOCKUP) {
-> +		writel(STARFIVE_ISTAT_LFSR_LOCKUP, trng->base + STARFIVE_ISTAT);
-> +		starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED);
+> +       /* Off we go */
+> +       rtcr_kick_engine(cdev);
+> +       if (rtcr_wait_for_request(cdev, dstidx))
+> +               return -EINVAL;
 
-You should not sleep in an IRQ handler.
+You cannot sleep in this function because it may be called from
+softirq context.  Instead you should use asynchronous completion.
 
-> +static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-
-You should respect the wait argument and not do polling/sleeping
-if it is false.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
