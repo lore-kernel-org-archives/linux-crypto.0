@@ -2,80 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 664FDC5479D
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 09:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227D0C4708D
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Jan 2023 15:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232457AbjAFJQD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 04:16:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40494 "EHLO
+        id S234786AbjAFPTA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 10:19:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232591AbjAFJPj (ORCPT
+        with ESMTP id S234399AbjAFPSl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 04:15:39 -0500
+        Fri, 6 Jan 2023 10:18:41 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09726B58B;
-        Fri,  6 Jan 2023 01:15:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A468111F;
+        Fri,  6 Jan 2023 07:18:39 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pDip2-00EVk3-3Y; Fri, 06 Jan 2023 17:15:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Jan 2023 17:15:32 +0800
-Date:   Fri, 6 Jan 2023 17:15:32 +0800
+        id 1pDoTy-00Ebwp-VF; Fri, 06 Jan 2023 23:18:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Jan 2023 23:18:10 +0800
+Date:   Fri, 6 Jan 2023 23:18:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.2
-Message-ID: <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
-References: <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     dhowells@redhat.com, davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, ebiggers@kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
+Message-ID: <Y7g7sp6UJJrYKihK@gondor.apana.org.au>
+References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
+ <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
+In-Reply-To: <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Tue, Dec 27, 2022 at 03:27:39PM +0100, Roberto Sassu wrote:
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> The helper mpi_read_raw_from_sgl sets the number of entries in
+> the SG list according to nbytes.  However, if the last entry
+> in the SG list contains more data than nbytes, then it may overrun
+> the buffer because it only allocates enough memory for nbytes.
+> 
+> Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+> Reported-by: Roberto Sassu <roberto.sassu@huaweicloud.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  lib/mpi/mpicoder.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-The following changes since commit 1b929c02afd37871d5afb9d498426f83432e71c2:
-
-  Linux 6.2-rc1 (2022-12-25 13:41:39 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.2-p2 
-
-for you to fetch changes up to 736f88689c6912f05d0116917910603a7ba97de7:
-
-  crypto: arm64/sm4 - fix possible crash with CFI enabled (2022-12-30 17:57:42 +0800)
-
-----------------------------------------------------------------
-This push fixes a CFI crash in arm64/sm4 as well as a regression
-in the caam driver.
-----------------------------------------------------------------
-
-Nikolaus Voss (1):
-      crypto: caam - fix CAAM io mem access in blob_gen
-
-Tianjia Zhang (1):
-      crypto: arm64/sm4 - fix possible crash with CFI enabled
-
- arch/arm64/crypto/sm4-ce-ccm-core.S | 5 +++--
- arch/arm64/crypto/sm4-ce-gcm-core.S | 5 +++--
- drivers/crypto/caam/blob_gen.c      | 2 +-
- 3 files changed, 7 insertions(+), 5 deletions(-)
- 
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
