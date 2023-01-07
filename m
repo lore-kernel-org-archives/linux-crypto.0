@@ -2,102 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3AFC5479D
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 02:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90892C54EBD
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 14:17:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbjAGCGb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 21:06:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S232161AbjAGORf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 7 Jan 2023 09:17:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236366AbjAGCGV (ORCPT
+        with ESMTP id S231987AbjAGORe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 21:06:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B5687F2C;
-        Fri,  6 Jan 2023 18:06:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F3610B81EE6;
-        Sat,  7 Jan 2023 02:06:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFD3C433D2;
-        Sat,  7 Jan 2023 02:06:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673057177;
-        bh=TjnR4/cNwXYZcaHqUWqPKsdE8NWp+ngNLYzqeN7WR2I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UzRilV2g2QXwDJ0pSBDmIV06RzW7VAcxSXdN0j0pt8M2/fKc+9Dsbn36uBRfGz/a7
-         4dnpNM1YXth199JN5bZ0AqMFCIxEeiNYNLi/21t8Xt34IAwQr2PXGUJ7uPnPDfa29y
-         Wv8kRESxkuY/qeHy+13oNtgmEatB9kWlCTtRZuBMrgyDE7dN7QRwbDhwT2mLTp6r0O
-         PnONf9GVKZCA//eggdSoXjdXvOixjUUGYnj3DPTX8HkhO+WWmTdzHuuwG+uGSRs0N/
-         Z+/9LvPPAgmfxWjQyAPS+kouV1gjOQox5+Nmt7W44/X7lb2DuehGq5TUqZSp+QdF8F
-         l4wK59vbia82A==
-Date:   Fri, 6 Jan 2023 18:06:16 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Dmitry Safonov <dima@arista.com>
-Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] crypto/Documentation: Add crypto_pool kernel API
-Message-ID: <20230106180616.4a39dd2a@kernel.org>
-In-Reply-To: <20230103184257.118069-6-dima@arista.com>
-References: <20230103184257.118069-1-dima@arista.com>
-        <20230103184257.118069-6-dima@arista.com>
+        Sat, 7 Jan 2023 09:17:34 -0500
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E7B4D483;
+        Sat,  7 Jan 2023 06:17:32 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id C534E1C0003;
+        Sat,  7 Jan 2023 14:17:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1673101050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3vSlD9vjCmzG/8rJElMrfdFbS1XrvDaONmQUsaXCWKY=;
+        b=Kf2+8JwqCfDZofc4LQX/Nss0zvoyIjOfD4HtDOPTgIkrMThTREIpUk7EN8Xp1JApjr7Gf6
+        yg30je3wDF8CzQkbv0xu3KTrN7GMvtgt3LZKzLCEW/QbJvq/BJ5ZD+y8fF1PiVsNWczFgv
+        XWNKbjySPTftTVh/fs9k/h1HYKZbMSR9o39T5dbgky4rw2Zg1Trkhu7RkTfhmQ6x8zvYmG
+        Rcpx9Mo0F1gTrFO3CKN1JoKocyu/bzOR25dAwj55Wv/SSP5YbmBmAJIgP5NtzyieHR7ool
+        r/CgQLx3iyNPAP1+fH2m9+VxzXaJnzXo7+7BEvS4nrrZj+/RQmW2YWqYoJ+y8w==
+Date:   Sat, 7 Jan 2023 15:17:22 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@linaro.org>, <arnd@arndb.de>,
+        <richard@nod.at>, <krzysztof.kozlowski+dt@linaro.org>,
+        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
+        <claudiu.beznea@microchip.com>, <broonie@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-spi@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+        <pratyush@kernel.org>, <michael@walle.cc>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v2] MAINTAINERS: Update email of Tudor Ambarus
+Message-ID: <20230107151722.743401bf@xps-13>
+In-Reply-To: <20230106164751.7ddaf5c54e0a764344806848@linux-foundation.org>
+References: <20221226144043.367706-1-tudor.ambarus@linaro.org>
+        <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
+        <678ad800-7a3b-e2bf-6428-f06d696d8edb@linaro.org>
+        <20230106165506.0a34fa78@xps-13>
+        <f653b23f-cf25-61ec-60d4-91dd7823edd2@microchip.com>
+        <20230106164751.7ddaf5c54e0a764344806848@linux-foundation.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some extra nits here since you need to respin for the build warning
-(include the document in some index / toc tree and adjust the length 
-of the underscores to match the line length).
+Hi Nicolas & Andrew,
 
-On Tue,  3 Jan 2023 18:42:57 +0000 Dmitry Safonov wrote:
-> diff --git a/Documentation/crypto/crypto_pool.rst b/Documentation/crypto/crypto_pool.rst
-> new file mode 100644
-> index 000000000000..4b8443171421
-> --- /dev/null
-> +++ b/Documentation/crypto/crypto_pool.rst
-> @@ -0,0 +1,33 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +Per-CPU pool of crypto requests
-> +=============
-> +
-> +Overview
-> +--------
-> +The crypto pool API manages pre-allocated per-CPU pool of crypto requests,
-> +providing ability to use async crypto requests on fast paths, potentially
+akpm@linux-foundation.org wrote on Fri, 6 Jan 2023 16:47:51 -0800:
 
-.. you *don't* enable async crypto in this series, right?
+> On Fri, 6 Jan 2023 16:59:52 +0100 Nicolas Ferre <nicolas.ferre@microchip.=
+com> wrote:
+>=20
+> > > Are MAINTAINERS changes accepted through fixes PR? I see a number of
+> > > experienced people in Cc:, I would like to hear from you folks, becau=
+se
+> > > I never had to do that before. If yes, then I'll do it right away,
+> > > otherwise I'll apply to mtd/next. I'm all ears :) =20
+> >=20
+> > I remember a conversation that stated that MAINTAINERS changes must lan=
+d=20
+> > in Linus' tree the quickest, because it'll just avoid confusion and=20
+> > bouncing emails. =20
+>=20
+> Yes, I always merge MAINTAINERS fixes asap.
+>=20
+> Probably these fixes should be backported into -stable kernels also -
+> we don't want incorrect email addresses in *any* kernel.  But I don't
+> do that.
 
-> +on atomic contexts. The allocation and initialization of the requests should
+Thanks a lot for your feedback, I'll take care of it.
 
-s/on/in/ atomic contexts
-
-> +be done before their usage as it's slow-path and may sleep.
-> +
-> +Order of operations
-> +-------------------
-> +You are required to allocate a new pool prior using it and manage its lifetime.
-
-The use of second person is quite uncommon for documentation, but if
-you prefer so be it..
-
-> +You can allocate a per-CPU pool of ahash requests by ``crypto_pool_alloc_ahash()``.
-
-You don't need to use the backticks around function names and struct
-names. Our doc rendering system recognizes them automatically. 
-
-`make htmldocs` to see for yourself.
+Cheers,
+Miqu=C3=A8l
