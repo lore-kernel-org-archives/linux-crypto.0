@@ -2,93 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90892C54EBD
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 14:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E435C54EBC
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 15:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232161AbjAGORf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 Jan 2023 09:17:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
+        id S232172AbjAGPij (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 7 Jan 2023 10:38:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231987AbjAGORe (ORCPT
+        with ESMTP id S229621AbjAGPii (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 Jan 2023 09:17:34 -0500
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E7B4D483;
-        Sat,  7 Jan 2023 06:17:32 -0800 (PST)
+        Sat, 7 Jan 2023 10:38:38 -0500
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7183743D84;
+        Sat,  7 Jan 2023 07:38:36 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id C534E1C0003;
-        Sat,  7 Jan 2023 14:17:23 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 29A1AFF808;
+        Sat,  7 Jan 2023 15:38:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1673101050;
+        t=1673105914;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3vSlD9vjCmzG/8rJElMrfdFbS1XrvDaONmQUsaXCWKY=;
-        b=Kf2+8JwqCfDZofc4LQX/Nss0zvoyIjOfD4HtDOPTgIkrMThTREIpUk7EN8Xp1JApjr7Gf6
-        yg30je3wDF8CzQkbv0xu3KTrN7GMvtgt3LZKzLCEW/QbJvq/BJ5ZD+y8fF1PiVsNWczFgv
-        XWNKbjySPTftTVh/fs9k/h1HYKZbMSR9o39T5dbgky4rw2Zg1Trkhu7RkTfhmQ6x8zvYmG
-        Rcpx9Mo0F1gTrFO3CKN1JoKocyu/bzOR25dAwj55Wv/SSP5YbmBmAJIgP5NtzyieHR7ool
-        r/CgQLx3iyNPAP1+fH2m9+VxzXaJnzXo7+7BEvS4nrrZj+/RQmW2YWqYoJ+y8w==
-Date:   Sat, 7 Jan 2023 15:17:22 +0100
+        bh=1R0tFrnRkxpaya7FaSMEH1Vxs62o5AiwN5XKT3zuHOw=;
+        b=jYj6k5t0jgbDvGd8bBN/g2gAALOqzhmVIfHgCR4EGMSQQH+igzEXI72CvXV9rj2isD+3lB
+        7plO+djicHvAMNALglZLvO7OdDiFcMYoltr+V4Y3269dV8SsStrd1wokepVu2GXaq3iAJz
+        umt3+MRVjk4D5EmVCSNOYOp+jctimyb/o3O7W2xKRa2x6Thygx78mr7O4JW8R4czS7rt3G
+        kAAVLU2wD7P2aEWQhWLeqZVxYjbhEkhvTqEdV+rOQq2+Zb5Hp7NP3STRWbwPV7ZQNhv/47
+        xIs6Q+hqKVv5tG5T1B7j83eMuKuC2U11mLBh7sv2T5hgMVfoKc8A/4dWDFlX/A==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@linaro.org>, <arnd@arndb.de>,
-        <richard@nod.at>, <krzysztof.kozlowski+dt@linaro.org>,
-        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
-        <claudiu.beznea@microchip.com>, <broonie@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-spi@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <pratyush@kernel.org>, <michael@walle.cc>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
+To:     Tudor Ambarus <tudor.ambarus@linaro.org>, arnd@arndb.de,
+        richard@nod.at, miquel.raynal@bootlin.com
+Cc:     krzysztof.kozlowski+dt@linaro.org, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, akpm@linux-foundation.org,
+        nicolas.ferre@microchip.com, claudiu.beznea@microchip.com,
+        broonie@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-spi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, pratyush@kernel.org,
+        michael@walle.cc, Tudor Ambarus <tudor.ambarus@microchip.com>,
         Rob Herring <robh@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Subject: Re: [PATCH v2] MAINTAINERS: Update email of Tudor Ambarus
-Message-ID: <20230107151722.743401bf@xps-13>
-In-Reply-To: <20230106164751.7ddaf5c54e0a764344806848@linux-foundation.org>
-References: <20221226144043.367706-1-tudor.ambarus@linaro.org>
-        <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
-        <678ad800-7a3b-e2bf-6428-f06d696d8edb@linaro.org>
-        <20230106165506.0a34fa78@xps-13>
-        <f653b23f-cf25-61ec-60d4-91dd7823edd2@microchip.com>
-        <20230106164751.7ddaf5c54e0a764344806848@linux-foundation.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Date:   Sat,  7 Jan 2023 16:38:29 +0100
+Message-Id: <20230107153829.895550-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221226144043.367706-1-tudor.ambarus@linaro.org>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-linux-mtd-patch-notification: thanks
+X-linux-mtd-patch-commit: b'c0f7ae27539fbac267384a7bfc58296ea7550d52'
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Nicolas & Andrew,
+On Mon, 2022-12-26 at 14:40:43 UTC, Tudor Ambarus wrote:
+> From: Tudor Ambarus <tudor.ambarus@microchip.com>
+> 
+> My professional email will change and the microchip one will bounce after
+> mid-november of 2022.
+> 
+> Update the MAINTAINERS file, the YAML bindings, MODULE_AUTHOR entries and
+> author mentions, and add an entry in the .mailmap file.
+> 
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+> Acked-by: Rob Herring <robh@kernel.org>
+> Acked-by: Pratyush Yadav <pratyush@kernel.org>
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-akpm@linux-foundation.org wrote on Fri, 6 Jan 2023 16:47:51 -0800:
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/mtd/linux.git mtd/fixes, thanks.
 
-> On Fri, 6 Jan 2023 16:59:52 +0100 Nicolas Ferre <nicolas.ferre@microchip.=
-com> wrote:
->=20
-> > > Are MAINTAINERS changes accepted through fixes PR? I see a number of
-> > > experienced people in Cc:, I would like to hear from you folks, becau=
-se
-> > > I never had to do that before. If yes, then I'll do it right away,
-> > > otherwise I'll apply to mtd/next. I'm all ears :) =20
-> >=20
-> > I remember a conversation that stated that MAINTAINERS changes must lan=
-d=20
-> > in Linus' tree the quickest, because it'll just avoid confusion and=20
-> > bouncing emails. =20
->=20
-> Yes, I always merge MAINTAINERS fixes asap.
->=20
-> Probably these fixes should be backported into -stable kernels also -
-> we don't want incorrect email addresses in *any* kernel.  But I don't
-> do that.
-
-Thanks a lot for your feedback, I'll take care of it.
-
-Cheers,
-Miqu=C3=A8l
+Miquel
