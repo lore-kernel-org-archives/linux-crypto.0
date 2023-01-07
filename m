@@ -2,92 +2,165 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54F2C54EBE
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 01:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CAFAC54EBE
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 02:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236504AbjAGBz3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 20:55:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47566 "EHLO
+        id S236224AbjAGCEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 21:04:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236224AbjAGBzX (ORCPT
+        with ESMTP id S229561AbjAGCEa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 20:55:23 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E826F87932;
-        Fri,  6 Jan 2023 17:55:21 -0800 (PST)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Npjsz4cX9zRqsF;
-        Sat,  7 Jan 2023 09:53:43 +0800 (CST)
-Received: from [10.67.101.184] (10.67.101.184) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Sat, 7 Jan 2023 09:55:18 +0800
-Subject: Re: [PATCH] crypto: hisilicon: Wipe entire pool on error
-To:     Kees Cook <keescook@chromium.org>
-References: <20230106041945.never.831-kees@kernel.org>
-CC:     Nathan Chancellor <nathan@kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        Fri, 6 Jan 2023 21:04:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3542284BC9;
+        Fri,  6 Jan 2023 18:04:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA36761FC9;
+        Sat,  7 Jan 2023 02:04:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79737C433EF;
+        Sat,  7 Jan 2023 02:04:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673057069;
+        bh=eXKo7QYU90F0i+EYDEsUIHPHKJBoRS8xY5pfwKzPS9I=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UNxJqKKEbdICrNiQVuxmXTG9U7Pdb9HJe5AikMAS2GyghC+PLAyiomDf1ZMN/8b8q
+         wNJ6svHD+OZqPlNv0zLIy1xTsA79xMZmk1BfOJx1x/nGcBBcliM4/uhE/NnA8FXVmy
+         gXZTMbefvBwkZ4o4DK6abTTXvdCnywq1EB8842T+thIgTLZ3DGj+iFfFlKXP8FgS2s
+         6m6qjg+scB2kq+GCa6BUhXidGTKEa75FqC/Aibaev4dvWCVl5M2OEcT8abRloSXkDY
+         DeW8ab8EhcWhrO+OJhOzzv74YEnSWwCP6SaXYtBCp50Bul3vcQUS81Ep6Ze3dPMW4y
+         ZR6/XAuX98ebA==
+Date:   Fri, 6 Jan 2023 18:04:27 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <llvm@lists.linux.dev>, <linux-hardening@vger.kernel.org>
-From:   Weili Qian <qianweili@huawei.com>
-Message-ID: <7c9e9870-2456-01af-177f-1af62a0055e3@huawei.com>
-Date:   Sat, 7 Jan 2023 09:55:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] crypto/pool: Add crypto_pool_reserve_scratch()
+Message-ID: <20230106180427.2ccbea51@kernel.org>
+In-Reply-To: <20230103184257.118069-3-dima@arista.com>
+References: <20230103184257.118069-1-dima@arista.com>
+        <20230103184257.118069-3-dima@arista.com>
 MIME-Version: 1.0
-In-Reply-To: <20230106041945.never.831-kees@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.101.184]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue,  3 Jan 2023 18:42:54 +0000 Dmitry Safonov wrote:
+> Instead of having build-time hardcoded constant, reallocate scratch
+> area, if needed by user. Different algos, different users may need
+> different size of temp per-CPU buffer. Only up-sizing supported for
+> simplicity.
 
-On 2023/1/6 12:19, Kees Cook wrote:
-> To work around a Clang __builtin_object_size bug that shows up under
-> CONFIG_FORTIFY_SOURCE and UBSAN_BOUNDS, move the per-loop-iteration
-> mem_block wipe into a single wipe of the entire pool structure after
-> the loop.
-> 
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Link: https://github.com/ClangBuiltLinux/linux/issues/1780
-> Cc: Weili Qian <qianweili@huawei.com>
-> Cc: Zhou Wang <wangzhou1@hisilicon.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  drivers/crypto/hisilicon/sgl.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-> index 2b6f2281cfd6..0974b0041405 100644
-> --- a/drivers/crypto/hisilicon/sgl.c
-> +++ b/drivers/crypto/hisilicon/sgl.c
-> @@ -124,9 +124,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
->  	for (j = 0; j < i; j++) {
->  		dma_free_coherent(dev, block_size, block[j].sgl,
->  				  block[j].sgl_dma);
-> -		memset(block + j, 0, sizeof(*block));
->  	}
-> -	kfree(pool);
-> +	kfree_sensitive(pool);
->  	return ERR_PTR(-ENOMEM);
->  }
->  EXPORT_SYMBOL_GPL(hisi_acc_create_sgl_pool);
-> 
-Thanks for your patch.
+> -static int crypto_pool_scratch_alloc(void)
+> +/* Slow-path */
+> +/**
+> + * crypto_pool_reserve_scratch - re-allocates scratch buffer, slow-path
+> + * @size: request size for the scratch/temp buffer
+> + */
+> +int crypto_pool_reserve_scratch(unsigned long size)
 
-There is no sensitive data in the pool, so memset zero can be deleted directly.
+Does this have to be a separate call? Can't we make it part of 
+the pool allocation? AFAICT the scratch gets freed when last
+pool is freed, so the user needs to know to allocate the pool
+_first_ otherwise there's a potential race:
 
-Thanks,
-Weili
+ CPU 1               CPU 2
+
+ alloc pool
+                    set scratch
+ free pool
+ [frees scratch]
+                    alloc pool
+
+>  {
+> -	int cpu;
+> -
+> -	lockdep_assert_held(&cpool_mutex);
+> +#define FREE_BATCH_SIZE		64
+> +	void *free_batch[FREE_BATCH_SIZE];
+> +	int cpu, err = 0;
+> +	unsigned int i = 0;
+>  
+> +	mutex_lock(&cpool_mutex);
+> +	if (size == scratch_size) {
+> +		for_each_possible_cpu(cpu) {
+> +			if (per_cpu(crypto_pool_scratch, cpu))
+> +				continue;
+> +			goto allocate_scratch;
+> +		}
+> +		mutex_unlock(&cpool_mutex);
+> +		return 0;
+> +	}
+> +allocate_scratch:
+> +	size = max(size, scratch_size);
+> +	cpus_read_lock();
+>  	for_each_possible_cpu(cpu) {
+> -		void *scratch = per_cpu(crypto_pool_scratch, cpu);
+> +		void *scratch, *old_scratch;
+>  
+> -		if (scratch)
+> +		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
+> +		if (!scratch) {
+> +			err = -ENOMEM;
+> +			break;
+> +		}
+> +
+> +		old_scratch = per_cpu(crypto_pool_scratch, cpu);
+> +		/* Pairs with crypto_pool_get() */
+> +		WRITE_ONCE(*per_cpu_ptr(&crypto_pool_scratch, cpu), scratch);
+
+You're using RCU for protection here, please use rcu accessors.
+
+> +		if (!cpu_online(cpu)) {
+> +			kfree(old_scratch);
+>  			continue;
+> +		}
+> +		free_batch[i++] = old_scratch;
+> +		if (i == FREE_BATCH_SIZE) {
+> +			cpus_read_unlock();
+> +			synchronize_rcu();
+> +			while (i > 0)
+> +				kfree(free_batch[--i]);
+> +			cpus_read_lock();
+> +		}
+
+This is a memory allocation routine, can we simplify this by
+dynamically sizing "free_batch" and using call_rcu()?
+
+struct humf_blah {
+	struct rcu_head rcu;
+	unsigned int cnt;
+	void *data[];
+};
+
+cheezit = kmalloc(struct_size(blah, data, num_possible_cpus()));
+
+for_each ..
+	cheezit->data[cheezit->cnt++] = old_scratch;
+
+call_rcu(&cheezit->rcu, my_free_them_scratches)
+
+etc.
+
+Feels like that'd be much less locking, unlocking and general
+carefully'ing.
+
+> +	}
+> +	cpus_read_unlock();
+> +	if (!err)
+> +		scratch_size = size;
+
