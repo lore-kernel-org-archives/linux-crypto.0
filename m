@@ -2,78 +2,232 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4655FC64981
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 00:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A481C5479D
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Jan 2023 01:53:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236642AbjAGAr7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Jan 2023 19:47:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51508 "EHLO
+        id S230293AbjAGBxe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Jan 2023 20:53:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236749AbjAGAr4 (ORCPT
+        with ESMTP id S230023AbjAGBxc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Jan 2023 19:47:56 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5895677D3A;
-        Fri,  6 Jan 2023 16:47:55 -0800 (PST)
+        Fri, 6 Jan 2023 20:53:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C17C87932;
+        Fri,  6 Jan 2023 17:53:31 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1F40FB81F44;
-        Sat,  7 Jan 2023 00:47:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E251C433D2;
-        Sat,  7 Jan 2023 00:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1673052472;
-        bh=nNZcUm2y6TRRNHYmy0+qpiZspVpC072+41FVY/tKC7Y=;
+        by ams.source.kernel.org (Postfix) with ESMTPS id A8942B81EFF;
+        Sat,  7 Jan 2023 01:53:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1A27C433D2;
+        Sat,  7 Jan 2023 01:53:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673056408;
+        bh=6XskKwH1CcZPB6O4nU/7JgwwAU5XHZ3lVHzF1vTq5Hw=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=cYJQWGa79RwekO/UXP3plTpopDgQkWdLf6BXafu/pwqkk5wJUE5Ko9BxRcaL9EGsd
-         RgCymAUjIHT7QHTNtJi76uZnX5KfDvIpquWglGa1n4ieQS7jsOvCYRLwoZp0/RNOLO
-         swWhSpCpNMdYsYpmttFF0E39evxAgC35q3cy5O9s=
-Date:   Fri, 6 Jan 2023 16:47:51 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Tudor Ambarus <tudor.ambarus@linaro.org>, <arnd@arndb.de>,
-        <richard@nod.at>, <krzysztof.kozlowski+dt@linaro.org>,
-        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
-        <claudiu.beznea@microchip.com>, <broonie@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-spi@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <pratyush@kernel.org>, <michael@walle.cc>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v2] MAINTAINERS: Update email of Tudor Ambarus
-Message-Id: <20230106164751.7ddaf5c54e0a764344806848@linux-foundation.org>
-In-Reply-To: <f653b23f-cf25-61ec-60d4-91dd7823edd2@microchip.com>
-References: <20221226144043.367706-1-tudor.ambarus@linaro.org>
-        <feb09bac-0ea4-9154-362b-6d81cba352a8@linaro.org>
-        <678ad800-7a3b-e2bf-6428-f06d696d8edb@linaro.org>
-        <20230106165506.0a34fa78@xps-13>
-        <f653b23f-cf25-61ec-60d4-91dd7823edd2@microchip.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
+        b=BGkNH17nlSOCeDY+Hd+W1EEpFyZlxMLfAvXiMTK+K5HQFZg/AQlzgt1GEfK48zDHQ
+         sSDnIFVhaSWC8da37uqt8M91WVQYg2pKPh69uh8Pt+PpUd/xgOT/HIH6GROlrF0sh2
+         4SCThLZe1wi3HZ8U7b3qklyxU+hDq5Fddxg6XrB5l2z3B2igCRPsy6bkYmEO9wWYJ/
+         sFi5kkO3Ul1WXeuruMUaeyI0CTwNJPgseXnnljALc3zvSercpjxgZOJQKisHzkAPxR
+         l5nz9YgRmbCFJ+iLK31bbHlA+vVOSl9RCTwfY9+TG8DJEY3cD5txwLc7NO+jrsKsqt
+         4/IeHxnwZMvIQ==
+Date:   Fri, 6 Jan 2023 17:53:26 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] crypto: Introduce crypto_pool
+Message-ID: <20230106175326.2d6a4dcd@kernel.org>
+In-Reply-To: <20230103184257.118069-2-dima@arista.com>
+References: <20230103184257.118069-1-dima@arista.com>
+        <20230103184257.118069-2-dima@arista.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 6 Jan 2023 16:59:52 +0100 Nicolas Ferre <nicolas.ferre@microchip.com> wrote:
-
-> > Are MAINTAINERS changes accepted through fixes PR? I see a number of
-> > experienced people in Cc:, I would like to hear from you folks, because
-> > I never had to do that before. If yes, then I'll do it right away,
-> > otherwise I'll apply to mtd/next. I'm all ears :)
+On Tue,  3 Jan 2023 18:42:53 +0000 Dmitry Safonov wrote:
+> Introduce a per-CPU pool of async crypto requests that can be used
+> in bh-disabled contexts (designed with net RX/TX softirqs as users in
+> mind). Allocation can sleep and is a slow-path.
+> Initial implementation has only ahash as a backend and a fix-sized array
+> of possible algorithms used in parallel.
 > 
-> I remember a conversation that stated that MAINTAINERS changes must land 
-> in Linus' tree the quickest, because it'll just avoid confusion and 
-> bouncing emails.
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 
-Yes, I always merge MAINTAINERS fixes asap.
+> +config CRYPTO_POOL
+> +	tristate "Per-CPU crypto pool"
+> +	default n
+> +	help
+> +	  Per-CPU pool of crypto requests ready for usage in atomic contexts.
 
-Probably these fixes should be backported into -stable kernels also -
-we don't want incorrect email addresses in *any* kernel.  But I don't
-do that.
+Let's make it a hidden symbol? It seems like a low-level library
+which gets select'ed, so no point bothering users with questions.
+
+config CRYPTO_POOL
+	tristate
+
+that's it.
+
+> +static int crypto_pool_scratch_alloc(void)
+
+This isn't called by anything in this patch..
+crypto_pool_alloc_ahash() should call it I'm guessing?
+
+> +{
+> +	int cpu;
+> +
+> +	lockdep_assert_held(&cpool_mutex);
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		void *scratch = per_cpu(crypto_pool_scratch, cpu);
+> +
+> +		if (scratch)
+> +			continue;
+> +
+> +		scratch = kmalloc_node(scratch_size, GFP_KERNEL,
+> +				       cpu_to_node(cpu));
+> +		if (!scratch)
+> +			return -ENOMEM;
+> +		per_cpu(crypto_pool_scratch, cpu) = scratch;
+> +	}
+> +	return 0;
+> +}
+
+> +out_free:
+> +	if (!IS_ERR_OR_NULL(hash) && e->needs_key)
+> +		crypto_free_ahash(hash);
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		if (*per_cpu_ptr(e->req, cpu) == NULL)
+> +			break;
+> +		hash = crypto_ahash_reqtfm(*per_cpu_ptr(e->req, cpu));
+
+Could you use a local variable here instead of @hash?
+That way you won't need the two separate free_ahash()
+one before and one after the loop..
+
+> +		ahash_request_free(*per_cpu_ptr(e->req, cpu));
+
+I think using @req here would be beneficial as well :S
+
+> +		if (e->needs_key) {
+> +			crypto_free_ahash(hash);
+> +			hash = NULL;
+> +		}
+> +	}
+> +
+> +	if (hash)
+> +		crypto_free_ahash(hash);
+
+This error handling is tricky as hell, please just add a separate
+variable to hold the 
+
+> +out_free_req:
+> +	free_percpu(e->req);
+> +out_free_alg:
+> +	kfree(e->alg);
+> +	e->alg = NULL;
+> +	return ret;
+> +}
+> +
+> +/**
+> + * crypto_pool_alloc_ahash - allocates pool for ahash requests
+> + * @alg: name of async hash algorithm
+> + */
+> +int crypto_pool_alloc_ahash(const char *alg)
+> +{
+> +	int i, ret;
+> +
+> +	/* slow-path */
+> +	mutex_lock(&cpool_mutex);
+> +
+> +	for (i = 0; i < cpool_populated; i++) {
+> +		if (cpool[i].alg && !strcmp(cpool[i].alg, alg)) {
+> +			if (kref_read(&cpool[i].kref) > 0) {
+
+In the current design we can as well resurrect a pool waiting to 
+be destroyed, right? Just reinit the ref and we're good.
+
+Otherwise the read() + get() looks quite suspicious to a reader.
+
+> +				kref_get(&cpool[i].kref);
+> +				ret = i;
+> +				goto out;
+> +			} else {
+> +				break;
+> +			}
+> +		}
+> +	}
+> +
+> +	for (i = 0; i < cpool_populated; i++) {
+> +		if (!cpool[i].alg)
+> +			break;
+> +	}
+> +	if (i >= CPOOL_SIZE) {
+> +		ret = -ENOSPC;
+> +		goto out;
+> +	}
+> +
+> +	ret = __cpool_alloc_ahash(&cpool[i], alg);
+> +	if (!ret) {
+> +		ret = i;
+> +		if (i == cpool_populated)
+> +			cpool_populated++;
+> +	}
+> +out:
+> +	mutex_unlock(&cpool_mutex);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_pool_alloc_ahash);
+
+> +/**
+> + * crypto_pool_add - increases number of users (refcounter) for a pool
+> + * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
+> + */
+> +void crypto_pool_add(unsigned int id)
+> +{
+> +	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
+> +		return;
+> +	kref_get(&cpool[id].kref);
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_pool_add);
+> +
+> +/**
+> + * crypto_pool_get - disable bh and start using crypto_pool
+> + * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
+> + * @c: returned crypto_pool for usage (uninitialized on failure)
+> + */
+> +int crypto_pool_get(unsigned int id, struct crypto_pool *c)
+
+Is there a precedent somewhere for the _add() and _get() semantics
+you're using here? I don't think I've seen _add() for taking a
+reference, maybe _get() -> start(), _add() -> _get()?
+
+> +{
+> +	struct crypto_pool_ahash *ret = (struct crypto_pool_ahash *)c;
+> +
+> +	local_bh_disable();
+> +	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg)) {
+> +		local_bh_enable();
+> +		return -EINVAL;
+> +	}
+> +	ret->req = *this_cpu_ptr(cpool[id].req);
+> +	ret->base.scratch = this_cpu_read(crypto_pool_scratch);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_pool_get);
+
