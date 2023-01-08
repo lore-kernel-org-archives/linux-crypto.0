@@ -2,55 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBB3C54EBD
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 20:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C219AC54EBC
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 22:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234729AbjAHUYW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Jan 2023 15:24:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39278 "EHLO
+        id S233652AbjAHWt3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 8 Jan 2023 17:49:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234193AbjAHUYV (ORCPT
+        with ESMTP id S231272AbjAHWt1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Jan 2023 15:24:21 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9F8F5A8
-        for <linux-crypto@vger.kernel.org>; Sun,  8 Jan 2023 12:24:19 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id bt23so9976536lfb.5
-        for <linux-crypto@vger.kernel.org>; Sun, 08 Jan 2023 12:24:19 -0800 (PST)
+        Sun, 8 Jan 2023 17:49:27 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6532B637C
+        for <linux-crypto@vger.kernel.org>; Sun,  8 Jan 2023 14:49:26 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id o7-20020a17090a0a0700b00226c9b82c3aso7497465pjo.3
+        for <linux-crypto@vger.kernel.org>; Sun, 08 Jan 2023 14:49:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=profian-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9RKhBj64YrGDgXaenCnk38khEC4PTOlAR4b5SORehLE=;
-        b=crYBvuwx12qdFGVvrOl8neMcQdVhQqr4cNtM4ua/EAUTmz34scR0o8RS3bqgt+nLwP
-         2UI+Euz+1y7j6bKfkCXMhCwkMl32Y8xts17IAgYYt6w0Td+nd7mcLJHByn44gDwCM2Ek
-         SYE6adNKxCxeBB630mbJF+xM5YZZpZQFYRgG29iCW9EkICfeoxFlljkyK9d/mN/j5a73
-         QrZuBhXO1I4LdLILxPJY4wK/LrQcZDcKxpE6PM+wXuKfwL+ntm3JCU1jGKqa2yc2ic4C
-         g2qKeDDYONNoxXjhz2xVifhrGnEN+qN6RWo0YTx2eN5LwU+6MLnP9C1MvGpWqC6e/Ydc
-         2eQg==
+        d=google.com; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+2EwBkT4ghB1jNt4S3UOpy3yeEZLhAzU9lSbZIAM7I4=;
+        b=IjbxJtzUDxQwTlGXvZfUXOkwvqxSafaHnYeSIIG1WzG669+JyAc4qXN/gkvArxh5SD
+         KsO/Gv3wxOSLuyRYLl7m++Sq+g2drIqTdrxHsBlUpfTotBCSHg6+bVEfSVH1azliE2T6
+         kMuxAfKCDqnPkj6ErNSZQcpYqqgzNbw1dL0XfJp7+zFUEPB+EvTlPWcm9HtX7LUVmzhd
+         ByL2BLxvkd6E8hMF+wBGoDQ8BbnAEINIRyGfhoWVJejIo8RthJBu2RF2L6c+QtHw++DZ
+         CTAC17nlepfakuYDSfZnfsWM8iXclE/CuFhCDYSVdCMCN+ZnCAMp5X+ACqqFzjacfUKi
+         t5iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9RKhBj64YrGDgXaenCnk38khEC4PTOlAR4b5SORehLE=;
-        b=oplRV+PdUq+iTCNdsIkP61n0v8j4fhx1KbCcSSDnt0XA/PgahBMDx6v+U3qZDZSsTj
-         M5VnGwO8CFp60hWiStsJYDvzcul8ougoc0ZLKivLgkadUJgVQzB7TOhlrBXPvy/b9154
-         2+MhLHHoj42bd/HINFTn0Jm6vtrd973I/jd1USYAGYSxXpDRSpjW5SRJiDZc7mD4Agdm
-         QLBoXi/tBE9S38TH36yIvwnNd3QhYwrh6CbJtLvqJwjUcPLT9LjJx+EYedHbFFlUniQw
-         zWdVNJDCZPhWQoBfA65R5k4xXYKlqSgASmymyfG8rafL/jWDDBdhb2TzPPY2P5Se6eMZ
-         C73A==
-X-Gm-Message-State: AFqh2kqw1EAjMDWgk9++Yv4xgRWrUNfH4NOIZjgkpzrfHlxkBvFkGKrL
-        +VZQrVZWxQjcnb9Woy9gYsY+lQ==
-X-Google-Smtp-Source: AMrXdXuhcg3GB/YJ2ZoVGa+/QfQ8Ub5XkF/qxTJtW1ugMW8laWqeK9Eh47TMdV/0NgiXYCuLiMnb3A==
-X-Received: by 2002:a05:6512:22c1:b0:4cb:783:54cd with SMTP id g1-20020a05651222c100b004cb078354cdmr15534958lfu.17.1673209457817;
-        Sun, 08 Jan 2023 12:24:17 -0800 (PST)
-Received: from localhost ([85.202.81.211])
-        by smtp.gmail.com with ESMTPSA id u7-20020ac258c7000000b004a100c21eaesm1213445lfo.97.2023.01.08.12.24.16
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+2EwBkT4ghB1jNt4S3UOpy3yeEZLhAzU9lSbZIAM7I4=;
+        b=wZUhfmpr+W6T2l0bnHA0YIkgcUulJKHsXjEQJM+hq8AYGWXq7m9hwlMoDpHexUNn7f
+         AmlXiDdLwPzdvk6ravlCWDZVkuTxWg+/jpp9F2fuwbAE4i5Gckaw2hJJCdaWdZo2YNlM
+         I38rvfP5MFmXt6/PdUS6/y6b+K5P/TVTOxc0xWNOFxhy0CCYsQhtzRGM5qdUH/xL3kpo
+         9fpYf7v3H2y3aWrahEyInp96u5Ec9XN1Tztv1hl1flG3c3lLfRj/zsSZ/OvWs0meZFZN
+         abCSHzTfSUrDNS3MIE08U4hk9yYN58kdU8/YdfKspbIPkX2jo9ujySkQmskqI8cpHT5C
+         Vb5A==
+X-Gm-Message-State: AFqh2kp6RYUZzrJoCrBhm6iMCpHj1UniD5SrFD7aIBd0WCZmfgNcic2A
+        N5YmqnLplyW0CiEIBQFMEogjrQ==
+X-Google-Smtp-Source: AMrXdXvFomA3pBImLcMEFvQje52p88TQ7bSKJjQem9k+a9RDK9TT4WhVZ39yoEM1TO2IIQGIx51y+w==
+X-Received: by 2002:a17:90b:3d03:b0:226:59d6:8219 with SMTP id pt3-20020a17090b3d0300b0022659d68219mr393178pjb.0.1673218165776;
+        Sun, 08 Jan 2023 14:49:25 -0800 (PST)
+Received: from [2620:15c:29:203:dfeb:5ed2:4968:d28b] ([2620:15c:29:203:dfeb:5ed2:4968:d28b])
+        by smtp.gmail.com with ESMTPSA id r23-20020a17090b051700b002271f55157bsm22569pjz.9.2023.01.08.14.49.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jan 2023 12:24:17 -0800 (PST)
-From:   Jarkko Sakkinen <jarkko@profian.com>
-To:     Sean Christopherson <seanjc@google.com>,
+        Sun, 08 Jan 2023 14:49:25 -0800 (PST)
+Date:   Sun, 8 Jan 2023 14:49:24 -0800 (PST)
+From:   David Rientjes <rientjes@google.com>
+To:     Jarkko Sakkinen <jarkko@profian.com>
+cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -60,201 +61,49 @@ To:     Sean Christopherson <seanjc@google.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     David Rientjes <rientjes@google.com>,
-        Jarkko Sakkinen <jarkko@profian.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Jarkko Sakkinen <jarkko@kernel.org>,
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT)),
-        linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER - SE...)
-Subject: [PATCH v2] crypto: ccp: Sanitize sev_platform_init() error messages
-Date:   Sun,  8 Jan 2023 20:24:05 +0000
-Message-Id: <20230108202407.104963-1-jarkko@profian.com>
-X-Mailer: git-send-email 2.38.1
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2] crypto: ccp: Sanitize sev_platform_init() error
+ messages
+In-Reply-To: <20230108202407.104963-1-jarkko@profian.com>
+Message-ID: <30d6aa4c-3af9-9e4c-748e-c7378b519504@google.com>
+References: <20230108202407.104963-1-jarkko@profian.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The following functions end up calling sev_platform_init() or
-__sev_platform_init_locked():
+On Sun, 8 Jan 2023, Jarkko Sakkinen wrote:
 
-* sev_guest_init()
-* sev_ioctl_do_pek_csr
-* sev_ioctl_do_pdh_export()
-* sev_ioctl_do_pek_import()
-* sev_ioctl_do_pek_pdh_gen()
-* sev_pci_init()
+> The following functions end up calling sev_platform_init() or
+> __sev_platform_init_locked():
+> 
+> * sev_guest_init()
+> * sev_ioctl_do_pek_csr
+> * sev_ioctl_do_pdh_export()
+> * sev_ioctl_do_pek_import()
+> * sev_ioctl_do_pek_pdh_gen()
+> * sev_pci_init()
+> 
+> However, only sev_pci_init() prints out the failed command error code, and
+> even there the error message does not specify, SEV which command failed.
+> 
+> Address this by printing out the SEV command errors inside
+> __sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
+> INIT_EX commands.  As a side-effect, @error can be removed from the
+> parameter list.
+> 
+> This extra information is particularly useful if firmware loading and/or
+> initialization is going to be made more robust, e.g. by allowing firmware
+> loading to be postponed.
+> 
+> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
 
-However, only sev_pci_init() prints out the failed command error code, and
-even there the error message does not specify, SEV which command failed.
-
-Address this by printing out the SEV command errors inside
-__sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
-INIT_EX commands.  As a side-effect, @error can be removed from the
-parameter list.
-
-This extra information is particularly useful if firmware loading and/or
-initialization is going to be made more robust, e.g. by allowing firmware
-loading to be postponed.
-
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
-v2:
-* Address David Rientjes's feedback:
-  https://lore.kernel.org/all/6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com/
-* Remove @error.
-* Remove "SEV_" prefix: it is obvious from context so no need to make klog
-  line longer.
----
- arch/x86/kvm/svm/sev.c       |  2 +-
- drivers/crypto/ccp/sev-dev.c | 33 +++++++++++++++++----------------
- include/linux/psp-sev.h      |  4 +---
- 3 files changed, 19 insertions(+), 20 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index efaaef2b7ae1..42e6bd637896 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -254,7 +254,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		goto e_no_asid;
- 	sev->asid = asid;
- 
--	ret = sev_platform_init(&argp->error);
-+	ret = sev_platform_init();
- 	if (ret)
- 		goto e_free;
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 06fc7156c04f..3b66cb1495d4 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -440,7 +440,7 @@ static int __sev_init_ex_locked(int *error)
- 	return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
- }
- 
--static int __sev_platform_init_locked(int *error)
-+static int __sev_platform_init_locked(void)
- {
- 	struct psp_device *psp = psp_master;
- 	struct sev_device *sev;
-@@ -476,19 +476,21 @@ static int __sev_platform_init_locked(int *error)
- 		dev_err(sev->dev, "SEV: retrying INIT command because of SECURE_DATA_INVALID error. Retrying once to reset PSP SEV state.");
- 		rc = init_function(&psp_ret);
- 	}
--	if (error)
--		*error = psp_ret;
--
--	if (rc)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: %s failed error %#x",
-+			sev_init_ex_buffer ? "CMD_INIT_EX" : "CMD_INIT", psp_ret);
- 		return rc;
-+	}
- 
- 	sev->state = SEV_STATE_INIT;
- 
- 	/* Prepare for first SEV guest launch after INIT */
- 	wbinvd_on_all_cpus();
--	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
--	if (rc)
-+	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &psp_ret);
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: CMD_DF_FLUSH failed error %#x", psp_ret);
- 		return rc;
-+	}
- 
- 	dev_dbg(sev->dev, "SEV firmware initialized\n");
- 
-@@ -498,12 +500,12 @@ static int __sev_platform_init_locked(int *error)
- 	return 0;
- }
- 
--int sev_platform_init(int *error)
-+int sev_platform_init(void)
- {
- 	int rc;
- 
- 	mutex_lock(&sev_cmd_mutex);
--	rc = __sev_platform_init_locked(error);
-+	rc = __sev_platform_init_locked();
- 	mutex_unlock(&sev_cmd_mutex);
- 
- 	return rc;
-@@ -610,7 +612,7 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool wr
- 		return -EPERM;
- 
- 	if (sev->state == SEV_STATE_UNINIT) {
--		rc = __sev_platform_init_locked(&argp->error);
-+		rc = __sev_platform_init_locked();
- 		if (rc)
- 			return rc;
- 	}
-@@ -653,7 +655,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 
- cmd:
- 	if (sev->state == SEV_STATE_UNINIT) {
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = __sev_platform_init_locked();
- 		if (ret)
- 			goto e_free_blob;
- 	}
-@@ -849,7 +851,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 
- 	/* If platform is not in INIT state then transition it to INIT */
- 	if (sev->state != SEV_STATE_INIT) {
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = __sev_platform_init_locked();
- 		if (ret)
- 			goto e_free_oca;
- 	}
-@@ -973,7 +975,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 		if (!writable)
- 			return -EPERM;
- 
--		ret = __sev_platform_init_locked(&argp->error);
-+		ret = __sev_platform_init_locked();
- 		if (ret)
- 			return ret;
- 	}
-@@ -1335,10 +1337,9 @@ void sev_pci_init(void)
- 		return;
- 
- 	/* Initialize the platform */
--	rc = sev_platform_init(&error);
-+	rc = sev_platform_init();
- 	if (rc)
--		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
--			error, rc);
-+		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
- 
- 	return;
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 1595088c428b..2f8681b753d0 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -536,8 +536,6 @@ struct sev_data_attestation_report {
- /**
-  * sev_platform_init - perform SEV INIT command
-  *
-- * @error: SEV command return code
-- *
-  * Returns:
-  * 0 if the SEV successfully processed the command
-  * -%ENODEV    if the SEV device is not available
-@@ -545,7 +543,7 @@ struct sev_data_attestation_report {
-  * -%ETIMEDOUT if the SEV command timed out
-  * -%EIO       if the SEV returned a non-zero return code
-  */
--int sev_platform_init(int *error);
-+int sev_platform_init(void);
- 
- /**
-  * sev_platform_status - perform SEV PLATFORM_STATUS command
--- 
-2.38.1
-
+Acked-by: David Rientjes <rientjes@google.com>
