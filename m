@@ -2,141 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC72C54EBE
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 14:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9866FC54EBD
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 17:36:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233196AbjAHONP convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Jan 2023 09:13:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57964 "EHLO
+        id S231272AbjAHRgx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 8 Jan 2023 12:36:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230478AbjAHONO (ORCPT
+        with ESMTP id S230396AbjAHRgw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Jan 2023 09:13:14 -0500
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D475DFBA;
-        Sun,  8 Jan 2023 06:13:09 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id E0DCB24DC94;
-        Sun,  8 Jan 2023 22:13:05 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Sun, 8 Jan
- 2023 22:13:05 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Sun, 8 Jan 2023 22:13:05 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+        Sun, 8 Jan 2023 12:36:52 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378EB24B;
+        Sun,  8 Jan 2023 09:36:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=yKwi7oD+9dGKCBplTt1ZAZy1UM
+        JXAsnyA1aDqDuxkNzWyltXEaET7t3Q7x7iASiXLms09724QP0A1sjmMIHvhbwIfNHUnwJ2Bx5yXzt
+        TB3hXd2ACPEuwJJT8dAA7q/8AAmQ/SN4JTRACLII5D2lS+S0g9BSyacVtHplzIkWnvn2rq/fZu3xg
+        6BAoPtcqtjvYHLIXcB/fGTJMZPFiYbrOkLZCkvvO0LrIIF61ZuFzairBHD3aZw4Txn89i+cgmIQIh
+        KjzZvlPbh6yBy2Uz+eBWroqAxujoZXN/bEFFyqQzGrMebT34JcZ4Q3a5k59UCoiNgQPhXkj2DLlPj
+        9h+qZxKQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pEZb7-00Eewp-SH; Sun, 08 Jan 2023 17:36:41 +0000
+Date:   Sun, 8 Jan 2023 09:36:41 -0800
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Olivia Mackall <olivia@selenic.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Thread-Topic: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive
- SoC
-Thread-Index: AQHZGoveBWEVWeSp5UqGtlmGFQKs8K6QmY4AgAQHL+A=
-Date:   Sun, 8 Jan 2023 14:13:05 +0000
-Message-ID: <75798088d1cd41dd94dafe67179761d9@EXMBX168.cuchost.com>
-References: <20221228071103.91797-1-jiajie.ho@starfivetech.com>
- <20221228071103.91797-3-jiajie.ho@starfivetech.com>
- <Y7fePDme5E3yhPhQ@gondor.apana.org.au>
-In-Reply-To: <Y7fePDme5E3yhPhQ@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [172.16.6.8]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LinuxKernelMailingList@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: sun8i-ss - Remove GFP_DMA and add DMA alignment
+ padding
+Message-ID: <Y7r/KaGH6oFjS5MV@infradead.org>
+References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
+ <Y4xpGNNsfbucyUlt@infradead.org>
+ <Y47BgCuZsYLX61A9@gondor.apana.org.au>
+ <Y47g7qO8dsRdxCgf@infradead.org>
+ <Y47+gxbdKR03EYCj@gondor.apana.org.au>
+ <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y61WrVAjjtAMAvSh@gondor.apana.org.au>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Looks good:
 
-
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: 6 January, 2023 4:39 PM
-> To: JiaJie Ho <jiajie.ho@starfivetech.com>
-> Cc: Olivia Mackall <olivia@selenic.com>; Rob Herring <robh+dt@kernel.org>;
-> Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Emil Renner
-> Berthing <kernel@esmil.dk>; Conor Dooley <conor.dooley@microchip.com>;
-> linux-crypto@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-riscv@lists.infradead.org
-> Subject: Re: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive
-> SoC
-> 
-> On Wed, Dec 28, 2022 at 03:11:02PM +0800, Jia Jie Ho wrote:
-> >
-> > +static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd) {
-> > +	int ret;
-> > +
-> > +	ret = starfive_trng_wait_idle(trng);
-> > +	if (ret)
-> > +		return -ETIMEDOUT;
-> > +
-> > +	switch (cmd) {
-> > +	case STARFIVE_CTRL_EXEC_NOP:
-> > +		writel(cmd, trng->base + STARFIVE_CTRL);
-> > +		break;
-> > +	case STARFIVE_CTRL_GENE_RANDNUM:
-> > +		reinit_completion(&trng->random_done);
-> > +		writel(cmd, trng->base + STARFIVE_CTRL);
-> > +		ret = wait_for_completion_timeout(&trng->random_done,
-> 3000);
-> 
-> Please don't use a constant jiffies value, because it may vary in length.
-> Instead use a constant millisecond value and convert it to jiffies.
-> 
-
-I'll fix this in next version.
-
-> > +static irqreturn_t starfive_trng_irq(int irq, void *priv) {
-> > +	u32 status;
-> > +	struct starfive_trng *trng = (struct starfive_trng *)priv;
-> > +
-> > +	status = readl(trng->base + STARFIVE_ISTAT);
-> > +	if (status & STARFIVE_ISTAT_RAND_RDY) {
-> > +		writel(STARFIVE_ISTAT_RAND_RDY, trng->base +
-> STARFIVE_ISTAT);
-> > +		complete(&trng->random_done);
-> > +	}
-> > +
-> > +	if (status & STARFIVE_ISTAT_SEED_DONE) {
-> > +		writel(STARFIVE_ISTAT_SEED_DONE, trng->base +
-> STARFIVE_ISTAT);
-> > +		complete(&trng->reseed_done);
-> > +	}
-> > +
-> > +	if (status & STARFIVE_ISTAT_LFSR_LOCKUP) {
-> > +		writel(STARFIVE_ISTAT_LFSR_LOCKUP, trng->base +
-> STARFIVE_ISTAT);
-> > +		starfive_trng_cmd(trng,
-> STARFIVE_CTRL_EXEC_RANDRESEED);
-> 
-> You should not sleep in an IRQ handler.
-> 
-
-Will fix this too.
-
-> > +static int starfive_trng_read(struct hwrng *rng, void *buf, size_t
-> > +max, bool wait)
-> 
-> You should respect the wait argument and not do polling/sleeping if it is false.
-
-I'll add this in the next version.
-
-Thanks for reviewing this patch.
-
-Best regards,
-Jia Jie
+Reviewed-by: Christoph Hellwig <hch@lst.de>
