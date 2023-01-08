@@ -2,152 +2,170 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FE5C54EBE
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 18:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA7BC54EBC
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Jan 2023 19:51:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233104AbjAHSeK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Jan 2023 13:34:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
+        id S233451AbjAHTvE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 8 Jan 2023 14:51:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229673AbjAHSdz (ORCPT
+        with ESMTP id S233758AbjAHTvC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Jan 2023 13:33:55 -0500
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CE41005;
-        Sun,  8 Jan 2023 10:33:54 -0800 (PST)
-Received: by mail-il1-f175.google.com with SMTP id u8so3833295ilq.13;
-        Sun, 08 Jan 2023 10:33:54 -0800 (PST)
+        Sun, 8 Jan 2023 14:51:02 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17659D101
+        for <linux-crypto@vger.kernel.org>; Sun,  8 Jan 2023 11:51:01 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id y25so9925862lfa.9
+        for <linux-crypto@vger.kernel.org>; Sun, 08 Jan 2023 11:51:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=profian-com.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aU2zr2iZRkwdiLRZc2HQ0PPfl5aKsrDvsWOmQ2ZkJHg=;
+        b=l8FngI+xGJZlNcTM9+XmMERicEgz/5P3iHfWvWkMRn6LZssTgmJ5JRoi5JWQ/L1hFo
+         AFXrvzTfnw4f/mp7K0uidlDpjw8gPohaXp3K3fLcrDLsaYEIUg2fD7TXh0EK9KE0xdqj
+         ziUIaWWE4spaz4hriq1Rj3+eZyCLs1uHQHVoOyX9LbAzJyQo22pKMh9H6xjX1tlXwDmw
+         NnvsH0lkEBb7vN1I5brydC6WheZYLSHjK524qAd9nCaliS0qlPtVefJiqT6GpZrT7Kzh
+         T56tLkYuh0onrcXgmR/azzCeQeQaLnSDHi6gJ9a4h1cbH+qPCs6DoD++7a3Uj8CkaSOt
+         6ZBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AnLn590CxObCPHVpqzU2YKM6yS2U3fQhJcXnp9MuaEg=;
-        b=yh0nj16rq21xVLIhyzGh4KV0gPtbKpkAGH7DHxNUGZo7FzxlgpNUsApBYVqqTbu8FF
-         nfZam41n0JqkQCdNexu5+SVKPvtGvIXvtFuinSm1EILeA/zIgbHgEdPDmG/WxTKgX3wg
-         94bHOa8aR6yphsYfWhtjS8u8xQn/frj9W2TMXTrgoP2x8U5Y2ATwj+cmNzgw4Um54Ta1
-         U9huDZ9k1ytH5SIBX3wdnE1ANuBbPco3jt3WIrdfqGHwS8RgavK28Pt3eAs6JqKmquuJ
-         iy99dy//Ucw9VHu5v1RoAgohQ2hvtge4Tn3RRGTEaxsq80IyV5xsW2ZYk19ERJbBjyfj
-         i6ZQ==
-X-Gm-Message-State: AFqh2kqTibbDQWCtndaUjn3yuxvPh1lci6r+q7bRhMYOcUben7e0s8Xb
-        oWQ3GoeCt/9160Bc8salcg==
-X-Google-Smtp-Source: AMrXdXsyQQy9O9q6deLP1/nsKTazK9kzf6iytk5IS8CbSyS/PIHCy5h3pO4pbod2IM6YsQCWfPmI7w==
-X-Received: by 2002:a05:6e02:525:b0:30c:2bb4:a2ea with SMTP id h5-20020a056e02052500b0030c2bb4a2eamr22671802ils.13.1673202833579;
-        Sun, 08 Jan 2023 10:33:53 -0800 (PST)
-Received: from robh_at_kernel.org ([2605:ef80:8069:516a:f2b0:691e:4315:7c0f])
-        by smtp.gmail.com with ESMTPSA id y21-20020a027315000000b00389cb050d1bsm2099433jab.33.2023.01.08.10.33.51
+        bh=aU2zr2iZRkwdiLRZc2HQ0PPfl5aKsrDvsWOmQ2ZkJHg=;
+        b=4Sl9IZcFnPUp+AmEgqqHYJ7Lf02vK4r8QO39Im9qFIMCC5g7a1MwWUzGDeWiPVLlcS
+         3xk65eLII4+R9kvxSRQB34oVUwIcRFAapGOvqFiVNv7iIrmWTfZ81gFg91GrZzzfMYgi
+         52tYGCYoIRfSDibJUf4YnlDuUUAIURx6lNlYxuhpHp2VtP5olFrGrLPYtyw4tVhVNZst
+         G02Xtbdua0NIvKmVLbFM35ahkE+AHYLITN8wXSDI+MY2QDvPLtoqhAU6UJb1N1A7ASlx
+         sLYZLRDNDSA7SKrQic0pQ67ujqA5v2pDsuRusPtwlO0vpy5jM4qjGE+YtGB3CIkoVWsU
+         uY4g==
+X-Gm-Message-State: AFqh2kpYdDNmhA8FtYphFkfS1h3e55XNCD64BECQBoSIHZWJ5lpeTFTD
+        BLw7ObBW3XGBjy5VATmjnH8+IA==
+X-Google-Smtp-Source: AMrXdXuRHLdXdNlP7oB+NQEBE/FcVjlDNWgmLu8baXnF3TfOWniqnR4Uz8byWcOB2WEHJt4MHG7fEg==
+X-Received: by 2002:ac2:48a5:0:b0:4b6:ed1d:38e9 with SMTP id u5-20020ac248a5000000b004b6ed1d38e9mr17209222lfg.64.1673207459424;
+        Sun, 08 Jan 2023 11:50:59 -0800 (PST)
+Received: from localhost ([85.202.81.211])
+        by smtp.gmail.com with ESMTPSA id s11-20020a056512314b00b004b592043413sm1202685lfi.12.2023.01.08.11.50.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jan 2023 10:33:53 -0800 (PST)
-Received: (nullmailer pid 180457 invoked by uid 1000);
-        Sun, 08 Jan 2023 18:33:50 -0000
-Date:   Sun, 8 Jan 2023 12:33:50 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 08 Jan 2023 11:50:58 -0800 (PST)
+Date:   Sun, 8 Jan 2023 19:50:56 +0000
+From:   Jarkko Sakkinen <jarkko@profian.com>
+To:     David Rientjes <rientjes@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/7] dt-bindings: crypto: Let STM32 define Ux500 HASH
-Message-ID: <20230108183350.GA177741-robh@kernel.org>
-References: <20221227-ux500-stm32-hash-v1-0-b637ac4cda01@linaro.org>
- <20221227-ux500-stm32-hash-v1-1-b637ac4cda01@linaro.org>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp: Improve sev_platform_init() error messages
+Message-ID: <Y7seoGQpTy6LYQZU@profian.com>
+References: <20221231151106.143121-1-jarkko@profian.com>
+ <6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221227-ux500-stm32-hash-v1-1-b637ac4cda01@linaro.org>
+In-Reply-To: <6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 12:03:33AM +0100, Linus Walleij wrote:
-> This adds device tree bindings for the Ux500 HASH block
-> as a compatible in the STM32 HASH bindings.
+On Sun, Jan 01, 2023 at 07:18:30PM -0800, David Rientjes wrote:
+> On Sat, 31 Dec 2022, Jarkko Sakkinen wrote:
 > 
-> The Ux500 HASH binding has been used for ages in the kernel
-> device tree for Ux500 but was never documented, so fill in
-> the gap by making it a sibling of the STM32 HASH block,
-> which is what it is.
+> > The following functions end up calling sev_platform_init() or
+> > __sev_platform_init_locked():
+> > 
+> > * sev_guest_init()
+> > * sev_ioctl_do_pek_csr
+> > * sev_ioctl_do_pdh_export()
+> > * sev_ioctl_do_pek_import()
+> > * sev_ioctl_do_pek_pdh_gen()
+> > * sev_pci_init()
+> > 
+> > However, only sev_pci_init() prints out the failed command error code, and
+> > even there the error message does not specify, SEV which command failed.
+> > 
+> > Address this by printing out the SEV command errors inside
+> > __sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
+> > INIT_EX commands.
+> > 
+> > This extra information is particularly useful if firmware loading and/or
+> > initialization is going to be made more robust, e.g. by allowing
+> > firmware loading to be postponed.
+> > 
+> > Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+> > ---
+> >  drivers/crypto/ccp/sev-dev.c | 19 ++++++++++++-------
+> >  1 file changed, 12 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > index 5350eacaba3a..ac7385c12091 100644
+> > --- a/drivers/crypto/ccp/sev-dev.c
+> > +++ b/drivers/crypto/ccp/sev-dev.c
+> > @@ -963,6 +963,7 @@ static int __sev_init_ex_locked(int *error)
+> >  
+> >  static int __sev_platform_init_locked(int *error)
+> >  {
+> > +	const char *cmd = sev_init_ex_buffer ? "SEV_CMD_INIT_EX" : "SEV_CMD_INIT";
+> >  	struct psp_device *psp = psp_master;
+> >  	struct sev_device *sev;
+> >  	int rc = 0, psp_ret = -1;
 > 
-> The relationship to the existing STM32 HASH block is pretty
-> obvious when looking at the register map, and I have written
-> patches to reuse the STM32 HASH driver on the Ux500.
-> 
-> The main difference from the outside is that the Ux500 HASH
-> lacks the interrupt line, so some special if-clauses are
-> needed to accomodate this in the binding.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  .../devicetree/bindings/crypto/st,stm32-hash.yaml  | 30 +++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> index 4ccb335e8063..681812e1c941 100644
-> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> @@ -6,12 +6,18 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
->  title: STMicroelectronics STM32 HASH
->  
-> +description: The STM32 HASH block is built on the HASH block found in
-> +  the STn8820 SoC introduced in 2007, and subsequently used in the U8500
-> +  SoC in 2010.
-> +
->  maintainers:
->    - Lionel Debieve <lionel.debieve@foss.st.com>
->  
->  properties:
->    compatible:
->      enum:
-> +      - st,stn8820-hash
-> +      - stericsson,ux500-hash
->        - st,stm32f456-hash
->        - st,stm32f756-hash
->  
-> @@ -41,11 +47,33 @@ properties:
->      maximum: 2
->      default: 0
->  
-> +  power-domains:
-> +    maxItems: 1
-> +
->  required:
->    - compatible
->    - reg
->    - clocks
-> -  - interrupts
-> +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          items:
-> +            const: stericsson,ux500-hash
-> +    then:
-> +      properties:
-> +        interrupts: false
-> +
-> +  - if:
-> +      not:
-> +        properties:
-> +          compatible:
-> +            items:
-> +              const: stericsson,ux500-hash
+> I think this can just be handled directly in the dev_err() since it's only 
+> used once.
 
-Why not use 'else' instead?
+Ack.
 
-> +    then:
-> +      required:
-> +        - interrupts
->  
->  additionalProperties: false
->  
+> > @@ -1008,18 +1009,23 @@ static int __sev_platform_init_locked(int *error)
+> >  	if (error)
+> >  		*error = psp_ret;
+> >  
+> > -	if (rc)
+> > +	if (rc) {
+> > +		dev_err(sev->dev, "SEV: %s failed error %#x", cmd, psp_ret);
+> >  		return rc;
+> > +	}
+> >  
+> >  	sev->state = SEV_STATE_INIT;
+> >  
+> >  	/* Prepare for first SEV guest launch after INIT */
+> >  	wbinvd_on_all_cpus();
+> > -	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
+> > -	if (rc)
+> > -		return rc;
+> > +	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &psp_ret);
+> > +	if (error)
+> > +		*error = psp_ret;
+> >  
+> > -	dev_dbg(sev->dev, "SEV firmware initialized\n");
 > 
-> -- 
-> 2.38.1
+> Any reason to remove this dbg line?  I assume the following dev_info() 
+> line is deemed sufficient?
+
+Yes, but agreed that it is not in the scope of the patch so I'll remove
+it from the next version.
+
 > 
+> > +	if (rc) {
+> > +		dev_err(sev->dev, "SEV: SEV_CMD_DF_FLUSH failed error %#x", psp_ret);
+> > +		return rc;
+> > +	}
+> >  
+> >  	dev_info(sev->dev, "SEV API:%d.%d build:%d\n", sev->api_major,
+> >  		 sev->api_minor, sev->build);
+> > @@ -2354,8 +2360,7 @@ void sev_pci_init(void)
+> >  	/* Initialize the platform */
+> >  	rc = sev_platform_init(&error);
+> >  	if (rc)
+> > -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> > -			error, rc);
+> > +		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
+> >  
+> >  skip_legacy:
+> >  	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
+
+Thank you for the feedback.
+
+BR, Jarkko
