@@ -2,292 +2,225 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7DAC54EBD
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 12:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCF3C5479D
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 14:14:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236892AbjAIM1X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Jan 2023 07:27:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55704 "EHLO
+        id S237248AbjAIONw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Jan 2023 09:13:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233679AbjAIM1V (ORCPT
+        with ESMTP id S234657AbjAIONY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Jan 2023 07:27:21 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463D51400A;
-        Mon,  9 Jan 2023 04:27:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673267240; x=1704803240;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Xp/C826A5GkWPdlb3xRYQZ7UDSOwL+bMU7EO6Zn0X7I=;
-  b=S6CKhr/OYgAH3nRLD+deL5V+EmNZG2H2XfHgfcLa9vV1+1SyRu1qSLJ5
-   aMi/LHcItSo7tqeawpDbCwtsKi3QUkz3NLgY0HBPrNlnrK5GpV5JYjTOw
-   tQomw8xSU3E/WspL1nx0kZuP82gOK5B8VxKxrB7ZNR5NYlm+qCe/OdVCE
-   L8SIdCfVF//jlO7/0omDXhTLsKM3dwIWIfG+YogBjTWR58A0eIZZ8z6TR
-   VYDKn23o5cq27UUiKxYvNBiObm9I8HApfDTjZJiN89PWwtx8d5SKJebn4
-   wm+AudlFvFfw4YEvIg5pGwFGGqyn61xn2gu+NUAmS+5to/Ja20sTiIEKd
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10584"; a="310654100"
-X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
-   d="scan'208";a="310654100"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 04:27:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10584"; a="745363802"
-X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
-   d="scan'208";a="745363802"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Jan 2023 04:27:19 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 9 Jan 2023 04:27:18 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 9 Jan 2023 04:27:18 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Mon, 9 Jan 2023 04:27:18 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Mon, 9 Jan 2023 04:27:18 -0800
+        Mon, 9 Jan 2023 09:13:24 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2081.outbound.protection.outlook.com [40.107.244.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F91DD2C5;
+        Mon,  9 Jan 2023 06:13:23 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UXFdzVmoia7TIPU2FDeaKLEs3rSuxxBVXGN+rxDwX0m4X2inuYtT97IpAnxcu4vW1ZJi7kcB8CzEsy8GAXHLkcclCWyo3uwZDUTyxtnMFQSj2yRKV3/fLlJqrIxntakZ/IFOFy/HI/0I8VSQ0rGjEQq5yr2WQfF6ltr7zcRE5KgJvWH5MTKCptQuqZ5ntUhUAld3J9/hkIwUQdT9PIPoNQcShWRjMAhtjWY1zNiUAj92bmkTJCfqwN8gGrY8hdWUkrW4pngAl+iXIr3U6laQqqXs91+7t/cZ4etigJBvA/0N/j9XPFV7bK9y91fI3be3hbhiluDfmeShqiz+l/FlBQ==
+ b=jFQ0aa61EpM5pgnUw8rC4i5M1ZM0EIuZokOJuCPqFgif0UvPOfCXQwz2oTm5whfB1qS7X4ca5jzni1/CiQhQv23+0Ud2xeW31v+krpOP6DTqPIxQDCqeD+qsSpSgBtjsOXU9pMH619wwZk/c5u6wmTCpVq+vC5nd+aPaR4lKHX7GJo7s0P8xerfQSeZRmSzPuZSeO1k/xmzdG10SA9H5aT12Pl0mKDvocscdhlPFQTuf8WCGQSPA3DKqBmMSUYL1Dii2Mj3G0vV5bhs3EYNHL6GzlTKwn2o4zHW1g6UYCMH9p3VdQs6Gs94JLduwGVbvAJLHEaFl1iq29Dk9t0aIEw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oQV86gxv9RhLtU3U5N+wpG5TuxBC9nn42PAQqdDzmRM=;
- b=l69TFjyykNipQD7fTRjtwQWGLwyAS0MOHm5ckYgiHh++wiRZSN+lE8FL1UC3pgNz8uXRLpgY+7P8lIxlZDkAY5WKORow6Ca7Do8qagaMuzPhzPhPSJ/bx0Z+rLr8NGJlgrtwBtl7T99X9wz70eK3JsTiemIpHBeYfpiqaN8lhF6f4EAUxr0ysZNMAwiD1kN68ZNLBTmU79jvsvcTJ1UMuqyK5SH6tM4PYgfkYefY6Tncf3FzHJ14mcfDTi0sjg//8/Pa09xMjmAzXgyNR+r/tdbXbjh2pMoH+HzpwtulP43DUNL/hcaHHa7Wq9gP8689otFXGCT5VMakufwVRXE6Og==
+ bh=uoOqcXHHetFb2z9HMNIEyeWtTI2GrtVKbuEdikm1HaY=;
+ b=A3i9y6ZmJTiinZ+UNhIMQI5Z4dFuPUjtdA1ik1ZbmwA8JxLpYEOs/dDeoWD5ysdrqPtpfXpMbNggnvUOzluW3x6mKj9tLlTh5RNbmKFunt0GhxsNGqfQohjyfX7tmpFA2GL5g7Uhh7tpQzPhqSaEqA3MkFFLaQAmrGe/0QUbpCJCmlzVL9Nmk71UbEspZyQsdQFTIxkVZPhhC1+ypNJk2jWJ+k1f4MDto3Bq0kJZyvh7uLJdsCLNrKFgWXD51kp968DuMZlSx+ot4ZG0Q/lChpdvEyeUpmX3IfyrF6H64Yq3zq1Wzop35wRpPbFZyOPK+jjIugmWJFFxcCulccm8vA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uoOqcXHHetFb2z9HMNIEyeWtTI2GrtVKbuEdikm1HaY=;
+ b=0H70/qlOO1HLVuiXHVpeXtWCBOUdMLHAwNs8Ze5FtZmLWbuQqFThzBiCa8Vw+aFx0nVc824oWx2/ZW7Ko+/BxrS12e4UxhLrHmLBKH32loFjvyPK+Toucfx7GwOsmGB4+BLJ4Z3j1HWKnQzCi1IXnqjojjWbcuFxLy3CwWLpbHo=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by IA0PR11MB7791.namprd11.prod.outlook.com (2603:10b6:208:401::20) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB7528.namprd12.prod.outlook.com (2603:10b6:8:110::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Mon, 9 Jan
- 2023 12:27:16 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::7b39:df5f:fe4e:f158]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::7b39:df5f:fe4e:f158%2]) with mapi id 15.20.5944.019; Mon, 9 Jan 2023
- 12:27:16 +0000
-Date:   Mon, 9 Jan 2023 12:27:03 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-CC:     "Liang, Kan" <kan.liang@linux.intel.com>, <bhelgaas@google.com>,
-        <hdegoede@redhat.com>, <kernelorg@undead.fr>,
-        <kjhambrick@gmail.com>, <2lprbe78@duck.com>,
-        <nicholas.johnson-opensource@outlook.com.au>, <benoitg@coeus.ca>,
-        <mika.westerberg@linux.intel.com>, <wse@tuxedocomputers.com>,
-        <mumblingdrunkard@protonmail.com>, <linux-pci@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <david.e.box@intel.com>,
-        <yunying.sun@intel.com>, Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+ 2023 14:13:21 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::8200:4042:8db4:63d7%4]) with mapi id 15.20.5986.018; Mon, 9 Jan 2023
+ 14:13:21 +0000
+Message-ID: <4b3d35d4-112e-9322-f693-9a4984308d34@amd.com>
+Date:   Mon, 9 Jan 2023 08:13:18 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH] crypto: ccp - Failure on re-initialization due to
+ duplicate sysfs filename
+To:     Koba Ko <koba.ko@canonical.com>, John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>
-Subject: Re: Bug report: the extended PCI config space is missed with 6.2-rc2
-Message-ID: <Y7wIF/qigYMgmByE@gcabiddu-mobl1.ger.corp.intel.com>
-References: <ac2693d8-8ba3-72e0-5b66-b3ae008d539d@linux.intel.com>
- <20230105223257.GA1177387@bhelgaas>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230105223257.GA1177387@bhelgaas>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: LO2P265CA0425.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a0::29) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vladis Dronov <vdronov@redhat.com>
+References: <20230109021502.682474-1-koba.ko@canonical.com>
+Content-Language: en-US
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20230109021502.682474-1-koba.ko@canonical.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR05CA0018.namprd05.prod.outlook.com (2603:10b6:610::31)
+ To DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|IA0PR11MB7791:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2c093629-9e7d-4cbf-ad9a-08daf23cd79b
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|DM4PR12MB7528:EE_
+X-MS-Office365-Filtering-Correlation-Id: f32d9d1d-40fd-48f1-9d19-08daf24ba945
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L52ah8/H9OnnPtELMNjOoJzQ1QD9jyaavUnNp0gW97Ty3O5XsWKZ4MKuGW4MtGzywwm1NNOsNPeRpYJ1I4sc2juDyrYni/t7T3L/UW10EH9Nyr9TD+z+a9/4UU/hMmhP2LVQpWNt+oDaoWXbT5UBXmFur+CWxELZBmJUbKjR9hC9y7B9L3u2D90QukBIqj6q5LflWzG25GHM0Zq5rqB5JgShDr6MAYrQAlR12S4882HN6no3T0pTpweDhLIUqvbU4H+Yky6JRvDpsuPso488bXCR4SPuSKbcB4KncoHlZZfJXYaEQJlVtuXqVIZF9Q/636S3ferTvJI7wNQnfinEjXjDq9UE/8qktKExDCaJSIGhKV9OTXlWqU1mh5JtQ7Oab3G9hqUdQibVZ0AGygffHxiqm3rBQxBqZ4naS0ZkFv/iKvUp7RpDyRWx3814K4BMTFRkKH3nlX7KiIv2D7F95HRkGpfPhQiMFN0iA73JGg+qxUzvy5jOKzqIKdSVJ9sY0gVmqgpe8eDPDDHBi94iAr1Ce8mZj2D8+HEJ825MpHgosuN2Dg4sxNo/lXcKmG9ikG2+mYWio3jSXx3TH9Asr8wFdYhyFgjpsotvz8zuDig3xxS6DbPfPLo3qyxcsyFX0Xo6tBtNUIlX4XIHOx6Cp6htkDrny/bxkFRn+OCw/Cw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(346002)(366004)(39860400002)(396003)(376002)(451199015)(86362001)(83380400001)(41300700001)(54906003)(66946007)(66476007)(66556008)(8676002)(4326008)(6916009)(82960400001)(38100700002)(6666004)(36916002)(478600001)(26005)(6486002)(186003)(966005)(6506007)(8936002)(7416002)(5660300002)(2906002)(316002)(44832011)(6512007);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: qFU+YfxmiZYq37sq7wtkG31i4adpO2FLQv9/c6iTp3cn16gWrob8Vz/t5lxbr4Ek2T2B3I379m4YpSwBYd/BKzZv+nMktkv3W1Zxu7zHyIx0xOastrDqrLk25rzQ0J//WOr4wTxw5Hk3CXpSTDUf3RA1NaPZUM0fncDFMuEg+V9/v9k+M0vmdrlmYALs0Em6cjrNfpdSmmsOQBakOA3e7/iMO20Hcvjp6dsHaDy7uJ73vzs56qEAbNdwCjJ/jgZoHoEc4kzj0hNj2FHtWt9kz24LXkzoy5PfOO8y17QbVP5Iwsh+YHYDLhBdEjU3vbxhIM6hAAgLMe/mptvRKkFmLNEQvJJgJ//1LxiX4OeexzpxeCGuMZgx/DYk0/n96831AKMnFpA8YnUpwafEV71VxpN29Nzo2yYRiXT4akY1TkyzR88cRVy9uAMbZNVFdycAhGMF5jLiKO7Z1yQftl/glyctkJ4jhecNx+3vWDYJekq9iXKyni9/CApZqBn3vSy6PAlQkJwyOFgoYZBl9MVOqRb9yDG+0JztvinDMvpZMlPyDnoze+zOV9i1wGapIEDJru/J9sSmDsuHCzj2jjJ4lfF7poe8/sTze1z1FdQWA3lqLQT2XhHCIT+bBp23qeVC3uQd8xiXog6gH0iC2923zCZYOJDMwEZdPaVK//S55hcRZH1K9he0VBdvCEXvlb3PfrGU//6kQCwrYub5TvsRMr5xmq962N8Lll8svHjOPgcFzmVonvRb2UWhfUOg7lkUJMuwLF7uLXyO3Yz2UPi6zw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(39860400002)(366004)(396003)(376002)(451199015)(36756003)(31686004)(86362001)(83380400001)(41300700001)(110136005)(66946007)(31696002)(66476007)(66556008)(8676002)(38100700002)(6666004)(53546011)(478600001)(6486002)(186003)(966005)(6506007)(26005)(8936002)(5660300002)(2906002)(316002)(2616005)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yHjYkaU0wp0Ua7nQf6dxVT9ZUYQ2k7N5XHJgKFdB5oRc0LUDZN3BCRtReYVD?=
- =?us-ascii?Q?SEa/MJodE4bQIKef08n/bv68h8ApMzJLGp91JHnFrw/i09nhBY2OmKJ4RnER?=
- =?us-ascii?Q?KulH4FDmu57rJQ/sTqq6w3C8z4MkqzDycl16tTTVWU1dFiv09Zx3CrCUKlm7?=
- =?us-ascii?Q?JEvSmSQ2qtUO9iDBmCrc1yNtLfrqa69IRz4IHXfGwIvvsIn5frNYOTfOSyen?=
- =?us-ascii?Q?T94nwdmzSYGoj2Nn5QcJTBBIHWceJF/7tVpGHPUUkePqKGmWXOXRzr+2vbjR?=
- =?us-ascii?Q?e/0iOHnU/FSUkzl00qkpIKw43gnayP7+EoEAhOu6mYb4bvRM+5zIKT4cgPnv?=
- =?us-ascii?Q?TKjSntaQu/BmUwKNZkZZ3MBdEwf8rtyyDLtyM5YY51sJhAx/GKNWQD8Wbmy8?=
- =?us-ascii?Q?UC0oxiEIRDciX7yiwHWpnwJclTQDqwhwlm/C5iDqXyypogWqzbHdhxOoAwhT?=
- =?us-ascii?Q?yWwBDCImgOfB+Z/C7h3zZHwiiscsKLXljbiuIC4ayYa1KuLauMn+aC5EJAHd?=
- =?us-ascii?Q?u4oe4zbqL+45UwbIiqL102pUQfmfm+rM3Pa/hCZAbGWMBVK0fIV5ZPG05h3v?=
- =?us-ascii?Q?ugsccO1Io+/9EcUUIjUSbM8COjrLZ/OM+0ABXxG6Z2ts9sklRv5myWIg3DGE?=
- =?us-ascii?Q?Lz82uO8A0iNpf6AsdL1BqdHjW95E0hbYPrjLMTIpdaI57dh6IrdcLSfRSzNh?=
- =?us-ascii?Q?PCUnVx18Wfq8HvL7ck+2F8LVANhNm8c8TjBZdpPp5F2TISO7p0rIU6SUNmBA?=
- =?us-ascii?Q?Ze44KyjOc3zTNeBfJZi3hGjbMV4Z3d7MsnM86XRz7Uv452WEerDMu/bpAEDA?=
- =?us-ascii?Q?PPm6mNWm+qxRb77vJRa5gEegj7SuvSNzqKzEdYW1PKISg5SkiKTTdNXCsyix?=
- =?us-ascii?Q?rm566lO4qfFdSgafaePjxvZerY+u2QtxuT/EUDtgTtNU52m3ED5dPRSOC/KK?=
- =?us-ascii?Q?CbOsSa/5H5FgmyXqADFMc3Sd4Z0TZH1xl5ceki89u4p/PUHfrX5WhbGfNiny?=
- =?us-ascii?Q?W2fZdsjgRoPyYm5WaqqBUj9MGGJlr1yVG0Ir45zI+gXdObJoMv/83KEWkYD4?=
- =?us-ascii?Q?hJH/9NudbKZ5lFsgftyaVBxyibYT3AH8i3uwvUtxHGSFHSEufuJieaDgI3tL?=
- =?us-ascii?Q?FoR9sXRleocKDc4rsWkG/ocEcHvsK9RYSBz9ch/5Pt5SEZV86UfR7htOGOtZ?=
- =?us-ascii?Q?3Eyjgi0XjJHVDheRI9k7pN7coHn9g3G0cpcUunOZ0rzodPuMzbRqWqLvUiuq?=
- =?us-ascii?Q?OhSPQZP0XjO84P3tgKLpMVQvpkNQalE41F/HmHD51nkc/fy4W7QzY20e3EgX?=
- =?us-ascii?Q?9BPkMqDZtDiuUPu+kdS2XVdz2FdaZNwAuhawhm+RRGbyLKq6ij3lmf5A2GCB?=
- =?us-ascii?Q?eJ1T5Ed56bs+a1gxoLmXZ87QdAwhGHFtBvKkWXZOAbNyhK0NY1rrXrzO2Gqn?=
- =?us-ascii?Q?YeEi0SmiS48Z4esb2GC8v2prJ2jzFbvZ0OrkNdF8RdwdMEk+KdTHyFBlcpeu?=
- =?us-ascii?Q?Y/stUDLiIKJssHjtepIzoZuGf3DeIwI6kNf+m5Uh1TS8g/PMeynSSImuScED?=
- =?us-ascii?Q?B1RZ+VzQI5G+Ebbigy9FmnLTm3ErUJWwoVNtRfq7q+hFClGB/gV1weBeGo2d?=
- =?us-ascii?Q?HQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c093629-9e7d-4cbf-ad9a-08daf23cd79b
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RXhrK3ZRTkIxOG1QS1FYMTRGQzF5dmV6Z3gydk5YcjVIR2JrSEVoT1VPL1ZJ?=
+ =?utf-8?B?Z3VWdUgxWTNOaDVXWEhoMGFHZWRTVDhpWXFDVVI0TmU5Y2FxaWRNRmNETHoz?=
+ =?utf-8?B?SXBFR3lGdUFjSWU0aWtBcEFDUk1iZVpMWjlTV3A2K3FzVnZZRTFLc1plaFNC?=
+ =?utf-8?B?RkxJU3pIWDVmZWtjMVBZRUNzQlJXc1gxbDRaSVBidTRzNm1CZEsxK2VBUlpn?=
+ =?utf-8?B?U0cvbXpIVGxWMDBwU2FBQjRBMmxlWXVEbTNkejJBdVZMOUs2dFNDZ0FDZG1Z?=
+ =?utf-8?B?TWVEWWtidXhsckhxL2RuNGFGQTRyTStTNGZlR0Zhai9Wdk1JVjU5R1QxQzBY?=
+ =?utf-8?B?OTR0V3VFM2Yyc1RuRDBwUGMzNWhPcFRxNTUrL09SQmY0QU9QSU1lNHhDdWpF?=
+ =?utf-8?B?bFFNTSsrWkFhT0NORVhPeFo1OHpSMTRIR2VaNXlLVXpHSzlJclFROWoxMldP?=
+ =?utf-8?B?aVJ5M3Q0RFAwNW5sVGNPV3U4QW5KVS9HZ0M2K3ZYT0xPYVUrRzlMYzF2bUU4?=
+ =?utf-8?B?WjFIVHVqUTltYUhVbkN0dHRGOGhIMUlyRDBoNnNySGhCSmlVaGNMNFZMSWd0?=
+ =?utf-8?B?aWIzZ2REZ3ZYekwrZzk5TjR4aFg4Q0hTV2Q2WGZvaGVreVc2bkdkYmxmOE51?=
+ =?utf-8?B?QlFWbUlkcXBKamtvbkZOQVZCVkhXakZqem1GYkpjNUhzMWFIM0UvL1R1VWN2?=
+ =?utf-8?B?Y3k0Y1pVNFY0ZVE3ZlBlSXJ3QXhCY01hajg4S21TM3J4TytWMlI1UEUwVzFy?=
+ =?utf-8?B?d3dPckozaVhXVm5nQVVKeXl1WG91Tk9Ha01Hd1FKS2RJT0NyTjR3VDFLUzdR?=
+ =?utf-8?B?VlhrTnhITmp3OGMwZEJZR1lwdjlqKzhzMzhSY0JFRmZsS3JOYTlZZ2w2dDBO?=
+ =?utf-8?B?a0lJMnJWNzFpOHdpQThnWWR5NUVNYVNaQTNsY3pqdUVsM0FKc2tVdWhaRUNw?=
+ =?utf-8?B?czJPRDQyL1ZSVGQ2eUhIZ0YvWlBFRGxvWVN2QmVoTVJaYUJlWjZCNEFVcGZ2?=
+ =?utf-8?B?RStON3NyZ2RrMVdrMFgvdnpYSnlvNkJ5cXQvTmdRZy90Qm0ycVVpUXZzN3V6?=
+ =?utf-8?B?cFdIWDRXa0J3ZytLdFlwbXhVQTlwZXozdXM3MXBSaHZCbHdOaFQ1QnVMcVBh?=
+ =?utf-8?B?eHRWWXJ2cGxLYlphVitObGdCR091YVQyVkJYNUhUVjlHZzZ0K1NtWWd5eXBk?=
+ =?utf-8?B?aE91VlVzVkU0eEtPRHZBUmREV3daNEJvWVljSlZhREx2c05FMkdlcGk5Q0NY?=
+ =?utf-8?B?NkcyZzBXbUQ4cjhQZ2FGN0NudVBoSmc0Tlp6OS9hbDRMbFozRktoUGdGanNo?=
+ =?utf-8?B?R1FtaDM3TXFibzRpTzZXNWZEaUtFNm5tbUdpVTBoY0dDYkx2clc4U1JTQmp2?=
+ =?utf-8?B?SHgrY2ZvWHRVWWpaMjdqNjBKTXMrMGxCK1VPeU9FRVRqRldLWFE0b3UxR3JH?=
+ =?utf-8?B?QU9MTlRlRmpoVjQ4UHU4MW1uS2NqWm9EcG4yRDNuaWRIcGROU2lqd2tZTE01?=
+ =?utf-8?B?WU1KWUZSaWJPc3VhZTh6YVZHYmtmblNtUXk4ejdZM01rbzByZndqdEUreWR5?=
+ =?utf-8?B?cGNaMkNaeWZybmtIUTVickM4TmI2MmoycnU4SXNlaklQUlNrREsxeGZVSkdo?=
+ =?utf-8?B?clRYdlFIdzJFQzAzRnR1VTFTejl0Qlc0N2tnUDQ1aE9OdjZNUFl5ZFZ0U3Ry?=
+ =?utf-8?B?R1FqVkh5MENxdzRFMGNaYTd0SElXdk1UdXhubUtwZW1hejdtQTlvQTlxY2I2?=
+ =?utf-8?B?U3hZait2M2YrNWttQ1ltNjhsd2xpcEVVcUpqZU1CRXlYR1ZWS3NBaVpUN0xo?=
+ =?utf-8?B?YUVsMlE1MUR0RWM2M0FPTmx0UWtJZFFLQmNVRDRabzRpenN4dEJNZUVLWTFi?=
+ =?utf-8?B?dWtTNHRUTEZlcitMUnFJUFlwUDNvbWppMDQ0dnM0RUo1Q2wzNndYa1QwVU1I?=
+ =?utf-8?B?dUdhTXM2Q01NcFI2VlRFQVJrSUM1R1ByZ0pJd09Qd1RtcC9tcGFhSTlVY3pv?=
+ =?utf-8?B?bVdzNDVyN2dKOTA4ZHBxUHhzbVFqd0ZlamQwSTI2bStqcHRsMzNidmh6c29X?=
+ =?utf-8?B?VVBUWVNGdmxQNy9rS1NKMWE2a2lrbjdXVytmeFhySjdLSjUrcUx0bnVjajV1?=
+ =?utf-8?Q?T1vNoyR8iCAYDPToxKbnuSgcb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f32d9d1d-40fd-48f1-9d19-08daf24ba945
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 12:27:15.8121
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 14:13:21.3818
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tNM/OzwpOqYU5WdX9I+Ghh+0PtvJFQ2zTkKUJ8WRjMYxhh1ht3EB947783lcsxUbfAMwPL2K4bh2T0ie3gaM2sPpgzXGmzG64xOt45BUoS8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7791
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: BTwRehTdsgaGjv1e3BmNiq6rgSZAjGBGCqMzrkUTHTmdZuEKHK1RXzKDvIcK17MtvOoHE4HRJ8twK2qovYNiow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7528
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[+cc Herbert, linux-crypto ML as it affects QAT]
+On 1/8/23 20:15, Koba Ko wrote:
+> From: Koba Ko <koba.taiwan@gmail.com>
+> 
+> The following warning appears during the CCP module re-initialization:
+> 
+> [  140.965403] sysfs: cannot create duplicate filename
+> '/devices/pci0000:00/0000:00:07.1/0000:03:00.2/dma/dma0chan0'
+> [  140.975736] CPU: 0 PID: 388 Comm: kworker/0:2 Kdump: loaded Not
+> tainted 6.2.0-0.rc2.18.eln124.x86_64 #1
+> [  140.985185] Hardware name: HPE ProLiant DL325 Gen10/ProLiant DL325
+> Gen10, BIOS A41 07/17/2020
+> [  140.993761] Workqueue: events work_for_cpu_fn
+> [  140.998151] Call Trace:
+> [  141.000613]  <TASK>
+> [  141.002726]  dump_stack_lvl+0x33/0x46
+> [  141.006415]  sysfs_warn_dup.cold+0x17/0x23
+> [  141.010542]  sysfs_create_dir_ns+0xba/0xd0
+> [  141.014670]  kobject_add_internal+0xba/0x260
+> [  141.018970]  kobject_add+0x81/0xb0
+> [  141.022395]  device_add+0xdc/0x7e0
+> [  141.025822]  ? complete_all+0x20/0x90
+> [  141.029510]  __dma_async_device_channel_register+0xc9/0x130
+> [  141.035119]  dma_async_device_register+0x19e/0x3b0
+> [  141.039943]  ccp_dmaengine_register+0x334/0x3f0 [ccp]
+> [  141.045042]  ccp5_init+0x662/0x6a0 [ccp]
+> [  141.049000]  ? devm_kmalloc+0x40/0xd0
+> [  141.052688]  ccp_dev_init+0xbb/0xf0 [ccp]
+> [  141.056732]  ? __pci_set_master+0x56/0xd0
+> [  141.060768]  sp_init+0x70/0x90 [ccp]
+> [  141.064377]  sp_pci_probe+0x186/0x1b0 [ccp]
+> [  141.068596]  local_pci_probe+0x41/0x80
+> [  141.072374]  work_for_cpu_fn+0x16/0x20
+> [  141.076145]  process_one_work+0x1c8/0x380
+> [  141.080181]  worker_thread+0x1ab/0x380
+> [  141.083953]  ? __pfx_worker_thread+0x10/0x10
+> [  141.088250]  kthread+0xda/0x100
+> [  141.091413]  ? __pfx_kthread+0x10/0x10
+> [  141.095185]  ret_from_fork+0x2c/0x50
+> [  141.098788]  </TASK>
+> [  141.100996] kobject_add_internal failed for dma0chan0 with -EEXIST,
+> don't try to register things with the same name in the same directory.
+> [  141.113703] ccp 0000:03:00.2: ccp initialization failed
+> 
+> The /dma/dma0chan0 sysfs file is not removed since dma_chan object
+> has been released in ccp_dma_release() before releasing dma device.
+> A correct procedure would be: release dma channels first => unregister
+> dma device => release ccp dma object.
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216888
+> Fixes: 68dbe80f5b51 ("crypto: ccp - Release dma channels before dmaengine unrgister")
+> Tested-by: Vladis Dronov <vdronov@redhat.com>
+> Signed-off-by: Koba Ko <koba.ko@canonical.com>
 
-On Thu, Jan 05, 2023 at 04:32:57PM -0600, Bjorn Helgaas wrote:
-> [+cc Tony, Dan]
-> 
-> On Wed, Jan 04, 2023 at 09:39:56AM -0500, Liang, Kan wrote:
-> > Hi Bjorn,
-> > 
-> > Happy new year!
-> > 
-> > We found some PCI issues with the latest 6.2-rc2.
-> > 
-> > - Using the lspci -xxxx, the extended PCI config space of all PCI
-> > devices are missed with the latest 6.2-rc2. The system we used had 932
-> > PCI devices, at least 800 which have extended space as seen when booted
-> > into a 5.15 kernel. But none of them appeared in 6.2-rc2.
-> > - The drivers which rely on the information in the extended PCI config
-> > space don't work anymore. We have confirmed that the perf uncore driver
-> > (uncore performance monitoring) and Intel VSEC driver (telemetry) don't
-> > work in 6.2-rc2. There could be more drivers which are impacted.
-> > 
-> > After a bisect, we found the regression is caused by the below commit
-> > 07eab0901ede ("efi/x86: Remove EfiMemoryMappedIO from E820 map").
-> > After reverting the commit, the issues are gone.
-This patch also affects all the QAT drivers, and causes them to fail
-during the probe when they look at data from the extended PCI config
-space.
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Herbert, FYI, this patch is in your cryptodev-2.6 tree.
-
-I tried the patch below and it seems to resolve the problem on my
-system (S2600WFQ with Skylake).
-
-> Can you try this patch (based on v6.2-rc1):
+> ---
+>   drivers/crypto/ccp/ccp-dmaengine.c | 21 +++++++++++++++++----
+>   1 file changed, 17 insertions(+), 4 deletions(-)
 > 
-> 
-> commit 89a0067217b0 ("x86/pci: Treat EfiMemoryMappedIO as reservation of ECAM space")
-> parent 1b929c02afd3
-> Author: Bjorn Helgaas <bhelgaas@google.com>
-> Date:   Thu Jan 5 16:02:58 2023 -0600
-> 
->     x86/pci: Treat EfiMemoryMappedIO as reservation of ECAM space
->     
->     Normally we reject ECAM space unless it is reported as reserved in the E820
->     table or via a PNP0C02 _CRS method (PCI Firmware, r3.3, sec 4.1.2).  This
->     means extended config space (offsets 0x100-0xfff) may not be accessible.
->     
->     Some firmware doesn't report ECAM space via PNP0C02 _CRS methods, but does
->     mention it as an EfiMemoryMappedIO region via EFI GetMemoryMap(), which is
->     normally converted to an E820 entry by a bootloader or EFI stub.
->     
->     07eab0901ede ("efi/x86: Remove EfiMemoryMappedIO from E820 map"), removes
->     E820 entries that correspond to EfiMemoryMappedIO regions because some
->     other firmware uses EfiMemoryMappedIO for PCI host bridge windows, and the
->     E820 entries prevent Linux from allocating BAR space for hot-added devices.
->     
->     Allow use of ECAM for extended config space when the region is covered by
->     an EfiMemoryMappedIO region, even if it's not included in E820 or PNP0C02
->     _CRS.
->     
->     Fixes: 07eab0901ede ("efi/x86: Remove EfiMemoryMappedIO from E820 map")
->     Link: https://lore.kernel.org/r/ac2693d8-8ba3-72e0-5b66-b3ae008d539d@linux.intel.com
-> 
-> diff --git a/arch/x86/pci/mmconfig-shared.c b/arch/x86/pci/mmconfig-shared.c
-> index 758cbfe55daa..4adc587a4c94 100644
-> --- a/arch/x86/pci/mmconfig-shared.c
-> +++ b/arch/x86/pci/mmconfig-shared.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include <linux/acpi.h>
-> +#include <linux/efi.h>
->  #include <linux/pci.h>
->  #include <linux/init.h>
->  #include <linux/bitmap.h>
-> @@ -442,6 +443,25 @@ static bool is_acpi_reserved(u64 start, u64 end, enum e820_type not_used)
->  	return mcfg_res.flags;
->  }
->  
-> +static bool is_efi_reserved(u64 start, u64 end, enum e820_type not_used)
+> diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+> index 9f753cb4f5f18..b386a7063818b 100644
+> --- a/drivers/crypto/ccp/ccp-dmaengine.c
+> +++ b/drivers/crypto/ccp/ccp-dmaengine.c
+> @@ -642,14 +642,26 @@ static void ccp_dma_release(struct ccp_device *ccp)
+>   		chan = ccp->ccp_dma_chan + i;
+>   		dma_chan = &chan->dma_chan;
+>   
+> -		if (dma_chan->client_count)
+> -			dma_release_channel(dma_chan);
+> -
+>   		tasklet_kill(&chan->cleanup_tasklet);
+>   		list_del_rcu(&dma_chan->device_node);
+>   	}
+>   }
+>   
+> +static void ccp_dma_release_channels(struct ccp_device *ccp)
 > +{
-> +	efi_memory_desc_t *md;
-> +	u64 size, mmio_start, mmio_end;
+> +	struct ccp_dma_chan *chan;
+> +	struct dma_chan *dma_chan;
+> +	unsigned int i;
 > +
-> +	for_each_efi_memory_desc(md) {
-> +		if (md->type == EFI_MEMORY_MAPPED_IO) {
-> +			size = md->num_pages << EFI_PAGE_SHIFT;
-> +			mmio_start = md->phys_addr;
-> +			mmio_end = mmio_start + size - 1;
+> +	for (i = 0; i < ccp->cmd_q_count; i++) {
+> +		chan = ccp->ccp_dma_chan + i;
+> +		dma_chan = &chan->dma_chan;
 > +
-> +			if (mmio_start <= start && end <= mmio_end)
-> +				return true;
-> +		}
+> +		if (dma_chan->client_count)
+> +			dma_release_channel(dma_chan);
 > +	}
-> +
-> +	return false;
 > +}
 > +
->  typedef bool (*check_reserved_t)(u64 start, u64 end, enum e820_type type);
->  
->  static bool __ref is_mmconf_reserved(check_reserved_t is_reserved,
-> @@ -452,7 +472,7 @@ static bool __ref is_mmconf_reserved(check_reserved_t is_reserved,
->  	u64 size = resource_size(&cfg->res);
->  	u64 old_size = size;
->  	int num_buses;
-> -	char *method = with_e820 ? "E820" : "ACPI motherboard resources";
-> +	char *method = with_e820 ? "E820" : "ACPI motherboard resources or EFI";
->  
->  	while (!is_reserved(addr, addr + size, E820_TYPE_RESERVED)) {
->  		size >>= 1;
-> @@ -502,15 +522,17 @@ pci_mmcfg_check_reserved(struct device *dev, struct pci_mmcfg_region *cfg, int e
->  	if (!early && !acpi_disabled) {
->  		if (is_mmconf_reserved(is_acpi_reserved, cfg, dev, 0))
->  			return true;
-> +		if (is_mmconf_reserved(is_efi_reserved, cfg, dev, 0))
-> +			return true;
->  
->  		if (dev)
->  			dev_info(dev, FW_INFO
-> -				 "MMCONFIG at %pR not reserved in "
-> +				 "MMCONFIG at %pR not reserved in EFI "
->  				 "ACPI motherboard resources\n",
->  				 &cfg->res);
->  		else
->  			pr_info(FW_INFO PREFIX
-> -			       "MMCONFIG at %pR not reserved in "
-> +			       "MMCONFIG at %pR not reserved in EFI or "
->  			       "ACPI motherboard resources\n",
->  			       &cfg->res);
->  	}
-Tested-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-
-Regards,
-
--- 
-Giovanni
+>   int ccp_dmaengine_register(struct ccp_device *ccp)
+>   {
+>   	struct ccp_dma_chan *chan;
+> @@ -770,8 +782,9 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp)
+>   	if (!dmaengine)
+>   		return;
+>   
+> -	ccp_dma_release(ccp);
+> +	ccp_dma_release_channels(ccp);
+>   	dma_async_device_unregister(dma_dev);
+> +	ccp_dma_release(ccp);
+>   
+>   	kmem_cache_destroy(ccp->dma_desc_cache);
+>   	kmem_cache_destroy(ccp->dma_cmd_cache);
