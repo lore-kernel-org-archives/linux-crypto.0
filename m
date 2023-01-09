@@ -2,34 +2,27 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC7AC61DB3
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 03:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA89C61DB3
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 04:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbjAIDl2 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Jan 2023 22:41:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40894 "EHLO
+        id S234198AbjAIEAr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 8 Jan 2023 23:00:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbjAIDl1 (ORCPT
+        with ESMTP id S233961AbjAIEAo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Jan 2023 22:41:27 -0500
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8133965B8;
-        Sun,  8 Jan 2023 19:41:24 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 0559324E1B2;
-        Mon,  9 Jan 2023 11:41:15 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 9 Jan
- 2023 11:41:14 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Mon, 9 Jan 2023 11:41:14 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Olivia Mackall <olivia@selenic.com>,
+        Sun, 8 Jan 2023 23:00:44 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664C76450;
+        Sun,  8 Jan 2023 20:00:40 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pEjKe-00FRxO-1i; Mon, 09 Jan 2023 12:00:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 09 Jan 2023 12:00:20 +0800
+Date:   Mon, 9 Jan 2023 12:00:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     JiaJie Ho <jiajie.ho@starfivetech.com>
+Cc:     Olivia Mackall <olivia@selenic.com>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Emil Renner Berthing <kernel@esmil.dk>,
@@ -38,61 +31,36 @@ CC:     Olivia Mackall <olivia@selenic.com>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Thread-Topic: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive
- SoC
-Thread-Index: AQHZGoveBWEVWeSp5UqGtlmGFQKs8K6QmY4AgATZceD//3/RgIAAj3Zg
-Date:   Mon, 9 Jan 2023 03:41:14 +0000
-Message-ID: <e0c9944151b24e848af55221a4388301@EXMBX168.cuchost.com>
+Subject: Re: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Message-ID: <Y7uRVNvplGjrZxa4@gondor.apana.org.au>
 References: <20221228071103.91797-1-jiajie.ho@starfivetech.com>
  <20221228071103.91797-3-jiajie.ho@starfivetech.com>
  <Y7fePDme5E3yhPhQ@gondor.apana.org.au>
  <7c2cc6e9cdf241318fc73162a5ec221d@EXMBX168.cuchost.com>
  <Y7uEGxl8xJ1xxkKZ@gondor.apana.org.au>
-In-Reply-To: <Y7uEGxl8xJ1xxkKZ@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.190.108.220]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+ <e0c9944151b24e848af55221a4388301@EXMBX168.cuchost.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0c9944151b24e848af55221a4388301@EXMBX168.cuchost.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Jan 09, 2023 at 03:41:14AM +0000, JiaJie Ho wrote:
+>
+> The average wait time is around 20 microseconds.
+> I measured from writel cmd to wait_for_completion done.
 
+Do you know of an upper bound? E.g., if we limit it to 40us how
+many requests would fail on average?
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: 9 January, 2023 11:04 AM
-> To: JiaJie Ho <jiajie.ho@starfivetech.com>
-> Cc: Olivia Mackall <olivia@selenic.com>; Rob Herring <robh+dt@kernel.org>;
-> Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Emil Renner
-> Berthing <kernel@esmil.dk>; Conor Dooley <conor.dooley@microchip.com>;
-> linux-crypto@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-riscv@lists.infradead.org
-> Subject: Re: [PATCH v2 2/3] hwrng: starfive - Add TRNG driver for StarFive
-> SoC
-> 
-> On Mon, Jan 09, 2023 at 02:58:14AM +0000, JiaJie Ho wrote:
-> >
-> > My trng device requires sending a generate new number cmd before each
-> read.
-> > It then only populates the data registers with new random number and
-> raise an interrupt when ready.
-> > If user choose to not wait, they will always get stale bits.
-> > Is it okay to always return error if wait=false ?
-> 
-> What is the length of the wait time? Is there an upper bound?
-> What is the average wait time?
-> 
+Having a maximum delay of 40us would be OK with wait == 0.  So
+you could implement it in a way such that if the wait time exceeded
+40us then you return if wait == 0, otherwise you can wait longer.
 
-The average wait time is around 20 microseconds.
-I measured from writel cmd to wait_for_completion done.
-
-Thanks
-Jia Jie
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
