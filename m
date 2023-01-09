@@ -2,249 +2,225 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3038C61DB3
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 18:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAE2C63797
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 21:08:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235018AbjAISuj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Jan 2023 13:50:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37920 "EHLO
+        id S238006AbjAIVIC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Jan 2023 16:08:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233106AbjAISui (ORCPT
+        with ESMTP id S237761AbjAIVHo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Jan 2023 13:50:38 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 385AE1AD8C;
-        Mon,  9 Jan 2023 10:50:36 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A63032F4;
-        Mon,  9 Jan 2023 10:51:17 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.37.246])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD6333F67D;
-        Mon,  9 Jan 2023 10:50:29 -0800 (PST)
-Date:   Mon, 9 Jan 2023 18:50:24 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
-        boqun.feng@gmail.com, catalin.marinas@arm.com, dennis@kernel.org,
-        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC][PATCH 05/12] arch: Introduce
- arch_{,try_}_cmpxchg128{,_local}()
-Message-ID: <Y7xh8Orb2/E2sM7J@FVFF77S0Q05N>
-References: <20221219153525.632521981@infradead.org>
- <20221219154119.154045458@infradead.org>
+        Mon, 9 Jan 2023 16:07:44 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7BE1A2A98
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Jan 2023 13:00:03 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id j16-20020a05600c1c1000b003d9ef8c274bso3745704wms.0
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Jan 2023 13:00:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UzZy04Ic2aUdzTgSub/+D+guuDt6qN2zJBC1MOCj0FE=;
+        b=PqmeRotaVpMJ4ujbDvAsrYaWBCkhC6Jo70nSAeNd9xslWsIzbDzbW0yNfoaF5r0yy9
+         F+MucbQxhBNAcGKweocHMmo5+KVIWsTmMv1VyPryn3dmpjL0F2VYdwCfyesz+ZpCFaGi
+         KEk4mw/VMVZZPxy4aVfVw8r3evMBAusP+9egBmEdInB+Gv95brlZUof60RG9aUl7JPRk
+         x72PxbuvIEETojjxnoPpsGNznAT3PvrJz8w4RfYe6jAOQlqiWrlxJHkkEA5/WRSZaG7E
+         VvP3ive0Pw6jKLya2jeoZuM6mKqhC41IZVpmOJxbxkvp2b9YWDbrTzZWNPuvbrrzITwM
+         BRpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UzZy04Ic2aUdzTgSub/+D+guuDt6qN2zJBC1MOCj0FE=;
+        b=X2nqEVRG2SMffhCWDQUB5M1LDuwesg6PmIjdHNbjy6REiYUS1SQyseRzawOmpWqUcw
+         rTnuACQebkuDazfYEjuBB0YUFd/FOOl56QF2gk5LSUxzWLsCQtMOFeMVo3ipVfH65t9T
+         K8PxdzRLapYU0DlClQt+2lcGx0kgHdxMzgGaGixs8xFmUMN60XRvIupSpf6mOGirY6B8
+         qDykEgUgmsRShsL4JY7OQKNBbsmxZpg3TNYCy9QRbM4lh54YT/i8dk2PrvS9WJkrb9c/
+         tBf97skgE7AvcrHHuZihDmmJNcYaeS8ao8aCGEs6h66Nke1uHU2mSeqsn0Xaq3zfaAdd
+         9kSg==
+X-Gm-Message-State: AFqh2kpKOFu+3I8vb8g37eQG0bT/YTxLPIMDP4PiTGAELskl/wWRI3mB
+        rdNe95G7hd7qOtVXVYq4ahaAaw==
+X-Google-Smtp-Source: AMrXdXu07Z6MDFh4ZEgcrX9Q3LqIJ4zJVrDOP82VKKfk8W315cyXZsXXbi88iyE0M9V8CvQMVxKb/Q==
+X-Received: by 2002:a05:600c:1d28:b0:3d2:1d51:246e with SMTP id l40-20020a05600c1d2800b003d21d51246emr50762581wms.9.1673298002065;
+        Mon, 09 Jan 2023 13:00:02 -0800 (PST)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id p21-20020a7bcc95000000b003c65c9a36dfsm12229340wma.48.2023.01.09.13.00.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Jan 2023 13:00:01 -0800 (PST)
+Message-ID: <00e43ac2-6238-79a2-d9cb-8c42208594d8@arista.com>
+Date:   Mon, 9 Jan 2023 20:59:54 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221219154119.154045458@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 1/5] crypto: Introduce crypto_pool
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20230103184257.118069-1-dima@arista.com>
+ <20230103184257.118069-2-dima@arista.com>
+ <20230106175326.2d6a4dcd@kernel.org>
+Content-Language: en-US
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20230106175326.2d6a4dcd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Peter,
+Hi Jakub,
 
-On Mon, Dec 19, 2022 at 04:35:30PM +0100, Peter Zijlstra wrote:
-> For all architectures that currently support cmpxchg_double()
-> implement the cmpxchg128() family of functions that is basically the
-> same but with a saner interface.
+Thanks for taking a look and your review,
+
+On 1/7/23 01:53, Jakub Kicinski wrote:
+[..]
+>> +config CRYPTO_POOL
+>> +	tristate "Per-CPU crypto pool"
+>> +	default n
+>> +	help
+>> +	  Per-CPU pool of crypto requests ready for usage in atomic contexts.
 > 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-
-I tried giving this a go, specifically your queue core/wip-u128 branch with
-HEAD commit c05419246aa69cd3, but it locked up at boot.
-
-I spotted a couple of problems there which also apply here, noted below with
-suggested fixes.
-
-> ---
->  arch/arm64/include/asm/atomic_ll_sc.h |   38 +++++++++++++++++++++++
->  arch/arm64/include/asm/atomic_lse.h   |   33 +++++++++++++++++++-
->  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
->  arch/s390/include/asm/cmpxchg.h       |   33 ++++++++++++++++++++
->  arch/x86/include/asm/cmpxchg_32.h     |    3 +
->  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
->  6 files changed, 185 insertions(+), 3 deletions(-)
+> Let's make it a hidden symbol? It seems like a low-level library
+> which gets select'ed, so no point bothering users with questions.
 > 
-> --- a/arch/arm64/include/asm/atomic_ll_sc.h
-> +++ b/arch/arm64/include/asm/atomic_ll_sc.h
-> @@ -326,6 +326,44 @@ __CMPXCHG_DBL(   ,        ,  ,         )
->  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
->  
->  #undef __CMPXCHG_DBL
-> +
-> +union __u128_halves {
-> +	u128 full;
-> +	struct {
-> +		u64 low, high;
-> +	};
-> +};
-> +
-> +#define __CMPXCHG128(name, mb, rel, cl)					\
-> +static __always_inline u128						\
-> +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
-> +{									\
-> +	union __u128_halves r, o = { .full = (old) },			\
-> +			       n = { .full = (new) };			\
-> +									\
-> +	asm volatile("// __cmpxchg128" #name "\n"			\
-> +	"	prfm	pstl1strm, %2\n"				\
-> +	"1:	ldxp	%0, %1, %2\n"					\
-> +	"	eor	%3, %0, %3\n"					\
-> +	"	eor	%4, %1, %4\n"					\
-> +	"	orr	%3, %4, %3\n"					\
-> +	"	cbnz	%3, 2f\n"					\
+> config CRYPTO_POOL
+> 	tristate
+> 
+> that's it.
 
-These lines clobber %3 and %4, but per below, those are input operands, and so this blows up.
+Sounds good
 
-> +	"	st" #rel "xp	%w3, %5, %6, %2\n"			\
-> +	"	cbnz	%w3, 1b\n"					\
-> +	"	" #mb "\n"						\
-> +	"2:"								\
-> +	: "=&r" (r.low), "=&r" (r.high), "+Q" (*(unsigned long *)ptr)	\
-> +	: "r" (o.low), "r" (o.high), "r" (n.low), "r" (n.high)		\
-> +	: cl);								\
-> +									\
-> +	return r.full;							\
-> +}
-> +
-> +__CMPXCHG128(   ,        ,  ,         )
-> +__CMPXCHG128(_mb, dmb ish, l, "memory")
-> +
-> +#undef __CMPXCHG128
+>> +static int crypto_pool_scratch_alloc(void)
+> 
+> This isn't called by anything in this patch..
+> crypto_pool_alloc_ahash() should call it I'm guessing?
 
-I think we can do this simpler and more clearly if we use the u128 operand
-directly, with the 'H' modifier to get at the high register of the pair:
+Ah, this is little historical left-over: in the beginning, I used
+constant-sized area as "scratch" buffer, the way TCP-MD5 does it.
+Later, while converting users to crypto_pool, I found that it would be
+helpful to support simple resizing as users have different size
+requirement to the temporary buffer, i.e. looking at xfrm_ipcomp, if
+later it would be converted to use the same API, rather than its own:
+IPCOMP_SCRATCH_SIZE is huge (which may help to save quite some memory if
+shared with other crypto_pool users: as the buffer is as well protected
+by bh-disabled section, the usage pattern is quite the same).
 
-| #define __CMPXCHG128(name, mb, rel, cl...)                              \
-| static __always_inline u128                                             \
-| __ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)       \
-| {                                                                       \
-|         u128 ret;                                                       \
-|         unsigned int tmp;                                               \
-|                                                                         \
-|         asm volatile("// __cmpxchg128" #name "\n"                       \
-|         "       prfm    pstl1strm, %[v]\n"                              \
-|         "1:     ldxp    %[ret], %H[ret], %[v]\n"                        \
-|         "       cmp     %[ret], %[old]\n"                               \
-|         "       ccmp    %H[ret], %H[old], #4, ne\n"                     \
-|         "       b.ne    2f\n"                                           \
-|         "       st" #rel "xp %w[tmp], %[new], %H[new], %[v]\n"          \
-|         "       cbnz    %w[tmp], 1b\n"                                  \
-|         "       " #mb "\n"                                              \
-|         "2:"                                                            \
-|         : [ret] "=&r" (ret),                                            \
-|           [tmp] "=&r" (tmp),                                            \
-|           [v] "+Q" (*ptr)                                               \
-|         : [old] "r" (old),                                              \
-|           [new] "r" (new)                                               \
-|         : "cc" , ##cl);                                                 \
-|                                                                         \
-|         return ret;                                                     \
-| }
-| 
-| __CMPXCHG128(   ,        ,  )
-| __CMPXCHG128(_mb, dmb ish, l, "memory")
-| 
-| #undef __CMPXCHG128
+In patch 2 I rewrote it for crypto_pool_reserve_scratch(). The purpose
+of patch 2 was to only add dynamic up-sizing of this buffer to make it
+easier to review the change. So, here are 2 options:
+- I can move scratch area allocation/resizing/freeing to patch2 for v3
+- Or I can keep patch 2 for only adding the resizing functionality, but
+in patch 1 make crypto_pool_scratch_alloc() non-static and to the header
+API.
 
-Note: I've used CMP and CCMP to simplify the equality check, which clobbers the
-flags/condition-codes ("cc"), but requires two fewer GPRs. I'm assuming that's
-the better tradeoff here.
+What would you prefer?
 
-The existing cmpxchg_double() code clobbers the loaded value as part of
-checking whether it was equal, but to be able to preserve the value and be able
-to replay the loop (which for hilarious LL/SC reasons *must* be in asm), we
-can't do the same here.
+[..]
+>> +out_free:
+>> +	if (!IS_ERR_OR_NULL(hash) && e->needs_key)
+>> +		crypto_free_ahash(hash);
+>> +
+>> +	for_each_possible_cpu(cpu) {
+>> +		if (*per_cpu_ptr(e->req, cpu) == NULL)
+>> +			break;
+>> +		hash = crypto_ahash_reqtfm(*per_cpu_ptr(e->req, cpu));
+> 
+> Could you use a local variable here instead of @hash?
+> That way you won't need the two separate free_ahash()
+> one before and one after the loop..
 
-I've boot-tested the suggestion with GCC 12.1.0.
+Good idea, will do
 
-> +
->  #undef K
->  
->  #endif	/* __ASM_ATOMIC_LL_SC_H */
-> --- a/arch/arm64/include/asm/atomic_lse.h
-> +++ b/arch/arm64/include/asm/atomic_lse.h
-> @@ -151,7 +151,7 @@ __lse_atomic64_fetch_##op##name(s64 i, a
->  	"	" #asm_op #mb "	%[i], %[old], %[v]"			\
->  	: [v] "+Q" (v->counter),					\
->  	  [old] "=r" (old)						\
-> -	: [i] "r" (i) 							\
-> +	: [i] "r" (i)							\
->  	: cl);								\
->  									\
->  	return old;							\
+> 
+>> +		ahash_request_free(*per_cpu_ptr(e->req, cpu));
+> 
+> I think using @req here would be beneficial as well :S
+> 
+>> +		if (e->needs_key) {
+>> +			crypto_free_ahash(hash);
+>> +			hash = NULL;
+>> +		}
+>> +	}
+>> +
+>> +	if (hash)
+>> +		crypto_free_ahash(hash);
+> 
+> This error handling is tricky as hell, please just add a separate
+> variable to hold the 
 
-Spurious whitespace change?
+Agree, will do for v3
 
-> @@ -324,4 +324,35 @@ __CMPXCHG_DBL(_mb, al, "memory")
->  
->  #undef __CMPXCHG_DBL
->  
-> +#define __CMPXCHG128(name, mb, cl...)					\
-> +static __always_inline u128						\
-> +__lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)		\
-> +{									\
-> +	union __u128_halves r, o = { .full = (old) },			\
-> +			       n = { .full = (new) };			\
-> +	register unsigned long x0 asm ("x0") = o.low;			\
-> +	register unsigned long x1 asm ("x1") = o.high;			\
-> +	register unsigned long x2 asm ("x2") = n.low;			\
-> +	register unsigned long x3 asm ("x3") = n.high;			\
-> +	register unsigned long x4 asm ("x4") = (unsigned long)ptr;	\
-> +									\
-> +	asm volatile(							\
-> +	__LSE_PREAMBLE							\
-> +	"	casp" #mb "\t%[old1], %[old2], %[new1], %[new2], %[v]\n"\
-> +	: [old1] "+&r" (x0), [old2] "+&r" (x1),				\
-> +	  [v] "+Q" (*(unsigned long *)ptr)				\
-> +	: [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),		\
-> +	  [oldval1] "r" (r.low), [oldval2] "r" (r.high)			\
-> +	: cl);								\
-> +									\
-> +	r.low = x0; r.high = x1;					\
-> +									\
-> +	return r.full;							\
-> +}
-> +
-> +__CMPXCHG128(   ,   )
-> +__CMPXCHG128(_mb, al, "memory")
-> +
-> +#undef __CMPXCHG128
+>> +out_free_req:
+>> +	free_percpu(e->req);
+>> +out_free_alg:
+>> +	kfree(e->alg);
+>> +	e->alg = NULL;
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * crypto_pool_alloc_ahash - allocates pool for ahash requests
+>> + * @alg: name of async hash algorithm
+>> + */
+>> +int crypto_pool_alloc_ahash(const char *alg)
+>> +{
+>> +	int i, ret;
+>> +
+>> +	/* slow-path */
+>> +	mutex_lock(&cpool_mutex);
+>> +
+>> +	for (i = 0; i < cpool_populated; i++) {
+>> +		if (cpool[i].alg && !strcmp(cpool[i].alg, alg)) {
+>> +			if (kref_read(&cpool[i].kref) > 0) {
+> 
+> In the current design we can as well resurrect a pool waiting to 
+> be destroyed, right? Just reinit the ref and we're good.
+> 
+> Otherwise the read() + get() looks quite suspicious to a reader.
 
-Similarly, I'd suggest:
+Yes, unsure why I haven't done it from the beginning
 
-| #define __CMPXCHG128(name, mb, cl...)                                   \
-| static __always_inline u128                                             \
-| __lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)         \
-| {                                                                       \
-|         asm volatile(                                                   \
-|         __LSE_PREAMBLE                                                  \
-|         "       casp" #mb "\t%[old], %H[old], %[new], %H[new], %[v]\n"  \
-|         : [old] "+&r" (old),                                            \
-|           [v] "+Q" (*(u128 *)ptr)                                       \
-|         : [new] "r" (new)                                               \
-|         : cl);                                                          \
-|                                                                         \
-|         return old;                                                     \
-| }
-| 
-| __CMPXCHG128(   ,   )   
-| __CMPXCHG128(_mb, al, "memory")
-| 
-| #undef __CMPXCHG128
+[..]
+>> +/**
+>> + * crypto_pool_add - increases number of users (refcounter) for a pool
+>> + * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
+>> + */
+>> +void crypto_pool_add(unsigned int id)
+>> +{
+>> +	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
+>> +		return;
+>> +	kref_get(&cpool[id].kref);
+>> +}
+>> +EXPORT_SYMBOL_GPL(crypto_pool_add);
+>> +
+>> +/**
+>> + * crypto_pool_get - disable bh and start using crypto_pool
+>> + * @id: crypto_pool that was previously allocated by crypto_pool_alloc_ahash()
+>> + * @c: returned crypto_pool for usage (uninitialized on failure)
+>> + */
+>> +int crypto_pool_get(unsigned int id, struct crypto_pool *c)
+> 
+> Is there a precedent somewhere for the _add() and _get() semantics
+> you're using here? I don't think I've seen _add() for taking a
+> reference, maybe _get() -> start(), _add() -> _get()?
+
+Yeah, I presume I took not the best-fitting naming from
+tcp_get_md5sig_pool()/tcp_put_md5sig_pool().
+Will do the renaming.
 
 Thanks,
-Mark.
+          Dmitry
+
