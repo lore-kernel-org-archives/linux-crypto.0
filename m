@@ -2,136 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6349EC61DB3
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 16:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EC2C61DB3
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Jan 2023 17:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232429AbjAIQ4l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Jan 2023 11:56:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51236 "EHLO
+        id S237397AbjAIR4u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Jan 2023 12:56:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237371AbjAIQ4H (ORCPT
+        with ESMTP id S229648AbjAIR4T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Jan 2023 11:56:07 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894523D9F2
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Jan 2023 08:55:39 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id jl4so10148267plb.8
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Jan 2023 08:55:39 -0800 (PST)
+        Mon, 9 Jan 2023 12:56:19 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A3E40C28;
+        Mon,  9 Jan 2023 09:51:59 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id h16so9008220wrz.12;
+        Mon, 09 Jan 2023 09:51:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=81sjJWzHO6Ovjo5Gl60AAk0+/2Zuzb6zOrT24WH6r3o=;
-        b=OOJuw8OWU9nGb+CL4TUgcpiaj0SA2J1CLUj7NLENcLFdDRo7NoHkTYncpkkO8iVYRl
-         74LR+OZkKxRfS5/+S70XDs2suGpDD6t9Hkh0kUhKuWlV9iwZpbsPPDe3G2gtcCd3m4nw
-         jkzOl8rELfTy/SlBdk23Ea03QIoTSoMfnf+EXS6eQOBKw7jDv0FTj3yFjQUvJjfapk4T
-         kf0Zy5ZqxRUUFZpsVxuA5H0Hw8apONfzLomEcmRWF/IHy93TJuSvzGiXQ8CJ/tb6x6h9
-         egX2evheI9vwF5TD/jWWy9FQg5kL0XyYYoEFICAoU2fjCkLhF9MUnLleCSPuBSDqBe0M
-         DX8A==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2L4Nx5qVuAviVSz8W0zvvT/84e//kF+LGBMYcQHzhto=;
+        b=OAT6bNAVgnQlY6KivDvwimWCgYQAWlKSZU+FsNS+g1O58an01D5QYUB38PZkGtBBX+
+         HQ0aSoY8+TgnzHpcBM9LJh0ySnmFD4xbmxZqKXUtYE2SOdBDBeyY9/cXu6MgS7hgnTEW
+         3wVOnf02ZgPi8H+N1lG9t7CGSi5jl6JJ7fno+ern+drJQLIxnfOV8ckd9Qxc29Sf5vvQ
+         BuB187f2XcDAmLtcgD6OzUcWuf7AvQwyU+/jxT7/La71KCQWp4zQTIfX8bgNNoNCO3rE
+         gDuHnSHWENE1IY9C15MNUyOmXxsol6MO1dFrBp0P7wF04CbPw+O6jTsXefbKyJq+g/Ev
+         plyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=81sjJWzHO6Ovjo5Gl60AAk0+/2Zuzb6zOrT24WH6r3o=;
-        b=ub5ygHVblkr0Js89f/76D9pUZlzeY7nkkubCHPA5P/0Iu1JSbCK8sy2ugqJ0aoNMei
-         KTLC64QYzt5XQFPKRdmsYIqkqSqFpKn5fZtn8J6whIMsw2JE2ouK0vjBaeukShiL1g2B
-         f9vgGo4Gzd7XPOaeLow3z88xBXIFl7MWCq0juznkbLyjoFGQ+Gb45VC19NRV7NUWT7tJ
-         uDzVvVs32j0rrh/3ufyAO4AD8DN7jFIexQzczfat3yHWulaD5QSDvsgf8UxGmE0AKwKl
-         xVcCmO9CKeNa4w6aleRzkAr9MGav6Qumm0C8yq5hjOE8omLJaTbbZDiRoB3jRYpOVsIF
-         mGEQ==
-X-Gm-Message-State: AFqh2kp5Ud5dqvtGzUqSEKaZGBe15TTownXVEyzRGTGYsfFBraG7fJM0
-        27TmUqNBElO7SqJydMrEHEwQ/TJ9BPw4yo02sIprBA==
-X-Google-Smtp-Source: AMrXdXsPdoZHVqBzLP7WRcXcNC4Xd6GTdeUcwaefhv8fy9Lwb6M6BmFfgkXiH/ADLsV/yr8LRaT3J6DHlJCmHzvZGPY=
-X-Received: by 2002:a17:902:82cb:b0:192:a04b:c624 with SMTP id
- u11-20020a17090282cb00b00192a04bc624mr2581882plz.134.1673283338843; Mon, 09
- Jan 2023 08:55:38 -0800 (PST)
+        bh=2L4Nx5qVuAviVSz8W0zvvT/84e//kF+LGBMYcQHzhto=;
+        b=3vZol5k0hC2L8yyHn6pfsDQTe1O20ZkfCsWBeFlg/KEXrLfe2KM04YpIhydTpTX5/8
+         JB6/P7Oa16hEsbe/4lTHuQE5U6VHHFaYTo3IsDVLrUxRkCpJk1ZD0AUM9+krn/D9vCrZ
+         dp9KLXHHTNzfOGBAxy9uTcTYTeIcbtas7KtvqgxWtFHqWxFMStNggbkR+fXdHD29XvW3
+         AQDV0iLwxnXYT0BOtMgz1FOkC0f4GTRUtOhfBBaCRyaG5aqr9svWf5xlC+vaJLTGJn/7
+         pkzHairrJo6ZB13mM3OjL8e9NmeJMRF0f2Id8gr9GQPmGLc/sweGQoz//JTid1TAJ8Qs
+         nNOQ==
+X-Gm-Message-State: AFqh2krP5rnJdeO2vcj3u5TL2xk01ioVpFY5rY8GdDAj6aS7aKpbByw2
+        cV5BjXwMisUSA/fVE2WQ0Cc=
+X-Google-Smtp-Source: AMrXdXvUK6A5f5l9Ckn5YqN3cLQ6zLmOpwGjk/W0rs5SIGBpOhiinBNYvloTHGDdkEdfNx2pD/+4fQ==
+X-Received: by 2002:a5d:5269:0:b0:2a6:37a6:a071 with SMTP id l9-20020a5d5269000000b002a637a6a071mr12809819wrc.21.1673286718114;
+        Mon, 09 Jan 2023 09:51:58 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id c18-20020adffb52000000b0025e86026866sm10678421wrs.0.2023.01.09.09.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 09:51:57 -0800 (PST)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] pefile: remove the redundant pointer secs
+Date:   Mon,  9 Jan 2023 17:51:56 +0000
+Message-Id: <20230109175156.1572877-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
-In-Reply-To: <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
-From:   Dionna Amalie Glaze <dionnaglaze@google.com>
-Date:   Mon, 9 Jan 2023 08:55:27 -0800
-Message-ID: <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-To:     Dov Murik <dovmurik@linux.ibm.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > +
-> > +static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> > +{
-> [...]
->
-> Here we set the length to the page-aligned value, but we copy only
-> params.cert_len bytes.  If there are two subsequent
-> snp_set_instance_certs() calls where the second one has a shorter
-> length, we might "keep" some leftover bytes from the first call.
->
-> Consider:
-> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
-> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
->
-> If I understand correctly, on the second call we'll copy 4097 "BBB..."
-> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
-> 1) & PAGE_MASK which will be 8192.
->
-> Later when fetching the certs (for the extended report or in
-> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
-> filled with 4097 BBBs and 4095 leftover AAAs.
->
-> Maybe zero sev->snp_certs_data entirely before writing to it?
->
+The pointer secs is being assigned a value that is never read. The
+pointer and assignment are redundant, remove them.
 
-Yes, I agree it should be zeroed, at least if the previous length is
-greater than the new length. Good catch.
+Cleans up clang scan build warning:
+warning: Although the value stored to 'secs' is used in the enclosing
+expression, the value is never actually read from 'secs'
 
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Related question (not only for this patch) regarding snp_certs_data
-> (host or per-instance): why is its size page-aligned at all? why is it
-> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
-> is never sent to the PSP.
->
-
-The buffer is meant to be copied into the guest driver following the
-GHCB extended guest request protocol. The data to copy back are
-expected to be in 4K page granularity.
-
-> [...]
-> >
-> > -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
-> > +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
-> >
->
-> This has effects in drivers/crypto/ccp/sev-dev.c
->                                                                (for
-> example in alloc_snp_host_map).  Is that OK?
->
-
-No, this was a mistake of mine because I was using a bloated data
-encoding that needed 5 pages for the GUID table plus 4 small
-certificates. I've since fixed that in our user space code.
-We shouldn't change this size and instead wait for a better size
-negotiation protocol between the guest and host to avoid this awkward
-hard-coding.
-
-
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index 7553ab18db89..a660e4d68d50 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -28,7 +28,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	const struct pe32plus_opt_hdr *pe64;
+ 	const struct data_directory *ddir;
+ 	const struct data_dirent *dde;
+-	const struct section_header *secs, *sec;
++	const struct section_header *sec;
+ 	size_t cursor, datalen = pelen;
+ 
+ 	kenter("");
+@@ -110,7 +110,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	ctx->n_sections = pe->sections;
+ 	if (ctx->n_sections > (ctx->header_size - cursor) / sizeof(*sec))
+ 		return -ELIBBAD;
+-	ctx->secs = secs = pebuf + cursor;
++	ctx->secs = pebuf + cursor;
+ 
+ 	return 0;
+ }
 -- 
--Dionna Glaze, PhD (she/her)
+2.30.2
+
