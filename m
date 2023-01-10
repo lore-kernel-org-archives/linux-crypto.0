@@ -2,156 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8DFC46467
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 03:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9432CC54EBE
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 03:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbjAJDfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Jan 2023 22:35:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52130 "EHLO
+        id S230133AbjAJDlw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Jan 2023 22:41:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbjAJDfa (ORCPT
+        with ESMTP id S229727AbjAJDlv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Jan 2023 22:35:30 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE643FA38
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Jan 2023 19:35:27 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id cf42so16294496lfb.1
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Jan 2023 19:35:27 -0800 (PST)
+        Mon, 9 Jan 2023 22:41:51 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876B93C383
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Jan 2023 19:41:50 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id k19so7771456pfg.11
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Jan 2023 19:41:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=profian-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UosNqGA9C/XIdHT1k8S2LsPXYWx8A3sEk/zWC7bC67s=;
-        b=xwwEbEXD12KZoQtAd4yCi07zYXy9XoxjKp5yUWCQlIjjdY5yqyduY7kzQVOSxNQ5B3
-         Z6WaC1d+4GyseI5Eu3f9HSqSXLAc4CDM8eV4sATmPaChxQ9/7R2bCxyUFSoxu9nNzOcn
-         bRHdD8sQs6M5SeNmJfSH9N9ou4QggFa1IN5anjzTsWots1ygtD9CU+VmN2PTtAYPcajB
-         fFSxIawiHTNgaV30nLANYlJAIJVHg2pFfRLs2rW2aZ++zI87Ld4xH/q74sOw0eufikq8
-         AiPlKm57Ecbtcc08gMqOeeWQVsuWaPwea53fvRi7EisQ5egBdEtvcKOdhCTLcNRUecc3
-         XJaw==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOunmGsE6zoHdf/rvKc+p3Dc6IxSircpX69k/W1g6mM=;
+        b=dQvfXnAUnxR9/8wFo6ZH1eFvZHOkVTrvtm+IrYbZhcRPUDfWJZJyXR+wfx0kiEAF1k
+         7m5Loc9WKSSGvy9llRY375ARn1jn+8peFd9OQV2NSh9TZPPw5Vjvn2I7osktQebqCX+m
+         /4rRIgl757N82v+D0ygq/9D14fBnJObMqhMWfL51DPptNGSq/zXZ/LCZ/P9QwSEfEeaQ
+         xf0DvBAR/v4D+qOwzACK/ZS9UusAPfWQmwEzyimxZ1av/f7Os0tm83lSkRIBsrBJgp1/
+         JPl13Pnc73o9otoZOGhpUqiu8B6q4FpODrROLlfMrI+arHhSGkiLjF7RjhzGbnhJGMxq
+         lfTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UosNqGA9C/XIdHT1k8S2LsPXYWx8A3sEk/zWC7bC67s=;
-        b=gbdhyJ3L3HzJtKCoNckUQ7D1SlGGMNe8l2b/dGtjMLzXq/NEis9MLpwDFhkkpY0GVf
-         +91NNZXDiFVJfEM4dgJRMKVhzhdqd5XaovqSRxZ5JbutRR4QS2UYu4su5+1nozxt+9dd
-         wx6fBh7uvEmnFEzUQytMILsdoNqFhv3sZlWD47BET8kbbu1wGcnFxdFjznjOFZA5DkQz
-         KGMjhbSFp17oCttht3xBcDMHZM9sk+mPhmt+woA+ilyddll3lAiM4nX0FrHfP6mN3a7w
-         D/j4hvQPhXI6gl3XF5wLTEyCmScAb3KaCx3FYV2IE0Af03fCCdE/P2znaLDbSgxEhsw1
-         RYKA==
-X-Gm-Message-State: AFqh2koxCipCHO+/ghvQn7pR+yW+s3vpc8lSMgixsx6Q+cSiwFqyAOKS
-        o3iKiY6LeSLIhRmmYpln09bZaQ==
-X-Google-Smtp-Source: AMrXdXsd0exkiXSWIxI6iXBfC1lzwBbDYhmrGgcgZfUVpJdIRiQnA8sbXQ63dUcWRs9pClckNjlGng==
-X-Received: by 2002:a05:6512:b22:b0:4cb:154d:2175 with SMTP id w34-20020a0565120b2200b004cb154d2175mr14399098lfu.30.1673321725738;
-        Mon, 09 Jan 2023 19:35:25 -0800 (PST)
-Received: from localhost (83-245-197-49.elisa-laajakaista.fi. [83.245.197.49])
-        by smtp.gmail.com with ESMTPSA id c14-20020a056512074e00b004cb3a55feacsm1941490lfs.100.2023.01.09.19.35.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 19:35:25 -0800 (PST)
-From:   Jarkko Sakkinen <jarkko@profian.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Jarkko Sakkinen <jarkko@profian.com>,
-        linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER - SE...), linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v4] crypto: ccp: Sanitize sev_platform_init() error messages
-Date:   Tue, 10 Jan 2023 03:35:20 +0000
-Message-Id: <20230110033520.66560-1-jarkko@profian.com>
-X-Mailer: git-send-email 2.38.1
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UOunmGsE6zoHdf/rvKc+p3Dc6IxSircpX69k/W1g6mM=;
+        b=ArnBE0xppyLIJaVZcc9d08pmJJYAnqsyogWe5d2yv8wll3XGGbXd93aVTDsuEFEnh+
+         bIVJin3BsI+afutc7NzHiQnECT3AZVa4duYoJQV0cAHvPdLYYHbrZNgr7A6q8qsxTRun
+         waUTLUXzbf+VOxDIl2DB/3VpsG+eDTJJuoYcNrMUUd/Wbqt/j7kX/27AEyHFKAUFNdrl
+         hsdNeO6RY+4H/JeeizcgIjX65P3SIz3EjeY1xMhi8ajeUDmTxGozfdE+WNTluoyH+RCE
+         dhBdBnMM7Ru7YEwsVIA7sv7UduhEr/F6rg4qd5q7K+hE0HBFqPU8t4Wl5kOMRO7fUcig
+         vW0Q==
+X-Gm-Message-State: AFqh2korsOnDxHtnKN8UCMmUKvwY18VX9CebiWKSDPcTj7Yf8V5tNypO
+        ZXMJKit10JZ2x0qAv0LRTS8=
+X-Google-Smtp-Source: AMrXdXuPADiNMs8pl93i/nvApMOtvcp0kY3zkpak0DclM/cGUisjtOpnSq+NTi4MpLfZgtTiQN1CgA==
+X-Received: by 2002:a05:6a00:981:b0:586:8ead:a8e8 with SMTP id u1-20020a056a00098100b005868eada8e8mr14444746pfg.8.1673322109932;
+        Mon, 09 Jan 2023 19:41:49 -0800 (PST)
+Received: from [172.25.138.193] ([203.246.171.161])
+        by smtp.gmail.com with ESMTPSA id e18-20020aa79812000000b0058119caa82csm6776427pfl.205.2023.01.09.19.41.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Jan 2023 19:41:48 -0800 (PST)
+Message-ID: <4395e670-5886-e219-32d9-130f066d56c4@gmail.com>
+Date:   Tue, 10 Jan 2023 12:41:45 +0900
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.1
+Subject: Re: crypto: aria-avx - add AES-NI/AVX/x86_64/GFNI assembler
+ implementation of aria cipher
+To:     Jan Beulich <jbeulich@suse.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+References: <5a07ddfd-eb8e-a9a1-6952-67fb45f2727e@suse.com>
+From:   Taehee Yoo <ap420073@gmail.com>
+In-Reply-To: <5a07ddfd-eb8e-a9a1-6952-67fb45f2727e@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The following functions end up calling sev_platform_init() or
-__sev_platform_init_locked():
+Hi Jan,
+Thank you so much for the report!
 
-* sev_guest_init()
-* sev_ioctl_do_pek_csr
-* sev_ioctl_do_pdh_export()
-* sev_ioctl_do_pek_import()
-* sev_ioctl_do_pek_pdh_gen()
-* sev_pci_init()
+On 2023. 1. 9. 오후 7:08, Jan Beulich wrote:
+ > Hello,
+ >
+ > sadly I don't have the original thread to hand to reply, so this 
+standalone
+ > mail will need to do.
+ >
+ > The documented GNU binutils baseline for the kernel (6.1) is 2.23, 
+yet this
+ > new drivers uses GFNI unconditionally. This breaks with any pre-2.30 gas.
+ >
+ > Regards, Jan
 
-However, only sev_pci_init() prints out the failed command error code, and
-even there, the error message does not specify which SEV command failed.
+I tested to build with the binutils 2.26.1 and I found a failure as you 
+mentioned.
 
-Address this by printing out the SEV command errors inside
-__sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
-INIT_EX commands.  As a side-effect, @error can be removed from the
-parameter list.
+   AS [M]  arch/x86/crypto/aria-aesni-avx-asm_64.o
+arch/x86/crypto/aria-aesni-avx-asm_64.S: Assembler messages:
+arch/x86/crypto/aria-aesni-avx-asm_64.S:1101: Error: no such 
+instruction: `vgf2p8affineinvqb $(( 
+(((0)&1)<<0)|(((1)&1)<<1)|(((0)&1)<<2)|(((0)&1)<<3)|(((0)&1)<<4)|(((1)&1)<<5)|(((1)&1)<<6)|(((1)&1)<<7))),%xmm0,%xmm9,%xmm9'
+arch/x86/crypto/aria-aesni-avx-asm_64.S:1101: Error: no such 
+instruction: `vgf2p8affineinvqb $(( 
+(((0)&1)<<0)|(((1)&1)<<1)|(((0)&1)<<2)|(((0)&1)<<3)|(((0)&1)<<4)|(((1)&1)<<5)|(((1)&1)<<6)|(((1)&1)<<7))),%xmm0,%xmm13,%xmm13'
+arch/x86/crypto/aria-aesni-avx-asm_64.S:1101: Error: no such 
+instruction: `vgf2p8affineqb $(( 
+(((1)&1)<<0)|(((0)&1)<<1)|(((1)&1)<<2)|(((0)&1)<<3)|(((0)&1)<<4)|(((0)&1)<<5)|(((0)&1)<<6)|(((0)&1)<<7))),%xmm1,%xmm10,%xmm10'
+arch/x86/crypto/aria-aesni-avx-asm_64.S:1101: Error: no such 
+instruction: `vgf2p8affineqb $(( 
+(((1)&1)<<0)|(((0)&1)<<1)|(((1)&1)<<2)|(((0)&1)<<3)|(((0)&1)<<4)|(((0)&1)<<5)|(((0)&1)<<6)|(((0)&1)<<7))),%xmm1,%xmm14,%xmm14'
 
-This extra information is particularly useful if firmware loading and/or
-initialization is going to be made more robust, e.g. by allowing firmware
-loading to be postponed.
----
-v4:
-* Sorry, v3 was malformed. Here's a proper patch.
+My plan is to use AS_* macro such as AS_AVX512 to disable building code 
+that uses GFNI.
+So, I may add AS_GFNI for this.
 
-v3:
-* Address Tom Lendacky's feedback:
-  https://lore.kernel.org/kvm/8bf6f179-eee7-fd86-7892-cdcd76e0762a@amd.com/
-
-v2:
-* Address David Rientjes's feedback:
-  https://lore.kernel.org/all/6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com/
-* Remove @error.
-* Remove "SEV_" prefix: it is obvious from context so no need to make klog
-  line longer.
-
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
- drivers/crypto/ccp/sev-dev.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 06fc7156c04f..bdc43e75c78b 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -476,19 +476,23 @@ static int __sev_platform_init_locked(int *error)
- 		dev_err(sev->dev, "SEV: retrying INIT command because of SECURE_DATA_INVALID error. Retrying once to reset PSP SEV state.");
- 		rc = init_function(&psp_ret);
- 	}
--	if (error)
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: %s failed error %#x",
-+			sev_init_ex_buffer ? "CMD_INIT_EX" : "CMD_INIT", psp_ret);
- 		*error = psp_ret;
--
--	if (rc)
- 		return rc;
-+	}
- 
- 	sev->state = SEV_STATE_INIT;
- 
- 	/* Prepare for first SEV guest launch after INIT */
- 	wbinvd_on_all_cpus();
--	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
--	if (rc)
-+	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &psp_ret);
-+	if (rc) {
-+		dev_err(sev->dev, "SEV: CMD_DF_FLUSH failed error %#x", psp_ret);
-+		*error = psp_ret;
- 		return rc;
-+	}
- 
- 	dev_dbg(sev->dev, "SEV firmware initialized\n");
- 
-@@ -1337,8 +1341,7 @@ void sev_pci_init(void)
- 	/* Initialize the platform */
- 	rc = sev_platform_init(&error);
- 	if (rc)
--		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
--			error, rc);
-+		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
- 
- 	return;
- 
--- 
-2.38.1
-
+Thank you so much again for the report!
+Taehee Yoo
