@@ -2,222 +2,167 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862ADC54EBE
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 15:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1B1C54EBE
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 15:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233175AbjAJPXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 10:23:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59630 "EHLO
+        id S234632AbjAJPy7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 10:54:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238964AbjAJPX1 (ORCPT
+        with ESMTP id S238946AbjAJPy5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 10:23:27 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8558619C21
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id m6so18963102lfj.11
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
+        Tue, 10 Jan 2023 10:54:57 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E00CB43E6B
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 07:54:51 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id f34so19115856lfv.10
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 07:54:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
-        b=ksjpe3ePskHcWnV5GTQFpREDCBhu/f/GUrq/ztAX0yjA5OuQ+DutOkLZMxTHo/I+oT
-         gSOsKR2CYx0y6FaPPb135ztWWumo2ihZo6Ahtz3tgU5mTzh1iUVqE/qC696Px6TF03zB
-         HJ2wfcTzzjh0RCQoPte6n7r2FXr0+ml9tuu2hdvhnf1kixXGHUUotiiqqOagwsRCu4tH
-         IfshrT0GjPV1fvD03OZ9Iy/w/vDEEyqakIvbgzh/c02+8JdjVRht0JGh1ozXSnsYeKhF
-         ci6m6qdmPoXCnxYdZT2PubbzQgh5LkWDPkj0xHHait+gqehjaPIYZrb0xA5uQaMFqCZD
-         GQXQ==
+        d=profian-com.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ix339kkTlpn2awHFm+SxDuLq8JxyWGFgKOqLAoyVa7Y=;
+        b=dOVMWBGzNqYUYXLR/FTKB5CsJSXGVsyIz6nmC2bcIfxOTCaUynzsUVLboUo0GVzG2i
+         6+vL7vdoZWhe44IzF3Mpf/IhwTp79uz0kwya/WXT5bVlQbrkCKe1deWtFSJB2OQDeKzw
+         WmbafcqaQYwZT76GLyQrOz7W/0ErkYaE5e3z89jOKDUTlZ3jzocoJM3CyLpwLfmRi+Kt
+         IOFEdlMp3D1kv1ZGKxJ3LEkPEqMuprF2qeYY1wlISwNhXMCtO8mHuSrN4PTnWLM3wV7Q
+         3W5vsg5cT9NcQqcqW6CpRANTcC3TS93SWoOIFdGNStHfJfA/y3hwkFmSKwRzEhAolLP0
+         dEDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
-        b=wFrEPARPdA4gQIPa+gUxK+RJK53Y48pA/LIpF9g+29A1uIf3bRrp711G5ejahypVMR
-         DSAODnuPCLZUz6OMciMkUZb+w6kjHqxibe1GpRB7qnKOE9fczGOMqm97Heu/AkhOZgG2
-         wvr4lHKy/W0wXQs7VSf2xJ/8hs9xWOyMa1vSeafdOkiGQt1lXjfJ2RvRPr2IVClaO2vL
-         lpyCwcGBYhbh2xARpVHB2kng97zKogag2peraQXEjRDMhdpWCXKuJ4wl+IReyj05C1Mm
-         2oebR0bbpc3zh8cF93g8AZXZgKnDfXsgHjRPv6zpWd1xMXKb6JR+4VGpdPro1r1MiBiB
-         gHSg==
-X-Gm-Message-State: AFqh2kp1pNHG2P1tQ9HsabBt0Lakf6xkX2Xgu1rdYWmBTn6tGDQxyIrr
-        8UMs44QOpDuwsY/UF1owKcpZoSm7S/5qIYyQteesGw==
-X-Google-Smtp-Source: AMrXdXutwwZyshi7xoMMAtLcru6vJQ0zecDlsCbhc0a61fPAh5s83V9KF6oInnQ7VfNNGFDxOOjHvS4HTidsTLJf/lM=
-X-Received: by 2002:ac2:5e7c:0:b0:4c3:d803:4427 with SMTP id
- a28-20020ac25e7c000000b004c3d8034427mr2883098lfr.170.1673364193464; Tue, 10
- Jan 2023 07:23:13 -0800 (PST)
-MIME-Version: 1.0
-References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com> <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
- <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com> <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
- <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
-In-Reply-To: <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 10 Jan 2023 08:23:01 -0700
-Message-ID: <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ix339kkTlpn2awHFm+SxDuLq8JxyWGFgKOqLAoyVa7Y=;
+        b=u6HIN3NXNvyq+hU8hEB+eIYEptlnoikYBpq7uU9Zyg4ytHvhi0X9Bp0598yPL8Or7L
+         e4SJI+DqK9Z3Cndevjl3OEVu2VbO/z1EXNwk+rVusB2GHhIkG8nz7jLM2+SQKrt/Gxt9
+         Sn+KeL+ntjflVvB247dDZCS9IaPmTvTiMgU9/denQ2lVONaXRHYL62Rg24Bs50+xf8fQ
+         9BAIDi+G2DLCPSiGtDyiEHn77BwaCmdLmnW6/Qre0FvHaxAEciTlfENBdaqNT5uL/7JL
+         ECms6B/7LvALpeZ0dpBgRl2HlBWcHVj0+PI8mLkL0zffs8w/Soytxw6cwrXKMorPok0u
+         haDg==
+X-Gm-Message-State: AFqh2kpipBssZYMlwjtNzKaNwbf2+IE7/JBSW9B2PCVWGr8U2VWrXuC4
+        2NoHraRgWE2DjJuuKMgaMVPGRA==
+X-Google-Smtp-Source: AMrXdXvYlXs9NrFjmUAGjtIBjURoNXBjkCKL2q9ffeOwPbmUOMgEN4lMhlAjNtZ6GUXvNZW4ABPz4g==
+X-Received: by 2002:a05:6512:3ca0:b0:4b5:b7c3:8053 with SMTP id h32-20020a0565123ca000b004b5b7c38053mr22268123lfv.42.1673366090060;
+        Tue, 10 Jan 2023 07:54:50 -0800 (PST)
+Received: from localhost (83-245-197-49.elisa-laajakaista.fi. [83.245.197.49])
+        by smtp.gmail.com with ESMTPSA id u7-20020ac258c7000000b004a100c21eaesm2239256lfo.97.2023.01.10.07.54.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jan 2023 07:54:49 -0800 (PST)
+Date:   Tue, 10 Jan 2023 15:54:48 +0000
+From:   Jarkko Sakkinen <jarkko@profian.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dov Murik <dovmurik@linux.ibm.com>,
-        Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
+        <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4] crypto: ccp: Sanitize sev_platform_init() error
+ messages
+Message-ID: <Y72KSC/Dr55Qszjy@profian.com>
+References: <20230110033520.66560-1-jarkko@profian.com>
+ <ddbb4b2f-3eb8-64da-bce9-3cfd66d7729a@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ddbb4b2f-3eb8-64da-bce9-3cfd66d7729a@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 8:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 1/10/23 01:10, Dov Murik wrote:
-> > Hi Tom,
-> >
-> > On 10/01/2023 0:27, Tom Lendacky wrote:
-> >> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
-> >>>>> +
-> >>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
-> >>>>> kvm_sev_cmd *argp)
-> >>>>> +{
-> >>>> [...]
-> >>>>
-> >>>> Here we set the length to the page-aligned value, but we copy only
-> >>>> params.cert_len bytes.  If there are two subsequent
-> >>>> snp_set_instance_certs() calls where the second one has a shorter
-> >>>> length, we might "keep" some leftover bytes from the first call.
-> >>>>
-> >>>> Consider:
-> >>>> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
-> >>>> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
-> >>>>
-> >>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
-> >>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
-> >>>> 1) & PAGE_MASK which will be 8192.
-> >>>>
-> >>>> Later when fetching the certs (for the extended report or in
-> >>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
-> >>>> filled with 4097 BBBs and 4095 leftover AAAs.
-> >>>>
-> >>>> Maybe zero sev->snp_certs_data entirely before writing to it?
-> >>>>
-> >>>
-> >>> Yes, I agree it should be zeroed, at least if the previous length is
-> >>> greater than the new length. Good catch.
-> >>>
-> >>>
-> >>>> Related question (not only for this patch) regarding snp_certs_data
-> >>>> (host or per-instance): why is its size page-aligned at all? why is it
-> >>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
-> >>>> is never sent to the PSP.
-> >>>>
-> >>>
-> >>> The buffer is meant to be copied into the guest driver following the
-> >>> GHCB extended guest request protocol. The data to copy back are
-> >>> expected to be in 4K page granularity.
-> >>
-> >> I don't think the data has to be in 4K page granularity. Why do you
-> >> think it does?
-> >>
-> >
-> > I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
-> > Block Standardization (July 2022), page 37.  The table says:
-> >
-> > --------------
-> >
-> > NAE Event: SNP Extended Guest Request
-> >
-> > Notes:
-> >
-> > RAX will have the guest physical address of the page(s) to hold returned
-> > data
-> >
-> > RBX
-> > State to Hypervisor: will contain the number of guest contiguous
-> > pages supplied to hold returned data
-> > State from Hypervisor: on error will contain the number of guest
-> > contiguous pages required to hold the data to be returned
-> >
-> > ...
-> >
-> > The request page, response page and data page(s) must be assigned to the
-> > hypervisor (shared).
-> >
-> > --------------
-> >
-> >
-> > According to this spec, it looks like the sizes are communicated as
-> > number of pages in RBX.  So the data should start at a 4KB alignment
-> > (this is verified in snp_handle_ext_guest_request()) and its length
-> > should be 4KB-aligned, as Dionna noted.
->
-> That only indicates how many pages are required to hold the data, but the
-> hypervisor only has to copy however much data is present. If the data is
-> 20 bytes, then you only have to copy 20 bytes. If the user supplied 0 for
-> the number of pages, then the code returns 1 in RBX to indicate that one
-> page is required to hold the 20 bytes.
->
-> >
-> > I see no reason (in the spec and in the kernel code) for the data length
-> > to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
-> > flow because Dionna ran into this limit.
->
-> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
-> to keep the memory usage controlled because data is coming from userspace
-> and it isn't expected that the data would be larger than that.
->
-> I'm not sure if that was in from the start or as a result of a review
-> comment. Not sure what is the best approach is.
+On Tue, Jan 10, 2023 at 08:41:33AM -0600, Tom Lendacky wrote:
+> On 1/9/23 21:35, Jarkko Sakkinen wrote:
+> > The following functions end up calling sev_platform_init() or
+> > __sev_platform_init_locked():
+> > 
+> > * sev_guest_init()
+> > * sev_ioctl_do_pek_csr
+> > * sev_ioctl_do_pdh_export()
+> > * sev_ioctl_do_pek_import()
+> > * sev_ioctl_do_pek_pdh_gen()
+> > * sev_pci_init()
+> > 
+> > However, only sev_pci_init() prints out the failed command error code, and
+> > even there, the error message does not specify which SEV command failed.
+> > 
+> > Address this by printing out the SEV command errors inside
+> > __sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
+> > INIT_EX commands.  As a side-effect, @error can be removed from the
+> > parameter list.
+> > 
+> > This extra information is particularly useful if firmware loading and/or
+> > initialization is going to be made more robust, e.g. by allowing firmware
+> > loading to be postponed.
+> > ---
+> > v4:
+> > * Sorry, v3 was malformed. Here's a proper patch.
+> > 
+> > v3:
+> > * Address Tom Lendacky's feedback:
+> >    https://lore.kernel.org/kvm/8bf6f179-eee7-fd86-7892-cdcd76e0762a@amd.com/
+> > 
+> > v2:
+> > * Address David Rientjes's feedback:
+> >    https://lore.kernel.org/all/6a16bbe4-4281-fb28-78c4-4ec44c8aa679@google.com/
+> > * Remove @error.
+> > * Remove "SEV_" prefix: it is obvious from context so no need to make klog
+> >    line longer.
+> > 
+> > Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+> > ---
+> >   drivers/crypto/ccp/sev-dev.c | 17 ++++++++++-------
+> >   1 file changed, 10 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > index 06fc7156c04f..bdc43e75c78b 100644
+> > --- a/drivers/crypto/ccp/sev-dev.c
+> > +++ b/drivers/crypto/ccp/sev-dev.c
+> > @@ -476,19 +476,23 @@ static int __sev_platform_init_locked(int *error)
+> >   		dev_err(sev->dev, "SEV: retrying INIT command because of SECURE_DATA_INVALID error. Retrying once to reset PSP SEV state.");
+> >   		rc = init_function(&psp_ret);
+> >   	}
+> > -	if (error)
+> > +	if (rc) {
+> > +		dev_err(sev->dev, "SEV: %s failed error %#x",
+> > +			sev_init_ex_buffer ? "CMD_INIT_EX" : "CMD_INIT", psp_ret);
+> >   		*error = psp_ret;
+> 
+> If I'm not mistaken, error can be NULL, that's why the "if (error)" was
+> present. So that should be kept and even filled in on success. So please
+> leave it the way it was and just add the message to the "if (rc)" section.
 
-This was discussed a bit in the guest driver changes recently too that
-SEV_FW_BLOB_MAX_SIZE is used in the guest driver code for the max cert
-length. We discussed increasing the limit there after fixing the IV
-reuse issue.
+Ah, right thanks, will do.
 
-Maybe we could introduce SEV_CERT_BLOB_MAX_SIZE here to be more clear
-there is no firmware based limit? Then we could switch the guest
-driver to use that too. Dionna confirmed 4 pages is enough for our
-current usecase, Dov would you recommend something larger to start?
+> > -
+> > -	if (rc)
+> >   		return rc;
+> > +	}
+> >   	sev->state = SEV_STATE_INIT;
+> >   	/* Prepare for first SEV guest launch after INIT */
+> >   	wbinvd_on_all_cpus();
+> > -	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
+> > -	if (rc)
+> > +	rc = __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, &psp_ret);
+> 
+> Same here, add:
+> 
+> 	if (error)
+> 		*error = psp_ret;
+> > +	if (rc) {
+> > +		dev_err(sev->dev, "SEV: CMD_DF_FLUSH failed error %#x", psp_ret);
+> > +		*error = psp_ret;
+> >   		return rc;
+> > +	}
+> >   	dev_dbg(sev->dev, "SEV firmware initialized\n");
+> > @@ -1337,8 +1341,7 @@ void sev_pci_init(void)
+> >   	/* Initialize the platform */
+> >   	rc = sev_platform_init(&error);
+> >   	if (rc)
+> > -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> > -			error, rc);
+> > +		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
+> >   	return;
 
->
-> Thanks,
-> Tom
->
-> >
-> >
-> > -Dov
-> >
-> >
-> >
-> >> Thanks,
-> >> Tom
-> >>
-> >>>
-> >>>> [...]
-> >>>>>
-> >>>>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
-> >>>>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
-> >>>>>
-> >>>>
-> >>>> This has effects in drivers/crypto/ccp/sev-dev.c
-> >>>>                                                                  (for
-> >>>> example in alloc_snp_host_map).  Is that OK?
-> >>>>
-> >>>
-> >>> No, this was a mistake of mine because I was using a bloated data
-> >>> encoding that needed 5 pages for the GUID table plus 4 small
-> >>> certificates. I've since fixed that in our user space code.
-> >>> We shouldn't change this size and instead wait for a better size
-> >>> negotiation protocol between the guest and host to avoid this awkward
-> >>> hard-coding.
-> >>>
-> >>>
+BR, Jarkko
