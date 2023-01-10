@@ -2,168 +2,164 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB60C54EBC
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 16:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A9AC54EBC
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 16:53:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238735AbjAJQtf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 11:49:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59606 "EHLO
+        id S230452AbjAJQxu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 11:53:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238561AbjAJQt2 (ORCPT
+        with ESMTP id S238958AbjAJQxq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 11:49:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96494216
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 08:48:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673369320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lJePnZsKXnubDcGA3DYzaayBveLdWQPssGSlTfWc4l8=;
-        b=TVodgAXQv+xTQHZdt2rKYeMfVOTOBMl1yTTiaHRGOz6fGYmsBvN0F8bCjlzvrEB4USFwEU
-        iCWjVXInJFw+mSOzqBOoaa3uF64nNHPwXuqma9NQHeEXIKXrAEwaUSN2sF5P0RfhGyeX+m
-        a0U5pCHXOPwICIhj2DrwEtF3ttPy1hk=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-66-qf-GHNnBO7OWRxoPdjUyMA-1; Tue, 10 Jan 2023 11:48:39 -0500
-X-MC-Unique: qf-GHNnBO7OWRxoPdjUyMA-1
-Received: by mail-pj1-f70.google.com with SMTP id t12-20020a17090a3e4c00b00225cb4e761cso5100423pjm.3
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 08:48:39 -0800 (PST)
+        Tue, 10 Jan 2023 11:53:46 -0500
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2E2140BF
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 08:53:45 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id e13so13204512ljn.0
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 08:53:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UHlQmz4MZPCYm9BygwyVFf2S1z6UZf0NIZ7PiPTX9pQ=;
+        b=eOEttK62GmXf0jQCMYIlYh623FQaOyPteJMvs+9gqBGF2BiED7YcvXEXCQPyMkpRna
+         MqDTI5zO2JB7sPi8MMKGgWs8qHzcu9xaZ7kdKe94nzBkUQ9Ap0b9Iririg90SObGYe7c
+         8mJfMbLaBJZqUbjXfMtt3E2BiHD58XiS6O9d3KpR4Z8Zd09eOfoBHNOal/QxXg1o7/Ih
+         uLmjZ4/fl5d3uEtnyqwezEPLSWsEcpm1iCjMv056cTVE7Gw2huxUTiP08y8uqLZ4a1DQ
+         1HxRNgQm74sTDb7Q2vmwJtBDjCZPgF38SMqoHI5W6WqeeYufRsMzfpvB5cidW0191Gah
+         ynDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-language:content-transfer-encoding:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lJePnZsKXnubDcGA3DYzaayBveLdWQPssGSlTfWc4l8=;
-        b=Wawydch+o3fFiBSAIXmxNr0YAhdtpvPae02j7kyzGUhjm9QUREeztbCUzVJlMET3aw
-         vZtOpUm7J3jhWWq6cmZ1aF8qmQOfeGi79MVKZU4Sp644i4zVxEfFN4cZ4bMje1KJJGm+
-         BsnM0eWyncabCv4NuwYEFKaHRfSAzxmxtv/LeCsQMOjT+9RcLhfsBUyQnORJW5xs9Pel
-         4Wd+bfZirpW6sFIcjQPplQuwDQ68M3wgV4u70OfyDcqlYJGajBpYKRiYdvaWboWpaV0j
-         Iqmk+62oixie63mjma0O9awyYwxQo8yzHlqKkNHGb0I8ltQoO7Db52yG+52u7i8Ttdj0
-         mmOQ==
-X-Gm-Message-State: AFqh2krKY1H3aLwU4bk/ydIdQ7XZrmCdGDWxYDvJziA0IIRoSgFSI9J7
-        oAKG/hXaiTMTD0mBHBoHlp2dkI230KJV3NpjvZvrg7EUG1KBQCI7llIKeDRgjE4727541mKzeZQ
-        1UxUMuhVJBfxK1OQJOwt1z/WR
-X-Received: by 2002:a17:902:8c90:b0:192:a470:2c0b with SMTP id t16-20020a1709028c9000b00192a4702c0bmr36292902plo.49.1673369318518;
-        Tue, 10 Jan 2023 08:48:38 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuNUHJUABqba3WYraNADndH3NP90X++/rRyazKN7bjjjbrXyT/4JMDE35Fof+hR07vv+79c1g==
-X-Received: by 2002:a17:902:8c90:b0:192:a470:2c0b with SMTP id t16-20020a1709028c9000b00192a4702c0bmr36292883plo.49.1673369318177;
-        Tue, 10 Jan 2023 08:48:38 -0800 (PST)
-Received: from localhost.localdomain (024-205-208-113.res.spectrum.com. [24.205.208.113])
-        by smtp.gmail.com with ESMTPSA id l7-20020a655607000000b00477bdc1d5d5sm7061400pgs.6.2023.01.10.08.48.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 08:48:37 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UHlQmz4MZPCYm9BygwyVFf2S1z6UZf0NIZ7PiPTX9pQ=;
+        b=QaYlKwlXixKlNdfMF7QFGqL06c6UL+NvTynCJbvl8SEWJqNtrrVgHkssqsh0lbVky9
+         82py6GMQKP1hF2q++biV+A9kVBWl3yFKJsLkq7ixbq9ZCdIIG/z5vknJmLe0r47XdOdf
+         6tOf50iToGFw6x1Vhp9hK559V10t8G4pdZ2/WvF7Xzw5ArglrpgKA2IQ1J8UNzwjSx9e
+         HvViW8lX1phOsgr6ulonq/o1Fz2nFJk59KO6F8KBA6k84Ai+3vA+v0daWDoOlg1RINdt
+         vdxcD5Jq7mms0GqMDJ2a0gjZTLyjdeJLhBYMeZYdnZ3vDyE2VVFXssVo4VGndVAhR599
+         qJLg==
+X-Gm-Message-State: AFqh2krv8QHFMHhgFa7ulMNk8RlsPPyBePrxYyoMqAHHK3e0HC8OnrcM
+        yz0ir/gIKG5dtrhyuXn93UkpcCe0ksATHgnJcn1EQw==
+X-Google-Smtp-Source: AMrXdXt/FTDJ1jQlyl0sPF3dYRo062A9EttvZq77C4MjzFUPN4zhXdMvRHWsX1mn8ECQcKnN7yCNgz1PVzPs7wpARFY=
+X-Received: by 2002:a2e:7316:0:b0:283:2205:3ba4 with SMTP id
+ o22-20020a2e7316000000b0028322053ba4mr510837ljc.494.1673369623680; Tue, 10
+ Jan 2023 08:53:43 -0800 (PST)
+MIME-Version: 1.0
+References: <20230110161831.2625821-1-trix@redhat.com> <CAMkAt6oqBH35=moST5nO_BXwc8k0M4h_8TvT9H6outR9vOw5qg@mail.gmail.com>
+ <ecd0c7f2-f82c-845f-b1fe-a7d3bf495bb1@redhat.com>
+In-Reply-To: <ecd0c7f2-f82c-845f-b1fe-a7d3bf495bb1@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 10 Jan 2023 09:53:32 -0700
+Message-ID: <CAMkAt6rKfM_uvLRMaN3SSTYVfiMixVGtEyZjo38OG8L1HcfKdg@mail.gmail.com>
 Subject: Re: [PATCH] crypto: initialize error
-To:     Peter Gonda <pgonda@google.com>
+To:     Tom Rix <trix@redhat.com>
 Cc:     brijesh.singh@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         nathan@kernel.org, ndesaulniers@google.com, rientjes@google.com,
         marcorr@google.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-References: <20230110161831.2625821-1-trix@redhat.com>
- <CAMkAt6oqBH35=moST5nO_BXwc8k0M4h_8TvT9H6outR9vOw5qg@mail.gmail.com>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <ecd0c7f2-f82c-845f-b1fe-a7d3bf495bb1@redhat.com>
-Date:   Tue, 10 Jan 2023 08:48:33 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <CAMkAt6oqBH35=moST5nO_BXwc8k0M4h_8TvT9H6outR9vOw5qg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jan 10, 2023 at 9:48 AM Tom Rix <trix@redhat.com> wrote:
+>
+>
+> On 1/10/23 8:27 AM, Peter Gonda wrote:
+> > On Tue, Jan 10, 2023 at 9:18 AM Tom Rix <trix@redhat.com> wrote:
+> >> clang static analysis reports this problem
+> >> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
+> >>    argument is an uninitialized value [core.CallAndMessage]
+> >>      dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> >>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>
+> >> __sev_platform_init_locked() can return without setting the
+> >> error parameter, causing the dev_err() to report a gargage
+> > garbage
+> ok
+> >
+> >> value.
+> >>
+> >> Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
+> > Should this be: 'Fixes: 200664d5237f ("crypto: ccp: Add Secure
+> > Encrypted Virtualization (SEV) command support")'
+> >
+> > Since in that patch an uninitialized error can be printed?
+>
+> It was a bit of a toss up on who is at fault. This is fine, i'll change
+> this as well.
 
-On 1/10/23 8:27 AM, Peter Gonda wrote:
-> On Tue, Jan 10, 2023 at 9:18 AM Tom Rix <trix@redhat.com> wrote:
->> clang static analysis reports this problem
->> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
->>    argument is an uninitialized value [core.CallAndMessage]
->>      dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
->>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> __sev_platform_init_locked() can return without setting the
->> error parameter, causing the dev_err() to report a gargage
-> garbage
-ok
->
->> value.
->>
->> Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
-> Should this be: 'Fixes: 200664d5237f ("crypto: ccp: Add Secure
-> Encrypted Virtualization (SEV) command support")'
->
-> Since in that patch an uninitialized error can be printed?
+Ack. Not trying to play a blame game =]. Just thought this patch might
+as well be backported back to anyone using this function.
 
-It was a bit of a toss up on who is at fault. This is fine, i'll change 
-this as well.
+If you are sending another version you can add:
 
-Thanks
+Reviewed-by: Peter Gonda <pgonda@google.com>
 
-Tom
-
-
-> +void psp_pci_init(void)
-> +{
-> +       struct sev_user_data_status *status;
-> +       struct sp_device *sp;
-> +       int error, rc;
-> +
-> +       sp = sp_get_psp_master_device();
-> +       if (!sp)
-> +               return;
-> +
-> +       psp_master = sp->psp_data;
-> +
-> +       /* Initialize the platform */
-> +       rc = sev_platform_init(&error);
-> +       if (rc) {
-> +               dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
-> +               goto err;
-> +       }
+>
+> Thanks
+>
+> Tom
 >
 >
-> ...
+> > +void psp_pci_init(void)
+> > +{
+> > +       struct sev_user_data_status *status;
+> > +       struct sp_device *sp;
+> > +       int error, rc;
+> > +
+> > +       sp = sp_get_psp_master_device();
+> > +       if (!sp)
+> > +               return;
+> > +
+> > +       psp_master = sp->psp_data;
+> > +
+> > +       /* Initialize the platform */
+> > +       rc = sev_platform_init(&error);
+> > +       if (rc) {
+> > +               dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
+> > +               goto err;
+> > +       }
+> >
+> >
+> > ...
+> >
+> > +static int __sev_platform_init_locked(int *error)
+> > +{
+> > +       struct psp_device *psp = psp_master;
+> > +       int rc = 0;
+> > +
+> > +       if (!psp)
+> > +               return -ENODEV;
+> > +
+> > +       if (psp->sev_state == SEV_STATE_INIT)
+> > +               return 0;
+> >
+> >
+> > So if !psp an uninitialized error is printed?
+> >
+> >> Signed-off-by: Tom Rix <trix@redhat.com>
+> >> ---
+> >>   drivers/crypto/ccp/sev-dev.c | 2 +-
+> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> >> index 56998bc579d6..643cccc06a0b 100644
+> >> --- a/drivers/crypto/ccp/sev-dev.c
+> >> +++ b/drivers/crypto/ccp/sev-dev.c
+> >> @@ -1307,7 +1307,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+> >>   void sev_pci_init(void)
+> >>   {
+> >>          struct sev_device *sev = psp_master->sev_data;
+> >> -       int error, rc;
+> >> +       int error = 0, rc;
+> >>
+> >>          if (!sev)
+> >>                  return;
+> >> --
+> >> 2.27.0
+> >>
 >
-> +static int __sev_platform_init_locked(int *error)
-> +{
-> +       struct psp_device *psp = psp_master;
-> +       int rc = 0;
-> +
-> +       if (!psp)
-> +               return -ENODEV;
-> +
-> +       if (psp->sev_state == SEV_STATE_INIT)
-> +               return 0;
->
->
-> So if !psp an uninitialized error is printed?
->
->> Signed-off-by: Tom Rix <trix@redhat.com>
->> ---
->>   drivers/crypto/ccp/sev-dev.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
->> index 56998bc579d6..643cccc06a0b 100644
->> --- a/drivers/crypto/ccp/sev-dev.c
->> +++ b/drivers/crypto/ccp/sev-dev.c
->> @@ -1307,7 +1307,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
->>   void sev_pci_init(void)
->>   {
->>          struct sev_device *sev = psp_master->sev_data;
->> -       int error, rc;
->> +       int error = 0, rc;
->>
->>          if (!sev)
->>                  return;
->> --
->> 2.27.0
->>
-
