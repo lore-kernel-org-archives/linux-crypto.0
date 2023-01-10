@@ -2,140 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E74BC46467
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 07:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC54C46467
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 07:41:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjAJHhk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 02:37:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53896 "EHLO
+        id S231182AbjAJHlT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 02:41:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbjAJHhj (ORCPT
+        with ESMTP id S229891AbjAJHlS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 02:37:39 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A438BB7FA;
-        Mon,  9 Jan 2023 23:37:37 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5E67CB810D2;
-        Tue, 10 Jan 2023 07:37:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F676C433EF;
-        Tue, 10 Jan 2023 07:37:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673336254;
-        bh=yyBOKFhrCvYd11DKsv7H9EdXoPHAesnTP8S2RO2fISM=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=V63Eu2pOQj2CNEJEp7UxZxAmbxUNKrHlTIeriGOqqdUZbZPdzgD5kz078zJkTycPs
-         VMc8vDYmBzyjQVGnzZj4W0Lkzd14+vcOVAMCwIewgcrXG1MDaeF1YZH2wEZGp7RTlB
-         wuYYTo/+oSKYpFJM1Jww1QxPboFpc85nU6IjecaT4ifVGWWe/lYyB7wIsXBH1KHjLr
-         4I8/5suum23hAIwuZJX83JJd0cvWocvrn1t9rdft9Bo12OudKlcLPG2ldOe7N/NuzV
-         qut4qEpX6n46Vxn627A4sy/Y9zA8kxcSiPGFdo7rrBZzWfkHT5ThF1nnvn44Uc019r
-         oj68fsnDJ1j/A==
-Date:   Tue, 10 Jan 2023 07:37:29 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     JiaJie Ho <jiajie.ho@starfivetech.com>
-CC:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 10 Jan 2023 02:41:18 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98E3D17595;
+        Mon,  9 Jan 2023 23:41:16 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pF9FZ-00FwmE-1Y; Tue, 10 Jan 2023 15:40:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Jan 2023 15:40:49 +0800
+Date:   Tue, 10 Jan 2023 15:40:49 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     Olivia Mackall <olivia@selenic.com>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Emil Renner Berthing <kernel@esmil.dk>,
         Conor Dooley <conor.dooley@microchip.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: =?US-ASCII?Q?RE=3A_=5BPATCH_v3_3/3=5D_riscv=3A_dts=3A_star?= =?US-ASCII?Q?five=3A_Add_TRNG_node_for_VisionFive_2?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <31f6c05b2836450d86560c3efda4abf2@EXMBX168.cuchost.com>
-References: <20230109165249.110279-1-jiajie.ho@starfivetech.com> <20230109165249.110279-4-jiajie.ho@starfivetech.com> <Y7xWtFZO/Y7GaYRQ@spud> <31f6c05b2836450d86560c3efda4abf2@EXMBX168.cuchost.com>
-Message-ID: <50178BB5-4698-4A52-AD89-7235C3802411@kernel.org>
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Message-ID: <Y70WgbySlio6cjew@gondor.apana.org.au>
+References: <20230109165249.110279-1-jiajie.ho@starfivetech.com>
+ <20230109165249.110279-3-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230109165249.110279-3-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jan 10, 2023 at 12:52:48AM +0800, Jia Jie Ho wrote:
+>
+> +static irqreturn_t starfive_trng_irq(int irq, void *priv)
+> +{
+> +	u32 status;
+> +	struct starfive_trng *trng = (struct starfive_trng *)priv;
+> +
+> +	status = readl(trng->base + STARFIVE_ISTAT);
+> +	if (status & STARFIVE_ISTAT_RAND_RDY) {
+> +		writel(STARFIVE_ISTAT_RAND_RDY, trng->base + STARFIVE_ISTAT);
+> +		complete(&trng->random_done);
+> +	}
+> +
+> +	if (status & STARFIVE_ISTAT_SEED_DONE) {
+> +		writel(STARFIVE_ISTAT_SEED_DONE, trng->base + STARFIVE_ISTAT);
+> +		complete(&trng->reseed_done);
+> +	}
+> +
+> +	if (status & STARFIVE_ISTAT_LFSR_LOCKUP) {
+> +		writel(STARFIVE_ISTAT_LFSR_LOCKUP, trng->base + STARFIVE_ISTAT);
+> +		/* SEU occurred, reseeding required*/
+> +		writel(STARFIVE_CTRL_EXEC_RANDRESEED, trng->base + STARFIVE_CTRL);
 
+This could occur at the same time as a GENE_RANDNUM write so perhaps
+you should add some locking?
 
-On 10 January 2023 00:59:58 GMT, JiaJie Ho <jiajie=2Eho@starfivetech=2Ecom=
-> wrote:
->
->
->> -----Original Message-----
->> From: Conor Dooley <conor@kernel=2Eorg>
->> Sent: 10 January, 2023 2:02 AM
->> To: JiaJie Ho <jiajie=2Eho@starfivetech=2Ecom>
->> Cc: Olivia Mackall <olivia@selenic=2Ecom>; Herbert Xu
->> <herbert@gondor=2Eapana=2Eorg=2Eau>; Rob Herring <robh+dt@kernel=2Eorg>=
-;
->> Krzysztof Kozlowski <krzysztof=2Ekozlowski+dt@linaro=2Eorg>; Emil Renne=
-r
->> Berthing <kernel@esmil=2Edk>; Conor Dooley <conor=2Edooley@microchip=2E=
-com>;
->> linux-crypto@vger=2Ekernel=2Eorg; devicetree@vger=2Ekernel=2Eorg; linux=
--
->> kernel@vger=2Ekernel=2Eorg; linux-riscv@lists=2Einfradead=2Eorg
->> Subject: Re: [PATCH v3 3/3] riscv: dts: starfive: Add TRNG node for Vis=
-ionFive
->> 2
->>=20
->> Hey folks,
->>=20
->> On Tue, Jan 10, 2023 at 12:52:49AM +0800, Jia Jie Ho wrote:
->> > Adding StarFive TRNG controller node to VisionFive 2 SoC=2E
->> >
->> > Co-developed-by: Jenny Zhang <jenny=2Ezhang@starfivetech=2Ecom>
->> > Signed-off-by: Jenny Zhang <jenny=2Ezhang@starfivetech=2Ecom>
->> > Signed-off-by: Jia Jie Ho <jiajie=2Eho@starfivetech=2Ecom>
->> > ---
->> >  arch/riscv/boot/dts/starfive/jh7110=2Edtsi | 10 ++++++++++
->> >  1 file changed, 10 insertions(+)
->> >
->> > diff --git a/arch/riscv/boot/dts/starfive/jh7110=2Edtsi
->> > b/arch/riscv/boot/dts/starfive/jh7110=2Edtsi
->> > index 4ac159d79d66=2E=2E3c29e0bc6246 100644
->> > --- a/arch/riscv/boot/dts/starfive/jh7110=2Edtsi
->> > +++ b/arch/riscv/boot/dts/starfive/jh7110=2Edtsi
->> > @@ -455,5 +455,15 @@ uart5: serial@12020000 {
->> >  			reg-shift =3D <2>;
->> >  			status =3D "disabled";
->> >  		};
->> > +
->> > +		rng: rng@1600c000 {
->> > +			compatible =3D "starfive,jh7110-trng";
->> > +			reg =3D <0x0 0x1600C000 0x0 0x4000>;
->> > +			clocks =3D <&stgcrg JH7110_STGCLK_SEC_HCLK>,
->> > +				 <&stgcrg JH7110_STGCLK_SEC_MISCAHB>;
->>=20
->> Which clock source is this? I see syscrg and aoncrg in the v3
->> devicetree:
->> https://lore=2Ekernel=2Eorg/linux-riscv/20221220011247=2E35560-7-
->> hal=2Efeng@starfivetech=2Ecom/
->>=20
->> Have a missed a patchset which adds support for this particular clock
->> controller? At the very least, I don't think one has reached the linux-=
-riscv
->> mailing list=2E
->> The clock driver patchset only has aoncrg & syscrg:
->> https://lore=2Ekernel=2Eorg/linux-riscv/20221220005054=2E34518-1-
->> hal=2Efeng@starfivetech=2Ecom/
->>=20
->
->Hi Conor,
->
->Thanks for reviewing the patches=2E
->Yes, the patch for stg domain hasn't been submitted yet=2E
->In this case should I drop this patch from the series until the related p=
-atches reach the mailing list?
+> +	ret = devm_request_irq(&pdev->dev, irq, starfive_trng_irq, 0, pdev->name,
+> +			       (void *)trng);
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, irq,
+> +				     "Failed to register interrupt handler\n");
 
-Since it doesn't apply anyway, no harm keeping it IMO=2E
-Having the dts can make it easier, although not in this case, to look at t=
-he binding and driver=2E
-Just mention it in the cover letter if/when you send another version=2E
+...
+
+> +	init_completion(&trng->random_done);
+> +	init_completion(&trng->reseed_done);
+
+These completion initialisations should be moved above the IRQ
+registration because you should always be prepared to get spurious
+interrupts.
+
+Otherwise the patch looks good.
 
 Thanks,
-Conor=2E
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
