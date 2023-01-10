@@ -2,57 +2,118 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004C2C6379F
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 08:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1045C63797
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 10:29:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbjAJIiq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 03:38:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59158 "EHLO
+        id S232378AbjAJK3R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 05:29:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237882AbjAJIiW (ORCPT
+        with ESMTP id S231959AbjAJK3P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 03:38:22 -0500
-Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8B3CCC1
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 00:38:20 -0800 (PST)
-Received: by mail.lokoho.com (Postfix, from userid 1001)
-        id 25BFC83744; Tue, 10 Jan 2023 08:37:09 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
-        t=1673339898; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
-        h=Date:From:To:Subject:From;
-        b=C1Xmm16njqu/Ef/xM6NPFxqauiqHCip8G0n49NrRr2h1S2JRFNg6IGLJ/vct4bQcx
-         hpysbDPItiF6Zu342grCibxjOM3WIhgswLMCWcqRfQQAYqPn2mahHYM/JcNuzQHRZd
-         ntUbDQH4QocdvgaUtSwMGjF7fSysy9eAbqAJXd0hkZaMm+SwnOS5ruftrW3Q1nKjPJ
-         eRPsfLOmweG3r752oVqYSAi+zaTshje5s0lk5Hp6M3yhjbQVrdKaMS+5al5uKTY8Vp
-         bzFxHMTB7U0Km2OJGuRK3ij4jkPdnloZcNCsIRleHQGcoZeQXuxgFnbc2CA8AuteiU
-         PdL8vX63l3tqg==
-Received: by mail.lokoho.com for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 08:35:39 GMT
-Message-ID: <20230110074501-0.1.3b.lh4w.0.eik3nu9tft@lokoho.com>
-Date:   Tue, 10 Jan 2023 08:35:39 GMT
-From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
-X-Mailer: mail.lokoho.com
+        Tue, 10 Jan 2023 05:29:15 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2DD235933;
+        Tue, 10 Jan 2023 02:29:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/xtL8wvIQ8lp3BC23umGDk+I9OXyKwohSrU+Z23LYik=; b=o5SrilMrWER24rePTbd37D5rR3
+        03Af0s4hy0SvanC8/eRAv5X/6uAN5F/D37kGqZ1sHdmfojYayBcomClwwtQiIFFdCCrLv2yPw1dXa
+        Fm4BcZIyoq4yqYyBsk6HX5F0QzoDAo3BN9pwxePmb9sUznFBGXraNlt6dS/GRvQMhW93msvZiysCK
+        AmxX+mYNLhKneNh3AvUn/71mZlQILHCKKAGsnTeeoD8/LqzD8wXbzyIqwmRbOO9qHL22LAPgnIhSV
+        ML3sHXLLe+KBW8dBXmM/b18gTjpNlwd+/D7x+QBPyC+JYSzLsANSUHofmbbP0vuBtoYuXo3yjMRMd
+        i5JOjQnA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pFBrQ-0035qA-1F;
+        Tue, 10 Jan 2023 10:28:05 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D9BAF3001F7;
+        Tue, 10 Jan 2023 11:28:07 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 75EEE2C539CAD; Tue, 10 Jan 2023 11:28:07 +0100 (CET)
+Date:   Tue, 10 Jan 2023 11:28:07 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Heiko Carstens <hca@linux.ibm.com>, corbet@lwn.net,
+        will@kernel.org, boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 11/12] slub: Replace cmpxchg_double()
+Message-ID: <Y709txFG5QjW2qrg@hirez.programming.kicks-ass.net>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.550996611@infradead.org>
+ <Y7Ri+Uij1GFkI/LB@osiris>
+ <CAHk-=wj9nK825MyHXu7zkegc7Va+ZxcperdOtRMZBCLHqGrr=g@mail.gmail.com>
+ <Y7xAsELYo4srs/z/@hirez.programming.kicks-ass.net>
+ <CAHk-=whm+u8YoUaE9PKugYBxujhDL5twz6HqzqLP8OTXjKuT4g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whm+u8YoUaE9PKugYBxujhDL5twz6HqzqLP8OTXjKuT4g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Mon, Jan 09, 2023 at 04:02:33PM -0600, Linus Torvalds wrote:
+> On Mon, Jan 9, 2023 at 10:29 AM Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > I ran into a ton of casting trouble when compiling kernel/fork.c which
+> > uses this_cpu_cmpxchg() on a pointer type and the compiler hates casting
+> > pointers to an integer that is not the exact same size.
+> 
+> Ahh. Yeah - not because that code needs or wants the 128-bit case, but
+> because the macro expands to all sizes in a switch statement, so the
+> compiler sees all the cases even if only one is then statically
+> picked.
+> 
+> So the silly casts are for all the cases that never matter.
+> 
+> Annoying.
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+Yes, very.
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+This seems to compile (and boot). Let me go update the others and push
+it out for the robots to have a go.
 
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
-
-
-Pozdrawiam
-Adam Charachuta
+#define percpu_cmpxchg128_op(size, qual, _var, _oval, _nval)		\
+({									\
+	union {								\
+		typeof(_var) full;					\
+		struct {						\
+			u64 low, high;					\
+		};							\
+	} old__, new__;							\
+									\
+	old__.full = _oval;						\
+	new__.full = _nval;						\
+									\
+	asm qual ("cmpxchg16b " __percpu_arg([var])			\
+		  : [var] "+m" (_var),					\
+		    "+a" (old__.low),					\
+		    "+d" (old__.high)					\
+		  : "b" (new__.low),					\
+		    "c" (new__.high)					\
+		  : "memory");						\
+									\
+	old__.full;							\
+})
