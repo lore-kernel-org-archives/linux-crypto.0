@@ -2,41 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4420BC678D8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63017C678D7
 	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 13:51:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232085AbjAJNvZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 08:51:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
+        id S233241AbjAJNv0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 08:51:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238268AbjAJNvD (ORCPT
+        with ESMTP id S238352AbjAJNu7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 08:51:03 -0500
-Received: from smtp1.axis.com (smtp1.axis.com [195.60.68.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE8717040;
+        Tue, 10 Jan 2023 08:50:59 -0500
+Received: from smtp2.axis.com (smtp2.axis.com [195.60.68.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF81D14D3D;
         Tue, 10 Jan 2023 05:50:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=axis.com; q=dns/txt; s=axis-central1; t=1673358658;
   x=1704894658;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kt3TYeUvcM4crKR3SNIuzYGknA7sW073R9rphDOt/eU=;
-  b=eIrpeflUif06kYBWPYgaG3u4YDO0brpeHaalvygw4q+trJmL5yYBI9bG
-   QFwTLpgZwtXkwItZ7V+DCbO/OkLHAtsi5uF8GnWYi31sK6IxDuIsfJVO0
-   31stF0cChEPMAWZx+f4rlXuMkLMR9AoC8S4OsNYfmInHsnBFCpd3T1wZl
-   aVuxthTYCTUyWUAXkUpcdvmIcFO5NRlllmuv54Anbgi42gXZWfdVVEQHB
-   H0jnyNC8qkY7n8SjWXdoHZlL2cbDnjUfQ5OVk3DONH1PyeT46d3DXmNm2
-   LcTnsl4+VUB51hYrgzPBI0NNoaRiPQu2YGvNgO3oYbH1IgsYo9VtX21bE
-   w==;
+  bh=imTnDMnDHu3Au0k4Q8/xix4gLYf+kdvkY3vppCY1wrw=;
+  b=JMjJ0U59I01d/2qkjigFdDLuh+Y2aqC0XKc7rcJCis3BR5wiE6Zmx12w
+   FYVThwmkBg9xHoU9QPBK1Ao6fd436ilarcvtpIWUrEJd+ckmjbEdjjj/m
+   Zj5Rz2Ek/nLv9VKi4djITF0I+SinjGLRK8c3eAqVK4aa6hV98GeFgyGx+
+   h6hfmqpTHQvkTIlNcbpT9BKS/a4WGgpCZy0xyPeAfxZoU1ih14p3dHMFS
+   SnwH67IEMQh0Go2cszGYN/LtgaBJJ6ZLXlkYf68bOfzEwTv1kY2NZk7vM
+   irzArzYfymXEtFhM6yt5PBytSGz7lK7yYfNQjfIxwgoAoRzDVwyMTHLLV
+   Q==;
 From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <jesper.nilsson@axis.com>, <lars.persson@axis.com>
 CC:     <kernel@axis.com>,
         Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 04/12] crypto: axis - fix in-place CBC output IV
-Date:   Tue, 10 Jan 2023 14:50:34 +0100
-Message-ID: <20230110135042.2940847-5-vincent.whitchurch@axis.com>
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Lars Persson <larper@axis.com>
+Subject: [PATCH 01/12] crypto: axis - do not DMA to ahash_request.result
+Date:   Tue, 10 Jan 2023 14:50:31 +0100
+Message-ID: <20230110135042.2940847-2-vincent.whitchurch@axis.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230110135042.2940847-1-vincent.whitchurch@axis.com>
 References: <20230110135042.2940847-1-vincent.whitchurch@axis.com>
@@ -47,49 +48,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When CBC is done in-place, the ->src is overwritten by the time the
-operation is done, so the output IV must be based on a backup of the
-ciphertext.
+From: Lars Persson <larper@axis.com>
 
+The crypto API does not promise that the result pointer is suitable
+for DMA.  Use an intermediate result buffer and let the CPU copy the
+digest to the ahash_request.
+
+Signed-off-by: Lars Persson <larper@axis.com>
 Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
 ---
- drivers/crypto/axis/artpec6_crypto.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/crypto/axis/artpec6_crypto.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index 67f510c497f2..87f82c314e48 100644
+index 51c66afbe677..87af44ac3e64 100644
 --- a/drivers/crypto/axis/artpec6_crypto.c
 +++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -321,6 +321,7 @@ struct artpec6_crypto_request_context {
- 	u32 cipher_md;
- 	bool decrypt;
- 	struct artpec6_crypto_req_common common;
-+	unsigned char last_ciphertext[AES_BLOCK_SIZE];
- 	unsigned char iv_bounce[AES_BLOCK_SIZE] CRYPTO_MINALIGN_ATTR;
+@@ -276,6 +276,7 @@ enum artpec6_crypto_hash_flags {
+ 	HASH_FLAG_FINALIZE = 8,
+ 	HASH_FLAG_HMAC = 16,
+ 	HASH_FLAG_UPDATE_KEY = 32,
++	HASH_FLAG_FINALIZED = 64,
  };
  
-@@ -1158,6 +1159,10 @@ static int artpec6_crypto_decrypt(struct skcipher_request *req)
+ struct artpec6_crypto_req_common {
+@@ -1493,12 +1494,15 @@ static int artpec6_crypto_prepare_hash(struct ahash_request *areq)
+ 			return error;
  
- 	switch (ctx->crypto_type) {
- 	case ARTPEC6_CRYPTO_CIPHER_AES_CBC:
-+		scatterwalk_map_and_copy(req_ctx->last_ciphertext, req->src,
-+					 req->cryptlen - sizeof(req_ctx->last_ciphertext),
-+					 sizeof(req_ctx->last_ciphertext), 0);
+ 		/* Descriptor for the final result */
+-		error = artpec6_crypto_setup_in_descr(common, areq->result,
++		error = artpec6_crypto_setup_in_descr(common,
++						      req_ctx->digeststate,
+ 						      digestsize,
+ 						      true);
+ 		if (error)
+ 			return error;
+ 
++		req_ctx->hash_flags |= HASH_FLAG_FINALIZED;
 +
- 		complete = artpec6_crypto_complete_cbc_decrypt;
- 		break;
- 	case ARTPEC6_CRYPTO_CIPHER_AES_CTR:
-@@ -2185,10 +2190,10 @@ artpec6_crypto_complete_cbc_decrypt(struct crypto_async_request *req)
+ 	} else { /* This is not the final operation for this request */
+ 		if (!run_hw)
+ 			return ARTPEC6_CRYPTO_PREPARE_HASH_NO_START;
+@@ -2216,6 +2220,14 @@ static void artpec6_crypto_complete_aead(struct crypto_async_request *req)
+ 
+ static void artpec6_crypto_complete_hash(struct crypto_async_request *req)
  {
- 	struct skcipher_request *cipher_req = container_of(req,
- 		struct skcipher_request, base);
-+	struct artpec6_crypto_request_context *req_ctx = skcipher_request_ctx(cipher_req);
++	struct ahash_request *areq = container_of(req, struct ahash_request, base);
++	struct artpec6_hash_request_context *ctx = ahash_request_ctx(areq);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
++	size_t digestsize = crypto_ahash_digestsize(ahash);
 +
-+	memcpy(cipher_req->iv, req_ctx->last_ciphertext, sizeof(req_ctx->last_ciphertext));
- 
--	scatterwalk_map_and_copy(cipher_req->iv, cipher_req->src,
--				 cipher_req->cryptlen - AES_BLOCK_SIZE,
--				 AES_BLOCK_SIZE, 0);
++	if (ctx->hash_flags & HASH_FLAG_FINALIZED)
++		memcpy(areq->result, ctx->digeststate, digestsize);
++
  	req->complete(req, 0);
  }
  
