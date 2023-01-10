@@ -2,73 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A75C54EBC
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 11:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7E7C46467
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Jan 2023 12:09:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238154AbjAJL5w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Jan 2023 06:57:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47038 "EHLO
+        id S231228AbjAJMI4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Jan 2023 07:08:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238153AbjAJL5j (ORCPT
+        with ESMTP id S232957AbjAJMI0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Jan 2023 06:57:39 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B65193E4;
-        Tue, 10 Jan 2023 03:57:28 -0800 (PST)
-Received: from dggpeml100012.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Nrq1g3dLTzqV4X;
-        Tue, 10 Jan 2023 19:52:39 +0800 (CST)
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Tue, 10 Jan 2023 19:57:25 +0800
-Subject: Re: [PATCH v10 3/3] crypto: hisilicon/qm - define the device
- isolation strategy
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-References: <20221119074817.12063-1-yekai13@huawei.com>
- <20221119074817.12063-4-yekai13@huawei.com>
- <Y5V1zaurC8TuuA6l@gondor.apana.org.au>
-CC:     <gregkh@linuxfoundation.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-        <liulongfang@huawei.com>
-From:   "yekai (A)" <yekai13@huawei.com>
-Message-ID: <03da282d-7654-4469-ca33-54eaa81b23d9@huawei.com>
-Date:   Tue, 10 Jan 2023 19:57:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <Y5V1zaurC8TuuA6l@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+        Tue, 10 Jan 2023 07:08:26 -0500
+X-Greylist: delayed 1800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Jan 2023 04:05:49 PST
+Received: from wind.enjellic.com (wind.enjellic.com [76.10.64.91])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1D7068C82
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Jan 2023 04:05:49 -0800 (PST)
+Received: from wind.enjellic.com (localhost [127.0.0.1])
+        by wind.enjellic.com (8.15.2/8.15.2) with ESMTP id 30AB1UCJ013380;
+        Tue, 10 Jan 2023 05:01:30 -0600
+Received: (from greg@localhost)
+        by wind.enjellic.com (8.15.2/8.15.2/Submit) id 30AB1SPZ013379;
+        Tue, 10 Jan 2023 05:01:28 -0600
+Date:   Tue, 10 Jan 2023 05:01:28 -0600
+From:   "Dr. Greg" <greg@enjellic.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Yann Droneaud <ydroneaud@opteya.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        patches@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>, linux-mm@kvack.org
+Subject: Re: [PATCH v14 2/7] mm: add VM_DROPPABLE for designating always lazily freeable mappings
+Message-ID: <20230110110128.GA12987@wind.enjellic.com>
+Reply-To: "Dr. Greg" <greg@enjellic.com>
+References: <CAHk-=whQdWFw+0eGttxsWBHZg1+uh=0MhxXYtvJGX4t9P1MgNw@mail.gmail.com> <Y7SJ+/axonTK0Fir@zx2c4.com> <CAHk-=wi4gshfKjbhEO_xZdVb9ztXf0iuv5kKhxtvAHf2HzTmng@mail.gmail.com> <Y7STv9+p248zr+0a@zx2c4.com> <10302240-51ec-0854-2c86-16752d67a9be@opteya.com> <Y7dV1lVUYjqs8fh0@zx2c4.com> <CAHk-=wijEC_oDzfUajhmp=ZVnzMTXgjxHEcxAfaHiNQm4iAcqA@mail.gmail.com> <CAHk-=wiO4rp8oVmj6i6vvC97gNePLN-SxhSK=UozA88G6nxBGQ@mail.gmail.com> <f36f19ee-5bff-4cd0-b9a9-0fe987cf6d38@app.fastmail.com> <CAHk-=wgLWcKq2AdrTmTOxJKn6w4oEpEGdipWAah5Xad5-Yii6Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wgLWcKq2AdrTmTOxJKn6w4oEpEGdipWAah5Xad5-Yii6Q@mail.gmail.com>
+User-Agent: Mutt/1.4i
+X-Greylist: Sender passed SPF test, not delayed by milter-greylist-4.2.3 (wind.enjellic.com [127.0.0.1]); Tue, 10 Jan 2023 05:01:30 -0600 (CST)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Jan 06, 2023 at 01:10:44PM -0800, Linus Torvalds wrote:
 
+Good morning, I hope the week is going well for everyone.
 
-On 2022/12/11 14:16, Herbert Xu wrote:
-> On Sat, Nov 19, 2022 at 07:48:17AM +0000, Kai Ye wrote:
->> Define the device isolation strategy by the device driver. The
->> user configures a hardware error threshold value by uacce interface.
->> If the number of hardware errors exceeds the value of setting error
->> threshold in one hour. The device will not be available in user space.
->> The VF device use the PF device isolation strategy. All the hardware
->> errors are processed by PF driver.
->>
->> Signed-off-by: Kai Ye <yekai13@huawei.com>
->> ---
->>  drivers/crypto/hisilicon/qm.c | 169 +++++++++++++++++++++++++++++++---
->>  include/linux/hisi_acc_qm.h   |  15 +++
->>  2 files changed, 169 insertions(+), 15 deletions(-)
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> On Fri, Jan 6, 2023 at 12:54 PM Andy Lutomirski <luto@kernel.org> wrote:
+> >
+> > I'm going to suggest a very very different approach: fix secret
+> > storage in memory for real. That is, don't lock "super secret
+> > sensitive stuff" into memory, and don't wipe it either. *Encrypt* it.
+> 
+> I don't think you're wrong, but people will complain about key
+> management, and worry about that part instead.
+> 
+> Honestly, this is what SGX and CPU enclaves is _supposed_ to all do
+> for you, but then nobody uses it for various reasons.
 
-Hi Greg KH
+The principal problem is that enclave technology was not made either
+ubiquitous or accessible, long story there, suitable for multiple
+snifters of single malt.
 
-Could you help me to apply this patchset v10?
+Unfortunately, the same goes for just about every other hardware
+security technology.  Every conversation comes down to; "what is the
+business case for the technology", which translated means, how much
+money are we going to make off it.
 
-thanks
-Kai
+Encrypting memory based secrets, as an alternative to wiping them, is
+attractive, but hardware support is needed to do key management
+securely and correctly.  Even than, by definition, there will be a
+window when the material needs to be in memory as plaintext.
+
+A discussion can be had in this arena about perfection being the enemy
+of good.  If you are truely interested in perfection in this endeavor,
+you need to have a trusted platform definition and implementation.
+
+Which, if history is any indication, needs to be an open architecture
+with respect to both software and hardware.
+
+>                Linus
+
+Best wishes to everyone for a productive remainder of the week.
+
+As always,
+Dr. Greg
+
+The Quixote Project - Flailing at the Travails of Cybersecurity
