@@ -2,95 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61644C46467
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 14:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C72C5479D
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 22:23:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232757AbjAKOvu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Jan 2023 09:51:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
+        id S236111AbjAKWXf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Jan 2023 17:23:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234684AbjAKOv1 (ORCPT
+        with ESMTP id S236068AbjAKWX1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2023 09:51:27 -0500
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB44819C13;
-        Wed, 11 Jan 2023 06:51:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1673448687; x=1704984687;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=n45m5Cnc0XyVGw5+Aet7GY6rtwRDVDBECQftBvbXgXQ=;
-  b=vpaXd1zk80KE4p8yk8PMktTvaB/u6R9704H/R+vv7jdWLDghFNFQ46Sd
-   /YzWOsuE+hNTROLGtV50G5nu179qFS4JSZeduSbqJHNsar047+kzTnE9m
-   LjE0+jI+QL741z3r3b92TBnNs/vKS2j6IB8YtNAtZHOOjo5Hjkz/OJnzu
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.96,317,1665446400"; 
-   d="scan'208";a="281733609"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2023 14:51:20 +0000
-Received: from EX13D31EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com (Postfix) with ESMTPS id 0446E40D7E;
-        Wed, 11 Jan 2023 14:51:16 +0000 (UTC)
-Received: from EX19D024EUA002.ant.amazon.com (10.252.50.224) by
- EX13D31EUA002.ant.amazon.com (10.43.165.238) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Wed, 11 Jan 2023 14:51:15 +0000
-Received: from [10.220.99.6] (10.43.161.114) by EX19D024EUA002.ant.amazon.com
- (10.252.50.224) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.7; Wed, 11 Jan
- 2023 14:51:01 +0000
-Message-ID: <65f056ed-68ab-2541-7c83-3f1712e597ce@amazon.com>
-Date:   Wed, 11 Jan 2023 16:50:56 +0200
+        Wed, 11 Jan 2023 17:23:27 -0500
+Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0031D431A6;
+        Wed, 11 Jan 2023 14:23:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
+        s=smtpout1; t=1673475805;
+        bh=1Oxpyw0xOs6/7W8Tuvd1QWxZNFxc0oTmNh4yGrJ47L0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ahLgkiB5IQ5QRVqLfHoeZAVd/D9rkVuFxvdtTNVcpj+nX3+Rzvw9sNQfLAFLHAfuC
+         fx2epI4w+DJKuXv6m4KR7SNDMY4qMZkhSzNmwfHDp9UqNnqPC07Z+ESFd62ySxl27x
+         1wDae6L32WANYrSWVuQ5r5f0bvZJC1zbqZBt+qAO6TYRifgM/TovLMfKe8NlW3HsLj
+         fGxSA7BZCmBpd8/UoA5TukoL0tLQap1kgsp3nWKpTHdr1PKfLtKXSds8I04INn6pf9
+         2Ku8+BOZMXNrPpCwYL7CdG4HKbEZoiMxoIHB2d2PRE0F6GcbbuI2DJ91Zc50i/9/Ua
+         ZUhqiJZIJYa4A==
+Received: from localhost (192-222-180-24.qc.cable.ebox.net [192.222.180.24])
+        by smtpout.efficios.com (Postfix) with ESMTPSA id 4Nshz073rzzgWG;
+        Wed, 11 Jan 2023 17:23:24 -0500 (EST)
+Date:   Wed, 11 Jan 2023 17:23:56 -0500
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        tglx@linutronix.de, linux-crypto@vger.kernel.org,
+        linux-api@vger.kernel.org, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v14 0/7] implement getrandom() in vDSO
+Message-ID: <Y782/D2WZJRR8SHY@localhost>
+References: <20230101162910.710293-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH RFC v7 14/64] x86/sev: Add the host SEV-SNP initialization
- support
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-15-michael.roth@amd.com>
-From:   Sabin Rapan <sabrapan@amazon.com>
-In-Reply-To: <20221214194056.161492-15-michael.roth@amd.com>
-X-Originating-IP: [10.43.161.114]
-X-ClientProxiedBy: EX13D49UWC001.ant.amazon.com (10.43.162.217) To
- EX19D024EUA002.ant.amazon.com (10.252.50.224)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230101162910.710293-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CgpPbiAxNC4xMi4yMDIyIDIxOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gKyNpZmRlZiBDT05G
-SUdfQU1EX01FTV9FTkNSWVBUCj4gKyMgZGVmaW5lIERJU0FCTEVfU0VWX1NOUCAgICAgICAwCj4g
-KyNlbHNlCj4gKyMgZGVmaW5lIERJU0FCTEVfU0VWX1NOUCAgICAgICAoMSA8PCAoWDg2X0ZFQVRV
-UkVfU0VWX1NOUCAmIDMxKSkKPiArI2VuZGlmCj4gKwoKV291bGQgaXQgbWFrZSBzZW5zZSB0byBz
-cGxpdCB0aGUgU0VWLSogZmVhdHVyZSBmYW1pbHkgaW50byB0aGVpciBvd24KY29uZmlnIGZsYWco
-cykgPwpJJ20gdGhpbmtpbmcgaW4gdGhlIGNvbnRleHQgb2YgU0VWLVNOUCBydW5uaW5nIG9uIHN5
-c3RlbXMgd2l0aApUcmFuc3BhcmVudCBTTUUgZW5hYmxlZCBpbiB0aGUgYmlvcy4gSW4gdGhpcyBj
-YXNlLCBlbmFibGluZwpDT05GSUdfQU1EX01FTV9FTkNSWVBUIHdpbGwgYWxzbyBlbmFibGUgU01F
-IGluIHRoZSBrZXJuZWwsIHdoaWNoIGlzIGEKYml0IHN0cmFuZ2UgYW5kIG5vdCBuZWNlc3Nhcmls
-eSB1c2VmdWwuCkNvbW1pdCA0ZTJjODc5NDlmMmIgKCJjcnlwdG86IGNjcCAtIFdoZW4gVFNNRSBh
-bmQgU01FIGJvdGggZGV0ZWN0ZWQKbm90aWZ5IHVzZXIiKSBoaWdobGlnaHRzIGl0LgoKLS0KU2Fi
-aW4uCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3Rl
-cmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElh
-c2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0
-cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+On 01-Jan-2023 05:29:03 PM, Jason A. Donenfeld wrote:
+[...]
+> Two statements:
+> 
+>   1) Userspace wants faster cryptographically secure random numbers of
+>      arbitrary size, big or small.
+> 
+>   2) Userspace is currently unable to safely roll its own RNG with the
+>      same security profile as getrandom().
+>
+[...]
+> API-wise, the vDSO gains this function:
+> 
+>   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
+> 
+> The return value and the first 3 arguments are the same as ordinary
+> getrandom(), while the last argument is a pointer to some state
+> allocated with vgetrandom_alloc(), explained below. Were all four
+> arguments passed to the getrandom syscall, nothing different would
+> happen, and the functions would have the exact same behavior.
+> 
+> Then, we introduce a new syscall:
+> 
+>   void *vgetrandom_alloc(unsigned int *num, unsigned int *size_per_each,
+>                          unsigned long addr, unsigned int flags);
+> 
+> This takes a hinted number of opaque states in `num`, and returns a
+> pointer to an array of opaque states, the number actually allocated back
+> in `num`, and the size in bytes of each one in `size_per_each`, enabling
+> a libc to slice up the returned array into a state per each thread. (The
+> `flags` and `addr` arguments, as well as the `*size_per_each` input
+> value, are reserved for the future and are forced to be zero for now.)
+> 
+> Libc is expected to allocate a chunk of these on first use, and then
+> dole them out to threads as they're created, allocating more when
+> needed. The returned address of the first state may be passed to
+> munmap(2) with a length of `num * size_per_each`, in order to deallocate
+> the memory.
+> 
+> We very intentionally do *not* leave state allocation up to the caller
+> of vgetrandom, but provide vgetrandom_alloc for that allocation. There
+> are too many weird things that can go wrong, and it's important that
+> vDSO does not provide too generic of a mechanism. It's not going to
+> store its state in just any old memory address. It'll do it only in ones
+> it allocates.
 
+[...]
+
+Have you considered extending rseq(2) per-thread "struct rseq" with an
+additional "prng_seed" pointer field, which would point to a per-thread
+memory area accessible both from userspace (at address
+__builtin_thread_pointer() + __rseq_offset) and from kernel's
+return-to-userspace rseq notification code (which can handle page
+faults) ?
+
+This way, the kernel can update its content when returning to userspace
+if an update is needed since the last update.
+
+Would that be sufficient as prng seed for your security requirements ?
+
+Implementation-wise, the semantic of the prng_seed could be entirely
+internal to a vgetrandom vDSO implementation, but the allocation of the
+memory holding this seed would be the responsibility of libc.
+
+libc could query the size required by the kernel for this prng seed with
+a new getauxval(3) entry, e.g. AT_RSEQ_PRNG_SIZE. By doing so, libc
+would only allocate as much memory as needed by the kernel vDSO
+implementation.
+
+This would remove the need for any kind of vgetrandom_alloc system call
+and all its associated complexity.
+
+Thoughts ?
+
+Thanks,
+
+Mathieu
+
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
