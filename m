@@ -2,241 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AAFC5479D
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 07:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F99C5479D
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 12:05:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230015AbjAKH1z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Jan 2023 02:27:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
+        id S239005AbjAKMFM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Jan 2023 07:05:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235641AbjAKH1u (ORCPT
+        with ESMTP id S238497AbjAKMEP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2023 02:27:50 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E623331A;
-        Tue, 10 Jan 2023 23:27:47 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30B7DoLq009757;
-        Wed, 11 Jan 2023 07:26:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bJaGhzuZvR6IABqF8ZAnYUhk8yUitqZDm487hDCv2iI=;
- b=e5l1zoDEzM/oIR9UHwpA1OPByGk/SEZnxOPBF9pnh+eRHiXXF0oces8jr/tKCEoeE7Em
- XCGNk5jhMt+YWzW/edepOh9im6W4g7EbynW9YxESvPeJJj41Ol2HMQ7pI0q7eCdHehGG
- 93UY5B21l3oVy3mNsX8gVgx2paAeDoTWvFm9XAx1Ol+kFuEtf8hBE6x6bhPJhPgHlkft
- 5h4lkIjt+jUPJ88ZtzENaA9xiQhTqIo4RZJk777naFPEFb5xhiEPMG3YAp5yE7nMnpD/
- CU1sGxIUJwXt5lBWJ43qdjIaZeA08y/ZwSABJkLmi5P0fFcz3zYynW0Kp57/7po1j96A dQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1rhu87ha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 07:26:33 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30B7I62h022293;
-        Wed, 11 Jan 2023 07:26:32 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1rhu87gx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 07:26:32 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30B54gj2014428;
-        Wed, 11 Jan 2023 07:26:31 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n1kv51j16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 07:26:30 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30B7QTfo29622816
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Jan 2023 07:26:29 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 171FE58053;
-        Wed, 11 Jan 2023 07:26:29 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D714358043;
-        Wed, 11 Jan 2023 07:26:19 +0000 (GMT)
-Received: from [9.148.12.120] (unknown [9.148.12.120])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Jan 2023 07:26:19 +0000 (GMT)
-Message-ID: <80ed8c14-1e00-166c-0754-42707b568562@linux.ibm.com>
-Date:   Wed, 11 Jan 2023 09:26:18 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Dov Murik <dovmurik@linux.ibm.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
- <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
- <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com>
- <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
- <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
- <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VM1eKCuyhDEX_d4qbaiVCVOno4JqwtpX
-X-Proofpoint-ORIG-GUID: pdXzmNaWViZBcZNPR3P4d2ZBgKoW_aSW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-11_03,2023-01-10_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- impostorscore=0 priorityscore=1501 mlxlogscore=999 spamscore=0
- phishscore=0 bulkscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301110054
+        Wed, 11 Jan 2023 07:04:15 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331EDE09D;
+        Wed, 11 Jan 2023 04:02:20 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id b4so2467779edf.0;
+        Wed, 11 Jan 2023 04:02:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KSuqfITy3pm9CBhTZW7epwEnvbhgxRePj6Bs2ANFDpM=;
+        b=N1zS2hQ1HfEy0d09EjJCAjf3Vqojk+cS720EpMWNIeTlJ2I80nW2qQf8Zy+ZypDx0v
+         XLZVBsknEaUA0QubwMJwF8m8lmHgHJoQaZ3PxBPlNxMOc9RfduDJk36yPddNk2nrGU9f
+         /dJPghA+Ozl7657uwIVw7oTQm71EA1jsa4Y0c8LCobifFCens8JZzuat5iqaDnz97KlH
+         wGBFFGgI/mL07XvMLUELztxBEZ7iWGc4Ep2XSU6Vm4nqr7DcdydTtu9+0BKix56JCn6Y
+         9hRSn337QSa097wypWNnESgiPJkv7BfH1PjGJJj0PcWb0RhzjCspRwjITeojGLQmxjyf
+         LvUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KSuqfITy3pm9CBhTZW7epwEnvbhgxRePj6Bs2ANFDpM=;
+        b=kAGMX2ianm7ukDxWdpbyMnzgv3TVoBB+HpoPaCd8ufxP2h5sBkoYIGrcO2MjFK8xTM
+         1EMSYR8x0iSMx3Xa21jPS1jpf1TKQOwBRDe1zO8poc4PIWgJ4aOg080D1rOwzqBUryIe
+         OiI26VMKih5hT2X2ULZdH1+5yb+c2ApQCxoZhP4FHHswELxvVKSi2MkX1N1io9ZEl1Xq
+         loQ3s8xAZLvfsSKanyltOnOyNypJmpxwIt5dJBAnglgXa93PePCVvhXfaxL5v76YUEQZ
+         Le5nlvE+WSNdkVmtLfIVPe1MEbwfrHK43033BPUASahsxMdjG3Xf75BJuhcGcH5jJGPz
+         Jbww==
+X-Gm-Message-State: AFqh2kpJkunSmgX2AKKTVJp/8OPsaibrBjHhOa4olrFPlR+WR54KYG2m
+        ZrDkEmx5USXZ6ygrrknRS+BNVOE5QJE=
+X-Google-Smtp-Source: AMrXdXuNHA9Xyr1zGaRBGq3GFbifwPFLIhsMvnW3acesULec+F01SyfhE+HE+O82bqgEsIdqJF6mTA==
+X-Received: by 2002:a05:6402:34f:b0:461:7c4e:c437 with SMTP id r15-20020a056402034f00b004617c4ec437mr66195299edw.1.1673438538628;
+        Wed, 11 Jan 2023 04:02:18 -0800 (PST)
+Received: from felia.fritz.box ([2a02:810d:2a40:1104:a47e:7f3e:6b25:bafb])
+        by smtp.gmail.com with ESMTPSA id p9-20020aa7d309000000b0046776f98d0csm6002410edq.79.2023.01.11.04.02.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jan 2023 04:02:18 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] crypto: hisilicon - remove redundant config PCI dependency for some CRYPTO_DEV_HISI configs
+Date:   Wed, 11 Jan 2023 13:02:03 +0100
+Message-Id: <20230111120203.822-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Peter,
+While reviewing dependencies in some Kconfig files, I noticed the redundant
+dependency "depends on PCI && PCI_MSI". The config PCI_MSI has always,
+since its introduction, been dependent on the config PCI. So, it is
+sufficient to just depend on PCI_MSI, and know that the dependency on PCI
+is implicitly implied.
 
-On 10/01/2023 17:23, Peter Gonda wrote:
-> On Tue, Jan 10, 2023 at 8:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->>
->> On 1/10/23 01:10, Dov Murik wrote:
->>> Hi Tom,
->>>
->>> On 10/01/2023 0:27, Tom Lendacky wrote:
->>>> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
->>>>>>> +
->>>>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
->>>>>>> kvm_sev_cmd *argp)
->>>>>>> +{
->>>>>> [...]
->>>>>>
->>>>>> Here we set the length to the page-aligned value, but we copy only
->>>>>> params.cert_len bytes.  If there are two subsequent
->>>>>> snp_set_instance_certs() calls where the second one has a shorter
->>>>>> length, we might "keep" some leftover bytes from the first call.
->>>>>>
->>>>>> Consider:
->>>>>> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
->>>>>> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
->>>>>>
->>>>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
->>>>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
->>>>>> 1) & PAGE_MASK which will be 8192.
->>>>>>
->>>>>> Later when fetching the certs (for the extended report or in
->>>>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
->>>>>> filled with 4097 BBBs and 4095 leftover AAAs.
->>>>>>
->>>>>> Maybe zero sev->snp_certs_data entirely before writing to it?
->>>>>>
->>>>>
->>>>> Yes, I agree it should be zeroed, at least if the previous length is
->>>>> greater than the new length. Good catch.
->>>>>
->>>>>
->>>>>> Related question (not only for this patch) regarding snp_certs_data
->>>>>> (host or per-instance): why is its size page-aligned at all? why is it
->>>>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
->>>>>> is never sent to the PSP.
->>>>>>
->>>>>
->>>>> The buffer is meant to be copied into the guest driver following the
->>>>> GHCB extended guest request protocol. The data to copy back are
->>>>> expected to be in 4K page granularity.
->>>>
->>>> I don't think the data has to be in 4K page granularity. Why do you
->>>> think it does?
->>>>
->>>
->>> I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
->>> Block Standardization (July 2022), page 37.  The table says:
->>>
->>> --------------
->>>
->>> NAE Event: SNP Extended Guest Request
->>>
->>> Notes:
->>>
->>> RAX will have the guest physical address of the page(s) to hold returned
->>> data
->>>
->>> RBX
->>> State to Hypervisor: will contain the number of guest contiguous
->>> pages supplied to hold returned data
->>> State from Hypervisor: on error will contain the number of guest
->>> contiguous pages required to hold the data to be returned
->>>
->>> ...
->>>
->>> The request page, response page and data page(s) must be assigned to the
->>> hypervisor (shared).
->>>
->>> --------------
->>>
->>>
->>> According to this spec, it looks like the sizes are communicated as
->>> number of pages in RBX.  So the data should start at a 4KB alignment
->>> (this is verified in snp_handle_ext_guest_request()) and its length
->>> should be 4KB-aligned, as Dionna noted.
->>
->> That only indicates how many pages are required to hold the data, but the
->> hypervisor only has to copy however much data is present. If the data is
->> 20 bytes, then you only have to copy 20 bytes. If the user supplied 0 for
->> the number of pages, then the code returns 1 in RBX to indicate that one
->> page is required to hold the 20 bytes.
->>
->>>
->>> I see no reason (in the spec and in the kernel code) for the data length
->>> to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
->>> flow because Dionna ran into this limit.
->>
->> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
->> to keep the memory usage controlled because data is coming from userspace
->> and it isn't expected that the data would be larger than that.
->>
->> I'm not sure if that was in from the start or as a result of a review
->> comment. Not sure what is the best approach is.
-> 
-> This was discussed a bit in the guest driver changes recently too that
-> SEV_FW_BLOB_MAX_SIZE is used in the guest driver code for the max cert
-> length. We discussed increasing the limit there after fixing the IV
-> reuse issue.
+Reduce the dependencies of configs CRYPTO_DEV_HISI_SEC2,
+CRYPTO_DEV_HISI_QM, CRYPTO_DEV_HISI_ZIP and CRYPTO_DEV_HISI_HPRE.
 
-I see it now.
+No functional change and effective change of Kconfig dependendencies.
 
-(Joerg, maybe we should add F:drivers/virt/coco/ to the MAINTAINERS list
-so that patches there are hopefully sent to linux-coco?)
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ drivers/crypto/hisilicon/Kconfig | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-
-> 
-> Maybe we could introduce SEV_CERT_BLOB_MAX_SIZE here to be more clear
-> there is no firmware based limit? Then we could switch the guest
-> driver to use that too. Dionna confirmed 4 pages is enough for our
-> current usecase, Dov would you recommend something larger to start?
-> 
-
-Introducing a new constant sounds good to me (and use the same constant
-in the guest driver).
-
-I think 4 pages are OK; I also don't see real harm in increasing this
-limit to 1 MB (if the host+guest agree to pass more stuff there, besides
-certificates).  But maybe that's just abusing this channel, and for
-other data we should use other mechanisms (like vsock).
-
--Dov
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index 743ce4fc3158..4137a8bf131f 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -27,7 +27,7 @@ config CRYPTO_DEV_HISI_SEC2
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_SM4_GENERIC
+-	depends on PCI && PCI_MSI
++	depends on PCI_MSI
+ 	depends on UACCE || UACCE=n
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	depends on ACPI
+@@ -42,7 +42,7 @@ config CRYPTO_DEV_HISI_SEC2
+ config CRYPTO_DEV_HISI_QM
+ 	tristate
+ 	depends on ARM64 || COMPILE_TEST
+-	depends on PCI && PCI_MSI
++	depends on PCI_MSI
+ 	depends on UACCE || UACCE=n
+ 	depends on ACPI
+ 	help
+@@ -51,7 +51,7 @@ config CRYPTO_DEV_HISI_QM
+ 
+ config CRYPTO_DEV_HISI_ZIP
+ 	tristate "Support for HiSilicon ZIP accelerator"
+-	depends on PCI && PCI_MSI
++	depends on PCI_MSI
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	depends on !CPU_BIG_ENDIAN || COMPILE_TEST
+ 	depends on UACCE || UACCE=n
+@@ -62,7 +62,7 @@ config CRYPTO_DEV_HISI_ZIP
+ 
+ config CRYPTO_DEV_HISI_HPRE
+ 	tristate "Support for HISI HPRE accelerator"
+-	depends on PCI && PCI_MSI
++	depends on PCI_MSI
+ 	depends on UACCE || UACCE=n
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	depends on ACPI
+-- 
+2.17.1
 
