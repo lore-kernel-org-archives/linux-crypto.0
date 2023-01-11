@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A313C67871
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 13:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 934F6C46467
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Jan 2023 13:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233456AbjAKNcf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Jan 2023 08:32:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54608 "EHLO
+        id S232042AbjAKNuP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Jan 2023 08:50:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238380AbjAKNcN (ORCPT
+        with ESMTP id S233008AbjAKNuA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Jan 2023 08:32:13 -0500
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE891BEB9;
-        Wed, 11 Jan 2023 05:28:35 -0800 (PST)
+        Wed, 11 Jan 2023 08:50:00 -0500
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38921C7E;
+        Wed, 11 Jan 2023 05:49:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1673443716; x=1704979716;
+  t=1673444999; x=1704980999;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=WCzp7M4ycosz0EMSJh4L4RaC5FrOhLeIurCLoHLODJg=;
-  b=qFUBXMNLpabYD/VxcApwE6SwLA0I4gN4LHiA54ab7eJah6vuCnvvv8tr
-   Cvb5E/5YXUH/UJzB+xs58zHGvNk9UxN7atkzkGykd8UV56n8CHg7ZNS8C
-   FTiPPqDT2SXYzsa8ISuJsWUzLlyyBNlF7bEM0GS2wWjO98x6z4b9/5uK7
-   A=;
+  bh=T4VLwb+WAEhKP27vGcXiylUrNAmmuEI1ccEYWHt8Qec=;
+  b=Ra/PmN25pRyquOGRjfAQVmnV+bZMLuPl7xAquLVbZkzcqVUT3XjEinK5
+   Rk95o+h1EJ/BByVoEQZ0I8eKBsAv3rwvTc1k5RKYgix4q2XUvSQhYKVSi
+   DLDA8Gu1uc3ItYlWC8UYkXAOZKuWUgZmfT+hiMGP9GTgdfxL3D2zYYYXd
+   s=;
 X-IronPort-AV: E=Sophos;i="5.96,317,1665446400"; 
-   d="scan'208";a="299087112"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2023 13:28:27 +0000
-Received: from EX13D40EUA001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id C9BBEA2673;
-        Wed, 11 Jan 2023 13:28:15 +0000 (UTC)
+   d="scan'208";a="285546276"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2023 13:49:56 +0000
+Received: from EX13D40EUA004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com (Postfix) with ESMTPS id C212381180;
+        Wed, 11 Jan 2023 13:49:45 +0000 (UTC)
 Received: from EX19D024EUA002.ant.amazon.com (10.252.50.224) by
- EX13D40EUA001.ant.amazon.com (10.43.165.234) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Wed, 11 Jan 2023 13:28:14 +0000
+ EX13D40EUA004.ant.amazon.com (10.43.165.178) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.42; Wed, 11 Jan 2023 13:49:44 +0000
 Received: from [10.220.99.6] (10.43.161.114) by EX19D024EUA002.ant.amazon.com
  (10.252.50.224) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.7; Wed, 11 Jan
- 2023 13:28:00 +0000
-Message-ID: <cc2998c8-1d18-caa7-0421-584c08406847@amazon.com>
-Date:   Wed, 11 Jan 2023 15:27:56 +0200
+ 2023 13:49:30 +0000
+Message-ID: <3c9d5c84-7b54-e12e-f6ba-a73f66e0b094@amazon.com>
+Date:   Wed, 11 Jan 2023 15:49:25 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH RFC v7 40/64] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
- command
+Subject: Re: [PATCH RFC v7 49/64] KVM: SVM: Introduce ops for the post gfn map
+ and unmap
 Content-Language: en-US
 To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -64,13 +64,14 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jarkko Sakkinen <jarkko@profian.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-41-michael.roth@amd.com>
+ <20221214194056.161492-50-michael.roth@amd.com>
 From:   Sabin Rapan <sabrapan@amazon.com>
-In-Reply-To: <20221214194056.161492-41-michael.roth@amd.com>
+In-Reply-To: <20221214194056.161492-50-michael.roth@amd.com>
 X-Originating-IP: [10.43.161.114]
-X-ClientProxiedBy: EX13D49UWC004.ant.amazon.com (10.43.162.106) To
+X-ClientProxiedBy: EX13D40UWC002.ant.amazon.com (10.43.162.191) To
  EX19D024EUA002.ant.amazon.com (10.252.50.224)
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
@@ -78,20 +79,16 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CgpPbiAxNC4xMi4yMDIyIDIxOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gK3N0YXRpYyBpbnQg
-c25wX2xhdW5jaF91cGRhdGVfdm1zYShzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fc2V2X2Nt
-ZCAqYXJncCkKPiArewo+ICsgICAgICAgc3RydWN0IGt2bV9zZXZfaW5mbyAqc2V2ID0gJnRvX2t2
-bV9zdm0oa3ZtKS0+c2V2X2luZm87Cj4gKyAgICAgICBzdHJ1Y3Qgc2V2X2RhdGFfc25wX2xhdW5j
-aF91cGRhdGUgZGF0YSA9IHt9Owo+ICsgICAgICAgaW50IGksIHJldDsKPiArCj4gKyAgICAgICBk
-YXRhLmdjdHhfcGFkZHIgPSBfX3BzcF9wYShzZXYtPnNucF9jb250ZXh0KTsKPiArICAgICAgIGRh
-dGEucGFnZV90eXBlID0gU05QX1BBR0VfVFlQRV9WTVNBOwo+ICsKPiArICAgICAgIGZvciAoaSA9
-IDA7IGkgPCBrdm0tPmNyZWF0ZWRfdmNwdXM7IGkrKykgewoKU2hvdWxkIGJlIHJlcGxhY2VkIHdp
-dGgga3ZtX2Zvcl9lYWNoX3ZjcHUoKSBhcyBpdCB3YXMgZG9uZSBmb3IKc2V2X2xhdW5jaF91cGRh
-dGVfdm1zYSgpIGluIGMzNmIxNmQyOWYzYSAoIktWTTogU1ZNOiBVc2Ugb25saW5lX3ZjcHVzLApu
-b3QgY3JlYXRlZF92Y3B1cywgdG8gaXRlcmF0ZSBvdmVyIHZDUFVzIikuClByZXZlbnRzIGFjY2Vz
-c2luZyB1bmluaXRpYWxpemVkIGRhdGEgaW4gc3RydWN0IHZjcHVfc3ZtLgoKLS0KU2FiaW4uCgoK
-CkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3RlcmVkIG9m
-ZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElhc2kgQ291
-bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0cmF0aW9u
-IG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+CgpPbiAxNC4xMi4yMDIyIDIxOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gZGlmZiAtLWdpdCBh
+L2FyY2gveDg2L2t2bS9zdm0vc3ZtLmggYi9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5oCj4gaW5kZXgg
+YTRkNDhjM2UwZjg5Li5hZWYxM2MxMjBmMmQgMTAwNjQ0Cj4gLS0tIGEvYXJjaC94ODYva3ZtL3N2
+bS9zdm0uaAo+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmgKPiBAQCAtMTAwLDYgKzEwMCw3
+IEBAIHN0cnVjdCBrdm1fc2V2X2luZm8gewo+ICAgICAgICAgYXRvbWljX3QgbWlncmF0aW9uX2lu
+X3Byb2dyZXNzOwo+ICAgICAgICAgdTY0IHNucF9pbml0X2ZsYWdzOwo+ICAgICAgICAgdm9pZCAq
+c25wX2NvbnRleHQ7ICAgICAgLyogU05QIGd1ZXN0IGNvbnRleHQgcGFnZSAqLwo+ICsgICAgICAg
+c3BpbmxvY2tfdCBwc2NfbG9jazsKCkxvb2tzIGxpa2UgYSBsZWZ0b3ZlciBmcm9tIHY2IHNlcmll
+cy4KCi0tClNhYmluLgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIu
+TC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAy
+LCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFu
+aWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
