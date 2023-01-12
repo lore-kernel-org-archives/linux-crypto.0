@@ -2,128 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A44C63797
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 18:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 313FAC54EBE
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 19:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240147AbjALSTE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 13:19:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60572 "EHLO
+        id S236915AbjALTFq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 14:05:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239929AbjALSSV (ORCPT
+        with ESMTP id S240154AbjALTF0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 13:18:21 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41FFDAE;
-        Thu, 12 Jan 2023 09:49:53 -0800 (PST)
+        Thu, 12 Jan 2023 14:05:26 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F0F13D1B;
+        Thu, 12 Jan 2023 10:46:47 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F0F662099;
-        Thu, 12 Jan 2023 17:49:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 477C1C433EF;
-        Thu, 12 Jan 2023 17:49:52 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="H4O9hc5O"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1673545787;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A7DMh06CMcFgJjStpStxXavfvThQkXamahLt/MITO4I=;
-        b=H4O9hc5OvySji42+gvOMAbWZESvbt+Vllxz/9xWfnRC46BhUorqgcDEKJV2gWWYuuXVbTL
-        /nV/1oRzeaugbj+6jWFyt+ncc3ay+9O1+MpydkWVqjwkNjkzjSrgs298kcBtGUqqk0ZZSV
-        NQRfBs8l2tBGOKeR0+Pr6yywPPaK0iE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0fbd866a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 12 Jan 2023 17:49:47 +0000 (UTC)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-4d4303c9de6so100050977b3.2;
-        Thu, 12 Jan 2023 09:49:45 -0800 (PST)
-X-Gm-Message-State: AFqh2krFGOwvM8sYPitTZejs4XqYMGBNpgQ+k3a1Pf9I7/mYrpUeLtSr
-        pySsAZs6MWX8sKkRN+02MbWxMhKakxZE7cpNS8M=
-X-Google-Smtp-Source: AMrXdXv3v3wwoofXvAn0i52oE2wu2AesOkpt83M/5nj367cjSEvCBYHr8Y4YqbcwKFmIgh2cUc6UeGILBC523DmLEIM=
-X-Received: by 2002:a0d:d552:0:b0:368:e6b8:77f1 with SMTP id
- x79-20020a0dd552000000b00368e6b877f1mr2520323ywd.414.1673545784796; Thu, 12
- Jan 2023 09:49:44 -0800 (PST)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C9AD9B81FF6;
+        Thu, 12 Jan 2023 18:46:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE49C433EF;
+        Thu, 12 Jan 2023 18:46:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673549204;
+        bh=GHrrw9qWTNs9t2tpYUa9+9mfy+wwMMMsbxkrugEewro=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nqzU1sWiKO8tXO1ihDuCoL1L8AQHSCRRqpSb+oW4k1a9ekg6D06NmQF3erceORHkV
+         JzTGIgfa4O6Xzcs3qOB2FSDHOrb+gozwM+/IhExZ4qAb6cxoZHh3H5nY+42mZax8P9
+         MedhJ6GtVLC1cX2B4TN0pOrAny1/v1A2+N0BgOLItFZLPBfHFFsQd+WTI21zp7TQI2
+         rh3dq5iAc6ZYoWXMZfDNv5fYsZyjBrhJvvx1lb96E/WKmv6YnS1o3XkwcXzzgqOWvO
+         rQ0gVutZXWwewlX2gy9gOgvYgtB7lBOMdEIs6HwH5hoxeefb4t9j+cxQuFJ1t5d4jU
+         YN3KiXUu4tifA==
+Date:   Thu, 12 Jan 2023 10:46:42 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
+        Jason@zx2c4.com, ardb@kernel.org, ap420073@gmail.com,
+        David.Laight@aculab.com, tim.c.chen@linux.intel.com,
+        peter@n8pjl.ca, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
+ loops
+Message-ID: <Y8BVkjwPc6DLm7HT@sol.localdomain>
+References: <20221219220223.3982176-1-elliott@hpe.com>
+ <20221219220223.3982176-4-elliott@hpe.com>
+ <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <20230101162910.710293-1-Jason@zx2c4.com> <20230101162910.710293-8-Jason@zx2c4.com>
- <2bee307f-182f-c556-d136-8451b490d74e@csgroup.eu>
-In-Reply-To: <2bee307f-182f-c556-d136-8451b490d74e@csgroup.eu>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 12 Jan 2023 18:49:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oGY88EXimqj6E6k1FuprMLTmxbzZ3THA7k7iWKyexgUA@mail.gmail.com>
-Message-ID: <CAHmME9oGY88EXimqj6E6k1FuprMLTmxbzZ3THA7k7iWKyexgUA@mail.gmail.com>
-Subject: Re: [PATCH v14 7/7] x86: vdso: Wire up getrandom() vDSO implementation
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "patches@lists.linux.dev" <patches@lists.linux.dev>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christophe,
-
-Thanks for the review.
-
-On Thu, Jan 12, 2023 at 6:27 PM Christophe Leroy
-<christophe.leroy@csgroup.eu> wrote:
-> Le 01/01/2023 =C3=A0 17:29, Jason A. Donenfeld a =C3=A9crit :
-> > Hook up the generic vDSO implementation to the x86 vDSO data page. Sinc=
-e
-> > the existing vDSO infrastructure is heavily based on the timekeeping
-> > functionality, which works over arrays of bases, a new macro is
-> > introduced for vvars that are not arrays.
+On Thu, Jan 12, 2023 at 04:05:55PM +0800, Herbert Xu wrote:
+> On Mon, Dec 19, 2022 at 04:02:13PM -0600, Robert Elliott wrote:
 > >
-> > The vDSO function requires a ChaCha20 implementation that does not writ=
-e
-> > to the stack, yet can still do an entire ChaCha20 permutation, so
-> > provide this using SSE2, since this is userland code that must work on
-> > all x86-64 processors. There's a simple test for this code as well.
->
-> As far as I understand the test is not dependent on the architecture,
-> can it be a separate patch ?
+> > @@ -41,9 +41,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+> 
+> I just realised a show-stopper with this patch-set.  We don't
+> have a desc->flags field that tells us whether we can sleep or
+> not.
+> 
+> I'm currently doing a patch-set for per-request keys and I will
+> add a flags field to shash_desc so we could use that for your
+> patch-set too.
+> 
 
-The test is dependent on architectures for which there's a vDSO
-implementation. I could move it to a patch before or after this one,
-though, if you think it'd be better to keep this commit as a template
-commit for other architectures.
+Right, this used to exist, but it didn't actually do anything, and it had
+suffered heavily from bitrot.  For example, some callers specified MAY_SLEEP
+when actually they couldn't sleep.  IIRC, some callers also didn't even bother
+initializing the flags, so they were passing uninitialized memory.  So I removed
+it in commit 877b5691f27a ("crypto: shash - remove shash_desc::flags").
 
-> Also, as the chacha implementation is standalone and can be tested by
-> the above mentionned simple test, can it be a separate patch as well ?
+Has there been any consideration of just adding the crypto_shash_update_large()
+helper function that I had mentioned in the commit message of 877b5691f27a?
 
-No, that actually needs to be part of this one, as it's part and
-parcel of the x86 implementation.
-
-> Then the last patch only has the glue to wire-up getrandom VDSO to the
-> architecture, and can be used as a reference for other architectures.
-
-This is part of the required glue, so no, it belongs in this one.
-> > + *   rdx: 8-byte counter input/output
->
-> Why a 8-byte counter ? According to RFC 7539, chacha20 takes:
-> Are you mixing up the upper part of the counter with the nonce ? In that
-> case you can't say you use a 0 nonce, can you ?
-
-No, I'm not mixing anything up. This is the same algorithm that
-random.c uses. And wireguard, for that matter. 8 byte nonce, 8 byte
-block counter. In this case, the nonce is 0.
-
-> > +#include <sodium/crypto_stream_chacha20.h>
->
-> Is that standard ? Every distribution has sodium ?
-
-As far as I can tell, yes.
-
-Jason
+- Eric
