@@ -2,63 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2461C54EBC
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 08:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4549C54EBD
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 10:44:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236888AbjALIwV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 03:52:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
+        id S232449AbjALKn1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 05:43:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229780AbjALIvn (ORCPT
+        with ESMTP id S234220AbjALKmh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:51:43 -0500
-Received: from mail.glencoeaur.com (mail.glencoeaur.com [217.61.97.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C0B2F787
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 00:50:00 -0800 (PST)
-Received: by mail.glencoeaur.com (Postfix, from userid 1001)
-        id A99758200D; Thu, 12 Jan 2023 08:31:04 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=glencoeaur.com;
-        s=mail; t=1673512271;
-        bh=2S0GQFScndXkBEK4sqdoOhOYLqsB2sEH8Q5XQfVvKpo=;
-        h=Date:From:To:Subject:From;
-        b=rJ/Z3bPU0srRmNqQ/kS/K8eAhExEwv/IhhZAAUCmGEQcTU6pnGSR8gSnKtPhRdZym
-         PpwgQysxqnhQqz7ukLrYeNmf0HXcGBue9h6DwsqCl//qZj9awTYsqT3DidS+fI117l
-         X+HblDWd1VajTXTLU8W8FrIbjcaDa0A//MtQUAJQvnfA+ci1iwFTvVtUBfzGFI5y6Y
-         uQoPEZvbpN3WmMWvtWilA+6iWM9R/vBzrzVVj7EvghH08rGIiFRU4AWIogi5GfWp82
-         j6j0ffSnyaorolLZosVXTvVCcK6Pdmgt/YRTjYvJAXyM0GpsptbvI30P+5qg+CeO4i
-         LhY8hvMJzxsZQ==
-Received: by mail.glencoeaur.com for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 08:31:00 GMT
-Message-ID: <20230112074500-0.1.z.3f1f.0.lmdm1r64db@glencoeaur.com>
-Date:   Thu, 12 Jan 2023 08:31:00 GMT
-From:   "Zbynek Spacek" <zbynek.spacek@glencoeaur.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Silikonmischungen
-X-Mailer: mail.glencoeaur.com
+        Thu, 12 Jan 2023 05:42:37 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD0838AFB;
+        Thu, 12 Jan 2023 02:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=FbD0IxWuAX/Y8WsFg6u3/hujf5Ic00N3x5hHmUPVo3k=; b=JJN8SRR0AcR1WfdCZaFcyHSia9
+        //YI6UN0uXhh2PkY8RGhTr4Lygk+YYq63ibUzQ5iZpz+1D0m/a8hjCg24QcmYFH50XRKasTBj7cQJ
+        rK31jXqyB4CIu1NKgIwZxoU11LJaKDLCg8rpBXGUQlCdhovZLYEzlHXi2Myu20rx0lcCY7yKgdq6C
+        FjLhRA3FtITaih04d9/a29ZLOgYnFMRs7ej45UE5i53cOYM7CPQ/HL0O5laaUvjvsgY64jtnnNt4Q
+        dCpFpDnoCkjV1Iih8lxPHE00Y25SCaI3EnkOu30Po1hfzB5iIuEgP3nCwt6o3Bano83Cx8LO/bq2B
+        UxGw7UJA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFuwT-004zNt-8i; Thu, 12 Jan 2023 10:36:17 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6F8DC30084B;
+        Thu, 12 Jan 2023 11:35:59 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2B0E12CC6D735; Thu, 12 Jan 2023 11:35:59 +0100 (CET)
+Date:   Thu, 12 Jan 2023 11:35:59 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC][PATCH 05/12] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y7/ijxXMGqYCqSRe@hirez.programming.kicks-ass.net>
+References: <20221219153525.632521981@infradead.org>
+ <20221219154119.154045458@infradead.org>
+ <Y7xh8Orb2/E2sM7J@FVFF77S0Q05N>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y7xh8Orb2/E2sM7J@FVFF77S0Q05N>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Good morning,
+On Mon, Jan 09, 2023 at 06:50:24PM +0000, Mark Rutland wrote:
 
-do you need intermediates for processing, plastics (e.g. rubber) or silic=
-one mixtures?
+> Similarly, I'd suggest:
+> 
+> | #define __CMPXCHG128(name, mb, cl...)                                   \
+> | static __always_inline u128                                             \
+> | __lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)         \
+> | {                                                                       \
+> |         asm volatile(                                                   \
+> |         __LSE_PREAMBLE                                                  \
+> |         "       casp" #mb "\t%[old], %H[old], %[new], %H[new], %[v]\n"  \
+> |         : [old] "+&r" (old),                                            \
+> |           [v] "+Q" (*(u128 *)ptr)                                       \
+> |         : [new] "r" (new)                                               \
+> |         : cl);                                                          \
+> |                                                                         \
+> |         return old;                                                     \
+> | }
+> | 
+> | __CMPXCHG128(   ,   )   
+> | __CMPXCHG128(_mb, al, "memory")
+> | 
+> | #undef __CMPXCHG128
 
-We provide a wide range of silicone rubbers with various properties, sili=
-cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
-d dyes, stabilizers, primers and anti-adhesive additives.
+clang-16 seems to hate on this like:
 
-We also produce technical silicone compounds with increased resistance to=
- oils, resistant to high temperatures and water vapor, conductive and man=
-y more.
+arch/arm64/include/asm/atomic_lse.h:342:1: warning: value size does not match register size specified by the constraint and modifier [-Wasm-operand-widths]
+arch/arm64/include/asm/atomic_lse.h:334:17: note: expanded from macro '__CMPXCHG128'
+	: [old] "+&r" (old),                                            \
+		       ^
 
-We provide fast order fulfillment, timely deliveries and cost optimizatio=
-n.
-
-Can I introduce what we can offer you?
-
-
-Best regards
-Zbynek Spacek
+(much the same for the ll_sc version; if you want the full build thing,
+holler and I'll bounce you the robot mail).
