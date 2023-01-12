@@ -2,226 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5D0C54EBC
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 15:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDA0C61DB3
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 17:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240232AbjALPM3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 10:12:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        id S237144AbjALRo6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 12:44:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232256AbjALPLw (ORCPT
+        with ESMTP id S231891AbjALRo2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 10:11:52 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D4C43E4D
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 07:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673535672; x=1705071672;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ag5Kfr5QunEEzjTFty1x28b3dt5dhYZaZnxp8YPCyVE=;
-  b=ljaHi3FXCmi7YIDaL8Zf+Ue+3LAhbRmSQq5TqPedt6kylH0IiNqRr6Cn
-   TbQ9lLwHh7IF1D33bMgOga1QviW2bCO8dsNs0Eq0YQkyEHQhuQZUVkFyd
-   2SdtNQLHcI2oQIuvWka55wMPSYS+Li+Ujdi5wBsYW2lvnvUQ/IUHWe2Nt
-   e5bYkqDSRqt6S7xcVjy+ZVikFvgZm7VjWhtiVc7Ohog2104dQ7baA1Dso
-   JcfeWRySfaA6EqK6gDMcy4xJhN0pEZVgn8MMPcO69ywHhltVYYsm0hmGP
-   hXS5f9sb3M6zCy6dSNzkZU+mv+a1cJGKnafzdTYNdBlIhh5xJZP8/ocW7
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="409959557"
-X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="409959557"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 07:01:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="690165630"
-X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="690165630"
-Received: from r031s002_zp31l10c01.gv.intel.com (HELO fedora..) ([10.219.171.29])
-  by orsmga001.jf.intel.com with ESMTP; 12 Jan 2023 07:01:08 -0800
-From:   Meadhbh <meadhbh.fitzpatrick@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Meadhbh Fitzpatrick <meadhbh.fitzpatrick@intel.com>,
-        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - fix spelling mistakes from 'bufer' to 'buffer'
-Date:   Thu, 12 Jan 2023 15:51:54 +0100
-Message-Id: <20230112145154.8766-1-meadhbh.fitzpatrick@intel.com>
-X-Mailer: git-send-email 2.37.3
+        Thu, 12 Jan 2023 12:44:28 -0500
+Received: from smtp6-g21.free.fr (smtp6-g21.free.fr [IPv6:2a01:e0c:1:1599::15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D6E82D05;
+        Thu, 12 Jan 2023 09:03:14 -0800 (PST)
+Received: from localhost (unknown [IPv6:2a01:e35:39f2:1220:dc8b:b602:9bcd:3004])
+        by smtp6-g21.free.fr (Postfix) with ESMTPS id 90AC57802D7;
+        Thu, 12 Jan 2023 18:02:54 +0100 (CET)
+From:   Yann Droneaud <ydroneaud@opteya.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Cc:     Yann Droneaud <ydroneaud@opteya.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Florian Weimer <fweimer@redhat.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>
+Subject: [RFC PATCH 0/4] random: a simple vDSO mechanism for reseeding userspace CSPRNGs
+Date:   Thu, 12 Jan 2023 18:02:32 +0100
+Message-Id: <cover.1673539719.git.ydroneaud@opteya.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogTWVhZGhiaCBGaXR6cGF0cmljayA8bWVhZGhiaC5maXR6cGF0cmlja0BpbnRlbC5jb20+
-CgpGaXggc3BlbGxpbmcgbWlzdGFrZXMgZnJvbSAnYnVmZXInIHRvICdidWZmZXInIGluIHFhdF9j
-b21tb24uCkFsc28gZml4IGluZGVudGF0aW9uIGlzc3VlIGNhdXNlZCBieSB0aGUgc3BlbGxpbmcg
-Y2hhbmdlLgoKU2lnbmVkLW9mZi1ieTogTWVhZGhiaCBGaXR6cGF0cmljayA8bWVhZGhiaC5maXR6
-cGF0cmlja0BpbnRlbC5jb20+ClJldmlld2VkLWJ5OiBJbHBvIErDpHJ2aW5lbiA8aWxwby5qYXJ2
-aW5lbkBsaW51eC5pbnRlbC5jb20+ClJldmlld2VkLWJ5OiBHaW92YW5uaSBDYWJpZGR1IDxnaW92
-YW5uaS5jYWJpZGR1QGludGVsLmNvbT4KLS0tCiAuLi4vcWF0X2NvbW1vbi9hZGZfdHJhbnNwb3J0
-X2FjY2Vzc19tYWNyb3MuaCAgfCAgMiArLQogZHJpdmVycy9jcnlwdG8vcWF0L3FhdF9jb21tb24v
-cWF0X2JsLmMgICAgICAgIHwgODYgKysrKysrKysrLS0tLS0tLS0tLQogZHJpdmVycy9jcnlwdG8v
-cWF0L3FhdF9jb21tb24vcWF0X2JsLmggICAgICAgIHwgIDIgKy0KIDMgZmlsZXMgY2hhbmdlZCwg
-NDUgaW5zZXJ0aW9ucygrKSwgNDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9j
-cnlwdG8vcWF0L3FhdF9jb21tb24vYWRmX3RyYW5zcG9ydF9hY2Nlc3NfbWFjcm9zLmggYi9kcml2
-ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9hZGZfdHJhbnNwb3J0X2FjY2Vzc19tYWNyb3MuaApp
-bmRleCAzYjZiMDI2N2JiZWMuLmQzNjY3ZGJkOTgyNiAxMDA2NDQKLS0tIGEvZHJpdmVycy9jcnlw
-dG8vcWF0L3FhdF9jb21tb24vYWRmX3RyYW5zcG9ydF9hY2Nlc3NfbWFjcm9zLmgKKysrIGIvZHJp
-dmVycy9jcnlwdG8vcWF0L3FhdF9jb21tb24vYWRmX3RyYW5zcG9ydF9hY2Nlc3NfbWFjcm9zLmgK
-QEAgLTM3LDcgKzM3LDcgQEAKICNkZWZpbmUgQURGX1NJWkVfVE9fUklOR19TSVpFX0lOX0JZVEVT
-KFNJWkUpICgoMSA8PCAoU0laRSAtIDEpKSA8PCA3KQogI2RlZmluZSBBREZfUklOR19TSVpFX0lO
-X0JZVEVTX1RPX1NJWkUoU0laRSkgKCgxIDw8IChTSVpFIC0gMSkpID4+IDcpCiAKLS8qIE1pbmlt
-dW0gcmluZyBidWZlciBzaXplIGZvciBtZW1vcnkgYWxsb2NhdGlvbiAqLworLyogTWluaW11bSBy
-aW5nIGJ1ZmZlciBzaXplIGZvciBtZW1vcnkgYWxsb2NhdGlvbiAqLwogI2RlZmluZSBBREZfUklO
-R19TSVpFX0JZVEVTX01JTihTSVpFKSBcCiAJKChTSVpFIDwgQURGX1NJWkVfVE9fUklOR19TSVpF
-X0lOX0JZVEVTKEFERl9SSU5HX1NJWkVfNEspKSA/IFwKIAkJQURGX1NJWkVfVE9fUklOR19TSVpF
-X0lOX0JZVEVTKEFERl9SSU5HX1NJWkVfNEspIDogU0laRSkKZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-Y3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9ibC5jIGIvZHJpdmVycy9jcnlwdG8vcWF0L3FhdF9j
-b21tb24vcWF0X2JsLmMKaW5kZXggMmU4OWZmMDgwNDFiLi5jNzI4MzFmYTAyNWQgMTAwNjQ0Ci0t
-LSBhL2RyaXZlcnMvY3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9ibC5jCisrKyBiL2RyaXZlcnMv
-Y3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9ibC5jCkBAIC0yNiw4ICsyNiw4IEBAIHZvaWQgcWF0
-X2JsX2ZyZWVfYnVmbChzdHJ1Y3QgYWRmX2FjY2VsX2RldiAqYWNjZWxfZGV2LAogCWJsX2RtYV9k
-aXIgPSBibHAgIT0gYmxwb3V0ID8gRE1BX1RPX0RFVklDRSA6IERNQV9CSURJUkVDVElPTkFMOwog
-CiAJZm9yIChpID0gMDsgaSA8IGJsLT5udW1fYnVmczsgaSsrKQotCQlkbWFfdW5tYXBfc2luZ2xl
-KGRldiwgYmwtPmJ1ZmVyc1tpXS5hZGRyLAotCQkJCSBibC0+YnVmZXJzW2ldLmxlbiwgYmxfZG1h
-X2Rpcik7CisJCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBibC0+YnVmZmVyc1tpXS5hZGRyLAorCQkJ
-CSBibC0+YnVmZmVyc1tpXS5sZW4sIGJsX2RtYV9kaXIpOwogCiAJZG1hX3VubWFwX3NpbmdsZShk
-ZXYsIGJscCwgc3osIERNQV9UT19ERVZJQ0UpOwogCkBAIC0zNiw4ICszNiw4IEBAIHZvaWQgcWF0
-X2JsX2ZyZWVfYnVmbChzdHJ1Y3QgYWRmX2FjY2VsX2RldiAqYWNjZWxfZGV2LAogCiAJaWYgKGJs
-cCAhPSBibHBvdXQpIHsKIAkJZm9yIChpID0gMDsgaSA8IGJsb3V0LT5udW1fbWFwcGVkX2J1ZnM7
-IGkrKykgewotCQkJZG1hX3VubWFwX3NpbmdsZShkZXYsIGJsb3V0LT5idWZlcnNbaV0uYWRkciwK
-LQkJCQkJIGJsb3V0LT5idWZlcnNbaV0ubGVuLAorCQkJZG1hX3VubWFwX3NpbmdsZShkZXYsIGJs
-b3V0LT5idWZmZXJzW2ldLmFkZHIsCisJCQkJCSBibG91dC0+YnVmZmVyc1tpXS5sZW4sCiAJCQkJ
-CSBETUFfRlJPTV9ERVZJQ0UpOwogCQl9CiAJCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBibHBvdXQs
-IHN6X291dCwgRE1BX1RPX0RFVklDRSk7CkBAIC02Myw3ICs2Myw3IEBAIHN0YXRpYyBpbnQgX19x
-YXRfYmxfc2dsX3RvX2J1Zmwoc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldiwKIAlkbWFf
-YWRkcl90IGJscCA9IERNQV9NQVBQSU5HX0VSUk9SOwogCWRtYV9hZGRyX3QgYmxvdXRwID0gRE1B
-X01BUFBJTkdfRVJST1I7CiAJc3RydWN0IHNjYXR0ZXJsaXN0ICpzZzsKLQlzaXplX3Qgc3pfb3V0
-LCBzeiA9IHN0cnVjdF9zaXplKGJ1ZmwsIGJ1ZmVycywgbik7CisJc2l6ZV90IHN6X291dCwgc3og
-PSBzdHJ1Y3Rfc2l6ZShidWZsLCBidWZmZXJzLCBuKTsKIAlpbnQgbm9kZSA9IGRldl90b19ub2Rl
-KCZHRVRfREVWKGFjY2VsX2RldikpOwogCWludCBidWZsX2RtYV9kaXI7CiAKQEAgLTg2LDcgKzg2
-LDcgQEAgc3RhdGljIGludCBfX3FhdF9ibF9zZ2xfdG9fYnVmbChzdHJ1Y3QgYWRmX2FjY2VsX2Rl
-diAqYWNjZWxfZGV2LAogCWJ1ZmxfZG1hX2RpciA9IHNnbCAhPSBzZ2xvdXQgPyBETUFfVE9fREVW
-SUNFIDogRE1BX0JJRElSRUNUSU9OQUw7CiAKIAlmb3IgKGkgPSAwOyBpIDwgbjsgaSsrKQotCQli
-dWZsLT5idWZlcnNbaV0uYWRkciA9IERNQV9NQVBQSU5HX0VSUk9SOworCQlidWZsLT5idWZmZXJz
-W2ldLmFkZHIgPSBETUFfTUFQUElOR19FUlJPUjsKIAogCWZvcl9lYWNoX3NnKHNnbCwgc2csIG4s
-IGkpIHsKIAkJaW50IHkgPSBzZ19uY3RyOwpAQCAtOTQsMTEgKzk0LDExIEBAIHN0YXRpYyBpbnQg
-X19xYXRfYmxfc2dsX3RvX2J1Zmwoc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldiwKIAkJ
-aWYgKCFzZy0+bGVuZ3RoKQogCQkJY29udGludWU7CiAKLQkJYnVmbC0+YnVmZXJzW3ldLmFkZHIg
-PSBkbWFfbWFwX3NpbmdsZShkZXYsIHNnX3ZpcnQoc2cpLAotCQkJCQkJICAgICAgc2ctPmxlbmd0
-aCwKLQkJCQkJCSAgICAgIGJ1ZmxfZG1hX2Rpcik7Ci0JCWJ1ZmwtPmJ1ZmVyc1t5XS5sZW4gPSBz
-Zy0+bGVuZ3RoOwotCQlpZiAodW5saWtlbHkoZG1hX21hcHBpbmdfZXJyb3IoZGV2LCBidWZsLT5i
-dWZlcnNbeV0uYWRkcikpKQorCQlidWZsLT5idWZmZXJzW3ldLmFkZHIgPSBkbWFfbWFwX3Npbmds
-ZShkZXYsIHNnX3ZpcnQoc2cpLAorCQkJCQkJICAgICAgIHNnLT5sZW5ndGgsCisJCQkJCQkgICAg
-ICAgYnVmbF9kbWFfZGlyKTsKKwkJYnVmbC0+YnVmZmVyc1t5XS5sZW4gPSBzZy0+bGVuZ3RoOwor
-CQlpZiAodW5saWtlbHkoZG1hX21hcHBpbmdfZXJyb3IoZGV2LCBidWZsLT5idWZmZXJzW3ldLmFk
-ZHIpKSkKIAkJCWdvdG8gZXJyX2luOwogCQlzZ19uY3RyKys7CiAJfQpAQCAtMTExLDEyICsxMTEs
-MTIgQEAgc3RhdGljIGludCBfX3FhdF9ibF9zZ2xfdG9fYnVmbChzdHJ1Y3QgYWRmX2FjY2VsX2Rl
-diAqYWNjZWxfZGV2LAogCWJ1Zi0+c3ogPSBzejsKIAkvKiBIYW5kbGUgb3V0IG9mIHBsYWNlIG9w
-ZXJhdGlvbiAqLwogCWlmIChzZ2wgIT0gc2dsb3V0KSB7Ci0JCXN0cnVjdCBxYXRfYWxnX2J1ZiAq
-YnVmZXJzOworCQlzdHJ1Y3QgcWF0X2FsZ19idWYgKmJ1ZmZlcnM7CiAJCWludCBleHRyYV9idWZm
-ID0gZXh0cmFfZHN0X2J1ZmYgPyAxIDogMDsKIAkJaW50IG5fc2dsb3V0ID0gc2dfbmVudHMoc2ds
-b3V0KTsKIAogCQluID0gbl9zZ2xvdXQgKyBleHRyYV9idWZmOwotCQlzel9vdXQgPSBzdHJ1Y3Rf
-c2l6ZShidWZsb3V0LCBidWZlcnMsIG4pOworCQlzel9vdXQgPSBzdHJ1Y3Rfc2l6ZShidWZsb3V0
-LCBidWZmZXJzLCBuKTsKIAkJc2dfbmN0ciA9IDA7CiAKIAkJaWYgKG4gPiBRQVRfTUFYX0JVRkZf
-REVTQykgewpAQCAtMTI5LDkgKzEyOSw5IEBAIHN0YXRpYyBpbnQgX19xYXRfYmxfc2dsX3RvX2J1
-Zmwoc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldiwKIAkJCWJ1Zi0+c2dsX2RzdF92YWxp
-ZCA9IHRydWU7CiAJCX0KIAotCQlidWZlcnMgPSBidWZsb3V0LT5idWZlcnM7CisJCWJ1ZmZlcnMg
-PSBidWZsb3V0LT5idWZmZXJzOwogCQlmb3IgKGkgPSAwOyBpIDwgbjsgaSsrKQotCQkJYnVmZXJz
-W2ldLmFkZHIgPSBETUFfTUFQUElOR19FUlJPUjsKKwkJCWJ1ZmZlcnNbaV0uYWRkciA9IERNQV9N
-QVBQSU5HX0VSUk9SOwogCiAJCWZvcl9lYWNoX3NnKHNnbG91dCwgc2csIG5fc2dsb3V0LCBpKSB7
-CiAJCQlpbnQgeSA9IHNnX25jdHI7CkBAIC0xMzksMTcgKzEzOSwxNyBAQCBzdGF0aWMgaW50IF9f
-cWF0X2JsX3NnbF90b19idWZsKHN0cnVjdCBhZGZfYWNjZWxfZGV2ICphY2NlbF9kZXYsCiAJCQlp
-ZiAoIXNnLT5sZW5ndGgpCiAJCQkJY29udGludWU7CiAKLQkJCWJ1ZmVyc1t5XS5hZGRyID0gZG1h
-X21hcF9zaW5nbGUoZGV2LCBzZ192aXJ0KHNnKSwKLQkJCQkJCQlzZy0+bGVuZ3RoLAotCQkJCQkJ
-CURNQV9GUk9NX0RFVklDRSk7Ci0JCQlpZiAodW5saWtlbHkoZG1hX21hcHBpbmdfZXJyb3IoZGV2
-LCBidWZlcnNbeV0uYWRkcikpKQorCQkJYnVmZmVyc1t5XS5hZGRyID0gZG1hX21hcF9zaW5nbGUo
-ZGV2LCBzZ192aXJ0KHNnKSwKKwkJCQkJCQkgc2ctPmxlbmd0aCwKKwkJCQkJCQkgRE1BX0ZST01f
-REVWSUNFKTsKKwkJCWlmICh1bmxpa2VseShkbWFfbWFwcGluZ19lcnJvcihkZXYsIGJ1ZmZlcnNb
-eV0uYWRkcikpKQogCQkJCWdvdG8gZXJyX291dDsKLQkJCWJ1ZmVyc1t5XS5sZW4gPSBzZy0+bGVu
-Z3RoOworCQkJYnVmZmVyc1t5XS5sZW4gPSBzZy0+bGVuZ3RoOwogCQkJc2dfbmN0cisrOwogCQl9
-CiAJCWlmIChleHRyYV9idWZmKSB7Ci0JCQlidWZlcnNbc2dfbmN0cl0uYWRkciA9IGV4dHJhX2Rz
-dF9idWZmOwotCQkJYnVmZXJzW3NnX25jdHJdLmxlbiA9IHN6X2V4dHJhX2RzdF9idWZmOworCQkJ
-YnVmZmVyc1tzZ19uY3RyXS5hZGRyID0gZXh0cmFfZHN0X2J1ZmY7CisJCQlidWZmZXJzW3NnX25j
-dHJdLmxlbiA9IHN6X2V4dHJhX2RzdF9idWZmOwogCQl9CiAKIAkJYnVmbG91dC0+bnVtX2J1ZnMg
-PSBzZ19uY3RyOwpAQCAtMTc0LDExICsxNzQsMTEgQEAgc3RhdGljIGludCBfX3FhdF9ibF9zZ2xf
-dG9fYnVmbChzdHJ1Y3QgYWRmX2FjY2VsX2RldiAqYWNjZWxfZGV2LAogCiAJbiA9IHNnX25lbnRz
-KHNnbG91dCk7CiAJZm9yIChpID0gMDsgaSA8IG47IGkrKykgewotCQlpZiAoYnVmbG91dC0+YnVm
-ZXJzW2ldLmFkZHIgPT0gZXh0cmFfZHN0X2J1ZmYpCisJCWlmIChidWZsb3V0LT5idWZmZXJzW2ld
-LmFkZHIgPT0gZXh0cmFfZHN0X2J1ZmYpCiAJCQlicmVhazsKLQkJaWYgKCFkbWFfbWFwcGluZ19l
-cnJvcihkZXYsIGJ1ZmxvdXQtPmJ1ZmVyc1tpXS5hZGRyKSkKLQkJCWRtYV91bm1hcF9zaW5nbGUo
-ZGV2LCBidWZsb3V0LT5idWZlcnNbaV0uYWRkciwKLQkJCQkJIGJ1ZmxvdXQtPmJ1ZmVyc1tpXS5s
-ZW4sCisJCWlmICghZG1hX21hcHBpbmdfZXJyb3IoZGV2LCBidWZsb3V0LT5idWZmZXJzW2ldLmFk
-ZHIpKQorCQkJZG1hX3VubWFwX3NpbmdsZShkZXYsIGJ1ZmxvdXQtPmJ1ZmZlcnNbaV0uYWRkciwK
-KwkJCQkJIGJ1ZmxvdXQtPmJ1ZmZlcnNbaV0ubGVuLAogCQkJCQkgRE1BX0ZST01fREVWSUNFKTsK
-IAl9CiAKQEAgLTE5MSw5ICsxOTEsOSBAQCBzdGF0aWMgaW50IF9fcWF0X2JsX3NnbF90b19idWZs
-KHN0cnVjdCBhZGZfYWNjZWxfZGV2ICphY2NlbF9kZXYsCiAKIAluID0gc2dfbmVudHMoc2dsKTsK
-IAlmb3IgKGkgPSAwOyBpIDwgbjsgaSsrKQotCQlpZiAoIWRtYV9tYXBwaW5nX2Vycm9yKGRldiwg
-YnVmbC0+YnVmZXJzW2ldLmFkZHIpKQotCQkJZG1hX3VubWFwX3NpbmdsZShkZXYsIGJ1ZmwtPmJ1
-ZmVyc1tpXS5hZGRyLAotCQkJCQkgYnVmbC0+YnVmZXJzW2ldLmxlbiwKKwkJaWYgKCFkbWFfbWFw
-cGluZ19lcnJvcihkZXYsIGJ1ZmwtPmJ1ZmZlcnNbaV0uYWRkcikpCisJCQlkbWFfdW5tYXBfc2lu
-Z2xlKGRldiwgYnVmbC0+YnVmZmVyc1tpXS5hZGRyLAorCQkJCQkgYnVmbC0+YnVmZmVyc1tpXS5s
-ZW4sCiAJCQkJCSBidWZsX2RtYV9kaXIpOwogCiAJaWYgKCFidWYtPnNnbF9zcmNfdmFsaWQpCkBA
-IC0yMzEsOSArMjMxLDkgQEAgc3RhdGljIHZvaWQgcWF0X2JsX3NnbF91bm1hcChzdHJ1Y3QgYWRm
-X2FjY2VsX2RldiAqYWNjZWxfZGV2LAogCWludCBpOwogCiAJZm9yIChpID0gMDsgaSA8IG47IGkr
-KykKLQkJaWYgKCFkbWFfbWFwcGluZ19lcnJvcihkZXYsIGJsLT5idWZlcnNbaV0uYWRkcikpCi0J
-CQlkbWFfdW5tYXBfc2luZ2xlKGRldiwgYmwtPmJ1ZmVyc1tpXS5hZGRyLAotCQkJCQkgYmwtPmJ1
-ZmVyc1tpXS5sZW4sIERNQV9GUk9NX0RFVklDRSk7CisJCWlmICghZG1hX21hcHBpbmdfZXJyb3Io
-ZGV2LCBibC0+YnVmZmVyc1tpXS5hZGRyKSkKKwkJCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBibC0+
-YnVmZmVyc1tpXS5hZGRyLAorCQkJCQkgYmwtPmJ1ZmZlcnNbaV0ubGVuLCBETUFfRlJPTV9ERVZJ
-Q0UpOwogfQogCiBzdGF0aWMgaW50IHFhdF9ibF9zZ2xfbWFwKHN0cnVjdCBhZGZfYWNjZWxfZGV2
-ICphY2NlbF9kZXYsCkBAIC0yNDgsMTMgKzI0OCwxMyBAQCBzdGF0aWMgaW50IHFhdF9ibF9zZ2xf
-bWFwKHN0cnVjdCBhZGZfYWNjZWxfZGV2ICphY2NlbF9kZXYsCiAJc2l6ZV90IHN6OwogCiAJbiA9
-IHNnX25lbnRzKHNnbCk7Ci0Jc3ogPSBzdHJ1Y3Rfc2l6ZShidWZsLCBidWZlcnMsIG4pOworCXN6
-ID0gc3RydWN0X3NpemUoYnVmbCwgYnVmZmVycywgbik7CiAJYnVmbCA9IGt6YWxsb2Nfbm9kZShz
-eiwgR0ZQX0tFUk5FTCwgbm9kZSk7CiAJaWYgKHVubGlrZWx5KCFidWZsKSkKIAkJcmV0dXJuIC1F
-Tk9NRU07CiAKIAlmb3IgKGkgPSAwOyBpIDwgbjsgaSsrKQotCQlidWZsLT5idWZlcnNbaV0uYWRk
-ciA9IERNQV9NQVBQSU5HX0VSUk9SOworCQlidWZsLT5idWZmZXJzW2ldLmFkZHIgPSBETUFfTUFQ
-UElOR19FUlJPUjsKIAogCXNnX25jdHIgPSAwOwogCWZvcl9lYWNoX3NnKHNnbCwgc2csIG4sIGkp
-IHsKQEAgLTI2MywxMSArMjYzLDExIEBAIHN0YXRpYyBpbnQgcWF0X2JsX3NnbF9tYXAoc3RydWN0
-IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldiwKIAkJaWYgKCFzZy0+bGVuZ3RoKQogCQkJY29udGlu
-dWU7CiAKLQkJYnVmbC0+YnVmZXJzW3ldLmFkZHIgPSBkbWFfbWFwX3NpbmdsZShkZXYsIHNnX3Zp
-cnQoc2cpLAotCQkJCQkJICAgICAgc2ctPmxlbmd0aCwKLQkJCQkJCSAgICAgIERNQV9GUk9NX0RF
-VklDRSk7Ci0JCWJ1ZmwtPmJ1ZmVyc1t5XS5sZW4gPSBzZy0+bGVuZ3RoOwotCQlpZiAodW5saWtl
-bHkoZG1hX21hcHBpbmdfZXJyb3IoZGV2LCBidWZsLT5idWZlcnNbeV0uYWRkcikpKQorCQlidWZs
-LT5idWZmZXJzW3ldLmFkZHIgPSBkbWFfbWFwX3NpbmdsZShkZXYsIHNnX3ZpcnQoc2cpLAorCQkJ
-CQkJICAgICAgIHNnLT5sZW5ndGgsCisJCQkJCQkgICAgICAgRE1BX0ZST01fREVWSUNFKTsKKwkJ
-YnVmbC0+YnVmZmVyc1t5XS5sZW4gPSBzZy0+bGVuZ3RoOworCQlpZiAodW5saWtlbHkoZG1hX21h
-cHBpbmdfZXJyb3IoZGV2LCBidWZsLT5idWZmZXJzW3ldLmFkZHIpKSkKIAkJCWdvdG8gZXJyX21h
-cDsKIAkJc2dfbmN0cisrOwogCX0KQEAgLTI4MCw5ICsyODAsOSBAQCBzdGF0aWMgaW50IHFhdF9i
-bF9zZ2xfbWFwKHN0cnVjdCBhZGZfYWNjZWxfZGV2ICphY2NlbF9kZXYsCiAKIGVycl9tYXA6CiAJ
-Zm9yIChpID0gMDsgaSA8IG47IGkrKykKLQkJaWYgKCFkbWFfbWFwcGluZ19lcnJvcihkZXYsIGJ1
-ZmwtPmJ1ZmVyc1tpXS5hZGRyKSkKLQkJCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBidWZsLT5idWZl
-cnNbaV0uYWRkciwKLQkJCQkJIGJ1ZmwtPmJ1ZmVyc1tpXS5sZW4sCisJCWlmICghZG1hX21hcHBp
-bmdfZXJyb3IoZGV2LCBidWZsLT5idWZmZXJzW2ldLmFkZHIpKQorCQkJZG1hX3VubWFwX3Npbmds
-ZShkZXYsIGJ1ZmwtPmJ1ZmZlcnNbaV0uYWRkciwKKwkJCQkJIGJ1ZmwtPmJ1ZmZlcnNbaV0ubGVu
-LAogCQkJCQkgRE1BX0ZST01fREVWSUNFKTsKIAlrZnJlZShidWZsKTsKIAkqYmwgPSBOVUxMOwpA
-QCAtMzUxLDcgKzM1MSw3IEBAIGludCBxYXRfYmxfcmVhbGxvY19tYXBfbmV3X2RzdChzdHJ1Y3Qg
-YWRmX2FjY2VsX2RldiAqYWNjZWxfZGV2LAogCWlmIChyZXQpCiAJCXJldHVybiByZXQ7CiAKLQlu
-ZXdfYmxfc2l6ZSA9IHN0cnVjdF9zaXplKG5ld19ibCwgYnVmZXJzLCBuZXdfYmwtPm51bV9idWZz
-KTsKKwluZXdfYmxfc2l6ZSA9IHN0cnVjdF9zaXplKG5ld19ibCwgYnVmZmVycywgbmV3X2JsLT5u
-dW1fYnVmcyk7CiAKIAkvKiBNYXAgbmV3IGZpcm13YXJlIFNHTCBkZXNjcmlwdG9yICovCiAJbmV3
-X2JscCA9IGRtYV9tYXBfc2luZ2xlKGRldiwgbmV3X2JsLCBuZXdfYmxfc2l6ZSwgRE1BX1RPX0RF
-VklDRSk7CmRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRfYmwu
-aCBiL2RyaXZlcnMvY3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9ibC5oCmluZGV4IDhjYTVlNTJl
-ZTllMi4uMTQ3OWZlZjNiNjM0IDEwMDY0NAotLS0gYS9kcml2ZXJzL2NyeXB0by9xYXQvcWF0X2Nv
-bW1vbi9xYXRfYmwuaAorKysgYi9kcml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRfYmwu
-aApAQCAtMTgsNyArMTgsNyBAQCBzdHJ1Y3QgcWF0X2FsZ19idWZfbGlzdCB7CiAJdTY0IHJlc3J2
-ZDsKIAl1MzIgbnVtX2J1ZnM7CiAJdTMyIG51bV9tYXBwZWRfYnVmczsKLQlzdHJ1Y3QgcWF0X2Fs
-Z19idWYgYnVmZXJzW107CisJc3RydWN0IHFhdF9hbGdfYnVmIGJ1ZmZlcnNbXTsKIH0gX19wYWNr
-ZWQ7CiAKIHN0cnVjdCBxYXRfYWxnX2ZpeGVkX2J1Zl9saXN0IHsKLS0gCjIuMzcuMwoKLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
-SW50ZWwgUmVzZWFyY2ggYW5kIERldmVsb3BtZW50IElyZWxhbmQgTGltaXRlZApSZWdpc3RlcmVk
-IGluIElyZWxhbmQKUmVnaXN0ZXJlZCBPZmZpY2U6IENvbGxpbnN0b3duIEluZHVzdHJpYWwgUGFy
-aywgTGVpeGxpcCwgQ291bnR5IEtpbGRhcmUKUmVnaXN0ZXJlZCBOdW1iZXI6IDMwODI2MwoKClRo
-aXMgZS1tYWlsIGFuZCBhbnkgYXR0YWNobWVudHMgbWF5IGNvbnRhaW4gY29uZmlkZW50aWFsIG1h
-dGVyaWFsIGZvciB0aGUgc29sZQp1c2Ugb2YgdGhlIGludGVuZGVkIHJlY2lwaWVudChzKS4gQW55
-IHJldmlldyBvciBkaXN0cmlidXRpb24gYnkgb3RoZXJzIGlzCnN0cmljdGx5IHByb2hpYml0ZWQu
-IElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHBsZWFzZSBjb250YWN0IHRo
-ZQpzZW5kZXIgYW5kIGRlbGV0ZSBhbGwgY29waWVzLgo=
+Hi,
+
+Here's my humble hack at improving kernel for a faster secure arc4random()
+userspace implementation, by allowing userspace to buffer getrandom()
+generated entropy, discarding it as the kernel's own CSPRNG is reseeded.
+
+It's largely built upon the vDSO work of Jason A. Donenfeld, as part of
+its latest patchset "[PATCH v14 0/7] implement getrandom() in vDSO" [1]
+but it's made simpler by making available only one of the missing tools
+for the userspace to properly buffer the output of getrandom().
+
+Using MADV_WIPEONFORK and mlock(), userspace can reasonably offer forward
+secrecy*, until something like VM_DROPPABLE[2] is provided by the kernel,
+to allow for the buffer memory to never, ever be written to the disk
+before its used, being inherited accross fork(), and isn't limited by
+RLIMIT_MEMLOCK.
+
+ * provided userspace can mlock() the memory and calls mlock() on buffer
+   after fork, as memory locks are not inherited accross fork().
+
+As it's a hack, it's far from perfect. The main drawback I see is the
+case where fresh entropy has to be discarded as the kernel's CSPRNG
+generation is updated as the result of calling getrandom() to generate
+the mentionned entropy. The workaround, is to limit the amount of fresh
+entropy fetched when a kernel's CSPRNG generation change is detected,
+and to increase the amount the data retrieved with getrandom() when
+generation doesn't change between calls.
+
+Performance wise, the improvements are here, as one can check with the
+test program provided:
+
+    getrandom(,,GRND_TIMESTAMP) test
+    getrandom() support GRND_TIMESTAMP
+    found getrandom() in vDSO at 0x7ffc3efccc60
+    == direct syscall getrandom(), 16777216 u32, 2.866324020 s,   5.853 M u32/s, 170.846 ns/u32
+    == direct vDSO getrandom(),    16777216 u32, 2.883473280 s,   5.818 M u32/s, 171.868 ns/u32
+    == pooled syscall getrandom(), 16777216 u32, 1.152421219 s,  14.558 M u32/s,  68.690 ns/u32, (0 bytes discarded)
+    == pooled vDSO getrandom(),    16777216 u32, 0.162477863 s, 103.258 M u32/s,   9.684 ns/u32, (0 bytes discarded)
+
+With the requirement to mlock() the memory page(s) used to buffer
+getrandom() output, I'm not sure userspace could afford to allocate
+4KBytes per thread, before being hit by RLIMIT_MEMLOCK (or worse,
+OOM killer). Thus, some form of sharing between threads would be
+needed, which would require locking, reducing the performances
+shown above.
+
+Also I haven't studied the security impact of making the kernel base
+CSPRNG seed generation available to userspace. It can be made more
+opaque if needed.
+
+Regards.
+
+[1] https://lore.kernel.org/all/20230101162910.710293-1-Jason@zx2c4.com/
+[2] https://lore.kernel.org/all/20230101162910.710293-3-Jason@zx2c4.com/
+
+Jason A. Donenfeld (2):
+  random: introduce generic vDSO getrandom(,, GRND_TIMESTAMP) fast path
+  x86: vdso: Wire up getrandom() vDSO implementation.
+
+Yann Droneaud (2):
+  random: introduce getrandom() GRND_TIMESTAMP
+  testing: add a getrandom() GRND_TIMESTAMP vDSO demonstration/benchmark
+
+ MAINTAINERS                                   |   1 +
+ arch/x86/Kconfig                              |   1 +
+ arch/x86/entry/vdso/Makefile                  |   3 +-
+ arch/x86/entry/vdso/vdso.lds.S                |   2 +
+ arch/x86/entry/vdso/vgetrandom.c              |  17 +
+ arch/x86/include/asm/vdso/getrandom.h         |  42 +++
+ arch/x86/include/asm/vdso/vsyscall.h          |   2 +
+ arch/x86/include/asm/vvar.h                   |  16 +
+ drivers/char/random.c                         |  52 ++-
+ include/linux/random.h                        |  31 ++
+ include/uapi/linux/random.h                   |   2 +
+ include/vdso/datapage.h                       |   9 +
+ lib/vdso/Kconfig                              |   5 +
+ lib/vdso/getrandom.c                          |  51 +++
+ tools/testing/crypto/getrandom/Makefile       |   4 +
+ .../testing/crypto/getrandom/test-getrandom.c | 307 ++++++++++++++++++
+ 16 files changed, 543 insertions(+), 2 deletions(-)
+ create mode 100644 arch/x86/entry/vdso/vgetrandom.c
+ create mode 100644 arch/x86/include/asm/vdso/getrandom.h
+ create mode 100644 lib/vdso/getrandom.c
+ create mode 100644 tools/testing/crypto/getrandom/Makefile
+ create mode 100644 tools/testing/crypto/getrandom/test-getrandom.c
+
+-- 
+2.37.2
 
