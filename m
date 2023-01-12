@@ -2,80 +2,177 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 313FAC54EBE
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 19:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F28C63797
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 19:25:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236915AbjALTFq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 14:05:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59732 "EHLO
+        id S240354AbjALTZz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 14:25:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240154AbjALTF0 (ORCPT
+        with ESMTP id S234111AbjALTZa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:05:26 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F0F13D1B;
-        Thu, 12 Jan 2023 10:46:47 -0800 (PST)
+        Thu, 12 Jan 2023 14:25:30 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65921A380;
+        Thu, 12 Jan 2023 11:16:57 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C9AD9B81FF6;
-        Thu, 12 Jan 2023 18:46:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE49C433EF;
-        Thu, 12 Jan 2023 18:46:44 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AC79F62167;
+        Thu, 12 Jan 2023 19:16:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9BCDC433EF;
+        Thu, 12 Jan 2023 19:16:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673549204;
-        bh=GHrrw9qWTNs9t2tpYUa9+9mfy+wwMMMsbxkrugEewro=;
+        s=k20201202; t=1673551016;
+        bh=8qPdRHscPzEsxrdzYWBcWavkV05o9Fa8dyWjFMiqcmU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nqzU1sWiKO8tXO1ihDuCoL1L8AQHSCRRqpSb+oW4k1a9ekg6D06NmQF3erceORHkV
-         JzTGIgfa4O6Xzcs3qOB2FSDHOrb+gozwM+/IhExZ4qAb6cxoZHh3H5nY+42mZax8P9
-         MedhJ6GtVLC1cX2B4TN0pOrAny1/v1A2+N0BgOLItFZLPBfHFFsQd+WTI21zp7TQI2
-         rh3dq5iAc6ZYoWXMZfDNv5fYsZyjBrhJvvx1lb96E/WKmv6YnS1o3XkwcXzzgqOWvO
-         rQ0gVutZXWwewlX2gy9gOgvYgtB7lBOMdEIs6HwH5hoxeefb4t9j+cxQuFJ1t5d4jU
-         YN3KiXUu4tifA==
-Date:   Thu, 12 Jan 2023 10:46:42 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
-        Jason@zx2c4.com, ardb@kernel.org, ap420073@gmail.com,
-        David.Laight@aculab.com, tim.c.chen@linux.intel.com,
-        peter@n8pjl.ca, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
- loops
-Message-ID: <Y8BVkjwPc6DLm7HT@sol.localdomain>
-References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-4-elliott@hpe.com>
- <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
+        b=WAbO4+eTHTQ/K3aOrr/++Olc+qK8C4VzmA5Zg+NEMk/z+1RcF2Mu2jdy4BaJ3Akj+
+         HU2TjkBTIjXxYPXuwKiPsFlQXG3h0URm93yJyIRCGIGrG2FQFBzmdBydjoMr5sqy+S
+         adq9s0CsjT9QD6oO6npfshWCpawhSjO6eft7Gyk7jBLiQx8uZRi7rwb8rx0DE5jQ7C
+         mIv08gzpCvsbTX3cbq+lbPLG9UMbXy812n0N4+hrEzmfxRquuIgaF29jAkKxvcM9nn
+         UG8sZ9NNoy23ffZ/H9bXQ43S5fNJqTTtmzFTKSm7grrDIKeX4Sftj4aJXo2tbQyy+W
+         MJjaCr6z0jYsg==
+Date:   Thu, 12 Jan 2023 19:16:51 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Message-ID: <Y8Bco7lBBj7CO9C5@spud>
+References: <20230112043812.150393-1-jiajie.ho@starfivetech.com>
+ <20230112043812.150393-3-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="pC+9YUp9vH5Uuamr"
 Content-Disposition: inline
-In-Reply-To: <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
+In-Reply-To: <20230112043812.150393-3-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 04:05:55PM +0800, Herbert Xu wrote:
-> On Mon, Dec 19, 2022 at 04:02:13PM -0600, Robert Elliott wrote:
-> >
-> > @@ -41,9 +41,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
-> 
-> I just realised a show-stopper with this patch-set.  We don't
-> have a desc->flags field that tells us whether we can sleep or
-> not.
-> 
-> I'm currently doing a patch-set for per-request keys and I will
-> add a flags field to shash_desc so we could use that for your
-> patch-set too.
-> 
 
-Right, this used to exist, but it didn't actually do anything, and it had
-suffered heavily from bitrot.  For example, some callers specified MAY_SLEEP
-when actually they couldn't sleep.  IIRC, some callers also didn't even bother
-initializing the flags, so they were passing uninitialized memory.  So I removed
-it in commit 877b5691f27a ("crypto: shash - remove shash_desc::flags").
+--pC+9YUp9vH5Uuamr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Has there been any consideration of just adding the crypto_shash_update_large()
-helper function that I had mentioned in the commit message of 877b5691f27a?
+On Thu, Jan 12, 2023 at 12:38:11PM +0800, Jia Jie Ho wrote:
+> This adds driver support for the hardware random number generator in
+> Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
+>=20
+> Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+> Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> ---
+>  MAINTAINERS                            |   6 +
+>  drivers/char/hw_random/Kconfig         |  11 +
+>  drivers/char/hw_random/Makefile        |   1 +
+>  drivers/char/hw_random/starfive-trng.c | 397 +++++++++++++++++++++++++
+>  4 files changed, 415 insertions(+)
+>  create mode 100644 drivers/char/hw_random/starfive-trng.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 65140500d9f8..b91e3fc11fc6 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -19626,6 +19626,12 @@ F:	drivers/reset/reset-starfive.c
+>  F:	include/linux/reset/starfive.h
+>  F:	include/dt-bindings/reset/starfive*
+> =20
+> +STARFIVE TRNG DRIVER
+> +M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
+> +S:	Maintained
+> +F:	Documentation/devicetree/bindings/rng/starfive*
+> +F:	drivers/char/hw_random/starfive-trng.c
 
-- Eric
+minor nit (so don't submit another version just to fix this):
+This should be Supported, no?
+
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Mak=
+efile
+> index 3e948cf04476..f68ac370847f 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) +=3D xiphera-trng.o
+>  obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) +=3D arm_smccc_trng.o
+>  obj-$(CONFIG_HW_RANDOM_CN10K) +=3D cn10k-rng.o
+>  obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) +=3D mpfs-rng.o
+> +obj-$(CONFIG_HW_RANDOM_STARFIVE) +=3D starfive-trng.o
+
+Is "STARFIVE" a bit too general of a name here and in the Kconfig entry?
+I don't have a TRM for the JH7100, but this name (and the Kconfig text)
+would give me the impression that I can use it there too.
+Does this driver support both?
+
+> +static int starfive_trng_probe(struct platform_device *pdev)
+
+> +	clk_prepare_enable(trng->hclk);
+> +	clk_prepare_enable(trng->ahb);
+> +	reset_control_deassert(trng->rst);
+> +
+> +	trng->rng.name =3D dev_driver_string(&pdev->dev);
+> +	trng->rng.init =3D starfive_trng_init;
+> +	trng->rng.cleanup =3D starfive_trng_cleanup;
+> +	trng->rng.read =3D starfive_trng_read;
+> +
+> +	trng->mode =3D PRNG_256BIT;
+> +	trng->mission =3D 1;
+> +	trng->reseed =3D RANDOM_RESEED;
+> +
+> +	ret =3D devm_hwrng_register(&pdev->dev, &trng->rng);
+> +	if (ret) {
+> +		dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
+> +		goto err_fail_register;
+> +	}
+> +
+> +	pm_runtime_use_autosuspend(&pdev->dev);
+> +	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
+
+> +	pm_runtime_enable(&pdev->dev);
+
+> +
+> +	return 0;
+> +
+> +err_fail_register:
+
+> +	pm_runtime_disable(&pdev->dev);
+
+This was only enabled after the only goto for this label, does it
+serve a purpose?
+I know little about runtime PM, it just caught my eye.
+I looked at the other rng drivers that had calls to pm_runtime_enable(),
+but they all seem to do their pm enablement _before_ calling
+hwrng_register().
+Again, I am not familiar with runtime PM, but curious why you are doing
+things differently, that's all.
+
+> +
+> +	reset_control_assert(trng->rst);
+> +	clk_disable_unprepare(trng->ahb);
+> +	clk_disable_unprepare(trng->hclk);
+> +
+> +	return ret;
+> +}
+
+Thanks,
+Conor.
+
+
+--pC+9YUp9vH5Uuamr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY8BcowAKCRB4tDGHoIJi
+0ooTAQCVQna4B47AvqRVufpOn/h7Kf45VvY66vkny3KGYOzbqgEAh0GS0PmMp9sY
+K/fI4Uwn7A+7DZ9+xKDhHSaNAjPdEAE=
+=8g8P
+-----END PGP SIGNATURE-----
+
+--pC+9YUp9vH5Uuamr--
