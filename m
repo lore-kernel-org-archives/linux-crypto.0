@@ -2,59 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DFCC54EBD
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 08:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2461C54EBC
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 08:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239720AbjALIHm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 03:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44524 "EHLO
+        id S236888AbjALIwV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 03:52:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239731AbjALIHM (ORCPT
+        with ESMTP id S229780AbjALIvn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:07:12 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDCBDFCFC;
-        Thu, 12 Jan 2023 00:06:34 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pFsax-00GhtF-Vu; Thu, 12 Jan 2023 16:05:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Jan 2023 16:05:55 +0800
-Date:   Thu, 12 Jan 2023 16:05:55 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Robert Elliott <elliott@hpe.com>
-Cc:     davem@davemloft.net, Jason@zx2c4.com, ardb@kernel.org,
-        ap420073@gmail.com, David.Laight@aculab.com, ebiggers@kernel.org,
-        tim.c.chen@linux.intel.com, peter@n8pjl.ca, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
- loops
-Message-ID: <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
-References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-4-elliott@hpe.com>
+        Thu, 12 Jan 2023 03:51:43 -0500
+Received: from mail.glencoeaur.com (mail.glencoeaur.com [217.61.97.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C0B2F787
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 00:50:00 -0800 (PST)
+Received: by mail.glencoeaur.com (Postfix, from userid 1001)
+        id A99758200D; Thu, 12 Jan 2023 08:31:04 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=glencoeaur.com;
+        s=mail; t=1673512271;
+        bh=2S0GQFScndXkBEK4sqdoOhOYLqsB2sEH8Q5XQfVvKpo=;
+        h=Date:From:To:Subject:From;
+        b=rJ/Z3bPU0srRmNqQ/kS/K8eAhExEwv/IhhZAAUCmGEQcTU6pnGSR8gSnKtPhRdZym
+         PpwgQysxqnhQqz7ukLrYeNmf0HXcGBue9h6DwsqCl//qZj9awTYsqT3DidS+fI117l
+         X+HblDWd1VajTXTLU8W8FrIbjcaDa0A//MtQUAJQvnfA+ci1iwFTvVtUBfzGFI5y6Y
+         uQoPEZvbpN3WmMWvtWilA+6iWM9R/vBzrzVVj7EvghH08rGIiFRU4AWIogi5GfWp82
+         j6j0ffSnyaorolLZosVXTvVCcK6Pdmgt/YRTjYvJAXyM0GpsptbvI30P+5qg+CeO4i
+         LhY8hvMJzxsZQ==
+Received: by mail.glencoeaur.com for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 08:31:00 GMT
+Message-ID: <20230112074500-0.1.z.3f1f.0.lmdm1r64db@glencoeaur.com>
+Date:   Thu, 12 Jan 2023 08:31:00 GMT
+From:   "Zbynek Spacek" <zbynek.spacek@glencoeaur.com>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Silikonmischungen
+X-Mailer: mail.glencoeaur.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221219220223.3982176-4-elliott@hpe.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 04:02:13PM -0600, Robert Elliott wrote:
->
-> @@ -41,9 +41,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+Good morning,
 
-I just realised a show-stopper with this patch-set.  We don't
-have a desc->flags field that tells us whether we can sleep or
-not.
+do you need intermediates for processing, plastics (e.g. rubber) or silic=
+one mixtures?
 
-I'm currently doing a patch-set for per-request keys and I will
-add a flags field to shash_desc so we could use that for your
-patch-set too.
+We provide a wide range of silicone rubbers with various properties, sili=
+cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
+d dyes, stabilizers, primers and anti-adhesive additives.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+We also produce technical silicone compounds with increased resistance to=
+ oils, resistant to high temperatures and water vapor, conductive and man=
+y more.
+
+We provide fast order fulfillment, timely deliveries and cost optimizatio=
+n.
+
+Can I introduce what we can offer you?
+
+
+Best regards
+Zbynek Spacek
