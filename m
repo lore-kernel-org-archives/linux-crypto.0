@@ -2,177 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F28C63797
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 19:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8357BC54EBE
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 20:54:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240354AbjALTZz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 14:25:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45702 "EHLO
+        id S240569AbjALUyp convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 15:54:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234111AbjALTZa (ORCPT
+        with ESMTP id S240473AbjALUx2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:25:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65921A380;
-        Thu, 12 Jan 2023 11:16:57 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AC79F62167;
-        Thu, 12 Jan 2023 19:16:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9BCDC433EF;
-        Thu, 12 Jan 2023 19:16:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673551016;
-        bh=8qPdRHscPzEsxrdzYWBcWavkV05o9Fa8dyWjFMiqcmU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WAbO4+eTHTQ/K3aOrr/++Olc+qK8C4VzmA5Zg+NEMk/z+1RcF2Mu2jdy4BaJ3Akj+
-         HU2TjkBTIjXxYPXuwKiPsFlQXG3h0URm93yJyIRCGIGrG2FQFBzmdBydjoMr5sqy+S
-         adq9s0CsjT9QD6oO6npfshWCpawhSjO6eft7Gyk7jBLiQx8uZRi7rwb8rx0DE5jQ7C
-         mIv08gzpCvsbTX3cbq+lbPLG9UMbXy812n0N4+hrEzmfxRquuIgaF29jAkKxvcM9nn
-         UG8sZ9NNoy23ffZ/H9bXQ43S5fNJqTTtmzFTKSm7grrDIKeX4Sftj4aJXo2tbQyy+W
-         MJjaCr6z0jYsg==
-Date:   Thu, 12 Jan 2023 19:16:51 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Message-ID: <Y8Bco7lBBj7CO9C5@spud>
-References: <20230112043812.150393-1-jiajie.ho@starfivetech.com>
- <20230112043812.150393-3-jiajie.ho@starfivetech.com>
+        Thu, 12 Jan 2023 15:53:28 -0500
+X-Greylist: delayed 1200 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 12 Jan 2023 12:31:17 PST
+Received: from ouvsmtp1.octopuce.fr (ouvsmtp1.octopuce.fr [194.36.166.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F7013F46;
+        Thu, 12 Jan 2023 12:31:17 -0800 (PST)
+Received: from panel.vitry.ouvaton.coop (unknown [194.36.166.20])
+        by ouvsmtp1.octopuce.fr (Postfix) with ESMTPS id 863D21DC;
+        Thu, 12 Jan 2023 20:55:34 +0100 (CET)
+Received: from sm.ouvaton.coop (ouvadm.octopuce.fr [194.36.166.2])
+        by panel.vitry.ouvaton.coop (Postfix) with ESMTPSA id 42E285E1B7F;
+        Thu, 12 Jan 2023 20:55:34 +0100 (CET)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pC+9YUp9vH5Uuamr"
-Content-Disposition: inline
-In-Reply-To: <20230112043812.150393-3-jiajie.ho@starfivetech.com>
+Date:   Thu, 12 Jan 2023 19:55:34 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+From:   "Yann Droneaud" <ydroneaud@opteya.com>
+Message-ID: <ae35afa5b824dc76c5ded98efcabc117e6dd3d70@opteya.com>
+Subject: Re: [RFC PATCH 0/4] random: a simple vDSO mechanism for reseeding
+ userspace CSPRNGs
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        "Vincenzo Frascino" <vincenzo.frascino@arm.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Florian Weimer" <fweimer@redhat.com>,
+        "Adhemerval Zanella Netto" <adhemerval.zanella@linaro.org>,
+        "Carlos O'Donell" <carlos@redhat.com>
+In-Reply-To: <CAHmME9oXB8=jUz98tv6k1xS+ELaRmgartoT6go_1axhH1L-HJg@mail.gmail.com>
+References: <CAHmME9oXB8=jUz98tv6k1xS+ELaRmgartoT6go_1axhH1L-HJg@mail.gmail.com>
+ <cover.1673539719.git.ydroneaud@opteya.com>
+X-Originating-IP: 10.0.20.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi
 
---pC+9YUp9vH5Uuamr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+12 janvier 2023 à 18:07 "Jason A. Donenfeld" <Jason@zx2c4.com> a écrit:
+ 
+> Sorry Yann, but I'm not interested in this approach, and I don't think
+> reviewing the details of it are a good allocation of time. I don't
+> want to lock the kernel into having specific reseeding semantics that
+> are a contract with userspace, which is what this approach does.
 
-On Thu, Jan 12, 2023 at 12:38:11PM +0800, Jia Jie Ho wrote:
-> This adds driver support for the hardware random number generator in
-> Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
->=20
-> Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> ---
->  MAINTAINERS                            |   6 +
->  drivers/char/hw_random/Kconfig         |  11 +
->  drivers/char/hw_random/Makefile        |   1 +
->  drivers/char/hw_random/starfive-trng.c | 397 +++++++++++++++++++++++++
->  4 files changed, 415 insertions(+)
->  create mode 100644 drivers/char/hw_random/starfive-trng.c
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 65140500d9f8..b91e3fc11fc6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19626,6 +19626,12 @@ F:	drivers/reset/reset-starfive.c
->  F:	include/linux/reset/starfive.h
->  F:	include/dt-bindings/reset/starfive*
-> =20
-> +STARFIVE TRNG DRIVER
-> +M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
-> +S:	Maintained
-> +F:	Documentation/devicetree/bindings/rng/starfive*
-> +F:	drivers/char/hw_random/starfive-trng.c
+This patch adds a mean for the kernel to tell userspace: between the
+last time you call us with getrandom(timestamp,, GRND_TIMESTAMP),
+something happened that trigger an update to the opaque cookie given
+to getrandom(timestamp, GRND_TIMESTAMP). When such update happen,
+userspace is advised to discard buffered random data and retry.
 
-minor nit (so don't submit another version just to fix this):
-This should be Supported, no?
+The meaning of the timestamp cookie is up to the kernel, and can be
+changed anytime. Userspace is not expected to read the content of this
+blob. Userspace only acts on the length returned by getrandom(,, GRND_TIMESTAMP):
+ -1 : not supported
+  0 : cookie not updated, no need to discard buffered data
+ >0 : cookie updated, userspace should discard buffered data
 
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Mak=
-efile
-> index 3e948cf04476..f68ac370847f 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) +=3D xiphera-trng.o
->  obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) +=3D arm_smccc_trng.o
->  obj-$(CONFIG_HW_RANDOM_CN10K) +=3D cn10k-rng.o
->  obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) +=3D mpfs-rng.o
-> +obj-$(CONFIG_HW_RANDOM_STARFIVE) +=3D starfive-trng.o
+For the cookie, I've used a single u64, but two u64 could be a better start,
+providing room for implementing improved behavior in future kernel versions.
 
-Is "STARFIVE" a bit too general of a name here and in the Kconfig entry?
-I don't have a TRM for the JH7100, but this name (and the Kconfig text)
-would give me the impression that I can use it there too.
-Does this driver support both?
+> Please just let me iterate on my original patchset for a little bit,
+> without adding more junk to the already overly large conversation.
 
-> +static int starfive_trng_probe(struct platform_device *pdev)
+I like the simplicity of my so called "junk". It's streamlined, doesn't
+require a new syscall, doesn't require a new copy of ChaCha20 code.
 
-> +	clk_prepare_enable(trng->hclk);
-> +	clk_prepare_enable(trng->ahb);
-> +	reset_control_deassert(trng->rst);
-> +
-> +	trng->rng.name =3D dev_driver_string(&pdev->dev);
-> +	trng->rng.init =3D starfive_trng_init;
-> +	trng->rng.cleanup =3D starfive_trng_cleanup;
-> +	trng->rng.read =3D starfive_trng_read;
-> +
-> +	trng->mode =3D PRNG_256BIT;
-> +	trng->mission =3D 1;
-> +	trng->reseed =3D RANDOM_RESEED;
-> +
-> +	ret =3D devm_hwrng_register(&pdev->dev, &trng->rng);
-> +	if (ret) {
-> +		dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
-> +		goto err_fail_register;
-> +	}
-> +
-> +	pm_runtime_use_autosuspend(&pdev->dev);
-> +	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
+I'm sorry it doesn't fit your expectations.
 
-> +	pm_runtime_enable(&pdev->dev);
+Regards.
 
-> +
-> +	return 0;
-> +
-> +err_fail_register:
-
-> +	pm_runtime_disable(&pdev->dev);
-
-This was only enabled after the only goto for this label, does it
-serve a purpose?
-I know little about runtime PM, it just caught my eye.
-I looked at the other rng drivers that had calls to pm_runtime_enable(),
-but they all seem to do their pm enablement _before_ calling
-hwrng_register().
-Again, I am not familiar with runtime PM, but curious why you are doing
-things differently, that's all.
-
-> +
-> +	reset_control_assert(trng->rst);
-> +	clk_disable_unprepare(trng->ahb);
-> +	clk_disable_unprepare(trng->hclk);
-> +
-> +	return ret;
-> +}
-
-Thanks,
-Conor.
-
-
---pC+9YUp9vH5Uuamr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY8BcowAKCRB4tDGHoIJi
-0ooTAQCVQna4B47AvqRVufpOn/h7Kf45VvY66vkny3KGYOzbqgEAh0GS0PmMp9sY
-K/fI4Uwn7A+7DZ9+xKDhHSaNAjPdEAE=
-=8g8P
------END PGP SIGNATURE-----
-
---pC+9YUp9vH5Uuamr--
+-- 
+Yann Droneaud
+OPTEYA
