@@ -2,127 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEED7C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 15:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077D9C54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 16:06:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbjAMP57 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Jan 2023 10:57:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47602 "EHLO
+        id S229963AbjAMQGC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Jan 2023 11:06:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230366AbjAMP5g (ORCPT
+        with ESMTP id S229761AbjAMQFU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2023 10:57:36 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578D690E54
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2023 07:49:04 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id u1-20020a17090a450100b0022936a63a21so932863pjg.4
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2023 07:49:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wobIjMJNqTwtr3bYoELqDsKPAwD1PC9Q+itWmni1C6o=;
-        b=b63RB6SUcCzsN6y8LRPVghJm6iLrFxEo37MywBuf7UMlj+FVwXhZZe4YLNQobeby9f
-         5Y7aa0MQGskyI2wvFHZz+jDqS363pC0Dz1i7oI/i6JDA6Xndz8H2Uyj6ctnHzV51E6/E
-         w792bLZupviwtara97i1v6aHHvJ6p1tQzOr0T7doUpDitcCzKuM5r010rVTnPFIm3Bog
-         RLbnXBcBp5mJBlujcwZJ1eZjCw7yBPrDxzjHsG8vRZXjN1VQLLh9sN8DhDoY0Ki7pAkB
-         2wQNZMUUctFpcWq/t8PpsJAki9xOcJ8zX1OD7H8Ltkbbcch0m4LNTv2NTDyZ6IZqe46O
-         RhDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wobIjMJNqTwtr3bYoELqDsKPAwD1PC9Q+itWmni1C6o=;
-        b=HEPiFXpQaeNJMmVrBQU+vEkhoqIz+GNtcMGR401I4AXnbLdp/VDgeyr5Mv5gxFjvcI
-         txRivcI0tOjkqWL4t96dWl72tBoXiZid9YL6+NwL9+zalOrNN9WY+tWuxsG5ecTD5Rum
-         qWOVUT5QEaepb/HbqDhLqprzONB58HgCQr55TVD/450ul/tX4GNa5QeQm5SiR17JhwKh
-         R4mmj6mntiujXydAY4jGQWkfKIwHFvStbHCW71cBRYzn9nE2KAMYxQGio/Ld9JQJFFkN
-         6k+oLQ+EZe5B4pm7y/FKW1z23iJzk9LDB32diTr0tjP8jRsAsIgmNsiI5fPrV3pQzJsO
-         3nWQ==
-X-Gm-Message-State: AFqh2kqDFsF0UfBo+JzeHw7Rr1ycvR0WoanMpnyOep6m/Jskl+8mCwuy
-        J9Trha1iObCtHYMkQGLjRc0DRg==
-X-Google-Smtp-Source: AMrXdXsEAKrdgDrfSletqAhmR5qRLbIJ5zZEClWrVw8g6qy+aLPjc/GLLtqeuK1KgkeyLfP8BgaTBA==
-X-Received: by 2002:a17:90a:fd12:b0:226:5758:a57f with SMTP id cv18-20020a17090afd1200b002265758a57fmr1478484pjb.2.1673624943743;
-        Fri, 13 Jan 2023 07:49:03 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id nv7-20020a17090b1b4700b00212cf2fe8c3sm2732462pjb.1.2023.01.13.07.49.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 07:49:03 -0800 (PST)
-Date:   Fri, 13 Jan 2023 15:48:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com
-Subject: Re: [PATCH RFC v7 04/64] KVM: x86: Add 'fault_is_private' x86 op
-Message-ID: <Y8F9a2pmh13aIQZL@google.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-5-michael.roth@amd.com>
- <Y628y6hQK38+IAev@zn.tnic>
- <20230105024256.ptujtjgzcdmpakoa@amd.com>
- <Y8Fr/F1RV0B8CHq5@zn.tnic>
+        Fri, 13 Jan 2023 11:05:20 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDFC43DA2;
+        Fri, 13 Jan 2023 07:58:00 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30DEdU18011808;
+        Fri, 13 Jan 2023 15:57:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CUAZX3R8Ar8CybdDlVVmgMlNlnQOFlAHQejDsqAJRyQ=;
+ b=D4pekrL3+kU4AfqL73eztlVqFfkr6zb9nNFAhXaw/m2/cN7/g/lVUtLGos3zjYIhwFJw
+ uwJMBN2sSPnT1zOiup3UzZWGQsOp2yZRyHB95+Bhh4OXoRDHY5V6WfVK7Tc8O0DBWYNH
+ nzqdgMOWGt7eeKsrbC6dkmO9wQykoaJsdnDMVRVYIkoz5Iz6nYDPMG3fq+Jk2IZLNrIG
+ i9HwaITcwNY1ESVTxe4iNsCtAB/7LuIOpOWFpc80E1Y1Z6DXuY+LWPh6Qe7KOwK51ONp
+ xrslZsB6mGy9aO9ZpiDQCKAEJjAnhDUV8Gv02dvPlDLF10Z35JTFIjXlYhbdHqoHFyXw og== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n38uh2huf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Jan 2023 15:57:49 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30DFUEZp029149;
+        Fri, 13 Jan 2023 15:57:49 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([9.208.129.114])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3n1m03mf3j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Jan 2023 15:57:48 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30DFvl4R55247220
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Jan 2023 15:57:47 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 984D258054;
+        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28C705805D;
+        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
+Received: from [9.163.65.152] (unknown [9.163.65.152])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
+Message-ID: <84ed2129-4bef-4b84-5d79-f787f498031f@linux.ibm.com>
+Date:   Fri, 13 Jan 2023 09:57:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8Fr/F1RV0B8CHq5@zn.tnic>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v2 0/6] crypto: Accelerated AES/GCM stitched
+ implementation
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
+References: <20221205003458.4182-1-dtsen@linux.ibm.com>
+ <Y8DaRph5Sv709m/m@gondor.apana.org.au>
+From:   Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <Y8DaRph5Sv709m/m@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zMJ_5q7aon6Nfy-reua4cUvbdStovn5e
+X-Proofpoint-ORIG-GUID: zMJ_5q7aon6Nfy-reua4cUvbdStovn5e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-13_06,2023-01-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 mlxlogscore=801 impostorscore=0 malwarescore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301130099
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 13, 2023, Borislav Petkov wrote:
-> On Wed, Jan 04, 2023 at 08:42:56PM -0600, Michael Roth wrote:
-> > Obviously I need to add some proper documentation for this, but a 1
-> > return basically means 'private_fault' pass-by-ref arg has been set
-> > with the appropriate value, whereas 0 means "there's no platform-specific
-> > handling for this, so if you have some generic way to determine this
-> > then use that instead".
-> 
-> Still binary, tho, and can be bool, right?
-> 
-> I.e., you can just as well do:
-> 
->         if (static_call(kvm_x86_fault_is_private)(kvm, gpa, err, &private_fault))
->                 goto out;
-> 
-> at the call site.
+Great.  Thanks Herbert.
 
-Ya.  Don't spend too much time trying to make this look super pretty though, there
-are subtle bugs inherited from the base UPM series that need to be sorted out and
-will impact this code.  E.g. invoking kvm_mem_is_private() outside of the protection
-of mmu_invalidate_seq means changes to the attributes may not be reflected in the
-page tables.
+-Danny
 
-I'm also hoping we can avoid a callback entirely, though that may prove to be
-more pain than gain.  I'm poking at the UPM and testing series right now, will
-circle back to this and TDX in a few weeks to see if there's a sane way to communicate
-shared vs. private without having to resort to a callback, and without having
-races between page faults, KVM_SET_MEMORY_ATTRIBUTES, and KVM_SET_USER_MEMORY_REGION2.
-
-> > This is mainly to handle CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, which
-> > just parrots whatever kvm_mem_is_private() returns to support running
-> > KVM selftests without needed hardware/platform support. If we don't
-> > take care to skip this check where the above fault_is_private() hook
-> > returns 1, then it ends up breaking SNP in cases where the kernel has
-> > been compiled with CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, since SNP
-> > relies on the page fault flags to make this determination, not
-> > kvm_mem_is_private(), which normally only tracks the memory attributes
-> > set by userspace via KVM_SET_MEMORY_ATTRIBUTES ioctl.
-> 
-> Some of that explanation belongs into the commit message, which is a bit
-> lacking...
-
-I'll circle back to this too when I give this series (and TDX) a proper look,
-there's got too be a better way to handle this.
+On 1/12/23 10:12 PM, Herbert Xu wrote:
+> On Sun, Dec 04, 2022 at 07:34:52PM -0500, Danny Tsen wrote:
+>> This patch series enable an accelerated AES/GCM stitched implementation for
+>> Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
+>> implementation provides 3.5X+ better performance than the baseline.
+>>
+>> This patch has been tested with the kernel crypto module tcrypt.ko and has
+>> passed the selftest.  The patch is also tested with
+>> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled
+>>
+>> Danny Tsen (6):
+>>    Patch1: Update Kconfig and Makefile.
+>>    Patch2: Glue code for AES/GCM stitched implementation.
+>>    Patch3: An accelerated AES/GCM stitched implementation.
+>>    Patch4: Supporting functions for AES.
+>>    Patch5: Supporting functions for ghash.
+>>    Patch6: A perl script to process PowerPC assembler source.
+>>
+>>   arch/powerpc/crypto/Kconfig            |   11 +
+>>   arch/powerpc/crypto/Makefile           |   10 +
+>>   arch/powerpc/crypto/aesp8-ppc.pl       | 3846 ++++++++++++++++++++++++
+>>   arch/powerpc/crypto/ghashp8-ppc.pl     |  370 +++
+>>   arch/powerpc/crypto/p10-aes-gcm-glue.c |  345 +++
+>>   arch/powerpc/crypto/p10_aes_gcm.S      | 1519 ++++++++++
+>>   arch/powerpc/crypto/ppc-xlate.pl       |  229 ++
+>>   7 files changed, 6330 insertions(+)
+>>   create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
+>>   create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
+>>   create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
+>>   create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
+>>   create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
+>>
+>> -- 
+>> 2.31.1
+> All applied.  Thanks.
