@@ -2,99 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE558C54EBE
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 04:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FA3C54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 07:49:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234761AbjAMESE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 23:18:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37798 "EHLO
+        id S232202AbjAMHto (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Jan 2023 02:49:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232445AbjAMEQs (ORCPT
+        with ESMTP id S232051AbjAMHtm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 23:16:48 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E353687B7;
-        Thu, 12 Jan 2023 20:13:35 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pGBRM-00H5Jc-38; Fri, 13 Jan 2023 12:13:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jan 2023 12:13:16 +0800
-Date:   Fri, 13 Jan 2023 12:13:16 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
+        Fri, 13 Jan 2023 02:49:42 -0500
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8DF1A822;
+        Thu, 12 Jan 2023 23:49:41 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id l22so20663095eja.12;
+        Thu, 12 Jan 2023 23:49:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ki/D1WUy5ryn68f131sCexKZ8Uw0CRINUHMpMThw1h4=;
+        b=MrZqIjlJU54cg2457lOD+lg384HK6gA1Nb9CBdGUiKfgYsB14QaQX61r9OtNwotQKB
+         THMs47B1dqPWxYTr7sgoDSVTHBgACpbIVVlRD715H+brWuzh91B9W8j1cR3TIFJgGVk4
+         lq4oEcRbrZIjFGCgcACACa7pmQA9hjXwKnhpL4wZ7lvSSniEIcS50+UyxUdlpY/+nx/K
+         niXvF292CD8sS4XkYXPBxMNf2xgeYY9W3FderhTHx6nJkpsr75YA78XAgzXB+Ku21Cdn
+         729M2KRBmulaAjdScbAqLBaR2faFc9g0J8W7vjpqnHrrQcHe8m71av87l8YRblaxALpj
+         IxAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ki/D1WUy5ryn68f131sCexKZ8Uw0CRINUHMpMThw1h4=;
+        b=YN8T2x9KkPCciKokUiSYgsfc1LLsytuWb9PdalQ8aPaoAf1G2TEiueIOrPYxLo/AXB
+         qScAIKA4kiuf+d+Es6XTeMV18BC7Hcy6mRLXURwvrKKidq9gPGC4X8DAMOMstkWi/ogJ
+         di/P6B6dRUvRl+voK6OuywHFCF0UWU98A9eNbKM9DPmKOL0K2D9oT8nN+7VxE53LWpNw
+         zSZ6KN097I8mL5wj5n5xfAQs2Mm7qet8gCpUVP+7ti0A78UTGd3a1EvFyh40KHS/qer7
+         RmO9v7x/avwBlmWANpr43FXcf2AJIXt1ue2XUeH4dU7DCNe2zz5dpu5SzN6DO52OpDzY
+         +3Hw==
+X-Gm-Message-State: AFqh2kpX266Z54lfjM9XKKKDkP9U5DnsE8PtmvyBrQNxoxEffTFWdI3f
+        WN/dqbhlOAz0hn1rGwDuQc8=
+X-Google-Smtp-Source: AMrXdXvpYNAJ1hb/R8RykYrpD9NO6MRCwedsK48BgHEkt6XdgGobwficLiSe7Qyl0u7bzBTsagaFdA==
+X-Received: by 2002:a17:907:c48d:b0:7c0:aafa:6dc0 with SMTP id tp13-20020a170907c48d00b007c0aafa6dc0mr52745239ejc.25.1673596179964;
+        Thu, 12 Jan 2023 23:49:39 -0800 (PST)
+Received: from felia.fritz.box (ipbcc1d920.dynamic.kabel-deutschland.de. [188.193.217.32])
+        by smtp.gmail.com with ESMTPSA id 18-20020a170906319200b007c1651aeeacsm8246555ejy.181.2023.01.12.23.49.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 23:49:39 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Chia-Wei Wang <chiawei_wang@aspeedtech.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5 0/4] Add Aspeed ACRY driver for hardware acceleration
-Message-ID: <Y8DaXA9X5Rp+3jCA@gondor.apana.org.au>
-References: <20230104013436.203427-1-neal_liu@aspeedtech.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230104013436.203427-1-neal_liu@aspeedtech.com>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] crypto: atmel-i2c - avoid defines prefixed with CONFIG
+Date:   Fri, 13 Jan 2023 08:47:15 +0100
+Message-Id: <20230113074715.32016-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 09:34:32AM +0800, Neal Liu wrote:
-> Aspeed ACRY engine is designed to accelerate the throughput of
-> ECDSA/RSA signature and verification.
-> 
-> These patches aim to add Aspeed ACRY RSA driver support.
-> This driver also pass the run-time self tests that take place at
-> algorithm registration on both big-endian/little-endian system
-> in AST2600 evaluation board .
-> 
-> Tested-by below configs:
-> - CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-> - CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> - CONFIG_DMA_API_DEBUG=y
-> - CONFIG_DMA_API_DEBUG_SG=y
-> - CONFIG_CPU_BIG_ENDIAN=y
-> 
-> Change since v4:
-> - Remove GFP_DMA flag since it's unnecessary.
-> 
-> Change since v3:
-> - Revise aspeed,ast2600-ahbc.yaml dt-bindings description.
-> 
-> Change since v2:
-> - Fix format and uninitialized warning.
-> - Revise binding description.
-> 
-> Change since v1:
-> - Fix dt-bindings description.
-> - Refine the Makefile which has been addressed.
-> 
-> Neal Liu (4):
->   crypto: aspeed: Add ACRY RSA driver
->   ARM: dts: aspeed: Add ACRY/AHBC device controller node
->   dt-bindings: crypto: add documentation for Aspeed ACRY
->   dt-bindings: bus: add documentation for Aspeed AHBC
-> 
->  .../bindings/bus/aspeed,ast2600-ahbc.yaml     |  37 +
->  .../bindings/crypto/aspeed,ast2600-acry.yaml  |  49 ++
->  MAINTAINERS                                   |   2 +-
->  arch/arm/boot/dts/aspeed-g6.dtsi              |  13 +
->  drivers/crypto/aspeed/Kconfig                 |  11 +
->  drivers/crypto/aspeed/Makefile                |   2 +
->  drivers/crypto/aspeed/aspeed-acry.c           | 828 ++++++++++++++++++
->  7 files changed, 941 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/devicetree/bindings/bus/aspeed,ast2600-ahbc.yaml
->  create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2600-acry.yaml
->  create mode 100644 drivers/crypto/aspeed/aspeed-acry.c
-> 
-> -- 
-> 2.25.1
+Defines prefixed with "CONFIG" should be limited to proper Kconfig options,
+that are introduced in a Kconfig file.
 
-All applied.  Thanks.
+Here, a definition for the driver's configuration zone is named
+CONFIG_ZONE. Rename this local definition to CONFIGURATION_ZONE to avoid
+defines prefixed with "CONFIG".
+
+No functional change.
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+Herbert, David, please pick this clean-up work into your crypto tree. Thanks.
+
+ drivers/crypto/atmel-i2c.c | 2 +-
+ drivers/crypto/atmel-i2c.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index 55bff1e13142..66e27f71e37e 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -59,7 +59,7 @@ void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
+ 	 * Read the word from Configuration zone that contains the lock bytes
+ 	 * (UserExtra, Selector, LockValue, LockConfig).
+ 	 */
+-	cmd->param1 = CONFIG_ZONE;
++	cmd->param1 = CONFIGURATION_ZONE;
+ 	cmd->param2 = cpu_to_le16(DEVICE_LOCK_ADDR);
+ 	cmd->count = READ_COUNT;
+ 
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 35f7857a7f7c..c1fdc04eac07 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -63,7 +63,7 @@ struct atmel_i2c_cmd {
+ #define STATUS_WAKE_SUCCESSFUL		0x11
+ 
+ /* Definitions for eeprom organization */
+-#define CONFIG_ZONE			0
++#define CONFIGURATION_ZONE		0
+ 
+ /* Definitions for Indexes common to all commands */
+ #define RSP_DATA_IDX			1 /* buffer index of data in response */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.17.1
+
