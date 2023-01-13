@@ -2,223 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD2DC63797
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 00:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8D3C54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 01:30:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbjAMAcq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 19:32:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40936 "EHLO
+        id S240540AbjAMBai (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 20:30:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232215AbjAMAcp (ORCPT
+        with ESMTP id S240248AbjAMBag (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 19:32:45 -0500
-Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718E960CC0;
-        Thu, 12 Jan 2023 16:32:43 -0800 (PST)
-Date:   Fri, 13 Jan 2023 00:32:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-        s=protonmail; t=1673569960; x=1673829160;
-        bh=QX+nECwZN3I0sjACQskWunwGexAVyvI38tBRthUZqi8=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=5KEj8O1+DGoKU+C2si1N1Giub5/toyi24R26iaYxIFkLMkpVPn4XKOI78HMGmYRHo
-         zmJOUXI+9ZbEQf6NrdDN+gVejG9ZDq28X8n8kIcVBFbAhBpHQxuD0GneKtqXhqCOD5
-         O5MJIz8lFIlhW69TpRA9Plsbh1v2k+gPCX+8u3uBsnNFfAWnGki4Nw1/wjRqG7pWQB
-         0BMbVyJHEbA8bqTNuvf8gOC6CGUAKMyS6MQ8Jt/tzrJORiHyKkShoRzhEGrZ40k1YR
-         egR9KfaG+fIhqSejvzJlUpLot6yiWdEMnB9Pb3squKMILtobi1xjFcFueGd5yQ1Ym0
-         zBvn/puqVxSEg==
-To:     Yann Droneaud <ydroneaud@opteya.com>
-From:   Peter Lafreniere <peter@n8pjl.ca>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Florian Weimer <fweimer@redhat.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-Subject: Re: [RFC PATCH 1/4] random: introduce getrandom() GRND_TIMESTAMP
-Message-ID: <u63qVsNp7euFAjiS_EUypV5P87i6gOl1BLX8cU8LQ7oHkzQVUxncjJhMb_4ybS574fV_buYZwDJDGFnFdREaQu44daEX7Pvednf-CXtPcJ0=@n8pjl.ca>
-In-Reply-To: <d890f9d03c2da1eef7bdf47e5b6f3d0b7e1afb3f.1673539719.git.ydroneaud@opteya.com>
-References: <cover.1673539719.git.ydroneaud@opteya.com> <d890f9d03c2da1eef7bdf47e5b6f3d0b7e1afb3f.1673539719.git.ydroneaud@opteya.com>
-Feedback-ID: 53133685:user:proton
+        Thu, 12 Jan 2023 20:30:36 -0500
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EAA5DE58;
+        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-15bb8ec196aso9109819fac.3;
+        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BHEg0Tu4T0FTdfDnr1uHsTuZiO21FEsCK3FYFxVcWdA=;
+        b=wRYxH+oyrHEQ8iJvNvnAxdscEzH5SQBvgEUZ0Kn+Te7FijriZMe8XFsHFsTruBbUx+
+         DujYXqfWZGgViyoV3+5yDxTiuZW6wBlnxRD5BGmgqJQv/pk0R4TaIEUSk45XCX4xa+T2
+         z2AHQF/AaLfPsuki0mk3ttGGhbJm/uiwxQfELtfdgTpS8k+BXZBTBKXmCT9XCNAl4XNU
+         tETuB5FKfgP2Lrch3X4RbJA55h5ewBiSJar5eUYYeZarBmUtPVECRyTQU2AL47ZtaGHC
+         nWLMaP3qs4Hw+PvB4OaCksBonYke6aVLY1ZwOET4YMqnNkkAjZYVuUheXFl4Hw2hSKOi
+         abWQ==
+X-Gm-Message-State: AFqh2ko8xWvYFh0YUDHUYGyXc14BMrOshve8spESH01HCI7bD7jI+mgI
+        EAd8Qyl84mRD6VRMTkNXGA==
+X-Google-Smtp-Source: AMrXdXu/Y+DQPo4vCrgC2MrR0FQ8VB5gdtOfweqbYceUwefQolDBA2xCqxSt8+XnoA9uaACqeriVOw==
+X-Received: by 2002:a05:6871:4408:b0:14f:9e41:7dbe with SMTP id nd8-20020a056871440800b0014f9e417dbemr4578946oab.10.1673573435159;
+        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id m26-20020a4abc9a000000b004a0aac2d28fsm9025181oop.35.2023.01.12.17.30.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 17:30:34 -0800 (PST)
+Received: (nullmailer pid 589937 invoked by uid 1000);
+        Fri, 13 Jan 2023 01:30:34 -0000
+Date:   Thu, 12 Jan 2023 19:30:34 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Let STM32 define Ux500 HASH
+Message-ID: <167357343355.589882.8533297538415386387.robh@kernel.org>
+References: <20221227-ux500-stm32-hash-v2-0-bc443bc44ca4@linaro.org>
+ <20221227-ux500-stm32-hash-v2-1-bc443bc44ca4@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221227-ux500-stm32-hash-v2-1-bc443bc44ca4@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[...]
 
->GRND_TIMESTAMP allows userspace to ask the kernel if previous
->"timestamp" has changed as the result of an event that
->triggered kernel CSPRNG reseed, and to update the "timestamp".
+On Tue, 10 Jan 2023 20:19:12 +0100, Linus Walleij wrote:
+> This adds device tree bindings for the Ux500 HASH block
+> as a compatible in the STM32 HASH bindings.
+> 
+> The Ux500 HASH binding has been used for ages in the kernel
+> device tree for Ux500 but was never documented, so fill in
+> the gap by making it a sibling of the STM32 HASH block,
+> which is what it is.
+> 
+> The relationship to the existing STM32 HASH block is pretty
+> obvious when looking at the register map, and I have written
+> patches to reuse the STM32 HASH driver on the Ux500.
+> 
+> The main difference from the outside is that the Ux500 HASH
+> lacks the interrupt line, so some special if-clauses are
+> needed to accomodate this in the binding.
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> ChangeLog v1->v2:
+> - Use an else construction instead of if/if not.
+> ---
+>  .../devicetree/bindings/crypto/st,stm32-hash.yaml  | 23 +++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
+> 
 
->In case the "timestamp" hasn't changed, userspace CSPRNG can
->consume a slice of its buffered random stream.
-
->If it has changed, remaining userspace buffered random values
->should be discarded. Userspace should call getrandom() to fill
->and/or generate its buffer with updated seed.
->It's advised to test again the "timestamp" to deal with the
->race condition, where the kernel reseed just after the call
->to getrandom() to get entropy.
-
-This second check is the 'safe thing' to do, but if you're that
-worried about race conditions then this api is useless. You can't
-ignore the inherent TOCTOU problem with the GRND_TIMESTAMP calls.
-
-That said, the race condition is so tiny that the added overhead
-of a third syscall (without vDSO support) starts to negate the
-value in buffering the random numbers (not to mention adding
-significant latency to every nth arc4random() call, for example).
-
-IMO, for callers that cannot accept the risk, the getrandom(,,0)
-option is the perfect alternative.
-
-[...]
-
->+static ssize_t get_random_timestamp(char __user *ubuf, size_t len, unsign=
-ed int flags)
->+{
->+=09u64 ts;
->+
->+=09/* other combination not supported */
->+=09if (WARN(flags !=3D GRND_TIMESTAMP, "GRND_TIMESTAMP cannot be used wit=
-h other flags"))
->+=09=09return -EINVAL;
-
-If userspace messes up the flags then it's the problem of the
-caller. Why clutter the logs in that case?
-
-At the very least this should be WARN_ONCE() to avoid log spam.
-
->+=09/* shorter structure not supported */
->+=09if (len < sizeof(ts))
->+=09=09return -EINVAL;
-
-This should be sizeof(u64) to match the vDSO patch and to avoid
-having to change this condition if ts becomes larger.
-
->+
->+=09if (copy_from_user(&ts, ubuf, sizeof(ts)))
->+=09=09return -EFAULT;
->+
->+=09/* longer structure supported, only if 0-padded,
->+=09   timestamp might be extended in the future with more fields */
->+=09if (len > sizeof(ts)) {
->+=09=09char __user *p =3D ubuf + sizeof(ts);
->+=09=09size_t l =3D len - sizeof(ts);
->+
->+=09=09while (l) {
->+=09=09=09char b;
->+
->+=09=09=09if (get_user(b, p++))
->+=09=09=09=09return -EFAULT;
->+
->+=09=09=09if (b)
->+=09=09=09=09return -EINVAL;
->+=09=09}
->+=09}
->+
->+=09if (!get_random_timestamp_update(&ts, READ_ONCE(base_crng.generation))=
-)
->+=09=09return 0;
->+
->+=09if (copy_to_user(ubuf, &ts, sizeof(ts)))
->+=09=09return -EFAULT;
->+
->+=09return sizeof(ts);
->+}
->+
-> SYSCALL_DEFINE3(getrandom, char __user *, ubuf, size_t, len, unsigned int=
-, flags)
-> {
-> =09struct iov_iter iter;
-> =09struct iovec iov;
-> =09int ret;
->
->-=09if (flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE))
->+=09if (flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE | GRND_TIMES=
-TAMP))
-> =09=09return -EINVAL;
->
->+=09if (unlikely(flags & GRND_TIMESTAMP))
->+=09=09return get_random_timestamp(ubuf, len, flags);
->+
-
-I'd remove the unlikely(). I don't like to assume usage patterns.
-
-> =09/*
-> =09 * Requesting insecure and blocking randomness at the same time makes
-> =09 * no sense.
->diff --git a/include/linux/random.h b/include/linux/random.h
->index b0a940af4fff..bc219b5a96a5 100644
->--- a/include/linux/random.h
->+++ b/include/linux/random.h
->@@ -161,4 +161,35 @@ int random_online_cpu(unsigned int cpu);
-> extern const struct file_operations random_fops, urandom_fops;
-> #endif
->
->+/*
->+ * get_random_timestamp_update()
->+ *
->+ * @generation: current CRNG generation (from base_crng.generation
->+ *              or _vdso_rng_data.generation)
->+ *
->+ * Return: timestamp size if previous timestamp is expired and is updated=
-,
->+ *         0 if not expired (and not updated)
->+ */
->+static inline bool get_random_timestamp_update(u64 *user_ts,
->+=09=09=09=09=09       u64 generation)
->+{
->+=09u64 ts;
->+
->+=09/* base_crng.generation is never ULONG_MAX,
->+=09 * OTOH userspace will initialize its timestamp
->+=09 * to 0, so inverting base_crng.generation ensure
->+=09 * first call to getrandom(,,GRND_TIMESTAMP) will
->+=09 * update
->+=09 */
-
-Rather than assuming that the timestamp will start zero-initilized,
-expect it to be uninitilized. Either way the code works.
-
->+=09ts =3D ~generation;
->+
->+=09/* not expired ? no refresh suggested */
->+=09if (*user_ts =3D=3D ts)
->+=09=09return false;
->+
->+=09*user_ts =3D ts;
->+
->+=09return true;
->+}
->+
-
-Not that it matters much, but you could make generation a u64* that
-gets dereferenced by get_random_timestamp_update(). It's cleaner for
-the caller, barely changes this function, and will get inlined anyway.
-I might just be imposing my personal style in this case though.
-
-After a cursory skimming of the rest of the series I think that this
-is a worthwhile direction to pursue. Jason's series is growing bulky
-and this provides the needed slimming while solving the root problem.
-
-The only thing I see immediately is the TOCTOU problem and the extra
-steps needed to guarantee forward secrecy.
-
-I should mention that I'm not a security or rng expert at all.
-
-Cheers,
-Peter Lafreniere
-<peter@n8pjl.ca>
-
-
+Reviewed-by: Rob Herring <robh@kernel.org>
