@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4ADAC677F1
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 18:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83778C677F1
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 19:11:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbjAMSqb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Jan 2023 13:46:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52366 "EHLO
+        id S229509AbjAMTLZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Jan 2023 14:11:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230022AbjAMSqa (ORCPT
+        with ESMTP id S229510AbjAMTLY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2023 13:46:30 -0500
+        Fri, 13 Jan 2023 14:11:24 -0500
 Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADCE2655;
-        Fri, 13 Jan 2023 10:46:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB40C6369;
+        Fri, 13 Jan 2023 11:11:21 -0800 (PST)
 Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0F6771EC04C1;
-        Fri, 13 Jan 2023 19:46:28 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7BF711EC0518;
+        Fri, 13 Jan 2023 20:11:20 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1673635588;
+        t=1673637080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=KRD3E8588u2tezl2sQYKK6rlbF2F4B2OiI46B0gWdS8=;
-        b=U2zfdZTum+2P6uMM4n6GHE4xnTO+4sYvHQBkSnFhinj1QhDfWL+E7/h45+S9I/O8MWXEl/
-        Vkur79isKnnRXyK/+y7DJiKOa41dy1KzpXCzdZqzDrdwUDgWV2nYD87K13d0dSgrJr3xrf
-        +zSgtgag+kFcMUCAylS4Qf7fa3inf6M=
-Date:   Fri, 13 Jan 2023 19:46:27 +0100
+        bh=uSenXaLo6u2BuPearjH6XYMPmRVbj/fPB2X9geCCSBQ=;
+        b=N4v11qcO3FHjovvV1c6EaFU2xeyguJlnWDJSyC8w+rf7M4BzksU9+WdDquv+1mHSgLIrOU
+        NqaFofzSkjTrLynioeH/8a5rGjWs2RFNEZSKoOHUAp0OTc4JkKP5IlN7DeXV3OGoQIjbsZ
+        duvJXqWfKJ71FJkX8JawNxzGZ60iono=
+Date:   Fri, 13 Jan 2023 20:11:14 +0100
 From:   Borislav Petkov <bp@alien8.de>
 To:     Michael Roth <michael.roth@amd.com>
 Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
@@ -46,27 +46,120 @@ Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
         ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH RFC v7 08/64] KVM: Move
- kvm_for_each_memslot_in_hva_range() to be used in SVM
-Message-ID: <Y8GnA622oqQ7ihsl@zn.tnic>
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v7 10/64] KVM: SEV: Populate private memory fd during
+ LAUNCH_UPDATE_DATA
+Message-ID: <Y8Gs0l1k4L96dP5V@zn.tnic>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-9-michael.roth@amd.com>
+ <20221214194056.161492-11-michael.roth@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-9-michael.roth@amd.com>
+In-Reply-To: <20221214194056.161492-11-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:00PM -0600, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
+On Wed, Dec 14, 2022 at 01:40:02PM -0600, Michael Roth wrote:
+> From: Vishal Annapurve <vannapurve@google.com>
 > 
-> Move the macro to kvm_host.h and make if visible for SVM to use.
+> This change adds handling of HVA ranges to copy contents
 
-s/if/it/
+s/This change adds handling of/Handle/
+
+> +static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
+> +					      struct kvm_gfn_range *range,
+> +					      struct kvm_sev_cmd *argp)
+> +{
+> +	struct sev_data_launch_update_data data;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	gfn_t gfn;
+> +	kvm_pfn_t pfn;
+> +	struct kvm_memory_slot *memslot = range->slot;
+> +	int ret = 0;
+> +
+> +	data.reserved = 0;
+> +	data.handle = sev->handle;
+> +
+> +	for (gfn = range->start; gfn < range->end; gfn++) {
+> +		int order;
+> +		void *kvaddr;
+> +
+> +		ret = kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
+> +		if (ret)
+> +			return ret;
+> +
+> +		kvaddr = pfn_to_kaddr(pfn);
+> +		if (!virt_addr_valid(kvaddr)) {
+> +			pr_err("Invalid kvaddr 0x%llx\n", (uint64_t)kvaddr);
+
+Is that some debugging help leftover or what is that printk issued for?
+
+> +			ret = -EINVAL;
+> +			goto e_ret;
+> +		}
+> +
+> +		ret = kvm_read_guest_page(kvm, gfn, kvaddr, 0, PAGE_SIZE);
+> +		if (ret) {
+> +			pr_err("guest read failed 0x%x\n", ret);
+> +			goto e_ret;
+> +		}
+> +
+> +		if (!this_cpu_has(X86_FEATURE_SME_COHERENT))
+
+check_for_deprecated_apis: WARNING: arch/x86/kvm/svm/sev.c:602: Do not use this_cpu_has() - use cpu_feature_enabled() instead.
+
+> +			clflush_cache_range(kvaddr, PAGE_SIZE);
+> +
+> +		data.len = PAGE_SIZE;
+> +		data.address = __sme_set(pfn << PAGE_SHIFT);
+> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
+> +		if (ret)
+> +			goto e_ret;
+> +		kvm_release_pfn_clean(pfn);
+> +	}
+> +	kvm_vm_set_region_attr(kvm, range->start, range->end,
+> +		true /* priv_attr */);
+
+No need to break that line.
+
+> +
+> +e_ret:
+> +	return ret;
+> +}
+> +
+> +static int sev_launch_update_gfn_handler(struct kvm *kvm, struct kvm_gfn_range *range,
+> +					 void *data)
+> +{
+> +	struct kvm_sev_cmd *argp = (struct kvm_sev_cmd *)data;
+> +
+> +	if (kvm_slot_can_be_private(range->slot))
+> +		return sev_launch_update_priv_gfn_handler(kvm, range, argp);
+> +
+> +	return sev_launch_update_shared_gfn_handler(kvm, range, argp);
+> +}
+> +
+> +static int sev_launch_update_data(struct kvm *kvm,
+> +		struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_launch_update_data params;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +		return -EFAULT;
+
+Not gonna check those user-supplied values for sanity?
+
+Or is this check
+
+        if (WARN_ON_ONCE(hva_end <= hva_start))
+                return -EINVAL;
+
+in kvm_vm_do_hva_range_op() enough?
+
+Thx.
 
 -- 
 Regards/Gruss,
