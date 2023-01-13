@@ -2,76 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC11C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 04:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F8AC54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 04:17:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235389AbjAMEQq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 23:16:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
+        id S232888AbjAMERQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 23:17:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233212AbjAMEPi (ORCPT
+        with ESMTP id S235540AbjAMEQV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 23:15:38 -0500
+        Thu, 12 Jan 2023 23:16:21 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12CF65355;
-        Thu, 12 Jan 2023 20:13:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C01C68CA7
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 20:13:13 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pGBR0-00H5Ig-Q3; Fri, 13 Jan 2023 12:12:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jan 2023 12:12:54 +0800
-Date:   Fri, 13 Jan 2023 12:12:54 +0800
+        id 1pGBRG-00H5JY-6G; Fri, 13 Jan 2023 12:13:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jan 2023 12:13:10 +0800
+Date:   Fri, 13 Jan 2023 12:13:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Danny Tsen <dtsen@linux.ibm.com>
-Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
-Subject: Re: [PATCH v2 0/6] crypto: Accelerated AES/GCM stitched
- implementation
-Message-ID: <Y8DaRph5Sv709m/m@gondor.apana.org.au>
-References: <20221205003458.4182-1-dtsen@linux.ibm.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org
+Subject: Re: [PATCH] crypto: skcipher - Use scatterwalk (un)map interface for
+ dst and src buffers
+Message-ID: <Y8DaVjPiZGAPhN1G@gondor.apana.org.au>
+References: <20230102101846.116448-1-ardb@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221205003458.4182-1-dtsen@linux.ibm.com>
+In-Reply-To: <20230102101846.116448-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Dec 04, 2022 at 07:34:52PM -0500, Danny Tsen wrote:
-> This patch series enable an accelerated AES/GCM stitched implementation for
-> Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
-> implementation provides 3.5X+ better performance than the baseline.
+On Mon, Jan 02, 2023 at 11:18:46AM +0100, Ard Biesheuvel wrote:
+> The skcipher walk API implementation avoids scatterwalk_map() for
+> mapping the source and destination buffers, and invokes kmap_atomic()
+> directly if the buffer in question is not in low memory (which can only
+> happen on 32-bit architectures). This avoids some overhead on 64-bit
+> architectures, and most notably, permits the skcipher code to run with
+> preemption enabled.
 > 
-> This patch has been tested with the kernel crypto module tcrypt.ko and has
-> passed the selftest.  The patch is also tested with
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled
+> Now that scatterwalk_map() has been updated to use kmap_local(), none of
+> this is needed, so we can simply use scatterwalk_map/unmap instead.
 > 
-> Danny Tsen (6):
->   Patch1: Update Kconfig and Makefile.
->   Patch2: Glue code for AES/GCM stitched implementation.
->   Patch3: An accelerated AES/GCM stitched implementation.
->   Patch4: Supporting functions for AES.
->   Patch5: Supporting functions for ghash.
->   Patch6: A perl script to process PowerPC assembler source.
-> 
->  arch/powerpc/crypto/Kconfig            |   11 +
->  arch/powerpc/crypto/Makefile           |   10 +
->  arch/powerpc/crypto/aesp8-ppc.pl       | 3846 ++++++++++++++++++++++++
->  arch/powerpc/crypto/ghashp8-ppc.pl     |  370 +++
->  arch/powerpc/crypto/p10-aes-gcm-glue.c |  345 +++
->  arch/powerpc/crypto/p10_aes_gcm.S      | 1519 ++++++++++
->  arch/powerpc/crypto/ppc-xlate.pl       |  229 ++
->  7 files changed, 6330 insertions(+)
->  create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
->  create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
->  create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
->  create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
->  create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
-> 
-> -- 
-> 2.31.1
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  crypto/skcipher.c | 22 ++++------------------
+>  1 file changed, 4 insertions(+), 18 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
