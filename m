@@ -2,113 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FA3C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 07:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDB3C54EBE
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 08:34:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbjAMHto (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Jan 2023 02:49:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
+        id S240194AbjAMIeP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Jan 2023 03:34:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232051AbjAMHtm (ORCPT
+        with ESMTP id S241173AbjAMIdy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2023 02:49:42 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8DF1A822;
-        Thu, 12 Jan 2023 23:49:41 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id l22so20663095eja.12;
-        Thu, 12 Jan 2023 23:49:41 -0800 (PST)
+        Fri, 13 Jan 2023 03:33:54 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F9B44C78
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2023 00:33:36 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id cf18so44238268ejb.5
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Jan 2023 00:33:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ki/D1WUy5ryn68f131sCexKZ8Uw0CRINUHMpMThw1h4=;
-        b=MrZqIjlJU54cg2457lOD+lg384HK6gA1Nb9CBdGUiKfgYsB14QaQX61r9OtNwotQKB
-         THMs47B1dqPWxYTr7sgoDSVTHBgACpbIVVlRD715H+brWuzh91B9W8j1cR3TIFJgGVk4
-         lq4oEcRbrZIjFGCgcACACa7pmQA9hjXwKnhpL4wZ7lvSSniEIcS50+UyxUdlpY/+nx/K
-         niXvF292CD8sS4XkYXPBxMNf2xgeYY9W3FderhTHx6nJkpsr75YA78XAgzXB+Ku21Cdn
-         729M2KRBmulaAjdScbAqLBaR2faFc9g0J8W7vjpqnHrrQcHe8m71av87l8YRblaxALpj
-         IxAg==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=69vPfjdndDvs8QEdWRfbzSSvuuOt62gz3qB9+kdUnVA=;
+        b=G0yy8cPfoiavoMyPQc3/K7FUfmxncwLLWeYLWTYO7Eh5k23/uG7jZmmlXAU3i+2m5u
+         T+4X9VzZxFiLZoEf0+m1uc3vT7FIYF3QS+8pUFkgqjMDrHwpuir72UVHlU7pmG+wzh3d
+         qTTgJ2qHORnGEzxoCQtk/C/gVDmiDZF8yfSukEJPxDQs1+JJuKVHhrzuPsvYWvnOdLaa
+         Tw84jFKE34wPD5VnjHCMf/2swGQlwXzn/k1FP6xV2KWTBcsxzHeV9O9lZV5dd+lOMXzH
+         BEBSkqPa8beFeQwqw/NarHzFP/8Mq19qyWTFQZ2roV9WU5I7QDf82+VcOg+qvEg/jm3Z
+         YhPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ki/D1WUy5ryn68f131sCexKZ8Uw0CRINUHMpMThw1h4=;
-        b=YN8T2x9KkPCciKokUiSYgsfc1LLsytuWb9PdalQ8aPaoAf1G2TEiueIOrPYxLo/AXB
-         qScAIKA4kiuf+d+Es6XTeMV18BC7Hcy6mRLXURwvrKKidq9gPGC4X8DAMOMstkWi/ogJ
-         di/P6B6dRUvRl+voK6OuywHFCF0UWU98A9eNbKM9DPmKOL0K2D9oT8nN+7VxE53LWpNw
-         zSZ6KN097I8mL5wj5n5xfAQs2Mm7qet8gCpUVP+7ti0A78UTGd3a1EvFyh40KHS/qer7
-         RmO9v7x/avwBlmWANpr43FXcf2AJIXt1ue2XUeH4dU7DCNe2zz5dpu5SzN6DO52OpDzY
-         +3Hw==
-X-Gm-Message-State: AFqh2kpX266Z54lfjM9XKKKDkP9U5DnsE8PtmvyBrQNxoxEffTFWdI3f
-        WN/dqbhlOAz0hn1rGwDuQc8=
-X-Google-Smtp-Source: AMrXdXvpYNAJ1hb/R8RykYrpD9NO6MRCwedsK48BgHEkt6XdgGobwficLiSe7Qyl0u7bzBTsagaFdA==
-X-Received: by 2002:a17:907:c48d:b0:7c0:aafa:6dc0 with SMTP id tp13-20020a170907c48d00b007c0aafa6dc0mr52745239ejc.25.1673596179964;
-        Thu, 12 Jan 2023 23:49:39 -0800 (PST)
-Received: from felia.fritz.box (ipbcc1d920.dynamic.kabel-deutschland.de. [188.193.217.32])
-        by smtp.gmail.com with ESMTPSA id 18-20020a170906319200b007c1651aeeacsm8246555ejy.181.2023.01.12.23.49.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 23:49:39 -0800 (PST)
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=69vPfjdndDvs8QEdWRfbzSSvuuOt62gz3qB9+kdUnVA=;
+        b=Swg6FPPuc7mVJ0+DlmPwu32uGjxGrWTIjaG+Fo4pIr40AMNfuvldYhCaUnZHwxvezM
+         B8ZT+j48z6Muu9CElIImubxgxzsyyCi+pQT/uLnGCeq0Vbsq5T0SvebjEdNGdlLAPOyu
+         KNdSyCJjo5gXOftTEPjcXtD+HyppivQSCoPcGZ3e2wyKog7k/0+5XQLACnOfBXomtcX/
+         xIOsgbeI7Yu1WmajubdpbPmuxBQI1HT1UYK5wNkdD88cB6vd+Jx53TStxzeYDnLBK55A
+         dJZW/S45m3JkahXg84n+tQuU6dqrZse9wB4uel4BlKMPFPdXW1HmS2iUpu4OumGNnFkd
+         cN9g==
+X-Gm-Message-State: AFqh2krpHePT1yu2VbBzIl0REVvSrWHDnmKRC6LjTb1m7eaZ/2DpBuDe
+        Zy6A4PqYTOlIAuVT1Z4uhNAUww==
+X-Google-Smtp-Source: AMrXdXs2ZJAqttVWYRXGxoX3QUG9Uarxkn9ckYoeRGcdElRtpW1qBalWUSAxDqAu65QxD49NUMt6mQ==
+X-Received: by 2002:a17:907:cbc6:b0:7c0:8371:97aa with SMTP id vk6-20020a170907cbc600b007c0837197aamr71708773ejc.28.1673598814566;
+        Fri, 13 Jan 2023 00:33:34 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id sb25-20020a1709076d9900b007b2a58e31dasm8336587ejc.145.2023.01.13.00.33.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jan 2023 00:33:34 -0800 (PST)
+Message-ID: <20651db4-b0e8-ee3e-a752-c1d4ff14b53f@linaro.org>
+Date:   Fri, 13 Jan 2023 09:33:32 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 1/3] dt-bindings: crypto: sun8i-ce: Add compatible for
+ D1
+Content-Language: en-US
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Samuel Holland <samuel@sholland.org>
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] crypto: atmel-i2c - avoid defines prefixed with CONFIG
-Date:   Fri, 13 Jan 2023 08:47:15 +0100
-Message-Id: <20230113074715.32016-1-lukas.bulwahn@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
+References: <20221231220146.646-1-samuel@sholland.org>
+ <20221231220146.646-2-samuel@sholland.org>
+ <Y8DVPvnfShdhlVHh@gondor.apana.org.au>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <Y8DVPvnfShdhlVHh@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Defines prefixed with "CONFIG" should be limited to proper Kconfig options,
-that are introduced in a Kconfig file.
+On 13/01/2023 04:51, Herbert Xu wrote:
+> On Sat, Dec 31, 2022 at 04:01:43PM -0600, Samuel Holland wrote:
+>> D1 has a crypto engine similar to the one in other Allwinner SoCs.
+>> Like H6, it has a separate MBUS clock gate.
+>>
+>> It also requires the internal RC oscillator to be enabled for the TRNG
+>> to return data, presumably because noise from the oscillator is used as
+>> an entropy source. This is likely the case for earlier variants as well,
+>> but it really only matters for H616 and newer SoCs, as H6 provides no
+>> way to disable the internal oscillator.
+>>
+>> Signed-off-by: Samuel Holland <samuel@sholland.org>
+>> ---
+>> I noticed that the vendor driver has code to explicitly enable IOSC when
+>> using the TRNG on A83T (search SS_TRNG_OSC_ADDR), but that is covered by
+>> a different binding/driver in mainline.
+>>
+>> Changes in v2:
+>>  - Add TRNG clock
+>>
+>>  .../bindings/crypto/allwinner,sun8i-ce.yaml   | 33 ++++++++++++++-----
+>>  1 file changed, 25 insertions(+), 8 deletions(-)
+> 
+> This doesn't have an ack from Rob Herring.  Would you like me
+> to apply just the crypto patch by itself?
 
-Here, a definition for the driver's configuration zone is named
-CONFIG_ZONE. Rename this local definition to CONFIGURATION_ZONE to avoid
-defines prefixed with "CONFIG".
+But it has my Reviewed-by, which is equivalent. Please take it via
+crypto with the driver change.
 
-No functional change.
-
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
----
-Herbert, David, please pick this clean-up work into your crypto tree. Thanks.
-
- drivers/crypto/atmel-i2c.c | 2 +-
- drivers/crypto/atmel-i2c.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 55bff1e13142..66e27f71e37e 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -59,7 +59,7 @@ void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
- 	 * Read the word from Configuration zone that contains the lock bytes
- 	 * (UserExtra, Selector, LockValue, LockConfig).
- 	 */
--	cmd->param1 = CONFIG_ZONE;
-+	cmd->param1 = CONFIGURATION_ZONE;
- 	cmd->param2 = cpu_to_le16(DEVICE_LOCK_ADDR);
- 	cmd->count = READ_COUNT;
- 
-diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index 35f7857a7f7c..c1fdc04eac07 100644
---- a/drivers/crypto/atmel-i2c.h
-+++ b/drivers/crypto/atmel-i2c.h
-@@ -63,7 +63,7 @@ struct atmel_i2c_cmd {
- #define STATUS_WAKE_SUCCESSFUL		0x11
- 
- /* Definitions for eeprom organization */
--#define CONFIG_ZONE			0
-+#define CONFIGURATION_ZONE		0
- 
- /* Definitions for Indexes common to all commands */
- #define RSP_DATA_IDX			1 /* buffer index of data in response */
--- 
-2.17.1
+Best regards,
+Krzysztof
 
