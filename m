@@ -2,124 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 077D9C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 16:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5299AC54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 16:08:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbjAMQGC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Jan 2023 11:06:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
+        id S229957AbjAMQIH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Jan 2023 11:08:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjAMQFU (ORCPT
+        with ESMTP id S230077AbjAMQHo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2023 11:05:20 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDFC43DA2;
-        Fri, 13 Jan 2023 07:58:00 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30DEdU18011808;
-        Fri, 13 Jan 2023 15:57:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CUAZX3R8Ar8CybdDlVVmgMlNlnQOFlAHQejDsqAJRyQ=;
- b=D4pekrL3+kU4AfqL73eztlVqFfkr6zb9nNFAhXaw/m2/cN7/g/lVUtLGos3zjYIhwFJw
- uwJMBN2sSPnT1zOiup3UzZWGQsOp2yZRyHB95+Bhh4OXoRDHY5V6WfVK7Tc8O0DBWYNH
- nzqdgMOWGt7eeKsrbC6dkmO9wQykoaJsdnDMVRVYIkoz5Iz6nYDPMG3fq+Jk2IZLNrIG
- i9HwaITcwNY1ESVTxe4iNsCtAB/7LuIOpOWFpc80E1Y1Z6DXuY+LWPh6Qe7KOwK51ONp
- xrslZsB6mGy9aO9ZpiDQCKAEJjAnhDUV8Gv02dvPlDLF10Z35JTFIjXlYhbdHqoHFyXw og== 
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n38uh2huf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Jan 2023 15:57:49 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30DFUEZp029149;
-        Fri, 13 Jan 2023 15:57:49 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([9.208.129.114])
-        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3n1m03mf3j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Jan 2023 15:57:48 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30DFvl4R55247220
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Jan 2023 15:57:47 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 984D258054;
-        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28C705805D;
-        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
-Received: from [9.163.65.152] (unknown [9.163.65.152])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Jan 2023 15:57:47 +0000 (GMT)
-Message-ID: <84ed2129-4bef-4b84-5d79-f787f498031f@linux.ibm.com>
-Date:   Fri, 13 Jan 2023 09:57:46 -0600
+        Fri, 13 Jan 2023 11:07:44 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76F0381D4F;
+        Fri, 13 Jan 2023 08:00:29 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E46401EC0657;
+        Fri, 13 Jan 2023 17:00:27 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1673625627;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=27o6Yp9lIyQ9qbRTNp3Mdd/CmshSTWD6HQz/gXlOA3o=;
+        b=e25h2q38vIHUR9CNYNMf4tXTOlOHI4G8rk4VVrsSmSLtK5pcWLoKu4BpzQjB4kuEIq3lg+
+        IsXSlOSBZ8LddYkmLkfbbsvYWLBHAbCUKnqKZnif4mdcYkpHnf//cFvKItev7lixW7KDtI
+        BAYLJEDGsUX250/UeZjiceJ21LbTllE=
+Date:   Fri, 13 Jan 2023 17:00:24 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
+        Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH RFC v7 07/64] KVM: SEV: Handle KVM_HC_MAP_GPA_RANGE
+ hypercall
+Message-ID: <Y8GAGB73ZKElDYPI@zn.tnic>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-8-michael.roth@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH v2 0/6] crypto: Accelerated AES/GCM stitched
- implementation
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com
-References: <20221205003458.4182-1-dtsen@linux.ibm.com>
- <Y8DaRph5Sv709m/m@gondor.apana.org.au>
-From:   Danny Tsen <dtsen@linux.ibm.com>
-In-Reply-To: <Y8DaRph5Sv709m/m@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zMJ_5q7aon6Nfy-reua4cUvbdStovn5e
-X-Proofpoint-ORIG-GUID: zMJ_5q7aon6Nfy-reua4cUvbdStovn5e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-13_06,2023-01-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 mlxlogscore=801 impostorscore=0 malwarescore=0 clxscore=1015
- mlxscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301130099
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-8-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Great.  Thanks Herbert.
+On Wed, Dec 14, 2022 at 01:39:59PM -0600, Michael Roth wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
+> 
+> KVM_HC_MAP_GPA_RANGE hypercall is used by the SEV guest to notify a
+> change in the page encryption status to the hypervisor.
+> 
+> The hypercall exits to userspace with KVM_EXIT_HYPERCALL exit code,
+> currently this is used for explicit memory conversion between
+> shared/private for memfd based private memory.
 
--Danny
+So Tom and I spent a while to figure out what this is doing...
 
-On 1/12/23 10:12 PM, Herbert Xu wrote:
-> On Sun, Dec 04, 2022 at 07:34:52PM -0500, Danny Tsen wrote:
->> This patch series enable an accelerated AES/GCM stitched implementation for
->> Power10+ CPU(ppc64le).  This module supports AEAD algorithm.  The stitched
->> implementation provides 3.5X+ better performance than the baseline.
->>
->> This patch has been tested with the kernel crypto module tcrypt.ko and has
->> passed the selftest.  The patch is also tested with
->> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled
->>
->> Danny Tsen (6):
->>    Patch1: Update Kconfig and Makefile.
->>    Patch2: Glue code for AES/GCM stitched implementation.
->>    Patch3: An accelerated AES/GCM stitched implementation.
->>    Patch4: Supporting functions for AES.
->>    Patch5: Supporting functions for ghash.
->>    Patch6: A perl script to process PowerPC assembler source.
->>
->>   arch/powerpc/crypto/Kconfig            |   11 +
->>   arch/powerpc/crypto/Makefile           |   10 +
->>   arch/powerpc/crypto/aesp8-ppc.pl       | 3846 ++++++++++++++++++++++++
->>   arch/powerpc/crypto/ghashp8-ppc.pl     |  370 +++
->>   arch/powerpc/crypto/p10-aes-gcm-glue.c |  345 +++
->>   arch/powerpc/crypto/p10_aes_gcm.S      | 1519 ++++++++++
->>   arch/powerpc/crypto/ppc-xlate.pl       |  229 ++
->>   7 files changed, 6330 insertions(+)
->>   create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
->>   create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
->>   create mode 100644 arch/powerpc/crypto/p10-aes-gcm-glue.c
->>   create mode 100644 arch/powerpc/crypto/p10_aes_gcm.S
->>   create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
->>
->> -- 
->> 2.31.1
-> All applied.  Thanks.
+Please explain in more detail what that is. Like the hypercall gets ignored for
+memslots which cannot be private...?
+
+And what's the story with supporting UPM with SEV{,-ES} guests?
+
+In general, this text needs more background and why this is being done.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
