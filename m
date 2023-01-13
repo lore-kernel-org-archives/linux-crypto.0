@@ -2,97 +2,223 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B43C54EBE
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Jan 2023 23:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD2DC63797
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 00:32:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233105AbjALX7t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 18:59:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52320 "EHLO
+        id S232713AbjAMAcq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 19:32:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238033AbjALX7n (ORCPT
+        with ESMTP id S232215AbjAMAcp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 18:59:43 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6C95D8AA
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 15:59:39 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id w3so21816973ply.3
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Jan 2023 15:59:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YOxGu9TF0QtV9czLWlRoi8MtO/LfBf5pI1clFeTOj3o=;
-        b=sWx4RBoGeV3nGFYmL0SgAWnfFH7s/pPAka7EdFUbaGzvI+oz9UpEJ/MkQDEtTuwnN9
-         ED2OZlG8Oc1Y/tAlmxByk1osBkmYbNDZFMdEVgbMyQt++/iBLJ77u1urNxwq5OA8Qe2C
-         ZaPFXwFSFeUAQdG0JVNbeWX1KowNmelNcdauSM80Wz6HXNDh+eHXCIADwF/s4SBEtZsg
-         NB8JEcUHOPgT6O1QpfqYNDcgT2v43qEUqY5N7+Ik5R11fF8nqgZdH87rpoLAmOLaJgVJ
-         Nd/bapu4YRQuYRTFv9grs7qrkxl9l4oxvL0f+tLxHwetZL0cliCw/l+jxF5dUthWAxKr
-         Sc1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YOxGu9TF0QtV9czLWlRoi8MtO/LfBf5pI1clFeTOj3o=;
-        b=kzWwq47iSKCD3ij+/uFWveT2mDWUT93V4eu1GUf83ZO9m9T2z/1xyDOCUS5rWNUab7
-         fPKB0KbbwP9UTd5jBsl4mIPZDl3QZE5IAoAhVifS/qm4jCr0d9Mk8XKmodMrA9L5ZiBu
-         ghnQfBLnq3E+e5A6ytBYsVw5VxyNHiyRercc+p1LUFAWgUEtJTfI00vXI87Bm5Uc1sRM
-         6anZYxILtOAAJxYFsKXbHXbEHNcV0KW6MFw0s8G+StFEjII9JH2mIOmHQys69M0B7tBd
-         HcvHF0nXwQVXlyzRrLvJVU0ZtQzT3SeuyeNjHPld9UL3IZ9CQtKmEnbaPp+Z1dluAVRW
-         EmTg==
-X-Gm-Message-State: AFqh2kq2tCall1VBbpDSfcr78r1lCDcpQwOWEhfhNMEyka4KRTiCcGQE
-        SK8g8vBrAdbg1juRWSwvujOlFGRDxW45O23s
-X-Google-Smtp-Source: AMrXdXtscQ7xEgomCamqZcZazKq6mWA71lXLjuymhU8awjVGmi4jnbBHrzR/XzGQnLoGXa4o7sltYw==
-X-Received: by 2002:a05:6a20:4284:b0:9d:b8e6:d8e5 with SMTP id o4-20020a056a20428400b0009db8e6d8e5mr1410949pzj.2.1673567978825;
-        Thu, 12 Jan 2023 15:59:38 -0800 (PST)
-Received: from [2620:15c:29:203:1f3b:d48c:199c:9f57] ([2620:15c:29:203:1f3b:d48c:199c:9f57])
-        by smtp.gmail.com with ESMTPSA id d4-20020a17090a8d8400b001fd6066284dsm11340564pjo.6.2023.01.12.15.59.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 15:59:38 -0800 (PST)
-Date:   Thu, 12 Jan 2023 15:59:37 -0800 (PST)
-From:   David Rientjes <rientjes@google.com>
-To:     Jarkko Sakkinen <jarkko@profian.com>
-cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5] crypto: ccp: Sanitize sev_platform_init() error
- messages
-In-Reply-To: <20230110191201.29666-1-jarkko@profian.com>
-Message-ID: <1a78beb1-bd63-ca70-6b05-bff45de842e5@google.com>
-References: <20230110191201.29666-1-jarkko@profian.com>
+        Thu, 12 Jan 2023 19:32:45 -0500
+Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718E960CC0;
+        Thu, 12 Jan 2023 16:32:43 -0800 (PST)
+Date:   Fri, 13 Jan 2023 00:32:31 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
+        s=protonmail; t=1673569960; x=1673829160;
+        bh=QX+nECwZN3I0sjACQskWunwGexAVyvI38tBRthUZqi8=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=5KEj8O1+DGoKU+C2si1N1Giub5/toyi24R26iaYxIFkLMkpVPn4XKOI78HMGmYRHo
+         zmJOUXI+9ZbEQf6NrdDN+gVejG9ZDq28X8n8kIcVBFbAhBpHQxuD0GneKtqXhqCOD5
+         O5MJIz8lFIlhW69TpRA9Plsbh1v2k+gPCX+8u3uBsnNFfAWnGki4Nw1/wjRqG7pWQB
+         0BMbVyJHEbA8bqTNuvf8gOC6CGUAKMyS6MQ8Jt/tzrJORiHyKkShoRzhEGrZ40k1YR
+         egR9KfaG+fIhqSejvzJlUpLot6yiWdEMnB9Pb3squKMILtobi1xjFcFueGd5yQ1Ym0
+         zBvn/puqVxSEg==
+To:     Yann Droneaud <ydroneaud@opteya.com>
+From:   Peter Lafreniere <peter@n8pjl.ca>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Florian Weimer <fweimer@redhat.com>,
+        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+        Carlos O'Donell <carlos@redhat.com>
+Subject: Re: [RFC PATCH 1/4] random: introduce getrandom() GRND_TIMESTAMP
+Message-ID: <u63qVsNp7euFAjiS_EUypV5P87i6gOl1BLX8cU8LQ7oHkzQVUxncjJhMb_4ybS574fV_buYZwDJDGFnFdREaQu44daEX7Pvednf-CXtPcJ0=@n8pjl.ca>
+In-Reply-To: <d890f9d03c2da1eef7bdf47e5b6f3d0b7e1afb3f.1673539719.git.ydroneaud@opteya.com>
+References: <cover.1673539719.git.ydroneaud@opteya.com> <d890f9d03c2da1eef7bdf47e5b6f3d0b7e1afb3f.1673539719.git.ydroneaud@opteya.com>
+Feedback-ID: 53133685:user:proton
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 10 Jan 2023, Jarkko Sakkinen wrote:
+[...]
 
-> The following functions end up calling sev_platform_init() or
-> __sev_platform_init_locked():
-> 
-> * sev_guest_init()
-> * sev_ioctl_do_pek_csr
-> * sev_ioctl_do_pdh_export()
-> * sev_ioctl_do_pek_import()
-> * sev_ioctl_do_pek_pdh_gen()
-> * sev_pci_init()
-> 
-> However, only sev_pci_init() prints out the failed command error code, and
-> even there, the error message does not specify which SEV command failed.
-> 
-> Address this by printing out the SEV command errors inside
-> __sev_platform_init_locked(), and differentiate between DF_FLUSH, INIT and
-> INIT_EX commands.  As a side-effect, @error can be removed from the
-> parameter list.
-> 
-> This extra information is particularly useful if firmware loading and/or
-> initialization is going to be made more robust, e.g. by allowing firmware
-> loading to be postponed.
-> 
-> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+>GRND_TIMESTAMP allows userspace to ask the kernel if previous
+>"timestamp" has changed as the result of an event that
+>triggered kernel CSPRNG reseed, and to update the "timestamp".
 
-Acked-by: David Rientjes <rientjes@google.com>
+>In case the "timestamp" hasn't changed, userspace CSPRNG can
+>consume a slice of its buffered random stream.
+
+>If it has changed, remaining userspace buffered random values
+>should be discarded. Userspace should call getrandom() to fill
+>and/or generate its buffer with updated seed.
+>It's advised to test again the "timestamp" to deal with the
+>race condition, where the kernel reseed just after the call
+>to getrandom() to get entropy.
+
+This second check is the 'safe thing' to do, but if you're that
+worried about race conditions then this api is useless. You can't
+ignore the inherent TOCTOU problem with the GRND_TIMESTAMP calls.
+
+That said, the race condition is so tiny that the added overhead
+of a third syscall (without vDSO support) starts to negate the
+value in buffering the random numbers (not to mention adding
+significant latency to every nth arc4random() call, for example).
+
+IMO, for callers that cannot accept the risk, the getrandom(,,0)
+option is the perfect alternative.
+
+[...]
+
+>+static ssize_t get_random_timestamp(char __user *ubuf, size_t len, unsign=
+ed int flags)
+>+{
+>+=09u64 ts;
+>+
+>+=09/* other combination not supported */
+>+=09if (WARN(flags !=3D GRND_TIMESTAMP, "GRND_TIMESTAMP cannot be used wit=
+h other flags"))
+>+=09=09return -EINVAL;
+
+If userspace messes up the flags then it's the problem of the
+caller. Why clutter the logs in that case?
+
+At the very least this should be WARN_ONCE() to avoid log spam.
+
+>+=09/* shorter structure not supported */
+>+=09if (len < sizeof(ts))
+>+=09=09return -EINVAL;
+
+This should be sizeof(u64) to match the vDSO patch and to avoid
+having to change this condition if ts becomes larger.
+
+>+
+>+=09if (copy_from_user(&ts, ubuf, sizeof(ts)))
+>+=09=09return -EFAULT;
+>+
+>+=09/* longer structure supported, only if 0-padded,
+>+=09   timestamp might be extended in the future with more fields */
+>+=09if (len > sizeof(ts)) {
+>+=09=09char __user *p =3D ubuf + sizeof(ts);
+>+=09=09size_t l =3D len - sizeof(ts);
+>+
+>+=09=09while (l) {
+>+=09=09=09char b;
+>+
+>+=09=09=09if (get_user(b, p++))
+>+=09=09=09=09return -EFAULT;
+>+
+>+=09=09=09if (b)
+>+=09=09=09=09return -EINVAL;
+>+=09=09}
+>+=09}
+>+
+>+=09if (!get_random_timestamp_update(&ts, READ_ONCE(base_crng.generation))=
+)
+>+=09=09return 0;
+>+
+>+=09if (copy_to_user(ubuf, &ts, sizeof(ts)))
+>+=09=09return -EFAULT;
+>+
+>+=09return sizeof(ts);
+>+}
+>+
+> SYSCALL_DEFINE3(getrandom, char __user *, ubuf, size_t, len, unsigned int=
+, flags)
+> {
+> =09struct iov_iter iter;
+> =09struct iovec iov;
+> =09int ret;
+>
+>-=09if (flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE))
+>+=09if (flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE | GRND_TIMES=
+TAMP))
+> =09=09return -EINVAL;
+>
+>+=09if (unlikely(flags & GRND_TIMESTAMP))
+>+=09=09return get_random_timestamp(ubuf, len, flags);
+>+
+
+I'd remove the unlikely(). I don't like to assume usage patterns.
+
+> =09/*
+> =09 * Requesting insecure and blocking randomness at the same time makes
+> =09 * no sense.
+>diff --git a/include/linux/random.h b/include/linux/random.h
+>index b0a940af4fff..bc219b5a96a5 100644
+>--- a/include/linux/random.h
+>+++ b/include/linux/random.h
+>@@ -161,4 +161,35 @@ int random_online_cpu(unsigned int cpu);
+> extern const struct file_operations random_fops, urandom_fops;
+> #endif
+>
+>+/*
+>+ * get_random_timestamp_update()
+>+ *
+>+ * @generation: current CRNG generation (from base_crng.generation
+>+ *              or _vdso_rng_data.generation)
+>+ *
+>+ * Return: timestamp size if previous timestamp is expired and is updated=
+,
+>+ *         0 if not expired (and not updated)
+>+ */
+>+static inline bool get_random_timestamp_update(u64 *user_ts,
+>+=09=09=09=09=09       u64 generation)
+>+{
+>+=09u64 ts;
+>+
+>+=09/* base_crng.generation is never ULONG_MAX,
+>+=09 * OTOH userspace will initialize its timestamp
+>+=09 * to 0, so inverting base_crng.generation ensure
+>+=09 * first call to getrandom(,,GRND_TIMESTAMP) will
+>+=09 * update
+>+=09 */
+
+Rather than assuming that the timestamp will start zero-initilized,
+expect it to be uninitilized. Either way the code works.
+
+>+=09ts =3D ~generation;
+>+
+>+=09/* not expired ? no refresh suggested */
+>+=09if (*user_ts =3D=3D ts)
+>+=09=09return false;
+>+
+>+=09*user_ts =3D ts;
+>+
+>+=09return true;
+>+}
+>+
+
+Not that it matters much, but you could make generation a u64* that
+gets dereferenced by get_random_timestamp_update(). It's cleaner for
+the caller, barely changes this function, and will get inlined anyway.
+I might just be imposing my personal style in this case though.
+
+After a cursory skimming of the rest of the series I think that this
+is a worthwhile direction to pursue. Jason's series is growing bulky
+and this provides the needed slimming while solving the root problem.
+
+The only thing I see immediately is the TOCTOU problem and the extra
+steps needed to guarantee forward secrecy.
+
+I should mention that I'm not a security or rng expert at all.
+
+Cheers,
+Peter Lafreniere
+<peter@n8pjl.ca>
+
+
