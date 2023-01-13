@@ -2,94 +2,139 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8D3C54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 01:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDB6C63797
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 02:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240540AbjAMBai (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 20:30:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36768 "EHLO
+        id S232888AbjAMCbC convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 21:31:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240248AbjAMBag (ORCPT
+        with ESMTP id S232586AbjAMCbA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 20:30:36 -0500
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EAA5DE58;
-        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-15bb8ec196aso9109819fac.3;
-        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BHEg0Tu4T0FTdfDnr1uHsTuZiO21FEsCK3FYFxVcWdA=;
-        b=wRYxH+oyrHEQ8iJvNvnAxdscEzH5SQBvgEUZ0Kn+Te7FijriZMe8XFsHFsTruBbUx+
-         DujYXqfWZGgViyoV3+5yDxTiuZW6wBlnxRD5BGmgqJQv/pk0R4TaIEUSk45XCX4xa+T2
-         z2AHQF/AaLfPsuki0mk3ttGGhbJm/uiwxQfELtfdgTpS8k+BXZBTBKXmCT9XCNAl4XNU
-         tETuB5FKfgP2Lrch3X4RbJA55h5ewBiSJar5eUYYeZarBmUtPVECRyTQU2AL47ZtaGHC
-         nWLMaP3qs4Hw+PvB4OaCksBonYke6aVLY1ZwOET4YMqnNkkAjZYVuUheXFl4Hw2hSKOi
-         abWQ==
-X-Gm-Message-State: AFqh2ko8xWvYFh0YUDHUYGyXc14BMrOshve8spESH01HCI7bD7jI+mgI
-        EAd8Qyl84mRD6VRMTkNXGA==
-X-Google-Smtp-Source: AMrXdXu/Y+DQPo4vCrgC2MrR0FQ8VB5gdtOfweqbYceUwefQolDBA2xCqxSt8+XnoA9uaACqeriVOw==
-X-Received: by 2002:a05:6871:4408:b0:14f:9e41:7dbe with SMTP id nd8-20020a056871440800b0014f9e417dbemr4578946oab.10.1673573435159;
-        Thu, 12 Jan 2023 17:30:35 -0800 (PST)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id m26-20020a4abc9a000000b004a0aac2d28fsm9025181oop.35.2023.01.12.17.30.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 17:30:34 -0800 (PST)
-Received: (nullmailer pid 589937 invoked by uid 1000);
-        Fri, 13 Jan 2023 01:30:34 -0000
-Date:   Thu, 12 Jan 2023 19:30:34 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
+        Thu, 12 Jan 2023 21:31:00 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9355133A;
+        Thu, 12 Jan 2023 18:30:58 -0800 (PST)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 3DEEB24E115;
+        Fri, 13 Jan 2023 10:30:56 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 13 Jan
+ 2023 10:30:56 +0800
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 13 Jan
+ 2023 10:30:55 +0800
+Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
+ EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
+ 15.00.1497.044; Fri, 13 Jan 2023 10:30:55 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+To:     Conor Dooley <conor@kernel.org>
+CC:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: Let STM32 define Ux500 HASH
-Message-ID: <167357343355.589882.8533297538415386387.robh@kernel.org>
-References: <20221227-ux500-stm32-hash-v2-0-bc443bc44ca4@linaro.org>
- <20221227-ux500-stm32-hash-v2-1-bc443bc44ca4@linaro.org>
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: RE: [PATCH v4 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
+Thread-Topic: [PATCH v4 2/3] hwrng: starfive - Add TRNG driver for StarFive
+ SoC
+Thread-Index: AQHZJj/IHp8vIBNNJEO5ZoaN+GosV66aoj2AgADzXNA=
+Date:   Fri, 13 Jan 2023 02:30:55 +0000
+Message-ID: <82979ef41b4a4c9f8a77c950e3c65c86@EXMBX168.cuchost.com>
+References: <20230112043812.150393-1-jiajie.ho@starfivetech.com>
+ <20230112043812.150393-3-jiajie.ho@starfivetech.com> <Y8Bco7lBBj7CO9C5@spud>
+In-Reply-To: <Y8Bco7lBBj7CO9C5@spud>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [202.190.108.220]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221227-ux500-stm32-hash-v2-1-bc443bc44ca4@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On Tue, 10 Jan 2023 20:19:12 +0100, Linus Walleij wrote:
-> This adds device tree bindings for the Ux500 HASH block
-> as a compatible in the STM32 HASH bindings.
+> > +STARFIVE TRNG DRIVER
+> > +M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
+> > +S:	Maintained
+> > +F:	Documentation/devicetree/bindings/rng/starfive*
+> > +F:	drivers/char/hw_random/starfive-trng.c
 > 
-> The Ux500 HASH binding has been used for ages in the kernel
-> device tree for Ux500 but was never documented, so fill in
-> the gap by making it a sibling of the STM32 HASH block,
-> which is what it is.
-> 
-> The relationship to the existing STM32 HASH block is pretty
-> obvious when looking at the register map, and I have written
-> patches to reuse the STM32 HASH driver on the Ux500.
-> 
-> The main difference from the outside is that the Ux500 HASH
-> lacks the interrupt line, so some special if-clauses are
-> needed to accomodate this in the binding.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> ChangeLog v1->v2:
-> - Use an else construction instead of if/if not.
-> ---
->  .../devicetree/bindings/crypto/st,stm32-hash.yaml  | 23 +++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
+> minor nit (so don't submit another version just to fix this):
+> This should be Supported, no?
 > 
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Hi Conor, 
+I'll update this in next version together with other comments below. 
+
+> > diff --git a/drivers/char/hw_random/Makefile
+> > b/drivers/char/hw_random/Makefile index 3e948cf04476..f68ac370847f
+> > 100644
+> > --- a/drivers/char/hw_random/Makefile
+> > +++ b/drivers/char/hw_random/Makefile
+> > @@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-
+> trng.o
+> >  obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
+> >  obj-$(CONFIG_HW_RANDOM_CN10K) += cn10k-rng.o
+> >  obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) += mpfs-rng.o
+> > +obj-$(CONFIG_HW_RANDOM_STARFIVE) += starfive-trng.o
+> 
+> Is "STARFIVE" a bit too general of a name here and in the Kconfig entry?
+> I don't have a TRM for the JH7100, but this name (and the Kconfig text)
+> would give me the impression that I can use it there too.
+> Does this driver support both?
+> 
+
+7100 uses a different trng module but this same generator might be used in
+future products, so I left it generic. Would it be better to specify the product?
+
+> > +static int starfive_trng_probe(struct platform_device *pdev)
+[...]
+> > +	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+> > +	if (ret) {
+> > +		dev_err_probe(&pdev->dev, ret, "Failed to register
+> hwrng\n");
+> > +		goto err_fail_register;
+> > +	}
+> > +
+> > +	pm_runtime_use_autosuspend(&pdev->dev);
+> > +	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
+> 
+> > +	pm_runtime_enable(&pdev->dev);
+> 
+> > +
+> > +	return 0;
+> > +
+> > +err_fail_register:
+> 
+> > +	pm_runtime_disable(&pdev->dev);
+> 
+> This was only enabled after the only goto for this label, does it serve a
+> purpose?
+> I know little about runtime PM, it just caught my eye.
+> I looked at the other rng drivers that had calls to pm_runtime_enable(), but
+> they all seem to do their pm enablement _before_ calling hwrng_register().
+> Again, I am not familiar with runtime PM, but curious why you are doing
+> things differently, that's all.
+
+It does make more sense to move pm_runtime_enable before registering the
+generator to align with codes in the goto label.
+I'll fix this part.
+
+Thanks again for reviewing the patches.
+
+Best regards,
+Jia Jie
+
+
