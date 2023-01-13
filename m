@@ -2,59 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A7EC54EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 02:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D1DC54EBD
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Jan 2023 03:52:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbjAMCiC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Jan 2023 21:38:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57978 "EHLO
+        id S231416AbjAMDwB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Jan 2023 22:52:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbjAMCiB (ORCPT
+        with ESMTP id S232178AbjAMDvv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Jan 2023 21:38:01 -0500
+        Thu, 12 Jan 2023 22:51:51 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8BCFE7;
-        Thu, 12 Jan 2023 18:38:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9425C1DD;
+        Thu, 12 Jan 2023 19:51:48 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pG9wo-00H4Bl-SR; Fri, 13 Jan 2023 10:37:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jan 2023 10:37:38 +0800
-Date:   Fri, 13 Jan 2023 10:37:38 +0800
+        id 1pGB6E-00H55C-R8; Fri, 13 Jan 2023 11:51:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Jan 2023 11:51:26 +0800
+Date:   Fri, 13 Jan 2023 11:51:26 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Robert Elliott <elliott@hpe.com>, davem@davemloft.net,
-        Jason@zx2c4.com, ardb@kernel.org, ap420073@gmail.com,
-        David.Laight@aculab.com, tim.c.chen@linux.intel.com,
-        peter@n8pjl.ca, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
- loops
-Message-ID: <Y8DD8s9nakxW5zzE@gondor.apana.org.au>
-References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-4-elliott@hpe.com>
- <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
- <Y8BVkjwPc6DLm7HT@sol.localdomain>
- <Y8DDmBg6J31pS0KW@gondor.apana.org.au>
+To:     Samuel Holland <samuel@sholland.org>
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH v2 1/3] dt-bindings: crypto: sun8i-ce: Add compatible for
+ D1
+Message-ID: <Y8DVPvnfShdhlVHh@gondor.apana.org.au>
+References: <20221231220146.646-1-samuel@sholland.org>
+ <20221231220146.646-2-samuel@sholland.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y8DDmBg6J31pS0KW@gondor.apana.org.au>
+In-Reply-To: <20221231220146.646-2-samuel@sholland.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 13, 2023 at 10:36:08AM +0800, Herbert Xu wrote:
->
-> Perhaps we should just convert any users that trigger these warnings
-> over to ahash? The shash interface was never meant to process large
-> amounts of data anyway.
+On Sat, Dec 31, 2022 at 04:01:43PM -0600, Samuel Holland wrote:
+> D1 has a crypto engine similar to the one in other Allwinner SoCs.
+> Like H6, it has a separate MBUS clock gate.
+> 
+> It also requires the internal RC oscillator to be enabled for the TRNG
+> to return data, presumably because noise from the oscillator is used as
+> an entropy source. This is likely the case for earlier variants as well,
+> but it really only matters for H616 and newer SoCs, as H6 provides no
+> way to disable the internal oscillator.
+> 
+> Signed-off-by: Samuel Holland <samuel@sholland.org>
+> ---
+> I noticed that the vendor driver has code to explicitly enable IOSC when
+> using the TRNG on A83T (search SS_TRNG_OSC_ADDR), but that is covered by
+> a different binding/driver in mainline.
+> 
+> Changes in v2:
+>  - Add TRNG clock
+> 
+>  .../bindings/crypto/allwinner,sun8i-ce.yaml   | 33 ++++++++++++++-----
+>  1 file changed, 25 insertions(+), 8 deletions(-)
 
-We could even add some length checks in shash to ensure that
-all large updates fail with a big bright warning once the existing
-users have been converted.
+This doesn't have an ack from Rob Herring.  Would you like me
+to apply just the crypto patch by itself?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
