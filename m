@@ -2,126 +2,302 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2372C54EBE
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Jan 2023 02:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2165FC677F1
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Jan 2023 19:47:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231224AbjANCW5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Jan 2023 21:22:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47450 "EHLO
+        id S230335AbjANTrw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 14 Jan 2023 14:47:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229883AbjANCW4 (ORCPT
+        with ESMTP id S230260AbjANTrt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Jan 2023 21:22:56 -0500
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A730F8BAAC;
-        Fri, 13 Jan 2023 18:22:54 -0800 (PST)
-Received: from [IPV6:2601:646:8600:40c1:5967:deb4:a714:2940] ([IPv6:2601:646:8600:40c1:5967:deb4:a714:2940])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 30E2MVvU2813069
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Fri, 13 Jan 2023 18:22:32 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 30E2MVvU2813069
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023010601; t=1673662954;
-        bh=KJ0MZzQf9nWc/obRK9dCTOC8sETJ1kHQc75kDMqlTBA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=cRRm4dYbxsq/napYdd6xvhdJPhYBBTgvvGCl5dMR0yZHP5i923R/3VDa+DROd60Jt
-         pVdcGhluvg+8P7sH/bF9whe9UCT5l0zNTB1svMwvwctHkCDGgMr/ndhtxAAk92rvaD
-         G9GhkoIQTyPVFzUkYEgo0vtLSVLzIls/uVdViCo2c/nKpIWb9C5PCl3YrJX9Vfslx5
-         gCwZYm8Fo3zLXhMubFRjo/81xWNF+4Xchk1LJ5ydDGD/DuWr1olJzJLK6eG/60VJFx
-         FigTINyjp94lsHXR86iImeQ7YvB9Dp9EUqT0h0ddAujw4FNWc2B/HOvZ9S9l90Afyi
-         JNAbqQk+IUiNA==
-Message-ID: <585ddb35-adc5-f5cf-4db3-27571f394108@zytor.com>
-Date:   Fri, 13 Jan 2023 18:22:26 -0800
+        Sat, 14 Jan 2023 14:47:49 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA011A5C9;
+        Sat, 14 Jan 2023 11:47:48 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DA52F60ADD;
+        Sat, 14 Jan 2023 19:47:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DA54C433D2;
+        Sat, 14 Jan 2023 19:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673725667;
+        bh=gMU2qV2VgM+YENiKJhH+abvn4ddBqKL0P0RzB5p/M9M=;
+        h=From:To:Cc:Subject:Date:From;
+        b=J80B8qRk5QOTG8JqtnwvGlTRxhA2TlX3aGgUGykutFA28xkS1L79HoIMWUQtYDCTj
+         dCd/689zlAuf5mMLONRyOIcLBGJAawuKZj0GNZM0DDyfIiv63g6cOGVUdPbGjzGOeK
+         43nrrY1DnPSIiCsMQ1mdGBgd09ZbU7hmOt/yvu59q2hP3l8M/NAyQ9o/F9B/CQK0on
+         fE3yWz8n685HzaXhQIOLWmaeEhVdi+exUo8YNDBbMl6cPP11Fb39GIRiU/kHrDNDvZ
+         HNsfKIJOXgJf6U3sjs1605a6/2LOgx2m45e2P4jaM8tXl63pcbaHE+AD8eIJbaVA1T
+         Q5DrM4P1UlMBg==
+From:   SeongJae Park <sj@kernel.org>
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     SeongJae Park <sj@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Iwona Winiarska <iwona.winiarska@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
+        openbmc@lists.ozlabs.org, alsa-devel@alsa-project.org,
+        linux-watchdog@vger.kernel.org
+Subject: [PATCH 1/2] Docs/subsystem-apis: Remove '[The ]Linux' prefixes from titles of listed documents
+Date:   Sat, 14 Jan 2023 19:47:40 +0000
+Message-Id: <20230114194741.115855-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH 0/4] random: a simple vDSO mechanism for reseeding
- userspace CSPRNGs
-Content-Language: en-US
-To:     Yann Droneaud <ydroneaud@opteya.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Florian Weimer <fweimer@redhat.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        "Carlos O'Donell" <carlos@redhat.com>
-References: <CAHmME9oXB8=jUz98tv6k1xS+ELaRmgartoT6go_1axhH1L-HJg@mail.gmail.com>
- <cover.1673539719.git.ydroneaud@opteya.com>
- <ae35afa5b824dc76c5ded98efcabc117e6dd3d70@opteya.com>
-From:   "H. Peter Anvin" <hpa@zytor.com>
-In-Reply-To: <ae35afa5b824dc76c5ded98efcabc117e6dd3d70@opteya.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/12/23 11:55, Yann Droneaud wrote:
-> Hi
-> 
-> 12 janvier 2023 à 18:07 "Jason A. Donenfeld" <Jason@zx2c4.com> a écrit:
->   
->> Sorry Yann, but I'm not interested in this approach, and I don't think
->> reviewing the details of it are a good allocation of time. I don't
->> want to lock the kernel into having specific reseeding semantics that
->> are a contract with userspace, which is what this approach does.
-> 
-> This patch adds a mean for the kernel to tell userspace: between the
-> last time you call us with getrandom(timestamp,, GRND_TIMESTAMP),
-> something happened that trigger an update to the opaque cookie given
-> to getrandom(timestamp, GRND_TIMESTAMP). When such update happen,
-> userspace is advised to discard buffered random data and retry.
-> 
-> The meaning of the timestamp cookie is up to the kernel, and can be
-> changed anytime. Userspace is not expected to read the content of this
-> blob. Userspace only acts on the length returned by getrandom(,, GRND_TIMESTAMP):
->   -1 : not supported
->    0 : cookie not updated, no need to discard buffered data
->   >0 : cookie updated, userspace should discard buffered data
-> 
-> For the cookie, I've used a single u64, but two u64 could be a better start,
-> providing room for implementing improved behavior in future kernel versions.
-> 
->> Please just let me iterate on my original patchset for a little bit,
->> without adding more junk to the already overly large conversation.
-> 
-> I like the simplicity of my so called "junk". It's streamlined, doesn't
-> require a new syscall, doesn't require a new copy of ChaCha20 code.
-> 
-> I'm sorry it doesn't fit your expectations.
-> 
+Some documents that listed on subsystem-apis have 'Linux' or 'The Linux'
+title prefixes.  It's duplicated information, and makes finding the
+document of interest with human eyes not easy.  Remove the prefixes from
+the titles.
 
-Why would anything more than a 64-bit counter be ever necessary? It only 
-needs to be incremented.
+Signed-off-by: SeongJae Park <sj@kernel.org>
+---
+ Documentation/PCI/index.rst        | 6 +++---
+ Documentation/cpu-freq/index.rst   | 6 +++---
+ Documentation/crypto/index.rst     | 6 +++---
+ Documentation/driver-api/index.rst | 6 +++---
+ Documentation/gpu/index.rst        | 6 +++---
+ Documentation/hwmon/index.rst      | 6 +++---
+ Documentation/input/index.rst      | 6 +++---
+ Documentation/mm/index.rst         | 6 +++---
+ Documentation/peci/index.rst       | 6 +++---
+ Documentation/scheduler/index.rst  | 6 +++---
+ Documentation/scsi/index.rst       | 6 +++---
+ Documentation/sound/index.rst      | 6 +++---
+ Documentation/virt/index.rst       | 6 +++---
+ Documentation/watchdog/index.rst   | 6 +++---
+ 14 files changed, 42 insertions(+), 42 deletions(-)
 
-Let user space manage keeping track of the cookie matching its own 
-buffers. You do NOT want this to be stateful, because that's just 
-begging for multiple libraries to step on each other.
+diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
+index c17c87af1968..e73f84aebde3 100644
+--- a/Documentation/PCI/index.rst
++++ b/Documentation/PCI/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-=======================
+-Linux PCI Bus Subsystem
+-=======================
++=================
++PCI Bus Subsystem
++=================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/cpu-freq/index.rst b/Documentation/cpu-freq/index.rst
+index 2fe32dad562a..de25740651f7 100644
+--- a/Documentation/cpu-freq/index.rst
++++ b/Documentation/cpu-freq/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-==============================================================================
+-Linux CPUFreq - CPU frequency and voltage scaling code in the Linux(TM) kernel
+-==============================================================================
++========================================================================
++CPUFreq - CPU frequency and voltage scaling code in the Linux(TM) kernel
++========================================================================
+ 
+ Author: Dominik Brodowski  <linux@brodo.de>
+ 
+diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+index 21338fa92642..da5d5ad2bdf3 100644
+--- a/Documentation/crypto/index.rst
++++ b/Documentation/crypto/index.rst
+@@ -1,6 +1,6 @@
+-=======================
+-Linux Kernel Crypto API
+-=======================
++==========
++Crypto API
++==========
+ 
+ :Author: Stephan Mueller
+ :Author: Marek Vasut
+diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
+index d3a58f77328e..b208e0dac3a0 100644
+--- a/Documentation/driver-api/index.rst
++++ b/Documentation/driver-api/index.rst
+@@ -1,6 +1,6 @@
+-========================================
+-The Linux driver implementer's API guide
+-========================================
++==============================
++Driver implementer's API guide
++==============================
+ 
+ The kernel offers a wide variety of interfaces to support the development
+ of device drivers.  This document is an only somewhat organized collection
+diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
+index b99dede9a5b1..eee5996acf2c 100644
+--- a/Documentation/gpu/index.rst
++++ b/Documentation/gpu/index.rst
+@@ -1,6 +1,6 @@
+-==================================
+-Linux GPU Driver Developer's Guide
+-==================================
++============================
++GPU Driver Developer's Guide
++============================
+ 
+ .. toctree::
+ 
+diff --git a/Documentation/hwmon/index.rst b/Documentation/hwmon/index.rst
+index fe2cc6b73634..c2b3c1a822dd 100644
+--- a/Documentation/hwmon/index.rst
++++ b/Documentation/hwmon/index.rst
+@@ -1,6 +1,6 @@
+-=========================
+-Linux Hardware Monitoring
+-=========================
++===================
++Hardware Monitoring
++===================
+ 
+ .. toctree::
+    :maxdepth: 1
+diff --git a/Documentation/input/index.rst b/Documentation/input/index.rst
+index 9888f5cbf6d5..35581cd18e91 100644
+--- a/Documentation/input/index.rst
++++ b/Documentation/input/index.rst
+@@ -1,6 +1,6 @@
+-=============================
+-The Linux Input Documentation
+-=============================
++===================
++Input Documentation
++===================
+ 
+ Contents:
+ 
+diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
+index 4aa12b8be278..5a94a921ea40 100644
+--- a/Documentation/mm/index.rst
++++ b/Documentation/mm/index.rst
+@@ -1,6 +1,6 @@
+-=====================================
+-Linux Memory Management Documentation
+-=====================================
++===============================
++Memory Management Documentation
++===============================
+ 
+ Memory Management Guide
+ =======================
+diff --git a/Documentation/peci/index.rst b/Documentation/peci/index.rst
+index 989de10416e7..930e75217c33 100644
+--- a/Documentation/peci/index.rst
++++ b/Documentation/peci/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0-only
+ 
+-====================
+-Linux PECI Subsystem
+-====================
++==============
++PECI Subsystem
++==============
+ 
+ .. toctree::
+ 
+diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
+index b430d856056a..1aac972a652f 100644
+--- a/Documentation/scheduler/index.rst
++++ b/Documentation/scheduler/index.rst
+@@ -1,6 +1,6 @@
+-===============
+-Linux Scheduler
+-===============
++=========
++Scheduler
++=========
+ 
+ .. toctree::
+     :maxdepth: 1
+diff --git a/Documentation/scsi/index.rst b/Documentation/scsi/index.rst
+index 7c5f5f8f614e..919f3edfe1bf 100644
+--- a/Documentation/scsi/index.rst
++++ b/Documentation/scsi/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-====================
+-Linux SCSI Subsystem
+-====================
++==============
++SCSI Subsystem
++==============
+ 
+ .. toctree::
+    :maxdepth: 1
+diff --git a/Documentation/sound/index.rst b/Documentation/sound/index.rst
+index 4d7d42acf6df..5abed5fc6485 100644
+--- a/Documentation/sound/index.rst
++++ b/Documentation/sound/index.rst
+@@ -1,6 +1,6 @@
+-===================================
+-Linux Sound Subsystem Documentation
+-===================================
++=============================
++Sound Subsystem Documentation
++=============================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/virt/index.rst b/Documentation/virt/index.rst
+index 56e003ff28ff..7fb55ae08598 100644
+--- a/Documentation/virt/index.rst
++++ b/Documentation/virt/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-============================
+-Linux Virtualization Support
+-============================
++======================
++Virtualization Support
++======================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/watchdog/index.rst b/Documentation/watchdog/index.rst
+index c177645081d8..4603f2511f58 100644
+--- a/Documentation/watchdog/index.rst
++++ b/Documentation/watchdog/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-======================
+-Linux Watchdog Support
+-======================
++================
++Watchdog Support
++================
+ 
+ .. toctree::
+     :maxdepth: 1
+-- 
+2.25.1
 
-Export the cookie from the vdso and volià, a very cheap check around any 
-user space randomness buffer will work:
-
-	static clone_cookie_t last_cookie;
-	clone_cookie_t this_cookie;
-
-	this_cookie = get_clone_cookie();
-	do {
-		while (this_cookie != last_cookie) {
-			last_cookie = this_cookie;
-			reinit_randomness();
-			this_cookie = get_clone_cookie();
-		}
-
-		extract_randomness_from_buffer();
-		this_cookie = get_clone_cookie();
-	} while (this_cookie != last_cookie);
-
-	last_cookie = this_cookie;
-
-	-hpa
