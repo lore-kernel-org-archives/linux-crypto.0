@@ -2,98 +2,182 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AC1C63797
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Jan 2023 12:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F86C67871
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Jan 2023 15:36:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231317AbjAOMQN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Jan 2023 07:16:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46158 "EHLO
+        id S231379AbjAOPgT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Jan 2023 10:36:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbjAOMQL (ORCPT
+        with ESMTP id S231214AbjAOPgS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Jan 2023 07:16:11 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AEFEC77
-        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 04:16:10 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id b9-20020a17090a7ac900b00226ef160dcaso26886809pjl.2
-        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 04:16:10 -0800 (PST)
+        Sun, 15 Jan 2023 10:36:18 -0500
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CE05B83;
+        Sun, 15 Jan 2023 07:36:17 -0800 (PST)
+Received: by mail-ot1-x332.google.com with SMTP id j16-20020a056830271000b0067202045ee9so14887309otu.7;
+        Sun, 15 Jan 2023 07:36:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wohviZ5AvrjkuM7pQcDlfVJrclFly2Iud3REWsRmAw4=;
-        b=lY7pD+T5ac0vU7tN+oT3cgxBrTlrow27QBa+Ul+yDnwo4ujhty+UqIMla6wQh4uopA
-         fLdjIO/298xMCdgXYXH+755sNG07yPI29YYubpWXM+DG2Ejegv+d9yv/5uq6ejresUPQ
-         wPUoPF4dznYt7YVMz9m6PaLnTAxIfO26e8foeMXuZmiQVa7xoKb9SD3FXjG1Hko/YSaW
-         bcx+QG1E0JZGvhauEG3Q6r7Acnq7SA0R32MqsN0fuRcAjK51mHcbVW3cgVkrFlBsHq7+
-         d7rFXFqzTYMA/z1MaXzsx6EJpTzidg9jDuliX1ky7DEiPguf4YBJxj/Ek4Df4mbumQri
-         BAww==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pRCLnfO5D50aLUIqRH3Be5ElBGG7mevjFvkDgjByEkg=;
+        b=ESYN/lgtsCJz1vk5hIWF8P0XT3zE4HOkfbCef61dEh9nfpUszGpqaILDdbRYwRpBaS
+         Gq0n3cdms6iw0aRSFDJpioaByPmQbKCQP0DMmTGvyCsapfKPYKjs4KTwwNR87Zitspdn
+         tniK5INo56zs/GSaaJc39/v4ceiIJC1pB59guwU6dk/ST7wHrW1GsjBxDt0fMLpUe9Og
+         1v9Whb4AApgIKVhjQbVH2MHL30mD29abfoMS+VPtLoheVkY7LhOupZe8UcHafZllZEmR
+         Q02XH5CuaiXHw9on84tyYVxbzt6ZWhdpxJ/RGI0Gk5dJ5RFTO2+nukuT+lKm/LaCi8GD
+         Tvcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wohviZ5AvrjkuM7pQcDlfVJrclFly2Iud3REWsRmAw4=;
-        b=gAnGsypLhhCp1NGBEPGsDvzL/1my3+TOO8KZhr08qWIAqWRYn2TsSsVByinJrXWmLk
-         GZHow2Bu9s6ydybHhpooYMuFGZ1d9j+ge/fubYpOfmBQg0jx1cP1KXBD0V1JxkOrJiVA
-         d041XLXGqU3FgNJYGzExTltqp9jy+VnxnMaOhgkGAa8ikYMxWeFQRlmZUIUdsdrWTGLk
-         mGdcdxuYKcsCeLLzU8boZd7yu0KnzbKXsAkqxYcOrvUv7vAQhFch9UzoiToRzvryp5vd
-         m4ftbdvRoA2FX4wI2EWWRibOVHD0rj5ZS56A8wpwnrYz0+mHzhvm4EGDR03HMcnZ3Bs3
-         vgkQ==
-X-Gm-Message-State: AFqh2kpaRvNTRN13D3gRgCoebphDVPpIP+N6Jq4amM0h+Nc5hH3ytI5d
-        On1nq/BtKUfPedHAa2CE20yZqdlBSKo=
-X-Google-Smtp-Source: AMrXdXt4FAh+3/A863+VTauLOL/OD890p6vjJkx4xKG3mU4iSXKS8R9xQwU5CNQ9MhurdLHBFo+v9w==
-X-Received: by 2002:a17:90a:8a84:b0:229:3660:1759 with SMTP id x4-20020a17090a8a8400b0022936601759mr7866277pjn.25.1673784968666;
-        Sun, 15 Jan 2023 04:16:08 -0800 (PST)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id e13-20020a63e00d000000b00485cbedd34bsm14361783pgh.89.2023.01.15.04.16.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Jan 2023 04:16:07 -0800 (PST)
-From:   Taehee Yoo <ap420073@gmail.com>
-To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, x86@kernel.org
-Cc:     jbeulich@suse.com, ap420073@gmail.com
-Subject: [PATCH 3/3] crypto: x86/aria-avx15 - fix build failure with old binutils
-Date:   Sun, 15 Jan 2023 12:15:36 +0000
-Message-Id: <20230115121536.465367-4-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230115121536.465367-1-ap420073@gmail.com>
-References: <20230115121536.465367-1-ap420073@gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pRCLnfO5D50aLUIqRH3Be5ElBGG7mevjFvkDgjByEkg=;
+        b=g9f7Piy/Nq3PFywGEVd18+BFVQ/jYGX1rjf15FY+4/ZsQXR3JUOzNER+Nr/dyI2qqK
+         t0dlW65vbjI0IDyRgVfUEtEyQM8AFmMLMjT9CbadShDF2l8c13GPt3ANBv6UkjGS5WHq
+         LtenkYbMBb4+ipZy0V6N6XbZjg6Ku1c1VaYVIJ4bXqp3T5WMHNwNq1BaATKDkVutPFq6
+         MNZAtO3KdB6uaeLXDfoksNRnarhsMv2vxefCJ61+ICYmJ/VTgoKb2oxcNcKK+kv/mDXD
+         A6u9O6fRVDwF/u8O22CGHXYS9FzjEqKrMn8icCiirhgA56zBwVYAXt+RHj/7cLmh8lVq
+         QaOw==
+X-Gm-Message-State: AFqh2kpqpxwuVaqZTqlWgYBWAlX9LSol4gywmZC0biwr0sjd5Pyyrc35
+        Tq09VdHwZIX0WGG1AX7ic8ms9/QsdsQQtwGhCv4=
+X-Google-Smtp-Source: AMrXdXu/zET195jKhsFTVp5xxmwIScKWmACgEKUi1QrBdrbk6v28T2qMy0jJBHOkkSBc+MnjFZnNZuARMBSt9P0VdRA=
+X-Received: by 2002:a9d:489:0:b0:684:bedc:4f54 with SMTP id
+ 9-20020a9d0489000000b00684bedc4f54mr837621otm.233.1673796976794; Sun, 15 Jan
+ 2023 07:36:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230114194741.115855-1-sj@kernel.org> <20230114194741.115855-2-sj@kernel.org>
+In-Reply-To: <20230114194741.115855-2-sj@kernel.org>
+From:   Alex Deucher <alexdeucher@gmail.com>
+Date:   Sun, 15 Jan 2023 10:35:57 -0500
+Message-ID: <CADnq5_OUnkzoZcCdW0X-=gJsXSRgY=GLrbmfNj0geDCzL5a7eQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Docs: Add some missing SPDX license identifiers of
+ subsystem docs
+To:     SeongJae Park <sj@kernel.org>
+Cc:     Jonathan Corbet <corbet@lwn.net>, linux-hwmon@vger.kernel.org,
+        alsa-devel@alsa-project.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jean Delvare <jdelvare@suse.com>, linux-crypto@vger.kernel.org,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        linux-input@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The minimum version of binutils for kernel build is currently 2.23 and
-it doesn't support GFNI.
-So, it fails to build the aria-avx512 if the old binutils is used.
-aria-avx512 requires GFNI, so it should not be allowed to build if the
-old binutils is used.
-The AS_AVX512 and AS_GFNI are added to the Kconfig to disable build
-aria-avx512 if the old binutils is used.
+On Sat, Jan 14, 2023 at 2:48 PM SeongJae Park <sj@kernel.org> wrote:
+>
+> Some subsystem documents are missing SPDX license identifiers.  Add
+> those.
 
-Fixes: c970d42001f2 ("crypto: x86/aria - implement aria-avx512")
-Reported-by: Jan Beulich <jbeulich@suse.com>
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
- arch/x86/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It would be good to split this up per subsystem.
 
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 688e848f740d..9bbfd01cfa2f 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -325,7 +325,7 @@ config CRYPTO_ARIA_AESNI_AVX2_X86_64
- 
- config CRYPTO_ARIA_GFNI_AVX512_X86_64
- 	tristate "Ciphers: ARIA with modes: ECB, CTR (AVX512/GFNI)"
--	depends on X86 && 64BIT
-+	depends on X86 && 64BIT && AS_AVX512 && AS_GFNI
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_SIMD
- 	select CRYPTO_ALGAPI
--- 
-2.34.1
+>
+> Signed-off-by: SeongJae Park <sj@kernel.org>
+> ---
+>  Documentation/crypto/index.rst     | 2 ++
+>  Documentation/driver-api/index.rst | 2 ++
+>  Documentation/gpu/index.rst        | 2 ++
+>  Documentation/hwmon/index.rst      | 2 ++
+>  Documentation/input/index.rst      | 2 ++
+>  Documentation/mm/index.rst         | 2 ++
+>  Documentation/scheduler/index.rst  | 2 ++
+>  Documentation/sound/index.rst      | 2 ++
+>  8 files changed, 16 insertions(+)
+>
+> diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+> index da5d5ad2bdf3..95b0870e09b8 100644
+> --- a/Documentation/crypto/index.rst
+> +++ b/Documentation/crypto/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ==========
+>  Crypto API
+>  ==========
+> diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
+> index b208e0dac3a0..7a2584ab63c4 100644
+> --- a/Documentation/driver-api/index.rst
+> +++ b/Documentation/driver-api/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ==============================
+>  Driver implementer's API guide
+>  ==============================
+> diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
+> index eee5996acf2c..ff06a6b12c5e 100644
+> --- a/Documentation/gpu/index.rst
+> +++ b/Documentation/gpu/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 
+Most of the DRM code is MIT.  I'd expect this would be MIT as well.
+
+Alex
+
+> +
+>  ============================
+>  GPU Driver Developer's Guide
+>  ============================
+> diff --git a/Documentation/hwmon/index.rst b/Documentation/hwmon/index.rst
+> index c2b3c1a822dd..2186d732654f 100644
+> --- a/Documentation/hwmon/index.rst
+> +++ b/Documentation/hwmon/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ===================
+>  Hardware Monitoring
+>  ===================
+> diff --git a/Documentation/input/index.rst b/Documentation/input/index.rst
+> index 35581cd18e91..d60bf9cfe005 100644
+> --- a/Documentation/input/index.rst
+> +++ b/Documentation/input/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ===================
+>  Input Documentation
+>  ===================
+> diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
+> index 5a94a921ea40..c4e9fbacaf38 100644
+> --- a/Documentation/mm/index.rst
+> +++ b/Documentation/mm/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ===============================
+>  Memory Management Documentation
+>  ===============================
+> diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
+> index 1aac972a652f..ae0229f5a9cf 100644
+> --- a/Documentation/scheduler/index.rst
+> +++ b/Documentation/scheduler/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  =========
+>  Scheduler
+>  =========
+> diff --git a/Documentation/sound/index.rst b/Documentation/sound/index.rst
+> index 5abed5fc6485..7e67e12730d3 100644
+> --- a/Documentation/sound/index.rst
+> +++ b/Documentation/sound/index.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  =============================
+>  Sound Subsystem Documentation
+>  =============================
+> --
+> 2.25.1
+>
