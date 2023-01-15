@@ -2,161 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B07C677F1
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Jan 2023 19:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B93C46467
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Jan 2023 12:16:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230364AbjANTr5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Jan 2023 14:47:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34016 "EHLO
+        id S231283AbjAOMQC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Jan 2023 07:16:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230345AbjANTry (ORCPT
+        with ESMTP id S231229AbjAOMQB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Jan 2023 14:47:54 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D64DA5C9;
-        Sat, 14 Jan 2023 11:47:53 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 08284B80A36;
-        Sat, 14 Jan 2023 19:47:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1236C433D2;
-        Sat, 14 Jan 2023 19:47:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673725670;
-        bh=h5oj8uz2mcobJK2H+Hm87QzyJogghFxebdxYASXr6cM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KiDrcBr9xYYjYZegA2r59TFavCdH1lJzSKxoSZ6AnPCL95MfbvVcN/2vpGfdMQsPS
-         cEQ2xGXQikIXt/oa7BuEOV6UUTZwitOmkFZ/IQb+AHojukxeVTNXd7gT4AN+4AE5TF
-         xNB1KvHvAWsJJQiJjtrAHEfQ7gL3a2YeYtcoQ+/mKfhDWWwOGZOAOFuWdRRkKcBSR0
-         1oLifEXl8Pf53b4bHvQbdXl5r9PY9o9nUOziEzSMP57fwtK63MPFONd5i1qND5Tz2V
-         HfKNpJPuqhUU/n0FFCruuQnRLZajl/DjGHd0wL593NZ07RyNMpUnjrPASGFfUoszoq
-         wt6ROkuSivsgA==
-From:   SeongJae Park <sj@kernel.org>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     SeongJae Park <sj@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-hwmon@vger.kernel.org,
-        linux-input@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: [PATCH 2/2] Docs: Add some missing SPDX license identifiers of subsystem docs
-Date:   Sat, 14 Jan 2023 19:47:41 +0000
-Message-Id: <20230114194741.115855-2-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230114194741.115855-1-sj@kernel.org>
-References: <20230114194741.115855-1-sj@kernel.org>
+        Sun, 15 Jan 2023 07:16:01 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83A8EC7F
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 04:16:00 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id g23so12131028plq.12
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 04:16:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/NNEujWNnfLu7gJyQPC6CcWQitDkF1OWYCczrzsIwSw=;
+        b=ZHrqoGXGWtb6s9tSL/bPhC2DIkYS/pkkDqCoFj7yzFvmnzagJPI29nh/6PrrFnr9ZO
+         lhuCXq8yjm2pkHe03Gl1OMAIsr3iOXp/sLBq++dgKN2mEPx9pqIvKcMWyhSoDDkL6tit
+         kiZ4p+p3n20H8qMFL8oZqkYZxfRR9mPC8zrtFCZmn6vx0Az2xasaxMXI0AkrdAu1vYtL
+         GkkwflG+0W4hYp/l/HCa5QN3XFf5i80imP/mGjsXWwo3VJ2DEY4L7YOEKhTW9Iucds3l
+         m6996+xTpZX5aUhF+UUAqiCHglNSR4o8TmklnEEcUx6byQTbEy8wt+zALy6PT9rTuwiK
+         DDtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/NNEujWNnfLu7gJyQPC6CcWQitDkF1OWYCczrzsIwSw=;
+        b=IYfVTNUdgOZBUYJgBHZtz6KZwg9VMNyp9s+uE3HxVgyOqLZI/+C12dN28ajkytCQKp
+         bM2YNV6NBsOICUQULSfsjq4Ar/1dxcBeuwV88I2QSNLeFQdQ6QdDPKZQtvbr/V7MjkWb
+         agNDPlhzw7F2rGnawUOCMtdAjGBQuNpPYEX3/Ur7KMwGnawVQmyNYJ8ojjWXnK4ajn2M
+         yk5JmkCIa1TkOrcZya0C77kzihkUSx0sd9hZIZ12B5AGdrTXb1++o2gnmj5NC4A+EFgM
+         siY+w86BvdP73Krfpzta9fLVkSWJ01T0g+SWGxeo0ysUIBnDlWWmAhnPQUcuNCMbH8n4
+         Y85w==
+X-Gm-Message-State: AFqh2kprwRMJPZv3cbvqyJuhodfY0BPBHiJjDQ46VEji7G0Z0zQqA0Dz
+        QoT51HGO7/M9ZweHmKdkOLL1RRXMfKU=
+X-Google-Smtp-Source: AMrXdXvo36zTK+PjuGfgmNqR5rX8WAhZpB0Vg8qlNzL5XTQUbDXi4dgBrsfzxCHPb+qhx4InpgCF/w==
+X-Received: by 2002:a17:903:2341:b0:192:fd1e:a968 with SMTP id c1-20020a170903234100b00192fd1ea968mr54602806plh.46.1673784959746;
+        Sun, 15 Jan 2023 04:15:59 -0800 (PST)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id e13-20020a63e00d000000b00485cbedd34bsm14361783pgh.89.2023.01.15.04.15.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Jan 2023 04:15:58 -0800 (PST)
+From:   Taehee Yoo <ap420073@gmail.com>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, x86@kernel.org
+Cc:     jbeulich@suse.com, ap420073@gmail.com
+Subject: [PATCH 0/3] crypto: x86/aria - fix build failure with old binutils
+Date:   Sun, 15 Jan 2023 12:15:33 +0000
+Message-Id: <20230115121536.465367-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some subsystem documents are missing SPDX license identifiers.  Add
-those.
+There is build failure issue when old binutils is used.
 
-Signed-off-by: SeongJae Park <sj@kernel.org>
----
- Documentation/crypto/index.rst     | 2 ++
- Documentation/driver-api/index.rst | 2 ++
- Documentation/gpu/index.rst        | 2 ++
- Documentation/hwmon/index.rst      | 2 ++
- Documentation/input/index.rst      | 2 ++
- Documentation/mm/index.rst         | 2 ++
- Documentation/scheduler/index.rst  | 2 ++
- Documentation/sound/index.rst      | 2 ++
- 8 files changed, 16 insertions(+)
+The minimum version of binutils to build kernel is 2.23 but it doesn't
+support GFNI.
+But aria-avx, aria-avx2, and aria-avx512 use GFNI.
+So, the build will be failed when old binutils is used.
 
-diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
-index da5d5ad2bdf3..95b0870e09b8 100644
---- a/Documentation/crypto/index.rst
-+++ b/Documentation/crypto/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ==========
- Crypto API
- ==========
-diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-index b208e0dac3a0..7a2584ab63c4 100644
---- a/Documentation/driver-api/index.rst
-+++ b/Documentation/driver-api/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ==============================
- Driver implementer's API guide
- ==============================
-diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
-index eee5996acf2c..ff06a6b12c5e 100644
---- a/Documentation/gpu/index.rst
-+++ b/Documentation/gpu/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ============================
- GPU Driver Developer's Guide
- ============================
-diff --git a/Documentation/hwmon/index.rst b/Documentation/hwmon/index.rst
-index c2b3c1a822dd..2186d732654f 100644
---- a/Documentation/hwmon/index.rst
-+++ b/Documentation/hwmon/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ===================
- Hardware Monitoring
- ===================
-diff --git a/Documentation/input/index.rst b/Documentation/input/index.rst
-index 35581cd18e91..d60bf9cfe005 100644
---- a/Documentation/input/index.rst
-+++ b/Documentation/input/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ===================
- Input Documentation
- ===================
-diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
-index 5a94a921ea40..c4e9fbacaf38 100644
---- a/Documentation/mm/index.rst
-+++ b/Documentation/mm/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ===============================
- Memory Management Documentation
- ===============================
-diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
-index 1aac972a652f..ae0229f5a9cf 100644
---- a/Documentation/scheduler/index.rst
-+++ b/Documentation/scheduler/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- =========
- Scheduler
- =========
-diff --git a/Documentation/sound/index.rst b/Documentation/sound/index.rst
-index 5abed5fc6485..7e67e12730d3 100644
---- a/Documentation/sound/index.rst
-+++ b/Documentation/sound/index.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- =============================
- Sound Subsystem Documentation
- =============================
+In order to fix this issue, it checks build environment is using
+binutils, which don't support GFNI or not.
+In addition, it also checks AVX512 for aria-avx512.
+
+aria-avx and aria-avx2 use GFNI optionally.
+So, if binutils doesn't support GFNI, it hides GFNI code.
+But aria-avx512 mandatorily requires GFNI and AVX512.
+So, if binutils doesn't support GFNI or AVX512, it disallows select to
+build.
+
+In order to check whether the using binutils is supporting GFNI, it adds
+AS_GFNI.
+
+Taehee Yoo (3):
+  crypto: x86/aria-avx - fix build failure with old binutils
+  crypto: x86/aria-avx2 - fix build failure with old binutils
+  crypto: x86/aria-avx15 - fix build failure with old binutils
+
+ arch/x86/Kconfig.assembler               |  5 +++++
+ arch/x86/crypto/Kconfig                  |  2 +-
+ arch/x86/crypto/aria-aesni-avx-asm_64.S  | 10 ++++++++++
+ arch/x86/crypto/aria-aesni-avx2-asm_64.S | 10 +++++++++-
+ arch/x86/crypto/aria_aesni_avx2_glue.c   |  4 +++-
+ arch/x86/crypto/aria_aesni_avx_glue.c    |  4 +++-
+ 6 files changed, 31 insertions(+), 4 deletions(-)
+
 -- 
-2.25.1
+2.34.1
 
