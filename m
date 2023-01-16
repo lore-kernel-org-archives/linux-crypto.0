@@ -2,64 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7782C46467
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 15:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A88BC54EBE
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 15:23:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjAPPSR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Jan 2023 10:18:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38908 "EHLO
+        id S231186AbjAPPXr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 10:23:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230074AbjAPPR5 (ORCPT
+        with ESMTP id S231247AbjAPPXY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2023 10:17:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914D4B741;
-        Mon, 16 Jan 2023 07:09:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0B186B80FC9;
-        Mon, 16 Jan 2023 15:09:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69F6C433F0;
-        Mon, 16 Jan 2023 15:09:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673881755;
-        bh=bSC1tYJtE/dAJ69MMY56mA9Mu7Fri07NMWjxcUc/p34=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=EN08y2BuPRT6MOp7kivWfwKdujHpSZ4tV0oOQ0TZqkbEdlqbRtJSucfj+l/cT4ODO
-         JKtdwLrgH1dcWjxtmAOjS+TPZ9kGfDYJebguFpTbE0aMf3WODEl+n+5An6CX+B8h1L
-         mhU3oRL+bf+bY+IttnYqRMC62d7YNdqocYDRkVJqlw5gAbXHgudajnAFGJfVNjucTu
-         T94cEKji9NpjfbFcsnKPRAz7zZ3/UFoSNL6QhLvKkIYGoP1bONypCSXYt4MyDH3dlj
-         SKe1tPsDsJO2cx/Y0+UbiW5So+dvJy6BAgGi7A0JlQBTvdU60j46WfSLsRHFftY0N+
-         lgoMg0d7C7dbw==
-Received: by mail-lf1-f54.google.com with SMTP id x40so9061324lfu.12;
-        Mon, 16 Jan 2023 07:09:15 -0800 (PST)
-X-Gm-Message-State: AFqh2krkafaju4jAajuGdFBHHFrc+yZC2SiO99in2iRDwMx0yKPGVMqI
-        TsNo+rk8gY9m1groTJfReU3136IanRKVINdbfMA=
-X-Google-Smtp-Source: AMrXdXvh8R29wCMut1pV0svkKYDMsD9TH3JlT8/hB5GgbCWkus0sb+dZA7j5Fz9qVyrfm27DyrNT2oTIzQhQCET7cqs=
-X-Received: by 2002:ac2:4f8c:0:b0:4d0:7b7:65dc with SMTP id
- z12-20020ac24f8c000000b004d007b765dcmr471882lfs.122.1673881753755; Mon, 16
- Jan 2023 07:09:13 -0800 (PST)
-MIME-Version: 1.0
-References: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
-In-Reply-To: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 16 Jan 2023 16:09:02 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
-Message-ID: <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: x86 - exit fpu context earlier in ECB/CBC macros
-To:     Peter Lafreniere <peter@n8pjl.ca>
+        Mon, 16 Jan 2023 10:23:24 -0500
+Received: from mail-40136.proton.ch (mail-40136.proton.ch [185.70.40.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DEB23110
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 07:21:07 -0800 (PST)
+Date:   Mon, 16 Jan 2023 15:20:59 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
+        s=protonmail; t=1673882466; x=1674141666;
+        bh=9ROIcCxSwU24OpoN9yTEGGEsUmOW1HNyhUpmcbioTJg=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=5UBduxfG1gCOkgNJ2vWniOv8muZ9owo/AT8a190wmqu0hVW8kRITBYfIzbb5DNr6d
+         pHpmsCxvBRWWXDO6lQ0ZtzXiRBGSAm675HVV5f/s60oTpnoRWXG0cSlX7vefC7SoNU
+         BUL/YDAdFB1WgleJxIocfcSkmLaz5MYWGKfOts1ygr3kewS/imolDKQOAT8KR4aR08
+         9r9w6tEodCVuRxeT4dsNMQAOFy0x1lJAlIiUbhG2ZFlafWTPvRppLS48ZJJDE4MupQ
+         LD6ctfuKCKascrxm9osuYFJ56a2brt+S79yC0wDmGYNb5aaa9pxV8DlK/378B1/T9A
+         sYTJlzudusD3Q==
+To:     Ard Biesheuvel <ardb@kernel.org>
+From:   Peter Lafreniere <peter@n8pjl.ca>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "x86@kernel.org" <x86@kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] crypto: x86 - exit fpu context earlier in ECB/CBC macros
+Message-ID: <T7YG602WaDuPk4rYB6-BwCn0pdxSTJxyOR7-vs59gUu1sXMFtkbjCUd1DZ9xuFy9724II9A1qQWf0hKsLJ04qawtcrfO90FA5eYn5hyLzvw=@n8pjl.ca>
+In-Reply-To: <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
+References: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca> <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
+Feedback-ID: 53133685:user:proton
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 16 Jan 2023 at 16:00, Peter Lafreniere <peter@n8pjl.ca> wrote:
+> Please don't send encrypted emails to the mailing list. Plaintext
+> only, with the patch in the message body (not as an attachment).
+> Please use git send-email if you have trouble configuring your email
+> client.
 
-Please don't send encrypted emails to the mailing list. Plaintext
-only, with the patch in the message body (not as an attachment).
-Please use git send-email if you have trouble configuring your email
-client.
+My apologies. I was having difficulties configuring git send-email,
+but now I believe that I have the issues resolved. Future patches will
+be properly formatted.
+
+- Peter
