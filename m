@@ -2,95 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40172C54EBE
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 03:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05FCC46467
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 07:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231624AbjAPDdr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Jan 2023 22:33:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39532 "EHLO
+        id S231942AbjAPHk0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 02:40:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231756AbjAPDdq (ORCPT
+        with ESMTP id S231864AbjAPHkZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Jan 2023 22:33:46 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568803C34;
-        Sun, 15 Jan 2023 19:33:45 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pHGF9-000Mjk-F4; Mon, 16 Jan 2023 11:33:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Jan 2023 11:33:07 +0800
-Date:   Mon, 16 Jan 2023 11:33:07 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "ap420073@gmail.com" <ap420073@gmail.com>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
-        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
-        "peter@n8pjl.ca" <peter@n8pjl.ca>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 03/13] crypto: x86/sha - yield FPU context during long
- loops
-Message-ID: <Y8TFc84dm3hSVHv5@gondor.apana.org.au>
-References: <20221219220223.3982176-1-elliott@hpe.com>
- <20221219220223.3982176-4-elliott@hpe.com>
- <Y7+/Yy7+mLEyqeiK@gondor.apana.org.au>
- <Y8BVkjwPc6DLm7HT@sol.localdomain>
- <Y8DDmBg6J31pS0KW@gondor.apana.org.au>
- <Y8DD8s9nakxW5zzE@gondor.apana.org.au>
- <MW5PR84MB1842C7F8190348625158DE9CABC29@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+        Mon, 16 Jan 2023 02:40:25 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6EB55BA
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 23:40:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4751560EB6
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 07:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A928DC433EF
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 07:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673854823;
+        bh=FfIcLNRdGqP+gxRzz5WI3OMzLIKJZ5maa6ZX3yWR+Cg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=cdWT5P2TVxrnkpl3N1WdwciEtpC3NPblsxCD2P5nh+7OdjHA392qXxSQuyOwdoFtv
+         WBLGbcveWkw3P3TiyGvnd/MX2FO3fNdMNG1ecFbb1bAhhFUvqrYR639Q1YRbwv63AU
+         MWvaXa3tHu32bHghmMH5yCaVEmnHuDjg2gQIuQukgoAAKPM8Ppaqne5bRpxxzj6Yld
+         8jSd5apLL91iMnXkH9/ZKl6oa3e1xeVphm1xEt7kCbJ3Zo6sCgLb5bHY3SYhpCbqhP
+         r2/qZC5ZVO+ZCuzNuveSM18C6bg4nHNY3aAkl8Ob8VR/lLAhsl9H/5V5GtEXJ7jOzm
+         wVOHm+UDi/BUg==
+Received: by mail-lj1-f181.google.com with SMTP id n5so28582838ljc.9
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Jan 2023 23:40:23 -0800 (PST)
+X-Gm-Message-State: AFqh2kr4QtZV9+wEb+bj7zxOqiiAc29NslGLBDPpsk3esuR0LBC4MygD
+        qZ49T+XCde66DsSZM/HxyjTu6HtjH/3smrqOI2I=
+X-Google-Smtp-Source: AMrXdXtsnV5QfFn02CMBXjwGq/nd+AfANJ1OwD4gbwOP+GtxfB+GYbVErJSTQ5mmLnqQv/GVfwm+6RfIhtc3Rz0dvTc=
+X-Received: by 2002:a2e:a901:0:b0:27f:ef88:3ecb with SMTP id
+ j1-20020a2ea901000000b0027fef883ecbmr2287639ljq.189.1673854821723; Sun, 15
+ Jan 2023 23:40:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MW5PR84MB1842C7F8190348625158DE9CABC29@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20221214171957.2833419-1-ardb@kernel.org> <CAMj1kXG_btjHUVpN9m5NoBdFv=3JWt-piPx_u40KTv70CC-sRQ@mail.gmail.com>
+ <Y8TEqNJuEmWE5Tg/@gondor.apana.org.au>
+In-Reply-To: <Y8TEqNJuEmWE5Tg/@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 16 Jan 2023 08:40:09 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXExpt4U64ncX6wSU_0zLNNQGiP3RFGNbAXwpuBjeV=fPg@mail.gmail.com>
+Message-ID: <CAMj1kXExpt4U64ncX6wSU_0zLNNQGiP3RFGNbAXwpuBjeV=fPg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] crypto: Accelerated GCM for IPSec on ARM/arm64
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 13, 2023 at 07:35:07PM +0000, Elliott, Robert (Servers) wrote:
+On Mon, 16 Jan 2023 at 04:29, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> pkcs_digest() uses shash like this:
->         /* Allocate the hashing algorithm we're going to need and find out how
->          * big the hash operational data will be.
->          */
->         tfm = crypto_alloc_shash(sinfo->sig->hash_algo, 0, 0);
->         if (IS_ERR(tfm))
->                 return (PTR_ERR(tfm) == -ENOENT) ? -ENOPKG : PTR_ERR(tfm);
-> 
->         desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
->         sig->digest_size = crypto_shash_digestsize(tfm);
-> 
->         ret = -ENOMEM;
->         sig->digest = kmalloc(sig->digest_size, GFP_KERNEL);
->         if (!sig->digest)
->                 goto error_no_desc;
-> 
->         desc = kzalloc(desc_size, GFP_KERNEL);
->         if (!desc)
->                 goto error_no_desc;
-> 
->         desc->tfm   = tfm;
-> 
->         /* Digest the message [RFC2315 9.3] */
->         ret = crypto_shash_digest(desc, pkcs7->data, pkcs7->data_len,
->                                   sig->digest);
->         if (ret < 0)
->                 goto error;
->         pr_devel("MsgDigest = [%*ph]\n", 8, sig->digest);
+> On Fri, Jan 13, 2023 at 05:00:59PM +0100, Ard Biesheuvel wrote:
+> >
+> > These prerequisite changes have now been queued up in the ARM tree.
+> >
+> > Note that these are runtime prerequisites only so I think this series
+> > can be safely merged as well, as I don't think anyone builds cryptodev
+> > for 32-bit ARM and tests it on 64-bit hardware (which is the only
+> > hardware that implements the AES instructions that patch #1 relies on)
+>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> I don't have any objections for merging this through the arm tree.
+>
 
-As this path is sleepable, the conversion should be fairly trivial
-with crypto_wait_req.
+Thanks.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Will you be taking the rest of the series? (patches #2 - #4). Or we
+might defer this to v6.4 entirely it if makes things easier. (The
+other changes really shouldn't go through the ARM tree)
