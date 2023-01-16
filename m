@@ -2,144 +2,184 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF46C54EBE
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 19:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661BCC54EBE
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 20:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232717AbjAPTuA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Jan 2023 14:50:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
+        id S230494AbjAPUDn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 15:03:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbjAPTt5 (ORCPT
+        with ESMTP id S230458AbjAPUDm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2023 14:49:57 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C6A2C67C
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 11:49:56 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id z13so3516815plg.6
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 11:49:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20210112.gappssmtp.com; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8wZvvACyBelhwyC9g77by0DEIkBqZpn0ZmXIgfmKr4s=;
-        b=0oC65SyRHbWDjj7xp6Z5i5H7PKj9V2uYPsPQ3OqlQp+3vN9gFAdP/sq3xkLwsvLRVS
-         McB8d3MpJc4v96EUA9wf/iM2TqR0GJ15g374T+k2oOetyyQWWe5sV0KcuuaI0T3DQ1mO
-         aPo1gjrVrlEsQNgjfwYbOonw+vgLoONw5oTLv4ZFnSeIM3jDuEFozpyQ+5pp9VxbxTEU
-         dIzgulr11qkfeUnYqXz7AVpJZ1KN2zDbCism7+gww5+ygd5mNP3cDh4X7duKjhUMeg4A
-         9+k+ruW9Y/N4jDkPQkNzvGey+mDbzzVDdaQJV7geBcMly8kcUZWwPTWhv8f4ZnhHKrtJ
-         2IIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8wZvvACyBelhwyC9g77by0DEIkBqZpn0ZmXIgfmKr4s=;
-        b=ws0ZFpdkPdGPNLPTLt8z0lHDZQl0EDvx8qrLg1xgSHdSauPEsowx7A1qBxSQEnVHVP
-         4xehCI09vyoj24fuTV79hHRYYQUUobGIW2rP4eQRjH5cQBezufLB+9pxTVilEnvQeeUQ
-         URTLx0luNhVz1oFZamKn9FEnkt0gae2/Pl6PpSVx/Wwj7G5zI4YD9ts5yAf37k3IkK6L
-         ZEAOeGTssVaK+ls8XQIKWnRGHON81quaqugL40Q/0PzuTjhmKHQVQr4chdjH8sAkohit
-         uXCPFEMFNLbqQEHQwTg/3m6roLwS3sKDU14/r+54kP7EXxyq/jUqnuzhDSu14f5KDIXR
-         YrFQ==
-X-Gm-Message-State: AFqh2kqypQfR/+tyg586WZxXNcaYOocyB130oo5bG7OTfh7pD0UQBpuQ
-        xcwjQf6zFqUWBop8Zw3buQweWQ==
-X-Google-Smtp-Source: AMrXdXtpS9tGPFZxJo7zJbNIiuX5+Bt+X5f0IpuEJBuXVCAC2ooHDIHjJz3wEm9Fj9oNuS3cd0YJAA==
-X-Received: by 2002:a05:6a20:1710:b0:b8:499d:7c99 with SMTP id bn16-20020a056a20171000b000b8499d7c99mr180334pzb.0.1673898596098;
-        Mon, 16 Jan 2023 11:49:56 -0800 (PST)
-Received: from smtpclient.apple ([2601:646:c200:522:b469:4533:dab3:1cd4])
-        by smtp.gmail.com with ESMTPSA id p5-20020a170902bd0500b0019248880f75sm19686244pls.77.2023.01.16.11.49.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 11:49:54 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [RFC PATCH 0/4] random: a simple vDSO mechanism for reseeding userspace CSPRNGs
-Date:   Mon, 16 Jan 2023 11:49:42 -0800
-Message-Id: <15F7D57C-8CC6-4CAE-8B7E-6F480B5F4133@amacapital.net>
-References: <585ddb35-adc5-f5cf-4db3-27571f394108@zytor.com>
-Cc:     Yann Droneaud <ydroneaud@opteya.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Florian Weimer <fweimer@redhat.com>,
-        Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-        Carlos O'Donell <carlos@redhat.com>
-In-Reply-To: <585ddb35-adc5-f5cf-4db3-27571f394108@zytor.com>
-To:     "H. Peter Anvin" <hpa@zytor.com>
-X-Mailer: iPhone Mail (20C65)
+        Mon, 16 Jan 2023 15:03:42 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2056.outbound.protection.outlook.com [40.107.93.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F20A021A32;
+        Mon, 16 Jan 2023 12:03:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U+SRPnKfFipgaEBsuEztsuKH0Hsui+4yqzqrCDlJ0CXycUeMHs5LnaDKK5Ow9hIj/y2xUPA998JjsuGVxRjA7+lssQWcuF+kU6vL51lF5ma1lRK6H0dEyvCuTzJreLx5DUi7cXMk29iJ48q6k0lkAswD5CWUlgiN3P9Ulrj05EKV6s+eS2YaqMvWYkUWMsnLrq+vNuxH7bOyUNOY4It9FFfzmLDIfetJYl5XZncqqbDMemtf9lJiB1i/Nln5C8TYyw5EJhdmoPMH6/vfNsYQOmBeJ4ftvz7vyK418DPVLSilj70WrRCoq6aS3lkS84+49wLkjQhNoAAurJRNqv0dag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+ogBOQgCXTGfT55qyW4Ib36ARO0SqWO8ycr0DcaWNA4=;
+ b=BIS1WwFJySTbeBoDmqFSOYydjabw92tIpifuvPdtXajR9F8GvmCYls0xS3G6PVLzQmYSwPRXpA4arLWGcJaKoIvczQCfJpLaZUCVlfCrA8BVFhykNb45yW2HRctda7siDP1aLu/tCPuop6GSv184O4Srir31dLIg+4w2Ofo8Ng/FCDWrjdrLTnnz14guBEowKTpTFByto3+xzgBid2OO/OIJENHMVYmP11r6YP9Kbzaag9usFaJ7QxVKXaDJxywN0zvBEe8f8nZNdN7GUMfqi5x58ga+6G010lhCvY4pvKrvHRo1QLQCgCOR9VFfcRNSJckbsGya27ub838HnABAqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+ogBOQgCXTGfT55qyW4Ib36ARO0SqWO8ycr0DcaWNA4=;
+ b=Nh48gC8yrShqsD2leRTZjk8Tx3B9yHnNy1xJJlEySSbbfDXIa1JWGY1P5N5E/s07Rb4xevPhN2FmusbSF5BtpYZcRdberj5WMhKXA/8Y6AGl5skebpeTVpKKE38cwF6e7L6yAx2C/SERf07e4hRQ4aOF6NAvMZtANCO/OtbSP4o=
+Received: from MW4PR03CA0232.namprd03.prod.outlook.com (2603:10b6:303:b9::27)
+ by IA1PR12MB6332.namprd12.prod.outlook.com (2603:10b6:208:3e2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Mon, 16 Jan
+ 2023 20:03:38 +0000
+Received: from CO1NAM11FT052.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b9:cafe::be) by MW4PR03CA0232.outlook.office365.com
+ (2603:10b6:303:b9::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.19 via Frontend
+ Transport; Mon, 16 Jan 2023 20:03:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT052.mail.protection.outlook.com (10.13.174.225) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6002.13 via Frontend Transport; Mon, 16 Jan 2023 20:03:37 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 16 Jan
+ 2023 14:03:36 -0600
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        John Allen <john.allen@amd.com>
+Subject: [PATCH] crypto: ccp - Provide MMIO register naming for documenation
+Date:   Mon, 16 Jan 2023 14:03:26 -0600
+Message-ID: <f345e88d664a6d6bb112eaae0e1d74d96d2e132b.1673899406.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.38.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT052:EE_|IA1PR12MB6332:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b146f02-5250-40a6-da2c-08daf7fcc1c6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Pe+a1r9JKNjn7NoMPDFfVuHbTCKYYCnoAMXL4BEPsqd2g1XxWcP5RK9iCyCWFkSRQjEIXj1nkt8+9rP8HO5tVQzEqUFpu10ODIiQNOPIQYxbxA7UVv7LJ5eeXTRxuO6F1tvrhGqjv1jk6bKJb/pvhlCHspqasrlgNe0X06qHEOlv8BSh0KcW1C9SXm9UtqJWSbZ6HcQ/VABRp3QfpommgzSEjSe1K7vFmW3ymYTmPC88bWbxRPJMQOFo1PWoTGkFz/yG7BfDS5FAsBjuv1v8LZwCT6FsuLjUYRteLvKnVc4NqExNjgMPUMRx/WHiTVbyFTA9PZkPj1C2Jvn0GuLQV5aas4lFObZMdWMXyORT0jFHqBFcnbxIxIyYlg0yQ1xba8vaX47Ee4qcgCSdVfPy9MqahrTSlseqGPEzVtlBCW5qV4TFPUQHbyhfEcHM/cmoW4u35DVn9OQtlFPLXL5ULNPM1mIkOpukX338VYsmIhPPeD6hhH+RQ0UL5lECF1vBFZ8cEQA1Fnx9Bp0vEN4dnIkgKJIlrgs2i3dlfAb1LO1MHrAGY9SS9UjIpivB5Il9gXMscXNME8b/PeSPh47I1wGYzR40NJZe/ygEXGEesoL9yJXd554LvNh8351H84MiSA7ROd5wMKAnSWVg5TySK7MVruWoktjAhFiGWVj2lOSn+TijCgiHSrojrlLZ0VBsx9PZGs2KWTW3tJORueiFIn4M6hW7SHQAXepc4OkSwqI=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(396003)(136003)(376002)(451199015)(36840700001)(40470700004)(46966006)(36756003)(82310400005)(86362001)(83380400001)(40480700001)(186003)(16526019)(26005)(8676002)(41300700001)(4326008)(70586007)(70206006)(426003)(47076005)(2616005)(316002)(6666004)(7696005)(2906002)(110136005)(54906003)(478600001)(40460700003)(81166007)(356005)(82740400003)(336012)(5660300002)(36860700001)(8936002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2023 20:03:37.9794
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b146f02-5250-40a6-da2c-08daf7fcc1c6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT052.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6332
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Add comments next to the version data MMIO register values to identify
+the register name being used.
 
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ drivers/crypto/ccp/sp-pci.c | 46 ++++++++++++++++++-------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-> On Jan 13, 2023, at 7:16 PM, H. Peter Anvin <hpa@zytor.com> wrote:
->=20
-> =EF=BB=BFOn 1/12/23 11:55, Yann Droneaud wrote:
->> Hi
->> 12 janvier 2023 =C3=A0 18:07 "Jason A. Donenfeld" <Jason@zx2c4.com> a =C3=
-=A9crit:
->> =20
->>> Sorry Yann, but I'm not interested in this approach, and I don't think
->>> reviewing the details of it are a good allocation of time. I don't
->>> want to lock the kernel into having specific reseeding semantics that
->>> are a contract with userspace, which is what this approach does.
->> This patch adds a mean for the kernel to tell userspace: between the
->> last time you call us with getrandom(timestamp,, GRND_TIMESTAMP),
->> something happened that trigger an update to the opaque cookie given
->> to getrandom(timestamp, GRND_TIMESTAMP). When such update happen,
->> userspace is advised to discard buffered random data and retry.
->> The meaning of the timestamp cookie is up to the kernel, and can be
->> changed anytime. Userspace is not expected to read the content of this
->> blob. Userspace only acts on the length returned by getrandom(,, GRND_TIM=
-ESTAMP):
->>  -1 : not supported
->>   0 : cookie not updated, no need to discard buffered data
->>  >0 : cookie updated, userspace should discard buffered data
->> For the cookie, I've used a single u64, but two u64 could be a better sta=
-rt,
->> providing room for implementing improved behavior in future kernel versio=
-ns.
->>> Please just let me iterate on my original patchset for a little bit,
->>> without adding more junk to the already overly large conversation.
->> I like the simplicity of my so called "junk". It's streamlined, doesn't
->> require a new syscall, doesn't require a new copy of ChaCha20 code.
->> I'm sorry it doesn't fit your expectations.
->=20
-> Why would anything more than a 64-bit counter be ever necessary? It only n=
-eeds to be incremented.
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 084d052fddcc..cde33b2ac71b 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -342,52 +342,52 @@ static int __maybe_unused sp_pci_resume(struct device *dev)
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ static const struct sev_vdata sevv1 = {
+-	.cmdresp_reg		= 0x10580,
+-	.cmdbuff_addr_lo_reg	= 0x105e0,
+-	.cmdbuff_addr_hi_reg	= 0x105e4,
++	.cmdresp_reg		= 0x10580,	/* C2PMSG_32 */
++	.cmdbuff_addr_lo_reg	= 0x105e0,	/* C2PMSG_56 */
++	.cmdbuff_addr_hi_reg	= 0x105e4,	/* C2PMSG_57 */
+ };
+ 
+ static const struct sev_vdata sevv2 = {
+-	.cmdresp_reg		= 0x10980,
+-	.cmdbuff_addr_lo_reg	= 0x109e0,
+-	.cmdbuff_addr_hi_reg	= 0x109e4,
++	.cmdresp_reg		= 0x10980,	/* C2PMSG_32 */
++	.cmdbuff_addr_lo_reg	= 0x109e0,	/* C2PMSG_56 */
++	.cmdbuff_addr_hi_reg	= 0x109e4,	/* C2PMSG_57 */
+ };
+ 
+ static const struct tee_vdata teev1 = {
+-	.cmdresp_reg		= 0x10544,
+-	.cmdbuff_addr_lo_reg	= 0x10548,
+-	.cmdbuff_addr_hi_reg	= 0x1054c,
+-	.ring_wptr_reg          = 0x10550,
+-	.ring_rptr_reg          = 0x10554,
++	.cmdresp_reg		= 0x10544,	/* C2PMSG_17 */
++	.cmdbuff_addr_lo_reg	= 0x10548,	/* C2PMSG_18 */
++	.cmdbuff_addr_hi_reg	= 0x1054c,	/* C2PMSG_19 */
++	.ring_wptr_reg          = 0x10550,	/* C2PMSG_20 */
++	.ring_rptr_reg          = 0x10554,	/* C2PMSG_21 */
+ };
+ 
+ static const struct psp_vdata pspv1 = {
+ 	.sev			= &sevv1,
+-	.feature_reg		= 0x105fc,
+-	.inten_reg		= 0x10610,
+-	.intsts_reg		= 0x10614,
++	.feature_reg		= 0x105fc,	/* C2PMSG_63 */
++	.inten_reg		= 0x10610,	/* P2CMSG_INTEN */
++	.intsts_reg		= 0x10614,	/* P2CMSG_INTSTS */
+ };
+ 
+ static const struct psp_vdata pspv2 = {
+ 	.sev			= &sevv2,
+-	.feature_reg		= 0x109fc,
+-	.inten_reg		= 0x10690,
+-	.intsts_reg		= 0x10694,
++	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
++	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
++	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
+ };
+ 
+ static const struct psp_vdata pspv3 = {
+ 	.tee			= &teev1,
+-	.feature_reg		= 0x109fc,
+-	.inten_reg		= 0x10690,
+-	.intsts_reg		= 0x10694,
++	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
++	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
++	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
+ };
+ 
+ static const struct psp_vdata pspv4 = {
+ 	.sev			= &sevv2,
+ 	.tee			= &teev1,
+-	.feature_reg		= 0x109fc,
+-	.inten_reg		= 0x10690,
+-	.intsts_reg		= 0x10694,
++	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
++	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
++	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
+ };
+ 
+ #endif
+-- 
+2.38.1
 
-This is completely broken with CRIU or, for that matter, with VM forking.
-
->=20
-> Let user space manage keeping track of the cookie matching its own buffers=
-. You do NOT want this to be stateful, because that's just begging for multi=
-ple libraries to step on each other.
->=20
-> Export the cookie from the vdso and voli=C3=A0, a very cheap check around a=
-ny user space randomness buffer will work:
->=20
->    static clone_cookie_t last_cookie;
->    clone_cookie_t this_cookie;
->=20
->    this_cookie =3D get_clone_cookie();
->    do {
->        while (this_cookie !=3D last_cookie) {
->            last_cookie =3D this_cookie;
->            reinit_randomness();
->            this_cookie =3D get_clone_cookie();
->        }
->=20
->        extract_randomness_from_buffer();
->        this_cookie =3D get_clone_cookie();
->    } while (this_cookie !=3D last_cookie);
->=20
->    last_cookie =3D this_cookie;
->=20
->    -hpa
