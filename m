@@ -2,182 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F86C67871
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Jan 2023 15:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B31C3DA78
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 00:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231379AbjAOPgT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Jan 2023 10:36:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55892 "EHLO
+        id S231381AbjAPA3o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Jan 2023 19:29:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231214AbjAOPgS (ORCPT
+        with ESMTP id S231428AbjAPA3m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Jan 2023 10:36:18 -0500
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CE05B83;
-        Sun, 15 Jan 2023 07:36:17 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id j16-20020a056830271000b0067202045ee9so14887309otu.7;
-        Sun, 15 Jan 2023 07:36:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pRCLnfO5D50aLUIqRH3Be5ElBGG7mevjFvkDgjByEkg=;
-        b=ESYN/lgtsCJz1vk5hIWF8P0XT3zE4HOkfbCef61dEh9nfpUszGpqaILDdbRYwRpBaS
-         Gq0n3cdms6iw0aRSFDJpioaByPmQbKCQP0DMmTGvyCsapfKPYKjs4KTwwNR87Zitspdn
-         tniK5INo56zs/GSaaJc39/v4ceiIJC1pB59guwU6dk/ST7wHrW1GsjBxDt0fMLpUe9Og
-         1v9Whb4AApgIKVhjQbVH2MHL30mD29abfoMS+VPtLoheVkY7LhOupZe8UcHafZllZEmR
-         Q02XH5CuaiXHw9on84tyYVxbzt6ZWhdpxJ/RGI0Gk5dJ5RFTO2+nukuT+lKm/LaCi8GD
-         Tvcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pRCLnfO5D50aLUIqRH3Be5ElBGG7mevjFvkDgjByEkg=;
-        b=g9f7Piy/Nq3PFywGEVd18+BFVQ/jYGX1rjf15FY+4/ZsQXR3JUOzNER+Nr/dyI2qqK
-         t0dlW65vbjI0IDyRgVfUEtEyQM8AFmMLMjT9CbadShDF2l8c13GPt3ANBv6UkjGS5WHq
-         LtenkYbMBb4+ipZy0V6N6XbZjg6Ku1c1VaYVIJ4bXqp3T5WMHNwNq1BaATKDkVutPFq6
-         MNZAtO3KdB6uaeLXDfoksNRnarhsMv2vxefCJ61+ICYmJ/VTgoKb2oxcNcKK+kv/mDXD
-         A6u9O6fRVDwF/u8O22CGHXYS9FzjEqKrMn8icCiirhgA56zBwVYAXt+RHj/7cLmh8lVq
-         QaOw==
-X-Gm-Message-State: AFqh2kpqpxwuVaqZTqlWgYBWAlX9LSol4gywmZC0biwr0sjd5Pyyrc35
-        Tq09VdHwZIX0WGG1AX7ic8ms9/QsdsQQtwGhCv4=
-X-Google-Smtp-Source: AMrXdXu/zET195jKhsFTVp5xxmwIScKWmACgEKUi1QrBdrbk6v28T2qMy0jJBHOkkSBc+MnjFZnNZuARMBSt9P0VdRA=
-X-Received: by 2002:a9d:489:0:b0:684:bedc:4f54 with SMTP id
- 9-20020a9d0489000000b00684bedc4f54mr837621otm.233.1673796976794; Sun, 15 Jan
- 2023 07:36:16 -0800 (PST)
+        Sun, 15 Jan 2023 19:29:42 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0062CC22;
+        Sun, 15 Jan 2023 16:29:41 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NwCZr35Crz4x1N;
+        Mon, 16 Jan 2023 11:29:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1673828980;
+        bh=N2kwPoMMz0R6pHkbqhmQk0W0f8pwQljldJVKjQUdfFI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=I4n2wZNh7W6ip9TSYGLiTof9ewMzDX4Jx6n4jCwyU7SEK8jYmIePymtUGbbTOILww
+         T+l81cj/I5nT3d+gbZzLNZkW4S9AOcOxAp/RQxyhPXwwJ24Iv20TPUIpIRj4c/fFKn
+         4tgjbOGNG1EyXT29mwE4X6hilA5+sf9fj715hcc4rKXPP9+WDZon8O7rxL8WAwEkzR
+         Pvf2hqzj/OsVg/qO8GINFubUme6SyEtDqKkld2KSM5Rx0gsP+yOXM3j2I0EhyWmJTS
+         aVtAYYdeLvXWxc9aza1NmlOreMhrT4MgK+1JyXknR3pf70nvFHoF/23UqKZ7flzaUn
+         beT3gj+a4j2tQ==
+Date:   Mon, 16 Jan 2023 11:29:39 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Danny Tsen <dtsen@linux.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20230116112939.0820ff24@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20230114194741.115855-1-sj@kernel.org> <20230114194741.115855-2-sj@kernel.org>
-In-Reply-To: <20230114194741.115855-2-sj@kernel.org>
-From:   Alex Deucher <alexdeucher@gmail.com>
-Date:   Sun, 15 Jan 2023 10:35:57 -0500
-Message-ID: <CADnq5_OUnkzoZcCdW0X-=gJsXSRgY=GLrbmfNj0geDCzL5a7eQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Docs: Add some missing SPDX license identifiers of
- subsystem docs
-To:     SeongJae Park <sj@kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>, linux-hwmon@vger.kernel.org,
-        alsa-devel@alsa-project.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jean Delvare <jdelvare@suse.com>, linux-crypto@vger.kernel.org,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        linux-input@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/oizzXh1XaAGuFYdWc2C7=3y";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 14, 2023 at 2:48 PM SeongJae Park <sj@kernel.org> wrote:
->
-> Some subsystem documents are missing SPDX license identifiers.  Add
-> those.
+--Sig_/oizzXh1XaAGuFYdWc2C7=3y
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-It would be good to split this up per subsystem.
+Hi all,
 
->
-> Signed-off-by: SeongJae Park <sj@kernel.org>
-> ---
->  Documentation/crypto/index.rst     | 2 ++
->  Documentation/driver-api/index.rst | 2 ++
->  Documentation/gpu/index.rst        | 2 ++
->  Documentation/hwmon/index.rst      | 2 ++
->  Documentation/input/index.rst      | 2 ++
->  Documentation/mm/index.rst         | 2 ++
->  Documentation/scheduler/index.rst  | 2 ++
->  Documentation/sound/index.rst      | 2 ++
->  8 files changed, 16 insertions(+)
->
-> diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
-> index da5d5ad2bdf3..95b0870e09b8 100644
-> --- a/Documentation/crypto/index.rst
-> +++ b/Documentation/crypto/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  ==========
->  Crypto API
->  ==========
-> diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
-> index b208e0dac3a0..7a2584ab63c4 100644
-> --- a/Documentation/driver-api/index.rst
-> +++ b/Documentation/driver-api/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  ==============================
->  Driver implementer's API guide
->  ==============================
-> diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
-> index eee5996acf2c..ff06a6b12c5e 100644
-> --- a/Documentation/gpu/index.rst
-> +++ b/Documentation/gpu/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
+After merging the crypto tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
 
-Most of the DRM code is MIT.  I'd expect this would be MIT as well.
+ERROR: modpost: ".aes_p10_gcm_decrypt" [arch/powerpc/crypto/p10-aes-gcm-cry=
+pto.ko] undefined!
+ERROR: modpost: ".aes_p10_gcm_encrypt" [arch/powerpc/crypto/p10-aes-gcm-cry=
+pto.ko] undefined!
 
-Alex
+Caused by commits
 
-> +
->  ============================
->  GPU Driver Developer's Guide
->  ============================
-> diff --git a/Documentation/hwmon/index.rst b/Documentation/hwmon/index.rst
-> index c2b3c1a822dd..2186d732654f 100644
-> --- a/Documentation/hwmon/index.rst
-> +++ b/Documentation/hwmon/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  ===================
->  Hardware Monitoring
->  ===================
-> diff --git a/Documentation/input/index.rst b/Documentation/input/index.rst
-> index 35581cd18e91..d60bf9cfe005 100644
-> --- a/Documentation/input/index.rst
-> +++ b/Documentation/input/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  ===================
->  Input Documentation
->  ===================
-> diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
-> index 5a94a921ea40..c4e9fbacaf38 100644
-> --- a/Documentation/mm/index.rst
-> +++ b/Documentation/mm/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  ===============================
->  Memory Management Documentation
->  ===============================
-> diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
-> index 1aac972a652f..ae0229f5a9cf 100644
-> --- a/Documentation/scheduler/index.rst
-> +++ b/Documentation/scheduler/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  =========
->  Scheduler
->  =========
-> diff --git a/Documentation/sound/index.rst b/Documentation/sound/index.rst
-> index 5abed5fc6485..7e67e12730d3 100644
-> --- a/Documentation/sound/index.rst
-> +++ b/Documentation/sound/index.rst
-> @@ -1,3 +1,5 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
->  =============================
->  Sound Subsystem Documentation
->  =============================
-> --
-> 2.25.1
->
+  cc40379b6e19 ("crypto: p10-aes-gcm - Glue code for AES/GCM stitched imple=
+mentation")
+  ca68a96c37eb ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched impl=
+ementation")
+
+I have used the crypto tree from next-20230113 for today.
+
+BTW, that series seems to have been committed in the wrong order -
+there are refrerences to files/functions before they are created.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/oizzXh1XaAGuFYdWc2C7=3y
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPEmnMACgkQAVBC80lX
+0GwrIgf/WctXiHQJZ7ArzEDBvM4OUVs9cwDjeN1AGScgP3tjlafxGq7Zm0G9PFkM
+Ftpw7L8YAZ6E6G/4jO6lob1jB3niHAgIZ7MT9I5MwN4qpffLeUTwiywanYyKofBy
+lP5/eGlPKY298tkxvzNh5eV2YE9Po7rzjb7lV24aH3gWYwJIJiNRZoQxmzRdmXr5
++2LJi5TESrWWWb7S4iWiG9b7pwV01BNQzZTJrA69RW85Y4LxVIanICtBmztav9WD
+PJILprxrZ7Ij3GNMPAPzuWpNQeIIkVcz5Lnqr9j/2pMKYnlFAh06CPb3Tb64xTpB
+IaQipqMB1BWDazTjbsv6M1w7hUqvOA==
+=rDnh
+-----END PGP SIGNATURE-----
+
+--Sig_/oizzXh1XaAGuFYdWc2C7=3y--
