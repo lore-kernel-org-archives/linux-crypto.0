@@ -2,111 +2,109 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D72C678D8
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 13:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB10C46467
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 15:12:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbjAPNSy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Jan 2023 08:18:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39976 "EHLO
+        id S232147AbjAPPMI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 10:12:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230417AbjAPNSZ (ORCPT
+        with ESMTP id S229918AbjAPPLp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2023 08:18:25 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F193C24;
-        Mon, 16 Jan 2023 05:17:20 -0800 (PST)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NwXZb4M7nznVlD;
-        Mon, 16 Jan 2023 21:15:35 +0800 (CST)
-Received: from [10.67.101.184] (10.67.101.184) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Mon, 16 Jan 2023 21:17:17 +0800
-Subject: Re: [PATCH] crypto: hisilicon - remove redundant config PCI
- dependency for some CRYPTO_DEV_HISI configs
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-References: <20230111120203.822-1-lukas.bulwahn@gmail.com>
-CC:     <kernel-janitors@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-From:   Weili Qian <qianweili@huawei.com>
-Message-ID: <e1a19c92-9162-1696-5974-99aecd86989b@huawei.com>
-Date:   Mon, 16 Jan 2023 21:17:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Mon, 16 Jan 2023 10:11:45 -0500
+Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B23E30294
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 06:59:57 -0800 (PST)
+Date:   Mon, 16 Jan 2023 14:59:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
+        s=protonmail; t=1673881196; x=1674140396;
+        bh=zzF9mAQN1tOBRS7sao22BNfZIlVCplVmqFFZ1O+i9rQ=;
+        h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+         Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+        b=PeWRTFyZ5oaod8KIEvldYz8XEm18qXWxt/IZefcD5a+Y/YTjdCq1zkY+4KeEEz8PC
+         vX4ti3EzR1zcuC6fkj3Pge1gIAHhHzbW9+DH7jl+TzK13q7hwiS+MQEyWvYWiz5poq
+         urQ3kcCoT1rzfhzh5f2dKN1J1qTerMlJZkqf2wOWPp0O7o2sXQbY+0VqzZn2seNdrd
+         2G/UfDWw9OY991VbA+GX35XY4icIf5elnTaVpDHqgeQs2/csr9UVq6KYWRZuczlU5/
+         +Ta0vNF0xeDFPKMwR7/cYBzEZne8HkH4g6f15DQrJq3FTilfyGvcFqPMMwQc8IJyVo
+         2cikKCqAFtEuw==
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From:   Peter Lafreniere <peter@n8pjl.ca>
+Cc:     "ardb@kernel.org" <ardb@kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Peter Lafreniere <peter@n8pjl.ca>
+Subject: [PATCH] crypto: x86 - exit fpu context earlier in ECB/CBC macros
+Message-ID: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
+Feedback-ID: 53133685:user:proton
 MIME-Version: 1.0
-In-Reply-To: <20230111120203.822-1-lukas.bulwahn@gmail.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.101.184]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Currently the ecb/cbc macros hold fpu context unnecessarily when using=20
+scalar cipher routines (e.g. when handling odd sizes of blocks per walk).
+
+Change the macros to drop fpu context as soon as the fpu is out of use.
+
+No performance impact found (on Intel Haswell).
+
+Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
+---
+ arch/x86/crypto/ecb_cbc_helpers.h | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/crypto/ecb_cbc_helpers.h b/arch/x86/crypto/ecb_cbc_he=
+lpers.h
+index eaa15c7b29d6..b83085e18ab0 100644
+--- a/arch/x86/crypto/ecb_cbc_helpers.h
++++ b/arch/x86/crypto/ecb_cbc_helpers.h
+@@ -14,12 +14,13 @@
+ #define ECB_WALK_START(req, bsize, fpu_blocks) do {=09=09=09\
+ =09void *ctx =3D crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));=09\
++=09const int __fpu_blocks =3D (fpu_blocks);=09=09=09=09\
+ =09const int __bsize =3D (bsize);=09=09=09=09=09\
+ =09struct skcipher_walk walk;=09=09=09=09=09\
+ =09int err =3D skcipher_walk_virt(&walk, (req), false);=09=09\
+ =09while (walk.nbytes > 0) {=09=09=09=09=09\
+ =09=09unsigned int nbytes =3D walk.nbytes;=09=09=09\
+-=09=09bool do_fpu =3D (fpu_blocks) !=3D -1 &&=09=09=09\
+-=09=09=09      nbytes >=3D (fpu_blocks) * __bsize;=09=09\
++=09=09bool do_fpu =3D __fpu_blocks !=3D -1 &&=09=09=09\
++=09=09=09      nbytes >=3D __fpu_blocks * __bsize;=09=09\
+ =09=09const u8 *src =3D walk.src.virt.addr;=09=09=09\
+ =09=09u8 *dst =3D walk.dst.virt.addr;=09=09=09=09\
+ =09=09u8 __maybe_unused buf[(bsize)];=09=09=09=09\
+@@ -35,7 +36,12 @@
+ } while (0)
+=20
+ #define ECB_BLOCK(blocks, func) do {=09=09=09=09=09\
+-=09while (nbytes >=3D (blocks) * __bsize) {=09=09=09=09\
++=09const int __blocks =3D (blocks);=09=09=09=09=09\
++=09if (do_fpu && __blocks < __fpu_blocks) {=09=09=09\
++=09=09kernel_fpu_end();=09=09=09=09=09\
++=09=09do_fpu =3D false;=09=09=09=09=09=09\
++=09}=09=09=09=09=09=09=09=09\
++=09while (nbytes >=3D __blocks * __bsize) {=09=09=09=09\
+ =09=09(func)(ctx, dst, src);=09=09=09=09=09\
+ =09=09ECB_WALK_ADVANCE(blocks);=09=09=09=09\
+ =09}=09=09=09=09=09=09=09=09\
+@@ -53,7 +59,12 @@
+ } while (0)
+=20
+ #define CBC_DEC_BLOCK(blocks, func) do {=09=09=09=09\
+-=09while (nbytes >=3D (blocks) * __bsize) {=09=09=09=09\
++=09const int __blocks =3D (blocks);=09=09=09=09=09\
++=09if (do_fpu && __blocks <  __fpu_blocks) {=09=09=09\
++=09=09kernel_fpu_end();=09=09=09=09=09\
++=09=09do_fpu =3D false;=09=09=09=09=09=09\
++=09}=09=09=09=09=09=09=09=09\
++=09while (nbytes >=3D __blocks * __bsize) {=09=09=09=09\
+ =09=09const u8 *__iv =3D src + ((blocks) - 1) * __bsize;=09\
+ =09=09if (dst =3D=3D src)=09=09=09=09=09=09\
+ =09=09=09__iv =3D memcpy(buf, __iv, __bsize);=09=09\
+--=20
+2.39.0
 
 
-On 2023/1/11 20:02, Lukas Bulwahn wrote:
-> While reviewing dependencies in some Kconfig files, I noticed the redundant
-> dependency "depends on PCI && PCI_MSI". The config PCI_MSI has always,
-> since its introduction, been dependent on the config PCI. So, it is
-> sufficient to just depend on PCI_MSI, and know that the dependency on PCI
-> is implicitly implied.
-> 
-> Reduce the dependencies of configs CRYPTO_DEV_HISI_SEC2,
-> CRYPTO_DEV_HISI_QM, CRYPTO_DEV_HISI_ZIP and CRYPTO_DEV_HISI_HPRE.
-> 
-> No functional change and effective change of Kconfig dependendencies.
-> 
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-> ---
->  drivers/crypto/hisilicon/Kconfig | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-Acked-by: Weili Qian <qianweili@huawei.com>
-
-> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-> index 743ce4fc3158..4137a8bf131f 100644
-> --- a/drivers/crypto/hisilicon/Kconfig
-> +++ b/drivers/crypto/hisilicon/Kconfig
-> @@ -27,7 +27,7 @@ config CRYPTO_DEV_HISI_SEC2
->  	select CRYPTO_SHA256
->  	select CRYPTO_SHA512
->  	select CRYPTO_SM4_GENERIC
-> -	depends on PCI && PCI_MSI
-> +	depends on PCI_MSI
->  	depends on UACCE || UACCE=n
->  	depends on ARM64 || (COMPILE_TEST && 64BIT)
->  	depends on ACPI
-> @@ -42,7 +42,7 @@ config CRYPTO_DEV_HISI_SEC2
->  config CRYPTO_DEV_HISI_QM
->  	tristate
->  	depends on ARM64 || COMPILE_TEST
-> -	depends on PCI && PCI_MSI
-> +	depends on PCI_MSI
->  	depends on UACCE || UACCE=n
->  	depends on ACPI
->  	help
-> @@ -51,7 +51,7 @@ config CRYPTO_DEV_HISI_QM
->  
->  config CRYPTO_DEV_HISI_ZIP
->  	tristate "Support for HiSilicon ZIP accelerator"
-> -	depends on PCI && PCI_MSI
-> +	depends on PCI_MSI
->  	depends on ARM64 || (COMPILE_TEST && 64BIT)
->  	depends on !CPU_BIG_ENDIAN || COMPILE_TEST
->  	depends on UACCE || UACCE=n
-> @@ -62,7 +62,7 @@ config CRYPTO_DEV_HISI_ZIP
->  
->  config CRYPTO_DEV_HISI_HPRE
->  	tristate "Support for HISI HPRE accelerator"
-> -	depends on PCI && PCI_MSI
-> +	depends on PCI_MSI
->  	depends on UACCE || UACCE=n
->  	depends on ARM64 || (COMPILE_TEST && 64BIT)
->  	depends on ACPI
-> 
