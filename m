@@ -2,109 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB10C46467
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 15:12:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7782C46467
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Jan 2023 15:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232147AbjAPPMI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Jan 2023 10:12:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37704 "EHLO
+        id S231477AbjAPPSR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 10:18:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbjAPPLp (ORCPT
+        with ESMTP id S230074AbjAPPR5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2023 10:11:45 -0500
-Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B23E30294
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Jan 2023 06:59:57 -0800 (PST)
-Date:   Mon, 16 Jan 2023 14:59:46 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-        s=protonmail; t=1673881196; x=1674140396;
-        bh=zzF9mAQN1tOBRS7sao22BNfZIlVCplVmqFFZ1O+i9rQ=;
-        h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-         Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-        b=PeWRTFyZ5oaod8KIEvldYz8XEm18qXWxt/IZefcD5a+Y/YTjdCq1zkY+4KeEEz8PC
-         vX4ti3EzR1zcuC6fkj3Pge1gIAHhHzbW9+DH7jl+TzK13q7hwiS+MQEyWvYWiz5poq
-         urQ3kcCoT1rzfhzh5f2dKN1J1qTerMlJZkqf2wOWPp0O7o2sXQbY+0VqzZn2seNdrd
-         2G/UfDWw9OY991VbA+GX35XY4icIf5elnTaVpDHqgeQs2/csr9UVq6KYWRZuczlU5/
-         +Ta0vNF0xeDFPKMwR7/cYBzEZne8HkH4g6f15DQrJq3FTilfyGvcFqPMMwQc8IJyVo
-         2cikKCqAFtEuw==
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From:   Peter Lafreniere <peter@n8pjl.ca>
-Cc:     "ardb@kernel.org" <ardb@kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Peter Lafreniere <peter@n8pjl.ca>
-Subject: [PATCH] crypto: x86 - exit fpu context earlier in ECB/CBC macros
-Message-ID: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
-Feedback-ID: 53133685:user:proton
+        Mon, 16 Jan 2023 10:17:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914D4B741;
+        Mon, 16 Jan 2023 07:09:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0B186B80FC9;
+        Mon, 16 Jan 2023 15:09:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69F6C433F0;
+        Mon, 16 Jan 2023 15:09:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673881755;
+        bh=bSC1tYJtE/dAJ69MMY56mA9Mu7Fri07NMWjxcUc/p34=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=EN08y2BuPRT6MOp7kivWfwKdujHpSZ4tV0oOQ0TZqkbEdlqbRtJSucfj+l/cT4ODO
+         JKtdwLrgH1dcWjxtmAOjS+TPZ9kGfDYJebguFpTbE0aMf3WODEl+n+5An6CX+B8h1L
+         mhU3oRL+bf+bY+IttnYqRMC62d7YNdqocYDRkVJqlw5gAbXHgudajnAFGJfVNjucTu
+         T94cEKji9NpjfbFcsnKPRAz7zZ3/UFoSNL6QhLvKkIYGoP1bONypCSXYt4MyDH3dlj
+         SKe1tPsDsJO2cx/Y0+UbiW5So+dvJy6BAgGi7A0JlQBTvdU60j46WfSLsRHFftY0N+
+         lgoMg0d7C7dbw==
+Received: by mail-lf1-f54.google.com with SMTP id x40so9061324lfu.12;
+        Mon, 16 Jan 2023 07:09:15 -0800 (PST)
+X-Gm-Message-State: AFqh2krkafaju4jAajuGdFBHHFrc+yZC2SiO99in2iRDwMx0yKPGVMqI
+        TsNo+rk8gY9m1groTJfReU3136IanRKVINdbfMA=
+X-Google-Smtp-Source: AMrXdXvh8R29wCMut1pV0svkKYDMsD9TH3JlT8/hB5GgbCWkus0sb+dZA7j5Fz9qVyrfm27DyrNT2oTIzQhQCET7cqs=
+X-Received: by 2002:ac2:4f8c:0:b0:4d0:7b7:65dc with SMTP id
+ z12-20020ac24f8c000000b004d007b765dcmr471882lfs.122.1673881753755; Mon, 16
+ Jan 2023 07:09:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
+In-Reply-To: <IBooTlGWpNE7pOelt0gm21bxW7wBILNYJ1HaoPbbfdEEMwz0Pp92vpd_OUlhNFNAitFThTi27P6q6NvcYMKm-y7tjwiF9YbImWjhgC3UDMk=@n8pjl.ca>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 16 Jan 2023 16:09:02 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
+Message-ID: <CAMj1kXGjOF7bNCS-v02aTZWmzvM-Ad-VYiNbHEmYf5RMHL57bQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86 - exit fpu context earlier in ECB/CBC macros
+To:     Peter Lafreniere <peter@n8pjl.ca>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the ecb/cbc macros hold fpu context unnecessarily when using=20
-scalar cipher routines (e.g. when handling odd sizes of blocks per walk).
+On Mon, 16 Jan 2023 at 16:00, Peter Lafreniere <peter@n8pjl.ca> wrote:
 
-Change the macros to drop fpu context as soon as the fpu is out of use.
-
-No performance impact found (on Intel Haswell).
-
-Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
----
- arch/x86/crypto/ecb_cbc_helpers.h | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/crypto/ecb_cbc_helpers.h b/arch/x86/crypto/ecb_cbc_he=
-lpers.h
-index eaa15c7b29d6..b83085e18ab0 100644
---- a/arch/x86/crypto/ecb_cbc_helpers.h
-+++ b/arch/x86/crypto/ecb_cbc_helpers.h
-@@ -14,12 +14,13 @@
- #define ECB_WALK_START(req, bsize, fpu_blocks) do {=09=09=09\
- =09void *ctx =3D crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));=09\
-+=09const int __fpu_blocks =3D (fpu_blocks);=09=09=09=09\
- =09const int __bsize =3D (bsize);=09=09=09=09=09\
- =09struct skcipher_walk walk;=09=09=09=09=09\
- =09int err =3D skcipher_walk_virt(&walk, (req), false);=09=09\
- =09while (walk.nbytes > 0) {=09=09=09=09=09\
- =09=09unsigned int nbytes =3D walk.nbytes;=09=09=09\
--=09=09bool do_fpu =3D (fpu_blocks) !=3D -1 &&=09=09=09\
--=09=09=09      nbytes >=3D (fpu_blocks) * __bsize;=09=09\
-+=09=09bool do_fpu =3D __fpu_blocks !=3D -1 &&=09=09=09\
-+=09=09=09      nbytes >=3D __fpu_blocks * __bsize;=09=09\
- =09=09const u8 *src =3D walk.src.virt.addr;=09=09=09\
- =09=09u8 *dst =3D walk.dst.virt.addr;=09=09=09=09\
- =09=09u8 __maybe_unused buf[(bsize)];=09=09=09=09\
-@@ -35,7 +36,12 @@
- } while (0)
-=20
- #define ECB_BLOCK(blocks, func) do {=09=09=09=09=09\
--=09while (nbytes >=3D (blocks) * __bsize) {=09=09=09=09\
-+=09const int __blocks =3D (blocks);=09=09=09=09=09\
-+=09if (do_fpu && __blocks < __fpu_blocks) {=09=09=09\
-+=09=09kernel_fpu_end();=09=09=09=09=09\
-+=09=09do_fpu =3D false;=09=09=09=09=09=09\
-+=09}=09=09=09=09=09=09=09=09\
-+=09while (nbytes >=3D __blocks * __bsize) {=09=09=09=09\
- =09=09(func)(ctx, dst, src);=09=09=09=09=09\
- =09=09ECB_WALK_ADVANCE(blocks);=09=09=09=09\
- =09}=09=09=09=09=09=09=09=09\
-@@ -53,7 +59,12 @@
- } while (0)
-=20
- #define CBC_DEC_BLOCK(blocks, func) do {=09=09=09=09\
--=09while (nbytes >=3D (blocks) * __bsize) {=09=09=09=09\
-+=09const int __blocks =3D (blocks);=09=09=09=09=09\
-+=09if (do_fpu && __blocks <  __fpu_blocks) {=09=09=09\
-+=09=09kernel_fpu_end();=09=09=09=09=09\
-+=09=09do_fpu =3D false;=09=09=09=09=09=09\
-+=09}=09=09=09=09=09=09=09=09\
-+=09while (nbytes >=3D __blocks * __bsize) {=09=09=09=09\
- =09=09const u8 *__iv =3D src + ((blocks) - 1) * __bsize;=09\
- =09=09if (dst =3D=3D src)=09=09=09=09=09=09\
- =09=09=09__iv =3D memcpy(buf, __iv, __bsize);=09=09\
---=20
-2.39.0
-
-
+Please don't send encrypted emails to the mailing list. Plaintext
+only, with the patch in the message body (not as an attachment).
+Please use git send-email if you have trouble configuring your email
+client.
