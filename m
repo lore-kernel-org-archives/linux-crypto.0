@@ -2,327 +2,180 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F690C67871
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 10:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C9BC3DA78
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 14:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236359AbjAQKma (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 05:42:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46634 "EHLO
+        id S230270AbjAQORz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 09:17:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236504AbjAQKmQ (ORCPT
+        with ESMTP id S230304AbjAQORx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 05:42:16 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE645C171;
-        Tue, 17 Jan 2023 02:42:14 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id p66so14724452iof.1;
-        Tue, 17 Jan 2023 02:42:14 -0800 (PST)
+        Tue, 17 Jan 2023 09:17:53 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A3B32525
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 06:17:52 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id bg13-20020a05600c3c8d00b003d9712b29d2so25924177wmb.2
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 06:17:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p9RSB0BhHGTXVHOfWxtaA4bX1SBCybHhxqLyFrdPZmE=;
-        b=k8VWcZVdA05kSA3xmlJoYb7deCbUU9YjweO55XWNW4IfmDji/qslO9QQG9m4fwrW0N
-         yDANrDzpDb+aa3G0ReKthCtjWKUilbiw6OCCLtw9nGDE1YAK5vUtyyaNQqVtEJ5eU5RK
-         Keva839sBX3DoYG/ed64sXzwvfX2BtVUr6UuXYUw3xVR6AGd9BQ+oL/ojZa+sn0WU/ZP
-         MJgFUhM4xz2x5RLy2D40xA+xdEhLuhW12oybtD24zSpYsXRej17/iEcV98MhQa2d7+2e
-         XCRI/T9r+DFwFJqu6bP1mPUXRyhPXSH7sMfo70XkZ3JWntRuhFeFPxCMbf7S0AfVmK4B
-         obOA==
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dTHyChbO618TW+g0tgT3zi0P3ULK8JiLkstdpFK8mZQ=;
+        b=lEDauw0Bb/fxvZJTnThpFfgivtEQ3RY/QrBemDT10fF8F7QGt54GNFNZIyvjlBpXqa
+         QoVWAa+ga6bzxooZIE2NU/MuOpTNNsVQf1leqmAfCtjYMUKySyYt5I+KewMyfSj8v0Cx
+         LwIgziyXKYbdHP1GDvscs9Qf+GWCM6WBDjx9gEhc2EP6eEkiR0r8Oqla6fbVB2Th5nsI
+         OAnSdeimj8lEMYKTiuf0Xc9MwTTVYWwzOWffpkBmFY0mWJ9K/FWqFYk2H2KiFuX2kdEt
+         PxKLpW0sR8GFVwIwI7ieDOjt7veajhEhmpTtDS/j4nDRLtwGjxISA//4S3E1a3k/Uqz2
+         NfKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p9RSB0BhHGTXVHOfWxtaA4bX1SBCybHhxqLyFrdPZmE=;
-        b=qx4ZPuiLuT7844bR/0siKvDDcW/VK0TCNCZrrT5iwQ/V3YpbMkPIwauP36dY+CInpy
-         nu+/Wr/YhrYqzXthOUPRDRcnp5Z5KB7FMQyLI08+IE+uhZ86s0wKTJFQj3RZJE4igP1N
-         OH9n892AmtEW8rzG6O6zB5F6kFqQvz+iknuZ+SpCar1iL7eIst7k9vkmTonZXHAN8R23
-         DIMYTj3L+c6c4ck4LmxCVX6Y8D5IT0+sQNSEsN/NeSnr9FMIKQaIuiU3C+cWS8ah4MNl
-         PmPcTqY+T88lm1O2EFfUvi9VvFQQImZGQFTN9GYwSupEaAiT8f0I1t9Gc+yEUkYQ5aOL
-         eILA==
-X-Gm-Message-State: AFqh2kpz1kp2M1RVc9nhehS0a9F9iJ/j4Hx/T3ehl4E5fwqom+aHMI9G
-        /akZisC5HvmkVA1ZDACR9xA=
-X-Google-Smtp-Source: AMrXdXsMjVzneQpnFD6YPzKcweoY87blKu8zb74uOTZ5iPScbWTixKwHYR/SUZP1V6RilnHO1ozs/Q==
-X-Received: by 2002:a6b:b2d0:0:b0:6e2:d939:4f30 with SMTP id b199-20020a6bb2d0000000b006e2d9394f30mr385034iof.0.1673952134013;
-        Tue, 17 Jan 2023 02:42:14 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g11-20020a02a08b000000b0038a3b8aaf11sm7656852jah.37.2023.01.17.02.42.07
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dTHyChbO618TW+g0tgT3zi0P3ULK8JiLkstdpFK8mZQ=;
+        b=dojSwe6L/YuUDqwg1zIWukz7W7P2/JYssjU52eTGlmuge9LSgP+8k3T5sig6tlxwzb
+         1lsgcXgpoAwc/naXM9kKVYkSofmPqHCK5zTTr+ATaJKIjiWUCtC2S2dQ4e9dY0eCTuRW
+         6zaYBJNT4razrSEzcywmACIC6Wa/B1uI2i3bKpfwHzZgArAfifmqeqeQZvjBE2boW/Yc
+         0xn8nCdqq1O2D61RJW6Dv1BSQLiu5FHrQXu2Y7Gi9ATyr5G6vlf778QBDznCHlUIwNgI
+         liMGzKxL6iNonifnwhKPNi1fR5cYa4XAscFhzEBIV4U5VyXmy7Bl0mV9ekJnSdQwgV7y
+         z1/g==
+X-Gm-Message-State: AFqh2kojLRP1SCxxJrslJFIeS0pMvDN28U9CQIgwiqWr60iGjrNKJ12a
+        78Z6yGtioTKJ9q+fTf3GzgNnQTYXOQmYZg==
+X-Google-Smtp-Source: AMrXdXutMAC+jsdRYpfzk/iK7JA4z7t000SJRBSX9kW92VeVEZ3PN0tUG0c3CRYH7q8lu/9lNgoQig==
+X-Received: by 2002:a05:600c:4f41:b0:3da:ff08:6c5f with SMTP id m1-20020a05600c4f4100b003daff086c5fmr3093100wmq.40.1673965071448;
+        Tue, 17 Jan 2023 06:17:51 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id o37-20020a05600c512500b003db09eaddb5sm2395600wms.3.2023.01.17.06.17.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 02:42:13 -0800 (PST)
-Date:   Tue, 17 Jan 2023 12:42:03 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@profian.com>
-Subject: Re: [PATCH RFC v7 20/64] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <20230117124203.00001961@gmail.com>
-In-Reply-To: <20221214194056.161492-21-michael.roth@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
-        <20221214194056.161492-21-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Tue, 17 Jan 2023 06:17:50 -0800 (PST)
+Date:   Tue, 17 Jan 2023 17:17:47 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     Jonathan.Cameron@huawei.com
+Cc:     linux-crypto@vger.kernel.org
+Subject: [bug report] crypto: hisilicon - SEC security accelerator driver
+Message-ID: <Y8auC2Ef+nC1FN1T@kili>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 14 Dec 2022 13:40:12 -0600
-Michael Roth <michael.roth@amd.com> wrote:
+Hello Jonathan Cameron,
 
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> When SEV-SNP is enabled globally, a write from the host goes through the
-> RMP check. When the host writes to pages, hardware checks the following
-> conditions at the end of page walk:
-> 
-> 1. Assigned bit in the RMP table is zero (i.e page is shared).
-> 2. If the page table entry that gives the sPA indicates that the target
->    page size is a large page, then all RMP entries for the 4KB
->    constituting pages of the target must have the assigned bit 0.
-> 3. Immutable bit in the RMP table is not zero.
-> 
+The patch 915e4e8413da: "crypto: hisilicon - SEC security accelerator
+driver" from Jul 23, 2018, leads to the following Smatch static
+checker warning:
 
-Just being curious. AMD APM table 15-37 "RMP Page Assignment Settings" shows
-Immuable bit is "don't care" when a page is owned by the hypervisor. The 
-table 15-39 "RMP Memory Access Checks" shows the hardware will do
-"Hypervisor-owned" check for host data write and page table access. I suppose
-"Hypervisor-owned" check means HW will check if the RMP entry is configured
-according to the table 15-37 (Assign bit = 0, ASID = 0, Immutable = X)
+drivers/crypto/hisilicon/sec/sec_algs.c:389 sec_send_request() warn: sleeping in atomic context
+drivers/crypto/hisilicon/sec/sec_algs.c:494 sec_skcipher_alg_callback() warn: sleeping in atomic context
+drivers/crypto/hisilicon/sec/sec_algs.c:506 sec_skcipher_alg_callback() warn: sleeping in atomic context
+drivers/crypto/hisilicon/sec/sec_algs.c:824 sec_alg_skcipher_crypto() warn: sleeping in atomic context
+drivers/crypto/hisilicon/sec/sec_drv.c:864 sec_queue_send() warn: sleeping in atomic context
 
-None of them mentions that Immutable bit in the related RMP-entry should
-be 1 for hypervisor-owned page.
+drivers/crypto/hisilicon/sec/sec_algs.c
+    421 static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
+    422                                       struct crypto_async_request *req_base)
+    423 {
+    424         struct skcipher_request *skreq = container_of(req_base,
+    425                                                       struct skcipher_request,
+    426                                                       base);
+    427         struct sec_request *sec_req = skcipher_request_ctx(skreq);
+    428         struct sec_request *backlog_req;
+    429         struct sec_request_el *sec_req_el, *nextrequest;
+    430         struct sec_alg_tfm_ctx *ctx = sec_req->tfm_ctx;
+    431         struct crypto_skcipher *atfm = crypto_skcipher_reqtfm(skreq);
+    432         struct device *dev = ctx->queue->dev_info->dev;
+    433         int icv_or_skey_en, ret;
+    434         bool done;
+    435 
+    436         sec_req_el = list_first_entry(&sec_req->elements, struct sec_request_el,
+    437                                       head);
+    438         icv_or_skey_en = (sec_resp->w0 & SEC_BD_W0_ICV_OR_SKEY_EN_M) >>
+    439                 SEC_BD_W0_ICV_OR_SKEY_EN_S;
+    440         if (sec_resp->w1 & SEC_BD_W1_BD_INVALID || icv_or_skey_en == 3) {
+    441                 dev_err(dev, "Got an invalid answer %lu %d\n",
+    442                         sec_resp->w1 & SEC_BD_W1_BD_INVALID,
+    443                         icv_or_skey_en);
+    444                 sec_req->err = -EINVAL;
+    445                 /*
+    446                  * We need to muddle on to avoid getting stuck with elements
+    447                  * on the queue. Error will be reported so requester so
+    448                  * it should be able to handle appropriately.
+    449                  */
+    450         }
+    451 
+    452         spin_lock_bh(&ctx->queue->queuelock);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Holding a spinlock.
 
-I can understand 1) 2). Can you explain more about 3)?
+    453         /* Put the IV in place for chained cases */
+    454         switch (ctx->cipher_alg) {
+    455         case SEC_C_AES_CBC_128:
+    456         case SEC_C_AES_CBC_192:
+    457         case SEC_C_AES_CBC_256:
+    458                 if (sec_req_el->req.w0 & SEC_BD_W0_DE)
+    459                         sg_pcopy_to_buffer(sec_req_el->sgl_out,
+    460                                            sg_nents(sec_req_el->sgl_out),
+    461                                            skreq->iv,
+    462                                            crypto_skcipher_ivsize(atfm),
+    463                                            sec_req_el->el_length -
+    464                                            crypto_skcipher_ivsize(atfm));
+    465                 else
+    466                         sg_pcopy_to_buffer(sec_req_el->sgl_in,
+    467                                            sg_nents(sec_req_el->sgl_in),
+    468                                            skreq->iv,
+    469                                            crypto_skcipher_ivsize(atfm),
+    470                                            sec_req_el->el_length -
+    471                                            crypto_skcipher_ivsize(atfm));
+    472                 /* No need to sync to the device as coherent DMA */
+    473                 break;
+    474         case SEC_C_AES_CTR_128:
+    475         case SEC_C_AES_CTR_192:
+    476         case SEC_C_AES_CTR_256:
+    477                 crypto_inc(skreq->iv, 16);
+    478                 break;
+    479         default:
+    480                 /* Do not update */
+    481                 break;
+    482         }
+    483 
+    484         if (ctx->queue->havesoftqueue &&
+    485             !kfifo_is_empty(&ctx->queue->softqueue) &&
+    486             sec_queue_empty(ctx->queue)) {
+    487                 ret = kfifo_get(&ctx->queue->softqueue, &nextrequest);
+    488                 if (ret <= 0)
+    489                         dev_err(dev,
+    490                                 "Error getting next element from kfifo %d\n",
+    491                                 ret);
+    492                 else
+    493                         /* We know there is space so this cannot fail */
+--> 494                         sec_queue_send(ctx->queue, &nextrequest->req,
+                                ^^^^^^^^^^^^^^^
 
-> The hardware will raise page fault if one of the above conditions is not
-> met. Try resolving the fault instead of taking fault again and again. If
-> the host attempts to write to the guest private memory then send the
-> SIGBUS signal to kill the process. If the page level between the host and
-> RMP entry does not match, then split the address to keep the RMP and host
-> page levels in sync.
-> 
-> Co-developed-by: Jarkko Sakkinen <jarkko.sakkinen@profian.com>
-> Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@profian.com>
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/mm/fault.c      | 97 ++++++++++++++++++++++++++++++++++++++++
->  include/linux/mm.h       |  3 +-
->  include/linux/mm_types.h |  3 ++
->  mm/memory.c              | 10 +++++
->  4 files changed, 112 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> index f8193b99e9c8..d611051dcf1e 100644
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -33,6 +33,7 @@
->  #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
->  #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
->  #include <asm/irq_stack.h>
-> +#include <asm/sev.h>			/* snp_lookup_rmpentry()	*/
->  
->  #define CREATE_TRACE_POINTS
->  #include <asm/trace/exceptions.h>
-> @@ -414,6 +415,7 @@ static void dump_pagetable(unsigned long address)
->  	pr_cont("PTE %lx", pte_val(*pte));
->  out:
->  	pr_cont("\n");
-> +
->  	return;
->  bad:
->  	pr_info("BAD\n");
-> @@ -1240,6 +1242,90 @@ do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,
->  }
->  NOKPROBE_SYMBOL(do_kern_addr_fault);
->  
-> +enum rmp_pf_ret {
-> +	RMP_PF_SPLIT	= 0,
-> +	RMP_PF_RETRY	= 1,
-> +	RMP_PF_UNMAP	= 2,
-> +};
-> +
-> +/*
-> + * The goal of RMP faulting routine is really to check whether the
-> + * page that faulted should be accessible.  That can be determined
-> + * simply by looking at the RMP entry for the 4k address being accessed.
-> + * If that entry has Assigned=1 then it's a bad address. It could be
-> + * because the 2MB region was assigned as a large page, or it could be
-> + * because the region is all 4k pages and that 4k was assigned.
-> + * In either case, it's a bad access.
-> + * There are basically two main possibilities:
-> + * 1. The 2M entry has Assigned=1 and Page_Size=1. Then all 511 middle
-> + * entries also have Assigned=1. This entire 2M region is a guest page.
-> + * 2. The 2M entry has Assigned=0 and Page_Size=0. Then the 511 middle
-> + * entries can be anything, this region consists of individual 4k assignments.
-> + */
-> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
-> +				      unsigned long address)
-> +{
-> +	int rmp_level, level;
-> +	pgd_t *pgd;
-> +	pte_t *pte;
-> +	u64 pfn;
-> +
-> +	pgd = __va(read_cr3_pa());
-> +	pgd += pgd_index(address);
-> +
-> +	pte = lookup_address_in_pgd(pgd, address, &level);
-> +
-> +	/*
-> +	 * It can happen if there was a race between an unmap event and
-> +	 * the RMP fault delivery.
-> +	 */
-> +	if (!pte || !pte_present(*pte))
-> +		return RMP_PF_UNMAP;
-> +
-> +	/*
-> +	 * RMP page fault handler follows this algorithm:
-> +	 * 1. Compute the pfn for the 4kb page being accessed
-> +	 * 2. Read that RMP entry -- If it is assigned then kill the process
-> +	 * 3. Otherwise, check the level from the host page table
-> +	 *    If level=PG_LEVEL_4K then the page is already smashed
-> +	 *    so just retry the instruction
-> +	 * 4. If level=PG_LEVEL_2M/1G, then the host page needs to be split
-> +	 */
-> +
-> +	pfn = pte_pfn(*pte);
-> +
-> +	/* If its large page then calculte the fault pfn */
-> +	if (level > PG_LEVEL_4K)
-> +		pfn = pfn | PFN_DOWN(address & (page_level_size(level) - 1));
-> +
-> +	/*
-> +	 * If its a guest private page, then the fault cannot be resolved.
-> +	 * Send a SIGBUS to terminate the process.
-> +	 *
-> +	 * As documented in APM vol3 pseudo-code for RMPUPDATE, when the 2M range
-> +	 * is covered by a valid (Assigned=1) 2M entry, the middle 511 4k entries
-> +	 * also have Assigned=1. This means that if there is an access to a page
-> +	 * which happens to lie within an Assigned 2M entry, the 4k RMP entry
-> +	 * will also have Assigned=1. Therefore, the kernel should see that
-> +	 * the page is not a valid page and the fault cannot be resolved.
-> +	 */
-> +	if (snp_lookup_rmpentry(pfn, &rmp_level)) {
-> +		pr_info("Fatal RMP page fault, terminating process, entry assigned for pfn 0x%llx\n",
-> +			pfn);
-> +		do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
-> +		return RMP_PF_RETRY;
-> +	}
-> +
-> +	/*
-> +	 * The backing page level is higher than the RMP page level, request
-> +	 * to split the page.
-> +	 */
-> +	if (level > rmp_level)
-> +		return RMP_PF_SPLIT;
-> +
-> +	return RMP_PF_RETRY;
-> +}
-> +
->  /*
->   * Handle faults in the user portion of the address space.  Nothing in here
->   * should check X86_PF_USER without a specific justification: for almost
-> @@ -1337,6 +1423,17 @@ void do_user_addr_fault(struct pt_regs *regs,
->  	if (error_code & X86_PF_INSTR)
->  		flags |= FAULT_FLAG_INSTRUCTION;
->  
-> +	/*
-> +	 * If its an RMP violation, try resolving it.
-> +	 */
-> +	if (error_code & X86_PF_RMP) {
-> +		if (handle_user_rmp_page_fault(regs, error_code, address))
-> +			return;
-> +
-> +		/* Ask to split the page */
-> +		flags |= FAULT_FLAG_PAGE_SPLIT;
-> +	}
-> +
->  #ifdef CONFIG_X86_64
->  	/*
->  	 * Faults in the vsyscall page might need emulation.  The
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 3c84f4e48cd7..2fd8e16d149c 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -466,7 +466,8 @@ static inline bool fault_flag_allow_retry_first(enum fault_flag flags)
->  	{ FAULT_FLAG_USER,		"USER" }, \
->  	{ FAULT_FLAG_REMOTE,		"REMOTE" }, \
->  	{ FAULT_FLAG_INSTRUCTION,	"INSTRUCTION" }, \
-> -	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }
-> +	{ FAULT_FLAG_INTERRUPTIBLE,	"INTERRUPTIBLE" }, \
-> +	{ FAULT_FLAG_PAGE_SPLIT,	"PAGESPLIT" }
->  
->  /*
->   * vm_fault is filled by the pagefault handler and passed to the vma's
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 500e536796ca..06ba34d51638 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -962,6 +962,8 @@ typedef struct {
->   *                      mapped R/O.
->   * @FAULT_FLAG_ORIG_PTE_VALID: whether the fault has vmf->orig_pte cached.
->   *                        We should only access orig_pte if this flag set.
-> + * @FAULT_FLAG_PAGE_SPLIT: The fault was due page size mismatch, split the
-> + *                         region to smaller page size and retry.
->   *
->   * About @FAULT_FLAG_ALLOW_RETRY and @FAULT_FLAG_TRIED: we can specify
->   * whether we would allow page faults to retry by specifying these two
-> @@ -999,6 +1001,7 @@ enum fault_flag {
->  	FAULT_FLAG_INTERRUPTIBLE =	1 << 9,
->  	FAULT_FLAG_UNSHARE =		1 << 10,
->  	FAULT_FLAG_ORIG_PTE_VALID =	1 << 11,
-> +	FAULT_FLAG_PAGE_SPLIT =		1 << 12,
->  };
->  
->  typedef unsigned int __bitwise zap_flags_t;
-> diff --git a/mm/memory.c b/mm/memory.c
-> index f88c351aecd4..e68da7e403c6 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -4996,6 +4996,12 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->  	return 0;
->  }
->  
-> +static int handle_split_page_fault(struct vm_fault *vmf)
-> +{
-> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-> +	return 0;
-> +}
-> +
->  /*
->   * By the time we get here, we already hold the mm semaphore
->   *
-> @@ -5078,6 +5084,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
->  				pmd_migration_entry_wait(mm, vmf.pmd);
->  			return 0;
->  		}
-> +
-> +		if (flags & FAULT_FLAG_PAGE_SPLIT)
-> +			return handle_split_page_fault(&vmf);
-> +
->  		if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
->  			if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
->  				return do_huge_pmd_numa_page(&vmf);
+Sleeping function.
 
+    495                                        nextrequest->sec_req);
+    496         } else if (!list_empty(&ctx->backlog)) {
+    497                 /* Need to verify there is room first */
+    498                 backlog_req = list_first_entry(&ctx->backlog,
+    499                                                typeof(*backlog_req),
+    500                                                backlog_head);
+    501                 if (sec_queue_can_enqueue(ctx->queue,
+    502                     backlog_req->num_elements) ||
+    503                     (ctx->queue->havesoftqueue &&
+    504                      kfifo_avail(&ctx->queue->softqueue) >
+    505                      backlog_req->num_elements)) {
+    506                         sec_send_request(backlog_req, ctx->queue);
+                                ^^^^^^^^^^^^^^^^
+Also sleeps.
+
+    507                         backlog_req->req_base->complete(backlog_req->req_base,
+    508                                                         -EINPROGRESS);
+    509                         list_del(&backlog_req->backlog_head);
+    510                 }
+    511         }
+    512         spin_unlock_bh(&ctx->queue->queuelock);
+
+regards,
+dan carpenter
