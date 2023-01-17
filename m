@@ -2,126 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 178BFC677F1
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 17:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A177C3DA78
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 19:15:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232721AbjAQRXX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 12:23:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47368 "EHLO
+        id S232454AbjAQTPV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 14:15:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233033AbjAQRWc (ORCPT
+        with ESMTP id S233914AbjAQSyX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 12:22:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145B64B77D
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 09:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673976037;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1PRuX+JN7wqNln+FW4J1BUr8fMYCnc6M3GNZOEvdC2c=;
-        b=bnLXJs/CS30vUyvdjLw/E+CIA4UFLaSHSY9KJ8jtcLjFb8ct8AMcDe+KmGpasElkomc1GE
-        jtx99DasnJ425X/TW8bAeOiZVC3Z1ZMlvJHewFayfdvlgOHzPmmxaWzvxn7Ab3bxBNXUU6
-        L9UtcwBN4qrMDkzIFSZg/F252hCEMgY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-zoROmHHFNWi7Yx2HUGpmQQ-1; Tue, 17 Jan 2023 12:20:32 -0500
-X-MC-Unique: zoROmHHFNWi7Yx2HUGpmQQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A44619705C0;
-        Tue, 17 Jan 2023 17:20:32 +0000 (UTC)
-Received: from rules.brq.redhat.com (ovpn-208-27.brq.redhat.com [10.40.208.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F3B5C140EBF5;
-        Tue, 17 Jan 2023 17:20:29 +0000 (UTC)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vladis Dronov <vdronov@redhat.com>
-Subject: [PATCH] crypto: testmgr - disallow certain DRBG hash functions in FIPS mode
-Date:   Tue, 17 Jan 2023 18:20:06 +0100
-Message-Id: <20230117172006.8912-1-vdronov@redhat.com>
+        Tue, 17 Jan 2023 13:54:23 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4F45A342
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 10:18:06 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso38095537pjt.0
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 10:18:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0fpJFz+uumjj7KE/lorb8wR6u11JYG6vZ+zsVfls5E=;
+        b=VBrRf9pTr/4IPYNmGourNvutyd/ceeVLNpGDPjYtcjudgwi8bWs3X2fID1pp4T6P9x
+         kCxV6g3thz6inwVNXqUomT28JPS2ASsErK+GnX32+XdchqM1ZA9rZp1L54MNryjAKc2D
+         3Y8dbKLBCXTr72HwAJPkq9mYKDdLlO9Ww4JA9vgJ+ariun+1gAwsRGjIgOetyIN/lKC8
+         pBlvSQCFm1kfkCg1oJ0Gp9WU//JwlAYAoqDqvoUs0678SECg+yGXEuLIzQdsvAU9uMH/
+         hlHBXvoF3ljJyon0Q4DggoJ1vVF1vkwaLkoZSDQW6aEmLBQARFMreCm7uLanSV6HKBfZ
+         0xCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q0fpJFz+uumjj7KE/lorb8wR6u11JYG6vZ+zsVfls5E=;
+        b=yGizgE/UqrPTJnwAM0B7Pgg9a+U9yBk6SE+X/1Po2fk/SaapYqAwKHBLHcUVo8dphI
+         K4i7sFWJx9/1IojaQUxFigL0g/w7LWqkg8sNmSRr3XgM2flZbYBryj8alE/nxdhpF6yc
+         S8hV25i8CnYmXzDUG70rn2MlVaDUOaf429izW7byrI0WAgQZFakW+JI8VrDM4KGU3rYg
+         94OWb/f1GDiXLSoBOLLv411wuSiRBy1XuJfDVu3t7sTyu8/Eny5admLXEno3ATlfQcsf
+         tuIQDDTmCp1ZJcG4ti0n6JOzh13x4hZC2rDt03octF4zK2eKDJujgF9fvlWPnY0b8hOr
+         6QGQ==
+X-Gm-Message-State: AFqh2kqpHfC0loi6tk3KbTQ2TvRzj0w+JJoBC4LZ8m6VoNNl0pvJ1Y1B
+        gEuzyP+fgeLl7goxv0w3LiPtRxWnnmzpLYGdU4o9qQ==
+X-Google-Smtp-Source: AMrXdXsLciTK/2HzPHQv+ZKXUDNClH0QiJEUmRoQczErUi+3abrIY/ID2bNm4k6HDiWy8rkplZ05CxtNFA2LLMBhZzU=
+X-Received: by 2002:a17:90a:c784:b0:227:202b:8eaa with SMTP id
+ gn4-20020a17090ac78400b00227202b8eaamr359677pjb.147.1673979476682; Tue, 17
+ Jan 2023 10:17:56 -0800 (PST)
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+References: <20230110170848.3022682-1-trix@redhat.com>
+In-Reply-To: <20230110170848.3022682-1-trix@redhat.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 17 Jan 2023 10:17:45 -0800
+Message-ID: <CAKwvOdnde5qmYCsU1V4ccRn4tkEmPZLwJ2UFFLQfR-to7wLQTw@mail.gmail.com>
+Subject: Re: [PATCH v3] crypto: ccp: initialize 'error' variable to zero
+To:     Tom Rix <trix@redhat.com>
+Cc:     brijesh.singh@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        nathan@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to FIPS 140-3 IG, section D.R "Hash Functions Acceptable for
-Use in the SP 800-90A DRBGs", modules certified after May 16th, 2023
-must not support the use of: SHA-224, SHA-384, SHA512-224, SHA512-256,
-SHA3-224, SHA3-384. Disallow HMAC and HASH DRBGs using SHA-384 in FIPS
-mode.
+On Tue, Jan 10, 2023 at 9:09 AM Tom Rix <trix@redhat.com> wrote:
+>
+> Clang static analysis reports this problem
+> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
+>   argument is an uninitialized value [core.CallAndMessage]
+>     dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+>     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> __sev_platform_init_locked() can return without setting the
+> error parameter, causing the dev_err() to report a garbage
+> value.
+>
+> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+> Signed-off-by: Tom Rix <trix@redhat.com>
 
-Signed-off-by: Vladis Dronov <vdronov@redhat.com>
----
-Some details:
+Thanks for the patch!
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-The following DRBG algos are defined in testmgr.c as of now:
+> ---
+> v2 cleanup commit log
+> v3 cleanup commit log
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 56998bc579d6..643cccc06a0b 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1307,7 +1307,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+>  void sev_pci_init(void)
+>  {
+>         struct sev_device *sev = psp_master->sev_data;
+> -       int error, rc;
+> +       int error = 0, rc;
+>
+>         if (!sev)
+>                 return;
+> --
+> 2.27.0
+>
+>
 
-drbg_{no,}pr_ctr_aes128
-drbg_{no,}pr_ctr_aes192
-drbg_{no,}pr_ctr_aes256
 
-drbg_{no,}pr_hmac_sha1
-drbg_{no,}pr_hmac_sha256
-drbg_{no,}pr_hmac_sha384 (disallow)
-drbg_{no,}pr_hmac_sha512
-
-drbg_{no,}pr_sha1
-drbg_{no,}pr_sha256
-drbg_{no,}pr_sha384 (disallow)
-drbg_{no,}pr_sha512
-
-Marked DRBGs should be disallowed in FIPS mode according to
-the requirements above.
----
- crypto/testmgr.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4476ac97baa5..fbb53d961ea9 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4782,7 +4782,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		/* covered by drbg_nopr_hmac_sha256 test */
- 		.alg = "drbg_nopr_hmac_sha384",
--		.fips_allowed = 1,
- 		.test = alg_test_null,
- 	}, {
- 		.alg = "drbg_nopr_hmac_sha512",
-@@ -4805,7 +4804,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		/* covered by drbg_nopr_sha256 test */
- 		.alg = "drbg_nopr_sha384",
--		.fips_allowed = 1,
- 		.test = alg_test_null,
- 	}, {
- 		.alg = "drbg_nopr_sha512",
-@@ -4841,7 +4839,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		/* covered by drbg_pr_hmac_sha256 test */
- 		.alg = "drbg_pr_hmac_sha384",
--		.fips_allowed = 1,
- 		.test = alg_test_null,
- 	}, {
- 		.alg = "drbg_pr_hmac_sha512",
-@@ -4861,7 +4858,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		/* covered by drbg_pr_sha256 test */
- 		.alg = "drbg_pr_sha384",
--		.fips_allowed = 1,
- 		.test = alg_test_null,
- 	}, {
- 		.alg = "drbg_pr_sha512",
 -- 
-2.39.0
-
+Thanks,
+~Nick Desaulniers
