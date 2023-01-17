@@ -2,157 +2,212 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E164C677F1
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 19:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBCFC3DA78
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 20:04:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbjAQTrq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 14:47:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38182 "EHLO
+        id S232808AbjAQUD2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 15:03:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235155AbjAQTpc (ORCPT
+        with ESMTP id S233278AbjAQUBA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 14:45:32 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3D358985;
-        Tue, 17 Jan 2023 10:45:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YfzYy3QfX4wfRm3KrBDABAYMmK7quVBTn007eHuaY3Twd79gkqHV6duTfpeL+FNqF3zuQv4iZ0HYZgBsa8jfNaHKqI5sypmCERDECX+jLGEKpAj2btZx2UTrXRWb2FxP+IEyXIwgtlVnWhiM4Pdfv/gx+pnU+IYrb/0u99N2IZbl40kvq/barSI6IfRrDb3yw1TksnMgTlb38HJd+n7/TtUcpT2VxZS53oxeZOtZbpotvOgDN3Kao+qi1LlRyyzTa08gu5MDw/hBUBZ0BkmraOIh4cUcQz4zXzDYYDNVMiCZpQFvEhw8l6hI7k7bPxzxyUZVpCtKzs+sFHkiSUDvNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jJGSZ/cYdPCbkd8m4SPazuhz32zpZSDAxjmPcJMkgNw=;
- b=JV5l4YMs/xrdOL5+N8DsFEL80b8s2bBfIHeY2lqC8rKk9+izHGs8IR95oaGC6/SDoneBttmjLKzgGXTKYq9ia4olr972TxGBz0FRWa3EKWQT4IIH0N5GhW7WfXEgEP38Z+oUFlUyQPhSRDtAzu8LchpMxNdWLOYYckg2VzNle+2NOCeNWlM2q0+fRUMuyDYV+PkW3heMWTxp0ctIVpuW8yzqSwAs0KcEIkwfcBit2ztADkOWgfLoTD6Nem72FpDSdaaHNjp3JrXu5ipc2Z3jBqvosJP7hxQ+ssA+UVOFf8oarq+yWPuL7ePdBQevxorU1oaXIdILjMJTBeL1zXqmvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJGSZ/cYdPCbkd8m4SPazuhz32zpZSDAxjmPcJMkgNw=;
- b=y3jdnUcVlQwHZL3Y6p7FCA8q+jRfZDnDBukzj5ncRB/JNJa8VKQgKmMHSu7P2fNg2vQtUP/ErKRvdhBj9YUn0aTzMEmLamsma+aBjuSh+duj+KSGh7cNE5IHvcZ1O7o+wwdfbURd1wZUI3jV+m+81FB5pRjYn59CDxtOFUw2yHc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by IA0PR12MB7556.namprd12.prod.outlook.com (2603:10b6:208:43c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Tue, 17 Jan
- 2023 18:45:00 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7%3]) with mapi id 15.20.6002.013; Tue, 17 Jan 2023
- 18:45:00 +0000
-Message-ID: <0a51100b-f10c-04ac-bce4-1a943ffa39d3@amd.com>
-Date:   Tue, 17 Jan 2023 12:44:58 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v3] crypto: ccp: initialize 'error' variable to zero
-Content-Language: en-US
-To:     Tom Rix <trix@redhat.com>, brijesh.singh@amd.com,
-        john.allen@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, nathan@kernel.org, ndesaulniers@google.com
+        Tue, 17 Jan 2023 15:01:00 -0500
+X-Greylist: delayed 179 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 Jan 2023 10:53:17 PST
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96164DE18;
+        Tue, 17 Jan 2023 10:53:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1673981230; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=HFSQpNTekvX+wFqqpqxz/aXmgPGzBSIUQhHCALyDt+oPyNKJmTvahoZylAowQigosg
+    WktDpwAuYoHAhUO17ypIQfJG7m6oQnQb9E3Z2EJkK9cyRZenHpJ6h8KBCzaUn/4HK60x
+    cobcLYoni0gXJUSy3x42O1Dot7TMgzPW9Ff8Py5mlat1mmqO/WGhifXz1U/O+jjo2GQG
+    FzopCvdodr2LKfbelmb82UQmST0mS91O4m24krkvqZsPKGzxD7jx522/FkuLd29M0ZN6
+    YTCNZD09KY0mWJ2pvlKAFc2Yw/T752LPvjZMIeULoCNBB03aIyP+4v3JVOo0s2KpSpcy
+    NekA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1673981230;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=VTtIscZoPH6qVhA3IKK5aIsGEbPXdZi3nR9I+EQcJmU=;
+    b=Q/NOlRMTyDcTdLhcJBRSvxTYD+m7OKDD62S2CQlWsWM6llwNHWspUsqlObr/p0kXgS
+    44EBLMZ8aFU2jvBDcQDLm7L3INcVewJpD89HDLxNdANK83IBRxo5QSxi1+XUFdVmGIw8
+    W5u1h/JaMi/YBJVXUDZgGJuUmCmjbXTqk+EWxdt/CWm9daPul0LI76XfSkKakXg2u/q/
+    bnyXYQT4JcfKUKtVm6g21d7Q1n00BPQ5ikQRX6ZNkbKpRNHz7FX030tT48UmrJloBn4s
+    8ZSPO2HwuyoZULw+ioRIlHqRNdFW9eMPbP06a65wSz1PlXJA0r94tSb2eXOY1djnhWu5
+    XmiQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1673981230;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=VTtIscZoPH6qVhA3IKK5aIsGEbPXdZi3nR9I+EQcJmU=;
+    b=WrrA9ZbGAmZ1rvIeRS5q8ZMJpz71uPZEuv7FTzy62s068tQaTtSRktDu6OKXMVNV2E
+    JI8Ca6dwIOM6xZOvPf4mVFsDeGohI+4BQ1J5F3vwcySV4J8ezwPQ79gMdzSKPE3STuCC
+    QxpWf/JmPgujyaE8dUO0YunLGv2GdT0KfXCIGzQkZSq2dw4ZBAj1CK7v10GAFo/D0jXE
+    jFHVWpKmhkNhL3qfnKrVgM7sH7Iuk5sotRPEsqm+whVEctEMZ4ccIuq8X7njlNzQBL67
+    hlnbhdRu3glHzq0BiqmQobOu2PnhWB/D74TgSqniX3Go/Vtm1xDBMGRHbii1TP5tS3Gt
+    fJcQ==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnjFHXPaJ/Sc8sY="
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 48.6.2 DYNA|AUTH)
+    with ESMTPSA id 35c3cez0HIl9X9m
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 17 Jan 2023 19:47:09 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Vladis Dronov <vdronov@redhat.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-References: <20230110170848.3022682-1-trix@redhat.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20230110170848.3022682-1-trix@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR07CA0027.namprd07.prod.outlook.com
- (2603:10b6:610:20::40) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        Vladis Dronov <vdronov@redhat.com>
+Subject: Re: [PATCH] crypto: testmgr - disallow certain DRBG hash functions in FIPS
+ mode
+Date:   Tue, 17 Jan 2023 19:47:08 +0100
+Message-ID: <12136143.O9o76ZdvQC@positron.chronox.de>
+In-Reply-To: <20230117172006.8912-1-vdronov@redhat.com>
+References: <20230117172006.8912-1-vdronov@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|IA0PR12MB7556:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ff05bba-1d7c-46d8-2a37-08daf8baf014
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: a8s9ag3hiUa930qvA6nfFl9dj7bECtWZJuzii7yw4boFVLZtjIsaUdx79EBKtgBIyzffGCEdQ3BpW43hKe7m6ihidPaCvAi6pvy84tumziIj3BI6fm2SHWOj8IGQmGtiRcktpIVrJStMUVvq2bHwA0lIQqr77i+EmOAmUj043GqgcQ2IZ0TBPDGzA4v83Pn+5rRZIq1IDCoLTcz3DhnLLQFFdU8KHki5CTLHBF8Xjaea/i5vmxBOm1XQ32GuSgZD6VGmq/IJDulcLjT8q2Lkr2AfbhKlQ8QTAFJ8cMyCiayIBInnIVzC+UdU5v8+Piq9FIT/bGm6OzvfthUr9zBKqK+HSbDUcnrX+16k6ZhUfIE24390JJaMoVXThDk7MecNlQdvg/2P1dNdT51sAneO6eatAOQ72ZRPUtgXCuN30pkI5Q/09JFENqr5MWJr9B5Tr3QQkMQuNzact7/dc9b0M8w4vTxW3Z+8DKYnX64lZnZA+conpPPMe8d5+tpL1TTYNELCv93Ozj4ZaJ5H5ixCAJJzgCxULRYDmOxNP0m+x5Gv+ZNurp68wbrRtSt4WvkRdcQ5ES9dRSWopbYWAX4L6oyvlfofUrL6VfZSYu7Kr/OgelSwgjaCU8uXhkexCN7gBcSJzwLxXs+yMGt1eAE7r2oUFOOhCI3/6jnzsa/ChypsHVCMwk/c/5i+4sUwwCnE7rwh9qICphpmMyxcj1vA2ztTh4/rTeZDD1jxI128GLE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(39860400002)(136003)(396003)(451199015)(31686004)(36756003)(38100700002)(86362001)(8936002)(66556008)(66476007)(31696002)(66946007)(5660300002)(4326008)(2906002)(8676002)(83380400001)(6486002)(316002)(478600001)(41300700001)(2616005)(53546011)(26005)(6506007)(6512007)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cVl3YXZCS0xsdmpDdjVzZ3ZRSnovdWx6dXY4TnlJbzZ5WTNSRUNNbHppTDJP?=
- =?utf-8?B?K3lSNHZmYmR1NmZTanR4MVA3djBDZHJlKzdzbHpSUVBvWTFQYkNuKy9UM3Fm?=
- =?utf-8?B?emhNYklVUkljQUZ2eDBjdTB6TWdSRDhpd0hHeFg2N0tVS2p6OUNTRUszbFVI?=
- =?utf-8?B?dklELy9UK3EyRW5OaStzeVp3SUkxQVJKcWVrYWZaelhCRk9obVhEMkNlSklN?=
- =?utf-8?B?cUtPN2VXclMySTMwTUNCMVZycFNLVVVQYjZMbUdvVXpZTXFWTmY4Njd5NjBa?=
- =?utf-8?B?N0NBUUlXdDh1SXI4RUlBbEpKcW9zVHUweTFSbVhKUGluV0FUVmM2Y0dzUHBz?=
- =?utf-8?B?bXdOKzJndy9ZWjQyN1hzZmxIamk4Q252azNwNmNTcFU5NXZZZnRxcFBIZThP?=
- =?utf-8?B?bXVDY2plNGVuL09mN0ZMN0Y0OHI2WG5uSEptSkJyZ2dXc1l3MFpaMU1IbzJI?=
- =?utf-8?B?UHU2UG51Z21iRzQ2RExQTFV1OHJKRVU5a3pRTFVwVWo5a2RBcVpMTnR3WDl0?=
- =?utf-8?B?dFkwU0FxUmZkTkhjQlJ6SHZlaG8yMDRiMG81czlJMm9WUmtRNzR0d0s0VXo3?=
- =?utf-8?B?Z2IxZTVKUnc2LzlleVQ3TnpXZjRCWGczYlRnTHRzTkVHOWk3d2VFeDBPa2lB?=
- =?utf-8?B?MExJK3Q0akxMY1ZaYUZxQktuYkJKNHBRS0tLWW1xa0hRQ09McllxbVhScVVk?=
- =?utf-8?B?ZDE5bXZmMzhhbG1qWnQ1L3Vad1lDK3VzSVlJdXR0UWt1U3U0Nk9mTGppWFdo?=
- =?utf-8?B?SGRYYXE5dU9DcDhRVHBJNStlOVorOEFlQko2VVkxak1kNWthQkdQSk1XY1Bx?=
- =?utf-8?B?SDFFQS9YdGkzSXZCdXdxcHNuM0ZMczczM2tHSVBubk5QSFd2RDdVaHp2aERP?=
- =?utf-8?B?WGQ4dkk2dmcwY3VLZGx3QnBTRU0remZYRjNWbDVBS2ZzSE9WYndmQnA3Sjdy?=
- =?utf-8?B?UEVSL3JPZGl5bVZoMi9JV1YvNDM4M2N5dEZLRm8xVWcwR1dYZm1nT3oyOFpM?=
- =?utf-8?B?MlRRblpmMnNDMzFYOWw1by9EUW5QRWNua2JmY0tmdDRkRlg0andHQWdwN3hK?=
- =?utf-8?B?Zy9mZFp0N0hQZTZZRnd3OGlpdEM4TkVZdU9SN1BrYm1jMkJpMVQwWXlKazRr?=
- =?utf-8?B?L2Z1OVdqR01pZUV2QU01UkR4Y3FDRXM0L01McG5EQk9BRzBxcnRtb1Z2SHZz?=
- =?utf-8?B?WGlkbGkxYk5FVG1Md1FHWUUzSUZpdmVoU0QrVjVCa01LdjhWSkg0eTMxQ3RQ?=
- =?utf-8?B?UTdMZFRLYXVhU0g2L1ExaGlWenAwbFFCY2hKL2lvSzBkTnp0VC8yWEhNdHZM?=
- =?utf-8?B?WDlaOS9EK2VJQXJ4ZFhWS0NQUUpDcFd1T3p4QVBqSGJEQXNkUk11NmJlMGZo?=
- =?utf-8?B?MVN3YVNXWFJtbmxiV0lRU2c3bEZrUkc2WkVkRTNzNU02dzIrSU9BU09DK1F0?=
- =?utf-8?B?MnhKQVlHTlVzc1RlUGhzc1lXTUF1ZHoydVQrdDhERTZ0ZlFBcDM1d0NrV1ZN?=
- =?utf-8?B?bkowZ3VnWXI4NDdVVUMycXNaSTVxWVRjeWVuVnJGemhkbWtydUdsQUo0L2hx?=
- =?utf-8?B?VDFPQ3N1Y3lmSWVGYnUralFjZ1lBOEZNNklDZHhEOWZmZG9NN3VEUVVpODN4?=
- =?utf-8?B?cnlwcVRZYlBCU3FGcXFjMzB6RWRaUjRMR1BkOUt3alpVOERFSGV3bVlMUFd5?=
- =?utf-8?B?M3Z5ZjZrZndLdENHZG1FVEI1dzVBZ2V6dldBV3h0SFpFTzRpa0VyQ2srNjN1?=
- =?utf-8?B?UWRwMFByaFUvYzdBVGxNRkI4Uk9oUmJ5RlZDZDNRQjVIMzJRd0lIZVpiZWdX?=
- =?utf-8?B?UkZwZVB4RlhNaTdraFVHcHZDN0psV0kyUFIrRTFkVjFjaS93NTdYaWJQbjRs?=
- =?utf-8?B?M3NVdjhSV0cyZkE5d3QwOGcrZytLWk5NVjdjbUQxR3BMREhkY2RqOTljM3hE?=
- =?utf-8?B?N2FDYndOK3BKTDdMczkrM2I0NUVHeHdvT05uUEc0KzExcVZtNTZBZnhLYm5t?=
- =?utf-8?B?K3dFbjl0NWF3bHU0Y0h4NDBvYzEvR1lLUHZFM3d3bXlPYUpKRHB0ZEM1cTE2?=
- =?utf-8?B?UForQ3ZBR0Z3a3lLR1EzQ1FZclp3dzY5Rkp5b3lPeUo2YWo2Qnk0Ym9sYnph?=
- =?utf-8?Q?ewEU9nOkCO7Z7/WR6XzdDxSDT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ff05bba-1d7c-46d8-2a37-08daf8baf014
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2023 18:45:00.3836
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gmiyxUc3rwY/WycX13LAtMZHAkGXWHhlnq5hieXA8RKZIoaYqppnIYi1huqO8zSvHt42IHY7d2xSm7tIiWSRnQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7556
+Autocrypt: addr=smueller@chronox.de;
+ keydata=
+ mQENBFqo+vgBCACp9hezmvJ4eeZv4PkyoMxGpXHN4Ox2+aofXxMv/yQ6oyZ69xu0U0yFcEcSWbe
+ 4qhxB+nlOvSBRJ8ohEU3hlGLrAKJwltHVzeO6nCby/T57b6SITCbcnZGIgKwX4CrJYmfQ4svvMG
+ NDOORPk6SFkK7hhe1cWJb+Gc5czw3wy7By5c1OtlnbmGB4k5+p7Mbi+rui/vLTKv7FKY5t2CpQo
+ OxptxFc/yq9sMdBnsjvhcCHcl1kpnQPTMppztWMj4Nkkd+Trvpym0WZ1px6+3kxhMn6LNYytHTC
+ mf/qyf1+1/PIpyEXvx66hxeN+fN/7R+0iYCisv3JTtfNkCV3QjGdKqT3ABEBAAG0HVN0ZXBoYW4
+ gTXVlbGxlciA8c21AZXBlcm0uZGU+iQFOBBMBCAA4FiEEO8xD1NLIfReEtp7kQh7pNjJqwVsFAl
+ qo/M8CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQQh7pNjJqwVsV8gf+OcAaiSqhn0mYk
+ fC7Fe48n9InAkHiSQ/T7eN+wWYLYMWGG0N2z5gBnNfdc4oFVL+ngye4C3bm98Iu7WnSl0CTOe1p
+ KGFJg3Y7YzSa5/FzS9nKsg6iXpNWL5nSYyz8T9Q0KGKNlAiyQEGkt8y05m8hNsvqkgDb923/RFf
+ UYX4mTUXJ1vk/6SFCA/72JQN7PpwMgGir7FNybuuDUuDLDgQ+BZHhJlW91XE2nwxUo9IrJ2FeT8
+ GgFKzX8A//peRZTSSeatJBr0HRKfTrKYw3lf897sddUjyQU1nDYv9EMLBvkzuE+gwUakt2rOcpR
+ +4Fn5jkQbN4vpfGPnybMAMMxW6GIrQfU3RlcGhhbiBNdWVsbGVyIDxzbUBjaHJvbm94LmRlPokB
+ TgQTAQgAOBYhBDvMQ9TSyH0XhLae5EIe6TYyasFbBQJaqPzEAhsDBQsJCAcCBhUKCQgLAgQWAgM
+ BAh4BAheAAAoJEEIe6TYyasFbsqUH/2euuyRj8b1xuapmrNUuU4atn9FN6XE1cGzXYPHNEUGBiM
+ kInPwZ/PFurrni7S22cMN+IuqmQzLo40izSjXhRJAa165GoJSrtf7S6iwry/k1S9nY2Vc/dxW6q
+ nFq7mJLAs0JWHOfhRe1caMb7P95B+O5B35023zYr9ApdQ4+Lyk+xx1+i++EOxbTJVqLZEF1EGmO
+ Wh3ERcGyT05+1LQ84yDSCUxZVZFrbA2Mtg8cdyvu68urvKiOCHzDH/xRRhFxUz0+dCOGBFSgSfK
+ I9cgS009BdH3Zyg795QV6wfhNas4PaNPN5ArMAvgPH1BxtkgyMjUSyLQQDrmuqHnLzExEQfG0JV
+ N0ZXBoYW4gTXVlbGxlciA8c211ZWxsZXJAY2hyb25veC5kZT6JAU4EEwEIADgWIQQ7zEPU0sh9F
+ 4S2nuRCHuk2MmrBWwUCWqj6+AIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRBCHuk2MmrB
+ WxVrB/wKYSuURgwKs2pJ2kmLIp34StoreNqe6cdIF7f7e8o7NaT528hFAVuDSTUyjXO+idbC0P+
+ zu9y2SZfQhc4xbD+Zf0QngX7/sqIWVeiXJa6uR/qrtJF7OBEvlGkxcAwkC0d/Ts68ps4QbZ7s5q
+ WBJJY4LmnytqvXGb63/fOTwImYiY3tKCOSCM2YQRFt6BO71t8tu/4NLk0KSW9OHa9nfcDqI18aV
+ ylGMu5zNjYqjJpT/be1UpyZo6I/7p0yAQfGJ5YBiN4S264mdFN7jOvxZE3NKXhL4QMt34hOSWPO
+ pW8ZGEo1hKjEdHFvYowPpcoOFicP+zvxdpMtUTEkppREN2a+uQENBFqo+vgBCACiLHsDAX7C0l0
+ sB8DhVvTDpC2CyaeuNW9GZ1Qqkenh3Y5KnYnh5Gg5b0jubSkauJ75YEOsOeClWuebL3i76kARC8
+ Gfo727wSLvfIAcWhO1ws6j1Utc8s1HNO0+vcGC9EEkn7LzO5piEUPkentjrSF7clPsXziW4IJq/
+ z3DYZQkVPk7PSw6r0jXWR/p6sj4aXxslIiDgFJZyopki7Sl2805JYcvKKC6OWTyPHJMlnu9dNxJ
+ viAentAUwzHxNqmvYjlkqBr/sFnjC9kydElecVm4YQh3TC6yt5h49AslAVlFYfwQwcio1LNWySc
+ lWHbDZhcVZJZZi4++gpFmmg1AjyfLABEBAAGJATYEGAEIACAWIQQ7zEPU0sh9F4S2nuRCHuk2Mm
+ rBWwUCWqj6+AIbIAAKCRBCHuk2MmrBWxPCCACQGQu5eOcH9qsqSOO64n+xUX7PG96S8s2JolN3F
+ t2YWKUzjVHLu5jxznmDwx+GJ3P7thrzW+V5XdDcXgSAXW793TaJ/XMM0jEG+jgvuhE65JfWCK+8
+ sumrO24M1KnVQigxrMpG5FT7ndpBRGbs059QSqoMVN4x2dvaP81/+u0sQQ2EGrhPFB2aOA3s7bb
+ Wy8xGVIPLcCqByPLbxbHzaU/dkiutSaYqmzdgrTdcuESSbK4qEv3g1i2Bw5kdqeY9mM96SUL8cG
+ UokqFtVP7b2mSfm51iNqlO3nsfwpRnl/IlRPThWLhM7/qr49GdWYfQsK4hbw0fo09QFCXN53MPL
+ hLwuQENBFqo+vgBCAClaPqyK/PUbf7wxTfu3ZBAgaszL98Uf1UHTekRNdYO7FP1dWWT4SebIgL8
+ wwtWZEqI1pydyvk6DoNF6CfRFq1lCo9QA4Rms7Qx3cdXu1G47ZtQvOqxvO4SPvi7lg3PgnuiHDU
+ STwo5a8+ojxbLzs5xExbx4RDGtykBoaOoLYeenn92AQ//gN6wCDjEjwP2u39xkWXlokZGrwn3yt
+ FE20rUTNCSLxdmoCr1faHzKmvql95wmA7ahg5s2vM9/95W4G71lJhy2crkZIAH0fx3iOUbDmlZ3
+ T3UvoLuyMToUyaQv5lo0lV2KJOBGhjnAfmykHsxQu0RygiNwvO3TGjpaeB5ABEBAAGJATYEGAEI
+ ACAWIQQ7zEPU0sh9F4S2nuRCHuk2MmrBWwUCWqj6+AIbDAAKCRBCHuk2MmrBW5Y4B/oCLcRZyN0
+ ETep2JK5CplZHHRN27DhL4KfnahZv872vq3c83hXDDIkCm/0/uDElso+cavceg5pIsoP2bvEeSJ
+ jGMJ5PVdCYOx6r/Fv/tkr46muOvaLdgnphv/CIA+IRykwyzXe3bsucHC4a1fnSoTMnV1XhsIh8z
+ WTINVVO8+qdNEv3ix2nP5yArexUGzmJV0HIkKm59wCLz4FpWR+QZru0i8kJNuFrdnDIP0wxDjiV
+ BifPhiegBv+/z2DOj8D9EI48KagdQP7MY7q/u1n3+pGTwa+F1hoGo5IOU5MnwVv7UHiW1MSNQ2/
+ kBFBHm+xdudNab2U0OpfqrWerOw3WcGd2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/10/23 11:08, Tom Rix wrote:
-> Clang static analysis reports this problem
-> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
->    argument is an uninitialized value [core.CallAndMessage]
->      dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> __sev_platform_init_locked() can return without setting the
-> error parameter, causing the dev_err() to report a garbage
-> value.
-> 
-> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
-> Signed-off-by: Tom Rix <trix@redhat.com>
+Am Dienstag, 17. Januar 2023, 18:20:06 CET schrieb Vladis Dronov:
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Hi Vladis,
+
+> According to FIPS 140-3 IG, section D.R "Hash Functions Acceptable for
+> Use in the SP 800-90A DRBGs", modules certified after May 16th, 2023
+> must not support the use of: SHA-224, SHA-384, SHA512-224, SHA512-256,
+> SHA3-224, SHA3-384. Disallow HMAC and HASH DRBGs using SHA-384 in FIPS
+> mode.
+>=20
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+
+Thank you very much for the patch!
+
+Reviewed-by: Stephan M=FCller <smueller@chronox.de>
 
 > ---
-> v2 cleanup commit log
-> v3 cleanup commit log
+> Some details:
+>=20
+> The following DRBG algos are defined in testmgr.c as of now:
+>=20
+> drbg_{no,}pr_ctr_aes128
+> drbg_{no,}pr_ctr_aes192
+> drbg_{no,}pr_ctr_aes256
+>=20
+> drbg_{no,}pr_hmac_sha1
+> drbg_{no,}pr_hmac_sha256
+> drbg_{no,}pr_hmac_sha384 (disallow)
+> drbg_{no,}pr_hmac_sha512
+>=20
+> drbg_{no,}pr_sha1
+> drbg_{no,}pr_sha256
+> drbg_{no,}pr_sha384 (disallow)
+> drbg_{no,}pr_sha512
+>=20
+> Marked DRBGs should be disallowed in FIPS mode according to
+> the requirements above.
 > ---
->   drivers/crypto/ccp/sev-dev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 56998bc579d6..643cccc06a0b 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1307,7 +1307,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
->   void sev_pci_init(void)
->   {
->   	struct sev_device *sev = psp_master->sev_data;
-> -	int error, rc;
-> +	int error = 0, rc;
->   
->   	if (!sev)
->   		return;
+>  crypto/testmgr.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>=20
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 4476ac97baa5..fbb53d961ea9 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -4782,7 +4782,6 @@ static const struct alg_test_desc alg_test_descs[] =
+=3D {
+> }, {
+>  		/* covered by drbg_nopr_hmac_sha256 test */
+>  		.alg =3D "drbg_nopr_hmac_sha384",
+> -		.fips_allowed =3D 1,
+>  		.test =3D alg_test_null,
+>  	}, {
+>  		.alg =3D "drbg_nopr_hmac_sha512",
+> @@ -4805,7 +4804,6 @@ static const struct alg_test_desc alg_test_descs[] =
+=3D {
+> }, {
+>  		/* covered by drbg_nopr_sha256 test */
+>  		.alg =3D "drbg_nopr_sha384",
+> -		.fips_allowed =3D 1,
+>  		.test =3D alg_test_null,
+>  	}, {
+>  		.alg =3D "drbg_nopr_sha512",
+> @@ -4841,7 +4839,6 @@ static const struct alg_test_desc alg_test_descs[] =
+=3D {
+> }, {
+>  		/* covered by drbg_pr_hmac_sha256 test */
+>  		.alg =3D "drbg_pr_hmac_sha384",
+> -		.fips_allowed =3D 1,
+>  		.test =3D alg_test_null,
+>  	}, {
+>  		.alg =3D "drbg_pr_hmac_sha512",
+> @@ -4861,7 +4858,6 @@ static const struct alg_test_desc alg_test_descs[] =
+=3D {
+> }, {
+>  		/* covered by drbg_pr_sha256 test */
+>  		.alg =3D "drbg_pr_sha384",
+> -		.fips_allowed =3D 1,
+>  		.test =3D alg_test_null,
+>  	}, {
+>  		.alg =3D "drbg_pr_sha512",
+
+
+Ciao
+Stephan
+
+
