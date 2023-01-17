@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56663C00A5A
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 00:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D72C00A5A
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 00:24:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbjARAOR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 19:14:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
+        id S229514AbjARAYt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 19:24:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjARAN4 (ORCPT
+        with ESMTP id S229768AbjARAYS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 19:13:56 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E798CD200;
-        Tue, 17 Jan 2023 15:31:07 -0800 (PST)
+        Tue, 17 Jan 2023 19:24:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F333EFC9;
+        Tue, 17 Jan 2023 15:42:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7640761588;
-        Tue, 17 Jan 2023 23:31:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E87AC433EF;
-        Tue, 17 Jan 2023 23:31:02 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C2F461587;
+        Tue, 17 Jan 2023 23:42:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D95C433EF;
+        Tue, 17 Jan 2023 23:42:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673998263;
-        bh=gX7M02TttoCc8S5RPwEXyV27eIRgsayZQ2pGPcyLZ3M=;
+        s=k20201202; t=1673998970;
+        bh=2ikdQhWN8QnY8MY7pt8CC+l4LYugedIuQZfZ7a0yhEU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ixzAcMagECl/baI4IaKYNOpGdQJOJkjkfXvuJn87XqFVcXiosbOzAmy96L8R0nGiD
-         9+zsVxepnnCJhKPfWv3acTFjNcVBYfSWEaLGw0TcWDtuafprlLKoH8L2ZZOyTqeIQl
-         +yl/lDlTOuGpnQiS/0o5KBF1BwW73ZnoJAJtdRzZR1mnKqjrkANaZN6L9XrwfH0ANP
-         k02FE2C3dEuYdsmcWUc73EdzYdLH/Ln5GuOhk37qqYeZYTAZISbRt5f1FEBTrTuM2I
-         je/v+iTB/IvQ4ppRIdzhyFIGT6CZ4JTNstc9MyXk9gtXYiXTRGjz4vHKK68XqKGQG3
-         +DtD30WIT6xig==
-Date:   Wed, 18 Jan 2023 01:30:57 +0200
+        b=r/1d4gQ7cape7g9hFv8XNl0XZBEZ0EVwPauBC4bqmnCoGOF+Xy+qUbw2jwW6F9vvZ
+         pVmYoRCzPA7YHryO/T0MH8YnOJXt0x4w2NzJ1ACiA5g/5vPjW519asy8n+GAnyMimK
+         sb06Z4wbntGBSR9tr8RZD6PYKrmIg1jc4sHeTiLeVELEsNxDwUkoohhtbCJEaQ7HRF
+         yI74gK0GdlqeWP0T8Y3RVRLOobjIJcMWIfHibmefBamQhUMzKiAdSE/SoUuntNsHbc
+         DNg0yxLMPeXtXszECrO3bClqp8i39Vug7emnDggHcfVbbg3/E6KmSMn+0e1TATY4XX
+         iowUzbxk9j9ag==
+Date:   Wed, 18 Jan 2023 01:42:45 +0200
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     Michael Roth <michael.roth@amd.com>
 Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
@@ -49,170 +49,256 @@ Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
         tony.luck@intel.com, marcorr@google.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
         dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v7 10/64] KVM: SEV: Populate private memory fd during
  LAUNCH_UPDATE_DATA
-Message-ID: <Y8cvsS27o1BaUNPz@kernel.org>
+Message-ID: <Y8cydYUfTUFwCh4K@kernel.org>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-12-michael.roth@amd.com>
+ <20221214194056.161492-11-michael.roth@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-12-michael.roth@amd.com>
+In-Reply-To: <20221214194056.161492-11-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
+On Wed, Dec 14, 2022 at 01:40:02PM -0600, Michael Roth wrote:
+> From: Vishal Annapurve <vannapurve@google.com>
 > 
-> Pre-boot guest payload needs to be encrypted and VMM has copied it
-> over to the private-fd. Add support to get the pfn from the memfile fd
-> for encrypting the payload in-place.
+> This change adds handling of HVA ranges to copy contents
+> to private memory while doing sev launch update data.
 > 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> mem_attr array is updated during LAUNCH_UPDATE_DATA to ensure
+> that encrypted memory is marked as private.
+> 
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> [mdr: use gfn_to_hva_memslot_prot() for shared GFN handler to deal with
+>       read-only slots for ROMs]
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 79 ++++++++++++++++++++++++++++++++++--------
->  1 file changed, 64 insertions(+), 15 deletions(-)
+>  arch/x86/kvm/svm/sev.c   | 99 ++++++++++++++++++++++++++++++++++++----
+>  include/linux/kvm_host.h |  1 +
+>  virt/kvm/kvm_main.c      | 27 ++++++++---
+>  3 files changed, 111 insertions(+), 16 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index a7e4e3005786..ae4920aeb281 100644
+> index 69dbf17f0d6a..a7e4e3005786 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -107,6 +107,11 @@ static inline bool is_mirroring_enc_context(struct kvm *kvm)
->  	return !!to_kvm_svm(kvm)->sev_info.enc_context_owner;
+> @@ -493,23 +493,26 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>  	return pages;
 >  }
 >  
-> +static bool kvm_is_upm_enabled(struct kvm *kvm)
-> +{
-> +	return kvm->arch.upm_mode;
-> +}
-> +
->  /* Must be called with the sev_bitmap_lock held */
->  static bool __sev_recycle_asids(int min_asid, int max_asid)
+> -static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +static int sev_launch_update_shared_gfn_handler(struct kvm *kvm,
+> +						struct kvm_gfn_range *range,
+> +						struct kvm_sev_cmd *argp)
 >  {
-> @@ -382,6 +387,38 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -	struct kvm_sev_launch_update_data params;
+>  	struct sev_data_launch_update_data data;
+>  	struct page **inpages;
+>  	int ret;
+>  
+> -	if (!sev_guest(kvm))
+> -		return -ENOTTY;
+> -
+> -	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> -		return -EFAULT;
+> +	vaddr = gfn_to_hva_memslot_prot(range->slot, range->start, NULL);
+> +	pr_debug("%s: shared GFN: %llx, slot.id: %d, slot.base_gfn: %llx, slot.userspace_addr: %lx, slot.flags: %x, vaddr: %lx\n",
+> +		 __func__, range->start, range->slot->id, range->slot->base_gfn,
+> +		 range->slot->userspace_addr, range->slot->flags, vaddr);
+> +	if (kvm_is_error_hva(vaddr)) {
+> +		pr_err("vaddr is erroneous 0x%lx\n", vaddr);
+> +		return -EINVAL;
+> +	}
+>  
+> -	vaddr = params.uaddr;
+> -	size = params.len;
+> +	size = (range->end - range->start) << PAGE_SHIFT;
+>  	vaddr_end = vaddr + size;
+>  
+>  	/* Lock the user memory. */
+> @@ -561,6 +564,84 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
 >  	return ret;
 >  }
 >  
-> +static int sev_get_memfile_pfn_handler(struct kvm *kvm, struct kvm_gfn_range *range, void *data)
+> +static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
+> +					      struct kvm_gfn_range *range,
+> +					      struct kvm_sev_cmd *argp)
 > +{
-> +	struct kvm_memory_slot *memslot = range->slot;
-> +	struct page **pages = data;
-> +	int ret = 0, i = 0;
-> +	kvm_pfn_t pfn;
+> +	struct sev_data_launch_update_data data;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
 > +	gfn_t gfn;
+> +	kvm_pfn_t pfn;
+> +	struct kvm_memory_slot *memslot = range->slot;
+> +	int ret = 0;
+> +
+> +	data.reserved = 0;
+> +	data.handle = sev->handle;
 > +
 > +	for (gfn = range->start; gfn < range->end; gfn++) {
 > +		int order;
+> +		void *kvaddr;
 > +
 > +		ret = kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
 > +		if (ret)
 > +			return ret;
 > +
-> +		if (is_error_noslot_pfn(pfn))
-> +			return -EFAULT;
+> +		kvaddr = pfn_to_kaddr(pfn);
+> +		if (!virt_addr_valid(kvaddr)) {
+> +			pr_err("Invalid kvaddr 0x%llx\n", (uint64_t)kvaddr);
+> +			ret = -EINVAL;
+> +			goto e_ret;
+> +		}
 > +
-> +		pages[i++] = pfn_to_page(pfn);
+> +		ret = kvm_read_guest_page(kvm, gfn, kvaddr, 0, PAGE_SIZE);
+> +		if (ret) {
+> +			pr_err("guest read failed 0x%x\n", ret);
+> +			goto e_ret;
+> +		}
+> +
+> +		if (!this_cpu_has(X86_FEATURE_SME_COHERENT))
+> +			clflush_cache_range(kvaddr, PAGE_SIZE);
+> +
+> +		data.len = PAGE_SIZE;
+> +		data.address = __sme_set(pfn << PAGE_SHIFT);
+> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
+> +		if (ret)
+> +			goto e_ret;
+> +		kvm_release_pfn_clean(pfn);
 > +	}
+> +	kvm_vm_set_region_attr(kvm, range->start, range->end,
+> +		true /* priv_attr */);
 > +
+> +e_ret:
 > +	return ret;
 > +}
 > +
-> +static int sev_get_memfile_pfn(struct kvm *kvm, unsigned long addr,
-> +			       unsigned long size, unsigned long npages,
-> +			       struct page **pages)
+> +static int sev_launch_update_gfn_handler(struct kvm *kvm, struct kvm_gfn_range *range,
+> +					 void *data)
 > +{
-> +	return kvm_vm_do_hva_range_op(kvm, addr, size,
-> +				      sev_get_memfile_pfn_handler, pages);
+> +	struct kvm_sev_cmd *argp = (struct kvm_sev_cmd *)data;
+> +
+> +	if (kvm_slot_can_be_private(range->slot))
+> +		return sev_launch_update_priv_gfn_handler(kvm, range, argp);
+> +
+> +	return sev_launch_update_shared_gfn_handler(kvm, range, argp);
 > +}
 > +
->  static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
->  				    unsigned long ulen, unsigned long *n,
->  				    int write)
-> @@ -424,16 +461,25 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
->  	if (!pages)
->  		return ERR_PTR(-ENOMEM);
->  
-> -	/* Pin the user virtual address. */
-> -	npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
-> -	if (npinned != npages) {
-> -		pr_err("SEV: Failure locking %lu pages.\n", npages);
-> -		ret = -ENOMEM;
-> -		goto err;
-> +	if (kvm_is_upm_enabled(kvm)) {
-> +		/* Get the PFN from memfile */
-> +		if (sev_get_memfile_pfn(kvm, uaddr, ulen, npages, pages)) {
-> +			pr_err("%s: ERROR: unable to find slot for uaddr %lx", __func__, uaddr);
-> +			ret = -ENOMEM;
-> +			goto err;
-> +		}
-> +	} else {
-> +		/* Pin the user virtual address. */
-> +		npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
-> +		if (npinned != npages) {
-> +			pr_err("SEV: Failure locking %lu pages.\n", npages);
-> +			ret = -ENOMEM;
-> +			goto err;
-> +		}
-> +		sev->pages_locked = locked;
->  	}
->  
->  	*n = npages;
-> -	sev->pages_locked = locked;
->  
->  	return pages;
->  
-> @@ -514,6 +560,7 @@ static int sev_launch_update_shared_gfn_handler(struct kvm *kvm,
->  
->  	size = (range->end - range->start) << PAGE_SHIFT;
->  	vaddr_end = vaddr + size;
-> +	WARN_ON(size < PAGE_SIZE);
->  
->  	/* Lock the user memory. */
->  	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
-> @@ -554,13 +601,16 @@ static int sev_launch_update_shared_gfn_handler(struct kvm *kvm,
->  	}
->  
->  e_unpin:
-> -	/* content of memory is updated, mark pages dirty */
-> -	for (i = 0; i < npages; i++) {
-> -		set_page_dirty_lock(inpages[i]);
-> -		mark_page_accessed(inpages[i]);
-> +	if (!kvm_is_upm_enabled(kvm)) {
-> +		/* content of memory is updated, mark pages dirty */
-> +		for (i = 0; i < npages; i++) {
-> +			set_page_dirty_lock(inpages[i]);
-> +			mark_page_accessed(inpages[i]);
-> +		}
-> +		/* unlock the user pages */
-> +		sev_unpin_memory(kvm, inpages, npages);
->  	}
-> -	/* unlock the user pages */
-> -	sev_unpin_memory(kvm, inpages, npages);
+> +static int sev_launch_update_data(struct kvm *kvm,
+> +		struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_launch_update_data params;
 > +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	return kvm_vm_do_hva_range_op(kvm, params.uaddr, params.uaddr + params.len,
+> +		sev_launch_update_gfn_handler, argp);
+> +}
+> +
+>  static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  {
+>  	struct sev_es_save_area *save = svm->sev_es.vmsa;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 21a539ab17f6..33fa0b1435d3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -973,6 +973,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  void kvm_exit(void);
+>  
+>  void kvm_get_kvm(struct kvm *kvm);
+> +int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end, u64 attributes);
+>  bool kvm_get_kvm_safe(struct kvm *kvm);
+>  void kvm_put_kvm(struct kvm *kvm);
+>  bool file_is_kvm(struct file *file);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 4ff7adaf6c56..1343070657d1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -747,6 +747,7 @@ int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+>  
 >  	return ret;
 >  }
+> +EXPORT_SYMBOL_GPL(kvm_vm_do_hva_range_op);
 >  
-> @@ -609,9 +659,8 @@ static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
->  			goto e_ret;
->  		kvm_release_pfn_clean(pfn);
+>  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+>  						unsigned long start,
+> @@ -2595,12 +2596,28 @@ static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end,
+>  		kvm_flush_remote_tlbs(kvm);
+>  }
+>  
+> +int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end,
+> +			   u64 attributes)
+> +{
+> +	gfn_t index;
+> +	void *entry;
+> +
+> +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> +
+> +	for (index = start; index < end; index++)
+> +		if (xa_err(xa_store(&kvm->mem_attr_array, index, entry,
+> +				    GFP_KERNEL_ACCOUNT)))
+> +			break;
+> +
+> +	return index;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_vm_set_region_attr);
+> +
+>  static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>  					   struct kvm_memory_attributes *attrs)
+>  {
+>  	gfn_t start, end;
+>  	unsigned long i;
+> -	void *entry;
+>  	int idx;
+>  	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+>  
+> @@ -2617,8 +2634,6 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>  	start = attrs->address >> PAGE_SHIFT;
+>  	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+>  
+> -	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> -
+>  	if (kvm_arch_has_private_mem(kvm)) {
+>  		KVM_MMU_LOCK(kvm);
+>  		kvm_mmu_invalidate_begin(kvm);
+> @@ -2627,10 +2642,7 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
 >  	}
-> -	kvm_vm_set_region_attr(kvm, range->start, range->end,
-> -		true /* priv_attr */);
 >  
-> +	kvm_vm_set_region_attr(kvm, range->start, range->end, KVM_MEMORY_ATTRIBUTE_PRIVATE);
->  e_ret:
->  	return ret;
+>  	mutex_lock(&kvm->lock);
+> -	for (i = start; i < end; i++)
+> -		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> -				    GFP_KERNEL_ACCOUNT)))
+> -			break;
+> +	i = kvm_vm_set_region_attr(kvm, start, end, attrs->attributes);
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	if (kvm_arch_has_private_mem(kvm)) {
+> @@ -2793,6 +2805,7 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot,
+>  
+>  	return hva;
 >  }
+> +EXPORT_SYMBOL_GPL(gfn_to_hva_memslot_prot);
+>  
+>  unsigned long gfn_to_hva_prot(struct kvm *kvm, gfn_t gfn, bool *writable)
+>  {
 > -- 
 > 2.25.1
 > 
 
-kvm_vm_set_region_attr() should be fixed already in:
+Hmm.. but user space is still allowed to call KVM_SET_MEMORY_ATTRIBUTES
+with KVM_MEMORY_ATTRIBUTE_PRIVATE set? How do these behaviours complement
+each other?
 
-https://lore.kernel.org/all/20221214194056.161492-11-michael.roth@amd.com/
+SEV specific changes and kvm_vm_set_region_attr() definition should really
+be separate patches.
 
 BR, Jarkko
-
