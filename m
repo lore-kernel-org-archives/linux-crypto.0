@@ -2,104 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2D1C3DA78
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 17:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 178BFC677F1
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 17:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235223AbjAQRUQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 12:20:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
+        id S232721AbjAQRXX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 12:23:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234952AbjAQRTu (ORCPT
+        with ESMTP id S233033AbjAQRWc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 12:19:50 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC91C4B1B9
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 09:19:07 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id cx21-20020a17090afd9500b00228f2ecc6dbso189283pjb.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 09:19:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M4+uVVLZLx9S3b5j+KW2LdAGdGkzXPxcqIXMG9Qphu4=;
-        b=Zmn3vSdzFkudY+uxAJeib6OqefKZoI53M+UVhVxk2WqR2FoAQbJhzqbFjoyLB3qXB9
-         lHMKsdUruoW6hzOcRIWmshuAOb9h8Y/4UBcZi1pttXgzlfscvTA9tjaah3KbnJGxxBLJ
-         /3QDrtBjDmHfkOVpCl977w9bfXT5XyLiEzbDZ+kWPBRK6u1r9MNoJDdnMj7oT3XfBFtu
-         dAdo+4aGgprK/zoYlyKrdcETQJ8ra6JbFEkwq7ciUPFGyAlZz6/v1YCzxsrjFeXPedhJ
-         /6Dvo50B3sKEMIz7aE9c049Ta9U81C+hcjVUYchXseAfDiIxshTY43AbOe19k47/xzyT
-         QDPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M4+uVVLZLx9S3b5j+KW2LdAGdGkzXPxcqIXMG9Qphu4=;
-        b=S34nvKQN+kRgaa8hkZYpb3tGtRe6DjN1JTBSlOR0LhpmA5Od5iRdUXABwaQy4Y93Ng
-         Z1nBPpi2qHhpFCGYtXN22NPgdY/GqAwrW/dbNBS5pO8ovSFFV2Zz/eRhvn8+rcZuPe0J
-         neQMawpyzaGSU+lafXwYt38UGmgQMIaBrpT74tIZDa23f1if5M+p8AAIKTy98tJPXqci
-         aGZDx4gSkphv0Hv9GrHWuRdaWluUnKvpVaLRbhmySQ2o/j1ubdPL+5+YKwCeOkJoYOjH
-         ie7r2UlpiJcqZppdet5CR3MgBS8/K2+oIJ6fubYWHs4uIcDQNLBANbdZSov3hRsYgtEo
-         Om1w==
-X-Gm-Message-State: AFqh2krBy+V2kxBPDbFMillOtXI9Oz97uK5t2nt5AY2TKNxvLZolE/g+
-        Q+1IU1Bia8X0U+nd4AxmsMDaXg==
-X-Google-Smtp-Source: AMrXdXuNA5Xq8t9IxmI5BkWk1YUjI2YY7hE8dkqUdf57/E+MmKpR4ttvP/Oqs+rhiKGbfUTmqtB5lQ==
-X-Received: by 2002:a05:6a20:93a4:b0:b8:e33c:f160 with SMTP id x36-20020a056a2093a400b000b8e33cf160mr89085pzh.0.1673975947148;
-        Tue, 17 Jan 2023 09:19:07 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b001943d58268csm15120181plb.55.2023.01.17.09.19.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 09:19:06 -0800 (PST)
-Date:   Tue, 17 Jan 2023 17:19:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com
-Subject: Re: [PATCH RFC v7 07/64] KVM: SEV: Handle KVM_HC_MAP_GPA_RANGE
- hypercall
-Message-ID: <Y8bYhpITRA+RZzWK@google.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-8-michael.roth@amd.com>
- <Y8GAGB73ZKElDYPI@zn.tnic>
- <Y8GEGnmD90bySl8C@google.com>
- <460524f8-e52b-e195-3bd2-27e41f367f5d@amd.com>
+        Tue, 17 Jan 2023 12:22:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145B64B77D
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Jan 2023 09:20:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673976037;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1PRuX+JN7wqNln+FW4J1BUr8fMYCnc6M3GNZOEvdC2c=;
+        b=bnLXJs/CS30vUyvdjLw/E+CIA4UFLaSHSY9KJ8jtcLjFb8ct8AMcDe+KmGpasElkomc1GE
+        jtx99DasnJ425X/TW8bAeOiZVC3Z1ZMlvJHewFayfdvlgOHzPmmxaWzvxn7Ab3bxBNXUU6
+        L9UtcwBN4qrMDkzIFSZg/F252hCEMgY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-618-zoROmHHFNWi7Yx2HUGpmQQ-1; Tue, 17 Jan 2023 12:20:32 -0500
+X-MC-Unique: zoROmHHFNWi7Yx2HUGpmQQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A44619705C0;
+        Tue, 17 Jan 2023 17:20:32 +0000 (UTC)
+Received: from rules.brq.redhat.com (ovpn-208-27.brq.redhat.com [10.40.208.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3B5C140EBF5;
+        Tue, 17 Jan 2023 17:20:29 +0000 (UTC)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vladis Dronov <vdronov@redhat.com>
+Subject: [PATCH] crypto: testmgr - disallow certain DRBG hash functions in FIPS mode
+Date:   Tue, 17 Jan 2023 18:20:06 +0100
+Message-Id: <20230117172006.8912-1-vdronov@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <460524f8-e52b-e195-3bd2-27e41f367f5d@amd.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 16, 2023, Nikunj A. Dadhania wrote:
-> On 13/01/23 21:47, Sean Christopherson wrote:
-> > It's perfectly legal for userspace to create the private memslot in response
-> > to a guest request.
-> 
-> Sean, did not understand this part, how could a memslot be created on a guest request?
+According to FIPS 140-3 IG, section D.R "Hash Functions Acceptable for
+Use in the SP 800-90A DRBGs", modules certified after May 16th, 2023
+must not support the use of: SHA-224, SHA-384, SHA512-224, SHA512-256,
+SHA3-224, SHA3-384. Disallow HMAC and HASH DRBGs using SHA-384 in FIPS
+mode.
 
-KVM_HC_MAP_GPA_RANGE gets routed to host userspace, at that point userspace can
-take any action it wants to satisfy the guest request.  E.g. a userspace+guest
-setup could define memory as shared by default, and only create KVM_MEM_PRIVATE
-memslots for memory that the guest explicitly requests to be mapped private.
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+Some details:
 
-I don't anticipate any real world use cases actually doing something like that,
-but I also don't see any value in going out of our way to disallow it.  Normally
-I like to be conservative when it comes to KVM's uAPI, e.g. allow the minimum
-needed to support known use cases, but restricting KVM_HC_MAP_GPA_RANGE doesn't
-actually achieve anything and just makes things more complex for KVM.  E.g. the
-behavior is non-deterministic from KVM's perspective if a userspace memslots update
-is in-progress.
+The following DRBG algos are defined in testmgr.c as of now:
+
+drbg_{no,}pr_ctr_aes128
+drbg_{no,}pr_ctr_aes192
+drbg_{no,}pr_ctr_aes256
+
+drbg_{no,}pr_hmac_sha1
+drbg_{no,}pr_hmac_sha256
+drbg_{no,}pr_hmac_sha384 (disallow)
+drbg_{no,}pr_hmac_sha512
+
+drbg_{no,}pr_sha1
+drbg_{no,}pr_sha256
+drbg_{no,}pr_sha384 (disallow)
+drbg_{no,}pr_sha512
+
+Marked DRBGs should be disallowed in FIPS mode according to
+the requirements above.
+---
+ crypto/testmgr.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4476ac97baa5..fbb53d961ea9 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4782,7 +4782,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		/* covered by drbg_nopr_hmac_sha256 test */
+ 		.alg = "drbg_nopr_hmac_sha384",
+-		.fips_allowed = 1,
+ 		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_nopr_hmac_sha512",
+@@ -4805,7 +4804,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		/* covered by drbg_nopr_sha256 test */
+ 		.alg = "drbg_nopr_sha384",
+-		.fips_allowed = 1,
+ 		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_nopr_sha512",
+@@ -4841,7 +4839,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		/* covered by drbg_pr_hmac_sha256 test */
+ 		.alg = "drbg_pr_hmac_sha384",
+-		.fips_allowed = 1,
+ 		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_pr_hmac_sha512",
+@@ -4861,7 +4858,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		/* covered by drbg_pr_sha256 test */
+ 		.alg = "drbg_pr_sha384",
+-		.fips_allowed = 1,
+ 		.test = alg_test_null,
+ 	}, {
+ 		.alg = "drbg_pr_sha512",
+-- 
+2.39.0
+
