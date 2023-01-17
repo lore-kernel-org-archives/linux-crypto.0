@@ -2,83 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4CDC678D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 07:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D246C63797
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 08:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235856AbjAQHqz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 02:46:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
+        id S232347AbjAQIBT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 03:01:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235920AbjAQHqv (ORCPT
+        with ESMTP id S235771AbjAQIBQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 02:46:51 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDF6244A2;
-        Mon, 16 Jan 2023 23:46:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IHNi2aQpDkDbxKRjgKUG7Y3Yld9OP1h4x11WFrd3RAw=; b=k/V5SGX3Iv307bhFijCNd9+XzJ
-        4OZZVg4pTrQ47wdACEoqa6fcwWyyzSJ1lhtSHglIupg7ogd211aVQJ6OI9/yW2sIpe+P6NgR5rA+D
-        zNqRtkse1UOtjqHzoW29Rh63WwvJgZVhfLw5XEWctufFrI/TO1HUHHd2RPU21xWLbBKk+NZo/eIce
-        IWHvU5eGdauz3vMjLWQeCKmowA6ii/hRCf0kjODMFgCNYp1z8V5c2cBjVZoKGAkmMvu4T0bJM+/Vk
-        P7yrjX4O+Fv6IO2OiPYjXeV1I4PNnQIWmi55XsISaHhLJ6PXVU5fsS9KGu4JeP2alt+NdMnC0fCim
-        Mp66819w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pHgfw-00DEsx-QJ; Tue, 17 Jan 2023 07:46:32 +0000
-Date:   Mon, 16 Jan 2023 23:46:32 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>, Paulo Alcantara <pc@cjr.nz>,
-        linux-scsi@vger.kernel.org, Steve French <sfrench@samba.org>,
-        Stefan Metzmacher <metze@samba.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Anna Schumaker <anna@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Tom Talpey <tom@talpey.com>, linux-rdma@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-        linux-nfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        linux-fsdevel@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Long Li <longli@microsoft.com>, Jan Kara <jack@suse.cz>,
-        linux-cachefs@redhat.com, linux-block@vger.kernel.org,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/34] iov_iter: Improve page extraction (ref, pin or
- just list)
-Message-ID: <Y8ZSWM2bxlRmMMTz@infradead.org>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Tue, 17 Jan 2023 03:01:16 -0500
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60F61BADF;
+        Tue, 17 Jan 2023 00:01:12 -0800 (PST)
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxct.zte.com.cn (FangMail) with ESMTPS id 4Nx1YL0N2Bz4xpyC;
+        Tue, 17 Jan 2023 16:01:10 +0800 (CST)
+Received: from xaxapp01.zte.com.cn ([10.88.99.176])
+        by mse-fl1.zte.com.cn with SMTP id 30H815we005478;
+        Tue, 17 Jan 2023 16:01:05 +0800 (+08)
+        (envelope-from ye.xingchen@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+        by mapi (Zmail) with MAPI id mid31;
+        Tue, 17 Jan 2023 16:01:08 +0800 (CST)
+Date:   Tue, 17 Jan 2023 16:01:08 +0800 (CST)
+X-Zmail-TransId: 2af963c655c4ffffffff87b29564
+X-Mailer: Zmail v1.0
+Message-ID: <202301171601080312252@zte.com.cn>
+Mime-Version: 1.0
+From:   <ye.xingchen@zte.com.cn>
+To:     <herbert@gondor.apana.org.au>
+Cc:     <davem@davemloft.net>, <mpe@ellerman.id.au>, <npiggin@gmail.com>,
+        <christophe.leroy@csgroup.eu>, <linux-crypto@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGNyeXB0bzogcDEwLWFlcy1nY20gLSByZW1vdmUgZHVwbGljYXRlIGluY2x1ZGVkIGhlYWRlciBmaWxlcw==?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl1.zte.com.cn 30H815we005478
+X-Fangmail-Gw-Spam-Type: 0
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 63C655C6.000/4Nx1YL0N2Bz4xpyC
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-First off the liver comment:  can we cut down things for a first
-round?  Maybe just convert everything using the bio based helpers
-and then chunk it up?  Reviewing 34 patches across a dozen subsystems
-isn't going to be easy and it will be hard to come up with a final
-positive conclusion.
+From: ye xingchen <ye.xingchen@zte.com.cn>
+
+crypto/algapi.h is included more than once.
+
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ arch/powerpc/crypto/p10-aes-gcm-glue.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/powerpc/crypto/p10-aes-gcm-glue.c b/arch/powerpc/crypto/p10-aes-gcm-glue.c
+index 777e6b5254da..a17d3e8d8f3c 100644
+--- a/arch/powerpc/crypto/p10-aes-gcm-glue.c
++++ b/arch/powerpc/crypto/p10-aes-gcm-glue.c
+@@ -8,7 +8,6 @@
+ #include <asm/unaligned.h>
+ #include <asm/simd.h>
+ #include <asm/switch_to.h>
+-#include <crypto/algapi.h>
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+ #include <crypto/b128ops.h>
+-- 
+2.25.1
