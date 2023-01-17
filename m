@@ -2,518 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B62C678D9
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 01:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B05C677F1
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Jan 2023 03:47:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235165AbjAQBzu convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Jan 2023 20:55:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49170 "EHLO
+        id S235348AbjAQDr5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Jan 2023 22:47:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235144AbjAQBzh (ORCPT
+        with ESMTP id S235121AbjAQDr4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Jan 2023 20:55:37 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C142B638;
-        Mon, 16 Jan 2023 17:55:28 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 4856E24E1F5;
-        Tue, 17 Jan 2023 09:55:22 +0800 (CST)
-Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 17 Jan
- 2023 09:55:22 +0800
-Received: from ubuntu.localdomain (202.190.108.220) by EXMBX068.cuchost.com
- (172.16.6.68) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 17 Jan
- 2023 09:55:00 +0800
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>
-CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
-Subject: [PATCH v5 2/3] hwrng: starfive - Add TRNG driver for StarFive SoC
-Date:   Tue, 17 Jan 2023 09:54:44 +0800
-Message-ID: <20230117015445.32500-3-jiajie.ho@starfivetech.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230117015445.32500-1-jiajie.ho@starfivetech.com>
-References: <20230117015445.32500-1-jiajie.ho@starfivetech.com>
+        Mon, 16 Jan 2023 22:47:56 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C701922DC5;
+        Mon, 16 Jan 2023 19:47:54 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Nwvx00xGvz4xG5;
+        Tue, 17 Jan 2023 14:47:48 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1673927268;
+        bh=pdT0tLO8GhTYnyOobd7AHS4rLZhzpys/XxIhDrVwTQE=;
+        h=Date:From:To:Cc:Subject:From;
+        b=cEF0eu2Lw5aegSx7hGanxUhFFwulU0oLGRKzDX7StCDPirx2Abu/ytDSH084deiY7
+         0z/FDrubl8A/sJMWjvQUUlgCAdTrcAzoOKiE8PY3dHCZLToxTdMAOkXNvsVi3kQYa2
+         Z7+lGjW01f/8Kvfy3lOv3AQhHhxO6Qxb4iO8z1JGBtr2g6azOGXgZOqgseK6bzFVqP
+         CV/C27yiGepyyLOvIuMHs/EhD+MgBM/DYHhse/55OFeSJ38FLztC92pSOp6zCGXTFL
+         RF435i6MR6FINTJcMmn8kgsbx8nHJId1zOfw44IdKlanWq8Jd9SDDPrScs/UJrJBLz
+         6WmWN7eIklSfg==
+Date:   Tue, 17 Jan 2023 14:47:47 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Danny Tsen <dtsen@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        PowerPC <linuxppc-dev@lists.ozlabs.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20230117144747.37115c52@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [202.190.108.220]
-X-ClientProxiedBy: EXCAS061.cuchost.com (172.16.6.21) To EXMBX068.cuchost.com
- (172.16.6.68)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/signed; boundary="Sig_/U3=+W9+taE+jWVag5qZssFt";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This adds driver support for the hardware random number generator in
-Starfive SoCs and adds StarFive TRNG entry to MAINTAINERS.
+--Sig_/U3=+W9+taE+jWVag5qZssFt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Hi all,
+
+After merging the crypto tree, today's linux-next build (powerpc
+pseries_le_defconfig) failed like this:
+
+arch/powerpc/crypto/p10_aes_gcm.o: warning: objtool: .text+0x884: unannotat=
+ed intra-function call
+arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0=
+x44: unannotated intra-function call
+ld: arch/powerpc/crypto/p10_aes_gcm.o: ABI version 1 is not compatible with=
+ ABI version 2 output
+ld: failed to merge target specific data of file arch/powerpc/crypto/p10_ae=
+s_gcm.o
+
+Caused by commit
+
+  ca68a96c37eb ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched impl=
+ementation")
+
+I have applied the following hack for today.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 17 Jan 2023 14:41:10 +1100
+Subject: [PATCH] crypto: p10-aes-gcm - only ABIv1 code has been implemented
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
 ---
- MAINTAINERS                          |   6 +
- drivers/char/hw_random/Kconfig       |  11 +
- drivers/char/hw_random/Makefile      |   1 +
- drivers/char/hw_random/jh7110-trng.c | 393 +++++++++++++++++++++++++++
- 4 files changed, 411 insertions(+)
- create mode 100644 drivers/char/hw_random/jh7110-trng.c
+ arch/powerpc/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 65140500d9f8..28542af172c6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19626,6 +19626,12 @@ F:	drivers/reset/reset-starfive.c
- F:	include/linux/reset/starfive.h
- F:	include/dt-bindings/reset/starfive*
- 
-+STARFIVE TRNG DRIVER
-+M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
-+S:	Supported
-+F:	Documentation/devicetree/bindings/rng/starfive*
-+F:	drivers/char/hw_random/starfive-trng.c
-+
- STATIC BRANCH/CALL
- M:	Peter Zijlstra <peterz@infradead.org>
- M:	Josh Poimboeuf <jpoimboe@kernel.org>
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 3da8e85f8aae..be202959efa6 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -549,6 +549,17 @@ config HW_RANDOM_CN10K
- 	 To compile this driver as a module, choose M here.
- 	 The module will be called cn10k_rng. If unsure, say Y.
- 
-+config HW_RANDOM_JH7110
-+	tristate "StarFive JH7110 Random Number Generator support"
-+	depends on SOC_STARFIVE
-+	depends on HW_RANDOM
-+	help
-+	  This driver provides support for the True Random Number
-+	  Generator in StarFive JH7110 SoCs.
-+
-+	  To compile this driver as a module, choose M here.
-+	  The module will be called jh7110-trng.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 3e948cf04476..09bde4a0f971 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -47,3 +47,4 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
- obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
- obj-$(CONFIG_HW_RANDOM_CN10K) += cn10k-rng.o
- obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) += mpfs-rng.o
-+obj-$(CONFIG_HW_RANDOM_JH7110) += jh7110-trng.o
-diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_random/jh7110-trng.c
-new file mode 100644
-index 000000000000..38474d48a25e
---- /dev/null
-+++ b/drivers/char/hw_random/jh7110-trng.c
-@@ -0,0 +1,393 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * TRNG driver for the StarFive JH7110 SoC
-+ *
-+ * Copyright (C) 2022 StarFive Technology Co.
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/completion.h>
-+#include <linux/delay.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/interrupt.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/random.h>
-+#include <linux/reset.h>
-+
-+/* trng register offset */
-+#define STARFIVE_CTRL			0x00
-+#define STARFIVE_STAT			0x04
-+#define STARFIVE_MODE			0x08
-+#define STARFIVE_SMODE			0x0C
-+#define STARFIVE_IE			0x10
-+#define STARFIVE_ISTAT			0x14
-+#define STARFIVE_RAND0			0x20
-+#define STARFIVE_RAND1			0x24
-+#define STARFIVE_RAND2			0x28
-+#define STARFIVE_RAND3			0x2C
-+#define STARFIVE_RAND4			0x30
-+#define STARFIVE_RAND5			0x34
-+#define STARFIVE_RAND6			0x38
-+#define STARFIVE_RAND7			0x3C
-+#define STARFIVE_AUTO_RQSTS		0x60
-+#define STARFIVE_AUTO_AGE		0x64
-+
-+/* CTRL CMD */
-+#define STARFIVE_CTRL_EXEC_NOP		0x0
-+#define STARFIVE_CTRL_GENE_RANDNUM	0x1
-+#define STARFIVE_CTRL_EXEC_RANDRESEED	0x2
-+
-+/* STAT */
-+#define STARFIVE_STAT_NONCE_MODE	BIT(2)
-+#define STARFIVE_STAT_R256		BIT(3)
-+#define STARFIVE_STAT_MISSION_MODE	BIT(8)
-+#define STARFIVE_STAT_SEEDED		BIT(9)
-+#define STARFIVE_STAT_LAST_RESEED(x)	((x) << 16)
-+#define STARFIVE_STAT_SRVC_RQST		BIT(27)
-+#define STARFIVE_STAT_RAND_GENERATING	BIT(30)
-+#define STARFIVE_STAT_RAND_SEEDING	BIT(31)
-+
-+/* MODE */
-+#define STARFIVE_MODE_R256		BIT(3)
-+
-+/* SMODE */
-+#define STARFIVE_SMODE_NONCE_MODE	BIT(2)
-+#define STARFIVE_SMODE_MISSION_MODE	BIT(8)
-+#define STARFIVE_SMODE_MAX_REJECTS(x)	((x) << 16)
-+
-+/* IE */
-+#define STARFIVE_IE_RAND_RDY_EN		BIT(0)
-+#define STARFIVE_IE_SEED_DONE_EN	BIT(1)
-+#define STARFIVE_IE_LFSR_LOCKUP_EN	BIT(4)
-+#define STARFIVE_IE_GLBL_EN		BIT(31)
-+
-+#define STARFIVE_IE_ALL			(STARFIVE_IE_GLBL_EN | \
-+					 STARFIVE_IE_RAND_RDY_EN | \
-+					 STARFIVE_IE_SEED_DONE_EN | \
-+					 STARFIVE_IE_LFSR_LOCKUP_EN)
-+
-+/* ISTAT */
-+#define STARFIVE_ISTAT_RAND_RDY		BIT(0)
-+#define STARFIVE_ISTAT_SEED_DONE	BIT(1)
-+#define STARFIVE_ISTAT_LFSR_LOCKUP	BIT(4)
-+
-+#define STARFIVE_RAND_LEN		sizeof(u32)
-+
-+#define to_trng(p)			container_of(p, struct starfive_trng, rng)
-+
-+enum reseed {
-+	RANDOM_RESEED,
-+	NONCE_RESEED,
-+};
-+
-+enum mode {
-+	PRNG_128BIT,
-+	PRNG_256BIT,
-+};
-+
-+struct starfive_trng {
-+	struct device		*dev;
-+	void __iomem		*base;
-+	struct clk		*hclk;
-+	struct clk		*ahb;
-+	struct reset_control	*rst;
-+	struct hwrng		rng;
-+	struct completion	random_done;
-+	struct completion	reseed_done;
-+	u32			mode;
-+	u32			mission;
-+	u32			reseed;
-+	/* protects against concurrent write to ctrl register */
-+	spinlock_t		write_lock;
-+};
-+
-+static u16 autoreq;
-+module_param(autoreq, ushort, 0);
-+MODULE_PARM_DESC(autoreq, "Auto-reseeding after random number requests by host reaches specified counter:\n"
-+				" 0 - disable counter\n"
-+				" other - reload value for internal counter");
-+
-+static u16 autoage;
-+module_param(autoage, ushort, 0);
-+MODULE_PARM_DESC(autoage, "Auto-reseeding after specified timer countdowns to 0:\n"
-+				" 0 - disable timer\n"
-+				" other - reload value for internal timer");
-+
-+static inline int starfive_trng_wait_idle(struct starfive_trng *trng)
-+{
-+	u32 stat;
-+
-+	return readl_relaxed_poll_timeout(trng->base + STARFIVE_STAT, stat,
-+					  !(stat & (STARFIVE_STAT_RAND_GENERATING |
-+						    STARFIVE_STAT_RAND_SEEDING)),
-+					  10, 100000);
-+}
-+
-+static inline void starfive_trng_irq_mask_clear(struct starfive_trng *trng)
-+{
-+	/* clear register: ISTAT */
-+	u32 data = readl(trng->base + STARFIVE_ISTAT);
-+
-+	writel(data, trng->base + STARFIVE_ISTAT);
-+}
-+
-+static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, bool wait)
-+{
-+	int wait_time = 1000;
-+
-+	/* allow up to 40 us for wait == 0 */
-+	if (!wait)
-+		wait_time = 40;
-+
-+	switch (cmd) {
-+	case STARFIVE_CTRL_GENE_RANDNUM:
-+		reinit_completion(&trng->random_done);
-+		spin_lock_irq(&trng->write_lock);
-+		writel(cmd, trng->base + STARFIVE_CTRL);
-+		spin_unlock_irq(&trng->write_lock);
-+		if (!wait_for_completion_timeout(&trng->random_done, usecs_to_jiffies(wait_time)))
-+			return -ETIMEDOUT;
-+		break;
-+	case STARFIVE_CTRL_EXEC_RANDRESEED:
-+		reinit_completion(&trng->reseed_done);
-+		spin_lock_irq(&trng->write_lock);
-+		writel(cmd, trng->base + STARFIVE_CTRL);
-+		spin_unlock_irq(&trng->write_lock);
-+		if (!wait_for_completion_timeout(&trng->reseed_done, usecs_to_jiffies(wait_time)))
-+			return -ETIMEDOUT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int starfive_trng_init(struct hwrng *rng)
-+{
-+	struct starfive_trng *trng = to_trng(rng);
-+	u32 mode, intr = 0;
-+
-+	/* setup Auto Request/Age register */
-+	writel(autoage, trng->base + STARFIVE_AUTO_AGE);
-+	writel(autoreq, trng->base + STARFIVE_AUTO_RQSTS);
-+
-+	/* clear register: ISTAT */
-+	starfive_trng_irq_mask_clear(trng);
-+
-+	intr |= STARFIVE_IE_ALL;
-+	writel(intr, trng->base + STARFIVE_IE);
-+
-+	mode  = readl(trng->base + STARFIVE_MODE);
-+
-+	switch (trng->mode) {
-+	case PRNG_128BIT:
-+		mode &= ~STARFIVE_MODE_R256;
-+		break;
-+	case PRNG_256BIT:
-+		mode |= STARFIVE_MODE_R256;
-+		break;
-+	default:
-+		mode |= STARFIVE_MODE_R256;
-+		break;
-+	}
-+
-+	writel(mode, trng->base + STARFIVE_MODE);
-+
-+	return starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED, 1);
-+}
-+
-+static irqreturn_t starfive_trng_irq(int irq, void *priv)
-+{
-+	u32 status;
-+	struct starfive_trng *trng = (struct starfive_trng *)priv;
-+
-+	status = readl(trng->base + STARFIVE_ISTAT);
-+	if (status & STARFIVE_ISTAT_RAND_RDY) {
-+		writel(STARFIVE_ISTAT_RAND_RDY, trng->base + STARFIVE_ISTAT);
-+		complete(&trng->random_done);
-+	}
-+
-+	if (status & STARFIVE_ISTAT_SEED_DONE) {
-+		writel(STARFIVE_ISTAT_SEED_DONE, trng->base + STARFIVE_ISTAT);
-+		complete(&trng->reseed_done);
-+	}
-+
-+	if (status & STARFIVE_ISTAT_LFSR_LOCKUP) {
-+		writel(STARFIVE_ISTAT_LFSR_LOCKUP, trng->base + STARFIVE_ISTAT);
-+		/* SEU occurred, reseeding required*/
-+		spin_lock(&trng->write_lock);
-+		writel(STARFIVE_CTRL_EXEC_RANDRESEED, trng->base + STARFIVE_CTRL);
-+		spin_unlock(&trng->write_lock);
-+	}
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static void starfive_trng_cleanup(struct hwrng *rng)
-+{
-+	struct starfive_trng *trng = to_trng(rng);
-+
-+	writel(0, trng->base + STARFIVE_CTRL);
-+
-+	reset_control_assert(trng->rst);
-+	clk_disable_unprepare(trng->hclk);
-+	clk_disable_unprepare(trng->ahb);
-+}
-+
-+static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct starfive_trng *trng = to_trng(rng);
-+	int ret;
-+
-+	pm_runtime_get_sync(trng->dev);
-+
-+	if (trng->mode == PRNG_256BIT)
-+		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 8));
-+	else
-+		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 4));
-+
-+	if (wait) {
-+		ret = starfive_trng_wait_idle(trng);
-+		if (ret)
-+			return -ETIMEDOUT;
-+	}
-+
-+	ret = starfive_trng_cmd(trng, STARFIVE_CTRL_GENE_RANDNUM, wait);
-+	if (ret)
-+		return ret;
-+
-+	memcpy_fromio(buf, trng->base + STARFIVE_RAND0, max);
-+
-+	pm_runtime_put_sync_autosuspend(trng->dev);
-+
-+	return max;
-+}
-+
-+static int starfive_trng_probe(struct platform_device *pdev)
-+{
-+	int ret;
-+	int irq;
-+	struct starfive_trng *trng;
-+
-+	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-+	if (!trng)
-+		return -ENOMEM;
-+
-+	platform_set_drvdata(pdev, trng);
-+	trng->dev = &pdev->dev;
-+
-+	trng->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(trng->base))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(trng->base),
-+				     "Error remapping memory for platform device.\n");
-+
-+	irq = platform_get_irq(pdev, 0);
-+	if (irq < 0)
-+		return irq;
-+
-+	init_completion(&trng->random_done);
-+	init_completion(&trng->reseed_done);
-+	spin_lock_init(&trng->write_lock);
-+
-+	ret = devm_request_irq(&pdev->dev, irq, starfive_trng_irq, 0, pdev->name,
-+			       (void *)trng);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, irq,
-+				     "Failed to register interrupt handler\n");
-+
-+	trng->hclk = devm_clk_get(&pdev->dev, "hclk");
-+	if (IS_ERR(trng->hclk))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(trng->hclk),
-+				     "Error getting hardware reference clock\n");
-+
-+	trng->ahb = devm_clk_get(&pdev->dev, "ahb");
-+	if (IS_ERR(trng->ahb))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(trng->ahb),
-+				     "Error getting ahb reference clock\n");
-+
-+	trng->rst = devm_reset_control_get_shared(&pdev->dev, NULL);
-+	if (IS_ERR(trng->rst))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(trng->rst),
-+				     "Error getting hardware reset line\n");
-+
-+	clk_prepare_enable(trng->hclk);
-+	clk_prepare_enable(trng->ahb);
-+	reset_control_deassert(trng->rst);
-+
-+	trng->rng.name = dev_driver_string(&pdev->dev);
-+	trng->rng.init = starfive_trng_init;
-+	trng->rng.cleanup = starfive_trng_cleanup;
-+	trng->rng.read = starfive_trng_read;
-+
-+	trng->mode = PRNG_256BIT;
-+	trng->mission = 1;
-+	trng->reseed = RANDOM_RESEED;
-+
-+	pm_runtime_use_autosuspend(&pdev->dev);
-+	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-+	pm_runtime_enable(&pdev->dev);
-+
-+	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
-+	if (ret) {
-+		pm_runtime_disable(&pdev->dev);
-+
-+		reset_control_assert(trng->rst);
-+		clk_disable_unprepare(trng->ahb);
-+		clk_disable_unprepare(trng->hclk);
-+
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
-+	}
-+
-+	return 0;
-+}
-+
-+static int __maybe_unused starfive_trng_suspend(struct device *dev)
-+{
-+	struct starfive_trng *trng = dev_get_drvdata(dev);
-+
-+	clk_disable_unprepare(trng->hclk);
-+	clk_disable_unprepare(trng->ahb);
-+
-+	return 0;
-+}
-+
-+static int __maybe_unused starfive_trng_resume(struct device *dev)
-+{
-+	struct starfive_trng *trng = dev_get_drvdata(dev);
-+
-+	clk_prepare_enable(trng->hclk);
-+	clk_prepare_enable(trng->ahb);
-+
-+	return 0;
-+}
-+
-+static DEFINE_SIMPLE_DEV_PM_OPS(starfive_trng_pm_ops, starfive_trng_suspend,
-+				starfive_trng_resume);
-+
-+static const struct of_device_id trng_dt_ids[] __maybe_unused = {
-+	{ .compatible = "starfive,jh7110-trng" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, trng_dt_ids);
-+
-+static struct platform_driver starfive_trng_driver = {
-+	.probe	= starfive_trng_probe,
-+	.driver	= {
-+		.name		= "jh7110-trng",
-+		.pm		= &starfive_trng_pm_ops,
-+		.of_match_table	= of_match_ptr(trng_dt_ids),
-+	},
-+};
-+
-+module_platform_driver(starfive_trng_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("StarFive True Random Number Generator");
--- 
-2.25.1
+diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+index db7d99383993..36928ad14a6b 100644
+--- a/arch/powerpc/crypto/Kconfig
++++ b/arch/powerpc/crypto/Kconfig
+@@ -97,6 +97,7 @@ config CRYPTO_AES_PPC_SPE
+ config CRYPTO_P10_AES_GCM
+ 	tristate "Stitched AES/GCM acceleration support on P10+ CPU (PPC)"
+ 	depends on PPC64
++	depends on PPC64_ELF_ABI_V1
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AEAD
+--=20
+2.35.1
 
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/U3=+W9+taE+jWVag5qZssFt
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPGGmMACgkQAVBC80lX
+0GzXFQf+IuQ0OoBK3RJPXB4MBEqFCXGFIsjgycvkBpeMhsPwrlTGzgd+Gk2oNnjn
+1VSGXyhT+Qy0mk5iSu7ZHteVWK2oM88re9zAzQoo0FkkNhBDi+6PITfoEjeqAifA
+OmVS1AOcz7XOuIVwGs5JosHJ3UGv8kvWiWjJaI6u1WYqpZF2gRfsNu2SnylW4Xs6
+8PMa66m4u9QaV3E8lav7d11I0gA88FIk2EE27vbIBboh0pvYY9j/VsEJ09YjplXX
+m2EjXwo54fIsP8/6Kunp4cOyd8DKJzwP3RundKYzZDPp5P8UBX9ems5nY7TyfstD
+HKhHguDvaYEwFPhNxs1u7LZUIcjpsg==
+=rAi6
+-----END PGP SIGNATURE-----
+
+--Sig_/U3=+W9+taE+jWVag5qZssFt--
