@@ -2,138 +2,282 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26829C38147
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 18:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A3DC32793
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 18:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbjARSOu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Jan 2023 13:14:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39984 "EHLO
+        id S229800AbjARSPz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Jan 2023 13:15:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbjARSOs (ORCPT
+        with ESMTP id S229949AbjARSPw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2023 13:14:48 -0500
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F6130E8E;
-        Wed, 18 Jan 2023 10:14:46 -0800 (PST)
-Date:   Wed, 18 Jan 2023 18:14:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail3; t=1674065684; x=1674324884;
-        bh=6IvJXSVCAaTVN5zBpjbXw6aPUMZ1WI+M2fxhC/cShMU=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=ErPARWtsyqeFEFumrKFhwbJ2UTL4TfHQjSbb3XjydlL5sEIDnaNHhdneo258YApkJ
-         uDoFqZpIlX9m96lhsHagOT8WEiHfTN9Lguj025Nwv1YjX6y5p7biYI/r9ZBn/r7OND
-         ltZdeja0FF19kvnklrmiW61PXlTy5zEZ/X2eQhW3M9a+nVeBmG4gIuoelDZcIAyAw3
-         te/Pj5WXqp+Ye2LzdmlPwX96globyJ8+w1sW2uJoCBhPagBah3g2fwrYiXfs2x6EbE
-         3lhTqzxfOGfeEMdVHhiIRx3uf0RgL5xV/PkQY9sFDvhz8vTBlpH0dFlfU48rf2TjML
-         tnmIgYeBmx2aw==
-To:     Denis Kenzior <denkenz@gmail.com>
-From:   Michael Yartys <michael.yartys@protonmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KEYS: asymmetric: Fix ECDSA use via keyctl uapi
-Message-ID: <-ZV1wRa2DQG_0s2MX9cYRQNRaxkwZkJAf5bqQQwjSy8pATVdr0oiYAwPGvKvdppGozE1qI2wiPNRbHMWEX8Xup2fzN3KULMvYXTASXSlfoI=@protonmail.com>
-In-Reply-To: <20220826145119.9375-1-denkenz@gmail.com>
-References: <20220826145119.9375-1-denkenz@gmail.com>
-Feedback-ID: 6588689:user:proton
+        Wed, 18 Jan 2023 13:15:52 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D9FA3EC59
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2023 10:15:50 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id m15so17455366ilq.2
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2023 10:15:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qFMvi2a6L2BPNbil1Z3ukPsrERB30WY5FsfmzneS0xY=;
+        b=FXN2VCbM00KvzRkLSjJCig2q0kiMeLGNdPtqDsL6Sn+DpZ+Rfxrxmut8jlbmR5reSW
+         MrN/046C1mOXE04WG8BP9Ag0tGSdsv3J1z3DLT+Ft+cTDKo0Fc8nHcQtX93SChBeTB3S
+         v+M0dtOnqM6E0LcYWrXGlAWURLkqAyXlfgRZUmty3DrKEjdVUMAJTpxYB9sMafWHFfnQ
+         Hw1IkSK/+hFION0jdBrcEI5Z2Pi0CTrplRkhpS3r4GLCFizUFFazRU1xi37XSU1WjSSS
+         GhASTTqJtcHutSoQlKJhlVJhKCKta6qfDEEx/dft6aFS/IzYIBXXmaQXjCEYcOjx29Of
+         zquQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qFMvi2a6L2BPNbil1Z3ukPsrERB30WY5FsfmzneS0xY=;
+        b=yLCZDJuvRJJtl72L4BRt2rYh3A/oapjjVV+rdSBz5tKZBoo+Mes6EPoh0mDS1WvQNo
+         +3EHIfQjvK26us68oP2HYYxPydMHOh51zDyh4gF73LODTsc2DVQxcAef2X3MLjzgUkxH
+         gou3UlYwNWF2jkUbZHbU1mZvC0cWDEWpOGUHcNbdpxBUM3MHTasA0+O98W+as7JkyxCN
+         moJDpTbi+ufU9FZAJ9nXCS+KsP3zQ35Pg/gLE6dMQveRbtGMvSg9EYBii8VISUyYzPID
+         j9AmhzPsrr+MJg75SZMAPjKCQtQCMMqLM4dnWQvlchVQsST3F8XmX25JVR4iewZZ8EI1
+         KFpA==
+X-Gm-Message-State: AFqh2kp1AthyUBtLqBMMAEajFE2ift3/bZBWCxIV726IqKtJpkVr6Pwc
+        U+0GPv26chMOM1Jn7RL+UzqIiYxlPkxmzyV5VAQvHw==
+X-Google-Smtp-Source: AMrXdXv6zW3mUb3uJJYwWd8l/Zc0mUhiArEpYUTm10kiV+NXSFLzq7Rpx0/aHPDhA/yUTebrZSMnVWp7fevFEhGvFro=
+X-Received: by 2002:a92:d911:0:b0:30d:a0c6:55a3 with SMTP id
+ s17-20020a92d911000000b0030da0c655a3mr951212iln.199.1674065749311; Wed, 18
+ Jan 2023 10:15:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-45-michael.roth@amd.com>
+ <20230118152721.GA24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20230118152721.GA24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+From:   Alper Gun <alpergun@google.com>
+Date:   Wed, 18 Jan 2023 10:15:38 -0800
+Message-ID: <CABpDEunq_GwJZWw9LNEHB=67w7PHut=UfCr_0bmTHe6Ymng9vQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 44/64] KVM: SVM: Remove the long-lived GHCB host map
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, dgilbert@redhat.com,
+        jarkko@kernel.org, ashish.kalra@amd.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+On Wed, Jan 18, 2023 at 7:27 AM Jeremi Piotrowski
+<jpiotrowski@linux.microsoft.com> wrote:
+>
+> On Wed, Dec 14, 2022 at 01:40:36PM -0600, Michael Roth wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> >
+> > On VMGEXIT, sev_handle_vmgexit() creates a host mapping for the GHCB GPA,
+> > and unmaps it just before VM-entry. This long-lived GHCB map is used by
+> > the VMGEXIT handler through accessors such as ghcb_{set_get}_xxx().
+> >
+> > A long-lived GHCB map can cause issue when SEV-SNP is enabled. When
+> > SEV-SNP is enabled the mapped GPA needs to be protected against a page
+> > state change.
+> >
+> > To eliminate the long-lived GHCB mapping, update the GHCB sync operations
+> > to explicitly map the GHCB before access and unmap it after access is
+> > complete. This requires that the setting of the GHCBs sw_exit_info_{1,2}
+> > fields be done during sev_es_sync_to_ghcb(), so create two new fields in
+> > the vcpu_svm struct to hold these values when required to be set outside
+> > of the GHCB mapping.
+> >
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > [mdr: defer per_cpu() assignment and order it with barrier() to fix case
+> >       where kvm_vcpu_map() causes reschedule on different CPU]
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  arch/x86/kvm/svm/sev.c | 131 ++++++++++++++++++++++++++---------------
+> >  arch/x86/kvm/svm/svm.c |  18 +++---
+> >  arch/x86/kvm/svm/svm.h |  24 +++++++-
+> >  3 files changed, 116 insertions(+), 57 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index d5c6e48055fb..6ac0cb6e3484 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -2921,15 +2921,40 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+> >       kvfree(svm->sev_es.ghcb_sa);
+> >  }
+> >
+> > +static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> > +{
+> > +     struct vmcb_control_area *control = &svm->vmcb->control;
+> > +     u64 gfn = gpa_to_gfn(control->ghcb_gpa);
+> > +
+> > +     if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
+> > +             /* Unable to map GHCB from guest */
+> > +             pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> > +{
+> > +     kvm_vcpu_unmap(&svm->vcpu, map, true);
+> > +}
+> > +
+> >  static void dump_ghcb(struct vcpu_svm *svm)
+> >  {
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> > +     struct kvm_host_map map;
+> >       unsigned int nbits;
+> > +     struct ghcb *ghcb;
+> > +
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return;
+> > +
+> > +     ghcb = map.hva;
+>
+> dump_ghcb() is called from sev_es_validate_vmgexit() with the ghcb already
+> mapped. How about passing 'struct kvm_host_map *' (or struct ghcb *) as a
+> param to avoid double mapping?
 
-What's the hold-up with this patch? I would really appreciate if someone co=
-uld take a look at it and move it along to finally enable iwd to connect to=
- networks using ECDSA certificates (my eduroam network for example).
+This also causes a soft lockup, PSC spin lock is already acquired in
+sev_es_validate_vmgexit. dump_ghcb will try to acquire the same lock
+again. So a guest can send an invalid ghcb page  and cause a host soft
+lockup.
 
-Michael
-
-
-------- Original Message -------
-On Friday, August 26th, 2022 at 16:51, Denis Kenzior <denkenz@gmail.com> wr=
-ote:
-
-
->=20
->=20
-> When support for ECDSA keys was added, constraints for data & signature
-> sizes were never updated. This makes it impossible to use such keys via
-> keyctl API from userspace.
->=20
-> Update constraint on max_data_size to 64 bytes in order to support
-> SHA512-based signatures. Also update the signature length constraints
-> per ECDSA signature encoding described in RFC 5480.
->=20
-> Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA=
- keys")
-> Signed-off-by: Denis Kenzior denkenz@gmail.com
->=20
-> ---
->=20
-> Version History:
->=20
-> v2: Update patch description according to Jarkko's comments. No
-> functional code changes.
->=20
-> crypto/asymmetric_keys/public_key.c | 24 ++++++++++++++++++++++--
-> 1 file changed, 22 insertions(+), 2 deletions(-)
->=20
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys=
-/public_key.c
-> index 2f8352e88860..eca5671ad3f2 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -186,8 +186,28 @@ static int software_key_query(const struct kernel_pk=
-ey_params *params,
->=20
-> len =3D crypto_akcipher_maxsize(tfm);
-> info->key_size =3D len * 8;
->=20
-> - info->max_data_size =3D len;
->=20
-> - info->max_sig_size =3D len;
->=20
-> +
-> + if (strncmp(pkey->pkey_algo, "ecdsa", 5) =3D=3D 0) {
->=20
-> + /*
-> + * ECDSA key sizes are much smaller than RSA, and thus could
-> + * operate on (hashed) inputs that are larger than key size.
-> + * For example SHA384-hashed input used with secp256r1
-> + * based keys. Set max_data_size to be at least as large as
-> + * the largest supported hash size (SHA512)
-> + */
-> + info->max_data_size =3D 64;
->=20
-> +
-> + /*
-> + * Verify takes ECDSA-Sig (described in RFC 5480) as input,
-> + * which is actually 2 'key_size'-bit integers encoded in
-> + * ASN.1. Account for the ASN.1 encoding overhead here.
-> + */
-> + info->max_sig_size =3D 2 * (len + 3) + 2;
->=20
-> + } else {
-> + info->max_data_size =3D len;
->=20
-> + info->max_sig_size =3D len;
->=20
-> + }
-> +
-> info->max_enc_size =3D len;
->=20
-> info->max_dec_size =3D len;
->=20
-> info->supported_ops =3D (KEYCTL_SUPPORTS_ENCRYPT |
->=20
-> --
-> 2.35.1
+>
+> >
+> >       /* Re-use the dump_invalid_vmcb module parameter */
+> >       if (!dump_invalid_vmcb) {
+> >               pr_warn_ratelimited("set kvm_amd.dump_invalid_vmcb=1 to dump internal KVM state.\n");
+> > -             return;
+> > +             goto e_unmap;
+> >       }
+> >
+> >       nbits = sizeof(ghcb->save.valid_bitmap) * 8;
+> > @@ -2944,12 +2969,21 @@ static void dump_ghcb(struct vcpu_svm *svm)
+> >       pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
+> >              ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
+> >       pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
+> > +
+> > +e_unmap:
+> > +     svm_unmap_ghcb(svm, &map);
+> >  }
+> >
+> > -static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> > +static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> >  {
+> >       struct kvm_vcpu *vcpu = &svm->vcpu;
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> > +     struct kvm_host_map map;
+> > +     struct ghcb *ghcb;
+> > +
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return false;
+> > +
+> > +     ghcb = map.hva;
+> >
+> >       /*
+> >        * The GHCB protocol so far allows for the following data
+> > @@ -2963,13 +2997,24 @@ static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> >       ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
+> >       ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
+> >       ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
+> > +
+> > +     /*
+> > +      * Copy the return values from the exit_info_{1,2}.
+> > +      */
+> > +     ghcb_set_sw_exit_info_1(ghcb, svm->sev_es.ghcb_sw_exit_info_1);
+> > +     ghcb_set_sw_exit_info_2(ghcb, svm->sev_es.ghcb_sw_exit_info_2);
+> > +
+> > +     trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, ghcb);
+> > +
+> > +     svm_unmap_ghcb(svm, &map);
+> > +
+> > +     return true;
+> >  }
+> >
+> > -static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+> > +static void sev_es_sync_from_ghcb(struct vcpu_svm *svm, struct ghcb *ghcb)
+> >  {
+> >       struct vmcb_control_area *control = &svm->vmcb->control;
+> >       struct kvm_vcpu *vcpu = &svm->vcpu;
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> >       u64 exit_code;
+> >
+> >       /*
+> > @@ -3013,20 +3058,25 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+> >       memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
+> >  }
+> >
+> > -static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> > +static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+> >  {
+> > -     struct kvm_vcpu *vcpu;
+> > +     struct kvm_vcpu *vcpu = &svm->vcpu;
+> > +     struct kvm_host_map map;
+> >       struct ghcb *ghcb;
+> > -     u64 exit_code;
+> >       u64 reason;
+> >
+> > -     ghcb = svm->sev_es.ghcb;
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return -EFAULT;
+> > +
+> > +     ghcb = map.hva;
+> > +
+> > +     trace_kvm_vmgexit_enter(vcpu->vcpu_id, ghcb);
+> >
+> >       /*
+> >        * Retrieve the exit code now even though it may not be marked valid
+> >        * as it could help with debugging.
+> >        */
+> > -     exit_code = ghcb_get_sw_exit_code(ghcb);
+> > +     *exit_code = ghcb_get_sw_exit_code(ghcb);
+> >
+> >       /* Only GHCB Usage code 0 is supported */
+> >       if (ghcb->ghcb_usage) {
+> > @@ -3119,6 +3169,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >               goto vmgexit_err;
+> >       }
+> >
+> > +     sev_es_sync_from_ghcb(svm, ghcb);
+> > +
+> > +     svm_unmap_ghcb(svm, &map);
+> >       return 0;
+> >
+> >  vmgexit_err:
+> > @@ -3129,10 +3182,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >                           ghcb->ghcb_usage);
+> >       } else if (reason == GHCB_ERR_INVALID_EVENT) {
+> >               vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
+> > -                         exit_code);
+> > +                         *exit_code);
+> >       } else {
+> >               vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
+> > -                         exit_code);
+> > +                         *exit_code);
+> >               dump_ghcb(svm);
+> >       }
+> >
+> > @@ -3142,6 +3195,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >       ghcb_set_sw_exit_info_1(ghcb, 2);
+> >       ghcb_set_sw_exit_info_2(ghcb, reason);
+> >
+> > +     svm_unmap_ghcb(svm, &map);
+> > +
+> >       /* Resume the guest to "return" the error code. */
+> >       return 1;
+> >  }
+>
