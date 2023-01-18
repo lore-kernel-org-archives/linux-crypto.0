@@ -2,180 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D0EC38147
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 03:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81BA0C38147
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 03:49:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjARDEw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Jan 2023 22:04:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
+        id S229455AbjARDtB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Jan 2023 22:49:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjARDEu (ORCPT
+        with ESMTP id S229379AbjARDtA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Jan 2023 22:04:50 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C9A4FC3F;
-        Tue, 17 Jan 2023 19:04:48 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        Tue, 17 Jan 2023 22:49:00 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25A15087D;
+        Tue, 17 Jan 2023 19:48:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NxVwt4lM1z4wgq;
-        Wed, 18 Jan 2023 14:04:46 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1674011087;
-        bh=M3BcInVBdGIb/eB5yTCtLvBO8sYnUT7vEAWHpGvU/p8=;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3CC4261615;
+        Wed, 18 Jan 2023 03:48:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05909C433D2;
+        Wed, 18 Jan 2023 03:48:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674013738;
+        bh=3KxMIHARERjccjn87E5q/Isvv9axqXiuByE+8f1JDvM=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rxpofKDtHQGO3VvuGcfmLroaX6kR+MQdUAci0CxVCxv2W9IhvCgSmZt3wSyLQmRNg
-         A8FVyjsDa7yc7mx/6AZqzOAwvxzpqCxaY6S3M2YpIobT0NzyCFfRCq+q/RS0mLTbzM
-         4o4lxrV44qlzjG6XudBb2iqgF0CGxRTOnNIbAxXh7OuyKYYw2vtLKUpijZjbd6VDde
-         vA8ol94I8/pG9Rw/gZdfzq+86VIPOLOsDdKbWtJlPWb3OhWFucOVlqyhh6pJR5DeWa
-         ENcrhYql/DiGenJsUvPgwYvHsb+zV6u3vk/pvt5Y/P0IhQkZr3MXoDlxXG8zPzZdZ9
-         yfJw0tlxL6cBA==
-Date:   Wed, 18 Jan 2023 14:04:44 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Danny Tsen <dtsen@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        PowerPC <linuxppc-dev@lists.ozlabs.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: crypto: p10-aes-gcm - Add asm markings necessary for kernel
- code
-Message-ID: <20230118140444.25353e67@canb.auug.org.au>
-In-Reply-To: <Y8ZNoBSX5P0ieJ3t@gondor.apana.org.au>
-References: <20230117144747.37115c52@canb.auug.org.au>
-        <Y8ZNoBSX5P0ieJ3t@gondor.apana.org.au>
+        b=QFnlsWY7Pn/7SjXTN36JFKLLFLwc93CDI385dWSeQTNxGVD/QWThZB5BHAm+iuSo8
+         I497yK2GQfuoSyzwbp2de9sO9EE8nIEOh/o/NEDuw6H7rc7y0tFYde/kKyglZWbc2k
+         dl+23TPR8iO908F4rZMXxZ5+rGe9CTzjbuyKP/5+TY8FTrw01l/jDTdzJWR33AM3gP
+         LFlJ2HchCCKVqLlSCDzXDIiZkE/fa7Ss9g1Y72ZJGntmqDVnjr0Ho7u+htLEse/cHe
+         B2jkOE0BB1Xdiib/haXO5XAgcxnlQKx/XWNzNTF8gu7Od9+6t7CrAv2xdc1PAmnEne
+         daFORN5Pc1dWg==
+Date:   Tue, 17 Jan 2023 19:48:56 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] crypto/net/ipv6: sr: Switch to using crypto_pool
+Message-ID: <20230117194856.55ec5458@kernel.org>
+In-Reply-To: <20230116201458.104260-4-dima@arista.com>
+References: <20230116201458.104260-1-dima@arista.com>
+        <20230116201458.104260-4-dima@arista.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/d5q8/40ndh9awWN2bgWdQ/3";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/d5q8/40ndh9awWN2bgWdQ/3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, 16 Jan 2023 20:14:57 +0000 Dmitry Safonov wrote:
+> The conversion to use crypto_pool has the following upsides:
+> - now SR uses asynchronous API which may potentially free CPU cycles and
+>   improve performance for of CPU crypto algorithm providers;
+> - hash descriptors now don't have to be allocated on boot, but only at
+>   the moment SR starts using HMAC and until the last HMAC secret is
+>   deleted;
+> - potentially reuse ahash_request(s) for different users
+> - allocate only one per-CPU scratch buffer rather than a new one for
+>   each user
+> - have a common API for net/ users that need ahash on RX/TX fast path
 
-Hi Herbert,
+breaks allmodconfig build:
 
-On Tue, 17 Jan 2023 15:26:24 +0800 Herbert Xu <herbert@gondor.apana.org.au>=
- wrote:
->
-> On Tue, Jan 17, 2023 at 02:47:47PM +1100, Stephen Rothwell wrote:
-> > Hi all,
-> >=20
-> > After merging the crypto tree, today's linux-next build (powerpc
-> > pseries_le_defconfig) failed like this:
-> >=20
-> > arch/powerpc/crypto/p10_aes_gcm.o: warning: objtool: .text+0x884: unann=
-otated intra-function call
-> > arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_k=
-ey+0x44: unannotated intra-function call
-> > ld: arch/powerpc/crypto/p10_aes_gcm.o: ABI version 1 is not compatible =
-with ABI version 2 output
-> > ld: failed to merge target specific data of file arch/powerpc/crypto/p1=
-0_aes_gcm.o
-> >=20
-> > Caused by commit
-> >=20
-> >   ca68a96c37eb ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched =
-implementation")
-> >=20
-> > I have applied the following hack for today. =20
->=20
-> Thanks Stephen, I'm going to update the previous fix as follows:
-
-I still get:
-
-arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0=
-x44: unannotated intra-function call
-
-from the powerpc pseries_le_defconfig build (which is otherwise ok).
-
-Now I also get (from a powerpc allyesconfig build):
-
-tmp/cc8g6b4E.s: Assembler messages:
-tmp/cc8g6b4E.s: Error: .size expression for gcm_init_p8 does not evaluate t=
-o a constant
-tmp/cc8g6b4E.s: Error: .size expression for .gcm_init_p8 does not evaluate =
-to a constant
-tmp/cc8g6b4E.s: Error: .size expression for gcm_init_htable does not evalua=
-te to a constant
-tmp/cc8g6b4E.s: Error: .size expression for .gcm_init_htable does not evalu=
-ate to a constant
-tmp/cc8g6b4E.s: Error: .size expression for gcm_gmult_p8 does not evaluate =
-to a constant
-tmp/cc8g6b4E.s: Error: .size expression for .gcm_gmult_p8 does not evaluate=
- to a constant
-tmp/cc8g6b4E.s: Error: .size expression for gcm_ghash_p8 does not evaluate =
-to a constant
-tmp/cc8g6b4E.s: Error: .size expression for .gcm_ghash_p8 does not evaluate=
- to a constant
-make[4]: *** [next/scripts/Makefile.build:374: arch/powerpc/crypto/ghashp8-=
-ppc.o] Error 1
-tmp/ccNrBtc1.s: Assembler messages:
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_set_encrypt_key does not=
- evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_set_encrypt_key does no=
-t evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_set_decrypt_key does not=
- evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_set_decrypt_key does no=
-t evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_encrypt does not evaluat=
-e to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_encrypt does not evalua=
-te to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_decrypt does not evaluat=
-e to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_decrypt does not evalua=
-te to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_cbc_encrypt does not eva=
-luate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_cbc_encrypt does not ev=
-aluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_ctr32_encrypt_blocks doe=
-s not evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_ctr32_encrypt_blocks do=
-es not evaluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_xts_encrypt does not eva=
-luate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_xts_encrypt does not ev=
-aluate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for aes_p8_xts_decrypt does not eva=
-luate to a constant
-tmp/ccNrBtc1.s: Error: .size expression for .aes_p8_xts_decrypt does not ev=
-aluate to a constant
-make[4]: *** [next/scripts/Makefile.build:374: arch/powerpc/crypto/aesp8-pp=
-c.o] Error 1
-make[4]: Target 'arch/powerpc/crypto/' not remade because of errors.
-
-$ grep gcm_init_p8 arch/powerpc/crypto/ghashp8-ppc.s
-.align 2 ; .type gcm_init_p8,@function; .globl gcm_init_p8; gcm_init_p8:
-.size gcm_init_p8,.-.gcm_init_p8
-.size .gcm_init_p8,.-.gcm_init_p8
-
-I have just marked CRYPTO_P10_AES_GCM as BROKEN for today.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/d5q8/40ndh9awWN2bgWdQ/3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPHYcwACgkQAVBC80lX
-0GziiAf/a7dQVij/7kJX36npVT5mYMIuyE334Zgbza3Gmd4KG//ah30gYZvin/7L
-tfdBgix0zKknGuSJATGs3vVxJUM5CahLwTYyN7XXO1JKuSTZ38Mo7aKMb7GA6leU
-4vhULq53kfckA4A7b49buAzXZVY/0uWM4csvbtto6Fp8oC6MHoBtpgm/7JHFFiUj
-WNir3nwi3J2OCu1emMBfF1Vna38FT+nZWU5z8nklS7oojuEm+JW26A3KRgjIdg5R
-oiU7IiOT0qYKd8WQfap74qkLaGxAd1ZIGIdMvpUks3iS3p9K/HiGXc8nKqRVXhyd
-hkIMeiBJVIAD9XEsx47ucLaP0acAPA==
-=wJm4
------END PGP SIGNATURE-----
-
---Sig_/d5q8/40ndh9awWN2bgWdQ/3--
+ERROR: modpost: "seg6_hmac_init" [net/ipv6/ipv6.ko] undefined!
+make[2]: *** [../scripts/Makefile.modpost:138: Module.symvers] Error 1
+make[1]: *** [/home/nipa/net-next/Makefile:1960: modpost] Error 2
+make: *** [Makefile:242: __sub-make] Error 2
