@@ -2,55 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED23C004D4
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 10:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1C0C32793
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 14:31:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbjARKUm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Jan 2023 05:20:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52408 "EHLO
+        id S229791AbjAROb3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Jan 2023 09:31:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbjARKTk (ORCPT
+        with ESMTP id S231360AbjARObO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2023 05:19:40 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80552798CA;
-        Wed, 18 Jan 2023 01:25:16 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pI4gj-001HJu-SK; Wed, 18 Jan 2023 17:24:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 18 Jan 2023 17:24:57 +0800
-Date:   Wed, 18 Jan 2023 17:24:57 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Danny Tsen <dtsen@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        PowerPC <linuxppc-dev@lists.ozlabs.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: crypto: p10-aes-gcm - Add asm markings necessary for kernel code
-Message-ID: <Y8e66XW6DiRol55O@gondor.apana.org.au>
-References: <20230117144747.37115c52@canb.auug.org.au>
- <Y8ZNoBSX5P0ieJ3t@gondor.apana.org.au>
- <20230118140444.25353e67@canb.auug.org.au>
+        Wed, 18 Jan 2023 09:31:14 -0500
+Received: from out30-6.freemail.mail.aliyun.com (out30-6.freemail.mail.aliyun.com [115.124.30.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7D760486;
+        Wed, 18 Jan 2023 06:19:33 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R571e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VZqUPxC_1674051569;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VZqUPxC_1674051569)
+          by smtp.aliyun-inc.com;
+          Wed, 18 Jan 2023 22:19:30 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: arm64/sm4 - Fix possible crash in GCM cryption
+Date:   Wed, 18 Jan 2023 22:19:28 +0800
+Message-Id: <20230118141928.48136-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118140444.25353e67@canb.auug.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 18, 2023 at 02:04:44PM +1100, Stephen Rothwell wrote:
->
-> arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0x44: unannotated intra-function call
-> 
-> from the powerpc pseries_le_defconfig build (which is otherwise ok).
+When the cryption total length is zero, GCM cryption call
+skcipher_walk_done() will cause an unexpected crash, so skip calling
+this function to avoid possible crash when the GCM cryption length
+is equal to zero.
 
-Thanks Stephen.  I've reverted these changes completely.
+Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ arch/arm64/crypto/sm4-ce-gcm-glue.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Thanks,
+diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
+index c450a2025ca9..9b63bcf9aa85 100644
+--- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
++++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
+@@ -178,11 +178,13 @@ static int gcm_crypt(struct aead_request *req, struct skcipher_walk *walk,
+ 
+ 		kernel_neon_end();
+ 
+-		err = skcipher_walk_done(walk, tail);
+-		if (err)
+-			return err;
+-		if (walk->nbytes)
+-			kernel_neon_begin();
++		if (walk->nbytes) {
++			err = skcipher_walk_done(walk, tail);
++			if (err)
++				return err;
++			if (walk->nbytes)
++				kernel_neon_begin();
++		}
+ 	} while (walk->nbytes > 0);
+ 
+ 	return 0;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.24.3 (Apple Git-128)
+
