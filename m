@@ -2,159 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2ECC38147
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 17:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26829C38147
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 18:15:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbjARRPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Jan 2023 12:15:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45202 "EHLO
+        id S229607AbjARSOu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Jan 2023 13:14:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjARRPj (ORCPT
+        with ESMTP id S230077AbjARSOs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2023 12:15:39 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF424B48A
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2023 09:15:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674062138; x=1705598138;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Qr2yti9Y2SttmzhbN0rQYK2Gj+ItSWFONIYmsPA476U=;
-  b=X5gdxtAFh6gtBzN3ukOgleKE9hHjOjTzmj98Ox4t1mlVAu7fpPhsCeqV
-   nKXMLCjgqV7SLBVNIFXrUL3rqa/OmwvdxMtWesn4IvTb/UekqxZ9dZqHh
-   86i/qmbgPjgZtqc4wTeHkclcZEdreSoFa0QFD5+NwFk45KL8Nia6j7Jir
-   Jri+zXozXHWL4fwQdth5HWQWGH6B9v9i9Bic5LK4vKCfmOEEObX+xCGzc
-   6bScGdWN7ytVcYHjaf4x76VaN03Clp71XjtrGkG0/0s1YlrdqwuXxA+2+
-   UCqt37OrETBTHxkew7MBPEjci2Je1pkK4E1K84C2T8zA/k0JmQoVOFbZk
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="312916457"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="312916457"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 09:14:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="692074558"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="692074558"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by orsmga001.jf.intel.com with ESMTP; 18 Jan 2023 09:14:14 -0800
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [RFC] crypto: qat - enable polling for compression
-Date:   Wed, 18 Jan 2023 17:14:11 +0000
-Message-Id: <20230118171411.8088-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.39.0
+        Wed, 18 Jan 2023 13:14:48 -0500
+Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F6130E8E;
+        Wed, 18 Jan 2023 10:14:46 -0800 (PST)
+Date:   Wed, 18 Jan 2023 18:14:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1674065684; x=1674324884;
+        bh=6IvJXSVCAaTVN5zBpjbXw6aPUMZ1WI+M2fxhC/cShMU=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=ErPARWtsyqeFEFumrKFhwbJ2UTL4TfHQjSbb3XjydlL5sEIDnaNHhdneo258YApkJ
+         uDoFqZpIlX9m96lhsHagOT8WEiHfTN9Lguj025Nwv1YjX6y5p7biYI/r9ZBn/r7OND
+         ltZdeja0FF19kvnklrmiW61PXlTy5zEZ/X2eQhW3M9a+nVeBmG4gIuoelDZcIAyAw3
+         te/Pj5WXqp+Ye2LzdmlPwX96globyJ8+w1sW2uJoCBhPagBah3g2fwrYiXfs2x6EbE
+         3lhTqzxfOGfeEMdVHhiIRx3uf0RgL5xV/PkQY9sFDvhz8vTBlpH0dFlfU48rf2TjML
+         tnmIgYeBmx2aw==
+To:     Denis Kenzior <denkenz@gmail.com>
+From:   Michael Yartys <michael.yartys@protonmail.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KEYS: asymmetric: Fix ECDSA use via keyctl uapi
+Message-ID: <-ZV1wRa2DQG_0s2MX9cYRQNRaxkwZkJAf5bqQQwjSy8pATVdr0oiYAwPGvKvdppGozE1qI2wiPNRbHMWEX8Xup2fzN3KULMvYXTASXSlfoI=@protonmail.com>
+In-Reply-To: <20220826145119.9375-1-denkenz@gmail.com>
+References: <20220826145119.9375-1-denkenz@gmail.com>
+Feedback-ID: 6588689:user:proton
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When a request is synchronous, it is more efficient to submit it and
-poll for a response without going through the interrupt path.
+Hi
 
-This patch adds logic in the transport layer to poll the response ring
-and enables polling for compression in the QAT driver.
+What's the hold-up with this patch? I would really appreciate if someone co=
+uld take a look at it and move it along to finally enable iwd to connect to=
+ networks using ECDSA certificates (my eduroam network for example).
 
-This is an initial and not complete implementation. The reason why it
-has been sent as RFC is to discuss about ways to mark a request as
-synchronous from the acomp APIs.
+Michael
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_transport.c | 28 +++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_transport.h |  1 +
- drivers/crypto/qat/qat_common/qat_comp_algs.c |  9 +++++-
- .../crypto/qat/qat_common/qat_compression.c   |  2 +-
- 4 files changed, 38 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
-index 630d0483c4e0..af613ee84cdc 100644
---- a/drivers/crypto/qat/qat_common/adf_transport.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport.c
-@@ -133,6 +133,34 @@ static int adf_handle_response(struct adf_etr_ring_data *ring)
- 	return 0;
- }
- 
-+int adf_poll_message(struct adf_etr_ring_data *ring)
-+{
-+	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(ring->bank->accel_dev);
-+	u32 msg_counter = 0;
-+	u32 *msg = (u32 *)((uintptr_t)ring->base_addr + ring->head);
-+
-+	if (atomic_read(ring->inflights) == 0)
-+		return 0;
-+
-+	while (*msg != ADF_RING_EMPTY_SIG) {
-+		ring->callback((u32 *)msg);
-+		atomic_dec(ring->inflights);
-+		*msg = ADF_RING_EMPTY_SIG;
-+		ring->head = adf_modulo(ring->head +
-+					ADF_MSG_SIZE_TO_BYTES(ring->msg_size),
-+					ADF_RING_SIZE_MODULO(ring->ring_size));
-+		msg_counter++;
-+		msg = (u32 *)((uintptr_t)ring->base_addr + ring->head);
-+	}
-+	if (msg_counter > 0) {
-+		csr_ops->write_csr_ring_head(ring->bank->csr_addr,
-+					     ring->bank->bank_number,
-+					     ring->ring_number, ring->head);
-+		return 0;
-+	}
-+	return -EAGAIN;
-+}
-+
- static void adf_configure_tx_ring(struct adf_etr_ring_data *ring)
- {
- 	struct adf_hw_csr_ops *csr_ops = GET_CSR_OPS(ring->bank->accel_dev);
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.h b/drivers/crypto/qat/qat_common/adf_transport.h
-index e6ef6f9b7691..d549081172f8 100644
---- a/drivers/crypto/qat/qat_common/adf_transport.h
-+++ b/drivers/crypto/qat/qat_common/adf_transport.h
-@@ -16,5 +16,6 @@ int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
- 
- bool adf_ring_nearly_full(struct adf_etr_ring_data *ring);
- int adf_send_message(struct adf_etr_ring_data *ring, u32 *msg);
-+int adf_poll_message(struct adf_etr_ring_data *ring);
- void adf_remove_ring(struct adf_etr_ring_data *ring);
- #endif
-diff --git a/drivers/crypto/qat/qat_common/qat_comp_algs.c b/drivers/crypto/qat/qat_common/qat_comp_algs.c
-index 1480d36a8d2b..07378e9fe8fa 100644
---- a/drivers/crypto/qat/qat_common/qat_comp_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_comp_algs.c
-@@ -291,8 +291,15 @@ static int qat_comp_alg_compress_decompress(struct acomp_req *areq,
- 	}
- 
- 	ret = qat_alg_send_dc_message(qat_req, inst, &areq->base);
--	if (ret == -ENOSPC)
-+	if (ret == -ENOSPC) {
- 		qat_bl_free_bufl(inst->accel_dev, &qat_req->buf);
-+		return ret;
-+	}
-+
-+	do {
-+		ret = adf_poll_message(inst->dc_rx);
-+		schedule();
-+	} while (ret);
- 
- 	return ret;
- }
-diff --git a/drivers/crypto/qat/qat_common/qat_compression.c b/drivers/crypto/qat/qat_common/qat_compression.c
-index 9fd10f4242f8..49b34c5ec595 100644
---- a/drivers/crypto/qat/qat_common/qat_compression.c
-+++ b/drivers/crypto/qat/qat_common/qat_compression.c
-@@ -174,7 +174,7 @@ static int qat_compression_create_instances(struct adf_accel_dev *accel_dev)
- 		msg_size = ICP_QAT_FW_RESP_DEFAULT_SZ;
- 		snprintf(key, sizeof(key), ADF_DC "%d" ADF_RING_DC_RX, i);
- 		ret = adf_create_ring(accel_dev, SEC, bank, num_msg_dc,
--				      msg_size, key, qat_comp_alg_callback, 0,
-+				      msg_size, key, qat_comp_alg_callback, 1,
- 				      &inst->dc_rx);
- 		if (ret)
- 			return ret;
--- 
-2.39.0
+------- Original Message -------
+On Friday, August 26th, 2022 at 16:51, Denis Kenzior <denkenz@gmail.com> wr=
+ote:
 
+
+>=20
+>=20
+> When support for ECDSA keys was added, constraints for data & signature
+> sizes were never updated. This makes it impossible to use such keys via
+> keyctl API from userspace.
+>=20
+> Update constraint on max_data_size to 64 bytes in order to support
+> SHA512-based signatures. Also update the signature length constraints
+> per ECDSA signature encoding described in RFC 5480.
+>=20
+> Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA=
+ keys")
+> Signed-off-by: Denis Kenzior denkenz@gmail.com
+>=20
+> ---
+>=20
+> Version History:
+>=20
+> v2: Update patch description according to Jarkko's comments. No
+> functional code changes.
+>=20
+> crypto/asymmetric_keys/public_key.c | 24 ++++++++++++++++++++++--
+> 1 file changed, 22 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys=
+/public_key.c
+> index 2f8352e88860..eca5671ad3f2 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -186,8 +186,28 @@ static int software_key_query(const struct kernel_pk=
+ey_params *params,
+>=20
+> len =3D crypto_akcipher_maxsize(tfm);
+> info->key_size =3D len * 8;
+>=20
+> - info->max_data_size =3D len;
+>=20
+> - info->max_sig_size =3D len;
+>=20
+> +
+> + if (strncmp(pkey->pkey_algo, "ecdsa", 5) =3D=3D 0) {
+>=20
+> + /*
+> + * ECDSA key sizes are much smaller than RSA, and thus could
+> + * operate on (hashed) inputs that are larger than key size.
+> + * For example SHA384-hashed input used with secp256r1
+> + * based keys. Set max_data_size to be at least as large as
+> + * the largest supported hash size (SHA512)
+> + */
+> + info->max_data_size =3D 64;
+>=20
+> +
+> + /*
+> + * Verify takes ECDSA-Sig (described in RFC 5480) as input,
+> + * which is actually 2 'key_size'-bit integers encoded in
+> + * ASN.1. Account for the ASN.1 encoding overhead here.
+> + */
+> + info->max_sig_size =3D 2 * (len + 3) + 2;
+>=20
+> + } else {
+> + info->max_data_size =3D len;
+>=20
+> + info->max_sig_size =3D len;
+>=20
+> + }
+> +
+> info->max_enc_size =3D len;
+>=20
+> info->max_dec_size =3D len;
+>=20
+> info->supported_ops =3D (KEYCTL_SUPPORTS_ENCRYPT |
+>=20
+> --
+> 2.35.1
