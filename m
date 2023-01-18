@@ -2,164 +2,208 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7C1C54EBE
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 08:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7393EC004D4
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Jan 2023 09:25:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjARIxA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Jan 2023 03:53:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
+        id S229557AbjARJYv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 Jan 2023 04:24:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjARIw3 (ORCPT
+        with ESMTP id S230010AbjARJVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Jan 2023 03:52:29 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9488E5DC0C;
-        Wed, 18 Jan 2023 00:05:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ll/0SSfoHKPnbiM1LtVgYwjnEZj4r0X3HQAZFmT5RQ3wJKwm9o45mchcsiioeGY7yqrD0EYFYB3EcrmxwHEmxoNqppUPhmn7OmwaSmvkWHcLIX6Tf9166nxVqiXT/5IStlOThzS9YtS0qasXg1xkVUKbFn0AyGcXlxBEn21Bze6ztbKEG/V0pRlKWy4+QMZwW5CMJRvnkQGdAEGOMsMH6Amo8/o93JnE+IsOcqsxzFsq/8Si4bS+kckKUaSvCGI13bmNR/99Ucyj6tRjElo84umnO7/ZbsGWK01XCMgsaspvIZTzEvTPKGNauX8txeokOs9SMxL2BmXM8boXM6NDqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J7AFGP3jHdED9IVdAq4ydlRzrDzeoEY8MQC3durBBcA=;
- b=TTMo0a2f1iffHRODUpqt+j4URJ6vIW6f2ThIl05snSjvDxENdGdGjSkhPbXKp6J9kzumv1GiBlsttnmDm1qWmpN6/+hUJEMkfX1HvU6Yf824lwbjeS5uDNkOTpAIeIZ5fyH6AIXxksdczreKH9g7GeAMNSEPX29b4jzxNS/aSEDCie/5ekWjxhNolsHCdkytNZgL+6+rek7lksLbOxdN7Ggo2N09Yyd7lMdLc+QRBcg6SGrI58E37+z9d2NcShBVYNO0kjDvzVP0LDgMDTnwtqEmnVl95GzWeZ8A+AhmUqYDvttxX4zR7zENgxHR0N8p7RV2GK3gIX5LgoxnYYbsNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J7AFGP3jHdED9IVdAq4ydlRzrDzeoEY8MQC3durBBcA=;
- b=UJ5P3EhTH37OsSTrEwZ+iSbnLzaP648hRUjg/pY4sMl39lYy1S3vFkTWchF2hOd4JpgJjlv6b+7LoMcmKKQ5bPrdSpTqMAjQXdMFvVzLLr9WqZEA1GDlmf9CBPtqsBiTddb4SYn083RnXVSq6hovjwuXzFNrQVTFZr+2+sahTV4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- BL1PR12MB5753.namprd12.prod.outlook.com (2603:10b6:208:390::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 18 Jan
- 2023 08:05:01 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Wed, 18 Jan 2023
- 08:05:01 +0000
-Message-ID: <a1856c7c-6106-3cf6-77a3-87d8cab9eecf@amd.com>
-Date:   Wed, 18 Jan 2023 13:34:38 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
- LAUNCH_UPDATE_DATA
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-12-michael.roth@amd.com> <Y8cvsS27o1BaUNPz@kernel.org>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <Y8cvsS27o1BaUNPz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0176.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:de::18) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+        Wed, 18 Jan 2023 04:21:15 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82AF5D136;
+        Wed, 18 Jan 2023 00:44:16 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30I7ps12027497;
+        Wed, 18 Jan 2023 08:44:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eNrikyelN4WZouIDC0wvtOj0G/iRNAO8GtqvXj8AdDk=;
+ b=NdAaTsAz9yVtGuxRedZdSru684VAwYWAqLh370bmsV2US+3SCVBwaAThETHfNj+TdMNn
+ dEmjr8KeTJRCDkb80RUu806RAgmDJM7ZPlBYI3YbAZ369b95tCJ4xp4B2336kntUGWBb
+ oivfmmcp+aJH/OuwcOK82seE0E8tKYqY5VzwqQt/YN9CxGR5mepZ4egxJwOmfuWG4xxf
+ JYCs+q4Xtr91NG30Bfk5dc7H2iHesZT0obLG2OqewCe34eTDPcL4shTGOx8433Wj/Wff
+ I9sh8gJb55BQNG4p2DYpU6cVcu1rWP7zr3tCXi1hn3MZ2ISo59sXyvTQXa+h1yPVqlsz jA== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6a2m4hkg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 08:44:05 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HM8lNZ004700;
+        Wed, 18 Jan 2023 08:44:03 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16n00n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 08:44:03 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30I8i1oS22151856
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Jan 2023 08:44:01 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F06F82004B;
+        Wed, 18 Jan 2023 08:44:00 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3B2782004E;
+        Wed, 18 Jan 2023 08:43:59 +0000 (GMT)
+Received: from [9.43.56.135] (unknown [9.43.56.135])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 18 Jan 2023 08:43:59 +0000 (GMT)
+Message-ID: <6fd4c038-4c13-b495-dc7b-7d8cfa7d41e4@linux.ibm.com>
+Date:   Wed, 18 Jan 2023 14:13:58 +0530
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|BL1PR12MB5753:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3a7f2a41-5a2d-4c2d-60d9-08daf92ab29c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b8RPihugXdpw/dreAvkuECX116CzTxzP01A4IZ/OvcunkaM8II3KFgOC7ArtavKZXaceRLT3+/Ws6Qt1/G4EJ2dM9xUlM1wNfDT59Q6w/OFw2ftw61ACLhQjUVvOW6dkvQVRnwOXLA1osPgXlAXnhndcEPp5D4+6iYaRgRF9DTUcKOeX0D489C3uUs/kAojGq8y06ck5NDLuZxjQuBjChj/lf36M9mHJCOYAPpg7ireTGwre1KaHcXifXHgJ434fBzs5jyqofXXiQHaUKYHFAXITIXUUGyHorO0gG4ls27g2rFwtOrMwnxfgwgQrtDXaWlP1DI3JbtNv1Da10FlL62SE1Qh+oVuXTWOHi3S4Wi3pvXUonEJO9VwoBd1tYz9DZhNBET1gYQ7PhtC3VFJIK0R3gtbJRkbC7n3Zp+xfwnxyz74TzMqhcfCnbQdfET4F/aeXjcNd3YwQNOBnHXVnxFVyxy3GVHB/LOrEltN/Hkgu6ntLZjGswAimNPugTuhqHz2+v0DjoDOR0msGpvkoo8ZDr9Hi4tmAYAVuHFtaxVJJxLF7iqLIJF6EdEINqD9DFfv9etJHirP2sIL13/RTJ47N7O8fyQpDMWhSKT/PCazGgYHDQaHIuRFduJpBvYTtwkSqM3oDGuh2dCiCMg8XwHO/5SaqSVYvU9yZOar5WsSXHN8Xbhvbvob/qkr+vqrilTgitrc58UHyu4Dvp6oQAj6zTPxwOEvsok7twqSSDm36NI2ZME4vqQ2W5P5uhrwc
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(366004)(136003)(39860400002)(346002)(451199015)(31686004)(36756003)(8936002)(83380400001)(66476007)(8676002)(66556008)(66946007)(7406005)(7416002)(31696002)(4744005)(5660300002)(2906002)(4326008)(38100700002)(6666004)(966005)(316002)(110136005)(6636002)(6486002)(41300700001)(2616005)(53546011)(26005)(6512007)(6506007)(186003)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFZkYXN0alZYWk9vbUd5Mk9MaWpMNDFhNHBqekNwUmx4cm1mVHVXV1VZZ0tK?=
- =?utf-8?B?Y0dMV0pxd3RtY2VnNk55bVdCTHZLVGF5ZnYvOU03eFhhK093ZStZRFpTZDVp?=
- =?utf-8?B?cEhTU1VNM0xLT0NYK3Q2K3B4Z0xyTXZ0cE42R3BCSVdwVTRnMkVEc3pPWEpC?=
- =?utf-8?B?UnpwM21wRTlrQzJHS1lYNEs0bmtzMjROSWk5QmNiME1WSFkyTzQxL2szb3V0?=
- =?utf-8?B?N3BQdW1ra0owZkpxU213MDBpc0pLK1J0TEJ2ZXFJdEJrV3pQakV4SXN1Yk9E?=
- =?utf-8?B?dGxoUjVWQ3NkTkU5TmlYMDNlSHBKQ084eFlwY1VWelk1aE13NW1wbUlla1pl?=
- =?utf-8?B?YUVJZ0RPeExJSGJacnZiaUx4L0ZrWUZjbmtnUWtqRlg3RDNDeUw3NmlueFIx?=
- =?utf-8?B?TzdueXF3Mjd2UkRnMzJGZ3ZJc1NwRWtjWmdCWmNMZmdLUTk2ZDduTWExYkRu?=
- =?utf-8?B?SG1JcmYySEYxYU9FY053Yi9aRG9hTzB4MWNKZkJpczBjb2hTOHNvMGt6dmE0?=
- =?utf-8?B?TlVqdDZDMFRPemV4MkNSSjc1MHZzaUhrcVFRckRXYTdENGVWYmh0WkFuc05G?=
- =?utf-8?B?MFY5WVVOakcyUU1xNXpiRlVRMHVrSzRuMlVqQlFhbGo4SDhPcGdDcHcwd0x0?=
- =?utf-8?B?QUVPWHRaK0tIODZiMjU2aTBWRDZ2b1RhTVQ0YlVZc1A0NjhtSkVuR0IyOEdD?=
- =?utf-8?B?bFZneTN5NDdPb1ZtbzQxbHh6TXlOREwvYmF6a01uNlJGN3czMUR0aE1XWGs1?=
- =?utf-8?B?eklwUURJWVJLY0hCaW9QQ28zRDJ3S1JxUk0wbE1oN3BxNGFSYkxHSUhsZUts?=
- =?utf-8?B?VXZPWm1ORVlidjVnbC96RUVleUpPQTQwTW9Oc0x1ay8wRDNlOGd2M0lTY3Fm?=
- =?utf-8?B?ZDFqSjRCY3Q1bjdVMXpzbnI1T3QzZWsvWGhiNHc1Zkk0V0tBZkp2MWQ0ZDJF?=
- =?utf-8?B?cS9xNnA4N3ZIREoxbW5FenVyU2R5bUNxK3JtcVYwQXF4b3dlK09lR3ozNlVO?=
- =?utf-8?B?ekVPVXZBc3I1U2N6b1lKWSs3SG5GRWtETlZQTVl4cDZicThCS3p3cGRYVE9L?=
- =?utf-8?B?WlBESFFwejh3d0F0cWFyV3lkZnhoL0RVNHFwTjU4bE9qeWQzYzVjOWZST0lv?=
- =?utf-8?B?YkJjcmp1WWRzdFVSZnhxWnN3UjNoSEJ0QjNHL0RrcHpDaDdCKzBoZ3M2S3JY?=
- =?utf-8?B?UFQ5MERvRVlUVDhpekYyamtXc0ZBWlVMb1RIcmxVbmhWR3pQaUhVcGRPRUVV?=
- =?utf-8?B?WjVUdGlkcGdxanhxMTZ5Tm5iZ2hwUk00MytUOEl4TElpQ0JGK0F2ZFBlUmpr?=
- =?utf-8?B?cXV6Z0kxd2dSa09TWVMwNWlvWFduMWdKNXdyZXhOa2xaeWJqRnByTGN5Qy9G?=
- =?utf-8?B?dGovSSsvOWc3RmxCWGgzMERWZkxHOHQrTVh3RVB1VEtUeExtcEJYT1ZGcHNM?=
- =?utf-8?B?UDZ5SkdGZm9DWFN2YjdhR20vdk4vTC90dUV6MUlvaiswM1kwUVYvcG51UHlG?=
- =?utf-8?B?T2p1ZFZFMHFyNm1COWFKZHQrMXBqU3dKOXdqcGVBejBjcm5XMzZiOHVISzNR?=
- =?utf-8?B?UUpEaGtSUHAyWWJXb2luOHdrMWxHdzM0aUx3emdDTjlNaksyQlFrdWk1bzBy?=
- =?utf-8?B?VjZBaElTWTRJWU9lalZ3SVhhWGcyOXJyZ2J4SUd4NFlQQ1JuWmM3YXJCR0V6?=
- =?utf-8?B?Z2tDa0ZQbmhPVjZ5WFVNN2xYYUFCUFhsb3hLZmhuUXdrRkxmKzl1SFgrMFJj?=
- =?utf-8?B?Y3Bsc2t1R0VZODJXcGt0bzRYUlJ5NDh3dFUvTFY0Q2lkMVVtM1NPaVBVV2hy?=
- =?utf-8?B?NjBSd0lSL3k4WTVrMk0rNGUrQUlXZm01dzQ2eVpZVDRqM0U4OEw2OGRXKzl6?=
- =?utf-8?B?d1U5MHB1Sm9pTTRHR1p4VFlWV1N4Ris0OUxGNy80cGU0alZxeloyQlYwMWFN?=
- =?utf-8?B?dmtRZmo2SjhLRzNsSDNHanU4K2FqckNjZjdlQ0VBTHh5QVYxbiszSHdLR2pj?=
- =?utf-8?B?TUFqMjRCNUFLL3lHRWtUNnpaSkExdXJJNXljZDg0OFJFMzZER3IyOHJFRStW?=
- =?utf-8?B?NVFRNDFzTUVUNEZSTEgwWVg3eS8zaTFRNGsvQk9zbGFQWUhqWWE4alFZY0NV?=
- =?utf-8?Q?NZ6WAj4NVAOaCZx2xwYhHYN8M?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a7f2a41-5a2d-4c2d-60d9-08daf92ab29c
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2023 08:05:01.0800
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tEyfH9gyAA0407A8kFxOqjswGiJdAdApw70EprGYyAERsjKYOHZpHpyJt5jYdDS248gPVMjAPqcjjCLyy580Kw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5753
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: crypto: p10-aes-gcm - Add asm markings necessary for kernel code
+Content-Language: en-US
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Danny Tsen <dtsen@linux.ibm.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        PowerPC <linuxppc-dev@lists.ozlabs.org>
+References: <20230117144747.37115c52@canb.auug.org.au>
+ <Y8ZNoBSX5P0ieJ3t@gondor.apana.org.au>
+ <20230118140444.25353e67@canb.auug.org.au>
+From:   Sathvika Vasireddy <sv@linux.ibm.com>
+In-Reply-To: <20230118140444.25353e67@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VNEjVrvbKitKxcjJgX5qoyOAnxQ5kTvI
+X-Proofpoint-ORIG-GUID: VNEjVrvbKitKxcjJgX5qoyOAnxQ5kTvI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-18_03,2023-01-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 phishscore=0 clxscore=1011 spamscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301180073
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 18/01/23 05:00, Jarkko Sakkinen wrote:
-> On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
->> From: Nikunj A Dadhania <nikunj@amd.com>
+Hi Stephen,
 
->> @@ -609,9 +659,8 @@ static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
->>  			goto e_ret;
->>  		kvm_release_pfn_clean(pfn);
->>  	}
->> -	kvm_vm_set_region_attr(kvm, range->start, range->end,
->> -		true /* priv_attr */);
->>  
->> +	kvm_vm_set_region_attr(kvm, range->start, range->end, KVM_MEMORY_ATTRIBUTE_PRIVATE);
+On 18/01/23 08:34, Stephen Rothwell wrote:
+> Hi Herbert,
+>
+> On Tue, 17 Jan 2023 15:26:24 +0800 Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>> On Tue, Jan 17, 2023 at 02:47:47PM +1100, Stephen Rothwell wrote:
+>>> Hi all,
+>>>
+>>> After merging the crypto tree, today's linux-next build (powerpc
+>>> pseries_le_defconfig) failed like this:
+>>>
+>>> arch/powerpc/crypto/p10_aes_gcm.o: warning: objtool: .text+0x884: unannotated intra-function call
+>>> arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0x44: unannotated intra-function call
+>>> ld: arch/powerpc/crypto/p10_aes_gcm.o: ABI version 1 is not compatible with ABI version 2 output
+>>> ld: failed to merge target specific data of file arch/powerpc/crypto/p10_aes_gcm.o
+>>>
+>>> Caused by commit
+>>>
+>>>    ca68a96c37eb ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched implementation")
+>>>
+>>> I have applied the following hack for today.
+>> Thanks Stephen, I'm going to update the previous fix as follows:
+> I still get:
+>
+> arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0x44: unannotated intra-function call
+>
+> from the powerpc pseries_le_defconfig build (which is otherwise ok).
 
-As the memory attribute is no more a boolean in the UPM series, I had this change.
+Warnings [1], [2], and [3] are seen with pseries_le_defconfig.
 
->>  e_ret:
->>  	return ret;
->>  }
->> -- 
->> 2.25.1
->>
-> 
-> kvm_vm_set_region_attr() should be fixed already in:
->> https://lore.kernel.org/all/20221214194056.161492-11-michael.roth@amd.com/
+[1] - arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: aes_p8_set_encrypt_key+0x44: unannotated intra-function call
+[2] - arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: .text+0x2448: unannotated intra-function call
+[3] - arch/powerpc/crypto/aesp8-ppc.o: warning: objtool: .text+0x2d68: unannotated intra-function call
 
-Will discuss with Mike and move this hunk to above patch.
+Given that there are no calls to _mcount, one way to address this warning, is by skipping objtool from running on arch/powerpc/crypto/aesp8-ppc.o file.
+The below diff works for me.
 
-Regards
-Nikunj
+=====
+diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
+index 5b8252013abd..d00664c8d761 100644
+--- a/arch/powerpc/crypto/Makefile
++++ b/arch/powerpc/crypto/Makefile
+@@ -31,3 +31,5 @@ targets += aesp8-ppc.S ghashp8-ppc.S
+  
+  $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
+         $(call if_changed,perl)
++
++OBJECT_FILES_NON_STANDARD_aesp8-ppc.o := y
+=====
+
+
+The other way to fix these warnings is by using ANNOTATE_INTRA_FUNCTION_CALL macro to indicate that the branch target is valid. And, by annotating symbols with SYM_FUNC_START_LOCAL and SYM_FUNC_END macros.
+The below diff works for me:
+
+=====
+diff --git a/arch/powerpc/crypto/aesp8-ppc.pl b/arch/powerpc/crypto/aesp8-ppc.pl
+index cdbcf6e13efc..355e0036869a 100644
+--- a/arch/powerpc/crypto/aesp8-ppc.pl
++++ b/arch/powerpc/crypto/aesp8-ppc.pl
+@@ -80,6 +80,9 @@
+  # POWER8[le]   3.96/0.72       0.74    1.1
+  # POWER8[be]   3.75/0.65       0.66    1.0
+  
++print "#include <linux/objtool.h>\n";
++print "#include <linux/linkage.h>\n";
++
+  $flavour = shift;
+  
+  if ($flavour =~ /64/) {
+@@ -185,7 +188,8 @@ Lset_encrypt_key:
+         lis             r0,0xfff0
+         mfspr           $vrsave,256
+         mtspr           256,r0
+-
++
++       ANNOTATE_INTRA_FUNCTION_CALL
+         bl              Lconsts
+         mtlr            r11
+  
+@@ -3039,7 +3043,7 @@ Lxts_enc6x_ret:
+         .long           0
+  
+  .align 5
+-_aesp8_xts_enc5x:
++SYM_FUNC_START_LOCAL(_aesp8_xts_enc5x)
+         vcipher         $out0,$out0,v24
+         vcipher         $out1,$out1,v24
+         vcipher         $out2,$out2,v24
+@@ -3121,6 +3125,7 @@ _aesp8_xts_enc5x:
+         blr
+          .long          0
+          .byte          0,12,0x14,0,0,0,0,0
++SYM_FUNC_END(_aesp8_xts_enc5x)
+  
+  .align 5
+  _aesp8_xts_decrypt6x:
+@@ -3727,7 +3732,7 @@ Lxts_dec6x_ret:
+         .long           0
+  
+  .align 5
+-_aesp8_xts_dec5x:
++SYM_FUNC_START_LOCAL(_aesp8_xts_dec5x)
+         vncipher        $out0,$out0,v24
+         vncipher        $out1,$out1,v24
+         vncipher        $out2,$out2,v24
+@@ -3809,6 +3814,7 @@ _aesp8_xts_dec5x:
+         blr
+          .long          0
+          .byte          0,12,0x14,0,0,0,0,0
++SYM_FUNC_END(_aesp8_xts_dec5x)
+  ___
+  }}     }}}
+
+=====
+
+
+Thanks,
+Sathvika
 
