@@ -2,115 +2,208 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93099C38142
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 10:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0779DC38142
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 10:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjASKNW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 05:13:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46638 "EHLO
+        id S229933AbjASKiD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 05:38:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjASKNV (ORCPT
+        with ESMTP id S230221AbjASKhl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 05:13:21 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D694C76AA
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 02:13:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FF7261444
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 10:13:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9707C433D2
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 10:13:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674123199;
-        bh=yuRMCUSnQCLZiqOi6+BEu50V0tUva5H8OvTeArASwkk=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=tqVaIrFNobOzWrXcppGINxeh4zUJhqykm/LMwB4z/C9bJqXMU/QRWESWf6wkf9ILZ
-         giBKpJ6zMbCTfoSwJYHc57DfNeh0sSwFUyBPz422SotNrRLeSZT8Pvy7KUnO3oNMcJ
-         8MaYm24SzEtd4ffyw7uMXr2rcG+q77Pr+PiLDGzWDs44AQPfab6mL9qy9100sKClDt
-         l4ejqWgd9bYeTlzmEvEgiiCLexHmmQTJ7HPF2XYgWRBPky9XxmMceJswuLr78eHoSX
-         RFSqAZWAl7CA26CdfDap5ofanBm8QrX2Tpn8nyVyMRIaXC05/KKd2vmMCj/gXaZTec
-         742hfsV/HFThQ==
-Received: by mail-lf1-f45.google.com with SMTP id f34so2483789lfv.10
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 02:13:19 -0800 (PST)
-X-Gm-Message-State: AFqh2kqg0D2t7T+fwFMNqlBh/YKyfXbgIns1vbrMNJig/SfWdmXcTTnj
-        lCJvzq1W+BL3x0KnXFewkgRgVx0T60eLrp/cgLY=
-X-Google-Smtp-Source: AMrXdXuYNOouniC/+yfxFssc8dNrgXiIKrz8VyE90e/DsPFj1eoUWDTW6wg6LQSM5ad04COXlKhUBNmt5qnyn0K35ks=
-X-Received: by 2002:ac2:4ade:0:b0:4d0:7b7:65dc with SMTP id
- m30-20020ac24ade000000b004d007b765dcmr460658lfp.122.1674123197789; Thu, 19
- Jan 2023 02:13:17 -0800 (PST)
+        Thu, 19 Jan 2023 05:37:41 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475976F33A
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 02:37:01 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pISHy-001iZe-N1; Thu, 19 Jan 2023 18:36:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 19 Jan 2023 18:36:58 +0800
+Date:   Thu, 19 Jan 2023 18:36:58 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Subject: [PATCH] crypto: bcm - Use subrequest for fallback
+Message-ID: <Y8kdSg6xF0IUM+dV@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <Y8kInrsuWybCTgK0@gondor.apana.org.au> <CAMj1kXGPqHsHSkj+hV_AcwPZxmWMi_=sVBHQWckUPomh6D7uGg@mail.gmail.com>
- <Y8kUJZfZ1+wQnMO0@gondor.apana.org.au>
-In-Reply-To: <Y8kUJZfZ1+wQnMO0@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 19 Jan 2023 11:13:06 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEtptbEz=zr8bRrcLsxqkCSxeap=7XOcqAdWw14G9wHyg@mail.gmail.com>
-Message-ID: <CAMj1kXEtptbEz=zr8bRrcLsxqkCSxeap=7XOcqAdWw14G9wHyg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: xts - Handle EBUSY correctly
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 19 Jan 2023 at 10:58, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Jan 19, 2023 at 10:50:26AM +0100, Ard Biesheuvel wrote:
-> > On Thu, 19 Jan 2023 at 10:08, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > >
-> > > As it is xts only handles the special return value of EINPROGERSS,
-> >
-> > EINPROGRESS
->
-> Thanks, I will fix this.
->
-> > > -               rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-> > > +               rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
-> >
-> > I don't get this bit. We used to preserve CRYPTO_TFM_REQ_MAY_BACKLOG
-> > before (along with all other flags except MAY_SLEEP), but now, we
-> > *only* preserve CRYPTO_TFM_REQ_MAY_BACKLOG.
->
-> This change is just in case we introduce any more flags in
-> future that we may not wish to pass along (as this code knows
-> nothing about it).
->
-> > So how is this related? Why are we clearing
-> > CRYPTO_TFM_REQ_FORBID_WEAK_KEYS here for instance?
->
-> WEAK_KEYS is only defined for setkey.  Only MAY_SLEEP and MAY_BACKLOG
-> are currently meaningful for encryption and decryption.
->
+Instead of doing saving and restoring on the AEAD request object
+for fallback processing, use a subrequest instead.
 
-Fair enough.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> > Apologies for the noob questions about this aspect of the crypto API,
-> > but I suppose this means that, if CRYPTO_TFM_REQ_MAY_BACKLOG was
-> > specified, it is up to the skcipher implementation to queue up the
-> > request and return -EBUSY, as opposed to starting the request
-> > asynchronously and returning -EINPROGRESS?
-> >
-> > So why the distinction? If the skcipher signals that the request is
-> > accepted and will complete asynchronously, couldn't it use EINPROGRESS
-> > for both cases? Or is the EBUSY interpreted differently by the caller,
-> > for providing back pressure to the source?
->
-> EBUSY signals to the caller that it must back off and not issue
-> any more requests.  The caller should wait for a completion call
-> with EINPROGRESS to indicate that it may issue new requests.
->
-> For xts we essentially ignore EBUSY at this point, and assume that
-> if our own caller issued any more requests it would directly get
-> an EBUSY which should be sufficient to avoid total collapse.
->
-
-Ah right - the request is only split across two calls into the
-underlying skcipher if CTS is needed, and otherwise, we just forward
-whatever non-zero return value we received.
-
-Thanks for the explanation.
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index c8c799428fe0..f8e035039aeb 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -2570,66 +2570,29 @@ static int aead_need_fallback(struct aead_request *req)
+ 		return payload_len > ctx->max_payload;
+ }
+ 
+-static void aead_complete(struct crypto_async_request *areq, int err)
+-{
+-	struct aead_request *req =
+-	    container_of(areq, struct aead_request, base);
+-	struct iproc_reqctx_s *rctx = aead_request_ctx(req);
+-	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-
+-	flow_log("%s() err:%d\n", __func__, err);
+-
+-	areq->tfm = crypto_aead_tfm(aead);
+-
+-	areq->complete = rctx->old_complete;
+-	areq->data = rctx->old_data;
+-
+-	areq->complete(areq, err);
+-}
+-
+ static int aead_do_fallback(struct aead_request *req, bool is_encrypt)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
+ 	struct iproc_reqctx_s *rctx = aead_request_ctx(req);
+ 	struct iproc_ctx_s *ctx = crypto_tfm_ctx(tfm);
+-	int err;
+-	u32 req_flags;
++	struct aead_request *subreq;
+ 
+ 	flow_log("%s() enc:%u\n", __func__, is_encrypt);
+ 
+-	if (ctx->fallback_cipher) {
+-		/* Store the cipher tfm and then use the fallback tfm */
+-		rctx->old_tfm = tfm;
+-		aead_request_set_tfm(req, ctx->fallback_cipher);
+-		/*
+-		 * Save the callback and chain ourselves in, so we can restore
+-		 * the tfm
+-		 */
+-		rctx->old_complete = req->base.complete;
+-		rctx->old_data = req->base.data;
+-		req_flags = aead_request_flags(req);
+-		aead_request_set_callback(req, req_flags, aead_complete, req);
+-		err = is_encrypt ? crypto_aead_encrypt(req) :
+-		    crypto_aead_decrypt(req);
+-
+-		if (err == 0) {
+-			/*
+-			 * fallback was synchronous (did not return
+-			 * -EINPROGRESS). So restore request state here.
+-			 */
+-			aead_request_set_callback(req, req_flags,
+-						  rctx->old_complete, req);
+-			req->base.data = rctx->old_data;
+-			aead_request_set_tfm(req, aead);
+-			flow_log("%s() fallback completed successfully\n\n",
+-				 __func__);
+-		}
+-	} else {
+-		err = -EINVAL;
+-	}
++	if (!ctx->fallback_cipher)
++		return -EINVAL;
+ 
+-	return err;
++	subreq = &rctx->req;
++	aead_request_set_tfm(subreq, ctx->fallback_cipher);
++	aead_request_set_callback(subreq, aead_request_flags(req),
++				  req->base.complete, req->base.data);
++	aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
++			       req->iv);
++	aead_request_set_ad(subreq, req->assoclen);
++
++	return is_encrypt ? crypto_aead_encrypt(req) :
++			    crypto_aead_decrypt(req);
+ }
+ 
+ static int aead_enqueue(struct aead_request *req, bool is_encrypt)
+@@ -4243,6 +4206,7 @@ static int ahash_cra_init(struct crypto_tfm *tfm)
+ 
+ static int aead_cra_init(struct crypto_aead *aead)
+ {
++	unsigned int reqsize = sizeof(struct iproc_reqctx_s);
+ 	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
+ 	struct iproc_ctx_s *ctx = crypto_tfm_ctx(tfm);
+ 	struct crypto_alg *alg = tfm->__crt_alg;
+@@ -4254,7 +4218,6 @@ static int aead_cra_init(struct crypto_aead *aead)
+ 
+ 	flow_log("%s()\n", __func__);
+ 
+-	crypto_aead_set_reqsize(aead, sizeof(struct iproc_reqctx_s));
+ 	ctx->is_esp = false;
+ 	ctx->salt_len = 0;
+ 	ctx->salt_offset = 0;
+@@ -4263,22 +4226,29 @@ static int aead_cra_init(struct crypto_aead *aead)
+ 	get_random_bytes(ctx->iv, MAX_IV_SIZE);
+ 	flow_dump("  iv: ", ctx->iv, MAX_IV_SIZE);
+ 
+-	if (!err) {
+-		if (alg->cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
+-			flow_log("%s() creating fallback cipher\n", __func__);
+-
+-			ctx->fallback_cipher =
+-			    crypto_alloc_aead(alg->cra_name, 0,
+-					      CRYPTO_ALG_ASYNC |
+-					      CRYPTO_ALG_NEED_FALLBACK);
+-			if (IS_ERR(ctx->fallback_cipher)) {
+-				pr_err("%s() Error: failed to allocate fallback for %s\n",
+-				       __func__, alg->cra_name);
+-				return PTR_ERR(ctx->fallback_cipher);
+-			}
+-		}
++	if (err)
++		goto out;
++
++	if (!(alg->cra_flags & CRYPTO_ALG_NEED_FALLBACK))
++		goto reqsize;
++
++	flow_log("%s() creating fallback cipher\n", __func__);
++
++	ctx->fallback_cipher = crypto_alloc_aead(alg->cra_name, 0,
++						 CRYPTO_ALG_ASYNC |
++						 CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(ctx->fallback_cipher)) {
++		pr_err("%s() Error: failed to allocate fallback for %s\n",
++		       __func__, alg->cra_name);
++		return PTR_ERR(ctx->fallback_cipher);
+ 	}
+ 
++	reqsize += crypto_aead_reqsize(ctx->fallback_cipher);
++
++reqsize:
++	crypto_aead_set_reqsize(aead, reqsize);
++
++out:
+ 	return err;
+ }
+ 
+diff --git a/drivers/crypto/bcm/cipher.h b/drivers/crypto/bcm/cipher.h
+index d6d87332140a..e36881c983cf 100644
+--- a/drivers/crypto/bcm/cipher.h
++++ b/drivers/crypto/bcm/cipher.h
+@@ -339,15 +339,12 @@ struct iproc_reqctx_s {
+ 	/* hmac context */
+ 	bool is_sw_hmac;
+ 
+-	/* aead context */
+-	struct crypto_tfm *old_tfm;
+-	crypto_completion_t old_complete;
+-	void *old_data;
+-
+ 	gfp_t gfp;
+ 
+ 	/* Buffers used to build SPU request and response messages */
+ 	struct spu_msg_buf msg_buf;
++
++	struct aead_request req;
+ };
+ 
+ /*
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
