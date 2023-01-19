@@ -2,71 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FB5C6379F
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 21:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC94EC46467
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 22:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230221AbjASVNQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 16:13:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
+        id S229968AbjASWiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 17:38:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjASVMm (ORCPT
+        with ESMTP id S229816AbjASWhG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:12:42 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C8A83E8;
-        Thu, 19 Jan 2023 13:07:35 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30JJxKIU011215;
-        Thu, 19 Jan 2023 21:06:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=L+X3DXDCuhVM9Vcsx9GYVQBzF5Z+vgs3gSmPdnHr2hw=;
- b=p3ieh/FaVtY+yP8csbVHBjzEcOy+8MUCW0+AOCbq5+i+RezI7/HqBUho6f65la+joePE
- RZnmU3gEfPSWbnK/Br4zjjDKKrgFM9p18OV7nKqhU0Q9eJSx0Zr/ijAqjA5/L1QKd8bB
- jyK8EiLxAFckz2d0GE7P2Kxr+HtN5qjJMl/GeVzC4b/HCHDKOUVE2WAVJVXbHW1VtyQQ
- ztcEHgjl7V57MXf0Zx1rNh//8YUKjnvjUfldLbt2n+3AO0IIqT8Va8ccNJO2ni15MnPT
- MJ4nLEmfy+kpvWJoXeRkI8eIw96Rilkp6E8PmfM0e4AyjE10TOHkzoHLULxMjJT5n/gx +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7cgm1ey9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:41 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30JKtsN1011348;
-        Thu, 19 Jan 2023 21:06:41 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7cgm1exh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:40 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30JItQhe024166;
-        Thu, 19 Jan 2023 21:06:39 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3n3m17xf3p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:39 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30JL6bxp38208052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Jan 2023 21:06:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A42C55805D;
-        Thu, 19 Jan 2023 21:06:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44BCC58043;
-        Thu, 19 Jan 2023 21:06:28 +0000 (GMT)
-Received: from [9.160.127.29] (unknown [9.160.127.29])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Jan 2023 21:06:28 +0000 (GMT)
-Message-ID: <52e31e39-e384-3c5e-307c-652926275099@linux.ibm.com>
-Date:   Thu, 19 Jan 2023 23:06:25 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH RFC v7 52/64] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
+        Thu, 19 Jan 2023 17:37:06 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC510B747;
+        Thu, 19 Jan 2023 14:18:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PEXOVk/EJ7Sb9doam88dUjUE0/dMugXODGhSNHg1Rc5Zv+3Wk7XqERDqZP/NvjoMFjFokUEbI1KvuCLq5KwSL48B0AlzjNhKLXjMziDx/rG6QpmzdesOTfS02FJ06UoUSUoQwOtVT6wHK1fMjtPjG2W63q8+c3q1+Tfp91ec2A/dd8GUSYdPGemzBdiErQdw5SgKxl1pcR4cDOAT4jN711ExdBY80dxXcJSPBsobo6P7Zrb7364PRzxXmX1TfayiufnIxdAL1H203KpBntcuzhiSS9/cO/e6rCNclR+dQ2eQsW5Mrw1sA5HwLGkXTarvJMC1cMZv43bS151o78ooWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fQAvO+vPnSsQkwXtBC0qEi41z0FWZ73yOQabW51oc3I=;
+ b=MTxA6OBj5LkEn0JxI9INMSHpzmirMISccUAvyO+CpIyGH4QTeoD00Tu0fy8hXch0iyGNnCiIdp4D1y/ILyxGY+I/j3Y384HvAnLOJkWIOIPZqw+xNfdB6nfFfWUfyZBSE4tq/LL1lZlDC4av5lgjjeH3KgbxLQhV6FKEin4SS2Ua2ykMTf7WSbFY8KyHqYTOprU4TAse7lk6uXRcHs9iHoLcK7np88SE4geteZwQAgJrNsH/VoNvDogVTK5pWB7qnRgQ+cSX4qaDaT0+X4h/2B9JfiMglr0p7DB2058xTCoYESPcEaWXBY9y5175JbvPmvCzTKRYI3OWGHBJjVhB3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fQAvO+vPnSsQkwXtBC0qEi41z0FWZ73yOQabW51oc3I=;
+ b=AjuicwzJEfvXhhYP1FY0p/Evu71ltcTL64JyhNZluAGmk8mnxTkjB+wSyCfR0cZwmJsxxmRBiqrfOjgvSSpViZkAWP+IyKy4ztTbM+fAKuSRwP7+WPX2YRqQRdwwZP8m0/urk5JBD7jlR/zBKeumJErLA0WUdj8Qvc4plUMnBxY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by PH7PR12MB5974.namprd12.prod.outlook.com (2603:10b6:510:1d9::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Thu, 19 Jan
+ 2023 22:18:46 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5986.023; Thu, 19 Jan 2023
+ 22:18:46 +0000
+Message-ID: <d09e13c2-3a3d-924b-05b3-560fe1121516@amd.com>
+Date:   Thu, 19 Jan 2023 16:18:39 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
 Content-Language: en-US
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>,
-        Dionna Amalie Glaze <dionnaglaze@google.com>,
+To:     Dionna Amalie Glaze <dionnaglaze@google.com>,
         Michael Roth <michael.roth@amd.com>
 Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
         linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
@@ -77,74 +57,95 @@ Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
         luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
         pgonda@google.com, peterz@infradead.org,
         srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
+        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-53-michael.roth@amd.com>
- <CAAH4kHYoWtM=Xe0kgmtKw01-45DefEikdLz0qUJRRMLdZHzkwA@mail.gmail.com>
- <e75569a8-6b15-780c-a7fa-945f1cce576c@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <e75569a8-6b15-780c-a7fa-945f1cce576c@amd.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VbAr4XuiHnxpbti04kJMcSjCudXmouKI
-X-Proofpoint-GUID: 4DLi_8nYQcJkqJ4G3xq-1WEWs9LXQnQG
+ <20221214194056.161492-63-michael.roth@amd.com>
+ <CAAH4kHZVaeL57bGAzeDjJDTumsnb96iAYBdhm7cs_8TjBg+v3w@mail.gmail.com>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <CAAH4kHZVaeL57bGAzeDjJDTumsnb96iAYBdhm7cs_8TjBg+v3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+X-ClientProxiedBy: BL1PR13CA0130.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::15) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-19_13,2023-01-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 adultscore=0 mlxscore=0 suspectscore=0
- mlxlogscore=892 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301190176
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|PH7PR12MB5974:EE_
+X-MS-Office365-Filtering-Correlation-Id: e76a7f86-e9c0-4a26-d607-08dafa6b2178
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4gb90v+E0qr24+8KIIfqdJJZDiine2of12V1UILkf0s1bDtm5c3+P+0zw13jvM+vKvY1TzngGUuhGaxBh/S1CfU4VGDn6Qof17eanRKx5J9u9bpsbPXLP6L9djHiTSdguyrOgbJIZ218g3hip5ctZZea/tWoyZOjICgParFON7kY1KyCbY3NqzlVvqq/r5SyvhcEuE/knODl3Z6WiPbBMpZaEY41Mddop9YZkyfnuVUarKl2o9hN3bUAPL7GhW+6OZxBupjCGxUuhZ+U36hDeChWxbjbMRoMFwPS4MOQh+seAqrtL3+i5e/p2vdZ/mA49HHhIqeH1WnryAtMlZkc4FIgqw3nLB8fIczBgorHtZsUfJn9E8Qjk/vc6c+cf4w54jh4FG1i4aGsBXNzgq+uGrMrNjJOHlT7zTz/p5Cb4iss8DLgudflE2nlWxzVzwDEgKiF+7VGq10Hec7rjjG0pRvmIQrYSVkauoSHWN0CbNf2K0k3v97ybK8mL7xdjGCepKw33ur1n2gNjvEpCHpK+Qm2BLg9okRluK+Ojeu8e0Y2vE1Hw7oLXxgz4ErcNkrVIk6gyB/Vlmh2brnRSSLNGjD6i0B0P8G/Y6g5lYgD1HdMg5LR6l7YH7SWR1jTKg6BvW/Lluw6ymZdVHqQa/+jy1osVSKvj/6N5ksMFGmiLo/7OoRcLh+wKso9TBVIkANupgvE14kKmuxm5fMb5lKKipI1TQVxWqIQhmtW0cuksbE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(366004)(39860400002)(136003)(376002)(451199015)(86362001)(2616005)(186003)(26005)(36756003)(4326008)(8676002)(66556008)(66946007)(53546011)(66476007)(31696002)(41300700001)(6512007)(4744005)(7416002)(6666004)(478600001)(6636002)(6506007)(110136005)(316002)(38100700002)(6486002)(7406005)(2906002)(5660300002)(83380400001)(8936002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VFRydjQ0dlRXOGloaGZ0NXltLzJTMkE5NFhPczJjVnpaVHFxcXIvTTdUTDBG?=
+ =?utf-8?B?TmI2ZG5SbUc5OEVCSWdUWCswQWJOeFRJMDRyVHo5d2hwRHhRWDFIeTB5d0JX?=
+ =?utf-8?B?NjdNWEdHc3hBajFhcFF0WHVZSXowSGdFNEY1K0xwdnJZbXNEMnNRalN3R2Rk?=
+ =?utf-8?B?dExqR1B3aGhmenk2R0hkN3lZSkE0cXlSZXdjMkM2WEVRMnN1L3VBZTN0SkRk?=
+ =?utf-8?B?eWM1dVI3aGdhWmNIK0VVb2pjOFhGK3paeEN5Y0NDMm9FRVIrc0wyZnplZjVl?=
+ =?utf-8?B?a3h0SDVCM1ltUXlIVHJMQUtTUjdXSFczcmErRE1MTy94NlhqWkNwOFRvdmw3?=
+ =?utf-8?B?RU5TSHQzdU9pSHJHbnBFbjdrd2hUbUhiM2NFWko3WmNuS0R2TjM5eE1sNmhM?=
+ =?utf-8?B?dzNMMEpEYTZnYTBUZ2N5c2EvRmNraVY5TzdhOHpRU2dWQjk3Y2Y4amkxcVo0?=
+ =?utf-8?B?dzBKc0FmelpmbzhlNFlYOXNTZGZtTTd4bDRVZ2RYMjA4OUtwYnA4bEgxL0xM?=
+ =?utf-8?B?bFpnZjBSbVlQQmxQcFRmSTFMTWwxVTlMTjVNcHBrVWtrRWdlRHBwMTM5YlhP?=
+ =?utf-8?B?TnZPbUsxRWl0QzUyMy85RmtVTTRHV29tSDVxall1OTJHemtoYndJbUdIazZj?=
+ =?utf-8?B?WlFPdVlsR2QrTmZqc1BzTG9DZmZXd0Z3R3FUUHVkd3VySkhpWEJORnQ0L3hO?=
+ =?utf-8?B?NGFxZ0xwOHlibVBHajllS3Q0SXpjNTVKa2tTa3VXUDYzQXZtanJrajk2emN1?=
+ =?utf-8?B?UWJUelpmcjgvRjZsWUQ2V2NjbkpXYUlmM3dTMUlVNURBaXJNV1NtNXVLOGk0?=
+ =?utf-8?B?WHA2UG9MV0daTzFmUEV3ZHZMRHRIT0V4Slp5U3kyYk9WRUR6TUIxTEtxbTEr?=
+ =?utf-8?B?S0xNbmxQdWV0VGFtOThsT2NldmNUZ0pUaStaVUN5Qjk3bjEzR09jYyt3QlFo?=
+ =?utf-8?B?UzA4OUpUMjA3cTh0R2tpMkF6VFdjUExvOXE3MURkOTNGSEN6alRFeVpTdzVO?=
+ =?utf-8?B?dEtJSjU1c2IvRXFGV0plUVAxTHhoSU03dEpEY1lUYmxxUVlGKzJMY1IycUJn?=
+ =?utf-8?B?WUpmL3FPdDBjbjhMdzRnNXVSNUp0WFRJN3RWdnJGMlE1RGlPeExYYVdqS1lI?=
+ =?utf-8?B?WjdUWUhaVFNpWDhjNUVsS1NqWDdLbWx5WW5pVVdHNTR1Q21ZYm5wTUd1SW12?=
+ =?utf-8?B?aUMrZDQyNWtlaTJ4QURReUQzNGJacW1XWElHVER6MTN1a2JiSndBTnV6NXBP?=
+ =?utf-8?B?YXFLN0IvaXByVVFNd25kTzRId2JSSVlOZHA2WllZcUNWK3VWSllJakFaV0Nt?=
+ =?utf-8?B?bXdORlBXY2tjL1NYQ095OTZ5dWtXUjNFWllOTHRqOHpvcExjaXVUQmZXbDRk?=
+ =?utf-8?B?VFhuWm1tMzFMbzZmWWZ6T3VDd1h6RG1WUlJvTVJIOHlhK241Mi92amt2WTNZ?=
+ =?utf-8?B?Y0tYcW53cjJpOHdVM3ZhTlBRRjZ0OEw4dVZweXhwZmxtalZ1NVRxRUQ5Z0pk?=
+ =?utf-8?B?RHhIQy9uYU5LNG9uY2w3TmZJMHlqbHBhTXFYbzRFV2RBNUVUaDVqVEl6OEIw?=
+ =?utf-8?B?U2pOcnpwbVlQMG85czBleDhTT1R1ZUFwUERpb09Md0krQ0trTkhjOU5Ga3d5?=
+ =?utf-8?B?ZEtVbHl2WVU2ME1CUjFSUU9nL0UvVUE4NjNSN0FYcHFCOG42UU9LQWgzREJN?=
+ =?utf-8?B?eGdIMkg1MCsxeUVYZm1mZ1FhTzhnakYxWk1US2s5b2ZUYUhEMnhkWjdhSGN4?=
+ =?utf-8?B?QW5ieVZhUU42OXJ0RnZxTTFCdEFrcmlkNUdVbXoyVERmSk84Sy9qYW9POS9y?=
+ =?utf-8?B?SDdjSnBjUlpWemZLYnR4SVRiRnFjUlhwSkQvWlZ3YkkzeXNaMVI2NVRRY3ov?=
+ =?utf-8?B?RzdSMlhtdkVuTTI3ZzdVSGtENnlwMU11d1hsdlJKRy9VYmdHM1IxTjllMHUy?=
+ =?utf-8?B?bHdjUWxweW1VcjZJYWVCRHdqcmpTNWdjV20rbUJ3dGMwa3AvdVZVbDV3KzM1?=
+ =?utf-8?B?eUpUZlhsNTUrTi9KK0xaa2NBVkxRSjZTR3VYY2N0UllBR25MczVyNHhvNk9l?=
+ =?utf-8?B?cWFhdnI0b1h0WGVUckozV0VsV3ZNOTY2S3ZmYTNxUnBmY0FLUUhBcXp4Q013?=
+ =?utf-8?Q?v4klIc+u998OjkFeqwHHKpzEj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e76a7f86-e9c0-4a26-d607-08dafa6b2178
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2023 22:18:45.9483
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: afhsZLqjDPcvOc3iRwAcJZ/hrzjFh8di3KrNZCFEBhN7PnbJ2+ajbndshX1JOqVOq7oykPTUo0I42htMLRLWfw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5974
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello Dionna,
 
+Do you also have other updates to this patch with regard to review 
+comments from Dov ?
 
-On 19/01/2023 22:54, Kalra, Ashish wrote:
+Thanks,
+Ashish
+
+On 1/19/2023 12:49 PM, Dionna Amalie Glaze wrote:
+>> +
+>> +       /* Page-align the length */
+>> +       length = (params.certs_len + PAGE_SIZE - 1) & PAGE_MASK;
+>> +
 > 
-> On 1/19/2023 2:35 PM, Dionna Amalie Glaze wrote:
->>> +
->>> +static void snp_handle_guest_request(struct vcpu_svm *svm, gpa_t
->>> req_gpa, gpa_t resp_gpa)
->>> +{
->>
->> Both regular,
->>
->>> +
->>> +static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t
->>> req_gpa, gpa_t resp_gpa)
->>> +{
->>
->> and extended guest requests should be subject to rate limiting, since
->> they take a lock on the shared resource that is the AMD-SP (psp?). I
->> proposed a mechanism with empirically chosen defaults in
->>
->> [PATCH v2 0/2] kvm: sev: Add SNP guest request throttling
->> [PATCH v2 1/2] kvm: sev: Add SEV-SNP guest request throttling
->> [PATCH v2 2/2] kvm: sev: If ccp is busy, report throttled to guest
->>
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03107.html
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03110.html
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03111.html
->>
->> But I don't see these on lore. Would you like me to repost these?
->>
+> I believe Ashish wanted this to be PAGE_ALIGN(params.certs_len)
 > 
-> Yes, please.
-> 
-
-I think it's this series:
-
-https://lore.kernel.org/all/20221117181127.1859634-1-dionnaglaze@google.com/
-
--Dov
