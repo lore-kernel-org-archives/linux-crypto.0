@@ -2,76 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD0BC46467
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 05:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3956C38159
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 05:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231517AbjATF3V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 00:29:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34608 "EHLO
+        id S230212AbjATFxw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 00:53:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbjATF2p (ORCPT
+        with ESMTP id S231138AbjATFxr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 00:28:45 -0500
+        Fri, 20 Jan 2023 00:53:47 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4F046D40
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 21:23:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DFB4ABC1
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 21:53:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1B813B823F7
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 14:05:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD919C43398
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 14:05:13 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ABCD4B82162
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 09:50:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B6FEC433D2
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 09:50:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674137113;
-        bh=cWZER9RVFSYIVQ+GvR+NYQUQ3OoWM6/H0pMET0zgWxw=;
+        s=k20201202; t=1674121839;
+        bh=cwfGxQaG+URthgCetdxt06MgdLxrxjNtdHKT4FtVIT0=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=mmIzOr1ZYdToFCznwlFVn0UHZx79y6rZiLhiWF3ZTYsba9/Vu5EaKv3uxjTGZR4G8
-         f8aumzpqV/xvnzLivJCN/WqtnmBrC7TbnRvQgZI1l6DeI0Vvku1zx6xKWdnoqtvf/M
-         U702VoYivROawvFyO+/xlkyFjewUfL9fhEV+pczTglo4x3aSleMf7E0fOT0hHChYtk
-         Cp2BSoBfdUFzdktgrhw2AidVxPZDs1/xu2Pp3niTxdafhHqmMewaq+E9x3usACyrdr
-         7KywzH/vXhTyiPzSCVRv890PKjAA1LUlkZbClilcZXlHgD3VKV07KoQnHN+F5aB9I0
-         00zcEdc7kmr0Q==
-Received: by mail-lj1-f173.google.com with SMTP id s22so2196904ljp.5
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 06:05:13 -0800 (PST)
-X-Gm-Message-State: AFqh2kqRI45j2TC1CuvOVLeza+cOuzIHVJOMqqqEOUpEQn/m6UHt/+/Y
-        fty6/CTbsRpKTFz2tigmf6n6bqCAzPRs66OJNrM=
-X-Google-Smtp-Source: AMrXdXvX5TbHPsvC0y5fB3FIwUE1lRIWsli6EmD/1Sr8zqUN6Dtot0SRMPOONq09tBwiJw9cY3KzcGdBJq7922aem/E=
-X-Received: by 2002:a2e:8783:0:b0:289:7fc6:e1d with SMTP id
- n3-20020a2e8783000000b002897fc60e1dmr576624lji.69.1674137111719; Thu, 19 Jan
- 2023 06:05:11 -0800 (PST)
+        b=hlQ5sHkwGpxp76mYavwbSbYa0wcZbK2DMUE47wRwDl/FwveFfL7GhDWBh+juEyKdE
+         YNGFq7w8PRa9YiUFqQd+XUf58+ANaqIR8cnEBW1d3FW1lxUtgoHrhZ3MmwAvwhSLTF
+         8KJ6qs59cI2oeFred6/nvib95qF/W32v1dinVLQg+AzreS47BSLv+GHptzfzdul+BU
+         Pw08LDBaECNWVY4FHWrw1mMmJdeZZvw8W3Zax/rFRfCKhmeg9VcEx4yC2sCGAUpf0z
+         vynXFwz9ekxQGNT7qX5Knm9sfqi+OKzkYNHfSHbykDAaZ6rcxQudNQyuOYVRP5xZpV
+         HCcoXthi3A3Jw==
+Received: by mail-lf1-f45.google.com with SMTP id bf43so2421846lfb.6
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 01:50:39 -0800 (PST)
+X-Gm-Message-State: AFqh2krrPK2HYpDxnuGlBL0l1Lv8XP3YRpnEdnf4KNQgoOJrYxINElIM
+        EFvenZJ+ViaRXkXSwPKG5oMLIpUqIRbaLL6kvdA=
+X-Google-Smtp-Source: AMrXdXt4IT8RfX3IWSdEFxQCEdVF49MM0CHnPNl2cpxloyFDP06h895QQvcsL/4qkvjTzMhfNkh9aoiLIw2R2xTcFTY=
+X-Received: by 2002:ac2:4ade:0:b0:4d0:7b7:65dc with SMTP id
+ m30-20020ac24ade000000b004d007b765dcmr457752lfp.122.1674121837337; Thu, 19
+ Jan 2023 01:50:37 -0800 (PST)
 MIME-Version: 1.0
-References: <20221214171957.2833419-1-ardb@kernel.org> <CAMj1kXG_btjHUVpN9m5NoBdFv=3JWt-piPx_u40KTv70CC-sRQ@mail.gmail.com>
- <Y8TEqNJuEmWE5Tg/@gondor.apana.org.au> <CAMj1kXExpt4U64ncX6wSU_0zLNNQGiP3RFGNbAXwpuBjeV=fPg@mail.gmail.com>
- <Y8UFjlyFqg+uddZ5@gondor.apana.org.au>
-In-Reply-To: <Y8UFjlyFqg+uddZ5@gondor.apana.org.au>
+References: <Y8kInrsuWybCTgK0@gondor.apana.org.au>
+In-Reply-To: <Y8kInrsuWybCTgK0@gondor.apana.org.au>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 19 Jan 2023 15:04:59 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGSkNROwP4NqEixMS1hw0qf3a_-b6AFacX1-=5mwG-yoQ@mail.gmail.com>
-Message-ID: <CAMj1kXGSkNROwP4NqEixMS1hw0qf3a_-b6AFacX1-=5mwG-yoQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] crypto: Accelerated GCM for IPSec on ARM/arm64
+Date:   Thu, 19 Jan 2023 10:50:26 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGPqHsHSkj+hV_AcwPZxmWMi_=sVBHQWckUPomh6D7uGg@mail.gmail.com>
+Message-ID: <CAMj1kXGPqHsHSkj+hV_AcwPZxmWMi_=sVBHQWckUPomh6D7uGg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: xts - Handle EBUSY correctly
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 16 Jan 2023 at 09:06, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Thu, 19 Jan 2023 at 10:08, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On Mon, Jan 16, 2023 at 08:40:09AM +0100, Ard Biesheuvel wrote:
-> >
-> > Will you be taking the rest of the series? (patches #2 - #4). Or we
-> > might defer this to v6.4 entirely it if makes things easier. (The
-> > other changes really shouldn't go through the ARM tree)
+> As it is xts only handles the special return value of EINPROGERSS,
+
+EINPROGRESS
+
+> which means that in all other cases it will free data related to the
+> request.
 >
-> I had assumed they were dependent.  But they do seem to make sense
-> on their own so yes I can certainly take patches 2-4.
+> However, as the caller of xts may specify MAY_BACKLOG, we also need
+> to expect EBUSY and treat it in the same way.  Otherwise backlogged
+> requests will trigger a use-after-free.
 >
+> Fixes: 8083b1bf8163 ("crypto: xts - add support for ciphertext stealing")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/crypto/xts.c b/crypto/xts.c
+> index 63c85b9e64e0..de6cbcf69bbd 100644
+> --- a/crypto/xts.c
+> +++ b/crypto/xts.c
+> @@ -203,12 +203,12 @@ static void xts_encrypt_done(struct crypto_async_request *areq, int err)
+>         if (!err) {
+>                 struct xts_request_ctx *rctx = skcipher_request_ctx(req);
+>
+> -               rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+> +               rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
 
-Excellent, thanks.
+I don't get this bit. We used to preserve CRYPTO_TFM_REQ_MAY_BACKLOG
+before (along with all other flags except MAY_SLEEP), but now, we
+*only* preserve CRYPTO_TFM_REQ_MAY_BACKLOG.
 
-Patch #1 has been picked up by Russell, so please pick up the rest.
+So how is this related? Why are we clearing
+CRYPTO_TFM_REQ_FORBID_WEAK_KEYS here for instance?
 
--- 
-Ard.
+
+>                 err = xts_xor_tweak_post(req, true);
+>
+>                 if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
+>                         err = xts_cts_final(req, crypto_skcipher_encrypt);
+> -                       if (err == -EINPROGRESS)
+> +                       if (err == -EINPROGRESS || err == -EBUSY)
+
+Apologies for the noob questions about this aspect of the crypto API,
+but I suppose this means that, if CRYPTO_TFM_REQ_MAY_BACKLOG was
+specified, it is up to the skcipher implementation to queue up the
+request and return -EBUSY, as opposed to starting the request
+asynchronously and returning -EINPROGRESS?
+
+So why the distinction? If the skcipher signals that the request is
+accepted and will complete asynchronously, couldn't it use EINPROGRESS
+for both cases? Or is the EBUSY interpreted differently by the caller,
+for providing back pressure to the source?
+
+>                                 return;
+>                 }
+>         }
+> @@ -223,12 +223,12 @@ static void xts_decrypt_done(struct crypto_async_request *areq, int err)
+>         if (!err) {
+>                 struct xts_request_ctx *rctx = skcipher_request_ctx(req);
+>
+> -               rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+> +               rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
+>                 err = xts_xor_tweak_post(req, false);
+>
+>                 if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
+>                         err = xts_cts_final(req, crypto_skcipher_decrypt);
+> -                       if (err == -EINPROGRESS)
+> +                       if (err == -EINPROGRESS || err == -EBUSY)
+>                                 return;
+>                 }
+>         }
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
