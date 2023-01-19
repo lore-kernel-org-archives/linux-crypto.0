@@ -2,114 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE07AC004D4
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 12:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7E3C00A5A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 13:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbjASMHf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 07:07:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
+        id S230115AbjASNFZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 08:05:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbjASMHe (ORCPT
+        with ESMTP id S229788AbjASNEi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 07:07:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40EA04EC2
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 04:06:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674130001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MA+Tu3X5uLRzP6doE5KbzSpkyhzhncA6EFOFEasfI5U=;
-        b=DK7pcS2u+aFZoC+wTDfap5awHqTSHIbqNhhHrINIuS6BreHRqcLfsDauJ420HGDARTc8d4
-        ecQvl1+FN9h1gOU+3zMfuSuSdFS0WlkcabbbgKmtDy97NfdbG5OzaVj1HG6Oqi+fb+F/m0
-        uKxepmwbvBuOlc5CkHBpy8mdORFo8Dw=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-149-zHlema--PHWG5vpZMCCVaw-1; Thu, 19 Jan 2023 07:06:40 -0500
-X-MC-Unique: zHlema--PHWG5vpZMCCVaw-1
-Received: by mail-qk1-f197.google.com with SMTP id q21-20020a05620a0d9500b0070572ccdbf9so1244072qkl.10
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 04:06:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MA+Tu3X5uLRzP6doE5KbzSpkyhzhncA6EFOFEasfI5U=;
-        b=QuS3xRUMgVbP+oowC9ifkzoNX25wGS2BhInZpy3WMmVN/Yj1fSgJa7Ph3n1WjRNwLW
-         HMPkKRYo2KKf5cIxD4JIkhiKaxkavRpEijFvVk8WVDOLVU4mAFUHdYOv1cjgY+FfxB1b
-         vylmesLiZObWUYYIYM6BMulFTjDnlenue+wOnR9FLJ8JwERI4o73A4qgh1XslQXlliaM
-         cEMVe0ecDvhPTjl5fHHwpxOnC10IVq03Pkz4awbAi+ofj/2UmMJZoQtNNsgh1P8LsHAh
-         IpWD5DZE9gayK5nQH8QdZupNqOOO9K0PSVDoVY9hM6crO89JC3nacB1FC9RjPZP9FoSy
-         A8Aw==
-X-Gm-Message-State: AFqh2koYGOsVbWvcNcObd1dWAGb3mBmCzqEX0m3FtFF1AYIy1ZMMHEoF
-        gWFpOwe3kDrttaoEeKpGau7JXveEpId8tABM6HRCWqk5Cb9jU91hdKJO0JJkp8RLM+FDDO5AAyL
-        VWq9fChDP3IXCYulVK3AENG7tydiPXkXl8hYp/h+V
-X-Received: by 2002:a05:620a:2fb:b0:6fe:c73e:2579 with SMTP id a27-20020a05620a02fb00b006fec73e2579mr337816qko.756.1674129999582;
-        Thu, 19 Jan 2023 04:06:39 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuB1xj8g49yNQDrZJdDlcymlZZ5MyruwIBZLgJ7+yb54wy/t1FK2bjN0BKkeFhzZVgJHoeEtvL+bWpF1BxEgVY=
-X-Received: by 2002:a05:620a:2fb:b0:6fe:c73e:2579 with SMTP id
- a27-20020a05620a02fb00b006fec73e2579mr337811qko.756.1674129999344; Thu, 19
- Jan 2023 04:06:39 -0800 (PST)
+        Thu, 19 Jan 2023 08:04:38 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B7346A2;
+        Thu, 19 Jan 2023 05:03:22 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D565F60F42;
+        Thu, 19 Jan 2023 13:03:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB22C433EF;
+        Thu, 19 Jan 2023 13:03:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674133401;
+        bh=ijfFcGC5kAQ2nYmXEtcyL9+phHOOgiGJvROKRw4V2qo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RZdMtEEuZr7tE97F12rPotBfCByLsKQcgcA6T//IQ5YqeQ/v/D6XDedO0BpuyIUnx
+         TBg5Gnpd4zOJUj/FvJCpx5TpBLL+470yit5tW60gms8xNYxGspnGiJA9tNTbG7R1wv
+         Z1VUxRwnyHcRPmdsKatfbX51tTlsShJvyrmuxG0VDCg1QTDKKpxv0am630By1QBssp
+         vzVOhZKVLz/CJJzpxLSHiCJ2Xa5fGCzVmk3raNpsu/uSz7pax5V9iNKDXGzwIgECbD
+         syk+CFVp5gx0CaFlSgcEdglnzc1pcBa8wCK5SMZItMZeaNCkmFgxHV+fT/JMPsu7eg
+         1A6DhF3Oj86pQ==
+Date:   Thu, 19 Jan 2023 13:03:17 +0000
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, ashish.kalra@amd.com,
+        harald@profian.com, chao.p.peng@linux.intel.com
+Subject: Re: [PATCH RFC v7 02/64] KVM: x86: Add
+ KVM_CAP_UNMAPPED_PRIVATE_MEMORY
+Message-ID: <Y8k/lXt18LwtUlff@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-3-michael.roth@amd.com>
+ <Y6RM8RRryLgK8KiB@zn.tnic>
+ <20230104174721.wa4detzppqzvsgsy@amd.com>
 MIME-Version: 1.0
-References: <20230119080508.24235-1-meadhbh.fitzpatrick@intel.com>
-In-Reply-To: <20230119080508.24235-1-meadhbh.fitzpatrick@intel.com>
-From:   Vladis Dronov <vdronov@redhat.com>
-Date:   Thu, 19 Jan 2023 13:06:28 +0100
-Message-ID: <CAMusb+RPz8PHe3ab6n=TYQG761Rn0uA7OHY7WVQ68onA0wXJMg@mail.gmail.com>
-Subject: Re: [PATCH] Documentation: qat: change kernel version
-To:     Meadhbh <meadhbh.fitzpatrick@intel.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, wojciech.ziemba@intel.com,
-        tomaszx.kowalik@intel.com, bagasdotme@gmail.com,
-        linux-kernel@vger.kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230104174721.wa4detzppqzvsgsy@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Wed, Jan 04, 2023 at 11:47:21AM -0600, Michael Roth wrote:
+> On Thu, Dec 22, 2022 at 01:26:25PM +0100, Borislav Petkov wrote:
+> > On Wed, Dec 14, 2022 at 01:39:54PM -0600, Michael Roth wrote:
+> > > This mainly indicates to KVM that it should expect all private guest
+> > > memory to be backed by private memslots. Ideally this would work
+> > > similarly for others archs, give or take a few additional flags, but
+> > > for now it's a simple boolean indicator for x86.
+> > 
+> > ...
+> > 
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index c7e9d375a902..cc9424ccf9b2 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -1219,6 +1219,7 @@ struct kvm_ppc_resize_hpt {
+> > >  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+> > >  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+> > >  #define KVM_CAP_MEMORY_ATTRIBUTES 225
+> > > +#define KVM_CAP_UNMAPPED_PRIVATE_MEM 240
+> > 
+> > Isn't this new cap supposed to be documented somewhere in
+> > Documentation/virt/kvm/api.rst ?
+> 
+> It should, but this is sort of a placeholder for now. Ideally we'd
+> re-use the capabilities introduced by UPM patchset rather than introduce
+> a new one. Originally the UPM patchset had a KVM_CAP_PRIVATE_MEM which
+> we planned to use to switch between legacy SEV and UPM-based SEV (for
+> lazy-pinning support) by making it writeable, but that was removed in v10
+> in favor of KVM_CAP_MEMORY_ATTRIBUTES, which is tied to the new
+> KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES ioctls:
+> 
+>   https://lore.kernel.org/lkml/CA+EHjTxXOdzcP25F57Mtmnb1NWyG5DcyqeDPqzjEOzRUrqH8FQ@mail.gmail.com/
+> 
+> It wasn't clear at the time if that was the right interface to use for
+> this particular case, so we stuck with the more general
+> 'use-upm/dont-use-upm' semantics originally provided by making
+> KVM_CAP_UNMAPPED_PRIVATE_MEM/KVM_CAP_PRIVATE_MEM writeable.
+> 
+> But maybe it's okay to just make KVM_CAP_MEMORY_ATTRIBUTES writeable and
+> require userspace to negotiate it rather than just tying it to
+> CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES. Or maybe introducing a new
+> KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to pair with
+> KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES. It sort of makes sense, since userspace
+> needs to be prepared to deal with KVM_EXIT_MEMORY_FAULTs relating to these
+> attributes.
 
-On Thu, Jan 19, 2023 at 9:15 AM Meadhbh <meadhbh.fitzpatrick@intel.com> wrote:
->
-> Change kernel version from 5.20 to 6.0, as 5.20 is not a release.
->
-> Signed-off-by: Meadhbh Fitzpatrick <meadhbh.fitzpatrick@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  Documentation/ABI/testing/sysfs-driver-qat | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-> index 185f81a2aab3..087842b1969e 100644
-> --- a/Documentation/ABI/testing/sysfs-driver-qat
-> +++ b/Documentation/ABI/testing/sysfs-driver-qat
-> @@ -1,6 +1,6 @@
->  What:          /sys/bus/pci/devices/<BDF>/qat/state
->  Date:          June 2022
-> -KernelVersion: 5.20
-> +KernelVersion: 6.0
->  Contact:       qat-linux@intel.com
->  Description:   (RW) Reports the current state of the QAT device. Write to
->                 the file to start or stop the device.
-> @@ -18,7 +18,7 @@ Description:  (RW) Reports the current state of the QAT device. Write to
->
->  What:          /sys/bus/pci/devices/<BDF>/qat/cfg_services
->  Date:          June 2022
-> -KernelVersion: 5.20
-> +KernelVersion: 6.0
->  Contact:       qat-linux@intel.com
->  Description:   (RW) Reports the current configuration of the QAT device.
->                 Write to the file to change the configured services.
-> --
-> 2.37.3
+Doesn't upm patch set imply that user space should negotiate the memory
+attributes with the ioctl? 
 
-Indeed,
+For me it looks like that the problem is introduced by conflicting usage
+pattern in the SNP code [*].
 
-Reviewed-by: Vladis Dronov <vdronov@redhat.com>
+Perhaps sev_launch_update_gfn_handler() should not set memory attributes
+but instead expect user space to do it before the call?
 
-Best regards,
-Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
+[*] https://lore.kernel.org/all/Y8cydYUfTUFwCh4K@kernel.org/
 
+BR, Jarkko
