@@ -2,141 +2,184 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E444C38142
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 05:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5920AC00A5A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 07:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbjASFaZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 00:30:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58168 "EHLO
+        id S229939AbjASHZp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 02:25:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjASFaZ (ORCPT
+        with ESMTP id S229961AbjASHZV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 00:30:25 -0500
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2120.outbound.protection.outlook.com [40.107.117.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87BDC1AE
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Jan 2023 21:30:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R8MavNw71UjNLWQBStIaVdDd6UTu/qYI2AShUuN7auVUywaUDvzaLAa5Pndcfu9adqHS4tpk4Zn/rXtWE3kmE7qKeabtQbadu75StKSMAQFgbFQRkcuGMu3gQnXvL8sMr2dw3SZA7spdAyaHJhw2Dxjz+abnLh+YvnmiS5v6KUkHbDTsk2eeKWNNGdoWgDdZBjOOiwaOc8m9Wj4LcGvPnbZYFCGIB45VibZwQX1ubMcctMQO25nu989GOnaWkm1BWNJdsDP2WjijFuZABryOUnLJaaXNInD4N/v3pL70DObpCT/rQXd7QnolOkd0W+v+4PUi0gMGRiVTRMiALdwxkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YTlANqY317wm69C6VIRxHd7WnTu73POBjX7KxE7T7U0=;
- b=LScGt2tVo9HyrIeqEUBphsreA+vW+kWFN4q6mM+lWKMlYOaf+BC9IB8Iu6Eq+pgimkpc9o9XOtQxhqP2TpIy5E38APISjIWWs7yIP3bqYfeEEGRl7rAvvaT1UU85p7ffpWOzjFLwDXnIvuhkaj4UVeLTvhPqRyiKcsYspsuywFVsS4DqBy+VuC7dV20oOTA8610wTiV45IMIt1wBtrLnwbVMAIH3n6tve43PBhVkkCRDcEI8ID/ltoTqPkf8yw9IMT1VNmEhkPXkCUBjmZ47pNtdbGtKXdcOzmnYZLvel2QwOblcN9L7/wVpPCyQYDQuPQD9G0psmKuFnmynzrwnOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YTlANqY317wm69C6VIRxHd7WnTu73POBjX7KxE7T7U0=;
- b=TQ390SIbvWyr6WzEd/fIhpvVT5RJ1n3isLpocXnq5X4UUglMJRY2l8v2AI8YMW/wBsUkdM0oQnbep+CZWSM3eQje0OPPoe+wfAT399nZtq0UDOA9q8aUbnd2CrMbrZrsJXrmc8Ugsp/pRATD0o+6JK1ROlxEaIB0VWU/wFhL2BvR61KbKLft6Fb6+O0eZGpEjqyEXIhtlpQShWQ/lJ70u/j2BB3TxgrBEIxrAmFXZqaalxytlY3qEqgsGbEXMVoGuBWGjQM8t5Vf4+gfH+4kWsxx/izh2kZtTcXjKSlfGKeD7iZWjHLApNXxTfDLjIB4nsgPg3re6xhwjy7URjzSow==
-Received: from SG2PR06MB3207.apcprd06.prod.outlook.com (2603:1096:4:6b::9) by
- PSAPR06MB4151.apcprd06.prod.outlook.com (2603:1096:301:2b::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6002.24; Thu, 19 Jan 2023 05:30:14 +0000
-Received: from SG2PR06MB3207.apcprd06.prod.outlook.com
- ([fe80::bfa0:771c:8258:c299]) by SG2PR06MB3207.apcprd06.prod.outlook.com
- ([fe80::bfa0:771c:8258:c299%3]) with mapi id 15.20.6002.024; Thu, 19 Jan 2023
- 05:30:14 +0000
-From:   Neal Liu <neal_liu@aspeedtech.com>
-To:     Yang Yingliang <yangyingliang@huawei.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Subject: RE: [PATCH -next] crypto: aspeed: change aspeed_acry_akcipher_algs to
- static
-Thread-Topic: [PATCH -next] crypto: aspeed: change aspeed_acry_akcipher_algs
- to static
-Thread-Index: AQHZK6WwSMVtzomYYE+HVkKQig9+xq6lNqxQ
-Date:   Thu, 19 Jan 2023 05:30:14 +0000
-Message-ID: <SG2PR06MB3207C0C0D82F4F27BC4C3F6F80C49@SG2PR06MB3207.apcprd06.prod.outlook.com>
-References: <20230119014859.1900136-1-yangyingliang@huawei.com>
-In-Reply-To: <20230119014859.1900136-1-yangyingliang@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-TW
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SG2PR06MB3207:EE_|PSAPR06MB4151:EE_
-x-ms-office365-filtering-correlation-id: 0bb0f2a6-578d-48a4-0bb1-08daf9de3df6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YxND1fMjxgWCcfzk4wyk6lbwzO5k49V9Ecp3z7LsQEUEPwVJB5UyeHIrsT6HnUUqJu4bivpFU9GYd/W7hf5XawXLnAvN+JfoXvtQffBGSTmguhor1krqBwIJrRn9OMR5rFPGfBeE3bbhyLWIW9OHNg2TV/S390i0sPf7Ij/VA+BY25Sxg03s0LOZDehkmbOLPkSBh674M/eOFU5VYq9xkRT6EHmFxvxrAnU58KHtFQEDeu6XKgTN7Gy/3zJqjSRCm1A+LSLno26WCjA2NOH81zwiu5cU7m7r+ZFv9DsQmXJR641Xj8R6+ViaSts18hAqGg+aOqsL0BKvLCV6cA9tdX3tpxDFfWBFt51BN5UVXTcfHecL0bBPS6zpt2HSIsS/+5oyizrwhkEvXFWLDErDdZ0D7zeaIXiAGI3mtGKhez4VPuemSnCMGUDeHqFRCP5v6QlcAURbsysq3brTPUsmGLKUe4E7ThH3TNAYH6smRoAPe+11j25SOoWDpT9w4Y8PXF/94v+LztuDkB670PjwDgv8VroDiPaHbM6SGzQL+v3i85+Yjq8+OzMDxxs03ZeWlQPiw3T/z/jCtx2+OdL2wRamlExuPhYIojsFDIA+itfqqu832M+J37eMa1EaQx/f6mW+MN0WrQwiSHwj2ldJ1JpmY+X40dZFqs78MxT7GtApCWj+DbmD8zmLFbsqk5j9o8V6YAtThp8wxUBzaDmSmA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3207.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(39840400004)(366004)(136003)(346002)(396003)(451199015)(33656002)(6506007)(110136005)(186003)(478600001)(26005)(9686003)(8936002)(7696005)(38070700005)(86362001)(8676002)(4744005)(83380400001)(64756008)(5660300002)(66556008)(52536014)(76116006)(66476007)(66446008)(71200400001)(66946007)(4326008)(41300700001)(316002)(2906002)(122000001)(38100700002)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VHwNtwVBZRaXJEW97jvf1mbPOAqBn/gn8LuOAn+fcQnKKa8RaATUoaAPIebJ?=
- =?us-ascii?Q?VMsfIxriouGyKzrxwJOQfeWg39ohOhYEMlxjkDeR1BAvnriBmBfPm+g9GlT9?=
- =?us-ascii?Q?C65ARVBxhgJqzXt57ezEGYTtzdR26v+jo+m1abbbImDBcLPZsE7C0XdpVhoY?=
- =?us-ascii?Q?PbPXPhMXDMUv0IyTehUub3aNg6lglhqykTLAA8NkQwUUoY03PWeXdgbsWad2?=
- =?us-ascii?Q?gL8T4w+ehdUMIKHxDHXbtdX4hTmvxG9jGiZXdbC+LWbIv2r/vhwTgEoNSbOO?=
- =?us-ascii?Q?VGiH4fywHg4Ib4M1V9v6s1ExA+PYV871iKk5axSXvovV5/jc3gltdxxHYMaf?=
- =?us-ascii?Q?yPkGJXa2G5i0RbjU1ZI8USgjtXBDr+xzJJlrAt3U4iBkGnUORkurzmfKgl0O?=
- =?us-ascii?Q?nfercce5G4caqPRxnN0Sl2SXFxs+QlQnm/teLLmAn3AknBROLjf73pvnlime?=
- =?us-ascii?Q?WSufw8nY45j910kK9eKQLmEByrvp6c8QsU211vIfR969bt2XgAudtoI2qlHW?=
- =?us-ascii?Q?qTaiReVKTWJrlDatJU2HkRD9/2Vx0vZiXpxkZbK4MpdFhfuP6FhOLLivRA8T?=
- =?us-ascii?Q?ZIci4Dfje0o0Wq7475LFmHUJJjvmm7qO7j92nIMVGUdWMIWYZRcFM5INz87D?=
- =?us-ascii?Q?HbB164bBOBlUTAtTZbLkaEKvFkzFvhloKb8l++pmfYalqDi5ecy8WXE5BI1R?=
- =?us-ascii?Q?nuAzf/GUpVzJaxrekcn8BX5XTfP5Qgwfizwo4IQg9tDYo77QOJDlha4mt2HL?=
- =?us-ascii?Q?H3XbZZbYDFx/8ItG16xOHId1AU2676iXdtIjf3qSPXMACBER1Fqd6oWAHKsp?=
- =?us-ascii?Q?BCgpemjYxrUkL/9d1WyfPi5i5rfvgr3IvhJvO+ODJJsKitGsmUqCDA6gh9yl?=
- =?us-ascii?Q?RtkS1pOxQhZyCXbenS64yWue11nPgucZ8X1ABokNQkyqeQa8SUr1ihV7oOfl?=
- =?us-ascii?Q?zpjGQr66i3gN5/6C+Z0kTXTy6M82jHMExkau8v/UTEVqG5gZxKjVb2aqwIqV?=
- =?us-ascii?Q?yStDRKD2tW1CIaXkOwCHXH/oTUEeovtx7JSKfA47spYahqM0vhn3QZBijk70?=
- =?us-ascii?Q?5ZfNWK0YCZF+nMwHpIyqibJgakwZ8zMFmKqy6fTNjvkzH3UBCQNa6uHCJY+N?=
- =?us-ascii?Q?+sHzfX0tpVbtj6d4yTn/Q1uiKgSUWJvHACoYyaRfbWVriQQrNXSCv0X5XnLS?=
- =?us-ascii?Q?sj6emuXsNsHWJswRt7QeH0FxPuKyDfB3Bqr3dEFWYGeiz8bD8ZfEzWnZOWv7?=
- =?us-ascii?Q?vAD996xj4M/LxrxSKDeEn1Sqw8vU4OEqScz34WyeO/b4giV6pvX3g7RtlS76?=
- =?us-ascii?Q?/hHW0q3/bKuxnQrvSWx2VUS8qadEetdBsxyjjf+9r6RMAD59H25cEgkErYq1?=
- =?us-ascii?Q?b9IDIU4Ua0tjHNm2UZzc74cNHKo2dW5vF4Gq/X4kKvz12YdgqweN+PCdTnl/?=
- =?us-ascii?Q?JbZifu7E94AhDMTGS4DHfpO66dOMxFhA58QdhBsCQpFXYMwHbwQAxKpIdIFb?=
- =?us-ascii?Q?TB3nXt0QDpI6VgEnxZlkjye1HOQ8NZVIdP8+EW51cHev1CuVlCZMYTmiTbEK?=
- =?us-ascii?Q?imOA5dBHdPHAWgBOmez4JJwhAC651/R9Tw7cNmGH?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 19 Jan 2023 02:25:21 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DF266FBD;
+        Wed, 18 Jan 2023 23:24:53 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30J67eJR030173;
+        Thu, 19 Jan 2023 07:23:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FaOVjx07ztTIdT60txx0s0b5gk5cg+3GhJNm7FRrqxA=;
+ b=gGqM15HYRcnG3WHsQqKbdungpZdZvmGzS2AtsdqaSW/xfjHO3tqDkZ25Hz8DIWEm2B7I
+ CZIrfeE1k3waUKwBNVVhBd+wbT/dshUzvjnPyhnHQ0PNJuTxFOPsnO/p0R/Zs86BeGLW
+ TNW/jXn2lZeMZOoJbFtLvH735N0X2+RIqgUB05N2MU4eDKCi2j7IxHPoFCaEA5Cs13gZ
+ 2xvzCM1CDorHq0AVtMhIKRmiXHPq7hUFGf5MIxbu1sEP92FQgZkgLLUbJOMldpnILphX
+ rc8jaP48Bu/BMhY4srYRuy7xajXYE1Lq4CXc2BrzuC5rah5fVX+eCre0o1NfExG5wx+Q QA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mkq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:41 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30J7DI0V030240;
+        Thu, 19 Jan 2023 07:23:40 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mk8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:40 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J73lel009766;
+        Thu, 19 Jan 2023 07:23:39 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n3m1837vq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:39 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30J7NbQw42271318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Jan 2023 07:23:37 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 868EA58059;
+        Thu, 19 Jan 2023 07:23:37 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FFC358043;
+        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
+Received: from [9.160.127.29] (unknown [9.160.127.29])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
+Message-ID: <f41e2872-a648-9c5d-88a3-23ad099dffa2@linux.ibm.com>
+Date:   Thu, 19 Jan 2023 09:23:26 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3207.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bb0f2a6-578d-48a4-0bb1-08daf9de3df6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jan 2023 05:30:14.3624
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pSe/Ps+1l86t1RQbQ6S/PtE/MlB88Gc9AUtlUxXEoqa/6Ga4SQTebwjCxCV/d93HKCZsGDeBM0CpWT9VLIyFxA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PSAPR06MB4151
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH RFC v7 31/64] crypto: ccp: Add the
+ SNP_{SET,GET}_EXT_CONFIG command
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-32-michael.roth@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <20221214194056.161492-32-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FI5em3frKKibChidKNc0sr30HSyxeZBK
+X-Proofpoint-ORIG-GUID: w6COoNNAPvn6WeEFWdLfRUXz5bx9bRjg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0 phishscore=0
+ mlxscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301190056
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> aspeed_acry_akcipher_algs is only used in aspeed-acry.c now, change it to
-> static.
->=20
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+Hi Mike,
 
-Reviewed-by: Neal Liu <neal_liu@aspeedtech.com>
-
+On 14/12/2022 21:40, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The SEV-SNP firmware provides the SNP_CONFIG command used to set the
+> system-wide configuration value for SNP guests. The information includes
+> the TCB version string to be reported in guest attestation reports.
+> 
+> Version 2 of the GHCB specification adds an NAE (SNP extended guest
+> request) that a guest can use to query the reports that include additional
+> certificates.
+> 
+> In both cases, userspace provided additional data is included in the
+> attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
+> command to give the certificate blob and the reported TCB version string
+> at once. Note that the specification defines certificate blob with a
+> specific GUID format; the userspace is responsible for building the
+> proper certificate blob. The ioctl treats it an opaque blob.
+> 
+> While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
+> command that can be used to obtain the data programmed through the
+> SNP_SET_EXT_CONFIG.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  drivers/crypto/aspeed/aspeed-acry.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/aspeed/aspeed-acry.c
-> b/drivers/crypto/aspeed/aspeed-acry.c
-> index 6d3790583f8b..164c524015f0 100644
-> --- a/drivers/crypto/aspeed/aspeed-acry.c
-> +++ b/drivers/crypto/aspeed/aspeed-acry.c
-> @@ -603,7 +603,7 @@ static void aspeed_acry_rsa_exit_tfm(struct
-> crypto_akcipher *tfm)
->  	crypto_free_akcipher(ctx->fallback_tfm);
->  }
->=20
-> -struct aspeed_acry_alg aspeed_acry_akcipher_algs[] =3D {
-> +static struct aspeed_acry_alg aspeed_acry_akcipher_algs[] =3D {
->  	{
->  		.akcipher =3D {
->  			.encrypt =3D aspeed_acry_rsa_enc,
-> --
-> 2.25.1
+>  Documentation/virt/coco/sev-guest.rst |  27 ++++++
+>  drivers/crypto/ccp/sev-dev.c          | 123 ++++++++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.h          |   4 +
+>  include/uapi/linux/psp-sev.h          |  17 ++++
+>  4 files changed, 171 insertions(+)
+> 
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
+> index 11ea67c944df..fad1e5639dac 100644
+> --- a/Documentation/virt/coco/sev-guest.rst
+> +++ b/Documentation/virt/coco/sev-guest.rst
+> @@ -145,6 +145,33 @@ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+>  status includes API major, minor version and more. See the SEV-SNP
+>  specification for further details.
+>  
+> +2.5 SNP_SET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
+> +reported TCB version in the attestation report. The command is similar to
+> +SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
+> +command also accepts an additional certificate blob defined in the GHCB
+> +specification.
+> +
+> +If the certs_address is zero, then the previous certificate blob will deleted.
+> +For more information on the certificate blob layout, see the GHCB spec
+> +(extended guest request message).
+> +
+> +2.6 SNP_GET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_SET_EXT_CONFIG is used to query the system-wide configuration set
+
+       ^^^^^^^^^^^^^^^^^^
+
+This should be SNP_GET_EXT_CONFIG.
+
+
+-Dov
+
+> +through the SNP_SET_EXT_CONFIG.
+> +
+>  3. SEV-SNP CPUID Enforcement
+>  ============================
+>  
