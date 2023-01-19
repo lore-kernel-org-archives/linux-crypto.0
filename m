@@ -2,28 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDCAC004D4
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 09:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB84C00A5A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 09:08:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbjASJBq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 04:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59536 "EHLO
+        id S229486AbjASJIy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 04:08:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjASJBp (ORCPT
+        with ESMTP id S229538AbjASJIw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 04:01:45 -0500
+        Thu, 19 Jan 2023 04:08:52 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCCA6796A
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 01:01:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9612B55AE
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 01:08:49 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pIQnj-001ge2-Eh; Thu, 19 Jan 2023 17:01:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 19 Jan 2023 17:01:39 +0800
-Date:   Thu, 19 Jan 2023 17:01:39 +0800
+        id 1pIQuc-001gkV-Qe; Thu, 19 Jan 2023 17:08:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 19 Jan 2023 17:08:46 +0800
+Date:   Thu, 19 Jan 2023 17:08:46 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: cryptd - Remove unnecessary skcipher_request_zero
-Message-ID: <Y8kG84TrzsjoR3Zp@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: xts - Handle EBUSY correctly
+Message-ID: <Y8kInrsuWybCTgK0@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -31,32 +32,51 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Previously the child skcipher request was stored on the stack and
-therefore needed to be zeroed.  As it is now dynamically allocated
-we no longer need to do so.
+As it is xts only handles the special return value of EINPROGERSS,
+which means that in all other cases it will free data related to the
+request.
 
+However, as the caller of xts may specify MAY_BACKLOG, we also need
+to expect EBUSY and treat it in the same way.  Otherwise backlogged
+requests will trigger a use-after-free.
+
+Fixes: 8083b1bf8163 ("crypto: xts - add support for ciphertext stealing")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index ca3a40fc7da9..1ff58a021d57 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -272,7 +272,6 @@ static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
- 				   req->iv);
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 63c85b9e64e0..de6cbcf69bbd 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -203,12 +203,12 @@ static void xts_encrypt_done(struct crypto_async_request *areq, int err)
+ 	if (!err) {
+ 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
  
- 	err = crypto_skcipher_encrypt(subreq);
--	skcipher_request_zero(subreq);
+-		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++		rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
+ 		err = xts_xor_tweak_post(req, true);
  
- 	req->base.complete = rctx->complete;
+ 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
+ 			err = xts_cts_final(req, crypto_skcipher_encrypt);
+-			if (err == -EINPROGRESS)
++			if (err == -EINPROGRESS || err == -EBUSY)
+ 				return;
+ 		}
+ 	}
+@@ -223,12 +223,12 @@ static void xts_decrypt_done(struct crypto_async_request *areq, int err)
+ 	if (!err) {
+ 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
  
-@@ -300,7 +299,6 @@ static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
- 				   req->iv);
+-		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++		rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
+ 		err = xts_xor_tweak_post(req, false);
  
- 	err = crypto_skcipher_decrypt(subreq);
--	skcipher_request_zero(subreq);
- 
- 	req->base.complete = rctx->complete;
- 
+ 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
+ 			err = xts_cts_final(req, crypto_skcipher_decrypt);
+-			if (err == -EINPROGRESS)
++			if (err == -EINPROGRESS || err == -EBUSY)
+ 				return;
+ 		}
+ 	}
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
