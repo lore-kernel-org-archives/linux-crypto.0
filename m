@@ -2,91 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7D9C38142
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 07:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE828C00A5A
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 08:14:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229655AbjASHhF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 02:37:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
+        id S229889AbjASIOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 03:14:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjASHhE (ORCPT
+        with ESMTP id S229468AbjASIOC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 02:37:04 -0500
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55EAADB;
-        Wed, 18 Jan 2023 23:37:01 -0800 (PST)
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4NyDwW38z3z6FK2Q;
-        Thu, 19 Jan 2023 15:36:59 +0800 (CST)
-Received: from xaxapp01.zte.com.cn ([10.88.99.176])
-        by mse-fl1.zte.com.cn with SMTP id 30J7ak41021725;
-        Thu, 19 Jan 2023 15:36:47 +0800 (+08)
-        (envelope-from ye.xingchen@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-        by mapi (Zmail) with MAPI id mid31;
-        Thu, 19 Jan 2023 15:36:49 +0800 (CST)
-Date:   Thu, 19 Jan 2023 15:36:49 +0800 (CST)
-X-Zmail-TransId: 2af963c8f31135184eee
-X-Mailer: Zmail v1.0
-Message-ID: <202301191536493046780@zte.com.cn>
-Mime-Version: 1.0
-From:   <ye.xingchen@zte.com.cn>
-To:     <herbert@gondor.apana.org.au>
-Cc:     <neal_liu@aspeedtech.com>, <davem@davemloft.net>, <joel@jms.id.au>,
-        <andrew@aj.id.au>, <linux-aspeed@lists.ozlabs.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIGNyeXB0bzogYXNwZWVkIC0gVXNlIGRldm1fcGxhdGZvcm1fZ2V0X2FuZF9pb3JlbWFwX3Jlc291cmNlKCk=?=
-Content-Type: text/plain;
-        charset="UTF-8"
-X-MAIL: mse-fl1.zte.com.cn 30J7ak41021725
-X-Fangmail-Gw-Spam-Type: 0
-X-FangMail-Miltered: at cgslv5.04-192.168.250.138.novalocal with ID 63C8F31B.000 by FangMail milter!
-X-FangMail-Envelope: 1674113819/4NyDwW38z3z6FK2Q/63C8F31B.000/10.5.228.132/[10.5.228.132]/mse-fl1.zte.com.cn/<ye.xingchen@zte.com.cn>
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 63C8F31B.000/4NyDwW38z3z6FK2Q
+        Thu, 19 Jan 2023 03:14:02 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5974245BDD;
+        Thu, 19 Jan 2023 00:14:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674116041; x=1705652041;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Uw39GHewdVy4hZPaY3+nKckas1yzZpDUlpEw/VuNI/U=;
+  b=DNZ/IHsYkcKhI+eej0rRM2g5ymBEt61AaajzC9veQvt0PL3BTy0IP1vb
+   CdbIC7PUYkgQ8HURXDsPAvmSNDj2nqy0edKsABk7jlVgWT1z8z5FFZAx6
+   yqy1H1CwtJfGaQfd0lCNRnlZULZ0IHXJ+eNElC1iKFx2K9raEbR/4K1kF
+   LGTPW3TRhEwjUg1l3aDa0+wIzaYK97HLr533FRLNgHlo5ECWc1XCKI1ww
+   Do4vX+AEOqWwiUdmHljeysvy0n5CKkhPA39YTKR2mImjLAcTXnuaaEbzs
+   /0qk2KINKUJIAQ4cxVt7oekQ6ftC1zTekVarD2kFD9PCXEmL33O/W7qKi
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="352480581"
+X-IronPort-AV: E=Sophos;i="5.97,228,1669104000"; 
+   d="scan'208";a="352480581"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 00:14:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="637608739"
+X-IronPort-AV: E=Sophos;i="5.97,228,1669104000"; 
+   d="scan'208";a="637608739"
+Received: from r031s002_zp31l10c01.gv.intel.com (HELO fedora..) ([10.219.171.29])
+  by orsmga006.jf.intel.com with ESMTP; 19 Jan 2023 00:13:59 -0800
+From:   Meadhbh <meadhbh.fitzpatrick@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        vdronov@redhat.com, wojciech.ziemba@intel.com,
+        tomaszx.kowalik@intel.com, bagasdotme@gmail.com,
+        linux-kernel@vger.kernel.org,
+        Meadhbh <meadhbh.fitzpatrick@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] Documentation: qat: change kernel version
+Date:   Thu, 19 Jan 2023 09:05:08 +0100
+Message-Id: <20230119080508.24235-1-meadhbh.fitzpatrick@intel.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+Change kernel version from 5.20 to 6.0, as 5.20 is not a release.
 
-Convert platform_get_resource(), devm_ioremap_resource() to a single
-call to devm_platform_get_and_ioremap_resource(), as this is exactly
-what this function does.
-
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+Signed-off-by: Meadhbh Fitzpatrick <meadhbh.fitzpatrick@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/aspeed/aspeed-hace.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ Documentation/ABI/testing/sysfs-driver-qat | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/aspeed/aspeed-hace.c b/drivers/crypto/aspeed/aspeed-hace.c
-index 656cb92c8bb6..d2871e1de9c2 100644
---- a/drivers/crypto/aspeed/aspeed-hace.c
-+++ b/drivers/crypto/aspeed/aspeed-hace.c
-@@ -99,7 +99,6 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 	const struct of_device_id *hace_dev_id;
- 	struct aspeed_engine_hash *hash_engine;
- 	struct aspeed_hace_dev *hace_dev;
--	struct resource *res;
- 	int rc;
-
- 	hace_dev = devm_kzalloc(&pdev->dev, sizeof(struct aspeed_hace_dev),
-@@ -118,11 +117,9 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 	hash_engine = &hace_dev->hash_engine;
- 	crypto_engine = &hace_dev->crypto_engine;
-
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--
- 	platform_set_drvdata(pdev, hace_dev);
-
--	hace_dev->regs = devm_ioremap_resource(&pdev->dev, res);
-+	hace_dev->regs = devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
- 	if (IS_ERR(hace_dev->regs))
- 		return PTR_ERR(hace_dev->regs);
-
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
+index 185f81a2aab3..087842b1969e 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat
++++ b/Documentation/ABI/testing/sysfs-driver-qat
+@@ -1,6 +1,6 @@
+ What:		/sys/bus/pci/devices/<BDF>/qat/state
+ Date:		June 2022
+-KernelVersion:	5.20
++KernelVersion:	6.0
+ Contact:	qat-linux@intel.com
+ Description:	(RW) Reports the current state of the QAT device. Write to
+ 		the file to start or stop the device.
+@@ -18,7 +18,7 @@ Description:	(RW) Reports the current state of the QAT device. Write to
+ 
+ What:		/sys/bus/pci/devices/<BDF>/qat/cfg_services
+ Date:		June 2022
+-KernelVersion:	5.20
++KernelVersion:	6.0
+ Contact:	qat-linux@intel.com
+ Description:	(RW) Reports the current configuration of the QAT device.
+ 		Write to the file to change the configured services.
 -- 
-2.25.1
+2.37.3
+
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
+
