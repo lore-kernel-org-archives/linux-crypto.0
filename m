@@ -2,81 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB84C00A5A
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 09:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 417BCC004D4
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 09:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229486AbjASJIy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 04:08:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34380 "EHLO
+        id S230200AbjASJvu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 04:51:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbjASJIw (ORCPT
+        with ESMTP id S230227AbjASJvf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 04:08:52 -0500
+        Thu, 19 Jan 2023 04:51:35 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9612B55AE
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 01:08:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EAC8676F2;
+        Thu, 19 Jan 2023 01:51:30 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pIQuc-001gkV-Qe; Thu, 19 Jan 2023 17:08:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 19 Jan 2023 17:08:46 +0800
-Date:   Thu, 19 Jan 2023 17:08:46 +0800
+        id 1pIRZh-001hVL-5O; Thu, 19 Jan 2023 17:51:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 19 Jan 2023 17:51:13 +0800
+Date:   Thu, 19 Jan 2023 17:51:13 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: xts - Handle EBUSY correctly
-Message-ID: <Y8kInrsuWybCTgK0@gondor.apana.org.au>
+To:     Dmitry Safonov <dima@arista.com>
+Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 1/4] crypto: Introduce crypto_pool
+Message-ID: <Y8kSkW4X4vQdFyOl@gondor.apana.org.au>
+References: <20230118214111.394416-1-dima@arista.com>
+ <20230118214111.394416-2-dima@arista.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20230118214111.394416-2-dima@arista.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As it is xts only handles the special return value of EINPROGERSS,
-which means that in all other cases it will free data related to the
-request.
+On Wed, Jan 18, 2023 at 09:41:08PM +0000, Dmitry Safonov wrote:
+> Introduce a per-CPU pool of async crypto requests that can be used
+> in bh-disabled contexts (designed with net RX/TX softirqs as users in
+> mind). Allocation can sleep and is a slow-path.
+> Initial implementation has only ahash as a backend and a fix-sized array
+> of possible algorithms used in parallel.
+> 
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> ---
+>  crypto/Kconfig        |   3 +
+>  crypto/Makefile       |   1 +
+>  crypto/crypto_pool.c  | 333 ++++++++++++++++++++++++++++++++++++++++++
+>  include/crypto/pool.h |  46 ++++++
+>  4 files changed, 383 insertions(+)
+>  create mode 100644 crypto/crypto_pool.c
+>  create mode 100644 include/crypto/pool.h
 
-However, as the caller of xts may specify MAY_BACKLOG, we also need
-to expect EBUSY and treat it in the same way.  Otherwise backlogged
-requests will trigger a use-after-free.
+I'm still nacking this.
 
-Fixes: 8083b1bf8163 ("crypto: xts - add support for ciphertext stealing")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+I'm currently working on per-request keys which should render
+this unnecessary.  With per-request keys you can simply do an
+atomic kmalloc when you compute the hash.
 
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 63c85b9e64e0..de6cbcf69bbd 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -203,12 +203,12 @@ static void xts_encrypt_done(struct crypto_async_request *areq, int err)
- 	if (!err) {
- 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 
--		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+		rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
- 		err = xts_xor_tweak_post(req, true);
- 
- 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
- 			err = xts_cts_final(req, crypto_skcipher_encrypt);
--			if (err == -EINPROGRESS)
-+			if (err == -EINPROGRESS || err == -EBUSY)
- 				return;
- 		}
- 	}
-@@ -223,12 +223,12 @@ static void xts_decrypt_done(struct crypto_async_request *areq, int err)
- 	if (!err) {
- 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
- 
--		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
-+		rctx->subreq.base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
- 		err = xts_xor_tweak_post(req, false);
- 
- 		if (!err && unlikely(req->cryptlen % XTS_BLOCK_SIZE)) {
- 			err = xts_cts_final(req, crypto_skcipher_decrypt);
--			if (err == -EINPROGRESS)
-+			if (err == -EINPROGRESS || err == -EBUSY)
- 				return;
- 		}
- 	}
+Modelling tcp_md5 is just propagating bad code.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
