@@ -2,150 +2,159 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC94EC46467
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 22:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13052C6379F
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 22:50:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229968AbjASWiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 17:38:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
+        id S229779AbjASWuA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 17:50:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbjASWhG (ORCPT
+        with ESMTP id S230350AbjASWtY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 17:37:06 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC510B747;
-        Thu, 19 Jan 2023 14:18:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PEXOVk/EJ7Sb9doam88dUjUE0/dMugXODGhSNHg1Rc5Zv+3Wk7XqERDqZP/NvjoMFjFokUEbI1KvuCLq5KwSL48B0AlzjNhKLXjMziDx/rG6QpmzdesOTfS02FJ06UoUSUoQwOtVT6wHK1fMjtPjG2W63q8+c3q1+Tfp91ec2A/dd8GUSYdPGemzBdiErQdw5SgKxl1pcR4cDOAT4jN711ExdBY80dxXcJSPBsobo6P7Zrb7364PRzxXmX1TfayiufnIxdAL1H203KpBntcuzhiSS9/cO/e6rCNclR+dQ2eQsW5Mrw1sA5HwLGkXTarvJMC1cMZv43bS151o78ooWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fQAvO+vPnSsQkwXtBC0qEi41z0FWZ73yOQabW51oc3I=;
- b=MTxA6OBj5LkEn0JxI9INMSHpzmirMISccUAvyO+CpIyGH4QTeoD00Tu0fy8hXch0iyGNnCiIdp4D1y/ILyxGY+I/j3Y384HvAnLOJkWIOIPZqw+xNfdB6nfFfWUfyZBSE4tq/LL1lZlDC4av5lgjjeH3KgbxLQhV6FKEin4SS2Ua2ykMTf7WSbFY8KyHqYTOprU4TAse7lk6uXRcHs9iHoLcK7np88SE4geteZwQAgJrNsH/VoNvDogVTK5pWB7qnRgQ+cSX4qaDaT0+X4h/2B9JfiMglr0p7DB2058xTCoYESPcEaWXBY9y5175JbvPmvCzTKRYI3OWGHBJjVhB3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fQAvO+vPnSsQkwXtBC0qEi41z0FWZ73yOQabW51oc3I=;
- b=AjuicwzJEfvXhhYP1FY0p/Evu71ltcTL64JyhNZluAGmk8mnxTkjB+wSyCfR0cZwmJsxxmRBiqrfOjgvSSpViZkAWP+IyKy4ztTbM+fAKuSRwP7+WPX2YRqQRdwwZP8m0/urk5JBD7jlR/zBKeumJErLA0WUdj8Qvc4plUMnBxY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by PH7PR12MB5974.namprd12.prod.outlook.com (2603:10b6:510:1d9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Thu, 19 Jan
- 2023 22:18:46 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5986.023; Thu, 19 Jan 2023
- 22:18:46 +0000
-Message-ID: <d09e13c2-3a3d-924b-05b3-560fe1121516@amd.com>
-Date:   Thu, 19 Jan 2023 16:18:39 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-Content-Language: en-US
-To:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-63-michael.roth@amd.com>
- <CAAH4kHZVaeL57bGAzeDjJDTumsnb96iAYBdhm7cs_8TjBg+v3w@mail.gmail.com>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <CAAH4kHZVaeL57bGAzeDjJDTumsnb96iAYBdhm7cs_8TjBg+v3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0130.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::15) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        Thu, 19 Jan 2023 17:49:24 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556EB2135;
+        Thu, 19 Jan 2023 14:32:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674167555; x=1705703555;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JoJGpj8vaP9dF2CWcRmJfrTrGxAvkWjp3W42IgzKc3E=;
+  b=oArC4bfcDJvjIAZZWuq/gP0twfANd68b+/1bZrB/rrZfWittmur8+o88
+   uWmDg8GoQ6VGMhVQpdSuv8OieZNQa0hsYmbtv+pn7qM/tFXwdMcZi43rf
+   8l0/Qd/xn/hFacrDPX5jLE9Fjg7k9vIB9PoAVo2AoS9UxBtkdiXHqsShy
+   B1LgEBgFI2+SaqQMw9Q0POkBwCGnzA3e7BZSJ3jipNLCZi36DgYMBprVx
+   k8fyIEE6o0WVzuW/3em6DTiygyT7zqFqfumpAywhn8Cs5C6tTV+0qEH4w
+   teAcIsCkUauQWlWGI2bAE34UF3Cm0hyJ7yx3AZ2Zs7YiefqW00B3/zCp7
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="389965184"
+X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
+   d="scan'208";a="389965184"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 14:31:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="768410237"
+X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
+   d="scan'208";a="768410237"
+Received: from lkp-server01.sh.intel.com (HELO 5646d64e7320) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 19 Jan 2023 14:31:26 -0800
+Received: from kbuild by 5646d64e7320 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pIdRN-0001uq-2N;
+        Thu, 19 Jan 2023 22:31:25 +0000
+Date:   Fri, 20 Jan 2023 06:31:05 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Babis Chalios <bchalios@amazon.es>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     oe-kbuild-all@lists.linux.dev, amit@kernel.org, graf@amazon.de,
+        Jason@zx2c4.com, xmarcalx@amazon.co.uk
+Subject: Re: [PATCH 2/2] virtio-rng: add sysfs entries for leak detection
+Message-ID: <202301200640.CsblwTsa-lkp@intel.com>
+References: <20230119184349.74072-3-bchalios@amazon.es>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|PH7PR12MB5974:EE_
-X-MS-Office365-Filtering-Correlation-Id: e76a7f86-e9c0-4a26-d607-08dafa6b2178
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4gb90v+E0qr24+8KIIfqdJJZDiine2of12V1UILkf0s1bDtm5c3+P+0zw13jvM+vKvY1TzngGUuhGaxBh/S1CfU4VGDn6Qof17eanRKx5J9u9bpsbPXLP6L9djHiTSdguyrOgbJIZ218g3hip5ctZZea/tWoyZOjICgParFON7kY1KyCbY3NqzlVvqq/r5SyvhcEuE/knODl3Z6WiPbBMpZaEY41Mddop9YZkyfnuVUarKl2o9hN3bUAPL7GhW+6OZxBupjCGxUuhZ+U36hDeChWxbjbMRoMFwPS4MOQh+seAqrtL3+i5e/p2vdZ/mA49HHhIqeH1WnryAtMlZkc4FIgqw3nLB8fIczBgorHtZsUfJn9E8Qjk/vc6c+cf4w54jh4FG1i4aGsBXNzgq+uGrMrNjJOHlT7zTz/p5Cb4iss8DLgudflE2nlWxzVzwDEgKiF+7VGq10Hec7rjjG0pRvmIQrYSVkauoSHWN0CbNf2K0k3v97ybK8mL7xdjGCepKw33ur1n2gNjvEpCHpK+Qm2BLg9okRluK+Ojeu8e0Y2vE1Hw7oLXxgz4ErcNkrVIk6gyB/Vlmh2brnRSSLNGjD6i0B0P8G/Y6g5lYgD1HdMg5LR6l7YH7SWR1jTKg6BvW/Lluw6ymZdVHqQa/+jy1osVSKvj/6N5ksMFGmiLo/7OoRcLh+wKso9TBVIkANupgvE14kKmuxm5fMb5lKKipI1TQVxWqIQhmtW0cuksbE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(366004)(39860400002)(136003)(376002)(451199015)(86362001)(2616005)(186003)(26005)(36756003)(4326008)(8676002)(66556008)(66946007)(53546011)(66476007)(31696002)(41300700001)(6512007)(4744005)(7416002)(6666004)(478600001)(6636002)(6506007)(110136005)(316002)(38100700002)(6486002)(7406005)(2906002)(5660300002)(83380400001)(8936002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VFRydjQ0dlRXOGloaGZ0NXltLzJTMkE5NFhPczJjVnpaVHFxcXIvTTdUTDBG?=
- =?utf-8?B?TmI2ZG5SbUc5OEVCSWdUWCswQWJOeFRJMDRyVHo5d2hwRHhRWDFIeTB5d0JX?=
- =?utf-8?B?NjdNWEdHc3hBajFhcFF0WHVZSXowSGdFNEY1K0xwdnJZbXNEMnNRalN3R2Rk?=
- =?utf-8?B?dExqR1B3aGhmenk2R0hkN3lZSkE0cXlSZXdjMkM2WEVRMnN1L3VBZTN0SkRk?=
- =?utf-8?B?eWM1dVI3aGdhWmNIK0VVb2pjOFhGK3paeEN5Y0NDMm9FRVIrc0wyZnplZjVl?=
- =?utf-8?B?a3h0SDVCM1ltUXlIVHJMQUtTUjdXSFczcmErRE1MTy94NlhqWkNwOFRvdmw3?=
- =?utf-8?B?RU5TSHQzdU9pSHJHbnBFbjdrd2hUbUhiM2NFWko3WmNuS0R2TjM5eE1sNmhM?=
- =?utf-8?B?dzNMMEpEYTZnYTBUZ2N5c2EvRmNraVY5TzdhOHpRU2dWQjk3Y2Y4amkxcVo0?=
- =?utf-8?B?dzBKc0FmelpmbzhlNFlYOXNTZGZtTTd4bDRVZ2RYMjA4OUtwYnA4bEgxL0xM?=
- =?utf-8?B?bFpnZjBSbVlQQmxQcFRmSTFMTWwxVTlMTjVNcHBrVWtrRWdlRHBwMTM5YlhP?=
- =?utf-8?B?TnZPbUsxRWl0QzUyMy85RmtVTTRHV29tSDVxall1OTJHemtoYndJbUdIazZj?=
- =?utf-8?B?WlFPdVlsR2QrTmZqc1BzTG9DZmZXd0Z3R3FUUHVkd3VySkhpWEJORnQ0L3hO?=
- =?utf-8?B?NGFxZ0xwOHlibVBHajllS3Q0SXpjNTVKa2tTa3VXUDYzQXZtanJrajk2emN1?=
- =?utf-8?B?UWJUelpmcjgvRjZsWUQ2V2NjbkpXYUlmM3dTMUlVNURBaXJNV1NtNXVLOGk0?=
- =?utf-8?B?WHA2UG9MV0daTzFmUEV3ZHZMRHRIT0V4Slp5U3kyYk9WRUR6TUIxTEtxbTEr?=
- =?utf-8?B?S0xNbmxQdWV0VGFtOThsT2NldmNUZ0pUaStaVUN5Qjk3bjEzR09jYyt3QlFo?=
- =?utf-8?B?UzA4OUpUMjA3cTh0R2tpMkF6VFdjUExvOXE3MURkOTNGSEN6alRFeVpTdzVO?=
- =?utf-8?B?dEtJSjU1c2IvRXFGV0plUVAxTHhoSU03dEpEY1lUYmxxUVlGKzJMY1IycUJn?=
- =?utf-8?B?WUpmL3FPdDBjbjhMdzRnNXVSNUp0WFRJN3RWdnJGMlE1RGlPeExYYVdqS1lI?=
- =?utf-8?B?WjdUWUhaVFNpWDhjNUVsS1NqWDdLbWx5WW5pVVdHNTR1Q21ZYm5wTUd1SW12?=
- =?utf-8?B?aUMrZDQyNWtlaTJ4QURReUQzNGJacW1XWElHVER6MTN1a2JiSndBTnV6NXBP?=
- =?utf-8?B?YXFLN0IvaXByVVFNd25kTzRId2JSSVlOZHA2WllZcUNWK3VWSllJakFaV0Nt?=
- =?utf-8?B?bXdORlBXY2tjL1NYQ095OTZ5dWtXUjNFWllOTHRqOHpvcExjaXVUQmZXbDRk?=
- =?utf-8?B?VFhuWm1tMzFMbzZmWWZ6T3VDd1h6RG1WUlJvTVJIOHlhK241Mi92amt2WTNZ?=
- =?utf-8?B?Y0tYcW53cjJpOHdVM3ZhTlBRRjZ0OEw4dVZweXhwZmxtalZ1NVRxRUQ5Z0pk?=
- =?utf-8?B?RHhIQy9uYU5LNG9uY2w3TmZJMHlqbHBhTXFYbzRFV2RBNUVUaDVqVEl6OEIw?=
- =?utf-8?B?U2pOcnpwbVlQMG85czBleDhTT1R1ZUFwUERpb09Md0krQ0trTkhjOU5Ga3d5?=
- =?utf-8?B?ZEtVbHl2WVU2ME1CUjFSUU9nL0UvVUE4NjNSN0FYcHFCOG42UU9LQWgzREJN?=
- =?utf-8?B?eGdIMkg1MCsxeUVYZm1mZ1FhTzhnakYxWk1US2s5b2ZUYUhEMnhkWjdhSGN4?=
- =?utf-8?B?QW5ieVZhUU42OXJ0RnZxTTFCdEFrcmlkNUdVbXoyVERmSk84Sy9qYW9POS9y?=
- =?utf-8?B?SDdjSnBjUlpWemZLYnR4SVRiRnFjUlhwSkQvWlZ3YkkzeXNaMVI2NVRRY3ov?=
- =?utf-8?B?RzdSMlhtdkVuTTI3ZzdVSGtENnlwMU11d1hsdlJKRy9VYmdHM1IxTjllMHUy?=
- =?utf-8?B?bHdjUWxweW1VcjZJYWVCRHdqcmpTNWdjV20rbUJ3dGMwa3AvdVZVbDV3KzM1?=
- =?utf-8?B?eUpUZlhsNTUrTi9KK0xaa2NBVkxRSjZTR3VYY2N0UllBR25MczVyNHhvNk9l?=
- =?utf-8?B?cWFhdnI0b1h0WGVUckozV0VsV3ZNOTY2S3ZmYTNxUnBmY0FLUUhBcXp4Q013?=
- =?utf-8?Q?v4klIc+u998OjkFeqwHHKpzEj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e76a7f86-e9c0-4a26-d607-08dafa6b2178
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2023 22:18:45.9483
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: afhsZLqjDPcvOc3iRwAcJZ/hrzjFh8di3KrNZCFEBhN7PnbJ2+ajbndshX1JOqVOq7oykPTUo0I42htMLRLWfw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5974
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230119184349.74072-3-bchalios@amazon.es>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Dionna,
+Hi Babis,
 
-Do you also have other updates to this patch with regard to review 
-comments from Dov ?
+Thank you for the patch! Perhaps something to improve:
 
-Thanks,
-Ashish
+[auto build test WARNING on char-misc/char-misc-testing]
+[also build test WARNING on char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.2-rc4 next-20230119]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-On 1/19/2023 12:49 PM, Dionna Amalie Glaze wrote:
->> +
->> +       /* Page-align the length */
->> +       length = (params.certs_len + PAGE_SIZE - 1) & PAGE_MASK;
->> +
-> 
-> I believe Ashish wanted this to be PAGE_ALIGN(params.certs_len)
-> 
+url:    https://github.com/intel-lab-lkp/linux/commits/Babis-Chalios/virtio-rng-implement-entropy-leak-feature/20230120-024631
+patch link:    https://lore.kernel.org/r/20230119184349.74072-3-bchalios%40amazon.es
+patch subject: [PATCH 2/2] virtio-rng: add sysfs entries for leak detection
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230120/202301200640.CsblwTsa-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/2a801d93b8225555e4cb293a173e2053870cb2d1
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Babis-Chalios/virtio-rng-implement-entropy-leak-feature/20230120-024631
+        git checkout 2a801d93b8225555e4cb293a173e2053870cb2d1
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/char/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/char/hw_random/virtio-rng.c:61:9: warning: no previous prototype for 'virtrng_sysfs_read' [-Wmissing-prototypes]
+      61 | ssize_t virtrng_sysfs_read(struct file *filep, struct kobject *kobj,
+         |         ^~~~~~~~~~~~~~~~~~
+>> drivers/char/hw_random/virtio-rng.c:76:5: warning: no previous prototype for 'virtrng_sysfs_mmap' [-Wmissing-prototypes]
+      76 | int virtrng_sysfs_mmap(struct file *filep, struct kobject *kobj,
+         |     ^~~~~~~~~~~~~~~~~~
+   drivers/char/hw_random/virtio-rng.c:106:5: warning: no previous prototype for 'add_fill_on_leak_request' [-Wmissing-prototypes]
+     106 | int add_fill_on_leak_request(struct virtrng_info *vi, struct virtqueue *vq, void *data, size_t len)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/char/hw_random/virtio-rng.c:120:5: warning: no previous prototype for 'virtrng_fill_on_leak' [-Wmissing-prototypes]
+     120 | int virtrng_fill_on_leak(struct virtrng_info *vi, void *data, size_t len)
+         |     ^~~~~~~~~~~~~~~~~~~~
+   drivers/char/hw_random/virtio-rng.c:141:5: warning: no previous prototype for 'add_copy_on_leak_request' [-Wmissing-prototypes]
+     141 | int add_copy_on_leak_request(struct virtrng_info *vi, struct virtqueue *vq,
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/char/hw_random/virtio-rng.c:160:5: warning: no previous prototype for 'virtrng_copy_on_leak' [-Wmissing-prototypes]
+     160 | int virtrng_copy_on_leak(struct virtrng_info *vi, void *to, void *from, size_t len)
+         |     ^~~~~~~~~~~~~~~~~~~~
+
+
+vim +/virtrng_sysfs_read +61 drivers/char/hw_random/virtio-rng.c
+
+    59	
+    60	#ifdef CONFIG_SYSFS
+  > 61	ssize_t virtrng_sysfs_read(struct file *filep, struct kobject *kobj,
+    62			struct bin_attribute *attr, char *buf, loff_t pos, size_t len)
+    63	{
+    64		struct virtrng_info *vi = attr->private;
+    65		unsigned long gen_counter = *(unsigned long *)vi->map_buffer;
+    66	
+    67		if (!len)
+    68			return 0;
+    69	
+    70		len = min(len, sizeof(gen_counter));
+    71		memcpy(buf, &gen_counter, len);
+    72	
+    73		return len;
+    74	}
+    75	
+  > 76	int virtrng_sysfs_mmap(struct file *filep, struct kobject *kobj,
+    77			struct bin_attribute *attr, struct vm_area_struct *vma)
+    78	{
+    79		struct virtrng_info *vi = attr->private;
+    80	
+    81		if (vma->vm_pgoff || vma_pages(vma) > 1)
+    82			return -EINVAL;
+    83	
+    84		if (vma->vm_flags & VM_WRITE)
+    85			return -EPERM;
+    86	
+    87		vma->vm_flags |= VM_DONTEXPAND;
+    88		vma->vm_flags &= ~VM_MAYWRITE;
+    89	
+    90		return vm_insert_page(vma, vma->vm_start, virt_to_page(vi->map_buffer));
+    91	}
+    92	#endif
+    93	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
