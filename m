@@ -2,177 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49696C38142
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 18:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C01C46467
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Jan 2023 18:44:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbjASSDw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 13:03:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
+        id S230317AbjASSod (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 Jan 2023 13:44:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjASSDv (ORCPT
+        with ESMTP id S230273AbjASSoc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 13:03:51 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF494EE3
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 10:03:49 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id k16so2196842wms.2
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 10:03:49 -0800 (PST)
+        Thu, 19 Jan 2023 13:44:32 -0500
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293BB792B4;
+        Thu, 19 Jan 2023 10:44:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4bF12/qep1PDbFnO6gUHntH+OCUapHjuYPjeXCbRLq0=;
-        b=Odx7DxEIHZg8hwb036lS+h52uP+N0Tzhudi68CBDrmtYNk4vhRChvSAU4G/Ef3QKpl
-         DDu4aZrVvOK4k461M5Uaz9yoV7yPZn1lsqiO1sYqS+WH3hmQxk6dPGS6FLJqVz6USbQa
-         IDja8SUPgnIMu53xDiEj/bdsop6E+QJjuAiHNKCmBVG9Vx+vJINg1qzFC/eFsixJrOaj
-         GonQkyr8FlkomBOO6y6mcn4xemD5LY+hDcbWo8KJnXlN/ypB1aqUr9hI4tqjmaybnppx
-         ynSjLVJRnrJNij25tUESpT0bEWbyeOBmtPwKlpx2ew5WD3q728fhYgYFc1pL69J8RdY/
-         y37w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4bF12/qep1PDbFnO6gUHntH+OCUapHjuYPjeXCbRLq0=;
-        b=p4iV6q+CpuWDYUyBfyKtW9jinJRkBOEOprFsrTS0bctpTxGEJF93tGrYEJpqH0YEtz
-         CeH6v0Dbk9S3BxuYyqYRfSKxeCGKOdyt93hKC2dM9Zfy+ANaVIxlsSTs6wFDSTXDmZVP
-         uAsNLApOamfxGXnAS3YFknqEm2PuAINtHmRm2jfixjMprx2B+fxEXSF8cE4s49cR3g9v
-         MA4pSvRB2dgQwjyw74u80HGP26ZU4blgTrezIPjC+54NrCGT+D+Gzs74RMuqW2Hr600H
-         miACJb9mu0RNnB3GEhGkFzLRn4x90aiVKnK5lyQIm/HwtrO72XkJoNE7FCDxd2wVXs65
-         MQTg==
-X-Gm-Message-State: AFqh2kqkrKCRDAUyYN2e7x35R8X189IAFE/yX/9+NoXzGTy87AkXaax6
-        esPsXaNepPnjQtSRcz0n2WnVAA==
-X-Google-Smtp-Source: AMrXdXszga0ovrLNYBNRra1xJWbMqemjj5lTl/z+wA8QSmzAs91cZM/qUtPy8gH84Fx22A2yFJ+LzQ==
-X-Received: by 2002:a05:600c:1f0a:b0:3db:1200:996e with SMTP id bd10-20020a05600c1f0a00b003db1200996emr6839875wmb.16.1674151427540;
-        Thu, 19 Jan 2023 10:03:47 -0800 (PST)
-Received: from [10.83.37.24] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id m9-20020a7bca49000000b003d98f92692fsm5382293wml.17.2023.01.19.10.03.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jan 2023 10:03:47 -0800 (PST)
-Message-ID: <7c4138b4-e7dd-c9c5-11ac-68be90563cad@arista.com>
-Date:   Thu, 19 Jan 2023 18:03:40 +0000
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1674153872; x=1705689872;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wGwQKx3jVgkXv97zihQNrADOvcnkGtzPZPkJZJLzNoc=;
+  b=Z747Av2xidKc4t6XYSibwpAOv0OK64G1eP1vew1Mf0m/epqcn3e0kcSn
+   4eRIN/nloTXcwKbyaVMMVd/iW+BX1dZ+sAupF1tPNStNB5IQxWLM8Pnh2
+   OFCbefE1Uo4Oo/mSJKgFQJ+OnnzGvB4bLt/CkvjrratDlsn/eHzK5SEbZ
+   c=;
+X-IronPort-AV: E=Sophos;i="5.97,229,1669075200"; 
+   d="scan'208";a="302113360"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 18:44:27 +0000
+Received: from EX13D51EUB004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 21E2241CCC;
+        Thu, 19 Jan 2023 18:44:25 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX13D51EUB004.ant.amazon.com (10.43.166.217) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Thu, 19 Jan 2023 18:44:23 +0000
+Received: from f4d4887fdcfb.ant.amazon.com (10.43.162.56) by
+ EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1118.7; Thu, 19 Jan 2023 18:44:19 +0000
+From:   Babis Chalios <bchalios@amazon.es>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        Babis Chalios <bchalios@amazon.es>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <amit@kernel.org>, <graf@amazon.de>, <Jason@zx2c4.com>,
+        <xmarcalx@amazon.co.uk>
+Subject: [PATCH 0/2] [RFC] virtio-rng entropy leak reporting feature
+Date:   Thu, 19 Jan 2023 19:43:46 +0100
+Message-ID: <20230119184349.74072-1-bchalios@amazon.es>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v4 1/4] crypto: Introduce crypto_pool
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20230118214111.394416-1-dima@arista.com>
- <20230118214111.394416-2-dima@arista.com>
- <Y8kSkW4X4vQdFyOl@gondor.apana.org.au>
-From:   Dmitry Safonov <dima@arista.com>
-In-Reply-To: <Y8kSkW4X4vQdFyOl@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
+X-Originating-IP: [10.43.162.56]
+X-ClientProxiedBy: EX13D44UWC002.ant.amazon.com (10.43.162.169) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+Recently, a proposal has been published [1] for a new feature in the
+VirtIO RNG device which will allows the device to report "entropy leaks"
+to the guest VM. Such an event occurs when, for example, we take a VM
+snapshot, or when we restore a VM from a snapshot.
 
-On 1/19/23 09:51, Herbert Xu wrote:
-> On Wed, Jan 18, 2023 at 09:41:08PM +0000, Dmitry Safonov wrote:
->> Introduce a per-CPU pool of async crypto requests that can be used
->> in bh-disabled contexts (designed with net RX/TX softirqs as users in
->> mind). Allocation can sleep and is a slow-path.
->> Initial implementation has only ahash as a backend and a fix-sized array
->> of possible algorithms used in parallel.
->>
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
->> ---
->>  crypto/Kconfig        |   3 +
->>  crypto/Makefile       |   1 +
->>  crypto/crypto_pool.c  | 333 ++++++++++++++++++++++++++++++++++++++++++
->>  include/crypto/pool.h |  46 ++++++
->>  4 files changed, 383 insertions(+)
->>  create mode 100644 crypto/crypto_pool.c
->>  create mode 100644 include/crypto/pool.h
-> 
-> I'm still nacking this.
-> 
-> I'm currently working on per-request keys which should render
-> this unnecessary.  With per-request keys you can simply do an
-> atomic kmalloc when you compute the hash.
+The feature allows the guest to request for certain operations to be
+performed upon an entropy leak event. When such an event occurs, the
+device will handle the requests and add the request buffers to the used
+queue. Adding these buffers to the used queue operates as a notification
+towards the guest about the entropy leak event.
 
-Adding per-request keys sounds like a real improvement to me.
-But that is not the same issue I'm addressing here. I'm maybe bad at
-describing or maybe I just don't see how per-request keys would help.
-Let me describe the problem I'm solving again and please feel free to
-correct inline or suggest alternatives.
+The proposed changes describe two types of requests that can be
+performed: (1) fill a buffer in guest memory with random bytes and (2)
+perform a memory copy between two buffers in guest memory.
 
-The initial need for crypto_pool comes from TCP-AO implementation that
-I'm pusing upstream, see RFC5925 that describes the option and the
-latest version of patch set is in [1]. In that patch set hashing is used
-in a similar way to TCP-MD5: crypto_alloc_ahash() is a slow-path in
-setsockopt() and the use of pre-allocated requests in fast path, TX/RX
-softirqs.
+The mechanism provides similar functionality to Microsoft's Virtual
+Machine Generation ID and it can be used to re-seed the kernel's PRNG
+upon taking a VM snapshot or resuming from one. Additionally, it allows
+to (1) avoid the race-condition that exists with our VMGENID
+implementation, between the time a VM is resumed after a "leak event"
+and the handling of the ACPI notification before adding the new entropy.
+Finally, it allows building on top of it to provide a mechanism for
+notifying user-space about such events.
 
-For TCP-AO 2 algorithms are "must have" in any compliant implementation,
-according to RFC5926: HMAC-SHA-1-96 and AES-128-CMAC-96, other
-algorithms are optional. But having in mind that sha1, as you know, is
-not secure to collision attacks, some customers prefer to have/use
-stronger hashes. In other words, TCP-AO implementation needs 2+ hashing
-algorithms to be used in a similar manner as TCP-MD5 uses MD5 hashing.
+The first patch of this series, extends the current virtio-rng driver to
+implement the new feature and ensures that there is always a request to
+get some random bytes from the device in the event of an entropy leak
+and uses these bytes as entropy through the `add_device_randomness`.
 
-And than, I look around and I see that the same pattern (slow allocation
-of crypto request and usage on a fast-path with bh disabled) is used in
-other places over kernel:
-- here I convert to crypto_pool seg6_hmac & tcp-md5
-- net/ipv4/ah4.c could benefit from it: currently it allocates
-crypto_alloc_ahash() per every connection, allocating user-specified
-hash algorithm with ahash = crypto_alloc_ahash(x->aalg->alg_name, 0, 0),
-which are not shared between each other and it doesn't provide
-pre-allocated temporary/scratch buffer to calculate hash, so it uses
-GFP_ATOMIC in ah_alloc_tmp()
-- net/ipv6/ah6.c is copy'n'paste of the above
-- net/ipv4/esp4.c and net/ipv6/esp6.c are more-or-less also copy'n'paste
-with crypto_alloc_aead() instead of crypto_alloc_ahash()
-- net/mac80211/ - another example of the same pattern, see even the
-comment in ieee80211_key_alloc() where the keys are allocated and the
-usage in net/mac80211/{rx,tx}.c with bh-disabled
-- net/xfrm/xfrm_ipcomp.c has its own manager for different compression
-algorithms that are used in quite the same fashion. The significant
-exception is scratch area: it's IPCOMP_SCRATCH_SIZE=65400. So, if it
-could be shared with other crypto users that do the same pattern
-(bh-disabled usage), it would save some memory.
+The second patch adds a copy-on-leak command as well in the queue,
+implementating the idea of a generation counter that has previously been
+part of the VMGENID saga. It then exposes the value of the generation
+counter over a sysfs file. User-space can read, mmap and poll on the
+file in order to be notified about entropy leak events.
 
-And those are just fast-grep examples from net/, looking closer it may
-be possible to find more potential users.
-So, in crypto_pool.c it's 333 lines where is a manager that let a user
-share pre-allocated ahash requests [comp, aead, may be added on top]
-inside bh-disabled section as well as share a temporary/scratch buffer.
-It will make it possible to remove some if not all custom managers of
-the very same code pattern, some of which don't even try to share
-pre-allocated tfms.
+I have performed basic tests of the user-space interfaces using a
+Firecracker where I implemented virtio-rng with the proposed features.
+Instructions on how to replicate this can be found here:
+https://github.com/bchalios/virtio-snapsafe-example
 
-That's why I see some value in this crypto-pool thing.
-If you NACK it, the alternative for TCP-AO patches would be to add just
-another pool into net/ipv4/tcp.c that either copies TCP-MD5 code or
-re-uses it.
+The patchset does not solve all problems. We do not define an API for
+other parts of the kernel to be able to use directly the new
+functionality (add commands to the queue), mainly because I 'm not sure
+what would the correct API be. I was toying with the idea of extending
+`struct hwrng` with two new hooks that would be implemented only by
+virtio-rng but I'm not sure I like it, so I am open to suggestions.
 
-I fail to see how your per-request keys patches would provide an API
-alternative to this patch set. Still, users will have to manage
-pre-allocated tfms and buffers.
-I can actually see how your per-request keys would benefit *from* this
-patch set: it will be much easier to wire per-req keys up to crypto_pool
-to avoid per-CPU tfm allocation for algorithms you'll add support for.
-In that case you won't have to patch crypto-pool users.
+As a result of the above, the way we use the functionality to add new
+entropy, i.e. calling `add_device_randomness`, is as racy as the VMGENID
+case, since it relies on used buffers been handled by the virtio driver.
 
-[1]:
-https://lore.kernel.org/all/20221027204347.529913-1-dima@arista.com/T/#u
+As for user-space, the `mmap` interface *is* race-free. Changes in the
+generation counter will be observable by user applications the moment VM
+vcpus resume. However, the `poll` interface isn't, `sysfs_notify` is
+being called as well when the virtio driver handles used buffers. I am
+not sure I have a solution for this last one.
 
-Thanks, waiting for your input,
-          Dmitry
+Posting this, I hope we can resume the discussion about solving the
+above issues (or any other issue that I haven't thought of), especially
+with regards to providing a mechanism suitable for user-space
+notifications.
+
+Cheers,
+Babis
+
+Babis Chalios (2):
+  virtio-rng: implement entropy leak feature
+  virtio-rng: add sysfs entries for leak detection
+
+ drivers/char/hw_random/virtio-rng.c | 360 +++++++++++++++++++++++++++-
+ include/uapi/linux/virtio_rng.h     |   3 +
+ 2 files changed, 357 insertions(+), 6 deletions(-)
+
+-- 
+2.38.1
+
+Amazon Spain Services sociedad limitada unipersonal, Calle Ramirez de Prado 5, 28045 Madrid. Registro Mercantil de Madrid . Tomo 22458 . Folio 102 . Hoja M-401234 . CIF B84570936
+
