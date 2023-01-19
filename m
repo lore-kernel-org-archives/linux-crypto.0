@@ -2,107 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454CAC38159
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 04:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD0BC46467
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 05:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230201AbjATElZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Jan 2023 23:41:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55258 "EHLO
+        id S231517AbjATF3V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 00:29:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230253AbjATElA (ORCPT
+        with ESMTP id S231239AbjATF2p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Jan 2023 23:41:00 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A38C925B;
-        Thu, 19 Jan 2023 20:36:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674189412; x=1705725412;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=l+mSYcjCs3VtHdH4MTzk9fTsaIZXQ5VDUn8clsV5ONw=;
-  b=ExGc6r8lcPmyAr9i6HsLJwR9RyNE0MBELu9oDTcIb2RXZjEXmPNTz/m/
-   HamP6H5+K+m3RFRETzVH+tFgcyqV8ypWVgJpdK8YkoMYpSePWN/BHu9ZY
-   ClNO6cDmsOi5IRtzM1qCoCeONgH7biho6X57mJiItFxRP/ij+erRddUAt
-   HRwjXb8fWhbaHA57g3hKGJr6mlbb9h1oc5I01EbfWEF2eq/BRZpNv+YLO
-   DjiLW39IiC6FcMfQVkyCO4iI5zRZBIgD62CLQ6RUkW3iqG2zBJ8FGDhxA
-   59qI63V2jy1J7LYZfWpcthYdyWv4PWDpVmnYHRc9J9PIi1XbpUL1Mk9n9
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="411726038"
-X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
-   d="scan'208";a="411726038"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 19:07:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="692719398"
-X-IronPort-AV: E=Sophos;i="5.97,230,1669104000"; 
-   d="scan'208";a="692719398"
-Received: from lkp-server01.sh.intel.com (HELO 5646d64e7320) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 19 Jan 2023 19:07:37 -0800
-Received: from kbuild by 5646d64e7320 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pIhke-00027Z-13;
-        Fri, 20 Jan 2023 03:07:36 +0000
-Date:   Fri, 20 Jan 2023 11:07:16 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Babis Chalios <bchalios@amazon.es>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     oe-kbuild-all@lists.linux.dev, amit@kernel.org, graf@amazon.de,
-        Jason@zx2c4.com, xmarcalx@amazon.co.uk
-Subject: Re: [PATCH 2/2] virtio-rng: add sysfs entries for leak detection
-Message-ID: <202301201004.z1gRttwb-lkp@intel.com>
-References: <20230119184349.74072-3-bchalios@amazon.es>
+        Fri, 20 Jan 2023 00:28:45 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4F046D40
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 21:23:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1B813B823F7
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 14:05:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD919C43398
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 14:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674137113;
+        bh=cWZER9RVFSYIVQ+GvR+NYQUQ3OoWM6/H0pMET0zgWxw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=mmIzOr1ZYdToFCznwlFVn0UHZx79y6rZiLhiWF3ZTYsba9/Vu5EaKv3uxjTGZR4G8
+         f8aumzpqV/xvnzLivJCN/WqtnmBrC7TbnRvQgZI1l6DeI0Vvku1zx6xKWdnoqtvf/M
+         U702VoYivROawvFyO+/xlkyFjewUfL9fhEV+pczTglo4x3aSleMf7E0fOT0hHChYtk
+         Cp2BSoBfdUFzdktgrhw2AidVxPZDs1/xu2Pp3niTxdafhHqmMewaq+E9x3usACyrdr
+         7KywzH/vXhTyiPzSCVRv890PKjAA1LUlkZbClilcZXlHgD3VKV07KoQnHN+F5aB9I0
+         00zcEdc7kmr0Q==
+Received: by mail-lj1-f173.google.com with SMTP id s22so2196904ljp.5
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Jan 2023 06:05:13 -0800 (PST)
+X-Gm-Message-State: AFqh2kqRI45j2TC1CuvOVLeza+cOuzIHVJOMqqqEOUpEQn/m6UHt/+/Y
+        fty6/CTbsRpKTFz2tigmf6n6bqCAzPRs66OJNrM=
+X-Google-Smtp-Source: AMrXdXvX5TbHPsvC0y5fB3FIwUE1lRIWsli6EmD/1Sr8zqUN6Dtot0SRMPOONq09tBwiJw9cY3KzcGdBJq7922aem/E=
+X-Received: by 2002:a2e:8783:0:b0:289:7fc6:e1d with SMTP id
+ n3-20020a2e8783000000b002897fc60e1dmr576624lji.69.1674137111719; Thu, 19 Jan
+ 2023 06:05:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230119184349.74072-3-bchalios@amazon.es>
+References: <20221214171957.2833419-1-ardb@kernel.org> <CAMj1kXG_btjHUVpN9m5NoBdFv=3JWt-piPx_u40KTv70CC-sRQ@mail.gmail.com>
+ <Y8TEqNJuEmWE5Tg/@gondor.apana.org.au> <CAMj1kXExpt4U64ncX6wSU_0zLNNQGiP3RFGNbAXwpuBjeV=fPg@mail.gmail.com>
+ <Y8UFjlyFqg+uddZ5@gondor.apana.org.au>
+In-Reply-To: <Y8UFjlyFqg+uddZ5@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 19 Jan 2023 15:04:59 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGSkNROwP4NqEixMS1hw0qf3a_-b6AFacX1-=5mwG-yoQ@mail.gmail.com>
+Message-ID: <CAMj1kXGSkNROwP4NqEixMS1hw0qf3a_-b6AFacX1-=5mwG-yoQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] crypto: Accelerated GCM for IPSec on ARM/arm64
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Babis,
+On Mon, 16 Jan 2023 at 09:06, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Mon, Jan 16, 2023 at 08:40:09AM +0100, Ard Biesheuvel wrote:
+> >
+> > Will you be taking the rest of the series? (patches #2 - #4). Or we
+> > might defer this to v6.4 entirely it if makes things easier. (The
+> > other changes really shouldn't go through the ARM tree)
+>
+> I had assumed they were dependent.  But they do seem to make sense
+> on their own so yes I can certainly take patches 2-4.
+>
 
-Thank you for the patch! Perhaps something to improve:
+Excellent, thanks.
 
-[auto build test WARNING on char-misc/char-misc-testing]
-[also build test WARNING on char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.2-rc4 next-20230119]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Babis-Chalios/virtio-rng-implement-entropy-leak-feature/20230120-024631
-patch link:    https://lore.kernel.org/r/20230119184349.74072-3-bchalios%40amazon.es
-patch subject: [PATCH 2/2] virtio-rng: add sysfs entries for leak detection
-config: x86_64-randconfig-s021 (https://download.01.org/0day-ci/archive/20230120/202301201004.z1gRttwb-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/2a801d93b8225555e4cb293a173e2053870cb2d1
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Babis-Chalios/virtio-rng-implement-entropy-leak-feature/20230120-024631
-        git checkout 2a801d93b8225555e4cb293a173e2053870cb2d1
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 olddefconfig
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/char/hw_random/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/char/hw_random/virtio-rng.c:61:9: sparse: sparse: symbol 'virtrng_sysfs_read' was not declared. Should it be static?
->> drivers/char/hw_random/virtio-rng.c:76:5: sparse: sparse: symbol 'virtrng_sysfs_mmap' was not declared. Should it be static?
-   drivers/char/hw_random/virtio-rng.c:106:5: sparse: sparse: symbol 'add_fill_on_leak_request' was not declared. Should it be static?
-   drivers/char/hw_random/virtio-rng.c:120:5: sparse: sparse: symbol 'virtrng_fill_on_leak' was not declared. Should it be static?
-   drivers/char/hw_random/virtio-rng.c:141:5: sparse: sparse: symbol 'add_copy_on_leak_request' was not declared. Should it be static?
-   drivers/char/hw_random/virtio-rng.c:160:5: sparse: sparse: symbol 'virtrng_copy_on_leak' was not declared. Should it be static?
+Patch #1 has been picked up by Russell, so please pick up the rest.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Ard.
