@@ -2,173 +2,410 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04970C25B4E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 15:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED3DC25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 16:51:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbjATPjc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 10:39:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42620 "EHLO
+        id S229974AbjATQvW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 11:51:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjATPj0 (ORCPT
+        with ESMTP id S229520AbjATQvV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 10:39:26 -0500
-X-Greylist: delayed 1584 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 20 Jan 2023 07:39:08 PST
-Received: from mx0a-002e3702.pphosted.com (mx0a-002e3702.pphosted.com [148.163.133.112])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AC3819B7;
-        Fri, 20 Jan 2023 07:39:07 -0800 (PST)
-Received: from pps.filterd (m0171835.ppops.net [127.0.0.1])
-        by mx0a-002e3702.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30KF8dEW017613;
-        Fri, 20 Jan 2023 15:12:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=ppsBULK0520;
- bh=bRw4jrt5vf/W6v2g3RL2LyLL2DU0XToZcPJtlw6+wYY=;
- b=oyURH4MS3SQWu29kr0LL87WuZmCOTFlgCIMjstGGp55HQVF96dBPBiK4p9/B7bqHQddQ
- r8mKQ1c8qYbhX740ysjz9Bw7WZvD9RYUmBRWDQO1CjdAF19W/DFnokAKGtekGrYm0661
- 6KhXLT83DVCxXdSOPf0TMZIe8RW/6Ql6yci71fQ1uSkfkLj60IVsJ8G39owkmMsqOWRn
- 1bIIXwdL55LHzxyIi5PliZLixpuqd9HFvdFV5DOk/YtK4/IJHG7WpHFGqx67onNGspJ8
- A3/hujGN29nDkh+cg1Cu6NfFkrzX/wohZcK/SShfVcUgqDpY7ig8Cu5jMK3mnTMIu1+2 YA== 
-Received: from p1lg14884.dc01.its.hpecorp.net (p1lg14884.it.hpe.com [16.230.97.209])
-        by mx0a-002e3702.pphosted.com (PPS) with ESMTPS id 3n3j66aabg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 15:12:25 +0000
-Received: from p1lg14879.it.hpe.com (p1lg14879.dc01.its.hpecorp.net [16.230.19.125])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by p1lg14884.dc01.its.hpecorp.net (Postfix) with ESMTPS id BFED180D8C3;
-        Fri, 20 Jan 2023 15:12:23 +0000 (UTC)
-Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 8F49A62FA1;
-        Fri, 20 Jan 2023 15:08:42 +0000 (UTC)
-Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
- p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Fri, 20 Jan 2023 03:08:29 -1200
-Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.15
- via Frontend Transport; Fri, 20 Jan 2023 03:08:29 -1200
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.15; Fri, 20 Jan 2023 15:07:09 +0000
+        Fri, 20 Jan 2023 11:51:21 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2086.outbound.protection.outlook.com [40.107.93.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54296C13ED;
+        Fri, 20 Jan 2023 08:51:10 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZhYBbxbgQsBHZPfvGDVWOF92CM7gkTN9lJbsTfX6tQA+11OVFwVPIKe/IZhd/zw6V0kRxT+vPjm95fX8+S+DSQ2mBzhdkLYnaXcuMKV5rgZTqcBQAbrDjydQQKq2vrKIV9Q64jDewXWcy7RpEcLoGYgmhGHw8C1A+tLj4v2Ul9M1bQEpflcDoT6YfEBrM7EC95vIX1q54LFFXitxEzOP1AK0KxsA/u/U3PRr6luPm+RQogcMBkGskEjvKyP34xes53AhMccHnBbyExWkE0tDk5RAp7+bWiBcGOPxx1eZ/atJJjqJIU+CPqWHXVuioI6bvBEwAAoPypMFbF7toov3Sw==
+ b=FXKmT2P0ke59c2/wAqWXg8dkj1WhDckZ/2qqWodseh3d43uIq8Dfvz1Pqnt6gOuZy0FkI+NVAPDpoTpjYy92XTTvA5sEQps5jw4UAaiHkfyBIR2NKDBK/QomTGfg9PsWojtWV+LzfESMbOao2Gk9he96+YffBwD2K0w8GAAv9DY1rzKoqFZn43PWDOV4arUWXNt44TERCr1xE7Fid45IMiOfmXTiLiUpQmMvCXW0AVuLRHsSBdyaTsXb4tRkituNfhQqgwRZxWAVti16wI44BWE2jkHAFdOGBmJR18QqSk7UWn4WHU5Du27j6/hMfcn4ot2ZnfTjAuW4chM+NRhWCA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bRw4jrt5vf/W6v2g3RL2LyLL2DU0XToZcPJtlw6+wYY=;
- b=KDCPjaUMHVTU9wHAZBmusYlJIoWZ9YsCN8hr6i4KXsmOBOqqvGL4+qbaH/ApsmPhAJn5B0Xm3yUeh9hg4ODKoTgZwAiDCzTjUXoNMImqbXhboMfsYDlPBTn4Gnnk2ElRdLam6kv6fJHQL1HbPLRwPP9KvMY6SDSfrB+CZfRzFxtzq3ooLdRNLgLIitiu0NrgvxvtKo5jE8zy4J2g4V54fTzH40fqenX14RFboc2FtbIOQdftcW+PBQhlj8vsTyC6u0rkivW5cALUuIO9ne9wKfr7UoOyhSmvwrkA/91yPhK2mKaDD9k5enrrJ1FeqpbB+IBejHUIbWr6KHHeyYwrHQ==
+ bh=jboexqpozZGmsq4ZnZS+tOYzzrbrLJjcLb97dtHdwC8=;
+ b=URvzImj0eY7HZnyzCDkTKfOvniOtDJD18Ft4PSzdJoL4Oq6Df748MaR4L9scUayo/yTuMGYUjRBkypw6PL+WD3fuKQsNvcyiXlpWwHFrKs+jDK8+kBRLP7tcWhXMZrYZiuM9SXHB/InJSP5L+X+TzPe9pdJey55yEr4zGJJ7284lFowmclGtfr6Ahw9L017jeikr3EqR8dx+Jq6w+BKKmVKVTsaTxRA20vNiLLGFGM8sC4OFEnpHcJJfSGBAdOfYxKNF97ggmjheq5h7GzwKPcrwpxNvsyUwGPrA8FAlCCANdlFKPpkVxkySZG6pL0ZPldUKGnTLWG8c7wRe3XJqHA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c4::18)
- by MW5PR84MB1428.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c2::9) with
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jboexqpozZGmsq4ZnZS+tOYzzrbrLJjcLb97dtHdwC8=;
+ b=Mh7Bd9oF8UjdHpAZnxXTLjeH2PyyXQAiqbD3JGIrsAbtSSzqZ2jo4L01LeyHKOi0XtGQlkMLmAmVPHOGpXWuTdZBEfwNlMHkzT++r4xI6sxh0TlWFjBoB9eh0q3bp/CtshDnoiyPuw4krIJ7rR4s9lJQ+KB9S1qMRGo5tBP3DaA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by DM4PR12MB5215.namprd12.prod.outlook.com (2603:10b6:5:397::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.27; Fri, 20 Jan
- 2023 15:07:08 +0000
-Received: from MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::5511:bd85:6961:816]) by MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::5511:bd85:6961:816%7]) with mapi id 15.20.6002.024; Fri, 20 Jan 2023
- 15:07:08 +0000
-From:   "Elliott, Robert (Servers)" <elliott@hpe.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Babis Chalios <bchalios@amazon.es>
-CC:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "amit@kernel.org" <amit@kernel.org>,
-        "graf@amazon.de" <graf@amazon.de>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "xmarcalx@amazon.co.uk" <xmarcalx@amazon.co.uk>
-Subject: RE: [PATCH 1/2] virtio-rng: implement entropy leak feature
-Thread-Topic: [PATCH 1/2] virtio-rng: implement entropy leak feature
-Thread-Index: AQHZLDYqz+OzQX/4LkKse2Y5pZYAp66nPh+AgAAqY0A=
-Date:   Fri, 20 Jan 2023 15:07:08 +0000
-Message-ID: <MW5PR84MB18426587FD27BB152D621BABABC59@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20230119184349.74072-1-bchalios@amazon.es>
- <20230119184349.74072-2-bchalios@amazon.es>
- <20230120072909-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230120072909-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
+ 2023 16:51:08 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5986.023; Fri, 20 Jan 2023
+ 16:51:08 +0000
+Message-ID: <bf617582-fdb9-8d41-8794-294b8669194b@amd.com>
+Date:   Fri, 20 Jan 2023 10:51:04 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH RFC v7 14/64] x86/sev: Add the host SEV-SNP initialization
+ support
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW5PR84MB1842:EE_|MW5PR84MB1428:EE_
-x-ms-office365-filtering-correlation-id: 5aec68a5-4c47-4b6c-c8a1-08dafaf7ffc2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lyC5vrzKM+kBHp4PY3vilmGIxQcsj0tPtJjunEk7OmRtVonh70//n1K1dBi6thkKzHoPXYdynJz9pLm0c7ZOTLEAdiGIB+cnLq54CJAtROMBgFUUalTJUsptBJIyRR4gbC921N/m47p8dJy9dv9eNISQQ5DaYR/avAG39DyePPOWiw1CMpRatZvoGTnOl/7LMEzoRgmHo0Wd/suAps9ccCioFs+rhAk/J2EQOyGTT5D84HM5XhTgL+SasZEcanowy6He2ROvIIvtANy6t64Vfocs+X2wLsxv2XZr732Fe/ywnohyFU0MR3YQiaP6xp9dL2EdNiDsaVO9XGjuJuCmfBKT5WWINRJSz0plbO0ZNNE5TqK7N41og4syDdrEe/OFcngkljYlq88+/uc9s6whiITU9ECNsvgejANs8Ddm88VfhDuPfVxlW9i5K87Mrzkg/TEvxcTPZ5MVI3qyLAXJ/2Fcn7cEJnTPsUPDmjhDT7ZVmlP2M3v9jRq1+SbseWEYO3ZyGWKSV8P7cwvWn+mnTDGyRTSyGSTxSVc52r9yS2QGTh2hAKYgZ0L0gV4b6+QfaavdMcQxtP2ljmUNuPJ9YpW8N6CXZxFDmKGzSf34u7uXujss2Ixoez16lrRtoPEk+qjAjiiFbU5wFr4FbZeR0hlSXaHtzqlMf9tIsOTYXoY+o+jgBCNw4ZsicHeOXSUWYJtkll2GrmRQf/MephV8NQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(136003)(39860400002)(396003)(346002)(451199015)(33656002)(110136005)(478600001)(7696005)(71200400001)(55016003)(38100700002)(86362001)(82960400001)(122000001)(38070700005)(6506007)(52536014)(2906002)(7416002)(41300700001)(186003)(26005)(9686003)(316002)(64756008)(66446008)(8676002)(4326008)(76116006)(66946007)(66556008)(66476007)(5660300002)(8936002)(4744005)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Scuez5bpEnoSM48zaINqVhAFHXn6jUBsSOrONSZq5MJDvM8x64s6pWM8ZHqI?=
- =?us-ascii?Q?yRf3gnTFtalQGrJVo4WRDNHq6fmQly8frOv0fa0sI5o2CRUPKDmftimZT1mi?=
- =?us-ascii?Q?xaFc8CrJMUpGT3DkHS7TrcreHUXLHsn+uxVl5nYWViiqW5TbF3nfIzcl5RKk?=
- =?us-ascii?Q?MGR1EsBGvgRRxbw7ZYlyI6wrTOQq/gQnA4q5EUcHGxNejkgcAV5qyBDIWIOn?=
- =?us-ascii?Q?YIsV6LIIP1VGe0ZiWqUgpPXL+RGD4GvicdEKQfRjWvA+3ip9pwj3FTnY8lWK?=
- =?us-ascii?Q?WSA2QoNjRz7q5p1CW9P+Enbjko6QdvnlT5Zb0oNej/KMZ78VkwLtt4QMdIZB?=
- =?us-ascii?Q?jnLrpuQZqWUjiFM5N1GMVSzzuQ4Q8wAEAZ2Jv9e+Jl4o0OPe9Xjt68v6WZbQ?=
- =?us-ascii?Q?mbMDYuyFgcxTuDjjrhfjQeTX03bToBJKqjk+ZAxlTsgs/G3J8hDAp6dJWtYn?=
- =?us-ascii?Q?UWE5xr8Wwf8vfblBJ3dUaDKzVFz8I6+InT/TMEb5vDNR91chjBARSamC5V2o?=
- =?us-ascii?Q?FxVZWtv86lvUXfKdK6sWQXcSMU7f2IMrHprEqq0qEQU5tjnZhBA0bQQ3TxOT?=
- =?us-ascii?Q?ZuSyAP33oiYHIHuiXEoUQAFuUpC6tAbwcWwoMdwaX9IiLvTswacI/QYxtfsQ?=
- =?us-ascii?Q?lZTlV5vZqA3hm7jE9PtAtFJoocbd4hkAwEzS+TKENR54BQJSqFvT1JC+2eGS?=
- =?us-ascii?Q?l1QeSRv0ExDi02qUzLa8ZX/sqol4ngBIBaAXu0GFdZ3f1qe9SXrTHLxAXq/b?=
- =?us-ascii?Q?MjgG+44mLXMwf+8O6JREbDatpEFH25G1rPiA96t3zHJT/r8lITPD19VuU7nr?=
- =?us-ascii?Q?l6o2IhzPdwEQR3VHfY2VENIOK36qx3ZomvjbyRSkJ06OfYFhaGqC39s6Vgq4?=
- =?us-ascii?Q?ACaiKhylNIrnzyE8XZHVqRMSbG9cS6/HZo7EpSj5ZtSBomrt80c+YwvrmXbo?=
- =?us-ascii?Q?93WVnZtse0UakbyHR6wi8HOZH3iN8KWFcPjQyB3MNUz/QZRz7yehg6E0atgb?=
- =?us-ascii?Q?uq0LgsT+33IFurKdJyiDodswv6z5RxMzr/GTYsE3/KOMMZL1nO+SZkS+wNdq?=
- =?us-ascii?Q?4VzaYHMExD1Wi4QS2i1Ao8+ZasyOuynmSWIM5DFLT7GDvnvr3xKpBEmBwdgG?=
- =?us-ascii?Q?wC4cNtZ2NseGwzxyUKHa9iEzvI3p9KiJUtAT/NVWC/4yI5YgWGJdUbRYCaFX?=
- =?us-ascii?Q?eF1vGSYEov3lMzT7WR/RFbi0QFhFm8yyL7zuI4tO0kelnOAp+WIghP8SsFe8?=
- =?us-ascii?Q?Lv4/v1bf0V08X5JQLDwXMnMJAGNi5b/1+K8BOP8T2MYUWXjIPCt6jEMbdHCd?=
- =?us-ascii?Q?1LrA1VA+ZNio377WadNnETN9JMaXXcDohFZUjD4N8uyxODx1Nl7wujgOUwkI?=
- =?us-ascii?Q?L3GOZo5RfMoZC2eGGfmrifNG+s8ZCIoOAUzoWhoPljpMMUulPZoNQKVtKGmT?=
- =?us-ascii?Q?Np8mCJCofcLSOuJtArK1YiUje7R98Y3v6uAnrkybnROVowT8tikHWf8ricTA?=
- =?us-ascii?Q?wZf9vmzrXYBDbiCh/MgoeFRcoFuUwIYqXMEZCva88w0cQ1sMl8fUIPvMm7WO?=
- =?us-ascii?Q?vn6HDiM/6eH+zqwZhn8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-15-michael.roth@amd.com>
+ <20230118155502.GB24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <2f786856-982a-1012-f680-9a6c5faee6ea@amd.com>
+In-Reply-To: <2f786856-982a-1012-f680-9a6c5faee6ea@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH2PR18CA0053.namprd18.prod.outlook.com
+ (2603:10b6:610:55::33) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|DM4PR12MB5215:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa98496b-3c33-47a4-e5d7-08dafb0686de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b0a3x0aCxltOBO2PwDb3lr+bCnOTlj0aYzRh8zIkVYlSA63kXihv8DXB7r2YfUqxcy+o1IO1oFyoas0yO9prGcj4Kj+m1CZDfeISi6/ZGlw7i9cX6KQ+FIBJNTQ5YZx3Q+HfYF682PF7nup03CeztJ3Q3UzjGSb7yUnx93c3h1aA5kQbGllUtwKM+Z+Wole6v1fqFTd6ls9peQMsSfxfSJoiC00z9GCIFXL4Ms7u+rSBTde3ANVwxkgKPlS1OKgW+u8O17VybweXfK7oRnErHv6tp5FOynXg/HM6zXC4CvEiKTRk794P8BqiybC4BC63cUpLjrBnfjHMaxR2UtfEbTJyNT/st9BCt+uImgQLrtO/UtDbxxB/uZRMTM1wkrNqj+fmMPLVqWYcWuiYZoPKIXzIoe7JvAQe28dvLa47avT8hxawudMJq/+d233JLz2qmRj/W5ipXkMcKcNIfQoy/FAeoLhIiDiwk1McVJU7x/1QkvSrdP1KuKhkRJcre5PCvJfLEr/3snv8gxIdpz5B+l4MLPQUE/naZJ0SbsyuP/oDrzOGSThwgbkGBTnvxDW8tl88Diwa0QEGYQeS+dQBVw2xLwX0htkYpsf2HXisAgHzxwy+mAhSXq5mCRJdv79a8kBWeN2UL75DV/TYrXvJ/P545fCrljIYI6jSCDd2x0o+UIQiinxyarUEyeflrTx9vVibgFN9ABIyohi8o/bhgYn9UaUr/KHZQnfoMW6QiSM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(39860400002)(366004)(346002)(396003)(451199015)(6506007)(478600001)(6636002)(53546011)(31686004)(110136005)(6666004)(6486002)(66476007)(66556008)(66946007)(186003)(316002)(26005)(6512007)(4326008)(7406005)(36756003)(8936002)(2616005)(7416002)(41300700001)(5660300002)(2906002)(83380400001)(86362001)(38100700002)(8676002)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGtjTWpmd3Avcjh0ZldwSlNzTzl5ZUJWWkpyZXdmVkFYcFhKZ3l1OVE0R0x2?=
+ =?utf-8?B?Tzl2aU1xMGJTcDZTdjZOUzF0ZnJEU3BXSkNTZGJ1aTVFNVV2bG00TUtSVE9q?=
+ =?utf-8?B?bTVnNnVDUE5pWGRxQmN5MjJabUVEbzlPdWFJS1dKUHg3Y3ozVWxFMGZtdlda?=
+ =?utf-8?B?Si8vVkVDazk0Mm9LU0VNekNlZzZibHMwTEV3SEVhM3ppQ0IyaGhqcElHZVla?=
+ =?utf-8?B?dk80cERoVjEvWG1GTFUvelplWEhMTlN4SmhEOE1HdUlXVTZ0SWZZUmY5WVpz?=
+ =?utf-8?B?TXVtc2habW5IOG94MWtqQ3oxOWN4WjRkTU5LSUIveUx1aGJSWmYxTXMwSTY0?=
+ =?utf-8?B?WGU3N2hwZ3d1VHo5RW41c0FuT1hmU0RZWktxcjhocmRlYkhQSlI1aFU1aGg5?=
+ =?utf-8?B?cXdHM3hNblJNUjhJVldpbzZaQ3Y4Q2V1a2k5OU1tR1lKVjlzeGVTUWYrL21i?=
+ =?utf-8?B?S3gzbW9jUk9XVGxLalNxZm9tRFN2VUhNVTQzWnZyK1pULzRIa0NjVFArOXFT?=
+ =?utf-8?B?MlpHOGc5a21KTWc1YXM0emplNVhUdTVuSWtNcStsbWgzVXNkTmRDUHVZaDND?=
+ =?utf-8?B?ZXZoVEE1TlhCaU44aHhjUGM2ZkZVRW1yUzhySExvdnpkN3FiNHlyaFN4SGl6?=
+ =?utf-8?B?d0t1c2pGb2F6ZGFtcS9MdnNaZVc1cnBMM0RDcWh4dnVDY213WGpEOFFGdm1a?=
+ =?utf-8?B?YzQza21ZK1E0R1lTZFFCTzVvdllJRWZYdjdqRm5tYnVqTnE5NXh3TXBCNEVi?=
+ =?utf-8?B?dnNzQnFJRjBnTW1Sc3BUVVJzSzh1VXp4MnAzQVhtbVRPUlBkU0xFZ2xVd0wz?=
+ =?utf-8?B?R1IvYkI1N0I2dXQzRm9UMkI5MTBFb3pocTVsRXVXS0tTOVZHaEt5V3pxdTgv?=
+ =?utf-8?B?YTdvZ3pOcDlTU0QrNGtFTy9YNDN0US9iN1FYenR6TFRaZTNjVEhUWWpSazFo?=
+ =?utf-8?B?dWl5OXd4cURITlNQUm55RGd5L08vcnBHSjZpbHVCemRzaW5wTERKeExLSGhN?=
+ =?utf-8?B?SWp6MVNJUUFYSU9ZQ1FuSlpoR29CZkd3TXZrTUFFd3Q5Rk52MDIxRjJPRDh6?=
+ =?utf-8?B?RGhLZmQ0czJpQ3M1R1RyNHdXQThUdjJHeEhvbHFpWTB3cTBJblpSSzR3Y2xX?=
+ =?utf-8?B?R202TXlqOW45V1NVZDRXWm1Pdmp0M0Uxb05EVUVpZFp1U29HTkxKNlFNd2g0?=
+ =?utf-8?B?Ny9qdGEwQzJmN0hab1RKVFlISUc1WWlzVDAra1ExaFNpSmdnMTdML2dhdXJz?=
+ =?utf-8?B?WlZRZFV5S2tMMTcremhsTTRibzUrT2cvanNBUEhTc2krRFY1NTd4VHV6VjhU?=
+ =?utf-8?B?R0RrTzF0czdZbTlENnMzbk81eU5zZE9HYUxBZFZ4UnpRS0d1L2dVS2dhYWhF?=
+ =?utf-8?B?aDhQNENLWGRBRkdzd3cxbm40R0x4SG91TVRpMmV5R3dxTHEvdE1aUW1SaFpZ?=
+ =?utf-8?B?Nnl6LzdiSGtCZDEvaGxSVWNxb3ZycHJYY2s5OGRCUC9xTTVSZWdxbTYyb2ll?=
+ =?utf-8?B?T3kzTUVZN2pMaytJcGpiazZmT3pTV1BDMDFxdjUzMlRRYVd1RktxbkFhUTZU?=
+ =?utf-8?B?b296SlRuVy9FZUlZOHFlSmFiaHhYQUhYUVk0UTVITnpvMG5yZTZobVB1dDZ4?=
+ =?utf-8?B?UmpnY3hteVA5T2oxVmlITm9UN0t0S3NSdStsR2tQdGZHT0p0bWQvUFdvK0R1?=
+ =?utf-8?B?bDFjR3JpcjUzM2ViOWt2cGJYSnRja215djFncm1GamNvRHVmanpHenE3T0tn?=
+ =?utf-8?B?QnJLamlYVDExam5NUHNHdDRvZGdpb2FKYysyYlljRWV5Z04xVmlHRWIwU29M?=
+ =?utf-8?B?cGEwaTZWamp5bWNBYXVLYW9HeTN5NkdCYVp5MlFha2hsb1lMSHp3bU9KUEsx?=
+ =?utf-8?B?SFBZOGVWTGZTOTd5VmFSZk1JYkpvVldwZVdtSzBsNWZMb1FtcFh4SC9FTDJK?=
+ =?utf-8?B?V3FhUXE0aXZUaDljaWtsM2dhQkpBd2cwY2xNcW5EMVZnd083aTM4WEdrN2RI?=
+ =?utf-8?B?ZVVwWGNlbFBOOGFNL0ozbWJMdDdsZDhhUnZpUjhGRm5tZGloSEQyN2taSnZ4?=
+ =?utf-8?B?b1VRU3M0UG5wMnJIdWo5Y2FEL2Z2N0tQMzhyREpOSXdZeXF1WktRNWg0YlJK?=
+ =?utf-8?Q?7zW5Q2QEfzlh2LudkCUBqXFIh?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa98496b-3c33-47a4-e5d7-08dafb0686de
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5aec68a5-4c47-4b6c-c8a1-08dafaf7ffc2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2023 15:07:08.0855
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2023 16:51:08.1539
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jV/J/88AG5kHbUtHzLRbImLcS3DD5pgeeF8EKR+iaKun+tPvxVr324lyRFq2W8s+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR84MB1428
-X-OriginatorOrg: hpe.com
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-20_09,2023-01-20_01,2022-06-22_01
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8iF0Xbjc+89VeGCRewZIwhBzYBoQmQN+02+EktyR3s8M+maabsBA4S+96854xJMzsZU0OMacuyj8gBTV81NPEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5215
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > +#include "asm-generic/errno.h"
->=20
-> Why are you pulling this in?
-> If you really need errno the thing to include
-> is linux/errno.h
->=20
-> checkpatch has a rule to catch such cases:
->=20
-> # warn if <asm/foo.h> is #included and <linux/foo.h> is available and inc=
-ludes
-> # itself <asm/foo.h> (uses RAW line)
+On 1/19/2023 5:59 PM, Kalra, Ashish wrote:
+> Hello Jeremi,
+> 
+> On 1/18/2023 9:55 AM, Jeremi Piotrowski wrote:
+>> On Wed, Dec 14, 2022 at 01:40:06PM -0600, Michael Roth wrote:
+>>> From: Brijesh Singh <brijesh.singh@amd.com>
+>>>
+>>> The memory integrity guarantees of SEV-SNP are enforced through a new
+>>> structure called the Reverse Map Table (RMP). The RMP is a single data
+>>> structure shared across the system that contains one entry for every 4K
+>>> page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
+>>> track the owner of each page of memory. Pages of memory can be owned by
+>>> the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
+>>> section 15.36.3 for more detail on RMP.
+>>>
+>>> The RMP table is used to enforce access control to memory. The table 
+>>> itself
+>>> is not directly writable by the software. New CPU instructions 
+>>> (RMPUPDATE,
+>>> PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
+>>>
+>>> Based on the platform configuration, the BIOS reserves the memory used
+>>> for the RMP table. The start and end address of the RMP table must be
+>>> queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
+>>> RMP_END are not set then disable the SEV-SNP feature.
+>>>
+>>> The SEV-SNP feature is enabled only after the RMP table is successfully
+>>> initialized.
+>>>
+>>> Also set SYSCFG.MFMD when enabling SNP as SEV-SNP FW >= 1.51 requires
+>>> that SYSCFG.MFMD must be se
+>>>
+>>> RMP table entry format is non-architectural and it can vary by processor
+>>> and is defined by the PPR. Restrict SNP support on the known CPU model
+>>> and family for which the RMP table entry format is currently defined 
+>>> for.
+>>>
+>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>> Signed-off-b: Ashish Kalra <ashish.kalra@amd.com>
+>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>>> ---
+>>>   arch/x86/include/asm/disabled-features.h |   8 +-
+>>>   arch/x86/include/asm/msr-index.h         |  11 +-
+>>>   arch/x86/kernel/sev.c                    | 180 +++++++++++++++++++++++
+>>>   3 files changed, 197 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/x86/include/asm/disabled-features.h 
+>>> b/arch/x86/include/asm/disabled-features.h
+>>> index 33d2cd04d254..9b5a2cc8064a 100644
+>>> --- a/arch/x86/include/asm/disabled-features.h
+>>> +++ b/arch/x86/include/asm/disabled-features.h
+>>> @@ -87,6 +87,12 @@
+>>>   # define DISABLE_TDX_GUEST    (1 << (X86_FEATURE_TDX_GUEST & 31))
+>>>   #endif
+>>> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+>>> +# define DISABLE_SEV_SNP    0
+>>> +#else
+>>> +# define DISABLE_SEV_SNP    (1 << (X86_FEATURE_SEV_SNP & 31))
+>>> +#endif
+>>> +
+>>>   /*
+>>>    * Make sure to add features to the correct mask
+>>>    */
+>>> @@ -110,7 +116,7 @@
+>>>                DISABLE_ENQCMD)
+>>>   #define DISABLED_MASK17    0
+>>>   #define DISABLED_MASK18    0
+>>> -#define DISABLED_MASK19    0
+>>> +#define DISABLED_MASK19    (DISABLE_SEV_SNP)
+>>>   #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+>>>   #endif /* _ASM_X86_DISABLED_FEATURES_H */
+>>> diff --git a/arch/x86/include/asm/msr-index.h 
+>>> b/arch/x86/include/asm/msr-index.h
+>>> index 10ac52705892..35100c630617 100644
+>>> --- a/arch/x86/include/asm/msr-index.h
+>>> +++ b/arch/x86/include/asm/msr-index.h
+>>> @@ -565,6 +565,8 @@
+>>>   #define MSR_AMD64_SEV_ENABLED        
+>>> BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+>>>   #define MSR_AMD64_SEV_ES_ENABLED    
+>>> BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+>>>   #define MSR_AMD64_SEV_SNP_ENABLED    
+>>> BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
+>>> +#define MSR_AMD64_RMP_BASE        0xc0010132
+>>> +#define MSR_AMD64_RMP_END        0xc0010133
+>>>   #define MSR_AMD64_VIRT_SPEC_CTRL    0xc001011f
+>>> @@ -649,7 +651,14 @@
+>>>   #define MSR_K8_TOP_MEM2            0xc001001d
+>>>   #define MSR_AMD64_SYSCFG        0xc0010010
+>>>   #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT    23
+>>> -#define MSR_AMD64_SYSCFG_MEM_ENCRYPT    
+>>> BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+>>> +#define MSR_AMD64_SYSCFG_MEM_ENCRYPT        
+>>> BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+>>> +#define MSR_AMD64_SYSCFG_SNP_EN_BIT        24
+>>> +#define MSR_AMD64_SYSCFG_SNP_EN        
+>>> BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
+>>> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT    25
+>>> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN        
+>>> BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+>>> +#define MSR_AMD64_SYSCFG_MFDM_BIT        19
+>>> +#define MSR_AMD64_SYSCFG_MFDM            
+>>> BIT_ULL(MSR_AMD64_SYSCFG_MFDM_BIT)
+>>> +
+>>>   #define MSR_K8_INT_PENDING_MSG        0xc0010055
+>>>   /* C1E active bits in int pending message */
+>>>   #define K8_INTP_C1E_ACTIVE_MASK        0x18000000
+>>> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+>>> index a428c62330d3..687a91284506 100644
+>>> --- a/arch/x86/kernel/sev.c
+>>> +++ b/arch/x86/kernel/sev.c
+>>> @@ -22,6 +22,9 @@
+>>>   #include <linux/efi.h>
+>>>   #include <linux/platform_device.h>
+>>>   #include <linux/io.h>
+>>> +#include <linux/cpumask.h>
+>>> +#include <linux/iommu.h>
+>>> +#include <linux/amd-iommu.h>
+>>>   #include <asm/cpu_entry_area.h>
+>>>   #include <asm/stacktrace.h>
+>>> @@ -38,6 +41,7 @@
+>>>   #include <asm/apic.h>
+>>>   #include <asm/cpuid.h>
+>>>   #include <asm/cmdline.h>
+>>> +#include <asm/iommu.h>
+>>>   #define DR7_RESET_VALUE        0x400
+>>> @@ -57,6 +61,12 @@
+>>>   #define AP_INIT_CR0_DEFAULT        0x60000010
+>>>   #define AP_INIT_MXCSR_DEFAULT        0x1f80
+>>> +/*
+>>> + * The first 16KB from the RMP_BASE is used by the processor for the
+>>> + * bookkeeping, the range needs to be added during the RMP entry 
+>>> lookup.
+>>> + */
+>>> +#define RMPTABLE_CPU_BOOKKEEPING_SZ    0x4000
+>>> +
+>>>   /* For early boot hypervisor communication in SEV-ES enabled guests */
+>>>   static struct ghcb boot_ghcb_page __bss_decrypted 
+>>> __aligned(PAGE_SIZE);
+>>> @@ -69,6 +79,9 @@ static struct ghcb *boot_ghcb __section(".data");
+>>>   /* Bitmap of SEV features supported by the hypervisor */
+>>>   static u64 sev_hv_features __ro_after_init;
+>>> +static unsigned long rmptable_start __ro_after_init;
+>>> +static unsigned long rmptable_end __ro_after_init;
+>>> +
+>>>   /* #VC handler runtime per-CPU data */
+>>>   struct sev_es_runtime_data {
+>>>       struct ghcb ghcb_page;
+>>> @@ -2260,3 +2273,170 @@ static int __init snp_init_platform_device(void)
+>>>       return 0;
+>>>   }
+>>>   device_initcall(snp_init_platform_device);
+>>> +
+>>> +#undef pr_fmt
+>>> +#define pr_fmt(fmt)    "SEV-SNP: " fmt
+>>> +
+>>> +static int __mfd_enable(unsigned int cpu)
+>>> +{
+>>> +    u64 val;
+>>> +
+>>> +    if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>>> +        return 0;
+>>> +
+>>> +    rdmsrl(MSR_AMD64_SYSCFG, val);
+>>> +
+>>> +    val |= MSR_AMD64_SYSCFG_MFDM;
+>>> +
+>>> +    wrmsrl(MSR_AMD64_SYSCFG, val);
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static __init void mfd_enable(void *arg)
+>>> +{
+>>> +    __mfd_enable(smp_processor_id());
+>>> +}
+>>> +
+>>> +static int __snp_enable(unsigned int cpu)
+>>> +{
+>>> +    u64 val;
+>>> +
+>>> +    if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>>> +        return 0;
+>>> +
+>>> +    rdmsrl(MSR_AMD64_SYSCFG, val);
+>>> +
+>>> +    val |= MSR_AMD64_SYSCFG_SNP_EN;
+>>> +    val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
+>>> +
+>>> +    wrmsrl(MSR_AMD64_SYSCFG, val);
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static __init void snp_enable(void *arg)
+>>> +{
+>>> +    __snp_enable(smp_processor_id());
+>>> +}
+>>> +
+>>> +static bool get_rmptable_info(u64 *start, u64 *len)
+>>> +{
+>>> +    u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end;
+>>> +
+>>> +    rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
+>>> +    rdmsrl(MSR_AMD64_RMP_END, rmp_end);
+>>> +
+>>> +    if (!rmp_base || !rmp_end) {
+>>> +        pr_err("Memory for the RMP table has not been reserved by 
+>>> BIOS\n");
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    rmp_sz = rmp_end - rmp_base + 1;
+>>> +
+>>> +    /*
+>>> +     * Calculate the amount the memory that must be reserved by the 
+>>> BIOS to
+>>> +     * address the whole RAM. The reserved memory should also cover the
+>>> +     * RMP table itself.
+>>> +     */
+>>> +    calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + totalram_pages()) << 4) 
+>>> + RMPTABLE_CPU_BOOKKEEPING_SZ;
+>>
+>> Since the rmptable is indexed by page number, I believe this check 
+>> should be
+>> using max_pfn:
+>>
+>>      calc_rmp_sz = (max_pfn << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
+>>
+>> This accounts for holes/offsets in the memory map which lead to the 
+>> top of
+>> memory having pfn > totalram_pages().
+>>
+> 
+> I agree that this check should use max. addressable pfn to account for 
+> holes in the physical address map. The BIOS will probably also be 
+> computing RMP table size to cover the entire physical memory, which 
+> should be max. addressable PFN.
+> 
+> But, then we primarly need to check that all available RAM pages are 
+> covered by the RMP table, so the above check is sufficient for that, 
+> right ?
+> 
+> Also, i assume that max_pfn will take into account any hotplugged memory 
+> as i do know that totalram_pages() handles hotplugged memory.
+> 
 
-It's only looking for asm, not variations like asm-generic.
+But essentially you are correct, as RMP table is indexed by PFN, we have 
+to take into account these physical memory holes so that we can have 
+entries for the max DRAM SPA, so i will fix this to use the max. 
+addressable PFN, i.e., max_pfn.
 
+Thanks,
+Ashish
+
+> 
+>>> +
+>>> +    if (calc_rmp_sz > rmp_sz) {
+>>> +        pr_err("Memory reserved for the RMP table does not cover 
+>>> full system RAM (expected 0x%llx got 0x%llx)\n",
+>>> +               calc_rmp_sz, rmp_sz);
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    *start = rmp_base;
+>>> +    *len = rmp_sz;
+>>> +
+>>> +    pr_info("RMP table physical address [0x%016llx - 0x%016llx]\n", 
+>>> rmp_base, rmp_end);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
