@@ -2,65 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30160C05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 09:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2056EC25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbjATJNC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 04:13:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52002 "EHLO
+        id S229629AbjATKJA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 05:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbjATJNB (ORCPT
+        with ESMTP id S229494AbjATKI7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 04:13:01 -0500
+        Fri, 20 Jan 2023 05:08:59 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8548C939;
-        Fri, 20 Jan 2023 01:12:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E9E8B32A;
+        Fri, 20 Jan 2023 02:08:57 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pInR9-0029bo-CL; Fri, 20 Jan 2023 17:11:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 17:11:51 +0800
-Date:   Fri, 20 Jan 2023 17:11:51 +0800
+        id 1pIoKC-002B4r-5s; Fri, 20 Jan 2023 18:08:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:08:44 +0800
+Date:   Fri, 20 Jan 2023 18:08:44 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vincent Whitchurch <vincent.whitchurch@axis.com>
-Cc:     davem@davemloft.net, jesper.nilsson@axis.com,
-        lars.persson@axis.com, kernel@axis.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/12] crypto: axis - do not DMA to IV
-Message-ID: <Y8pa15wREUvWO1L8@gondor.apana.org.au>
-References: <20230110135042.2940847-1-vincent.whitchurch@axis.com>
- <20230110135042.2940847-3-vincent.whitchurch@axis.com>
+To:     Tom Rix <trix@redhat.com>
+Cc:     brijesh.singh@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+        davem@davemloft.net, nathan@kernel.org, ndesaulniers@google.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH v3] crypto: ccp: initialize 'error' variable to zero
+Message-ID: <Y8poLLMG8C31f91j@gondor.apana.org.au>
+References: <20230110170848.3022682-1-trix@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230110135042.2940847-3-vincent.whitchurch@axis.com>
+In-Reply-To: <20230110170848.3022682-1-trix@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 02:50:32PM +0100, Vincent Whitchurch wrote:
-> The crypto API does not promise that the IV buffer is suitable for DMA.
-> Use an intermediate buffer instead.
+On Tue, Jan 10, 2023 at 12:08:48PM -0500, Tom Rix wrote:
+> Clang static analysis reports this problem
+> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
+>   argument is an uninitialized value [core.CallAndMessage]
+>     dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+>     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > 
-> Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+> __sev_platform_init_locked() can return without setting the
+> error parameter, causing the dev_err() to report a garbage
+> value.
+> 
+> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+> Signed-off-by: Tom Rix <trix@redhat.com>
 > ---
->  drivers/crypto/axis/artpec6_crypto.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-> index 87af44ac3e64..d3b6ee065a81 100644
-> --- a/drivers/crypto/axis/artpec6_crypto.c
-> +++ b/drivers/crypto/axis/artpec6_crypto.c
-> @@ -321,6 +321,7 @@ struct artpec6_crypto_request_context {
->  	u32 cipher_md;
->  	bool decrypt;
->  	struct artpec6_crypto_req_common common;
-> +	unsigned char iv_bounce[AES_BLOCK_SIZE] CRYPTO_MINALIGN_ATTR;
+> v2 cleanup commit log
+> v3 cleanup commit log
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please use the newly introduced CRYPTO_DMA_ALIGN macro.
+I think error should be removed completely on top of
 
-CRYPTO_MINALIGN only reflects minimum kmalloc alignment, which
-may be less than that required for DMA.  You're currently safe
-on arm32, but we should not rely on this in new code.
+https://patchwork.kernel.org/project/linux-crypto/patch/20230110191201.29666-1-jarkko@profian.com/
 
 Thanks,
 -- 
