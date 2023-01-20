@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B47C25B50
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 22:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6498C05027
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 22:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbjATWT7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 17:19:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
+        id S230045AbjATW5J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 17:57:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbjATWTz (ORCPT
+        with ESMTP id S229695AbjATW5I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 17:19:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AD4762C2;
-        Fri, 20 Jan 2023 14:19:52 -0800 (PST)
+        Fri, 20 Jan 2023 17:57:08 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAE7EB5C;
+        Fri, 20 Jan 2023 14:56:40 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A48AFB82A95;
-        Fri, 20 Jan 2023 22:19:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3130C4339B;
-        Fri, 20 Jan 2023 22:19:49 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 76160620DC;
+        Fri, 20 Jan 2023 22:56:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 546A7C433EF;
+        Fri, 20 Jan 2023 22:56:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674253190;
-        bh=HvcNM2UjecQL348bqHAOm445agwCIVqQtDTv2S/yEmw=;
+        s=k20201202; t=1674255373;
+        bh=oKkf+3Q00EAO2IQpP2ByrfkTu1TC3Bz2jqgj3PZH6PQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pDTcPNR6BXuGBjP48njVINKN5F4mgJzV2lu2lU+SiajKyiN1d9pouPWpoFT+XvXmP
-         p1moDyoN+5EFFREdr0oR4/QtuhG0eBg+nfymIU51LXQZjPtt4+tZSHc8kRvTMIesNi
-         N5TKxI/AuyFae1Pod78Qp6VO3XsbPnvU8SMAyKuj05xhg6Y+YN1BhQDju7OUbzYhdT
-         zrRiBZSrl4uuJw5bUXrzdOKEZfhl6OF9parCd9H83GKLEDxvijBfUR5wsISatx4H2+
-         evuGZ2pTnCHVocTM/YFfyfwP75KRtLMYIFTqZYgGjd6DKGo1p0Ps0At4i/ddziPeOm
-         JETqPRmVwe03Q==
-Date:   Fri, 20 Jan 2023 22:19:47 +0000
+        b=NzmNBo5pWTxCwXoH0a09URQ35CxJllJ7ZLTx0s6tk84iP9ghkbZ456e1RsoYumXPA
+         0P2LRE6zdU9RuUkniD+0Zoh1jQ3DSIs22QHjfQoP1AYEAaIXuZ7vi/QD1IqciTXUO2
+         +DIXG29qkSmTWTkgp5r8CVst1DlL4dpWt4Oqv+VQC28qZO/wBBbSZYQnGCWPD1WbAi
+         Y7v9Z6HCAJe2NHI9c1LKhKf8OBK78NBqAltqti0fNVMJAlHI8rKswZysP4WMbtMf8M
+         wO9k9noYac4ACsDgYgd9Jsu1kywyp/7BCtza+cftv2hGULqPXs87IC/zz28HA8VZKa
+         59bQV8ds2AMbg==
+Date:   Fri, 20 Jan 2023 22:56:11 +0000
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     "Kalra, Ashish" <ashish.kalra@amd.com>
 Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
@@ -53,164 +53,57 @@ Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
         Brijesh Singh <brijesh.singh@amd.com>
 Subject: Re: [PATCH RFC v7 25/64] crypto: ccp: Add support to initialize the
  AMD-SP for SEV-SNP
-Message-ID: <Y8sTg3gI879qzDMV@kernel.org>
+Message-ID: <Y8scC4GFM6o15Adg@kernel.org>
 References: <20221214194056.161492-1-michael.roth@amd.com>
  <20221214194056.161492-26-michael.roth@amd.com>
- <Y7BWGvGj/Ky8RctP@kernel.org>
- <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
+ <Y7VtOQa5Hd0oMdfh@kernel.org>
+ <897b503e-48d1-bc4b-1e68-42792d589ddb@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
+In-Reply-To: <897b503e-48d1-bc4b-1e68-42792d589ddb@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 04:40:29PM -0600, Kalra, Ashish wrote:
+On Thu, Jan 05, 2023 at 04:54:23PM -0600, Kalra, Ashish wrote:
 > Hello Jarkko,
 > 
-> On 12/31/2022 9:32 AM, Jarkko Sakkinen wrote:
+> On 1/4/2023 6:12 AM, Jarkko Sakkinen wrote:
 > > On Wed, Dec 14, 2022 at 01:40:17PM -0600, Michael Roth wrote:
-> > > From: Brijesh Singh <brijesh.singh@amd.com>
-> > > 
-> > > Before SNP VMs can be launched, the platform must be appropriately
-> > > configured and initialized. Platform initialization is accomplished via
-> > > the SNP_INIT command. Make sure to do a WBINVD and issue DF_FLUSH
-> > > command to prepare for the first SNP guest launch after INIT.
-> > > 
-> > > During the execution of SNP_INIT command, the firmware configures
-> > > and enables SNP security policy enforcement in many system components.
-> > > Some system components write to regions of memory reserved by early
-> > > x86 firmware (e.g. UEFI). Other system components write to regions
-> > > provided by the operation system, hypervisor, or x86 firmware.
-> > > Such system components can only write to HV-fixed pages or Default
-> > > pages. They will error when attempting to write to other page states
-> > > after SNP_INIT enables their SNP enforcement.
-> > > 
-> > > Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
-> > > system physical address ranges to convert into the HV-fixed page states
-> > > during the RMP initialization. If INIT_RMP is 1, hypervisors should
-> > > provide all system physical address ranges that the hypervisor will
-> > > never assign to a guest until the next RMP re-initialization.
-> > > For instance, the memory that UEFI reserves should be included in the
-> > > range list. This allows system components that occasionally write to
-> > > memory (e.g. logging to UEFI reserved regions) to not fail due to
-> > > RMP initialization and SNP enablement.
-> > > 
-> > > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > ---
-> > >   drivers/crypto/ccp/sev-dev.c | 225 +++++++++++++++++++++++++++++++++++
-> > >   drivers/crypto/ccp/sev-dev.h |   2 +
-> > >   include/linux/psp-sev.h      |  17 +++
-> > >   3 files changed, 244 insertions(+)
-> > > 
-> > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > > index 9d84720a41d7..af20420bd6c2 100644
-> > > --- a/drivers/crypto/ccp/sev-dev.c
-> > > +++ b/drivers/crypto/ccp/sev-dev.c
-> > > @@ -26,6 +26,7 @@
-> > >   #include <linux/fs_struct.h>
-> > >   #include <asm/smp.h>
-> > > +#include <asm/e820/types.h>
-> > >   #include "psp-dev.h"
-> > >   #include "sev-dev.h"
-> > > @@ -34,6 +35,10 @@
-> > >   #define SEV_FW_FILE		"amd/sev.fw"
-> > >   #define SEV_FW_NAME_SIZE	64
-> > > +/* Minimum firmware version required for the SEV-SNP support */
-> > > +#define SNP_MIN_API_MAJOR	1
-> > > +#define SNP_MIN_API_MINOR	51
-> > > +
-> > >   static DEFINE_MUTEX(sev_cmd_mutex);
-> > >   static struct sev_misc_dev *misc_dev;
-> > > @@ -76,6 +81,13 @@ static void *sev_es_tmr;
-> > >   #define NV_LENGTH (32 * 1024)
-> > >   static void *sev_init_ex_buffer;
-> > > +/*
-> > > + * SEV_DATA_RANGE_LIST:
-> > > + *   Array containing range of pages that firmware transitions to HV-fixed
-> > > + *   page state.
-> > > + */
-> > > +struct sev_data_range_list *snp_range_list;
-> > > +
-> > >   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
-> > >   {
-> > >   	struct sev_device *sev = psp_master->sev_data;
-> > > @@ -830,6 +842,186 @@ static int sev_update_firmware(struct device *dev)
-> > >   	return ret;
-> > >   }
-> > > +static void snp_set_hsave_pa(void *arg)
-> > > +{
-> > > +	wrmsrl(MSR_VM_HSAVE_PA, 0);
-> > > +}
-> > > +
-> > > +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
-> > > +{
-> > > +	struct sev_data_range_list *range_list = arg;
-> > > +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
-> > > +	size_t size;
-> > > +
-> > > +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
-> > > +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
-> > > +		return -E2BIG;
-> > > +
-> > > +	switch (rs->desc) {
-> > > +	case E820_TYPE_RESERVED:
-> > > +	case E820_TYPE_PMEM:
-> > > +	case E820_TYPE_ACPI:
-> > > +		range->base = rs->start & PAGE_MASK;
-> > > +		size = (rs->end + 1) - rs->start;
-> > > +		range->page_count = size >> PAGE_SHIFT;
-> > > +		range_list->num_elements++;
-> > > +		break;
-> > > +	default:
-> > > +		break;
+> > > +	/*
+> > > +	 * If boot CPU supports SNP, then first attempt to initialize
+> > > +	 * the SNP firmware.
+> > > +	 */
+> > > +	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+> > > +		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+> > > +			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+> > > +				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+> > > +		} else {
+> > > +			rc = sev_snp_init(&error, true);
+> > > +			if (rc) {
+> > > +				/*
+> > > +				 * Don't abort the probe if SNP INIT failed,
+> > > +				 * continue to initialize the legacy SEV firmware.
+> > > +				 */
+> > > +				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+> > > +			}
+> > > +		}
 > > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int __sev_snp_init_locked(int *error)
-> > > +{
-> > > +	struct psp_device *psp = psp_master;
-> > > +	struct sev_data_snp_init_ex data;
-> > > +	struct sev_device *sev;
-> > > +	int rc = 0;
-> > > +
-> > > +	if (!psp || !psp->sev_data)
-> > > +		return -ENODEV;
-> > > +
-> > > +	sev = psp->sev_data;
-> > > +
-> > > +	if (sev->snp_initialized)
-> > > +		return 0;
 > > 
-> > Shouldn't this follow this check:
+> > I think this is not right as there is a dep between sev init and this,
+> > and there is about a dozen of call sites already __sev_platform_init_locked().
 > > 
-> >          if (sev->state == SEV_STATE_INIT) {
-> >                  /* debug printk about possible incorrect call order */
-> >                  return -ENODEV;
-> >          }
-> > 
-> > It is game over for SNP, if SEV_CMD_INIT{_EX} got first, which means that
-> > this should not proceed.
 > 
+> sev_init ?
 > 
-> But, how will SEV_CMD_INIT_EX happen before as sev_pci_init() which is
-> invoked during CCP module load/initialization, will first try to do
-> sev_snp_init() if SNP is supported, before it invokes sev_platform_init() to
-> do SEV firmware initialization ?
+> As this is invoked during CCP module load/initialization, shouldn't this get
+> invoked before any other call sites invoking __sev_platform_init_locked() ?
 
-Because the symbol is exported outside the driver to be called by other
-subsystems, you need to have a santiy check for the call order, as it
-is a hardware constraint. Otherwise, any unconsidered change in either
-side could unknowingily break the kernel.
+Then it should not be exported because this the only working call site.
 
-Alternatively, you could choose not to export sev_snp_init(). It is
-supported by the fact that the call in sev_guest_init() is does nothing
-useful (for the reasons you already wrote).
+However, the benefit of __sev_platform_init_locked() addressing SNP init is
+that psp_init_on_probe can also postpone SNP init without possibility to
+any side effects (other call sites than sev_guest_init()).
 
 BR, Jarkko
