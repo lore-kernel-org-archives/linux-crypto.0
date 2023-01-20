@@ -2,85 +2,82 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2627C25B4E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6C1C05027
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbjATKYP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 05:24:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
+        id S229528AbjATKcY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 05:32:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjATKYP (ORCPT
+        with ESMTP id S229619AbjATKcX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 05:24:15 -0500
-Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60DD8C91E;
-        Fri, 20 Jan 2023 02:24:13 -0800 (PST)
-Received: from mail02.huawei.com (unknown [172.18.147.228])
-        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4NywPq1Kl2z9v7gS;
-        Fri, 20 Jan 2023 18:16:15 +0800 (CST)
-Received: from [10.206.134.65] (unknown [10.206.134.65])
-        by APP1 (Coremail) with SMTP id LxC2BwBn7gmva8pjQduwAA--.5258S2;
-        Fri, 20 Jan 2023 11:23:54 +0100 (CET)
-Message-ID: <5c65358c-4e77-901b-01bb-5df0d4c50949@huaweicloud.com>
-Date:   Fri, 20 Jan 2023 11:23:40 +0100
+        Fri, 20 Jan 2023 05:32:23 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1BDB1EC1
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Jan 2023 02:32:12 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pIogs-002BVY-6V; Fri, 20 Jan 2023 18:32:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:32:10 +0800
+Date:   Fri, 20 Jan 2023 18:32:10 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v2 0/4] crypto: Accelerated GCM for IPSec on ARM/arm64
+Message-ID: <Y8ptqnTHRvy4mqB8@gondor.apana.org.au>
+References: <20221214171957.2833419-1-ardb@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, davem@davemloft.net, zohar@linux.ibm.com,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, ebiggers@kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
- <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
- <Y7g7sp6UJJrYKihK@gondor.apana.org.au>
- <755e1dc9c777fa657ccd948f65f5f33240226c43.camel@huaweicloud.com>
- <Y8UTghm0Y8U4ndmH@gondor.apana.org.au>
-Content-Language: en-US
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-In-Reply-To: <Y8UTghm0Y8U4ndmH@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: LxC2BwBn7gmva8pjQduwAA--.5258S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjc
-        xK6I8E87Iv6xkF7I0E14v26r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY
-        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQADBF1jj4fWbQACsJ
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221214171957.2833419-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/16/2023 10:06 AM, Herbert Xu wrote:
-> On Mon, Jan 16, 2023 at 09:57:57AM +0100, Roberto Sassu wrote:
->>
->> Hi Herbert
->>
->> will you take also the second patch?
+On Wed, Dec 14, 2022 at 06:19:53PM +0100, Ard Biesheuvel wrote:
+> This is a v2 as patch #1 was sent out in isolation a couple of days ago.
 > 
-> That's part of David Howells' tree so hopefully he will pick
-> it up soon.
+> As it turns out, we can get ~10% speedup for RFC4106 on arm64
+> (Cortex-A53) by giving it the same treatment as ARM, i.e., avoid the
+> generic template and implement RFC4106 encapsulation directly in the
+> driver
+> 
+> Patch #3 adds larger key sizes to the tcrypt benchmark for RFC4106
+> 
+> Patch #4 fixes some prose on AEAD that turned out to be inaccurate.
+> 
+> Changes since v1:
+> - minor tweaks to the asm code in patch #1, one of which to fix a Clang
+>   build error
+> 
+> Note: patch #1 depends on the softirq context patches for kernel mode
+> NEON I sent out last week. More specifically, this implements a sync
+> AEAD that does not implement a !simd fallback, as AEADs are not callable
+> in hard IRQ context anyway.
+> 
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> Ard Biesheuvel (4):
+>   crypto: arm/ghash - implement fused AES/GHASH version of AES-GCM
+>   crypto: arm64/gcm - add RFC4106 support
+>   crypto: tcrypt - include larger key sizes in RFC4106 benchmark
+>   crypto: aead - fix inaccurate documentation
+> 
+>  arch/arm/crypto/Kconfig           |   2 +
+>  arch/arm/crypto/ghash-ce-core.S   | 382 +++++++++++++++++-
+>  arch/arm/crypto/ghash-ce-glue.c   | 424 +++++++++++++++++++-
+>  arch/arm64/crypto/ghash-ce-glue.c | 145 +++++--
+>  crypto/tcrypt.c                   |   8 +-
+>  crypto/tcrypt.h                   |   2 +-
+>  include/crypto/aead.h             |  20 +-
+>  7 files changed, 913 insertions(+), 70 deletions(-)
+> 
+> -- 
+> 2.35.1
 
-Hi David
-
-could you please take the second patch?
-
-Thanks
-
-Roberto
-
+Patches 2-4 applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
