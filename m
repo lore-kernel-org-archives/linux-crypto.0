@@ -2,75 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0B3C27C7C
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 14:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08B1C25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 14:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbjATO0h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 09:26:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
+        id S229754AbjATO3U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 09:29:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbjATO0T (ORCPT
+        with ESMTP id S229675AbjATO3S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 09:26:19 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B11269F;
-        Fri, 20 Jan 2023 06:25:44 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A13761F8A;
-        Fri, 20 Jan 2023 14:20:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3AAC433D2;
-        Fri, 20 Jan 2023 14:20:39 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="InXIFNlL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1674224437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e7/u6Xz+Ghh5AzLpeu/oxPkoROb2gfCM3ENaGLRIflc=;
-        b=InXIFNlLjoa24zR7k6w5yeL9RJHEHH3aky3LUyniu9fenU8KBrWBfv1qAqXJfwSWW796JV
-        tuWLd+f98xWii6q/UCjbAFWNn/X/oNf9OnaObFDnlz9uxOJbdWAZIIdYoZCYgK3RKe6PqD
-        AzWjUeUBdcbs1wy4Pyrl6qURZzIEeks=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fc1d6521 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 20 Jan 2023 14:20:36 +0000 (UTC)
-Date:   Fri, 20 Jan 2023 15:20:30 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Babis Chalios <bchalios@amazon.es>
-Cc:     Olivia Mackall <olivia@selenic.com>,
+        Fri, 20 Jan 2023 09:29:18 -0500
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBB480899;
+        Fri, 20 Jan 2023 06:28:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1674224932; x=1705760932;
+  h=message-id:date:mime-version:from:to:references:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=FkMRWQ83h9RadsNbLD+ZuI0L7IMzva4jSqpOEcCAdeU=;
+  b=T9tAcjJE0lczYrZ1sdgTeIf9NxUNe7cTEBm3AgCumozr7oy9eKa0r5iS
+   EaVnxQzARwbq1jeU56FTw9yEf9tCiguthtLiOlmGzDmGDBqvvnccXRmnG
+   0c0HGGt6s9iiiGiuz4U9fyqBqGreIH93PQOIbKefX0NLInjw/S4jCMOnl
+   E=;
+X-IronPort-AV: E=Sophos;i="5.97,232,1669075200"; 
+   d="scan'208";a="173241907"
+Subject: Re: [PATCH 0/2] [RFC] virtio-rng entropy leak reporting feature
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2023 14:28:12 +0000
+Received: from EX13D48EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id 6AFCF81FDA;
+        Fri, 20 Jan 2023 14:28:08 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX13D48EUB003.ant.amazon.com (10.43.166.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Fri, 20 Jan 2023 14:28:07 +0000
+Received: from [192.168.17.83] (10.43.162.56) by EX19D037EUB003.ant.amazon.com
+ (10.252.61.119) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.7; Fri, 20 Jan
+ 2023 14:28:03 +0000
+Message-ID: <2e0e51a5-d852-241d-3c3a-5440296bc896@amazon.es>
+Date:   Fri, 20 Jan 2023 15:27:58 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+From:   <bchalios@amazon.es>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, amit@kernel.org,
-        graf@amazon.de, xmarcalx@amazon.co.uk
-Subject: Re: [PATCH 0/2] [RFC] virtio-rng entropy leak reporting feature
-Message-ID: <Y8qjLolaLbMnDnkw@zx2c4.com>
+        Jason Wang <jasowang@redhat.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>, <amit@kernel.org>,
+        <graf@amazon.de>, <xmarcalx@amazon.co.uk>
 References: <20230119184349.74072-1-bchalios@amazon.es>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230119184349.74072-1-bchalios@amazon.es>
+ <Y8qjLolaLbMnDnkw@zx2c4.com>
+In-Reply-To: <Y8qjLolaLbMnDnkw@zx2c4.com>
+X-Originating-IP: [10.43.162.56]
+X-ClientProxiedBy: EX13D39UWB003.ant.amazon.com (10.43.161.215) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Babis,
+CgpPbiAxLzIwLzIzIDM6MjAgUE0sICJKYXNvbiBBLiBEb25lbmZlbGQiIDxKYXNvbkB6eDJjNC5j
+b20+IHdyb3RlOgo+IENBVVRJT046IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUg
+b2YgdGhlIG9yZ2FuaXphdGlvbi4gRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVu
+dHMgdW5sZXNzIHlvdSBjYW4gY29uZmlybSB0aGUgc2VuZGVyIGFuZCBrbm93IHRoZSBjb250ZW50
+IGlzIHNhZmUuCj4gCj4gCj4gCj4gSGkgQmFiaXMsCj4gCj4gQXMgSSBtZW50aW9uZWQgdG8geW91
+IHByaXZhdGVseSB0aGlzIHdlZWssIEknbSBhYm91dCB0byBiZSBvdXQgb2YgdG93biwKPiBzbyBJ
+IHdvbid0IGJlIGFibGUgdG8gbG9vayBhdCB0aGlzIHVudGlsIEknbSBiYWNrIGluIGEgZmV3IHdl
+ZWtzLiBJCj4gYXBwcmVjaWF0ZSB5b3VyIHBhdGllbmNlLgo+IAo+IEJ1dCBhcyBhIGN1cnNvcnkg
+bG9vaywgSSdtIGhhcHB5IHRoYXQgeW91J3ZlIHdyaXR0ZW4gdGhlIGhhcmR3YXJlLXNpZGUKPiBj
+b2RlIGZvciB0aGlzLiBUaGF0J3MgYSBncmVhdCBzdGFydGluZyBwb2ludC4gVGhlIHBsdW1iaW5n
+IGlzIG5vdCBzbwo+IG5pY2UsIHRob3VnaC4gVGhpcyBuZWVkcyB0byBiZSBpbnRlZ3JhdGVkIG1v
+cmUgY2xvc2VseSB3aXRoIHJhbmRvbS5jCj4gaXRzZWxmLCBzaW1pbGFyIHRvIGhvdyB2bWdlbmlk
+IHdvcmtzLgo+IAo+IFdoZW4gSSdtIGJhY2sgaW4gYSBmZXcgd2Vla3MsIEknbGwgc2VlIGlmIEkg
+Y2FuIGVpdGhlciB3cml0ZSBhCj4gZGVzY3JpcHRpb24gb2Ygd2hhdCBJIGhhdmUgaW4gbWluZCwg
+b3Igc2ltcGx5IGludGVncmF0ZSB0aGUgdXNlZnVsCj4gaGFyZHdhcmUgd29yayBoZXJlIGludG8g
+YW4gZXhwYW5kZWQgcGF0Y2ggc2VyaWVzLgo+IAo+IFtQbGVhc2UgZG9uJ3QgbWVyZ2UgYW55dGhp
+bmcgZm9yIG5vdy5dCj4gCj4gSmFzb24KPiAKCkhleSBKYXNvbiwKCkkgYWdyZWUgdGhhdCB0aGUg
+cGx1bWJpbmcgd2l0aCByYW5kb20uYyBuZWVkcyB3b3JrLiBUaGF0J3Mgd2h5IHRoaXMgaXMgYW4g
+UkZDISBUaGF0J3MgdGhlIGtpbmQgb2YgaW5wdXQgSSdtIGxvb2tpbmcgZm9yLgpBcyBJIG1lbnRp
+b24gaW4gdGhlIGNvdmVyIGxldHRlciwgSU1ITywgd2UgbmVlZCB0byBnaXZlIHRvIHJhbmRvbS5j
+IChhbmQgb3RoZXIgcGFydHMgb2YgdGhlIGtlcm5lbCB0aGF0IHRoZXkgbWlnaHQgbmVlZCBpdCkK
+YW4gQVBJIHRvIGRpcmVjdGx5IGFkZCBidWZmZXJzIGluIHRoZSBxdWV1ZSwgc28gdGhhdCB3ZSBh
+dm9pZCB0aGUgcmFjZS1jb25kaXRpb24gaGVyZS4KCkFueSBpZGVhcyBvbiB0aGF0IGZyb250IGFy
+ZSBtb3JlIHRoYW4gd2VsY29tZSBhbmQgbG9va2luZyBmb3J3YXJkIHRvIHRoZW0uCgpDaGVlcnMs
+CkJhYmlzCkFtYXpvbiBTcGFpbiBTZXJ2aWNlcyBzb2NpZWRhZCBsaW1pdGFkYSB1bmlwZXJzb25h
+bCwgQ2FsbGUgUmFtaXJleiBkZSBQcmFkbyA1LCAyODA0NSBNYWRyaWQuIFJlZ2lzdHJvIE1lcmNh
+bnRpbCBkZSBNYWRyaWQgLiBUb21vIDIyNDU4IC4gRm9saW8gMTAyIC4gSG9qYSBNLTQwMTIzNCAu
+IENJRiBCODQ1NzA5MzYK
 
-As I mentioned to you privately this week, I'm about to be out of town,
-so I won't be able to look at this until I'm back in a few weeks. I
-appreciate your patience.
-
-But as a cursory look, I'm happy that you've written the hardware-side
-code for this. That's a great starting point. The plumbing is not so
-nice, though. This needs to be integrated more closely with random.c
-itself, similar to how vmgenid works.
-
-When I'm back in a few weeks, I'll see if I can either write a
-description of what I have in mind, or simply integrate the useful
-hardware work here into an expanded patch series.
-
-[Please don't merge anything for now.]
-
-Jason
