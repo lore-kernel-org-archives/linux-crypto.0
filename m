@@ -2,79 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6831C05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5A6C25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 11:07:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbjATKfj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 05:35:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47696 "EHLO
+        id S230124AbjATLHK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 06:07:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbjATKfg (ORCPT
+        with ESMTP id S230033AbjATLHE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 05:35:36 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF478A7F
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Jan 2023 02:35:35 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pIok8-002Be8-Ie; Fri, 20 Jan 2023 18:35:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:35:32 +0800
-Date:   Fri, 20 Jan 2023 18:35:32 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Taehee Yoo <ap420073@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net, x86@kernel.org,
-        jbeulich@suse.com
-Subject: Re: [PATCH 0/3] crypto: x86/aria - fix build failure with old
- binutils
-Message-ID: <Y8pudCQPrubAYlQr@gondor.apana.org.au>
-References: <20230115121536.465367-1-ap420073@gmail.com>
+        Fri, 20 Jan 2023 06:07:04 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 010AEB4E1F;
+        Fri, 20 Jan 2023 03:06:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8CB6461EF6;
+        Fri, 20 Jan 2023 11:06:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99727C4339B;
+        Fri, 20 Jan 2023 11:06:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1674212816;
+        bh=tVbn5JTds4p/qo8OX0AbDwPKZh0p5F1FTdIi8kiCORU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=s8cX2WzMxlEiCDtXKxnN12H8MDcaO/Jr+QZle8Vd0pv46SWWV8BYOfEdjeEZaP1mv
+         rpfjm2gPDnIUG48112bjER7jAdRjKDYVVFKNy9J9glWVjuYzjJLD804deNDh+74mOL
+         nbGEW4GQOIwmEdxu/oB6AtusbzOcFIGv6Vd4VBdc=
+Date:   Fri, 20 Jan 2023 12:06:53 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "yekai (A)" <yekai13@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        wangzhou1@hisilicon.com, liulongfang@huawei.com
+Subject: Re: [PATCH v10 3/3] crypto: hisilicon/qm - define the device
+ isolation strategy
+Message-ID: <Y8p1zdHjYZ+Gqeh0@kroah.com>
+References: <20221119074817.12063-1-yekai13@huawei.com>
+ <20221119074817.12063-4-yekai13@huawei.com>
+ <Y5V1zaurC8TuuA6l@gondor.apana.org.au>
+ <e1bb7612-2763-5a00-0e53-bad22fa167cf@huawei.com>
+ <9e3aa5d6-951c-afcd-5544-2056d63a087a@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230115121536.465367-1-ap420073@gmail.com>
+In-Reply-To: <9e3aa5d6-951c-afcd-5544-2056d63a087a@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jan 15, 2023 at 12:15:33PM +0000, Taehee Yoo wrote:
-> There is build failure issue when old binutils is used.
+On Fri, Jan 20, 2023 at 10:13:50AM +0800, yekai (A) wrote:
 > 
-> The minimum version of binutils to build kernel is 2.23 but it doesn't
-> support GFNI.
-> But aria-avx, aria-avx2, and aria-avx512 use GFNI.
-> So, the build will be failed when old binutils is used.
 > 
-> In order to fix this issue, it checks build environment is using
-> binutils, which don't support GFNI or not.
-> In addition, it also checks AVX512 for aria-avx512.
+> On 2023/1/12 17:26, yekai (A) wrote:
+> >
+> >
+> >
+> > On 2022/12/11 14:16, Herbert Xu wrote:
+> >> On Sat, Nov 19, 2022 at 07:48:17AM +0000, Kai Ye wrote:
+> >>> Define the device isolation strategy by the device driver. The
+> >>> user configures a hardware error threshold value by uacce interface.
+> >>> If the number of hardware errors exceeds the value of setting error
+> >>> threshold in one hour. The device will not be available in user space.
+> >>> The VF device use the PF device isolation strategy. All the hardware
+> >>> errors are processed by PF driver.
+> >>>
+> >>> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> >>> ---
+> >>>  drivers/crypto/hisilicon/qm.c | 169 +++++++++++++++++++++++++++++++---
+> >>>  include/linux/hisi_acc_qm.h   |  15 +++
+> >>>  2 files changed, 169 insertions(+), 15 deletions(-)
+> >> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> >
+> > Hi Greg KH
+> >
+> >  
+> >
+> > Could you help me to apply this patchset v10?
+> >
+> >  
+> >
+> > thanks
+> >
+> > Kai
+> >
+> >
+> Hi Greg KH
 > 
-> aria-avx and aria-avx2 use GFNI optionally.
-> So, if binutils doesn't support GFNI, it hides GFNI code.
-> But aria-avx512 mandatorily requires GFNI and AVX512.
-> So, if binutils doesn't support GFNI or AVX512, it disallows select to
-> build.
-> 
-> In order to check whether the using binutils is supporting GFNI, it adds
-> AS_GFNI.
-> 
-> Taehee Yoo (3):
->   crypto: x86/aria-avx - fix build failure with old binutils
->   crypto: x86/aria-avx2 - fix build failure with old binutils
->   crypto: x86/aria-avx15 - fix build failure with old binutils
-> 
->  arch/x86/Kconfig.assembler               |  5 +++++
->  arch/x86/crypto/Kconfig                  |  2 +-
->  arch/x86/crypto/aria-aesni-avx-asm_64.S  | 10 ++++++++++
->  arch/x86/crypto/aria-aesni-avx2-asm_64.S | 10 +++++++++-
->  arch/x86/crypto/aria_aesni_avx2_glue.c   |  4 +++-
->  arch/x86/crypto/aria_aesni_avx_glue.c    |  4 +++-
->  6 files changed, 31 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.34.1
+> Just a friendly ping. 
+> Could you help me to apply this patchset v10?  Your prompt reply is much appreciated.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sorry for the delay, I missed the crypto maintainer's review.  now
+queued up.
+
+greg k-h
