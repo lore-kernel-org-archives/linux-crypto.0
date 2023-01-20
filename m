@@ -2,64 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2056EC25B4E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A549C25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:12:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbjATKJA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 05:09:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
+        id S229488AbjATKMa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 05:12:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjATKI7 (ORCPT
+        with ESMTP id S229487AbjATKM3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 05:08:59 -0500
+        Fri, 20 Jan 2023 05:12:29 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E9E8B32A;
-        Fri, 20 Jan 2023 02:08:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B618B745;
+        Fri, 20 Jan 2023 02:12:28 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pIoKC-002B4r-5s; Fri, 20 Jan 2023 18:08:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:08:44 +0800
-Date:   Fri, 20 Jan 2023 18:08:44 +0800
+        id 1pIoNi-002B7X-4u; Fri, 20 Jan 2023 18:12:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:12:22 +0800
+Date:   Fri, 20 Jan 2023 18:12:22 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Rix <trix@redhat.com>
-Cc:     brijesh.singh@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
-        davem@davemloft.net, nathan@kernel.org, ndesaulniers@google.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-Subject: Re: [PATCH v3] crypto: ccp: initialize 'error' variable to zero
-Message-ID: <Y8poLLMG8C31f91j@gondor.apana.org.au>
-References: <20230110170848.3022682-1-trix@redhat.com>
+To:     Jarkko Sakkinen <jarkko@profian.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SE..." 
+        <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5] crypto: ccp: Sanitize sev_platform_init() error
+ messages
+Message-ID: <Y8ppBmdsqcCHDn9v@gondor.apana.org.au>
+References: <20230110191201.29666-1-jarkko@profian.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230110170848.3022682-1-trix@redhat.com>
+In-Reply-To: <20230110191201.29666-1-jarkko@profian.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 12:08:48PM -0500, Tom Rix wrote:
-> Clang static analysis reports this problem
-> drivers/crypto/ccp/sev-dev.c:1347:3: warning: 3rd function call
->   argument is an uninitialized value [core.CallAndMessage]
->     dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
->     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> __sev_platform_init_locked() can return without setting the
-> error parameter, causing the dev_err() to report a garbage
-> value.
-> 
-> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
-> Signed-off-by: Tom Rix <trix@redhat.com>
-> ---
-> v2 cleanup commit log
-> v3 cleanup commit log
-> ---
->  drivers/crypto/ccp/sev-dev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Jan 10, 2023 at 07:12:00PM +0000, Jarkko Sakkinen wrote:
+>
+> @@ -1337,8 +1343,7 @@ void sev_pci_init(void)
+>  	/* Initialize the platform */
+>  	rc = sev_platform_init(&error);
+>  	if (rc)
+> -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> -			error, rc);
+> +		dev_err(sev->dev, "SEV: failed to INIT rc %d\n", rc);
 
-I think error should be removed completely on top of
-
-https://patchwork.kernel.org/project/linux-crypto/patch/20230110191201.29666-1-jarkko@profian.com/
+Please remove error and replace it with NULL.
 
 Thanks,
 -- 
