@@ -2,108 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6015FC25B50
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2627C25B4E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 10:24:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjATKVx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 05:21:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33588 "EHLO
+        id S229584AbjATKYP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 05:24:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjATKVw (ORCPT
+        with ESMTP id S229612AbjATKYP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 05:21:52 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC364617D;
-        Fri, 20 Jan 2023 02:21:51 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pIoWd-002BGR-8C; Fri, 20 Jan 2023 18:21:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Jan 2023 18:21:35 +0800
-Date:   Fri, 20 Jan 2023 18:21:35 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5/6] crypto: stm32/hash: Support Ux500 hash
-Message-ID: <Y8prL1fzhdf1jEyT@gondor.apana.org.au>
-References: <20221227-ux500-stm32-hash-v2-0-bc443bc44ca4@linaro.org>
- <20221227-ux500-stm32-hash-v2-5-bc443bc44ca4@linaro.org>
+        Fri, 20 Jan 2023 05:24:15 -0500
+Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60DD8C91E;
+        Fri, 20 Jan 2023 02:24:13 -0800 (PST)
+Received: from mail02.huawei.com (unknown [172.18.147.228])
+        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4NywPq1Kl2z9v7gS;
+        Fri, 20 Jan 2023 18:16:15 +0800 (CST)
+Received: from [10.206.134.65] (unknown [10.206.134.65])
+        by APP1 (Coremail) with SMTP id LxC2BwBn7gmva8pjQduwAA--.5258S2;
+        Fri, 20 Jan 2023 11:23:54 +0100 (CET)
+Message-ID: <5c65358c-4e77-901b-01bb-5df0d4c50949@huaweicloud.com>
+Date:   Fri, 20 Jan 2023 11:23:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221227-ux500-stm32-hash-v2-5-bc443bc44ca4@linaro.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v5 1/2] lib/mpi: Fix buffer overrun when SG is too long
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, ebiggers@kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
+ <20221227142740.2807136-2-roberto.sassu@huaweicloud.com>
+ <Y7g7sp6UJJrYKihK@gondor.apana.org.au>
+ <755e1dc9c777fa657ccd948f65f5f33240226c43.camel@huaweicloud.com>
+ <Y8UTghm0Y8U4ndmH@gondor.apana.org.au>
+Content-Language: en-US
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+In-Reply-To: <Y8UTghm0Y8U4ndmH@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: LxC2BwBn7gmva8pjQduwAA--.5258S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjc
+        xK6I8E87Iv6xkF7I0E14v26r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY
+        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
+        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+        VFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQADBF1jj4fWbQACsJ
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 08:19:16PM +0100, Linus Walleij wrote:
->  
-> +static void stm32_hash_emptymsg_fallback(struct ahash_request *req)
-> +{
-> +	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-> +	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(ahash);
-> +	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
-> +	struct stm32_hash_dev *hdev = rctx->hdev;
-> +	struct crypto_shash *xtfm;
-> +	struct shash_desc *sdesc;
-> +	size_t len;
-> +	int ret;
-> +
-> +	dev_dbg(hdev->dev, "use fallback message size 0 key size %d\n",
-> +		ctx->keylen);
-> +	xtfm = crypto_alloc_shash(crypto_ahash_alg_name(ahash),
-> +				  0, CRYPTO_ALG_NEED_FALLBACK);
-> +	if (IS_ERR(xtfm)) {
-> +		dev_err(hdev->dev, "failed to allocate synchronous fallback\n");
-> +		return;
-> +	}
-> +
-> +	len = sizeof(*sdesc) + crypto_shash_descsize(xtfm);
-> +	sdesc = kmalloc(len, GFP_KERNEL);
-> +	if (!sdesc)
-> +		goto err_hashkey_sdesc;
-> +	sdesc->tfm = xtfm;
-> +
-> +	if (ctx->keylen) {
-> +		ret = crypto_shash_setkey(xtfm, ctx->key, ctx->keylen);
-> +		if (ret) {
-> +			dev_err(hdev->dev, "failed to set key ret=%d\n", ret);
-> +			goto err_hashkey;
-> +		}
-> +	}
-> +
-> +	ret = crypto_shash_init(sdesc);
-> +	if (ret) {
-> +		dev_err(hdev->dev, "shash init error ret=%d\n", ret);
-> +		goto err_hashkey;
-> +	}
-> +
-> +	ret = crypto_shash_finup(sdesc, NULL, 0, rctx->digest);
-> +	if (ret)
-> +		dev_err(hdev->dev, "shash finup error\n");
-> +err_hashkey:
-> +	kfree(sdesc);
-> +err_hashkey_sdesc:
-> +	crypto_free_shash(xtfm);
-> +}
+On 1/16/2023 10:06 AM, Herbert Xu wrote:
+> On Mon, Jan 16, 2023 at 09:57:57AM +0100, Roberto Sassu wrote:
+>>
+>> Hi Herbert
+>>
+>> will you take also the second patch?
+> 
+> That's part of David Howells' tree so hopefully he will pick
+> it up soon.
 
-Calling crypto_alloc_shash is not allowed in this context.  For
-example, we might have been called down from the block layer due to
-swapping.  Even if you intermediate this with kernel threads, it
-still doesn't change the nature of the dead-lock.
+Hi David
 
-So if you need a fallback for zero-length messages, just allocate
-it unconditionally in the init_tfm function.
+could you please take the second patch?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks
+
+Roberto
+
