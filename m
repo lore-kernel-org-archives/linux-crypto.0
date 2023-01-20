@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2C8C25B50
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 21:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B47C25B50
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Jan 2023 22:20:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbjATVUh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 16:20:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39730 "EHLO
+        id S230057AbjATWT7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 17:19:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjATVUh (ORCPT
+        with ESMTP id S230096AbjATWTz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Jan 2023 16:20:37 -0500
+        Fri, 20 Jan 2023 17:19:55 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C80EC55;
-        Fri, 20 Jan 2023 13:20:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AD4762C2;
+        Fri, 20 Jan 2023 14:19:52 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 57E76B829FB;
-        Fri, 20 Jan 2023 21:20:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A04EC433EF;
-        Fri, 20 Jan 2023 21:20:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A48AFB82A95;
+        Fri, 20 Jan 2023 22:19:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3130C4339B;
+        Fri, 20 Jan 2023 22:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674249633;
-        bh=F8IpSOi2yAsoDoJtoZ+I9NR2c/7qvXeB0K1/DdBRsNY=;
+        s=k20201202; t=1674253190;
+        bh=HvcNM2UjecQL348bqHAOm445agwCIVqQtDTv2S/yEmw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ND9fVSSJQ8Sdt6aDyGMKj6L0Pk+kfUC0xhp9OzbiQ/MwP1P2i/fY/4x70eG08kFP+
-         FP/JzlzKcIwTfDuYnjZkj5Apjc+uSXOxq1vvelxt/4Ru+uzopag4DNPO/Uywaq4FLI
-         lPR8GD0GpVv1bwxvW1lMIcOpGlQsaqt4wEXyFmu4X+WYIhVm5t4VVaqt2LvnsTH8Aq
-         vdMcLamh7xyew6Ujc02MhTwLFJTdt4CNomQaoE9IZOdVBfZy4CVVFykaoBSy7eaDGz
-         7YP9emKOeK3RyjYyuyu0uf1e05N12b5TcHPsvFPQ0rKucbHZdxWZrw1dR5YHVEueVt
-         bJ8MVSTtdE8Gw==
-Date:   Fri, 20 Jan 2023 21:20:30 +0000
+        b=pDTcPNR6BXuGBjP48njVINKN5F4mgJzV2lu2lU+SiajKyiN1d9pouPWpoFT+XvXmP
+         p1moDyoN+5EFFREdr0oR4/QtuhG0eBg+nfymIU51LXQZjPtt4+tZSHc8kRvTMIesNi
+         N5TKxI/AuyFae1Pod78Qp6VO3XsbPnvU8SMAyKuj05xhg6Y+YN1BhQDju7OUbzYhdT
+         zrRiBZSrl4uuJw5bUXrzdOKEZfhl6OF9parCd9H83GKLEDxvijBfUR5wsISatx4H2+
+         evuGZ2pTnCHVocTM/YFfyfwP75KRtLMYIFTqZYgGjd6DKGo1p0Ps0At4i/ddziPeOm
+         JETqPRmVwe03Q==
+Date:   Fri, 20 Jan 2023 22:19:47 +0000
 From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
@@ -45,171 +45,172 @@ Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
         luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
         pgonda@google.com, peterz@infradead.org,
         srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, ashish.kalra@amd.com,
-        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>,
-        chao.p.peng@linux.intel.com
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <Y8sFnsk2GvnUCVFI@kernel.org>
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v7 25/64] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Message-ID: <Y8sTg3gI879qzDMV@kernel.org>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
+ <20221214194056.161492-26-michael.roth@amd.com>
+ <Y7BWGvGj/Ky8RctP@kernel.org>
+ <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230105021419.rs23nfq44rv64tsd@amd.com>
+In-Reply-To: <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
-> > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> > > +       bool (*private_mem_enabled)(struct kvm *kvm);
+On Thu, Jan 05, 2023 at 04:40:29PM -0600, Kalra, Ashish wrote:
+> Hello Jarkko,
+> 
+> On 12/31/2022 9:32 AM, Jarkko Sakkinen wrote:
+> > On Wed, Dec 14, 2022 at 01:40:17PM -0600, Michael Roth wrote:
+> > > From: Brijesh Singh <brijesh.singh@amd.com>
+> > > 
+> > > Before SNP VMs can be launched, the platform must be appropriately
+> > > configured and initialized. Platform initialization is accomplished via
+> > > the SNP_INIT command. Make sure to do a WBINVD and issue DF_FLUSH
+> > > command to prepare for the first SNP guest launch after INIT.
+> > > 
+> > > During the execution of SNP_INIT command, the firmware configures
+> > > and enables SNP security policy enforcement in many system components.
+> > > Some system components write to regions of memory reserved by early
+> > > x86 firmware (e.g. UEFI). Other system components write to regions
+> > > provided by the operation system, hypervisor, or x86 firmware.
+> > > Such system components can only write to HV-fixed pages or Default
+> > > pages. They will error when attempting to write to other page states
+> > > after SNP_INIT enables their SNP enforcement.
+> > > 
+> > > Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
+> > > system physical address ranges to convert into the HV-fixed page states
+> > > during the RMP initialization. If INIT_RMP is 1, hypervisors should
+> > > provide all system physical address ranges that the hypervisor will
+> > > never assign to a guest until the next RMP re-initialization.
+> > > For instance, the memory that UEFI reserves should be included in the
+> > > range list. This allows system components that occasionally write to
+> > > memory (e.g. logging to UEFI reserved regions) to not fail due to
+> > > RMP initialization and SNP enablement.
+> > > 
+> > > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >   drivers/crypto/ccp/sev-dev.c | 225 +++++++++++++++++++++++++++++++++++
+> > >   drivers/crypto/ccp/sev-dev.h |   2 +
+> > >   include/linux/psp-sev.h      |  17 +++
+> > >   3 files changed, 244 insertions(+)
+> > > 
+> > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > > index 9d84720a41d7..af20420bd6c2 100644
+> > > --- a/drivers/crypto/ccp/sev-dev.c
+> > > +++ b/drivers/crypto/ccp/sev-dev.c
+> > > @@ -26,6 +26,7 @@
+> > >   #include <linux/fs_struct.h>
+> > >   #include <asm/smp.h>
+> > > +#include <asm/e820/types.h>
+> > >   #include "psp-dev.h"
+> > >   #include "sev-dev.h"
+> > > @@ -34,6 +35,10 @@
+> > >   #define SEV_FW_FILE		"amd/sev.fw"
+> > >   #define SEV_FW_NAME_SIZE	64
+> > > +/* Minimum firmware version required for the SEV-SNP support */
+> > > +#define SNP_MIN_API_MAJOR	1
+> > > +#define SNP_MIN_API_MINOR	51
+> > > +
+> > >   static DEFINE_MUTEX(sev_cmd_mutex);
+> > >   static struct sev_misc_dev *misc_dev;
+> > > @@ -76,6 +81,13 @@ static void *sev_es_tmr;
+> > >   #define NV_LENGTH (32 * 1024)
+> > >   static void *sev_init_ex_buffer;
+> > > +/*
+> > > + * SEV_DATA_RANGE_LIST:
+> > > + *   Array containing range of pages that firmware transitions to HV-fixed
+> > > + *   page state.
+> > > + */
+> > > +struct sev_data_range_list *snp_range_list;
+> > > +
+> > >   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+> > >   {
+> > >   	struct sev_device *sev = psp_master->sev_data;
+> > > @@ -830,6 +842,186 @@ static int sev_update_firmware(struct device *dev)
+> > >   	return ret;
+> > >   }
+> > > +static void snp_set_hsave_pa(void *arg)
+> > > +{
+> > > +	wrmsrl(MSR_VM_HSAVE_PA, 0);
+> > > +}
+> > > +
+> > > +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+> > > +{
+> > > +	struct sev_data_range_list *range_list = arg;
+> > > +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
+> > > +	size_t size;
+> > > +
+> > > +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
+> > > +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
+> > > +		return -E2BIG;
+> > > +
+> > > +	switch (rs->desc) {
+> > > +	case E820_TYPE_RESERVED:
+> > > +	case E820_TYPE_PMEM:
+> > > +	case E820_TYPE_ACPI:
+> > > +		range->base = rs->start & PAGE_MASK;
+> > > +		size = (rs->end + 1) - rs->start;
+> > > +		range->page_count = size >> PAGE_SHIFT;
+> > > +		range_list->num_elements++;
+> > > +		break;
+> > > +	default:
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int __sev_snp_init_locked(int *error)
+> > > +{
+> > > +	struct psp_device *psp = psp_master;
+> > > +	struct sev_data_snp_init_ex data;
+> > > +	struct sev_device *sev;
+> > > +	int rc = 0;
+> > > +
+> > > +	if (!psp || !psp->sev_data)
+> > > +		return -ENODEV;
+> > > +
+> > > +	sev = psp->sev_data;
+> > > +
+> > > +	if (sev->snp_initialized)
+> > > +		return 0;
 > > 
-> > This looks like a function returning boolean to me. IOW, you can
-> > simplify this to:
-> 
-> The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
-> impression it needed to return an integer value, since by default if a
-> platform doesn't implement the op it would "return 0", and so could
-> still be called unconditionally.
-> 
-> Maybe that's not actually enforced, by it seems awkward to try to use a
-> bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
-> 
-> However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> use a function that returns bool, and then we just need to do:
-> 
->   bool kvm_arch_has_private_mem(struct kvm *kvm)
->   {
->           if (kvm_x86_ops.private_mem_enabled)
->                   return static_call(kvm_x86_private_mem_enabled)(kvm);
-
-I guess this is missing:
-
-        return false;
-
->   }
->     
-> instead of relying on default return value. So I'll take that approach
-> and adopt your other suggested changes.
-> 
-> ...
-> 
-> On a separate topic though, at a high level, this hook is basically a way
-> for platform-specific code to tell generic KVM code that private memslots
-> are supported by overriding the kvm_arch_has_private_mem() weak
-> reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> flag to convey that, which is in turn set by the
-> KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> 
-> But if, as I suggested in response to your PATCH 2 comments, we drop
-> KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> supported, whereas SEV/SNP code would be using what was set by
-> KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> kvm_arch_has_private_mem().
-
-Does this mean that internal calls to  kvm_vm_set_region_attr() will
-cease to exist, and it will rely for user space to use the ioctl
-properly instead?
-
-> So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> on something else. Maybe the logic can just be:
-> 
->   bool svm_private_mem_enabled(struct kvm *kvm)
->   {
->     return sev_enabled(kvm) || sev_snp_enabled(kvm)
->   }
-> 
-> (at least in the context of this patchset where UPM support is added for
-> both SEV and SNP).
-> 
-> So I'll plan to make that change as well.
-> 
-> -Mike
-> 
+> > Shouldn't this follow this check:
 > > 
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index 82ba4a564e58..4449aeff0dff 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
-> >  KVM_X86_OP(complete_emulated_msr)
-> >  KVM_X86_OP(vcpu_deliver_sipi_vector)
-> >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
-> >  
-> >  #undef KVM_X86_OP
-> >  #undef KVM_X86_OP_OPTIONAL
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 1da0474edb2d..1b4b89ddeb55 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
-> >  
-> >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
-> >  			     int root_level);
-> > +	bool (*private_mem_enabled)(struct kvm *kvm);
-> >  
-> >  	bool (*has_wbinvd_exit)(void);
-> >  
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index ce362e88a567..73b780fa4653 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
-> >  	return 0;
-> >  }
-> >  
-> > +static bool svm_private_mem_enabled(struct kvm *kvm)
-> > +{
-> > +	if (sev_guest(kvm))
-> > +		return kvm->arch.upm_mode;
-> > +
-> > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-> > +}
-> > +
-> >  static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >  	.name = "kvm_amd",
-> >  
-> > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >  
-> >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-> >  
-> > +	.private_mem_enabled = svm_private_mem_enabled,
-> > +
-> >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
-> >  
-> >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 823646d601db..9a1ca59d36a4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> >  }
-> >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
-> >  
-> > +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> > +{
-> > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
-> > +}
-> > +
-> >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
-> >  {
-> >  	kvm_mmu_pre_destroy_vm(kvm);
+> >          if (sev->state == SEV_STATE_INIT) {
+> >                  /* debug printk about possible incorrect call order */
+> >                  return -ENODEV;
+> >          }
 > > 
-> > -- 
-> > Regards/Gruss,
-> >     Boris.
-> > 
-> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
+> > It is game over for SNP, if SEV_CMD_INIT{_EX} got first, which means that
+> > this should not proceed.
+> 
+> 
+> But, how will SEV_CMD_INIT_EX happen before as sev_pci_init() which is
+> invoked during CCP module load/initialization, will first try to do
+> sev_snp_init() if SNP is supported, before it invokes sev_platform_init() to
+> do SEV firmware initialization ?
+
+Because the symbol is exported outside the driver to be called by other
+subsystems, you need to have a santiy check for the call order, as it
+is a hardware constraint. Otherwise, any unconsidered change in either
+side could unknowingily break the kernel.
+
+Alternatively, you could choose not to export sev_snp_init(). It is
+supported by the fact that the call in sev_guest_init() is does nothing
+useful (for the reasons you already wrote).
 
 BR, Jarkko
