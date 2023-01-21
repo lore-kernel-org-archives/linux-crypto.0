@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCE1C52D11
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Jan 2023 04:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D103C52D11
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Jan 2023 04:25:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbjAUEZR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Jan 2023 23:25:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36480 "EHLO
+        id S229720AbjAUEZW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 Jan 2023 23:25:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbjAUEZJ (ORCPT
+        with ESMTP id S229707AbjAUEZJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 20 Jan 2023 23:25:09 -0500
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70723530EC;
-        Fri, 20 Jan 2023 20:24:53 -0800 (PST)
-Received: by mail-qt1-x829.google.com with SMTP id g16so3765838qtu.2;
-        Fri, 20 Jan 2023 20:24:53 -0800 (PST)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D83E54119;
+        Fri, 20 Jan 2023 20:24:50 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id jr19so4581282qtb.7;
+        Fri, 20 Jan 2023 20:24:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qwRl6AriAxtLsQshG0WLT8xXpSJi+NGIVxpWZYX/6II=;
-        b=oYxzuFmr5pVt01gJibPdD5ns77LWVJeQmmVcsoPATQ4AhkNE8Da5wsu9Mc1wJLeNaB
-         tehkdeWQw8aXAeGragVTrfuwq647RKKSq23gNAuq9fjHG5+mwpwbdicJcnlrSaljEfQr
-         Eb4bFX6NvVp0r5sOxhE2t/7kgma9WzMeWKopGbGj4cFeEf3SghA9EFKoNP2F8ewXDmpg
-         1GJMDoD0tN/M476NAiSuwmkMZjRnvs29wvpAoqtHYdA4dhfCJDtFiNT4jD3KDxwhJWJy
-         7aVDQmCmdhwT0P+5kyStCHbeHIKIm0dZSkrbfczaE/6i5VUbDGixfB8lbev7Cga34Dh4
-         WNOQ==
+        bh=+S0aKvtNtHji2MwhEJCerU5PDiGf8bD52pNGNrh5jes=;
+        b=aMj8AEtUF7+dyhnay+QHtRZynp8reOr1WKixbCoxjKPgzn4RbIoBzC6ObzXVtimmCl
+         gxeLz4Pf+NcsqI6ANdrOSokQ5PV2rFWyi8IuNdK/+325yIgghnbm2i35b/kBDRSzgU1E
+         hHoJ9jiV//+RqlxtX18tN+85qBpVl9OTclfHDu7NSijv3lrX24mdNc0XJFldC/9B8tca
+         zBY7y4R7i6JKiTNnPDjHxQrjyvvc8ob2w7rputsx8wrzgIZBWuhD3g764GOTseVURSl6
+         jdS+kq++ChxJmCNbWH1lTil1mePsY0mHnURRwnCoJy8tBXKgFpWOPgYjOghP27CjLDfs
+         erxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qwRl6AriAxtLsQshG0WLT8xXpSJi+NGIVxpWZYX/6II=;
-        b=wVG6Gd/rAGHQc2rlv9wYu0+LBdmUgtcntNe1rssNUWfZw5j2OSNzHu/4eEiqJ2uNWE
-         6RIGnjH147H+VLLT2/YiWJTrT8+wWgGb2Ki+n8IvUpIPxZdDGaou6jyOpuoDK5X2cDhk
-         zfJYB53CgMlRqEAp1ggjbDvtI3HvJDCX9vegzal9dTvROZAPt+82jS9AFHZ4bX8grCH9
-         jLliBqUQT/UpADEPHWtxJBfiBZ3OaRhrTlgPPN4CP08xqKzjtJOD9LEdo5At0Ap1jkVd
-         W+CZLY3VXAG9EY6IQtNaCEPXpVPajuiLcYgDyWZCNMBczHXd+m9+Q1kHsCZ3B4Ib2I8f
-         E3Rg==
-X-Gm-Message-State: AFqh2kolEj+i1bDZ8BECtUVoBZpNOYxNwwyWHOGyDjE2h+Xl4U2XD8M+
-        Z/btl2BBENcohzdoB5giy0VUGH9b2tE=
-X-Google-Smtp-Source: AMrXdXuIb83rZuSdHzA4rxpr75oAXNzqP23zVDgdCNSGS7ZxV26QSDHnFK2M21j5vg9ZIdQWGnLVzw==
-X-Received: by 2002:ac8:6a0e:0:b0:3ab:7928:526c with SMTP id t14-20020ac86a0e000000b003ab7928526cmr23006426qtr.17.1674275092061;
-        Fri, 20 Jan 2023 20:24:52 -0800 (PST)
+        bh=+S0aKvtNtHji2MwhEJCerU5PDiGf8bD52pNGNrh5jes=;
+        b=DxEqhksqJBmykFmrTzAO9S/MGMNsFhlcA/beSpojMxfg40U1D9udDMQWqHYQccFT0X
+         uBivr6yXtB2dmu4xG5z5ZVV4UvBQ+mJs3qWqi06EoOXfOYedUjFCQn3UPTAMW4ygRE35
+         pHOStVX5ALLCExuaE9QrU3uLncm1k/EN86G1w9zxiRCkks+P/7rUfDxZaLCFHrN8CkS5
+         /wsV1TEVgWbn4ltHXitN6pgjoxvQ4t8s9rtNjB3SuiM+PJxkd91PzOP7J/HMgUu+nbVb
+         +KxA8RTx96CHoTt/gmIDWrvKbVDX/lCVGppUvBZgWdmlVEDzcV5bmt/54s2H2KvIa0fU
+         pZQw==
+X-Gm-Message-State: AFqh2kqRyITJn3BUYG3elXBx0DN/Hc4N2xhP3kV4UV/3+wgaOKKVNYbY
+        XSBO3wcflJdacZ+HxSuwPIsCtA39sfo=
+X-Google-Smtp-Source: AMrXdXtIv5QggoFAoBrhAWpQnUP/+5MgCRar/zhpHAxgG25dU29UxDfYodLxvFHa/bEwvKhOLpn4Sw==
+X-Received: by 2002:ac8:6681:0:b0:3b6:3b1a:d028 with SMTP id d1-20020ac86681000000b003b63b1ad028mr22452427qtp.19.1674275089170;
+        Fri, 20 Jan 2023 20:24:49 -0800 (PST)
 Received: from localhost (50-242-44-45-static.hfc.comcastbusiness.net. [50.242.44.45])
-        by smtp.gmail.com with ESMTPSA id ga15-20020a05622a590f00b003b6325dfc4esm8255304qtb.67.2023.01.20.20.24.51
+        by smtp.gmail.com with ESMTPSA id dt26-20020a05620a479a00b00705c8cce5dcsm16652425qkb.111.2023.01.20.20.24.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 20:24:51 -0800 (PST)
+        Fri, 20 Jan 2023 20:24:48 -0800 (PST)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
@@ -83,9 +83,9 @@ To:     linux-kernel@vger.kernel.org,
         Vincent Guittot <vincent.guittot@linaro.org>
 Cc:     Yury Norov <yury.norov@gmail.com>, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: [PATCH 9/9] lib/cpumask: update comment for cpumask_local_spread()
-Date:   Fri, 20 Jan 2023 20:24:36 -0800
-Message-Id: <20230121042436.2661843-10-yury.norov@gmail.com>
+Subject: [PATCH 7/9] sched/topology: Introduce for_each_numa_hop_mask()
+Date:   Fri, 20 Jan 2023 20:24:34 -0800
+Message-Id: <20230121042436.2661843-8-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230121042436.2661843-1-yury.norov@gmail.com>
 References: <20230121042436.2661843-1-yury.norov@gmail.com>
@@ -95,55 +95,46 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that we have an iterator-based alternative for a very common case
-of using cpumask_local_spread for all cpus in a row, it's worth to
-mention that in comment to cpumask_local_spread().
+From: Valentin Schneider <vschneid@redhat.com>
 
+The recently introduced sched_numa_hop_mask() exposes cpumasks of CPUs
+reachable within a given distance budget, wrap the logic for iterating over
+all (distance, mask) values inside an iterator macro.
+
+Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+Reviewed-by: Yury Norov <yury.norov@gmail.com>
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
-Reviewed-by: Valentin Schneider <vschneid@redhat.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- lib/cpumask.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ include/linux/topology.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/lib/cpumask.c b/lib/cpumask.c
-index 10aa15715c0d..98291b07c756 100644
---- a/lib/cpumask.c
-+++ b/lib/cpumask.c
-@@ -114,11 +114,29 @@ void __init free_bootmem_cpumask_var(cpumask_var_t mask)
-  * @i: index number
-  * @node: local numa_node
-  *
-- * This function selects an online CPU according to a numa aware policy;
-- * local cpus are returned first, followed by non-local ones, then it
-- * wraps around.
-+ * Returns online CPU according to a numa aware policy; local cpus are returned
-+ * first, followed by non-local ones, then it wraps around.
-  *
-- * It's not very efficient, but useful for setup.
-+ * For those who wants to enumerate all CPUs based on their NUMA distances,
-+ * i.e. call this function in a loop, like:
+diff --git a/include/linux/topology.h b/include/linux/topology.h
+index 344c2362755a..fea32377f7c7 100644
+--- a/include/linux/topology.h
++++ b/include/linux/topology.h
+@@ -261,4 +261,22 @@ sched_numa_hop_mask(unsigned int node, unsigned int hops)
+ }
+ #endif	/* CONFIG_NUMA */
+ 
++/**
++ * for_each_numa_hop_mask - iterate over cpumasks of increasing NUMA distance
++ *                          from a given node.
++ * @mask: the iteration variable.
++ * @node: the NUMA node to start the search from.
 + *
-+ * for (i = 0; i < num_online_cpus(); i++) {
-+ *	cpu = cpumask_local_spread(i, node);
-+ *	do_something(cpu);
-+ * }
++ * Requires rcu_lock to be held.
 + *
-+ * There's a better alternative based on for_each()-like iterators:
-+ *
-+ *	for_each_numa_hop_mask(mask, node) {
-+ *		for_each_cpu_andnot(cpu, mask, prev)
-+ *			do_something(cpu);
-+ *		prev = mask;
-+ *	}
-+ *
-+ * It's simpler and more verbose than above. Complexity of iterator-based
-+ * enumeration is O(sched_domains_numa_levels * nr_cpu_ids), while
-+ * cpumask_local_spread() when called for each cpu is
-+ * O(sched_domains_numa_levels * nr_cpu_ids * log(nr_cpu_ids)).
-  */
- unsigned int cpumask_local_spread(unsigned int i, int node)
- {
++ * Yields cpu_online_mask for @node == NUMA_NO_NODE.
++ */
++#define for_each_numa_hop_mask(mask, node)				       \
++	for (unsigned int __hops = 0;					       \
++	     mask = (node != NUMA_NO_NODE || __hops) ?			       \
++		     sched_numa_hop_mask(node, __hops) :		       \
++		     cpu_online_mask,					       \
++	     !IS_ERR_OR_NULL(mask);					       \
++	     __hops++)
++
+ #endif /* _LINUX_TOPOLOGY_H */
 -- 
 2.34.1
 
