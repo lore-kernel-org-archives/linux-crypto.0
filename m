@@ -2,101 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0A1C25B4E
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Jan 2023 15:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31214C27C76
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Jan 2023 16:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbjAVPrN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Jan 2023 10:47:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37118 "EHLO
+        id S231553AbjAVQKM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Jan 2023 11:10:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjAVPrM (ORCPT
+        with ESMTP id S231544AbjAVQKC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Jan 2023 10:47:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C3918B3E
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Jan 2023 07:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674402384;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=E6jYgjX2bdUMfo7qC2knF1fy2KORUnKc0O3IR4qBP1I=;
-        b=MZN+OuCBr83G0nnTEvGOsTOfTCTnXjloRue7z5O/aeJbvGTgSnzFGK295y4t0LO3X5tLNO
-        XZGjsbetsyfhBjRXjnyFSa/VyarfT5rVD4IJAurHAjexua7Rctn5Ie2c0ZaB120THcmFYf
-        FV0jTFUovf1QszOgMxRAzWB3/TtOI2E=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-515-vfrNIATxMnSaCCBMFqxBMA-1; Sun, 22 Jan 2023 10:46:22 -0500
-X-MC-Unique: vfrNIATxMnSaCCBMFqxBMA-1
-Received: by mail-qk1-f198.google.com with SMTP id w17-20020a05620a425100b00706bf3b459eso7252996qko.11
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Jan 2023 07:46:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E6jYgjX2bdUMfo7qC2knF1fy2KORUnKc0O3IR4qBP1I=;
-        b=fuImegUee5RUY0ZLeuQ1/LJxR7OzgPNUB1ESFxne+LHap7TbyEwP45qvYJJp0gzyOv
-         woBHtuADbofTAqGcD8yW3VradZksZBF3AUKmMAf9MhZNQc0kpwg0fsXPLMCg5+oxx66J
-         rfRlLp98vCL7a0dBqXSi4ehhHTYkjz1hp+BuQflmjR4NJkuAUcj3ffj6fVw/AQTDJQcX
-         T5IVAiIRWayDsj8P+DRBi/lWMWF/oeQAPxnMMc1Ld6H7+7HVLXYO7aa8S/2JkZXRDeAe
-         R9jVMhV3E24EnT+pFyGzDma91C+DLUZyshQAa2UmAmm5LvOtPEkPBluGh+mrG0RIDfTv
-         gpRA==
-X-Gm-Message-State: AFqh2kr031EP5CtDDuUmg1HKjPy4oOBMI7l3pYVP3Wk1iV9Bhmk7d8WU
-        S6pl9lVnajIwKEZSg9k1m7KQTIPWGs3cRsmhl/PAlBcY4A1pqWnhSWvQUBU3zkRCbADsjrnGY8w
-        I3bTJuhKExngbps64Ws3IYFr5
-X-Received: by 2002:a05:6214:350e:b0:535:b22:d8dd with SMTP id nk14-20020a056214350e00b005350b22d8ddmr31727124qvb.5.1674402382068;
-        Sun, 22 Jan 2023 07:46:22 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvzKqhaSc8ThZothYAnzF5/kTMB4L4BWs63as8xoBUPLzodub1dl0JsOxTCxYNPbqC2WLN7Cg==
-X-Received: by 2002:a05:6214:350e:b0:535:b22:d8dd with SMTP id nk14-20020a056214350e00b005350b22d8ddmr31727112qvb.5.1674402381836;
-        Sun, 22 Jan 2023 07:46:21 -0800 (PST)
-Received: from localhost.localdomain.com (024-205-208-113.res.spectrum.com. [24.205.208.113])
-        by smtp.gmail.com with ESMTPSA id h8-20020a05620a284800b006fa7b5ea2d1sm29929090qkp.125.2023.01.22.07.46.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Jan 2023 07:46:21 -0800 (PST)
-From:   Tom Rix <trix@redhat.com>
-To:     neal_liu@aspeedtech.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, joel@jms.id.au, andrew@aj.id.au
-Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH] crypto: change aspeed_acry_akcipher_algs storage-class-specifier to static
-Date:   Sun, 22 Jan 2023 07:46:11 -0800
-Message-Id: <20230122154611.504808-1-trix@redhat.com>
-X-Mailer: git-send-email 2.26.3
+        Sun, 22 Jan 2023 11:10:02 -0500
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9919821974;
+        Sun, 22 Jan 2023 08:10:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1674403801; x=1705939801;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=W1DMcmxxuPyhCSVP9BInb5PzO19g12QdLJPsrjS+ZQg=;
+  b=nJNTr87R/aoHv3NUKVBhsXF3dYekfVMaP8uqnL9UP3fMNdVFUsG3MtLf
+   gc9tMI/1XTtjXHwuoc5WJbyJImPh0wzmK8Pie4hWGcsYeWj6tvJt1jBjy
+   Pt/JcBo39m1JYmdvSClocPvCb8Kgnfea21xKXUHaQNr9/sqJYWYoJB2hW
+   0=;
+X-IronPort-AV: E=Sophos;i="5.97,237,1669075200"; 
+   d="scan'208";a="289193225"
+Subject: Re: [PATCH RFC v7 24/64] crypto:ccp: Define the SEV-SNP commands
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2023 16:09:55 +0000
+Received: from EX13D46EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com (Postfix) with ESMTPS id 9EE678114F;
+        Sun, 22 Jan 2023 16:09:52 +0000 (UTC)
+Received: from EX19D024EUA002.ant.amazon.com (10.252.50.224) by
+ EX13D46EUA002.ant.amazon.com (10.43.165.177) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Sun, 22 Jan 2023 16:09:51 +0000
+Received: from [192.168.14.18] (10.43.160.120) by
+ EX19D024EUA002.ant.amazon.com (10.252.50.224) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1118.7; Sun, 22 Jan 2023 16:09:38 +0000
+Message-ID: <377e3bba-3948-908d-610d-d9961518498b@amazon.com>
+Date:   Sun, 22 Jan 2023 18:09:33 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <harald@profian.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-25-michael.roth@amd.com>
+Content-Language: en-US
+From:   Sabin Rapan <sabrapan@amazon.com>
+In-Reply-To: <20221214194056.161492-25-michael.roth@amd.com>
+X-Originating-IP: [10.43.160.120]
+X-ClientProxiedBy: EX13D30UWB004.ant.amazon.com (10.43.161.51) To
+ EX19D024EUA002.ant.amazon.com (10.252.50.224)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-smatch reports
-drivers/crypto/aspeed/aspeed-acry.c:606:24: warning: symbol 'aspeed_acry_akcipher_algs'
-  was not declared. Should it be static?
-
-aspeed_acry_akcipher_algs is only used in aspeed-acry.c,
-so it should be static.
-
-Fixes: 2f1cf4e50c95 ("crypto: aspeed - Add ACRY RSA driver")
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/crypto/aspeed/aspeed-acry.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
-index 6d3790583f8b..164c524015f0 100644
---- a/drivers/crypto/aspeed/aspeed-acry.c
-+++ b/drivers/crypto/aspeed/aspeed-acry.c
-@@ -603,7 +603,7 @@ static void aspeed_acry_rsa_exit_tfm(struct crypto_akcipher *tfm)
- 	crypto_free_akcipher(ctx->fallback_tfm);
- }
- 
--struct aspeed_acry_alg aspeed_acry_akcipher_algs[] = {
-+static struct aspeed_acry_alg aspeed_acry_akcipher_algs[] = {
- 	{
- 		.akcipher = {
- 			.encrypt = aspeed_acry_rsa_enc,
--- 
-2.26.3
+CgpPbiAxNC4xMi4yMDIyIDIxOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gRnJvbTogQnJpamVz
+aCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPgo+IAo+ICsvKgo+ICsgKiBzdHJ1Y3Qgc2V2
+X3VzZXJfZGF0YV9zbnBfY29uZmlnIC0gc3lzdGVtIHdpZGUgY29uZmlndXJhdGlvbiB2YWx1ZSBm
+b3IgU05QLgo+ICsgKgo+ICsgKiBAcmVwb3J0ZWRfdGNiOiBUaGUgVENCIHZlcnNpb24gdG8gcmVw
+b3J0IGluIHRoZSBndWVzdCBhdHRlc3RhdGlvbiByZXBvcnQuCj4gKyAqIEBtYXNrX2NoaXBfaWQ6
+IEluZGljYXRlcyB0aGF0IHRoZSBDSElEX0lEIGZpZWxkIGluIHRoZSBhdHRlc3RhdGlvbiByZXBv
+cnQKPiArICogd2lsbCBhbHdheXMgYmUgemVyby4KPiArICovCj4gK3N0cnVjdCBzZXZfdXNlcl9k
+YXRhX3NucF9jb25maWcgewo+ICsgICAgICAgX191NjQgcmVwb3J0ZWRfdGNiOyAgICAgLyogSW4g
+Ki8KPiArICAgICAgIF9fdTMyIG1hc2tfY2hpcF9pZDsgICAgIC8qIEluICovCj4gKyAgICAgICBf
+X3U4IHJzdmRbNTJdOwo+ICt9IF9fcGFja2VkOwo+ICsKCkJhc2VkIG9uIHRhYmxlIDQ1IHNlY3Rp
+b24gOC42LjEgaW4KaHR0cHM6Ly93d3cuYW1kLmNvbS9zeXN0ZW0vZmlsZXMvVGVjaERvY3MvNTY4
+NjAucGRmIEkgdGhpbmsgdGhpcyBzaG91bGQgYmUgCgpzdHJ1Y3Qgc2V2X3VzZXJfZGF0YV9zbnBf
+Y29uZmlnIHsKICAgICAgIF9fdTY0IHJlcG9ydGVkX3RjYjsgICAgIC8qIEluICovCiAgICAgICBf
+X3UzMiBtYXNrX2NoaXBfaWQ6MTsgICAgIC8qIEluICovCiAgICAgICBfX3UzMiBtYXNrX2NoaXBf
+a2V5OjE7ICAgICAvKiBJbiAqLwogICAgICAgX191MzIgcnN2ZDozMDsKICAgICAgIF9fdTggcnN2
+ZDFbNTJdOwp9IF9fcGFja2VkOwoKCi0tClNhYmluLgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2Vu
+dGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3Ry
+ZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBS
+ZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
