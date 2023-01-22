@@ -2,98 +2,308 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31214C27C76
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Jan 2023 16:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F1FC61D9D
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Jan 2023 18:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231553AbjAVQKM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Jan 2023 11:10:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
+        id S230011AbjAVSsm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 22 Jan 2023 13:48:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231544AbjAVQKC (ORCPT
+        with ESMTP id S229973AbjAVSsl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Jan 2023 11:10:02 -0500
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9919821974;
-        Sun, 22 Jan 2023 08:10:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1674403801; x=1705939801;
-  h=message-id:date:mime-version:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=W1DMcmxxuPyhCSVP9BInb5PzO19g12QdLJPsrjS+ZQg=;
-  b=nJNTr87R/aoHv3NUKVBhsXF3dYekfVMaP8uqnL9UP3fMNdVFUsG3MtLf
-   gc9tMI/1XTtjXHwuoc5WJbyJImPh0wzmK8Pie4hWGcsYeWj6tvJt1jBjy
-   Pt/JcBo39m1JYmdvSClocPvCb8Kgnfea21xKXUHaQNr9/sqJYWYoJB2hW
-   0=;
-X-IronPort-AV: E=Sophos;i="5.97,237,1669075200"; 
-   d="scan'208";a="289193225"
-Subject: Re: [PATCH RFC v7 24/64] crypto:ccp: Define the SEV-SNP commands
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2023 16:09:55 +0000
-Received: from EX13D46EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com (Postfix) with ESMTPS id 9EE678114F;
-        Sun, 22 Jan 2023 16:09:52 +0000 (UTC)
-Received: from EX19D024EUA002.ant.amazon.com (10.252.50.224) by
- EX13D46EUA002.ant.amazon.com (10.43.165.177) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Sun, 22 Jan 2023 16:09:51 +0000
-Received: from [192.168.14.18] (10.43.160.120) by
- EX19D024EUA002.ant.amazon.com (10.252.50.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1118.7; Sun, 22 Jan 2023 16:09:38 +0000
-Message-ID: <377e3bba-3948-908d-610d-d9961518498b@amazon.com>
-Date:   Sun, 22 Jan 2023 18:09:33 +0200
+        Sun, 22 Jan 2023 13:48:41 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9314C13538;
+        Sun, 22 Jan 2023 10:48:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0132560C8F;
+        Sun, 22 Jan 2023 18:48:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CF3C433EF;
+        Sun, 22 Jan 2023 18:48:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674413318;
+        bh=gsccqyhXgczWujfYNuc8IWNveSbdGH+ZyHwJN2WZqFM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=PZzAU6myHzlfwwNDBAp7BM5f5SfE6HBGwNawDwelEREuKD8hzBnSWdJYeuTXkFNND
+         N+VSv5Obu/gt3kxFgQCbzqPMAcJ85Nvi5OFfh4bhpaR91aSD5CMZjDPQY+a9+yz4Dp
+         WNTgF3S8Xe2NcLfQOq/EFCEZnnRSY4WmFkACfP+0+khAeTDd4JNEBvaFmkMLHX8n04
+         IuauBpOYga+cs2xjxZmeEmhBCqYrXwP3+g2dUCDbEQG8ymRrAnlGWU6q35upGddfBh
+         J8wAEm9wuvjASDyI3azF9SCn4Q6DKoNhU95FkxrdPbuRBIP7oGyvlpvL4FmmgeGQ9i
+         X1Du+uzXPnzpg==
+From:   SeongJae Park <sj@kernel.org>
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     SeongJae Park <sj@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Iwona Winiarska <iwona.winiarska@intel.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
+        dri-devel@lists.freedesktop.org, linux-hwmon@vger.kernel.org,
+        linux-input@vger.kernel.org, openbmc@lists.ozlabs.org,
+        alsa-devel@alsa-project.org, linux-watchdog@vger.kernel.org
+Subject: [PATCH v2 1/1] Docs/subsystem-apis: Remove '[The ]Linux' prefixes from titles of listed documents
+Date:   Sun, 22 Jan 2023 18:48:34 +0000
+Message-Id: <20230122184834.181977-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-25-michael.roth@amd.com>
-Content-Language: en-US
-From:   Sabin Rapan <sabrapan@amazon.com>
-In-Reply-To: <20221214194056.161492-25-michael.roth@amd.com>
-X-Originating-IP: [10.43.160.120]
-X-ClientProxiedBy: EX13D30UWB004.ant.amazon.com (10.43.161.51) To
- EX19D024EUA002.ant.amazon.com (10.252.50.224)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CgpPbiAxNC4xMi4yMDIyIDIxOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gRnJvbTogQnJpamVz
-aCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPgo+IAo+ICsvKgo+ICsgKiBzdHJ1Y3Qgc2V2
-X3VzZXJfZGF0YV9zbnBfY29uZmlnIC0gc3lzdGVtIHdpZGUgY29uZmlndXJhdGlvbiB2YWx1ZSBm
-b3IgU05QLgo+ICsgKgo+ICsgKiBAcmVwb3J0ZWRfdGNiOiBUaGUgVENCIHZlcnNpb24gdG8gcmVw
-b3J0IGluIHRoZSBndWVzdCBhdHRlc3RhdGlvbiByZXBvcnQuCj4gKyAqIEBtYXNrX2NoaXBfaWQ6
-IEluZGljYXRlcyB0aGF0IHRoZSBDSElEX0lEIGZpZWxkIGluIHRoZSBhdHRlc3RhdGlvbiByZXBv
-cnQKPiArICogd2lsbCBhbHdheXMgYmUgemVyby4KPiArICovCj4gK3N0cnVjdCBzZXZfdXNlcl9k
-YXRhX3NucF9jb25maWcgewo+ICsgICAgICAgX191NjQgcmVwb3J0ZWRfdGNiOyAgICAgLyogSW4g
-Ki8KPiArICAgICAgIF9fdTMyIG1hc2tfY2hpcF9pZDsgICAgIC8qIEluICovCj4gKyAgICAgICBf
-X3U4IHJzdmRbNTJdOwo+ICt9IF9fcGFja2VkOwo+ICsKCkJhc2VkIG9uIHRhYmxlIDQ1IHNlY3Rp
-b24gOC42LjEgaW4KaHR0cHM6Ly93d3cuYW1kLmNvbS9zeXN0ZW0vZmlsZXMvVGVjaERvY3MvNTY4
-NjAucGRmIEkgdGhpbmsgdGhpcyBzaG91bGQgYmUgCgpzdHJ1Y3Qgc2V2X3VzZXJfZGF0YV9zbnBf
-Y29uZmlnIHsKICAgICAgIF9fdTY0IHJlcG9ydGVkX3RjYjsgICAgIC8qIEluICovCiAgICAgICBf
-X3UzMiBtYXNrX2NoaXBfaWQ6MTsgICAgIC8qIEluICovCiAgICAgICBfX3UzMiBtYXNrX2NoaXBf
-a2V5OjE7ICAgICAvKiBJbiAqLwogICAgICAgX191MzIgcnN2ZDozMDsKICAgICAgIF9fdTggcnN2
-ZDFbNTJdOwp9IF9fcGFja2VkOwoKCi0tClNhYmluLgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2Vu
-dGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3Ry
-ZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBS
-ZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
+Some documents that listed on subsystem-apis have 'Linux' or 'The Linux'
+title prefixes.  It's duplicated information, and makes finding the
+document of interest with human eyes not easy.  Remove the prefixes from
+the titles.
+
+Signed-off-by: SeongJae Park <sj@kernel.org>
+---
+Changes from v1
+(https://lore.kernel.org/lkml/20230114194741.115855-1-sj@kernel.org/)
+- Drop second patch (will post later for each subsystem)
+
+ Documentation/PCI/index.rst        | 6 +++---
+ Documentation/cpu-freq/index.rst   | 6 +++---
+ Documentation/crypto/index.rst     | 6 +++---
+ Documentation/driver-api/index.rst | 6 +++---
+ Documentation/gpu/index.rst        | 6 +++---
+ Documentation/hwmon/index.rst      | 6 +++---
+ Documentation/input/index.rst      | 6 +++---
+ Documentation/mm/index.rst         | 6 +++---
+ Documentation/peci/index.rst       | 6 +++---
+ Documentation/scheduler/index.rst  | 6 +++---
+ Documentation/scsi/index.rst       | 6 +++---
+ Documentation/sound/index.rst      | 6 +++---
+ Documentation/virt/index.rst       | 6 +++---
+ Documentation/watchdog/index.rst   | 6 +++---
+ 14 files changed, 42 insertions(+), 42 deletions(-)
+
+diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
+index c17c87af1968..e73f84aebde3 100644
+--- a/Documentation/PCI/index.rst
++++ b/Documentation/PCI/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-=======================
+-Linux PCI Bus Subsystem
+-=======================
++=================
++PCI Bus Subsystem
++=================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/cpu-freq/index.rst b/Documentation/cpu-freq/index.rst
+index 2fe32dad562a..de25740651f7 100644
+--- a/Documentation/cpu-freq/index.rst
++++ b/Documentation/cpu-freq/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-==============================================================================
+-Linux CPUFreq - CPU frequency and voltage scaling code in the Linux(TM) kernel
+-==============================================================================
++========================================================================
++CPUFreq - CPU frequency and voltage scaling code in the Linux(TM) kernel
++========================================================================
+ 
+ Author: Dominik Brodowski  <linux@brodo.de>
+ 
+diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+index 21338fa92642..da5d5ad2bdf3 100644
+--- a/Documentation/crypto/index.rst
++++ b/Documentation/crypto/index.rst
+@@ -1,6 +1,6 @@
+-=======================
+-Linux Kernel Crypto API
+-=======================
++==========
++Crypto API
++==========
+ 
+ :Author: Stephan Mueller
+ :Author: Marek Vasut
+diff --git a/Documentation/driver-api/index.rst b/Documentation/driver-api/index.rst
+index d3a58f77328e..b208e0dac3a0 100644
+--- a/Documentation/driver-api/index.rst
++++ b/Documentation/driver-api/index.rst
+@@ -1,6 +1,6 @@
+-========================================
+-The Linux driver implementer's API guide
+-========================================
++==============================
++Driver implementer's API guide
++==============================
+ 
+ The kernel offers a wide variety of interfaces to support the development
+ of device drivers.  This document is an only somewhat organized collection
+diff --git a/Documentation/gpu/index.rst b/Documentation/gpu/index.rst
+index b99dede9a5b1..eee5996acf2c 100644
+--- a/Documentation/gpu/index.rst
++++ b/Documentation/gpu/index.rst
+@@ -1,6 +1,6 @@
+-==================================
+-Linux GPU Driver Developer's Guide
+-==================================
++============================
++GPU Driver Developer's Guide
++============================
+ 
+ .. toctree::
+ 
+diff --git a/Documentation/hwmon/index.rst b/Documentation/hwmon/index.rst
+index fe2cc6b73634..c2b3c1a822dd 100644
+--- a/Documentation/hwmon/index.rst
++++ b/Documentation/hwmon/index.rst
+@@ -1,6 +1,6 @@
+-=========================
+-Linux Hardware Monitoring
+-=========================
++===================
++Hardware Monitoring
++===================
+ 
+ .. toctree::
+    :maxdepth: 1
+diff --git a/Documentation/input/index.rst b/Documentation/input/index.rst
+index 9888f5cbf6d5..35581cd18e91 100644
+--- a/Documentation/input/index.rst
++++ b/Documentation/input/index.rst
+@@ -1,6 +1,6 @@
+-=============================
+-The Linux Input Documentation
+-=============================
++===================
++Input Documentation
++===================
+ 
+ Contents:
+ 
+diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
+index 4aa12b8be278..5a94a921ea40 100644
+--- a/Documentation/mm/index.rst
++++ b/Documentation/mm/index.rst
+@@ -1,6 +1,6 @@
+-=====================================
+-Linux Memory Management Documentation
+-=====================================
++===============================
++Memory Management Documentation
++===============================
+ 
+ Memory Management Guide
+ =======================
+diff --git a/Documentation/peci/index.rst b/Documentation/peci/index.rst
+index 989de10416e7..930e75217c33 100644
+--- a/Documentation/peci/index.rst
++++ b/Documentation/peci/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0-only
+ 
+-====================
+-Linux PECI Subsystem
+-====================
++==============
++PECI Subsystem
++==============
+ 
+ .. toctree::
+ 
+diff --git a/Documentation/scheduler/index.rst b/Documentation/scheduler/index.rst
+index b430d856056a..1aac972a652f 100644
+--- a/Documentation/scheduler/index.rst
++++ b/Documentation/scheduler/index.rst
+@@ -1,6 +1,6 @@
+-===============
+-Linux Scheduler
+-===============
++=========
++Scheduler
++=========
+ 
+ .. toctree::
+     :maxdepth: 1
+diff --git a/Documentation/scsi/index.rst b/Documentation/scsi/index.rst
+index 7c5f5f8f614e..919f3edfe1bf 100644
+--- a/Documentation/scsi/index.rst
++++ b/Documentation/scsi/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-====================
+-Linux SCSI Subsystem
+-====================
++==============
++SCSI Subsystem
++==============
+ 
+ .. toctree::
+    :maxdepth: 1
+diff --git a/Documentation/sound/index.rst b/Documentation/sound/index.rst
+index 4d7d42acf6df..5abed5fc6485 100644
+--- a/Documentation/sound/index.rst
++++ b/Documentation/sound/index.rst
+@@ -1,6 +1,6 @@
+-===================================
+-Linux Sound Subsystem Documentation
+-===================================
++=============================
++Sound Subsystem Documentation
++=============================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/virt/index.rst b/Documentation/virt/index.rst
+index 56e003ff28ff..7fb55ae08598 100644
+--- a/Documentation/virt/index.rst
++++ b/Documentation/virt/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-============================
+-Linux Virtualization Support
+-============================
++======================
++Virtualization Support
++======================
+ 
+ .. toctree::
+    :maxdepth: 2
+diff --git a/Documentation/watchdog/index.rst b/Documentation/watchdog/index.rst
+index c177645081d8..4603f2511f58 100644
+--- a/Documentation/watchdog/index.rst
++++ b/Documentation/watchdog/index.rst
+@@ -1,8 +1,8 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-======================
+-Linux Watchdog Support
+-======================
++================
++Watchdog Support
++================
+ 
+ .. toctree::
+     :maxdepth: 1
+-- 
+2.25.1
 
