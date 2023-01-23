@@ -2,112 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BE9C38142
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 14:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369CAC54EB4
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 15:02:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjAWOMo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Jan 2023 09:12:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60782 "EHLO
+        id S231620AbjAWPCj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Jan 2023 10:02:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231712AbjAWOMn (ORCPT
+        with ESMTP id S231493AbjAWPCi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2023 09:12:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F73173C;
-        Mon, 23 Jan 2023 06:12:42 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Mon, 23 Jan 2023 10:02:38 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 397017DB5;
+        Mon, 23 Jan 2023 07:02:38 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::5f6])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AE34CB80DAD;
-        Mon, 23 Jan 2023 14:12:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39AEC433D2;
-        Mon, 23 Jan 2023 14:12:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674483159;
-        bh=xFLOnDtk94LbkRcvU27vXX6doFgrUITeWaNgk1986HA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jQq6YkkL4QqEs8PFGw3bcEihpcmRbNRanM32NBpqWFWdXh5Ehhz4b8G1VFErSpd5G
-         3mPltjvOIJm6Mkk2GBX6cH8SabBqpW0qqK8TV3C8xUdRiD7Qm0izf9YHWyaSYDX981
-         tOdyj8EXbYHIr0Dm1Bun/NlOhTdu6F/yfUcc9b7gw/jwoetUd6xtRilM12Drpx8zUP
-         fCBWyOp5AIPI1OrZXvR7uamLjREor/aShknMCc/Xik4qJIYp6+pNHHXhLiSl6RG7QA
-         mBWeauYkaOjPPE4qhLJK71c99GqGuztPiPWEwbH8SvYBOXG/dN38Z9P1s3kGB9dpi6
-         kdn5DCte2Iysg==
-Date:   Mon, 23 Jan 2023 07:12:37 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, "kernelci.org bot" <bot@kernelci.org>
-Subject: Re: [PATCH] ARM: Reduce __thumb2__ definition to crypto files that
- require it
-Message-ID: <Y86V1Ro+iQaa3IYe@dev-arch.thelio-3990X>
-References: <20221222193039.2267074-1-nathan@kernel.org>
- <CAKwvOd=WQ5cAL74z+gbGgxG9WrOcDJtrGXJWxEEcWnmyoypu0w@mail.gmail.com>
- <Y85l+E22PJ8lhmcN@shell.armlinux.org.uk>
+        by ms.lwn.net (Postfix) with ESMTPSA id 8D62E4E5;
+        Mon, 23 Jan 2023 15:02:37 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8D62E4E5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1674486157; bh=wxSnxIUwdkEE3c/KbtJ9Rj/dEJdzd01IhaDBd3YRbOA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=NmRRM54uhrNW9CPQE0Rj7FopmjfzAKSU48AkFmXI0PBahR3aZFhVv/eI2ez+LoQdt
+         GAwYh6oeA5wECwc1VQwN51GdGKYJ3pRv9sjFAyB5PU6NyuPRJB5Fj49M9rtpAg90hA
+         mGPUpT3XUv7qqmpuYvcPec8YgT+TOBIcluJ1TZ6CAVlJnVS8pi6FNVqF+QhufMW4B+
+         FV+OdLKAsAKEypABjdte4J85m/2O/g6sbTnwMqgqCRN+jZ4f78bASoJqxscJz6dI3F
+         Hho+mHPNvcZo038OgNds35wZPvtdAVg0kaVxnJntVPoQ1g5X7wLgwH/M1nzD8v/OGH
+         XykY+7P/t3Ggg==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     SeongJae Park <sj@kernel.org>
+Cc:     SeongJae Park <sj@kernel.org>,
+        Alex Deucher <alexdeucher@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jean Delvare <jdelvare@suse.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Takashi Iwai <tiwai@suse.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/8] Docs: Add missing SPDX license identifiers of
+In-Reply-To: <20230122213650.187710-1-sj@kernel.org>
+References: <20230122213650.187710-1-sj@kernel.org>
+Date:   Mon, 23 Jan 2023 08:02:36 -0700
+Message-ID: <874jshl2er.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y85l+E22PJ8lhmcN@shell.armlinux.org.uk>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 10:48:24AM +0000, Russell King (Oracle) wrote:
-> On Thu, Dec 22, 2022 at 11:52:27AM -0800, Nick Desaulniers wrote:
-> > On Thu, Dec 22, 2022 at 11:30 AM Nathan Chancellor <nathan@kernel.org> wrote:
-> > >
-> > > Commit 1d2e9b67b001 ("ARM: 9265/1: pass -march= only to compiler") added
-> > > a __thumb2__ define to ASFLAGS to avoid build errors in the crypto code,
-> > > which relies on __thumb2__ for preprocessing. Commit 59e2cf8d21e0 ("ARM:
-> > > 9275/1: Drop '-mthumb' from AFLAGS_ISA") followed up on this by removing
-> > > -mthumb from AFLAGS so that __thumb2__ would not be defined when the
-> > > default target was ARMv7 or newer.
-> > >
-> > > Unfortunately, the second commit's fix assumes that the toolchain
-> > > defaults to -mno-thumb / -marm, which is not the case for Debian's
-> > > arm-linux-gnueabihf target, which defaults to -mthumb:
-> > >
-> > >   $ echo | arm-linux-gnueabihf-gcc -dM -E - | grep __thumb
-> > >   #define __thumb2__ 1
-> > >   #define __thumb__ 1
-> > 
-> > Interesting, that was hard to foresee in review of 1d2e9b67b001 and
-> > 59e2cf8d21e0.
-> > 
-> > FWIW, their non-hf target does not.
-> > $ echo | arm-linux-gnueabi-gcc -dM -E - | grep __thumb
-> > $
-> > 
-> > >
-> > > This target is used by several CI systems, which will still see
-> > > redefined macro warnings, despite '-mthumb' not being present in the
-> > > flags:
-> > >
-> > >   <command-line>: warning: "__thumb2__" redefined
-> > >   <built-in>: note: this is the location of the previous definition
-> > >
-> > > Remove the global AFLAGS __thumb2__ define and move it to the crypto
-> > > folder where it is required by the imported OpenSSL algorithms; the rest
-> > > of the kernel should use the internal CONFIG_THUMB2_KERNEL symbol to
-> > > know whether or not Thumb2 is being used or not. Be sure that __thumb2__
-> > > is undefined first so that there are no macro redefinition warnings.
-> > >
-> > > Link: https://github.com/ClangBuiltLinux/linux/issues/1772
-> > > Reported-by: "kernelci.org bot" <bot@kernelci.org>
-> > > Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > 
-> > Thanks Nathan and Ard.
-> 
-> Shouldn't this also have a fixes tag?
+SeongJae Park <sj@kernel.org> writes:
 
-Ugh, yes, sorry about that :( would you kind taking these when you apply
-the patch or would you like me to resubmit?
+> Some subsystem documents are missing SPDX license identifiers on index
+> files.  This patchset adds those.
 
-Fixes: 59e2cf8d21e0 ("ARM: 9275/1: Drop '-mthumb' from AFLAGS_ISA")
-Fixes: 1d2e9b67b001 ("ARM: 9265/1: pass -march= only to compiler")
+Documentation/ is far behind on the SPDX front, and I'm all in favor of
+fixing that.  I do worry, though, about sticking license declarations
+onto files that did not previously have them; do we know what the
+original contributor's intent was?
 
-Cheers,
-Nathan
+> Changes from v1
+> (https://lore.kernel.org/lkml/20230114194741.115855-2-sj@kernel.org/)
+> - Separate from index file content changes
+> - Separate patch for each subsystem doc (Alex Deucher)
+> - Use MIT license for gpu (Alex Deucher)
+>
+> SeongJae Park (8):
+>   Docs/crypto/index: Add missing SPDX License Identifier
+>   Docs/driver-api/index: Add missing SPDX License Identifier
+>   Docs/gpu/index: Add missing SPDX License Identifier
+>   Docs/hwmon/index: Add missing SPDX License Identifier
+>   Docs/input/index: Add missing SPDX License Identifier
+>   Docs/mm/index: Add missing SPDX License Identifier
+>   Docs/scheduler/index: Add missing SPDX License Identifier
+>   Docs/sound/index: Add missing SPDX License Identifier
+>
+>  Documentation/crypto/index.rst     | 2 ++
+>  Documentation/driver-api/index.rst | 2 ++
+
+I added this one, and GPLv2 is fine there.
+
+>  Documentation/gpu/index.rst        | 2 ++
+>  Documentation/hwmon/index.rst      | 2 ++
+>  Documentation/input/index.rst      | 2 ++
+>  Documentation/mm/index.rst         | 2 ++
+>  Documentation/scheduler/index.rst  | 2 ++
+>  Documentation/sound/index.rst      | 2 ++
+>  8 files changed, 16 insertions(+)
+
+Thanks,
+
+jon
