@@ -2,105 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 369CAC54EB4
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 15:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4833CC05027
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 15:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231620AbjAWPCj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Jan 2023 10:02:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59708 "EHLO
+        id S232492AbjAWPY2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Jan 2023 10:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231493AbjAWPCi (ORCPT
+        with ESMTP id S232691AbjAWPYM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2023 10:02:38 -0500
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 397017DB5;
-        Mon, 23 Jan 2023 07:02:38 -0800 (PST)
-Received: from localhost (unknown [IPv6:2601:281:8300:73::5f6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 8D62E4E5;
-        Mon, 23 Jan 2023 15:02:37 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8D62E4E5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1674486157; bh=wxSnxIUwdkEE3c/KbtJ9Rj/dEJdzd01IhaDBd3YRbOA=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=NmRRM54uhrNW9CPQE0Rj7FopmjfzAKSU48AkFmXI0PBahR3aZFhVv/eI2ez+LoQdt
-         GAwYh6oeA5wECwc1VQwN51GdGKYJ3pRv9sjFAyB5PU6NyuPRJB5Fj49M9rtpAg90hA
-         mGPUpT3XUv7qqmpuYvcPec8YgT+TOBIcluJ1TZ6CAVlJnVS8pi6FNVqF+QhufMW4B+
-         FV+OdLKAsAKEypABjdte4J85m/2O/g6sbTnwMqgqCRN+jZ4f78bASoJqxscJz6dI3F
-         Hho+mHPNvcZo038OgNds35wZPvtdAVg0kaVxnJntVPoQ1g5X7wLgwH/M1nzD8v/OGH
-         XykY+7P/t3Ggg==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     SeongJae Park <sj@kernel.org>
-Cc:     SeongJae Park <sj@kernel.org>,
-        Alex Deucher <alexdeucher@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        David Airlie <airlied@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jean Delvare <jdelvare@suse.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/8] Docs: Add missing SPDX license identifiers of
-In-Reply-To: <20230122213650.187710-1-sj@kernel.org>
-References: <20230122213650.187710-1-sj@kernel.org>
-Date:   Mon, 23 Jan 2023 08:02:36 -0700
-Message-ID: <874jshl2er.fsf@meer.lwn.net>
+        Mon, 23 Jan 2023 10:24:12 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A3CE110439;
+        Mon, 23 Jan 2023 07:23:40 -0800 (PST)
+Received: from vm02.corp.microsoft.com (unknown [167.220.196.155])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 0D16B20E2D02;
+        Mon, 23 Jan 2023 07:23:02 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0D16B20E2D02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1674487385;
+        bh=7TNJ2WIfSIYuwj2O7qe++FA04VZR5MAYU2yAGmNDdFA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Wj+eKekO/LSI+nhLw7leLdjlsN8jdoRSQw+pP90GAr0gW5aWiGqydq+tnXYvIQMBF
+         cXu+DGC8Pwlo8YXL9Ubh31tTkXueZYA6nUlxxNSdo11dg5F0956AJXbS3nHofvXzO+
+         vjEfEBB7gPaewIQLfLxzRd9XXQMG+/8LFq7RimDI=
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        "Brijesh Singh" <brijesh.singh@amd.com>,
+        "Tom Lendacky" <thomas.lendacky@amd.com>,
+        "Kalra, Ashish" <ashish.kalra@amd.com>,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Len Brown" <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org
+Subject: [PATCH v1 0/8] Support ACPI PSP on Hyper-V
+Date:   Mon, 23 Jan 2023 15:22:42 +0000
+Message-Id: <20230123152250.26413-1-jpiotrowski@linux.microsoft.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SeongJae Park <sj@kernel.org> writes:
+This patch series introduces support for discovering AMD's PSP from an ACPI
+table and extends the CCP driver to allow binding to that device on x86. This
+method of PSP discovery is used on Hyper-V when SNP isolation support is
+exposed to the guest. There is no ACPI node associated with this PSP, so after
+parsing the ASPT it is registered with the system as a platform_device.
 
-> Some subsystem documents are missing SPDX license identifiers on index
-> files.  This patchset adds those.
+I was not quite sure about where to place some of this code but opted for
+placing the ASPT parsing code in drivers/acpi/ and the platform device creation
+in arch/x86/ because configuring the irq for the PSP through the ACPI interface
+requires poking at bits from the architectural vector domain. This was also
+inspired by the sev-guest device.
 
-Documentation/ is far behind on the SPDX front, and I'm all in favor of
-fixing that.  I do worry, though, about sticking license declarations
-onto files that did not previously have them; do we know what the
-original contributor's intent was?
+This series is a prerequisite for nested SNP-host support on Hyper-V but is
+independent of the SNP-host support patch set. Hyper-V only supports nested
+SEV-SNP (not SEV or SEV-ES) so the PSP only supports a subset of the full PSP
+command set. Without SNP-host support (which is not upstream yet), the only
+PSP command that will succeed is SEV_PLATFORM_STATUS.
 
-> Changes from v1
-> (https://lore.kernel.org/lkml/20230114194741.115855-2-sj@kernel.org/)
-> - Separate from index file content changes
-> - Separate patch for each subsystem doc (Alex Deucher)
-> - Use MIT license for gpu (Alex Deucher)
->
-> SeongJae Park (8):
->   Docs/crypto/index: Add missing SPDX License Identifier
->   Docs/driver-api/index: Add missing SPDX License Identifier
->   Docs/gpu/index: Add missing SPDX License Identifier
->   Docs/hwmon/index: Add missing SPDX License Identifier
->   Docs/input/index: Add missing SPDX License Identifier
->   Docs/mm/index: Add missing SPDX License Identifier
->   Docs/scheduler/index: Add missing SPDX License Identifier
->   Docs/sound/index: Add missing SPDX License Identifier
->
->  Documentation/crypto/index.rst     | 2 ++
->  Documentation/driver-api/index.rst | 2 ++
+Jeremi Piotrowski (8):
+  include/acpi: add definition of ASPT table
+  ACPI: ASPT: Add helper to parse table
+  x86/psp: Register PSP platform device when ASP table is present
+  x86/psp: Add IRQ support
+  crypto: cpp - Bind to psp platform device on x86
+  crypto: ccp - Add vdata for platform device
+  crypto: ccp - Skip DMA coherency check for platform psp
+  crypto: ccp - Allow platform device to be psp master device
 
-I added this one, and GPLv2 is fine there.
+ arch/x86/kernel/Makefile          |   2 +-
+ arch/x86/kernel/psp.c             | 213 ++++++++++++++++++++++++++++++
+ drivers/acpi/Makefile             |   1 +
+ drivers/acpi/aspt.c               | 104 +++++++++++++++
+ drivers/crypto/ccp/sp-dev.c       |  67 +++++++++-
+ drivers/crypto/ccp/sp-dev.h       |  16 ++-
+ drivers/crypto/ccp/sp-pci.c       |  48 -------
+ drivers/crypto/ccp/sp-platform.c  |  73 +++++++++-
+ include/acpi/actbl1.h             |  46 +++++++
+ include/linux/platform_data/psp.h |  32 +++++
+ 10 files changed, 544 insertions(+), 58 deletions(-)
+ create mode 100644 arch/x86/kernel/psp.c
+ create mode 100644 drivers/acpi/aspt.c
+ create mode 100644 include/linux/platform_data/psp.h
 
->  Documentation/gpu/index.rst        | 2 ++
->  Documentation/hwmon/index.rst      | 2 ++
->  Documentation/input/index.rst      | 2 ++
->  Documentation/mm/index.rst         | 2 ++
->  Documentation/scheduler/index.rst  | 2 ++
->  Documentation/sound/index.rst      | 2 ++
->  8 files changed, 16 insertions(+)
+-- 
+2.25.1
 
-Thanks,
-
-jon
