@@ -2,125 +2,114 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85E5C38142
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 16:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A136C61D97
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 20:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233478AbjAWQwU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Jan 2023 11:52:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
+        id S232542AbjAWUei (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Jan 2023 15:34:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233482AbjAWQwS (ORCPT
+        with ESMTP id S229791AbjAWUeh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2023 11:52:18 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 011872DE4E;
-        Mon, 23 Jan 2023 08:52:05 -0800 (PST)
-Received: from vm02.corp.microsoft.com (unknown [167.220.196.155])
-        by linux.microsoft.com (Postfix) with ESMTPSA id AF73C20E2C03;
-        Mon, 23 Jan 2023 08:52:03 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AF73C20E2C03
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1674492725;
-        bh=pp03YGGSPJklBjx3IO05F7RCBMZonuTyZ6VVAlGDVMI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bf5Vv0NXstLz3CaB5zygZxlKKX1GLIaTAcak1iUhWQBViY71Nnd7FvGy44lWis+Cx
-         yKUi4GMz12SiI7eGx9b84+aOmcOTJroBQii8CKRc/JHOin4MPgBIdgqaCxaMjE0Zxl
-         Yk7wCM8XCpISMrsxdGxPtfce3yJuYvr5+Up4s2Ok=
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org
-Subject: [RFC PATCH v1 6/6] crypto: ccp - Introduce quirk to always reclaim pages after SEV-legacy commands
-Date:   Mon, 23 Jan 2023 16:51:28 +0000
-Message-Id: <20230123165128.28185-7-jpiotrowski@linux.microsoft.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230123165128.28185-1-jpiotrowski@linux.microsoft.com>
-References: <20230123165128.28185-1-jpiotrowski@linux.microsoft.com>
+        Mon, 23 Jan 2023 15:34:37 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCFF0E04C;
+        Mon, 23 Jan 2023 12:34:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4E28661026;
+        Mon, 23 Jan 2023 20:34:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 795F8C433EF;
+        Mon, 23 Jan 2023 20:34:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674506075;
+        bh=FmnPLtlEEZLnIMIwawfGix9wzSwjvgWL7c11CtPG7VM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=gF5F3tETTnRMP1JPBnu7Ptp/If+nrlkHmh1UvayGFWUyXYmpvpFIlY+pg0zyr7IvH
+         EVxJOqmXmJX4Qp/NQU69I9zkedvW44RZCoOXej3wWBme0Mdka7wWgcqiXHBS0ZO9AT
+         gCCeJ5Uq2QZnfqQa2fxLrDKyt14RL6D7czuJJnAOpLLNhbfPWA+yt32/GYape34E4O
+         F5mvBPdKOsbsv8biqPPZmtLiy9WobD+Fa+Nr4SCWtPIUvLRWLgmYTlf3NVqXtdDuWD
+         rOx+KcDSyNsyRQHtz5q6KnNbBnT517gw8xLmWe7kphfoQ/6r8WJFEAIN5ITvVAGWH0
+         7e32wlfHKB2Xw==
+Date:   Mon, 23 Jan 2023 14:34:34 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     SeongJae Park <sj@kernel.org>
+Cc:     Jonathan Corbet <corbet@lwn.net>, alsa-devel@alsa-project.org,
+        linux-doc@vger.kernel.org, Viresh Kumar <viresh.kumar@linaro.org>,
+        dri-devel@lists.freedesktop.org, Jaroslav Kysela <perex@perex.cz>,
+        linux-mm@kvack.org, linux-watchdog@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iwona Winiarska <iwona.winiarska@intel.com>,
+        openbmc@lists.ozlabs.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+        linux-pci@vger.kernel.org, Guenter Roeck <linux@roeck-us.net>,
+        Jean Delvare <jdelvare@suse.com>, linux-pm@vger.kernel.org,
+        linux-input@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        linux-hwmon@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v2 1/1] Docs/subsystem-apis: Remove '[The ]Linux'
+ prefixes from titles of listed documents
+Message-ID: <20230123203434.GA979965@bhelgaas>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230122184834.181977-1-sj@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Hyper-V, the rmp_mark_pages_shared() call after a SEV_PLATFORM_STATUS
-fails with return code 2 (FAIL_PERMISSION) due to the page having the
-immutable bit set in the RMP (SNP has been initialized). The comment
-above this spot mentions that firmware automatically clears the
-immutable bit, but I can't find any mention of this behavior in the SNP
-Firmware ABI Spec.
+On Sun, Jan 22, 2023 at 06:48:34PM +0000, SeongJae Park wrote:
+> Some documents that listed on subsystem-apis have 'Linux' or 'The Linux'
+> title prefixes.  It's duplicated information, and makes finding the
+> document of interest with human eyes not easy.  Remove the prefixes from
+> the titles.
+> 
+> Signed-off-by: SeongJae Park <sj@kernel.org>
 
-Introduce a quirk to always attempt the page reclaim and set it for the
-platform PSP. It would be possible to make this behavior unconditional
-as the firmware spec defines that page reclaim results in success if the
-page does not have the immutable bit set.
+PCI/index.rst change is fine with me:
 
-Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
----
- drivers/crypto/ccp/sev-dev.c     | 6 +++++-
- drivers/crypto/ccp/sp-dev.h      | 4 ++++
- drivers/crypto/ccp/sp-platform.c | 1 +
- 3 files changed, 10 insertions(+), 1 deletion(-)
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 6c4fdcaed72b..4719c0cafa28 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -658,8 +658,12 @@ static int __snp_cmd_buf_copy(int cmd, void *cmd_buf, bool to_fw, int fw_err)
- 	 * no not need to reclaim the page.
- 	 */
- 	if (from_fw && sev_legacy_cmd_buf_writable(cmd)) {
--		if (rmp_mark_pages_shared(__pa(cmd_buf), 1))
-+		if (psp_master->vdata->quirks & PSP_QUIRK_ALWAYS_RECLAIM) {
-+			if (snp_reclaim_pages(__pa(cmd_buf), 1, true))
-+				return -EFAULT;
-+		} else if (rmp_mark_pages_shared(__pa(cmd_buf), 1)) {
- 			return -EFAULT;
-+		}
- 
- 		/* No need to go further if firmware failed to execute command. */
- 		if (fw_err)
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 083e57652c7b..6fb065a7d1fd 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -28,6 +28,9 @@
- #define CACHE_NONE			0x00
- #define CACHE_WB_NO_ALLOC		0xb7
- 
-+/* PSP requires a reclaim after every firmware command */
-+#define PSP_QUIRK_ALWAYS_RECLAIM	BIT(0)
-+
- /* Structure to hold CCP device data */
- struct ccp_device;
- struct ccp_vdata {
-@@ -59,6 +62,7 @@ struct psp_vdata {
- 	unsigned int feature_reg;
- 	unsigned int inten_reg;
- 	unsigned int intsts_reg;
-+	unsigned int quirks;
- };
- 
- /* Structure to hold SP device data */
-diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
-index d56b34255b97..cae3e7e8f289 100644
---- a/drivers/crypto/ccp/sp-platform.c
-+++ b/drivers/crypto/ccp/sp-platform.c
-@@ -43,6 +43,7 @@ static struct psp_vdata psp_platform = {
- 	.feature_reg = -1,
- 	.inten_reg = -1,
- 	.intsts_reg = -1,
-+	.quirks = PSP_QUIRK_ALWAYS_RECLAIM,
- };
- #endif
- 
--- 
-2.25.1
-
+> ---
+> Changes from v1
+> (https://lore.kernel.org/lkml/20230114194741.115855-1-sj@kernel.org/)
+> - Drop second patch (will post later for each subsystem)
+> 
+>  Documentation/PCI/index.rst        | 6 +++---
+>  Documentation/cpu-freq/index.rst   | 6 +++---
+>  Documentation/crypto/index.rst     | 6 +++---
+>  Documentation/driver-api/index.rst | 6 +++---
+>  Documentation/gpu/index.rst        | 6 +++---
+>  Documentation/hwmon/index.rst      | 6 +++---
+>  Documentation/input/index.rst      | 6 +++---
+>  Documentation/mm/index.rst         | 6 +++---
+>  Documentation/peci/index.rst       | 6 +++---
+>  Documentation/scheduler/index.rst  | 6 +++---
+>  Documentation/scsi/index.rst       | 6 +++---
+>  Documentation/sound/index.rst      | 6 +++---
+>  Documentation/virt/index.rst       | 6 +++---
+>  Documentation/watchdog/index.rst   | 6 +++---
+>  14 files changed, 42 insertions(+), 42 deletions(-)
+> 
+> diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
+> index c17c87af1968..e73f84aebde3 100644
+> --- a/Documentation/PCI/index.rst
+> +++ b/Documentation/PCI/index.rst
+> @@ -1,8 +1,8 @@
+>  .. SPDX-License-Identifier: GPL-2.0
+>  
+> -=======================
+> -Linux PCI Bus Subsystem
+> -=======================
+> +=================
+> +PCI Bus Subsystem
+> +=================
+>  
+>  .. toctree::
+>     :maxdepth: 2
