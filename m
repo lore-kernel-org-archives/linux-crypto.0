@@ -2,102 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9B2C05027
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 16:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A85E5C38142
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Jan 2023 16:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231727AbjAWQvo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Jan 2023 11:51:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57616 "EHLO
+        id S233478AbjAWQwU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 Jan 2023 11:52:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232029AbjAWQvn (ORCPT
+        with ESMTP id S233482AbjAWQwS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Jan 2023 11:51:43 -0500
+        Mon, 23 Jan 2023 11:52:18 -0500
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 26635298C1;
-        Mon, 23 Jan 2023 08:51:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 011872DE4E;
+        Mon, 23 Jan 2023 08:52:05 -0800 (PST)
 Received: from vm02.corp.microsoft.com (unknown [167.220.196.155])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 9ED5F20E1ABC;
-        Mon, 23 Jan 2023 08:51:39 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9ED5F20E1ABC
+        by linux.microsoft.com (Postfix) with ESMTPSA id AF73C20E2C03;
+        Mon, 23 Jan 2023 08:52:03 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AF73C20E2C03
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1674492702;
-        bh=iXDswEmTakfKGhN5QPKSBgNjZ3wfETJIr5E58OOkzlc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=OvKZ+2WD6ti+zkEgW7x7/TPAdZL3Elx7jqHOrvQwmbWGUCIk75cr7EpIDKgeKpheq
-         r7GdGjLxjIBaxBct9Oj98Pc14uM/GerxskXqy2ptQMG+JAJCqypJxNPzsu1WvrgV+P
-         l/JlbXv/uvx8tyo6H05keMreUWQsVpDd4VUlKbIk=
+        s=default; t=1674492725;
+        bh=pp03YGGSPJklBjx3IO05F7RCBMZonuTyZ6VVAlGDVMI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bf5Vv0NXstLz3CaB5zygZxlKKX1GLIaTAcak1iUhWQBViY71Nnd7FvGy44lWis+Cx
+         yKUi4GMz12SiI7eGx9b84+aOmcOTJroBQii8CKRc/JHOin4MPgBIdgqaCxaMjE0Zxl
+         Yk7wCM8XCpISMrsxdGxPtfce3yJuYvr5+Up4s2Ok=
 From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
         Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
         Tianyu Lan <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         linux-hyperv@vger.kernel.org,
         Brijesh Singh <brijesh.singh@amd.com>,
         Michael Roth <michael.roth@amd.com>,
         Ashish Kalra <ashish.kalra@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        iommu@lists.linux.dev
-Subject: [RFC PATCH v1 0/6] Support nested SNP KVM guests on Hyper-V
-Date:   Mon, 23 Jan 2023 16:51:22 +0000
-Message-Id: <20230123165128.28185-1-jpiotrowski@linux.microsoft.com>
+        linux-crypto@vger.kernel.org
+Subject: [RFC PATCH v1 6/6] crypto: ccp - Introduce quirk to always reclaim pages after SEV-legacy commands
+Date:   Mon, 23 Jan 2023 16:51:28 +0000
+Message-Id: <20230123165128.28185-7-jpiotrowski@linux.microsoft.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230123165128.28185-1-jpiotrowski@linux.microsoft.com>
+References: <20230123165128.28185-1-jpiotrowski@linux.microsoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch series enables SNP-host support when running on Hyper-V, which
-allows launching nested SNP guests. No guest or qemu changes are necessary
-for this to work.
+On Hyper-V, the rmp_mark_pages_shared() call after a SEV_PLATFORM_STATUS
+fails with return code 2 (FAIL_PERMISSION) due to the page having the
+immutable bit set in the RMP (SNP has been initialized). The comment
+above this spot mentions that firmware automatically clears the
+immutable bit, but I can't find any mention of this behavior in the SNP
+Firmware ABI Spec.
 
-Patch 1 deals with allocating an RMP table which is not provided by
-firmware/hypervisor. Patch 2 implements MSR-based rmpupdate/psmash instructions
-which are meant for virtualized environments. Patch 3 maintains the rmptable
-for internal kernel page tracking. Patch 4 makes sure that the kernel does not
-disable SNP support during early CPU init. Patch 5 allows SNP initialization to
-proceed when no iommus are available. Patch 6 adds a quirk in psp command
-buffer handling, because of differences in SNP firmware spec interpretation.
+Introduce a quirk to always attempt the page reclaim and set it for the
+platform PSP. It would be possible to make this behavior unconditional
+as the firmware spec defines that page reclaim results in success if the
+page does not have the immutable bit set.
 
-This series depends on
+Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+---
+ drivers/crypto/ccp/sev-dev.c     | 6 +++++-
+ drivers/crypto/ccp/sp-dev.h      | 4 ++++
+ drivers/crypto/ccp/sp-platform.c | 1 +
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-- "Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support" (applies on top of RFC v7)
-  https://lore.kernel.org/lkml/20221214194056.161492-1-michael.roth@amd.com/
-- "Support ACPI PSP on Hyper-V"
-  https://lore.kernel.org/lkml/20230123152250.26413-1-jpiotrowski@linux.microsoft.com/
-
-Jeremi Piotrowski (6):
-  x86/hyperv: Allocate RMP table during boot
-  x86/sev: Add support for NestedVirtSnpMsr
-  x86/sev: Maintain shadow rmptable on Hyper-V
-  x86/amd: Configure necessary MSRs for SNP during CPU init when running
-    as a guest
-  iommu/amd: Don't fail snp_enable when running virtualized
-  crypto: ccp - Introduce quirk to always reclaim pages after SEV-legacy
-    commands
-
- arch/x86/hyperv/hv_init.c          |   5 ++
- arch/x86/include/asm/cpufeatures.h |   1 +
- arch/x86/include/asm/hyperv-tlfs.h |   3 +
- arch/x86/include/asm/mshyperv.h    |   3 +
- arch/x86/include/asm/msr-index.h   |   2 +
- arch/x86/include/asm/sev.h         |   2 +
- arch/x86/kernel/cpu/amd.c          |   8 +-
- arch/x86/kernel/cpu/mshyperv.c     |  41 ++++++++++
- arch/x86/kernel/sev.c              | 122 ++++++++++++++++++++++++++---
- drivers/crypto/ccp/sev-dev.c       |   6 +-
- drivers/crypto/ccp/sp-dev.h        |   4 +
- drivers/crypto/ccp/sp-platform.c   |   1 +
- drivers/iommu/amd/init.c           |   6 ++
- 13 files changed, 191 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 6c4fdcaed72b..4719c0cafa28 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -658,8 +658,12 @@ static int __snp_cmd_buf_copy(int cmd, void *cmd_buf, bool to_fw, int fw_err)
+ 	 * no not need to reclaim the page.
+ 	 */
+ 	if (from_fw && sev_legacy_cmd_buf_writable(cmd)) {
+-		if (rmp_mark_pages_shared(__pa(cmd_buf), 1))
++		if (psp_master->vdata->quirks & PSP_QUIRK_ALWAYS_RECLAIM) {
++			if (snp_reclaim_pages(__pa(cmd_buf), 1, true))
++				return -EFAULT;
++		} else if (rmp_mark_pages_shared(__pa(cmd_buf), 1)) {
+ 			return -EFAULT;
++		}
+ 
+ 		/* No need to go further if firmware failed to execute command. */
+ 		if (fw_err)
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 083e57652c7b..6fb065a7d1fd 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -28,6 +28,9 @@
+ #define CACHE_NONE			0x00
+ #define CACHE_WB_NO_ALLOC		0xb7
+ 
++/* PSP requires a reclaim after every firmware command */
++#define PSP_QUIRK_ALWAYS_RECLAIM	BIT(0)
++
+ /* Structure to hold CCP device data */
+ struct ccp_device;
+ struct ccp_vdata {
+@@ -59,6 +62,7 @@ struct psp_vdata {
+ 	unsigned int feature_reg;
+ 	unsigned int inten_reg;
+ 	unsigned int intsts_reg;
++	unsigned int quirks;
+ };
+ 
+ /* Structure to hold SP device data */
+diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+index d56b34255b97..cae3e7e8f289 100644
+--- a/drivers/crypto/ccp/sp-platform.c
++++ b/drivers/crypto/ccp/sp-platform.c
+@@ -43,6 +43,7 @@ static struct psp_vdata psp_platform = {
+ 	.feature_reg = -1,
+ 	.inten_reg = -1,
+ 	.intsts_reg = -1,
++	.quirks = PSP_QUIRK_ALWAYS_RECLAIM,
+ };
+ #endif
+ 
 -- 
 2.25.1
 
