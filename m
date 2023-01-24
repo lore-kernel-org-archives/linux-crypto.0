@@ -2,30 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F0AC38142
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Jan 2023 08:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F43C25B4E
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Jan 2023 08:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229452AbjAXI2r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Jan 2023 03:28:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51654 "EHLO
+        id S232680AbjAXI6r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Jan 2023 03:58:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjAXI2q (ORCPT
+        with ESMTP id S231629AbjAXI6q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Jan 2023 03:28:46 -0500
+        Tue, 24 Jan 2023 03:58:46 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344EC1D910
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Jan 2023 00:28:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E8AA3D09F
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Jan 2023 00:58:44 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pKEfX-003UIO-J0; Tue, 24 Jan 2023 16:28:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 24 Jan 2023 16:28:39 +0800
-Date:   Tue, 24 Jan 2023 16:28:39 +0800
+        id 1pKF8b-003UjP-Li; Tue, 24 Jan 2023 16:58:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 24 Jan 2023 16:58:41 +0800
+Date:   Tue, 24 Jan 2023 16:58:41 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Will Thomas <will.thomas@imgtec.com>,
-        James Hartley <james.hartley@imgtec.com>
-Subject: [PATCH] crypto: img-hash - Fix sparse endianness warning
-Message-ID: <Y8+Wt4MK4roMeEjd@gondor.apana.org.au>
+        Antoine Tenart <atenart@kernel.org>
+Subject: [PATCH] crypto: safexcel - Use crypto_wait_req
+Message-ID: <Y8+dwWHIz2058E43@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -33,40 +32,165 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use cpu_to_be32 instead of be32_to_cpu in img_hash_read_result_queue
-to silence sparse.  The generated code should be identical.
+This patch replaces the custom crypto completion function with
+crypto_req_done.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index 9629e98bd68b..e5ed098a154d 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -157,9 +157,9 @@ static inline void img_hash_write(struct img_hash_dev *hdev,
- 	writel_relaxed(value, hdev->io_base + offset);
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index ae6110376e21..baff0123f919 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -970,17 +970,6 @@ void safexcel_complete(struct safexcel_crypto_priv *priv, int ring)
+ 	} while (!cdesc->last_seg);
  }
  
--static inline u32 img_hash_read_result_queue(struct img_hash_dev *hdev)
-+static inline __be32 img_hash_read_result_queue(struct img_hash_dev *hdev)
+-void safexcel_inv_complete(struct crypto_async_request *req, int error)
+-{
+-	struct safexcel_inv_result *result = req->data;
+-
+-	if (error == -EINPROGRESS)
+-		return;
+-
+-	result->error = error;
+-	complete(&result->completion);
+-}
+-
+ int safexcel_invalidate_cache(struct crypto_async_request *async,
+ 			      struct safexcel_crypto_priv *priv,
+ 			      dma_addr_t ctxr_dma, int ring)
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 6c2fc662f64f..47ef6c7cd02c 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -884,11 +884,6 @@ struct safexcel_alg_template {
+ 	} alg;
+ };
+ 
+-struct safexcel_inv_result {
+-	struct completion completion;
+-	int error;
+-};
+-
+ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
+ int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
+ 				void *rdp);
+@@ -927,7 +922,6 @@ void safexcel_rdr_req_set(struct safexcel_crypto_priv *priv,
+ 			  struct crypto_async_request *req);
+ inline struct crypto_async_request *
+ safexcel_rdr_req_get(struct safexcel_crypto_priv *priv, int ring);
+-void safexcel_inv_complete(struct crypto_async_request *req, int error);
+ int safexcel_hmac_setkey(struct safexcel_context *base, const u8 *key,
+ 			 unsigned int keylen, const char *alg,
+ 			 unsigned int state_sz);
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 32a37e3850c5..272c28b5a088 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -1091,13 +1091,12 @@ static int safexcel_aead_send(struct crypto_async_request *async, int ring,
+ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm,
+ 				    struct crypto_async_request *base,
+ 				    struct safexcel_cipher_req *sreq,
+-				    struct safexcel_inv_result *result)
++				    struct crypto_wait *result)
  {
--	return be32_to_cpu(img_hash_read(hdev, CR_RESULT_QUEUE));
-+	return cpu_to_be32(img_hash_read(hdev, CR_RESULT_QUEUE));
- }
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->base.priv;
+ 	int ring = ctx->base.ring;
+-
+-	init_completion(&result->completion);
++	int err;
  
- static void img_hash_start(struct img_hash_dev *hdev, bool dma)
-@@ -283,10 +283,10 @@ static int img_hash_finish(struct ahash_request *req)
- static void img_hash_copy_hash(struct ahash_request *req)
+ 	ctx = crypto_tfm_ctx(base->tfm);
+ 	ctx->base.exit_inv = true;
+@@ -1110,13 +1109,13 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm,
+ 	queue_work(priv->ring[ring].workqueue,
+ 		   &priv->ring[ring].work_data.work);
+ 
+-	wait_for_completion(&result->completion);
++	err = crypto_wait_req(-EINPROGRESS, result);
+ 
+-	if (result->error) {
++	if (err) {
+ 		dev_warn(priv->dev,
+ 			"cipher: sync: invalidate: completion error %d\n",
+-			 result->error);
+-		return result->error;
++			 err);
++		return err;
+ 	}
+ 
+ 	return 0;
+@@ -1126,12 +1125,12 @@ static int safexcel_skcipher_exit_inv(struct crypto_tfm *tfm)
  {
- 	struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
--	u32 *hash = (u32 *)ctx->digest;
-+	__be32 *hash = (__be32 *)ctx->digest;
- 	int i;
+ 	EIP197_REQUEST_ON_STACK(req, skcipher, EIP197_SKCIPHER_REQ_SIZE);
+ 	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
+-	struct safexcel_inv_result result = {};
++	DECLARE_CRYPTO_WAIT(result);
  
--	for (i = (ctx->digsize / sizeof(u32)) - 1; i >= 0; i--)
-+	for (i = (ctx->digsize / sizeof(*hash)) - 1; i >= 0; i--)
- 		hash[i] = img_hash_read_result_queue(ctx->hdev);
- }
+ 	memset(req, 0, sizeof(struct skcipher_request));
  
+ 	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				      safexcel_inv_complete, &result);
++				      crypto_req_done, &result);
+ 	skcipher_request_set_tfm(req, __crypto_skcipher_cast(tfm));
+ 
+ 	return safexcel_cipher_exit_inv(tfm, &req->base, sreq, &result);
+@@ -1141,12 +1140,12 @@ static int safexcel_aead_exit_inv(struct crypto_tfm *tfm)
+ {
+ 	EIP197_REQUEST_ON_STACK(req, aead, EIP197_AEAD_REQ_SIZE);
+ 	struct safexcel_cipher_req *sreq = aead_request_ctx(req);
+-	struct safexcel_inv_result result = {};
++	DECLARE_CRYPTO_WAIT(result);
+ 
+ 	memset(req, 0, sizeof(struct aead_request));
+ 
+ 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				  safexcel_inv_complete, &result);
++				  crypto_req_done, &result);
+ 	aead_request_set_tfm(req, __crypto_aead_cast(tfm));
+ 
+ 	return safexcel_cipher_exit_inv(tfm, &req->base, sreq, &result);
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index ca46328472d4..442f887e00ae 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -625,15 +625,16 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
+ 	struct safexcel_crypto_priv *priv = ctx->base.priv;
+ 	EIP197_REQUEST_ON_STACK(req, ahash, EIP197_AHASH_REQ_SIZE);
+ 	struct safexcel_ahash_req *rctx = ahash_request_ctx_dma(req);
+-	struct safexcel_inv_result result = {};
++	DECLARE_CRYPTO_WAIT(result);
+ 	int ring = ctx->base.ring;
++	int err;
+ 
+ 	memset(req, 0, EIP197_AHASH_REQ_SIZE);
+ 
+ 	/* create invalidation request */
+ 	init_completion(&result.completion);
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   safexcel_inv_complete, &result);
++				   crypto_req_done, &result);
+ 
+ 	ahash_request_set_tfm(req, __crypto_ahash_cast(tfm));
+ 	ctx = crypto_tfm_ctx(req->base.tfm);
+@@ -647,12 +648,11 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
+ 	queue_work(priv->ring[ring].workqueue,
+ 		   &priv->ring[ring].work_data.work);
+ 
+-	wait_for_completion(&result.completion);
++	err = crypto_wait_req(-EINPROGRESS, &result);
+ 
+-	if (result.error) {
+-		dev_warn(priv->dev, "hash: completion error (%d)\n",
+-			 result.error);
+-		return result.error;
++	if (err) {
++		dev_warn(priv->dev, "hash: completion error (%d)\n", err);
++		return err;
+ 	}
+ 
+ 	return 0;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
