@@ -2,59 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AAEFC61DA2
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 16:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7270C54E94
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 16:58:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjAYQzc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Jan 2023 11:55:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48486 "EHLO
+        id S235870AbjAYQ6Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Jan 2023 11:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235736AbjAYQz3 (ORCPT
+        with ESMTP id S235850AbjAYQ6P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Jan 2023 11:55:29 -0500
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C75A29E30
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 08:55:25 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-50112511ba7so213311397b3.3
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 08:55:25 -0800 (PST)
+        Wed, 25 Jan 2023 11:58:15 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0830D366AB
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 08:58:02 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id d132so2265685ybb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 08:58:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=49H+5dcfdqsESvQ4qNxkOgTxyGkRYtaMvRra0jMgwoI=;
-        b=S433Z2p/j0oEnqzhdMbCoBVS6yLsoVuhPxi7PQkxnyRK8RoE5tlGqQCWFiSx/y2EvP
-         VAUU6f5te6yd0FF3QKoXQk59fXSc40Ni99FjmOhoS8uoMeuhfG+AT8hg6vTHrAcNtls7
-         iMIrnMdjSfEnhMBuERTLvpM6IdVwE9wobd2Cb3XY0VBKEUGGTBatMri522T6kyoxGdRv
-         R/YHI2CzXA+66ssNNRD0kBHVPl8TI5ear6XOrgI2lTdtmT0YpMoSddNSDob6lG0ADoLk
-         +xTQAwFZ3i/oeH+aroOYDwlOGwYRh8N7mvnq0HFpqRIYUl+jcTUyG7X+0g74P9WaFx1x
-         4nDw==
+        bh=G/HaQvIeifLKJJp6JsBUTA/Cu0PG4HCFXOBV2LCBpGc=;
+        b=ngnRJahtqVxSN6UIjLqWU+1aTxdIhv7re4hDfLrN8LXncI6BNG1ZwqGy4tzOTLxPiH
+         4VWOIuHk0tMtzp4F11bJV5cn9qN75X4TjPW2iyn4nOIj2Y2qsTa18wfmHkOGhLKlmZoS
+         vXpRc/g/QGDtReYNnPGF6rlvG7jz8sM8MsRTR7LhXioKCpHgDgO7fKBddw0dzS48JeET
+         78piPZYcyZX9vIYyfAzpklatM6XnaaFqr/b+XLZlxI1Y0y+wCHWFOsnbVElEi6T+CQOb
+         4zMPa96gAXD4xbmjnQv7nMUvo5bgJJEK/r3Eu0NIV8f4SPGC7eT5IU6zl2RkKdozGWcK
+         sknQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=49H+5dcfdqsESvQ4qNxkOgTxyGkRYtaMvRra0jMgwoI=;
-        b=18/WmIs8BfcrD3AhmMIrks5Jt7k2NTyXEtVANhlbj5xoEs3kzakkUEdUY4cx+kQvSS
-         r/R8MhdYn3tJqDRPpM3V/DjMkumzk3BMRSykNDQq2KokROaNbcuk3VjZej5+nWyesKt8
-         WGvzDTXc4JJTWpDW88U7boeXIbNFVtRpN8ApuMvqBFkHgQOeSl8HJoDl25Qo/4FKCOP3
-         BHe+W0z+LliiSuY9BR6D774zdW4mqAlLfISF7IhKofbTaORux829YolBuwraC01dkcnR
-         oVcjnS9mC1tYBmZjq89kuKuikBb0ZmR/GUryNJR/U/dL3WE8y8FrK1fKn0PBFj/HkAFX
-         tOiw==
-X-Gm-Message-State: AO0yUKU7eIWyvHrdExilnRxhUn/SIxCvp6lEYu7MWIT2jSX2RqMmuO9I
-        YIeDXinsIKkhg+S4QcfzYIb4cbKowDB1F3gSTP4v4g==
-X-Google-Smtp-Source: AK7set/FwLbWx6yiqkzvjcGbe3t+VxnD8xj+/iXHUbjRIwB0jRkvrcCR+VhH4DhOMzxTzJJlzd0h1TxaYfABci/YfRk=
-X-Received: by 2002:a0d:d456:0:b0:507:26dc:ebd with SMTP id
- w83-20020a0dd456000000b0050726dc0ebdmr239978ywd.455.1674665724181; Wed, 25
- Jan 2023 08:55:24 -0800 (PST)
+        bh=G/HaQvIeifLKJJp6JsBUTA/Cu0PG4HCFXOBV2LCBpGc=;
+        b=4xmx6T8QsPsWAClGxGEEjNp9QxzFE+edJcfIgp1Sud8eaHM+jyTfDZFCW7TlDC1CQV
+         6Xq5117eTAqcLqUyNf6dLMDpVRsWrONb4Ov8xcS8hpks/3V3xbsfLCsb5Aj7eeDmImdm
+         Q1q5NTTZDJbEUfiRdRy+ndTgO277mSR5TlvWCn8GJ6vEo/3WhF1xfME2EOg3p8uoRz0q
+         aHiBGuM3Cz4USj/YAZLI8OxX9pXEdGSZAjkOo3pYDrTZKWRdRx4nPzn1eyNDeuERgd2d
+         4o02ZiOkEimwoiQPl6Bz8sxpMczjvqBh89c8S57ACwShT/XdsLA0JhThUMDl+flKlN0G
+         jQmg==
+X-Gm-Message-State: AO0yUKW5i3CvTIgUqo0PJDz+hjCTw58C7tRM6l31JFcLfiFszHMbdJy9
+        wKz86tGZHfK54JvNjg+e7AaWemMlPeUzZkFVyZfqsw==
+X-Google-Smtp-Source: AK7set97wrc43TM0/ovVONCfpWDKrtFzkyYmNKL3FW97qdU/yOGMPZssBTWD4MRF2UhZkPfEz4JLEj3/xF1loldnjYM=
+X-Received: by 2002:a25:ad02:0:b0:80b:6fd3:84d3 with SMTP id
+ y2-20020a25ad02000000b0080b6fd384d3mr714673ybi.316.1674665880846; Wed, 25 Jan
+ 2023 08:58:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-4-surenb@google.com>
- <Y9D2zXpy+9iyZNun@dhcp22.suse.cz>
-In-Reply-To: <Y9D2zXpy+9iyZNun@dhcp22.suse.cz>
+References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-5-surenb@google.com>
+ <Y9D4rWEsajV/WfNx@dhcp22.suse.cz>
+In-Reply-To: <Y9D4rWEsajV/WfNx@dhcp22.suse.cz>
 From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Wed, 25 Jan 2023 08:55:12 -0800
-Message-ID: <CAJuCfpG7KWnj3J_t4nN1R4gfiM5jgjsiTfL55hNa=Uvz4E835g@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] mm: replace vma->vm_flags direct modifications
- with modifier calls
+Date:   Wed, 25 Jan 2023 08:57:48 -0800
+Message-ID: <CAJuCfpGd2eG0RSMte9OVgsRVWPo+Sj7+t8EOo8o_iKzZoh1MXA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] mm: replace vma->vm_flags indirect modification in ksm_madvise
 To:     Michal Hocko <mhocko@suse.com>
 Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
         jglisse@google.com, vbabka@suse.cz, hannes@cmpxchg.org,
@@ -131,39 +130,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 1:30 AM 'Michal Hocko' via kernel-team
+On Wed, Jan 25, 2023 at 1:38 AM 'Michal Hocko' via kernel-team
 <kernel-team@android.com> wrote:
 >
-> On Wed 25-01-23 00:38:48, Suren Baghdasaryan wrote:
-> > Replace direct modifications to vma->vm_flags with calls to modifier
+> On Wed 25-01-23 00:38:49, Suren Baghdasaryan wrote:
+> > Replace indirect modifications to vma->vm_flags with calls to modifier
 > > functions to be able to track flag changes and to keep vma locking
-> > correctness.
+> > correctness. Add a BUG_ON check in ksm_madvise() to catch indirect
+> > vm_flags modification attempts.
 >
-> Is this a manual (git grep) based work or have you used Coccinele for
-> the patch generation?
+> Those BUG_ONs scream to much IMHO. KSM is an MM internal code so I
+> gueess we should be willing to trust it.
 
-It was a manual "search and replace" and in the process I temporarily
-renamed vm_flags to ensure I did not miss any usage.
-
->
-> My potentially incomplete check
-> $ git grep ">[[:space:]]*vm_flags[[:space:]]*[&|^]="
->
-> shows that nothing should be left after this. There is still quite a lot
-> of direct checks of the flags (more than 600). Maybe it would be good to
-> make flags accessible only via accessors which would also prevent any
-> future direct setting of those flags in uncontrolled way as well.
-
-Yes, I think Peter's suggestion in the first patch would also require
-that. Much more churn but probably worth it for the future
-maintenance. I'll add a patch which converts all readers as well.
+Yes, but I really want to prevent an indirect misuse since it was not
+easy to find these. If you feel strongly about it I will remove them
+or if you have a better suggestion I'm all for it.
 
 >
-> Anyway
+> > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+>
 > Acked-by: Michal Hocko <mhocko@suse.com>
-
-Thanks for all the reviews!
-
 > --
 > Michal Hocko
 > SUSE Labs
