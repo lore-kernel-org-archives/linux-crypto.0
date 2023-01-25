@@ -2,106 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBB0C61D97
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Jan 2023 23:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E1BC38142
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 00:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233206AbjAXXDu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Jan 2023 18:03:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
+        id S233061AbjAYAXV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 Jan 2023 19:23:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233603AbjAXXDr (ORCPT
+        with ESMTP id S230334AbjAYAXV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Jan 2023 18:03:47 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5EE49548;
-        Tue, 24 Jan 2023 15:03:45 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7F9A7B81717;
-        Tue, 24 Jan 2023 23:03:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AC5C433EF;
-        Tue, 24 Jan 2023 23:03:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674601423;
-        bh=FInAJGM6hitQqEWREbqfiZT6RW4VKmJRYiGIyELSJQc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VDav27OxxZTsAQgsUUqCRxbi02UJHTXeQ4BNvRR2EVcVurslbfZQ1hQbAIbZQ0Dfe
-         d2YSKzxKcs/H8PX8n256ShJsj1Yt/HpEuQvjdnXNW7LxK4qClB/5cWjD9N85pUzOHq
-         f9gUdwmJmO9TH4Nu6ulKdR7s5iitURCwPLteuRHaK6g42tTBOlrwyVzrc/b54PXQrm
-         FbSFiUK1nyUKX9eWCnkged8yubqQAufRoj0a6bqC3EvH/1rfsEWHb0Tb9HTxrVTird
-         q9ZhjkXbmN7rMAWQP3zs8stWUwCCsCvl/nEQ1sr2UBHleUHB7lQ7F6o7uEEzUcCbTU
-         KQ4JYbXPqsgEQ==
-From:   SeongJae Park <sj@kernel.org>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     SeongJae Park <sj@kernel.org>,
-        Alex Deucher <alexdeucher@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        David Airlie <airlied@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jean Delvare <jdelvare@suse.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/8] Docs: Add missing SPDX license identifiers of
-Date:   Tue, 24 Jan 2023 23:03:40 +0000
-Message-Id: <20230124230340.113608-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <87a627ftuf.fsf@meer.lwn.net>
-References: 
+        Tue, 24 Jan 2023 19:23:21 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A7D4B89A
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Jan 2023 16:23:19 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id kt14so43551125ejc.3
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Jan 2023 16:23:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9qmjL5YE1HyeJVsvTfsUWFKz+T/3Ixilqwo6/hu6Qzo=;
+        b=ehG+o2447r6Td9RR2+nlur6qkPp25WNZ5VRULzjwSQnqXWt2MCg7k78WBPyeu45jwG
+         NOdpFnBuzpDSS1OdTfsIl3z3WdQ15/+Y3RR4TPn2qjpDBQXWqz+0SJlGzXcdKhYVYFYV
+         f+b9LPEusuXHwVWllUUPlJJiAnus4nITRAsSN2iBT5ACFqsfC/xiJ/m/2set+UOC4dIR
+         vHtEv9QW7w8O3v7pcBGdyUd+cTZZPxPcoJg+YkGVVfzvnvhgqGJqzHk5dew4FSyJEmP3
+         0HenwMS/nh+xF7VYGNpLE7wxnRKlybsHnHVvw7WRcJfHkOuune3yXsNkiSSUXA5z2CCT
+         HOXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9qmjL5YE1HyeJVsvTfsUWFKz+T/3Ixilqwo6/hu6Qzo=;
+        b=0+rl++PL2yNFeHYsEMBkUN/I2kttTidZJFq1x/FnmUctALxsvSZdGqvmCwxWJbTTox
+         Au/fAS22nMgt6udEU9xYVGdTNfMpCfSQ06mRSmDFN/SA51AcLLD0+Jb6V+5MQ8joY1R1
+         pWkOX6pEn/V6MEBd935m4ntceOl7VRaZGHPL8X68IoJ3zgTxYcEgCrF7qL1OaGDJ8icY
+         sw+nJ9ikJfWbVFeNUQFUDR9It1W3HUm5LwMxDf8Ed6hNIYZpwFgbxWpBUiMkZhr0sdtF
+         Y158jklxCY4dMdlpdIwE+UObrgpsm9dTcDgOU8OZVs9gAoahhngLqgiF98EvLgrYSXTY
+         7YuA==
+X-Gm-Message-State: AFqh2kqg3K+6l3WChQYh4WLj/KNtMdc1tAvl1kNQEorrijw79GM/tKEY
+        7bVNajaqfHjSL6nufQdVbMhVcw==
+X-Google-Smtp-Source: AMrXdXsDD/LQk4PBY7vHxwupmEw2Zbk2BgwZl6oR9qqIRyEiY3CjmumNBHn7lMrPc11U8zqCl8ppjg==
+X-Received: by 2002:a17:906:cd1f:b0:84d:4a2b:73b9 with SMTP id oz31-20020a170906cd1f00b0084d4a2b73b9mr32449420ejb.59.1674606198366;
+        Tue, 24 Jan 2023 16:23:18 -0800 (PST)
+Received: from fedora.local (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
+        by smtp.gmail.com with ESMTPSA id if10-20020a170906df4a00b00738795e7d9bsm1584606ejc.2.2023.01.24.16.23.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 16:23:17 -0800 (PST)
+From:   Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH v3 0/6] crypto: stm32 hash - reuse for Ux500
+Date:   Wed, 25 Jan 2023 01:23:06 +0100
+Message-Id: <20221227-ux500-stm32-hash-v3-0-32ee12cd6f06@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGt20GMC/4WOwQ6CMBBEf4X07JqyraCe/A/joZSFNlFK2kogh
+ H+XohcvetlkNjNvZmaBvKXAztnMPA02WNetQuwypo3qWgJbr5ohR8wRS3iOB84hxIdAMCoYOBFh
+ cRQST9iwNVapQFB51WmTgm9/pBA/Ie2nPvl6T40dt+rrbdXGhuj8tC0Z8vT9UTrkwKEqRKm01LX
+ i+eVuO+Xd3vmWJdqA/wiYCFpKkY5W8ouwLMsL/cdYQBsBAAA=
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Rob Herring <robh@kernel.org>
+X-Mailer: b4 0.11.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 24 Jan 2023 15:31:04 -0700 Jonathan Corbet <corbet@lwn.net> wrote:
+By taking some small portions of the Ux500 HASH driver and
+adding to the STM32 driver, it turns out we can support both
+platforms with the more modern STM32 driver.
 
-> SeongJae Park <sj@kernel.org> writes:
-> 
-> > Some subsystem documents are missing SPDX license identifiers on index
-> > files.  This patchset adds those.
-> >
-> > Changes from v1
-> > (https://lore.kernel.org/lkml/20230114194741.115855-2-sj@kernel.org/)
-> > - Separate from index file content changes
-> > - Separate patch for each subsystem doc (Alex Deucher)
-> > - Use MIT license for gpu (Alex Deucher)
-> >
-> > SeongJae Park (8):
-> >   Docs/crypto/index: Add missing SPDX License Identifier
-> >   Docs/driver-api/index: Add missing SPDX License Identifier
-> >   Docs/gpu/index: Add missing SPDX License Identifier
-> >   Docs/hwmon/index: Add missing SPDX License Identifier
-> >   Docs/input/index: Add missing SPDX License Identifier
-> >   Docs/mm/index: Add missing SPDX License Identifier
-> >   Docs/scheduler/index: Add missing SPDX License Identifier
-> >   Docs/sound/index: Add missing SPDX License Identifier
-> 
-> So I've applied patches 2 (since I wrote the initial file) and 8 (with
-> Takashi's ack).  The others are also fine, I think, but I hesitate to
-> apply license texts to files without knowing that they match the
-> author's intent.  I hate to say it, but I think the best approach is to
-> send each of the remaining patches to the appropriate maintainers for
-> the subsystem involved.
+The STM32 driver is more modern and compact thanks to using
+things like the crypto engine.
 
-That makes 100% sense, thank you, Jon!
+We add a polled mode since the Ux500 does not have any
+interrupt. Incidentally, this could perhaps be re-used to
+implement synchronous mode, if this is desireable.
 
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+To: Rob Herring <robh+dt@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>
+To: Lionel Debieve <lionel.debieve@foss.st.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-Thanks,
-SJ
+---
+Changes in v3:
+- Allocate the synchronous fallback algorithm in .cra_init()
+  and free it in .cra_exit().
+- Pick up some review tags.
+- Link to v2: https://lore.kernel.org/r/20221227-ux500-stm32-hash-v2-0-bc443bc44ca4@linaro.org
 
-> 
-> Thanks,
-> 
-> jon
+Changes in v2:
+- Use an else-clause in the DT bindings.
+- Fix up issues pointed out by Lionel in the driver extension.
+- Dropped the patch converting dma_mode to a bool after
+  Lionel explained how this works.
+- Link to v1: https://lore.kernel.org/r/20221227-ux500-stm32-hash-v1-0-b637ac4cda01@linaro.org
+
+---
+Linus Walleij (6):
+      dt-bindings: crypto: Let STM32 define Ux500 HASH
+      crypto: stm32/hash: Simplify code
+      crypto: stm32/hash: Use existing busy poll function
+      crypto: stm32/hash: Wait for idle before final CPU xmit
+      crypto: stm32/hash: Support Ux500 hash
+      crypto: ux500/hash - delete driver
+
+ .../devicetree/bindings/crypto/st,stm32-hash.yaml  |   23 +-
+ drivers/crypto/Kconfig                             |   10 -
+ drivers/crypto/Makefile                            |    1 -
+ drivers/crypto/stm32/stm32-hash.c                  |  266 ++-
+ drivers/crypto/ux500/Kconfig                       |   22 -
+ drivers/crypto/ux500/Makefile                      |    7 -
+ drivers/crypto/ux500/hash/Makefile                 |   11 -
+ drivers/crypto/ux500/hash/hash_alg.h               |  398 ----
+ drivers/crypto/ux500/hash/hash_core.c              | 1966 --------------------
+ 9 files changed, 249 insertions(+), 2455 deletions(-)
+---
+base-commit: 1b929c02afd37871d5afb9d498426f83432e71c2
+change-id: 20221227-ux500-stm32-hash-9ee26834292f
+
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
