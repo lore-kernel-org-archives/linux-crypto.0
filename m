@@ -2,192 +2,289 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 822DFC54E94
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 03:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E20C54EED
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 08:39:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbjAYDIG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Jan 2023 22:08:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
+        id S235259AbjAYIjV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Jan 2023 03:39:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbjAYDIF (ORCPT
+        with ESMTP id S234745AbjAYIjD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Jan 2023 22:08:05 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CFA1A4A1;
-        Tue, 24 Jan 2023 19:08:04 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id k13so16732293plg.0;
-        Tue, 24 Jan 2023 19:08:04 -0800 (PST)
+        Wed, 25 Jan 2023 03:39:03 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4190848A31
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 00:38:57 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id a4-20020a5b0004000000b006fdc6aaec4fso19369465ybp.20
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 00:38:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YfbAZNKHnQjoQqV+oSEOnJ44206h+RlEkw2Q9ldf62E=;
-        b=iJusNhz0PLJmn/MnJP41L/0EUL5RSMoYNO6jtwOZ/BoN/dWeN0qB8GYsLJvZXT9UZD
-         6c+YvJdLSf08T2Fea5YMOAnlXM0ZRMszvq8Ls5ds8rS2Y3X81yCEfWdapYBSj5UhHKGS
-         uNkIav3DvN9L2kGErazTB9xx4yR9OEJdutI8c8HKIpK2MOc9rb9bE8RcWlpi5yr+vOOS
-         dhYtpx2AmREr+aMVnnPlcx3r3fzFg0px1YRzuEzpoePeonxFXyiScQrdQxcVyvPyBjfZ
-         2+YhhzV5Nz0RioCrBQsi9wSONKZNiW8W5HtN4BNf7VzYrZXuS+YgVngM3CE49UVgSzN6
-         6vhA==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gBh0+9Ej4fdZiBcL1FEtjjBddEyxpct0JkyXcSRf3Wg=;
+        b=lB4btchvNlTfCRHflexrgCXbRXFvyy8g1gFK/OMeKiIJNh1tqeN9E/OUXMnf2U4uji
+         YYT9ZG6Uz9BNIXcJPuB6IBGSNwEdssClBGTD7I8F8xN9feCnsNR77DeUemH49gSW7JIZ
+         i8Fyk+8dX7xmZBgb/4LlxS50DWuY+p/ZAvE5rke3AXUvgG50Y7E3pTP3J2Z3NRLwRPG+
+         tuCoTtjvQeclLyeusopPtZIO8LUuu13+9dnLJ2g+6d0g96WjPTO8eD8l7HbwyilzSGVH
+         oGzLOV4is7gwgAYTgd7llD5IZe+pWMCF81FsE6KNSAjCT9NY1E+DcM18ZvHUvuruVpcX
+         WOLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YfbAZNKHnQjoQqV+oSEOnJ44206h+RlEkw2Q9ldf62E=;
-        b=wKjFSzzFG4DePJ6npTI6HLy1w1XjRoY1TNKZgEK2ii99TrtI/fh1lliRK1DNvxOeLf
-         fuij49S7yksXYh+bWam2cT4B+AWqChPM8A3RtRIWNrpoyf4DeETpynmbV9ymCDRF6o9g
-         /NXI0z6vR9Gjox6OxLLUNKOaYNt/aIsCVAqY/y3V7Zn8nYw9PfEvT8dqPl3ZSQ1zT8sT
-         wsK1GlBKVu5+1XM9oNZybTYGWCWPdaaMseXCOxIfLUPyiN7iOmTZpvO21Vj8XR7LA9km
-         sT10klLkcOGhaPYo9oHPKgSViydRchA/T2K5BG17Xy6Uc7Y7ajcjlRbZ/IHwGIVrYmBI
-         O5rQ==
-X-Gm-Message-State: AFqh2kpvxgzOtslXNhCTL4imMBZX6Hs1inb0xkkQaZAqzNuzPq1zix31
-        b5+99dT7z6xxT148UUrqVUY=
-X-Google-Smtp-Source: AMrXdXsdx32XHMWaa76ixUliBWh2tUXGdswiWw6kycW4lPKa4AY8Ade5OM66K88nmP9Kwz5mx6pzzw==
-X-Received: by 2002:a17:902:aa48:b0:194:892b:8654 with SMTP id c8-20020a170902aa4800b00194892b8654mr29540451plr.17.1674616084288;
-        Tue, 24 Jan 2023 19:08:04 -0800 (PST)
-Received: from debian.me (subs02-180-214-232-19.three.co.id. [180.214.232.19])
-        by smtp.gmail.com with ESMTPSA id f10-20020a17090274ca00b001948720f6bdsm2390878plt.98.2023.01.24.19.08.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 19:08:01 -0800 (PST)
-Received: by debian.me (Postfix, from userid 1000)
-        id 0A4AE1055E3; Wed, 25 Jan 2023 10:07:57 +0700 (WIB)
-Date:   Wed, 25 Jan 2023 10:07:57 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Roxana Bradescu <roxabee@chromium.org>,
-        Adam Langley <agl@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
-Message-ID: <Y9CdDUudjeczrOWz@debian.me>
-References: <20230125012801.362496-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="dhq4nShMaaV3GoZ4"
-Content-Disposition: inline
-In-Reply-To: <20230125012801.362496-1-ebiggers@kernel.org>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gBh0+9Ej4fdZiBcL1FEtjjBddEyxpct0JkyXcSRf3Wg=;
+        b=TZjjCCq+HD99GfMCILlrMPjjLgrPrgkRVgba0Jy2rPrPCHakCmmICRNE1D2ulSeoNL
+         qDQf+cUr3f+s7HnnZZI+v8ppQZVPdc7HVlUmtzh0gISZFP6S5FjUGVBXw3+dtRwH+jOH
+         k/rJt4/KrFiFC+QM3Lt8/KnIpPP0Au0VwqWVQauK6lAqhRgfvufEJXp5Yomqqqfy4ekk
+         mdVV7yODeKDTkVyVtwPGIiHIF96Q3u3lo8CeS82SW7d+l9+l+gUZHmFia4MFcPmG3rHF
+         EP/fsOJsXXu0gU35lSl74yzh3LY/0WawuJKo5IKjtdDOM5LuXiNUiPwM7Jpb3Ab+8HGY
+         x9bw==
+X-Gm-Message-State: AFqh2kq2GV3R3wBOWOCkEKK8Y65DMdlzFh9GCmSNLCnOGC/Yg/nMb17f
+        oBCp7mzu9D++ZaAw94wkTqAojj45WH4=
+X-Google-Smtp-Source: AMrXdXtLI+TT5dUaC9pRI2aKjkmKt7tjdC79b+se6AwZUh4jJJgCSUqcAubWc2ByjewYclrfSPgwiLKmrmw=
+X-Received: from surenb-desktop.mtv.corp.google.com ([2620:15c:211:200:f7b0:20e8:ce66:f98])
+ (user=surenb job=sendgmr) by 2002:a05:6902:34f:b0:6f9:7bf9:8fc7 with SMTP id
+ e15-20020a056902034f00b006f97bf98fc7mr3373858ybs.279.1674635936246; Wed, 25
+ Jan 2023 00:38:56 -0800 (PST)
+Date:   Wed, 25 Jan 2023 00:38:45 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.405.gd4c25cc71f-goog
+Message-ID: <20230125083851.27759-1-surenb@google.com>
+Subject: [PATCH v2 0/6] introduce vm_flags modifier functions
+From:   Suren Baghdasaryan <surenb@google.com>
+To:     akpm@linux-foundation.org
+Cc:     michel@lespinasse.org, jglisse@google.com, mhocko@suse.com,
+        vbabka@suse.cz, hannes@cmpxchg.org, mgorman@techsingularity.net,
+        dave@stgolabs.net, willy@infradead.org, liam.howlett@oracle.com,
+        peterz@infradead.org, ldufour@linux.ibm.com, paulmck@kernel.org,
+        luto@kernel.org, songliubraving@fb.com, peterx@redhat.com,
+        david@redhat.com, dhowells@redhat.com, hughd@google.com,
+        bigeasy@linutronix.de, kent.overstreet@linux.dev,
+        punit.agrawal@bytedance.com, lstoakes@gmail.com,
+        peterjung1337@gmail.com, rientjes@google.com,
+        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
+        jannh@google.com, shakeelb@google.com, tatashin@google.com,
+        edumazet@google.com, gthelen@google.com, gurua@google.com,
+        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
+        leewalsh@google.com, posk@google.com, will@kernel.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
+        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
+        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
+        qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+        airlied@gmail.com, daniel@ffwll.ch,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, l.stach@pengutronix.de,
+        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
+        matthias.bgg@gmail.com, robdclark@gmail.com,
+        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
+        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
+        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
+        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
+        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
+        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
+        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, miklos@szeredi.hu,
+        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
+        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
+        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
+        loongarch@lists.linux.dev, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
+        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
+        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org,
+        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        devel@lists.orangefs.org, kexec@lists.infradead.org,
+        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
+        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
+        kernel-team@android.com, surenb@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This patchset was originally published as a part of per-VMA locking [1] and
+was split after suggestion that it's viable on its own and to facilitate
+the review process. It is now a preprequisite for the next version of per-VMA
+lock patchset, which reuses vm_flags modifier functions to lock the VMA when
+vm_flags are being updated.
 
---dhq4nShMaaV3GoZ4
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+VMA vm_flags modifications are usually done under exclusive mmap_lock
+protection because this attrubute affects other decisions like VMA merging
+or splitting and races should be prevented. Introduce vm_flags modifier
+functions to enforce correct locking.
 
-On Tue, Jan 24, 2023 at 05:28:01PM -0800, Eric Biggers wrote:
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +DODT - Data Operand Dependent Timing
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Data Operand Dependent Timing (DODT) is a CPU vulnerability that makes t=
-he
-> +execution times of instructions depend on the values of the data operate=
-d on.
-> +
-> +This vulnerability potentially enables side-channel attacks on data, inc=
-luding
-> +cryptographic keys.  Most cryptography algorithms require that a variety=
- of
-> +instructions be constant-time in order to prevent side-channel attacks.
-> +
-> +Affected CPUs
-> +-------------
-> +
-> +This vulnerability affects Intel Core family processors based on the Ice=
- Lake
-> +and later microarchitectures, and Intel Atom family processors based on =
-the
-> +Gracemont and later microarchitectures.  For more information, see Intel=
-'s
-> +documentation [1]_.
-> +
-> +Mitigation
-> +----------
-> +
-> +Mitigation of this vulnerability involves setting a Model Specific Regis=
-ter
-> +(MSR) bit to enable Data Operand Independent Timing Mode (DOITM).
-> +
-> +By the default, the kernel does this on all CPUs.  This mitigation is gl=
-obal, so
-> +it applies to both the kernel and userspace.
-> +
-> +This mitigation can be disabled by adding ``doitm=3Doff`` to the kernel =
-command
-> +line.  It's also one of the mitigations that can be disabled by
-> +``mitigations=3Doff``.
-> +
-> +References
-> +----------
-> +.. [1] Data Operand Independent Timing Instruction Set Architecture (ISA=
-) Guidance
-> +   https://www.intel.com/content/www/us/en/developer/articles/technical/=
-software-security-guidance/best-practices/data-operand-independent-timing-i=
-sa-guidance.html
-> diff --git a/Documentation/admin-guide/hw-vuln/index.rst b/Documentation/=
-admin-guide/hw-vuln/index.rst
-> index 4df436e7c4177..cd962f9634dad 100644
-> --- a/Documentation/admin-guide/hw-vuln/index.rst
-> +++ b/Documentation/admin-guide/hw-vuln/index.rst
-> @@ -18,3 +18,4 @@ are configurable at compile, boot or run time.
->     core-scheduling.rst
->     l1d_flush.rst
->     processor_mmio_stale_data.rst
-> +   dodt.rst
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentat=
-ion/admin-guide/kernel-parameters.txt
-> index 6cfa6e3996cf7..a6a872c4365e6 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -1119,6 +1119,12 @@
->  			The filter can be disabled or changed to another
->  			driver later using sysfs.
-> =20
-> +	doitm=3Doff	[X86,INTEL] Disable the use of Data Operand Independent
-> +			Timing Mode (DOITM).  I.e., disable the mitigation for
-> +			the Data Operand Dependent Timing (DODT) CPU
-> +			vulnerability.  For details, see
-> +			Documentation/admin-guide/hw-vuln/dodt.rst
-> +
->  	driver_async_probe=3D  [KNL]
->  			List of driver names to be probed asynchronously. *
->  			matches with all driver names. If * is specified, the
-> @@ -3259,6 +3265,7 @@
->  					       no_uaccess_flush [PPC]
->  					       mmio_stale_data=3Doff [X86]
->  					       retbleed=3Doff [X86]
-> +					       doitm=3Doff [X86,INTEL]
-> =20
->  				Exceptions:
->  					       This does not have any effect on
-=20
-The doc LGTM, thanks!
+[1] https://lore.kernel.org/all/20230109205336.3665937-1-surenb@google.com/
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+The patchset applies cleanly over mm-unstable branch of mm tree.
 
---=20
-An old man doll... just what I always wanted! - Clara
+My apologies for an extremely large distribution list. The patch touches
+lots of files and many are in arch/ and drivers/.
 
---dhq4nShMaaV3GoZ4
-Content-Type: application/pgp-signature; name="signature.asc"
+Suren Baghdasaryan (6):
+  mm: introduce vma->vm_flags modifier functions
+  mm: replace VM_LOCKED_CLEAR_MASK with VM_LOCKED_MASK
+  mm: replace vma->vm_flags direct modifications with modifier calls
+  mm: replace vma->vm_flags indirect modification in ksm_madvise
+  mm: introduce mod_vm_flags_nolock and use it in untrack_pfn
+  mm: export dump_mm()
 
------BEGIN PGP SIGNATURE-----
+ arch/arm/kernel/process.c                     |  2 +-
+ arch/ia64/mm/init.c                           |  8 +--
+ arch/loongarch/include/asm/tlb.h              |  2 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |  5 +-
+ arch/powerpc/kvm/book3s_xive_native.c         |  2 +-
+ arch/powerpc/mm/book3s64/subpage_prot.c       |  2 +-
+ arch/powerpc/platforms/book3s/vas-api.c       |  2 +-
+ arch/powerpc/platforms/cell/spufs/file.c      | 14 ++---
+ arch/s390/mm/gmap.c                           |  8 +--
+ arch/x86/entry/vsyscall/vsyscall_64.c         |  2 +-
+ arch/x86/kernel/cpu/sgx/driver.c              |  2 +-
+ arch/x86/kernel/cpu/sgx/virt.c                |  2 +-
+ arch/x86/mm/pat/memtype.c                     | 14 +++--
+ arch/x86/um/mem_32.c                          |  2 +-
+ drivers/acpi/pfr_telemetry.c                  |  2 +-
+ drivers/android/binder.c                      |  3 +-
+ drivers/char/mspec.c                          |  2 +-
+ drivers/crypto/hisilicon/qm.c                 |  2 +-
+ drivers/dax/device.c                          |  2 +-
+ drivers/dma/idxd/cdev.c                       |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c       |  2 +-
+ drivers/gpu/drm/amd/amdkfd/kfd_chardev.c      |  4 +-
+ drivers/gpu/drm/amd/amdkfd/kfd_doorbell.c     |  4 +-
+ drivers/gpu/drm/amd/amdkfd/kfd_events.c       |  4 +-
+ drivers/gpu/drm/amd/amdkfd/kfd_process.c      |  4 +-
+ drivers/gpu/drm/drm_gem.c                     |  2 +-
+ drivers/gpu/drm/drm_gem_dma_helper.c          |  3 +-
+ drivers/gpu/drm/drm_gem_shmem_helper.c        |  2 +-
+ drivers/gpu/drm/drm_vm.c                      |  8 +--
+ drivers/gpu/drm/etnaviv/etnaviv_gem.c         |  2 +-
+ drivers/gpu/drm/exynos/exynos_drm_gem.c       |  4 +-
+ drivers/gpu/drm/gma500/framebuffer.c          |  2 +-
+ drivers/gpu/drm/i810/i810_dma.c               |  2 +-
+ drivers/gpu/drm/i915/gem/i915_gem_mman.c      |  4 +-
+ drivers/gpu/drm/mediatek/mtk_drm_gem.c        |  2 +-
+ drivers/gpu/drm/msm/msm_gem.c                 |  2 +-
+ drivers/gpu/drm/omapdrm/omap_gem.c            |  3 +-
+ drivers/gpu/drm/rockchip/rockchip_drm_gem.c   |  3 +-
+ drivers/gpu/drm/tegra/gem.c                   |  5 +-
+ drivers/gpu/drm/ttm/ttm_bo_vm.c               |  3 +-
+ drivers/gpu/drm/virtio/virtgpu_vram.c         |  2 +-
+ drivers/gpu/drm/vmwgfx/vmwgfx_ttm_glue.c      |  2 +-
+ drivers/gpu/drm/xen/xen_drm_front_gem.c       |  3 +-
+ drivers/hsi/clients/cmt_speech.c              |  2 +-
+ drivers/hwtracing/intel_th/msu.c              |  2 +-
+ drivers/hwtracing/stm/core.c                  |  2 +-
+ drivers/infiniband/hw/hfi1/file_ops.c         |  4 +-
+ drivers/infiniband/hw/mlx5/main.c             |  4 +-
+ drivers/infiniband/hw/qib/qib_file_ops.c      | 13 +++--
+ drivers/infiniband/hw/usnic/usnic_ib_verbs.c  |  2 +-
+ .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.c   |  2 +-
+ .../common/videobuf2/videobuf2-dma-contig.c   |  2 +-
+ .../common/videobuf2/videobuf2-vmalloc.c      |  2 +-
+ drivers/media/v4l2-core/videobuf-dma-contig.c |  2 +-
+ drivers/media/v4l2-core/videobuf-dma-sg.c     |  4 +-
+ drivers/media/v4l2-core/videobuf-vmalloc.c    |  2 +-
+ drivers/misc/cxl/context.c                    |  2 +-
+ drivers/misc/habanalabs/common/memory.c       |  2 +-
+ drivers/misc/habanalabs/gaudi/gaudi.c         |  4 +-
+ drivers/misc/habanalabs/gaudi2/gaudi2.c       |  8 +--
+ drivers/misc/habanalabs/goya/goya.c           |  4 +-
+ drivers/misc/ocxl/context.c                   |  4 +-
+ drivers/misc/ocxl/sysfs.c                     |  2 +-
+ drivers/misc/open-dice.c                      |  4 +-
+ drivers/misc/sgi-gru/grufile.c                |  4 +-
+ drivers/misc/uacce/uacce.c                    |  2 +-
+ drivers/sbus/char/oradax.c                    |  2 +-
+ drivers/scsi/cxlflash/ocxl_hw.c               |  2 +-
+ drivers/scsi/sg.c                             |  2 +-
+ .../staging/media/atomisp/pci/hmm/hmm_bo.c    |  2 +-
+ drivers/staging/media/deprecated/meye/meye.c  |  4 +-
+ .../media/deprecated/stkwebcam/stk-webcam.c   |  2 +-
+ drivers/target/target_core_user.c             |  2 +-
+ drivers/uio/uio.c                             |  2 +-
+ drivers/usb/core/devio.c                      |  3 +-
+ drivers/usb/mon/mon_bin.c                     |  3 +-
+ drivers/vdpa/vdpa_user/iova_domain.c          |  2 +-
+ drivers/vfio/pci/vfio_pci_core.c              |  2 +-
+ drivers/vhost/vdpa.c                          |  2 +-
+ drivers/video/fbdev/68328fb.c                 |  2 +-
+ drivers/video/fbdev/core/fb_defio.c           |  4 +-
+ drivers/xen/gntalloc.c                        |  2 +-
+ drivers/xen/gntdev.c                          |  4 +-
+ drivers/xen/privcmd-buf.c                     |  2 +-
+ drivers/xen/privcmd.c                         |  4 +-
+ fs/aio.c                                      |  2 +-
+ fs/cramfs/inode.c                             |  2 +-
+ fs/erofs/data.c                               |  2 +-
+ fs/exec.c                                     |  4 +-
+ fs/ext4/file.c                                |  2 +-
+ fs/fuse/dax.c                                 |  2 +-
+ fs/hugetlbfs/inode.c                          |  4 +-
+ fs/orangefs/file.c                            |  3 +-
+ fs/proc/task_mmu.c                            |  2 +-
+ fs/proc/vmcore.c                              |  3 +-
+ fs/userfaultfd.c                              |  2 +-
+ fs/xfs/xfs_file.c                             |  2 +-
+ include/linux/mm.h                            | 51 +++++++++++++++++--
+ include/linux/mm_types.h                      |  8 ++-
+ include/linux/pgtable.h                       |  5 +-
+ kernel/bpf/ringbuf.c                          |  4 +-
+ kernel/bpf/syscall.c                          |  4 +-
+ kernel/events/core.c                          |  2 +-
+ kernel/fork.c                                 |  2 +-
+ kernel/kcov.c                                 |  2 +-
+ kernel/relay.c                                |  2 +-
+ mm/debug.c                                    |  1 +
+ mm/hugetlb.c                                  |  4 +-
+ mm/khugepaged.c                               |  2 +
+ mm/ksm.c                                      |  2 +
+ mm/madvise.c                                  |  2 +-
+ mm/memory.c                                   | 19 +++----
+ mm/memremap.c                                 |  4 +-
+ mm/mlock.c                                    | 12 ++---
+ mm/mmap.c                                     | 32 +++++++-----
+ mm/mprotect.c                                 |  2 +-
+ mm/mremap.c                                   |  8 +--
+ mm/nommu.c                                    | 11 ++--
+ mm/secretmem.c                                |  2 +-
+ mm/shmem.c                                    |  2 +-
+ mm/vmalloc.c                                  |  2 +-
+ net/ipv4/tcp.c                                |  4 +-
+ security/selinux/selinuxfs.c                  |  6 +--
+ sound/core/oss/pcm_oss.c                      |  2 +-
+ sound/core/pcm_native.c                       |  9 ++--
+ sound/soc/pxa/mmp-sspa.c                      |  2 +-
+ sound/usb/usx2y/us122l.c                      |  4 +-
+ sound/usb/usx2y/usX2Yhwdep.c                  |  2 +-
+ sound/usb/usx2y/usx2yhwdeppcm.c               |  2 +-
+ 129 files changed, 292 insertions(+), 233 deletions(-)
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY9CdBQAKCRD2uYlJVVFO
-o3YWAP9vxo2raPyezzmpJXihfOoPIsfgiDaVQnNuEA2vPpLg/gD7BkpfGEypyQoE
-M217c17ZSWa/VpCfJRbSiQBF9Vz0OQ8=
-=hiFs
------END PGP SIGNATURE-----
+-- 
+2.39.1
 
---dhq4nShMaaV3GoZ4--
