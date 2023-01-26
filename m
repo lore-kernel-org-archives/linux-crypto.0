@@ -2,243 +2,81 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF55C61DA2
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Jan 2023 21:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19659C05027
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Jan 2023 03:55:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236708AbjAYVrs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Jan 2023 16:47:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
+        id S229506AbjAZDzH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 Jan 2023 22:55:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236494AbjAYVre (ORCPT
+        with ESMTP id S229483AbjAZDzH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Jan 2023 16:47:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD9885957E
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 13:46:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674683172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jlR4JcCg1XC8eTF3I+rHcc7NxJf4yOAtTyxChrY5i+Y=;
-        b=ZktsmkNPPzpIAbc7+Jpb4L1Fx7Di/37hR6QOTPyVh/BC03y06ydg5Y9TnN636IfGnMw+hx
-        monDLahAsfrlpT4KvXv+P9aqzjNum8V++YoA8eH6elyTZEcXFVwsvX3hNLxkix7efaYkZp
-        RBy3gUai0V0bgkvVguUtKDp3FMmUtgk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-332-XiSjnpOUOPSY55REepdOug-1; Wed, 25 Jan 2023 16:46:06 -0500
-X-MC-Unique: XiSjnpOUOPSY55REepdOug-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 39E1938041C8;
-        Wed, 25 Jan 2023 21:46:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5948C1121330;
-        Wed, 25 Jan 2023 21:46:01 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-crypto@vger.kernel.org
-Subject: [RFC 06/13] cifs: Add a function to Hash the contents of an iterator
-Date:   Wed, 25 Jan 2023 21:45:36 +0000
-Message-Id: <20230125214543.2337639-7-dhowells@redhat.com>
-In-Reply-To: <20230125214543.2337639-1-dhowells@redhat.com>
-References: <20230125214543.2337639-1-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+        Wed, 25 Jan 2023 22:55:07 -0500
+Received: from aib29gb123.yyz1.oracleemaildelivery.com (aib29gb123.yyz1.oracleemaildelivery.com [192.29.72.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAF1457EA
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Jan 2023 19:55:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=oci-2023;
+ d=n8pjl.ca;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender;
+ bh=z4oWTguh112gq5BHQdKzWiYxkFlOOC8XW4Ugi9+/YT8=;
+ b=cfoTI/27fHCOyNkyhhSPUDYWTi44fg5kwux/133YaLmoz4PJAhS7UfdSv8rBx35VzKpPipjB3UTx
+   tzGOn+0rGCggn//NCMsMuvyksfeXkf6XhaWWfYrxhdtR3AihJvlEjfJ4nCfDnFFWkOHY+8UdiSP/
+   h8fpQbW/1sl3jfbV7704kmqbSRzUQNEH82D4zk1GD4kP0E7c8qBETGDTKqZaoUHSwaA8oq5UA0zX
+   CKA+c4Xy4DijiSBjsWxj9Tl9C+OcfbW8VHyX3TTGsrgw1T5Kg/D+j3aoWk0UqAUycg/KkJI24mMa
+   3itIKuC1SiNT0A5M5HO8IyPgU35ey1I5iL9JXQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; s=prod-yyz-20200204;
+ d=yyz1.rp.oracleemaildelivery.com;
+ h=Date:To:From:Subject:Message-Id:MIME-Version:Sender;
+ bh=z4oWTguh112gq5BHQdKzWiYxkFlOOC8XW4Ugi9+/YT8=;
+ b=l9fyEXBFdrDx+CllGKeaGZ7YiYaavqubL72tm1JJgymaRGni75BXurRFHzTrfHAborleUkbIcMCC
+   RkQ7WrEHASkblLMlKVLjl1yOr1Uyn/oDT7g2Si9+KLQzBSX4oWIBHpGq3SRn3LsER05WXLMbeYlp
+   cUWHFDbONEabblqzesA3kS0WYeEwArTQfEUb42r93qaJ7+WJ+dfoIsqCf9mUflUmn8cDCE6TQBsf
+   WArIfOWe9G5/gJRqQIAE4F5pyHY+UgQvSJ8/ph50ta7zo9ujj+YbQFl+z1oW/S0PonLq0At8wYcT
+   DYdK4UTBdkgK34BxJl+UUu+wS2g6ZKzaZ+2o6w==
+Received: by omta-ad1-fd1-102-ca-toronto-1.omtaad1.vcndpyyz.oraclevcn.com
+ (Oracle Communications Messaging Server 8.1.0.1.20230118 64bit (built Jan 18
+ 2023))
+ with ESMTPS id <0RP2000QDQVSX780@omta-ad1-fd1-102-ca-toronto-1.omtaad1.vcndpyyz.oraclevcn.com> for
+ linux-crypto@vger.kernel.org; Thu, 26 Jan 2023 03:55:04 +0000 (GMT)
+From:   Peter Lafreniere <peter@n8pjl.ca>
+To:     linux-crypto@vger.kernel.org
+Cc:     Peter Lafreniere <peter@n8pjl.ca>, x86@kernel.org,
+        jussi.kivilinna@mbnet.fi
+Subject: [PATCH 0/3] crypto: x86/blowfish - Cleanup and convert to ECB/CBC
+ macros
+Date:   Wed, 25 Jan 2023 22:54:32 -0500
+Message-id: <20230126035433.5291-1-peter@n8pjl.ca>
+X-Mailer: git-send-email 2.39.1
+MIME-version: 1.0
+Content-transfer-encoding: 8bit
+Reporting-Meta: AAGLmsdiyB4PGyn7+In7rV6QBZ5OTvOSWiLYpD1TZNZj2h0lcACgDMDi0nori/iH
+ k6j6g7zEP4tzudYydKlKWKN4ZKPPoQCrl3NWGeivFFHDCpm7T/UNcJd9Ek5LUBnu
+ dpAKpSVMiqp8r+VY1vLtPNTY0kaffxQGBycRvD9SUMQHJ8ua7suu8dv6HgFZMCwy
+ tBcHJ4x0BfQrKDa3y8xlaAhzoL6z4mGKIOi/i62hMsIJkgItzTghBuJ5mLNaQ06u
+ D6OMIHR8N5wzh+CUvP4ORXnXMpRPpQeDyM2QIGoLURT+lnRlWwd0CJtyZWiUbUXN
+ oTdOJ4g1kVsSgXQE64m6BnccN9SetTMtMXsqT3IEQ7KWpcwVGEJEfYIi5+7DRBOt
+ YbRDCkN/RJ3Ir9j4NmUV7S4OPGEK6sPCQivO45QYYw2aqugz5SzjrU08Z8Zk8hU=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
-iterator into a symmetric hash algorithm.
+We can acheive a reduction in code size by cleaning up unused logic in
+assembly functions, and by replacing handwritten ECB/CBC routines with
+helper macros from 'ecb_cbc_helpers.h'.
 
-UBUF- and IOBUF-type iterators are not supported on the assumption that
-either we're doing buffered I/O, in which case we won't see them, or we're
-doing direct I/O, in which case the iterator will have been extracted into
-a BVEC-type iterator higher up.
+Additionally, these changes can allow future x86_64 optimized
+implementations to take advantage of blowfish-x86_64's fast 1-way and
+4-way functions with less code churn.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
+Peter Lafreniere (3):
+  crypto: x86/blowfish - Remove unused encode parameter
+  crypto: x86/blowfish - Convert to use ECB/CBC helpers
+  crypto: x86/blowfish - Eliminate use of SYM_TYPED_FUNC_START in asm
 
-Link: https://lore.kernel.org/r/166697257423.61150.12070648579830206483.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732029577.3186319.17162612653237909961.stgit@warthog.procyon.org.uk/ # rfc
----
- fs/cifs/cifsencrypt.c | 144 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 144 insertions(+)
+ arch/x86/crypto/blowfish-x86_64-asm_64.S |  71 ++++----
+ arch/x86/crypto/blowfish_glue.c          | 200 +++--------------------
+ 2 files changed, 55 insertions(+), 216 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index cbc18b4a9cb2..7be589aeb520 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -24,6 +24,150 @@
- #include "../smbfs_common/arc4.h"
- #include <crypto/aead.h>
- 
-+/*
-+ * Hash data from a BVEC-type iterator.
-+ */
-+static int cifs_shash_bvec(const struct iov_iter *iter, ssize_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	const struct bio_vec *bv = iter->bvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	void *p;
-+	int ret;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		size_t off, len;
-+
-+		len = bv[i].bv_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		len = min_t(size_t, maxsize, len - start);
-+		off = bv[i].bv_offset + start;
-+
-+		p = kmap_local_page(bv[i].bv_page);
-+		ret = crypto_shash_update(shash, p + off, len);
-+		kunmap_local(p);
-+		if (ret < 0)
-+			return ret;
-+
-+		maxsize -= len;
-+		if (maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Hash data from a KVEC-type iterator.
-+ */
-+static int cifs_shash_kvec(const struct iov_iter *iter, ssize_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	const struct kvec *kv = iter->kvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	int ret;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		size_t len;
-+
-+		len = kv[i].iov_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		len = min_t(size_t, maxsize, len - start);
-+		ret = crypto_shash_update(shash, kv[i].iov_base + start, len);
-+		if (ret < 0)
-+			return ret;
-+		maxsize -= len;
-+
-+		if (maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Hash data from an XARRAY-type iterator.
-+ */
-+static ssize_t cifs_shash_xarray(const struct iov_iter *iter, ssize_t maxsize,
-+				 struct shash_desc *shash)
-+{
-+	struct folio *folios[16], *folio;
-+	unsigned int nr, i, j, npages;
-+	loff_t start = iter->xarray_start + iter->iov_offset;
-+	pgoff_t last, index = start / PAGE_SIZE;
-+	ssize_t ret = 0;
-+	size_t len, offset, foffset;
-+	void *p;
-+
-+	if (maxsize == 0)
-+		return 0;
-+
-+	last = (start + maxsize - 1) / PAGE_SIZE;
-+	do {
-+		nr = xa_extract(iter->xarray, (void **)folios, index, last,
-+				ARRAY_SIZE(folios), XA_PRESENT);
-+		if (nr == 0)
-+			return -EIO;
-+
-+		for (i = 0; i < nr; i++) {
-+			folio = folios[i];
-+			npages = folio_nr_pages(folio);
-+			foffset = start - folio_pos(folio);
-+			offset = foffset % PAGE_SIZE;
-+			for (j = foffset / PAGE_SIZE; j < npages; j++) {
-+				len = min_t(size_t, maxsize, PAGE_SIZE - offset);
-+				p = kmap_local_page(folio_page(folio, j));
-+				ret = crypto_shash_update(shash, p, len);
-+				kunmap_local(p);
-+				if (ret < 0)
-+					return ret;
-+				maxsize -= len;
-+				if (maxsize <= 0)
-+					return 0;
-+				start += len;
-+				offset = 0;
-+				index++;
-+			}
-+		}
-+	} while (nr == ARRAY_SIZE(folios));
-+	return 0;
-+}
-+
-+/*
-+ * Pass the data from an iterator into a hash.
-+ */
-+static int cifs_shash_iter(const struct iov_iter *iter, size_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	if (maxsize == 0)
-+		return 0;
-+
-+	switch (iov_iter_type(iter)) {
-+	case ITER_BVEC:
-+		return cifs_shash_bvec(iter, maxsize, shash);
-+	case ITER_KVEC:
-+		return cifs_shash_kvec(iter, maxsize, shash);
-+	case ITER_XARRAY:
-+		return cifs_shash_xarray(iter, maxsize, shash);
-+	default:
-+		pr_err("cifs_shash_iter(%u) unsupported\n", iov_iter_type(iter));
-+		WARN_ON_ONCE(1);
-+		return -EIO;
-+	}
-+}
-+
- int __cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature,
- 			struct shash_desc *shash)
+-- 
+2.39.1
 
