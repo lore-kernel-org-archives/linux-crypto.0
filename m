@@ -2,224 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8076EC61D97
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Jan 2023 13:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90001C636CC
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Jan 2023 14:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbjAZNxp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Jan 2023 08:53:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44596 "EHLO
+        id S231766AbjAZOs4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 26 Jan 2023 09:48:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231922AbjAZNxV (ORCPT
+        with ESMTP id S229473AbjAZOsz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2023 08:53:21 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8426226A
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 05:53:00 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id u8so761225ilq.13
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 05:53:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GqTUVgcDFqgmuPJcaaLIwvX9dO9nsd2mP5P4UmvWTho=;
-        b=J0st/oZXubF7DyEMWEeTRbY+I1MUcRZ5PUjHbSVTAZirHwo25K/Mq2pdxzxrt9yzJQ
-         KNEO31wBqIngUh0Ly5yOS74Y1dY3FxDYCD3efdU+5U0hHzRZDxloipK6IayvU1abWy/6
-         JngkkpZaGzJy8Q2x0KcVraFdKpiH38+uHPrB0jTAlgmWOiatPyC2loSlW+zUZMMTA93A
-         p8IuCV62II8oseVXchM85xx07CfCxPlZIrqW6cSzZwnh0V0NtdqR0w2Jc9ZpbM8T1Gfw
-         qmh/O6Xmix7sTAwYbc3/jC+ZY15AwIPaOC7Txi0MnIaKKRRQmttMr1n4q8KZQT5k16Z0
-         8AMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GqTUVgcDFqgmuPJcaaLIwvX9dO9nsd2mP5P4UmvWTho=;
-        b=HPxfq/aSPos/rzQDT6V5DDH14WvTx/4DZmnrBHXUzMgPF0JuJz98lQtc0qGkrX4Vdc
-         +1CQVSScSZoncP1qeJ9SijpJpyF/gU3D0qWtBb1n6vAX8LGY5LltQ/+D+V6InGQ5XvSA
-         QyiR4SNzpeZdHCnhvvPuW/1R0zLukbZ8+bkY4JGoZlSHJ1WlBzRdFLFJGdFlLtqqUaml
-         H7YZGgAFkkAj/uPH5zA9WQ2jt9/q5yOyLDCTNXcuhThGkwMt5iZ+EYXwZfR8LIh1bl4V
-         1v1yvA851z+XcmhK1b1fB6aDNTDIUo2kj9U0uLy1MddlNaYYm8E0CICos3wzhuLDWiWZ
-         f7kw==
-X-Gm-Message-State: AO0yUKVySI5vguErw0d3X4r2hmafNpnxeYTAjWVOhD+1KKLu6zZfPIAA
-        kLgH45YZxbrVVcBHMTZrU+pXPXmFB05XQ/+93b8DFFdssVd3k0CJaqo=
-X-Google-Smtp-Source: AK7set8RUMV3L+iyC5AX/q8lHI2SYXMKriTm/G+slHUUKKu1q61ZQnRMWRlifyq14Ug/kpcZ4bQHM5aWcDBHiOJ+4VA=
-X-Received: by 2002:a92:ca8d:0:b0:310:98bd:dbf0 with SMTP id
- t13-20020a92ca8d000000b0031098bddbf0mr1239903ilo.128.1674741177112; Thu, 26
- Jan 2023 05:52:57 -0800 (PST)
+        Thu, 26 Jan 2023 09:48:55 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 606A94489;
+        Thu, 26 Jan 2023 06:48:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EE0DA61856;
+        Thu, 26 Jan 2023 14:48:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05241C4339B;
+        Thu, 26 Jan 2023 14:48:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674744532;
+        bh=WNohoknU9nLfbwIXeO77neZ4yMyv64MASZK2UIAfOfc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OyaVsT5ePzTFS76R1FH5KLxOUgzscan6sLv55lgf+totKkalpj5P4hTJ0CFzpg2nB
+         FjnAcEI6WBL0tfwF/TTw8b+wwY6a9pfQDEoFaNDhDzv4Bx4E//TKL2HIis05iqFTqA
+         6cWnwUhcKJagQmydnhE9MWdKN98RZA7QH0/g2op6Qc+WX5kkWc6P8AxP1IQok4d4Iv
+         rC+rDq5bfpCpp87TX2zmlNbavkxhh4pjEZT5VQ1/5GQQQR5j3P3SiDxYUla0TLmDmY
+         tHoanGw9DWG+oAt/RnrhsxsQ7gltrsJN75kvWssUX4MOKayClNcjWM9UluK5fqquNs
+         P9OGQuC06AeFQ==
+Date:   Thu, 26 Jan 2023 16:48:04 +0200
+From:   Mike Rapoport <rppt@kernel.org>
+To:     Suren Baghdasaryan <surenb@google.com>
+Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
+        jglisse@google.com, mhocko@suse.com, vbabka@suse.cz,
+        hannes@cmpxchg.org, mgorman@techsingularity.net, dave@stgolabs.net,
+        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
+        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
+        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
+        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
+        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
+        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
+        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
+        jannh@google.com, shakeelb@google.com, tatashin@google.com,
+        edumazet@google.com, gthelen@google.com, gurua@google.com,
+        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
+        leewalsh@google.com, posk@google.com, will@kernel.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
+        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
+        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
+        qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+        airlied@gmail.com, daniel@ffwll.ch,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, l.stach@pengutronix.de,
+        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
+        matthias.bgg@gmail.com, robdclark@gmail.com,
+        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
+        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
+        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
+        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
+        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
+        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
+        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, miklos@szeredi.hu,
+        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
+        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
+        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
+        loongarch@lists.linux.dev, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
+        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
+        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org,
+        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        devel@lists.orangefs.org, kexec@lists.infradead.org,
+        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
+        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 6/6] mm: export dump_mm()
+Message-ID: <Y9KSpNJ4y0GMwkrW@kernel.org>
+References: <20230125083851.27759-1-surenb@google.com>
+ <20230125083851.27759-7-surenb@google.com>
 MIME-Version: 1.0
-References: <20230125012801.362496-1-ebiggers@kernel.org> <14506678-918f-81e1-2c26-2b347ff50701@intel.com>
-In-Reply-To: <14506678-918f-81e1-2c26-2b347ff50701@intel.com>
-From:   Jann Horn <jannh@google.com>
-Date:   Thu, 26 Jan 2023 14:52:20 +0100
-Message-ID: <CAG48ez1NaWarARJj5SBdKKTYFO2MbX7xO75Rk0Q2iK8LX4BwFA@mail.gmail.com>
-Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Roxana Bradescu <roxabee@chromium.org>,
-        Adam Langley <agl@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230125083851.27759-7-surenb@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 4:30 PM Dave Hansen <dave.hansen@intel.com> wrote:
-> On 1/24/23 17:28, Eric Biggers wrote:
-> > To mitigate this CPU vulnerability, it's possible to enable "Data
-> > Operand Independent Timing Mode" (DOITM) by setting a bit in a MSR.
-> > While Intel's documentation suggests that this bit should only be set
-> > where "necessary", that is highly impractical, given the fact that
-> > cryptography can happen nearly anywhere in the kernel and userspace, and
-> > the fact that the entire kernel likely needs to be protected anyway.
->
-> I think this misses a key point from the documentation:
->
->         This functionality is intended for use by software which has
->         already applied other techniques to mitigate software timing
->         side channels, such as those documented in Intel's Guidelines
->         for Mitigating Timing Side Channels Against Cryptographic
->         Implementations.
->
-> Translating from Intel-speak: Intel thinks that DOITM purely a way to
-> make the CPU run slower if you haven't already written code specifically
-> to mitigate timing side channels.  All pain, no gain.
->
-> The kernel as a whole is not written that way.
+On Wed, Jan 25, 2023 at 12:38:51AM -0800, Suren Baghdasaryan wrote:
+> mmap_assert_write_locked() is used in vm_flags modifiers. Because
+> mmap_assert_write_locked() uses dump_mm() and vm_flags are sometimes
+> modified from from inside a module, it's necessary to export
+> dump_mm() function.
+> 
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
 
-The kernel as a whole also doesn't really use the FPU registers for
-anything other than checksumming and cryptography and stuff like that
-(it's disabled in the compiler flags because the FPU registers
-normally contain userspace state that must not be clobbered). The
-instructions listed on that Intel help page are all weird PM* and VP*
-arithmetic instructions that can't be generated from C code in the
-kernel (except for weird subsystems in which every function is only
-callable in kernel-FPU-enabled mode and the compiler is set to enable
-FPU instruction generation, by which I mean amdgpu).
+Acked-by: Mike Rapoport (IBM) <rppt@kernel.org>
 
-So with the current generations of CPUs, based on that Intel help
-page, "the kernel as a whole" should not be affected by this setting,
-it's mostly just cryptographic helpers written in assembly. From a
-quick-and-dirty grep:
-
-$ find arch/x86/ -name '*.S' | xargs egrep -li
-'(PMADDUBSW|PMULUDQ|VPMULHRSW|PMADDWD|VPLZCNTD|VPMULHUW|PMULDQ|VPLZCNTQ|VPMULHW|PMULHRSW|VPMADD52HUQ|VPMULLD|PMULHUW|VPMADD52LUQ|VPMULLQ|PMULHW|VPMADDUBSW|VPMULLW|PMULLD|VPMADDWD|VPMULUDQ|PMULLW|VPMULDQ)'
-arch/x86/crypto/nh-avx2-x86_64.S
-arch/x86/crypto/nh-sse2-x86_64.S
-arch/x86/crypto/poly1305-x86_64-cryptogams.S
-
-That's NHPoly1305 and Poly1305, two crypto functions. Poly1305 is used
-for the authentication part of AEAD schemes (in particular WireGuard
-uses Poly1305 for all its authentication), NHPoly1305 is for Adiantum
-(weird Android disk encryption stuff AFAIK).
-
-> I'm sure the crypto
-> folks that are cc'd can tell us specifically if the kernel crypto code
-> is written following those recommendations.
-
-Note that all the memory-management and block layer code that copies
-page contents around and swaps them to disk and so on should (ideally)
-be cryptographically timing-safe (yes I know that's very much not true
-with zram swap), because it operates on basically all userspace
-memory, including userspace memory used by cryptographic code.
-
-On top of that, some cryptographic secrets (including SSH
-authentication keys) need to be persisted somewhere - some
-cryptographic key material is stored in filesystems. And of course
-there are also secrets that are not quite cryptographic, and can be
-similarly important and small as cryptographic keys, such as cookies
-and OAuth tokens stored in the various databases of something like a
-browser.
-
-I think part of the reason why KSM is nowadays disabled in most cloud
-environments is that it introduced timing differences in the MM
-subsystem (between taking a write fault on a private page and taking a
-write fault on a KSM-shared page), and those timing differences could
-be used to leak information between VMs. (See, for example,
-<https://gruss.cc/files/remote_dedup.pdf>.)
-
-So I think there is quite a bit more kernel code that *handles
-cryptographic intermediate states and cryptographic secrets* (and
-non-cryptographic secrets that have similar properties) than kernel
-code that *performs cryptography*.
-
-Do we have a guarantee that things like page copying (for example as
-part of migration or forking), usercopy (for example for filesystem
-access), and whatever checksumming and other things might reasonably
-be happening in the block layer (including for swap) and in
-filesystems are going to be data-timing-independent on future
-processors?
-
-> So, let's call this patch what it is: a potential global slowdown which
-> protects a very small amount of crypto code, probably just in userspace.
-
-And a bunch of data paths that this crypto code's secrets might go
-through, in particular in the kernel.
-
-Also note that the kernel can do a bunch of important cryptography on
-its own, like for disk encryption, filesystem encryption, SSL/TLS
-sockets (yes you can have the kernel do the easy parts of TLS for
-you), IPSec, WireGuard, and probably a bunch of other things.
-
->  That is probably the code that's generating your RSA keys, so it's
-> quite important, but it's also a _very_ small total amount of code.
-
-Yeah but all the code that handles storage of your RSA keys really
-also needs a similar level of protection when touching them.
-See https://arxiv.org/pdf/2108.04600.pdf for an example:
-"We analyze the exploitability of base64 decoding functions across
-several widely used cryptographic libraries. Base64 decoding is used
-when loading keys stored in PEM format. We show that these functions
-by themselves leak sufficient information even if libraries are
-executed in trusted execution environments. In fact, we show that
-recent countermeasures to transient execution attacks such as LVI ease
-the exploitability of the observed faint leakages, allowing us to
-robustly infer sufficient information about RSA private keys with a
-single trace. We present a complete attack, including a broad library
-analysis, a high-resolution last level cache attack on SGX enclaves,
-and a fully parallelized implementation of the extend-and-prune
-approach that allows a complete key recovery at medium costs."
-
-> There's another part here which I think was recently added to the
-> documentation:
->
->         Intel expects the performance impact of this mode may be
->         significantly higher on future processors.
->
-> That's _meant_ to be really scary and keep folks from turning this on by
-> default, aka. what this patch does.  Your new CPU will be really slow if
-> you turn this on!  Boo!
-
-It does sound really scary, because it sounds like that list of
-instructions Intel published might be useless for trying to reason
-about the security impact of turning this optimization on for future
-hardware?
-
-If the performance impact is going to be higher on newer CPUs then I
-would *definitely* want DOITM to be on by default, and then when Intel
-can say what instructions are actually affected on a new CPU, we can
-figure out whether it's safe to turn it off as a per-cpu-generation
-thing?
-
-> All that said, and given the information that Intel has released, I
-> think this patch is generally the right thing to do.  I don't think
-> people are wrong for looking at "DODT" as being a new vulnerability.
-> Intel obviously doesn't see it that way, which is why "DODT" has (as far
-> as I can tell) not been treated with the same security pomp and
-> circumstance as other stuff.
->
-> Last, if you're going to propose that this be turned on, I expect to see
-> at least _some_ performance data.  DOITM=1 isn't free, even on Ice Lake.
-
-So all in all, it sounds to me like this should only affect the
-performance of crypto code in current CPUs (where we really want
-data-independent timing), so it should definitely be enabled on
-current CPUs. And on future CPUs it's a surprise package of potential
-security problems, so for those we should be turning it on even more?
+> ---
+>  mm/debug.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/mm/debug.c b/mm/debug.c
+> index 9d3d893dc7f4..96d594e16292 100644
+> --- a/mm/debug.c
+> +++ b/mm/debug.c
+> @@ -215,6 +215,7 @@ void dump_mm(const struct mm_struct *mm)
+>  		mm->def_flags, &mm->def_flags
+>  	);
+>  }
+> +EXPORT_SYMBOL(dump_mm);
+>  
+>  static bool page_init_poisoning __read_mostly = true;
+>  
+> -- 
+> 2.39.1
+> 
