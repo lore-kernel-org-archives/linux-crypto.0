@@ -2,84 +2,133 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77147C61DA3
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Jan 2023 21:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD336C05027
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Jan 2023 22:38:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232935AbjAZVZs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Jan 2023 16:25:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51146 "EHLO
+        id S232161AbjAZWiR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 26 Jan 2023 17:38:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232873AbjAZVZq (ORCPT
+        with ESMTP id S230282AbjAZWiO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2023 16:25:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6966FCA;
-        Thu, 26 Jan 2023 13:25:45 -0800 (PST)
+        Thu, 26 Jan 2023 17:38:14 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E359EC2;
+        Thu, 26 Jan 2023 14:37:53 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2653FB81EEB;
-        Thu, 26 Jan 2023 21:25:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 548D2C433D2;
-        Thu, 26 Jan 2023 21:25:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DDCED6198A;
+        Thu, 26 Jan 2023 22:37:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BFDCC433D2;
+        Thu, 26 Jan 2023 22:37:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674768342;
-        bh=l0Zu8iIrldR2UdBT8hZ4gHGIUEy3EDsOun6BQFWhokg=;
+        s=k20201202; t=1674772672;
+        bh=7AYFhb4koS9pJTdWI4SB1Hdg+HY7ss67hczEY93WEp4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=t0YubjSrKMW8vSsWkSdr/4Myl+5dSI9ia2kr4LIeXQ1OQP2FM8Eh/dDexFNEwl5cG
-         8ufJH0uQn3UXphqct9gaEaImNF8ghCGQgqypnch95wp532zrbiUo8ZqMUt77kSYKHs
-         lhYV+gclqQzVbZ+fAPORNgX7uWeY+dWR9Sq8MhQ4rOL+TC8QjvYekGKZEGCNPpfv8b
-         di3MMIexrbGo1alA4a50vLYIMO/d1+gfiHhTAxhOvvkm8DsGHIzUdZLFjeIyuQMlhH
-         zSSPrODVBQCNwfYn5xedaFwqnlA8BeB/I0SxKkuY6VQVpmrxi/u63REoQtkqGnrN0h
-         VezmjkZ07iGmA==
-Date:   Thu, 26 Jan 2023 21:25:40 +0000
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Pavan Kumar Paluri <papaluri@amd.com>
-Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
-Message-ID: <Y9Lv1HjD1FWdH9jg@kernel.org>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-38-michael.roth@amd.com>
- <Y7BG6pSuoZsBQYrx@kernel.org>
- <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
- <16523f06-bb08-c4f9-bdfa-745fee553a43@amd.com>
+        b=LqohPkmrzcf+GeWXrSxRwkqs0k3Xlkoj3CqzVFnli+3LGo2FeksZWSp8oiMS/0mpe
+         wyTWlXFSB8V3a+A9ccMGpCoh3t9TiDFMgSjz4z59Yi/nT81dkJjAyz88fixXoi8sr7
+         +9fFSF7B7qwRNBluZ5Pb+caWOmWqKCRtUUYxfN2R+LMeA7CQJJg7j2HRoRlyXz7OwW
+         9NG5dOkCIS/ocf4Wru/IR9jfED5dfasZHMKZXqRzaf+D+HMJtprrAxx7oHC/KpvICE
+         ueBsvTuibj18Vf5H+A0m2Zfz35wRxNRprgmPBCucrgg+yIU+dgzgyTi/uwe++hmtUt
+         mdNVbSKrG3s5g==
+Date:   Thu, 26 Jan 2023 22:37:50 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Jann Horn <jannh@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Roxana Bradescu <roxabee@chromium.org>,
+        Adam Langley <agl@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
+Message-ID: <Y9MAvhQYlOe4l2BM@gmail.com>
+References: <20230125012801.362496-1-ebiggers@kernel.org>
+ <14506678-918f-81e1-2c26-2b347ff50701@intel.com>
+ <CAG48ez1NaWarARJj5SBdKKTYFO2MbX7xO75Rk0Q2iK8LX4BwFA@mail.gmail.com>
+ <394c92e2-a9aa-37e1-7a34-d7569ac844fd@intel.com>
+ <CAG48ez0ZK3pMqkto4DTZPNyddYcv8jPHQDNhYoFEPvSRLf80fQ@mail.gmail.com>
+ <e37a17c4-8611-6d1d-85ad-fcd04ff285e1@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <16523f06-bb08-c4f9-bdfa-745fee553a43@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e37a17c4-8611-6d1d-85ad-fcd04ff285e1@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 04:49:14PM -0600, Kalra, Ashish wrote:
-> There was an early firmware issue on Genoa which supported only SNP_INIT or
-> SEV_INIT, but this issue is resolved now.
+On Thu, Jan 26, 2023 at 11:12:36AM -0800, Dave Hansen wrote:
+> On 1/26/23 09:52, Jann Horn wrote:
+> >> Maybe I'm totally missing something, but I thought the scope here was
+> >> the "non-data operand independent timing behavior for the listed
+> >> instructions" referenced here:
+> >>
+> >>> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/data-operand-independent-timing-isa-guidance.html
+> >> where the "listed instructions" is this list:
+> >>
+> >>> https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/resources/data-operand-independent-timing-instructions.html
+> >> For example, that includes XOR with the 0x31 and 0x81 opcodes which
+> >> there are plenty of in the kernel.
+> > That list says at the top: "The table below lists instructions that
+> > have data-independent timing."
 > 
-> Now, the main constraints are that SNP_INIT is always required before
-> SEV_INIT in case we want to launch SNP guests. In other words, if only
-> SEV_INIT is done on a platform which supports SNP we won't be able to launch
-> SNP guests after that.
+> So, first of all, apologies for the documentation.  It needs some work,
+> and I see where the confusion is coming from.
 > 
-> So once we have RMP table setup (in BIOS) we will always do an SNP_INIT and
-> SEV_INIT will be ideally done only (on demand) when an SEV guest is
-> launched.
+> But, I did just confirm with the folks that wrote it. The "listed
+> instructions" *ARE* within the scope of being affected by the DOITM=0/1
+> setting.
+> 
+> Instead of saying:
+> 
+> 	The table below lists instructions that have data-independent
+> 	timing.
+> 
+> I think it should probably say something like:
+> 
+> 	The table below lists instructions that have data-independent
+> 	timing when DOITM is enabled.
+> 
+> 	(Modulo the MXCSR interactions for now)
+> 
+> Somebody from Intel please thwack me over the head if I'm managing to
+> get this wrong (wouldn't be the first time).
 
-OK, thanks for the clarification!
+That's my understanding too, based on the part of
+https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/data-operand-independent-timing-isa-guidance.html
+that describes DOITM.  The page
+https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/resources/data-operand-independent-timing-instructions.html
+is actively misleading, so yes please get that fixed.
 
-BR, Jarkko
+I think the following is also extremely important:
+
+	For Intel® Core™ family processors based on microarchitectures before
+	Ice Lake and Intel Atom® family processors based on microarchitectures
+	before Gracemont that do not enumerate IA32_UARCH_MISC_CTL, developers
+	may assume that the instructions listed here operate as if DOITM is
+	enabled.
+
+The end result is that on older CPUs, Intel explicitly guarantees that the
+instructions in
+https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/resources/data-operand-independent-timing-instructions.html
+have data operand independent timing.  But on newer CPUs, Intel has explicitly
+removed that guarantee, and enabling DOITM is needed to get it back.
+
+By the way, surely the importance of using DOITM on a particular CPU correlates
+strongly with its performance overhead?  So I'm not sure that benchmarks of
+DOITM would even be very interesting, as we couldn't necessarily decide on
+something like "don't use DOITM if the overhead is more than X percent", since
+that would exclude exactly the CPUs where it's the most important to use...
+
+I think the real takeaway here is that the optimizations that Intel is
+apparently trying to introduce are a bad idea and not safe at all.  To the
+extent that they exist at all, they should be an opt-in thing, not out-opt.  The
+CPU gets that wrong, but Linux can flip that and do it right.
+
+- Eric
