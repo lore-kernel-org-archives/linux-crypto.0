@@ -2,56 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EBCBC05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 02:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CE7C54EAA
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 02:53:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233753AbjA0CxD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Jan 2023 21:53:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32788 "EHLO
+        id S233629AbjA0CxU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 26 Jan 2023 21:53:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233665AbjA0CxA (ORCPT
+        with ESMTP id S233749AbjA0CxD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Jan 2023 21:53:00 -0500
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E7F2ED41
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 18:52:58 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id hw16so10128493ejc.10
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 18:52:58 -0800 (PST)
+        Thu, 26 Jan 2023 21:53:03 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C87A2ED62
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 18:53:01 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id m2so9731207ejb.8
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Jan 2023 18:53:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=profian-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S4j4/b8H0VfIoZZXeUlO2fvMPvORV541RFGt87/AIxU=;
-        b=iK/dqptLinfJiezJF6DdUdzO29dwCVB5SIvBU1ZwzCCC4nRqYP4SzRMkl4Zg2Y6gkZ
-         XvPag+NHCDsdiy2NCp56ijpEkIF1kAhZ3RsESDZ5jAUkVPBBCwbKSei+ME3NuxSS2mAf
-         D7+N+j6C5Z3pJN6lL0RvLj8VSp364vOhCmk/zZveW4rrigqKwcM+48XUL0V9IbG0sQ7E
-         ehapxq/Pet/SbemXxFAJXUthmtttmXD7eDbCDj94e/UmLXCm6Y8JloBD3/CnAKhmuxr1
-         IsiIBXqzJeKL9BOTV7llIa/LZ0bFCZRSLd5/u69lHpfUVZ/LWE6qxy6nQlSeumR9ONHZ
-         sMtQ==
+        bh=kGR72ilt2gtK78L/01GDQFic4BE6v4opXftOgadBZmM=;
+        b=Lf3jMVkLYEooxOFsQ2UBYZ7oTLwkWaXYk4tOLe6s3JsN3C77zcAjpvXAn70onXf8aI
+         pJVXZyluvJ9dCN0OyyMQxZq9gWneQ6KR6XnY/N5nJE7Q3TloRfG17rhl9s4gNf4nCTmb
+         r24GTgiayDnc7Dm0HdQT4rSE5GJd3sclsvUM9mMt9YdNqHxvy5CYiarzSMgkppqwDtWS
+         1mW9r/B1IL5wW//yCuHE0dOkURdYDtR/+KoeBX9lgBh32gm2HiM0J45bb8BrLQYDwUlT
+         We7kQesXgNwG59l6Ag5eEAO9ZydgPdrSVGgmiY4oLyDg49GLbWLf8ecDvLU9BxLYCJdA
+         0Cqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S4j4/b8H0VfIoZZXeUlO2fvMPvORV541RFGt87/AIxU=;
-        b=QTWiaUlb4/xO0yizYSvrb7jg1mctaNOQ8QCrBC+fEq7Kphp6QX4VZvvUAel8cZG9Hh
-         d2OtVK9tyj7Quvzug0zkXQ8kMOv9E+TEhcJ51kQfxb3/ISeuUmoYSs9d0mQwpW2T9tWQ
-         SKgxX2MZqvO8LrJA1cLG589mWuGy2BEQsFNRWqbvqBWh7txkIMczBqY01RBwFMZzKsE4
-         l3omNJwoOyBkbtkHBwqyveEJ8vZVYkffahfbEqVfOVjVzModB10j09MnuVvpqpvMzS+r
-         mlFna78eRtV/q3AE+3u5okGtvIOyQ+Dk5l1nGr0nhks8s62IioJgfkusENq0BdQWu9Jg
-         sf7g==
-X-Gm-Message-State: AFqh2koVHUfzLKW0K13nog5AtwYsbeAgb81wNyP+NShnctK9AvRHilTy
-        E9Byhijuvwl4CvgrznIY9qkaeg==
-X-Google-Smtp-Source: AMrXdXvHWxudJNHWGEuzyM6Rt1AAOD4BD9Q4iY85hyE4iNz0uBLacDTQpb5Kv5zkRqyhskfp3yomuA==
-X-Received: by 2002:a17:907:c712:b0:7ba:5085:869 with SMTP id ty18-20020a170907c71200b007ba50850869mr43792444ejc.9.1674787977214;
-        Thu, 26 Jan 2023 18:52:57 -0800 (PST)
+        bh=kGR72ilt2gtK78L/01GDQFic4BE6v4opXftOgadBZmM=;
+        b=PC97UVovX4NYTIPCSML6BS4mEmL4OE25fzGRmqorSu5qq3MMJpxgGpoVJPx4jlXbzQ
+         XJBBLQSW3vKMrv7NZXwGM3S6d62xUcWphV8xTi8DuESHc0c3UcpQUNaTkWHTmqKKNTsG
+         D9QbdQoBfESdQzU5aOTaTThLiUy7dgVAdbirNbPyk7L1wTdCdpYrXzZRdd4t7ya6gjUU
+         iXDSXaiBhy/BlqHdhMN7NmllKiW9lx19uTB6/Xh3pCinwBk9bmdYGWDwXlYGyphg9qHc
+         g07UF72qk1n9tV23+wDbZXMfKdIx9Y8HjrXDAdbobbXIQEweZSuiiqjcjcKGLxHkJS4W
+         0jcg==
+X-Gm-Message-State: AFqh2koV/vgHFEWnUzSn7yXHP5XtOTMMr+BdFt9Vf6VE/zVfVWQDxjII
+        oHU7PNETCs0nKdBMxAT0pOhWpA==
+X-Google-Smtp-Source: AMrXdXvH6K2KIVQ57HXDPFWTIupQQmzKHOj9PFBD+BFxcDAyzsbuY15PV1cK4uSsBwYoAKV9ae35sA==
+X-Received: by 2002:a17:906:744:b0:877:9eab:118c with SMTP id z4-20020a170906074400b008779eab118cmr26664836ejb.68.1674787979362;
+        Thu, 26 Jan 2023 18:52:59 -0800 (PST)
 Received: from localhost (88-113-101-73.elisa-laajakaista.fi. [88.113.101.73])
-        by smtp.gmail.com with ESMTPSA id gn19-20020a1709070d1300b008512e1379dbsm1483151ejc.171.2023.01.26.18.52.56
+        by smtp.gmail.com with ESMTPSA id q23-20020a056402041700b0048eb0886b00sm1591026edv.42.2023.01.26.18.52.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 18:52:56 -0800 (PST)
+        Thu, 26 Jan 2023 18:52:58 -0800 (PST)
 From:   Jarkko Sakkinen <jarkko@profian.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>,
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -60,11 +66,16 @@ Cc:     Harald Hoyer <harald@profian.com>, Tom Dohrmann <erbse.13@gmx.de>,
         Ashish Kalra <ashish.kalra@amd.com>,
         Michael Roth <michael.roth@amd.com>,
         Jarkko Sakkinen <jarkko@profian.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT)),
         linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR
-        (CCP) DRIVER - SE...), linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH RFC 7/8] crypto: ccp: Prevent a spurious SEV_CMD_SNP_INIT triggered by sev_guest_init()
-Date:   Fri, 27 Jan 2023 02:52:36 +0000
-Message-Id: <20230127025237.269680-8-jarkko@profian.com>
+        (CCP) DRIVER - SE...)
+Subject: [PATCH RFC 8/8] crypto: ccp: Move __sev_snp_init_locked() call inside __sev_platform_init_locked()
+Date:   Fri, 27 Jan 2023 02:52:37 +0000
+Message-Id: <20230127025237.269680-9-jarkko@profian.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230127025237.269680-1-jarkko@profian.com>
 References: <20230127025237.269680-1-jarkko@profian.com>
@@ -74,64 +85,174 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move the firmware version check from sev_pci_init() to sev_snp_init().
+The following functions end up calling sev_platform_init() or
+__sev_platform_init_locked():
+
+* sev_guest_init()
+* sev_ioctl_do_pek_csr
+* sev_ioctl_do_pdh_export()
+* sev_ioctl_do_pek_import()
+* sev_ioctl_do_pek_pdh_gen()
+* sev_pci_init()
+
+Only sev_guest_init() and sev_pci_init() also call sev_snp_init().
+Address this by calling __sev_snp_init_locked() inside
+__sev_platform_init_locked() before any other initialization.
 
 Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ arch/x86/kvm/svm/sev.c       |  4 +--
+ drivers/crypto/ccp/sev-dev.c | 51 +++++++++++++-----------------------
+ include/linux/psp-sev.h      | 15 -----------
+ 3 files changed, 19 insertions(+), 51 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5e4666b79689..2dd56f59fc50 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -343,11 +343,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 			goto e_free;
+ 
+ 		mutex_init(&sev->guest_req_lock);
+-		ret = sev_snp_init(&argp->error, false);
+-	} else {
+-		ret = sev_platform_init(&argp->error);
+ 	}
+ 
++	ret = sev_platform_init(&argp->error);
+ 	if (ret)
+ 		goto e_free;
+ 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 6c4fdcaed72b..50e73df966ec 100644
+index 50e73df966ec..be040926f66a 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1381,6 +1381,12 @@ static int __sev_snp_init_locked(int *error)
- 	if (sev->snp_initialized)
+@@ -102,6 +102,7 @@ struct sev_data_range_list *snp_range_list;
+ static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+ 
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
++static int __sev_snp_init_locked(int *error);
+ 
+ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+ {
+@@ -965,7 +966,8 @@ static int __sev_platform_init_locked(int *error)
+ {
+ 	struct psp_device *psp = psp_master;
+ 	struct sev_device *sev;
+-	int rc = 0, psp_ret = -1;
++	int psp_ret = -1;
++	int rc;
+ 	int (*init_function)(int *error);
+ 
+ 	if (!psp || !psp->sev_data)
+@@ -976,6 +978,18 @@ static int __sev_platform_init_locked(int *error)
+ 	if (sev->state == SEV_STATE_INIT)
  		return 0;
  
-+	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
-+		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
-+			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
-+		return 0;
++	rc = __sev_snp_init_locked(error);
++	if (rc < 0 && rc != -ENODEV)
++		return rc;
++
++	if (!sev_es_tmr) {
++		/* Obtain the TMR memory area for SEV-ES use */
++		sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
++		if (!sev_es_tmr)
++			dev_warn(sev->dev,
++				 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
 +	}
 +
- 	/*
- 	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
- 	 * across all cores.
-@@ -2313,25 +2319,19 @@ void sev_pci_init(void)
+ 	if (sev_init_ex_buffer) {
+ 		init_function = __sev_init_ex_locked;
+ 		rc = sev_read_init_ex_file();
+@@ -1373,6 +1387,9 @@ static int __sev_snp_init_locked(int *error)
+ 	struct sev_device *sev;
+ 	int rc = 0;
+ 
++	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
++		return -ENODEV;
++
+ 	if (!psp || !psp->sev_data)
+ 		return -ENODEV;
+ 
+@@ -1457,24 +1474,6 @@ static int __sev_snp_init_locked(int *error)
+ 	return rc;
+ }
+ 
+-int sev_snp_init(int *error, bool init_on_probe)
+-{
+-	int rc;
+-
+-	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+-		return -ENODEV;
+-
+-	if (init_on_probe && !psp_init_on_probe)
+-		return 0;
+-
+-	mutex_lock(&sev_cmd_mutex);
+-	rc = __sev_snp_init_locked(error);
+-	mutex_unlock(&sev_cmd_mutex);
+-
+-	return rc;
+-}
+-EXPORT_SYMBOL_GPL(sev_snp_init);
+-
+ static int __sev_snp_shutdown_locked(int *error)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+@@ -2319,14 +2318,6 @@ void sev_pci_init(void)
  		}
  	}
  
-+	rc = sev_snp_init(&error, true);
-+	if (rc)
-+		/*
-+		 * Don't abort the probe if SNP INIT failed,
-+		 * continue to initialize the legacy SEV firmware.
-+		 */
-+		dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
-+
+-	rc = sev_snp_init(&error, true);
+-	if (rc)
+-		/*
+-		 * Don't abort the probe if SNP INIT failed,
+-		 * continue to initialize the legacy SEV firmware.
+-		 */
+-		dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+-
  	/*
  	 * If boot CPU supports SNP, then first attempt to initialize
  	 * the SNP firmware.
- 	 */
- 	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
--		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
--			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
--				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
--		} else {
--			rc = sev_snp_init(&error, true);
--			if (rc) {
--				/*
--				 * Don't abort the probe if SNP INIT failed,
--				 * continue to initialize the legacy SEV firmware.
--				 */
--				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
--			}
--		}
+@@ -2341,12 +2332,6 @@ void sev_pci_init(void)
+ 		}
+ 	}
+ 
+-	/* Obtain the TMR memory area for SEV-ES use */
+-	sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
+-	if (!sev_es_tmr)
+-		dev_warn(sev->dev,
+-			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
 -
- 		/*
- 		 * Allocate the intermediate buffers used for the legacy command handling.
- 		 */
+ 	if (!psp_init_on_probe)
+ 		return;
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 970a9de0ed20..ef0c6941a8f4 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -794,21 +794,6 @@ struct sev_data_snp_shutdown_ex {
+  */
+ int sev_platform_init(int *error);
+ 
+-/**
+- * sev_snp_init - perform SEV SNP_INIT command
+- *
+- * @error: SEV command return code
+- * @init_on_probe: indicates if called during module probe/init
+- *
+- * Returns:
+- * 0 if the SEV successfully processed the command
+- * -%ENODEV    if the SEV device is not available
+- * -%ENOTSUPP  if the SEV does not support SEV
+- * -%ETIMEDOUT if the SEV command timed out
+- * -%EIO       if the SEV returned a non-zero return code
+- */
+-int sev_snp_init(int *error, bool init_on_probe);
+-
+ /**
+  * sev_platform_status - perform SEV PLATFORM_STATUS command
+  *
 -- 
 2.38.1
 
