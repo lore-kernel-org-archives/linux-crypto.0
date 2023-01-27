@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94032C38142
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 11:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08DBC38142
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 11:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbjA0LBh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Jan 2023 06:01:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        id S232778AbjA0LEB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Jan 2023 06:04:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjA0LB1 (ORCPT
+        with ESMTP id S232782AbjA0LD6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:01:27 -0500
+        Fri, 27 Jan 2023 06:03:58 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2DEC234F2;
-        Fri, 27 Jan 2023 03:01:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D8074FC33;
+        Fri, 27 Jan 2023 03:03:50 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pLMTL-004hGz-0u; Fri, 27 Jan 2023 19:00:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Jan 2023 19:00:43 +0800
-Date:   Fri, 27 Jan 2023 19:00:43 +0800
+        id 1pLMVt-004hKi-RU; Fri, 27 Jan 2023 19:03:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Jan 2023 19:03:21 +0800
+Date:   Fri, 27 Jan 2023 19:03:21 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
 Cc:     Olivia Mackall <olivia@selenic.com>,
@@ -29,68 +29,37 @@ Cc:     Olivia Mackall <olivia@selenic.com>,
         Conor Dooley <conor.dooley@microchip.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v5 0/3] hwrng: starfive: Add driver for TRNG module
-Message-ID: <Y9Ou20ocr+ReaFVZ@gondor.apana.org.au>
+Subject: [PATCH] hwrng: starfive - Enable compile testing
+Message-ID: <Y9OveVKTkX8cRhyP@gondor.apana.org.au>
 References: <20230117015445.32500-1-jiajie.ho@starfivetech.com>
+ <20230117015445.32500-3-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230117015445.32500-1-jiajie.ho@starfivetech.com>
+In-Reply-To: <20230117015445.32500-3-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 17, 2023 at 09:54:42AM +0800, Jia Jie Ho wrote:
-> This patch series adds kernel support for StarFive JH7110 hardware
-> random number generator. First 2 patches add binding docs and device
-> driver for this module. Patch 3 adds devicetree entry for VisionFive 2
-> SoC.
-> 
-> Patch 3 needs to be applied on top of:
-> https://patchwork.kernel.org/project/linux-riscv/patch/20221220011247.35560-7-hal.feng@starfivetech.com/
-> 
-> Patch 3 also depends on additional clock and reset patches for stg
-> domain that are yet to be submitted to mailing list.
-> 
-> Changes v4->v5:
-> - Updated status in MAINTAINERS. (Conor)
-> - Specified targeted device in Kconfig title and descriptions. (Conor)
-> - Removed unnecessary goto label in patch 2. (Conor)
-> - Enable runtime PM before registering hwrng in patch 2. (Conor)
-> 
-> Changes v3->v4:
-> - Moved init_completion before IRQ registration to be prepared for
->   spurious interrupts. (Herbert)
-> - Added locks to guard concurrent write to the same register. (Herbert)
-> 
-> Changes v2->v3:
-> - Use constant usecs and convert to jiffies. (Herbert)
-> - Removed sleep in irq handler. (Herbert)
-> - Limited wait time to 40us if wait == 0 for trng read. (Herbert)
-> 
-> Changes v1->v2:
-> - Updated of_match_ptr and added pm_sleep_ptr. (Krzysztof)
-> - Dropped "status" in dts as module is always on. (Krzysztof)
-> 
-> Jia Jie Ho (3):
->   dt-bindings: rng: Add StarFive TRNG module
->   hwrng: starfive - Add TRNG driver for StarFive SoC
->   riscv: dts: starfive: Add TRNG node for VisionFive 2
-> 
->  .../bindings/rng/starfive,jh7110-trng.yaml    |  55 +++
->  MAINTAINERS                                   |   6 +
->  arch/riscv/boot/dts/starfive/jh7110.dtsi      |  10 +
->  drivers/char/hw_random/Kconfig                |  11 +
->  drivers/char/hw_random/Makefile               |   1 +
->  drivers/char/hw_random/jh7110-trng.c          | 393 ++++++++++++++++++
->  6 files changed, 476 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
->  create mode 100644 drivers/char/hw_random/jh7110-trng.c
-> 
-> -- 
-> 2.25.1
+Enable compile testing for jh7110.  Also remove the dependency on
+HW_RANDOM.
 
-Patches 1-2 applied.  Thanks.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 9924e2f35b69..ae508e96cfc2 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -551,8 +551,7 @@ config HW_RANDOM_CN10K
+ 
+ config HW_RANDOM_JH7110
+ 	tristate "StarFive JH7110 Random Number Generator support"
+-	depends on SOC_STARFIVE
+-	depends on HW_RANDOM
++	depends on SOC_STARFIVE || COMPILE_TEST
+ 	help
+ 	  This driver provides support for the True Random Number
+ 	  Generator in StarFive JH7110 SoCs.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
