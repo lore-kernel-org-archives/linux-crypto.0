@@ -2,93 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EF8C61DA4
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 11:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC19C38142
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Jan 2023 15:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232949AbjA0LNy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Jan 2023 06:13:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
+        id S234436AbjA0PZV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 Jan 2023 10:25:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232933AbjA0LNx (ORCPT
+        with ESMTP id S229456AbjA0PZU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:13:53 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF94E13514;
-        Fri, 27 Jan 2023 03:13:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1674818032; x=1706354032;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=no1En9x29CtZ9fZVT34CIJmSYilJ9YDPJ3JKw7YN+O4=;
-  b=nGNoX0K2s0d8yuFkfiucsWdFXSzp/uyHSp2kK2x/x6OH4BpTLUAvKcfr
-   C/dSZ+m78b9+FSOd1/NHfiVyIgK6Ag42PUEcrKKR39RruyA60/E0KaGPe
-   Sk2DIXd6y4k6tbM3f0ka9eaoHzY8bzgXHIJxuSQAEpYbGcf9PU3vGSBFo
-   NFzMWpBL951RzSDw4e8qbmtwt82aAoBRPW9sUAo79W4lz//FfKwuEmO9w
-   B98RzG7wwN4Ti4o2QRheEmIew4D6pXBRufzfl3eRuNEOd7f1vE5ydWSpC
-   sE96nwKbjz2ZXbKN0pf/g7uyqm8AMkxYamoB6KgMy8Tz0dTWiVdm9nZLK
-   A==;
-X-IronPort-AV: E=Sophos;i="5.97,250,1669100400"; 
-   d="asc'?scan'208";a="194133952"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 27 Jan 2023 04:13:51 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 27 Jan 2023 04:13:45 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
- Transport; Fri, 27 Jan 2023 04:13:44 -0700
-Date:   Fri, 27 Jan 2023 11:13:20 +0000
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
-Subject: Re: [PATCH] hwrng: starfive - Enable compile testing
-Message-ID: <Y9Ox0M3fW7Lqr2P6@wendy>
-References: <20230117015445.32500-1-jiajie.ho@starfivetech.com>
- <20230117015445.32500-3-jiajie.ho@starfivetech.com>
- <Y9OveVKTkX8cRhyP@gondor.apana.org.au>
+        Fri, 27 Jan 2023 10:25:20 -0500
+Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95B37B434;
+        Fri, 27 Jan 2023 07:25:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1674833119; x=1706369119;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version;
+  bh=zO8nVNBHWCsW7pm+iq5qvzD/WuhnugOCzKAoOIfNKP0=;
+  b=wJwnypwm9K0p8ZYtn3rNJuJOeP+GcAtFq0cMEoGc3mpHv4PEHEOi34mR
+   upWoO2pDFsKJK9A+JnN6U61kJ8O6RDvoldX/HlSyTOr6r52EQ0mPM/64Q
+   I+grKvu9UwRr3nQaM2ctKXU8WvMjDvtfKWYxUfY7HwWkwAkQ/pK31mJqP
+   U=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+  by alexa-out-sd-01.qualcomm.com with ESMTP; 27 Jan 2023 07:25:19 -0800
+X-QCInternal: smtphost
+Received: from nasanex01c.na.qualcomm.com ([10.45.79.139])
+  by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2023 07:25:19 -0800
+Received: from hu-mojha-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.36; Fri, 27 Jan 2023 07:25:16 -0800
+From:   Mukesh Ojha <quic_mojha@quicinc.com>
+To:     <rdunlap@infradead.org>
+CC:     <corbet@lwn.net>, <daniel.m.jordan@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <olteanv@gmail.com>, <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 05/35] Documentation: core-api: correct spelling
+Date:   Fri, 27 Jan 2023 20:55:07 +0530
+Message-ID: <1674833107-10526-1-git-send-email-quic_mojha@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <20230127064005.1558-6-rdunlap@infradead.org>
+References: <20230127064005.1558-6-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="EPnwagEDOKKyRmai"
-Content-Disposition: inline
-In-Reply-To: <Y9OveVKTkX8cRhyP@gondor.apana.org.au>
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---EPnwagEDOKKyRmai
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>Correct spelling problems for Documentation/core-api/ as reported
+>by codespell.
 
-On Fri, Jan 27, 2023 at 07:03:21PM +0800, Herbert Xu wrote:
-> Enable compile testing for jh7110.  Also remove the dependency on
-> HW_RANDOM.
+>Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>Cc: Vladimir Oltean <olteanv@gmail.com>
+>Cc: netdev@vger.kernel.org
+>Cc: Steffen Klassert <steffen.klassert@secunet.com>
+>Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+>Cc: linux-crypto@vger.kernel.org
+>Cc: Jonathan Corbet <corbet@lwn.net>
+>Cc: linux-doc@vger.kernel.org
 
-Checked, the latter is because the whole menu is wrapped in a if
-HW_RANDOM, so seems fair to me!
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
 
-Thanks,
-Conor.
-
-
---EPnwagEDOKKyRmai
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9OxwgAKCRB4tDGHoIJi
-0rz1APsH+L8iRJIRtnC9eGhBl+yL7xG/S/IqVBLiqtq+xLZvEQEA+dihIHwbCj/K
-rFMXj7DUd8lIg/MTF7MeyTkdQzvT2QM=
-=83bB
------END PGP SIGNATURE-----
-
---EPnwagEDOKKyRmai--
+-Mukesh
