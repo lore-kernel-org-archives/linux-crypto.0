@@ -2,124 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF72BC636D0
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Jan 2023 20:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14E3C61D97
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Jan 2023 08:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234878AbjA1UaY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 Jan 2023 15:30:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57328 "EHLO
+        id S229878AbjA2III (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 29 Jan 2023 03:08:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233816AbjA1UaV (ORCPT
+        with ESMTP id S229741AbjA2IIH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Jan 2023 15:30:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E9E1C305;
-        Sat, 28 Jan 2023 12:30:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3F85DB80BEC;
-        Sat, 28 Jan 2023 20:30:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA46EC4339C;
-        Sat, 28 Jan 2023 20:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674937816;
-        bh=NyfyYmvHuYCep7B9YHaipGsiO9fFZKxd2hw/3QQJwqQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LEOdKD+xVK+ChdUeMYF7EWUBmGq14I7a4s4JCxsX0Z2pbDfy98ZnOQg9LaM70RuVC
-         9xRu4+lF+DVHmBGVHpWV6C3DKQnB6htlyuiQ1J3mBpVE0Cta4vW2RE/BXmcJavx0so
-         NpT9ZM/k0gp3REittQZbOAE5Pu2nnNW4ZzWWewKaFAFD3E6WwCsC+zOFh5CoV4HfQe
-         lQLG294nW9w5VbGq5Yt6s9D6T/oia27mZXgUwJMw43HV8z7gJz+N1dbAJrJr5rDjld
-         W58/LuDYy+LQisFZsbodjJ+lGQoGjrCfyPfOcghY/B7T6gUkoFPJyIGFHljP3NeW1j
-         sFiy6/39HdTbA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 76D09E52504;
-        Sat, 28 Jan 2023 20:30:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Sun, 29 Jan 2023 03:08:07 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1BBC12F24;
+        Sun, 29 Jan 2023 00:08:03 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id d14so8456001wrr.9;
+        Sun, 29 Jan 2023 00:08:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lfLvX+h7dXHOBDCZOU5BYDr/d44mVPnFEAIaaBtTNZ4=;
+        b=HyVwwWfU8Ll50zyC1wvl0OKDx170Y7xZxKQwMToKvkqboqnQ1W6ZLDXgwPiqp7YuUK
+         fmAKg8T/D/3ROlqGy7SA61kapillDEmpYVPt8OybaXp/OSOsLsQezTyUrHiyN1fDoM3e
+         EMu4YUTn6ocUnXjDTVd9Slb1N4HDb2nAbr7oGL4vli+BNST04RTir/tVHVSPvoOQl6mf
+         ONf2EzdLP6wg5bcoCK04bOJKFOXoA0vEYIbK3/AC3Spm9JEkYei8fBFDXUrIUcMowBqd
+         +Z/CbiLYoXxa7kfz53T6FqSwixqEmh5k8G9EvkEaKg++O+ksyX5MZEnr60jxkayadloN
+         SkeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lfLvX+h7dXHOBDCZOU5BYDr/d44mVPnFEAIaaBtTNZ4=;
+        b=xEGBeoHRG4SNgS0gQDoDOJh8+FwpuQKpv25jFJj7TQVqHd5Yxbgk3d1UeYzGrP+46v
+         17qRKhO092GdFuZKrSeT0oqXDJTAS6qnyKE6Ujo4dD27tJCWJTFtX6ScVYmq0Uwv7K7N
+         rJDZma8pSNZLBxXxQ553/rnHju6jMPSZ6YGVCslns8QMM5OC/pnQfrTREd7qedzKxshI
+         Hb4z+bGWVf4EVRsc3/Q0Z8i11CyQ/MP7KIhxR+2g7AkXiyxjYbKY/oI4If3QRreYHthJ
+         +efSjg4kB/gCOoq0H3ry1Q1pZ40CJOcobz8B73EF+dHC0Qvt27Sr96GW7K2CwyIEMsdP
+         pijQ==
+X-Gm-Message-State: AFqh2kpR6arAdD61FkWDX0HLN74M9Am+IGt3Nf/RuZ/+ziEQnaaQCFTF
+        6b0Lj3Wwlm0u7g71ukuVPTI=
+X-Google-Smtp-Source: AMrXdXuQ2DLZwgyUgnmklx1KxRouHizUxMiWIQHG9FtBZ8QWbiK7lW5/sM2Q0SGTw4fZIdPaUSZbOQ==
+X-Received: by 2002:a05:6000:1708:b0:2bd:db1c:8dfe with SMTP id n8-20020a056000170800b002bddb1c8dfemr45534383wrc.48.1674979682420;
+        Sun, 29 Jan 2023 00:08:02 -0800 (PST)
+Received: from [192.168.0.106] ([77.126.163.156])
+        by smtp.gmail.com with ESMTPSA id q4-20020adff944000000b002bfae3f6802sm8469044wrr.58.2023.01.29.00.07.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Jan 2023 00:08:01 -0800 (PST)
+Message-ID: <4fa5d53d-d614-33b6-2d33-156281420507@gmail.com>
+Date:   Sun, 29 Jan 2023 10:07:58 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 00/35] Documentation: correct lots of spelling errors (series
- 1)
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167493781647.31903.18128774325127042067.git-patchwork-notify@kernel.org>
-Date:   Sat, 28 Jan 2023 20:30:16 +0000
-References: <20230127064005.1558-1-rdunlap@infradead.org>
-In-Reply-To: <20230127064005.1558-1-rdunlap@infradead.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, corbet@lwn.net,
-        catalin.marinas@arm.com, will@kernel.org, linux@armlinux.org.uk,
-        axboe@kernel.dk, andrii@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, olteanv@gmail.com,
-        steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-        akinobu.mita@gmail.com, deller@gmx.de, rafael@kernel.org,
-        jikos@kernel.org, benjamin.tissoires@redhat.com,
-        srinivas.pandruvada@linux.intel.com, wsa@kernel.org,
-        dmitry.torokhov@gmail.com, rydberg@bitmath.org,
-        isdn@linux-pingi.de, pavel@ucw.cz, lee@kernel.org,
-        jpoimboe@kernel.org, mbenes@suse.cz, pmladek@suse.com,
-        peterz@infradead.org, mingo@redhat.com, jglisse@redhat.com,
-        naoya.horiguchi@nec.com, linmiaohe@huawei.com, jonas@southpole.se,
-        stefan.kristiansson@saunalahti.fi, shorne@gmail.com,
-        bhelgaas@google.com, lpieralisi@kernel.org, maz@kernel.org,
-        mpe@ellerman.id.au, len.brown@intel.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dhowells@redhat.com, jarkko@kernel.org,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        perex@perex.cz, tiwai@suse.com, broonie@kernel.org,
-        martin.petersen@oracle.com, bristot@kernel.org,
-        rostedt@goodmis.org, gregkh@linuxfoundation.org,
-        mhiramat@kernel.org, mathieu.poirier@linaro.org,
-        suzuki.poulose@arm.com, zbr@ioremap.net, fenghua.yu@intel.com,
-        reinette.chatre@intel.com, tglx@linutronix.de, bp@alien8.de,
-        chris@zankel.net, jcmvbkbc@gmail.com, alsa-devel@alsa-project.org,
-        coresight@lists.linaro.org, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, isdn4linux@listserv.isdn4linux.de,
-        keyrings@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-trace-devel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-mm@kvack.org,
-        openrisc@lists.librecores.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
-        x86@kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH RESEND 0/9] sched: cpumask: improve on
+ cpumask_local_spread() locality
+Content-Language: en-US
+To:     Valentin Schneider <vschneid@redhat.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Haniel Bristot de Oliveira <bristot@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Lafreniere <peter@n8pjl.ca>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
+ <4dc2a367-d3b1-e73e-5f42-166e9cf84bac@gmail.com>
+ <xhsmhv8kxh8tk.mognet@vschneid.remote.csb>
+From:   Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <xhsmhv8kxh8tk.mognet@vschneid.remote.csb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
 
-On Thu, 26 Jan 2023 22:39:30 -0800 you wrote:
-> Correct many spelling errors in Documentation/ as reported by codespell.
+On 23/01/2023 11:57, Valentin Schneider wrote:
+> On 22/01/23 14:57, Tariq Toukan wrote:
+>> On 21/01/2023 6:24, Yury Norov wrote:
+>>>
+>>> This series was supposed to be included in v6.2, but that didn't happen. It
+>>> spent enough in -next without any issues, so I hope we'll finally see it
+>>> in v6.3.
+>>>
+>>> I believe, the best way would be moving it with scheduler patches, but I'm
+>>> OK to try again with bitmap branch as well.
+>>
+>> Now that Yury dropped several controversial bitmap patches form the PR,
+>> the rest are mostly in sched, or new API that's used by sched.
+>>
+>> Valentin, what do you think? Can you take it to your sched branch?
+>>
 > 
-> Maintainers of specific kernel subsystems are only Cc-ed on their
-> respective patches, not the entire series. [if all goes well]
+> I would if I had one :-)
 > 
-> These patches are based on linux-next-20230125.
+
+Oh I see :)
+
+> Peter/Ingo, any objections to stashing this in tip/sched/core?
 > 
-> [...]
 
-Here is the summary with links:
-  - [04/35] Documentation: bpf: correct spelling
-    https://git.kernel.org/bpf/bpf-next/c/1d3cab43f4c7
-  - [05/35] Documentation: core-api: correct spelling
-    (no matching commit)
-  - [13/35] Documentation: isdn: correct spelling
-    (no matching commit)
+Hi Peter and Ingo,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Can you please look into it? So we'll have enough time to act (in 
+case...) during this kernel.
 
+We already missed one kernel...
 
+Thanks,
+Tariq
