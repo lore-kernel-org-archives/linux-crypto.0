@@ -2,109 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B12BC54EAA
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 12:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B75C54EAA
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 12:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234488AbjA3MRI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Jan 2023 07:17:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
+        id S230365AbjA3MyW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Jan 2023 07:54:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232072AbjA3MRH (ORCPT
+        with ESMTP id S229809AbjA3MyV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2023 07:17:07 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49DB6E3;
-        Mon, 30 Jan 2023 04:17:06 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id a3so4162086wrt.6;
-        Mon, 30 Jan 2023 04:17:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uIlSiZXzAKFScUSHiJ+0tNApITPA2xK9uxvd2of89gg=;
-        b=mMVX48jGVpOwVWYt8RsV3r0ZEEGDByr9P91Oon2ul08+ARTID2kf1ciNiuU69rIG81
-         etSqOgcdasB0VsNd8K9gDkHyVEvifV3yjRk7oXHjR5X88+JcnuBgsJYhfp/wCeHNO/Mu
-         f83SkKBdEsFuJgG8eBIJ8JEY3Cd2+dimAChU0mIHciavXBhIL8LbOWkUn6XiPAIUmuzH
-         vjZC4VRIWkFTw/WNMjqLzGL8dbnT/jqbUU7KA6pW4pPzDTVW0ii0i2YeSKbdoZLbNmnI
-         YtzL+ack3M1HKPSoeUyx+mQwFx2Kxixj3GnSh95Gsbs8RHBwZSf+9rTpjYTqftUzt55a
-         n53Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uIlSiZXzAKFScUSHiJ+0tNApITPA2xK9uxvd2of89gg=;
-        b=WYJ0Aaehk8g1SY7rv9AKJiYPLkoFgN6tGyq3VSnxQ7nxLKy8RQ/j/ntKgiW0759nSA
-         icE1C4e8fpDn99fHkaqx+Yg9xcQrf8XqmSGyvYsFmPUW+Pe2vrLnyWp/48yhc2LPj2nX
-         DFGq6I1Huc69gdrrbmAzlIEZCRTn9DaA6b2gxs/QWPudgU3cZMURME7WGuUTM+iOn/wW
-         34n7sU98iIJH3C/1OS1eOVhhUoQx4s7MtIRo0FnVUWVjd5Ic4GsiDO8H7ClR6Lzy2IIS
-         6xmMFgHOD7iIucnAFHP8doKXtYsuBChCbo3emqRIsXe3GdLind9nwsyEpKqLJb6oNqQH
-         OzuQ==
-X-Gm-Message-State: AO0yUKU/V1QEV8aHQlZvt8TzPHjfbyHWkn2ITNgJOT9kzjrrd2fnfaVZ
-        Y4xROsfYTQslZV55gQ8Bjtn7aghq6AY=
-X-Google-Smtp-Source: AK7set8pubIjJo9j0bilyXjoJlr/qj2/T46nIlrc8OjG12RALLCOO6f7cjhrWBqiFDOYMrRaP+p6wQ==
-X-Received: by 2002:a05:6000:1247:b0:2bf:ecd8:c9f4 with SMTP id j7-20020a056000124700b002bfecd8c9f4mr3544372wrx.55.1675081024640;
-        Mon, 30 Jan 2023 04:17:04 -0800 (PST)
-Received: from debian ([167.98.27.226])
-        by smtp.gmail.com with ESMTPSA id k10-20020adff28a000000b002b9b9445149sm3257005wro.54.2023.01.30.04.17.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 04:17:04 -0800 (PST)
-From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-X-Google-Original-From: Sudip Mukherjee <sudip@debian>
-Date:   Mon, 30 Jan 2023 12:17:02 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: mainline build failure on arm hosts
-Message-ID: <Y9e1PoEJgq3TPNtP@debian>
+        Mon, 30 Jan 2023 07:54:21 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B19310E3;
+        Mon, 30 Jan 2023 04:54:21 -0800 (PST)
+Received: from [2a02:8108:963f:de38:4bc7:2566:28bd:b73c]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1pMTfs-0000cR-QZ; Mon, 30 Jan 2023 13:54:16 +0100
+Message-ID: <d018d4ba-802d-76f4-0892-97b033fbc7bb@leemhuis.info>
+Date:   Mon, 30 Jan 2023 13:54:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [Bug 216888] New: "sysfs: cannot create duplicate filename
+ /dma/dma0chan0" with 68dbe80f ("crypto: ccp - Release dma channels before
+ dmaengine unrgister")
+Content-Language: en-US, de-DE
+From:   "Linux kernel regression tracking (#update)" 
+        <regressions@leemhuis.info>
+To:     Bjorn Helgaas <helgaas@kernel.org>, Koba Ko <koba.ko@canonical.com>
+Cc:     vsd@suremail.info, Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        regressions@lists.linux.dev
+Reply-To: Thorsten Leemhuis <regressions@leemhuis.info>,
+          Linux regressions mailing list 
+          <regressions@lists.linux.dev>
+References: <20230105174736.GA1154719@bhelgaas>
+ <7b38ae22-b13d-64af-7c79-a56cdba26754@leemhuis.info>
+In-Reply-To: <7b38ae22-b13d-64af-7c79-a56cdba26754@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1675083261;c0db296e;
+X-HE-SMSGID: 1pMTfs-0000cR-QZ
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi All,
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
 
-The mainline kernel branch had been failing native build on arm hosts
-for some weeks with the error:
+On 06.01.23 09:38, Linux kernel regression tracking (#adding) wrote:
+> On 05.01.23 18:47, Bjorn Helgaas wrote:
+>> Per the report, this is a regression and reverting 68dbe80f5b51
+>> ("crypto: ccp - Release dma channels before dmaengine unrgister"),
+>> which appeared in v6.1, avoids the problem.
+>>
+>> The bugzilla is assigned to PCI, and I know PCI does have similar
+>> sysfs duplicate filename issues, but I don't know whether this
+>> instance is related to 68dbe80f5b51 or to the PCI core.
+>>
+>> On Thu, Jan 05, 2023 at 03:12:26PM +0000, bugzilla-daemon@kernel.org wrote:
+>>> https://bugzilla.kernel.org/show_bug.cgi?id=216888
 
-drivers/crypto/caam/desc_constr.h: In function 'append_data.constprop':
-./include/linux/fortify-string.h:57:29: error: argument 2 null where non-null expected [-Werror=nonnull]
-   57 | #define __underlying_memcpy __builtin_memcpy
-      |                             ^
-./include/linux/fortify-string.h:578:2: note: in expansion of macro '__underlying_memcpy'
-  578 |  __underlying_##op(p, q, __fortify_size);   \
-      |  ^~~~~~~~~~~~~
-./include/linux/fortify-string.h:623:26: note: in expansion of macro '__fortify_memcpy_chk'
-  623 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,   \
-      |                          ^~~~~~~~~~~~~~~~~~~~
-drivers/crypto/caam/desc_constr.h:167:3: note: in expansion of macro 'memcpy'
-  167 |   memcpy(offset, data, len);
-      |   ^~~~~~
-./include/linux/fortify-string.h:57:29: note: in a call to built-in function '__builtin_memcpy'
-   57 | #define __underlying_memcpy __builtin_memcpy
-      |                             ^
-./include/linux/fortify-string.h:578:2: note: in expansion of macro '__underlying_memcpy'
-  578 |  __underlying_##op(p, q, __fortify_size);   \
-      |  ^~~~~~~~~~~~~
-./include/linux/fortify-string.h:623:26: note: in expansion of macro '__fortify_memcpy_chk'
-  623 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,   \
-      |                          ^~~~~~~~~~~~~~~~~~~~
-drivers/crypto/caam/desc_constr.h:167:3: note: in expansion of macro 'memcpy'
-  167 |   memcpy(offset, data, len);
-      |   ^~~~~~
-cc1: all warnings being treated as errors
+#regzbot fix: crypto: ccp - Failure on re-initialization due to
+duplicate sysfs filename
 
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
-The commit 4f289826fee0 ("crypto: caam - Avoid GCC memset bug warning")
-in linux-next fixes the build.
-
-
--- 
-Regards
-Sudip
+#regzbot ignore-activity
