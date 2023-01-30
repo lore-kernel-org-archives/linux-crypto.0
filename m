@@ -2,76 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B75C54EAA
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 12:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B4FC54EAA
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 15:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbjA3MyW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Jan 2023 07:54:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46642 "EHLO
+        id S236786AbjA3Pot convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Jan 2023 10:44:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229809AbjA3MyV (ORCPT
+        with ESMTP id S230202AbjA3Pot (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2023 07:54:21 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B19310E3;
-        Mon, 30 Jan 2023 04:54:21 -0800 (PST)
-Received: from [2a02:8108:963f:de38:4bc7:2566:28bd:b73c]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1pMTfs-0000cR-QZ; Mon, 30 Jan 2023 13:54:16 +0100
-Message-ID: <d018d4ba-802d-76f4-0892-97b033fbc7bb@leemhuis.info>
-Date:   Mon, 30 Jan 2023 13:54:16 +0100
+        Mon, 30 Jan 2023 10:44:49 -0500
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB05E3EC74;
+        Mon, 30 Jan 2023 07:44:44 -0800 (PST)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 7455F24E02F;
+        Mon, 30 Jan 2023 23:44:35 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 30 Jan
+ 2023 23:44:35 +0800
+Received: from ubuntu.localdomain (202.190.105.77) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 30 Jan
+ 2023 23:43:07 +0800
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor.dooley@microchip.com>
+CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+Subject: [PATCH v2 0/4] crypto: starfive - Add drivers for crypto engine
+Date:   Mon, 30 Jan 2023 23:42:38 +0800
+Message-ID: <20230130154242.112613-1-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [Bug 216888] New: "sysfs: cannot create duplicate filename
- /dma/dma0chan0" with 68dbe80f ("crypto: ccp - Release dma channels before
- dmaengine unrgister")
-Content-Language: en-US, de-DE
-From:   "Linux kernel regression tracking (#update)" 
-        <regressions@leemhuis.info>
-To:     Bjorn Helgaas <helgaas@kernel.org>, Koba Ko <koba.ko@canonical.com>
-Cc:     vsd@suremail.info, Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        regressions@lists.linux.dev
-Reply-To: Thorsten Leemhuis <regressions@leemhuis.info>,
-          Linux regressions mailing list 
-          <regressions@lists.linux.dev>
-References: <20230105174736.GA1154719@bhelgaas>
- <7b38ae22-b13d-64af-7c79-a56cdba26754@leemhuis.info>
-In-Reply-To: <7b38ae22-b13d-64af-7c79-a56cdba26754@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1675083261;c0db296e;
-X-HE-SMSGID: 1pMTfs-0000cR-QZ
+Content-Type: text/plain
+X-Originating-IP: [202.190.105.77]
+X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+This patch series adds kernel driver support for StarFive JH7110 crypto
+engine. The first patch add Documentations for the device and Patch 2
+adds device probe and DMA init for the module. Patch 3 adds crypto and
+DMA dts node for VisionFive 2 board. Patch 4 adds hash/hmac support to
+the module.
 
-On 06.01.23 09:38, Linux kernel regression tracking (#adding) wrote:
-> On 05.01.23 18:47, Bjorn Helgaas wrote:
->> Per the report, this is a regression and reverting 68dbe80f5b51
->> ("crypto: ccp - Release dma channels before dmaengine unrgister"),
->> which appeared in v6.1, avoids the problem.
->>
->> The bugzilla is assigned to PCI, and I know PCI does have similar
->> sysfs duplicate filename issues, but I don't know whether this
->> instance is related to 68dbe80f5b51 or to the PCI core.
->>
->> On Thu, Jan 05, 2023 at 03:12:26PM +0000, bugzilla-daemon@kernel.org wrote:
->>> https://bugzilla.kernel.org/show_bug.cgi?id=216888
+Patch 3 needs to be applied on top of:
+https://patchwork.kernel.org/project/linux-riscv/patch/20221220011247.35560-7-hal.feng@starfivetech.com/
+https://patchwork.kernel.org/project/linux-riscv/cover/20230120024445.244345-1-xingyu.wu@starfivetech.com/
 
-#regzbot fix: crypto: ccp - Failure on re-initialization due to
-duplicate sysfs filename
+Changes v1->v2:
+- Fixed yaml filename and format (Krzysztof)
+- Removed unnecessary property names in yaml (Krzysztof)
+- Moved of_device_id table close to usage (Krzysztof)
+- Use dev_err_probe for error returns (Krzysztof)
+- Dropped redundant readl and writel wrappers (Krzysztof)
+- Updated commit signed offs (Conor)
+- Dropped redundant node in dts, module set to on in dtsi (Conor)
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+Jia Jie Ho (4):
+  dt-bindings: crypto: Add StarFive crypto module
+  crypto: starfive - Add crypto engine support
+  riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
+  crypto: starfive - Add hash and HMAC support
 
-#regzbot ignore-activity
+ .../crypto/starfive,jh7110-crypto.yaml        |   70 ++
+ MAINTAINERS                                   |    7 +
+ arch/riscv/boot/dts/starfive/jh7110.dtsi      |   27 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/starfive/Kconfig               |   20 +
+ drivers/crypto/starfive/Makefile              |    4 +
+ drivers/crypto/starfive/starfive-cryp.c       |  238 ++++
+ drivers/crypto/starfive/starfive-hash.c       | 1095 +++++++++++++++++
+ drivers/crypto/starfive/starfive-regs.h       |   71 ++
+ drivers/crypto/starfive/starfive-str.h        |   99 ++
+ 11 files changed, 1633 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
+ create mode 100644 drivers/crypto/starfive/Kconfig
+ create mode 100644 drivers/crypto/starfive/Makefile
+ create mode 100644 drivers/crypto/starfive/starfive-cryp.c
+ create mode 100644 drivers/crypto/starfive/starfive-hash.c
+ create mode 100644 drivers/crypto/starfive/starfive-regs.h
+ create mode 100644 drivers/crypto/starfive/starfive-str.h
+
+-- 
+2.25.1
+
