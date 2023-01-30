@@ -2,120 +2,172 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA30C54EED
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 08:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355C3C54EED
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 08:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235876AbjA3IQ3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Jan 2023 03:16:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43928 "EHLO
+        id S233324AbjA3I65 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Jan 2023 03:58:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235232AbjA3IQ2 (ORCPT
+        with ESMTP id S233298AbjA3I64 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2023 03:16:28 -0500
+        Mon, 30 Jan 2023 03:58:56 -0500
 Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426712CFEF;
-        Mon, 30 Jan 2023 00:16:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915531C58C
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Jan 2023 00:58:54 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pMPK9-005VfP-6V; Mon, 30 Jan 2023 16:15:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 30 Jan 2023 16:15:33 +0800
-Date:   Mon, 30 Jan 2023 16:15:33 +0800
+        id 1pMQ03-005WO7-Ft; Mon, 30 Jan 2023 16:58:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 30 Jan 2023 16:58:51 +0800
+Date:   Mon, 30 Jan 2023 16:58:51 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] crypto: arm64/sm4 - Fix possible crash in GCM cryption
-Message-ID: <Y9d8pfRQADxIhLIB@gondor.apana.org.au>
-References: <20230118141928.48136-1-tianjia.zhang@linux.alibaba.com>
- <Y8gIC8Yn/E8Kwtf0@gondor.apana.org.au>
- <c7dbadbf-dade-fb1e-bda3-d23d567c620f@linux.alibaba.com>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: arm64/aes-ccm - Rewrite skcipher walker loop
+Message-ID: <Y9eGyzZ+JAqRQvtm@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c7dbadbf-dade-fb1e-bda3-d23d567c620f@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 03:34:42PM +0800, Tianjia Zhang wrote:
->
-> I printed the walk->nbytes of each iteration of the walker, it is not
-> always multiples of chunksize except at the end when the algorithm test
-> manager is turned on.
+An often overlooked aspect of the skcipher walker API is that an
+error is not just indicated by a non-zero return value, but by the
+fact that walk->nbytes is zero.
 
-Sorry I was mistaken.  We only guarantee that a minimum of chunksize
-bytes is given to you until the very end, not that it is exactly a
-multiple of chunksize.
+Thus it is an error to call skcipher_walk_done after getting back
+walk->nbytes == 0 from the previous interaction with the walker.
 
-While you still need to compute tail, you could get rid of the else if
-check as walk->nbytes - tail cannot be zero (we must provide you with
-at least one chunk before the end):
+This is because when walk->nbytes is zero the walker is left in
+an undefined state and any further calls to it may try to free
+uninitialised stack memory.
 
-		if (walk->nbytes == walk->total) {
-			tail = 0;
+The arm64 ccm code has to deal with zero-length messages, and
+it needs to process data even when walk->nbytes == 0 is returned.
+It doesn't have this bug because there is an explicit check for
+walk->nbytes != 0 prior to the skcipher_walk_done call.
 
-			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
-					       walk->nbytes, ghash,
-					       ctx->ghash_table,
-					       (const u8 *)&lengths);
-		} else {
-			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
-					       walk->nbytes - tail, ghash,
-					       ctx->ghash_table, NULL);
-		}
+However, the loop is still sufficiently different from the usual
+layout and it appears to have been copied into other code which
+then ended up with this bug.  This patch rewrites it to follow the
+usual convention of checking walk->nbytes.
 
-In fact we could rewrite it like this:
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-		unsigned int tail = walk->nbytes % SM4_BLOCK_SIZE;
-		unsigned int nbytes = walk->nbytes - tail;
-		const u8 *src = walk->src.virt.addr;
-		u8 *dst = walk->dst.virt.addr;
-		u8 *lp = NULL;
-
-		if (walk->nbytes == walk->total) {
-			nbytes = walk->nbytes;
-			tail = 0;
-			lp = (u8 *)&lengths;
-		}
-
-		sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
-				       nbytes, ghash, ctx->ghash_table, lp);
-
-The second part of that loop could also be rewritten as:
-
-		kernel_neon_end();
-
-		err = skcipher_walk_done(walk, tail);
-		if (!walk->nbytes)
-			return err;
-
-		kernel_neon_begin();
-	} while (1);
-
-Actually I think there is a serious bug here.  If you're doing an
-empty message, you must not call skcipher_walk_done as that may
-then free random uninitialised stack memory.
-
-Did you copy this code from somewhere else? If so wherever you got
-it from needs to be fixed too.  The loop should look like this:
-
-	if (!walk->nbytes) {
-		/* iv may be unaligned as the walker didn't run at all. */
-		sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, NULL, NULL, iv,
-				       0, ghash, ctx->ghash_table,
-				       (u8 *)&lengths);
-		kernel_neon_end();
-		return 0;
-	}
-
-	do {
-		...
-	}
-
-Thanks,
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index c4f14415f5f0..25cd3808ecbe 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -161,43 +161,39 @@ static int ccm_encrypt(struct aead_request *req)
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+ 	err = skcipher_walk_aead_encrypt(&walk, req, false);
+-	if (unlikely(err))
+-		return err;
+ 
+ 	kernel_neon_begin();
+ 
+ 	if (req->assoclen)
+ 		ccm_calculate_auth_mac(req, mac);
+ 
+-	do {
++	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
++		bool final = walk.nbytes == walk.total;
+ 
+-		if (walk.nbytes == walk.total)
++		if (final)
+ 			tail = 0;
+ 
+ 		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
+ 
+-		if (walk.nbytes == walk.total)
+-			ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
++		if (!final)
++			kernel_neon_end();
++		err = skcipher_walk_done(&walk, tail);
++		if (!final)
++			kernel_neon_begin();
++	}
+ 
+-		kernel_neon_end();
++	ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+ 
+-		if (walk.nbytes) {
+-			err = skcipher_walk_done(&walk, tail);
+-			if (unlikely(err))
+-				return err;
+-			if (unlikely(walk.nbytes))
+-				kernel_neon_begin();
+-		}
+-	} while (walk.nbytes);
++	kernel_neon_end();
+ 
+ 	/* copy authtag to end of dst */
+ 	scatterwalk_map_and_copy(mac, req->dst, req->assoclen + req->cryptlen,
+ 				 crypto_aead_authsize(aead), 1);
+ 
+-	return 0;
++	return err;
+ }
+ 
+ static int ccm_decrypt(struct aead_request *req)
+@@ -219,37 +215,36 @@ static int ccm_decrypt(struct aead_request *req)
+ 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
+ 
+ 	err = skcipher_walk_aead_decrypt(&walk, req, false);
+-	if (unlikely(err))
+-		return err;
+ 
+ 	kernel_neon_begin();
+ 
+ 	if (req->assoclen)
+ 		ccm_calculate_auth_mac(req, mac);
+ 
+-	do {
++	while (walk.nbytes) {
+ 		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
++		bool final = walk.nbytes == walk.total;
+ 
+-		if (walk.nbytes == walk.total)
++		if (final)
+ 			tail = 0;
+ 
+ 		ce_aes_ccm_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				   walk.nbytes - tail, ctx->key_enc,
+ 				   num_rounds(ctx), mac, walk.iv);
+ 
+-		if (walk.nbytes == walk.total)
+-			ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
++		if (!final)
++			kernel_neon_end();
++		err = skcipher_walk_done(&walk, tail);
++		if (!final)
++			kernel_neon_begin();
++	}
+ 
+-		kernel_neon_end();
++	ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
+ 
+-		if (walk.nbytes) {
+-			err = skcipher_walk_done(&walk, tail);
+-			if (unlikely(err))
+-				return err;
+-			if (unlikely(walk.nbytes))
+-				kernel_neon_begin();
+-		}
+-	} while (walk.nbytes);
++	kernel_neon_end();
++
++	if (unlikely(err))
++		return err;
+ 
+ 	/* compare calculated auth tag with the stored one */
+ 	scatterwalk_map_and_copy(buf, req->src,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
