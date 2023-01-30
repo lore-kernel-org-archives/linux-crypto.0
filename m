@@ -2,67 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D587C54EED
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 07:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99145C54EED
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 07:54:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235183AbjA3Hfd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Jan 2023 02:35:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47422 "EHLO
+        id S235351AbjA3Hyt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Jan 2023 02:54:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234964AbjA3Hfb (ORCPT
+        with ESMTP id S234158AbjA3Hys (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2023 02:35:31 -0500
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835D423874;
-        Sun, 29 Jan 2023 23:35:28 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VaQT8Xt_1675064125;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VaQT8Xt_1675064125)
-          by smtp.aliyun-inc.com;
-          Mon, 30 Jan 2023 15:35:26 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v2] crypto: arm64/sm4 - Fix possible crash in GCM cryption
-Date:   Mon, 30 Jan 2023 15:35:24 +0800
-Message-Id: <20230130073524.68266-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20230118141928.48136-1-tianjia.zhang@linux.alibaba.com>
-References: <20230118141928.48136-1-tianjia.zhang@linux.alibaba.com>
+        Mon, 30 Jan 2023 02:54:48 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41E0279BF;
+        Sun, 29 Jan 2023 23:54:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1675065284; x=1706601284;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WesUET345ugTfJZy/nJ9gDULy86DO/4dGSyE+q4VP1E=;
+  b=sXkDFINytR71Ha7kdmnMUwgZ1PTRX0DK+wifR2DDGCtrok1nybAD0s11
+   lxyN25LUi5xkPJZEdZ9RNIHJKzlPJmqfrazvBt9HJU4gYgzYAnn8OFnrd
+   EFBJJrUYilZTcWChgt3i2pN1UTqlbjKdAXJvKLztn+S4j6eDDMt9y3q2d
+   ZFPjUTKVkA/lHvDodzZ3QK4xskFYJSVnl+MH3/63wapIxU+yU8YGpQaQf
+   MuXEvsDbsNxjEUtICowQGPJMa5H51qKAYbCAqlhXahy3XQ2YWbPC9kPf0
+   ygAd9UK2QWsOx/LgrlM+lxsqfBd+Rl7DTGcZppexle0r0Lc1P4MmEWfhP
+   w==;
+X-IronPort-AV: E=Sophos;i="5.97,257,1669100400"; 
+   d="asc'?scan'208";a="134573322"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Jan 2023 00:54:43 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 30 Jan 2023 00:54:42 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
+ Transport; Mon, 30 Jan 2023 00:54:41 -0700
+Date:   Mon, 30 Jan 2023 07:54:17 +0000
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Jenny Zhang <jenny.zhang@starfivetech.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Walker Chen <walker.chen@starfivetech.com>
+Subject: Re: linux-next: manual merge of the crypto tree with the riscv-soc
+ tree
+Message-ID: <Y9d3qWZYlULl8Vxq@wendy>
+References: <20230130114128.692c7961@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="NvR2dxayvgF+UicQ"
+Content-Disposition: inline
+In-Reply-To: <20230130114128.692c7961@canb.auug.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the cryption total length is zero, GCM cryption call
-skcipher_walk_done() will cause an unexpected crash, so skip calling
-this function to avoid possible crash when the GCM cryption length
-is equal to zero.
+--NvR2dxayvgF+UicQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- arch/arm64/crypto/sm4-ce-gcm-glue.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Mon, Jan 30, 2023 at 11:41:28AM +1100, Stephen Rothwell wrote:
+> Hi all,
+>=20
+> Today's linux-next merge of the crypto tree got a conflict in:
+>=20
+>   MAINTAINERS
+>=20
+> between commit:
+>=20
+>   08b9a94e8654 ("soc: starfive: Add StarFive JH71XX pmu driver")
+>=20
+> from the riscv-soc tree and commit:
+>=20
+>   c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
+>=20
+> from the crypto tree.
 
-diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-index c450a2025ca9..29aa7470281d 100644
---- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-@@ -178,6 +178,9 @@ static int gcm_crypt(struct aead_request *req, struct skcipher_walk *walk,
- 
- 		kernel_neon_end();
- 
-+		if (unlikely(!walk->nbytes))
-+			break;
-+
- 		err = skcipher_walk_done(walk, tail);
- 		if (err)
- 			return err;
--- 
-2.24.3 (Apple Git-128)
+> Note, please keep MAINTAINERS file entries in alphabetical order.
 
+Huh, good point. I didn't notice the PMU entry was added out of order.
+
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+
+Thanks Stephen
+
+--NvR2dxayvgF+UicQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9d3iwAKCRB4tDGHoIJi
+0rKXAP9XsN9TwPiTn6NtRxbzzgXVP4IccdRaJxPHAriEpcyAFgEAvZf4E5L5iVRz
+wltg1n/FIKDvPFgrEmDggSNxtuaCug8=
+=J/5E
+-----END PGP SIGNATURE-----
+
+--NvR2dxayvgF+UicQ--
