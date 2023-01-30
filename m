@@ -2,111 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99145C54EED
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 07:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA30C54EED
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Jan 2023 08:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235351AbjA3Hyt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Jan 2023 02:54:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55008 "EHLO
+        id S235876AbjA3IQ3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 Jan 2023 03:16:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234158AbjA3Hys (ORCPT
+        with ESMTP id S235232AbjA3IQ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Jan 2023 02:54:48 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41E0279BF;
-        Sun, 29 Jan 2023 23:54:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1675065284; x=1706601284;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WesUET345ugTfJZy/nJ9gDULy86DO/4dGSyE+q4VP1E=;
-  b=sXkDFINytR71Ha7kdmnMUwgZ1PTRX0DK+wifR2DDGCtrok1nybAD0s11
-   lxyN25LUi5xkPJZEdZ9RNIHJKzlPJmqfrazvBt9HJU4gYgzYAnn8OFnrd
-   EFBJJrUYilZTcWChgt3i2pN1UTqlbjKdAXJvKLztn+S4j6eDDMt9y3q2d
-   ZFPjUTKVkA/lHvDodzZ3QK4xskFYJSVnl+MH3/63wapIxU+yU8YGpQaQf
-   MuXEvsDbsNxjEUtICowQGPJMa5H51qKAYbCAqlhXahy3XQ2YWbPC9kPf0
-   ygAd9UK2QWsOx/LgrlM+lxsqfBd+Rl7DTGcZppexle0r0Lc1P4MmEWfhP
-   w==;
-X-IronPort-AV: E=Sophos;i="5.97,257,1669100400"; 
-   d="asc'?scan'208";a="134573322"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Jan 2023 00:54:43 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 30 Jan 2023 00:54:42 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
- Transport; Mon, 30 Jan 2023 00:54:41 -0700
-Date:   Mon, 30 Jan 2023 07:54:17 +0000
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Jenny Zhang <jenny.zhang@starfivetech.com>,
-        Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Walker Chen <walker.chen@starfivetech.com>
-Subject: Re: linux-next: manual merge of the crypto tree with the riscv-soc
- tree
-Message-ID: <Y9d3qWZYlULl8Vxq@wendy>
-References: <20230130114128.692c7961@canb.auug.org.au>
+        Mon, 30 Jan 2023 03:16:28 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426712CFEF;
+        Mon, 30 Jan 2023 00:16:02 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pMPK9-005VfP-6V; Mon, 30 Jan 2023 16:15:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 30 Jan 2023 16:15:33 +0800
+Date:   Mon, 30 Jan 2023 16:15:33 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] crypto: arm64/sm4 - Fix possible crash in GCM cryption
+Message-ID: <Y9d8pfRQADxIhLIB@gondor.apana.org.au>
+References: <20230118141928.48136-1-tianjia.zhang@linux.alibaba.com>
+ <Y8gIC8Yn/E8Kwtf0@gondor.apana.org.au>
+ <c7dbadbf-dade-fb1e-bda3-d23d567c620f@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="NvR2dxayvgF+UicQ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230130114128.692c7961@canb.auug.org.au>
+In-Reply-To: <c7dbadbf-dade-fb1e-bda3-d23d567c620f@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---NvR2dxayvgF+UicQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jan 30, 2023 at 03:34:42PM +0800, Tianjia Zhang wrote:
+>
+> I printed the walk->nbytes of each iteration of the walker, it is not
+> always multiples of chunksize except at the end when the algorithm test
+> manager is turned on.
 
-On Mon, Jan 30, 2023 at 11:41:28AM +1100, Stephen Rothwell wrote:
-> Hi all,
->=20
-> Today's linux-next merge of the crypto tree got a conflict in:
->=20
->   MAINTAINERS
->=20
-> between commit:
->=20
->   08b9a94e8654 ("soc: starfive: Add StarFive JH71XX pmu driver")
->=20
-> from the riscv-soc tree and commit:
->=20
->   c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
->=20
-> from the crypto tree.
+Sorry I was mistaken.  We only guarantee that a minimum of chunksize
+bytes is given to you until the very end, not that it is exactly a
+multiple of chunksize.
 
-> Note, please keep MAINTAINERS file entries in alphabetical order.
+While you still need to compute tail, you could get rid of the else if
+check as walk->nbytes - tail cannot be zero (we must provide you with
+at least one chunk before the end):
 
-Huh, good point. I didn't notice the PMU entry was added out of order.
+		if (walk->nbytes == walk->total) {
+			tail = 0;
 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
+					       walk->nbytes, ghash,
+					       ctx->ghash_table,
+					       (const u8 *)&lengths);
+		} else {
+			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
+					       walk->nbytes - tail, ghash,
+					       ctx->ghash_table, NULL);
+		}
 
-Thanks Stephen
+In fact we could rewrite it like this:
 
---NvR2dxayvgF+UicQ
-Content-Type: application/pgp-signature; name="signature.asc"
+		unsigned int tail = walk->nbytes % SM4_BLOCK_SIZE;
+		unsigned int nbytes = walk->nbytes - tail;
+		const u8 *src = walk->src.virt.addr;
+		u8 *dst = walk->dst.virt.addr;
+		u8 *lp = NULL;
 
------BEGIN PGP SIGNATURE-----
+		if (walk->nbytes == walk->total) {
+			nbytes = walk->nbytes;
+			tail = 0;
+			lp = (u8 *)&lengths;
+		}
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9d3iwAKCRB4tDGHoIJi
-0rKXAP9XsN9TwPiTn6NtRxbzzgXVP4IccdRaJxPHAriEpcyAFgEAvZf4E5L5iVRz
-wltg1n/FIKDvPFgrEmDggSNxtuaCug8=
-=J/5E
------END PGP SIGNATURE-----
+		sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
+				       nbytes, ghash, ctx->ghash_table, lp);
 
---NvR2dxayvgF+UicQ--
+The second part of that loop could also be rewritten as:
+
+		kernel_neon_end();
+
+		err = skcipher_walk_done(walk, tail);
+		if (!walk->nbytes)
+			return err;
+
+		kernel_neon_begin();
+	} while (1);
+
+Actually I think there is a serious bug here.  If you're doing an
+empty message, you must not call skcipher_walk_done as that may
+then free random uninitialised stack memory.
+
+Did you copy this code from somewhere else? If so wherever you got
+it from needs to be fixed too.  The loop should look like this:
+
+	if (!walk->nbytes) {
+		/* iv may be unaligned as the walker didn't run at all. */
+		sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, NULL, NULL, iv,
+				       0, ghash, ctx->ghash_table,
+				       (u8 *)&lengths);
+		kernel_neon_end();
+		return 0;
+	}
+
+	do {
+		...
+	}
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
