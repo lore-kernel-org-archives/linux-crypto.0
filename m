@@ -2,99 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BE9C38142
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 14:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C10C636CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 14:57:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232053AbjAaOPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 09:15:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
+        id S230110AbjAaO5O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 09:57:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232052AbjAaOPI (ORCPT
+        with ESMTP id S231303AbjAaO5N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 09:15:08 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D46E12843;
-        Tue, 31 Jan 2023 06:15:07 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1112)
-        id 0A33C20EA201; Tue, 31 Jan 2023 06:15:07 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0A33C20EA201
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675174507;
-        bh=mT19G71ucLF+4CaSTXOpXQE/L4+jsWO6AotXm3MMpfA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=f4of6yuJuqxU4bwC8lYZggOCEjPalaQPNsTBE3fhlgDrMgY+vtzzXGQlAff+wYAVQ
-         mbZHxNBhfyk66pyhrYtonfjcK3mmagigi+pYRKBanuiMtQCkDmPuMUds8loo3afvqF
-         C3+wntX9R8q9w9AwgdpOxAJU1QKzbRugpppPtnig=
-Date:   Tue, 31 Jan 2023 06:15:07 -0800
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 07/64] KVM: SEV: Handle KVM_HC_MAP_GPA_RANGE
- hypercall
-Message-ID: <20230131141506.GA14449@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-8-michael.roth@amd.com>
- <20230127163558.GA22533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+        Tue, 31 Jan 2023 09:57:13 -0500
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C69D51C7C;
+        Tue, 31 Jan 2023 06:56:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1675177015; x=1706713015;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XSDcZI74s9f8AMx7xjEoypdbAe3QClb1iLeEjBiKsBI=;
+  b=EvUMvy9LUUaeUkv8clzUbJP6p1GkVRTTMrBB/Za8FF5tA7eB3Wa+8aZk
+   OX324yvcIgADEt0PX+Zs6At7JC2VWK71y4agYG/1/XgriocclMmkjfz2S
+   W6q26TeX9JQ/NqNhqgqLZRdKDRsrAqhe+0DfvIrTsINpcO80adHu0wKg8
+   w=;
+X-IronPort-AV: E=Sophos;i="5.97,261,1669075200"; 
+   d="scan'208";a="292084543"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d40ec5a9.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2023 14:56:52 +0000
+Received: from EX13D43EUB003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2a-m6i4x-d40ec5a9.us-west-2.amazon.com (Postfix) with ESMTPS id C756241DC7;
+        Tue, 31 Jan 2023 14:56:48 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX13D43EUB003.ant.amazon.com (10.43.166.195) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Tue, 31 Jan 2023 14:56:47 +0000
+Received: from f4d4887fdcfb.ant.amazon.com (10.43.161.198) by
+ EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1118.24; Tue, 31 Jan 2023 14:56:41 +0000
+From:   Babis Chalios <bchalios@amazon.es>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        Babis Chalios <bchalios@amazon.es>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <sgarzare@redhat.com>, <amit@kernel.org>, <graf@amazon.de>,
+        <Jason@zx2c4.com>, <xmarcalx@amazon.co.uk>
+Subject: [PATCH v2 0/2] [RFC] virtio-rng entropy leak reporting feature
+Date:   Tue, 31 Jan 2023 15:55:41 +0100
+Message-ID: <20230131145543.86369-1-bchalios@amazon.es>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230127163558.GA22533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [10.43.161.198]
+X-ClientProxiedBy: EX13D39UWB001.ant.amazon.com (10.43.161.5) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 08:35:58AM -0800, Jeremi Piotrowski wrote:
-> On Wed, Dec 14, 2022 at 01:39:59PM -0600, Michael Roth wrote:
-> > From: Nikunj A Dadhania <nikunj@amd.com>
-> > 
-> > KVM_HC_MAP_GPA_RANGE hypercall is used by the SEV guest to notify a
-> > change in the page encryption status to the hypervisor.
-> > 
-> > The hypercall exits to userspace with KVM_EXIT_HYPERCALL exit code,
-> > currently this is used for explicit memory conversion between
-> > shared/private for memfd based private memory.
-> > 
-> > Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
-> >  arch/x86/kvm/x86.c  | 8 ++++++++
-> >  virt/kvm/kvm_main.c | 1 +
-> >  2 files changed, 9 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index bb6adb216054..732f9cbbadb5 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9649,6 +9649,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> 
-> Couldn't find a better commit to comment on:
-> when the guest has the ptp-kvm module, it will issue a KVM_HC_CLOCK_PAIRING
-> hypercall. This will pass sev_es_validate_vmgexit validation and end up in this
-> function where kvm_pv_clock_pairing() is called, and that calls
-> kvm_write_guest(). This results in a CPU soft-lockup, at least in my testing.
-> 
-> Are there any emulated hypercalls that make sense for snp guests? We should
-> block at least the ones that definitely don't work.
-> 
-> Jeremi
 
-So turns out the soft-lockup is a nested issue (details here for those
-interested: [^1]), but the questions still stands, of whether we should
-block kvm_write_page (and similar) explicitly or rely on the rmp fault.
+Recently, a proposal has been published [1] for a new feature in the
+VirtIO RNG device which will allows the device to report "entropy leaks"
+to the guest VM. Such an event occurs when, for example, we take a VM
+snapshot, or when we restore a VM from a snapshot.
 
-[^1]: https://github.com/jepio/linux/commit/6c3bdf552e93664ae172660e24ceceed60fd4df5
+The feature allows the guest to request for certain operations to be
+performed upon an entropy leak event. When such an event occurs, the
+device will handle the requests and add the request buffers to the used
+queue. Adding these buffers to the used queue operates as a notification
+towards the guest about the entropy leak event.
+
+The proposed changes describe two types of requests that can be
+performed: (1) fill a buffer in guest memory with random bytes and (2)
+perform a memory copy between two buffers in guest memory.
+
+The mechanism provides similar functionality to Microsoft's Virtual
+Machine Generation ID and it can be used to re-seed the kernel's PRNG
+upon taking a VM snapshot or resuming from one. Additionally, it allows
+to (1) avoid the race-condition that exists with our VMGENID
+implementation, between the time a VM is resumed after a "leak event"
+and the handling of the ACPI notification before adding the new entropy.
+Finally, it allows building on top of it to provide a mechanism for
+notifying user-space about such events.
+
+The first patch of this series, extends the current virtio-rng driver to
+implement the new feature and ensures that there is always a request to
+get some random bytes from the device in the event of an entropy leak
+and uses these bytes as entropy through the `add_device_randomness`.
+
+The second patch adds a copy-on-leak command as well in the queue,
+implementating the idea of a generation counter that has previously been
+part of the VMGENID saga. It then exposes the value of the generation
+counter over a sysfs file. User-space can read, mmap and poll on the
+file in order to be notified about entropy leak events.
+
+I have performed basic tests of the user-space interfaces using a
+Firecracker where I implemented virtio-rng with the proposed features.
+Instructions on how to replicate this can be found here:
+https://github.com/bchalios/virtio-snapsafe-example
+
+The patchset does not solve all problems. We do not define an API for
+other parts of the kernel to be able to use directly the new
+functionality (add commands to the queue), mainly because I 'm not sure
+what would the correct API be. I was toying with the idea of extending
+`struct hwrng` with two new hooks that would be implemented only by
+virtio-rng but I'm not sure I like it, so I am open to suggestions.
+
+As a result of the above, the way we use the functionality to add new
+entropy, i.e. calling `add_device_randomness`, is as racy as the VMGENID
+case, since it relies on used buffers been handled by the virtio driver.
+
+As for user-space, the `mmap` interface *is* race-free. Changes in the
+generation counter will be observable by user applications the moment VM
+vcpus resume. However, the `poll` interface isn't, `sysfs_notify` is
+being called as well when the virtio driver handles used buffers. I am
+not sure I have a solution for this last one.
+
+Posting this, I hope we can resume the discussion about solving the
+above issues (or any other issue that I haven't thought of), especially
+with regards to providing a mechanism suitable for user-space
+notifications.
+
+Cheers,
+Babis
+
+Changes in v2: fix kbuild warnings
+
+Babis Chalios (2):
+  virtio-rng: implement entropy leak feature
+  virtio-rng: add sysfs entries for leak detection
+
+ drivers/char/hw_random/virtio-rng.c | 372 +++++++++++++++++++++++++++-
+ include/uapi/linux/virtio_rng.h     |   3 +
+ 2 files changed, 368 insertions(+), 7 deletions(-)
+
+-- 
+2.38.1
+
+Amazon Spain Services sociedad limitada unipersonal, Calle Ramirez de Prado 5, 28045 Madrid. Registro Mercantil de Madrid . Tomo 22458 . Folio 102 . Hoja M-401234 . CIF B84570936
+
