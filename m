@@ -2,74 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5D7C38142
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 07:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65832C38142
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 08:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjAaHcr convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 02:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41912 "EHLO
+        id S229559AbjAaIAk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:00:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjAaHcq (ORCPT
+        with ESMTP id S231331AbjAaIAe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 02:32:46 -0500
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A61D42B0B7;
-        Mon, 30 Jan 2023 23:32:45 -0800 (PST)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 12BF024E1E2;
-        Tue, 31 Jan 2023 15:32:41 +0800 (CST)
-Received: from EXMBX167.cuchost.com (172.16.6.77) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 31 Jan
- 2023 15:32:40 +0800
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX167.cuchost.com
- (172.16.6.77) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 31 Jan
- 2023 15:32:40 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Tue, 31 Jan 2023 15:32:40 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Jenny Zhang <jenny.zhang@starfivetech.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] MAINTAINERS: repair file entry for STARFIVE TRNG DRIVER
-Thread-Topic: [PATCH] MAINTAINERS: repair file entry for STARFIVE TRNG DRIVER
-Thread-Index: AQHZNH029ca3Y+nofU6pYdo9/RGqe664ImLA
-Date:   Tue, 31 Jan 2023 07:32:40 +0000
-Message-ID: <b994277b5be24b8eba14d69228ca1208@EXMBX168.cuchost.com>
-References: <20230130073109.32025-1-lukas.bulwahn@gmail.com>
-In-Reply-To: <20230130073109.32025-1-lukas.bulwahn@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.188.176.82]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Tue, 31 Jan 2023 03:00:34 -0500
+Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875C640BF5
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Jan 2023 00:00:32 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pMlZ3-005vct-CF; Tue, 31 Jan 2023 16:00:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 31 Jan 2023 16:00:25 +0800
+Date:   Tue, 31 Jan 2023 16:00:25 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Jesper Nilsson <jesper.nilsson@axis.com>,
+        Lars Persson <lars.persson@axis.com>,
+        linux-arm-kernel@axis.com,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        George Cherian <gcherian@marvell.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Kai Ye <yekai13@huawei.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        qat-linux@intel.com, Thara Gopinath <thara.gopinath@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Vladimir Zapolskiy <vz@mleia.com>
+Subject: [PATCH 0/32] crypto: api - Prepare to change callback argument to
+ void star
+Message-ID: <Y9jKmRsdHsIwfFLo@gondor.apana.org.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> Commit c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
-> adds the STARFIVE TRNG DRIVER section to MAINTAINERS, but refers to the
-> non-existing file drivers/char/hw_random/starfive-trng.c rather than to the
-> actually added file drivers/char/hw_random/jh7110-trng.c in this commit.
-> 
-> Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about a
-> broken reference.
-> 
-> Repair this file entry in STARFIVE TRNG DRIVER.
+Hi:
 
-Acked-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+The crypto completion function currently takes a pointer to a
+struct crypto_async_request object.  However, in reality the API
+does not allow the use of any part of the object apart from the
+data field.  For example, ahash/shash will create a fake object
+on the stack to pass along a different data field.
 
-Thanks,
-Jia Jie
+This leads to potential bugs where the user may try to dereference
+or otherwise use the crypto_async_request object.
+
+This series lays the groundwork for converting the completion
+function to take a void * argument instead of crypto_async_request.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
