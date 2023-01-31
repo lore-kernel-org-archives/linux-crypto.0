@@ -2,93 +2,136 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 087DAC636CC
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 16:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11BEC38142
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 16:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbjAaQ2M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 11:28:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37928 "EHLO
+        id S230112AbjAaQ3y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 11:29:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbjAaQ2D (ORCPT
+        with ESMTP id S231998AbjAaQ3T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 11:28:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D72B58664;
-        Tue, 31 Jan 2023 08:27:48 -0800 (PST)
+        Tue, 31 Jan 2023 11:29:19 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B0E56488;
+        Tue, 31 Jan 2023 08:29:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7143FB80FED;
-        Tue, 31 Jan 2023 16:27:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA51BC433EF;
-        Tue, 31 Jan 2023 16:27:44 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FMCjvAE1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1675182461;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=d4bJ8ayNL8Vv9SKkQ7MpjnXBwsEDaGM3RccfYdV9qww=;
-        b=FMCjvAE1ka/LCINi+0+vlxwAWUsv20/4+wExDLC5VgsDtYNIxcWwAxfESw7VCdPbiOIphk
-        PG/b/7q4uOpoUrh8aEJENtXYnSPbXYYBtwK7pJzHoxi6dlGy4V2y7dlWQxpFgFnclGZTCa
-        kexypyU3N4MZ8VCg4rzzI2AI61N+Vyg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1320d313 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 31 Jan 2023 16:27:41 +0000 (UTC)
-Date:   Tue, 31 Jan 2023 17:27:39 +0100
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Babis Chalios <bchalios@amazon.es>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, sgarzare@redhat.com,
-        amit@kernel.org, graf@amazon.de, xmarcalx@amazon.co.uk
-Subject: Re: [PATCH v2 0/2] [RFC] virtio-rng entropy leak reporting feature
-Message-ID: <Y9lBeymca9eFaJ33@zx2c4.com>
-References: <20230131145543.86369-1-bchalios@amazon.es>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3F2E0B81DAE;
+        Tue, 31 Jan 2023 16:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 727A2C433EF;
+        Tue, 31 Jan 2023 16:28:50 +0000 (UTC)
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+Cc:     Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Wolfram Sang <wsa@kernel.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Henrik Rydberg <rydberg@bitmath.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Len Brown <len.brown@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Daniel Bristot de Oliveira <bristot@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Evgeniy Polyakov <zbr@ioremap.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>, alsa-devel@alsa-project.org,
+        coresight@lists.linaro.org, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, isdn4linux@listserv.isdn4linux.de,
+        keyrings@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-trace-devel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-mm@kvack.org,
+        openrisc@lists.librecores.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
+        x86@kernel.org
+Subject: Re: (subset) [PATCH 00/35] Documentation: correct lots of spelling errors (series 1)
+Date:   Tue, 31 Jan 2023 16:28:48 +0000
+Message-Id: <167518251202.582976.5415495075435902323.b4-ty@arm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230127064005.1558-1-rdunlap@infradead.org>
+References: <20230127064005.1558-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230131145543.86369-1-bchalios@amazon.es>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-You sent a v2, but I'm not back until the 11th to provide comments on
-v1. I still think this isn't the right direction, as this needs tie-ins
-to the rng to actually be useful. Please stop posting new versions of
-this for now, so that somebody doesn't accidentally merge it; that'd be
-a big mistake. I'll paste what I wrote you prior:
+On Thu, 26 Jan 2023 22:39:30 -0800, Randy Dunlap wrote:
+> Correct many spelling errors in Documentation/ as reported by codespell.
+> 
+> Maintainers of specific kernel subsystems are only Cc-ed on their
+> respective patches, not the entire series. [if all goes well]
+> 
+> These patches are based on linux-next-20230125.
+> 
+> [...]
 
-| Hi Babis,
-| 
-| As I mentioned to you privately this week, I'm about to be out of town,
-| so I won't be able to look at this until I'm back in a few weeks. I
-| appreciate your patience.
-| 
-| But as a cursory look, I'm happy that you've written the hardware-side
-| code for this. That's a great starting point. The plumbing is not so
-| nice, though. This needs to be integrated more closely with random.c
-| itself, similar to how vmgenid works.
-| 
-| When I'm back in a few weeks, I'll see if I can either write a
-| description of what I have in mind, or simply integrate the useful
-| hardware work here into an expanded patch series.
-| 
-| [Please don't merge anything for now.]
+Applied to arm64 (for-next/misc), thanks!
 
-So: you wrote some maybe useful hardware code. The rest is wrong. And we
-haven't even concluded discussions on whether the virtio interface is
-the right one. In fact, I had previously asked if we could schedule this
-all until March. Marco from your team then sent an impatient email, so I
-said, alright, what about Feb 11 when I'm back. That's annoying for me
-but I figured I'd just shuffle everything around and prioritize this.
-Then, instead of waiting for that, you posted v1 of this patchset the
-next day. I asked you again. And now, while I'm away on the first
-holiday in a while with very little connectivity and no laptop, you post
-a v2. So I'm really annoyed. In order to avoid all doubt about this, let
-me then just NACK this, and I'll lift the nack when I'm back:
+[01/35] Documentation: arm64: correct spelling
+        https://git.kernel.org/arm64/c/a70f00e7f1a3
 
-    Nacked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+-- 
+Catalin
+
