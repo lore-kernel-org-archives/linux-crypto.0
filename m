@@ -2,385 +2,201 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BB9C38142
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 14:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA40C636CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 15:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232296AbjAaO5l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 09:57:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56416 "EHLO
+        id S233191AbjAaPXU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 10:23:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbjAaO5Z (ORCPT
+        with ESMTP id S232688AbjAaPXC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 09:57:25 -0500
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 002FC518C5;
-        Tue, 31 Jan 2023 06:57:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
-  t=1675177036; x=1706713036;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PR8HUEPIxrqi0LUZkI2xhXWCD6zjhx6Dwty3IoU2bD0=;
-  b=Li5VirOB6nkG0rHHunA1GE0GoF5bWEKFnZ64Mr3XSGc1OatyRUpYCZab
-   44FUGtu+0rw1GueyPI+ocnik8wS6ulS9WTHw1UQXa33EvDFSKj9xr3jke
-   +cgA+1koGS5B43tj95voxEU8uZ4gj5rJOr1jvWmC46HMmMu+aiqAJeOHR
-   s=;
-X-IronPort-AV: E=Sophos;i="5.97,261,1669075200"; 
-   d="scan'208";a="288177124"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2023 14:57:14 +0000
-Received: from EX13D51EUB004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com (Postfix) with ESMTPS id 119AC41D88;
-        Tue, 31 Jan 2023 14:57:13 +0000 (UTC)
-Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
- EX13D51EUB004.ant.amazon.com (10.43.166.217) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Tue, 31 Jan 2023 14:57:11 +0000
-Received: from f4d4887fdcfb.ant.amazon.com (10.43.161.198) by
- EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1118.24; Tue, 31 Jan 2023 14:57:05 +0000
-From:   Babis Chalios <bchalios@amazon.es>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        Babis Chalios <bchalios@amazon.es>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>
-CC:     <sgarzare@redhat.com>, <amit@kernel.org>, <graf@amazon.de>,
-        <Jason@zx2c4.com>, <xmarcalx@amazon.co.uk>
-Subject: [PATCH v2 2/2] virtio-rng: add sysfs entries for leak detection
-Date:   Tue, 31 Jan 2023 15:55:43 +0100
-Message-ID: <20230131145543.86369-3-bchalios@amazon.es>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
-In-Reply-To: <20230131145543.86369-1-bchalios@amazon.es>
-References: <20230131145543.86369-1-bchalios@amazon.es>
-MIME-Version: 1.0
-X-Originating-IP: [10.43.161.198]
-X-ClientProxiedBy: EX13D39UWB001.ant.amazon.com (10.43.161.5) To
- EX19D037EUB003.ant.amazon.com (10.252.61.119)
-Content-Type: text/plain; charset="us-ascii"
+        Tue, 31 Jan 2023 10:23:02 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2060.outbound.protection.outlook.com [40.107.237.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3ACF49953
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Jan 2023 07:21:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OjugOij0m+sRea5jDx8WsOpaz6+W1sRB6b3SG2OW1MOD/h59mi4re3moDdNR6f6V8QLRCVo15chVCfzYbSvHLuDTPlDtTxSst1E87GhLyvc/a5fLaGtTl+lmURz+ArFqId0MeY8B6sAjhhmuNeuKHHF6VRRJD+/uYBVWQxgPwQduiorpC2v1nfKd0Yxr9ict2uh63yj0Rt4J7qyze0nxmmCaJmXyj8flR+Qs+ZRG6+dgvh4lkam2hr8rSypFU2O12M/x6Laz1ink0JwPTxTf6AukREY+E3ba+VVWOwPzoLlHkWV/U9vEM4GPeMjllbQ1oFBHEdcVXWFyqQxx+QKTrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=N2ttiAMWGl8MvQ5BL/b6i+v8qy/dmcXy5OrQfo5agEg=;
+ b=Ghqa+DRSxZTYnvI8gevPzcK/VgJ2Kfn43+A0UerDbxLf5MxHb02aKRGN7bE4At7dxF8qELOaU0DgyAy0xjolWJFHncUpoWx/Ll2lNIGqaIEH2hkhJpMruq3vrYRLp7BQYnlIGyvtAiCpYRbZ0092mOUUoZLQL/WL2yhUlt9dzUmX0q0lFg7ei9SeGlWR9R1Ky/c4A9i/L/nUE0L4HKZBL1ZggQtIHGXHVvlf4AerNd2d+hgxYI3t5jwUnKqiiFrwMhF4ODdAhR9ZQReyjjUw5WUsgoYnQTwLC2ptFHR5CtCOCUKKjWMGNEM4OmCePszVIzYZtHyybQjasiGvIM1lNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N2ttiAMWGl8MvQ5BL/b6i+v8qy/dmcXy5OrQfo5agEg=;
+ b=kVYy4Dkialko0j4MIAmlvTjCkZIwmVA+xLIM7YNOcCDmQh1W3Nz6Zvqxk3QzR8ViRildx56tCN79rznrrDb0Ow+LOw2PrreXuuE/hJ/6L3OA9Gxi4Y9M/PyVFga6RN0LVMkWcuM75jxQd4VxwXamz4KGSdD0pUr6gzBIL8iKrRw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DS7PR12MB6006.namprd12.prod.outlook.com (2603:10b6:8:7d::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.36; Tue, 31 Jan
+ 2023 15:21:46 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c%9]) with mapi id 15.20.6043.038; Tue, 31 Jan 2023
+ 15:21:46 +0000
+Message-ID: <7d6effd4-4109-184c-064e-e606b9dcd200@amd.com>
+Date:   Tue, 31 Jan 2023 09:21:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH 17/32] crypto: ccp - Use request_complete helpers
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Jesper Nilsson <jesper.nilsson@axis.com>,
+        Lars Persson <lars.persson@axis.com>,
+        linux-arm-kernel@axis.com,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        George Cherian <gcherian@marvell.com>,
+        John Allen <john.allen@amd.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Kai Ye <yekai13@huawei.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        qat-linux@intel.com, Thara Gopinath <thara.gopinath@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Vladimir Zapolskiy <vz@mleia.com>
+References: <Y9jKmRsdHsIwfFLo@gondor.apana.org.au>
+ <E1pMlat-005vmv-9T@formenos.hmeau.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <E1pMlat-005vmv-9T@formenos.hmeau.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: YT3PR01CA0006.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:86::11) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|DS7PR12MB6006:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a3ace3d-9db5-4ea0-6256-08db039edd94
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VICoYlqMD8pWzdY4ycF49+M4yiv5HiU052qp9Xmrj/8jHFVW2dAyF9/rpWyOAr3xqHXydGJSgefayEmK3R0AYE3m03NWTxIAgO6sK1SlMHP7oUx/YGhXWh9m0JjflrDndRXnJ1kjvpAFJH+fTY2Vd6h57mZNS4AtPt8uMdvHzeiOz1X2s2kWuXw6RYdCRHbgFlLmTIHtdMLSfxtV4VP+AvGzoWnHCLsxeueVQ4GyEHcVIybXUkJoJDNOHWnI1W0jdAj8WJfnf2LmWnINmLYgXj/vuW/pjV7FM6UUJ5BhJH/N69/UFWxrpIy+kzEHstG8YiQ7xu2uFJ6IYzSIM8E0cCJD5p89SULLKwbNdBJzzJ0z1Qtyfv9FdWxJa0TwVMT8s12Gr6mvLnWtGUhkr2Tptvwmq9DDptiZx8uf/09a4miGWbZM35yvBliygrQIrFg2CayDnsMwU5nNu3Nhks8yLihJ5WuJ1iiXvp/9d6dMhWNjbCBVnPtDmunsTjgdrPIz9F4WAPs2/YTHbiU+rQEdf5xrAOPhmkuKQCnh44iHJKqWd+ghPVJyzmA5O1rbCMGJPpg9tnxuHGnjkbTTftTgGSjh5x4NqdA2XClPCG704LDL5cUEurkhLHTfB/e13KIubGm6ock80TPqlB0DD8nG8huU6C+wey8vJK1mR9/iyAtmnLmHiqSgt5STTXpoe0tTZvWKDDfWqsPmUAd2WekuEZgjF1wN8i2nnJHTiwF1gzzCJaXvluuByMLCZq8WDlgB
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(136003)(396003)(366004)(376002)(346002)(451199018)(2906002)(316002)(26005)(6506007)(921005)(6512007)(186003)(53546011)(5660300002)(7416002)(36756003)(110136005)(2616005)(6666004)(38100700002)(6486002)(31696002)(31686004)(83380400001)(86362001)(478600001)(66476007)(66556008)(8676002)(8936002)(66946007)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SStLS2FYcm1wM1dvL2IyNjRIZE1ZNVhGUWpuOWFLSlJOMlluWC9iSkprLzZs?=
+ =?utf-8?B?K1ppSVJiNE5kZG1CUUd3ZjZTdzkwSGVsY0xpN1V0dkd0N0c1a2NscWVWYXlB?=
+ =?utf-8?B?ZldRS1FvMzJGVEVSa255TXBHdGRFaU1jSWNMOHBRN0pMODdieVZIb28vako0?=
+ =?utf-8?B?eXRBbGVKOWlDZ2hMTDhEaXJUUHFYa1d3Q1JDc2V6T01SMWMxWkxDRWpvbjBq?=
+ =?utf-8?B?SmJ2TVQwQmsrdkp3L1g3M2VHK1liUlVLMDM0ZGVGeTZhZTZPK25nNy9TSGti?=
+ =?utf-8?B?UUxzVWRkWEMvN0ZXWnBVMXh5aG9tVGh6N2xvamQ4UW0zWWs2R0tvekN0N1l3?=
+ =?utf-8?B?WmtGWHlaYzRNTU01cEtsWWhIK2NLRno3QWd3QmRoTzRJanBUU3pDQmF1QzMw?=
+ =?utf-8?B?K2VwMWd3VGRSc3crbHJmelRRVCsyZ3ZrSk03ZlhYK1lpWFlOYWdZV0FjZGt5?=
+ =?utf-8?B?bVpEVFZOczNQVy9ScWxLMWE5V2huaTZaWm5VMFo0U1R3UmFrVnVCRU1KUk4v?=
+ =?utf-8?B?d0NTSDU5Zi9xaFkwRXhlOWN0Ynd4NzVHNmJDaTh6bXJOaVNxRCtyTUpsZmdj?=
+ =?utf-8?B?aXppbG81NE1jN0xpTkJ4WjRzR20vdmtzYk9zc2JxankwRjBGNGFLMFVTN3h2?=
+ =?utf-8?B?M2pUWXhYQmNlQkd6eWFVUVZ5SmxKc1YwZXUrVEdXMUJqeEpFWnV0RWZScjVK?=
+ =?utf-8?B?YjUrNlRPS3FFZ25VVmgzcWRvQnpURG9UME53OWJpSnpRNm5qcSt0LzdMejMz?=
+ =?utf-8?B?V3BTRVBZRHJjS0VIYVJFaVpnR0FUSFkrTmlRMWp0UzZGNGpTV2JtY3M5WU14?=
+ =?utf-8?B?OVlCM3pCVTJPZ1A4RE50am1lTXNxOUNpaHFEclRUZ1haRDc4R1VXcXVXcW5P?=
+ =?utf-8?B?NFVOcmtkNlFUUnFwaGFkcFdGMCsxSDI3NGNaVzJibzZBYllJWVJUUmNGdjVk?=
+ =?utf-8?B?eTFsbFNqT09rWTRhSXhQdHVBUjJPZHl4eFh6OXFZVTFIMlRkZmtiUGVnRmdO?=
+ =?utf-8?B?YkJKQUhCMVRSTVhWSnJXNzJFaFN0Q3l0OVFoVnFXVjAxQXF2cWxSR0lBMGRz?=
+ =?utf-8?B?dDZIa202V2Z6anR5UWFHSGloNEp3UW0rT2I1VTZBN2ZOc3lRT0JEdllMRERo?=
+ =?utf-8?B?RGtsOW5PSWZGK3lwVkRQR2dXMnVQenJVUHpjQWVBU24ydGhQNXFsRW80djdX?=
+ =?utf-8?B?dkNScFNDVkR6WG4wS0lLc0ltdHZlWDAvQzFuT2czVVM4MTVJOHRWK3VjYXN2?=
+ =?utf-8?B?QXB2TUJCRmVkQi9DYXoydXE0T3dCM2JKclVPSXJSMW1IcEprQWt5ZjdVSkxK?=
+ =?utf-8?B?UTUrcmthK2hyZktlZlV2WnlyVmpMdUY5MTEvWkxzdU01K21lV1N2VkZFUGtz?=
+ =?utf-8?B?dW9GVVMxQjd0NXdmUFcwM0kvZ3ZSbzZ6OGxaOExvaU0xSDhwYjhpVERKdHM0?=
+ =?utf-8?B?MWRnWU8xTHNpMTRXalZFUEJKTzA5aFo3cEZGV2k3dUFKR2crOGlRb2VnLyty?=
+ =?utf-8?B?eEVIRStmU1JGcDRpaEQvZE5uTkRrNDlrd041Z3U3SHlMNUFlOG1UZ1Q4cWpW?=
+ =?utf-8?B?cDNRSXVIZllCK0hrZ3prZy9jaUUxQnlrQnNocEFnOThVenFzUjdpeXhmczBq?=
+ =?utf-8?B?L1RUSnJmTkpuNllQUTJ5UUkrZGlUM3hpUy9td1UvRzY1dzhHYnNMeEw0REIr?=
+ =?utf-8?B?TGhlc0xOQW5RNkRYMHZaZmgyWFduaGlUNndqQjBZUmpKSllkRzJaaHQ1TnlC?=
+ =?utf-8?B?N1NNdFNtd0xmSmRRTlI5NDRnajV0dmNxb09iZ2NCMGM0L25SRGxlQ3VnRFI0?=
+ =?utf-8?B?OXF1MWRyNk1pRzhXcXpSZnhMNmN5Q3JmMVFrRXVGNmVwQnhoYzJ1U0hEZTZq?=
+ =?utf-8?B?Q09zZXBSaHh1QVR2L2gvZGo1UmI2TmloMURHOTFUVVRwK1FBN2huNUQvZ0dB?=
+ =?utf-8?B?Tk9ndUlXdStJYVdvOS95VnR3NmtQOXhlOUJOY1ZXSHhjVjg3cnBBMUF1ZTI3?=
+ =?utf-8?B?UVp3aDBtNXUwVTkvRU41QWE1MWRrNnp6bG52VVljaFlCRGZ0VUtwelArbFFh?=
+ =?utf-8?B?c3dTM2ZjaURNSk05aFZacVZydnU1ajBpcVdQUVpnbXRneG0xVWIxWEVrOGZs?=
+ =?utf-8?Q?R+KLOom27ik2/KomAjGidIjv9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a3ace3d-9db5-4ea0-6256-08db039edd94
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2023 15:21:46.1960
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VJfznaO+OMa9GZ0XsHUoRhrop6uPlqYgMpYM/LSM1+aLFuvu+xQKWhEMuxYf8UJjvZBe/uqdvAD2QRIU0zA+bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6006
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make use of the copy-on-leak functionality of the virtio rng driver to
-expose a mechanism to user space for detecting entropy leak events, such
-as taking a VM snapshot or restoring from one.
+On 1/31/23 02:02, Herbert Xu wrote:
+> Use the request_complete helpers instead of calling the completion
+> function directly.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-The driver setups a single page of memory where it stores in the first
-word a counter and queues a copy-on-leak command for increasing the
-counter every time an entropy leak occurs. It exposes the value of the
-counter in a binary sysfs file per device. The file can be mmap'ed and
-read and every time a change on the counter is observed, `sysfs_notify`
-is used to notify processes that are polling it.
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-The mechanism is implemented based on the idea of a VM generation
-counter that had been before proposed as an extension to the VM
-Generation ID device, where mmap and poll interfaces can be used on the
-file containing the counter and changes in its value signal snapshot
-events.
-
-It is worth noting that using mmap is entirely race-free, since changes
-in the counter are observable by user-space as soon as vcpus are
-resumed. Instead, using poll is not race-free. There is a race-window
-between the moment the vcpus are resumed and the used-buffers are
-handled by the virtio-rng driver.
-
-Signed-off-by: Babis Chalios <bchalios@amazon.es>
----
- drivers/char/hw_random/virtio-rng.c | 178 +++++++++++++++++++++++++++-
- 1 file changed, 175 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index 154f68a1e326..9fe9da09f202 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -4,6 +4,9 @@
-  *  Copyright (C) 2007, 2008 Rusty Russell IBM Corporation
-  */
- 
-+#include "linux/gfp.h"
-+#include "linux/minmax.h"
-+#include "linux/sysfs.h"
- #include <linux/hw_random.h>
- #include <linux/scatterlist.h>
- #include <linux/spinlock.h>
-@@ -15,6 +18,10 @@
- 
- static DEFINE_IDA(rng_index_ida);
- 
-+#ifdef CONFIG_SYSFS
-+static struct kobject *virtio_rng_kobj;
-+#endif
-+
- struct virtrng_info {
- 	struct hwrng hwrng;
- 	struct virtqueue *vq;
-@@ -23,6 +30,12 @@ struct virtrng_info {
- 	struct virtqueue *leakq[2];
- 	spinlock_t lock;
- 	int active_leakq;
-+#ifdef CONFIG_SYSFS
-+	struct kobject *kobj;
-+	struct bin_attribute vm_gen_counter_attr;
-+	unsigned long map_buffer;
-+	unsigned long next_vm_gen_counter;
-+#endif
- 
- 	char name[25];
- 	int index;
-@@ -42,6 +55,40 @@ struct virtrng_info {
- #endif
- };
- 
-+#ifdef CONFIG_SYSFS
-+static ssize_t virtrng_sysfs_read(struct file *filep, struct kobject *kobj,
-+		struct bin_attribute *attr, char *buf, loff_t pos, size_t len)
-+{
-+	struct virtrng_info *vi = attr->private;
-+	unsigned long gen_counter = *(unsigned long *)vi->map_buffer;
-+
-+	if (!len)
-+		return 0;
-+
-+	len = min(len, sizeof(gen_counter));
-+	memcpy(buf, &gen_counter, len);
-+
-+	return len;
-+}
-+
-+static int virtrng_sysfs_mmap(struct file *filep, struct kobject *kobj,
-+		struct bin_attribute *attr, struct vm_area_struct *vma)
-+{
-+	struct virtrng_info *vi = attr->private;
-+
-+	if (vma->vm_pgoff || vma_pages(vma) > 1)
-+		return -EINVAL;
-+
-+	if (vma->vm_flags & VM_WRITE)
-+		return -EPERM;
-+
-+	vma->vm_flags |= VM_DONTEXPAND;
-+	vma->vm_flags &= ~VM_MAYWRITE;
-+
-+	return vm_insert_page(vma, vma->vm_start, virt_to_page(vi->map_buffer));
-+}
-+#endif
-+
- /* Swaps the queues and returns the new active leak queue. */
- static struct virtqueue *swap_leakqs(struct virtrng_info *vi)
- {
-@@ -81,7 +128,7 @@ static int virtrng_fill_on_leak(struct virtrng_info *vi, void *data, size_t len)
- 
- 	vq = get_active_leakq(vi);
- 	ret = add_fill_on_leak_request(vi, vq, data, len);
--	if (ret)
-+	if (!ret)
- 		virtqueue_kick(vq);
- 
- 	spin_unlock_irqrestore(&vi->lock, flags);
-@@ -121,7 +168,7 @@ static int virtrng_copy_on_leak(struct virtrng_info *vi, void *to, void *from, s
- 
- 	vq = get_active_leakq(vi);
- 	ret = add_copy_on_leak_request(vi, vq, to, from, len);
--	if (ret)
-+	if (!ret)
- 		virtqueue_kick(vq);
- 
- 	spin_unlock_irqrestore(&vi->lock, flags);
-@@ -137,6 +184,9 @@ static void entropy_leak_detected(struct virtqueue *vq)
- 	unsigned long flags;
- 	void *buffer;
- 	bool kick_activeq = false;
-+#ifdef CONFIG_SYSFS
-+	bool notify_sysfs = false;
-+#endif
- 
- 	spin_lock_irqsave(&vi->lock, flags);
- 
-@@ -158,12 +208,34 @@ static void entropy_leak_detected(struct virtqueue *vq)
- 			add_fill_on_leak_request(vi, activeq, vi->leak_data, sizeof(vi->leak_data));
- 			kick_activeq = true;
- 		}
-+
-+#ifdef CONFIG_SYSFS
-+		if (buffer == (void *)vi->map_buffer) {
-+			notify_sysfs = true;
-+
-+			/* Add a request to bump the generation counter on the next leak event.
-+			 * We have already swapped leak queues, so this will get properly handled
-+			 * with the next entropy leak event.
-+			 */
-+			vi->next_vm_gen_counter++;
-+			add_copy_on_leak_request(vi, activeq, (void *)vi->map_buffer,
-+					&vi->next_vm_gen_counter, sizeof(unsigned long));
-+
-+			kick_activeq = true;
-+		}
-+#endif
- 	}
- 
- 	if (kick_activeq)
- 		virtqueue_kick(activeq);
- 
- 	spin_unlock_irqrestore(&vi->lock, flags);
-+
-+#ifdef CONFIG_SYSFS
-+	/* Notify anyone polling on the sysfs file */
-+	if (notify_sysfs)
-+		sysfs_notify(vi->kobj, NULL, "vm_gen_counter");
-+#endif
- }
- 
- static void random_recv_done(struct virtqueue *vq)
-@@ -300,6 +372,59 @@ static int init_virtqueues(struct virtrng_info *vi, struct virtio_device *vdev)
- 	return ret;
- }
- 
-+#ifdef CONFIG_SYSFS
-+static int setup_sysfs(struct virtrng_info *vi)
-+{
-+	int err;
-+
-+	vi->next_vm_gen_counter = 1;
-+
-+	/* We have one binary file per device under /sys/virtio-rng/<device>/vm_gen_counter */
-+	vi->vm_gen_counter_attr.attr.name = "vm_gen_counter";
-+	vi->vm_gen_counter_attr.attr.mode = 0444;
-+	vi->vm_gen_counter_attr.read = virtrng_sysfs_read;
-+	vi->vm_gen_counter_attr.mmap = virtrng_sysfs_mmap;
-+	vi->vm_gen_counter_attr.private = vi;
-+
-+	vi->map_buffer = get_zeroed_page(GFP_KERNEL);
-+	if (!vi->map_buffer)
-+		return -ENOMEM;
-+
-+	err = -ENOMEM;
-+	vi->kobj = kobject_create_and_add(vi->name, virtio_rng_kobj);
-+	if (!vi->kobj)
-+		goto err_page;
-+
-+	err = sysfs_create_bin_file(vi->kobj, &vi->vm_gen_counter_attr);
-+	if (err)
-+		goto err_kobj;
-+
-+	return 0;
-+
-+err_kobj:
-+	kobject_put(vi->kobj);
-+err_page:
-+	free_pages(vi->map_buffer, 0);
-+	return err;
-+}
-+
-+static void cleanup_sysfs(struct virtrng_info *vi)
-+{
-+	sysfs_remove_bin_file(vi->kobj, &vi->vm_gen_counter_attr);
-+	kobject_put(vi->kobj);
-+	free_pages(vi->map_buffer, 0);
-+}
-+#else
-+static int setup_sysfs(struct virtrng_info *vi)
-+{
-+	return 0;
-+}
-+
-+static void cleanup_sysfs(struct virtrng_info *vi)
-+{
-+}
-+#endif
-+
- static int probe_common(struct virtio_device *vdev)
- {
- 	int err, index;
-@@ -330,11 +455,15 @@ static int probe_common(struct virtio_device *vdev)
- 	if (vi->has_leakqs) {
- 		spin_lock_init(&vi->lock);
- 		vi->active_leakq = 0;
-+
-+		err = setup_sysfs(vi);
-+		if (err)
-+			goto err_find;
- 	}
- 
- 	err = init_virtqueues(vi, vdev);
- 	if (err)
--		goto err_find;
-+		goto err_sysfs;
- 
- 	virtio_device_ready(vdev);
- 
-@@ -344,8 +473,18 @@ static int probe_common(struct virtio_device *vdev)
- 	/* we always have a fill_on_leak request pending */
- 	virtrng_fill_on_leak(vi, vi->leak_data, sizeof(vi->leak_data));
- 
-+#ifdef CONFIG_SYSFS
-+	/* also a copy_on_leak request for the generation counter when we have sysfs
-+	 * support.
-+	 */
-+	virtrng_copy_on_leak(vi, (void *)vi->map_buffer, &vi->next_vm_gen_counter,
-+			sizeof(unsigned long));
-+#endif
-+
- 	return 0;
- 
-+err_sysfs:
-+	cleanup_sysfs(vi);
- err_find:
- 	ida_simple_remove(&rng_index_ida, index);
- err_ida:
-@@ -363,6 +502,8 @@ static void remove_common(struct virtio_device *vdev)
- 	complete(&vi->have_data);
- 	if (vi->hwrng_register_done)
- 		hwrng_unregister(&vi->hwrng);
-+	if (vi->has_leakqs)
-+		cleanup_sysfs(vi);
- 	virtio_reset_device(vdev);
- 	vdev->config->del_vqs(vdev);
- 	ida_simple_remove(&rng_index_ida, vi->index);
-@@ -445,7 +586,38 @@ static struct virtio_driver virtio_rng_driver = {
- #endif
- };
- 
-+#ifdef CONFIG_SYSFS
-+static int __init virtio_rng_init(void)
-+{
-+	int ret;
-+
-+	virtio_rng_kobj = kobject_create_and_add("virtio-rng", NULL);
-+	if (!virtio_rng_kobj)
-+		return -ENOMEM;
-+
-+	ret = register_virtio_driver(&virtio_rng_driver);
-+	if (ret < 0)
-+		goto err;
-+
-+	return 0;
-+
-+err:
-+	kobject_put(virtio_rng_kobj);
-+	return ret;
-+}
-+
-+static void __exit virtio_rng_fini(void)
-+{
-+	kobject_put(virtio_rng_kobj);
-+	unregister_virtio_driver(&virtio_rng_driver);
-+}
-+
-+module_init(virtio_rng_init);
-+module_exit(virtio_rng_fini);
-+#else
- module_virtio_driver(virtio_rng_driver);
-+#endif
-+
- MODULE_DEVICE_TABLE(virtio, id_table);
- MODULE_DESCRIPTION("Virtio random number driver");
- MODULE_LICENSE("GPL");
--- 
-2.38.1
-
-Amazon Spain Services sociedad limitada unipersonal, Calle Ramirez de Prado 5, 28045 Madrid. Registro Mercantil de Madrid . Tomo 22458 . Folio 102 . Hoja M-401234 . CIF B84570936
-
+> ---
+> 
+>   drivers/crypto/ccp/ccp-crypto-main.c |   12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index 73442a382f68..ecd58b38c46e 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -146,7 +146,7 @@ static void ccp_crypto_complete(void *data, int err)
+>   		/* Only propagate the -EINPROGRESS if necessary */
+>   		if (crypto_cmd->ret == -EBUSY) {
+>   			crypto_cmd->ret = -EINPROGRESS;
+> -			req->complete(req, -EINPROGRESS);
+> +			crypto_request_complete(req, -EINPROGRESS);
+>   		}
+>   
+>   		return;
+> @@ -159,18 +159,18 @@ static void ccp_crypto_complete(void *data, int err)
+>   	held = ccp_crypto_cmd_complete(crypto_cmd, &backlog);
+>   	if (backlog) {
+>   		backlog->ret = -EINPROGRESS;
+> -		backlog->req->complete(backlog->req, -EINPROGRESS);
+> +		crypto_request_complete(backlog->req, -EINPROGRESS);
+>   	}
+>   
+>   	/* Transition the state from -EBUSY to -EINPROGRESS first */
+>   	if (crypto_cmd->ret == -EBUSY)
+> -		req->complete(req, -EINPROGRESS);
+> +		crypto_request_complete(req, -EINPROGRESS);
+>   
+>   	/* Completion callbacks */
+>   	ret = err;
+>   	if (ctx->complete)
+>   		ret = ctx->complete(req, ret);
+> -	req->complete(req, ret);
+> +	crypto_request_complete(req, ret);
+>   
+>   	/* Submit the next cmd */
+>   	while (held) {
+> @@ -186,12 +186,12 @@ static void ccp_crypto_complete(void *data, int err)
+>   		ctx = crypto_tfm_ctx_dma(held->req->tfm);
+>   		if (ctx->complete)
+>   			ret = ctx->complete(held->req, ret);
+> -		held->req->complete(held->req, ret);
+> +		crypto_request_complete(held->req, ret);
+>   
+>   		next = ccp_crypto_cmd_complete(held, &backlog);
+>   		if (backlog) {
+>   			backlog->ret = -EINPROGRESS;
+> -			backlog->req->complete(backlog->req, -EINPROGRESS);
+> +			crypto_request_complete(backlog->req, -EINPROGRESS);
+>   		}
+>   
+>   		kfree(held);
