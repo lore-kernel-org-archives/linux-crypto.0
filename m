@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A128FC38142
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 22:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B76C636CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 22:42:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjAaWA5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 17:00:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35268 "EHLO
+        id S231644AbjAaWmb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 17:42:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjAaWA4 (ORCPT
+        with ESMTP id S231561AbjAaWmZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 17:00:56 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2068.outbound.protection.outlook.com [40.107.101.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7F14FAE4;
-        Tue, 31 Jan 2023 14:00:54 -0800 (PST)
+        Tue, 31 Jan 2023 17:42:25 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2068.outbound.protection.outlook.com [40.107.220.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6C81BAC4;
+        Tue, 31 Jan 2023 14:42:23 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TRjWwHmSZhqLUMU7EC9sC6kQGxdancMUgXj5mk/aZuWnTideWyA++AN0D9dmxJ7Py4soobA588vh2hJLYT6g+UIU2E9i7FiA0RrV/NlBpaEJ3MF//EnjIprIEiqVq7rimLcJ0LqtfvbW60FgKIGc1wlRVqNwMQz/2yxrMF0r9gZZwjBracpMDlr3nIuTY5vT1AJ3njjXXaKtj3go+gu/8Kl4W3p3lyieZxMkgxWlP6YafPxtKR6fgiLYTuJuWbap5jTui4xDaKqmTkv5s5pU14gz6BIUqLWHvIR0yHiqCk8+hbd9Ixm4gsowaGefAwKW82Dlbq1TSoCUe0sor/7srg==
+ b=HWeTk86te0HFWf9yHvEIp5uEoNONrI8a773xFkcOQGSUTHT+H07GnC2CeYS0yIwW1kdjAVgEsm6+5hgkdlOostwktoes2ASbKSnTp4hMJGirfQaDLxv9EDSvvZID5HF1d4aDx/jwS4IQjbzvXlZe/MTi0AFTBD3pKqGiqDXvZZTwDMq7AbUZCT2TUY/aGn++aVNI//px1GBYdWiT4nkZ6731yRPyUSP0S0xWNfQ70L33dRHvVNKRknyvA8Pm4udCED2p1LO/Qn7sXiPq2dsSeuUUq0/UnFYyVwqv6ehzWPm9AJ6jlnwgywdhDQAdrHJsQ6h1YH/pjhUg5URVhte+wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dsVyyYs0e5NyYf3dAMOlv0j3RXmAL7O8D4n09s61MLY=;
- b=mj3kb2s/0RsXUwmrRzyhtkRR4IBVw91zANlA89wAy1gWGT/ZHCSrQ2Ua+lg6jJJE7csdnZwWz/FBSsgeLJR3Dv6l7F+I3/0sGcRaXfCpWvcUoSaviAPFX4Xwt8q/jqnntvkit7P0UPtL/OC9ZsiwRUoCCKSc5/F87QXNK7PAq2qV/45TbWTidLeVHWiAEogxchT8fcv2NTpNNFYTx1ti/qWqiQwTxskvSsoyWVXo0VjpE3Rd7KYEZXZPU+pJCWM0pr+vNoHBcWA7aBCfCjp+gE4sKJ3dTkmVV63P2XXoaBUC1w8tRQCRSNQUqyKdGPbYMfm+WKsG8/QAcHnEtH0reg==
+ bh=ogMc1Or4w7ebrVqasXzFd1ET89kvKakAFQ2scjApBAQ=;
+ b=nEBZXaf1xYonyAJbb12F8Loc5k71fuhb9lzOaNyjykyOQmXdNsWqKdmfxqobIswPZWj5tLkFAgNz/SwyjrcYFptUX810IgPWulKUVcYkuIjtSspWrEQ+jMSW52OWeX/t2IRNnHrC240BeeLbIYRxne/xObkmKfSE2o5xSmvsQo4o9UzAEvuSZaL5AHcYZTnuwdSlBw+rkyfkjkUtDKFpCMIK2SkzjPtEF9RxH/Ah/AoDAJYjmw/sA2O99KnZdS51ifzFb3bidLevNbi+tx1QRU3oo+XQhJkrb9dC60FKbm2RoTV0lAXPq/hFTonKGNP/mzwDzOGQgsOJURFO2/R6zg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dsVyyYs0e5NyYf3dAMOlv0j3RXmAL7O8D4n09s61MLY=;
- b=3ixcV8BFXl0YDBe6rv4Jmhxnv5Au8in0AFC2G9T20m4uY/Bf1hhajbrtVIrM/2IWmueSD2xAS8HOasCPEnkGes1utF9qRcPwqHclikY+x3HQJhNl90lw24tGxj2jjGpMSQ7W/+sSP+rbP2h9+LdBRQFTQnGC0rOzfn1jGs+EUdo=
+ bh=ogMc1Or4w7ebrVqasXzFd1ET89kvKakAFQ2scjApBAQ=;
+ b=OPxLVKJOc+fKcRLA72SEh6tfd97A/EuHQaGFO5uZVYT1PCUtiOyFDiSqIg35z+lvKMYcU9au4/KZo44YV5TiqX0Qx+M8PY3/MFnPl70gEvsHXNJaiapXDGfQOPmcNBLAEXd6CbxNeXhYirT+DxR5ircV6mFW99csU+h9aUE2lpY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
- IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13) with
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by LV2PR12MB6016.namprd12.prod.outlook.com (2603:10b6:408:14e::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.36; Tue, 31 Jan
- 2023 22:00:53 +0000
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::2867:7b21:95a4:aaf]) by DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::2867:7b21:95a4:aaf%2]) with mapi id 15.20.6043.036; Tue, 31 Jan 2023
- 22:00:53 +0000
-Message-ID: <4c642bd1-5f1c-292e-398f-eed699db590d@amd.com>
-Date:   Wed, 1 Feb 2023 09:00:30 +1100
+ 2023 22:42:21 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c%9]) with mapi id 15.20.6043.038; Tue, 31 Jan 2023
+ 22:42:21 +0000
+Message-ID: <65cb8f0f-7e8b-6df6-6bb1-a9f1add027bb@amd.com>
+Date:   Tue, 31 Jan 2023 16:42:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
+ Thunderbird/102.4.2
 Subject: Re: [PATCH RFC v7 52/64] KVM: SVM: Provide support for
  SNP_GUEST_REQUEST NAE event
 Content-Language: en-US
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
+To:     Alexey Kardashevskiy <aik@amd.com>,
         "Kalra, Ashish" <ashish.kalra@amd.com>,
         Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -76,155 +76,164 @@ References: <20221214194056.161492-1-michael.roth@amd.com>
  <dbcb6666-270a-4867-6de7-73812d32fd8c@amd.com>
  <7fb25176-3752-1be3-66d4-a7f5a0e1617a@amd.com>
  <682c0bf9-ccf7-9660-21fe-925ef63c5fbb@amd.com>
-From:   Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <682c0bf9-ccf7-9660-21fe-925ef63c5fbb@amd.com>
+ <4c642bd1-5f1c-292e-398f-eed699db590d@amd.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <4c642bd1-5f1c-292e-398f-eed699db590d@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SYBPR01CA0152.ausprd01.prod.outlook.com
- (2603:10c6:10:d::20) To DM6PR12MB2843.namprd12.prod.outlook.com
- (2603:10b6:5:48::24)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: YT1P288CA0025.CANP288.PROD.OUTLOOK.COM (2603:10b6:b01::38)
+ To DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|IA0PR12MB8301:EE_
-X-MS-Office365-Filtering-Correlation-Id: eef611a4-3402-43e4-cf76-08db03d69ebc
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|LV2PR12MB6016:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc66b041-46cc-4cf2-8b86-08db03dc6a40
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: l7GaFX+FatlI/v2eZpaRb6J1Q4S1tZVPZLnjVwzgEHIsErz4nm3BoozMLtxOld6p0ff3+X9Ux8ty2ghh30m0Pug7kl0gxJwkrZNJXOds4BT+myWgGT/i8eeVEyANazcTRLxD45CxE2jM924MgOD4K1EYHVE8WUHoPFF6bc5LOKiC9JkeibT7SWVkLY13i/XmqrtAfcE/LxI55Evcu/mSe8KRd98uLYYe/bx2+3L3ZBDjdJlMZO1ftkAXLCS7bNEZdU/7BUo1YQWkzBnUvq5kcAenm5oSAjRzJL6Ek01Twuk/rQ26JKMs25RBLoYaTzYg6j3uo63Srxj+7Kvn5Z/O2vU+X3v3pQc8a+njIcpD+ySk5+cPCsDMasOHHOmp2T7u7+LOOZYAe2QeoTpIOgBhQfl3SIOi/E7jwBdXki0yr2Iuywh+hAz2z+IfVLhTTX2Cy+Hk1MnUIXzZNKLtT9WN2uKQ4wtZMLhq0hdAt64vc1gRJrrDT8kOOfKfSO5pMg+WkCEQVFbyLdUi9XalmHhO/OiQdfJyJt084DQPw2PiRMVTUyUvNShE7Yn+Csi+4UnpwujNCgyVx4nb5wNIiuUf8Vbdh3yNlj/UY6Po61Y10t7bgtiPhAc63wZ6fYfeIgNLYxFXTeLbKWCDFt0k6QlIejPcTHHChDtaK2rgKRcWc4w2OgN6z6B7XTHYTYjaEouGBUBB0HX83YoeKVOiyCRXpLyx2YQQkJPoloL3ZH4J0nI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(451199018)(41300700001)(38100700002)(316002)(8936002)(2616005)(110136005)(7416002)(7406005)(31696002)(5660300002)(2906002)(36756003)(83380400001)(53546011)(4326008)(6506007)(6486002)(6512007)(478600001)(186003)(6666004)(26005)(31686004)(66556008)(8676002)(66946007)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: RC6HTS4moo6hZ+U/NkkDuclgQHJETZbEiF43ulvsaDRnwCEmirgjShPtwtnq+PT/oPnlNImYrSJDsXbciBE6UeJ8vZE+VJw76aLGrLcOnoIgd8whzhiWAY7j4PCrcA/qgMkbXG5VkXh29aEoXy8VoGTY0ONvwB977ugUZ85hzM2PulKJscHCBahfzZF8mpnQ1dnGoI2cvStpBh8Oe/TUICGNPUqqi/biVm+kb6idhCa4ozrmsOQ9AwP/IFb8ZmbSGgRQUuov5ETzr6claijoAI9vLxZqfoiSOazDyz5SRP0qKa5E4267paIDdAdc4+yu60PuhdAtYOLKTH4SOmICJGE6o1MSDHGY4umU0teagv7HUfKesT5jQQGYp7nk2Q6bjcS/pXGAzU8uooVgXZAqSiknBQSahXN7eVqEtZWCK1knT7svS8BNWvHH7jT25c75C0DVeJeHQs8WkQjxyXkGm+TGj90AaK0UAAjtZ4jbxPbWWio9w1+TK7n1k13vvQvaxbxpUmUQJIk+GAw4FQrBVcHt9yfMBPaG9BR40H/LhW2hLwCsDZZ2lDV1xCCcmCPHJjExnjx1UrciyAdwDpTfccpIgOVjHJmJQi0dBd/7ofs9EnRiQqeERRsDGgQsIWGfRg4TEO6JQaVmzr9EYZPd/QSe8mlOvYWDGliid3c/unoB14I2aA+DrR3QD4CF41xXTOXjf18ck6SmZ7Z/GcbkMzPKjVvnfq8F75GMvF8qkUI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(366004)(376002)(39860400002)(451199018)(7416002)(7406005)(6486002)(83380400001)(38100700002)(86362001)(31696002)(6512007)(2906002)(36756003)(186003)(6506007)(53546011)(478600001)(26005)(2616005)(6666004)(8676002)(66476007)(66556008)(8936002)(41300700001)(31686004)(66946007)(4326008)(5660300002)(110136005)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0ovcnAxS2ZCRWlxOExmQVBTZjB2SCtyWkdjS0pZTXVsMGRUVys1aEhrVmNl?=
- =?utf-8?B?ZzBac2FYYko5LyticHYrS3FzSDYyRkwwMVAvOCtiemVhcUhCcnYxZCtnY09j?=
- =?utf-8?B?bVhLc3VWcjdMajFScFVnakovcWViWWcwSE4xUXRreXdiQlBpUFc5TGU0ZTlx?=
- =?utf-8?B?cUcwSjNtc0NGTm94dHpUSm9IcG0vNXdmU2RDNmJwVHlzaEIySnh5dllvSkZn?=
- =?utf-8?B?dndjRHI4eG1lV2FrbVJGYTd3aDk4MHduaXdWcFpwa2FJQldhcTlaV0ZSRERq?=
- =?utf-8?B?V2FSSDNobkl1UGtHMnVtSnVyeUVIWWFDSVZyR2toQ1J6NUF4Ry8xaC8xSmZv?=
- =?utf-8?B?YmNUUHloL0tWSnpNUTgzSmdqWXdOWVZDNzRVWEJCUEc1dGc0bno0eE00SU91?=
- =?utf-8?B?MWc1VTlOVVg0dmFoN3k0ZnFrRDBJVlh4RHVKUFJFU1RXSlNybnZWcWJXditk?=
- =?utf-8?B?UjVYbWVWeDQ0aTNDaTJLN0ZqK0gzd1dXanIrRkJSeCs4eU94WmlZWWMvczMr?=
- =?utf-8?B?ekxpTmVyU2g4ZGR0aXNHTlpQRHpDYms4d0VjcjVhQWVtR0dYUm9uNzM1cE1F?=
- =?utf-8?B?RS9wUS9UdG9LOWdGK05OYWFDZlh5NEp2S0lDVmZGdEQwbG5teW9OTjFFUCtF?=
- =?utf-8?B?a2U3ZWg3MUdPY1lRM3FkakZjZlVtM04xeVM2dnRPSmpFYVpuQjZUUUw2Q2tT?=
- =?utf-8?B?YTVVZGwyTFpCWWpoMVMzMzVSS1R6N0N5Nm5rMFd5TFd5RXg0dEpFSi9Ya2VG?=
- =?utf-8?B?WVlpQ2ZwUjRSTm5YWUJIRk44UTczN3d2VEl0REdkUktaelRvNWE0ZFI3U3gw?=
- =?utf-8?B?SWZaZUlvSUM4ZEhvZEN3dGhIWUhzNmZIT1VubnhlcHBqR2VwY2d4WGlGeW5Q?=
- =?utf-8?B?ME9GbzNWYk1UZ1diTW1KdFk3YTZ0Z0ZFblkwOEMxdzBmV1FGMGlkejVBR3c3?=
- =?utf-8?B?dUVuQjdiRlZIeFRqNkhjNDBrY3MwWnBUUzVuTjBCNjh6c3o5YkVEZS9vbFdR?=
- =?utf-8?B?MXhOM2FMajhnWnJiQWVmelJLNGkydWh1dEJTQ2RWRC9rNzdud1ZxUmtUSHRM?=
- =?utf-8?B?ZW1PRFJKMk8zNGpPSitBZkZQMUZlWU9Ob1Vic0NsbTFGVVpqdlhZWnpuWm9x?=
- =?utf-8?B?TzFQYmYrOUZ1OFlpT3daNGdLK1FlTlkyVTArZEhkRHJjZnZleVZ6ZmZWSFI3?=
- =?utf-8?B?S2JxTWVNODVUaE5vS2pTRVdHSzF3UVdtamtTSXNmSUVyM0IzZjBuODg5MVFJ?=
- =?utf-8?B?WWJSaDBZWnJEQXc0TW5LblVVQ1c3NVlwZEttSWoxMk5VZXEyMlZQbGFtdjl1?=
- =?utf-8?B?T2RSRzhsanpnQ2VURG5MaE54WGI2eTBiU0tnSkpTWXlyQmZyNFBLME55MUdo?=
- =?utf-8?B?TUVCNXNUNHdwRXdJc3RnYi9KY1VLKy94WXNrUlA5ZGNQdnZSZnlhaHVxVndW?=
- =?utf-8?B?L3JGNXY2RkxscldjaVhlcXducUJWdXhrWmRxZDdjRVdFclhEMm85WElubGxk?=
- =?utf-8?B?UDh4SmptT2tXT0JEc1NnVmJnODRMVzdsbi9ORE5DUEUraTFIOURNWFk5M2NL?=
- =?utf-8?B?YmVBU2t1VEwwZEFUUHU0dFhxdFB1cTlDN0xOelFOQ1gvWUdCbWFOWFl1aEVN?=
- =?utf-8?B?dWF4UnJVVW42UStKRElwRnNLWTFOdTVNMkxzKzNBekJHbTVGdzJQOVBsMnFt?=
- =?utf-8?B?UGdKa0dubzlDNGJsUXBNeEdQcmxJSGVhVjczZzFJNVp4YVZPRVRMN1ZPNVQ3?=
- =?utf-8?B?SXRUZzNiUlBnK1k2WXRkZlJuVG9QQ3QvWktsNW00U2JMTEdrdXR2cGhPck9M?=
- =?utf-8?B?S1VmVVo0WGU0OHE2cU1uc0J4cUdYdHZ6WlRLWjMrazJtbWxzUkt1SzdIbkIv?=
- =?utf-8?B?eDRpNTZqa29NNnJlRzNTUy9ETUJpcWs1UUpSaTAxMHNNUnNkRUx6VU9EeCt0?=
- =?utf-8?B?Ni9yVDhrSWEvRkJhMnhnU3NQRmc0YWR1ODJldFhla0kvZUZGNHc2a0JneEE3?=
- =?utf-8?B?VWJEUC96SDRwbGN4TjhlYkNGZG9qelUrLzA1SDlIczFVMTVSZFhyM0d2L1hN?=
- =?utf-8?B?S0JvR3dMdFdXeHREUWNCME84elVXaXFhek9yei9LeStrYVRkcWdjNVlubWRU?=
- =?utf-8?Q?EtbPbpLsfoDFomdSXG0uq+d/w?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MFlHK25WYVFGWWV0eWN1QWNHSGxNcXVxVktmS0dyK1RGdmlpVWdBelZrYW9H?=
+ =?utf-8?B?emQxdFRwRTZwd0JlelNPNnI1NTNKbzNwdEdMbEsyRmJQbGN1cWlMSjhHYlNw?=
+ =?utf-8?B?anVVb2cwVGhFNVFvRHRvclVKUGNTRTdLcTlxUzBPeHdqdjFNVHNWMTJBRFhJ?=
+ =?utf-8?B?aVJsSHpvbHdLdWt1QzFtSHR5VHVMdWRyYm9TMmM1R1Y0NythNGN4cElQTTdq?=
+ =?utf-8?B?Mi9VbDd4anptNHUwS2JEZE8wTUxJV2RYSnkzbEd0ZUx3c0ZwV2V5ZS8zLzEv?=
+ =?utf-8?B?aGU3Y21QRFEvbTluVHZLK1VWWmFhMzFYR2g0VHlJdi9WS2JLMFJ4NUZ5U2NH?=
+ =?utf-8?B?SDJ4bDRBSm5wc1hwempQS254YzlmUkJLM20vOVF0WUliT0F0cUViMmJ0dEZu?=
+ =?utf-8?B?UTROMS9xUGxMaGc3QmJkTDd6cVVaeW9QbmtNbUtLQXRIN0pUNkpTTUpBNjdE?=
+ =?utf-8?B?MDNFMDdOZnJiSWdETUl3MFlodkNIVytOcWJuSEovVzBsNDB1ZXZVazg3QUk1?=
+ =?utf-8?B?c1VQeWNBb3ltNEN4N1NGVlNUdTV1RnhNaVorMG5vcVhmRnpRUmpWUkpDWGdE?=
+ =?utf-8?B?Vm1TOUo1enZyMU95WlNYRVdMTDJNbjBSMG9WVjlaM0RNemdqSitHMXE4RE1M?=
+ =?utf-8?B?aHhaRXNDa05oWmV6R0lPbm1aYXluR3lsbWx3TStRb0dzZ3JuZlJnZGZodjV2?=
+ =?utf-8?B?RG1OalVDS3M4OUhYbjEyYnUwRHRXTHZPejlSSnpRRGZOd0xoSmpONnRkNGZ2?=
+ =?utf-8?B?d2F5eGVFSUZIOFlYU3NtTTl4Ung1Q1VOcHk2OXVIT1lwYXZRRzVnSEhJeDBI?=
+ =?utf-8?B?QTY2MWlPa0Uxd01FSEtaY0JLdGRtbHhqVFJvU29MaXRQRUloc0dycktPK2E4?=
+ =?utf-8?B?aWRHVy9pRUV3VWQ0M05MSTdYQm8vcHp3eHlCWUlnZnVkSVRUYU1KRDlJbk9Y?=
+ =?utf-8?B?MlpiT0ZVUmNIVU1uMWpUSDlpczlxODJKaVJmWTVubDhYaldEVTlZZGJwMnR2?=
+ =?utf-8?B?ZEUzNUdSV296ZWVjRlVwYWUvZjZzTWZQTHdSUUtwZkZzZFFia3Jqc09FSXB6?=
+ =?utf-8?B?eVh6V0pnNVNiRlZZR2JnMEZqUDVCSUdJWVBTSUdMUm5FZHM1T1JramI0YUtZ?=
+ =?utf-8?B?ejJIM2JWUUtWTzdLS3dkTW42TmVWUG9kZU1tb3ZTdnM1NEtZb0tPejNQb0pj?=
+ =?utf-8?B?bk4vNFg3Vm9kdW5FTldMN1A4bGpIemlMSXpSOWY4Z0hHYmkxTmNJdWxaK1V4?=
+ =?utf-8?B?OGhpbFFUbjFGK2E4UnZ4RjYvUFhSd2U0VzVGTmwrNk10YjdJK3MwZGhucVpP?=
+ =?utf-8?B?N2tHRWhHdHVlTnR3MUoxRUUyUVlGbGtBaVJvRGVKZ1VzcjV2L1BxcVROY1Rz?=
+ =?utf-8?B?cUdJVUZqbThWQlo5ZFhpbTlqdTJ5cUFVaERKcFhDZ1MzSWpVaXhpbTg5eGRx?=
+ =?utf-8?B?cU1HKzBoQUQreUM5ZGtZWkE3RzlVbUhhRmVyNUdSUlJJVG9RMjJuMDNqQXpT?=
+ =?utf-8?B?Q1NXZ1hSSm1yNHBsRksrUXB6THNGWkhTM0RFTGJDSkRCNFlTQ1dqK3pjRGNT?=
+ =?utf-8?B?TkgzQlRwdm90TnFCcFRWS25RZ2VuL25KUzFqQlJ1UGE3SVJ0VkNWdGR3bWpy?=
+ =?utf-8?B?ZitDcjhuNks2VXZIV0VwR29DcG5XcDhvZnFkUjVORWhjdnZkK0hEVFR6S3cr?=
+ =?utf-8?B?STZoOERYaGpqWEVsR0hIVjdJUzR2b2NkL0cxalQvK1NPWEhlSUwvQmRQZ0sr?=
+ =?utf-8?B?ektxaUpVN2FVU2JYV3ZWc2tJTUhEYzJ5aFZqb29ZZ1R2cVB5Q3Q2UTh6ckFD?=
+ =?utf-8?B?RjMxOGt3NTBDMUEyZjRwdmVhTzZOZnJXaXBiNE03SWFSODdKMWFvN1FDZ1dW?=
+ =?utf-8?B?OE9LWkE2ZEIva0hsZ01SVnRCVWNXeXJ5U3NoUWticlVaWGt0NUVtbkE3anQy?=
+ =?utf-8?B?RllIQ0UxMDQ5WmF0RGhDR0VCSXY3U2FaWEpKOE1EQk5XcEZoRVJiUnQ2UFUx?=
+ =?utf-8?B?cThEY1BQcjNjY09JblluYllTYXNyRXBoSEpYSzRmRnFkNlZUaE9oVThYbzIv?=
+ =?utf-8?B?K1Vva00rczZSYktTU0p2RGlLN0NXS25pTmJmeWs2M0NCU2U2eXBwWFNySGdG?=
+ =?utf-8?Q?geZbg1zg2u6K2reLfv9DXiCHn?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eef611a4-3402-43e4-cf76-08db03d69ebc
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc66b041-46cc-4cf2-8b86-08db03dc6a40
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2023 22:00:52.7396
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2023 22:42:21.5391
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fGJMagJtsEV2Ag0zFjabhHD1ib9xPeZEudN+5SjK9FIZA82cKMh57FE8YgoJ1pcZ2eMWdi26wpl53resfT+RKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8301
+X-MS-Exchange-CrossTenant-UserPrincipalName: ijCilJqp2Ey7WSMy5gKfOvrcklrqeikRNDJ0EMVRuj/5MrLtMYmolPTpQcKwNiWgccqUN6nOTVjnPvYCJYRi8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB6016
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 01/02/2023 08:21, Tom Lendacky wrote:
-> On 1/31/23 14:21, Alexey Kardashevskiy wrote:
->> On 01/02/2023 03:23, Tom Lendacky wrote:
->>> On 1/30/23 19:54, Alexey Kardashevskiy wrote:
->>>> On 11/1/23 13:01, Kalra, Ashish wrote:
->>>>> On 1/10/2023 6:48 PM, Alexey Kardashevskiy wrote:
->>>>>> On 10/1/23 19:33, Kalra, Ashish wrote:
->>>>>>> On 1/9/2023 8:28 PM, Alexey Kardashevskiy wrote:
->>>>>>>> On 10/1/23 10:41, Kalra, Ashish wrote:
->>>>>>>>> On 1/8/2023 9:33 PM, Alexey Kardashevskiy wrote:
->>>>>>>>>> On 15/12/22 06:40, Michael Roth wrote:
->>>>>>>>>>> From: Brijesh Singh <brijesh.singh@amd.com>
->>>>>>>>>>>
->>>>>>>>>>> Version 2 of GHCB specification added the support for two SNP 
->>>>>>>>>>> Guest
->>>>>>>>>>> Request Message NAE events. The events allows for an SEV-SNP 
->>>>>>>>>>> guest to
->>>>>>>>>>> make request to the SEV-SNP firmware through hypervisor using 
->>>>>>>>>>> the
->>>>>>>>>>> SNP_GUEST_REQUEST API define in the SEV-SNP firmware 
->>>>>>>>>>> specification.
->>>>>>>>>>>
->>>>>>>>>>> The SNP_EXT_GUEST_REQUEST is similar to SNP_GUEST_REQUEST 
->>>>>>>>>>> with the
->>>>>>>>>>> difference of an additional certificate blob that can be 
->>>>>>>>>>> passed through
->>>>>>>>>>> the SNP_SET_CONFIG ioctl defined in the CCP driver. The CCP 
->>>>>>>>>>> driver
->>>>>>>>>>> provides snp_guest_ext_guest_request() that is used by the 
->>>>>>>>>>> KVM to get
->>>>>>>>>>> both the report and certificate data at once.
->>>>>>>>>>>
->>>>>>>>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->>>>>>>>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->>>>>>>>>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
->>>>>>>>>>> ---
-> 
+On 1/31/23 16:00, Alexey Kardashevskiy wrote:
+> On 01/02/2023 08:21, Tom Lendacky wrote:
+>> On 1/31/23 14:21, Alexey Kardashevskiy wrote:
+>>> On 01/02/2023 03:23, Tom Lendacky wrote:
+>>>> On 1/30/23 19:54, Alexey Kardashevskiy wrote:
+>>>>> On 11/1/23 13:01, Kalra, Ashish wrote:
+>>>>>> On 1/10/2023 6:48 PM, Alexey Kardashevskiy wrote:
+>>>>>>> On 10/1/23 19:33, Kalra, Ashish wrote:
+>>>>>>>> On 1/9/2023 8:28 PM, Alexey Kardashevskiy wrote:
+>>>>>>>>> On 10/1/23 10:41, Kalra, Ashish wrote:
+>>>>>>>>>> On 1/8/2023 9:33 PM, Alexey Kardashevskiy wrote:
+>>>>>>>>>>> On 15/12/22 06:40, Michael Roth wrote:
+>>>>>>>>>>>> From: Brijesh Singh <brijesh.singh@amd.com>
+>>>>>>>>>>>>
+>>>>>>>>>>>> Version 2 of GHCB specification added the support for two SNP 
+>>>>>>>>>>>> Guest
+>>>>>>>>>>>> Request Message NAE events. The events allows for an SEV-SNP 
+>>>>>>>>>>>> guest to
+>>>>>>>>>>>> make request to the SEV-SNP firmware through hypervisor using the
+>>>>>>>>>>>> SNP_GUEST_REQUEST API define in the SEV-SNP firmware 
+>>>>>>>>>>>> specification.
+>>>>>>>>>>>>
+>>>>>>>>>>>> The SNP_EXT_GUEST_REQUEST is similar to SNP_GUEST_REQUEST with 
+>>>>>>>>>>>> the
+>>>>>>>>>>>> difference of an additional certificate blob that can be 
+>>>>>>>>>>>> passed through
+>>>>>>>>>>>> the SNP_SET_CONFIG ioctl defined in the CCP driver. The CCP 
+>>>>>>>>>>>> driver
+>>>>>>>>>>>> provides snp_guest_ext_guest_request() that is used by the KVM 
+>>>>>>>>>>>> to get
+>>>>>>>>>>>> both the report and certificate data at once.
+>>>>>>>>>>>>
+>>>>>>>>>>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>>>>>>>>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>>>>>>>>>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>>>>>>>>>>>> ---
+>>
+>>>>>
+>>>>> And GET ioctls() return what SET passed on (not something the firware 
+>>>>> returned, for example), what is ever going to call SET? The userspace 
+>>>>> can 
 >>>>
->>>> And GET ioctls() return what SET passed on (not something the 
->>>> firware returned, for example), what is ever going to call SET? The 
->>>> userspace can 
+>>>> As stated above, the firmware already has the information needed to 
+>>>> sign the attestation report. The SET IOCTL is used to supply the 
+>>>> certficates to the guest for validation of the attestation report.
 >>>
->>> As stated above, the firmware already has the information needed to 
->>> sign the attestation report. The SET IOCTL is used to supply the 
->>> certficates to the guest for validation of the attestation report.
+>>>
+>>> Does the firmware have to have all certificates beforehand? How does 
+>>> the firmware choose which certificate to use for a specific VM, or just 
+>>> signs all reports with all certificates it knows?
 >>
->>
->> Does the firmware have to have all certificates beforehand? How does 
->> the firmware choose which certificate to use for a specific VM, or 
->> just signs all reports with all certificates it knows?
+>>  From the SNP API spec, the firmware uses the VCEK, which is derived 
+>> from chip-unique secrets, to sign the attestation report.
 > 
->  From the SNP API spec, the firmware uses the VCEK, which is derived 
-> from chip-unique secrets, to sign the attestation report.
+> Does the firmware derive it? How does the guest gets to know it?
+> (forgive me my ignorance)
 
-Does the firmware derive it? How does the guest gets to know it?
-(forgive me my ignorance)
+Yes, the firmware derives the private key. The guest doesn't know the 
+private key, it gets the VCEK certificate which has the public key and can 
+then validate the attestation report.
 
-
-> The guest can then use the returned VCEK certificate, the ASK 
-> certificate and ARK certificate from the extended guest request to 
-> validate the attestation report.
-
->>
->>
->>> This reduces the traffic and complexity of the guest requesting the 
->>> certficates from the KDS.
->>
->> Guest <-> HV interaction is clear, I am only wondering about HV <-> FW.
 > 
-> I'm not sure what you mean here. The HV doesn't put the signing key in 
-> the firmware, it is derived.
+> 
+>> The guest can then use the returned VCEK certificate, the ASK 
+>> certificate and ARK certificate from the extended guest request to 
+>> validate the attestation report.
+> 
+>>>
+>>>
+>>>> This reduces the traffic and complexity of the guest requesting the 
+>>>> certficates from the KDS.
+>>>
+>>> Guest <-> HV interaction is clear, I am only wondering about HV <-> FW.
+>>
+>> I'm not sure what you mean here. The HV doesn't put the signing key in 
+>> the firmware, it is derived.
+> 
+> 
+> Those ioctls() are in the HV and they take certificates which then get 
+> sent to the guest but not to the firmware. The firmware signs a report 
+> with a key and the guest needs another half of it to verify the report. 
+> Sadly I do not know cryptography enough.
 
+Correct, no need to send the certificates to the firmware. The certs have 
+the public key which can be used to verify the report signed with the 
+private key.
 
-Those ioctls() are in the HV and they take certificates which then get 
-sent to the guest but not to the firmware. The firmware signs a report 
-with a key and the guest needs another half of it to verify the report. 
-Sadly I do not know cryptography enough.
+Thanks,
+Tom
 
-
-
--- 
-Alexey
+> 
+> 
+> 
