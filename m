@@ -2,140 +2,134 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE543C6379F
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 08:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5093BC636CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Jan 2023 08:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbjAaIOb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:14:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35884 "EHLO
+        id S229874AbjAaIas (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:30:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbjAaIOa (ORCPT
+        with ESMTP id S229468AbjAaIar (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:14:30 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66BC52FCC0
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Jan 2023 00:14:28 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pMlm9-0006LX-25; Tue, 31 Jan 2023 09:13:57 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pMlm8-001eFc-BD; Tue, 31 Jan 2023 09:13:55 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pMlm6-00HHHl-Bx; Tue, 31 Jan 2023 09:13:54 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Tudor Ambarus <tudor.ambarus@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de
-Subject: [PATCH] crypto: atmel-i2c: Drop unused id parameter from atmel_i2c_probe()
-Date:   Tue, 31 Jan 2023 09:13:51 +0100
-Message-Id: <20230131081351.165235-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.39.0
+        Tue, 31 Jan 2023 03:30:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1271B568;
+        Tue, 31 Jan 2023 00:30:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 164F5613B3;
+        Tue, 31 Jan 2023 08:30:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C10BC4339C;
+        Tue, 31 Jan 2023 08:30:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675153845;
+        bh=MmjALNBfvdWez2aR1yaJB9INPg8W1OfRoP5fkM954vw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=TUwn/use7R8focdO/D8XyPR51jHzLktKeJnPHAnzeaQapurYbx9vLbJ0pT3DmYdA6
+         jpx3Jri7T5VreOd+bxA71QMgjfpvfFGCKe4pa8kdRDXN+D1vqDxBJgQ3I+UYN4tl7i
+         lYU0R50hdDlsmadRJ986cKuUn3ruW4mZcoaB/hKdrCsrmZEZV6NKi7wS0ITwdecJaO
+         cSdIHbRKFFYJz8rF+JloV4DaxwFohNyAdNUmp24W2lVVUW81MyDo4Hww4UW5RXr132
+         T0Wy0nFwjMv7mWO54IV+KhS/WbXSF5RW5O+ND0ug5jPFH1f0s/cKJQ7dhpsrYKJMWc
+         fWAKX2SnbANew==
+Received: by mail-lj1-f170.google.com with SMTP id b13so5260670ljf.8;
+        Tue, 31 Jan 2023 00:30:45 -0800 (PST)
+X-Gm-Message-State: AO0yUKUrB/wH7LMyae9Je+w6BlUuK3UFlNckD7Rdwwg6LN2aAGT7LKrO
+        PLwC6S7BGGucvpX9XXRXURrn58RGNfOUEeQR3fw=
+X-Google-Smtp-Source: AK7set+BvU5t5r0neeqP/RNCa/kypJDMf0Gt0f37PPU2RJLIfUOoFIiw8IEz9/q9sLhyWW3vk+67UroolmT+b7AJFw4=
+X-Received: by 2002:a2e:91cc:0:b0:290:5920:fc30 with SMTP id
+ u12-20020a2e91cc000000b002905920fc30mr1241931ljg.128.1675153843490; Tue, 31
+ Jan 2023 00:30:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2811; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=RlwnWuVIIpRybU88j7KMHkdk6doB4l9M+k7cgJOSprg=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBj2M276DqXefzpaxUi9jOoCA+C1yinbOvxC5xPD6gi /VemPDKJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCY9jNuwAKCRDB/BR4rcrsCYm6B/ 92ACNrrj6Um+7c0e4I8SWx54yj4YMJOGCxUBG/DX4QV2UHjG8jGyt+7yJdV/M1m8Cxq3i+NLV5a8iB 74MwUkqmeDSHPdQGcnDF7qIEyf0RlTRMmRVP47JSg8cSxlMagy+WlEdNfodAzjazOWbyhbQclIrl0c uTl7BUlEnMk9cLW9gnRK4XQC45DYacujO2vJMuRU2BasOXlidewvnv7N+lb04IbTszUV2d4SPLa8Q/ zatCYBxJf4i4Vwofucg+yddTQdayPDDUtM+Zs4FdmFxdQkIesNiBBCPczyZPHwrXtq3/8SonG0zSU0 tSseBTj4oJ0Ndb0FQkzWRXZgK5bKdp
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <20230121183450.14570-1-peter@n8pjl.ca>
+In-Reply-To: <20230121183450.14570-1-peter@n8pjl.ca>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 31 Jan 2023 09:30:32 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFd+SXvpTyFrQVBHeODHNABn6pvG4Go0E3YEDH=ArqRAw@mail.gmail.com>
+Message-ID: <CAMj1kXFd+SXvpTyFrQVBHeODHNABn6pvG4Go0E3YEDH=ArqRAw@mail.gmail.com>
+Subject: Re: [PATCH RESEND] crypto: x86 - exit fpu context earlier in ECB/CBC macros
+To:     Peter Lafreniere <peter@n8pjl.ca>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        conor.dooley@microchip.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-id is unused in atmel_i2c_probe() and the callers have extra efforts to
-determine the right parameter. So drop the parameter simplifying both
-atmel_i2c_probe() and its callers.
+On Sat, 21 Jan 2023 at 19:40, Peter Lafreniere <peter@n8pjl.ca> wrote:
+>
+> Currently the ecb/cbc macros hold fpu context unnecessarily when using
+> scalar cipher routines (e.g. when handling odd sizes of blocks per walk).
+>
+> Change the macros to drop fpu context as soon as the fpu is out of use.
+>
+> No performance impact found (on Intel Haswell).
+>
+> Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
-Hello,
+The patch seems correct to me, so
 
-just found a nice optimisation while grepping for something else in the
-tree ...
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-Best regards
-Uwe
+although I seriously doubt whether anyone would ever notice the
+difference, given that the algorithms that use these macros are
+primarily used in legacy block encryption scenarios, where the data is
+always presented in multiples of the largest block size.
 
- drivers/crypto/atmel-ecc.c     | 3 +--
- drivers/crypto/atmel-i2c.c     | 2 +-
- drivers/crypto/atmel-i2c.h     | 2 +-
- drivers/crypto/atmel-sha204a.c | 3 +--
- 4 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 12205e2b53b4..aac64b555204 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -313,11 +313,10 @@ static struct kpp_alg atmel_ecdh_nist_p256 = {
- 
- static int atmel_ecc_probe(struct i2c_client *client)
- {
--	const struct i2c_device_id *id = i2c_client_get_device_id(client);
- 	struct atmel_i2c_client_priv *i2c_priv;
- 	int ret;
- 
--	ret = atmel_i2c_probe(client, id);
-+	ret = atmel_i2c_probe(client);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 66e27f71e37e..83a9093eff25 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -324,7 +324,7 @@ static int device_sanity_check(struct i2c_client *client)
- 	return ret;
- }
- 
--int atmel_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
-+int atmel_i2c_probe(struct i2c_client *client)
- {
- 	struct atmel_i2c_client_priv *i2c_priv;
- 	struct device *dev = &client->dev;
-diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index c1fdc04eac07..c0bd429ee2c7 100644
---- a/drivers/crypto/atmel-i2c.h
-+++ b/drivers/crypto/atmel-i2c.h
-@@ -167,7 +167,7 @@ struct atmel_i2c_work_data {
- 	struct atmel_i2c_cmd cmd;
- };
- 
--int atmel_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id);
-+int atmel_i2c_probe(struct i2c_client *client);
- 
- void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
- 		       void (*cbk)(struct atmel_i2c_work_data *work_data,
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index 272a06f0b588..4403dbb0f0b1 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -93,11 +93,10 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, void *data, size_t max,
- 
- static int atmel_sha204a_probe(struct i2c_client *client)
- {
--	const struct i2c_device_id *id = i2c_client_get_device_id(client);
- 	struct atmel_i2c_client_priv *i2c_priv;
- 	int ret;
- 
--	ret = atmel_i2c_probe(client, id);
-+	ret = atmel_i2c_probe(client);
- 	if (ret)
- 		return ret;
- 
-
-base-commit: f160a0e64f0f80a82f797ea7aa007e41ba8ed441
--- 
-2.39.0
-
+> ---
+>  arch/x86/crypto/ecb_cbc_helpers.h | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/crypto/ecb_cbc_helpers.h b/arch/x86/crypto/ecb_cbc_helpers.h
+> index eaa15c7b29d6..11955bd01af1 100644
+> --- a/arch/x86/crypto/ecb_cbc_helpers.h
+> +++ b/arch/x86/crypto/ecb_cbc_helpers.h
+> @@ -13,13 +13,14 @@
+>
+>  #define ECB_WALK_START(req, bsize, fpu_blocks) do {                    \
+>         void *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));   \
+> +       const int __fpu_blocks = (fpu_blocks);                          \
+>         const int __bsize = (bsize);                                    \
+>         struct skcipher_walk walk;                                      \
+>         int err = skcipher_walk_virt(&walk, (req), false);              \
+>         while (walk.nbytes > 0) {                                       \
+>                 unsigned int nbytes = walk.nbytes;                      \
+> -               bool do_fpu = (fpu_blocks) != -1 &&                     \
+> -                             nbytes >= (fpu_blocks) * __bsize;         \
+> +               bool do_fpu = __fpu_blocks != -1 &&                     \
+> +                             nbytes >= __fpu_blocks * __bsize;         \
+>                 const u8 *src = walk.src.virt.addr;                     \
+>                 u8 *dst = walk.dst.virt.addr;                           \
+>                 u8 __maybe_unused buf[(bsize)];                         \
+> @@ -35,7 +36,12 @@
+>  } while (0)
+>
+>  #define ECB_BLOCK(blocks, func) do {                                   \
+> -       while (nbytes >= (blocks) * __bsize) {                          \
+> +       const int __blocks = (blocks);                                  \
+> +       if (do_fpu && __blocks < __fpu_blocks) {                        \
+> +               kernel_fpu_end();                                       \
+> +               do_fpu = false;                                         \
+> +       }                                                               \
+> +       while (nbytes >= __blocks * __bsize) {                          \
+>                 (func)(ctx, dst, src);                                  \
+>                 ECB_WALK_ADVANCE(blocks);                               \
+>         }                                                               \
+> @@ -53,7 +59,12 @@
+>  } while (0)
+>
+>  #define CBC_DEC_BLOCK(blocks, func) do {                               \
+> -       while (nbytes >= (blocks) * __bsize) {                          \
+> +       const int __blocks = (blocks);                                  \
+> +       if (do_fpu && __blocks <  __fpu_blocks) {                       \
+> +               kernel_fpu_end();                                       \
+> +               do_fpu = false;                                         \
+> +       }                                                               \
+> +       while (nbytes >= __blocks * __bsize) {                          \
+>                 const u8 *__iv = src + ((blocks) - 1) * __bsize;        \
+>                 if (dst == src)                                         \
+>                         __iv = memcpy(buf, __iv, __bsize);              \
+> --
+> 2.39.0
+>
