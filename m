@@ -2,86 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8FDC05027
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 14:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FA89C636CD
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 16:00:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230417AbjBAOhq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Feb 2023 09:37:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
+        id S231245AbjBAQAI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 11:00:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbjBAOhq (ORCPT
+        with ESMTP id S231963AbjBAQAG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2023 09:37:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E91D69513
-        for <linux-crypto@vger.kernel.org>; Wed,  1 Feb 2023 06:36:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675262209;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8/dpDM/3REEz3eyiAc+dJjDInqTxFwwyfLND3C6oXCQ=;
-        b=EPxkDWp7sVJUosiE/bWnBgLYsaIUAIqDbf1o0rAkAIv2zDxGG4fPVFlrNb0hhC2RQB6PCW
-        KpPXrl0iEFTfEMJ0j9mFTvpuOSLHh2PK1tLPCt4yFqdLMYs6U72JZMzFksAJOCR8tw4C3e
-        zumwWt11E0oT5CKndtj4gIzGkgV6ER4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-292-20SeWIIfNo2jUTyP7mdrOw-1; Wed, 01 Feb 2023 09:36:46 -0500
-X-MC-Unique: 20SeWIIfNo2jUTyP7mdrOw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3223C1C08793;
-        Wed,  1 Feb 2023 14:36:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44A41492B05;
-        Wed,  1 Feb 2023 14:36:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
-References: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, smfrench@gmail.com, viro@zeniv.linux.org.uk,
-        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
-        metze@samba.org, hch@infradead.org, willy@infradead.org,
-        jlayton@kernel.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sfrench@samba.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 05/12] cifs: Add a function to Hash the contents of an iterator
+        Wed, 1 Feb 2023 11:00:06 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C16273B;
+        Wed,  1 Feb 2023 07:59:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675267195; x=1706803195;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0J/+bcc/kBvFoqYMM1Kp8Sv8LAgfC3hzyVRuwc24ypo=;
+  b=fuePT1qEVBXeZlNmF3BLya8LJEKfTY89IFpGdAgBIiBg08iG1PEr7Hz3
+   /GUE8b0fu+aDM/9oBU8ZoplSv6yfL2X19hB5prI8g7on2tMwNywox59sN
+   HTDTgH/G8KUIpwEzWDQWQh4gddH4gqQMEni38AEFX4Opt2+FM5ZvvqOgm
+   3fJTWRIUoXNru47Jbr2ndMjZ7OY4KvCYriFKLkbloOkoKicLGdCVXc3Tm
+   e6JlUa27uYAmCwkWCRzV2l0R3E53TFYTedepTN4Ttd4Q9ufW+57PaxrN3
+   Xoscm6G2oExyeTbhEIlQ+1wYg4ZOSwcg/ksCXSp2cjfIB8nHyUwfwmzxP
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="414389921"
+X-IronPort-AV: E=Sophos;i="5.97,263,1669104000"; 
+   d="scan'208";a="414389921"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2023 07:59:52 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="695396360"
+X-IronPort-AV: E=Sophos;i="5.97,263,1669104000"; 
+   d="scan'208";a="695396360"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga008.jf.intel.com with ESMTP; 01 Feb 2023 07:59:50 -0800
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        stable@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>,
+        Fiona Trahe <fiona.trahe@intel.com>
+Subject: [PATCH] crypto: qat - fix out-of-bounds read
+Date:   Wed,  1 Feb 2023 15:59:44 +0000
+Message-Id: <20230201155944.23379-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <312907.1675262203.1@warthog.procyon.org.uk>
-Date:   Wed, 01 Feb 2023 14:36:43 +0000
-Message-ID: <312908.1675262203@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+When preparing an AER-CTR request, the driver copies the key provided by
+the user into a data structure that is accessible by the firmware.
+If the target device is QAT GEN4, the key size is rounded up by 16 since
+a rounded up size is expected by the device.
+If the key size is rounded up before the copy, the size used for copying
+the key might be bigger than the size of the region containing the key,
+causing an out-of-bounds read.
 
-> > Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
-> > iterator into a symmetric hash algorithm.
-> 
-> There is no such thing as a symmetric hash.  You're using shash
-> which stands for synchronous hash.
+Fix by doing the copy first and then update the keylen.
 
-Sorry, you're right.
+This is to fix the following warning reported by KASAN:
 
-> In any case, as I said in the previous review this is abusing the
-> shash API.  Please use ahash instead.
+	[  138.150574] BUG: KASAN: global-out-of-bounds in qat_alg_skcipher_init_com.isra.0+0x197/0x250 [intel_qat]
+	[  138.150641] Read of size 32 at addr ffffffff88c402c0 by task cryptomgr_test/2340
 
-It's already abusing the shash API, this doesn't change that, except where it
-gets the data from.
+	[  138.150651] CPU: 15 PID: 2340 Comm: cryptomgr_test Not tainted 6.2.0-rc1+ #45
+	[  138.150659] Hardware name: Intel Corporation ArcherCity/ArcherCity, BIOS EGSDCRB1.86B.0087.D13.2208261706 08/26/2022
+	[  138.150663] Call Trace:
+	[  138.150668]  <TASK>
+	[  138.150922]  kasan_check_range+0x13a/0x1c0
+	[  138.150931]  memcpy+0x1f/0x60
+	[  138.150940]  qat_alg_skcipher_init_com.isra.0+0x197/0x250 [intel_qat]
+	[  138.151006]  qat_alg_skcipher_init_sessions+0xc1/0x240 [intel_qat]
+	[  138.151073]  crypto_skcipher_setkey+0x82/0x160
+	[  138.151085]  ? prepare_keybuf+0xa2/0xd0
+	[  138.151095]  test_skcipher_vec_cfg+0x2b8/0x800
 
-I can have a go at conversion to ahash, but that will have to be a separate
-patch set as it isn't trivial.  The problem is that the current code just
-assumes it can push bits into the hash as it gets them - this is not possible
-with ahash.
+Fixes: 67916c951689 ("crypto: qat - add AES-CTR support for QAT GEN4 devices")
+Cc: <stable@vger.kernel.org>
+Reported-by: Vladis Dronov <vdronov@redhat.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-David
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index b4b9f0aa59b9..b61ada559158 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -435,8 +435,8 @@ static void qat_alg_skcipher_init_com(struct qat_alg_skcipher_ctx *ctx,
+ 	} else if (aes_v2_capable && mode == ICP_QAT_HW_CIPHER_CTR_MODE) {
+ 		ICP_QAT_FW_LA_SLICE_TYPE_SET(header->serv_specif_flags,
+ 					     ICP_QAT_FW_LA_USE_UCS_SLICE_TYPE);
+-		keylen = round_up(keylen, 16);
+ 		memcpy(cd->ucs_aes.key, key, keylen);
++		keylen = round_up(keylen, 16);
+ 	} else {
+ 		memcpy(cd->aes.key, key, keylen);
+ 	}
+-- 
+2.39.1
 
