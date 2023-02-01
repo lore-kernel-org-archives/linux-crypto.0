@@ -2,211 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E871C636CC
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 02:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E02EC38142
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 06:55:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230009AbjBACxp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Jan 2023 21:53:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
+        id S229963AbjBAGzD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 01:55:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbjBACxp (ORCPT
+        with ESMTP id S229483AbjBAGzC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Jan 2023 21:53:45 -0500
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C994910DF
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Jan 2023 18:53:42 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VaZDSP3_1675220019;
-Received: from 30.240.102.229(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VaZDSP3_1675220019)
-          by smtp.aliyun-inc.com;
-          Wed, 01 Feb 2023 10:53:39 +0800
-Message-ID: <b83ca139-1e8c-60f3-939f-15f727710c36@linux.alibaba.com>
-Date:   Wed, 1 Feb 2023 10:53:37 +0800
+        Wed, 1 Feb 2023 01:55:02 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A134D1ABC6;
+        Tue, 31 Jan 2023 22:54:23 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33D52B820E3;
+        Wed,  1 Feb 2023 06:54:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5FDC433D2;
+        Wed,  1 Feb 2023 06:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675234459;
+        bh=KMtVzKmdPlrQIUHaXY0uBFlMTKi/xJ843BQMk9glniY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Wly5c+fZHIaF4HwWcpKHwCgt9WVmBSJXE3Ak9cFw/nW187YoruMo39FTtOPs0TG9J
+         j4ygeOopPRZ4NexqPAknlOgEbU38rjyWqpaXUYagHVdcvmwc03Xfr5OfEvcNTam30U
+         Qjop95KIdM0NF7+9w0dw01dT7t5ah1pCCACkSWUfHg5uzQh1RoApvMMARtfrabmVB6
+         iw3tf5AHTI72H6CQuBqvXmSWxOfPfHfSmzml1IY2WKZdgloZBIBkooK5Qvof4eD+XW
+         OBkpUZcjPkSmc23PL82USP8dZZZpPxRoWwRz3gixLmY5up36+F4Zw/5u6sR2S9OwK5
+         4J53/kezSfjUw==
+Date:   Tue, 31 Jan 2023 22:54:17 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Jann Horn <jannh@google.com>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Roxana Bradescu <roxabee@chromium.org>,
+        Adam Langley <agl@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
+Message-ID: <Y9oMmYWzy7mlk3D9@sol.localdomain>
+References: <20230125012801.362496-1-ebiggers@kernel.org>
+ <14506678-918f-81e1-2c26-2b347ff50701@intel.com>
+ <CAG48ez1NaWarARJj5SBdKKTYFO2MbX7xO75Rk0Q2iK8LX4BwFA@mail.gmail.com>
+ <394c92e2-a9aa-37e1-7a34-d7569ac844fd@intel.com>
+ <CAG48ez0ZK3pMqkto4DTZPNyddYcv8jPHQDNhYoFEPvSRLf80fQ@mail.gmail.com>
+ <e37a17c4-8611-6d1d-85ad-fcd04ff285e1@intel.com>
+ <Y9MAvhQYlOe4l2BM@gmail.com>
+ <8b2771ce-9cfa-54cc-de6b-e80ce7af0a93@intel.com>
+ <16e3217b-1561-51ea-7514-014e27240402@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH] crypto: arm64/aes-ccm - Rewrite skcipher walker loop
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-References: <Y9eGyzZ+JAqRQvtm@gondor.apana.org.au>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <Y9eGyzZ+JAqRQvtm@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <16e3217b-1561-51ea-7514-014e27240402@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jan 31, 2023 at 02:48:05PM -0800, Dave Hansen wrote:
+> We've been talking about this inside Intel.  Suffice to say that DOITM
+> was not designed to be turned on all the time.  If software turns it on
+> all the time, it won't accomplish what it was designed to do.
 
+Why wouldn't it accomplish what it is designed to do?  Does it not actually
+work?
 
-On 1/30/23 4:58 PM, Herbert Xu wrote:
-> An often overlooked aspect of the skcipher walker API is that an
-> error is not just indicated by a non-zero return value, but by the
-> fact that walk->nbytes is zero.
 > 
-> Thus it is an error to call skcipher_walk_done after getting back
-> walk->nbytes == 0 from the previous interaction with the walker.
+> The _most_ likely thing that's going to happen is that DOITM gets
+> redefined to be much more limited in scope.  The current DOITM
+> architecture is very broad, but the implementations have much more
+> limited effects.  This means that the architecture can probably be
+> constrained and still match the hardware that's out there today.  That's
+> pure speculation (ha!) on my part.
+>
+> I think we should hold off on merging any DOITM patches until the dust
+> settles.  As far as I know, there is no pressing practical reason to
+> apply something urgently.
 > 
-> This is because when walk->nbytes is zero the walker is left in
-> an undefined state and any further calls to it may try to free
-> uninitialised stack memory.
-> 
-> The arm64 ccm code has to deal with zero-length messages, and
-> it needs to process data even when walk->nbytes == 0 is returned.
-> It doesn't have this bug because there is an explicit check for
-> walk->nbytes != 0 prior to the skcipher_walk_done call.
-> 
-> However, the loop is still sufficiently different from the usual
-> layout and it appears to have been copied into other code which
-> then ended up with this bug.  This patch rewrites it to follow the
-> usual convention of checking walk->nbytes.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> index c4f14415f5f0..25cd3808ecbe 100644
-> --- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-> +++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-> @@ -161,43 +161,39 @@ static int ccm_encrypt(struct aead_request *req)
->   	memcpy(buf, req->iv, AES_BLOCK_SIZE);
->   
->   	err = skcipher_walk_aead_encrypt(&walk, req, false);
-> -	if (unlikely(err))
-> -		return err;
->   
->   	kernel_neon_begin();
->   
->   	if (req->assoclen)
->   		ccm_calculate_auth_mac(req, mac);
->   
-> -	do {
-> +	while (walk.nbytes) {
->   		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
-> +		bool final = walk.nbytes == walk.total;
->   
-> -		if (walk.nbytes == walk.total)
-> +		if (final)
->   			tail = 0;
->   
->   		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
->   				   walk.nbytes - tail, ctx->key_enc,
->   				   num_rounds(ctx), mac, walk.iv);
->   
-> -		if (walk.nbytes == walk.total)
-> -			ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
-> +		if (!final)
-> +			kernel_neon_end();
-> +		err = skcipher_walk_done(&walk, tail);
-> +		if (!final)
-> +			kernel_neon_begin();
-> +	}
->   
-> -		kernel_neon_end();
-> +	ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
->   
-> -		if (walk.nbytes) {
-> -			err = skcipher_walk_done(&walk, tail);
-> -			if (unlikely(err))
-> -				return err;
-> -			if (unlikely(walk.nbytes))
-> -				kernel_neon_begin();
-> -		}
-> -	} while (walk.nbytes);
-> +	kernel_neon_end();
->   
->   	/* copy authtag to end of dst */
->   	scatterwalk_map_and_copy(mac, req->dst, req->assoclen + req->cryptlen,
->   				 crypto_aead_authsize(aead), 1);
->   
-> -	return 0;
-> +	return err;
->   }
+> Any objections?
 
-I think the following is a more cleaner rewriting form of the loop,
-which handles the last chunk separately, and both gcm and ccm can be
-handled similarly.
+Does this mean that Intel will be restoring the data operand independent timing
+guarantee of some instructions that have had it removed?  If so, which
+instructions will still be left?
 
-	while (walk.nbytes != walk.total) {
-		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+Also, given that the DOITM flag can only be set and cleared by the kernel, and
+assuming that Linux won't support DOITM in any way yet (as you're recommending),
+what should the developers of userspace cryptographic libraries do?  Does Intel
+have a list of which instructions *already* have started having data operand
+dependent timing on released CPUs, so that the existing security impact can be
+assessed and so that developers can avoid using those instructions?
 
-		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-				   walk.nbytes - tail, ctx->key_enc,
-				   num_rounds(ctx), mac, walk.iv);
-
-		kernel_neon_end();
-
-		err = skcipher_walk_done(&walk, tail);
-
-		kernel_neon_begin();
-	}
-
-	if (walk.nbytes) {
-		ce_aes_ccm_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-				   walk.nbytes, ctx->key_enc,
-				   num_rounds(ctx), mac, walk.iv);
-
-		err = skcipher_walk_done(&walk, 0);
-	}
-
-	ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
-
-	kernel_neon_end();
-
-
-I have tested it initially. What are your opinions？
-
->   
->   static int ccm_decrypt(struct aead_request *req)
-> @@ -219,37 +215,36 @@ static int ccm_decrypt(struct aead_request *req)
->   	memcpy(buf, req->iv, AES_BLOCK_SIZE);
->   
->   	err = skcipher_walk_aead_decrypt(&walk, req, false);
-> -	if (unlikely(err))
-> -		return err;
->   
->   	kernel_neon_begin();
->   
->   	if (req->assoclen)
->   		ccm_calculate_auth_mac(req, mac);
->   
-> -	do {
-> +	while (walk.nbytes) {
->   		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
-> +		bool final = walk.nbytes == walk.total;
->   
-> -		if (walk.nbytes == walk.total)
-> +		if (final)
->   			tail = 0;
->   
->   		ce_aes_ccm_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
->   				   walk.nbytes - tail, ctx->key_enc,
->   				   num_rounds(ctx), mac, walk.iv);
->   
-> -		if (walk.nbytes == walk.total)
-> -			ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
-> +		if (!final)
-> +			kernel_neon_end();
-> +		err = skcipher_walk_done(&walk, tail);
-> +		if (!final)
-> +			kernel_neon_begin();
-> +	}
->   
-> -		kernel_neon_end();
-> +	ce_aes_ccm_final(mac, buf, ctx->key_enc, num_rounds(ctx));
->   
-> -		if (walk.nbytes) {
-> -			err = skcipher_walk_done(&walk, tail);
-> -			if (unlikely(err))
-> -				return err;
-> -			if (unlikely(walk.nbytes))
-> -				kernel_neon_begin();
-> -		}
-> -	} while (walk.nbytes);
-> +	kernel_neon_end();
-> +
-> +	if (unlikely(err))
-> +		return err;
->   
->   	/* compare calculated auth tag with the stored one */
->   	scatterwalk_map_and_copy(buf, req->src,
+- Eric
