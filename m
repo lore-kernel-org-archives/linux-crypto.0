@@ -2,288 +2,199 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F004C05027
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 17:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF14C38142
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 17:21:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbjBAROp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Feb 2023 12:14:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S231685AbjBARVA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 12:21:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjBAROo (ORCPT
+        with ESMTP id S232159AbjBARU6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2023 12:14:44 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2057.outbound.protection.outlook.com [40.107.93.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28AB71AE;
-        Wed,  1 Feb 2023 09:14:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dmw2zsKbl9nBgpreaaV+9qjvu1yYizgs0AE88Wsoi2XgYo1PGQyTDGqhhZTki6lylfkOza+dXHmTtFLjdWlr4AaatbQGtS27ZfGzehECN9o6k5/WRNzG+NFVwXgRssi3KKil1qUCP6uFmK1r5h0H2z0ODqw/cp1Er2BpC/AYaRf8XxQWGTfTfjQuLLtW4bj4dy3Dsj9565JdmuDEMkUGhZCuWdPPQb/mW2eu4KCB4Q5cMo35Te4D4yXnXyeN4c+ex3SoL93LN/PTZ4eEtjla5pD15IoPUe6oD/s3/+ny4uayiYMRghmWpTr4gdAeZorLbmNWanV5x3tLu7RDG+Pjkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dHg7VcZi6mhfgVEot8Xfo6rGddRf+Vq02u3jPhmUstQ=;
- b=AjEGYPcWvqOqpISTjJj5RQ7Up8b+ztx9gxAOHAEJ/KR4i6dO4h2Gv7NFEXqmESn7Ykm+fNBGnTDOzZs+QBphklFpUTypeod8xE5LAC9K0AwJpOmKZsoiZPmn3gaWb6WG02EQfFypMhYsDBAxNOl0/MhLotuX1aOra/zsU73vs2kXUQeKOlaqUEmyUdMHMz6JZH5rSQerm9bo/zrL9GS0LFbhXQOz2vch412FGKizU4PON2Gi+yJNZnHRVvk6g9HT9evHm7K7gt7gY0ZfdevmMcHMH6BTxMzfB5U29H4hgJ0B1pW9g8c2JqwYvyWDOhvlFZT9090Wb6f6wgMufV7Aww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dHg7VcZi6mhfgVEot8Xfo6rGddRf+Vq02u3jPhmUstQ=;
- b=0ypcZNBmRO444E1xgWtqFC3SBDnfJMz4EwULOdiN5O8nvAUEle68yaApjtNI0DYErSj3edXChCLXWTypsGq/kESF5EsPsxllMOFQRBb7kXzET9NVePv1AIHysXKHvsgxXqDjzo9B7GcP9faaySg/lxGQzu4EWcgdPIjQYz/Vsv4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by MN2PR12MB4454.namprd12.prod.outlook.com (2603:10b6:208:26c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.36; Wed, 1 Feb
- 2023 17:14:41 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6043.038; Wed, 1 Feb 2023
- 17:14:41 +0000
-Message-ID: <59dd6291-6a99-ab7a-865f-b333a5f57bb9@amd.com>
-Date:   Wed, 1 Feb 2023 11:14:35 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
+        Wed, 1 Feb 2023 12:20:58 -0500
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C222E5CE7A;
+        Wed,  1 Feb 2023 09:20:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1675272050; x=1706808050;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r3+1R9eof3Rid7BA198DtwB/M24a62e7cpNgDf7b0qU=;
+  b=JIOPno+w/v8pOcLUIJDJpYyQPQZIWqPRJZuo+45vBMBh3r/HeD+LokR1
+   dvESIXPJNWtDout1fdgG2sh7Z69xFC6aXCt5QzwGVu4iOnvxB91ETBT0Y
+   bGzNZ9pB+pqJzoz4px9U+kFQzzObyAIcq0CugNk8M9XIKvFGcydBAyc7A
+   o=;
+X-IronPort-AV: E=Sophos;i="5.97,263,1669075200"; 
+   d="scan'208";a="292542619"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2023 17:20:47 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id 748DBC1D54;
+        Wed,  1 Feb 2023 17:20:36 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.45; Wed, 1 Feb 2023 17:20:34 +0000
+Received: from [0.0.0.0] (10.43.160.120) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.24; Wed, 1 Feb
+ 2023 17:20:26 +0000
+Message-ID: <7e73cb2d-5046-66cd-5a9b-8e2faa8458dc@amazon.com>
+Date:   Wed, 1 Feb 2023 18:20:24 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
 Subject: Re: [PATCH RFC v7 16/64] x86/sev: Add helper functions for RMPUPDATE
  and PSMASH instruction
 Content-Language: en-US
-To:     Alexander Graf <graf@amazon.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>,
+        Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <harald@profian.com>, Brijesh Singh <brijesh.singh@amd.com>,
         "Rapan, Sabin" <sabrapan@amazon.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
  <20221214194056.161492-17-michael.roth@amd.com>
  <854a0caf-6940-8381-1e20-0ddb5ed94858@amazon.com>
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <854a0caf-6940-8381-1e20-0ddb5ed94858@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH2PR05CA0069.namprd05.prod.outlook.com
- (2603:10b6:610:38::46) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|MN2PR12MB4454:EE_
-X-MS-Office365-Filtering-Correlation-Id: ced064b8-1158-4b3b-577d-08db0477ce07
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: juvK1depu2UTO4W9EXcYX+89lESqd0HhOI45KNLFmhD6Ok0XEGKpWzJ38RlmfmFI9BBumtWgSM/NH6xfzhwDfnDyn1rLXRfLFMTGUGBcLa6B9utrULccOAGlJOJjLi/IUppAUeZSy9yz15kqCX3PgrnMIrW6RA/PDCUiApiMUN4aFTARZ+RM9fzYRgnefeBfKl/t7CeAtILO1yhdQcghLpEpB+GM077qaX1X/MJMvjdnfucAqSTNFhIxxCf+AsqsFX2Se9mqaY1khTQxEnNDdOs1eRXZzAtRnYkMaM7NKP26fftRVXTWQeM47QAmuiuDzIlAoqjIzp4Z/s65jx7tTxQ0tm0xQaSuTHJJopyi6fHr//z9vO73gN2Nd/iCi2VehQneA+VpS+2m5C0S33dWq8PEBQLaG1RMiAV4LsvcA2WWTJQMCMjf73fRXz0CMNG+uM8SePWTEOh/QtPHDVpzCoTscC4mR1emb373ig/obZ4X7cNk98Oj64CCHDXOZaWRodrEc7GEu2uuDVxsPOf8lnjVj/reLbjV686wb4FNVeslpJviC5ZZRf6VDqZ0iWlQ3bRkGHN1Ce3SbhMXLqOXrcUq1DrNT+tGuqrySJoFi4GXISzL/xPAnHakvg3DNnDVooN4ufrM/17uhtSwe1InspnS/yKkaF2n3E+Q5jxRKirfJVrpMf2gMtvwlfapbDIiReSgc0RaUU52e2x4NGh+yg7ixCXpwYd9DU+urmdB6vD7obw+N56FsRescmmvTWDalQEBltMXqRfbNGvzRUL+og==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(136003)(396003)(376002)(346002)(39860400002)(451199018)(316002)(38100700002)(2906002)(6506007)(26005)(6512007)(5660300002)(186003)(36756003)(110136005)(2616005)(54906003)(53546011)(7406005)(7416002)(6666004)(6486002)(66476007)(31696002)(31686004)(83380400001)(4326008)(86362001)(478600001)(8676002)(66556008)(66946007)(8936002)(41300700001)(45980500001)(43740500002)(309714004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3lITUJVa0RoYzVzazFZNHhicVArVTNNUkJhQUJodjBtMmtWOElYU2xxakU2?=
- =?utf-8?B?WFlSQVFoRFkzdE9LQS9kRFA5c1pQTlBsNURLYjR0MGlld29ka2VKckc2ZVlW?=
- =?utf-8?B?WU9BVFh6QVArZVhPcm5LZURqWFRKVStnSitSaURONFB5UmYrU09KZ2YxK2hh?=
- =?utf-8?B?cndONmVZUGhrbXp0U3F6NVlOcDlWcEcwSnNreDRaRENmQnlGdjlsV2IyU1pj?=
- =?utf-8?B?bzdhejhFMnplSGFHd3dDVGJYem96N0Z0VEJzS0JZRTVDMVFMOWladVhLZjRo?=
- =?utf-8?B?MFYwWFFkOW1VMEJxd2QyRnBmSW16SmwrcXlNUkx3NVViS21OV1g0YjJ2YzZJ?=
- =?utf-8?B?OU1QTm11NHZKODhLRzJMcmptZThNdlRQSVZBdmY2VE5YbWpHanZTR2FJSUFT?=
- =?utf-8?B?ZG9QSDY0OGk4Q2tGUlBCczA3bW14U2ZmTy9XT04rNG96aUZVM2c5VjBqTjVO?=
- =?utf-8?B?bjlxUWx1Q2NZR2Ivc1BEZy9ZQUdIYmpUUGpsR1pWekF4emZ6VHMyTjhQWWpp?=
- =?utf-8?B?bzNRR2MwZkVkczFscHhucWdLV2hLUkpMUEUya1FQeUVnQXlZWDJmM0F3RSt2?=
- =?utf-8?B?SzhDa2U4aVFneW91NGFsdTJCZzRhTm05bWNqdHZNN1JYYnZ3cVFPNDZiRUx2?=
- =?utf-8?B?NVdyWFRubkRSQkUwcmxzNE1TSE1uVW16MTBwQ0JiOWRTQVNuNUMyZWVNcFZ2?=
- =?utf-8?B?NHBlZmErU24vUjBaYzEyV2gwWi9EKzRFMWVuWW1ZYU5GQUdFLzNKaEdROVNl?=
- =?utf-8?B?aHhjYXd1cmdpeXRPV0QybzZ3WVpCWmZ6SjFlZ2huS081d1pxUmV6eWlRWG5L?=
- =?utf-8?B?SlorNTFkdy9vUzFodTNFZ1lDaTNnZGo4MFJqdkVtRVZQRHhOMG9JaExuVUg4?=
- =?utf-8?B?VklUdVhvbloyUVgyYUZ5ME1CVXBxSjZ5M2FvYkRsY21UdVhZSitRVTRNamdY?=
- =?utf-8?B?QmE3TlZobllrVUdaQU9OMnYzeVRTbFAyTCtHQ2h0RWNIa0xnNW5GRUlFeFA2?=
- =?utf-8?B?RlArK3ljN0V2VXRRclBzSHg4YkhaTDRIY3NrRG1qZGVic0Q2V2w1eXo0TjVu?=
- =?utf-8?B?UzA3bkd5ZGUzUURlaUcvM2hJVjZzN0J0YngrZFdCYzBFWmE4ZnFRbHJVMFl0?=
- =?utf-8?B?WGxLcU1Ta2tqWGZneDF3aE9FYTNSZU5VMzliN3R3OTJsd2dJQkdmK3M3Rm9C?=
- =?utf-8?B?SHlHWFBJL1QzYVRRZUx3QktGdWdPblBRTFdNTCtMME1WR3dYMzQvbzR5dlkv?=
- =?utf-8?B?eWxnOEF6aHB5dmdnQkVxdXUxVEtoc1lMMlRYSENLalFBeU5NTlZoUk5ZQlp1?=
- =?utf-8?B?S0U3NTBhMUMzcldEd1YzVk85NnAyT0M1azRCb0E0WitxTi9RZGdCcDByNk84?=
- =?utf-8?B?TGFnTVJrYzJabFg0MXJyZE5nMkV3R2dNdElrU1F0cG5palBzTFBVbVZuNEtM?=
- =?utf-8?B?VVdvYkNveVM5M29HUWNUcXpsaWJ0a3owUVpaOGtnRGpMdGR0WXoyb1MzYXA1?=
- =?utf-8?B?WUlNOUc4T0s5TEdYd2ozaDNOUnpzRXI2blBjUHZJd0VWYlh0bFlpWnJ4RTV1?=
- =?utf-8?B?STRMbW8xU3c1S1NOVVFlNk1qeDVKeGZzdG9hRU1pdTNUeDh2dk9VY3BQZjVu?=
- =?utf-8?B?N1B5eE5xUlJmRUhWUnpWWXZ3NUx4c2dCcTZmMjUwMUxjYUpqZWtzby9CVlVq?=
- =?utf-8?B?a2hVS2N2ZUM2STY5VysyczBBd3RUSW4zb1IrbDgyWmVRN0ZlckNCOVczMStK?=
- =?utf-8?B?aDVLd2k3QXhnRFludGw3cVUrQWNDWUx2aDZQU3pRQ0tFb2srMlpQOXhVdU5D?=
- =?utf-8?B?ajNEUkl3OUt3MFJYTTk4ZVZxZTM2VU82Vjd2dFJYeDliemxLcnBEbzFCQVk2?=
- =?utf-8?B?VEo0R0tFSjMwbXFZQ2lwL1JHU0xYSUNRL1JZV2tSQXBOblFtK2ZpTHFIMWFJ?=
- =?utf-8?B?K3VkYWZlR0Z6bVhIQnMvREt5OW5GSi85Z05QaXZSb0FHb2xMdDBLRGtWK0tl?=
- =?utf-8?B?cWJ0eEZxQ0xmVDFXTjFLOTEwM0gvUjF6eWRhUVJsUGNyY2VNd1cvVVVhZndU?=
- =?utf-8?B?LzRJQXQzYzc5cVhtZE9ISTZmdDBlNVNoOXJWem5EUHZHblAzMG9BL2hUNSs5?=
- =?utf-8?Q?4PBfYo8Y9BTtRDih6ZgxLTnQZ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ced064b8-1158-4b3b-577d-08db0477ce07
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2023 17:14:40.9920
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0Y8a0z3HRhIpedlD5R2JFAYXlS3/4c6sxMM26x0VY156rxWjpT1ryUmqJPT2tPoeIy0kLk9esZM+EuOJ4hQqjQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4454
+ <59dd6291-6a99-ab7a-865f-b333a5f57bb9@amd.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <59dd6291-6a99-ab7a-865f-b333a5f57bb9@amd.com>
+X-Originating-IP: [10.43.160.120]
+X-ClientProxiedBy: EX13D44UWB002.ant.amazon.com (10.43.161.192) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Ck9uIDAxLjAyLjIzIDE4OjE0LCBLYWxyYSwgQXNoaXNoIHdyb3RlOgo+Cj4gT24gMS8zMS8yMDIz
+IDM6MjYgUE0sIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+Pgo+PiBPbiAxNC4xMi4yMiAyMDo0MCwg
+TWljaGFlbCBSb3RoIHdyb3RlOgo+Pj4gRnJvbTogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5n
+aEBhbWQuY29tPgo+Pj4KPj4+IFRoZSBSTVBVUERBVEUgaW5zdHJ1Y3Rpb24gd3JpdGVzIGEgbmV3
+IFJNUCBlbnRyeSBpbiB0aGUgUk1QIFRhYmxlLiBUaGUKPj4+IGh5cGVydmlzb3Igd2lsbCB1c2Ug
+dGhlIGluc3RydWN0aW9uIHRvIGFkZCBwYWdlcyB0byB0aGUgUk1QIHRhYmxlLiBTZWUKPj4+IEFQ
+TTMgZm9yIGRldGFpbHMgb24gdGhlIGluc3RydWN0aW9uIG9wZXJhdGlvbnMuCj4+Pgo+Pj4gVGhl
+IFBTTUFTSCBpbnN0cnVjdGlvbiBleHBhbmRzIGEgMk1CIFJNUCBlbnRyeSBpbnRvIGEgY29ycmVz
+cG9uZGluZyBzZXQKPj4+IG9mIGNvbnRpZ3VvdXMgNEtCLVBhZ2UgUk1QIGVudHJpZXMuIFRoZSBo
+eXBlcnZpc29yIHdpbGwgdXNlIHRoaXMKPj4+IGluc3RydWN0aW9uIHRvIGFkanVzdCB0aGUgUk1Q
+IGVudHJ5IHdpdGhvdXQgaW52YWxpZGF0aW5nIHRoZSBwcmV2aW91cwo+Pj4gUk1QIGVudHJ5Lgo+
+Pj4KPj4+IEFkZCB0aGUgZm9sbG93aW5nIGV4dGVybmFsIGludGVyZmFjZSBBUEkgZnVuY3Rpb25z
+Ogo+Pj4KPj4+IGludCBwc21hc2godTY0IHBmbik7Cj4+PiBwc21hc2ggaXMgdXNlZCB0byBzbWFz
+aCBhIDJNQiBhbGlnbmVkIHBhZ2UgaW50byA0Swo+Pj4gcGFnZXMgd2hpbGUgcHJlc2VydmluZyB0
+aGUgVmFsaWRhdGVkIGJpdCBpbiB0aGUgUk1QLgo+Pj4KPj4+IGludCBybXBfbWFrZV9wcml2YXRl
+KHU2NCBwZm4sIHU2NCBncGEsIGVudW0gcGdfbGV2ZWwgbGV2ZWwsIGludCBhc2lkLAo+Pj4gYm9v
+bCBpbW11dGFibGUpOwo+Pj4gVXNlZCB0byBhc3NpZ24gYSBwYWdlIHRvIGd1ZXN0IHVzaW5nIHRo
+ZSBSTVBVUERBVEUgaW5zdHJ1Y3Rpb24uCj4+Pgo+Pj4gaW50IHJtcF9tYWtlX3NoYXJlZCh1NjQg
+cGZuLCBlbnVtIHBnX2xldmVsIGxldmVsKTsKPj4+IFVzZWQgdG8gdHJhbnNpdGlvbiBhIHBhZ2Ug
+dG8gaHlwZXJ2aXNvci9zaGFyZWQgc3RhdGUgdXNpbmcgdGhlCj4+PiBSTVBVUERBVEUgaW5zdHJ1
+Y3Rpb24uCj4+Pgo+Pj4gU2lnbmVkLW9mZi1ieTogQXNoaXNoIEthbHJhIDxhc2hpc2gua2FscmFA
+YW1kLmNvbT4KPj4+IFNpZ25lZC1vZmYtYnk6IEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2luZ2hA
+YW1kLmNvbT4KPj4+IFttZHI6IGFkZCBSTVBVUERBVEUgcmV0cnkgbG9naWMgZm9yIHRyYW5zaWVu
+dCBGQUlMX09WRVJMQVAgZXJyb3JzXQo+Pj4gU2lnbmVkLW9mZi1ieTogTWljaGFlbCBSb3RoIDxt
+aWNoYWVsLnJvdGhAYW1kLmNvbT4KPj4+IC0tLQo+Pj4gwqAgYXJjaC94ODYvaW5jbHVkZS9hc20v
+c2V2LmggfCAyNCArKysrKysrKysrCj4+PiDCoCBhcmNoL3g4Ni9rZXJuZWwvc2V2LmPCoMKgwqDC
+oMKgIHwgOTUgCj4+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+Pj4g
+wqAgMiBmaWxlcyBjaGFuZ2VkLCAxMTkgaW5zZXJ0aW9ucygrKQo+Pj4KPj4+IGRpZmYgLS1naXQg
+YS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9zZXYuaCBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL3Nldi5o
+Cj4+PiBpbmRleCA4ZDNjZTJhZDI3ZGEuLjRlZWVkY2FjYTU5MyAxMDA2NDQKPj4+IC0tLSBhL2Fy
+Y2gveDg2L2luY2x1ZGUvYXNtL3Nldi5oCj4+PiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9z
+ZXYuaAo+Pj4gQEAgLTgwLDEwICs4MCwxNSBAQCBleHRlcm4gYm9vbCBoYW5kbGVfdmNfYm9vdF9n
+aGNiKHN0cnVjdCBwdF9yZWdzCj4+PiAqcmVncyk7Cj4+Pgo+Pj4gwqAgLyogU29mdHdhcmUgZGVm
+aW5lZCAod2hlbiByRmxhZ3MuQ0YgPSAxKSAqLwo+Pj4gwqAgI2RlZmluZSBQVkFMSURBVEVfRkFJ
+TF9OT1VQREFURcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAyNTUKPj4+ICsvKiBSTVVQ
+REFURSBkZXRlY3RlZCA0SyBwYWdlIGFuZCAyTUIgcGFnZSBvdmVybGFwLiAqLwo+Pj4gKyNkZWZp
+bmUgUk1QVVBEQVRFX0ZBSUxfT1ZFUkxBUMKgwqDCoMKgwqDCoMKgwqAgNwo+Pj4KPj4+IMKgIC8q
+IFJNUCBwYWdlIHNpemUgKi8KPj4+IMKgICNkZWZpbmUgUk1QX1BHX1NJWkVfNEvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAwCj4+PiArI2RlZmluZSBSTVBfUEdfU0laRV8yTcKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDEKPj4+IMKgICNkZWZpbmUgUk1QX1RPX1g4Nl9Q
+R19MRVZFTChsZXZlbCnCoMKgwqDCoCAoKChsZXZlbCkgPT0gUk1QX1BHX1NJWkVfNEspCj4+PiA/
+IFBHX0xFVkVMXzRLIDogUEdfTEVWRUxfMk0pCj4+PiArI2RlZmluZSBYODZfVE9fUk1QX1BHX0xF
+VkVMKGxldmVsKcKgwqDCoMKgICgoKGxldmVsKSA9PSBQR19MRVZFTF80SykgPwo+Pj4gUk1QX1BH
+X1NJWkVfNEsgOiBSTVBfUEdfU0laRV8yTSkKPj4+ICsKPj4+IMKgICNkZWZpbmUgUk1QQURKVVNU
+X1ZNU0FfUEFHRV9CSVTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQklUKDE2KQo+Pj4K
+Pj4+IMKgIC8qIFNOUCBHdWVzdCBtZXNzYWdlIHJlcXVlc3QgKi8KPj4+IEBAIC0xMzMsNiArMTM4
+LDE1IEBAIHN0cnVjdCBzbnBfc2VjcmV0c19wYWdlX2xheW91dCB7Cj4+PiDCoMKgwqDCoMKgwqDC
+oMKgIHU4IHJzdmQzWzM4NDBdOwo+Pj4gwqAgfSBfX3BhY2tlZDsKPj4+Cj4+PiArc3RydWN0IHJt
+cF9zdGF0ZSB7Cj4+PiArwqDCoMKgwqDCoMKgIHU2NCBncGE7Cj4+PiArwqDCoMKgwqDCoMKgIHU4
+IGFzc2lnbmVkOwo+Pj4gK8KgwqDCoMKgwqDCoCB1OCBwYWdlc2l6ZTsKPj4+ICvCoMKgwqDCoMKg
+wqAgdTggaW1tdXRhYmxlOwo+Pj4gK8KgwqDCoMKgwqDCoCB1OCByc3ZkOwo+Pj4gK8KgwqDCoMKg
+wqDCoCB1MzIgYXNpZDsKPj4+ICt9IF9fcGFja2VkOwo+Pj4gKwo+Pj4gwqAgI2lmZGVmIENPTkZJ
+R19BTURfTUVNX0VOQ1JZUFQKPj4+IMKgIGV4dGVybiBzdHJ1Y3Qgc3RhdGljX2tleV9mYWxzZSBz
+ZXZfZXNfZW5hYmxlX2tleTsKPj4+IMKgIGV4dGVybiB2b2lkIF9fc2V2X2VzX2lzdF9lbnRlcihz
+dHJ1Y3QgcHRfcmVncyAqcmVncyk7Cj4+PiBAQCAtMTk4LDYgKzIxMiw5IEBAIGJvb2wgc25wX2lu
+aXQoc3RydWN0IGJvb3RfcGFyYW1zICpicCk7Cj4+PiDCoCB2b2lkIF9faW5pdCBfX25vcmV0dXJu
+IHNucF9hYm9ydCh2b2lkKTsKPj4+IMKgIGludCBzbnBfaXNzdWVfZ3Vlc3RfcmVxdWVzdCh1NjQg
+ZXhpdF9jb2RlLCBzdHJ1Y3Qgc25wX3JlcV9kYXRhCj4+PiAqaW5wdXQsIHVuc2lnbmVkIGxvbmcg
+KmZ3X2Vycik7Cj4+PiDCoCBpbnQgc25wX2xvb2t1cF9ybXBlbnRyeSh1NjQgcGZuLCBpbnQgKmxl
+dmVsKTsKPj4+ICtpbnQgcHNtYXNoKHU2NCBwZm4pOwo+Pj4gK2ludCBybXBfbWFrZV9wcml2YXRl
+KHU2NCBwZm4sIHU2NCBncGEsIGVudW0gcGdfbGV2ZWwgbGV2ZWwsIGludCBhc2lkLAo+Pj4gYm9v
+bCBpbW11dGFibGUpOwo+Pj4gK2ludCBybXBfbWFrZV9zaGFyZWQodTY0IHBmbiwgZW51bSBwZ19s
+ZXZlbCBsZXZlbCk7Cj4+PiDCoCAjZWxzZQo+Pj4gwqAgc3RhdGljIGlubGluZSB2b2lkIHNldl9l
+c19pc3RfZW50ZXIoc3RydWN0IHB0X3JlZ3MgKnJlZ3MpIHsgfQo+Pj4gwqAgc3RhdGljIGlubGlu
+ZSB2b2lkIHNldl9lc19pc3RfZXhpdCh2b2lkKSB7IH0KPj4+IEBAIC0yMjMsNiArMjQwLDEzIEBA
+IHN0YXRpYyBpbmxpbmUgaW50IHNucF9pc3N1ZV9ndWVzdF9yZXF1ZXN0KHU2NAo+Pj4gZXhpdF9j
+b2RlLCBzdHJ1Y3Qgc25wX3JlcV9kYXRhICppbgo+Pj4gwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4g
+LUVOT1RUWTsKPj4+IMKgIH0KPj4+IMKgIHN0YXRpYyBpbmxpbmUgaW50IHNucF9sb29rdXBfcm1w
+ZW50cnkodTY0IHBmbiwgaW50ICpsZXZlbCkgeyByZXR1cm4KPj4+IDA7IH0KPj4+ICtzdGF0aWMg
+aW5saW5lIGludCBwc21hc2godTY0IHBmbikgeyByZXR1cm4gLUVOWElPOyB9Cj4+PiArc3RhdGlj
+IGlubGluZSBpbnQgcm1wX21ha2VfcHJpdmF0ZSh1NjQgcGZuLCB1NjQgZ3BhLCBlbnVtIHBnX2xl
+dmVsCj4+PiBsZXZlbCwgaW50IGFzaWQsCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb2wgaW1tdXRhYmxlKQo+
+Pj4gK3sKPj4+ICvCoMKgwqDCoMKgwqAgcmV0dXJuIC1FTk9ERVY7Cj4+PiArfQo+Pj4gK3N0YXRp
+YyBpbmxpbmUgaW50IHJtcF9tYWtlX3NoYXJlZCh1NjQgcGZuLCBlbnVtIHBnX2xldmVsIGxldmVs
+KSB7Cj4+PiByZXR1cm4gLUVOT0RFVjsgfQo+Pj4gwqAgI2VuZGlmCj4+Pgo+Pj4gwqAgI2VuZGlm
+Cj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva2VybmVsL3Nldi5jIGIvYXJjaC94ODYva2VybmVs
+L3Nldi5jCj4+PiBpbmRleCA3MDY2NzU1NjFmNDkuLjY3MDM1ZDM0YWRhZCAxMDA2NDQKPj4+IC0t
+LSBhL2FyY2gveDg2L2tlcm5lbC9zZXYuYwo+Pj4gKysrIGIvYXJjaC94ODYva2VybmVsL3Nldi5j
+Cj4+PiBAQCAtMjUyMywzICsyNTIzLDk4IEBAIGludCBzbnBfbG9va3VwX3JtcGVudHJ5KHU2NCBw
+Zm4sIGludCAqbGV2ZWwpCj4+PiDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAhIXJtcGVudHJ5X2Fz
+c2lnbmVkKGUpOwo+Pj4gwqAgfQo+Pj4gwqAgRVhQT1JUX1NZTUJPTF9HUEwoc25wX2xvb2t1cF9y
+bXBlbnRyeSk7Cj4+PiArCj4+PiArLyoKPj4+ICsgKiBwc21hc2ggaXMgdXNlZCB0byBzbWFzaCBh
+IDJNQiBhbGlnbmVkIHBhZ2UgaW50byA0Swo+Pj4gKyAqIHBhZ2VzIHdoaWxlIHByZXNlcnZpbmcg
+dGhlIFZhbGlkYXRlZCBiaXQgaW4gdGhlIFJNUC4KPj4+ICsgKi8KPj4+ICtpbnQgcHNtYXNoKHU2
+NCBwZm4pCj4+PiArewo+Pj4gK8KgwqDCoMKgwqDCoCB1bnNpZ25lZCBsb25nIHBhZGRyID0gcGZu
+IDw8IFBBR0VfU0hJRlQ7Cj4+PiArwqDCoMKgwqDCoMKgIGludCByZXQ7Cj4+PiArCj4+PiArwqDC
+oMKgwqDCoMKgIGlmICghcGZuX3ZhbGlkKHBmbikpCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCByZXR1cm4gLUVJTlZBTDsKPj4KPj4KPj4gV2UgKGFuZCBtYW55IG90aGVyIGNsb3Vk
+cykgdXNlIGEgbmVhdCB0cmljayB0byByZWR1Y2UgdGhlIG51bWJlciBvZgo+PiBzdHJ1Y3QgcGFn
+ZXMgTGludXggYWxsb2NhdGVzIGZvciBndWVzdCBtZW1vcnk6IEluIGl0cyBzaW1wbGVzdCBmb3Jt
+LCBhZGQKPj4gbWVtPSB0byB0aGUga2VybmVsIGNtZGxpbmUgYW5kIG1tYXAoKSAvZGV2L21lbSB0
+byBhY2Nlc3MgdGhlIHJlc2VydmVkCj4+IG1lbW9yeSBpbnN0ZWFkLgo+Pgo+PiBUaGlzIG1lYW5z
+IHRoYXQgdGhlIHN5c3RlbSBjb3ZlcnMgbW9yZSBSQU0gdGhhbiBMaW51eCBjb250YWlucywgd2hp
+Y2gKPj4gbWVhbnMgcGZuX3ZhbGlkKCkgaXMgbm8gbG9uZ2VyIGEgZ29vZCBpbmRpY2F0aW9uIHdo
+ZXRoZXIgYSBwYWdlIGlzCj4+IGluZGVlZCB2YWxpZC4gS1ZNIGhhbmRsZXMgdGhpcyBjYXNlIGZp
+bmUsIGJ1dCB0aGlzIGNvZGUgZG9lcyBub3QuCj4KPiBIbW0uLi5idXQgdGhlbiBpcyBhbHNvIHVz
+aW5nIG1heF9wZm4gcmVsaWFibGUgPwoKCkkgd291bGQgZXhwZWN0IGl0IHRvIG5vdCBiZSByZWxp
+YWJsZSBhcyBpdCBvbmx5IGxvb2tzIGF0IEU4MjBfVFlQRV9SQU0sIAp5ZXMuIERvIHlvdSByZWx5
+IG9uIG1heF9wZm4gYW55d2hlcmU/CgoKPgo+Pgo+PiBJcyB0aGVyZSBhbnkgcGFydGljdWxhciBy
+ZWFzb24gd2h5IHdlIG5lZWQgdGhpcyBjaGVjayAoYW5kIHNpbWlsYXIgb25lcwo+PiBiZWxvdyBh
+bmQgaW4gb3RoZXIgUk1QIHJlbGF0ZWQgcGF0Y2hlcykgaW4gdGhlIGZpcnN0IHBsYWNlLiBJIHdv
+dWxkID4gCj4+IGV4cGVjdCB0aGF0IFBTTUFTSCBhbmQgZnJpZW5kcyByZXR1cm4gZmFpbHVyZSBj
+b2RlcyBmb3IgaW52YWxpZCBwZm5zLgo+Pgo+Cj4gWWVzLCBQU01BU0ggZG9lcyBvdXQgb2YgYm91
+bmRzIGNoZWNrIG9uIHRoZSBpbnB1dCBTUEEgYW5kIGFkZGl0aW9uYWxseQo+IGNoZWNrcyBpZiBT
+UEEgaXMgMk0gYWxpZ25lZCwgc28gZ3Vlc3Mgd2UgY2FuIHJlbHkgb24gdXNpbmcgUFNNQVNICj4g
+ZmFpbGluZyBvbiBpbnZhbGlkIHBmbnMuCgoKUGVyZmVjdCwgcGxlYXNlIHJlbW92ZSBhbGwgdGhl
+IHN1cGVyZmx1b3VzIGNoZWNrcyB0aGVuLiBJZiB5b3Ugd2FudCB0byAKbWFrZSBvdXIgbGlmZSBl
+YXN5LCBJJ2QgcmVjb21tZW5kIHlvdSB0cnkgdG8gdHJ5IHRoZSBwYXRjaCBzZXQgd2l0aCBtZW09
+IApwYXNzZWQgb24gdGhlIGhvc3QgYW5kIHRlbGwgUUVNVSB0byBtbWFwKCkgL2Rldi9tZW0gZm9y
+IGd1ZXN0IFJBTS4gVGhhdCAKd2F5IHlvdSBzaG91bGQgYmUgYWJsZSB0byBmaW5kIGFueSBvdGhl
+ciBwaXRmYWxscyA6KQoKCkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1h
+bnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBD
+aHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2Vy
+aWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1J
+RDogREUgMjg5IDIzNyA4NzkKCgo=
 
-On 1/31/2023 3:26 PM, Alexander Graf wrote:
-> 
-> On 14.12.22 20:40, Michael Roth wrote:
->> From: Brijesh Singh <brijesh.singh@amd.com>
->>
->> The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
->> hypervisor will use the instruction to add pages to the RMP table. See
->> APM3 for details on the instruction operations.
->>
->> The PSMASH instruction expands a 2MB RMP entry into a corresponding set
->> of contiguous 4KB-Page RMP entries. The hypervisor will use this
->> instruction to adjust the RMP entry without invalidating the previous
->> RMP entry.
->>
->> Add the following external interface API functions:
->>
->> int psmash(u64 pfn);
->> psmash is used to smash a 2MB aligned page into 4K
->> pages while preserving the Validated bit in the RMP.
->>
->> int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, 
->> bool immutable);
->> Used to assign a page to guest using the RMPUPDATE instruction.
->>
->> int rmp_make_shared(u64 pfn, enum pg_level level);
->> Used to transition a page to hypervisor/shared state using the 
->> RMPUPDATE instruction.
->>
->> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> [mdr: add RMPUPDATE retry logic for transient FAIL_OVERLAP errors]
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> ---
->>   arch/x86/include/asm/sev.h | 24 ++++++++++
->>   arch/x86/kernel/sev.c      | 95 ++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 119 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
->> index 8d3ce2ad27da..4eeedcaca593 100644
->> --- a/arch/x86/include/asm/sev.h
->> +++ b/arch/x86/include/asm/sev.h
->> @@ -80,10 +80,15 @@ extern bool handle_vc_boot_ghcb(struct pt_regs 
->> *regs);
->>
->>   /* Software defined (when rFlags.CF = 1) */
->>   #define PVALIDATE_FAIL_NOUPDATE                255
->> +/* RMUPDATE detected 4K page and 2MB page overlap. */
->> +#define RMPUPDATE_FAIL_OVERLAP         7
->>
->>   /* RMP page size */
->>   #define RMP_PG_SIZE_4K                 0
->> +#define RMP_PG_SIZE_2M                 1
->>   #define RMP_TO_X86_PG_LEVEL(level)     (((level) == RMP_PG_SIZE_4K) 
->> ? PG_LEVEL_4K : PG_LEVEL_2M)
->> +#define X86_TO_RMP_PG_LEVEL(level)     (((level) == PG_LEVEL_4K) ? 
->> RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
->> +
->>   #define RMPADJUST_VMSA_PAGE_BIT                BIT(16)
->>
->>   /* SNP Guest message request */
->> @@ -133,6 +138,15 @@ struct snp_secrets_page_layout {
->>          u8 rsvd3[3840];
->>   } __packed;
->>
->> +struct rmp_state {
->> +       u64 gpa;
->> +       u8 assigned;
->> +       u8 pagesize;
->> +       u8 immutable;
->> +       u8 rsvd;
->> +       u32 asid;
->> +} __packed;
->> +
->>   #ifdef CONFIG_AMD_MEM_ENCRYPT
->>   extern struct static_key_false sev_es_enable_key;
->>   extern void __sev_es_ist_enter(struct pt_regs *regs);
->> @@ -198,6 +212,9 @@ bool snp_init(struct boot_params *bp);
->>   void __init __noreturn snp_abort(void);
->>   int snp_issue_guest_request(u64 exit_code, struct snp_req_data 
->> *input, unsigned long *fw_err);
->>   int snp_lookup_rmpentry(u64 pfn, int *level);
->> +int psmash(u64 pfn);
->> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, 
->> bool immutable);
->> +int rmp_make_shared(u64 pfn, enum pg_level level);
->>   #else
->>   static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->>   static inline void sev_es_ist_exit(void) { }
->> @@ -223,6 +240,13 @@ static inline int snp_issue_guest_request(u64 
->> exit_code, struct snp_req_data *in
->>          return -ENOTTY;
->>   }
->>   static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 
->> 0; }
->> +static inline int psmash(u64 pfn) { return -ENXIO; }
->> +static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level 
->> level, int asid,
->> +                                  bool immutable)
->> +{
->> +       return -ENODEV;
->> +}
->> +static inline int rmp_make_shared(u64 pfn, enum pg_level level) { 
->> return -ENODEV; }
->>   #endif
->>
->>   #endif
->> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
->> index 706675561f49..67035d34adad 100644
->> --- a/arch/x86/kernel/sev.c
->> +++ b/arch/x86/kernel/sev.c
->> @@ -2523,3 +2523,98 @@ int snp_lookup_rmpentry(u64 pfn, int *level)
->>          return !!rmpentry_assigned(e);
->>   }
->>   EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
->> +
->> +/*
->> + * psmash is used to smash a 2MB aligned page into 4K
->> + * pages while preserving the Validated bit in the RMP.
->> + */
->> +int psmash(u64 pfn)
->> +{
->> +       unsigned long paddr = pfn << PAGE_SHIFT;
->> +       int ret;
->> +
->> +       if (!pfn_valid(pfn))
->> +               return -EINVAL;
-> 
-> 
-> We (and many other clouds) use a neat trick to reduce the number of 
-> struct pages Linux allocates for guest memory: In its simplest form, add 
-> mem= to the kernel cmdline and mmap() /dev/mem to access the reserved 
-> memory instead.
-> 
-> This means that the system covers more RAM than Linux contains, which 
-> means pfn_valid() is no longer a good indication whether a page is 
-> indeed valid. KVM handles this case fine, but this code does not.
-
-Hmm...but then is also using max_pfn reliable ?
-
-> 
-> Is there any particular reason why we need this check (and similar ones 
-> below and in other RMP related patches) in the first place. I would > expect that PSMASH and friends return failure codes for invalid pfns.
-> 
-
-Yes, PSMASH does out of bounds check on the input SPA and additionally 
-checks if SPA is 2M aligned, so guess we can rely on using PSMASH 
-failing on invalid pfns.
-
-Thanks,
-Ashish
