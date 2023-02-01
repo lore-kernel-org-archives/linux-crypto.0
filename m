@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 449D1C38142
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 18:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1626BC38142
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 18:40:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbjBASWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Feb 2023 13:22:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57880 "EHLO
+        id S230369AbjBASkM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 13:40:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231540AbjBASWe (ORCPT
+        with ESMTP id S231938AbjBASkI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2023 13:22:34 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FD57BE7F;
-        Wed,  1 Feb 2023 10:22:33 -0800 (PST)
+        Wed, 1 Feb 2023 13:40:08 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 922BA8693;
+        Wed,  1 Feb 2023 10:39:43 -0800 (PST)
 Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C97791EC0426;
-        Wed,  1 Feb 2023 19:22:31 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 271441EC0426;
+        Wed,  1 Feb 2023 19:39:37 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1675275751;
+        t=1675276777;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=LK1P/CMLNeISz/c0nlGst2RWi/0NZ0o/BpvrK0rFx2Q=;
-        b=OFXvmyKPcyconiHwMNrgQAUNOb0dhANdfQjhsK1+Kr8nj9iA+ITBUH/1kjILD7uoP/A/d9
-        G3Jihf+k44XEUC+K34HG/rOGRbCMHMbFe0JMSFsqVnG2UGxr1YUgSM2sL+g+LqvF1lO6NK
-        poXHV6aglKBiEyXYXfKUQsOYwEpKe+s=
-Date:   Wed, 1 Feb 2023 19:22:31 +0100
+        bh=tKVIURcKaHRFs3NAkMIo/G/++qtyGK5ycT5xSsbxJIY=;
+        b=pL3mCb0HMuL7otKyse87wvGKUFk1BglCv1B6UO1QV73/AZ9qcIFWXZxsAYdAzaY++nFSfJ
+        yTagf3Dv0E0Z96HD8Gq08OOGHtg3l3T8rpsb0epWZlSEAbZztLckNKTlmc3l1+ueB6YXMV
+        GL69ghcgEm73bH5Vyl1er01cagZ9Muc=
+Date:   Wed, 1 Feb 2023 19:39:32 +0100
 From:   Borislav Petkov <bp@alien8.de>
 To:     Michael Roth <michael.roth@amd.com>
 Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
@@ -46,38 +46,42 @@ Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
         ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
- LAUNCH_UPDATE_DATA
-Message-ID: <Y9qt50zW+eJcz7cm@zn.tnic>
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH RFC v7 13/64] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <Y9qx5NbZIRdpHy5J@zn.tnic>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-12-michael.roth@amd.com>
+ <20221214194056.161492-14-michael.roth@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-12-michael.roth@amd.com>
+In-Reply-To: <20221214194056.161492-14-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
+On Wed, Dec 14, 2022 at 01:40:05PM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Pre-boot guest payload needs to be encrypted and VMM has copied it
+> Add CPU feature detection for Secure Encrypted Virtualization with
+> Secure Nested Paging. This feature adds a strong memory integrity
+> protection to help prevent malicious hypervisor-based attacks like
+> data replay, memory re-mapping, and more.
+> 
+> Link: https://lore.kernel.org/all/YrGINaPc3cojG6%2F3@zn.tnic/
 
-"has to have copied it over" I presume?
+That points to some review feedback I've given - dunno if it is
+relevant.
 
-> over to the private-fd. Add support to get the pfn from the memfile fd
-> for encrypting the payload in-place.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
 
-Why is that a good thing?
+I read this as Jarkko has handled this patch too. Is that the case?
 
-I guess with UPM you're supposed to get the PFN of that encrypted guest
-payload from that memslot.
+> Signed-off-by: Ashish Kalra <Ashish.Kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-IOW, such commit messages are too laconic for my taste and you could try
-to explain more why this is happening instead of me having to
-"reverse-deduce" what you're doing from the code...
+Those last two are ok - you took ovef from Ashish.
 
 Thx.
 
