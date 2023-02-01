@@ -2,128 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967FCC05027
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 12:32:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8FDC05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Feb 2023 14:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231226AbjBAMcP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Feb 2023 07:32:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46680 "EHLO
+        id S230417AbjBAOhq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 09:37:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjBAMcP (ORCPT
+        with ESMTP id S230255AbjBAOhq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2023 07:32:15 -0500
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CD423662;
-        Wed,  1 Feb 2023 04:32:12 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0Vagxb9L_1675254728;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Vagxb9L_1675254728)
-          by smtp.aliyun-inc.com;
-          Wed, 01 Feb 2023 20:32:08 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] crypto: arm64/sm4-ccm - Rewrite skcipher walker loop
-Date:   Wed,  1 Feb 2023 20:32:07 +0800
-Message-Id: <20230201123207.99858-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+        Wed, 1 Feb 2023 09:37:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E91D69513
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Feb 2023 06:36:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675262209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8/dpDM/3REEz3eyiAc+dJjDInqTxFwwyfLND3C6oXCQ=;
+        b=EPxkDWp7sVJUosiE/bWnBgLYsaIUAIqDbf1o0rAkAIv2zDxGG4fPVFlrNb0hhC2RQB6PCW
+        KpPXrl0iEFTfEMJ0j9mFTvpuOSLHh2PK1tLPCt4yFqdLMYs6U72JZMzFksAJOCR8tw4C3e
+        zumwWt11E0oT5CKndtj4gIzGkgV6ER4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-292-20SeWIIfNo2jUTyP7mdrOw-1; Wed, 01 Feb 2023 09:36:46 -0500
+X-MC-Unique: 20SeWIIfNo2jUTyP7mdrOw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3223C1C08793;
+        Wed,  1 Feb 2023 14:36:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44A41492B05;
+        Wed,  1 Feb 2023 14:36:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
+References: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, viro@zeniv.linux.org.uk,
+        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
+        metze@samba.org, hch@infradead.org, willy@infradead.org,
+        jlayton@kernel.org, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sfrench@samba.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 05/12] cifs: Add a function to Hash the contents of an iterator
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <312907.1675262203.1@warthog.procyon.org.uk>
+Date:   Wed, 01 Feb 2023 14:36:43 +0000
+Message-ID: <312908.1675262203@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The fact that an error in the skcipher walker API are indicated
-not only by a non-zero return value, but also by the fact that
-walk->nbytes is zero, causes the layout of the skcipher walker
-loop to be sufficiently different from the usual layout, which
-is not a problem in itself, but it is likely to cause reading
-confusion and difficulty in code maintenance.
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-This patch rewrites skcipher walker loop, and separates the
-last chunk cryption from the loop to avoid wrong calls to the
-skcipher walker API. In addition to following the usual convention
-of checking walk->nbytes, it also makes the loop execute logic
-clearer and easier to understand.
+> > Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
+> > iterator into a symmetric hash algorithm.
+> 
+> There is no such thing as a symmetric hash.  You're using shash
+> which stands for synchronous hash.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- arch/arm64/crypto/sm4-ce-ccm-glue.c | 44 ++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 20 deletions(-)
+Sorry, you're right.
 
-diff --git a/arch/arm64/crypto/sm4-ce-ccm-glue.c b/arch/arm64/crypto/sm4-ce-ccm-glue.c
-index f2cec7b52efc..5e7e17bbec81 100644
---- a/arch/arm64/crypto/sm4-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-ccm-glue.c
-@@ -166,7 +166,7 @@ static int ccm_crypt(struct aead_request *req, struct skcipher_walk *walk,
- 					unsigned int nbytes, u8 *mac))
- {
- 	u8 __aligned(8) ctr0[SM4_BLOCK_SIZE];
--	int err;
-+	int err = 0;
- 
- 	/* preserve the initial ctr0 for the TAG */
- 	memcpy(ctr0, walk->iv, SM4_BLOCK_SIZE);
-@@ -177,33 +177,37 @@ static int ccm_crypt(struct aead_request *req, struct skcipher_walk *walk,
- 	if (req->assoclen)
- 		ccm_calculate_auth_mac(req, mac);
- 
--	do {
-+	while (walk->nbytes && walk->nbytes != walk->total) {
- 		unsigned int tail = walk->nbytes % SM4_BLOCK_SIZE;
--		const u8 *src = walk->src.virt.addr;
--		u8 *dst = walk->dst.virt.addr;
- 
--		if (walk->nbytes == walk->total)
--			tail = 0;
-+		sm4_ce_ccm_crypt(rkey_enc, walk->dst.virt.addr,
-+				 walk->src.virt.addr, walk->iv,
-+				 walk->nbytes - tail, mac);
-+
-+		kernel_neon_end();
-+
-+		err = skcipher_walk_done(walk, tail);
-+
-+		kernel_neon_begin();
-+	}
- 
--		if (walk->nbytes - tail)
--			sm4_ce_ccm_crypt(rkey_enc, dst, src, walk->iv,
--					 walk->nbytes - tail, mac);
-+	if (walk->nbytes) {
-+		sm4_ce_ccm_crypt(rkey_enc, walk->dst.virt.addr,
-+				 walk->src.virt.addr, walk->iv,
-+				 walk->nbytes, mac);
- 
--		if (walk->nbytes == walk->total)
--			sm4_ce_ccm_final(rkey_enc, ctr0, mac);
-+		sm4_ce_ccm_final(rkey_enc, ctr0, mac);
- 
- 		kernel_neon_end();
- 
--		if (walk->nbytes) {
--			err = skcipher_walk_done(walk, tail);
--			if (err)
--				return err;
--			if (walk->nbytes)
--				kernel_neon_begin();
--		}
--	} while (walk->nbytes > 0);
-+		err = skcipher_walk_done(walk, 0);
-+	} else {
-+		sm4_ce_ccm_final(rkey_enc, ctr0, mac);
- 
--	return 0;
-+		kernel_neon_end();
-+	}
-+
-+	return err;
- }
- 
- static int ccm_encrypt(struct aead_request *req)
--- 
-2.24.3 (Apple Git-128)
+> In any case, as I said in the previous review this is abusing the
+> shash API.  Please use ahash instead.
+
+It's already abusing the shash API, this doesn't change that, except where it
+gets the data from.
+
+I can have a go at conversion to ahash, but that will have to be a separate
+patch set as it isn't trivial.  The problem is that the current code just
+assumes it can push bits into the hash as it gets them - this is not possible
+with ahash.
+
+David
 
