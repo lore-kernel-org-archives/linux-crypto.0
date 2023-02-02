@@ -2,237 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 797B3C64ED6
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 15:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EF4C636D6
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 16:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233208AbjBBPbi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:31:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51230 "EHLO
+        id S231688AbjBBQQb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 11:16:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233103AbjBBPbY (ORCPT
+        with ESMTP id S231546AbjBBQQa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 10:31:24 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43BF4CDE1;
-        Thu,  2 Feb 2023 07:30:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
-        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To;
-        bh=3ubHXmjMHuO7YFbxrF9R90Y+YVnse9xBuEbHAitlUas=; b=Huq1BblpHoH+3Obm8iACci5gq3
-        megzhmNOz8SY2lHByGtJBiuzwCZGxcMReZzqMQ4nIME6rS6KZPdBpp1dHuZ00OwNftd1HbhvcySE3
-        68GXZUzOIxjxl/PwuKG0UW9kglxjDzk22ad/LD6UJv9zU4ZgdkrBGLgtw+Cz/xSyQt3S1hhz17MSd
-        2NH8seRyMtxOnwvDrB2Z74x1Ewfp5FBvRH95zDsTzpjJKo5MKphmgIskhBW4cEQnuCCQ7WcDOGGtJ
-        goq/K07AkOWFmKlEHfneue1iwLtuIO6jiCeUIAifHqjRKGFxknHNxxnuLwpxLHmhgTgElUSqJXVoQ
-        hqTg8AmQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pNbVU-005CFw-21;
-        Thu, 02 Feb 2023 15:28:12 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3AE0D3007C5;
-        Thu,  2 Feb 2023 16:28:45 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 9AAE923F31FBD; Thu,  2 Feb 2023 16:28:40 +0100 (CET)
-Message-ID: <20230202152655.624998774@infradead.org>
-User-Agent: quilt/0.66
-Date:   Thu, 02 Feb 2023 15:50:37 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     torvalds@linux-foundation.org
-Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2 07/10] x86,intel_iommu: Replace cmpxchg_double()
-References: <20230202145030.223740842@infradead.org>
+        Thu, 2 Feb 2023 11:16:30 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3740469522
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 08:16:29 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id qw12so7473228ejc.2
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 08:16:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s/TwqFRK5J7OU2Udmc50EVMhDx9RBIMJL0vHwyknTSs=;
+        b=XWQQBGJxyxq3gaYJAuz0o/leYgJ4JpCq+TyHU9q4BBpPQX45LzNb1Ml1GimJSuoVpI
+         SbPl2XiNcbFxp7QeOBrZrQByNcgU+UeOnw1pkQ5Ht8X8G4DelE/JzYiPjOWx+LnhUV9M
+         To5UtT37HaaSR+WgkRqh70/vhEHuq8VzCG3Ft3BK2R33jY9GuYnAXGZXnwA1c4TJ3NMa
+         j1nRjvp1R0c7gaHEkixz172ke4zI9R6TzjVJVSFVuQeobOpzy4w31e622IPX0s3Us8SW
+         stJb+1Qm4Do7ZbfaDeua++SXx+66L/qT0evP5+uhDp0PKX6TrMEUtltMN+0e5QWh3BLr
+         fxHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s/TwqFRK5J7OU2Udmc50EVMhDx9RBIMJL0vHwyknTSs=;
+        b=UGOgqRQHi9o0RQDUMAyA74Py1+mFPqpl/+fdWynfLL8p4FOPDULZ+nDj61iRQBO6MA
+         wdeU0pogP7AMSHIJctfXgC8CfnqQe72ng5p1p0O41ioxlMegowHI/Q941JPz2THwm+3c
+         ctYXrvKiqBJdX0DGKPL4BLiv5vjCTHWlaEJyXQR8abPdsOspqCU4pP7CDlNsU+KfDMpi
+         ikkLDhgDF8JpivJlz2xcanxiZTGbnyTfPmCP/ZDo6337TUQ0CSMNoFjLksutJ7REE1Fj
+         oZaAfcxUDBTbo7sBtjcU04GykFNT9UqjF5noxKNOZyfN2uOlev1YJ3D9JQLhD60Je2MX
+         gqPg==
+X-Gm-Message-State: AO0yUKUbmDoMYo5n4kYV69Vvf31S6uqH94ncgGBVqldziTjqAZuiOdua
+        wYKN0bEpi7UBFCsZFKkeHmWyyPF9ReRZaSUXMjWPKA==
+X-Google-Smtp-Source: AK7set+1Utb1hKncVan/1yoYW6OY9gZkOOpnIvO/wnMteRFA+qaLiCYslLcGmMcw4tzIYelPbMiWlQ==
+X-Received: by 2002:a17:906:535e:b0:88a:4655:b089 with SMTP id j30-20020a170906535e00b0088a4655b089mr6700089ejo.6.1675354587736;
+        Thu, 02 Feb 2023 08:16:27 -0800 (PST)
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id 1-20020a17090600c100b0088b24b3aff8sm5151933eji.183.2023.02.02.08.16.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Feb 2023 08:16:27 -0800 (PST)
+Message-ID: <61eb2a01-762e-b83b-16b7-2c9b178407da@linaro.org>
+Date:   Thu, 2 Feb 2023 18:16:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
+ clock-names as optional
+Content-Language: en-US
+To:     Neil Armstrong <neil.armstrong@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
+ <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+ <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
+ <36b6f8f2-c438-f5e6-b48f-326e8b709de8@linaro.org>
+ <a2e4dff0-af8f-dccb-9074-8244b054c448@linaro.org>
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <a2e4dff0-af8f-dccb-9074-8244b054c448@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 2/2/23 16:21, Neil Armstrong wrote:
+> On 02/02/2023 15:04, Vladimir Zapolskiy wrote:
+>> Hi Krzysztof,
+>>
+>> On 2/2/23 15:53, Krzysztof Kozlowski wrote:
+>>> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
+>>>> From: Neil Armstrong <neil.armstrong@linaro.org>
+>>>>
+>>>> On certain Snapdragon processors, the crypto engine clocks are enabled by
+>>>> default by security firmware.
+>>>
+>>> Then probably we should not require them only on these variants.
+>>
+>> I don't have the exact list of the affected SoCs, I believe Neil can provide
+>> such a list, if you find it crucial.
+> 
+> It's the case for SM8350, SM8450 & SM8550.
+> 
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- drivers/iommu/intel/irq_remapping.c |    8 --
- include/linux/dmar.h                |  125 +++++++++++++++++++-----------------
- 2 files changed, 68 insertions(+), 65 deletions(-)
+On SM8250 there is no QCE clocks also, so I'll add it to the list, and I hope
+that now the list is complete.
 
---- a/drivers/iommu/intel/irq_remapping.c
-+++ b/drivers/iommu/intel/irq_remapping.c
-@@ -174,18 +174,14 @@ static int modify_irte(struct irq_2_iomm
- 	irte = &iommu->ir_table->base[index];
- 
- 	if ((irte->pst == 1) || (irte_modified->pst == 1)) {
--		bool ret;
--
--		ret = cmpxchg_double(&irte->low, &irte->high,
--				     irte->low, irte->high,
--				     irte_modified->low, irte_modified->high);
- 		/*
- 		 * We use cmpxchg16 to atomically update the 128-bit IRTE,
- 		 * and it cannot be updated by the hardware or other processors
- 		 * behind us, so the return value of cmpxchg16 should be the
- 		 * same as the old value.
- 		 */
--		WARN_ON(!ret);
-+		u128 old = irte->irte;
-+		WARN_ON(!try_cmpxchg128(&irte->irte, &old, irte_modified->irte));
- 	} else {
- 		WRITE_ONCE(irte->low, irte_modified->low);
- 		WRITE_ONCE(irte->high, irte_modified->high);
---- a/include/linux/dmar.h
-+++ b/include/linux/dmar.h
-@@ -201,67 +201,74 @@ static inline void detect_intel_iommu(vo
- 
- struct irte {
- 	union {
--		/* Shared between remapped and posted mode*/
- 		struct {
--			__u64	present		: 1,  /*  0      */
--				fpd		: 1,  /*  1      */
--				__res0		: 6,  /*  2 -  6 */
--				avail		: 4,  /*  8 - 11 */
--				__res1		: 3,  /* 12 - 14 */
--				pst		: 1,  /* 15      */
--				vector		: 8,  /* 16 - 23 */
--				__res2		: 40; /* 24 - 63 */
-+			union {
-+				/* Shared between remapped and posted mode*/
-+				struct {
-+					__u64	present		: 1,  /*  0      */
-+						fpd		: 1,  /*  1      */
-+						__res0		: 6,  /*  2 -  6 */
-+						avail		: 4,  /*  8 - 11 */
-+						__res1		: 3,  /* 12 - 14 */
-+						pst		: 1,  /* 15      */
-+						vector		: 8,  /* 16 - 23 */
-+						__res2		: 40; /* 24 - 63 */
-+				};
-+
-+				/* Remapped mode */
-+				struct {
-+					__u64	r_present	: 1,  /*  0      */
-+						r_fpd		: 1,  /*  1      */
-+						dst_mode	: 1,  /*  2      */
-+						redir_hint	: 1,  /*  3      */
-+						trigger_mode	: 1,  /*  4      */
-+						dlvry_mode	: 3,  /*  5 -  7 */
-+						r_avail		: 4,  /*  8 - 11 */
-+						r_res0		: 4,  /* 12 - 15 */
-+						r_vector	: 8,  /* 16 - 23 */
-+						r_res1		: 8,  /* 24 - 31 */
-+						dest_id		: 32; /* 32 - 63 */
-+				};
-+
-+				/* Posted mode */
-+				struct {
-+					__u64	p_present	: 1,  /*  0      */
-+						p_fpd		: 1,  /*  1      */
-+						p_res0		: 6,  /*  2 -  7 */
-+						p_avail		: 4,  /*  8 - 11 */
-+						p_res1		: 2,  /* 12 - 13 */
-+						p_urgent	: 1,  /* 14      */
-+						p_pst		: 1,  /* 15      */
-+						p_vector	: 8,  /* 16 - 23 */
-+						p_res2		: 14, /* 24 - 37 */
-+						pda_l		: 26; /* 38 - 63 */
-+				};
-+				__u64 low;
-+			};
-+
-+			union {
-+				/* Shared between remapped and posted mode*/
-+				struct {
-+					__u64	sid		: 16,  /* 64 - 79  */
-+						sq		: 2,   /* 80 - 81  */
-+						svt		: 2,   /* 82 - 83  */
-+						__res3		: 44;  /* 84 - 127 */
-+				};
-+
-+				/* Posted mode*/
-+				struct {
-+					__u64	p_sid		: 16,  /* 64 - 79  */
-+						p_sq		: 2,   /* 80 - 81  */
-+						p_svt		: 2,   /* 82 - 83  */
-+						p_res3		: 12,  /* 84 - 95  */
-+						pda_h		: 32;  /* 96 - 127 */
-+				};
-+				__u64 high;
-+			};
- 		};
--
--		/* Remapped mode */
--		struct {
--			__u64	r_present	: 1,  /*  0      */
--				r_fpd		: 1,  /*  1      */
--				dst_mode	: 1,  /*  2      */
--				redir_hint	: 1,  /*  3      */
--				trigger_mode	: 1,  /*  4      */
--				dlvry_mode	: 3,  /*  5 -  7 */
--				r_avail		: 4,  /*  8 - 11 */
--				r_res0		: 4,  /* 12 - 15 */
--				r_vector	: 8,  /* 16 - 23 */
--				r_res1		: 8,  /* 24 - 31 */
--				dest_id		: 32; /* 32 - 63 */
--		};
--
--		/* Posted mode */
--		struct {
--			__u64	p_present	: 1,  /*  0      */
--				p_fpd		: 1,  /*  1      */
--				p_res0		: 6,  /*  2 -  7 */
--				p_avail		: 4,  /*  8 - 11 */
--				p_res1		: 2,  /* 12 - 13 */
--				p_urgent	: 1,  /* 14      */
--				p_pst		: 1,  /* 15      */
--				p_vector	: 8,  /* 16 - 23 */
--				p_res2		: 14, /* 24 - 37 */
--				pda_l		: 26; /* 38 - 63 */
--		};
--		__u64 low;
--	};
--
--	union {
--		/* Shared between remapped and posted mode*/
--		struct {
--			__u64	sid		: 16,  /* 64 - 79  */
--				sq		: 2,   /* 80 - 81  */
--				svt		: 2,   /* 82 - 83  */
--				__res3		: 44;  /* 84 - 127 */
--		};
--
--		/* Posted mode*/
--		struct {
--			__u64	p_sid		: 16,  /* 64 - 79  */
--				p_sq		: 2,   /* 80 - 81  */
--				p_svt		: 2,   /* 82 - 83  */
--				p_res3		: 12,  /* 84 - 95  */
--				pda_h		: 32;  /* 96 - 127 */
--		};
--		__u64 high;
-+#ifdef CONFIG_IRQ_REMAP
-+		__u128 irte;
-+#endif
- 	};
- };
- 
+It could be that the relevant platforms are the ones with 'qcom,no-clock-support'
+property of QCE in the downstream.
 
-
+-- 
+Best wishes,
+Vladimir
