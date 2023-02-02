@@ -2,56 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F94DC636CD
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 00:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5B8C636CD
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 02:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjBBAze (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Feb 2023 19:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
+        id S230323AbjBBC5N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Feb 2023 21:57:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjBBAze (ORCPT
+        with ESMTP id S229457AbjBBC5M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Feb 2023 19:55:34 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B5244FAE7;
-        Wed,  1 Feb 2023 16:55:31 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pNNsa-006ZcC-6G; Thu, 02 Feb 2023 08:55:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Feb 2023 08:55:08 +0800
-Date:   Thu, 2 Feb 2023 08:55:08 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, viro@zeniv.linux.org.uk,
-        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
-        metze@samba.org, hch@infradead.org, willy@infradead.org,
-        jlayton@kernel.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sfrench@samba.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 05/12] cifs: Add a function to Hash the contents of an
- iterator
-Message-ID: <Y9sJ7Nuubw1U4M6u@gondor.apana.org.au>
-References: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
- <312908.1675262203@warthog.procyon.org.uk>
+        Wed, 1 Feb 2023 21:57:12 -0500
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83EC728CB
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Feb 2023 18:57:11 -0800 (PST)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 3122iIF8098244;
+        Thu, 2 Feb 2023 10:44:18 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Feb
+ 2023 10:56:03 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+Subject: [PATCH-next] crypto: aspeed: fix type warnings
+Date:   Thu, 2 Feb 2023 10:56:00 +0800
+Message-ID: <20230202025600.2598548-1-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <312908.1675262203@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 3122iIF8098244
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 01, 2023 at 02:36:43PM +0000, David Howells wrote:
-> 
-> It's already abusing the shash API, this doesn't change that, except where it
-> gets the data from.
+This patch fixes following warnings:
 
-Oh OK.  All I saw was this one patch which added shash code.
-Were you also deleting shash code in another patch that wasn't
-cc'ed to me?
+1. sparse: incorrect type in assignment (different base types)
+Fix: change to __le32 type.
+2. sparse: cast removes address space '__iomem' of expression
+Fix: change to force cast.
 
-Cheers,
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+---
+ drivers/crypto/aspeed/aspeed-acry.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
+index 164c524015f0..f8c733376469 100644
+--- a/drivers/crypto/aspeed/aspeed-acry.c
++++ b/drivers/crypto/aspeed/aspeed-acry.c
+@@ -252,7 +252,7 @@ static int aspeed_acry_rsa_ctx_copy(struct aspeed_acry_dev *acry_dev, void *buf,
+ 				    enum aspeed_rsa_key_mode mode)
+ {
+ 	const u8 *src = xbuf;
+-	u32 *dw_buf = (u32 *)buf;
++	__le32 *dw_buf = (__le32 *)buf;
+ 	int nbits, ndw;
+ 	int i, j, idx;
+ 	u32 data = 0;
+@@ -302,7 +302,7 @@ static int aspeed_acry_rsa_ctx_copy(struct aspeed_acry_dev *acry_dev, void *buf,
+ static int aspeed_acry_rsa_transfer(struct aspeed_acry_dev *acry_dev)
+ {
+ 	struct akcipher_request *req = acry_dev->req;
+-	u8 *sram_buffer = (u8 *)acry_dev->acry_sram;
++	u8 *sram_buffer = (u8 __force *)acry_dev->acry_sram;
+ 	struct scatterlist *out_sg = req->dst;
+ 	static u8 dram_buffer[ASPEED_ACRY_SRAM_MAX_LEN];
+ 	int leading_zero = 1;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
+
