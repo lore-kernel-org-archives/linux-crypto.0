@@ -2,107 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0671EC6379F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 22:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50798C636D7
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 22:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231829AbjBBW1M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 17:27:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
+        id S232946AbjBBWqL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 17:46:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231442AbjBBW1L (ORCPT
+        with ESMTP id S232964AbjBBWqK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 17:27:11 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B071C1ABE6
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 14:27:09 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id fi26so3527915edb.7
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 14:27:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=htsoF+0dAV+soqelwMOxu8OLAjWrlwNcAr2UdCMs8v4=;
-        b=H44bIUH3EWCmyadBXYgygjbXAYlG952xbCVe1R1Lu41LfJ1MmT88QhdPiPtdCYjY/O
-         YN7AIIIYhSd8vN0BMDcOk85ky+avOHAvXDS8YwOJ70AQNwRum7QO+1uCqgRcP4Q9/0XB
-         tTnYzrDXzovj4h/qsdjE4ONlN94GjXrWB6cGW4GvssCqAl1M129TpWzB4mwtdIVG7bz0
-         9LfJEw01Htor7po8vMgfUnmp1Gqexw/Q3+T3KrFFyhMafMeWKZnmEH1SyFVmjt+p4SA4
-         IJEcaU5aZL61WgoCPjWbnR0EBZWkl4JCk/lAX8UNAUSoIWR4CcCugFsTKWb8u0S+eTdk
-         EWfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=htsoF+0dAV+soqelwMOxu8OLAjWrlwNcAr2UdCMs8v4=;
-        b=cOA7+uLFMT40xZ11l/D1yQ1BqzmwdlMZOlI0FH1XSRoH7Y2O+0EOZ43cdGHCHM8XAm
-         aflDeeDqfjWN94J4kSCOuFXh/SYfWfXRzKKWGsmCbYjnO6dM/fq6wZOtfKF17OdHaNWD
-         bKWA+Pmmgu2zyig72nlW4fqLqdloli9U5wOASssytX2JA+INWkpKi/gWpwtu8xVrsQwj
-         my1hbKtDkrRlH4xBE+gVY0vGvAmOGWKKaB0Qj4PdbZqjcZKuv/TZRxOIG8QeZhR8PsKq
-         TF1ik7CaZHN05b5TTw1Zs+Ttj39jSUhmz5hraXrmLZulrhZKqX1trvzbNHEh+Eiav6c/
-         JKRg==
-X-Gm-Message-State: AO0yUKWe1na29RRcZlejMa7yWc9Kzh9FpSqybvzAUJ42bdtCgJUFIzK3
-        EIpxEoT6RsVEZHlVFQqs1yYqLA==
-X-Google-Smtp-Source: AK7set/yLIBMIxVVa09c0abZawIa36KcE8yzXqO5U2V8ePOTwQhiJEGkap+3ftH4iHbY8R7Pb99vPw==
-X-Received: by 2002:a05:6402:34cc:b0:49b:67c5:3044 with SMTP id w12-20020a05640234cc00b0049b67c53044mr9046173edc.4.1675376828243;
-        Thu, 02 Feb 2023 14:27:08 -0800 (PST)
-Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id s22-20020aa7cb16000000b004a236384909sm303300edt.10.2023.02.02.14.27.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 14:27:07 -0800 (PST)
-Message-ID: <22f191c4-5346-8fe7-690d-9422775bb2d5@linaro.org>
-Date:   Fri, 3 Feb 2023 00:27:06 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
- clock-names as optional
-Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
+        Thu, 2 Feb 2023 17:46:10 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF616CCA8
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 14:46:03 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-29-y36o5xIlPiWVEvSaXEynsQ-1; Thu, 02 Feb 2023 22:45:59 +0000
+X-MC-Unique: y36o5xIlPiWVEvSaXEynsQ-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.45; Thu, 2 Feb
+ 2023 22:45:57 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.045; Thu, 2 Feb 2023 22:45:57 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>
+CC:     "corbet@lwn.net" <corbet@lwn.net>,
+        "will@kernel.org" <will@kernel.org>,
+        "boqun.feng@gmail.com" <boqun.feng@gmail.com>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "dennis@kernel.org" <dennis@kernel.org>,
+        "tj@kernel.org" <tj@kernel.org>, "cl@linux.com" <cl@linux.com>,
+        "hca@linux.ibm.com" <hca@linux.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "svens@linux.ibm.com" <svens@linux.ibm.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Neil Armstrong <neil.armstrong@linaro.org>
-References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
- <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
- <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-In-Reply-To: <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "penberg@kernel.org" <penberg@kernel.org>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "iamjoonsoo.kim@lge.com" <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "roman.gushchin@linux.dev" <roman.gushchin@linux.dev>,
+        "42.hyeyoo@gmail.com" <42.hyeyoo@gmail.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH v2 00/10] Introduce cmpxchg128() -- aka. the demise of
+ cmpxchg_double()
+Thread-Topic: [PATCH v2 00/10] Introduce cmpxchg128() -- aka. the demise of
+ cmpxchg_double()
+Thread-Index: AQHZNz4vE8dWPUdohk2nkEpDmnikoa68PlfA
+Date:   Thu, 2 Feb 2023 22:45:57 +0000
+Message-ID: <fe484df93b1d437b84edfd85fed66191@AcuMS.aculab.com>
+References: <20230202145030.223740842@infradead.org>
+ <CAHk-=wiF6y7CwR1P5_73aK2f=x=RZjwgh3sgeO3Mczv4XcDc8g@mail.gmail.com>
+In-Reply-To: <CAHk-=wiF6y7CwR1P5_73aK2f=x=RZjwgh3sgeO3Mczv4XcDc8g@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Krzysztof,
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMDIgRmVicnVhcnkgMjAyMyAxOTozOQ0KPiAN
+Cj4gT24gVGh1LCBGZWIgMiwgMjAyMyBhdCA3OjI5IEFNIFBldGVyIFppamxzdHJhIDxwZXRlcnpA
+aW5mcmFkZWFkLm9yZz4gd3JvdGU6DQo+ID4NCj4gPiAgLSBmaXhlZCB1cCB0aGUgaW5saW5lIGFz
+bSB0byB1c2UgJ3UxMjggKicgbWVtIGFyZ3VtZW50IHNvIHRoZSBjb21waWxlciBrbm93cw0KPiA+
+ICAgIGhvdyB3aWRlIHRoZSBtb2RpZmljYXRpb24gaXMuDQo+ID4gIC0gcmV3b3JrZWQgdGhlIHBl
+cmNwdSB0aGluZyB0byB1c2UgdW5pb24gYmFzZWQgdHlwZS1wdW5uaW5nIGluc3RlYWQgb2YNCj4g
+PiAgICBfR2VuZXJpYygpIGJhc2VkIGNhc3RzLg0KPiANCj4gTG9va3MgbG92ZWx5IHRvIG1lLiBU
+aGlzIHJlbW92ZWQgYWxsIG15IGNvbmNlcm5zIChleGNlcHQgZm9yIHRoZQ0KPiB0ZXN0aW5nIG9u
+ZSwgYnV0IGFsbCB0aGUgcGF0Y2hlcyBsb29rZWQgbmljZSBhbmQgY2xlYW4gdG8gbWUsIHNvDQo+
+IGNsZWFybHkgaXQgbXVzdCBiZSBwZXJmZWN0KS4NCg0KVGhlIGNoYW5nZSBpcyBhbG1vc3QgY2Vy
+dGFpbmx5IGZvciB0aGUgYmV0dGVyLg0KDQpCdXQgZGlkIEkgc3BvdCBvbmUgb2YgdGhlIGJpdHMg
+dXNpbmcgY21weGNoZzEyOCBqdXN0IHRvIGRvIGFuIGF0b21pYyB3cml0ZT8NCkkgdGhpbmsgaXQg
+d2FzIHVwZGF0aW5nIHNvbWUgaW50ZXJydXB0IGluZm8gdGhhdCB3YXMgYXQgZmlyc3QgZ2xhbmNl
+IG5vdA0KZGlzc2ltaWxhciB0byB0aGF0IHVzZWQgYnkgTVNJLVggKGl0IHdhc24ndCBNU0ktWCku
+DQoNCklmIHRoYXQgd2FzIGEgaGFyZHdhcmUgcmVnaXN0ZXIgdGhlbiBpdCBjb3VsZCB3ZWxsIHJl
+cXVpcmUgYSBmdWxsIGJ1cyBsb2NrLg0KVXNpbmcgYSB3cml0ZSBvZiBhIHNzZSAob3IgZXF1aXYp
+IDEyOGJpdCByZWdpc3RlciB3b3VsZCBiZSBhbiBhdG9taWMgd3JpdGUNCndpdGhvdXQgdGhlIGJ1
+cyBsb2NrIHByb2JsZW0uDQoNCkFsc28sIHRoYXQgaXMgb25seSBnb2luZyB0byB3b3JrIGlmIHRo
+ZSBoYXJkd2FyZS9sb2dpYyBzaWRlIGd1YXJhbnRlZXMgdG8NCnRyZWF0IGEgc2luZ2xlIHdyaXRl
+IGFzIGF0b21pYy4NCkkga25vdyB0aGVyZSBhcmUgTVNJLVggaW1wbGVtZW50YXRpb25zIG91dCB0
+aGVyZSB3aGVyZSB0aGUgY3B1IHdyaXRlDQp3aWxsIGJlIHNwbGl0IGludG8gZm91ciAzMmJpdCB3
+cml0ZXMgdG8gc29tZSBpbnRlcm5hbCBtZW1vcnkgYW5kIHRoZQ0KaGFyZHdhcmUgc2lkZSB3aWxs
+IGFsc28gZG8gbXVsdGlwbGUgYWNjZXNzZXMuDQooUHJldHR5IG11Y2ggYW55IGltcGxlbWVudGF0
+aW9uIG9uIGFuIGZwZ2Egd2lsbCBiZWhhdmUgbGlrZSB0aGF0LA0Kbm90IGp1c3QgdGhlIG9uZSBJ
+IHdyb3RlLikNCkkgZGlkbid0IHNlZSB0aGUgTVNJLVggY29kZSB0aGVyZSwgYnV0IEkgZG8gd29u
+ZGVyIGhvdyBpdCBzYWZlbHkgY2hhbmdlcw0KYWZmaW5pdGllcy4NCg0KCURhdmlkDQoNCi0NClJl
+Z2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0
+b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykN
+Cg==
 
-On 2/2/23 15:53, Krzysztof Kozlowski wrote:
-> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
->> From: Neil Armstrong <neil.armstrong@linaro.org>
->>
->> On certain Snapdragon processors, the crypto engine clocks are enabled by
->> default by security firmware.
-> 
-> Then probably we should not require them only on these variants.
-
-the rationale is clear, but here comes a minor problem, older platforms
-require clocks, when newer ones do not. When a generic SoC-specific compatible
-is introduced, let say "qcom,ipq4019-qce", it itself requires the clocks,
-but then newer platforms can not be based on this particular compatible,
-otherwise they will require clocks and this comes as invalid.
-
-How to resolve it properly, shall there be another generic SoC-specific
-compatible without clocks and NOT based on that "qcom,ipq4019-qce" compatible?
-
-By the way, QCE on SM8150 also shall not need the clocks.
-
---
-Best wishes,
-Vladimir
