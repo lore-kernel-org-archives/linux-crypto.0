@@ -2,119 +2,151 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB37CC05027
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 16:33:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73ACAC05027
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 16:52:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbjBBQdL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 11:33:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44484 "EHLO
+        id S232398AbjBBQwJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 11:52:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbjBBQdK (ORCPT
+        with ESMTP id S232391AbjBBQwF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 11:33:10 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826D91205A
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 08:33:03 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id m7so2223633wru.8
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 08:33:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=x+y+o/Wjd2NwudZ2nm6ZyEg3Aj1gsA3hyrscQ3Yxhh0=;
-        b=NhqLwXJennmkEBzy7M5keLNElRd6jggbjgsfzEfw36x+ET93hlQpIqBvHCvEPYKdcf
-         9ESdhznNjkO+4cNAoK5096MXEmxDjpRlItE/LlK99RMgUq1i5LK2GIPGHvQXr5WqJv/6
-         +UQ2YGDMXiEEA3iyEwVnR1k0y6VsP+kIXFMHweE26aCZIIXrD36YI/oukh4ze+RmNltv
-         XbPss7nPpZtL3OWRmKxWGn2o7mjM4dAE4kJbtGJrEfA1Gutf/9NEOe1Yj2OqFKVStNGv
-         yG+VwzrFQJRLJJAzKZszMmpKvy2Z8nY4vWnjbxKHPzbXzE+ogczeBgzqbWAr3F2NblQy
-         y2dA==
+        Thu, 2 Feb 2023 11:52:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC846DFC3
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 08:51:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675356677;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JTzAWBEi5HSO9Co7j9eqLuzQVPsmDG7KdLe0XlcpLzA=;
+        b=f3k0aAGVu7/S7COiTfJKlz6B8WVbnO2icXp0gnYhCuvM71V1APN9Qfj9V1LYl0gke8Yf36
+        muqTcDQWeY/gOGS/2v0D0VQPwlizWHfPnwF7XGvzBqrlbGzk8l2ATfKyUkZoMHy7tvr2r+
+        p/Ti1yYKTKsF2NtNJ1x31CGn704/zbI=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-620-K6cCMn1KMrqr7W21tGCfZA-1; Thu, 02 Feb 2023 11:51:16 -0500
+X-MC-Unique: K6cCMn1KMrqr7W21tGCfZA-1
+Received: by mail-qk1-f197.google.com with SMTP id a6-20020a05620a102600b00729952b4c73so1634167qkk.6
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 08:51:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=x+y+o/Wjd2NwudZ2nm6ZyEg3Aj1gsA3hyrscQ3Yxhh0=;
-        b=Dq1xoxm6EEYHOp7xqkcYHWXWA/UcpEXXpptqui6UOHmzvqAoaCCbqT6H8jYeeJBeeu
-         u8/diVxczKu1rnHsinDC2Qxnk+cM9S39erviyDb9v0QcxeoeUkl9BsCRCiDL25tjHqEr
-         2D8ggRdhEZaa5aEf011I83cmfFobEWYcQ1a5QleUpnBnaXjvTR0dxKWZvtDGRcWB4PpQ
-         3fAXR8axyDkY+KwRg1weKk7oX7ejREBNFq98P0PjdPwEMToW3Q0EPb2SSN0gzeE+wmoV
-         /lyyylrbYW6gOyLJhdIRzEcdnpx2yN6xHhRpNc1c5BRAJiRtchDq+Zy6/yuvg+dPAhLk
-         Jrvg==
-X-Gm-Message-State: AO0yUKV/fMKzJI+wjQAUGI1jBdLc19B+kGLwYMgEFqxg7vMZkWGi/epI
-        ptOfV2dwGoL08MfDsAxv8WfmwWhf2NKaxmUKV/4=
-X-Google-Smtp-Source: AK7set8eRf4Ge+qR3bh/ypq9RkQrO+GZz7CPDskr/v1RpP9diYU0jhW3yp8mu4JWchabCjgN3LvfyA==
-X-Received: by 2002:a05:6000:110d:b0:2bf:c0f2:4b0 with SMTP id z13-20020a056000110d00b002bfc0f204b0mr6402311wrw.19.1675355581548;
-        Thu, 02 Feb 2023 08:33:01 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:ce5b:78ab:f662:ef0d? ([2a01:e0a:982:cbb0:ce5b:78ab:f662:ef0d])
-        by smtp.gmail.com with ESMTPSA id p6-20020a5d48c6000000b002bfc0558ecdsm19941965wrs.113.2023.02.02.08.32.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 08:33:00 -0800 (PST)
-Message-ID: <5363960d-8ca1-aaf0-3721-f5d3a1575da2@linaro.org>
-Date:   Thu, 2 Feb 2023 17:32:54 +0100
+        bh=JTzAWBEi5HSO9Co7j9eqLuzQVPsmDG7KdLe0XlcpLzA=;
+        b=JwnTU5eXqiyVjetgh7BuY67XHCGn9Xyd1+diWsGhQ92uLRLwqsF7VaXguLa8FD9iA7
+         MYGVGeUk3hVXAKu1yh4nNls1cb244qeKiyhfjVswRR+Y9LEvAYuLfeH5OfTu1bGE3erc
+         03xOYrUyWnptOZp2w4lwpKAXtTE5dfUpgYlf39XnrLtv1OA8lFe03BPhpnXswlwSZp4i
+         5t64SsW5kHl2yjGC2g+DCuNfumSP+ptIoUHpfYRgq2cMCRQtm/9RYapuEERZTVqB3kDa
+         kj09bFJPWy6d14k4P+EGNO+i/f6uNaIoRWsvQJ7XbLTrb8jsBRyJKW21xYfEEsbh5g96
+         yJOw==
+X-Gm-Message-State: AO0yUKU5/W+OsEugA4LLVM46aGh++xqe3oknTinfWrCH1AJjhll6DK5w
+        1NOe+1311xc37tYqpkZQmfPV5kOHkrGcTqOATNEdjGy2gQtFcxsJrUP+lNLblzKI3zdoKiqC0Hl
+        fz4fVrLqMz7bV3zLxX+HyipcL7WyDqpqnj3iuIfH5
+X-Received: by 2002:ac8:5bcb:0:b0:3b8:4aed:5e35 with SMTP id b11-20020ac85bcb000000b003b84aed5e35mr755704qtb.377.1675356675868;
+        Thu, 02 Feb 2023 08:51:15 -0800 (PST)
+X-Google-Smtp-Source: AK7set9CdlG5MCbspTLzaIYSjOuDOOu9+Li9sUJHoDTil1GB7T0FTEtXJ34q3qGH8hAtfqWNRKuEkLMS14ckMfg0JSQ=
+X-Received: by 2002:ac8:5bcb:0:b0:3b8:4aed:5e35 with SMTP id
+ b11-20020ac85bcb000000b003b84aed5e35mr755698qtb.377.1675356675572; Thu, 02
+ Feb 2023 08:51:15 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-From:   Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
- clock-names as optional
-Content-Language: en-US
-To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
- <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
- <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
- <36b6f8f2-c438-f5e6-b48f-326e8b709de8@linaro.org>
- <a2e4dff0-af8f-dccb-9074-8244b054c448@linaro.org>
- <61eb2a01-762e-b83b-16b7-2c9b178407da@linaro.org>
-Organization: Linaro Developer Services
-In-Reply-To: <61eb2a01-762e-b83b-16b7-2c9b178407da@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230201155944.23379-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20230201155944.23379-1-giovanni.cabiddu@intel.com>
+From:   Vladis Dronov <vdronov@redhat.com>
+Date:   Thu, 2 Feb 2023 17:51:04 +0100
+Message-ID: <CAMusb+TdiP=RJ_gQ0K8Wx1_6MoNBfb=7QUrvEeJcF3G45Yo-aA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: qat - fix out-of-bounds read
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, stable@vger.kernel.org,
+        Fiona Trahe <fiona.trahe@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 02/02/2023 17:16, Vladimir Zapolskiy wrote:
-> On 2/2/23 16:21, Neil Armstrong wrote:
->> On 02/02/2023 15:04, Vladimir Zapolskiy wrote:
->>> Hi Krzysztof,
->>>
->>> On 2/2/23 15:53, Krzysztof Kozlowski wrote:
->>>> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
->>>>> From: Neil Armstrong <neil.armstrong@linaro.org>
->>>>>
->>>>> On certain Snapdragon processors, the crypto engine clocks are enabled by
->>>>> default by security firmware.
->>>>
->>>> Then probably we should not require them only on these variants.
->>>
->>> I don't have the exact list of the affected SoCs, I believe Neil can provide
->>> such a list, if you find it crucial.
->>
->> It's the case for SM8350, SM8450 & SM8550.
->>
-> 
-> On SM8250 there is no QCE clocks also, so I'll add it to the list, and I hope
-> that now the list is complete.
-> 
-> It could be that the relevant platforms are the ones with 'qcom,no-clock-support'
-> property of QCE in the downstream.
-> 
+ Hi, Giovanni, all,
 
-Yes this is what I figured out with the 5.10 device-trees I have checkouted.
+On Wed, Feb 1, 2023 at 4:59 PM Giovanni Cabiddu
+<giovanni.cabiddu@intel.com> wrote:
+>
+> When preparing an AER-CTR request, the driver copies the key provided by
+> the user into a data structure that is accessible by the firmware.
+> If the target device is QAT GEN4, the key size is rounded up by 16 since
+> a rounded up size is expected by the device.
+> If the key size is rounded up before the copy, the size used for copying
+> the key might be bigger than the size of the region containing the key,
+> causing an out-of-bounds read.
+>
+> Fix by doing the copy first and then update the keylen.
+>
+> This is to fix the following warning reported by KASAN:
+>
+>         [  138.150574] BUG: KASAN: global-out-of-bounds in qat_alg_skcipher_init_com.isra.0+0x197/0x250 [intel_qat]
+>         [  138.150641] Read of size 32 at addr ffffffff88c402c0 by task cryptomgr_test/2340
+>
+>         [  138.150651] CPU: 15 PID: 2340 Comm: cryptomgr_test Not tainted 6.2.0-rc1+ #45
+>         [  138.150659] Hardware name: Intel Corporation ArcherCity/ArcherCity, BIOS EGSDCRB1.86B.0087.D13.2208261706 08/26/2022
+>         [  138.150663] Call Trace:
+>         [  138.150668]  <TASK>
+>         [  138.150922]  kasan_check_range+0x13a/0x1c0
+>         [  138.150931]  memcpy+0x1f/0x60
+>         [  138.150940]  qat_alg_skcipher_init_com.isra.0+0x197/0x250 [intel_qat]
+>         [  138.151006]  qat_alg_skcipher_init_sessions+0xc1/0x240 [intel_qat]
+>         [  138.151073]  crypto_skcipher_setkey+0x82/0x160
+>         [  138.151085]  ? prepare_keybuf+0xa2/0xd0
+>         [  138.151095]  test_skcipher_vec_cfg+0x2b8/0x800
+>
+> Fixes: 67916c951689 ("crypto: qat - add AES-CTR support for QAT GEN4 devices")
+> Cc: <stable@vger.kernel.org>
+> Reported-by: Vladis Dronov <vdronov@redhat.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+> ---
+>  drivers/crypto/qat/qat_common/qat_algs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+> index b4b9f0aa59b9..b61ada559158 100644
+> --- a/drivers/crypto/qat/qat_common/qat_algs.c
+> +++ b/drivers/crypto/qat/qat_common/qat_algs.c
+> @@ -435,8 +435,8 @@ static void qat_alg_skcipher_init_com(struct qat_alg_skcipher_ctx *ctx,
+>         } else if (aes_v2_capable && mode == ICP_QAT_HW_CIPHER_CTR_MODE) {
+>                 ICP_QAT_FW_LA_SLICE_TYPE_SET(header->serv_specif_flags,
+>                                              ICP_QAT_FW_LA_USE_UCS_SLICE_TYPE);
+> -               keylen = round_up(keylen, 16);
+>                 memcpy(cd->ucs_aes.key, key, keylen);
+> +               keylen = round_up(keylen, 16);
+>         } else {
+>                 memcpy(cd->aes.key, key, keylen);
+>         }
+> --
+> 2.39.1
+>
 
-Neil
+Thanks, the fix seems to be working. It was tested on "Intel(R) Xeon(R)
+Platinum 8468H / Sapphire Rapids 4 skt (SPR) XCC-SP, Qual E-3
+stepping" machine with 8086:4940 (rev 40) QAT device:
+
+Without the fix:
+
+# dmesg | grep KASAN
+[  142.612847] BUG: KASAN: global-out-of-bounds in
+qat_alg_skcipher_init_com.isra.0+0x2fe/0x440 [intel_qat]
+
+With the fix:
+
+# dmesg | grep KASAN
+<no output>
+
+So,
+
+Reviewed-by: Vladis Dronov <vdronov@redhat.com>
+Tested-by: Vladis Dronov <vdronov@redhat.com>
+
+Best regards,
+Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
 
