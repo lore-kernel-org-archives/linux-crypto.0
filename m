@@ -2,56 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17573C636D4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 13:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02F7C61DA4
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 13:53:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231486AbjBBNvV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 08:51:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
+        id S231149AbjBBNx6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 08:53:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232261AbjBBNvH (ORCPT
+        with ESMTP id S231482AbjBBNxz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 08:51:07 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9ACF8FB64
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 05:50:54 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id cw4so2018300edb.13
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 05:50:54 -0800 (PST)
+        Thu, 2 Feb 2023 08:53:55 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E24625E18
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 05:53:54 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id q5so1821250wrv.0
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 05:53:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oCbqvORx24QYDOSwcFJXyWQd0s0yT+w31F5oNZstwBs=;
-        b=bmmg3KkS0nzITvHmzjv661grJmumPmx8/8K9g7d7Oh2ZCJY8hOoUZkJPa8pJW46iYD
-         xAUFij6lYoXFfTb6qfRo3Lsf8BCWXXwMx0a5Tm0R4zX/yck4nUWBqHsgAGvN3wDKJW00
-         h7mqVxbLIE1aHkPdAYvP3UKDrAbhgXSgj1XOgnJBbxQuqi62knS/p3k6pq005OEpniB6
-         HRUSO6nwBVTD0uzy1srgQD9UuyMWOuVzIsdrIHyqtg7g4mM39TsYYKQO80axpLvvCCQZ
-         sYX2z+rMm6q4wdIrA9YAgC22BpOEDw9y+HYOGard8PEsZz4g3yk8vuc6isK4qabV+2Bk
-         9T3Q==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x6jPPRzCymygBdtkYK+PVPRo7vQuaUfKjd8hJMNHQBs=;
+        b=c9PQ9kV/8Paq3Y3yhbFzRBhrvjoelncuq/NevOVnVfPB6kIwAU3sMzwb8nTaq4ZY1J
+         92YonJrjz47xmBSMIpyCebNbH3+krAkk+lZYnzREX2mulIZku5wFqirdHqvSB7bPyqFM
+         dvVixQZrlews8F+sKpabikRVbVVe5jtO8t2K4tJpNDTHOfmHYdfhy4u3jNonsN0GYYtT
+         y1oLBLbo3uBydgUjf6aK4N9+hbKJel9yOj3qbbwpAH4DDUlRv/5qxvSX3ZQ1RiwxvJvl
+         YdVz9onEiMBA/0Z+mgB6piNQfCETSJ7yHrbc4k1lFwtt5V8R6tLo9OoXmwENIXS5NTBS
+         Qzfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oCbqvORx24QYDOSwcFJXyWQd0s0yT+w31F5oNZstwBs=;
-        b=VJebI1O+C/1/otJH8+9VCNbtcUSYSZ53y4hL39DritGstYK8KysnbHB3AmkLJ5x/AS
-         OLbAdTFSO7OjZo4+dGfEDsAAvUeOD2FLNH4biEFdG8a39nmHVzZM8QrTuIaRe3oLFOdX
-         KyOQkYOQCnQN/UO9b3VjdoQDd7EsH8xSCrQ0OOd5skPPahO6fLrYNIajEXh3EvYdszRP
-         vtcIkPmoxIwaGU4EWd7i+Q+S5axbLt5grWsq/6DKY6FBBYfLri2w77XFRpwtj1GTi1wF
-         zWzhcRwSneTkVb7pmPor39XBVgf74r5BuihCw2WrOT78c35lN9pORw4Q+wYPKE/JDTNE
-         /YFg==
-X-Gm-Message-State: AO0yUKUSlRaTuhR84NPqvQrCtwoNU6SKROcGPNESObaXEu9JVe8aqhGl
-        keX81CVYt69TaNJe6mJ+3V0jgA==
-X-Google-Smtp-Source: AK7set+5WXg+XjiI2lc5qdpF6HR4DET7H/I4VycOwstEgIu9xLxEX+9Wo3oax3fAcYLWaEOwdSh3PA==
-X-Received: by 2002:a05:6402:74c:b0:4a2:590b:668a with SMTP id p12-20020a056402074c00b004a2590b668amr6528640edy.3.1675345854269;
-        Thu, 02 Feb 2023 05:50:54 -0800 (PST)
-Received: from localhost.localdomain (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id r23-20020aa7c157000000b0049e1f167956sm7596332edp.9.2023.02.02.05.50.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 05:50:53 -0800 (PST)
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6jPPRzCymygBdtkYK+PVPRo7vQuaUfKjd8hJMNHQBs=;
+        b=RDRV7MdP7p0KgGVmzCIBgF0EBajA5OmkrfhBFTg6Go09dgrimPt+VWpnT5fKhh+3vc
+         xJEd8VBzZnC60EHKkH4XuGTT+akx++99wNLRGAntoo5fWr9iQVGlvkNKPDnVY6ED5wls
+         XHetoOphVfgGrfkSDkFXSbDFn7P55jZ4lRfTxu7ledvStUi0zm1RtP3ijgLmiM9UW1CI
+         ISNtAnbVp19SqsBqwYG4ts81ybYcOloQdT4mzFtltAJYfeRnlZUlqR7yFdThVQ2O0a1R
+         IfnwuD0wOMUWb41qbw3kK7lbm7ifZUUdy6nnC8MGPDAiKVPcg6qaZWgEE6O8GBwTVHhl
+         TJ/w==
+X-Gm-Message-State: AO0yUKVGGbDfT4dGnwtpbLFF/svK1swNCWJ/yV7tjnj+Oj2FdmTNMnip
+        TTvPxiNgkwl+8PZ+xPjC8wbcqg==
+X-Google-Smtp-Source: AK7set/MPPeZpuw7Mk30vtkJlm8zPLV7xBjKZzvi3W5HtgEcuaIs0nclq0JE/8HvZTbi7b+P8nYJPA==
+X-Received: by 2002:a5d:67cd:0:b0:2bf:b0e6:f463 with SMTP id n13-20020a5d67cd000000b002bfb0e6f463mr4661026wrw.13.1675346032814;
+        Thu, 02 Feb 2023 05:53:52 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id n5-20020a5d4c45000000b002be4ff0c917sm19874807wrt.84.2023.02.02.05.53.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Feb 2023 05:53:52 -0800 (PST)
+Message-ID: <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
+Date:   Thu, 2 Feb 2023 14:53:51 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
+ clock-names as optional
+Content-Language: en-US
+To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Bjorn Andersson <andersson@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Thara Gopinath <thara.gopinath@gmail.com>,
@@ -61,63 +69,26 @@ Cc:     Rob Herring <robh+dt@kernel.org>,
         Andy Gross <agross@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Rob Herring <robh@kernel.org>,
-        Jordan Crouse <jorcrous@amazon.com>
-Subject: [PATCH v8 8/9] crypto: qce: core: Make clocks optional
-Date:   Thu,  2 Feb 2023 15:50:35 +0200
-Message-Id: <20230202135036.2635376-9-vladimir.zapolskiy@linaro.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
+        linux-crypto@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>
 References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Thara Gopinath <thara.gopinath@gmail.com>
+On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
+> From: Neil Armstrong <neil.armstrong@linaro.org>
+> 
+> On certain Snapdragon processors, the crypto engine clocks are enabled by
+> default by security firmware.
 
-On certain Snapdragon processors, the crypto engine clocks are enabled by
-default by security firmware and the driver need not/ should not handle the
-clocks. Make acquiring of all the clocks optional in crypto engine driver
-so that the driver initializes properly even if no clocks are specified in
-the dt.
+Then probably we should not require them only on these variants.
 
-Cc: Bjorn Andersson <andersson@kernel.org>
-Cc: Rob Herring <robh@kernel.org>
-Cc: herbert@gondor.apana.org.au
-Tested-by: Jordan Crouse <jorcrous@amazon.com>
-Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-[Bhupesh: Massage the commit log]
-Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
----
- drivers/crypto/qce/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index 336edba2513e..8e496fb2d5e2 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -209,15 +209,15 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 	if (ret < 0)
- 		return ret;
- 
--	qce->core = devm_clk_get(qce->dev, "core");
-+	qce->core = devm_clk_get_optional(qce->dev, "core");
- 	if (IS_ERR(qce->core))
- 		return PTR_ERR(qce->core);
- 
--	qce->iface = devm_clk_get(qce->dev, "iface");
-+	qce->iface = devm_clk_get_optional(qce->dev, "iface");
- 	if (IS_ERR(qce->iface))
- 		return PTR_ERR(qce->iface);
- 
--	qce->bus = devm_clk_get(qce->dev, "bus");
-+	qce->bus = devm_clk_get_optional(qce->dev, "bus");
- 	if (IS_ERR(qce->bus))
- 		return PTR_ERR(qce->bus);
- 
--- 
-2.33.0
+Best regards,
+Krzysztof
 
