@@ -2,203 +2,199 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 243FAC05027
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 11:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E78CC636D6
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 13:50:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbjBBLRR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 06:17:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
+        id S231575AbjBBNuq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 08:50:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBBLRQ (ORCPT
+        with ESMTP id S231339AbjBBNuq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 06:17:16 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522DF8B363;
-        Thu,  2 Feb 2023 03:16:43 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 40F4B1EC069A;
-        Thu,  2 Feb 2023 12:16:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1675336591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uvIi+Jx60bAKZN/jWrmPW8ftCneMWCqwRu7t5YqCP6A=;
-        b=VnhgzffYvCsw8bh+fg0k2U0T6Z3TNXxqbpnwhrQo53m3rVqxJxfuRf2qalw08ZdGttXzmS
-        eidLqdR/beaGLg4/8THaXR8t9Ifu0BDQnyxlBIx/42WtxL3O6a7xqtaAHrhg5gC6cc/Ozy
-        V2Iyhp9ReyT77PiDvfz2bpjHqKwMYsU=
-Date:   Thu, 2 Feb 2023 12:16:27 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v7 14/64] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <Y9ubi0i4Z750gdMm@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-15-michael.roth@amd.com>
+        Thu, 2 Feb 2023 08:50:46 -0500
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC7174A57
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 05:50:43 -0800 (PST)
+Received: by mail-ed1-x542.google.com with SMTP id z11so2077418ede.1
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 05:50:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rf0VgEByS+dEGqCN3splXKV9KTkduOfaE2qRRkUgcps=;
+        b=OR0NdpgRzgqiIthozDCVRgHAC3fFyIBoH0kh6aoDCmRIX0KTCVhFyFtPgiB9/s3uns
+         bgiMqn9XVJc67Iq+Y8S4LupNgVowFXCotbmCLTKdp5RNg+2CXUeXuBxWIfNLz10LHaua
+         3wjDND9W2uYeAv6/2A3MwH9tt8D58nT9w+j/vGSFF6mDBRcWX/8aWb2BDuIstaBjcFp9
+         BviKgZiH5a7tjQu07J172vq/MUPhU95ywunNvSpf9fGz2q4VcNEWEO6OJtQS9Sx/W3Uh
+         kjrexaPgBDfSlB5OTlNGkWDpcq7H/Ig92zZA3A4UhdobdsWNyMyb3YvR0LWezoKM8NOQ
+         1BWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rf0VgEByS+dEGqCN3splXKV9KTkduOfaE2qRRkUgcps=;
+        b=wtXuEEQfpRvM19eT9OnFuejUHk/lUoXpGYfhssCOLTFA2qduSmrVpW1rn2JRCDkzTH
+         skCqY1OFRID9X9pd9ZoiVaORG5kAJpTB78rHxkLuwuyPKl6w0dwUCO7shV6V2pA7veyO
+         4wCDXM43Ju2SM6SzjuLBilvq15DRW/9CDwaRvVxJEvobKAMihk8BfWy4c62nDv36asmB
+         zTKUMRS1wjnLwNpFtb5nAPE5KiQWJppbi77p0lT1JaAfEiVTqdVxgARuXMcMt3iog+FW
+         eKW9HDRQMeiQpg+u94BgPI81ErN3VaBNILq1BsII0i/E3SNGYGtCt8HBtKP/AX/dUGQh
+         qstA==
+X-Gm-Message-State: AO0yUKWRsFVziKgr602An8v9ZE7Qt8j3RHnosBMfmpxr4z5fU1Na3I9f
+        QcMGLX8qILg4RsITf4cdcFGp5A==
+X-Google-Smtp-Source: AK7set/DOJzZLgThxp0kv0e2P5JlVxnl3aQz6FJjGZ81Z2x9kfnHTdGMW3kx2Icjs5DTswJdsRh2xw==
+X-Received: by 2002:a05:6402:74c:b0:4a2:590b:668a with SMTP id p12-20020a056402074c00b004a2590b668amr6527959edy.3.1675345842515;
+        Thu, 02 Feb 2023 05:50:42 -0800 (PST)
+Received: from localhost.localdomain (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id r23-20020aa7c157000000b0049e1f167956sm7596332edp.9.2023.02.02.05.50.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 05:50:42 -0800 (PST)
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Rob Herring <robh@kernel.org>,
+        Jordan Crouse <jorcrous@amazon.com>
+Subject: [PATCH v8 1/9] dt-bindings: qcom-qce: Convert bindings to yaml
+Date:   Thu,  2 Feb 2023 15:50:28 +0200
+Message-Id: <20230202135036.2635376-2-vladimir.zapolskiy@linaro.org>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
+References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-15-michael.roth@amd.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:06PM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The memory integrity guarantees of SEV-SNP are enforced through a new
-> structure called the Reverse Map Table (RMP). The RMP is a single data
-> structure shared across the system that contains one entry for every 4K
-> page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
-> track the owner of each page of memory. Pages of memory can be owned by
-> the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
-> section 15.36.3 for more detail on RMP.
-> 
-> The RMP table is used to enforce access control to memory. The table itself
-> is not directly writable by the software. New CPU instructions (RMPUPDATE,
-> PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
-> 
-> Based on the platform configuration, the BIOS reserves the memory used
-> for the RMP table. The start and end address of the RMP table must be
-> queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
-> RMP_END are not set then disable the SEV-SNP feature.
-> 
-> The SEV-SNP feature is enabled only after the RMP table is successfully
-> initialized.
-> 
-> Also set SYSCFG.MFMD when enabling SNP as SEV-SNP FW >= 1.51 requires
-> that SYSCFG.MFMD must be se
+From: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 
-			   set.
-> 
-> RMP table entry format is non-architectural and it can vary by processor
-> and is defined by the PPR. Restrict SNP support on the known CPU model
-> and family for which the RMP table entry format is currently defined for.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-b: Ashish Kalra <ashish.kalra@amd.com>
-	     ^^
+Convert Qualcomm QCE crypto devicetree binding to YAML.
 
-Somebody ate a 'y' here. :)
+Reviewed-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+Tested-by: Jordan Crouse <jorcrous@amazon.com>
+Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+---
+ .../devicetree/bindings/crypto/qcom-qce.txt   | 25 -------
+ .../devicetree/bindings/crypto/qcom-qce.yaml  | 67 +++++++++++++++++++
+ 2 files changed, 67 insertions(+), 25 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/disabled-features.h |   8 +-
->  arch/x86/include/asm/msr-index.h         |  11 +-
->  arch/x86/kernel/sev.c                    | 180 +++++++++++++++++++++++
->  3 files changed, 197 insertions(+), 2 deletions(-)
-
-...
-
-> +static __init int __snp_rmptable_init(void)
-
-Why is this one carved out of snp_rmptable_init() ?
-
-> +{
-> +	u64 rmp_base, sz;
-> +	void *start;
-> +	u64 val;
-> +
-> +	if (!get_rmptable_info(&rmp_base, &sz))
-> +		return 1;
-> +
-> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
-> +	if (!start) {
-> +		pr_err("Failed to map RMP table addr 0x%llx size 0x%llx\n", rmp_base, sz);
-> +		return 1;
-> +	}
-> +
-> +	/*
-> +	 * Check if SEV-SNP is already enabled, this can happen in case of
-> +	 * kexec boot.
-> +	 */
-> +	rdmsrl(MSR_AMD64_SYSCFG, val);
-> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-> +		goto skip_enable;
-> +
-> +	/* Initialize the RMP table to zero */
-
-Useless comment.
-
-> +	memset(start, 0, sz);
-> +
-> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
-> +	wbinvd_on_all_cpus();
-> +
-> +	/* MFDM must be enabled on all the CPUs prior to enabling SNP. */
-> +	on_each_cpu(mfd_enable, NULL, 1);
-> +
-> +	/* Enable SNP on all CPUs. */
-> +	on_each_cpu(snp_enable, NULL, 1);
-
-What happens if someone boots the machine with maxcpus=N, where N is
-less than all CPUs on the machine? The hotplug notifier should handle it
-but have you checked that it works fine?
-
-> +skip_enable:
-> +	rmptable_start = (unsigned long)start;
-> +	rmptable_end = rmptable_start + sz - 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init snp_rmptable_init(void)
-> +{
-> +	int family, model;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return 0;
-> +
-> +	family = boot_cpu_data.x86;
-> +	model  = boot_cpu_data.x86_model;
-
-Looks useless - just use boot_cpu_data directly below.
-
-> +
-> +	/*
-> +	 * RMP table entry format is not architectural and it can vary by processor and
-> +	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
-> +	 * model and family for which the RMP table entry format is currently defined for.
-> +	 */
-> +	if (family != 0x19 || model > 0xaf)
-> +		goto nosnp;
-> +
-> +	if (amd_iommu_snp_enable())
-> +		goto nosnp;
-> +
-> +	if (__snp_rmptable_init())
-> +		goto nosnp;
-> +
-> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-> +
-> +	return 0;
-> +
-> +nosnp:
-> +	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +	return -ENOSYS;
-> +}
-
-Thx.
-
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+deleted file mode 100644
+index fdd53b184ba8..000000000000
+--- a/Documentation/devicetree/bindings/crypto/qcom-qce.txt
++++ /dev/null
+@@ -1,25 +0,0 @@
+-Qualcomm crypto engine driver
+-
+-Required properties:
+-
+-- compatible  : should be "qcom,crypto-v5.1"
+-- reg         : specifies base physical address and size of the registers map
+-- clocks      : phandle to clock-controller plus clock-specifier pair
+-- clock-names : "iface" clocks register interface
+-                "bus" clocks data transfer interface
+-                "core" clocks rest of the crypto block
+-- dmas        : DMA specifiers for tx and rx dma channels. For more see
+-                Documentation/devicetree/bindings/dma/dma.txt
+-- dma-names   : DMA request names should be "rx" and "tx"
+-
+-Example:
+-	crypto@fd45a000 {
+-		compatible = "qcom,crypto-v5.1";
+-		reg = <0xfd45a000 0x6000>;
+-		clocks = <&gcc GCC_CE2_AHB_CLK>,
+-			 <&gcc GCC_CE2_AXI_CLK>,
+-			 <&gcc GCC_CE2_CLK>;
+-		clock-names = "iface", "bus", "core";
+-		dmas = <&cryptobam 2>, <&cryptobam 3>;
+-		dma-names = "rx", "tx";
+-	};
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+new file mode 100644
+index 000000000000..8df47e8513b8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+@@ -0,0 +1,67 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/qcom-qce.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm crypto engine driver
++
++maintainers:
++  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
++
++description:
++  This document defines the binding for the QCE crypto
++  controller found on Qualcomm parts.
++
++properties:
++  compatible:
++    const: qcom,crypto-v5.1
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: iface clocks register interface.
++      - description: bus clocks data transfer interface.
++      - description: core clocks rest of the crypto block.
++
++  clock-names:
++    items:
++      - const: iface
++      - const: bus
++      - const: core
++
++  dmas:
++    items:
++      - description: DMA specifiers for rx dma channel.
++      - description: DMA specifiers for tx dma channel.
++
++  dma-names:
++    items:
++      - const: rx
++      - const: tx
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - dmas
++  - dma-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/qcom,gcc-apq8084.h>
++    crypto-engine@fd45a000 {
++        compatible = "qcom,crypto-v5.1";
++        reg = <0xfd45a000 0x6000>;
++        clocks = <&gcc GCC_CE2_AHB_CLK>,
++                 <&gcc GCC_CE2_AXI_CLK>,
++                 <&gcc GCC_CE2_CLK>;
++        clock-names = "iface", "bus", "core";
++        dmas = <&cryptobam 2>, <&cryptobam 3>;
++        dma-names = "rx", "tx";
++    };
 -- 
-Regards/Gruss,
-    Boris.
+2.33.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
