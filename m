@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42645C636D6
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 15:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB4EC636D4
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 15:31:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbjBBPbN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:31:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
+        id S233129AbjBBPbZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 10:31:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232917AbjBBPbM (ORCPT
+        with ESMTP id S232994AbjBBPbR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 10:31:12 -0500
+        Thu, 2 Feb 2023 10:31:17 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91F27E6FA;
-        Thu,  2 Feb 2023 07:30:34 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396E03ABB;
+        Thu,  2 Feb 2023 07:30:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=SmAZMxmhVzZFpMcgEk2xjJ9SlIW4an+wqq1Ku13zd8I=; b=h4vsppu3IFznffLowHKrwukDM3
-        slWQ9lk2uwAZd19UeQ8IiP6R82RdPP/jl2f/J2Bp9b69mzYayvhTYAstyqu4YM7w/Qm7aRexqb8Fi
-        fQKtWH0QhG0NPqA0vENbIPMnhqB/F+DW1yTsK/SNLBxsZ+l2DuNJkFsE0R/fqfkzGDR1VH/zOyBr/
-        kbyhWQHhXJ87Z+BFddWkPvPlDnD0qTMm+8fW+KHQw4EYkzITpu27WO8OztfpCgecLHKf25790kYjx
-        VZRNEjKgQFWHaeZeahaKB/xNAXWZznALwCoy0s/Ne5hgd7KBKy/fdMMjB/r6uKcIQbSkov2P0s+5k
-        KGDjPJfg==;
+        bh=LNTskqo5roGsovH+JFQKAebOFNRW3Kky7MgwbIWmzaM=; b=SutQsn5HCDPd7RqYYJOqaRBAAw
+        ghza+gVMb7VvZ8S5mXEBYv9fP8q8Y9wXALUK5q0pzocuZuyXrPepuT1+wCOd/OzB+ntZth6DaMT6B
+        S8zOdGU0FmbWx9fMkVMCos7RUSpLps4sna/LO0IsKeshnyabCK7cNceYm4e+4Fmn11Z+jL+MTpNzN
+        I6xv1Uhkv4ss9oJhXYo64MzEkqJxVqSn1hWToVBJlsAr9MjKCkQ2hdLEGzmvnX+l4DLFC6cT1hP4d
+        2/1/3QPc9YolaFPwoZcHS+Sn+GoiEBzfYylecr9r98dtv7EMTfckM+5a0Ow5UAFEBYeCLaBAG2mQU
+        PcOP0H6w==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNbW4-00DV2d-2S; Thu, 02 Feb 2023 15:28:48 +0000
+        id 1pNbW4-00DV2e-2G; Thu, 02 Feb 2023 15:28:48 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3BA2B3021E2;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4121B302E1F;
         Thu,  2 Feb 2023 16:28:45 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 93E3223F31FBB; Thu,  2 Feb 2023 16:28:40 +0100 (CET)
-Message-ID: <20230202152655.494373332@infradead.org>
+        id AB09623F326C1; Thu,  2 Feb 2023 16:28:40 +0100 (CET)
+Message-ID: <20230202152655.805747571@infradead.org>
 User-Agent: quilt/0.66
-Date:   Thu, 02 Feb 2023 15:50:35 +0100
+Date:   Thu, 02 Feb 2023 15:50:40 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -59,7 +59,7 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         iommu@lists.linux.dev, linux-arch@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v2 05/10] percpu: Wire up cmpxchg128
+Subject: [PATCH v2 10/10] s390/cpum_sf: Convert to cmpxchg128()
 References: <20230202145030.223740842@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -67,212 +67,97 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to replace cmpxchg_double() with the newly minted
-cmpxchg128() family of functions, wire it up in this_cpu_cmpxchg().
+Now that there is a cross arch u128 and cmpxchg128(), use those
+instead of the custom CDSG helper.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/arm64/include/asm/percpu.h |   21 +++++++++++++++
- arch/s390/include/asm/percpu.h  |   17 ++++++++++++
- arch/x86/include/asm/percpu.h   |   56 ++++++++++++++++++++++++++++++++++++++++
- include/asm-generic/percpu.h    |    8 +++++
- include/linux/percpu-defs.h     |   20 ++++++++++++--
- 5 files changed, 120 insertions(+), 2 deletions(-)
+ arch/s390/include/asm/cpu_mf.h  |    2 +-
+ arch/s390/kernel/perf_cpum_sf.c |   22 ++++++----------------
+ 2 files changed, 7 insertions(+), 17 deletions(-)
 
---- a/arch/arm64/include/asm/percpu.h
-+++ b/arch/arm64/include/asm/percpu.h
-@@ -140,6 +140,10 @@ PERCPU_RET_OP(add, add, ldadd)
-  * re-enabling preemption for preemptible kernels, but doing that in a way
-  * which builds inside a module would mean messing directly with the preempt
-  * count. If you do this, peterz and tglx will hunt you down.
-+ *
-+ * Not to mention it'll break the actual preemption model for missing a
-+ * preemption point when TIF_NEED_RESCHED gets set while preemption is
-+ * disabled.
-  */
- #define this_cpu_cmpxchg_double_8(ptr1, ptr2, o1, o2, n1, n2)		\
- ({									\
-@@ -240,6 +244,23 @@ PERCPU_RET_OP(add, add, ldadd)
- #define this_cpu_cmpxchg_8(pcp, o, n)	\
- 	_pcp_protect_return(cmpxchg_relaxed, pcp, o, n)
+--- a/arch/s390/include/asm/cpu_mf.h
++++ b/arch/s390/include/asm/cpu_mf.h
+@@ -141,7 +141,7 @@ union hws_trailer_header {
+ 		unsigned int dsdes:16;	/* 48-63: size of diagnostic SDE */
+ 		unsigned long long overflow; /* 64 - Overflow Count   */
+ 	};
+-	__uint128_t val;
++	u128 val;
+ };
  
-+#define this_cpu_cmpxchg_16(pcp, o, n)					\
-+({									\
-+	typedef typeof(pcp) pcp_op_T__;					\
-+	union {								\
-+		pcp_op_T__ pot;						\
-+		u128 val;						\
-+	} old__, new__, ret__;						\
-+	pcp_op_T__ *ptr__;						\
-+	old__.pot = o;							\
-+	new__.pot = n;							\
-+	preempt_disable_notrace();					\
-+	ptr__ = raw_cpu_ptr(&(pcp));					\
-+	ret__.val = cmpxchg128_local((void *)ptr__, old__.val, new__.val); \
-+	preempt_enable_notrace();					\
-+	ret__.pot;							\
-+})
-+
- #ifdef __KVM_NVHE_HYPERVISOR__
- extern unsigned long __hyp_per_cpu_offset(unsigned int cpu);
- #define __per_cpu_offset
---- a/arch/s390/include/asm/percpu.h
-+++ b/arch/s390/include/asm/percpu.h
-@@ -148,6 +148,23 @@
- #define this_cpu_cmpxchg_4(pcp, oval, nval) arch_this_cpu_cmpxchg(pcp, oval, nval)
- #define this_cpu_cmpxchg_8(pcp, oval, nval) arch_this_cpu_cmpxchg(pcp, oval, nval)
+ struct hws_trailer_entry {
+--- a/arch/s390/kernel/perf_cpum_sf.c
++++ b/arch/s390/kernel/perf_cpum_sf.c
+@@ -1228,16 +1228,6 @@ static void hw_collect_samples(struct pe
+ 	}
+ }
  
-+#define this_cpu_cmpxchg_16(pcp, oval, nval)				\
-+({									\
-+	typedef typeof(pcp) pcp_op_T__;					\
-+	union {								\
-+		pcp_op_T__ pot;						\
-+		u128 val;						\
-+	} old__, new__, ret__;						\
-+	pcp_op_T__ *ptr__;						\
-+	old__.pot = oval;						\
-+	new__.pot = nval;						\
-+	preempt_disable_notrace();					\
-+	ptr__ = raw_cpu_ptr(&(pcp));					\
-+	ret__.val = cmpxchg128((void *)ptr__, old__.val, new__.val);	\
-+	preempt_enable_notrace();					\
-+	ret__.pot;							\
-+})
-+
- #define arch_this_cpu_xchg(pcp, nval)					\
- ({									\
- 	typeof(pcp) *ptr__;						\
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -210,6 +210,62 @@ do {									\
- 	(typeof(_var))(unsigned long) pco_old__;			\
- })
+-static inline __uint128_t __cdsg(__uint128_t *ptr, __uint128_t old, __uint128_t new)
+-{
+-	asm volatile(
+-		"	cdsg	%[old],%[new],%[ptr]\n"
+-		: [old] "+d" (old), [ptr] "+QS" (*ptr)
+-		: [new] "d" (new)
+-		: "memory", "cc");
+-	return old;
+-}
+-
+ /* hw_perf_event_update() - Process sampling buffer
+  * @event:	The perf event
+  * @flush_all:	Flag to also flush partially filled sample-data-blocks
+@@ -1307,14 +1297,14 @@ static void hw_perf_event_update(struct
  
-+#if defined(CONFIG_X86_32) && defined(CONFIG_X86_CMPXCHG64)
-+#define percpu_cmpxchg64_op(size, qual, _var, _oval, _nval)		\
-+({									\
-+	union {								\
-+		typeof(_var) var;					\
-+		struct {						\
-+			u32 low, high;					\
-+		};							\
-+	} old__, new__;							\
-+									\
-+	old__.var = _oval;						\
-+	new__.var = _nval;						\
-+									\
-+	asm qual ("cmpxchg8b " __percpu_arg([var])			\
-+		  : [var] "+m" (_var),					\
-+		    "+a" (old__.low),					\
-+		    "+d" (old__.high)					\
-+		  : "b" (new__.low),					\
-+		    "c" (new__.high)					\
-+		  : "memory");						\
-+									\
-+	old__.var;							\
-+})
-+
-+#define raw_cpu_cmpxchg_8(pcp, oval, nval)	percpu_cmpxchg64_op(8,         , pcp, oval, nval)
-+#define this_cpu_cmpxchg_8(pcp, oval, nval)	percpu_cmpxchg64_op(8, volatile, pcp, oval, nval)
-+#endif
-+
-+#ifdef CONFIG_X86_64
-+#define percpu_cmpxchg128_op(size, qual, _var, _oval, _nval)		\
-+({									\
-+	union {								\
-+		typeof(_var) var;					\
-+		struct {						\
-+			u64 low, high;					\
-+		};							\
-+	} old__, new__;							\
-+									\
-+	old__.var = _oval;						\
-+	new__.var = _nval;						\
-+									\
-+	asm qual ("cmpxchg16b " __percpu_arg([var])			\
-+		  : [var] "+m" (_var),					\
-+		    "+a" (old__.low),					\
-+		    "+d" (old__.high)					\
-+		  : "b" (new__.low),					\
-+		    "c" (new__.high)					\
-+		  : "memory");						\
-+									\
-+	old__.var;							\
-+})
-+
-+#define raw_cpu_cmpxchg_16(pcp, oval, nval)	percpu_cmpxchg128_op(16,         , pcp, oval, nval)
-+#define this_cpu_cmpxchg_16(pcp, oval, nval)	percpu_cmpxchg128_op(16, volatile, pcp, oval, nval)
-+#endif
-+
- /*
-  * this_cpu_read() makes gcc load the percpu variable every time it is
-  * accessed while this_cpu_read_stable() allows the value to be cached.
---- a/include/asm-generic/percpu.h
-+++ b/include/asm-generic/percpu.h
-@@ -298,6 +298,10 @@ do {									\
- #define raw_cpu_cmpxchg_8(pcp, oval, nval) \
- 	raw_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
-+#ifndef raw_cpu_cmpxchg_16
-+#define raw_cpu_cmpxchg_16(pcp, oval, nval) \
-+	raw_cpu_generic_cmpxchg(pcp, oval, nval)
-+#endif
+ 		/* Reset trailer (using compare-double-and-swap) */
+ 		/* READ_ONCE() 16 byte header */
+-		prev.val = __cdsg(&te->header.val, 0, 0);
++		prev.val = cmpxchg128(&te->header.val, 0, 0);
+ 		do {
+ 			old.val = prev.val;
+ 			new.val = prev.val;
+ 			new.f = 0;
+ 			new.a = 1;
+ 			new.overflow = 0;
+-			prev.val = __cdsg(&te->header.val, old.val, new.val);
++			prev.val = cmpxchg128(&te->header.val, old.val, new.val);
+ 		} while (prev.val != old.val);
  
- #ifndef raw_cpu_cmpxchg_double_1
- #define raw_cpu_cmpxchg_double_1(pcp1, pcp2, oval1, oval2, nval1, nval2) \
-@@ -423,6 +427,10 @@ do {									\
- #define this_cpu_cmpxchg_8(pcp, oval, nval) \
- 	this_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
-+#ifndef this_cpu_cmpxchg_16
-+#define this_cpu_cmpxchg_16(pcp, oval, nval) \
-+	this_cpu_generic_cmpxchg(pcp, oval, nval)
-+#endif
+ 		/* Advance to next sample-data-block */
+@@ -1496,7 +1486,7 @@ static bool aux_set_alert(struct aux_buf
  
- #ifndef this_cpu_cmpxchg_double_1
- #define this_cpu_cmpxchg_double_1(pcp1, pcp2, oval1, oval2, nval1, nval2) \
---- a/include/linux/percpu-defs.h
-+++ b/include/linux/percpu-defs.h
-@@ -343,6 +343,22 @@ static inline void __this_cpu_preempt_ch
- 	pscr2_ret__;							\
- })
- 
-+#define __pcpu_size16_call_return2(stem, variable, ...)			\
-+({									\
-+	typeof(variable) pscr2_ret__;					\
-+	__verify_pcpu_ptr(&(variable));					\
-+	switch(sizeof(variable)) {					\
-+	case 1: pscr2_ret__ = stem##1(variable, __VA_ARGS__); break;	\
-+	case 2: pscr2_ret__ = stem##2(variable, __VA_ARGS__); break;	\
-+	case 4: pscr2_ret__ = stem##4(variable, __VA_ARGS__); break;	\
-+	case 8: pscr2_ret__ = stem##8(variable, __VA_ARGS__); break;	\
-+	case 16: pscr2_ret__ = stem##16(variable, __VA_ARGS__); break;	\
-+	default:							\
-+		__bad_size_call_parameter(); break;			\
-+	}								\
-+	pscr2_ret__;							\
-+})
-+
- /*
-  * Special handling for cmpxchg_double.  cmpxchg_double is passed two
-  * percpu variables.  The first has to be aligned to a double word
-@@ -425,7 +441,7 @@ do {									\
- #define raw_cpu_add_return(pcp, val)	__pcpu_size_call_return2(raw_cpu_add_return_, pcp, val)
- #define raw_cpu_xchg(pcp, nval)		__pcpu_size_call_return2(raw_cpu_xchg_, pcp, nval)
- #define raw_cpu_cmpxchg(pcp, oval, nval) \
--	__pcpu_size_call_return2(raw_cpu_cmpxchg_, pcp, oval, nval)
-+	__pcpu_size16_call_return2(raw_cpu_cmpxchg_, pcp, oval, nval)
- #define raw_cpu_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, nval2) \
- 	__pcpu_double_call_return_bool(raw_cpu_cmpxchg_double_, pcp1, pcp2, oval1, oval2, nval1, nval2)
- 
-@@ -512,7 +528,7 @@ do {									\
- #define this_cpu_add_return(pcp, val)	__pcpu_size_call_return2(this_cpu_add_return_, pcp, val)
- #define this_cpu_xchg(pcp, nval)	__pcpu_size_call_return2(this_cpu_xchg_, pcp, nval)
- #define this_cpu_cmpxchg(pcp, oval, nval) \
--	__pcpu_size_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
-+	__pcpu_size16_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
- #define this_cpu_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, nval2) \
- 	__pcpu_double_call_return_bool(this_cpu_cmpxchg_double_, pcp1, pcp2, oval1, oval2, nval1, nval2)
- 
+ 	te = aux_sdb_trailer(aux, alert_index);
+ 	/* READ_ONCE() 16 byte header */
+-	prev.val = __cdsg(&te->header.val, 0, 0);
++	prev.val = cmpxchg128(&te->header.val, 0, 0);
+ 	do {
+ 		old.val = prev.val;
+ 		new.val = prev.val;
+@@ -1511,7 +1501,7 @@ static bool aux_set_alert(struct aux_buf
+ 		}
+ 		new.a = 1;
+ 		new.overflow = 0;
+-		prev.val = __cdsg(&te->header.val, old.val, new.val);
++		prev.val = cmpxchg128(&te->header.val, old.val, new.val);
+ 	} while (prev.val != old.val);
+ 	return true;
+ }
+@@ -1575,7 +1565,7 @@ static bool aux_reset_buffer(struct aux_
+ 	for (i = 0; i < range_scan; i++, idx++) {
+ 		te = aux_sdb_trailer(aux, idx);
+ 		/* READ_ONCE() 16 byte header */
+-		prev.val = __cdsg(&te->header.val, 0, 0);
++		prev.val = cmpxchg128(&te->header.val, 0, 0);
+ 		do {
+ 			old.val = prev.val;
+ 			new.val = prev.val;
+@@ -1586,7 +1576,7 @@ static bool aux_reset_buffer(struct aux_
+ 				new.a = 1;
+ 			else
+ 				new.a = 0;
+-			prev.val = __cdsg(&te->header.val, old.val, new.val);
++			prev.val = cmpxchg128(&te->header.val, old.val, new.val);
+ 		} while (prev.val != old.val);
+ 		*overflow += orig_overflow;
+ 	}
 
 
