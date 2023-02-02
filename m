@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02F7C61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 13:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A032C636D4
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 13:57:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbjBBNx6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 08:53:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
+        id S229710AbjBBN5f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 08:57:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231482AbjBBNxz (ORCPT
+        with ESMTP id S231695AbjBBN5e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 08:53:55 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E24625E18
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 05:53:54 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id q5so1821250wrv.0
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 05:53:54 -0800 (PST)
+        Thu, 2 Feb 2023 08:57:34 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25B07167E
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 05:57:32 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id h16so1761679wrz.12
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 05:57:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=x6jPPRzCymygBdtkYK+PVPRo7vQuaUfKjd8hJMNHQBs=;
-        b=c9PQ9kV/8Paq3Y3yhbFzRBhrvjoelncuq/NevOVnVfPB6kIwAU3sMzwb8nTaq4ZY1J
-         92YonJrjz47xmBSMIpyCebNbH3+krAkk+lZYnzREX2mulIZku5wFqirdHqvSB7bPyqFM
-         dvVixQZrlews8F+sKpabikRVbVVe5jtO8t2K4tJpNDTHOfmHYdfhy4u3jNonsN0GYYtT
-         y1oLBLbo3uBydgUjf6aK4N9+hbKJel9yOj3qbbwpAH4DDUlRv/5qxvSX3ZQ1RiwxvJvl
-         YdVz9onEiMBA/0Z+mgB6piNQfCETSJ7yHrbc4k1lFwtt5V8R6tLo9OoXmwENIXS5NTBS
-         Qzfg==
+        bh=fQv4EInwan8kcb6xlAJfnG13F2BxITSAq/Y5jRVwQo0=;
+        b=x51hm61597wc7e9dh0Zf5RrLS9xoJlkjSd2cuztMK12X4bPW8RWK/L4Mt5Xhq+Ijk+
+         1vv/9QOw0MZP6MO1VGukgf/GnKBCISd9zTmCeOKJXKIsrRANmqrhRd0OCqNpUBjLmq/S
+         J0DOIAyo8H/DhzmQxMEkJTTsGZCbXc9XEVjNK6SzAkcYzmafm0gApHuex04XGBIu827y
+         tsZMcN4KoHOTBYqoupBEt0nuzRnm7uyGL8o0dL9Vl1gsKYBAjIRgWrZfK1HtN0WCyzfI
+         N+lvUl4sMO1QLRkeFxDUl15MjdklI5zB7FzMGgpe2uouvKXnU+9XReqhoryvmoNskdla
+         K1zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x6jPPRzCymygBdtkYK+PVPRo7vQuaUfKjd8hJMNHQBs=;
-        b=RDRV7MdP7p0KgGVmzCIBgF0EBajA5OmkrfhBFTg6Go09dgrimPt+VWpnT5fKhh+3vc
-         xJEd8VBzZnC60EHKkH4XuGTT+akx++99wNLRGAntoo5fWr9iQVGlvkNKPDnVY6ED5wls
-         XHetoOphVfgGrfkSDkFXSbDFn7P55jZ4lRfTxu7ledvStUi0zm1RtP3ijgLmiM9UW1CI
-         ISNtAnbVp19SqsBqwYG4ts81ybYcOloQdT4mzFtltAJYfeRnlZUlqR7yFdThVQ2O0a1R
-         IfnwuD0wOMUWb41qbw3kK7lbm7ifZUUdy6nnC8MGPDAiKVPcg6qaZWgEE6O8GBwTVHhl
-         TJ/w==
-X-Gm-Message-State: AO0yUKVGGbDfT4dGnwtpbLFF/svK1swNCWJ/yV7tjnj+Oj2FdmTNMnip
-        TTvPxiNgkwl+8PZ+xPjC8wbcqg==
-X-Google-Smtp-Source: AK7set/MPPeZpuw7Mk30vtkJlm8zPLV7xBjKZzvi3W5HtgEcuaIs0nclq0JE/8HvZTbi7b+P8nYJPA==
-X-Received: by 2002:a5d:67cd:0:b0:2bf:b0e6:f463 with SMTP id n13-20020a5d67cd000000b002bfb0e6f463mr4661026wrw.13.1675346032814;
-        Thu, 02 Feb 2023 05:53:52 -0800 (PST)
+        bh=fQv4EInwan8kcb6xlAJfnG13F2BxITSAq/Y5jRVwQo0=;
+        b=RN5+29wBVB5soZmR1gpJpMKm7iqUrOq0gAU7iJLa798VrzfrSZL1jY2/CZ3k+/i2wc
+         dTFsndT4bWtd3FbvelWADFROzBhYFB6Q66xEUap6Zj4FTHcY2Go5Kid0wk2fAGmKIFle
+         Plyki2ZnslfiycSdQeS3hM1w4LrVw+HdRienygimdR4QnMU70Aq/6Ubta5nQQ0/labut
+         ZW95dWxugjzNW3Sr6kK+ZugD3+dJSt06BDU9KupEq/Wk15Eq+SUEjzOfbPNu8fBzdMD4
+         tbgP5zwF07mDGzndU1GUaf2g071BTc9KZgZGtt9DeCPuUHnEdoq9i7Dm+Vm2JMZCCBnF
+         mL9Q==
+X-Gm-Message-State: AO0yUKUQcUARIPBSq7Ec9rl2Oqqjxp07ortJRDH3Bt5lc/Ix0bhcQRlI
+        C+MVuZW9ZPOZ5mmc+IIKqgE0KQ==
+X-Google-Smtp-Source: AK7set+A2VYSe/rRtYkeW/HISsxVTJg51Q8BnDYOun/Cta+g0XP3PniMXBuPCTYNKFMRdGxmjbeiiQ==
+X-Received: by 2002:a05:6000:16c4:b0:2bf:ce9a:c19f with SMTP id h4-20020a05600016c400b002bfce9ac19fmr6601726wrf.34.1675346251140;
+        Thu, 02 Feb 2023 05:57:31 -0800 (PST)
 Received: from [192.168.1.109] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id n5-20020a5d4c45000000b002be4ff0c917sm19874807wrt.84.2023.02.02.05.53.51
+        by smtp.gmail.com with ESMTPSA id l16-20020adffe90000000b002b8fe58d6desm19351447wrr.62.2023.02.02.05.57.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 05:53:52 -0800 (PST)
-Message-ID: <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
-Date:   Thu, 2 Feb 2023 14:53:51 +0100
+        Thu, 02 Feb 2023 05:57:30 -0800 (PST)
+Message-ID: <0fc4c509-2db4-0bce-75c6-11835d6987d0@linaro.org>
+Date:   Thu, 2 Feb 2023 14:57:28 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
- clock-names as optional
+Subject: Re: [PATCH v8 6/9] dt-bindings: qcom-qce: Add new SoC compatible
+ strings for qcom-qce
 Content-Language: en-US
 To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -69,12 +69,12 @@ Cc:     Rob Herring <robh+dt@kernel.org>,
         Andy Gross <agross@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Neil Armstrong <neil.armstrong@linaro.org>
+        linux-crypto@vger.kernel.org, Rob Herring <robh@kernel.org>,
+        Jordan Crouse <jorcrous@amazon.com>
 References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
- <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+ <20230202135036.2635376-7-vladimir.zapolskiy@linaro.org>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+In-Reply-To: <20230202135036.2635376-7-vladimir.zapolskiy@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -82,12 +82,61 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
-> From: Neil Armstrong <neil.armstrong@linaro.org>
+> From: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 > 
-> On certain Snapdragon processors, the crypto engine clocks are enabled by
-> default by security firmware.
+> Newer Qualcomm chips support newer versions of the qce crypto IP, so add
+> soc specific compatible strings for qcom-qce instead of using crypto
+> IP version specific ones.
+> 
+> Keep the old strings for backward-compatibility, but mark them as
+> deprecated.
+> 
+> Cc: Bjorn Andersson <andersson@kernel.org>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> Tested-by: Jordan Crouse <jorcrous@amazon.com>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+> ---
+>  .../devicetree/bindings/crypto/qcom-qce.yaml  | 19 +++++++++++++++++--
+>  1 file changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> index a159089e8a6a..4e0b63b85267 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> @@ -15,7 +15,22 @@ description:
+>  
+>  properties:
+>    compatible:
+> -    const: qcom,crypto-v5.1
+> +    oneOf:
+> +      - const: qcom,crypto-v5.1
+> +        deprecated: true
+> +        description: Kept only for ABI backward compatibility
+> +      - items:
 
-Then probably we should not require them only on these variants.
+Drop items.
+
+> +          - enum:
+> +              - qcom,ipq4019-qce
+> +              - qcom,ipq6018-qce
+> +              - qcom,ipq8074-qce
+> +              - qcom,msm8996-qce
+> +              - qcom,sdm845-qce
+> +              - qcom,sm8150-qce
+> +              - qcom,sm8250-qce
+> +              - qcom,sm8350-qce
+> +              - qcom,sm8450-qce
+> +              - qcom,sm8550-qce
+
+Unfortunately my comments from v6 was not addressed, nor responded to.
+
+We already got a public comment from community that we handle Qualcomm
+bindings in a too loose way. I don't think we should be doing this (so
+keep ignoring ABI), just for the sanity of cleanup.
+
+It's fine to discuss it with me, but since v6 there was no discussion,
+so let's be clear here - NAK on ABI break.
 
 Best regards,
 Krzysztof
