@@ -2,149 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7B7C61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 16:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 090B4C636D4
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 17:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231339AbjBBQ4C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 11:56:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60958 "EHLO
+        id S230117AbjBBRGK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 12:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbjBBQ4C (ORCPT
+        with ESMTP id S229602AbjBBRGJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 11:56:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 335EC65EF4
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 08:55:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675356920;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JV11BQfFbz8y/OihZFs3ax0HCNcH7wh9QP2DsX+dYHU=;
-        b=PQNTcMS1v1U+5dr+h9aISuQR2b+zZK2CfALUXDC9u3Nu+TezqFlRZuCYMuxp439VkWEG+M
-        e5mQXkxubTg+ifg0d17SxWeFrr7tQtb+729SMX6L8Z7OSqloEeDr6V6ci12rrDYTB0CJAU
-        EWHAA0ChuOGqREa19CDPOCCqhBIYldo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-121-LZ_M8JmsOr2aARNyVtBe4A-1; Thu, 02 Feb 2023 11:55:19 -0500
-X-MC-Unique: LZ_M8JmsOr2aARNyVtBe4A-1
-Received: by mail-qv1-f71.google.com with SMTP id ly4-20020a0562145c0400b0054d2629a759so1243925qvb.16
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 08:55:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JV11BQfFbz8y/OihZFs3ax0HCNcH7wh9QP2DsX+dYHU=;
-        b=ItgOwXAkovb9aYfR2UtF0UyvBqJtEBU5yoajHcllVNGVXKi0TeruBrju2yFKUVs/QF
-         ERZk4Pit0OLEtWbxApNExALZb5z6osq+8dK5fSxiClyJiBaKHl7i+v6DVnRMEUWE/Bsn
-         sMJ0D8lvPM2g2QhWWMAIjhsEm+valHRnvVyWFZ0kQYiQpnpSnZHJOwxVJ/PwOJGPwIeT
-         7Aiism4P0ycyYNFbX3tlKvxMgrMVRHsNs4c9CCzVrwQzqTe231cguseO2syfyU/xkJuP
-         MGmIDdsfLHnx/Du8GhVwG8X2CxnjT1f5CPfoPSA3/3A1rY7ObDbhTH+MDnIjHzNcHEoO
-         9jqw==
-X-Gm-Message-State: AO0yUKXnLmXickYfxz8/3+yRFv2VFbQE0ZGFKQNUVac9Op4cdKCq43aX
-        HmANJLWclRWs/b8YWpDi21YQ7TL+yuk3TFN1zOuYiDzliHEiUVyPrnvajYDzZBr7ABRe7+0O2af
-        sEPI3s9/rjIqSZ9XVO0U2XDI+yuhxU+VGsQJ9Hial
-X-Received: by 2002:a05:620a:46a8:b0:705:bc80:7220 with SMTP id bq40-20020a05620a46a800b00705bc807220mr550062qkb.248.1675356918530;
-        Thu, 02 Feb 2023 08:55:18 -0800 (PST)
-X-Google-Smtp-Source: AK7set9FA8KkGmVOEKtiVVb+Ihk7Yb2ApB0ALIbLiZagHeK/tfzbxY5gPB5blJeXiL0+tagTwSgS8tiJScmKmKNa7tA=
-X-Received: by 2002:a05:620a:46a8:b0:705:bc80:7220 with SMTP id
- bq40-20020a05620a46a800b00705bc807220mr550058qkb.248.1675356918227; Thu, 02
- Feb 2023 08:55:18 -0800 (PST)
+        Thu, 2 Feb 2023 12:06:09 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E1C3EFCA;
+        Thu,  2 Feb 2023 09:06:08 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 312G70iv014674;
+        Thu, 2 Feb 2023 17:04:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=THmzzCVcKPPGZMPEbQflXm3IvB3LKRlax4gS3uPm2Cg=;
+ b=TrxNGHtP3zuDTiRB+QF5ll3EWkcYVujoAKXghE8rtaJu26XV8VJ/t7M8gt4vHbGaYr6u
+ wS0iwPRgWM3SvjC4k2ucaS6INccYjuM1SqIYAyfTLjka1cjjbprLkNXGU9yn9qD87yZd
+ mO+v2TqIqrACv71/CvbH1BuWsZYlNhkw3s4sCX4/TuV04c0BWj2sWALiK6jyXghQAG/0
+ fMXfZQRBe/fL4TwbDwbdDhB1om9qeKNpkpiGyKVaBD3Cy9+QkrRtBW2jt7DjwVbJCSG2
+ 1CKRQyOhVuQ/THAusffCDfNOC8uLwuMCLDjNr9nxNpYrebHbJGQ+eCQiDa5/Yo5lhYPc GQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nge3bwf46-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 17:04:55 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 312G79gm016181;
+        Thu, 2 Feb 2023 17:04:54 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nge3bwf2k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 17:04:54 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 312C25cu026867;
+        Thu, 2 Feb 2023 17:04:50 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3ncvs7pf5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 17:04:50 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 312H4kMv22217088
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Feb 2023 17:04:47 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D43692004B;
+        Thu,  2 Feb 2023 17:04:46 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 05CC320043;
+        Thu,  2 Feb 2023 17:04:45 +0000 (GMT)
+Received: from osiris (unknown [9.171.31.155])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu,  2 Feb 2023 17:04:44 +0000 (GMT)
+Date:   Thu, 2 Feb 2023 18:04:43 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, joro@8bytes.org,
+        suravee.suthikulpanit@amd.com, robin.murphy@arm.com,
+        dwmw2@infradead.org, baolu.lu@linux.intel.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 03/10] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y9vtK1voirb1wUfW@osiris>
+References: <20230202145030.223740842@infradead.org>
+ <20230202152655.373335780@infradead.org>
 MIME-Version: 1.0
-References: <20230201170441.29756-1-giovanni.cabiddu@intel.com>
-In-Reply-To: <20230201170441.29756-1-giovanni.cabiddu@intel.com>
-From:   Vladis Dronov <vdronov@redhat.com>
-Date:   Thu, 2 Feb 2023 17:55:07 +0100
-Message-ID: <CAMusb+S_Fxyt-KMjK+-SFenuypdmziK6qJcriHaXP4iux=W5gQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qat - drop log level of msg in get_instance_node()
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, Fiona Trahe <fiona.trahe@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230202152655.373335780@infradead.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FHdsPEaqsFg45qSGo90As5Aep1zo1_oE
+X-Proofpoint-GUID: hpauW67JMPa2pJxw-_S6KStoX2TLt-s_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-02_10,2023-02-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ phishscore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=383
+ mlxscore=0 clxscore=1011 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302020148
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Giovanni, all,
-
-On Wed, Feb 1, 2023 at 6:05 PM Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> The functions qat_crypto_get_instance_node() and
-> qat_compression_get_instance_node() allow to get a QAT instance (ring
-> pair) on a device close to the node specified as input parameter.
-> When this is not possible, and a QAT device is available in the system,
-> these function return an instance on a remote node and they print a
-> message reporting that it is not possible to find a device on the specified
-> node. This is interpreted by people as an error rather than an info.
->
-> The print "Could not find a device on node" indicates that a kernel
-> application is running on a core in a socket that does not have a QAT
-> device directly attached to it and performance might suffer.
->
-> Due to the nature of the message, this can be considered as a debug
-> message, therefore drop the severity to debug and report it only once
-> to avoid flooding.
->
-> Suggested-by: Vladis Dronov <vdronov@redhat.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+On Thu, Feb 02, 2023 at 03:50:33PM +0100, Peter Zijlstra wrote:
+> For all architectures that currently support cmpxchg_double()
+> implement the cmpxchg128() family of functions that is basically the
+> same but with a saner interface.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 > ---
->  drivers/crypto/qat/qat_common/qat_compression.c | 2 +-
->  drivers/crypto/qat/qat_common/qat_crypto.c      | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/crypto/qat/qat_common/qat_compression.c b/drivers/crypto/qat/qat_common/qat_compression.c
-> index 9fd10f4242f8..3f1f35283266 100644
-> --- a/drivers/crypto/qat/qat_common/qat_compression.c
-> +++ b/drivers/crypto/qat/qat_common/qat_compression.c
-> @@ -72,7 +72,7 @@ struct qat_compression_instance *qat_compression_get_instance_node(int node)
->         }
->
->         if (!accel_dev) {
-> -               pr_info("QAT: Could not find a device on node %d\n", node);
-> +               pr_debug_ratelimited("QAT: Could not find a device on node %d\n", node);
->                 /* Get any started device */
->                 list_for_each(itr, adf_devmgr_get_head()) {
->                         struct adf_accel_dev *tmp_dev;
-> diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
-> index e31199eade5b..40c8e74d1cf9 100644
-> --- a/drivers/crypto/qat/qat_common/qat_crypto.c
-> +++ b/drivers/crypto/qat/qat_common/qat_crypto.c
-> @@ -70,7 +70,7 @@ struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
->         }
->
->         if (!accel_dev) {
-> -               pr_info("QAT: Could not find a device on node %d\n", node);
-> +               pr_debug_ratelimited("QAT: Could not find a device on node %d\n", node);
->                 /* Get any started device */
->                 list_for_each_entry(tmp_dev, adf_devmgr_get_head(), list) {
->                         if (adf_dev_started(tmp_dev) &&
-> --
-> 2.39.1
->
+>  arch/arm64/include/asm/atomic_ll_sc.h |   41 +++++++++++++++++++++++++
+>  arch/arm64/include/asm/atomic_lse.h   |   31 +++++++++++++++++++
+>  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+>  arch/s390/include/asm/cmpxchg.h       |   14 ++++++++
+>  arch/x86/include/asm/cmpxchg_32.h     |    3 +
+>  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+>  6 files changed, 168 insertions(+), 2 deletions(-)
 
-Thanks, the fix seems to be working. It was tested on "Intel(R) Xeon(R)
-Platinum 8468H / Sapphire Rapids 4 skt (SPR) XCC-SP, Qual E-3
-stepping" machine with 8086:4940 (rev 40) QAT device:
-
-Without the fix:
-
-# dmesg | grep "QAT: Could not find a device" | wc -l
-498
-
-With the fix:
-
-# dmesg | grep "QAT: Could not find a device"
-<not output>
-
-So,
-
-Reviewed-by: Vladis Dronov <vdronov@redhat.com>
-Tested-by: Vladis Dronov <vdronov@redhat.com>
-
-Best regards,
-Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
-
+For s390:
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
