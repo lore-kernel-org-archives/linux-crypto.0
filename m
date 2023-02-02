@@ -2,118 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 745CBC61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 20:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0671EC6379F
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Feb 2023 22:27:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231964AbjBBUXU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 15:23:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58848 "EHLO
+        id S231829AbjBBW1M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 17:27:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232353AbjBBUXS (ORCPT
+        with ESMTP id S231442AbjBBW1L (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 15:23:18 -0500
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CB96B34E;
-        Thu,  2 Feb 2023 12:23:17 -0800 (PST)
-Received: from [127.0.0.1] ([73.223.250.219])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 312KLhl02116280
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Thu, 2 Feb 2023 12:21:43 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 312KLhl02116280
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023010601; t=1675369310;
-        bh=dXToUAE7pJaQg5q02/GLa3Mz5KxM6AhfOCiviB9LkQ0=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=UFfeQLpd1CqaHNn2oWCKbjD/Ifu3loYs//M/YBH4IzNZ5zM+uQu+ca+o7wZeN5w3F
-         DsbUdz66y666X/uc3jG3vgwkg5rRf6GtVkLag+fJE2MvpK5A0UNEmO1M3fnQXeE1Lo
-         Fnl4Ppvdj9DkLLQ/AJYxM7e3cAS5zRrO/+4y12Pny3EZtxFITNqL4C9j1UlDEGI9HH
-         V7hreJiSU/iR392Npg1nWQoPfZXJyKUx9354wvJDSamVNEibIAyoENMY/UFznsWzLs
-         NKi29eZOby3JTQ76f7S8MgceIaH2aMGDaJX/L7Onx4h96zynB+LoMD69Q9XjMUGe2n
-         iFW315XTSuLfQ==
-Date:   Thu, 02 Feb 2023 12:21:41 -0800
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        torvalds@linux-foundation.org
-CC:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] cyrpto/b128ops: Remove struct u128
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20230202152655.250913242@infradead.org>
-References: <20230202145030.223740842@infradead.org> <20230202152655.250913242@infradead.org>
-Message-ID: <6B45ADCF-4E3C-4D01-92AB-87BFF6BEE744@zytor.com>
+        Thu, 2 Feb 2023 17:27:11 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B071C1ABE6
+        for <linux-crypto@vger.kernel.org>; Thu,  2 Feb 2023 14:27:09 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id fi26so3527915edb.7
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Feb 2023 14:27:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=htsoF+0dAV+soqelwMOxu8OLAjWrlwNcAr2UdCMs8v4=;
+        b=H44bIUH3EWCmyadBXYgygjbXAYlG952xbCVe1R1Lu41LfJ1MmT88QhdPiPtdCYjY/O
+         YN7AIIIYhSd8vN0BMDcOk85ky+avOHAvXDS8YwOJ70AQNwRum7QO+1uCqgRcP4Q9/0XB
+         tTnYzrDXzovj4h/qsdjE4ONlN94GjXrWB6cGW4GvssCqAl1M129TpWzB4mwtdIVG7bz0
+         9LfJEw01Htor7po8vMgfUnmp1Gqexw/Q3+T3KrFFyhMafMeWKZnmEH1SyFVmjt+p4SA4
+         IJEcaU5aZL61WgoCPjWbnR0EBZWkl4JCk/lAX8UNAUSoIWR4CcCugFsTKWb8u0S+eTdk
+         EWfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=htsoF+0dAV+soqelwMOxu8OLAjWrlwNcAr2UdCMs8v4=;
+        b=cOA7+uLFMT40xZ11l/D1yQ1BqzmwdlMZOlI0FH1XSRoH7Y2O+0EOZ43cdGHCHM8XAm
+         aflDeeDqfjWN94J4kSCOuFXh/SYfWfXRzKKWGsmCbYjnO6dM/fq6wZOtfKF17OdHaNWD
+         bKWA+Pmmgu2zyig72nlW4fqLqdloli9U5wOASssytX2JA+INWkpKi/gWpwtu8xVrsQwj
+         my1hbKtDkrRlH4xBE+gVY0vGvAmOGWKKaB0Qj4PdbZqjcZKuv/TZRxOIG8QeZhR8PsKq
+         TF1ik7CaZHN05b5TTw1Zs+Ttj39jSUhmz5hraXrmLZulrhZKqX1trvzbNHEh+Eiav6c/
+         JKRg==
+X-Gm-Message-State: AO0yUKWe1na29RRcZlejMa7yWc9Kzh9FpSqybvzAUJ42bdtCgJUFIzK3
+        EIpxEoT6RsVEZHlVFQqs1yYqLA==
+X-Google-Smtp-Source: AK7set/yLIBMIxVVa09c0abZawIa36KcE8yzXqO5U2V8ePOTwQhiJEGkap+3ftH4iHbY8R7Pb99vPw==
+X-Received: by 2002:a05:6402:34cc:b0:49b:67c5:3044 with SMTP id w12-20020a05640234cc00b0049b67c53044mr9046173edc.4.1675376828243;
+        Thu, 02 Feb 2023 14:27:08 -0800 (PST)
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id s22-20020aa7cb16000000b004a236384909sm303300edt.10.2023.02.02.14.27.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Feb 2023 14:27:07 -0800 (PST)
+Message-ID: <22f191c4-5346-8fe7-690d-9422775bb2d5@linaro.org>
+Date:   Fri, 3 Feb 2023 00:27:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
+ clock-names as optional
+Content-Language: en-US
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>
+References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
+ <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+ <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On February 2, 2023 6:50:31 AM PST, Peter Zijlstra <peterz@infradead=2Eorg>=
- wrote:
->Per git-grep u128_xor() and its related struct u128 are unused except
->to implement {be,le}128_xor()=2E Remove them to free up the namespace=2E
->
->Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead=2Eorg>
->---
-> include/crypto/b128ops=2Eh |   14 +++-----------
-> 1 file changed, 3 insertions(+), 11 deletions(-)
->
->--- a/include/crypto/b128ops=2Eh
->+++ b/include/crypto/b128ops=2Eh
->@@ -50,10 +50,6 @@
-> #include <linux/types=2Eh>
->=20
-> typedef struct {
->-	u64 a, b;
->-} u128;
->-
->-typedef struct {
-> 	__be64 a, b;
-> } be128;
->=20
->@@ -61,20 +57,16 @@ typedef struct {
-> 	__le64 b, a;
-> } le128;
->=20
->-static inline void u128_xor(u128 *r, const u128 *p, const u128 *q)
->+static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
-> {
-> 	r->a =3D p->a ^ q->a;
-> 	r->b =3D p->b ^ q->b;
-> }
->=20
->-static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
->-{
->-	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
->-}
->-
-> static inline void le128_xor(le128 *r, const le128 *p, const le128 *q)
-> {
->-	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
->+	r->a =3D p->a ^ q->a;
->+	r->b =3D p->b ^ q->b;
-> }
->=20
-> #endif /* _CRYPTO_B128OPS_H */
->
->
+Hi Krzysztof,
 
-Can we centralize these ordered types, too?
+On 2/2/23 15:53, Krzysztof Kozlowski wrote:
+> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
+>> From: Neil Armstrong <neil.armstrong@linaro.org>
+>>
+>> On certain Snapdragon processors, the crypto engine clocks are enabled by
+>> default by security firmware.
+> 
+> Then probably we should not require them only on these variants.
+
+the rationale is clear, but here comes a minor problem, older platforms
+require clocks, when newer ones do not. When a generic SoC-specific compatible
+is introduced, let say "qcom,ipq4019-qce", it itself requires the clocks,
+but then newer platforms can not be based on this particular compatible,
+otherwise they will require clocks and this comes as invalid.
+
+How to resolve it properly, shall there be another generic SoC-specific
+compatible without clocks and NOT based on that "qcom,ipq4019-qce" compatible?
+
+By the way, QCE on SM8150 also shall not need the clocks.
+
+--
+Best wishes,
+Vladimir
