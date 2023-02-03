@@ -2,71 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EEFC636D4
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 03:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E31DCC61DA4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 05:04:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232115AbjBCDi6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 22:38:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55768 "EHLO
+        id S230372AbjBCFEH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Feb 2023 00:04:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjBCDi5 (ORCPT
+        with ESMTP id S231827AbjBCFEE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 22:38:57 -0500
+        Fri, 3 Feb 2023 00:04:04 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8E1EF94;
-        Thu,  2 Feb 2023 19:38:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14BC22B618;
+        Thu,  2 Feb 2023 21:03:33 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pNmt8-0070dc-T8; Fri, 03 Feb 2023 11:37:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Feb 2023 11:37:22 +0800
-Date:   Fri, 3 Feb 2023 11:37:22 +0800
+        id 1pNoEA-0071QD-0I; Fri, 03 Feb 2023 13:03:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Feb 2023 13:03:10 +0800
+Date:   Fri, 3 Feb 2023 13:03:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        davem@davemloft.net, penberg@kernel.org, rientjes@google.com,
-        iamjoonsoo.kim@lge.com, Andrew Morton <akpm@linux-foundation.org>,
-        vbabka@suse.cz, roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 02/10] types: Introduce [us]128
-Message-ID: <Y9yBcu6ThKC7tVdt@gondor.apana.org.au>
-References: <20230202145030.223740842@infradead.org>
- <20230202152655.313053173@infradead.org>
+To:     Peter Lafreniere <peter@n8pjl.ca>
+Cc:     linux-crypto@vger.kernel.org, peter@n8pjl.ca, ardb@kernel.org,
+        linux-kernel@vger.kernel.org, conor.dooley@microchip.com,
+        x86@kernel.org
+Subject: Re: [PATCH RESEND] crypto: x86 - exit fpu context earlier in ECB/CBC
+ macros
+Message-ID: <Y9yVjerSZcAkkmDf@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230202152655.313053173@infradead.org>
+In-Reply-To: <20230121183450.14570-1-peter@n8pjl.ca>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 02, 2023 at 03:50:32PM +0100, Peter Zijlstra wrote:
-> Introduce [us]128 (when available). Unlike [us]64, ensure they are
-> always naturally aligned.
+Peter Lafreniere <peter@n8pjl.ca> wrote:
+> Currently the ecb/cbc macros hold fpu context unnecessarily when using
+> scalar cipher routines (e.g. when handling odd sizes of blocks per walk).
 > 
-> This also enables 128bit wide atomics (which require natural
-> alignment) such as cmpxchg128().
+> Change the macros to drop fpu context as soon as the fpu is out of use.
 > 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> No performance impact found (on Intel Haswell).
+> 
+> Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
 > ---
->  include/linux/types.h      |    5 +++++
->  include/uapi/linux/types.h |    4 ++++
->  2 files changed, 9 insertions(+)
+> arch/x86/crypto/ecb_cbc_helpers.h | 19 +++++++++++++++----
+> 1 file changed, 15 insertions(+), 4 deletions(-)
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
