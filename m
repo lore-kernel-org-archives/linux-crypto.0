@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EBEC636CC
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 09:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21152C61DA4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 09:38:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230020AbjBCJiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232445AbjBCJiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 3 Feb 2023 04:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57608 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbjBCJiL (ORCPT
+        with ESMTP id S230317AbjBCJiK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2023 04:38:11 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CDB1D936;
-        Fri,  3 Feb 2023 01:38:09 -0800 (PST)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4P7VsV4qZlzJrQ9;
-        Fri,  3 Feb 2023 17:36:30 +0800 (CST)
+        Fri, 3 Feb 2023 04:38:10 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19FD14C29;
+        Fri,  3 Feb 2023 01:38:08 -0800 (PST)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4P7Vrx54vDz16MkV;
+        Fri,  3 Feb 2023 17:36:01 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Fri, 3 Feb 2023 17:38:07 +0800
+ 15.1.2375.34; Fri, 3 Feb 2023 17:38:06 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
         Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 4/5] crypto: hisilicon/qm - update comments to match function
-Date:   Fri, 3 Feb 2023 17:37:29 +0800
-Message-ID: <20230203093730.49314-5-qianweili@huawei.com>
+Subject: [PATCH 2/5] crypto: hisilicon/qm - change data type in min_t
+Date:   Fri, 3 Feb 2023 17:37:27 +0800
+Message-ID: <20230203093730.49314-3-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230203093730.49314-1-qianweili@huawei.com>
 References: <20230203093730.49314-1-qianweili@huawei.com>
@@ -44,56 +44,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The return values of some functions have been modified,
-but the comments have not been modified together. The
-comments must be updated to be consistent with the functions.
-
-Also move comments over the codes instead of right place
-to ensure consistent coding styles.
+'act_q_num = min_t(int, act_q_num, max_qp_num)', 'act_q_num'
+and 'max_qp_num' are 'u32' type, change min_t() to use 'u32'
+type instead of 'int'.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 5 ++---
- include/linux/hisi_acc_qm.h   | 3 ++-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 457dd126bc3d..0b278bdbf527 100644
+index 4e277168b48d..c440d79f2e84 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -1892,8 +1892,7 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
-  * @qm: The qm we create a qp from.
-  * @alg_type: Accelerator specific algorithm type in sqc.
-  *
-- * return created qp, -EBUSY if all qps in qm allocated, -ENOMEM if allocating
-- * qp memory fails.
-+ * Return created qp, negative error code if failed.
-  */
- static struct hisi_qp *hisi_qm_create_qp(struct hisi_qm *qm, u8 alg_type)
- {
-@@ -2062,7 +2061,7 @@ static int qm_start_qp_nolock(struct hisi_qp *qp, unsigned long arg)
-  * @arg: Accelerator specific argument.
-  *
-  * After this function, qp can receive request from user. Return 0 if
-- * successful, Return -EBUSY if failed.
-+ * successful, negative error code if failed.
-  */
- int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
- {
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index a9e75b7a0636..a7d54d4d41fd 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -322,7 +322,8 @@ struct hisi_qm {
- 	const struct hisi_qm_err_ini *err_ini;
- 	struct hisi_qm_err_info err_info;
- 	struct hisi_qm_err_status err_status;
--	unsigned long misc_ctl; /* driver removing and reset sched */
-+	/* driver removing and reset sched */
-+	unsigned long misc_ctl;
- 	/* Device capability bit */
- 	unsigned long caps;
+@@ -3493,7 +3493,7 @@ static int qm_vf_q_assign(struct hisi_qm *qm, u32 num_vfs)
+ 			act_q_num = q_num;
+ 		}
  
+-		act_q_num = min_t(int, act_q_num, max_qp_num);
++		act_q_num = min_t(u32, act_q_num, max_qp_num);
+ 		ret = hisi_qm_set_vft(qm, i, q_base, act_q_num);
+ 		if (ret) {
+ 			for (j = num_vfs; j > i; j--)
 -- 
 2.33.0
 
