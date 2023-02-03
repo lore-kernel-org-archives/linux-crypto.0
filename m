@@ -2,154 +2,304 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A888C05027
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 16:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88568C636D4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 16:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233004AbjBCQZ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Feb 2023 11:25:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48888 "EHLO
+        id S233337AbjBCQxQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Feb 2023 11:53:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232387AbjBCQZs (ORCPT
+        with ESMTP id S233020AbjBCQxP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2023 11:25:48 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D9EA6B9F;
-        Fri,  3 Feb 2023 08:25:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675441547; x=1706977547;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vIRC4xnaApbPW8RCCJgEQXnu08a0bMVna8tyTv2MRHQ=;
-  b=Py+NP4thkZbXh0tNJQ//Ow9qleoK0j/YxWbpW8j2xGpVgbopq7rM2rAK
-   +FNSk9Skj6EoxB9McbT+zPr/QFKbZ7gU5Au8ILGM6CWILsyeMOjyo1VYx
-   DCl/A+N70aqmihKHc0x8FRglx23+6nxKGRE2LLUJQtE8ON8nd2e6G3hqy
-   UGRBj1OvITlNz9h9Xn2TCSS0PbM69V8kA3fx5Dudp/paQvCPJBq3MxMO9
-   qnJwhPF9udfnkhrbvESp532Eze/IDWcgf1JTDa251U+RFMC9hnJW83jdQ
-   a+RbOTsBirFH5kQOaOX1scYrQzCHehyEaWlRb7VGHep3T6lZIi/29Qiyy
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="316783306"
-X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
-   d="scan'208";a="316783306"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 08:25:46 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="911208619"
-X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
-   d="scan'208";a="911208619"
-Received: from hheck-mobl.amr.corp.intel.com (HELO [10.212.230.180]) ([10.212.230.180])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 08:25:45 -0800
-Message-ID: <851920c5-31c9-ddd9-3e2d-57d379aa0671@intel.com>
-Date:   Fri, 3 Feb 2023 08:25:44 -0800
+        Fri, 3 Feb 2023 11:53:15 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5332768B;
+        Fri,  3 Feb 2023 08:53:13 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CD93C14;
+        Fri,  3 Feb 2023 08:53:55 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.90.37])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF3D43F71E;
+        Fri,  3 Feb 2023 08:53:06 -0800 (PST)
+Date:   Fri, 3 Feb 2023 16:52:59 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 03/10] arch: Introduce
+ arch_{,try_}_cmpxchg128{,_local}()
+Message-ID: <Y90763uF/cHqiOYN@FVFF77S0Q05N>
+References: <20230202145030.223740842@infradead.org>
+ <20230202152655.373335780@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Jann Horn <jannh@google.com>, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Roxana Bradescu <roxabee@chromium.org>,
-        Adam Langley <agl@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-References: <20230125012801.362496-1-ebiggers@kernel.org>
- <14506678-918f-81e1-2c26-2b347ff50701@intel.com>
- <CAG48ez1NaWarARJj5SBdKKTYFO2MbX7xO75Rk0Q2iK8LX4BwFA@mail.gmail.com>
- <394c92e2-a9aa-37e1-7a34-d7569ac844fd@intel.com>
- <CAG48ez0ZK3pMqkto4DTZPNyddYcv8jPHQDNhYoFEPvSRLf80fQ@mail.gmail.com>
- <e37a17c4-8611-6d1d-85ad-fcd04ff285e1@intel.com> <Y9MAvhQYlOe4l2BM@gmail.com>
- <8b2771ce-9cfa-54cc-de6b-e80ce7af0a93@intel.com>
- <16e3217b-1561-51ea-7514-014e27240402@intel.com>
- <Y9oMmYWzy7mlk3D9@sol.localdomain>
- <c5809098-9066-d90d-1bcc-108a11525cac@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <c5809098-9066-d90d-1bcc-108a11525cac@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230202152655.373335780@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/1/23 10:09, Dave Hansen wrote:
-> Good questions.  I want to make sure what I'm saying here is accurate,
-> and I don't have good answers to those right now.  We're working on it,
-> and should have something useful to say in the next couple of days.
+On Thu, Feb 02, 2023 at 03:50:33PM +0100, Peter Zijlstra wrote:
+> For all architectures that currently support cmpxchg_double()
+> implement the cmpxchg128() family of functions that is basically the
+> same but with a saner interface.
+> 
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-This is an attempt to make sure that everyone that is concerned about
-DOITM behavior has all the same information as Intel folks before we
-make a decision about a kernel implementation.
+For arm64:
 
-Here we go...
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-The execution latency of the DOIT instructions[1] does not depend on the
-value of data operands on all currently-supported Intel processors. This
-includes all processors that enumerate DOITM support.  There are no
-plans for any processors where this behavior would change, despite the
-DOITM architecture theoretically allowing it.
+Mark.
 
-So, what's the point of DOITM in the first place?  Fixed execution
-latency does not mean that programs as a whole will have constant
-overall latency.  DOITM currently affects features which do not affect
-execution latency but may, for instance, affect overall program latency
-due to side-effects of prefetching on the cache.  Even with fixed
-instruction execution latency, these side-effects can matter especially
-to the paranoid.
-
-Today, those affected features are:
- * Data Dependent Prefetchers (DDP)[2]
- * Some Fast Store Forwarding Predictors (FSFP)[3].
-
-There are existing controls for those features, including
-spec_store_bypass_disable=[4].  Some paranoid software may already have
-mitigations in place that are a superset of DOITM.  In addition, both
-DDP and FSFP were also designed to limit nastiness when crossing
-privilege boundaries.  Please see the linked docs for more details.
-
-That's basically the Intel side of things.  Everyone else should have
-all the background that I have.  Now back to maintainer mode...
-
-So, in short, I don't think everyone's crypto libraries are busted today
-when DOITM=0.  I don't think they're going to _become_ busted any time soon.
-
-Where do we go from here?  There are a few choices:
-
-1. Apply the patch in this thread, set DOITM=1 always.  Today, this
-   reduces exposure to DDP and FSFP, but probably only for userspace.
-   It reduces exposure to any future predictors under the DOITM umbrella
-   and also from Intel changing its mind.
-2. Ignore DOITM, leave it to the hardware default of DOITM=0.  Today,
-   this probably just steers folks to using relatively heavyweight
-   mitigations (like SSBD) if they want DDP/FSFP disabled.  It also
-   leaves Linux exposed to Intel changing its mind on its future plans.
-3. Apply the patch in this thread, but leave DOITM=0 as the default.
-   This lets folks enable DOITM on a moment's notice if the need arises.
-
-There are some other crazier choices like adding ABI to toggle DOITM for
-userspace, but I'm not sure they're even worth discussing.
-
-#1 is obviously the only way to go if the DOITM architecture remains
-as-is.  There is talk of making changes, like completely removing the
-idea of variable execution latency.  But that's a slow process and would
-be a non-starter if *anyone* (like other OSes) is depending on the
-existing DOITM definition.
-
-My inclination is to wait a couple of weeks to see which way DOITM is
-headed and if the definition is likely to get changed.  Does anyone feel
-any greater sense of urgency?
-
-
-1.
-https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/resources/data-operand-independent-timing-instructions.html
-2.
-https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/data-dependent-prefetcher.html
-3.
-https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/fast-store-forwarding-predictor.html
-4. https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
-
-
-
+> ---
+>  arch/arm64/include/asm/atomic_ll_sc.h |   41 +++++++++++++++++++++++++
+>  arch/arm64/include/asm/atomic_lse.h   |   31 +++++++++++++++++++
+>  arch/arm64/include/asm/cmpxchg.h      |   26 ++++++++++++++++
+>  arch/s390/include/asm/cmpxchg.h       |   14 ++++++++
+>  arch/x86/include/asm/cmpxchg_32.h     |    3 +
+>  arch/x86/include/asm/cmpxchg_64.h     |   55 +++++++++++++++++++++++++++++++++-
+>  6 files changed, 168 insertions(+), 2 deletions(-)
+> 
+> --- a/arch/arm64/include/asm/atomic_ll_sc.h
+> +++ b/arch/arm64/include/asm/atomic_ll_sc.h
+> @@ -326,6 +326,47 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+>  __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
+>  
+>  #undef __CMPXCHG_DBL
+> +
+> +union __u128_halves {
+> +	u128 full;
+> +	struct {
+> +		u64 low, high;
+> +	};
+> +};
+> +
+> +#define __CMPXCHG128(name, mb, rel, cl...)                             \
+> +static __always_inline u128						\
+> +__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
+> +{									\
+> +	union __u128_halves r, o = { .full = (old) },			\
+> +			       n = { .full = (new) };			\
+> +       unsigned int tmp;                                               \
+> +									\
+> +	asm volatile("// __cmpxchg128" #name "\n"			\
+> +       "       prfm    pstl1strm, %[v]\n"                              \
+> +       "1:     ldxp    %[rl], %[rh], %[v]\n"                           \
+> +       "       cmp     %[rl], %[ol]\n"                                 \
+> +       "       ccmp    %[rh], %[oh], 0, eq\n"                          \
+> +       "       b.ne    2f\n"                                           \
+> +       "       st" #rel "xp    %w[tmp], %[nl], %[nh], %[v]\n"          \
+> +       "       cbnz    %w[tmp], 1b\n"                                  \
+> +	"	" #mb "\n"						\
+> +	"2:"								\
+> +       : [v] "+Q" (*(u128 *)ptr),                                      \
+> +         [rl] "=&r" (r.low), [rh] "=&r" (r.high),                      \
+> +         [tmp] "=&r" (tmp)                                             \
+> +       : [ol] "r" (o.low), [oh] "r" (o.high),                          \
+> +         [nl] "r" (n.low), [nh] "r" (n.high)                           \
+> +       : "cc", ##cl);                                                  \
+> +									\
+> +	return r.full;							\
+> +}
+> +
+> +__CMPXCHG128(   ,        ,  )
+> +__CMPXCHG128(_mb, dmb ish, l, "memory")
+> +
+> +#undef __CMPXCHG128
+> +
+>  #undef K
+>  
+>  #endif	/* __ASM_ATOMIC_LL_SC_H */
+> --- a/arch/arm64/include/asm/atomic_lse.h
+> +++ b/arch/arm64/include/asm/atomic_lse.h
+> @@ -324,4 +324,35 @@ __CMPXCHG_DBL(_mb, al, "memory")
+>  
+>  #undef __CMPXCHG_DBL
+>  
+> +#define __CMPXCHG128(name, mb, cl...)					\
+> +static __always_inline u128						\
+> +__lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)		\
+> +{									\
+> +	union __u128_halves r, o = { .full = (old) },			\
+> +			       n = { .full = (new) };			\
+> +	register unsigned long x0 asm ("x0") = o.low;			\
+> +	register unsigned long x1 asm ("x1") = o.high;			\
+> +	register unsigned long x2 asm ("x2") = n.low;			\
+> +	register unsigned long x3 asm ("x3") = n.high;			\
+> +	register unsigned long x4 asm ("x4") = (unsigned long)ptr;	\
+> +									\
+> +	asm volatile(							\
+> +	__LSE_PREAMBLE							\
+> +	"	casp" #mb "\t%[old1], %[old2], %[new1], %[new2], %[v]\n"\
+> +	: [old1] "+&r" (x0), [old2] "+&r" (x1),				\
+> +	  [v] "+Q" (*(u128 *)ptr)					\
+> +	: [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),		\
+> +	  [oldval1] "r" (o.low), [oldval2] "r" (o.high)			\
+> +	: cl);								\
+> +									\
+> +	r.low = x0; r.high = x1;					\
+> +									\
+> +	return r.full;							\
+> +}
+> +
+> +__CMPXCHG128(   ,   )
+> +__CMPXCHG128(_mb, al, "memory")
+> +
+> +#undef __CMPXCHG128
+> +
+>  #endif	/* __ASM_ATOMIC_LSE_H */
+> --- a/arch/arm64/include/asm/cmpxchg.h
+> +++ b/arch/arm64/include/asm/cmpxchg.h
+> @@ -147,6 +147,19 @@ __CMPXCHG_DBL(_mb)
+>  
+>  #undef __CMPXCHG_DBL
+>  
+> +#define __CMPXCHG128(name)						\
+> +static inline u128 __cmpxchg128##name(volatile u128 *ptr,		\
+> +				      u128 old, u128 new)		\
+> +{									\
+> +	return __lse_ll_sc_body(_cmpxchg128##name,			\
+> +				ptr, old, new);				\
+> +}
+> +
+> +__CMPXCHG128(   )
+> +__CMPXCHG128(_mb)
+> +
+> +#undef __CMPXCHG128
+> +
+>  #define __CMPXCHG_GEN(sfx)						\
+>  static __always_inline unsigned long __cmpxchg##sfx(volatile void *ptr,	\
+>  					   unsigned long old,		\
+> @@ -229,6 +242,19 @@ __CMPXCHG_GEN(_mb)
+>  	__ret;									\
+>  })
+>  
+> +/* cmpxchg128 */
+> +#define system_has_cmpxchg128()		1
+> +
+> +#define arch_cmpxchg128(ptr, o, n)						\
+> +({										\
+> +	__cmpxchg128_mb((ptr), (o), (n));					\
+> +})
+> +
+> +#define arch_cmpxchg128_local(ptr, o, n)					\
+> +({										\
+> +	__cmpxchg128((ptr), (o), (n));						\
+> +})
+> +
+>  #define __CMPWAIT_CASE(w, sfx, sz)					\
+>  static inline void __cmpwait_case_##sz(volatile void *ptr,		\
+>  				       unsigned long val)		\
+> --- a/arch/s390/include/asm/cmpxchg.h
+> +++ b/arch/s390/include/asm/cmpxchg.h
+> @@ -201,4 +201,18 @@ static __always_inline int __cmpxchg_dou
+>  			 (unsigned long)(n1), (unsigned long)(n2));	\
+>  })
+>  
+> +#define system_has_cmpxchg128()		1
+> +
+> +static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
+> +{
+> +	asm volatile(
+> +		"	cdsg	%[old],%[new],%[ptr]\n"
+> +		: [old] "+d" (old), [ptr] "+QS" (*ptr)
+> +		: [new] "d" (new)
+> +		: "memory", "cc");
+> +	return old;
+> +}
+> +
+> +#define arch_cmpxchg128		arch_cmpxchg128
+> +
+>  #endif /* __ASM_CMPXCHG_H */
+> --- a/arch/x86/include/asm/cmpxchg_32.h
+> +++ b/arch/x86/include/asm/cmpxchg_32.h
+> @@ -103,6 +103,7 @@ static inline bool __try_cmpxchg64(volat
+>  
+>  #endif
+>  
+> -#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX8)
+> +#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX8)
+> +#define system_has_cmpxchg64()		boot_cpu_has(X86_FEATURE_CX8)
+>  
+>  #endif /* _ASM_X86_CMPXCHG_32_H */
+> --- a/arch/x86/include/asm/cmpxchg_64.h
+> +++ b/arch/x86/include/asm/cmpxchg_64.h
+> @@ -20,6 +20,59 @@
+>  	arch_try_cmpxchg((ptr), (po), (n));				\
+>  })
+>  
+> -#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX16)
+> +union __u128_halves {
+> +	u128 full;
+> +	struct {
+> +		u64 low, high;
+> +	};
+> +};
+> +
+> +static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
+> +{
+> +	union __u128_halves o = { .full = old, }, n = { .full = new, };
+> +
+> +	asm volatile(LOCK_PREFIX "cmpxchg16b %[ptr]"
+> +		     : [ptr] "+m" (*ptr),
+> +		       "+a" (o.low), "+d" (o.high)
+> +		     : "b" (n.low), "c" (n.high)
+> +		     : "memory");
+> +
+> +	return o.full;
+> +}
+> +
+> +static __always_inline u128 arch_cmpxchg128_local(volatile u128 *ptr, u128 old, u128 new)
+> +{
+> +	union __u128_halves o = { .full = old, }, n = { .full = new, };
+> +
+> +	asm volatile("cmpxchg16b %[ptr]"
+> +		     : [ptr] "+m" (*ptr),
+> +		       "+a" (o.low), "+d" (o.high)
+> +		     : "b" (n.low), "c" (n.high)
+> +		     : "memory");
+> +
+> +	return o.full;
+> +}
+> +
+> +static __always_inline bool arch_try_cmpxchg128(volatile u128 *ptr, u128 *old, u128 new)
+> +{
+> +	union __u128_halves o = { .full = *old, }, n = { .full = new, };
+> +	bool ret;
+> +
+> +	asm volatile(LOCK_PREFIX "cmpxchg16b %[ptr]"
+> +		     CC_SET(e)
+> +		     : CC_OUT(e) (ret),
+> +		       [ptr] "+m" (*ptr),
+> +		       "+a" (o.low), "+d" (o.high)
+> +		     : "b" (n.low), "c" (n.high)
+> +		     : "memory");
+> +
+> +	if (unlikely(!ret))
+> +		*old = o.full;
+> +
+> +	return likely(ret);
+> +}
+> +
+> +#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX16)
+> +#define system_has_cmpxchg128()		boot_cpu_has(X86_FEATURE_CX16)
+>  
+>  #endif /* _ASM_X86_CMPXCHG_64_H */
+> 
+> 
