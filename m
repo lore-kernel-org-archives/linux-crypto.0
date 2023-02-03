@@ -2,138 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B6FC61DA4
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 17:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6025C05027
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 18:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233343AbjBCRvf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Feb 2023 12:51:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57228 "EHLO
+        id S233090AbjBCS0x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Feb 2023 13:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233002AbjBCRve (ORCPT
+        with ESMTP id S232476AbjBCS0x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Feb 2023 12:51:34 -0500
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A3783F8;
-        Fri,  3 Feb 2023 09:51:21 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.nyi.internal (Postfix) with ESMTP id C60BE582007;
-        Fri,  3 Feb 2023 12:25:35 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Fri, 03 Feb 2023 12:25:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; t=1675445135; x=1675452335; bh=WOj1XJ/2nW
-        hhYICuUWvW/halINqVJ3cfLXpbNnnM1BY=; b=b16DgUjGr10ahekmo+ZIsgBmwH
-        NI+4WKiYPn0WRip7ki2No6/JcXSEn5Lbchwr0PX4NJN4lZDK/RDjs5Y94yJM0ggC
-        5JAdFObkE0yrMYUboTNDTueCCZ/jMUgQdLERu0cCkQyqwP2mQ/nbcj9IlEgvkNDu
-        kYscEQW5aPKbRIpuSz9VJ1Gjku5hfKhRLWalPFD8O4wjXGCtju1rGzPBqPmfh0+F
-        C+v8aQzPfNrMRqHt6Y4zRdZsvFi2gaFgnMrO4eHfnIjNvBwmaMzspYjxyu/FTHU8
-        Kect+k+Hs3CGy3Ro6Nsd8+xuC98eXMBBmkaA5enHge8egtEYjQ899wWzQXjA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1675445135; x=1675452335; bh=WOj1XJ/2nWhhYICuUWvW/halINqV
-        J3cfLXpbNnnM1BY=; b=ndNbp+CxgZoarRRJg0oDB1vu4ErnnZgQS9OnLuWKTxJ3
-        rZsTad8uHfRNwCp3NH9sjW3eSUBjBT90p6HLG+cI4sDwH5CdapVchP2gGhkYXqDl
-        7GiE90ULhcZqBEwWeTskCI3DL48asLTwbW65TIZwFlNRm+TtDxecNFlIkuy0I6W3
-        x5tof5n4OYnE5HG4V4JoORLn7VxtHBxUXzWp3dTqBWZjAzZF8qMHeowxswghIZi6
-        IBFFhovJvoh7fNI40KDbP/tFtIJLeFomNfM3wl/+Xz+Pim6Zs6EGiSC/Yha+XLPe
-        2+XVk1aLuV0zQOzcvp3wMLMAoyn8vMzYzYYr5a9KWw==
-X-ME-Sender: <xms:jUPdYw7P6JnOYeN8iVeMNrpkTwrTbP8jzfhe_AeB0wWU4AGZJ0ydzQ>
-    <xme:jUPdYx7ZBP_oam7Utuhlz8bYRrfCtkYTOiUD_Zwf4E-ytw7QNteB5TeHvFvXmASTj
-    1UsZEEUzcT1qMIF4WE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudegtddgleejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepvefhffeltdegheeffffhtdegvdehjedtgfekueevgfduffettedtkeekueef
-    hedunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:jUPdY_e9KRM9ZbeTMsHtXXWE5CukEx6HAbnENBBhMVXHkp_an_WOjA>
-    <xmx:jUPdY1I4CUAZY-Bp5g6StetrxCGSeaG2raErr07Q6bwJAGAL3BNzjg>
-    <xmx:jUPdY0JrYtCQXVjTuwyWdhYJ8TY4Hg1WUFzvGpzaxx2LW0ah7BzuRA>
-    <xmx:j0PdYyakU9xoWDa5ryktR4FHchVeWoQd1ZNOvmSn4fM710A1pe4JuA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 78555B6044F; Fri,  3 Feb 2023 12:25:33 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-107-g82c3c54364-fm-20230131.002-g82c3c543
-Mime-Version: 1.0
-Message-Id: <24007667-1ff3-4c86-9c17-a361c3f9f072@app.fastmail.com>
-In-Reply-To: <20230202152655.494373332@infradead.org>
-References: <20230202145030.223740842@infradead.org>
- <20230202152655.494373332@infradead.org>
-Date:   Fri, 03 Feb 2023 18:25:04 +0100
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Peter Zijlstra" <peterz@infradead.org>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>
-Cc:     "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Boqun Feng" <boqun.feng@gmail.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>, dwmw2@infradead.org,
-        "Baolu Lu" <baolu.lu@linux.intel.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] percpu: Wire up cmpxchg128
-Content-Type: text/plain
+        Fri, 3 Feb 2023 13:26:53 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626268C1E3;
+        Fri,  3 Feb 2023 10:26:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675448812; x=1706984812;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=o7iXVgypVhVDm2Y42Qj83EPr1rJZUQX2KVOGDIIjZu0=;
+  b=B5VcYN8bfiuRVQr97D37RT6RzPUxQKnoy+t6Fxlzds7UFPElm9etsMha
+   xtr/R5BBE1Vw8vKS3JqQrxNczV0po/PiwZWe7FeOaj+1FPYTttm4scsnP
+   I1jfIlx6B5yO4zdsKYlOH3/9DXHg8kWd6c+MvoBkHRaQeTIvKgD6OrGek
+   ptUe+Jo6gmuz6ne5Od+eBAcjc1/vhpgwctC/ohHLIidm2MTTlT8gHyhuW
+   1Uo0ByUvIHGn3M4wPtPJdW332xoecd3s7XPZxMss07Y+PBuDi+Ir43VUg
+   O0vIOmt8NEq+ojta6tnPB7aAN5xInakMH25mDGUDZYUBTDsMo4OxvFEHv
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="309153085"
+X-IronPort-AV: E=Sophos;i="5.97,271,1669104000"; 
+   d="scan'208";a="309153085"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 10:26:51 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="667729007"
+X-IronPort-AV: E=Sophos;i="5.97,271,1669104000"; 
+   d="scan'208";a="667729007"
+Received: from hheck-mobl.amr.corp.intel.com (HELO [10.212.230.180]) ([10.212.230.180])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 10:25:57 -0800
+Message-ID: <fbf8d93e-2426-67f7-33c6-fe7d1a1a15b2@intel.com>
+Date:   Fri, 3 Feb 2023 10:25:56 -0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Roxana Bradescu <roxabee@chromium.org>,
+        Adam Langley <agl@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Pawan Kumar Gupta <pawan.kumar.gupta@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>
+References: <20230125012801.362496-1-ebiggers@kernel.org>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230125012801.362496-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 2, 2023, at 15:50, Peter Zijlstra wrote:
-> In order to replace cmpxchg_double() with the newly minted
-> cmpxchg128() family of functions, wire it up in this_cpu_cmpxchg().
->
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+BTW, I'm basically moving forward assuming that we're going to apply
+this patch in _some_ form.  I'm going to make some changes, but I'll
+discuss them in this thread to make sure we're all on the same page first.
 
-I commented on this in the previous version but never got any
-reply from you:
+On 1/24/23 17:28, Eric Biggers wrote:
+> +Affected CPUs
+> +-------------
+> +
+> +This vulnerability affects Intel Core family processors based on the Ice Lake
+> +and later microarchitectures, and Intel Atom family processors based on the
+> +Gracemont and later microarchitectures.  For more information, see Intel's
+> +documentation [1]_.
 
-https://lore.kernel.org/all/1d88ba9f-5541-4b67-9cc8-a361eef36547@app.fastmail.com/
+I had a hard time following the docs in this area.
 
-Unless I have misunderstood what you are doing, my concerns are
-still the same:
+But I'm not sure this statement is correct.  The docs actually say:
 
->  #define this_cpu_cmpxchg(pcp, oval, nval) \
-> -	__pcpu_size_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
-> +	__pcpu_size16_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
->  #define this_cpu_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, 
-> nval2) \
->  	__pcpu_double_call_return_bool(this_cpu_cmpxchg_double_, pcp1, pcp2, 
-> oval1, oval2, nval1, nval2)
+	For Intel® Core™ family processors based on microarchitectures
+	before Ice Lake and Intel Atom® family processors based on
+	microarchitectures before Gracemont that do not enumerate
+	IA32_UARCH_MISC_CTL, developers may assume that the instructions
+	listed here operate as if DOITM is enabled.
 
-Having a variable-length this_cpu_cmpxchg() that turns into cmpxchg128()
-and cmpxchg64() even on CPUs where this traps (!X86_FEATURE_CX16) seems
-like a bad design to me.
+A processor needs to be before "Ice Lake" and friends *AND* not
+enumerate IA32_UARCH_MISC_CTL to be unaffected.
 
-I would much prefer fixed-length this_cpu_cmpxchg64()/this_cpu_cmpxchg128()
-calls that never trap but fall back to the generic version on CPUs that
-are lacking the atomics.
+There's also another tweak that's needed because:
 
-     Arnd
+	Processors that do not enumerate IA32_ARCH_CAPABILITIES[DOITM]
+	when the latest microcode is applied do not need to set
+	IA32_UARCH_MISC_CTL [DOITM] in order to have the behavior
+	described in this document...
+
+First, we need to mention the "latest microcode" thing in the kernel
+docs.  I also _think_ the whole "microarchitectures before" stuff is
+rather irrelevant and we can simplify this down to:
+
+	This vulnerability affects all Intel processors that support
+	MSR_IA32_ARCH_CAPABILITIES and set MSR_IA32_ARCH_CAPABILITIES[DOITM]
+	when the latest microcode is applied.
+
+Which reminds me.  This:
+
+> +void update_doitm_msr(void)
+> +{
+> +	u64 msr;
+> +
+> +	if (doitm_off)
+> +		return;
+> +
+> +	rdmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
+> +	wrmsrl(MSR_IA32_UARCH_MISC_CTL, msr | UARCH_MISC_DOITM);
+> +}
+
+should probably be:
+
+void update_doitm_msr(void)
+{
+	u64 msr;
+
+	/*
+	 * All processors that enumerate support for DOIT
+	 * are affected *and* have the mitigation available.
+	 */
+	if (!boot_cpu_has_bug(X86_BUG_DODT))
+		return;
+
+	rdmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
+	if (doitm_off)
+		msr &= ~UARCH_MISC_DOITM;
+	else
+		msr |= UARCH_MISC_DOITM;
+	wrmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
+}
+
+in case the CPU isn't actually coming out of reset, like if kexec() left
+DOITM=1.
+
