@@ -2,210 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6D0C636D3
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 02:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D20C63797
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Feb 2023 02:51:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjBCCpB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Feb 2023 21:45:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
+        id S231660AbjBCCvr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Feb 2023 21:51:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbjBCCo7 (ORCPT
+        with ESMTP id S230147AbjBCCvr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Feb 2023 21:44:59 -0500
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4D5234C8;
-        Thu,  2 Feb 2023 18:44:57 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vamridi_1675392294;
-Received: from 30.240.100.126(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Vamridi_1675392294)
-          by smtp.aliyun-inc.com;
-          Fri, 03 Feb 2023 10:44:55 +0800
-Message-ID: <f4df6e4f-9d88-bb63-42bf-e2fa23b9a9bc@linux.alibaba.com>
-Date:   Fri, 3 Feb 2023 10:44:53 +0800
+        Thu, 2 Feb 2023 21:51:47 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109F24A1CB;
+        Thu,  2 Feb 2023 18:51:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675392705; x=1706928705;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UxeZ8FJwNzkiSv+FCcjHMP+ssabzgfr3PcMLKiBT6p0=;
+  b=WTtTHnc4Iyd5y1FWOzWjW8o2fqGDG0DwHnj/sCgYtlbcsqpRMrklqY08
+   Kg5rxnbgcrAjYKs3qY9NPYh+vqPa40MWiHog4vU4fMNZh5o6zloThN5A1
+   hO5YpD4JCB+F87ccIKQfqp0SCOX+FoVJYfnDwIGRM7vLwI/65iUwfiSCQ
+   Tb2P1jpDehG3aBDW0IEGyvYOFV70c6PBCxS64UdBBLxI9nlUbiq1s8p/3
+   QCTMShQYagh8KJsayZCNglOjt93HKEZaqb5taDkYmE1UTNRsbR3NBrNnR
+   3Ivay3NHweWfdZeA3zHdiLdVXBtiY/kANh28GLDthssmho54U9gDvTUPA
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="414851328"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="414851328"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 18:51:44 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="615547679"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="615547679"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.208.253]) ([10.254.208.253])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 18:51:35 -0800
+Message-ID: <018498d7-d966-6c87-d829-50270565147d@linux.intel.com>
+Date:   Fri, 3 Feb 2023 10:51:33 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [v4 PATCH] crypto: arm64/sm4-gcm - Fix possible crash in GCM
- cryption
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20230201123133.99768-1-tianjia.zhang@linux.alibaba.com>
- <Y9t1a2HkqlPT+Zfn@gondor.apana.org.au>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Cc:     baolu.lu@linux.intel.com, corbet@lwn.net, will@kernel.org,
+        boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 07/10] x86,intel_iommu: Replace cmpxchg_double()
 Content-Language: en-US
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <Y9t1a2HkqlPT+Zfn@gondor.apana.org.au>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        torvalds@linux-foundation.org
+References: <20230202145030.223740842@infradead.org>
+ <20230202152655.624998774@infradead.org>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230202152655.624998774@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On 2023/2/2 22:50, Peter Zijlstra wrote:
+> Signed-off-by: Peter Zijlstra (Intel)<peterz@infradead.org>
+> ---
+>   drivers/iommu/intel/irq_remapping.c |    8 --
+>   include/linux/dmar.h                |  125 +++++++++++++++++++-----------------
+>   2 files changed, 68 insertions(+), 65 deletions(-)
 
-On 2/2/23 4:33 PM, Herbert Xu wrote:
-> On Wed, Feb 01, 2023 at 08:31:33PM +0800, Tianjia Zhang wrote:
->>
->> +	sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, walk->dst.virt.addr,
->> +			       walk->src.virt.addr, iv, walk->nbytes, ghash,
->> +			       ctx->ghash_table, (const u8 *)&lengths);
-> 
-> I still think this is error-prone.  When walk->nbytes == 0,
-> walk->src and walk->dst are undefined.  Sure you could argue
-> that the underlying assembly code won't touch the values, but
-> accessing uninitialised memory even if just to throw them away
-> is still a bit icky.
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
-You're right, whether used or not, accessing an undefined pointer is
-always ugly. This benefited me a lot.
-
-> 
-> Anyway, here's my attempt at rewriting the gcm loop:
-> 
-> ---8<---
-> An often overlooked aspect of the skcipher walker API is that an
-> error is not just indicated by a non-zero return value, but by the
-> fact that walk->nbytes is zero.
-> 
-> Thus it is an error to call skcipher_walk_done after getting back
-> walk->nbytes == 0 from the previous interaction with the walker.
-> 
-> This is because when walk->nbytes is zero the walker is left in
-> an undefined state and any further calls to it may try to free
-> uninitialised stack memory.
-> 
-> The sm4 arm64 ccm code gets this wrong and ends up calling
-> skcipher_walk_done even when walk->nbytes is zero.
-> 
-> This patch rewrites the loop in a form that resembles other callers.
-> 
-> Reported-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> Fixes: ae1b83c7d572 ("crypto: arm64/sm4 - add CE implementation for GCM mode")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Thanks for the fix, this patch works find to me, so
-
-Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-
-> 
-> diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-> index c450a2025ca9..73bfb6972d3a 100644
-> --- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
-> +++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-> @@ -135,22 +135,23 @@ static void gcm_calculate_auth_mac(struct aead_request *req, u8 ghash[])
->   }
->   
->   static int gcm_crypt(struct aead_request *req, struct skcipher_walk *walk,
-> -		     struct sm4_gcm_ctx *ctx, u8 ghash[],
-> +		     u8 ghash[], int err,
->   		     void (*sm4_ce_pmull_gcm_crypt)(const u32 *rkey_enc,
->   				u8 *dst, const u8 *src, u8 *iv,
->   				unsigned int nbytes, u8 *ghash,
->   				const u8 *ghash_table, const u8 *lengths))
->   {
-> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> +	struct sm4_gcm_ctx *ctx = crypto_aead_ctx(aead);
->   	u8 __aligned(8) iv[SM4_BLOCK_SIZE];
->   	be128 __aligned(8) lengths;
-> -	int err;
->   
->   	memset(ghash, 0, SM4_BLOCK_SIZE);
->   
->   	lengths.a = cpu_to_be64(req->assoclen * 8);
->   	lengths.b = cpu_to_be64(walk->total * 8);
->   
-> -	memcpy(iv, walk->iv, GCM_IV_SIZE);
-> +	memcpy(iv, req->iv, GCM_IV_SIZE);
->   	put_unaligned_be32(2, iv + GCM_IV_SIZE);
->   
->   	kernel_neon_begin();
-> @@ -158,49 +159,51 @@ static int gcm_crypt(struct aead_request *req, struct skcipher_walk *walk,
->   	if (req->assoclen)
->   		gcm_calculate_auth_mac(req, ghash);
->   
-> -	do {
-> +	while (walk->nbytes) {
->   		unsigned int tail = walk->nbytes % SM4_BLOCK_SIZE;
->   		const u8 *src = walk->src.virt.addr;
->   		u8 *dst = walk->dst.virt.addr;
->   
->   		if (walk->nbytes == walk->total) {
-> -			tail = 0;
-> -
->   			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
->   					       walk->nbytes, ghash,
->   					       ctx->ghash_table,
->   					       (const u8 *)&lengths);
-> -		} else if (walk->nbytes - tail) {
-> -			sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
-> -					       walk->nbytes - tail, ghash,
-> -					       ctx->ghash_table, NULL);
-> +
-> +			kernel_neon_end();
-> +
-> +			return skcipher_walk_done(walk, 0);
->   		}
->   
-> +		sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, dst, src, iv,
-> +				       walk->nbytes - tail, ghash,
-> +				       ctx->ghash_table, NULL);
-> +
->   		kernel_neon_end();
->   
->   		err = skcipher_walk_done(walk, tail);
-> -		if (err)
-> -			return err;
-> -		if (walk->nbytes)
-> -			kernel_neon_begin();
-> -	} while (walk->nbytes > 0);
->   
-> -	return 0;
-> +		kernel_neon_begin();
-> +	}
-> +
-> +	sm4_ce_pmull_gcm_crypt(ctx->key.rkey_enc, NULL, NULL, iv,
-> +			       walk->nbytes, ghash, ctx->ghash_table,
-> +			       (const u8 *)&lengths);
-> +
-> +	kernel_neon_end();
-> +
-> +	return err;
->   }
->   
->   static int gcm_encrypt(struct aead_request *req)
->   {
->   	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> -	struct sm4_gcm_ctx *ctx = crypto_aead_ctx(aead);
->   	u8 __aligned(8) ghash[SM4_BLOCK_SIZE];
->   	struct skcipher_walk walk;
->   	int err;
->   
->   	err = skcipher_walk_aead_encrypt(&walk, req, false);
-> -	if (err)
-> -		return err;
-> -
-> -	err = gcm_crypt(req, &walk, ctx, ghash, sm4_ce_pmull_gcm_enc);
-> +	err = gcm_crypt(req, &walk, ghash, err, sm4_ce_pmull_gcm_enc);
->   	if (err)
->   		return err;
->   
-> @@ -215,17 +218,13 @@ static int gcm_decrypt(struct aead_request *req)
->   {
->   	struct crypto_aead *aead = crypto_aead_reqtfm(req);
->   	unsigned int authsize = crypto_aead_authsize(aead);
-> -	struct sm4_gcm_ctx *ctx = crypto_aead_ctx(aead);
->   	u8 __aligned(8) ghash[SM4_BLOCK_SIZE];
->   	u8 authtag[SM4_BLOCK_SIZE];
->   	struct skcipher_walk walk;
->   	int err;
->   
->   	err = skcipher_walk_aead_decrypt(&walk, req, false);
-> -	if (err)
-> -		return err;
-> -
-> -	err = gcm_crypt(req, &walk, ctx, ghash, sm4_ce_pmull_gcm_dec);
-> +	err = gcm_crypt(req, &walk, ghash, err, sm4_ce_pmull_gcm_dec);
->   	if (err)
->   		return err;
->   
+Best regards,
+baolu
