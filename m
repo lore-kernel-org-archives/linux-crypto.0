@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3421CC05027
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9B8C61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbjBFLdV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:33:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46566 "EHLO
+        id S230094AbjBFLde (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 06:33:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbjBFLdQ (ORCPT
+        with ESMTP id S229841AbjBFLdT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:16 -0500
+        Mon, 6 Feb 2023 06:33:19 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7997413D52;
-        Mon,  6 Feb 2023 03:33:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C2813DF7;
+        Mon,  6 Feb 2023 03:33:16 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOye6-007zks-J4; Mon, 06 Feb 2023 18:22:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:46 +0800
+        id 1pOye2-007zkJ-CU; Mon, 06 Feb 2023 18:22:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:42 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:46 +0800
-Subject: [PATCH 17/17] crypto: api - Remove completion function scaffolding
+Date:   Mon, 06 Feb 2023 18:22:42 +0800
+Subject: [PATCH 15/17] tipc: Remove completion function scaffolding
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -42,7 +42,7 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOye6-007zks-J4@formenos.hmeau.com>
+Message-Id: <E1pOye2-007zkJ-CU@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -53,30 +53,47 @@ function signature has been converted.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/linux/crypto.h |    6 ------
- 1 file changed, 6 deletions(-)
+ net/tipc/crypto.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 80f6350fb588..bb1d9b0e1647 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -176,7 +176,6 @@ struct crypto_async_request;
- struct crypto_tfm;
- struct crypto_type;
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index ab356e7a3870..577fa5af33ec 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -267,10 +267,10 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
+ 			     struct tipc_bearer *b,
+ 			     struct tipc_media_addr *dst,
+ 			     struct tipc_node *__dnode);
+-static void tipc_aead_encrypt_done(crypto_completion_data_t *data, int err);
++static void tipc_aead_encrypt_done(void *data, int err);
+ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 			     struct sk_buff *skb, struct tipc_bearer *b);
+-static void tipc_aead_decrypt_done(crypto_completion_data_t *data, int err);
++static void tipc_aead_decrypt_done(void *data, int err);
+ static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr);
+ static int tipc_ehdr_build(struct net *net, struct tipc_aead *aead,
+ 			   u8 tx_key, struct sk_buff *skb,
+@@ -830,9 +830,9 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
+ 	return rc;
+ }
  
--typedef void crypto_completion_data_t;
- typedef void (*crypto_completion_t)(void *req, int err);
+-static void tipc_aead_encrypt_done(crypto_completion_data_t *data, int err)
++static void tipc_aead_encrypt_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct tipc_crypto_tx_ctx *tx_ctx = TIPC_SKB_CB(skb)->crypto_ctx;
+ 	struct tipc_bearer *b = tx_ctx->bearer;
+ 	struct tipc_aead *aead = tx_ctx->aead;
+@@ -954,9 +954,9 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 	return rc;
+ }
  
- /**
-@@ -596,11 +595,6 @@ struct crypto_wait {
- /*
-  * Async ops completion helper functioons
-  */
--static inline void *crypto_get_completion_data(void *data)
--{
--	return data;
--}
--
- void crypto_req_done(void *req, int err);
- 
- static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+-static void tipc_aead_decrypt_done(crypto_completion_data_t *data, int err)
++static void tipc_aead_decrypt_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct tipc_crypto_rx_ctx *rx_ctx = TIPC_SKB_CB(skb)->crypto_ctx;
+ 	struct tipc_bearer *b = rx_ctx->bearer;
+ 	struct tipc_aead *aead = rx_ctx->aead;
