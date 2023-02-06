@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61820C05027
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB6EC61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjBFLdj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:33:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46794 "EHLO
+        id S230121AbjBFLdw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 06:33:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbjBFLdd (ORCPT
+        with ESMTP id S230093AbjBFLde (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:33 -0500
+        Mon, 6 Feb 2023 06:33:34 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2574F1449B;
-        Mon,  6 Feb 2023 03:33:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409C41E1D8;
+        Mon,  6 Feb 2023 03:33:24 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOye0-007zk1-9e; Mon, 06 Feb 2023 18:22:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:40 +0800
+        id 1pOydu-007zio-0W; Mon, 06 Feb 2023 18:22:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:34 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:40 +0800
-Subject: [PATCH 14/17] net: ipv6: Remove completion function scaffolding
+Date:   Mon, 06 Feb 2023 18:22:34 +0800
+Subject: [PATCH 11/17] dm: Remove completion function scaffolding
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -42,7 +42,7 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOye0-007zk1-9e@formenos.hmeau.com>
+Message-Id: <E1pOydu-007zio-0W@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -53,93 +53,48 @@ function signature has been converted.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- net/ipv6/ah6.c  |    8 ++++----
- net/ipv6/esp6.c |   16 ++++++++--------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/md/dm-crypt.c     |    6 +++---
+ drivers/md/dm-integrity.c |    4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
-index e43735578a76..01005035ad10 100644
---- a/net/ipv6/ah6.c
-+++ b/net/ipv6/ah6.c
-@@ -281,12 +281,12 @@ static int ipv6_clear_mutable_options(struct ipv6hdr *iph, int len, int dir)
- 	return 0;
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 7609fe39ab8c..3aeeb8f2802f 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -1458,7 +1458,7 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 	return r;
  }
  
--static void ah6_output_done(crypto_completion_data_t *data, int err)
-+static void ah6_output_done(void *data, int err)
+-static void kcryptd_async_done(crypto_completion_data_t *async_req, int error);
++static void kcryptd_async_done(void *async_req, int error);
+ 
+ static int crypt_alloc_req_skcipher(struct crypt_config *cc,
+ 				     struct convert_context *ctx)
+@@ -2146,9 +2146,9 @@ static void kcryptd_crypt_read_convert(struct dm_crypt_io *io)
+ 	crypt_dec_pending(io);
+ }
+ 
+-static void kcryptd_async_done(crypto_completion_data_t *data, int error)
++static void kcryptd_async_done(void *data, int error)
  {
- 	int extlen;
- 	u8 *iph_base;
- 	u8 *icv;
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 	struct xfrm_state *x = skb_dst(skb)->xfrm;
- 	struct ah_data *ahp = x->data;
- 	struct ipv6hdr *top_iph = ipv6_hdr(skb);
-@@ -451,12 +451,12 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	return err;
+-	struct dm_crypt_request *dmreq = crypto_get_completion_data(data);
++	struct dm_crypt_request *dmreq = data;
+ 	struct convert_context *ctx = dmreq->ctx;
+ 	struct dm_crypt_io *io = container_of(ctx, struct dm_crypt_io, ctx);
+ 	struct crypt_config *cc = io->cc;
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index eefe25ed841e..c58156deb2b1 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -955,9 +955,9 @@ static void xor_journal(struct dm_integrity_c *ic, bool encrypt, unsigned sectio
+ 	async_tx_issue_pending_all();
  }
  
--static void ah6_input_done(crypto_completion_data_t *data, int err)
-+static void ah6_input_done(void *data, int err)
+-static void complete_journal_encrypt(crypto_completion_data_t *data, int err)
++static void complete_journal_encrypt(void *data, int err)
  {
- 	u8 *auth_data;
- 	u8 *icv;
- 	u8 *work_iph;
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 	struct xfrm_state *x = xfrm_input_state(skb);
- 	struct ah_data *ahp = x->data;
- 	struct ip_auth_hdr *ah = ip_auth_hdr(skb);
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index b9ee81c7dfcf..fddd0cbdede1 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -278,9 +278,9 @@ static void esp_output_encap_csum(struct sk_buff *skb)
- 	}
- }
- 
--static void esp_output_done(crypto_completion_data_t *data, int err)
-+static void esp_output_done(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	void *tmp;
- 	struct xfrm_state *x;
-@@ -368,9 +368,9 @@ static struct ip_esp_hdr *esp_output_set_esn(struct sk_buff *skb,
- 	return esph;
- }
- 
--static void esp_output_done_esn(crypto_completion_data_t *data, int err)
-+static void esp_output_done_esn(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 
- 	esp_output_restore_header(skb);
- 	esp_output_done(data, err);
-@@ -879,9 +879,9 @@ int esp6_input_done2(struct sk_buff *skb, int err)
- }
- EXPORT_SYMBOL_GPL(esp6_input_done2);
- 
--static void esp_input_done(crypto_completion_data_t *data, int err)
-+static void esp_input_done(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 
- 	xfrm_input_resume(skb, esp6_input_done2(skb, err));
- }
-@@ -909,9 +909,9 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
- 	}
- }
- 
--static void esp_input_done_esn(crypto_completion_data_t *data, int err)
-+static void esp_input_done_esn(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 
- 	esp_input_restore_header(skb);
- 	esp_input_done(data, err);
+-	struct journal_completion *comp = crypto_get_completion_data(data);
++	struct journal_completion *comp = data;
+ 	if (unlikely(err)) {
+ 		if (likely(err == -EINPROGRESS)) {
+ 			complete(&comp->ic->crypto_backoff);
