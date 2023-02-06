@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 750D4C636D6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E064EC61DA4
 	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229556AbjBFLdg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:33:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
+        id S229548AbjBFLdh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 06:33:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjBFLdT (ORCPT
+        with ESMTP id S229987AbjBFLdd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:19 -0500
+        Mon, 6 Feb 2023 06:33:33 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDA201E1EB;
-        Mon,  6 Feb 2023 03:33:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2562814211;
+        Mon,  6 Feb 2023 03:33:20 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOye4-007zka-Fr; Mon, 06 Feb 2023 18:22:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:44 +0800
+        id 1pOydy-007zjk-6G; Mon, 06 Feb 2023 18:22:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:38 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:44 +0800
-Subject: [PATCH 16/17] tls: Remove completion function scaffolding
+Date:   Mon, 06 Feb 2023 18:22:38 +0800
+Subject: [PATCH 13/17] net: ipv4: Remove completion function scaffolding
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -42,7 +42,7 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOye4-007zka-Fr@formenos.hmeau.com>
+Message-Id: <E1pOydy-007zjk-6G@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -53,34 +53,92 @@ function signature has been converted.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- net/tls/tls_sw.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/ipv4/ah4.c  |    8 ++++----
+ net/ipv4/esp4.c |   16 ++++++++--------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 5b7f67a7d394..0515cda32fe2 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -179,9 +179,9 @@ static int tls_padding_length(struct tls_prot_info *prot, struct sk_buff *skb,
- 	return sub;
+diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
+index 1fc0231eb1ee..015c0f4ec5ba 100644
+--- a/net/ipv4/ah4.c
++++ b/net/ipv4/ah4.c
+@@ -117,11 +117,11 @@ static int ip_clear_mutable_options(const struct iphdr *iph, __be32 *daddr)
+ 	return 0;
  }
  
--static void tls_decrypt_done(crypto_completion_data_t *data, int err)
-+static void tls_decrypt_done(void *data, int err)
+-static void ah_output_done(crypto_completion_data_t *data, int err)
++static void ah_output_done(void *data, int err)
  {
--	struct aead_request *aead_req = crypto_get_completion_data(data);
-+	struct aead_request *aead_req = data;
- 	struct crypto_aead *aead = crypto_aead_reqtfm(aead_req);
- 	struct scatterlist *sgout = aead_req->dst;
- 	struct scatterlist *sgin = aead_req->src;
-@@ -428,9 +428,9 @@ int tls_tx_records(struct sock *sk, int flags)
- 	return rc;
+ 	u8 *icv;
+ 	struct iphdr *iph;
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_state *x = skb_dst(skb)->xfrm;
+ 	struct ah_data *ahp = x->data;
+ 	struct iphdr *top_iph = ip_hdr(skb);
+@@ -262,12 +262,12 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
+ 	return err;
  }
  
--static void tls_encrypt_done(crypto_completion_data_t *data, int err)
-+static void tls_encrypt_done(void *data, int err)
+-static void ah_input_done(crypto_completion_data_t *data, int err)
++static void ah_input_done(void *data, int err)
  {
--	struct aead_request *aead_req = crypto_get_completion_data(data);
-+	struct aead_request *aead_req = data;
- 	struct tls_sw_context_tx *ctx;
- 	struct tls_context *tls_ctx;
- 	struct tls_prot_info *prot;
+ 	u8 *auth_data;
+ 	u8 *icv;
+ 	struct iphdr *work_iph;
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_state *x = xfrm_input_state(skb);
+ 	struct ah_data *ahp = x->data;
+ 	struct ip_auth_hdr *ah = ip_auth_hdr(skb);
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 8abe07c1ff28..ba06ed42e428 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -244,9 +244,9 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+ }
+ #endif
+ 
+-static void esp_output_done(crypto_completion_data_t *data, int err)
++static void esp_output_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
+ 	void *tmp;
+ 	struct xfrm_state *x;
+@@ -332,9 +332,9 @@ static struct ip_esp_hdr *esp_output_set_extra(struct sk_buff *skb,
+ 	return esph;
+ }
+ 
+-static void esp_output_done_esn(crypto_completion_data_t *data, int err)
++static void esp_output_done_esn(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	esp_output_restore_header(skb);
+ 	esp_output_done(data, err);
+@@ -830,9 +830,9 @@ int esp_input_done2(struct sk_buff *skb, int err)
+ }
+ EXPORT_SYMBOL_GPL(esp_input_done2);
+ 
+-static void esp_input_done(crypto_completion_data_t *data, int err)
++static void esp_input_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	xfrm_input_resume(skb, esp_input_done2(skb, err));
+ }
+@@ -860,9 +860,9 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
+ 	}
+ }
+ 
+-static void esp_input_done_esn(crypto_completion_data_t *data, int err)
++static void esp_input_done_esn(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	esp_input_restore_header(skb);
+ 	esp_input_done(data, err);
