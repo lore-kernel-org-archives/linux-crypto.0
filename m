@@ -2,25 +2,27 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A699C63797
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3421CC05027
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbjBFLdR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:33:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46502 "EHLO
+        id S230042AbjBFLdV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 06:33:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229981AbjBFLdO (ORCPT
+        with ESMTP id S230024AbjBFLdQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:14 -0500
+        Mon, 6 Feb 2023 06:33:16 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 138DECA23;
-        Mon,  6 Feb 2023 03:33:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7997413D52;
+        Mon,  6 Feb 2023 03:33:14 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOycU-007zew-Vi; Mon, 06 Feb 2023 18:21:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:21:06 +0800
-Date:   Mon, 6 Feb 2023 18:21:06 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        id 1pOye6-007zks-J4; Mon, 06 Feb 2023 18:22:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:46 +0800
+From:   "Herbert Xu" <herbert@gondor.apana.org.au>
+Date:   Mon, 06 Feb 2023 18:22:46 +0800
+Subject: [PATCH 17/17] crypto: api - Remove completion function scaffolding
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
@@ -40,40 +42,41 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: [PATCH 0/17] crypto: api - Change completion callback argument to
- void star
-Message-ID: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-Id: <E1pOye6-007zks-J4@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi:
+This patch removes the temporary scaffolding now that the comletion
+function signature has been converted.
 
-The crypto completion function currently takes a pointer to a
-struct crypto_async_request object.  However, in reality the API
-does not allow the use of any part of the object apart from the
-data field.  For example, ahash/shash will create a fake object
-on the stack to pass along a different data field.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-This leads to potential bugs where the user may try to dereference
-or otherwise use the crypto_async_request object.
+ include/linux/crypto.h |    6 ------
+ 1 file changed, 6 deletions(-)
 
-This series changes the completion function to take a void *
-argument instead of crypto_async_request.
-
-This series touches code in a number of different subsystems.
-Most of them are trivial except for tls which was actually buggy
-as it did exactly what was described above.
-
-I'd like to pull all the changes through the crypto tree.  But
-feel free to object if you'd like the relevant patches to go
-through your trees instead and I'll split this up.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 80f6350fb588..bb1d9b0e1647 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -176,7 +176,6 @@ struct crypto_async_request;
+ struct crypto_tfm;
+ struct crypto_type;
+ 
+-typedef void crypto_completion_data_t;
+ typedef void (*crypto_completion_t)(void *req, int err);
+ 
+ /**
+@@ -596,11 +595,6 @@ struct crypto_wait {
+ /*
+  * Async ops completion helper functioons
+  */
+-static inline void *crypto_get_completion_data(void *data)
+-{
+-	return data;
+-}
+-
+ void crypto_req_done(void *req, int err);
+ 
+ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
