@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B522C64EC4
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B61C61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:34:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbjBFLeV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S230072AbjBFLeV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 6 Feb 2023 06:34:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46814 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230063AbjBFLdo (ORCPT
+        with ESMTP id S229983AbjBFLdv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:44 -0500
+        Mon, 6 Feb 2023 06:33:51 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DD81449B;
-        Mon,  6 Feb 2023 03:33:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76DBF1E1EB;
+        Mon,  6 Feb 2023 03:33:44 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOydj-007zhY-EX; Mon, 06 Feb 2023 18:22:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:23 +0800
+        id 1pOydb-007zgc-0p; Mon, 06 Feb 2023 18:22:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:15 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:23 +0800
-Subject: [PATCH 6/17] net: ipv6: Add scaffolding to change completion function signature
+Date:   Mon, 06 Feb 2023 18:22:15 +0800
+Subject: [PATCH 2/17] net: macsec: Add scaffolding to change completion function signature
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -42,7 +42,7 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOydj-007zhY-EX@formenos.hmeau.com>
+Message-Id: <E1pOydb-007zgc-0p@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -50,105 +50,38 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 This patch adds temporary scaffolding so that the Crypto API
 completion function can take a void * instead of crypto_async_request.
 Once affected users have been converted this can be removed.
-    
+
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- net/ipv6/ah6.c  |    8 ++++----
- net/ipv6/esp6.c |   20 ++++++++++----------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ drivers/net/macsec.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
-index 5228d2716289..e43735578a76 100644
---- a/net/ipv6/ah6.c
-+++ b/net/ipv6/ah6.c
-@@ -281,12 +281,12 @@ static int ipv6_clear_mutable_options(struct ipv6hdr *iph, int len, int dir)
- 	return 0;
- }
- 
--static void ah6_output_done(struct crypto_async_request *base, int err)
-+static void ah6_output_done(crypto_completion_data_t *data, int err)
- {
- 	int extlen;
- 	u8 *iph_base;
- 	u8 *icv;
--	struct sk_buff *skb = base->data;
-+	struct sk_buff *skb = crypto_get_completion_data(data);
- 	struct xfrm_state *x = skb_dst(skb)->xfrm;
- 	struct ah_data *ahp = x->data;
- 	struct ipv6hdr *top_iph = ipv6_hdr(skb);
-@@ -451,12 +451,12 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	return err;
- }
- 
--static void ah6_input_done(struct crypto_async_request *base, int err)
-+static void ah6_input_done(crypto_completion_data_t *data, int err)
- {
- 	u8 *auth_data;
- 	u8 *icv;
- 	u8 *work_iph;
--	struct sk_buff *skb = base->data;
-+	struct sk_buff *skb = crypto_get_completion_data(data);
- 	struct xfrm_state *x = xfrm_input_state(skb);
- 	struct ah_data *ahp = x->data;
- 	struct ip_auth_hdr *ah = ip_auth_hdr(skb);
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 14ed868680c6..b9ee81c7dfcf 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -278,9 +278,9 @@ static void esp_output_encap_csum(struct sk_buff *skb)
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index bf8ac7a3ded7..b7d9d487ccd2 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -528,9 +528,9 @@ static void count_tx(struct net_device *dev, int ret, int len)
  	}
  }
  
--static void esp_output_done(struct crypto_async_request *base, int err)
-+static void esp_output_done(crypto_completion_data_t *data, int err)
+-static void macsec_encrypt_done(struct crypto_async_request *base, int err)
++static void macsec_encrypt_done(crypto_completion_data_t *data, int err)
  {
 -	struct sk_buff *skb = base->data;
 +	struct sk_buff *skb = crypto_get_completion_data(data);
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	void *tmp;
- 	struct xfrm_state *x;
-@@ -368,12 +368,12 @@ static struct ip_esp_hdr *esp_output_set_esn(struct sk_buff *skb,
- 	return esph;
+ 	struct net_device *dev = skb->dev;
+ 	struct macsec_dev *macsec = macsec_priv(dev);
+ 	struct macsec_tx_sa *sa = macsec_skb_cb(skb)->tx_sa;
+@@ -835,9 +835,9 @@ static void count_rx(struct net_device *dev, int len)
+ 	u64_stats_update_end(&stats->syncp);
  }
  
--static void esp_output_done_esn(struct crypto_async_request *base, int err)
-+static void esp_output_done_esn(crypto_completion_data_t *data, int err)
+-static void macsec_decrypt_done(struct crypto_async_request *base, int err)
++static void macsec_decrypt_done(crypto_completion_data_t *data, int err)
  {
 -	struct sk_buff *skb = base->data;
 +	struct sk_buff *skb = crypto_get_completion_data(data);
- 
- 	esp_output_restore_header(skb);
--	esp_output_done(base, err);
-+	esp_output_done(data, err);
- }
- 
- static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
-@@ -879,9 +879,9 @@ int esp6_input_done2(struct sk_buff *skb, int err)
- }
- EXPORT_SYMBOL_GPL(esp6_input_done2);
- 
--static void esp_input_done(struct crypto_async_request *base, int err)
-+static void esp_input_done(crypto_completion_data_t *data, int err)
- {
--	struct sk_buff *skb = base->data;
-+	struct sk_buff *skb = crypto_get_completion_data(data);
- 
- 	xfrm_input_resume(skb, esp6_input_done2(skb, err));
- }
-@@ -909,12 +909,12 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
- 	}
- }
- 
--static void esp_input_done_esn(struct crypto_async_request *base, int err)
-+static void esp_input_done_esn(crypto_completion_data_t *data, int err)
- {
--	struct sk_buff *skb = base->data;
-+	struct sk_buff *skb = crypto_get_completion_data(data);
- 
- 	esp_input_restore_header(skb);
--	esp_input_done(base, err);
-+	esp_input_done(data, err);
- }
- 
- static int esp6_input(struct xfrm_state *x, struct sk_buff *skb)
+ 	struct net_device *dev = skb->dev;
+ 	struct macsec_dev *macsec = macsec_priv(dev);
+ 	struct macsec_rx_sa *rx_sa = macsec_skb_cb(skb)->rx_sa;
