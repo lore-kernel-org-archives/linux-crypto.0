@@ -2,145 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED01FC63797
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 13:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3554C64EC4
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 17:30:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbjBFNbC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 08:31:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36332 "EHLO
+        id S229954AbjBFRa0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 12:30:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjBFNa6 (ORCPT
+        with ESMTP id S230478AbjBFRaN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 08:30:58 -0500
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52120A5C5;
-        Mon,  6 Feb 2023 05:30:48 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 47B8E581FCA;
-        Mon,  6 Feb 2023 08:20:27 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Mon, 06 Feb 2023 08:20:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm3; t=1675689627; x=1675696827; bh=YEEKxWvDaU
-        UtEFigpSanl+1o6NoqA2MTTLwchnDt7mc=; b=JJZuuSyMXi8+7dbMJeo+D5x90Q
-        QSbmGMLSv82Wox3Is7pYL6nhbEWJBfC0wbE6oSvPTHqWQlE4S2v1bVxYTpkKfNnK
-        y8m5HTeGnuwwsAD7ZZ/Q5cz/1UGExNYutXiIkce2Je9GS2BfYijaO1nPMpyEnLWr
-        e1MxJrchORh3tiGvi4noN95wywfSBXFN8OHGqnJ+ZaCd4RHMwutetH/6Sbd12cji
-        2SXSakWZMLrIogUEFOmJzEZa7IigmbvUSyaMF7rDnUNQDshLq7sV/QJTa+Bm/lbD
-        AYSybO0NjenKBsowbzxVsgQxpoJxGppz/CNhM9yfZz9cvm68/YozcNpmfl6A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1675689627; x=1675696827; bh=YEEKxWvDaUUtEFigpSanl+1o6Noq
-        A2MTTLwchnDt7mc=; b=KRQjthpW7gLPW560Bl7atCLRmIn2E7b44jydvggP3nts
-        V9EQyO1jI7xhj/PaB6Fw7rijYTBROEnM7JBkgAxTMlEK/nvofQ6gCC9o0toDI1mK
-        1e34kfAUyoBC8rCDYv4yKTzg3Rs83/ceaAksG7AaJcQ5CudvZhUJNzpFFGnNtFUs
-        oTmdC/2MFKSomfaBaN/1og55RxtXWQBUxpKWjd+g4OPFIO3Cy8cCm5T3mYnswIpa
-        +7jyNRgX0ExN4Wdu3h6A3lqGV4Hsikw4md/C7hMVJAALwT7aZZYlvy8sDNefeghT
-        P0bAjLowOlA3PmNDGQnzD87RWuAk2krAFZokgXES2Q==
-X-ME-Sender: <xms:mf7gY3foy0vdkEfg6nDAo-B7hqZwkLBctiTaAbFv7FRBT1mOsdtWCw>
-    <xme:mf7gY9MAV0AzwLHZ58z5Gsc5pDW1kC76uT6ALWEjNsFllcVehpPeP9y2OiWwGwrIL
-    B5dUScsbPfqBDdBtsc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudegiedggeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:mf7gYwhErUMLiE8ckBfrt1leyzv5fLxQUxR0yy-vfBSj3VPXrlrf_A>
-    <xmx:mf7gY4-TKGg2qSpA-Ql4Q76CcYHKsKWfJx2ltb6rViaRwX2xpB9wKA>
-    <xmx:mf7gYzsS8RMxI7v2oEYaAkRyWFamtuSzaJQEDtWi58FRx7SVZ_MvFA>
-    <xmx:m_7gY5vB_pxzNaeJp31Wk1pS-jfDAK-fntPE2o5v-Ht24Fv0S-HWQg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 35F87B60086; Mon,  6 Feb 2023 08:20:25 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-108-ge995779fee-fm-20230203.001-ge995779f
-Mime-Version: 1.0
-Message-Id: <86c8ba70-2a2f-4c5b-8e74-20e3823e2db3@app.fastmail.com>
-In-Reply-To: <Y+D3F2pg7X4XFT4r@hirez.programming.kicks-ass.net>
-References: <20230202145030.223740842@infradead.org>
- <20230202152655.494373332@infradead.org>
- <24007667-1ff3-4c86-9c17-a361c3f9f072@app.fastmail.com>
- <Y+DjULnIxcPU/rtp@hirez.programming.kicks-ass.net>
- <Y+DvI7ai/wuovjER@hirez.programming.kicks-ass.net>
- <Y+D3F2pg7X4XFT4r@hirez.programming.kicks-ass.net>
-Date:   Mon, 06 Feb 2023 14:20:06 +0100
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Peter Zijlstra" <peterz@infradead.org>
-Cc:     "Linus Torvalds" <torvalds@linux-foundation.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Boqun Feng" <boqun.feng@gmail.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>, dwmw2@infradead.org,
-        "Baolu Lu" <baolu.lu@linux.intel.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] percpu: Wire up cmpxchg128
-Content-Type: text/plain
+        Mon, 6 Feb 2023 12:30:13 -0500
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373E22887A
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Feb 2023 09:29:09 -0800 (PST)
+Received: by mail-qt1-f174.google.com with SMTP id c2so13660895qtw.5
+        for <linux-crypto@vger.kernel.org>; Mon, 06 Feb 2023 09:29:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/FrP9fMYR82jRAmAW0QmGxlvWeMEFDYdTqEQD3Ix7oU=;
+        b=x1RB3YSiShSN2O4F0U0D7azzYfLZDl7lwsxEJQutW8Gmnjsym/nYmMfR1vIBz5MMI2
+         c/ayIgsa3p87Cpgw40pvhJ38ltWqqqFxon/NrCo2EQ9OhvT/K9ad0mCe/frUQoUbQoIV
+         kiabTC0BjLHbK9yyTuXoGc2cffwddAGMW0PG2Kq1IvtI6oXXTI6H+YZ9Yx2zmluhPNMJ
+         ZBy3vP2t8gme7vYo9KZw+oYTC6BCqhWi+UYrn0YjWXlzurFml6wKEDUXWhNSelkEl5lF
+         v4FK1CnvVuJ+d/OWGH2mF8WAXCdWkxMApOgWod7vTCWGnwu4Yfuyg5RaVo/zgFh79Pw8
+         8fgw==
+X-Gm-Message-State: AO0yUKUxT583TgsyajEFagNfNEloYwDcvSfc/iLs9OoJ2S/PeLG/Iq0C
+        6lxIoTdZCeipFpkUXlJcAMZy
+X-Google-Smtp-Source: AK7set88PegyfxPSUhpDYL1wKeHEutu8R092IP6zZRvoiYjEuTLO6pmSpIUQElcD/sBIBkgW1V2HAg==
+X-Received: by 2002:ac8:5f95:0:b0:3ba:266f:103b with SMTP id j21-20020ac85f95000000b003ba266f103bmr38942qta.47.1675704548352;
+        Mon, 06 Feb 2023 09:29:08 -0800 (PST)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id b5-20020a37b205000000b00719165e9e72sm7647589qkf.91.2023.02.06.09.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 09:29:07 -0800 (PST)
+Date:   Mon, 6 Feb 2023 12:29:06 -0500
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
+Subject: Re: [PATCH 1/17] dm: Add scaffolding to change completion function
+ signature
+Message-ID: <Y+E44kb3bJViytuh@redhat.com>
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
+ <E1pOydY-007zgU-U2@formenos.hmeau.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1pOydY-007zgU-U2@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 6, 2023, at 13:48, Peter Zijlstra wrote:
-> On Mon, Feb 06, 2023 at 01:14:28PM +0100, Peter Zijlstra wrote:
->> On Mon, Feb 06, 2023 at 12:24:00PM +0100, Peter Zijlstra wrote:
->> Basically, using 64bit percpu ops on 32bit is already somewhat dangerous
->> -- wiring up native cmpxchg64 support in that case seemed an
->> improvement.
->> 
->> Anyway... let me get on with doing explicit
->> {raw,this}_cpu_cmpxchg{64,128}() thingies.
->
-> I only converted x86 and didn't do the automagic downgrade...
->
-> Opinions?
+On Mon, Feb 06 2023 at  5:22P -0500,
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-I think that's much better, it keeps the interface symmetric
-between cmpxchg and this_cpu_cmp_cmpxchg, and makes it harder
-to run into the subtle corner case on old x86 CPUs.
+> This patch adds temporary scaffolding so that the Crypto API
+> completion function can take a void * instead of crypto_async_request.
+> Once affected users have been converted this can be removed.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-For the M486/M586/MK8/MPSC/MATOM/MCORE2 configs, I would
-probably want to go with a compile-time check and have most
-distro kernels build with at least M586TSC for 32-bit or
-an upgraded CONFIG_GENERIC_CPU for x86_64 that assumes cmpxchg16b
-(nehalem, second-geneneration k8, silverthorne, ...) in
-order to turn system_has_cmpxchg* into a constant value on
-all architectures. That can be a separate discussion though
-and shouldn't block your series as you just keep the current
-state.
-
-> -#ifdef system_has_freelist_aba
-> +#ifdef syste_has_freelist_aba
-
-Typo
-
-    Arnd
+Acked-by: Mike Snitzer <snitzer@kernel.org>
