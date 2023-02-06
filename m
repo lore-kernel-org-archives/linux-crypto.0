@@ -2,316 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FEAC63797
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 12:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED01FC63797
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 13:31:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230189AbjBFMtd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 07:49:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37824 "EHLO
+        id S229680AbjBFNbC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 08:31:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjBFMtc (ORCPT
+        with ESMTP id S229571AbjBFNa6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 07:49:32 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E374511161;
-        Mon,  6 Feb 2023 04:49:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bcFixH8+YqomwdNAIz5TC0lbv8llOKjCDTzT/15p89Y=; b=gDr6q+UUUvpmalKveY90Z9mKoU
-        feL7VIJlC7cOsfPh7TWmPCKxMv/3rZe/BGG7ZoJI8x2UqBwhLbYi85gyj63IbvaRUs4GIiTSO3Pqo
-        OVK5BTPq+pLIlLu+H1RxuK8O9yhcxWGvv4PBrGClRiRRzIlOCLrSWoSK80kPb8FC2Z/3vi44br+dz
-        QqiszmVInSmiuqpwITmG88XRQlvSb/CZcPEGuI9mtOZ6RJLfuLIgomGZUS1RojJOkp3LECt8WAq3T
-        70mP4KpcwQH+siIlqQo8iRSiyKggIkVR5F3EMW/BFFEjqMwd8rtkS5Yyzd0SDfDSezVzpyJz95bd8
-        Atrsuu0g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pP0uT-006YgS-2N;
-        Mon, 06 Feb 2023 12:47:50 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id ED3B830012F;
-        Mon,  6 Feb 2023 13:48:23 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id BCEBF207A0B88; Mon,  6 Feb 2023 13:48:23 +0100 (CET)
-Date:   Mon, 6 Feb 2023 13:48:23 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        dwmw2@infradead.org, Baolu Lu <baolu.lu@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] percpu: Wire up cmpxchg128
-Message-ID: <Y+D3F2pg7X4XFT4r@hirez.programming.kicks-ass.net>
+        Mon, 6 Feb 2023 08:30:58 -0500
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52120A5C5;
+        Mon,  6 Feb 2023 05:30:48 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 47B8E581FCA;
+        Mon,  6 Feb 2023 08:20:27 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Mon, 06 Feb 2023 08:20:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; t=1675689627; x=1675696827; bh=YEEKxWvDaU
+        UtEFigpSanl+1o6NoqA2MTTLwchnDt7mc=; b=JJZuuSyMXi8+7dbMJeo+D5x90Q
+        QSbmGMLSv82Wox3Is7pYL6nhbEWJBfC0wbE6oSvPTHqWQlE4S2v1bVxYTpkKfNnK
+        y8m5HTeGnuwwsAD7ZZ/Q5cz/1UGExNYutXiIkce2Je9GS2BfYijaO1nPMpyEnLWr
+        e1MxJrchORh3tiGvi4noN95wywfSBXFN8OHGqnJ+ZaCd4RHMwutetH/6Sbd12cji
+        2SXSakWZMLrIogUEFOmJzEZa7IigmbvUSyaMF7rDnUNQDshLq7sV/QJTa+Bm/lbD
+        AYSybO0NjenKBsowbzxVsgQxpoJxGppz/CNhM9yfZz9cvm68/YozcNpmfl6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1675689627; x=1675696827; bh=YEEKxWvDaUUtEFigpSanl+1o6Noq
+        A2MTTLwchnDt7mc=; b=KRQjthpW7gLPW560Bl7atCLRmIn2E7b44jydvggP3nts
+        V9EQyO1jI7xhj/PaB6Fw7rijYTBROEnM7JBkgAxTMlEK/nvofQ6gCC9o0toDI1mK
+        1e34kfAUyoBC8rCDYv4yKTzg3Rs83/ceaAksG7AaJcQ5CudvZhUJNzpFFGnNtFUs
+        oTmdC/2MFKSomfaBaN/1og55RxtXWQBUxpKWjd+g4OPFIO3Cy8cCm5T3mYnswIpa
+        +7jyNRgX0ExN4Wdu3h6A3lqGV4Hsikw4md/C7hMVJAALwT7aZZYlvy8sDNefeghT
+        P0bAjLowOlA3PmNDGQnzD87RWuAk2krAFZokgXES2Q==
+X-ME-Sender: <xms:mf7gY3foy0vdkEfg6nDAo-B7hqZwkLBctiTaAbFv7FRBT1mOsdtWCw>
+    <xme:mf7gY9MAV0AzwLHZ58z5Gsc5pDW1kC76uT6ALWEjNsFllcVehpPeP9y2OiWwGwrIL
+    B5dUScsbPfqBDdBtsc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudegiedggeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:mf7gYwhErUMLiE8ckBfrt1leyzv5fLxQUxR0yy-vfBSj3VPXrlrf_A>
+    <xmx:mf7gY4-TKGg2qSpA-Ql4Q76CcYHKsKWfJx2ltb6rViaRwX2xpB9wKA>
+    <xmx:mf7gYzsS8RMxI7v2oEYaAkRyWFamtuSzaJQEDtWi58FRx7SVZ_MvFA>
+    <xmx:m_7gY5vB_pxzNaeJp31Wk1pS-jfDAK-fntPE2o5v-Ht24Fv0S-HWQg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 35F87B60086; Mon,  6 Feb 2023 08:20:25 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-108-ge995779fee-fm-20230203.001-ge995779f
+Mime-Version: 1.0
+Message-Id: <86c8ba70-2a2f-4c5b-8e74-20e3823e2db3@app.fastmail.com>
+In-Reply-To: <Y+D3F2pg7X4XFT4r@hirez.programming.kicks-ass.net>
 References: <20230202145030.223740842@infradead.org>
  <20230202152655.494373332@infradead.org>
  <24007667-1ff3-4c86-9c17-a361c3f9f072@app.fastmail.com>
  <Y+DjULnIxcPU/rtp@hirez.programming.kicks-ass.net>
  <Y+DvI7ai/wuovjER@hirez.programming.kicks-ass.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+DvI7ai/wuovjER@hirez.programming.kicks-ass.net>
+ <Y+D3F2pg7X4XFT4r@hirez.programming.kicks-ass.net>
+Date:   Mon, 06 Feb 2023 14:20:06 +0100
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Peter Zijlstra" <peterz@infradead.org>
+Cc:     "Linus Torvalds" <torvalds@linux-foundation.org>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        "Will Deacon" <will@kernel.org>,
+        "Boqun Feng" <boqun.feng@gmail.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
+        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
+        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
+        "Alexander Gordeev" <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com,
+        "Robin Murphy" <robin.murphy@arm.com>, dwmw2@infradead.org,
+        "Baolu Lu" <baolu.lu@linux.intel.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Pekka Enberg" <penberg@kernel.org>,
+        "David Rientjes" <rientjes@google.com>,
+        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Roman Gushchin" <roman.gushchin@linux.dev>,
+        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 05/10] percpu: Wire up cmpxchg128
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 01:14:28PM +0100, Peter Zijlstra wrote:
-> On Mon, Feb 06, 2023 at 12:24:00PM +0100, Peter Zijlstra wrote:
-> 
-> > > Unless I have misunderstood what you are doing, my concerns are
-> > > still the same:
-> > > 
-> > > >  #define this_cpu_cmpxchg(pcp, oval, nval) \
-> > > > -	__pcpu_size_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
-> > > > +	__pcpu_size16_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
-> > > >  #define this_cpu_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, 
-> > > > nval2) \
-> > > >  	__pcpu_double_call_return_bool(this_cpu_cmpxchg_double_, pcp1, pcp2, 
-> > > > oval1, oval2, nval1, nval2)
-> > > 
-> > > Having a variable-length this_cpu_cmpxchg() that turns into cmpxchg128()
-> > > and cmpxchg64() even on CPUs where this traps (!X86_FEATURE_CX16) seems
-> > > like a bad design to me.
-> > > 
-> > > I would much prefer fixed-length this_cpu_cmpxchg64()/this_cpu_cmpxchg128()
-> > > calls that never trap but fall back to the generic version on CPUs that
-> > > are lacking the atomics.
-> > 
-> > You're thinking acidental usage etc..? Lemme see what I can do.
-> 
-> So lookng at this I remember why I did it like this, currently 32bit
-> archs silently fall back to the generics for most/all 64bit ops.
-> 
-> And personally I would just as soon drop support for the
-> !X86_FEATURE_CX* cpus... :/ Those are some serious museum pieces.
-> 
-> One problem with silent downgrades like this is that semantics vs NMI
-> change, which makes for subtle bugs on said museum pieces.
-> 
-> Basically, using 64bit percpu ops on 32bit is already somewhat dangerous
-> -- wiring up native cmpxchg64 support in that case seemed an
-> improvement.
-> 
-> Anyway... let me get on with doing explicit
-> {raw,this}_cpu_cmpxchg{64,128}() thingies.
+On Mon, Feb 6, 2023, at 13:48, Peter Zijlstra wrote:
+> On Mon, Feb 06, 2023 at 01:14:28PM +0100, Peter Zijlstra wrote:
+>> On Mon, Feb 06, 2023 at 12:24:00PM +0100, Peter Zijlstra wrote:
+>> Basically, using 64bit percpu ops on 32bit is already somewhat dangerous
+>> -- wiring up native cmpxchg64 support in that case seemed an
+>> improvement.
+>> 
+>> Anyway... let me get on with doing explicit
+>> {raw,this}_cpu_cmpxchg{64,128}() thingies.
+>
+> I only converted x86 and didn't do the automagic downgrade...
+>
+> Opinions?
 
-I only converted x86 and didn't do the automagic downgrade...
+I think that's much better, it keeps the interface symmetric
+between cmpxchg and this_cpu_cmp_cmpxchg, and makes it harder
+to run into the subtle corner case on old x86 CPUs.
 
-Opinions?
+For the M486/M586/MK8/MPSC/MATOM/MCORE2 configs, I would
+probably want to go with a compile-time check and have most
+distro kernels build with at least M586TSC for 32-bit or
+an upgraded CONFIG_GENERIC_CPU for x86_64 that assumes cmpxchg16b
+(nehalem, second-geneneration k8, silverthorne, ...) in
+order to turn system_has_cmpxchg* into a constant value on
+all architectures. That can be a separate discussion though
+and shouldn't block your series as you just keep the current
+state.
 
----
- arch/x86/include/asm/percpu.h | 11 +++++++----
- include/asm-generic/percpu.h  | 18 ++++++++++++++----
- include/linux/percpu-defs.h   | 20 ++------------------
- mm/slab.h                     |  2 ++
- mm/slub.c                     | 21 +++++++++++----------
- 5 files changed, 36 insertions(+), 36 deletions(-)
+> -#ifdef system_has_freelist_aba
+> +#ifdef syste_has_freelist_aba
 
-diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-index 4c803a1fd0e7..7515e065369b 100644
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -214,7 +214,7 @@ do {									\
- #define percpu_cmpxchg64_op(size, qual, _var, _oval, _nval)		\
- ({									\
- 	union {								\
--		typeof(_var) var;					\
-+		u64 val;						\
- 		struct {						\
- 			u32 low, high;					\
- 		};							\
-@@ -234,15 +234,18 @@ do {									\
- 	old__.var;							\
- })
- 
--#define raw_cpu_cmpxchg_8(pcp, oval, nval)	percpu_cmpxchg64_op(8,         , pcp, oval, nval)
--#define this_cpu_cmpxchg_8(pcp, oval, nval)	percpu_cmpxchg64_op(8, volatile, pcp, oval, nval)
-+#define raw_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg64_op(8,         , pcp, oval, nval)
-+#define this_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg64_op(8, volatile, pcp, oval, nval)
- #endif
- 
- #ifdef CONFIG_X86_64
-+#define raw_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg_op(8,         , pcp, oval, nval);
-+#define this_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg_op(8, volatile, pcp, oval, nval);
-+
- #define percpu_cmpxchg128_op(size, qual, _var, _oval, _nval)		\
- ({									\
- 	union {								\
--		typeof(_var) var;					\
-+		u128 var;						\
- 		struct {						\
- 			u64 low, high;					\
- 		};							\
-diff --git a/include/asm-generic/percpu.h b/include/asm-generic/percpu.h
-index ad254a20fe68..7da7d1793411 100644
---- a/include/asm-generic/percpu.h
-+++ b/include/asm-generic/percpu.h
-@@ -274,8 +274,13 @@ do {									\
- #define raw_cpu_cmpxchg_8(pcp, oval, nval) \
- 	raw_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
--#ifndef raw_cpu_cmpxchg_16
--#define raw_cpu_cmpxchg_16(pcp, oval, nval) \
-+
-+#ifndef raw_cpu_cmpxchg64
-+#define raw_cpu_cmpxchg64(pcp, oval, nval) \
-+	raw_cpu_generic_cmpxchg(pcp, oval, nval)
-+#endif
-+#ifndef raw_cpu_cmpxchg128
-+#define raw_cpu_cmpxchg128(pcp, oval, nval) \
- 	raw_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
- 
-@@ -386,8 +391,13 @@ do {									\
- #define this_cpu_cmpxchg_8(pcp, oval, nval) \
- 	this_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
--#ifndef this_cpu_cmpxchg_16
--#define this_cpu_cmpxchg_16(pcp, oval, nval) \
-+
-+#ifndef this_cpu_cmpxchg64
-+#define this_cpu_cmpxchg64(pcp, oval, nval) \
-+	this_cpu_generic_cmpxchg(pcp, oval, nval)
-+#endif
-+#ifndef this_cpu_cmpxchg128
-+#define this_cpu_cmpxchg128(pcp, oval, nval) \
- 	this_cpu_generic_cmpxchg(pcp, oval, nval)
- #endif
- 
-diff --git a/include/linux/percpu-defs.h b/include/linux/percpu-defs.h
-index fe3c7fc2d411..7cd614a46af4 100644
---- a/include/linux/percpu-defs.h
-+++ b/include/linux/percpu-defs.h
-@@ -343,22 +343,6 @@ static inline void __this_cpu_preempt_check(const char *op) { }
- 	pscr2_ret__;							\
- })
- 
--#define __pcpu_size16_call_return2(stem, variable, ...)			\
--({									\
--	typeof(variable) pscr2_ret__;					\
--	__verify_pcpu_ptr(&(variable));					\
--	switch(sizeof(variable)) {					\
--	case 1: pscr2_ret__ = stem##1(variable, __VA_ARGS__); break;	\
--	case 2: pscr2_ret__ = stem##2(variable, __VA_ARGS__); break;	\
--	case 4: pscr2_ret__ = stem##4(variable, __VA_ARGS__); break;	\
--	case 8: pscr2_ret__ = stem##8(variable, __VA_ARGS__); break;	\
--	case 16: pscr2_ret__ = stem##16(variable, __VA_ARGS__); break;	\
--	default:							\
--		__bad_size_call_parameter(); break;			\
--	}								\
--	pscr2_ret__;							\
--})
--
- #define __pcpu_size_call(stem, variable, ...)				\
- do {									\
- 	__verify_pcpu_ptr(&(variable));					\
-@@ -414,7 +398,7 @@ do {									\
- #define raw_cpu_add_return(pcp, val)	__pcpu_size_call_return2(raw_cpu_add_return_, pcp, val)
- #define raw_cpu_xchg(pcp, nval)		__pcpu_size_call_return2(raw_cpu_xchg_, pcp, nval)
- #define raw_cpu_cmpxchg(pcp, oval, nval) \
--	__pcpu_size16_call_return2(raw_cpu_cmpxchg_, pcp, oval, nval)
-+	__pcpu_size_call_return2(raw_cpu_cmpxchg_, pcp, oval, nval)
- #define raw_cpu_sub(pcp, val)		raw_cpu_add(pcp, -(val))
- #define raw_cpu_inc(pcp)		raw_cpu_add(pcp, 1)
- #define raw_cpu_dec(pcp)		raw_cpu_sub(pcp, 1)
-@@ -493,7 +477,7 @@ do {									\
- #define this_cpu_add_return(pcp, val)	__pcpu_size_call_return2(this_cpu_add_return_, pcp, val)
- #define this_cpu_xchg(pcp, nval)	__pcpu_size_call_return2(this_cpu_xchg_, pcp, nval)
- #define this_cpu_cmpxchg(pcp, oval, nval) \
--	__pcpu_size16_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
-+	__pcpu_size_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
- #define this_cpu_sub(pcp, val)		this_cpu_add(pcp, -(typeof(pcp))(val))
- #define this_cpu_inc(pcp)		this_cpu_add(pcp, 1)
- #define this_cpu_dec(pcp)		this_cpu_sub(pcp, 1)
-diff --git a/mm/slab.h b/mm/slab.h
-index 19e1899673ef..50b5edd6a950 100644
---- a/mm/slab.h
-+++ b/mm/slab.h
-@@ -25,11 +25,13 @@ typedef union {
- # ifdef system_has_cmpxchg128
- # define system_has_freelist_aba()	system_has_cmpxchg128()
- # define try_cmpxchg_freelist		try_cmpxchg128
-+# define this_cpu_cmpxchg_freelist	this_cpu_cmpxchg128
- # endif
- #else /* CONFIG_64BIT */
- # ifdef system_has_cmpxchg64
- # define system_has_freelist_aba()	system_has_cmpxchg64()
- # define try_cmpxchg_freelist		try_cmpxchg64
-+# define this_cpu_cmpxchg_freelist	this_cpu_cmpxchg64
- # endif
- #endif /* CONFIG_64BIT */
- 
-diff --git a/mm/slub.c b/mm/slub.c
-index 45f2b28d60e1..35939c5aa28a 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -523,17 +523,14 @@ __update_freelist_fast(struct slab *slab,
- 		      void *freelist_old, unsigned long counters_old,
- 		      void *freelist_new, unsigned long counters_new)
- {
--
--	bool ret = false;
--
--#ifdef system_has_freelist_aba
-+#ifdef syste_has_freelist_aba
- 	freelist_aba_t old = { .freelist = freelist_old, .counter = counters_old };
- 	freelist_aba_t new = { .freelist = freelist_new, .counter = counters_new };
- 
--	ret = try_cmpxchg_freelist(&slab->freelist_counter.full, &old.full, new.full);
--#endif /* system_has_freelist_aba */
--
--	return ret;
-+	return try_cmpxchg_freelist(&slab->freelist_counter.full, &old.full, new.full);
-+#else
-+	return false;
-+#endif
- }
- 
- static inline bool
-@@ -3039,11 +3036,15 @@ __update_cpu_freelist_fast(struct kmem_cache *s,
- 			   void *freelist_old, void *freelist_new,
- 			   unsigned long tid)
- {
-+#ifdef system_has_freelist_aba
- 	freelist_aba_t old = { .freelist = freelist_old, .counter = tid };
- 	freelist_aba_t new = { .freelist = freelist_new, .counter = next_tid(tid) };
- 
--	return this_cpu_cmpxchg(s->cpu_slab->freelist_tid.full,
--				old.full, new.full) == old.full;
-+	return this_cpu_cmpxchg_freelist(s->cpu_slab->freelist_tid.full,
-+					 old.full, new.full) == old.full;
-+#else
-+	return false;
-+#endif
- }
- 
- /*
+Typo
+
+    Arnd
