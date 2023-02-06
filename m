@@ -2,102 +2,122 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC084C636D6
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 11:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409F4C63797
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Feb 2023 12:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbjBFLeW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Feb 2023 06:34:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
+        id S230192AbjBFMPR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Feb 2023 07:15:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230082AbjBFLdv (ORCPT
+        with ESMTP id S229865AbjBFMPQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Feb 2023 06:33:51 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E334166DC;
-        Mon,  6 Feb 2023 03:33:44 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOydY-007zgU-U2; Mon, 06 Feb 2023 18:22:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:12 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:12 +0800
-Subject: [PATCH 1/17] dm: Add scaffolding to change completion function signature
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOydY-007zgU-U2@formenos.hmeau.com>
+        Mon, 6 Feb 2023 07:15:16 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E0C12051;
+        Mon,  6 Feb 2023 04:15:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=RSckQc2Emh9jJfvS33gHYGvM8sjY/00hI0zuLioFFNM=; b=ntuP4M7dSK2zsWVQTbDs9Ox2Ac
+        V4r4EFjkZ99kyYLqdozZ6xzE+QxqYHoG0WCIaMJeVBoR6Y2BbtLPsYb3i01D2x0modrsfxSX57f8v
+        DF30B1tNGD0ZtMzW6GNbWnE/bcmDfjWi9O6PWHEH/Si4SWWexelyntk5L1wIG2NbBH0WlqmGoT5WP
+        AyMxq8eNX+N/jJLzOfoUuQe06/8Jp7hZdjmobg06aJY4TkJlY21aHVxYTE2KfbswHeSGde/+OdjK2
+        Dlior1hUsskbO4lX904cgjfDDm8i9Mg06fGrnhOO3gfkmEmyQ166CbjhPt5EUYYdvgrPaRfUt5YvB
+        rcxZk8pQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pP0OE-00GkH1-Ik; Mon, 06 Feb 2023 12:14:31 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6EA2030030F;
+        Mon,  6 Feb 2023 13:14:28 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 084DE207A0B88; Mon,  6 Feb 2023 13:14:27 +0100 (CET)
+Date:   Mon, 6 Feb 2023 13:14:27 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        dwmw2@infradead.org, Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 05/10] percpu: Wire up cmpxchg128
+Message-ID: <Y+DvI7ai/wuovjER@hirez.programming.kicks-ass.net>
+References: <20230202145030.223740842@infradead.org>
+ <20230202152655.494373332@infradead.org>
+ <24007667-1ff3-4c86-9c17-a361c3f9f072@app.fastmail.com>
+ <Y+DjULnIxcPU/rtp@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y+DjULnIxcPU/rtp@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds temporary scaffolding so that the Crypto API
-completion function can take a void * instead of crypto_async_request.
-Once affected users have been converted this can be removed.
+On Mon, Feb 06, 2023 at 12:24:00PM +0100, Peter Zijlstra wrote:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> > Unless I have misunderstood what you are doing, my concerns are
+> > still the same:
+> > 
+> > >  #define this_cpu_cmpxchg(pcp, oval, nval) \
+> > > -	__pcpu_size_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
+> > > +	__pcpu_size16_call_return2(this_cpu_cmpxchg_, pcp, oval, nval)
+> > >  #define this_cpu_cmpxchg_double(pcp1, pcp2, oval1, oval2, nval1, 
+> > > nval2) \
+> > >  	__pcpu_double_call_return_bool(this_cpu_cmpxchg_double_, pcp1, pcp2, 
+> > > oval1, oval2, nval1, nval2)
+> > 
+> > Having a variable-length this_cpu_cmpxchg() that turns into cmpxchg128()
+> > and cmpxchg64() even on CPUs where this traps (!X86_FEATURE_CX16) seems
+> > like a bad design to me.
+> > 
+> > I would much prefer fixed-length this_cpu_cmpxchg64()/this_cpu_cmpxchg128()
+> > calls that never trap but fall back to the generic version on CPUs that
+> > are lacking the atomics.
+> 
+> You're thinking acidental usage etc..? Lemme see what I can do.
 
- drivers/md/dm-crypt.c     |    8 +++-----
- drivers/md/dm-integrity.c |    4 ++--
- 2 files changed, 5 insertions(+), 7 deletions(-)
+So lookng at this I remember why I did it like this, currently 32bit
+archs silently fall back to the generics for most/all 64bit ops.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 2653516bcdef..7609fe39ab8c 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1458,8 +1458,7 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
- 	return r;
- }
- 
--static void kcryptd_async_done(struct crypto_async_request *async_req,
--			       int error);
-+static void kcryptd_async_done(crypto_completion_data_t *async_req, int error);
- 
- static int crypt_alloc_req_skcipher(struct crypt_config *cc,
- 				     struct convert_context *ctx)
-@@ -2147,10 +2146,9 @@ static void kcryptd_crypt_read_convert(struct dm_crypt_io *io)
- 	crypt_dec_pending(io);
- }
- 
--static void kcryptd_async_done(struct crypto_async_request *async_req,
--			       int error)
-+static void kcryptd_async_done(crypto_completion_data_t *data, int error)
- {
--	struct dm_crypt_request *dmreq = async_req->data;
-+	struct dm_crypt_request *dmreq = crypto_get_completion_data(data);
- 	struct convert_context *ctx = dmreq->ctx;
- 	struct dm_crypt_io *io = container_of(ctx, struct dm_crypt_io, ctx);
- 	struct crypt_config *cc = io->cc;
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index 1388ee35571e..eefe25ed841e 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -955,9 +955,9 @@ static void xor_journal(struct dm_integrity_c *ic, bool encrypt, unsigned sectio
- 	async_tx_issue_pending_all();
- }
- 
--static void complete_journal_encrypt(struct crypto_async_request *req, int err)
-+static void complete_journal_encrypt(crypto_completion_data_t *data, int err)
- {
--	struct journal_completion *comp = req->data;
-+	struct journal_completion *comp = crypto_get_completion_data(data);
- 	if (unlikely(err)) {
- 		if (likely(err == -EINPROGRESS)) {
- 			complete(&comp->ic->crypto_backoff);
+And personally I would just as soon drop support for the
+!X86_FEATURE_CX* cpus... :/ Those are some serious museum pieces.
+
+One problem with silent downgrades like this is that semantics vs NMI
+change, which makes for subtle bugs on said museum pieces.
+
+Basically, using 64bit percpu ops on 32bit is already somewhat dangerous
+-- wiring up native cmpxchg64 support in that case seemed an
+improvement.
+
+Anyway... let me get on with doing explicit
+{raw,this}_cpu_cmpxchg{64,128}() thingies.
+
