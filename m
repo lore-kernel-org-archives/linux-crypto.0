@@ -2,114 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA26C636CD
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 08:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AC7C636CC
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 10:30:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230290AbjBGITL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Feb 2023 03:19:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
+        id S231196AbjBGKad (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Feb 2023 05:30:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBGITL (ORCPT
+        with ESMTP id S230378AbjBGKa3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2023 03:19:11 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB701C315;
-        Tue,  7 Feb 2023 00:19:08 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pPJBU-008OYZ-Tl; Tue, 07 Feb 2023 16:18:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 07 Feb 2023 16:18:36 +0800
-Date:   Tue, 7 Feb 2023 16:18:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        Tue, 7 Feb 2023 05:30:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8A323108
+        for <linux-crypto@vger.kernel.org>; Tue,  7 Feb 2023 02:29:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675765759;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XeNNXdPHcFQFjrDCbOR/TvrpskWkdGBwv23ZwvAwhAQ=;
+        b=UO1XhJhXp+IJnTNYshZK7vZUjvRg8lX5ss+Vj6mhVrFdSndq7ai4ZcnnsiI8HuZ4pCpSHy
+        +tXdM3RwIqatATEs7sx2Knd78dY/Q58q6UGr+xrs1L0LHAaOC6rbXGHZmpUGwvNwXavP3a
+        OdVE18GWpHVPbI/k5L9une1bM4jIUMM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-656-zn3UNTYePiiTmY3rwErMqA-1; Tue, 07 Feb 2023 05:29:18 -0500
+X-MC-Unique: zn3UNTYePiiTmY3rwErMqA-1
+Received: by mail-qt1-f197.google.com with SMTP id v8-20020a05622a144800b003ba0dc5d798so6149147qtx.22
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Feb 2023 02:29:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XeNNXdPHcFQFjrDCbOR/TvrpskWkdGBwv23ZwvAwhAQ=;
+        b=yEIN2G8qxsXvzxA6UgisFDg4ldszon5E4GCtluQnccKDBpy4hxgo+g9R8LxtJDHGIt
+         wvc9XlVwBi7iaXCDKyMp/S3SZKZV3kuXkZed2b4XRfOlYzkoWkALrLhFljkapZMlvOBV
+         gjMTW2QY+t4OIjKJJV470J49Tgz50QNQWqSNJ8KX+6v9mLtjBzYy6cTYt8B0s+YFmnkK
+         0cRin8JLZVPoypJHGZpd+AY39S6iSKgBlpv7eGafREzgULafVH+8eA53fJ7cZEiV390M
+         skhcAlMWGgDp8QZh4Pp3SkCYP1A1s30Y5N0qeR1WxHsUIPWbNvEQA1kz1broLVIkmmx7
+         er9w==
+X-Gm-Message-State: AO0yUKVY/GOILwuFOBWAnr81qmxE/t2753Lg6qiyUokrjjXIMNDPYXlg
+        WESiohhI5U20+zYC/InOSwt+MVxcQ/EPCJCICcF1X7cLPyd4oe1LelHXFyJUUC/scqFLYXWmPxy
+        qiKOB2cOLTCF6GTqAOkj7bBo/
+X-Received: by 2002:a05:6214:628:b0:568:d153:823a with SMTP id a8-20020a056214062800b00568d153823amr3751787qvx.15.1675765757654;
+        Tue, 07 Feb 2023 02:29:17 -0800 (PST)
+X-Google-Smtp-Source: AK7set9BUnmZ40Hqit30IPBlDyN9DB7QZjcW+HxvsM96EkuqWD4++1pq7itmtw1eDdcYnxruJSbEJA==
+X-Received: by 2002:a05:6214:628:b0:568:d153:823a with SMTP id a8-20020a056214062800b00568d153823amr3751745qvx.15.1675765757393;
+        Tue, 07 Feb 2023 02:29:17 -0800 (PST)
+Received: from vschneid.remote.csb ([154.57.232.159])
+        by smtp.gmail.com with ESMTPSA id r6-20020a05620a03c600b00702d1c6e7bbsm8958153qkm.130.2023.02.07.02.29.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Feb 2023 02:29:16 -0800 (PST)
+From:   Valentin Schneider <vschneid@redhat.com>
 To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+Cc:     Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: [PATCH] tls: Pass rec instead of aead_req into tls_encrypt_done
-Message-ID: <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
- <E1pOydn-007zi3-LG@formenos.hmeau.com>
- <20230206231521.712f53e5@kernel.org>
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Haniel Bristot de Oliveira <bristot@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Lafreniere <peter@n8pjl.ca>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tariq Toukan <ttoukan.linux@gmail.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 3/9] sched: add sched_numa_find_nth_cpu()
+In-Reply-To: <20230206210943.79e01af9@kernel.org>
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
+ <20230121042436.2661843-4-yury.norov@gmail.com>
+ <20230206210943.79e01af9@kernel.org>
+Date:   Tue, 07 Feb 2023 10:29:12 +0000
+Message-ID: <xhsmh4jrxsr9j.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230206231521.712f53e5@kernel.org>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 11:15:21PM -0800, Jakub Kicinski wrote:
+On 06/02/23 21:09, Jakub Kicinski wrote:
+> On Fri, 20 Jan 2023 20:24:30 -0800 Yury Norov wrote:
+>> The function finds Nth set CPU in a given cpumask starting from a given
+>> node.
+>>
+>> Leveraging the fact that each hop in sched_domains_numa_masks includes the
+>> same or greater number of CPUs than the previous one, we can use binary
+>> search on hops instead of linear walk, which makes the overall complexity
+>> of O(log n) in terms of number of cpumask_weight() calls.
 >
-> >  	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> > -				  tls_encrypt_done, sk);
-> > +				  tls_encrypt_done, aead_req);
-> 
-> ... let's just pass rec instead of aead_req here, then?
+> Valentin, would you be willing to give us a SoB or Review tag for
+> this one?  We'd like to take the whole series via networking, if
+> that's okay.
 
-Good point.  Could we do this as a follow-up patch? Reposting
-the whole series would disturb a lot of people.  Of course if
-other major issues crop up I can fold this into the existing
-patch.
+Sure, feel free to add
 
-Thanks!
+  Reviewed-by: Valentin Schneider <vschneid@redhat.com>
 
----8<---
-The function tls_encrypt_done only uses aead_req to get ahold of
-the tls_rec object.  So we could pass that in instead of aead_req
-to simplify the code.
+to patches that don't already have it.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 0515cda32fe2..6dfec2e8fdfa 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -430,18 +430,16 @@ int tls_tx_records(struct sock *sk, int flags)
- 
- static void tls_encrypt_done(void *data, int err)
- {
--	struct aead_request *aead_req = data;
- 	struct tls_sw_context_tx *ctx;
- 	struct tls_context *tls_ctx;
- 	struct tls_prot_info *prot;
-+	struct tls_rec *rec = data;
- 	struct scatterlist *sge;
- 	struct sk_msg *msg_en;
--	struct tls_rec *rec;
- 	bool ready = false;
- 	struct sock *sk;
- 	int pending;
- 
--	rec = container_of(aead_req, struct tls_rec, aead_req);
- 	msg_en = &rec->msg_encrypted;
- 
- 	sk = rec->sk;
-@@ -536,7 +534,7 @@ static int tls_do_encryption(struct sock *sk,
- 			       data_len, rec->iv_data);
- 
- 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  tls_encrypt_done, aead_req);
-+				  tls_encrypt_done, rec);
- 
- 	/* Add the record in tx_list */
- 	list_add_tail((struct list_head *)&rec->list, &ctx->tx_list);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
