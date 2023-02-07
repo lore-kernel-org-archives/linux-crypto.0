@@ -2,123 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF3FC636CC
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 11:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01019C6379F
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 13:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231642AbjBGLkQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Feb 2023 06:40:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56378 "EHLO
+        id S231336AbjBGNcQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Feb 2023 08:32:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbjBGLkN (ORCPT
+        with ESMTP id S230303AbjBGNcP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2023 06:40:13 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F91F10248;
-        Tue,  7 Feb 2023 03:40:11 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id m16-20020a05600c3b1000b003dc4050c94aso11209572wms.4;
-        Tue, 07 Feb 2023 03:40:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CVUPLdLOw/UB93NtGlM7IQoioXa06+RQkko/zl9JthU=;
-        b=VJCAqSwV8SEb9dTPQAkuvQc6ycFufPKuoCv64JlqglyOojgkokfgfcYkqfLlwXNQpn
-         esBze4kx7maIBe9Gj7fO5/maQRe4j0VGoK6sRo56hQz4BwofN0iety2nxvczkCiWUuDF
-         vx2BzS54uej4q+inVIiGJcyLBFp6riToS9IfGgzskm1w6eTnB3u9UY/cSW0+quzLoe1Q
-         o8CEduKXROvELtrLaEm2ONJeFkOt9y6LvOnCjOPIpRWq1vO5bmuZRWy82uQsqcrByTJk
-         3iiiSBzX1YSkZ14m5X24o6zgleo2ItqDxpLCTUR8WWLSz9ti7ekw5P/7UPcQxHf4+gH/
-         86EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CVUPLdLOw/UB93NtGlM7IQoioXa06+RQkko/zl9JthU=;
-        b=5DC42oq9NQYYaMbupIJQYgP/71A6doSJcyw8Jj8pIjD85kEWquqEmgsqjBU8gXHnRE
-         h6e6yuYMYtRzUXFQfrVGTk0uFFUCch6vaUaFq6UKY4+EI6WZK/jfmO7NHgwLpwxGeVGK
-         3US7cpwNYGNTs7zQlgelgcBVNfPc7rng8kIkqEy3hhJ412Ew2gcld4GY4kXWW6krYT/q
-         avQUmXOR4hBXA3F2xj0exIKCzpHr0/xoF81DetoDCUweI2v3LNqPrVHx8LCg3LN10L/x
-         9VGDR1pyTANNY3Apzxb92uSha/0R39vxNrMyltveV+bGdhM0/0z2MRXKDjL1PW4HxxGa
-         4wZg==
-X-Gm-Message-State: AO0yUKXYdhB6IOifnGPatb6k8iesR7nznFvKXwSOBXEWa78EQRu6I8sr
-        4zjT4Tsh5isOwH0eOMZgj5I=
-X-Google-Smtp-Source: AK7set+O8Z1wCa2vCtlaMwiUEB+EQ/2JqzGwSRInIaDGWnSxMWM7KwBYn1o29gzma5ZL7XOjOqPUow==
-X-Received: by 2002:a05:600c:3d8b:b0:3df:fd8c:8f2f with SMTP id bi11-20020a05600c3d8b00b003dffd8c8f2fmr2797728wmb.40.1675770009336;
-        Tue, 07 Feb 2023 03:40:09 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id o35-20020a05600c512300b003cffd3c3d6csm14762782wms.12.2023.02.07.03.40.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 03:40:08 -0800 (PST)
-Date:   Tue, 7 Feb 2023 14:40:04 +0300
-From:   Dan Carpenter <error27@gmail.com>
-To:     oe-kbuild@lists.linux.dev, Dmitry Safonov <dima@arista.com>,
-        linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-        netdev@vger.kernel.org, Dmitry Safonov <dima@arista.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Bob Gilligan <gilligan@arista.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 3/4] crypto/net/ipv6: sr: Switch to using crypto_pool
-Message-ID: <202302071833.k6CihGFl-lkp@intel.com>
+        Tue, 7 Feb 2023 08:32:15 -0500
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2208B126EB;
+        Tue,  7 Feb 2023 05:32:12 -0800 (PST)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317ArI1e008460;
+        Tue, 7 Feb 2023 14:31:34 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=DvaNpdrSgE+lHP2IkmzvxSLVAaIdRRvLf0BwPPBEci4=;
+ b=aQaSbkCpRXS5PTBvs/7A4rURHj3O8ll9TldW/dJbYL96OW9dyidgNbpqQ2IMwlJcHYfV
+ PCVnikmHA0+/GU/YHrkk37G8Rh1vwsakP87ID7Au4i9IPIaHZeIDNhs3YvOTq1WTSruH
+ P/8HpNo2WO25T81982igFgAtil5zgYjG1s7tQEMU059ZhJ/Ri0m3Ps7/HUr6/6js0yXH
+ 74wlbwkqH4zm93ascw8YJ8mG5y0V5j0ZKxb4kjWICzncOKYOnHM36Ik5nhtQdo8YyV1/
+ CkELeSEYnoaCyUnTE4l4Y2LIuOvGfr53WsS7P8Z1L0NcrxY6EwxnjvkuyxgzkO+gacI9 kw== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3nhdcfk48x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Feb 2023 14:31:34 +0100
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B91DA10002A;
+        Tue,  7 Feb 2023 14:31:21 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id F17372194F5;
+        Tue,  7 Feb 2023 14:31:20 +0100 (CET)
+Received: from [10.201.20.249] (10.201.20.249) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Tue, 7 Feb
+ 2023 14:31:19 +0100
+Message-ID: <d283ef50-7807-b928-83a5-63ef4565f9e4@foss.st.com>
+Date:   Tue, 7 Feb 2023 14:31:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118214111.394416-4-dima@arista.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v3 3/6] dt-bindings: bus: add STM32 System Bus
+To:     Jonathan Cameron <jic23@kernel.org>
+CC:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        Loic PALLARDY <loic.pallardy@st.com>
+References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
+ <20230127164040.1047583-4-gatien.chevallier@foss.st.com>
+ <20230128154827.4f23534e@jic23-huawei>
+Content-Language: en-US
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230128154827.4f23534e@jic23-huawei>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.249]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_05,2023-02-06_03,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dmitry,
+Hello Jonathan,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Safonov/crypto-Introduce-crypto_pool/20230119-054258
-base:   c1649ec55708ae42091a2f1bca1ab49ecd722d55
-patch link:    https://lore.kernel.org/r/20230118214111.394416-4-dima%40arista.com
-patch subject: [PATCH v4 3/4] crypto/net/ipv6: sr: Switch to using crypto_pool
-config: s390-randconfig-m041-20230206 (https://download.01.org/0day-ci/archive/20230207/202302071833.k6CihGFl-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 12.1.0
+On 1/28/23 16:48, Jonathan Cameron wrote:
+> On Fri, 27 Jan 2023 17:40:37 +0100
+> Gatien Chevallier <gatien.chevallier@foss.st.com> wrote:
+> 
+>> Document STM32 System Bus. This bus is intended to control firewall
+>> access for the peripherals connected to it.
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>> Signed-off-by: Loic PALLARDY <loic.pallardy@st.com>
+> Trivial comment on formatting.
+> 
+>> +
+>> +examples:
+>> +  - |
+>> +    // In this example, the rng1 device refers to etzpc as its domain controller.
+>> +    // Same goes for fmc.
+>> +    // Access rights are verified before creating devices.
+>> +
+>> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+>> +    #include <dt-bindings/clock/stm32mp1-clks.h>
+>> +    #include <dt-bindings/reset/stm32mp1-resets.h>
+>> +
+>> +    etzpc: bus@5c007000 {
+>> +        compatible = "st,stm32mp15-sys-bus";
+>> +        reg = <0x5c007000 0x400>;
+>> +        #address-cells = <1>;
+>> +        #size-cells = <1>;
+>> +        ranges;
+>> +        feature-domain-controller;
+>> +        #feature-domain-cells = <1>;
+>> +
+>> +        rng1: rng@54003000 {
+> 
+> Odd mixture of 4 spacing and 2 spacing in this example.
+> I'd suggest one or the other (slight preference for 4 space indents).
+> 
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <error27@gmail.com>
+Thank you for spotting this, I'll change to 4 space indents
 
-smatch warnings:
-net/ipv6/seg6.c:539 seg6_init() warn: ignoring unreachable code.
+> 
+>> +          compatible = "st,stm32-rng";
+>> +          reg = <0x54003000 0x400>;
+>> +          clocks = <&rcc RNG1_K>;
+>> +          resets = <&rcc RNG1_R>;
+>> +          feature-domains = <&etzpc 7>;
+>> +          status = "disabled";
+>> +        };
 
-vim +539 net/ipv6/seg6.c
-
-4f4853dc1c9c19 David Lebrun   2016-11-08  532  
-915d7e5e5930b4 David Lebrun   2016-11-08  533  	pr_info("Segment Routing with IPv6\n");
-915d7e5e5930b4 David Lebrun   2016-11-08  534  
-915d7e5e5930b4 David Lebrun   2016-11-08  535  out:
-915d7e5e5930b4 David Lebrun   2016-11-08  536  	return err;
-754f6619437c57 Dmitry Safonov 2023-01-18  537  
-46738b1317e169 David Lebrun   2016-11-15  538  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
-d1df6fd8a1d22d David Lebrun   2017-08-05 @539  	seg6_local_exit();
-
-Not a bug.  Just dead code.  Some people like to store dead code here
-for later, but it's not a common thing...
-
-754f6619437c57 Dmitry Safonov 2023-01-18  540  out_unregister_iptun:
-4f4853dc1c9c19 David Lebrun   2016-11-08  541  	seg6_iptunnel_exit();
-4f4853dc1c9c19 David Lebrun   2016-11-08  542  #endif
-46738b1317e169 David Lebrun   2016-11-15  543  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
-6c8702c60b8865 David Lebrun   2016-11-08  544  out_unregister_pernet:
-6c8702c60b8865 David Lebrun   2016-11-08  545  	unregister_pernet_subsys(&ip6_segments_ops);
-46738b1317e169 David Lebrun   2016-11-15  546  #endif
-915d7e5e5930b4 David Lebrun   2016-11-08  547  out_unregister_genl:
-915d7e5e5930b4 David Lebrun   2016-11-08  548  	genl_unregister_family(&seg6_genl_family);
-915d7e5e5930b4 David Lebrun   2016-11-08  549  	goto out;
-915d7e5e5930b4 David Lebrun   2016-11-08  550  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
-
+Best regards,
+Gatien
