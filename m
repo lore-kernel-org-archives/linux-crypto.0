@@ -2,83 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A09C636CC
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 05:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDCECC636CD
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 07:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229490AbjBGFU2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Feb 2023 00:20:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S230509AbjBGHKX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Feb 2023 02:10:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjBGFU1 (ORCPT
+        with ESMTP id S231335AbjBGHKO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2023 00:20:27 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9041E9F5;
-        Mon,  6 Feb 2023 21:20:26 -0800 (PST)
+        Tue, 7 Feb 2023 02:10:14 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF1C2278C;
+        Mon,  6 Feb 2023 23:10:13 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1867DB816D5;
-        Tue,  7 Feb 2023 05:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A50A3C433EF;
-        Tue,  7 Feb 2023 05:20:23 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0B2E2B81716;
+        Tue,  7 Feb 2023 07:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B308DC433D2;
+        Tue,  7 Feb 2023 07:10:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675747223;
-        bh=OwxoFBJ52qioqVj8L5GWl7Ol7CkRkpnbBBk035/GJNo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l8yfQKzhZZP1sgvmlUMLzjGSDPuPbWm6e/B5BIlHxIB7Dy6caqCWDcNNuKclXApU/
-         hJEMcuvSmgmJILxb4XIl9nXV3RruWDS8aBh90CPtIMzqV3DIA2hTUiN8PL4c0Wrskd
-         6+pkAC4Ty07Lp7zMVtNbXJrRy3QTGuck/nXDQML5P+Ds7IVgI0Hbc2GhdPB5wK6luk
-         ajuNuEN2p4LkYjKgj+dZn9p9fqk7AXcPhS5gWV5jZbMXB28WXD2qXa7nfBYgFdmKq+
-         PZXlOhNNcjN8PwllvNFg0Mn00GFZwD2foXfjPCXUP+pwzFskuMCWFfgnCkZiUJkZj5
-         1XZJF3x2FPREA==
-Date:   Mon, 6 Feb 2023 21:20:12 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Zhang Yiqun <zhangyiqun@phytium.com.cn>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: testmgr - add diff-splits of src/dst into
- default cipher config
-Message-ID: <Y+HfjH0YVYdX+BFq@sol.localdomain>
-References: <20230202083805.21838-1-zhangyiqun@phytium.com.cn>
+        s=k20201202; t=1675753810;
+        bh=VvGaQpQYZUpL7fyQlSvZZVk0dw3V7tJuaCipJTwS3LE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=gwRQHVQZXXLf3IlUyHa5iYI2x/L5N7XSGYnPzfWftS3FkFJWWNX+ramJHM7xTarTG
+         Fgushcdoy4VOIDfg3VQQQP4kIog7p+H4L7o0VDY8qDErtqPifDnrXgsxt9OHBq+iXU
+         I+S2kZQxITWQawon3Y5XMWeCmkTMQeQWFEXIZexhWPhnRKWfoHqhVjcICME87wNn1j
+         rrdd7K9B89hrQH7I8AO1EhiPCvkz74PSxs/U3JkKrspeJ77s1MWJpgxWFSz/e7yKmh
+         MgLTIhjDdW1JgOzu4Id1uQgkVRk19vXWNxZfbgtxWkE9czEOtwQfd002OTaqr5Gg4s
+         N82CH80wcAS1g==
+Date:   Mon, 6 Feb 2023 23:10:08 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
+Subject: Re: [PATCH 0/17] crypto: api - Change completion callback argument
+ to void star
+Message-ID: <20230206231008.64c822c1@kernel.org>
+In-Reply-To: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230202083805.21838-1-zhangyiqun@phytium.com.cn>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 02, 2023 at 04:38:05PM +0800, Zhang Yiqun wrote:
-> This type of request is often happened in AF_ALG cases.
-> So add this vector in default cipher config array.
-> 
-> Signed-off-by: Zhang Yiqun <zhangyiqun@phytium.com.cn>
-> ---
->  crypto/testmgr.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 4476ac97baa5..6e8d08999104 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -356,6 +356,14 @@ static const struct testvec_config default_cipher_testvec_configs[] = {
->  			{ .proportion_of_total = 5000 },
->  			{ .proportion_of_total = 5000 },
->  		},
-> +	}, {
-> +		.name = "one src, two even splits dst",
-> +		.inplace_mode = OUT_OF_PLACE,
-> +		.src_divs = { { .proportion_of_total = 10000 } },
-> +		.dst_divs = {
-> +			{ .proportion_of_total = 5000 },
-> +			{ .proportion_of_total = 5000 },
-> +		 },
->  	}, {
->  		.name = "uneven misaligned splits, may sleep",
->  		.req_flags = CRYPTO_TFM_REQ_MAY_SLEEP,
-> -- 
+On Mon, 6 Feb 2023 18:21:06 +0800 Herbert Xu wrote:
+> The crypto completion function currently takes a pointer to a
+> struct crypto_async_request object.  However, in reality the API
+> does not allow the use of any part of the object apart from the
+> data field.  For example, ahash/shash will create a fake object
+> on the stack to pass along a different data field.
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+"different data field" == copy the value to a different structure?
+A bit hard to parse TBH.
 
-- Eric
+> This leads to potential bugs where the user may try to dereference
+> or otherwise use the crypto_async_request object.
+> 
+> This series changes the completion function to take a void *
+> argument instead of crypto_async_request.
+> 
+> This series touches code in a number of different subsystems.
+> Most of them are trivial except for tls which was actually buggy
+> as it did exactly what was described above.
+
+Buggy means bug could be hit in real light or buggy == did not use 
+the API right?
+
+> I'd like to pull all the changes through the crypto tree.  But
+> feel free to object if you'd like the relevant patches to go
+> through your trees instead and I'll split this up.
