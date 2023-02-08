@@ -2,56 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B1FC636D3
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 09:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C23C636D6
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 11:57:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230283AbjBHJad (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 04:30:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48496 "EHLO
+        id S229457AbjBHL5P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 06:57:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjBHJaK (ORCPT
+        with ESMTP id S230340AbjBHL5O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 04:30:10 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C359647091
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 01:28:42 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pPgjn-008oXL-RK; Wed, 08 Feb 2023 17:27:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Feb 2023 17:27:35 +0800
-Date:   Wed, 8 Feb 2023 17:27:35 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Cc:     Clemens Lang <cllang@redhat.com>
-Subject: [PATCH] crypto: testmgr - Disable raw RSA in FIPS mode
-Message-ID: <Y+NrB5q1VcIIa+jk@gondor.apana.org.au>
+        Wed, 8 Feb 2023 06:57:14 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B63485A2
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 03:57:12 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id m14so16451637wrg.13
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Feb 2023 03:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pkgv51e+S+gpia9goEDyOF+wKS8a5XCd9MWj3hy4Qh8=;
+        b=cyXRdaZ8m06Ue4ok4y+JiEQ69PyZ6VegToLzU/gZcbU8UM1DxPT0KDrENTWdb1wI+8
+         ZTl9rwGNWkhua8qh37Ixw25uiZja+eb/rHnFIUwvqZIYsIZKmwo4sk5GKHmOzcjsqrc+
+         qnQ4EhYVmxINmOGrIt3YL3Cw4HoPuwdvKwCO538Dj4ax8fzY7uyoutPTt+0tHobfrnyB
+         EjlFQ799aIP6ypzx9ClpxyAFiPYRSy5Soa75uN7AASmaNdE7ilHdiwLKfORmdZQyYlSR
+         QfpqWrJ3O+fWQ4fSWeyECEFE7Ld00Faf5O1VjNEI9swfXEjnme7uBZJec7l5zJjjERz+
+         4pgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pkgv51e+S+gpia9goEDyOF+wKS8a5XCd9MWj3hy4Qh8=;
+        b=3igSl7QXM/YA4xoSqonWaxK9FfK72RQEk/ee1Mj5WooLYBPsfIpJZ6w2vhZex876XX
+         eTWRuSwooAwMwhazna4TYpeNIB1Tmbm2Vg4lcgJBPz4Ml533KEk0s4wup5dnX0JiDtWM
+         l8DzUV9jIp79/yla3qMfxbjKoe8iBdUS1/ITYI7yamn3KUWhN5nTgHZpX/ezM54XJ2mv
+         sv4FPn6C1fSDurxqPvZha3HCf+tOg0OL7RquH6nKD94m98qvWMfnsfwWRUWgqcFZGQbm
+         /XAHQpwwlUal+OIcYmmIzgQLuVtBjXC15TFFrCwC5RqiRcdxIP5EVek5RTjJvN1Y+FYr
+         QLuQ==
+X-Gm-Message-State: AO0yUKUTDmHNKB2UEhme4nyXbK4UHNgOZV1EEHPOevUkCocactej7/zx
+        P6hxZ0g7ydcrb7HPZ3wV0Hb9Fqi21SPWogDn
+X-Google-Smtp-Source: AK7set/7wPBkCfjTlFM94tHI/xXenu6VgOEq5rCokaHvC6jxnV+xKlh1y0eNcmWGi/cGDZrHkUhdzg==
+X-Received: by 2002:a5d:42cf:0:b0:2c3:efe7:607c with SMTP id t15-20020a5d42cf000000b002c3efe7607cmr6013996wrr.6.1675857431344;
+        Wed, 08 Feb 2023 03:57:11 -0800 (PST)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id d5-20020adfef85000000b002c3e600d1a8sm8004744wro.95.2023.02.08.03.57.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Feb 2023 03:57:10 -0800 (PST)
+Message-ID: <02e45c4e-1343-3077-2848-b5148faa2d4e@arista.com>
+Date:   Wed, 8 Feb 2023 11:57:03 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v4 3/4] crypto/net/ipv6: sr: Switch to using crypto_pool
+To:     Dan Carpenter <error27@gmail.com>
+Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+        netdev@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+        Bob Gilligan <gilligan@arista.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Leonard Crestez <cdleonard@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        linux-crypto@vger.kernel.org, oe-kbuild@lists.linux.dev,
+        linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+References: <202302071833.k6CihGFl-lkp@intel.com>
+Content-Language: en-US
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <202302071833.k6CihGFl-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As FIPS is only able to verify the compliance of pkcs1pad the
-underlying "rsa" algorithm should not be marked as fips_allowed.
+On 2/7/23 11:40, Dan Carpenter wrote:
+> Hi Dmitry,
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Safonov/crypto-Introduce-crypto_pool/20230119-054258
+> base:   c1649ec55708ae42091a2f1bca1ab49ecd722d55
+> patch link:    https://lore.kernel.org/r/20230118214111.394416-4-dima%40arista.com
+> patch subject: [PATCH v4 3/4] crypto/net/ipv6: sr: Switch to using crypto_pool
+> config: s390-randconfig-m041-20230206 (https://download.01.org/0day-ci/archive/20230207/202302071833.k6CihGFl-lkp@intel.com/config)
+> compiler: s390-linux-gcc (GCC) 12.1.0
+> 
+> If you fix the issue, kindly add following tag where applicable
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Reported-by: Dan Carpenter <error27@gmail.com>
+> 
+> smatch warnings:
+> net/ipv6/seg6.c:539 seg6_init() warn: ignoring unreachable code.
+> 
+> vim +539 net/ipv6/seg6.c
+> 
+> 4f4853dc1c9c19 David Lebrun   2016-11-08  532  
+> 915d7e5e5930b4 David Lebrun   2016-11-08  533  	pr_info("Segment Routing with IPv6\n");
+> 915d7e5e5930b4 David Lebrun   2016-11-08  534  
+> 915d7e5e5930b4 David Lebrun   2016-11-08  535  out:
+> 915d7e5e5930b4 David Lebrun   2016-11-08  536  	return err;
+> 754f6619437c57 Dmitry Safonov 2023-01-18  537  
+> 46738b1317e169 David Lebrun   2016-11-15  538  #ifdef CONFIG_IPV6_SEG6_LWTUNNEL
+> d1df6fd8a1d22d David Lebrun   2017-08-05 @539  	seg6_local_exit();
+> 
+> Not a bug.  Just dead code.  Some people like to store dead code here
+> for later, but it's not a common thing...
 
-Reported-by: Clemens Lang <cllang@redhat.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Thanks for the report, Dan!
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index dd748832ed4a..6fbb56c6bd4c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5467,7 +5467,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "rsa",
- 		.test = alg_test_akcipher,
--		.fips_allowed = 1,
- 		.suite = {
- 			.akcipher = __VECS(rsa_tv_template)
- 		}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+          Dmitry
+
