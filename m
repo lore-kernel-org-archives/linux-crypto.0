@@ -2,81 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26F8C636D6
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 04:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBBAC05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 04:20:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbjBHECw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Feb 2023 23:02:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58922 "EHLO
+        id S229949AbjBHEU0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Feb 2023 23:20:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbjBHECv (ORCPT
+        with ESMTP id S229674AbjBHEUY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2023 23:02:51 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3713A3867D;
-        Tue,  7 Feb 2023 20:02:49 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pPbev-008jle-Fn; Wed, 08 Feb 2023 12:02:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Feb 2023 12:02:13 +0800
-Date:   Wed, 8 Feb 2023 12:02:13 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: Re: [PATCH 0/17] crypto: api - Change completion callback argument
- to void star
-Message-ID: <Y+MexdOj12Y5Ikj1@gondor.apana.org.au>
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
- <20230206231008.64c822c1@kernel.org>
- <Y+IF6L4cb2Ijy0fN@gondor.apana.org.au>
- <20230207105146.267fc5e8@kernel.org>
+        Tue, 7 Feb 2023 23:20:24 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F8202823E;
+        Tue,  7 Feb 2023 20:20:23 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id BA102CE1DD9;
+        Wed,  8 Feb 2023 04:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E82F1C4339B;
+        Wed,  8 Feb 2023 04:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675830020;
+        bh=U4GQLJyTsARaBKfrYmycFh9XU5Dd+XRhoXk8AVmi44c=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=rTXE9i6EJ8FWzrCwW3x3191Atwiqu21zFMj1pf4OP4oxWA14MtVzlYz0DQcDRwLVX
+         HketLz37EpmPFqt1JXEOFKE0Ox0sDD7TDg6FUbD+xYENTvAMDQnhtXViJCPCmHdelC
+         ra+QKLvw3039QXimEkQwq8qv3Diz/eaEdIDmN2Z2R+leWgHMCu2j6Wk1NGUljPQN4O
+         KcEkrtO/Kz0DtYZxTV/VVz+FNMpB/DTFizmy+xSBtCvCwvobQx2EHy0ofSKdPmzehj
+         Cb6uKoK1GDFZQrbPu58kR9pR+qwjLIPPqsmncKxWXDPZ2SseHSZG8jsvy2M9RJkrh2
+         dC30CjjQM/sNA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BF85DE4D032;
+        Wed,  8 Feb 2023 04:20:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230207105146.267fc5e8@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND 0/9] sched: cpumask: improve on cpumask_local_spread()
+ locality
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167583001977.19489.3612592708687977676.git-patchwork-notify@kernel.org>
+Date:   Wed, 08 Feb 2023 04:20:19 +0000
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
+In-Reply-To: <20230121042436.2661843-1-yury.norov@gmail.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, davem@davemloft.net,
+        andriy.shevchenko@linux.intel.com, baohua@kernel.org,
+        bsegall@google.com, dietmar.eggemann@arm.com, gal@nvidia.com,
+        gregkh@linuxfoundation.org, bristot@redhat.com, hca@linux.ibm.com,
+        mingo@redhat.com, jacob.e.keller@intel.com, kuba@kernel.org,
+        jgg@nvidia.com, jesse.brandeburg@intel.com,
+        Jonathan.Cameron@huawei.com, juri.lelli@redhat.com,
+        leonro@nvidia.com, torvalds@linux-foundation.org, mgorman@suse.de,
+        peter@n8pjl.ca, peterz@infradead.org, linux@rasmusvillemoes.dk,
+        saeedm@nvidia.com, rostedt@goodmis.org, tariqt@nvidia.com,
+        ttoukan.linux@gmail.com, tony.luck@intel.com, vschneid@redhat.com,
+        vincent.guittot@linaro.org, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 07, 2023 at 10:51:46AM -0800, Jakub Kicinski wrote:
-.
-> Any aes-gcm or chacha-poly implementations which would do that come 
-> to mind? I'm asking 'cause we probably want to do stable if we know
-> of a combination which would be broken, or the chances of one existing
-> are high.
+Hello:
 
-Good point.  I had a quick look at tls_sw.c and it *appears* to be
-safe with the default software code.  As tls_sw only uses the generic
-AEAD algorithms (rather than the IPsec-specific variants which aren't
-safe), the software-only paths *should* be OK.
+This series was applied to netdev/net-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-However, drivers that support these algorithms may require fallbacks
-for esoteric reasons.  For example, drivers/crypto/amcc appears to
-require a fallback for certain input parameters which may or may not
-be possible with TLS.
+On Fri, 20 Jan 2023 20:24:27 -0800 you wrote:
+> cpumask_local_spread() currently checks local node for presence of i'th
+> CPU, and then if it finds nothing makes a flat search among all non-local
+> CPUs. We can do it better by checking CPUs per NUMA hops.
+> 
+> This has significant performance implications on NUMA machines, for example
+> when using NUMA-aware allocated memory together with NUMA-aware IRQ
+> affinity hints.
+> 
+> [...]
 
-To be on the safe side I would do a backport once this has been
-in mainline for a little bit.
+Here is the summary with links:
+  - [1/9] lib/find: introduce find_nth_and_andnot_bit
+    https://git.kernel.org/netdev/net-next/c/43245117806f
+  - [2/9] cpumask: introduce cpumask_nth_and_andnot
+    https://git.kernel.org/netdev/net-next/c/62f4386e564d
+  - [3/9] sched: add sched_numa_find_nth_cpu()
+    https://git.kernel.org/netdev/net-next/c/cd7f55359c90
+  - [4/9] cpumask: improve on cpumask_local_spread() locality
+    https://git.kernel.org/netdev/net-next/c/406d394abfcd
+  - [5/9] lib/cpumask: reorganize cpumask_local_spread() logic
+    https://git.kernel.org/netdev/net-next/c/b1beed72b8b7
+  - [6/9] sched/topology: Introduce sched_numa_hop_mask()
+    https://git.kernel.org/netdev/net-next/c/9feae65845f7
+  - [7/9] sched/topology: Introduce for_each_numa_hop_mask()
+    https://git.kernel.org/netdev/net-next/c/06ac01721f7d
+  - [8/9] net/mlx5e: Improve remote NUMA preferences used for the IRQ affinity hints
+    https://git.kernel.org/netdev/net-next/c/2acda57736de
+  - [9/9] lib/cpumask: update comment for cpumask_local_spread()
+    https://git.kernel.org/netdev/net-next/c/2ac4980c57f5
 
-Cheers,
+You are awesome, thank you!
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
