@@ -2,36 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C68CC05027
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 12:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3B4C05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 12:56:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230506AbjBHMtB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 07:49:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46018 "EHLO
+        id S230482AbjBHM4s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 07:56:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230450AbjBHMtA (ORCPT
+        with ESMTP id S230498AbjBHM4q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 07:49:00 -0500
+        Wed, 8 Feb 2023 07:56:46 -0500
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D5B045231;
-        Wed,  8 Feb 2023 04:48:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 05EBB4A20B;
+        Wed,  8 Feb 2023 04:56:44 -0800 (PST)
 Received: from [192.168.2.24] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id E722F203B41F;
-        Wed,  8 Feb 2023 04:48:57 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E722F203B41F
+        by linux.microsoft.com (Postfix) with ESMTPSA id 6229E203B41F;
+        Wed,  8 Feb 2023 04:56:43 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6229E203B41F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1675860538;
-        bh=m2UZGw4LRKpUDCphB6szCpitw1pKqr+oXASlc/ublls=;
+        s=default; t=1675861004;
+        bh=hIyrhydIQJAz1+mLJZ3NXAMgFDv6A+5TbDZt8dN6ZOs=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=CGxTortYHRozdT30JGTZN1OnuEDzAyHrqS2D9fFKj9uw9JNM70mFK+j+u7JoET473
-         IUlS6U1CoJtBFUh3fSVETk244tYRcmaXnmF9OxsTuP9ui8ObKjfW3G6bPOgnlSXkke
-         Mi3tQ6LxN450G+njdhdU2ac3xHiFEjZ0f2BfXSD4=
-Message-ID: <354a02a2-7335-4600-ee38-b9a57f5381ec@linux.microsoft.com>
-Date:   Wed, 8 Feb 2023 13:48:58 +0100
+        b=c//rjRFlXiWMZ6M0aRgFTWQVzTmG0m08gqCv6XzF7OREw+jjMjwQX8Zwt+OTKgg98
+         Z9cin/nOMvo8fHHfnmZmI2WpPUiNaGpdoxvDeKOpN9+Rqp9RhCXqVQP2ZVYRlOVtm0
+         3fYSdhAw0d8v2v73+1ICjCjyU+sGN8AvgC9dIGK4=
+Message-ID: <13d4b5cb-247f-817a-5699-9cdcc4c46713@linux.microsoft.com>
+Date:   Wed, 8 Feb 2023 13:56:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH v1 5/8] crypto: cpp - Bind to psp platform device on x86
+Subject: Re: [PATCH v1 7/8] crypto: ccp - Skip DMA coherency check for
+ platform psp
 Content-Language: en-US
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         linux-kernel@vger.kernel.org
@@ -39,99 +40,84 @@ Cc:     Brijesh Singh <brijesh.singh@amd.com>,
         "Kalra, Ashish" <ashish.kalra@amd.com>,
         linux-crypto@vger.kernel.org
 References: <20230123152250.26413-1-jpiotrowski@linux.microsoft.com>
- <20230123152250.26413-6-jpiotrowski@linux.microsoft.com>
- <272a68e1-ca89-ff30-81e3-79dfcf211615@amd.com>
+ <20230123152250.26413-8-jpiotrowski@linux.microsoft.com>
+ <9a6a152e-1c60-6300-88ce-85b835d3d198@amd.com>
 From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <272a68e1-ca89-ff30-81e3-79dfcf211615@amd.com>
+In-Reply-To: <9a6a152e-1c60-6300-88ce-85b835d3d198@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 31/01/2023 20:51, Tom Lendacky wrote:
+On 31/01/2023 21:42, Tom Lendacky wrote:
 > On 1/23/23 09:22, Jeremi Piotrowski wrote:
->> The PSP in Hyper-V VMs is exposed through the ASP ACPI table and is
->> represented as a platform_device. Allow the ccp driver to bind to it by
->> adding an id_table and initing the platform_driver also on x86. At this
->> point probe is called for the psp device but init fails due to missing
->> driver data.
+>> The value of device_get_dma_attr() is only relevenat for ARM64 and CCP
+>> devices to configure the value of the axcache attribute used to access
+>> memory by the coprocessor. None of this applies to the platform psp so
+>> skip it.
 >>
 >> Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 >> ---
->>   drivers/crypto/ccp/sp-dev.c      | 8 ++++++--
->>   drivers/crypto/ccp/sp-platform.c | 7 +++++++
->>   2 files changed, 13 insertions(+), 2 deletions(-)
+>>   drivers/crypto/ccp/sp-platform.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
 >>
->> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
->> index 7eb3e4668286..52b8d957d0f6 100644
->> --- a/drivers/crypto/ccp/sp-dev.c
->> +++ b/drivers/crypto/ccp/sp-dev.c
->> @@ -258,7 +258,11 @@ static int __init sp_mod_init(void)
->>       ret = sp_pci_init();
->>       if (ret)
->>           return ret;
->> -
-> Please keep the blank line here.>
-
-ok
- 
->> +    ret = sp_platform_init();
->> +    if (ret) {
->> +        sp_pci_exit();
->> +        return ret;
->> +    }
-> 
-> Add a blank line here.
->
-
-ok
-
->>   #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>       psp_pci_init();
->>   #endif
->> @@ -286,7 +290,7 @@ static void __exit sp_mod_exit(void)
->>   #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>       psp_pci_exit();
->>   #endif
->> -
-> 
-> Please keep the blank line here.
->
-
-ok
-
->> +    sp_platform_exit(); >       sp_pci_exit();
->>   #endif
->>   diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
->> index 7d79a8744f9a..ea8926e87981 100644
+>> diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+>> index 281dbf6b150c..b74f16e0e963 100644
 >> --- a/drivers/crypto/ccp/sp-platform.c
 >> +++ b/drivers/crypto/ccp/sp-platform.c
->> @@ -56,6 +56,12 @@ static const struct of_device_id sp_of_match[] = {
->>   MODULE_DEVICE_TABLE(of, sp_of_match);
->>   #endif
->>   +static const struct platform_device_id sp_plat_match[] = {
+>> @@ -29,6 +29,7 @@
+>>   struct sp_platform {
+>>       int coherent;
+>>       unsigned int irq_count;
+>> +    bool is_platform;
 > 
-> s/plat/platform/
+> s/is_platform/is_platform_device/
 > 
 
 ok
 
+>>   };
+>>     #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+>> @@ -190,8 +191,10 @@ static int sp_platform_probe(struct platform_device *pdev)
+>>       sp->dev_specific = sp_platform;
+>>       sp->dev_vdata = pdev->dev.of_node ? sp_get_of_version(pdev)
+>>                        : sp_get_acpi_version(pdev);
+>> -    if (!sp->dev_vdata && pdev->id_entry)
+>> +    if (!sp->dev_vdata && pdev->id_entry) {
+>> +        sp_platform->is_platform = true;
+> 
+> Move this into the sp_get_plat_version() function.
+> 
+>>           sp->dev_vdata = sp_get_plat_version(pdev);
+> 
+> And I probably should have made this comment in the previous patch, but you should probably spell out platform here.
+>
+
+ok (i had done that before i got to this comment for consistency)
+
+>> +    }
+>>       if (!sp->dev_vdata) {
+>>           ret = -ENODEV;
+>>           dev_err(dev, "missing driver data\n");
+>> @@ -205,7 +208,7 @@ static int sp_platform_probe(struct platform_device *pdev)
+>>       }
+>>         attr = device_get_dma_attr(dev);
+>> -    if (attr == DEV_DMA_NOT_SUPPORTED) {
+>> +    if (!sp_platform->is_platform && attr == DEV_DMA_NOT_SUPPORTED) {
+> 
+> Just a nit but I'd prefer to see this as:
+> 
+>     if (attr == DEV_DMA_NOT_SUPPORTED && !sp_platform->is_platform) {
+> 
+> The diff is easier to see that way.
+
+makes sense
+
+> 
 > Thanks,
 > Tom
 > 
->> +    { "psp" },
->> +    { },
->> +};
->> +MODULE_DEVICE_TABLE(platform, sp_plat_match);
->> +
->>   static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
->>   {
->>   #ifdef CONFIG_OF
->> @@ -212,6 +218,7 @@ static int sp_platform_resume(struct platform_device *pdev)
->>   #endif
->>     static struct platform_driver sp_platform_driver = {
->> +    .id_table = sp_plat_match,
->>       .driver = {
->>           .name = "ccp",
->>   #ifdef CONFIG_ACPI
+>>           dev_err(dev, "DMA is not supported");
+>>           goto e_err;
+>>       }
