@@ -2,117 +2,151 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC53FC74A44
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 18:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1C9C64EC5
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 18:54:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231527AbjBHSjA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 13:39:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39682 "EHLO
+        id S229936AbjBHSyi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 13:54:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbjBHSia (ORCPT
+        with ESMTP id S229479AbjBHSyh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 13:38:30 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6CB4526F
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 10:38:29 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id v13so21673187eda.11
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Feb 2023 10:38:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SAHs+SDEqt1ZZjAtte39FysEWDFBUT1+AZHfiDgMVRA=;
-        b=vv1ZJQWkIkONSmBeiG7pNI6Hcoa1H5TWQgwTku3Ls7bWSOGrTQ2UbnakOB2iEOU5qw
-         TQGS1xg3ryBP44LpW6DKJ77W7o/28DgqjkM2tC6TYyvRe4dRVzRt1wwCucx9vUIvXhbj
-         SnwlCmBQLC/9raKFEuMnwpTyBtGNxlBWf0FV0+YnH+kNnms2eoBJiC/m+GQzZ17//Kgj
-         kECKyKT/xjFEePdH2ncrCqV7S5jLZ8dI4RawW98403Q/N47P+Hk5+du996GwvdSQBJuq
-         4+lY7A537y3Q/aFaYwJ6kMLykSa4VJzU5ApoArKuULOSLfR39p8rrJQbjGIPA9NEPlrs
-         G0Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SAHs+SDEqt1ZZjAtte39FysEWDFBUT1+AZHfiDgMVRA=;
-        b=jYj83IW3EMu/VhjODFUcArgsJlPN03zRDK72fJEDC0t31Zf9GpHrE35T9SSPM1SuGR
-         uKO+kKWE0h3NPIkPr5rM1matnJXNZksLJHixapf3ub5XJqPWPOrt8jVlMbze8rIBN+9j
-         GwlUS+jshCnsLoEvgNsbKw0podIdzzaOfNPD+LIlhVkThViIG3bZ0pnzQib2mVq2a9g6
-         hp97bHX6G0jZxK+FHm+pBYSfFNJr3FE+I/f+HrySSmzHCh6gKFuj17AX1ywBJV6P8ccs
-         hBxD2GLIa1MFZQCyDIcpDDjjS1WndNn4ehItyhNHEpCawOux4FmclnYgYe6BcAgsxHxE
-         nUlg==
-X-Gm-Message-State: AO0yUKXN09HgCwJE2ivMXpkYpL1FfCJQOTy9A8bBPGFIB21z4blEo994
-        6cgL+sEarQdBwqzTw28sskM5Hg==
-X-Google-Smtp-Source: AK7set8jvWeiiJ8HRdxUE5ZrOm82+hU2lb7t7t3pIj64LRTS7tZjtkDo5HvxOnQgD5fbQGhW7Riykw==
-X-Received: by 2002:a05:6402:510f:b0:49d:fd2a:39cd with SMTP id m15-20020a056402510f00b0049dfd2a39cdmr10566704edd.1.1675881509329;
-        Wed, 08 Feb 2023 10:38:29 -0800 (PST)
-Received: from localhost.localdomain (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id d22-20020a50cd56000000b004aaa8e65d0esm5179663edj.84.2023.02.08.10.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Feb 2023 10:38:28 -0800 (PST)
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Jordan Crouse <jorcrous@amazon.com>
-Subject: [PATCH v9 13/14] crypto: qce: core: Make clocks optional
-Date:   Wed,  8 Feb 2023 20:37:54 +0200
-Message-Id: <20230208183755.2907771-14-vladimir.zapolskiy@linaro.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
-References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
+        Wed, 8 Feb 2023 13:54:37 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A7ED18A95;
+        Wed,  8 Feb 2023 10:54:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1C5BEB81F4D;
+        Wed,  8 Feb 2023 18:54:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB21C433D2;
+        Wed,  8 Feb 2023 18:54:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675882473;
+        bh=xTtM9WlSf7bwExmahb6XOjPHbEjpNPb+C9ZLErT3mV8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=kJN28UveNEt23ZFALxkKRAduymcXqKXXhl5ZE6krYfbalb6HMbzHo9qeVzvcHI7Wm
+         H7S6jcL16vD7PqCbUM676t6Ujn2JFJPW6F8SYQEY0t+JColJ5tdmzL8HnmWP59Mv+N
+         h1XG21jruiC7Pqu0lZhIHvhdf8KfE3r2XiOfPuEIw7UtbGW+1gt8cYhRh3sZd6iQB0
+         OKQT0joBdQfoYqU3AXs0x+0ro+BNaKQvYiFcCdFS93pX8FTqdLs62iSLZQceti8ikH
+         8vqlPouh7hbFMq94LAL+5Wj+RTZZwiFzYMUZ+IE2R0duumYDsHSZLH3uCg57RDgxC5
+         5i80rfFHy/R9Q==
+Date:   Wed, 8 Feb 2023 19:08:33 +0000
+From:   Jonathan Cameron <jic23@kernel.org>
+To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        Loic PALLARDY <loic.pallardy@st.com>
+Subject: Re: [PATCH v3 4/6] bus: stm32_sys_bus: add support for STM32MP15
+ and STM32MP13 system bus
+Message-ID: <20230208190833.532cd60c@jic23-huawei>
+In-Reply-To: <d6c659d8-2e5c-cb60-d950-685c4ba319e2@foss.st.com>
+References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
+        <20230127164040.1047583-5-gatien.chevallier@foss.st.com>
+        <20230128161217.0e79436e@jic23-huawei>
+        <d6c659d8-2e5c-cb60-d950-685c4ba319e2@foss.st.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.36; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Thara Gopinath <thara.gopinath@gmail.com>
+On Tue, 7 Feb 2023 15:12:23 +0100
+Gatien CHEVALLIER <gatien.chevallier@foss.st.com> wrote:
 
-On certain Snapdragon processors, the crypto engine clocks are enabled by
-default by security firmware and the driver should not handle the clocks.
-Make acquiring of all the clocks optional in crypto engine driver, so that
-the driver initializes properly even if no clocks are specified in the dt.
+> Hi Jonathan,
+> 
+> On 1/28/23 17:12, Jonathan Cameron wrote:
+> > On Fri, 27 Jan 2023 17:40:38 +0100
+> > Gatien Chevallier <gatien.chevallier@foss.st.com> wrote:
+> >   
+> >> This driver is checking the access rights of the different
+> >> peripherals connected to the system bus. If access is denied,
+> >> the associated device tree node is skipped so the platform bus
+> >> does not probe it.
+> >>
+> >> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> >> Signed-off-by: Loic PALLARDY <loic.pallardy@st.com>  
+> > 
+> > Hi Gatien,
+> > 
+> > A few comments inline,
+> > 
+> > Thanks,
+> > 
+> > Jonathan
+> >   
+> >> diff --git a/drivers/bus/stm32_sys_bus.c b/drivers/bus/stm32_sys_bus.c
+> >> new file mode 100644
+> >> index 000000000000..c12926466bae
+> >> --- /dev/null
+> >> +++ b/drivers/bus/stm32_sys_bus.c
+> >> @@ -0,0 +1,168 @@
+> >> +// SPDX-License-Identifier: GPL-2.0
+> >> +/*
+> >> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
+> >> + */
+> >> +
+> >> +#include <linux/bitfield.h>
+> >> +#include <linux/bits.h>
+> >> +#include <linux/device.h>
+> >> +#include <linux/err.h>
+> >> +#include <linux/io.h>
+> >> +#include <linux/init.h>
+> >> +#include <linux/kernel.h>
+> >> +#include <linux/module.h>
+> >> +#include <linux/of.h>
+> >> +#include <linux/of_platform.h>
+> >> +#include <linux/platform_device.h>
+> >> +
+> >> +/* ETZPC peripheral as firewall bus */
+> >> +/* ETZPC registers */
+> >> +#define ETZPC_DECPROT			0x10
+> >> +
+> >> +/* ETZPC miscellaneous */
+> >> +#define ETZPC_PROT_MASK			GENMASK(1, 0)
+> >> +#define ETZPC_PROT_A7NS			0x3
+> >> +#define ETZPC_DECPROT_SHIFT		1  
+> > 
+> > This define makes the code harder to read.  What we care about is
+> > the number of bits in the register divided by number of entries.
+> > (which is 2) hence the shift by 1. See below for more on this.
+> > 
+> >   
+> >> +
+> >> +#define IDS_PER_DECPROT_REGS		16  
+> >   
+> >> +#define STM32MP15_ETZPC_ENTRIES		96
+> >> +#define STM32MP13_ETZPC_ENTRIES		64  
+> > 
+> > These defines just make the code harder to check.
+> > They aren't magic numbers, but rather just telling us how many
+> > entries there are, so I would just put them in the structures directly.
+> > Their use make it clear what they are without needing to give them a name.
+> >   
+> 
+> Honestly, I'd rather read the hardware configuration registers to get 
+> this information instead of differentiating MP13/15. Would you agree on 
+> that?
 
-Tested-by: Jordan Crouse <jorcrous@amazon.com>
-Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-[Bhupesh: Massage the commit log]
-Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
----
- drivers/crypto/qce/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Sure, if they are discoverable even better.
 
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index 336edba2513e..8e496fb2d5e2 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -209,15 +209,15 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 	if (ret < 0)
- 		return ret;
- 
--	qce->core = devm_clk_get(qce->dev, "core");
-+	qce->core = devm_clk_get_optional(qce->dev, "core");
- 	if (IS_ERR(qce->core))
- 		return PTR_ERR(qce->core);
- 
--	qce->iface = devm_clk_get(qce->dev, "iface");
-+	qce->iface = devm_clk_get_optional(qce->dev, "iface");
- 	if (IS_ERR(qce->iface))
- 		return PTR_ERR(qce->iface);
- 
--	qce->bus = devm_clk_get(qce->dev, "bus");
-+	qce->bus = devm_clk_get_optional(qce->dev, "bus");
- 	if (IS_ERR(qce->bus))
- 		return PTR_ERR(qce->bus);
- 
--- 
-2.33.0
 
