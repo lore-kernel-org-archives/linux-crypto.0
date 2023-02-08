@@ -2,135 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5288C636D7
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 15:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A71C05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 15:41:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbjBHPKb convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 10:10:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40974 "EHLO
+        id S231582AbjBHPl0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 10:41:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230237AbjBHPKN (ORCPT
+        with ESMTP id S231386AbjBHPlW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 10:10:13 -0500
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4DC222CA;
-        Wed,  8 Feb 2023 07:10:09 -0800 (PST)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id D28A824E12B;
-        Wed,  8 Feb 2023 23:10:01 +0800 (CST)
-Received: from EXMBX064.cuchost.com (172.16.6.64) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 8 Feb
- 2023 23:10:01 +0800
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX064.cuchost.com
- (172.16.6.64) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 8 Feb
- 2023 23:10:01 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Wed, 8 Feb 2023 23:10:01 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH v2 0/4] crypto: starfive - Add drivers for crypto engine
-Thread-Topic: [PATCH v2 0/4] crypto: starfive - Add drivers for crypto engine
-Thread-Index: AQHZNMHj24kMYgm7ukiZl0u5RF7lfq7FM/vg
-Date:   Wed, 8 Feb 2023 15:10:01 +0000
-Message-ID: <685bf9174a354c5c9b2ada538a89b785@EXMBX168.cuchost.com>
-References: <20230130154242.112613-1-jiajie.ho@starfivetech.com>
-In-Reply-To: <20230130154242.112613-1-jiajie.ho@starfivetech.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [202.190.105.77]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 8 Feb 2023 10:41:22 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B075049001;
+        Wed,  8 Feb 2023 07:41:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675870880; x=1707406880;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=CMviFYN8WaZJ3J3sp7VBjtnbhJB9FGlUbTZgSmraYhs=;
+  b=ehqv4EnTYE3HGq6ttBryt5Lkig5eNPTJhmH/cImvi12Kr5z30wGTHBNN
+   66g9F0b9lXZJ4JEgBSznIl2BTL4bondRfBzQ565oAQr5zaLbaiTpRYrNl
+   G1TilVjeGC9ON2HX+E+9YIAN4CxgoxkVzGS8Ms19Queaayj6wii3ja6b6
+   qaLANf7dElBIC+0smSG9X4aTfD1B36H87j4RDKSo7RU9Vwz15FkBMKn83
+   5dOwUTfS7NGEQA6HTa9TF1mpjGnkw5N7a5l/C2GOaO4wf1T0GEo0kr2jt
+   oL+7eRNZyOuwFxFGFvZkF/Ep5psgVk6/OtTe5NZyfZq7sAmfBT5GjwSUs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="317834817"
+X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
+   d="scan'208";a="317834817"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 07:41:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="669227604"
+X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
+   d="scan'208";a="669227604"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga007.fm.intel.com with ESMTP; 08 Feb 2023 07:41:12 -0800
+Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
+        by irvmail002.ir.intel.com (Postfix) with ESMTP id 673E133EB8;
+        Wed,  8 Feb 2023 15:41:10 +0000 (GMT)
+From:   Pawel Chmielewski <pawel.chmielewski@intel.com>
+To:     yury.norov@gmail.com
+Cc:     Jonathan.Cameron@huawei.com, andriy.shevchenko@linux.intel.com,
+        baohua@kernel.org, bristot@redhat.com, bsegall@google.com,
+        davem@davemloft.net, dietmar.eggemann@arm.com, gal@nvidia.com,
+        gregkh@linuxfoundation.org, hca@linux.ibm.com,
+        jacob.e.keller@intel.com, jesse.brandeburg@intel.com,
+        jgg@nvidia.com, juri.lelli@redhat.com, kuba@kernel.org,
+        leonro@nvidia.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@redhat.com,
+        netdev@vger.kernel.org, peter@n8pjl.ca, peterz@infradead.org,
+        rostedt@goodmis.org, saeedm@nvidia.com, tariqt@nvidia.com,
+        tony.luck@intel.com, torvalds@linux-foundation.org,
+        ttoukan.linux@gmail.com, vincent.guittot@linaro.org,
+        vschneid@redhat.com,
+        Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: [PATCH 1/1] ice: Change assigning method of the CPU affinity masks
+Date:   Wed,  8 Feb 2023 16:39:05 +0100
+Message-Id: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20230121042436.2661843-1-yury.norov@gmail.com>
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+With the introduction of sched_numa_hop_mask() and
+for_each_numa_hop_mask(), the affinity masks for queue vectors can be
+conveniently set by preferring the CPUs that are closest to the NUMA node
+of the parent PCI device.
 
+Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_base.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-> -----Original Message-----
-> From: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> Sent: 30 January, 2023 11:43 PM
-> To: Herbert Xu <herbert@gondor.apana.org.au>; David S . Miller
-> <davem@davemloft.net>; Rob Herring <robh+dt@kernel.org>; Krzysztof
-> Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Emil Renner Berthing
-> <kernel@esmil.dk>; Conor Dooley <conor.dooley@microchip.com>
-> Cc: linux-crypto@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-riscv@lists.infradead.org
-> Subject: [PATCH v2 0/4] crypto: starfive - Add drivers for crypto engine
-> 
-> This patch series adds kernel driver support for StarFive JH7110 crypto engine.
-> The first patch add Documentations for the device and Patch 2 adds device
-> probe and DMA init for the module. Patch 3 adds crypto and DMA dts node
-> for VisionFive 2 board. Patch 4 adds hash/hmac support to the module.
-> 
-> Patch 3 needs to be applied on top of:
-> https://patchwork.kernel.org/project/linux-
-> riscv/patch/20221220011247.35560-7-hal.feng@starfivetech.com/
-> https://patchwork.kernel.org/project/linux-
-> riscv/cover/20230120024445.244345-1-xingyu.wu@starfivetech.com/
-> 
-> Changes v1->v2:
-> - Fixed yaml filename and format (Krzysztof)
-> - Removed unnecessary property names in yaml (Krzysztof)
-> - Moved of_device_id table close to usage (Krzysztof)
-> - Use dev_err_probe for error returns (Krzysztof)
-> - Dropped redundant readl and writel wrappers (Krzysztof)
-> - Updated commit signed offs (Conor)
-> - Dropped redundant node in dts, module set to on in dtsi (Conor)
-> 
-> Jia Jie Ho (4):
->   dt-bindings: crypto: Add StarFive crypto module
->   crypto: starfive - Add crypto engine support
->   riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
->   crypto: starfive - Add hash and HMAC support
-> 
->  .../crypto/starfive,jh7110-crypto.yaml        |   70 ++
->  MAINTAINERS                                   |    7 +
->  arch/riscv/boot/dts/starfive/jh7110.dtsi      |   27 +
->  drivers/crypto/Kconfig                        |    1 +
->  drivers/crypto/Makefile                       |    1 +
->  drivers/crypto/starfive/Kconfig               |   20 +
->  drivers/crypto/starfive/Makefile              |    4 +
->  drivers/crypto/starfive/starfive-cryp.c       |  238 ++++
->  drivers/crypto/starfive/starfive-hash.c       | 1095 +++++++++++++++++
->  drivers/crypto/starfive/starfive-regs.h       |   71 ++
->  drivers/crypto/starfive/starfive-str.h        |   99 ++
->  11 files changed, 1633 insertions(+)
->  create mode 100644
-> Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
->  create mode 100644 drivers/crypto/starfive/Kconfig  create mode 100644
-> drivers/crypto/starfive/Makefile  create mode 100644
-> drivers/crypto/starfive/starfive-cryp.c
->  create mode 100644 drivers/crypto/starfive/starfive-hash.c
->  create mode 100644 drivers/crypto/starfive/starfive-regs.h
->  create mode 100644 drivers/crypto/starfive/starfive-str.h
-> 
-> --
-> 2.25.1
-
-Hi all,
-
-Could you please review this patch series?
-Or should I send a new version with Rob's sign-off on patch 1?
-Thank you in advance.
-
-Best regards,
-Jia Jie
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index e864634d66bc..fd3550d15c9e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -122,8 +122,6 @@ static int ice_vsi_alloc_q_vector(struct ice_vsi *vsi, u16 v_idx)
+ 	if (vsi->type == ICE_VSI_VF)
+ 		goto out;
+ 	/* only set affinity_mask if the CPU is online */
+-	if (cpu_online(v_idx))
+-		cpumask_set_cpu(v_idx, &q_vector->affinity_mask);
+ 
+ 	/* This will not be called in the driver load path because the netdev
+ 	 * will not be created yet. All other cases with register the NAPI
+@@ -659,8 +657,10 @@ int ice_vsi_wait_one_rx_ring(struct ice_vsi *vsi, bool ena, u16 rxq_idx)
+  */
+ int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi)
+ {
++	cpumask_t *aff_mask, *last_aff_mask = cpu_none_mask;
+ 	struct device *dev = ice_pf_to_dev(vsi->back);
+-	u16 v_idx;
++	int numa_node = dev->numa_node;
++	u16 v_idx, cpu = 0;
+ 	int err;
+ 
+ 	if (vsi->q_vectors[0]) {
+@@ -674,6 +674,17 @@ int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi)
+ 			goto err_out;
+ 	}
+ 
++	v_idx = 0;
++	for_each_numa_hop_mask(aff_mask, numa_node) {
++		for_each_cpu_andnot(cpu, aff_mask, last_aff_mask)
++			if (v_idx < vsi->num_q_vectors) {
++				if (cpu_online(cpu))
++					cpumask_set_cpu(cpu, &vsi->q_vectors[v_idx]->affinity_mask);
++				v_idx++;
++			}
++		last_aff_mask = aff_mask;
++	}
++
+ 	return 0;
+ 
+ err_out:
+-- 
+2.37.3
 
