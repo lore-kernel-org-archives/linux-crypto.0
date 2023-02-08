@@ -2,151 +2,104 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1C9C64EC5
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 18:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDABBC05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 19:04:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbjBHSyi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 13:54:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49236 "EHLO
+        id S231501AbjBHTEQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 14:04:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjBHSyh (ORCPT
+        with ESMTP id S231591AbjBHTEQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 13:54:37 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A7ED18A95;
-        Wed,  8 Feb 2023 10:54:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1C5BEB81F4D;
-        Wed,  8 Feb 2023 18:54:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB21C433D2;
-        Wed,  8 Feb 2023 18:54:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675882473;
-        bh=xTtM9WlSf7bwExmahb6XOjPHbEjpNPb+C9ZLErT3mV8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=kJN28UveNEt23ZFALxkKRAduymcXqKXXhl5ZE6krYfbalb6HMbzHo9qeVzvcHI7Wm
-         H7S6jcL16vD7PqCbUM676t6Ujn2JFJPW6F8SYQEY0t+JColJ5tdmzL8HnmWP59Mv+N
-         h1XG21jruiC7Pqu0lZhIHvhdf8KfE3r2XiOfPuEIw7UtbGW+1gt8cYhRh3sZd6iQB0
-         OKQT0joBdQfoYqU3AXs0x+0ro+BNaKQvYiFcCdFS93pX8FTqdLs62iSLZQceti8ikH
-         8vqlPouh7hbFMq94LAL+5Wj+RTZZwiFzYMUZ+IE2R0duumYDsHSZLH3uCg57RDgxC5
-         5i80rfFHy/R9Q==
-Date:   Wed, 8 Feb 2023 19:08:33 +0000
-From:   Jonathan Cameron <jic23@kernel.org>
-To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        Loic PALLARDY <loic.pallardy@st.com>
-Subject: Re: [PATCH v3 4/6] bus: stm32_sys_bus: add support for STM32MP15
- and STM32MP13 system bus
-Message-ID: <20230208190833.532cd60c@jic23-huawei>
-In-Reply-To: <d6c659d8-2e5c-cb60-d950-685c4ba319e2@foss.st.com>
-References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
-        <20230127164040.1047583-5-gatien.chevallier@foss.st.com>
-        <20230128161217.0e79436e@jic23-huawei>
-        <d6c659d8-2e5c-cb60-d950-685c4ba319e2@foss.st.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.36; x86_64-pc-linux-gnu)
+        Wed, 8 Feb 2023 14:04:16 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBD0552B8
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 11:03:44 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id bk16so17783643wrb.11
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Feb 2023 11:03:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YcFa+o0o/HGPVfh9CAEExeraGr3RyMHQ6+ferc/dsVA=;
+        b=oPXL2Ez2tQFZ1E1PrSalxrbCbV9FZ5VrcNskl9/zL1ReaZI+lyRJabtUE59h/F64xJ
+         BAnFITM34JSJnThNSuFjPte8FVi6Irv83Fe2uQicP/gQnAuU2BVBUOIXkR3+byLvhamC
+         03s4zgjPrjVMAy/z30UAlVW+8pG8H9LKh5g+SG6O7R4fdPNY5Of69GzPdsr+dtD2XnC7
+         /c3mPvZpgzqunndMqHue58WoQ1mRFxs0Cl8shLil8dpy4PKgUfyFI9Q5f2q7FeqKoFPy
+         ybcnqz6vKYyCnnZ/UPIGSnU/l8hyaUbjE2Bmoryzvy3ZgBgfZhtoVSwyBmxjH3tXoCBM
+         JQmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YcFa+o0o/HGPVfh9CAEExeraGr3RyMHQ6+ferc/dsVA=;
+        b=YmI19vf9cIEwU+j+OMWASMx4M/v8cXZOB7tNizW8UoQdnUyvDv/fQvy43c0oaR7RPa
+         VGzvhsOg0R8S194v2jJp8Cti8GX+7ZszSZEhQQLXeBLEiwh2pSF3oNiXakOwCcxhxt3B
+         Y3n73gZy+butXpokNb69vIWywxRDcA8hY54xHiNhxtzN9ImRS7r2ecaemcMp2FtN7kKv
+         pnuRdzkOZMOVr6qKTuH7+H2vNCmbw7YbRd4rKPkwd9qiny5idNpPJJ+B04h8NyxlslCz
+         O0Fdbzx8DNxV+YnK5SZubc0m7VknK5e6B2RbtmUpy6trnutvoFAiMunkLK4IWdGa+NZ6
+         5GKA==
+X-Gm-Message-State: AO0yUKX0m+9PsQ/uBFrsHc+F4oSi/qAqX/flrJ1UNXJL8QTcmRcETCyi
+        BhTii6o570AFsBwoOQRdNS8tH8OSpgA=
+X-Google-Smtp-Source: AK7set9lJQg5HLxM5eYzL+HANk/ZxpcT99x9r4cBKYPjhpmmscBKRD92rfgjhgqOiBu5CVZmRhhO1Q==
+X-Received: by 2002:a5d:595f:0:b0:2c3:9851:e644 with SMTP id e31-20020a5d595f000000b002c39851e644mr7359832wri.63.1675883018641;
+        Wed, 08 Feb 2023 11:03:38 -0800 (PST)
+Received: from shift (pd9e294ad.dip0.t-ipconnect.de. [217.226.148.173])
+        by smtp.gmail.com with ESMTPSA id t15-20020adfdc0f000000b002c3f81c51b6sm4009822wri.90.2023.02.08.11.03.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 11:03:38 -0800 (PST)
+Received: from localhost ([127.0.0.1])
+        by shift with esmtp (Exim 4.96)
+        (envelope-from <chunkeey@gmail.com>)
+        id 1pPpgj-001IcD-1f;
+        Wed, 08 Feb 2023 20:03:37 +0100
+Message-ID: <cf60caa6-a540-c09a-e34b-4fdf30fd0d39@gmail.com>
+Date:   Wed, 8 Feb 2023 20:03:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] crypto: crypto4xx - Call dma_unmap_page when done
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <Y+CX0WWNtrURdr5g@gondor.apana.org.au>
+Content-Language: de-DE, en-US
+From:   Christian Lamparter <chunkeey@gmail.com>
+In-Reply-To: <Y+CX0WWNtrURdr5g@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 7 Feb 2023 15:12:23 +0100
-Gatien CHEVALLIER <gatien.chevallier@foss.st.com> wrote:
-
-> Hi Jonathan,
+On 2/6/23 07:01, Herbert Xu wrote:
+> In crypto4xx_cipher_done, we should be unmapping the dst page, not
+> mapping it.
 > 
-> On 1/28/23 17:12, Jonathan Cameron wrote:
-> > On Fri, 27 Jan 2023 17:40:38 +0100
-> > Gatien Chevallier <gatien.chevallier@foss.st.com> wrote:
-> >   
-> >> This driver is checking the access rights of the different
-> >> peripherals connected to the system bus. If access is denied,
-> >> the associated device tree node is skipped so the platform bus
-> >> does not probe it.
-> >>
-> >> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> >> Signed-off-by: Loic PALLARDY <loic.pallardy@st.com>  
-> > 
-> > Hi Gatien,
-> > 
-> > A few comments inline,
-> > 
-> > Thanks,
-> > 
-> > Jonathan
-> >   
-> >> diff --git a/drivers/bus/stm32_sys_bus.c b/drivers/bus/stm32_sys_bus.c
-> >> new file mode 100644
-> >> index 000000000000..c12926466bae
-> >> --- /dev/null
-> >> +++ b/drivers/bus/stm32_sys_bus.c
-> >> @@ -0,0 +1,168 @@
-> >> +// SPDX-License-Identifier: GPL-2.0
-> >> +/*
-> >> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-> >> + */
-> >> +
-> >> +#include <linux/bitfield.h>
-> >> +#include <linux/bits.h>
-> >> +#include <linux/device.h>
-> >> +#include <linux/err.h>
-> >> +#include <linux/io.h>
-> >> +#include <linux/init.h>
-> >> +#include <linux/kernel.h>
-> >> +#include <linux/module.h>
-> >> +#include <linux/of.h>
-> >> +#include <linux/of_platform.h>
-> >> +#include <linux/platform_device.h>
-> >> +
-> >> +/* ETZPC peripheral as firewall bus */
-> >> +/* ETZPC registers */
-> >> +#define ETZPC_DECPROT			0x10
-> >> +
-> >> +/* ETZPC miscellaneous */
-> >> +#define ETZPC_PROT_MASK			GENMASK(1, 0)
-> >> +#define ETZPC_PROT_A7NS			0x3
-> >> +#define ETZPC_DECPROT_SHIFT		1  
-> > 
-> > This define makes the code harder to read.  What we care about is
-> > the number of bits in the register divided by number of entries.
-> > (which is 2) hence the shift by 1. See below for more on this.
-> > 
-> >   
-> >> +
-> >> +#define IDS_PER_DECPROT_REGS		16  
-> >   
-> >> +#define STM32MP15_ETZPC_ENTRIES		96
-> >> +#define STM32MP13_ETZPC_ENTRIES		64  
-> > 
-> > These defines just make the code harder to check.
-> > They aren't magic numbers, but rather just telling us how many
-> > entries there are, so I would just put them in the structures directly.
-> > Their use make it clear what they are without needing to give them a name.
-> >   
+> This was flagged by a sparse warning about the unused addr variable.
+> While we're at it, also fix a sparse warning regarding the unused
+> ctx variable in crypto4xx_ahash_done (by actually using it).
 > 
-> Honestly, I'd rather read the hardware configuration registers to get 
-> this information instead of differentiating MP13/15. Would you agree on 
-> that?
+> Fixes: 049359d65527 ("crypto: amcc - Add crypt4xx driver")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Sure, if they are discoverable even better.
+Tested this on the MyBook Live. Internal cryptmgr_test pass with:
 
+[    2.888784] alg: No test for stdrng (crypto4xx_rng)
+[    7.519740] "cryptomgr_test" (102) uses obsolete ecb(arc4) skcipher
+(but all crypto4xx entries in /proc/crypto say that the selftest pass)
+
+as well as libkcapi kcapi-enc-test.sh passes.
+
+The ahash portion is a bit "underused". Currently the driver doesn't
+register any hashes (this is because in testing I found the getting
+the crypto-hardware to do those is so much slower than letting the
+CPU do these).
+
+Anyway:
+
+Tested-by: Christian Lamparter <chunkeey@gmail.com>
+
+Thanks!
 
