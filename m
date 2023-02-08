@@ -2,364 +2,213 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B78C05027
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 17:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8148DC636D3
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 18:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbjBHRX2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 12:23:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54582 "EHLO
+        id S229483AbjBHSiV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 13:38:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjBHRX1 (ORCPT
+        with ESMTP id S229479AbjBHSiU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 12:23:27 -0500
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2062.outbound.protection.outlook.com [40.107.212.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E6D2C665;
-        Wed,  8 Feb 2023 09:23:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AEsRjOAhUPYRJHcFhsH1B+gy/f5IhnF0fYPF0W3RLvhVRJ74kiN5v/Px/GFHpVDNysKR4aTCfhiFxYJWf+Ovskfa0HOh5a8W8tj+SJHrlajKqy7gMSpWvJB4LyquILg+7/DKQCgOdWLpn0m9LoRpMMAioG5aIH7ir+3kh3NHZJvcQMD2beZPRGKBMcfge2C/4c2HXKHlTYch5hJmKsEkNUzc1LmLbD1fI2tWKn2UBQFim6qvnhTIazEdvKKTH1ttmFmgkEYyo8UR9yAUuiSqXIKkSc4L+g4K295Shi63FIlMPaQHTacvAkKimJWdhy5SdxZkBvq47nmpVfPZ/F59Yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3HNotVm0//elBHC9sb+StMZMLNE0N45VrniG0O7IHZc=;
- b=NK4etEj63u8mZPQ0wSmY+2dAssF64MqbheMEtrMTWGrAOvC9orICVrX1CI6nHWbMMU0sSGENMOwYRyUubALUYHdY79ZGyEEsGrfrOkDQiNfQXOWXtLwE8gQmzwUNO9Bes2FAs1SashS6aOhZ7SblIqH58RxD97uCI2zSX+6LI1loR5TrV+Z+3rwzrzbpw0XwKu/Ag3F361ksJ+3B18Kw0XLEYLslplJfSOvphngROcSpD4HsU5ABwwGpiKBgsnZWJEWlzrm6mEL7NvZlnNalbC8NClE0vPitlh1+WURFfFGqjo+wwApRM/cUBQ9Csoe5P09AOU2J1wtdksPAbO9r9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3HNotVm0//elBHC9sb+StMZMLNE0N45VrniG0O7IHZc=;
- b=l5MNBIffumCTHsZbsFBX9VGzBOrJBi3JcCA40Kn4Xg4+/dlhZZlEjfYUSZy+r6nbyDc6CyufJepcfNQbRZDnpfhE7rJ7ljfOs9L3AyT5HTxTLAme+PHayZqFPs0maFUBRiy+lqxJ3ICxtAzPtMASkoISsGOEkcrEMSxlwNTE2G8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by PH7PR12MB7330.namprd12.prod.outlook.com (2603:10b6:510:20d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27; Wed, 8 Feb
- 2023 17:23:22 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c%5]) with mapi id 15.20.6064.036; Wed, 8 Feb 2023
- 17:23:22 +0000
-Message-ID: <505e7b7c-11dc-b932-09b0-93b47b031750@amd.com>
-Date:   Wed, 8 Feb 2023 11:23:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v1 6/8] crypto: ccp - Add vdata for platform device
-Content-Language: en-US
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
+        Wed, 8 Feb 2023 13:38:20 -0500
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B904659A
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 10:38:10 -0800 (PST)
+Received: by mail-ej1-x643.google.com with SMTP id rp23so2292386ejb.7
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Feb 2023 10:38:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ITYwvQKOh1EHW+/stMcAlY0XUScWUl1QlZHx90l/TYw=;
+        b=OpSPzq2XkHHy09BppC3vzCg4uFSGXrbQbunpO1o+TcH0OlSBlkIrRi+dFpa+EholoB
+         UPA5wsguCk2P3165vybbPmT4DfWDFeP4UgHK5oeU1c8p8mvmsldOY20bLV0j8ducU0bv
+         n0AdRj9Ikm6vVwqdh+C8eLsFur8ECMHdG6HR8SGwd6XHeAZ9vX2U45+eCLk/B03Q9uRT
+         QXDuHtpE/gHGRhNQZsv38JGSIaRsh1ajoVBFw5nsaf3L3l5fc4BdaItcKK4UGyM1Rccz
+         3Bb69rA1jPRiYFWpOPrcZY+LYNIi70SlOrnkC7L2pedMmQgu4kq8LM87I8kVXJBR6V+D
+         wvMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ITYwvQKOh1EHW+/stMcAlY0XUScWUl1QlZHx90l/TYw=;
+        b=U31RyikpAcmwPqziX6nf2vdoetzd8Eo3a73GNFtD141O5I3+CxRWHc3B/DiR05np42
+         cOb9PKMd/JGNMJCI8lhS3z6/c4DAlSFeXu01RJ2YE9weJVhNn89u3xmxflihh+24m900
+         id7ljqfvzupVOWEaEPYc/U2bsGqAQzpWJMM4/l4idaRXpYRNChvKiKVf3gtDLtoxbc2o
+         soyFSBHP3FGiL/lY2U91vEAFQVctuK1hEqPuLQq8XSL1z+i3yCMkF1Eth8n2Yi2QsX4P
+         LeGhxuiZJK5inj6p1QYoYRt49rIXVTtexx8QsnQClKF0ZjChrsIC8Tzn67tphC/pifVM
+         63Wg==
+X-Gm-Message-State: AO0yUKU4u2YYJ3MNmijFl5DPtoig4H2h6pLQPsThXHtL0SLxgjRP1uGn
+        Zo7+qUd77NCE5MMdq9Tsmvv5BQ==
+X-Google-Smtp-Source: AK7set8DKCReVwHT9EMd9k0fgLQH/HefKLeTt92hYll39OEPFsA7rFjPN02mBMvHDBMke/kBetdHSw==
+X-Received: by 2002:a17:906:2085:b0:8aa:a9df:b7f0 with SMTP id 5-20020a170906208500b008aaa9dfb7f0mr7026593ejq.7.1675881488728;
+        Wed, 08 Feb 2023 10:38:08 -0800 (PST)
+Received: from localhost.localdomain (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id d22-20020a50cd56000000b004aaa8e65d0esm5179663edj.84.2023.02.08.10.38.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 10:38:08 -0800 (PST)
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
         linux-crypto@vger.kernel.org
-References: <20230123152250.26413-1-jpiotrowski@linux.microsoft.com>
- <20230123152250.26413-7-jpiotrowski@linux.microsoft.com>
- <6f76fe2b-63ea-8c45-87d8-3de30d3d76c2@amd.com>
- <20230201192409.GA14074@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <b4b8e49c-ea5d-916c-5808-7c6aefa44dd2@amd.com>
- <3ed3234e-e811-71ef-41f9-d7999066b62d@linux.microsoft.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <3ed3234e-e811-71ef-41f9-d7999066b62d@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BLAPR03CA0094.namprd03.prod.outlook.com
- (2603:10b6:208:32a::9) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+Subject: [PATCH v9 00/14] crypto: qcom-qce: Add YAML bindings & support for newer SoCs
+Date:   Wed,  8 Feb 2023 20:37:41 +0200
+Message-Id: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|PH7PR12MB7330:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7452d821-5003-472f-167f-08db09f92de0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DHIVeBMJ+foFpWbXDvZ3I56kBYAxEXyUttbToKbW5WVpzfZpvrH9XkDlcNFliHW1kOQQIncsDa/q8S27T1703XBXciF4HqxRoeG2QQZOPCdspGmS1No04vOESqcZtuGgutP6SNpEeICrcnJsPvbFMWmcq1jG6utaK42eAm99I2cDWo5tjcABWLaniuecUkGSVa9z9oeYwQI5FiZmn+iCvWqBnmxa7mbeAPouHS+ZwXI/7hQfMNnZh0v0JW28TFO9AtJ8GcPuovZVm+L4hFHSKZiUxZYP8WWOqcvK4MAPMGd+NFtmO8JpSwsmtkici3um5oPJYDUmhsWz7yq27wU9acX3Q0U8q8jo5dsMiFMzEe5FAU5vjO8E0iM7Qgg9MhF9YW/z5mzYxM/ef5lmj1zVN04/cghlp0YKW2wb1wMxfdccfvSNPpszNYjwefvK8UiGbNXeN0XGfa3GDTaYY+6B8YrpGXCG10gJEkasEEHvsJxw9SQ2FBijdnLJetlPALlx4iItBi7Mzda1BcerVQV6YkQKqCZcJ7J5pKIOG1+izIBO7QSO+u47A6pZZiJkL9kTwX9OltDRa75ySzlzJYw/LkqDsn2FGdEpCnEv67LEra6Cn++YdlTAdGW1hKvs33zaJW7gyYZbXHx/PJM4GrIg7jRQlSzu0FzncFX36SFJ1ARSUyWY+cey3UgdfGu+8tmooL+r5PY0b+Xf5+pS9Bas8catn3I+hcAfnHLlTb55zwI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(366004)(136003)(39860400002)(376002)(451199018)(6506007)(6512007)(26005)(36756003)(53546011)(186003)(478600001)(8936002)(66556008)(8676002)(4326008)(5660300002)(66476007)(6916009)(66946007)(38100700002)(41300700001)(2616005)(2906002)(86362001)(31696002)(54906003)(316002)(83380400001)(31686004)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WXJFN1FrbCtLZTlNTUduSFM2NCtDNSt1NllPRWoxZmJaVWtVcHlrWFQ0ZWxp?=
- =?utf-8?B?NWEreGk0b20wZ1paNk9yaE0reUErSTJWdXBZeHloMmpOSUYvVFJvMzNTY29C?=
- =?utf-8?B?YXNNSE1XRVRXSnlTem9QaTV4VkYxVmVIaWEyTUhuNms0cTJkVitoTE5JelUx?=
- =?utf-8?B?dkJ3WVBaaEpuc0FUTzRLVjFRUFJnek5kWGpWcDhsemJWVmhUUDhiTlJON0xQ?=
- =?utf-8?B?RU5kTUcvamY4YXoyNjFFdkQwbmRONDJ1UDMyS0lPYVFVVU9FdUdtVWQxMHha?=
- =?utf-8?B?eWROekZ5Z3NCKzUzNStWRzJpQmh6dWRQNTRKTVVXY2hMQzgxMFoybDVVRC9L?=
- =?utf-8?B?bUYwRlRpeTRSNXdyK1VReEM4bDNDYnFyYkFVMUhRL0toNmxQT2M0MThsdHBj?=
- =?utf-8?B?bGFrTnlnVGJrS0VEQllHNUhvZi9IMVlydnVTMWdBWTlOUkNnaUdRN0R1R2ZQ?=
- =?utf-8?B?TVVHOStUOU9IYmJlRjE4YVlyc2VMNEVGTVFnaWJ2a0NqdlZNNXg3bUtUN2pG?=
- =?utf-8?B?VCtQdUFvZGxDNzg4dm1tRnNtV0pXM1VXVWdwMCswQWR2bUk3MjF1KzJlYWI0?=
- =?utf-8?B?eW1pYUNiU09kOVBZZm1uVkdyY1hyNXpsMFF2aTFlWW55Y0w1c1JMQmZCSlRq?=
- =?utf-8?B?L00vNmZlVUZOSXYybDU0bE5CZlI1aG1jZnRUejNPem44NTRlWnlhUTBBcUhq?=
- =?utf-8?B?MEJoeTV2V3hTc2Z4ZXR2Ry96WHV6aGZUY2t3eVZLajdKK3hRV1JQMy9EdHVI?=
- =?utf-8?B?RHY3Rm5qTXdSU3FaS2pFMnZnN2tnNkp0R1VVeWt4VTJ4b3JzZjJJRWcrNGJV?=
- =?utf-8?B?V3hFOWRRMS8vRi9XVVQybXUwRkVkSVQrYTg3VjdhV2xxRTBlUXpaV0JiVDh0?=
- =?utf-8?B?YVFxN3dtZUlRL1YvbzVoVi9VRGQ3Y0dOUDZKMFkveVpMbzhHdk0yWlBUR0Z6?=
- =?utf-8?B?SEtDYm9BdTluV3N3T1BsSm5JNjY3ZHhDdk43d3dtenhuY2dHdHBBUTZoNXo3?=
- =?utf-8?B?NzZnbTZncjN1QWtrZmhiSjFUNGxtMjdrdFEzcGxYV2VnYXR2U3R2UHdRcnRh?=
- =?utf-8?B?bXZOTDhRdDZLd3IzWmxZUFQwb2gzQkRYTzYvMm1RZDQ3bXlyUlp0Y2M2Smha?=
- =?utf-8?B?Q0NqSTRTVkxoNTBOWGxTeUxXdXdqOENEdG1KOVRBVDBXZzZSckpXUlhNSHFW?=
- =?utf-8?B?c3NKbFZCaW43ZElXZFUvZmNzK2d3Yk9mN085d2RVSHc2VjVQTGloQ2V1VUlN?=
- =?utf-8?B?ckpneW5qZWNRQ1N1SlQ1ZGNhNWRQYlczNFlYdHZZSmZqcXB5OTE2UmJ1dkVO?=
- =?utf-8?B?MGlsMEJzWVAxZnpncjNBL01CT1ZhZkRya2U4Y1dnVEVOcFQ2SlBIaC9YYVp2?=
- =?utf-8?B?RGNwU2VwZFd0Ri9XN0RvUmk2YUZ3ZU9VWDRibWIzWWVMUEttRUdjSldOUWxq?=
- =?utf-8?B?RURGSi94WGhzclNDclg5UHB1Vm5FVk82TG1ROXZNS3QwaUdncHJidW5jaGtw?=
- =?utf-8?B?Uys3akhYVUdsYW1GQmdlam9zNkg0S2lxRjJSQXFMYURhRE9yOEtwN29RQnhX?=
- =?utf-8?B?Ry9MbUErU1Npci9ubjNqampvQTczMExKMDZYNG9iMStFZmNPV050QUVXSnFG?=
- =?utf-8?B?YUI0c3dyZEpNcU02eUEwWmxTZGo4YXJqV0Zwa1NVWG1Hc3VZR2NNZ0VqRTZW?=
- =?utf-8?B?T0NnR2F1ZHI0MC9FVWZQVmdPMlpzcTlEdVBBZlQ4UHhwMzh3bGpkQlloNUVQ?=
- =?utf-8?B?VGFZZWc3RTJqMnNLTXk5dTJYbThwY2JLYXVqem9adEVkbVQzc09kb2VmNWJp?=
- =?utf-8?B?RFBEMWpaeXFMODN2TVhObjhBcml2aGhMbXNYUHI0ejN3WkV0NEw3Vm5yUUVl?=
- =?utf-8?B?Qkw0ZnJob2tlYjdsbm40dmZiTFJCalJSa2xFTDJQTlFJRk85aDFocmRMNVVp?=
- =?utf-8?B?LzlCNmxhNnY3OGZFVm1tbnA5dzhkUDduZTFlOTNyWktyUWtBamxPK3duRVFJ?=
- =?utf-8?B?NFkxSG9IMElEVXJIaFNxUzcvdE1HcjU2ckxnUEIxZEd0cTVtbEdlT0VyNzVS?=
- =?utf-8?B?c1lna0dGb0VyL3VXL3VkYmZ2TWtlaUN1TE5ZVDdLTE4wUmZ1Zzk2cnFEcWg1?=
- =?utf-8?Q?VjXJb8v1XGwsJfy9YnS4BYZF6?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7452d821-5003-472f-167f-08db09f92de0
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2023 17:23:22.6255
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gBhmV7bkhDhaVkPrmJ9JsBU6eih6VsZWpR/3LKdZy92VpWEWdgIEBJVNgM7uwq3wxw+3n0NQ53qrUA50KnnIUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7330
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/8/23 06:45, Jeremi Piotrowski wrote:
-> On 06/02/2023 20:13, Tom Lendacky wrote:
->> On 2/1/23 13:24, Jeremi Piotrowski wrote:
->>> On Tue, Jan 31, 2023 at 02:36:01PM -0600, Tom Lendacky wrote:
->>>> On 1/23/23 09:22, Jeremi Piotrowski wrote:
->>>>> When matching the "psp" platform_device, determine the register offsets
->>>>> at runtime from the ASP ACPI table. Pass the parsed register offsets
->>>> >from the ASPT through platdata.
->>>>>
->>>>> To support this scenario, mark the members of 'struct sev_vdata' and
->>>>> 'struct psp_vdata' non-const so that the probe function can write the
->>>>> values. This does not affect the other users of sev_vdata/psp_vdata as
->>>>> they define the whole struct const and the pointer in struct
->>>>> sp_dev_vdata stays const too.
->>>>>
->>>>> Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
->>>>> ---
->>>>>    arch/x86/kernel/psp.c            |  3 ++
->>>>>    drivers/crypto/ccp/sp-dev.h      | 12 +++----
->>>>>    drivers/crypto/ccp/sp-platform.c | 57 +++++++++++++++++++++++++++++++-
->>>>>    3 files changed, 65 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/arch/x86/kernel/psp.c b/arch/x86/kernel/psp.c
->>>>> index 24181d132bae..68511a14df63 100644
->>>>> --- a/arch/x86/kernel/psp.c
->>>>> +++ b/arch/x86/kernel/psp.c
->>>>> @@ -199,6 +199,9 @@ static int __init psp_init_platform_device(void)
->>>>>        if (err)
->>>>>            return err;
->>>>>        err = platform_device_add_resources(&psp_device, res, 2);
->>>>> +    if (err)
->>>>> +        return err;
->>>>> +    err = platform_device_add_data(&psp_device, &pdata, sizeof(pdata));
->>>>>        if (err)
->>>>>            return err;
->>>>> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
->>>>> index 20377e67f65d..aaa651364425 100644
->>>>> --- a/drivers/crypto/ccp/sp-dev.h
->>>>> +++ b/drivers/crypto/ccp/sp-dev.h
->>>>> @@ -40,9 +40,9 @@ struct ccp_vdata {
->>>>>    };
->>>>>    struct sev_vdata {
->>>>> -    const unsigned int cmdresp_reg;
->>>>> -    const unsigned int cmdbuff_addr_lo_reg;
->>>>> -    const unsigned int cmdbuff_addr_hi_reg;
->>>>> +    unsigned int cmdresp_reg;
->>>>> +    unsigned int cmdbuff_addr_lo_reg;
->>>>> +    unsigned int cmdbuff_addr_hi_reg;
->>>>>    };
->>>>>    struct tee_vdata {
->>>>> @@ -56,9 +56,9 @@ struct tee_vdata {
->>>>>    struct psp_vdata {
->>>>>        const struct sev_vdata *sev;
->>>>>        const struct tee_vdata *tee;
->>>>> -    const unsigned int feature_reg;
->>>>> -    const unsigned int inten_reg;
->>>>> -    const unsigned int intsts_reg;
->>>>> +    unsigned int feature_reg;
->>>>> +    unsigned int inten_reg;
->>>>> +    unsigned int intsts_reg;
->>>>>    };
->>>>>    /* Structure to hold SP device data */
->>>>> diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
->>>>> index ea8926e87981..281dbf6b150c 100644
->>>>> --- a/drivers/crypto/ccp/sp-platform.c
->>>>> +++ b/drivers/crypto/ccp/sp-platform.c
->>>>> @@ -22,6 +22,7 @@
->>>>>    #include <linux/of.h>
->>>>>    #include <linux/of_address.h>
->>>>>    #include <linux/acpi.h>
->>>>> +#include <linux/platform_data/psp.h>
->>>>>    #include "ccp-dev.h"
->>>>> @@ -30,11 +31,31 @@ struct sp_platform {
->>>>>        unsigned int irq_count;
->>>>>    };
->>>>> +#ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>>>> +static struct sev_vdata sev_platform = {
->>>>> +    .cmdresp_reg = -1,
->>>>> +    .cmdbuff_addr_lo_reg = -1,
->>>>> +    .cmdbuff_addr_hi_reg = -1,
->>>>> +};
->>>>> +static struct psp_vdata psp_platform = {
->>>>> +    .sev = &sev_platform,
->>>>> +    .feature_reg = -1,
->>>>> +    .inten_reg = -1,
->>>>> +    .intsts_reg = -1,
->>>>> +};
->>>>> +#endif
->>>>> +
->>>>>    static const struct sp_dev_vdata dev_vdata[] = {
->>>>>        {
->>>>>            .bar = 0,
->>>>>    #ifdef CONFIG_CRYPTO_DEV_SP_CCP
->>>>>            .ccp_vdata = &ccpv3_platform,
->>>>> +#endif
->>>>> +    },
->>>>> +    {
->>>>> +        .bar = 0,
->>>>> +#ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>>>> +        .psp_vdata = &psp_platform,
->>>>>    #endif
->>>>>        },
->>>>>    };
->>>>> @@ -57,7 +78,7 @@ MODULE_DEVICE_TABLE(of, sp_of_match);
->>>>>    #endif
->>>>>    static const struct platform_device_id sp_plat_match[] = {
->>>>> -    { "psp" },
->>>>> +    { "psp", (kernel_ulong_t)&dev_vdata[1] },
->>>>>        { },
->>>>>    };
->>>>>    MODULE_DEVICE_TABLE(platform, sp_plat_match);
->>>>> @@ -86,6 +107,38 @@ static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
->>>>>        return NULL;
->>>>>    }
->>>>> +static struct sp_dev_vdata *sp_get_plat_version(struct platform_device *pdev)
->>>>> +{
->>>>> +    struct sp_dev_vdata *drvdata = (struct sp_dev_vdata *)pdev->id_entry->driver_data;
->>>>
->>>> s/drvdata/vdata/
->>>>
->>>
->>> ok
->>>
->>>>> +    struct device *dev = &pdev->dev;
->>>>> +
->>>>
->>>> Should check for null vdata and return NULL, e.g.:
->>>>
->>>>      if (!vdata)
->>>>          return NULL;
->>>>
->>>
->>> ok
->>>
->>>>> +    if (drvdata == &dev_vdata[1]) {
->>>>
->>>> This should be a check for vdata->psp_vdata being non-NULL and
->>>> vdata->psp_vdata->sev being non-NULL, e.g.:
->>>>
->>>>      if (vdata->psp_vdata && vdata->psp_vdata->sev) {
->>>>
->>>>> +        struct psp_platform_data *pdata = dev_get_platdata(dev);
->>>>> +
->>>>> +        if (!pdata) {
->>>>> +            dev_err(dev, "missing platform data\n");
->>>>> +            return NULL;
->>>>> +        }
->>>>> +#ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>>>
->>>> No need for this with the above checks
->>>>
->>>>> +        psp_platform.feature_reg = pdata->feature_reg;
->>>>
->>>> These should then be:
->>>>
->>>>          vdata->psp_vdata->inten_reg = pdata->feature_reg;
->>>>          ...
->>>
->>> I see where you're going with this and the above suggestions, but
->>> the psp_vdata pointer is const in struct sp_dev_vdata and so is the
->>> sev pointer in struct psp_vdata. I find these consts to be important
->>> and doing it this way would require casting away the const. I don't
->>> think that's worth doing.
->>
->> Ok, then maybe it would be better to kmalloc a vdata structure that you fill in and then assign that to dev_vdata field for use. That could eliminate the removal of the "const" notations in one of the previous patches. I just don't think you should be changing the underlying module data that isn't expected to be changed.
->>
-> 
-> I can do that and undo the removal of consts from the
-> struct (sev|psp)_vdata members, but the outcome would look something
-> like this:
-> 
-> static void sp_platform_fill_vdata(struct sp_dev_vdata *vdata,
-> 					struct psp_vdata *psp,
-> 					struct sev_vdata *sev,
-> 					const struct psp_platform_data *pdata)
-> {
-> 	struct sev_vdata sevtmp = {
-> 		.cmdbuff_addr_hi_reg = pdata->sev_cmd_buf_hi_reg,
-> 		.cmdbuff_addr_lo_reg = pdata->sev_cmd_buf_lo_reg,
-> 		.cmdresp_reg = pdata->sev_cmd_resp_reg,
-> 	};
-> 	struct psp_vdata psptmp = {
-> 		.feature_reg = pdata->feature_reg,
-> 		.inten_reg = pdata->irq_en_reg,
-> 		.intsts_reg = pdata->irq_st_reg,
-> 		.sev = sev,
-> 	};
-> 
-> 	memcpy(sev, &sevtmp, sizeof(*sev));
-> 	memcpy(psp, &psptmp, sizeof(*psp));
-> 	vdata->psp_vdata = psp;
-> }
-> 
-> static struct sp_dev_vdata *sp_get_platform_version(struct sp_device *sp)
-> {
-> 	struct sp_platform *sp_platform = sp->dev_specific;
-> 	struct psp_platform_data *pdata;
-> 	struct device *dev = sp->dev;
-> 	struct sp_dev_vdata *vdata;
-> 	struct psp_vdata *psp;
-> 	struct sev_vdata *sev;
-> 
-> 	pdata = dev_get_platdata(dev);
-> 	if (!pdata) {
-> 		dev_err(dev, "missing platform data\n");
-> 		return NULL;
-> 	}
-> 
-> 	sp_platform->is_platform_device = true;
-> 
-> 	vdata = devm_kzalloc(dev, sizeof(*vdata) + sizeof(*psp) + sizeof(*sev), GFP_KERNEL);
-> 	if (!vdata)
-> 		return NULL;
-> 
-> 	psp = (void *)vdata + sizeof(*vdata);
-> 	sev = (void *)psp + sizeof(*psp);
-> 	sp_platform_fill_vdata(vdata, psp, sev, pdata);
-> 
-> 	/* elided debug print */
-> 	...
-> 
-> 	return vdata;
-> }
-> 
-> with the const fields in the struct it's not possible to assign in any
-> other way than on initialization, so I need to use the helper function,
-> tmp structs and memcpy.
+The series contains Qualcomm Crypto Engine dts and driver changes,
+which modify a set of accepted compatible property values, this is
+needed to provide a unified and fine-grained support of the driver
+on old and new platforms. In addition due to QCE IP changes on new
+Qualcomm platforms, it is reflected in updates to valid device tree
+properties, namely added iommu, interconnects and optional clocks.
 
-Yeah, not the prettiest, but I prefer this over altering the static data.
+Changes since v8:
+=================
+- v8 can be found here: https://lore.kernel.org/all/20230202135036.2635376-1-vladimir.zapolskiy@linaro.org/
+- Rebased the series on top of linux-next, sm8550 qce support is already
+  found in the tree,
+- Reduced the list of QCE IP compatibles in the driver, added one more
+  compatible for backward DTB ABI compatibility,
+- Replaced a documentation change from Neil Armstrong by a more advanced
+  version of it per review comments from Krzysztof Kozlowski about clock
+  and clock-names properties,
+- Added changes to all relevant Qualcomm platform dtsi files according to
+  the changes in the scheme file,
+- Added QCE support on SM8250 platform.
 
-> 
-> Could you ack that you like this approach before I post a v2?
+Changes since v7:
+=================
+- v7 can be found here: https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org
+- Added a change by Neil Armstrong to document clocks and clock-names
+  properties as optional,
+- At the moment do not add Bhupesh as a new QCE driver maintainer,
+- Minor updates to device tree binding documentation and qce driver,
+  in particular added more compatibles and fixed lesser issues.
 
-Yes, please go with this approach.
+Changes since v6:
+=================
+- v6 can be seen here: https://lore.kernel.org/linux-arm-msm/30756e6f-952f-ccf2-b493-e515ba4f0a64@linaro.org/
+- As per Krzysztof's suggestion on v6, clubbed the crypto driver and
+  dt-bindings changes together. Now the overall v5 patchset into 3
+  separate patchsets, one each for the following areas to allow easier
+  review and handling from the maintainer:
+	arm-msm, crypto and dma
 
-Thanks,
-Tom
+Changes since v5:
+=================
+- v5 can be seen here: https://lore.kernel.org/lkml/20211110105922.217895-1-bhupesh.sharma@linaro.org/
+- As per Bjorn's suggestion on irc, broke down the patchset into 4
+  separate patchsets, one each for the following areas to allow easier
+  review and handling from the maintainer:
+	arm-msm, crypto, dma and devicetree
+- Addressed Rob's, Vladimir's and Bjorn's review comments received on
+  v5.
+- Added Tested-by from Jordan received on the v5.
+
+Changes since v4:
+=================
+- v4 for sm8250 can be seen here: https://lore.kernel.org/linux-arm-msm/20211013105541.68045-1-bhupesh.sharma@linaro.org/
+- v1 for sm8150 qce enablement can be seen here: https://lore.kernel.org/linux-arm-msm/20211013165823.88123-1-bhupesh.sharma@linaro.org/
+- Merged the sm8150 and sm8250 enablement patches in the same patchset,
+  as per suggestions from Bjorn.
+- Dropped a couple of patches from v4, as these have been picked by
+  Bjorn already via his tree.
+- Addressed review comments from Vladimir, Thara and Rob.
+- Collect Reviewed-by from Rob and Thara on some of the patches from the
+  v4 patchset.
+
+Changes since v3:
+=================
+- v3 can be seen here: https://lore.kernel.org/linux-arm-msm/20210519143700.27392-1-bhupesh.sharma@linaro.org/
+- Dropped a couple of patches from v3, on basis of the review comments:
+   ~ [PATCH 13/17] crypto: qce: core: Make clocks optional
+   ~ [PATCH 15/17] crypto: qce: Convert the device found dev_dbg() to dev_info()
+- Addressed review comments from Thara, Rob and Stephan Gerhold.
+- Collect Reviewed-by from Rob and Thara on some of the patches from the
+  v3 patchset.
+
+Changes since v2:
+=================
+- v2 can be seen here: https://lore.kernel.org/dmaengine/20210505213731.538612-1-bhupesh.sharma@linaro.org/
+- Drop a couple of patches from v1, which tried to address the defered
+  probing of qce driver in case bam dma driver is not yet probed.
+  Replace it instead with a single (simpler) patch [PATCH 16/17].
+- Convert bam dma and qce crypto dt-bindings to YAML.
+- Addressed review comments from Thara, Bjorn, Vinod and Rob.
+
+Changes since v1:
+=================
+- v1 can be seen here: https://lore.kernel.org/linux-arm-msm/20210310052503.3618486-1-bhupesh.sharma@linaro.org/
+- v1 did not work well as reported earlier by Dmitry, so v2 contains the following
+  changes/fixes:
+  ~ Enable the interconnect path b/w BAM DMA and main memory first
+    before trying to access the BAM DMA registers.
+  ~ Enable the interconnect path b/w qce crytpo and main memory first
+    before trying to access the qce crypto registers.
+  ~ Make sure to document the required and optional properties for both
+    BAM DMA and qce crypto drivers.
+  ~ Add a few debug related print messages in case the qce crypto driver
+    passes or fails to probe.
+  ~ Convert the qce crypto driver probe to a defered one in case the BAM DMA
+    or the interconnect driver(s) (needed on specific Qualcomm parts) are not
+    yet probed.
+
+Qualcomm crypto engine (qce) is available on several Snapdragon SoCs.
+The qce block supports hardware accelerated algorithms for encryption
+and authentication. It also provides support for aes, des, 3des
+encryption algorithms and sha1, sha256, hmac(sha1), hmac(sha256)
+authentication algorithms.
+
+Bhupesh Sharma (4):
+  dt-bindings: qcom-qce: Convert bindings to yaml
+  MAINTAINERS: Add qcom-qce dt-binding file to QUALCOMM CRYPTO DRIVERS section
+  dt-bindings: qcom-qce: Add 'interconnects' and 'interconnect-names'
+  dt-bindings: qcom-qce: Add 'iommus' to optional properties
+
+Thara Gopinath (2):
+  crypto: qce: core: Add support to initialize interconnect path
+  crypto: qce: core: Make clocks optional
+
+Vladimir Zapolskiy (8):
+  dt-bindings: qcom-qce: Add new SoC compatible strings for qcom-qce
+  dt-bindings: qcom-qce: document optional clocks and clock-names properties
+  arm: dts: qcom: ipq4019: update a compatible for QCE IP on IPQ4019 SoC
+  arm64: dts: qcom: msm8996: update QCE compatible according to a new scheme
+  arm64: dts: qcom: sdm845: update QCE compatible according to a new scheme
+  arm64: dts: qcom: sm8550: add a family compatible for QCE IP
+  arm64: dts: qcom: sm8250: add description of Qualcomm Crypto Engine IP
+  crypto: qce: core: Add a compatible based on a SoC name
+
+ .../devicetree/bindings/crypto/qcom-qce.txt   |  25 ----
+ .../devicetree/bindings/crypto/qcom-qce.yaml  | 116 ++++++++++++++++++
+ MAINTAINERS                                   |   1 +
+ arch/arm/boot/dts/qcom-ipq4019.dtsi           |   2 +-
+ arch/arm64/boot/dts/qcom/msm8996.dtsi         |   2 +-
+ arch/arm64/boot/dts/qcom/sdm845.dtsi          |   2 +-
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          |  24 ++++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |   2 +-
+ drivers/crypto/qce/core.c                     |  24 +++-
+ drivers/crypto/qce/core.h                     |   1 +
+ 10 files changed, 166 insertions(+), 33 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+
+-- 
+2.33.0
 
