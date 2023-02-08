@@ -2,49 +2,70 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6774C636D3
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 21:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B71C05027
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 23:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbjBHVxN convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Feb 2023 16:53:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60184 "EHLO
+        id S229676AbjBHXVQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Feb 2023 18:21:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjBHVxN (ORCPT
+        with ESMTP id S229683AbjBHXVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Feb 2023 16:53:13 -0500
-X-Greylist: delayed 601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Feb 2023 13:53:12 PST
-Received: from mail0.waputel.com (mail0.waputel.com [194.87.151.3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A626768B
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 13:53:12 -0800 (PST)
-Reply-To: sales@transfeldoffshore.com
-From:   Adams Bill <sales@transfeldoffshore.com>
-To:     linux-crypto@vger.kernel.org
-Subject: Transfield Offshore Order #76510
-Date:   08 Feb 2023 13:43:07 -0800
-Message-ID: <20230208133926.8E0A55674414D2C5@transfeldoffshore.com>
+        Wed, 8 Feb 2023 18:21:15 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369EDF759;
+        Wed,  8 Feb 2023 15:21:09 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C21E461806;
+        Wed,  8 Feb 2023 23:21:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23883C4339B;
+        Wed,  8 Feb 2023 23:21:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675898468;
+        bh=V8fWl/k6mey3hU7Kqp91TSyMc8cvo2RhUVtz0LJkIdI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qlOmPt6WxLO7e0aXkEJdpkGU5Mfkyc1WFOse11zKkBG1ETdcWpUhgIlOgQS29PtG0
+         uV3fXyJ6Ar6KuVZKrpUojc4Sui8jtrpEnLwMQXjf0/BvfaYyTZW/6Zls91CM1m+SJt
+         x2y49azNhPt+1IGxnbhqo6+wv1ROjVn2WKgPBvSU3OWYws6OrODR1b4euvUpMkYC8P
+         QzJFuOqK3EpnhKa+8dW3/OeWMny35KttkVlj8g+uquNkaO/NczNYYscEC3vnbCME8w
+         d3hJYkSyvCyg/EI4Fd4l9THJvWAhdLkcGpSzfU1JMViG6MnYZ5+p8IrWKQkTsX4evT
+         eTFCcaurwqOtA==
+Date:   Wed, 8 Feb 2023 15:21:06 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Pawel Chmielewski <pawel.chmielewski@intel.com>
+Cc:     yury.norov@gmail.com, Jonathan.Cameron@huawei.com,
+        andriy.shevchenko@linux.intel.com, baohua@kernel.org,
+        bristot@redhat.com, bsegall@google.com, davem@davemloft.net,
+        dietmar.eggemann@arm.com, gal@nvidia.com,
+        gregkh@linuxfoundation.org, hca@linux.ibm.com,
+        jacob.e.keller@intel.com, jesse.brandeburg@intel.com,
+        jgg@nvidia.com, juri.lelli@redhat.com, leonro@nvidia.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux@rasmusvillemoes.dk,
+        mgorman@suse.de, mingo@redhat.com, netdev@vger.kernel.org,
+        peter@n8pjl.ca, peterz@infradead.org, rostedt@goodmis.org,
+        saeedm@nvidia.com, tariqt@nvidia.com, tony.luck@intel.com,
+        torvalds@linux-foundation.org, ttoukan.linux@gmail.com,
+        vincent.guittot@linaro.org, vschneid@redhat.com
+Subject: Re: [PATCH 1/1] ice: Change assigning method of the CPU affinity
+ masks
+Message-ID: <20230208152106.09e5ad83@kernel.org>
+In-Reply-To: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
+        <20230208153905.109912-1-pawel.chmielewski@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-FYI,
+On Wed,  8 Feb 2023 16:39:05 +0100 Pawel Chmielewski wrote:
+> With the introduction of sched_numa_hop_mask() and
+> for_each_numa_hop_mask(), the affinity masks for queue vectors can be
+> conveniently set by preferring the CPUs that are closest to the NUMA node
+> of the parent PCI device.
 
-
-
-Please could you provide me with a quote for attached files.
-
-awaiting your urgent reply.
- 
-
-Kind regards
-
-
-Adams Bill
-PROCUREMENT MANAGER
-TRANSFIELD OFFSHORE LTD
-Address: 3744 N Josey Ln, Carrollton,
-TX 75007 United States
+Damn, you had this one locked and ready, didn't you.. :)
