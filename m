@@ -2,64 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092B9C636D3
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Feb 2023 18:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB22C636CD
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Feb 2023 02:25:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbjBGSvv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Feb 2023 13:51:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44652 "EHLO
+        id S229726AbjBHCZk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Feb 2023 21:25:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232361AbjBGSvu (ORCPT
+        with ESMTP id S229457AbjBHCZj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Feb 2023 13:51:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE049EF0;
-        Tue,  7 Feb 2023 10:51:49 -0800 (PST)
+        Tue, 7 Feb 2023 21:25:39 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D5E1F4BC;
+        Tue,  7 Feb 2023 18:25:37 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B9D586112F;
-        Tue,  7 Feb 2023 18:51:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34265C433EF;
-        Tue,  7 Feb 2023 18:51:47 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8E605B81B89;
+        Wed,  8 Feb 2023 02:25:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 476F0C433EF;
+        Wed,  8 Feb 2023 02:25:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675795908;
-        bh=x0UI86gVTuknlQ58qUTLvMciZe/bE/6g39HHqZCq0K4=;
+        s=k20201202; t=1675823135;
+        bh=SgugQqxYjKhGUHXY/+X1U2clrX2KnDY2G5ysonoqD4E=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VSh5Dyt8xASnmvTydKvQbaFJHbGaq1MUZN0wdEy/DvbasC+0O95aScLPc+6Klyn2c
-         bLz6vOPlX5UKFjct+uvCLhp86OXHdlZPpVqQgrYkimu51YAHILD+cqxvyKhr7J3d/M
-         nqbxe3p3Vx5295uCHBjBlp47OW4aIwk5nY1ESc6NK2c2qx5wqo2p+2hcR65kVen1IY
-         FW6fJjvx/vzksgupXienOhJuoQYRPZRHbu4D0ZygWDJCwF1+YiHzvHIQiWy9Jq58LT
-         1CQcYb1TQMbYcUV0R2BSzEDllmjW91t3LetazrD8asBbWcH6yyxYmJFefmk99GRAGy
-         qJc4dDpNt9BjQ==
-Date:   Tue, 7 Feb 2023 10:51:46 -0800
+        b=VV2iSfyfqFn9Wt1M1ZbkHRbI+v7uUjZk6ph5Wg7xtSbkAXrTKOdrtF484WKZec4ys
+         bi7cTm/oFHUwC4qJlphWDIH3YwHomrbB9pgkChlad9MWAwBxyIQhaLACE9ml09f53C
+         epKonp2iromyLe983yhIl0BXOiVwvRXmC347Im1fJo9+KG63M4DMbK/TufiV0dYJHF
+         Fs2FDFHB12n8vLi+8mZxXpqMe6G2jKY80M41GWOptJxXoRalf8wbY7U1jRvLZWAas8
+         bRHsJpZoSBGrOGo5/Ot8QMjcVGxQylLIjAn1dEQyrZKKtlPv5ECHe0UmUDUeQZoO7S
+         62vduv1zgxj1w==
+Date:   Tue, 7 Feb 2023 18:25:33 -0800
 From:   Jakub Kicinski <kuba@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     Tariq Toukan <ttoukan.linux@gmail.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: Re: [PATCH 0/17] crypto: api - Change completion callback argument
- to void star
-Message-ID: <20230207105146.267fc5e8@kernel.org>
-In-Reply-To: <Y+IF6L4cb2Ijy0fN@gondor.apana.org.au>
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
-        <20230206231008.64c822c1@kernel.org>
-        <Y+IF6L4cb2Ijy0fN@gondor.apana.org.au>
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Barry Song <baohua@kernel.org>,
+        Ben Segall <bsegall@google.com>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Gal Pressman <gal@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Haniel Bristot de Oliveira <bristot@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jesse Brandeburg <jesse.brandeburg@intel.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Peter Lafreniere <peter@n8pjl.ca>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH RESEND 0/9] sched: cpumask: improve on
+ cpumask_local_spread() locality
+Message-ID: <20230207182533.4819fbb9@kernel.org>
+In-Reply-To: <xhsmhv8kxh8tk.mognet@vschneid.remote.csb>
+References: <20230121042436.2661843-1-yury.norov@gmail.com>
+        <4dc2a367-d3b1-e73e-5f42-166e9cf84bac@gmail.com>
+        <xhsmhv8kxh8tk.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -67,19 +80,24 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 7 Feb 2023 16:03:52 +0800 Herbert Xu wrote:
-> > Buggy means bug could be hit in real light or buggy == did not use 
-> > the API right?  
+On Mon, 23 Jan 2023 09:57:43 +0000 Valentin Schneider wrote:
+> On 22/01/23 14:57, Tariq Toukan wrote:
+> > On 21/01/2023 6:24, Yury Norov wrote:  
+> >>
+> >> This series was supposed to be included in v6.2, but that didn't happen. It
+> >> spent enough in -next without any issues, so I hope we'll finally see it
+> >> in v6.3.
+> >>
+> >> I believe, the best way would be moving it with scheduler patches, but I'm
+> >> OK to try again with bitmap branch as well.  
+> >
+> > Now that Yury dropped several controversial bitmap patches form the PR,
+> > the rest are mostly in sched, or new API that's used by sched.
+> >
+> > Valentin, what do you think? Can you take it to your sched branch?
+>
+> I would if I had one :-)
 > 
-> Yes this bug is real.  If you hit a driver/algorithm that returns
-> a different request object (of which there are many in the API) then
-> you will be dereferencing random pointers.
+> Peter/Ingo, any objections to stashing this in tip/sched/core?
 
-Any aes-gcm or chacha-poly implementations which would do that come 
-to mind? I'm asking 'cause we probably want to do stable if we know
-of a combination which would be broken, or the chances of one existing
-are high.
-
-Otherwise no objections for the patches to go via the crypto tree,
-there should be no conflicts AFAIK. Feel free to add my ack on the
-networking changes if needed.
+No replies... so let me take it via networking.
