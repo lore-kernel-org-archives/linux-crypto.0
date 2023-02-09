@@ -2,164 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B19DBC61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 14:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930F8C636D6
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 15:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjBIOao (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Feb 2023 09:30:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53242 "EHLO
+        id S229915AbjBIPUa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Feb 2023 10:20:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbjBIOaW (ORCPT
+        with ESMTP id S230199AbjBIPU3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 09:30:22 -0500
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586ED5EBC4
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Feb 2023 06:30:21 -0800 (PST)
-Received: by mail-ed1-x544.google.com with SMTP id v13so2226208eda.11
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Feb 2023 06:30:21 -0800 (PST)
+        Thu, 9 Feb 2023 10:20:29 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0270270F;
+        Thu,  9 Feb 2023 07:20:27 -0800 (PST)
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 319BO67h014329;
+        Thu, 9 Feb 2023 15:20:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2022-7-12;
+ bh=MbWLhbQ1oLHaC5/TrUb8e0wMYld1xFo1o68FvY00M5I=;
+ b=PDd46ruixxZL9ij1J0LpZmWpeLbCH9Qnuk0q+W3+i6KNdVuVFhxPy3hU/I9sAoxN2IBn
+ C8sIcBigfBDcGuXW1N81YA4g8h27+XRT7ie/ftEJryWcp1RpJFljH3yG6GwPTDWv0DgR
+ xds/ag83Y8kxK9XpaxDGKeiJTWukdQhTWR2dtyW2uyCrCcAA6bv9l1Y4/IH+PlHFDx/D
+ KF+tFIBxUzLGdiHxeQ8Q5F2b9Tj5m+vbjcIZJyMUN18MP4niWNOPLt3Cbeqa3Peu1uVH
+ s3Y45UmehO7cXxzYZQxIqFOXRyir8F6XarPytOoaB5x1rXQvnN8BX0pwI7JCBA+G35Ib 1Q== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3nhfdck1be-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Feb 2023 15:20:11 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 319FHg2K002663;
+        Thu, 9 Feb 2023 15:20:11 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2042.outbound.protection.outlook.com [104.47.66.42])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3nhdtfg484-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 09 Feb 2023 15:20:11 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oDAxKqDshDqvGJAKcOzwPp74lznKC8lTQxUQeWJQfjY5xHsbNpweEF8WH/yX/NgypEqDMnkRfgeOtwfxMiR52ke5m6ax1YMRA0MqDtCMNjKbz7DOyKtu8AmylBHhjGQzhahFYzOeMLX+dY8tJKzMCvWVlHaAt+Ug5vTfOCjE/TRrndrfpDtg0ku0eVvVCN/vRitlDfuWC6lUFLhCRpusRUHDOQTeto4AAteF+4GJI7zp0JNjQ5VwX+VHs0ra9NKqMe2T+P5ZymiwljOcar+vxluT/GRcMYQz1VqrTpNPvsRhFCPoSK0AZ8pVPEqHKBAKd+ueqHxUxhFN4OebE0SXSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MbWLhbQ1oLHaC5/TrUb8e0wMYld1xFo1o68FvY00M5I=;
+ b=FRHvkGNnOe9N/bpkTv/pEe3Bj7Ea2zipYt65YE7kCHbNcojuWBEf6XNZgegEXBEYItg/vvQPWX48jKksc79ddhNJqdFGk3SOAPHk9ckLRdOX6U293yQWhq7/fWf5h0rZ7+NW3ei1FNS1pY+8JFh91FcWHsW1EAZK/H4sDH173x2hY1AhWe/OcugA8JpkWCdnntq9lY9qZNLg73Xpv/ZxLaa+DalNI9lAshb0ZMSFiMIBkhUVdIefMXMa2RXNs9kANymtFqwgbDOz86ZNgfukrk3a0lOTY2OT51l06iJ2oj9wfTJ2Ip7qu83JbtqHyAskW57ejVc/0i87b1RN/G/5vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G8CEuoh8/tO2WNNegwThQxagifKl5T8FJBwqfoW5Qnc=;
-        b=SLGQcgFTk/Q7umfCm+MrcT/2zfBfsY9XWR6t8bXBJw05C+0rMFcK4Z/xQMX6wGtpL6
-         SGMPId3De6pc/g9HmwUn1T2FhUt6whVHN+xb0rcIvu0EbgFSqsiZiKyyTR6f4yRkn/Pc
-         22VI8DLNLF+gAEDs0/OuwADncNQt5WrRQ61gJMlBVRyEoMAlV2TBpWSdYYYShiBwAVda
-         ig1uLWuZZwelZ3DBQXFwfWw9kN3L1i/KxnEDlQ+bfdyiKRsqraRlxBMAyw4panDajrRp
-         T7ht0+06i3UD1pvoI8GlZeT2Boe/2K3OGn8t/z1vZassa39GpFZgwFpfMpMBMvHSVes1
-         brrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G8CEuoh8/tO2WNNegwThQxagifKl5T8FJBwqfoW5Qnc=;
-        b=PRLBowv0BHyyPJM3+RNP3jy+k5B7aKSKJuwSPJBxHQb99vFxAsS3BXW1BloPxJ+4Y8
-         ta0av96SePTsRm5Fru1Iiq86X5jJJicyj0el1BLDZGhMQD8clKF71tWl75cYgjoBOn18
-         ub/9U0djgXQqsZi4XYG4GZn8XnKosSrWSXgT/A69qszaodDRpTuIZARb4uzTcdGwmPzm
-         UVvuV1cC9E/E2OnL79Ksr6MLgdytJKbjTVYFJlXqsRmDnuMjDAwsLLwp2VDTT+3frvr/
-         RINm6rVVn2HOsl/4iyH/j/HhbS2ErakFZ4I+JjFlVrzDsTTaga/kb1CFKu853R0le8yA
-         rqaQ==
-X-Gm-Message-State: AO0yUKUO0xUubDliBM+fhKNiMdCJFWlMSjVBqek2rhzQYYxmQYq/H7CS
-        WXCERCL8f9KFA4NFas9Pi3PG2Q==
-X-Google-Smtp-Source: AK7set/YQoyOdPS8Zp+k/ZHZSM5vg5zjI3jXX8fddlGMbqeVIPumeeTulTVDogjdrTt4rG8rFZ4dAg==
-X-Received: by 2002:a05:6402:268b:b0:4a2:2e9e:c2ec with SMTP id w11-20020a056402268b00b004a22e9ec2ecmr14059882edd.4.1675953019947;
-        Thu, 09 Feb 2023 06:30:19 -0800 (PST)
-Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id v28-20020a50d59c000000b004aaa09d50adsm815359edi.94.2023.02.09.06.30.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Feb 2023 06:30:19 -0800 (PST)
-Message-ID: <ce42e852-fb73-08ca-48c7-9826ab087289@linaro.org>
-Date:   Thu, 9 Feb 2023 16:30:17 +0200
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MbWLhbQ1oLHaC5/TrUb8e0wMYld1xFo1o68FvY00M5I=;
+ b=iT6/yXhQ+1XS8eYtSVuoWpJz4KPS8RWELj4SoNBWdhDJyZFgZbxmxE91Ui/icrP40+xNFfdpu3ynb9eDrvsE25fM5g0pJorCN4gs7j5Id1EEdSPGV56XTMFswk2menA9sL2DEgQAAwOdkecg8U5M9oo7a8yECL8OaXjIvR9/rPM=
+Received: from PH7PR10MB5698.namprd10.prod.outlook.com (2603:10b6:510:126::18)
+ by CO1PR10MB4499.namprd10.prod.outlook.com (2603:10b6:303:6d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6086.19; Thu, 9 Feb
+ 2023 15:20:08 +0000
+Received: from PH7PR10MB5698.namprd10.prod.outlook.com
+ ([fe80::ae2:4810:d708:fe8b]) by PH7PR10MB5698.namprd10.prod.outlook.com
+ ([fe80::ae2:4810:d708:fe8b%2]) with mapi id 15.20.6086.019; Thu, 9 Feb 2023
+ 15:20:08 +0000
+Date:   Thu, 9 Feb 2023 10:20:04 -0500
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+        netdev@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org, Mukesh Ojha <quic_mojha@quicinc.com>
+Subject: Re: [PATCH 03/24] Documentation: core-api: correct spelling
+Message-ID: <20230209152004.n2tk5wr4exnah7xt@parnassus.localdomain>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
+ <20230209071400.31476-4-rdunlap@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209071400.31476-4-rdunlap@infradead.org>
+X-ClientProxiedBy: MN2PR20CA0065.namprd20.prod.outlook.com
+ (2603:10b6:208:235::34) To PH7PR10MB5698.namprd10.prod.outlook.com
+ (2603:10b6:510:126::18)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v9 11/14] arm64: dts: qcom: sm8250: add description of
- Qualcomm Crypto Engine IP
-Content-Language: en-US
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
- <20230208183755.2907771-12-vladimir.zapolskiy@linaro.org>
- <7b38331c-3b29-03c1-fbed-f5799d11ca1f@linaro.org>
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-In-Reply-To: <7b38331c-3b29-03c1-fbed-f5799d11ca1f@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR10MB5698:EE_|CO1PR10MB4499:EE_
+X-MS-Office365-Filtering-Correlation-Id: 555003b2-aac9-4d00-b9ce-08db0ab1210a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7zYaqb5RtZsqJJYXUAlx4xb5Otnbe4XGFPNL+Ts6VmfUKqYS+O/owdtgbCDK3D1Du2lhH5jm0Z/018/WHYigYEvQj0S+kUQbZuw+h2tBMeKj+6Mei8hfEpF45KRU6ZVppHhg9kjaoTGNrlfgCXCKh0/AUMhRN6+gp+s3Ey3M2wD8FUWuWa6shv/QBnZ3knBX2RvWqV++VTSS9coy51Y+BvQWIahF+yk6lEag7Fha6JEC1UEefpxoxpjHZ+/Sn57twsGxgoWzpQEWHGsEUWjKPp/x7o1Fe1ikVuP6Xl/YbVD7kiMOmH2tmMtBtIbJnl3hxnGj5qLHNXzhzN5G07IjIFCZfWsocK0YTfLuLF44BM/nIzmg11pia+Czzy2SBAo4oegCP97GUiReGaR9VjH4R/4CltdMOrtgbp9lC9S9wOQORU097ThFcy3p1s945aC2SV9HUyvcZIiEUWOTQLPAdFSUXciJz407PtE3Eo3gmuvYcOJgu8EclVED78jfpkiPhDHu0zHRmHXDw05YDSieCK2T2q9Xqhxl2aD2OUfocTXAnw1HiO8xX2GLfdBXlwx/7AcAO1NMWvN2R+XPugsihf8IsPVCVK9OkpIFFq0P4vbRS8RzeYFYrqYHYsxnwn/pGoA+3WmhgKXfJJv2oW8bqa+q32ASNzhd6fnublKsOPd5gRXgJ4hYf2pKHs1kmYHs
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR10MB5698.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(396003)(366004)(376002)(136003)(346002)(451199018)(83380400001)(2906002)(26005)(186003)(6916009)(9686003)(6512007)(6506007)(6666004)(1076003)(8936002)(4326008)(5660300002)(41300700001)(8676002)(6486002)(478600001)(86362001)(38100700002)(66946007)(66556008)(316002)(66476007)(54906003)(21314003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LNQvphLeVqWHU7Qclwcs3LCMXjFAc7sfPTk6ky+gmDSJu8wvT9AArlf1CWLh?=
+ =?us-ascii?Q?9EI2HEDIYA+hNhUNhiwchkPicO66883FVWVvex+fciSax9WBO0midqcC/ARK?=
+ =?us-ascii?Q?by+y/lWtR8HCyaibY36OPbKWy5Yy59b18b+jO0HdhpTh4A39HHFIgrPrOJ0d?=
+ =?us-ascii?Q?e5jzFzMNTihbvDBJuKhgUv97ZtpF9NR7ozJjpTPhGj5rBClTSv0cyiZGx0fO?=
+ =?us-ascii?Q?5lSmDIwfYxPXoTMiCee7qlFwDrJCOWy4YHl0UJkQcAVkjr8G6vt8Tx3ePWag?=
+ =?us-ascii?Q?hPHu3YW8rlh8oZhOPe5yOIVj9amNnHziiD46MRyvFiRMp3ZE2o4HKli+Tlk6?=
+ =?us-ascii?Q?co+f69U3NwpnbdYHabqmMq659SjnhQDWYEGHjfV/+yTH6WwiWFaZIYuNBDqR?=
+ =?us-ascii?Q?ySWKJO8GPRFRI42LyyfpXcJd6EA9ngZfZV9bc6BUWfk4PRzNT3438K4M++c3?=
+ =?us-ascii?Q?U/Cu6wSEhQ1uKNiNghLVVqI36Wg+NMKsy3KQx7v24aT5+IYzxI9uoCFdooqi?=
+ =?us-ascii?Q?OWRFG/eApossPez35QueK7QqydkS+cfmdsqd1aU3AOmPWs+zxWHwL9glxUNU?=
+ =?us-ascii?Q?yeUukkW4/07XeFx1KsAlRc4oerG27BW6Jao3jOtPHTJaMXzrbA8+YO4rLZwF?=
+ =?us-ascii?Q?pzSWxCGss4ABc+mZpx8huAHCuPvV9BXdEek86Qi/0VjVBP0jYLzV85FITE/s?=
+ =?us-ascii?Q?9Va1QeHyqQuztWCn/eu5FK6AYWwN7ngxv36m+U2AeLHPYAifiEkQ0Fax0jNO?=
+ =?us-ascii?Q?tDKSRKLhjNxlB8BEzLRXuUQ8+KiDYveuryxqQsVnTLbdf3sR6RNxQtoSfCX0?=
+ =?us-ascii?Q?1MIYD06EfzYnGySerQGLVP/DL1Hek+0l+gChCj4J5n49sDnV3Upmjfhq9hN5?=
+ =?us-ascii?Q?IMLso9GB+pEHOZ2Le8GUIhMWmv2HgcCjVsVTnaVqgHiw1R44qosw9bAYLYoY?=
+ =?us-ascii?Q?fiH0d9oZQm0l4Y8jBLlunf5DSujMB6qQDTtx0Bry5oWRWnSlRnHxfI0XkZRM?=
+ =?us-ascii?Q?xZdt2R7OrMJOn7oFedufCrC/dW1cPATT4svBqu9N3VJqEdnatrTeJQygUBF2?=
+ =?us-ascii?Q?BboiPDLiwhe+PnDcMrUi/Ub4FOdZ8V84XRN/+HKfLb4nJKJj8/luhlOod2+R?=
+ =?us-ascii?Q?58IQ5TkHh1lYHP2KtZfYluOccZvcVlzSvPZ86dn2s5BZfyofzMT2fKf01cIm?=
+ =?us-ascii?Q?f1+doLV35pW0baKEu5t15m6n/tgPQqf2FZJvJ/AOjfyuxwsEKAv29/6lGBM6?=
+ =?us-ascii?Q?7/LnXtYGuLXiiVjeK0NOsQ0C8RDy6f4bNmCYkVtfVBHoOeCPQIdiuiNwrlOy?=
+ =?us-ascii?Q?y7HAV6EleWMc4wTExIJgVjO+X3zLEMj8MrnbX/2ug6opq1vW1BOMT+qN92wN?=
+ =?us-ascii?Q?H/HdH9vt4nvTRPoTijw78ZxvWZz2s/WPM+1oINF167Vr9a3QpdKgWRgKhAqI?=
+ =?us-ascii?Q?S9hxBw9z4Oc5ITgGmJqtihuTsu+lQUhQKpy2idM1CEFFJuvWOxHx94FnKsgh?=
+ =?us-ascii?Q?9Xv2+1GBrqc/RZg0hniORy5SCW6cphWHpxn0aVyLgIdmaNmiCYwXGvlhBxad?=
+ =?us-ascii?Q?n43QCEbupGOQyWzhb47W8vzrTfKInQS+PxCwYbGBzcyh2YNb+B9iW+x2iTHR?=
+ =?us-ascii?Q?hQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: zFak8G4H9RFu1zAlnwwlWr+GM14t7KQSrm/WFpHzesdGHPH/K6xuSkNc7Ef2/k4fL/ijVklfJJSXjUlLHmy012atvckUcu4CNPzaH07OnjC9BME7wIee5xry1EOIgwCa+slwHgLMeo+37W5g1tzCs+ABLj1mvxw9s1V0carfl1jGBEE3vV6Yznr0D+QfapEwEEgJwfWeqSIZxHvlV63vsDRdIbiDyBmEbJJGZCIcjG+FbURfo264uBENUH1OxpjPXMfiXeB8Ujk5cdlbASrUcs+27jspJXpMZ9CpGjSOJCLw0mbdKQdlJmr3q77YBzeMKAq/271bVm2GTm9JBntHfc+T5XjZclX8apgkcfrv4GFfELGB/UDJW8HI6JnHCRSiodAW5u901WYab8A79B4yieqIj1xsrTZxK88d/qVLzLIFhfJ+gKThpwRdeZmrHolccuwWxlGQqLX6P9v2ZyVdqHHJICkFu2K5g6H6CBqqh6D/aAO5VQU7ld94iDUJ0i5XpfdY9ofTqSxIRqMhwO6aEqciyABUDhZJzYIAqmTd0XIOn6NmKpv9Nq9V6d1pmLmhz4DFyvm4R04gHUlKWAlho9VLNwJTVPQTddfUIWADFWr2Noe+HkK3UYbT0dKSny/xi/jKyOoxurWOL3msC5H3cP5iPC0g8vOVGS7O6giue8eVlJNAiA0kM6pgtiBmD0IyO2h1diWaH4DQh+gT0ueAAy0pJ2ibMS2TrIHsUZrmLy6cQcFtzUzYIjWrrehDqaW440tJG6TRiRsZZAXZq3AXeb27Fp5LX0zorRsDKIXS35qZH/WNMyiVo6XFcyFWEnN+GuzqfH6APMV9J6pSuSE061jog6RliIqFzjmtyA6mWsyzrN7/9SBNnK3FsrMuxHtT13wF7jOthbmOgPb/QxzVmg==
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 555003b2-aac9-4d00-b9ce-08db0ab1210a
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR10MB5698.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2023 15:20:08.4928
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rSjxS6fBLe9PZdzECAsRyWHKaAD/85Hn8MGinjmGhuNoNHG1gpI7oTfAmOP0uI6GSIhkymCA1ss6HpHrD7dPPxVfI07TP8vky8Wztg2kc5E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4499
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-09_11,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ adultscore=0 phishscore=0 suspectscore=0 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302090146
+X-Proofpoint-GUID: uKHdDLTjp1l41sppSd1WbJdLamaQofmH
+X-Proofpoint-ORIG-GUID: uKHdDLTjp1l41sppSd1WbJdLamaQofmH
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bhupesh,
-
-On 2/9/23 14:21, Bhupesh Sharma wrote:
-> Hi Vladimir,
+On Wed, Feb 08, 2023 at 11:13:39PM -0800, Randy Dunlap wrote:
+> Correct spelling problems for Documentation/core-api/ as reported
+> by codespell.
 > 
-> On 2/9/23 12:07 AM, Vladimir Zapolskiy wrote:
->> Add description of QCE and its corresponding BAM DMA IPs on SM8250 SoC.
->>
->> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
->> ---
->>    arch/arm64/boot/dts/qcom/sm8250.dtsi | 24 ++++++++++++++++++++++++
->>    1 file changed, 24 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
->> index e59c16f74d17..d8698d18223e 100644
->> --- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
->> @@ -2215,6 +2215,30 @@ ufs_mem_phy_lanes: phy@1d87400 {
->>    			};
->>    		};
->>    
->> +		cryptobam: dma-controller@1dc4000 {
->> +			compatible = "qcom,bam-v1.7.0";
->> +			reg = <0x0 0x01dc4000 0x0 0x24000>;
->> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
->> +			#dma-cells = <1>;
->> +			qcom,ee = <0>;
->> +			qcom,controlled-remotely;
->> +			num-channels = <8>;
->> +			qcom,num-ees = <2>;
->> +			iommus = <&apps_smmu 0x586 0x11>,
->> +				 <&apps_smmu 0x596 0x11>;
->> +		};
->> +
->> +		crypto: crypto@1dfa000 {
->> +			compatible = "qcom,sm8250-qce", "qcom,sm8150-qce";
->> +			reg = <0x0 0x01dfa000 0x0 0x6000>;
->> +			dmas = <&cryptobam 6>, <&cryptobam 7>;
->> +			dma-names = "rx", "tx";
->> +			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
->> +			interconnect-names = "memory";
->> +			iommus = <&apps_smmu 0x586 0x11>,
->> +				 <&apps_smmu 0x596 0x11>;
->> +		};
->> +
->>    		tcsr_mutex: hwlock@1f40000 {
->>    			compatible = "qcom,tcsr-mutex";
->>    			reg = <0x0 0x01f40000 0x0 0x40000>;
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Vladimir Oltean <olteanv@gmail.com>
+> Cc: netdev@vger.kernel.org
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: linux-doc@vger.kernel.org
+> Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
+
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+
+> ---
+>  Documentation/core-api/packing.rst |    2 +-
+>  Documentation/core-api/padata.rst  |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> This patch was part of the v7 arm64 dts fixes I sent out - see [1].
-
-thank you for pointing it out, so there are two different v7 series of related
-patches, as it's stated in the cover letter I based my v8 on top of linux-crypto
-changes [*], and this particular change was developed independently from yours.
-
-And so, there are some differences, can you please comment on them?
-
-- My change does not have 'interconnects' property under dma-controller@1dc4000
-   device tree node, I believe it is not needed, but please correct me here.
-- My change uses DMA channel number taken from the downstream code [**], is
-   there a reason to use different ones like in your change?
-- My change has a shorter list of IOMMUs also copied from the same downstream
-   code, is there a reason to use a different extended list like in your change?
-- On my end I have to retest your change without 'num-channels' and 'qcom,num-ees'
-   properties, since this also seems as an important difference between two patches.
-
-Nevertheless, thank you again for bringing my attention to a different patch
-series, I'll reuse the changes from it, and also publish all of them together and
-in a separate changeset as Krzysztof suggested.
-
-> Probably you can use it as a base and make the changes (interconnect
-> property for the BAM DMA node and qce-compatible names) directly there
-> and include it in your patch series.
-
-[*]  https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org/
-[**] https://source.codeaurora.org/quic/la/kernel/msm-4.19/tree/arch/arm64/boot/dts/qcom/kona.dtsi?h=LA.UM.8.12.3.1&id=f3dd4aaeb34438c877ccd42f5a48ccd554dd765a#n2979
-
-> [1].
-> https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-3-bhupesh.sharma@linaro.org/
-
---
-Best wishes,
-Vladimir
+> diff -- a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
+> --- a/Documentation/core-api/packing.rst
+> +++ b/Documentation/core-api/packing.rst
+> @@ -161,6 +161,6 @@ xxx_packing() that calls it using the pr
+>  
+>  The packing() function returns an int-encoded error code, which protects the
+>  programmer against incorrect API use.  The errors are not expected to occur
+> -durring runtime, therefore it is reasonable for xxx_packing() to return void
+> +during runtime, therefore it is reasonable for xxx_packing() to return void
+>  and simply swallow those errors. Optionally it can dump stack or print the
+>  error description.
+> diff -- a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
+> --- a/Documentation/core-api/padata.rst
+> +++ b/Documentation/core-api/padata.rst
+> @@ -42,7 +42,7 @@ padata_shells associated with it, each a
+>  Modifying cpumasks
+>  ------------------
+>  
+> -The CPUs used to run jobs can be changed in two ways, programatically with
+> +The CPUs used to run jobs can be changed in two ways, programmatically with
+>  padata_set_cpumask() or via sysfs.  The former is defined::
+>  
+>      int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
