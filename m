@@ -2,64 +2,136 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DC8C6379F
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 11:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E298C05027
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 12:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbjBILNA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Feb 2023 06:13:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38488 "EHLO
+        id S229582AbjBIMV3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Feb 2023 07:21:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjBILMy (ORCPT
+        with ESMTP id S229482AbjBIMV2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 06:12:54 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA974C1F;
-        Thu,  9 Feb 2023 03:12:51 -0800 (PST)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4PCDgK1Fqsz16NVF;
-        Thu,  9 Feb 2023 19:10:37 +0800 (CST)
-Received: from [10.67.101.184] (10.67.101.184) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Thu, 9 Feb 2023 19:12:49 +0800
-Subject: Re: [PATCH 2/5] crypto: hisilicon/qm - change data type in min_t
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-References: <20230203093730.49314-1-qianweili@huawei.com>
- <20230203093730.49314-3-qianweili@huawei.com>
- <Y+S9kS8cElGRGysn@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
-From:   Weili Qian <qianweili@huawei.com>
-Message-ID: <658e62e1-2337-32df-3641-03a4789f30a0@huawei.com>
-Date:   Thu, 9 Feb 2023 19:12:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        Thu, 9 Feb 2023 07:21:28 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96C41BCA
+        for <linux-crypto@vger.kernel.org>; Thu,  9 Feb 2023 04:21:25 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id s8so1418378pgg.11
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Feb 2023 04:21:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7kOs7sC2FIm1iO3NpfdUuEs1p01vyNH33hBJhAwcmDs=;
+        b=XzCnCXQbk+rtSUDcAJUcX9DuqzMGcSpXXwhzAl0BTT3YIu2j0ohJUqEFakrMMqZQRv
+         MSx03y1VRxwRrJxkmwyA2im7SMKM/7/iiZss5OxproE7UBewoCQw6QBn/CqClv7VLpzY
+         m4tVFXJheNgKIaWdnoSGIaARzhoTijEI0ORHt3KUwqCfqweAInum/9lNoioyA65bSCVP
+         MXNsILXzs6oitTz43SAPvrOUkYFf4tu+HTGx73MJNOaeziLLDMNlf6f2oq1kTkhxG/ne
+         s0PcbrBXH3g1OsaEo+BQDGjv79qz0mIiaVaw4gtViqkTBdsO2lj/dBCNT5B8K2wQT7hE
+         gZZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7kOs7sC2FIm1iO3NpfdUuEs1p01vyNH33hBJhAwcmDs=;
+        b=8Epus/NVrnTHGBxxgKUwHIf6tHHe9tBOYFLpHo17iUN/4T/dOTQeoTWW+GcmXhf1+P
+         llsmD4tgNH4bJs0bo29Nn84sy4xOtWlzIklIptCfnA8DnAYLhyQMu6OBhlac8ucvUzr0
+         gqhsd/Xxru52CYcV5EVEp/lT4FHHC4OVmfECRzRRR7k8nnB+5DO8jEb8wO3WwiO8+ZCF
+         SsgPrDoa3PCnUrpMPzNYYcw11khz0Pmnz1P+bPnEClVxJOkOYV7z9Ymh6WVUhBhkmUVP
+         75FCC31jxWImSq8KcVzlZzGDvf47ong0Ak7GL0qH77iDUAF+QRYpifWDuRP8eUuippdZ
+         xFzg==
+X-Gm-Message-State: AO0yUKU7hCJaOM4gmPYaIC3vh41rhQGSA3vjmdz2UV3/ELj4FYkOQcp+
+        EIexzOlbs8MVcgz/7WhOhdB+Nw==
+X-Google-Smtp-Source: AK7set8GpSN1A9MlZL+SCVntv8ObFNFEyzB5vL4OhjfjJspfRANTpB/kHJZkd63/tWMV4Rai1Xofsg==
+X-Received: by 2002:a62:5243:0:b0:5a8:5271:5a2e with SMTP id g64-20020a625243000000b005a852715a2emr1651099pfb.0.1675945285249;
+        Thu, 09 Feb 2023 04:21:25 -0800 (PST)
+Received: from ?IPV6:2401:4900:1c5f:7a7d:9c44:b2ee:ae34:5374? ([2401:4900:1c5f:7a7d:9c44:b2ee:ae34:5374])
+        by smtp.gmail.com with ESMTPSA id e22-20020aa78256000000b00592626fe48csm1278584pfn.122.2023.02.09.04.21.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Feb 2023 04:21:24 -0800 (PST)
+Message-ID: <7b38331c-3b29-03c1-fbed-f5799d11ca1f@linaro.org>
+Date:   Thu, 9 Feb 2023 17:51:19 +0530
 MIME-Version: 1.0
-In-Reply-To: <Y+S9kS8cElGRGysn@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v9 11/14] arm64: dts: qcom: sm8250: add description of
+ Qualcomm Crypto Engine IP
+To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
+ <20230208183755.2907771-12-vladimir.zapolskiy@linaro.org>
+Content-Language: en-US
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+In-Reply-To: <20230208183755.2907771-12-vladimir.zapolskiy@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.101.184]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Vladimir,
 
-
-On 2023/2/9 17:32, Herbert Xu wrote:
-> On Fri, Feb 03, 2023 at 05:37:27PM +0800, Weili Qian wrote:
->> 'act_q_num = min_t(int, act_q_num, max_qp_num)', 'act_q_num'
->> and 'max_qp_num' are 'u32' type, change min_t() to use 'u32'
->> type instead of 'int'.
+On 2/9/23 12:07 AM, Vladimir Zapolskiy wrote:
+> Add description of QCE and its corresponding BAM DMA IPs on SM8250 SoC.
 > 
-> If they are of the same type, why not just do min?
+> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+> ---
+>   arch/arm64/boot/dts/qcom/sm8250.dtsi | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
 > 
-> Thanks,
-> 
+> diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
+> index e59c16f74d17..d8698d18223e 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
+> @@ -2215,6 +2215,30 @@ ufs_mem_phy_lanes: phy@1d87400 {
+>   			};
+>   		};
+>   
+> +		cryptobam: dma-controller@1dc4000 {
+> +			compatible = "qcom,bam-v1.7.0";
+> +			reg = <0x0 0x01dc4000 0x0 0x24000>;
+> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells = <1>;
+> +			qcom,ee = <0>;
+> +			qcom,controlled-remotely;
+> +			num-channels = <8>;
+> +			qcom,num-ees = <2>;
+> +			iommus = <&apps_smmu 0x586 0x11>,
+> +				 <&apps_smmu 0x596 0x11>;
+> +		};
+> +
+> +		crypto: crypto@1dfa000 {
+> +			compatible = "qcom,sm8250-qce", "qcom,sm8150-qce";
+> +			reg = <0x0 0x01dfa000 0x0 0x6000>;
+> +			dmas = <&cryptobam 6>, <&cryptobam 7>;
+> +			dma-names = "rx", "tx";
+> +			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
+> +			interconnect-names = "memory";
+> +			iommus = <&apps_smmu 0x586 0x11>,
+> +				 <&apps_smmu 0x596 0x11>;
+> +		};
+> +
+>   		tcsr_mutex: hwlock@1f40000 {
+>   			compatible = "qcom,tcsr-mutex";
+>   			reg = <0x0 0x01f40000 0x0 0x40000>;
 
-Thanks for your reminder. I will fix it in next version.
+This patch was part of the v7 arm64 dts fixes I sent out - see [1].
+Probably you can use it as a base and make the changes (interconnect 
+property for the BAM DMA node and qce-compatible names) directly there
+and include it in your patch series.
 
-Best regards,
-Weili
+[1]. 
+https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-3-bhupesh.sharma@linaro.org/
+
+Thanks,
+Bhupesh
