@@ -2,276 +2,661 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB511C61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 07:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 539D1C636D4
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 07:47:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbjBIHO1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Feb 2023 02:14:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S229742AbjBIHrS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Feb 2023 02:47:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbjBIHOS (ORCPT
+        with ESMTP id S229739AbjBIHrQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 02:14:18 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C9942DC2;
-        Wed,  8 Feb 2023 23:14:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=hOwPtrFr9W1RAetj4yw8lS4WGxzVY9WeB5xiD+rtLZk=; b=YzYv5Lu+GhnsQWcrh/P3dNn99Y
-        kFFn/VTStVzrVt7izdrqqcFl3XXWJTiUSU7zkMNSHLZccvHB/fdFfsSF2G3d9l6tM8mZkGWrqFoL+
-        zV70haeTAUkVk/rmntIAjBbeTETDQ9gynZkiS5FkcxD5ysQrDwctOiqgUEqy0Xc8jqVEGJ0uWfK0f
-        t2HqZ/A6Oxx0EJl+SAADCmwyxjMuktOo75CIMUWNmk83r+Z+8eyEK1uwZEhembDTSx9i7ostc00tO
-        /jouGLzfxYzc3+YcINRJIpim6ul86T5PcNwp2g7wUJajkYggQ+pjUyATSgrXOBG/P/NTAUzC9nrO4
-        AJo7w9JQ==;
-Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pQ189-000LPt-4s; Thu, 09 Feb 2023 07:14:05 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        Helge Deller <deller@gmx.de>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Henrik Rydberg <rydberg@bitmath.org>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Jonas Bonn <jonas@southpole.se>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Stafford Horne <shorne@gmail.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Daniel Bristot de Oliveira <bristot@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Evgeniy Polyakov <zbr@ioremap.net>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>, coresight@lists.linaro.org,
-        dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-trace-devel@vger.kernel.org,
-        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-mm@kvack.org,
-        openrisc@lists.librecores.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
-        x86@kernel.org
-Subject: [PATCH 00/24 v2] Documentation: correct lots of spelling errors (series 1)
-Date:   Wed,  8 Feb 2023 23:13:36 -0800
-Message-Id: <20230209071400.31476-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.39.1
+        Thu, 9 Feb 2023 02:47:16 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00DE244B1
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Feb 2023 23:47:11 -0800 (PST)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1pQ1dS-0004fZ-Fe; Thu, 09 Feb 2023 08:46:26 +0100
+Message-ID: <da51fd69-e3e8-510c-00b1-b5213d0696b1@pengutronix.de>
+Date:   Thu, 9 Feb 2023 08:46:20 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [Linux-stm32] [PATCH v3 6/6] ARM: dts: stm32: add ETZPC as a
+ system bus for STM32MP13x boards
+Content-Language: en-US
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
+        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
+        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
+        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc:     devicetree@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-serial@vger.kernel.org, dmaengine@vger.kernel.org,
+        linux-media@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
+References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
+ <20230127164040.1047583-7-gatien.chevallier@foss.st.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20230127164040.1047583-7-gatien.chevallier@foss.st.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Correct many spelling errors in Documentation/ as reported by codespell.
+Hello Gatien,
 
-Maintainers of specific kernel subsystems are only Cc-ed on their
-respective patches, not the entire series.
+On 27.01.23 17:40, Gatien Chevallier wrote:
+> The STM32 System Bus is an internal bus on which devices are connected.
+> ETZPC is a peripheral overseeing the firewall bus that configures
+> and control access to the peripherals connected on it.
+> 
+> For more information on which peripheral is securable, please read
+> the STM32MP13 reference manual.
 
-These patches are based on linux-next-20230209.
+Diff is way too big. Please split up the alphabetic reordering into its
+own commit, so actual functional changes are apparent.
 
+Thanks,
+Ahmad
 
- [PATCH 01/24] Documentation: arm: correct spelling
- [PATCH 02/24] Documentation: block: correct spelling
- [PATCH 03/24] Documentation: core-api: correct spelling
- [PATCH 04/24] Documentation: fault-injection: correct spelling
- [PATCH 05/24] Documentation: fb: correct spelling
- [PATCH 06/24] Documentation: features: correct spelling
- [PATCH 07/24] Documentation: input: correct spelling
- [PATCH 08/24] Documentation: isdn: correct spelling
- [PATCH 09/24] Documentation: livepatch: correct spelling
- [PATCH 10/24] Documentation: locking: correct spelling
- [PATCH 11/24] Documentation: mm: correct spelling
- [PATCH 12/24] Documentation: openrisc: correct spelling
- [PATCH 13/24] Documentation: PCI: correct spelling
- [PATCH 14/24] Documentation: powerpc: correct spelling
- [PATCH 15/24] Documentation: s390: correct spelling
- [PATCH 16/24] Documentation: scheduler: correct spelling
- [PATCH 17/24] Documentation: security: correct spelling
- [PATCH 18/24] Documentation: timers: correct spelling
- [PATCH 19/24] Documentation: tools/rtla: correct spelling
- [PATCH 20/24] Documentation: trace/rv: correct spelling
- [PATCH 21/24] Documentation: trace: correct spelling
- [PATCH 22/24] Documentation: w1: correct spelling
- [PATCH 23/24] Documentation: x86: correct spelling
- [PATCH 24/24] Documentation: xtensa: correct spelling
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+> 
+> No changes in V2.
+> 
+> Changes in V3:
+> 	-Use appriopriate node name: bus
+> 
+>  arch/arm/boot/dts/stm32mp131.dtsi  | 407 +++++++++++++++--------------
+>  arch/arm/boot/dts/stm32mp133.dtsi  |  51 ++--
+>  arch/arm/boot/dts/stm32mp13xc.dtsi |  19 +-
+>  arch/arm/boot/dts/stm32mp13xf.dtsi |  18 +-
+>  4 files changed, 258 insertions(+), 237 deletions(-)
+> 
+> diff --git a/arch/arm/boot/dts/stm32mp131.dtsi b/arch/arm/boot/dts/stm32mp131.dtsi
+> index accc3824f7e9..24462a647101 100644
+> --- a/arch/arm/boot/dts/stm32mp131.dtsi
+> +++ b/arch/arm/boot/dts/stm32mp131.dtsi
+> @@ -253,148 +253,6 @@ dmamux1: dma-router@48002000 {
+>  			dma-channels = <16>;
+>  		};
+>  
+> -		adc_2: adc@48004000 {
+> -			compatible = "st,stm32mp13-adc-core";
+> -			reg = <0x48004000 0x400>;
+> -			interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc ADC2>, <&rcc ADC2_K>;
+> -			clock-names = "bus", "adc";
+> -			interrupt-controller;
+> -			#interrupt-cells = <1>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			status = "disabled";
+> -
+> -			adc2: adc@0 {
+> -				compatible = "st,stm32mp13-adc";
+> -				#io-channel-cells = <1>;
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -				reg = <0x0>;
+> -				interrupt-parent = <&adc_2>;
+> -				interrupts = <0>;
+> -				dmas = <&dmamux1 10 0x400 0x80000001>;
+> -				dma-names = "rx";
+> -				status = "disabled";
+> -
+> -				channel@13 {
+> -					reg = <13>;
+> -					label = "vrefint";
+> -				};
+> -				channel@14 {
+> -					reg = <14>;
+> -					label = "vddcore";
+> -				};
+> -				channel@16 {
+> -					reg = <16>;
+> -					label = "vddcpu";
+> -				};
+> -				channel@17 {
+> -					reg = <17>;
+> -					label = "vddq_ddr";
+> -				};
+> -			};
+> -		};
+> -
+> -		usbotg_hs: usb@49000000 {
+> -			compatible = "st,stm32mp15-hsotg", "snps,dwc2";
+> -			reg = <0x49000000 0x40000>;
+> -			clocks = <&rcc USBO_K>;
+> -			clock-names = "otg";
+> -			resets = <&rcc USBO_R>;
+> -			reset-names = "dwc2";
+> -			interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
+> -			g-rx-fifo-size = <512>;
+> -			g-np-tx-fifo-size = <32>;
+> -			g-tx-fifo-size = <256 16 16 16 16 16 16 16>;
+> -			dr_mode = "otg";
+> -			otg-rev = <0x200>;
+> -			usb33d-supply = <&usb33>;
+> -			status = "disabled";
+> -		};
+> -
+> -		spi4: spi@4c002000 {
+> -			compatible = "st,stm32h7-spi";
+> -			reg = <0x4c002000 0x400>;
+> -			interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc SPI4_K>;
+> -			resets = <&rcc SPI4_R>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			dmas = <&dmamux1 83 0x400 0x01>,
+> -			       <&dmamux1 84 0x400 0x01>;
+> -			dma-names = "rx", "tx";
+> -			status = "disabled";
+> -		};
+> -
+> -		spi5: spi@4c003000 {
+> -			compatible = "st,stm32h7-spi";
+> -			reg = <0x4c003000 0x400>;
+> -			interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc SPI5_K>;
+> -			resets = <&rcc SPI5_R>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			dmas = <&dmamux1 85 0x400 0x01>,
+> -			       <&dmamux1 86 0x400 0x01>;
+> -			dma-names = "rx", "tx";
+> -			status = "disabled";
+> -		};
+> -
+> -		i2c3: i2c@4c004000 {
+> -			compatible = "st,stm32mp13-i2c";
+> -			reg = <0x4c004000 0x400>;
+> -			interrupt-names = "event", "error";
+> -			interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>,
+> -				     <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc I2C3_K>;
+> -			resets = <&rcc I2C3_R>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			dmas = <&dmamux1 73 0x400 0x1>,
+> -			       <&dmamux1 74 0x400 0x1>;
+> -			dma-names = "rx", "tx";
+> -			st,syscfg-fmp = <&syscfg 0x4 0x4>;
+> -			i2c-analog-filter;
+> -			status = "disabled";
+> -		};
+> -
+> -		i2c4: i2c@4c005000 {
+> -			compatible = "st,stm32mp13-i2c";
+> -			reg = <0x4c005000 0x400>;
+> -			interrupt-names = "event", "error";
+> -			interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+> -				     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc I2C4_K>;
+> -			resets = <&rcc I2C4_R>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			dmas = <&dmamux1 75 0x400 0x1>,
+> -			       <&dmamux1 76 0x400 0x1>;
+> -			dma-names = "rx", "tx";
+> -			st,syscfg-fmp = <&syscfg 0x4 0x8>;
+> -			i2c-analog-filter;
+> -			status = "disabled";
+> -		};
+> -
+> -		i2c5: i2c@4c006000 {
+> -			compatible = "st,stm32mp13-i2c";
+> -			reg = <0x4c006000 0x400>;
+> -			interrupt-names = "event", "error";
+> -			interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
+> -				     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc I2C5_K>;
+> -			resets = <&rcc I2C5_R>;
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			dmas = <&dmamux1 115 0x400 0x1>,
+> -			       <&dmamux1 116 0x400 0x1>;
+> -			dma-names = "rx", "tx";
+> -			st,syscfg-fmp = <&syscfg 0x4 0x10>;
+> -			i2c-analog-filter;
+> -			status = "disabled";
+> -		};
+> -
+>  		rcc: rcc@50000000 {
+>  			compatible = "st,stm32mp13-rcc", "syscon";
+>  			reg = <0x50000000 0x1000>;
+> @@ -431,34 +289,6 @@ mdma: dma-controller@58000000 {
+>  			dma-requests = <48>;
+>  		};
+>  
+> -		sdmmc1: mmc@58005000 {
+> -			compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+> -			arm,primecell-periphid = <0x20253180>;
+> -			reg = <0x58005000 0x1000>, <0x58006000 0x1000>;
+> -			interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc SDMMC1_K>;
+> -			clock-names = "apb_pclk";
+> -			resets = <&rcc SDMMC1_R>;
+> -			cap-sd-highspeed;
+> -			cap-mmc-highspeed;
+> -			max-frequency = <130000000>;
+> -			status = "disabled";
+> -		};
+> -
+> -		sdmmc2: mmc@58007000 {
+> -			compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+> -			arm,primecell-periphid = <0x20253180>;
+> -			reg = <0x58007000 0x1000>, <0x58008000 0x1000>;
+> -			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc SDMMC2_K>;
+> -			clock-names = "apb_pclk";
+> -			resets = <&rcc SDMMC2_R>;
+> -			cap-sd-highspeed;
+> -			cap-mmc-highspeed;
+> -			max-frequency = <130000000>;
+> -			status = "disabled";
+> -		};
+> -
+>  		usbh_ohci: usb@5800c000 {
+>  			compatible = "generic-ohci";
+>  			reg = <0x5800c000 0x1000>;
+> @@ -486,29 +316,6 @@ iwdg2: watchdog@5a002000 {
+>  			status = "disabled";
+>  		};
+>  
+> -		usbphyc: usbphyc@5a006000 {
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -			#clock-cells = <0>;
+> -			compatible = "st,stm32mp1-usbphyc";
+> -			reg = <0x5a006000 0x1000>;
+> -			clocks = <&rcc USBPHY_K>;
+> -			resets = <&rcc USBPHY_R>;
+> -			vdda1v1-supply = <&reg11>;
+> -			vdda1v8-supply = <&reg18>;
+> -			status = "disabled";
+> -
+> -			usbphyc_port0: usb-phy@0 {
+> -				#phy-cells = <0>;
+> -				reg = <0>;
+> -			};
+> -
+> -			usbphyc_port1: usb-phy@1 {
+> -				#phy-cells = <1>;
+> -				reg = <1>;
+> -			};
+> -		};
+> -
+>  		rtc: rtc@5c004000 {
+>  			compatible = "st,stm32mp1-rtc";
+>  			reg = <0x5c004000 0x400>;
+> @@ -536,6 +343,220 @@ ts_cal2: calib@5e {
+>  			};
+>  		};
+>  
+> +		etzpc: bus@5c007000 {
+> +			compatible = "st,stm32mp13-sys-bus";
+> +			reg = <0x5c007000 0x400>;
+> +			#address-cells = <1>;
+> +			#size-cells = <1>;
+> +			feature-domain-controller;
+> +			#feature-domain-cells = <1>;
+> +			ranges;
+> +
+> +			adc_2: adc@48004000 {
+> +				compatible = "st,stm32mp13-adc-core";
+> +				reg = <0x48004000 0x400>;
+> +				interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc ADC2>, <&rcc ADC2_K>;
+> +				clock-names = "bus", "adc";
+> +				interrupt-controller;
+> +				#interrupt-cells = <1>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				feature-domains = <&etzpc 33>;
+> +				status = "disabled";
+> +
+> +				adc2: adc@0 {
+> +					compatible = "st,stm32mp13-adc";
+> +					#io-channel-cells = <1>;
+> +					#address-cells = <1>;
+> +					#size-cells = <0>;
+> +					reg = <0x0>;
+> +					interrupt-parent = <&adc_2>;
+> +					interrupts = <0>;
+> +					dmas = <&dmamux1 10 0x400 0x80000001>;
+> +					dma-names = "rx";
+> +					status = "disabled";
+> +
+> +					channel@13 {
+> +						reg = <13>;
+> +						label = "vrefint";
+> +					};
+> +					channel@14 {
+> +						reg = <14>;
+> +						label = "vddcore";
+> +					};
+> +					channel@16 {
+> +						reg = <16>;
+> +						label = "vddcpu";
+> +					};
+> +					channel@17 {
+> +						reg = <17>;
+> +						label = "vddq_ddr";
+> +					};
+> +				};
+> +			};
+> +
+> +			usbotg_hs: usb@49000000 {
+> +				compatible = "st,stm32mp15-hsotg", "snps,dwc2";
+> +				reg = <0x49000000 0x40000>;
+> +				clocks = <&rcc USBO_K>;
+> +				clock-names = "otg";
+> +				resets = <&rcc USBO_R>;
+> +				reset-names = "dwc2";
+> +				interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
+> +				g-rx-fifo-size = <512>;
+> +				g-np-tx-fifo-size = <32>;
+> +				g-tx-fifo-size = <256 16 16 16 16 16 16 16>;
+> +				dr_mode = "otg";
+> +				otg-rev = <0x200>;
+> +				usb33d-supply = <&usb33>;
+> +				feature-domains = <&etzpc 34>;
+> +				status = "disabled";
+> +			};
+> +
+> +			spi4: spi@4c002000 {
+> +				compatible = "st,stm32h7-spi";
+> +				reg = <0x4c002000 0x400>;
+> +				interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc SPI4_K>;
+> +				resets = <&rcc SPI4_R>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				dmas = <&dmamux1 83 0x400 0x01>,
+> +				       <&dmamux1 84 0x400 0x01>;
+> +				dma-names = "rx", "tx";
+> +				feature-domains = <&etzpc 18>;
+> +				status = "disabled";
+> +			};
+> +
+> +			spi5: spi@4c003000 {
+> +				compatible = "st,stm32h7-spi";
+> +				reg = <0x4c003000 0x400>;
+> +				interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc SPI5_K>;
+> +				resets = <&rcc SPI5_R>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				dmas = <&dmamux1 85 0x400 0x01>,
+> +				       <&dmamux1 86 0x400 0x01>;
+> +				dma-names = "rx", "tx";
+> +				feature-domains = <&etzpc 19>;
+> +				status = "disabled";
+> +			};
+> +
+> +			i2c3: i2c@4c004000 {
+> +				compatible = "st,stm32mp13-i2c";
+> +				reg = <0x4c004000 0x400>;
+> +				interrupt-names = "event", "error";
+> +				interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>,
+> +					     <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc I2C3_K>;
+> +				resets = <&rcc I2C3_R>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				dmas = <&dmamux1 73 0x400 0x1>,
+> +				       <&dmamux1 74 0x400 0x1>;
+> +				dma-names = "rx", "tx";
+> +				st,syscfg-fmp = <&syscfg 0x4 0x4>;
+> +				i2c-analog-filter;
+> +				feature-domains = <&etzpc 20>;
+> +				status = "disabled";
+> +			};
+> +
+> +			i2c4: i2c@4c005000 {
+> +				compatible = "st,stm32mp13-i2c";
+> +				reg = <0x4c005000 0x400>;
+> +				interrupt-names = "event", "error";
+> +				interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+> +					     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc I2C4_K>;
+> +				resets = <&rcc I2C4_R>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				dmas = <&dmamux1 75 0x400 0x1>,
+> +				       <&dmamux1 76 0x400 0x1>;
+> +				dma-names = "rx", "tx";
+> +				st,syscfg-fmp = <&syscfg 0x4 0x8>;
+> +				i2c-analog-filter;
+> +				feature-domains = <&etzpc 21>;
+> +				status = "disabled";
+> +			};
+> +
+> +			i2c5: i2c@4c006000 {
+> +				compatible = "st,stm32mp13-i2c";
+> +				reg = <0x4c006000 0x400>;
+> +				interrupt-names = "event", "error";
+> +				interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
+> +					     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc I2C5_K>;
+> +				resets = <&rcc I2C5_R>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				dmas = <&dmamux1 115 0x400 0x1>,
+> +				       <&dmamux1 116 0x400 0x1>;
+> +				dma-names = "rx", "tx";
+> +				st,syscfg-fmp = <&syscfg 0x4 0x10>;
+> +				i2c-analog-filter;
+> +				feature-domains = <&etzpc 22>;
+> +				status = "disabled";
+> +			};
+> +
+> +			sdmmc1: mmc@58005000 {
+> +				compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+> +				arm,primecell-periphid = <0x20253180>;
+> +				reg = <0x58005000 0x1000>, <0x58006000 0x1000>;
+> +				interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc SDMMC1_K>;
+> +				clock-names = "apb_pclk";
+> +				resets = <&rcc SDMMC1_R>;
+> +				cap-sd-highspeed;
+> +				cap-mmc-highspeed;
+> +				max-frequency = <130000000>;
+> +				feature-domains = <&etzpc 50>;
+> +				status = "disabled";
+> +			};
+> +
+> +			sdmmc2: mmc@58007000 {
+> +				compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+> +				arm,primecell-periphid = <0x20253180>;
+> +				reg = <0x58007000 0x1000>, <0x58008000 0x1000>;
+> +				interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
+> +				clocks = <&rcc SDMMC2_K>;
+> +				clock-names = "apb_pclk";
+> +				resets = <&rcc SDMMC2_R>;
+> +				cap-sd-highspeed;
+> +				cap-mmc-highspeed;
+> +				max-frequency = <130000000>;
+> +				feature-domains = <&etzpc 51>;
+> +				status = "disabled";
+> +			};
+> +
+> +			usbphyc: usbphyc@5a006000 {
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +				#clock-cells = <0>;
+> +				compatible = "st,stm32mp1-usbphyc";
+> +				reg = <0x5a006000 0x1000>;
+> +				clocks = <&rcc USBPHY_K>;
+> +				resets = <&rcc USBPHY_R>;
+> +				vdda1v1-supply = <&reg11>;
+> +				vdda1v8-supply = <&reg18>;
+> +				feature-domains = <&etzpc 5>;
+> +				status = "disabled";
+> +
+> +				usbphyc_port0: usb-phy@0 {
+> +					#phy-cells = <0>;
+> +					reg = <0>;
+> +				};
+> +
+> +				usbphyc_port1: usb-phy@1 {
+> +					#phy-cells = <1>;
+> +					reg = <1>;
+> +				};
+> +			};
+> +
+> +		};
+> +
+>  		/*
+>  		 * Break node order to solve dependency probe issue between
+>  		 * pinctrl and exti.
+> diff --git a/arch/arm/boot/dts/stm32mp133.dtsi b/arch/arm/boot/dts/stm32mp133.dtsi
+> index df451c3c2a26..be6061552683 100644
+> --- a/arch/arm/boot/dts/stm32mp133.dtsi
+> +++ b/arch/arm/boot/dts/stm32mp133.dtsi
+> @@ -33,35 +33,38 @@ m_can2: can@4400f000 {
+>  			bosch,mram-cfg = <0x1400 0 0 32 0 0 2 2>;
+>  			status = "disabled";
+>  		};
+> +	};
+> +};
+>  
+> -		adc_1: adc@48003000 {
+> -			compatible = "st,stm32mp13-adc-core";
+> -			reg = <0x48003000 0x400>;
+> -			interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc ADC1>, <&rcc ADC1_K>;
+> -			clock-names = "bus", "adc";
+> -			interrupt-controller;
+> -			#interrupt-cells = <1>;
+> +&etzpc {
+> +	adc_1: adc@48003000 {
+> +		compatible = "st,stm32mp13-adc-core";
+> +		reg = <0x48003000 0x400>;
+> +		interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&rcc ADC1>, <&rcc ADC1_K>;
+> +		clock-names = "bus", "adc";
+> +		interrupt-controller;
+> +		#interrupt-cells = <1>;
+> +		#address-cells = <1>;
+> +		#size-cells = <0>;
+> +		feature-domains = <&etzpc 32>;
+> +		status = "disabled";
+> +
+> +		adc1: adc@0 {
+> +			compatible = "st,stm32mp13-adc";
+> +			#io-channel-cells = <1>;
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+> +			reg = <0x0>;
+> +			interrupt-parent = <&adc_1>;
+> +			interrupts = <0>;
+> +			dmas = <&dmamux1 9 0x400 0x80000001>;
+> +			dma-names = "rx";
+>  			status = "disabled";
+>  
+> -			adc1: adc@0 {
+> -				compatible = "st,stm32mp13-adc";
+> -				#io-channel-cells = <1>;
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -				reg = <0x0>;
+> -				interrupt-parent = <&adc_1>;
+> -				interrupts = <0>;
+> -				dmas = <&dmamux1 9 0x400 0x80000001>;
+> -				dma-names = "rx";
+> -				status = "disabled";
+> -
+> -				channel@18 {
+> -					reg = <18>;
+> -					label = "vrefint";
+> -				};
+> +			channel@18 {
+> +				reg = <18>;
+> +				label = "vrefint";
+>  			};
+>  		};
+>  	};
+> diff --git a/arch/arm/boot/dts/stm32mp13xc.dtsi b/arch/arm/boot/dts/stm32mp13xc.dtsi
+> index 4d00e7592882..a1a7a40c2a3e 100644
+> --- a/arch/arm/boot/dts/stm32mp13xc.dtsi
+> +++ b/arch/arm/boot/dts/stm32mp13xc.dtsi
+> @@ -4,15 +4,14 @@
+>   * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
+>   */
+>  
+> -/ {
+> -	soc {
+> -		cryp: crypto@54002000 {
+> -			compatible = "st,stm32mp1-cryp";
+> -			reg = <0x54002000 0x400>;
+> -			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc CRYP1>;
+> -			resets = <&rcc CRYP1_R>;
+> -			status = "disabled";
+> -		};
+> +&etzpc {
+> +	cryp: crypto@54002000 {
+> +		compatible = "st,stm32mp1-cryp";
+> +		reg = <0x54002000 0x400>;
+> +		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&rcc CRYP1>;
+> +		resets = <&rcc CRYP1_R>;
+> +		feature-domains = <&etzpc 42>;
+> +		status = "disabled";
+>  	};
+>  };
+> diff --git a/arch/arm/boot/dts/stm32mp13xf.dtsi b/arch/arm/boot/dts/stm32mp13xf.dtsi
+> index 4d00e7592882..b9fb071a1471 100644
+> --- a/arch/arm/boot/dts/stm32mp13xf.dtsi
+> +++ b/arch/arm/boot/dts/stm32mp13xf.dtsi
+> @@ -4,15 +4,13 @@
+>   * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
+>   */
+>  
+> -/ {
+> -	soc {
+> -		cryp: crypto@54002000 {
+> -			compatible = "st,stm32mp1-cryp";
+> -			reg = <0x54002000 0x400>;
+> -			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+> -			clocks = <&rcc CRYP1>;
+> -			resets = <&rcc CRYP1_R>;
+> -			status = "disabled";
+> -		};
+> +&etzpc {
+> +	cryp: crypto@54002000 {
+> +		compatible = "st,stm32mp1-cryp";
+> +		reg = <0x54002000 0x400>;
+> +		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+> +		clocks = <&rcc CRYP1>;
+> +		resets = <&rcc CRYP1_R>;
+> +		status = "disabled";
+>  	};
+>  };
 
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
-diffstat:
- Documentation/PCI/endpoint/pci-vntb-howto.rst                    |    2 +-
- Documentation/PCI/msi-howto.rst                                  |    2 +-
- Documentation/arm/arm.rst                                        |    2 +-
- Documentation/arm/ixp4xx.rst                                     |    4 ++--
- Documentation/arm/keystone/knav-qmss.rst                         |    2 +-
- Documentation/arm/stm32/stm32-dma-mdma-chaining.rst              |    6 +++---
- Documentation/arm/sunxi/clocks.rst                               |    2 +-
- Documentation/arm/swp_emulation.rst                              |    2 +-
- Documentation/arm/tcm.rst                                        |    2 +-
- Documentation/arm/vlocks.rst                                     |    2 +-
- Documentation/block/data-integrity.rst                           |    2 +-
- Documentation/core-api/packing.rst                               |    2 +-
- Documentation/core-api/padata.rst                                |    2 +-
- Documentation/fault-injection/fault-injection.rst                |    2 +-
- Documentation/fb/sm712fb.rst                                     |    2 +-
- Documentation/fb/sstfb.rst                                       |    2 +-
- Documentation/features/core/thread-info-in-task/arch-support.txt |    2 +-
- Documentation/input/devices/iforce-protocol.rst                  |    2 +-
- Documentation/input/multi-touch-protocol.rst                     |    2 +-
- Documentation/isdn/interface_capi.rst                            |    2 +-
- Documentation/isdn/m_isdn.rst                                    |    2 +-
- Documentation/livepatch/reliable-stacktrace.rst                  |    2 +-
- Documentation/locking/lockdep-design.rst                         |    4 ++--
- Documentation/locking/locktorture.rst                            |    2 +-
- Documentation/locking/locktypes.rst                              |    2 +-
- Documentation/locking/preempt-locking.rst                        |    2 +-
- Documentation/mm/hmm.rst                                         |    4 ++--
- Documentation/mm/hwpoison.rst                                    |    2 +-
- Documentation/openrisc/openrisc_port.rst                         |    4 ++--
- Documentation/power/suspend-and-interrupts.rst                   |    2 +-
- Documentation/powerpc/kasan.txt                                  |    2 +-
- Documentation/powerpc/papr_hcalls.rst                            |    2 +-
- Documentation/powerpc/qe_firmware.rst                            |    4 ++--
- Documentation/powerpc/vas-api.rst                                |    4 ++--
- Documentation/s390/pci.rst                                       |    4 ++--
- Documentation/s390/vfio-ccw.rst                                  |    2 +-
- Documentation/scheduler/sched-bwc.rst                            |    2 +-
- Documentation/scheduler/sched-energy.rst                         |    4 ++--
- Documentation/security/digsig.rst                                |    4 ++--
- Documentation/security/keys/core.rst                             |    2 +-
- Documentation/security/secrets/coco.rst                          |    2 +-
- Documentation/timers/hrtimers.rst                                |    2 +-
- Documentation/tools/rtla/rtla-timerlat-top.rst                   |    2 +-
- Documentation/trace/coresight/coresight-etm4x-reference.rst      |    2 +-
- Documentation/trace/events.rst                                   |    6 +++---
- Documentation/trace/fprobe.rst                                   |    2 +-
- Documentation/trace/ftrace-uses.rst                              |    2 +-
- Documentation/trace/hwlat_detector.rst                           |    2 +-
- Documentation/trace/rv/runtime-verification.rst                  |    2 +-
- Documentation/trace/uprobetracer.rst                             |    2 +-
- Documentation/w1/w1-netlink.rst                                  |    2 +-
- Documentation/x86/boot.rst                                       |    2 +-
- Documentation/x86/buslock.rst                                    |    2 +-
- Documentation/x86/mds.rst                                        |    2 +-
- Documentation/x86/resctrl.rst                                    |    2 +-
- Documentation/x86/sgx.rst                                        |    2 +-
- Documentation/xtensa/atomctl.rst                                 |    2 +-
- 57 files changed, 70 insertions(+), 70 deletions(-)
-
-
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Vladimir Oltean <olteanv@gmail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Helge Deller <deller@gmx.de>
-?Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Henrik Rydberg <rydberg@bitmath.org>
-Cc: Karsten Keil <isdn@linux-pingi.de>
-Cc: Jiri Kosina <jikos@kernel.org>
-Cc: Miroslav Benes <mbenes@suse.cz>
-Cc: Petr Mladek <pmladek@suse.com>
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Jérôme Glisse <jglisse@redhat.com>
-Cc: Naoya Horiguchi <naoya.horiguchi@nec.com>
-Cc: Miaohe Lin <linmiaohe@huawei.com>
-Cc: Jonas Bonn <jonas@southpole.se>
-Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
-Cc: Stafford Horne <shorne@gmail.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Juri Lelli <juri.lelli@redhat.com>
-Cc: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Daniel Bristot de Oliveira <bristot@kernel.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Evgeniy Polyakov <zbr@ioremap.net>
-Cc: Fenghua Yu <fenghua.yu@intel.com>
-Cc: Reinette Chatre <reinette.chatre@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Chris Zankel <chris@zankel.net>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
-
-Cc: coresight@lists.linaro.org
-Cc: dri-devel@lists.freedesktop.org
-Cc: keyrings@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-fbdev@vger.kernel.org
-Cc: linux-input@vger.kernel.org
-Cc: linux-pci@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-sgx@vger.kernel.org
-Cc: linux-trace-devel@vger.kernel.org
-Cc: linux-trace-kernel@vger.kernel.org
-Cc: live-patching@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-Cc: linux-usb@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-mm@kvack.org
-Cc: openrisc@lists.librecores.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-xtensa@linux-xtensa.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: x86@kernel.org
