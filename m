@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470E6C61DA4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761B8C636D7
 	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 12:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbjBIMhO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S229892AbjBIMhO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 9 Feb 2023 07:37:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46110 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjBIMhE (ORCPT
+        with ESMTP id S229642AbjBIMhG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 07:37:04 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E9F5A9E3;
-        Thu,  9 Feb 2023 04:37:01 -0800 (PST)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4PCGXQ2yNTznW3J;
-        Thu,  9 Feb 2023 20:34:46 +0800 (CST)
+        Thu, 9 Feb 2023 07:37:06 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D065ACC9;
+        Thu,  9 Feb 2023 04:37:04 -0800 (PST)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4PCGXx5zhPzJsLd;
+        Thu,  9 Feb 2023 20:35:13 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Thu, 9 Feb 2023 20:36:59 +0800
+ 15.1.2375.34; Thu, 9 Feb 2023 20:36:56 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
         Weili Qian <qianweili@huawei.com>
-Subject: [PATCH v2 5/5] crypto: hisilicon/qm - fix coding style issues
-Date:   Thu, 9 Feb 2023 20:36:17 +0800
-Message-ID: <20230209123617.30545-6-qianweili@huawei.com>
+Subject: [PATCH v2 1/5] crypto: hisilicon/qm - remove some unused defines
+Date:   Thu, 9 Feb 2023 20:36:13 +0800
+Message-ID: <20230209123617.30545-2-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230209123617.30545-1-qianweili@huawei.com>
 References: <20230209123617.30545-1-qianweili@huawei.com>
@@ -44,133 +44,93 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-1. Remove extra blank lines.
-2. Remove extra spaces.
-3. Use spaces instead of tabs around '=' and '\',
-to ensure consistent coding styles.
-4. Macros should be capital letters, change 'QM_SQC_VFT_NUM_MASK_v2'
-to 'QM_SQC_VFT_NUM_MASK_V2'.
+1. Remove some macros define since it is not used.
+2. Remove enum QM_HW_UNKNOWN since it is not used.
+3. Remove unused member 'is_frozen' in 'hisi_qm' structure.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c  | 29 ++++++++++++-----------------
- drivers/crypto/hisilicon/sgl.c |  1 -
- 2 files changed, 12 insertions(+), 18 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 10 ----------
+ include/linux/hisi_acc_qm.h   |  2 --
+ 2 files changed, 12 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 6ce69e8eba82..04b2d382267a 100644
+index 58d023f6fba3..4e277168b48d 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -116,7 +116,7 @@
- #define QM_SQC_VFT_BASE_SHIFT_V2	28
- #define QM_SQC_VFT_BASE_MASK_V2		GENMASK(15, 0)
- #define QM_SQC_VFT_NUM_SHIFT_V2		45
--#define QM_SQC_VFT_NUM_MASK_v2		GENMASK(9, 0)
-+#define QM_SQC_VFT_NUM_MASK_V2		GENMASK(9, 0)
+@@ -95,8 +95,6 @@
+ #define QM_VFT_CFG_RDY			0x10006c
+ #define QM_VFT_CFG_OP_WR		0x100058
+ #define QM_VFT_CFG_TYPE			0x10005c
+-#define QM_SQC_VFT			0x0
+-#define QM_CQC_VFT			0x1
+ #define QM_VFT_CFG			0x100060
+ #define QM_VFT_CFG_OP_ENABLE		0x100054
+ #define QM_PM_CTRL			0x100148
+@@ -164,7 +162,6 @@
  
- #define QM_ABNORMAL_INT_SOURCE		0x100000
- #define QM_ABNORMAL_INT_MASK		0x100004
-@@ -230,23 +230,23 @@
+ /* interfunction communication */
+ #define QM_IFC_READY_STATUS		0x100128
+-#define QM_IFC_C_STS_M			0x10012C
+ #define QM_IFC_INT_SET_P		0x100130
+ #define QM_IFC_INT_CFG			0x100134
+ #define QM_IFC_INT_SOURCE_P		0x100138
+@@ -198,7 +195,6 @@
+ 
+ #define PCI_BAR_2			2
+ #define PCI_BAR_4			4
+-#define QM_SQE_DATA_ALIGN_MASK		GENMASK(6, 0)
+ #define QMC_ALIGN(sz)			ALIGN(sz, 32)
+ 
+ #define QM_DBG_READ_LEN		256
+@@ -212,8 +208,6 @@
+ #define QM_DRIVER_REMOVING		0
+ #define QM_RST_SCHED			1
+ #define QM_QOS_PARAM_NUM		2
+-#define QM_QOS_VAL_NUM			1
+-#define QM_QOS_BDF_PARAM_NUM		4
+ #define QM_QOS_MAX_VAL			1000
+ #define QM_QOS_RATE			100
+ #define QM_QOS_EXPAND_RATE		1000
+@@ -225,18 +219,14 @@
+ #define QM_SHAPER_FACTOR_CBS_B_SHIFT	15
+ #define QM_SHAPER_FACTOR_CBS_S_SHIFT	19
+ #define QM_SHAPER_CBS_B			1
+-#define QM_SHAPER_CBS_S			16
+ #define QM_SHAPER_VFT_OFFSET		6
+-#define WAIT_FOR_QOS_VF			100
+ #define QM_QOS_MIN_ERROR_RATE		5
+-#define QM_QOS_TYPICAL_NUM		8
+ #define QM_SHAPER_MIN_CBS_S		8
+ #define QM_QOS_TICK			0x300U
+ #define QM_QOS_DIVISOR_CLK		0x1f40U
+ #define QM_QOS_MAX_CIR_B		200
+ #define QM_QOS_MIN_CIR_B		100
+ #define QM_QOS_MAX_CIR_U		6
+-#define QM_QOS_MAX_CIR_S		11
  #define QM_AUTOSUSPEND_DELAY		3000
  
  #define QM_MK_CQC_DW3_V1(hop_num, pg_sz, buf_sz, cqe_sz) \
--	(((hop_num) << QM_CQ_HOP_NUM_SHIFT)	| \
--	((pg_sz) << QM_CQ_PAGE_SIZE_SHIFT)	| \
--	((buf_sz) << QM_CQ_BUF_SIZE_SHIFT)	| \
-+	(((hop_num) << QM_CQ_HOP_NUM_SHIFT) | \
-+	((pg_sz) << QM_CQ_PAGE_SIZE_SHIFT) | \
-+	((buf_sz) << QM_CQ_BUF_SIZE_SHIFT) | \
- 	((cqe_sz) << QM_CQ_CQE_SIZE_SHIFT))
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index d08bff0f87f9..a9e75b7a0636 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -122,7 +122,6 @@ enum qp_state {
+ };
  
- #define QM_MK_CQC_DW3_V2(cqe_sz, cq_depth) \
- 	((((u32)cq_depth) - 1) | ((cqe_sz) << QM_CQ_CQE_SIZE_SHIFT))
+ enum qm_hw_ver {
+-	QM_HW_UNKNOWN = -1,
+ 	QM_HW_V1 = 0x20,
+ 	QM_HW_V2 = 0x21,
+ 	QM_HW_V3 = 0x30,
+@@ -346,7 +345,6 @@ struct hisi_qm {
  
- #define QM_MK_SQC_W13(priority, orders, alg_type) \
--	(((priority) << QM_SQ_PRIORITY_SHIFT)	| \
--	((orders) << QM_SQ_ORDERS_SHIFT)	| \
-+	(((priority) << QM_SQ_PRIORITY_SHIFT) | \
-+	((orders) << QM_SQ_ORDERS_SHIFT) | \
- 	(((alg_type) & QM_SQ_TYPE_MASK) << QM_SQ_TYPE_SHIFT))
+ 	const char *algs;
+ 	bool use_sva;
+-	bool is_frozen;
  
- #define QM_MK_SQC_DW3_V1(hop_num, pg_sz, buf_sz, sqe_sz) \
--	(((hop_num) << QM_SQ_HOP_NUM_SHIFT)	| \
--	((pg_sz) << QM_SQ_PAGE_SIZE_SHIFT)	| \
--	((buf_sz) << QM_SQ_BUF_SIZE_SHIFT)	| \
-+	(((hop_num) << QM_SQ_HOP_NUM_SHIFT) | \
-+	((pg_sz) << QM_SQ_PAGE_SIZE_SHIFT) | \
-+	((buf_sz) << QM_SQ_BUF_SIZE_SHIFT) | \
- 	((u32)ilog2(sqe_sz) << QM_SQ_SQE_SIZE_SHIFT))
- 
- #define QM_MK_SQC_DW3_V2(sqe_sz, sq_depth) \
-@@ -706,7 +706,7 @@ static void qm_db_v2(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
- 
- 	doorbell = qn | ((u64)cmd << QM_DB_CMD_SHIFT_V2) |
- 		   ((u64)randata << QM_DB_RAND_SHIFT_V2) |
--		   ((u64)index << QM_DB_INDEX_SHIFT_V2)	 |
-+		   ((u64)index << QM_DB_INDEX_SHIFT_V2) |
- 		   ((u64)priority << QM_DB_PRIORITY_SHIFT_V2);
- 
- 	writeq(doorbell, io_base);
-@@ -1304,7 +1304,7 @@ static int qm_get_vft_v2(struct hisi_qm *qm, u32 *base, u32 *number)
- 	sqc_vft = readl(qm->io_base + QM_MB_CMD_DATA_ADDR_L) |
- 		  ((u64)readl(qm->io_base + QM_MB_CMD_DATA_ADDR_H) << 32);
- 	*base = QM_SQC_VFT_BASE_MASK_V2 & (sqc_vft >> QM_SQC_VFT_BASE_SHIFT_V2);
--	*number = (QM_SQC_VFT_NUM_MASK_v2 &
-+	*number = (QM_SQC_VFT_NUM_MASK_V2 &
- 		   (sqc_vft >> QM_SQC_VFT_NUM_SHIFT_V2)) + 1;
- 
- 	return 0;
-@@ -3195,7 +3195,6 @@ static int qm_stop_started_qp(struct hisi_qm *qm)
- 	return 0;
- }
- 
--
- /**
-  * qm_clear_queues() - Clear all queues memory in a qm.
-  * @qm: The qm in which the queues will be cleared.
-@@ -3679,7 +3678,7 @@ static ssize_t qm_algqos_read(struct file *filp, char __user *buf,
- 	qos_val = ir / QM_QOS_RATE;
- 	ret = scnprintf(tbuf, QM_DBG_READ_LEN, "%u\n", qos_val);
- 
--	ret =  simple_read_from_buffer(buf, count, pos, tbuf, ret);
-+	ret = simple_read_from_buffer(buf, count, pos, tbuf, ret);
- 
- err_get_status:
- 	clear_bit(QM_RESETTING, &qm->misc_ctl);
-@@ -4176,13 +4175,10 @@ static void qm_dev_ecc_mbit_handle(struct hisi_qm *qm)
- 	if (!qm->err_status.is_dev_ecc_mbit &&
- 	    qm->err_status.is_qm_ecc_mbit &&
- 	    qm->err_ini->close_axi_master_ooo) {
--
- 		qm->err_ini->close_axi_master_ooo(qm);
--
- 	} else if (qm->err_status.is_dev_ecc_mbit &&
- 		   !qm->err_status.is_qm_ecc_mbit &&
- 		   !qm->err_ini->close_axi_master_ooo) {
--
- 		nfe_enb = readl(qm->io_base + QM_RAS_NFE_ENABLE);
- 		writel(nfe_enb & QM_RAS_NFE_MBIT_DISABLE,
- 		       qm->io_base + QM_RAS_NFE_ENABLE);
-@@ -4630,7 +4626,6 @@ static irqreturn_t qm_abnormal_irq(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--
- /**
-  * hisi_qm_dev_shutdown() - Shutdown device.
-  * @pdev: The device will be shutdown.
-diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index 2b6f2281cfd6..a07257a7e75f 100644
---- a/drivers/crypto/hisilicon/sgl.c
-+++ b/drivers/crypto/hisilicon/sgl.c
-@@ -250,7 +250,6 @@ hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
- 		dev_err(dev, "Get SGL error!\n");
- 		dma_unmap_sg(dev, sgl, sg_n, DMA_BIDIRECTIONAL);
- 		return ERR_PTR(-ENOMEM);
--
- 	}
- 	curr_hw_sgl->entry_length_in_sgl = cpu_to_le16(pool->sge_nr);
- 	curr_hw_sge = curr_hw_sgl->sge_entries;
+ 	resource_size_t phys_base;
+ 	resource_size_t db_phys_base;
 -- 
 2.33.0
 
