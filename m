@@ -2,176 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5B0C61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 05:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AB9C636D7
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Feb 2023 07:14:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbjBIFOf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Feb 2023 00:14:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58980 "EHLO
+        id S229754AbjBIHOL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Feb 2023 02:14:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbjBIFOc (ORCPT
+        with ESMTP id S229709AbjBIHOK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 00:14:32 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF372B298;
-        Wed,  8 Feb 2023 21:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675919671; x=1707455671;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tXlCsiS4ItKh3KiHiSPxfC0oS0H4trHUJSCkYJAmxPI=;
-  b=Va2LIlK5P4rP76X6F8Nv7w3GGtLAeb/hX7PDgNSvHw6eidbDXi/mso20
-   jxOfQQ9Mf82p0gvkibVUFnVfONv81XT5tg5nUgAYgJo/ctORy0Sun21J2
-   P5OrAqyRy50jzaLYow6LLYyUcWG02rshNognvOlIsqTib/ynivGJYzrB9
-   HEp9mEbk72mvWDQiqOexJEu6OhM/Rv0VYbbXk65HfNrd+qkDGERNQXH3x
-   nAyo4fPtG1KGItyi/oH9yCYl+DLNvgpA6SfGLC7/Ehd7OGi5AsNvbqvqw
-   zLJUnQ57MA0ERNSdNwkmJeXueZo0b8bfY3AVPe/arZCdCvpk+++f4iWJz
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="313650338"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="313650338"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 21:14:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="669457609"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="669457609"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 08 Feb 2023 21:14:24 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pPzGJ-0004qE-1m;
-        Thu, 09 Feb 2023 05:14:23 +0000
-Date:   Thu, 9 Feb 2023 13:14:22 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Pawel Chmielewski <pawel.chmielewski@intel.com>,
-        yury.norov@gmail.com
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        Jonathan.Cameron@huawei.com, andriy.shevchenko@linux.intel.com,
-        baohua@kernel.org, bristot@redhat.com, bsegall@google.com,
-        davem@davemloft.net, dietmar.eggemann@arm.com, gal@nvidia.com,
-        gregkh@linuxfoundation.org, hca@linux.ibm.com,
-        jacob.e.keller@intel.com, jesse.brandeburg@intel.com,
-        jgg@nvidia.com, juri.lelli@redhat.com, kuba@kernel.org,
-        leonro@nvidia.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@redhat.com,
-        netdev@vger.kernel.org, peter@n8pjl.ca, peterz@infradead.org,
-        rostedt@goodmis.org, saeedm@nvidia.com, tariqt@nvidia.com,
-        tony.luck@intel.com
-Subject: Re: [PATCH 1/1] ice: Change assigning method of the CPU affinity
- masks
-Message-ID: <202302091302.PaJoE0gU-lkp@intel.com>
-References: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+        Thu, 9 Feb 2023 02:14:10 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F2C1B33C;
+        Wed,  8 Feb 2023 23:14:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=ne9BZXE2iGM8OzEUId4GcMH1B4GCk5QE1QnyEU0ZMDY=; b=Gnu931rUugqu6/NTy96e4cSCb3
+        YMPfyooaHOAUgFp2TnsirmkhX4rtEbdKrfewKNx1cnlLYCehfbOc9rSYcVTJTAkB3zXuXfkpMFO/c
+        +QbVHWMs5e2kq8xc7DyTdNV1mM2dnSGs5Oua2etemHzKoCVzIwNUZ1SUlRbu4Xou4+f6So4bLMynB
+        GE28fgtIFXNhXmNMBZoOj0ptK/DcpORE3poIdIrEE76JMeobIljmWeD67pj3GiHoHdgH9WkVpC/00
+        PQSlm4vi5Q65OIzZdOpfIABFn8OVhuPjWZm5vMDlxw9PiRJmXr6pPrt+6euJsGLGQW4/FMz5bUR1s
+        5W4QgASA==;
+Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pQ18A-000LPt-Bf; Thu, 09 Feb 2023 07:14:06 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org, Mukesh Ojha <quic_mojha@quicinc.com>
+Subject: [PATCH 03/24] Documentation: core-api: correct spelling
+Date:   Wed,  8 Feb 2023 23:13:39 -0800
+Message-Id: <20230209071400.31476-4-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.39.1
+In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pawel,
+Correct spelling problems for Documentation/core-api/ as reported
+by codespell.
 
-Thank you for the patch! Yet something to improve:
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org
+Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
+---
+ Documentation/core-api/packing.rst |    2 +-
+ Documentation/core-api/padata.rst  |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-[auto build test ERROR on tnguy-next-queue/dev-queue]
-[also build test ERROR on linus/master v6.2-rc7 next-20230208]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Pawel-Chmielewski/ice-Change-assigning-method-of-the-CPU-affinity-masks/20230208-234144
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20230208153905.109912-1-pawel.chmielewski%40intel.com
-patch subject: [PATCH 1/1] ice: Change assigning method of the CPU affinity masks
-config: i386-randconfig-a013 (https://download.01.org/0day-ci/archive/20230209/202302091302.PaJoE0gU-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/33971c3245ae75900dbc4cc9aa2b76ff9cdb534c
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Pawel-Chmielewski/ice-Change-assigning-method-of-the-CPU-affinity-masks/20230208-234144
-        git checkout 33971c3245ae75900dbc4cc9aa2b76ff9cdb534c
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/net/ethernet/intel/ice/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202302091302.PaJoE0gU-lkp@intel.com
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/ethernet/intel/ice/ice_base.c:662:23: error: no member named 'numa_node' in 'struct device'
-           int numa_node = dev->numa_node;
-                           ~~~  ^
->> drivers/net/ethernet/intel/ice/ice_base.c:678:2: error: implicit declaration of function 'for_each_numa_hop_mask' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-           for_each_numa_hop_mask(aff_mask, numa_node) {
-           ^
->> drivers/net/ethernet/intel/ice/ice_base.c:678:45: error: expected ';' after expression
-           for_each_numa_hop_mask(aff_mask, numa_node) {
-                                                      ^
-                                                      ;
-   3 errors generated.
-
-
-vim +662 drivers/net/ethernet/intel/ice/ice_base.c
-
-   650	
-   651	/**
-   652	 * ice_vsi_alloc_q_vectors - Allocate memory for interrupt vectors
-   653	 * @vsi: the VSI being configured
-   654	 *
-   655	 * We allocate one q_vector per queue interrupt. If allocation fails we
-   656	 * return -ENOMEM.
-   657	 */
-   658	int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi)
-   659	{
-   660		cpumask_t *aff_mask, *last_aff_mask = cpu_none_mask;
-   661		struct device *dev = ice_pf_to_dev(vsi->back);
- > 662		int numa_node = dev->numa_node;
-   663		u16 v_idx, cpu = 0;
-   664		int err;
-   665	
-   666		if (vsi->q_vectors[0]) {
-   667			dev_dbg(dev, "VSI %d has existing q_vectors\n", vsi->vsi_num);
-   668			return -EEXIST;
-   669		}
-   670	
-   671		for (v_idx = 0; v_idx < vsi->num_q_vectors; v_idx++) {
-   672			err = ice_vsi_alloc_q_vector(vsi, v_idx);
-   673			if (err)
-   674				goto err_out;
-   675		}
-   676	
-   677		v_idx = 0;
- > 678		for_each_numa_hop_mask(aff_mask, numa_node) {
-   679			for_each_cpu_andnot(cpu, aff_mask, last_aff_mask)
-   680				if (v_idx < vsi->num_q_vectors) {
-   681					if (cpu_online(cpu))
-   682						cpumask_set_cpu(cpu, &vsi->q_vectors[v_idx]->affinity_mask);
-   683					v_idx++;
-   684				}
-   685			last_aff_mask = aff_mask;
-   686		}
-   687	
-   688		return 0;
-   689	
-   690	err_out:
-   691		while (v_idx--)
-   692			ice_free_q_vector(vsi, v_idx);
-   693	
-   694		dev_err(dev, "Failed to allocate %d q_vector for VSI %d, ret=%d\n",
-   695			vsi->num_q_vectors, vsi->vsi_num, err);
-   696		vsi->num_q_vectors = 0;
-   697		return err;
-   698	}
-   699	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+diff -- a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
+--- a/Documentation/core-api/packing.rst
++++ b/Documentation/core-api/packing.rst
+@@ -161,6 +161,6 @@ xxx_packing() that calls it using the pr
+ 
+ The packing() function returns an int-encoded error code, which protects the
+ programmer against incorrect API use.  The errors are not expected to occur
+-durring runtime, therefore it is reasonable for xxx_packing() to return void
++during runtime, therefore it is reasonable for xxx_packing() to return void
+ and simply swallow those errors. Optionally it can dump stack or print the
+ error description.
+diff -- a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
+--- a/Documentation/core-api/padata.rst
++++ b/Documentation/core-api/padata.rst
+@@ -42,7 +42,7 @@ padata_shells associated with it, each a
+ Modifying cpumasks
+ ------------------
+ 
+-The CPUs used to run jobs can be changed in two ways, programatically with
++The CPUs used to run jobs can be changed in two ways, programmatically with
+ padata_set_cpumask() or via sysfs.  The former is defined::
+ 
+     int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
