@@ -2,243 +2,387 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0449EC636D4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 23:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56BAC636D4
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 23:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbjBJXd4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 18:33:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39682 "EHLO
+        id S229585AbjBJXtG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 18:49:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjBJXdz (ORCPT
+        with ESMTP id S229551AbjBJXtG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 18:33:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615DB74065
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 15:32:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676071943;
+        Fri, 10 Feb 2023 18:49:06 -0500
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C95511E93
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 15:49:03 -0800 (PST)
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4PD9Rt6g7Jz9sYd;
+        Sat, 11 Feb 2023 00:48:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+        t=1676072938;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jlR4JcCg1XC8eTF3I+rHcc7NxJf4yOAtTyxChrY5i+Y=;
-        b=LkVUUvNZVcID1nuaE6TSvsxH288eEfJR+V7f/6G1qAdU2ghkky/GK7r4r/IVjyKuevLJg1
-        wOqYi+gylO+SZxYotJlMrpXbivb9VqlInTWA/vYunRvGrTeak8prxSnbwtLFnPmAsXvOhX
-        /E0a/AoKDWKDqhkXCWKT90Dm16MD/gQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-91-ZvPK5vUbNbORrETn_rtiuw-1; Fri, 10 Feb 2023 18:32:20 -0500
-X-MC-Unique: ZvPK5vUbNbORrETn_rtiuw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42D3885A588;
-        Fri, 10 Feb 2023 23:32:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 908CF2026D4B;
-        Fri, 10 Feb 2023 23:32:17 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH 04/11] cifs: Add a function to Hash the contents of an iterator
-Date:   Fri, 10 Feb 2023 23:31:58 +0000
-Message-Id: <20230210233205.1517459-5-dhowells@redhat.com>
-In-Reply-To: <20230210233205.1517459-1-dhowells@redhat.com>
-References: <20230210233205.1517459-1-dhowells@redhat.com>
+        bh=47jNWr1JdAc0yNzMDj9l5Gi9JnlTOZC7wAqROptU+nM=;
+        b=QwDhrBeGxlQD6Pij31ci5A6MCSEuZL82mJLosV8S8BvIbXmDg/C/E7Xm4zEoQ6Uf9Z+jgR
+        SszrZBFmzwRJLTU8C2uudfPZ+9/8tceVJKJlPotfqTTXfENlr0aVxGfo98SPidc0InNdy0
+        UNBxe0irxpNL11Zv+ZkMOGDFYzARvUtuzxEkiS26EW9WoWf3azGtt9Erdsg535+LgIdb+4
+        PSz98M1ZBWxXkeq4TRUo1sEX085eFaraOU5nX8sPRWoNg9jvFHdqJb2yM3LNTXuhZzMSDj
+        l8f/eqbupLqE6yykM61g0ZoIEf01A1iOQ9aMm1YJzTSk8bYjMeBmmOKPjB+7dQ==
+Date:   Sat, 11 Feb 2023 00:48:55 +0100
+From:   "Erhard F." <erhard_f@mailbox.org>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, x86@kernel.org
+Subject: Re: [PATCH] crypto: x86/aria-avx - fix using avx2 instructions
+Message-ID: <20230211004855.52a8380c@yea>
+In-Reply-To: <20230210181541.2895144-1-ap420073@gmail.com>
+References: <20230210181541.2895144-1-ap420073@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-ID: 34887e700ddd964495e
+X-MBO-RS-META: xz5jtfj4gakzehb5334qtoq4c3cpczzu
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
-iterator into a symmetric hash algorithm.
+On Fri, 10 Feb 2023 18:15:41 +0000
+Taehee Yoo <ap420073@gmail.com> wrote:
 
-UBUF- and IOBUF-type iterators are not supported on the assumption that
-either we're doing buffered I/O, in which case we won't see them, or we're
-doing direct I/O, in which case the iterator will have been extracted into
-a BVEC-type iterator higher up.
+> vpbroadcastb and vpbroadcastd are not AVX instructions.
+> But the aria-avx assembly code contains these instructions.
+> So, kernel panic will occur if the aria-avx works on AVX2 unsupported
+> CPU.
+> 
+> vbroadcastss, and vpshufb are used to avoid using vpbroadcastb in it.
+> Unfortunately, this change reduces performance by about 5%.
+> Also, vpbroadcastd is simply replaced by vmovdqa in it.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
+Thanks Taehee, your patch fixes the issue on my AMD FX-8370!
 
-Link: https://lore.kernel.org/r/166697257423.61150.12070648579830206483.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732029577.3186319.17162612653237909961.stgit@warthog.procyon.org.uk/ # rfc
----
- fs/cifs/cifsencrypt.c | 144 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 144 insertions(+)
+# cryptsetup benchmark -c aria-ctr-plain64
+# Tests are approximate using memory only (no storage IO).
+# Algorithm |       Key |      Encryption |      Decryption
+   aria-ctr        256b       301.3 MiB/s       303.6 MiB/s
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index cbc18b4a9cb2..7be589aeb520 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -24,6 +24,150 @@
- #include "../smbfs_common/arc4.h"
- #include <crypto/aead.h>
+The patch did not apply cleanly on v6.2-rc7 however. I needed to do small trivial modifications on hunk #1 and #21. Perhaps this is useful for other users to test so i'll attach it.
+
+Regards,
+Erhard
+
+diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+index fe0d84a7ced1..9243f6289d34 100644
+--- a/arch/x86/crypto/aria-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+@@ -271,34 +271,43 @@
  
-+/*
-+ * Hash data from a BVEC-type iterator.
-+ */
-+static int cifs_shash_bvec(const struct iov_iter *iter, ssize_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	const struct bio_vec *bv = iter->bvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	void *p;
-+	int ret;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		size_t off, len;
-+
-+		len = bv[i].bv_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		len = min_t(size_t, maxsize, len - start);
-+		off = bv[i].bv_offset + start;
-+
-+		p = kmap_local_page(bv[i].bv_page);
-+		ret = crypto_shash_update(shash, p + off, len);
-+		kunmap_local(p);
-+		if (ret < 0)
-+			return ret;
-+
-+		maxsize -= len;
-+		if (maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Hash data from a KVEC-type iterator.
-+ */
-+static int cifs_shash_kvec(const struct iov_iter *iter, ssize_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	const struct kvec *kv = iter->kvec;
-+	unsigned long start = iter->iov_offset;
-+	unsigned int i;
-+	int ret;
-+
-+	for (i = 0; i < iter->nr_segs; i++) {
-+		size_t len;
-+
-+		len = kv[i].iov_len;
-+		if (start >= len) {
-+			start -= len;
-+			continue;
-+		}
-+
-+		len = min_t(size_t, maxsize, len - start);
-+		ret = crypto_shash_update(shash, kv[i].iov_base + start, len);
-+		if (ret < 0)
-+			return ret;
-+		maxsize -= len;
-+
-+		if (maxsize <= 0)
-+			break;
-+		start = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Hash data from an XARRAY-type iterator.
-+ */
-+static ssize_t cifs_shash_xarray(const struct iov_iter *iter, ssize_t maxsize,
-+				 struct shash_desc *shash)
-+{
-+	struct folio *folios[16], *folio;
-+	unsigned int nr, i, j, npages;
-+	loff_t start = iter->xarray_start + iter->iov_offset;
-+	pgoff_t last, index = start / PAGE_SIZE;
-+	ssize_t ret = 0;
-+	size_t len, offset, foffset;
-+	void *p;
-+
-+	if (maxsize == 0)
-+		return 0;
-+
-+	last = (start + maxsize - 1) / PAGE_SIZE;
-+	do {
-+		nr = xa_extract(iter->xarray, (void **)folios, index, last,
-+				ARRAY_SIZE(folios), XA_PRESENT);
-+		if (nr == 0)
-+			return -EIO;
-+
-+		for (i = 0; i < nr; i++) {
-+			folio = folios[i];
-+			npages = folio_nr_pages(folio);
-+			foffset = start - folio_pos(folio);
-+			offset = foffset % PAGE_SIZE;
-+			for (j = foffset / PAGE_SIZE; j < npages; j++) {
-+				len = min_t(size_t, maxsize, PAGE_SIZE - offset);
-+				p = kmap_local_page(folio_page(folio, j));
-+				ret = crypto_shash_update(shash, p, len);
-+				kunmap_local(p);
-+				if (ret < 0)
-+					return ret;
-+				maxsize -= len;
-+				if (maxsize <= 0)
-+					return 0;
-+				start += len;
-+				offset = 0;
-+				index++;
-+			}
-+		}
-+	} while (nr == ARRAY_SIZE(folios));
-+	return 0;
-+}
-+
-+/*
-+ * Pass the data from an iterator into a hash.
-+ */
-+static int cifs_shash_iter(const struct iov_iter *iter, size_t maxsize,
-+			   struct shash_desc *shash)
-+{
-+	if (maxsize == 0)
-+		return 0;
-+
-+	switch (iov_iter_type(iter)) {
-+	case ITER_BVEC:
-+		return cifs_shash_bvec(iter, maxsize, shash);
-+	case ITER_KVEC:
-+		return cifs_shash_kvec(iter, maxsize, shash);
-+	case ITER_XARRAY:
-+		return cifs_shash_xarray(iter, maxsize, shash);
-+	default:
-+		pr_err("cifs_shash_iter(%u) unsupported\n", iov_iter_type(iter));
-+		WARN_ON_ONCE(1);
-+		return -EIO;
-+	}
-+}
-+
- int __cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature,
- 			struct shash_desc *shash)
-
+ #define aria_ark_8way(x0, x1, x2, x3,			\
+ 		      x4, x5, x6, x7,			\
+-		      t0, rk, idx, round)		\
++		      t0, t1, t2, rk,			\
++		      idx, round)			\
+ 	/* AddRoundKey */                               \
+-	vpbroadcastb ((round * 16) + idx + 3)(rk), t0;	\
+-	vpxor t0, x0, x0;				\
+-	vpbroadcastb ((round * 16) + idx + 2)(rk), t0;	\
+-	vpxor t0, x1, x1;				\
+-	vpbroadcastb ((round * 16) + idx + 1)(rk), t0;	\
+-	vpxor t0, x2, x2;				\
+-	vpbroadcastb ((round * 16) + idx + 0)(rk), t0;	\
+-	vpxor t0, x3, x3;				\
+-	vpbroadcastb ((round * 16) + idx + 7)(rk), t0;	\
+-	vpxor t0, x4, x4;				\
+-	vpbroadcastb ((round * 16) + idx + 6)(rk), t0;	\
+-	vpxor t0, x5, x5;				\
+-	vpbroadcastb ((round * 16) + idx + 5)(rk), t0;	\
+-	vpxor t0, x6, x6;				\
+-	vpbroadcastb ((round * 16) + idx + 4)(rk), t0;	\
+-	vpxor t0, x7, x7;
++	vbroadcastss ((round * 16) + idx + 0)(rk), t0;	\
++	vpsrld $24, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x0, x0;				\
++	vpsrld $16, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x1, x1;				\
++	vpsrld $8, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x2, x2;				\
++	vpshufb t1, t0, t2;				\
++	vpxor t2, x3, x3;				\
++	vbroadcastss ((round * 16) + idx + 4)(rk), t0;	\
++	vpsrld $24, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x4, x4;				\
++	vpsrld $16, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x5, x5;				\
++	vpsrld $8, t0, t2;				\
++	vpshufb t1, t2, t2;				\
++	vpxor t2, x6, x6;				\
++	vpshufb t1, t0, t2;				\
++	vpxor t2, x7, x7;
+ 
+ #define aria_sbox_8way_gfni(x0, x1, x2, x3,		\
+ 			    x4, x5, x6, x7,		\
+ 			    t0, t1, t2, t3,		\
+ 			    t4, t5, t6, t7)		\
+-	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
+-	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
+-	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
+-	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
+-	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
++	vmovdqa .Ltf_s2_bitmatrix, t0;			\
++	vmovdqa .Ltf_inv_bitmatrix, t1;			\
++	vmovdqa .Ltf_id_bitmatrix, t2;			\
++	vmovdqa .Ltf_aff_bitmatrix, t3;			\
++	vmovdqa .Ltf_x2_bitmatrix, t4;			\
+ 	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
+ 	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
+ 	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
+@@ -315,10 +324,9 @@
+ 		       x4, x5, x6, x7,			\
+ 		       t0, t1, t2, t3,			\
+ 		       t4, t5, t6, t7)			\
+-	vpxor t7, t7, t7;				\
+ 	vmovdqa .Linv_shift_row, t0;			\
+ 	vmovdqa .Lshift_row, t1;			\
+-	vpbroadcastd .L0f0f0f0f, t6;			\
++	vbroadcastss .L0f0f0f0f, t6;			\
+ 	vmovdqa .Ltf_lo__inv_aff__and__s2, t2;		\
+ 	vmovdqa .Ltf_hi__inv_aff__and__s2, t3;		\
+ 	vmovdqa .Ltf_lo__x2__and__fwd_aff, t4;		\
+@@ -413,8 +421,9 @@
+ 		y0, y1, y2, y3,				\
+ 		y4, y5, y6, y7,				\
+ 		mem_tmp, rk, round)			\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+@@ -429,7 +438,7 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+@@ -467,8 +476,9 @@
+ 		y0, y1, y2, y3,				\
+ 		y4, y5, y6, y7,				\
+ 		mem_tmp, rk, round)			\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+@@ -483,7 +493,7 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+@@ -521,14 +531,15 @@
+ 		y0, y1, y2, y3,				\
+ 		y4, y5, y6, y7,				\
+ 		mem_tmp, rk, round, last_round)		\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+ 							\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, last_round);		\
++		      y0, y7, y2, rk, 8, last_round);	\
+ 							\
+ 	aria_store_state_8way(x0, x1, x2, x3,		\
+ 			      x4, x5, x6, x7,		\
+@@ -538,13 +549,13 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
+ 		       y0, y1, y2, y3, y4, y5, y6, y7);	\
+ 							\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, last_round);		\
++		      y0, y7, y2, rk, 0, last_round);	\
+ 							\
+ 	aria_load_state_8way(y0, y1, y2, y3,		\
+ 			     y4, y5, y6, y7,		\
+@@ -556,8 +567,9 @@
+ 		     y0, y1, y2, y3,			\
+ 		     y4, y5, y6, y7,			\
+ 		     mem_tmp, rk, round)		\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
+ 			    x6, x7, x4, x5,		\
+@@ -574,7 +586,7 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
+ 			    x6, x7, x4, x5,		\
+@@ -614,8 +626,9 @@
+ 		     y0, y1, y2, y3,			\
+ 		     y4, y5, y6, y7,			\
+ 		     mem_tmp, rk, round)		\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
+ 			    x4, x5, x6, x7,		\
+@@ -632,7 +645,7 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
+ 			    x4, x5, x6, x7,		\
+@@ -672,8 +685,9 @@
+ 		y0, y1, y2, y3,				\
+ 		y4, y5, y6, y7,				\
+ 		mem_tmp, rk, round, last_round)		\
++	vpxor y7, y7, y7;				\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, round);		\
++		      y0, y7, y2, rk, 8, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
+ 			    x6, x7, x4, x5,		\
+@@ -681,7 +695,7 @@
+ 			    y4, y5, y6, y7);		\
+ 							\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 8, last_round);		\
++		      y0, y7, y2, rk, 8, last_round);	\
+ 							\
+ 	aria_store_state_8way(x0, x1, x2, x3,		\
+ 			      x4, x5, x6, x7,		\
+@@ -691,7 +705,7 @@
+ 			     x4, x5, x6, x7,		\
+ 			     mem_tmp, 0);		\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, round);		\
++		      y0, y7, y2, rk, 0, round);	\
+ 							\
+ 	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
+ 			    x6, x7, x4, x5,		\
+@@ -699,7 +713,7 @@
+ 			    y4, y5, y6, y7);		\
+ 							\
+ 	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
+-		      y0, rk, 0, last_round);		\
++		      y0, y7, y2, rk, 0, last_round);	\
+ 							\
+ 	aria_load_state_8way(y0, y1, y2, y3,		\
+ 			     y4, y5, y6, y7,		\
+@@ -772,6 +786,14 @@
+ 		    BV8(0, 1, 1, 1, 1, 1, 0, 0),
+ 		    BV8(0, 0, 1, 1, 1, 1, 1, 0),
+ 		    BV8(0, 0, 0, 1, 1, 1, 1, 1))
++	.quad BM8X8(BV8(1, 0, 0, 0, 1, 1, 1, 1),
++		    BV8(1, 1, 0, 0, 0, 1, 1, 1),
++		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 1, 0, 0, 0, 1),
++		    BV8(1, 1, 1, 1, 1, 0, 0, 0),
++		    BV8(0, 1, 1, 1, 1, 1, 0, 0),
++		    BV8(0, 0, 1, 1, 1, 1, 1, 0),
++		    BV8(0, 0, 0, 1, 1, 1, 1, 1))
+ 
+ /* AES inverse affine: */
+ #define tf_inv_const BV8(1, 0, 1, 0, 0, 0, 0, 0)
+@@ -784,6 +806,14 @@
+ 		    BV8(0, 0, 1, 0, 1, 0, 0, 1),
+ 		    BV8(1, 0, 0, 1, 0, 1, 0, 0),
+ 		    BV8(0, 1, 0, 0, 1, 0, 1, 0))
++	.quad BM8X8(BV8(0, 0, 1, 0, 0, 1, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 0, 1, 0),
++		    BV8(0, 1, 0, 0, 1, 0, 0, 1),
++		    BV8(1, 0, 1, 0, 0, 1, 0, 0),
++		    BV8(0, 1, 0, 1, 0, 0, 1, 0),
++		    BV8(0, 0, 1, 0, 1, 0, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 1, 0, 0),
++		    BV8(0, 1, 0, 0, 1, 0, 1, 0))
+ 
+ /* S2: */
+ #define tf_s2_const BV8(0, 1, 0, 0, 0, 1, 1, 1)
+@@ -796,6 +826,14 @@
+ 		    BV8(1, 1, 0, 0, 1, 1, 1, 0),
+ 		    BV8(0, 1, 1, 0, 0, 0, 1, 1),
+ 		    BV8(1, 1, 1, 1, 0, 1, 1, 0))
++	.quad BM8X8(BV8(0, 1, 0, 1, 0, 1, 1, 1),
++		    BV8(0, 0, 1, 1, 1, 1, 1, 1),
++		    BV8(1, 1, 1, 0, 1, 1, 0, 1),
++		    BV8(1, 1, 0, 0, 0, 0, 1, 1),
++		    BV8(0, 1, 0, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 0, 0, 1, 1, 1, 0),
++		    BV8(0, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 1, 0, 1, 1, 0))
+ 
+ /* X2: */
+ #define tf_x2_const BV8(0, 0, 1, 1, 0, 1, 0, 0)
+@@ -808,6 +846,14 @@
+ 		    BV8(0, 1, 1, 0, 1, 0, 1, 1),
+ 		    BV8(1, 0, 1, 1, 1, 1, 0, 1),
+ 		    BV8(1, 0, 0, 1, 0, 0, 1, 1))
++	.quad BM8X8(BV8(0, 0, 0, 1, 1, 0, 0, 0),
++		    BV8(0, 0, 1, 0, 0, 1, 1, 0),
++		    BV8(0, 0, 0, 0, 1, 0, 1, 0),
++		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
++		    BV8(1, 1, 1, 0, 1, 1, 0, 0),
++		    BV8(0, 1, 1, 0, 1, 0, 1, 1),
++		    BV8(1, 0, 1, 1, 1, 1, 0, 1),
++		    BV8(1, 0, 0, 1, 0, 0, 1, 1))
+ 
+ /* Identity matrix: */
+ .Ltf_id_bitmatrix:
+@@ -862,6 +862,14 @@
+ 		    BV8(0, 0, 0, 0, 0, 1, 0, 0),
+ 		    BV8(0, 0, 0, 0, 0, 0, 1, 0),
+ 		    BV8(0, 0, 0, 0, 0, 0, 0, 1))
++	.quad BM8X8(BV8(1, 0, 0, 0, 0, 0, 0, 0),
++		    BV8(0, 1, 0, 0, 0, 0, 0, 0),
++		    BV8(0, 0, 1, 0, 0, 0, 0, 0),
++		    BV8(0, 0, 0, 1, 0, 0, 0, 0),
++		    BV8(0, 0, 0, 0, 1, 0, 0, 0),
++		    BV8(0, 0, 0, 0, 0, 1, 0, 0),
++		    BV8(0, 0, 0, 0, 0, 0, 1, 0),
++		    BV8(0, 0, 0, 0, 0, 0, 0, 1))
+ 
+ /* 4-bit mask */
+ .section	.rodata.cst4.L0f0f0f0f, "aM", @progbits, 4
+-- 
+2.34.1
