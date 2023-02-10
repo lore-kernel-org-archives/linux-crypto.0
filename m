@@ -2,125 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E85C636D4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 20:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78171C05027
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 20:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233455AbjBJUpk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 15:45:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
+        id S233814AbjBJUvo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 15:51:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233302AbjBJUpi (ORCPT
+        with ESMTP id S233787AbjBJUvn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 15:45:38 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26E979B36;
-        Fri, 10 Feb 2023 12:45:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=vblkJk5JW9Sn6Kfu8Q+gIzph4v+G06dnGDO+PJJTE5k=; b=ZByHmY6I/xqvq7jr5sles6DzFv
-        X8E5rrfScXVNgEnb8mhtIqL6cUXo/yrZlB2tS/vtfsgnKSyeyOS8DKofKjNESgQO6NfDAqhSKyd9J
-        iXrX510/06aCayJJKONL7emQ6lSqNgDpmtelnAHiNyMfsxx+8cKOPQsDEa6HdET1YERK/PKhMomcl
-        GP95KfpeYTWn9gVC74Y1nvFxKvlFcA9u1Ip1+AjbNBo16pYbhNPHxwt1/KZKzhr/jT0k8EioFkcMb
-        RCNLcPgj5/6P7WRXC7rw/ZcgFfaCae4QSwE2mny1bkz6Gn4igoywch9QS5pj3+m17Nic2iYwezNK0
-        QDTh4TIZKm6TLpn8xkIr56+NpTkdk2R07P+ehd1SbpAiBsKLPiUNVHHFss+cNqIGyxIbtuKRpffWz
-        B/MTbtDylzRkBWinHWdDtvw9ibgSIDIMAoPOL2pzUT80zHZ4HJbASTZzFFbOXZaFQ8n4mD2vrUGDh
-        O7SDmlrp4tf1SHfYF0PWeJaJ;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1pQaGv-00D4BD-Vr; Fri, 10 Feb 2023 20:45:30 +0000
-Message-ID: <6858a9bd-a8aa-3eaa-979d-83e1743ce85e@samba.org>
-Date:   Fri, 10 Feb 2023 21:45:29 +0100
+        Fri, 10 Feb 2023 15:51:43 -0500
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A197F82C
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 12:51:41 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id ud5so18984566ejc.4
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 12:51:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=s2Azvxdn84xto/x8V66pxCf76GAuLOkrFIRsWg8lS4s=;
+        b=CExvujm0mDZb5b8Q0YyIk4qMEt2KO+XrVyPAus7CXHhyvaiDKton8DMFVNJsqauRlU
+         nI1nneBrMPjQD5z0K9+CdqJYNcj8cP+aS9E0t7rQMDVkDPH9lCTi56TrRMFd1OP/EM6c
+         8oYMudVstq0I+TSzaRmEBx/yV05z10/f7jbHs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s2Azvxdn84xto/x8V66pxCf76GAuLOkrFIRsWg8lS4s=;
+        b=76/NQGqMFCvSsEK5rlZCIhBIACEl3GuxM7f8akBAshwj2gyND1A4NHlF31nNxJHjVq
+         +9tPLuvxcyNcm4azlM42asvQCxyTADa1EUIRmjBATmoivtW+QtPVSs+gge1BeltCN1hJ
+         a7ynkgljLXq1fA+MvZBzqkbA93sb7SHuLhFEOGX7fA1KMyyQDzoUr1x67xradNjbKc6y
+         Gj+4pDrdEPoN4vMwauwsSBa8G5yEawryWA7S8m1oL9UyFdF+ezRPWqbFRJz1SgPe822W
+         CjEcECl2Zcd30EcpZZvUvl+HiV7Nk32C016CV+Wah0N+tPYLpkC4m8HpmdDGKEEHhSVT
+         7QNg==
+X-Gm-Message-State: AO0yUKXspkkQluhAL+h7f5deT+Lxk7l+TAfRTj6JkDS2fNXer4uZKoZI
+        R7Ob8ATvb0P527Ag5+HfOu6HggyWrpI+r0g+VfA=
+X-Google-Smtp-Source: AK7set97fvk4QYjck2yalEk4p63KiBd4rcUFEAHWfqo+25M+QAkvhenpsYTfkkscxmsSKNO5pp2Exg==
+X-Received: by 2002:a17:906:57d6:b0:86f:fbcf:f30a with SMTP id u22-20020a17090657d600b0086ffbcff30amr18683247ejr.58.1676062299175;
+        Fri, 10 Feb 2023 12:51:39 -0800 (PST)
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
+        by smtp.gmail.com with ESMTPSA id hf27-20020a1709072c5b00b0088cdb05f1d5sm2887022ejc.113.2023.02.10.12.51.38
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Feb 2023 12:51:38 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id gr7so18956205ejb.5
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 12:51:38 -0800 (PST)
+X-Received: by 2002:a17:906:d217:b0:877:747e:f076 with SMTP id
+ w23-20020a170906d21700b00877747ef076mr1548367ejz.0.1676062298057; Fri, 10 Feb
+ 2023 12:51:38 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
+References: <0cfd9f02-dea7-90e2-e932-c8129b6013c7@samba.org>
+ <CAHk-=wj8rthcQ9gQbvkMzeFt0iymq+CuOzmidx3Pm29Lg+W0gg@mail.gmail.com>
+ <f6c6d42e-337a-bbab-0d36-cfcc915d26c6@samba.org> <CAHk-=widtNT9y-9uGMnAgyR0kzyo0XjTkExSMoGpbZgeU=+vng@mail.gmail.com>
+ <CAHk-=whprvcY=KRh15uqtmVqR2rL-H1yN6RaswHiWPsGHDqsSQ@mail.gmail.com> <6858a9bd-a8aa-3eaa-979d-83e1743ce85e@samba.org>
+In-Reply-To: <6858a9bd-a8aa-3eaa-979d-83e1743ce85e@samba.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 10 Feb 2023 12:51:21 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wi=JeuB3aDX4yej=9SE-J6RR9LG28eRVfntkoQCPpHNpw@mail.gmail.com>
+Message-ID: <CAHk-=wi=JeuB3aDX4yej=9SE-J6RR9LG28eRVfntkoQCPpHNpw@mail.gmail.com>
 Subject: Re: copy on write for splice() from file to pipe?
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Linux API Mailing List <linux-api@vger.kernel.org>,
         Samba Technical <samba-technical@lists.samba.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         io-uring <io-uring@vger.kernel.org>, linux-crypto@vger.kernel.org
-References: <0cfd9f02-dea7-90e2-e932-c8129b6013c7@samba.org>
- <CAHk-=wj8rthcQ9gQbvkMzeFt0iymq+CuOzmidx3Pm29Lg+W0gg@mail.gmail.com>
- <f6c6d42e-337a-bbab-0d36-cfcc915d26c6@samba.org>
- <CAHk-=widtNT9y-9uGMnAgyR0kzyo0XjTkExSMoGpbZgeU=+vng@mail.gmail.com>
- <CAHk-=whprvcY=KRh15uqtmVqR2rL-H1yN6RaswHiWPsGHDqsSQ@mail.gmail.com>
-From:   Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAHk-=whprvcY=KRh15uqtmVqR2rL-H1yN6RaswHiWPsGHDqsSQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 09.02.23 um 20:48 schrieb Linus Torvalds via samba-technical:
-> On Thu, Feb 9, 2023 at 11:36 AM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> I guarantee that you will only slow things down with some odd async_memcpy.
-> 
-> Extended note: even if the copies themselves would then be done
-> concurrently with other work (so "not faster, but more parallel"), the
-> synchronization required at the end would then end up being costly
-> enough to eat up any possible win. Plus  you'd still end up with a
-> fundamental problem of "what if the data changes in the meantime".
-> 
-> And that's ignoring all the practical problems of actually starting
-> the async copy, which traditionally requires virtual to physical
-> translations (where "physical" is whatever the DMA address space is).
-> 
-> So I don't think there are any actual real cases of async memory copy
-> engines being even _remotely_ better than memcpy outside of
-> microcontrollers (and historical computers before caches - people may
-> still remember things like the Amiga blitter fondly).
-> 
-> Again, the exception ends up being if you can actually use real DMA to
-> not do a memory copy, but to transfer data directly to or from the
-> device. That's in some way what 'splice()' is designed to allow you to
-> do, but exactly by the pipe part ending up being the "conceptual
-> buffer" for the zero-copy pages.
-> 
-> So this is exactly *why* splicing from a file all the way to the
-> network will then show any file changes that have happened in between
-> that "splice started" and "network card got the data". You're supposed
-> to use splice only when you can guarantee the data stability (or,
-> alternatively, when you simply don't care about the data stability,
-> and getting the changed data is perfectly fine).
+On Fri, Feb 10, 2023 at 12:45 PM Stefan Metzmacher <metze@samba.org> wrote:
+>
+> I guess it would be easy to pass a flag (maybe SPLICE_F_FORCE_COPY)
+> down to generic_file_splice_read() and let it create dedicated pages
+> and use memcpy() from the page cache to the dedicated pages.
 
-Ok, thanks for the explanation!
+I really think you'd be much better off passing it off to the
+*destination*, not the source.
 
-Looking at this patch from David Howells :
-https://lore.kernel.org/linux-fsdevel/909202.1675959337@warthog.procyon.org.uk/
-indicates that we don't have that problem with O_DIRECT as it operates
-on dedicated pages (not part of the shared page cache). And these pages
-might be filled via DMA (depending on the filesystem and block device).
+The destination knows whether it needs to copy or not, and in the case
+of at least networking, already has the copy option.
 
-Is my understanding correct?
+The destination might also already know whether it can use the data
+synchronously, so that there isn't even any issue with "data may
+change later".
 
-Together with this patch:
-https://lore.kernel.org/linux-fsdevel/20230209102954.528942-4-dhowells@redhat.com/
+In contrast, the source has no clue. It just knows "I'm a page cache
+page". It would have to always copy.
 
-I guess it would be easy to pass a flag (maybe SPLICE_F_FORCE_COPY)
-down to generic_file_splice_read() and let it create dedicated pages
-and use memcpy() from the page cache to the dedicated pages.
-This would mean one memcpy(), but it would allow the pipe to be used
-for the splice() to the socket, tee(). This might be easier than
-using pread() followed by vmsplice(SPLICE_F_GIFT).
-
-The usage of SPLICE_F_GIFT is very confusing to me...
-I found this example in libkcapi using the kernel crypto sockets:
-https://github.com/smuellerDD/libkcapi/blob/master/lib/kcapi-kernel-if.c#L324
-where it just passes SPLICE_F_GIFT together with an iovec passed from the
-caller of the library.
-
-To me it's not clear if the caller can still use it's buffers referenced by
-the passed iovec...
-
-metze
-
-
+               Linus
