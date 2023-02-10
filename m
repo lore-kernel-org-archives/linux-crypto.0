@@ -2,93 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC72C636CD
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 03:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B907C636D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 03:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbjBJDcy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Feb 2023 22:32:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35756 "EHLO
+        id S230478AbjBJDjg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Feb 2023 22:39:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbjBJDcy (ORCPT
+        with ESMTP id S229825AbjBJDjf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Feb 2023 22:32:54 -0500
-X-Greylist: delayed 390 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Feb 2023 19:32:51 PST
-Received: from psionic.psi5.com (psionic.psi5.com [IPv6:2a02:c206:3008:6895::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70035BA52
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Feb 2023 19:32:51 -0800 (PST)
-Received: from [IPV6:2a02:8106:18:4800:9e5c:8eff:fec0:ee40] (unknown [IPv6:2a02:8106:18:4800:9e5c:8eff:fec0:ee40])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by psionic.psi5.com (Postfix) with ESMTPSA id 057003F073
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 04:26:18 +0100 (CET)
-Message-ID: <d9c58a67-b254-5a42-ca3d-38a0b504de83@hogyros.de>
-Date:   Fri, 10 Feb 2023 04:26:17 +0100
+        Thu, 9 Feb 2023 22:39:35 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C01ECD50A;
+        Thu,  9 Feb 2023 19:39:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 55A70B819FF;
+        Fri, 10 Feb 2023 03:39:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE552C433A0;
+        Fri, 10 Feb 2023 03:39:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676000372;
+        bh=xj47ybbF7LI1Wrz6w6+Q/zE1oBtiQ7WkVJ8gYj3Z8yc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ulPIXuoGBO891EXyVOKqbaLIDplW7SI8JhbdWl6lbINdlqR24Xa0JieSlZfQULpJl
+         LaBTjJ/fp1nDH0k33nEp8grRay2z1Q3mSd6P1HYxGCvHPW5+LVt9Qwm5iRV2X/lcVj
+         c+KnyPAF3wP5PL0aBu83IsuVS04KxANBqJXS8VGed++cBqTu1odY0P7Ss1GrPAFtD1
+         7LYUMbjh/J6wthNqNLHGTmszJMNh9dNCTTCPcB1OSvZ3H45M9+nosuDKiQ3U/J0WyI
+         +4tF5Zyd2jwVV24KR14KttgXAkhLr1qZr9E0EdBkftiChbzjwyTSBASCk0Jgm18V/w
+         wQ6O9gOyKpqWg==
+Date:   Fri, 10 Feb 2023 05:39:29 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, pvorel@suse.cz, tadeusz.struk@intel.com,
+        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
+        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v4 1/6] KEYS: Create static version of
+ public_key_verify_signature
+Message-ID: <Y+W8VQnCw2RlwFnH@kernel.org>
+References: <20230207025958.974056-1-eric.snowberg@oracle.com>
+ <20230207025958.974056-2-eric.snowberg@oracle.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Content-Language: en-US
-From:   Simon Richter <Simon.Richter@hogyros.de>
-Subject: ahash with hardware queue
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------YkjKqQBGyWQHEW0Dt0tyHj6E"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230207025958.974056-2-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------YkjKqQBGyWQHEW0Dt0tyHj6E
-Content-Type: multipart/mixed; boundary="------------5qrdSKszuquK7bIE9MsqV7b7";
- protected-headers="v1"
-From: Simon Richter <Simon.Richter@hogyros.de>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Message-ID: <d9c58a67-b254-5a42-ca3d-38a0b504de83@hogyros.de>
-Subject: ahash with hardware queue
+On Mon, Feb 06, 2023 at 09:59:53PM -0500, Eric Snowberg wrote:
+> The kernel test robot reports undefined reference to
+> public_key_verify_signature when CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE is
+> not defined. Create a static version in this case and return -EINVAL.
+> 
+> Fixes: db6c43bd2132 ("crypto: KEYS: convert public key and digsig asym to the akcipher api")
+> Reported-by: kernel test robot <lkp@intel.com>
 
---------------5qrdSKszuquK7bIE9MsqV7b7
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+What is this reported-by is good for?
 
-SGksDQoNCkkgaGF2ZSBhIFNIQTI1NiBpbXBsZW1lbnRhdGlvbiBpbiBhbiBGUEdBIHRoYXQg
-a2VlcHMgdGhlIGhhc2ggc3RhdGUgaW4gDQppbnRlcm5hbCByZWdpc3RlcnMsIGFuZCB1c2Vz
-IERNQSB0byByZWFkIGlucHV0IGRhdGEgYW5kIHJldHVybiB0aGUgaGFzaCANCm91dHB1dC4N
-Cg0KRmlyc3Qgb2YgYWxsLCB0aGUgcmVzdWx0IG9mIHRoZSBoYXNoIGlzIGluYWNjZXNzaWJs
-ZSBieSBETUEsIHNvIEkndmUgaGFkIA0KdG8gYWRkIGEgc2VwYXJhdGUgcmVzdWx0IHF1ZXVl
-IHdpdGggYW4gaW50ZXJydXB0IGJvdHRvbSBoYWxmIGhhbmRsZXIgDQp0aGF0IGNvcGllcyB0
-aGUgcmVzdWx0IGJhY2sgaW50byB0aGUgcmVxdWVzdC4gSXMgdGhlcmUgYSBiZXR0ZXIgd2F5
-IHRvIA0KZG8gdGhpcywgZS5nLiBhIGZsYWcgSSBjYW4gc2V0IHRvIGdldCBhIERNQSBhY2Nl
-c3NpYmxlIHJlc3VsdCBidWZmZXI/DQoNClNlY29uZCwgdGhlIGltcG9ydC9leHBvcnQgQVBJ
-cyBzZWVtIHRvIGJlIHN5bmNocm9ub3VzLiBJJ2QgbGlrZSB0byBydW4gDQp0aGVzZSB0aHJv
-dWdoIHRoZSBub3JtYWwgcmVxdWVzdC9yZXN1bHQgcXVldWVzIGFsb25nIHdpdGggb3RoZXIg
-DQpyZXF1ZXN0cywgYnV0IG9idmlvdXNseSByZXR1cm5pbmcgLUVJTlBST0dSRVNTIGZyb20g
-ZXhwb3J0IGlzIGEgYmFkIGlkZWEuDQoNCkNhbiBJIG1ha2UgbXkgZXhwb3J0IGZ1bmN0aW9u
-IHN5bmNocm9ub3VzIGJ5IHNsZWVwaW5nIHVudGlsIHRoZSANCmNvbXBsZXRpb24gaW50ZXJy
-dXB0IGFycml2ZXMsIG9yIGlzIHRoYXQgYSBiYWQgaWRlYT8NCg0KSSBjb3VsZCBwb3NzaWJs
-eSBpbXBsZW1lbnQgYSBzeW5jaHJvbm91cyBpbnRlcmZhY2UgYnkgYWx3YXlzIHJldHVybmlu
-ZyANCnRoZSBjdXJyZW50IGhhc2ggc3RhdGUgaW4gdGhlIHJlc3VsdCBxdWV1ZSBmb3IgZWFj
-aCBhc3luY2hyb25vdXMgDQpvcGVyYXRpb24gYW5kIHVwZGF0aW5nIHRoZSByZXF1ZXN0IGlu
-IGNhc2UgYW4gZXhwb3J0IHJlcXVlc3QgY29tZXMgDQphbG9uZywgaXMgdGhhdCByZWFsbHkg
-dGhlIGJlc3Qgb3B0aW9uPw0KDQogICAgU2ltb24NCg==
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+> Reviewed-by: Petr Vorel <pvorel@suse.cz>
+> ---
+>  include/crypto/public_key.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+> index 68f7aa2a7e55..6d61695e1cde 100644
+> --- a/include/crypto/public_key.h
+> +++ b/include/crypto/public_key.h
+> @@ -80,7 +80,16 @@ extern int create_signature(struct kernel_pkey_params *, const void *, void *);
+>  extern int verify_signature(const struct key *,
+>  			    const struct public_key_signature *);
+>  
+> +#if IS_REACHABLE(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE)
+>  int public_key_verify_signature(const struct public_key *pkey,
+>  				const struct public_key_signature *sig);
+> +#else
+> +static inline
+> +int public_key_verify_signature(const struct public_key *pkey,
+> +				const struct public_key_signature *sig)
+> +{
+> +	return -EINVAL;
+> +}
+> +#endif
+>  
+>  #endif /* _LINUX_PUBLIC_KEY_H */
+> -- 
+> 2.27.0
+> 
 
---------------5qrdSKszuquK7bIE9MsqV7b7--
-
---------------YkjKqQBGyWQHEW0Dt0tyHj6E
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmPluVkACgkQfr04e7CZ
-CBHTtAf/WnMdrw9Tx5FgI9W737MNAWSeh1SeCm/eSccUoj72mr3g2QXCRVZG650G
-5XWorTcpqm4Ab7Zz1q/45YwuEuXF3R312QimrclogESQdEcoiLgCa342Bz7qZAwF
-QCUUTNpSrxBo3MeF1JFwUyAN/6DaV5hniHTid7lBEU702qksLxiUL1zh4T7TEFbc
-BhxEvk0NIKZMpX14f3pHcVu3dwXAL1iH1gNmFpRg6ensebvAcRaaOtG+c5krVlQH
-1PfzOcc6wUSmdDd8TFm0VDkNTS0GSaxpMFiXrljZvAxZqERGh5DKYjKjMXMWWScU
-nLtqKeflesJZeQQN51jtG63eblZ0fQ==
-=FPuS
------END PGP SIGNATURE-----
-
---------------YkjKqQBGyWQHEW0Dt0tyHj6E--
+BR, Jarkko
