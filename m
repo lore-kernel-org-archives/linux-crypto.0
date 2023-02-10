@@ -2,231 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC469C6379F
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 13:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEB8C636D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 17:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbjBJNG2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 08:06:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40664 "EHLO
+        id S232836AbjBJRcy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 12:32:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231685AbjBJNG1 (ORCPT
+        with ESMTP id S232762AbjBJRcw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 08:06:27 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223E47AE11;
-        Fri, 10 Feb 2023 05:06:11 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31ACtYDD018947;
-        Fri, 10 Feb 2023 13:05:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=RMH9PfxrEZmXBs5HlCWUIj1nqHeW1n/Z8WQHJeUWOqg=;
- b=nMt2jStB/RyQux4u1Jx1XzrM4NLw3uCBkSDZCIp2aNgoNfJ4pGeT1Y/kk078Byp90BnV
- yUgF7S/5cMzap2aA0R9smC6uVk2S1F1jAjDTJxbDGTOK7GCOJvg2MeCm96kEFBsLtR5y
- t4y3BnORfZzeRx+t/1fqPI0ntbAF8ngd9nRPCAy3rbfIqbRAozNJZzP7YaCX+53QAb7D
- owd8RK9BPnecBwXbYsrmQdYh4qjvPyEU5dRyTu88TVP1z0N7gUlU+k597c43icFZdViX
- fY0ZvR26BmwTpvxds9r8vlapHfeIQp5EoyTfcxPV+q2fm0djdc7zOAdAhEPuzHKxadpU vA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnpc0ga0v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 13:05:28 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31ACu6NA020617;
-        Fri, 10 Feb 2023 13:05:27 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nnpc0g9xx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 13:05:27 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31ACCrSX001971;
-        Fri, 10 Feb 2023 13:05:25 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([9.208.130.101])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3nhf07xsp3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Feb 2023 13:05:25 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-        by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31AD5Ouf56754632
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Feb 2023 13:05:24 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D1F95803F;
-        Fri, 10 Feb 2023 13:05:24 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BAA9D58060;
-        Fri, 10 Feb 2023 13:05:22 +0000 (GMT)
-Received: from sig-9-77-142-160.ibm.com (unknown [9.77.142.160])
-        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Feb 2023 13:05:22 +0000 (GMT)
-Message-ID: <4bda209dfc891ac9044ce847785c383e89f14f97.camel@linux.ibm.com>
-Subject: Re: [PATCH v4 6/6] integrity: machine keyring CA configuration
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, jarkko@kernel.org,
-        dhowells@redhat.com, dwmw2@infradead.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, pvorel@suse.cz, tadeusz.struk@intel.com,
-        kanth.ghatraju@oracle.com, konrad.wilk@oracle.com,
-        erpalmer@linux.vnet.ibm.com, coxu@redhat.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Fri, 10 Feb 2023 08:05:22 -0500
-In-Reply-To: <20230207025958.974056-7-eric.snowberg@oracle.com>
-References: <20230207025958.974056-1-eric.snowberg@oracle.com>
-         <20230207025958.974056-7-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: iRVp5qk64i13A31hNdiBJVZrE8vj_KXY
-X-Proofpoint-GUID: x5mR7gi2FFWd4BNQqSF3zFvhIVEUIIbL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-10_07,2023-02-09_03,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 clxscore=1015 phishscore=0
- mlxscore=0 impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302100108
+        Fri, 10 Feb 2023 12:32:52 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68F9277B85
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 09:32:50 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id x31so4187236pgl.6
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 09:32:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1676050370;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VGMTFKoCBVoIuyA3qlOD8xOm7koGj1xemOk912C4V+A=;
+        b=Vn7d2rD7KGb7soIfLuYz1nXiJpWVaDMVEjgXteyCUSzsxr9Ncgw5UXzFLSbVKN4S/A
+         0cNjJaodxEQj/fEADyE0WZIGlfJzE3cvA6yuJWvmOcY8Qn0ZRFbwDDaHDLXQOmXjKGKc
+         +6YnLJWmQb25ktasgn3xtGPPz8uMe2oJdmnz0VyDW+gRGgo9/ZpuRjeshqHyQhrqC9BJ
+         coRxqszDAsqrCbcMcC9a5OSEMQXOoHhTWVUeu6/bqCxv30bjtf20ysQVu/JwpLN9Oirv
+         XqIFUU9DzANMzAhpTEARzChmzDzUQDJ7HPGzBvtmHrwHJ2Wj+5jzViU7/t0T8CXtQG3O
+         UubQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1676050370;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VGMTFKoCBVoIuyA3qlOD8xOm7koGj1xemOk912C4V+A=;
+        b=dfkcwwHLHIh209P6TNdjlYumE39w5Rnqv3J7v4Bfs9hIN70SWDhHiCouGDBZWorW3r
+         YSFeljOBe8vB2TxzP4czoFtVojCfegC5hgi+jeUbMZzppR1XDl6buMaQqBUxq8706pxe
+         lHedxnF3L3E7kS+xUN5ArxtFib8SZJvQ+kOlRJwhBgGBCJ76I24hbMDo9Qu+//rgsWOy
+         4PCJt24Z29tJDmiUNjtp+XMDBj4HEVuMcrUYFL5x/fpW+m4ya3gPX9pykfL/xg7WSDSo
+         wUSf2oEje/xwCtM890/D0G+iqnvqDwfGPoeiVrbRliGqNmS2ZniRKWD5e1hzV8JX5vMc
+         O3Nw==
+X-Gm-Message-State: AO0yUKVVKRkbhpg/A9+vnoL/b9VSPnNkSsYoD9SkJS8nmfzOo7V2KKH/
+        LQyhFow1KaGLlVNlRm3kB+pkCROGMZ+nC8hMYBPa
+X-Google-Smtp-Source: AK7set+OFwR+/j/4Th5qsCUEm60XL68IDyvuTHzlxIKdhE8fa2HwbFZ2wXzS/HuuMttpavQk/9qh74WXRb4WZw948c8=
+X-Received: by 2002:a62:5f02:0:b0:5a8:5247:2589 with SMTP id
+ t2-20020a625f02000000b005a852472589mr1477860pfb.7.1676050369837; Fri, 10 Feb
+ 2023 09:32:49 -0800 (PST)
+MIME-Version: 1.0
+References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
+ <20221227142740.2807136-3-roberto.sassu@huaweicloud.com> <Y64XB0yi24yjeBDw@sol.localdomain>
+ <d2a54ddec403cad12c003132542070bf781d5e26.camel@huaweicloud.com>
+ <857eedc5ad18eddae7686dca63cf8c613a051be4.camel@huaweicloud.com>
+ <Y+VBMQEwPTPGBIpP@gmail.com> <CAHC9VhTYeqCB8roaNvWUYJeKPwT35ixJ8MMXBe0v0+a9o8CXWw@mail.gmail.com>
+ <Y+XAbz6YmazGNFQr@kernel.org>
+In-Reply-To: <Y+XAbz6YmazGNFQr@kernel.org>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Fri, 10 Feb 2023 12:32:38 -0500
+Message-ID: <CAHC9VhQ8e96LbCSBMXoQwETJBmWvazjzSDE2X4cr3ezhaC_5uA@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] KEYS: asymmetric: Copy sig and digest in public_key_verify_signature()
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com, jmorris@namei.org,
+        serge@hallyn.com, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Thu, Feb 9, 2023 at 10:56 PM Jarkko Sakkinen <jarkko@kernel.org> wrote:
+> On Thu, Feb 09, 2023 at 05:46:32PM -0500, Paul Moore wrote:
+> > On Thu, Feb 9, 2023 at 1:53 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > > On Thu, Feb 09, 2023 at 11:49:19AM +0100, Roberto Sassu wrote:
+> > > > On Fri, 2023-01-27 at 09:27 +0100, Roberto Sassu wrote:
+> > > > > On Thu, 2022-12-29 at 14:39 -0800, Eric Biggers wrote:
+> > > > > > On Tue, Dec 27, 2022 at 03:27:40PM +0100, Roberto Sassu wrote:
+> > > > > > > From: Roberto Sassu <roberto.sassu@huawei.com>
+> > > > > > >
+> > > > > > > Commit ac4e97abce9b8 ("scatterlist: sg_set_buf() argument must be in linear
+> > > > > > > mapping") checks that both the signature and the digest reside in the
+> > > > > > > linear mapping area.
+> > > > > > >
+> > > > > > > However, more recently commit ba14a194a434c ("fork: Add generic vmalloced
+> > > > > > > stack support") made it possible to move the stack in the vmalloc area,
+> > > > > > > which is not contiguous, and thus not suitable for sg_set_buf() which needs
+> > > > > > > adjacent pages.
+> > > > > > >
+> > > > > > > Always make a copy of the signature and digest in the same buffer used to
+> > > > > > > store the key and its parameters, and pass them to sg_init_one(). Prefer it
+> > > > > > > to conditionally doing the copy if necessary, to keep the code simple. The
+> > > > > > > buffer allocated with kmalloc() is in the linear mapping area.
+> > > > > > >
+> > > > > > > Cc: stable@vger.kernel.org # 4.9.x
+> > > > > > > Fixes: ba14a194a434 ("fork: Add generic vmalloced stack support")
+> > > > > > > Link: https://lore.kernel.org/linux-integrity/Y4pIpxbjBdajymBJ@sol.localdomain/
+> > > > > > > Suggested-by: Eric Biggers <ebiggers@kernel.org>
+> > > > > > > Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+> > > > > > > ---
+> > > > > > >  crypto/asymmetric_keys/public_key.c | 38 ++++++++++++++++-------------
+> > > > > > >  1 file changed, 21 insertions(+), 17 deletions(-)
+> > > > > >
+> > > > > > Reviewed-by: Eric Biggers <ebiggers@google.com>
+> > > > >
+> > > > > Hi David
+> > > > >
+> > > > > could you please take this patch in your repo, if it is ok?
+> > > >
+> > > > Kindly ask your support here. Has this patch been queued somewhere?
+> > > > Wasn't able to find it, also it is not in linux-next.
+> > > >
+> > >
+> > > The maintainer of asymmetric_keys (David Howells) is ignoring this patch, so
+> > > you'll need to find someone else to apply it.  Herbert Xu, the maintainer of the
+> > > crypto subsystem, might be willing to apply it.  Or maybe Jarkko Sakkinen, who
+> > > is a co-maintainer of the keyrings subsystem (but not asymmetric_keys, for some
+> > > reason; should that change?).
+> >
+> > It is problematic that David isn't replying to this.  I have no idea
+> > if it will work, but I just reached out to him to see if I can draw
+> > his attention back to this ...
+>
+> See my response to Eric.
 
-On Mon, 2023-02-06 at 21:59 -0500, Eric Snowberg wrote:
-> Add a machine keyring CA restriction menu option to control the type of
-> keys that may be added to it. The options include none, min and max
-> restrictions.
-> 
-> When no restrictions are selected, all Machine Owner Keys (MOK) are added
-> to the machine keyring.  When CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MIN is
-> selected, the CA bit must be true.  Also the key usage must contain
-> keyCertSign, any other usage field may be set as well.
-> 
-> When CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MAX is selected, the CA bit must
-> be true. Also the key usage must contain keyCertSign and the
-> digitialSignature usage may not be set.
-> 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+Thanks Jarkko.
 
-Missing from the patch description is the motivation for this change.  
-The choices none, min, max implies a progression, which is good, and
-the technical differences between the choices, but not the reason.
-
-The motivation, at least from my perspective, is separation of
-certificate signing from code signing keys, where "none" is no
-separation and "max" being total separation of keys based on usage.
-
-Subsequent work, as discussed in the cover letter thread, will limit
-certificates being loaded onto the IMA keyring to code signing keys
-used for signature verification.
-
-thanks,
-
-Mimi
-> ---
->  crypto/asymmetric_keys/restrict.c |  2 ++
->  security/integrity/Kconfig        | 39 ++++++++++++++++++++++++++++++-
->  security/integrity/digsig.c       |  8 +++++--
->  3 files changed, 46 insertions(+), 3 deletions(-)
-> 
-> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-> index 48457c6f33f9..633021ea7901 100644
-> --- a/crypto/asymmetric_keys/restrict.c
-> +++ b/crypto/asymmetric_keys/restrict.c
-> @@ -140,6 +140,8 @@ int restrict_link_by_ca(struct key *dest_keyring,
->  		return -ENOKEY;
->  	if (!test_bit(KEY_EFLAG_KEYCERTSIGN, &pkey->key_eflags))
->  		return -ENOKEY;
-> +	if (IS_ENABLED(CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MIN))
-> +		return 0;
->  	if (test_bit(KEY_EFLAG_DIGITALSIG, &pkey->key_eflags))
->  		return -ENOKEY;
->  
-> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-> index 599429f99f99..eba6fd59fd16 100644
-> --- a/security/integrity/Kconfig
-> +++ b/security/integrity/Kconfig
-> @@ -68,13 +68,50 @@ config INTEGRITY_MACHINE_KEYRING
->  	depends on INTEGRITY_ASYMMETRIC_KEYS
->  	depends on SYSTEM_BLACKLIST_KEYRING
->  	depends on LOAD_UEFI_KEYS
-> -	depends on !IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY
->  	help
->  	 If set, provide a keyring to which Machine Owner Keys (MOK) may
->  	 be added. This keyring shall contain just MOK keys.  Unlike keys
->  	 in the platform keyring, keys contained in the .machine keyring will
->  	 be trusted within the kernel.
->  
-> +choice
-> +	prompt "Enforce Machine Keyring CA Restrictions"
-> +	default INTEGRITY_CA_MACHINE_KEYRING_NONE
-> +	depends on INTEGRITY_MACHINE_KEYRING
-> +	help
-> +	  The .machine keyring can be configured to enforce CA restriction
-> +	  on any key added to it. The options include none, min and max
-> +	  restrictions. By default no restrictions are in place and all
-> +	  Machine Owner Keys (MOK) are added to the machine keyring.
-> +
-> +config INTEGRITY_CA_MACHINE_KEYRING_NONE
-> +	bool "No restrictions"
-> +	help
-> +	  When no restrictions are selected, all Machine Owner Keys (MOK)
-> +	  are added to the machine keyring. MOK keys do not require the
-> +	  CA bit to be set. The key usage field is ignored. This is the
-> +	  default setting.
-> +
-> +config INTEGRITY_CA_MACHINE_KEYRING_MIN
-> +	bool "Only CA keys (with or without DigitialSignature usage set)"
-> +	help
-> +	  When min is selected, only load CA keys into the machine keyring.
-> +	  The CA bit must be set along with the keyCertSign Usage field.
-> +	  Keys containing the digitialSignature Usage field will also be
-> +	  loaded. The remaining MOK keys are loaded into the .platform
-> +	  keyring.
-> +
-> +config INTEGRITY_CA_MACHINE_KEYRING_MAX
-> +	bool "Only CA keys"
-> +	help
-> +	  When max is selected, only load CA keys into the machine keyring.
-> +	  The CA bit must be set along with the keyCertSign Usage field.
-> +	  Keys containing the digitialSignature Usage field will not be
-> +	  loaded. The remaining MOK keys are loaded into the .platform
-> +	  keyring.
-> +
-> +endchoice
-> +
->  config LOAD_UEFI_KEYS
->         depends on INTEGRITY_PLATFORM_KEYRING
->         depends on EFI
-> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-> index f2193c531f4a..3385f534f1da 100644
-> --- a/security/integrity/digsig.c
-> +++ b/security/integrity/digsig.c
-> @@ -132,7 +132,8 @@ int __init integrity_init_keyring(const unsigned int id)
->  		| KEY_USR_READ | KEY_USR_SEARCH;
->  
->  	if (id == INTEGRITY_KEYRING_PLATFORM ||
-> -	    id == INTEGRITY_KEYRING_MACHINE) {
-> +	    (id == INTEGRITY_KEYRING_MACHINE &&
-> +	    IS_ENABLED(CONFIG_INTEGRITY_CA_MACHINE_KEYRING_NONE))) {
->  		restriction = NULL;
->  		goto out;
->  	}
-> @@ -144,7 +145,10 @@ int __init integrity_init_keyring(const unsigned int id)
->  	if (!restriction)
->  		return -ENOMEM;
->  
-> -	restriction->check = restrict_link_to_ima;
-> +	if (id == INTEGRITY_KEYRING_MACHINE)
-> +		restriction->check = restrict_link_by_ca;
-> +	else
-> +		restriction->check = restrict_link_to_ima;
->  
->  	/*
->  	 * MOK keys can only be added through a read-only runtime services
-
-
+-- 
+paul-moore.com
