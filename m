@@ -2,100 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6135AC05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 10:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3977C05027
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 11:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbjBJKna (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 05:43:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
+        id S231724AbjBJLNl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 06:13:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231732AbjBJKn3 (ORCPT
+        with ESMTP id S232370AbjBJLNg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 05:43:29 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 757946ADC6;
-        Fri, 10 Feb 2023 02:43:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676025808; x=1707561808;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4ZpVP0uZpF9n0L+B8eTG5Uh8ltX2SGFA9vlGugK1LX8=;
-  b=OYe4fGNZg3XcmByQvMs1QqsOTVrJCqWYsish+F+SZ4zeOk/DkTDbmV36
-   7IuquLb9SJ64MfzPGApcd75DQpFB4c/IvnWMpyS4aony3RZeh9ZqSvmhh
-   Cgg0wSlVebXDkOFz04c8Tnw/OvQ0lsSsH7NBsrNIjFcL4+UBXURl1hGVI
-   Yq9bha6crkcF2d+r6Iz94Nk9UoiZjOhnTSu+GQtt1ziIsEkgvJ8z1k7ye
-   SiC9VqvEayCbs+InhvB+Byd/tpRrtu6hpVImX7m4X8m92rF5DCZ/s6TpP
-   cDc/3VsiO2oc0YO3DGTWoli6zLiTQy4pt5z/FzDgr8OjLSc2d0cwjN/AV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10616"; a="329019191"
-X-IronPort-AV: E=Sophos;i="5.97,286,1669104000"; 
-   d="scan'208";a="329019191"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2023 02:43:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10616"; a="617853387"
-X-IronPort-AV: E=Sophos;i="5.97,286,1669104000"; 
-   d="scan'208";a="617853387"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga003.jf.intel.com with ESMTP; 10 Feb 2023 02:43:24 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pQQsF-0050i0-0D;
-        Fri, 10 Feb 2023 12:43:23 +0200
-Date:   Fri, 10 Feb 2023 12:43:22 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
-        Grzegorz Bernacki <gjb@semihalf.com>,
-        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
-        Lendacky Thomas <Thomas.Lendacky@amd.com>,
-        herbert@gondor.apana.org.au,
-        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/6] i2c: designware: Use PCI PSP driver for communication
-Message-ID: <Y+YfyiERB80bHE1Y@smile.fi.intel.com>
-References: <20230209223811.4993-1-mario.limonciello@amd.com>
- <20230209223811.4993-7-mario.limonciello@amd.com>
+        Fri, 10 Feb 2023 06:13:36 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C907C26855
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:13:04 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id cq19so1724427edb.5
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:13:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0F5V8u32FkjZ6JTMcQQ2ae07GfQcwmVc4zZnvRqmXRs=;
+        b=S21+MFb+tXtaWrsM+rK9N7Bzg92fDQf4ErvwKLcuouOry/H3Y+PDE9IJU3W8+XIVQV
+         JtiY7ioCJmg0eWG67ecjPXMzGDo3+n2sdxImCN8CBh7+fkIjMctLzI/ZGaJHHn5VeePm
+         QCAG0dNotPZ2cG4PU7hu6GYqi/gXzkwG5ZTeqf479SwpdBQpquuyPVhu0gIXEyi9dPrL
+         cGKIf47XxG1qQkeo42pswqSCx2uTmEj7dEjNR4AW+OvXaaTlQjpi8bCZnhC7Zd57kuzS
+         KsVY9t55fG7UnNdKANALQmbbaiL6GBFEECd6V7gFwGKkGeI9IMFZ/kPwg2ATCmv6Ci19
+         nfVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0F5V8u32FkjZ6JTMcQQ2ae07GfQcwmVc4zZnvRqmXRs=;
+        b=LGnrkCrUO3PBccCubr0DGRE+/VPohTpEuR+tfXSEAnOHC/WqGC31a6hXMq/vwdfIkg
+         ALA3memN9izBx7b1hjd6jb6m6E/i0Ueyb8z+Y8288Hef2u4M4b38dMdMG2i+oREQxQQA
+         Fm6998kjiCLfC7A5gHY4reD6wWaT1JDIP7N7ej+CAtRjWnJM7fEslLKKUvgDxFD3bAMQ
+         IkrHkcDfyG7KGzzDNbrc9oyciTMXpOX2ZccLkWY7siIfWxrc0fddQrxFEq8gnua1+/lb
+         TvX+FRf/8rid817rOWnAo5MGrnl5QNZ2gcFIjBSgWlNz5Re9az/lkMHFFp34jYDqOoUY
+         XxEg==
+X-Gm-Message-State: AO0yUKWXboaoSH63mePXoQI0+X+shiBRI7im/ImBRyU9azuQ8/CixI+3
+        8zbW6WdE8FxXizopi/JZQqKlQQ==
+X-Google-Smtp-Source: AK7set9RvWvTSPxyoIeX9cMUXBUxTpSjONcNj5Cfqc1SMbCe6hopnlaOSNUMiM8c6e8TIB6ZJJITCA==
+X-Received: by 2002:a05:6402:5252:b0:4ac:373e:9d18 with SMTP id t18-20020a056402525200b004ac373e9d18mr339003edd.0.1676027577497;
+        Fri, 10 Feb 2023 03:12:57 -0800 (PST)
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id r12-20020a50c00c000000b0049dd7eec977sm2063655edb.41.2023.02.10.03.12.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Feb 2023 03:12:56 -0800 (PST)
+Message-ID: <4dd74e75-9412-b6e6-4077-719ef28d4b35@linaro.org>
+Date:   Fri, 10 Feb 2023 13:12:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230209223811.4993-7-mario.limonciello@amd.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
+ clock-names as optional
+Content-Language: en-US
+To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
+ <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
+ <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
+ <36b6f8f2-c438-f5e6-b48f-326e8b709de8@linaro.org>
+ <a2e4dff0-af8f-dccb-9074-8244b054c448@linaro.org>
+ <61eb2a01-762e-b83b-16b7-2c9b178407da@linaro.org>
+ <4fdd5618-fc35-00a8-7a6b-2dd231700686@linaro.org>
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <4fdd5618-fc35-00a8-7a6b-2dd231700686@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 09, 2023 at 04:38:08PM -0600, Mario Limonciello wrote:
-> Currently the PSP semaphore communication base address is discovered
-> by using an MSR that is not architecturally guaranteed for future
-> platforms.  Also the mailbox that is utilized for communication with
-> the PSP may have other consumers in the kernel, so it's better to
-> make all communication go through a single driver.
+On 2/7/23 01:45, Dmitry Baryshkov wrote:
+> On 02/02/2023 18:16, Vladimir Zapolskiy wrote:
+>> On 2/2/23 16:21, Neil Armstrong wrote:
+>>> On 02/02/2023 15:04, Vladimir Zapolskiy wrote:
+>>>> Hi Krzysztof,
+>>>>
+>>>> On 2/2/23 15:53, Krzysztof Kozlowski wrote:
+>>>>> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
+>>>>>> From: Neil Armstrong <neil.armstrong@linaro.org>
+>>>>>>
+>>>>>> On certain Snapdragon processors, the crypto engine clocks are
+>>>>>> enabled by
+>>>>>> default by security firmware.
+>>>>>
+>>>>> Then probably we should not require them only on these variants.
+>>>>
+>>>> I don't have the exact list of the affected SoCs, I believe Neil can
+>>>> provide
+>>>> such a list, if you find it crucial.
+>>>
+>>> It's the case for SM8350, SM8450 & SM8550.
+>>>
+>>
+>> On SM8250 there is no QCE clocks also, so I'll add it to the list, and I
+>> hope
+>> that now the list is complete.
+>>
+>> It could be that the relevant platforms are the ones with
+>> 'qcom,no-clock-support'
+>> property of QCE in the downstream.
+>>
+> 
+> Then, sc7180, sc8180x, sdx55, sm6150, sm7150, sm8150 also have this
+> property in QCE device. And, I think, it should also be applicable to
+> sc7280 and sc8280xp.
 
-...
+So maybe do you have a better candidate among the SoCs for a QCE IP family
+name than SM8150 based? Likely it could be the first released SoC among
+mentioned above.
 
->  #if IS_ENABLED(CONFIG_I2C_DESIGNWARE_AMDPSP)
->  int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev);
-> -void i2c_dw_amdpsp_remove_lock_support(struct dw_i2c_dev *dev);
->  #endif
-
-...
-
->  #ifdef CONFIG_I2C_DESIGNWARE_AMDPSP
->  	{
->  		.probe = i2c_dw_amdpsp_probe_lock_support,
-> -		.remove = i2c_dw_amdpsp_remove_lock_support,
->  	},
->  #endif
-
-Personally I found better to have empty stub for the sake of symmetry of API.
-But at the end it's not my decision, just felt that I have to express this.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+--
+Best wishes,
+Vladimir
