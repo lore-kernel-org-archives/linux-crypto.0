@@ -2,65 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60758C636D3
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 09:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6135AC05027
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 10:43:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231555AbjBJJti (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 04:49:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44224 "EHLO
+        id S231841AbjBJKna (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 05:43:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231439AbjBJJth (ORCPT
+        with ESMTP id S231732AbjBJKn3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 04:49:37 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A9A527B;
-        Fri, 10 Feb 2023 01:49:35 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pQQ1s-009c8U-00; Fri, 10 Feb 2023 17:49:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Feb 2023 17:49:15 +0800
-Date:   Fri, 10 Feb 2023 17:49:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Gonglei <arei.gonglei@huawei.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] virtio-crypto: Do not use GFP_ATOMIC when not needed
-Message-ID: <Y+YTG/RcD3hU2Dws@gondor.apana.org.au>
-References: <00f487d16bf9fc5ce215c44bed3f11df5adf266a.1675544037.git.christophe.jaillet@wanadoo.fr>
+        Fri, 10 Feb 2023 05:43:29 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 757946ADC6;
+        Fri, 10 Feb 2023 02:43:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676025808; x=1707561808;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4ZpVP0uZpF9n0L+B8eTG5Uh8ltX2SGFA9vlGugK1LX8=;
+  b=OYe4fGNZg3XcmByQvMs1QqsOTVrJCqWYsish+F+SZ4zeOk/DkTDbmV36
+   7IuquLb9SJ64MfzPGApcd75DQpFB4c/IvnWMpyS4aony3RZeh9ZqSvmhh
+   Cgg0wSlVebXDkOFz04c8Tnw/OvQ0lsSsH7NBsrNIjFcL4+UBXURl1hGVI
+   Yq9bha6crkcF2d+r6Iz94Nk9UoiZjOhnTSu+GQtt1ziIsEkgvJ8z1k7ye
+   SiC9VqvEayCbs+InhvB+Byd/tpRrtu6hpVImX7m4X8m92rF5DCZ/s6TpP
+   cDc/3VsiO2oc0YO3DGTWoli6zLiTQy4pt5z/FzDgr8OjLSc2d0cwjN/AV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10616"; a="329019191"
+X-IronPort-AV: E=Sophos;i="5.97,286,1669104000"; 
+   d="scan'208";a="329019191"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2023 02:43:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10616"; a="617853387"
+X-IronPort-AV: E=Sophos;i="5.97,286,1669104000"; 
+   d="scan'208";a="617853387"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga003.jf.intel.com with ESMTP; 10 Feb 2023 02:43:24 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1pQQsF-0050i0-0D;
+        Fri, 10 Feb 2023 12:43:23 +0200
+Date:   Fri, 10 Feb 2023 12:43:22 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
+        Grzegorz Bernacki <gjb@semihalf.com>,
+        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
+        Lendacky Thomas <Thomas.Lendacky@amd.com>,
+        herbert@gondor.apana.org.au,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] i2c: designware: Use PCI PSP driver for communication
+Message-ID: <Y+YfyiERB80bHE1Y@smile.fi.intel.com>
+References: <20230209223811.4993-1-mario.limonciello@amd.com>
+ <20230209223811.4993-7-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <00f487d16bf9fc5ce215c44bed3f11df5adf266a.1675544037.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20230209223811.4993-7-mario.limonciello@amd.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 04, 2023 at 09:54:08PM +0100, Christophe JAILLET wrote:
-> There is no need to use GFP_ATOMIC here. GFP_KERNEL is already used for
-> another memory allocation just the line after.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> This patch is speculative ! ! !
-> 
-> Maybe it is the other memory allocation that should use GFP_ATOMIC.
-> 
-> Review with care !
+On Thu, Feb 09, 2023 at 04:38:08PM -0600, Mario Limonciello wrote:
+> Currently the PSP semaphore communication base address is discovered
+> by using an MSR that is not architecturally guaranteed for future
+> platforms.  Also the mailbox that is utilized for communication with
+> the PSP may have other consumers in the kernel, so it's better to
+> make all communication go through a single driver.
 
-Looks correct to me.  We don't support calling akcipher in atomic
-contexts.
+...
 
-> ---
->  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  #if IS_ENABLED(CONFIG_I2C_DESIGNWARE_AMDPSP)
+>  int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev);
+> -void i2c_dw_amdpsp_remove_lock_support(struct dw_i2c_dev *dev);
+>  #endif
 
-Patch applied.  Thanks.
+...
+
+>  #ifdef CONFIG_I2C_DESIGNWARE_AMDPSP
+>  	{
+>  		.probe = i2c_dw_amdpsp_probe_lock_support,
+> -		.remove = i2c_dw_amdpsp_remove_lock_support,
+>  	},
+>  #endif
+
+Personally I found better to have empty stub for the sake of symmetry of API.
+But at the end it's not my decision, just felt that I have to express this.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+With Best Regards,
+Andy Shevchenko
+
+
