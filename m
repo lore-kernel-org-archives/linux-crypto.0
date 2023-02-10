@@ -2,65 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3977C05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 11:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA92C6379F
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Feb 2023 11:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231724AbjBJLNl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Feb 2023 06:13:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
+        id S232324AbjBJLRw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Feb 2023 06:17:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232370AbjBJLNg (ORCPT
+        with ESMTP id S232404AbjBJLRn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Feb 2023 06:13:36 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C907C26855
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:13:04 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id cq19so1724427edb.5
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:13:04 -0800 (PST)
+        Fri, 10 Feb 2023 06:17:43 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035DB39BAF
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:17:27 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id qb15so12872049ejc.1
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 03:17:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=linaro.org; s=google; t=1676027840;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0F5V8u32FkjZ6JTMcQQ2ae07GfQcwmVc4zZnvRqmXRs=;
-        b=S21+MFb+tXtaWrsM+rK9N7Bzg92fDQf4ErvwKLcuouOry/H3Y+PDE9IJU3W8+XIVQV
-         JtiY7ioCJmg0eWG67ecjPXMzGDo3+n2sdxImCN8CBh7+fkIjMctLzI/ZGaJHHn5VeePm
-         QCAG0dNotPZ2cG4PU7hu6GYqi/gXzkwG5ZTeqf479SwpdBQpquuyPVhu0gIXEyi9dPrL
-         cGKIf47XxG1qQkeo42pswqSCx2uTmEj7dEjNR4AW+OvXaaTlQjpi8bCZnhC7Zd57kuzS
-         KsVY9t55fG7UnNdKANALQmbbaiL6GBFEECd6V7gFwGKkGeI9IMFZ/kPwg2ATCmv6Ci19
-         nfVA==
+        bh=aezVSxJ46OjzjaqgPkeYoeGbwBe2zO4fLCrZB2BY/og=;
+        b=ooO7l0hGVnz/F4hX+nsq/R15dmokH73APhqZAa7eFE6+UR+mEm0lSteXP+VzV1mkul
+         NqbT799XeR2F26VyAX4CwYVrqJIn5rs5Gxtc0Tgf9hNN8cM16ikWY8q7sAccD0ZNyHUv
+         qlJI2WzqpPkhrQ52oTsqupvrzn7T+luyQV2mcdStVEnbNGz5Iajc1wErji6ot2JHLbBB
+         rOWok2ABJPiYNxsDjwBOxBhPlK09hXDVithExTM8z5MPT9Zy5qI7k9BhKMVMAWnnszXn
+         0GFDr0j7uQWxzmpO9EPx2BqbRLKQw5zFs1g+utM1bN7kl+ncw+m78UMy3izOjqBQyCuE
+         FBWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
+        d=1e100.net; s=20210112; t=1676027840;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0F5V8u32FkjZ6JTMcQQ2ae07GfQcwmVc4zZnvRqmXRs=;
-        b=LGnrkCrUO3PBccCubr0DGRE+/VPohTpEuR+tfXSEAnOHC/WqGC31a6hXMq/vwdfIkg
-         ALA3memN9izBx7b1hjd6jb6m6E/i0Ueyb8z+Y8288Hef2u4M4b38dMdMG2i+oREQxQQA
-         Fm6998kjiCLfC7A5gHY4reD6wWaT1JDIP7N7ej+CAtRjWnJM7fEslLKKUvgDxFD3bAMQ
-         IkrHkcDfyG7KGzzDNbrc9oyciTMXpOX2ZccLkWY7siIfWxrc0fddQrxFEq8gnua1+/lb
-         TvX+FRf/8rid817rOWnAo5MGrnl5QNZ2gcFIjBSgWlNz5Re9az/lkMHFFp34jYDqOoUY
-         XxEg==
-X-Gm-Message-State: AO0yUKWXboaoSH63mePXoQI0+X+shiBRI7im/ImBRyU9azuQ8/CixI+3
-        8zbW6WdE8FxXizopi/JZQqKlQQ==
-X-Google-Smtp-Source: AK7set9RvWvTSPxyoIeX9cMUXBUxTpSjONcNj5Cfqc1SMbCe6hopnlaOSNUMiM8c6e8TIB6ZJJITCA==
-X-Received: by 2002:a05:6402:5252:b0:4ac:373e:9d18 with SMTP id t18-20020a056402525200b004ac373e9d18mr339003edd.0.1676027577497;
-        Fri, 10 Feb 2023 03:12:57 -0800 (PST)
+        bh=aezVSxJ46OjzjaqgPkeYoeGbwBe2zO4fLCrZB2BY/og=;
+        b=Sn15hQITq4165yyIE7AQq+MClkyj79G+CLW4fmYPDjXwWjl4M0pHiKcoiFRYztW66i
+         eRD2sy/QjGbXNUE0sg8bxhwXCcePNAmvu8q8S6NyYT8CbPcoprATXmHPXZv+cIDUW7bN
+         GpcF2aS843NhdUlqtsPAKgyMpXbryHWAajUN8y80LZhyj4PufP/Vc1Ax/KVuPwqVF/9b
+         B1ia22BGKocJTl/bZtvyxOzNpDGHPEV2TNaWbVVbtvrC08KtUd6PQr90ehH30OByDHiJ
+         2L033sGcWRoyCoKSU2eMX9j0mPdXC8sNF0WtbdhTnJv/OMLXkSS8bNbli813okhMKaMp
+         /7AA==
+X-Gm-Message-State: AO0yUKUveOBLViiEgkyYWl/WIIgxTaLFlzdEo8JPph3CVykZMiAW1RTA
+        SgZnw9796wqZaVpE5yAaj7yZIw==
+X-Google-Smtp-Source: AK7set8NkHKvtt8ANyqJ3Y2tcUCj/pPJEHc8nsiYaAnl2rX6HI9NEO85ZQo3APey5JONQ5qv3hErcA==
+X-Received: by 2002:a17:906:5349:b0:889:d24e:6017 with SMTP id j9-20020a170906534900b00889d24e6017mr13083721ejo.3.1676027840433;
+        Fri, 10 Feb 2023 03:17:20 -0800 (PST)
 Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id r12-20020a50c00c000000b0049dd7eec977sm2063655edb.41.2023.02.10.03.12.55
+        by smtp.gmail.com with ESMTPSA id f13-20020a170906c08d00b00878003adeeesm2250686ejz.23.2023.02.10.03.17.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Feb 2023 03:12:56 -0800 (PST)
-Message-ID: <4dd74e75-9412-b6e6-4077-719ef28d4b35@linaro.org>
-Date:   Fri, 10 Feb 2023 13:12:55 +0200
+        Fri, 10 Feb 2023 03:17:19 -0800 (PST)
+Message-ID: <5e419feb-8219-61d5-8e4b-f96c5f382a64@linaro.org>
+Date:   Fri, 10 Feb 2023 13:17:18 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.0.2
-Subject: Re: [PATCH v8 5/9] dt-bindings: qcom-qce: document clocks and
- clock-names as optional
+Subject: Re: [PATCH v9 06/14] dt-bindings: qcom-qce: document optional clocks
+ and clock-names properties
 Content-Language: en-US
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Bjorn Andersson <andersson@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Thara Gopinath <thara.gopinath@gmail.com>,
@@ -70,61 +69,55 @@ Cc:     Rob Herring <robh+dt@kernel.org>,
         Andy Gross <agross@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20230202135036.2635376-1-vladimir.zapolskiy@linaro.org>
- <20230202135036.2635376-6-vladimir.zapolskiy@linaro.org>
- <32c23da1-45f0-82a4-362d-ae5c06660e20@linaro.org>
- <36b6f8f2-c438-f5e6-b48f-326e8b709de8@linaro.org>
- <a2e4dff0-af8f-dccb-9074-8244b054c448@linaro.org>
- <61eb2a01-762e-b83b-16b7-2c9b178407da@linaro.org>
- <4fdd5618-fc35-00a8-7a6b-2dd231700686@linaro.org>
+        linux-crypto@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>
+References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
+ <20230208183755.2907771-7-vladimir.zapolskiy@linaro.org>
+ <b2d75c0a-a9f3-3d28-5e05-25fe3a18dcfb@linaro.org>
 From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-In-Reply-To: <4fdd5618-fc35-00a8-7a6b-2dd231700686@linaro.org>
+In-Reply-To: <b2d75c0a-a9f3-3d28-5e05-25fe3a18dcfb@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/7/23 01:45, Dmitry Baryshkov wrote:
-> On 02/02/2023 18:16, Vladimir Zapolskiy wrote:
->> On 2/2/23 16:21, Neil Armstrong wrote:
->>> On 02/02/2023 15:04, Vladimir Zapolskiy wrote:
->>>> Hi Krzysztof,
->>>>
->>>> On 2/2/23 15:53, Krzysztof Kozlowski wrote:
->>>>> On 02/02/2023 14:50, Vladimir Zapolskiy wrote:
->>>>>> From: Neil Armstrong <neil.armstrong@linaro.org>
->>>>>>
->>>>>> On certain Snapdragon processors, the crypto engine clocks are
->>>>>> enabled by
->>>>>> default by security firmware.
->>>>>
->>>>> Then probably we should not require them only on these variants.
->>>>
->>>> I don't have the exact list of the affected SoCs, I believe Neil can
->>>> provide
->>>> such a list, if you find it crucial.
->>>
->>> It's the case for SM8350, SM8450 & SM8550.
->>>
+On 2/9/23 11:20, Krzysztof Kozlowski wrote:
+> On 08/02/2023 19:37, Vladimir Zapolskiy wrote:
+>> On newer Qualcomm SoCs the crypto engine clocks are enabled by default
+>> by security firmware. To drop clocks and clock-names from the list of
+>> required properties use 'qcom,sm8150-qce' compatible name.
 >>
->> On SM8250 there is no QCE clocks also, so I'll add it to the list, and I
->> hope
->> that now the list is complete.
+>> The change is based on Neil Armstrong's observation and an original change.
 >>
->> It could be that the relevant platforms are the ones with
->> 'qcom,no-clock-support'
->> property of QCE in the downstream.
+>> Cc: Neil Armstrong <neil.armstrong@linaro.org>
+>> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+>> ---
+>>   .../devicetree/bindings/crypto/qcom-qce.yaml      | 15 +++++++++++++--
+>>   1 file changed, 13 insertions(+), 2 deletions(-)
 >>
+>> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> index f6f1759a2f6e..d0f6b830a5dd 100644
+>> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>> @@ -79,11 +79,22 @@ properties:
+>>   required:
+>>     - compatible
+>>     - reg
+>> -  - clocks
+>> -  - clock-names
+>>     - dmas
+>>     - dma-names
+>>   
+>> +if:
 > 
-> Then, sc7180, sc8180x, sdx55, sm6150, sm7150, sm8150 also have this
-> property in QCE device. And, I think, it should also be applicable to
-> sc7280 and sc8280xp.
+> This should be in allOf, like I wrote in last discussion.
 
-So maybe do you have a better candidate among the SoCs for a QCE IP family
-name than SM8150 based? Likely it could be the first released SoC among
-mentioned above.
+In the last discussion you shared two options, and I got an impression
+that adding a new "non-clock-requiring" compatible is a better option,
+in this series it is "qcom,sm8150-qce".
+
+So, do you wish to see an added allOf: on top of a single if: anyway?
 
 --
 Best wishes,
