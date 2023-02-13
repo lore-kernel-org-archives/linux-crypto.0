@@ -2,424 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDACDC636CC
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Feb 2023 19:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B34C05027
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Feb 2023 01:48:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjBKTJq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Feb 2023 14:09:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49012 "EHLO
+        id S229476AbjBMBst (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 12 Feb 2023 20:48:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBKTJo (ORCPT
+        with ESMTP id S229468AbjBMBss (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Feb 2023 14:09:44 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18AEA138
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Feb 2023 11:09:43 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d8so8641659plr.10
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Feb 2023 11:09:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R3dyCmBTvYfMxYq89TafHnhB0U3eSob4XWUodE6XlKA=;
-        b=IVIsT0kDIbXAGcSeNj3uEphm0Z+xl3Bg6sftUoG/Vrju74pPwFGShj3cZO3NydxgVn
-         TekSk7TbEB8PCowzi1gUovsEM/5dPW1o27r6SwJul4C963wGm4gpyypokKRm6bCfZmL5
-         MZhiKHsjlztNlWke/yxM5l9C/+UPgqSWIbxR/F3TgTpFqge280CTbvG7ck3AUulJY+8W
-         1I8uG2vyB50atNBYHoiozomj5Rm52OPMM4sSybI8Z46DYblQEoJz67eU3naZ4HQ5xoEl
-         1lh6IrY3aeU1zpZC/6VlYVvrTYl1TXWvPnRVY1AmbfOJM0AMqWndBvspdTlgyksP0HRD
-         LSHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R3dyCmBTvYfMxYq89TafHnhB0U3eSob4XWUodE6XlKA=;
-        b=KhpFCt/D1JCf3XONcjvg6KbKNLW4ej+w9oTSdtYlzDO5mubn8HMyzEgmfC1EjFLjs7
-         ZgXCxoUSz8FG0o/zsqPG8qqyo2j4+oHwReeATEbfEqdT/Gt8LMo454g6kEaeWuwKohIv
-         +b3DZN2dKn9n3I6t9NXDqFKtEPN0l3vccc9QpUMUsi4HJSvpJTr/0EQ1uRLKY9bN8/3p
-         5PonPm+t3QifAS40baZiPQ30dvQpa2Jn6k9CB+BcoCwrQ5t9k1eT0dRx2HOqwYr4vAI/
-         +KWcoKWLaSEtaQ/hJlntgQq5oF4tQDQjCM2dF1E5NW7DTo7MsXpjvyG/urxhKWBQh4t+
-         kR8A==
-X-Gm-Message-State: AO0yUKUXikdX42IZBP1KwEIO6P8ZAxvbSD4U1CRnRcBFtW9qNOQddjyc
-        vg8cRMhyZjF6H2OlU7id6uo=
-X-Google-Smtp-Source: AK7set93enYo/03UoTr+n660rDL2Ug0DN+9ZpdHFbTUd4/929xLI/IXSzBZLwPywLInMD4HiQJIEAg==
-X-Received: by 2002:a17:90b:3904:b0:22c:b2bf:e462 with SMTP id ob4-20020a17090b390400b0022cb2bfe462mr21831085pjb.34.1676142581823;
-        Sat, 11 Feb 2023 11:09:41 -0800 (PST)
-Received: from [192.168.0.4] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id p9-20020a17090a2d8900b00233bab35b57sm2171537pjd.29.2023.02.11.11.09.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Feb 2023 11:09:41 -0800 (PST)
-Message-ID: <e4df2d68-6106-0c42-e61a-65fff0292a9d@gmail.com>
-Date:   Sun, 12 Feb 2023 04:09:37 +0900
+        Sun, 12 Feb 2023 20:48:48 -0500
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2093.outbound.protection.outlook.com [40.107.117.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F98FEB7E
+        for <linux-crypto@vger.kernel.org>; Sun, 12 Feb 2023 17:48:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Po7Sbw+qNLwZI4iANLBmVM+Bj56WfFXbGH9OadVAU0zuJcCRUoLVMHjgn5+ir5b2WzRwz3v6JHN8uxN2MU/s/CRBMUV+vPp4wTklo1RtCYzqWZLY8955R1Abs+Tm4x8Wg7QjZbfaY1aOvT50DB6ax0NkOO8ScSCZPSC6STfPHDILPwLH4uDM2E9vbNvHMJAYC+J/s5DsPahO/USn2BrhoP3V/zqJm79iwVuVZhtycPzqXH0BIK7DNODlAdpqVmsJaj3GLMns9pgKLJqcvs/g2A1HfC6OyrExsopAXYdJlWKHv3+mzJM1N2HIizSTUS3XyYoL64q6T5sgQv0VHdmykA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UxLoBiPLmR1+Px60LxYQ3Epo7GDFNSOyzlfsj8qIkJ4=;
+ b=KTHp0TEBeODp56h4/HRiAuRPjsmY6bbYsbGMehAwOrA9nZIr88c+N8GN4/grQlEYiCwXQ1X3mlirUxuHA07uv7fwAzkdrNJMsOCiQsmllrACrsw1pRztuD29NJ0NRuMruhKEWRtSufQCNKWVM10LepDJScQfNtzQB3jKGxTdSc7hESTwvB5EDK7qmzY6hJaq3aWGbqvZ3gP+lwFx8qCG+TV0iCsGasZyXf87TtKrm7u6t9kOVisnsZ+oMjx8FOQS8WeSMalIKUpaEwrcpL513u1YzLSSpVJPzO6GAgrPEl5nn3C3JDOxB7xDDkREd+oTqA1Wv60qAQUlqISza/mUAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UxLoBiPLmR1+Px60LxYQ3Epo7GDFNSOyzlfsj8qIkJ4=;
+ b=C1x1Dnj5Mu8z5OfEIzq3QwqV+PML6bkHRWTrz+doO5/rHCC8fZLw9Mim4aU1LL2Txbe1dd87Cn5HOjNk5JKNcAouCc/9E/enVXEf4RlxlIb/tu5nwIoCHT4tAduSlLsu7m+YO5btD3vDPJsUYRn0teXkq3KzzevznfjM6NTK1danvleGw+7UX7XrQmE75p2YBB16Fjoqlr/77bavtVI+Z17AR4Gn/EMwz7AiFo06wn8Etf5f76QFQvbw1S9rKcCkvRlv0hoJ6b8StklRszpu3sJS6aA1GF+00CGJj+isEU2NWA9ZxNhO3Kwc1w8r6JAzmwUmx6GIW+owLgyKOzbo2g==
+Received: from TY2PR06MB3213.apcprd06.prod.outlook.com (2603:1096:404:97::16)
+ by TYZPR06MB3997.apcprd06.prod.outlook.com (2603:1096:400:25::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.9; Mon, 13 Feb
+ 2023 01:48:40 +0000
+Received: from TY2PR06MB3213.apcprd06.prod.outlook.com
+ ([fe80::b113:70f9:7dc9:543f]) by TY2PR06MB3213.apcprd06.prod.outlook.com
+ ([fe80::b113:70f9:7dc9:543f%7]) with mapi id 15.20.6086.017; Mon, 13 Feb 2023
+ 01:48:40 +0000
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>
+Subject: RE: [PATCH] crypto: aspeed - Fix modular aspeed-acry
+Thread-Topic: [PATCH] crypto: aspeed - Fix modular aspeed-acry
+Thread-Index: AQHZPTPOz63YKu8QIkKM6cbL7zYuJq7MIA0Q
+Date:   Mon, 13 Feb 2023 01:48:40 +0000
+Message-ID: <TY2PR06MB3213FAE443DC7F66CC3438CB80DD9@TY2PR06MB3213.apcprd06.prod.outlook.com>
+References: <Y+YRKdWUA4jjoUZ2@gondor.apana.org.au>
+In-Reply-To: <Y+YRKdWUA4jjoUZ2@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY2PR06MB3213:EE_|TYZPR06MB3997:EE_
+x-ms-office365-filtering-correlation-id: 680446d4-80f7-4a0f-81d3-08db0d646eaa
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Bh0yefv39WbxT0pHJiNWO4zZm/S/ABsK0LGcL8980NTAXb/E7woSAKjH4dfUsCWaML0G9EAPXbv4QvrvRu3NZrfJaUsOk1aBfEfYK935YWAnwGzl6uwx9AE5TqwQ1yOX9uHscDu9BRAEuM6UI3HSdccqTlzjxQ696y7rVLglOM/8xq73vT+/QOJ4vnet/0a3rQtdNMSHr+b7kb9Bj2vFE+HsOeoqGTR1IpoWh8D+uS6i3n85gHkdXV+Ro51sjVR/U/2SehGTMFLaIk8Dxgh0FCKag1nludtoz5dSRqHo5dxVgGR6gJX5m1M+wL1K14bMd5JQ8kMPkbyiEMgjgedCWVt5KEbMnbZQZFCnZsv8B81IAl294GsLDTLkCP4eX8JUfQ3nqWKFhuZHuNRFEk6EsF39BFfxpT4WFTJIfXW8juOkbC7GZC6dhxhzaf7tIyk6s+LYmpoS3DhFEadCa27ZbMdWU8Z5NKwTdmGNdJqQkXAD6A9kxYp6Y8pdfvOU80z6vcnf22OOI7Dk4IxESDYJ7Dy76Ht2Lix9bB2hAZlk7AqAxyto4iKC+mI0qdEZm89pUgMkFwYrFJ2u+aN7ZquqFvuRAhFWelQBTA/a53kLz+9h+g8vroQGBLtaOTOWG1zVd5X2l/rQWyyKwH+PwhB7l6buJQihasp4V7fuBll5YrnVer1MeoXern+2rhgY/QYnukMTC7XV41+iDPneCH0XQoq7lcaZa2RLqc737ltSOAk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3213.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(346002)(136003)(39830400003)(396003)(376002)(451199018)(86362001)(316002)(71200400001)(110136005)(26005)(6506007)(9686003)(186003)(478600001)(33656002)(966005)(55016003)(7696005)(2906002)(8936002)(38100700002)(4744005)(52536014)(38070700005)(41300700001)(76116006)(5660300002)(8676002)(66446008)(66556008)(66476007)(122000001)(64756008)(66946007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?l9DjIrm9Vvf30Nz/1y2BSxojGu74NRT7hsnkGf/vm17FUNuXYDRfmwUpLsgL?=
+ =?us-ascii?Q?c0ipVJuWaJk+LW99P/I6mD32rsFPUKJ3kGxKRmQbMUYQ8sbwmUc+tTQgMY5w?=
+ =?us-ascii?Q?dMFp/OKj0khojT/S83aAu3VWHSecQimmJN3Ddydl563FCgKFuAVv6lTjeUCZ?=
+ =?us-ascii?Q?qbU+ZvNxMwDnColKkbRSghR7Wh96OpXjleFUemROecrkrAzz4Wm/LOp4A+pM?=
+ =?us-ascii?Q?25tChBWE5cA6+t0PazENRGbH1FLqakqpQZY7wfFMqxMkl6qMThtNlOKpt/1M?=
+ =?us-ascii?Q?ZJcwUCF0yHbQRk28eggpjUi3HaDrWrzli20JSEc7hy869LVfyPum+D0VEqqJ?=
+ =?us-ascii?Q?k2tHeoRkr7L8XJj45qxR16JhNdKs2XhSDFg4h7AEzTcjogiKUNCxwaxjSo3h?=
+ =?us-ascii?Q?CChzSwe7621Ms07U1jM54Bdhbs3e5UkCoh7ojHv0BCtgjVUDz0bJsmhJyPQT?=
+ =?us-ascii?Q?bEQfgH3H6moTdHvssKD2qKzxPThW2IPQDI6pk6gqXye1QatjdfPuvPf8AYWL?=
+ =?us-ascii?Q?2ETHkfMDne8hqjBa5+XNk7lTCDiTm39t2aAtlT5KzPVfMFG67ElZ7RrKkf+y?=
+ =?us-ascii?Q?7GC6tpEoSoZpGHeUPVIP+Hd1a1STm/RN1boZsJ6RJoT3R8aPj5Mf/2FFQaKu?=
+ =?us-ascii?Q?vTG84Jh96xJuPb9sv/SQuwWg/iD7HpwpP3o56G7D7nBOk26BxnUaf7KGlkRu?=
+ =?us-ascii?Q?fi3L4u/ruKSBhLxMPGBWpa+ZtS38Krc+e9CpcoQYxlhk7CXT8piG/8LJsyPE?=
+ =?us-ascii?Q?VCvCc4K0ugvUM89jN0N6AwBRoI5nGJeuvhETQLaiP4LneyfahsBCG3GuK8U+?=
+ =?us-ascii?Q?UCsseauwGDsS+z41FSXgdRdtXU/A/QQdPvRZLfVhJwpQnaZWKgGYSIBvbztT?=
+ =?us-ascii?Q?XpOnrY/amx4/zM5Y0kpkkJGqM/dBExmUqulbo9PA2qbQxPM+k6wLjOVFe4ai?=
+ =?us-ascii?Q?PB7s1yIUBAKAbxt01cNTbZp/rjJvn+kjHFf+bZMIyhCskfWvbWmiWzMPQQ60?=
+ =?us-ascii?Q?IOf79vWi6FT4J+w+Ew+3NyqmFnUwP1Ka6quUpv5qj+W9e1Jq/dWNJrKQlf8c?=
+ =?us-ascii?Q?JronV2nGUQRw3gTbuPHQzWcy9bn48b2FzQTqvwfettsDRsjek/TFC3KW28LA?=
+ =?us-ascii?Q?f0uiez7+FihyCGm0vpB2Y+U1AaddwBNS6eOW3aPLf0vaZyArcJq9kSfHk54N?=
+ =?us-ascii?Q?S+kpT2pScqlNGDROuvA2qww/tWbZvxfpABbH74pg5QXFIcE9frEio6nmuagS?=
+ =?us-ascii?Q?ZgZpmPDp/RNPVgPFeDrzGXG5HolbM7iY+buq1jJRz8pN8zYM2aSawIWkO4Ue?=
+ =?us-ascii?Q?hQa596XKY72AwoR20xcAeSc5uImbtoJX/wq/kw5VIk0ON2yDFxSPIg0/SwD0?=
+ =?us-ascii?Q?Ksx6XPGN4MXt4ixQkinJa1yliA2XdyQab4NSOe1sZf2MMvATeASOR2Jlz7cU?=
+ =?us-ascii?Q?apWGTKTkREeVHcoWzl3+6l/E5xGY/okI9+1yMKX+WJ4tOnt/+fFn9EJ/L77q?=
+ =?us-ascii?Q?LdXzUTf5WQeW5T6hVez8RUioOy0CpkmS5dHDitUFcqSfZPXX3EWbOLP28PbQ?=
+ =?us-ascii?Q?5ojCzntw8mIjPcjWe+WdtsfdpVR2JaKU1nbmuB9F?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] crypto: x86/aria-avx - fix using avx2 instructions
-Content-Language: en-US
-To:     "Erhard F." <erhard_f@mailbox.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, x86@kernel.org
-References: <20230210181541.2895144-1-ap420073@gmail.com>
- <20230211004855.52a8380c@yea>
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <20230211004855.52a8380c@yea>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3213.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 680446d4-80f7-4a0f-81d3-08db0d646eaa
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Feb 2023 01:48:40.7303
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JBnpsCdEZbBCAMnPC/G4VafySvrJw8r0Myf0NmNkFdZOqA1NQlB+ELgJ79rMicfoj4Utdu2i/kZBdMaHIlFBJg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB3997
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/11/23 08:48, Erhard F. wrote:
+> When aspeed-acry is enabled as a module it doesn't get built at all.  Fix=
+ this
+> by adding it to obj-m.
+>=20
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Hi Erhard,
-Thank you so much for the testing!
-
- > On Fri, 10 Feb 2023 18:15:41 +0000
- > Taehee Yoo <ap420073@gmail.com> wrote:
- >
- >> vpbroadcastb and vpbroadcastd are not AVX instructions.
- >> But the aria-avx assembly code contains these instructions.
- >> So, kernel panic will occur if the aria-avx works on AVX2 unsupported
- >> CPU.
- >>
- >> vbroadcastss, and vpshufb are used to avoid using vpbroadcastb in it.
- >> Unfortunately, this change reduces performance by about 5%.
- >> Also, vpbroadcastd is simply replaced by vmovdqa in it.
- >
- > Thanks Taehee, your patch fixes the issue on my AMD FX-8370!
-
-Nice :)
-
- >
- > # cryptsetup benchmark -c aria-ctr-plain64
- > # Tests are approximate using memory only (no storage IO).
- > # Algorithm |       Key |      Encryption |      Decryption
- >     aria-ctr        256b       301.3 MiB/s       303.6 MiB/s
-
-Thanks for this benchmark!
-
- >
- > The patch did not apply cleanly on v6.2-rc7 however. I needed to do 
-small trivial modifications on hunk #1 and #21. Perhaps this is useful 
-for other users to test so i'll attach it.
-
-Thanks for this :)
-
- >
- > Regards,
- > Erhard
- >
- > diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S 
-b/arch/x86/crypto/aria-aesni-avx-asm_64.S
- > index fe0d84a7ced1..9243f6289d34 100644
- > --- a/arch/x86/crypto/aria-aesni-avx-asm_64.S
- > +++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
- > @@ -271,34 +271,43 @@
- >
- >   #define aria_ark_8way(x0, x1, x2, x3,			\
- >   		      x4, x5, x6, x7,			\
- > -		      t0, rk, idx, round)		\
- > +		      t0, t1, t2, rk,			\
- > +		      idx, round)			\
- >   	/* AddRoundKey */                               \
- > -	vpbroadcastb ((round * 16) + idx + 3)(rk), t0;	\
- > -	vpxor t0, x0, x0;				\
- > -	vpbroadcastb ((round * 16) + idx + 2)(rk), t0;	\
- > -	vpxor t0, x1, x1;				\
- > -	vpbroadcastb ((round * 16) + idx + 1)(rk), t0;	\
- > -	vpxor t0, x2, x2;				\
- > -	vpbroadcastb ((round * 16) + idx + 0)(rk), t0;	\
- > -	vpxor t0, x3, x3;				\
- > -	vpbroadcastb ((round * 16) + idx + 7)(rk), t0;	\
- > -	vpxor t0, x4, x4;				\
- > -	vpbroadcastb ((round * 16) + idx + 6)(rk), t0;	\
- > -	vpxor t0, x5, x5;				\
- > -	vpbroadcastb ((round * 16) + idx + 5)(rk), t0;	\
- > -	vpxor t0, x6, x6;				\
- > -	vpbroadcastb ((round * 16) + idx + 4)(rk), t0;	\
- > -	vpxor t0, x7, x7;
- > +	vbroadcastss ((round * 16) + idx + 0)(rk), t0;	\
- > +	vpsrld $24, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x0, x0;				\
- > +	vpsrld $16, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x1, x1;				\
- > +	vpsrld $8, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x2, x2;				\
- > +	vpshufb t1, t0, t2;				\
- > +	vpxor t2, x3, x3;				\
- > +	vbroadcastss ((round * 16) + idx + 4)(rk), t0;	\
- > +	vpsrld $24, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x4, x4;				\
- > +	vpsrld $16, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x5, x5;				\
- > +	vpsrld $8, t0, t2;				\
- > +	vpshufb t1, t2, t2;				\
- > +	vpxor t2, x6, x6;				\
- > +	vpshufb t1, t0, t2;				\
- > +	vpxor t2, x7, x7;
- >
- >   #define aria_sbox_8way_gfni(x0, x1, x2, x3,		\
- >   			    x4, x5, x6, x7,		\
- >   			    t0, t1, t2, t3,		\
- >   			    t4, t5, t6, t7)		\
- > -	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
- > -	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
- > -	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
- > -	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
- > -	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
- > +	vmovdqa .Ltf_s2_bitmatrix, t0;			\
- > +	vmovdqa .Ltf_inv_bitmatrix, t1;			\
- > +	vmovdqa .Ltf_id_bitmatrix, t2;			\
- > +	vmovdqa .Ltf_aff_bitmatrix, t3;			\
- > +	vmovdqa .Ltf_x2_bitmatrix, t4;			\
- >   	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
- >   	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
- >   	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
- > @@ -315,10 +324,9 @@
- >   		       x4, x5, x6, x7,			\
- >   		       t0, t1, t2, t3,			\
- >   		       t4, t5, t6, t7)			\
- > -	vpxor t7, t7, t7;				\
- >   	vmovdqa .Linv_shift_row, t0;			\
- >   	vmovdqa .Lshift_row, t1;			\
- > -	vpbroadcastd .L0f0f0f0f, t6;			\
- > +	vbroadcastss .L0f0f0f0f, t6;			\
- >   	vmovdqa .Ltf_lo__inv_aff__and__s2, t2;		\
- >   	vmovdqa .Ltf_hi__inv_aff__and__s2, t3;		\
- >   	vmovdqa .Ltf_lo__x2__and__fwd_aff, t4;		\
- > @@ -413,8 +421,9 @@
- >   		y0, y1, y2, y3,				\
- >   		y4, y5, y6, y7,				\
- >   		mem_tmp, rk, round)			\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- > @@ -429,7 +438,7 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- > @@ -467,8 +476,9 @@
- >   		y0, y1, y2, y3,				\
- >   		y4, y5, y6, y7,				\
- >   		mem_tmp, rk, round)			\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- > @@ -483,7 +493,7 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- > @@ -521,14 +531,15 @@
- >   		y0, y1, y2, y3,				\
- >   		y4, y5, y6, y7,				\
- >   		mem_tmp, rk, round, last_round)		\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- >   							\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, last_round);		\
- > +		      y0, y7, y2, rk, 8, last_round);	\
- >   							\
- >   	aria_store_state_8way(x0, x1, x2, x3,		\
- >   			      x4, x5, x6, x7,		\
- > @@ -538,13 +549,13 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way(x2, x3, x0, x1, x6, x7, x4, x5,	\
- >   		       y0, y1, y2, y3, y4, y5, y6, y7);	\
- >   							\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, last_round);		\
- > +		      y0, y7, y2, rk, 0, last_round);	\
- >   							\
- >   	aria_load_state_8way(y0, y1, y2, y3,		\
- >   			     y4, y5, y6, y7,		\
- > @@ -556,8 +567,9 @@
- >   		     y0, y1, y2, y3,			\
- >   		     y4, y5, y6, y7,			\
- >   		     mem_tmp, rk, round)		\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
- >   			    x6, x7, x4, x5,		\
- > @@ -574,7 +586,7 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
- >   			    x6, x7, x4, x5,		\
- > @@ -614,8 +626,9 @@
- >   		     y0, y1, y2, y3,			\
- >   		     y4, y5, y6, y7,			\
- >   		     mem_tmp, rk, round)		\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
- >   			    x4, x5, x6, x7,		\
- > @@ -632,7 +645,7 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x0, x1, x2, x3, 		\
- >   			    x4, x5, x6, x7,		\
- > @@ -672,8 +685,9 @@
- >   		y0, y1, y2, y3,				\
- >   		y4, y5, y6, y7,				\
- >   		mem_tmp, rk, round, last_round)		\
- > +	vpxor y7, y7, y7;				\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, round);		\
- > +		      y0, y7, y2, rk, 8, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
- >   			    x6, x7, x4, x5,		\
- > @@ -681,7 +695,7 @@
- >   			    y4, y5, y6, y7);		\
- >   							\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 8, last_round);		\
- > +		      y0, y7, y2, rk, 8, last_round);	\
- >   							\
- >   	aria_store_state_8way(x0, x1, x2, x3,		\
- >   			      x4, x5, x6, x7,		\
- > @@ -691,7 +705,7 @@
- >   			     x4, x5, x6, x7,		\
- >   			     mem_tmp, 0);		\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, round);		\
- > +		      y0, y7, y2, rk, 0, round);	\
- >   							\
- >   	aria_sbox_8way_gfni(x2, x3, x0, x1, 		\
- >   			    x6, x7, x4, x5,		\
- > @@ -699,7 +713,7 @@
- >   			    y4, y5, y6, y7);		\
- >   							\
- >   	aria_ark_8way(x0, x1, x2, x3, x4, x5, x6, x7,	\
- > -		      y0, rk, 0, last_round);		\
- > +		      y0, y7, y2, rk, 0, last_round);	\
- >   							\
- >   	aria_load_state_8way(y0, y1, y2, y3,		\
- >   			     y4, y5, y6, y7,		\
- > @@ -772,6 +786,14 @@
- >   		    BV8(0, 1, 1, 1, 1, 1, 0, 0),
- >   		    BV8(0, 0, 1, 1, 1, 1, 1, 0),
- >   		    BV8(0, 0, 0, 1, 1, 1, 1, 1))
- > +	.quad BM8X8(BV8(1, 0, 0, 0, 1, 1, 1, 1),
- > +		    BV8(1, 1, 0, 0, 0, 1, 1, 1),
- > +		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
- > +		    BV8(1, 1, 1, 1, 0, 0, 0, 1),
- > +		    BV8(1, 1, 1, 1, 1, 0, 0, 0),
- > +		    BV8(0, 1, 1, 1, 1, 1, 0, 0),
- > +		    BV8(0, 0, 1, 1, 1, 1, 1, 0),
- > +		    BV8(0, 0, 0, 1, 1, 1, 1, 1))
- >
- >   /* AES inverse affine: */
- >   #define tf_inv_const BV8(1, 0, 1, 0, 0, 0, 0, 0)
- > @@ -784,6 +806,14 @@
- >   		    BV8(0, 0, 1, 0, 1, 0, 0, 1),
- >   		    BV8(1, 0, 0, 1, 0, 1, 0, 0),
- >   		    BV8(0, 1, 0, 0, 1, 0, 1, 0))
- > +	.quad BM8X8(BV8(0, 0, 1, 0, 0, 1, 0, 1),
- > +		    BV8(1, 0, 0, 1, 0, 0, 1, 0),
- > +		    BV8(0, 1, 0, 0, 1, 0, 0, 1),
- > +		    BV8(1, 0, 1, 0, 0, 1, 0, 0),
- > +		    BV8(0, 1, 0, 1, 0, 0, 1, 0),
- > +		    BV8(0, 0, 1, 0, 1, 0, 0, 1),
- > +		    BV8(1, 0, 0, 1, 0, 1, 0, 0),
- > +		    BV8(0, 1, 0, 0, 1, 0, 1, 0))
- >
- >   /* S2: */
- >   #define tf_s2_const BV8(0, 1, 0, 0, 0, 1, 1, 1)
- > @@ -796,6 +826,14 @@
- >   		    BV8(1, 1, 0, 0, 1, 1, 1, 0),
- >   		    BV8(0, 1, 1, 0, 0, 0, 1, 1),
- >   		    BV8(1, 1, 1, 1, 0, 1, 1, 0))
- > +	.quad BM8X8(BV8(0, 1, 0, 1, 0, 1, 1, 1),
- > +		    BV8(0, 0, 1, 1, 1, 1, 1, 1),
- > +		    BV8(1, 1, 1, 0, 1, 1, 0, 1),
- > +		    BV8(1, 1, 0, 0, 0, 0, 1, 1),
- > +		    BV8(0, 1, 0, 0, 0, 0, 1, 1),
- > +		    BV8(1, 1, 0, 0, 1, 1, 1, 0),
- > +		    BV8(0, 1, 1, 0, 0, 0, 1, 1),
- > +		    BV8(1, 1, 1, 1, 0, 1, 1, 0))
- >
- >   /* X2: */
- >   #define tf_x2_const BV8(0, 0, 1, 1, 0, 1, 0, 0)
- > @@ -808,6 +846,14 @@
- >   		    BV8(0, 1, 1, 0, 1, 0, 1, 1),
- >   		    BV8(1, 0, 1, 1, 1, 1, 0, 1),
- >   		    BV8(1, 0, 0, 1, 0, 0, 1, 1))
- > +	.quad BM8X8(BV8(0, 0, 0, 1, 1, 0, 0, 0),
- > +		    BV8(0, 0, 1, 0, 0, 1, 1, 0),
- > +		    BV8(0, 0, 0, 0, 1, 0, 1, 0),
- > +		    BV8(1, 1, 1, 0, 0, 0, 1, 1),
- > +		    BV8(1, 1, 1, 0, 1, 1, 0, 0),
- > +		    BV8(0, 1, 1, 0, 1, 0, 1, 1),
- > +		    BV8(1, 0, 1, 1, 1, 1, 0, 1),
- > +		    BV8(1, 0, 0, 1, 0, 0, 1, 1))
- >
- >   /* Identity matrix: */
- >   .Ltf_id_bitmatrix:
- > @@ -862,6 +862,14 @@
- >   		    BV8(0, 0, 0, 0, 0, 1, 0, 0),
- >   		    BV8(0, 0, 0, 0, 0, 0, 1, 0),
- >   		    BV8(0, 0, 0, 0, 0, 0, 0, 1))
- > +	.quad BM8X8(BV8(1, 0, 0, 0, 0, 0, 0, 0),
- > +		    BV8(0, 1, 0, 0, 0, 0, 0, 0),
- > +		    BV8(0, 0, 1, 0, 0, 0, 0, 0),
- > +		    BV8(0, 0, 0, 1, 0, 0, 0, 0),
- > +		    BV8(0, 0, 0, 0, 1, 0, 0, 0),
- > +		    BV8(0, 0, 0, 0, 0, 1, 0, 0),
- > +		    BV8(0, 0, 0, 0, 0, 0, 1, 0),
- > +		    BV8(0, 0, 0, 0, 0, 0, 0, 1))
- >
- >   /* 4-bit mask */
- >   .section	.rodata.cst4.L0f0f0f0f, "aM", @progbits, 4
-
-Thank you so much,
-Taehee Yoo
+Reviewed-by: Neal Liu <neal_liu@aspeedtech.com>
+=20
+> diff --git a/drivers/crypto/aspeed/Makefile b/drivers/crypto/aspeed/Makef=
+ile
+> index 24284d812b79..15862752c053 100644
+> --- a/drivers/crypto/aspeed/Makefile
+> +++ b/drivers/crypto/aspeed/Makefile
+> @@ -6,4 +6,6 @@ aspeed_crypto-objs :=3D aspeed-hace.o	\
+>  		      $(hace-hash-y)	\
+>  		      $(hace-crypto-y)
+>=20
+> -obj-$(CONFIG_CRYPTO_DEV_ASPEED_ACRY) +=3D aspeed-acry.o
+> +aspeed_acry-$(CONFIG_CRYPTO_DEV_ASPEED_ACRY) +=3D aspeed-acry.o
+> +
+> +obj-$(CONFIG_CRYPTO_DEV_ASPEED) +=3D $(aspeed_acry-y)
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+> http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
