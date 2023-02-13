@@ -2,69 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 386D6C636D7
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Feb 2023 03:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B34C64EC4
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Feb 2023 07:55:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbjBMDKT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 12 Feb 2023 22:10:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37562 "EHLO
+        id S229917AbjBMHzT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Feb 2023 02:55:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbjBMDKS (ORCPT
+        with ESMTP id S229942AbjBMHzP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Feb 2023 22:10:18 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C0309EFC
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Feb 2023 19:10:12 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pRPED-00ARdr-2s; Mon, 13 Feb 2023 11:10:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Feb 2023 11:10:05 +0800
-Date:   Mon, 13 Feb 2023 11:10:05 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: acomp - Be more careful with request flags
-Message-ID: <Y+mqDZBCjnVjRKUk@gondor.apana.org.au>
+        Mon, 13 Feb 2023 02:55:15 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB498126CC;
+        Sun, 12 Feb 2023 23:54:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 764FB6091F;
+        Mon, 13 Feb 2023 07:54:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 887CAC433D2;
+        Mon, 13 Feb 2023 07:54:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676274897;
+        bh=DqzDuNoxyaD1ldPm3X/0qqam3Ewe4anz3SG/CvWps/0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dSpumf4qd22kq7DKkT0xsWGl8dAnbzWGS+fxJ73M1Hl/a0LIL65Zbwfe/ba5Mt/a/
+         TvWzd0SzTyHL99D7qW46cJJh28zDP9fZNNubkeZdDj+5TbxOnta+KOQv1k6aKKRlzC
+         /E4cW/i+DvnvAE616OXW9wZ9Da6Cdq+uuTL+ZE9BpEueQcdbsAEuGX07oc+jLoNuvr
+         IIFelrG2Ky3q1eKCBge8eTo6pE7oB7QE5TrrX8FKpbHEcAjRs5B2juikoRjfHQaePC
+         hkYAzoyodgrxv9UEoRTYGBvT85Odz8oBxT5cGMfuuV+2DHyR15ljw3MCcRXr24cJBQ
+         zZJ6FetTtsjEw==
+Date:   Mon, 13 Feb 2023 09:54:54 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     Eric Snowberg <eric.snowberg@oracle.com>, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        pvorel@suse.cz, tadeusz.struk@intel.com, kanth.ghatraju@oracle.com,
+        konrad.wilk@oracle.com, erpalmer@linux.vnet.ibm.com,
+        coxu@redhat.com, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v4 6/6] integrity: machine keyring CA configuration
+Message-ID: <Y+nszt7I9rGem1az@kernel.org>
+References: <20230207025958.974056-1-eric.snowberg@oracle.com>
+ <20230207025958.974056-7-eric.snowberg@oracle.com>
+ <4bda209dfc891ac9044ce847785c383e89f14f97.camel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <4bda209dfc891ac9044ce847785c383e89f14f97.camel@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The request flags for acompress is split into two parts.  Part of
-it may be set by the user while the other part (ALLOC_OUTPUT) is
-managed by the API.
+On Fri, Feb 10, 2023 at 08:05:22AM -0500, Mimi Zohar wrote:
+> Hi Eric,
+> 
+> On Mon, 2023-02-06 at 21:59 -0500, Eric Snowberg wrote:
+> > Add a machine keyring CA restriction menu option to control the type of
+> > keys that may be added to it. The options include none, min and max
+> > restrictions.
+> > 
+> > When no restrictions are selected, all Machine Owner Keys (MOK) are added
+> > to the machine keyring.  When CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MIN is
+> > selected, the CA bit must be true.  Also the key usage must contain
+> > keyCertSign, any other usage field may be set as well.
+> > 
+> > When CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MAX is selected, the CA bit must
+> > be true. Also the key usage must contain keyCertSign and the
+> > digitialSignature usage may not be set.
+> > 
+> > Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> 
+> Missing from the patch description is the motivation for this change.  
+> The choices none, min, max implies a progression, which is good, and
+> the technical differences between the choices, but not the reason.
+> 
+> The motivation, at least from my perspective, is separation of
+> certificate signing from code signing keys, where "none" is no
+> separation and "max" being total separation of keys based on usage.
+> 
+> Subsequent work, as discussed in the cover letter thread, will limit
+> certificates being loaded onto the IMA keyring to code signing keys
+> used for signature verification.
 
-This patch makes the split more explicit by not touching the other
-bits at all in the two "set" functions that let the user modify the
-flags.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+It would be more robust just to have two binary options for CA bit and
+keyCertSign. You can use "select" for setting keyCertSign, when CA bit
+option is selected.
 
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index e4bc96528902..c14cfc9a3b79 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -219,7 +219,8 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
- {
- 	req->base.complete = cmpl;
- 	req->base.data = data;
--	req->base.flags = flgs;
-+	req->base.flags &= CRYPTO_ACOMP_ALLOC_OUTPUT;
-+	req->base.flags |= flgs & ~CRYPTO_ACOMP_ALLOC_OUTPUT;
- }
- 
- /**
-@@ -246,6 +247,7 @@ static inline void acomp_request_set_params(struct acomp_req *req,
- 	req->slen = slen;
- 	req->dlen = dlen;
- 
-+	req->flags &= ~CRYPTO_ACOMP_ALLOC_OUTPUT;
- 	if (!req->dst)
- 		req->flags |= CRYPTO_ACOMP_ALLOC_OUTPUT;
- }
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+BR, Jarkko
