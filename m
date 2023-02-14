@@ -2,125 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDBCC05027
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Feb 2023 16:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63657C64EC7
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Feb 2023 17:00:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjBNQ3D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Feb 2023 11:29:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45786 "EHLO
+        id S232203AbjBNRAQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Feb 2023 12:00:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229826AbjBNQ3B (ORCPT
+        with ESMTP id S229930AbjBNQ7g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2023 11:29:01 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D5B5B9F
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2023 08:28:55 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pRyAk-0007T1-CZ; Tue, 14 Feb 2023 17:28:50 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pRyAh-004v9W-A1; Tue, 14 Feb 2023 17:28:48 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pRyAh-003WdO-C5; Tue, 14 Feb 2023 17:28:47 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, kernel@pengutronix.de
-Subject: [PATCH 1/3] hwrng: xgene - Simplify using dev_err_probe()
-Date:   Tue, 14 Feb 2023 17:28:27 +0100
-Message-Id: <20230214162829.113148-2-u.kleine-koenig@pengutronix.de>
+        Tue, 14 Feb 2023 11:59:36 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0140D2E0E6;
+        Tue, 14 Feb 2023 08:59:13 -0800 (PST)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31EGXk5t027870;
+        Tue, 14 Feb 2023 16:57:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2022-7-12;
+ bh=COxPmLf+paRDDdFuvH25Zi2bcrkGUWbmw1AV1Vzz6fg=;
+ b=YLvFKW+EqHo4lJihtKam5O2u/Ez9btXYR9UATFH2zB8Iu5e5Y/RW6Fp0KY6CkhCradAN
+ WTilqdKWZFcLKiqsqfa4V8mYN1ZQvBadLk2TsOnIkEtZUKsfbgOWWK7HvSPFJKd8W46X
+ 6I8lZN4dOtwp7sy+z6JM8Hyy2wb+bAGvhr+gIyRw8kVIAEWVmTfaTTf5O0Ec6XCJ2W+/
+ s+ECjqJ+6XkIgXtXUIiTIJDq/ia5qoW1iTGafvouFXOp0XKQKEIPCwqm6SXEU/hwPFGd
+ rIIwhMwB2pOtB0Be/uO7OEApgaB8P0mSiaWnOpESEKGFyDpTBPCUpGUYLIbIrtBSw8Fd aQ== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3np2mtdxts-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Feb 2023 16:57:48 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 31EGuKPb009707;
+        Tue, 14 Feb 2023 16:57:47 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3np1f5uuka-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Feb 2023 16:57:47 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31EGuHor039739;
+        Tue, 14 Feb 2023 16:57:45 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3np1f5uuff-9;
+        Tue, 14 Feb 2023 16:57:45 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Wolfram Sang <wsa@kernel.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Henrik Rydberg <rydberg@bitmath.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Len Brown <len.brown@intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>,
+        Daniel Bristot de Oliveira <bristot@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Evgeniy Polyakov <zbr@ioremap.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>, alsa-devel@alsa-project.org,
+        coresight@lists.linaro.org, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, isdn4linux@listserv.isdn4linux.de,
+        keyrings@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-trace-devel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-mm@kvack.org,
+        openrisc@lists.librecores.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
+        x86@kernel.org
+Subject: Re: (subset) [PATCH 00/35] Documentation: correct lots of spelling errors (series 1)
+Date:   Tue, 14 Feb 2023 11:57:35 -0500
+Message-Id: <167639371105.486235.1228754650636546815.b4-ty@oracle.com>
 X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230214162829.113148-1-u.kleine-koenig@pengutronix.de>
-References: <20230214162829.113148-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230127064005.1558-1-rdunlap@infradead.org>
+References: <20230127064005.1558-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2260; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=5rPibkTxgwk9CqlfvS5PEBSxCYiLpBJ60L3YMoK8eqE=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBj67ahOPmTyyVKxLd3FqyXP2vSwhjMUWov8sCtV IftREIs/pKJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCY+u2oQAKCRDB/BR4rcrs CaCxB/9ysP09c2OzJhBi1iqJQO2uvNorgQ1aL2JqoukUjfsfNFVCq+1b8gSJNoW6F66JC7wU+HJ 5c3CheBZmul+U/U5pbQHgHbJAGoayHZjWH+5NXFi2LGzyew6jfiXV1cgoBaDVON3wWIg6dSADP+ 3E1jNm+Nl8OAPGicFKiQmtmwVDxb1Xz3wg8jibqlo1rn0rjQk8OjgpnlsBL9GubRvjUpxRpthUb Iy6nA2j84DdG3TC+5ptY6BXTwmqC1+WW0njvY+dq/mYKUWKlFAj9+LgwpP4mMz67/2FUEE6OgOx NPcFzjSsyZrfQphRG5qw89GK3/jDbdtnfuqFAt6sdJgPooqC
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-14_11,2023-02-14_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=997 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302140144
+X-Proofpoint-GUID: F9bpdPmEiXIR5xn5JduF_4kuCVCc4so3
+X-Proofpoint-ORIG-GUID: F9bpdPmEiXIR5xn5JduF_4kuCVCc4so3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-dev_err_probe simplifies the idiom:
+On Thu, 26 Jan 2023 22:39:30 -0800, Randy Dunlap wrote:
 
-	if (ret != -EPROBE_DEFER)
-		dev_err(...)
-	return ret;
+> Correct many spelling errors in Documentation/ as reported by codespell.
+> 
+> Maintainers of specific kernel subsystems are only Cc-ed on their
+> respective patches, not the entire series. [if all goes well]
+> 
+> These patches are based on linux-next-20230125.
+> 
+> [...]
 
-, emits the error code in a human readable way and even yields a useful
-entry in /sys/kernel/debug/devices_deferred in the EPROBE_DEFER case.
+Applied to 6.3/scsi-queue, thanks!
 
-So simplify and at the same time improve the driver by using
-dev_err_probe().
+[28/35] Documentation: target: correct spelling
+        https://git.kernel.org/mkp/scsi/c/c57ac5748be5
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/char/hw_random/xgene-rng.c | 21 +++++++--------------
- 1 file changed, 7 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
-index 008e6db9ce01..a6a30686a58b 100644
---- a/drivers/char/hw_random/xgene-rng.c
-+++ b/drivers/char/hw_random/xgene-rng.c
-@@ -337,10 +337,8 @@ static int xgene_rng_probe(struct platform_device *pdev)
- 
- 	rc = devm_request_irq(&pdev->dev, ctx->irq, xgene_rng_irq_handler, 0,
- 				dev_name(&pdev->dev), ctx);
--	if (rc) {
--		dev_err(&pdev->dev, "Could not request RNG alarm IRQ\n");
--		return rc;
--	}
-+	if (rc)
-+		return dev_err_probe(&pdev->dev, rc, "Could not request RNG alarm IRQ\n");
- 
- 	/* Enable IP clock */
- 	ctx->clk = devm_clk_get(&pdev->dev, NULL);
-@@ -348,30 +346,25 @@ static int xgene_rng_probe(struct platform_device *pdev)
- 		dev_warn(&pdev->dev, "Couldn't get the clock for RNG\n");
- 	} else {
- 		rc = clk_prepare_enable(ctx->clk);
--		if (rc) {
--			dev_warn(&pdev->dev,
--				 "clock prepare enable failed for RNG");
--			return rc;
--		}
-+		if (rc)
-+			return dev_err_probe(&pdev->dev, rc,
-+					     "clock prepare enable failed for RNG");
- 	}
- 
- 	xgene_rng_func.priv = (unsigned long) ctx;
- 
- 	rc = devm_hwrng_register(&pdev->dev, &xgene_rng_func);
- 	if (rc) {
--		dev_err(&pdev->dev, "RNG registering failed error %d\n", rc);
- 		if (!IS_ERR(ctx->clk))
- 			clk_disable_unprepare(ctx->clk);
--		return rc;
-+		return dev_err_probe(&pdev->dev, rc, "RNG registering failed\n");
- 	}
- 
- 	rc = device_init_wakeup(&pdev->dev, 1);
- 	if (rc) {
--		dev_err(&pdev->dev, "RNG device_init_wakeup failed error %d\n",
--			rc);
- 		if (!IS_ERR(ctx->clk))
- 			clk_disable_unprepare(ctx->clk);
--		return rc;
-+		return dev_err_probe(&pdev->dev, rc, "RNG device_init_wakeup failed\n");
- 	}
- 
- 	return 0;
 -- 
-2.39.1
-
+Martin K. Petersen	Oracle Linux Engineering
