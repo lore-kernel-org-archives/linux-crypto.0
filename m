@@ -2,201 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E3FC636CC
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Feb 2023 17:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62222C636CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Feb 2023 00:05:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbjBMRMU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Feb 2023 12:12:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60662 "EHLO
+        id S229597AbjBNAFa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Feb 2023 19:05:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230234AbjBMRMT (ORCPT
+        with ESMTP id S229652AbjBNAF3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Feb 2023 12:12:19 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3C42723
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Feb 2023 09:12:17 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id z14-20020a17090abd8e00b00233bb9d6bdcso7682703pjr.4
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Feb 2023 09:12:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EKMkxCSBt1daduBxN91tfS7EXIyN4ih9xz0ONJyhj2w=;
-        b=bykOFJzd3cj/FkdgDryJESiP5UsFHZwPDgqkeBE/u4BlN7WJKxoA68TljgQUEUtCRp
-         IsTHDPOjLQ4nTPeIs1OUrB8D4jdS03GzZ3YtXx8/Henb287BNY8jFiBEbYcqBd561Nzb
-         on89bCLGNhoFz0eVcMvQcUWGikLdfcYS89qR9d4x+KPW9NpZJi5B/TMK11JHPmiGqJQR
-         3TlxBvoqPQbYUaN2WoFm7r15OL3+OcLfwJmfKcmoYz5vvmoFnDql73cmtVh9kJ0WIIL5
-         ILoyz7Qmf8h38/RsoSqTkEo88ff4CUvdlsfWfGEazpmjvupPH05G+DdaAlDb3/x7Uz48
-         4wCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EKMkxCSBt1daduBxN91tfS7EXIyN4ih9xz0ONJyhj2w=;
-        b=S8b4lr8yV6yu7jXhOuizB2nEFSKrJG0QoZx3FOEl/OW9QInHhD87tL2GkS1Qqniu3j
-         94xlZ2/KY+HjkV9y5XII2SUzsYHtZUac4QvI2FxPyYxrO4xxwZzgbhFvdK7VenHBI++0
-         7c3AC8l792qUJPf7D6fSAFU7rBb81KvXBMnvzSxo71i6xV+SeT65ziuAlrqq9DgPEe1g
-         Qb/UQQ4vAwB4Yzd/GxIP1F7UdLIWKQokucV4Gd3QwvTm1RqNrSrA5XAhZTYIp9O3qaMr
-         sV6Dp6PWC19i6eGA4C6n8BhV+jYIpH93sHiURlvqMNyucnllXUTsjkIuxqUSjI6KtY4i
-         HWBQ==
-X-Gm-Message-State: AO0yUKXt6MvQu3okVMUs9pyme2uFunLQuHzoZ0sJFdE7Ybv/ZH0yJKu5
-        wAbPNvH1S1Hr1P+OerwXLt9+6A==
-X-Google-Smtp-Source: AK7set+RuwCaZVWLLB/xLfmyY36OAq/hYz+CM4pCNgAMk1o2P0Qe/nyzXgohCpn9XJCl9gJQYcmXrQ==
-X-Received: by 2002:a17:902:c613:b0:19a:743e:b152 with SMTP id r19-20020a170902c61300b0019a743eb152mr10620246plr.63.1676308337292;
-        Mon, 13 Feb 2023 09:12:17 -0800 (PST)
-Received: from ?IPV6:2401:4900:1c61:e00:1f91:2:8c63:d600? ([2401:4900:1c61:e00:1f91:2:8c63:d600])
-        by smtp.gmail.com with ESMTPSA id jj9-20020a170903048900b00198d5c7cafasm5047395plb.156.2023.02.13.09.12.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Feb 2023 09:12:16 -0800 (PST)
-Message-ID: <a93b0dac-6a5a-309a-e4c0-7b0d0911bd4c@linaro.org>
-Date:   Mon, 13 Feb 2023 22:42:10 +0530
+        Mon, 13 Feb 2023 19:05:29 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B672A974E;
+        Mon, 13 Feb 2023 16:05:26 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PG1gQ1N2Qz4x4q;
+        Tue, 14 Feb 2023 11:05:22 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1676333122;
+        bh=CAzSLDb1dEbfnAtFmlA4dMrg04aRPe2Txx15eZN3dho=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Xr1i8k3oBTZ/5Pqc6KY0CKqYw6LZyBYLX+8RnitJYdvMsMhKlmR+wmfGruokDjLBN
+         oGjjRoJhBxkMd8+PcQTMrVLr7PeczeOph2t8tsl5YK4ES5jU8XnlW1Xl3BWmUnlbbR
+         n1bITYE1TZnxne270aV+7aveDBtrdId5ntM64X8n9DqIta0WCrue8HgTu5MyxY3g7Y
+         OmtkURPc8KQRwXFk/O8Tl13wPGIW/Hq034e46K/kBZYs34bEVFqcZ48IIL/e/JL0nM
+         qIjlm7XqUtVPBSxEksZtcJLWgHdz9ZiXgGmIXAKKgK/nHqqg/klhOj8lxYgCO9b3ki
+         LIEFydIxCmiQQ==
+Date:   Tue, 14 Feb 2023 11:05:21 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Alasdair G Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the device-mapper tree with the crypto
+ tree
+Message-ID: <20230214110521.77685fbb@canb.auug.org.au>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v9 11/14] arm64: dts: qcom: sm8250: add description of
- Qualcomm Crypto Engine IP
-To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
- <20230208183755.2907771-12-vladimir.zapolskiy@linaro.org>
- <7b38331c-3b29-03c1-fbed-f5799d11ca1f@linaro.org>
- <ce42e852-fb73-08ca-48c7-9826ab087289@linaro.org>
-Content-Language: en-US
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-In-Reply-To: <ce42e852-fb73-08ca-48c7-9826ab087289@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/scfy7q3Wnh0HpAradU4zis/";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Vladimir,
+--Sig_/scfy7q3Wnh0HpAradU4zis/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 2/9/23 8:00 PM, Vladimir Zapolskiy wrote:
-> Hi Bhupesh,
-> 
-> On 2/9/23 14:21, Bhupesh Sharma wrote:
->> Hi Vladimir,
->>
->> On 2/9/23 12:07 AM, Vladimir Zapolskiy wrote:
->>> Add description of QCE and its corresponding BAM DMA IPs on SM8250 SoC.
->>>
->>> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
->>> ---
->>>    arch/arm64/boot/dts/qcom/sm8250.dtsi | 24 ++++++++++++++++++++++++
->>>    1 file changed, 24 insertions(+)
->>>
->>> diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi 
->>> b/arch/arm64/boot/dts/qcom/sm8250.dtsi
->>> index e59c16f74d17..d8698d18223e 100644
->>> --- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
->>> +++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
->>> @@ -2215,6 +2215,30 @@ ufs_mem_phy_lanes: phy@1d87400 {
->>>                };
->>>            };
->>> +        cryptobam: dma-controller@1dc4000 {
->>> +            compatible = "qcom,bam-v1.7.0";
->>> +            reg = <0x0 0x01dc4000 0x0 0x24000>;
->>> +            interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
->>> +            #dma-cells = <1>;
->>> +            qcom,ee = <0>;
->>> +            qcom,controlled-remotely;
->>> +            num-channels = <8>;
->>> +            qcom,num-ees = <2>;
->>> +            iommus = <&apps_smmu 0x586 0x11>,
->>> +                 <&apps_smmu 0x596 0x11>;
->>> +        };
->>> +
->>> +        crypto: crypto@1dfa000 {
->>> +            compatible = "qcom,sm8250-qce", "qcom,sm8150-qce";
->>> +            reg = <0x0 0x01dfa000 0x0 0x6000>;
->>> +            dmas = <&cryptobam 6>, <&cryptobam 7>;
->>> +            dma-names = "rx", "tx";
->>> +            interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 
->>> &mc_virt SLAVE_EBI_CH0>;
->>> +            interconnect-names = "memory";
->>> +            iommus = <&apps_smmu 0x586 0x11>,
->>> +                 <&apps_smmu 0x596 0x11>;
->>> +        };
->>> +
->>>            tcsr_mutex: hwlock@1f40000 {
->>>                compatible = "qcom,tcsr-mutex";
->>>                reg = <0x0 0x01f40000 0x0 0x40000>;
->>
->> This patch was part of the v7 arm64 dts fixes I sent out - see [1].
-> 
-> thank you for pointing it out, so there are two different v7 series of 
-> related
-> patches, as it's stated in the cover letter I based my v8 on top of 
-> linux-crypto
-> changes [*], and this particular change was developed independently from 
-> yours.
-> 
-> And so, there are some differences, can you please comment on them?
-> 
-> - My change does not have 'interconnects' property under 
-> dma-controller@1dc4000
->    device tree node, I believe it is not needed, but please correct me 
-> here.
-> - My change uses DMA channel number taken from the downstream code [**], is
->    there a reason to use different ones like in your change?
-> - My change has a shorter list of IOMMUs also copied from the same 
-> downstream
->    code, is there a reason to use a different extended list like in your 
-> change?
-> - On my end I have to retest your change without 'num-channels' and 
-> 'qcom,num-ees'
->    properties, since this also seems as an important difference between 
-> two patches.
-> 
-> Nevertheless, thank you again for bringing my attention to a different 
-> patch
-> series, I'll reuse the changes from it, and also publish all of them 
-> together and
-> in a separate changeset as Krzysztof suggested.
-> 
->> Probably you can use it as a base and make the changes (interconnect
->> property for the BAM DMA node and qce-compatible names) directly there
->> and include it in your patch series.
-> 
-> [*]  
-> https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org/
-> [**] 
-> https://source.codeaurora.org/quic/la/kernel/msm-4.19/tree/arch/arm64/boot/dts/qcom/kona.dtsi?h=LA.UM.8.12.3.1&id=f3dd4aaeb34438c877ccd42f5a48ccd554dd765a#n2979
-> 
->> [1].
->> https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-3-bhupesh.sharma@linaro.org/
+Hi all,
 
-Now that you mention it, I am a bit confused. My v7 series had 3 
-sub-series (one each for the arm64 dts + defconfig, crypto & dma tree):
+Today's linux-next merge of the device-mapper tree got a conflict in:
 
-- 
-https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-1-bhupesh.sharma@linaro.org/
-- 
-https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org/
-- 
-https://lore.kernel.org/linux-arm-msm/20220921030649.1436434-1-bhupesh.sharma@linaro.org/
+  drivers/md/dm-integrity.c
 
-Where do you propose the v9 of the dma tree patch? I think you have
-already clubbed the v9 arm64 dts patchset with this series
-(you have left out the defconfig patch from there as it is already 
-merged and the sm8150 dts change, so that I can send it later), right?
+between commits:
 
-Having said that, with only the v9 crypto series you shared, I am not
-able to bring up crypto on either sm8250-mtp or (with one dts patch 
-added) on sa8155p-adp board(s). So, do I need to make other changes 
-(include patches from my earlier series) to get the same working?
+  96747228b725 ("dm: Add scaffolding to change completion function signatur=
+e")
+  dcfe653d7cd4 ("dm: Remove completion function scaffolding")
 
-Thanks,
-Bhupesh
+from the crypto tree and commit:
+
+  ff65cea88e49 ("dm: add missing empty lines")
+
+from the device-mapper tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/md/dm-integrity.c
+index c58156deb2b1,16aa68988363..000000000000
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@@ -955,9 -963,10 +963,10 @@@ static void xor_journal(struct dm_integ
+  	async_tx_issue_pending_all();
+  }
+ =20
+ -static void complete_journal_encrypt(struct crypto_async_request *req, in=
+t err)
+ +static void complete_journal_encrypt(void *data, int err)
+  {
+ -	struct journal_completion *comp =3D req->data;
+ +	struct journal_completion *comp =3D data;
++=20
+  	if (unlikely(err)) {
+  		if (likely(err =3D=3D -EINPROGRESS)) {
+  			complete(&comp->ic->crypto_backoff);
+
+--Sig_/scfy7q3Wnh0HpAradU4zis/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPq0EEACgkQAVBC80lX
+0GyJhwf/b0C84ZSrgtO04M3b2so/ej0poAKhCwioIKKpMwf165A5pu5D4AF/mbwX
+VvXHgkosV7goOrTIycLxN4RX71qGQnAeSKWAW6XTFgkLG4XR6ZymruLj/wWdRPi3
+20WreD2Uo/CnncB6xnzntgm8wW45/xogBKEvW6A8KtDb05r6dHIeqJJgq7OGrVjX
+GJ72fHBbhqrbxtJ4hGtC1DAtGAFVSJ2vDxrImD1D7Sz/fv/dWzmHbbuIyccxT677
+rn7U2WZt2Cgi5SnMYqq6Pn0ysK329AT+dW0jWXxRM97fsMPTMW0agmjPHly1VXgc
+iPrrJqatYNak9beEtQ+Wnz9w0HB5uw==
+=7B8D
+-----END PGP SIGNATURE-----
+
+--Sig_/scfy7q3Wnh0HpAradU4zis/--
