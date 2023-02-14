@@ -2,59 +2,224 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6D5C05027
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Feb 2023 09:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74755C61DA4
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Feb 2023 10:24:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232373AbjBNJL0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Feb 2023 04:11:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45166 "EHLO
+        id S232079AbjBNKYd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Feb 2023 05:24:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjBNJKx (ORCPT
+        with ESMTP id S231526AbjBNKYc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2023 04:10:53 -0500
-Received: from mail.workercentrum.pl (mail.workercentrum.pl [51.89.166.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1392424107
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2023 01:09:24 -0800 (PST)
-Received: by mail.workercentrum.pl (Postfix, from userid 1002)
-        id C784FA559A; Fri, 10 Feb 2023 08:30:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=workercentrum.pl;
-        s=mail; t=1676018062;
-        bh=DQrvNxV4sbMtkGDNj/C7a2f11q8dNrBm5UPp1jE5GkY=;
-        h=Date:From:To:Subject:From;
-        b=qq4QsXtYZbqWyMeXBqnyrsy/PxgvEuhY3SCabXrEzkoY0r6BmSdspJBZLwydgofsy
-         HcKdJFrkpwSP4DOl3j/jkbjWR9g2NLSDrFFpXLQI2ghod4X6F8AEjyt0W1LOi0TqBW
-         /nUAqLg3fyonqtyoQwppYGkwpjuwNIeHbkApL2KvYUvG2JB3s6IUwsadJbMKWappYt
-         l7woZfQIKaIpUcf+zaGeMs8YGXQWHYqLomkzrKSldmOBW8+aSDWJiIO/mKoaSuB5mZ
-         atFI1TpehViJcv3vswiJQrc3Y6bpO4q0HpRxnJIupJeBJdR/oxBUf+2KTegQlOAQ60
-         zdpiPfdNziBRQ==
-Received: by mail.workercentrum.pl for <linux-crypto@vger.kernel.org>; Fri, 10 Feb 2023 08:30:37 GMT
-Message-ID: <20230210074500-0.1.7d.it5c.0.a14m1oecji@workercentrum.pl>
-Date:   Fri, 10 Feb 2023 08:30:37 GMT
-From:   "Piotr Werner" <piotr.werner@workercentrum.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Panele fotowaltaiczne
-X-Mailer: mail.workercentrum.pl
+        Tue, 14 Feb 2023 05:24:32 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E63234C6
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2023 02:24:30 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id n10so11899394ejc.4
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Feb 2023 02:24:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cZHT6Rt4ZDtQeMBtQT9LeqSvKhh++IkPVxaFNqjM/b0=;
+        b=fF7HcsM9R/9n4og0aw5vO4JbtYdD1f2zAjEz0rKOxzd91n+/JfbYXwhCjShiJ3oni2
+         4ealE3Ukwaj1ve0BYr7u/BuShuzW7jOLICOJkWSk2igOFfr3bqrSYlQIOHaq4kVpi2t/
+         z5n93zSZAE8Bo/zExlRg0y5Yvt6yozBvcF0WfrEU2L+Fj6tClB+T0uN4kqRmKluG8F4m
+         Q3yTgZAMRFT3OMdk6Msy3ldZ4Fw/NIJ74+8LW94ESkhF2ZJ4AL2NQ1+4zzduH4pq7isF
+         /LeipJUkKUjR/fyFfbdmafL2bULNDM/YlOPw32Z9TtlD638kv6OueBE4CbspLlK4nWTj
+         OcXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cZHT6Rt4ZDtQeMBtQT9LeqSvKhh++IkPVxaFNqjM/b0=;
+        b=U5hBy2eHBnByT7eqZs1g3RB++YxZCdGvTROTz3Igcvyq+YRNkd4y+P/zkGJIZ0mVAb
+         KA0Rzzh0yMPKSqyXQmlENwScjPBZsqOUJHzNRjJXFpo9KTTFUvx43++mvb2hBwvsbeF+
+         JZM9j67Qc9LqVvG6yyTTaMBEpFh40oVxhhOtjrbYW38+20h7zbp708mdok4AeSO8odpw
+         Pd9NLMT2093oE+D6P4XRFPhxtryqVWoFU6M4GuUbqdrKSD9JiWq6bJIivCpEJrvKx/uP
+         MOGsHG2pI0T1j+G6tFNL/FGIPmeq/m2cdMEAZ0LOkR0iVr8ysC0y9g9hVWLgNj6ycCnG
+         OVVw==
+X-Gm-Message-State: AO0yUKVEpjN4woqG/ZnJd2QvR4BplS6HOtd8rVyvWVQeqY8uqzNm8tgc
+        XeU4HYkl2I3I2DzqRrloTZdLMQ==
+X-Google-Smtp-Source: AK7set/4xkcfgqfnguoD7bUbGVid6jjWKjrlVNK0y/C5yxLuGODFu75sXV9DXiCEePPcN+iUKLPAog==
+X-Received: by 2002:a17:906:739d:b0:8ae:a4db:ba6e with SMTP id f29-20020a170906739d00b008aea4dbba6emr1907627ejl.2.1676370269129;
+        Tue, 14 Feb 2023 02:24:29 -0800 (PST)
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id se26-20020a170906ce5a00b0086621d9d9b0sm8021581ejb.81.2023.02.14.02.24.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 02:24:28 -0800 (PST)
+Message-ID: <731af3cf-6f18-caf9-ef65-ec73b0744ad9@linaro.org>
+Date:   Tue, 14 Feb 2023 12:24:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v9 11/14] arm64: dts: qcom: sm8250: add description of
+ Qualcomm Crypto Engine IP
+Content-Language: en-US
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+References: <20230208183755.2907771-1-vladimir.zapolskiy@linaro.org>
+ <20230208183755.2907771-12-vladimir.zapolskiy@linaro.org>
+ <7b38331c-3b29-03c1-fbed-f5799d11ca1f@linaro.org>
+ <ce42e852-fb73-08ca-48c7-9826ab087289@linaro.org>
+ <a93b0dac-6a5a-309a-e4c0-7b0d0911bd4c@linaro.org>
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <a93b0dac-6a5a-309a-e4c0-7b0d0911bd4c@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Hi Bhupesh,
 
-Jeste=C5=9Bmy firm=C4=85 z wieloletnim do=C5=9Bwiadczeniem, kt=C3=B3ra sp=
-rawnie przygotuje dla Pa=C5=84stwa ofert=C4=99 i wszelkie formalno=C5=9Bc=
-i. Sam monta=C5=BC zaplanujemy na wiosn=C4=99.
+On 2/13/23 19:12, Bhupesh Sharma wrote:
+> Hi Vladimir,
+> 
+> On 2/9/23 8:00 PM, Vladimir Zapolskiy wrote:
+>> Hi Bhupesh,
+>>
+>> On 2/9/23 14:21, Bhupesh Sharma wrote:
+>>> Hi Vladimir,
+>>>
+>>> On 2/9/23 12:07 AM, Vladimir Zapolskiy wrote:
+>>>> Add description of QCE and its corresponding BAM DMA IPs on SM8250 SoC.
+>>>>
+>>>> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+>>>> ---
+>>>>     arch/arm64/boot/dts/qcom/sm8250.dtsi | 24 ++++++++++++++++++++++++
+>>>>     1 file changed, 24 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi
+>>>> b/arch/arm64/boot/dts/qcom/sm8250.dtsi
+>>>> index e59c16f74d17..d8698d18223e 100644
+>>>> --- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
+>>>> +++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
+>>>> @@ -2215,6 +2215,30 @@ ufs_mem_phy_lanes: phy@1d87400 {
+>>>>                 };
+>>>>             };
+>>>> +        cryptobam: dma-controller@1dc4000 {
+>>>> +            compatible = "qcom,bam-v1.7.0";
+>>>> +            reg = <0x0 0x01dc4000 0x0 0x24000>;
+>>>> +            interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+>>>> +            #dma-cells = <1>;
+>>>> +            qcom,ee = <0>;
+>>>> +            qcom,controlled-remotely;
+>>>> +            num-channels = <8>;
+>>>> +            qcom,num-ees = <2>;
+>>>> +            iommus = <&apps_smmu 0x586 0x11>,
+>>>> +                 <&apps_smmu 0x596 0x11>;
+>>>> +        };
+>>>> +
+>>>> +        crypto: crypto@1dfa000 {
+>>>> +            compatible = "qcom,sm8250-qce", "qcom,sm8150-qce";
+>>>> +            reg = <0x0 0x01dfa000 0x0 0x6000>;
+>>>> +            dmas = <&cryptobam 6>, <&cryptobam 7>;
+>>>> +            dma-names = "rx", "tx";
+>>>> +            interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0
+>>>> &mc_virt SLAVE_EBI_CH0>;
+>>>> +            interconnect-names = "memory";
+>>>> +            iommus = <&apps_smmu 0x586 0x11>,
+>>>> +                 <&apps_smmu 0x596 0x11>;
+>>>> +        };
+>>>> +
+>>>>             tcsr_mutex: hwlock@1f40000 {
+>>>>                 compatible = "qcom,tcsr-mutex";
+>>>>                 reg = <0x0 0x01f40000 0x0 0x40000>;
+>>>
+>>> This patch was part of the v7 arm64 dts fixes I sent out - see [1].
+>>
+>> thank you for pointing it out, so there are two different v7 series of
+>> related
+>> patches, as it's stated in the cover letter I based my v8 on top of
+>> linux-crypto
+>> changes [*], and this particular change was developed independently from
+>> yours.
+>>
+>> And so, there are some differences, can you please comment on them?
+>>
+>> - My change does not have 'interconnects' property under
+>> dma-controller@1dc4000
+>>     device tree node, I believe it is not needed, but please correct me
+>> here.
+>> - My change uses DMA channel number taken from the downstream code [**], is
+>>     there a reason to use different ones like in your change?
+>> - My change has a shorter list of IOMMUs also copied from the same
+>> downstream
+>>     code, is there a reason to use a different extended list like in your
+>> change?
+>> - On my end I have to retest your change without 'num-channels' and
+>> 'qcom,num-ees'
+>>     properties, since this also seems as an important difference between
+>> two patches.
+>>
+>> Nevertheless, thank you again for bringing my attention to a different
+>> patch
+>> series, I'll reuse the changes from it, and also publish all of them
+>> together and
+>> in a separate changeset as Krzysztof suggested.
+>>
+>>> Probably you can use it as a base and make the changes (interconnect
+>>> property for the BAM DMA node and qce-compatible names) directly there
+>>> and include it in your patch series.
+>>
+>> [*]
+>> https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org/
+>> [**]
+>> https://source.codeaurora.org/quic/la/kernel/msm-4.19/tree/arch/arm64/boot/dts/qcom/kona.dtsi?h=LA.UM.8.12.3.1&id=f3dd4aaeb34438c877ccd42f5a48ccd554dd765a#n2979
+>>
+>>> [1].
+>>> https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-3-bhupesh.sharma@linaro.org/
+> 
+> Now that you mention it, I am a bit confused. My v7 series had 3
+> sub-series (one each for the arm64 dts + defconfig, crypto & dma tree):
+> 
+> -
+> https://lore.kernel.org/linux-arm-msm/20220921045602.1462007-1-bhupesh.sharma@linaro.org/
+> -
+> https://lore.kernel.org/linux-arm-msm/20220920114051.1116441-1-bhupesh.sharma@linaro.org/
+> -
+> https://lore.kernel.org/linux-arm-msm/20220921030649.1436434-1-bhupesh.sharma@linaro.org/
 
-O samych plusach fotowoltaiki czy pompach ciep=C5=82a na pewno ju=C5=BC P=
-a=C5=84stwo s=C5=82yszeli, dlatego teraz prosimy o zostawienie kontaktu, =
-aby nasz specjalista m=C3=B3g=C5=82 przedstawi=C4=87 ofert=C4=99 zgodn=C4=
-=85 z Waszymi potrzebami.
+Thank you, I will follow these series, the interconnects on DMA BAM
+series is slipped from my attention, however I am able to run QCE
+without adding interconnects to DMA BAM on available to me hardware.
 
-Kiedy mogliby=C5=9Bmy z Pa=C5=84stwem um=C3=B3wi=C4=87 si=C4=99 na rozmow=
-=C4=99 w celu zbadania potrzeb?
+> Where do you propose the v9 of the dma tree patch? I think you have
+> already clubbed the v9 arm64 dts patchset with this series
+> (you have left out the defconfig patch from there as it is already
+> merged and the sm8150 dts change, so that I can send it later), right?
+> 
+> Having said that, with only the v9 crypto series you shared, I am not
+> able to bring up crypto on either sm8250-mtp or (with one dts patch
+> added) on sa8155p-adp board(s). So, do I need to make other changes
+> (include patches from my earlier series) to get the same working?
 
+No, the shared v9 is complete, and I test it on top of the linux-next.
 
-Pozdrawiam,
-Piotr Werner
+I'm able to successfully test QCE by running 'cryptsetup benchmark' on
+RB5 hardware, the involvement of QCE and DMA BAM IPs can be checked
+either by looking at bam_dma interrupt numbers from /proc/interrupts,
+by adding qcrypto.dyndbg=+p into the kernel command line or by
+registered algos and priorities found at /proc/crypto:
+
+[    9.515729] qcrypto 1dfa000.crypto: Crypto device found, version 5.5.0
+
+I will be glad to know your opinion about the technical difference
+between our two different sm8250.dtsi changes, please find my queries
+in the previous email.
+
+--
+Best wishes,
+Vladimir
