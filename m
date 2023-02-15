@@ -2,83 +2,73 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1E1C6379F
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 05:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9CCC636CC
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 06:55:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbjBOFhv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Feb 2023 00:37:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50586 "EHLO
+        id S233482AbjBOGzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Feb 2023 01:55:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjBOFht (ORCPT
+        with ESMTP id S233361AbjBOGzH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2023 00:37:49 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B966A35AD;
-        Tue, 14 Feb 2023 21:37:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=3DQRN1CQ/XqMIvWvWF20UaQJ2HBfRPScgCtiXy5hN3U=; b=0QJivvrrBkYjIm/Kknb4P6rRrs
-        BKrobwAo5ZXdvux1S1ecaeoPJPKkizTrANRjU81ZgVqaNP0h7B3KkGolSUCQkoMMbpttfDEHOTOWV
-        zjX79Yrx/22jG8Atz7dvW0BJvZap8cTqfqrtHCEFXTM6WhDlFUnWkRyp8HTlpwORelLpfX3snX5sG
-        i5otESatwnG4WHvurojSVUhXHNYVa0AbiUbg+Uzi/ptDLo5/GogrvRIbDYEcrv/DDw9eBIG5VxDkm
-        gJYPJv/s2Qhrs9ixykTQ++VwszhVhySVGYzT9eBY8erwAmk8qgk4Yh3U2JVN9ZRh6Nalg1iwSKEkO
-        MiAmSbFA==;
-Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pSAUD-004naN-Ga; Wed, 15 Feb 2023 05:37:45 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        linux-crypto@vger.kernel.org,
+        Wed, 15 Feb 2023 01:55:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC985D53C;
+        Tue, 14 Feb 2023 22:55:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 726F261A34;
+        Wed, 15 Feb 2023 06:55:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD2BC433D2;
+        Wed, 15 Feb 2023 06:55:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1676444104;
+        bh=iubP8yXcNToMx9a2qJfqUPAOhKiuH64xBy+JLMWqOcA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=acHTA80ZfrGm82Mb7Joyzy9mqHb+B+t04DTzqpUqN9zfoprtEdYLAibv9Tq86ZxIt
+         isD0F9YrYhffllcPC3xEjTG2tdIyDX6JrpJ1tmZp24hFTs4DI5dQ70WzMKVlMomRvs
+         5iaTbTyNFmNszgxbNjBeud/aBFURWjjIibAjyAak=
+Date:   Wed, 15 Feb 2023 07:55:01 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+Cc:     stable@vger.kernel.org, Xiu Jianfeng <xiujianfeng@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Mukesh Ojha <quic_mojha@quicinc.com>
-Subject: [PATCH v3] Documentation: core-api: padata: correct spelling
-Date:   Tue, 14 Feb 2023 21:37:44 -0800
-Message-Id: <20230215053744.11716-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.39.1
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH stable v5.15.y 1/1] crypto: add __init/__exit annotations
+ to init/exit funcs
+Message-ID: <Y+yBxXNjBLuonPKP@kroah.com>
+References: <20230214195300.2432989-1-saeed.mirzamohammadi@oracle.com>
+ <20230214195300.2432989-2-saeed.mirzamohammadi@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230214195300.2432989-2-saeed.mirzamohammadi@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Correct spelling problems for Documentation/core-api/padata.rst as
-reported by codespell.
+On Tue, Feb 14, 2023 at 11:53:00AM -0800, Saeed Mirzamohammadi wrote:
+> From: Xiu Jianfeng <xiujianfeng@huawei.com>
+> 
+> Add missing __init/__exit annotations to init/exit funcs.
+> 
+> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> (cherry picked from commit 33837be33367172d66d1f2bd6964cc41448e6e7c)
+> Cc: stable@vger.kernel.org # 5.15+
+> Signed-off-by: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+> ---
+>  crypto/async_tx/raid6test.c | 4 ++--
+>  crypto/curve25519-generic.c | 4 ++--
+>  crypto/dh.c                 | 4 ++--
+>  crypto/ecdh.c               | 4 ++--
+>  crypto/ecdsa.c              | 4 ++--
+>  crypto/rsa.c                | 4 ++--
+>  crypto/sm2.c                | 4 ++--
+>  7 files changed, 14 insertions(+), 14 deletions(-)
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
----
-v3: split into a separate patch as requested by Jakub.
-
- Documentation/core-api/padata.rst |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff -- a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
---- a/Documentation/core-api/padata.rst
-+++ b/Documentation/core-api/padata.rst
-@@ -42,7 +42,7 @@ padata_shells associated with it, each a
- Modifying cpumasks
- ------------------
- 
--The CPUs used to run jobs can be changed in two ways, programatically with
-+The CPUs used to run jobs can be changed in two ways, programmatically with
- padata_set_cpumask() or via sysfs.  The former is defined::
- 
-     int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+What bug/problem does this resolve?  Why is this needed in stable
+kernels?
