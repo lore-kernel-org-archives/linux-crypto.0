@@ -2,143 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 853FEC61DA4
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 00:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1E1C6379F
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 05:37:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbjBOAQf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Feb 2023 19:16:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55270 "EHLO
+        id S229877AbjBOFhv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Feb 2023 00:37:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjBOAQe (ORCPT
+        with ESMTP id S229848AbjBOFht (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Feb 2023 19:16:34 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C410030184;
-        Tue, 14 Feb 2023 16:16:32 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PGdsj4Kxyz4x4r;
-        Wed, 15 Feb 2023 11:16:25 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1676420187;
-        bh=BbNn6Pgl+xjsw/pPrE8cV2dCSLevjgOOJD49Mzbz0Bs=;
-        h=Date:From:To:Cc:Subject:From;
-        b=DtgkI+GbHy3dmcoX6/nN47rCf+8HR5zHhn5MvtRgNiE0Lf18Pop5po6BBAsKLXteK
-         hO12dvDBxDcqY0387PiGfpH1CC9n+Fgmit38ALla8/XjQChAR0WgZtkN6vXU91XHCU
-         2+41vhorFb6jrn6puAbKO4wiLZHmPNr2/dulBmEGg+H3/9xwsbB2Qh9sNRkZpcis4x
-         Ky9itz8q8uK/EILIpJobxpw+AuGO2QNMVMZZnVi5pAlMfg67dHQnQd5jDO2wqe+KVV
-         sYpM982haAcuk5+dcCozx2MNjw+QG4LzOxXroPO/iRDxWTMVXrkeKPZpm6WzPJaqz9
-         8MYUvljyuWd/g==
-Date:   Wed, 15 Feb 2023 11:16:23 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        ARM <linux-arm-kernel@lists.infradead.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Jenny Zhang <jenny.zhang@starfivetech.com>,
-        Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Walker Chen <walker.chen@starfivetech.com>,
-        William Qiu <william.qiu@starfivetech.com>
-Subject: linux-next: manual merge of the mmc tree with the arm-soc, crypto
- trees
-Message-ID: <20230215111623.06d9aa24@canb.auug.org.au>
+        Wed, 15 Feb 2023 00:37:49 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B966A35AD;
+        Tue, 14 Feb 2023 21:37:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=3DQRN1CQ/XqMIvWvWF20UaQJ2HBfRPScgCtiXy5hN3U=; b=0QJivvrrBkYjIm/Kknb4P6rRrs
+        BKrobwAo5ZXdvux1S1ecaeoPJPKkizTrANRjU81ZgVqaNP0h7B3KkGolSUCQkoMMbpttfDEHOTOWV
+        zjX79Yrx/22jG8Atz7dvW0BJvZap8cTqfqrtHCEFXTM6WhDlFUnWkRyp8HTlpwORelLpfX3snX5sG
+        i5otESatwnG4WHvurojSVUhXHNYVa0AbiUbg+Uzi/ptDLo5/GogrvRIbDYEcrv/DDw9eBIG5VxDkm
+        gJYPJv/s2Qhrs9ixykTQ++VwszhVhySVGYzT9eBY8erwAmk8qgk4Yh3U2JVN9ZRh6Nalg1iwSKEkO
+        MiAmSbFA==;
+Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pSAUD-004naN-Ga; Wed, 15 Feb 2023 05:37:45 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        Mukesh Ojha <quic_mojha@quicinc.com>
+Subject: [PATCH v3] Documentation: core-api: padata: correct spelling
+Date:   Tue, 14 Feb 2023 21:37:44 -0800
+Message-Id: <20230215053744.11716-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/xYWY+F03bDGzVDc1ewxMDwP";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/xYWY+F03bDGzVDc1ewxMDwP
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Correct spelling problems for Documentation/core-api/padata.rst as
+reported by codespell.
 
-Hi all,
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Mukesh Ojha <quic_mojha@quicinc.com>
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+---
+v3: split into a separate patch as requested by Jakub.
 
-Today's linux-next merge of the mmc tree got a conflict in:
+ Documentation/core-api/padata.rst |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  MAINTAINERS
-
-between commits:
-
-  08b9a94e8654 ("soc: starfive: Add StarFive JH71XX pmu driver")
-  c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
-
-from the arm-soc, crypto trees and commit:
-
-  bfde6b3869f5 ("mmc: starfive: Add sdio/emmc driver support")
-
-from the mmc tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc MAINTAINERS
-index 9262a1d7203d,71355c68a237..000000000000
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@@ -19840,25 -19926,12 +19840,31 @@@ F:	Documentation/devicetree/bindings/=
-re
-  F:	drivers/reset/reset-starfive-jh7100.c
-  F:	include/dt-bindings/reset/starfive-jh7100.h
- =20
-+ STARFIVE JH7110 MMC/SD/SDIO DRIVER
-+ M:	William Qiu <william.qiu@starfivetech.com>
-+ S:	Maintained
-+ F:	Documentation/devicetree/bindings/mmc/starfive*
-+ F:	drivers/mmc/dw_mmc-starfive.c
-+=20
- +STARFIVE JH71XX PMU CONTROLLER DRIVER
- +M:	Walker Chen <walker.chen@starfivetech.com>
- +S:	Supported
- +F:	Documentation/devicetree/bindings/power/starfive*
- +F:	drivers/soc/starfive/jh71xx_pmu.c
- +F:	include/dt-bindings/power/starfive,jh7110-pmu.h
- +
- +STARFIVE SOC DRIVERS
- +M:	Conor Dooley <conor@kernel.org>
- +S:	Maintained
- +T:	git https://git.kernel.org/pub/scm/linux/kernel/git/conor/linux.git/
- +F:	drivers/soc/starfive/
- +
- +STARFIVE TRNG DRIVER
- +M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
- +S:	Supported
- +F:	Documentation/devicetree/bindings/rng/starfive*
- +F:	drivers/char/hw_random/jh7110-trng.c
- +
-  STATIC BRANCH/CALL
-  M:	Peter Zijlstra <peterz@infradead.org>
-  M:	Josh Poimboeuf <jpoimboe@kernel.org>
-
---Sig_/xYWY+F03bDGzVDc1ewxMDwP
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPsJFcACgkQAVBC80lX
-0GyVyQf/WkesqKQgdqnkmU9O1rz8bojh62kuao4DrPg3KM8fZ9oYae7IlzoU8/xm
-MqU1bzcN1+4984cFpI035ua1vKgDsLc/JfBvEzbxdCMaM/fuJ09U5fiX14jf2pR7
-TLKdW0rmTs4hk2HyD1KfmDezsFy8d6mCnPxKvU5zTHazqYANFAwuE3yC0vuHGf+s
-fsp7xPSLRK9Dj+opFY5OfrrF4QBv8IY7Dr+zNEqXegz50xyWheFeHM+YZeRzFEkL
-lZatSkrzB8cqfkZzs5keA9YqqWLYX2yefofxOBXPPJGBDfGWdeA4p5fQUrHzTjHX
-3IAPsIdrqXbp1iwdNHWmEEzRVSI+kA==
-=VMnB
------END PGP SIGNATURE-----
-
---Sig_/xYWY+F03bDGzVDc1ewxMDwP--
+diff -- a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
+--- a/Documentation/core-api/padata.rst
++++ b/Documentation/core-api/padata.rst
+@@ -42,7 +42,7 @@ padata_shells associated with it, each a
+ Modifying cpumasks
+ ------------------
+ 
+-The CPUs used to run jobs can be changed in two ways, programatically with
++The CPUs used to run jobs can be changed in two ways, programmatically with
+ padata_set_cpumask() or via sysfs.  The former is defined::
+ 
+     int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
