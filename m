@@ -2,383 +2,493 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706E0C64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 09:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8B8C636CC
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 09:26:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234000AbjBOJ0Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Feb 2023 04:26:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37774 "EHLO
+        id S233884AbjBOJ0P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Feb 2023 04:26:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbjBOJZ7 (ORCPT
+        with ESMTP id S233934AbjBOJZ6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2023 04:25:59 -0500
+        Wed, 15 Feb 2023 04:25:58 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25AA03754E
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2023 01:25:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144F63772E
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2023 01:25:26 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pSE2Y-00BVmY-4s; Wed, 15 Feb 2023 17:25:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 15 Feb 2023 17:25:26 +0800
+        id 1pSE2T-00BVlo-VL; Wed, 15 Feb 2023 17:25:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 15 Feb 2023 17:25:21 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Wed, 15 Feb 2023 17:25:26 +0800
-Subject: [PATCH 10/10] crypto: api - Check CRYPTO_USER instead of NET for report
+Date:   Wed, 15 Feb 2023 17:25:21 +0800
+Subject: [PATCH 8/10] crypto: rng - Count error stats differently
 References: <Y+ykvcAIAH5Rsn7C@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1pSE2Y-00BVmY-4s@formenos.hmeau.com>
+Message-Id: <E1pSE2T-00BVlo-VL@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The report function is currently conditionalised on CONFIG_NET.
-As it's only used by CONFIG_CRYPTO_USER, conditionalising on that
-instead of CONFIG_NET makes more sense.
+Move all stat code specific to rng into the rng code.
 
-This gets rid of a rarely used code-path.
+While we're at it, change the stats so that bytes and counts
+are always incremented even in case of error.  This allows the
+reference counting to be removed as we can now increment the
+counters prior to the operation.
+
+After the operation we simply increase the error count if necessary.
+This is safe as errors can only occur synchronously (or rather,
+the existing code already ignored asynchronous errors which are
+only visible to the callback function).
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/acompress.c |   11 ++++-------
- crypto/aead.c      |   11 ++++-------
- crypto/ahash.c     |   11 ++++-------
- crypto/akcipher.c  |   11 ++++-------
- crypto/kpp.c       |   11 ++++-------
- crypto/rng.c       |   11 ++++-------
- crypto/scompress.c |   11 ++++-------
- crypto/shash.c     |   11 ++++-------
- crypto/skcipher.c  |   11 ++++-------
- 9 files changed, 36 insertions(+), 63 deletions(-)
+ crypto/algapi.c           |   39 --------------------------
+ crypto/crypto_user_stat.c |   33 ++++------------------
+ crypto/rng.c              |   54 ++++++++++++++++++++++++++++--------
+ include/crypto/rng.h      |   69 +++++++++++++++++++++++++++++++++++++++-------
+ include/linux/crypto.h    |   41 ---------------------------
+ 5 files changed, 108 insertions(+), 128 deletions(-)
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index 022839ab457a..d17c1ef779de 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -33,7 +33,8 @@ static inline struct acomp_alg *crypto_acomp_alg(struct crypto_acomp *tfm)
- 	return __crypto_acomp_alg(crypto_acomp_tfm(tfm)->__crt_alg);
- }
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 3259be84169b..9b7e263ed469 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -339,8 +339,6 @@ __crypto_register_alg(struct crypto_alg *alg, struct list_head *algs_to_put)
  
--#ifdef CONFIG_NET
-+static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_acomp racomp;
-@@ -44,12 +45,6 @@ static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ 	list_add(&alg->cra_list, &crypto_alg_list);
  
- 	return nla_put(skb, CRYPTOCFGA_REPORT_ACOMP, sizeof(racomp), &racomp);
+-	crypto_stats_init(alg);
+-
+ 	if (larval) {
+ 		/* No cheating! */
+ 		alg->cra_flags &= ~CRYPTO_ALG_TESTED;
+@@ -1038,43 +1036,6 @@ int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
  }
--#else
--static int crypto_acomp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ EXPORT_SYMBOL_GPL(crypto_type_has_alg);
+ 
+-#ifdef CONFIG_CRYPTO_STATS
+-void crypto_stats_init(struct crypto_alg *alg)
 -{
--	return -ENOSYS;
+-	memset(&alg->stats, 0, sizeof(alg->stats));
 -}
--#endif
- 
- static void crypto_acomp_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -131,7 +126,9 @@ static const struct crypto_type crypto_acomp_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_acomp_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_acomp_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_acomp_report_stat,
- #endif
-diff --git a/crypto/aead.c b/crypto/aead.c
-index a36c3417ff6c..83d103addb62 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -177,7 +177,8 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
--#ifdef CONFIG_NET
-+static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_aead raead;
-@@ -194,12 +195,6 @@ static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_AEAD, sizeof(raead), &raead);
- }
--#else
--static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
+-EXPORT_SYMBOL_GPL(crypto_stats_init);
+-
+-void crypto_stats_get(struct crypto_alg *alg)
 -{
--	return -ENOSYS;
+-	crypto_alg_get(alg);
 -}
--#endif
- 
- static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -251,7 +246,9 @@ static const struct crypto_type crypto_aead_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_aead_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_aead_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_aead_report_stat,
- #endif
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 3030caf8b1af..b1a9d7919157 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -469,7 +469,8 @@ static void crypto_ahash_free_instance(struct crypto_instance *inst)
- 	ahash->free(ahash);
- }
- 
--#ifdef CONFIG_NET
-+static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_hash rhash;
-@@ -483,12 +484,6 @@ static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_HASH, sizeof(rhash), &rhash);
- }
--#else
--static int crypto_ahash_report(struct sk_buff *skb, struct crypto_alg *alg)
+-EXPORT_SYMBOL_GPL(crypto_stats_get);
+-
+-void crypto_stats_rng_seed(struct crypto_alg *alg, int ret)
 -{
--	return -ENOSYS;
+-	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
+-		atomic64_inc(&alg->stats.rng.err_cnt);
+-	else
+-		atomic64_inc(&alg->stats.rng.seed_cnt);
+-	crypto_alg_put(alg);
 -}
--#endif
- 
- static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -517,7 +512,9 @@ static const struct crypto_type crypto_ahash_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_ahash_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_ahash_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_ahash_report_stat,
- #endif
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index d298baf9f312..a5aac25aa6f0 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -17,7 +17,8 @@
- 
- #include "internal.h"
- 
--#ifdef CONFIG_NET
-+static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_akcipher rakcipher;
-@@ -29,12 +30,6 @@ static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- 	return nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
- 		       sizeof(rakcipher), &rakcipher);
- }
--#else
--static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+-EXPORT_SYMBOL_GPL(crypto_stats_rng_seed);
+-
+-void crypto_stats_rng_generate(struct crypto_alg *alg, unsigned int dlen,
+-			       int ret)
 -{
--	return -ENOSYS;
+-	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.rng.err_cnt);
+-	} else {
+-		atomic64_inc(&alg->stats.rng.generate_cnt);
+-		atomic64_add(dlen, &alg->stats.rng.generate_tlen);
+-	}
+-	crypto_alg_put(alg);
 -}
+-EXPORT_SYMBOL_GPL(crypto_stats_rng_generate);
 -#endif
- 
- static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -107,7 +102,9 @@ static const struct crypto_type crypto_akcipher_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_akcipher_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_akcipher_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_akcipher_report_stat,
- #endif
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-index 8dd2289469a6..12ebaf668c10 100644
---- a/crypto/kpp.c
-+++ b/crypto/kpp.c
-@@ -17,7 +17,8 @@
- 
- #include "internal.h"
- 
--#ifdef CONFIG_NET
-+static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
+-
+ static void __init crypto_start_tests(void)
  {
- 	struct crypto_report_kpp rkpp;
-@@ -28,12 +29,6 @@ static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ 	if (IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS))
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index b57e43278ee1..d4f3d39b5137 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -6,15 +6,14 @@
+  *
+  */
  
- 	return nla_put(skb, CRYPTOCFGA_REPORT_KPP, sizeof(rkpp), &rkpp);
+-#include <linux/crypto.h>
+-#include <linux/cryptouser.h>
+-#include <linux/sched.h>
++#include <crypto/algapi.h>
++#include <crypto/internal/cryptouser.h>
++#include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/string.h>
+ #include <net/netlink.h>
+ #include <net/sock.h>
+-#include <crypto/internal/rng.h>
+-#include <crypto/internal/cryptouser.h>
+-
+-#include "internal.h"
+ 
+ #define null_terminated(x)	(strnlen(x, sizeof(x)) < sizeof(x))
+ 
+@@ -47,22 +46,6 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
  }
--#else
--static int crypto_kpp_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
  
- static void crypto_kpp_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -103,7 +98,9 @@ static const struct crypto_type crypto_kpp_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_kpp_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_kpp_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_kpp_report_stat,
- #endif
+-static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+-{
+-	struct crypto_stat_rng rrng;
+-
+-	memset(&rrng, 0, sizeof(rrng));
+-
+-	strscpy(rrng.type, "rng", sizeof(rrng.type));
+-
+-	rrng.stat_generate_cnt = atomic64_read(&alg->stats.rng.generate_cnt);
+-	rrng.stat_generate_tlen = atomic64_read(&alg->stats.rng.generate_tlen);
+-	rrng.stat_seed_cnt = atomic64_read(&alg->stats.rng.seed_cnt);
+-	rrng.stat_err_cnt = atomic64_read(&alg->stats.rng.err_cnt);
+-
+-	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
+-}
+-
+ static int crypto_reportstat_one(struct crypto_alg *alg,
+ 				 struct crypto_user_alg *ualg,
+ 				 struct sk_buff *skb)
+@@ -107,10 +90,6 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
+ 		if (crypto_report_comp(skb, alg))
+ 			goto nla_put_failure;
+ 		break;
+-	case CRYPTO_ALG_TYPE_RNG:
+-		if (crypto_report_rng(skb, alg))
+-			goto nla_put_failure;
+-		break;
+ 	default:
+ 		pr_err("ERROR: Unhandled alg %d in %s\n",
+ 		       alg->cra_flags & (CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_LARVAL),
 diff --git a/crypto/rng.c b/crypto/rng.c
-index de2b24dd88d4..5c4507769676 100644
+index fea082b25fe4..de2b24dd88d4 100644
 --- a/crypto/rng.c
 +++ b/crypto/rng.c
-@@ -69,7 +69,8 @@ static unsigned int seedsize(struct crypto_alg *alg)
- 	return ralg->seedsize;
- }
+@@ -8,17 +8,17 @@
+  * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
+  */
  
--#ifdef CONFIG_NET
-+static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
+-#include <linux/atomic.h>
+ #include <crypto/internal/rng.h>
++#include <linux/atomic.h>
++#include <linux/cryptouser.h>
+ #include <linux/err.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/random.h>
+ #include <linux/seq_file.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
+-#include <linux/cryptouser.h>
+-#include <linux/compiler.h>
+ #include <net/netlink.h>
+ 
+ #include "internal.h"
+@@ -30,27 +30,30 @@ static int crypto_default_rng_refcnt;
+ 
+ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
  {
- 	struct crypto_report_rng rrng;
-@@ -82,12 +83,6 @@ static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
+-	struct crypto_alg *alg = tfm->base.__crt_alg;
++	struct rng_alg *alg = crypto_rng_alg(tfm);
+ 	u8 *buf = NULL;
+ 	int err;
  
- 	return nla_put(skb, CRYPTOCFGA_REPORT_RNG, sizeof(rrng), &rrng);
++	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
++		atomic64_inc(&rng_get_stat(alg)->seed_cnt);
++
+ 	if (!seed && slen) {
+ 		buf = kmalloc(slen, GFP_KERNEL);
++		err = -ENOMEM;
+ 		if (!buf)
+-			return -ENOMEM;
++			goto out;
+ 
+ 		err = get_random_bytes_wait(buf, slen);
+ 		if (err)
+-			goto out;
++			goto free_buf;
+ 		seed = buf;
+ 	}
+ 
+-	crypto_stats_get(alg);
+-	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
+-	crypto_stats_rng_seed(alg, err);
+-out:
++	err = alg->seed(tfm, seed, slen);
++free_buf:
+ 	kfree_sensitive(buf);
+-	return err;
++out:
++	return crypto_rng_errstat(alg, err);
  }
--#else
--static int crypto_rng_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
+ EXPORT_SYMBOL_GPL(crypto_rng_reset);
  
- static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -125,7 +120,9 @@ static const struct crypto_type crypto_rng_type = {
- #ifdef CONFIG_PROC_FS
+@@ -94,6 +97,28 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+ 	seq_printf(m, "seedsize     : %u\n", seedsize(alg));
+ }
+ 
++static int crypto_rng_report_stat(struct sk_buff *skb, struct crypto_alg *alg)
++	__maybe_unused;
++static int crypto_rng_report_stat(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct rng_alg *rng = __crypto_rng_alg(alg);
++	struct crypto_istat_rng *istat;
++	struct crypto_stat_rng rrng;
++
++	istat = rng_get_stat(rng);
++
++	memset(&rrng, 0, sizeof(rrng));
++
++	strscpy(rrng.type, "rng", sizeof(rrng.type));
++
++	rrng.stat_generate_cnt = atomic64_read(&istat->generate_cnt);
++	rrng.stat_generate_tlen = atomic64_read(&istat->generate_tlen);
++	rrng.stat_seed_cnt = atomic64_read(&istat->seed_cnt);
++	rrng.stat_err_cnt = atomic64_read(&istat->err_cnt);
++
++	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
++}
++
+ static const struct crypto_type crypto_rng_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_rng_init_tfm,
+@@ -101,6 +126,9 @@ static const struct crypto_type crypto_rng_type = {
  	.show = crypto_rng_show,
  #endif
-+#ifdef CONFIG_CRYPTO_USER
  	.report = crypto_rng_report,
++#ifdef CONFIG_CRYPTO_STATS
++	.report_stat = crypto_rng_report_stat,
 +#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_rng_report_stat,
- #endif
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 214283f7730a..7e26a37b8eff 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -37,7 +37,8 @@ static const struct crypto_type crypto_scomp_type;
- static int scomp_scratch_users;
- static DEFINE_MUTEX(scomp_lock);
+ 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
+ 	.maskset = CRYPTO_ALG_TYPE_MASK,
+ 	.type = CRYPTO_ALG_TYPE_RNG,
+@@ -176,6 +204,7 @@ EXPORT_SYMBOL_GPL(crypto_del_default_rng);
  
--#ifdef CONFIG_NET
-+static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
+ int crypto_register_rng(struct rng_alg *alg)
  {
- 	struct crypto_report_comp rscomp;
-@@ -49,12 +50,6 @@ static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
- 	return nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
- 		       sizeof(rscomp), &rscomp);
- }
--#else
--static int crypto_scomp_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
++	struct crypto_istat_rng *istat = rng_get_stat(alg);
+ 	struct crypto_alg *base = &alg->base;
  
- static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -246,7 +241,9 @@ static const struct crypto_type crypto_scomp_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_scomp_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_scomp_report,
+ 	if (alg->seedsize > PAGE_SIZE / 8)
+@@ -185,6 +214,9 @@ int crypto_register_rng(struct rng_alg *alg)
+ 	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
+ 	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
+ 
++	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
++		memset(istat, 0, sizeof(*istat));
++
+ 	return crypto_register_alg(base);
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_rng);
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index 17bb3673d3c1..7ed21a3a8287 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -9,10 +9,26 @@
+ #ifndef _CRYPTO_RNG_H
+ #define _CRYPTO_RNG_H
+ 
++#include <linux/atomic.h>
++#include <linux/container_of.h>
+ #include <linux/crypto.h>
+ 
+ struct crypto_rng;
+ 
++/*
++ * struct crypto_istat_rng: statistics for RNG algorithm
++ * @generate_cnt:	number of RNG generate requests
++ * @generate_tlen:	total data size of generated data by the RNG
++ * @seed_cnt:		number of times the RNG was seeded
++ * @err_cnt:		number of error for RNG requests
++ */
++struct crypto_istat_rng {
++	atomic64_t generate_cnt;
++	atomic64_t generate_tlen;
++	atomic64_t seed_cnt;
++	atomic64_t err_cnt;
++};
++
+ /**
+  * struct rng_alg - random number generator definition
+  *
+@@ -30,6 +46,7 @@ struct crypto_rng;
+  *		size of the seed is defined with @seedsize .
+  * @set_ent:	Set entropy that would otherwise be obtained from
+  *		entropy source.  Internal use only.
++ * @stat:	Statistics for rng algorithm
+  * @seedsize:	The seed size required for a random number generator
+  *		initialization defined with this variable. Some
+  *		random number generators does not require a seed
+@@ -39,6 +56,8 @@ struct crypto_rng;
+  * @base:	Common crypto API algorithm data structure.
+  */
+ struct rng_alg {
++	struct crypto_alg base;
++
+ 	int (*generate)(struct crypto_rng *tfm,
+ 			const u8 *src, unsigned int slen,
+ 			u8 *dst, unsigned int dlen);
+@@ -46,9 +65,11 @@ struct rng_alg {
+ 	void (*set_ent)(struct crypto_rng *tfm, const u8 *data,
+ 			unsigned int len);
+ 
+-	unsigned int seedsize;
++#ifdef CONFIG_CRYPTO_STATS
++	struct crypto_istat_rng stat;
 +#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_acomp_report_stat,
- #endif
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 3ccacdbee73f..9b9e7b4ac804 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -490,7 +490,8 @@ static void crypto_shash_free_instance(struct crypto_instance *inst)
- 	shash->free(shash);
+ 
+-	struct crypto_alg base;
++	unsigned int seedsize;
+ };
+ 
+ struct crypto_rng {
+@@ -94,6 +115,11 @@ static inline struct crypto_tfm *crypto_rng_tfm(struct crypto_rng *tfm)
+ 	return &tfm->base;
  }
  
--#ifdef CONFIG_NET
-+static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
++static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct rng_alg, base);
++}
++
+ /**
+  * crypto_rng_alg - obtain name of RNG
+  * @tfm: cipher handle
+@@ -104,8 +130,7 @@ static inline struct crypto_tfm *crypto_rng_tfm(struct crypto_rng *tfm)
+  */
+ static inline struct rng_alg *crypto_rng_alg(struct crypto_rng *tfm)
  {
- 	struct crypto_report_hash rhash;
-@@ -505,12 +506,6 @@ static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_HASH, sizeof(rhash), &rhash);
+-	return container_of(crypto_rng_tfm(tfm)->__crt_alg,
+-			    struct rng_alg, base);
++	return __crypto_rng_alg(crypto_rng_tfm(tfm)->__crt_alg);
  }
--#else
--static int crypto_shash_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
  
- static void crypto_shash_show(struct seq_file *m, struct crypto_alg *alg)
- 	__maybe_unused;
-@@ -538,7 +533,9 @@ static const struct crypto_type crypto_shash_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_shash_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_shash_report,
+ /**
+@@ -119,6 +144,26 @@ static inline void crypto_free_rng(struct crypto_rng *tfm)
+ 	crypto_destroy_tfm(tfm, crypto_rng_tfm(tfm));
+ }
+ 
++static inline struct crypto_istat_rng *rng_get_stat(struct rng_alg *alg)
++{
++#ifdef CONFIG_CRYPTO_STATS
++	return &alg->stat;
++#else
++	return NULL;
 +#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_shash_report_stat,
- #endif
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index e8314722223d..d2f0b067715c 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -727,7 +727,8 @@ static void crypto_skcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "walksize     : %u\n", skcipher->walksize);
- }
- 
--#ifdef CONFIG_NET
-+static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
-+	__maybe_unused;
- static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
++}
++
++static inline int crypto_rng_errstat(struct rng_alg *alg, int err)
++{
++	if (!IS_ENABLED(CONFIG_CRYPTO_STATS))
++		return err;
++
++	if (err && err != -EINPROGRESS && err != -EBUSY)
++		atomic64_inc(&rng_get_stat(alg)->err_cnt);
++
++	return err;
++}
++
+ /**
+  * crypto_rng_generate() - get random number
+  * @tfm: cipher handle
+@@ -137,13 +182,17 @@ static inline int crypto_rng_generate(struct crypto_rng *tfm,
+ 				      const u8 *src, unsigned int slen,
+ 				      u8 *dst, unsigned int dlen)
  {
- 	struct skcipher_alg *skcipher = __crypto_skcipher_alg(alg);
-@@ -746,12 +747,6 @@ static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- 	return nla_put(skb, CRYPTOCFGA_REPORT_BLKCIPHER,
- 		       sizeof(rblkcipher), &rblkcipher);
- }
--#else
--static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
+-	struct crypto_alg *alg = tfm->base.__crt_alg;
+-	int ret;
++	struct rng_alg *alg = crypto_rng_alg(tfm);
++
++	if (IS_ENABLED(CONFIG_CRYPTO_STATS)) {
++		struct crypto_istat_rng *istat = rng_get_stat(alg);
++
++		atomic64_inc(&istat->generate_cnt);
++		atomic64_add(dlen, &istat->generate_tlen);
++	}
  
- static int crypto_skcipher_report_stat(struct sk_buff *skb,
- 				       struct crypto_alg *alg) __maybe_unused;
-@@ -784,7 +779,9 @@ static const struct crypto_type crypto_skcipher_type = {
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_skcipher_show,
- #endif
-+#ifdef CONFIG_CRYPTO_USER
- 	.report = crypto_skcipher_report,
-+#endif
- #ifdef CONFIG_CRYPTO_STATS
- 	.report_stat = crypto_skcipher_report_stat,
- #endif
+-	crypto_stats_get(alg);
+-	ret = crypto_rng_alg(tfm)->generate(tfm, src, slen, dst, dlen);
+-	crypto_stats_rng_generate(alg, dlen, ret);
+-	return ret;
++	return crypto_rng_errstat(alg,
++				  alg->generate(tfm, src, slen, dst, dlen));
+ }
+ 
+ /**
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index e2db56160d5c..c26e59bb7bca 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -275,22 +275,6 @@ struct compress_alg {
+ 			      unsigned int slen, u8 *dst, unsigned int *dlen);
+ };
+ 
+-#ifdef CONFIG_CRYPTO_STATS
+-/*
+- * struct crypto_istat_rng: statistics for RNG algorithm
+- * @generate_cnt:	number of RNG generate requests
+- * @generate_tlen:	total data size of generated data by the RNG
+- * @seed_cnt:		number of times the RNG was seeded
+- * @err_cnt:		number of error for RNG requests
+- */
+-struct crypto_istat_rng {
+-	atomic64_t generate_cnt;
+-	atomic64_t generate_tlen;
+-	atomic64_t seed_cnt;
+-	atomic64_t err_cnt;
+-};
+-#endif /* CONFIG_CRYPTO_STATS */
+-
+ #define cra_cipher	cra_u.cipher
+ #define cra_compress	cra_u.compress
+ 
+@@ -368,9 +352,6 @@ struct crypto_istat_rng {
+  * @cra_refcnt: internally used
+  * @cra_destroy: internally used
+  *
+- * @stats: union of all possible crypto_istat_xxx structures
+- * @stats.rng:		statistics for rng algorithm
+- *
+  * The struct crypto_alg describes a generic Crypto API algorithm and is common
+  * for all of the transformations. Any variable not documented here shall not
+  * be used by a cipher implementation as it is internal to the Crypto API.
+@@ -402,30 +383,8 @@ struct crypto_alg {
+ 	void (*cra_destroy)(struct crypto_alg *alg);
+ 	
+ 	struct module *cra_module;
+-
+-#ifdef CONFIG_CRYPTO_STATS
+-	union {
+-		struct crypto_istat_rng rng;
+-	} stats;
+-#endif /* CONFIG_CRYPTO_STATS */
+-
+ } CRYPTO_MINALIGN_ATTR;
+ 
+-#ifdef CONFIG_CRYPTO_STATS
+-void crypto_stats_init(struct crypto_alg *alg);
+-void crypto_stats_get(struct crypto_alg *alg);
+-void crypto_stats_rng_seed(struct crypto_alg *alg, int ret);
+-void crypto_stats_rng_generate(struct crypto_alg *alg, unsigned int dlen, int ret);
+-#else
+-static inline void crypto_stats_init(struct crypto_alg *alg)
+-{}
+-static inline void crypto_stats_get(struct crypto_alg *alg)
+-{}
+-static inline void crypto_stats_rng_seed(struct crypto_alg *alg, int ret)
+-{}
+-static inline void crypto_stats_rng_generate(struct crypto_alg *alg, unsigned int dlen, int ret)
+-{}
+-#endif
+ /*
+  * A helper struct for waiting for completion of async crypto ops
+  */
