@@ -2,95 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F05C2C6379F
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 11:14:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B250C6379F
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Feb 2023 13:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231751AbjBOLN4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Feb 2023 06:13:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
+        id S231899AbjBON3h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Feb 2023 08:29:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231476AbjBOLNU (ORCPT
+        with ESMTP id S232106AbjBON30 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Feb 2023 06:13:20 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E6AF367DE;
-        Wed, 15 Feb 2023 03:13:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676459599; x=1707995599;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=e16pSdQgmFTyQTyCvFDV4lMnQOhE7jy+vLaJeDYlLbo=;
-  b=Dfu6Atn5qBmZxAWNy+sqLP/r44d5htxDqMEeWlB8I3D5MdXXvw7A4060
-   6T36snurDdxiYlHfyuoYpD2BUjwWWD7mFs9DIZSIHtNdQTdPbYZ9jYq9m
-   5T4QBoGLfINHxC5m3bB3sYOh8UywMsGBEKQgUH6i4/WNw389a7OLp6XyA
-   iXHvUNBjZo/VH9YiqXhp7RLrbyZnXSMdXU0qrMVyZqoMAnW7uQgi6buys
-   xZ52pWLQx3DHfFjNqdTE/bxcc/dmZIYAgsmjgj4a+DZEEXGSrAQCqQa3W
-   XdHh1VXFstGwuqs9SPbkJHP6+ZNdfgAsIZljYenGDO+B8iyG5TU/L6CkK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="330033485"
-X-IronPort-AV: E=Sophos;i="5.97,299,1669104000"; 
-   d="scan'208";a="330033485"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2023 03:13:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="619390996"
-X-IronPort-AV: E=Sophos;i="5.97,299,1669104000"; 
-   d="scan'208";a="619390996"
-Received: from mylly.fi.intel.com (HELO [10.237.72.51]) ([10.237.72.51])
-  by orsmga003.jf.intel.com with ESMTP; 15 Feb 2023 03:13:11 -0800
-Message-ID: <72567585-0091-7bf4-35b3-ce3f94936bcc@linux.intel.com>
-Date:   Wed, 15 Feb 2023 13:13:10 +0200
+        Wed, 15 Feb 2023 08:29:26 -0500
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B45D95580;
+        Wed, 15 Feb 2023 05:29:09 -0800 (PST)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1pSHqN-0005qp-0A;
+        Wed, 15 Feb 2023 14:29:07 +0100
+Date:   Wed, 15 Feb 2023 13:27:30 +0000
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     devicetree@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Mingming Su <Mingming.Su@mediatek.com>,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] dt-bindings: rng: Add MediaTek MT7981 TRNG
+Message-ID: <c750e786ad0f529d2ae63c8f766d3c294808ff53.1676467500.git.daniel@makrotopia.org>
+References: <89865515728cb937b6591160ad9c30b4bcc8dd41.1676467500.git.daniel@makrotopia.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.7.1
-Subject: Re: [PATCH 2/6] crypto: ccp: Add a header for multiple drivers to use
- `__psp_pa`
-To:     =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>,
-        Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Grzegorz Bernacki <gjb@semihalf.com>,
-        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
-        Lendacky Thomas <Thomas.Lendacky@amd.com>,
-        herbert@gondor.apana.org.au,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Sumit Garg <sumit.garg@linaro.org>, kvm@vger.kernel.org,
-        op-tee@lists.trustedfirmware.org
-References: <20230209223811.4993-1-mario.limonciello@amd.com>
- <20230209223811.4993-3-mario.limonciello@amd.com>
- <CAOtMz3OfGFsiThY7hQYG2oh1=HKg7N56cuA28e+dhB4EtZsz=Q@mail.gmail.com>
-Content-Language: en-US
-From:   Jarkko Nikula <jarkko.nikula@linux.intel.com>
-In-Reply-To: <CAOtMz3OfGFsiThY7hQYG2oh1=HKg7N56cuA28e+dhB4EtZsz=Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89865515728cb937b6591160ad9c30b4bcc8dd41.1676467500.git.daniel@makrotopia.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/14/23 10:40, Jan Dąbroś wrote:
->> The TEE subdriver for CCP, the amdtee driver and the i2c-designware-amdpsp
->> drivers all include `psp-sev.h` even though they don't use SEV
->> functionality.
->>
->> Move the definition of `__psp_pa` into a common header to be included
->> by all of these drivers.
->>
->> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-> 
-> Reviewed-by: Jan Dabros <jsd@semihalf.com>
+Add documentation to describe the MediaTek true random number generator
+which is provided by ARM TrustedFirmware-A of the MT7981.
 
-For the drivers/i2c/busses/i2c-designware-amdpsp.c:
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ .../bindings/rng/mediatek,mt7981-rng.yaml     | 39 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ 2 files changed, 40 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/mediatek,mt7981-rng.yaml
 
-Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+diff --git a/Documentation/devicetree/bindings/rng/mediatek,mt7981-rng.yaml b/Documentation/devicetree/bindings/rng/mediatek,mt7981-rng.yaml
+new file mode 100644
+index 000000000000..d577d60538d8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/mediatek,mt7981-rng.yaml
+@@ -0,0 +1,39 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/mediatek,mt7981-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MediaTek Random number generator (v2/SMC)
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++properties:
++  $nodename:
++    pattern: "^rng$"
++
++  compatible:
++    enum:
++      - mediatek,mt7981-rng
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    items:
++      - const: rng
++
++required:
++  - compatible
++
++additionalProperties: false
++
++examples:
++  - |
++    rng {
++      compatible = "mediatek,mt7981-rng";
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 90d82aba6d73..523f1abf00d5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13148,6 +13148,7 @@ F:	drivers/leds/leds-mt6323.c
+ MEDIATEK RANDOM NUMBER GENERATOR SUPPORT
+ M:	Sean Wang <sean.wang@mediatek.com>
+ S:	Maintained
++F:	Documentation/devicetree/bindings/rng/mediatek,*
+ F:	drivers/char/hw_random/mtk-rng-v2.c
+ F:	drivers/char/hw_random/mtk-rng.c
+ 
+-- 
+2.39.1
+
