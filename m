@@ -2,97 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 490DDC61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 14:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F611C636CC
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 15:16:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjBPO44 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:56:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35122 "EHLO
+        id S229502AbjBPPQ1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 10:16:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230302AbjBPO4x (ORCPT
+        with ESMTP id S230017AbjBPPQ1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 09:56:53 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39275521E9;
-        Thu, 16 Feb 2023 06:56:40 -0800 (PST)
+        Thu, 16 Feb 2023 10:16:27 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC32F48E32;
+        Thu, 16 Feb 2023 07:16:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676559400; x=1708095400;
+  t=1676560582; x=1708096582;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Jnag3RTmvPqBfzuViYzSn81cgXd3OsGGPoaxMk4z/kA=;
-  b=OkLArTbgpuaCB1kL3Xh3m/ABtQgMsi92eNWXt26gH1CWF5PLrUl7w2dx
-   moZ14klivmV3ElyhWeLWljPUS5WTVJ7v6psLYpRUC2qgZXPVxdNSaGGvL
-   kVUwOGGBxbfSNQUrFNKemQNHzZD3p2mrp0hW2cY8YlSuhfK+w3p3+aMl/
-   a+cCRkxk4+2ovnK5ClrCclaQK1GnDj4fY/sHFCdzabgWiXR/5OYWxyEkC
-   vwZ37S4cjrWhA/IzIRtrtGVhFzVsof/ogBo5Bhl6TcRdMNBfFKJytdPzx
-   lTT7JVSYQJOESDQqB+jdUxJbA7dQj3BuKop300cUpjFFZgVz7sBR2V1ts
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="359164718"
+   mime-version:in-reply-to;
+  bh=hyvrL3VPiM3hBe27Vo+7YLaXTY2ZmoTK1UQfWn9rojw=;
+  b=Crwo6lbsQ3nzD/dPh9DlsBMtw4SFwK/9HB1bBR2fQbwO1goeZ1vuXDZL
+   a+m4aGSKljNeQ/YN8jZZXqXVC+SBqo6LIO00XLWNydsDA6rr8CcWVXEi3
+   g++tAZH9+JCLyqKEfqkCFNlEk3c0IgSg990achUcYwZwpsFEGjk+UDCyZ
+   mSvPzrh0v4xr4rRAQpXRiepwwdnQQYT4GVfPVeltOLnD2UX6CxWsbi3Cx
+   zX8VaHaBVfPEB9V9mnouFab5P3wgqlIqNRQpJBV9h5QH+sRcOBy3MVPaP
+   +9U9yr1SFBQA2GOQTJgtW1l60KC7ityvgvUx3rNYZIfqcvN9paZ4mIpxE
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="312101385"
 X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="359164718"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 06:56:39 -0800
+   d="scan'208";a="312101385"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 07:16:20 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="844169379"
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="663496371"
 X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="844169379"
+   d="scan'208";a="663496371"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga005.jf.intel.com with ESMTP; 16 Feb 2023 06:56:37 -0800
+  by orsmga007.jf.intel.com with ESMTP; 16 Feb 2023 07:16:11 -0800
 Received: from andy by smile.fi.intel.com with local (Exim 4.96)
         (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pSfgZ-007pOc-1d;
-        Thu, 16 Feb 2023 16:56:35 +0200
-Date:   Thu, 16 Feb 2023 16:56:35 +0200
+        id 1pSfzT-007ppX-2j;
+        Thu, 16 Feb 2023 17:16:07 +0200
+Date:   Thu, 16 Feb 2023 17:16:07 +0200
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
-        Grzegorz Bernacki <gjb@semihalf.com>,
-        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
-        Lendacky Thomas <Thomas.Lendacky@amd.com>,
-        herbert@gondor.apana.org.au,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/6] i2c: designware: Use PCI PSP driver for communication
-Message-ID: <Y+5EI3XGBzuwwVBV@smile.fi.intel.com>
-References: <20230209223811.4993-1-mario.limonciello@amd.com>
- <20230209223811.4993-7-mario.limonciello@amd.com>
- <703033aa-1293-307d-42a2-9734a51c7190@linux.intel.com>
- <ca9c0f77-c191-d88a-22a1-315ca97f17e8@amd.com>
+To:     Pawel Chmielewski <pawel.chmielewski@intel.com>
+Cc:     Jonathan.Cameron@huawei.com, baohua@kernel.org, bristot@redhat.com,
+        bsegall@google.com, davem@davemloft.net, dietmar.eggemann@arm.com,
+        gal@nvidia.com, gregkh@linuxfoundation.org, hca@linux.ibm.com,
+        jacob.e.keller@intel.com, jesse.brandeburg@intel.com,
+        jgg@nvidia.com, juri.lelli@redhat.com, kuba@kernel.org,
+        leonro@nvidia.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@redhat.com,
+        netdev@vger.kernel.org, peter@n8pjl.ca, peterz@infradead.org,
+        rostedt@goodmis.org, saeedm@nvidia.com, tariqt@nvidia.com,
+        tony.luck@intel.com, torvalds@linux-foundation.org,
+        ttoukan.linux@gmail.com, vincent.guittot@linaro.org,
+        vschneid@redhat.com, yury.norov@gmail.com
+Subject: Re: [PATCH v2 1/1] ice: Change assigning method of the CPU affinity
+ masks
+Message-ID: <Y+5It7zl66IoeKj3@smile.fi.intel.com>
+References: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+ <20230216145455.661709-1-pawel.chmielewski@intel.com>
+ <Y+5IWLpC1uTaa4Ks@smile.fi.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ca9c0f77-c191-d88a-22a1-315ca97f17e8@amd.com>
+In-Reply-To: <Y+5IWLpC1uTaa4Ks@smile.fi.intel.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 07:29:53AM -0600, Mario Limonciello wrote:
-> On 2/16/23 07:27, Jarkko Nikula wrote:
-> > On 2/10/23 00:38, Mario Limonciello wrote:
+On Thu, Feb 16, 2023 at 05:14:33PM +0200, Andy Shevchenko wrote:
+> On Thu, Feb 16, 2023 at 03:54:55PM +0100, Pawel Chmielewski wrote:
 
 ...
 
-> > >     config I2C_DESIGNWARE_AMDPSP
-> > >       bool "AMD PSP I2C semaphore support"
-> > > -    depends on X86_MSR
-> > >       depends on ACPI
-> > >       depends on I2C_DESIGNWARE_PLATFORM
-> > > +    depends on CRYPTO_DEV_SP_PSP && !(I2C_DESIGNWARE_PLATFORM=y &&
-> > > CRYPTO_DEV_CCP_DD=m)
-> > >       help
-> > 
-> > Would this look better if split? I.e.
-> > 
-> >     depends on CRYPTO_DEV_SP_PSP
-> >     depends on !(I2C_DESIGNWARE_PLATFORM=y && CRYPTO_DEV_CCP_DD=m)
-> Yes, thanks I'll change that for next version.
+> > +		for_each_cpu_andnot(cpu, aff_mask, last_aff_mask) {
+> > +			if (v_idx >= vsi->num_q_vectors)
+> 
+> > +				goto out;
+> 
+> Useless. You can return 0; here.
+> 
+> > +		}
 
-I'm wondering if this is homegrown implementation of 'imply' keyword?
+Btw, I briefly checked the other functions nearby in the code and none of them
+is using goto for OK cases.
+
 
 -- 
 With Best Regards,
