@@ -2,53 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0EEC636CC
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 05:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EE1C636CC
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 05:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbjBPFWA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 00:22:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46878 "EHLO
+        id S229759AbjBPFfk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 00:35:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjBPFV2 (ORCPT
+        with ESMTP id S229830AbjBPFfj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 00:21:28 -0500
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 515DF46D40
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2023 21:19:42 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pSWfZ-00Bqu6-SG; Thu, 16 Feb 2023 13:18:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Feb 2023 13:18:57 +0800
-Date:   Thu, 16 Feb 2023 13:18:57 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
+        Thu, 16 Feb 2023 00:35:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5228B43450
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2023 21:35:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E23D36134F
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 05:35:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D643C433D2;
+        Thu, 16 Feb 2023 05:35:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676525723;
+        bh=s7NYdflzTd9WYWcKE8S32stBKWVJau7UrZknQip4Nhs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lYAXCzmlIV1lGNgs7CW+3fSMhcLpSl2wWscAWvxcXRQxciEADzZTUcKJvRnP8r3Yg
+         eTNnnSyiHll1dT7/iVZ9+38QXWBsclA/TxM3sLs4jWaFrJby5OcBSIx9fFhpTT3DTS
+         cogr+lmwFdO0MYsk87E1KeAcxymfBk+aBHZTSdVLEAmwd5O/YshAJtjo8XZqWz4kFB
+         qV/ObJ6+ZYaI0i6HayFNNSf95e8z6WXMhUKFVafvrzjLf+u0fXoYRRXJb0BCN0m+2E
+         nI4B5NwHsI1KMF/BheiwHZAQfyar9q1Aa+bz8Rhl+XY0e1ySzw8X/gYVgjHvL7taWh
+         nWV7FT6XTCD6g==
+Date:   Wed, 15 Feb 2023 21:35:21 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 9/10] crypto: api - Move MODULE_ALIAS_CRYPTO to algapi.h
-Message-ID: <Y+28wd7Vz5atplvA@gondor.apana.org.au>
+Subject: Re: [PATCH 2/10] crypto: aead - Count error stats differently
+Message-ID: <Y+3AmZaoNJBO4xU0@sol.localdomain>
 References: <Y+ykvcAIAH5Rsn7C@gondor.apana.org.au>
- <E1pSE2W-00BVm0-2d@formenos.hmeau.com>
- <Y+28cG3kezAyPZSN@sol.localdomain>
+ <E1pSE2H-00BVkZ-8X@formenos.hmeau.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y+28cG3kezAyPZSN@sol.localdomain>
+In-Reply-To: <E1pSE2H-00BVkZ-8X@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 09:17:36PM -0800, Eric Biggers wrote:
->
-> For this to work, drivers/crypto/qat/qat_common/adf_ctl_drv.c needs to include
-> <crypto/algapi.h>.
+On Wed, Feb 15, 2023 at 05:25:09PM +0800, Herbert Xu wrote:
+>  int crypto_aead_encrypt(struct aead_request *req)
+>  {
+>  	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> -	struct crypto_alg *alg = aead->base.__crt_alg;
+> +	struct aead_alg *alg = crypto_aead_alg(aead);
+>  	unsigned int cryptlen = req->cryptlen;
 
-https://patchwork.kernel.org/project/linux-crypto/patch/Y+yZHiWPKyyR6fLw@gondor.apana.org.au/
+The cryptlen local variable is no longer needed.  Just use req->cryptlen below.
 
-> There could be others too.
+> +	struct crypto_istat_aead *istat;
+>  	int ret;
+>  
+> -	crypto_stats_get(alg);
+> +	istat = aead_get_stat(alg);
+> +
+> +	if (IS_ENABLED(CONFIG_CRYPTO_STATS)) {
+> +		atomic64_inc(&istat->encrypt_cnt);
+> +		atomic64_add(cryptlen, &istat->encrypt_tlen);
+> +	}
+> +
 
-I grepped and couldn't find any others.
+This could just check whether istat is NULL:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	istat = aead_get_stat(alg);
+	if (istat) {
+		atomic64_inc(&istat->encrypt_cnt);
+		atomic64_add(req->cryptlen, &istat->encrypt_tlen);
+	}
+
+That's simpler, and it makes it clearer that the pointer is not dereferenced
+when it is NULL.
+
+Note that aead_get_stat() is an inline function, so the stats code will still be
+optimized out when !CONFIG_CRYPTO_STATS.
+
+> +static inline int crypto_aead_errstat(struct crypto_istat_aead *istat, int err)
+> +{
+> +	if (!IS_ENABLED(CONFIG_CRYPTO_STATS))
+> +		return err;
+> +
+> +	if (err && err != -EINPROGRESS && err != -EBUSY)
+> +		atomic64_inc(&istat->err_cnt);
+> +
+> +	return err;
+> +}
+> +
+[...]
+>  	if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
+>  		ret = -ENOKEY;
+>  	else
+> -		ret = crypto_aead_alg(aead)->encrypt(req);
+> -	crypto_stats_aead_encrypt(cryptlen, alg, ret);
+> -	return ret;
+> +		ret = alg->encrypt(req);
+> +
+> +	return crypto_aead_errstat(istat, ret);
+
+Similarly, istat != NULL could be used instead of CONFIG_CRYPTO_STATS.
+
+IMO, this would also be easier to read if the stats increment was just coded
+directly, like it is above, without the crypto_aead_errstat() function:
+
+	if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
+		ret = -ENOKEY;
+	else
+		ret = alg->encrypt(req);
+
+	if (istat && ret && ret != -EINPROGRESS && ret != -EBUSY)
+		atomic64_inc(&istat->err_cnt);
+
+	return ret;
+
+Similarly for all the other algorithm types.
+
+- Eric
