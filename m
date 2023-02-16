@@ -2,139 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284AAC636D6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 14:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 490DDC61DA4
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 14:56:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230292AbjBPO4M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:56:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34278 "EHLO
+        id S230329AbjBPO44 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 09:56:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbjBPO4L (ORCPT
+        with ESMTP id S230302AbjBPO4x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 09:56:11 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AD15454D;
-        Thu, 16 Feb 2023 06:56:03 -0800 (PST)
+        Thu, 16 Feb 2023 09:56:53 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39275521E9;
+        Thu, 16 Feb 2023 06:56:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676559363; x=1708095363;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=M7bCw9YBvd+whohCI1z9/R8TgpQAstWxF8zfxUADeKg=;
-  b=DUWtrc0+Ckzr5kymXHnLzun3pIm3hwT7nkFh1amt+/c8AsQfF/xbVHOc
-   scn/g8qCZjaiL6XpS6rA++ypZ2Fawb0tJ1FQOdk0n8/iio4wmpFq8AGJp
-   FS6Vdh7b9afpsiihKO3xeXNB4yyJZeAuRdGg738dgN/MceszpvpzHDwMJ
-   U7T2qax95lU9R3hPoOr+lHcMZbDrTw/PMiyOoKLB4Jo4WlmC6IcVuiSFC
-   +YtET/abqUh6R9bIc6JKpvhM1VRAwXAQnRiV8ECPnEkBH19s3keimhz24
-   ORICC3R1vfnEo0kLIW7DkcYBVtVqr9OY3seAWN/FdgZudAKjkb9nO+Lxg
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="312094412"
+  t=1676559400; x=1708095400;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Jnag3RTmvPqBfzuViYzSn81cgXd3OsGGPoaxMk4z/kA=;
+  b=OkLArTbgpuaCB1kL3Xh3m/ABtQgMsi92eNWXt26gH1CWF5PLrUl7w2dx
+   moZ14klivmV3ElyhWeLWljPUS5WTVJ7v6psLYpRUC2qgZXPVxdNSaGGvL
+   kVUwOGGBxbfSNQUrFNKemQNHzZD3p2mrp0hW2cY8YlSuhfK+w3p3+aMl/
+   a+cCRkxk4+2ovnK5ClrCclaQK1GnDj4fY/sHFCdzabgWiXR/5OYWxyEkC
+   vwZ37S4cjrWhA/IzIRtrtGVhFzVsof/ogBo5Bhl6TcRdMNBfFKJytdPzx
+   lTT7JVSYQJOESDQqB+jdUxJbA7dQj3BuKop300cUpjFFZgVz7sBR2V1ts
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="359164718"
 X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="312094412"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 06:56:03 -0800
+   d="scan'208";a="359164718"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 06:56:39 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="733895702"
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="844169379"
 X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
-   d="scan'208";a="733895702"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga008.fm.intel.com with ESMTP; 16 Feb 2023 06:55:57 -0800
-Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
-        by irvmail002.ir.intel.com (Postfix) with ESMTP id AB1E9365A7;
-        Thu, 16 Feb 2023 14:55:54 +0000 (GMT)
-From:   Pawel Chmielewski <pawel.chmielewski@intel.com>
-To:     pawel.chmielewski@intel.com
-Cc:     Jonathan.Cameron@huawei.com, andriy.shevchenko@linux.intel.com,
-        baohua@kernel.org, bristot@redhat.com, bsegall@google.com,
-        davem@davemloft.net, dietmar.eggemann@arm.com, gal@nvidia.com,
-        gregkh@linuxfoundation.org, hca@linux.ibm.com,
-        jacob.e.keller@intel.com, jesse.brandeburg@intel.com,
-        jgg@nvidia.com, juri.lelli@redhat.com, kuba@kernel.org,
-        leonro@nvidia.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@redhat.com,
-        netdev@vger.kernel.org, peter@n8pjl.ca, peterz@infradead.org,
-        rostedt@goodmis.org, saeedm@nvidia.com, tariqt@nvidia.com,
-        tony.luck@intel.com, torvalds@linux-foundation.org,
-        ttoukan.linux@gmail.com, vincent.guittot@linaro.org,
-        vschneid@redhat.com, yury.norov@gmail.com
-Subject: [PATCH v2 1/1] ice: Change assigning method of the CPU affinity masks
-Date:   Thu, 16 Feb 2023 15:54:55 +0100
-Message-Id: <20230216145455.661709-1-pawel.chmielewski@intel.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20230208153905.109912-1-pawel.chmielewski@intel.com>
-References: <20230208153905.109912-1-pawel.chmielewski@intel.com>
+   d="scan'208";a="844169379"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga005.jf.intel.com with ESMTP; 16 Feb 2023 06:56:37 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1pSfgZ-007pOc-1d;
+        Thu, 16 Feb 2023 16:56:35 +0200
+Date:   Thu, 16 Feb 2023 16:56:35 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Jan =?utf-8?B?RMSFYnJvxZs=?= <jsd@semihalf.com>,
+        Grzegorz Bernacki <gjb@semihalf.com>,
+        Thomas Rijo-john <Rijo-john.Thomas@amd.com>,
+        Lendacky Thomas <Thomas.Lendacky@amd.com>,
+        herbert@gondor.apana.org.au,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] i2c: designware: Use PCI PSP driver for communication
+Message-ID: <Y+5EI3XGBzuwwVBV@smile.fi.intel.com>
+References: <20230209223811.4993-1-mario.limonciello@amd.com>
+ <20230209223811.4993-7-mario.limonciello@amd.com>
+ <703033aa-1293-307d-42a2-9734a51c7190@linux.intel.com>
+ <ca9c0f77-c191-d88a-22a1-315ca97f17e8@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ca9c0f77-c191-d88a-22a1-315ca97f17e8@amd.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With the introduction of sched_numa_hop_mask() and for_each_numa_hop_mask(),
-the affinity masks for queue vectors can be conveniently set by preferring the
-CPUs that are closest to the NUMA node of the parent PCI device.
+On Thu, Feb 16, 2023 at 07:29:53AM -0600, Mario Limonciello wrote:
+> On 2/16/23 07:27, Jarkko Nikula wrote:
+> > On 2/10/23 00:38, Mario Limonciello wrote:
 
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
----
+...
 
-Changes since v1:
- * Removed obsolete comment
- * Inverted condition for loop escape
- * Incrementing v_idx only in case of available cpu
----
- drivers/net/ethernet/intel/ice/ice_base.c | 24 +++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+> > >     config I2C_DESIGNWARE_AMDPSP
+> > >       bool "AMD PSP I2C semaphore support"
+> > > -    depends on X86_MSR
+> > >       depends on ACPI
+> > >       depends on I2C_DESIGNWARE_PLATFORM
+> > > +    depends on CRYPTO_DEV_SP_PSP && !(I2C_DESIGNWARE_PLATFORM=y &&
+> > > CRYPTO_DEV_CCP_DD=m)
+> > >       help
+> > 
+> > Would this look better if split? I.e.
+> > 
+> >     depends on CRYPTO_DEV_SP_PSP
+> >     depends on !(I2C_DESIGNWARE_PLATFORM=y && CRYPTO_DEV_CCP_DD=m)
+> Yes, thanks I'll change that for next version.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 9e36f01dfa4f..27b00d224c5d 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -121,9 +121,6 @@ static int ice_vsi_alloc_q_vector(struct ice_vsi *vsi, u16 v_idx)
- 
- 	if (vsi->type == ICE_VSI_VF)
- 		goto out;
--	/* only set affinity_mask if the CPU is online */
--	if (cpu_online(v_idx))
--		cpumask_set_cpu(v_idx, &q_vector->affinity_mask);
- 
- 	/* This will not be called in the driver load path because the netdev
- 	 * will not be created yet. All other cases with register the NAPI
-@@ -659,8 +656,10 @@ int ice_vsi_wait_one_rx_ring(struct ice_vsi *vsi, bool ena, u16 rxq_idx)
-  */
- int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi)
- {
-+	cpumask_t *aff_mask, *last_aff_mask = cpu_none_mask;
- 	struct device *dev = ice_pf_to_dev(vsi->back);
--	u16 v_idx;
-+	int numa_node = dev->numa_node;
-+	u16 v_idx, cpu = 0;
- 	int err;
- 
- 	if (vsi->q_vectors[0]) {
-@@ -674,6 +673,23 @@ int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi)
- 			goto err_out;
- 	}
- 
-+	v_idx = 0;
-+
-+	for_each_numa_hop_mask(aff_mask, numa_node) {
-+		for_each_cpu_andnot(cpu, aff_mask, last_aff_mask) {
-+			if (v_idx >= vsi->num_q_vectors)
-+				goto out;
-+
-+			if (cpu_online(cpu)) {
-+				cpumask_set_cpu(cpu, &vsi->q_vectors[v_idx]->affinity_mask);
-+				v_idx++;
-+			}
-+		}
-+
-+		last_aff_mask = aff_mask;
-+	}
-+
-+out:
- 	return 0;
- 
- err_out:
+I'm wondering if this is homegrown implementation of 'imply' keyword?
+
 -- 
-2.37.3
+With Best Regards,
+Andy Shevchenko
+
 
