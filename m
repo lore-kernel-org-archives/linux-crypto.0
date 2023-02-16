@@ -2,144 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E97F0C636D6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 14:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC5DC636CC
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 14:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbjBPOTR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:19:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56914 "EHLO
+        id S229725AbjBPOYy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 09:24:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbjBPOTQ (ORCPT
+        with ESMTP id S229850AbjBPOYu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 09:19:16 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF4F4AFD6
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 06:19:10 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id h38so984584lfv.7
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 06:19:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GxTGD03obauPpwowDNWVaAqc6zJSxkIOx+vWTE0ZGWc=;
-        b=ioT50KfL2v2ZGczCYrYam4vv9r38LafB0yPYgqxhE/AVoKHMUBUue/zcDbiM/LbZO1
-         Ys+b9JoyAbT82AsAcG8vqXWIe4tD4zAKp0zj+7jvGOCwAFLAECV/eIzcTeESGTrSnkyd
-         gHAZ9o3o1QgtBI1j+oWcNsAp1z3E8VaCOFK4SNU9wUifXYHlfu8B0ePlQgyDiF8JXsBA
-         JyNACezoNt4eXHkBjw93dVAJ2KB4Rw7unu/zcU2mD8Z5SgkYE7jY+pAeuttsk8NspEID
-         YGQDKxkWQDkpxIDu1vEUx3JxASKgvxPOOlLawgulLlcPm90D3SzmANe37fXVvu9SbRNb
-         02lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GxTGD03obauPpwowDNWVaAqc6zJSxkIOx+vWTE0ZGWc=;
-        b=3KYK604ZeVyxl6tuFb0em2TYh7tA6QdrswraENH44MIwDHoOlvMmSnsxftBeLlGYfa
-         1WSoyk5PofUZXzoTb0XMaYqAL2sJykdYf7q/NqlAeNIrZ471KGNrdbRzjYeJtdLCy+wd
-         oe0fpiMrqZ+2I5MNc4zTDCBaL9hdHGBl1jnf7XBK8uQtaG90aDK/sgxXk+tChc2Cj/Em
-         BUHPvc2r36qhRBraiTcT1CotGJeDGBRBgA0ci19ArOwI0KigNE9SZ0iZcUUpcKZ2kYxW
-         /f+WPiGtBDQQhKBY1j1LThFOgp1/HyjquHPhaiX7HgPDIG9y6KDjWcrAmWiAIZOfBjLh
-         yujg==
-X-Gm-Message-State: AO0yUKUd22bKnO3c6hqpPkNH8Qzbua79AjHkWwlCYPjMaV4WyYoKBvdu
-        XGk/nYTH48MrwDHhAePxwBTYcg==
-X-Google-Smtp-Source: AK7set/luZwL1YyDPx/x8pAcIL8TjZWGGzKs1pIi0y2GYmBhjYX69LgYeoXWrxqa2gGSDDdtBsJ3cA==
-X-Received: by 2002:a05:6512:491:b0:4b6:e4c8:8a4e with SMTP id v17-20020a056512049100b004b6e4c88a4emr1683189lfq.0.1676557148977;
-        Thu, 16 Feb 2023 06:19:08 -0800 (PST)
-Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id q28-20020ac2515c000000b004d8580b2470sm311445lfd.225.2023.02.16.06.19.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 06:19:08 -0800 (PST)
-Message-ID: <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
-Date:   Thu, 16 Feb 2023 16:18:57 +0200
-MIME-Version: 1.0
+        Thu, 16 Feb 2023 09:24:50 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BDF14AFE1;
+        Thu, 16 Feb 2023 06:24:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VOoBj4RkyVw8ORkZVWfSQVPGuWg65nCSMnmNn6BNhCP93UNMXhNug3GfjJHFjukUrAxZruwXFR30BMeRSEjJCxbZV+4UgZeHXxuuReLXVTgE+vCgeEDgJnesmFfc2wdMxaXiHHQ2MyCNtZI65AKUb+UkWkm5aPE/3Sz2BNWBnpt+ASgDGlFXlxzQNmLnZQxBOzAlDebDkTLIbNmSSMjWkPaqHNLJ+zgDEKEMkGLJ/seM8FjHqCDQrHenyP6QMcECOm8ai/i4Zfea/W2AOU7ddFSez98p7+UmbzyQEWg4C8yPpyZM+1CJ5GomeKsr9VB62dgKdY7uA8Oa1Atkl7xknA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RE3DVXgzSZMSuugj3L4nmvN4LG9u57qlil3DsSTiKcw=;
+ b=FydOvc/wdhLCneDEVPsXWiwpxsaMAvNcq1hP/YErkp6FMAkYc8y0hSfxqwW/GFhtUthwSfSRVU184LQvddBxD0QwkZn8/a+OJCu4EbkPk43yNriDdFYl8VQ+ovHwQVZvmMzDNsAdiFLbwpMXV6YNz+9EVo+l3jVA3RMINoQ5xHe6BQO6WCsncMvRT1Q3CDPFElgsCssiyTWPP/9w1acZM6KXQeQoG904jyzyGbdTymoNINQIFMXtjdzjnX4nOohFb7s2Eh86hpMfVQ5WC3NIrH1tKiOxcsmQ/gmHfuYNXMWBrj/Ub/th4pjS+WSkWFMWIacMUy4WfboGeyIsd3vNYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RE3DVXgzSZMSuugj3L4nmvN4LG9u57qlil3DsSTiKcw=;
+ b=PzumTOOw2XcgtayBunmHyB72n1Zq8IUpQyLjyW1TaXGkCmzzZB5oAOSXl+MOjZ5CbJzFngHH12IBYZG8CTKNWfaG6Js8nKxfh1zuuFGKT39Dyp/+skL/h9QJKf6H6a8qqgUfE1eQBKzi0wvKJfZn3q7x4LnwJi6IsDFlCuvpGTo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CH2PR12MB4953.namprd12.prod.outlook.com (2603:10b6:610:36::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.13; Thu, 16 Feb
+ 2023 14:23:05 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::6cc0:9c7a:bd00:441c%4]) with mapi id 15.20.6111.013; Thu, 16 Feb 2023
+ 14:23:05 +0000
+Message-ID: <d86181b5-bf73-13e3-08f7-6cab43cb3398@amd.com>
+Date:   Thu, 16 Feb 2023 08:23:02 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v7 1/1] dma: qcom: bam_dma: Add support to initialize
- interconnect path
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 3/6] crypto: ccp: Move some PSP mailbox bit definitions
+ into common header
 Content-Language: en-US
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        dmaengine@vger.kernel.org
-Cc:     agross@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        thara.gopinath@gmail.com, devicetree@vger.kernel.org,
-        andersson@kernel.org, bhupesh.linux@gmail.com, vkoul@kernel.org,
-        Rob Herring <robh@kernel.org>
-References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
- <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-In-Reply-To: <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
+To:     "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+        =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>
+Cc:     Grzegorz Bernacki <gjb@semihalf.com>,
+        "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "Allen, John" <John.Allen@amd.com>,
+        "Singh, Brijesh" <Brijesh.Singh@amd.com>,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        "linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+References: <20230209223811.4993-1-mario.limonciello@amd.com>
+ <20230209223811.4993-4-mario.limonciello@amd.com>
+ <CAOtMz3PuzpcrqQb-L9kzY1be4xwhp72fqNqSWnRvAE0Nd4d3qQ@mail.gmail.com>
+ <MN0PR12MB61017A594AF2CCD1D75EC798E2A29@MN0PR12MB6101.namprd12.prod.outlook.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <MN0PR12MB61017A594AF2CCD1D75EC798E2A29@MN0PR12MB6101.namprd12.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0P221CA0008.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11c::9) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CH2PR12MB4953:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc093cdb-9021-4dab-4da4-08db10295162
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kKPI5I/+5yLhbiToehQNQeskUymvcm4k8oWOb1bmEIh8tNVm7ZtvcTeET7/7ssHBI/dYT4ykeVb+/Bn3SA5DSa64sa/LTufqP+UPiu5AkE5lVHQB3RwFkCuUVdLJCLiNaRWYdCVhhNc/I8hdUFHM8hnw6xlaQIrd/7XA87+rB/Di9Rr44AFehFE+nUMUzrlbgfKlPg8uNi3NHF4pKxToYrNO9RPnbHEmuVcZPpogWLDss2igu75M/7/WNOChqqiW8UrSVTHQvMevhWM+r5lsCYDm0HSzmtlbgqTL2G0Q/0kQuNRRA8EhOfvPrS+BDQIgMUB96cj9IKChWFHUU4sUJHexaqOmIxrzlkBGRzsOCIYBanPhCw035wS6P4MK3MVUqnom77dWWuQz3xPx9NTPw+N2JzENa0FYb/uIr9dh00gARTGRpRw7HqIT/1G2LaMaEsOGhT8K2VCAYqcjzO1F9EgGG7MxMHo+Z2Gv30jf0zcAIVF4tpKGhuGHXPiYdlEb3s6AwCx0A0rFiHIzITZ+0oPN+Gu2TowFSvh2cviGJz865b9ENeBojaBZRZpqpKg9uUmTj/5NrKvf3UkEPJXJ6UTK7BjAZ+9aiGYq5a2Ch6TgaiiLoQKom4xXthb2h4BdT6Gs3SF2wJR/je05z3WQ5pTKC3ecAqZe2gMGamOCtOq4AhYZmCg00csSKE3fTt3Yl/x5YaMNklze0K2ie3V3AQOFOw3HKmiir6zctc+iDh0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(451199018)(83380400001)(15650500001)(31696002)(8936002)(86362001)(4326008)(41300700001)(7416002)(5660300002)(8676002)(54906003)(316002)(110136005)(66946007)(36756003)(66556008)(66476007)(38100700002)(6666004)(31686004)(186003)(6512007)(26005)(6506007)(53546011)(478600001)(6486002)(2906002)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QXorMFlodzV0YWpsYit1VzFyalZvSkc2aUk3YWtGdk1DTG9yUEY3dUFrcDQr?=
+ =?utf-8?B?ck43VDBNMm9IRGhsV2xnTUdCNXFMN2ErNGhDLzBuelUrUVlXNDhtSGwweWFu?=
+ =?utf-8?B?OURlYzEwR2FNdFkwS2xLakM0dVk2RGNtcGdhbm9RQ1BRTFBiKzFJd1RwaXoz?=
+ =?utf-8?B?WUhDaE9GM3IwYVNnUkF6eHhBRkRobTNNbkRyU0JrT3NrWmhYWURGVUhmK2Rq?=
+ =?utf-8?B?cmZvT1dhb3dybFRyQzRNWDdtczRZQ0JiMmx5VGJmTVMrOE1jSXRWQVpybGNS?=
+ =?utf-8?B?ZnpGaTJLNEFoWUxzNVNpb241M0xmdUc4YTJnWkU4ZVZmRWRwdVZsMU01dkov?=
+ =?utf-8?B?dGVoWWswMlV6MnBxNjhDZEJjQWEySVkvQlJzRDEyTVdteUVPQjZaVmFFMVBx?=
+ =?utf-8?B?eDFjQ3ZPUXlTY2E1Z24zWGRFZ3BKVTM3VXBsWjAwUUdSdGlVZ2wyNnNxV0t1?=
+ =?utf-8?B?anMvRUxMNzRoTnVLVlFUVmZxTlhiSU96VFd1QnJpSFN3S3NuUGdYUUpKZk50?=
+ =?utf-8?B?NkR0L3FIQktaTjZVWWxwVy9mMEp6SXF6aHRJQUVGK1lRdEExZk9tSWdVOVJL?=
+ =?utf-8?B?TVVncU9QdFZBdTYzT1I5TFdPVHZlRzJYYWVFSmJDZUNjdWcvNmlETWt4MXJ5?=
+ =?utf-8?B?ekJJL295M3JUTTNISnBEcFN4ZE1TWGlUS0Y2b21CMEloemRpRmpCUE4xcy9T?=
+ =?utf-8?B?TU82amdtLzZOajNhRG5paU5Zbjdtd3d2WHR2Um1PQ0ViWkNSMWJUMVg2UVZD?=
+ =?utf-8?B?aHlhREFBQWpKZGowdGF1cW9lZkVnMFVOUjNWSjVyZ2xyN0d0aFFvTkhtUHlE?=
+ =?utf-8?B?d1Q2b0ZqdkRNajQzMVZabnBEMTF1SEdjZmlQNXFHWVlFL3hDcElxVDdOQXhj?=
+ =?utf-8?B?NTRMemp0VDR3aGVDMGRTQTJsK1lTZDMxUzZYT25rUXVnTG1TOGtZbkEyRHJm?=
+ =?utf-8?B?WHpTVVhRVTh6UGJWT1pMNVFnU3R0eDZ5QlVONVFOSHpWa1llMWJOWC9oN2NZ?=
+ =?utf-8?B?bEdsRnNwYnE4Tzl0NWZzTXRPL0J6VUhoZlhROXM1ZFhTK3N0Snk5TnNEbTAr?=
+ =?utf-8?B?Rm42YUo5VlM1NkZZQjJFbDVWTDFFNnplQTBJWUVrRGlnbFZic2doczkwOGE4?=
+ =?utf-8?B?ZHZZb1YwR0R6ak8zWE4vUndIVHFnOEdnbURXZ0ZKaHhBZWpwWFBXRytVS2Rm?=
+ =?utf-8?B?Ky94ckNjUGxjK2NLSGhKSUR0UWdjWXdYekdvbHBIT2Y3M1B4V1liVnU3ZWR6?=
+ =?utf-8?B?SUNuNFdUQjYzR3lJajFlMFZvTzNJSVVVemJ0KytHdWUyVVdUNGRaR2ppckYy?=
+ =?utf-8?B?MkV2WnRwRHoxZWM0V201WW5nWFQzVlVyYy9xb2pZSzA0UC92WkpJRVRmcC9k?=
+ =?utf-8?B?KzdnQ1FjZ1dVS041WE5DazNNVjRZeldwZzJKZk53WG9qaEJoZWMrdy8rRUQr?=
+ =?utf-8?B?Z0FKNXU1ZjVMdnhnZVN6K204ZDJtUlNUZFcxdXg0ZVVPOUNTZ0Vldm9HbVRZ?=
+ =?utf-8?B?Q1ArVCtUemFpbi9RVmZ1Q1hhK2ZuMHdzb0NpR1Q3UXdPOXR1Sk1UZkNqc1JD?=
+ =?utf-8?B?ZnFFTkt5WlJoWERJQnd2Q2N2SGhKQlFYK05XenhYOUVZK1M2dCtNcTFlTzMr?=
+ =?utf-8?B?eFdKam1ObmhySVlZOTBpM3UwS2M4VkRpMVBaM2l4YlhFaEdoemJmS000Smcw?=
+ =?utf-8?B?ZXcwVUNmdTVvSU5YdklId0ZMRjduTWpCMGorV0VsdHY2WncvRDJ2Z1pES29r?=
+ =?utf-8?B?bFB1SW9Yekt4VTBDWGliNWdwVzVCRHR1bENNaGtKY2E0Z0J4Y2tHYkhGUlJS?=
+ =?utf-8?B?QXU5YXg2VUppU1BlUm4wWUFGMTIyRGQ0bmU3T0w2UGpNemluSVB1SUZlUFZt?=
+ =?utf-8?B?NUIrRGprMmJyWUo1ZGNyaC9EQm81ME41TTBuU1hUaCtlSGExOTJuUTVUVVhM?=
+ =?utf-8?B?UkkwSzRsdE42M1dCMFNqSCtCeDJlTVpwcGFMRW4xUmx4THhOZ3RZRFdPQlk0?=
+ =?utf-8?B?bzhpckRVeThmNUttMUZqMllsZG5qNUZoa2NsR2RhaU5jQlhENngrbVYzbjFY?=
+ =?utf-8?B?VkxTMlZPaGwvSzI5LzBFSEh0MmhDcjByaHRWckgrbVAwSmN6RFc5eGZ0K2pN?=
+ =?utf-8?Q?kMLWZeO8mJHxYRZN/WIu/WzdA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc093cdb-9021-4dab-4da4-08db10295162
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2023 14:23:05.0344
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tEdTdzzWZyL2XEE9gTO1AV3rER429BWps6UZEbwea9szGY3VVnJzFSffn1sQXNO2qNrgPBqtriK7/BeEbb3l8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4953
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/21/22 06:06, Bhupesh Sharma wrote:
-> From: Thara Gopinath <thara.gopinath@gmail.com>
+On 2/14/23 16:05, Limonciello, Mario wrote:
+> [Public]
 > 
-> BAM dma engine associated with certain hardware blocks could require
-> relevant interconnect pieces be initialized prior to the dma engine
-> initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
-
-Apparently it's proven that the change description is incorrect, Qualcomm
-crypto engine is working fine on SM8250 and even more recent platforms,
-so far there is no obvious necessity in this change.
-
-> is passed on to the bam dma driver from dt via the "interconnects"
-> property. Add support in bam_dma driver to check whether the interconnect
-> path is accessible/enabled prior to attempting driver intializations.
 > 
-> If interconnects are not yet setup, defer the BAM DMA driver probe().
 > 
-> Cc: Bjorn Andersson <andersson@kernel.org>
-> Cc: Rob Herring <robh@kernel.org>
-> Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
-> ---
->   drivers/dma/qcom/bam_dma.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
+>> -----Original Message-----
+>> From: Jan Dąbroś <jsd@semihalf.com>
+>> Sent: Tuesday, February 14, 2023 03:04
+>> To: Limonciello, Mario <Mario.Limonciello@amd.com>
+>> Cc: Grzegorz Bernacki <gjb@semihalf.com>; Thomas, Rijo-john <Rijo-
+>> john.Thomas@amd.com>; Lendacky, Thomas
+>> <Thomas.Lendacky@amd.com>; herbert@gondor.apana.org.au; Allen, John
+>> <John.Allen@amd.com>; Singh, Brijesh <Brijesh.Singh@amd.com>; Jarkko
+>> Nikula <jarkko.nikula@linux.intel.com>; Andy Shevchenko
+>> <andriy.shevchenko@linux.intel.com>; Mika Westerberg
+>> <mika.westerberg@linux.intel.com>; linux-i2c@vger.kernel.org; linux-
+>> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; David S. Miller
+>> <davem@davemloft.net>
+>> Subject: Re: [PATCH 3/6] crypto: ccp: Move some PSP mailbox bit definitions
+>> into common header
+>>
+>> (...)
+>>> @@ -99,7 +93,7 @@ static int psp_check_mbox_recovery(struct psp_mbox
+>> __iomem *mbox)
+>>>
+>>>          tmp = readl(&mbox->cmd_fields);
+>>>
+>>> -       return FIELD_GET(PSP_MBOX_FIELDS_RECOVERY, tmp);
+>>> +       return FIELD_GET(PSP_CMDRESP_RECOVERY, tmp);
+>>>   }
+>>>
+>>>   static int psp_wait_cmd(struct psp_mbox __iomem *mbox)
+>>> @@ -107,7 +101,7 @@ static int psp_wait_cmd(struct psp_mbox __iomem
+>> *mbox)
+>>>          u32 tmp, expected;
+>>>
+>>>          /* Expect mbox_cmd to be cleared and ready bit to be set by PSP */
+>>> -       expected = FIELD_PREP(PSP_MBOX_FIELDS_READY, 1);
+>>> +       expected = FIELD_PREP(PSP_CMDRESP_RESP, 1);
+>>
+>> What's the meaning of "PSP_CMDRESP_RESP"? I see that this new macro
+>> name is currently used by other drivers, but in my opinion "READY" is
+>> more descriptive. (It is also aligned to the comment above this line.)
 > 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index 2ff787df513e..a5b0cf28ffb7 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -26,6 +26,7 @@
->   #include <linux/kernel.h>
->   #include <linux/io.h>
->   #include <linux/init.h>
-> +#include <linux/interconnect.h>
->   #include <linux/slab.h>
->   #include <linux/module.h>
->   #include <linux/interrupt.h>
-> @@ -394,6 +395,7 @@ struct bam_device {
->   	const struct reg_offset_data *layout;
->   
->   	struct clk *bamclk;
-> +	struct icc_path *mem_path;
->   	int irq;
->   
->   	/* dma start transaction tasklet */
-> @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
->   	if (IS_ERR(bdev->bamclk))
->   		return PTR_ERR(bdev->bamclk);
->   
-> +	/* Ensure that interconnects are initialized */
-> +	bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
-> +	if (IS_ERR(bdev->mem_path)) {
-> +		ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
-> +				    "failed to acquire icc path\n");
-> +		return ret;
-> +	}
-> +
->   	ret = clk_prepare_enable(bdev->bamclk);
->   	if (ret) {
->   		dev_err(bdev->dev, "failed to prepare/enable clock\n");
+> It should indicate that the PSP has responded.  I think both terms work
+> to describe what's going on.
+> 
+> Tom - What's your preference?
+> I'll either adjust all the drivers to use READY or fix the comment for v2.
 
-I'm resurrecting the comments on this change to emphasize the observation
-that the change is not needed at all to run QCE.
+I think the comment should be changed.
 
---
-Best wishes,
-Vladimir
+Thanks,
+Tom
+
