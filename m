@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B52C64EC4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA17C64ED6
 	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 13:15:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbjBPNOw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 08:14:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56742 "EHLO
+        id S230183AbjBPNOv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 08:14:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjBPNOl (ORCPT
+        with ESMTP id S230076AbjBPNOj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 08:14:41 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E255356C
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 05:14:39 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id g14so1869965ljh.10
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 05:14:39 -0800 (PST)
+        Thu, 16 Feb 2023 08:14:39 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A97353553
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 05:14:38 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id b30so1909664ljf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 05:14:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1676553277;
+        d=linaro.org; s=google; t=1676553276;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/cQTcEdA6/1Tvp2AynCxy/uYQRIV6AL4re0IqB5Qt5w=;
-        b=WmHCiNh1iOAGvg0WxMM6/09R1KCZOunBt55vRYlh0THdC+EEcwtAZrCFydLjYWzAqV
-         q+jUdR8UQQacgj7YhjbMOaKLu9MjXh8BSMVsUl28k2xwQL0RjitNnZ01vsDVPA6Eb5gd
-         7o3fbI1YDpLObiv3GXDN7WPFTULmeBzv8EzsrVrfnyobbH3TS1olRauACGoTPgwfLKqB
-         wffsdlJEmYwNZMk39zOEdS77i9Md9o79LU80EKMOurXIU2XNOJvBB1rRqAW06MsHdaIf
-         qvvHGnQ7EhsCF6UCyYPIe68twPwgFuRCNxHsexfOTYXvu1YV6v23zbMKf5ItztUR1rQj
-         HXkQ==
+        bh=T8Dshvhn/u6JxIEsr1GHQ58ZptmtCs5B/Gl7LxOGqZU=;
+        b=EGhvTziYsFm7oahPnP1OkeV+Vwy1O4j5rpvmA67G0FkQ7h+lWM+v9lYck948g1rshd
+         k7L/m9J/+24+TzJQr0j0XMW97XCiAnfRFBbc1fzMEyt7B7GC10q3oLIhHeDozqkf2JlO
+         WVAWyfC4JjIjiwa9Cwo3rQOKwdVZYBxDG+UkoQkK29eOkArEsmMVPf07luruOVXJpeme
+         g0aivotitBH7by2qVt19YTJv5oeSJRUeh0/YjcktYhdWRHvf92tu4NkBWCciKIXl9Bqw
+         l2KRX4CiEjfPltzBoppxfLCHp/UnKy24gy8TJCPELuU8b41Bmq3HMnnLbYwwN1eg7ug4
+         lStg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676553277;
+        d=1e100.net; s=20210112; t=1676553276;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/cQTcEdA6/1Tvp2AynCxy/uYQRIV6AL4re0IqB5Qt5w=;
-        b=zL2iJ89TPZPgTAxUSBc1QRzJ59+MZAE3vIcq+tik50AMSSFFptizJ30D3l7FzIdjz8
-         RcxLLxSHDOYPAIiZuyyp6KTsdcal8aSXKe3t6uX5pBe/jwlWCrTYdTqoX6rWQXap+vV+
-         TF7XldhbnX/G72aF9vaWIIw6rPx5WrbAx36ypFoqpWIaECilkmXgQ/t0nlohVyO8OZDW
-         SNBuE/b4QywqgcEWsWVXGS2DDH3QjjZQuF6R88gUSFTlVaKC/ECWhsc74hdVNd3jr7LD
-         iDF6ExH5CkyDD8pYOvpl/1AGJNJt1pPUptqqvzd8n4nD/HYciKYkN/+C135nsg9p1dPX
-         NWPg==
-X-Gm-Message-State: AO0yUKU6DibNyhX1W+IOSOaGTdYfoMXeEQ2B1rCHl1gNMXn4+JwZOu7S
-        nToITO6MiT5/4v5syyKhHzoCXA==
-X-Google-Smtp-Source: AK7set+OX9qZ5I3ZoqUDUICHns/n6P882LYTlqlnCMY04ZjXaBimoEsaLOpZ+WCEG25hZQrjdGcEiQ==
-X-Received: by 2002:a05:651c:2115:b0:292:b368:3483 with SMTP id a21-20020a05651c211500b00292b3683483mr1824607ljq.1.1676553277636;
-        Thu, 16 Feb 2023 05:14:37 -0800 (PST)
+        bh=T8Dshvhn/u6JxIEsr1GHQ58ZptmtCs5B/Gl7LxOGqZU=;
+        b=f0blhd0oQyoPzuu6wTJC8ezNUOhpNtJaY6hsG2NMNg2fWdHBL69VolOQiuT9TTK/6s
+         j/7EJ6H+iyzFyVIyZ2r9yDIm2Jd+3unT6Yba/9uUDIdhNqQgILteoInw3gzgsXVkkqbf
+         TkrRISPO4W35tkKXwFRQTXTn5DURek4oiE/gCo8n/2sngQlIYuT/V0UjqWS8InG1t3fH
+         WGF7uWC0Uo9/udU2cbFmF+xil2/yFQUJSNpGmUCXl4aKEiW/sThs8XGUMk1ahdfno/Eq
+         RBzon45vcUCrtW10i+Cmp/7iBMbxqfbZC5+4RYnpH+dVHQZUr+X1OopyEP6DAr0I0mA/
+         qJrQ==
+X-Gm-Message-State: AO0yUKU5gYtXcK4mN4WCBx0pcmkk4iHC+xbHqkH857Ls/WR8rtH5P0vM
+        j3xoLZx2rGnxQlAsFgEv1CDDoA==
+X-Google-Smtp-Source: AK7set9uMYvXdjN7EkZNCcEXNePvuhN+rv+yPlRbDXytheBC2JAOp4/tMtVRGt2cwIyF7vxxEgOZ5w==
+X-Received: by 2002:a2e:be0a:0:b0:293:1696:a042 with SMTP id z10-20020a2ebe0a000000b002931696a042mr2018625ljq.4.1676553276325;
+        Thu, 16 Feb 2023 05:14:36 -0800 (PST)
 Received: from localhost.localdomain (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id j8-20020a2e8248000000b00293500280e5sm194345ljh.111.2023.02.16.05.14.36
+        by smtp.gmail.com with ESMTPSA id j8-20020a2e8248000000b00293500280e5sm194345ljh.111.2023.02.16.05.14.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 05:14:37 -0800 (PST)
+        Thu, 16 Feb 2023 05:14:35 -0800 (PST)
 From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
 To:     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Bjorn Andersson <andersson@kernel.org>,
@@ -61,11 +61,10 @@ Cc:     Rob Herring <robh+dt@kernel.org>,
         Andy Gross <agross@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Rob Herring <robh@kernel.org>,
-        Jordan Crouse <jorcrous@amazon.com>
-Subject: [PATCH v10 03/10] dt-bindings: qcom-qce: Add 'interconnects' and 'interconnect-names'
-Date:   Thu, 16 Feb 2023 15:14:23 +0200
-Message-Id: <20230216131430.3107308-4-vladimir.zapolskiy@linaro.org>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v10 02/10] MAINTAINERS: Add qcom-qce dt-binding file to QUALCOMM CRYPTO DRIVERS section
+Date:   Thu, 16 Feb 2023 15:14:22 +0200
+Message-Id: <20230216131430.3107308-3-vladimir.zapolskiy@linaro.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230216131430.3107308-1-vladimir.zapolskiy@linaro.org>
 References: <20230216131430.3107308-1-vladimir.zapolskiy@linaro.org>
@@ -77,40 +76,29 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 
-Add 'interconnects' and 'interconnect-names' as optional properties
-to the device-tree binding documentation for Qualcomm crypto IP.
+Add the entry for 'Documentation/devicetree/bindings/crypto/qcom-qce.yaml'
+to the appropriate section for 'QUALCOMM CRYPTO DRIVERS' in
+MAINTAINERS file.
 
-These properties describe the interconnect path between crypto and main
-memory and the interconnect type respectively.
-
-Cc: Bjorn Andersson <andersson@kernel.org>
-Acked-by: Rob Herring <robh@kernel.org>
-Tested-by: Jordan Crouse <jorcrous@amazon.com>
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
 Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
 ---
- Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-index 8df47e8513b8..94f96ebc5dac 100644
---- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-@@ -32,6 +32,14 @@ properties:
-       - const: bus
-       - const: core
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0abf3589423b..e93f0d45b400 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17272,6 +17272,7 @@ M:	Thara Gopinath <thara.gopinath@gmail.com>
+ L:	linux-crypto@vger.kernel.org
+ L:	linux-arm-msm@vger.kernel.org
+ S:	Maintained
++F:	Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+ F:	drivers/crypto/qce/
  
-+  interconnects:
-+    maxItems: 1
-+    description:
-+      Interconnect path between qce crypto and main memory.
-+
-+  interconnect-names:
-+    const: memory
-+
-   dmas:
-     items:
-       - description: DMA specifiers for rx dma channel.
+ QUALCOMM EMAC GIGABIT ETHERNET DRIVER
 -- 
 2.33.0
 
