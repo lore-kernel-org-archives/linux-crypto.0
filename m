@@ -2,81 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F86CC61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 06:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD769C636D7
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Feb 2023 06:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjBPGbe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 01:31:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37712 "EHLO
+        id S229783AbjBPG6r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 01:58:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbjBPGbe (ORCPT
+        with ESMTP id S229782AbjBPG6m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 01:31:34 -0500
+        Thu, 16 Feb 2023 01:58:42 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5933D0A4
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Feb 2023 22:31:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4342911165;
+        Wed, 15 Feb 2023 22:58:41 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9B804B825BC
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 06:31:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42E27C433D2;
-        Thu, 16 Feb 2023 06:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676529089;
-        bh=h832o51QR/Ud3vH12RN8s1z1mVWC6jqFVyYEFwJNs1M=;
+        by ams.source.kernel.org (Postfix) with ESMTPS id D390DB825BC;
+        Thu, 16 Feb 2023 06:58:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E06AC433D2;
+        Thu, 16 Feb 2023 06:58:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1676530718;
+        bh=2FqkwkZjiBPavFp1l2RKoVJVfxS4Y70fRW3GIwt8mFQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=M48DF+ioUpXXerMKpE7+ODEa1rcH8ATW+FikxsLXaL4SbqntyzCrAs5c4Vjpva1hN
-         JcP2hNOKNwX4WLRXMyU2RV5uNMzQQ+BROsCW2XfUsxR0wmDEInl8IhYu5DJtXG9NLK
-         FitNbba9aMgmS01L+Mj/WoIjN5wnX0C9wF8G4idqAOeOvqB/OQ3+Hga2Ci+4+tzVA5
-         OFy+y6zsPdydz+xW5i+6yXdLPQ/WCF9Zkx+p8v+uH1ixW0JMF4Ef4HS33+8NuMEKxS
-         bPg0Ak62JmJdZ6msytxG8FGkoHooqX8Pp3mFIpsExU/Y9bYr0+j0jAFdYnVrzhn6EJ
-         yxwmol+WtwcrA==
-Date:   Wed, 15 Feb 2023 22:31:27 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 2/10] crypto: aead - Count error stats differently
-Message-ID: <Y+3Nv2Me9c8KYcQU@sol.localdomain>
-References: <Y+ykvcAIAH5Rsn7C@gondor.apana.org.au>
- <E1pSE2H-00BVkZ-8X@formenos.hmeau.com>
- <Y+3C6f/W4fHtVgnM@sol.localdomain>
- <Y+3GdBy7H5/sELON@gondor.apana.org.au>
+        b=N+7mz4VFp532ugW2m0Vzn0nQcLmlcW8gUWBN/P9xeIvLzkoI+ysmtlfu7GlKRYwFb
+         tNCJzL28MOHGAkSaQULBmpxdq9uizMkZsM6u797NC4DQt8kKwD/XlWL6B+J/WdTNVf
+         cubS79kYC5swxO7uZ2YihEDpvHi7XydZZOP4+Y1U=
+Date:   Thu, 16 Feb 2023 07:58:35 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+Cc:     "# v4 . 16+" <stable@vger.kernel.org>,
+        Xiu Jianfeng <xiujianfeng@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH stable v5.15.y 1/1] crypto: add __init/__exit annotations
+ to init/exit funcs
+Message-ID: <Y+3UGwHNMbTQq7bF@kroah.com>
+References: <20230214195300.2432989-1-saeed.mirzamohammadi@oracle.com>
+ <20230214195300.2432989-2-saeed.mirzamohammadi@oracle.com>
+ <Y+yBxXNjBLuonPKP@kroah.com>
+ <281CF1A3-C16D-4598-B741-B1128DA97B5B@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y+3GdBy7H5/sELON@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <281CF1A3-C16D-4598-B741-B1128DA97B5B@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 02:00:20PM +0800, Herbert Xu wrote:
-> > > +	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
-> > > +		memset(istat, 0, sizeof(*istat));
-> > > +
+On Wed, Feb 15, 2023 at 11:10:14PM +0000, Saeed Mirzamohammadi wrote:
+> Hi,
+> 
+> > On Feb 14, 2023, at 10:55 PM, Greg KH <gregkh@linuxfoundation.org> wrote:
 > > 
-> > Above is another place that can just do 'if (istat)'.
+> > On Tue, Feb 14, 2023 at 11:53:00AM -0800, Saeed Mirzamohammadi wrote:
+> >> From: Xiu Jianfeng <xiujianfeng@huawei.com>
+> >> 
+> >> Add missing __init/__exit annotations to init/exit funcs.
+> >> 
+> >> Signed-off-by: Xiu Jianfeng <xiujianfeng@huawei.com>
+> >> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> >> (cherry picked from commit 33837be33367172d66d1f2bd6964cc41448e6e7c)
+> >> Cc: stable@vger.kernel.org # 5.15+
+> >> Signed-off-by: Saeed Mirzamohammadi <saeed.mirzamohammadi@oracle.com>
+> >> ---
+> >> crypto/async_tx/raid6test.c | 4 ++--
+> >> crypto/curve25519-generic.c | 4 ++--
+> >> crypto/dh.c                 | 4 ++--
+> >> crypto/ecdh.c               | 4 ++--
+> >> crypto/ecdsa.c              | 4 ++--
+> >> crypto/rsa.c                | 4 ++--
+> >> crypto/sm2.c                | 4 ++--
+> >> 7 files changed, 14 insertions(+), 14 deletions(-)
+> > 
+> > What bug/problem does this resolve?  Why is this needed in stable
+> > kernels?
 > 
-> As I mentioned before, this would create an unnecessary branch
-> when STATS are enabled (which would presumably be the common case).
-> 
+> I don’t have any specific bug to discuss for this fix. It would help freeing up some memory after initialization for these crypto modules since the init function is only called once but not addressing any major issue. Feel free to disregard if this is trivial for stable.
 
-I was hoping the compiler would know the pointer is non-NULL, since it's created
-through an expression like &foo->bar where bar is at nonzero offset, and foo is
-also dereferenced.  Unfortunately it does seem that's not the case, though,
-probably because of some of the compiler flags the kernel is compiled with
-(-fno-strict-aliasing and -fno-delete-null-pointer-checks, maybe?).
+Exactly how much memory is actually freed here and why is that required
+for a stable kernel?
 
-Anyway, if CONFIG_CRYPTO_STATS=y is the common case, that's unfortunate.  Surely
-hardly anyone actually uses the feature, and all this stats collection for every
-crypto operation is for nothing?
+Please read the kernel documentation for what is considered a valid
+stable kernel change:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
 
-Here's a thread where someone claimed that disabling CONFIG_CRYPTO_STATS
-significantly improves performance:
-https://lists.ceph.io/hyperkitty/list/ceph-users@ceph.io/thread/44GMO5UGOXDZKFSOQMCPPHYTREUEA3ZI/
+thanks,
 
-IMO this feature should never have been accepted.  But could we at least put the
-stats collection behind a static branch that defaults to off?  If someone really
-wants to collect stats, they can set a sysctl that turns on the static branch.
-
-- Eric
+greg k-h
