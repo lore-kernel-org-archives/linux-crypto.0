@@ -2,149 +2,174 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B221C6379F
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 04:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76778C636D6
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 07:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbjBQEBN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 23:01:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
+        id S229749AbjBQHHy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Feb 2023 02:07:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjBQEBM (ORCPT
+        with ESMTP id S229475AbjBQHHw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 23:01:12 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326C14E5E8
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 20:01:09 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id h17so4107771ljq.4
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 20:01:09 -0800 (PST)
+        Fri, 17 Feb 2023 02:07:52 -0500
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7AB900C
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 23:07:47 -0800 (PST)
+Received: by mail-lj1-x243.google.com with SMTP id a18so307804ljp.7
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 23:07:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ymeKyoEPaB2TlyXtYfKO3gw6CH1MjfygMlQz73O8po=;
-        b=yCZKr8/p4yd+8jG2V8QlBXF9KW3dR7ZBJGXIWJ9S0PxxkGxs9p/hPwsoZBM80VHShR
-         4LdrM/kudaLex8OpMLiIzw1ptqK2nTs2YGhlxQ5Glrfy7FmQ05XSKl97t8Gq/iXvM6AJ
-         yDNiUDfIU66SA9X+POtTNQAOZcjVd8Ny9SomMb4vei22woi5WigkWY1cT+bEpD8fMhKg
-         PGPeDPmBCbeT1P2TLuFTcAbz0u0uh9K7qWHe4LJ7l6BLT6UdVitFsnYNK4bmfQsQXtP7
-         UHq+R9bx3po5ispQXnqo5ajbhz3Ay3UCnECMGO4K34Z6ZTdwKephGKsShTPCRA7I5cI5
-         ZhHA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DSwBYjZrNmln+ctA3/m+T2GVcsFUCJyV9W5bCg8FwVk=;
+        b=WDYC5mLgBgby4IkaIx/erhiX6pHvAGJfn8AJ4Fg/PsJDfzV1FccE5bSHlt/k0neWN+
+         5qavbew9Z52SAlMUJ96LibXdf5m1sH5ZOkRocvtrbl0TH3Xrmt/+XPkVPM59vvG1r+hn
+         HbDNb/N+2xr7ig+uN972FTzu6d3SEDZyRlEFzAp6pA2US89GZjl/hBOEG/IEJWigdGPt
+         Lst25/ZCiiIBlMlLrvVQVm+sR9pDzrACptLz81ApuVfu/gf+8sw7lo47LQefw6+eHJuV
+         yD5/EGCJghbXSuVjvEL6I2t+czet84cYRS2HZBLOMylaDln80DXMzGttG3vaQR6V8971
+         PI7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ymeKyoEPaB2TlyXtYfKO3gw6CH1MjfygMlQz73O8po=;
-        b=gK1PisXLxgQ2QCOQJpv0g4KJUfdJp8l+Cd14wyeLOsv78XWlenUKKVQ5UlvYmYEaWP
-         pKdlYRopKUaGsnJxOpcjDDpfbnx36FR0g6aKFqamtjOWMZ8FQO+mm9/PHoOD1w+8gkuo
-         9LKRhbTj1D7RZdHMhvZZU8N/6uFbTKdpLwlZiWz3cytGUb8+cMf3LzRGdalghP18qExv
-         Q/zXK1a3v9vka4S5LVp5eahBlVtzlchZ00qq4PZmCLs9OCOy/1X/e3nAy9F+4o8wv+yX
-         dmZAKnthmRI4P6trrUve5IYfTAlEBmIsybSr7Gn0oixnsV7a+i9Vz3WVegrgecFrauAk
-         0EzQ==
-X-Gm-Message-State: AO0yUKX+pdzqbsAgEeUk3PjNTIDDEc9ij/0vEZz8g4vFvHVhFl4wEe9G
-        0qX4c1SBZFv1TsCxMS9836mgnWHr+TB1eLcOi8+56A==
-X-Google-Smtp-Source: AK7set8K5xDrSpT9L0kqCyfqBz0MMroZlR6Mbt2q07zvqdmgztRyOjO1+YmLFjBskGBUQZJF1uyB0xVoL/svv7JZWJ8=
-X-Received: by 2002:a05:651c:1719:b0:293:4e6d:f4f7 with SMTP id
- be25-20020a05651c171900b002934e6df4f7mr2283009ljb.3.1676606467219; Thu, 16
- Feb 2023 20:01:07 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DSwBYjZrNmln+ctA3/m+T2GVcsFUCJyV9W5bCg8FwVk=;
+        b=vbNVGx89RYT3o168D4M9KiOO+XlPZF93Z6oGhekLUIUokNixaWQqS2rns2ODsNP6Bw
+         vskKjcqPdU1y2NheuaiJhkBzhYHhEax8baEtf0cAw80GXs37bPFe3Av60qlwSbZnT6dp
+         wcwmE4wsPyjbWwKyG5MNAv/2Apu+5zT4j6BxTTJQsl++oCwLDOr+HtO7winKJQwAN28z
+         8W1r70qCOZTyUx9JAbczxolqDfiSZgcrTI2FpZYGk/bIr27auus8ayL016yRxDcj4dLE
+         ul/iajhrKQo0vW79xPH+q7FYce0UTvvg8Ej66mo+HUAu4hjckcnR1IUT+HJMyMtp4usJ
+         Hvqw==
+X-Gm-Message-State: AO0yUKUuQtOZJgKw99Ug7Yfi3EG+moByFzlR7ZF7mQb+IDSvlAvplKP3
+        6tRQkyjKO6KzMN1WkH8/ni/UZQ==
+X-Google-Smtp-Source: AK7set/tAqwu8sxy4AE7vnmKG3xqNcDOKRCF7xpzyi9Ted3sLXbDrbOLyQwAqOQnLDHo62Xv/Vt9tQ==
+X-Received: by 2002:a05:651c:b29:b0:290:7d15:464a with SMTP id b41-20020a05651c0b2900b002907d15464amr134730ljr.5.1676617665835;
+        Thu, 16 Feb 2023 23:07:45 -0800 (PST)
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
+        by smtp.gmail.com with ESMTPSA id f2-20020a2e1f02000000b00294619d902dsm471489ljf.112.2023.02.16.23.07.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Feb 2023 23:07:44 -0800 (PST)
+Message-ID: <767e4d8d-b691-1849-71ac-5d6cefbb8d6a@linaro.org>
+Date:   Fri, 17 Feb 2023 09:07:43 +0200
 MIME-Version: 1.0
-References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
- <20220921030649.1436434-2-bhupesh.sharma@linaro.org> <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
-In-Reply-To: <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Fri, 17 Feb 2023 09:30:55 +0530
-Message-ID: <CAH=2Ntw6XcyB2zy-cs35z3eOf8iTa28hGerhLndOgARrG05gJw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
 Subject: Re: [PATCH v7 1/1] dma: qcom: bam_dma: Add support to initialize
  interconnect path
-To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+Content-Language: en-US
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
 Cc:     dmaengine@vger.kernel.org, agross@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, thara.gopinath@gmail.com,
         devicetree@vger.kernel.org, andersson@kernel.org,
         bhupesh.linux@gmail.com, vkoul@kernel.org,
         Rob Herring <robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
+ <20220921030649.1436434-2-bhupesh.sharma@linaro.org>
+ <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
+ <CAH=2Ntw6XcyB2zy-cs35z3eOf8iTa28hGerhLndOgARrG05gJw@mail.gmail.com>
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <CAH=2Ntw6XcyB2zy-cs35z3eOf8iTa28hGerhLndOgARrG05gJw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 16 Feb 2023 at 19:49, Vladimir Zapolskiy
-<vladimir.zapolskiy@linaro.org> wrote:
->
-> On 9/21/22 06:06, Bhupesh Sharma wrote:
-> > From: Thara Gopinath <thara.gopinath@gmail.com>
-> >
-> > BAM dma engine associated with certain hardware blocks could require
-> > relevant interconnect pieces be initialized prior to the dma engine
-> > initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
->
-> Apparently it's proven that the change description is incorrect, Qualcomm
-> crypto engine is working fine on SM8250 and even more recent platforms,
-> so far there is no obvious necessity in this change.
+On 2/17/23 06:00, Bhupesh Sharma wrote:
+> On Thu, 16 Feb 2023 at 19:49, Vladimir Zapolskiy
+> <vladimir.zapolskiy@linaro.org> wrote:
+>>
+>> On 9/21/22 06:06, Bhupesh Sharma wrote:
+>>> From: Thara Gopinath <thara.gopinath@gmail.com>
+>>>
+>>> BAM dma engine associated with certain hardware blocks could require
+>>> relevant interconnect pieces be initialized prior to the dma engine
+>>> initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
+>>
+>> Apparently it's proven that the change description is incorrect, Qualcomm
+>> crypto engine is working fine on SM8250 and even more recent platforms,
+>> so far there is no obvious necessity in this change.
+> 
+> Since your v9 patchset produces no entry in $ cat /proc/crypto on
+> either RB5 (qrb5165) or (with an additional patch) on sm8150-mtp or
+> sa8115p-adp with the default arm64 defconfig with linux-next, I am not
+> sure we can conclude QCE is working with these changes.
 
-Since your v9 patchset produces no entry in $ cat /proc/crypto on
-either RB5 (qrb5165) or (with an additional patch) on sm8150-mtp or
-sa8115p-adp with the default arm64 defconfig with linux-next, I am not
-sure we can conclude QCE is working with these changes.
+Hopefully someone else can conclude it independently.
 
-Please share more details on how you tested this.
+You may notice that v9 patchset series does not contain sm8150 specific
+changes, but sm8250 one (v9 11/14) is present, testing on RB5 is valid.
 
-Regards,
-Bhupesh
+> Please share more details on how you tested this.
 
-> > is passed on to the bam dma driver from dt via the "interconnects"
-> > property. Add support in bam_dma driver to check whether the interconnect
-> > path is accessible/enabled prior to attempting driver intializations.
-> >
-> > If interconnects are not yet setup, defer the BAM DMA driver probe().
-> >
-> > Cc: Bjorn Andersson <andersson@kernel.org>
-> > Cc: Rob Herring <robh@kernel.org>
-> > Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
-> > ---
-> >   drivers/dma/qcom/bam_dma.c | 10 ++++++++++
-> >   1 file changed, 10 insertions(+)
-> >
-> > diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> > index 2ff787df513e..a5b0cf28ffb7 100644
-> > --- a/drivers/dma/qcom/bam_dma.c
-> > +++ b/drivers/dma/qcom/bam_dma.c
-> > @@ -26,6 +26,7 @@
-> >   #include <linux/kernel.h>
-> >   #include <linux/io.h>
-> >   #include <linux/init.h>
-> > +#include <linux/interconnect.h>
-> >   #include <linux/slab.h>
-> >   #include <linux/module.h>
-> >   #include <linux/interrupt.h>
-> > @@ -394,6 +395,7 @@ struct bam_device {
-> >       const struct reg_offset_data *layout;
-> >
-> >       struct clk *bamclk;
-> > +     struct icc_path *mem_path;
-> >       int irq;
-> >
-> >       /* dma start transaction tasklet */
-> > @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
-> >       if (IS_ERR(bdev->bamclk))
-> >               return PTR_ERR(bdev->bamclk);
-> >
-> > +     /* Ensure that interconnects are initialized */
-> > +     bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
-> > +     if (IS_ERR(bdev->mem_path)) {
-> > +             ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
-> > +                                 "failed to acquire icc path\n");
-> > +             return ret;
-> > +     }
-> > +
-> >       ret = clk_prepare_enable(bdev->bamclk);
-> >       if (ret) {
-> >               dev_err(bdev->dev, "failed to prepare/enable clock\n");
->
-> I'm resurrecting the comments on this change to emphasize the observation
-> that the change is not needed at all to run QCE.
->
-> --
-> Best wishes,
-> Vladimir
+I do compile linux-next with v9 QCE series applied on top of it and run the
+kernel on RB5 board, there is nothing really complicated about it.
+
+If you missed it, the 'cryptobench benchmark' test etc. have been already
+described, please find it here:
+
+   https://lore.kernel.org/linux-crypto/731af3cf-6f18-caf9-ef65-ec73b0744ad9@linaro.org/
+
+--
+Best wishes,
+Vladimir
+
+>>> is passed on to the bam dma driver from dt via the "interconnects"
+>>> property. Add support in bam_dma driver to check whether the interconnect
+>>> path is accessible/enabled prior to attempting driver intializations.
+>>>
+>>> If interconnects are not yet setup, defer the BAM DMA driver probe().
+>>>
+>>> Cc: Bjorn Andersson <andersson@kernel.org>
+>>> Cc: Rob Herring <robh@kernel.org>
+>>> Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
+>>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>>> [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
+>>> ---
+>>>    drivers/dma/qcom/bam_dma.c | 10 ++++++++++
+>>>    1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+>>> index 2ff787df513e..a5b0cf28ffb7 100644
+>>> --- a/drivers/dma/qcom/bam_dma.c
+>>> +++ b/drivers/dma/qcom/bam_dma.c
+>>> @@ -26,6 +26,7 @@
+>>>    #include <linux/kernel.h>
+>>>    #include <linux/io.h>
+>>>    #include <linux/init.h>
+>>> +#include <linux/interconnect.h>
+>>>    #include <linux/slab.h>
+>>>    #include <linux/module.h>
+>>>    #include <linux/interrupt.h>
+>>> @@ -394,6 +395,7 @@ struct bam_device {
+>>>        const struct reg_offset_data *layout;
+>>>
+>>>        struct clk *bamclk;
+>>> +     struct icc_path *mem_path;
+>>>        int irq;
+>>>
+>>>        /* dma start transaction tasklet */
+>>> @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
+>>>        if (IS_ERR(bdev->bamclk))
+>>>                return PTR_ERR(bdev->bamclk);
+>>>
+>>> +     /* Ensure that interconnects are initialized */
+>>> +     bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
+>>> +     if (IS_ERR(bdev->mem_path)) {
+>>> +             ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
+>>> +                                 "failed to acquire icc path\n");
+>>> +             return ret;
+>>> +     }
+>>> +
+>>>        ret = clk_prepare_enable(bdev->bamclk);
+>>>        if (ret) {
+>>>                dev_err(bdev->dev, "failed to prepare/enable clock\n");
+>>
+>> I'm resurrecting the comments on this change to emphasize the observation
+>> that the change is not needed at all to run QCE.
+>>
+>> --
+>> Best wishes,
+>> Vladimir
