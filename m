@@ -2,182 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7566DC05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 16:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D556C636D6
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 16:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231192AbjBQQP6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Feb 2023 11:15:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45600 "EHLO
+        id S230302AbjBQQS0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Feb 2023 11:18:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231199AbjBQQPp (ORCPT
+        with ESMTP id S229608AbjBQQSZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2023 11:15:45 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C453672914;
-        Fri, 17 Feb 2023 08:15:10 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31HFwnpZ030453;
-        Fri, 17 Feb 2023 16:14:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type :
- content-transfer-encoding : in-reply-to : mime-version; s=corp-2022-7-12;
- bh=9Pc9VU7tubsYzvYV/0WYCkop5zQXxvC9K/YCudNeidg=;
- b=iHC78h8p38jJCtRIB5fqpCEkrS3APLmCg479hR+xYJ7RemnwcwxQJlSkF3QJN6gVH+h2
- +6CJE63vghg5zsIGkQ93NwXhPCqJKBlqjBK/TPNqq8pO/hd8khuwrOD8ipi8eYh86zVM
- so1SsLPghYunF/M1Rso1r4ZTz80X4Z5xzZy5e93S9uh37fozSnk7bLb962pyxZwXqBan
- JqNIikrmJFZOqZjKDe3K2Dsppd11CYDI/NfRxxnPsboqIrr1fzVqzW2639S9XvJf2liR
- f7yTeu4QQ/PUgpH7YumUY6VnzS9NhO2C2QrHS4t5Fo5PRx5SBzHF2xE1aTEn9HWahFOf 0g== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3np2mtp9vj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 16:14:56 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 31HFD8wZ035971;
-        Fri, 17 Feb 2023 16:14:55 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2176.outbound.protection.outlook.com [104.47.55.176])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3np1fab2e7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 16:14:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JOSTLl/RirtnH3zzVe3Mo9w/4e2nvLQ8Zk+eaNzeQUFTpSbk+wJZHChoOV4ssKHpPJ06g5OuJe2dB3aRQE5mB1sv/xLeV0ub2Ugeu8TNOZenAD7Dr6evQlmmog8R+dM7FgkYplYbEhvmziQ6Gdu3pjLL3UNYUe95jxMI107owMiFQOt5v5wGtPWxdwpHI8wZm1GiW4jou3NHbx/hbzLQaGRl+0A5wOB1JXPxf4R0XWFUVXRrWsGPzMdMIeQMjNo6J2HN8FXdRXncLc2+w1iSetllwZLc6WfFRV8heob9hxac4QMvrVWHN4yV0Ugxz068WGI4X0/5FCt/q73lZHsjaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5heF+cBJAAND6fRw4nyNeYp6X3msMuS8U5MTPugVUSo=;
- b=b5skDfEtfbBS9vpKjH1cvlQkrpVnRZT5yvRpcS88OpeZ5Ef5GX0piLRODTzzidSNnXM3uRc/Y7iF5aUbiFMPE9ggdWSwzpuI7gTtK6NEwtBLnrpGHgY9h22//FDX+xwej6oZNIXlqa9l70rQEZ6CSOF4HZLZe9IXj08RpdJrGCfEbUpSx4/xYfVKcg3kDzw6vrdI1ZrBSIuSLGeFbe7V1uUrwbbqFA02j7oHwaivYNlTNkPEckrz6HsSmjc6imbEtcdHRt8Snvh4ot/SU9jkYaxztvpHXbZ6ZjqoFvD2CSJ8TWvRY6yHuiINOJSIfbE3f6OhZniUX3OehtwBDlHAbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5heF+cBJAAND6fRw4nyNeYp6X3msMuS8U5MTPugVUSo=;
- b=X9VrSj0awiP7ytxD3Py3Up6S9UxnXFkWNIQz801R6JtSqR0q/V2pp2kR90bXzolhEwSii/mFerKFe4wvfB1eWF9XElDi9McKbAK8mrQRyXupTezzWnhK09p6ODg2CkD2uUlzzbi5R+m4rrXnJqKVVnrBKVPiWdmowqV3hL70ZmI=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SA1PR10MB6471.namprd10.prod.outlook.com (2603:10b6:806:2b0::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.12; Fri, 17 Feb
- 2023 16:14:54 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::3e0d:2900:bdbf:949f]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::3e0d:2900:bdbf:949f%3]) with mapi id 15.20.6134.012; Fri, 17 Feb 2023
- 16:14:54 +0000
-Date:   Fri, 17 Feb 2023 11:14:50 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: Make kobj_type structure constant
-Message-ID: <20230217161450.blix7iek7duexlic@parnassus.localdomain>
-References: <20230217-kobj_type-padata-v1-1-e70b6cab4875@weissschuh.net>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230217-kobj_type-padata-v1-1-e70b6cab4875@weissschuh.net>
-X-ClientProxiedBy: MN2PR17CA0021.namprd17.prod.outlook.com
- (2603:10b6:208:15e::34) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+        Fri, 17 Feb 2023 11:18:25 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050AF61AE;
+        Fri, 17 Feb 2023 08:18:23 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31HGEjCU012429;
+        Fri, 17 Feb 2023 16:18:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=m2U4weSxO7RFJn5ZUHEAC1icwJ4/jhFRYYc83ds40FU=;
+ b=l+DtRb/TLRLr/qUGFD/4BVDUI65Cw0If85/7r9j//lw1TTFhHEV1IBVU6vlGthC+JFST
+ VbRFeVQa0VqVbSMQDUK2EtLDFT/g/Kb+F8sm5uHA41s/asZF50lHCt6EIxAyMrp1TOE+
+ H9l09l+D3+zWxPcVPff6DwPfa4AIgu2hwFWila+RYumB17aFbaqHdvwHC3UDy5UNPQCi
+ UtjLWXA4DxZiPJx/cVIMSkdi/LRG6S+ttBIdnTax8cvxbtq95eZsxgedv4QqAeTuIamE
+ +ht0rX3F3Hxmepr6SAM+1UDz3bPzA/zx7XcnP98HNNYwM5PHfwwPJI4A2SiCcSwwc9uM jA== 
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ntcx3r2jj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Feb 2023 16:18:14 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31HFoV8u016713;
+        Fri, 17 Feb 2023 16:18:14 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
+        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3np2n7rk18-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Feb 2023 16:18:14 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31HGID8v10945038
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Feb 2023 16:18:13 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11D0F58059;
+        Fri, 17 Feb 2023 16:18:13 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5EDC95805D;
+        Fri, 17 Feb 2023 16:18:12 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Feb 2023 16:18:12 +0000 (GMT)
+From:   Danny Tsen <dtsen@linux.ibm.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
+        dtsen@us.ibm.com, Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH v3 1/6] Update Kconfig and Makefile.
+Date:   Fri, 17 Feb 2023 11:18:00 -0500
+Message-Id: <20230217161805.236319-2-dtsen@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230217161805.236319-1-dtsen@linux.ibm.com>
+References: <20230217161805.236319-1-dtsen@linux.ibm.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB5711:EE_|SA1PR10MB6471:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad874ef4-fedb-4f2a-5a03-08db11021aa8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: werQxZYn2t/kzZuHoi3HUZBgyedVVonlZqMffoiXNC2eTFtBvXA1Wv/yrvp+Rws6UnftH3qQqrd/4hLJgec6w1I+EhzCARxQ4MPnHGGzsPyS4pZ9eZyTp1of9LBUI7ya8uze0jjLaB8HHc5F6Q92XyXQiXufnhYYYYYq0T4EhLz1aJyjj+Imc8GUs/cTZ+4cFe2yuQjm1NvXkui55aXZ2RTZqrWBCecg2H/LMulVkU31RXLiZYIfnaxuAKpAq4csVTVQ21TC+A2PaLnK4e11JEPjrMQ9Oq3GUsQwO8xh6i8t3YV7oOfbHO35lbv5LapAV5XrtHq4pQEUmIQALovV9BGYe9DT94daeAV7LK3dxm72NmN0hHlx0u4vhDLIGWHK6jYNo5u1AJ9qerxEU114MuujIBYocURqtK505jUGU06aF4tMy/OXPDrsFssTbsNWo16EYkLfOSC+vbNTBgDx+VUmzjZZIcWHq6CthSMB5IUM1n0OBSRDGjqHp6dEK8H2dV2o/Ur0ec2ifw/X0ctTig2HqYmwf73Vwi3eewCLNyclygrW8lj98ocUK3dEtJYf2b1nAtnBuukL8VRarT+SuHI1rFEfe/+RgwyRgKpKhxA1D3LTP/e66sDCKbNa4Z4JBkkLPp1vg3u/LFHeP9uYbg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(376002)(366004)(136003)(346002)(396003)(451199018)(8676002)(66556008)(66946007)(66476007)(86362001)(38100700002)(2906002)(66574015)(6486002)(478600001)(6512007)(6506007)(1076003)(5660300002)(316002)(6666004)(9686003)(83380400001)(26005)(6916009)(41300700001)(186003)(8936002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?rvJh+16N4vW94NxUh4uIr4jMJdn71FS4nU4BoL4JGkdrmmYVuyfi0jVpWu?=
- =?iso-8859-1?Q?QQjZp+ApcjC+bAJ7NMe3pPQKUm3h0f5fz/O565Nx+DPdHpC7SFGaJu+SW0?=
- =?iso-8859-1?Q?pdD8GhToB/+39+A9WEi0P5Q2SZzFO0RqJoNt+jdMZJjgjtIWoyA1+n50nj?=
- =?iso-8859-1?Q?nBwM5JZWt1d2wiWaCFbMRWeZfY/FdeZ4Whi2fFRYzuyj8zhbxJYEBS7FzQ?=
- =?iso-8859-1?Q?t/+TuKbzqrS8R+oEAxJTKlOufSpJcP/HTHPD+gFYrV7dMh0R3DjJcdKptD?=
- =?iso-8859-1?Q?YWW3/EQ1xtnl+FTxbSfIG4gsVR7BevL/xCU+dzj3Trt50bYT+tZ1AmJ7wm?=
- =?iso-8859-1?Q?Z5vq+UtDQb7LJ4SekRSmttoUzskex9Dy3FRnXXjmIG6LHOmBD++2batZxH?=
- =?iso-8859-1?Q?0UxKEUjHoaWo5NXwNTsesugyk5AgJNSi/gqCT/OhmdijNppAIJGvk+9b7E?=
- =?iso-8859-1?Q?i5KDGvjz9aac+RDLNl29Vr0uiaOBERVGrBTsJ/9Xp6y8VV6VBZv9lfEPle?=
- =?iso-8859-1?Q?cyIO4obCp4MYwheKq/kclafJ/vJED2QNGw4FEp4S5gEVw4RAk7hy6Srbel?=
- =?iso-8859-1?Q?52o46vx/4kwK+DRm9C+4lKIOoYCzQcrvRpsI3vTl5PLNljbsUFJ9mUbBOe?=
- =?iso-8859-1?Q?nhfk6b4aMH//8QWRk+xzmTF+pVGKxQlXKFEgQkUw208f+xHkK+UM534OJv?=
- =?iso-8859-1?Q?a7PMQGWP71DuezVMAUuuYRRk7ggQgWeKAT0eP4STuH31B7fNrogofMtpLd?=
- =?iso-8859-1?Q?81DAoi3UzySuMVlhpl9gB4bvHAfw3oEiJmWDpEqPdWUru7Sl+3r2Yx65wi?=
- =?iso-8859-1?Q?GMZfzOJ7gdrPV9Tvkto7HbyMS+Cg5nZAZqKCc6aUvjvfnIG07BD+PnnVa2?=
- =?iso-8859-1?Q?vqqNmzts3bhplrO6YqJs/wnDzzs1I6kz0v9kKlC4rlOKzqEoiOo2DUFNIQ?=
- =?iso-8859-1?Q?QvyOw5XeGCi15Gu3wdfQbioV/AREDg89Lg2YOHRSHQgM8BY2iFr2chxgp5?=
- =?iso-8859-1?Q?aWMA//yAXc1sAgadRHD7/f2ucqxbGkAcsFgsaI5DCvtQnAOjyiTRsLLCvJ?=
- =?iso-8859-1?Q?udwBxs6Q5YRkJ8FuJPZef9zvy8y6+8SpnuUxf+CUS+l8qjuo1mgPN2kbjT?=
- =?iso-8859-1?Q?Q88MXUCg8qSAMaazEapW7VE5pzSZLPeZEgRrBQMeAotpOg8jTYApi5mGyx?=
- =?iso-8859-1?Q?mb1HEQY8mTWwn6hPv6z5XTma3LiZq5b+M65lYHUdTaRuOEie5qZ3Y+oSlY?=
- =?iso-8859-1?Q?8XQQ6kWf6OkP5cdc9GOMKioDYg/DjVhY5jJ6f0MFXDnqYnEZVKgQzuNBRj?=
- =?iso-8859-1?Q?fzDuq/r5qMRmoXROhZ5az+Dj9Iq2WenvUM4mK+Tc+P+zRDJNyg7NQb1jQb?=
- =?iso-8859-1?Q?1wUe4hpVT8uX2XVTqYLZD+kF9jdWffHvz2Sf50Rqb3lmrY2+nMF/zTz9xt?=
- =?iso-8859-1?Q?/X9Q4BBZBcYrNQ5Gxma/M2HTVGYg4XeU/yYND7BTu3a5vkBVarggFxub+I?=
- =?iso-8859-1?Q?vAUChbszgLuwmQVuMVGXugI8NtqwwTJojUdhqQ3KSQPzBgTvoMVKKX8rQq?=
- =?iso-8859-1?Q?E/WnhRreoObmWeixOOhgoAmtMR2LPvfurMcvPYz+uulECw9NaGMA5xfIsh?=
- =?iso-8859-1?Q?I5JfNaj172WCf1rBNYecngX/AdgWogc0602B3iHXtitUBDW9kHhu72pw?=
- =?iso-8859-1?Q?=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: dy6LlPmwLe+ncs6l5MtDRolW6/UutydZ3jWCAsFU09rhiXhjjh5ICgP9/OT1ib1lD+8ct8LI0VSe1gEZF9LdAJBT/0R12j2sm+T9gxXJMMEk5Kw5GMk1jvz1Ou1JV6xJ88tnbVCVltFb/ijrC6IDIT3hx9Ezm7COVmMfwY4xDivwnv7WTe3QJa2uKclqPHITFrnQkwlvep7gjqxGzKzR7CcKrqR0G+ENv2Xofobhpb+e2k0v/eJMMEXFhm0QVGq5IR89G4+M8V6XCtjpTsx8NRSpQfFR8Np2v3bCFpBeS9wwDjN+Sl6wouR7wWDgJi5b4a8VrYG+jsIGUOAkSb1yzEyzAouQkzhW2sekBunjYpfOh21egE7XfGlMTxD3zSSr4wlaeW4xPbFCwrA3xCeL76hkafaFDnaIcD1j9xlaTY1r20hHVZLcuHTOkKdWy/i4IXR0INaG5zOExDzkuQpbDWD3Mkbu+mGJZJl97YPtMp0wchp8XPy/wxVQHNDp2pX6r+L40A5Y3RD52PTa0fM3UNT++rkjk3V4Ij64u6MZ0X1qfmfbWNQGSvtDfP/H+ESl1Wsn4KwPIpdpZ7DWljYn01yEGh0L0fR0K0x1FEfBrwBeUCzx8A9zJQ3YFUU8V06tsiwFZaqhWZt6MhR4F6kuGU1njS9hlyh0a5Vu75hi+SBw/0kPXYU7qoMg72haj6NISQSUuEAYKvNwyBKh1igAkO3IGweRJ7uF+iCB6dbR4pBRmPSg5xqfUF1lLpqJ7rlJWNr1B4uV5ZBEqCL624i7OMPFfLsi/aYFgDqaO2I/UtMSRIJwSpZ6c2jfNlK4h0ZP+ICLwWev4+3UdSQvBEAPaQ==
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad874ef4-fedb-4f2a-5a03-08db11021aa8
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2023 16:14:53.9935
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: X1R8MwLdi1tGFPaIy5Il7VCjypfUYVkVOVVZU4ObEwxNYna9vEThLQwMd35PdgnPZTU+N2rKCbB8JGBI9jyoXBjK9iSLy+UMAGYiRPELu80=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6471
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: UjO90dFypaFQ7qCX3YIYGVorAbZt-gLF
+X-Proofpoint-ORIG-GUID: UjO90dFypaFQ7qCX3YIYGVorAbZt-gLF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
  definitions=2023-02-17_10,2023-02-17_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 adultscore=0
- mlxlogscore=999 phishscore=0 spamscore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302170144
-X-Proofpoint-GUID: wGipZ43OcmKd7QiNSycIE5v5qo-ucxXl
-X-Proofpoint-ORIG-GUID: wGipZ43OcmKd7QiNSycIE5v5qo-ucxXl
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 impostorscore=0 phishscore=0 spamscore=0
+ lowpriorityscore=0 mlxscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2302170143
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 03:17:49AM +0000, Thomas Weiﬂschuh wrote:
-> Since commit ee6d3dd4ed48 ("driver core: make kobj_type constant.")
-> the driver core allows the usage of const struct kobj_type.
-> 
-> Take advantage of this to constify the structure definition to prevent
-> modification at runtime.
-> 
-> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+Defined CRYPTO_P10_AES_GCM in Kconfig to support AES/GCM
+stitched implementation for Power10+ CPU.
 
-I see the symbol in .rodata now.  Thanks.
+Added a new module driver p10-aes-gcm-crypto.
 
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+---
+ arch/powerpc/crypto/Kconfig  | 11 +++++++++++
+ arch/powerpc/crypto/Makefile | 13 +++++++++++++
+ 2 files changed, 24 insertions(+)
 
-> ---
->  kernel/padata.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index e007b8a4b738..106d08ee9ce2 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -967,7 +967,7 @@ static const struct sysfs_ops padata_sysfs_ops = {
->  	.store = padata_sysfs_store,
->  };
->  
-> -static struct kobj_type padata_attr_type = {
-> +static const struct kobj_type padata_attr_type = {
->  	.sysfs_ops = &padata_sysfs_ops,
->  	.default_groups = padata_default_groups,
->  	.release = padata_sysfs_release,
-> 
-> ---
-> base-commit: 3ac88fa4605ec98e545fb3ad0154f575fda2de5f
-> change-id: 20230217-kobj_type-padata-288edceca728
-> 
-> Best regards,
-> -- 
-> Thomas Weiﬂschuh <linux@weissschuh.net>
-> 
+diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+index c1b964447401..3a403b7aad82 100644
+--- a/arch/powerpc/crypto/Kconfig
++++ b/arch/powerpc/crypto/Kconfig
+@@ -94,4 +94,15 @@ config CRYPTO_AES_PPC_SPE
+ 	  architecture specific assembler implementations that work on 1KB
+ 	  tables or 256 bytes S-boxes.
+ 
++config CRYPTO_P10_AES_GCM
++	tristate "Stitched AES/GCM acceleration support on P10+ CPU (PPC)"
++	depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
++	select CRYPTO_LIB_AES
++	select CRYPTO_ALGAPI
++	select CRYPTO_AEAD
++	default m
++	help
++	  Support for cryptographic acceleration instructions on Power10+ CPU.
++	    This module supports stitched acceleration for AES/GCM in hardware.
++
+ endmenu
+diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
+index 4808d97fede5..36373a028f0e 100644
+--- a/arch/powerpc/crypto/Makefile
++++ b/arch/powerpc/crypto/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
+ obj-$(CONFIG_CRYPTO_CRC32C_VPMSUM) += crc32c-vpmsum.o
+ obj-$(CONFIG_CRYPTO_CRCT10DIF_VPMSUM) += crct10dif-vpmsum.o
+ obj-$(CONFIG_CRYPTO_VPMSUM_TESTER) += crc-vpmsum_test.o
++obj-$(CONFIG_CRYPTO_P10_AES_GCM) += p10-aes-gcm-crypto.o
+ 
+ aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes-spe-glue.o
+ md5-ppc-y := md5-asm.o md5-glue.o
+@@ -21,3 +22,15 @@ sha1-ppc-spe-y := sha1-spe-asm.o sha1-spe-glue.o
+ sha256-ppc-spe-y := sha256-spe-asm.o sha256-spe-glue.o
+ crc32c-vpmsum-y := crc32c-vpmsum_asm.o crc32c-vpmsum_glue.o
+ crct10dif-vpmsum-y := crct10dif-vpmsum_asm.o crct10dif-vpmsum_glue.o
++p10-aes-gcm-crypto-y := p10-aes-gcm-glue.o p10_aes_gcm.o ghashp8-ppc.o aesp8-ppc.o
++
++quiet_cmd_perl = PERL    $@
++      cmd_perl = $(PERL) $< $(if $(CONFIG_CPU_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
++
++targets += aesp8-ppc.S ghashp8-ppc.S
++
++$(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
++	$(call if_changed,perl)
++
++OBJECT_FILES_NON_STANDARD_aesp8-ppc.o := y
++OBJECT_FILES_NON_STANDARD_ghashp8-ppc.o := y
+-- 
+2.31.1
+
