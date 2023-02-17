@@ -2,82 +2,149 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F021C636CC
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 03:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B221C6379F
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 04:01:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbjBQDR5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 22:17:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41152 "EHLO
+        id S229799AbjBQEBN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 23:01:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbjBQDR4 (ORCPT
+        with ESMTP id S229614AbjBQEBM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 22:17:56 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA77974B;
-        Thu, 16 Feb 2023 19:17:53 -0800 (PST)
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
-        s=mail; t=1676603871;
-        bh=ztr+IdxQRuyl8zlbtckleV8yYV26Hon5GkrvjeCXFEU=;
-        h=From:Date:Subject:To:Cc:From;
-        b=afOOM1iVH7yC0qYEmdHyCXYUxJOZ/wI+wgcqpyIqPgrzmzdDG+7z3/4Gk9xtcr3+F
-         XAIEMo5LLctMy1WLrofmrzfjXWws9p22wof8whxfSrWbUnSE1QjzxeDmoCqEUk8XJB
-         PDdXmHWGWu0z5dUFFDJ+Ds7LYvX+tswrchBg4SMI=
-Date:   Fri, 17 Feb 2023 03:17:49 +0000
-Subject: [PATCH] padata: Make kobj_type structure constant
+        Thu, 16 Feb 2023 23:01:12 -0500
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326C14E5E8
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 20:01:09 -0800 (PST)
+Received: by mail-lj1-x232.google.com with SMTP id h17so4107771ljq.4
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Feb 2023 20:01:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ymeKyoEPaB2TlyXtYfKO3gw6CH1MjfygMlQz73O8po=;
+        b=yCZKr8/p4yd+8jG2V8QlBXF9KW3dR7ZBJGXIWJ9S0PxxkGxs9p/hPwsoZBM80VHShR
+         4LdrM/kudaLex8OpMLiIzw1ptqK2nTs2YGhlxQ5Glrfy7FmQ05XSKl97t8Gq/iXvM6AJ
+         yDNiUDfIU66SA9X+POtTNQAOZcjVd8Ny9SomMb4vei22woi5WigkWY1cT+bEpD8fMhKg
+         PGPeDPmBCbeT1P2TLuFTcAbz0u0uh9K7qWHe4LJ7l6BLT6UdVitFsnYNK4bmfQsQXtP7
+         UHq+R9bx3po5ispQXnqo5ajbhz3Ay3UCnECMGO4K34Z6ZTdwKephGKsShTPCRA7I5cI5
+         ZhHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4ymeKyoEPaB2TlyXtYfKO3gw6CH1MjfygMlQz73O8po=;
+        b=gK1PisXLxgQ2QCOQJpv0g4KJUfdJp8l+Cd14wyeLOsv78XWlenUKKVQ5UlvYmYEaWP
+         pKdlYRopKUaGsnJxOpcjDDpfbnx36FR0g6aKFqamtjOWMZ8FQO+mm9/PHoOD1w+8gkuo
+         9LKRhbTj1D7RZdHMhvZZU8N/6uFbTKdpLwlZiWz3cytGUb8+cMf3LzRGdalghP18qExv
+         Q/zXK1a3v9vka4S5LVp5eahBlVtzlchZ00qq4PZmCLs9OCOy/1X/e3nAy9F+4o8wv+yX
+         dmZAKnthmRI4P6trrUve5IYfTAlEBmIsybSr7Gn0oixnsV7a+i9Vz3WVegrgecFrauAk
+         0EzQ==
+X-Gm-Message-State: AO0yUKX+pdzqbsAgEeUk3PjNTIDDEc9ij/0vEZz8g4vFvHVhFl4wEe9G
+        0qX4c1SBZFv1TsCxMS9836mgnWHr+TB1eLcOi8+56A==
+X-Google-Smtp-Source: AK7set8K5xDrSpT9L0kqCyfqBz0MMroZlR6Mbt2q07zvqdmgztRyOjO1+YmLFjBskGBUQZJF1uyB0xVoL/svv7JZWJ8=
+X-Received: by 2002:a05:651c:1719:b0:293:4e6d:f4f7 with SMTP id
+ be25-20020a05651c171900b002934e6df4f7mr2283009ljb.3.1676606467219; Thu, 16
+ Feb 2023 20:01:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230217-kobj_type-padata-v1-1-e70b6cab4875@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIANzx7mMC/x2N0QqDMAwAf0XybECzB4u/MoakbabZpJbWjQ3x3
- xf2eAfHHVClqFQYmwOKvLXqlgz6toGwcJoFNRoDdXTpqB/wufnHtH+zYObIOyM5JzFI4IEcWOa
- 5CvrCKSwWpte6msxF7vr5f6638/wBMCwCNXcAAAA=
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1676603869; l=1008;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=ztr+IdxQRuyl8zlbtckleV8yYV26Hon5GkrvjeCXFEU=;
- b=XJNUk7Qrt62DXTVLIUYJKJzbykvAPZXCRfLiYSOkMlPlRs3CloLD4TRX2qiNyKKyN1fqwCYFX
- smwVNT1vvP9CX2qV7igv+fUPCmWOAwzOA74C5E8O1iU9MepET3AC2cY
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+References: <20220921030649.1436434-1-bhupesh.sharma@linaro.org>
+ <20220921030649.1436434-2-bhupesh.sharma@linaro.org> <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
+In-Reply-To: <a5b6255c-7282-32ed-8031-a4b841a78db7@linaro.org>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Date:   Fri, 17 Feb 2023 09:30:55 +0530
+Message-ID: <CAH=2Ntw6XcyB2zy-cs35z3eOf8iTa28hGerhLndOgARrG05gJw@mail.gmail.com>
+Subject: Re: [PATCH v7 1/1] dma: qcom: bam_dma: Add support to initialize
+ interconnect path
+To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+Cc:     dmaengine@vger.kernel.org, agross@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, thara.gopinath@gmail.com,
+        devicetree@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, vkoul@kernel.org,
+        Rob Herring <robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since commit ee6d3dd4ed48 ("driver core: make kobj_type constant.")
-the driver core allows the usage of const struct kobj_type.
+On Thu, 16 Feb 2023 at 19:49, Vladimir Zapolskiy
+<vladimir.zapolskiy@linaro.org> wrote:
+>
+> On 9/21/22 06:06, Bhupesh Sharma wrote:
+> > From: Thara Gopinath <thara.gopinath@gmail.com>
+> >
+> > BAM dma engine associated with certain hardware blocks could require
+> > relevant interconnect pieces be initialized prior to the dma engine
+> > initialization. For e.g. crypto bam dma engine on sm8250. Such requirement
+>
+> Apparently it's proven that the change description is incorrect, Qualcomm
+> crypto engine is working fine on SM8250 and even more recent platforms,
+> so far there is no obvious necessity in this change.
 
-Take advantage of this to constify the structure definition to prevent
-modification at runtime.
+Since your v9 patchset produces no entry in $ cat /proc/crypto on
+either RB5 (qrb5165) or (with an additional patch) on sm8150-mtp or
+sa8115p-adp with the default arm64 defconfig with linux-next, I am not
+sure we can conclude QCE is working with these changes.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please share more details on how you tested this.
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index e007b8a4b738..106d08ee9ce2 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -967,7 +967,7 @@ static const struct sysfs_ops padata_sysfs_ops = {
- 	.store = padata_sysfs_store,
- };
- 
--static struct kobj_type padata_attr_type = {
-+static const struct kobj_type padata_attr_type = {
- 	.sysfs_ops = &padata_sysfs_ops,
- 	.default_groups = padata_default_groups,
- 	.release = padata_sysfs_release,
+Regards,
+Bhupesh
 
----
-base-commit: 3ac88fa4605ec98e545fb3ad0154f575fda2de5f
-change-id: 20230217-kobj_type-padata-288edceca728
-
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+> > is passed on to the bam dma driver from dt via the "interconnects"
+> > property. Add support in bam_dma driver to check whether the interconnect
+> > path is accessible/enabled prior to attempting driver intializations.
+> >
+> > If interconnects are not yet setup, defer the BAM DMA driver probe().
+> >
+> > Cc: Bjorn Andersson <andersson@kernel.org>
+> > Cc: Rob Herring <robh@kernel.org>
+> > Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
+> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> > [Bhupesh: Make header file inclusion alphabetical and use 'devm_of_icc_get()']
+> > ---
+> >   drivers/dma/qcom/bam_dma.c | 10 ++++++++++
+> >   1 file changed, 10 insertions(+)
+> >
+> > diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+> > index 2ff787df513e..a5b0cf28ffb7 100644
+> > --- a/drivers/dma/qcom/bam_dma.c
+> > +++ b/drivers/dma/qcom/bam_dma.c
+> > @@ -26,6 +26,7 @@
+> >   #include <linux/kernel.h>
+> >   #include <linux/io.h>
+> >   #include <linux/init.h>
+> > +#include <linux/interconnect.h>
+> >   #include <linux/slab.h>
+> >   #include <linux/module.h>
+> >   #include <linux/interrupt.h>
+> > @@ -394,6 +395,7 @@ struct bam_device {
+> >       const struct reg_offset_data *layout;
+> >
+> >       struct clk *bamclk;
+> > +     struct icc_path *mem_path;
+> >       int irq;
+> >
+> >       /* dma start transaction tasklet */
+> > @@ -1294,6 +1296,14 @@ static int bam_dma_probe(struct platform_device *pdev)
+> >       if (IS_ERR(bdev->bamclk))
+> >               return PTR_ERR(bdev->bamclk);
+> >
+> > +     /* Ensure that interconnects are initialized */
+> > +     bdev->mem_path = devm_of_icc_get(bdev->dev, "memory");
+> > +     if (IS_ERR(bdev->mem_path)) {
+> > +             ret = dev_err_probe(bdev->dev, PTR_ERR(bdev->mem_path),
+> > +                                 "failed to acquire icc path\n");
+> > +             return ret;
+> > +     }
+> > +
+> >       ret = clk_prepare_enable(bdev->bamclk);
+> >       if (ret) {
+> >               dev_err(bdev->dev, "failed to prepare/enable clock\n");
+>
+> I'm resurrecting the comments on this change to emphasize the observation
+> that the change is not needed at all to run QCE.
+>
+> --
+> Best wishes,
+> Vladimir
