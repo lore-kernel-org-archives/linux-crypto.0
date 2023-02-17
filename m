@@ -2,152 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A24C636CC
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 01:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D004C636D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 03:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjBQBjO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Feb 2023 20:39:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51634 "EHLO
+        id S230093AbjBQDES (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Feb 2023 22:04:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjBQBjN (ORCPT
+        with ESMTP id S229489AbjBQDER (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Feb 2023 20:39:13 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251165356C;
-        Thu, 16 Feb 2023 17:39:12 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id bh15so3584685oib.4;
-        Thu, 16 Feb 2023 17:39:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VXQ5NrgvHcnTZDrYMA7luKxwlYKnjw3ntxCLdrLg57U=;
-        b=gYvzaviFtqImQ3zUrVvJmoLWnxgJkoUH+uQVlf3ZPNK+gFO9Qcg//Tb5sdXRlRP/fL
-         tk1XGt/RFgKLRqV4DW5him6L2tAzFpn7HmQF6EXRwER1S1w+fBKTaMHXYzskpk/Jb2gP
-         Qp79v0eejOd0i+jXCHWxaGVZUvTs4BePZ9v13MrLZKugqdsuHsEbNKte6ygjoBcnAgEt
-         8DkibJueUqgu4kJUvn3atA7afhXE4uLvK7bIO7fBHuuCxb7/UjbuL65eGdIP/nz5Wpx+
-         mk0xPywsi3xRi5GgUdIAVbFwB+9TkiJgXCpjwybA1KTXop6mTziZ8OHyps8NdsR/m0qR
-         GZUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VXQ5NrgvHcnTZDrYMA7luKxwlYKnjw3ntxCLdrLg57U=;
-        b=Vo5sANe2nKL5RUvKYL7338f/g5bHrFN889pzQU6vopWCIS9D6siwGZvxv8/LZbNaG2
-         bNE0yCgatBCL6XvGecl4YKtS4RRylIUETEtuP+T1R+xSWgZ0kOIiAKLEK2JwvxXy/XXZ
-         CanHg2lXQUdlqV8ojuctR6fYEXY/vzlS8JhKG4t+ZtxYslxtYBzwV8usE+9nv3G6yJYg
-         eG0Mk4t4G8zGQ2QbFbtHMbuSyHi03nvZ4QC68ZB0fV7MBTFWNXxowzKPoTLCkvzamn5s
-         4jL4oaY1dDzP4EQ/Ye7Qs/xZZV5tImQMIwa19Xr2ZMkKVvZGeo/1M/NS4TDneOwIkvlj
-         3/qw==
-X-Gm-Message-State: AO0yUKU0XAzISQc6whFgYNfQ6ttngYQWsAioXNclM9gZPAK7yMC5wqoX
-        E1WYWorecXmwrnaYbFj3JGIO7G5zxxY=
-X-Google-Smtp-Source: AK7set8drcacu6OsYNi6+44bXIOT2XIdpYwoXbf6odYP67GCPakNkgeQBA5IfD5qhYUu3W78NJdfPw==
-X-Received: by 2002:aca:f11:0:b0:37f:b2dd:73a with SMTP id 17-20020aca0f11000000b0037fb2dd073amr102656oip.24.1676597950923;
-        Thu, 16 Feb 2023 17:39:10 -0800 (PST)
-Received: from localhost ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id r204-20020acac1d5000000b0037834b1a20bsm1235358oif.0.2023.02.16.17.39.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Feb 2023 17:39:10 -0800 (PST)
-Date:   Thu, 16 Feb 2023 17:39:08 -0800
-From:   Yury Norov <yury.norov@gmail.com>
-To:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Barry Song <baohua@kernel.org>,
-        Ben Segall <bsegall@google.com>,
-        Bruno Goncalves <bgoncalv@redhat.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Gal Pressman <gal@nvidia.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Haniel Bristot de Oliveira <bristot@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Kees Cook <kees@kernel.org>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Mel Gorman <mgorman@suse.de>,
-        Peter Lafreniere <peter@n8pjl.ca>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Tariq Toukan <ttoukan.linux@gmail.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 3/9] sched: add sched_numa_find_nth_cpu()
-Message-ID: <Y+7avK6V9SyAWsXi@yury-laptop>
-References: <20230121042436.2661843-1-yury.norov@gmail.com>
- <20230121042436.2661843-4-yury.norov@gmail.com>
+        Thu, 16 Feb 2023 22:04:17 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18AC953816;
+        Thu, 16 Feb 2023 19:04:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B83E0B82AF2;
+        Fri, 17 Feb 2023 03:04:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBE80C433EF;
+        Fri, 17 Feb 2023 03:04:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676603054;
+        bh=tnwZHUNV/A6Ohqf/7DM1M/eShouPHHc1DKhnpkFHCH0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=q3kP69MGqucrdNFfVA9sfK7SZKXlnLHxzCNecX4QorMGw56xDYPqlkLmfBrNM5ESi
+         fo9+TpSFCATip2io+s3YbuZfexRP3UkuB/keMdtDlQ6OYKV3UWlo+L+64+H9tJpKWM
+         86B53aphhQsaDhVD22TWo1HCVbVjNrt55jTiU4+7xpwH8uyG+KAMZbFkxDcRdEx3tH
+         YDSTQSBR3kiz87IVpJMIH0VjoFHdrL545VuTBV0mYB85SgPDGToZfluyPaPLHpyybB
+         4U4EH/pchFibuT0JFWL0oPukXI7ycYim1aE4dJAs9z3oeUIBw5qityrcPFvuOLPh6L
+         3Zh2R2tQHQaBg==
+Date:   Thu, 16 Feb 2023 19:04:12 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Steve French <sfrench@samba.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 11/17] cifs: Add a function to Hash the contents of an
+ iterator
+Message-ID: <Y+7urFTFOCXOq5kp@sol.localdomain>
+References: <20230216214745.3985496-1-dhowells@redhat.com>
+ <20230216214745.3985496-12-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230121042436.2661843-4-yury.norov@gmail.com>
+In-Reply-To: <20230216214745.3985496-12-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jakub,
+On Thu, Feb 16, 2023 at 09:47:39PM +0000, David Howells wrote:
+> Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
+> iterator into a symmetric hash algorithm.
 
-Can you please fold-in the following patch? 
+I think you mean a "synchronous hash algorithm".
 
-Thanks,
-Yury
-
-From: Yury Norov <yury.norov@gmail.com>
-Date: Thu, 16 Feb 2023 17:03:30 -0800
-Subject: [PATCH] sched/topology: fix KASAN warning in hop_cmp()
-
-Despite that prev_hop is used conditionally on curr_hop is not the
-first hop, it's initialized unconditionally.
-
-Because initialization implies dereferencing, it might happen that
-the code dereferences uninitialized memory, which has been spotted by
-KASAN. Fix it by reorganizing hop_cmp() logic.
-
-Reported-by: Bruno Goncalves <bgoncalv@redhat.com>
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- kernel/sched/topology.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-index 48838a05c008..c21b8b1f3537 100644
---- a/kernel/sched/topology.c
-+++ b/kernel/sched/topology.c
-@@ -2081,14 +2081,19 @@ struct __cmp_key {
- 
- static int hop_cmp(const void *a, const void *b)
- {
--	struct cpumask **prev_hop = *((struct cpumask ***)b - 1);
--	struct cpumask **cur_hop = *(struct cpumask ***)b;
-+	struct cpumask **prev_hop, **cur_hop = *(struct cpumask ***)b;
- 	struct __cmp_key *k = (struct __cmp_key *)a;
- 
- 	if (cpumask_weight_and(k->cpus, cur_hop[k->node]) <= k->cpu)
- 		return 1;
- 
--	k->w = (b == k->masks) ? 0 : cpumask_weight_and(k->cpus, prev_hop[k->node]);
-+	if (b == k->masks) {
-+		k->w = 0;
-+		return 0;
-+	}
-+
-+	prev_hop = *((struct cpumask ***)b - 1);
-+	k->w = cpumask_weight_and(k->cpus, prev_hop[k->node]);
- 	if (k->w <= k->cpu)
- 		return 0;
- 
--- 
-2.34.1
-
+- Eric
