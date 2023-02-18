@@ -2,144 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5686AC05027
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Feb 2023 22:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0588C61DA4
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Feb 2023 05:38:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjBQWUZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Feb 2023 17:20:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48434 "EHLO
+        id S229648AbjBRFil (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Feb 2023 00:38:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbjBQWUY (ORCPT
+        with ESMTP id S229436AbjBRFik (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Feb 2023 17:20:24 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D0563BF3;
-        Fri, 17 Feb 2023 14:20:19 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31HKZTg4015157;
-        Fri, 17 Feb 2023 22:20:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : subject; s=pp1;
- bh=mhjb/9tQC18m3DhbPkph4yznk7N7qkt/C7MEhpyUlaw=;
- b=EmRI3W7mwpln/lGJil90AkGhWxyb8obVLwOz8QGWdcR6X8icseAJNwe3Fkua78vb3iBZ
- CiDd+3SqTy0jqZwTc1UY3hEaArElbX3RtxuW5XqZREZrV3hKqgVlLgS03aQNwghFPmSy
- PHRBz+8ZOKi3iSnsQHCaijH344voSvebh0rvozAbkTomqpbOgegS8gnal1fZFyIciI7i
- Bw2SkajqoUnrQKfyRN32y6rWq6p9P0ZaHX0PkSdJqGIraRKfqwBTM4ngwCxoDdOcipEG
- 0Bc48ZNcoqE2VwuJqPfUwbeA8SAuMadrBmq8sV6UJexEhmMVP9lZ7jfX2kChabEldqVN 9A== 
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nte73dte4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 22:20:10 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31HM0lgZ000883;
-        Fri, 17 Feb 2023 22:20:09 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
-        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3np2n82cr9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Feb 2023 22:20:09 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31HMK7Vv60031332
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Feb 2023 22:20:08 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D884E58052;
-        Fri, 17 Feb 2023 22:20:07 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57C7358054;
-        Fri, 17 Feb 2023 22:20:07 +0000 (GMT)
-Received: from [9.163.28.78] (unknown [9.163.28.78])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Feb 2023 22:20:07 +0000 (GMT)
-Message-ID: <02d4b4b5-4292-aef0-8e20-7ec031348e91@linux.ibm.com>
-Date:   Fri, 17 Feb 2023 16:20:06 -0600
+        Sat, 18 Feb 2023 00:38:40 -0500
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2055.outbound.protection.outlook.com [40.107.96.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301E75CF1A;
+        Fri, 17 Feb 2023 21:38:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JR7g3RfeqRnEm6+WiAPtwj2/FzibXYkH9ECxMbPASA5DGH2ln9vqkd7PEBdncfe9wcfCrdMIHG2FuCZShxWDARZhP2nokKJ4WNzU/CZ5pjnRr9iyO5aleBoVgYCQLetekQeJ5I68cnNRbFmtOoHhxa+C8Ab2IXBgGKJwGoUUDBq2F5SPA+OCuM5ExSqHaa8iBMKL0NE0SfjU4taNlsJOsnxrOk7OhzvWYa4EQ1EgI0jzzv1JeMhKPm3uCxSN+9k+EGAluLly7cN4ybLJHzpdgxy5y2ONbn4u8elnXqWPln/lEaHwRqm2+zPy0ZHlctjxMyWsnrZKuZJELrJADaYKNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jj5SHFDulF6gxWkCEuxIU7+ZPeHjzo76uZ2/FrC+NKQ=;
+ b=gGn9tUNJpSdJ8CJQLHtXFocRhHy6hrSLp9ve4uG1ASYArZ48bS9QokkmbYzwvScbn7HcpZdZQEw8Ce0R7aKUBiig94bmjZtEZcoW8/x6VdSrEKffS27W5TJDhSJ6TqItyd5Vy/nhxVpCn3jNvbG0mwX0qXvExWafRq55oW25J6q+9TSUnQVMp5g/OMff/ZZgKiBmouSgd27el4Ny90ai+1HW2lTHStW1xRbgfLYWwLWwalNose7nfrc76ankrHiWpPViAQlRwa2Psgg2qX7u8ufThiHj1a7EKVWi/bSsVE2FM8P2e5g/OsuRWg0GEusG36NPN33w5MNVPJzcK92xBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jj5SHFDulF6gxWkCEuxIU7+ZPeHjzo76uZ2/FrC+NKQ=;
+ b=fD61eynzvJxaRtSx5qZ1I/6+04Scjpu1GNcIKf6h+u3PfQwsIM7SMJ1ys67EkaiLqhvBR2KhCZHopZ2aORqa7Xsmx15We6rQcy88H3L4nA8zyqgmmNVG53td+2SdcNWAhx1Z8Vz4Ewxnj9kgzbMGpCpBlQQ9/Fbkpd3DEVTLAvI=
+Received: from BN9PR03CA0924.namprd03.prod.outlook.com (2603:10b6:408:107::29)
+ by CY8PR12MB7636.namprd12.prod.outlook.com (2603:10b6:930:9f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.12; Sat, 18 Feb
+ 2023 05:38:36 +0000
+Received: from BN8NAM11FT028.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:107:cafe::a3) by BN9PR03CA0924.outlook.office365.com
+ (2603:10b6:408:107::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.17 via Frontend
+ Transport; Sat, 18 Feb 2023 05:38:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT028.mail.protection.outlook.com (10.13.176.225) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6111.18 via Frontend Transport; Sat, 18 Feb 2023 05:38:34 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 17 Feb
+ 2023 23:38:34 -0600
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
+ (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 17 Feb
+ 2023 21:38:33 -0800
+Received: from xhdharshah40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
+ Transport; Fri, 17 Feb 2023 23:38:31 -0600
+From:   Harsha Harsha <harsha.harsha@amd.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <michals@xilinx.com>
+CC:     <saratcha@xilinx.com>, <git@amd.com>,
+        Harsha Harsha <harsha.harsha@amd.com>
+Subject: [PATCH 0/4] crypto: Add Xilinx ZynqMP RSA driver support
+Date:   Sat, 18 Feb 2023 11:08:05 +0530
+Message-ID: <20230218053809.1780-1-harsha.harsha@amd.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.7.2
-Content-Language: en-US
-To:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "leitao@debian.org" <leitao@debian.org>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "appro@cryptogams.org" <appro@cryptogams.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ltcgcw@linux.vnet.ibm.com" <ltcgcw@linux.vnet.ibm.com>,
-        "dtsen@us.ibm.com" <dtsen@us.ibm.com>
-References: <20230217161805.236319-1-dtsen@linux.ibm.com>
- <20230217161805.236319-2-dtsen@linux.ibm.com>
- <MW5PR84MB1842DB9DF917B9B3B83A005BABA19@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-From:   Danny Tsen <dtsen@linux.ibm.com>
-In-Reply-To: <MW5PR84MB1842DB9DF917B9B3B83A005BABA19@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XYCtLY4FySTB1k31z7lEQ3LapKtKWems
-X-Proofpoint-GUID: XYCtLY4FySTB1k31z7lEQ3LapKtKWems
-Subject: RE: [PATCH v3 1/6] Update Kconfig and Makefile.
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-17_15,2023-02-17_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 spamscore=0
- malwarescore=0 lowpriorityscore=0 phishscore=0 clxscore=1011
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302170193
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT028:EE_|CY8PR12MB7636:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2001188-8352-4da3-b9c4-08db11726082
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r+U3ymawVBmdRGKPdXZdVEKmpjviLSaYP2rQdCvvOYQVFsAYYCHVO3Xwn++aEFX5GYW5GB4Hlw6BngQq/jepJ7kNWId6UplmPpuQZrwPpPFfWXaS/y8mzmBtGk1pUraFBIoIa/VszRslSi0vV2pip4maKBHXD/lOq+XczB1DYJ4voztPEOzngry8D2zRLzusxp5/XeFYsFg0bBNGvpvIHl/hcnRFMU8fGHJwDl1xbepXjb/W1MHT7Y7MMjm5kfrhyXOZ8o0Ovb39ce1ntMeymdXd9CxyNUtG8KMeQk/ebLtw9fXo9QdIDNIqTGm7nVCYM9EfmPEzeyqmVwz83eblLK6MoMe6XSipFDDplB9/nU9Vsz7pYMzZ2tWkYoa0MrvihgS9Z4vcXpONYEIs7B3Unhh8jb4qofTqcjVOUchaxHW4BFb+MjZk2ffywujFcFog274481nYZVz3n+DfTdCFhGcIzHKe/uNMYdSH2bS39mYfMgLMmOJQqJmoApehNRswaCxyCcXs3/4OCX07Tui0kKDSyhSqVANGIH8IZOgjAQ5C0wKSwXImtF+HhEIi8gqM/WrJu5DGnOUqjuqZKWZvXEc9p+UqSKndtl7CjlWqYW21e4zAXR0vPvaAkQlEn9XQXTFnu6SJUFj3zL3kw24otAr/6kn3HbEQJCa1ePtL+66L2vJ4EgJ2BnFFg6Ak8Lh3r4sotzmEPor8MqGm5y3FP3hFy/M8Ndj/+yQs1+bnH5hueKF8JEBgkpJJyRtYN+lC
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(136003)(346002)(396003)(376002)(39860400002)(451199018)(40470700004)(36840700001)(46966006)(478600001)(83380400001)(47076005)(426003)(316002)(36756003)(54906003)(81166007)(356005)(36860700001)(110136005)(2906002)(82740400003)(86362001)(82310400005)(40460700003)(70586007)(8676002)(70206006)(4326008)(5660300002)(8936002)(40480700001)(4744005)(41300700001)(26005)(2616005)(1076003)(44832011)(6666004)(186003)(336012)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2023 05:38:34.5712
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2001188-8352-4da3-b9c4-08db11726082
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT028.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7636
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Robert,
+This patch set does the following:
+  - Get the SoC family specific data for crypto operation
+  - Adds communication layer support for zynqmp_pm_rsa in zynqmp.c
+  - Adds Xilinx driver for RSA Algorithm
+  - Updates the list of MAINTAINERS
 
-Power10+ means Power10 or later.  Other modes were not stripped by the 
-perl script.
+Harsha Harsha (4):
+  firmware: xilinx: Get the SoC family specific data for crypto
+    operation
+  firmware: xilinx: Add ZynqMP RSA API for RSA encrypt/decrypt operation
+  crypto: xilinx: Add ZynqMP RSA driver
+  MAINTAINERS: Add maintainer for Xilinx ZynqMP RSA driver
 
-Thanks for the comments I will fix the suggestions.
+ MAINTAINERS                          |   5 +
+ drivers/crypto/Kconfig               |  10 +
+ drivers/crypto/xilinx/Makefile       |   1 +
+ drivers/crypto/xilinx/xilinx-rsa.c   | 489 +++++++++++++++++++++++++++
+ drivers/firmware/xilinx/zynqmp.c     | 100 ++++++
+ include/linux/firmware/xlnx-zynqmp.h |  42 +++
+ 6 files changed, 647 insertions(+)
+ create mode 100644 drivers/crypto/xilinx/xilinx-rsa.c
 
--Danny
+-- 
+2.36.1
 
-On 2/17/23 3:44 PM, Elliott, Robert (Servers) wrote:
->> +config CRYPTO_P10_AES_GCM
->> +	tristate "Stitched AES/GCM acceleration support on P10+ CPU (PPC)"
->> +	depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
->> +	select CRYPTO_LIB_AES
->> +	select CRYPTO_ALGAPI
->> +	select CRYPTO_AEAD
->> +	default m
->> +	help
->> +	  Support for cryptographic acceleration instructions on Power10+ CPU.
->> +	    This module supports stitched acceleration for AES/GCM in
->> hardware.
-> Is "Power10+" a specific architecture or does that mean "Power10 or later"?
->
-> Please follow the newer wording conventions for the menu item and
-> help text, more like:
->
-> config CRYPTO_AES_GCM_PPC_P10
->          tristate "AEAD cipher: AES in GCM mode (Power10)"
->
->          help
->            AEAD cipher: AES cipher algorithms (FIPS-197) with
-> 	   GCM (Galois/Counter Mode) authenticated encryption mode (NIST SP800-38D)
->
->            Architecture: powerpc64 using:
->            - little-endian
->            - Power10 features
->
->            [some description here]
->
-> Also, all the other powerpc cra_driver_names follow
-> 	alg-arch
-> not
-> 	arch-alg
->
-> so
-> 	.base.cra_driver_name	= "p10_aes_gcm",
-> might be better as
-> 	.base.cra_driver_name	= "aes-gcm-p10",
->
-> Patch 4 seems to have code for lots of other modes like CBC and XTS.
-> Does the perl script strip out all of that?
->
->
->
