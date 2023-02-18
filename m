@@ -2,61 +2,60 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EAEC636CC
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Feb 2023 20:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6833DC6379F
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Feb 2023 20:59:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjBRU7e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Feb 2023 15:59:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36266 "EHLO
+        id S229669AbjBRU7f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 18 Feb 2023 15:59:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbjBRU7c (ORCPT
+        with ESMTP id S229478AbjBRU7d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Feb 2023 15:59:32 -0500
+        Sat, 18 Feb 2023 15:59:33 -0500
 Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F276114239
-        for <linux-crypto@vger.kernel.org>; Sat, 18 Feb 2023 12:59:29 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id ec30so5335939edb.10
-        for <linux-crypto@vger.kernel.org>; Sat, 18 Feb 2023 12:59:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868C714EA9
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Feb 2023 12:59:32 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id t19so4722633edi.13
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Feb 2023 12:59:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1CdgShzJsLfglTo1Xd8hw9nnwHbg4uyqhCM3K/USB0M=;
-        b=J5nWCaZqzX/ZvFVcvj2Aiyl/2tE3nKuC6Cu1p4AccJHRmqBjypVHdWoXGMN3bU/WL3
-         Dz5ZUwBPcqm7BJhvP1pJvWcjckmmTYrwSP4RZyACmiam65fA4utvDdcYuFUpC46nKSf5
-         5nZ0DdBF7LMKduLKy9vVUZDADy1w+CPcM457qH2SzJompaBGiMEewf2vPD1BVqEmygQN
-         E9B6RQ80LbJwLS5MVgl//+XaEgJGCcjZ6tQHO/HDdKTEJyP2y/KOTD9g2ft+k4I2H5fG
-         JvVPoQGrBSy3xNjakAjnsh2jNwvVMBacVnv+B0Rgmck66c8EXb90n1tg7bNYXw9KzHss
-         RESQ==
+        bh=5/WDNEbgisYy7HKbKtg3x5sM5lSnk3f53fWjIWsdioM=;
+        b=Y5gt30hgLmyK/3disDGoNv7X5srdEOUlDiSjD/3a48VwOFAiYNikZNzBVmseWIQhc8
+         wmvRaOKgWbilnzKnxSlytLpkd6KzKJsiKCs5+q7xHD+eKN8kEQisu/hE0KiDbbqM0cFb
+         n8vcdXIsovnFq0a8/68NvPOMDA39RCIuJfGy4fvcKRKD5zFwvtQmFoB4LT/zV8KB1qFH
+         flHf1ONOnMquhWR1LE+59FNbM1msej2cg85DdtkUbl4LBz7z73l521/1eoGY0jjpxAId
+         +swPpoZFN9EnsJt2paeQsP7Ufukg4c+eKVMcz+ZDSjakeyNohtIZcc9p2MhAW6l67PEh
+         X9rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1CdgShzJsLfglTo1Xd8hw9nnwHbg4uyqhCM3K/USB0M=;
-        b=lYKKug4UhuULRjYAGFxpv8bWe6ZcA5Q04EGUG1qh7Z1g3XeHvzez1jqY30gpji9a5U
-         3bkaBOj/6tTlqj2VVDUwKOxeWvzNsCadZ8vBguOQcfz1KA6kEMp6quvAQKbfuuKx+IgU
-         xD6yoyyRVzZ/XkmnDrcDwTeS2+7E0AX26pxjLkRcaPX/peCGWUy1oDegNnbSI50CqS8A
-         y1kxGGT4ShvH0wg2cXZLAWug0IkxkqMrBnwG5ZpH7u/ISGhiiK0KXTwr51U+HyG6HKpO
-         2VbjVV8SyAH2Ta5bGFZeQe5uwGPIUMHHqFpbF3ZVL+dVSsm1F0/t5tTih6Oh+NT+rnZ8
-         8ebg==
-X-Gm-Message-State: AO0yUKX4OI134CuTxI94DJzwEMvJTR7yjr1nvSV6igRo/KkBtPsjd3uM
-        1ArCOV9tkbUJsjKMEqxZfE0=
-X-Google-Smtp-Source: AK7set+pVqKO0qtR2rjMhz2whJ4ZFXhhPKg0n2vy/N4o4SSV+VoJpI48u988WW+cuxwn7blOgg6xFA==
-X-Received: by 2002:a05:6402:18:b0:4ab:4011:ff3d with SMTP id d24-20020a056402001800b004ab4011ff3dmr4876606edu.0.1676753968290;
-        Sat, 18 Feb 2023 12:59:28 -0800 (PST)
+        bh=5/WDNEbgisYy7HKbKtg3x5sM5lSnk3f53fWjIWsdioM=;
+        b=wAKuOdEmhHGMfJHqsfzKxTqPogg9OSM86kgy5JxxJ3pPiAxQlWcjOdFaJLK56cNcHE
+         9u257otqG+0Z9JlGWH7KdwtfHRczfVgOczW8ZlmCPGQnkqPkTMX7CRoBsjuLeymgS12Y
+         oWukwkE5C+1oSth7INqag01TYRvfKF80Mcrmmem6uSTbWShbltfaMaY1EGaea7Qm5DGT
+         ooDc/n4BXiDaZ89xGm3Jvu0YIQOT8gC9A51M7WgCY+7n/hCDUk1WeZeuEquOr5J/hqUd
+         ySvIU+zYJf7nLzDpkBqzfTqF0zbNXoqwC53b8JALO/tGQPOwPpzT8niVDmzgYO4r1ARe
+         8blQ==
+X-Gm-Message-State: AO0yUKXGgbOSGR1vKP6xCog9hDe/xPlc28YqOiQTS96FUddhTIv67mop
+        oOSgl9DufBvkFoVxiTtaWhE=
+X-Google-Smtp-Source: AK7set+1fXie4wFZicnTmT6HJm5KRsiKzoOl5iHtScvxq3/fscAEsLtL00IXPlWW+dYOolN6W6DI8w==
+X-Received: by 2002:a17:906:aad6:b0:8b1:3b95:cf3f with SMTP id kt22-20020a170906aad600b008b13b95cf3fmr4095079ejb.70.1676753971103;
+        Sat, 18 Feb 2023 12:59:31 -0800 (PST)
 Received: from ?IPV6:2a01:c22:7b82:af00:2955:cfd1:cf55:9ea? (dynamic-2a01-0c22-7b82-af00-2955-cfd1-cf55-09ea.c22.pool.telefonica.de. [2a01:c22:7b82:af00:2955:cfd1:cf55:9ea])
-        by smtp.googlemail.com with ESMTPSA id h11-20020a50cdcb000000b004aaa4da918fsm3983907edj.45.2023.02.18.12.59.27
+        by smtp.googlemail.com with ESMTPSA id s21-20020a1709060c1500b00887f6c39ac0sm3762386ejf.98.2023.02.18.12.59.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Feb 2023 12:59:27 -0800 (PST)
-Message-ID: <7d1fc713-850d-d9cd-3fe2-60fd690f406a@gmail.com>
-Date:   Sat, 18 Feb 2023 21:57:18 +0100
+        Sat, 18 Feb 2023 12:59:30 -0800 (PST)
+Message-ID: <db2112cf-ff3e-e2e6-9eca-1b5956d921fd@gmail.com>
+Date:   Sat, 18 Feb 2023 21:59:08 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: [PATCH 3/5] hwrng: meson: remove not needed call to
- platform_set_drvdata
+Subject: [PATCH 5/5] hwrng: meson: remove struct meson_rng_data
 Content-Language: en-US
 From:   Heiner Kallweit <hkallweit1@gmail.com>
 To:     Olivia Mackall <olivia@selenic.com>,
@@ -77,26 +76,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-drvdata isn't used, therefore remove this call.
+Because no other members of struct meson_rng_data are left,
+we can remove it completely.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/char/hw_random/meson-rng.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/char/hw_random/meson-rng.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index 22e3dcc6f..a4eb8e35f 100644
+index bf7a6e594..633d98b48 100644
 --- a/drivers/char/hw_random/meson-rng.c
 +++ b/drivers/char/hw_random/meson-rng.c
-@@ -53,8 +53,6 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	data->rng.name = pdev->name;
- 	data->rng.read = meson_rng_read;
+@@ -16,10 +16,6 @@
  
--	platform_set_drvdata(pdev, data);
+ #define RNG_DATA 0x00
+ 
+-struct meson_rng_data {
+-	struct hwrng rng;
+-};
 -
- 	return devm_hwrng_register(dev, &data->rng);
+ static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ {
+ 	void __iomem *base = (__force void __iomem *)rng->priv;
+@@ -32,12 +28,12 @@ static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ static int meson_rng_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+-	struct meson_rng_data *data;
+ 	struct clk *core_clk;
+ 	void __iomem *base;
++	struct hwrng *rng;
+ 
+-	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+-	if (!data)
++	rng = devm_kzalloc(dev, sizeof(*rng), GFP_KERNEL);
++	if (!rng)
+ 		return -ENOMEM;
+ 
+ 	base = devm_platform_ioremap_resource(pdev, 0);
+@@ -49,11 +45,11 @@ static int meson_rng_probe(struct platform_device *pdev)
+ 		return dev_err_probe(dev, PTR_ERR(core_clk),
+ 				     "Failed to get core clock\n");
+ 
+-	data->rng.name = pdev->name;
+-	data->rng.read = meson_rng_read;
+-	data->rng.priv = (__force unsigned long)base;
++	rng->name = pdev->name;
++	rng->read = meson_rng_read;
++	rng->priv = (__force unsigned long)base;
+ 
+-	return devm_hwrng_register(dev, &data->rng);
++	return devm_hwrng_register(dev, rng);
  }
  
+ static const struct of_device_id meson_rng_of_match[] = {
 -- 
 2.39.2
 
